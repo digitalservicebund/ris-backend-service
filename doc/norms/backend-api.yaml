@@ -336,6 +336,10 @@ components:
         - DIVERGENT_EXPIRATION_DEFINED
         - DIVERGENT_EXPIRATION_UNDEFINED
         - CATEGORIZED_REFERENCE
+        - ENTRY_INTO_FORCE
+        - PRINCIPLE_ENTRY_INTO_FORCE
+        - EXPIRATION
+        - PRINCIPLE_EXPIRATION
 
     MetadataSection:
       type: object
@@ -481,10 +485,6 @@ components:
         footnoteEuLaw:
           type: string
           example: ''
-        expirationDate:
-          $ref: '#/components/schemas/Date'
-        entryIntoForceDate:
-          $ref: '#/components/schemas/Date'
         risAbbreviation:
           type: string
           example: SaubFahrzeugBeschG
@@ -535,14 +535,6 @@ components:
         text:
           type: string
           example: text
-        principleExpirationDate:
-          $ref: '#/components/schemas/Date'
-        principleExpirationDateState:
-          $ref: '#/components/schemas/UndefinedDate'
-        principleEntryIntoForceDate:
-          $ref: '#/components/schemas/Date'
-        principleEntryIntoForceDateState:
-          $ref: '#/components/schemas/UndefinedDate'
         publicationDate:
           $ref: '#/components/schemas/Date'
         documentStatusReference:
@@ -574,15 +566,6 @@ components:
           type: string
           example: ''
         digitalEvidenceAppendix:
-          type: string
-          example: ''
-        isExpirationDateTemp:
-          type: boolean
-          example: false
-        expirationDateState:
-          type: string
-          example: ''
-        entryIntoForceDateState:
           type: string
           example: ''
         metadataSections:

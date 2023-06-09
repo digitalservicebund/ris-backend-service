@@ -175,6 +175,7 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
     },
     {
       heading: "Dokumenttyp",
+      isExpandableNotRepeatable: true,
       id: "documentTypes",
       fields: [
         {
@@ -402,31 +403,81 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
       ],
     },
     {
-      heading: "Inkrafttreten",
+      heading: "Datum des Inkrafttretens",
+      isExpandableNotRepeatable: true,
+      id: "entryIntoForces",
       fields: [
+        {
+          type: FieldType.RADIO,
+          id: "entryIntoForceSelection",
+          label: "bestimmt",
+          values: norm.metadataSections?.ENTRY_INTO_FORCE?.map(
+            (section) => !!section?.DATE
+          ),
+        },
         {
           type: FieldType.TEXT,
           id: "entryIntoForceDate",
-          label: "Datum des Inkrafttretens",
-          value: norm.entryIntoForceDate,
+          label: "Bestimmtes Inkrafttretedatum",
+          values: norm.metadataSections?.ENTRY_INTO_FORCE?.map(
+            (section) => section?.DATE?.[0]
+          ),
+        },
+        {
+          type: FieldType.RADIO,
+          id: "entryIntoForceUndefinedSelection",
+          label: "unbestimmt",
+          values: norm.metadataSections?.ENTRY_INTO_FORCE?.map(
+            (section) => !!section?.UNDEFINED_DATE
+          ),
         },
         {
           type: FieldType.DROPDOWN,
-          id: "entryIntoForceDateState",
-          label: "Unbestimmtes Datum des Inkrafttretens",
-          value: norm.entryIntoForceDateState,
+          id: "entryIntoForceUndefinedDateState",
+          label: "Unbestimmtes Inkrafttretedatum",
+          values: norm.metadataSections?.ENTRY_INTO_FORCE?.map((section) =>
+            undefinedDateToDropdownEntry(section?.UNDEFINED_DATE?.[0])
+          ),
+        },
+      ],
+    },
+    {
+      heading: "Grundsätzliches Inkrafttretedatum",
+      isExpandableNotRepeatable: true,
+      id: "principleEntryIntoForces",
+      fields: [
+        {
+          type: FieldType.RADIO,
+          id: "principleEntryIntoForceSelection",
+          label: "bestimmt",
+          values: norm.metadataSections?.PRINCIPLE_ENTRY_INTO_FORCE?.map(
+            (section) => !!section?.DATE
+          ),
         },
         {
           type: FieldType.TEXT,
           id: "principleEntryIntoForceDate",
-          label: "Grundsätzliches Inkrafttretedatum",
-          value: norm.principleEntryIntoForceDate,
+          label: "Bestimmtes grundsätzliches Inkrafttretedatum",
+          values: norm.metadataSections?.PRINCIPLE_ENTRY_INTO_FORCE?.map(
+            (section) => section?.DATE?.[0]
+          ),
+        },
+        {
+          type: FieldType.RADIO,
+          id: "principleEntryIntoForceUndefinedSelection",
+          label: "unbestimmt",
+          values: norm.metadataSections?.PRINCIPLE_ENTRY_INTO_FORCE?.map(
+            (section) => !!section?.UNDEFINED_DATE
+          ),
         },
         {
           type: FieldType.DROPDOWN,
-          id: "principleEntryIntoForceDateState",
+          id: "principleEntryIntoForceUndefinedDateState",
           label: "Unbestimmtes grundsätzliches Inkrafttretedatum",
-          value: norm.principleEntryIntoForceDateState,
+          values: norm.metadataSections?.PRINCIPLE_ENTRY_INTO_FORCE?.map(
+            (section) =>
+              undefinedDateToDropdownEntry(section?.UNDEFINED_DATE?.[0])
+          ),
         },
       ],
     },
@@ -574,37 +625,80 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
       ],
     },
     {
-      heading: "Außerkrafttreten",
+      heading: "Datum des Außerkrafttretens",
+      isExpandableNotRepeatable: true,
+      id: "expirations",
       fields: [
+        {
+          type: FieldType.RADIO,
+          id: "expirationSelection",
+          label: "bestimmt",
+          values: norm.metadataSections?.EXPIRATION?.map(
+            (section) => !!section?.DATE
+          ),
+        },
         {
           type: FieldType.TEXT,
           id: "expirationDate",
-          label: "Datum des Außerkrafttretens",
-          value: norm.expirationDate,
+          label: "Bestimmtes Außerkrafttretedatum",
+          values: norm.metadataSections?.EXPIRATION?.map(
+            (section) => section?.DATE?.[0]
+          ),
+        },
+        {
+          type: FieldType.RADIO,
+          id: "expirationUndefinedSelection",
+          label: "unbestimmt",
+          values: norm.metadataSections?.EXPIRATION?.map(
+            (section) => !!section?.UNDEFINED_DATE
+          ),
         },
         {
           type: FieldType.DROPDOWN,
-          id: "expirationDateState",
-          label: "Unbestimmtes Datum des Außerkrafttretens",
-          value: norm.expirationDateState,
+          id: "expirationUndefinedDate",
+          label: "Unbestimmtes Außerkrafttretedatum",
+          values: norm.metadataSections?.EXPIRATION?.map((section) =>
+            undefinedDateToDropdownEntry(section?.UNDEFINED_DATE?.[0])
+          ),
         },
+      ],
+    },
+    {
+      heading: "Grundsätzliches Außerkrafttretedatum",
+      isExpandableNotRepeatable: true,
+      id: "principleExpirations",
+      fields: [
         {
-          type: FieldType.CHECKBOX,
-          id: "isExpirationDateTemp",
-          label: "Befristet",
-          value: norm.isExpirationDateTemp,
+          type: FieldType.RADIO,
+          id: "principleExpirationSelection",
+          label: "bestimmt",
+          values: norm.metadataSections?.PRINCIPLE_EXPIRATION?.map(
+            (section) => !!section?.DATE
+          ),
         },
         {
           type: FieldType.TEXT,
           id: "principleExpirationDate",
-          label: "Grundsätzliches Außerkrafttretedatum",
-          value: norm.principleExpirationDate,
+          label: "Bestimmtes grundsätzliches Außerkrafttretedatum",
+          values: norm.metadataSections?.PRINCIPLE_EXPIRATION?.map(
+            (section) => section?.DATE?.[0]
+          ),
+        },
+        {
+          type: FieldType.RADIO,
+          id: "principleExpirationUndefinedSelection",
+          label: "unbestimmt",
+          values: norm.metadataSections?.PRINCIPLE_EXPIRATION?.map(
+            (section) => !!section?.UNDEFINED_DATE
+          ),
         },
         {
           type: FieldType.DROPDOWN,
-          id: "principleExpirationDateState",
-          label: "Unbestimmtes grundsätzliches Außerkrafttretdatum",
-          value: norm.principleExpirationDateState,
+          id: "principleExpirationUndefinedDate",
+          label: "Unbestimmtes grundsätzliches Außerkrafttretedatum",
+          values: norm.metadataSections?.PRINCIPLE_EXPIRATION?.map((section) =>
+            undefinedDateToDropdownEntry(section?.UNDEFINED_DATE?.[0])
+          ),
         },
       ],
     },

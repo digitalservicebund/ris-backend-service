@@ -21,7 +21,6 @@ import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.KEYWORD
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.PARTICIPATION_INSTITUTION
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.PARTICIPATION_TYPE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.YEAR
-import de.bund.digitalservice.ris.norms.domain.value.UndefinedDate
 import de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto.MetadatumDto
 import de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto.NormDto
 import org.assertj.core.api.Assertions.assertThat
@@ -446,8 +445,6 @@ class NormsServiceTest : PostgresTestcontainerIntegrationTest() {
         val updatedNorm = NORM.copy(
             officialLongTitle = "new title",
             documentNumber = "document number",
-            entryIntoForceDate = LocalDate.now(),
-            expirationDateState = UndefinedDate.UNDEFINED_FUTURE,
             completeCitation = "complete citation",
             celexNumber = "celex number",
         )
@@ -464,8 +461,6 @@ class NormsServiceTest : PostgresTestcontainerIntegrationTest() {
             .assertNext {
                 assertThat(it.officialLongTitle).isEqualTo(updatedNorm.officialLongTitle)
                 assertThat(it.documentNumber).isEqualTo(updatedNorm.documentNumber)
-                assertThat(it.entryIntoForceDate).isEqualTo(updatedNorm.entryIntoForceDate)
-                assertThat(it.expirationDateState).isEqualTo(updatedNorm.expirationDateState)
                 assertThat(it.completeCitation).isEqualTo(updatedNorm.completeCitation)
                 assertThat(it.celexNumber).isEqualTo(updatedNorm.celexNumber)
             }

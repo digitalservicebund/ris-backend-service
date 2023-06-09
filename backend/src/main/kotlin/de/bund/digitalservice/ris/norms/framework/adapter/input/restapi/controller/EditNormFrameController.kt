@@ -1,6 +1,5 @@
 package de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.controller
 
-import com.fasterxml.jackson.annotation.JsonProperty
 import de.bund.digitalservice.ris.norms.application.port.input.EditNormFrameUseCase
 import de.bund.digitalservice.ris.norms.domain.entity.MetadataSection
 import de.bund.digitalservice.ris.norms.domain.entity.Metadatum
@@ -50,19 +49,6 @@ class EditNormFrameController(private val editNormFrameService: EditNormFrameUse
 
         var officialShortTitle: String? = null
         var officialAbbreviation: String? = null
-
-        var entryIntoForceDate: String? = null
-        var entryIntoForceDateState: UndefinedDate? = null
-        var principleEntryIntoForceDate: String? = null
-        var principleEntryIntoForceDateState: UndefinedDate? = null
-
-        var expirationDate: String? = null
-        var expirationDateState: UndefinedDate? = null
-
-        @get:JsonProperty("isExpirationDateTemp")
-        var isExpirationDateTemp: Boolean? = null
-        var principleExpirationDate: String? = null
-        var principleExpirationDateState: UndefinedDate? = null
 
         var announcementDate: String? = null
         var publicationDate: String? = null
@@ -122,15 +108,6 @@ class EditNormFrameController(private val editNormFrameService: EditNormFrameUse
             this.documentCategory,
             this.officialShortTitle,
             this.officialAbbreviation,
-            decodeLocalDate(this.entryIntoForceDate),
-            this.entryIntoForceDateState,
-            decodeLocalDate(this.principleEntryIntoForceDate),
-            this.principleEntryIntoForceDateState,
-            decodeLocalDate(this.expirationDate),
-            this.expirationDateState,
-            this.isExpirationDateTemp,
-            decodeLocalDate(this.principleExpirationDate),
-            this.principleExpirationDateState,
             decodeLocalDate(this.announcementDate),
             decodeLocalDate(this.publicationDate),
             this.completeCitation,

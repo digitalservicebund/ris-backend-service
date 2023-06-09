@@ -10,11 +10,15 @@ import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName.DIVERGE
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName.DIVERGENT_EXPIRATION
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName.DIVERGENT_EXPIRATION_UNDEFINED
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName.DOCUMENT_TYPE
+import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName.ENTRY_INTO_FORCE
+import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName.EXPIRATION
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName.LEAD
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName.NORM
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName.NORM_PROVIDER
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName.OFFICIAL_REFERENCE
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName.PARTICIPATION
+import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName.PRINCIPLE_ENTRY_INTO_FORCE
+import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName.PRINCIPLE_EXPIRATION
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName.SUBJECT_AREA
 
 val hasValidSections =
@@ -35,6 +39,10 @@ val hasValidSections =
                 DIVERGENT_EXPIRATION,
                 DIVERGENT_EXPIRATION_UNDEFINED,
                 CATEGORIZED_REFERENCE,
+                ENTRY_INTO_FORCE,
+                PRINCIPLE_ENTRY_INTO_FORCE,
+                EXPIRATION,
+                PRINCIPLE_EXPIRATION,
             )
         }
     }

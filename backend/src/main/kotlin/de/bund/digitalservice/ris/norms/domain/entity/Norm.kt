@@ -4,7 +4,6 @@ import de.bund.digitalservice.ris.norms.domain.specification.norm.hasValidSectio
 import de.bund.digitalservice.ris.norms.domain.value.Eli
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType
-import de.bund.digitalservice.ris.norms.domain.value.UndefinedDate
 import java.time.LocalDate
 import java.util.UUID
 
@@ -20,17 +19,6 @@ data class Norm(
 
     var officialShortTitle: String? = null,
     var officialAbbreviation: String? = null,
-
-    var entryIntoForceDate: LocalDate? = null,
-    var entryIntoForceDateState: UndefinedDate? = null,
-    var principleEntryIntoForceDate: LocalDate? = null,
-    var principleEntryIntoForceDateState: UndefinedDate? = null,
-
-    var expirationDate: LocalDate? = null,
-    var expirationDateState: UndefinedDate? = null,
-    var isExpirationDateTemp: Boolean? = null,
-    var principleExpirationDate: LocalDate? = null,
-    var principleExpirationDateState: UndefinedDate? = null,
 
     var announcementDate: LocalDate? = null,
     var publicationDate: LocalDate? = null,

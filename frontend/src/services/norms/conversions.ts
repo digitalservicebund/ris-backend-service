@@ -35,10 +35,6 @@ function encodeString(data?: string | null): string | null {
   return data && data.length > 0 ? data : null
 }
 
-function encodeBooleanInFlatten(data?: boolean | null): boolean | null {
-  return data ?? null
-}
-
 // Makes the assumption that we currently get a date string in the following
 // format: `2022-11-14T23:00:00.000Z`. To comply with the expected date format
 // of the API, we only take the first 10 characters.
@@ -451,14 +447,7 @@ export function encodeFlatMetadata(
     documentStatusReference: encodeString(flatMetadata.documentStatusReference),
     documentStatusWorkNote: encodeString(flatMetadata.documentStatusWorkNote),
     documentTextProof: encodeString(flatMetadata.documentTextProof),
-    entryIntoForceDate: encodeNullDate(flatMetadata.entryIntoForceDate),
-    entryIntoForceDateState: encodeString(flatMetadata.entryIntoForceDateState),
     eli: encodeString(flatMetadata.eli),
-    expirationDate: encodeNullDate(flatMetadata.expirationDate),
-    expirationDateState: encodeString(flatMetadata.expirationDateState),
-    isExpirationDateTemp: encodeBooleanInFlatten(
-      flatMetadata.isExpirationDateTemp
-    ),
     officialAbbreviation: encodeString(flatMetadata.officialAbbreviation),
     officialLongTitle: encodeString(flatMetadata.officialLongTitle) ?? "",
     officialShortTitle: encodeString(flatMetadata.officialShortTitle),
@@ -470,18 +459,6 @@ export function encodeFlatMetadata(
     footnoteStateLaw: encodeString(flatMetadata.footnoteStateLaw),
     footnoteEuLaw: encodeString(flatMetadata.footnoteEuLaw),
     otherStatusNote: encodeString(flatMetadata.otherStatusNote),
-    principleEntryIntoForceDate: encodeNullDate(
-      flatMetadata.principleEntryIntoForceDate
-    ),
-    principleEntryIntoForceDateState: encodeString(
-      flatMetadata.principleEntryIntoForceDateState
-    ),
-    principleExpirationDate: encodeNullDate(
-      flatMetadata.principleExpirationDate
-    ),
-    principleExpirationDateState: encodeString(
-      flatMetadata.principleExpirationDateState
-    ),
     announcementDate: encodeNullDate(flatMetadata.announcementDate),
     publicationDate: encodeNullDate(flatMetadata.publicationDate),
     reissueArticle: encodeString(flatMetadata.reissueArticle),

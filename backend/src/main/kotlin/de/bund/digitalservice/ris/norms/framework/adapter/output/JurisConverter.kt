@@ -46,6 +46,7 @@ import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.VALIDITY_RULE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.YEAR
 import de.bund.digitalservice.ris.norms.domain.value.NormCategory
 import de.bund.digitalservice.ris.norms.domain.value.UndefinedDate
+import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.decodeLocalDate
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.encodeLocalDate
 import de.bund.digitalservice.ris.norms.juris.converter.extractor.extractData
 import de.bund.digitalservice.ris.norms.juris.converter.generator.generateZip
@@ -99,8 +100,6 @@ fun mapDomainToData(norm: Norm): NormData {
         citationDateList = citationDates.filterNotNull() + citationYears,
         documentCategory = norm.documentCategory,
         divergentDocumentNumber = divergentNumber,
-        entryIntoForceDate = encodeLocalDate(norm.entryIntoForceDate),
-        expirationDate = encodeLocalDate(norm.expirationDate),
         frameKeywordList = keywords,
         officialAbbreviation = norm.officialAbbreviation,
         officialLongTitle = norm.officialLongTitle,
@@ -150,7 +149,8 @@ fun mapDataToDomain(guid: UUID, data: NormData): Norm {
         createSectionsForDivergentEntryIntoForce(data.divergentEntryIntoForceList) +
         createSectionsForDivergentExpiration(data.divergentExpirationsList) +
         citationDateSections + ageIndicationSections + categorizedReferenceSections +
-        addProviderSections(data.normProviderList)
+        addProviderSections(data.normProviderList) +
+        createSectionForEntryIntoForceAndExpiration(data)
 
     return Norm(
         guid = guid,
@@ -161,15 +161,6 @@ fun mapDataToDomain(guid: UUID, data: NormData): Norm {
         documentCategory = data.documentCategory,
         officialShortTitle = data.officialShortTitle,
         officialAbbreviation = data.officialAbbreviation,
-        entryIntoForceDate = parseDateString(data.entryIntoForceDate),
-        entryIntoForceDateState = parseDateStateString(data.entryIntoForceDateState ?: ""),
-        principleEntryIntoForceDate = parseDateString(data.principleEntryIntoForceDate),
-        principleEntryIntoForceDateState =
-        parseDateStateString(data.principleEntryIntoForceDateState),
-        expirationDate = parseDateString(data.expirationDate),
-        expirationDateState = parseDateStateString(data.expirationDateState),
-        principleExpirationDate = parseDateString(data.principleExpirationDate),
-        principleExpirationDateState = parseDateStateString(data.principleExpirationDateState),
         announcementDate = parseDateString(data.announcementDate),
         statusNote = data.statusNote,
         statusDescription = data.statusDescription,
@@ -194,6 +185,44 @@ fun mapDataToDomain(guid: UUID, data: NormData): Norm {
         celexNumber = data.celexNumber,
         text = data.text,
     )
+}
+
+fun createSectionForEntryIntoForceAndExpiration(data: NormData): List<MetadataSection> {
+    val sectionList = mutableListOf<MetadataSection>()
+
+    if (data.entryIntoForceDate !== null) {
+        val metadata = Metadatum(decodeLocalDate(data.entryIntoForceDate), DATE)
+        sectionList.add(MetadataSection(MetadataSectionName.ENTRY_INTO_FORCE, listOf(metadata)))
+    } else if (data.entryIntoForceDateState !== null) {
+        val metadata = Metadatum(parseDateStateString(data.entryIntoForceDateState), UNDEFINED_DATE)
+        sectionList.add(MetadataSection(MetadataSectionName.ENTRY_INTO_FORCE, listOf(metadata)))
+    }
+
+    if (data.principleEntryIntoForceDate !== null) {
+        val metadata = Metadatum(decodeLocalDate(data.principleEntryIntoForceDate), DATE)
+        sectionList.add(MetadataSection(MetadataSectionName.PRINCIPLE_ENTRY_INTO_FORCE, listOf(metadata)))
+    } else if (data.principleEntryIntoForceDateState !== null) {
+        val metadata = Metadatum(parseDateStateString(data.principleEntryIntoForceDateState), UNDEFINED_DATE)
+        sectionList.add(MetadataSection(MetadataSectionName.PRINCIPLE_ENTRY_INTO_FORCE, listOf(metadata)))
+    }
+
+    if (data.expirationDate !== null) {
+        val metadata = Metadatum(decodeLocalDate(data.expirationDate), DATE)
+        sectionList.add(MetadataSection(MetadataSectionName.EXPIRATION, listOf(metadata)))
+    } else if (data.expirationDateState !== null) {
+        val metadata = Metadatum(parseDateStateString(data.expirationDateState), UNDEFINED_DATE)
+        sectionList.add(MetadataSection(MetadataSectionName.EXPIRATION, listOf(metadata)))
+    }
+
+    if (data.principleExpirationDate !== null) {
+        val metadata = Metadatum(decodeLocalDate(data.principleExpirationDate), DATE)
+        sectionList.add(MetadataSection(MetadataSectionName.PRINCIPLE_EXPIRATION, listOf(metadata)))
+    } else if (data.principleExpirationDateState !== null) {
+        val metadata = Metadatum(parseDateStateString(data.principleExpirationDateState), UNDEFINED_DATE)
+        sectionList.add(MetadataSection(MetadataSectionName.PRINCIPLE_EXPIRATION, listOf(metadata)))
+    }
+
+    return sectionList
 }
 
 private fun createSectionForDocumentType(documentType: DocumentType?): MetadataSection? {

@@ -165,6 +165,21 @@ export async function fillRepeatedMetadataSectionList(
   await finishButton.click()
 }
 
+export async function fillExpandableSectionNotRepeatable(
+  page: Page,
+  section: MetadataInputSection
+): Promise<void> {
+  await clearRepeatedMetadataSectionList(page, section)
+
+  const expandable = page.locator(`#${section.id}`)
+  await expandable.click()
+
+  await fillInputFieldGroup(page, section.fields ?? [], 0)
+
+  const finishButton = expandable.getByRole("button", { name: "Fertig" })
+  await finishButton.click()
+}
+
 export async function fillMetadataInputSection(
   page: Page,
   section: MetadataInputSection
@@ -173,6 +188,8 @@ export async function fillMetadataInputSection(
     await fillRepeatedMetadataSectionList(page, section)
   } else if (section.isSingleFieldSection) {
     await fillInputFieldGroup(page, section.fields ?? [])
+  } else if (section.isExpandableNotRepeatable) {
+    await fillExpandableSectionNotRepeatable(page, section)
   } else {
     await fillInputFieldGroup(page, section.fields ?? [])
 

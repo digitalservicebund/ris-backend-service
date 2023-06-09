@@ -455,4 +455,152 @@ class HasValidMetadataTest {
 
         assertThat(hasValidMetadata.isSatisfiedBy(instance)).isFalse()
     }
+
+    @Test
+    fun `can generate entry into force with a date value`() {
+        val instance = mockk<MetadataSection>()
+        every { instance.name } returns MetadataSectionName.ENTRY_INTO_FORCE
+        every { instance.sections } returns null
+        every { instance.metadata } returns listOf(
+            Metadatum(LocalDate.now(), MetadatumType.DATE),
+        )
+
+        assertThat(hasValidMetadata.isSatisfiedBy(instance)).isTrue()
+    }
+
+    @Test
+    fun `can generate entry into force with an Undefined date value`() {
+        val instance = mockk<MetadataSection>()
+        every { instance.name } returns MetadataSectionName.ENTRY_INTO_FORCE
+        every { instance.sections } returns null
+        every { instance.metadata } returns listOf(
+            Metadatum(UndefinedDate.UNDEFINED_UNKNOWN, MetadatumType.UNDEFINED_DATE),
+        )
+
+        assertThat(hasValidMetadata.isSatisfiedBy(instance)).isTrue()
+    }
+
+    @Test
+    fun `it throws an error on entry into foce with both a date and undefined date value`() {
+        val instance = mockk<MetadataSection>()
+        every { instance.name } returns MetadataSectionName.ENTRY_INTO_FORCE
+        every { instance.sections } returns null
+        every { instance.metadata } returns listOf(
+            Metadatum(LocalDate.now(), MetadatumType.DATE),
+            Metadatum(UndefinedDate.UNDEFINED_UNKNOWN, MetadatumType.UNDEFINED_DATE),
+        )
+
+        assertThat(hasValidMetadata.isSatisfiedBy(instance)).isFalse()
+    }
+
+    @Test
+    fun `can generate principle entry into force with a date value`() {
+        val instance = mockk<MetadataSection>()
+        every { instance.name } returns MetadataSectionName.PRINCIPLE_ENTRY_INTO_FORCE
+        every { instance.sections } returns null
+        every { instance.metadata } returns listOf(
+            Metadatum(LocalDate.now(), MetadatumType.DATE),
+        )
+
+        assertThat(hasValidMetadata.isSatisfiedBy(instance)).isTrue()
+    }
+
+    @Test
+    fun `can generate principle entry into force with an Undefined date value`() {
+        val instance = mockk<MetadataSection>()
+        every { instance.name } returns MetadataSectionName.PRINCIPLE_ENTRY_INTO_FORCE
+        every { instance.sections } returns null
+        every { instance.metadata } returns listOf(
+            Metadatum(UndefinedDate.UNDEFINED_UNKNOWN, MetadatumType.UNDEFINED_DATE),
+        )
+
+        assertThat(hasValidMetadata.isSatisfiedBy(instance)).isTrue()
+    }
+
+    @Test
+    fun `it throws an error on principle entry into foce with both a date and undefined date value`() {
+        val instance = mockk<MetadataSection>()
+        every { instance.name } returns MetadataSectionName.PRINCIPLE_ENTRY_INTO_FORCE
+        every { instance.sections } returns null
+        every { instance.metadata } returns listOf(
+            Metadatum(LocalDate.now(), MetadatumType.DATE),
+            Metadatum(UndefinedDate.UNDEFINED_UNKNOWN, MetadatumType.UNDEFINED_DATE),
+        )
+
+        assertThat(hasValidMetadata.isSatisfiedBy(instance)).isFalse()
+    }
+
+    @Test
+    fun `can generate an expiration date with a date value`() {
+        val instance = mockk<MetadataSection>()
+        every { instance.name } returns MetadataSectionName.EXPIRATION
+        every { instance.sections } returns null
+        every { instance.metadata } returns listOf(
+            Metadatum(LocalDate.now(), MetadatumType.DATE),
+        )
+
+        assertThat(hasValidMetadata.isSatisfiedBy(instance)).isTrue()
+    }
+
+    @Test
+    fun `can generate an expiration date with an Undefined date value`() {
+        val instance = mockk<MetadataSection>()
+        every { instance.name } returns MetadataSectionName.EXPIRATION
+        every { instance.sections } returns null
+        every { instance.metadata } returns listOf(
+            Metadatum(UndefinedDate.UNDEFINED_UNKNOWN, MetadatumType.UNDEFINED_DATE),
+        )
+
+        assertThat(hasValidMetadata.isSatisfiedBy(instance)).isTrue()
+    }
+
+    @Test
+    fun `it throws an error on an expiration date with both a date and undefined date value`() {
+        val instance = mockk<MetadataSection>()
+        every { instance.name } returns MetadataSectionName.EXPIRATION
+        every { instance.sections } returns null
+        every { instance.metadata } returns listOf(
+            Metadatum(LocalDate.now(), MetadatumType.DATE),
+            Metadatum(UndefinedDate.UNDEFINED_UNKNOWN, MetadatumType.UNDEFINED_DATE),
+        )
+
+        assertThat(hasValidMetadata.isSatisfiedBy(instance)).isFalse()
+    }
+
+    @Test
+    fun `can generate a principle expiration date with a date value`() {
+        val instance = mockk<MetadataSection>()
+        every { instance.name } returns MetadataSectionName.PRINCIPLE_EXPIRATION
+        every { instance.sections } returns null
+        every { instance.metadata } returns listOf(
+            Metadatum(LocalDate.now(), MetadatumType.DATE),
+        )
+
+        assertThat(hasValidMetadata.isSatisfiedBy(instance)).isTrue()
+    }
+
+    @Test
+    fun `can generate a principle expiration date with an Undefined date value`() {
+        val instance = mockk<MetadataSection>()
+        every { instance.name } returns MetadataSectionName.PRINCIPLE_EXPIRATION
+        every { instance.sections } returns null
+        every { instance.metadata } returns listOf(
+            Metadatum(UndefinedDate.UNDEFINED_UNKNOWN, MetadatumType.UNDEFINED_DATE),
+        )
+
+        assertThat(hasValidMetadata.isSatisfiedBy(instance)).isTrue()
+    }
+
+    @Test
+    fun `it throws an error on a principle expiration date with both a date and undefined date value`() {
+        val instance = mockk<MetadataSection>()
+        every { instance.name } returns MetadataSectionName.PRINCIPLE_EXPIRATION
+        every { instance.sections } returns null
+        every { instance.metadata } returns listOf(
+            Metadatum(LocalDate.now(), MetadatumType.DATE),
+            Metadatum(UndefinedDate.UNDEFINED_UNKNOWN, MetadatumType.UNDEFINED_DATE),
+        )
+
+        assertThat(hasValidMetadata.isSatisfiedBy(instance)).isFalse()
+    }
 }

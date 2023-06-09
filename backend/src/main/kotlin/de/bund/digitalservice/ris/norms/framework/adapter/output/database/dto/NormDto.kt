@@ -1,6 +1,5 @@
 package de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto
 
-import de.bund.digitalservice.ris.norms.domain.value.UndefinedDate
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Column
 import org.springframework.data.relational.core.mapping.Table
@@ -26,26 +25,6 @@ data class NormDto(
     var officialShortTitle: String? = null,
     @Column("official_abbreviation")
     var officialAbbreviation: String? = null,
-
-    @Column("entry_into_force_date")
-    var entryIntoForceDate: LocalDate? = null,
-    @Column("entry_into_force_date_state")
-    var entryIntoForceDateState: UndefinedDate? = null,
-    @Column("principle_entry_into_force_date")
-    var principleEntryIntoForceDate: LocalDate? = null,
-    @Column("principle_entry_into_force_date_state")
-    var principleEntryIntoForceDateState: UndefinedDate? = null,
-
-    @Column("expiration_date")
-    var expirationDate: LocalDate? = null,
-    @Column("expiration_date_state")
-    var expirationDateState: UndefinedDate? = null,
-    @Column("is_expiration_date_temp")
-    var isExpirationDateTemp: Boolean? = null,
-    @Column("principle_expiration_date")
-    var principleExpirationDate: LocalDate? = null,
-    @Column("principle_expiration_date_state")
-    var principleExpirationDateState: UndefinedDate? = null,
 
     @Column("announcement_date")
     var announcementDate: LocalDate? = null,
