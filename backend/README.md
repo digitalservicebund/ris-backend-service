@@ -215,3 +215,7 @@ Can be used to show the latest release version for every dependency. Generate a 
 ```bash
 ./gradlew dependencyUpdates -Drevision=release
 ```
+
+## Reports
+
+All reports that should be publicly accessible will be published on the GitHub Page of [digitalservicebund/ris-reports](https://github.com/digitalservicebund/ris-reports)
