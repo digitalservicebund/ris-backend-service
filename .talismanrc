@@ -15,13 +15,13 @@ fileignoreconfig:
 - filename: backend/src/test/kotlin/unit/adapter/input/restapi/controller/GenerateNormFileControllerTest.kt
   checksum: 07aa4cd7453685661091978479eef00f475a3415d0b26882352e19da66bf1dda
 - filename: doc/norms/backend-api.yaml
-  checksum: 2f5e1297365eda980415bbe35d9a0d7ce14556094c23a06b65e9d09498e8d513
+  checksum: 867d0a6301f1276bac069e00c7cc196bb15eea3f962ce5a
 - filename: doc/structurizr/workspace.json
   checksum: 4cd729e6a2267acf57953e7e511806f967a106542cfa422946dbed23f0dd1d25
 - filename: frontend/FRONTEND_STYLEGUIDE.md
   checksum: e6b8194eba2012f2a769c5a5d3577715a573b441a7b94e744c32b3149d0d3a93
 - filename: frontend/test/test-helper/dataGenerators.ts
-  checksum: 597354ee137202d1a07164a2d8727010a378a15c41b2015858b6ffeb0ad4f00b
+  checksum: c5a604ebf6fcc657dea58e996412f16f00d8877f7bb282865f441d87581fc3d5
 scopeconfig:
 - scope: node
 allowed_patterns:

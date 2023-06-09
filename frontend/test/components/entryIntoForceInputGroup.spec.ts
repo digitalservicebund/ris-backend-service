@@ -89,7 +89,7 @@ describe("EntryIntoForceInputGroup", () => {
       renderComponent()
       await changeToDateStateInput()
       const dropdown = screen.getByLabelText(
-        "Unbestimmtes abweichendes Inkrafttretedatum Dropdown"
+        "Unbestimmtes Inkrafttretedatum Dropdown"
       ) as HTMLInputElement
 
       expect(dropdown).toBeInTheDocument()

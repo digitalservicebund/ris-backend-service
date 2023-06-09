@@ -40,7 +40,7 @@ describe("PrincipleEntryIntoForceInputGroup", () => {
         "unbestimmt"
       ) as HTMLInputElement
       const dateInputField = screen.getByLabelText(
-        "Bestimmtes Inkrafttretedatum Date Input"
+        "Bestimmtes grundsätzliches Inkrafttretedatum Date Input"
       ) as HTMLInputElement
 
       expect(definedRadioButton).toBeInTheDocument()
@@ -58,7 +58,7 @@ describe("PrincipleEntryIntoForceInputGroup", () => {
     it("User can enter a date input", async () => {
       renderComponent()
       const dateInputField = screen.getByLabelText(
-        "Bestimmtes Inkrafttretedatum Date Input"
+        "Bestimmtes grundsätzliches Inkrafttretedatum Date Input"
       ) as HTMLInputElement
 
       expect(dateInputField).toBeInTheDocument()
@@ -75,7 +75,7 @@ describe("PrincipleEntryIntoForceInputGroup", () => {
       renderComponent({ modelValue })
 
       const dateInputField = screen.getByLabelText(
-        "Bestimmtes Inkrafttretedatum Date Input"
+        "Bestimmtes grundsätzliches Inkrafttretedatum Date Input"
       ) as HTMLInputElement
 
       expect(dateInputField).toHaveValue("12.05.2020")
@@ -89,7 +89,7 @@ describe("PrincipleEntryIntoForceInputGroup", () => {
       renderComponent()
       await changeToDateStateInput()
       const dropdown = screen.getByLabelText(
-        "Unbestimmtes abweichendes Inkrafttretedatum Dropdown"
+        "Unbestimmtes grundsätzliches Inkrafttretedatum Dropdown"
       ) as HTMLInputElement
 
       expect(dropdown).toBeInTheDocument()
