@@ -167,12 +167,12 @@ public class DocumentUnitListEntryIntegrationTest {
         documentationOfficeRepository.findByLabel("DigitalService").block();
 
     List<Instant> timestampsExpected = new ArrayList<>();
-    for (int i = 0; i < 10; i++) {
+    for (int i = 0; i < 11; i++) {
       timestampsExpected.add(Instant.now().minus(i, ChronoUnit.DAYS));
     }
     Collections.shuffle(timestampsExpected);
 
-    for (int i = 0; i < 10; i++) {
+    for (int i = 0; i < 11; i++) {
       repository
           .save(
               DocumentUnitDTO.builder()
@@ -200,7 +200,7 @@ public class DocumentUnitListEntryIntegrationTest {
     List<String> timestampActualStrings =
         JsonPath.read(result.getResponseBody(), "$.content[*].creationTimestamp");
     List<Instant> timestampsActual = timestampActualStrings.stream().map(Instant::parse).toList();
-    assertThat(timestampsActual).hasSameSizeAs(timestampsExpected);
+    assertThat(timestampsActual).hasSize(10); // test pagination
 
     for (int i = 0; i < timestampsActual.size() - 1; i++) {
       Instant tThis = timestampsActual.get(i);

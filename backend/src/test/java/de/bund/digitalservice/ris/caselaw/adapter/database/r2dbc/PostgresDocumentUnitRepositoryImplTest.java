@@ -74,7 +74,7 @@ class PostgresDocumentUnitRepositoryImplTest {
     var documentationOfficeId = UUID.randomUUID();
     Mockito.when(
             metadataRepository.findAllByDataSourceAndDocumentationOfficeId(
-                DataSource.NEURIS.name(), PageRequest.of(0, 10, sort), documentationOfficeId))
+                DataSource.NEURIS.name(), documentationOfficeId, 10, 0L))
         .thenReturn(Flux.empty());
 
     Mockito.when(documentationOfficeRepository.findByLabel("Test"))
@@ -89,6 +89,6 @@ class PostgresDocumentUnitRepositoryImplTest {
 
     verify(metadataRepository)
         .findAllByDataSourceAndDocumentationOfficeId(
-            DataSource.NEURIS.name(), PageRequest.of(0, 10, sort), documentationOfficeId);
+            DataSource.NEURIS.name(), documentationOfficeId, 10, 0L);
   }
 }

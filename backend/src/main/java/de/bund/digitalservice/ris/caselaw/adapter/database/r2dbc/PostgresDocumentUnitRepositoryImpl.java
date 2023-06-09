@@ -939,7 +939,10 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
         .flatMapMany(
             docOffice ->
                 metadataRepository.findAllByDataSourceAndDocumentationOfficeId(
-                    DataSource.NEURIS.name(), pageable, docOffice.getId()))
+                    DataSource.NEURIS.name(),
+                    docOffice.getId(),
+                    pageable.getPageSize(),
+                    pageable.getOffset()))
         .flatMapSequential(this::injectFileNumbers)
         .flatMapSequential(this::injectDocumentationOffice)
         .flatMapSequential(this::injectStatus)

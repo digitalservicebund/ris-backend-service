@@ -3,7 +3,6 @@ package de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc;
 import de.bund.digitalservice.ris.caselaw.domain.DataSource;
 import java.time.Instant;
 import java.util.UUID;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.r2dbc.repository.Query;
 import org.springframework.data.r2dbc.repository.R2dbcRepository;
 import org.springframework.stereotype.Repository;
@@ -24,8 +23,6 @@ public interface DatabaseDocumentUnitMetadataRepository
 
   Mono<DocumentUnitMetadataDTO> findByUuid(UUID documentUnitUuid);
 
-  Flux<DocumentUnitMetadataDTO> findAllByDataSource(String dataSource, Pageable pageable);
-
   @Query(
       "SELECT docunit.* "
           + "FROM doc_unit docunit "
@@ -38,9 +35,10 @@ public interface DatabaseDocumentUnitMetadataRepository
           + "    docunit.documentation_office_id = :documentationOffice OR"
           + "    status.status IS NULL OR "
           + "    status.status = 'PUBLISHED') "
-          + " ORDER BY docunit.creationtimestamp DESC")
+          + "ORDER BY docunit.creationtimestamp DESC "
+          + "LIMIT :pageSize OFFSET :offset")
   Flux<DocumentUnitMetadataDTO> findAllByDataSourceAndDocumentationOfficeId(
-      String dataSource, Pageable pageable, UUID documentationOffice);
+      String dataSource, UUID documentationOffice, Integer pageSize, Long offset);
 
   @Query(
       "SELECT * FROM doc_unit WHERE "
