@@ -967,7 +967,7 @@ jobs:
         with:
           name: performance-report
           path: tmp/performance-reports/
-      - run: mv tmp/performance-reports/profile*.html _site/profile-report.html
+      - run: mv tmp/performance-reports/profile*.html tmp/performance-reports/profile-report.html
       - name: Performance report - git add report
         uses: digitalservicebund/ris-reports/actions/git-add-report@728043a0126de421396dde2b11e7c61dfe5c1892
         with:
