@@ -40,9 +40,9 @@ function collapse(): void {
     open-icon-name="expand_more"
   >
     <template #header>
-      <div class="flex w-full" :class="{ 'flex-col': asColumn }">
+      <div class="flex gap-8 w-full" :class="{ 'flex-col': asColumn }">
         <h2
-          class="label-02-bold min-w-[15rem] text-left"
+          class="flex-none label-02-bold text-left w-[15rem]"
           :class="{ 'mb-24': asColumn && !isExpanded }"
         >
           {{ title }}

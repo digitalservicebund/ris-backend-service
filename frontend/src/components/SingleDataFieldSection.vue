@@ -31,15 +31,6 @@ const inputAttributes = computed(
   (): InputAttributes => ({ ariaLabel: props.label, readOnly: props.readonly })
 )
 
-const dynamicClasses = computed(() => ({
-  "hover:!bg-blue-200": !props.readonly,
-  "hover:cursor-pointer": !props.readonly,
-  "focus:bg-blue-200": !props.readonly,
-  "focus:hover:!outline-2": !props.readonly,
-  "focus:hover:!outline-blue-800": !props.readonly,
-  "h-44": [InputType.TEXT, InputType.DATE].includes(props.type),
-}))
-
 watch(
   () => props.modelValue,
   () => (value.value = props.modelValue),
@@ -50,11 +41,10 @@ watch(value, () => emit("update:modelValue", value.value), { deep: true })
 </script>
 
 <template>
-  <div class="bg-white border-b border-gray-400 flex gap-8 p-6 pl-16">
-    <label
-      class="label-02-bold max-w-[14rem] min-w-[14rem] my-12 text-left"
-      :for="id"
-    >
+  <div
+    class="bg-white border-b border-gray-400 flex gap-8 items-start p-8 pl-16"
+  >
+    <label class="flex-none label-02-bold my-12 w-[15rem]" :for="id">
       <h2>{{ label }}</h2>
     </label>
 
@@ -62,8 +52,7 @@ watch(value, () => emit("update:modelValue", value.value), { deep: true })
       :id="id"
       v-model="value"
       :attributes="inputAttributes"
-      class="!border-none hover:outline-none label-02-reg outline-offset-2 self-center w-full"
-      :class="dynamicClasses"
+      class="label-02-reg"
       disable-error
       :type="type"
     />

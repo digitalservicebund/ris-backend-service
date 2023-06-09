@@ -140,7 +140,7 @@ defineExpose({ focusPrevious, focusNext, resetFocus, focusFirst })
   display: flex;
   align-items: center;
   border-radius: 10px;
-  margin: 4px;
+  margin: 4px 8px 4px 0;
   word-break: break-word;
 
   .icon-wrapper {

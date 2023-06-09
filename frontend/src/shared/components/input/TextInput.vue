@@ -31,7 +31,6 @@ const { inputValue, emitInputEvent } = useInputModel<string, Props, Emits>(
 
 const conditionalClasses = computed(() => ({
   input__error: props.validationError,
-  input__readonly: props.readOnly,
   input__fullheight: props.fullHeight,
 }))
 
@@ -50,7 +49,7 @@ defineExpose({ focusInput })
     ref="inputRef"
     v-model="inputValue"
     :aria-label="ariaLabel"
-    class="bg-white border-2 border-blue-800 flex focus:outline-2 h-[3.75rem] hover:outline-2 input outline-0 outline-blue-800 outline-none outline-offset-[-4px] px-16 read-only:border-none read-only:hover:outline-0 w-full"
+    class="-outline-offset-4 autofill:focus:shadow-white autofill:focus:text-inherit autofill:shadow-white autofill:text-inherit bg-white border-2 border-blue-800 content-between flex flex-wrap focus:outline h-[3.75rem] hover:outline input outline-2 outline-blue-800 px-16 read-only:border-none read-only:hover:outline-0 readonly:focus:outline-none w-full"
     :class="conditionalClasses"
     :placeholder="placeholder"
     :readonly="$props.readOnly"
@@ -63,17 +62,6 @@ defineExpose({ focusInput })
 
 <style lang="scss" scoped>
 .input {
-  flex-wrap: wrap;
-  align-content: space-between;
-
-  &:autofill {
-    @apply shadow-white text-inherit;
-  }
-
-  &:autofill:focus {
-    @apply shadow-white text-inherit;
-  }
-
   &__error {
     @apply border-red-800 outline-red-800 bg-red-200;
 
@@ -83,12 +71,6 @@ defineExpose({ focusInput })
 
     &:autofill:focus {
       @apply shadow-error text-inherit;
-    }
-  }
-
-  &__readonly {
-    &:focus {
-      @apply outline-none;
     }
   }
 
