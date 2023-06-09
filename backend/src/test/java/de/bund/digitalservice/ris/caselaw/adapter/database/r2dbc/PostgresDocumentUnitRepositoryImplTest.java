@@ -9,6 +9,8 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.Dat
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.StateRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.proceedingdecision.DatabaseProceedingDecisionLinkRepository;
 import de.bund.digitalservice.ris.caselaw.domain.DataSource;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
+import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -18,6 +20,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 @ExtendWith(SpringExtension.class)
@@ -68,15 +71,24 @@ class PostgresDocumentUnitRepositoryImplTest {
   @Test
   void testFindAll() {
     Sort sort = Sort.unsorted();
+    var documentationOfficeId = UUID.randomUUID();
     Mockito.when(
-            metadataRepository.findAllByDataSource(
-                DataSource.NEURIS.name(), PageRequest.of(0, 10, sort)))
+            metadataRepository.findAllByDataSourceAndDocumentationOfficeId(
+                DataSource.NEURIS.name(), PageRequest.of(0, 10, sort), documentationOfficeId))
         .thenReturn(Flux.empty());
 
-    StepVerifier.create(postgresDocumentUnitRepository.findAll(PageRequest.of(0, 10, sort)))
+    Mockito.when(documentationOfficeRepository.findByLabel("Test"))
+        .thenReturn(
+            Mono.just(
+                DocumentationOfficeDTO.builder().id(documentationOfficeId).label("Test").build()));
+
+    StepVerifier.create(
+            postgresDocumentUnitRepository.findAll(
+                PageRequest.of(0, 10, sort), DocumentationOffice.builder().label("Test").build()))
         .verifyComplete();
 
     verify(metadataRepository)
-        .findAllByDataSource(DataSource.NEURIS.name(), PageRequest.of(0, 10, sort));
+        .findAllByDataSourceAndDocumentationOfficeId(
+            DataSource.NEURIS.name(), PageRequest.of(0, 10, sort), documentationOfficeId);
   }
 }

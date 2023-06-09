@@ -27,6 +27,22 @@ public interface DatabaseDocumentUnitMetadataRepository
   Flux<DocumentUnitMetadataDTO> findAllByDataSource(String dataSource, Pageable pageable);
 
   @Query(
+      "SELECT docunit.* "
+          + "FROM doc_unit docunit "
+          + "LEFT JOIN ( "
+          + "    SELECT DISTINCT ON (document_unit_id) document_unit_id, status "
+          + "    FROM public.document_unit_status "
+          + "    ORDER BY document_unit_id, created_at DESC "
+          + ") status ON docunit.uuid = status.document_unit_id "
+          + "WHERE docunit.data_source = :dataSource AND ( "
+          + "    docunit.documentation_office_id = :documentationOffice OR"
+          + "    status.status IS NULL OR "
+          + "    status.status = 'PUBLISHED') "
+          + " ORDER BY docunit.creationtimestamp DESC")
+  Flux<DocumentUnitMetadataDTO> findAllByDataSourceAndDocumentationOfficeId(
+      String dataSource, Pageable pageable, UUID documentationOffice);
+
+  @Query(
       "SELECT * FROM doc_unit WHERE "
           + WHERE
           + "ORDER BY decision_date DESC, id DESC "
@@ -48,5 +64,6 @@ public interface DatabaseDocumentUnitMetadataRepository
       Long[] docUnitIds,
       Long docTypeId);
 
-  Mono<Long> countByDataSource(DataSource dataSource);
+  Mono<Long> countByDataSourceAndDocumentationOfficeId(
+      DataSource dataSource, UUID documentationOfficeId);
 }

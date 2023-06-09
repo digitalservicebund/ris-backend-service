@@ -76,9 +76,13 @@ public class DocumentUnitController {
 
   @GetMapping(value = "")
   public Mono<Page<DocumentUnitListEntry>> getAll(
-      @RequestParam("pg") int page, @RequestParam("sz") int size) {
+      @RequestParam("pg") int page,
+      @RequestParam("sz") int size,
+      @AuthenticationPrincipal OidcUser oidcUser) {
 
-    return service.getAll(PageRequest.of(page, size));
+    return userService
+        .getDocumentationOffice(oidcUser)
+        .flatMap(user -> service.getAll(PageRequest.of(page, size), user));
   }
 
   @GetMapping(value = "/{documentNumber}")

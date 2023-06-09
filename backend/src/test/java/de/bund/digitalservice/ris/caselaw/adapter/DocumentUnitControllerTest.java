@@ -151,17 +151,20 @@ class DocumentUnitControllerTest {
 
   @Test
   void testGetAll() {
-    when(service.getAll(PageRequest.of(0, 10))).thenReturn(Mono.empty());
+    var docOffice = DocumentationOffice.builder().abbreviation("KO").label("BGH").build();
+    when(userService.getDocumentationOffice(any(OidcUser.class))).thenReturn(Mono.just(docOffice));
 
+    when(service.getAll(PageRequest.of(0, 10), docOffice)).thenReturn(Mono.empty());
     webClient
         .mutateWith(csrf())
+        .mutateWith(getMockLogin())
         .get()
         .uri("/api/v1/caselaw/documentunits?pg=0&sz=10")
         .exchange()
         .expectStatus()
         .isOk();
 
-    verify(service).getAll(PageRequest.of(0, 10));
+    verify(service).getAll(PageRequest.of(0, 10), docOffice);
   }
 
   @Test

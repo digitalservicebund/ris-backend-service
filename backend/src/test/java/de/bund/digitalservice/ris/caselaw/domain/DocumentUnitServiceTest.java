@@ -15,6 +15,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentUnitStatusService;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentationOfficeRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentationOfficeDTO;
 import java.nio.ByteBuffer;
 import java.time.Instant;
 import java.util.Arrays;
@@ -56,6 +58,8 @@ class DocumentUnitServiceTest {
   @SpyBean private DocumentUnitService service;
 
   @MockBean private DocumentUnitRepository repository;
+
+  @MockBean private DatabaseDocumentationOfficeRepository documentationOfficeRepository;
 
   @MockBean private DocumentNumberService documentNumberService;
 
@@ -188,15 +192,21 @@ class DocumentUnitServiceTest {
   @Test
   void testGetAll() {
     PageRequest pageRequest = PageRequest.of(0, 10, Sort.by(Order.desc("creationtimestamp")));
+    var docOffice = DocumentationOffice.builder().label("do1").build();
 
+    UUID docOfficeUuid = UUID.randomUUID();
     List<DocumentUnitListEntry> entries =
         Arrays.asList(
-            DocumentUnitListEntry.builder().build(), DocumentUnitListEntry.builder().build());
-    when(repository.findAll(pageRequest)).thenReturn(Flux.fromIterable(entries));
-    when(repository.countByDataSource(DataSource.NEURIS))
+            DocumentUnitListEntry.builder().documentationOffice(docOffice).build(),
+            DocumentUnitListEntry.builder().documentationOffice(docOffice).build());
+    when(documentationOfficeRepository.findByLabel("do1"))
+        .thenReturn(
+            Mono.just(DocumentationOfficeDTO.builder().label("do1").id(docOfficeUuid).build()));
+    when(repository.findAll(pageRequest, docOffice)).thenReturn(Flux.fromIterable(entries));
+    when(repository.countByDataSourceAndDocumentationOffice(DataSource.NEURIS, docOffice))
         .thenReturn(Mono.just((long) entries.size()));
 
-    StepVerifier.create(service.getAll(pageRequest))
+    StepVerifier.create(service.getAll(pageRequest, docOffice))
         .assertNext(
             page -> {
               assertEquals(entries.size(), page.getNumberOfElements());
@@ -204,7 +214,7 @@ class DocumentUnitServiceTest {
             })
         .verifyComplete();
 
-    verify(repository).findAll(pageRequest);
+    verify(repository).findAll(pageRequest, docOffice);
   }
 
   @Test

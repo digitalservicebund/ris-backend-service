@@ -932,9 +932,14 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
     return list.isEmpty() ? null : list.toArray(Long[]::new);
   }
 
-  public Flux<DocumentUnitListEntry> findAll(Pageable pageable) {
-    return metadataRepository
-        .findAllByDataSource(DataSource.NEURIS.name(), pageable)
+  public Flux<DocumentUnitListEntry> findAll(
+      Pageable pageable, DocumentationOffice documentationOffice) {
+    return documentationOfficeRepository
+        .findByLabel(documentationOffice.label())
+        .flatMapMany(
+            docOffice ->
+                metadataRepository.findAllByDataSourceAndDocumentationOfficeId(
+                    DataSource.NEURIS.name(), pageable, docOffice.getId()))
         .flatMapSequential(this::injectFileNumbers)
         .flatMapSequential(this::injectDocumentationOffice)
         .flatMapSequential(this::injectStatus)
@@ -1042,7 +1047,13 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
   }
 
   @Override
-  public Mono<Long> countByDataSource(DataSource dataSource) {
-    return metadataRepository.countByDataSource(dataSource);
+  public Mono<Long> countByDataSourceAndDocumentationOffice(
+      DataSource dataSource, DocumentationOffice documentationOffice) {
+    return documentationOfficeRepository
+        .findByLabel(documentationOffice.label())
+        .flatMap(
+            docOffice ->
+                metadataRepository.countByDataSourceAndDocumentationOfficeId(
+                    dataSource, docOffice.getId()));
   }
 }

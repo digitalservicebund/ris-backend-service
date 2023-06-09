@@ -171,15 +171,19 @@ public class DocumentUnitService {
         .flatMap(Function.identity());
   }
 
-  public Mono<Page<DocumentUnitListEntry>> getAll(Pageable pageable) {
+  public Mono<Page<DocumentUnitListEntry>> getAll(
+      Pageable pageable, DocumentationOffice documentationOffice) {
     return repository
         .findAll(
             PageRequest.of(
                 pageable.getPageNumber(),
                 pageable.getPageSize(),
-                Sort.by(Order.desc("creationtimestamp"))))
+                Sort.by(Order.desc("creationtimestamp"))),
+            documentationOffice)
         .collectList()
-        .zipWith(repository.countByDataSource(DataSource.NEURIS))
+        .zipWith(
+            repository.countByDataSourceAndDocumentationOffice(
+                DataSource.NEURIS, documentationOffice))
         .map(tuple -> new PageImpl<>(tuple.getT1(), pageable, tuple.getT2()));
   }
 

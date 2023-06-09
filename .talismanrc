@@ -11,7 +11,7 @@ fileignoreconfig:
 - filename: backend/src/test/java/de/bund/digitalservice/ris/caselaw/integration/tests/JurisXmlExporterWrapperIntegrationTest.java
   checksum: e59fceca98b7ace276dacbe5d647bd68368a942383e4ec1f7e5c21f9292fcb42
 - filename: backend/src/test/java/de/bund/digitalservice/ris/caselaw/integration/tests/ProceedingDecisionIntegrationTest.java
-  checksum: 8430e68bf93d88ae38d803917b68c45170f007c0523942a3ad9a22c413b13282
+  checksum: 41fd47d2b766398e40ddb78b215c6e5c4fa8136653fed02e67417db87abfdd89
 - filename: backend/src/test/kotlin/unit/adapter/input/restapi/controller/GenerateNormFileControllerTest.kt
   checksum: 07aa4cd7453685661091978479eef00f475a3415d0b26882352e19da66bf1dda
 - filename: doc/norms/backend-api.yaml

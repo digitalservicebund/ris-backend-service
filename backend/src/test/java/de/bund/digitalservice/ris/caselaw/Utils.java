@@ -8,12 +8,16 @@ import org.springframework.security.test.web.reactive.server.SecurityMockServerC
 public class Utils {
 
   public static OidcLoginMutator getMockLogin() {
+    return getMockLoginWithDocOffice("/DigitalService");
+  }
+
+  public static OidcLoginMutator getMockLoginWithDocOffice(String docOfficeGroup) {
     return mockOidcLogin()
         .idToken(
             token ->
                 token.claims(
                     claims -> {
-                      claims.put("groups", Collections.singletonList("/DigitalService"));
+                      claims.put("groups", Collections.singletonList(docOfficeGroup));
                       claims.put("name", "testUser");
                     }));
   }
