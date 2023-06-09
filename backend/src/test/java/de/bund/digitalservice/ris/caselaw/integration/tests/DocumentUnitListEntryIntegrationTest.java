@@ -219,44 +219,30 @@ public class DocumentUnitListEntryIntegrationTest {
         documentationOfficeRepository.findByLabel("CC-RIS").block();
     DocumentationOfficeDTO docOffice2DTO = documentationOfficeRepository.findByLabel("BGH").block();
 
-    // docOffice1: new docUnit1
     DocumentUnitDTO docUnit1 = createNewDocumentUnitDTO(docOffice1DTO.getId());
     saveToStatusRepository(docUnit1, docUnit1.getCreationtimestamp(), UNPUBLISHED);
 
-    // docOffice1: new docUnit2
     DocumentUnitDTO docUnit2 = createNewDocumentUnitDTO(docOffice2DTO.getId());
     saveToStatusRepository(docUnit2, docUnit2.getCreationtimestamp(), UNPUBLISHED);
-
-    // docOffice1: publish docUnit2
     saveToStatusRepository(docUnit2, Instant.now(), PUBLISHED);
 
-    // docOffice2: new docUnit3
     DocumentUnitDTO docUnit3 = createNewDocumentUnitDTO(docOffice2DTO.getId());
     saveToStatusRepository(docUnit3, docUnit3.getCreationtimestamp(), UNPUBLISHED);
 
-    // docOffice2: new docUnit4
     DocumentUnitDTO docUnit4 = createNewDocumentUnitDTO(docOffice2DTO.getId());
     saveToStatusRepository(docUnit4, docUnit4.getCreationtimestamp(), UNPUBLISHED);
-
-    // docOffice2: publish docUnit4
     saveToStatusRepository(docUnit4, Instant.now(), PUBLISHED);
 
-    // docOffice2: new docUnit5 with no status
     DocumentUnitDTO docUnit5 = createNewDocumentUnitDTO(docOffice2DTO.getId());
 
-    // without docOffice: new docUnit6 with no status
     DocumentUnitDTO docUnit6 = createNewDocumentUnitDTO(null);
 
-    // docOffice2: new docUnit7, publish and unpublish it
     DocumentUnitDTO docUnit7 = createNewDocumentUnitDTO(docOffice2DTO.getId());
     saveToStatusRepository(docUnit7, docUnit7.getCreationtimestamp(), UNPUBLISHED);
-    Instant publishTime = Instant.now().plus(1, ChronoUnit.DAYS);
-    saveToStatusRepository(docUnit7, publishTime, PUBLISHED);
-    Instant unpublishTime = Instant.now().plus(2, ChronoUnit.DAYS);
-    saveToStatusRepository(docUnit7, unpublishTime, UNPUBLISHED);
+    saveToStatusRepository(docUnit7, Instant.now().plus(1, ChronoUnit.DAYS), PUBLISHED);
+    saveToStatusRepository(docUnit7, Instant.now().plus(2, ChronoUnit.DAYS), UNPUBLISHED);
 
-    // expectation
-    // expect user1 to see only docUnit1, docUnit2, docUnit4, docUnit5, docUnit6
+    // Documentation Office 1
     EntityExchangeResult<String> result =
         webClient
             .mutateWith(csrf())
@@ -282,7 +268,32 @@ public class DocumentUnitListEntryIntegrationTest {
         .isEqualTo(PUBLISHED.toString());
     assertThat(extractDocUnitsByUuid(result.getResponseBody(), docUnit7.getUuid())).isEmpty();
 
-    // expect user2 to see only docUnit2, docUnit3, docUnit4, docUnit5, docUnit6
+    // Documentation Office 2
+    result =
+        webClient
+            .mutateWith(csrf())
+            .mutateWith(getMockLoginWithDocOffice(docOffice2Group))
+            .get()
+            .uri("/api/v1/caselaw/documentunits?pg=0&sz=10")
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectBody(String.class)
+            .returnResult();
+
+    assertThat(extractDocUnitsByUuid(result.getResponseBody(), docUnit1.getUuid())).isEmpty();
+    assertThat(extractStatusByUuid(result.getResponseBody(), docUnit2.getUuid()))
+        .isEqualTo(PUBLISHED.toString());
+    assertThat(extractStatusByUuid(result.getResponseBody(), docUnit3.getUuid()))
+        .isEqualTo(UNPUBLISHED.toString());
+    assertThat(extractStatusByUuid(result.getResponseBody(), docUnit4.getUuid()))
+        .isEqualTo(PUBLISHED.toString());
+    assertThat(extractStatusByUuid(result.getResponseBody(), docUnit5.getUuid()))
+        .isEqualTo(PUBLISHED.toString());
+    assertThat(extractStatusByUuid(result.getResponseBody(), docUnit6.getUuid()))
+        .isEqualTo(PUBLISHED.toString());
+    assertThat(extractStatusByUuid(result.getResponseBody(), docUnit7.getUuid()))
+        .isEqualTo(UNPUBLISHED.toString());
   }
 
   private DocumentUnitDTO createNewDocumentUnitDTO(UUID documentationOfficeId) {
