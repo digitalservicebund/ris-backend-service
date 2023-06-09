@@ -95,9 +95,14 @@ testWithImportedNorm(
     const sectionsWithHeading = sections.filter((section) => !!section.heading)
 
     for (const section of sectionsWithHeading) {
+      // TODO because of inconsistencies in design, having section name not listed in the menu
       if (
         section.heading === "Abweichendes Inkrafttretedatum" ||
-        section.heading === "Abweichendes Außerkrafttretedatum"
+        section.heading === "Abweichendes Außerkrafttretedatum" ||
+        section.heading === "Datum des Inkrafttretens" ||
+        section.heading === "Datum des Außerkrafttretens" ||
+        section.heading === "Grundsätzliches Inkrafttretedatum" ||
+        section.heading === "Grundsätzliches Außerkrafttretedatum"
       ) {
         continue
       }

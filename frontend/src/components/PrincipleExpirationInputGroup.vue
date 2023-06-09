@@ -90,7 +90,7 @@ const dateValue = computed({
         <input
           id="principleExpirationSelection"
           v-model="selectedInputType"
-          aria-label="Bestimmtes Datum des Inkrafttretens"
+          aria-label="Auswahl bestimmtes grundsätzliches Außerkrafttretedatum"
           name="principleExpirationDefined"
           type="radio"
           :value="InputType.DATE"
@@ -101,7 +101,7 @@ const dateValue = computed({
         <input
           id="principleExpirationUndefinedSelection"
           v-model="selectedInputType"
-          aria-label="Unbestimmtes Datum des Inkrafttretens"
+          aria-label="Auswahl unbestimmtes grundsätzliches Außerkrafttretedatum"
           name="principleExpirationUndefined"
           type="radio"
           :value="InputType.UNDEFINED_DATE"
@@ -112,26 +112,26 @@ const dateValue = computed({
     <InputField
       v-if="selectedInputType === InputType.DATE"
       id="principleExpirationDate"
-      aria-label="Bestimmtes Inkrafttretedatum"
-      label="Bestimmtes abweichendes Inkrafttretedatum"
+      aria-label="Bestimmtes grundsätzliches Außerkrafttretedatum"
+      label="Bestimmtes grundsätzliches Außerkrafttretedatum"
     >
       <DateInput
         id="principleExpirationDate"
         v-model="dateValue"
-        aria-label="Bestimmtes Inkrafttretedatum Date Input"
+        aria-label="Bestimmtes grundsätzliches Außerkrafttretedatum Date Input"
         is-future-date
       />
     </InputField>
     <InputField
       v-if="selectedInputType === InputType.UNDEFINED_DATE"
       id="principleExpirationUndefinedDate"
-      aria-label="Unbestimmtes abweichendes Inkrafttretedatum"
-      label="Unbestimmtes abweichendes Inkrafttretedatum"
+      aria-label="Unbestimmtes grundsätzliches Außerkrafttretedatum"
+      label="Unbestimmtes grundsätzliches Außerkrafttretedatum"
     >
       <DropdownInput
         id="principleExpirationUndefinedDate"
         v-model="undefinedDateState"
-        aria-label="Unbestimmtes abweichendes Inkrafttretedatum Dropdown"
+        aria-label="Unbestimmtes grundsätzliches Außerkrafttretedatum Dropdown"
         has-smaller-height
         :items="dropdownItems"
         placeholder="Bitte auswählen"

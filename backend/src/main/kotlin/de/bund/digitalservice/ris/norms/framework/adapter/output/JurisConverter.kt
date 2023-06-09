@@ -217,8 +217,8 @@ fun createSectionForEntryIntoForceAndExpiration(data: NormData): List<MetadataSe
     if (data.principleExpirationDate !== null) {
         val metadata = Metadatum(decodeLocalDate(data.principleExpirationDate), DATE)
         sectionList.add(MetadataSection(MetadataSectionName.PRINCIPLE_EXPIRATION, listOf(metadata)))
-    } else if (data.principleEntryIntoForceDateState !== null) {
-        val metadata = Metadatum(parseDateStateString(data.principleEntryIntoForceDateState), UNDEFINED_DATE)
+    } else if (data.principleExpirationDateState !== null) {
+        val metadata = Metadatum(parseDateStateString(data.principleExpirationDateState), UNDEFINED_DATE)
         sectionList.add(MetadataSection(MetadataSectionName.PRINCIPLE_EXPIRATION, listOf(metadata)))
     }
 

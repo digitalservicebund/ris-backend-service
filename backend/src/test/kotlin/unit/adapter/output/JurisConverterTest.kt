@@ -147,14 +147,14 @@ class JurisConverterTest {
                     unofficialShortTitleList = listOf("test unofficial short title")
                     unofficialAbbreviationList = listOf("test unofficial abbreviation")
                     entryIntoForceDate = "2022-01-01"
-                    entryIntoForceDateState = "UNDEFINED_UNKNOWN"
-                    principleEntryIntoForceDate = "2022-01-02"
+                    entryIntoForceDateState = null
+                    principleEntryIntoForceDate = null
                     principleEntryIntoForceDateState = "UNDEFINED_FUTURE"
                     divergentEntryIntoForceList = listOf(DivergentEntryIntoForce("2022-01-03", null, "SN"), DivergentEntryIntoForce(null, "UNDEFINED_NOT_PRESENT", "ÜN"))
-                    expirationDate = "2022-01-04"
+                    expirationDate = null
                     expirationDateState = "UNDEFINED_UNKNOWN"
                     principleExpirationDate = "2022-01-05"
-                    principleExpirationDateState = "UNDEFINED_UNKNOWN"
+                    principleExpirationDateState = null
                     divergentExpirationsList = listOf(DivergentExpiration("2022-01-06", null, "ÄN"), DivergentExpiration(null, "UNDEFINED_UNKNOWN", "SN"))
                     announcementDate = "2022-01-07"
                     citationDateList = listOf("2022-01-08")
@@ -288,6 +288,30 @@ class JurisConverterTest {
             assertThat(categorizedReferenceSections).hasSize(2)
             assertThat(categorizedReferenceSections?.get(0)?.metadata).usingRecursiveFieldByFieldElementComparatorIgnoringFields("guid").contains(Metadatum("test categorized reference 1", TEXT, 1))
             assertThat(categorizedReferenceSections?.get(1)?.metadata).usingRecursiveFieldByFieldElementComparatorIgnoringFields("guid").contains(Metadatum("test categorized reference 2", TEXT, 1))
+
+            val entryIntoForceSection = norm?.metadataSections?.filter { it.name == MetadataSectionName.ENTRY_INTO_FORCE }
+            assertThat(entryIntoForceSection).hasSize(1)
+            val entryIntoForceMetadata = entryIntoForceSection?.flatMap { it.metadata }
+            assertThat(entryIntoForceMetadata).hasSize(1)
+            assertThat(entryIntoForceMetadata).usingRecursiveFieldByFieldElementComparatorIgnoringFields("guid").contains(Metadatum(decodeLocalDate(data.entryIntoForceDate), DATE, 1))
+
+            val principleEntryIntoForceSection = norm?.metadataSections?.filter { it.name == MetadataSectionName.PRINCIPLE_ENTRY_INTO_FORCE }
+            assertThat(principleEntryIntoForceSection).hasSize(1)
+            val principleEntryIntoForceMetadata = principleEntryIntoForceSection?.flatMap { it.metadata }
+            assertThat(principleEntryIntoForceMetadata).hasSize(1)
+            assertThat(principleEntryIntoForceMetadata).usingRecursiveFieldByFieldElementComparatorIgnoringFields("guid").contains(Metadatum(UndefinedDate.UNDEFINED_FUTURE, UNDEFINED_DATE, 1))
+
+            val expirationSection = norm?.metadataSections?.filter { it.name == MetadataSectionName.EXPIRATION }
+            assertThat(expirationSection).hasSize(1)
+            val expirationMetadata = expirationSection?.flatMap { it.metadata }
+            assertThat(expirationMetadata).hasSize(1)
+            assertThat(expirationMetadata).usingRecursiveFieldByFieldElementComparatorIgnoringFields("guid").contains(Metadatum(UndefinedDate.UNDEFINED_UNKNOWN, UNDEFINED_DATE, 1))
+
+            val principleExpirationSection = norm?.metadataSections?.filter { it.name == MetadataSectionName.PRINCIPLE_EXPIRATION }
+            assertThat(principleExpirationSection).hasSize(1)
+            val principleExpirationMetadata = principleExpirationSection?.flatMap { it.metadata }
+            assertThat(principleExpirationMetadata).hasSize(1)
+            assertThat(principleExpirationMetadata).usingRecursiveFieldByFieldElementComparatorIgnoringFields("guid").contains(Metadatum(decodeLocalDate(data.principleExpirationDate), DATE, 1))
         }
 
         @Test

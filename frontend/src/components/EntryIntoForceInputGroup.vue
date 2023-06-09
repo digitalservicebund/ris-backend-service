@@ -93,7 +93,7 @@ const dateValue = computed({
         <input
           id="entryIntoForceSelection"
           v-model="selectedInputType"
-          aria-label="Bestimmtes Datum des Inkrafttretens"
+          aria-label="Auswahl bestimmtes Datum des Inkrafttretens"
           name="EntryIntoForceDefined"
           type="radio"
           :value="InputType.DATE"
@@ -104,7 +104,7 @@ const dateValue = computed({
         <input
           id="entryIntoForceUndefinedSelection"
           v-model="selectedInputType"
-          aria-label="Unbestimmtes Datum des Inkrafttretens"
+          aria-label="Auswahl unbestimmtes Datum des Inkrafttretens"
           name="EntryIntoForceUndefined"
           type="radio"
           :value="InputType.UNDEFINED_DATE"
@@ -128,13 +128,13 @@ const dateValue = computed({
     <InputField
       v-if="selectedInputType === InputType.UNDEFINED_DATE"
       id="entryIntoForceUndefinedDateState"
-      aria-label="Unbestimmtes abweichendes Inkrafttretedatum"
-      label="Unbestimmtes abweichendes Inkrafttretedatum"
+      aria-label="Unbestimmtes Inkrafttretedatum"
+      label="Unbestimmtes Inkrafttretedatum"
     >
       <DropdownInput
         id="entryIntoForceUndefinedDateState"
         v-model="undefinedDateState"
-        aria-label="Unbestimmtes abweichendes Inkrafttretedatum Dropdown"
+        aria-label="Unbestimmtes Inkrafttretedatum Dropdown"
         has-smaller-height
         :items="dropdownItems"
         placeholder="Bitte auswählen"

@@ -90,7 +90,7 @@ const dateValue = computed({
         <input
           id="expirationSelection"
           v-model="selectedInputType"
-          aria-label="Bestimmtes Datum des Inkrafttretens"
+          aria-label="Auswahl bestimmtes Datum des Außerkrafttretens"
           name="expirationDefined"
           type="radio"
           :value="InputType.DATE"
@@ -101,7 +101,7 @@ const dateValue = computed({
         <input
           id="expirationUndefinedSelection"
           v-model="selectedInputType"
-          aria-label="Unbestimmtes Datum des Inkrafttretens"
+          aria-label="Auswahl unbestimmtes Datum des Außerkrafttretens"
           name="expirationUndefined"
           type="radio"
           :value="InputType.UNDEFINED_DATE"
@@ -112,26 +112,26 @@ const dateValue = computed({
     <InputField
       v-if="selectedInputType === InputType.DATE"
       id="expirationDate"
-      aria-label="Bestimmtes Inkrafttretedatum"
-      label="Bestimmtes Inkrafttretedatum"
+      aria-label="Bestimmtes Außerkrafttretedatum"
+      label="Bestimmtes Außerkrafttretedatum"
     >
       <DateInput
         id="expirationDate"
         v-model="dateValue"
-        aria-label="Bestimmtes Inkrafttretedatum Date Input"
+        aria-label="Bestimmtes Außerkrafttretedatum Date Input"
         is-future-date
       />
     </InputField>
     <InputField
       v-if="selectedInputType === InputType.UNDEFINED_DATE"
       id="expirationUndefinedDate"
-      aria-label="Unbestimmtes abweichendes Inkrafttretedatum"
-      label="Unbestimmtes abweichendes Inkrafttretedatum"
+      aria-label="Unbestimmtes Außerkrafttretedatum"
+      label="Unbestimmtes Außerkrafttretedatum"
     >
       <DropdownInput
         id="expirationUndefinedDate"
         v-model="undefinedDateState"
-        aria-label="Unbestimmtes abweichendes Inkrafttretedatum Dropdown"
+        aria-label="Unbestimmtes Außerkrafttretedatum Dropdown"
         has-smaller-height
         :items="dropdownItems"
         placeholder="Bitte auswählen"

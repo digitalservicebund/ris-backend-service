@@ -132,6 +132,8 @@ export async function expectExpandableSectionNotRepeatableToHaveCorrectValues(
       )
     }
   }
+  const finishButton = expandable.getByRole("button", { name: "Fertig" })
+  await finishButton.click()
 }
 
 export async function expectMetadataInputSectionToHaveCorrectData(

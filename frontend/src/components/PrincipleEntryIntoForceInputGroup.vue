@@ -93,7 +93,7 @@ const dateValue = computed({
         <input
           id="principleEntryIntoForceSelection"
           v-model="selectedInputType"
-          aria-label="Bestimmtes Datum des Inkrafttretens"
+          aria-label="Auswahl bestimmtes grundsätzliches Inkrafttretedatum"
           name="EntryIntoForceDefined"
           type="radio"
           :value="InputType.DATE"
@@ -104,7 +104,7 @@ const dateValue = computed({
         <input
           id="principleEntryIntoForceUndefinedSelection"
           v-model="selectedInputType"
-          aria-label="Unbestimmtes Datum des Inkrafttretens"
+          aria-label="Auswahl unbestimmtes grundsätzliches Inkrafttretedatum"
           name="EntryIntoForceUndefined"
           type="radio"
           :value="InputType.UNDEFINED_DATE"
@@ -115,26 +115,26 @@ const dateValue = computed({
     <InputField
       v-if="selectedInputType === InputType.DATE"
       id="principleEntryIntoForceDate"
-      aria-label="Bestimmtes Inkrafttretedatum"
-      label="Bestimmtes Inkrafttretedatum"
+      aria-label="Bestimmtes grundsätzliches Inkrafttretedatum"
+      label="Bestimmtes grundsätzliches Inkrafttretedatum"
     >
       <DateInput
         id="principleEntryIntoForceDate"
         v-model="dateValue"
-        aria-label="Bestimmtes Inkrafttretedatum Date Input"
+        aria-label="Bestimmtes grundsätzliches Inkrafttretedatum Date Input"
         is-future-date
       />
     </InputField>
     <InputField
       v-if="selectedInputType === InputType.UNDEFINED_DATE"
       id="principleEntryIntoForceUndefinedDateState"
-      aria-label="Unbestimmtes abweichendes Inkrafttretedatum"
-      label="Unbestimmtes abweichendes Inkrafttretedatum"
+      aria-label="Unbestimmtes grundsätzliches Inkrafttretedatum"
+      label="Unbestimmtes grundsätzliches Inkrafttretedatum"
     >
       <DropdownInput
         id="principleEntryIntoForceUndefinedDateState"
         v-model="undefinedDateState"
-        aria-label="Unbestimmtes abweichendes Inkrafttretedatum Dropdown"
+        aria-label="Unbestimmtes grundsätzliches Inkrafttretedatum Dropdown"
         has-smaller-height
         :items="dropdownItems"
         placeholder="Bitte auswählen"
