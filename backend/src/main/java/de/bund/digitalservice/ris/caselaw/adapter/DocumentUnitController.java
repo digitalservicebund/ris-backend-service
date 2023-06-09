@@ -17,6 +17,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.NonNull;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -86,8 +87,9 @@ public class DocumentUnitController {
   }
 
   @GetMapping(value = "/{documentNumber}")
+  @PreAuthorize("@authService.userHasReadAccess(#documentNumber, #oidcUser)")
   public Mono<ResponseEntity<DocumentUnit>> getByDocumentNumber(
-      @NonNull @PathVariable String documentNumber) {
+      @NonNull @PathVariable String documentNumber, @AuthenticationPrincipal OidcUser oidcUser) {
 
     if (documentNumber.length() != 13 && documentNumber.length() != 14) {
       return Mono.just(ResponseEntity.unprocessableEntity().body(DocumentUnit.builder().build()));
