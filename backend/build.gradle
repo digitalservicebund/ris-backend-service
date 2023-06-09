@@ -152,6 +152,8 @@ dependencies {
   annotationProcessor "org.projectlombok:lombok"
 
   developmentOnly "org.springframework.boot:spring-boot-devtools"
+  // => CVE-2023-20883
+  implementation "org.springframework.boot:spring-boot-autoconfigure:3.0.7"
 
   testImplementation("org.springframework.boot:spring-boot-starter-test") {
     exclude group: "org.mockito", module: "mockito-core"
