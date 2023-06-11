@@ -33,5 +33,8 @@ describe("Core Data", () => {
     expect(chipList[1]).toHaveTextContent("two")
 
     expect(screen.getByLabelText("ECLI")).toHaveValue("abc123")
+    expect(
+      screen.getByLabelText("Stammdaten Speichern Button")
+    ).toBeInTheDocument()
   })
 })

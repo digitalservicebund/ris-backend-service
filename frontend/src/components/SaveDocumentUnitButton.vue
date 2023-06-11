@@ -1,49 +1,156 @@
 <script lang="ts" setup>
-import { onUnmounted } from "vue"
-import { ServiceResponse } from "@/services/httpClient"
-import TextButton from "@/shared/components/input/TextButton.vue"
-import { useSaveToRemote } from "@/shared/composables/useSaveToRemote"
+import dayjs from "dayjs"
+import { onMounted, watch, ref } from "vue"
+import TextButton from "../shared/components/input/TextButton.vue"
+import { UpdateStatus } from "@/enum/enumUpdateStatus"
 
 const props = defineProps<{
   ariaLabel: string
-  serviceCallback: () => Promise<ServiceResponse<void>>
+  updateStatus: number
 }>()
+const emit = defineEmits<{
+  (e: "updateDocumentUnit"): void
+}>()
+const isFristTimeLoad = ref(false)
+const onUpload = ref(false)
+const updateSucceed = ref(true)
+const hasUpdateError = ref(false)
+const lastUpdatedTime = ref("")
 
-const getCurrentTime = (dateSaved: Date) => {
-  const fullHour = ("0" + dateSaved.getHours()).slice(-2)
-  const fullMinute = ("0" + dateSaved.getMinutes()).slice(-2)
-  return `${fullHour}:${fullMinute}`
+const setDefaultStatus = () => {
+  isFristTimeLoad.value = false
+  onUpload.value = false
+  updateSucceed.value = false
+  hasUpdateError.value = false
+}
+const setStatus = () => {
+  setDefaultStatus()
+  switch (props.updateStatus) {
+    case UpdateStatus.BEFORE_UPDATE: {
+      isFristTimeLoad.value = true
+      return
+    }
+    case UpdateStatus.ON_UPDATE: {
+      isFristTimeLoad.value = false
+      onUpload.value = true
+      return
+    }
+    case UpdateStatus.SUCCEED: {
+      isFristTimeLoad.value = false
+      updateSucceed.value = true
+      lastUpdatedTime.value = dayjs().format("HH:mm:ss")
+      return
+    }
+    default:
+      isFristTimeLoad.value = false
+      hasUpdateError.value = true
+      return
+  }
 }
 
-const { triggerSave, lastSaveError, lastSavedOn, timer } = useSaveToRemote(
-  props.serviceCallback,
-  10000
+const handleUpdateDocumentUnit = () => {
+  emit("updateDocumentUnit")
+}
+watch(
+  () => props.updateStatus,
+  () => {
+    setStatus()
+  }
 )
-
-onUnmounted(() => {
-  clearInterval(timer)
+onMounted(() => {
+  setStatus()
 })
 </script>
 
 <template>
-  <div class="flex flex-col space-y-[5px]">
+  <div class="save-button-container">
     <TextButton
       :aria-label="ariaLabel"
       label="Speichern"
-      @click="triggerSave"
+      @click="handleUpdateDocumentUnit"
     />
-    <div class="justify-start">
-      <div v-if="lastSaveError !== undefined">
-        <p class="label-03-reg text-red-800">Fehler beim Speichern</p>
+    <div v-if="!isFristTimeLoad" class="save-status">
+      <div v-if="onUpload">
+        <div class="icon">
+          <span class="material-icons"> cloud_upload </span>
+        </div>
+        <p class="status-text">Daten werden gespeichert</p>
       </div>
-
-      <div v-if="lastSavedOn !== undefined && lastSaveError === undefined">
-        <p class="label-03-reg">
-          Zuletzt
-          <span>{{ getCurrentTime(lastSavedOn) }}</span>
-          Uhr
+      <div v-if="hasUpdateError">
+        <div class="icon icon--error">
+          <span class="material-icons"> error_outline </span>
+        </div>
+        <p class="error-text">Fehler beim Speichern</p>
+      </div>
+      <div v-if="updateSucceed">
+        <p class="status-text">
+          Zuletzt gespeichert um
+          <span class="on-succeed">{{ lastUpdatedTime }}</span> Uhr
         </p>
       </div>
     </div>
   </div>
 </template>
+
+<style lang="scss" scoped>
+.save-button-container {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-end;
+  justify-content: flex-start;
+  column-gap: 10px;
+
+  .save-status div {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-end;
+    justify-items: flex-start;
+
+    .icon {
+      display: flex;
+      width: 30px;
+      height: 25px;
+      flex-wrap: wrap;
+      align-items: center;
+
+      &--error {
+        color: red;
+      }
+    }
+
+    p {
+      font-weight: 400;
+      letter-spacing: 0.16px;
+    }
+
+    .status-text {
+      font-size: 14px;
+      line-height: 18px;
+    }
+
+    .error-text {
+      font-size: 16px;
+      line-height: 22px;
+    }
+
+    .on-succeed {
+      animation: text-faded;
+      animation-delay: 1s;
+      animation-duration: 2s;
+      animation-fill-mode: forwards;
+      animation-timing-function: ease-in;
+      font-size: 16px;
+    }
+  }
+
+  @keyframes text-faded {
+    from {
+      font-size: 16px;
+    }
+
+    to {
+      font-size: 14px;
+    }
+  }
+}
+</style>

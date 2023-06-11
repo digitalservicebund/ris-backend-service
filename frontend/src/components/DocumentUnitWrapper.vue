@@ -78,7 +78,6 @@ watchEffect(() => {
     </div>
     <div class="bg-gray-100 flex flex-col w-full">
       <DocumentUnitInfoPanel
-        :document-unit="documentUnit"
         :first-row="firstRowInfos"
         :heading="documentUnit.documentNumber ?? ''"
         :second-row="secondRowInfos"

@@ -220,7 +220,7 @@ onUnmounted(() => {
         >
           <SideToggle
             v-model:is-expanded="showDocPanel"
-            class="sticky top-[8rem] z-20"
+            class="sticky top-[96px] z-20"
             label="Originaldokument"
             :opening-direction="OpeningDirection.LEFT"
           >

@@ -41,10 +41,10 @@ export async function waitForSaving(
     await page.reload()
   }
 
-  const saveStatus = page.getByText(/Zuletzt .* Uhr/).first()
+  const saveStatus = page.getByText(/Zuletzt gespeichert um .* Uhr/).first()
   let lastSaving: string | undefined = undefined
   if (await saveStatus.isVisible()) {
-    lastSaving = /Zuletzt (.*) Uhr/.exec(
+    lastSaving = /Zuletzt gespeichert um (.*) Uhr/.exec(
       await saveStatus.innerText()
     )?.[1] as string
   }
@@ -52,14 +52,16 @@ export async function waitForSaving(
   await body()
 
   if (options?.clickSaveButton) {
-    await page.locator("[aria-label='Speichern Button']").click()
+    await page.locator("[aria-label='Stammdaten Speichern Button']").click()
   }
 
   await Promise.all([
-    await expect(page.getByText(`Zuletzt`).first()).toBeVisible(),
+    await expect(
+      page.getByText(`Zuletzt gespeichert um`).first()
+    ).toBeVisible(),
     lastSaving ??
       (await expect(
-        page.getByText(`Zuletzt ${lastSaving} Uhr`).first()
+        page.getByText(`Zuletzt gespeichert um ${lastSaving} Uhr`).first()
       ).toBeHidden()),
   ])
 }
