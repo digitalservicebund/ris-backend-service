@@ -23,6 +23,11 @@ const isExpanded = ref(false)
 const iconName = computed(() =>
   isExpanded.value ? props.closeIconName : props.openIconName
 )
+
+const ariaLabel = computed(() =>
+  isExpanded.value ? "Zuklappen" : "Aufklappen"
+)
+
 function toggleContentVisibility(): void {
   isExpanded.value = !isExpanded.value
 }
@@ -38,14 +43,16 @@ watch(isExpanded, () => emit("update:isExpanded", isExpanded.value))
   <div>
     <button
       :aria-labelledby="headerId"
-      class="flex justify-between w-full"
+      class="flex focus-visible:outline-blue-800 focus:outline-none justify-between w-full"
       @click="toggleContentVisibility"
     >
       <slot name="header">
         <span>{{ header }}</span>
       </slot>
 
-      <span class="icon material-icons">{{ iconName }}</span>
+      <span :aria-label="ariaLabel" class="icon material-icons">{{
+        iconName
+      }}</span>
     </button>
 
     <div v-if="isExpanded">

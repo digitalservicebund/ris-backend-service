@@ -1,4 +1,6 @@
-import dayjs from "dayjs"
+import DocumentationOffice from "./documentationOffice"
+import NormReference from "./normReference"
+import ProceedingDecision from "./proceedingDecision"
 
 export type CoreData = {
   fileNumbers?: string[]
@@ -14,8 +16,12 @@ export type CoreData = {
   deviatingDecisionDates?: string[]
   legalEffect?: string
   inputType?: string
-  center?: string
+  documentationOffice?: DocumentationOffice
   region?: string
+}
+
+export type ContentRelatedIndexing = {
+  norms?: NormReference[]
 }
 
 export type DocumentType = {
@@ -41,43 +47,12 @@ export type Texts = {
   decisionReasons?: string
 }
 
-export class ProceedingDecision {
-  public uuid?: string
-  public documentNumber?: string
-  public dataSource?: "NEURIS" | "MIGRATION" | "PROCEEDING_DECISION"
-  public court?: Court
-  public date?: string
-  public fileNumber?: string
-  public documentType?: DocumentType
-
-  public static renderDecision(decision: ProceedingDecision): string {
-    if (decision == undefined) return ""
-    else {
-      return [
-        ...(decision.court ? [`${decision.court.label}`] : []),
-        ...(decision.documentType
-          ? [decision.documentType?.jurisShortcut]
-          : []),
-        ...(decision.date ? [dayjs(decision.date).format("DD.MM.YYYY")] : []),
-        ...(decision.fileNumber ? [decision.fileNumber] : []),
-        ...(decision.documentNumber && this.hasLink(decision)
-          ? [decision.documentNumber]
-          : []),
-      ].join(", ")
-    }
-  }
-
-  public static hasLink(decision: ProceedingDecision): boolean {
-    if (decision === undefined) return false
-    else return decision.dataSource !== "PROCEEDING_DECISION"
-  }
-}
-
 export default class DocumentUnit {
   readonly uuid: string
   readonly id?: string
   readonly documentNumber?: string
   readonly creationtimestamp?: string
+  readonly status?: "PUBLISHED" | "UNPUBLISHED"
 
   public fileuploadtimestamp?: string
   public s3path?: string
@@ -87,6 +62,7 @@ export default class DocumentUnit {
   public coreData: CoreData = {}
   public texts: Texts = {}
   public proceedingDecisions?: ProceedingDecision[]
+  public contentRelatedIndexing: ContentRelatedIndexing = {}
 
   static requiredFields = [
     "fileNumbers",
@@ -113,6 +89,16 @@ export default class DocumentUnit {
       if (data.texts && data.texts[textsField] === null)
         delete data.texts[textsField]
     }
+
+    if (data.proceedingDecisions)
+      data.proceedingDecisions = data.proceedingDecisions.map(
+        (decision) => new ProceedingDecision({ ...decision })
+      )
+
+    if (data.contentRelatedIndexing?.norms)
+      data.contentRelatedIndexing.norms = data.contentRelatedIndexing.norms.map(
+        (norm) => new NormReference({ ...norm })
+      )
 
     Object.assign(this, data)
   }

@@ -1,7 +1,7 @@
 /* eslint-disable vue/one-component-per-file */
 import userEvent from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
-import { Component, computed, defineComponent, markRaw } from "vue"
+import { Component, computed, nextTick, defineComponent, markRaw } from "vue"
 import EditableList from "@/shared/components/EditableList.vue"
 
 const SimpleTextEditComponent = defineComponent({
@@ -33,11 +33,12 @@ const JsonStringifySummary = defineComponent({
   template: "<span>{{ JSON.stringify(data) }}</span>",
 })
 
-function renderComponent(options?: {
+async function renderComponent(options?: {
   editComponent?: Component
   summaryComponent?: Component
   modelValue?: unknown[]
   defaultValue?: unknown
+  disableMultiEntry?: boolean
 }) {
   const props = {
     editComponent: markRaw(options?.editComponent ?? SimpleTextEditComponent),
@@ -46,9 +47,11 @@ function renderComponent(options?: {
     ),
     modelValue: options?.modelValue,
     defaultValue: options?.defaultValue ?? "",
+    disableMultiEntry: options?.disableMultiEntry ?? false,
   }
 
   render(EditableList, { props })
+  await nextTick() // Wait for onMounted hook.
 }
 
 async function clickEditButtonOfEntry(
@@ -76,8 +79,8 @@ async function clickDeleteButtonOfEntry(
 }
 
 describe("EditableList", () => {
-  it("renders a summary per model entry on initial render", () => {
-    renderComponent({
+  it("renders a summary per model entry on initial render", async () => {
+    await renderComponent({
       summaryComponent: JsonStringifySummary,
       modelValue: ["entry 1", "entry 2"],
     })
@@ -88,9 +91,9 @@ describe("EditableList", () => {
 
   it("shows edit component for default value when adding new new entry via button click", async () => {
     const user = userEvent.setup()
-    renderComponent({
+    await renderComponent({
       editComponent: SimpleTextEditComponent,
-      modelValue: ["entry 1"],
+      modelValue: ["entry 1", "entry 2"],
       defaultValue: "default entry",
     })
 
@@ -105,7 +108,7 @@ describe("EditableList", () => {
   })
 
   it("shows edit component for correct entry when edit button is clicked", async () => {
-    renderComponent({
+    await renderComponent({
       editComponent: SimpleTextEditComponent,
       summaryComponent: JsonStringifySummary,
       modelValue: ["entry 1", "entry 2", "entry 3"],
@@ -125,7 +128,7 @@ describe("EditableList", () => {
 
   it("shows edit component for correct entry when entry is clicked", async () => {
     const user = userEvent.setup()
-    renderComponent({
+    await renderComponent({
       editComponent: SimpleTextEditComponent,
       summaryComponent: JsonStringifySummary,
       modelValue: ["entry 1", "entry 2", "entry 3"],
@@ -145,7 +148,7 @@ describe("EditableList", () => {
 
   it("deletes correct entry when delete button is clicked", async () => {
     const modelValue = ["entry 1", "entry 2"]
-    renderComponent({
+    await renderComponent({
       summaryComponent: JsonStringifySummary,
       modelValue,
     })
@@ -158,7 +161,7 @@ describe("EditableList", () => {
   })
 
   it("correctly maintains edit state if predecessor entry gets deleted", async () => {
-    renderComponent({
+    await renderComponent({
       editComponent: SimpleTextEditComponent,
       summaryComponent: JsonStringifySummary,
       modelValue: ["entry 1", "entry 2", "entry 3"],
@@ -173,7 +176,7 @@ describe("EditableList", () => {
   })
 
   it("correctly maintains edit state if successor entry gets deleted", async () => {
-    renderComponent({
+    await renderComponent({
       editComponent: SimpleTextEditComponent,
       summaryComponent: JsonStringifySummary,
       modelValue: ["entry 1", "entry 2", "entry 3"],
@@ -187,9 +190,9 @@ describe("EditableList", () => {
     expect(input).toHaveValue("entry 2")
   })
 
-  it("automatically adds a default entry in edit mode if list is empty on initial render", () => {
+  it("automatically adds a default entry in edit mode if list is empty on initial render", async () => {
     const modelValue: string[] = []
-    renderComponent({
+    await renderComponent({
       editComponent: SimpleTextEditComponent,
       modelValue,
       defaultValue: "default entry",
@@ -202,8 +205,8 @@ describe("EditableList", () => {
     expect(modelValue).toEqual(["default entry"])
   })
 
-  it("automatically adds a default entry in edit mode if list is undefined", () => {
-    renderComponent({
+  it("automatically adds a default entry in edit mode if list is undefined", async () => {
+    await renderComponent({
       editComponent: SimpleTextEditComponent,
       modelValue: undefined,
       defaultValue: "default entry",
@@ -216,13 +219,14 @@ describe("EditableList", () => {
   })
 
   it("automatically adds a default entry in edit mode if user deletes all entries", async () => {
-    const modelValue: string[] = ["entry 1"]
-    renderComponent({
+    const modelValue: string[] = ["entry 1", "entry 2"]
+    await renderComponent({
       editComponent: SimpleTextEditComponent,
       modelValue,
       defaultValue: "default entry",
     })
 
+    await clickDeleteButtonOfEntry(1)
     await clickDeleteButtonOfEntry(0)
 
     const input = screen.queryByRole("textbox") as HTMLInputElement
@@ -232,9 +236,9 @@ describe("EditableList", () => {
   })
 
   it("automatically focuses the first input element of the edit component", async () => {
-    renderComponent({
+    await renderComponent({
       editComponent: SimpleTextEditComponent,
-      modelValue: ["entry 1"],
+      modelValue: ["entry 1", "entry 2"],
     })
 
     await clickEditButtonOfEntry(0)
@@ -245,7 +249,7 @@ describe("EditableList", () => {
   it("updates the model value entry on editing it", async () => {
     const user = userEvent.setup()
     const modelValue = ["fo", "bar"]
-    renderComponent({
+    await renderComponent({
       editComponent: SimpleTextEditComponent,
       modelValue,
     })
@@ -259,10 +263,10 @@ describe("EditableList", () => {
 
   it("closes the editing component if user hits the enter key inside it", async () => {
     const user = userEvent.setup()
-    renderComponent({
+    await renderComponent({
       editComponent: SimpleTextEditComponent,
       summaryComponent: JsonStringifySummary,
-      modelValue: ["entry 1"],
+      modelValue: ["entry 1", "entry 2"],
     })
 
     await clickEditButtonOfEntry(0, user)
@@ -271,5 +275,27 @@ describe("EditableList", () => {
 
     expect(input).not.toBeInTheDocument()
     expect(screen.queryByText('"entry 1"')).toBeVisible()
+  })
+
+  it("puts the first entry into edit mode it is the only one", async () => {
+    await renderComponent({
+      editComponent: SimpleTextEditComponent,
+      modelValue: ["entry 1"],
+    })
+
+    const input = screen.queryByRole("textbox") as HTMLInputElement
+
+    expect(input).toBeInTheDocument()
+    expect(input).toHaveValue("entry 1")
+  })
+
+  it("renders the component without the multi entry capability", async () => {
+    await renderComponent({
+      disableMultiEntry: true,
+    })
+
+    expect(
+      screen.queryByRole("button", { name: "Weitere Angabe" })
+    ).not.toBeInTheDocument()
   })
 })

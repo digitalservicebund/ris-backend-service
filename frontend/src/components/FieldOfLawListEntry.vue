@@ -32,13 +32,13 @@ function handleTokenClick(tokenContent: string) {
               props.fieldOfLaw.text +
               ' im Sachgebietsbaum anzeigen'
             "
-            class="identifier link"
+            class="link mr-12 w-44 whitespace-nowrap"
             @click="emit('node-clicked')"
             @keyup.enter="emit('node-clicked')"
           >
             {{ props.fieldOfLaw.identifier }}
           </span>
-          <span class="text-wrapper">
+          <span class="ml-112 text-black">
             <TokenizeText
               :keywords="props.fieldOfLaw.linkedFields ?? []"
               :text="props.fieldOfLaw.text"
@@ -64,17 +64,6 @@ function handleTokenClick(tokenContent: string) {
 </template>
 
 <style lang="scss" scoped>
-.identifier {
-  width: 50px;
-  margin-right: 10px;
-  white-space: nowrap;
-}
-
-.text-wrapper {
-  margin-left: 105px;
-  color: black;
-}
-
 .link {
   cursor: pointer;
   text-decoration: underline;

@@ -1,5 +1,12 @@
 import { expect } from "@playwright/test"
-import { navigateToPublication, waitForSaving } from "../e2e-utils"
+import {
+  fillProceedingDecisionInputs,
+  navigateToCategories,
+  navigateToPublication,
+  toggleNormsSection,
+  toggleProceedingDecisionsSection,
+  waitForSaving,
+} from "../e2e-utils"
 import { testWithDocumentUnit as test } from "../fixtures"
 
 test.describe("ensuring the publishing of documentunits works as expected", () => {
@@ -15,6 +22,36 @@ test.describe("ensuring the publishing of documentunits works as expected", () =
       page.locator("li:has-text('Entscheidungsdatum')")
     ).toBeVisible()
     await expect(page.locator("li:has-text('Dokumenttyp')")).toBeVisible()
+  })
+
+  test("publication page shows missing required fields of proceeding decisions", async ({
+    page,
+    documentNumber,
+  }) => {
+    await navigateToCategories(page, documentNumber)
+    await toggleProceedingDecisionsSection(page)
+
+    await fillProceedingDecisionInputs(page, {
+      court: "AG Aalen",
+    })
+
+    await page.getByText("Manuell Hinzufügen").click()
+
+    await expect(
+      page.getByText(`AG Aalen`, {
+        exact: true,
+      })
+    ).toBeVisible()
+    await navigateToPublication(page, documentNumber)
+
+    await expect(page.locator("li:has-text('Rechtszug')")).toBeVisible()
+
+    await expect(
+      page.locator("li:has-text('Rechtszug')").getByText("Entscheidungsdatum")
+    ).toBeVisible()
+    await expect(
+      page.locator("li:has-text('Rechtszug')").getByText("Aktenzeichen")
+    ).toBeVisible()
   })
 
   test("publication page updates missing required fields after fields were updated", async ({
@@ -61,6 +98,8 @@ test.describe("ensuring the publishing of documentunits works as expected", () =
     await expect(
       page.locator("text=Es sind noch nicht alle Pflichtfelder befüllt.")
     ).toBeVisible()
+
+    await expect(page.locator("text=unveröffentlicht")).toBeVisible()
   })
 
   test("publication not possible with empty email", async ({
@@ -122,10 +161,10 @@ test.describe("ensuring the publishing of documentunits works as expected", () =
       async () => {
         await page
           .locator("[aria-label='Entscheidungsdatum']")
-          .fill("2022-02-03")
+          .fill("03.02.2022")
         expect(
           await page.locator("[aria-label='Entscheidungsdatum']").inputValue()
-        ).toBe("2022-02-03")
+        ).toBe("03.02.2022")
         await page.keyboard.press("Tab")
       },
       page,
@@ -147,7 +186,7 @@ test.describe("ensuring the publishing of documentunits works as expected", () =
     await waitForSaving(
       async () => {
         await page.locator("[aria-label='Dokumenttyp']").fill("AnU")
-        await page.locator("text=AnU - Anerkenntnisurteil").click()
+        await page.locator("text=Anerkenntnisurteil").click()
       },
       page,
       { clickSaveButton: true, reload: true }
@@ -158,7 +197,7 @@ test.describe("ensuring the publishing of documentunits works as expected", () =
         await page
           .locator("[aria-label='Rechtskraft'] + button.input-expand-icon")
           .click()
-        await page.locator("text=Ja").click()
+        await page.getByText("Ja", { exact: true }).click()
       },
       page,
       { clickSaveButton: true, reload: true }
@@ -183,5 +222,33 @@ test.describe("ensuring the publishing of documentunits works as expected", () =
     await expect(page.locator("text=Email wurde versendet")).toBeVisible()
 
     await expect(page.locator("text=Letzte Veröffentlichung am")).toBeVisible()
+
+    await expect(page.locator("text=veröffentlicht")).toBeVisible()
+  })
+
+  test("publication not possible when required norm abbreviation missing", async ({
+    page,
+    documentNumber,
+  }) => {
+    await navigateToCategories(page, documentNumber)
+
+    await toggleNormsSection(page)
+    await waitForSaving(
+      async () => {
+        await page.locator("[aria-label='Einzelnorm']").fill("abc")
+      },
+      page,
+      { clickSaveButton: true }
+    )
+
+    await navigateToPublication(page, documentNumber)
+
+    await expect(
+      page.locator(
+        "text=Die folgenden Rubriken-Pflichtfelder sind nicht befüllt:"
+      )
+    ).toBeVisible()
+
+    await expect(page.locator("text=Normen abc - RIS-Abkürzung")).toBeVisible()
   })
 })

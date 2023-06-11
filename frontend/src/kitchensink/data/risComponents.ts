@@ -6,6 +6,7 @@ export const risComponents: risComponent[] = [
   { name: "Input", view: "InputView" },
   { name: "Chips", view: "ChipsView" },
   { name: "Dropdown", view: "DropdownView" },
+  { name: "Pagination", view: "PaginationView" },
   { name: "Code Snippet", view: "CodeSnippetView" },
   { name: "Popup Modal", view: "PopupModalView" },
   { name: "Expandable Content", view: "ExpandableContentView" },

@@ -42,4 +42,6 @@ enum class MetadatumType {
     TYPE_NAME,
     NORM_CATEGORY,
     TEMPLATE_NAME,
+    UNDEFINED_DATE,
+    TEXT,
 }

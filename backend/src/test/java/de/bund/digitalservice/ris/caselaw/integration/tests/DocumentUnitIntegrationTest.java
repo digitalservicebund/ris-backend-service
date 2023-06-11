@@ -1,18 +1,26 @@
 package de.bund.digitalservice.ris.caselaw.integration.tests;
 
+import static de.bund.digitalservice.ris.caselaw.Utils.getMockLogin;
+import static de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatus.PUBLISHED;
+import static de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatus.UNPUBLISHED;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
 
+import com.jayway.jsonpath.JsonPath;
 import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentNumberService;
+import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentUnitStatusService;
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentUnitController;
+import de.bund.digitalservice.ris.caselaw.adapter.KeycloakUserService;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDeviatingDecisionDateRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentUnitMetadataRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentUnitRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentUnitStatusRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseIncorrectCourtRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DeviatingDecisionDateDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DeviatingEcliDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DeviatingEcliRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitStatusDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.FileNumberDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.FileNumberRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.IncorrectCourtDTO;
@@ -27,7 +35,6 @@ import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresConfig;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitCreationInfo;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.EmailPublishService;
 import de.bund.digitalservice.ris.caselaw.domain.LegalEffect;
@@ -35,12 +42,11 @@ import de.bund.digitalservice.ris.caselaw.domain.ProceedingDecision;
 import de.bund.digitalservice.ris.caselaw.domain.Texts;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.court.Court;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
+import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
@@ -57,7 +63,9 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
 @RISIntegrationTest(
     imports = {
       DocumentUnitService.class,
+      KeycloakUserService.class,
       DatabaseDocumentNumberService.class,
+      DatabaseDocumentUnitStatusService.class,
       PostgresDocumentUnitRepositoryImpl.class,
       FlywayConfig.class,
       PostgresConfig.class
@@ -86,6 +94,7 @@ class DocumentUnitIntegrationTest {
   @Autowired private DatabaseDeviatingDecisionDateRepository deviatingDecisionDateRepository;
   @Autowired private DatabaseDocumentTypeRepository databaseDocumentTypeRepository;
   @Autowired private DatabaseIncorrectCourtRepository incorrectCourtRepository;
+  @Autowired private DatabaseDocumentUnitStatusRepository documentUnitStatusRepository;
   @MockBean private S3AsyncClient s3AsyncClient;
   @MockBean private EmailPublishService publishService;
 
@@ -100,17 +109,16 @@ class DocumentUnitIntegrationTest {
     incorrectCourtRepository.deleteAll().block();
     repository.deleteAll().block();
     databaseDocumentTypeRepository.deleteAll().block();
+    documentUnitStatusRepository.deleteAll().block();
   }
 
   @Test
   void testForCorrectDbEntryAfterNewDocumentUnitCreation() {
-    DocumentUnitCreationInfo info = new DocumentUnitCreationInfo("ABC", "D");
-
     webClient
         .mutateWith(csrf())
-        .post()
-        .uri("/api/v1/caselaw/documentunits")
-        .bodyValue(info)
+        .mutateWith(getMockLogin())
+        .get()
+        .uri("/api/v1/caselaw/documentunits/new")
         .exchange()
         .expectStatus()
         .isCreated()
@@ -118,12 +126,23 @@ class DocumentUnitIntegrationTest {
         .consumeWith(
             response -> {
               assertThat(response.getResponseBody()).isNotNull();
-              assertThat(response.getResponseBody().documentNumber()).startsWith("ABCD");
+              assertThat(response.getResponseBody().documentNumber()).startsWith("XXRE");
+              assertThat(response.getResponseBody().coreData().dateKnown()).isTrue();
             });
 
     List<DocumentUnitDTO> list = repository.findAll().collectList().block();
     assertThat(list).hasSize(1);
-    assertThat(list.get(0).getDocumentnumber()).startsWith("ABCD");
+    DocumentUnitDTO documentUnitDTO = list.get(0);
+    assertThat(documentUnitDTO.getDocumentnumber()).startsWith("XXRE");
+    assertThat(documentUnitDTO.isDateKnown()).isTrue();
+
+    List<DocumentUnitStatusDTO> statusList =
+        documentUnitStatusRepository.findAll().collectList().block();
+    assertThat(statusList).hasSize(1);
+    DocumentUnitStatusDTO status = statusList.get(0);
+    assertThat(status.getStatus()).isEqualTo(UNPUBLISHED);
+    assertThat(status.getDocumentUnitId()).isEqualTo(documentUnitDTO.getUuid());
+    assertThat(status.getCreatedAt()).isEqualTo(documentUnitDTO.getCreationtimestamp());
   }
 
   @Test
@@ -753,43 +772,78 @@ class DocumentUnitIntegrationTest {
     webClient
         .mutateWith(csrf())
         .put()
-        .uri("/api/v1/caselaw/documentunits/search")
+        .uri("/api/v1/caselaw/documentunits/search?pg=0&sz=20")
         .bodyValue(proceedingDecision)
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(ProceedingDecision[].class)
+        .expectBody()
+        .jsonPath("$.content")
+        .isArray()
+        .jsonPath("$.content.length()")
+        .isEqualTo(20)
         .consumeWith(
             response -> {
-              assertThat(response.getResponseBody()).isNotNull();
-              assertThat(response.getResponseBody()).hasSize(20);
+              String responseBody = new String(response.getResponseBody(), StandardCharsets.UTF_8);
+              assertThat(responseBody).isNotNull();
 
-              Arrays.stream(response.getResponseBody())
-                  .map(ProceedingDecision::uuid)
-                  .map(responseUUIDs::add)
-                  .collect(Collectors.toList());
+              List<String> uuids = JsonPath.read(responseBody, "$.content[*].uuid");
+              assertThat(uuids).hasSize(20);
+              responseUUIDs.addAll(uuids.stream().map(UUID::fromString).toList());
             });
 
     webClient
         .mutateWith(csrf())
         .put()
-        .uri("/api/v1/caselaw/documentunits/search")
+        .uri("/api/v1/caselaw/documentunits/search?pg=0&sz=20")
         .bodyValue(proceedingDecision)
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(ProceedingDecision[].class)
+        .expectBody()
+        .jsonPath("$.content")
+        .isArray()
+        .jsonPath("$.content.length()")
+        .isEqualTo(20)
+        .consumeWith(
+            response -> {
+              String responseBody = new String(response.getResponseBody(), StandardCharsets.UTF_8);
+              assertThat(responseBody).isNotNull();
+
+              List<String> uuids = JsonPath.read(responseBody, "$.content[*].uuid");
+              List<UUID> responseUUIDs2 = uuids.stream().map(UUID::fromString).toList();
+
+              assertThat(responseUUIDs2).isEqualTo(responseUUIDs);
+            });
+  }
+
+  @Test
+  void testDefaultStatus() {
+    DocumentUnitDTO dto =
+        repository
+            .save(
+                DocumentUnitDTO.builder()
+                    .uuid(UUID.randomUUID())
+                    .creationtimestamp(Instant.now())
+                    .documentnumber("1234567890123")
+                    .build())
+            .block();
+
+    assertThat(repository.findAll().collectList().block()).hasSize(1);
+
+    webClient
+        .mutateWith(csrf())
+        .mutateWith(getMockLogin())
+        .get()
+        .uri("/api/v1/caselaw/documentunits/" + dto.getDocumentnumber())
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody(DocumentUnit.class)
         .consumeWith(
             response -> {
               assertThat(response.getResponseBody()).isNotNull();
-              assertThat(response.getResponseBody()).hasSize(20);
-
-              List<UUID> responseUUIDs2 =
-                  Arrays.stream(response.getResponseBody())
-                      .map(ProceedingDecision::uuid)
-                      .collect(Collectors.toList());
-
-              assertThat(responseUUIDs2).isEqualTo(responseUUIDs);
+              assertThat(response.getResponseBody().status()).isEqualTo(PUBLISHED);
             });
   }
 }

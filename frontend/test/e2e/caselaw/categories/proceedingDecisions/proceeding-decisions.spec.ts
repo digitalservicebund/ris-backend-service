@@ -1,13 +1,15 @@
 import { expect } from "@playwright/test"
-import { generateString } from "../../../../test-helper/dataGenerators"
 import {
+  checkIfProceedingDecisionCleared,
   fillProceedingDecisionInputs,
   navigateToCategories,
   toggleProceedingDecisionsSection,
-} from "../../e2e-utils"
-import { testWithDocumentUnit as test } from "../../fixtures"
+} from "~/e2e/caselaw/e2e-utils"
+import { testWithDocumentUnit as test } from "~/e2e/caselaw/fixtures"
+import { generateString } from "~/test-helper/dataGenerators"
 
 test.describe("Proceeding decisions", () => {
+  test.slow()
   test("rendering", async ({ page, documentNumber }) => {
     await navigateToCategories(page, documentNumber)
 
@@ -40,15 +42,19 @@ test.describe("Proceeding decisions", () => {
 
     await fillProceedingDecisionInputs(page, {
       court: "AG Aalen",
-      date: "2004-12-03",
+      date: "03.12.2004",
       fileNumber: fileNumber,
       documentType: "AnU",
     })
 
     await page.getByText("Manuell Hinzufügen").click()
 
+    await checkIfProceedingDecisionCleared(page)
+
     await expect(
-      page.getByText(`AG Aalen, AnU, 03.12.2004, ${fileNumber}`)
+      page.getByText(`AG Aalen, AnU, 03.12.2004, ${fileNumber}`, {
+        exact: true,
+      })
     ).toBeVisible()
 
     await page.reload()
@@ -84,28 +90,73 @@ test.describe("Proceeding decisions", () => {
     await toggleProceedingDecisionsSection(page)
     await fillProceedingDecisionInputs(page, {
       court: "AG Aalen",
-      date: "2004-12-03",
+      date: "03.12.2004",
       fileNumber: "1a2b3c",
       documentType: "AnU",
     })
 
     await page.getByText("Manuell Hinzufügen").click()
 
+    await checkIfProceedingDecisionCleared(page)
+
     await expect(
-      page.getByText("AG Aalen, AnU, 03.12.2004, 1a2b3c")
+      page.getByText("AG Aalen, AnU, 03.12.2004, 1a2b3c", { exact: true })
     ).toBeVisible()
 
     await fillProceedingDecisionInputs(page, {
       court: "AG Aalen",
-      date: "2004-12-03",
+      date: "03.12.2004",
       fileNumber: "1a2b3c",
       documentType: "AnU",
     })
 
     await page.getByText("Manuell Hinzufügen").click()
 
+    await checkIfProceedingDecisionCleared(page)
+
     await expect(
       page.getByText("AG Aalen, AnU, 03.12.2004, 1a2b3c")
     ).toHaveCount(2)
+  })
+
+  test("add proceeding decision with unknown date", async ({
+    page,
+    documentNumber,
+  }) => {
+    await navigateToCategories(page, documentNumber)
+    await toggleProceedingDecisionsSection(page)
+
+    const fileNumber = generateString()
+
+    await test.step("create decision with normal date", async () =>
+      await fillProceedingDecisionInputs(page, {
+        court: "AG Aalen",
+        fileNumber: fileNumber,
+        date: "03.12.2004",
+        documentType: "AnU",
+        dateUnknown: true,
+      }))
+
+    await page.getByText("Manuell Hinzufügen").click()
+
+    await checkIfProceedingDecisionCleared(page)
+
+    await expect(
+      page.getByText(
+        `AG Aalen, AnU, unbekanntes Entscheidungsdatum, ${fileNumber}`,
+        {
+          exact: true,
+        }
+      )
+    ).toBeVisible()
+
+    await page.reload()
+    await toggleProceedingDecisionsSection(page)
+
+    await expect(
+      page.getByText(
+        `AG Aalen, AnU, unbekanntes Entscheidungsdatum, ${fileNumber}`
+      )
+    ).toHaveCount(1)
   })
 })

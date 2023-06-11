@@ -30,7 +30,7 @@ updates:
         update-types: ["version-update:semver-patch"]
 
   - package-ecosystem: "docker"
-    directory: "/"
+    directory: "/frontend"
     schedule:
       interval: "daily"
     # Too much noise with patch releases...

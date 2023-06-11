@@ -4,6 +4,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DeviatingDecisi
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DeviatingEcliDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitMetadataDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentationOfficeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.FileNumberDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.IncorrectCourtDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.KeywordDTO;
@@ -12,6 +13,8 @@ import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.DataSource;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitNorm;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.ProceedingDecision;
 import de.bund.digitalservice.ris.caselaw.domain.Texts;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.court.Court;
@@ -50,8 +53,13 @@ public class DocumentUnitTransformer {
           .ecli(coreData.ecli())
           .appraisalBody(coreData.appraisalBody())
           .decisionDate(coreData.decisionDate())
-          .inputType(coreData.inputType())
-          .center(coreData.center());
+          .dateKnown(coreData.dateKnown())
+          .inputType(coreData.inputType());
+
+      if (coreData.documentationOffice() != null) {
+        builder.documentationOffice(
+            DocumentationOfficeTransformer.transform(coreData.documentationOffice()));
+      }
 
       if (coreData.court() != null) {
         builder
@@ -67,8 +75,9 @@ public class DocumentUnitTransformer {
           .ecli(null)
           .appraisalBody(null)
           .decisionDate(null)
+          .dateKnown(true)
           .inputType(null)
-          .center(null)
+          .documentationOffice(null)
           .courtType(null)
           .courtLocation(null);
     }
@@ -118,6 +127,14 @@ public class DocumentUnitTransformer {
     return court;
   }
 
+  private static DocumentationOffice getDocumentationOffice(
+      DocumentationOfficeDTO documentationOfficeDTO) {
+    if (documentationOfficeDTO == null) {
+      return null;
+    }
+    return DocumentationOfficeTransformer.transformDTO(documentationOfficeDTO);
+  }
+
   public static DocumentUnit transformMetadataToDomain(
       DocumentUnitMetadataDTO documentUnitMetadataDTO) {
     if (documentUnitMetadataDTO == null) {
@@ -165,13 +182,15 @@ public class DocumentUnitTransformer {
             null,
             documentUnitMetadataDTO.getAppraisalBody(),
             documentUnitMetadataDTO.getDecisionDate(),
+            documentUnitMetadataDTO.isDateKnown(),
             null,
             documentUnitMetadataDTO.getLegalEffect(),
             documentUnitMetadataDTO.getInputType(),
-            documentUnitMetadataDTO.getCenter(),
+            getDocumentationOffice(documentUnitMetadataDTO.getDocumentationOffice()),
             documentUnitMetadataDTO.getRegion()),
         null,
         null,
+        documentUnitMetadataDTO.getStatus(),
         null);
   }
 
@@ -237,6 +256,14 @@ public class DocumentUnitTransformer {
               .toList();
     }
 
+    List<DocumentUnitNorm> norms = null;
+    if (documentUnitDTO.getNorms() != null) {
+      norms =
+          documentUnitDTO.getNorms().stream()
+              .map(DocumentUnitNormTransformer::transformToDomain)
+              .toList();
+    }
+
     DataSource dataSource = DataSource.NEURIS;
     if (documentUnitDTO.getDataSource() != null) {
       dataSource = documentUnitDTO.getDataSource();
@@ -267,10 +294,11 @@ public class DocumentUnitTransformer {
             deviatingEclis,
             documentUnitDTO.getAppraisalBody(),
             documentUnitDTO.getDecisionDate(),
+            documentUnitDTO.isDateKnown(),
             deviatingDecisionDates,
             documentUnitDTO.getLegalEffect(),
             documentUnitDTO.getInputType(),
-            documentUnitDTO.getCenter(),
+            getDocumentationOffice(documentUnitDTO.getDocumentationOffice()),
             documentUnitDTO.getRegion()),
         proceedingDecisions,
         new Texts(
@@ -282,6 +310,7 @@ public class DocumentUnitTransformer {
             documentUnitDTO.getReasons(),
             documentUnitDTO.getCaseFacts(),
             documentUnitDTO.getDecisionReasons()),
-        new ContentRelatedIndexing(keywords, fieldsOfLaw));
+        documentUnitDTO.getStatus(),
+        new ContentRelatedIndexing(keywords, fieldsOfLaw, norms));
   }
 }

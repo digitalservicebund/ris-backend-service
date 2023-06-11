@@ -19,12 +19,14 @@ const inputValue = ref(props.modelValue)
 
 const rangeStart = computed({
   get: () => inputValue.value.RANGE_START?.[0],
-  set: (data?: string) => data && (inputValue.value.RANGE_START = [data]),
+  set: (data?: string) =>
+    (inputValue.value.RANGE_START = data ? [data] : undefined),
 })
 
 const rangeEnd = computed({
   get: () => inputValue.value.RANGE_END?.[0],
-  set: (data?: string) => data && (inputValue.value.RANGE_END = [data]),
+  set: (data?: string) =>
+    (inputValue.value.RANGE_END = data ? [data] : undefined),
 })
 
 watch(props, () => (inputValue.value = props.modelValue), {

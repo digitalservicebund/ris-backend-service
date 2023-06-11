@@ -42,7 +42,7 @@ _setup_git_hooks() {
 }
 
 _setup_direnv() {
-  # Allow direnv to use `.env` files as described here: 
+  # Allow direnv to use `.env` files as described here:
   # https://github.com/direnv/direnv/blob/master/man/direnv.toml.1.md#codeloaddotenvcode
   [ -d ~/.config/direnv/. ] || mkdir ~/.config/direnv
   cat > ~/.config/direnv/direnv.toml<< EOF
@@ -69,7 +69,7 @@ _env() {
     fail "Setup requires gopass, please install first"
     exit 1
   fi
-  
+
   cat > ./.env<< EOF
 GH_PACKAGES_REPOSITORY_USER=$(gopass show -o -y neuris/maven.pkg.github.com/digitalservicebund/neuris-juris-xml-export/username)
 GH_PACKAGES_REPOSITORY_TOKEN=$(gopass show -o -y neuris/maven.pkg.github.com/digitalservicebund/neuris-juris-xml-export/token)
@@ -78,8 +78,13 @@ OAUTH2_CLIENT_ID=$(gopass show -o -y neuris/maven.pkg.github.com/digitalserviceb
 OAUTH2_CLIENT_SECRET=$(gopass show -o -y neuris/maven.pkg.github.com/digitalservicebund/neuris-dev-oauth2-client/client-secret)
 E2E_TEST_USER=$(gopass show -o -y neuris/maven.pkg.github.com/digitalservicebund/neuris-e2e-test-user/username)
 E2E_TEST_PASSWORD=$(gopass show -o -y neuris/maven.pkg.github.com/digitalservicebund/neuris-e2e-test-user/password)
+E2E_TEST_USER_BGH=$(gopass show -o -y neuris/maven.pkg.github.com/digitalservicebund/neuris-e2e-test-user-bgh/username)
+E2E_TEST_PASSWORD_BGH=$(gopass show -o -y neuris/maven.pkg.github.com/digitalservicebund/neuris-e2e-test-user-bgh/password)
 MY_UID=$(id -u)
 MY_GID=$(id -g)
+DB_URL=jdbc:postgresql://localhost:5432/postgres
+DB_USER=test
+DB_PASSWORD=test
 EOF
 
   if ! command -v direnv > /dev/null 2>&1; then
@@ -98,7 +103,7 @@ _dev() {
     exit 1
   fi
   docker build ./frontend -f frontend/Dockerfile -t neuris/frontend
-  
+
   wait=""
   services=""
   for arg in "$@"; do
@@ -116,8 +121,22 @@ _dev() {
   echo "The application is available at http://127.0.0.1"
 }
 
+_doc() {
+  if ! type "docker-compose" > /dev/null
+  then
+    _fail "Running doc environment requires docker-compose, please install first"
+    exit 1
+  fi
+  # TODO : introduce docker-compose profiles and start doc environment by `docker-compose --profile doc up`
+  docker compose up -d --wait structurizr
+  sleep 5
+  open http://127.0.0.1:58080 &
+}
+
 _down() {
   docker compose stop
+  # TODO : introduce profile for dev containers
+  docker compose --profile doc stop
 }
 
 _commit_message_template() {
@@ -162,7 +181,8 @@ _help() {
   echo "dev                   Start full-stack development environment"
   echo "                      Add '-' or '--no-backend' to start backend separately"
   echo "                      Add '-d' or '--detached' to check the health of the services in the background instead of showing the log stream"
-  echo "down                  Stop development environment"
+  echo "doc                   Start doc environment with structurizr"
+  echo "down                  Stop development/doc environment"
   echo "clean-staging         Deletes all existing documentunits on staging"
   echo "cm <issue-number>     Configure commit message template with given issue number;"
   echo "                      issue number can be with or without prefix: 1234, RISDEV-1234."
@@ -172,9 +192,10 @@ cmd="${1:-}"
 case "$cmd" in
   "init") _init ;;
   "env") _env ;;
-  "dev") 
-    shift 
+  "dev")
+    shift
     _dev "$@";;
+  "doc") _doc ;;
   "down") _down ;;
   "clean-staging") _clean_staging ;;
   "_start") _start ;;

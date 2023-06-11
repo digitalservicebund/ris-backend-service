@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ProceedingDecision } from "@/domain/documentUnit"
+import ProceedingDecision from "@/domain/proceedingDecision"
 
 defineProps<{
   decision: ProceedingDecision
@@ -9,19 +9,20 @@ defineProps<{
 <template>
   <div>
     <router-link
-      v-if="ProceedingDecision.hasLink(decision)"
+      v-if="decision.hasLink"
       class="link-01-bold underline"
+      tabindex="-1"
       target="_blank"
       :to="{
         name: 'caselaw-documentUnit-:documentNumber-categories',
         params: { documentNumber: decision.documentNumber },
       }"
     >
-      {{ ProceedingDecision.renderDecision(decision) }}
+      <button class="underline">
+        {{ decision.renderDecision }}
+      </button>
     </router-link>
 
-    <span v-else class="label-02-reg">{{
-      ProceedingDecision.renderDecision(decision)
-    }}</span>
+    <span v-else class="label-02-reg">{{ decision.renderDecision }}</span>
   </div>
 </template>

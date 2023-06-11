@@ -1,7 +1,7 @@
 import userEvent from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
 import DocumentUnitProceedingDecisions from "@/components/proceedingDecisions/ProceedingDecisions.vue"
-import type { ProceedingDecision } from "@/domain/documentUnit"
+import ProceedingDecision from "@/domain/proceedingDecision"
 import documentUnitService from "@/services/documentUnitService"
 import proceedingDecisionService from "@/services/proceedingDecisionService"
 
@@ -56,15 +56,19 @@ describe("DocumentUnitProceedingDecisions", async () => {
         Promise.resolve({
           status: 200,
           data: [
-            {
-              court: { type: "type1", location: "location1", label: "label1" },
+            new ProceedingDecision({
+              court: {
+                type: "type1",
+                location: "location1",
+                label: "label1",
+              },
               date: "2022-02-01",
               documentType: {
                 jurisShortcut: "documentTypeShortcut1",
                 label: "documentType1",
               },
               fileNumber: "testFileNumber1",
-            },
+            }),
           ],
         })
       )
@@ -101,26 +105,43 @@ describe("DocumentUnitProceedingDecisions", async () => {
       .mockImplementation(() =>
         Promise.resolve({
           status: 200,
-          data: [
-            {
-              court: { type: "type1", location: "location1", label: "label1" },
-              date: "2022-02-01",
-              documentType: {
-                jurisShortcut: "documentTypeShortcut1",
-                label: "documentType1",
-              },
-              fileNumber: "test fileNumber",
-            },
-            {
-              court: { type: "type2", location: "location2", label: "label2" },
-              date: "2022-02-02",
-              documentType: {
-                jurisShortcut: "documentTypeShortcut2",
-                label: "documentType2",
-              },
-              fileNumber: "test fileNumber",
-            },
-          ],
+          data: {
+            content: [
+              new ProceedingDecision({
+                court: {
+                  type: "type1",
+                  location: "location1",
+                  label: "label1",
+                },
+                date: "2022-02-01",
+                documentType: {
+                  jurisShortcut: "documentTypeShortcut1",
+                  label: "documentType1",
+                },
+                fileNumber: "test fileNumber",
+              }),
+              new ProceedingDecision({
+                court: {
+                  type: "type2",
+                  location: "location2",
+                  label: "label2",
+                },
+                date: "2022-02-02",
+                documentType: {
+                  jurisShortcut: "documentTypeShortcut2",
+                  label: "documentType2",
+                },
+                fileNumber: "test fileNumber",
+              }),
+            ],
+            size: 0,
+            totalElements: 20,
+            totalPages: 2,
+            number: 0,
+            numberOfElements: 20,
+            first: true,
+            last: false,
+          },
         })
       )
     const { user } = renderComponent()
@@ -145,21 +166,30 @@ describe("DocumentUnitProceedingDecisions", async () => {
         .mockImplementation(() =>
           Promise.resolve({
             status: 200,
-            data: [
-              {
-                court: {
-                  type: "type1",
-                  location: "location1",
-                  label: "label1",
-                },
-                date: "2022-02-01",
-                documentType: {
-                  jurisShortcut: "documentTypeShortcut1",
-                  label: "documentType1",
-                },
-                fileNumber: "test fileNumber",
-              },
-            ],
+            data: {
+              content: [
+                new ProceedingDecision({
+                  court: {
+                    type: "type1",
+                    location: "location1",
+                    label: "label1",
+                  },
+                  date: "2022-02-01",
+                  documentType: {
+                    jurisShortcut: "documentTypeShortcut1",
+                    label: "documentType1",
+                  },
+                  fileNumber: "test fileNumber",
+                }),
+              ],
+              size: 0,
+              totalElements: 20,
+              totalPages: 2,
+              number: 0,
+              numberOfElements: 20,
+              first: true,
+              last: false,
+            },
           })
         )
       const { user } = renderComponent()

@@ -4,10 +4,12 @@ import de.bund.digitalservice.ris.norms.domain.entity.MetadataSection
 import de.bund.digitalservice.ris.norms.domain.entity.Metadatum
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType
+import de.bund.digitalservice.ris.norms.domain.value.UndefinedDate
 import io.mockk.every
 import io.mockk.mockk
 import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.Test
+import java.time.LocalDate
 
 class HasValidChildrenTest {
 
@@ -145,5 +147,156 @@ class HasValidChildrenTest {
         )
 
         Assertions.assertThat(hasValidChildren.isSatisfiedBy(instance)).isFalse()
+    }
+
+    @Test
+    fun `it is satisfied that the divergent entry into force defined section does not have any children sections`() {
+        val instance = mockk<MetadataSection>()
+        every { instance.name } returns MetadataSectionName.DIVERGENT_ENTRY_INTO_FORCE_DEFINED
+        every { instance.sections } returns null
+
+        Assertions.assertThat(hasValidChildren.isSatisfiedBy(instance)).isTrue()
+    }
+
+    @Test
+    fun `it is satisfied that the divergent entry into force undefined section does not have any children sections`() {
+        val instance = mockk<MetadataSection>()
+        every { instance.name } returns MetadataSectionName.DIVERGENT_ENTRY_INTO_FORCE_UNDEFINED
+        every { instance.sections } returns null
+
+        Assertions.assertThat(hasValidChildren.isSatisfiedBy(instance)).isTrue()
+    }
+
+    @Test
+    fun `it is satisfied that the divergent expiration defined section does not have any children sections`() {
+        val instance = mockk<MetadataSection>()
+        every { instance.name } returns MetadataSectionName.DIVERGENT_EXPIRATION_DEFINED
+        every { instance.sections } returns null
+
+        Assertions.assertThat(hasValidChildren.isSatisfiedBy(instance)).isTrue()
+    }
+
+    @Test
+    fun `it is satisfied that the divergent expiration undefined section does not have any children sections`() {
+        val instance = mockk<MetadataSection>()
+        every { instance.name } returns MetadataSectionName.DIVERGENT_EXPIRATION_UNDEFINED
+        every { instance.sections } returns null
+
+        Assertions.assertThat(hasValidChildren.isSatisfiedBy(instance)).isTrue()
+    }
+
+    @Test
+    fun `it is satisfied that the divergent entry into force section contains once every allowed children sections`() {
+        val instance = mockk<MetadataSection>()
+        every { instance.name } returns MetadataSectionName.DIVERGENT_ENTRY_INTO_FORCE
+        every { instance.sections } returns listOf(
+            MetadataSection(MetadataSectionName.DIVERGENT_ENTRY_INTO_FORCE_DEFINED, listOf(Metadatum(LocalDate.now(), MetadatumType.DATE))),
+            MetadataSection(MetadataSectionName.DIVERGENT_ENTRY_INTO_FORCE_UNDEFINED, listOf(Metadatum(UndefinedDate.UNDEFINED_UNKNOWN, MetadatumType.UNDEFINED_DATE))),
+        )
+
+        Assertions.assertThat(hasValidChildren.isSatisfiedBy(instance)).isFalse()
+    }
+
+    @Test
+    fun `it is satisfied that the divergent entry into force section contains only one of the allowed children sections`() {
+        val instance = mockk<MetadataSection>()
+        every { instance.name } returns MetadataSectionName.DIVERGENT_ENTRY_INTO_FORCE
+        every { instance.sections } returns listOf(
+            MetadataSection(MetadataSectionName.DIVERGENT_ENTRY_INTO_FORCE_UNDEFINED, listOf(Metadatum(UndefinedDate.UNDEFINED_FUTURE, MetadatumType.UNDEFINED_DATE))),
+        )
+
+        Assertions.assertThat(hasValidChildren.isSatisfiedBy(instance)).isTrue()
+    }
+
+    @Test
+    fun `it is not satisfied that the divergent entry into force section only contains allowed children sections`() {
+        val instance = mockk<MetadataSection>()
+        every { instance.name } returns MetadataSectionName.DIVERGENT_ENTRY_INTO_FORCE
+        every { instance.sections } returns listOf(
+            MetadataSection(MetadataSectionName.DIVERGENT_ENTRY_INTO_FORCE_DEFINED, listOf(Metadatum(LocalDate.now(), MetadatumType.DATE))),
+            MetadataSection(MetadataSectionName.NORM, listOf(Metadatum("keyword", MetadatumType.KEYWORD))),
+        )
+
+        Assertions.assertThat(hasValidChildren.isSatisfiedBy(instance)).isFalse()
+    }
+
+    @Test
+    fun `it is satisfied that the divergent expiration section contains once every allowed children sections`() {
+        val instance = mockk<MetadataSection>()
+        every { instance.name } returns MetadataSectionName.DIVERGENT_EXPIRATION
+        every { instance.sections } returns listOf(
+            MetadataSection(MetadataSectionName.DIVERGENT_EXPIRATION_DEFINED, listOf(Metadatum(LocalDate.now(), MetadatumType.DATE))),
+            MetadataSection(MetadataSectionName.DIVERGENT_EXPIRATION_UNDEFINED, listOf(Metadatum(UndefinedDate.UNDEFINED_UNKNOWN, MetadatumType.UNDEFINED_DATE))),
+        )
+
+        Assertions.assertThat(hasValidChildren.isSatisfiedBy(instance)).isFalse()
+    }
+
+    @Test
+    fun `it is satisfied that the divergent expiration section contains only one of the allowed children sections`() {
+        val instance = mockk<MetadataSection>()
+        every { instance.name } returns MetadataSectionName.DIVERGENT_EXPIRATION
+        every { instance.sections } returns listOf(
+            MetadataSection(MetadataSectionName.DIVERGENT_EXPIRATION_UNDEFINED, listOf(Metadatum(UndefinedDate.UNDEFINED_FUTURE, MetadatumType.UNDEFINED_DATE))),
+        )
+
+        Assertions.assertThat(hasValidChildren.isSatisfiedBy(instance)).isTrue()
+    }
+
+    @Test
+    fun `it is not satisfied that the divergent expiration section only contains allowed children sections`() {
+        val instance = mockk<MetadataSection>()
+        every { instance.name } returns MetadataSectionName.DIVERGENT_EXPIRATION
+        every { instance.sections } returns listOf(
+            MetadataSection(MetadataSectionName.DIVERGENT_EXPIRATION_DEFINED, listOf(Metadatum(LocalDate.now(), MetadatumType.DATE))),
+            MetadataSection(MetadataSectionName.NORM, listOf(Metadatum("keyword", MetadatumType.KEYWORD))),
+        )
+
+        Assertions.assertThat(hasValidChildren.isSatisfiedBy(instance)).isFalse()
+    }
+
+    @Test
+    fun `it is satisfied if the categorized reference does not have any children sections`() {
+        val instance = mockk<MetadataSection>()
+        every { instance.name } returns MetadataSectionName.CATEGORIZED_REFERENCE
+        every { instance.sections } returns null
+
+        Assertions.assertThat(hasValidChildren.isSatisfiedBy(instance)).isTrue()
+    }
+
+    @Test
+    fun `it is satisfied if the entry into force section does not have any children sections`() {
+        val instance = mockk<MetadataSection>()
+        every { instance.name } returns MetadataSectionName.ENTRY_INTO_FORCE
+        every { instance.sections } returns null
+
+        Assertions.assertThat(hasValidChildren.isSatisfiedBy(instance)).isTrue()
+    }
+
+    @Test
+    fun `it is satisfied if the principle entry into force section does not have any children sections`() {
+        val instance = mockk<MetadataSection>()
+        every { instance.name } returns MetadataSectionName.PRINCIPLE_ENTRY_INTO_FORCE
+        every { instance.sections } returns null
+
+        Assertions.assertThat(hasValidChildren.isSatisfiedBy(instance)).isTrue()
+    }
+
+    @Test
+    fun `it is satisfied if the expiration section does not have any children sections`() {
+        val instance = mockk<MetadataSection>()
+        every { instance.name } returns MetadataSectionName.EXPIRATION
+        every { instance.sections } returns null
+
+        Assertions.assertThat(hasValidChildren.isSatisfiedBy(instance)).isTrue()
+    }
+
+    @Test
+    fun `it is satisfied if the principle expiration section does not have any children sections`() {
+        val instance = mockk<MetadataSection>()
+        every { instance.name } returns MetadataSectionName.PRINCIPLE_EXPIRATION
+        every { instance.sections } returns null
+
+        Assertions.assertThat(hasValidChildren.isSatisfiedBy(instance)).isTrue()
     }
 }

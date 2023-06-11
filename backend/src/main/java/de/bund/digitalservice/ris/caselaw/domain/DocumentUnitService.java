@@ -1,5 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.domain;
 
+import static de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatus.PUBLISHED;
 import static de.bund.digitalservice.ris.caselaw.domain.ServiceUtils.byteBufferToArray;
 
 import java.io.ByteArrayInputStream;
@@ -18,6 +19,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Order;
 import org.springframework.http.HttpHeaders;
@@ -44,6 +49,7 @@ public class DocumentUnitService {
   private final DocumentNumberService documentNumberService;
   private final S3AsyncClient s3AsyncClient;
   private final EmailPublishService publishService;
+  private final DocumentUnitStatusService documentUnitStatusService;
 
   @Value("${otc.obs.bucket-name}")
   private String bucketName;
@@ -52,19 +58,22 @@ public class DocumentUnitService {
       DocumentUnitRepository repository,
       DocumentNumberService documentNumberService,
       S3AsyncClient s3AsyncClient,
-      EmailPublishService publishService) {
+      EmailPublishService publishService,
+      DocumentUnitStatusService documentUnitStatusService) {
 
     this.repository = repository;
     this.documentNumberService = documentNumberService;
     this.s3AsyncClient = s3AsyncClient;
     this.publishService = publishService;
+    this.documentUnitStatusService = documentUnitStatusService;
   }
 
-  public Mono<DocumentUnit> generateNewDocumentUnit(
-      DocumentUnitCreationInfo documentUnitCreationInfo) {
-    return documentNumberService
-        .generateNextDocumentNumber(documentUnitCreationInfo)
-        .flatMap(repository::createNewDocumentUnit)
+  public Mono<DocumentUnit> generateNewDocumentUnit(DocumentationOffice documentationOffice) {
+    return Mono.just(documentationOffice)
+        .flatMap(documentNumberService::generateNextDocumentNumber)
+        .flatMap(
+            documentNumber -> repository.createNewDocumentUnit(documentNumber, documentationOffice))
+        .flatMap(documentUnitStatusService::setInitialStatus)
         .retryWhen(Retry.backoff(5, Duration.ofSeconds(2)).jitter(0.75))
         .doOnError(ex -> log.error("Couldn't create empty doc unit", ex));
   }
@@ -162,8 +171,20 @@ public class DocumentUnitService {
         .flatMap(Function.identity());
   }
 
-  public Flux<DocumentUnitListEntry> getAll() {
-    return repository.findAll(Sort.by(Order.desc("creationtimestamp")));
+  public Mono<Page<DocumentUnitListEntry>> getAll(
+      Pageable pageable, DocumentationOffice documentationOffice) {
+    return repository
+        .findAll(
+            PageRequest.of(
+                pageable.getPageNumber(),
+                pageable.getPageSize(),
+                Sort.by(Order.desc("creationtimestamp"))),
+            documentationOffice)
+        .collectList()
+        .zipWith(
+            repository.countByDataSourceAndDocumentationOffice(
+                DataSource.NEURIS, documentationOffice))
+        .map(tuple -> new PageImpl<>(tuple.getT1(), pageable, tuple.getT2()));
   }
 
   public Mono<DocumentUnit> getByDocumentNumber(String documentNumber) {
@@ -245,23 +266,46 @@ public class DocumentUnitService {
   public Mono<MailResponse> publishAsEmail(UUID documentUnitUuid, String receiverAddress) {
     return repository
         .findByUuid(documentUnitUuid)
-        .flatMap(documentUnit -> publishService.publish(documentUnit, receiverAddress));
+        .flatMap(
+            documentUnit ->
+                publishService
+                    .publish(documentUnit, receiverAddress)
+                    .flatMap(
+                        mailResponse -> {
+                          if (mailResponse
+                              .getStatusCode()
+                              .equals(String.valueOf(HttpStatus.OK.value()))) {
+                            return documentUnitStatusService
+                                .updateStatus(
+                                    documentUnit, PUBLISHED, mailResponse.getPublishDate())
+                                .thenReturn(mailResponse);
+                          } else {
+                            return Mono.just(mailResponse);
+                          }
+                        }));
   }
 
   public Mono<MailResponse> getLastPublishedXmlMail(UUID documentUuid) {
     return publishService.getLastPublishedXml(documentUuid);
   }
 
-  public Flux<ProceedingDecision> searchForDocumentUnitsByProceedingDecisionInput(
-      ProceedingDecision proceedingDecision) {
-    return repository.searchForDocumentUnitsByProceedingDecisionInput(proceedingDecision);
+  public Mono<Page<ProceedingDecision>> searchByProceedingDecision(
+      ProceedingDecision proceedingDecision, Pageable pageable) {
+
+    return repository
+        .searchByProceedingDecision(proceedingDecision, pageable)
+        .collectList()
+        .zipWith(repository.countByProceedingDecision(proceedingDecision))
+        .map(tuple -> new PageImpl<>(tuple.getT1(), pageable, tuple.getT2()));
   }
 
   @Transactional(transactionManager = "connectionFactoryTransactionManager")
   public Flux<ProceedingDecision> createProceedingDecision(
-      UUID parentDocumentUnitUuid, ProceedingDecision proceedingDecision) {
+      UUID parentDocumentUnitUuid,
+      ProceedingDecision proceedingDecision,
+      DocumentationOffice documentationOffice) {
 
-    return generateNewDocumentUnit(new DocumentUnitCreationInfo("KO", "RE"))
+    return generateNewDocumentUnit(documentationOffice)
         .flatMap(
             childDocumentUnit ->
                 updateDocumentUnit(
@@ -300,6 +344,7 @@ public class DocumentUnitService {
             .documentType(proceedingDecision.documentType())
             .decisionDate(proceedingDecision.date())
             .court(proceedingDecision.court())
+            .dateKnown(proceedingDecision.dateKnown())
             .build();
 
     return documentUnit.toBuilder()

@@ -30,6 +30,7 @@ import org.springframework.security.test.web.reactive.server.SecurityMockServerC
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.springframework.test.web.reactive.server.WebTestClient
 import reactor.test.StepVerifier
+import utils.factory.norm
 import java.time.Duration
 import java.time.LocalDate
 import java.util.*
@@ -76,10 +77,17 @@ class LoadNormAsXmlControllerIntegrationTest : PostgresTestcontainerIntegrationT
             listOf(Metadatum(date, MetadatumType.DATE)),
         )
         val printAnnouncementSection = MetadataSection(
-            MetadataSectionName.PRINT_ANNOUNCEMENT,
+            MetadataSectionName.OFFICIAL_REFERENCE,
+            listOf(),
+            1,
             listOf(
-                Metadatum("BGBl I", MetadatumType.ANNOUNCEMENT_GAZETTE),
-                Metadatum("3", MetadatumType.PAGE),
+                MetadataSection(
+                    MetadataSectionName.PRINT_ANNOUNCEMENT,
+                    listOf(
+                        Metadatum("BGBl I", MetadatumType.ANNOUNCEMENT_GAZETTE),
+                        Metadatum("3", MetadatumType.PAGE),
+                    ),
+                ),
             ),
         )
         val norm = Norm(

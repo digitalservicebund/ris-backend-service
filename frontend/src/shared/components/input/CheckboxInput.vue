@@ -28,14 +28,6 @@ const { inputValue, emitInputEvent } = useInputModel<boolean, Props, Emits>(
   emit
 )
 
-function updateValue() {
-  if (inputValue.value === undefined) {
-    inputValue.value = true
-  } else {
-    inputValue.value = !inputValue.value
-  }
-}
-
 const isInvalid = computed(() => props.validationError !== undefined)
 </script>
 <template>
@@ -43,11 +35,10 @@ const isInvalid = computed(() => props.validationError !== undefined)
     :id="id"
     v-model="inputValue"
     :aria-label="ariaLabel"
-    class="ds-checkbox"
-    :class="{ 'has-error': isInvalid }"
+    class="appearance-none border-2 border-blue-800 disabled:border-gray-600 disabled:focus:outline-0 disabled:hover:outline-0 focus:outline-2 h-40 hover:outline-2 mr-8 outline-0 outline-blue-800 outline-none outline-offset-[-4px] w-40"
+    :class="{ 'border-red-800': isInvalid, 'outline-red-800': isInvalid }"
     type="checkbox"
     @input="emitInputEvent"
-    @keydown.enter="updateValue"
   />
   <label></label>
 </template>

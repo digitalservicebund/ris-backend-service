@@ -118,6 +118,10 @@ export async function toggleProceedingDecisionsSection(
   await page.locator("text=Vorgehende Entscheidungen").click()
 }
 
+export async function toggleNormsSection(page: Page): Promise<void> {
+  await page.getByRole("button", { name: "Normen Aufklappen" }).click()
+}
+
 export async function fillProceedingDecisionInputs(
   page: Page,
   values?: {
@@ -125,24 +129,24 @@ export async function fillProceedingDecisionInputs(
     date?: string
     fileNumber?: string
     documentType?: string
+    dateUnknown?: boolean
   },
   decisionIndex = 0
 ): Promise<void> {
-  const fillInput = async (ariaLabel: string, value?: string) => {
-    await page
-      .locator(`[aria-label='${ariaLabel}']`)
-      .nth(decisionIndex)
-      .fill(value ?? generateString())
+  const fillInput = async (ariaLabel: string, value = generateString()) => {
+    const input = page.locator(`[aria-label='${ariaLabel}']`).nth(decisionIndex)
+    await input.fill(value ?? ariaLabel)
+    await waitForInputValue(page, `[aria-label='${ariaLabel}']`, value)
   }
 
   if (values?.court) {
     await fillInput("Gericht Rechtszug", values?.court)
     await page.getByText(values.court, { exact: true }).click()
-
-    await expect(async () => {
-      const inputValue = await page.getByLabel("Gericht Rechtszug").inputValue()
-      expect(inputValue).toBe(values.court)
-    }).toPass({ timeout: 5000 })
+    await waitForInputValue(
+      page,
+      "[aria-label='Gericht Rechtszug']",
+      values.court
+    )
   }
   if (values?.date) {
     await fillInput("Entscheidungsdatum Rechtszug", values?.date)
@@ -154,4 +158,27 @@ export async function fillProceedingDecisionInputs(
     await fillInput("Dokumenttyp Rechtszug", values?.documentType)
     await page.locator("[aria-label='dropdown-option']").first().click()
   }
+  if (values?.dateUnknown) {
+    const dateUnknownCheckbox = page.getByLabel("Datum unbekannt")
+    if (!(await dateUnknownCheckbox.isChecked())) {
+      await dateUnknownCheckbox.click()
+      await expect(dateUnknownCheckbox).toBeChecked()
+      await waitForInputValue(
+        page,
+        "[aria-label='Entscheidungsdatum Rechtszug']",
+        ""
+      )
+    }
+  }
+}
+
+export async function checkIfProceedingDecisionCleared(page: Page) {
+  ;[
+    "Gericht Rechtszug",
+    "Entscheidungsdatum Rechtszug",
+    "Aktenzeichen Rechtszug",
+    "Dokumenttyp Rechtszug",
+  ].forEach((ariaLabel) =>
+    waitForInputValue(page, `[aria-label='${ariaLabel}']`, "")
+  )
 }

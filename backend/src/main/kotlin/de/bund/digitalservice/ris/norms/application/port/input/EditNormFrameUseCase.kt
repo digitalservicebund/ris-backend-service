@@ -1,7 +1,6 @@
 package de.bund.digitalservice.ris.norms.application.port.input
 
 import de.bund.digitalservice.ris.norms.domain.entity.MetadataSection
-import de.bund.digitalservice.ris.norms.domain.value.UndefinedDate
 import reactor.core.publisher.Mono
 import java.time.LocalDate
 import java.util.UUID
@@ -19,55 +18,11 @@ interface EditNormFrameUseCase {
         var documentNumber: String? = null,
         var documentCategory: String? = null,
 
-        var documentTypeName: String? = null,
-        var documentNormCategory: String? = null,
-        var documentTemplateName: String? = null,
-
         var officialShortTitle: String? = null,
         var officialAbbreviation: String? = null,
 
-        var entryIntoForceDate: LocalDate? = null,
-        var entryIntoForceDateState: UndefinedDate? = null,
-        var principleEntryIntoForceDate: LocalDate? = null,
-        var principleEntryIntoForceDateState: UndefinedDate? = null,
-        var divergentEntryIntoForceDate: LocalDate? = null,
-        var divergentEntryIntoForceDateState: UndefinedDate? = null,
-        var entryIntoForceNormCategory: String? = null,
-
-        var expirationDate: LocalDate? = null,
-        var expirationDateState: UndefinedDate? = null,
-        var isExpirationDateTemp: Boolean? = null,
-        var principleExpirationDate: LocalDate? = null,
-        var principleExpirationDateState: UndefinedDate? = null,
-        var divergentExpirationDate: LocalDate? = null,
-        var divergentExpirationDateState: UndefinedDate? = null,
-        var expirationNormCategory: String? = null,
-
         var announcementDate: LocalDate? = null,
         var publicationDate: LocalDate? = null,
-
-        var printAnnouncementGazette: String? = null,
-        var printAnnouncementYear: String? = null,
-        var printAnnouncementNumber: String? = null,
-        var printAnnouncementPage: String? = null,
-        var printAnnouncementInfo: String? = null,
-        var printAnnouncementExplanations: String? = null,
-        var digitalAnnouncementMedium: String? = null,
-        var digitalAnnouncementDate: LocalDate? = null,
-        var digitalAnnouncementEdition: String? = null,
-        var digitalAnnouncementYear: String? = null,
-        var digitalAnnouncementArea: String? = null,
-        var digitalAnnouncementAreaNumber: String? = null,
-        var digitalAnnouncementInfo: String? = null,
-        var digitalAnnouncementExplanations: String? = null,
-        var euAnnouncementGazette: String? = null,
-        var euAnnouncementYear: String? = null,
-        var euAnnouncementSeries: String? = null,
-        var euAnnouncementNumber: String? = null,
-        var euAnnouncementPage: String? = null,
-        var euAnnouncementInfo: String? = null,
-        var euAnnouncementExplanations: String? = null,
-        var otherOfficialAnnouncement: String? = null,
 
         var completeCitation: String? = null,
 
@@ -97,8 +52,6 @@ interface EditNormFrameUseCase {
         var applicationScopeArea: String? = null,
         var applicationScopeStartDate: LocalDate? = null,
         var applicationScopeEndDate: LocalDate? = null,
-
-        var categorizedReference: String? = null,
 
         var otherFootnote: String? = null,
         var footnoteChange: String? = null,

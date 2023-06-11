@@ -2,7 +2,7 @@ package de.bund.digitalservice.ris.caselaw.adapter;
 
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentNumberCounterRepository;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentNumberService;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitCreationInfo;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import java.util.Calendar;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
@@ -10,14 +10,14 @@ import reactor.core.publisher.Mono;
 @Service
 public class DatabaseDocumentNumberService implements DocumentNumberService {
   private final DatabaseDocumentNumberCounterRepository repository;
+  private final String CASELAW_ABBREVIATION = "RE";
 
   public DatabaseDocumentNumberService(DatabaseDocumentNumberCounterRepository repository) {
     this.repository = repository;
   }
 
   @Override
-  public Mono<String> generateNextDocumentNumber(
-      DocumentUnitCreationInfo documentUnitCreationInfo) {
+  public Mono<String> generateNextDocumentNumber(DocumentationOffice documentationOffice) {
     int currentYear = Calendar.getInstance().get(Calendar.YEAR);
 
     return repository
@@ -38,8 +38,8 @@ public class DatabaseDocumentNumberService implements DocumentNumberService {
             documentNumberCounter ->
                 String.format(
                     "%s%s%04d%05d",
-                    documentUnitCreationInfo.documentationCenterAbbreviation(),
-                    documentUnitCreationInfo.documentType(),
+                    documentationOffice.abbreviation(),
+                    CASELAW_ABBREVIATION,
                     currentYear,
                     documentNumberCounter.getNextnumber() - 1));
   }

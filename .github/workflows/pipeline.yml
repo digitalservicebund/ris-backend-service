@@ -16,6 +16,7 @@ env:
   GH_PACKAGES_REPOSITORY_USER: ${{ secrets.GH_PACKAGES_REPOSITORY_USER }} # Secrets must not start with "GITHUB_"..
   GH_PACKAGES_REPOSITORY_TOKEN: ${{ secrets.GH_PACKAGES_REPOSITORY_TOKEN }}
   SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
+  REPORTS_REPOSITORY: digitalservicebund/ris-reports
 
 jobs:
   backend-build:
@@ -151,7 +152,7 @@ jobs:
       - name: Run Trivy vulnerability scanner
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
-        uses: aquasecurity/trivy-action@e5f43133f6e8736992c9f3c1b3296e24b37e17f2
+        uses: aquasecurity/trivy-action@b43daad0c3c96202fc5800b511dfae8e6ecce864
         with:
           image-ref: ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}:${{ env.CONTAINER_IMAGE_VERSION }}
           format: "sarif"
@@ -166,7 +167,7 @@ jobs:
       - name: Generate cosign vulnerability scan record
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
-        uses: aquasecurity/trivy-action@e5f43133f6e8736992c9f3c1b3296e24b37e17f2
+        uses: aquasecurity/trivy-action@b43daad0c3c96202fc5800b511dfae8e6ecce864
         with:
           image-ref: ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}:${{ env.CONTAINER_IMAGE_VERSION }}
           format: "cosign-vuln"
@@ -373,7 +374,7 @@ jobs:
       - name: Run Trivy vulnerability image scanner
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
-        uses: aquasecurity/trivy-action@e5f43133f6e8736992c9f3c1b3296e24b37e17f2
+        uses: aquasecurity/trivy-action@b43daad0c3c96202fc5800b511dfae8e6ecce864
         with:
           image-ref: ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}/frontend:${{ env.CONTAINER_IMAGE_VERSION }}
           format: "sarif"
@@ -389,7 +390,7 @@ jobs:
       - name: Run Trivy vulnerability file scanner
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
-        uses: aquasecurity/trivy-action@e5f43133f6e8736992c9f3c1b3296e24b37e17f2
+        uses: aquasecurity/trivy-action@b43daad0c3c96202fc5800b511dfae8e6ecce864
         with:
           scan-type: "fs"
           scan-ref: "./frontend"
@@ -407,7 +408,7 @@ jobs:
       - name: Generate cosign vulnerability scan record
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
-        uses: aquasecurity/trivy-action@e5f43133f6e8736992c9f3c1b3296e24b37e17f2
+        uses: aquasecurity/trivy-action@b43daad0c3c96202fc5800b511dfae8e6ecce864
         with:
           image-ref: ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}/frontend:${{ env.CONTAINER_IMAGE_VERSION }}
           format: "cosign-vuln"
@@ -572,7 +573,7 @@ jobs:
       - name: Log into container registry
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
-        uses: docker/login-action@f4ef78c080cd8ba55a85445d5b36e214a81df20a
+        uses: docker/login-action@465a07811f14bebb1938fbed4728c6a1ff8901fc
         with:
           registry: ${{ env.CONTAINER_REGISTRY }}
           username: ${{ github.actor }}
@@ -582,19 +583,19 @@ jobs:
       - name: Install cosign
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
-        uses: sigstore/cosign-installer@9becc617647dfa20ae7b1151972e9b3a2c338a2b
+        uses: sigstore/cosign-installer@871cdc754496eb3792209f6e81422fac01b793b4
       - name: Sign the published Docker image
         env:
           COSIGN_EXPERIMENTAL: "true"
         # This step uses the identity token to provision an ephemeral certificate
         # against the sigstore community Fulcio instance.
-        run: cosign sign ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}:${{ env.CONTAINER_IMAGE_VERSION }}
+        run: cosign sign --yes ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}:${{ env.CONTAINER_IMAGE_VERSION }}
       - name: Download cosign vulnerability scan record
         uses: actions/download-artifact@v3
         with:
           name: "vuln-backend.json"
       - name: Attest vulnerability scan
-        run: cosign attest --replace --predicate vuln-backend.json --type vuln ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}:${{ env.CONTAINER_IMAGE_VERSION }}
+        run: cosign attest --yes --replace --predicate vuln-backend.json --type vuln ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}:${{ env.CONTAINER_IMAGE_VERSION }}
         env:
           COSIGN_EXPERIMENTAL: "true"
       - id: set-version
@@ -641,7 +642,7 @@ jobs:
       - name: Log into container registry
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
-        uses: docker/login-action@f4ef78c080cd8ba55a85445d5b36e214a81df20a
+        uses: docker/login-action@465a07811f14bebb1938fbed4728c6a1ff8901fc
         with:
           registry: ${{ env.CONTAINER_REGISTRY }}
           username: ${{ github.actor }}
@@ -651,19 +652,19 @@ jobs:
       - name: Install cosign
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
-        uses: sigstore/cosign-installer@9becc617647dfa20ae7b1151972e9b3a2c338a2b
+        uses: sigstore/cosign-installer@871cdc754496eb3792209f6e81422fac01b793b4
       - name: Sign the published Docker image
         env:
           COSIGN_EXPERIMENTAL: "true"
         # This step uses the identity token to provision an ephemeral certificate
         # against the sigstore community Fulcio instance.
-        run: cosign sign ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}/frontend:${{ env.CONTAINER_IMAGE_VERSION }}
+        run: cosign sign --yes ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}/frontend:${{ env.CONTAINER_IMAGE_VERSION }}
       - name: Download cosign vulnerability scan record
         uses: actions/download-artifact@v3
         with:
           name: "vuln-frontend.json"
       - name: Attest vulnerability scan
-        run: cosign attest --replace --predicate vuln-frontend.json --type vuln ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}/frontend:${{ env.CONTAINER_IMAGE_VERSION }}
+        run: cosign attest --yes --replace --predicate vuln-frontend.json --type vuln ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}/frontend:${{ env.CONTAINER_IMAGE_VERSION }}
         env:
           COSIGN_EXPERIMENTAL: "true"
       - id: set-version
@@ -762,23 +763,17 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        subproject: [caselaw, norms]
+        subproject: [caselaw, norms, shared]
         browser: [chromium, firefox]
+        mode: [e2e]
+        include:
+          - mode: a11y
+            browser: a11y
     uses: ./.github/workflows/_playwright-test.yml
     with:
       subproject: ${{ matrix.subproject}}
       browser: ${{ matrix.browser }}
-      mode: e2e
-    secrets: inherit
-
-  a11y-chrome:
-    if: ${{ github.ref == 'refs/heads/main' }}
-    needs: [deploy-staging, prep-playwright-tests]
-    uses: ./.github/workflows/_playwright-test.yml
-    with:
-      browser: chromium
-      mode: a11y
-      subproject: all
+      mode: ${{ matrix.mode }}
     secrets: inherit
 
   deploy-production:
@@ -790,7 +785,6 @@ jobs:
       - push-frontend-image-to-registry
       - push-backend-image-to-registry
       - e2e-tests
-      - a11y-chrome
     permissions:
       id-token: write # Enable OIDC for gitsign
     steps:
@@ -834,7 +828,6 @@ jobs:
     if: ${{ github.ref == 'refs/heads/main' }}
     needs:
       - e2e-tests
-      - a11y-chrome
     permissions:
       pages: write
       id-token: write
@@ -863,3 +856,129 @@ jobs:
         uses: actions/deploy-pages@v2.0.0
         env:
           GITHUB_TOKEN: ${{ github.token }}
+
+  generate-entity-relationship-diagram:
+    runs-on: ubuntu-latest
+    if: ${{ github.ref == 'refs/heads/main' }}
+    env:
+      POSTGRES_DB: ris-erd
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: postgres
+    services:
+      postgres:
+        image: postgres:12-alpine
+        env:
+          POSTGRES_DB: ris-erd
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_USER: postgres
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+    steps:
+      - uses: actions/checkout@v3
+      - name: Get Gradle version
+        working-directory: ./backend
+        run: |
+          echo "GRADLE_VERSION=$(sed -n 's/.*gradle-\([0-9]*\(\.[0-9]*\)*\)-.*/\1/p' ./gradle/wrapper/gradle-wrapper.properties)" >> $GITHUB_ENV
+      - name: Set up JDK
+        uses: actions/setup-java@5ffc13f4174014e2d4d4572b3d74c3fa61aeb2c2 # v3.11.0
+        with:
+          java-version: "17.0"
+          distribution: "temurin"
+          cache: gradle
+      - uses: gradle/gradle-build-action@749f47bda3e44aa060e82d7b3ef7e40d953bd629
+        with:
+          gradle-version: ${{ env.GRADLE_VERSION }}
+          arguments: migrateDatabaseForERD
+          build-root-directory: ./backend
+        env:
+          DB_URL: jdbc:postgresql://localhost:5432/${{ env.POSTGRES_DB }}
+          DB_USER: ${{ env.POSTGRES_USER }}
+          DB_PASSWORD: ${{ env.POSTGRES_PASSWORD }}
+      - name: Generate mermaid ER-diagram
+        uses: digitalservicebund/github-actions/entity-relationship-diagram@b0e67dbb3637296eeb2ae0c9110cd42d4d8de6fb
+        with:
+          configFile: ./backend/mermerd.config.yaml
+          connectionString: postgresql://${{ env.POSTGRES_USER }}:${{ env.POSTGRES_PASSWORD }}@localhost:5432/${{ env.POSTGRES_DB }}
+          outputFile: latest.mmd
+          flags: --debug
+          version: 0.8.0
+      - name: Upload mermaid ER-diagram
+        uses: actions/upload-artifact@v3
+        with:
+          name: erdiagram
+          retention-days: 3
+          path: latest.mmd
+
+  push-reports:
+    runs-on: ubuntu-latest
+    needs:
+      - generate-entity-relationship-diagram
+      - backend-build
+      - audit-licenses-backend
+      - audit-licenses-frontend
+      - e2e-tests
+    if: ${{ github.ref == 'refs/heads/main' }}
+    steps:
+      # Setup
+      - uses: actions/checkout@v3
+        with:
+          repository: ${{ env.REPORTS_REPOSITORY }}
+          ssh-key: ${{ secrets.REPORTS_DEPLOY_KEY }}
+      - name: Setup git config
+        run: |
+          git config user.name "${{ github.repository }}"
+          # This email identifies the commit as GitHub Actions - see https://github.com/orgs/community/discussions/26560
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+      # ER-diagram
+      - name: ER-diagram - Download artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: erdiagram
+          path: tmp/erdiagram-reports/
+      - name: ER-diagram - git add report
+        uses: digitalservicebund/ris-reports/actions/git-add-report@728043a0126de421396dde2b11e7c61dfe5c1892
+        with:
+          filePath: tmp/erdiagram-reports/latest.mmd
+          destinationDir: entity-relationship-diagrams/ris-backend-service
+      # Licence reports
+      - name: Licence reports - Download
+        uses: actions/download-artifact@v3
+        with:
+          name: licence-reports
+          path: tmp/licence-reports/
+      - name: Frontend licence report - git add report
+        uses: digitalservicebund/ris-reports/actions/git-add-report@728043a0126de421396dde2b11e7c61dfe5c1892
+        with:
+          filePath: tmp/licence-reports/frontend-licence-report.csv
+          destinationDir: licence-reports/frontend/ris-backend-service
+      - name: Backend licence report - git add report
+        uses: digitalservicebund/ris-reports/actions/git-add-report@728043a0126de421396dde2b11e7c61dfe5c1892
+        with:
+          filePath: tmp/licence-reports/backend-licence-report.csv
+          destinationDir: licence-reports/backend/ris-backend-service
+      # Performance report
+      - name: Performance reports - Download
+        uses: actions/download-artifact@v3
+        with:
+          name: performance-report
+          path: tmp/performance-reports/
+      - run: mv tmp/performance-reports/profile*.html tmp/performance-reports/profile-report.html
+      - name: Performance report - git add report
+        uses: digitalservicebund/ris-reports/actions/git-add-report@728043a0126de421396dde2b11e7c61dfe5c1892
+        with:
+          filePath: tmp/performance-reports/profile-report.html
+          destinationDir: performance-reports/ris-backend-service
+      # Push reports
+      - name: Push reports
+        run: |
+          git diff-index --cached --quiet HEAD ||
+            git commit \
+              -m "${{ github.event.head_commit.message }}" \
+              -m "From commit: ${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}" &&
+            git push origin main &&
+            echo "Pushed reports to ${{ github.server_url }}/${{ env.REPORTS_REPOSITORY }}" >> $GITHUB_STEP_SUMMARY

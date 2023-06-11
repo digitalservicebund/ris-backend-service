@@ -1,28 +1,38 @@
 fileignoreconfig:
-  - filename: "*README.md"
-    ignore_detectors: [filecontent]
-  - filename: frontend/test/test-helper/dataGenerators.ts
-    checksum: 89ff7c6f13b276ea2c1f65f920157ac3eed03fda117c99e3f0fd0ef3db631752
-  - filename: frontend/FRONTEND_STYLEGUIDE.md
-    checksum: 024c241cafa55504e94771f109457721d5eff58b3e66389982f34e23e8ac4a41
-  - filename: doc/norms/backend-api.yaml
-    checksum: ea8c3c035360509a42808da85419260e47cfef1ab14c09c2acb18d2c5000b486
-  - filename: backend/src/test/java/de/bund/digitalservice/ris/caselaw/integration/tests/JurisXmlExporterWrapperIntegrationTest.java
-    checksum: fa91f7fac42dcf3fc0aab40f5baaa367b335acf3ba208373ed067c6f6659f52b
-  - filename: backend/src/test/kotlin/unit/adapter/input/restapi/controller/GenerateNormFileControllerTest.kt
-    checksum: 07aa4cd7453685661091978479eef00f475a3415d0b26882352e19da66bf1dda
-  - filename: backend/src/test/java/de/bund/digitalservice/ris/caselaw/integration/tests/ProceedingDecisionIntegrationTest.java
-    checksum: 3255e1a60a6ec357c06c1077d6ac0227f839546193a0dce4ffb3c92cdddb40d1
-  - filename: "*.sql"
-    ignore_detectors: [filename]
-
+- filename: '*.sql'
+  ignore_detectors:
+  - filename
+- filename: '*README.md'
+  ignore_detectors:
+  - filecontent
+- filename: _site/*
+  ignore_detectors:
+  - filecontent
+- filename: backend/src/test/java/de/bund/digitalservice/ris/caselaw/integration/tests/JurisXmlExporterWrapperIntegrationTest.java
+  checksum: e59fceca98b7ace276dacbe5d647bd68368a942383e4ec1f7e5c21f9292fcb42
+- filename: backend/src/test/java/de/bund/digitalservice/ris/caselaw/integration/tests/ProceedingDecisionIntegrationTest.java
+  checksum: 41fd47d2b766398e40ddb78b215c6e5c4fa8136653fed02e67417db87abfdd89
+- filename: backend/src/test/kotlin/unit/adapter/input/restapi/controller/GenerateNormFileControllerTest.kt
+  checksum: 07aa4cd7453685661091978479eef00f475a3415d0b26882352e19da66bf1dda
+- filename: doc/norms/backend-api.yaml
+  checksum: 7d5f05a1c7ab78df41cb5441f464f1ae69d74165cca9ea780f80ec4ee5ec777d
+- filename: doc/structurizr/workspace.json
+  checksum: 4cd729e6a2267acf57953e7e511806f967a106542cfa422946dbed23f0dd1d25
+- filename: frontend/FRONTEND_STYLEGUIDE.md
+  checksum: e6b8194eba2012f2a769c5a5d3577715a573b441a7b94e744c32b3149d0d3a93
+- filename: frontend/test/test-helper/dataGenerators.ts
+  checksum: c5a604ebf6fcc657dea58e996412f16f00d8877f7bb282865f441d87581fc3d5
+- filename: _site/prototype-footnotes/assets/index-086108b4.js
+  checksum: 0bd435f734159482c18b1f78fbde74f6b3be56604f380ac59405dc240cf8a270
 scopeconfig:
-  - scope: node
+- scope: node
 allowed_patterns:
-  - key
-  - uses:\ ([A-z0-9\-]+\/)*[A-z0-9\-]+@[a-fA-F0-9]{40}
-  - https://github.com/jk1/Gradle-License-Report/blob/7cf695c38126b63ef9e907345adab84dfa92ea0e/src/main/resources/default-license-normalizer-bundle.json
-  - paketobuildpacks/builder@sha256:367c3da5ae0a3caeb12e7e5bc317cb0b21e700c7f7bbb29204f70151cb5d8e66
-  - KEYWORD
-
+- key
+- uses:\ ([A-z0-9\-]+\/)*[A-z0-9\-]+@[a-fA-F0-9]{40}
+- https://github.com/jk1/Gradle-License-Report/blob/7cf695c38126b63ef9e907345adab84dfa92ea0e/src/main/resources/default-license-normalizer-bundle.json
+- paketobuildpacks/builder@sha256:367c3da5ae0a3caeb12e7e5bc317cb0b21e700c7f7bbb29204f70151cb5d8e66
+- KEYWORD
 threshold: medium
+version: "1.0"
+threshold: medium
+version: "1.0"

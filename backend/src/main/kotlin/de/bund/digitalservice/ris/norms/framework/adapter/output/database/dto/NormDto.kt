@@ -1,6 +1,5 @@
 package de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto
 
-import de.bund.digitalservice.ris.norms.domain.value.UndefinedDate
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Column
 import org.springframework.data.relational.core.mapping.Table
@@ -22,49 +21,10 @@ data class NormDto(
     @Column("document_category")
     var documentCategory: String? = null,
 
-    @Column("document_type_name")
-    var documentTypeName: String? = null,
-    @Column("document_norm_category")
-    var documentNormCategory: String? = null,
-    @Column("document_template_name")
-    var documentTemplateName: String? = null,
-
     @Column("official_short_title")
     var officialShortTitle: String? = null,
     @Column("official_abbreviation")
     var officialAbbreviation: String? = null,
-
-    @Column("entry_into_force_date")
-    var entryIntoForceDate: LocalDate? = null,
-    @Column("entry_into_force_date_state")
-    var entryIntoForceDateState: UndefinedDate? = null,
-    @Column("principle_entry_into_force_date")
-    var principleEntryIntoForceDate: LocalDate? = null,
-    @Column("principle_entry_into_force_date_state")
-    var principleEntryIntoForceDateState: UndefinedDate? = null,
-    @Column("divergent_entry_into_force_date")
-    var divergentEntryIntoForceDate: LocalDate? = null,
-    @Column("divergent_entry_into_force_date_state")
-    var divergentEntryIntoForceDateState: UndefinedDate? = null,
-    @Column("entry_into_force_norm_category")
-    var entryIntoForceNormCategory: String? = null,
-
-    @Column("expiration_date")
-    var expirationDate: LocalDate? = null,
-    @Column("expiration_date_state")
-    var expirationDateState: UndefinedDate? = null,
-    @Column("is_expiration_date_temp")
-    var isExpirationDateTemp: Boolean? = null,
-    @Column("principle_expiration_date")
-    var principleExpirationDate: LocalDate? = null,
-    @Column("principle_expiration_date_state")
-    var principleExpirationDateState: UndefinedDate? = null,
-    @Column("divergent_expiration_date")
-    var divergentExpirationDate: LocalDate? = null,
-    @Column("divergent_expiration_date_state")
-    var divergentExpirationDateState: UndefinedDate? = null,
-    @Column("expiration_norm_category")
-    var expirationNormCategory: String? = null,
 
     @Column("announcement_date")
     var announcementDate: LocalDate? = null,
@@ -124,9 +84,6 @@ data class NormDto(
     var applicationScopeStartDate: LocalDate? = null,
     @Column("application_scope_end_date")
     var applicationScopeEndDate: LocalDate? = null,
-
-    @Column("categorized_reference")
-    var categorizedReference: String? = null,
 
     @Column("other_footnote")
     var otherFootnote: String? = null,

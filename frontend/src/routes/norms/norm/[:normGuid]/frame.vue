@@ -1,32 +1,38 @@
 <script lang="ts" setup>
 import { storeToRefs } from "pinia"
-import { computed, toRefs, ref, watch, h } from "vue"
+import { computed, toRefs, ref, watch, h, VNode, createTextVNode } from "vue"
 import { useRoute } from "vue-router"
 import CheckMark from "@/assets/icons/ckeckbox_regular.svg"
 import AgeIndicationInputGroup from "@/components/AgeIndicationInputGroup.vue"
+import AnnouncementGroup from "@/components/AnnouncementGroup.vue"
+import CategorizedReferenceInputGroup from "@/components/CategorizedReferenceInputGroup.vue"
 import CitationDateInputGroup from "@/components/CitationDateInputGroup.vue"
+import DivergentEntryIntoForceGroup from "@/components/DivergentEntryIntoForceGroup.vue"
+import DivergentExpirationGroup from "@/components/DivergentExpirationGroup.vue"
+import DocumentTypeInputGroup from "@/components/DocumentTypeInputGroup.vue"
+import EntryIntoForceInputGroup from "@/components/EntryIntoForceInputGroup.vue"
 import ExpandableDataSet from "@/components/ExpandableDataSet.vue"
+import ExpirationInputGroup from "@/components/ExpirationInputGroup.vue"
 import LeadInputGroup from "@/components/LeadInputGroup.vue"
 import NormProviderInputGroup from "@/components/NormProviderInputGroup.vue"
 import ParticipatingInstitutionInputGroup from "@/components/ParticipatingInstitutionInputGroup.vue"
+import PrincipleEntryIntoForceInputGroup from "@/components/PrincipleEntryIntoForceInputGroup.vue"
+import PrincipleExpirationInputGroup from "@/components/PrincipleExpirationInputGroup.vue"
 import SingleDataFieldSection from "@/components/SingleDataFieldSection.vue"
 import SubjectAreaInputGroup from "@/components/SubjectAreaInputGroup.vue"
 import { useScrollToHash } from "@/composables/useScrollToHash"
-import { FlatMetadata, Metadata, MetadataSections } from "@/domain/Norm"
-import { categorizedReference } from "@/fields/norms/categorizedReference"
-import { digitalAnnouncement } from "@/fields/norms/digitalAnnouncement"
+import {
+  FlatMetadata,
+  Metadata,
+  MetadataSections,
+  UndefinedDate,
+} from "@/domain/Norm"
 import { digitalEvidence } from "@/fields/norms/digitalEvidence"
 import { documentStatus } from "@/fields/norms/documentStatus"
 import { documentTextProof } from "@/fields/norms/documentTextProof"
-import { documentType } from "@/fields/norms/documentType"
-import { entryIntoForce } from "@/fields/norms/entryIntoForce"
-import { euAnnouncement } from "@/fields/norms/euAnnouncement"
-import { expiration } from "@/fields/norms/expiration"
 import { otherDocumentNote } from "@/fields/norms/otherDocumentNote"
 import { otherFootnote } from "@/fields/norms/otherFootnote"
-import { otherOfficialReferences } from "@/fields/norms/otherOfficialReferences"
 import { otherStatusNote } from "@/fields/norms/otherStatusNote"
-import { printAnnouncement } from "@/fields/norms/printAnnouncement"
 import { reissue } from "@/fields/norms/reissue"
 import { repeal } from "@/fields/norms/repeal"
 import { status } from "@/fields/norms/status"
@@ -72,35 +78,14 @@ watch(
   flatMetadata,
   (data) => {
     if (loadedNorm.value !== undefined && data !== undefined) {
-      loadedNorm.value.documentTemplateName =
-        data.documentTemplateName as string
-      loadedNorm.value.announcementDate = data.announcementDate as string
       loadedNorm.value.applicationScopeArea =
         data.applicationScopeArea as string
       loadedNorm.value.applicationScopeEndDate =
         data.applicationScopeEndDate as string
       loadedNorm.value.applicationScopeStartDate =
         data.applicationScopeStartDate as string
-      loadedNorm.value.categorizedReference =
-        data.categorizedReference as string
       loadedNorm.value.celexNumber = data.celexNumber as string
       loadedNorm.value.completeCitation = data.completeCitation as string
-      loadedNorm.value.digitalAnnouncementDate =
-        data.digitalAnnouncementDate as string
-      loadedNorm.value.digitalAnnouncementArea =
-        data.digitalAnnouncementArea as string
-      loadedNorm.value.digitalAnnouncementAreaNumber =
-        data.digitalAnnouncementAreaNumber as string
-      loadedNorm.value.digitalAnnouncementEdition =
-        data.digitalAnnouncementEdition as string
-      loadedNorm.value.digitalAnnouncementExplanations =
-        data.digitalAnnouncementExplanations as string
-      loadedNorm.value.digitalAnnouncementInfo =
-        data.digitalAnnouncementInfo as string
-      loadedNorm.value.digitalAnnouncementMedium =
-        data.digitalAnnouncementMedium as string
-      loadedNorm.value.digitalAnnouncementYear =
-        data.digitalAnnouncementYear as string
       loadedNorm.value.digitalEvidenceAppendix =
         data.digitalEvidenceAppendix as string
       loadedNorm.value.digitalEvidenceExternalDataNote =
@@ -108,17 +93,7 @@ watch(
       loadedNorm.value.digitalEvidenceLink = data.digitalEvidenceLink as string
       loadedNorm.value.digitalEvidenceRelatedData =
         data.digitalEvidenceRelatedData as string
-      loadedNorm.value.divergentEntryIntoForceDate =
-        data.divergentEntryIntoForceDate as string
-      loadedNorm.value.divergentEntryIntoForceDateState =
-        data.divergentEntryIntoForceDateState as string
-      loadedNorm.value.divergentExpirationDate =
-        data.divergentExpirationDate as string
-      loadedNorm.value.divergentExpirationDateState =
-        data.divergentExpirationDateState as string
       loadedNorm.value.documentCategory = data.documentCategory as string
-      loadedNorm.value.documentNormCategory =
-        data.documentNormCategory as string
       loadedNorm.value.documentNumber = data.documentNumber as string
       loadedNorm.value.documentStatusDate = data.documentStatusDate as string
       loadedNorm.value.documentStatusDescription =
@@ -131,30 +106,7 @@ watch(
       loadedNorm.value.documentStatusWorkNote =
         data.documentStatusWorkNote as string
       loadedNorm.value.documentTextProof = data.documentTextProof as string
-      loadedNorm.value.documentTypeName = data.documentTypeName as string
-      loadedNorm.value.entryIntoForceDate = data.entryIntoForceDate as string
-      loadedNorm.value.entryIntoForceDateState =
-        data.entryIntoForceDateState as string
-      loadedNorm.value.entryIntoForceNormCategory =
-        data.entryIntoForceNormCategory as string
-      loadedNorm.value.euAnnouncementExplanations =
-        data.euAnnouncementExplanations as string
-      loadedNorm.value.euAnnouncementGazette =
-        data.euAnnouncementGazette as string
-      loadedNorm.value.euAnnouncementInfo = data.euAnnouncementInfo as string
-      loadedNorm.value.euAnnouncementNumber =
-        data.euAnnouncementNumber as string
-      loadedNorm.value.euAnnouncementPage = data.euAnnouncementPage as string
-      loadedNorm.value.euAnnouncementSeries =
-        data.euAnnouncementSeries as string
-      loadedNorm.value.euAnnouncementYear = data.euAnnouncementYear as string
       loadedNorm.value.eli = data.eli as string
-      loadedNorm.value.expirationDate = data.expirationDate as string
-      loadedNorm.value.expirationDateState = data.expirationDateState as string
-      loadedNorm.value.expirationNormCategory =
-        data.expirationNormCategory as string
-      loadedNorm.value.isExpirationDateTemp =
-        data.isExpirationDateTemp as boolean
       loadedNorm.value.officialAbbreviation =
         data.officialAbbreviation as string
       loadedNorm.value.officialLongTitle = data.officialLongTitle as string
@@ -166,29 +118,8 @@ watch(
       loadedNorm.value.footnoteDecision = data.footnoteDecision as string
       loadedNorm.value.footnoteStateLaw = data.footnoteStateLaw as string
       loadedNorm.value.footnoteEuLaw = data.footnoteEuLaw as string
-      loadedNorm.value.otherOfficialAnnouncement =
-        data.otherOfficialAnnouncement as string
       loadedNorm.value.otherStatusNote = data.otherStatusNote as string
-      loadedNorm.value.principleEntryIntoForceDate =
-        data.principleEntryIntoForceDate as string
-      loadedNorm.value.principleEntryIntoForceDateState =
-        data.principleEntryIntoForceDateState as string
-      loadedNorm.value.principleExpirationDate =
-        data.principleExpirationDate as string
-      loadedNorm.value.principleExpirationDateState =
-        data.principleExpirationDateState as string
-      loadedNorm.value.printAnnouncementExplanations =
-        data.printAnnouncementExplanations as string
-      loadedNorm.value.printAnnouncementGazette =
-        data.printAnnouncementGazette as string
-      loadedNorm.value.printAnnouncementInfo =
-        data.printAnnouncementInfo as string
-      loadedNorm.value.printAnnouncementNumber =
-        data.printAnnouncementNumber as string
-      loadedNorm.value.printAnnouncementPage =
-        data.printAnnouncementPage as string
-      loadedNorm.value.printAnnouncementYear =
-        data.printAnnouncementYear as string
+      loadedNorm.value.announcementDate = data.announcementDate as string
       loadedNorm.value.publicationDate = data.publicationDate as string
       loadedNorm.value.reissueArticle = data.reissueArticle as string
       loadedNorm.value.reissueDate = data.reissueDate as string
@@ -209,6 +140,20 @@ watch(
   { deep: true }
 )
 
+function formatDate(dateStrings: (string | undefined)[] | undefined): string {
+  const dateString = Array.isArray(dateStrings) ? dateStrings[0] : dateStrings
+
+  if (!dateString) {
+    return ""
+  }
+
+  const date = new Date(dateString)
+  const day = date.getDate().toString().padStart(2, "0")
+  const month = (date.getMonth() + 1).toString().padStart(2, "0")
+  const year = date.getFullYear().toString()
+  return `${day}.${month}.${year}`
+}
+
 function citationDateSummarizer(data: Metadata): string {
   if (!data) return ""
 
@@ -216,21 +161,104 @@ function citationDateSummarizer(data: Metadata): string {
     return data.YEAR.toString()
   }
 
-  function formatDate(dateStrings: string[] | undefined): string {
-    if (!dateStrings) {
-      return ""
-    }
-
-    const dateString = Array.isArray(dateStrings) ? dateStrings[0] : dateStrings
-
-    const date = new Date(dateString)
-    const day = date.getDate().toString().padStart(2, "0")
-    const month = (date.getMonth() + 1).toString().padStart(2, "0")
-    const year = date.getFullYear().toString()
-    return `${day}.${month}.${year}`
-  }
-
   return formatDate(data.DATE)
+}
+
+function printAnnouncementSummary(data: Metadata): string {
+  if (!data) return ""
+
+  const announcementGazette = data.ANNOUNCEMENT_GAZETTE?.[0]
+  const announcementYear = data.YEAR?.[0]
+  const announcementNumber = data.NUMBER?.[0]
+  const announcementPage = data.PAGE?.[0]
+  const announcementAdditionalInfo = data.ADDITIONAL_INFO?.[0]
+  const announcementExplanation = data.EXPLANATION?.[0]
+
+  return `Papierverkündungsblatt | ${[
+    announcementGazette,
+    announcementYear,
+    announcementNumber,
+    announcementPage,
+    announcementAdditionalInfo,
+    announcementExplanation,
+  ]
+    .filter(Boolean)
+    .join(", ")}`
+}
+
+function digitalAnnouncementSummary(data: Metadata): string {
+  if (!data) return ""
+
+  const announcementMedium = data.ANNOUNCEMENT_MEDIUM?.[0]
+  const announcementDate = data.DATE?.[0]
+  const announcementYear = data.YEAR?.[0]
+  const announcementPage = data.PAGE?.[0]
+  const announcementEdition = data.EDITION?.[0]
+  const announcementAreaOfPub = data.AREA_OF_PUBLICATION?.[0]
+  const announcementNumberOfPub =
+    data.NUMBER_OF_THE_PUBLICATION_IN_THE_RESPECTIVE_AREA?.[0]
+  const announcementAdditionalInfo = data.ADDITIONAL_INFO?.[0]
+  const announcementExplanation = data.EXPLANATION?.[0]
+
+  return `Elektronisches Verkündungsblatt | ${[
+    announcementMedium,
+    formatDate([announcementDate]),
+    announcementEdition,
+    announcementYear,
+    announcementPage,
+    announcementAreaOfPub,
+    announcementNumberOfPub,
+    announcementAdditionalInfo,
+    announcementExplanation,
+  ]
+    .filter(Boolean)
+    .join(", ")}`
+}
+
+function euAnnouncementSummary(data: Metadata): string {
+  if (!data) return ""
+
+  const euGazette = data.EU_GOVERNMENT_GAZETTE?.[0]
+  const euYear = data.YEAR?.[0]
+  const euSeries = data.SERIES?.[0]
+  const euNumber = data.NUMBER?.[0]
+  const euPage = data.PAGE?.[0]
+  const euAdditionalInfo = data.ADDITIONAL_INFO?.[0]
+  const euExplanation = data.EXPLANATION?.[0]
+
+  return `Amtsblatt der EU | ${[
+    euGazette,
+    euYear,
+    euSeries,
+    euNumber,
+    euPage,
+    euAdditionalInfo,
+    euExplanation,
+  ]
+    .filter(Boolean)
+    .join(", ")}`
+}
+
+function otherOfficialReferenceSummary(data: Metadata): string {
+  if (!data) return ""
+
+  const otherOfficialReference = data.OTHER_OFFICIAL_REFERENCE?.[0] ?? ""
+
+  return `Sonstige amtliche Fundstelle | ${otherOfficialReference}`
+}
+
+function officialReferenceSummarizer(data: MetadataSections): string {
+  if (!data) return ""
+
+  if (data.PRINT_ANNOUNCEMENT) {
+    return printAnnouncementSummary(data.PRINT_ANNOUNCEMENT[0])
+  } else if (data.DIGITAL_ANNOUNCEMENT) {
+    return digitalAnnouncementSummary(data.DIGITAL_ANNOUNCEMENT[0])
+  } else if (data.EU_ANNOUNCEMENT) {
+    return euAnnouncementSummary(data.EU_ANNOUNCEMENT[0])
+  } else if (data.OTHER_OFFICIAL_ANNOUNCEMENT) {
+    return otherOfficialReferenceSummary(data.OTHER_OFFICIAL_ANNOUNCEMENT[0])
+  } else return ""
 }
 
 function normProviderSummarizer(data: Metadata) {
@@ -255,19 +283,206 @@ function normProviderSummarizer(data: Metadata) {
         width: "16",
         alt: "Schwarzes Haken",
       }),
-      h("span", "Beschlussfassung mit qual. Mehrheit"),
+      h("span", "Beschlussf\assung mit qual. Mehrheit"),
     ])
   } else {
     return summaryLine
   }
 }
 
+const NORM_CATEGORY_TRANSLATIONS = {
+  AMENDMENT_NORM: "Änderungsnorm",
+  BASE_NORM: "Stammnorm",
+  TRANSITIONAL_NORM: "Übergangsnorm",
+}
+
+function documentTypeSummarizer(data?: Metadata): VNode {
+  const propertyNodes = []
+
+  const typeName = data?.TYPE_NAME?.[0]
+  const categories =
+    data?.NORM_CATEGORY?.filter((category) => category != null) ?? []
+  const templateNames = data?.TEMPLATE_NAME ?? []
+
+  propertyNodes.push(typeName)
+
+  if (typeName && categories.length > 0) propertyNodes.push(h("div", "|"))
+
+  categories.forEach((category) =>
+    propertyNodes.push(
+      h("div", { class: ["flex", "gap-4"] }, [
+        h("img", { src: CheckMark, alt: "checkmark", width: "16" }),
+        h("span", NORM_CATEGORY_TRANSLATIONS[category]),
+      ])
+    )
+  )
+
+  if ((typeName || categories.length > 0) && templateNames.length > 0)
+    propertyNodes.push(h("div", "|"))
+
+  templateNames.forEach((templateName) =>
+    propertyNodes.push(
+      h(
+        "div",
+        { class: ["bg-blue-500", "rounded-lg", "px-8", "py-4"] },
+        templateName
+      )
+    )
+  )
+
+  return h(
+    "div",
+    { class: ["flex", "gap-8", "items-center", "flex-wrap"] },
+    propertyNodes
+  )
+}
+
+function divergentEntryIntoForceDefinedSummary(data: Metadata): VNode {
+  if (!data) return createTextVNode("")
+
+  const date = formatDate(data?.DATE)
+  const categories =
+    data?.NORM_CATEGORY?.filter((category) => category != null) ?? []
+
+  if (categories.length === 0 && date) {
+    return h("div", {}, date)
+  }
+
+  const elements = []
+
+  if (date) {
+    elements.push(h("div", {}, date))
+  }
+
+  if (date && categories.length > 0) {
+    elements.push(h("div", "|"))
+  }
+
+  categories.forEach((category) => {
+    elements.push(
+      h("div", { class: ["flex", "gap-8"] }, [
+        h("img", {
+          src: CheckMark,
+          width: "16",
+          alt: "Schwarzes Haken",
+        }),
+        h("span", {}, NORM_CATEGORY_TRANSLATIONS[category]),
+      ])
+    )
+  })
+
+  return h("div", { class: ["flex", "gap-8"] }, elements)
+}
+
+function getLabel(value: UndefinedDate): string {
+  switch (value) {
+    case UndefinedDate.UNDEFINED_UNKNOWN:
+      return "unbestimmt (unbekannt)"
+    case UndefinedDate.UNDEFINED_FUTURE:
+      return "unbestimmt (zukünftig)"
+    case UndefinedDate.UNDEFINED_NOT_PRESENT:
+      return "nicht vorhanden"
+    default:
+      return ""
+  }
+}
+
+function divergentEntryIntoForceUndefinedSummary(data: Metadata): VNode {
+  if (!data) return createTextVNode("")
+
+  const undefinedDate = data?.UNDEFINED_DATE?.[0]
+  const categories =
+    data?.NORM_CATEGORY?.filter((category) => category != null) ?? []
+
+  const elements = []
+
+  if (categories.length === 0 && undefinedDate) {
+    return h("div", {}, getLabel(undefinedDate))
+  }
+
+  if (undefinedDate) {
+    elements.push(h("div", {}, getLabel(undefinedDate)))
+  }
+
+  if (undefinedDate && categories.length > 0) {
+    elements.push(h("div", "|"))
+  }
+
+  categories.forEach((category) => {
+    elements.push(
+      h("div", { class: ["flex", "gap-8"] }, [
+        h("img", {
+          src: CheckMark,
+          width: "16",
+          alt: "Schwarzes Haken",
+        }),
+        h("span", {}, NORM_CATEGORY_TRANSLATIONS[category]),
+      ])
+    )
+  })
+
+  return h("div", { class: ["flex", "gap-8"] }, elements)
+}
+
+function DivergentEntryIntoForceSummarizer(
+  data: MetadataSections
+): VNode | string {
+  if (!data) return ""
+
+  if (data.DIVERGENT_ENTRY_INTO_FORCE_DEFINED) {
+    return divergentEntryIntoForceDefinedSummary(
+      data.DIVERGENT_ENTRY_INTO_FORCE_DEFINED[0]
+    )
+  } else if (data.DIVERGENT_ENTRY_INTO_FORCE_UNDEFINED) {
+    return divergentEntryIntoForceUndefinedSummary(
+      data.DIVERGENT_ENTRY_INTO_FORCE_UNDEFINED[0]
+    )
+  } else return ""
+}
+
+function DivergentExpirationSummarizer(data: MetadataSections): VNode | string {
+  if (!data) return ""
+
+  if (data.DIVERGENT_EXPIRATION_DEFINED) {
+    return divergentEntryIntoForceDefinedSummary(
+      data.DIVERGENT_EXPIRATION_DEFINED[0]
+    )
+  } else if (data.DIVERGENT_EXPIRATION_UNDEFINED) {
+    return divergentEntryIntoForceUndefinedSummary(
+      data.DIVERGENT_EXPIRATION_UNDEFINED[0]
+    )
+  } else return ""
+}
+
+function GeneralSummarizer(data: Metadata): string {
+  if (!data) return ""
+
+  const undefinedDate = data?.UNDEFINED_DATE?.[0]
+
+  if (undefinedDate) {
+    return getLabel(undefinedDate)
+  } else {
+    return formatDate(data.DATE)
+  }
+}
+
 const CitationDateSummary = withSummarizer(citationDateSummarizer)
+const OfficialReferenceSummary = withSummarizer(officialReferenceSummarizer)
 const NormProviderSummary = withSummarizer(normProviderSummarizer)
+const DocumentTypeSummary = withSummarizer(documentTypeSummarizer)
+const DivergentEntryIntoForceSummary = withSummarizer(
+  DivergentEntryIntoForceSummarizer
+)
+const DivergentExpirationSummary = withSummarizer(DivergentExpirationSummarizer)
+const GeneralSummary = withSummarizer(GeneralSummarizer)
 </script>
 
 <template>
   <div class="flex flex-col gap-8 max-w-screen-lg">
+    <h1 class="h-[1px] overflow-hidden w-[1px]">
+      Dokumentation des Rahmenelements
+    </h1>
+
     <SingleDataFieldSection
       id="officialLongTitle"
       v-model="flatMetadata.officialLongTitle"
@@ -313,23 +528,25 @@ const NormProviderSummary = withSummarizer(normProviderSummarizer)
       :type="InputType.CHIPS"
     />
 
-    <h1 class="h-[1px] mt-40 overflow-hidden w-[1px]">
-      Dokumentation des Rahmenelements
-    </h1>
-
-    <fieldset>
-      <legend id="documentTypeFields" class="heading-02-regular mb-[1rem]">
-        Dokumenttyp
-      </legend>
-      <InputGroup
-        v-model="flatMetadata"
-        :column-count="1"
-        :fields="documentType"
+    <ExpandableDataSet
+      id="documentTypes"
+      border-bottom
+      :data-set="metadataSections.DOCUMENT_TYPE"
+      :summary-component="DocumentTypeSummary"
+      title="Dokumenttyp"
+    >
+      <EditableList
+        v-model="metadataSections.DOCUMENT_TYPE"
+        :default-value="{}"
+        disable-multi-entry
+        :edit-component="DocumentTypeInputGroup"
+        :summary-component="DocumentTypeSummary"
       />
-    </fieldset>
+    </ExpandableDataSet>
 
     <ExpandableDataSet
       id="normProviders"
+      border-bottom
       :data-set="metadataSections.NORM_PROVIDER"
       :summary-component="NormProviderSummary"
       title="Normgeber"
@@ -344,6 +561,7 @@ const NormProviderSummary = withSummarizer(normProviderSummarizer)
 
     <ExpandableDataSet
       id="participatingInstitutions"
+      border-bottom
       :data-set="metadataSections.PARTICIPATION"
       title="Mitwirkende Organe"
     >
@@ -356,6 +574,7 @@ const NormProviderSummary = withSummarizer(normProviderSummarizer)
 
     <ExpandableDataSet
       id="leads"
+      border-bottom
       :data-set="metadataSections.LEAD"
       title="Federführung"
     >
@@ -368,6 +587,7 @@ const NormProviderSummary = withSummarizer(normProviderSummarizer)
 
     <ExpandableDataSet
       id="subjectAreas"
+      border-bottom
       :data-set="metadataSections.SUBJECT_AREA"
       title="Sachgebiet"
     >
@@ -411,30 +631,99 @@ const NormProviderSummary = withSummarizer(normProviderSummarizer)
       :type="InputType.CHIPS"
     />
 
-    <fieldset>
-      <legend
-        id="entryIntoForceFields"
-        class="heading-02-regular mb-[1rem] mt-32"
-      >
-        Inkrafttreten
-      </legend>
-      <InputGroup
-        v-model="flatMetadata"
-        :column-count="1"
-        :fields="entryIntoForce"
+    <ExpandableDataSet
+      id="entryIntoForces"
+      border-bottom
+      :data-set="metadataSections.ENTRY_INTO_FORCE"
+      :summary-component="GeneralSummary"
+      title="Datum des Inkrafttretens"
+    >
+      <EditableList
+        v-model="metadataSections.ENTRY_INTO_FORCE"
+        :default-value="{}"
+        disable-multi-entry
+        :edit-component="EntryIntoForceInputGroup"
+        :summary-component="GeneralSummary"
       />
-    </fieldset>
+    </ExpandableDataSet>
 
-    <fieldset>
-      <legend id="expirationFields" class="heading-02-regular mb-[1rem]">
-        Außerkrafttreten
-      </legend>
-      <InputGroup
-        v-model="flatMetadata"
-        :column-count="1"
-        :fields="expiration"
+    <ExpandableDataSet
+      id="principleEntryIntoForces"
+      border-bottom
+      :data-set="metadataSections.PRINCIPLE_ENTRY_INTO_FORCE"
+      :summary-component="GeneralSummary"
+      title="Grundsätzliches Inkrafttretedatum"
+    >
+      <EditableList
+        v-model="metadataSections.PRINCIPLE_ENTRY_INTO_FORCE"
+        :default-value="{}"
+        disable-multi-entry
+        :edit-component="PrincipleEntryIntoForceInputGroup"
+        :summary-component="GeneralSummary"
       />
-    </fieldset>
+    </ExpandableDataSet>
+
+    <ExpandableDataSet
+      id="divergentEntryIntoForces"
+      border-bottom
+      :data-set="metadataSections.DIVERGENT_ENTRY_INTO_FORCE"
+      :summary-component="DivergentEntryIntoForceSummary"
+      title="Abweichendes Inkrafttretedatum"
+    >
+      <EditableList
+        v-model="metadataSections.DIVERGENT_ENTRY_INTO_FORCE"
+        :default-value="{}"
+        :edit-component="DivergentEntryIntoForceGroup"
+        :summary-component="DivergentEntryIntoForceSummary"
+      />
+    </ExpandableDataSet>
+
+    <ExpandableDataSet
+      id="expirations"
+      border-bottom
+      :data-set="metadataSections.EXPIRATION"
+      :summary-component="GeneralSummary"
+      title="Datum des Außerkrafttretens"
+    >
+      <EditableList
+        v-model="metadataSections.EXPIRATION"
+        :default-value="{}"
+        disable-multi-entry
+        :edit-component="ExpirationInputGroup"
+        :summary-component="GeneralSummary"
+      />
+    </ExpandableDataSet>
+
+    <ExpandableDataSet
+      id="principleExpirations"
+      border-bottom
+      :data-set="metadataSections.PRINCIPLE_EXPIRATION"
+      :summary-component="GeneralSummary"
+      title="Grundsätzliches Außerkrafttretedatum"
+    >
+      <EditableList
+        v-model="metadataSections.PRINCIPLE_EXPIRATION"
+        :default-value="{}"
+        disable-multi-entry
+        :edit-component="PrincipleExpirationInputGroup"
+        :summary-component="GeneralSummary"
+      />
+    </ExpandableDataSet>
+
+    <ExpandableDataSet
+      id="divergentExpirations"
+      border-bottom
+      :data-set="metadataSections.DIVERGENT_EXPIRATION"
+      :summary-component="DivergentExpirationSummary"
+      title="Abweichendes Außerkrafttretedatum"
+    >
+      <EditableList
+        v-model="metadataSections.DIVERGENT_EXPIRATION"
+        :default-value="{}"
+        :edit-component="DivergentExpirationGroup"
+        :summary-component="DivergentExpirationSummary"
+      />
+    </ExpandableDataSet>
 
     <SingleDataFieldSection
       id="announcementDate"
@@ -452,6 +741,7 @@ const NormProviderSummary = withSummarizer(normProviderSummarizer)
 
     <ExpandableDataSet
       id="citationDates"
+      border-bottom
       :data-set="metadataSections.CITATION_DATE"
       :summary-component="CitationDateSummary"
       title="Zitierdatum"
@@ -464,61 +754,20 @@ const NormProviderSummary = withSummarizer(normProviderSummarizer)
       />
     </ExpandableDataSet>
 
-    <h2
-      id="officialAnnouncementFields"
-      class="heading-02-regular mb-[1rem] mt-32"
+    <ExpandableDataSet
+      id="officialReferences"
+      border-bottom
+      :data-set="metadataSections.OFFICIAL_REFERENCE"
+      :summary-component="OfficialReferenceSummary"
+      title="Amtliche Fundstelle"
     >
-      Amtliche Fundstelle
-    </h2>
-    <fieldset>
-      <legend id="printAnnouncementFields" class="heading-03-regular mb-[1rem]">
-        Papierverkündung
-      </legend>
-      <InputGroup
-        v-model="flatMetadata"
-        :column-count="1"
-        :fields="printAnnouncement"
+      <EditableList
+        v-model="metadataSections.OFFICIAL_REFERENCE"
+        :default-value="{}"
+        :edit-component="AnnouncementGroup"
+        :summary-component="OfficialReferenceSummary"
       />
-    </fieldset>
-
-    <fieldset>
-      <legend
-        id="digitalAnnouncementFields"
-        class="heading-03-regular mb-[1rem]"
-      >
-        Elektronisches Verkündungsblatt
-      </legend>
-      <InputGroup
-        v-model="flatMetadata"
-        :column-count="1"
-        :fields="digitalAnnouncement"
-      />
-    </fieldset>
-
-    <fieldset>
-      <legend id="euAnnouncementFields" class="heading-03-regular mb-[1rem]">
-        Amtsblatt der EU
-      </legend>
-      <InputGroup
-        v-model="flatMetadata"
-        :column-count="1"
-        :fields="euAnnouncement"
-      />
-    </fieldset>
-
-    <fieldset>
-      <legend
-        id="otherOfficialReferencesFields"
-        class="heading-03-regular mb-[1rem]"
-      >
-        Sonstige amtliche Fundstelle
-      </legend>
-      <InputGroup
-        v-model="flatMetadata"
-        :column-count="1"
-        :fields="otherOfficialReferences"
-      />
-    </fieldset>
+    </ExpandableDataSet>
 
     <SingleDataFieldSection
       id="unofficialReferences"
@@ -607,23 +856,22 @@ const NormProviderSummary = withSummarizer(normProviderSummarizer)
       />
     </fieldset>
 
-    <fieldset>
-      <legend
-        id="categorizedReferenceFields"
-        class="heading-02-regular mb-[1rem]"
-      >
-        Aktivverweisung
-      </legend>
-      <InputGroup
-        v-model="flatMetadata"
-        :column-count="1"
-        :fields="categorizedReference"
+    <ExpandableDataSet
+      id="categorizedReferences"
+      border-bottom
+      :data-set="metadataSections.CATEGORIZED_REFERENCE"
+      title="Aktivverweisung"
+    >
+      <EditableList
+        v-model="metadataSections.CATEGORIZED_REFERENCE"
+        :default-value="{}"
+        :edit-component="CategorizedReferenceInputGroup"
       />
-    </fieldset>
+    </ExpandableDataSet>
 
-    <fieldset>
+    <fieldset class="mt-32">
       <legend id="otherFootnoteFields" class="heading-02-regular mb-[1rem]">
-        Fußnote
+        Fußnoten
       </legend>
       <InputGroup
         v-model="flatMetadata"
@@ -672,6 +920,7 @@ const NormProviderSummary = withSummarizer(normProviderSummarizer)
 
     <ExpandableDataSet
       id="ageIndications"
+      border-bottom
       :data-set="metadataSections.AGE_INDICATION"
       title="Altersangabe"
     >

@@ -8,49 +8,58 @@ import de.bund.digitalservice.ris.norms.domain.entity.Metadatum
 import de.bund.digitalservice.ris.norms.domain.entity.Norm
 import de.bund.digitalservice.ris.norms.domain.entity.Paragraph
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType
-import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.decodeLocalDate
+import de.bund.digitalservice.ris.norms.domain.value.NormCategory
+import de.bund.digitalservice.ris.norms.domain.value.UndefinedDate
 import de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto.ArticleDto
 import de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto.FileReferenceDto
 import de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto.MetadataSectionDto
 import de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto.MetadatumDto
 import de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto.NormDto
 import de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto.ParagraphDto
+import java.time.LocalDate
+import java.util.UUID
 
 interface NormsMapper {
     fun normToEntity(
         normDto: NormDto,
         articles: List<Article>,
         fileReferences: List<FileReference>,
-        metadataSections: List<MetadataSection>,
+        dtoSections: List<MetadataSectionDto>,
+        dtoMetadata: List<MetadatumDto> = emptyList(),
     ): Norm {
+        val listDomainSections = mutableListOf<MetadataSection>()
+
+        // 1. Objective: move children from parent level to their respective parents because otherwise we can't instantite the parent MetadataSection
+        dtoSections.filter { dtoSectionToFilter -> dtoSectionToFilter.sectionId == null }.map { dtoCurrentParentSection ->
+            val dtoChildrenOfCurrentParentSection = dtoSections.filter { it2 -> it2.sectionId == dtoCurrentParentSection.id }
+            if (dtoChildrenOfCurrentParentSection.isEmpty()) {
+                // Parent section without children, meaning with metadata
+                val dtoMetadatumOfCurrentParentSection = dtoMetadata.filter { dtoMetadatum -> dtoCurrentParentSection.id == dtoMetadatum.sectionId }
+                val convertedSection = metadataSectionToEntity(dtoCurrentParentSection, dtoMetadatumOfCurrentParentSection.map { metadatumToEntity(it) })
+                listDomainSections.add(convertedSection)
+            } else {
+                // Parent section with children (assumming without metadata)
+                val listChildrenDomain = mutableListOf<MetadataSection>()
+                dtoChildrenOfCurrentParentSection.map { dtoChildOfCurrentParentSection ->
+                    val dtoMetadatumOfChild = dtoMetadata.filter { dtoMetadatum -> dtoChildOfCurrentParentSection.id == dtoMetadatum.sectionId }
+                    val convertedChildSection = metadataSectionToEntity(dtoChildOfCurrentParentSection, dtoMetadatumOfChild.map { metadatumToEntity(it) })
+                    listChildrenDomain.add(convertedChildSection)
+                }
+                val domainParent = MetadataSection(name = dtoCurrentParentSection.name, order = dtoCurrentParentSection.order, guid = dtoCurrentParentSection.guid, metadata = emptyList(), sections = listChildrenDomain)
+                listDomainSections.add(domainParent)
+            }
+        }
+
         return Norm(
             normDto.guid,
             articles,
-            metadataSections,
+            listDomainSections,
             normDto.officialLongTitle,
             normDto.risAbbreviation,
             normDto.documentNumber,
             normDto.documentCategory,
-            normDto.documentTypeName,
-            normDto.documentNormCategory,
-            normDto.documentTemplateName,
             normDto.officialShortTitle,
             normDto.officialAbbreviation,
-            normDto.entryIntoForceDate,
-            normDto.entryIntoForceDateState,
-            normDto.principleEntryIntoForceDate,
-            normDto.principleEntryIntoForceDateState,
-            normDto.divergentEntryIntoForceDate,
-            normDto.divergentEntryIntoForceDateState,
-            normDto.entryIntoForceNormCategory,
-            normDto.expirationDate,
-            normDto.expirationDateState,
-            normDto.isExpirationDateTemp,
-            normDto.principleExpirationDate,
-            normDto.principleExpirationDateState,
-            normDto.divergentExpirationDate,
-            normDto.divergentExpirationDateState,
-            normDto.expirationNormCategory,
             normDto.announcementDate,
             normDto.publicationDate,
             normDto.completeCitation,
@@ -78,7 +87,6 @@ interface NormsMapper {
             normDto.applicationScopeArea,
             normDto.applicationScopeStartDate,
             normDto.applicationScopeEndDate,
-            normDto.categorizedReference,
             normDto.otherFootnote,
             normDto.footnoteChange,
             normDto.footnoteComment,
@@ -104,7 +112,7 @@ interface NormsMapper {
     }
 
     fun metadataSectionToEntity(metadataSectionDto: MetadataSectionDto, metadata: List<Metadatum<*>>): MetadataSection {
-        return MetadataSection(name = metadataSectionDto.name, order = metadataSectionDto.order, metadata = metadata)
+        return MetadataSection(name = metadataSectionDto.name, order = metadataSectionDto.order, metadata = metadata, guid = metadataSectionDto.guid)
     }
 
     fun fileReferenceToEntity(fileReferenceDto: FileReferenceDto): FileReference {
@@ -113,12 +121,14 @@ interface NormsMapper {
 
     fun metadatumToEntity(metadatumDto: MetadatumDto): Metadatum<*> {
         val value = when (metadatumDto.type) {
-            MetadatumType.DATE -> decodeLocalDate(metadatumDto.value)
+            MetadatumType.DATE -> LocalDate.parse(metadatumDto.value)
             MetadatumType.RESOLUTION_MAJORITY -> metadatumDto.value.toBoolean()
+            MetadatumType.NORM_CATEGORY -> NormCategory.valueOf(metadatumDto.value)
+            MetadatumType.UNDEFINED_DATE -> UndefinedDate.valueOf(metadatumDto.value)
             else -> metadatumDto.value
         }
 
-        return Metadatum(value, metadatumDto.type, metadatumDto.order)
+        return Metadatum(value, metadatumDto.type, metadatumDto.order, metadatumDto.guid)
     }
 
     fun normToDto(norm: Norm, id: Int = 0): NormDto {
@@ -129,26 +139,8 @@ interface NormsMapper {
             norm.risAbbreviation,
             norm.documentNumber,
             norm.documentCategory,
-            norm.documentTypeName,
-            norm.documentNormCategory,
-            norm.documentTemplateName,
             norm.officialShortTitle,
             norm.officialAbbreviation,
-            norm.entryIntoForceDate,
-            norm.entryIntoForceDateState,
-            norm.principleEntryIntoForceDate,
-            norm.principleEntryIntoForceDateState,
-            norm.divergentEntryIntoForceDate,
-            norm.divergentEntryIntoForceDateState,
-            norm.entryIntoForceNormCategory,
-            norm.expirationDate,
-            norm.expirationDateState,
-            norm.isExpirationDateTemp,
-            norm.principleExpirationDate,
-            norm.principleExpirationDateState,
-            norm.divergentExpirationDate,
-            norm.divergentExpirationDateState,
-            norm.expirationNormCategory,
             norm.announcementDate,
             norm.publicationDate,
             norm.completeCitation,
@@ -176,7 +168,6 @@ interface NormsMapper {
             norm.applicationScopeArea,
             norm.applicationScopeStartDate,
             norm.applicationScopeEndDate,
-            norm.categorizedReference,
             norm.otherFootnote,
             norm.footnoteChange,
             norm.footnoteComment,
@@ -192,31 +183,42 @@ interface NormsMapper {
         )
     }
 
-    fun articlesToDto(articles: List<Article>, normId: Int, id: Int = 0): List<ArticleDto> {
-        return articles.map { ArticleDto(id, it.guid, it.title, it.marker, normId) }
+    fun articlesToDto(articles: List<Article>, normId: Int, id: Int = 0, normGuid: UUID): List<ArticleDto> {
+        return articles.map { ArticleDto(id, it.guid, it.title, it.marker, normId, normGuid) }
     }
 
-    fun paragraphsToDto(paragraphs: List<Paragraph>, articleId: Int, id: Int = 0): List<ParagraphDto> {
-        return paragraphs.map { ParagraphDto(id, it.guid, it.marker, it.text, articleId) }
+    fun paragraphsToDto(paragraphs: List<Paragraph>, articleId: Int, id: Int = 0, articleGuid: UUID): List<ParagraphDto> {
+        return paragraphs.map { ParagraphDto(id, it.guid, it.marker, it.text, articleId, articleGuid) }
     }
 
-    fun fileReferencesToDto(fileReferences: List<FileReference>, normId: Int, id: Int = 0): List<FileReferenceDto> {
-        return fileReferences.map { fileReferenceToDto(it, normId) }
+    fun fileReferencesToDto(fileReferences: List<FileReference>, normId: Int, normGuid: UUID, id: Int = 0): List<FileReferenceDto> {
+        return fileReferences.map { fileReferenceToDto(fileReference = it, normId = normId, normGuid = normGuid) }
     }
 
-    fun fileReferenceToDto(fileReference: FileReference, normId: Int, id: Int = 0): FileReferenceDto {
-        return FileReferenceDto(id, fileReference.name, fileReference.hash, normId, fileReference.createdAt)
+    fun fileReferenceToDto(fileReference: FileReference, normId: Int, id: Int = 0, normGuid: UUID): FileReferenceDto {
+        return FileReferenceDto(id, fileReference.name, fileReference.hash, normId, normGuid, fileReference.createdAt)
     }
 
-    fun metadataListToDto(metadata: List<Metadatum<*>>, sectionId: Int, id: Int = 0): List<MetadatumDto> {
-        return metadata.map { MetadatumDto(id = id, value = it.value.toString(), type = it.type, order = it.order, sectionId = sectionId) }
+    fun metadataListToDto(metadata: List<Metadatum<*>>, sectionId: Int, sectionGuid: UUID, id: Int = 0): List<MetadatumDto> {
+        return metadata.map { MetadatumDto(id = id, value = it.value.toString(), type = it.type, order = it.order, sectionId = sectionId, guid = it.guid, sectionGuid = sectionGuid) }
     }
 
-    fun metadataSectionToDto(metadataSection: MetadataSection, normId: Int, sectionId: Int? = null, id: Int = 0): MetadataSectionDto {
-        return MetadataSectionDto(id = id, name = metadataSection.name, normId = normId, order = metadataSection.order, sectionId = sectionId)
+    fun metadataSectionToDto(metadataSection: MetadataSection, normId: Int, sectionGuid: UUID? = null, sectionId: Int? = null, id: Int = 0): MetadataSectionDto {
+        return MetadataSectionDto(id = id, guid = metadataSection.guid, name = metadataSection.name, normId = normId, order = metadataSection.order, sectionId = sectionId, sectionGuid = sectionGuid)
     }
 
-    // TODO Add UNOFFICIAL_LONG_TITLE & UNOFFICIAL_SHORT_TITLE once all metadata are migrated
+    fun metadataSectionsToDto(sections: List<MetadataSection>, normId: Int, sectionGuid: UUID? = null, sectionId: Int? = null, id: Int = 0): List<MetadataSectionDto> {
+        return sections.map {
+            metadataSectionToDto(
+                it,
+                normId,
+                sectionGuid,
+                sectionId,
+            )
+        }
+    }
+
+    // TODO RISDEV-1813 Add UNOFFICIAL_LONG_TITLE & UNOFFICIAL_SHORT_TITLE once all metadata are migrated
     fun queryFieldToDbColumn(field: QueryFields): String {
         return when (field) {
             QueryFields.PRINT_ANNOUNCEMENT_PAGE -> "print_announcement_page"

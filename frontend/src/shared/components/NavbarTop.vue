@@ -2,14 +2,15 @@
 import { ref, onMounted } from "vue"
 import { useRoute } from "vue-router"
 import Logo from "@/assets/neuRIS-logo.svg"
+import { User } from "@/domain/user"
 import { getName } from "@/services/authService"
 
 const route = useRoute()
-const userName = ref<string>()
+const user = ref<User>()
 
 onMounted(async () => {
   const nameResponse = await getName()
-  if (nameResponse.data) userName.value = nameResponse.data
+  if (nameResponse.data) user.value = nameResponse.data
 })
 </script>
 
@@ -41,9 +42,16 @@ onMounted(async () => {
       >
     </div>
 
-    <div class="flex font-bold gap-8 items-center">
+    <div v-if="user" class="gap-10 grid grid-cols-[auto,1fr]">
       <span aria-hidden="true" class="material-icons"> perm_identity </span>
-      {{ userName }}
+      <div>
+        <div class="label-03-bold">
+          {{ user.name }}
+        </div>
+        <div v-if="user.documentationOffice" class="label-03-reg">
+          {{ user.documentationOffice.label }}
+        </div>
+      </div>
     </div>
   </nav>
 </template>

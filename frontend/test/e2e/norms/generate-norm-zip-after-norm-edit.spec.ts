@@ -17,13 +17,8 @@ testWithImportedNorm(
     await expect(locatorFrameButton).toBeVisible()
     await locatorFrameButton.click()
 
-    const newValue = "fake-gazette-1"
-    await fillInputField(
-      page,
-      FieldType.TEXT,
-      "printAnnouncementGazette",
-      newValue
-    )
+    const newValue = "fake-Juris-Abkürzung"
+    await fillInputField(page, FieldType.TEXT, "risAbbreviation", newValue)
 
     await page.locator("[aria-label='Rahmendaten Speichern Button']").click()
     await expect(

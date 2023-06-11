@@ -1,0 +1,4 @@
+ALTER TABLE
+  doc_unit
+ADD COLUMN IF NOT EXISTS
+  date_known BOOLEAN NOT NULL DEFAULT true;

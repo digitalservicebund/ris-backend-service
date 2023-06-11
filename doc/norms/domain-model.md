@@ -15,23 +15,6 @@ classDiagram
     String officialShortTitle
     String officialAbbreviation
 
-    Date entryIntoForceDate
-    UndefinedDate entryIntoForceDateState
-    Date principleEntryIntoForceDate
-    UndefinedDate principleEntryIntoForceDateState
-    Date divergentEntryIntoForceDate
-    UndefinedDate divergentEntryIntoForceDateState
-    String entryIntoForceNormCategory
-
-    Date expirationDate
-    String expirationDateState
-    Boolean isExpirationDateTemp
-    Date principleExpirationDate
-    UndefinedDate principleExpirationDateState
-    Date divergentExpirationDate
-    UndefinedDate divergentExpirationDateState
-    String expirationNormCategory
-
     Date announcementDate
     Date publicationDate
 
@@ -63,8 +46,6 @@ classDiagram
     String applicationScopeArea
     Date applicationScopeStartDate
     Date applicationScopeEndDate
-
-    String categorizedReference
 
     String otherFootnote
     String footnoteChange
@@ -133,50 +114,63 @@ classDiagram
      OTHER_OFFICIAL_ANNOUNCEMENT
      NORM_PROVIDER
      DOCUMENT_TYPE
+     DIVERGENT_ENTRY_INTO_FORCE
+     DIVERGENT_ENTRY_INTO_FORCE_DEFINED
+     DIVERGENT_ENTRY_INTO_FORCE_UNDEFINED
+     DIVERGENT_EXPIRATION
+     DIVERGENT_EXPIRATION_DEFINED
+     DIVERGENT_EXPIRATION_UNDEFINED
+     CATEGORIZED_REFERENCE
+     ENTRY_INTO_FORCE
+     PRINCIPLE_ENTRY_INTO_FORCE
+     EXPIRATION
+     PRINCIPLE_EXPIRATION
   }
 
   class MetadatumType  {
       <<enumeration>>
-    KEYWORD,
-    UNOFFICIAL_LONG_TITLE,
-    UNOFFICIAL_SHORT_TITLE,
-    UNOFFICIAL_ABBREVIATION,
-    UNOFFICIAL_REFERENCE,
-    DIVERGENT_DOCUMENT_NUMBER,
-    REFERENCE_NUMBER,
-    DEFINITION,
-    RIS_ABBREVIATION_INTERNATIONAL_LAW,
-    AGE_OF_MAJORITY_INDICATION,
-    VALIDITY_RULE,
-    LEAD_JURISDICTION,
-    LEAD_UNIT,
-    PARTICIPATION_TYPE,
-    PARTICIPATION_INSTITUTION,
-    SUBJECT_FNA,
-    SUBJECT_PREVIOUS_FNA,
-    SUBJECT_GESTA,
-    SUBJECT_BGB_3,
-    DATE,
-    YEAR,
-    RANGE_START,
-    RANGE_END,
-    ANNOUNCEMENT_GAZETTE,
-    NUMBER,
-    PAGE_NUMBER,
-    ADDITIONAL_INFO,
-    EXPLANATION,
-    ANNOUNCEMENT_MEDIUM,
-    AREA_OF_PUBLICATION,
-    NUMBER_OF_THE_PUBLICATION_IN_THE_RESPECTIVE_AREA,
-    SERIES,
-    EU_GOVERNMENT_GAZETTE,
-    ENTITY,
-    OTHER_OFFICIAL_REFERENCE,
-    DECIDING_BODY,
-    RESOLUTION_MAJORITY,
-    TYPE_NAME,
-    NORM_CATEGORY,
-    TEMPLATE_NAME,
+    KEYWORD
+    UNOFFICIAL_LONG_TITLE
+    UNOFFICIAL_SHORT_TITLE
+    UNOFFICIAL_ABBREVIATION
+    UNOFFICIAL_REFERENCE
+    DIVERGENT_DOCUMENT_NUMBER
+    REFERENCE_NUMBER
+    DEFINITION
+    RIS_ABBREVIATION_INTERNATIONAL_LAW
+    AGE_OF_MAJORITY_INDICATION
+    VALIDITY_RULE
+    LEAD_JURISDICTION
+    LEAD_UNIT
+    PARTICIPATION_TYPE
+    PARTICIPATION_INSTITUTION
+    SUBJECT_FNA
+    SUBJECT_PREVIOUS_FNA
+    SUBJECT_GESTA
+    SUBJECT_BGB_3
+    DATE
+    YEAR
+    RANGE_START
+    RANGE_END
+    ANNOUNCEMENT_GAZETTE
+    NUMBER
+    PAGE_NUMBER
+    ADDITIONAL_INFO
+    EXPLANATION
+    ANNOUNCEMENT_MEDIUM
+    AREA_OF_PUBLICATION
+    NUMBER_OF_THE_PUBLICATION_IN_THE_RESPECTIVE_AREA
+    SERIES
+    EU_GOVERNMENT_GAZETTE
+    ENTITY
+    OTHER_OFFICIAL_REFERENCE
+    DECIDING_BODY
+    RESOLUTION_MAJORITY
+    TYPE_NAME
+    NORM_CATEGORY
+    TEMPLATE_NAME
+    UNDEFINED_DATE
+    TEXT
   }
 
   class FileReference {

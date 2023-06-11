@@ -37,7 +37,9 @@ import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.SUBJECT_FNA
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.SUBJECT_GESTA
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.SUBJECT_PREVIOUS_FNA
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.TEMPLATE_NAME
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.TEXT
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.TYPE_NAME
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.UNDEFINED_DATE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.UNOFFICIAL_ABBREVIATION
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.UNOFFICIAL_LONG_TITLE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.UNOFFICIAL_REFERENCE
@@ -60,17 +62,28 @@ val hasValidMetadata =
             Section.AGE_INDICATION -> hasType(listOf(RANGE_START, RANGE_END), instance)
             Section.OFFICIAL_REFERENCE -> hasNone(instance)
             Section.PRINT_ANNOUNCEMENT -> hasType(listOf(ANNOUNCEMENT_GAZETTE, YEAR, NUMBER, PAGE, ADDITIONAL_INFO, EXPLANATION), instance)
-            Section.DIGITAL_ANNOUNCEMENT -> hasType(listOf(ANNOUNCEMENT_MEDIUM, DATE, YEAR, EDITION, AREA_OF_PUBLICATION, NUMBER_OF_THE_PUBLICATION_IN_THE_RESPECTIVE_AREA, ADDITIONAL_INFO, EXPLANATION), instance)
+            Section.DIGITAL_ANNOUNCEMENT -> hasType(listOf(ANNOUNCEMENT_MEDIUM, DATE, YEAR, EDITION, PAGE, AREA_OF_PUBLICATION, NUMBER_OF_THE_PUBLICATION_IN_THE_RESPECTIVE_AREA, ADDITIONAL_INFO, EXPLANATION), instance)
             Section.EU_ANNOUNCEMENT -> hasType(listOf(EU_GOVERNMENT_GAZETTE, YEAR, SERIES, NUMBER, PAGE, ADDITIONAL_INFO, EXPLANATION), instance)
             Section.OTHER_OFFICIAL_ANNOUNCEMENT -> hasType(listOf(OTHER_OFFICIAL_REFERENCE), instance)
             Section.NORM_PROVIDER -> hasType(listOf(ENTITY, DECIDING_BODY, RESOLUTION_MAJORITY), instance)
             Section.DOCUMENT_TYPE -> hasType(listOf(TYPE_NAME, NORM_CATEGORY, TEMPLATE_NAME), instance)
+            Section.DIVERGENT_ENTRY_INTO_FORCE -> hasNone(instance)
+            Section.DIVERGENT_ENTRY_INTO_FORCE_DEFINED -> hasType(listOf(DATE, NORM_CATEGORY), instance)
+            Section.DIVERGENT_ENTRY_INTO_FORCE_UNDEFINED -> hasType(listOf(UNDEFINED_DATE, NORM_CATEGORY), instance)
+            Section.DIVERGENT_EXPIRATION -> hasNone(instance)
+            Section.DIVERGENT_EXPIRATION_DEFINED -> hasType(listOf(DATE, NORM_CATEGORY), instance)
+            Section.DIVERGENT_EXPIRATION_UNDEFINED -> hasType(listOf(UNDEFINED_DATE, NORM_CATEGORY), instance)
+            Section.CATEGORIZED_REFERENCE -> hasType(listOf(TEXT), instance)
+            Section.ENTRY_INTO_FORCE -> hasOneOfType(listOf(DATE, UNDEFINED_DATE), instance)
+            Section.PRINCIPLE_ENTRY_INTO_FORCE -> hasOneOfType(listOf(DATE, UNDEFINED_DATE), instance)
+            Section.EXPIRATION -> hasOneOfType(listOf(DATE, UNDEFINED_DATE), instance)
+            Section.PRINCIPLE_EXPIRATION -> hasOneOfType(listOf(DATE, UNDEFINED_DATE), instance)
         }
 
         private fun hasNone(instance: MetadataSection): Boolean =
             instance.metadata.isEmpty()
         private fun hasType(types: List<MetadatumType>, instance: MetadataSection): Boolean =
-            instance.metadata.all { types.contains(it.type) }
+            instance.metadata.all { it.type in types }
         private fun hasOneOfType(types: List<MetadatumType>, instance: MetadataSection): Boolean =
             instance.metadata.count() == 1 && hasType(types, instance)
     }

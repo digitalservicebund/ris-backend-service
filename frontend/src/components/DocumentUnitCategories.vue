@@ -14,6 +14,9 @@ import { UpdateStatus } from "@/enum/enumUpdateStatus"
 import documentUnitService from "@/services/documentUnitService"
 import fileService from "@/services/fileService"
 import { ValidationError } from "@/shared/components/input/types"
+import SideToggle, {
+  OpeningDirection,
+} from "@/shared/components/SideToggle.vue"
 
 const props = defineProps<{
   documentUnit: DocumentUnit
@@ -34,7 +37,9 @@ const handleUpdateValueDocumentUnitTexts = async (
 
 const handleUpdateDocumentUnit = async () => {
   updateStatus.value = UpdateStatus.ON_UPDATE
-  const response = await documentUnitService.update(updatedDocumentUnit.value)
+  const response = await documentUnitService.update(
+    updatedDocumentUnit.value as DocumentUnit
+  )
   if (response?.error?.validationErrors) {
     validationErrors.value = response.error.validationErrors
   } else {
@@ -77,7 +82,7 @@ watch(
 const coreData = computed({
   // get: () => props.documentUnit.coreData,
   get: () => updatedDocumentUnit.value.coreData,
-  set: async (newValues) => {
+  set: (newValues) => {
     let triggerSaving = false
     if (
       updatedDocumentUnit.value.coreData.court?.label !== newValues.court?.label
@@ -86,23 +91,20 @@ const coreData = computed({
     }
     Object.assign(updatedDocumentUnit.value.coreData, newValues)
     if (triggerSaving) {
-      await handleUpdateDocumentUnit()
+      handleUpdateDocumentUnit()
     }
+  },
+})
+
+const contentRelatedIndexing = computed({
+  get: () => (updatedDocumentUnit.value as DocumentUnit).contentRelatedIndexing,
+  set: (newValues) => {
+    Object.assign(updatedDocumentUnit.value.contentRelatedIndexing, newValues)
   },
 })
 
 const { hash: routeHash } = toRefs(route)
 useScrollToHash(routeHash)
-
-const fixedPanelPosition = ref(false)
-
-function onScroll() {
-  const element = document.getElementById("odoc-panel-element")
-  if (!element) return
-  element.getBoundingClientRect().top <= 0 && showDocPanel.value === true
-    ? (fixedPanelPosition.value = true)
-    : (fixedPanelPosition.value = false)
-}
 
 async function getOriginalDocumentUnit() {
   if (fileAsHTML.value.length > 0) return
@@ -160,7 +162,6 @@ const removeAutoUpdate = () => {
 }
 
 onMounted(async () => {
-  window.addEventListener("scroll", onScroll)
   window.addEventListener(
     "keydown",
     handleUpdateDocumentUnitWithShortCut,
@@ -170,17 +171,16 @@ onMounted(async () => {
   await getOriginalDocumentUnit()
 })
 onUnmounted(() => {
-  window.removeEventListener("scroll", onScroll)
   window.removeEventListener("keydown", handleUpdateDocumentUnitWithShortCut)
   removeAutoUpdate()
 })
 </script>
 
 <template>
-  <DocumentUnitWrapper :document-unit="updatedDocumentUnit">
+  <DocumentUnitWrapper :document-unit="(updatedDocumentUnit as DocumentUnit)">
     <template #default="{ classes }">
-      <div class="flex w-full">
-        <div :class="classes">
+      <div class="flex flex-grow w-full">
+        <div class="bg-gray-100 flex flex-col" :class="classes">
           <DocumentUnitCoreData
             id="coreData"
             v-model="coreData"
@@ -199,7 +199,12 @@ onUnmounted(() => {
             :proceeding-decisions="documentUnit.proceedingDecisions"
           />
 
-          <!-- TODO add validationErrors -->
+          <DocumentUnitContentRelatedIndexing
+            id="contentRelatedIndexing"
+            v-model="contentRelatedIndexing"
+            :document-unit-uuid="updatedDocumentUnit.uuid"
+          />
+
           <DocumentUnitTexts
             id="texts"
             :texts="documentUnit.texts"
@@ -207,26 +212,27 @@ onUnmounted(() => {
             @update-document-unit="handleUpdateDocumentUnit"
             @update-value="handleUpdateValueDocumentUnitTexts"
           />
-
-          <DocumentUnitContentRelatedIndexing
-            id="contentRelatedIndexing"
-            :document-unit="props.documentUnit"
-          />
         </div>
 
         <div
-          class="bg-white border-gray-400 border-l-1 border-solid"
+          class="bg-white border-gray-400 border-l-1 border-solid flex flex-col"
           :class="{ full: showDocPanel }"
         >
-          <OriginalFileSidePanel
-            id="odoc-panel-element"
-            v-model:open="showDocPanel"
-            class="bg-white"
-            :class="classes"
-            :file="fileAsHTML"
-            :fixed-panel-position="fixedPanelPosition"
-            :has-file="documentUnit.hasFile"
-          />
+          <SideToggle
+            v-model:is-expanded="showDocPanel"
+            class="sticky top-[96px] z-20"
+            label="Originaldokument"
+            :opening-direction="OpeningDirection.LEFT"
+          >
+            <OriginalFileSidePanel
+              id="odoc-panel-element"
+              v-model:open="showDocPanel"
+              class="bg-white"
+              :class="classes"
+              :file="fileAsHTML"
+              :has-file="documentUnit.hasFile"
+            />
+          </SideToggle>
         </div>
       </div>
     </template>

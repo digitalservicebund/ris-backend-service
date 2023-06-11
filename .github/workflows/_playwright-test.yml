@@ -64,6 +64,8 @@ jobs:
           E2E_BASE_URL: ${{ secrets.STAGING_URL }}
           E2E_TEST_USER: ${{ secrets.E2E_TEST_USER }}
           E2E_TEST_PASSWORD: ${{ secrets.E2E_TEST_PASSWORD }}
+          E2E_TEST_USER_BGH: ${{ secrets.E2E_TEST_USER_BGH }}
+          E2E_TEST_PASSWORD_BGH: ${{ secrets.E2E_TEST_PASSWORD_BGH }}
           E2E_TEST_BASIC_AUTH_USER: ${{ secrets.E2E_TEST_BASIC_AUTH_USER }}
           E2E_TEST_BASIC_AUTH_PASSWORD: ${{ secrets.E2E_TEST_BASIC_AUTH_PASSWORD }}
           GH_PACKAGES_REPOSITORY_USER: ${{ secrets.GH_PACKAGES_REPOSITORY_USER }}
@@ -72,14 +74,11 @@ jobs:
           echo "Running ${{ inputs.mode }} ${{ inputs.subproject || '' }} tests ${{ inputs.runs }} times"
 
           test_target=${{ inputs.mode }}
-          if [[ -n ${{ inputs.subproject || '' }} && ${{ inputs.subproject }} != 'all' ]]; then
+          if [[ ${{ inputs.subproject || 'all' }} != 'all' ]]; then
             test_target=${{ inputs.mode }}:${{ inputs.subproject }}
           fi
 
-          for i in $(seq 1 ${{ inputs.runs}}); do
-            echo "Attempt $i" 
-            npm run test:"$test_target" -- --project ${{ inputs.browser }} --retries=0
-          done
+          npm run test:"$test_target" -- --project ${{ inputs.browser }} --repeat-each ${{ inputs.runs}}
         working-directory: ./frontend
       - name: Upload screenshots and traces of failed tests
         uses: actions/upload-artifact@v3

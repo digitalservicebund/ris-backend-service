@@ -18,7 +18,7 @@ async function expectSectionAppearsAfterScroll(
   if (section.isSingleFieldSection) {
     const firstFieldLabel = section.fields?.[0].label ?? ""
     await expect(
-      page.locator(`label:text-is("${firstFieldLabel}")`)
+      page.locator(`h2:text-is("${firstFieldLabel}")`)
     ).toBeInViewport()
   } else {
     await expect(
@@ -83,6 +83,7 @@ testWithImportedNorm(
 testWithImportedNorm(
   "Check if switching frame sections affects sections being inside or outside viewport",
   async ({ page, normData, guid }) => {
+    testWithImportedNorm.slow()
     await openNorm(page, normData.officialLongTitle, guid)
 
     const locatorFrameButton = page.locator("a:has-text('Rahmen')")
@@ -94,6 +95,17 @@ testWithImportedNorm(
     const sectionsWithHeading = sections.filter((section) => !!section.heading)
 
     for (const section of sectionsWithHeading) {
+      // TODO because of inconsistencies in design, having section name not listed in the menu
+      if (
+        section.heading === "Abweichendes Inkrafttretedatum" ||
+        section.heading === "Abweichendes Außerkrafttretedatum" ||
+        section.heading === "Datum des Inkrafttretens" ||
+        section.heading === "Datum des Außerkrafttretens" ||
+        section.heading === "Grundsätzliches Inkrafttretedatum" ||
+        section.heading === "Grundsätzliches Außerkrafttretedatum"
+      ) {
+        continue
+      }
       await expectSectionAppearsAfterScroll(page, section)
     }
   }

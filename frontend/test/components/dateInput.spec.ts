@@ -26,18 +26,13 @@ function renderComponent(options?: {
   return { user, props, ...utils }
 }
 
-const mockValidationError: ValidationError = {
-  defaultMessage: "wrong date",
-  field: "coreData.decisionDate",
-}
-
 describe("DateInput", () => {
   it("shows an date input element", () => {
     renderComponent()
     const input = screen.queryByLabelText("aria-label") as HTMLInputElement
 
     expect(input).toBeInTheDocument()
-    expect(input?.type).toBe("date")
+    expect(input?.type).toBe("text")
   })
 
   it("shows input with an aria label", () => {
@@ -50,58 +45,71 @@ describe("DateInput", () => {
   })
 
   it("allows to type date inside input", async () => {
-    renderComponent({ modelValue: "2022-02-03" })
+    renderComponent()
     const input = screen.queryByLabelText("aria-label") as HTMLInputElement
 
-    expect(input).toHaveValue("2022-02-03")
+    await userEvent.type(input, "12.05.2020")
 
-    await userEvent.clear(input)
-    await userEvent.type(input, "2020-05-12")
-
-    expect(input).toHaveValue("2020-05-12")
+    expect(input).toHaveValue("12.05.2020")
   })
 
-  it("emits model update event when input changes", async () => {
-    const { emitted } = renderComponent({
-      value: "2022-02-03",
-    })
+  it("displays modelValue in correct format", async () => {
+    renderComponent({ modelValue: "2022-05-13T18:08:14.036Z" })
     const input = screen.queryByLabelText("aria-label") as HTMLInputElement
-    Object.defineProperty(input, "target", {
-      value: "2020-05-12",
-    })
-    await userEvent.clear(input)
-    await userEvent.type(input, "2020-05-12")
-    await userEvent.tab()
 
-    expect(input).toHaveValue("2020-05-12")
-    expect(emitted()["update:modelValue"]).toBeTruthy()
+    expect(input).toHaveValue("13.05.2022")
+  })
+
+  it("emits model update event when input completed and valid", async () => {
+    const { emitted } = renderComponent({
+      modelValue: "2022-05-13T18:08:14.036Z",
+    })
+    const input: HTMLInputElement = screen.queryByLabelText(
+      "aria-label"
+    ) as HTMLInputElement
+    expect(input).toHaveValue("13.05.2022")
+    await userEvent.clear(input)
+    await userEvent.type(input, "14.05.2022")
+    await nextTick()
+
+    expect(input).toHaveValue("14.05.2022")
+
+    expect(emitted()["update:modelValue"]).toEqual([
+      ["2022-05-14T00:00:00.000Z"],
+    ])
   })
 
   it("emits undefined on backspace delete", async () => {
     const { emitted } = renderComponent({
-      value: "2022-02-03",
+      modelValue: "2022-05-13T18:08:14.036Z",
     })
-    const input = screen.queryByLabelText("aria-label") as HTMLInputElement
+    const input: HTMLInputElement = screen.queryByLabelText(
+      "aria-label"
+    ) as HTMLInputElement
+    expect(input).toHaveValue("13.05.2022")
     await userEvent.type(input, "{backspace}")
+    await fireEvent.update(input)
     await nextTick()
 
     expect(input).toHaveValue("")
+
     expect(emitted()["update:modelValue"]).toBeTruthy()
-    expect(emitted().input).toEqual(undefined)
+
+    const array = emitted()["update:modelValue"] as ValidationError[][]
+
+    expect(array.filter((element) => element[0] === undefined)).toHaveLength(1)
   })
 
   it("does not allow dates in the future", async () => {
     const { emitted } = renderComponent()
-    const input = screen.queryByLabelText("aria-label") as HTMLInputElement
-    const futureDate = "2099-02-10"
-
-    Object.defineProperty(input, "target", {
-      value: futureDate,
-    })
-
-    await userEvent.clear(input)
-    await userEvent.type(input, futureDate)
+    const input: HTMLInputElement = screen.queryByLabelText(
+      "aria-label"
+    ) as HTMLInputElement
+    expect(input).toHaveValue("")
+    await userEvent.type(input, "14.05.2099")
     await nextTick()
+
+    expect(input).toHaveValue("14.05.2099")
 
     expect(emitted()["update:modelValue"]).not.toBeTruthy()
 
@@ -115,32 +123,28 @@ describe("DateInput", () => {
   })
 
   it("it allows dates in the future if flag is set", async () => {
-    const { props, emitted } = renderComponent({ isFutureDate: true })
-    const input = screen.queryByLabelText("aria-label") as HTMLInputElement
-    const futureDate = "2024-02-10"
-    Object.defineProperty(input, "target", {
-      value: futureDate,
-    })
-
-    await userEvent.clear(input)
-    await userEvent.type(input, futureDate)
-    await userEvent.tab()
+    const { emitted } = renderComponent({ isFutureDate: true })
+    const input: HTMLInputElement = screen.queryByLabelText(
+      "aria-label"
+    ) as HTMLInputElement
+    expect(input).toHaveValue("")
+    await userEvent.type(input, "14.05.2099")
     await nextTick()
-    expect(props.validationError).toBe(undefined)
-    expect(input).toHaveValue(futureDate)
+
+    expect(input).toHaveValue("14.05.2099")
+
     expect(emitted()["update:modelValue"]).toBeTruthy()
   })
 
   it("does not allow invalid dates", async () => {
     const { emitted } = renderComponent()
-    const input = screen.queryByLabelText("aria-label") as HTMLInputElement
-
-    Object.defineProperty(input, "target", {
-      value: "2020-02-31",
-    })
-
-    await fireEvent.update(input)
+    const input: HTMLInputElement = screen.queryByLabelText(
+      "aria-label"
+    ) as HTMLInputElement
+    await userEvent.type(input, "29.02.2001")
     await nextTick()
+
+    expect(input).toHaveValue("29.02.2001")
 
     expect(emitted()["update:modelValue"]).not.toBeTruthy()
 
@@ -153,32 +157,11 @@ describe("DateInput", () => {
     ).toBe("Kein valides Datum")
   })
 
-  it("show validation error coming from the backend", async () => {
-    renderComponent({
-      validationError: mockValidationError,
-    })
-    const input = screen.queryByLabelText("aria-label") as HTMLInputElement
-
-    // The date is valid, so the backend validation error is "artificially" added here
-    // to trigger the error. Invalid dates would be also caught by the component directly,
-    // so we couldn't test if the backend mechanism works.
-    Object.defineProperty(input, "target", {
-      value: "2020-05-12",
-    })
-
-    await fireEvent.update(input)
-    await nextTick()
-  })
-
   it("does not allow letters", async () => {
     const { emitted } = renderComponent()
     const input = screen.queryByLabelText("aria-label") as HTMLInputElement
 
-    Object.defineProperty(input, "target", {
-      value: "20HA-02-31",
-    })
-
-    await fireEvent.update(input)
+    await userEvent.type(input, "FO.OO.2001")
     await nextTick()
 
     expect(emitted()["update:modelValue"]).not.toBeTruthy()

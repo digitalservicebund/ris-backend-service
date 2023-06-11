@@ -1,4 +1,4 @@
-import { expect } from "@playwright/test"
+import { APIResponse, expect } from "@playwright/test"
 import { testWithImportedNorm } from "./fixtures"
 import { normData } from "./testdata/norm_basic"
 
@@ -32,7 +32,7 @@ testWithImportedNorm(
   }
 )
 
-async function assertResponseOk(response) {
+async function assertResponseOk(response: APIResponse) {
   expect(response.ok()).toBeTruthy()
   const norms = await response.json()
   expect(norms.data[0].officialLongTitle).toBe(normData.officialLongTitle)

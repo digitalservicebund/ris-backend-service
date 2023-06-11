@@ -84,7 +84,7 @@ public class XmlEMailPublishService implements EmailPublishService {
     subject += " dt=N";
     subject += " mod=T";
     subject += " ld=" + deliveryDate;
-    subject += " vg=Testvorgang";
+    subject += " vg=" + documentUnit.documentNumber();
 
     return Mono.just(subject);
   }

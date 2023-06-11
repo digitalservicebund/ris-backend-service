@@ -1,24 +1,33 @@
 <script lang="ts" setup>
-import { ref } from "vue"
+import { onMounted, ref } from "vue"
 import DocumentUnitPublication from "@/components/DocumentUnitPublication.vue"
+import DocumentUnit from "@/domain/documentUnit"
 import documentUnitService from "@/services/documentUnitService"
+import { ResponseError } from "@/services/httpClient"
 
 const props = defineProps<{ documentNumber: string }>()
+
+const documentUnit = ref<DocumentUnit>()
+const error = ref<ResponseError>()
 
 async function loadDocumentUnit() {
   const response = await documentUnitService.getByDocumentNumber(
     props.documentNumber
   )
-  return {
-    documentUnit: ref(response.data),
-    error: response.error,
-  }
+
+  documentUnit.value = response.data
+  error.value = response.error
 }
-const { documentUnit, error } = await loadDocumentUnit()
+
+onMounted(() => loadDocumentUnit())
 </script>
 
 <template>
-  <DocumentUnitPublication v-if="documentUnit" :document-unit="documentUnit" />
+  <DocumentUnitPublication
+    v-if="documentUnit"
+    :document-unit="(documentUnit as DocumentUnit)"
+    @update-document-unit="loadDocumentUnit"
+  />
   <div v-else>
     <h2>{{ error?.title }}</h2>
     <p>{{ error?.description }}</p>

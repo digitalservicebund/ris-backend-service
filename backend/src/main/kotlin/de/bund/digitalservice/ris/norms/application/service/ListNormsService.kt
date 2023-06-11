@@ -20,7 +20,7 @@ class ListNormsService(private val searchNormsOutputAdapter: SearchNormsOutputPo
     }
 }
 
-// TODO Add UNOFFICIAL_LONG_TITLE & UNOFFICIAL_SHORT_TITLE once all metadata are migrated
+// TODO RISDEV-1813 Add UNOFFICIAL_LONG_TITLE & UNOFFICIAL_SHORT_TITLE once all metadata are migrated
 private val SEARCH_TERM_QUERY_FIELDS = listOf(
     SearchNormsOutputPort.QueryFields.OFFICIAL_LONG_TITLE,
     SearchNormsOutputPort.QueryFields.OFFICIAL_SHORT_TITLE,

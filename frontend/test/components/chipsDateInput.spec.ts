@@ -1,12 +1,7 @@
 import userEvent from "@testing-library/user-event"
-import { render, screen } from "@testing-library/vue"
-import dayjs from "dayjs"
-import timezone from "dayjs/plugin/timezone"
-import utc from "dayjs/plugin/utc"
+import { fireEvent, render, screen } from "@testing-library/vue"
+import { nextTick } from "vue"
 import ChipsDateInput from "@/shared/components/input/ChipsDateInput.vue"
-
-dayjs.extend(utc)
-dayjs.extend(timezone)
 
 function renderComponent(options?: {
   ariaLabel?: string
@@ -27,22 +22,14 @@ function renderComponent(options?: {
 }
 
 describe("ChipsInput", () => {
-  beforeEach(() => {
-    dayjs.tz.setDefault("Europe/Berlin")
-  })
-
-  afterEach(() => {
-    dayjs.tz.setDefault()
-  })
-
-  it("shows a chips input element with type of date", () => {
+  it("shows a chips input element", () => {
     renderComponent({
       ariaLabel: "test-label",
     })
     const input = screen.getByLabelText("test-label") as HTMLInputElement
 
     expect(input).toBeInTheDocument()
-    expect(input?.type).toBe("date")
+    expect(input?.type).toBe("text")
   })
 
   it("shows chips date input with an aria label", () => {
@@ -59,10 +46,8 @@ describe("ChipsInput", () => {
       ariaLabel: "test-label",
     })
     const input = screen.getByLabelText("test-label")
-    await userEvent.clear(input)
-    expect(input).toHaveValue("")
 
-    await user.type(input, "2022-02-03")
+    await user.type(input, "03.02.2022")
     await user.type(input, "{enter}")
 
     const chipList = screen.getAllByLabelText("chip")
@@ -89,11 +74,10 @@ describe("ChipsInput", () => {
   it("adds multiple date values in chips", async () => {
     const { user } = renderComponent()
     const input = screen.getByLabelText("aria-label")
-    expect(input).toHaveValue("")
 
-    await user.type(input, "2022-02-03")
+    await user.type(input, "03.02.2022")
     await user.type(input, "{enter}")
-    await user.type(input, "2022-01-03")
+    await user.type(input, "03.01.2022")
     await user.type(input, "{enter}")
 
     const chipList = screen.getAllByLabelText("chip")
@@ -119,7 +103,7 @@ describe("ChipsInput", () => {
   it("emits model update event when user adds an input", async () => {
     const { emitted, user } = renderComponent()
     const input = screen.getByLabelText("aria-label")
-    await user.type(input, "2022-02-03")
+    await user.type(input, "03.02.2022")
     await user.type(input, "{enter}")
     await userEvent.tab()
 
@@ -129,11 +113,16 @@ describe("ChipsInput", () => {
   })
 
   it("resets date input on backspace delete", async () => {
-    const { user } = renderComponent()
-    const input = screen.getByLabelText("aria-label") as HTMLInputElement
-    await user.type(input, "2022-02-03")
-    expect(input).toHaveValue("2022-02-03")
-    await user.type(input, "{backspace}")
+    renderComponent()
+    const input: HTMLInputElement = screen.queryByLabelText(
+      "aria-label"
+    ) as HTMLInputElement
+    await userEvent.type(input, "13.05.2022")
+    expect(input).toHaveValue("13.05.2022")
+    await userEvent.type(input, "{backspace}")
+    await fireEvent.update(input)
+    await nextTick()
+
     expect(input).toHaveValue("")
   })
 
@@ -142,9 +131,9 @@ describe("ChipsInput", () => {
     const input = screen.getByLabelText("aria-label") as HTMLInputElement
     expect(input).toHaveValue("")
 
-    await user.type(input, "2022-02-03")
+    await user.type(input, "03.02.2022")
     await user.type(input, "{enter}")
-    await user.type(input, "2022-02-03")
+    await user.type(input, "04.02.2022")
     await user.type(input, "{enter}")
 
     const chipList = screen.getAllByLabelText("chip")
@@ -156,7 +145,7 @@ describe("ChipsInput", () => {
 
     await user.type(chipList[0], "{enter}")
     expect(screen.getAllByLabelText("chip").length).toBe(1)
-    expect(chipList[0]).toHaveTextContent("03.02.2022")
+    expect(chipList[0]).toHaveTextContent("04.02.2022")
   })
 
   it("deleting chips multiple times correctly resets focus", async () => {
@@ -164,7 +153,7 @@ describe("ChipsInput", () => {
     const input = screen.getByLabelText("aria-label") as HTMLInputElement
     expect(input).toHaveValue("")
 
-    await user.type(input, "2022-02-03")
+    await user.type(input, "03.02.2022")
     await user.type(input, "{enter}")
 
     expect(screen.getAllByLabelText("chip").length).toBe(1)
@@ -174,7 +163,7 @@ describe("ChipsInput", () => {
 
     expect(screen.queryAllByLabelText("chip").length).toBe(0)
 
-    await user.type(input, "2022-02-03")
+    await user.type(input, "03.02.2022")
     await user.type(input, "{enter}")
 
     expect(screen.getAllByLabelText("chip").length).toBe(1)

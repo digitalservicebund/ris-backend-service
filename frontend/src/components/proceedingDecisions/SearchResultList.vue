@@ -1,26 +1,12 @@
 <script setup lang="ts">
-import { ref, watch } from "vue"
 import InlineDecision from "./InlineDecision.vue"
-import { ProceedingDecision } from "@/domain/documentUnit"
+import ProceedingDecision from "@/domain/proceedingDecision"
 import TextButton from "@/shared/components/input/TextButton.vue"
 
-const props = defineProps<{ searchResults: SearchResults | undefined }>()
+defineProps<{ searchResults?: SearchResults }>()
 const emits = defineEmits<{
   (event: "linkDecision", uuid: string): void
 }>()
-
-const searchResultFeedbackString = ref<string>(
-  "Noch keine Suchparameter eingegeben"
-)
-
-watch(props, () => {
-  if (!props.searchResults) return
-  if (props.searchResults.length > 0) {
-    searchResultFeedbackString.value = `Suche hat ${props.searchResults.length} Treffer ergeben`
-  } else {
-    searchResultFeedbackString.value = "Suche hat keine Treffer ergeben"
-  }
-})
 </script>
 
 <script lang="ts">
@@ -32,8 +18,10 @@ export type SearchResults = {
 
 <template>
   <div>
-    <span class="label-02-bold">{{ searchResultFeedbackString }}</span>
-    <div class="table">
+    <span v-if="!searchResults?.length" class="label-03-bold"
+      >Suche hat keine Treffer ergeben</span
+    >
+    <div class="mt-16 table">
       <div
         v-for="searchResult in searchResults"
         :key="searchResult.decision.uuid"

@@ -53,4 +53,5 @@ public class DocumentUnitDTO extends DocumentUnitMetadataDTO {
   @Transient List<DeviatingDecisionDateDTO> deviatingDecisionDates;
   @Transient List<KeywordDTO> keywords;
   @Transient List<FieldOfLawDTO> fieldsOfLaw;
+  @Transient List<DocumentUnitNormDTO> norms;
 }

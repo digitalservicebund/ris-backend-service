@@ -1,3 +1,7 @@
+import DocumentationOffice from "@/domain/documentationOffice"
+import { Court, DocumentType } from "@/domain/documentUnit"
+import { FieldOfLawNode } from "@/domain/fieldOfLaw"
+import { NormAbbreviation } from "@/domain/normAbbreviation"
 import { LabelPosition } from "@/shared/components/input/InputField.vue"
 
 export enum InputType {
@@ -11,7 +15,6 @@ export enum InputType {
   DATECHIPS = "datechips",
   NESTED = "nested",
   COMBOBOX = "combobox",
-  CUSTOMDATE = "customdate",
 }
 
 //BASE
@@ -85,6 +88,7 @@ export interface DateAttributes extends BaseInputAttributes {
 }
 
 export interface DateInputField extends BaseInputField {
+  placeholder?: string
   type: InputType.DATE
   inputAttributes: DateAttributes
 }
@@ -110,11 +114,16 @@ export interface DropdownInputField extends BaseInputField {
 }
 
 //COMBOBOX
-export type ComboboxInputModelType = string | { label: string }
+export type ComboboxInputModelType =
+  | DocumentType
+  | Court
+  | NormAbbreviation
+  | FieldOfLawNode
 
 export type ComboboxItem = {
   label: string
-  value: ComboboxInputModelType
+  value?: ComboboxInputModelType
+  additionalInformation?: string
 }
 
 export interface ComboboxAttributes extends BaseInputAttributes {
@@ -172,6 +181,7 @@ export type ModelType =
   | ChipsInputModelType
   | NestedInputModelType
   | ComboboxInputModelType
+  | DocumentationOffice
 
 // TODO We keep the name `defaultMessage` from the backend response,
 // but this could ne misleading. We should rename this to `message`.

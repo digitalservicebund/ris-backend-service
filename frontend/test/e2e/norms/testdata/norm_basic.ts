@@ -1,4 +1,5 @@
 import { NormData } from "../fixtures"
+import { NormCategory, UndefinedDate } from "@/domain/Norm"
 
 export const normData: NormData = {
   jurisZipFileName: "Tierarznei.3-0_multi.zip",
@@ -71,7 +72,7 @@ export const normData: NormData = {
       { PARTICIPATION_TYPE: ["EZ"], PARTICIPATION_INSTITUTION: ["BR"] },
       { PARTICIPATION_TYPE: ["RU"], PARTICIPATION_INSTITUTION: ["NT"] },
     ],
-    CITATION_DATE: [{ DATE: ["2023-01-02"] }, { DATE: ["2001-03-10"] }],
+    CITATION_DATE: [{ DATE: ["02.01.2023"] }, { DATE: ["10.03.2001"] }],
     AGE_INDICATION: [
       { RANGE_START: ["Lebensjahr 28"] },
       { RANGE_START: ["Monate 8"] },
@@ -84,19 +85,98 @@ export const normData: NormData = {
         RESOLUTION_MAJORITY: [false],
       },
     ],
+    OFFICIAL_REFERENCE: [
+      {
+        PRINT_ANNOUNCEMENT: [
+          { ANNOUNCEMENT_GAZETTE: ["BGBl I"], YEAR: ["2023"], PAGE: ["3"] },
+        ],
+      },
+      {
+        PRINT_ANNOUNCEMENT: [
+          { ANNOUNCEMENT_GAZETTE: ["BGBl II"], YEAR: ["2024"], PAGE: ["9"] },
+        ],
+      },
+      {
+        DIGITAL_ANNOUNCEMENT: [
+          { ANNOUNCEMENT_MEDIUM: ["BGBl I"], EDITION: ["3"], YEAR: ["2023"] },
+        ],
+      },
+      {
+        DIGITAL_ANNOUNCEMENT: [
+          { ANNOUNCEMENT_MEDIUM: ["BGBl II"], EDITION: ["9"], YEAR: ["2024"] },
+        ],
+      },
+    ],
+    DIVERGENT_ENTRY_INTO_FORCE: [
+      {
+        DIVERGENT_ENTRY_INTO_FORCE_DEFINED: [
+          {
+            DATE: ["13.01.2023"],
+            NORM_CATEGORY: [NormCategory.BASE_NORM],
+          },
+        ],
+      },
+      {
+        DIVERGENT_ENTRY_INTO_FORCE_UNDEFINED: [
+          {
+            UNDEFINED_DATE: [UndefinedDate.UNDEFINED_FUTURE],
+            NORM_CATEGORY: [NormCategory.AMENDMENT_NORM],
+          },
+        ],
+      },
+      {
+        DIVERGENT_ENTRY_INTO_FORCE_UNDEFINED: [
+          {
+            UNDEFINED_DATE: [UndefinedDate.UNDEFINED_UNKNOWN],
+            NORM_CATEGORY: [NormCategory.TRANSITIONAL_NORM],
+          },
+        ],
+      },
+      {
+        DIVERGENT_ENTRY_INTO_FORCE_UNDEFINED: [
+          { UNDEFINED_DATE: [UndefinedDate.UNDEFINED_UNKNOWN] },
+        ],
+      },
+    ],
+    DIVERGENT_EXPIRATION: [
+      {
+        DIVERGENT_EXPIRATION_DEFINED: [
+          { DATE: ["13.01.2023"], NORM_CATEGORY: [NormCategory.BASE_NORM] },
+        ],
+      },
+      {
+        DIVERGENT_EXPIRATION_UNDEFINED: [
+          {
+            UNDEFINED_DATE: [UndefinedDate.UNDEFINED_FUTURE],
+            NORM_CATEGORY: [NormCategory.TRANSITIONAL_NORM],
+          },
+        ],
+      },
+    ],
+    DOCUMENT_TYPE: [
+      { TYPE_NAME: ["RV"], NORM_CATEGORY: [NormCategory.BASE_NORM] },
+    ],
+    CATEGORIZED_REFERENCE: [
+      { TEXT: ["&A 31 &B Art 1 Nr 4 Buchst a &E HGB &E3 § 246 &E6 Abs 1"] },
+      {
+        TEXT: [
+          "&A 32 &B Art 1 Nr 4 Buchst b &E HGB &E3 § 246 &E6 Abs 2 S 2 und 3",
+        ],
+      },
+    ],
+    ENTRY_INTO_FORCE: [{ DATE: ["01.01.2007"] }],
+    PRINCIPLE_ENTRY_INTO_FORCE: [{ DATE: ["01.01.2007"] }],
+    EXPIRATION: [{ UNDEFINED_DATE: [UndefinedDate.UNDEFINED_UNKNOWN] }],
+    PRINCIPLE_EXPIRATION: [
+      { UNDEFINED_DATE: [UndefinedDate.UNDEFINED_UNKNOWN] },
+    ],
   },
   officialLongTitle:
     "Verordnung zur Anpassung von Rechtsverordnungen an das Tierarzneimittelrecht",
   officialShortTitle: "Angepasstes Tierarzneimittelrecht",
   risAbbreviation: "Tierarznei",
-  documentCategory: "N",
-  entryIntoForceDate: "2007-01-01",
-  principleEntryIntoForceDate: "2007-01-01",
-  divergentEntryIntoForceDateState: "nicht vorhanden",
-  expirationDateState: "unbestimmt (unbekannt)",
-  principleExpirationDateState: "unbestimmt (unbekannt)",
-  divergentExpirationDateState: "nicht vorhanden",
-  announcementDate: "2023-01-06",
+  documentCategory: "NR",
+  announcementDate: "06.01.2023",
   printAnnouncementGazette: "BGBl I",
   printAnnouncementYear: "2023",
   printAnnouncementPage: "3",

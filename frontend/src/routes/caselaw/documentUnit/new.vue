@@ -6,7 +6,7 @@ import documentUnitService from "@/services/documentUnitService"
 const router = useRouter()
 
 onBeforeMount(async () => {
-  const createResponse = await documentUnitService.createNew("KO", "RE")
+  const createResponse = await documentUnitService.createNew()
   if (createResponse.data)
     await router.replace({
       name: "caselaw-documentUnit-:documentNumber-files",

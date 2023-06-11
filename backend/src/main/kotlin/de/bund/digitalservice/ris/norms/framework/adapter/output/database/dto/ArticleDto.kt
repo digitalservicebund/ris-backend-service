@@ -14,4 +14,6 @@ data class ArticleDto(
     val marker: String,
     @Column("norm_id")
     val normId: Int,
+    @Column("norm_guid")
+    val normGuid: UUID,
 )

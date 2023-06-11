@@ -2,7 +2,7 @@ import userEvent from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
 import {
   defineTextField,
-  defineDateField,
+  defineChipsField,
 } from "@/fields/caselaw/coreDataFields"
 import NestedInput from "@/shared/components/input/NestedInput.vue"
 import {
@@ -85,11 +85,11 @@ describe("NestedInput", () => {
           "text input 1",
           "text input label"
         ),
-        child: defineDateField(
-          "decisionDate",
-          "Entscheidungsdatum",
-          "date input label",
-          undefined
+        child: defineChipsField(
+          "chips input",
+          "chips input",
+          "chips input label",
+          ""
         ),
       },
     })
@@ -98,10 +98,10 @@ describe("NestedInput", () => {
       "text input label"
     ) as HTMLInputElement
     const input2 = screen.queryByLabelText(
-      "date input label"
+      "chips input label"
     ) as HTMLInputElement
 
     expect(input1).toHaveAttribute("type", "text")
-    expect(input2).toHaveAttribute("type", "date")
+    expect(input2).toHaveAttribute("type", "text")
   })
 })

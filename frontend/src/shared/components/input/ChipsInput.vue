@@ -32,9 +32,10 @@ function updateModelValue() {
   emits("update:modelValue", chips.value.length === 0 ? undefined : chips.value)
 }
 
-function saveChip() {
+function saveChip(event: Event) {
   const trimmed = currentInput.value.trim()
   if (trimmed.length > 0) {
+    event.stopPropagation()
     chips.value.push(trimmed)
     updateModelValue()
     currentInput.value = ""
@@ -61,7 +62,9 @@ watch(chips, () => {
 </script>
 
 <template>
-  <div class="input">
+  <div
+    class="-outline-offset-4 [&:has(:focus)]:outline autofill:focus:shadow-white autofill:focus:text-inherit autofill:shadow-white autofill:text-inherit bg-white border-2 border-blue-800 border-solid content-between flex flex-wrap hover:outline min-h-[3.75rem] outline-2 outline-blue-800 px-16 py-8 w-full"
+  >
     <ChipsList
       ref="chipsList"
       v-model="chips"
@@ -72,6 +75,7 @@ watch(chips, () => {
       ref="chipsInput"
       v-model="currentInput"
       :aria-label="ariaLabel"
+      class="bg-transparent border-none flex-auto outline-none p-4 w-32"
       type="text"
       @input="emitInputEvent"
       @keypress.enter="saveChip"
@@ -79,36 +83,3 @@ watch(chips, () => {
     />
   </div>
 </template>
-
-<style lang="scss" scoped>
-.input {
-  display: flex;
-  width: 100%;
-  min-height: 3.75rem;
-  flex-wrap: wrap;
-  align-content: space-between;
-  padding: 8px 16px;
-  background-color: white;
-  @apply border-2 border-solid border-blue-800;
-
-  &:focus {
-    outline: none;
-  }
-
-  &:autofill {
-    @apply shadow-white text-inherit;
-  }
-
-  &:autofill:focus {
-    @apply shadow-white text-inherit;
-  }
-
-  input {
-    width: 30px;
-    flex: 1 1 auto;
-    padding: 4px;
-    border: none;
-    outline: none;
-  }
-}
-</style>

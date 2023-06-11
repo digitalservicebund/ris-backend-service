@@ -450,12 +450,13 @@ public class DocumentUnitDocxBuilder extends DocxBuilder {
       throw new DocxConverterException("no graphic data");
     }
 
+    Dimension size = parseImageSize(anchor.getExtent());
+
     RunElement runElement =
-        parseGraphicData(anchor.getGraphic().getGraphicData(), AnchorImageElement.class);
+        parseGraphicData(anchor.getGraphic().getGraphicData(), size, AnchorImageElement.class);
 
     if (runElement instanceof AnchorImageElement imageElement) {
       imageElement.setAlternateText(parseImageAlternateText(anchor.getDocPr()));
-      imageElement.setSize(parseImageSize(anchor.getExtent()));
       String floating = parseFloating(anchor);
       if (floating != null) {
         if (floating.equals("error")) {
@@ -479,12 +480,13 @@ public class DocumentUnitDocxBuilder extends DocxBuilder {
       throw new DocxConverterException("no graphic data");
     }
 
+    Dimension size = parseImageSize(inline.getExtent());
+
     RunElement runElement =
-        parseGraphicData(inline.getGraphic().getGraphicData(), InlineImageElement.class);
+        parseGraphicData(inline.getGraphic().getGraphicData(), size, InlineImageElement.class);
 
     if (runElement instanceof InlineImageElement imageElement) {
       imageElement.setAlternateText(parseImageAlternateText(inline.getDocPr()));
-      imageElement.setSize(parseImageSize(inline.getExtent()));
 
       return imageElement;
     }
@@ -541,7 +543,7 @@ public class DocumentUnitDocxBuilder extends DocxBuilder {
   }
 
   private RunElement parseGraphicData(
-      GraphicData graphicData, Class<? extends InlineImageElement> clazz) {
+      GraphicData graphicData, Dimension size, Class<? extends InlineImageElement> clazz) {
 
     InlineImageElement imageElement = new InlineImageElement();
     try {
@@ -559,9 +561,9 @@ public class DocumentUnitDocxBuilder extends DocxBuilder {
       var embed = pic.getBlipFill().getBlip().getEmbed();
       var image = images.get(embed);
 
-      var base64 = Base64.getEncoder().encodeToString(image.bytes());
-      imageElement.setBase64Representation(base64);
-      imageElement.setContentType(image.contentType());
+      if (image != null) {
+        addImageContent(imageElement, image, size);
+      }
     } else {
       LOGGER.error("no picture");
       List<Object> anyGraphicElement = graphicData.getAny();
@@ -572,6 +574,20 @@ public class DocumentUnitDocxBuilder extends DocxBuilder {
     }
 
     return imageElement;
+  }
+
+  private void addImageContent(InlineImageElement element, DocxImagePart image, Dimension size) {
+    element.setContentType(image.contentType());
+
+    byte[] bytes = image.bytes();
+    if (image.contentType().equals("image/x-emf")) {
+      bytes = EMF2PNGConverter.convertEMF2PNG(bytes, size);
+      element.setContentType("image/png");
+    }
+
+    element.setBase64Representation(Base64.getEncoder().encodeToString(bytes));
+
+    element.setSize(size);
   }
 
   private String getAlignment(PPr pPr) {

@@ -1,5 +1,6 @@
 import httpClient, { ServiceResponse } from "./httpClient"
-import { FieldOfLawNode, Page } from "@/domain/fieldOfLaw"
+import { FieldOfLawNode } from "@/domain/fieldOfLaw"
+import { Page, PageableService } from "@/shared/components/Pagination.vue"
 
 interface FieldOfLawService {
   getSelectedFieldsOfLaw(
@@ -17,11 +18,7 @@ interface FieldOfLawService {
   getTreeForIdentifier(
     identifier: string
   ): Promise<ServiceResponse<FieldOfLawNode>>
-  searchForFieldsOfLaw(
-    searchStr: string,
-    page: number,
-    size: number
-  ): Promise<ServiceResponse<Page<FieldOfLawNode>>>
+  searchForFieldsOfLaw: PageableService<FieldOfLawNode, string>
 }
 
 const service: FieldOfLawService = {
@@ -78,7 +75,6 @@ const service: FieldOfLawService = {
     const response = await httpClient.get<FieldOfLawNode>(
       `caselaw/fieldsoflaw/${identifier}/tree`
     )
-    // if (response.data) console.log("service - load tree:", response.data)
     if (response.status >= 300) {
       response.error = {
         title: "Pfad zu ausgewähltem Sachgebiet konnte nicht geladen werden.",
@@ -86,10 +82,10 @@ const service: FieldOfLawService = {
     }
     return response
   },
-  async searchForFieldsOfLaw(searchStr: string, page: number, size: number) {
+  async searchForFieldsOfLaw(page: number, size: number, query?: string) {
     const response = await httpClient.get<Page<FieldOfLawNode>>(
       `caselaw/fieldsoflaw?pg=${page}&sz=${size}`,
-      { params: { q: searchStr } }
+      { params: { q: query ?? "" } }
     )
     if (response.status >= 300) {
       response.error = {

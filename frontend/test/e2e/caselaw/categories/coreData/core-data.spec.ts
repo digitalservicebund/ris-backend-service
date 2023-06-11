@@ -178,7 +178,7 @@ test.describe("core data", () => {
       .locator("[aria-label='Rechtskraft'] + button.input-expand-icon")
       .click()
 
-    await expect(page.locator("text=Ja")).toBeVisible()
+    await expect(page.getByText("Ja", { exact: true })).toBeVisible()
     await expect(page.locator("text=Nein")).toBeVisible()
     await expect(page.locator("text=Keine Angabe")).toBeVisible()
   })
@@ -199,8 +199,8 @@ test.describe("core data", () => {
     await expect(page.locator("[aria-label='dropdown-option']")).toHaveCount(
       totalCaselawDocumentTypes
     )
-    await expect(page.locator("text=AnU - Anerkenntnisurteil")).toBeVisible()
-    await expect(page.locator("text=AnH - Anhängiges Verfahren")).toBeVisible()
+    await expect(page.locator("text=Anerkenntnisurteil")).toBeVisible()
+    await expect(page.locator("text=Anhängiges Verfahren")).toBeVisible()
 
     // type search string: 3 results for "zwischen"
     await page.locator("[aria-label='Dokumenttyp']").fill("zwischen")
@@ -229,5 +229,45 @@ test.describe("core data", () => {
     await page.keyboard.down("Escape")
     await expect(page.locator("[aria-label='dropdown-option']")).toBeHidden()
     expect(await page.inputValue("[aria-label='Dokumenttyp']")).toBe("")
+  })
+
+  test("ensure new docUnit has correct documentationOffice for DS user", async ({
+    page,
+  }) => {
+    await test.step("create new docUnit with logged in user", async () => {
+      page.goto("/caselaw")
+      await page.getByText("Neue Dokumentationseinheit").click()
+
+      await expect(
+        page.getByText("Aktuell ist keine Datei hinterlegt")
+      ).toBeVisible()
+
+      await page.getByText("Rubriken").click()
+      await expect(
+        page.getByText("DOKUMENTATIONSSTELLEDigitalService")
+      ).toBeVisible()
+    })
+  })
+})
+
+test.describe(() => {
+  test.use({
+    storageState: "test/e2e/shared/.auth/user_bgh.json",
+  })
+
+  test("ensure new docUnit has correct documentationOffice for BGH user", async ({
+    page,
+  }) => {
+    await test.step("create new docUnit with logged in user", async () => {
+      page.goto("/caselaw")
+      await page.getByText("Neue Dokumentationseinheit").click()
+
+      await expect(
+        page.getByText("Aktuell ist keine Datei hinterlegt")
+      ).toBeVisible()
+
+      await page.getByText("Rubriken").click()
+      await expect(page.getByText("DOKUMENTATIONSSTELLEBGH")).toBeVisible()
+    })
   })
 })

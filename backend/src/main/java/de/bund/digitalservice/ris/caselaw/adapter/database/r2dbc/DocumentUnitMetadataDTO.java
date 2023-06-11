@@ -2,6 +2,7 @@ package de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc;
 
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DocumentTypeDTO;
 import de.bund.digitalservice.ris.caselaw.domain.DataSource;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatus;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
@@ -54,6 +55,9 @@ public class DocumentUnitMetadataDTO {
   @Column("decision_date")
   private Instant decisionDate;
 
+  @Column("date_known")
+  private boolean dateKnown;
+
   @Column("gerichtssitz")
   private String courtLocation;
 
@@ -63,11 +67,15 @@ public class DocumentUnitMetadataDTO {
   @Column("eingangsart")
   private String inputType;
 
-  @Column("dokumentationsstelle")
-  private String center;
-
   @Column("region")
   private String region;
 
+  @Column("documentation_office_id")
+  private UUID documentationOfficeId;
+
+  @Transient private DocumentationOfficeDTO documentationOffice;
+
   @Transient private List<FileNumberDTO> fileNumbers;
+
+  @Transient private DocumentUnitStatus status;
 }

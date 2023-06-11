@@ -11,6 +11,7 @@ import {
 testWithImportedNorm(
   "Check if fields can be edited",
   async ({ page, normData, guid }) => {
+    testWithImportedNorm.slow()
     await openNorm(page, normData["officialLongTitle"], guid)
 
     const locatorFrameButton = page.locator("a:has-text('Rahmen')")

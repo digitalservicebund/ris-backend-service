@@ -220,7 +220,7 @@ class FieldOfLawIntegrationTest {
         webClient
             .mutateWith(csrf())
             .get()
-            .uri("/api/v1/caselaw/fieldsoflaw/search-by-identifier?searchStr=FL-01")
+            .uri("/api/v1/caselaw/fieldsoflaw/search-by-identifier?q=FL-01")
             .exchange()
             .expectStatus()
             .isOk()
@@ -366,14 +366,14 @@ class FieldOfLawIntegrationTest {
   @Test
   void testOrderingOfGetFieldsOfLawByNormsAndSearchQuery() {
     String[][] fieldOfLawData = {
-      {"AB-01", "Some text here", "§ 123", "abc"},
-      {"AB-01-01", "More text also here", "§ 456", "cab"},
+      {"AB-01", "Some text here", "§ 123", "abcd"},
+      {"AB-01-01", "More text also here", "§ 123", "abxyz"},
       {"CD", "Other text without more", null, null},
       {"CD-01", "Text means writing here", "§ 012", "dab"},
-      {"CD-02", "Aber a word starting with ab and text + here", "§ 345", "abx"}
+      {"CD-02", "Aber a word starting with ab and text + here", "§ 123", "aber hallo"}
     };
 
-    String searchStr = "norm:\"ab\" AB here text";
+    String searchStr = "norm:\"§ 123 ab\" AB here text";
 
     List<String> expectedIdentifiers = Arrays.asList("CD-02", "AB-01", "AB-01-01");
     List<Integer> expectedScores = Arrays.asList(38, 28, 28);
@@ -433,7 +433,7 @@ class FieldOfLawIntegrationTest {
         webClient
             .mutateWith(csrf())
             .get()
-            .uri("/api/v1/caselaw/fieldsoflaw/search-by-identifier?searchStr=" + searchStr)
+            .uri("/api/v1/caselaw/fieldsoflaw/search-by-identifier?q=" + searchStr)
             .exchange()
             .expectStatus()
             .isOk()

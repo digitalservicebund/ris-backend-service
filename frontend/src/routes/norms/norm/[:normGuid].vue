@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import dayjs from "dayjs"
 import { storeToRefs } from "pinia"
 import { toRefs, watchEffect, onUnmounted, computed } from "vue"
 import { RouterView, useRoute, useRouter } from "vue-router"
@@ -29,26 +28,10 @@ const normIsExportable = computed(
 )
 const menuItems = useNormMenuItems(normGuid, route, normIsExportable)
 
-const ENTRY_INTO_FORCE_DATE_MAP: Record<string, string> = {
-  UNDEFINED_UNKNOWN: "unbestimmt (unbekannt)",
-  UNDEFINED_FUTURE: "unbestimmt (zukünftig)",
-  UNDEFINED_NOT_PRESENT: "nicht vorhanden",
-}
-
 const announcementInfo = computed(() => {
   const gazette = loadedNorm.value?.printAnnouncementGazette
   const page = loadedNorm.value?.printAnnouncementPage
   return gazette && page ? `${gazette} S. ${page}` : undefined
-})
-
-const entryIntoForceInfo = computed(() => {
-  if (loadedNorm.value?.entryIntoForceDate) {
-    return dayjs(loadedNorm.value.entryIntoForceDate).format("DD.MM.YYYY")
-  } else if (loadedNorm.value?.entryIntoForceDateState) {
-    return ENTRY_INTO_FORCE_DATE_MAP[loadedNorm.value.entryIntoForceDateState]
-  } else {
-    return undefined
-  }
 })
 
 const propertyInfos = computed(() => [
@@ -58,7 +41,7 @@ const propertyInfos = computed(() => [
     value:
       loadedNorm.value?.metadataSections?.SUBJECT_AREA?.[0]?.SUBJECT_FNA?.[0],
   },
-  { label: "Inkrafttreten", value: entryIntoForceInfo.value },
+  { label: "Inkrafttreten", value: undefined },
 ])
 
 watchEffect(() => store.load(props.normGuid))
@@ -80,8 +63,8 @@ onUnmounted(() => (loadedNorm.value = undefined))
       class="bg-gray-100 border-gray-400 border-l-1 w-full"
     >
       <DocumentUnitInfoPanel
+        :first-row="propertyInfos"
         :heading="loadedNorm.risAbbreviation"
-        :property-infos="propertyInfos"
       />
       <RouterView class="p-48" />
     </div>

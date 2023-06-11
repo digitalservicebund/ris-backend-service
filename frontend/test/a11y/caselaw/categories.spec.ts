@@ -59,7 +59,7 @@ test.describe("a11y of categories page (/caselaw/documentunit/{documentNumber}/c
   test("entscheidungsdatum", async ({ page, documentNumber }) => {
     await navigateToCategories(page, documentNumber)
 
-    await page.locator("[aria-label='Entscheidungsdatum']").fill("2022-02-03")
+    await page.locator("[aria-label='Entscheidungsdatum']").fill("03.02.2022")
 
     await page
       .locator("[aria-label='Abweichendes Entscheidungsdatum anzeigen']")
@@ -67,11 +67,11 @@ test.describe("a11y of categories page (/caselaw/documentunit/{documentNumber}/c
 
     await page
       .locator("[aria-label='Abweichendes Entscheidungsdatum']")
-      .fill("2022-02-02")
+      .fill("02.02.2022")
     await page.keyboard.press("Enter")
     await page
       .locator("[aria-label='Abweichendes Entscheidungsdatum']")
-      .fill("2022-02-01")
+      .fill("01.02.2022")
     await page.keyboard.press("Enter")
 
     const accessibilityScanResults = await new AxeBuilder({ page }).analyze()
@@ -133,7 +133,7 @@ test.describe("a11y of categories page (/caselaw/documentunit/{documentNumber}/c
       async () => {
         await fillProceedingDecisionInputs(page, {
           court: "AG Aalen",
-          date: "2004-12-03",
+          date: "03.12.2004",
           fileNumber: "1a2b3c",
         })
       },
@@ -143,7 +143,7 @@ test.describe("a11y of categories page (/caselaw/documentunit/{documentNumber}/c
     await page.reload()
     await toggleProceedingDecisionsSection(page)
     await fillProceedingDecisionInputs(page, {
-      date: "2004-12-03",
+      date: "03.12.2004",
     })
 
     const accessibilityScanResults = await new AxeBuilder({ page })

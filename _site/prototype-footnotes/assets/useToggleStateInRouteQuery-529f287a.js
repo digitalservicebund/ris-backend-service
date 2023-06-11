@@ -1,0 +1,1 @@
+import{i as s,H as c,Z as r}from"./index-086108b4.js";function y(u,e,o,i=!0){const t=s(i),n=c(()=>e.query[u]);return r(n,a=>{a&&(t.value=a==="true")},{immediate:!0}),r(t,async()=>{await o({...e,query:{...e.query,[u]:t.value.toString()}})}),t}export{y as u};

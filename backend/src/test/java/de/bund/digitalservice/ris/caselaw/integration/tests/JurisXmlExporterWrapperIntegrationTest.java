@@ -1,5 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.integration.tests;
 
+import static de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatus.UNPUBLISHED;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -10,6 +11,8 @@ import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.DataSource;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitNorm;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.ProceedingDecision;
 import de.bund.digitalservice.ris.caselaw.domain.Texts;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.court.Court;
@@ -68,6 +71,7 @@ public class JurisXmlExporterWrapperIntegrationTest {
                 .uuid(UUID.randomUUID())
                 .court(new Court("courtType", "courtPlace", "courtLabel", null))
                 .date(Instant.parse("2020-05-06T00:00:00Z"))
+                .dateKnown(true)
                 .fileNumber("fileNumber")
                 .documentType(
                     DocumentType.builder().jurisShortcut("category").label("category123").build())
@@ -129,7 +133,8 @@ public class JurisXmlExporterWrapperIntegrationTest {
             .decisionDate(Instant.parse("2021-01-01T00:00:00Z"))
             .legalEffect("legalEffect")
             .inputType("inputType")
-            .center("center")
+            .documentationOffice(
+                DocumentationOffice.builder().label("fooOffice").label("FO").build())
             .region("region")
             .build();
     Texts texts =
@@ -152,6 +157,7 @@ public class JurisXmlExporterWrapperIntegrationTest {
                 .dataSource(DataSource.NEURIS)
                 .court(new Court("courtType", "courtPlace", "courtLabel", null))
                 .date(Instant.parse("2020-04-05T00:00:00Z"))
+                .dateKnown(true)
                 .fileNumber("fileNumber")
                 .documentType(
                     DocumentType.builder().jurisShortcut("category").label("category123").build())
@@ -161,7 +167,8 @@ public class JurisXmlExporterWrapperIntegrationTest {
         new ContentRelatedIndexing(
             List.of("keyword1", "keyword2"),
             List.of(
-                FieldOfLaw.builder().id(1L).identifier("SF-01").text("field of law text").build()));
+                FieldOfLaw.builder().id(1L).identifier("SF-01").text("field of law text").build()),
+            List.of(DocumentUnitNorm.builder().singleNorm("01").build()));
 
     DocumentUnit documentUnit =
         DocumentUnit.builder()
@@ -177,6 +184,7 @@ public class JurisXmlExporterWrapperIntegrationTest {
             .proceedingDecisions(proceedingDecisions)
             .texts(texts)
             .contentRelatedIndexing(indexing)
+            .status(UNPUBLISHED)
             .build();
 
     assertThat(documentUnit).hasNoNullFieldsOrProperties();

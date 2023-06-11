@@ -4,7 +4,6 @@ import ComboboxInput from "@/components/ComboboxInput.vue"
 import CheckboxInput from "@/shared/components/input/CheckboxInput.vue"
 import ChipsDateInput from "@/shared/components/input/ChipsDateInput.vue"
 import ChipsInput from "@/shared/components/input/ChipsInput.vue"
-import CustomDateInput from "@/shared/components/input/CustomDateInput.vue"
 import DateInput from "@/shared/components/input/DateInput.vue"
 import DropdownInput from "@/shared/components/input/DropdownInput.vue"
 import FileInput from "@/shared/components/input/FileInput.vue"
@@ -56,8 +55,6 @@ const component = computed(() => {
       return DropdownInput
     case InputType.DATE:
       return DateInput
-    case InputType.CUSTOMDATE:
-      return CustomDateInput
     case InputType.CHECKBOX:
       return CheckboxInput
     case InputType.CHIPS:

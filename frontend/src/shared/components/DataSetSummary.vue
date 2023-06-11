@@ -1,11 +1,11 @@
-<script lang="ts" setup>
+<script lang="ts" setup generic="T">
 import { computed, h, defineComponent } from "vue"
 import type { VNode } from "vue"
 import Ourselves from "@/shared/components/DataSetSummary.vue"
 
 const props = defineProps<{
-  data: undefined
-  summarizer?: (dataEntry: undefined) => string | VNode
+  data: T | T[]
+  summarizer?: (dataEntry: T) => string | VNode
 }>()
 
 const dataAsList = computed(() =>
@@ -15,7 +15,7 @@ const dataAsList = computed(() =>
 const summarizer = computed(() => props.summarizer ?? defaultSummarizer)
 const summaries = computed(() => dataAsList.value.map(wrappedSummarizer))
 
-function wrappedSummarizer(dataEntry: undefined): VNode {
+function wrappedSummarizer(dataEntry: T): VNode {
   const summary = summarizer.value(dataEntry)
   return typeof summary == "string" ? h("span", summary) : summary
 }
@@ -73,7 +73,7 @@ export function withSummarizer(
     <div
       v-for="(summary, index) in summaries"
       :key="index"
-      class="border-b-1 border-b-blue-500 first:pt-0 flex flex-start label-02-reg last:border-none last:pb-0 py-10 w-full"
+      class="border-b-1 border-b-gray-400 first:pt-0 flex flex-start label-02-reg last:border-none last:pb-0 py-10 w-full"
     >
       <component :is="summary" />
     </div>

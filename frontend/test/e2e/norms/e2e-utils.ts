@@ -6,18 +6,16 @@ import { APIRequestContext, expect } from "@playwright/test"
 import jsZip from "jszip"
 import { Page } from "playwright"
 
-const REMOTE_JURIS_TEST_FILE_FOLDER_URL =
-  "raw.githubusercontent.com/digitalservicebund/ris-norms-juris-converter/main/src/test/resources/juris"
+const VERSION_TAG = "v0.11.1"
+const REMOTE_JURIS_TEST_FILE_FOLDER_URL = `raw.githubusercontent.com/digitalservicebund/ris-norms-juris-converter/${VERSION_TAG}/src/test/resources/juris`
 
 async function getLocalJurisTestFileFolderPath(): Promise<string> {
-  const folderPath = path.join(tmpdir(), "ris-norms_juris-test-files")
-
-  try {
-    await fs.promises.access(folderPath, fs.constants.F_OK)
-  } catch {
-    await fs.promises.mkdir(folderPath)
-  }
-
+  const folderPath = path.join(
+    tmpdir(),
+    "ris-norms_juris-test-files",
+    VERSION_TAG
+  )
+  await fs.promises.mkdir(folderPath, { recursive: true })
   return folderPath
 }
 

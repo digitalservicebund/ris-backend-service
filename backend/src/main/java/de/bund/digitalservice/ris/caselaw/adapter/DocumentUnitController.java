@@ -1,30 +1,33 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitCreationInfo;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitListEntry;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.MailResponse;
 import de.bund.digitalservice.ris.caselaw.domain.ProceedingDecision;
+import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import jakarta.validation.Valid;
 import java.nio.ByteBuffer;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.NonNull;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @RestController
@@ -32,16 +35,20 @@ import reactor.core.publisher.Mono;
 @Slf4j
 public class DocumentUnitController {
   private final DocumentUnitService service;
+  private final UserService userService;
 
-  public DocumentUnitController(DocumentUnitService service) {
+  public DocumentUnitController(DocumentUnitService service, UserService userService) {
     this.service = service;
+    this.userService = userService;
   }
 
-  @PostMapping(value = "")
+  @GetMapping(value = "new")
   public Mono<ResponseEntity<DocumentUnit>> generateNewDocumentUnit(
-      @RequestBody DocumentUnitCreationInfo documentUnitCreationInfo) {
-    return service
-        .generateNewDocumentUnit(documentUnitCreationInfo)
+      @AuthenticationPrincipal OidcUser oidcUser) {
+
+    return userService
+        .getDocumentationOffice(oidcUser)
+        .flatMap(service::generateNewDocumentUnit)
         .map(documentUnit -> ResponseEntity.status(HttpStatus.CREATED).body(documentUnit))
         .onErrorReturn(ResponseEntity.internalServerError().body(DocumentUnit.builder().build()));
   }
@@ -68,10 +75,14 @@ public class DocumentUnitController {
   }
 
   @GetMapping(value = "")
-  public Flux<DocumentUnitListEntry> getAll() {
-    log.debug("All DocumentUnits were requested");
+  public Mono<Page<DocumentUnitListEntry>> getAll(
+      @RequestParam("pg") int page,
+      @RequestParam("sz") int size,
+      @AuthenticationPrincipal OidcUser oidcUser) {
 
-    return service.getAll();
+    return userService
+        .getDocumentationOffice(oidcUser)
+        .flatMap(user -> service.getAll(PageRequest.of(page, size), user));
   }
 
   @GetMapping(value = "/{documentNumber}")
@@ -127,8 +138,11 @@ public class DocumentUnitController {
   }
 
   @PutMapping(value = "/search")
-  public Flux<ProceedingDecision> searchForDocumentUnitsByProceedingDecisionInput(
+  public Mono<Page<ProceedingDecision>> searchByProceedingDecision(
+      @RequestParam("pg") int page,
+      @RequestParam("sz") int size,
       @RequestBody ProceedingDecision proceedingDecision) {
-    return service.searchForDocumentUnitsByProceedingDecisionInput(proceedingDecision);
+
+    return service.searchByProceedingDecision(proceedingDecision, PageRequest.of(page, size));
   }
 }

@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed } from "vue"
+import { computed, ref } from "vue"
 import { ValidationError } from "@/shared/components/input/types"
 import { useInputModel } from "@/shared/composables/useInputModel"
 
@@ -22,6 +22,7 @@ interface Emits {
 
 const props = defineProps<Props>()
 const emit = defineEmits<Emits>()
+const inputRef = ref()
 
 const { inputValue, emitInputEvent } = useInputModel<string, Props, Emits>(
   props,
@@ -34,11 +35,18 @@ const conditionalClasses = computed(() => ({
 }))
 
 const tabindex = computed(() => (props.readOnly ? -1 : 0))
+
+function focusInput() {
+  inputRef.value.focus()
+}
+
+defineExpose({ focusInput })
 </script>
 
 <template>
   <input
     :id="id"
+    ref="inputRef"
     v-model="inputValue"
     :aria-label="ariaLabel"
     class="ds-input"
@@ -54,17 +62,6 @@ const tabindex = computed(() => (props.readOnly ? -1 : 0))
 
 <style lang="scss" scoped>
 .input {
-  flex-wrap: wrap;
-  align-content: space-between;
-
-  &:autofill {
-    @apply shadow-white text-inherit;
-  }
-
-  &:autofill:focus {
-    @apply shadow-white text-inherit;
-  }
-
   &__error {
     @apply border-red-800 outline-red-800 bg-red-200;
 
@@ -74,12 +71,6 @@ const tabindex = computed(() => (props.readOnly ? -1 : 0))
 
     &:autofill:focus {
       @apply shadow-error text-inherit;
-    }
-  }
-
-  &__readonly {
-    &:focus {
-      @apply outline-none;
     }
   }
 

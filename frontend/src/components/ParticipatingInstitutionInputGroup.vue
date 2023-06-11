@@ -20,13 +20,13 @@ const inputValue = ref(props.modelValue)
 const type = computed({
   get: () => inputValue.value.PARTICIPATION_TYPE?.[0],
   set: (data?: string) =>
-    data && (inputValue.value.PARTICIPATION_TYPE = [data]),
+    (inputValue.value.PARTICIPATION_TYPE = data ? [data] : undefined),
 })
 
 const institution = computed({
   get: () => inputValue.value.PARTICIPATION_INSTITUTION?.[0],
   set: (data?: string) =>
-    data && (inputValue.value.PARTICIPATION_INSTITUTION = [data]),
+    (inputValue.value.PARTICIPATION_INSTITUTION = data ? [data] : undefined),
 })
 
 watch(props, () => (inputValue.value = props.modelValue), {

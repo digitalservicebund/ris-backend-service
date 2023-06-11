@@ -3,7 +3,7 @@ import { computed } from "vue"
 
 interface Props {
   id: string
-  label?: string
+  label?: string | string[]
   errorMessage?: string
   required?: boolean
   labelPosition?: LabelPosition
@@ -24,6 +24,10 @@ const wrapperClasses = computed(() => ({
     props.labelPosition === LabelPosition.RIGHT ||
     props.labelPosition === LabelPosition.LEFT,
 }))
+
+const labelConverted = Array.isArray(props.label)
+  ? props.label
+  : Array.of(props.label)
 </script>
 
 <script lang="ts">
@@ -36,7 +40,7 @@ export enum LabelPosition {
 </script>
 
 <template>
-  <div class="flex flex-start" :class="wrapperClasses">
+  <div class="flex flex-start w-full" :class="wrapperClasses">
     <!-- slot rendered BEFORE label if the label position should be to the right or bottom -->
     <slot
       v-if="
@@ -47,13 +51,20 @@ export enum LabelPosition {
     />
 
     <label
-      v-if="label"
+      v-if="labelConverted.length !== 0"
       :aria-label="id"
-      class="flex gap-4 items-center label-03-reg mb-2 text-gray-900"
+      class="grid items-center label-03-reg text-gray-900"
+      :class="{ 'mb-4': labelPosition === LabelPosition.TOP }"
       :for="id"
     >
-      {{ label }}
-      <span v-if="!!required">*</span>
+      <span v-for="(line, index) in labelConverted" :key="line">
+        {{ line }}
+        <span
+          v-if="index === labelConverted.length - 1 && !!required"
+          class="ml-4"
+          >*</span
+        >
+      </span>
     </label>
 
     <!-- slot rendered AFTER label, if the label position should be to the left or top -->

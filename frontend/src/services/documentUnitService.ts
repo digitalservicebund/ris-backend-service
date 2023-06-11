@@ -1,30 +1,30 @@
-import DocumentUnit, { ProceedingDecision } from "../domain/documentUnit"
-import { DocumentUnitListEntry } from "../domain/documentUnitListEntry"
 import httpClient, {
   ServiceResponse,
   FailedValidationServerResponse,
 } from "./httpClient"
+import DocumentUnit from "@/domain/documentUnit"
+import { DocumentUnitListEntry } from "@/domain/documentUnitListEntry"
+import ProceedingDecision from "@/domain/proceedingDecision"
+import { PageableService, Page } from "@/shared/components/Pagination.vue"
 
 interface DocumentUnitService {
-  getAllListEntries(): Promise<ServiceResponse<DocumentUnitListEntry[]>>
+  getAllListEntries: PageableService<DocumentUnitListEntry>
   getByDocumentNumber(
     documentNumber: string
   ): Promise<ServiceResponse<DocumentUnit>>
-  createNew(
-    docCenter: string,
-    docType: string
-  ): Promise<ServiceResponse<DocumentUnit>>
+  createNew(): Promise<ServiceResponse<DocumentUnit>>
   update(documentUnit: DocumentUnit): Promise<ServiceResponse<unknown>>
   delete(documentUnitUuid: string): Promise<ServiceResponse<unknown>>
-  searchByProceedingDecisionInput(
-    proceedingDecision: ProceedingDecision
-  ): Promise<ServiceResponse<ProceedingDecision[]>>
+  searchByProceedingDecisionInput: PageableService<
+    ProceedingDecision,
+    ProceedingDecision
+  >
 }
 
 const service: DocumentUnitService = {
-  async getAllListEntries() {
-    const response = await httpClient.get<DocumentUnitListEntry[]>(
-      "caselaw/documentunits"
+  async getAllListEntries(page: number, size: number) {
+    const response = await httpClient.get<Page<DocumentUnitListEntry>>(
+      `caselaw/documentunits?pg=${page}&sz=${size}`
     )
     if (response.status >= 300) {
       response.error = {
@@ -48,30 +48,27 @@ const service: DocumentUnitService = {
     return response
   },
 
-  async createNew(docCenter: string, docType: string) {
-    const response = await httpClient.post<Partial<DocumentUnit>, DocumentUnit>(
-      "caselaw/documentunits",
-      {
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-        },
-      },
-      JSON.stringify({
-        documentationCenterAbbreviation: docCenter,
-        documentType: docType,
-      }) as Partial<DocumentUnit>
+  async createNew() {
+    const response = await httpClient.get<DocumentUnit>(
+      "caselaw/documentunits/new"
     )
     if (response.status >= 300) {
       response.error = {
         title: "Neue Dokumentationseinheit konnte nicht erstellt werden.",
       }
+    } else {
+      response.data = new DocumentUnit((response.data as DocumentUnit).uuid, {
+        ...(response.data as DocumentUnit),
+      })
     }
     return response
   },
 
   async update(documentUnit: DocumentUnit) {
-    const response = await httpClient.put(
+    const response = await httpClient.put<
+      DocumentUnit,
+      DocumentUnit | FailedValidationServerResponse
+    >(
       `caselaw/documentunits/${documentUnit.uuid}`,
       {
         headers: {
@@ -79,7 +76,7 @@ const service: DocumentUnitService = {
           "Content-Type": "application/json",
         },
       },
-      JSON.stringify(documentUnit)
+      documentUnit
     )
     if (response.status >= 300) {
       response.error = {
@@ -94,6 +91,10 @@ const service: DocumentUnitService = {
           response.data as FailedValidationServerResponse
         ).errors
       }
+    } else {
+      response.data = new DocumentUnit((response.data as DocumentUnit).uuid, {
+        ...(response.data as DocumentUnit),
+      })
     }
     return response
   },
@@ -111,27 +112,38 @@ const service: DocumentUnitService = {
   },
 
   async searchByProceedingDecisionInput(
-    proceedingDecision: ProceedingDecision
+    page: number,
+    size: number,
+    query = new ProceedingDecision()
   ) {
     const response = await httpClient.put<
       ProceedingDecision,
-      ProceedingDecision[]
+      Page<ProceedingDecision>
     >(
-      `caselaw/documentunits/search`,
+      `caselaw/documentunits/search?pg=${page}&sz=${size}`,
       {
         headers: {
           Accept: "application/json",
           "Content-Type": "application/json",
         },
       },
-      proceedingDecision
+      query
     )
     if (response.status >= 300) {
       response.error = {
         title: `Die Suche nach passenden Dokumentationseinheit konnte nicht ausgeführt werden`,
       }
     }
-    return response
+    response.data = response.data as Page<ProceedingDecision>
+    return {
+      status: response.status,
+      data: {
+        ...response.data,
+        content: response.data.content.map(
+          (decision) => new ProceedingDecision({ ...decision })
+        ),
+      },
+    }
   },
 }
 

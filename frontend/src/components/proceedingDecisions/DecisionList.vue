@@ -2,7 +2,7 @@
 import dayjs from "dayjs"
 import { computed } from "vue"
 import InlineDecision from "@/components/proceedingDecisions/InlineDecision.vue"
-import { ProceedingDecision } from "@/domain/documentUnit"
+import ProceedingDecision from "@/domain/proceedingDecision"
 
 const props = defineProps<{
   decisions: ProceedingDecision[]
@@ -28,6 +28,7 @@ const sortedDecisions = computed(() =>
       <span
         aria-label="Löschen"
         class="cursor-pointer font-base icon material-icons ml-[1.5rem] text-blue-800"
+        tabindex="0"
         @click="emit('removeLink', decision)"
         @keyup.enter="emit('removeLink', decision)"
         >delete_outline</span

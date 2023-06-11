@@ -38,6 +38,7 @@ public class ProceedingDecisionTransformer {
         .fileNumber(fileNumber)
         .documentType(getDocumentTypeByDTO(documentUnitMetadataDTO.getDocumentTypeDTO()))
         .date(documentUnitMetadataDTO.getDecisionDate())
+        .dateKnown(documentUnitMetadataDTO.isDateKnown())
         .build();
   }
 

@@ -8,6 +8,7 @@ import de.bund.digitalservice.ris.norms.domain.entity.Norm
 import de.bund.digitalservice.ris.norms.domain.entity.Paragraph
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType
+import de.bund.digitalservice.ris.norms.domain.value.NormCategory
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.decodeLocalDate
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
@@ -79,10 +80,17 @@ class ToLegalDocMLConverterTest {
     @Test
     fun `it creates the identification tag with proper data`() {
         val printAnnouncementSection = MetadataSection(
-            MetadataSectionName.PRINT_ANNOUNCEMENT,
+            MetadataSectionName.OFFICIAL_REFERENCE,
+            listOf(),
+            1,
             listOf(
-                Metadatum("printAnnouncementGazette", MetadatumType.ANNOUNCEMENT_GAZETTE),
-                Metadatum("1102", MetadatumType.PAGE),
+                MetadataSection(
+                    MetadataSectionName.PRINT_ANNOUNCEMENT,
+                    listOf(
+                        Metadatum("printAnnouncementGazette", MetadatumType.ANNOUNCEMENT_GAZETTE, 1),
+                        Metadatum("1102", MetadatumType.PAGE, 1),
+                    ),
+                ),
             ),
         )
         val guid = UUID.randomUUID()
@@ -159,12 +167,17 @@ class ToLegalDocMLConverterTest {
         val document = convertNormToLegalDocML(
             createRandomNorm()
                 .copy(
-                    documentTypeName = "documentTypeName",
-                    documentNormCategory = "documentNormCategory",
                     metadataSections = listOf(
                         MetadataSection(MetadataSectionName.PARTICIPATION, listOf(Metadatum("participationInstitution", MetadatumType.PARTICIPATION_INSTITUTION))),
                         MetadataSection(MetadataSectionName.CITATION_DATE, listOf(Metadatum(decodeLocalDate("2002-02-02"), MetadatumType.DATE))),
                         MetadataSection(MetadataSectionName.NORM_PROVIDER, listOf(Metadatum("providerDecidingBody", MetadatumType.DECIDING_BODY))),
+                        MetadataSection(
+                            MetadataSectionName.DOCUMENT_TYPE,
+                            listOf(
+                                Metadatum("documentTypeName", MetadatumType.TYPE_NAME),
+                                Metadatum(NormCategory.BASE_NORM, MetadatumType.NORM_CATEGORY),
+                            ),
+                        ),
                     ),
                 ),
         )
@@ -176,20 +189,14 @@ class ToLegalDocMLConverterTest {
         val participant = getFirstChildNodeWithTagName(metadata, "meta:bearbeitendeInstitution")
 
         assertThat(type.textContent.trim()).isEqualTo("gesetz")
-        assertThat(category.textContent.trim()).isEqualTo("regelungstext")
+        assertThat(category.textContent.trim()).isEqualTo("rechtsetzungsdokument")
         assertThat(initiant.textContent.trim()).isEqualTo("nicht-vorhanden")
         assertThat(participant.textContent.trim()).isEqualTo("nicht-vorhanden")
     }
 
     @Test
     fun `it creates the metadata tag with default values if null provided`() {
-        val document = convertNormToLegalDocML(
-            createRandomNormWithCitationDate()
-                .copy(
-                    documentTypeName = null,
-                    documentNormCategory = null,
-                ),
-        )
+        val document = convertNormToLegalDocML(createRandomNormWithCitationDate())
 
         val metadata = document.getElementsByTagName("meta:legalDocML.de_metadaten").item(0)
         val type = getFirstChildNodeWithTagName(metadata, "meta:typ")
@@ -198,7 +205,7 @@ class ToLegalDocMLConverterTest {
         val participant = getFirstChildNodeWithTagName(metadata, "meta:bearbeitendeInstitution")
 
         assertThat(type.textContent.trim()).isEqualTo("gesetz")
-        assertThat(category.textContent.trim()).isEqualTo("regelungstext")
+        assertThat(category.textContent.trim()).isEqualTo("rechtsetzungsdokument")
         assertThat(initiant.textContent.trim()).isEqualTo("nicht-vorhanden")
         assertThat(participant.textContent.trim()).isEqualTo("nicht-vorhanden")
     }
@@ -208,12 +215,17 @@ class ToLegalDocMLConverterTest {
         val document = convertNormToLegalDocML(
             createRandomNorm()
                 .copy(
-                    documentTypeName = "SO",
-                    documentNormCategory = "Rechtsetzungsdokument",
                     metadataSections = listOf(
                         MetadataSection(MetadataSectionName.PARTICIPATION, listOf(Metadatum("Bundeskanzleramt", MetadatumType.PARTICIPATION_INSTITUTION))),
                         MetadataSection(MetadataSectionName.CITATION_DATE, listOf(Metadatum(decodeLocalDate("2002-02-02"), MetadatumType.DATE))),
                         MetadataSection(MetadataSectionName.NORM_PROVIDER, listOf(Metadatum("Präsident des Deutschen Bundestages", MetadatumType.DECIDING_BODY))),
+                        MetadataSection(
+                            MetadataSectionName.DOCUMENT_TYPE,
+                            listOf(
+                                Metadatum("SO", MetadatumType.TYPE_NAME),
+                                Metadatum(NormCategory.AMENDMENT_NORM, MetadatumType.NORM_CATEGORY),
+                            ),
+                        ),
                     ),
                 ),
 

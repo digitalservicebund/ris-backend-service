@@ -3,19 +3,22 @@ import { render, screen } from "@testing-library/vue"
 import SearchResultList, {
   SearchResults,
 } from "@/components/proceedingDecisions/SearchResultList.vue"
+import ProceedingDecision from "@/domain/proceedingDecision"
 
 function renderComponent(searchResults?: SearchResults) {
   const props: { searchResults: SearchResults } = {
     searchResults: searchResults ?? [
       {
-        decision: {
-          court: {
-            type: "fooType",
-            location: "fooLocation",
-            label: "fooLabel",
+        decision: new ProceedingDecision({
+          ...{
+            court: {
+              type: "fooType",
+              location: "fooLocation",
+              label: "fooLabel",
+            },
+            documentNumber: "fooDocumentNumber",
           },
-          documentNumber: "fooDocumentNumber",
-        },
+        }),
         isLinked: false,
       },
     ],
@@ -50,19 +53,21 @@ describe("ProceedingDecision SearchResult List", () => {
   it("indicates already added proceeding decisions", async () => {
     renderComponent([
       {
-        decision: {
-          court: {
-            type: "fooType",
-            location: "fooLocation",
-            label: "fooLabel",
+        decision: new ProceedingDecision({
+          ...{
+            court: {
+              type: "fooType",
+              location: "fooLocation",
+              label: "fooLabel",
+            },
+            documentNumber: "fooDocumentNumber",
           },
-          documentNumber: "fooDocumentNumber",
-        },
+        }),
         isLinked: true,
       },
     ])
 
-    expect(await screen.findByText("Übernehmen")).toBeVisible() //todo change this
+    expect(await screen.findByText("Übernehmen")).toBeVisible()
     expect(await screen.findByText(/Bereits hinzugefügt/)).toBeVisible()
   })
 

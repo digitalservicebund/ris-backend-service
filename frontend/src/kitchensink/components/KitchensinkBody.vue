@@ -16,6 +16,7 @@ import InfoModalView from "@/kitchensink/views/InfoModalView.vue"
 import InputView from "@/kitchensink/views/InputView.vue"
 import NavbarView from "@/kitchensink/views/NavbarView.vue"
 import OriginalFileSidePanelView from "@/kitchensink/views/OriginalFileSidePanelView.vue"
+import PaginationView from "@/kitchensink/views/PaginationView.vue"
 import PopupModalView from "@/kitchensink/views/PopupModalView.vue"
 import PropertyInfoView from "@/kitchensink/views/PropertyInfoView.vue"
 import SideToggleView from "@/kitchensink/views/SideToggleView.vue"
@@ -63,6 +64,8 @@ const component = computed(() => {
       return PropertyInfoView
     case "EditableList":
       return EditableListView
+    case "PaginationView":
+      return PaginationView
     default:
       return ErrorView
   }

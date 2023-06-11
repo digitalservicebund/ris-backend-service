@@ -1,58 +1,66 @@
-import { expect, test } from "@playwright/test"
-import { testWithDocumentUnit } from "../caselaw/fixtures"
+import { expect } from "@playwright/test"
+import { testWithDocumentUnit as test } from "../caselaw/fixtures"
 
 test.describe("authentication", () => {
-  testWithDocumentUnit(
-    "should not be able to access with invalid session and redirect to login",
-    async ({ page, documentNumber }) => {
-      await page.goto("/")
-      await expect(page.getByText("Neue Dokumentationseinheit")).toBeVisible()
+  test("name and documentation center should be displayed", async ({
+    page,
+  }) => {
+    await page.goto("/")
 
-      await page.context().clearCookies()
+    await expect(page.getByText("e2e_tests DigitalService")).toBeVisible()
+  })
 
-      await page.goto(`/caselaw/documentunit/${documentNumber}/categories`)
-      await expect(page.locator("text=Spruchkörper")).toBeHidden()
-      await expect(page.getByLabel("E-Mailadresse")).toBeVisible()
-    }
-  )
+  test("should not be able to access with invalid session and redirect to login", async ({
+    page,
+    documentNumber,
+  }) => {
+    await page.goto("/")
+    await expect(page.getByText("Neue Dokumentationseinheit")).toBeVisible()
 
-  testWithDocumentUnit(
-    "should get new session ID without new login",
-    async ({ page, documentNumber }) => {
-      await page.goto("/")
-      await expect(page.getByText("Neue Dokumentationseinheit")).toBeVisible()
+    await page.context().clearCookies()
 
-      await page.context().clearCookies()
+    await page.goto(`/caselaw/documentunit/${documentNumber}/categories`)
+    await expect(page.locator("text=Spruchkörper")).toBeHidden()
+    await expect(page.getByLabel("E-Mailadresse")).toBeVisible()
+  })
 
-      await page.goto(`/caselaw/documentunit/${documentNumber}/categories`)
-      await expect(page.locator("text=Spruchkörper")).toBeHidden()
-      await expect(page.getByLabel("E-Mailadresse")).toBeVisible()
-    }
-  )
+  test("should get new session ID without new login", async ({
+    page,
+    documentNumber,
+  }) => {
+    await page.goto("/")
+    await expect(page.getByText("Neue Dokumentationseinheit")).toBeVisible()
 
-  testWithDocumentUnit(
-    "should should remember location after new login",
-    async ({ page, documentNumber }) => {
-      await page.goto("/")
-      await expect(page.getByText("Neue Dokumentationseinheit")).toBeVisible()
-      const validCookies = await page.context().cookies()
+    await page.context().clearCookies()
 
-      await page.context().clearCookies()
-      await page.goto(`/caselaw/documentunit/${documentNumber}/categories`)
+    await page.goto(`/caselaw/documentunit/${documentNumber}/categories`)
+    await expect(page.locator("text=Spruchkörper")).toBeHidden()
+    await expect(page.getByLabel("E-Mailadresse")).toBeVisible()
+  })
 
-      // expect to be on login page
-      await expect(page.locator("text=Spruchkörper")).toBeHidden()
-      await expect(page.getByLabel("E-Mailadresse")).toBeVisible()
+  test("should should remember location after new login", async ({
+    page,
+    documentNumber,
+  }) => {
+    await page.goto("/")
+    await expect(page.getByText("Neue Dokumentationseinheit")).toBeVisible()
+    const validCookies = await page.context().cookies()
 
-      // login
-      await page.context().addCookies(validCookies)
-      await page.goto("/")
+    await page.context().clearCookies()
+    await page.goto(`/caselaw/documentunit/${documentNumber}/categories`)
 
-      await expect(page).toHaveURL(
-        `/caselaw/documentunit/${documentNumber}/categories`
-      )
-    }
-  )
+    // expect to be on login page
+    await expect(page.locator("text=Spruchkörper")).toBeHidden()
+    await expect(page.getByLabel("E-Mailadresse")).toBeVisible()
+
+    // login
+    await page.context().addCookies(validCookies)
+    await page.goto("/")
+
+    await expect(page).toHaveURL(
+      `/caselaw/documentunit/${documentNumber}/categories`
+    )
+  })
 
   test("public endpoints (`open/`) should be restricted with basicAuth", async ({
     page,

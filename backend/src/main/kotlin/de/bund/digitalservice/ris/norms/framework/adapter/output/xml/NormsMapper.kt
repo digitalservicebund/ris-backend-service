@@ -26,8 +26,14 @@ fun mapNormToDto(norm: Norm): NormDto {
         officialLongTitle = IdentifiedElement(norm.officialLongTitle),
         officialShortTitle = IdentifiedElement(norm.officialShortTitle),
         announcementDate = norm.announcementDate?.toString() ?: (firstCitationDate ?: firstCitationYear),
-        documentTypeName = getMappedValue(Property.DOCUMENT_TYPE_NAME, norm.documentTypeName ?: ""),
-        documentNormCategory = getMappedValue(Property.DOCUMENT_NORM_CATEGORY, norm.documentNormCategory ?: ""),
+        documentTypeName = getMappedValue(
+            Property.DOCUMENT_TYPE_NAME,
+            norm.getFirstMetadatum(MetadataSectionName.DOCUMENT_TYPE, MetadatumType.TYPE_NAME)?.value.toString(),
+        ),
+        documentNormCategory = getMappedValue(
+            Property.DOCUMENT_NORM_CATEGORY,
+            norm.getFirstMetadatum(MetadataSectionName.DOCUMENT_TYPE, MetadatumType.NORM_CATEGORY)?.value.toString(),
+        ),
         providerDecidingBody = getMappedValue(
             Property.PROVIDER_DECIDING_BODY,
             norm.getFirstMetadatum(MetadataSectionName.NORM_PROVIDER, MetadatumType.DECIDING_BODY)?.value.toString(),
@@ -36,7 +42,7 @@ fun mapNormToDto(norm: Norm): NormDto {
             Property.PARTICIPATION_INSTITUTION,
             norm.getFirstMetadatum(MetadataSectionName.PARTICIPATION, MetadatumType.PARTICIPATION_INSTITUTION)?.value.toString(),
         ),
-        printAnnouncementGazette = norm.eli.gazette,
+        printAnnouncementGazette = norm.eli.gazetteOrMedium,
         printAnnouncementPage = norm.eli.printAnnouncementPage,
         eli = norm.eli.toString(),
         articles = norm.articles.filter { it.marker !in listOf("Eingangsformel", "Schlussformel") }.sortedBy { if (it.marker.contains("§")) it.marker.substring(2).toInt() else it.marker.substring(4).toInt() }

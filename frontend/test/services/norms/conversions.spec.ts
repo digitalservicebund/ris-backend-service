@@ -283,7 +283,7 @@ describe("conversions", () => {
     })
 
     it("maps empty child sections list to null", () => {
-      const decoded: MetadataSections = { LEAD: [{ LEAD_UNIT: [] }] }
+      const decoded: MetadataSections = { LEAD: [{ LEAD_UNIT: ["text"] }] }
 
       const encoded = encodeMetadataSections(decoded)
 
@@ -291,7 +291,9 @@ describe("conversions", () => {
         {
           name: MetadataSectionName.LEAD,
           order: 1,
-          metadata: [],
+          metadata: [
+            { type: MetadatumType.LEAD_UNIT, value: "text", order: 1 },
+          ],
           sections: null,
         },
       ])
@@ -550,6 +552,23 @@ describe("conversions", () => {
           ],
         },
       ])
+    })
+
+    it("filters sections that have no metadata nor child sections", () => {
+      const decoded: MetadataSections = {
+        OFFICIAL_REFERENCE: [
+          {
+            PRINT_ANNOUNCEMENT: [],
+          },
+          {
+            DIGITAL_ANNOUNCEMENT: [{}],
+          },
+        ],
+      }
+
+      const encoded = encodeMetadataSections(decoded)
+
+      expect(encoded).toStrictEqual([])
     })
   })
 

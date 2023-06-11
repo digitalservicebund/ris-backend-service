@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import dayjs from "dayjs"
-import { computed } from "vue"
+import { computed, ref, watchEffect } from "vue"
 import { useRoute, useRouter } from "vue-router"
 import { useCaseLawMenuItems } from "@/composables/useCaseLawMenuItems"
+import { useStatusBadge } from "@/composables/useStatusBadge"
 import { useToggleStateInRouteQuery } from "@/composables/useToggleStateInRouteQuery"
 import DocumentUnit from "@/domain/documentUnit"
 import DocumentUnitInfoPanel from "@/shared/components/DocumentUnitInfoPanel.vue"
@@ -31,33 +32,55 @@ const decisionDateInfo = computed(() =>
     : undefined
 )
 
+const documentationOffice = computed(
+  () => props.documentUnit.coreData.documentationOffice?.label
+)
+
 const courtInfo = computed(() => props.documentUnit.coreData.court?.label)
 
-const propertyInfos = computed(() => [
+const statusBadge = ref(useStatusBadge(props.documentUnit.status).value)
+
+const firstRowInfos = computed(() => [
+  ...(statusBadge.value ? [statusBadge.value] : []),
+  {
+    label: "Dokumentationsstelle",
+    value: documentationOffice.value,
+  },
+])
+
+const secondRowInfos = computed(() => [
   { label: "Aktenzeichen", value: fileNumberInfo.value },
   { label: "Entscheidungsdatum", value: decisionDateInfo.value },
   { label: "Gericht", value: courtInfo.value },
 ])
+
+watchEffect(() => {
+  statusBadge.value = useStatusBadge(props.documentUnit.status).value
+})
 </script>
 
 <template>
   <div class="flex grow w-screen">
-    <SideToggle
-      v-model:is-expanded="navigationIsOpen"
-      class="border-gray-400 border-r-1 border-solid"
-      label="Navigation"
+    <div
+      class="bg-white border-gray-400 border-r-1 border-solid flex flex-col sticky top-0 z-20"
     >
-      <NavbarSide
-        go-back-label="Zurück"
-        :go-back-route="goBackRoute"
-        :menu-items="menuItems"
-      />
-    </SideToggle>
-
+      <SideToggle
+        v-model:is-expanded="navigationIsOpen"
+        class="sticky top-0 z-20"
+        label="Navigation"
+      >
+        <NavbarSide
+          go-back-label="Zurück"
+          :go-back-route="goBackRoute"
+          :menu-items="menuItems"
+        />
+      </SideToggle>
+    </div>
     <div class="bg-gray-100 flex flex-col w-full">
       <DocumentUnitInfoPanel
+        :first-row="firstRowInfos"
         :heading="documentUnit.documentNumber ?? ''"
-        :property-infos="propertyInfos"
+        :second-row="secondRowInfos"
       />
 
       <div class="flex flex-col grow items-start">

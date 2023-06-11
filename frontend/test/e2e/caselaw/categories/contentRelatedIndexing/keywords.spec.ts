@@ -46,6 +46,32 @@ test.describe("keywords", () => {
     await expect(page.getByText(keywordWithSpecialCharacters)).toBeVisible()
   })
 
+  test("delete keywords with special character", async ({
+    page,
+    documentNumber,
+  }) => {
+    await navigateToCategories(page, documentNumber)
+
+    const firstKeyword = generateString() + "%&/="
+    const secondKeyword = generateString() + "%&/="
+
+    await page.locator("[aria-label='Schlagwörter']").fill(firstKeyword)
+    await page.keyboard.press("Enter")
+    await expect(page.getByText(firstKeyword)).toBeVisible()
+
+    await page.locator("[aria-label='Schlagwörter']").fill(secondKeyword)
+    await page.keyboard.press("Enter")
+    await expect(page.getByText(secondKeyword)).toBeVisible()
+
+    await page
+      .locator("[aria-label='chip']", { hasText: firstKeyword })
+      .getByLabel("Löschen")
+      .click()
+
+    await expect(await page.getByText(secondKeyword)).toBeVisible()
+    await expect(await page.getByText(firstKeyword)).toBeHidden()
+  })
+
   test("add same keyword not working", async ({ page, documentNumber }) => {
     await navigateToCategories(page, documentNumber)
 

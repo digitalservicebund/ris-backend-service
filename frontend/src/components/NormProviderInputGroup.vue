@@ -22,12 +22,13 @@ const inputValue = ref(props.modelValue)
 
 const entity = computed({
   get: () => inputValue.value.ENTITY?.[0],
-  set: (data?: string) => data && (inputValue.value.ENTITY = [data]),
+  set: (data?: string) => (inputValue.value.ENTITY = data ? [data] : undefined),
 })
 
 const decidingBody = computed({
   get: () => inputValue.value.DECIDING_BODY?.[0],
-  set: (data?: string) => data && (inputValue.value.DECIDING_BODY = [data]),
+  set: (data?: string) =>
+    (inputValue.value.DECIDING_BODY = data ? [data] : undefined),
 })
 
 const isResolutionMajority = computed({
@@ -44,24 +45,33 @@ watch(props, () => (inputValue.value = props.modelValue), {
 watch(inputValue, () => emit("update:modelValue", inputValue.value), {
   deep: true,
 })
+
+const checkboxStyle = ref({
+  width: "24px",
+  height: "24px",
+})
 </script>
 
 <template>
-  <div class="flex flex-col">
-    <div class="flex">
+  <div class="flex flex-col gap-8">
+    <div class="">
       <InputField
         id="normProviderEntity"
-        aria-label="Staat, Land, Stadt, Landkreis oder juristische Person "
+        aria-label="Staat, Land, Stadt, Landkreis oder juristische Person, deren Hoheitsgewalt oder Rechtsmacht die Norm trägt "
         class="w-1/2"
-        label="Staat, Land, Stadt, Landkreis oder juristische Person "
+        :label="[
+          'Staat, Land, Stadt, Landkreis oder juristische Person,',
+          'deren Hoheitsgewalt oder Rechtsmacht die Norm trägt',
+        ]"
       >
         <TextInput
           id="normProviderEntity"
           v-model="entity"
-          aria-label="Staat, Land, Stadt, Landkreis oder juristische Person "
+          aria-label="Staat, Land, Stadt, Landkreis oder juristische Person, deren Hoheitsgewalt oder Rechtsmacht die Norm trägt "
         />
       </InputField>
-
+    </div>
+    <div>
       <InputField
         id="normProviderDecidingBody"
         aria-label="Beschließendes Organ"
@@ -72,11 +82,10 @@ watch(inputValue, () => emit("update:modelValue", inputValue.value), {
           id="normProviderDecidingBody"
           v-model="decidingBody"
           aria-label="Beschließendes Organ"
-          class="[&:not(:hover,:focus)]:border-l-0"
         />
       </InputField>
     </div>
-    <div class="mb-24 mt-24">
+    <div>
       <InputField
         id="normProviderIsResolutionMajority"
         aria-label="Beschlussfassung mit qualifizierter Mehrheit"
@@ -87,6 +96,7 @@ watch(inputValue, () => emit("update:modelValue", inputValue.value), {
           id="normProviderIsResolutionMajority"
           v-model="isResolutionMajority"
           aria-label="Beschlussfassung mit qualifizierter Mehrheit"
+          :style="checkboxStyle"
         />
       </InputField>
     </div>

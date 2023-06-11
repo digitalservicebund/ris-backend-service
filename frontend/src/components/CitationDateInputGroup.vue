@@ -47,25 +47,23 @@ watch(inputValue, detectSelectedInputType, { immediate: true, deep: true })
 const dateValue = computed({
   get: () => inputValue.value.DATE?.[0],
   set: (value) => {
-    if (value && (inputValue.value.DATE = [value])) {
-      inputValue.value.YEAR = undefined
-    }
+    inputValue.value.DATE = value ? [value] : undefined
+    inputValue.value.YEAR = undefined
   },
 })
 
 const yearValue = computed({
   get: () => inputValue.value.YEAR?.[0],
   set: (value) => {
-    if (value && (inputValue.value.YEAR = [value])) {
-      inputValue.value.DATE = undefined
-    }
+    inputValue.value.YEAR = value ? [value] : undefined
+    inputValue.value.DATE = undefined
   },
 })
 </script>
 
 <template>
-  <div class="pb-32 w-288">
-    <div class="radio-group w-320">
+  <div class="w-320">
+    <div class="flex justify-between mb-24">
       <label class="form-control">
         <input
           id="citationTypeDate"
@@ -116,12 +114,6 @@ const yearValue = computed({
 </template>
 
 <style lang="scss" scoped>
-.radio-group {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 24px;
-}
-
 .form-control {
   display: flex;
   flex-direction: row;
@@ -141,9 +133,15 @@ input[type="radio"] {
   place-content: center;
 }
 
+input[type="radio"]:hover,
+input[type="radio"]:focus {
+  border: 4px solid #004b76;
+  outline: none;
+}
+
 input[type="radio"]::before {
-  width: 0.75em;
-  height: 0.75em;
+  width: 0.9em;
+  height: 0.9em;
   border-radius: 50%;
   background-color: #004b76;
   content: "";

@@ -11,5 +11,7 @@ interface MetadataSectionsRepository : ReactiveCrudRepository<MetadataSectionDto
 
     fun findByNormId(normId: Int): Flux<MetadataSectionDto>
 
+    fun findByNormIdAndSectionIdIsNull(normId: Int): Flux<MetadataSectionDto>
+
     fun deleteByNormId(normId: Int): Mono<Void>
 }

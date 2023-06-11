@@ -15,6 +15,7 @@ import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.ENTITY
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.KEYWORD
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.LEAD_JURISDICTION
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.LEAD_UNIT
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.NORM_CATEGORY
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.PAGE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.PARTICIPATION_INSTITUTION
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.PARTICIPATION_TYPE
@@ -24,16 +25,25 @@ import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.RESOLUTION_MA
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.RIS_ABBREVIATION_INTERNATIONAL_LAW
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.SUBJECT_FNA
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.SUBJECT_GESTA
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.TEMPLATE_NAME
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.TEXT
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.TYPE_NAME
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.UNDEFINED_DATE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.UNOFFICIAL_ABBREVIATION
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.UNOFFICIAL_LONG_TITLE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.UNOFFICIAL_REFERENCE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.UNOFFICIAL_SHORT_TITLE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.VALIDITY_RULE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.YEAR
+import de.bund.digitalservice.ris.norms.domain.value.NormCategory
 import de.bund.digitalservice.ris.norms.domain.value.UndefinedDate
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.decodeLocalDate
 import de.bund.digitalservice.ris.norms.juris.converter.extractor.extractData
 import de.bund.digitalservice.ris.norms.juris.converter.generator.generateZip
+import de.bund.digitalservice.ris.norms.juris.converter.model.CategorizedReference
+import de.bund.digitalservice.ris.norms.juris.converter.model.DivergentEntryIntoForce
+import de.bund.digitalservice.ris.norms.juris.converter.model.DivergentExpiration
+import de.bund.digitalservice.ris.norms.juris.converter.model.DocumentType
 import de.bund.digitalservice.ris.norms.juris.converter.model.Lead
 import de.bund.digitalservice.ris.norms.juris.converter.model.NormProvider
 import de.bund.digitalservice.ris.norms.juris.converter.model.Participation
@@ -130,25 +140,22 @@ class JurisConverterTest {
                     participationList = listOf(Participation("test participation type", "test participation institution"))
                     leadList = listOf(Lead("test lead jurisdiction", "test lead unit"))
                     subjectAreaList = listOf(SubjectArea("test subject FNA", "test subject Gesta"))
+                    documentType = DocumentType("RV", listOf("documentTemplateName"), listOf("ÜN"))
                     officialShortTitle = "test official short title"
                     officialAbbreviation = "test official abbreviation"
                     unofficialLongTitleList = listOf("test unofficial long title")
                     unofficialShortTitleList = listOf("test unofficial short title")
                     unofficialAbbreviationList = listOf("test unofficial abbreviation")
                     entryIntoForceDate = "2022-01-01"
-                    entryIntoForceDateState = "UNDEFINED_UNKNOWN"
-                    principleEntryIntoForceDate = "2022-01-02"
+                    entryIntoForceDateState = null
+                    principleEntryIntoForceDate = null
                     principleEntryIntoForceDateState = "UNDEFINED_FUTURE"
-                    divergentEntryIntoForceDate = "2022-01-03"
-                    divergentEntryIntoForceDateState = "UNDEFINED_NOT_PRESENT"
-                    entryIntoForceNormCategory = "test entry into force norm category"
-                    expirationDate = "2022-01-04"
+                    divergentEntryIntoForceList = listOf(DivergentEntryIntoForce("2022-01-03", null, "SN"), DivergentEntryIntoForce(null, "UNDEFINED_NOT_PRESENT", "ÜN"))
+                    expirationDate = null
                     expirationDateState = "UNDEFINED_UNKNOWN"
                     principleExpirationDate = "2022-01-05"
-                    principleExpirationDateState = "UNDEFINED_UNKNOWN"
-                    divergentExpirationDate = "2022-01-06"
-                    divergentExpirationDateState = "UNDEFINED_UNKNOWN"
-                    expirationNormCategory = "test expiration norm category"
+                    principleExpirationDateState = null
+                    divergentExpirationsList = listOf(DivergentExpiration("2022-01-06", null, "ÄN"), DivergentExpiration(null, "UNDEFINED_UNKNOWN", "SN"))
                     announcementDate = "2022-01-07"
                     citationDateList = listOf("2022-01-08")
                     printAnnouncementList = listOf(PrintAnnouncement("test print announcement year", "test print announcement page", "test print announcement gazette"))
@@ -172,7 +179,6 @@ class JurisConverterTest {
                     applicationScopeArea = "test application scope area"
                     applicationScopeStartDate = "2022-01-13"
                     applicationScopeEndDate = "2022-01-14"
-                    categorizedReference = "test categorized reference"
                     otherFootnote = "test other footnote"
                     validityRuleList = listOf("test validity rule")
                     referenceNumberList = listOf("test reference number")
@@ -181,6 +187,7 @@ class JurisConverterTest {
                     ageOfMajorityIndicationList = listOf("test age of majority indication")
                     text = "test text"
                     ageIndicationStartList = listOf("Lebensjahr 10", "Monate 11")
+                    categorizedReferences = listOf(CategorizedReference("test categorized reference 1"), CategorizedReference("test categorized reference 2"))
                 }
             val query = ParseJurisXmlOutputPort.Query(anyGuid, anyZipFile.readBytes(), anyZipFile.name)
             every { extractData(any()) } returns data
@@ -192,20 +199,6 @@ class JurisConverterTest {
             assertThat(norm?.documentCategory).isEqualTo("test document category")
             assertThat(norm?.officialShortTitle).isEqualTo("test official short title")
             assertThat(norm?.officialAbbreviation).isEqualTo("test official abbreviation")
-            assertThat(norm?.entryIntoForceDate).isEqualTo(LocalDate.parse("2022-01-01"))
-            assertThat(norm?.entryIntoForceDateState).isEqualTo(UndefinedDate.UNDEFINED_UNKNOWN)
-            assertThat(norm?.principleEntryIntoForceDate).isEqualTo(LocalDate.parse("2022-01-02"))
-            assertThat(norm?.principleEntryIntoForceDateState).isEqualTo(UndefinedDate.UNDEFINED_FUTURE)
-            assertThat(norm?.divergentEntryIntoForceDate).isEqualTo(LocalDate.parse("2022-01-03"))
-            assertThat(norm?.divergentEntryIntoForceDateState).isEqualTo(UndefinedDate.UNDEFINED_NOT_PRESENT)
-            assertThat(norm?.entryIntoForceNormCategory).isEqualTo("test entry into force norm category")
-            assertThat(norm?.expirationDate).isEqualTo(LocalDate.parse("2022-01-04"))
-            assertThat(norm?.expirationDateState).isEqualTo(UndefinedDate.UNDEFINED_UNKNOWN)
-            assertThat(norm?.principleExpirationDate).isEqualTo(LocalDate.parse("2022-01-05"))
-            assertThat(norm?.principleExpirationDateState).isEqualTo(UndefinedDate.UNDEFINED_UNKNOWN)
-            assertThat(norm?.divergentExpirationDate).isEqualTo(LocalDate.parse("2022-01-06"))
-            assertThat(norm?.divergentExpirationDateState).isEqualTo(UndefinedDate.UNDEFINED_UNKNOWN)
-            assertThat(norm?.expirationNormCategory).isEqualTo("test expiration norm category")
             assertThat(norm?.announcementDate).isEqualTo(LocalDate.parse("2022-01-07"))
             assertThat(norm?.statusNote).isEqualTo("test status note")
             assertThat(norm?.statusDescription).isEqualTo("test status description")
@@ -226,39 +219,99 @@ class JurisConverterTest {
             assertThat(norm?.applicationScopeArea).isEqualTo("test application scope area")
             assertThat(norm?.applicationScopeStartDate).isEqualTo(LocalDate.parse("2022-01-13"))
             assertThat(norm?.applicationScopeEndDate).isEqualTo(LocalDate.parse("2022-01-14"))
-            assertThat(norm?.categorizedReference).isEqualTo("test categorized reference")
             assertThat(norm?.otherFootnote).isEqualTo("test other footnote")
             assertThat(norm?.celexNumber).isEqualTo("test celex number")
             assertThat(norm?.text).isEqualTo("test text")
             val metadata = norm?.metadataSections?.flatMap { it.metadata }
-            assertThat(metadata).contains(Metadatum("test print announcement gazette", ANNOUNCEMENT_GAZETTE, 1))
-            assertThat(metadata).contains(Metadatum("test print announcement year", YEAR, 1))
-            assertThat(metadata).contains(Metadatum("test print announcement page", PAGE, 1))
-            assertThat(metadata).contains(Metadatum("test document number", DIVERGENT_DOCUMENT_NUMBER, 1))
-            assertThat(metadata).contains(Metadatum("test ris abbreviation international law", RIS_ABBREVIATION_INTERNATIONAL_LAW, 1))
-            assertThat(metadata).contains(Metadatum("test unofficial long title", UNOFFICIAL_LONG_TITLE, 1))
-            assertThat(metadata).contains(Metadatum("test unofficial short title", UNOFFICIAL_SHORT_TITLE, 1))
-            assertThat(metadata).contains(Metadatum("test unofficial abbreviation", UNOFFICIAL_ABBREVIATION, 1))
-            assertThat(metadata).contains(Metadatum("test unofficial reference", UNOFFICIAL_REFERENCE, 1))
-            assertThat(metadata).contains(Metadatum("test validity rule", VALIDITY_RULE, 1))
-            assertThat(metadata).contains(Metadatum("test reference number", REFERENCE_NUMBER, 1))
-            assertThat(metadata).contains(Metadatum("test definition", DEFINITION, 1))
-            assertThat(metadata).contains(Metadatum("test age of majority indication", AGE_OF_MAJORITY_INDICATION, 1))
-            assertThat(metadata).contains(Metadatum("test participation type", PARTICIPATION_TYPE, 1))
-            assertThat(metadata).contains(Metadatum("test participation institution", PARTICIPATION_INSTITUTION, 1))
-            assertThat(metadata).contains(Metadatum("test lead jurisdiction", LEAD_JURISDICTION, 1))
-            assertThat(metadata).contains(Metadatum("test lead unit", LEAD_UNIT, 1))
-            assertThat(metadata).contains(Metadatum("test subject FNA", SUBJECT_FNA, 1))
-            assertThat(metadata).contains(Metadatum("test subject Gesta", SUBJECT_GESTA, 1))
-            assertThat(metadata).contains(Metadatum(decodeLocalDate("2022-01-08"), DATE, 1))
-            assertThat(metadata).contains(Metadatum("test provider entity", ENTITY, 1))
-            assertThat(metadata).contains(Metadatum("test provider deciding body", DECIDING_BODY, 1))
-            assertThat(metadata).contains(Metadatum(true, RESOLUTION_MAJORITY, 1))
-            assertThat(metadata).contains(Metadatum("DEU", ENTITY, 1))
-            assertThat(metadata).contains(Metadatum("BT", DECIDING_BODY, 1))
-            assertThat(metadata).contains(Metadatum(false, RESOLUTION_MAJORITY, 1))
-            assertThat(metadata).contains(Metadatum("Lebensjahr 10", RANGE_START, 1))
-            assertThat(metadata).contains(Metadatum("Monate 11", RANGE_START, 1))
+
+            assertThat(metadata).usingRecursiveFieldByFieldElementComparatorIgnoringFields("guid").contains(Metadatum("test document number", DIVERGENT_DOCUMENT_NUMBER, 1))
+            assertThat(metadata).usingRecursiveFieldByFieldElementComparatorIgnoringFields("guid").contains(Metadatum("test ris abbreviation international law", RIS_ABBREVIATION_INTERNATIONAL_LAW, 1))
+            assertThat(metadata).usingRecursiveFieldByFieldElementComparatorIgnoringFields("guid").contains(Metadatum("test unofficial long title", UNOFFICIAL_LONG_TITLE, 1))
+            assertThat(metadata).usingRecursiveFieldByFieldElementComparatorIgnoringFields("guid").contains(Metadatum("test unofficial short title", UNOFFICIAL_SHORT_TITLE, 1))
+            assertThat(metadata).usingRecursiveFieldByFieldElementComparatorIgnoringFields("guid").contains(Metadatum("test unofficial abbreviation", UNOFFICIAL_ABBREVIATION, 1))
+            assertThat(metadata).usingRecursiveFieldByFieldElementComparatorIgnoringFields("guid").contains(Metadatum("test unofficial reference", UNOFFICIAL_REFERENCE, 1))
+            assertThat(metadata).usingRecursiveFieldByFieldElementComparatorIgnoringFields("guid").contains(Metadatum("test validity rule", VALIDITY_RULE, 1))
+            assertThat(metadata).usingRecursiveFieldByFieldElementComparatorIgnoringFields("guid").contains(Metadatum("test reference number", REFERENCE_NUMBER, 1))
+            assertThat(metadata).usingRecursiveFieldByFieldElementComparatorIgnoringFields("guid").contains(Metadatum("test definition", DEFINITION, 1))
+            assertThat(metadata).usingRecursiveFieldByFieldElementComparatorIgnoringFields("guid").contains(Metadatum("test age of majority indication", AGE_OF_MAJORITY_INDICATION, 1))
+            assertThat(metadata).usingRecursiveFieldByFieldElementComparatorIgnoringFields("guid").contains(Metadatum("test participation type", PARTICIPATION_TYPE, 1))
+            assertThat(metadata).usingRecursiveFieldByFieldElementComparatorIgnoringFields("guid").contains(Metadatum("test participation institution", PARTICIPATION_INSTITUTION, 1))
+            assertThat(metadata).usingRecursiveFieldByFieldElementComparatorIgnoringFields("guid").contains(Metadatum("test lead jurisdiction", LEAD_JURISDICTION, 1))
+            assertThat(metadata).usingRecursiveFieldByFieldElementComparatorIgnoringFields("guid").contains(Metadatum("test lead unit", LEAD_UNIT, 1))
+            assertThat(metadata).usingRecursiveFieldByFieldElementComparatorIgnoringFields("guid").contains(Metadatum("test subject FNA", SUBJECT_FNA, 1))
+            assertThat(metadata).usingRecursiveFieldByFieldElementComparatorIgnoringFields("guid").contains(Metadatum("test subject Gesta", SUBJECT_GESTA, 1))
+            assertThat(metadata).usingRecursiveFieldByFieldElementComparatorIgnoringFields("guid").contains(Metadatum(decodeLocalDate("2022-01-08"), DATE, 1))
+            assertThat(metadata).usingRecursiveFieldByFieldElementComparatorIgnoringFields("guid").contains(Metadatum("test provider entity", ENTITY, 1))
+            assertThat(metadata).usingRecursiveFieldByFieldElementComparatorIgnoringFields("guid").contains(Metadatum("test provider deciding body", DECIDING_BODY, 1))
+            assertThat(metadata).usingRecursiveFieldByFieldElementComparatorIgnoringFields("guid").contains(Metadatum(true, RESOLUTION_MAJORITY, 1))
+            assertThat(metadata).usingRecursiveFieldByFieldElementComparatorIgnoringFields("guid").contains(Metadatum("DEU", ENTITY, 1))
+            assertThat(metadata).usingRecursiveFieldByFieldElementComparatorIgnoringFields("guid").contains(Metadatum("BT", DECIDING_BODY, 1))
+            assertThat(metadata).usingRecursiveFieldByFieldElementComparatorIgnoringFields("guid").contains(Metadatum(false, RESOLUTION_MAJORITY, 1))
+            assertThat(metadata).usingRecursiveFieldByFieldElementComparatorIgnoringFields("guid").contains(Metadatum("Lebensjahr 10", RANGE_START, 1))
+            assertThat(metadata).usingRecursiveFieldByFieldElementComparatorIgnoringFields("guid").contains(Metadatum("Monate 11", RANGE_START, 1))
+
+            val printAnnouncementMetadata = norm?.metadataSections?.flatMap { it.sections ?: listOf() }?.flatMap { it.metadata }
+            assertThat(printAnnouncementMetadata).usingRecursiveFieldByFieldElementComparatorIgnoringFields("guid").contains(Metadatum("test print announcement gazette", ANNOUNCEMENT_GAZETTE, 1))
+            assertThat(printAnnouncementMetadata).usingRecursiveFieldByFieldElementComparatorIgnoringFields("guid").contains(Metadatum("test print announcement year", YEAR, 1))
+            assertThat(printAnnouncementMetadata).usingRecursiveFieldByFieldElementComparatorIgnoringFields("guid").contains(Metadatum("test print announcement page", PAGE, 1))
+
+            val documentTypeSections = norm?.metadataSections?.filter { it.name == MetadataSectionName.DOCUMENT_TYPE }
+            assertThat(documentTypeSections).hasSize(1)
+            val documentTypeMetadata = documentTypeSections?.flatMap { it.metadata }
+            assertThat(documentTypeMetadata).usingRecursiveFieldByFieldElementComparatorIgnoringFields("guid").contains(Metadatum("RV", TYPE_NAME, 1))
+            assertThat(documentTypeMetadata).usingRecursiveFieldByFieldElementComparatorIgnoringFields("guid").contains(Metadatum(NormCategory.TRANSITIONAL_NORM, NORM_CATEGORY, 1))
+            assertThat(documentTypeMetadata).usingRecursiveFieldByFieldElementComparatorIgnoringFields("guid").contains(Metadatum("documentTemplateName", TEMPLATE_NAME, 1))
+
+            val divergentEntryIntoForceParentSections = norm?.metadataSections?.filter { it.name == MetadataSectionName.DIVERGENT_ENTRY_INTO_FORCE }
+            assertThat(divergentEntryIntoForceParentSections).hasSize(2)
+            val divergentEntryIntoForceChildrenSections = divergentEntryIntoForceParentSections?.mapNotNull { it.sections }?.flatten()
+            assertThat(divergentEntryIntoForceChildrenSections).hasSize(2)
+            val divergentEntryIntoForceDefinedMetadata = divergentEntryIntoForceChildrenSections?.filter { it.name == MetadataSectionName.DIVERGENT_ENTRY_INTO_FORCE_DEFINED }?.flatMap { it.metadata }
+            assertThat(divergentEntryIntoForceDefinedMetadata).usingRecursiveFieldByFieldElementComparatorIgnoringFields("guid").contains(Metadatum(LocalDate.parse("2022-01-03"), DATE, 1))
+            assertThat(divergentEntryIntoForceDefinedMetadata).usingRecursiveFieldByFieldElementComparatorIgnoringFields("guid").contains(Metadatum(NormCategory.BASE_NORM, NORM_CATEGORY, 1))
+            val divergentEntryIntoForceUndefinedMetadata = divergentEntryIntoForceChildrenSections?.filter { it.name == MetadataSectionName.DIVERGENT_ENTRY_INTO_FORCE_UNDEFINED }?.flatMap { it.metadata }
+            assertThat(divergentEntryIntoForceUndefinedMetadata).usingRecursiveFieldByFieldElementComparatorIgnoringFields("guid").contains(Metadatum(UndefinedDate.UNDEFINED_NOT_PRESENT, UNDEFINED_DATE, 1))
+            assertThat(divergentEntryIntoForceUndefinedMetadata).usingRecursiveFieldByFieldElementComparatorIgnoringFields("guid").contains(Metadatum(NormCategory.TRANSITIONAL_NORM, NORM_CATEGORY, 1))
+
+            val divergentexpirationParentSections = norm?.metadataSections?.filter { it.name == MetadataSectionName.DIVERGENT_EXPIRATION }
+            assertThat(divergentexpirationParentSections).hasSize(2)
+            val divergentexpirationChildrenSections = divergentexpirationParentSections?.mapNotNull { it.sections }?.flatten()
+            assertThat(divergentexpirationChildrenSections).hasSize(2)
+            val divergentexpirationDefinedMetadata = divergentexpirationChildrenSections?.filter { it.name == MetadataSectionName.DIVERGENT_EXPIRATION_DEFINED }?.flatMap { it.metadata }
+            assertThat(divergentexpirationDefinedMetadata).usingRecursiveFieldByFieldElementComparatorIgnoringFields("guid").contains(Metadatum(LocalDate.parse("2022-01-06"), DATE, 1))
+            assertThat(divergentexpirationDefinedMetadata).usingRecursiveFieldByFieldElementComparatorIgnoringFields("guid").contains(Metadatum(NormCategory.AMENDMENT_NORM, NORM_CATEGORY, 1))
+            val divergentexpirationUndefinedMetadata = divergentexpirationChildrenSections?.filter { it.name == MetadataSectionName.DIVERGENT_EXPIRATION_UNDEFINED }?.flatMap { it.metadata }
+            assertThat(divergentexpirationUndefinedMetadata).usingRecursiveFieldByFieldElementComparatorIgnoringFields("guid").contains(Metadatum(UndefinedDate.UNDEFINED_UNKNOWN, UNDEFINED_DATE, 1))
+            assertThat(divergentexpirationUndefinedMetadata).usingRecursiveFieldByFieldElementComparatorIgnoringFields("guid").contains(Metadatum(NormCategory.BASE_NORM, NORM_CATEGORY, 1))
+
+            val categorizedReferenceSections = norm?.metadataSections?.filter { it.name == MetadataSectionName.CATEGORIZED_REFERENCE }
+            assertThat(categorizedReferenceSections).hasSize(2)
+            assertThat(categorizedReferenceSections?.get(0)?.metadata).usingRecursiveFieldByFieldElementComparatorIgnoringFields("guid").contains(Metadatum("test categorized reference 1", TEXT, 1))
+            assertThat(categorizedReferenceSections?.get(1)?.metadata).usingRecursiveFieldByFieldElementComparatorIgnoringFields("guid").contains(Metadatum("test categorized reference 2", TEXT, 1))
+
+            val entryIntoForceSection = norm?.metadataSections?.filter { it.name == MetadataSectionName.ENTRY_INTO_FORCE }
+            assertThat(entryIntoForceSection).hasSize(1)
+            val entryIntoForceMetadata = entryIntoForceSection?.flatMap { it.metadata }
+            assertThat(entryIntoForceMetadata).hasSize(1)
+            assertThat(entryIntoForceMetadata).usingRecursiveFieldByFieldElementComparatorIgnoringFields("guid").contains(Metadatum(decodeLocalDate(data.entryIntoForceDate), DATE, 1))
+
+            val principleEntryIntoForceSection = norm?.metadataSections?.filter { it.name == MetadataSectionName.PRINCIPLE_ENTRY_INTO_FORCE }
+            assertThat(principleEntryIntoForceSection).hasSize(1)
+            val principleEntryIntoForceMetadata = principleEntryIntoForceSection?.flatMap { it.metadata }
+            assertThat(principleEntryIntoForceMetadata).hasSize(1)
+            assertThat(principleEntryIntoForceMetadata).usingRecursiveFieldByFieldElementComparatorIgnoringFields("guid").contains(Metadatum(UndefinedDate.UNDEFINED_FUTURE, UNDEFINED_DATE, 1))
+
+            val expirationSection = norm?.metadataSections?.filter { it.name == MetadataSectionName.EXPIRATION }
+            assertThat(expirationSection).hasSize(1)
+            val expirationMetadata = expirationSection?.flatMap { it.metadata }
+            assertThat(expirationMetadata).hasSize(1)
+            assertThat(expirationMetadata).usingRecursiveFieldByFieldElementComparatorIgnoringFields("guid").contains(Metadatum(UndefinedDate.UNDEFINED_UNKNOWN, UNDEFINED_DATE, 1))
+
+            val principleExpirationSection = norm?.metadataSections?.filter { it.name == MetadataSectionName.PRINCIPLE_EXPIRATION }
+            assertThat(principleExpirationSection).hasSize(1)
+            val principleExpirationMetadata = principleExpirationSection?.flatMap { it.metadata }
+            assertThat(principleExpirationMetadata).hasSize(1)
+            assertThat(principleExpirationMetadata).usingRecursiveFieldByFieldElementComparatorIgnoringFields("guid").contains(Metadatum(decodeLocalDate(data.principleExpirationDate), DATE, 1))
         }
 
         @Test
@@ -271,8 +324,8 @@ class JurisConverterTest {
 
             val norm = converter.parseJurisXml(query).block()
             val metadata = norm?.metadataSections?.flatMap { it.metadata }
-            assertThat(metadata).contains(Metadatum("foo", KEYWORD, 1))
-            assertThat(metadata).contains(Metadatum("bar", KEYWORD, 2))
+            assertThat(metadata).usingRecursiveFieldByFieldElementComparatorIgnoringFields("guid").contains(Metadatum("foo", KEYWORD, 1))
+            assertThat(metadata).usingRecursiveFieldByFieldElementComparatorIgnoringFields("guid").contains(Metadatum("bar", KEYWORD, 2))
         }
 
         @Test
@@ -289,7 +342,7 @@ class JurisConverterTest {
             val norm = converter.parseJurisXml(query).block()
 
             assertThat(norm?.officialLongTitle).isEqualTo("test official long title")
-            assertThat(norm?.metadataSections?.flatMap { it.metadata }).contains(Metadatum("2022", YEAR, 1))
+            assertThat(norm?.metadataSections?.flatMap { it.metadata }).usingRecursiveFieldByFieldElementComparatorIgnoringFields("guid").contains(Metadatum("2022", YEAR, 1))
             assertThat(norm?.metadataSections?.flatMap { it.metadata }?.filter { it.type == DATE }).isEmpty()
         }
 

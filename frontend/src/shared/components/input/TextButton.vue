@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import { sanitizeUrl } from "@braintree/sanitize-url"
 import { computed, h } from "vue"
 
 interface Props {
@@ -21,6 +22,7 @@ const props = withDefaults(defineProps<Props>(), {
   disabled: false,
   href: undefined,
   download: undefined,
+  size: "large",
   target: undefined,
 })
 
@@ -38,9 +40,12 @@ const buttonClasses = computed(() => ({
 }))
 
 const isLink = computed(() => !!props.href)
+const sanitizedUrl = computed(() => sanitizeUrl(props.href))
 
 const renderIcon = () =>
-  props.icon ? h("span", { class: "material-icons ds-button-icon" }, props.icon) : undefined
+  props.icon
+    ? h("span", { class: "material-icons ds-button-icon" }, props.icon)
+    : undefined
 
 const renderLabel = () =>
   props.label ? h("span", { class: "ds-button-label" }, props.label) : undefined
@@ -58,7 +63,7 @@ const render = () => {
       class: ["ds-button", buttonClasses.value],
       "aria-label": props.ariaLabel,
       disabled: !href && disabled,
-      href,
+      href: sanitizedUrl.value,
       download,
       target,
     },
@@ -71,7 +76,8 @@ const render = () => {
   <render />
 </template>
 
-<style lang="scss">
+<style lang="scss" scoped>
+// eslint-disable-next-line vue-scoped-css/no-unused-selector
 .ds-button-large > .ds-button-icon {
   font-size: 2rem;
 }

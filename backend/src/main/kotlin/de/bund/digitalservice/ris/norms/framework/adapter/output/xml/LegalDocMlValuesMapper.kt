@@ -30,11 +30,8 @@ val legalDocMlValuesMap: List<MappedValues> = listOf(
     ),
     MappedValues(
         Property.DOCUMENT_NORM_CATEGORY,
-        "regelungstext",
-        listOf(
-            MappedValue("rechtsetzungsdokument", listOf("Rechtsetzungsdokument")),
-            MappedValue("vereinbarung", listOf("Vereinbarung")),
-        ),
+        "rechtsetzungsdokument",
+        listOf(),
     ),
     MappedValues(
         Property.PROVIDER_DECIDING_BODY,

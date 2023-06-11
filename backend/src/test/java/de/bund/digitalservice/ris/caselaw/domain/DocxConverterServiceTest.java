@@ -241,7 +241,7 @@ class DocxConverterServiceTest {
       Map<String, DocxImagePart> imageMapValue = imageMapCaptor.getValue();
       assertEquals(3, imageMapValue.values().size());
       assertTrue(imageMapValue.containsKey("emfPart"));
-      assertEquals("image/png", imageMapValue.get("emfPart").contentType());
+      assertEquals("image/x-emf", imageMapValue.get("emfPart").contentType());
       assertTrue(imageMapValue.containsKey("jpegPart"));
       assertEquals("image/jpeg", imageMapValue.get("jpegPart").contentType());
       assertTrue(imageMapValue.containsKey("pngPart"));

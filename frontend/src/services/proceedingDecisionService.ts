@@ -1,10 +1,8 @@
-import DocumentUnit, { ProceedingDecision } from "./../domain/documentUnit"
 import httpClient, { ServiceResponse } from "./httpClient"
+import DocumentUnit from "@/domain/documentUnit"
+import ProceedingDecision from "@/domain/proceedingDecision"
 
 interface ProceedingDecisionService {
-  getProceedingDecisions(
-    uuid: string
-  ): Promise<ServiceResponse<ProceedingDecision[]>>
   createProceedingDecision(
     uuid: string,
     proceedingDecision: ProceedingDecision
@@ -20,18 +18,6 @@ interface ProceedingDecisionService {
 }
 
 const service: ProceedingDecisionService = {
-  async getProceedingDecisions(uuid: string) {
-    const response = await httpClient.get<ProceedingDecision[]>(
-      `caselaw/documentunits/${uuid}/proceedingdecisions`
-    )
-    if (response.status >= 300) {
-      response.error = {
-        title: `Vorgehende Entscheidungen für die Dokumentationseinheit ${uuid} konnten nicht geladen werden.`,
-      }
-    }
-    return response
-  },
-
   async createProceedingDecision(
     uuid: string,
     proceedingDecision: ProceedingDecision
@@ -50,12 +36,21 @@ const service: ProceedingDecisionService = {
       proceedingDecision
     )
     if (response.status >= 300) {
-      response.error = {
-        title: `Vorgehende Entscheidung konnte nicht zu
+      return {
+        status: 500,
+        error: {
+          title: `Vorgehende Entscheidung konnte nicht zu
           Dokumentationseinheit ${uuid} hinzugefügt werden`,
+        },
+      }
+    } else {
+      return {
+        status: 200,
+        data: (response.data as ProceedingDecision[]).map(
+          (decision) => new ProceedingDecision({ ...decision })
+        ),
       }
     }
-    return response
   },
 
   async linkProceedingDecision(parentUuid: string, childUuid: string) {
@@ -72,8 +67,10 @@ const service: ProceedingDecisionService = {
     } else {
       return {
         status: 200,
-        data: (response.data as DocumentUnit)
-          .proceedingDecisions as ProceedingDecision[],
+        data: (
+          (response.data as DocumentUnit)
+            .proceedingDecisions as ProceedingDecision[]
+        ).map((decision) => new ProceedingDecision({ ...decision })),
       }
     }
   },
@@ -87,6 +84,7 @@ const service: ProceedingDecisionService = {
         title: `Vorgehende Entscheidung ${childUuid} für die Dokumentationseinheit ${parentUuid} konnten nicht entfernt werden.`,
       }
     }
+
     return response
   },
 }

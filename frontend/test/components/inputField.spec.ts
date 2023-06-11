@@ -5,7 +5,7 @@ import InputField, {
 
 function renderComponent(options?: {
   id?: string
-  label?: string
+  label?: string | string[]
   slot?: string
   errorMessage?: string
   required?: true
@@ -86,5 +86,44 @@ describe("InputField", () => {
     expect(input.compareDocumentPosition(label)).toBe(
       Node.DOCUMENT_POSITION_FOLLOWING
     )
+  })
+
+  it("shows input with given label in two lines", () => {
+    renderComponent({
+      label: ["test label 1", "test label 2"],
+    })
+    const spanLabelFirstPart = screen.queryByText("test label 1") as HTMLElement
+    expect(spanLabelFirstPart).toBeInTheDocument()
+    const spanLabelSecondPart = screen.queryByText(
+      "test label 2"
+    ) as HTMLElement
+    expect(spanLabelSecondPart).toBeInTheDocument()
+
+    expect(
+      spanLabelFirstPart.compareDocumentPosition(spanLabelSecondPart)
+    ).toBe(Node.DOCUMENT_POSITION_FOLLOWING)
+  })
+
+  it("shows input with given label in two lines and required", () => {
+    renderComponent({
+      label: ["test label 1", "test label 2"],
+      required: true,
+    })
+
+    const spanLabelFirstPart = screen.queryByText("test label 1") as HTMLElement
+    expect(spanLabelFirstPart).toBeInTheDocument()
+    const spanLabelSecondPart = screen.queryByText(
+      "test label 2"
+    ) as HTMLElement
+    expect(spanLabelSecondPart).toBeInTheDocument()
+
+    expect(
+      spanLabelFirstPart.compareDocumentPosition(spanLabelSecondPart)
+    ).toBe(Node.DOCUMENT_POSITION_FOLLOWING)
+
+    const spanLabelRequired = screen.queryByText("*") as HTMLElement
+    expect(spanLabelRequired).toBeInTheDocument()
+
+    expect(spanLabelSecondPart.contains(spanLabelRequired)).toBe(true)
   })
 })

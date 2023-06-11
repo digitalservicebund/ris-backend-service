@@ -14,4 +14,6 @@ data class ParagraphDto(
     val text: String,
     @Column("article_id")
     val articleId: Int,
+    @Column("article_guid")
+    val articleGuid: UUID,
 )

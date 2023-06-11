@@ -66,6 +66,17 @@ export enum MetadatumType {
   ENTITY = "ENTITY",
   DECIDING_BODY = "DECIDING_BODY",
   RESOLUTION_MAJORITY = "RESOLUTION_MAJORITY",
+  TYPE_NAME = "TYPE_NAME",
+  NORM_CATEGORY = "NORM_CATEGORY",
+  TEMPLATE_NAME = "TEMPLATE_NAME",
+  UNDEFINED_DATE = "UNDEFINED_DATE",
+  TEXT = "TEXT",
+}
+
+export enum NormCategory {
+  AMENDMENT_NORM = "AMENDMENT_NORM",
+  BASE_NORM = "BASE_NORM",
+  TRANSITIONAL_NORM = "TRANSITIONAL_NORM",
 }
 
 // TODO: Establish typing that requires all `MetadatumType`s to be listed.
@@ -108,6 +119,11 @@ export type MetadataValueType = {
   [MetadatumType.ENTITY]: string
   [MetadatumType.DECIDING_BODY]: string
   [MetadatumType.RESOLUTION_MAJORITY]: boolean
+  [MetadatumType.TYPE_NAME]: string
+  [MetadatumType.NORM_CATEGORY]: NormCategory
+  [MetadatumType.TEMPLATE_NAME]: string
+  [MetadatumType.UNDEFINED_DATE]: UndefinedDate
+  [MetadatumType.TEXT]: string
 }
 
 export type Metadata = {
@@ -126,6 +142,19 @@ export enum MetadataSectionName {
   EU_ANNOUNCEMENT = "EU_ANNOUNCEMENT",
   OTHER_OFFICIAL_ANNOUNCEMENT = "OTHER_OFFICIAL_ANNOUNCEMENT",
   NORM_PROVIDER = "NORM_PROVIDER",
+  OFFICIAL_REFERENCE = "OFFICIAL_REFERENCE",
+  DOCUMENT_TYPE = "DOCUMENT_TYPE",
+  DIVERGENT_ENTRY_INTO_FORCE = "DIVERGENT_ENTRY_INTO_FORCE",
+  DIVERGENT_ENTRY_INTO_FORCE_DEFINED = "DIVERGENT_ENTRY_INTO_FORCE_DEFINED",
+  DIVERGENT_ENTRY_INTO_FORCE_UNDEFINED = "DIVERGENT_ENTRY_INTO_FORCE_UNDEFINED",
+  DIVERGENT_EXPIRATION = "DIVERGENT_EXPIRATION",
+  DIVERGENT_EXPIRATION_DEFINED = "DIVERGENT_EXPIRATION_DEFINED",
+  DIVERGENT_EXPIRATION_UNDEFINED = "DIVERGENT_EXPIRATION_UNDEFINED",
+  CATEGORIZED_REFERENCE = "CATEGORIZED_REFERENCE",
+  ENTRY_INTO_FORCE = "ENTRY_INTO_FORCE",
+  PRINCIPLE_ENTRY_INTO_FORCE = "PRINCIPLE_ENTRY_INTO_FORCE",
+  EXPIRATION = "EXPIRATION",
+  PRINCIPLE_EXPIRATION = "PRINCIPLE_EXPIRATION",
 }
 
 export type MetadataSections = {
@@ -133,32 +162,17 @@ export type MetadataSections = {
 }
 
 export type FlatMetadata = {
-  documentTemplateName?: string
-  announcementDate?: string
   applicationScopeArea?: string
   applicationScopeEndDate?: string
   applicationScopeStartDate?: string
   categorizedReference?: string
   celexNumber?: string
   completeCitation?: string
-  digitalAnnouncementDate?: string
-  digitalAnnouncementArea?: string
-  digitalAnnouncementAreaNumber?: string
-  digitalAnnouncementEdition?: string
-  digitalAnnouncementExplanations?: string
-  digitalAnnouncementInfo?: string
-  digitalAnnouncementMedium?: string
-  digitalAnnouncementYear?: string
   digitalEvidenceAppendix?: string
   digitalEvidenceExternalDataNote?: string
   digitalEvidenceLink?: string
   digitalEvidenceRelatedData?: string
-  divergentEntryIntoForceDate?: string
-  divergentEntryIntoForceDateState?: string
-  divergentExpirationDate?: string
-  divergentExpirationDateState?: string
   documentCategory?: string
-  documentNormCategory?: string
   documentNumber?: string
   documentStatusDate?: string
   documentStatusDescription?: string
@@ -167,22 +181,7 @@ export type FlatMetadata = {
   documentStatusReference?: string
   documentStatusWorkNote?: string
   documentTextProof?: string
-  documentTypeName?: string
-  entryIntoForceDate?: string
-  entryIntoForceDateState?: string
-  entryIntoForceNormCategory?: string
-  euAnnouncementExplanations?: string
-  euAnnouncementGazette?: string
-  euAnnouncementInfo?: string
-  euAnnouncementNumber?: string
-  euAnnouncementPage?: string
-  euAnnouncementSeries?: string
-  euAnnouncementYear?: string
   eli?: string
-  expirationDate?: string
-  expirationDateState?: string
-  expirationNormCategory?: string
-  isExpirationDateTemp?: boolean
   officialAbbreviation?: string
   officialLongTitle: string
   officialShortTitle?: string
@@ -193,18 +192,11 @@ export type FlatMetadata = {
   footnoteDecision?: string
   footnoteStateLaw?: string
   footnoteEuLaw?: string
-  otherOfficialAnnouncement?: string
   otherStatusNote?: string
-  principleEntryIntoForceDate?: string
-  principleEntryIntoForceDateState?: string
-  principleExpirationDate?: string
-  principleExpirationDateState?: string
-  printAnnouncementExplanations?: string
   printAnnouncementGazette?: string
-  printAnnouncementInfo?: string
-  printAnnouncementNumber?: string
   printAnnouncementPage?: string
   printAnnouncementYear?: string
+  announcementDate?: string
   publicationDate?: string
   reissueArticle?: string
   reissueDate?: string
@@ -220,4 +212,10 @@ export type FlatMetadata = {
   statusNote?: string
   statusReference?: string
   text?: string
+}
+
+export enum UndefinedDate {
+  UNDEFINED_UNKNOWN = "UNDEFINED_UNKNOWN",
+  UNDEFINED_FUTURE = "UNDEFINED_FUTURE",
+  UNDEFINED_NOT_PRESENT = "UNDEFINED_NOT_PRESENT",
 }

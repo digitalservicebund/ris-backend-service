@@ -1,5 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
+import static de.bund.digitalservice.ris.caselaw.Utils.getMockLogin;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -11,11 +12,12 @@ import static org.springframework.security.test.web.reactive.server.SecurityMock
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentUnitTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitCreationInfo;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitPublishException;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.ProceedingDecision;
 import de.bund.digitalservice.ris.caselaw.domain.PublishState;
+import de.bund.digitalservice.ris.caselaw.domain.User;
 import de.bund.digitalservice.ris.caselaw.domain.XmlMail;
 import de.bund.digitalservice.ris.caselaw.domain.XmlMailResponse;
 import java.nio.ByteBuffer;
@@ -23,6 +25,7 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -30,12 +33,13 @@ import org.mockito.Captor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpHeaders;
+import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.web.reactive.function.BodyInserters;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @ExtendWith(SpringExtension.class)
@@ -45,28 +49,46 @@ class DocumentUnitControllerTest {
   @Autowired private WebTestClient webClient;
 
   @MockBean private DocumentUnitService service;
+  @MockBean private KeycloakUserService userService;
 
   @Captor private ArgumentCaptor<ByteBuffer> captor;
 
   private static final UUID TEST_UUID = UUID.fromString("88888888-4444-4444-4444-121212121212");
   private static final String RECEIVER_ADDRESS = "test@exporter.neuris";
 
+  @BeforeEach
+  void setup() {
+    when(userService.getUser(any(OidcUser.class)))
+        .thenReturn(
+            Mono.just(
+                User.builder()
+                    .documentationOffice(
+                        DocumentationOffice.builder().label("BGH").abbreviation("KO").build())
+                    .build()));
+  }
+
   @Test
   void testGenerateNewDocumentUnit() {
-    DocumentUnitCreationInfo documentUnitCreationInfo = DocumentUnitCreationInfo.EMPTY;
-    when(service.generateNewDocumentUnit(DocumentUnitCreationInfo.EMPTY))
+    DocumentationOffice documentationOffice =
+        DocumentationOffice.builder().label("DigitalService").abbreviation("XX").build();
+
+    when(userService.getDocumentationOffice(any(OidcUser.class)))
+        .thenReturn(Mono.just(documentationOffice));
+
+    when(service.generateNewDocumentUnit(documentationOffice))
         .thenReturn(Mono.just(DocumentUnit.builder().build()));
 
     webClient
         .mutateWith(csrf())
-        .post()
-        .uri("/api/v1/caselaw/documentunits")
-        .bodyValue(documentUnitCreationInfo)
+        .mutateWith(getMockLogin())
+        .get()
+        .uri("/api/v1/caselaw/documentunits/new")
         .exchange()
         .expectStatus()
         .isCreated();
 
-    verify(service, times(1)).generateNewDocumentUnit(DocumentUnitCreationInfo.EMPTY);
+    verify(service, times(1)).generateNewDocumentUnit(documentationOffice);
+    verify(userService, times(1)).getDocumentationOffice(any(OidcUser.class));
   }
 
   @Test
@@ -129,17 +151,20 @@ class DocumentUnitControllerTest {
 
   @Test
   void testGetAll() {
-    when(service.getAll()).thenReturn(Flux.empty());
+    var docOffice = DocumentationOffice.builder().abbreviation("KO").label("BGH").build();
+    when(userService.getDocumentationOffice(any(OidcUser.class))).thenReturn(Mono.just(docOffice));
 
+    when(service.getAll(PageRequest.of(0, 10), docOffice)).thenReturn(Mono.empty());
     webClient
         .mutateWith(csrf())
+        .mutateWith(getMockLogin())
         .get()
-        .uri("/api/v1/caselaw/documentunits")
+        .uri("/api/v1/caselaw/documentunits?pg=0&sz=10")
         .exchange()
         .expectStatus()
         .isOk();
 
-    verify(service).getAll();
+    verify(service).getAll(PageRequest.of(0, 10), docOffice);
   }
 
   @Test
@@ -352,21 +377,23 @@ class DocumentUnitControllerTest {
   }
 
   @Test
-  void testSearchForDocumentUnitsByProceedingDecisionInput() {
+  void testSearchByProceedingDecision() {
     ProceedingDecision proceedingDecision = ProceedingDecision.builder().build();
-    when(service.searchForDocumentUnitsByProceedingDecisionInput(proceedingDecision))
-        .thenReturn(Flux.empty());
+    PageRequest pageRequest = PageRequest.of(0, 10);
+
+    when(service.searchByProceedingDecision(proceedingDecision, pageRequest))
+        .thenReturn(Mono.empty());
 
     webClient
         .mutateWith(csrf())
         .put()
-        .uri("/api/v1/caselaw/documentunits/search")
+        .uri("/api/v1/caselaw/documentunits/search?pg=0&sz=10")
         .header(HttpHeaders.CONTENT_TYPE, "application/json")
         .bodyValue(proceedingDecision)
         .exchange()
         .expectStatus()
         .isOk();
 
-    verify(service).searchForDocumentUnitsByProceedingDecisionInput(proceedingDecision);
+    verify(service).searchByProceedingDecision(proceedingDecision, pageRequest);
   }
 }

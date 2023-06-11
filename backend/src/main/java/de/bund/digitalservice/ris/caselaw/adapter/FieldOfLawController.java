@@ -31,7 +31,7 @@ public class FieldOfLawController {
 
   @GetMapping(value = "/search-by-identifier")
   public Flux<FieldOfLaw> getFieldsOfLawByIdentifierSearch(
-      @RequestParam Optional<String> searchStr) {
+      @RequestParam("q") Optional<String> searchStr) {
     return service.getFieldsOfLawByIdentifierSearch(searchStr);
   }
 

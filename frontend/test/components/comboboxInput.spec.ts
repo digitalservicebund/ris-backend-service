@@ -12,7 +12,7 @@ import {
 function renderComponent(
   options: {
     id?: string
-    modelValue?: string
+    modelValue?: ComboboxItem
     itemService?: ComboboxAttributes["itemService"]
     ariaLabel?: string
   } = {}
@@ -25,9 +25,30 @@ function renderComponent(
       itemService:
         options.itemService ??
         service.filterItems([
-          { label: "testItem1", value: "t1" },
-          { label: "testItem2", value: "t2" },
-          { label: "testItem3", value: "t3" },
+          {
+            label: "testItem1",
+            value: {
+              type: "courttype1",
+              location: "courtlocation1",
+              label: "courtlabel1",
+            },
+          },
+          {
+            label: "testItem2",
+            value: {
+              type: "courttype2",
+              location: "courtlocation2",
+              label: "courtlabel2",
+            },
+          },
+          {
+            label: "testItem3",
+            value: {
+              type: "courttype3",
+              location: "courtlocation3",
+              label: "courtlabel3",
+            },
+          },
         ]),
     },
   })
@@ -57,7 +78,7 @@ describe("Combobox Element", () => {
   it("items should be filtered", async () => {
     renderComponent()
 
-    const input = screen.getByLabelText("test label") as HTMLInputElement
+    const input = screen.getByLabelText("test label")
     await user.type(input, "testItem2")
 
     const dropdownItems = screen.queryAllByLabelText("dropdown-option")
@@ -69,7 +90,7 @@ describe("Combobox Element", () => {
   it("items should stay filtered after selection", async () => {
     renderComponent()
 
-    const input = screen.getByLabelText("test label") as HTMLInputElement
+    const input = screen.getByLabelText("test label")
     await user.type(input, "testItem2")
 
     const dropdownItems = screen.getAllByLabelText("dropdown-option")
@@ -78,9 +99,7 @@ describe("Combobox Element", () => {
 
     await user.click(dropdownItems[0])
 
-    const openDropdownContainer = screen.getByLabelText(
-      "Dropdown öffnen"
-    ) as HTMLElement
+    const openDropdownContainer = screen.getByLabelText("Dropdown öffnen")
 
     await user.click(openDropdownContainer)
 
@@ -90,7 +109,7 @@ describe("Combobox Element", () => {
   it("items should stay filtered after typing without selection", async () => {
     renderComponent()
 
-    const input = screen.getByLabelText("test label") as HTMLInputElement
+    const input = screen.getByLabelText("test label")
     await user.type(input, "testItem2")
 
     const dropdownItems = screen.getAllByLabelText("dropdown-option")
@@ -98,25 +117,28 @@ describe("Combobox Element", () => {
     expect(dropdownItems).toHaveLength(1)
     expect(dropdownItems[0]).toHaveTextContent("testItem2")
 
-    const closeDropdownContainer = screen.getByLabelText(
-      "Dropdown schließen"
-    ) as HTMLElement
+    const closeDropdownContainer = screen.getByLabelText("Dropdown schließen")
 
     await user.click(closeDropdownContainer)
-    const openDropdownContainer = screen.getByLabelText(
-      "Dropdown öffnen"
-    ) as HTMLElement
+    const openDropdownContainer = screen.getByLabelText("Dropdown öffnen")
     await user.click(openDropdownContainer)
 
     expect(screen.getAllByLabelText("dropdown-option")).toHaveLength(1)
   })
 
   it("items should be filtered if selected value exists", async () => {
-    renderComponent({ modelValue: "testItem1" })
+    renderComponent({
+      modelValue: {
+        label: "testItem1",
+        value: {
+          type: "courttype1",
+          location: "courtlocation1",
+          label: "courtlabel1",
+        },
+      },
+    })
 
-    const openDropdownContainer = screen.getByLabelText(
-      "Dropdown öffnen"
-    ) as HTMLElement
+    const openDropdownContainer = screen.getByLabelText("Dropdown öffnen")
 
     await user.click(openDropdownContainer)
     const dropdownItems = screen.getAllByLabelText("dropdown-option")
@@ -127,7 +149,7 @@ describe("Combobox Element", () => {
   it("items should show message if no items matched", async () => {
     renderComponent()
 
-    const input = screen.getByLabelText("test label") as HTMLInputElement
+    const input = screen.getByLabelText("test label")
     await user.type(input, "testItem10")
 
     const dropdownItems = screen.getAllByLabelText("dropdown-option")
@@ -138,7 +160,7 @@ describe("Combobox Element", () => {
   it("Dropdown item should be visible after selecting", async () => {
     renderComponent()
 
-    const input = screen.getByLabelText("test label") as HTMLInputElement
+    const input = screen.getByLabelText("test label")
     await user.type(input, "testItem2")
 
     const dropdownItems = screen.getAllByLabelText("dropdown-option")
@@ -166,7 +188,10 @@ describe("Combobox Element", () => {
           data: [
             {
               label: "AO - Anordnung",
-              value: "Anordnung", // <-- string
+              value: {
+                jurisShortcut: "AO",
+                label: "AO - Anordnung",
+              },
             },
           ],
         })
@@ -243,7 +268,7 @@ describe("Combobox Element", () => {
       itemService: service.getCourts,
     })
 
-    const input = screen.getByLabelText("test label") as HTMLInputElement
+    const input = screen.getByLabelText("test label")
     await user.type(input, "bgh")
 
     const dropdownItemElements = screen.getAllByLabelText("dropdown-option")
@@ -265,6 +290,7 @@ describe("Combobox Element", () => {
       {
         label: "ABC",
         value: court,
+        additionalInformation: court.revoked,
       },
     ]
     const fetchSpy = vi
@@ -284,9 +310,7 @@ describe("Combobox Element", () => {
     expect(fetchSpy).toHaveBeenCalledTimes(1)
     expect(fetchSpy).toHaveBeenCalledWith(undefined)
     expect(dropdownItemElements).toHaveLength(1)
-    expect(dropdownItemElements[0]).toHaveTextContent(
-      "ABCaufgehoben seit: 1973"
-    )
+    expect(dropdownItemElements[0]).toHaveTextContent("ABC")
 
     const additionalInfoElement = screen.getAllByLabelText(
       "additional-dropdown-info"
@@ -298,7 +322,7 @@ describe("Combobox Element", () => {
   it("Should revert to last saved state when leaving the input field via esc/tab", async () => {
     const { emitted } = renderComponent()
 
-    const input = screen.getByLabelText("test label") as HTMLInputElement
+    const input = screen.getByLabelText("test label")
     await user.type(input, "foo")
 
     let dropdownItems = screen.getAllByLabelText("dropdown-option")
@@ -332,7 +356,7 @@ describe("Combobox Element", () => {
 
   it("Top search result should get chosen upon enter", async () => {
     const { emitted } = renderComponent()
-    const input = screen.getByLabelText("test label") as HTMLInputElement
+    const input = screen.getByLabelText("test label")
     await user.type(input, "test")
     expect(screen.getAllByLabelText("dropdown-option")).toHaveLength(3)
 
@@ -341,12 +365,20 @@ describe("Combobox Element", () => {
     expect(screen.queryByLabelText("dropdown-option")).not.toBeInTheDocument()
     // like in previous test: workaround for not being able to read testItem1 from the DOM
     expect(emitted()["update:modelValue"]).toHaveLength(1)
-    expect(emitted()["update:modelValue"]).toEqual([["t1"]]) // value of testItem1
+    expect(emitted()["update:modelValue"]).toEqual([
+      [
+        {
+          label: "courtlabel1",
+          location: "courtlocation1",
+          type: "courttype1",
+        },
+      ],
+    ]) // value of testItem1
   })
 
   it("First Enter should open dropdown, second should select top value", async () => {
     const { emitted } = renderComponent()
-    const input = screen.getByLabelText("test label") as HTMLInputElement
+    const input = screen.getByLabelText("test label")
     input.focus()
 
     await user.keyboard("{enter}")
@@ -355,12 +387,20 @@ describe("Combobox Element", () => {
 
     await user.keyboard("{enter}")
 
-    expect(emitted()["update:modelValue"]).toEqual([["t1"]])
+    expect(emitted()["update:modelValue"]).toEqual([
+      [
+        {
+          label: "courtlabel1",
+          location: "courtlocation1",
+          type: "courttype1",
+        },
+      ],
+    ])
   })
 
   it("Clear-button should unset the currently set value", async () => {
     const { emitted } = renderComponent()
-    const input = screen.getByLabelText("test label") as HTMLInputElement
+    const input = screen.getByLabelText("test label")
 
     await user.type(input, "test")
     const dropdownItems = screen.getAllByLabelText("dropdown-option")
@@ -373,6 +413,15 @@ describe("Combobox Element", () => {
 
     expect(screen.queryByLabelText("dropdown-option")).not.toBeInTheDocument()
     expect(input).toHaveValue("")
-    expect(emitted()["update:modelValue"]).toEqual([["t2"], [undefined]])
+    expect(emitted()["update:modelValue"]).toEqual([
+      [
+        {
+          label: "courtlabel2",
+          location: "courtlocation2",
+          type: "courttype2",
+        },
+      ],
+      [undefined],
+    ])
   })
 })

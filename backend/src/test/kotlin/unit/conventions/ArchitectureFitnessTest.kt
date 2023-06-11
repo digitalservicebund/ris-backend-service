@@ -131,4 +131,13 @@ class ArchitectureFitnessTest {
             .should(notImplement(anyOutputPort()))
             .check(sourceClasses)
     }
+
+    @Test
+    fun `adapters should not depend on each other`() {
+        SlicesRuleDefinition.slices()
+            .matching("$BASE_PACKAGE_PATH.framework.adapter.(*)..")
+            .should()
+            .notDependOnEachOther()
+            .check(sourceClasses)
+    }
 }

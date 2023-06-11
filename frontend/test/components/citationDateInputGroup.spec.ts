@@ -1,7 +1,7 @@
 import userEvent from "@testing-library/user-event"
 import { render, screen, fireEvent } from "@testing-library/vue"
-import { Metadata } from "../../src/domain/Norm"
 import CitationDateInputGroup from "@/components/CitationDateInputGroup.vue"
+import { Metadata } from "@/domain/Norm"
 
 function renderComponent(options?: {
   ariaLabel?: string
@@ -72,11 +72,24 @@ describe("Citation date/year field", () => {
 
       expect(dateInputField).toBeInTheDocument()
       expect(dateInputField).toBeVisible()
-      expect(dateInputField?.type).toBe("date")
 
-      await userEvent.type(dateInputField, "2020-05-12")
+      await userEvent.type(dateInputField, "12.05.2020")
 
-      expect(dateInputField).toHaveValue("2020-05-12")
+      expect(dateInputField).toHaveValue("12.05.2020")
+    })
+
+    it("User can clear the date input", async () => {
+      const user = userEvent.setup()
+      const modelValue: Metadata = { DATE: ["2020-05-12"] }
+      renderComponent({ modelValue })
+
+      const dateInputField = screen.getByLabelText(
+        "Zitierdatum Datum"
+      ) as HTMLInputElement
+
+      expect(dateInputField).toHaveValue("12.05.2020")
+      await user.type(dateInputField, "{backspace}")
+      expect(modelValue.DATE).toBeUndefined()
     })
   })
 
@@ -122,6 +135,20 @@ describe("Citation date/year field", () => {
       expect(yearInputField.value).toBe("1234")
       expect(yearInputField.value.length).toBe(4)
     })
+
+    it("user can clear the date input", async () => {
+      const user = userEvent.setup()
+      const modelValue: Metadata = { YEAR: ["2023"] }
+      renderComponent({ modelValue })
+
+      const yearInputField = screen.getByLabelText(
+        "Zitierdatum"
+      ) as HTMLInputElement
+
+      expect(yearInputField).toHaveValue("2023")
+      await user.clear(yearInputField)
+      expect(modelValue.YEAR).toBeUndefined()
+    })
   })
 
   describe("Behaviour when switching between date and year components", () => {
@@ -135,10 +162,10 @@ describe("Citation date/year field", () => {
       expect(dateInputField).toBeInTheDocument()
       expect(dateInputField).toBeVisible()
 
-      await userEvent.type(dateInputField, "2020-05-12")
+      await userEvent.type(dateInputField, "05.12.2020")
       await userEvent.tab()
 
-      expect(dateInputField).toHaveValue("2020-05-12")
+      expect(dateInputField).toHaveValue("05.12.2020")
 
       await changeToYearInput()
 
@@ -180,10 +207,10 @@ describe("Citation date/year field", () => {
       expect(dateInputField).toBeInTheDocument()
       expect(dateInputField).toBeVisible()
 
-      await userEvent.type(dateInputField, "2020-05-12")
+      await userEvent.type(dateInputField, "05.12.2020")
       await userEvent.tab()
 
-      expect(dateInputField).toHaveValue("2020-05-12")
+      expect(dateInputField).toHaveValue("05.12.2020")
 
       await changeToYearInput()
 

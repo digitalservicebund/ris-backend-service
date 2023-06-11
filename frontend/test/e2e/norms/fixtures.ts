@@ -1,5 +1,10 @@
 import { expect, test } from "@playwright/test"
-import { Norm } from "../../../src/domain/Norm"
+import {
+  MetadataSectionName,
+  Norm,
+  NormCategory,
+  UndefinedDate,
+} from "../../../src/domain/Norm"
 import { importNormViaApi, loadJurisTestFile } from "./e2e-utils"
 import { normData } from "./testdata/norm_basic"
 import { FieldType, MetadataInputSection } from "./utilities"
@@ -53,6 +58,21 @@ type RecursiveOmit<Type, KeyToOmit extends PropertyKey> = Type extends {
 }
   ? NullUnionOmit<RecursiveOmitHelper<Type, KeyToOmit>, KeyToOmit>
   : RecursiveOmitHelper<Type, KeyToOmit>
+
+function undefinedDateToDropdownEntry(
+  unit?: UndefinedDate
+): string | undefined {
+  switch (unit) {
+    case UndefinedDate.UNDEFINED_UNKNOWN:
+      return "unbestimmt (unbekannt)"
+    case UndefinedDate.UNDEFINED_FUTURE:
+      return "unbestimmt (zukünftig)"
+    case UndefinedDate.UNDEFINED_NOT_PRESENT:
+      return "nicht vorhanden"
+    default:
+      return undefined
+  }
+}
 
 export type NormData = RecursiveOmit<Norm, "guid"> & {
   jurisZipFileName: string
@@ -155,24 +175,57 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
     },
     {
       heading: "Dokumenttyp",
+      isExpandableNotRepeatable: true,
+      id: "documentTypes",
       fields: [
         {
           type: FieldType.TEXT,
           id: "documentTypeName",
           label: "Typbezeichnung",
-          value: norm.documentTypeName,
+          values: norm.metadataSections?.DOCUMENT_TYPE?.map(
+            (section) => section?.TYPE_NAME?.[0]
+          ),
         },
         {
-          type: FieldType.TEXT,
-          id: "documentNormCategory",
-          label: "Art der Norm",
-          value: norm.documentNormCategory,
+          type: FieldType.CHECKBOX,
+          id: NormCategory.AMENDMENT_NORM,
+          label: "Änderungsnorm",
+          values: norm.metadataSections?.DOCUMENT_TYPE?.map(
+            (section) =>
+              !!section?.NORM_CATEGORY?.find(
+                (category) => category == NormCategory.AMENDMENT_NORM
+              )
+          ),
         },
         {
-          type: FieldType.TEXT,
+          type: FieldType.CHECKBOX,
+          id: NormCategory.BASE_NORM,
+          label: "Stammnorm",
+          values: norm.metadataSections?.DOCUMENT_TYPE?.map(
+            (section) =>
+              !!section?.NORM_CATEGORY?.find(
+                (category) => category == NormCategory.BASE_NORM
+              )
+          ),
+        },
+        {
+          type: FieldType.CHECKBOX,
+          id: NormCategory.TRANSITIONAL_NORM,
+          label: "Übergangsnorm",
+          values: norm.metadataSections?.DOCUMENT_TYPE?.map(
+            (section) =>
+              !!section?.NORM_CATEGORY?.find(
+                (category) => category == NormCategory.TRANSITIONAL_NORM
+              )
+          ),
+        },
+        {
+          type: FieldType.CHIPS,
           id: "documentTemplateName",
           label: "Bezeichnung gemäß Vorlage",
-          value: norm.documentTemplateName,
+          values: norm.metadataSections?.DOCUMENT_TYPE?.map(
+            (section) => section?.TEMPLATE_NAME
+          ),
         },
       ],
     },
@@ -184,7 +237,8 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
         {
           type: FieldType.TEXT,
           id: "normProviderEntity",
-          label: "Staat, Land, Stadt, Landkreis oder juristische Person",
+          label:
+            "Staat, Land, Stadt, Landkreis oder juristische Person, deren Hoheitsgewalt oder Rechtsmacht die Norm trägt",
           values: norm.metadataSections?.NORM_PROVIDER?.map(
             (section) => section?.ENTITY?.[0]
           ),
@@ -349,96 +403,445 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
       ],
     },
     {
-      heading: "Inkrafttreten",
+      heading: "Datum des Inkrafttretens",
+      isExpandableNotRepeatable: true,
+      id: "entryIntoForces",
       fields: [
+        {
+          type: FieldType.RADIO,
+          id: "entryIntoForceSelection",
+          label: "bestimmt",
+          values: norm.metadataSections?.ENTRY_INTO_FORCE?.map(
+            (section) => !!section?.DATE
+          ),
+        },
         {
           type: FieldType.TEXT,
           id: "entryIntoForceDate",
-          label: "Datum des Inkrafttretens",
-          value: norm.entryIntoForceDate,
+          label: "Bestimmtes Inkrafttretedatum",
+          values: norm.metadataSections?.ENTRY_INTO_FORCE?.map(
+            (section) => section?.DATE?.[0]
+          ),
+        },
+        {
+          type: FieldType.RADIO,
+          id: "entryIntoForceUndefinedSelection",
+          label: "unbestimmt",
+          values: norm.metadataSections?.ENTRY_INTO_FORCE?.map(
+            (section) => !!section?.UNDEFINED_DATE
+          ),
         },
         {
           type: FieldType.DROPDOWN,
-          id: "entryIntoForceDateState",
-          label: "Unbestimmtes Datum des Inkrafttretens",
-          value: norm.entryIntoForceDateState,
-        },
-        {
-          type: FieldType.TEXT,
-          id: "principleEntryIntoForceDate",
-          label: "Grundsätzliches Inkrafttretedatum",
-          value: norm.principleEntryIntoForceDate,
-        },
-        {
-          type: FieldType.DROPDOWN,
-          id: "principleEntryIntoForceDateState",
-          label: "Unbestimmtes grundsätzliches Inkrafttretedatum",
-          value: norm.principleEntryIntoForceDateState,
-        },
-        {
-          type: FieldType.TEXT,
-          id: "divergentEntryIntoForceDate",
-          label: "Bestimmtes abweichendes Inkrafttretedatum",
-          value: norm.divergentEntryIntoForceDate,
-        },
-        {
-          type: FieldType.DROPDOWN,
-          id: "divergentEntryIntoForceDateState",
-          label: "Unbestimmtes abweichendes Inkrafttretedatum",
-          value: norm.divergentEntryIntoForceDateState,
+          id: "entryIntoForceUndefinedDateState",
+          label: "Unbestimmtes Inkrafttretedatum",
+          values: norm.metadataSections?.ENTRY_INTO_FORCE?.map((section) =>
+            undefinedDateToDropdownEntry(section?.UNDEFINED_DATE?.[0])
+          ),
         },
       ],
     },
     {
-      heading: "Außerkrafttreten",
+      heading: "Grundsätzliches Inkrafttretedatum",
+      isExpandableNotRepeatable: true,
+      id: "principleEntryIntoForces",
       fields: [
         {
+          type: FieldType.RADIO,
+          id: "principleEntryIntoForceSelection",
+          label: "bestimmt",
+          values: norm.metadataSections?.PRINCIPLE_ENTRY_INTO_FORCE?.map(
+            (section) => !!section?.DATE
+          ),
+        },
+        {
           type: FieldType.TEXT,
-          id: "expirationDate",
-          label: "Datum des Außerkrafttretens",
-          value: norm.expirationDate,
+          id: "principleEntryIntoForceDate",
+          label: "Bestimmtes grundsätzliches Inkrafttretedatum",
+          values: norm.metadataSections?.PRINCIPLE_ENTRY_INTO_FORCE?.map(
+            (section) => section?.DATE?.[0]
+          ),
+        },
+        {
+          type: FieldType.RADIO,
+          id: "principleEntryIntoForceUndefinedSelection",
+          label: "unbestimmt",
+          values: norm.metadataSections?.PRINCIPLE_ENTRY_INTO_FORCE?.map(
+            (section) => !!section?.UNDEFINED_DATE
+          ),
         },
         {
           type: FieldType.DROPDOWN,
-          id: "expirationDateState",
-          label: "Unbestimmtes Datum des Außerkrafttretens",
-          value: norm.expirationDateState,
+          id: "principleEntryIntoForceUndefinedDateState",
+          label: "Unbestimmtes grundsätzliches Inkrafttretedatum",
+          values: norm.metadataSections?.PRINCIPLE_ENTRY_INTO_FORCE?.map(
+            (section) =>
+              undefinedDateToDropdownEntry(section?.UNDEFINED_DATE?.[0])
+          ),
+        },
+      ],
+    },
+    {
+      heading: "Abweichendes Inkrafttretedatum",
+      id: "divergentEntryIntoForces",
+      isRepeatedSection: true,
+      fields: [
+        {
+          type: FieldType.RADIO,
+          id: "divergentEntryIntoForceDefinedSelection",
+          label: "bestimmt",
+          values: norm.metadataSections?.DIVERGENT_ENTRY_INTO_FORCE?.map(
+            (section) => !!section?.DIVERGENT_ENTRY_INTO_FORCE_DEFINED
+          ),
+        },
+        {
+          type: FieldType.TEXT,
+          id: "divergentEntryIntoForceDefinedDate",
+          label: "Bestimmtes abweichendes Inkrafttretedatum",
+          values: norm.metadataSections?.DIVERGENT_ENTRY_INTO_FORCE?.map(
+            (section) => section?.DIVERGENT_ENTRY_INTO_FORCE_DEFINED?.[0]
+          ).map((section) => section?.DATE?.[0]),
         },
         {
           type: FieldType.CHECKBOX,
-          id: "isExpirationDateTemp",
-          label: "Befristet",
-          value: norm.isExpirationDateTemp,
+          id: [
+            MetadataSectionName.DIVERGENT_ENTRY_INTO_FORCE_DEFINED,
+            NormCategory.AMENDMENT_NORM,
+          ].join("-"),
+          label: "Änderungsnorm",
+          values: norm.metadataSections?.DIVERGENT_ENTRY_INTO_FORCE?.map(
+            (section) => section?.DIVERGENT_ENTRY_INTO_FORCE_DEFINED?.[0]
+          ).map((section) =>
+            section === undefined
+              ? undefined
+              : !!section?.NORM_CATEGORY?.find(
+                  (category) => category == NormCategory.AMENDMENT_NORM
+                )
+          ),
+        },
+        {
+          type: FieldType.CHECKBOX,
+          id: [
+            MetadataSectionName.DIVERGENT_ENTRY_INTO_FORCE_DEFINED,
+            NormCategory.BASE_NORM,
+          ].join("-"),
+          label: "Stammnorm",
+          values: norm.metadataSections?.DIVERGENT_ENTRY_INTO_FORCE?.map(
+            (section) => section?.DIVERGENT_ENTRY_INTO_FORCE_DEFINED?.[0]
+          ).map((section) =>
+            section === undefined
+              ? undefined
+              : !!section?.NORM_CATEGORY?.find(
+                  (category) => category == NormCategory.BASE_NORM
+                )
+          ),
+        },
+        {
+          type: FieldType.CHECKBOX,
+          id: [
+            MetadataSectionName.DIVERGENT_ENTRY_INTO_FORCE_DEFINED,
+            NormCategory.TRANSITIONAL_NORM,
+          ].join("-"),
+          label: "Übergangsnorm",
+          values: norm.metadataSections?.DIVERGENT_ENTRY_INTO_FORCE?.map(
+            (section) => section?.DIVERGENT_ENTRY_INTO_FORCE_DEFINED?.[0]
+          ).map((section) =>
+            section === undefined
+              ? undefined
+              : !!section?.NORM_CATEGORY?.find(
+                  (category) => category == NormCategory.TRANSITIONAL_NORM
+                )
+          ),
+        },
+        {
+          type: FieldType.RADIO,
+          id: "divergentEntryIntoForceUndefinedSelection",
+          label: "unbestimmt",
+          values: norm.metadataSections?.DIVERGENT_ENTRY_INTO_FORCE?.map(
+            (section) => !!section?.DIVERGENT_ENTRY_INTO_FORCE_UNDEFINED
+          ),
+        },
+        {
+          type: FieldType.DROPDOWN,
+          id: "divergentEntryIntoForceUndefinedDate",
+          label: "Unbestimmtes abweichendes Inkrafttretedatum",
+          values: norm.metadataSections?.DIVERGENT_ENTRY_INTO_FORCE?.map(
+            (section) => section?.DIVERGENT_ENTRY_INTO_FORCE_UNDEFINED?.[0]
+          ).map((section) =>
+            undefinedDateToDropdownEntry(section?.UNDEFINED_DATE?.[0])
+          ),
+        },
+        {
+          type: FieldType.CHECKBOX,
+          id: [
+            MetadataSectionName.DIVERGENT_ENTRY_INTO_FORCE_UNDEFINED,
+            NormCategory.AMENDMENT_NORM,
+          ].join("-"),
+          label: "Änderungsnorm",
+          values: norm.metadataSections?.DIVERGENT_ENTRY_INTO_FORCE?.map(
+            (section) => section?.DIVERGENT_ENTRY_INTO_FORCE_UNDEFINED?.[0]
+          ).map((section) =>
+            section === undefined
+              ? undefined
+              : !!section?.NORM_CATEGORY?.find(
+                  (category) => category == NormCategory.AMENDMENT_NORM
+                )
+          ),
+        },
+        {
+          type: FieldType.CHECKBOX,
+          id: [
+            MetadataSectionName.DIVERGENT_ENTRY_INTO_FORCE_UNDEFINED,
+            NormCategory.BASE_NORM,
+          ].join("-"),
+          label: "Stammnorm",
+          values: norm.metadataSections?.DIVERGENT_ENTRY_INTO_FORCE?.map(
+            (section) => section?.DIVERGENT_ENTRY_INTO_FORCE_UNDEFINED?.[0]
+          ).map((section) =>
+            section === undefined
+              ? undefined
+              : !!section?.NORM_CATEGORY?.find(
+                  (category) => category == NormCategory.BASE_NORM
+                )
+          ),
+        },
+        {
+          type: FieldType.CHECKBOX,
+          id: [
+            MetadataSectionName.DIVERGENT_ENTRY_INTO_FORCE_UNDEFINED,
+            NormCategory.TRANSITIONAL_NORM,
+          ].join("-"),
+          label: "Übergangsnorm",
+          values: norm.metadataSections?.DIVERGENT_ENTRY_INTO_FORCE?.map(
+            (section) => section?.DIVERGENT_ENTRY_INTO_FORCE_UNDEFINED?.[0]
+          ).map((section) =>
+            section === undefined
+              ? undefined
+              : !!section?.NORM_CATEGORY?.find(
+                  (category) => category == NormCategory.TRANSITIONAL_NORM
+                )
+          ),
+        },
+      ],
+    },
+    {
+      heading: "Datum des Außerkrafttretens",
+      isExpandableNotRepeatable: true,
+      id: "expirations",
+      fields: [
+        {
+          type: FieldType.RADIO,
+          id: "expirationSelection",
+          label: "bestimmt",
+          values: norm.metadataSections?.EXPIRATION?.map(
+            (section) => !!section?.DATE
+          ),
+        },
+        {
+          type: FieldType.TEXT,
+          id: "expirationDate",
+          label: "Bestimmtes Außerkrafttretedatum",
+          values: norm.metadataSections?.EXPIRATION?.map(
+            (section) => section?.DATE?.[0]
+          ),
+        },
+        {
+          type: FieldType.RADIO,
+          id: "expirationUndefinedSelection",
+          label: "unbestimmt",
+          values: norm.metadataSections?.EXPIRATION?.map(
+            (section) => !!section?.UNDEFINED_DATE
+          ),
+        },
+        {
+          type: FieldType.DROPDOWN,
+          id: "expirationUndefinedDate",
+          label: "Unbestimmtes Außerkrafttretedatum",
+          values: norm.metadataSections?.EXPIRATION?.map((section) =>
+            undefinedDateToDropdownEntry(section?.UNDEFINED_DATE?.[0])
+          ),
+        },
+      ],
+    },
+    {
+      heading: "Grundsätzliches Außerkrafttretedatum",
+      isExpandableNotRepeatable: true,
+      id: "principleExpirations",
+      fields: [
+        {
+          type: FieldType.RADIO,
+          id: "principleExpirationSelection",
+          label: "bestimmt",
+          values: norm.metadataSections?.PRINCIPLE_EXPIRATION?.map(
+            (section) => !!section?.DATE
+          ),
         },
         {
           type: FieldType.TEXT,
           id: "principleExpirationDate",
-          label: "Grundsätzliches Außerkrafttretedatum",
-          value: norm.principleExpirationDate,
+          label: "Bestimmtes grundsätzliches Außerkrafttretedatum",
+          values: norm.metadataSections?.PRINCIPLE_EXPIRATION?.map(
+            (section) => section?.DATE?.[0]
+          ),
+        },
+        {
+          type: FieldType.RADIO,
+          id: "principleExpirationUndefinedSelection",
+          label: "unbestimmt",
+          values: norm.metadataSections?.PRINCIPLE_EXPIRATION?.map(
+            (section) => !!section?.UNDEFINED_DATE
+          ),
         },
         {
           type: FieldType.DROPDOWN,
-          id: "principleExpirationDateState",
-          label: "Unbestimmtes grundsätzliches Außerkrafttretdatum",
-          value: norm.principleExpirationDateState,
+          id: "principleExpirationUndefinedDate",
+          label: "Unbestimmtes grundsätzliches Außerkrafttretedatum",
+          values: norm.metadataSections?.PRINCIPLE_EXPIRATION?.map((section) =>
+            undefinedDateToDropdownEntry(section?.UNDEFINED_DATE?.[0])
+          ),
+        },
+      ],
+    },
+    {
+      heading: "Abweichendes Außerkrafttretedatum",
+      id: "divergentExpirations",
+      isRepeatedSection: true,
+      fields: [
+        {
+          type: FieldType.RADIO,
+          id: "divergentExpirationDefinedSelection",
+          label: "bestimmt",
+          values: norm.metadataSections?.DIVERGENT_EXPIRATION?.map(
+            (section) => !!section?.DIVERGENT_EXPIRATION_DEFINED
+          ),
         },
         {
           type: FieldType.TEXT,
-          id: "divergentExpirationDate",
+          id: "divergentExpirationDefinedDate",
           label: "Bestimmtes abweichendes Außerkrafttretedatum",
-          value: norm.divergentExpirationDate,
+          values: norm.metadataSections?.DIVERGENT_EXPIRATION?.map(
+            (section) => section?.DIVERGENT_EXPIRATION_DEFINED?.[0]
+          ).map((section) => section?.DATE?.[0]),
+        },
+        {
+          type: FieldType.CHECKBOX,
+          id: [
+            MetadataSectionName.DIVERGENT_EXPIRATION_DEFINED,
+            NormCategory.AMENDMENT_NORM,
+          ].join("-"),
+          label: "Änderungsnorm",
+          values: norm.metadataSections?.DIVERGENT_EXPIRATION?.map(
+            (section) => section?.DIVERGENT_EXPIRATION_DEFINED?.[0]
+          ).map((section) =>
+            section === undefined
+              ? undefined
+              : !!section?.NORM_CATEGORY?.find(
+                  (category) => category == NormCategory.AMENDMENT_NORM
+                )
+          ),
+        },
+        {
+          type: FieldType.CHECKBOX,
+          id: [
+            MetadataSectionName.DIVERGENT_EXPIRATION_DEFINED,
+            NormCategory.BASE_NORM,
+          ].join("-"),
+          label: "Stammnorm",
+          values: norm.metadataSections?.DIVERGENT_EXPIRATION?.map(
+            (section) => section?.DIVERGENT_EXPIRATION_DEFINED?.[0]
+          ).map((section) =>
+            section === undefined
+              ? undefined
+              : !!section?.NORM_CATEGORY?.find(
+                  (category) => category == NormCategory.BASE_NORM
+                )
+          ),
+        },
+        {
+          type: FieldType.CHECKBOX,
+          id: [
+            MetadataSectionName.DIVERGENT_EXPIRATION_DEFINED,
+            NormCategory.TRANSITIONAL_NORM,
+          ].join("-"),
+          label: "Übergangsnorm",
+          values: norm.metadataSections?.DIVERGENT_EXPIRATION?.map(
+            (section) => section?.DIVERGENT_EXPIRATION_DEFINED?.[0]
+          ).map((section) =>
+            section === undefined
+              ? undefined
+              : !!section?.NORM_CATEGORY?.find(
+                  (category) => category == NormCategory.TRANSITIONAL_NORM
+                )
+          ),
+        },
+        {
+          type: FieldType.RADIO,
+          id: "divergentExpirationUndefinedSelection",
+          label: "unbestimmt",
+          values: norm.metadataSections?.DIVERGENT_EXPIRATION?.map(
+            (section) => !!section?.DIVERGENT_EXPIRATION_UNDEFINED
+          ),
         },
         {
           type: FieldType.DROPDOWN,
-          id: "divergentExpirationDateState",
-          label: "Unbestimmtes abweichendes Außerkrafttretdatum",
-          value: norm.divergentExpirationDateState,
+          id: "divergentExpirationUndefinedDate",
+          label: "Unbestimmtes abweichendes Außerkrafttretedatum",
+          values: norm.metadataSections?.DIVERGENT_EXPIRATION?.map(
+            (section) => section?.DIVERGENT_EXPIRATION_UNDEFINED?.[0]
+          )
+            .map((section) => section?.UNDEFINED_DATE?.[0])
+            .map(undefinedDateToDropdownEntry),
         },
         {
-          type: FieldType.TEXT,
-          id: "expirationNormCategory",
-          label: "Art der Norm",
-          value: norm.expirationNormCategory,
+          type: FieldType.CHECKBOX,
+          id: [
+            MetadataSectionName.DIVERGENT_EXPIRATION_UNDEFINED,
+            NormCategory.AMENDMENT_NORM,
+          ].join("-"),
+          label: "Änderungsnorm",
+          values: norm.metadataSections?.DIVERGENT_EXPIRATION?.map(
+            (section) => section?.DIVERGENT_EXPIRATION_UNDEFINED?.[0]
+          ).map((section) =>
+            section === undefined
+              ? undefined
+              : !!section?.NORM_CATEGORY?.find(
+                  (category) => category == NormCategory.AMENDMENT_NORM
+                )
+          ),
+        },
+        {
+          type: FieldType.CHECKBOX,
+          id: [
+            MetadataSectionName.DIVERGENT_EXPIRATION_UNDEFINED,
+            NormCategory.BASE_NORM,
+          ].join("-"),
+          label: "Stammnorm",
+          values: norm.metadataSections?.DIVERGENT_EXPIRATION?.map(
+            (section) => section?.DIVERGENT_EXPIRATION_UNDEFINED?.[0]
+          ).map((section) =>
+            section === undefined
+              ? undefined
+              : !!section?.NORM_CATEGORY?.find(
+                  (category) => category == NormCategory.BASE_NORM
+                )
+          ),
+        },
+        {
+          type: FieldType.CHECKBOX,
+          id: [
+            MetadataSectionName.DIVERGENT_EXPIRATION_UNDEFINED,
+            NormCategory.TRANSITIONAL_NORM,
+          ].join("-"),
+          label: "Übergangsnorm",
+          values: norm.metadataSections?.DIVERGENT_EXPIRATION?.map(
+            (section) => section?.DIVERGENT_EXPIRATION_UNDEFINED?.[0]
+          ).map((section) =>
+            section === undefined
+              ? undefined
+              : !!section?.NORM_CATEGORY?.find(
+                  (category) => category == NormCategory.TRANSITIONAL_NORM
+                )
+          ),
         },
       ],
     },
@@ -505,158 +908,219 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
     },
     {
       heading: "Amtliche Fundstelle",
-      sections: [
+      id: "officialReferences",
+      isRepeatedSection: true,
+      fields: [
         {
-          heading: "Papierverkündung",
-          fields: [
-            {
-              type: FieldType.TEXT,
-              id: "printAnnouncementGazette",
-              label: "Verkündungsblatt",
-              value: norm.printAnnouncementGazette,
-            },
-            {
-              type: FieldType.TEXT,
-              id: "printAnnouncementYear",
-              label: "Jahr",
-              value: norm.printAnnouncementYear,
-            },
-            {
-              type: FieldType.TEXT,
-              id: "printAnnouncementNumber",
-              label: "Nummer",
-              value: norm.printAnnouncementNumber,
-            },
-            {
-              type: FieldType.TEXT,
-              id: "printAnnouncementPage",
-              label: "Seitenzahl",
-              value: norm.printAnnouncementPage,
-            },
-            {
-              type: FieldType.TEXT,
-              id: "printAnnouncementInfo",
-              label: "Zusatzangaben",
-              value: norm.printAnnouncementInfo,
-            },
-            {
-              type: FieldType.TEXT,
-              id: "printAnnouncementExplanations",
-              label: "Erläuterungen",
-              value: norm.printAnnouncementExplanations,
-            },
-          ],
+          type: FieldType.RADIO,
+          id: "printAnnouncementSelection",
+          label: "Papierverkündungsblatt",
+          values: norm.metadataSections?.OFFICIAL_REFERENCE?.map(
+            (section) => !!section?.PRINT_ANNOUNCEMENT
+          ),
         },
         {
-          heading: "Elektronisches Verkündungsblatt",
-          fields: [
-            {
-              type: FieldType.TEXT,
-              id: "digitalAnnouncementMedium",
-              label: "Verkündungsmedium",
-              value: norm.digitalAnnouncementMedium,
-            },
-            {
-              type: FieldType.TEXT,
-              id: "digitalAnnouncementDate",
-              label: "Verkündungsdatum",
-              value: norm.digitalAnnouncementDate,
-            },
-            {
-              type: FieldType.TEXT,
-              id: "digitalAnnouncementEdition",
-              label: "Ausgabenummer",
-              value: norm.digitalAnnouncementEdition,
-            },
-            {
-              type: FieldType.TEXT,
-              id: "digitalAnnouncementYear",
-              label: "Jahr",
-              value: norm.digitalAnnouncementYear,
-            },
-            {
-              type: FieldType.TEXT,
-              id: "digitalAnnouncementArea",
-              label: "Bereich der Veröffentlichung",
-              value: norm.digitalAnnouncementArea,
-            },
-            {
-              type: FieldType.TEXT,
-              id: "digitalAnnouncementAreaNumber",
-              label: "Nummer der Veröffentlichung im jeweiligen Bereich",
-              value: norm.digitalAnnouncementAreaNumber,
-            },
-            {
-              type: FieldType.TEXT,
-              id: "digitalAnnouncementInfo",
-              label: "Zusatzangaben",
-              value: norm.digitalAnnouncementInfo,
-            },
-            {
-              type: FieldType.TEXT,
-              id: "digitalAnnouncementExplanations",
-              label: "Erläuterungen",
-              value: norm.digitalAnnouncementExplanations,
-            },
-          ],
+          type: FieldType.TEXT,
+          id: "printAnnouncementGazette",
+          label: "Verkündungsblatt",
+          values: norm.metadataSections?.OFFICIAL_REFERENCE?.map(
+            (section) => section?.PRINT_ANNOUNCEMENT?.[0]
+          ).map((section) => section?.ANNOUNCEMENT_GAZETTE?.[0]),
         },
         {
-          heading: "Amtsblatt der EU",
-          fields: [
-            {
-              type: FieldType.TEXT,
-              id: "euAnnouncementGazette",
-              label: "Amtsblatt der EU",
-              value: norm.euAnnouncementGazette,
-            },
-            {
-              type: FieldType.TEXT,
-              id: "euAnnouncementYear",
-              label: "Jahresangabe",
-              value: norm.euAnnouncementYear,
-            },
-            {
-              type: FieldType.TEXT,
-              id: "euAnnouncementSeries",
-              label: "Reihe",
-              value: norm.euAnnouncementSeries,
-            },
-            {
-              type: FieldType.TEXT,
-              id: "euAnnouncementNumber",
-              label: "Nummer des Amtsblatts",
-              value: norm.euAnnouncementNumber,
-            },
-            {
-              type: FieldType.TEXT,
-              id: "euAnnouncementPage",
-              label: "Seitenzahl",
-              value: norm.euAnnouncementPage,
-            },
-            {
-              type: FieldType.TEXT,
-              id: "euAnnouncementInfo",
-              label: "Zusatzangaben",
-              value: norm.euAnnouncementInfo,
-            },
-            {
-              type: FieldType.TEXT,
-              id: "euAnnouncementExplanations",
-              label: "Erläuterungen",
-              value: norm.euAnnouncementExplanations,
-            },
-          ],
+          type: FieldType.TEXT,
+          id: "printAnnouncementYear",
+          label: "Jahr",
+          values: norm.metadataSections?.OFFICIAL_REFERENCE?.map(
+            (section) => section?.PRINT_ANNOUNCEMENT?.[0]
+          ).map((section) => section?.YEAR?.[0]),
         },
         {
-          heading: "Sonstige amtliche Fundstelle",
-          fields: [
-            {
-              type: FieldType.TEXT,
-              id: "otherOfficialAnnouncement",
-              label: "Sonstige amtliche Fundstelle",
-              value: norm.otherOfficialAnnouncement,
-            },
-          ],
+          type: FieldType.TEXT,
+          id: "printAnnouncementNumber",
+          label: "Nummer",
+          values: norm.metadataSections?.OFFICIAL_REFERENCE?.map(
+            (section) => section?.PRINT_ANNOUNCEMENT?.[0]
+          ).map((section) => section?.NUMBER?.[0]),
+        },
+        {
+          type: FieldType.TEXT,
+          id: "printAnnouncementPage",
+          label: "Seitenzahl",
+          values: norm.metadataSections?.OFFICIAL_REFERENCE?.map(
+            (section) => section?.PRINT_ANNOUNCEMENT?.[0]
+          ).map((section) => section?.PAGE?.[0]),
+        },
+        {
+          type: FieldType.TEXT,
+          id: "printAnnouncementInfo",
+          label: "Zusatzangaben",
+          values: norm.metadataSections?.OFFICIAL_REFERENCE?.map(
+            (section) => section?.PRINT_ANNOUNCEMENT?.[0]
+          ).map((section) => section?.ADDITIONAL_INFO?.[0]),
+        },
+        {
+          type: FieldType.TEXT,
+          id: "printAnnouncementExplanations",
+          label: "Erläuterungen",
+          values: norm.metadataSections?.OFFICIAL_REFERENCE?.map(
+            (section) => section?.PRINT_ANNOUNCEMENT?.[0]
+          ).map((section) => section?.EXPLANATION?.[0]),
+        },
+        {
+          type: FieldType.RADIO,
+          id: "digitalAnnouncementSelection",
+          label: "Elektronisches Verkündungsblatt",
+          values: norm.metadataSections?.OFFICIAL_REFERENCE?.map(
+            (section) => !!section?.DIGITAL_ANNOUNCEMENT
+          ),
+        },
+        {
+          type: FieldType.TEXT,
+          id: "digitalAnnouncementMedium",
+          label: "Verkündungsmedium",
+          values: norm.metadataSections?.OFFICIAL_REFERENCE?.map(
+            (section) => section?.DIGITAL_ANNOUNCEMENT?.[0]
+          ).map((section) => section?.ANNOUNCEMENT_MEDIUM?.[0]),
+        },
+        {
+          type: FieldType.TEXT,
+          id: "digitalAnnouncementDate",
+          label: "Verkündungsdatum",
+          values: norm.metadataSections?.OFFICIAL_REFERENCE?.map(
+            (section) => section?.DIGITAL_ANNOUNCEMENT?.[0]
+          ).map((section) => section?.DATE?.[0]),
+        },
+        {
+          type: FieldType.TEXT,
+          id: "digitalAnnouncementEdition",
+          label: "Ausgabenummer",
+          values: norm.metadataSections?.OFFICIAL_REFERENCE?.map(
+            (section) => section?.DIGITAL_ANNOUNCEMENT?.[0]
+          ).map((section) => section?.EDITION?.[0]),
+        },
+        {
+          type: FieldType.TEXT,
+          id: "digitalAnnouncementYear",
+          label: "Jahr",
+          values: norm.metadataSections?.OFFICIAL_REFERENCE?.map(
+            (section) => section?.DIGITAL_ANNOUNCEMENT?.[0]
+          ).map((section) => section?.YEAR?.[0]),
+        },
+        {
+          type: FieldType.TEXT,
+          id: "digitalAnnouncementArea",
+          label: "Bereich der Veröffentlichung",
+          values: norm.metadataSections?.OFFICIAL_REFERENCE?.map(
+            (section) => section?.DIGITAL_ANNOUNCEMENT?.[0]
+          ).map((section) => section?.AREA_OF_PUBLICATION?.[0]),
+        },
+        {
+          type: FieldType.TEXT,
+          id: "digitalAnnouncementAreaNumber",
+          label: "Nummer der Veröffentlichung im jeweiligen Bereich",
+          values: norm.metadataSections?.OFFICIAL_REFERENCE?.map(
+            (section) => section?.DIGITAL_ANNOUNCEMENT?.[0]
+          ).map(
+            (section) =>
+              section?.NUMBER_OF_THE_PUBLICATION_IN_THE_RESPECTIVE_AREA?.[0]
+          ),
+        },
+        {
+          type: FieldType.TEXT,
+          id: "digitalAnnouncementInfo",
+          label: "Zusatzangaben",
+          values: norm.metadataSections?.OFFICIAL_REFERENCE?.map(
+            (section) => section?.DIGITAL_ANNOUNCEMENT?.[0]
+          ).map((section) => section?.ADDITIONAL_INFO?.[0]),
+        },
+        {
+          type: FieldType.TEXT,
+          id: "digitalAnnouncementExplanations",
+          label: "Erläuterungen",
+          values: norm.metadataSections?.OFFICIAL_REFERENCE?.map(
+            (section) => section?.DIGITAL_ANNOUNCEMENT?.[0]
+          ).map((section) => section?.EXPLANATION?.[0]),
+        },
+        {
+          type: FieldType.RADIO,
+          id: "euAnnouncementSelection",
+          label: "Amtsblatt der EU",
+          values: norm.metadataSections?.OFFICIAL_REFERENCE?.map(
+            (section) => !!section?.EU_ANNOUNCEMENT
+          ),
+        },
+        {
+          type: FieldType.TEXT,
+          id: "euAnnouncementGazette",
+          label: "Amtsblatt der EU",
+          values: norm.metadataSections?.OFFICIAL_REFERENCE?.map(
+            (section) => section?.EU_ANNOUNCEMENT?.[0]
+          ).map((section) => section?.EU_GOVERNMENT_GAZETTE?.[0]),
+        },
+        {
+          type: FieldType.TEXT,
+          id: "euAnnouncementYear",
+          label: "Jahresangabe",
+          values: norm.metadataSections?.OFFICIAL_REFERENCE?.map(
+            (section) => section?.EU_ANNOUNCEMENT?.[0]
+          ).map((section) => section?.YEAR?.[0]),
+        },
+        {
+          type: FieldType.TEXT,
+          id: "euAnnouncementSeries",
+          label: "Reihe",
+          values: norm.metadataSections?.OFFICIAL_REFERENCE?.map(
+            (section) => section?.EU_ANNOUNCEMENT?.[0]
+          ).map((section) => section?.SERIES?.[0]),
+        },
+        {
+          type: FieldType.TEXT,
+          id: "euAnnouncementNumber",
+          label: "Nummer des Amtsblatts",
+          values: norm.metadataSections?.OFFICIAL_REFERENCE?.map(
+            (section) => section?.EU_ANNOUNCEMENT?.[0]
+          ).map((section) => section?.NUMBER?.[0]),
+        },
+        {
+          type: FieldType.TEXT,
+          id: "euAnnouncementPage",
+          label: "Seitenzahl",
+          values: norm.metadataSections?.OFFICIAL_REFERENCE?.map(
+            (section) => section?.EU_ANNOUNCEMENT?.[0]
+          ).map((section) => section?.PAGE?.[0]),
+        },
+        {
+          type: FieldType.TEXT,
+          id: "euAnnouncementInfo",
+          label: "Zusatzangaben",
+          values: norm.metadataSections?.OFFICIAL_REFERENCE?.map(
+            (section) => section?.EU_ANNOUNCEMENT?.[0]
+          ).map((section) => section?.ADDITIONAL_INFO?.[0]),
+        },
+        {
+          type: FieldType.TEXT,
+          id: "euAnnouncementExplanations",
+          label: "Erläuterungen",
+          values: norm.metadataSections?.OFFICIAL_REFERENCE?.map(
+            (section) => section?.EU_ANNOUNCEMENT?.[0]
+          ).map((section) => section?.EXPLANATION?.[0]),
+        },
+        {
+          type: FieldType.RADIO,
+          id: "otherAnnouncementSelection",
+          label: "Sonstige amtliche Fundstelle",
+          values: norm.metadataSections?.OFFICIAL_REFERENCE?.map(
+            (section) => !!section?.OTHER_OFFICIAL_ANNOUNCEMENT
+          ),
+        },
+        {
+          type: FieldType.TEXT,
+          id: "otherOfficialAnnouncement",
+          label: "Sonstige amtliche Fundstelle",
+          values: norm.metadataSections?.OFFICIAL_REFERENCE?.map(
+            (section) => section?.OTHER_OFFICIAL_ANNOUNCEMENT?.[0]
+          ).map((section) => section?.OTHER_OFFICIAL_REFERENCE?.[0]),
         },
       ],
     },
@@ -858,17 +1322,21 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
     },
     {
       heading: "Aktivverweisung",
+      isRepeatedSection: true,
+      id: "categorizedReferences",
       fields: [
         {
           type: FieldType.TEXT,
-          id: "categorizedReference",
+          id: "categorizedReferenceText",
           label: "Aktivverweisung",
-          value: norm.categorizedReference,
+          values: norm.metadataSections?.CATEGORIZED_REFERENCE?.map(
+            (section) => section?.TEXT?.[0]
+          ),
         },
       ],
     },
     {
-      heading: "Fußnote",
+      heading: "Fußnoten",
       fields: [
         {
           type: FieldType.TEXT,

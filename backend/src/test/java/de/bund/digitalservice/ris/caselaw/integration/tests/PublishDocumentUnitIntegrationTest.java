@@ -1,15 +1,20 @@
 package de.bund.digitalservice.ris.caselaw.integration.tests;
 
+import static de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatus.PUBLISHED;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
 
 import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentNumberService;
+import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentUnitStatusService;
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentUnitController;
+import de.bund.digitalservice.ris.caselaw.adapter.KeycloakUserService;
 import de.bund.digitalservice.ris.caselaw.adapter.MockXmlExporter;
 import de.bund.digitalservice.ris.caselaw.adapter.XmlEMailPublishService;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentUnitRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentUnitStatusRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseXmlMailRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitStatusDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.PostgresDocumentUnitRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.PostgresXmlMailRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.XmlMailDTO;
@@ -42,10 +47,12 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
 @RISIntegrationTest(
     imports = {
       DocumentUnitService.class,
+      KeycloakUserService.class,
       DatabaseDocumentNumberService.class,
       PostgresDocumentUnitRepositoryImpl.class,
       PostgresXmlMailRepositoryImpl.class,
       XmlEMailPublishService.class,
+      DatabaseDocumentUnitStatusService.class,
       MockXmlExporter.class,
       FlywayConfig.class,
       PostgresConfig.class
@@ -72,6 +79,7 @@ class PublishDocumentUnitIntegrationTest {
 
   @Autowired private DatabaseDocumentUnitRepository repository;
   @Autowired private DatabaseXmlMailRepository xmlMailRepository;
+  @Autowired private DatabaseDocumentUnitStatusRepository documentUnitStatusRepository;
 
   @MockBean private S3AsyncClient s3AsyncClient;
   @MockBean private HttpMailSender mailSender;
@@ -80,6 +88,7 @@ class PublishDocumentUnitIntegrationTest {
   void cleanUp() {
     xmlMailRepository.deleteAll().block();
     repository.deleteAll().block();
+    documentUnitStatusRepository.deleteAll().block();
   }
 
   @Test
@@ -90,14 +99,21 @@ class PublishDocumentUnitIntegrationTest {
             .uuid(documentUnitUuid1)
             .documentnumber("docnr12345678")
             .creationtimestamp(Instant.now())
+            .decisionDate(Instant.now())
             .build();
     DocumentUnitDTO savedDocumentUnitDTO = repository.save(documentUnitDTO).block();
+
+    assertThat(repository.findAll().collectList().block()).hasSize(1);
+
     XmlMailDTO expectedXmlMailDTO =
         new XmlMailDTO(
             1L,
             savedDocumentUnitDTO.getId(),
             "exporter@neuris.de",
-            "id=juris name=NeuRIS da=R df=X dt=N mod=T ld=" + DELIVER_DATE + " vg=Testvorgang",
+            "id=juris name=NeuRIS da=R df=X dt=N mod=T ld="
+                + DELIVER_DATE
+                + " vg="
+                + savedDocumentUnitDTO.getDocumentnumber(),
             "xml",
             "200",
             "message 1|message 2",
@@ -108,7 +124,10 @@ class PublishDocumentUnitIntegrationTest {
         new XmlMail(
             documentUnitUuid1,
             "exporter@neuris.de",
-            "id=juris name=NeuRIS da=R df=X dt=N mod=T ld=" + DELIVER_DATE + " vg=Testvorgang",
+            "id=juris name=NeuRIS da=R df=X dt=N mod=T ld="
+                + DELIVER_DATE
+                + " vg="
+                + savedDocumentUnitDTO.getDocumentnumber(),
             "xml",
             "200",
             List.of("message 1", "message 2"),
@@ -129,12 +148,11 @@ class PublishDocumentUnitIntegrationTest {
         .isOk()
         .expectBody(XmlMailResponse.class)
         .consumeWith(
-            response -> {
-              assertThat(response.getResponseBody())
-                  .usingRecursiveComparison()
-                  .ignoringFields("publishDate")
-                  .isEqualTo(expectedXmlResultObject);
-            });
+            response ->
+                assertThat(response.getResponseBody())
+                    .usingRecursiveComparison()
+                    .ignoringFields("publishDate")
+                    .isEqualTo(expectedXmlResultObject));
 
     List<XmlMailDTO> xmlMailList = xmlMailRepository.findAll().collectList().block();
     assertThat(xmlMailList).hasSize(1);
@@ -143,6 +161,65 @@ class PublishDocumentUnitIntegrationTest {
         .usingRecursiveComparison()
         .ignoringFields("publishDate", "id")
         .isEqualTo(expectedXmlMailDTO);
+
+    List<DocumentUnitStatusDTO> statusList =
+        documentUnitStatusRepository.findAll().collectList().block();
+    DocumentUnitStatusDTO status = statusList.get(statusList.size() - 1);
+    assertThat(status.getStatus()).isEqualTo(PUBLISHED);
+    assertThat(status.getDocumentUnitId()).isEqualTo(documentUnitDTO.getUuid());
+    assertThat(status.getCreatedAt()).isEqualTo(xmlMail.publishDate());
+  }
+
+  @Test
+  void testPublishDocumentUnitWithNotAllMandatoryFieldsFilled_shouldNotUpdateStatus() {
+    UUID documentUnitUuid = UUID.randomUUID();
+    DocumentUnitDTO documentUnitDTO =
+        DocumentUnitDTO.builder()
+            .uuid(documentUnitUuid)
+            .documentnumber("docnr12345678")
+            .creationtimestamp(Instant.now())
+            .build();
+    DocumentUnitDTO savedDocumentUnitDTO = repository.save(documentUnitDTO).block();
+
+    assertThat(repository.findAll().collectList().block()).hasSize(1);
+
+    XmlMail expectedXmlMail =
+        new XmlMail(
+            documentUnitUuid,
+            null,
+            null,
+            null,
+            "400",
+            List.of("message 1", "message 2"),
+            "text.xml",
+            null,
+            PublishState.UNKNOWN);
+    XmlMailResponse expectedXmlResultObject =
+        new XmlMailResponse(documentUnitUuid, expectedXmlMail);
+
+    webClient
+        .mutateWith(csrf())
+        .put()
+        .uri("/api/v1/caselaw/documentunits/" + documentUnitUuid + "/publish")
+        .contentType(MediaType.TEXT_PLAIN)
+        .bodyValue("exporter@neuris.de")
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody(XmlMailResponse.class)
+        .consumeWith(
+            response ->
+                assertThat(response.getResponseBody())
+                    .usingRecursiveComparison()
+                    .ignoringFields("publishDate")
+                    .isEqualTo(expectedXmlResultObject));
+
+    List<XmlMailDTO> xmlMailList = xmlMailRepository.findAll().collectList().block();
+    assertThat(xmlMailList).isEmpty();
+
+    List<DocumentUnitStatusDTO> statusList =
+        documentUnitStatusRepository.findAll().collectList().block();
+    assertThat(statusList).isEmpty();
   }
 
   @Test

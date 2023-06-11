@@ -17,6 +17,8 @@ function renderComponent(
             creationTimestamp: "2022-02-10",
             fileName: "",
             fileNumber: "",
+            documentationOffice: { label: "testOffice" },
+            status: "PUBLISHED",
             ...options,
           },
         ]
@@ -86,6 +88,18 @@ describe("documentUnit list", () => {
     expect(
       screen.queryByText("Keine Dokumentationseinheiten gefunden")
     ).not.toBeInTheDocument()
+  })
+
+  test("renders documentationOffice", async () => {
+    renderComponent()
+
+    await screen.findByText("testOffice")
+  })
+
+  test("renders status", async () => {
+    renderComponent()
+
+    await screen.findByText("veröffentlicht")
   })
 
   test("delete emits event", async () => {

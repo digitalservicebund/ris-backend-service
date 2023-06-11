@@ -1,3 +1,4 @@
+import { NormCategory, UndefinedDate } from "../../../../src/domain/Norm"
 import { NormData } from "../fixtures"
 
 export const newNorm: NormData = {
@@ -82,7 +83,7 @@ export const newNorm: NormData = {
         PARTICIPATION_INSTITUTION: ["Neues mitwirkendes Organ 2"],
       },
     ],
-    CITATION_DATE: [{ DATE: ["2022-03-02"] }, { YEAR: ["1990"] }],
+    CITATION_DATE: [{ DATE: ["02.03.2023"] }, { YEAR: ["1990"] }],
     AGE_INDICATION: [
       {
         RANGE_START: ["1 Jahr"],
@@ -100,59 +101,145 @@ export const newNorm: NormData = {
         RESOLUTION_MAJORITY: [false],
       },
     ],
+    OFFICIAL_REFERENCE: [
+      {
+        PRINT_ANNOUNCEMENT: [
+          {
+            ANNOUNCEMENT_GAZETTE: ["ABC"],
+            YEAR: ["2023"],
+            NUMBER: ["1"],
+            PAGE: ["2"],
+            ADDITIONAL_INFO: ["TEST"],
+            EXPLANATION: ["ABC"],
+          },
+        ],
+      },
+      {
+        DIGITAL_ANNOUNCEMENT: [
+          {
+            ANNOUNCEMENT_MEDIUM: ["ABC"],
+            DATE: ["10.10.2023"],
+            YEAR: ["2023"],
+            EDITION: ["2"],
+            AREA_OF_PUBLICATION: ["ABC"],
+            NUMBER_OF_THE_PUBLICATION_IN_THE_RESPECTIVE_AREA: ["ABC"],
+            ADDITIONAL_INFO: ["ABC"],
+            EXPLANATION: ["ABC"],
+          },
+        ],
+      },
+      {
+        EU_ANNOUNCEMENT: [
+          {
+            YEAR: ["2023"],
+            SERIES: ["5"],
+            NUMBER: ["1"],
+            PAGE: ["2"],
+            ADDITIONAL_INFO: ["ABC"],
+            EXPLANATION: ["ABC"],
+          },
+        ],
+      },
+      {
+        OTHER_OFFICIAL_ANNOUNCEMENT: [{ OTHER_OFFICIAL_REFERENCE: ["BGBl I"] }],
+      },
+    ],
+    DIVERGENT_ENTRY_INTO_FORCE: [
+      {
+        DIVERGENT_ENTRY_INTO_FORCE_DEFINED: [
+          {
+            DATE: ["23.02.2015"],
+            NORM_CATEGORY: [
+              NormCategory.BASE_NORM,
+              NormCategory.TRANSITIONAL_NORM,
+              NormCategory.AMENDMENT_NORM,
+            ],
+          },
+        ],
+      },
+      {
+        DIVERGENT_ENTRY_INTO_FORCE_UNDEFINED: [
+          {
+            UNDEFINED_DATE: [UndefinedDate.UNDEFINED_UNKNOWN],
+            NORM_CATEGORY: [
+              NormCategory.TRANSITIONAL_NORM,
+              NormCategory.AMENDMENT_NORM,
+            ],
+          },
+        ],
+      },
+    ],
+    DIVERGENT_EXPIRATION: [
+      {
+        DIVERGENT_EXPIRATION_DEFINED: [
+          {
+            DATE: ["10.10.1990"],
+            NORM_CATEGORY: [
+              NormCategory.BASE_NORM,
+              NormCategory.TRANSITIONAL_NORM,
+            ],
+          },
+        ],
+      },
+      {
+        DIVERGENT_EXPIRATION_UNDEFINED: [
+          {
+            UNDEFINED_DATE: [UndefinedDate.UNDEFINED_NOT_PRESENT],
+            NORM_CATEGORY: [NormCategory.TRANSITIONAL_NORM],
+          },
+        ],
+      },
+    ],
+    DOCUMENT_TYPE: [
+      {
+        TYPE_NAME: ["abc"],
+        NORM_CATEGORY: [
+          NormCategory.BASE_NORM,
+          NormCategory.TRANSITIONAL_NORM,
+          NormCategory.AMENDMENT_NORM,
+        ],
+        TEMPLATE_NAME: ["foo", "bar", "foobar"],
+      },
+    ],
+    CATEGORIZED_REFERENCE: [
+      {
+        TEXT: ["foo"],
+      },
+      {
+        TEXT: ["bar"],
+      },
+    ],
+    ENTRY_INTO_FORCE: [{ DATE: ["01.11.2022"] }],
+    PRINCIPLE_ENTRY_INTO_FORCE: [
+      { UNDEFINED_DATE: [UndefinedDate.UNDEFINED_NOT_PRESENT] },
+    ],
+    EXPIRATION: [{ DATE: ["01.11.2022"] }],
+    PRINCIPLE_EXPIRATION: [
+      { UNDEFINED_DATE: [UndefinedDate.UNDEFINED_NOT_PRESENT] },
+    ],
   },
   officialLongTitle:
     "Verordnung zur Anpassung von Rechtsverordnungen an das Tierarzneimittelrecht",
   officialShortTitle: "officialShortTitle",
   officialAbbreviation: "officialAbbreviation",
-  announcementDate: "2022-11-01",
   risAbbreviation: "risAbbreviation",
-  documentTemplateName: "documentTemplateName",
-  publicationDate: "2022-11-01",
-  isExpirationDateTemp: false,
-  categorizedReference: "categorizedReference",
+  publicationDate: "01.11.2022",
   celexNumber: "celexNumber",
   completeCitation: "completeCitation",
-  digitalAnnouncementDate: "2022-11-01",
-  digitalAnnouncementArea: "digitalAnnouncementArea",
-  digitalAnnouncementAreaNumber: "digitalAnnouncementAreaNumber",
-  digitalAnnouncementEdition: "digitalAnnouncementEdition",
-  digitalAnnouncementExplanations: "digitalAnnouncementExplanations",
-  digitalAnnouncementInfo: "digitalAnnouncementInfo",
-  digitalAnnouncementMedium: "digitalAnnouncementMedium",
-  digitalAnnouncementYear: "digitalAnnouncementYear",
   digitalEvidenceAppendix: "digitalEvidenceAppendix",
   digitalEvidenceExternalDataNote: "digitalEvidenceExternalDataNote",
   digitalEvidenceLink: "digitalEvidenceLink",
   digitalEvidenceRelatedData: "digitalEvidenceRelatedData",
-  divergentEntryIntoForceDate: "2022-11-01",
-  divergentEntryIntoForceDateState: "unbestimmt (unbekannt)",
-  divergentExpirationDate: "2022-11-01",
-  divergentExpirationDateState: "nicht vorhanden",
   documentCategory: "documentCategory",
-  documentNormCategory: "documentNormCategory",
   documentNumber: "documentNumber",
-  documentStatusDate: "2022-11-01",
+  documentStatusDate: "01.11.2022",
   documentStatusDescription: "documentStatusDescription",
-  documentStatusEntryIntoForceDate: "2022-11-01",
+  documentStatusEntryIntoForceDate: "01.11.2022",
   documentStatusProof: "documentStatusProof",
   documentStatusReference: "documentStatusReference",
   documentStatusWorkNote: "documentStatusWorkNote",
   documentTextProof: "documentTextProof",
-  documentTypeName: "documentTypeName",
-  entryIntoForceDate: "2022-11-01",
-  entryIntoForceDateState: "unbestimmt (zukünftig)",
-  euAnnouncementExplanations: "euAnnouncementExplanations",
-  euAnnouncementGazette: "euAnnouncementGazette",
-  euAnnouncementInfo: "euAnnouncementInfo",
-  euAnnouncementNumber: "euAnnouncementNumber",
-  euAnnouncementPage: "euAnnouncementPage",
-  euAnnouncementSeries: "euAnnouncementSeries",
-  euAnnouncementYear: "euAnnouncementYear",
   eli: "europeanLegalIdentifier",
-  expirationDate: "2022-11-01",
-  expirationDateState: "unbestimmt (unbekannt)",
-  expirationNormCategory: "expirationNormCategory",
   otherDocumentNote: "otherDocumentNote",
   otherFootnote: "otherFootnote",
   footnoteChange: "footnoteChange",
@@ -160,27 +247,16 @@ export const newNorm: NormData = {
   footnoteDecision: "footnoteDecision",
   footnoteStateLaw: "footnoteStateLaw",
   footnoteEuLaw: "footnoteEuLaw",
-  otherOfficialAnnouncement: "otherOfficialAnnouncement",
   otherStatusNote: "otherStatusNote",
-  principleEntryIntoForceDate: "2022-11-01",
-  principleEntryIntoForceDateState: "nicht vorhanden",
-  principleExpirationDate: "2022-11-01",
-  principleExpirationDateState: "unbestimmt (zukünftig)",
-  printAnnouncementExplanations: "printAnnouncementExplanations",
-  printAnnouncementGazette: "printAnnouncementGazette",
-  printAnnouncementInfo: "printAnnouncementInfo",
-  printAnnouncementNumber: "printAnnouncementNumber",
-  printAnnouncementPage: "printAnnouncementPage",
-  printAnnouncementYear: "printAnnouncementYear",
   reissueArticle: "reissueArticle",
-  reissueDate: "2022-11-01",
+  reissueDate: "01.11.2022",
   reissueNote: "reissueNote",
   reissueReference: "reissueReference",
   repealArticle: "repealArticle",
-  repealDate: "2022-11-01",
+  repealDate: "01.11.2022",
   repealNote: "repealNote",
   repealReferences: "repealReferences",
-  statusDate: "2022-11-01",
+  statusDate: "01.11.2022",
   statusDescription: "statusDescription",
   statusNote: "statusNote",
   statusReference: "statusReference",
