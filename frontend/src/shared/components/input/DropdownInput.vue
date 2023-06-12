@@ -173,9 +173,7 @@ const computedStyle = computed(() => {
 
   &__open-dropdown {
     .input-container {
-      @apply flex border-2 border-blue-800 disabled:focus:outline-0 focus-within:outline-2 hover:outline-2 outline-offset-[-4px] outline-0 outline-blue-800 outline-none;
-
-      padding: 12px 16px;
+      @apply flex border-2 border-blue-800 disabled:focus:outline-0 focus-within:outline-2 h-[3.75rem] hover:outline-2 outline-offset-[-4px] outline-0 outline-blue-800 outline-none px-16;
     }
   }
 

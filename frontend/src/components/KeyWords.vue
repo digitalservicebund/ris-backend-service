@@ -63,7 +63,7 @@ watch(
 </script>
 
 <template>
-  <div class="bg-white mb-[2rem] p-16">
+  <div class="bg-white p-16">
     <h2 class="label-02-bold mb-[1rem]">Schlagwörter</h2>
     <div class="flex flex-row">
       <div class="flex-1">
