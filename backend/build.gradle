@@ -226,7 +226,7 @@ task integrationTest(type: Test) {
   // So that running integration test require running unit tests first,
   // and we won"t even attempt running integration tests when there are
   // failing unit tests.
-  //  dependsOn test
+  dependsOn test
   finalizedBy jacocoTestReport
 }
 check.dependsOn integrationTest
