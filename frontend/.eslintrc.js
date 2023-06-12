@@ -78,6 +78,10 @@ module.exports = {
         "vue/static-class-names-order": "error",
         "vue/v-for-delimiter-style": "error",
         "vue/v-on-function-call": "error",
+        "vue-scoped-css/enforce-style-type": [
+          "warn",
+          { allows: ["module", "scoped"] },
+        ],
         "@typescript-eslint/no-unused-vars": [
           "error",
           { ignoreRestSiblings: true },
