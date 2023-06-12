@@ -182,7 +182,7 @@ class ProceedingDecisionIntegrationTest {
     webClient
         .mutateWith(csrf())
         .get()
-        .uri("/api/v1/caselaw/documentunits/1234567890123")
+        .uri("/api/v1/caselaw/documentunits/docnumber")
         .exchange()
         .expectStatus()
         .isOk()
@@ -325,7 +325,7 @@ class ProceedingDecisionIntegrationTest {
     webClient
         .mutateWith(csrf())
         .get()
-        .uri("/api/v1/caselaw/documentunits/1234567890123")
+        .uri("/api/v1/caselaw/documentunits/docnumber")
         .exchange()
         .expectStatus()
         .isOk()
