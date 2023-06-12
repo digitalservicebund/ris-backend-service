@@ -308,22 +308,18 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
                   documentUnitNormDTO -> {
                     int index = normIndex.getAndIncrement();
                     UUID normAbbreviationId = null;
-                    DocumentUnitNorm currentNorm = documentUnitNorms.get(index);
-                    if (isEmptyNorm(currentNorm)) {
-                      toDelete.add(documentUnitNormDTO);
-                    } else {
+                    if (index < documentUnitNorms.size()) {
+                      DocumentUnitNorm currentNorm = documentUnitNorms.get(index);
                       if (currentNorm.normAbbreviation() != null) {
                         normAbbreviationId = currentNorm.normAbbreviation().id();
                       }
-                      if (index < documentUnitNorms.size()) {
-                        documentUnitNormDTO.normAbbreviationUuid = normAbbreviationId;
-                        documentUnitNormDTO.singleNorm = currentNorm.singleNorm();
-                        documentUnitNormDTO.dateOfVersion = currentNorm.dateOfVersion();
-                        documentUnitNormDTO.dateOfRelevance = currentNorm.dateOfRelevance();
-                        toSave.add(documentUnitNormDTO);
-                      } else {
-                        toDelete.add(documentUnitNormDTO);
-                      }
+                      documentUnitNormDTO.normAbbreviationUuid = normAbbreviationId;
+                      documentUnitNormDTO.singleNorm = currentNorm.singleNorm();
+                      documentUnitNormDTO.dateOfVersion = currentNorm.dateOfVersion();
+                      documentUnitNormDTO.dateOfRelevance = currentNorm.dateOfRelevance();
+                      toSave.add(documentUnitNormDTO);
+                    } else {
+                      toDelete.add(documentUnitNormDTO);
                     }
                   });
 
