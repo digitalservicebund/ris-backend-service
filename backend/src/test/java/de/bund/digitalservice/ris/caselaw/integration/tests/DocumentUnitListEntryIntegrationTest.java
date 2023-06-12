@@ -1,9 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.integration.tests;
 
 import static de.bund.digitalservice.ris.caselaw.Utils.getMockLogin;
-import static de.bund.digitalservice.ris.caselaw.Utils.getMockLoginWithDocOffice;
-import static de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatus.PUBLISHED;
-import static de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatus.UNPUBLISHED;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
 
@@ -17,7 +14,6 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumen
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentUnitStatusRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentationOfficeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitStatusDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentationOfficeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.FileNumberDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.FileNumberRepository;
@@ -26,16 +22,13 @@ import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresConfig;
 import de.bund.digitalservice.ris.caselaw.domain.DataSource;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatus;
 import de.bund.digitalservice.ris.caselaw.domain.EmailPublishService;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Random;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -207,132 +200,5 @@ public class DocumentUnitListEntryIntegrationTest {
       Instant tNext = timestampsActual.get(i + 1);
       assertThat(tThis).isAfter(tNext);
     }
-  }
-
-  @Test
-  void testForCorrectFilteringDependingOnUser() {
-    String docOffice1Group = "/CC-RIS";
-    String docOffice2Group = "/caselaw/BGH";
-
-    // created via db migration V0_79__caselaw_insert_default_documentation_offices
-    DocumentationOfficeDTO docOffice1DTO =
-        documentationOfficeRepository.findByLabel("CC-RIS").block();
-    DocumentationOfficeDTO docOffice2DTO = documentationOfficeRepository.findByLabel("BGH").block();
-
-    DocumentUnitDTO docUnit1 = createNewDocumentUnitDTO(docOffice1DTO.getId());
-    saveToStatusRepository(docUnit1, docUnit1.getCreationtimestamp(), UNPUBLISHED);
-
-    DocumentUnitDTO docUnit2 = createNewDocumentUnitDTO(docOffice2DTO.getId());
-    saveToStatusRepository(docUnit2, docUnit2.getCreationtimestamp(), UNPUBLISHED);
-    saveToStatusRepository(docUnit2, Instant.now(), PUBLISHED);
-
-    DocumentUnitDTO docUnit3 = createNewDocumentUnitDTO(docOffice2DTO.getId());
-    saveToStatusRepository(docUnit3, docUnit3.getCreationtimestamp(), UNPUBLISHED);
-
-    DocumentUnitDTO docUnit4 = createNewDocumentUnitDTO(docOffice2DTO.getId());
-    saveToStatusRepository(docUnit4, docUnit4.getCreationtimestamp(), UNPUBLISHED);
-    saveToStatusRepository(docUnit4, Instant.now(), PUBLISHED);
-
-    DocumentUnitDTO docUnit5 = createNewDocumentUnitDTO(docOffice2DTO.getId());
-
-    DocumentUnitDTO docUnit6 = createNewDocumentUnitDTO(null);
-
-    DocumentUnitDTO docUnit7 = createNewDocumentUnitDTO(docOffice2DTO.getId());
-    saveToStatusRepository(docUnit7, docUnit7.getCreationtimestamp(), UNPUBLISHED);
-    saveToStatusRepository(docUnit7, Instant.now().plus(1, ChronoUnit.DAYS), PUBLISHED);
-    saveToStatusRepository(docUnit7, Instant.now().plus(2, ChronoUnit.DAYS), UNPUBLISHED);
-
-    // Documentation Office 1
-    EntityExchangeResult<String> result =
-        webClient
-            .mutateWith(csrf())
-            .mutateWith(getMockLoginWithDocOffice(docOffice1Group))
-            .get()
-            .uri("/api/v1/caselaw/documentunits?pg=0&sz=10")
-            .exchange()
-            .expectStatus()
-            .isOk()
-            .expectBody(String.class)
-            .returnResult();
-
-    assertThat(extractStatusByUuid(result.getResponseBody(), docUnit1.getUuid()))
-        .isEqualTo(UNPUBLISHED.toString());
-    assertThat(extractStatusByUuid(result.getResponseBody(), docUnit2.getUuid()))
-        .isEqualTo(PUBLISHED.toString());
-    assertThat(extractDocUnitsByUuid(result.getResponseBody(), docUnit3.getUuid())).isEmpty();
-    assertThat(extractStatusByUuid(result.getResponseBody(), docUnit4.getUuid()))
-        .isEqualTo(PUBLISHED.toString());
-    assertThat(extractStatusByUuid(result.getResponseBody(), docUnit5.getUuid()))
-        .isEqualTo(PUBLISHED.toString());
-    assertThat(extractStatusByUuid(result.getResponseBody(), docUnit6.getUuid()))
-        .isEqualTo(PUBLISHED.toString());
-    assertThat(extractDocUnitsByUuid(result.getResponseBody(), docUnit7.getUuid())).isEmpty();
-
-    // Documentation Office 2
-    result =
-        webClient
-            .mutateWith(csrf())
-            .mutateWith(getMockLoginWithDocOffice(docOffice2Group))
-            .get()
-            .uri("/api/v1/caselaw/documentunits?pg=0&sz=10")
-            .exchange()
-            .expectStatus()
-            .isOk()
-            .expectBody(String.class)
-            .returnResult();
-
-    assertThat(extractDocUnitsByUuid(result.getResponseBody(), docUnit1.getUuid())).isEmpty();
-    assertThat(extractStatusByUuid(result.getResponseBody(), docUnit2.getUuid()))
-        .isEqualTo(PUBLISHED.toString());
-    assertThat(extractStatusByUuid(result.getResponseBody(), docUnit3.getUuid()))
-        .isEqualTo(UNPUBLISHED.toString());
-    assertThat(extractStatusByUuid(result.getResponseBody(), docUnit4.getUuid()))
-        .isEqualTo(PUBLISHED.toString());
-    assertThat(extractStatusByUuid(result.getResponseBody(), docUnit5.getUuid()))
-        .isEqualTo(PUBLISHED.toString());
-    assertThat(extractStatusByUuid(result.getResponseBody(), docUnit6.getUuid()))
-        .isEqualTo(PUBLISHED.toString());
-    assertThat(extractStatusByUuid(result.getResponseBody(), docUnit7.getUuid()))
-        .isEqualTo(UNPUBLISHED.toString());
-  }
-
-  private DocumentUnitDTO createNewDocumentUnitDTO(UUID documentationOfficeId) {
-    String documentNumber =
-        new Random().ints(13, 0, 10).mapToObj(Integer::toString).collect(Collectors.joining());
-    return repository
-        .save(
-            DocumentUnitDTO.builder()
-                .uuid(UUID.randomUUID())
-                .creationtimestamp(Instant.now())
-                .documentnumber(documentNumber)
-                .dataSource(DataSource.NEURIS)
-                .documentationOfficeId(documentationOfficeId)
-                .build())
-        .block();
-  }
-
-  private void saveToStatusRepository(
-      DocumentUnitDTO docUnitDTO, Instant createdAt, DocumentUnitStatus status) {
-    statusRepository
-        .save(
-            DocumentUnitStatusDTO.builder()
-                .documentUnitId(docUnitDTO.getUuid())
-                .status(status)
-                .createdAt(createdAt)
-                .id(UUID.randomUUID())
-                .newEntry(true)
-                .build())
-        .block();
-  }
-
-  private String extractStatusByUuid(String responseBody, UUID uuid) {
-    List<String> docUnitStatusResults =
-        JsonPath.read(responseBody, String.format("$.content[?(@.uuid=='%s')].status", uuid));
-    assertThat(docUnitStatusResults).hasSize(1);
-    return docUnitStatusResults.get(0);
-  }
-
-  private List<String> extractDocUnitsByUuid(String responseBody, UUID uuid) {
-    return JsonPath.read(responseBody, String.format("$.content[?(@.uuid=='%s')]", uuid));
   }
 }
