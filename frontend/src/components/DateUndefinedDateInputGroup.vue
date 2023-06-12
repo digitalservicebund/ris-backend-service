@@ -26,7 +26,7 @@ interface Emits {
 }
 
 const props = defineProps<Props>()
-const emit = defineEmits<Emits>()
+defineEmits<Emits>()
 
 const undefineDateValue = ref(props.undefinedDateStateValue)
 const dateValue = ref(props.dateValue)
@@ -68,7 +68,7 @@ enum InputType {
         :aria-label="dateInputAriaLabel"
         is-future-date
         :model-value="dateValue"
-        @update:model-value="emit('update:dateValue', $event)"
+        @update:model-value="$emit('update:dateValue', $event)"
       />
     </InputField>
     <InputField
@@ -84,7 +84,7 @@ enum InputType {
         :items="dropdownItems"
         :model-value="undefineDateValue"
         placeholder="Bitte auswählen"
-        @update:model-value="emit('update:undefinedDateStateValue', $event)"
+        @update:model-value="$emit('update:undefinedDateStateValue', $event)"
       />
     </InputField>
   </div>
