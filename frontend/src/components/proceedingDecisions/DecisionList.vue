@@ -13,7 +13,9 @@ const emit = defineEmits<{
 }>()
 
 const sortedDecisions = computed(() =>
-  [...props.decisions].sort((a, b) => dayjs(b.date).diff(a.date))
+  [...props.decisions].sort((a, b) =>
+    dayjs(b.decisionDate).diff(a.decisionDate)
+  )
 )
 </script>
 

@@ -7,7 +7,6 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.Dat
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DatabaseFieldOfLawRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DatabaseNormAbbreviationRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.StateRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.proceedingdecision.DatabaseProceedingDecisionLinkRepository;
 import de.bund.digitalservice.ris.caselaw.domain.DataSource;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import java.util.UUID;
@@ -31,7 +30,7 @@ class PostgresDocumentUnitRepositoryImplTest {
   @MockBean private DatabaseDocumentUnitMetadataRepository metadataRepository;
   @MockBean private FileNumberRepository fileNumberRepository;
   @MockBean private DeviatingEcliRepository deviatingEcliRepository;
-  @MockBean private DatabaseProceedingDecisionLinkRepository proceedingDecisionLinkRepository;
+  @MockBean private DatabaseDocumentationUnitLinkRepository documentationUnitLinkRepository;
   @MockBean private DatabaseDeviatingDecisionDateRepository deviatingDecisionDateRepository;
   @MockBean private DatabaseIncorrectCourtRepository incorrectCourtRepository;
   @MockBean private DatabaseCourtRepository databaseCourtRepository;
@@ -53,7 +52,6 @@ class PostgresDocumentUnitRepositoryImplTest {
             metadataRepository,
             fileNumberRepository,
             deviatingEcliRepository,
-            proceedingDecisionLinkRepository,
             deviatingDecisionDateRepository,
             incorrectCourtRepository,
             databaseCourtRepository,
@@ -65,7 +63,8 @@ class PostgresDocumentUnitRepositoryImplTest {
             documentUnitNormRepository,
             documentationOfficeRepository,
             databaseDocumentUnitStatusRepository,
-            normAbbreviationRepository);
+            normAbbreviationRepository,
+            documentationUnitLinkRepository);
   }
 
   @Test

@@ -37,7 +37,7 @@ public class ProceedingDecisionTransformer {
         .court(court)
         .fileNumber(fileNumber)
         .documentType(getDocumentTypeByDTO(documentUnitMetadataDTO.getDocumentTypeDTO()))
-        .date(documentUnitMetadataDTO.getDecisionDate())
+        .decisionDate(documentUnitMetadataDTO.getDecisionDate())
         .dateKnown(documentUnitMetadataDTO.isDateKnown())
         .build();
   }

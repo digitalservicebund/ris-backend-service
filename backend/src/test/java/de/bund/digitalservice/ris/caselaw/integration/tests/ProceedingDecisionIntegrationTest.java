@@ -13,22 +13,23 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumen
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentUnitRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentUnitStatusRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentationOfficeRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentationUnitLinkRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitMetadataDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitStatusDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentationOfficeDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentationUnitLinkDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.FileNumberDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.FileNumberRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.PostgresDocumentUnitRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DatabaseDocumentTypeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DocumentTypeDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.proceedingdecision.DatabaseProceedingDecisionLinkRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.proceedingdecision.ProceedingDecisionLinkDTO;
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresConfig;
 import de.bund.digitalservice.ris.caselaw.domain.DataSource;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitLinkType;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatus;
 import de.bund.digitalservice.ris.caselaw.domain.EmailPublishService;
 import de.bund.digitalservice.ris.caselaw.domain.ProceedingDecision;
@@ -79,7 +80,7 @@ class ProceedingDecisionIntegrationTest {
   @Autowired private WebTestClient webClient;
   @Autowired private DatabaseDocumentUnitRepository repository;
   @Autowired private DatabaseDocumentUnitMetadataRepository metadataRepository;
-  @Autowired private DatabaseProceedingDecisionLinkRepository linkRepository;
+  @Autowired private DatabaseDocumentationUnitLinkRepository linkRepository;
   @Autowired private FileNumberRepository fileNumberRepository;
   @Autowired private DatabaseDocumentTypeRepository databaseDocumentTypeRepository;
   @Autowired private DatabaseDocumentationOfficeRepository documentationOfficeRepository;
@@ -116,7 +117,8 @@ class ProceedingDecisionIntegrationTest {
 
     assertThat(
             linkRepository
-                .findAllByParentDocumentUnitId(parentDocumentUnitDTO.getId())
+                .findAllByParentDocumentationUnitUuidAndType(
+                    parentDocumentUnitDTO.getUuid(), DocumentationUnitLinkType.PREVIOUS_DECISION)
                 .collectList()
                 .block())
         .isEmpty();
@@ -133,20 +135,22 @@ class ProceedingDecisionIntegrationTest {
 
     assertThat(
             linkRepository
-                .findAllByParentDocumentUnitId(parentDocumentUnitDTO.getId())
+                .findAllByParentDocumentationUnitUuidAndType(
+                    parentDocumentUnitDTO.getUuid(), DocumentationUnitLinkType.PREVIOUS_DECISION)
                 .collectList()
                 .block())
         .hasSize(1);
 
-    List<Long> childUuids =
+    List<UUID> childUuids =
         linkRepository
-            .findAllByParentDocumentUnitId(parentDocumentUnitDTO.getId())
-            .map(ProceedingDecisionLinkDTO::getChildDocumentUnitId)
+            .findAllByParentDocumentationUnitUuidAndType(
+                parentDocumentUnitDTO.getUuid(), DocumentationUnitLinkType.PREVIOUS_DECISION)
+            .map(DocumentationUnitLinkDTO::childDocumentationUnitUuid)
             .collectList()
             .block();
 
     childUuids.stream()
-        .map(childUuid -> assertThat(repository.findById(childUuid).block()).isNotNull());
+        .map(childUuid -> assertThat(repository.findByUuid(childUuid).block()).isNotNull());
   }
 
   @Test
@@ -171,10 +175,11 @@ class ProceedingDecisionIntegrationTest {
             .build();
     childDocumentUnitDTO = repository.save(childDocumentUnitDTO).block();
 
-    ProceedingDecisionLinkDTO linkDTO =
-        ProceedingDecisionLinkDTO.builder()
-            .parentDocumentUnitId(parentDocumentUnitDTO.getId())
-            .childDocumentUnitId(childDocumentUnitDTO.getId())
+    DocumentationUnitLinkDTO linkDTO =
+        DocumentationUnitLinkDTO.builder()
+            .parentDocumentationUnitUuid(parentDocumentUnitDTO.getUuid())
+            .childDocumentationUnitUuid(childDocumentUnitDTO.getUuid())
+            .type(DocumentationUnitLinkType.PREVIOUS_DECISION)
             .build();
     linkDTO = linkRepository.save(linkDTO).block();
     assertThat(linkDTO).isNotNull();
@@ -218,8 +223,10 @@ class ProceedingDecisionIntegrationTest {
 
     assertThat(
             linkRepository
-                .findByParentDocumentUnitIdAndChildDocumentUnitId(
-                    parentDocumentUnitDTO.getId(), childDocumentUnitDTO.getId())
+                .findByParentDocumentationUnitUuidAndChildDocumentationUnitUuidAndType(
+                    parentDocumentUnitDTO.getUuid(),
+                    childDocumentUnitDTO.getUuid(),
+                    DocumentationUnitLinkType.PREVIOUS_DECISION)
                 .block())
         .isNull();
 
@@ -233,8 +240,10 @@ class ProceedingDecisionIntegrationTest {
 
     assertThat(
             linkRepository
-                .findByParentDocumentUnitIdAndChildDocumentUnitId(
-                    parentDocumentUnitDTO.getId(), childDocumentUnitDTO.getId())
+                .findByParentDocumentationUnitUuidAndChildDocumentationUnitUuidAndType(
+                    parentDocumentUnitDTO.getUuid(),
+                    childDocumentUnitDTO.getUuid(),
+                    DocumentationUnitLinkType.PREVIOUS_DECISION)
                 .block())
         .isNotNull();
   }
@@ -261,10 +270,11 @@ class ProceedingDecisionIntegrationTest {
             .build();
     childDocumentUnitDTO = repository.save(childDocumentUnitDTO).block();
 
-    ProceedingDecisionLinkDTO linkDTO =
-        ProceedingDecisionLinkDTO.builder()
-            .parentDocumentUnitId(parentDocumentUnitDTO.getId())
-            .childDocumentUnitId(childDocumentUnitDTO.getId())
+    DocumentationUnitLinkDTO linkDTO =
+        DocumentationUnitLinkDTO.builder()
+            .parentDocumentationUnitUuid(parentDocumentUnitDTO.getUuid())
+            .childDocumentationUnitUuid(childDocumentUnitDTO.getUuid())
+            .type(DocumentationUnitLinkType.PREVIOUS_DECISION)
             .build();
     linkDTO = linkRepository.save(linkDTO).block();
     assertThat(linkDTO).isNotNull();
@@ -277,7 +287,7 @@ class ProceedingDecisionIntegrationTest {
         .expectStatus()
         .is2xxSuccessful();
 
-    assertThat(linkRepository.findById(linkDTO.getId()).block()).isNull();
+    assertThat(linkRepository.findById(linkDTO.id()).block()).isNull();
     assertThat(repository.findById(childDocumentUnitDTO.getId()).block()).isNotNull();
   }
 
@@ -303,10 +313,11 @@ class ProceedingDecisionIntegrationTest {
             .build();
     childDocumentUnitDTO = repository.save(childDocumentUnitDTO).block();
 
-    ProceedingDecisionLinkDTO linkDTO =
-        ProceedingDecisionLinkDTO.builder()
-            .parentDocumentUnitId(parentDocumentUnitDTO.getId())
-            .childDocumentUnitId(childDocumentUnitDTO.getId())
+    DocumentationUnitLinkDTO linkDTO =
+        DocumentationUnitLinkDTO.builder()
+            .parentDocumentationUnitUuid(parentDocumentUnitDTO.getUuid())
+            .childDocumentationUnitUuid(childDocumentUnitDTO.getUuid())
+            .type(DocumentationUnitLinkType.PREVIOUS_DECISION)
             .build();
     linkDTO = linkRepository.save(linkDTO).block();
     assertThat(linkDTO).isNotNull();
@@ -319,7 +330,7 @@ class ProceedingDecisionIntegrationTest {
         .expectStatus()
         .is2xxSuccessful();
 
-    assertThat(linkRepository.findById(linkDTO.getId()).block()).isNull();
+    assertThat(linkRepository.findById(linkDTO.id()).block()).isNull();
     assertThat(repository.findById(childDocumentUnitDTO.getId()).block()).isNotNull();
 
     webClient
@@ -359,10 +370,11 @@ class ProceedingDecisionIntegrationTest {
             .build();
     childDocumentUnitDTO = repository.save(childDocumentUnitDTO).block();
 
-    ProceedingDecisionLinkDTO linkDTO =
-        ProceedingDecisionLinkDTO.builder()
-            .parentDocumentUnitId(parentDocumentUnitDTO.getId())
-            .childDocumentUnitId(childDocumentUnitDTO.getId())
+    DocumentationUnitLinkDTO linkDTO =
+        DocumentationUnitLinkDTO.builder()
+            .parentDocumentationUnitUuid(parentDocumentUnitDTO.getUuid())
+            .childDocumentationUnitUuid(childDocumentUnitDTO.getUuid())
+            .type(DocumentationUnitLinkType.PREVIOUS_DECISION)
             .build();
     linkDTO = linkRepository.save(linkDTO).block();
     assertThat(linkDTO).isNotNull();
@@ -375,7 +387,7 @@ class ProceedingDecisionIntegrationTest {
         .expectStatus()
         .is2xxSuccessful();
 
-    assertThat(linkRepository.findById(linkDTO.getId()).block()).isNull();
+    assertThat(linkRepository.findById(linkDTO.id()).block()).isNull();
     assertThat(repository.findById(childDocumentUnitDTO.getId()).block()).isNull();
   }
 
@@ -411,18 +423,20 @@ class ProceedingDecisionIntegrationTest {
             .build();
     childDocumentUnitDTO = repository.save(childDocumentUnitDTO).block();
 
-    ProceedingDecisionLinkDTO linkDTO1 =
-        ProceedingDecisionLinkDTO.builder()
-            .parentDocumentUnitId(parentDocumentUnitDTO1.getId())
-            .childDocumentUnitId(childDocumentUnitDTO.getId())
+    DocumentationUnitLinkDTO linkDTO1 =
+        DocumentationUnitLinkDTO.builder()
+            .parentDocumentationUnitUuid(parentDocumentUnitDTO1.getUuid())
+            .childDocumentationUnitUuid(childDocumentUnitDTO.getUuid())
+            .type(DocumentationUnitLinkType.PREVIOUS_DECISION)
             .build();
     linkDTO1 = linkRepository.save(linkDTO1).block();
     assertThat(linkDTO1).isNotNull();
 
-    ProceedingDecisionLinkDTO linkDTO2 =
-        ProceedingDecisionLinkDTO.builder()
-            .parentDocumentUnitId(parentDocumentUnitDTO2.getId())
-            .childDocumentUnitId(childDocumentUnitDTO.getId())
+    DocumentationUnitLinkDTO linkDTO2 =
+        DocumentationUnitLinkDTO.builder()
+            .parentDocumentationUnitUuid(parentDocumentUnitDTO2.getUuid())
+            .childDocumentationUnitUuid(childDocumentUnitDTO.getUuid())
+            .type(DocumentationUnitLinkType.PREVIOUS_DECISION)
             .build();
     linkDTO2 = linkRepository.save(linkDTO2).block();
     assertThat(linkDTO2).isNotNull();
@@ -435,8 +449,8 @@ class ProceedingDecisionIntegrationTest {
         .expectStatus()
         .is2xxSuccessful();
 
-    assertThat(linkRepository.findById(linkDTO1.getId()).block()).isNull();
-    assertThat(linkRepository.findById(linkDTO2.getId()).block()).isNotNull();
+    assertThat(linkRepository.findById(linkDTO1.id()).block()).isNull();
+    assertThat(linkRepository.findById(linkDTO2.id()).block()).isNotNull();
     assertThat(repository.findById(childDocumentUnitDTO.getId()).block()).isNotNull();
   }
 
@@ -496,14 +510,15 @@ class ProceedingDecisionIntegrationTest {
             response -> {
               assertThat(response.getResponseBody()).isNotNull();
               assertThat(response.getResponseBody().proceedingDecisions().size()).isEqualTo(1);
-              assertThat(response.getResponseBody().proceedingDecisions().get(0).uuid())
+              assertThat(response.getResponseBody().proceedingDecisions().get(0).getUuid())
                   .isEqualTo(childUuid);
             });
 
-    List<ProceedingDecisionLinkDTO> list = linkRepository.findAll().collectList().block();
+    List<DocumentationUnitLinkDTO> list = linkRepository.findAll().collectList().block();
     assertThat(list).hasSize(1);
-    assertThat(list.get(0).getParentDocumentUnitId()).isEqualTo(parentDocumentUnitDTO.getId());
-    assertThat(list.get(0).getChildDocumentUnitId()).isEqualTo(childDocumentUnitDTO.getId());
+    assertThat(list.get(0).parentDocumentationUnitUuid())
+        .isEqualTo(parentDocumentUnitDTO.getUuid());
+    assertThat(list.get(0).childDocumentationUnitUuid()).isEqualTo(childDocumentUnitDTO.getUuid());
   }
 
   @Test
@@ -519,12 +534,12 @@ class ProceedingDecisionIntegrationTest {
   @Test
   void testSearchForDocumentUnitsByProceedingDecisionInput_onlyDate_shouldMatchOne() {
     Instant date1 = prepareDocumentUnitMetadataDTOs();
-    simulateAPICall(ProceedingDecision.builder().date(date1).build())
+    simulateAPICall(ProceedingDecision.builder().decisionDate(date1).build())
         .jsonPath("$.content")
         .isNotEmpty()
         .jsonPath("$.content.length()")
         .isEqualTo(1)
-        .jsonPath("$.content[0].date")
+        .jsonPath("$.content[0].decisionDate")
         .isEqualTo(date1.toString());
   }
 
@@ -574,7 +589,7 @@ class ProceedingDecisionIntegrationTest {
     Instant date1 = prepareDocumentUnitMetadataDTOs();
     simulateAPICall(
             ProceedingDecision.builder()
-                .date(date1)
+                .decisionDate(date1)
                 .court(Court.builder().type("SomeCourt").build())
                 .fileNumber("AkteX")
                 .documentType(DocumentType.builder().jurisShortcut("XY").build())

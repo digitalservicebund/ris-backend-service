@@ -37,14 +37,16 @@ public interface DocumentUnitRepository {
 
   Flux<DocumentUnitListEntry> findAll(Pageable pageable, DocumentationOffice documentationOfficeId);
 
-  Flux<ProceedingDecision> findAllLinkedDocumentUnitsByParentDocumentUnitId(
-      UUID parentDocumentUnitUuid);
+  Flux<ProceedingDecision> findAllLinkedDocumentUnitsByParentDocumentUnitIdAndType(
+      UUID parentDocumentUnitUuid, DocumentationUnitLinkType type);
 
   Mono<DocumentUnit> filterUnlinkedDocumentUnit(DocumentUnit documentUnit);
 
-  Mono<DocumentUnit> linkDocumentUnits(UUID parentDocumentUnitUuid, UUID childDocumentUnitUuid);
+  Mono<DocumentUnit> linkDocumentUnits(
+      UUID parentDocumentUnitUuid, UUID childDocumentUnitUuid, DocumentationUnitLinkType type);
 
-  Mono<Void> unlinkDocumentUnits(UUID parentDocumentUnitUuid, UUID childDocumentUnitUuid);
+  Mono<Void> unlinkDocumentUnits(
+      UUID parentDocumentUnitUuid, UUID childDocumentUnitUuid, DocumentationUnitLinkType type);
 
   Mono<Long> countLinksByChildDocumentUnitUuid(UUID childDocumentUnitUuid);
 }

@@ -7,7 +7,7 @@ import ProceedingDecision from "@/domain/proceedingDecision"
 function renderComponent(options?: {
   court?: Court
   documentType?: DocumentType
-  date?: string
+  decisionDate?: string
   dataSource?: ProceedingDecision["dataSource"]
   documentNumber?: string
 }) {
@@ -23,7 +23,8 @@ function renderComponent(options?: {
           label: "testDocumentType",
           jurisShortcut: "testDocumentTypeShortcut",
         },
-        date: options?.date ?? "2004-12-02 12:00:00.000000 +00:00",
+        decisionDate:
+          options?.decisionDate ?? "2004-12-02 12:00:00.000000 +00:00",
         dataSource: options?.dataSource ?? "PROCEEDING_DECISION",
         documentNumber: options?.documentNumber ?? "testDocumentNumber",
       },
@@ -71,7 +72,7 @@ describe("Decision ListItem", () => {
   })
 
   it("renders date correctly", async () => {
-    renderComponent({ date: "2022-03-27" })
+    renderComponent({ decisionDate: "2022-03-27" })
     expect(await screen.findByText(/27.03.2022/)).toBeVisible()
   })
 

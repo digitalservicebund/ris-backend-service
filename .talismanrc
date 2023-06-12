@@ -9,13 +9,13 @@ fileignoreconfig:
   ignore_detectors:
   - filecontent
 - filename: backend/src/test/java/de/bund/digitalservice/ris/caselaw/integration/tests/JurisXmlExporterWrapperIntegrationTest.java
-  checksum: e59fceca98b7ace276dacbe5d647bd68368a942383e4ec1f7e5c21f9292fcb42
+  checksum: 3c7774ef0d860349d974a2b63326f7d81f92b34d660877606402a6e573cbe7d2
 - filename: backend/src/test/kotlin/unit/adapter/input/restapi/controller/GenerateNormFileControllerTest.kt
   checksum: 07aa4cd7453685661091978479eef00f475a3415d0b26882352e19da66bf1dda
 - filename: doc/norms/backend-api.yaml
   checksum: 867d0a6301f1276bac069e00c7cc196bb15eea3f962ce5a
 - filename: doc/structurizr/workspace.json
-  checksum: 4cd729e6a2267acf57953e7e511806f967a106542cfa422946dbed23f0dd1d25
+  checksum: 3e4a3d02bf05d6e0d930ddb6c965a2e512daded3b93127c9ad41feb875007153
 - filename: frontend/FRONTEND_STYLEGUIDE.md
   checksum: e6b8194eba2012f2a769c5a5d3577715a573b441a7b94e744c32b3149d0d3a93
 - filename: frontend/test/test-helper/dataGenerators.ts

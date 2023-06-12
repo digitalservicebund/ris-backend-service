@@ -33,11 +33,11 @@ const input = ref<ProceedingDecision>(new ProceedingDecision())
 
 function isNotEmpty({
   court,
-  date,
+  decisionDate,
   fileNumber,
   documentType,
 }: ProceedingDecision): boolean {
-  return [court, date, fileNumber, documentType].some(
+  return [court, decisionDate, fileNumber, documentType].some(
     (property) => property != undefined
   )
 }
@@ -164,7 +164,7 @@ watch(
 watch(
   input,
   () => {
-    if (!input.value.dateKnown) input.value.date = undefined
+    if (!input.value.dateKnown) input.value.decisionDate = undefined
   },
   {
     immediate: true,
@@ -208,8 +208,8 @@ watch(
           <div class="fake-input-group__row__field flex-col">
             <InputField id="date" class="w-full" label="Entscheidungsdatum *">
               <DateInput
-                id="date"
-                v-model="input.date"
+                id="decisionDate"
+                v-model="input.decisionDate"
                 aria-label="Entscheidungsdatum Rechtszug"
                 :disabled="input.dateUnknown"
               ></DateInput>

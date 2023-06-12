@@ -62,7 +62,7 @@ describe("ProceedingDecision List", () => {
               location: "testCourtLocation",
               label: "label",
             },
-            date: "10-10-2000 12:00:00.000000 +00:00",
+            decisionDate: "10-10-2000 12:00:00.000000 +00:00",
           },
         }),
         new ProceedingDecision({
@@ -72,7 +72,7 @@ describe("ProceedingDecision List", () => {
               location: "testCourtLocation",
               label: "label",
             },
-            date: "10-10-2100 12:00:00.000000 +00:00",
+            decisionDate: "10-10-2100 12:00:00.000000 +00:00",
           },
         }),
         new ProceedingDecision({
@@ -82,7 +82,7 @@ describe("ProceedingDecision List", () => {
               location: "testCourtLocation",
               label: "label",
             },
-            date: "10-10-1900 12:00:00.000000 +00:00",
+            decisionDate: "10-10-1900 12:00:00.000000 +00:00",
           },
         }),
       ],
@@ -91,8 +91,14 @@ describe("ProceedingDecision List", () => {
     const decision1 = await screen.findByText(/10.10.1900/)
     const decision2 = await screen.findByText(/10.10.2000/)
     const decision3 = await screen.findByText(/10.10.2100/)
-    expect(decision1.compareDocumentPosition(decision2)).toBe(2)
-    expect(decision1.compareDocumentPosition(decision3)).toBe(2)
-    expect(decision2.compareDocumentPosition(decision3)).toBe(2)
+    expect(decision1.compareDocumentPosition(decision2)).toBe(
+      Node.DOCUMENT_POSITION_PRECEDING
+    )
+    expect(decision1.compareDocumentPosition(decision3)).toBe(
+      Node.DOCUMENT_POSITION_PRECEDING
+    )
+    expect(decision2.compareDocumentPosition(decision3)).toBe(
+      Node.DOCUMENT_POSITION_PRECEDING
+    )
   })
 })

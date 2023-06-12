@@ -237,7 +237,7 @@ public class DocumentUnitService {
                       proceedingDecisions.flatMap(
                           proceedingDecision ->
                               removeProceedingDecision(
-                                  documentUnitUuid, proceedingDecision.uuid())))
+                                  documentUnitUuid, proceedingDecision.getUuid())))
                   .then(repository.delete(documentUnit))
                   .thenReturn(logMsg);
             })
@@ -312,20 +312,24 @@ public class DocumentUnitService {
                     enrichNewDocumentUnitWithData(childDocumentUnit, proceedingDecision)))
         .flatMap(
             childDocumentUnit ->
-                repository.linkDocumentUnits(parentDocumentUnitUuid, childDocumentUnit.uuid()))
+                repository.linkDocumentUnits(
+                    parentDocumentUnitUuid,
+                    childDocumentUnit.uuid(),
+                    DocumentationUnitLinkType.PREVIOUS_DECISION))
         .flatMapMany(
             documentUnit ->
-                repository.findAllLinkedDocumentUnitsByParentDocumentUnitId(
-                    parentDocumentUnitUuid));
+                repository.findAllLinkedDocumentUnitsByParentDocumentUnitIdAndType(
+                    parentDocumentUnitUuid, DocumentationUnitLinkType.PREVIOUS_DECISION));
   }
 
   public Mono<DocumentUnit> linkProceedingDecision(UUID parentUuid, UUID childUuid) {
-    return repository.linkDocumentUnits(parentUuid, childUuid);
+    return repository.linkDocumentUnits(
+        parentUuid, childUuid, DocumentationUnitLinkType.PREVIOUS_DECISION);
   }
 
   public Mono<String> removeProceedingDecision(UUID parentUuid, UUID childUuid) {
     return repository
-        .unlinkDocumentUnits(parentUuid, childUuid)
+        .unlinkDocumentUnits(parentUuid, childUuid, DocumentationUnitLinkType.PREVIOUS_DECISION)
         .doOnError(ex -> log.error("Couldn't unlink the ProceedingDecision", ex))
         .then(deleteIfOrphanedProceedingDecision(childUuid))
         .thenReturn("done");
@@ -334,17 +338,17 @@ public class DocumentUnitService {
   private DocumentUnit enrichNewDocumentUnitWithData(
       DocumentUnit documentUnit, ProceedingDecision proceedingDecision) {
     List<String> fileNumbers = null;
-    if (!StringUtils.isBlank(proceedingDecision.fileNumber())) {
-      fileNumbers = List.of(proceedingDecision.fileNumber());
+    if (!StringUtils.isBlank(proceedingDecision.getFileNumber())) {
+      fileNumbers = List.of(proceedingDecision.getFileNumber());
     }
 
     CoreData coreData =
         documentUnit.coreData().toBuilder()
             .fileNumbers(fileNumbers)
-            .documentType(proceedingDecision.documentType())
-            .decisionDate(proceedingDecision.date())
-            .court(proceedingDecision.court())
-            .dateKnown(proceedingDecision.dateKnown())
+            .documentType(proceedingDecision.getDocumentType())
+            .decisionDate(proceedingDecision.getDecisionDate())
+            .court(proceedingDecision.getCourt())
+            .dateKnown(proceedingDecision.isDateKnown())
             .build();
 
     return documentUnit.toBuilder()

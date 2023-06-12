@@ -124,7 +124,7 @@ export async function fillProceedingDecisionInputs(
   page: Page,
   values?: {
     court?: string
-    date?: string
+    decisionDate?: string
     fileNumber?: string
     documentType?: string
     dateUnknown?: boolean
@@ -146,8 +146,8 @@ export async function fillProceedingDecisionInputs(
       values.court
     )
   }
-  if (values?.date) {
-    await fillInput("Entscheidungsdatum Rechtszug", values?.date)
+  if (values?.decisionDate) {
+    await fillInput("Entscheidungsdatum Rechtszug", values?.decisionDate)
   }
   if (values?.fileNumber) {
     await fillInput("Aktenzeichen Rechtszug", values?.fileNumber)
