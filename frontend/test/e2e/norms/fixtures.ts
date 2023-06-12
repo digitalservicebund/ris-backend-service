@@ -99,7 +99,7 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
       isSingleFieldSection: true,
       fields: [
         {
-          type: FieldType.TEXT,
+          type: FieldType.TEXTAREA,
           id: "officialLongTitle",
           label: "Amtliche Langüberschrift",
           value: norm.officialLongTitle,

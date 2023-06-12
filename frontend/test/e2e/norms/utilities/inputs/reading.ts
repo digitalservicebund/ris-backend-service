@@ -17,6 +17,11 @@ const expectTextInput: FieldExpecter<string> = async (page, id, value) => {
   expect(content).toBe(value)
 }
 
+const expectTextArea: FieldExpecter<string> = async (page, id, value) => {
+  const content = await page.locator(`textarea#${id}`).inputValue()
+  expect(content).toBe(value)
+}
+
 const expectCheckbox: FieldExpecter<boolean> = async (page, id, value) => {
   const checked = await page.locator(`input#${id}`).isChecked()
   expect(checked).toBe(value)
@@ -41,6 +46,7 @@ const expectDropdown: FieldExpecter<string> = async (page, id, value) => {
 
 const FIELD_EXPECTER: FieldExpectMapping = {
   [FieldType.TEXT]: expectTextInput,
+  [FieldType.TEXTAREA]: expectTextArea,
   [FieldType.CHECKBOX]: expectCheckbox,
   [FieldType.RADIO]: expectRadioButton,
   [FieldType.CHIPS]: expectChipsInput,

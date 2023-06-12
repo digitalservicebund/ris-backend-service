@@ -88,6 +88,7 @@ defineExpose({ focus })
 
 <template>
   <textarea
+    :id="id"
     ref="textareaRef"
     v-model="localValue"
     :aria-label="ariaLabel"

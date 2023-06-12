@@ -27,6 +27,12 @@ describe("TextAreaInput", () => {
     expect(input?.tagName).toBe("TEXTAREA")
   })
 
+  it("sets the ID of the textarea", () => {
+    renderComponent({ id: "test-id" })
+    const input: HTMLTextAreaElement | null = screen.queryByRole("textbox")
+    expect(input).toHaveAttribute("id", "test-id")
+  })
+
   it("shows input with an aria label", () => {
     renderComponent({ ariaLabel: "test-label" })
     const input = screen.queryByLabelText("test-label")

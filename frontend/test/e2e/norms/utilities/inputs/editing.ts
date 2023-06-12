@@ -18,6 +18,12 @@ const fillTextInput: FieldFiller<string> = async (page, id, value) => {
   await input.fill(value)
 }
 
+const fillTextArea: FieldFiller<string> = async (page, id, value) => {
+  const input = page.locator(`textarea#${id}`)
+  await expect(input).toBeEditable()
+  await input.fill(value)
+}
+
 const fillCheckbox: FieldFiller<boolean> = async (page, id, value) => {
   const input = page.locator(`input#${id}`)
   await expect(input).toBeEditable()
@@ -74,6 +80,7 @@ const FIELD_FILLERS: FieldFillerMapping = {
   [FieldType.RADIO]: fillRadioButton,
   [FieldType.CHIPS]: fillChipsInput,
   [FieldType.DROPDOWN]: fillDropdown,
+  [FieldType.TEXTAREA]: fillTextArea,
 }
 
 export function fillInputField<
