@@ -44,7 +44,7 @@ export function useNormMenuItems(
         getChildItem("Sachgebiet", "subjectAreas"),
         getChildItem("Überschriften und Abkürzungen", "officialShortTitle"),
         getChildItem("Inkrafttreten", "entryIntoForces"),
-        getChildItem("Außerkrafttreten", "expirationFields"),
+        getChildItem("Außerkrafttreten", "expirations"),
         getChildItem("Verkündungsdatum", "announcementDate"),
         getChildItem("Zitierdatum", "citationDates"),
         getChildItem("Amtliche Fundstelle", "officialReferences"),
