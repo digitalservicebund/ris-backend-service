@@ -106,7 +106,7 @@ class ProceedingDecisionIntegrationTest {
         DocumentUnitDTO.builder()
             .uuid(parentUuid)
             .creationtimestamp(Instant.now())
-            .documentnumber("1234567890")
+            .documentnumber("documntnumber")
             .dataSource(DataSource.NEURIS)
             .build();
     repository.save(parentDocumentUnitDTO).block();
@@ -156,7 +156,7 @@ class ProceedingDecisionIntegrationTest {
         DocumentUnitDTO.builder()
             .uuid(parentUuid)
             .creationtimestamp(Instant.now())
-            .documentnumber("1234567890123")
+            .documentnumber("documntnumber")
             .dataSource(DataSource.NEURIS)
             .build();
     parentDocumentUnitDTO = repository.save(parentDocumentUnitDTO).block();
@@ -182,7 +182,7 @@ class ProceedingDecisionIntegrationTest {
     webClient
         .mutateWith(csrf())
         .get()
-        .uri("/api/v1/caselaw/documentunits/docnumber")
+        .uri("/api/v1/caselaw/documentunits/documntnumber")
         .exchange()
         .expectStatus()
         .isOk()
@@ -288,7 +288,7 @@ class ProceedingDecisionIntegrationTest {
         DocumentUnitDTO.builder()
             .uuid(parentUuid)
             .creationtimestamp(Instant.now())
-            .documentnumber("1234567890123")
+            .documentnumber("documntnumber")
             .dataSource(DataSource.NEURIS)
             .build();
     parentDocumentUnitDTO = repository.save(parentDocumentUnitDTO).block();
@@ -325,7 +325,7 @@ class ProceedingDecisionIntegrationTest {
     webClient
         .mutateWith(csrf())
         .get()
-        .uri("/api/v1/caselaw/documentunits/docnumber")
+        .uri("/api/v1/caselaw/documentunits/documntnumber")
         .exchange()
         .expectStatus()
         .isOk()
