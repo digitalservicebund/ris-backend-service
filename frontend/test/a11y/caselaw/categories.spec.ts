@@ -133,7 +133,7 @@ test.describe("a11y of categories page (/caselaw/documentunit/{documentNumber}/c
       async () => {
         await fillProceedingDecisionInputs(page, {
           court: "AG Aalen",
-          date: "03.12.2004",
+          decisionDate: "03.12.2004",
           fileNumber: "1a2b3c",
         })
       },
@@ -143,7 +143,7 @@ test.describe("a11y of categories page (/caselaw/documentunit/{documentNumber}/c
     await page.reload()
     await toggleProceedingDecisionsSection(page)
     await fillProceedingDecisionInputs(page, {
-      date: "03.12.2004",
+      decisionDate: "03.12.2004",
     })
 
     const accessibilityScanResults = await new AxeBuilder({ page })
