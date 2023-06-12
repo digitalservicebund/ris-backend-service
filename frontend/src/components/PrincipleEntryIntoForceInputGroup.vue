@@ -1,9 +1,7 @@
 <script lang="ts" setup>
 import { computed, ref, watch } from "vue"
+import DateUndefinedDateInputGroup from "@/components/DateUndefinedDateInputGroup.vue"
 import { Metadata, UndefinedDate } from "@/domain/Norm"
-import DateInput from "@/shared/components/input/DateInput.vue"
-import DropdownInput from "@/shared/components/input/DropdownInput.vue"
-import InputField from "@/shared/components/input/InputField.vue"
 
 interface Props {
   modelValue: Metadata
@@ -19,11 +17,6 @@ const emit = defineEmits<Emits>()
 enum InputType {
   DATE = "date",
   UNDEFINED_DATE = "undefined_date",
-}
-
-interface DropdownItem {
-  label: string
-  value: string
 }
 
 const inputValue = ref(props.modelValue)
@@ -53,19 +46,6 @@ watch(inputValue, () => emit("update:modelValue", inputValue.value), {
 })
 
 watch(inputValue, detectSelectedInputType, { immediate: true, deep: true })
-
-const ENTRY_INTO_FORCE_DATE_TRANSLATIONS: { [Value in UndefinedDate]: string } =
-  {
-    [UndefinedDate.UNDEFINED_UNKNOWN]: "unbestimmt (unbekannt)",
-    [UndefinedDate.UNDEFINED_FUTURE]: "unbestimmt (zukünftig)",
-    [UndefinedDate.UNDEFINED_NOT_PRESENT]: "nicht vorhanden",
-  }
-
-const dropdownItems: DropdownItem[] = Object.entries(
-  ENTRY_INTO_FORCE_DATE_TRANSLATIONS
-).map(([value, label]) => {
-  return { label, value }
-})
 
 const undefinedDateState = computed({
   get: () => inputValue.value.UNDEFINED_DATE?.[0],
@@ -112,34 +92,17 @@ const dateValue = computed({
         unbestimmt
       </label>
     </div>
-    <InputField
-      v-if="selectedInputType === InputType.DATE"
-      id="principleEntryIntoForceDate"
-      aria-label="Bestimmtes grundsätzliches Inkrafttretedatum"
-      label="Bestimmtes grundsätzliches Inkrafttretedatum"
-    >
-      <DateInput
-        id="principleEntryIntoForceDate"
-        v-model="dateValue"
-        aria-label="Bestimmtes grundsätzliches Inkrafttretedatum Date Input"
-        is-future-date
-      />
-    </InputField>
-    <InputField
-      v-if="selectedInputType === InputType.UNDEFINED_DATE"
-      id="principleEntryIntoForceUndefinedDateState"
-      aria-label="Unbestimmtes grundsätzliches Inkrafttretedatum"
-      label="Unbestimmtes grundsätzliches Inkrafttretedatum"
-    >
-      <DropdownInput
-        id="principleEntryIntoForceUndefinedDateState"
-        v-model="undefinedDateState"
-        aria-label="Unbestimmtes grundsätzliches Inkrafttretedatum Dropdown"
-        has-smaller-height
-        :items="dropdownItems"
-        placeholder="Bitte auswählen"
-      />
-    </InputField>
+    <DateUndefinedDateInputGroup
+      v-model:date-value="dateValue"
+      v-model:undefined-date-state-value="undefinedDateState"
+      date-id="principleEntryIntoForceDate"
+      date-input-aria-label="Bestimmtes grundsätzliches Inkrafttretedatum Date Input"
+      date-input-field-label="Bestimmtes grundsätzliches Inkrafttretedatum"
+      :selected-input-type="selectedInputType"
+      undefined-date-dropdown-aria-label="Unbestimmtes grundsätzliches Inkrafttretedatum Dropdown"
+      undefined-date-id="principleEntryIntoForceUndefinedDateState"
+      undefined-date-input-field-label="Unbestimmtes grundsätzliches Inkrafttretedatum"
+    />
   </div>
 </template>
 
