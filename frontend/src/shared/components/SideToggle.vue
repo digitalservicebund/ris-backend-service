@@ -67,10 +67,10 @@ export enum OpeningDirection {
 </script>
 
 <template>
-  <div class="bg-white pr-[1.25rem]">
+  <div class="bg-white pr-[1.25rem] relative">
     <button
       :aria-label="label"
-      class="absolute flex items-center top-28"
+      class="absolute flex items-center top-28 z-20"
       :class="classes"
       @click="toggleContentVisibility"
     >
