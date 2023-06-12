@@ -173,7 +173,6 @@ public class DocumentUnitService {
 
   public Mono<Page<DocumentUnitListEntry>> getAll(
       Pageable pageable, DocumentationOffice documentationOffice) {
-    log.info("Pageable: {}", pageable);
     return repository
         .findAll(
             PageRequest.of(
@@ -183,17 +182,8 @@ public class DocumentUnitService {
             documentationOffice)
         .collectList()
         .zipWith(
-            repository
-                .countByDataSourceAndDocumentationOffice(DataSource.NEURIS, documentationOffice)
-                .doOnNext(
-                    total -> {
-                      log.info("Total: {}", total);
-                    }))
-        .doOnNext(
-            tuple -> {
-              log.info("Tuple: {}", tuple.toString());
-            })
-        .log()
+            repository.countByDataSourceAndDocumentationOffice(
+                DataSource.NEURIS, documentationOffice))
         .map(tuple -> new PageImpl<>(tuple.getT1(), pageable, tuple.getT2()));
   }
 
