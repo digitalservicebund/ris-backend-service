@@ -5,7 +5,6 @@ import de.bund.digitalservice.ris.caselaw.domain.HttpMailSender;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sendinblue.ApiClient;
@@ -34,7 +33,8 @@ public class SendInBlueHttpMailSender implements HttpMailSender {
       String subject,
       String content,
       String fileName,
-      UUID documentUnitUuid) {
+      String fileContent,
+      String tag) {
 
     ApiClient defaultClient = Configuration.getDefaultApiClient();
     ApiKeyAuth apiKeyAuth = (ApiKeyAuth) defaultClient.getAuthentication("api-key");
@@ -48,17 +48,19 @@ public class SendInBlueHttpMailSender implements HttpMailSender {
     SendSmtpEmailTo to = new SendSmtpEmailTo();
     to.setEmail(receiverAddress);
     toList.add(to);
+
     SendSmtpEmailAttachment attachment = new SendSmtpEmailAttachment();
     attachment.setName(fileName);
-    attachment.setContent(content.getBytes(StandardCharsets.UTF_8));
+    attachment.setContent(fileContent.getBytes(StandardCharsets.UTF_8));
     List<SendSmtpEmailAttachment> attachmentList = new ArrayList<>();
     attachmentList.add(attachment);
+
     List<String> tags = new ArrayList<>();
-    tags.add(documentUnitUuid.toString());
+    tags.add(tag);
     SendSmtpEmail sendSmtpEmail = new SendSmtpEmail();
     sendSmtpEmail.setSender(sender);
     sendSmtpEmail.setTo(toList);
-    sendSmtpEmail.setTextContent("neuris");
+    sendSmtpEmail.setTextContent(content);
     sendSmtpEmail.setSubject(subject);
     sendSmtpEmail.setAttachment(attachmentList);
     sendSmtpEmail.setTags(tags);

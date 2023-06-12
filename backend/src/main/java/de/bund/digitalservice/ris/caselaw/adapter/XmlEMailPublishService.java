@@ -106,9 +106,10 @@ public class XmlEMailPublishService implements EmailPublishService {
         senderAddress,
         xmlMail.receiverAddress(),
         xmlMail.mailSubject(),
-        xmlMail.xml(),
+        "neuris",
         xmlMail.fileName(),
-        xmlMail.documentUnitUuid());
+        xmlMail.xml(),
+        xmlMail.documentUnitUuid().toString());
   }
 
   private XmlMail generateXmlMail(

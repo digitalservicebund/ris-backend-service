@@ -110,9 +110,10 @@ class XmlEMailPublishServiceTest {
             SENDER_ADDRESS,
             RECEIVER_ADDRESS,
             SAVED_XML_MAIL.mailSubject(),
-            SAVED_XML_MAIL.xml(),
+            "neuris",
             SAVED_XML_MAIL.fileName(),
-            SAVED_XML_MAIL.documentUnitUuid());
+            SAVED_XML_MAIL.xml(),
+            SAVED_XML_MAIL.documentUnitUuid().toString());
   }
 
   @Test
@@ -140,7 +141,14 @@ class XmlEMailPublishServiceTest {
 
     verify(repository, times(0)).save(any(XmlMail.class));
     verify(mailSender, times(0))
-        .sendMail(anyString(), anyString(), anyString(), anyString(), anyString(), any(UUID.class));
+        .sendMail(
+            anyString(),
+            anyString(),
+            anyString(),
+            anyString(),
+            anyString(),
+            anyString(),
+            anyString());
   }
 
   @Test
@@ -157,7 +165,14 @@ class XmlEMailPublishServiceTest {
 
     verify(repository, times(0)).save(any(XmlMail.class));
     verify(mailSender, times(0))
-        .sendMail(anyString(), anyString(), anyString(), anyString(), anyString(), any(UUID.class));
+        .sendMail(
+            anyString(),
+            anyString(),
+            anyString(),
+            anyString(),
+            anyString(),
+            anyString(),
+            anyString());
   }
 
   @Test
@@ -173,7 +188,14 @@ class XmlEMailPublishServiceTest {
 
     verify(repository, times(0)).save(any(XmlMail.class));
     verify(mailSender, times(0))
-        .sendMail(anyString(), anyString(), anyString(), anyString(), anyString(), any(UUID.class));
+        .sendMail(
+            anyString(),
+            anyString(),
+            anyString(),
+            anyString(),
+            anyString(),
+            anyString(),
+            anyString());
   }
 
   @Test
@@ -186,7 +208,14 @@ class XmlEMailPublishServiceTest {
 
     verify(repository).save(any(XmlMail.class));
     verify(mailSender)
-        .sendMail(anyString(), anyString(), anyString(), anyString(), anyString(), any(UUID.class));
+        .sendMail(
+            anyString(),
+            anyString(),
+            anyString(),
+            anyString(),
+            anyString(),
+            anyString(),
+            anyString());
   }
 
   @Test
@@ -201,14 +230,28 @@ class XmlEMailPublishServiceTest {
 
     verify(repository, times(0)).save(any(XmlMail.class));
     verify(mailSender, times(0))
-        .sendMail(anyString(), anyString(), anyString(), anyString(), anyString(), any(UUID.class));
+        .sendMail(
+            anyString(),
+            anyString(),
+            anyString(),
+            anyString(),
+            anyString(),
+            anyString(),
+            anyString());
   }
 
   @Test
   void testPublish_withExceptionBySendingEmail() {
     doThrow(DocumentUnitPublishException.class)
         .when(mailSender)
-        .sendMail(SENDER_ADDRESS, RECEIVER_ADDRESS, MAIL_SUBJECT, "xml", "test.xml", TEST_UUID);
+        .sendMail(
+            SENDER_ADDRESS,
+            RECEIVER_ADDRESS,
+            MAIL_SUBJECT,
+            "neuris",
+            "test.xml",
+            "xml",
+            TEST_UUID.toString());
 
     StepVerifier.create(service.publish(documentUnit, RECEIVER_ADDRESS))
         .expectErrorMatches(DocumentUnitPublishException.class::isInstance)
@@ -216,7 +259,14 @@ class XmlEMailPublishServiceTest {
 
     verify(repository, times(0)).save(any(XmlMail.class));
     verify(mailSender)
-        .sendMail(SENDER_ADDRESS, RECEIVER_ADDRESS, MAIL_SUBJECT, "xml", "test.xml", TEST_UUID);
+        .sendMail(
+            SENDER_ADDRESS,
+            RECEIVER_ADDRESS,
+            MAIL_SUBJECT,
+            "neuris",
+            "test.xml",
+            "xml",
+            TEST_UUID.toString());
   }
 
   @Test
