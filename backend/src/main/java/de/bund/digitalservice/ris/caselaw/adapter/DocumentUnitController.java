@@ -87,9 +87,9 @@ public class DocumentUnitController {
   }
 
   @GetMapping(value = "/{documentNumber}")
-  @PreAuthorize("@authService.userHasReadAccess(#documentNumber, #oidcUser)")
+  @PreAuthorize("@authService.userHasReadAccess.apply(#documentNumber)")
   public Mono<ResponseEntity<DocumentUnit>> getByDocumentNumber(
-      @NonNull @PathVariable String documentNumber, @AuthenticationPrincipal OidcUser oidcUser) {
+      @NonNull @PathVariable String documentNumber) {
 
     if (documentNumber.length() != 13 && documentNumber.length() != 14) {
       return Mono.just(ResponseEntity.unprocessableEntity().body(DocumentUnit.builder().build()));
