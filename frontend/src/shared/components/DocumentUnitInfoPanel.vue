@@ -16,6 +16,7 @@ interface Props {
   heading?: string
   firstRow?: (PropertyInfo | IconBadgeProps)[]
   secondRow?: (PropertyInfo | IconBadgeProps)[]
+  hasSaveButton?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -23,6 +24,7 @@ const props = withDefaults(defineProps<Props>(), {
   heading: "",
   firstRow: () => [],
   secondRow: () => [],
+  hasSaveButton: false,
 })
 
 function isBadge(
@@ -92,7 +94,7 @@ async function handleUpdateDocumentUnit(): Promise<ServiceResponse<void>> {
         </div>
       </div>
     </div>
-    <div>
+    <div v-if="hasSaveButton">
       <SaveButton
         aria-label="Speichern Button"
         :service-callback="handleUpdateDocumentUnit"
