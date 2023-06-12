@@ -41,7 +41,6 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -599,45 +598,109 @@ class ProceedingDecisionIntegrationTest {
   }
 
   @Test
-  @Disabled("will be implemented")
   void testSearchForDocumentUnitsByProceedingDecisionInput_shouldOnlyFindPublished() {
-    prepareDocumentUnitsOfDifferentOfficesandStatus();
+    Instant date = Instant.parse("2023-02-02T00:00:00.00Z");
+    var du1 =
+        buildDocumentUnitMetadataDTO(
+            "Court1",
+            "Berlin",
+            date,
+            List.of("AkteZ"),
+            "EF",
+            "DigitalService",
+            DocumentUnitStatus.UNPUBLISHED);
+    var du2 =
+        buildDocumentUnitMetadataDTO(
+            "Court2",
+            "Berlin",
+            date,
+            List.of("AkteZ"),
+            "EF",
+            "DigitalService",
+            DocumentUnitStatus.PUBLISHED);
+    var du3 =
+        buildDocumentUnitMetadataDTO(
+            "Court3", "Berlin", date, List.of("AkteZ"), "EF", "DigitalService", null);
+
+    var du4 =
+        buildDocumentUnitMetadataDTO(
+            "Court4",
+            "Berlin",
+            date,
+            List.of("AkteZ"),
+            "EF",
+            "CC-RIS",
+            DocumentUnitStatus.UNPUBLISHED);
+    var du5 =
+        buildDocumentUnitMetadataDTO(
+            "Court5",
+            "Berlin",
+            date,
+            List.of("AkteZ"),
+            "EF",
+            "CC-RIS",
+            DocumentUnitStatus.PUBLISHED);
+    var du6 =
+        buildDocumentUnitMetadataDTO(
+            "Court6", "Berlin", date, List.of("AkteZ"), "EF", "CC-RIS", null);
+
     simulateAPICall(ProceedingDecision.builder().fileNumber("AkteZ").build())
         .jsonPath("$.content.length()")
-        .isEqualTo(2);
-  }
-
-  private void prepareDocumentUnitsOfDifferentOfficesandStatus() {
-    Instant date = Instant.parse("2023-02-02T00:00:00.00Z");
-    buildDocumentUnitMetadataDTO(
-        "Court1", "Berlin", date, List.of("AkteZ"), "EF", "DigitalService", false);
-    buildDocumentUnitMetadataDTO(
-        "Court2", "Berlin", date, List.of("AkteZ"), "EF", "DigitalService", true);
-    buildDocumentUnitMetadataDTO("Court3", "Berlin", date, List.of("AkteZ"), "EF", "CC-RIS", false);
-    buildDocumentUnitMetadataDTO("Court4", "Berlin", date, List.of("AkteZ"), "EF", "CC-RIS", true);
+        .isEqualTo(4)
+        .jsonPath("$.content[?(@.uuid=='" + du1.getUuid() + "')]")
+        .isEmpty()
+        .jsonPath("$.content[?(@.uuid=='" + du2.getUuid() + "')]")
+        .isArray()
+        .jsonPath("$.content[?(@.uuid=='" + du3.getUuid() + "')]")
+        .isArray()
+        .jsonPath("$.content[?(@.uuid=='" + du4.getUuid() + "')]")
+        .isEmpty()
+        .jsonPath("$.content[?(@.uuid=='" + du5.getUuid() + "')]")
+        .isArray()
+        .jsonPath("$.content[?(@.uuid=='" + du6.getUuid() + "')]")
+        .isArray();
   }
 
   private Instant prepareDocumentUnitMetadataDTOs() {
     Instant date1 = Instant.parse("2023-01-02T00:00:00.00Z");
     DocumentUnitMetadataDTO documentUnit1 =
         buildDocumentUnitMetadataDTO(
-            "SomeCourt", "Berlin", date1, List.of("AkteX", "AkteY"), "CD", "DigitalService", true);
+            "SomeCourt",
+            "Berlin",
+            date1,
+            List.of("AkteX", "AkteY"),
+            "CD",
+            "DigitalService",
+            DocumentUnitStatus.PUBLISHED);
 
     Instant date2 = Instant.parse("2023-02-03T00:00:00.00Z");
     DocumentUnitMetadataDTO documentUnit2 =
         buildDocumentUnitMetadataDTO(
-            "AnotherCourt", "Hamburg", date2, null, "EF", "DigitalService", true);
+            "AnotherCourt",
+            "Hamburg",
+            date2,
+            null,
+            "EF",
+            "DigitalService",
+            DocumentUnitStatus.PUBLISHED);
 
     Instant date3 = Instant.parse("2023-03-04T00:00:00.00Z");
     DocumentUnitMetadataDTO documentUnit3 =
         buildDocumentUnitMetadataDTO(
-            "YetAnotherCourt", "Munich", date3, List.of("AkteX"), "GH", "DigitalService", true);
+            "YetAnotherCourt",
+            "Munich",
+            date3,
+            List.of("AkteX"),
+            "GH",
+            "DigitalService",
+            DocumentUnitStatus.PUBLISHED);
     return date1;
   }
 
   private BodyContentSpec simulateAPICall(ProceedingDecision proceedingDecisionSearchInput) {
     return webClient
         .mutateWith(csrf())
+        .mutateWith(getMockLogin())
         .put()
         .uri("/api/v1/caselaw/documentunits/search?pg=0&sz=30")
         .bodyValue(proceedingDecisionSearchInput)
@@ -654,7 +717,7 @@ class ProceedingDecisionIntegrationTest {
       List<String> fileNumbers,
       String documentTypeJurisShortcut,
       String documentOfficeLabel,
-      boolean publish) {
+      DocumentUnitStatus status) {
 
     Long documentTypeId = null;
     if (documentTypeJurisShortcut != null) {
@@ -694,16 +757,21 @@ class ProceedingDecisionIntegrationTest {
               .collect(Collectors.toList());
       fileNumberRepository.saveAll(fileNumberDTOs).collectList().block();
     }
-    DocumentUnitStatus status =
-        publish ? DocumentUnitStatus.PUBLISHED : DocumentUnitStatus.UNPUBLISHED;
+
+    if (status == null) {
+      return documentUnitMetadataDTO;
+    }
 
     assertThat(
-            statusRepository.save(
-                DocumentUnitStatusDTO.builder()
-                    .documentUnitId(documentUnitMetadataDTO.getUuid())
-                    .status(status)
-                    .newEntry(true)
-                    .build()))
+            statusRepository
+                .save(
+                    DocumentUnitStatusDTO.builder()
+                        .id(UUID.randomUUID())
+                        .documentUnitId(documentUnitMetadataDTO.getUuid())
+                        .status(status)
+                        .newEntry(true)
+                        .build())
+                .block())
         .isNotNull();
     return documentUnitMetadataDTO;
   }

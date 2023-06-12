@@ -41,8 +41,16 @@ public interface DatabaseDocumentUnitMetadataRepository
       String dataSource, UUID documentationOffice, Integer pageSize, Long offset);
 
   @Query(
-      "SELECT * FROM doc_unit WHERE "
+      "SELECT * "
+          + "FROM doc_unit docunit "
+          + "LEFT JOIN ( "
+          + "    SELECT DISTINCT ON (document_unit_id) document_unit_id, status "
+          + "    FROM public.document_unit_status "
+          + "    ORDER BY document_unit_id, created_at DESC "
+          + ") status ON uuid = status.document_unit_id "
+          + "WHERE "
           + WHERE
+          + "AND (status.status = 'PUBLISHED' OR status.status IS NULL) "
           + "ORDER BY decision_date DESC, id DESC "
           + "LIMIT :pageSize OFFSET :offset")
   Flux<DocumentUnitMetadataDTO> findByCourtDateFileNumberAndDocumentType(
