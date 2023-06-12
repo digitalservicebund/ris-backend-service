@@ -28,7 +28,11 @@ const emit = defineEmits<Emits>()
 const value = ref(props.modelValue)
 
 const inputAttributes = computed(
-  (): InputAttributes => ({ ariaLabel: props.label, readOnly: props.readonly })
+  (): InputAttributes => ({
+    ariaLabel: props.label,
+    readOnly: props.readonly,
+    autosize: props.type === InputType.TEXTAREA,
+  })
 )
 
 watch(

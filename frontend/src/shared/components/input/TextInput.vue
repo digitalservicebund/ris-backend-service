@@ -22,7 +22,8 @@ interface Emits {
 
 const props = defineProps<Props>()
 const emit = defineEmits<Emits>()
-const inputRef = ref()
+
+const inputRef = ref<HTMLInputElement | null>()
 
 const { inputValue, emitInputEvent } = useInputModel<string, Props, Emits>(
   props,
@@ -37,7 +38,7 @@ const conditionalClasses = computed(() => ({
 const tabindex = computed(() => (props.readOnly ? -1 : 0))
 
 function focusInput() {
-  inputRef.value.focus()
+  inputRef.value?.focus()
 }
 
 defineExpose({ focusInput })
@@ -49,10 +50,10 @@ defineExpose({ focusInput })
     ref="inputRef"
     v-model="inputValue"
     :aria-label="ariaLabel"
-    class="-outline-offset-4 autofill:focus:shadow-white autofill:focus:text-inherit autofill:shadow-white autofill:text-inherit bg-white border-2 border-blue-800 content-between flex flex-wrap focus:outline h-[3.75rem] hover:outline input outline-2 outline-blue-800 px-16 read-only:border-none read-only:hover:outline-0 readonly:focus:outline-none w-full"
+    class="-outline-offset-4 autofill:focus:shadow-white autofill:focus:text-inherit autofill:shadow-white autofill:text-inherit bg-white block border-2 border-blue-800 focus:outline h-[3.75rem] hover:outline input outline-2 outline-blue-800 px-16 py-12 read-only:border-none read-only:hover:outline-0 readonly:focus:outline-none w-full"
     :class="conditionalClasses"
     :placeholder="placeholder"
-    :readonly="$props.readOnly"
+    :readonly="readOnly"
     :tabindex="tabindex"
     type="text"
     @input="emitInputEvent"

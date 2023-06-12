@@ -487,6 +487,7 @@ const GeneralSummary = withSummarizer(GeneralSummarizer)
       id="officialLongTitle"
       v-model="flatMetadata.officialLongTitle"
       label="Amtliche Langüberschrift"
+      :type="InputType.TEXTAREA"
     />
 
     <SingleDataFieldSection

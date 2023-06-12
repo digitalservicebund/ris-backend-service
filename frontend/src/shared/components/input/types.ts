@@ -15,6 +15,7 @@ export enum InputType {
   DATECHIPS = "datechips",
   NESTED = "nested",
   COMBOBOX = "combobox",
+  TEXTAREA = "textarea",
 }
 
 //BASE
@@ -154,6 +155,20 @@ export interface CheckboxInputField extends BaseInputField {
   inputAttributes: BaseInputAttributes
 }
 
+//TEXTAREA
+export type TextaraInputModelType = string
+
+export interface TextaraInputAttqributes extends BaseInputAttributes {
+  placeholder?: string
+  readOnly?: boolean
+  autosize?: boolean
+}
+
+export interface TextaraInputField extends BaseInputField {
+  type: InputType.TEXTAREA
+  inputAttributes: TextaraInputAttqributes
+}
+
 export type InputField =
   | TextInputField
   | DropdownInputField
@@ -163,6 +178,7 @@ export type InputField =
   | DateChipsInputField
   | NestedInputField
   | ComboboxInputField
+  | TextaraInputField
 
 export type InputAttributes =
   | TextInputAttributes
@@ -171,6 +187,7 @@ export type InputAttributes =
   | NestedInputAttributes
   | DateAttributes
   | ComboboxAttributes
+  | TextaraInputAttqributes
 
 export type ModelType =
   | TextInputModelType
@@ -182,6 +199,7 @@ export type ModelType =
   | NestedInputModelType
   | ComboboxInputModelType
   | DocumentationOffice
+  | TextaraInputModelType
 
 // TODO We keep the name `defaultMessage` from the backend response,
 // but this could ne misleading. We should rename this to `message`.
