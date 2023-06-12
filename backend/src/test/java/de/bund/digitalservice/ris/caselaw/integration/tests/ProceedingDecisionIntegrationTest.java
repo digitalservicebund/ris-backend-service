@@ -39,8 +39,8 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.junit.Ignore;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -584,7 +584,7 @@ class ProceedingDecisionIntegrationTest {
   }
 
   @Test
-  @Ignore
+  @Disabled("will be implemented")
   void testSearchForDocumentUnitsByProceedingDecisionInput_shouldOnlyFindPublished() {
     prepareDocumentUnitsOfDifferentOfficesandStatus();
     simulateAPICall(ProceedingDecision.builder().fileNumber("AkteZ").build())
