@@ -11,9 +11,12 @@ import de.bund.digitalservice.ris.caselaw.adapter.KeycloakUserService;
 import de.bund.digitalservice.ris.caselaw.adapter.ProceedingDecisionController;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentUnitMetadataRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentUnitRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentUnitStatusRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentationOfficeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitMetadataDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitStatusDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentationOfficeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.FileNumberDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.FileNumberRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.PostgresDocumentUnitRepositoryImpl;
@@ -26,6 +29,7 @@ import de.bund.digitalservice.ris.caselaw.config.PostgresConfig;
 import de.bund.digitalservice.ris.caselaw.domain.DataSource;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatus;
 import de.bund.digitalservice.ris.caselaw.domain.EmailPublishService;
 import de.bund.digitalservice.ris.caselaw.domain.ProceedingDecision;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.court.Court;
@@ -35,6 +39,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.junit.Ignore;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -78,7 +83,7 @@ class ProceedingDecisionIntegrationTest {
   @Autowired private FileNumberRepository fileNumberRepository;
   @Autowired private DatabaseDocumentTypeRepository databaseDocumentTypeRepository;
   @Autowired private DatabaseDocumentationOfficeRepository documentationOfficeRepository;
-
+  @Autowired private DatabaseDocumentUnitStatusRepository statusRepository;
   @MockBean private S3AsyncClient s3AsyncClient;
   @MockBean private EmailPublishService publishService;
 
@@ -90,6 +95,7 @@ class ProceedingDecisionIntegrationTest {
     metadataRepository.deleteAll().block();
     fileNumberRepository.deleteAll().block();
     databaseDocumentTypeRepository.deleteAll().block();
+    statusRepository.deleteAll().block();
   }
 
   // This test is flaky if executed locally, but reliable in the pipeline
@@ -577,18 +583,40 @@ class ProceedingDecisionIntegrationTest {
         .isEqualTo(0);
   }
 
+  @Test
+  @Ignore
+  void testSearchForDocumentUnitsByProceedingDecisionInput_shouldOnlyFindPublished() {
+    prepareDocumentUnitsOfDifferentOfficesandStatus();
+    simulateAPICall(ProceedingDecision.builder().fileNumber("AkteZ").build())
+        .jsonPath("$.content.length()")
+        .isEqualTo(2);
+  }
+
+  private void prepareDocumentUnitsOfDifferentOfficesandStatus() {
+    Instant date = Instant.parse("2023-02-02T00:00:00.00Z");
+    buildDocumentUnitMetadataDTO(
+        "Court1", "Berlin", date, List.of("AkteZ"), "EF", "DigitalService", false);
+    buildDocumentUnitMetadataDTO(
+        "Court2", "Berlin", date, List.of("AkteZ"), "EF", "DigitalService", true);
+    buildDocumentUnitMetadataDTO("Court3", "Berlin", date, List.of("AkteZ"), "EF", "CC-RIS", false);
+    buildDocumentUnitMetadataDTO("Court4", "Berlin", date, List.of("AkteZ"), "EF", "CC-RIS", true);
+  }
+
   private Instant prepareDocumentUnitMetadataDTOs() {
     Instant date1 = Instant.parse("2023-01-02T00:00:00.00Z");
     DocumentUnitMetadataDTO documentUnit1 =
-        buildDocumentUnitMetadataDTO("SomeCourt", "Berlin", date1, List.of("AkteX", "AkteY"), "CD");
+        buildDocumentUnitMetadataDTO(
+            "SomeCourt", "Berlin", date1, List.of("AkteX", "AkteY"), "CD", "DigitalService", true);
 
     Instant date2 = Instant.parse("2023-02-03T00:00:00.00Z");
     DocumentUnitMetadataDTO documentUnit2 =
-        buildDocumentUnitMetadataDTO("AnotherCourt", "Hamburg", date2, null, "EF");
+        buildDocumentUnitMetadataDTO(
+            "AnotherCourt", "Hamburg", date2, null, "EF", "DigitalService", true);
 
     Instant date3 = Instant.parse("2023-03-04T00:00:00.00Z");
     DocumentUnitMetadataDTO documentUnit3 =
-        buildDocumentUnitMetadataDTO("YetAnotherCourt", "Munich", date3, List.of("AkteX"), "GH");
+        buildDocumentUnitMetadataDTO(
+            "YetAnotherCourt", "Munich", date3, List.of("AkteX"), "GH", "DigitalService", true);
     return date1;
   }
 
@@ -609,7 +637,9 @@ class ProceedingDecisionIntegrationTest {
       String courtLocation,
       Instant decisionDate,
       List<String> fileNumbers,
-      String documentTypeJurisShortcut) {
+      String documentTypeJurisShortcut,
+      String documentOfficeLabel,
+      boolean publish) {
 
     Long documentTypeId = null;
     if (documentTypeJurisShortcut != null) {
@@ -623,6 +653,10 @@ class ProceedingDecisionIntegrationTest {
       documentTypeId = databaseDocumentTypeRepository.save(documentTypeDTO).block().getId();
     }
 
+    DocumentationOfficeDTO documentOffice =
+        documentationOfficeRepository.findByLabel(documentOfficeLabel).block();
+    assertThat(documentOffice).isNotNull();
+
     DocumentUnitMetadataDTO documentUnitMetadataDTO =
         DocumentUnitMetadataDTO.builder()
             .uuid(UUID.randomUUID())
@@ -633,6 +667,7 @@ class ProceedingDecisionIntegrationTest {
             .decisionDate(decisionDate)
             .documentTypeId(documentTypeId)
             .dataSource(DataSource.NEURIS)
+            .documentationOfficeId(documentOffice.getId())
             .build();
     Long id = metadataRepository.save(documentUnitMetadataDTO).block().getId();
 
@@ -644,6 +679,17 @@ class ProceedingDecisionIntegrationTest {
               .collect(Collectors.toList());
       fileNumberRepository.saveAll(fileNumberDTOs).collectList().block();
     }
+    DocumentUnitStatus status =
+        publish ? DocumentUnitStatus.PUBLISHED : DocumentUnitStatus.UNPUBLISHED;
+
+    assertThat(
+            statusRepository.save(
+                DocumentUnitStatusDTO.builder()
+                    .documentUnitId(documentUnitMetadataDTO.getUuid())
+                    .status(status)
+                    .newEntry(true)
+                    .build()))
+        .isNotNull();
     return documentUnitMetadataDTO;
   }
 }

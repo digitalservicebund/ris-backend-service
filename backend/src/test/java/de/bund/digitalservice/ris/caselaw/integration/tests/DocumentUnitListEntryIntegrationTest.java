@@ -29,6 +29,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -200,5 +202,42 @@ public class DocumentUnitListEntryIntegrationTest {
       Instant tNext = timestampsActual.get(i + 1);
       assertThat(tThis).isAfter(tNext);
     }
+  }
+
+  @Test
+  void testForCorrectPagination() {
+    // created via db migration V0_79__caselaw_insert_default_documentation_offices
+    DocumentationOfficeDTO documentationOfficeDTO =
+        documentationOfficeRepository.findByLabel("DigitalService").block();
+
+    List<DocumentUnitDTO> documents =
+        IntStream.range(0, 99)
+            .mapToObj(
+                i ->
+                    DocumentUnitDTO.builder()
+                        .uuid(UUID.randomUUID())
+                        .creationtimestamp(Instant.now())
+                        .documentnumber("123456780" + i)
+                        .dataSource(DataSource.NEURIS)
+                        .documentationOfficeId(documentationOfficeDTO.getId())
+                        .build())
+            .collect(Collectors.toList());
+
+    repository.saveAll(documents).blockLast();
+
+    EntityExchangeResult<String> result =
+        webClient
+            .mutateWith(csrf())
+            .mutateWith(getMockLogin())
+            .get()
+            .uri("/api/v1/caselaw/documentunits?pg=0&sz=1")
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectBody(String.class)
+            .returnResult();
+
+    Integer totalElements = JsonPath.read(result.getResponseBody(), "$.totalElements");
+    assertThat(totalElements).isEqualTo(99);
   }
 }
