@@ -1,14 +1,19 @@
-INSERT INTO
+insert into
   documentation_unit_link (
     parent_documentation_unit_uuid,
     child_documentation_unit_uuid,
     type
   )
-SELECT
+select
   dp.uuid,
   dc.uuid,
   'PREVIOUS_DECISION'
-FROM
+from
   proceeding_decision_link pdl
-  INNER JOIN doc_unit dc ON pdl.child_document_unit_id = dc.id
-  INNER JOIN doc_unit dp ON pdl.parent_document_unit_id = dp.id;
+  inner join doc_unit dc on pdl.child_document_unit_id = dc.id
+  inner join doc_unit dp on pdl.parent_document_unit_id = dp.id
+  left outer join documentation_unit_link dul on dc.uuid = dul.child_documentation_unit_uuid
+  and dp.uuid = dul.parent_documentation_unit_uuid
+  and dul.type = 'PREVIOUS_DECISION'
+where
+  dul.id is null;
