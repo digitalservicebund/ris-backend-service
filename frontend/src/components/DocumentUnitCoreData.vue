@@ -8,7 +8,6 @@ import { useTransformNestedData } from "@/shared/composables/useTransformNestedD
 
 interface Props {
   modelValue: CoreData
-  updateStatus: number
   validationErrors?: ValidationError[]
 }
 

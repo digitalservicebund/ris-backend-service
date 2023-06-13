@@ -80,7 +80,6 @@ watchEffect(() => {
       <DocumentUnitInfoPanel
         :document-unit="documentUnit"
         :first-row="firstRowInfos"
-        has-save-button
         :heading="documentUnit.documentNumber ?? ''"
         :second-row="secondRowInfos"
       />

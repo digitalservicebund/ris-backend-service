@@ -1,8 +1,4 @@
 <script lang="ts" setup>
-import SaveButton from "@/components/SaveDocumentUnitButton.vue"
-import DocumentUnit from "@/domain/documentUnit"
-import documentUnitService from "@/services/documentUnitService"
-import { ServiceResponse } from "@/services/httpClient"
 import IconBadge, { IconBadgeProps } from "@/shared/components/IconBadge.vue"
 import PropertyInfo from "@/shared/components/PropertyInfo.vue"
 
@@ -12,44 +8,21 @@ interface PropertyInfo {
 }
 
 interface Props {
-  documentUnit?: DocumentUnit
   heading?: string
   firstRow?: (PropertyInfo | IconBadgeProps)[]
   secondRow?: (PropertyInfo | IconBadgeProps)[]
-  hasSaveButton?: boolean
 }
 
-const props = withDefaults(defineProps<Props>(), {
-  documentUnit: undefined,
+withDefaults(defineProps<Props>(), {
   heading: "",
   firstRow: () => [],
   secondRow: () => [],
-  hasSaveButton: false,
 })
 
 function isBadge(
   entry: PropertyInfo | IconBadgeProps
 ): entry is IconBadgeProps {
   return "icon" in entry
-}
-
-async function handleUpdateDocumentUnit(): Promise<ServiceResponse<void>> {
-  let response: ServiceResponse<void> = {
-    status: 200,
-    data: undefined,
-    error: undefined,
-  }
-  if (props.documentUnit) {
-    response = (await documentUnitService.update(
-      props.documentUnit
-    )) as ServiceResponse<void>
-    return {
-      status: response.status,
-      data: response.data,
-      error: response.error,
-    } as ServiceResponse<void>
-  }
-  return response
 }
 </script>
 
@@ -93,12 +66,6 @@ async function handleUpdateDocumentUnit(): Promise<ServiceResponse<void>> {
           ></PropertyInfo>
         </div>
       </div>
-    </div>
-    <div v-if="hasSaveButton">
-      <SaveButton
-        aria-label="Speichern Button"
-        :service-callback="handleUpdateDocumentUnit"
-      />
     </div>
   </div>
 </template>
