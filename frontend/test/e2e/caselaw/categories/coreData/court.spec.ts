@@ -238,13 +238,12 @@ test.describe("court", () => {
       async () => {
         await page.locator("[aria-label='Gericht']").fill("bgh")
         await page.locator("text=BGH").click()
+        await waitForInputValue(page, "[aria-label='Gericht']", "BGH")
+        await waitForInputValue(page, "[aria-label='Rechtskraft']", "Ja")
       },
       page,
-      { clickSaveButton: true }
+      { clickSaveButton: true, reload: true }
     )
-
-    await waitForInputValue(page, "[aria-label='Gericht']", "BGH")
-    await waitForInputValue(page, "[aria-label='Rechtskraft']", "Ja")
 
     await waitForSaving(
       async () => {
