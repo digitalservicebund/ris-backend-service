@@ -600,8 +600,9 @@ class ProceedingDecisionIntegrationTest {
   @Test
   void testSearchForDocumentUnitsByProceedingDecisionInput_shouldOnlyFindPublished() {
     Instant date = Instant.parse("2023-02-02T00:00:00.00Z");
+
     var du1 =
-        buildDocumentUnitMetadataDTO(
+        createDocumentUnit(
             "Court1",
             "Berlin",
             date,
@@ -610,7 +611,7 @@ class ProceedingDecisionIntegrationTest {
             "DigitalService",
             DocumentUnitStatus.UNPUBLISHED);
     var du2 =
-        buildDocumentUnitMetadataDTO(
+        createDocumentUnit(
             "Court2",
             "Berlin",
             date,
@@ -619,11 +620,11 @@ class ProceedingDecisionIntegrationTest {
             "DigitalService",
             DocumentUnitStatus.PUBLISHED);
     var du3 =
-        buildDocumentUnitMetadataDTO(
+        createDocumentUnit(
             "Court3", "Berlin", date, List.of("AkteZ"), "EF", "DigitalService", null);
 
     var du4 =
-        buildDocumentUnitMetadataDTO(
+        createDocumentUnit(
             "Court4",
             "Berlin",
             date,
@@ -632,7 +633,7 @@ class ProceedingDecisionIntegrationTest {
             "CC-RIS",
             DocumentUnitStatus.UNPUBLISHED);
     var du5 =
-        buildDocumentUnitMetadataDTO(
+        createDocumentUnit(
             "Court5",
             "Berlin",
             date,
@@ -640,9 +641,7 @@ class ProceedingDecisionIntegrationTest {
             "EF",
             "CC-RIS",
             DocumentUnitStatus.PUBLISHED);
-    var du6 =
-        buildDocumentUnitMetadataDTO(
-            "Court6", "Berlin", date, List.of("AkteZ"), "EF", "CC-RIS", null);
+    var du6 = createDocumentUnit("Court6", "Berlin", date, List.of("AkteZ"), "EF", "CC-RIS", null);
 
     simulateAPICall(ProceedingDecision.builder().fileNumber("AkteZ").build())
         .jsonPath("$.content.length()")
@@ -664,7 +663,7 @@ class ProceedingDecisionIntegrationTest {
   private Instant prepareDocumentUnitMetadataDTOs() {
     Instant date1 = Instant.parse("2023-01-02T00:00:00.00Z");
     DocumentUnitMetadataDTO documentUnit1 =
-        buildDocumentUnitMetadataDTO(
+        createDocumentUnit(
             "SomeCourt",
             "Berlin",
             date1,
@@ -675,7 +674,7 @@ class ProceedingDecisionIntegrationTest {
 
     Instant date2 = Instant.parse("2023-02-03T00:00:00.00Z");
     DocumentUnitMetadataDTO documentUnit2 =
-        buildDocumentUnitMetadataDTO(
+        createDocumentUnit(
             "AnotherCourt",
             "Hamburg",
             date2,
@@ -686,7 +685,7 @@ class ProceedingDecisionIntegrationTest {
 
     Instant date3 = Instant.parse("2023-03-04T00:00:00.00Z");
     DocumentUnitMetadataDTO documentUnit3 =
-        buildDocumentUnitMetadataDTO(
+        createDocumentUnit(
             "YetAnotherCourt",
             "Munich",
             date3,
@@ -710,7 +709,7 @@ class ProceedingDecisionIntegrationTest {
         .expectBody();
   }
 
-  private DocumentUnitMetadataDTO buildDocumentUnitMetadataDTO(
+  private DocumentUnitMetadataDTO createDocumentUnit(
       String courtType,
       String courtLocation,
       Instant decisionDate,

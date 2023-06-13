@@ -3,6 +3,7 @@ import {
   checkIfProceedingDecisionCleared,
   fillProceedingDecisionInputs,
   navigateToCategories,
+  navigateToPublication,
   toggleProceedingDecisionsSection,
 } from "~/e2e/caselaw/e2e-utils"
 import { testWithDocumentUnit as test } from "~/e2e/caselaw/fixtures"
@@ -14,6 +15,19 @@ test.describe("Search proceeding decisions", () => {
     documentNumber,
     secondaryDocumentUnit,
   }) => {
+    await navigateToPublication(
+      page,
+      secondaryDocumentUnit.documentNumber || ""
+    )
+
+    await page
+      .locator("[aria-label='Dokumentationseinheit veröffentlichen']")
+      .click()
+    await expect(page.locator("text=Email wurde versendet")).toBeVisible()
+
+    await expect(page.locator("text=Letzte Veröffentlichung am")).toBeVisible()
+    await expect(page.locator("text=veröffentlicht")).toBeVisible()
+
     await navigateToCategories(page, documentNumber)
     await expect(page.getByText(documentNumber)).toBeVisible()
     await toggleProceedingDecisionsSection(page)
