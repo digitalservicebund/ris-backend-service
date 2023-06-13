@@ -496,7 +496,7 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
         },
         {
           type: FieldType.TEXT,
-          id: "divergentEntryIntoForceDefinedDate",
+          id: "divergentEntryIntoForceDefinedDateDateInput",
           label: "Bestimmtes abweichendes Inkrafttretedatum",
           values: norm.metadataSections?.DIVERGENT_ENTRY_INTO_FORCE?.map(
             (section) => section?.DIVERGENT_ENTRY_INTO_FORCE_DEFINED?.[0]
@@ -563,7 +563,7 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
         },
         {
           type: FieldType.DROPDOWN,
-          id: "divergentEntryIntoForceUndefinedDate",
+          id: "divergentEntryIntoForceUndefinedDateDropdown",
           label: "Unbestimmtes abweichendes Inkrafttretedatum",
           values: norm.metadataSections?.DIVERGENT_ENTRY_INTO_FORCE?.map(
             (section) => section?.DIVERGENT_ENTRY_INTO_FORCE_UNDEFINED?.[0]
@@ -717,7 +717,7 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
         },
         {
           type: FieldType.TEXT,
-          id: "divergentExpirationDefinedDate",
+          id: "divergentExpirationDefinedDateDateInput",
           label: "Bestimmtes abweichendes Außerkrafttretedatum",
           values: norm.metadataSections?.DIVERGENT_EXPIRATION?.map(
             (section) => section?.DIVERGENT_EXPIRATION_DEFINED?.[0]
@@ -784,7 +784,7 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
         },
         {
           type: FieldType.DROPDOWN,
-          id: "divergentExpirationUndefinedDate",
+          id: "divergentExpirationUndefinedDateDropdown",
           label: "Unbestimmtes abweichendes Außerkrafttretedatum",
           values: norm.metadataSections?.DIVERGENT_EXPIRATION?.map(
             (section) => section?.DIVERGENT_EXPIRATION_UNDEFINED?.[0]

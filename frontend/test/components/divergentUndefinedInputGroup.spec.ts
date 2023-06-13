@@ -1,21 +1,30 @@
 import userEvent from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
-import DivergentExpirationUndefinedInputGroup from "@/components/DivergentExpirationUndefinedInputGroup.vue"
+import DivergentUndefinedInputGroup from "@/components/DivergentUndefinedInputGroup.vue"
 import {
   Metadata,
+  MetadataSectionName,
   MetadatumType,
   NormCategory,
   UndefinedDate,
 } from "@/domain/Norm"
 
-function renderComponent(options?: { modelValue?: Metadata }) {
+function renderComponent(options?: {
+  modelValue?: Metadata
+  id: string
+  label: string
+  sectionName: MetadataSectionName
+}) {
   const props = {
     modelValue: options?.modelValue ?? {},
+    id: options?.id,
+    label: options?.label,
+    sectionName: options?.sectionName,
   }
-  return render(DivergentExpirationUndefinedInputGroup, { props })
+  return render(DivergentUndefinedInputGroup, { props })
 }
 
-describe("DivergentExpirationUndefinedInputGroup", () => {
+describe("DivergentEntryIntoForceUndefinedInputGroup", () => {
   it("renders all inputs and correct model value entry", () => {
     renderComponent({
       modelValue: {
@@ -26,10 +35,13 @@ describe("DivergentExpirationUndefinedInputGroup", () => {
           NormCategory.AMENDMENT_NORM,
         ],
       },
+      id: "divergentEntryIntoForceUndefinedDate",
+      label: "Unbestimmtes abweichendes Inkrafttretedatum",
+      sectionName: MetadataSectionName.DIVERGENT_ENTRY_INTO_FORCE_UNDEFINED,
     })
 
-    const Date = screen.getByLabelText(
-      "Unbestimmtes abweichendes Außerkrafttretedatum Dropdown"
+    const dropdown = screen.getByLabelText(
+      "Unbestimmtes abweichendes Inkrafttretedatum Dropdown"
     ) as HTMLInputElement
 
     const amendmentNormCheckBox = screen.getByRole("checkbox", {
@@ -42,8 +54,8 @@ describe("DivergentExpirationUndefinedInputGroup", () => {
       name: "Übergangsnorm",
     }) as HTMLInputElement
 
-    expect(Date).toBeInTheDocument()
-    expect(Date).toHaveValue("nicht vorhanden")
+    expect(dropdown).toBeInTheDocument()
+    expect(dropdown).toHaveValue("nicht vorhanden")
 
     expect(amendmentNormCheckBox).toBeChecked()
     expect(baseNormCheckBox).toBeChecked()
@@ -53,10 +65,15 @@ describe("DivergentExpirationUndefinedInputGroup", () => {
   it("should change the modelvalue when update the input", async () => {
     const user = userEvent.setup()
     const modelValue = {}
-    renderComponent({ modelValue })
+    renderComponent({
+      modelValue: modelValue,
+      id: "divergentEntryIntoForceUndefinedDate",
+      label: "Unbestimmtes abweichendes Inkrafttretedatum",
+      sectionName: MetadataSectionName.DIVERGENT_ENTRY_INTO_FORCE_UNDEFINED,
+    })
 
     const dropdown = screen.getByLabelText(
-      "Unbestimmtes abweichendes Außerkrafttretedatum Dropdown"
+      "Unbestimmtes abweichendes Inkrafttretedatum Dropdown"
     ) as HTMLInputElement
 
     await userEvent.click(dropdown)

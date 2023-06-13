@@ -60,7 +60,6 @@ const ENTRY_INTO_FORCE_DATE_MAP: Record<string, string> = {
   UNDEFINED_FUTURE: "unbestimmt (zukünftig)",
   UNDEFINED_NOT_PRESENT: "nicht vorhanden",
 }
-console.log(loadedNorm.value?.metadataSections?.ENTRY_INTO_FORCE)
 
 const entryIntoForceInfo = computed(() => {
   const entryIntoForceItem =
