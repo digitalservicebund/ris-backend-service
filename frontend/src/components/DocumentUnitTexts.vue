@@ -2,7 +2,7 @@
 import { computed } from "vue"
 import { Texts } from "../domain/documentUnit"
 import TextEditor from "../shared/components/input/TextEditor.vue"
-import { texts } from "@/fields/caselaw"
+import { texts as textsFields } from "@/fields/caselaw"
 import { FieldSize } from "@/shared/components/input/FieldSize"
 
 const props = defineProps<{ texts: Texts }>()
@@ -12,7 +12,7 @@ const emit = defineEmits<{
 }>()
 
 const data = computed(() =>
-  texts.map((item) => {
+  textsFields.map((item) => {
     return {
       id: item.name as keyof Texts,
       name: item.name,

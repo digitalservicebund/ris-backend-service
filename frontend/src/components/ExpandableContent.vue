@@ -8,6 +8,7 @@ interface Props {
   closeIconName?: string
   headerId?: string
 }
+
 interface Emits {
   (event: "update:isExpanded", value: boolean): void
 }
@@ -18,25 +19,30 @@ const props = withDefaults(defineProps<Props>(), {
   closeIconName: "horizontal_rule",
   headerId: "",
 })
+
 const emit = defineEmits<Emits>()
-const isExpanded = ref(false)
+
+const localIsExpanded = ref(false)
+
 const iconName = computed(() =>
-  isExpanded.value ? props.closeIconName : props.openIconName
+  localIsExpanded.value ? props.closeIconName : props.openIconName
 )
 
 const ariaLabel = computed(() =>
-  isExpanded.value ? "Zuklappen" : "Aufklappen"
+  localIsExpanded.value ? "Zuklappen" : "Aufklappen"
 )
 
 function toggleContentVisibility(): void {
-  isExpanded.value = !isExpanded.value
+  localIsExpanded.value = !localIsExpanded.value
 }
+
 watch(
   () => props.isExpanded,
-  () => (isExpanded.value = props.isExpanded ?? false),
+  () => (localIsExpanded.value = props.isExpanded ?? false),
   { immediate: true }
 )
-watch(isExpanded, () => emit("update:isExpanded", isExpanded.value))
+
+watch(localIsExpanded, () => emit("update:isExpanded", localIsExpanded.value))
 </script>
 
 <template>
@@ -55,7 +61,7 @@ watch(isExpanded, () => emit("update:isExpanded", isExpanded.value))
       }}</span>
     </button>
 
-    <div v-if="isExpanded">
+    <div v-if="localIsExpanded">
       <slot />
     </div>
   </div>
