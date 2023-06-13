@@ -1,9 +1,32 @@
-import router, { beforeEach } from "@/router"
+import router, { beforeEach as routerBeforeEach } from "@/router"
 import { isAuthenticated } from "@/services/authService"
 
 vi.mock("@/services/authService")
 
 describe("router's auth navigation guards", () => {
+  beforeEach(() => {
+    vi.mock("~pages", () => ({
+      default: [
+        {
+          path: "/",
+          component: { template: "<div>Home</div>" },
+        },
+        {
+          path: "/caselaw",
+          component: { template: "<div>Case Law</div>" },
+        },
+        {
+          path: "/caselaw/documentunit/:id/categories",
+          component: { template: "<div>Categories</div>" },
+        },
+        {
+          path: "/norms",
+          component: { template: "<div>Norms</div>" },
+        },
+      ],
+    }))
+  })
+
   const assignMock = vi.fn()
   window.location = { assign: assignMock as Location["assign"] } as Location
   window.location.href = "/"
@@ -19,7 +42,7 @@ describe("router's auth navigation guards", () => {
       .mocked(isAuthenticated)
       .mockResolvedValueOnce(false)
 
-    const result = await beforeEach(router.resolve("/caselaw"))
+    const result = await routerBeforeEach(router.resolve("/caselaw"))
     expect(authServiceMock).toHaveBeenCalledTimes(1)
     expect(result).toEqual(false)
   })
@@ -29,7 +52,7 @@ describe("router's auth navigation guards", () => {
       .mocked(isAuthenticated)
       .mockResolvedValueOnce(true)
 
-    const result = await beforeEach(router.resolve("/caselaw"))
+    const result = await routerBeforeEach(router.resolve("/caselaw"))
     expect(authServiceMock).toHaveBeenCalledTimes(1)
     expect(result).toEqual(true)
   })
@@ -37,7 +60,9 @@ describe("router's auth navigation guards", () => {
   it("does safe location cookie if not authenticated", async () => {
     vi.mocked(isAuthenticated).mockResolvedValueOnce(false)
 
-    await beforeEach(router.resolve("/caselaw/documentunit/123456/categories"))
+    await routerBeforeEach(
+      router.resolve("/caselaw/documentunit/123456/categories")
+    )
     expect(document.cookie).toEqual(
       "location=/caselaw/documentunit/123456/categories"
     )
@@ -47,7 +72,7 @@ describe("router's auth navigation guards", () => {
     vi.mocked(isAuthenticated).mockResolvedValueOnce(true)
     document.cookie = "location=/norms; path=/;"
 
-    await beforeEach(router.resolve("/"))
+    await routerBeforeEach(router.resolve("/"))
     expect(document.cookie).toEqual("")
     expect(window.location.href).toEqual("/norms")
   })
@@ -56,7 +81,7 @@ describe("router's auth navigation guards", () => {
     document.cookie = "SESSION=invalid; path=/;"
     vi.mocked(isAuthenticated).mockResolvedValueOnce(false)
 
-    await beforeEach(router.resolve("/"))
+    await routerBeforeEach(router.resolve("/"))
     expect(document.cookie).not.toContain("SESSION")
   })
 })
