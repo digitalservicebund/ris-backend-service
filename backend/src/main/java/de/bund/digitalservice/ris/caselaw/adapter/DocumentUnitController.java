@@ -87,7 +87,7 @@ public class DocumentUnitController {
   }
 
   @GetMapping(value = "/{documentNumber}")
-  @PreAuthorize("@authService.userHasReadAccess.apply(#documentNumber)")
+  @PreAuthorize("@userHasReadAccess.apply(#documentNumber)")
   public Mono<ResponseEntity<DocumentUnit>> getByDocumentNumber(
       @NonNull @PathVariable String documentNumber) {
 

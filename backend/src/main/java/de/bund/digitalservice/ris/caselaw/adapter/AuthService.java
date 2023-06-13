@@ -6,6 +6,7 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import java.util.function.Function;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Bean;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.security.core.context.SecurityContext;
@@ -25,6 +26,7 @@ public class AuthService {
     this.documentUnitService = documentUnitService;
   }
 
+  @Bean
   public Function<String, Mono<Boolean>> userHasReadAccess() {
     return documentNumber ->
         Mono.defer(
