@@ -14,7 +14,7 @@
     "test:e2e:caselaw": "playwright test test/e2e/caselaw",
     "test:e2e:norms": "playwright test test/e2e/norms",
     "test:e2e:shared": "playwright test test/e2e/shared",
-    "coverage": "TZ=UTC vitest run --coverage",
+    "coverage": "TZ=UTC vitest run --coverage.enabled --coverage.provider c8",
     "check": "npm run style:check && npm test && npm run test:e2e && npm run test:a11y",
     "dev": "vite",
     "prettier:check": "f() { prettier --check ${@:-.}; }; f",
