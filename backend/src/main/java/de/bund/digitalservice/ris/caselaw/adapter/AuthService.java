@@ -34,26 +34,27 @@ public class AuthService {
                 documentUnitService
                     .getByDocumentNumber(documentNumber)
                     .flatMap(
-                        documentUnit ->
-                            ReactiveSecurityContextHolder.getContext()
+                        documentUnit -> {
+                          if (documentUnit.status() == PUBLISHED) {
+                            return Mono.just(true);
+                          } else {
+                            return ReactiveSecurityContextHolder.getContext()
                                 .map(SecurityContext::getAuthentication)
                                 .map(Authentication::getPrincipal)
                                 .flatMap(
-                                    principal -> {
-                                      if (documentUnit.status() == PUBLISHED
-                                          || documentUnit.status() == null) {
-                                        return Mono.just(true);
-                                      }
-                                      return userService
-                                          .getDocumentationOffice((OidcUser) principal)
-                                          .map(
-                                              userOffice ->
-                                                  documentUnit
-                                                      .coreData()
-                                                      .documentationOffice()
-                                                      .equals(userOffice));
-                                    }))
-                    .switchIfEmpty(Mono.just(false))
+                                    principal ->
+                                        userService
+                                            .getDocumentationOffice((OidcUser) principal)
+                                            .map(
+                                                userOffice ->
+                                                    documentUnit
+                                                        .coreData()
+                                                        .documentationOffice()
+                                                        .equals(userOffice)))
+                                .defaultIfEmpty(false);
+                          }
+                        })
+                    .defaultIfEmpty(false)
                     .onErrorReturn(false));
   }
 }
