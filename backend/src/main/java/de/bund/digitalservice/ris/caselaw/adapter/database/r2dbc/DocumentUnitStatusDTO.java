@@ -29,6 +29,8 @@ public class DocumentUnitStatusDTO implements Persistable<UUID> {
   @Column("document_unit_id")
   private UUID documentUnitId;
 
+  private String issuerAddress;
+
   @Transient private boolean newEntry;
 
   @Override

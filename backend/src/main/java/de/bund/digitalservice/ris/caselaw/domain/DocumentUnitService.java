@@ -263,7 +263,8 @@ public class DocumentUnitService {
         .doOnError(ex -> log.error("Couldn't update the DocumentUnit", ex));
   }
 
-  public Mono<MailResponse> publishAsEmail(UUID documentUnitUuid, String receiverAddress) {
+  public Mono<MailResponse> publishAsEmail(
+      UUID documentUnitUuid, String receiverAddress, String issuerAddress) {
     return repository
         .findByUuid(documentUnitUuid)
         .flatMap(
@@ -277,7 +278,10 @@ public class DocumentUnitService {
                               .equals(String.valueOf(HttpStatus.OK.value()))) {
                             return documentUnitStatusService
                                 .updateStatus(
-                                    documentUnit, PUBLISHED, mailResponse.getPublishDate())
+                                    documentUnit,
+                                    PUBLISHED,
+                                    mailResponse.getPublishDate(),
+                                    issuerAddress)
                                 .thenReturn(mailResponse);
                           } else {
                             return Mono.just(mailResponse);

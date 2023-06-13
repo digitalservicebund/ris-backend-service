@@ -158,6 +158,11 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
         .flatMap(documentUnitDTO -> saveDeviatingDecisionDate(documentUnitDTO, documentUnit))
         .flatMap(documentUnitDTO -> saveIncorrectCourt(documentUnitDTO, documentUnit))
         .flatMap(documentUnitDTO -> saveNorms(documentUnitDTO, documentUnit))
+        .flatMap(this::injectStatus)
+        .flatMap(this::injectProceedingDecisions)
+        .flatMap(this::injectKeywords)
+        .flatMap(this::injectFieldsOfLaw)
+        .flatMap(this::injectNorms)
         //        .flatMap(documentUnitDTO -> saveActiveCitations(documentUnitDTO, documentUnit))
         .map(DocumentUnitTransformer::transformDTO);
   }

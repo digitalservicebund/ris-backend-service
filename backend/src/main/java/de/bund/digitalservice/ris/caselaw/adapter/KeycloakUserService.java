@@ -43,9 +43,14 @@ public class KeycloakUserService implements UserService {
     return getUser(oidcUser).map(User::documentationOffice);
   }
 
+  public String getEmail(OidcUser oidcUser) {
+    return oidcUser.getEmail();
+  }
+
   private User createUser(OidcUser oidcUser, DocumentationOffice documentationOffice) {
     return User.builder()
         .name(oidcUser.getAttribute("name"))
+        .email(oidcUser.getEmail())
         .documentationOffice(documentationOffice)
         .build();
   }

@@ -124,9 +124,12 @@ public class DocumentUnitController {
       produces = MediaType.APPLICATION_JSON_VALUE,
       consumes = MediaType.TEXT_PLAIN_VALUE)
   public Mono<ResponseEntity<MailResponse>> publishDocumentUnitAsEmail(
-      @PathVariable UUID uuid, @RequestBody String receiverAddress) {
+      @PathVariable UUID uuid,
+      @RequestBody String receiverAddress,
+      @AuthenticationPrincipal OidcUser oidcUser) {
+
     return service
-        .publishAsEmail(uuid, receiverAddress)
+        .publishAsEmail(uuid, receiverAddress, userService.getEmail(oidcUser))
         .map(ResponseEntity::ok)
         .doOnError(ex -> ResponseEntity.internalServerError().build());
   }

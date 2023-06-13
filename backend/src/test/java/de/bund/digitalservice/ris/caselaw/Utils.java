@@ -19,6 +19,7 @@ public class Utils {
                     claims -> {
                       claims.put("groups", Collections.singletonList(docOfficeGroup));
                       claims.put("name", "testUser");
+                      claims.put("email", "test@test.com");
                     }));
   }
 }

@@ -55,6 +55,7 @@ class DocumentUnitControllerTest {
 
   private static final UUID TEST_UUID = UUID.fromString("88888888-4444-4444-4444-121212121212");
   private static final String RECEIVER_ADDRESS = "test@exporter.neuris";
+  private static final String ISSUER_ADDRESS = "test-issuer@exporter.neuris";
 
   @BeforeEach
   void setup() {
@@ -255,7 +256,8 @@ class DocumentUnitControllerTest {
 
   @Test
   void testPublishAsEmail() {
-    when(service.publishAsEmail(TEST_UUID, RECEIVER_ADDRESS))
+    when(userService.getEmail(any(OidcUser.class))).thenReturn(ISSUER_ADDRESS);
+    when(service.publishAsEmail(TEST_UUID, RECEIVER_ADDRESS, ISSUER_ADDRESS))
         .thenReturn(
             Mono.just(
                 new XmlMailResponse(
@@ -273,6 +275,7 @@ class DocumentUnitControllerTest {
 
     webClient
         .mutateWith(csrf())
+        .mutateWith(getMockLogin())
         .put()
         .uri("/api/v1/caselaw/documentunits/" + TEST_UUID + "/publish")
         .bodyValue(RECEIVER_ADDRESS)
@@ -297,16 +300,18 @@ class DocumentUnitControllerTest {
         .jsonPath("publishDate")
         .isEqualTo("2020-01-01T01:01:01Z");
 
-    verify(service).publishAsEmail(TEST_UUID, RECEIVER_ADDRESS);
+    verify(service).publishAsEmail(TEST_UUID, RECEIVER_ADDRESS, ISSUER_ADDRESS);
   }
 
   @Test
   void testPublishAsEmail_withServiceThrowsException() {
-    when(service.publishAsEmail(TEST_UUID, RECEIVER_ADDRESS))
+    when(userService.getEmail(any(OidcUser.class))).thenReturn(ISSUER_ADDRESS);
+    when(service.publishAsEmail(TEST_UUID, RECEIVER_ADDRESS, ISSUER_ADDRESS))
         .thenThrow(DocumentUnitPublishException.class);
 
     webClient
         .mutateWith(csrf())
+        .mutateWith(getMockLogin())
         .put()
         .uri("/api/v1/caselaw/documentunits/" + TEST_UUID + "/publish")
         .bodyValue(RECEIVER_ADDRESS)
@@ -314,7 +319,7 @@ class DocumentUnitControllerTest {
         .expectStatus()
         .is5xxServerError();
 
-    verify(service).publishAsEmail(TEST_UUID, RECEIVER_ADDRESS);
+    verify(service).publishAsEmail(TEST_UUID, RECEIVER_ADDRESS, ISSUER_ADDRESS);
   }
 
   @Test

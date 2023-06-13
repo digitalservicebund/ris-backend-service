@@ -1,5 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.integration.tests;
 
+import static de.bund.digitalservice.ris.caselaw.Utils.getMockLogin;
 import static de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatus.PUBLISHED;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
@@ -21,6 +22,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.XmlMailDTO;
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresConfig;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatus;
 import de.bund.digitalservice.ris.caselaw.domain.HttpMailSender;
 import de.bund.digitalservice.ris.caselaw.domain.PublishState;
 import de.bund.digitalservice.ris.caselaw.domain.XmlMail;
@@ -139,6 +141,7 @@ class PublishDocumentUnitIntegrationTest {
 
     webClient
         .mutateWith(csrf())
+        .mutateWith(getMockLogin())
         .put()
         .uri("/api/v1/caselaw/documentunits/" + documentUnitUuid1 + "/publish")
         .contentType(MediaType.TEXT_PLAIN)
@@ -168,6 +171,7 @@ class PublishDocumentUnitIntegrationTest {
     assertThat(status.getStatus()).isEqualTo(PUBLISHED);
     assertThat(status.getDocumentUnitId()).isEqualTo(documentUnitDTO.getUuid());
     assertThat(status.getCreatedAt()).isEqualTo(xmlMail.publishDate());
+    assertThat(status.getIssuerAddress()).isEqualTo("test@test.com");
   }
 
   @Test
@@ -180,8 +184,19 @@ class PublishDocumentUnitIntegrationTest {
             .creationtimestamp(Instant.now())
             .build();
     DocumentUnitDTO savedDocumentUnitDTO = repository.save(documentUnitDTO).block();
-
     assertThat(repository.findAll().collectList().block()).hasSize(1);
+
+    documentUnitStatusRepository
+        .save(
+            DocumentUnitStatusDTO.builder()
+                .newEntry(true)
+                .id(UUID.randomUUID())
+                .documentUnitId(savedDocumentUnitDTO.getUuid())
+                .issuerAddress("test1@test.com")
+                .status(DocumentUnitStatus.UNPUBLISHED)
+                .build())
+        .block();
+    assertThat(documentUnitStatusRepository.findAll().collectList().block()).hasSize(1);
 
     XmlMail expectedXmlMail =
         new XmlMail(
@@ -199,6 +214,7 @@ class PublishDocumentUnitIntegrationTest {
 
     webClient
         .mutateWith(csrf())
+        .mutateWith(getMockLogin())
         .put()
         .uri("/api/v1/caselaw/documentunits/" + documentUnitUuid + "/publish")
         .contentType(MediaType.TEXT_PLAIN)
@@ -219,7 +235,8 @@ class PublishDocumentUnitIntegrationTest {
 
     List<DocumentUnitStatusDTO> statusList =
         documentUnitStatusRepository.findAll().collectList().block();
-    assertThat(statusList).isEmpty();
+    assertThat(statusList).hasSize(1);
+    assertThat(statusList.get(0).getStatus()).isEqualTo(DocumentUnitStatus.UNPUBLISHED);
   }
 
   @Test
