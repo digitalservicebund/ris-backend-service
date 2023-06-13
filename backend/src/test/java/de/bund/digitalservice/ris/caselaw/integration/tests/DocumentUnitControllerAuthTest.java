@@ -176,6 +176,53 @@ class DocumentUnitControllerAuthTest {
         .isEqualTo(UNPUBLISHED.toString());
   }
 
+  @Test
+  void testGetByDocumentNumber() {
+    DocumentUnitDTO docUnit1 = createNewDocumentUnitDTO(docOffice1DTO.getId());
+    saveToStatusRepository(docUnit1, docUnit1.getCreationtimestamp(), UNPUBLISHED);
+
+    // Documentation Office 1
+    EntityExchangeResult<String> result =
+        webClient
+            .mutateWith(csrf())
+            .mutateWith(getMockLoginWithDocOffice(docOffice1Group))
+            .get()
+            .uri("/api/v1/caselaw/documentunits/" + docUnit1.getDocumentnumber())
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectBody(String.class)
+            .returnResult();
+
+    assertThat(extractUuid(result.getResponseBody())).hasToString(docUnit1.getUuid().toString());
+
+    // Documentation Office 2
+    webClient
+        .mutateWith(csrf())
+        .mutateWith(getMockLoginWithDocOffice(docOffice2Group))
+        .get()
+        .uri("/api/v1/caselaw/documentunits/" + docUnit1.getDocumentnumber())
+        .exchange()
+        .expectStatus()
+        .isForbidden();
+
+    saveToStatusRepository(docUnit1, docUnit1.getCreationtimestamp(), PUBLISHED);
+
+    result =
+        webClient
+            .mutateWith(csrf())
+            .mutateWith(getMockLoginWithDocOffice(docOffice1Group))
+            .get()
+            .uri("/api/v1/caselaw/documentunits/" + docUnit1.getDocumentnumber())
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectBody(String.class)
+            .returnResult();
+
+    assertThat(extractUuid(result.getResponseBody())).hasToString(docUnit1.getUuid().toString());
+  }
+
   private DocumentUnitDTO createNewDocumentUnitDTO(UUID documentationOfficeId) {
     String documentNumber =
         new Random().ints(13, 0, 10).mapToObj(Integer::toString).collect(Collectors.joining());
@@ -214,5 +261,9 @@ class DocumentUnitControllerAuthTest {
 
   private List<String> extractDocUnitsByUuid(String responseBody, UUID uuid) {
     return JsonPath.read(responseBody, String.format("$.content[?(@.uuid=='%s')]", uuid));
+  }
+
+  private String extractUuid(String responseBody) {
+    return JsonPath.read(responseBody, "$.uuid");
   }
 }
