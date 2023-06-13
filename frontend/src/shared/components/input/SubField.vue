@@ -7,30 +7,37 @@ interface Props {
   iconExpanding?: string
   iconClosing?: string
 }
+
 interface Emits {
   (event: "update:isExpanded", value: boolean): void
 }
+
 const props = withDefaults(defineProps<Props>(), {
   isExpanded: false,
   iconExpanding: "add",
   iconClosing: "horizontal_rule",
 })
+
 const emit = defineEmits<Emits>()
+
 const expandableContainer = ref()
 const containerHeight = ref(0)
-const isExpanded = ref(false)
+const localIsExpanded = ref(false)
 const iconName = computed(() =>
-  isExpanded.value ? props.iconClosing : props.iconExpanding
+  localIsExpanded.value ? props.iconClosing : props.iconExpanding
 )
+
 function toggleContentVisibility(): void {
-  isExpanded.value = !isExpanded.value
+  localIsExpanded.value = !localIsExpanded.value
 }
+
 watch(
   () => props.isExpanded,
-  () => (isExpanded.value = props.isExpanded ?? false),
+  () => (localIsExpanded.value = props.isExpanded ?? false),
   { immediate: true }
 )
-watch(isExpanded, () => emit("update:isExpanded", isExpanded.value))
+
+watch(localIsExpanded, () => emit("update:isExpanded", localIsExpanded.value))
 
 onMounted(() => {
   const expandableContainer = document.querySelector(".expandable")
@@ -51,7 +58,7 @@ const resizeObserver = new ResizeObserver((entries) => {
     >
       <span
         :aria-label="
-          isExpanded ? ariaLabel + ' schließen' : ariaLabel + ' anzeigen'
+          localIsExpanded ? ariaLabel + ' schließen' : ariaLabel + ' anzeigen'
         "
         class="bg-blue-800 material-icons rounded-full w-icon"
         >{{ iconName }}</span
@@ -60,11 +67,11 @@ const resizeObserver = new ResizeObserver((entries) => {
     <div
       ref="expandableContainer"
       class="expandable"
-      :class="{ expanded: isExpanded }"
+      :class="{ expanded: localIsExpanded }"
       :style="{ height: containerHeight.valueOf + 'px' }"
     >
       <transition name="expand">
-        <div v-show="isExpanded">
+        <div v-show="localIsExpanded">
           <slot />
         </div>
       </transition>
@@ -72,8 +79,8 @@ const resizeObserver = new ResizeObserver((entries) => {
   </div>
 </template>
 
-<!-- Transitions are difficult to handle with dynamic heights in vue. To use the max-height as 
-  transition parameter is a known workaround for this issue, the max-height doesn't have 
+<!-- Transitions are difficult to handle with dynamic heights in vue. To use the max-height as
+  transition parameter is a known workaround for this issue, the max-height doesn't have
   an effect on the actual height, but is just used to get the transition effect. -->
 
 <style lang="scss" scoped>

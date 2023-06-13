@@ -11,15 +11,16 @@ const props = defineProps<{
 
 const emit = defineEmits<{ (e: "update:open", value: boolean): void }>()
 
-const open = ref(false)
+const localOpen = ref(false)
 
 watch(
   () => props.open,
-  () => (open.value = props.open ?? false),
+  () => (localOpen.value = props.open ?? false),
   { immediate: true }
 )
 
-watch(open, () => emit("update:open", open.value))
+watch(localOpen, () => emit("update:open", localOpen.value))
+
 const route = useRoute()
 
 const uploadFileRoute = computed(() => ({

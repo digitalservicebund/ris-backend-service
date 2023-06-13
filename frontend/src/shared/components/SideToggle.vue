@@ -19,7 +19,8 @@ const props = withDefaults(defineProps<Props>(), {
 })
 
 const emit = defineEmits<Emits>()
-const isExpanded = ref(false)
+
+const localIsExpanded = ref(false)
 
 const closeIconNames = {
   [OpeningDirection.LEFT]: "chevron_right",
@@ -32,12 +33,14 @@ const openIconNames = {
 }
 
 const iconName = computed(() =>
-  isExpanded.value
+  localIsExpanded.value
     ? closeIconNames[props.openingDirection]
     : openIconNames[props.openingDirection]
 )
-const postFix = computed(() => (isExpanded.value ? "schließen" : "öffnen"))
+
+const postFix = computed(() => (localIsExpanded.value ? "schließen" : "öffnen"))
 const label = computed(() => props.label + " " + postFix.value)
+
 const classes = computed(() => ({
   "right-0": props.openingDirection == OpeningDirection.RIGHT,
   "left-0": props.openingDirection == OpeningDirection.LEFT,
@@ -46,17 +49,17 @@ const classes = computed(() => ({
 }))
 
 function toggleContentVisibility(): void {
-  isExpanded.value = !isExpanded.value
+  localIsExpanded.value = !localIsExpanded.value
   emit("toggle")
 }
 
 watch(
   () => props.isExpanded,
-  () => (isExpanded.value = props.isExpanded ?? false),
+  () => (localIsExpanded.value = props.isExpanded ?? false),
   { immediate: true }
 )
 
-watch(isExpanded, () => emit("update:isExpanded", isExpanded.value))
+watch(localIsExpanded, () => emit("update:isExpanded", localIsExpanded.value))
 </script>
 
 <script lang="ts">
@@ -79,7 +82,7 @@ export enum OpeningDirection {
         >{{ iconName }}</span
       >
     </button>
-    <div v-show="isExpanded" class="-mr-[1.25rem]">
+    <div v-show="localIsExpanded" class="-mr-[1.25rem]">
       <slot />
     </div>
   </div>
