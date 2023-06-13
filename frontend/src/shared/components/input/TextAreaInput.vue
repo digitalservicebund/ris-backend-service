@@ -56,7 +56,7 @@ async function datermineTextareHeight() {
   await nextTick()
 
   const { borderTopWidth, borderBottomWidth } = getComputedStyle(
-    textareaRef.value
+    textareaRef.value as Element
   )
 
   const borderTop = parseInt(borderTopWidth)
@@ -67,8 +67,10 @@ async function datermineTextareHeight() {
   }px`
 }
 
-watchEffect(async () => {
-  await datermineTextareHeight()
+watchEffect(() => {
+  datermineTextareHeight().catch(() => {
+    // left blank intentionally
+  })
 })
 
 watch(localValue, async () => {
