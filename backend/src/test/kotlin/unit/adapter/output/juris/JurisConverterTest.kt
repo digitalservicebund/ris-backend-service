@@ -1,4 +1,4 @@
-package de.bund.digitalservice.ris.norms.framework.adapter.output
+package unit.adapter.output.juris
 
 import de.bund.digitalservice.ris.norms.application.port.output.GenerateNormFileOutputPort
 import de.bund.digitalservice.ris.norms.application.port.output.ParseJurisXmlOutputPort
@@ -38,6 +38,8 @@ import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.YEAR
 import de.bund.digitalservice.ris.norms.domain.value.NormCategory
 import de.bund.digitalservice.ris.norms.domain.value.UndefinedDate
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.decodeLocalDate
+import de.bund.digitalservice.ris.norms.framework.adapter.output.juris.JurisConverter
+import de.bund.digitalservice.ris.norms.framework.adapter.output.juris.mapDomainToData
 import de.bund.digitalservice.ris.norms.juris.converter.extractor.extractData
 import de.bund.digitalservice.ris.norms.juris.converter.generator.generateZip
 import de.bund.digitalservice.ris.norms.juris.converter.model.CategorizedReference

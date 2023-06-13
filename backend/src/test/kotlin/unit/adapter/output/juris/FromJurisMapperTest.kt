@@ -1,4 +1,4 @@
-package de.bund.digitalservice.ris.norms.framework.adapter.output
+package unit.adapter.output.juris
 
 import de.bund.digitalservice.ris.norms.domain.entity.MetadataSection
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName
@@ -24,6 +24,7 @@ import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName.PRINT_A
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName.SUBJECT_AREA
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType
 import de.bund.digitalservice.ris.norms.domain.value.UndefinedDate
+import de.bund.digitalservice.ris.norms.framework.adapter.output.juris.mapDataToDomain
 import de.bund.digitalservice.ris.norms.juris.converter.model.Article
 import de.bund.digitalservice.ris.norms.juris.converter.model.CategorizedReference
 import de.bund.digitalservice.ris.norms.juris.converter.model.DigitalAnnouncement
@@ -31,7 +32,6 @@ import de.bund.digitalservice.ris.norms.juris.converter.model.DivergentEntryInto
 import de.bund.digitalservice.ris.norms.juris.converter.model.DivergentExpiration
 import de.bund.digitalservice.ris.norms.juris.converter.model.DocumentType
 import de.bund.digitalservice.ris.norms.juris.converter.model.Lead
-import de.bund.digitalservice.ris.norms.juris.converter.model.Norm
 import de.bund.digitalservice.ris.norms.juris.converter.model.NormProvider
 import de.bund.digitalservice.ris.norms.juris.converter.model.Paragraph
 import de.bund.digitalservice.ris.norms.juris.converter.model.Participation
@@ -41,12 +41,13 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
 import java.util.*
+import de.bund.digitalservice.ris.norms.juris.converter.model.Norm as NormData
 
-class JurisConverterMappingTest {
+class FromJurisMapperTest {
 
     @Test
-    fun `it correctly maps the domain to data`() {
-        val extractedData = Norm(
+    fun `it correctly maps the data to domain`() {
+        val extractedData = NormData(
             articles = listOf(
                 Article(
                     "articleTitle",
