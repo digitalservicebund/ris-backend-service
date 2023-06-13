@@ -67,12 +67,12 @@ async function datermineTextareHeight() {
   }px`
 }
 
-watchEffect(() => {
-  datermineTextareHeight()
+watchEffect(async () => {
+  await datermineTextareHeight()
 })
 
-watch(localValue, () => {
-  datermineTextareHeight()
+watch(localValue, async () => {
+  await datermineTextareHeight()
 })
 
 /* -------------------------------------------------- *
