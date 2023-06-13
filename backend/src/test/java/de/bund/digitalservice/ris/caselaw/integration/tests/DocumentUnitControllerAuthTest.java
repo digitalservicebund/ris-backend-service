@@ -194,7 +194,7 @@ class DocumentUnitControllerAuthTest {
             .expectBody(String.class)
             .returnResult();
 
-    assertThat(extractUuid(result.getResponseBody())).hasToString(docUnit1.getUuid().toString());
+    assertThat(extractUuid(result.getResponseBody())).isEqualTo(docUnit1.getUuid().toString());
 
     // Documentation Office 2
     webClient
@@ -206,7 +206,8 @@ class DocumentUnitControllerAuthTest {
         .expectStatus()
         .isForbidden();
 
-    saveToStatusRepository(docUnit1, docUnit1.getCreationtimestamp(), PUBLISHED);
+    saveToStatusRepository(
+        docUnit1, docUnit1.getCreationtimestamp().plus(1, ChronoUnit.DAYS), PUBLISHED);
 
     result =
         webClient
