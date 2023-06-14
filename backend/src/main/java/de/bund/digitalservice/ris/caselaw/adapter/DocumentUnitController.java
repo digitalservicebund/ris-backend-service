@@ -68,6 +68,7 @@ public class DocumentUnitController {
   }
 
   @DeleteMapping(value = "/{uuid}/file")
+  @PreAuthorize("@userHasWriteAccessByUuid.apply(#uuid)")
   public Mono<ResponseEntity<DocumentUnit>> removeFileFromDocumentUnit(@PathVariable UUID uuid) {
 
     return service

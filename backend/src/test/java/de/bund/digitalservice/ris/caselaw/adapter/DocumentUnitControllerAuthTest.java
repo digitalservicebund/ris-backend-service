@@ -101,4 +101,34 @@ class DocumentUnitControllerAuthTest {
         .expectStatus()
         .isForbidden();
   }
+
+  @Test
+  void testRemoveFileFromDocumentUnit() {
+    when(service.removeFileFromDocumentUnit(TEST_UUID)).thenReturn(Mono.empty());
+
+    when(service.getByUuid(TEST_UUID))
+        .thenReturn(
+            Mono.just(
+                DocumentUnit.builder()
+                    .coreData(CoreData.builder().documentationOffice(docOffice2).build())
+                    .build()));
+
+    webClient
+        .mutateWith(csrf())
+        .mutateWith(getMockLoginWithDocOffice(docOffice2Group))
+        .delete()
+        .uri("/api/v1/caselaw/documentunits/" + TEST_UUID + "/file")
+        .exchange()
+        .expectStatus()
+        .isOk();
+
+    webClient
+        .mutateWith(csrf())
+        .mutateWith(getMockLoginWithDocOffice(docOffice1Group))
+        .delete()
+        .uri("/api/v1/caselaw/documentunits/" + TEST_UUID + "/file")
+        .exchange()
+        .expectStatus()
+        .isForbidden();
+  }
 }
