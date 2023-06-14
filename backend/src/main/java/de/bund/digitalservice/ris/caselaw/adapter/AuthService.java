@@ -5,6 +5,7 @@ import static de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatus.PUBLI
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
+import java.util.UUID;
 import java.util.function.Function;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
@@ -39,6 +40,18 @@ public class AuthService {
                             documentUnit.status() == PUBLISHED
                                 ? Mono.just(true)
                                 : userHasSameDocOfficeAsDocument(documentUnit))
+                    .defaultIfEmpty(false)
+                    .onErrorReturn(false));
+  }
+
+  @Bean
+  public Function<UUID, Mono<Boolean>> userHasWriteAccessByUuid() {
+    return uuid ->
+        Mono.defer(
+            () ->
+                documentUnitService
+                    .getByUuid(uuid)
+                    .flatMap(this::userHasSameDocOfficeAsDocument)
                     .defaultIfEmpty(false)
                     .onErrorReturn(false));
   }

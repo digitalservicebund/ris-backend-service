@@ -55,6 +55,7 @@ public class DocumentUnitController {
   }
 
   @PutMapping(value = "/{uuid}/file")
+  @PreAuthorize("@userHasWriteAccessByUuid.apply(#uuid)")
   public Mono<ResponseEntity<DocumentUnit>> attachFileToDocumentUnit(
       @PathVariable UUID uuid,
       @RequestBody ByteBuffer byteBuffer,
