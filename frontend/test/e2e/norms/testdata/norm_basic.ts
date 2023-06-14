@@ -59,10 +59,10 @@ export const normData: NormData = {
       },
     ],
     SUBJECT_AREA: [
-      { SUBJECT_FNA: ["315-12"] },
-      { SUBJECT_FNA: ["671-34"] },
-      { SUBJECT_GESTA: ["123-45"] },
-      { SUBJECT_GESTA: ["678-90"] },
+      { SUBJECT_FNA: ["FNA 315-12"] },
+      { SUBJECT_FNA: ["FNA 671-34"] },
+      { SUBJECT_GESTA: ["GESTA 123-45"] },
+      { SUBJECT_GESTA: ["GESTA 678-90"] },
     ],
     LEAD: [
       { LEAD_JURISDICTION: ["BMVBS"], LEAD_UNIT: ["RS III 2"] },
