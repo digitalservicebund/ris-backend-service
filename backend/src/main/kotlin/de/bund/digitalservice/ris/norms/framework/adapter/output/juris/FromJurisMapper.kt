@@ -56,7 +56,7 @@ fun mapDataToDomain(guid: UUID, data: NormData): Norm {
         createSectionsWithoutGrouping(Section.SUBJECT_AREA, subjectFna + subjectGesta) +
         createSectionsFromMetadata(Section.LEAD, leadJurisdiction + leadUnit) +
         createSectionForDocumentType(data.documentType) +
-        createSectionsFromMetadata(Section.PARTICIPATION, participationInstitution + participationType) +
+        createSectionsFromMetadata(Section.PARTICIPATION, participationType + participationInstitution) +
         createSectionsForOfficialReference(data.digitalAnnouncementList, data.printAnnouncementList) +
         createSectionsForDivergentEntryIntoForce(data.divergentEntryIntoForceList) +
         createSectionsForDivergentExpiration(data.divergentExpirationsList) +

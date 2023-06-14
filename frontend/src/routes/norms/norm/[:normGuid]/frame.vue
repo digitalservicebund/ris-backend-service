@@ -283,7 +283,7 @@ function normProviderSummarizer(data: Metadata) {
         width: "16",
         alt: "Schwarzes Haken",
       }),
-      h("span", "Beschlussf\assung mit qual. Mehrheit"),
+      h("span", "Beschlussfassung mit qual. Mehrheit"),
     ])
   } else {
     return summaryLine
@@ -466,6 +466,30 @@ function GeneralSummarizer(data: Metadata): string {
   }
 }
 
+function participationSummarizer(data: Metadata) {
+  if (!data) return ""
+
+  const type = data.PARTICIPATION_TYPE?.[0]
+  const institution = data.PARTICIPATION_INSTITUTION?.[0]
+
+  return [type, institution]
+    .filter((value) => value != "" && value != null)
+    .join(" | ")
+}
+
+function subjectAreaSummarizer(data: Metadata) {
+  if (!data) return ""
+
+  const fna = data.SUBJECT_FNA?.[0]
+  const previousFna = data.SUBJECT_PREVIOUS_FNA?.[0]
+  const gesta = data.SUBJECT_GESTA?.[0]
+  const bgb3 = data.SUBJECT_BGB_3?.[0]
+
+  return [fna, previousFna, gesta, bgb3]
+    .filter((value) => value != "" && value != null)
+    .join(" | ")
+}
+
 const CitationDateSummary = withSummarizer(citationDateSummarizer)
 const OfficialReferenceSummary = withSummarizer(officialReferenceSummarizer)
 const NormProviderSummary = withSummarizer(normProviderSummarizer)
@@ -475,6 +499,9 @@ const DivergentEntryIntoForceSummary = withSummarizer(
 )
 const DivergentExpirationSummary = withSummarizer(DivergentExpirationSummarizer)
 const GeneralSummary = withSummarizer(GeneralSummarizer)
+
+const ParticipationSummary = withSummarizer(participationSummarizer)
+const SubjectAreaSummary = withSummarizer(subjectAreaSummarizer)
 </script>
 
 <template>
@@ -566,6 +593,7 @@ const GeneralSummary = withSummarizer(GeneralSummarizer)
       id="participatingInstitutions"
       border-bottom
       :data-set="metadataSections.PARTICIPATION"
+      :summary-component="ParticipationSummary"
       test-id="a11y-expandable-dataset"
       title="Mitwirkende Organe"
     >
@@ -573,6 +601,7 @@ const GeneralSummary = withSummarizer(GeneralSummarizer)
         v-model="metadataSections.PARTICIPATION"
         :default-value="{}"
         :edit-component="ParticipatingInstitutionInputGroup"
+        :summary-component="ParticipationSummary"
       />
     </ExpandableDataSet>
 
@@ -594,6 +623,7 @@ const GeneralSummary = withSummarizer(GeneralSummarizer)
       id="subjectAreas"
       border-bottom
       :data-set="metadataSections.SUBJECT_AREA"
+      :summary-component="SubjectAreaSummary"
       test-id="a11y-expandable-dataset"
       title="Sachgebiet"
     >
@@ -601,6 +631,7 @@ const GeneralSummary = withSummarizer(GeneralSummarizer)
         v-model="metadataSections.SUBJECT_AREA"
         :default-value="{}"
         :edit-component="SubjectAreaInputGroup"
+        :summary-component="SubjectAreaSummary"
       />
     </ExpandableDataSet>
 
