@@ -2,6 +2,7 @@ package de.bund.digitalservice.ris.caselaw.adapter;
 
 import static de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatus.PUBLISHED;
 
+import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import java.util.function.Function;
@@ -27,34 +28,32 @@ public class AuthService {
   }
 
   @Bean
-  public Function<String, Mono<Boolean>> userHasReadAccess() {
+  public Function<String, Mono<Boolean>> userHasReadAccessByDocumentNumber() {
     return documentNumber ->
         Mono.defer(
             () ->
                 documentUnitService
                     .getByDocumentNumber(documentNumber)
                     .flatMap(
-                        documentUnit -> {
-                          if (documentUnit.status() == PUBLISHED) {
-                            return Mono.just(true);
-                          } else {
-                            return ReactiveSecurityContextHolder.getContext()
-                                .map(SecurityContext::getAuthentication)
-                                .map(Authentication::getPrincipal)
-                                .flatMap(
-                                    principal ->
-                                        userService
-                                            .getDocumentationOffice((OidcUser) principal)
-                                            .map(
-                                                userOffice ->
-                                                    documentUnit
-                                                        .coreData()
-                                                        .documentationOffice()
-                                                        .equals(userOffice)))
-                                .defaultIfEmpty(false);
-                          }
-                        })
+                        documentUnit ->
+                            documentUnit.status() == PUBLISHED
+                                ? Mono.just(true)
+                                : userHasSameDocOfficeAsDocument(documentUnit))
                     .defaultIfEmpty(false)
                     .onErrorReturn(false));
+  }
+
+  private Mono<Boolean> userHasSameDocOfficeAsDocument(DocumentUnit documentUnit) {
+    return ReactiveSecurityContextHolder.getContext()
+        .map(SecurityContext::getAuthentication)
+        .map(Authentication::getPrincipal)
+        .flatMap(
+            principal ->
+                userService
+                    .getDocumentationOffice((OidcUser) principal)
+                    .map(
+                        userOffice ->
+                            documentUnit.coreData().documentationOffice().equals(userOffice)))
+        .defaultIfEmpty(false);
   }
 }
