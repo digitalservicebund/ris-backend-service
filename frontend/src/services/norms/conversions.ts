@@ -139,6 +139,13 @@ const DECODERS: MetadataValueDecoders = {
   [MetadatumType.TEMPLATE_NAME]: identity,
   [MetadatumType.UNDEFINED_DATE]: decodeUndefinedDate,
   [MetadatumType.TEXT]: identity,
+  [MetadatumType.FOOTNOTE_REFERENCE]: identity,
+  [MetadatumType.FOOTNOTE_CHANGE]: identity,
+  [MetadatumType.FOOTNOTE_COMMENT]: identity,
+  [MetadatumType.FOOTNOTE_DECISION]: identity,
+  [MetadatumType.FOOTNOTE_STATE_LAW]: identity,
+  [MetadatumType.FOOTNOTE_EU_LAW]: identity,
+  [MetadatumType.FOOTNOTE_OTHER]: identity,
 }
 
 const ENCODERS: MetadataValueEncoders = {
@@ -185,6 +192,13 @@ const ENCODERS: MetadataValueEncoders = {
   [MetadatumType.TEMPLATE_NAME]: identity,
   [MetadatumType.UNDEFINED_DATE]: encodeUndefinedDate,
   [MetadatumType.TEXT]: identity,
+  [MetadatumType.FOOTNOTE_REFERENCE]: identity,
+  [MetadatumType.FOOTNOTE_CHANGE]: identity,
+  [MetadatumType.FOOTNOTE_COMMENT]: identity,
+  [MetadatumType.FOOTNOTE_DECISION]: identity,
+  [MetadatumType.FOOTNOTE_STATE_LAW]: identity,
+  [MetadatumType.FOOTNOTE_EU_LAW]: identity,
+  [MetadatumType.FOOTNOTE_OTHER]: identity,
 }
 
 /**

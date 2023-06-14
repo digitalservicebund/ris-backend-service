@@ -68,6 +68,13 @@ const METADATA_VALUE_GENERATORS: MetadataValueGenerators = {
   [MetadatumType.TEMPLATE_NAME]: generateString,
   [MetadatumType.UNDEFINED_DATE]: pickRandomUndefinedDate,
   [MetadatumType.TEXT]: generateString,
+  [MetadatumType.FOOTNOTE_REFERENCE]: generateString,
+  [MetadatumType.FOOTNOTE_CHANGE]: generateString,
+  [MetadatumType.FOOTNOTE_COMMENT]: generateString,
+  [MetadatumType.FOOTNOTE_DECISION]: generateString,
+  [MetadatumType.FOOTNOTE_STATE_LAW]: generateString,
+  [MetadatumType.FOOTNOTE_EU_LAW]: generateString,
+  [MetadatumType.FOOTNOTE_OTHER]: generateString,
 }
 
 const ALPHABET_CHARACTERS = "abcdefghijklmnopqrstuvwxyz"
