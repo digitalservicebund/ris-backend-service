@@ -58,7 +58,7 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
       SecurityConfig.class
     },
     controllers = {DocumentUnitController.class})
-class DocumentUnitControllerAuthTest {
+class DocumentUnitControllerAuthIntegrationTest {
   @Container
   static PostgreSQLContainer<?> postgreSQLContainer = new PostgreSQLContainer<>("postgres:12");
 
