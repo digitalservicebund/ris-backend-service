@@ -111,6 +111,7 @@ public class DocumentUnitController {
   }
 
   @PutMapping(value = "/{uuid}", consumes = MediaType.APPLICATION_JSON_VALUE)
+  @PreAuthorize("@userHasWriteAccessByUuid.apply(#uuid)")
   public Mono<ResponseEntity<DocumentUnit>> updateByUuid(
       @PathVariable UUID uuid, @Valid @RequestBody DocumentUnit documentUnit) {
     if (!uuid.equals(documentUnit.uuid())) {

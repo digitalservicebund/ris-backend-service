@@ -161,4 +161,38 @@ class DocumentUnitControllerAuthTest {
         .expectStatus()
         .isForbidden();
   }
+
+  @Test
+  void testUpdateByUuid() {
+    DocumentUnit docUnit =
+        DocumentUnit.builder()
+            .uuid(TEST_UUID)
+            .coreData(CoreData.builder().documentationOffice(docOffice2).build())
+            .build();
+
+    when(service.updateDocumentUnit(docUnit)).thenReturn(Mono.empty());
+    when(service.getByUuid(TEST_UUID)).thenReturn(Mono.just(docUnit));
+
+    webClient
+        .mutateWith(csrf())
+        .mutateWith(getMockLoginWithDocOffice(docOffice2Group))
+        .put()
+        .uri("/api/v1/caselaw/documentunits/" + TEST_UUID)
+        .header(HttpHeaders.CONTENT_TYPE, "application/json")
+        .bodyValue(docUnit)
+        .exchange()
+        .expectStatus()
+        .isOk();
+
+    webClient
+        .mutateWith(csrf())
+        .mutateWith(getMockLoginWithDocOffice(docOffice1Group))
+        .put()
+        .uri("/api/v1/caselaw/documentunits/" + TEST_UUID)
+        .header(HttpHeaders.CONTENT_TYPE, "application/json")
+        .bodyValue(docUnit)
+        .exchange()
+        .expectStatus()
+        .isForbidden();
+  }
 }
