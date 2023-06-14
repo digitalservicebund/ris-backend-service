@@ -101,6 +101,7 @@ public class DocumentUnitController {
   }
 
   @DeleteMapping(value = "/{uuid}")
+  @PreAuthorize("@userHasWriteAccessByUuid.apply(#uuid)")
   public Mono<ResponseEntity<String>> deleteByUuid(@PathVariable UUID uuid) {
 
     return service
