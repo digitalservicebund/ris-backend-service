@@ -534,6 +534,7 @@ const GeneralSummary = withSummarizer(GeneralSummarizer)
       border-bottom
       :data-set="metadataSections.DOCUMENT_TYPE"
       :summary-component="DocumentTypeSummary"
+      test-id="a11y-expandable-dataset"
       title="Dokumenttyp"
     >
       <EditableList
@@ -550,6 +551,7 @@ const GeneralSummary = withSummarizer(GeneralSummarizer)
       border-bottom
       :data-set="metadataSections.NORM_PROVIDER"
       :summary-component="NormProviderSummary"
+      test-id="a11y-expandable-dataset"
       title="Normgeber"
     >
       <EditableList
@@ -564,6 +566,7 @@ const GeneralSummary = withSummarizer(GeneralSummarizer)
       id="participatingInstitutions"
       border-bottom
       :data-set="metadataSections.PARTICIPATION"
+      test-id="a11y-expandable-dataset"
       title="Mitwirkende Organe"
     >
       <EditableList
@@ -577,6 +580,7 @@ const GeneralSummary = withSummarizer(GeneralSummarizer)
       id="leads"
       border-bottom
       :data-set="metadataSections.LEAD"
+      test-id="a11y-expandable-dataset"
       title="Federführung"
     >
       <EditableList
@@ -590,6 +594,7 @@ const GeneralSummary = withSummarizer(GeneralSummarizer)
       id="subjectAreas"
       border-bottom
       :data-set="metadataSections.SUBJECT_AREA"
+      test-id="a11y-expandable-dataset"
       title="Sachgebiet"
     >
       <EditableList
@@ -653,6 +658,7 @@ const GeneralSummary = withSummarizer(GeneralSummarizer)
       border-bottom
       :data-set="metadataSections.PRINCIPLE_ENTRY_INTO_FORCE"
       :summary-component="GeneralSummary"
+      test-id="a11y-expandable-dataset"
       title="Grundsätzliches Inkrafttretedatum"
     >
       <EditableList
@@ -669,6 +675,7 @@ const GeneralSummary = withSummarizer(GeneralSummarizer)
       border-bottom
       :data-set="metadataSections.DIVERGENT_ENTRY_INTO_FORCE"
       :summary-component="DivergentEntryIntoForceSummary"
+      test-id="a11y-expandable-dataset"
       title="Abweichendes Inkrafttretedatum"
     >
       <EditableList
@@ -684,6 +691,7 @@ const GeneralSummary = withSummarizer(GeneralSummarizer)
       border-bottom
       :data-set="metadataSections.EXPIRATION"
       :summary-component="GeneralSummary"
+      test-id="a11y-expandable-dataset"
       title="Datum des Außerkrafttretens"
     >
       <EditableList
@@ -700,6 +708,7 @@ const GeneralSummary = withSummarizer(GeneralSummarizer)
       border-bottom
       :data-set="metadataSections.PRINCIPLE_EXPIRATION"
       :summary-component="GeneralSummary"
+      test-id="a11y-expandable-dataset"
       title="Grundsätzliches Außerkrafttretedatum"
     >
       <EditableList
@@ -716,6 +725,7 @@ const GeneralSummary = withSummarizer(GeneralSummarizer)
       border-bottom
       :data-set="metadataSections.DIVERGENT_EXPIRATION"
       :summary-component="DivergentExpirationSummary"
+      test-id="a11y-expandable-dataset"
       title="Abweichendes Außerkrafttretedatum"
     >
       <EditableList
@@ -745,6 +755,7 @@ const GeneralSummary = withSummarizer(GeneralSummarizer)
       border-bottom
       :data-set="metadataSections.CITATION_DATE"
       :summary-component="CitationDateSummary"
+      test-id="a11y-expandable-dataset"
       title="Zitierdatum"
     >
       <EditableList
@@ -760,6 +771,7 @@ const GeneralSummary = withSummarizer(GeneralSummarizer)
       border-bottom
       :data-set="metadataSections.OFFICIAL_REFERENCE"
       :summary-component="OfficialReferenceSummary"
+      test-id="a11y-expandable-dataset"
       title="Amtliche Fundstelle"
     >
       <EditableList
@@ -861,6 +873,7 @@ const GeneralSummary = withSummarizer(GeneralSummarizer)
       id="categorizedReferences"
       border-bottom
       :data-set="metadataSections.CATEGORIZED_REFERENCE"
+      test-id="a11y-expandable-dataset"
       title="Aktivverweisung"
     >
       <EditableList
@@ -923,6 +936,7 @@ const GeneralSummary = withSummarizer(GeneralSummarizer)
       id="ageIndications"
       border-bottom
       :data-set="metadataSections.AGE_INDICATION"
+      test-id="a11y-expandable-dataset"
       title="Altersangabe"
     >
       <EditableList

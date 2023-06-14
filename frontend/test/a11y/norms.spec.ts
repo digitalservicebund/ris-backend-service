@@ -28,6 +28,23 @@ test.describe("a11y of a norm frame data (/norms/norm/{guid}/frame)", () => {
     await expect(
       page.locator("text=Dokumentation des Rahmenelements")
     ).toBeVisible()
+
+    // eslint-disable-next-line playwright/no-element-handle
+    const sections = await page.$$('[test-id="a11y-expandable-dataset"]')
+    for (const section of sections) {
+      const aufklappenButton = await section.$('[aria-label="Aufklappen"]')
+      if (aufklappenButton) {
+        await aufklappenButton.click()
+
+        const editButtons = await section.$$(
+          '[aria-label="Eintrag bearbeiten"]'
+        )
+        if (editButtons.length > 0) {
+          await editButtons[0].click()
+        }
+      }
+    }
+
     await injectAxe(page)
     await checkA11y(page)
   })
