@@ -123,17 +123,12 @@ public class DocumentUnitController {
         .onErrorReturn(ResponseEntity.internalServerError().body(DocumentUnit.builder().build()));
   }
 
-  @PutMapping(
-      value = "/{uuid}/publish",
-      produces = MediaType.APPLICATION_JSON_VALUE,
-      consumes = MediaType.TEXT_PLAIN_VALUE)
+  @PutMapping(value = "/{uuid}/publish", produces = MediaType.APPLICATION_JSON_VALUE)
   public Mono<ResponseEntity<MailResponse>> publishDocumentUnitAsEmail(
-      @PathVariable UUID uuid,
-      @RequestBody String receiverAddress,
-      @AuthenticationPrincipal OidcUser oidcUser) {
+      @PathVariable UUID uuid, @AuthenticationPrincipal OidcUser oidcUser) {
 
     return service
-        .publishAsEmail(uuid, receiverAddress, userService.getEmail(oidcUser))
+        .publishAsEmail(uuid, userService.getEmail(oidcUser))
         .map(ResponseEntity::ok)
         .doOnError(ex -> ResponseEntity.internalServerError().build());
   }

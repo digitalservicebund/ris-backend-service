@@ -38,7 +38,6 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.MediaType;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.reactive.server.WebTestClient;
@@ -111,7 +110,7 @@ class PublishDocumentUnitIntegrationTest {
         new XmlMailDTO(
             1L,
             savedDocumentUnitDTO.getId(),
-            "exporter@neuris.de",
+            DocumentUnitService.JURIS_RECEIVER_MAILADDRESS,
             "id=juris name=NeuRIS da=R df=X dt=N mod=T ld="
                 + DELIVER_DATE
                 + " vg="
@@ -125,7 +124,7 @@ class PublishDocumentUnitIntegrationTest {
     XmlMail expectedXmlMail =
         new XmlMail(
             documentUnitUuid1,
-            "exporter@neuris.de",
+            DocumentUnitService.JURIS_RECEIVER_MAILADDRESS,
             "id=juris name=NeuRIS da=R df=X dt=N mod=T ld="
                 + DELIVER_DATE
                 + " vg="
@@ -144,8 +143,6 @@ class PublishDocumentUnitIntegrationTest {
         .mutateWith(getMockLogin())
         .put()
         .uri("/api/v1/caselaw/documentunits/" + documentUnitUuid1 + "/publish")
-        .contentType(MediaType.TEXT_PLAIN)
-        .bodyValue("exporter@neuris.de")
         .exchange()
         .expectStatus()
         .isOk()
@@ -217,8 +214,6 @@ class PublishDocumentUnitIntegrationTest {
         .mutateWith(getMockLogin())
         .put()
         .uri("/api/v1/caselaw/documentunits/" + documentUnitUuid + "/publish")
-        .contentType(MediaType.TEXT_PLAIN)
-        .bodyValue("exporter@neuris.de")
         .exchange()
         .expectStatus()
         .isOk()

@@ -45,6 +45,7 @@ import software.amazon.awssdk.services.s3.model.PutObjectResponse;
 @Slf4j
 public class DocumentUnitService {
 
+  public static final String JURIS_RECEIVER_MAILADDRESS = "dokmbx@juris.de";
   private final DocumentUnitRepository repository;
   private final DocumentNumberService documentNumberService;
   private final S3AsyncClient s3AsyncClient;
@@ -263,14 +264,13 @@ public class DocumentUnitService {
         .doOnError(ex -> log.error("Couldn't update the DocumentUnit", ex));
   }
 
-  public Mono<MailResponse> publishAsEmail(
-      UUID documentUnitUuid, String receiverAddress, String issuerAddress) {
+  public Mono<MailResponse> publishAsEmail(UUID documentUnitUuid, String issuerAddress) {
     return repository
         .findByUuid(documentUnitUuid)
         .flatMap(
             documentUnit ->
                 publishService
-                    .publish(documentUnit, receiverAddress)
+                    .publish(documentUnit, JURIS_RECEIVER_MAILADDRESS)
                     .flatMap(
                         mailResponse -> {
                           if (mailResponse

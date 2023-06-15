@@ -106,44 +106,6 @@ test.describe("ensuring the publishing of documentunits works as expected", () =
     await expect(page.locator("text=unveröffentlicht")).toBeVisible()
   })
 
-  test("publication not possible with empty email", async ({
-    page,
-    documentNumber,
-  }) => {
-    await navigateToPublication(page, documentNumber)
-
-    await page.locator("[aria-label='Empfängeradresse E-Mail']").fill("")
-    await page.keyboard.down("Tab")
-
-    await page
-      .locator("[aria-label='Dokumentationseinheit veröffentlichen']")
-      .click()
-    await page
-      .locator("[aria-label='Dokumentationseinheit veröffentlichen']")
-      .click()
-    await expect(page.locator("text=E-Mail-Adresse ungültig")).toBeVisible()
-  })
-
-  test("publication not possible with invalid email", async ({
-    page,
-    documentNumber,
-  }) => {
-    await navigateToPublication(page, documentNumber)
-
-    await page
-      .locator("[aria-label='Empfängeradresse E-Mail']")
-      .fill("wrong.email")
-    await page.keyboard.down("Tab")
-
-    await page
-      .locator("[aria-label='Dokumentationseinheit veröffentlichen']")
-      .click()
-    await page
-      .locator("[aria-label='Dokumentationseinheit veröffentlichen']")
-      .click()
-    await expect(page.locator("text=E-Mail-Adresse ungültig")).toBeVisible()
-  })
-
   test("publication possible when all required fields filled", async ({
     page,
     documentNumber,
