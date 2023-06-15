@@ -301,6 +301,15 @@ class HasValidChildrenTest {
     }
 
     @Test
+    fun `it is satisfied if the digital evidence section does not have any children sections`() {
+        val instance = mockk<MetadataSection>()
+        every { instance.name } returns MetadataSectionName.DIGITAL_EVIDENCE
+        every { instance.sections } returns null
+
+        Assertions.assertThat(hasValidChildren.isSatisfiedBy(instance)).isTrue()
+    }
+
+    @Test
     fun `it is satisfied that the footnote section does not have any children sections`() {
         val instance = mockk<MetadataSection>()
         every { instance.name } returns MetadataSectionName.FOOTNOTES

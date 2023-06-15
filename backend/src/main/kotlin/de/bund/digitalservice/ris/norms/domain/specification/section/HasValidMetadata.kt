@@ -7,6 +7,7 @@ import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.ADDITIONAL_IN
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.AGE_OF_MAJORITY_INDICATION
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.ANNOUNCEMENT_GAZETTE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.ANNOUNCEMENT_MEDIUM
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.APPENDIX
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.AREA_OF_PUBLICATION
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.DATE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.DECIDING_BODY
@@ -16,6 +17,7 @@ import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.EDITION
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.ENTITY
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.EU_GOVERNMENT_GAZETTE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.EXPLANATION
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.EXTERNAL_DATA_NOTE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.FOOTNOTE_CHANGE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.FOOTNOTE_COMMENT
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.FOOTNOTE_DECISION
@@ -26,6 +28,7 @@ import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.FOOTNOTE_STAT
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.KEYWORD
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.LEAD_JURISDICTION
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.LEAD_UNIT
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.LINK
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.NORM_CATEGORY
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.NUMBER
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.NUMBER_OF_THE_PUBLICATION_IN_THE_RESPECTIVE_AREA
@@ -36,6 +39,7 @@ import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.PARTICIPATION
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.RANGE_END
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.RANGE_START
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.REFERENCE_NUMBER
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.RELATED_DATA
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.RESOLUTION_MAJORITY
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.RIS_ABBREVIATION_INTERNATIONAL_LAW
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.SERIES
@@ -85,6 +89,7 @@ val hasValidMetadata =
             Section.PRINCIPLE_ENTRY_INTO_FORCE -> hasOneOfType(listOf(DATE, UNDEFINED_DATE), instance)
             Section.EXPIRATION -> hasOneOfType(listOf(DATE, UNDEFINED_DATE), instance)
             Section.PRINCIPLE_EXPIRATION -> hasOneOfType(listOf(DATE, UNDEFINED_DATE), instance)
+            Section.DIGITAL_EVIDENCE -> hasType(listOf(LINK, RELATED_DATA, EXTERNAL_DATA_NOTE, APPENDIX), instance)
             Section.FOOTNOTES -> hasType(listOf(FOOTNOTE_REFERENCE, FOOTNOTE_CHANGE, FOOTNOTE_COMMENT, FOOTNOTE_DECISION, FOOTNOTE_STATE_LAW, FOOTNOTE_EU_LAW, FOOTNOTE_OTHER), instance)
         }
 

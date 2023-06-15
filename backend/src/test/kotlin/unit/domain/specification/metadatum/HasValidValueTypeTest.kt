@@ -2,7 +2,9 @@ package de.bund.digitalservice.ris.norms.domain.specification.metadatum
 
 import de.bund.digitalservice.ris.norms.domain.entity.Metadatum
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.APPENDIX
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.DATE
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.EXTERNAL_DATA_NOTE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.FOOTNOTE_CHANGE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.FOOTNOTE_COMMENT
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.FOOTNOTE_DECISION
@@ -11,9 +13,11 @@ import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.FOOTNOTE_OTHE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.FOOTNOTE_REFERENCE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.FOOTNOTE_STATE_LAW
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.KEYWORD
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.LINK
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.NORM_CATEGORY
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.RANGE_END
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.RANGE_START
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.RELATED_DATA
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.RESOLUTION_MAJORITY
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.TEXT
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.UNDEFINED_DATE
@@ -89,6 +93,62 @@ class HasValidValueTypeTest {
     @Test
     fun `it is not satisfied if the value for a text is not string`() {
         val instance = getMockedMetadatum(123, TEXT)
+
+        assertThat(hasValidValueType.isSatisfiedBy(instance)).isFalse()
+    }
+
+    @Test
+    fun `it is satisfied if the value for a link is a string`() {
+        val instance = getMockedMetadatum("test link", LINK)
+
+        assertThat(hasValidValueType.isSatisfiedBy(instance)).isTrue()
+    }
+
+    @Test
+    fun `it is not satisfied if the value for a link is not string`() {
+        val instance = getMockedMetadatum(123, LINK)
+
+        assertThat(hasValidValueType.isSatisfiedBy(instance)).isFalse()
+    }
+
+    @Test
+    fun `it is satisfied if the value for related data is a string`() {
+        val instance = getMockedMetadatum("test related data", RELATED_DATA)
+
+        assertThat(hasValidValueType.isSatisfiedBy(instance)).isTrue()
+    }
+
+    @Test
+    fun `it is not satisfied if the value for related data is not string`() {
+        val instance = getMockedMetadatum(123, RELATED_DATA)
+
+        assertThat(hasValidValueType.isSatisfiedBy(instance)).isFalse()
+    }
+
+    @Test
+    fun `it is satisfied if the value for an external data note is a string`() {
+        val instance = getMockedMetadatum("test external data note", EXTERNAL_DATA_NOTE)
+
+        assertThat(hasValidValueType.isSatisfiedBy(instance)).isTrue()
+    }
+
+    @Test
+    fun `it is not satisfied if the value for an external data note is not string`() {
+        val instance = getMockedMetadatum(123, EXTERNAL_DATA_NOTE)
+
+        assertThat(hasValidValueType.isSatisfiedBy(instance)).isFalse()
+    }
+
+    @Test
+    fun `it is satisfied if the value for appendix is a string`() {
+        val instance = getMockedMetadatum("test appendix", APPENDIX)
+
+        assertThat(hasValidValueType.isSatisfiedBy(instance)).isTrue()
+    }
+
+    @Test
+    fun `it is not satisfied if the value for an appendix is not string`() {
+        val instance = getMockedMetadatum(123, APPENDIX)
 
         assertThat(hasValidValueType.isSatisfiedBy(instance)).isFalse()
     }

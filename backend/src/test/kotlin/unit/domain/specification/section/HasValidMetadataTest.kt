@@ -605,6 +605,34 @@ class HasValidMetadataTest {
     }
 
     @Test
+    fun `can generate digital evidence with right metadata`() {
+        val instance = mockk<MetadataSection>()
+        every { instance.name } returns MetadataSectionName.DIGITAL_EVIDENCE
+        every { instance.sections } returns null
+        every { instance.metadata } returns listOf(
+            Metadatum("link", MetadatumType.LINK),
+            Metadatum("related data", MetadatumType.RELATED_DATA),
+            Metadatum("external data note", MetadatumType.EXTERNAL_DATA_NOTE),
+            Metadatum("appendix", MetadatumType.APPENDIX),
+        )
+
+        assertThat(hasValidMetadata.isSatisfiedBy(instance)).isTrue()
+    }
+
+    @Test
+    fun `it throws an error on digital evidence with right and wrong metadata`() {
+        val instance = mockk<MetadataSection>()
+        every { instance.name } returns MetadataSectionName.DIGITAL_EVIDENCE
+        every { instance.sections } returns null
+        every { instance.metadata } returns listOf(
+            Metadatum("link", MetadatumType.LINK),
+            Metadatum("announcement medium", MetadatumType.ANNOUNCEMENT_MEDIUM),
+        )
+
+        assertThat(hasValidMetadata.isSatisfiedBy(instance)).isFalse()
+    }
+
+    @Test
     fun `can generate footnote with right metadata`() {
         val instance = mockk<MetadataSection>()
         every { instance.name } returns MetadataSectionName.FOOTNOTES
