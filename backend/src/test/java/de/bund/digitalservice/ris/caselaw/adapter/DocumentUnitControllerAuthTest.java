@@ -69,18 +69,14 @@ class DocumentUnitControllerAuthTest {
                 }));
   }
 
+  // testGetByDocumentNumber() is in DocumentUnitControllerAuthIntegrationTest
+
   @Test
   void testAttachFileToDocumentUnit() {
     when(service.attachFileToDocumentUnit(
             eq(TEST_UUID), any(ByteBuffer.class), any(HttpHeaders.class)))
         .thenReturn(Mono.empty());
-
-    when(service.getByUuid(TEST_UUID))
-        .thenReturn(
-            Mono.just(
-                DocumentUnit.builder()
-                    .coreData(CoreData.builder().documentationOffice(docOffice1).build())
-                    .build()));
+    mockDocumentUnit(docOffice1);
 
     webClient
         .mutateWith(csrf())
@@ -106,13 +102,7 @@ class DocumentUnitControllerAuthTest {
   @Test
   void testRemoveFileFromDocumentUnit() {
     when(service.removeFileFromDocumentUnit(TEST_UUID)).thenReturn(Mono.empty());
-
-    when(service.getByUuid(TEST_UUID))
-        .thenReturn(
-            Mono.just(
-                DocumentUnit.builder()
-                    .coreData(CoreData.builder().documentationOffice(docOffice2).build())
-                    .build()));
+    mockDocumentUnit(docOffice2);
 
     webClient
         .mutateWith(csrf())
@@ -136,13 +126,7 @@ class DocumentUnitControllerAuthTest {
   @Test
   void testDeleteByUuid() {
     when(service.deleteByUuid(TEST_UUID)).thenReturn(Mono.empty());
-
-    when(service.getByUuid(TEST_UUID))
-        .thenReturn(
-            Mono.just(
-                DocumentUnit.builder()
-                    .coreData(CoreData.builder().documentationOffice(docOffice1).build())
-                    .build()));
+    mockDocumentUnit(docOffice1);
 
     webClient
         .mutateWith(csrf())
@@ -165,12 +149,7 @@ class DocumentUnitControllerAuthTest {
 
   @Test
   void testUpdateByUuid() {
-    DocumentUnit docUnit =
-        DocumentUnit.builder()
-            .uuid(TEST_UUID)
-            .coreData(CoreData.builder().documentationOffice(docOffice2).build())
-            .build();
-
+    DocumentUnit docUnit = mockDocumentUnit(docOffice2);
     when(service.updateDocumentUnit(docUnit)).thenReturn(Mono.empty());
     when(service.getByUuid(TEST_UUID)).thenReturn(Mono.just(docUnit));
 
@@ -195,5 +174,15 @@ class DocumentUnitControllerAuthTest {
         .exchange()
         .expectStatus()
         .isForbidden();
+  }
+
+  private DocumentUnit mockDocumentUnit(DocumentationOffice docOffice) {
+    DocumentUnit docUnit =
+        DocumentUnit.builder()
+            .uuid(TEST_UUID)
+            .coreData(CoreData.builder().documentationOffice(docOffice).build())
+            .build();
+    when(service.getByUuid(TEST_UUID)).thenReturn(Mono.just(docUnit));
+    return docUnit;
   }
 }
