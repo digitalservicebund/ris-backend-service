@@ -7,6 +7,7 @@ import AgeIndicationInputGroup from "@/components/AgeIndicationInputGroup.vue"
 import AnnouncementGroup from "@/components/AnnouncementGroup.vue"
 import CategorizedReferenceInputGroup from "@/components/CategorizedReferenceInputGroup.vue"
 import CitationDateInputGroup from "@/components/CitationDateInputGroup.vue"
+import DigitalEvidenceInputGroup from "@/components/DigitalEvidenceInputGroup.vue"
 import DivergentEntryIntoForceGroup from "@/components/DivergentEntryIntoForceGroup.vue"
 import DivergentExpirationGroup from "@/components/DivergentExpirationGroup.vue"
 import DocumentTypeInputGroup from "@/components/DocumentTypeInputGroup.vue"
@@ -27,7 +28,6 @@ import {
   MetadataSections,
   UndefinedDate,
 } from "@/domain/Norm"
-import { digitalEvidence } from "@/fields/norms/digitalEvidence"
 import { documentStatus } from "@/fields/norms/documentStatus"
 import { documentTextProof } from "@/fields/norms/documentTextProof"
 import { otherDocumentNote } from "@/fields/norms/otherDocumentNote"
@@ -932,16 +932,20 @@ const SubjectAreaSummary = withSummarizer(subjectAreaSummarizer)
       :type="InputType.CHIPS"
     />
 
-    <fieldset class="mt-32">
-      <legend id="digitalEvidenceFields" class="heading-02-regular mb-[1rem]">
-        Elektronischer Nachweis
-      </legend>
-      <InputGroup
-        v-model="flatMetadata"
-        :column-count="1"
-        :fields="digitalEvidence"
+    <ExpandableDataSet
+      id="digitalEvidence"
+      border-bottom
+      :data-set="metadataSections.DIGITAL_EVIDENCE"
+      test-id="a11y-expandable-dataset"
+      title="Elektronischer Nachweis"
+    >
+      <EditableList
+        v-model="metadataSections.DIGITAL_EVIDENCE"
+        :default-value="{}"
+        disable-multi-entry
+        :edit-component="DigitalEvidenceInputGroup"
       />
-    </fieldset>
+    </ExpandableDataSet>
 
     <SingleDataFieldSection
       id="referenceNumbers"

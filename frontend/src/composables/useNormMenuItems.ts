@@ -58,7 +58,7 @@ export function useNormMenuItems(
         getChildItem("Aktivverweisung", "categorizedReferences"),
         getChildItem("Fußnoten", "otherFootnoteFields"),
         getChildItem("Gültigkeitsregelung", "validityRules"),
-        getChildItem("Elektronischer Nachweis", "digitalEvidenceFields"),
+        getChildItem("Elektronischer Nachweis", "digitalEvidence"),
         getChildItem("Aktenzeichen", "referenceNumbers"),
         getChildItem("ELI", "eli"),
         getChildItem("CELEX-Nummer", "celexNumber"),
