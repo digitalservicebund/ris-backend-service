@@ -12,7 +12,7 @@ describe("publishService", () => {
       }
     })
 
-    const result = await service.publishDocument("123", "test@test.com")
+    const result = await service.publishDocument("123")
     expect(result.error?.title).toEqual("Leider ist ein Fehler aufgetreten.")
     expect(result.error?.description).toEqual(
       "Die Dokumentationseinheit kann nicht veröffentlicht werden."
