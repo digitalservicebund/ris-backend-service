@@ -81,11 +81,13 @@ class DocumentUnitControllerAuthTest {
         .thenReturn(Mono.empty());
     mockDocumentUnit(docOffice1, null, null);
 
+    String uri = "/api/v1/caselaw/documentunits/" + TEST_UUID + "/file";
+
     webClient
         .mutateWith(csrf())
         .mutateWith(getMockLoginWithDocOffice(docOffice1Group))
         .put()
-        .uri("/api/v1/caselaw/documentunits/" + TEST_UUID + "/file")
+        .uri(uri)
         .body(BodyInserters.fromValue(new byte[] {}))
         .exchange()
         .expectStatus()
@@ -95,7 +97,7 @@ class DocumentUnitControllerAuthTest {
         .mutateWith(csrf())
         .mutateWith(getMockLoginWithDocOffice(docOffice2Group))
         .put()
-        .uri("/api/v1/caselaw/documentunits/" + TEST_UUID + "/file")
+        .uri(uri)
         .body(BodyInserters.fromValue(new byte[] {}))
         .exchange()
         .expectStatus()
@@ -107,11 +109,13 @@ class DocumentUnitControllerAuthTest {
     when(service.removeFileFromDocumentUnit(TEST_UUID)).thenReturn(Mono.empty());
     mockDocumentUnit(docOffice2, null, null);
 
+    String uri = "/api/v1/caselaw/documentunits/" + TEST_UUID + "/file";
+
     webClient
         .mutateWith(csrf())
         .mutateWith(getMockLoginWithDocOffice(docOffice2Group))
         .delete()
-        .uri("/api/v1/caselaw/documentunits/" + TEST_UUID + "/file")
+        .uri(uri)
         .exchange()
         .expectStatus()
         .isOk();
@@ -120,7 +124,7 @@ class DocumentUnitControllerAuthTest {
         .mutateWith(csrf())
         .mutateWith(getMockLoginWithDocOffice(docOffice1Group))
         .delete()
-        .uri("/api/v1/caselaw/documentunits/" + TEST_UUID + "/file")
+        .uri(uri)
         .exchange()
         .expectStatus()
         .isForbidden();
@@ -131,11 +135,13 @@ class DocumentUnitControllerAuthTest {
     when(service.deleteByUuid(TEST_UUID)).thenReturn(Mono.empty());
     mockDocumentUnit(docOffice1, null, null);
 
+    String uri = "/api/v1/caselaw/documentunits/" + TEST_UUID;
+
     webClient
         .mutateWith(csrf())
         .mutateWith(getMockLoginWithDocOffice(docOffice1Group))
         .delete()
-        .uri("/api/v1/caselaw/documentunits/" + TEST_UUID)
+        .uri(uri)
         .exchange()
         .expectStatus()
         .isOk();
@@ -144,7 +150,7 @@ class DocumentUnitControllerAuthTest {
         .mutateWith(csrf())
         .mutateWith(getMockLoginWithDocOffice(docOffice2Group))
         .delete()
-        .uri("/api/v1/caselaw/documentunits/" + TEST_UUID)
+        .uri(uri)
         .exchange()
         .expectStatus()
         .isForbidden();
@@ -156,11 +162,13 @@ class DocumentUnitControllerAuthTest {
     when(service.updateDocumentUnit(docUnit)).thenReturn(Mono.empty());
     when(service.getByUuid(TEST_UUID)).thenReturn(Mono.just(docUnit));
 
+    String uri = "/api/v1/caselaw/documentunits/" + TEST_UUID;
+
     webClient
         .mutateWith(csrf())
         .mutateWith(getMockLoginWithDocOffice(docOffice2Group))
         .put()
-        .uri("/api/v1/caselaw/documentunits/" + TEST_UUID)
+        .uri(uri)
         .header(HttpHeaders.CONTENT_TYPE, "application/json")
         .bodyValue(docUnit)
         .exchange()
@@ -171,7 +179,7 @@ class DocumentUnitControllerAuthTest {
         .mutateWith(csrf())
         .mutateWith(getMockLoginWithDocOffice(docOffice1Group))
         .put()
-        .uri("/api/v1/caselaw/documentunits/" + TEST_UUID)
+        .uri(uri)
         .header(HttpHeaders.CONTENT_TYPE, "application/json")
         .bodyValue(docUnit)
         .exchange()
@@ -184,11 +192,13 @@ class DocumentUnitControllerAuthTest {
     mockDocumentUnit(docOffice1, "123", PUBLISHED);
     when(docxConverterService.getConvertedObject("123")).thenReturn(Mono.empty());
 
+    String uri = "/api/v1/caselaw/documentunits/" + TEST_UUID + "/docx";
+
     webClient
         .mutateWith(csrf())
         .mutateWith(getMockLoginWithDocOffice(docOffice1Group))
         .get()
-        .uri("/api/v1/caselaw/documentunits/" + TEST_UUID + "/docx")
+        .uri(uri)
         .exchange()
         .expectStatus()
         .isOk();
@@ -197,7 +207,7 @@ class DocumentUnitControllerAuthTest {
         .mutateWith(csrf())
         .mutateWith(getMockLoginWithDocOffice(docOffice2Group))
         .get()
-        .uri("/api/v1/caselaw/documentunits/" + TEST_UUID + "/docx")
+        .uri(uri)
         .exchange()
         .expectStatus()
         .isOk();
@@ -208,7 +218,7 @@ class DocumentUnitControllerAuthTest {
         .mutateWith(csrf())
         .mutateWith(getMockLoginWithDocOffice(docOffice2Group))
         .get()
-        .uri("/api/v1/caselaw/documentunits/" + TEST_UUID + "/docx")
+        .uri(uri)
         .exchange()
         .expectStatus()
         .isForbidden();
@@ -220,11 +230,13 @@ class DocumentUnitControllerAuthTest {
     when(userService.getEmail(any(OidcUser.class))).thenReturn("abc");
     when(service.publishAsEmail(TEST_UUID, "abc")).thenReturn(Mono.empty());
 
+    String uri = "/api/v1/caselaw/documentunits/" + TEST_UUID + "/publish";
+
     webClient
         .mutateWith(csrf())
         .mutateWith(getMockLoginWithDocOffice(docOffice1Group))
         .put()
-        .uri("/api/v1/caselaw/documentunits/" + TEST_UUID + "/publish")
+        .uri(uri)
         .exchange()
         .expectStatus()
         .isForbidden();
@@ -233,7 +245,7 @@ class DocumentUnitControllerAuthTest {
         .mutateWith(csrf())
         .mutateWith(getMockLoginWithDocOffice(docOffice2Group))
         .put()
-        .uri("/api/v1/caselaw/documentunits/" + TEST_UUID + "/publish")
+        .uri(uri)
         .exchange()
         .expectStatus()
         .isOk();
@@ -244,11 +256,13 @@ class DocumentUnitControllerAuthTest {
     mockDocumentUnit(docOffice1, null, PUBLISHED);
     when(service.getLastPublishedXmlMail(TEST_UUID)).thenReturn(Mono.empty());
 
+    String uri = "/api/v1/caselaw/documentunits/" + TEST_UUID + "/publish";
+
     webClient
         .mutateWith(csrf())
         .mutateWith(getMockLoginWithDocOffice(docOffice1Group))
         .get()
-        .uri("/api/v1/caselaw/documentunits/" + TEST_UUID + "/publish")
+        .uri(uri)
         .exchange()
         .expectStatus()
         .isOk();
@@ -257,7 +271,7 @@ class DocumentUnitControllerAuthTest {
         .mutateWith(csrf())
         .mutateWith(getMockLoginWithDocOffice(docOffice2Group))
         .get()
-        .uri("/api/v1/caselaw/documentunits/" + TEST_UUID + "/publish")
+        .uri(uri)
         .exchange()
         .expectStatus()
         .isOk();
@@ -268,7 +282,7 @@ class DocumentUnitControllerAuthTest {
         .mutateWith(csrf())
         .mutateWith(getMockLoginWithDocOffice(docOffice2Group))
         .get()
-        .uri("/api/v1/caselaw/documentunits/" + TEST_UUID + "/publish")
+        .uri(uri)
         .exchange()
         .expectStatus()
         .isForbidden();
