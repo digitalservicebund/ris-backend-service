@@ -67,16 +67,6 @@ class ContentRelatedIndexingControllerAuthTest {
                 }));
   }
 
-  private void mockDocumentUnit(DocumentationOffice docOffice, DocumentUnitStatus status) {
-    when(documentUnitService.getByUuid(TEST_UUID))
-        .thenReturn(
-            Mono.just(
-                DocumentUnit.builder()
-                    .status(status)
-                    .coreData(CoreData.builder().documentationOffice(docOffice).build())
-                    .build()));
-  }
-
   @Test
   void testGetFieldsOfLaw() {
     when(fieldOfLawService.getFieldsOfLawForDocumentUnit(TEST_UUID)).thenReturn(Mono.empty());
@@ -276,5 +266,15 @@ class ContentRelatedIndexingControllerAuthTest {
         .exchange()
         .expectStatus()
         .isOk();
+  }
+
+  private void mockDocumentUnit(DocumentationOffice docOffice, DocumentUnitStatus status) {
+    when(documentUnitService.getByUuid(TEST_UUID))
+        .thenReturn(
+            Mono.just(
+                DocumentUnit.builder()
+                    .status(status)
+                    .coreData(CoreData.builder().documentationOffice(docOffice).build())
+                    .build()));
   }
 }
