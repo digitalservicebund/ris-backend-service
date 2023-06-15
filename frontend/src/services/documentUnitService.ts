@@ -39,8 +39,12 @@ const service: DocumentUnitService = {
       `caselaw/documentunits/${documentNumber}`
     )
     if (response.status >= 300 || response.error) {
+      response.data = undefined
       response.error = {
-        title: "Dokumentationseinheit konnten nicht geladen werden.",
+        title:
+          response.status == 403
+            ? "Diese Dokumentationseinheit existiert nicht oder sie haben keine Berechtigung"
+            : "Dokumentationseinheit konnten nicht geladen werden.",
       }
     } else {
       response.data = new DocumentUnit(response.data.uuid, { ...response.data })
