@@ -214,6 +214,66 @@ class DocumentUnitControllerAuthTest {
         .isForbidden();
   }
 
+  @Test
+  void testPublishDocumentUnitAsEmail() {
+    mockDocumentUnit(docOffice2, null, null);
+    when(userService.getEmail(any(OidcUser.class))).thenReturn("abc");
+    when(service.publishAsEmail(TEST_UUID, "abc")).thenReturn(Mono.empty());
+
+    webClient
+        .mutateWith(csrf())
+        .mutateWith(getMockLoginWithDocOffice(docOffice1Group))
+        .put()
+        .uri("/api/v1/caselaw/documentunits/" + TEST_UUID + "/publish")
+        .exchange()
+        .expectStatus()
+        .isForbidden();
+
+    webClient
+        .mutateWith(csrf())
+        .mutateWith(getMockLoginWithDocOffice(docOffice2Group))
+        .put()
+        .uri("/api/v1/caselaw/documentunits/" + TEST_UUID + "/publish")
+        .exchange()
+        .expectStatus()
+        .isOk();
+  }
+
+  @Test
+  void testGetLastPublishedXml() {
+    mockDocumentUnit(docOffice1, null, PUBLISHED);
+    when(service.getLastPublishedXmlMail(TEST_UUID)).thenReturn(Mono.empty());
+
+    webClient
+        .mutateWith(csrf())
+        .mutateWith(getMockLoginWithDocOffice(docOffice1Group))
+        .get()
+        .uri("/api/v1/caselaw/documentunits/" + TEST_UUID + "/publish")
+        .exchange()
+        .expectStatus()
+        .isOk();
+
+    webClient
+        .mutateWith(csrf())
+        .mutateWith(getMockLoginWithDocOffice(docOffice2Group))
+        .get()
+        .uri("/api/v1/caselaw/documentunits/" + TEST_UUID + "/publish")
+        .exchange()
+        .expectStatus()
+        .isOk();
+
+    mockDocumentUnit(docOffice1, null, UNPUBLISHED);
+
+    webClient
+        .mutateWith(csrf())
+        .mutateWith(getMockLoginWithDocOffice(docOffice2Group))
+        .get()
+        .uri("/api/v1/caselaw/documentunits/" + TEST_UUID + "/publish")
+        .exchange()
+        .expectStatus()
+        .isForbidden();
+  }
+
   private DocumentUnit mockDocumentUnit(
       DocumentationOffice docOffice, String s3path, DocumentUnitStatus status) {
     DocumentUnit docUnit =

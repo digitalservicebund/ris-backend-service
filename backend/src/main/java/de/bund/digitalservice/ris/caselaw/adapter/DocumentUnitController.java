@@ -130,6 +130,7 @@ public class DocumentUnitController {
   }
 
   @PutMapping(value = "/{uuid}/publish", produces = MediaType.APPLICATION_JSON_VALUE)
+  @PreAuthorize("@userHasWriteAccessByUuid.apply(#uuid)")
   public Mono<ResponseEntity<MailResponse>> publishDocumentUnitAsEmail(
       @PathVariable UUID uuid, @AuthenticationPrincipal OidcUser oidcUser) {
 
@@ -140,6 +141,7 @@ public class DocumentUnitController {
   }
 
   @GetMapping(value = "/{uuid}/publish", produces = MediaType.APPLICATION_JSON_VALUE)
+  @PreAuthorize("@userHasReadAccessByUuid.apply(#uuid)")
   public Mono<ResponseEntity<MailResponse>> getLastPublishedXml(@PathVariable UUID uuid) {
     return service
         .getLastPublishedXmlMail(uuid)
