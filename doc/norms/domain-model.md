@@ -47,13 +47,6 @@ classDiagram
     Date applicationScopeStartDate
     Date applicationScopeEndDate
 
-    String otherFootnote
-    String footnoteChange
-    String footnoteComment
-    String footnoteDecision
-    String footnoteStateLaw
-    String footnoteEuLaw
-
     String digitalEvidenceLink
     String digitalEvidenceRelatedData
     String digitalEvidenceExternalDataNote
@@ -125,6 +118,7 @@ classDiagram
      PRINCIPLE_ENTRY_INTO_FORCE
      EXPIRATION
      PRINCIPLE_EXPIRATION
+     FOOTNOTES
   }
 
   class MetadatumType  {
@@ -171,6 +165,13 @@ classDiagram
     TEMPLATE_NAME
     UNDEFINED_DATE
     TEXT
+    FOOTNOTE_REFERENCE
+    FOOTNOTE_CHANGE
+    FOOTNOTE_COMMENT
+    FOOTNOTE_DECISION
+    FOOTNOTE_STATE_LAW
+    FOOTNOTE_EU_LAW
+    FOOTNOTE_OTHER
   }
 
   class FileReference {

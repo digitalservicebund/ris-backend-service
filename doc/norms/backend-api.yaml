@@ -311,6 +311,13 @@ components:
         - TEMPLATE_NAME
         - UNDEFINED_DATE
         - TEXT
+        - FOOTNOTE_REFERENCE
+        - FOOTNOTE_CHANGE
+        - FOOTNOTE_COMMENT
+        - FOOTNOTE_DECISION
+        - FOOTNOTE_STATE_LAW
+        - FOOTNOTE_EU_LAW
+        - FOOTNOTE_OTHER
 
     MetadataSectionName:
       description: A field that indicates the name of the section
@@ -340,6 +347,7 @@ components:
         - PRINCIPLE_ENTRY_INTO_FORCE
         - EXPIRATION
         - PRINCIPLE_EXPIRATION
+        - FOOTNOTES
 
     MetadataSection:
       type: object
@@ -465,24 +473,6 @@ components:
         applicationScopeEndDate:
           $ref: '#/components/schemas/Date'
         celexNumber:
-          type: string
-          example: ''
-        otherFootnote:
-          type: string
-          example: Das G wurde vom Bundestag beschlossen und ist am 1.1.1998 in Kraft getreten.
-        footnoteChange:
-          type: string
-          example: ''
-        footnoteComment:
-          type: string
-          example: ''
-        footnoteDecision:
-          type: string
-          example: ''
-        footnoteStateLaw:
-          type: string
-          example: ''
-        footnoteEuLaw:
           type: string
           example: ''
         risAbbreviation:
