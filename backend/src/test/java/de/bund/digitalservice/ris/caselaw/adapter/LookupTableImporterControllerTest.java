@@ -75,6 +75,22 @@ class LookupTableImporterControllerTest {
   }
 
   @Test
+  void testImportCitationStyleLookupTable() {
+    when(service.importCitationStyleLookupTable(any(ByteBuffer.class))).thenReturn(Mono.empty());
+
+    webClient
+        .mutateWith(csrf())
+        .put()
+        .uri("/api/v1/caselaw/lookuptableimporter/zitart")
+        .bodyValue(BodyInserters.fromValue(new byte[] {}))
+        .exchange()
+        .expectStatus()
+        .isOk();
+
+    verify(service, times(1)).importCitationStyleLookupTable(any(ByteBuffer.class));
+  }
+
+  @Test
   void testImportFieldOfLawLookupTable() {
     when(service.importFieldOfLawLookupTable(any(ByteBuffer.class))).thenReturn(Mono.empty());
 
