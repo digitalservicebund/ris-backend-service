@@ -3,6 +3,13 @@ package de.bund.digitalservice.ris.norms.domain.specification.metadatum
 import de.bund.digitalservice.ris.norms.domain.entity.Metadatum
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.DATE
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.FOOTNOTE_CHANGE
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.FOOTNOTE_COMMENT
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.FOOTNOTE_DECISION
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.FOOTNOTE_EU_LAW
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.FOOTNOTE_OTHER
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.FOOTNOTE_REFERENCE
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.FOOTNOTE_STATE_LAW
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.KEYWORD
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.NORM_CATEGORY
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.RANGE_END
@@ -82,6 +89,104 @@ class HasValidValueTypeTest {
     @Test
     fun `it is not satisfied if the value for a text is not string`() {
         val instance = getMockedMetadatum(123, TEXT)
+
+        assertThat(hasValidValueType.isSatisfiedBy(instance)).isFalse()
+    }
+
+    @Test
+    fun `it is satisfied if the value for a footnote reference is a string`() {
+        val instance = getMockedMetadatum("test text", FOOTNOTE_REFERENCE)
+
+        assertThat(hasValidValueType.isSatisfiedBy(instance)).isTrue()
+    }
+
+    @Test
+    fun `it is not satisfied if the value for a footnote reference is not string`() {
+        val instance = getMockedMetadatum(123, FOOTNOTE_REFERENCE)
+
+        assertThat(hasValidValueType.isSatisfiedBy(instance)).isFalse()
+    }
+
+    @Test
+    fun `it is satisfied if the value for a footnote change is a string`() {
+        val instance = getMockedMetadatum("test text", FOOTNOTE_CHANGE)
+
+        assertThat(hasValidValueType.isSatisfiedBy(instance)).isTrue()
+    }
+
+    @Test
+    fun `it is not satisfied if the value for a footnote change is not string`() {
+        val instance = getMockedMetadatum(123, FOOTNOTE_CHANGE)
+
+        assertThat(hasValidValueType.isSatisfiedBy(instance)).isFalse()
+    }
+
+    @Test
+    fun `it is satisfied if the value for a footnote comment is a string`() {
+        val instance = getMockedMetadatum("test text", FOOTNOTE_COMMENT)
+
+        assertThat(hasValidValueType.isSatisfiedBy(instance)).isTrue()
+    }
+
+    @Test
+    fun `it is not satisfied if the value for a footnote comment is not string`() {
+        val instance = getMockedMetadatum(123, FOOTNOTE_COMMENT)
+
+        assertThat(hasValidValueType.isSatisfiedBy(instance)).isFalse()
+    }
+
+    @Test
+    fun `it is satisfied if the value for a footnote decision is a string`() {
+        val instance = getMockedMetadatum("test text", FOOTNOTE_DECISION)
+
+        assertThat(hasValidValueType.isSatisfiedBy(instance)).isTrue()
+    }
+
+    @Test
+    fun `it is not satisfied if the value for a footnote decision is not string`() {
+        val instance = getMockedMetadatum(123, FOOTNOTE_DECISION)
+
+        assertThat(hasValidValueType.isSatisfiedBy(instance)).isFalse()
+    }
+
+    @Test
+    fun `it is satisfied if the value for a footnote state law is a string`() {
+        val instance = getMockedMetadatum("test text", FOOTNOTE_STATE_LAW)
+
+        assertThat(hasValidValueType.isSatisfiedBy(instance)).isTrue()
+    }
+
+    @Test
+    fun `it is not satisfied if the value for a footnote state law is not string`() {
+        val instance = getMockedMetadatum(123, FOOTNOTE_STATE_LAW)
+
+        assertThat(hasValidValueType.isSatisfiedBy(instance)).isFalse()
+    }
+
+    @Test
+    fun `it is satisfied if the value for a footnote eu law is a string`() {
+        val instance = getMockedMetadatum("test text", FOOTNOTE_EU_LAW)
+
+        assertThat(hasValidValueType.isSatisfiedBy(instance)).isTrue()
+    }
+
+    @Test
+    fun `it is not satisfied if the value for a footnote eu law is not string`() {
+        val instance = getMockedMetadatum(123, FOOTNOTE_EU_LAW)
+
+        assertThat(hasValidValueType.isSatisfiedBy(instance)).isFalse()
+    }
+
+    @Test
+    fun `it is satisfied if the value for a footnote other is a string`() {
+        val instance = getMockedMetadatum("test text", FOOTNOTE_OTHER)
+
+        assertThat(hasValidValueType.isSatisfiedBy(instance)).isTrue()
+    }
+
+    @Test
+    fun `it is not satisfied if the value for a footnote other is not string`() {
+        val instance = getMockedMetadatum(123, FOOTNOTE_OTHER)
 
         assertThat(hasValidValueType.isSatisfiedBy(instance)).isFalse()
     }

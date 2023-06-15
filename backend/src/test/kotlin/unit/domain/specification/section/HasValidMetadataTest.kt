@@ -603,4 +603,37 @@ class HasValidMetadataTest {
 
         assertThat(hasValidMetadata.isSatisfiedBy(instance)).isFalse()
     }
+
+    @Test
+    fun `can generate footnote with right metadata`() {
+        val instance = mockk<MetadataSection>()
+        every { instance.name } returns MetadataSectionName.FOOTNOTES
+        every { instance.sections } returns null
+        every { instance.metadata } returns listOf(
+            Metadatum("footnote reference", MetadatumType.FOOTNOTE_REFERENCE),
+            Metadatum("footnote change", MetadatumType.FOOTNOTE_CHANGE),
+            Metadatum("footnote comment", MetadatumType.FOOTNOTE_COMMENT),
+            Metadatum("footnote decision", MetadatumType.FOOTNOTE_DECISION),
+            Metadatum("footnote state law", MetadatumType.FOOTNOTE_STATE_LAW),
+            Metadatum("footnote eu law", MetadatumType.FOOTNOTE_EU_LAW),
+            Metadatum("footnote other", MetadatumType.FOOTNOTE_OTHER),
+        )
+
+        assertThat(hasValidMetadata.isSatisfiedBy(instance)).isTrue()
+    }
+
+    @Test
+    fun `it throws an error on footnote with right and wrong metadata`() {
+        val instance = mockk<MetadataSection>()
+        every { instance.name } returns MetadataSectionName.FOOTNOTES
+        every { instance.sections } returns null
+        every { instance.metadata } returns listOf(
+            Metadatum("footnote reference", MetadatumType.FOOTNOTE_REFERENCE),
+            Metadatum("footnote change", MetadatumType.FOOTNOTE_CHANGE),
+            Metadatum("footnote comment", MetadatumType.FOOTNOTE_COMMENT),
+            Metadatum("gazette", MetadatumType.ANNOUNCEMENT_GAZETTE),
+        )
+
+        assertThat(hasValidMetadata.isSatisfiedBy(instance)).isFalse()
+    }
 }

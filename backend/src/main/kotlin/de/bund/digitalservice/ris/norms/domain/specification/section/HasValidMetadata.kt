@@ -16,6 +16,13 @@ import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.EDITION
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.ENTITY
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.EU_GOVERNMENT_GAZETTE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.EXPLANATION
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.FOOTNOTE_CHANGE
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.FOOTNOTE_COMMENT
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.FOOTNOTE_DECISION
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.FOOTNOTE_EU_LAW
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.FOOTNOTE_OTHER
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.FOOTNOTE_REFERENCE
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.FOOTNOTE_STATE_LAW
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.KEYWORD
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.LEAD_JURISDICTION
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.LEAD_UNIT
@@ -78,6 +85,7 @@ val hasValidMetadata =
             Section.PRINCIPLE_ENTRY_INTO_FORCE -> hasOneOfType(listOf(DATE, UNDEFINED_DATE), instance)
             Section.EXPIRATION -> hasOneOfType(listOf(DATE, UNDEFINED_DATE), instance)
             Section.PRINCIPLE_EXPIRATION -> hasOneOfType(listOf(DATE, UNDEFINED_DATE), instance)
+            Section.FOOTNOTES -> hasType(listOf(FOOTNOTE_REFERENCE, FOOTNOTE_CHANGE, FOOTNOTE_COMMENT, FOOTNOTE_DECISION, FOOTNOTE_STATE_LAW, FOOTNOTE_EU_LAW, FOOTNOTE_OTHER), instance)
         }
 
         private fun hasNone(instance: MetadataSection): Boolean =

@@ -25,4 +25,5 @@ enum class MetadataSectionName {
     PRINCIPLE_ENTRY_INTO_FORCE,
     EXPIRATION,
     PRINCIPLE_EXPIRATION,
+    FOOTNOTES,
 }

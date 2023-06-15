@@ -17,6 +17,7 @@ import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName.DOCUMEN
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName.ENTRY_INTO_FORCE
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName.EU_ANNOUNCEMENT
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName.EXPIRATION
+import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName.FOOTNOTES
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName.LEAD
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName.NORM
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName.NORM_PROVIDER
@@ -34,7 +35,8 @@ val hasValidChildren =
             NORM, NORM_PROVIDER, SUBJECT_AREA, LEAD, PARTICIPATION,
             CITATION_DATE, AGE_INDICATION, PRINT_ANNOUNCEMENT, DIGITAL_ANNOUNCEMENT,
             EU_ANNOUNCEMENT, OTHER_OFFICIAL_ANNOUNCEMENT, DOCUMENT_TYPE, DIVERGENT_ENTRY_INTO_FORCE_DEFINED,
-            DIVERGENT_ENTRY_INTO_FORCE_UNDEFINED, DIVERGENT_EXPIRATION_DEFINED, DIVERGENT_EXPIRATION_UNDEFINED, CATEGORIZED_REFERENCE, ENTRY_INTO_FORCE, PRINCIPLE_ENTRY_INTO_FORCE, EXPIRATION, PRINCIPLE_EXPIRATION,
+            DIVERGENT_ENTRY_INTO_FORCE_UNDEFINED, DIVERGENT_EXPIRATION_DEFINED, DIVERGENT_EXPIRATION_UNDEFINED, CATEGORIZED_REFERENCE,
+            ENTRY_INTO_FORCE, PRINCIPLE_ENTRY_INTO_FORCE, EXPIRATION, PRINCIPLE_EXPIRATION, FOOTNOTES,
             -> hasNone(instance)
 
             OFFICIAL_REFERENCE -> hasOneOfType(listOf(PRINT_ANNOUNCEMENT, DIGITAL_ANNOUNCEMENT, EU_ANNOUNCEMENT, OTHER_OFFICIAL_ANNOUNCEMENT), instance)
