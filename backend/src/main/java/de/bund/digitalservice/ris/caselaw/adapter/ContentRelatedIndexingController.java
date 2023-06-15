@@ -3,6 +3,7 @@ package de.bund.digitalservice.ris.caselaw.adapter;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw.FieldOfLaw;
 import java.util.List;
 import java.util.UUID;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -24,11 +25,13 @@ public class ContentRelatedIndexingController {
   }
 
   @GetMapping("fieldsoflaw")
+  @PreAuthorize("@userHasReadAccessByUuid.apply(#documentUnitUuid)")
   public Mono<List<FieldOfLaw>> getFieldsOfLaw(@PathVariable("uuid") UUID documentUnitUuid) {
     return fieldOfLawService.getFieldsOfLawForDocumentUnit(documentUnitUuid);
   }
 
   @PutMapping("fieldsoflaw/{identifier}")
+  @PreAuthorize("@userHasWriteAccessByUuid.apply(#documentUnitUuid)")
   public Mono<List<FieldOfLaw>> addFieldOfLaw(
       @PathVariable("uuid") UUID documentUnitUuid, @PathVariable("identifier") String identifier) {
 
@@ -36,6 +39,7 @@ public class ContentRelatedIndexingController {
   }
 
   @DeleteMapping("fieldsoflaw/{identifier}")
+  @PreAuthorize("@userHasWriteAccessByUuid.apply(#documentUnitUuid)")
   public Mono<List<FieldOfLaw>> removeFieldOfLaw(
       @PathVariable("uuid") UUID documentUnitUuid, @PathVariable("identifier") String identifier) {
 
@@ -43,11 +47,13 @@ public class ContentRelatedIndexingController {
   }
 
   @GetMapping("keywords")
+  @PreAuthorize("@userHasReadAccessByUuid.apply(#documentUnitUuid)")
   public Mono<List<String>> getKeywords(@PathVariable("uuid") UUID documentUnitUuid) {
     return keywordService.getKeywordsForDocumentUnit(documentUnitUuid);
   }
 
   @PutMapping("keywords/{keyword}")
+  @PreAuthorize("@userHasWriteAccessByUuid.apply(#documentUnitUuid)")
   public Mono<List<String>> addKeyword(
       @PathVariable("uuid") UUID documentUnitUuid, @PathVariable("keyword") String keyword) {
 
@@ -55,6 +61,7 @@ public class ContentRelatedIndexingController {
   }
 
   @DeleteMapping("keywords/{keyword}")
+  @PreAuthorize("@userHasWriteAccessByUuid.apply(#documentUnitUuid)")
   public Mono<List<String>> deleteKeyword(
       @PathVariable("uuid") UUID documentUnitUuid, @PathVariable("keyword") String keyword) {
 

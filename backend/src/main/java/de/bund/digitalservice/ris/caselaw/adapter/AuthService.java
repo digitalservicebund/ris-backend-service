@@ -35,13 +35,13 @@ public class AuthService {
             () ->
                 documentUnitService
                     .getByDocumentNumber(documentNumber)
-                    .flatMap(
-                        documentUnit ->
-                            documentUnit.status() == PUBLISHED
-                                ? Mono.just(true)
-                                : userHasSameDocOfficeAsDocument(documentUnit))
-                    .defaultIfEmpty(false)
-                    .onErrorReturn(false));
+                    .flatMap(this::userHasReadAccess));
+  }
+
+  @Bean
+  public Function<UUID, Mono<Boolean>> userHasReadAccessByUuid() {
+    return uuid ->
+        Mono.defer(() -> documentUnitService.getByUuid(uuid).flatMap(this::userHasReadAccess));
   }
 
   @Bean
@@ -54,6 +54,14 @@ public class AuthService {
                     .flatMap(this::userHasSameDocOfficeAsDocument)
                     .defaultIfEmpty(false)
                     .onErrorReturn(false));
+  }
+
+  private Mono<Boolean> userHasReadAccess(DocumentUnit documentUnit) {
+    return (documentUnit.status() == PUBLISHED
+            ? Mono.just(true)
+            : userHasSameDocOfficeAsDocument(documentUnit))
+        .defaultIfEmpty(false)
+        .onErrorReturn(false);
   }
 
   private Mono<Boolean> userHasSameDocOfficeAsDocument(DocumentUnit documentUnit) {
