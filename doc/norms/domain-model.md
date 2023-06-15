@@ -47,11 +47,6 @@ classDiagram
     Date applicationScopeStartDate
     Date applicationScopeEndDate
 
-    String digitalEvidenceLink
-    String digitalEvidenceRelatedData
-    String digitalEvidenceExternalDataNote
-    String digitalEvidenceAppendix
-
     String celexNumber
 
     String text
@@ -118,6 +113,7 @@ classDiagram
      PRINCIPLE_ENTRY_INTO_FORCE
      EXPIRATION
      PRINCIPLE_EXPIRATION
+     DIGITAL_EVIDENCE
      FOOTNOTES
   }
 
@@ -165,6 +161,10 @@ classDiagram
     TEMPLATE_NAME
     UNDEFINED_DATE
     TEXT
+    LINK
+    RELATED_DATA
+    EXTERNAL_DATA_NOTE
+    APPENDIX
     FOOTNOTE_REFERENCE
     FOOTNOTE_CHANGE
     FOOTNOTE_COMMENT

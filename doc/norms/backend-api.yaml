@@ -311,6 +311,10 @@ components:
         - TEMPLATE_NAME
         - UNDEFINED_DATE
         - TEXT
+        - LINK
+        - RELATED_DATA
+        - EXTERNAL_DATA_NOTE
+        - APPENDIX
         - FOOTNOTE_REFERENCE
         - FOOTNOTE_CHANGE
         - FOOTNOTE_COMMENT
@@ -347,6 +351,7 @@ components:
         - PRINCIPLE_ENTRY_INTO_FORCE
         - EXPIRATION
         - PRINCIPLE_EXPIRATION
+        - DIGITAL_EVIDENCE
         - FOOTNOTES
 
     MetadataSection:
@@ -544,18 +549,6 @@ components:
         eli:
           $ref: '#/components/schemas/ELI'
         completeCitation:
-          type: string
-          example: ''
-        digitalEvidenceLink:
-          type: string
-          example: ''
-        digitalEvidenceRelatedData:
-          type: string
-          example: ''
-        digitalEvidenceExternalDataNote:
-          type: string
-          example: ''
-        digitalEvidenceAppendix:
           type: string
           example: ''
         metadataSections:
