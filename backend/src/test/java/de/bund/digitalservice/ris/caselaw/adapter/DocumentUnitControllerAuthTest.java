@@ -39,6 +39,7 @@ class DocumentUnitControllerAuthTest {
 
   @MockBean private DocumentUnitService service;
   @MockBean private KeycloakUserService userService;
+  @MockBean DocxConverterService docxConverterService;
 
   private static final UUID TEST_UUID = UUID.fromString("88888888-4444-4444-4444-121212121212");
   private final String docOffice1Group = "/CC-RIS";

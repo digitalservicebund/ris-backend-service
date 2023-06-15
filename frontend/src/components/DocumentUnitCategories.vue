@@ -101,7 +101,7 @@ async function getOriginalDocumentUnit() {
   if (fileAsHTML.value.length > 0) return
   if (props.documentUnit.s3path) {
     const htmlResponse = await fileService.getDocxFileAsHtml(
-      props.documentUnit.s3path
+      props.documentUnit.uuid
     )
     if (htmlResponse.error === undefined) fileAsHTML.value = htmlResponse.data
   }

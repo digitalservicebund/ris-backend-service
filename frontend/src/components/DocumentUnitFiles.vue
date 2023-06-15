@@ -54,8 +54,8 @@ async function upload(file: File) {
           v-if="documentUnit.hasFile"
           :file-name="documentUnit.filename"
           :file-type="documentUnit.filetype"
-          :s3-path="(documentUnit.s3path as string)"
           :upload-time-stamp="documentUnit.fileuploadtimestamp"
+          :uuid="documentUnit.uuid"
           @delete-file="handleDeleteFile"
         />
 

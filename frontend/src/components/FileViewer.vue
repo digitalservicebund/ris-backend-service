@@ -8,7 +8,7 @@ import PopupModal from "@/shared/components/PopupModal.vue"
 import PropertyInfo from "@/shared/components/PropertyInfo.vue"
 
 const props = defineProps<{
-  s3Path: string
+  uuid: string
   fileName?: string
   fileType?: string
   uploadTimeStamp?: string
@@ -58,7 +58,7 @@ const toggleModal = () => {
 
 const fileAsHtml = ref("Dokument wird geladen.")
 onMounted(async () => {
-  const fileResponse = await fileService.getDocxFileAsHtml(props.s3Path)
+  const fileResponse = await fileService.getDocxFileAsHtml(props.uuid)
   if (fileResponse.error) {
     console.error(fileResponse.error)
   } else {

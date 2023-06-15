@@ -50,6 +50,7 @@ class DocumentUnitControllerTest {
 
   @MockBean private DocumentUnitService service;
   @MockBean private KeycloakUserService userService;
+  @MockBean private DocxConverterService docxConverterService;
 
   @Captor private ArgumentCaptor<ByteBuffer> captor;
 
@@ -397,5 +398,23 @@ class DocumentUnitControllerTest {
         .isOk();
 
     verify(service).searchByProceedingDecision(proceedingDecision, pageRequest);
+  }
+
+  @Test
+  void testHtml() {
+    when(service.getByUuid(TEST_UUID))
+        .thenReturn(Mono.just(DocumentUnit.builder().s3path("123").build()));
+    when(docxConverterService.getConvertedObject("123")).thenReturn(Mono.empty());
+
+    webClient
+        .mutateWith(csrf())
+        .get()
+        .uri("/api/v1/caselaw/documentunits/" + TEST_UUID + "/docx")
+        .exchange()
+        .expectStatus()
+        .isOk();
+
+    verify(service).getByUuid(TEST_UUID);
+    verify(docxConverterService).getConvertedObject("123");
   }
 }

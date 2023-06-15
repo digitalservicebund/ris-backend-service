@@ -6,6 +6,7 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.MailResponse;
 import de.bund.digitalservice.ris.caselaw.domain.ProceedingDecision;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
+import de.bund.digitalservice.ris.caselaw.domain.docx.Docx2Html;
 import jakarta.validation.Valid;
 import java.nio.ByteBuffer;
 import java.util.UUID;
@@ -37,10 +38,15 @@ import reactor.core.publisher.Mono;
 public class DocumentUnitController {
   private final DocumentUnitService service;
   private final UserService userService;
+  private final DocxConverterService docxConverterService;
 
-  public DocumentUnitController(DocumentUnitService service, UserService userService) {
+  public DocumentUnitController(
+      DocumentUnitService service,
+      UserService userService,
+      DocxConverterService docxConverterService) {
     this.service = service;
     this.userService = userService;
+    this.docxConverterService = docxConverterService;
   }
 
   @GetMapping(value = "new")
@@ -148,5 +154,15 @@ public class DocumentUnitController {
       @RequestBody ProceedingDecision proceedingDecision) {
 
     return service.searchByProceedingDecision(proceedingDecision, PageRequest.of(page, size));
+  }
+
+  @GetMapping(value = "/{uuid}/docx", produces = MediaType.APPLICATION_JSON_VALUE)
+  public Mono<ResponseEntity<Docx2Html>> html(@PathVariable UUID uuid) {
+    return service
+        .getByUuid(uuid)
+        .map(DocumentUnit::s3path)
+        .flatMap(docxConverterService::getConvertedObject)
+        .map(ResponseEntity::ok)
+        .onErrorReturn(ResponseEntity.internalServerError().build());
   }
 }

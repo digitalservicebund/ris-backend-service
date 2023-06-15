@@ -7,7 +7,7 @@ interface fileService {
     file: File
   ): Promise<ServiceResponse<DocumentUnit>>
   delete(documentUnitUuid: string): Promise<ServiceResponse<unknown>>
-  getDocxFileAsHtml(fileName: string): Promise<ServiceResponse<string>>
+  getDocxFileAsHtml(uuid: string): Promise<ServiceResponse<string>>
 }
 
 const service: fileService = {
@@ -70,9 +70,9 @@ const service: fileService = {
     return response
   },
 
-  async getDocxFileAsHtml(fileName: string) {
+  async getDocxFileAsHtml(uuid: string) {
     const response = await httpClient.get<string>(
-      `caselaw/documentunitdocx/${fileName}`
+      `caselaw/documentunits/${uuid}/docx`
     )
     response.error =
       response.status >= 300
