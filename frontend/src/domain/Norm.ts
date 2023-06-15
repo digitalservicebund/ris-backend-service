@@ -71,6 +71,10 @@ export enum MetadatumType {
   TEMPLATE_NAME = "TEMPLATE_NAME",
   UNDEFINED_DATE = "UNDEFINED_DATE",
   TEXT = "TEXT",
+  LINK = "LINK",
+  RELATED_DATA = "RELATED_DATA",
+  EXTERNAL_DATA_NOTE = "EXTERNAL_DATA_NOTE",
+  APPENDIX = "APPENDIX",
   FOOTNOTE_REFERENCE = "FOOTNOTE_REFERENCE",
   FOOTNOTE_CHANGE = "FOOTNOTE_CHANGE",
   FOOTNOTE_COMMENT = "FOOTNOTE_COMMENT",
@@ -131,6 +135,10 @@ export type MetadataValueType = {
   [MetadatumType.TEMPLATE_NAME]: string
   [MetadatumType.UNDEFINED_DATE]: UndefinedDate
   [MetadatumType.TEXT]: string
+  [MetadatumType.LINK]: string
+  [MetadatumType.RELATED_DATA]: string
+  [MetadatumType.EXTERNAL_DATA_NOTE]: string
+  [MetadatumType.APPENDIX]: string
   [MetadatumType.FOOTNOTE_REFERENCE]: string
   [MetadatumType.FOOTNOTE_CHANGE]: string
   [MetadatumType.FOOTNOTE_COMMENT]: string
@@ -169,6 +177,7 @@ export enum MetadataSectionName {
   PRINCIPLE_ENTRY_INTO_FORCE = "PRINCIPLE_ENTRY_INTO_FORCE",
   EXPIRATION = "EXPIRATION",
   PRINCIPLE_EXPIRATION = "PRINCIPLE_EXPIRATION",
+  DIGITAL_EVIDENCE = "DIGITAL_EVIDENCE",
   FOOTNOTES = "FOOTNOTES",
 }
 
