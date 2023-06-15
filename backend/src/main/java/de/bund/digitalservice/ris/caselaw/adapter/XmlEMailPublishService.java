@@ -16,11 +16,13 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.UUID;
+import java.util.stream.Stream;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
@@ -35,15 +37,21 @@ public class XmlEMailPublishService implements EmailPublishService {
 
   private final XmlMailRepository repository;
 
+  private final Environment env;
+
   @Value("${mail.exporter.senderAddress:export.test@neuris}")
   private String senderAddress;
 
   public XmlEMailPublishService(
-      XmlExporter xmlExporter, HttpMailSender mailSender, XmlMailRepository repository) {
+      XmlExporter xmlExporter,
+      HttpMailSender mailSender,
+      XmlMailRepository repository,
+      Environment env) {
 
     this.xmlExporter = xmlExporter;
     this.mailSender = mailSender;
     this.repository = repository;
+    this.env = env;
   }
 
   @Override
@@ -84,7 +92,9 @@ public class XmlEMailPublishService implements EmailPublishService {
     subject += " dt=N";
     subject += " mod=T";
     subject += " ld=" + deliveryDate;
-    subject += " vg=" + documentUnit.documentNumber();
+    subject += " vg=";
+    if (Stream.of(env.getActiveProfiles()).anyMatch("staging"::equals)) subject += "[stage]";
+    subject += documentUnit.documentNumber();
 
     return Mono.just(subject);
   }
