@@ -13,7 +13,7 @@ fileignoreconfig:
 - filename: backend/src/test/kotlin/unit/adapter/input/restapi/controller/GenerateNormFileControllerTest.kt
   checksum: 07aa4cd7453685661091978479eef00f475a3415d0b26882352e19da66bf1dda
 - filename: doc/norms/backend-api.yaml
-  checksum: 7d5f05a1c7ab78df41cb5441f464f1ae69d74165cca9ea780f80ec4ee5ec777d
+  checksum: 7e3e8af31a5a30442f35d465fcb0df13d6c4ec3fa7d29f8452952ad43280347f
 - filename: doc/structurizr/workspace.json
   checksum: 3e4a3d02bf05d6e0d930ddb6c965a2e512daded3b93127c9ad41feb875007153
 - filename: frontend/FRONTEND_STYLEGUIDE.md
