@@ -1,9 +1,9 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
+import static de.bund.digitalservice.ris.caselaw.Utils.buildDocOffice;
 import static de.bund.digitalservice.ris.caselaw.Utils.getMockLoginWithDocOffice;
+import static de.bund.digitalservice.ris.caselaw.Utils.setUpDocumentationOfficeMocks;
 import static de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatus.PUBLISHED;
-import static org.mockito.ArgumentMatchers.argThat;
-import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
 
@@ -13,8 +13,6 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatus;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
-import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -23,7 +21,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
-import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Mono;
@@ -41,30 +38,14 @@ class ContentRelatedIndexingControllerAuthTest {
 
   private static final UUID TEST_UUID = UUID.fromString("88888888-4444-4444-4444-121212121212");
   private final String docOffice1Group = "/CC-RIS";
-  private final DocumentationOffice docOffice1 =
-      DocumentationOffice.builder().label("CC-RIS").abbreviation("XX").build();
   private final String docOffice2Group = "/caselaw/BGH";
-  private final DocumentationOffice docOffice2 =
-      DocumentationOffice.builder().label("BGH").abbreviation("CO").build();
+  private final DocumentationOffice docOffice1 = buildDocOffice("CC-RIS", "XX");
+  private final DocumentationOffice docOffice2 = buildDocOffice("BGH", "CO");
 
   @BeforeEach
   void setUp() {
-    doReturn(Mono.just(docOffice1))
-        .when(userService)
-        .getDocumentationOffice(
-            argThat(
-                (OidcUser user) -> {
-                  List<String> groups = user.getAttribute("groups");
-                  return Objects.requireNonNull(groups).get(0).equals(docOffice1Group);
-                }));
-    doReturn(Mono.just(docOffice2))
-        .when(userService)
-        .getDocumentationOffice(
-            argThat(
-                (OidcUser user) -> {
-                  List<String> groups = user.getAttribute("groups");
-                  return Objects.requireNonNull(groups).get(0).equals(docOffice2Group);
-                }));
+    setUpDocumentationOfficeMocks(
+        userService, docOffice1, docOffice1Group, docOffice2, docOffice2Group);
   }
 
   @Test
