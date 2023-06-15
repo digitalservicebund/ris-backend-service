@@ -157,6 +157,7 @@ public class DocumentUnitController {
   }
 
   @GetMapping(value = "/{uuid}/docx", produces = MediaType.APPLICATION_JSON_VALUE)
+  @PreAuthorize("@userHasReadAccessByUuid.apply(#uuid)")
   public Mono<ResponseEntity<Docx2Html>> html(@PathVariable UUID uuid) {
     return service
         .getByUuid(uuid)

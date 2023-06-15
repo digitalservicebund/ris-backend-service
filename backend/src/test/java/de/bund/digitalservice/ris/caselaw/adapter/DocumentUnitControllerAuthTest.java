@@ -1,6 +1,8 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
 import static de.bund.digitalservice.ris.caselaw.Utils.getMockLoginWithDocOffice;
+import static de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatus.PUBLISHED;
+import static de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatus.UNPUBLISHED;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
@@ -12,6 +14,7 @@ import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatus;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import java.nio.ByteBuffer;
 import java.util.List;
@@ -76,7 +79,7 @@ class DocumentUnitControllerAuthTest {
     when(service.attachFileToDocumentUnit(
             eq(TEST_UUID), any(ByteBuffer.class), any(HttpHeaders.class)))
         .thenReturn(Mono.empty());
-    mockDocumentUnit(docOffice1);
+    mockDocumentUnit(docOffice1, null, null);
 
     webClient
         .mutateWith(csrf())
@@ -102,7 +105,7 @@ class DocumentUnitControllerAuthTest {
   @Test
   void testRemoveFileFromDocumentUnit() {
     when(service.removeFileFromDocumentUnit(TEST_UUID)).thenReturn(Mono.empty());
-    mockDocumentUnit(docOffice2);
+    mockDocumentUnit(docOffice2, null, null);
 
     webClient
         .mutateWith(csrf())
@@ -126,7 +129,7 @@ class DocumentUnitControllerAuthTest {
   @Test
   void testDeleteByUuid() {
     when(service.deleteByUuid(TEST_UUID)).thenReturn(Mono.empty());
-    mockDocumentUnit(docOffice1);
+    mockDocumentUnit(docOffice1, null, null);
 
     webClient
         .mutateWith(csrf())
@@ -149,7 +152,7 @@ class DocumentUnitControllerAuthTest {
 
   @Test
   void testUpdateByUuid() {
-    DocumentUnit docUnit = mockDocumentUnit(docOffice2);
+    DocumentUnit docUnit = mockDocumentUnit(docOffice2, null, null);
     when(service.updateDocumentUnit(docUnit)).thenReturn(Mono.empty());
     when(service.getByUuid(TEST_UUID)).thenReturn(Mono.just(docUnit));
 
@@ -176,10 +179,48 @@ class DocumentUnitControllerAuthTest {
         .isForbidden();
   }
 
-  private DocumentUnit mockDocumentUnit(DocumentationOffice docOffice) {
+  @Test
+  void testHtml() {
+    mockDocumentUnit(docOffice1, "123", PUBLISHED);
+    when(docxConverterService.getConvertedObject("123")).thenReturn(Mono.empty());
+
+    webClient
+        .mutateWith(csrf())
+        .mutateWith(getMockLoginWithDocOffice(docOffice1Group))
+        .get()
+        .uri("/api/v1/caselaw/documentunits/" + TEST_UUID + "/docx")
+        .exchange()
+        .expectStatus()
+        .isOk();
+
+    webClient
+        .mutateWith(csrf())
+        .mutateWith(getMockLoginWithDocOffice(docOffice2Group))
+        .get()
+        .uri("/api/v1/caselaw/documentunits/" + TEST_UUID + "/docx")
+        .exchange()
+        .expectStatus()
+        .isOk();
+
+    mockDocumentUnit(docOffice1, "123", UNPUBLISHED);
+
+    webClient
+        .mutateWith(csrf())
+        .mutateWith(getMockLoginWithDocOffice(docOffice2Group))
+        .get()
+        .uri("/api/v1/caselaw/documentunits/" + TEST_UUID + "/docx")
+        .exchange()
+        .expectStatus()
+        .isForbidden();
+  }
+
+  private DocumentUnit mockDocumentUnit(
+      DocumentationOffice docOffice, String s3path, DocumentUnitStatus status) {
     DocumentUnit docUnit =
         DocumentUnit.builder()
             .uuid(TEST_UUID)
+            .status(status)
+            .s3path(s3path)
             .coreData(CoreData.builder().documentationOffice(docOffice).build())
             .build();
     when(service.getByUuid(TEST_UUID)).thenReturn(Mono.just(docUnit));
