@@ -10,8 +10,8 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPAFieldOfLawLink
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPAFieldOfLawLinkRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPAFieldOfLawRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.CitationStyleDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.CitationStyleRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.CourtDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DatabaseCitationStyleRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DatabaseCourtRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DatabaseDocumentTypeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.StateDTO;
@@ -51,7 +51,7 @@ public class LookupTableImporterService {
   private final JPADocumentTypeRepository jpaDocumentTypeRepository;
   private final DatabaseCourtRepository databaseCourtRepository;
   private final StateRepository stateRepository;
-  private final CitationStyleRepository citationStyleRepository;
+  private final DatabaseCitationStyleRepository databaseCitationStyleRepository;
   private final JPAFieldOfLawRepository jpaFieldOfLawRepository;
   private final JPAFieldOfLawLinkRepository jpaFieldOfLawLinkRepository;
   private static final Pattern FIELD_OF_LAW_NUMBER_PATTERN =
@@ -62,14 +62,14 @@ public class LookupTableImporterService {
       JPADocumentTypeRepository jpaDocumentTypeRepository,
       DatabaseCourtRepository databaseCourtRepository,
       StateRepository stateRepository,
-      CitationStyleRepository citationStyleRepository,
+      DatabaseCitationStyleRepository databaseCitationStyleRepository,
       JPAFieldOfLawRepository jpaFieldOfLawRepository,
       JPAFieldOfLawLinkRepository jpaFieldOfLawLinkRepository) {
     this.databaseDocumentTypeRepository = databaseDocumentTypeRepository;
     this.jpaDocumentTypeRepository = jpaDocumentTypeRepository;
     this.databaseCourtRepository = databaseCourtRepository;
     this.stateRepository = stateRepository;
-    this.citationStyleRepository = citationStyleRepository;
+    this.databaseCitationStyleRepository = databaseCitationStyleRepository;
     this.jpaFieldOfLawRepository = jpaFieldOfLawRepository;
     this.jpaFieldOfLawLinkRepository = jpaFieldOfLawLinkRepository;
   }
@@ -259,9 +259,9 @@ public class LookupTableImporterService {
                         .build())
             .toList();
 
-    return citationStyleRepository
+    return databaseCitationStyleRepository
         .deleteAll()
-        .thenMany(citationStyleRepository.saveAll(citationsDTO))
+        .thenMany(databaseCitationStyleRepository.saveAll(citationsDTO))
         .then(Mono.just("Successfully imported the citation lookup table"));
   }
 

@@ -4,7 +4,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.CitationStyleDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.CourtDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DatabaseCitationStyleRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DatabaseCourtRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DatabaseDocumentTypeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DocumentTypeDTO;
@@ -12,12 +14,15 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.Fie
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.NormRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.PostgresCourtRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.PostgresDocumentTypeRepositoryImpl;
+import de.bund.digitalservice.ris.caselaw.domain.lookuptable.citation.CitationStyleRepository;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.court.Court;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.context.annotation.Import;
@@ -37,9 +42,13 @@ class LookupTableServiceTest {
 
   @MockBean private DatabaseDocumentTypeRepository databaseDocumentTypeRepository;
   @MockBean private DatabaseCourtRepository databaseCourtRepository;
+  @MockBean private DatabaseCitationStyleRepository databaseCitationStyleRepository;
+  @MockBean private CitationStyleRepository citationStyleRepository;
   @MockBean private FieldOfLawRepository fieldOfLawRepository;
   @MockBean private NormRepository normRepository;
   @MockBean private FieldOfLawKeywordRepository fieldOfLawKeywordRepository;
+
+  @Captor private ArgumentCaptor<CitationStyleDTO> listCaptor;
 
   @Test
   void testGetDocumentTypes() {

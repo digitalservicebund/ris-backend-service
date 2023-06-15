@@ -5,6 +5,7 @@ import static org.springframework.security.test.web.reactive.server.SecurityMock
 
 import de.bund.digitalservice.ris.caselaw.adapter.LookupTableController;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.CourtDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DatabaseCitationStyleRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DatabaseCourtRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DatabaseDocumentTypeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.PostgresCourtRepositoryImpl;
@@ -15,6 +16,7 @@ import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
 import de.bund.digitalservice.ris.caselaw.domain.EmailPublishService;
 import de.bund.digitalservice.ris.caselaw.domain.FieldOfLawRepository;
 import de.bund.digitalservice.ris.caselaw.domain.LookupTableService;
+import de.bund.digitalservice.ris.caselaw.domain.lookuptable.citation.CitationStyleRepository;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.court.Court;
 import java.util.Arrays;
 import java.util.List;
@@ -55,7 +57,8 @@ class LookupTableIntegrationTest {
   @Autowired private WebTestClient webClient;
   @Autowired private DatabaseCourtRepository databaseCourtRepository;
   @Autowired private DatabaseDocumentTypeRepository databaseDocumentTypeRepository;
-
+  @Autowired private DatabaseCitationStyleRepository databaseCitationStyleRepository;
+  @MockBean private CitationStyleRepository citationStyleRepository;
   @MockBean private FieldOfLawRepository fieldOfLawRepository;
   @MockBean private S3AsyncClient s3AsyncClient;
   @MockBean private EmailPublishService publishService;

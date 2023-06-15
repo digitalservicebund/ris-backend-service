@@ -19,8 +19,8 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPAFieldOfLawRepo
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPAKeywordDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPANormDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.CitationStyleDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.CitationStyleRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.CourtDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DatabaseCitationStyleRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DatabaseCourtRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DatabaseDocumentTypeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DatabaseFieldOfLawRepository;
@@ -57,7 +57,7 @@ class LookupTableImporterServiceTest {
 
   @MockBean private StateRepository stateRepository;
 
-  @MockBean private CitationStyleRepository citationStyleRepository;
+  @MockBean private DatabaseCitationStyleRepository databaseCitationStyleRepository;
 
   @MockBean private DatabaseFieldOfLawRepository fieldOfLawRepository;
 
@@ -207,8 +207,8 @@ class LookupTableImporterServiceTest {
                 .newEntry(true)
                 .build());
 
-    when(citationStyleRepository.deleteAll()).thenReturn(Mono.empty());
-    when(citationStyleRepository.saveAll(citationStyleDTOS))
+    when(databaseCitationStyleRepository.deleteAll()).thenReturn(Mono.empty());
+    when(databaseCitationStyleRepository.saveAll(citationStyleDTOS))
         .thenReturn(Flux.fromIterable(citationStyleDTOS));
 
     String citationStyleXml =
@@ -234,8 +234,8 @@ class LookupTableImporterServiceTest {
           .verifyComplete();
     }
 
-    verify(citationStyleRepository).deleteAll();
-    verify(citationStyleRepository).saveAll(citationStyleDTOS);
+    verify(databaseCitationStyleRepository).deleteAll();
+    verify(databaseCitationStyleRepository).saveAll(citationStyleDTOS);
   }
 
   @Test
