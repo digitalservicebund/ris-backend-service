@@ -34,7 +34,13 @@ onUnmounted(() => {
     />
     <div class="justify-start">
       <div v-if="lastSaveError !== undefined">
-        <p class="label-03-reg text-red-800">Fehler beim Speichern</p>
+        <p class="label-03-reg text-red-800">
+          Fehler beim Speichern{{
+            lastSaveError.title.includes("Berechtigung")
+              ? ": " + lastSaveError.title
+              : ""
+          }}
+        </p>
       </div>
 
       <div v-if="lastSavedOn !== undefined && lastSaveError === undefined">

@@ -44,7 +44,7 @@ const service: DocumentUnitService = {
         title:
           response.status == 403
             ? "Diese Dokumentationseinheit existiert nicht oder sie haben keine Berechtigung"
-            : "Dokumentationseinheit konnten nicht geladen werden.",
+            : "Dokumentationseinheit konnte nicht geladen werden.",
       }
     } else {
       response.data = new DocumentUnit(response.data.uuid, { ...response.data })
@@ -84,7 +84,10 @@ const service: DocumentUnitService = {
     )
     if (response.status >= 300) {
       response.error = {
-        title: "Dokumentationseinheit konnte nicht aktualisiert werden.",
+        title:
+          response.status == 403
+            ? "Keine Berechtigung"
+            : "Dokumentationseinheit konnte nicht aktualisiert werden.",
       }
       // good enough condition to detect validation errors (@Valid)?
       if (
@@ -94,6 +97,8 @@ const service: DocumentUnitService = {
         response.error.validationErrors = (
           response.data as FailedValidationServerResponse
         ).errors
+      } else {
+        response.data = undefined
       }
     } else {
       response.data = new DocumentUnit((response.data as DocumentUnit).uuid, {
