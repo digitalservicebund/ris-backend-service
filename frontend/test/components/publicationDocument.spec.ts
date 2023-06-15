@@ -245,7 +245,7 @@ describe("PublicationDocument:", () => {
     })
 
     expect(container).toHaveTextContent(
-      `Veröffentlichen1. Plausibilitätsprüfung check Alle Pflichtfelder sind korrekt ausgefüllt2. Empfänger der Export-EmailEmpfänger-E-Mail-Adresse: campaignDokumentationseinheit veröffentlichenLetzte Veröffentlichungen Letzte Veröffentlichung am 01.02.2000 (Zustellung: erfolgreich angekommen) ÜBERE-Mail an: receiver address Betreff: mail subjectALS`
+      `Veröffentlichen1. Plausibilitätsprüfung check Alle Pflichtfelder sind korrekt ausgefülltcampaignDokumentationseinheit veröffentlichenLetzte Veröffentlichungen Letzte Veröffentlichung am 01.02.2000 (Zustellung: erfolgreich angekommen) ÜBERE-Mail an: receiver address Betreff: mail subjectALS`
     )
 
     const codeSnippet = screen.queryByTestId("code-snippet")
