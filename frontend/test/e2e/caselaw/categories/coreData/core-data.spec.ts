@@ -248,26 +248,20 @@ test.describe("core data", () => {
       ).toBeVisible()
     })
   })
-})
-
-test.describe(() => {
-  test.use({
-    storageState: "test/e2e/shared/.auth/user_bgh.json",
-  })
 
   test("ensure new docUnit has correct documentationOffice for BGH user", async ({
-    page,
+    bghPage,
   }) => {
     await test.step("create new docUnit with logged in user", async () => {
-      page.goto("/caselaw")
-      await page.getByText("Neue Dokumentationseinheit").click()
+      bghPage.goto("/caselaw")
+      await bghPage.getByText("Neue Dokumentationseinheit").click()
 
       await expect(
-        page.getByText("Aktuell ist keine Datei hinterlegt")
+        bghPage.getByText("Aktuell ist keine Datei hinterlegt")
       ).toBeVisible()
 
-      await page.getByText("Rubriken").click()
-      await expect(page.getByText("DOKUMENTATIONSSTELLEBGH")).toBeVisible()
+      await bghPage.getByText("Rubriken").click()
+      await expect(bghPage.getByText("DOKUMENTATIONSSTELLEBGH")).toBeVisible()
     })
   })
 })
