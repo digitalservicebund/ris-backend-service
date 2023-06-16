@@ -2,9 +2,8 @@
 import { computed } from "vue"
 import ComboboxInput from "@/components/ComboboxInput.vue"
 import ActiveCitation from "@/domain/activeCitation"
-// import ComboboxItemService from "@/services/comboboxItemService"
+import ComboboxItemService from "@/services/comboboxItemService"
 import DateInput from "@/shared/components/input/DateInput.vue"
-import Dropdown from "@/shared/components/input/DropdownInput.vue"
 import InputField from "@/shared/components/input/InputField.vue"
 import TextInput from "@/shared/components/input/TextInput.vue"
 
@@ -21,24 +20,37 @@ const activeCitation = computed({
   },
 })
 
-const predicateItems = [
-  { label: "Ja", value: "Ja" },
-  { label: "Nein", value: "Nein" },
-  { label: "Keine Angabe", value: "Keine Angabe" },
-]
+const activeCitationPredicate = computed({
+  get: () =>
+    activeCitation?.value?.predicateList
+      ? {
+          label: activeCitation.value.predicateList,
+        }
+      : undefined,
+  set: (newValue) => {
+    let activeCitationRef = new ActiveCitation()
+    if (newValue) {
+      activeCitationRef = new ActiveCitation({
+        ...activeCitation.value,
+        predicateList: newValue.label,
+      })
+    } else delete activeCitationRef.predicateList
+    emit("update:modelValue", activeCitationRef)
+  },
+})
 </script>
 
 <template>
   <div>
-    <InputField id="activeCitationCourt" label="Gericht">
+    <InputField id="activeCitationPredicate" label="Prädikat">
       <ComboboxInput
-        id="activeCitationCourt"
-        v-model="activeCitation.court"
-        aria-label="Gericht Aktivzitierung"
+        id="activeCitationPredicate"
+        v-model="activeCitationPredicate"
+        aria-label="Suchfeld"
         clear-on-choosing-item
-        placeholder="Aktivzitierung Gericht"
-      >
-      </ComboboxInput>
+        :item-service="ComboboxItemService.getCitationStyles"
+        placeholder="Bitte auswählen"
+      ></ComboboxInput>
     </InputField>
     <div class="flex gap-24 justify-between">
       <InputField id="activeCitationDecisionDate" label="Entscheidungsdatum">
@@ -66,13 +78,15 @@ const predicateItems = [
           placeholder="Aktenzeichen"
         ></TextInput>
       </InputField>
-      <InputField id="activeCitationPredicateList" label="Prädikatliste">
-        <Dropdown
-          id="activeCitationPredicateList"
-          aria-label="Prädikatliste Aktivzitierung"
-          :items="predicateItems"
-          placeholder="Bitte auswählen"
-        />
+      <InputField id="activeCitationCourt" label="Gericht">
+        <ComboboxInput
+          id="activeCitationCourt"
+          v-model="activeCitation.court"
+          aria-label="Gericht Aktivzitierung"
+          clear-on-choosing-item
+          placeholder="Aktivzitierung Gericht"
+        >
+        </ComboboxInput>
       </InputField>
     </div>
   </div>

@@ -1,4 +1,5 @@
 import httpClient, { ServiceResponse } from "./httpClient"
+import { CitationStyle } from "@/domain/citationStyle"
 import { Court } from "@/domain/documentUnit"
 import { FieldOfLawNode } from "@/domain/fieldOfLaw"
 import { NormAbbreviation } from "@/domain/normAbbreviation"
@@ -7,6 +8,7 @@ import { ComboboxItem } from "@/shared/components/input/types"
 enum Endpoint {
   documentTypes = "lookuptable/documentTypes",
   courts = "lookuptable/courts",
+  citationStyles = "lookuptable/zitart",
   fieldOfLawSearchByIdentifier = "fieldsoflaw/search-by-identifier",
   risAbbreviations = `normabbreviation?pg=0&sz=30`,
   risAbbreviationsAwesome = `normabbreviation/search?pg=0&sz=30`,
@@ -23,6 +25,7 @@ type DropdownType =
   | Court[]
   | FieldOfLawNode[]
   | NormAbbreviation[]
+  | CitationStyle[]
 
 function formatDropdownItems(
   responseData: DropdownType,
@@ -62,6 +65,13 @@ function formatDropdownItems(
         label: item.abbreviation,
         value: item,
         additionalInformation: item.officialLongTitle,
+      }))
+    }
+    case Endpoint.citationStyles: {
+      return (responseData as CitationStyle[]).map((item) => ({
+        label: item.label,
+        value: item,
+        additionalInformation: item.jurisShortcut,
       }))
     }
   }
@@ -114,6 +124,8 @@ const service: ComboboxItemService = {
     fetchFromEndpoint(Endpoint.risAbbreviations, filter),
   getRisAbbreviationsAwesome: (filter?: string) =>
     fetchFromEndpoint(Endpoint.risAbbreviationsAwesome, filter),
+  getCitationStyles: (filter?: string) =>
+    fetchFromEndpoint(Endpoint.citationStyles, filter),
 }
 
 export default service

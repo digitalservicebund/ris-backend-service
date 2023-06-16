@@ -1,3 +1,4 @@
+import { CitationStyle } from "@/domain/citationStyle"
 import DocumentationOffice from "@/domain/documentationOffice"
 import { Court, DocumentType } from "@/domain/documentUnit"
 import { FieldOfLawNode } from "@/domain/fieldOfLaw"
@@ -120,6 +121,7 @@ export type ComboboxInputModelType =
   | Court
   | NormAbbreviation
   | FieldOfLawNode
+  | CitationStyle
 
 export type ComboboxItem = {
   label: string
