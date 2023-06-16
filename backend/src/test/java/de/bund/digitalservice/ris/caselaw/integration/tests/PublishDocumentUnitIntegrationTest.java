@@ -112,7 +112,7 @@ class PublishDocumentUnitIntegrationTest {
         new XmlMailDTO(
             1L,
             savedDocumentUnitDTO.getId(),
-            DocumentUnitService.JURIS_RECEIVER_MAILADDRESS,
+            "neuris@example.com",
             "id=juris name=NeuRIS da=R df=X dt=N mod=T ld="
                 + DELIVER_DATE
                 + " vg="
@@ -126,7 +126,7 @@ class PublishDocumentUnitIntegrationTest {
     XmlMail expectedXmlMail =
         new XmlMail(
             documentUnitUuid1,
-            DocumentUnitService.JURIS_RECEIVER_MAILADDRESS,
+            "neuris@example.com",
             "id=juris name=NeuRIS da=R df=X dt=N mod=T ld="
                 + DELIVER_DATE
                 + " vg="

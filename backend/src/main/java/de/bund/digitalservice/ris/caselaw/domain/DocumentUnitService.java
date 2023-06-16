@@ -45,7 +45,6 @@ import software.amazon.awssdk.services.s3.model.PutObjectResponse;
 @Slf4j
 public class DocumentUnitService {
 
-  public static final String JURIS_RECEIVER_MAILADDRESS = "dokmbx@juris.de";
   private final DocumentUnitRepository repository;
   private final DocumentNumberService documentNumberService;
   private final S3AsyncClient s3AsyncClient;
@@ -54,6 +53,9 @@ public class DocumentUnitService {
 
   @Value("${otc.obs.bucket-name}")
   private String bucketName;
+
+  @Value("${mail.exporter.recipientAddress:neuris@example.com}")
+  private String recipientAddress;
 
   public DocumentUnitService(
       DocumentUnitRepository repository,
@@ -270,7 +272,7 @@ public class DocumentUnitService {
         .flatMap(
             documentUnit ->
                 publishService
-                    .publish(documentUnit, JURIS_RECEIVER_MAILADDRESS)
+                    .publish(documentUnit, recipientAddress)
                     .flatMap(
                         mailResponse -> {
                           if (mailResponse
