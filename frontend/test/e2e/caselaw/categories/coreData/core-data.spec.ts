@@ -250,18 +250,20 @@ test.describe("core data", () => {
   })
 
   test("ensure new docUnit has correct documentationOffice for BGH user", async ({
-    bghPage,
+    pageWithBghUser,
   }) => {
     await test.step("create new docUnit with logged in user", async () => {
-      bghPage.goto("/caselaw")
-      await bghPage.getByText("Neue Dokumentationseinheit").click()
+      pageWithBghUser.goto("/caselaw")
+      await pageWithBghUser.getByText("Neue Dokumentationseinheit").click()
 
       await expect(
-        bghPage.getByText("Aktuell ist keine Datei hinterlegt")
+        pageWithBghUser.getByText("Aktuell ist keine Datei hinterlegt")
       ).toBeVisible()
 
-      await bghPage.getByText("Rubriken").click()
-      await expect(bghPage.getByText("DOKUMENTATIONSSTELLEBGH")).toBeVisible()
+      await pageWithBghUser.getByText("Rubriken").click()
+      await expect(
+        pageWithBghUser.getByText("DOKUMENTATIONSSTELLEBGH")
+      ).toBeVisible()
     })
   })
 })

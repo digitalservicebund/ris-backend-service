@@ -12,7 +12,7 @@ type MyFixtures = {
   documentNumber: string
   editorField: Locator
   secondaryDocumentUnit: DocumentUnit
-  bghPage: Page
+  pageWithBghUser: Page
 }
 
 export const testWithDocumentUnit = test.extend<MyFixtures>({
@@ -63,13 +63,13 @@ export const testWithDocumentUnit = test.extend<MyFixtures>({
     await use(editorField)
   },
 
-  bghPage: async ({ browser }, use) => {
+  pageWithBghUser: async ({ browser }, use) => {
     const bghContext = await browser.newContext({
       storageState: `test/e2e/shared/.auth/user_bgh.json`,
     })
-    const bghPage = await bghContext.newPage()
+    const pageWithBghUser = await bghContext.newPage()
 
-    await use(bghPage)
+    await use(pageWithBghUser)
 
     await bghContext.close()
   },
