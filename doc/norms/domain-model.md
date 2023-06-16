@@ -34,15 +34,6 @@ classDiagram
     String reissueReference
     String otherStatusNote
 
-    String documentStatusWorkNote
-    String documentStatusDescription
-    Date documentStatusDate
-    String documentStatusReference
-    Date documentStatusEntryIntoForceDate
-    String documentStatusProof
-    String documentTextProof
-    String otherDocumentNote
-
     String applicationScopeArea
     Date applicationScopeStartDate
     Date applicationScopeEndDate
@@ -87,6 +78,32 @@ classDiagram
     UNDEFINED_NOT_PRESENT
   }
 
+  class NormCategory  {
+     <<enumeration>>
+    BASE_NORM
+    AMENDMENT_NORM
+    TRANSITIONAL_NORM
+  }
+
+  class ProofIndication  {
+     <<enumeration>>
+    NOT_YET_CONSIDERED
+    CONSIDERED
+  }
+
+  class ProofType  {
+     <<enumeration>>
+    TEXT_PROOF_FROM
+    TEXT_PROOF_VALIDITY_FROM
+  }
+
+  class OtherType  {
+     <<enumeration>>
+    TEXT_IN_PROGRESS
+    TEXT_PROOFED_BUT_NOT_DONE
+  }
+
+
   class MetadataSectionName  {
      <<enumeration>>
      NORM
@@ -115,6 +132,10 @@ classDiagram
      PRINCIPLE_EXPIRATION
      DIGITAL_EVIDENCE
      FOOTNOTES
+     DOCUMENT_STATUS_SECTION
+     DOCUMENT_STATUS
+     DOCUMENT_TEXT_PROOF
+     DOCUMENT_OTHER
   }
 
   class MetadatumType  {
@@ -172,6 +193,13 @@ classDiagram
     FOOTNOTE_STATE_LAW
     FOOTNOTE_EU_LAW
     FOOTNOTE_OTHER
+    WORK_NOTE
+    DESCRIPTION
+    REFERENCE
+    ENTRY_INTO_FORCE_DATE_NOTE
+    PROOF_INDICATION
+    PROOF_TYPE
+    OTHER_TYPE
   }
 
   class FileReference {

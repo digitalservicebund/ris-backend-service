@@ -265,6 +265,31 @@ components:
         - UNDEFINED_UNKNOWN
         - UNDEFINED_FUTURE
         - UNDEFINED_NOT_PRESENT
+    NormCategory:
+      description: A field that takes one of three values
+      type: string
+      enum:
+        - BASE_NORM
+        - AMENDMENT_NORM
+        - TRANSITIONAL_NORM
+    ProofIndication:
+      description: A field that takes one of three values
+      type: string
+      enum:
+        - NOT_YET_CONSIDERED
+        - CONSIDERED
+    ProofType:
+      description: A field that takes one of three values
+      type: string
+      enum:
+        - TEXT_PROOF_FROM
+        - TEXT_PROOF_VALIDITY_FROM
+    OtherType:
+      description: A field that takes one of three values
+      type: string
+      enum:
+        - TEXT_IN_PROGRESS
+        - TEXT_PROOFED_BUT_NOT_DONE
     MetadatumType:
       description: A field that indicates the type of the metadatum
       type: string
@@ -322,6 +347,13 @@ components:
         - FOOTNOTE_STATE_LAW
         - FOOTNOTE_EU_LAW
         - FOOTNOTE_OTHER
+        - WORK_NOTE
+        - DESCRIPTION
+        - REFERENCE
+        - ENTRY_INTO_FORCE_DATE_NOTE
+        - PROOF_INDICATION
+        - PROOF_TYPE
+        - OTHER_TYPE
 
     MetadataSectionName:
       description: A field that indicates the name of the section
@@ -353,6 +385,10 @@ components:
         - PRINCIPLE_EXPIRATION
         - DIGITAL_EVIDENCE
         - FOOTNOTES
+        - DOCUMENT_STATUS_SECTION
+        - DOCUMENT_STATUS
+        - DOCUMENT_TEXT_PROOF
+        - DOCUMENT_OTHER
 
     MetadataSection:
       type: object
@@ -483,14 +519,6 @@ components:
         risAbbreviation:
           type: string
           example: SaubFahrzeugBeschG
-        documentStatusWorkNote:
-          type: string
-          example: ''
-        documentStatusDescription:
-          type: string
-          example: ''
-        documentStatusDate:
-          $ref: '#/components/schemas/Date'
         statusNote:
           type: string
           example: ''
@@ -532,20 +560,6 @@ components:
           example: text
         publicationDate:
           $ref: '#/components/schemas/Date'
-        documentStatusReference:
-          type: string
-          example: ''
-        documentStatusEntryIntoForceDate:
-          $ref: '#/components/schemas/Date'
-        documentStatusProof:
-          type: string
-          example: ''
-        documentTextProof:
-          type: string
-          example: ''
-        otherDocumentNote:
-          type: string
-          example: ''
         eli:
           $ref: '#/components/schemas/ELI'
         completeCitation:
