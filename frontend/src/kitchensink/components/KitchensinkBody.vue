@@ -12,6 +12,7 @@ import ExpandableContentView from "@/kitchensink/views/ExpandableContentView.vue
 import ExpandableDataSetView from "@/kitchensink/views/ExpandableDataSetView.vue"
 import FileUploadView from "@/kitchensink/views/FileUploadView.vue"
 import FileViewerView from "@/kitchensink/views/FileViewerView.vue"
+import FootnotesView from "@/kitchensink/views/FootnotesView.vue"
 import InfoModalView from "@/kitchensink/views/InfoModalView.vue"
 import InputView from "@/kitchensink/views/InputView.vue"
 import NavbarView from "@/kitchensink/views/NavbarView.vue"
@@ -66,6 +67,8 @@ const component = computed(() => {
       return EditableListView
     case "PaginationView":
       return PaginationView
+    case "FootnotesView":
+      return FootnotesView
     default:
       return ErrorView
   }
