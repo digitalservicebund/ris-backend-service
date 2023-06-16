@@ -147,7 +147,9 @@ export async function fillRepeatedMetadataSectionList(
   page: Page,
   section: MetadataInputSection
 ): Promise<void> {
-  await clearRepeatedMetadataSectionList(page, section)
+  if (section.isNotImported !== true) {
+    await clearRepeatedMetadataSectionList(page, section)
+  }
 
   const expandable = page.locator(`#${section.id}`)
   await expandable.click()
@@ -176,7 +178,9 @@ export async function fillExpandableSectionNotRepeatable(
   page: Page,
   section: MetadataInputSection
 ): Promise<void> {
-  await clearRepeatedMetadataSectionList(page, section)
+  if (!section.isNotImported) {
+    await clearRepeatedMetadataSectionList(page, section)
+  }
 
   const expandable = page.locator(`#${section.id}`)
   await expandable.click()

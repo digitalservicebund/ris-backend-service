@@ -217,6 +217,14 @@ export const newNorm: NormData = {
     PRINCIPLE_EXPIRATION: [
       { UNDEFINED_DATE: [UndefinedDate.UNDEFINED_NOT_PRESENT] },
     ],
+    DIGITAL_EVIDENCE: [
+      {
+        LINK: ["link"],
+        RELATED_DATA: ["related data"],
+        EXTERNAL_DATA_NOTE: ["external data note"],
+        APPENDIX: ["appendix"],
+      },
+    ],
   },
   officialLongTitle:
     "Verordnung zur Anpassung von Rechtsverordnungen an das Tierarzneimittelrecht",
@@ -226,10 +234,6 @@ export const newNorm: NormData = {
   publicationDate: "01.11.2022",
   celexNumber: "celexNumber",
   completeCitation: "completeCitation",
-  digitalEvidenceAppendix: "digitalEvidenceAppendix",
-  digitalEvidenceExternalDataNote: "digitalEvidenceExternalDataNote",
-  digitalEvidenceLink: "digitalEvidenceLink",
-  digitalEvidenceRelatedData: "digitalEvidenceRelatedData",
   documentCategory: "documentCategory",
   documentNumber: "documentNumber",
   documentStatusDate: "01.11.2022",

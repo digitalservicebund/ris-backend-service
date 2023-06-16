@@ -1390,30 +1390,41 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
     },
     {
       heading: "Elektronischer Nachweis",
+      isExpandableNotRepeatable: true,
+      isNotImported: true,
+      id: "digitalEvidence",
       fields: [
         {
           type: FieldType.TEXT,
           id: "digitalEvidenceLink",
           label: "Verlinkung",
-          value: norm.digitalEvidenceLink,
+          values: norm.metadataSections?.DIGITAL_EVIDENCE?.map(
+            (section) => section?.LINK?.[0]
+          ),
         },
         {
           type: FieldType.TEXT,
           id: "digitalEvidenceRelatedData",
-          label: "Zugehörige Dateien",
-          value: norm.digitalEvidenceRelatedData,
+          label: "Zugehörige Daten",
+          values: norm.metadataSections?.DIGITAL_EVIDENCE?.map(
+            (section) => section?.RELATED_DATA?.[0]
+          ),
         },
         {
           type: FieldType.TEXT,
           id: "digitalEvidenceExternalDataNote",
           label: "Hinweis auf fremde Verlinkung oder Daten",
-          value: norm.digitalEvidenceExternalDataNote,
+          values: norm.metadataSections?.DIGITAL_EVIDENCE?.map(
+            (section) => section?.EXTERNAL_DATA_NOTE?.[0]
+          ),
         },
         {
           type: FieldType.TEXT,
           id: "digitalEvidenceAppendix",
           label: "Zusatz zum Nachweis",
-          value: norm.digitalEvidenceAppendix,
+          values: norm.metadataSections?.DIGITAL_EVIDENCE?.map(
+            (section) => section?.APPENDIX?.[0]
+          ),
         },
       ],
     },
