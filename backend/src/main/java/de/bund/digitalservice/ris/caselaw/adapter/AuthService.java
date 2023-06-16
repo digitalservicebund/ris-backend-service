@@ -35,13 +35,19 @@ public class AuthService {
             () ->
                 documentUnitService
                     .getByDocumentNumber(documentNumber)
-                    .flatMap(this::userHasReadAccess));
+                    .flatMap(this::userHasReadAccess)
+                    .switchIfEmpty(Mono.just(false)));
   }
 
   @Bean
   public Function<UUID, Mono<Boolean>> userHasReadAccessByUuid() {
     return uuid ->
-        Mono.defer(() -> documentUnitService.getByUuid(uuid).flatMap(this::userHasReadAccess));
+        Mono.defer(
+            () ->
+                documentUnitService
+                    .getByUuid(uuid)
+                    .flatMap(this::userHasReadAccess)
+                    .switchIfEmpty(Mono.just(false)));
   }
 
   @Bean

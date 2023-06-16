@@ -54,7 +54,29 @@ class DocumentUnitControllerAuthTest {
         userService, docOffice1, docOffice1Group, docOffice2, docOffice2Group);
   }
 
-  // testGetByDocumentNumber() is in DocumentUnitControllerAuthIntegrationTest
+  @Test
+  void testGetByDocumentNumber_nonExistentDocumentNumber_shouldYield403Too() {
+    // testGetByDocumentNumber() is also in DocumentUnitControllerAuthIntegrationTest
+    when(service.getByDocumentNumber(any(String.class))).thenReturn(Mono.empty());
+
+    webClient
+        .mutateWith(csrf())
+        .mutateWith(getMockLoginWithDocOffice(docOffice1Group))
+        .get()
+        .uri("/api/v1/caselaw/documentunits/abc123")
+        .exchange()
+        .expectStatus()
+        .isForbidden();
+
+    webClient
+        .mutateWith(csrf())
+        .mutateWith(getMockLoginWithDocOffice(docOffice2Group))
+        .get()
+        .uri("/api/v1/caselaw/documentunits/abc123")
+        .exchange()
+        .expectStatus()
+        .isForbidden();
+  }
 
   @Test
   void testAttachFileToDocumentUnit() {
@@ -148,6 +170,17 @@ class DocumentUnitControllerAuthTest {
 
     webClient
         .mutateWith(csrf())
+        .mutateWith(getMockLoginWithDocOffice(docOffice1Group))
+        .put()
+        .uri(uri)
+        .header(HttpHeaders.CONTENT_TYPE, "application/json")
+        .bodyValue(docUnit)
+        .exchange()
+        .expectStatus()
+        .isForbidden();
+
+    webClient
+        .mutateWith(csrf())
         .mutateWith(getMockLoginWithDocOffice(docOffice2Group))
         .put()
         .uri(uri)
@@ -157,9 +190,24 @@ class DocumentUnitControllerAuthTest {
         .expectStatus()
         .isOk();
 
+    UUID nonExistentUuid = UUID.fromString("12345678-1111-2222-3333-787878787878");
+    when(service.getByUuid(nonExistentUuid)).thenReturn(Mono.empty());
+    uri = "/api/v1/caselaw/documentunits/" + nonExistentUuid;
+
     webClient
         .mutateWith(csrf())
         .mutateWith(getMockLoginWithDocOffice(docOffice1Group))
+        .put()
+        .uri(uri)
+        .header(HttpHeaders.CONTENT_TYPE, "application/json")
+        .bodyValue(docUnit)
+        .exchange()
+        .expectStatus()
+        .isForbidden();
+
+    webClient
+        .mutateWith(csrf())
+        .mutateWith(getMockLoginWithDocOffice(docOffice2Group))
         .put()
         .uri(uri)
         .header(HttpHeaders.CONTENT_TYPE, "application/json")
