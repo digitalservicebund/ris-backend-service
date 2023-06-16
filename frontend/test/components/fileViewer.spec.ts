@@ -2,7 +2,7 @@ import { fireEvent, render, screen } from "@testing-library/vue"
 import { createRouter, createWebHistory } from "vue-router"
 import FileViewer from "@/components/FileViewer.vue"
 
-const S3PATH = "47a77c3f-a05d-4362-97ea-d54a35236a67"
+const UUID = "88888888-4444-4444-4444-121212121212"
 const FILE_NAME = "some-formatting.docx"
 const FILE_TYPE = "docx"
 const USER_NAME = "USER NAME"
@@ -31,7 +31,7 @@ describe("file viewer", async () => {
   test("file viewer should be rendered", async () => {
     render(FileViewer, {
       props: {
-        s3Path: S3PATH,
+        uuid: UUID,
         fileName: FILE_NAME,
         fileType: FILE_TYPE,
         uploadTimeStamp: getUploadTimeStampToUpload(),
@@ -50,7 +50,7 @@ describe("file viewer", async () => {
   test("file viewer emitted delete uploadfile event", async () => {
     const { emitted } = render(FileViewer, {
       props: {
-        s3Path: S3PATH,
+        uuid: UUID,
         fileName: FILE_NAME,
         fileType: FILE_TYPE,
         uploadTimeStamp: getUploadTimeStampToUpload(),
