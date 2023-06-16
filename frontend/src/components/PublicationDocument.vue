@@ -119,7 +119,7 @@ const fieldsMissing = computed(() =>
     <h1 class="heading-02-regular">Veröffentlichen</h1>
     <div aria-label="Plausibilitätsprüfung" class="flex flex-row gap-16">
       <div class="w-[15.625rem]">
-        <p class="subheading">1. Plausibilitätsprüfung</p>
+        <p class="subheading">Plausibilitätsprüfung</p>
       </div>
       <div v-if="fieldsMissing" class="flex flex-row gap-8">
         <div>
