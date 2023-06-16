@@ -230,15 +230,16 @@ const ENCODERS: MetadataValueEncoders = {
  */
 function decodeMetadata(metadata: MetadatumSchema[]): Metadata {
   const grouped = groupBy(metadata, (datum) => datum.type)
-  return mapValues(grouped, (data) =>
-    data.sort(compareOrder).map((datum) => DECODERS[datum.type](datum.value))
-  )
+  return mapValues(grouped, (data) => {
+    const sortedData = data.sort(compareOrder)
+    return sortedData.map((datum) => DECODERS[datum.type](datum.value))
+  })
 }
 
 /**
  * Encodes some metadata from the domain format to the API request schema. The
  * mapping keys are used as type, also used for the encoding of the values. The
- * index within a group is used as order property. Finally all groups get merged
+ * index within a group is used as order property. Finally, all groups get merged
  * back together.
  *
  * @example
@@ -448,14 +449,6 @@ export function encodeFlatMetadata(
     ),
     celexNumber: encodeString(flatMetadata.celexNumber),
     completeCitation: encodeString(flatMetadata.completeCitation),
-    digitalEvidenceAppendix: encodeString(flatMetadata.digitalEvidenceAppendix),
-    digitalEvidenceExternalDataNote: encodeString(
-      flatMetadata.digitalEvidenceExternalDataNote
-    ),
-    digitalEvidenceLink: encodeString(flatMetadata.digitalEvidenceLink),
-    digitalEvidenceRelatedData: encodeString(
-      flatMetadata.digitalEvidenceRelatedData
-    ),
     documentCategory: encodeString(flatMetadata.documentCategory),
     documentNumber: encodeString(flatMetadata.documentNumber),
     documentStatusDate: encodeNullDate(flatMetadata.documentStatusDate),
