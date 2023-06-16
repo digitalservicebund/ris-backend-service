@@ -86,13 +86,6 @@ watch(
         data.applicationScopeStartDate as string
       loadedNorm.value.celexNumber = data.celexNumber as string
       loadedNorm.value.completeCitation = data.completeCitation as string
-      loadedNorm.value.digitalEvidenceAppendix =
-        data.digitalEvidenceAppendix as string
-      loadedNorm.value.digitalEvidenceExternalDataNote =
-        data.digitalEvidenceExternalDataNote as string
-      loadedNorm.value.digitalEvidenceLink = data.digitalEvidenceLink as string
-      loadedNorm.value.digitalEvidenceRelatedData =
-        data.digitalEvidenceRelatedData as string
       loadedNorm.value.documentCategory = data.documentCategory as string
       loadedNorm.value.documentNumber = data.documentNumber as string
       loadedNorm.value.documentStatusDate = data.documentStatusDate as string

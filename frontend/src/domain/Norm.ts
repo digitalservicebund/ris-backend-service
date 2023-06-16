@@ -192,10 +192,6 @@ export type FlatMetadata = {
   categorizedReference?: string
   celexNumber?: string
   completeCitation?: string
-  digitalEvidenceAppendix?: string
-  digitalEvidenceExternalDataNote?: string
-  digitalEvidenceLink?: string
-  digitalEvidenceRelatedData?: string
   documentCategory?: string
   documentNumber?: string
   documentStatusDate?: string

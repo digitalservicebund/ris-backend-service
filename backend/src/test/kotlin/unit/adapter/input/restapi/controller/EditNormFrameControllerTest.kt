@@ -1,10 +1,8 @@
 package de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.controller
 
-import com.fasterxml.jackson.annotation.JsonProperty
 import com.ninjasquad.springmockk.MockkBean
 import de.bund.digitalservice.ris.norms.application.port.input.EditNormFrameUseCase
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType
-import de.bund.digitalservice.ris.norms.domain.value.UndefinedDate
 import io.mockk.every
 import io.mockk.verify
 import org.assertj.core.api.Assertions.assertThat
@@ -117,19 +115,6 @@ class EditNormFrameControllerTest {
         var officialShortTitle: String? = null
         var officialAbbreviation: String? = null
 
-        var entryIntoForceDate: String? = null
-        var entryIntoForceDateState: UndefinedDate? = null
-        var principleEntryIntoForceDate: String? = null
-        var principleEntryIntoForceDateState: UndefinedDate? = null
-
-        var expirationDate: String? = null
-        var expirationDateState: UndefinedDate? = null
-
-        @get:JsonProperty("isExpirationDateTemp")
-        var isExpirationDateTemp: Boolean? = null
-        var principleExpirationDate: String? = null
-        var principleExpirationDateState: UndefinedDate? = null
-
         var announcementDate: String? = null
         var publicationDate: String? = null
 
@@ -168,11 +153,6 @@ class EditNormFrameControllerTest {
         var footnoteDecision: String? = null
         var footnoteStateLaw: String? = null
         var footnoteEuLaw: String? = null
-
-        var digitalEvidenceLink: String? = null
-        var digitalEvidenceRelatedData: String? = null
-        var digitalEvidenceExternalDataNote: String? = null
-        var digitalEvidenceAppendix: String? = null
 
         var celexNumber: String? = null
 

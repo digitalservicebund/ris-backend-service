@@ -60,11 +60,6 @@ interface EditNormFrameUseCase {
         var footnoteStateLaw: String? = null,
         var footnoteEuLaw: String? = null,
 
-        var digitalEvidenceLink: String? = null,
-        var digitalEvidenceRelatedData: String? = null,
-        var digitalEvidenceExternalDataNote: String? = null,
-        var digitalEvidenceAppendix: String? = null,
-
         var celexNumber: String? = null,
 
         var text: String? = null,
