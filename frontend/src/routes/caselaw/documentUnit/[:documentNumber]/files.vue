@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { ref } from "vue"
 import DocumentUnitFiles from "@/components/DocumentUnitFiles.vue"
+import RouteErrorDisplay from "@/components/RouteErrorDisplay.vue"
 import DocumentUnit from "@/domain/documentUnit"
 import documentUnitService from "@/services/documentUnitService"
 
@@ -24,8 +25,5 @@ const { documentUnit, error } = await loadDocumentUnit()
     :document-unit="(documentUnit as DocumentUnit)"
     @update-document-unit="Object.assign(documentUnit as DocumentUnit, $event)"
   />
-  <div v-else class="m-24">
-    <h2>{{ error?.title }}</h2>
-    <p>{{ error?.description }}</p>
-  </div>
+  <RouteErrorDisplay v-else :error="error" />
 </template>

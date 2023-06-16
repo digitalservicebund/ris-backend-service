@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { onMounted, ref } from "vue"
 import DocumentUnitPublication from "@/components/DocumentUnitPublication.vue"
+import RouteErrorDisplay from "@/components/RouteErrorDisplay.vue"
 import DocumentUnit from "@/domain/documentUnit"
 import documentUnitService from "@/services/documentUnitService"
 import { ResponseError } from "@/services/httpClient"
@@ -28,8 +29,5 @@ onMounted(() => loadDocumentUnit())
     :document-unit="(documentUnit as DocumentUnit)"
     @update-document-unit="loadDocumentUnit"
   />
-  <div v-else class="m-24">
-    <h2>{{ error?.title }}</h2>
-    <p>{{ error?.description }}</p>
-  </div>
+  <RouteErrorDisplay v-else :error="error" />
 </template>
