@@ -1,19 +1,14 @@
 import dayjs from "dayjs"
-import { Court, DocumentType } from "./documentUnit"
+import LinkedDocumentUnit from "./linkedDocumentUnit"
 
-export default class ProceedingDecision {
-  public uuid?: string
-  public documentNumber?: string
+export default class ProceedingDecision extends LinkedDocumentUnit {
   public dataSource?: "NEURIS" | "MIGRATION" | "PROCEEDING_DECISION"
-  public court?: Court
-  public decisionDate?: string
-  public fileNumber?: string
-  public documentType?: DocumentType
   public dateKnown = true
 
   static requiredFields = ["fileNumber", "court", "decisionDate"] as const
 
   constructor(data: Partial<ProceedingDecision> = {}) {
+    super()
     Object.assign(this, data)
   }
 

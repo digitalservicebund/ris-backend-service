@@ -1,16 +1,13 @@
 import dayjs from "dayjs"
-import { Court, DocumentType } from "@/domain/documentUnit"
+import LinkedDocumentUnit from "./linkedDocumentUnit"
 
-export default class ActiveCitation {
-  public court?: Court
-  public decisionDate?: string
-  public documentType?: DocumentType
-  public fileNumber?: string
+export default class ActiveCitation extends LinkedDocumentUnit {
   public predicateList?: string
 
   static requiredFields = ["court"] as const
 
   constructor(data: Partial<ActiveCitation> = {}) {
+    super()
     Object.assign(this, data)
   }
 
