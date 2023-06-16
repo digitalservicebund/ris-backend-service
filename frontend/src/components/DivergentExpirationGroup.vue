@@ -1,8 +1,8 @@
 <script lang="ts" setup>
 import { storeToRefs } from "pinia"
 import { computed, ref, watch } from "vue"
-import DivergentExpirationDefinedInputGroup from "@/components/DivergentExpirationDefinedInputGroup.vue"
-import DivergentExpirationUndefinedInputGroup from "@/components/DivergentExpirationUndefinedInputGroup.vue"
+import DivergentDefinedInputGroup from "@/components/DivergentDefinedInputGroup.vue"
+import DivergentUndefinedInputGroup from "@/components/DivergentUndefinedInputGroup.vue"
 import { Metadata, MetadataSectionName, MetadataSections } from "@/domain/Norm"
 import { useLoadedNormStore } from "@/stores/loadedNorm"
 
@@ -67,19 +67,6 @@ watch(
 )
 
 watch(selectedChildSectionName, () => (childSection.value = {}))
-
-const component = computed(() => {
-  switch (selectedChildSectionName.value) {
-    case MetadataSectionName.DIVERGENT_EXPIRATION_DEFINED:
-      return DivergentExpirationDefinedInputGroup
-    case MetadataSectionName.DIVERGENT_EXPIRATION_UNDEFINED:
-      return DivergentExpirationUndefinedInputGroup
-    default:
-      throw Error(
-        `Unknown divergent expiration child section: "${selectedChildSectionName.value}"`
-      )
-  }
-})
 </script>
 
 <template>
@@ -115,7 +102,26 @@ const component = computed(() => {
         <span>unbestimmt</span>
       </label>
     </div>
-    <component :is="component" v-model="childSection" />
+    <DivergentDefinedInputGroup
+      v-if="
+        selectedChildSectionName ===
+        MetadataSectionName.DIVERGENT_EXPIRATION_DEFINED
+      "
+      id="divergentExpirationDefinedDate"
+      v-model="childSection"
+      label="Bestimmtes abweichendes Außerkrafttretedatum"
+      :section-name="MetadataSectionName.DIVERGENT_EXPIRATION_DEFINED"
+    />
+    <DivergentUndefinedInputGroup
+      v-if="
+        selectedChildSectionName ===
+        MetadataSectionName.DIVERGENT_EXPIRATION_UNDEFINED
+      "
+      id="divergentExpirationUndefinedDate"
+      v-model="childSection"
+      label="Unbestimmtes abweichendes Außerkrafttretedatum"
+      :section-name="MetadataSectionName.DIVERGENT_EXPIRATION_UNDEFINED"
+    />
   </div>
 </template>
 

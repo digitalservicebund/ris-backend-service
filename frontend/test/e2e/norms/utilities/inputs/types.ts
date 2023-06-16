@@ -4,6 +4,7 @@ export enum FieldType {
   RADIO,
   CHIPS,
   DROPDOWN,
+  TEXTAREA,
 }
 
 export type FieldValue = string | boolean | string[]
@@ -14,6 +15,7 @@ export type FieldValueTypeMapping = {
   [FieldType.RADIO]: boolean
   [FieldType.CHIPS]: string[]
   [FieldType.DROPDOWN]: string
+  [FieldType.TEXTAREA]: string
 }
 
 // FIXME: resolve awkward mixture with value and values.
@@ -38,6 +40,7 @@ export type MetadataInputSection = {
   isRepeatedSection?: boolean
   isSingleFieldSection?: boolean
   isExpandableNotRepeatable?: boolean
+  isNotImported?: boolean
   fields?: AnyField[]
   sections?: MetadataInputSection[]
 }

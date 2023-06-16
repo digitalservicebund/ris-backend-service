@@ -8,6 +8,7 @@ import jakarta.validation.Valid;
 import java.util.UUID;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -32,6 +33,7 @@ public class ProceedingDecisionController {
   }
 
   @PutMapping
+  @PreAuthorize("@userHasWriteAccessByUuid.apply(#documentUnitUuid)")
   public Flux<ProceedingDecision> createProceedingDecision(
       @AuthenticationPrincipal OidcUser oidcUser,
       @PathVariable("uuid") UUID documentUnitUuid,
@@ -46,6 +48,7 @@ public class ProceedingDecisionController {
   }
 
   @PutMapping(value = "/{childUuid}")
+  @PreAuthorize("@userHasWriteAccessByUuid.apply(#parentUuid)")
   public Mono<ResponseEntity<DocumentUnit>> linkProceedingDecision(
       @PathVariable("uuid") UUID parentUuid, @PathVariable UUID childUuid) {
     return service
@@ -54,6 +57,7 @@ public class ProceedingDecisionController {
   }
 
   @DeleteMapping(value = "/{childUuid}")
+  @PreAuthorize("@userHasWriteAccessByUuid.apply(#parentUuid)")
   public Mono<ResponseEntity<String>> removeProceedingDecision(
       @PathVariable("uuid") UUID parentUuid, @PathVariable UUID childUuid) {
 

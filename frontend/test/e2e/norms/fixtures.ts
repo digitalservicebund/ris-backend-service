@@ -99,7 +99,7 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
       isSingleFieldSection: true,
       fields: [
         {
-          type: FieldType.TEXT,
+          type: FieldType.TEXTAREA,
           id: "officialLongTitle",
           label: "Amtliche Langüberschrift",
           value: norm.officialLongTitle,
@@ -496,7 +496,7 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
         },
         {
           type: FieldType.TEXT,
-          id: "divergentEntryIntoForceDefinedDate",
+          id: "divergentEntryIntoForceDefinedDateDateInput",
           label: "Bestimmtes abweichendes Inkrafttretedatum",
           values: norm.metadataSections?.DIVERGENT_ENTRY_INTO_FORCE?.map(
             (section) => section?.DIVERGENT_ENTRY_INTO_FORCE_DEFINED?.[0]
@@ -563,7 +563,7 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
         },
         {
           type: FieldType.DROPDOWN,
-          id: "divergentEntryIntoForceUndefinedDate",
+          id: "divergentEntryIntoForceUndefinedDateDropdown",
           label: "Unbestimmtes abweichendes Inkrafttretedatum",
           values: norm.metadataSections?.DIVERGENT_ENTRY_INTO_FORCE?.map(
             (section) => section?.DIVERGENT_ENTRY_INTO_FORCE_UNDEFINED?.[0]
@@ -717,7 +717,7 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
         },
         {
           type: FieldType.TEXT,
-          id: "divergentExpirationDefinedDate",
+          id: "divergentExpirationDefinedDateDateInput",
           label: "Bestimmtes abweichendes Außerkrafttretedatum",
           values: norm.metadataSections?.DIVERGENT_EXPIRATION?.map(
             (section) => section?.DIVERGENT_EXPIRATION_DEFINED?.[0]
@@ -784,7 +784,7 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
         },
         {
           type: FieldType.DROPDOWN,
-          id: "divergentExpirationUndefinedDate",
+          id: "divergentExpirationUndefinedDateDropdown",
           label: "Unbestimmtes abweichendes Außerkrafttretedatum",
           values: norm.metadataSections?.DIVERGENT_EXPIRATION?.map(
             (section) => section?.DIVERGENT_EXPIRATION_UNDEFINED?.[0]
@@ -1390,30 +1390,41 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
     },
     {
       heading: "Elektronischer Nachweis",
+      isExpandableNotRepeatable: true,
+      isNotImported: true,
+      id: "digitalEvidence",
       fields: [
         {
           type: FieldType.TEXT,
           id: "digitalEvidenceLink",
           label: "Verlinkung",
-          value: norm.digitalEvidenceLink,
+          values: norm.metadataSections?.DIGITAL_EVIDENCE?.map(
+            (section) => section?.LINK?.[0]
+          ),
         },
         {
           type: FieldType.TEXT,
           id: "digitalEvidenceRelatedData",
-          label: "Zugehörige Dateien",
-          value: norm.digitalEvidenceRelatedData,
+          label: "Zugehörige Daten",
+          values: norm.metadataSections?.DIGITAL_EVIDENCE?.map(
+            (section) => section?.RELATED_DATA?.[0]
+          ),
         },
         {
           type: FieldType.TEXT,
           id: "digitalEvidenceExternalDataNote",
           label: "Hinweis auf fremde Verlinkung oder Daten",
-          value: norm.digitalEvidenceExternalDataNote,
+          values: norm.metadataSections?.DIGITAL_EVIDENCE?.map(
+            (section) => section?.EXTERNAL_DATA_NOTE?.[0]
+          ),
         },
         {
           type: FieldType.TEXT,
           id: "digitalEvidenceAppendix",
           label: "Zusatz zum Nachweis",
-          value: norm.digitalEvidenceAppendix,
+          values: norm.metadataSections?.DIGITAL_EVIDENCE?.map(
+            (section) => section?.APPENDIX?.[0]
+          ),
         },
       ],
     },

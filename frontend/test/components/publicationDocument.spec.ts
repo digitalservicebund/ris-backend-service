@@ -115,42 +115,8 @@ describe("PublicationDocument:", () => {
   })
 
   describe("on press 'Dokumentationseinheit veröffentlichen'", () => {
-    it("with default email address", async () => {
+    it("publishes successfully", async () => {
       const { emitted } = setupWithAllRequiredFields()
-      const publishButton = screen.getByRole("button", {
-        name: "Dokumentationseinheit veröffentlichen",
-      })
-      await fireEvent.click(publishButton)
-
-      expect(emitted().publishADocument).toBeTruthy()
-      expect(emitted().publishADocument[0]).toEqual(["dokmbx@juris.de"])
-    })
-
-    it("with invalid email address", async () => {
-      const { emitted } = setupWithAllRequiredFields()
-      const inputReceiverAddress = screen.getByLabelText(
-        "Empfängeradresse E-Mail"
-      )
-
-      await userEvent.clear(inputReceiverAddress)
-      await userEvent.type(inputReceiverAddress, "test.email")
-
-      const publishButton = screen.getByRole("button", {
-        name: "Dokumentationseinheit veröffentlichen",
-      })
-      await fireEvent.click(publishButton)
-
-      expect(emitted().publishADocument).toBeFalsy()
-    })
-
-    it("with valid email address", async () => {
-      const { emitted } = setupWithAllRequiredFields()
-      const inputReceiverAddress = screen.getByLabelText(
-        "Empfängeradresse E-Mail"
-      )
-
-      await userEvent.type(inputReceiverAddress, "test.email@test.com")
-
       const publishButton = screen.getByRole("button", {
         name: "Dokumentationseinheit veröffentlichen",
       })
@@ -199,12 +165,6 @@ describe("PublicationDocument:", () => {
           plugins: [router],
         },
       })
-
-      const inputReceiverAddress = screen.getByLabelText(
-        "Empfängeradresse E-Mail"
-      )
-
-      await userEvent.type(inputReceiverAddress, "test.email@test.com")
 
       const publishButton = screen.getByRole("button", {
         name: "Dokumentationseinheit veröffentlichen",
@@ -285,7 +245,7 @@ describe("PublicationDocument:", () => {
     })
 
     expect(container).toHaveTextContent(
-      `Veröffentlichen1. Plausibilitätsprüfung check Alle Pflichtfelder sind korrekt ausgefüllt2. Empfänger der Export-EmailEmpfänger-E-Mail-Adresse: campaignDokumentationseinheit veröffentlichenLetzte Veröffentlichungen Letzte Veröffentlichung am 01.02.2000 (Zustellung: erfolgreich angekommen) ÜBERE-Mail an: receiver address Betreff: mail subjectALS`
+      `VeröffentlichenPlausibilitätsprüfung check Alle Pflichtfelder sind korrekt ausgefülltcampaignDokumentationseinheit veröffentlichenLetzte Veröffentlichungen Letzte Veröffentlichung am 01.02.2000 (Zustellung: erfolgreich angekommen) ÜBERE-Mail an: receiver address Betreff: mail subjectALS`
     )
 
     const codeSnippet = screen.queryByTestId("code-snippet")

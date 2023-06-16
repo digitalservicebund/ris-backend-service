@@ -1,21 +1,16 @@
 package de.bund.digitalservice.ris.caselaw.domain;
 
-import de.bund.digitalservice.ris.caselaw.domain.lookuptable.court.Court;
-import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
 import de.bund.digitalservice.ris.caselaw.domain.validator.DateKnownConstraint;
-import jakarta.validation.constraints.PastOrPresent;
-import java.time.Instant;
-import java.util.UUID;
-import lombok.Builder;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
-@Builder
+@SuperBuilder
+@Getter
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 @DateKnownConstraint
-public record ProceedingDecision(
-    UUID uuid,
-    String documentNumber,
-    DataSource dataSource,
-    Court court,
-    @PastOrPresent Instant date,
-    String fileNumber,
-    DocumentType documentType,
-    boolean dateKnown) {}
+public class ProceedingDecision extends LinkedDocumentationUnit {
+  private boolean dateKnown;
+}

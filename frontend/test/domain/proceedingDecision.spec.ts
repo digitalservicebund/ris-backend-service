@@ -13,12 +13,12 @@ describe("ProceedingDecision", () => {
         label: "testDocumentType",
         jurisShortcut: "testDocumentTypeShortcut",
       },
-      date: "hi",
+      decisionDate: "hi",
       fileNumber: "bar",
     })
     expect(proceedingDecision.court?.label).toEqual("label1")
     expect(proceedingDecision.documentType?.label).toEqual("testDocumentType")
-    expect(proceedingDecision.date).toEqual("hi")
+    expect(proceedingDecision.decisionDate).toEqual("hi")
     expect(proceedingDecision.fileNumber).toEqual("bar")
   })
 
@@ -59,7 +59,7 @@ describe("ProceedingDecision", () => {
     expect(proceedingDecision.missingRequiredFields).toStrictEqual([
       "fileNumber",
       "court",
-      "date",
+      "decisionDate",
     ])
   })
 
@@ -70,7 +70,7 @@ describe("ProceedingDecision", () => {
         location: "testCourtLocation",
         label: "label1",
       },
-      date: "2019-12-31T23:00:00Z",
+      decisionDate: "2019-12-31T23:00:00Z",
     })
     expect(proceedingDecision.missingRequiredFields).toStrictEqual([
       "fileNumber",
@@ -87,7 +87,7 @@ describe("ProceedingDecision", () => {
       fileNumber: "bar",
     })
     expect(decisionWithoutDateKnown.missingRequiredFields).toStrictEqual([
-      "date",
+      "decisionDate",
     ])
 
     const decisionWithDateKnown = new ProceedingDecision({

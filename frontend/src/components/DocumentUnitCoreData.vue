@@ -2,14 +2,12 @@
 import { computed, onMounted, ref, toRefs } from "vue"
 import { CoreData } from "../domain/documentUnit"
 import InputGroup from "../shared/components/input/InputGroup.vue"
-import SaveDocumentUnitButton from "./SaveDocumentUnitButton.vue"
 import { courtFields, coreDataFields } from "@/fields/caselaw"
 import { ValidationError } from "@/shared/components/input/types"
 import { useTransformNestedData } from "@/shared/composables/useTransformNestedData"
 
 interface Props {
   modelValue: CoreData
-  updateStatus: number
   validationErrors?: ValidationError[]
 }
 
@@ -59,12 +57,5 @@ const resizeObserver = new ResizeObserver((entries) => {
       :validation-errors="props.validationErrors"
     />
     <div class="mt-4">* Pflichtfelder zum Veröffentlichen</div>
-
-    <SaveDocumentUnitButton
-      aria-label="Stammdaten Speichern Button"
-      class="mt-8"
-      :update-status="updateStatus"
-      @update-document-unit="emit('updateDocumentUnit')"
-    />
   </div>
 </template>

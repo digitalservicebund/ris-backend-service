@@ -1,7 +1,7 @@
 <script lang="ts" setup>
-import { computed, ref, watch } from "vue"
-import DivergentEntryIntoForceDefinedInputGroup from "@/components/DivergentEntryIntoForceDefinedInputGroup.vue"
-import DivergentEntryIntoForceUndefinedInputGroup from "@/components/DivergentEntryIntoForceUndefinedInputGroup.vue"
+import { ref, watch } from "vue"
+import DivergentDefinedInputGroup from "@/components/DivergentDefinedInputGroup.vue"
+import DivergentUndefinedInputGroup from "@/components/DivergentUndefinedInputGroup.vue"
 import { Metadata, MetadataSectionName, MetadataSections } from "@/domain/Norm"
 
 interface Props {
@@ -55,19 +55,6 @@ watch(
 )
 
 watch(selectedChildSectionName, () => (childSection.value = {}))
-
-const component = computed(() => {
-  switch (selectedChildSectionName.value) {
-    case MetadataSectionName.DIVERGENT_ENTRY_INTO_FORCE_DEFINED:
-      return DivergentEntryIntoForceDefinedInputGroup
-    case MetadataSectionName.DIVERGENT_ENTRY_INTO_FORCE_UNDEFINED:
-      return DivergentEntryIntoForceUndefinedInputGroup
-    default:
-      throw Error(
-        `Unknown divergent entry into force child section: "${selectedChildSectionName.value}"`
-      )
-  }
-})
 </script>
 
 <template>
@@ -96,7 +83,26 @@ const component = computed(() => {
         unbestimmt
       </label>
     </div>
-    <component :is="component" v-model="childSection" />
+    <DivergentDefinedInputGroup
+      v-if="
+        selectedChildSectionName ===
+        MetadataSectionName.DIVERGENT_ENTRY_INTO_FORCE_DEFINED
+      "
+      id="divergentEntryIntoForceDefinedDate"
+      v-model="childSection"
+      label="Bestimmtes abweichendes Inkrafttretedatum"
+      :section-name="MetadataSectionName.DIVERGENT_ENTRY_INTO_FORCE_DEFINED"
+    />
+    <DivergentUndefinedInputGroup
+      v-if="
+        selectedChildSectionName ===
+        MetadataSectionName.DIVERGENT_ENTRY_INTO_FORCE_UNDEFINED
+      "
+      id="divergentEntryIntoForceUndefinedDate"
+      v-model="childSection"
+      label="Unbestimmtes abweichendes Inkrafttretedatum"
+      :section-name="MetadataSectionName.DIVERGENT_ENTRY_INTO_FORCE_UNDEFINED"
+    />
   </div>
 </template>
 

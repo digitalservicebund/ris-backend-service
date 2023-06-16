@@ -10,6 +10,7 @@ import InputField, {
   LabelPosition,
 } from "@/shared/components/input/InputField.vue"
 import NestedInput from "@/shared/components/input/NestedInput.vue"
+import TextAreaInput from "@/shared/components/input/TextAreaInput.vue"
 import TextInput from "@/shared/components/input/TextInput.vue"
 import {
   ValidationError,
@@ -18,6 +19,8 @@ import {
   InputType,
 } from "@/shared/components/input/types"
 import type { ChipsInputModelType } from "@/shared/components/input/types"
+
+const multilineTextInputModel = ref("")
 
 const chipsModelValue = ref<ChipsInputModelType>(["one", "two"])
 const chipsDateModelValue = ref<ChipsInputModelType>(["2022-01-31T23:00:00Z"])
@@ -89,6 +92,21 @@ const dateInputAttributes: BaseInputAttributes = {
       aria-label="readonly text input"
       read-only
       value="Loremipsum"
+    />
+
+    <h1 class="font-bold text-24">Multiline text input (aka. textarea)</h1>
+    <TextAreaInput
+      id="multilineTextInput"
+      v-model="multilineTextInputModel"
+      aria-label="multiline text input"
+    />
+
+    <h2>Autosizing</h2>
+    <TextAreaInput
+      id="multilineTextInput"
+      v-model="multilineTextInputModel"
+      aria-label="multiline text input"
+      autosize
     />
 
     <h1 class="font-bold text-24">Dropdown Input</h1>

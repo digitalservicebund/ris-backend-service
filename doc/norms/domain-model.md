@@ -34,30 +34,9 @@ classDiagram
     String reissueReference
     String otherStatusNote
 
-    String documentStatusWorkNote
-    String documentStatusDescription
-    Date documentStatusDate
-    String documentStatusReference
-    Date documentStatusEntryIntoForceDate
-    String documentStatusProof
-    String documentTextProof
-    String otherDocumentNote
-
     String applicationScopeArea
     Date applicationScopeStartDate
     Date applicationScopeEndDate
-
-    String otherFootnote
-    String footnoteChange
-    String footnoteComment
-    String footnoteDecision
-    String footnoteStateLaw
-    String footnoteEuLaw
-
-    String digitalEvidenceLink
-    String digitalEvidenceRelatedData
-    String digitalEvidenceExternalDataNote
-    String digitalEvidenceAppendix
 
     String celexNumber
 
@@ -99,6 +78,32 @@ classDiagram
     UNDEFINED_NOT_PRESENT
   }
 
+  class NormCategory  {
+     <<enumeration>>
+    BASE_NORM
+    AMENDMENT_NORM
+    TRANSITIONAL_NORM
+  }
+
+  class ProofIndication  {
+     <<enumeration>>
+    NOT_YET_CONSIDERED
+    CONSIDERED
+  }
+
+  class ProofType  {
+     <<enumeration>>
+    TEXT_PROOF_FROM
+    TEXT_PROOF_VALIDITY_FROM
+  }
+
+  class OtherType  {
+     <<enumeration>>
+    TEXT_IN_PROGRESS
+    TEXT_PROOFED_BUT_NOT_DONE
+  }
+
+
   class MetadataSectionName  {
      <<enumeration>>
      NORM
@@ -125,6 +130,12 @@ classDiagram
      PRINCIPLE_ENTRY_INTO_FORCE
      EXPIRATION
      PRINCIPLE_EXPIRATION
+     DIGITAL_EVIDENCE
+     FOOTNOTES
+     DOCUMENT_STATUS_SECTION
+     DOCUMENT_STATUS
+     DOCUMENT_TEXT_PROOF
+     DOCUMENT_OTHER
   }
 
   class MetadatumType  {
@@ -171,6 +182,24 @@ classDiagram
     TEMPLATE_NAME
     UNDEFINED_DATE
     TEXT
+    LINK
+    RELATED_DATA
+    EXTERNAL_DATA_NOTE
+    APPENDIX
+    FOOTNOTE_REFERENCE
+    FOOTNOTE_CHANGE
+    FOOTNOTE_COMMENT
+    FOOTNOTE_DECISION
+    FOOTNOTE_STATE_LAW
+    FOOTNOTE_EU_LAW
+    FOOTNOTE_OTHER
+    WORK_NOTE
+    DESCRIPTION
+    REFERENCE
+    ENTRY_INTO_FORCE_DATE_NOTE
+    PROOF_INDICATION
+    PROOF_TYPE
+    OTHER_TYPE
   }
 
   class FileReference {

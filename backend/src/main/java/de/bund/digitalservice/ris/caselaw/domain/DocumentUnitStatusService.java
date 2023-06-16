@@ -8,5 +8,10 @@ public interface DocumentUnitStatusService {
   Mono<DocumentUnit> setInitialStatus(DocumentUnit documentUnit);
 
   Mono<DocumentUnit> updateStatus(
-      DocumentUnit documentUnit, DocumentUnitStatus status, Instant publishDate);
+      DocumentUnit documentUnit,
+      DocumentUnitStatus status,
+      Instant publishDate,
+      String issuerAddress);
+
+  Mono<String> getIssuerAddressOfLatestStatus(String documentNumber);
 }

@@ -47,6 +47,7 @@ public class DocumentUnitDTO extends DocumentUnitMetadataDTO {
   String decisionReasons;
 
   @Transient List<DocumentUnitMetadataDTO> proceedingDecisions;
+  @Transient List<DocumentUnitMetadataDTO> activeCitations;
   @Transient List<FileNumberDTO> deviatingFileNumbers;
   @Transient List<IncorrectCourtDTO> incorrectCourts;
   @Transient List<DeviatingEcliDTO> deviatingEclis;

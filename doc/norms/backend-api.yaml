@@ -265,6 +265,31 @@ components:
         - UNDEFINED_UNKNOWN
         - UNDEFINED_FUTURE
         - UNDEFINED_NOT_PRESENT
+    NormCategory:
+      description: A field that takes one of three values
+      type: string
+      enum:
+        - BASE_NORM
+        - AMENDMENT_NORM
+        - TRANSITIONAL_NORM
+    ProofIndication:
+      description: A field that takes one of three values
+      type: string
+      enum:
+        - NOT_YET_CONSIDERED
+        - CONSIDERED
+    ProofType:
+      description: A field that takes one of three values
+      type: string
+      enum:
+        - TEXT_PROOF_FROM
+        - TEXT_PROOF_VALIDITY_FROM
+    OtherType:
+      description: A field that takes one of three values
+      type: string
+      enum:
+        - TEXT_IN_PROGRESS
+        - TEXT_PROOFED_BUT_NOT_DONE
     MetadatumType:
       description: A field that indicates the type of the metadatum
       type: string
@@ -311,6 +336,24 @@ components:
         - TEMPLATE_NAME
         - UNDEFINED_DATE
         - TEXT
+        - LINK
+        - RELATED_DATA
+        - EXTERNAL_DATA_NOTE
+        - APPENDIX
+        - FOOTNOTE_REFERENCE
+        - FOOTNOTE_CHANGE
+        - FOOTNOTE_COMMENT
+        - FOOTNOTE_DECISION
+        - FOOTNOTE_STATE_LAW
+        - FOOTNOTE_EU_LAW
+        - FOOTNOTE_OTHER
+        - WORK_NOTE
+        - DESCRIPTION
+        - REFERENCE
+        - ENTRY_INTO_FORCE_DATE_NOTE
+        - PROOF_INDICATION
+        - PROOF_TYPE
+        - OTHER_TYPE
 
     MetadataSectionName:
       description: A field that indicates the name of the section
@@ -340,6 +383,12 @@ components:
         - PRINCIPLE_ENTRY_INTO_FORCE
         - EXPIRATION
         - PRINCIPLE_EXPIRATION
+        - DIGITAL_EVIDENCE
+        - FOOTNOTES
+        - DOCUMENT_STATUS_SECTION
+        - DOCUMENT_STATUS
+        - DOCUMENT_TEXT_PROOF
+        - DOCUMENT_OTHER
 
     MetadataSection:
       type: object
@@ -467,35 +516,9 @@ components:
         celexNumber:
           type: string
           example: ''
-        otherFootnote:
-          type: string
-          example: Das G wurde vom Bundestag beschlossen und ist am 1.1.1998 in Kraft getreten.
-        footnoteChange:
-          type: string
-          example: ''
-        footnoteComment:
-          type: string
-          example: ''
-        footnoteDecision:
-          type: string
-          example: ''
-        footnoteStateLaw:
-          type: string
-          example: ''
-        footnoteEuLaw:
-          type: string
-          example: ''
         risAbbreviation:
           type: string
           example: SaubFahrzeugBeschG
-        documentStatusWorkNote:
-          type: string
-          example: ''
-        documentStatusDescription:
-          type: string
-          example: ''
-        documentStatusDate:
-          $ref: '#/components/schemas/Date'
         statusNote:
           type: string
           example: ''
@@ -537,35 +560,9 @@ components:
           example: text
         publicationDate:
           $ref: '#/components/schemas/Date'
-        documentStatusReference:
-          type: string
-          example: ''
-        documentStatusEntryIntoForceDate:
-          $ref: '#/components/schemas/Date'
-        documentStatusProof:
-          type: string
-          example: ''
-        documentTextProof:
-          type: string
-          example: ''
-        otherDocumentNote:
-          type: string
-          example: ''
         eli:
           $ref: '#/components/schemas/ELI'
         completeCitation:
-          type: string
-          example: ''
-        digitalEvidenceLink:
-          type: string
-          example: ''
-        digitalEvidenceRelatedData:
-          type: string
-          example: ''
-        digitalEvidenceExternalDataNote:
-          type: string
-          example: ''
-        digitalEvidenceAppendix:
           type: string
           example: ''
         metadataSections:

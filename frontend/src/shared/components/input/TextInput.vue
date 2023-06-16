@@ -22,7 +22,8 @@ interface Emits {
 
 const props = defineProps<Props>()
 const emit = defineEmits<Emits>()
-const inputRef = ref()
+
+const inputRef = ref<HTMLInputElement | null>()
 
 const { inputValue, emitInputEvent } = useInputModel<string, Props, Emits>(
   props,
@@ -37,7 +38,7 @@ const conditionalClasses = computed(() => ({
 const tabindex = computed(() => (props.readOnly ? -1 : 0))
 
 function focusInput() {
-  inputRef.value.focus()
+  inputRef.value?.focus()
 }
 
 defineExpose({ focusInput })
@@ -52,7 +53,7 @@ defineExpose({ focusInput })
     class="ds-input"
     :class="conditionalClasses"
     :placeholder="placeholder"
-    :readonly="$props.readOnly"
+    :readonly="readOnly"
     :tabindex="tabindex"
     type="text"
     @input="emitInputEvent"

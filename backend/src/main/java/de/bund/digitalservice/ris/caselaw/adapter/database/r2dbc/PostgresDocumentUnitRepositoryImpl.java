@@ -9,8 +9,6 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.Doc
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.NormAbbreviationDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.StateDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.StateRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.proceedingdecision.DatabaseProceedingDecisionLinkRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.proceedingdecision.ProceedingDecisionLinkDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DeviatingDecisionDateTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentUnitTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationOfficeTransformer;
@@ -23,6 +21,7 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitNorm;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitRepository;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatus;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitLinkType;
 import de.bund.digitalservice.ris.caselaw.domain.LegalEffect;
 import de.bund.digitalservice.ris.caselaw.domain.ProceedingDecision;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.court.Court;
@@ -54,7 +53,6 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
   private final FileNumberRepository fileNumberRepository;
   private final DeviatingEcliRepository deviatingEcliRepository;
   private final DatabaseDeviatingDecisionDateRepository deviatingDecisionDateRepository;
-  private final DatabaseProceedingDecisionLinkRepository proceedingDecisionLinkRepository;
   private final DatabaseIncorrectCourtRepository incorrectCourtRepository;
   private final DatabaseCourtRepository databaseCourtRepository;
   private final StateRepository stateRepository;
@@ -66,13 +64,13 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
   private final DatabaseDocumentationOfficeRepository documentationOfficeRepository;
   private final DatabaseDocumentUnitStatusRepository databaseDocumentUnitStatusRepository;
   private final DatabaseNormAbbreviationRepository normAbbreviationRepository;
+  private final DatabaseDocumentationUnitLinkRepository documentationUnitLinkRepository;
 
   public PostgresDocumentUnitRepositoryImpl(
       DatabaseDocumentUnitRepository repository,
       DatabaseDocumentUnitMetadataRepository metadataRepository,
       FileNumberRepository fileNumberRepository,
       DeviatingEcliRepository deviatingEcliRepository,
-      DatabaseProceedingDecisionLinkRepository proceedingDecisionLinkRepository,
       DatabaseDeviatingDecisionDateRepository deviatingDecisionDateRepository,
       DatabaseIncorrectCourtRepository incorrectCourtRepository,
       DatabaseCourtRepository databaseCourtRepository,
@@ -84,11 +82,11 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
       DatabaseDocumentUnitNormRepository documentUnitNormRepository,
       DatabaseDocumentationOfficeRepository documentationOfficeRepository,
       DatabaseDocumentUnitStatusRepository databaseDocumentUnitStatusRepository,
-      DatabaseNormAbbreviationRepository normAbbreviationRepository) {
+      DatabaseNormAbbreviationRepository normAbbreviationRepository,
+      DatabaseDocumentationUnitLinkRepository documentationUnitLinkRepository) {
 
     this.repository = repository;
     this.metadataRepository = metadataRepository;
-    this.proceedingDecisionLinkRepository = proceedingDecisionLinkRepository;
     this.fileNumberRepository = fileNumberRepository;
     this.deviatingEcliRepository = deviatingEcliRepository;
     this.deviatingDecisionDateRepository = deviatingDecisionDateRepository;
@@ -103,6 +101,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
     this.documentationOfficeRepository = documentationOfficeRepository;
     this.databaseDocumentUnitStatusRepository = databaseDocumentUnitStatusRepository;
     this.normAbbreviationRepository = normAbbreviationRepository;
+    this.documentationUnitLinkRepository = documentationUnitLinkRepository;
   }
 
   @Override
@@ -159,6 +158,12 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
         .flatMap(documentUnitDTO -> saveDeviatingDecisionDate(documentUnitDTO, documentUnit))
         .flatMap(documentUnitDTO -> saveIncorrectCourt(documentUnitDTO, documentUnit))
         .flatMap(documentUnitDTO -> saveNorms(documentUnitDTO, documentUnit))
+        .flatMap(this::injectStatus)
+        .flatMap(this::injectProceedingDecisions)
+        .flatMap(this::injectKeywords)
+        .flatMap(this::injectFieldsOfLaw)
+        .flatMap(this::injectNorms)
+        //        .flatMap(documentUnitDTO -> saveActiveCitations(documentUnitDTO, documentUnit))
         .map(DocumentUnitTransformer::transformDTO);
   }
 
@@ -308,22 +313,18 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
                   documentUnitNormDTO -> {
                     int index = normIndex.getAndIncrement();
                     UUID normAbbreviationId = null;
-                    DocumentUnitNorm currentNorm = documentUnitNorms.get(index);
-                    if (isEmptyNorm(currentNorm)) {
-                      toDelete.add(documentUnitNormDTO);
-                    } else {
+                    if (index < documentUnitNorms.size()) {
+                      DocumentUnitNorm currentNorm = documentUnitNorms.get(index);
                       if (currentNorm.normAbbreviation() != null) {
                         normAbbreviationId = currentNorm.normAbbreviation().id();
                       }
-                      if (index < documentUnitNorms.size()) {
-                        documentUnitNormDTO.normAbbreviationUuid = normAbbreviationId;
-                        documentUnitNormDTO.singleNorm = currentNorm.singleNorm();
-                        documentUnitNormDTO.dateOfVersion = currentNorm.dateOfVersion();
-                        documentUnitNormDTO.dateOfRelevance = currentNorm.dateOfRelevance();
-                        toSave.add(documentUnitNormDTO);
-                      } else {
-                        toDelete.add(documentUnitNormDTO);
-                      }
+                      documentUnitNormDTO.normAbbreviationUuid = normAbbreviationId;
+                      documentUnitNormDTO.singleNorm = currentNorm.singleNorm();
+                      documentUnitNormDTO.dateOfVersion = currentNorm.dateOfVersion();
+                      documentUnitNormDTO.dateOfRelevance = currentNorm.dateOfRelevance();
+                      toSave.add(documentUnitNormDTO);
+                    } else {
+                      toDelete.add(documentUnitNormDTO);
                     }
                   });
 
@@ -619,33 +620,51 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
   }
 
   private Mono<DocumentUnitDTO> injectAdditionalInformation(DocumentUnitDTO documentUnitDTO) {
-    return injectFileNumbers(documentUnitDTO)
+    return injectMetadataInformation(documentUnitDTO)
         .flatMap(this::injectDeviatingFileNumbers)
         .flatMap(this::injectProceedingDecisions)
         .flatMap(this::injectDeviatingEclis)
         .flatMap(this::injectDeviatingDecisionDates)
         .flatMap(this::injectIncorrectCourt)
-        .flatMap(this::injectDocumentType)
         .flatMap(this::injectKeywords)
         .flatMap(this::injectNorms)
         .flatMap(this::injectFieldsOfLaw)
         .flatMap(this::injectDocumentationOffice)
-        .flatMap(this::injectStatus);
+        .flatMap(this::injectStatus)
+        .flatMap(this::injectActiveCitations);
+  }
+
+  private <T extends DocumentUnitMetadataDTO> Mono<T> injectMetadataInformation(
+      T documentUnitMetadataDTO) {
+    return injectFileNumbers(documentUnitMetadataDTO).flatMap(this::injectDocumentType);
   }
 
   private Mono<DocumentUnitDTO> injectProceedingDecisions(DocumentUnitDTO documentUnitDTO) {
-    return metadataRepository
-        .findAllById(
-            metadataRepository
-                .findByUuid(documentUnitDTO.uuid)
-                .map(DocumentUnitMetadataDTO::getId)
-                .flatMapMany(proceedingDecisionLinkRepository::findAllByParentDocumentUnitId)
-                .map(ProceedingDecisionLinkDTO::getChildDocumentUnitId))
-        .flatMap(this::injectAdditionalProceedingDecisionInformation)
+    return documentationUnitLinkRepository
+        .findAllByParentDocumentationUnitUuidAndType(
+            documentUnitDTO.getUuid(), DocumentationUnitLinkType.PREVIOUS_DECISION)
+        .map(DocumentationUnitLinkDTO::childDocumentationUnitUuid)
+        .flatMap(metadataRepository::findByUuid)
+        .flatMap(this::injectMetadataInformation)
         .collectList()
         .map(
-            proceedingDecisionDTOS -> {
-              documentUnitDTO.setProceedingDecisions(proceedingDecisionDTOS);
+            proceedingDecisionDTOs -> {
+              documentUnitDTO.setProceedingDecisions(proceedingDecisionDTOs);
+              return documentUnitDTO;
+            });
+  }
+
+  private Mono<DocumentUnitDTO> injectActiveCitations(DocumentUnitDTO documentUnitDTO) {
+    return documentationUnitLinkRepository
+        .findAllByParentDocumentationUnitUuidAndType(
+            documentUnitDTO.getUuid(), DocumentationUnitLinkType.ACTIVE_CITATION)
+        .map(DocumentationUnitLinkDTO::childDocumentationUnitUuid)
+        .flatMap(metadataRepository::findByUuid)
+        .flatMap(this::injectMetadataInformation)
+        .collectList()
+        .map(
+            activeCitationDTOs -> {
+              documentUnitDTO.setActiveCitations(activeCitationDTOs);
               return documentUnitDTO;
             });
   }
@@ -790,42 +809,6 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
             });
   }
 
-  private Mono<DocumentUnitMetadataDTO> injectAdditionalProceedingDecisionInformation(
-      DocumentUnitMetadataDTO documentUnitMetadataDTO) {
-    return injectProceedingDecisionFileNumbers(documentUnitMetadataDTO)
-        .flatMap(this::injectProceedingDecisionDocumentType);
-  }
-
-  private Mono<DocumentUnitMetadataDTO> injectProceedingDecisionFileNumbers(
-      DocumentUnitMetadataDTO documentUnitMetadataDTO) {
-    return fileNumberRepository
-        .findAllByDocumentUnitId(documentUnitMetadataDTO.getId())
-        .collectList()
-        .map(
-            fileNumbers -> {
-              documentUnitMetadataDTO.setFileNumbers(
-                  fileNumbers.stream()
-                      .filter(fileNumberDTO -> !fileNumberDTO.getIsDeviating())
-                      .toList());
-              return documentUnitMetadataDTO;
-            });
-  }
-
-  private Mono<DocumentUnitMetadataDTO> injectProceedingDecisionDocumentType(
-      DocumentUnitMetadataDTO documentUnitMetadataDTO) {
-    if (documentUnitMetadataDTO.getDocumentTypeId() == null) {
-      return Mono.just(documentUnitMetadataDTO);
-    }
-    return databaseDocumentTypeRepository
-        .findById(documentUnitMetadataDTO.getDocumentTypeId())
-        .defaultIfEmpty(DocumentTypeDTO.builder().build())
-        .map(
-            documentTypeDTO -> {
-              documentUnitMetadataDTO.setDocumentTypeDTO(documentTypeDTO);
-              return documentUnitMetadataDTO;
-            });
-  }
-
   private <T extends DocumentUnitMetadataDTO> Mono<T> injectStatus(T documentUnitDTO) {
     return Mono.just(documentUnitDTO)
         .flatMap(
@@ -856,10 +839,10 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
               Long[] documentUnitDTOIdsViaFileNumber =
                   convertListToArrayOrReturnNull(tuple.getT1());
               if (documentUnitDTOIdsViaFileNumber == null
-                  && proceedingDecision.fileNumber() != null) return Flux.empty();
+                  && proceedingDecision.getFileNumber() != null) return Flux.empty();
 
               Long documentTypeDTOId = tuple.getT2() == -1L ? null : tuple.getT2();
-              if (documentTypeDTOId == null && proceedingDecision.documentType() != null)
+              if (documentTypeDTOId == null && proceedingDecision.getDocumentType() != null)
                 return Flux.empty();
 
               return metadataRepository.findByCourtDateFileNumberAndDocumentType(
@@ -885,10 +868,10 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
               Long[] documentUnitDTOIdsViaFileNumber =
                   convertListToArrayOrReturnNull(tuple.getT1());
               if (documentUnitDTOIdsViaFileNumber == null
-                  && proceedingDecision.fileNumber() != null) return Mono.just(0L);
+                  && proceedingDecision.getFileNumber() != null) return Mono.just(0L);
 
               Long documentTypeDTOId = tuple.getT2() == -1L ? null : tuple.getT2();
-              if (documentTypeDTOId == null && proceedingDecision.documentType() != null)
+              if (documentTypeDTOId == null && proceedingDecision.getDocumentType() != null)
                 return Mono.just(0L);
 
               return metadataRepository.countByCourtDateFileNumberAndDocumentType(
@@ -901,27 +884,27 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
   }
 
   private String extractCourtType(ProceedingDecision proceedingDecision) {
-    return Optional.ofNullable(proceedingDecision.court()).map(Court::type).orElse(null);
+    return Optional.ofNullable(proceedingDecision.getCourt()).map(Court::type).orElse(null);
   }
 
   private String extractCourtLocation(ProceedingDecision proceedingDecision) {
-    return Optional.ofNullable(proceedingDecision.court()).map(Court::location).orElse(null);
+    return Optional.ofNullable(proceedingDecision.getCourt()).map(Court::location).orElse(null);
   }
 
   private Instant extractDecisionDate(ProceedingDecision proceedingDecision) {
-    return Optional.ofNullable(proceedingDecision.date())
+    return Optional.ofNullable(proceedingDecision.getDecisionDate())
         .map(date -> date.atZone(ZoneId.of("UTC")).toInstant())
         .orElse(null);
   }
 
   private Flux<Long> extractDocumentUnitDTOIdsViaFileNumber(ProceedingDecision proceedingDecision) {
     return fileNumberRepository
-        .findByFileNumber(proceedingDecision.fileNumber())
+        .findByFileNumber(proceedingDecision.getFileNumber())
         .map(FileNumberDTO::getDocumentUnitId);
   }
 
   private Mono<Long> extractDocumentTypeDTOId(ProceedingDecision proceedingDecision) {
-    return Mono.justOrEmpty(proceedingDecision.documentType())
+    return Mono.justOrEmpty(proceedingDecision.getDocumentType())
         .map(DocumentType::jurisShortcut)
         .flatMap(databaseDocumentTypeRepository::findByJurisShortcut)
         .mapNotNull(DocumentTypeDTO::getId)
@@ -967,25 +950,20 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
   }
 
   @Override
-  public Flux<ProceedingDecision> findAllLinkedDocumentUnitsByParentDocumentUnitId(
-      UUID parentDocumentUnitUuid) {
-    return metadataRepository
-        .findAllById(
-            metadataRepository
-                .findByUuid(parentDocumentUnitUuid)
-                .map(DocumentUnitMetadataDTO::getId)
-                .flatMapMany(proceedingDecisionLinkRepository::findAllByParentDocumentUnitId)
-                .map(ProceedingDecisionLinkDTO::getChildDocumentUnitId))
+  public Flux<ProceedingDecision> findAllLinkedDocumentUnitsByParentDocumentUnitIdAndType(
+      UUID parentDocumentUnitUuid, DocumentationUnitLinkType type) {
+    return documentationUnitLinkRepository
+        .findAllByParentDocumentationUnitUuidAndType(parentDocumentUnitUuid, type)
+        .map(DocumentationUnitLinkDTO::childDocumentationUnitUuid)
+        .flatMap(metadataRepository::findByUuid)
         .flatMap(this::injectAdditionalInformation)
         .map(ProceedingDecisionTransformer::transformToDomain);
   }
 
   @Override
   public Mono<DocumentUnit> filterUnlinkedDocumentUnit(DocumentUnit documentUnit) {
-    return metadataRepository
-        .findByUuid(documentUnit.uuid())
-        .map(DocumentUnitMetadataDTO::getId)
-        .flatMap(proceedingDecisionLinkRepository::existsByChildDocumentUnitId)
+    return documentationUnitLinkRepository
+        .existsByChildDocumentationUnitUuid(documentUnit.uuid())
         .filter(isLinked -> !isLinked)
         .map(isLinked -> documentUnit);
   }
@@ -999,49 +977,39 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
 
   @Override
   public Mono<DocumentUnit> linkDocumentUnits(
-      UUID parentDocumentUnitUuid, UUID childDocumentUnitUuid) {
-    Mono<Long> parentDocumentUnitId =
-        metadataRepository.findByUuid(parentDocumentUnitUuid).map(DocumentUnitMetadataDTO::getId);
-    Mono<Long> childDocumentUnitId =
-        metadataRepository.findByUuid(childDocumentUnitUuid).map(DocumentUnitMetadataDTO::getId);
+      UUID parentDocumentUnitUuid, UUID childDocumentUnitUuid, DocumentationUnitLinkType type) {
 
-    return Mono.zip(parentDocumentUnitId, childDocumentUnitId)
-        .flatMap(
-            tuple ->
-                proceedingDecisionLinkRepository
-                    .save(
-                        ProceedingDecisionLinkDTO.builder()
-                            .parentDocumentUnitId(tuple.getT1())
-                            .childDocumentUnitId(tuple.getT2())
-                            .build())
-                    .map(ProceedingDecisionLinkDTO::getParentDocumentUnitId)
-                    .flatMap(repository::findById)
-                    .flatMap(this::injectAdditionalInformation)
-                    .map(DocumentUnitTransformer::transformDTO));
+    DocumentationUnitLinkDTO documentationUnitLinkDTO =
+        DocumentationUnitLinkDTO.builder()
+            .parentDocumentationUnitUuid(parentDocumentUnitUuid)
+            .childDocumentationUnitUuid(childDocumentUnitUuid)
+            .type(type)
+            .build();
+
+    return documentationUnitLinkRepository
+        .save(documentationUnitLinkDTO)
+        .map(DocumentationUnitLinkDTO::parentDocumentationUnitUuid)
+        .flatMap(repository::findByUuid)
+        .flatMap(this::injectAdditionalInformation)
+        .map(DocumentUnitTransformer::transformDTO);
   }
 
   @Override
-  public Mono<Void> unlinkDocumentUnits(UUID parentDocumentUnitUuid, UUID childDocumentUnitUuid) {
-    Mono<Long> parentDocumentUnitId =
-        metadataRepository.findByUuid(parentDocumentUnitUuid).map(DocumentUnitMetadataDTO::getId);
-    Mono<Long> childDocumentUnitId =
-        metadataRepository.findByUuid(childDocumentUnitUuid).map(DocumentUnitMetadataDTO::getId);
+  public Mono<Void> unlinkDocumentUnits(
+      UUID parentDocumentationUnitUuid,
+      UUID childDocumentationUnitUuid,
+      DocumentationUnitLinkType type) {
 
-    return Mono.zip(parentDocumentUnitId, childDocumentUnitId)
-        .flatMap(
-            tuple ->
-                proceedingDecisionLinkRepository
-                    .findByParentDocumentUnitIdAndChildDocumentUnitId(tuple.getT1(), tuple.getT2())
-                    .map(ProceedingDecisionLinkDTO::getId)
-                    .flatMap(proceedingDecisionLinkRepository::deleteById));
+    return documentationUnitLinkRepository
+        .findByParentDocumentationUnitUuidAndChildDocumentationUnitUuidAndType(
+            parentDocumentationUnitUuid, childDocumentationUnitUuid, type)
+        .map(DocumentationUnitLinkDTO::id)
+        .flatMap(documentationUnitLinkRepository::deleteById);
   }
 
   @Override
   public Mono<Long> countLinksByChildDocumentUnitUuid(UUID childDocumentUnitUuid) {
-    return repository
-        .findByUuid(childDocumentUnitUuid)
-        .map(DocumentUnitMetadataDTO::getId)
-        .flatMap(proceedingDecisionLinkRepository::countByChildDocumentUnitId);
+    return documentationUnitLinkRepository.countByChildDocumentationUnitUuid(childDocumentUnitUuid);
   }
 
   @Override

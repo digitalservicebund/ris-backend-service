@@ -21,11 +21,8 @@ const publishResult = ref<XmlMail>()
 const errorMessage = ref<ResponseError>()
 const succeedMessage = ref<{ title: string; description: string }>()
 
-async function publishADocument(email: string) {
-  const response = await publishService.publishDocument(
-    props.documentUnit.uuid,
-    email
-  )
+async function publishADocument() {
+  const response = await publishService.publishDocument(props.documentUnit.uuid)
   publishResult.value = response.data
   if (response.data && Number(response.data?.statusCode) < 300) {
     lastPublishedXmlMail.value = response.data
@@ -98,7 +95,7 @@ onMounted(async () => {
           :last-published-xml-mail="lastPublishedXmlMail"
           :publish-result="publishResult"
           :succeed-message="succeedMessage"
-          @publish-a-document="publishADocument($event)"
+          @publish-a-document="publishADocument"
         />
 
         <div v-else class="spinner">

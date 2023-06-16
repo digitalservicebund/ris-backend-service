@@ -1,6 +1,7 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
 import de.bund.digitalservice.ris.caselaw.domain.LookupTableService;
+import de.bund.digitalservice.ris.caselaw.domain.lookuptable.citation.CitationStyle;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.court.Court;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
 import java.util.Optional;
@@ -31,5 +32,11 @@ public class LookupTableController {
   @GetMapping(value = "courts")
   public Flux<Court> getCourts(@RequestParam(value = "q") Optional<String> searchStr) {
     return service.getCourts(searchStr);
+  }
+
+  @GetMapping(value = "zitart")
+  public Flux<CitationStyle> getCitationStyles(
+      @RequestParam(value = "q") Optional<String> searchStr) {
+    return service.getCitationStyles(searchStr);
   }
 }

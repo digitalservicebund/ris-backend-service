@@ -24,7 +24,7 @@ const props = defineProps<{
   proceedingDecisions?: ProceedingDecision[]
 }>()
 
-const proceedingDecisions = ref<ProceedingDecision[]>()
+const localProceedingDecisions = ref<ProceedingDecision[]>()
 
 const searchResults = ref<SearchResults>()
 const searchResultsCurrentPage = ref<Page<ProceedingDecision>>()
@@ -33,11 +33,11 @@ const input = ref<ProceedingDecision>(new ProceedingDecision())
 
 function isNotEmpty({
   court,
-  date,
+  decisionDate,
   fileNumber,
   documentType,
 }: ProceedingDecision): boolean {
-  return [court, date, fileNumber, documentType].some(
+  return [court, decisionDate, fileNumber, documentType].some(
     (property) => property != undefined
   )
 }
@@ -51,7 +51,7 @@ async function createProceedingDecision(
       proceedingDecision
     )
     if (response.data) {
-      proceedingDecisions.value = response.data
+      localProceedingDecisions.value = response.data
     } else {
       console.error(response.error)
     }
@@ -69,7 +69,7 @@ async function linkProceedingDecision(childUuid: string) {
     childUuid
   )
   if (response.data) {
-    proceedingDecisions.value = response.data
+    localProceedingDecisions.value = response.data
 
     updateSearchResultsLinkStatus(childUuid)
   } else {
@@ -84,7 +84,7 @@ async function removeProceedingDecision(decision: ProceedingDecision) {
     decision.uuid as string
   )
   if (response.data) {
-    proceedingDecisions.value = proceedingDecisions.value?.filter(
+    localProceedingDecisions.value = localProceedingDecisions.value?.filter(
       (listItem) => listItem.uuid !== decision.uuid
     )
     updateSearchResultsLinkStatus(decision.uuid as string)
@@ -94,9 +94,9 @@ async function removeProceedingDecision(decision: ProceedingDecision) {
 }
 
 function isLinked(decision: ProceedingDecision): boolean {
-  if (!proceedingDecisions.value) return false
+  if (!localProceedingDecisions.value) return false
 
-  return proceedingDecisions.value.some(
+  return localProceedingDecisions.value.some(
     (proceedingDecision) => proceedingDecision.uuid == decision.uuid
   )
 }
@@ -154,7 +154,7 @@ const DecisionSummary = withSummarizer(decisionSummarizer)
 watch(
   props,
   () => {
-    proceedingDecisions.value = props.proceedingDecisions
+    localProceedingDecisions.value = props.proceedingDecisions
   },
   {
     immediate: true,
@@ -164,7 +164,7 @@ watch(
 watch(
   input,
   () => {
-    if (!input.value.dateKnown) input.value.date = undefined
+    if (!input.value.dateKnown) input.value.decisionDate = undefined
   },
   {
     immediate: true,
@@ -178,14 +178,14 @@ watch(
     <h1 class="heading-02-regular mb-[1rem]">Rechtszug</h1>
     <ExpandableDataSet
       as-column
-      :data-set="proceedingDecisions"
+      :data-set="localProceedingDecisions"
       fallback-text="Noch keine vorhergehende Entscheidung hinzugefügt."
       :summary-component="DecisionSummary"
       title="Vorgehende Entscheidungen"
     >
       <DecisionList
-        v-if="proceedingDecisions"
-        :decisions="proceedingDecisions"
+        v-if="localProceedingDecisions"
+        :decisions="localProceedingDecisions"
         @remove-link="removeProceedingDecision"
       />
 
@@ -208,8 +208,8 @@ watch(
           <div class="fake-input-group__row__field flex-col">
             <InputField id="date" class="w-full" label="Entscheidungsdatum *">
               <DateInput
-                id="date"
-                v-model="input.date"
+                id="decisionDate"
+                v-model="input.decisionDate"
                 aria-label="Entscheidungsdatum Rechtszug"
                 :disabled="input.dateUnknown"
               ></DateInput>

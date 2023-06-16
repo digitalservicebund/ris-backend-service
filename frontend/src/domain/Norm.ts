@@ -71,6 +71,17 @@ export enum MetadatumType {
   TEMPLATE_NAME = "TEMPLATE_NAME",
   UNDEFINED_DATE = "UNDEFINED_DATE",
   TEXT = "TEXT",
+  LINK = "LINK",
+  RELATED_DATA = "RELATED_DATA",
+  EXTERNAL_DATA_NOTE = "EXTERNAL_DATA_NOTE",
+  APPENDIX = "APPENDIX",
+  FOOTNOTE_REFERENCE = "FOOTNOTE_REFERENCE",
+  FOOTNOTE_CHANGE = "FOOTNOTE_CHANGE",
+  FOOTNOTE_COMMENT = "FOOTNOTE_COMMENT",
+  FOOTNOTE_DECISION = "FOOTNOTE_DECISION",
+  FOOTNOTE_STATE_LAW = "FOOTNOTE_STATE_LAW",
+  FOOTNOTE_EU_LAW = "FOOTNOTE_EU_LAW",
+  FOOTNOTE_OTHER = "FOOTNOTE_OTHER",
 }
 
 export enum NormCategory {
@@ -124,6 +135,17 @@ export type MetadataValueType = {
   [MetadatumType.TEMPLATE_NAME]: string
   [MetadatumType.UNDEFINED_DATE]: UndefinedDate
   [MetadatumType.TEXT]: string
+  [MetadatumType.LINK]: string
+  [MetadatumType.RELATED_DATA]: string
+  [MetadatumType.EXTERNAL_DATA_NOTE]: string
+  [MetadatumType.APPENDIX]: string
+  [MetadatumType.FOOTNOTE_REFERENCE]: string
+  [MetadatumType.FOOTNOTE_CHANGE]: string
+  [MetadatumType.FOOTNOTE_COMMENT]: string
+  [MetadatumType.FOOTNOTE_DECISION]: string
+  [MetadatumType.FOOTNOTE_STATE_LAW]: string
+  [MetadatumType.FOOTNOTE_EU_LAW]: string
+  [MetadatumType.FOOTNOTE_OTHER]: string
 }
 
 export type Metadata = {
@@ -155,6 +177,8 @@ export enum MetadataSectionName {
   PRINCIPLE_ENTRY_INTO_FORCE = "PRINCIPLE_ENTRY_INTO_FORCE",
   EXPIRATION = "EXPIRATION",
   PRINCIPLE_EXPIRATION = "PRINCIPLE_EXPIRATION",
+  DIGITAL_EVIDENCE = "DIGITAL_EVIDENCE",
+  FOOTNOTES = "FOOTNOTES",
 }
 
 export type MetadataSections = {
@@ -168,10 +192,6 @@ export type FlatMetadata = {
   categorizedReference?: string
   celexNumber?: string
   completeCitation?: string
-  digitalEvidenceAppendix?: string
-  digitalEvidenceExternalDataNote?: string
-  digitalEvidenceLink?: string
-  digitalEvidenceRelatedData?: string
   documentCategory?: string
   documentNumber?: string
   documentStatusDate?: string

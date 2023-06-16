@@ -51,10 +51,6 @@ class NormBuilder {
     var footnoteDecision = randomString()
     var footnoteStateLaw = randomString()
     var footnoteEuLaw = randomString()
-    var digitalEvidenceLink = randomString()
-    var digitalEvidenceRelatedData = randomString()
-    var digitalEvidenceExternalDataNote = randomString()
-    var digitalEvidenceAppendix = randomString()
     var celexNumber = randomString()
     var text = randomString()
 
@@ -110,10 +106,6 @@ class NormBuilder {
         footnoteDecision = footnoteDecision,
         footnoteStateLaw = footnoteStateLaw,
         footnoteEuLaw = footnoteEuLaw,
-        digitalEvidenceLink = digitalEvidenceLink,
-        digitalEvidenceRelatedData = digitalEvidenceRelatedData,
-        digitalEvidenceExternalDataNote = digitalEvidenceExternalDataNote,
-        digitalEvidenceAppendix = digitalEvidenceAppendix,
         celexNumber = celexNumber,
         text = text,
     )

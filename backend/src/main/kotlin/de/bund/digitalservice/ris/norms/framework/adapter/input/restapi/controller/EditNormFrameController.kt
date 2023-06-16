@@ -89,11 +89,6 @@ class EditNormFrameController(private val editNormFrameService: EditNormFrameUse
         var footnoteStateLaw: String? = null
         var footnoteEuLaw: String? = null
 
-        var digitalEvidenceLink: String? = null
-        var digitalEvidenceRelatedData: String? = null
-        var digitalEvidenceExternalDataNote: String? = null
-        var digitalEvidenceAppendix: String? = null
-
         var eli: String? = null
 
         var celexNumber: String? = null
@@ -141,10 +136,6 @@ class EditNormFrameController(private val editNormFrameService: EditNormFrameUse
             this.footnoteDecision,
             this.footnoteStateLaw,
             this.footnoteEuLaw,
-            this.digitalEvidenceLink,
-            this.digitalEvidenceRelatedData,
-            this.digitalEvidenceExternalDataNote,
-            this.digitalEvidenceAppendix,
             this.celexNumber,
             this.text,
         )

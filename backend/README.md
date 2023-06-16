@@ -37,7 +37,7 @@ Some dropdown menus in the frontend get populated via calls to the backend that 
 
 To import the XML files, follow these steps:
 
-- Download the XML files `doktyp.xml`, `gerichtdata_gesamt.xml`, `buland.xml`, `sachneudata_gesamt.xml` (Link in the Engineering Onboarding Wiki)
+- Download the XML files `doktyp.xml`, `gerichtdata_gesamt.xml`, `buland.xml`, `sachneudata_gesamt.xml`, `zitartdata_gesamt.xml` (Link in the Engineering Onboarding Wiki)
 - Start the application (see [root README](../README.md)), open it in your browser and log in
 - Copy the `SESSION` cookie value from the Browser Developer Tools --> Application Tab --> Cookies
   (If you prefer using Postman, it also supports [importing cookies](https://github.com/digitalservicebund/ris-backend-service/commit/69684a3872ce9875484761fcb18f3367d0143bce#commitcomment-99597762) from your browser.)
@@ -56,6 +56,7 @@ curl -v -X PUT -H 'Content-Type: application/xml' -H "cookie: SESSION=$SESSION_V
 curl -v -X PUT -H 'Content-Type: application/xml' -H "cookie: SESSION=$SESSION_VALUE" --data "@$PATH_TO_XML_FILES/gerichtdata_gesamt.xml" http://127.0.0.1/api/v1/caselaw/lookuptableimporter/gerichtdata
 curl -v -X PUT -H 'Content-Type: application/xml' -H "cookie: SESSION=$SESSION_VALUE" --data "@$PATH_TO_XML_FILES/buland.xml" http://127.0.0.1/api/v1/caselaw/lookuptableimporter/buland
 curl -v -X PUT -H 'Content-Type: application/xml' -H "cookie: SESSION=$SESSION_VALUE" --data "@$PATH_TO_XML_FILES/sachneudata_gesamt.xml" http://127.0.0.1/api/v1/caselaw/lookuptableimporter/fieldOfLaw
+curl -v -X PUT -H 'Content-Type: application/xml' -H "cookie: SESSION=$SESSION_VALUE" --data "@$PATH_TO_XML_FILES/zitartdata_gesamt.xml" http://127.0.0.1/api/v1/caselaw/lookuptableimporter/zitart
 ```
 
 ### Database Setup & Migration with Flyway

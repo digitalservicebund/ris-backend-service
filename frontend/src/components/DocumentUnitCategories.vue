@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, onMounted, onUnmounted, toRefs, watch } from "vue"
+import { computed, ref, onMounted, toRefs, watch } from "vue"
 import { useRoute, useRouter } from "vue-router"
 import DocumentUnitContentRelatedIndexing from "@/components/DocumentUnitContentRelatedIndexing.vue"
 import DocumentUnitCoreData from "@/components/DocumentUnitCoreData.vue"
@@ -7,12 +7,13 @@ import DocumentUnitTexts from "@/components/DocumentUnitTexts.vue"
 import DocumentUnitWrapper from "@/components/DocumentUnitWrapper.vue"
 import OriginalFileSidePanel from "@/components/OriginalFileSidePanel.vue"
 import DocumentUnitProceedingDecision from "@/components/proceedingDecisions/ProceedingDecisions.vue"
+import SaveButton from "@/components/SaveDocumentUnitButton.vue"
 import { useScrollToHash } from "@/composables/useScrollToHash"
 import { useToggleStateInRouteQuery } from "@/composables/useToggleStateInRouteQuery"
 import DocumentUnit, { Texts } from "@/domain/documentUnit"
-import { UpdateStatus } from "@/enum/enumUpdateStatus"
 import documentUnitService from "@/services/documentUnitService"
 import fileService from "@/services/fileService"
+import { ServiceResponse } from "@/services/httpClient"
 import { ValidationError } from "@/shared/components/input/types"
 import SideToggle, {
   OpeningDirection,
@@ -22,6 +23,16 @@ const props = defineProps<{
   documentUnit: DocumentUnit
 }>()
 const updatedDocumentUnit = ref<DocumentUnit>(props.documentUnit)
+const validationErrors = ref<ValidationError[]>([])
+const router = useRouter()
+const route = useRoute()
+const fileAsHTML = ref("")
+const showDocPanel = useToggleStateInRouteQuery(
+  "showDocPanel",
+  route,
+  router.replace,
+  false
+)
 
 const handleUpdateValueDocumentUnitTexts = async (
   updatedValue: [keyof Texts, string]
@@ -35,8 +46,7 @@ const handleUpdateValueDocumentUnitTexts = async (
     hasInnerText || hasImgElem || hasTable ? updatedValue[1] : ""
 }
 
-const handleUpdateDocumentUnit = async () => {
-  updateStatus.value = UpdateStatus.ON_UPDATE
+async function handleUpdateDocumentUnit(): Promise<ServiceResponse<void>> {
   const response = await documentUnitService.update(
     updatedDocumentUnit.value as DocumentUnit
   )
@@ -48,26 +58,8 @@ const handleUpdateDocumentUnit = async () => {
   if (response.data) {
     updatedDocumentUnit.value = response.data as DocumentUnit
   }
-  hasDataChange.value = false
-  lastUpdatedDocumentUnit.value = JSON.stringify(updatedDocumentUnit.value)
-  updateStatus.value = response.status
+  return response as ServiceResponse<void>
 }
-const router = useRouter()
-const route = useRoute()
-
-const isOnline = ref(navigator.onLine)
-const validationErrors = ref<ValidationError[]>([])
-const updateStatus = ref(UpdateStatus.BEFORE_UPDATE)
-const lastUpdatedDocumentUnit = ref(JSON.stringify(props.documentUnit))
-const fileAsHTML = ref("")
-const automaticUpload = ref()
-const hasDataChange = ref(false)
-const showDocPanel = useToggleStateInRouteQuery(
-  "showDocPanel",
-  route,
-  router.replace,
-  false
-)
 
 watch(
   showDocPanel,
@@ -80,7 +72,6 @@ watch(
 )
 
 const coreData = computed({
-  // get: () => props.documentUnit.coreData,
   get: () => updatedDocumentUnit.value.coreData,
   set: (newValues) => {
     let triggerSaving = false
@@ -110,87 +101,39 @@ async function getOriginalDocumentUnit() {
   if (fileAsHTML.value.length > 0) return
   if (props.documentUnit.s3path) {
     const htmlResponse = await fileService.getDocxFileAsHtml(
-      props.documentUnit.s3path
+      props.documentUnit.uuid
     )
     if (htmlResponse.error === undefined) fileAsHTML.value = htmlResponse.data
   }
 }
 
-/** Overwrite ctrl + S to update documentUnit */
-const handleUpdateDocumentUnitWithShortCut = async (event: KeyboardEvent) => {
-  const OS = navigator.userAgent.indexOf("Mac") != -1 ? "Mac" : "Window"
-  if (OS === "Mac") {
-    if (!event.metaKey) return
-    if (event.key !== "s") return
-    await handleUpdateDocumentUnit()
-    event.preventDefault()
-  } else {
-    if (!event.ctrlKey) return
-    if (event.key !== "s") return
-    await handleUpdateDocumentUnit()
-    event.preventDefault()
-  }
-}
-
-// Time interval to automatic update documentUnit every 10sec
-// Only update documentUnit when there is any change after 10sec and last update is done
-const autoUpdate = () => {
-  automaticUpload.value = setInterval(async () => {
-    hasDataChange.value =
-      JSON.stringify(updatedDocumentUnit.value) !==
-      lastUpdatedDocumentUnit.value
-    if (
-      isOnline.value &&
-      hasDataChange.value &&
-      updateStatus.value !== UpdateStatus.ON_UPDATE
-    ) {
-      await handleUpdateDocumentUnit()
-    }
-    // Offline mode
-    if (isOnline.value && !navigator.onLine) {
-      isOnline.value = false
-    }
-    if (!isOnline.value && navigator.onLine) {
-      isOnline.value = true
-      await handleUpdateDocumentUnit()
-    }
-  }, 10000)
-}
-// Clear time Interval
-const removeAutoUpdate = () => {
-  clearInterval(automaticUpload.value)
-}
-
 onMounted(async () => {
-  window.addEventListener(
-    "keydown",
-    handleUpdateDocumentUnitWithShortCut,
-    false
-  )
-  autoUpdate()
   await getOriginalDocumentUnit()
-})
-onUnmounted(() => {
-  window.removeEventListener("keydown", handleUpdateDocumentUnitWithShortCut)
-  removeAutoUpdate()
 })
 </script>
 
 <template>
   <DocumentUnitWrapper :document-unit="(updatedDocumentUnit as DocumentUnit)">
     <template #default="{ classes }">
+      <div
+        class="-mt-96 grid h-[6rem] justify-items-end pb-8 pr-[2rem] sticky top-[2rem] w-full z-30"
+      >
+        <SaveButton
+          aria-label="Speichern Button"
+          :service-callback="handleUpdateDocumentUnit"
+        />
+      </div>
+
       <div class="flex flex-grow w-full">
         <div class="bg-gray-100 flex flex-col" :class="classes">
           <DocumentUnitCoreData
             id="coreData"
             v-model="coreData"
-            :update-status="updateStatus"
             :validation-errors="
               validationErrors.filter(
                 (err) => err.field.split('\.')[0] === 'coreData'
               )
             "
-            @update-document-unit="handleUpdateDocumentUnit"
           />
 
           <DocumentUnitProceedingDecision
@@ -208,8 +151,6 @@ onUnmounted(() => {
           <DocumentUnitTexts
             id="texts"
             :texts="documentUnit.texts"
-            :update-status="updateStatus"
-            @update-document-unit="handleUpdateDocumentUnit"
             @update-value="handleUpdateValueDocumentUnitTexts"
           />
         </div>
@@ -220,7 +161,7 @@ onUnmounted(() => {
         >
           <SideToggle
             v-model:is-expanded="showDocPanel"
-            class="sticky top-[96px] z-20"
+            class="sticky top-[8rem] z-20"
             label="Originaldokument"
             :opening-direction="OpeningDirection.LEFT"
           >

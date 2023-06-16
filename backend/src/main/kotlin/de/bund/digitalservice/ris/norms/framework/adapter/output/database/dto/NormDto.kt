@@ -98,15 +98,6 @@ data class NormDto(
     @Column("footnote_eu_law")
     var footnoteEuLaw: String? = null,
 
-    @Column("digital_evidence_link")
-    var digitalEvidenceLink: String? = null,
-    @Column("digital_evidence_related_data")
-    var digitalEvidenceRelatedData: String? = null,
-    @Column("digital_evidence_external_data_note")
-    var digitalEvidenceExternalDataNote: String? = null,
-    @Column("digital_evidence_appendix")
-    var digitalEvidenceAppendix: String? = null,
-
     @Column("celex_number")
     var celexNumber: String? = null,
 

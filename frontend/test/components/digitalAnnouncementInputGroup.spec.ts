@@ -28,7 +28,7 @@ function getControls() {
   }) as HTMLInputElement
 
   const pageInput = screen.queryByRole("textbox", {
-    name: "Seitenzahlen",
+    name: "Seitenzahl",
   }) as HTMLInputElement
 
   const areaOfPublicationInput = screen.queryByRole("textbox", {

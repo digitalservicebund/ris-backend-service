@@ -12,9 +12,7 @@ import { fieldLabels } from "@/fields/caselaw"
 import { ResponseError } from "@/services/httpClient"
 import { InfoStatus } from "@/shared/components/enumInfoStatus"
 import InfoModal from "@/shared/components/InfoModal.vue"
-import InputField from "@/shared/components/input/InputField.vue"
 import TextButton from "@/shared/components/input/TextButton.vue"
-import TextInput from "@/shared/components/input/TextInput.vue"
 
 const props = defineProps<{
   documentUnit: DocumentUnit
@@ -25,15 +23,13 @@ const props = defineProps<{
 }>()
 
 const emits = defineEmits<{
-  (e: "publishADocument", newValue: string): void
+  (e: "publishADocument"): void
 }>()
 
 const categoriesRoute = computed(() => ({
   name: "caselaw-documentUnit-:documentNumber-categories",
   params: { documentNumber: props.documentUnit.documentNumber },
 }))
-const receiverAddress = ref("dokmbx@juris.de")
-const emailAddressInvalid = ref(false)
 const isFirstTimePublication = computed(() => {
   return !props.lastPublishedXmlMail
 })
@@ -49,24 +45,8 @@ function publishDocumentUnit() {
         "Die Dokumentationseinheit kann nicht veröffentlicht werden.",
     }
   }
-  if (validateEmailAddress()) {
-    emailAddressInvalid.value = false
-    emits("publishADocument", receiverAddress.value)
-  } else {
-    emailAddressInvalid.value = true
-  }
-}
 
-function validateEmailAddress(): boolean {
-  // deactivate sonar for this line because it's the best regex for checking of email addresses
-  const EMAIL_REGEX =
-    /(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9]))\.){3}(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9])|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])/ // NOSONAR
-
-  return EMAIL_REGEX.test(receiverAddress.value)
-}
-
-function selectAll(event: Event) {
-  ;(event.target as HTMLInputElement).select()
+  emits("publishADocument")
 }
 
 //Required Core Data fields
@@ -139,7 +119,7 @@ const fieldsMissing = computed(() =>
     <h1 class="heading-02-regular">Veröffentlichen</h1>
     <div aria-label="Plausibilitätsprüfung" class="flex flex-row gap-16">
       <div class="w-[15.625rem]">
-        <p class="subheading">1. Plausibilitätsprüfung</p>
+        <p class="subheading">Plausibilitätsprüfung</p>
       </div>
       <div v-if="fieldsMissing" class="flex flex-row gap-8">
         <div>
@@ -220,29 +200,6 @@ const fieldsMissing = computed(() =>
       <div v-else class="flex flex-row gap-8">
         <span class="material-icons text-green-700"> check </span>
         <p class="body-01-reg">Alle Pflichtfelder sind korrekt ausgefüllt</p>
-      </div>
-    </div>
-    <div class="border-b-1 border-b-gray-400"></div>
-    <div class="flex flex-row gap-16">
-      <div class="w-[15.625rem]">
-        <p class="subheading">2. Empfänger der Export-Email</p>
-      </div>
-      <div class="grow">
-        <InputField
-          id="receiverAddress"
-          key="receiverAddress"
-          :error-message="
-            emailAddressInvalid ? 'E-Mail-Adresse ungültig' : undefined
-          "
-          label="Empfänger-E-Mail-Adresse:"
-        >
-          <TextInput
-            id="receiverAddress"
-            v-model="receiverAddress"
-            aria-label="Empfängeradresse E-Mail"
-            @focus="selectAll($event)"
-          />
-        </InputField>
       </div>
     </div>
     <div class="border-b-1 border-b-gray-400"></div>

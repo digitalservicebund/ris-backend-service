@@ -70,7 +70,7 @@ public class JurisXmlExporterWrapperIntegrationTest {
             ProceedingDecision.builder()
                 .uuid(UUID.randomUUID())
                 .court(new Court("courtType", "courtPlace", "courtLabel", null))
-                .date(Instant.parse("2020-05-06T00:00:00Z"))
+                .decisionDate(Instant.parse("2020-05-06T00:00:00Z"))
                 .dateKnown(true)
                 .fileNumber("fileNumber")
                 .documentType(
@@ -156,7 +156,7 @@ public class JurisXmlExporterWrapperIntegrationTest {
                 .documentNumber("documentNumber")
                 .dataSource(DataSource.NEURIS)
                 .court(new Court("courtType", "courtPlace", "courtLabel", null))
-                .date(Instant.parse("2020-04-05T00:00:00Z"))
+                .decisionDate(Instant.parse("2020-04-05T00:00:00Z"))
                 .dateKnown(true)
                 .fileNumber("fileNumber")
                 .documentType(

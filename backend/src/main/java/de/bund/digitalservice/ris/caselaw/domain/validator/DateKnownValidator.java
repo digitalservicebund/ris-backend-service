@@ -14,7 +14,7 @@ public class DateKnownValidator
   public boolean isValid(
       ProceedingDecision proceedingDecision,
       ConstraintValidatorContext constraintValidatorContext) {
-    if (!proceedingDecision.dateKnown() && proceedingDecision.date() != null) {
+    if (!proceedingDecision.isDateKnown() && proceedingDecision.getDecisionDate() != null) {
       return false;
     }
     return true;

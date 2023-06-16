@@ -5,6 +5,7 @@ import de.bund.digitalservice.ris.norms.domain.specification.Specification
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName.AGE_INDICATION
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName.CATEGORIZED_REFERENCE
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName.CITATION_DATE
+import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName.DIGITAL_EVIDENCE
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName.DIVERGENT_ENTRY_INTO_FORCE
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName.DIVERGENT_ENTRY_INTO_FORCE_UNDEFINED
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName.DIVERGENT_EXPIRATION
@@ -12,6 +13,7 @@ import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName.DIVERGE
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName.DOCUMENT_TYPE
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName.ENTRY_INTO_FORCE
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName.EXPIRATION
+import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName.FOOTNOTES
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName.LEAD
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName.NORM
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName.NORM_PROVIDER
@@ -43,6 +45,8 @@ val hasValidSections =
                 PRINCIPLE_ENTRY_INTO_FORCE,
                 EXPIRATION,
                 PRINCIPLE_EXPIRATION,
+                DIGITAL_EVIDENCE,
+                FOOTNOTES,
             )
         }
     }

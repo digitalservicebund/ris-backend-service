@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.tuple;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.anyCollection;
 import static org.mockito.Mockito.atMostOnce;
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -17,7 +18,9 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPAFieldOfLawLink
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPAFieldOfLawRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPAKeywordDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPANormDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.CitationStyleDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.CourtDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DatabaseCitationStyleRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DatabaseCourtRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DatabaseDocumentTypeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DatabaseFieldOfLawRepository;
@@ -26,10 +29,12 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.Sta
 import java.nio.ByteBuffer;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
+import org.mockito.MockedStatic;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.context.annotation.Import;
@@ -51,6 +56,8 @@ class LookupTableImporterServiceTest {
   @MockBean private DatabaseCourtRepository databaseCourtRepository;
 
   @MockBean private StateRepository stateRepository;
+
+  @MockBean private DatabaseCitationStyleRepository databaseCitationStyleRepository;
 
   @MockBean private DatabaseFieldOfLawRepository fieldOfLawRepository;
 
@@ -180,6 +187,55 @@ class LookupTableImporterServiceTest {
 
     verify(stateRepository).deleteAll();
     verify(stateRepository).saveAll(anyCollection());
+  }
+
+  @Test
+  void testImportCitationStyleLookupTable() {
+
+    UUID TEST_UUID = UUID.randomUUID();
+    List<CitationStyleDTO> citationStyleDTOS =
+        List.of(
+            CitationStyleDTO.builder()
+                .uuid(TEST_UUID)
+                .jurisId(1L)
+                .changeIndicator('N')
+                .version("1.0")
+                .documentType("R")
+                .citationDocumentType("R")
+                .jurisShortcut("Änderung")
+                .label("Änderung")
+                .newEntry(true)
+                .build());
+
+    when(databaseCitationStyleRepository.deleteAll()).thenReturn(Mono.empty());
+    when(databaseCitationStyleRepository.saveAll(citationStyleDTOS))
+        .thenReturn(Flux.fromIterable(citationStyleDTOS));
+
+    String citationStyleXml =
+        """
+            <?xml version="1.0"?>
+            <juris-table>
+              <juris-zitart id="1" aendkz="N" version="1.0">
+                <dok_dokumentart>R</dok_dokumentart>
+                <zit_dokumentart>R</zit_dokumentart>
+                <abk>Änderung</abk>
+                <bezeichnung>Änderung</bezeichnung>
+              </juris-zitart>
+            </juris-table>
+            """;
+    ByteBuffer byteBuffer = ByteBuffer.wrap(citationStyleXml.getBytes());
+
+    try (MockedStatic<UUID> mockedUUIDStatic = mockStatic(UUID.class)) {
+      mockedUUIDStatic.when(UUID::randomUUID).thenReturn(TEST_UUID);
+      StepVerifier.create(service.importCitationStyleLookupTable(byteBuffer))
+          .consumeNextWith(
+              citationStyleDTO ->
+                  assertEquals("Successfully imported the citation lookup table", citationStyleDTO))
+          .verifyComplete();
+    }
+
+    verify(databaseCitationStyleRepository).deleteAll();
+    verify(databaseCitationStyleRepository).saveAll(citationStyleDTOS);
   }
 
   @Test

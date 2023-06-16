@@ -42,7 +42,10 @@ public class DatabaseDocumentUnitStatusService implements DocumentUnitStatusServ
   }
 
   public Mono<DocumentUnit> updateStatus(
-      DocumentUnit documentUnit, DocumentUnitStatus status, Instant publishDate) {
+      DocumentUnit documentUnit,
+      DocumentUnitStatus status,
+      Instant publishDate,
+      String issuerAddress) {
     return repository
         .save(
             DocumentUnitStatusDTO.builder()
@@ -51,7 +54,17 @@ public class DatabaseDocumentUnitStatusService implements DocumentUnitStatusServ
                 .createdAt(publishDate)
                 .documentUnitId(documentUnit.uuid())
                 .status(status)
+                .issuerAddress(issuerAddress)
                 .build())
         .then(documentUnitRepository.findByUuid(documentUnit.uuid()));
+  }
+
+  public Mono<String> getIssuerAddressOfLatestStatus(String documentNumber) {
+    return documentUnitRepository
+        .findByDocumentNumber(documentNumber)
+        .flatMap(
+            documentUnit ->
+                repository.findFirstByDocumentUnitIdOrderByCreatedAtDesc(documentUnit.uuid()))
+        .map(DocumentUnitStatusDTO::getIssuerAddress);
   }
 }

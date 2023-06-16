@@ -62,7 +62,7 @@ describe("DocumentUnitProceedingDecisions", async () => {
                 location: "location1",
                 label: "label1",
               },
-              date: "2022-02-01",
+              decisionDate: "2022-02-01",
               documentType: {
                 jurisShortcut: "documentTypeShortcut1",
                 label: "documentType1",
@@ -113,7 +113,7 @@ describe("DocumentUnitProceedingDecisions", async () => {
                   location: "location1",
                   label: "label1",
                 },
-                date: "2022-02-01",
+                decisionDate: "2022-02-01",
                 documentType: {
                   jurisShortcut: "documentTypeShortcut1",
                   label: "documentType1",
@@ -126,7 +126,7 @@ describe("DocumentUnitProceedingDecisions", async () => {
                   location: "location2",
                   label: "label2",
                 },
-                date: "2022-02-02",
+                decisionDate: "2022-02-02",
                 documentType: {
                   jurisShortcut: "documentTypeShortcut2",
                   label: "documentType2",
@@ -174,7 +174,7 @@ describe("DocumentUnitProceedingDecisions", async () => {
                     location: "location1",
                     label: "label1",
                   },
-                  date: "2022-02-01",
+                  decisionDate: "2022-02-01",
                   documentType: {
                     jurisShortcut: "documentTypeShortcut1",
                     label: "documentType1",

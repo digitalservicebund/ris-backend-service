@@ -1,18 +1,26 @@
 package de.bund.digitalservice.ris.caselaw;
 
+import com.tngtech.archunit.core.domain.JavaClass;
 import com.tngtech.archunit.core.domain.JavaClass.Predicates;
 import com.tngtech.archunit.core.domain.JavaClasses;
+import com.tngtech.archunit.core.domain.JavaMethod;
+import com.tngtech.archunit.core.domain.JavaModifier;
 import com.tngtech.archunit.core.importer.ClassFileImporter;
 import com.tngtech.archunit.core.importer.ImportOption.Predefined;
+import com.tngtech.archunit.lang.ArchCondition;
 import com.tngtech.archunit.lang.ArchRule;
+import com.tngtech.archunit.lang.ConditionEvents;
+import com.tngtech.archunit.lang.SimpleConditionEvent;
 import com.tngtech.archunit.lang.syntax.ArchRuleDefinition;
 import com.tngtech.archunit.library.dependencies.SliceRule;
 import com.tngtech.archunit.library.dependencies.SlicesRuleDefinition;
+import java.util.Set;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.repository.reactive.ReactiveCrudRepository;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -148,6 +156,55 @@ class ArchitectureFitnessTest {
             .beInterfaces()
             .andShould()
             .beAssignableTo(JpaRepository.class);
+    rule.check(classes);
+  }
+
+  @Test
+  void relevantControllerEndpointsAreSecuredWithPreAuthorize() {
+    // add your classes and/or methods here if you are sure they don't need @PreAuthorize
+
+    Set<String> ignoreClasses =
+        Set.of(
+            "AuthController",
+            "FieldOfLawController",
+            "FeatureToggleController",
+            "LookupTableController",
+            "LookupTableImporterController",
+            "MailTrackingController",
+            "NormAbbreviationController");
+    Set<String> ignoreMethods =
+        Set.of(
+            "DocumentUnitController.generateNewDocumentUnit",
+            "DocumentUnitController.getAll",
+            "DocumentUnitController.searchByProceedingDecision");
+
+    ArchRule rule =
+        ArchRuleDefinition.classes()
+            .that()
+            .areAnnotatedWith(RestController.class)
+            .should(
+                new ArchCondition<>("have relevant public methods annotated with @PreAuthorize") {
+                  @Override
+                  public void check(JavaClass javaClass, ConditionEvents conditionEvents) {
+                    if (ignoreClasses.contains(javaClass.getSimpleName())) {
+                      return;
+                    }
+                    for (JavaMethod method : javaClass.getMethods()) {
+                      String methodIdentifier = javaClass.getSimpleName() + "." + method.getName();
+                      if (!ignoreMethods.contains(methodIdentifier)
+                          && method.getModifiers().contains(JavaModifier.PUBLIC)
+                          && !method.isAnnotatedWith(PreAuthorize.class)) {
+                        conditionEvents.add(
+                            new SimpleConditionEvent(
+                                method,
+                                false,
+                                String.format(
+                                    "Method %s is not annotated with @PreAuthorize",
+                                    methodIdentifier)));
+                      }
+                    }
+                  }
+                });
     rule.check(classes);
   }
 }

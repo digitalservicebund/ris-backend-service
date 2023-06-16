@@ -6,7 +6,7 @@ plugins {
   id "org.jetbrains.kotlin.plugin.spring" version "1.7.0"
   id "com.diffplug.spotless" version "6.17.0"
   id "jacoco"
-  id "org.sonarqube" version "4.0.0.2929"
+  id "org.sonarqube" version "4.2.0.3129"
   id "com.github.jk1.dependency-license-report" version "2.4"
   id "com.gorylenko.gradle-git-properties" version "2.4.1"
   id "com.adarshr.test-logger" version "3.2.0"
@@ -81,7 +81,7 @@ dependencies {
   implementation "org.springframework.session:spring-session-data-redis"
 
   // CVE-2022-3171
-  implementation "com.google.protobuf:protobuf-java:3.22.0"
+  implementation "com.google.protobuf:protobuf-java:3.23.3"
 
   // => CVE-2021-37136, CVE-2021-37137, CVE-2021-43797
   implementation("io.netty:netty-all:4.1.86.Final") {
@@ -102,7 +102,9 @@ dependencies {
   implementation "org.springframework.boot:spring-boot-starter-data-jpa"
   implementation "org.postgresql:postgresql:42.5.4"
 
-  implementation "com.sendinblue:sib-api-v3-sdk:6.0.0"
+  implementation "com.sendinblue:sib-api-v3-sdk:7.0.0"
+  // CVE-2017-1000487
+  implementation "org.codehaus.plexus:plexus-utils:3.0.16"
 
   implementation platform("software.amazon.awssdk:bom:2.20.12")
   implementation "software.amazon.awssdk:netty-nio-client"
@@ -129,13 +131,13 @@ dependencies {
   implementation "org.freehep:freehep-graphicsio-emf:2.4"
 
   // package served by private repo, requires authentication:
-  implementation("de.bund.digitalservice:neuris-juris-xml-export:0.6.0") {
+  implementation("de.bund.digitalservice:neuris-juris-xml-export:0.6.1") {
     exclude group: "org.slf4j", module: "slf4j-simple"
   }
   // for local development:
   // implementation files("../../neuris-juris-xml-export/build/libs/neuris-juris-xml-export-0.1.5.jar")
 
-  implementation("de.bund.digitalservice:ris-norms-juris-converter:0.11.1")
+  implementation("de.bund.digitalservice:ris-norms-juris-converter:0.12.2")
 
   implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.14.2"
 
@@ -226,7 +228,7 @@ task integrationTest(type: Test) {
   // So that running integration test require running unit tests first,
   // and we won"t even attempt running integration tests when there are
   // failing unit tests.
-  //  dependsOn test
+  dependsOn test
   finalizedBy jacocoTestReport
 }
 check.dependsOn integrationTest
@@ -280,7 +282,7 @@ spotless {
   }
 }
 
-sonarqube {
+sonar {
   // NOTE: sonarqube picks up combined coverage correctly without further configuration from:
   // build/reports/jacoco/test/jacocoTestReport.xml
   properties {
@@ -291,7 +293,7 @@ sonarqube {
   }
 }
 
-project.tasks["sonarqube"].dependsOn jacocoTestReport
+project.tasks["sonar"].dependsOn jacocoTestReport
 
 bootBuildImage {
   def containerRegistry = System.getenv("CONTAINER_REGISTRY") ?: "ghcr.io"

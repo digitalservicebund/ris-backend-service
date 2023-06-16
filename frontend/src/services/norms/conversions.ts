@@ -139,6 +139,17 @@ const DECODERS: MetadataValueDecoders = {
   [MetadatumType.TEMPLATE_NAME]: identity,
   [MetadatumType.UNDEFINED_DATE]: decodeUndefinedDate,
   [MetadatumType.TEXT]: identity,
+  [MetadatumType.LINK]: identity,
+  [MetadatumType.RELATED_DATA]: identity,
+  [MetadatumType.EXTERNAL_DATA_NOTE]: identity,
+  [MetadatumType.APPENDIX]: identity,
+  [MetadatumType.FOOTNOTE_REFERENCE]: identity,
+  [MetadatumType.FOOTNOTE_CHANGE]: identity,
+  [MetadatumType.FOOTNOTE_COMMENT]: identity,
+  [MetadatumType.FOOTNOTE_DECISION]: identity,
+  [MetadatumType.FOOTNOTE_STATE_LAW]: identity,
+  [MetadatumType.FOOTNOTE_EU_LAW]: identity,
+  [MetadatumType.FOOTNOTE_OTHER]: identity,
 }
 
 const ENCODERS: MetadataValueEncoders = {
@@ -185,6 +196,17 @@ const ENCODERS: MetadataValueEncoders = {
   [MetadatumType.TEMPLATE_NAME]: identity,
   [MetadatumType.UNDEFINED_DATE]: encodeUndefinedDate,
   [MetadatumType.TEXT]: identity,
+  [MetadatumType.LINK]: identity,
+  [MetadatumType.RELATED_DATA]: identity,
+  [MetadatumType.EXTERNAL_DATA_NOTE]: identity,
+  [MetadatumType.APPENDIX]: identity,
+  [MetadatumType.FOOTNOTE_REFERENCE]: identity,
+  [MetadatumType.FOOTNOTE_CHANGE]: identity,
+  [MetadatumType.FOOTNOTE_COMMENT]: identity,
+  [MetadatumType.FOOTNOTE_DECISION]: identity,
+  [MetadatumType.FOOTNOTE_STATE_LAW]: identity,
+  [MetadatumType.FOOTNOTE_EU_LAW]: identity,
+  [MetadatumType.FOOTNOTE_OTHER]: identity,
 }
 
 /**
@@ -208,15 +230,16 @@ const ENCODERS: MetadataValueEncoders = {
  */
 function decodeMetadata(metadata: MetadatumSchema[]): Metadata {
   const grouped = groupBy(metadata, (datum) => datum.type)
-  return mapValues(grouped, (data) =>
-    data.sort(compareOrder).map((datum) => DECODERS[datum.type](datum.value))
-  )
+  return mapValues(grouped, (data) => {
+    const sortedData = data.sort(compareOrder)
+    return sortedData.map((datum) => DECODERS[datum.type](datum.value))
+  })
 }
 
 /**
  * Encodes some metadata from the domain format to the API request schema. The
  * mapping keys are used as type, also used for the encoding of the values. The
- * index within a group is used as order property. Finally all groups get merged
+ * index within a group is used as order property. Finally, all groups get merged
  * back together.
  *
  * @example
@@ -426,14 +449,6 @@ export function encodeFlatMetadata(
     ),
     celexNumber: encodeString(flatMetadata.celexNumber),
     completeCitation: encodeString(flatMetadata.completeCitation),
-    digitalEvidenceAppendix: encodeString(flatMetadata.digitalEvidenceAppendix),
-    digitalEvidenceExternalDataNote: encodeString(
-      flatMetadata.digitalEvidenceExternalDataNote
-    ),
-    digitalEvidenceLink: encodeString(flatMetadata.digitalEvidenceLink),
-    digitalEvidenceRelatedData: encodeString(
-      flatMetadata.digitalEvidenceRelatedData
-    ),
     documentCategory: encodeString(flatMetadata.documentCategory),
     documentNumber: encodeString(flatMetadata.documentNumber),
     documentStatusDate: encodeNullDate(flatMetadata.documentStatusDate),

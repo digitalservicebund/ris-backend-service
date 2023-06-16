@@ -146,15 +146,15 @@ const explanation = computed({
     </InputField>
     <InputField
       id="digitalAnnouncementPageNumber"
-      aria-label="Seitenzahlen"
+      aria-label="Seitenzahl"
       class="w-1/3"
-      label="Seitenzahlen"
+      label="Seitenzahl"
     >
       <TextInput
         id="digitalAnnouncementPageNumber"
         v-model="pageNumber"
-        alt-text="Seitenzahlen"
-        aria-label="Seitenzahlen"
+        alt-text="Seitenzahl"
+        aria-label="Seitenzahl"
       />
     </InputField>
   </div>

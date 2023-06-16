@@ -7,4 +7,6 @@ public interface UserService {
   Mono<User> getUser(OidcUser oidcUser);
 
   Mono<DocumentationOffice> getDocumentationOffice(OidcUser oidcUser);
+
+  String getEmail(OidcUser oidcUser);
 }

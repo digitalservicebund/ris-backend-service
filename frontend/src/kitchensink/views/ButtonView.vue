@@ -1,10 +1,5 @@
 <script lang="ts" setup>
-import { ref } from "vue"
-import SaveDocumentUnitButton from "@/components/SaveDocumentUnitButton.vue"
-import { UpdateStatus } from "@/enum/enumUpdateStatus"
 import TextButton from "@/shared/components/input/TextButton.vue"
-
-const updateStatus = ref(UpdateStatus)
 </script>
 
 <template>
@@ -26,8 +21,18 @@ const updateStatus = ref(UpdateStatus)
     </div>
 
     <div class="flex gap-20 items-start w-full">
-      <TextButton button-type="primary" size="small" label="Button Small" icon="close" />
-      <TextButton button-type="primary" size="medium" label="Button Medium" icon="close" />
+      <TextButton
+        button-type="primary"
+        icon="close"
+        label="Button Small"
+        size="small"
+      />
+      <TextButton
+        button-type="primary"
+        icon="close"
+        label="Button Medium"
+        size="medium"
+      />
     </div>
 
     <div class="flex gap-20 items-start w-full">
@@ -70,34 +75,6 @@ const updateStatus = ref(UpdateStatus)
       <TextButton button-type="ghost" icon="close" />
 
       <TextButton button-type="ghost" disabled label="Disabled" />
-    </div>
-
-    <div class="flex gap-20 items-start w-full">
-      <TextButton button-type="primary" label="Disabled link" disabled href="https://digitalservice.bund.de" />
-    </div>
-
-    <div class="flex flex-col gap-y-20 items-start">
-      <h2 class="heading-02-regular">Save Docunit Button</h2>
-      <p class="text-20">Status: Before update</p>
-      <SaveDocumentUnitButton
-        aria-label="Save Document Unit"
-        :update-status="updateStatus.BEFORE_UPDATE"
-      />
-      <p class="text-20">Status: On update</p>
-      <SaveDocumentUnitButton
-        aria-label="Save Document Unit"
-        :update-status="updateStatus.ON_UPDATE"
-      />
-      <p class="text-20">Status: Error</p>
-      <SaveDocumentUnitButton
-        aria-label="Save Document Unit"
-        :update-status="updateStatus.ERROR"
-      />
-      <p class="text-20">Status: Succeed</p>
-      <SaveDocumentUnitButton
-        aria-label="Save Document Unit"
-        :update-status="updateStatus.SUCCEED"
-      />
     </div>
   </div>
 </template>

@@ -1,3 +1,4 @@
+import ActiveCitation from "./activeCitation"
 import DocumentationOffice from "./documentationOffice"
 import NormReference from "./normReference"
 import ProceedingDecision from "./proceedingDecision"
@@ -21,7 +22,11 @@ export type CoreData = {
 }
 
 export type ContentRelatedIndexing = {
+  // TODO: keywords and fieldsOfLaw still have their own endpoints --> refactor
+  // keywords?: string[]
+  // fieldsOfLaw?: FieldOfLaw[]
   norms?: NormReference[]
+  activeCitations?: ActiveCitation[]
 }
 
 export type DocumentType = {

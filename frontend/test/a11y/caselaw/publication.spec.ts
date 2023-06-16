@@ -12,21 +12,12 @@ test.describe("a11y of publication page (/caselaw/documentunit/{documentNumber}/
 
   test("publication not possible", async ({ page, documentNumber }) => {
     await navigateToPublication(page, documentNumber)
-
-    await navigateToPublication(page, documentNumber)
-
-    await page
-      .locator("[aria-label='Empfängeradresse E-Mail']")
-      .fill("wrong.email")
-    await page.keyboard.down("Tab")
-
     await page
       .locator("[aria-label='Dokumentationseinheit veröffentlichen']")
       .click()
-    await page
-      .locator("[aria-label='Dokumentationseinheit veröffentlichen']")
-      .click()
-    await expect(page.locator("text=E-Mail-Adresse ungültig")).toBeVisible()
+    await expect(
+      page.locator("text=Es sind noch nicht alle Pflichtfelder befüllt.")
+    ).toBeVisible()
 
     const accessibilityScanResults = await new AxeBuilder({ page }).analyze()
     expect(accessibilityScanResults.violations).toEqual([])

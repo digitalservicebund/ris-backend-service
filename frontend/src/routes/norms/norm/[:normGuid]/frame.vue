@@ -7,6 +7,7 @@ import AgeIndicationInputGroup from "@/components/AgeIndicationInputGroup.vue"
 import AnnouncementGroup from "@/components/AnnouncementGroup.vue"
 import CategorizedReferenceInputGroup from "@/components/CategorizedReferenceInputGroup.vue"
 import CitationDateInputGroup from "@/components/CitationDateInputGroup.vue"
+import DigitalEvidenceInputGroup from "@/components/DigitalEvidenceInputGroup.vue"
 import DivergentEntryIntoForceGroup from "@/components/DivergentEntryIntoForceGroup.vue"
 import DivergentExpirationGroup from "@/components/DivergentExpirationGroup.vue"
 import DocumentTypeInputGroup from "@/components/DocumentTypeInputGroup.vue"
@@ -27,7 +28,6 @@ import {
   MetadataSections,
   UndefinedDate,
 } from "@/domain/Norm"
-import { digitalEvidence } from "@/fields/norms/digitalEvidence"
 import { documentStatus } from "@/fields/norms/documentStatus"
 import { documentTextProof } from "@/fields/norms/documentTextProof"
 import { otherDocumentNote } from "@/fields/norms/otherDocumentNote"
@@ -86,13 +86,6 @@ watch(
         data.applicationScopeStartDate as string
       loadedNorm.value.celexNumber = data.celexNumber as string
       loadedNorm.value.completeCitation = data.completeCitation as string
-      loadedNorm.value.digitalEvidenceAppendix =
-        data.digitalEvidenceAppendix as string
-      loadedNorm.value.digitalEvidenceExternalDataNote =
-        data.digitalEvidenceExternalDataNote as string
-      loadedNorm.value.digitalEvidenceLink = data.digitalEvidenceLink as string
-      loadedNorm.value.digitalEvidenceRelatedData =
-        data.digitalEvidenceRelatedData as string
       loadedNorm.value.documentCategory = data.documentCategory as string
       loadedNorm.value.documentNumber = data.documentNumber as string
       loadedNorm.value.documentStatusDate = data.documentStatusDate as string
@@ -283,7 +276,7 @@ function normProviderSummarizer(data: Metadata) {
         width: "16",
         alt: "Schwarzes Haken",
       }),
-      h("span", "Beschlussf\assung mit qual. Mehrheit"),
+      h("span", "Beschlussfassung mit qual. Mehrheit"),
     ])
   } else {
     return summaryLine
@@ -466,6 +459,30 @@ function GeneralSummarizer(data: Metadata): string {
   }
 }
 
+function participationSummarizer(data: Metadata) {
+  if (!data) return ""
+
+  const type = data.PARTICIPATION_TYPE?.[0]
+  const institution = data.PARTICIPATION_INSTITUTION?.[0]
+
+  return [type, institution]
+    .filter((value) => value != "" && value != null)
+    .join(" | ")
+}
+
+function subjectAreaSummarizer(data: Metadata) {
+  if (!data) return ""
+
+  const fna = data.SUBJECT_FNA?.[0]
+  const previousFna = data.SUBJECT_PREVIOUS_FNA?.[0]
+  const gesta = data.SUBJECT_GESTA?.[0]
+  const bgb3 = data.SUBJECT_BGB_3?.[0]
+
+  return [fna, previousFna, gesta, bgb3]
+    .filter((value) => value != "" && value != null)
+    .join(" | ")
+}
+
 const CitationDateSummary = withSummarizer(citationDateSummarizer)
 const OfficialReferenceSummary = withSummarizer(officialReferenceSummarizer)
 const NormProviderSummary = withSummarizer(normProviderSummarizer)
@@ -475,6 +492,9 @@ const DivergentEntryIntoForceSummary = withSummarizer(
 )
 const DivergentExpirationSummary = withSummarizer(DivergentExpirationSummarizer)
 const GeneralSummary = withSummarizer(GeneralSummarizer)
+
+const ParticipationSummary = withSummarizer(participationSummarizer)
+const SubjectAreaSummary = withSummarizer(subjectAreaSummarizer)
 </script>
 
 <template>
@@ -487,6 +507,7 @@ const GeneralSummary = withSummarizer(GeneralSummarizer)
       id="officialLongTitle"
       v-model="flatMetadata.officialLongTitle"
       label="Amtliche Langüberschrift"
+      :type="InputType.TEXTAREA"
     />
 
     <SingleDataFieldSection
@@ -533,6 +554,7 @@ const GeneralSummary = withSummarizer(GeneralSummarizer)
       border-bottom
       :data-set="metadataSections.DOCUMENT_TYPE"
       :summary-component="DocumentTypeSummary"
+      test-id="a11y-expandable-dataset"
       title="Dokumenttyp"
     >
       <EditableList
@@ -549,6 +571,7 @@ const GeneralSummary = withSummarizer(GeneralSummarizer)
       border-bottom
       :data-set="metadataSections.NORM_PROVIDER"
       :summary-component="NormProviderSummary"
+      test-id="a11y-expandable-dataset"
       title="Normgeber"
     >
       <EditableList
@@ -563,12 +586,15 @@ const GeneralSummary = withSummarizer(GeneralSummarizer)
       id="participatingInstitutions"
       border-bottom
       :data-set="metadataSections.PARTICIPATION"
+      :summary-component="ParticipationSummary"
+      test-id="a11y-expandable-dataset"
       title="Mitwirkende Organe"
     >
       <EditableList
         v-model="metadataSections.PARTICIPATION"
         :default-value="{}"
         :edit-component="ParticipatingInstitutionInputGroup"
+        :summary-component="ParticipationSummary"
       />
     </ExpandableDataSet>
 
@@ -576,6 +602,7 @@ const GeneralSummary = withSummarizer(GeneralSummarizer)
       id="leads"
       border-bottom
       :data-set="metadataSections.LEAD"
+      test-id="a11y-expandable-dataset"
       title="Federführung"
     >
       <EditableList
@@ -589,12 +616,15 @@ const GeneralSummary = withSummarizer(GeneralSummarizer)
       id="subjectAreas"
       border-bottom
       :data-set="metadataSections.SUBJECT_AREA"
+      :summary-component="SubjectAreaSummary"
+      test-id="a11y-expandable-dataset"
       title="Sachgebiet"
     >
       <EditableList
         v-model="metadataSections.SUBJECT_AREA"
         :default-value="{}"
         :edit-component="SubjectAreaInputGroup"
+        :summary-component="SubjectAreaSummary"
       />
     </ExpandableDataSet>
 
@@ -652,6 +682,7 @@ const GeneralSummary = withSummarizer(GeneralSummarizer)
       border-bottom
       :data-set="metadataSections.PRINCIPLE_ENTRY_INTO_FORCE"
       :summary-component="GeneralSummary"
+      test-id="a11y-expandable-dataset"
       title="Grundsätzliches Inkrafttretedatum"
     >
       <EditableList
@@ -668,6 +699,7 @@ const GeneralSummary = withSummarizer(GeneralSummarizer)
       border-bottom
       :data-set="metadataSections.DIVERGENT_ENTRY_INTO_FORCE"
       :summary-component="DivergentEntryIntoForceSummary"
+      test-id="a11y-expandable-dataset"
       title="Abweichendes Inkrafttretedatum"
     >
       <EditableList
@@ -683,6 +715,7 @@ const GeneralSummary = withSummarizer(GeneralSummarizer)
       border-bottom
       :data-set="metadataSections.EXPIRATION"
       :summary-component="GeneralSummary"
+      test-id="a11y-expandable-dataset"
       title="Datum des Außerkrafttretens"
     >
       <EditableList
@@ -699,6 +732,7 @@ const GeneralSummary = withSummarizer(GeneralSummarizer)
       border-bottom
       :data-set="metadataSections.PRINCIPLE_EXPIRATION"
       :summary-component="GeneralSummary"
+      test-id="a11y-expandable-dataset"
       title="Grundsätzliches Außerkrafttretedatum"
     >
       <EditableList
@@ -715,6 +749,7 @@ const GeneralSummary = withSummarizer(GeneralSummarizer)
       border-bottom
       :data-set="metadataSections.DIVERGENT_EXPIRATION"
       :summary-component="DivergentExpirationSummary"
+      test-id="a11y-expandable-dataset"
       title="Abweichendes Außerkrafttretedatum"
     >
       <EditableList
@@ -744,6 +779,7 @@ const GeneralSummary = withSummarizer(GeneralSummarizer)
       border-bottom
       :data-set="metadataSections.CITATION_DATE"
       :summary-component="CitationDateSummary"
+      test-id="a11y-expandable-dataset"
       title="Zitierdatum"
     >
       <EditableList
@@ -759,6 +795,7 @@ const GeneralSummary = withSummarizer(GeneralSummarizer)
       border-bottom
       :data-set="metadataSections.OFFICIAL_REFERENCE"
       :summary-component="OfficialReferenceSummary"
+      test-id="a11y-expandable-dataset"
       title="Amtliche Fundstelle"
     >
       <EditableList
@@ -860,6 +897,7 @@ const GeneralSummary = withSummarizer(GeneralSummarizer)
       id="categorizedReferences"
       border-bottom
       :data-set="metadataSections.CATEGORIZED_REFERENCE"
+      test-id="a11y-expandable-dataset"
       title="Aktivverweisung"
     >
       <EditableList
@@ -887,16 +925,20 @@ const GeneralSummary = withSummarizer(GeneralSummarizer)
       :type="InputType.CHIPS"
     />
 
-    <fieldset class="mt-32">
-      <legend id="digitalEvidenceFields" class="heading-02-regular mb-[1rem]">
-        Elektronischer Nachweis
-      </legend>
-      <InputGroup
-        v-model="flatMetadata"
-        :column-count="1"
-        :fields="digitalEvidence"
+    <ExpandableDataSet
+      id="digitalEvidence"
+      border-bottom
+      :data-set="metadataSections.DIGITAL_EVIDENCE"
+      test-id="a11y-expandable-dataset"
+      title="Elektronischer Nachweis"
+    >
+      <EditableList
+        v-model="metadataSections.DIGITAL_EVIDENCE"
+        :default-value="{}"
+        disable-multi-entry
+        :edit-component="DigitalEvidenceInputGroup"
       />
-    </fieldset>
+    </ExpandableDataSet>
 
     <SingleDataFieldSection
       id="referenceNumbers"
@@ -922,6 +964,7 @@ const GeneralSummary = withSummarizer(GeneralSummarizer)
       id="ageIndications"
       border-bottom
       :data-set="metadataSections.AGE_INDICATION"
+      test-id="a11y-expandable-dataset"
       title="Altersangabe"
     >
       <EditableList

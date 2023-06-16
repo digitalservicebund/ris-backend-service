@@ -1,5 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
+import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitPublishException;
 import de.bund.digitalservice.ris.caselaw.domain.EmailPublishService;
@@ -11,16 +12,22 @@ import de.bund.digitalservice.ris.caselaw.domain.XmlMail;
 import de.bund.digitalservice.ris.caselaw.domain.XmlMailRepository;
 import de.bund.digitalservice.ris.caselaw.domain.XmlMailResponse;
 import de.bund.digitalservice.ris.caselaw.domain.XmlResultObject;
+import de.bund.digitalservice.ris.caselaw.domain.lookuptable.court.Court;
 import java.time.Clock;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.Collections;
+import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
@@ -35,22 +42,28 @@ public class XmlEMailPublishService implements EmailPublishService {
 
   private final XmlMailRepository repository;
 
+  private final Environment env;
+
   @Value("${mail.exporter.senderAddress:export.test@neuris}")
   private String senderAddress;
 
   public XmlEMailPublishService(
-      XmlExporter xmlExporter, HttpMailSender mailSender, XmlMailRepository repository) {
+      XmlExporter xmlExporter,
+      HttpMailSender mailSender,
+      XmlMailRepository repository,
+      Environment env) {
 
     this.xmlExporter = xmlExporter;
     this.mailSender = mailSender;
     this.repository = repository;
+    this.env = env;
   }
 
   @Override
   public Mono<MailResponse> publish(DocumentUnit documentUnit, String receiverAddress) {
     XmlResultObject xml;
     try {
-      xml = xmlExporter.generateXml(documentUnit);
+      xml = xmlExporter.generateXml(getTestDocumentUnit(documentUnit));
     } catch (ParserConfigurationException | TransformerException ex) {
       return Mono.error(new DocumentUnitPublishException("Couldn't generate xml.", ex));
     }
@@ -84,7 +97,9 @@ public class XmlEMailPublishService implements EmailPublishService {
     subject += " dt=N";
     subject += " mod=T";
     subject += " ld=" + deliveryDate;
-    subject += " vg=" + documentUnit.documentNumber();
+    subject += " vg=";
+    if (Stream.of(env.getActiveProfiles()).anyMatch("staging"::equals)) subject += "[stage]";
+    subject += documentUnit.documentNumber();
 
     return Mono.just(subject);
   }
@@ -106,9 +121,10 @@ public class XmlEMailPublishService implements EmailPublishService {
         senderAddress,
         xmlMail.receiverAddress(),
         xmlMail.mailSubject(),
-        xmlMail.xml(),
+        "neuris",
         xmlMail.fileName(),
-        xmlMail.documentUnitUuid());
+        xmlMail.xml(),
+        xmlMail.documentUnitUuid().toString());
   }
 
   private XmlMail generateXmlMail(
@@ -145,5 +161,38 @@ public class XmlEMailPublishService implements EmailPublishService {
     }
 
     return repository.save(xmlMail);
+  }
+
+  private DocumentUnit getTestDocumentUnit(DocumentUnit documentUnit) {
+    return documentUnit.toBuilder()
+        .coreData(
+            Optional.ofNullable(documentUnit.coreData())
+                .map(
+                    coreData ->
+                        coreData.toBuilder()
+                            .court(
+                                Court.builder()
+                                    .type("VGH")
+                                    .location("Mannheim")
+                                    .label("VGH Mannheim")
+                                    .build())
+                            .fileNumbers(
+                                Stream.concat(
+                                        Stream.of("TEST"),
+                                        documentUnit.coreData().fileNumbers().stream())
+                                    .collect(Collectors.toList()))
+                            .build())
+                .orElseGet(
+                    () ->
+                        CoreData.builder()
+                            .court(
+                                Court.builder()
+                                    .type("VGH")
+                                    .location("Mannheim")
+                                    .label("VGH Mannheim")
+                                    .build())
+                            .fileNumbers(Collections.singletonList("TEST"))
+                            .build()))
+        .build();
   }
 }

@@ -11,15 +11,16 @@ const props = defineProps<{
 
 const emit = defineEmits<{ (e: "update:open", value: boolean): void }>()
 
-const open = ref(false)
+const localOpen = ref(false)
 
 watch(
   () => props.open,
-  () => (open.value = props.open ?? false),
+  () => (localOpen.value = props.open ?? false),
   { immediate: true }
 )
 
-watch(open, () => emit("update:open", open.value))
+watch(localOpen, () => emit("update:open", localOpen.value))
+
 const route = useRoute()
 
 const uploadFileRoute = computed(() => ({
@@ -29,18 +30,9 @@ const uploadFileRoute = computed(() => ({
 }))
 </script>
 
-<script lang="ts">
-// As this component does not have a root node, Vue throws a warning that Extraneous non-props attributes (class)
-// were passed to component but could not be automatically inherited. This disables attribute inheritance to avoid
-// the warning. An alternative could be to wrap the component with another root div.
-export default {
-  inheritAttrs: false,
-}
-</script>
-
 <template>
   <div v-bind="$attrs">
-    <div class="basis-1/3! flex flex-col gap-56 w-full">
+    <div class="flex flex-col gap-40 sticky top-0 w-full">
       <div class="flex items-center">
         <h2 class="grow heading-02-regular">Originaldokument</h2>
       </div>
@@ -61,7 +53,10 @@ export default {
 
       <div v-else-if="!file">Dokument wird geladen</div>
 
-      <div v-else class="border-1 border-gray-400 border-solid overflow-scroll">
+      <div
+        v-else
+        class="border-1 border-gray-400 border-solid h-[65vh] overflow-scroll"
+      >
         <TextEditor element-id="odoc" field-size="max" :value="file" />
       </div>
     </div>

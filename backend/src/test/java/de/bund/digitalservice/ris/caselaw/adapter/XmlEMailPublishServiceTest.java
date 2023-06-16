@@ -91,7 +91,7 @@ class XmlEMailPublishServiceTest {
   void setUp() throws ParserConfigurationException, TransformerException {
     documentUnit =
         DocumentUnit.builder().uuid(TEST_UUID).documentNumber("test-document-number").build();
-    when(xmlExporter.generateXml(documentUnit)).thenReturn(FORMATTED_XML);
+    when(xmlExporter.generateXml(any(DocumentUnit.class))).thenReturn(FORMATTED_XML);
 
     when(repository.save(EXPECTED_BEFORE_SAVE)).thenReturn(Mono.just(SAVED_XML_MAIL));
   }
@@ -110,9 +110,10 @@ class XmlEMailPublishServiceTest {
             SENDER_ADDRESS,
             RECEIVER_ADDRESS,
             SAVED_XML_MAIL.mailSubject(),
-            SAVED_XML_MAIL.xml(),
+            "neuris",
             SAVED_XML_MAIL.fileName(),
-            SAVED_XML_MAIL.documentUnitUuid());
+            SAVED_XML_MAIL.xml(),
+            SAVED_XML_MAIL.documentUnitUuid().toString());
   }
 
   @Test
@@ -131,7 +132,7 @@ class XmlEMailPublishServiceTest {
             null,
             PublishState.UNKNOWN);
     var expected = new XmlMailResponse(TEST_UUID, xmlMail);
-    when(xmlExporter.generateXml(documentUnit)).thenReturn(xmlWithValidationError);
+    when(xmlExporter.generateXml(any(DocumentUnit.class))).thenReturn(xmlWithValidationError);
 
     StepVerifier.create(service.publish(documentUnit, RECEIVER_ADDRESS))
         .consumeNextWith(
@@ -140,13 +141,21 @@ class XmlEMailPublishServiceTest {
 
     verify(repository, times(0)).save(any(XmlMail.class));
     verify(mailSender, times(0))
-        .sendMail(anyString(), anyString(), anyString(), anyString(), anyString(), any(UUID.class));
+        .sendMail(
+            anyString(),
+            anyString(),
+            anyString(),
+            anyString(),
+            anyString(),
+            anyString(),
+            anyString());
   }
 
   @Test
   void testPublish_withExceptionFromXmlExporter()
       throws ParserConfigurationException, TransformerException {
-    when(xmlExporter.generateXml(documentUnit)).thenThrow(ParserConfigurationException.class);
+    when(xmlExporter.generateXml(any(DocumentUnit.class)))
+        .thenThrow(ParserConfigurationException.class);
 
     StepVerifier.create(service.publish(documentUnit, RECEIVER_ADDRESS))
         .expectErrorMatches(
@@ -157,7 +166,14 @@ class XmlEMailPublishServiceTest {
 
     verify(repository, times(0)).save(any(XmlMail.class));
     verify(mailSender, times(0))
-        .sendMail(anyString(), anyString(), anyString(), anyString(), anyString(), any(UUID.class));
+        .sendMail(
+            anyString(),
+            anyString(),
+            anyString(),
+            anyString(),
+            anyString(),
+            anyString(),
+            anyString());
   }
 
   @Test
@@ -173,7 +189,14 @@ class XmlEMailPublishServiceTest {
 
     verify(repository, times(0)).save(any(XmlMail.class));
     verify(mailSender, times(0))
-        .sendMail(anyString(), anyString(), anyString(), anyString(), anyString(), any(UUID.class));
+        .sendMail(
+            anyString(),
+            anyString(),
+            anyString(),
+            anyString(),
+            anyString(),
+            anyString(),
+            anyString());
   }
 
   @Test
@@ -186,7 +209,14 @@ class XmlEMailPublishServiceTest {
 
     verify(repository).save(any(XmlMail.class));
     verify(mailSender)
-        .sendMail(anyString(), anyString(), anyString(), anyString(), anyString(), any(UUID.class));
+        .sendMail(
+            anyString(),
+            anyString(),
+            anyString(),
+            anyString(),
+            anyString(),
+            anyString(),
+            anyString());
   }
 
   @Test
@@ -201,14 +231,28 @@ class XmlEMailPublishServiceTest {
 
     verify(repository, times(0)).save(any(XmlMail.class));
     verify(mailSender, times(0))
-        .sendMail(anyString(), anyString(), anyString(), anyString(), anyString(), any(UUID.class));
+        .sendMail(
+            anyString(),
+            anyString(),
+            anyString(),
+            anyString(),
+            anyString(),
+            anyString(),
+            anyString());
   }
 
   @Test
   void testPublish_withExceptionBySendingEmail() {
     doThrow(DocumentUnitPublishException.class)
         .when(mailSender)
-        .sendMail(SENDER_ADDRESS, RECEIVER_ADDRESS, MAIL_SUBJECT, "xml", "test.xml", TEST_UUID);
+        .sendMail(
+            SENDER_ADDRESS,
+            RECEIVER_ADDRESS,
+            MAIL_SUBJECT,
+            "neuris",
+            "test.xml",
+            "xml",
+            TEST_UUID.toString());
 
     StepVerifier.create(service.publish(documentUnit, RECEIVER_ADDRESS))
         .expectErrorMatches(DocumentUnitPublishException.class::isInstance)
@@ -216,7 +260,14 @@ class XmlEMailPublishServiceTest {
 
     verify(repository, times(0)).save(any(XmlMail.class));
     verify(mailSender)
-        .sendMail(SENDER_ADDRESS, RECEIVER_ADDRESS, MAIL_SUBJECT, "xml", "test.xml", TEST_UUID);
+        .sendMail(
+            SENDER_ADDRESS,
+            RECEIVER_ADDRESS,
+            MAIL_SUBJECT,
+            "neuris",
+            "test.xml",
+            "xml",
+            TEST_UUID.toString());
   }
 
   @Test

@@ -6,7 +6,7 @@ import FileViewer from "@/components/FileViewer.vue"
   <FileViewer
     file-name="File name"
     file-type="Document type"
-    s3-path="s3-path"
     upload-time-stamp="01.01.2022 10:00"
+    uuid="uuid"
   />
 </template>

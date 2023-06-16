@@ -61,10 +61,6 @@ private fun getUpdatedNorm(guid: UUID, properties: EditNormFrameUseCase.NormFram
     footnoteDecision = properties.footnoteDecision,
     footnoteStateLaw = properties.footnoteStateLaw,
     footnoteEuLaw = properties.footnoteEuLaw,
-    digitalEvidenceLink = properties.digitalEvidenceLink,
-    digitalEvidenceRelatedData = properties.digitalEvidenceRelatedData,
-    digitalEvidenceExternalDataNote = properties.digitalEvidenceExternalDataNote,
-    digitalEvidenceAppendix = properties.digitalEvidenceAppendix,
     celexNumber = properties.celexNumber,
     text = properties.text,
 )

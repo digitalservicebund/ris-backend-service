@@ -4,6 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
@@ -54,7 +56,7 @@ import software.amazon.awssdk.services.s3.model.S3Exception;
 @TestPropertySource(properties = "otc.obs.bucket-name:testBucket")
 class DocumentUnitServiceTest {
   private static final UUID TEST_UUID = UUID.fromString("88888888-4444-4444-4444-121212121212");
-  private static final String RECEIVER_ADDRESS = "test@exporter.neuris";
+  private static final String ISSUER_ADDRESS = "test-issuer@exporter.neuris";
   @SpyBean private DocumentUnitService service;
 
   @MockBean private DocumentUnitRepository repository;
@@ -325,12 +327,15 @@ class DocumentUnitServiceTest {
             "filename",
             Instant.now(),
             PublishState.UNKNOWN);
-    when(publishService.publish(DocumentUnit.builder().build(), RECEIVER_ADDRESS))
+    when(publishService.publish(eq(DocumentUnit.builder().build()), anyString()))
         .thenReturn(Mono.just(new XmlMailResponse(TEST_UUID, xmlMail)));
     when(documentUnitStatusService.updateStatus(
-            any(DocumentUnit.class), any(DocumentUnitStatus.class), any(Instant.class)))
+            any(DocumentUnit.class),
+            any(DocumentUnitStatus.class),
+            any(Instant.class),
+            anyString()))
         .thenReturn(Mono.just(DocumentUnit.builder().build()));
-    StepVerifier.create(service.publishAsEmail(TEST_UUID, RECEIVER_ADDRESS))
+    StepVerifier.create(service.publishAsEmail(TEST_UUID, ISSUER_ADDRESS))
         .consumeNextWith(
             mailResponse ->
                 assertThat(mailResponse)
@@ -338,18 +343,22 @@ class DocumentUnitServiceTest {
                     .isEqualTo(new XmlMailResponse(TEST_UUID, xmlMail)))
         .verifyComplete();
     verify(repository).findByUuid(TEST_UUID);
-    verify(publishService).publish(DocumentUnit.builder().build(), RECEIVER_ADDRESS);
+    verify(publishService).publish(eq(DocumentUnit.builder().build()), anyString());
     verify(documentUnitStatusService)
-        .updateStatus(any(DocumentUnit.class), any(DocumentUnitStatus.class), any(Instant.class));
+        .updateStatus(
+            any(DocumentUnit.class),
+            any(DocumentUnitStatus.class),
+            any(Instant.class),
+            anyString());
   }
 
   @Test
   void testPublishByEmail_withoutDocumentUnitForUuid() {
     when(repository.findByUuid(TEST_UUID)).thenReturn(Mono.empty());
 
-    StepVerifier.create(service.publishAsEmail(TEST_UUID, RECEIVER_ADDRESS)).verifyComplete();
+    StepVerifier.create(service.publishAsEmail(TEST_UUID, ISSUER_ADDRESS)).verifyComplete();
     verify(repository).findByUuid(TEST_UUID);
-    verify(publishService, never()).publish(DocumentUnit.builder().build(), RECEIVER_ADDRESS);
+    verify(publishService, never()).publish(eq(DocumentUnit.builder().build()), anyString());
   }
 
   @Test
