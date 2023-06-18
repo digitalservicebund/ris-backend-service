@@ -82,12 +82,34 @@ export enum MetadatumType {
   FOOTNOTE_STATE_LAW = "FOOTNOTE_STATE_LAW",
   FOOTNOTE_EU_LAW = "FOOTNOTE_EU_LAW",
   FOOTNOTE_OTHER = "FOOTNOTE_OTHER",
+  WORK_NOTE = "WORK_NOTE",
+  DESCRIPTION = "DESCRIPTION",
+  REFERENCE = "REFERENCE",
+  ENTRY_INTO_FORCE_DATE_NOTE = "ENTRY_INTO_FORCE_DATE_NOTE",
+  PROOF_INDICATION = "PROOF_INDICATION",
+  PROOF_TYPE = "PROOF_TYPE",
+  OTHER_TYPE = "OTHER_TYPE",
 }
 
 export enum NormCategory {
   AMENDMENT_NORM = "AMENDMENT_NORM",
   BASE_NORM = "BASE_NORM",
   TRANSITIONAL_NORM = "TRANSITIONAL_NORM",
+}
+
+export enum ProofIndication {
+  NOT_YET_CONSIDERED = "NOT_YET_CONSIDERED",
+  CONSIDERED = "CONSIDERED",
+}
+
+export enum ProofType {
+  TEXT_PROOF_FROM = "TEXT_PROOF_FROM",
+  TEXT_PROOF_VALIDITY_FROM = "TEXT_PROOF_VALIDITY_FROM",
+}
+
+export enum OtherType {
+  TEXT_IN_PROGRESS = "TEXT_IN_PROGRESS",
+  TEXT_PROOFED_BUT_NOT_DONE = "TEXT_PROOFED_BUT_NOT_DONE",
 }
 
 // TODO: Establish typing that requires all `MetadatumType`s to be listed.
@@ -146,6 +168,13 @@ export type MetadataValueType = {
   [MetadatumType.FOOTNOTE_STATE_LAW]: string
   [MetadatumType.FOOTNOTE_EU_LAW]: string
   [MetadatumType.FOOTNOTE_OTHER]: string
+  [MetadatumType.WORK_NOTE]: string
+  [MetadatumType.DESCRIPTION]: string
+  [MetadatumType.REFERENCE]: string
+  [MetadatumType.ENTRY_INTO_FORCE_DATE_NOTE]: string
+  [MetadatumType.PROOF_INDICATION]: ProofIndication
+  [MetadatumType.PROOF_TYPE]: ProofType
+  [MetadatumType.OTHER_TYPE]: OtherType
 }
 
 export type Metadata = {
@@ -179,6 +208,10 @@ export enum MetadataSectionName {
   PRINCIPLE_EXPIRATION = "PRINCIPLE_EXPIRATION",
   DIGITAL_EVIDENCE = "DIGITAL_EVIDENCE",
   FOOTNOTES = "FOOTNOTES",
+  DOCUMENT_STATUS_SECTION = "DOCUMENT_STATUS_SECTION",
+  DOCUMENT_STATUS = "DOCUMENT_STATUS",
+  DOCUMENT_TEXT_PROOF = "DOCUMENT_TEXT_PROOF",
+  DOCUMENT_OTHER = "DOCUMENT_OTHER",
 }
 
 export type MetadataSections = {

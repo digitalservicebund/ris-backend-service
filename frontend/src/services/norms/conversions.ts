@@ -25,6 +25,9 @@ import {
   FlatMetadata,
   NormCategory,
   UndefinedDate,
+  ProofIndication,
+  ProofType,
+  OtherType,
 } from "@/domain/Norm"
 
 function identity<T>(data: T): T {
@@ -91,7 +94,49 @@ function decodeUndefinedDate(data: string): UndefinedDate {
   } else throw new Error(`Could not decode UndefinedDate: '${data}'`)
 }
 
+function decodeProofIndication(data: string): ProofIndication {
+  const indexOfKeyPassed = Object.keys(ProofIndication).indexOf(data)
+
+  const unit = Object.values(ProofIndication)[indexOfKeyPassed]
+
+  if (unit) {
+    return unit
+  } else throw new Error(`Could not decode ProofIndication: '${data}'`)
+}
+
+function decodeProofType(data: string): ProofType {
+  const indexOfKeyPassed = Object.keys(ProofType).indexOf(data)
+
+  const unit = Object.values(ProofType)[indexOfKeyPassed]
+
+  if (unit) {
+    return unit
+  } else throw new Error(`Could not decode ProofType: '${data}'`)
+}
+
+function decodeOtherType(data: string): OtherType {
+  const indexOfKeyPassed = Object.keys(OtherType).indexOf(data)
+
+  const unit = Object.values(OtherType)[indexOfKeyPassed]
+
+  if (unit) {
+    return unit
+  } else throw new Error(`Could not decode OtherType: '${data}'`)
+}
+
 function encodeUndefinedDate(data: UndefinedDate): string {
+  return data
+}
+
+function encodeProofIndication(data: ProofIndication): string {
+  return data
+}
+
+function encodeProofType(data: ProofType): string {
+  return data
+}
+
+function encodeOtherType(data: OtherType): string {
   return data
 }
 
@@ -150,6 +195,13 @@ const DECODERS: MetadataValueDecoders = {
   [MetadatumType.FOOTNOTE_STATE_LAW]: identity,
   [MetadatumType.FOOTNOTE_EU_LAW]: identity,
   [MetadatumType.FOOTNOTE_OTHER]: identity,
+  [MetadatumType.WORK_NOTE]: identity,
+  [MetadatumType.DESCRIPTION]: identity,
+  [MetadatumType.REFERENCE]: identity,
+  [MetadatumType.ENTRY_INTO_FORCE_DATE_NOTE]: identity,
+  [MetadatumType.PROOF_INDICATION]: decodeProofIndication,
+  [MetadatumType.PROOF_TYPE]: decodeProofType,
+  [MetadatumType.OTHER_TYPE]: decodeOtherType,
 }
 
 const ENCODERS: MetadataValueEncoders = {
@@ -207,6 +259,13 @@ const ENCODERS: MetadataValueEncoders = {
   [MetadatumType.FOOTNOTE_STATE_LAW]: identity,
   [MetadatumType.FOOTNOTE_EU_LAW]: identity,
   [MetadatumType.FOOTNOTE_OTHER]: identity,
+  [MetadatumType.WORK_NOTE]: identity,
+  [MetadatumType.DESCRIPTION]: identity,
+  [MetadatumType.REFERENCE]: identity,
+  [MetadatumType.ENTRY_INTO_FORCE_DATE_NOTE]: identity,
+  [MetadatumType.PROOF_INDICATION]: encodeProofIndication,
+  [MetadatumType.PROOF_TYPE]: encodeProofType,
+  [MetadatumType.OTHER_TYPE]: encodeOtherType,
 }
 
 /**

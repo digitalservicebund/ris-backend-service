@@ -8,7 +8,10 @@ import {
   MetadatumType,
   Norm,
   NormCategory,
+  OtherType,
   Paragraph,
+  ProofIndication,
+  ProofType,
   UndefinedDate,
 } from "@/domain/Norm"
 import {
@@ -79,6 +82,13 @@ const METADATA_VALUE_GENERATORS: MetadataValueGenerators = {
   [MetadatumType.FOOTNOTE_STATE_LAW]: generateString,
   [MetadatumType.FOOTNOTE_EU_LAW]: generateString,
   [MetadatumType.FOOTNOTE_OTHER]: generateString,
+  [MetadatumType.WORK_NOTE]: generateString,
+  [MetadatumType.DESCRIPTION]: generateString,
+  [MetadatumType.REFERENCE]: generateString,
+  [MetadatumType.ENTRY_INTO_FORCE_DATE_NOTE]: generateString,
+  [MetadatumType.PROOF_INDICATION]: pickRandomProofIndication,
+  [MetadatumType.PROOF_TYPE]: pickRandomProofType,
+  [MetadatumType.OTHER_TYPE]: pickRandomOtherType,
 }
 
 const ALPHABET_CHARACTERS = "abcdefghijklmnopqrstuvwxyz"
@@ -196,6 +206,23 @@ export function generateArticle(partialArticle?: Partial<Article>): Article {
   }
 }
 
+export function pickRandomProofIndication(): ProofIndication {
+  const options = Object.values(ProofIndication)
+  const index = generateRandomNumber(0, options.length - 1)
+  return options[index]
+}
+
+export function pickRandomProofType(): ProofType {
+  const options = Object.values(ProofType)
+  const index = generateRandomNumber(0, options.length - 1)
+  return options[index]
+}
+
+export function pickRandomOtherType(): OtherType {
+  const options = Object.values(OtherType)
+  const index = generateRandomNumber(0, options.length - 1)
+  return options[index]
+}
 export function pickRandomNormCategory(): NormCategory {
   const options = Object.values(NormCategory)
   const index = generateRandomNumber(0, options.length - 1)
@@ -226,7 +253,10 @@ export function generateMetadata(partialMetadata?: Partial<Metadata>) {
       .map(METADATA_VALUE_GENERATORS[type]) as string[] &
       boolean[] &
       NormCategory[] &
-      UndefinedDate[]
+      UndefinedDate[] &
+      ProofIndication[] &
+      ProofType[] &
+      OtherType[]
     metadata[type] = values
   }
 
