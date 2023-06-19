@@ -33,7 +33,7 @@ public class ProceedingDecisionController {
   }
 
   @PutMapping
-  @PreAuthorize("@userHasWriteAccessByUuid.apply(#documentUnitUuid)")
+  @PreAuthorize("@userHasWriteAccessByDocumentUnitUuid.apply(#documentUnitUuid)")
   public Flux<ProceedingDecision> createProceedingDecision(
       @AuthenticationPrincipal OidcUser oidcUser,
       @PathVariable("uuid") UUID documentUnitUuid,
@@ -48,7 +48,7 @@ public class ProceedingDecisionController {
   }
 
   @PutMapping(value = "/{childUuid}")
-  @PreAuthorize("@userHasWriteAccessByUuid.apply(#parentUuid)")
+  @PreAuthorize("@userHasWriteAccessByDocumentUnitUuid.apply(#parentUuid)")
   public Mono<ResponseEntity<DocumentUnit>> linkProceedingDecision(
       @PathVariable("uuid") UUID parentUuid, @PathVariable UUID childUuid) {
     return service
@@ -57,7 +57,7 @@ public class ProceedingDecisionController {
   }
 
   @DeleteMapping(value = "/{childUuid}")
-  @PreAuthorize("@userHasWriteAccessByUuid.apply(#parentUuid)")
+  @PreAuthorize("@userHasWriteAccessByDocumentUnitUuid.apply(#parentUuid)")
   public Mono<ResponseEntity<String>> removeProceedingDecision(
       @PathVariable("uuid") UUID parentUuid, @PathVariable UUID childUuid) {
 

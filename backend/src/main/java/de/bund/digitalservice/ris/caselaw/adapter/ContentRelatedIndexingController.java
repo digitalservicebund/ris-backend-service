@@ -25,13 +25,13 @@ public class ContentRelatedIndexingController {
   }
 
   @GetMapping("fieldsoflaw")
-  @PreAuthorize("@userHasReadAccessByUuid.apply(#documentUnitUuid)")
+  @PreAuthorize("@userHasReadAccessByDocumentUnitUuid.apply(#documentUnitUuid)")
   public Mono<List<FieldOfLaw>> getFieldsOfLaw(@PathVariable("uuid") UUID documentUnitUuid) {
     return fieldOfLawService.getFieldsOfLawForDocumentUnit(documentUnitUuid);
   }
 
   @PutMapping("fieldsoflaw/{identifier}")
-  @PreAuthorize("@userHasWriteAccessByUuid.apply(#documentUnitUuid)")
+  @PreAuthorize("@userHasWriteAccessByDocumentUnitUuid.apply(#documentUnitUuid)")
   public Mono<List<FieldOfLaw>> addFieldOfLaw(
       @PathVariable("uuid") UUID documentUnitUuid, @PathVariable("identifier") String identifier) {
 
@@ -39,7 +39,7 @@ public class ContentRelatedIndexingController {
   }
 
   @DeleteMapping("fieldsoflaw/{identifier}")
-  @PreAuthorize("@userHasWriteAccessByUuid.apply(#documentUnitUuid)")
+  @PreAuthorize("@userHasWriteAccessByDocumentUnitUuid.apply(#documentUnitUuid)")
   public Mono<List<FieldOfLaw>> removeFieldOfLaw(
       @PathVariable("uuid") UUID documentUnitUuid, @PathVariable("identifier") String identifier) {
 
@@ -47,13 +47,13 @@ public class ContentRelatedIndexingController {
   }
 
   @GetMapping("keywords")
-  @PreAuthorize("@userHasReadAccessByUuid.apply(#documentUnitUuid)")
+  @PreAuthorize("@userHasReadAccessByDocumentUnitUuid.apply(#documentUnitUuid)")
   public Mono<List<String>> getKeywords(@PathVariable("uuid") UUID documentUnitUuid) {
     return keywordService.getKeywordsForDocumentUnit(documentUnitUuid);
   }
 
   @PutMapping("keywords/{keyword}")
-  @PreAuthorize("@userHasWriteAccessByUuid.apply(#documentUnitUuid)")
+  @PreAuthorize("@userHasWriteAccessByDocumentUnitUuid.apply(#documentUnitUuid)")
   public Mono<List<String>> addKeyword(
       @PathVariable("uuid") UUID documentUnitUuid, @PathVariable("keyword") String keyword) {
 
@@ -61,7 +61,7 @@ public class ContentRelatedIndexingController {
   }
 
   @DeleteMapping("keywords/{keyword}")
-  @PreAuthorize("@userHasWriteAccessByUuid.apply(#documentUnitUuid)")
+  @PreAuthorize("@userHasWriteAccessByDocumentUnitUuid.apply(#documentUnitUuid)")
   public Mono<List<String>> deleteKeyword(
       @PathVariable("uuid") UUID documentUnitUuid, @PathVariable("keyword") String keyword) {
 

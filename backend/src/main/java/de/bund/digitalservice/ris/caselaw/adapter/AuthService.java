@@ -40,7 +40,7 @@ public class AuthService {
   }
 
   @Bean
-  public Function<UUID, Mono<Boolean>> userHasReadAccessByUuid() {
+  public Function<UUID, Mono<Boolean>> userHasReadAccessByDocumentUnitUuid() {
     return uuid ->
         Mono.defer(
             () ->
@@ -51,7 +51,7 @@ public class AuthService {
   }
 
   @Bean
-  public Function<UUID, Mono<Boolean>> userHasWriteAccessByUuid() {
+  public Function<UUID, Mono<Boolean>> userHasWriteAccessByDocumentUnitUuid() {
     return uuid ->
         Mono.defer(
             () ->

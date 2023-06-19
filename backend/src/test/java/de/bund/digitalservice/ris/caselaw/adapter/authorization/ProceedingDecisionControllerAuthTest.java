@@ -1,4 +1,4 @@
-package de.bund.digitalservice.ris.caselaw.adapter;
+package de.bund.digitalservice.ris.caselaw.adapter.authorization;
 
 import static de.bund.digitalservice.ris.caselaw.Utils.buildDocOffice;
 import static de.bund.digitalservice.ris.caselaw.Utils.getMockLoginWithDocOffice;
@@ -7,6 +7,9 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
 
+import de.bund.digitalservice.ris.caselaw.adapter.AuthService;
+import de.bund.digitalservice.ris.caselaw.adapter.KeycloakUserService;
+import de.bund.digitalservice.ris.caselaw.adapter.ProceedingDecisionController;
 import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;

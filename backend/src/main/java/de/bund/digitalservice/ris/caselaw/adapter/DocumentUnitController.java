@@ -61,7 +61,7 @@ public class DocumentUnitController {
   }
 
   @PutMapping(value = "/{uuid}/file")
-  @PreAuthorize("@userHasWriteAccessByUuid.apply(#uuid)")
+  @PreAuthorize("@userHasWriteAccessByDocumentUnitUuid.apply(#uuid)")
   public Mono<ResponseEntity<DocumentUnit>> attachFileToDocumentUnit(
       @PathVariable UUID uuid,
       @RequestBody ByteBuffer byteBuffer,
@@ -74,7 +74,7 @@ public class DocumentUnitController {
   }
 
   @DeleteMapping(value = "/{uuid}/file")
-  @PreAuthorize("@userHasWriteAccessByUuid.apply(#uuid)")
+  @PreAuthorize("@userHasWriteAccessByDocumentUnitUuid.apply(#uuid)")
   public Mono<ResponseEntity<DocumentUnit>> removeFileFromDocumentUnit(@PathVariable UUID uuid) {
 
     return service
@@ -107,7 +107,7 @@ public class DocumentUnitController {
   }
 
   @DeleteMapping(value = "/{uuid}")
-  @PreAuthorize("@userHasWriteAccessByUuid.apply(#uuid)")
+  @PreAuthorize("@userHasWriteAccessByDocumentUnitUuid.apply(#uuid)")
   public Mono<ResponseEntity<String>> deleteByUuid(@PathVariable UUID uuid) {
 
     return service
@@ -117,7 +117,7 @@ public class DocumentUnitController {
   }
 
   @PutMapping(value = "/{uuid}", consumes = MediaType.APPLICATION_JSON_VALUE)
-  @PreAuthorize("@userHasWriteAccessByUuid.apply(#uuid)")
+  @PreAuthorize("@userHasWriteAccessByDocumentUnitUuid.apply(#uuid)")
   public Mono<ResponseEntity<DocumentUnit>> updateByUuid(
       @PathVariable UUID uuid, @Valid @RequestBody DocumentUnit documentUnit) {
     if (!uuid.equals(documentUnit.uuid())) {
@@ -130,7 +130,7 @@ public class DocumentUnitController {
   }
 
   @PutMapping(value = "/{uuid}/publish", produces = MediaType.APPLICATION_JSON_VALUE)
-  @PreAuthorize("@userHasWriteAccessByUuid.apply(#uuid)")
+  @PreAuthorize("@userHasWriteAccessByDocumentUnitUuid.apply(#uuid)")
   public Mono<ResponseEntity<MailResponse>> publishDocumentUnitAsEmail(
       @PathVariable UUID uuid, @AuthenticationPrincipal OidcUser oidcUser) {
 
@@ -141,7 +141,7 @@ public class DocumentUnitController {
   }
 
   @GetMapping(value = "/{uuid}/publish", produces = MediaType.APPLICATION_JSON_VALUE)
-  @PreAuthorize("@userHasReadAccessByUuid.apply(#uuid)")
+  @PreAuthorize("@userHasReadAccessByDocumentUnitUuid.apply(#uuid)")
   public Mono<ResponseEntity<MailResponse>> getLastPublishedXml(@PathVariable UUID uuid) {
     return service
         .getLastPublishedXmlMail(uuid)
@@ -159,7 +159,7 @@ public class DocumentUnitController {
   }
 
   @GetMapping(value = "/{uuid}/docx", produces = MediaType.APPLICATION_JSON_VALUE)
-  @PreAuthorize("@userHasReadAccessByUuid.apply(#uuid)")
+  @PreAuthorize("@userHasReadAccessByDocumentUnitUuid.apply(#uuid)")
   public Mono<ResponseEntity<Docx2Html>> html(@PathVariable UUID uuid) {
     return service
         .getByUuid(uuid)
