@@ -7,7 +7,7 @@ export type FootnoteSection = {
 
 export type Footnote = { FOOTNOTE: { [key: string]: string[] }[] }
 
-export const FOOTNOTE_LABELS = {
+export const FOOTNOTE_LABELS: { [key: string]: string } = {
   [MetadatumType.FOOTNOTE_CHANGE]: "Änderungsfußnote",
   [MetadatumType.FOOTNOTE_COMMENT]: "Kommentierende Fußnote",
   [MetadatumType.FOOTNOTE_DECISION]: "BVerfG-Entscheidung",

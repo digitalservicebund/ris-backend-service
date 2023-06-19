@@ -2,7 +2,11 @@
 import { h, ref, VNode } from "vue"
 import ExpandableDataSet from "@/components/ExpandableDataSet.vue"
 import FootnoteInput from "@/components/Footnotes/FootnoteInput.vue"
-import { FOOTNOTE_LABELS, FootnoteSection } from "@/components/Footnotes/types"
+import {
+  Footnote,
+  FOOTNOTE_LABELS,
+  FootnoteSection,
+} from "@/components/Footnotes/types"
 import { MetadataSections, MetadatumType } from "@/domain/Norm"
 import { withSummarizer } from "@/shared/components/DataSetSummary.vue"
 import EditableList from "@/shared/components/EditableList.vue"
@@ -19,7 +23,7 @@ function summarizeFootnotePart(
     "whitespace-pre",
     ...extraTypeClasses,
   ]
-  const typeLabel = FOOTNOTE_LABELS[part.type] ?? "Unbekannt"
+  const typeLabel = part.type ? FOOTNOTE_LABELS[part.type] : "Unbekannt"
   const type = h("span", { class: typeClasses }, typeLabel)
   const contentClasses = ["pl-6", "pr-10", "inline", "whitespace-pre-wrap"]
   const contentText = h("p", { class: contentClasses }, part.content?.trim())
@@ -41,7 +45,7 @@ function summarizePrefix(prefix?: string): VNode | string {
   const hasPrefix = prefix && prefix.trim().length > 0
   return hasPrefix ? prefixNode : ""
 }
-function summarizeFootnotePerLine(data: MetadataSections): VNode {
+function summarizeFootnotePerLine(data: Footnote): VNode {
   const prefix =
     data.FOOTNOTE?.filter((footnote) =>
       Object.keys(footnote).includes(MetadatumType.FOOTNOTE_REFERENCE)
@@ -53,8 +57,10 @@ function summarizeFootnotePerLine(data: MetadataSections): VNode {
     h(
       "div",
       summarizeFootnotePart({
-        type: MetadatumType[Object.keys(footnote)[0]],
-        content: Object.values(footnote)[0][0] as string,
+        type: MetadatumType[
+          Object.keys(footnote)[0] as keyof typeof MetadatumType
+        ],
+        content: Object.values(footnote)[0][0],
       })
     )
   )

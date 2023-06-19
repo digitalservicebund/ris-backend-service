@@ -90,7 +90,7 @@ function insertMewLineTextNodeBetweenParagraphs(
     return { ...paragraph, content }
   })
 }
-function getAllNodes(paragraphs: JSONContent[]): JSONContent {
+function getAllNodes(paragraphs: JSONContent[]): JSONContent[] {
   return paragraphs.reduce(
     (allContentNodes, paragraph) => [
       ...allContentNodes,
@@ -192,13 +192,15 @@ function parseSegmentsAsEditorContent(segments?: Segment[]): JSONContent {
   const nodeGroups = groupEditorNodesByNewLines(nodes)
   // TipTap throws errors for empty text nodes. Such can be a result from the
   // former splitting across paragraphs.
-  const nodeGroupdsWithoutEmptyTexts = nodeGroups?.map((group) =>
+  const nodeGroupdsWithoutEmptyTexts = nodeGroups?.map((group: JSONContent[]) =>
     group.filter(({ text }) => text == undefined || text.length > 0)
   )
-  const paragraphs = nodeGroupdsWithoutEmptyTexts?.map((nodeGroup) => ({
-    type: "paragraph",
-    content: nodeGroup,
-  }))
+  const paragraphs = nodeGroupdsWithoutEmptyTexts?.map(
+    (nodeGroup: JSONContent) => ({
+      type: "paragraph",
+      content: nodeGroup,
+    })
+  )
   return { type: "doc", content: paragraphs }
 }
 

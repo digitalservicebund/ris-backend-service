@@ -26,15 +26,15 @@ const inputValue = computed({
 
 const FOOTNOTE_SEGMENT_TYPE = "footnote_type"
 
-function parseFootnoteAsSegments(section): Segment[] {
-  const segments = []
+function parseFootnoteAsSegments(section: Footnote): Segment[] {
+  const segments = [] as Segment[]
   section?.FOOTNOTE?.forEach((footnote) => {
     const metadatumType = Object.keys(footnote)[0]
     if (metadatumType != MetadatumType.FOOTNOTE_REFERENCE) {
       segments.push({
         type: FOOTNOTE_SEGMENT_TYPE,
-        content: FOOTNOTE_LABELS[metadatumType],
-        id: MetadatumType[metadatumType],
+        content: FOOTNOTE_LABELS[metadatumType as keyof typeof MetadatumType],
+        id: MetadatumType[metadatumType as keyof typeof MetadatumType],
       })
     }
     segments.push({ type: "text", content: Object.values(footnote)[0][0] })
@@ -51,12 +51,13 @@ function parseSegmentsAsFootnote(segments: Segment[]): Footnote {
   while (partIndex < segments.length) {
     const segment = segments[partIndex]
     const hasFootnoteType = segment.type == FOOTNOTE_SEGMENT_TYPE
-    const footnoteType: MetadatumType | undefined = hasFootnoteType
-      ? (segment.id as MetadatumType)
-      : undefined
+    const footnoteType: string =
+      hasFootnoteType && segment.id
+        ? segment.id
+        : MetadatumType.FOOTNOTE_REFERENCE.toString()
     const nextSegment = segments[partIndex + 1] ?? ({} as Segment)
     const hasFootnoteContent = nextSegment.type == "text"
-    const footnoteContent = hasFootnoteContent ? nextSegment.content : undefined
+    const footnoteContent = hasFootnoteContent ? nextSegment.content : ""
     footnote.FOOTNOTE.push({ [footnoteType]: [footnoteContent] })
     partIndex += hasFootnoteContent ? 2 : 1
   }
