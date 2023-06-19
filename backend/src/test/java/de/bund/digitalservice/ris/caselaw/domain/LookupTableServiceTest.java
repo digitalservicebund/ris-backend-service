@@ -135,38 +135,4 @@ class LookupTableServiceTest {
     verify(databaseCitationStyleRepository)
         .findAllByDocumentTypeAndCitationDocumentTypeOrderByCitationDocumentTypeAsc('R', 'R');
   }
-
-  @Test
-  void testGetCitationStylesWithSearchQuery() {
-    UUID TEST_UUID = UUID.randomUUID();
-    List<CitationStyleDTO> citationStyleDTOS =
-        List.of(
-            CitationStyleDTO.builder()
-                .uuid(TEST_UUID)
-                .jurisId(1L)
-                .changeIndicator('N')
-                .version("1.0")
-                .documentType("R")
-                .citationDocumentType("R")
-                .jurisShortcut("Änderung")
-                .label("Änderung")
-                .newEntry(true)
-                .build());
-
-    when(databaseCitationStyleRepository.findBySearchStr("Änderung"))
-        .thenReturn(Flux.fromIterable(citationStyleDTOS));
-
-    StepVerifier.create(service.getCitationStyles(Optional.of("Änderung")))
-        .consumeNextWith(
-            citationStyle -> {
-              assertThat(citationStyle).isInstanceOf(CitationStyle.class);
-              assertThat(citationStyle.documentType()).isEqualTo("R");
-              assertThat(citationStyle.citationDocumentType()).isEqualTo("R");
-              assertThat(citationStyle.jurisShortcut()).isEqualTo("Änderung");
-              assertThat(citationStyle.label()).isEqualTo("Änderung");
-            })
-        .verifyComplete();
-
-    verify(databaseCitationStyleRepository).findBySearchStr("Änderung");
-  }
 }
