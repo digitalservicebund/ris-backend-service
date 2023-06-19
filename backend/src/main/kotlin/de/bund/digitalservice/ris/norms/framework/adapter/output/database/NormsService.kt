@@ -71,18 +71,18 @@ class NormsService(
 
     override fun getNormByGuid(query: GetNormByGuidOutputPort.Query): Mono<Norm> {
         val findNormRequest = normsRepository.findByGuid(query.guid).cache()
-        val buildArticlesRequest = findNormRequest.flatMapMany { articlesRepository.findByNormGuid(it.guid) }
+        val buildArticlesRequest = findNormRequest.flatMapMany { articlesRepository.findByNormId(it.id) }
             .flatMap(::getArticleWithParagraphs)
             .collectList()
 
-        val findFileReferencesRequest = findNormRequest.flatMapMany { fileReferenceRepository.findByNormGuid(it.guid) }
+        val findFileReferencesRequest = findNormRequest.flatMapMany { fileReferenceRepository.findByNormId(it.id) }
             .map(::fileReferenceToEntity)
             .collectList()
 
-        val findSectionsRequest = findNormRequest.flatMapMany { metadataSectionsRepository.findByNormGuid(it.guid) }
+        val findSectionsRequest = findNormRequest.flatMapMany { metadataSectionsRepository.findByNormId(it.id) }
             .collectList()
 
-        val findMetadataRequest = findSectionsRequest.flatMapMany { metadataRepository.findBySectionGuidIn(it.map { section -> section.guid }) }
+        val findMetadataRequest = findSectionsRequest.flatMapMany { metadataRepository.findBySectionIdIn(it.map { section -> section.id }) }
             .collectList()
 
         return Mono.zip(
@@ -108,9 +108,9 @@ class NormsService(
 
     @Transactional(transactionManager = "connectionFactoryTransactionManager")
     override fun editNorm(command: EditNormOutputPort.Command): Mono<Boolean> {
-        val deleteNormRequest = normsRepository.deleteByGuid(command.norm.guid).cache()
-        val saveNormRequest = deleteNormRequest
-            .then(Mono.fromCallable { normToDto(command.norm) })
+        val findNormRequest = normsRepository.findByGuid(command.norm.guid).cache()
+        val saveNormRequest = findNormRequest
+            .map { normDto -> normToDto(command.norm, normDto.id) }
             .flatMap(normsRepository::save).cache()
 
         val updateMetadataRequest = saveNormRequest.flatMapMany { normDto -> saveNormSectionsWithMetadata(command.norm, normDto) }
@@ -122,21 +122,21 @@ class NormsService(
     override fun saveFileReference(command: SaveFileReferenceOutputPort.Command): Mono<Boolean> {
         return normsRepository
             .findByGuid(command.norm.guid)
-            .map { normDto -> fileReferenceToDto(fileReference = command.fileReference, normGuid = normDto.guid) }
+            .map { normDto -> fileReferenceToDto(fileReference = command.fileReference, normId = normDto.id, normGuid = normDto.guid) }
             .flatMap(fileReferenceRepository::save)
             .map { true }
     }
 
     private fun saveNormArticles(norm: Norm, normDto: NormDto): Flux<ParagraphDto> {
         return articlesRepository
-            .saveAll(articlesToDto(articles = norm.articles, normGuid = normDto.guid))
+            .saveAll(articlesToDto(articles = norm.articles, normId = normDto.id, normGuid = normDto.guid))
             .flatMap { article -> saveArticleParagraphs(norm, article) }
     }
 
     private fun saveNormSectionsWithMetadata(norm: Norm, normDto: NormDto): Flux<MetadataSectionDto> {
-        return deleteOldMetadata(normDto.guid)
+        return deleteOldMetadata(normDto.id)
             .thenMany(Flux.fromIterable(norm.metadataSections))
-            .flatMap { metadataSectionsRepository.save(metadataSectionToDto(it, normDto.guid)) }
+            .flatMap { metadataSectionsRepository.save(metadataSectionToDto(it, normDto.id)) }
             .flatMap { parentSectionDto ->
                 val sectionDomain = norm.metadataSections.first { it.guid == parentSectionDto.guid }
                 if (sectionDomain.sections.isNullOrEmpty()) {
@@ -158,8 +158,9 @@ class NormsService(
                 norm.metadataSections
                     .find { it.guid == parentSection.guid }
                     ?.sections ?: listOf(),
+                parentSection.normId,
                 parentSection.guid,
-                parentSection.normGuid,
+                parentSection.id,
             ),
         ).flatMap { childrenSectionDto ->
             val childrenSectionsDomain = norm.metadataSections
@@ -176,17 +177,17 @@ class NormsService(
     }
 
     private fun saveNormFiles(norm: Norm, normDto: NormDto): Flux<FileReferenceDto> {
-        return fileReferenceRepository.saveAll(fileReferencesToDto(norm.files, normDto.guid))
+        return fileReferenceRepository.saveAll(fileReferencesToDto(norm.files, normDto.id, normDto.guid))
     }
 
     private fun saveSectionMetadata(metadataSectionDto: MetadataSectionDto, metadata: List<Metadatum<*>>): Flux<MetadatumDto> {
-        return metadataRepository.saveAll(metadataListToDto(metadata, metadataSectionDto.guid))
+        return metadataRepository.saveAll(metadataListToDto(metadata, metadataSectionDto.id, metadataSectionDto.guid))
     }
 
-    private fun deleteOldMetadata(normGuid: UUID): Mono<Void> = metadataSectionsRepository.findByNormGuid(normGuid)
+    private fun deleteOldMetadata(normId: Int): Mono<Void> = metadataSectionsRepository.findByNormId(normId)
         .flatMap {
-            metadataRepository.deleteBySectionGuid(it.guid)
-        }.then(metadataSectionsRepository.deleteByNormGuid(normGuid))
+            metadataRepository.deleteBySectionId(it.id)
+        }.then(metadataSectionsRepository.deleteByNormId(normId))
 
     private fun saveArticleParagraphs(norm: Norm, article: ArticleDto): Flux<ParagraphDto> {
         return paragraphsRepository.saveAll(
@@ -194,14 +195,15 @@ class NormsService(
                 paragraphs = norm.articles
                     .find { it.guid == article.guid }
                     ?.paragraphs ?: listOf(),
+                articleId = article.id,
                 articleGuid = article.guid,
             ),
         )
     }
 
     private fun getNormWithMetadata(normDto: NormDto): Mono<Norm> {
-        val findSectionsRequest = metadataSectionsRepository.findByNormGuid(normDto.guid).collectList()
-        val findMetadataRequest = findSectionsRequest.flatMapMany { metadataRepository.findBySectionGuidIn(it.map { section -> section.guid }) }
+        val findSectionsRequest = metadataSectionsRepository.findByNormId(normDto.id).collectList()
+        val findMetadataRequest = findSectionsRequest.flatMapMany { metadataRepository.findBySectionIdIn(it.map { section -> section.id }) }
             .collectList()
 
         return Mono.zip(
@@ -213,7 +215,7 @@ class NormsService(
     }
 
     private fun getArticleWithParagraphs(articleDto: ArticleDto): Mono<Article> {
-        return paragraphsRepository.findByArticleGuid(articleDto.guid)
+        return paragraphsRepository.findByArticleId(articleDto.id)
             .map(::paragraphToEntity)
             .collectList()
             .map { paragraphs -> articleToEntity(articleDto, paragraphs) }

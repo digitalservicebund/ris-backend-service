@@ -21,12 +21,8 @@ import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.KEYWORD
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.PARTICIPATION_INSTITUTION
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.PARTICIPATION_TYPE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.YEAR
-import de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto.ArticleDto
-import de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto.FileReferenceDto
-import de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto.MetadataSectionDto
 import de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto.MetadatumDto
 import de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto.NormDto
-import de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto.ParagraphDto
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeAll
@@ -41,6 +37,7 @@ import org.springframework.r2dbc.core.DatabaseClient
 import reactor.test.StepVerifier
 import utils.createRandomNorm
 import utils.createSimpleSections
+import java.time.Duration
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
@@ -59,7 +56,7 @@ class NormsServiceTest : PostgresTestcontainerIntegrationTest() {
         private val PARAGRAPH2: Paragraph = Paragraph(UUID.randomUUID(), "(2)", "Text2")
         private val PARAGRAPH3: Paragraph = Paragraph(UUID.randomUUID(), "(1)", "Text3")
         private val PARAGRAPH4: Paragraph = Paragraph(UUID.randomUUID(), "(2)", "Text4")
-        private val FILE1: FileReference = FileReference("test.zip", "123456789", LocalDateTime.now(), UUID.randomUUID())
+        private val FILE1: FileReference = FileReference("test.zip", "123456789", LocalDateTime.now())
     }
 
     @Autowired
@@ -77,12 +74,7 @@ class NormsServiceTest : PostgresTestcontainerIntegrationTest() {
 
     @AfterEach
     fun cleanUp() {
-        template.delete(NormDto::class.java).all().block()
-        template.delete(ArticleDto::class.java).all().block()
-        template.delete(ParagraphDto::class.java).all().block()
-        template.delete(FileReferenceDto::class.java).all().block()
-        template.delete(MetadataSectionDto::class.java).all().block()
-        template.delete(MetadatumDto::class.java).all().block()
+        template.delete(NormDto::class.java).all().block(Duration.ofSeconds(1))
     }
 
     @Test
@@ -437,9 +429,6 @@ class NormsServiceTest : PostgresTestcontainerIntegrationTest() {
 
     @Test
     fun `save norm and edit norm`() {
-        val norm = NORM.copy(
-            articles = listOf(ARTICLE1, ARTICLE2),
-        )
         val saveCommand = SaveNormOutputPort.Command(NORM)
         val guidQuery = GetNormByGuidOutputPort.Query(NORM.guid)
 
@@ -552,7 +541,7 @@ class NormsServiceTest : PostgresTestcontainerIntegrationTest() {
     @Test
     fun `it maps metadatum of date type to entity properly`() {
         val guid: UUID = UUID.randomUUID()
-        val metadatumDto = MetadatumDto(guid, "2020-12-23", DATE, 1, UUID.randomUUID())
+        val metadatumDto = MetadatumDto(1, guid, "2020-12-23", DATE, 1, 1, UUID.randomUUID())
         val result = normsService.metadatumToEntity(metadatumDto)
 
         assertThat(result.value).isEqualTo(LocalDate.of(2020, 12, 23))

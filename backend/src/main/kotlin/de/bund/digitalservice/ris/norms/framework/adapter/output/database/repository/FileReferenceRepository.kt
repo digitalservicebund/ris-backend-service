@@ -4,10 +4,9 @@ import de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto.Fi
 import org.springframework.data.repository.reactive.ReactiveCrudRepository
 import org.springframework.stereotype.Repository
 import reactor.core.publisher.Flux
-import java.util.*
 
 @Repository
-interface FileReferenceRepository : ReactiveCrudRepository<FileReferenceDto, UUID> {
+interface FileReferenceRepository : ReactiveCrudRepository<FileReferenceDto, Int> {
 
-    fun findByNormGuid(normGuid: UUID): Flux<FileReferenceDto>
+    fun findByNormId(norm: Int): Flux<FileReferenceDto>
 }

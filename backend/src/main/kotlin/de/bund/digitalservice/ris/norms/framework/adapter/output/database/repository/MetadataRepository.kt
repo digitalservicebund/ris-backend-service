@@ -5,12 +5,13 @@ import org.springframework.data.repository.reactive.ReactiveCrudRepository
 import org.springframework.stereotype.Repository
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
-import java.util.UUID
 
 @Repository
-interface MetadataRepository : ReactiveCrudRepository<MetadatumDto, UUID> {
+interface MetadataRepository : ReactiveCrudRepository<MetadatumDto, Int> {
 
-    fun deleteBySectionGuid(normGuid: UUID): Mono<Void>
+    fun findBySectionId(normId: Int): Flux<MetadatumDto>
 
-    fun findBySectionGuidIn(sectionGuids: List<UUID>): Flux<MetadatumDto>
+    fun deleteBySectionId(normId: Int): Mono<Void>
+
+    fun findBySectionIdIn(sectionIds: List<Int>): Flux<MetadatumDto>
 }

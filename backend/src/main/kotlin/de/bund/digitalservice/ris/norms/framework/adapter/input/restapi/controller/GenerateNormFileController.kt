@@ -3,7 +3,6 @@ package de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.control
 import de.bund.digitalservice.ris.norms.application.port.input.GenerateNormFileUseCase
 import de.bund.digitalservice.ris.norms.domain.entity.FileReference
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.ApiConfiguration
-import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.encodeGuid
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.encodeLocalDateTime
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.PathVariable
@@ -32,14 +31,12 @@ class GenerateNormFileController(private val generateNormFileService: GenerateNo
         val name: String,
         val hash: String,
         val createdAt: String,
-        val guid: String,
     ) {
         companion object {
             fun fromUseCaseData(data: FileReference): FileReferenceResponseSchema = FileReferenceResponseSchema(
                 data.name,
                 data.hash,
                 encodeLocalDateTime(data.createdAt),
-                encodeGuid(data.guid),
             )
         }
     }

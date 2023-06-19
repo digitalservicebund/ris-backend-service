@@ -17,7 +17,7 @@ import org.w3c.dom.Node
 import org.xml.sax.InputSource
 import reactor.test.StepVerifier
 import utils.createRandomNorm
-import utils.createRandomNormWithCitationDateAndArticles
+import utils.createRandomNormWithCitationDate
 import java.io.File
 import java.io.StringReader
 import java.io.StringWriter
@@ -36,7 +36,7 @@ import kotlin.collections.ArrayList
 class ToLegalDocMLConverterTest {
     @Test
     fun `it creates a Akoma Ntoso document with correct schema and version`() {
-        val document = convertNormToLegalDocML(createRandomNormWithCitationDateAndArticles())
+        val document = convertNormToLegalDocML(createRandomNormWithCitationDate())
         assertThat(document.getElementsByTagName("akn:akomaNtoso").length).isEqualTo(1)
         assertThat(document.firstChild.nodeName).isEqualTo("akn:akomaNtoso")
 
@@ -50,7 +50,7 @@ class ToLegalDocMLConverterTest {
 
     @Test
     fun `it adds the correct main element with name`() {
-        val document = convertNormToLegalDocML(createRandomNormWithCitationDateAndArticles())
+        val document = convertNormToLegalDocML(createRandomNormWithCitationDate())
 
         val mainElement = document.getElementsByTagName("akn:bill")
 
@@ -60,7 +60,7 @@ class ToLegalDocMLConverterTest {
     @Test
     fun `it creates the preface with the norm its official titles`() {
         val norm =
-            createRandomNormWithCitationDateAndArticles()
+            createRandomNormWithCitationDate()
                 .copy(
                     officialLongTitle = "test official long title",
                     officialShortTitle = "test official short title",
@@ -95,7 +95,7 @@ class ToLegalDocMLConverterTest {
         )
         val guid = UUID.randomUUID()
         val norm =
-            createRandomNormWithCitationDateAndArticles()
+            createRandomNormWithCitationDate()
                 .copy(
                     guid = guid,
                     announcementDate = LocalDate.parse("2001-01-01"),
@@ -152,7 +152,7 @@ class ToLegalDocMLConverterTest {
 
     @Test
     fun `it creates the constant metadata tags `() {
-        val document = convertNormToLegalDocML(createRandomNormWithCitationDateAndArticles())
+        val document = convertNormToLegalDocML(createRandomNormWithCitationDate())
 
         val metadata = document.getElementsByTagName("meta:legalDocML.de_metadaten").item(0)
         val form = getFirstChildNodeWithTagName(metadata, "meta:form")
@@ -196,7 +196,7 @@ class ToLegalDocMLConverterTest {
 
     @Test
     fun `it creates the metadata tag with default values if null provided`() {
-        val document = convertNormToLegalDocML(createRandomNormWithCitationDateAndArticles())
+        val document = convertNormToLegalDocML(createRandomNormWithCitationDate())
 
         val metadata = document.getElementsByTagName("meta:legalDocML.de_metadaten").item(0)
         val type = getFirstChildNodeWithTagName(metadata, "meta:typ")
@@ -275,7 +275,7 @@ class ToLegalDocMLConverterTest {
                 marker = "§ 9a",
                 paragraphs = listOf(paragraph),
             )
-        val norm = createRandomNormWithCitationDateAndArticles().copy(
+        val norm = createRandomNormWithCitationDate().copy(
             articles = listOf(article),
         )
         val document = convertNormToLegalDocML(norm)
@@ -334,7 +334,7 @@ class ToLegalDocMLConverterTest {
                 marker = "§ 1",
                 paragraphs = listOf(paragraph),
             )
-        val norm = createRandomNormWithCitationDateAndArticles().copy(
+        val norm = createRandomNormWithCitationDate().copy(
             articles = listOf(article),
         )
         val document = convertNormToLegalDocML(norm)
@@ -413,7 +413,7 @@ class ToLegalDocMLConverterTest {
                 marker = "§ 1",
                 paragraphs = listOf(paragraph),
             )
-        val norm = createRandomNormWithCitationDateAndArticles().copy(
+        val norm = createRandomNormWithCitationDate().copy(
             articles = listOf(article),
         )
         val document = convertNormToLegalDocML(norm)
@@ -481,7 +481,7 @@ class ToLegalDocMLConverterTest {
 
     @Test
     fun `it produces valid xml content according to xml schema definition`() {
-        val norm = createRandomNormWithCitationDateAndArticles()
+        val norm = createRandomNormWithCitationDate()
         val document = convertNormToLegalDocML(norm)
         val domSource = DOMSource(document)
         val writer = StringWriter()

@@ -1,5 +1,6 @@
 package de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto
 
+import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Column
 import org.springframework.data.relational.core.mapping.Table
 import java.time.LocalDate
@@ -7,7 +8,10 @@ import java.util.*
 
 @Table(name = "norms")
 data class NormDto(
+    @Id
+    val id: Int,
     val guid: UUID,
+
     @Column("official_long_title")
     val officialLongTitle: String,
     @Column("ris_abbreviation")

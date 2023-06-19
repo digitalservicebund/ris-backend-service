@@ -12,7 +12,6 @@ import de.bund.digitalservice.ris.norms.domain.entity.getHashFromContent
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import reactor.core.publisher.Mono
-import java.util.*
 
 @Service
 class GenerateNormFileService(
@@ -63,7 +62,7 @@ class GenerateNormFileService(
     }
 
     private fun createNewFileReference(streamDataBox: StreamDataBox): Mono<FileReference> {
-        val fileReference = FileReference(streamDataBox.lastFileReference.name, getHashFromContent(streamDataBox.file), guid = UUID.randomUUID())
+        val fileReference = FileReference(streamDataBox.lastFileReference.name, getHashFromContent(streamDataBox.file))
         val commandSaveFileReference = SaveFileReferenceOutputPort.Command(fileReference, streamDataBox.norm)
         return saveFileReferenceOutputPort.saveFileReference(commandSaveFileReference)
             .flatMap { Mono.just(fileReference) }

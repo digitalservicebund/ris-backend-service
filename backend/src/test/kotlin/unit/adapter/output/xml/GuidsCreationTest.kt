@@ -3,12 +3,12 @@ package de.bund.digitalservice.ris.norms.framework.adapter.output.xml
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.w3c.dom.Node
-import utils.createRandomNormWithCitationDateAndArticles
+import utils.createRandomNormWithCitationDate
 
 class GuidsCreationTest {
     @Test
     fun `it creates unique guids for short and long titles`() {
-        val document = convertNormToLegalDocML(createRandomNormWithCitationDateAndArticles())
+        val document = convertNormToLegalDocML(createRandomNormWithCitationDate())
 
         val longTitle = document.getElementsByTagName("akn:longTitle").item(0)
         val longTitleP = getFirstChildNodeWithTagName(longTitle, "akn:p")
@@ -25,7 +25,7 @@ class GuidsCreationTest {
 
     @Test
     fun `it creates unique guids for articles`() {
-        val document = convertNormToLegalDocML(createRandomNormWithCitationDateAndArticles())
+        val document = convertNormToLegalDocML(createRandomNormWithCitationDate())
 
         val article = document.getElementsByTagName("akn:article").item(0)
         val marker = getFirstChildNodeWithTagName(article, "akn:num")
@@ -36,7 +36,7 @@ class GuidsCreationTest {
 
     @Test
     fun `it creates unique guids for paragraphs`() {
-        val document = convertNormToLegalDocML(createRandomNormWithCitationDateAndArticles())
+        val document = convertNormToLegalDocML(createRandomNormWithCitationDate())
 
         val paragraph = document.getElementsByTagName("akn:paragraph").item(0)
         val marker = getFirstChildNodeWithTagName(paragraph, "akn:num")
