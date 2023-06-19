@@ -3,11 +3,12 @@ import { computed } from "vue"
 import SegmentEditor, {
   Segment,
   SuggestionGroupOptions,
-} from "./SegmentEditor.vue"
-import {Footnote, FOOTNOTE_TYPE_TO_LABEL_MAPPING, FootnoteSectionType} from "@/components/Footnotes/types";
+} from "../SegmentEditor.vue"
+import {Footnote, FOOTNOTE_LABELS} from "@/components/Footnotes/types";
+import {MetadatumType} from "@/domain/Norm";
 
 const props = withDefaults(defineProps<Props>(), {
-  modelValue: () => ({ parts: [] }),
+  modelValue: () => ({} as Footnote),
 })
 
 const emit = defineEmits<Emits>()
@@ -25,54 +26,49 @@ const inputValue = computed({
 
 const FOOTNOTE_SEGMENT_TYPE = "footnote_type"
 
-function parseFootnoteAsSegments(footnote: Footnote): Segment[] {
-  const segments = footnote.parts
-    .map((part): Segment[] => {
-      const segments = []
-      part.type &&
+function parseFootnoteAsSegments(section): Segment[] {
+  const segments = []
+  section?.FOOTNOTE?.forEach((footnote) => {
+      const metadatumType = Object.keys(footnote)[0]
+      if (metadatumType != MetadatumType.FOOTNOTE_REFERENCE) {
         segments.push({
           type: FOOTNOTE_SEGMENT_TYPE,
-          content: FOOTNOTE_TYPE_TO_LABEL_MAPPING[part.type],
-          id: part.type,
+          content: FOOTNOTE_LABELS[metadatumType],
+          id: MetadatumType[metadatumType],
         })
-      part.content && segments.push({ type: "text", content: part.content })
-      return segments
+      }
+      segments.push({ type: "text", content: Object.values(footnote)[0][0] })
     })
-    .reduce(
-      (allSegments, currentValue) => [...allSegments, ...currentValue],
-      []
-    )
-  footnote.prefix &&
-    segments.unshift({ type: "text", content: footnote.prefix })
   return segments
 }
 function parseSegmentsAsFootnote(segments: Segment[]): Footnote {
-  const footnote: Footnote = { parts: [] }
+  const footnote: Footnote = { FOOTNOTE: [] }
   let partIndex = 0
   if (segments.length > 0 && segments[0].type == "text") {
-    footnote.prefix = segments[0].content
+    footnote.FOOTNOTE.push({FOOTNOTE_REFERENCE: [segments[0].content]})
     partIndex = 1
   }
   while (partIndex < segments.length) {
     const segment = segments[partIndex]
     const hasFootnoteType = segment.type == FOOTNOTE_SEGMENT_TYPE
-    const footnoteType = hasFootnoteType
-      ? (segment.id as FootnoteSectionType)
+    const footnoteType: MetadatumType | undefined = hasFootnoteType
+      ? (segment.id as MetadatumType)
       : undefined
     const nextSegment = segments[partIndex + 1] ?? ({} as Segment)
     const hasFootnoteContent = nextSegment.type == "text"
     const footnoteContent = hasFootnoteContent ? nextSegment.content : undefined
-    footnote.parts.push({ type: footnoteType, content: footnoteContent })
+    footnote.FOOTNOTE.push({ [footnoteType]: [footnoteContent] })
     partIndex += hasFootnoteContent ? 2 : 1
   }
   return footnote
 }
+
 const options: SuggestionGroupOptions = {
   segmentType: FOOTNOTE_SEGMENT_TYPE,
   trigger: "@",
   elementClasses: ["bg-yellow-300", "rounded", "px-10", "py-2"],
   callback: (input: string) =>
-    Object.entries(FOOTNOTE_TYPE_TO_LABEL_MAPPING)
+    Object.entries(FOOTNOTE_LABELS)
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       .filter(([_, label]) =>
         label.toLowerCase().startsWith(input.toLowerCase())

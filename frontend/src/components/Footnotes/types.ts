@@ -1,29 +1,18 @@
-export enum FootnoteSectionType {
-    FOOTNOTE_REFERENCE = "FOOTNOTE_REFERENCE",
-    FOOTNOTE_CHANGE = "FOOTNOTE_CHANGE",
-    FOOTNOTE_COMMENT = "FOOTNOTE_COMMENT",
-    FOOTNOTE_DECISION = "FOOTNOTE_DECISION",
-    FOOTNOTE_STATE_LAW = "FOOTNOTE_STATE_LAW",
-    FOOTNOTE_EU_LAW = "FOOTNOTE_EU_LAW",
-    FOOTNOTE_OTHER = "FOOTNOTE_OTHER",
-}
+import {MetadatumType} from "@/domain/Norm";
 
 export type FootnoteSection = {
-    type?: FootnoteSectionType
+    type?: MetadatumType
     content?: string
 }
 
-export type Footnote = {
-    prefix?: string
-    parts: FootnoteSection[]
-}
+export type Footnote = { FOOTNOTE: {[key:string] : string[]}[] }
 
-export const FOOTNOTE_TYPE_TO_LABEL_MAPPING: Record<FootnoteSectionType, string> = {
-    [FootnoteSectionType.FOOTNOTE_CHANGE]: "Änderungsfußnote",
-    [FootnoteSectionType.FOOTNOTE_COMMENT]: "Kommentierende Fußnote",
-    [FootnoteSectionType.FOOTNOTE_DECISION]: "BVerfG-Entscheidung",
-    [FootnoteSectionType.FOOTNOTE_STATE_LAW]: "Landesrecht",
-    [FootnoteSectionType.FOOTNOTE_EU_LAW]: "EU/EG-Recht",
-    [FootnoteSectionType.FOOTNOTE_OTHER]: "Sonstige Fußnote",
-    [FootnoteSectionType.FOOTNOTE_REFERENCE]: "",
+export const FOOTNOTE_LABELS = {
+    [MetadatumType.FOOTNOTE_CHANGE]: "Änderungsfußnote",
+    [MetadatumType.FOOTNOTE_COMMENT]: "Kommentierende Fußnote",
+    [MetadatumType.FOOTNOTE_DECISION]: "BVerfG-Entscheidung",
+    [MetadatumType.FOOTNOTE_STATE_LAW]: "Landesrecht",
+    [MetadatumType.FOOTNOTE_EU_LAW]: "EU/EG-Recht",
+    [MetadatumType.FOOTNOTE_OTHER]: "Sonstige Fußnote",
+    [MetadatumType.FOOTNOTE_REFERENCE]: "",
 }

@@ -5,11 +5,10 @@ import FootnoteInput from "@/components/Footnotes/FootnoteInput.vue"
 import { withSummarizer } from "@/shared/components/DataSetSummary.vue"
 import EditableList from "@/shared/components/EditableList.vue"
 import {
-  Footnote,
-  FOOTNOTE_TYPE_TO_LABEL_MAPPING,
+  FOOTNOTE_LABELS,
   FootnoteSection,
-  FootnoteSectionType
 } from "@/components/Footnotes/types";
+import {MetadataSections, MetadatumType} from "@/domain/Norm";
 
 
 function summarizeFootnotePart(
@@ -24,7 +23,7 @@ function summarizeFootnotePart(
     "whitespace-pre",
     ...extraTypeClasses,
   ]
-  const typeLabel = part.type ?? "Unbekannt"
+  const typeLabel = FOOTNOTE_LABELS[part.type] ?? "Unbekannt"
   const type = h("span", { class: typeClasses }, typeLabel)
   const contentClasses = ["pl-6", "pr-10", "inline", "whitespace-pre-wrap"]
   const contentText = h("p", { class: contentClasses }, part.content?.trim())
@@ -46,68 +45,49 @@ function summarizePrefix(prefix?: string): VNode | string {
   const hasPrefix = prefix && prefix.trim().length > 0
   return hasPrefix ? prefixNode : ""
 }
-function summarizeFootnotePerLine(footnote: Footnote): VNode {
-  const partNodes = footnote.parts.map(({ type, content }) =>
+function summarizeFootnotePerLine(data: MetadataSections): VNode {
+  const prefix = data.FOOTNOTE?.filter((footnote) => Object.keys(footnote).includes(MetadatumType.FOOTNOTE_REFERENCE))[0]?.FOOTNOTE_REFERENCE[0] ?? undefined
+  const segments = data.FOOTNOTE?.filter((footnote) => !Object.keys(footnote).includes(MetadatumType.FOOTNOTE_REFERENCE))?.map((footnote) =>
     h(
       "div",
       summarizeFootnotePart({
-        type: type && FOOTNOTE_TYPE_TO_LABEL_MAPPING[type],
-        content,
+        type: MetadatumType[Object.keys(footnote)[0]],
+        content: Object.values(footnote)[0][0] as string,
       })
     )
   )
-  const prefix = summarizePrefix(footnote.prefix)
   return h("div", { class: ["flex", "flex-col", "gap-10"] }, [
-    prefix,
-    partNodes,
+    prefix ? summarizePrefix(prefix) : "",
+    segments,
   ])
 }
-const EXAMPLE_FOOTNOTES: Footnote[] = [
-  {
-    prefix: "§ 7 Abs. 1a Satz 1 u. 2",
-    parts: [
-      {
-        type: FootnoteSectionType.FOOTNOTE_CHANGE,
-        content:
-          "eine ganze Menge Text mit viel Inhalt über eine Zeile hinaus und noch viel viel viel weiter in die nächste",
-      },
-      {
-        type: FootnoteSectionType.FOOTNOTE_EU_LAW,
-        content: "irgendwas halt",
-      },
-    ],
-  },
-  {
-    parts: [
-      { type: FootnoteSectionType.FOOTNOTE_STATE_LAW, content: "" },
-      {
-        type: FootnoteSectionType.FOOTNOTE_COMMENT,
-        content: "einfach nur ein Kommentar",
-      },
-      {
-        type: FootnoteSectionType.FOOTNOTE_DECISION,
-        content: "das wurde halt so entschieden",
-      },
-    ],
-  },
-  {
-    prefix: "§ 1 Abs. 5b",
-    parts: [
-      {
-        type: FootnoteSectionType.FOOTNOTE_OTHER,
-        content:
-          "noch etwas mehr oben drauf\nmit einer neuen Zeile\nund noch einer\n",
-      },
-      {
-        type: FootnoteSectionType.FOOTNOTE_OTHER,
-        content: "ach nochmal eben etwas",
-      },
-    ],
-  },
-]
-const inputValueForExamples = ref<Footnote[]>(
-  JSON.parse(JSON.stringify(EXAMPLE_FOOTNOTES))
-)
+
+const EXAMPLE_FOOTNOTES = [
+    {
+      FOOTNOTE: [
+        {FOOTNOTE_REFERENCE: ["§ 7 Abs. 1a Satz 1 u. 2"]},
+        {FOOTNOTE_CHANGE: ["eine ganze Menge Text mit viel Inhalt über eine Zeile hinaus und noch viel viel viel weiter in die nächste"]},
+        {FOOTNOTE_EU_LAW: ["irgendwas halt"]},
+      ]
+    },
+    {
+      FOOTNOTE: [
+        {FOOTNOTE_STATE_LAW: [""]},
+        {FOOTNOTE_COMMENT: ["einfach nur ein Kommentar"]},
+        {FOOTNOTE_DECISION: ["das wurde halt so entschieden"]},
+      ]
+    },
+    {
+      FOOTNOTE: [
+        {FOOTNOTE_REFERENCE: ["§ 1 Abs. 5b"]},
+        {FOOTNOTE_OTHER: ["noch etwas mehr oben drauf\nmit einer neuen Zeile\nund noch einer\n", "ach nochmal eben etwas"]},
+        {FOOTNOTE_CHANGE: ["eine ganze Menge Text mit viel Inhalt über eine Zeile hinaus und noch viel viel viel weiter in die nächste"]},
+        {FOOTNOTE_OTHER: ["ach nochmal eben etwas"]},
+      ]
+    }
+  ]
+
+const inputValueForExamples = ref<MetadataSections[]>(EXAMPLE_FOOTNOTES)
 
 const FootnotePerLineSummary = withSummarizer(summarizeFootnotePerLine)
 </script>
@@ -121,7 +101,7 @@ const FootnotePerLineSummary = withSummarizer(summarizeFootnotePerLine)
     >
       <EditableList
         v-model="inputValueForExamples"
-        :default-value="{ parts: [] }"
+        :default-value="{}"
         :edit-component="FootnoteInput"
         :summary-component="FootnotePerLineSummary"
       />
