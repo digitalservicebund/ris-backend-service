@@ -18,6 +18,7 @@ test.describe("saving behaviour", () => {
       await route.abort("internetdisconnected")
     })
 
+    await page.locator("[aria-label='Spruchkörper']").fill("VG-001")
     await page.locator("[aria-label='Speichern Button']").click()
 
     await expect(page.locator("text='Fehler beim Speichern'")).toBeVisible()

@@ -33,6 +33,8 @@ const showDocPanel = useToggleStateInRouteQuery(
   router.replace,
   false
 )
+const hasDataChange = ref(false)
+const lastUpdatedDocumentUnit = ref(JSON.stringify(props.documentUnit))
 
 const handleUpdateValueDocumentUnitTexts = async (
   updatedValue: [keyof Texts, string]
@@ -47,18 +49,26 @@ const handleUpdateValueDocumentUnitTexts = async (
 }
 
 async function handleUpdateDocumentUnit(): Promise<ServiceResponse<void>> {
-  const response = await documentUnitService.update(
-    updatedDocumentUnit.value as DocumentUnit
-  )
-  if (response?.error?.validationErrors) {
-    validationErrors.value = response.error.validationErrors
-  } else {
-    validationErrors.value = []
+  hasDataChange.value =
+    JSON.stringify(updatedDocumentUnit.value) !== lastUpdatedDocumentUnit.value
+
+  if (hasDataChange.value) {
+    const response = await documentUnitService.update(
+      updatedDocumentUnit.value as DocumentUnit
+    )
+    if (response?.error?.validationErrors) {
+      validationErrors.value = response.error.validationErrors
+    } else {
+      validationErrors.value = []
+    }
+    if (response.data) {
+      updatedDocumentUnit.value = response.data as DocumentUnit
+    }
+    hasDataChange.value = false
+    lastUpdatedDocumentUnit.value = JSON.stringify(updatedDocumentUnit.value)
+    return response as ServiceResponse<void>
   }
-  if (response.data) {
-    updatedDocumentUnit.value = response.data as DocumentUnit
-  }
-  return response as ServiceResponse<void>
+  return { status: 200, data: undefined } as ServiceResponse<void>
 }
 
 watch(
