@@ -121,7 +121,7 @@ dependencies {
   implementation "com.fasterxml.woodstox:woodstox-core:6.5.0"
 
   implementation "org.docx4j:docx4j-JAXB-MOXy:11.4.9"
-  implementation "com.sun.mail:jakarta.mail:2.0.1"
+  implementation "jakarta.mail:jakarta.mail-api:2.0.1"
   implementation "com.sun.activation:jakarta.activation:2.0.1"
   implementation("jakarta.xml.bind:jakarta.xml.bind-api") {
     version {
@@ -131,11 +131,11 @@ dependencies {
   implementation "org.freehep:freehep-graphicsio-emf:2.4"
 
   // package served by private repo, requires authentication:
-  implementation("de.bund.digitalservice:neuris-juris-xml-export:0.6.1") {
+  implementation("de.bund.digitalservice:neuris-juris-xml-export:0.6.3") {
     exclude group: "org.slf4j", module: "slf4j-simple"
   }
   // for local development:
-  // implementation files("../../neuris-juris-xml-export/build/libs/neuris-juris-xml-export-0.1.5.jar")
+  //  implementation files("../../neuris-juris-xml-export/build/libs/neuris-juris-xml-export-0.6.3.jar")
 
   implementation("de.bund.digitalservice:ris-norms-juris-converter:0.12.2")
 

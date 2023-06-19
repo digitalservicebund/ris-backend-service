@@ -3,6 +3,7 @@ package de.bund.digitalservice.ris.caselaw.adapter;
 import static de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatus.UNPUBLISHED;
 
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentUnitStatusRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitException;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitStatusDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.PostgresDocumentUnitRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
@@ -62,6 +63,10 @@ public class DatabaseDocumentUnitStatusService implements DocumentUnitStatusServ
   public Mono<String> getIssuerAddressOfLatestStatus(String documentNumber) {
     return documentUnitRepository
         .findByDocumentNumber(documentNumber)
+        .switchIfEmpty(
+            Mono.error(
+                new DocumentUnitException(
+                    "Could not find Document Unit with documentNumber " + documentNumber)))
         .flatMap(
             documentUnit ->
                 repository.findFirstByDocumentUnitIdOrderByCreatedAtDesc(documentUnit.uuid()))
