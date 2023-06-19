@@ -18,6 +18,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -46,6 +48,9 @@ public class JurisXmlExporterResponseProcessor {
 
   @Value("${mail.exporter.response.mailbox.password:}")
   public String mailboxPassword;
+
+  private static final Logger LOGGER =
+      LoggerFactory.getLogger(JurisXmlExporterResponseProcessor.class);
 
   public JurisXmlExporterResponseProcessor(
       HttpMailSender mailSender, DocumentUnitStatusService statusService) {
@@ -77,7 +82,6 @@ public class JurisXmlExporterResponseProcessor {
       inbox.open(Folder.READ_WRITE);
 
       Folder processed = store.getFolder("processed");
-      processed.open(Folder.READ_WRITE);
 
       Folder unprocessable = store.getFolder("unprocessable");
 
@@ -95,12 +99,8 @@ public class JurisXmlExporterResponseProcessor {
 
           forwardMessage(message, (ActionableMessageHandler) handler)
               .doOnSuccess(result -> processedMessages.add(message))
-              .onErrorResume(
-                  e -> {
-                    System.out.println("Could not forward message: " + e);
-                    return Mono.empty();
-                  })
-              .subscribe();
+              .onErrorResume(e -> Mono.empty())
+              .block();
           break;
         }
       }
@@ -110,13 +110,13 @@ public class JurisXmlExporterResponseProcessor {
 
       inbox.expunge();
     } catch (MessagingException e) {
-      e.printStackTrace();
+      throw new StatusImporterException("Error connecting to exporter response mailbox: " + e);
     } finally {
       if (store != null) {
         try {
           store.close();
         } catch (MessagingException e) {
-          e.printStackTrace();
+          LOGGER.error(e.toString());
         }
       }
     }
