@@ -2,14 +2,10 @@
 import { h, ref, VNode } from "vue"
 import ExpandableDataSet from "@/components/ExpandableDataSet.vue"
 import FootnoteInput from "@/components/Footnotes/FootnoteInput.vue"
+import { FOOTNOTE_LABELS, FootnoteSection } from "@/components/Footnotes/types"
+import { MetadataSections, MetadatumType } from "@/domain/Norm"
 import { withSummarizer } from "@/shared/components/DataSetSummary.vue"
 import EditableList from "@/shared/components/EditableList.vue"
-import {
-  FOOTNOTE_LABELS,
-  FootnoteSection,
-} from "@/components/Footnotes/types";
-import {MetadataSections, MetadatumType} from "@/domain/Norm";
-
 
 function summarizeFootnotePart(
   part: FootnoteSection,
@@ -46,8 +42,14 @@ function summarizePrefix(prefix?: string): VNode | string {
   return hasPrefix ? prefixNode : ""
 }
 function summarizeFootnotePerLine(data: MetadataSections): VNode {
-  const prefix = data.FOOTNOTE?.filter((footnote) => Object.keys(footnote).includes(MetadatumType.FOOTNOTE_REFERENCE))[0]?.FOOTNOTE_REFERENCE[0] ?? undefined
-  const segments = data.FOOTNOTE?.filter((footnote) => !Object.keys(footnote).includes(MetadatumType.FOOTNOTE_REFERENCE))?.map((footnote) =>
+  const prefix =
+    data.FOOTNOTE?.filter((footnote) =>
+      Object.keys(footnote).includes(MetadatumType.FOOTNOTE_REFERENCE)
+    )[0]?.FOOTNOTE_REFERENCE[0] ?? undefined
+  const segments = data.FOOTNOTE?.filter(
+    (footnote) =>
+      !Object.keys(footnote).includes(MetadatumType.FOOTNOTE_REFERENCE)
+  )?.map((footnote) =>
     h(
       "div",
       summarizeFootnotePart({
@@ -63,29 +65,42 @@ function summarizeFootnotePerLine(data: MetadataSections): VNode {
 }
 
 const EXAMPLE_FOOTNOTES = [
-    {
-      FOOTNOTE: [
-        {FOOTNOTE_REFERENCE: ["§ 7 Abs. 1a Satz 1 u. 2"]},
-        {FOOTNOTE_CHANGE: ["eine ganze Menge Text mit viel Inhalt über eine Zeile hinaus und noch viel viel viel weiter in die nächste"]},
-        {FOOTNOTE_EU_LAW: ["irgendwas halt"]},
-      ]
-    },
-    {
-      FOOTNOTE: [
-        {FOOTNOTE_STATE_LAW: [""]},
-        {FOOTNOTE_COMMENT: ["einfach nur ein Kommentar"]},
-        {FOOTNOTE_DECISION: ["das wurde halt so entschieden"]},
-      ]
-    },
-    {
-      FOOTNOTE: [
-        {FOOTNOTE_REFERENCE: ["§ 1 Abs. 5b"]},
-        {FOOTNOTE_OTHER: ["noch etwas mehr oben drauf\nmit einer neuen Zeile\nund noch einer\n", "ach nochmal eben etwas"]},
-        {FOOTNOTE_CHANGE: ["eine ganze Menge Text mit viel Inhalt über eine Zeile hinaus und noch viel viel viel weiter in die nächste"]},
-        {FOOTNOTE_OTHER: ["ach nochmal eben etwas"]},
-      ]
-    }
-  ]
+  {
+    FOOTNOTE: [
+      { FOOTNOTE_REFERENCE: ["§ 7 Abs. 1a Satz 1 u. 2"] },
+      {
+        FOOTNOTE_CHANGE: [
+          "eine ganze Menge Text mit viel Inhalt über eine Zeile hinaus und noch viel viel viel weiter in die nächste",
+        ],
+      },
+      { FOOTNOTE_EU_LAW: ["irgendwas halt"] },
+    ],
+  },
+  {
+    FOOTNOTE: [
+      { FOOTNOTE_STATE_LAW: [""] },
+      { FOOTNOTE_COMMENT: ["einfach nur ein Kommentar"] },
+      { FOOTNOTE_DECISION: ["das wurde halt so entschieden"] },
+    ],
+  },
+  {
+    FOOTNOTE: [
+      { FOOTNOTE_REFERENCE: ["§ 1 Abs. 5b"] },
+      {
+        FOOTNOTE_OTHER: [
+          "noch etwas mehr oben drauf\nmit einer neuen Zeile\nund noch einer\n",
+          "ach nochmal eben etwas",
+        ],
+      },
+      {
+        FOOTNOTE_CHANGE: [
+          "eine ganze Menge Text mit viel Inhalt über eine Zeile hinaus und noch viel viel viel weiter in die nächste",
+        ],
+      },
+      { FOOTNOTE_OTHER: ["ach nochmal eben etwas"] },
+    ],
+  },
+]
 
 const inputValueForExamples = ref<MetadataSections[]>(EXAMPLE_FOOTNOTES)
 

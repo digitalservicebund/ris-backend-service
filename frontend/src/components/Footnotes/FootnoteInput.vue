@@ -4,8 +4,8 @@ import SegmentEditor, {
   Segment,
   SuggestionGroupOptions,
 } from "../SegmentEditor.vue"
-import {Footnote, FOOTNOTE_LABELS} from "@/components/Footnotes/types";
-import {MetadatumType} from "@/domain/Norm";
+import { Footnote, FOOTNOTE_LABELS } from "@/components/Footnotes/types"
+import { MetadatumType } from "@/domain/Norm"
 
 const props = withDefaults(defineProps<Props>(), {
   modelValue: () => ({} as Footnote),
@@ -29,23 +29,23 @@ const FOOTNOTE_SEGMENT_TYPE = "footnote_type"
 function parseFootnoteAsSegments(section): Segment[] {
   const segments = []
   section?.FOOTNOTE?.forEach((footnote) => {
-      const metadatumType = Object.keys(footnote)[0]
-      if (metadatumType != MetadatumType.FOOTNOTE_REFERENCE) {
-        segments.push({
-          type: FOOTNOTE_SEGMENT_TYPE,
-          content: FOOTNOTE_LABELS[metadatumType],
-          id: MetadatumType[metadatumType],
-        })
-      }
-      segments.push({ type: "text", content: Object.values(footnote)[0][0] })
-    })
+    const metadatumType = Object.keys(footnote)[0]
+    if (metadatumType != MetadatumType.FOOTNOTE_REFERENCE) {
+      segments.push({
+        type: FOOTNOTE_SEGMENT_TYPE,
+        content: FOOTNOTE_LABELS[metadatumType],
+        id: MetadatumType[metadatumType],
+      })
+    }
+    segments.push({ type: "text", content: Object.values(footnote)[0][0] })
+  })
   return segments
 }
 function parseSegmentsAsFootnote(segments: Segment[]): Footnote {
   const footnote: Footnote = { FOOTNOTE: [] }
   let partIndex = 0
   if (segments.length > 0 && segments[0].type == "text") {
-    footnote.FOOTNOTE.push({FOOTNOTE_REFERENCE: [segments[0].content]})
+    footnote.FOOTNOTE.push({ FOOTNOTE_REFERENCE: [segments[0].content] })
     partIndex = 1
   }
   while (partIndex < segments.length) {
