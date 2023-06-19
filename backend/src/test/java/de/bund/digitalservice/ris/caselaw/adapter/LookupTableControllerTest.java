@@ -54,4 +54,19 @@ class LookupTableControllerTest {
 
     verify(service, times(1)).getCourts(Optional.empty());
   }
+
+  @Test
+  void testGetCitationStyles() {
+    when(service.getCitationStyles(Optional.empty())).thenReturn(Flux.empty());
+
+    webClient
+        .mutateWith(csrf())
+        .get()
+        .uri("/api/v1/caselaw/lookuptable/zitart")
+        .exchange()
+        .expectStatus()
+        .isOk();
+
+    verify(service, times(1)).getCitationStyles(Optional.empty());
+  }
 }

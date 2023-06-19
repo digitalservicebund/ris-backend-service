@@ -7,7 +7,9 @@ import de.bund.digitalservice.ris.caselaw.adapter.LookupTableImporterController;
 import de.bund.digitalservice.ris.caselaw.adapter.LookupTableImporterService;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPADocumentTypeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPADocumentTypeRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.CitationStyleDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.CourtDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DatabaseCitationStyleRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DatabaseCourtRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DatabaseFieldOfLawRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.FieldOfLawDTO;
@@ -61,6 +63,7 @@ class LookupTableImporterIntegrationTest {
   @Autowired private WebTestClient webClient;
   @Autowired private JPADocumentTypeRepository jpaDocumentTypeRepository;
   @Autowired private DatabaseCourtRepository databaseCourtRepository;
+  @Autowired private DatabaseCitationStyleRepository databaseCitationStyleRepository;
   @Autowired private StateRepository stateRepository;
   @Autowired private DatabaseFieldOfLawRepository fieldOfLawRepository;
   @Autowired private FieldOfLawKeywordRepository fieldOfLawKeywordRepository;
@@ -74,6 +77,7 @@ class LookupTableImporterIntegrationTest {
   void cleanUp() {
     jpaDocumentTypeRepository.deleteAll();
     databaseCourtRepository.deleteAll().block();
+    databaseCitationStyleRepository.deleteAll().block();
     stateRepository.deleteAll().block();
     fieldOfLawRepository.deleteAll().block(); // will cascade delete the other 3 repo-contents
   }
@@ -187,6 +191,43 @@ class LookupTableImporterIntegrationTest {
     assertThat(stateDTO.getChangeindicator()).isEqualTo('N');
     assertThat(stateDTO.getJurisshortcut()).isEqualTo("AB");
     assertThat(stateDTO.getLabel()).isEqualTo("Bezeichnung123");
+  }
+
+  @Test
+  void shouldImportCitationStyleLookupTableCorrectly() {
+    String citationStyleXml =
+        """
+                <?xml version="1.0"?>
+                <juris-table>
+                  <juris-zitart id="1" aendkz="N" version="1.0">
+                    <dok_dokumentart>R</dok_dokumentart>
+                    <zit_dokumentart>R</zit_dokumentart>
+                    <abk>Änderung</abk>
+                    <bezeichnung>Änderung</bezeichnung>
+                  </juris-zitart>
+                </juris-table>
+                """;
+
+    webClient
+        .mutateWith(csrf())
+        .put()
+        .uri("/api/v1/caselaw/lookuptableimporter/zitart")
+        .bodyValue(citationStyleXml)
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody(String.class)
+        .consumeWith(
+            response ->
+                assertThat(response.getResponseBody())
+                    .isEqualTo("Successfully imported the citation lookup table"));
+
+    List<CitationStyleDTO> citationStyleDTOS =
+        databaseCitationStyleRepository.findAll().collectList().block();
+    assertThat(citationStyleDTOS).hasSize(1);
+    CitationStyleDTO citationStyleDTO = citationStyleDTOS.get(0);
+    assertThat(citationStyleDTO.getJurisShortcut()).isEqualTo("Änderung");
+    assertThat(citationStyleDTO.getLabel()).isEqualTo("Änderung");
   }
 
   @Test

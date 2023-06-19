@@ -4,10 +4,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
 
 import de.bund.digitalservice.ris.caselaw.adapter.LookupTableController;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.CitationStyleDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.CourtDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DatabaseCitationStyleRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DatabaseCourtRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DatabaseDocumentTypeRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.PostgresCitationStyleRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.PostgresCourtRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.PostgresDocumentTypeRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
@@ -16,10 +18,11 @@ import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
 import de.bund.digitalservice.ris.caselaw.domain.EmailPublishService;
 import de.bund.digitalservice.ris.caselaw.domain.FieldOfLawRepository;
 import de.bund.digitalservice.ris.caselaw.domain.LookupTableService;
-import de.bund.digitalservice.ris.caselaw.domain.lookuptable.citation.CitationStyleRepository;
+import de.bund.digitalservice.ris.caselaw.domain.lookuptable.citation.CitationStyle;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.court.Court;
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,7 +41,8 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
       PostgresConfig.class,
       PostgresJPAConfig.class,
       PostgresDocumentTypeRepositoryImpl.class,
-      PostgresCourtRepositoryImpl.class
+      PostgresCourtRepositoryImpl.class,
+      PostgresCitationStyleRepositoryImpl.class
     },
     controllers = {LookupTableController.class})
 class LookupTableIntegrationTest {
@@ -58,7 +62,6 @@ class LookupTableIntegrationTest {
   @Autowired private DatabaseCourtRepository databaseCourtRepository;
   @Autowired private DatabaseDocumentTypeRepository databaseDocumentTypeRepository;
   @Autowired private DatabaseCitationStyleRepository databaseCitationStyleRepository;
-  @MockBean private CitationStyleRepository citationStyleRepository;
   @MockBean private FieldOfLawRepository fieldOfLawRepository;
   @MockBean private S3AsyncClient s3AsyncClient;
   @MockBean private EmailPublishService publishService;
@@ -66,6 +69,7 @@ class LookupTableIntegrationTest {
   @AfterEach
   void cleanUp() {
     databaseCourtRepository.deleteAll().block();
+    databaseCitationStyleRepository.deleteAll().block();
     databaseDocumentTypeRepository.deleteAll().block();
   }
 
@@ -134,13 +138,106 @@ class LookupTableIntegrationTest {
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(Court[].class)
+        .expectBody(CitationStyle[].class)
         .consumeWith(
             response -> {
               assertThat(response.getResponseBody()).hasSize(6);
               for (int i = 0; i < expectedOrder.size(); i++) {
                 assertThat(response.getResponseBody()[i].label()).isEqualTo(expectedOrder.get(i));
               }
+            });
+  }
+
+  @Test
+  void testGetAllCitationStyles() {
+    UUID TEST_UUID = UUID.randomUUID();
+    UUID TEST_UUID2 = UUID.randomUUID();
+    CitationStyleDTO citationStyleDTO =
+        CitationStyleDTO.builder()
+            .uuid(TEST_UUID)
+            .jurisId(1L)
+            .changeIndicator('N')
+            .version("1.0")
+            .documentType("R")
+            .citationDocumentType("R")
+            .jurisShortcut("Änderung")
+            .label("Änderung")
+            .newEntry(true)
+            .build();
+    databaseCitationStyleRepository.save(citationStyleDTO).block();
+    citationStyleDTO =
+        CitationStyleDTO.builder()
+            .uuid(TEST_UUID2)
+            .jurisId(2L)
+            .changeIndicator('N')
+            .version("1.0")
+            .documentType("R")
+            .citationDocumentType("R")
+            .jurisShortcut("Vergleich")
+            .label("Vergleich")
+            .newEntry(true)
+            .build();
+    databaseCitationStyleRepository.save(citationStyleDTO).block();
+
+    webClient
+        .mutateWith(csrf())
+        .get()
+        .uri("/api/v1/caselaw/lookuptable/zitart")
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody(CitationStyle[].class)
+        .consumeWith(
+            response -> {
+              assertThat(response.getResponseBody()).hasSize(2);
+              assertThat(response.getResponseBody()[0].label()).isEqualTo("Änderung");
+              assertThat(response.getResponseBody()[1].label()).isEqualTo("Vergleich");
+            });
+  }
+
+  @Test
+  void testGetCitationStylesBySearchString() {
+    UUID TEST_UUID = UUID.randomUUID();
+    UUID TEST_UUID2 = UUID.randomUUID();
+    CitationStyleDTO citationStyleDTO =
+        CitationStyleDTO.builder()
+            .uuid(TEST_UUID)
+            .jurisId(3L)
+            .changeIndicator('N')
+            .version("1.0")
+            .documentType("R")
+            .citationDocumentType("R")
+            .jurisShortcut("Änderung")
+            .label("Änderung")
+            .newEntry(true)
+            .build();
+    databaseCitationStyleRepository.save(citationStyleDTO).block();
+    citationStyleDTO =
+        CitationStyleDTO.builder()
+            .uuid(TEST_UUID2)
+            .jurisId(4L)
+            .changeIndicator('N')
+            .version("1.0")
+            .documentType("R")
+            .citationDocumentType("R")
+            .jurisShortcut("Vergleich")
+            .label("Vergleich")
+            .newEntry(true)
+            .build();
+    databaseCitationStyleRepository.save(citationStyleDTO).block();
+
+    webClient
+        .mutateWith(csrf())
+        .get()
+        .uri("/api/v1/caselaw/lookuptable/zitart?q=Änd")
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody(Court[].class)
+        .consumeWith(
+            response -> {
+              assertThat(response.getResponseBody()).hasSize(1);
+              assertThat(response.getResponseBody()[0].label()).isEqualTo("Änderung");
             });
   }
 }
