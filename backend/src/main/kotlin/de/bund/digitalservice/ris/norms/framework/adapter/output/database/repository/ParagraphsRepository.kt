@@ -9,5 +9,5 @@ import java.util.UUID
 @Repository
 interface ParagraphsRepository : ReactiveCrudRepository<ParagraphDto, UUID> {
 
-    fun findByArticleId(article: Int): Flux<ParagraphDto>
+    fun findByArticleGuid(articleGuid: UUID): Flux<ParagraphDto>
 }

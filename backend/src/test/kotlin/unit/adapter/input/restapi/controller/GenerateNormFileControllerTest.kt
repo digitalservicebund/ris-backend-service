@@ -36,6 +36,7 @@ class GenerateNormFileControllerTest {
                 "norm.zip",
                 "1c47461aea72b7d4f36c075fe09ae283e78477d261e5b1141c510cb46c941d10",
                 LocalDateTime.now(),
+                UUID.randomUUID(),
             )
 
         every { generateNormFileService.generateNormFile(any()) } returns Mono.just(fileReference)
@@ -58,6 +59,7 @@ class GenerateNormFileControllerTest {
                 "norm.zip",
                 "1c47461aea72b7d4f36c075fe09ae283e78477d261e5b1141c510cb46c941d10",
                 LocalDateTime.now(),
+                UUID.randomUUID(),
             )
 
         every { generateNormFileService.generateNormFile(any()) } returns Mono.just(fileReference)
