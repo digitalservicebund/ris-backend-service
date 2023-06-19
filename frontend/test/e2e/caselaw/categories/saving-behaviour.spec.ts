@@ -4,7 +4,7 @@ import {
   waitForSaving,
   waitForInputValue,
 } from "../e2e-utils"
-import { testWithDocumentUnit as test } from "../fixtures"
+import { caselawTest as test } from "../fixtures"
 import { generateString } from "~/test-helper/dataGenerators"
 
 test.describe("saving behaviour", () => {

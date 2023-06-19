@@ -10,12 +10,12 @@ dayjs.extend(utc)
 // Declare the types of your fixtures.
 type MyFixtures = {
   documentNumber: string
+  prefilledDocumentUnit: DocumentUnit
   editorField: Locator
-  secondaryDocumentUnit: DocumentUnit
   pageWithBghUser: Page
 }
 
-export const testWithDocumentUnit = test.extend<MyFixtures>({
+export const caselawTest = test.extend<MyFixtures>({
   documentNumber: async ({ request }, use) => {
     const response = await request.get(`/api/v1/caselaw/documentunits/new`)
     const { uuid, documentNumber } = await response.json()
@@ -25,16 +25,16 @@ export const testWithDocumentUnit = test.extend<MyFixtures>({
     await request.delete(`/api/v1/caselaw/documentunits/${uuid}`)
   },
 
-  secondaryDocumentUnit: async ({ request }, use) => {
+  prefilledDocumentUnit: async ({ request }, use) => {
     const response = await request.get(`/api/v1/caselaw/documentunits/new`)
-    const secondaryDocumentUnit = await response.json()
+    const prefilledDocumentUnit = await response.json()
     const updateResponse = await request.put(
-      `/api/v1/caselaw/documentunits/${secondaryDocumentUnit.uuid}`,
+      `/api/v1/caselaw/documentunits/${prefilledDocumentUnit.uuid}`,
       {
         data: {
-          ...secondaryDocumentUnit,
+          ...prefilledDocumentUnit,
           coreData: {
-            ...secondaryDocumentUnit.coreData,
+            ...prefilledDocumentUnit.coreData,
             court: {
               type: "AG",
               location: "Aachen",
@@ -50,7 +50,7 @@ export const testWithDocumentUnit = test.extend<MyFixtures>({
     await use(await updateResponse.json())
 
     await request.delete(
-      `/api/v1/caselaw/documentunits/${secondaryDocumentUnit.uuid}`
+      `/api/v1/caselaw/documentunits/${prefilledDocumentUnit.uuid}`
     )
   },
 
@@ -71,6 +71,7 @@ export const testWithDocumentUnit = test.extend<MyFixtures>({
 
     await use(pageWithBghUser)
 
+    await pageWithBghUser.close()
     await bghContext.close()
   },
 })

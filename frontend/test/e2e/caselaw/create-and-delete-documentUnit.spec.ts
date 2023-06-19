@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test"
 import { deleteDocumentUnit } from "./e2e-utils"
-import { testWithDocumentUnit } from "./fixtures"
+import { caselawTest } from "./fixtures"
 
 test.describe("create a doc unit and delete it again", () => {
   test("create and delete new doc unit", async ({ page }) => {
@@ -19,23 +19,20 @@ test.describe("create a doc unit and delete it again", () => {
     await deleteDocumentUnit(page, documentNumber)
   })
 
-  testWithDocumentUnit(
-    "cancel delete doc unit",
-    async ({ page, documentNumber }) => {
-      await page.goto("/")
-      await expect(
-        page.locator(`a[href*="/caselaw/documentunit/${documentNumber}/files"]`)
-      ).toBeVisible()
-      await page
-        .locator(".table-row", {
-          hasText: documentNumber,
-        })
-        .locator("[aria-label='Dokumentationseinheit löschen']")
-        .click()
-      await page.locator('button:has-text("Abbrechen")').click()
-      await expect(
-        page.locator(`a[href*="/caselaw/documentunit/${documentNumber}/files"]`)
-      ).toBeVisible()
-    }
-  )
+  caselawTest("cancel delete doc unit", async ({ page, documentNumber }) => {
+    await page.goto("/")
+    await expect(
+      page.locator(`a[href*="/caselaw/documentunit/${documentNumber}/files"]`)
+    ).toBeVisible()
+    await page
+      .locator(".table-row", {
+        hasText: documentNumber,
+      })
+      .locator("[aria-label='Dokumentationseinheit löschen']")
+      .click()
+    await page.locator('button:has-text("Abbrechen")').click()
+    await expect(
+      page.locator(`a[href*="/caselaw/documentunit/${documentNumber}/files"]`)
+    ).toBeVisible()
+  })
 })

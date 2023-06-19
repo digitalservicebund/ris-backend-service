@@ -1,6 +1,6 @@
 import { expect } from "@playwright/test"
 import { navigateToCategories } from "./e2e-utils"
-import { testWithDocumentUnit as test } from "./fixtures"
+import { caselawTest as test } from "./fixtures"
 
 test.describe("info panel", () => {
   test("updated fileNumber should update info panel", async ({

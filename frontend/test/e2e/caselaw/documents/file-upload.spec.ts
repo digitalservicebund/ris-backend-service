@@ -1,7 +1,7 @@
 import fs from "fs"
 import { expect } from "@playwright/test"
 import { navigateToFiles, uploadTestfile } from "../e2e-utils"
-import { testWithDocumentUnit as test } from "../fixtures"
+import { caselawTest as test } from "../fixtures"
 import { createDataTransfer } from "~/e2e/shared/e2e-utils"
 
 test.describe("upload an original document to a doc unit", () => {

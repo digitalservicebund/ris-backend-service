@@ -4,7 +4,7 @@ import {
   toggleNormsSection,
   waitForInputValue,
 } from "~/e2e/caselaw/e2e-utils"
-import { testWithDocumentUnit as test } from "~/e2e/caselaw/fixtures"
+import { caselawTest as test } from "~/e2e/caselaw/fixtures"
 
 test.describe("norm", () => {
   test("rendering", async ({ page, documentNumber }) => {

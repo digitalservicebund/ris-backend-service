@@ -5,7 +5,7 @@ import {
   waitForSaving,
   waitForInputValue,
 } from "../../e2e-utils"
-import { testWithDocumentUnit as test } from "../../fixtures"
+import { caselawTest as test } from "../../fixtures"
 
 test.describe("keywords", () => {
   test("rendering", async ({ page, documentNumber }) => {

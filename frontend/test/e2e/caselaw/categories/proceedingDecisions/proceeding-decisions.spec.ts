@@ -5,7 +5,7 @@ import {
   navigateToCategories,
   toggleProceedingDecisionsSection,
 } from "~/e2e/caselaw/e2e-utils"
-import { testWithDocumentUnit as test } from "~/e2e/caselaw/fixtures"
+import { caselawTest as test } from "~/e2e/caselaw/fixtures"
 import { generateString } from "~/test-helper/dataGenerators"
 
 test.describe("Proceeding decisions", () => {

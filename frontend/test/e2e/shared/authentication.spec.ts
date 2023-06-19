@@ -1,5 +1,5 @@
 import { expect } from "@playwright/test"
-import { testWithDocumentUnit as test } from "../caselaw/fixtures"
+import { caselawTest as test } from "../caselaw/fixtures"
 
 test.describe("authentication", () => {
   test("name and documentation center should be displayed", async ({

@@ -4,7 +4,7 @@ import {
   waitForInputValue,
   waitForSaving,
 } from "../../e2e-utils"
-import { testWithDocumentUnit as test } from "../../fixtures"
+import { caselawTest as test } from "../../fixtures"
 
 test.describe("court", () => {
   test("input value in court field, press enter and reload", async ({

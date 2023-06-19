@@ -1,6 +1,6 @@
 import AxeBuilder from "@axe-core/playwright"
 import { expect } from "@playwright/test"
-import { testWithDocumentUnit as test } from "../../e2e/caselaw/fixtures"
+import { caselawTest as test } from "../../e2e/caselaw/fixtures"
 
 test.describe("a11y of start page (/caselaw)", () => {
   test("documentUnit list", async ({ page }) => {

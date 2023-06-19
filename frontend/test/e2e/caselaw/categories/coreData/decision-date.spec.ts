@@ -1,6 +1,6 @@
 import { expect } from "@playwright/test"
 import { navigateToCategories, waitForSaving } from "../../e2e-utils"
-import { testWithDocumentUnit as test } from "../../fixtures"
+import { caselawTest as test } from "../../fixtures"
 
 test.describe("decision date", () => {
   test("invalid decision date shows error", async ({
