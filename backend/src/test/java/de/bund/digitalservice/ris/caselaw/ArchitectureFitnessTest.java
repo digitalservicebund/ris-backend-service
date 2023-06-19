@@ -161,22 +161,32 @@ class ArchitectureFitnessTest {
 
   @Test
   void relevantControllerEndpointsAreSecuredWithPreAuthorize() {
-    // add your classes and/or methods here if you are sure they don't need @PreAuthorize
+    // add your methods here if you are sure they don't need @PreAuthorize
 
-    Set<String> ignoreClasses =
-        Set.of(
-            "AuthController",
-            "FieldOfLawController",
-            "FeatureToggleController",
-            "LookupTableController",
-            "LookupTableImporterController",
-            "MailTrackingController",
-            "NormAbbreviationController");
     Set<String> ignoreMethods =
         Set.of(
             "DocumentUnitController.generateNewDocumentUnit",
             "DocumentUnitController.getAll",
-            "DocumentUnitController.searchByProceedingDecision");
+            "DocumentUnitController.searchByProceedingDecision",
+            "AuthController.getUser",
+            "FeatureToggleController.getFeatureToggleNames",
+            "FeatureToggleController.isEnabled",
+            "FieldOfLawController.getChildrenOfFieldOfLaw",
+            "FieldOfLawController.getFieldsOfLawByIdentifierSearch",
+            "FieldOfLawController.getFieldsOfLawBySearchQuery",
+            "FieldOfLawController.getTreeForFieldOfLaw",
+            "LookupTableController.getCaselawDocumentTypes",
+            "LookupTableController.getCitationStyles",
+            "LookupTableController.getCourts",
+            "LookupTableImporterController.importCitationStyleLookupTable",
+            "LookupTableImporterController.importCourtLookupTable",
+            "LookupTableImporterController.importDocumentTypeLookupTable",
+            "LookupTableImporterController.importFieldOfLawLookupTable",
+            "LookupTableImporterController.importStateLookupTable",
+            "MailTrackingController.setPublishState",
+            "NormAbbreviationController.getAllNormAbbreviationsByAwesomeSearchQuery",
+            "NormAbbreviationController.getAllNormAbbreviationsBySearchQuery",
+            "NormAbbreviationController.getNormAbbreviationController");
 
     ArchRule rule =
         ArchRuleDefinition.classes()
@@ -186,9 +196,6 @@ class ArchitectureFitnessTest {
                 new ArchCondition<>("have relevant public methods annotated with @PreAuthorize") {
                   @Override
                   public void check(JavaClass javaClass, ConditionEvents conditionEvents) {
-                    if (ignoreClasses.contains(javaClass.getSimpleName())) {
-                      return;
-                    }
                     for (JavaMethod method : javaClass.getMethods()) {
                       String methodIdentifier = javaClass.getSimpleName() + "." + method.getName();
                       if (!ignoreMethods.contains(methodIdentifier)
