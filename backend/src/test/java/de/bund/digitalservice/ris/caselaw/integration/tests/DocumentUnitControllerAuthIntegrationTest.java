@@ -214,7 +214,7 @@ class DocumentUnitControllerAuthIntegrationTest {
     result =
         webClient
             .mutateWith(csrf())
-            .mutateWith(getMockLoginWithDocOffice(docOffice1Group))
+            .mutateWith(getMockLoginWithDocOffice(docOffice2Group))
             .get()
             .uri("/api/v1/caselaw/documentunits/" + docUnit1.getDocumentnumber())
             .exchange()
