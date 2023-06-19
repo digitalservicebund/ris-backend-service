@@ -26,7 +26,7 @@ const props = defineProps<{
 
 const localProceedingDecisions = ref<ProceedingDecision[]>()
 
-const searchResults = ref<SearchResults>()
+const searchResults = ref<SearchResults<ProceedingDecision>>()
 const searchResultsCurrentPage = ref<Page<ProceedingDecision>>()
 const searchResultsPerPage = 30
 const input = ref<ProceedingDecision>(new ProceedingDecision())
@@ -93,14 +93,6 @@ async function removeProceedingDecision(decision: ProceedingDecision) {
   }
 }
 
-function isLinked(decision: ProceedingDecision): boolean {
-  if (!localProceedingDecisions.value) return false
-
-  return localProceedingDecisions.value.some(
-    (proceedingDecision) => proceedingDecision.uuid == decision.uuid
-  )
-}
-
 function updateSearchResultsLinkStatus(uuid: string) {
   if (searchResults.value == undefined) return
 
@@ -123,7 +115,7 @@ async function search(page = 0) {
     searchResults.value = response.data.content.map((searchResult) => {
       return {
         decision: searchResult,
-        isLinked: isLinked(searchResult),
+        isLinked: searchResult.isLinked(localProceedingDecisions.value),
       }
     })
   }

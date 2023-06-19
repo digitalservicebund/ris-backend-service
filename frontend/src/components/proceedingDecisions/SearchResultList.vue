@@ -1,17 +1,21 @@
 <script setup lang="ts">
 import InlineDecision from "./InlineDecision.vue"
+import ActiveCitation from "@/domain/activeCitation"
+import LinkedDocumentUnit from "@/domain/linkedDocumentUnit"
 import ProceedingDecision from "@/domain/proceedingDecision"
 import TextButton from "@/shared/components/input/TextButton.vue"
 
-defineProps<{ searchResults?: SearchResults }>()
+defineProps<{
+  searchResults?: SearchResults<ProceedingDecision | ActiveCitation>
+}>()
 const emits = defineEmits<{
   (event: "linkDecision", uuid: string): void
 }>()
 </script>
 
 <script lang="ts">
-export type SearchResults = {
-  decision: ProceedingDecision
+export type SearchResults<Type extends LinkedDocumentUnit> = {
+  decision: Type
   isLinked: boolean
 }[]
 </script>

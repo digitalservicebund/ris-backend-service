@@ -2,6 +2,7 @@ import httpClient, {
   ServiceResponse,
   FailedValidationServerResponse,
 } from "./httpClient"
+import ActiveCitation from "@/domain/activeCitation"
 import DocumentUnit from "@/domain/documentUnit"
 import { DocumentUnitListEntry } from "@/domain/documentUnitListEntry"
 import ProceedingDecision from "@/domain/proceedingDecision"
@@ -19,6 +20,7 @@ interface DocumentUnitService {
     ProceedingDecision,
     ProceedingDecision
   >
+  searchByActiveCitationInput: PageableService<ActiveCitation, ActiveCitation>
 }
 
 const service: DocumentUnitService = {
@@ -150,6 +152,38 @@ const service: DocumentUnitService = {
         ...response.data,
         content: response.data.content.map(
           (decision) => new ProceedingDecision({ ...decision })
+        ),
+      },
+    }
+  },
+
+  async searchByActiveCitationInput(
+    page: number,
+    size: number,
+    query = new ActiveCitation()
+  ) {
+    const response = await httpClient.put<ActiveCitation, Page<ActiveCitation>>(
+      `caselaw/documentunits/search?pg=${page}&sz=${size}`,
+      {
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+      },
+      query
+    )
+    if (response.status >= 300) {
+      response.error = {
+        title: `Die Suche nach passenden Dokumentationseinheit konnte nicht ausgeführt werden`,
+      }
+    }
+    response.data = response.data as Page<ActiveCitation>
+    return {
+      status: response.status,
+      data: {
+        ...response.data,
+        content: response.data.content.map(
+          (decision) => new ActiveCitation({ ...decision })
         ),
       },
     }

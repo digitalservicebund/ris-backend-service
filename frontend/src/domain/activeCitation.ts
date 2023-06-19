@@ -2,6 +2,7 @@ import dayjs from "dayjs"
 import LinkedDocumentUnit from "./linkedDocumentUnit"
 
 export default class ActiveCitation extends LinkedDocumentUnit {
+  public dataSource?: "NEURIS" | "MIGRATION" | "ACTIVE_CITATION"
   public predicateList?: string
 
   static requiredFields = ["court"] as const
@@ -12,15 +13,21 @@ export default class ActiveCitation extends LinkedDocumentUnit {
   }
 
   get renderDecision(): string {
+    console.log(this)
     return [
       ...(this.court?.label ? [`${this.court?.label}`] : []),
       ...(this.decisionDate
         ? [dayjs(this.decisionDate).format("DD.MM.YYYY")]
         : []),
-      ...(this.documentType ? [this.documentType] : []),
+      ...(this.documentType ? [this.documentType.label] : []),
       ...(this.fileNumber ? [this.fileNumber] : []),
       ...(this.predicateList ? [this.predicateList] : []),
+      ...(this.documentNumber && this.hasLink ? [this.documentNumber] : []),
     ].join(", ")
+  }
+
+  get hasLink(): boolean {
+    return this.dataSource !== "ACTIVE_CITATION"
   }
 
   get missingRequiredFields() {

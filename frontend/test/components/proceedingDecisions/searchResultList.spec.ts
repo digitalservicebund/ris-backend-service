@@ -5,8 +5,8 @@ import SearchResultList, {
 } from "@/components/proceedingDecisions/SearchResultList.vue"
 import ProceedingDecision from "@/domain/proceedingDecision"
 
-function renderComponent(searchResults?: SearchResults) {
-  const props: { searchResults: SearchResults } = {
+function renderComponent(searchResults?: SearchResults<ProceedingDecision>) {
+  const props: { searchResults: SearchResults<ProceedingDecision> } = {
     searchResults: searchResults ?? [
       {
         decision: new ProceedingDecision({

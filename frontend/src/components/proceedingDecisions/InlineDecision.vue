@@ -1,8 +1,9 @@
 <script setup lang="ts">
+import ActiveCitation from "@/domain/activeCitation"
 import ProceedingDecision from "@/domain/proceedingDecision"
 
 defineProps<{
-  decision: ProceedingDecision
+  decision: ProceedingDecision | ActiveCitation
 }>()
 </script>
 
