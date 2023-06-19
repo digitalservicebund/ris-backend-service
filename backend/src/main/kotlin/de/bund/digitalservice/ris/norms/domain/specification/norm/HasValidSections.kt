@@ -10,6 +10,10 @@ import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName.DIVERGE
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName.DIVERGENT_ENTRY_INTO_FORCE_UNDEFINED
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName.DIVERGENT_EXPIRATION
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName.DIVERGENT_EXPIRATION_UNDEFINED
+import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName.DOCUMENT_OTHER
+import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName.DOCUMENT_STATUS
+import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName.DOCUMENT_STATUS_SECTION
+import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName.DOCUMENT_TEXT_PROOF
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName.DOCUMENT_TYPE
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName.ENTRY_INTO_FORCE
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName.EXPIRATION
@@ -47,6 +51,10 @@ val hasValidSections =
                 PRINCIPLE_EXPIRATION,
                 DIGITAL_EVIDENCE,
                 FOOTNOTES,
+                DOCUMENT_STATUS_SECTION,
+                DOCUMENT_STATUS,
+                DOCUMENT_TEXT_PROOF,
+                DOCUMENT_OTHER,
             )
         }
     }

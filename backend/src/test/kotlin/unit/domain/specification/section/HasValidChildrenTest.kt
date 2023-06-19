@@ -4,6 +4,7 @@ import de.bund.digitalservice.ris.norms.domain.entity.MetadataSection
 import de.bund.digitalservice.ris.norms.domain.entity.Metadatum
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType
+import de.bund.digitalservice.ris.norms.domain.value.OtherType
 import de.bund.digitalservice.ris.norms.domain.value.UndefinedDate
 import io.mockk.every
 import io.mockk.mockk
@@ -313,6 +314,58 @@ class HasValidChildrenTest {
     fun `it is satisfied that the footnote section does not have any children sections`() {
         val instance = mockk<MetadataSection>()
         every { instance.name } returns MetadataSectionName.FOOTNOTES
+        every { instance.sections } returns null
+
+        Assertions.assertThat(hasValidChildren.isSatisfiedBy(instance)).isTrue()
+    }
+
+    @Test
+    fun `it is satisfied that the document status parent section only contains only one of the allowed children sections`() {
+        val instance = mockk<MetadataSection>()
+        every { instance.name } returns MetadataSectionName.DOCUMENT_STATUS_SECTION
+        every { instance.sections } returns listOf(
+            MetadataSection(MetadataSectionName.DOCUMENT_STATUS, listOf(Metadatum("work note", MetadatumType.WORK_NOTE))),
+            MetadataSection(MetadataSectionName.DOCUMENT_TEXT_PROOF, listOf(Metadatum("text", MetadatumType.TEXT))),
+            MetadataSection(MetadataSectionName.DOCUMENT_OTHER, listOf(Metadatum(OtherType.TEXT_IN_PROGRESS, MetadatumType.OTHER_TYPE))),
+        )
+
+        Assertions.assertThat(hasValidChildren.isSatisfiedBy(instance)).isFalse()
+    }
+
+    @Test
+    fun `it is not satisfied that the document status section only contains allowed children sections`() {
+        val instance = mockk<MetadataSection>()
+        every { instance.name } returns MetadataSectionName.DOCUMENT_STATUS_SECTION
+        every { instance.sections } returns listOf(
+            MetadataSection(MetadataSectionName.DOCUMENT_STATUS, listOf(Metadatum("work note", MetadatumType.WORK_NOTE))),
+            MetadataSection(MetadataSectionName.NORM, listOf(Metadatum("keyword", MetadatumType.KEYWORD))),
+        )
+
+        Assertions.assertThat(hasValidChildren.isSatisfiedBy(instance)).isFalse()
+    }
+
+    @Test
+    fun `it is satisfied that the document status section does not have any children sections`() {
+        val instance = mockk<MetadataSection>()
+        every { instance.name } returns MetadataSectionName.DOCUMENT_STATUS
+        every { instance.sections } returns null
+
+        Assertions.assertThat(hasValidChildren.isSatisfiedBy(instance)).isTrue()
+    }
+
+    @Test
+    fun `it is satisfied that the document text proof section does not have any children sections`() {
+        val instance = mockk<MetadataSection>()
+        every { instance.name } returns MetadataSectionName.DOCUMENT_TEXT_PROOF
+        every { instance.sections } returns null
+
+        Assertions.assertThat(hasValidChildren.isSatisfiedBy(instance)).isTrue()
+    }
+
+    @Test
+    fun `it is satisfied that the document other section does not have any children sections`() {
+        val instance = mockk<MetadataSection>()
+        every { instance.name } returns MetadataSectionName.DOCUMENT_OTHER
         every { instance.sections } returns null
 
         Assertions.assertThat(hasValidChildren.isSatisfiedBy(instance)).isTrue()

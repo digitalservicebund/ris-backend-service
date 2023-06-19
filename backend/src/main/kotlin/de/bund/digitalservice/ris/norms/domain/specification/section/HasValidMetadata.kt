@@ -12,9 +12,11 @@ import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.AREA_OF_PUBLI
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.DATE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.DECIDING_BODY
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.DEFINITION
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.DESCRIPTION
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.DIVERGENT_DOCUMENT_NUMBER
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.EDITION
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.ENTITY
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.ENTRY_INTO_FORCE_DATE_NOTE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.EU_GOVERNMENT_GAZETTE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.EXPLANATION
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.EXTERNAL_DATA_NOTE
@@ -33,11 +35,15 @@ import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.NORM_CATEGORY
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.NUMBER
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.NUMBER_OF_THE_PUBLICATION_IN_THE_RESPECTIVE_AREA
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.OTHER_OFFICIAL_REFERENCE
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.OTHER_TYPE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.PAGE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.PARTICIPATION_INSTITUTION
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.PARTICIPATION_TYPE
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.PROOF_INDICATION
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.PROOF_TYPE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.RANGE_END
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.RANGE_START
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.REFERENCE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.REFERENCE_NUMBER
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.RELATED_DATA
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.RESOLUTION_MAJORITY
@@ -56,6 +62,7 @@ import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.UNOFFICIAL_LO
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.UNOFFICIAL_REFERENCE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.UNOFFICIAL_SHORT_TITLE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.VALIDITY_RULE
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.WORK_NOTE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.YEAR
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName as Section
 
@@ -91,6 +98,10 @@ val hasValidMetadata =
             Section.PRINCIPLE_EXPIRATION -> hasOneOfType(listOf(DATE, UNDEFINED_DATE), instance)
             Section.DIGITAL_EVIDENCE -> hasType(listOf(LINK, RELATED_DATA, EXTERNAL_DATA_NOTE, APPENDIX), instance)
             Section.FOOTNOTES -> hasType(listOf(FOOTNOTE_REFERENCE, FOOTNOTE_CHANGE, FOOTNOTE_COMMENT, FOOTNOTE_DECISION, FOOTNOTE_STATE_LAW, FOOTNOTE_EU_LAW, FOOTNOTE_OTHER), instance)
+            Section.DOCUMENT_STATUS_SECTION -> hasNone(instance)
+            Section.DOCUMENT_STATUS -> hasType(listOf(WORK_NOTE, DESCRIPTION, DATE, YEAR, REFERENCE, ENTRY_INTO_FORCE_DATE_NOTE, PROOF_INDICATION), instance)
+            Section.DOCUMENT_TEXT_PROOF -> hasType(listOf(PROOF_TYPE, TEXT), instance)
+            Section.DOCUMENT_OTHER -> hasType(listOf(OTHER_TYPE), instance)
         }
 
         private fun hasNone(instance: MetadataSection): Boolean =

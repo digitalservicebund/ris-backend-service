@@ -5,6 +5,9 @@ import de.bund.digitalservice.ris.norms.domain.entity.Metadatum
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType
 import de.bund.digitalservice.ris.norms.domain.value.NormCategory
+import de.bund.digitalservice.ris.norms.domain.value.OtherType
+import de.bund.digitalservice.ris.norms.domain.value.ProofIndication
+import de.bund.digitalservice.ris.norms.domain.value.ProofType
 import de.bund.digitalservice.ris.norms.domain.value.UndefinedDate
 import io.mockk.every
 import io.mockk.mockk
@@ -660,6 +663,88 @@ class HasValidMetadataTest {
             Metadatum("footnote change", MetadatumType.FOOTNOTE_CHANGE),
             Metadatum("footnote comment", MetadatumType.FOOTNOTE_COMMENT),
             Metadatum("gazette", MetadatumType.ANNOUNCEMENT_GAZETTE),
+        )
+
+        assertThat(hasValidMetadata.isSatisfiedBy(instance)).isFalse()
+    }
+
+    @Test
+    fun `can generate document status with right metadata`() {
+        val instance = mockk<MetadataSection>()
+        every { instance.name } returns MetadataSectionName.DOCUMENT_STATUS
+        every { instance.sections } returns null
+        every { instance.metadata } returns listOf(
+            Metadatum("work note", MetadatumType.WORK_NOTE),
+            Metadatum("description", MetadatumType.DESCRIPTION),
+            Metadatum(LocalDate.now(), MetadatumType.DATE),
+            Metadatum("year", MetadatumType.YEAR),
+            Metadatum("reference", MetadatumType.REFERENCE),
+            Metadatum("entry into force date note", MetadatumType.ENTRY_INTO_FORCE_DATE_NOTE),
+            Metadatum(ProofIndication.NOT_YET_CONSIDERED, MetadatumType.PROOF_INDICATION),
+        )
+
+        assertThat(hasValidMetadata.isSatisfiedBy(instance)).isTrue()
+    }
+
+    @Test
+    fun `it throws an error on  document status with right and wrong metadata`() {
+        val instance = mockk<MetadataSection>()
+        every { instance.name } returns MetadataSectionName.DOCUMENT_STATUS
+        every { instance.sections } returns null
+        every { instance.metadata } returns listOf(
+            Metadatum("work note", MetadatumType.WORK_NOTE),
+            Metadatum("announcement medium", MetadatumType.ANNOUNCEMENT_MEDIUM),
+        )
+
+        assertThat(hasValidMetadata.isSatisfiedBy(instance)).isFalse()
+    }
+
+    @Test
+    fun `can generate document text proof with right metadata`() {
+        val instance = mockk<MetadataSection>()
+        every { instance.name } returns MetadataSectionName.DOCUMENT_TEXT_PROOF
+        every { instance.sections } returns null
+        every { instance.metadata } returns listOf(
+            Metadatum("work note", MetadatumType.TEXT),
+            Metadatum(ProofType.TEXT_PROOF_FROM, MetadatumType.PROOF_TYPE),
+        )
+
+        assertThat(hasValidMetadata.isSatisfiedBy(instance)).isTrue()
+    }
+
+    @Test
+    fun `it throws an error on  document text proof with right and wrong metadata`() {
+        val instance = mockk<MetadataSection>()
+        every { instance.name } returns MetadataSectionName.DOCUMENT_TEXT_PROOF
+        every { instance.sections } returns null
+        every { instance.metadata } returns listOf(
+            Metadatum("work note", MetadatumType.TEXT),
+            Metadatum("announcement medium", MetadatumType.ANNOUNCEMENT_MEDIUM),
+        )
+
+        assertThat(hasValidMetadata.isSatisfiedBy(instance)).isFalse()
+    }
+
+    @Test
+    fun `can generate document other with right metadata`() {
+        val instance = mockk<MetadataSection>()
+        every { instance.name } returns MetadataSectionName.DOCUMENT_OTHER
+        every { instance.sections } returns null
+        every { instance.metadata } returns listOf(
+            Metadatum(OtherType.TEXT_IN_PROGRESS, MetadatumType.OTHER_TYPE),
+        )
+
+        assertThat(hasValidMetadata.isSatisfiedBy(instance)).isTrue()
+    }
+
+    @Test
+    fun `it throws an error on  document other with right and wrong metadata`() {
+        val instance = mockk<MetadataSection>()
+        every { instance.name } returns MetadataSectionName.DOCUMENT_OTHER
+        every { instance.sections } returns null
+        every { instance.metadata } returns listOf(
+            Metadatum("work note", MetadatumType.TEXT),
+            Metadatum(OtherType.TEXT_IN_PROGRESS, MetadatumType.OTHER_TYPE),
         )
 
         assertThat(hasValidMetadata.isSatisfiedBy(instance)).isFalse()

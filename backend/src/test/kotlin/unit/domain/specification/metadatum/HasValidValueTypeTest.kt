@@ -4,6 +4,8 @@ import de.bund.digitalservice.ris.norms.domain.entity.Metadatum
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.APPENDIX
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.DATE
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.DESCRIPTION
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.ENTRY_INTO_FORCE_DATE_NOTE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.EXTERNAL_DATA_NOTE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.FOOTNOTE_CHANGE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.FOOTNOTE_COMMENT
@@ -15,12 +17,17 @@ import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.FOOTNOTE_STAT
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.KEYWORD
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.LINK
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.NORM_CATEGORY
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.OTHER_TYPE
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.PROOF_INDICATION
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.PROOF_TYPE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.RANGE_END
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.RANGE_START
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.REFERENCE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.RELATED_DATA
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.RESOLUTION_MAJORITY
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.TEXT
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.UNDEFINED_DATE
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.WORK_NOTE
 import io.mockk.every
 import io.mockk.mockk
 import org.assertj.core.api.Assertions.assertThat
@@ -247,6 +254,83 @@ class HasValidValueTypeTest {
     @Test
     fun `it is not satisfied if the value for a footnote other is not string`() {
         val instance = getMockedMetadatum(123, FOOTNOTE_OTHER)
+
+        assertThat(hasValidValueType.isSatisfiedBy(instance)).isFalse()
+    }
+
+    @Test
+    fun `it is satisfied if the value for a work note is a string`() {
+        val instance = getMockedMetadatum("test text", WORK_NOTE)
+
+        assertThat(hasValidValueType.isSatisfiedBy(instance)).isTrue()
+    }
+
+    @Test
+    fun `it is not satisfied if the value for a work note is not string`() {
+        val instance = getMockedMetadatum(123, WORK_NOTE)
+
+        assertThat(hasValidValueType.isSatisfiedBy(instance)).isFalse()
+    }
+
+    @Test
+    fun `it is satisfied if the value for a description is a string`() {
+        val instance = getMockedMetadatum("test text", DESCRIPTION)
+
+        assertThat(hasValidValueType.isSatisfiedBy(instance)).isTrue()
+    }
+
+    @Test
+    fun `it is not satisfied if the value for a description is not string`() {
+        val instance = getMockedMetadatum(123, DESCRIPTION)
+
+        assertThat(hasValidValueType.isSatisfiedBy(instance)).isFalse()
+    }
+
+    @Test
+    fun `it is satisfied if the value for a reference is a string`() {
+        val instance = getMockedMetadatum("test text", REFERENCE)
+
+        assertThat(hasValidValueType.isSatisfiedBy(instance)).isTrue()
+    }
+
+    @Test
+    fun `it is not satisfied if the value for a reference is not string`() {
+        val instance = getMockedMetadatum(123, REFERENCE)
+
+        assertThat(hasValidValueType.isSatisfiedBy(instance)).isFalse()
+    }
+
+    @Test
+    fun `it is satisfied if the value for an entry into force date note is a string`() {
+        val instance = getMockedMetadatum("test text", ENTRY_INTO_FORCE_DATE_NOTE)
+
+        assertThat(hasValidValueType.isSatisfiedBy(instance)).isTrue()
+    }
+
+    @Test
+    fun `it is not satisfied if the value for an entry into force date note  is not string`() {
+        val instance = getMockedMetadatum(123, ENTRY_INTO_FORCE_DATE_NOTE)
+
+        assertThat(hasValidValueType.isSatisfiedBy(instance)).isFalse()
+    }
+
+    @Test
+    fun `it is not satisfied if the value for a proof indication type is a string`() {
+        val instance = getMockedMetadatum("test text", PROOF_INDICATION)
+
+        assertThat(hasValidValueType.isSatisfiedBy(instance)).isFalse()
+    }
+
+    @Test
+    fun `it is not satisfied if the value for a proof type is a string`() {
+        val instance = getMockedMetadatum("test text", PROOF_TYPE)
+
+        assertThat(hasValidValueType.isSatisfiedBy(instance)).isFalse()
+    }
+
+    @Test
+    fun `it is not satisfied if the value for other type is a string`() {
+        val instance = getMockedMetadatum("test text", OTHER_TYPE)
 
         assertThat(hasValidValueType.isSatisfiedBy(instance)).isFalse()
     }

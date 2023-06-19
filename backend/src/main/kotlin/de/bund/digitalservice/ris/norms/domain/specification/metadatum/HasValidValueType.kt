@@ -11,9 +11,11 @@ import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.AREA_OF_PUBLI
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.DATE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.DECIDING_BODY
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.DEFINITION
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.DESCRIPTION
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.DIVERGENT_DOCUMENT_NUMBER
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.EDITION
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.ENTITY
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.ENTRY_INTO_FORCE_DATE_NOTE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.EU_GOVERNMENT_GAZETTE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.EXPLANATION
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.EXTERNAL_DATA_NOTE
@@ -32,11 +34,15 @@ import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.NORM_CATEGORY
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.NUMBER
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.NUMBER_OF_THE_PUBLICATION_IN_THE_RESPECTIVE_AREA
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.OTHER_OFFICIAL_REFERENCE
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.OTHER_TYPE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.PAGE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.PARTICIPATION_INSTITUTION
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.PARTICIPATION_TYPE
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.PROOF_INDICATION
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.PROOF_TYPE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.RANGE_END
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.RANGE_START
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.REFERENCE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.REFERENCE_NUMBER
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.RELATED_DATA
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.RESOLUTION_MAJORITY
@@ -55,8 +61,12 @@ import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.UNOFFICIAL_LO
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.UNOFFICIAL_REFERENCE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.UNOFFICIAL_SHORT_TITLE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.VALIDITY_RULE
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.WORK_NOTE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.YEAR
 import de.bund.digitalservice.ris.norms.domain.value.NormCategory
+import de.bund.digitalservice.ris.norms.domain.value.OtherType
+import de.bund.digitalservice.ris.norms.domain.value.ProofIndication
+import de.bund.digitalservice.ris.norms.domain.value.ProofType
 import de.bund.digitalservice.ris.norms.domain.value.UndefinedDate
 import java.time.LocalDate
 
@@ -74,7 +84,7 @@ val hasValidValueType =
                 AREA_OF_PUBLICATION, NUMBER_OF_THE_PUBLICATION_IN_THE_RESPECTIVE_AREA,
                 SERIES, DECIDING_BODY, EU_GOVERNMENT_GAZETTE, OTHER_OFFICIAL_REFERENCE, ENTITY,
                 TYPE_NAME, TEMPLATE_NAME, EDITION, TEXT, LINK, RELATED_DATA, EXTERNAL_DATA_NOTE, APPENDIX, FOOTNOTE_REFERENCE, FOOTNOTE_CHANGE,
-                FOOTNOTE_COMMENT, FOOTNOTE_DECISION, FOOTNOTE_STATE_LAW, FOOTNOTE_EU_LAW, FOOTNOTE_OTHER,
+                FOOTNOTE_COMMENT, FOOTNOTE_DECISION, FOOTNOTE_STATE_LAW, FOOTNOTE_EU_LAW, FOOTNOTE_OTHER, WORK_NOTE, DESCRIPTION, REFERENCE, ENTRY_INTO_FORCE_DATE_NOTE,
                 -> instance.value is String
 
                 DATE -> instance.value is LocalDate
@@ -84,6 +94,12 @@ val hasValidValueType =
                 RESOLUTION_MAJORITY -> instance.value is Boolean
 
                 UNDEFINED_DATE -> instance.value is UndefinedDate
+
+                PROOF_INDICATION -> instance.value is ProofIndication
+
+                PROOF_TYPE -> instance.value is ProofType
+
+                OTHER_TYPE -> instance.value is OtherType
             }
         }
     }
