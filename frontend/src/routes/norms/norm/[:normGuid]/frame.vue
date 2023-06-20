@@ -10,6 +10,7 @@ import CitationDateInputGroup from "@/components/CitationDateInputGroup.vue"
 import DigitalEvidenceInputGroup from "@/components/DigitalEvidenceInputGroup.vue"
 import DivergentEntryIntoForceGroup from "@/components/DivergentEntryIntoForceGroup.vue"
 import DivergentExpirationGroup from "@/components/DivergentExpirationGroup.vue"
+import DocumentStatusGroup from "@/components/DocumentStatusGroup.vue"
 import DocumentTypeInputGroup from "@/components/DocumentTypeInputGroup.vue"
 import EntryIntoForceInputGroup from "@/components/EntryIntoForceInputGroup.vue"
 import ExpandableDataSet from "@/components/ExpandableDataSet.vue"
@@ -30,9 +31,6 @@ import {
   MetadataSections,
   UndefinedDate,
 } from "@/domain/Norm"
-import { documentStatus } from "@/fields/norms/documentStatus"
-import { documentTextProof } from "@/fields/norms/documentTextProof"
-import { otherDocumentNote } from "@/fields/norms/otherDocumentNote"
 import { otherStatusNote } from "@/fields/norms/otherStatusNote"
 import { reissue } from "@/fields/norms/reissue"
 import { repeal } from "@/fields/norms/repeal"
@@ -240,6 +238,95 @@ function officialReferenceSummarizer(data: MetadataSections): string {
     return euAnnouncementSummary(data.EU_ANNOUNCEMENT[0])
   } else if (data.OTHER_OFFICIAL_ANNOUNCEMENT) {
     return otherOfficialReferenceSummary(data.OTHER_OFFICIAL_ANNOUNCEMENT[0])
+  } else return ""
+}
+
+function documentStatusSummary(data: Metadata): string {
+  const PROOF_INDICATION_TRANSLATIONS = {
+    NOT_YET_CONSIDERED: "noch nicht berücksichtigt",
+    CONSIDERED: "ist berücksichtigt",
+  }
+
+  if (!data) return ""
+
+  const workNote = data?.WORK_NOTE ?? []
+  const description = data?.DESCRIPTION?.[0]
+  const date = formatDate([data?.DATE?.[0]])
+  const year = data?.YEAR?.[0]
+  const reference = data?.REFERENCE?.[0]
+  const entryIntoForceDateState = data?.ENTRY_INTO_FORCE_DATE_NOTE ?? []
+  const proofIndication =
+    data?.PROOF_INDICATION?.filter((category) => category != null) ?? []
+
+  const translatedProofIndication = proofIndication.map(
+    (indication) => PROOF_INDICATION_TRANSLATIONS[indication] || indication
+  )
+  const resultArray = []
+
+  if (workNote) resultArray.push(...workNote)
+  if (description) resultArray.push(description)
+  if (date) resultArray.push(date)
+  if (year) resultArray.push(year)
+  if (reference) resultArray.push(reference)
+  if (entryIntoForceDateState) resultArray.push(...entryIntoForceDateState)
+
+  resultArray.push(...translatedProofIndication)
+
+  return resultArray.join(" ")
+}
+
+function documentTextProofSummary(data: Metadata): string {
+  const PROOF_TYPE_TRANSLATIONS = {
+    TEXT_PROOF_FROM: "Textnachweis ab",
+    TEXT_PROOF_VALIDITY_FROM: "Textnachweis Geltung ab",
+  }
+
+  if (!data) return ""
+
+  const proofType =
+    data?.PROOF_TYPE?.filter((category) => category != null) ?? []
+  const text = data?.TEXT?.[0]
+
+  const translatedProofType = proofType.map(
+    (type) => PROOF_TYPE_TRANSLATIONS[type] || type
+  )
+  const resultArray = [...translatedProofType]
+
+  if (text) {
+    resultArray.push(text)
+  }
+
+  return resultArray.join(" ")
+}
+
+function documentOtherSummary(data: Metadata): string {
+  const OTHER_TYPE_TRANSLATIONS = {
+    TEXT_IN_PROGRESS: "Text in Bearbeitung",
+    TEXT_PROOFED_BUT_NOT_DONE:
+      "Nachgewiesener Text dokumentarisch noch nicht abschließend bearbeitet",
+  }
+
+  if (!data) return ""
+
+  const otherType =
+    data?.OTHER_TYPE?.filter((category) => category != null) ?? []
+
+  const translatedOtherType = otherType.map(
+    (type) => OTHER_TYPE_TRANSLATIONS[type] || type
+  )
+
+  return translatedOtherType.join(" ")
+}
+
+function documentStatusSectionSummarizer(data: MetadataSections): string {
+  if (!data) return ""
+
+  if (data.DOCUMENT_STATUS) {
+    return documentStatusSummary(data.DOCUMENT_STATUS[0])
+  } else if (data.DOCUMENT_TEXT_PROOF) {
+    return documentTextProofSummary(data.DOCUMENT_TEXT_PROOF[0])
+  } else if (data.DOCUMENT_OTHER) {
+    return documentOtherSummary(data.DOCUMENT_OTHER[0])
   } else return ""
 }
 
@@ -474,6 +561,9 @@ function subjectAreaSummarizer(data: Metadata) {
 
 const CitationDateSummary = withSummarizer(citationDateSummarizer)
 const OfficialReferenceSummary = withSummarizer(officialReferenceSummarizer)
+const DocumentStatusSectionSummary = withSummarizer(
+  documentStatusSectionSummarizer
+)
 const NormProviderSummary = withSummarizer(normProviderSummarizer)
 const DocumentTypeSummary = withSummarizer(documentTypeSummarizer)
 const DivergentEntryIntoForceSummary = withSummarizer(
@@ -844,44 +934,21 @@ const footnoteLineSummary = withSummarizer(summarizeFootnotePerLine)
       />
     </fieldset>
 
-    <h2
-      id="documentProcessingStatusFields"
-      class="heading-02-regular mb-[1rem]"
+    <ExpandableDataSet
+      id="documentStatus"
+      border-bottom
+      :data-set="metadataSections.DOCUMENT_STATUS_SECTION"
+      :summary-component="DocumentStatusSectionSummary"
+      test-id="a11y-expandable-dataset"
+      title="Stand der dokumentarischen Bearbeitung"
     >
-      Stand der dokumentarischen Bearbeitung
-    </h2>
-    <fieldset>
-      <legend id="documentStatusFields" class="heading-03-regular mb-[1rem]">
-        Stand der dokumentarischen Bearbeitung
-      </legend>
-      <InputGroup
-        v-model="flatMetadata"
-        :column-count="1"
-        :fields="documentStatus"
+      <EditableList
+        v-model="metadataSections.DOCUMENT_STATUS_SECTION"
+        :default-value="{}"
+        :edit-component="DocumentStatusGroup"
+        :summary-component="DocumentStatusSectionSummary"
       />
-    </fieldset>
-
-    <fieldset>
-      <legend id="documentTextProofFields" class="heading-03-regular mb-[1rem]">
-        Textnachweis
-      </legend>
-      <InputGroup
-        v-model="flatMetadata"
-        :column-count="1"
-        :fields="documentTextProof"
-      />
-    </fieldset>
-
-    <fieldset>
-      <legend id="otherDocumentNoteFields" class="heading-03-regular mb-[1rem]">
-        Sonstiger Hinweis
-      </legend>
-      <InputGroup
-        v-model="flatMetadata"
-        :column-count="1"
-        :fields="otherDocumentNote"
-      />
-    </fieldset>
+    </ExpandableDataSet>
 
     <ExpandableDataSet
       id="categorizedReferences"
