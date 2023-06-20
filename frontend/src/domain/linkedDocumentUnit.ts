@@ -1,3 +1,4 @@
+import dayjs from "dayjs"
 import { Court, DocumentType } from "./documentUnit"
 
 export default class LinkedDocumentUnit {
@@ -29,5 +30,17 @@ export default class LinkedDocumentUnit {
 
   public isDocUnit(): boolean {
     return this.dataSource === "NEURIS" || this.dataSource === "MIGRATION"
+  }
+
+  get renderDecision(): string {
+    return [
+      ...(this.court?.label ? [`${this.court?.label}`] : []),
+      ...(this.decisionDate
+        ? [dayjs(this.decisionDate).format("DD.MM.YYYY")]
+        : []),
+      ...(this.documentType ? [this.documentType.label] : []),
+      ...(this.fileNumber ? [this.fileNumber] : []),
+      ...(this.documentNumber && this.isDocUnit() ? [this.documentNumber] : []),
+    ].join(", ")
   }
 }
