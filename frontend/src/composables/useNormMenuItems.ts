@@ -53,7 +53,7 @@ export function useNormMenuItems(
         getChildItem("Stand-Angabe", "statusIndicationFields"),
         getChildItem(
           "Stand der dokumentarischen Bearbeitung",
-          "documentProcessingStatusFields"
+          "documentStatus"
         ),
         getChildItem("Aktivverweisung", "categorizedReferences"),
         getChildItem("Fußnoten", "footnotes"),
