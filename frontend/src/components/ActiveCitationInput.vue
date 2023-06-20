@@ -74,7 +74,11 @@ async function search(page = 0) {
 
 <template>
   <div>
-    <InputField id="activeCitationPredicate" label="Art der Zitierung">
+    <InputField
+      id="activeCitationPredicate"
+      class="border-b-1 border-gray-400 mb-16"
+      label="Art der Zitierung"
+    >
       <ComboboxInput
         id="activeCitationPredicate"
         v-model="activeCitationPredicate"
