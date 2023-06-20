@@ -18,7 +18,7 @@ class FileReferenceTest {
         val name = "test.zip"
         val time = LocalDateTime.now()
 
-        val fileReference = FileReference(name, getHashFromContent(bytes), time)
+        val fileReference = FileReference(name, getHashFromContent(bytes), time, UUID.randomUUID())
         assertThat(fileReference.name).isEqualTo(name)
         assertThat(fileReference.hash).isEqualTo(hash)
         assertThat(fileReference.createdAt).isEqualTo(time)

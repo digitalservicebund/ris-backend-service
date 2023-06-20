@@ -46,30 +46,48 @@ fun createRandomEditNormRequestTestSchema(): EditNormFrameControllerTest.NormFra
 
 fun createRandomNorm(): Norm {
     val parameters: EasyRandomParameters =
-        EasyRandomParameters().randomize(named("marker").and(inClass(Article::class.java))) {
-            "§ " + Random().nextInt(1, 50).toString()
-        }.randomize(named("marker").and(inClass(Paragraph::class.java))) {
-            "(" + Random().nextInt(1, 50).toString() + ")"
-        }.randomize(named("citationYear")) {
+        EasyRandomParameters().randomize(named("citationYear")) {
             EasyRandom(EasyRandomParameters().stringLengthRange(4, 4)).nextObject(String::class.java)
         }.randomize(named("metadataSections")) {
             emptyList<MetadataSection>()
         }.randomize(named("files")) {
             emptyList<FileReference>()
+        }.randomize(named("articles")) {
+            emptyList<FileReference>()
         }
     return EasyRandom(parameters).nextObject(Norm::class.java)
 }
 
-fun createRandomNormWithCitationDate(): Norm {
+fun createRandomNormWithCitationDateAndArticles(): Norm {
     return createRandomNorm().copy(
         metadataSections = listOf(
             MetadataSection(MetadataSectionName.CITATION_DATE, listOf(Metadatum(decodeLocalDate("2002-02-02"), MetadatumType.DATE))),
+        ),
+        articles = listOf(
+            createRandomArticle().copy(paragraphs = listOf(createRandomParagraph())),
+            createRandomArticle().copy(paragraphs = listOf(createRandomParagraph())),
         ),
     )
 }
 
 fun createRandomFileReference(): FileReference {
     return EasyRandom().nextObject(FileReference::class.java)
+}
+
+fun createRandomArticle(): Article {
+    val parameters: EasyRandomParameters =
+        EasyRandomParameters().randomize(named("marker").and(inClass(Article::class.java))) {
+            "§ " + Random().nextInt(1, 50).toString()
+        }
+    return EasyRandom(parameters).nextObject(Article::class.java)
+}
+
+fun createRandomParagraph(): Paragraph {
+    val parameters: EasyRandomParameters =
+        EasyRandomParameters().randomize(named("marker").and(inClass(Paragraph::class.java))) {
+            "(" + Random().nextInt(1, 50).toString() + ")"
+        }
+    return EasyRandom(parameters).nextObject(Paragraph::class.java)
 }
 
 private fun createRandomLocalDateInString(): String {

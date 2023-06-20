@@ -9,5 +9,5 @@ import java.util.UUID
 @Repository
 interface ArticlesRepository : ReactiveCrudRepository<ArticleDto, UUID> {
 
-    fun findByNormId(norm: Int): Flux<ArticleDto>
+    fun findByNormGuid(normGuid: UUID): Flux<ArticleDto>
 }

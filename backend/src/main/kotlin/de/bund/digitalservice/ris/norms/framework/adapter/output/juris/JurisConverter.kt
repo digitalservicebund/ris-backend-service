@@ -10,13 +10,14 @@ import de.bund.digitalservice.ris.norms.juris.converter.generator.generateZip
 import org.springframework.stereotype.Component
 import reactor.core.publisher.Mono
 import java.nio.ByteBuffer
+import java.util.*
 
 @Component
 class JurisConverter() : ParseJurisXmlOutputPort, GenerateNormFileOutputPort {
     override fun parseJurisXml(query: ParseJurisXmlOutputPort.Query): Mono<Norm> {
         val data = extractData(ByteBuffer.wrap(query.zipFile))
         val norm = mapDataToDomain(query.newGuid, data)
-        norm.files = listOf(FileReference(query.filename, getHashFromContent(query.zipFile)))
+        norm.files = listOf(FileReference(query.filename, getHashFromContent(query.zipFile), guid = UUID.randomUUID()))
         return Mono.just(norm)
     }
 
