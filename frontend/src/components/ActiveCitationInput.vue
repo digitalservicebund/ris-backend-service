@@ -74,11 +74,11 @@ async function search(page = 0) {
 
 <template>
   <div>
-    <InputField id="activeCitationPredicate" label="Prädikat">
+    <InputField id="activeCitationPredicate" label="Art der Zitierung">
       <ComboboxInput
         id="activeCitationPredicate"
         v-model="activeCitationPredicate"
-        aria-label="Suchfeld"
+        aria-label="Art der Zitierung"
         clear-on-choosing-item
         :item-service="ComboboxItemService.getCitationStyles"
         placeholder="Bitte auswählen"
