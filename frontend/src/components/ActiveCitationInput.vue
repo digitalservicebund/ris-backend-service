@@ -50,16 +50,21 @@ const searchResults = ref<SearchResults<ActiveCitation>>()
 const localActiveCitations = ref<ActiveCitation[]>()
 
 async function search(page = 0) {
-  const response = await documentUnitService.searchByActiveCitationInput(
+  const response = await documentUnitService.searchByLinkedDocumentUnit(
     page,
     30,
     activeCitation.value as ActiveCitation
   )
   if (response.data) {
-    searchResultsCurrentPage.value = response.data
+    searchResultsCurrentPage.value = {
+      ...response.data,
+      content: response.data.content.map(
+        (decision) => new ActiveCitation({ ...decision })
+      ),
+    }
     searchResults.value = response.data.content.map((searchResult) => {
       return {
-        decision: searchResult,
+        decision: new ActiveCitation({ ...searchResult }),
         isLinked: searchResult.isLinked(localActiveCitations.value),
       }
     })

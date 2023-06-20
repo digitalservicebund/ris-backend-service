@@ -22,11 +22,11 @@ export default class ActiveCitation extends LinkedDocumentUnit {
       ...(this.documentType ? [this.documentType.label] : []),
       ...(this.fileNumber ? [this.fileNumber] : []),
       ...(this.predicateList ? [this.predicateList] : []),
-      ...(this.documentNumber && this.hasLink ? [this.documentNumber] : []),
+      ...(this.documentNumber && this.isDocUnit() ? [this.documentNumber] : []),
     ].join(", ")
   }
 
-  get hasLink(): boolean {
+  public isDocUnit(): boolean {
     return this.dataSource !== "ACTIVE_CITATION"
   }
 

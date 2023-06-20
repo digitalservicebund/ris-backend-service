@@ -32,14 +32,14 @@ describe("ProceedingDecision", () => {
     const proceedingDecision = new ProceedingDecision({
       dataSource: "PROCEEDING_DECISION",
     })
-    expect(proceedingDecision.hasLink).toBeFalsy()
+    expect(proceedingDecision.isDocUnit()).toBeFalsy()
   })
 
   it("returns true if linked to other docunit", () => {
     const proceedingDecision = new ProceedingDecision({
       dataSource: "NEURIS",
     })
-    expect(proceedingDecision.hasLink).toBeTruthy()
+    expect(proceedingDecision.isDocUnit()).toBeTruthy()
   })
 
   it("returns a string representation of a proceeding decision", () => {

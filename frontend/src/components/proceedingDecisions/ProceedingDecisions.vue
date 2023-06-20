@@ -105,16 +105,21 @@ function updateSearchResultsLinkStatus(uuid: string) {
 }
 
 async function search(page = 0) {
-  const response = await documentUnitService.searchByProceedingDecisionInput(
+  const response = await documentUnitService.searchByLinkedDocumentUnit(
     page,
     searchResultsPerPage,
     input.value as ProceedingDecision
   )
   if (response.data) {
-    searchResultsCurrentPage.value = response.data
+    searchResultsCurrentPage.value = {
+      ...response.data,
+      content: response.data.content.map(
+        (decision) => new ProceedingDecision({ ...decision })
+      ),
+    }
     searchResults.value = response.data.content.map((searchResult) => {
       return {
-        decision: searchResult,
+        decision: new ProceedingDecision({ ...searchResult }),
         isLinked: searchResult.isLinked(localProceedingDecisions.value),
       }
     })
@@ -122,8 +127,8 @@ async function search(page = 0) {
 }
 
 function decisionSummarizer(dataEntry: ProceedingDecision) {
-  return h("div", { tabindex: dataEntry.hasLink ? 0 : -1 }, [
-    dataEntry.hasLink
+  return h("div", { tabindex: dataEntry.isDocUnit() ? 0 : -1 }, [
+    dataEntry.isDocUnit()
       ? h(
           RouterLink,
           {

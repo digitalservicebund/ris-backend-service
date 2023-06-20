@@ -12,7 +12,7 @@ export default class LinkedDocumentUnit {
     Object.assign(this, data)
   }
 
-  isLinked<Type extends LinkedDocumentUnit>(
+  public isLinked<Type extends LinkedDocumentUnit>(
     localDecisions: Type[] | undefined
   ): boolean {
     if (!localDecisions) return false

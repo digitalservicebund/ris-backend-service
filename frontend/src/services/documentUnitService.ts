@@ -2,10 +2,9 @@ import httpClient, {
   ServiceResponse,
   FailedValidationServerResponse,
 } from "./httpClient"
-import ActiveCitation from "@/domain/activeCitation"
 import DocumentUnit from "@/domain/documentUnit"
 import { DocumentUnitListEntry } from "@/domain/documentUnitListEntry"
-import ProceedingDecision from "@/domain/proceedingDecision"
+import LinkedDocumentUnit from "@/domain/linkedDocumentUnit"
 import { PageableService, Page } from "@/shared/components/Pagination.vue"
 
 interface DocumentUnitService {
@@ -16,11 +15,10 @@ interface DocumentUnitService {
   createNew(): Promise<ServiceResponse<DocumentUnit>>
   update(documentUnit: DocumentUnit): Promise<ServiceResponse<unknown>>
   delete(documentUnitUuid: string): Promise<ServiceResponse<unknown>>
-  searchByProceedingDecisionInput: PageableService<
-    ProceedingDecision,
-    ProceedingDecision
+  searchByLinkedDocumentUnit: PageableService<
+    LinkedDocumentUnit,
+    LinkedDocumentUnit
   >
-  searchByActiveCitationInput: PageableService<ActiveCitation, ActiveCitation>
 }
 
 const service: DocumentUnitService = {
@@ -122,14 +120,14 @@ const service: DocumentUnitService = {
     return response
   },
 
-  async searchByProceedingDecisionInput(
+  async searchByLinkedDocumentUnit(
     page: number,
     size: number,
-    query = new ProceedingDecision()
+    query = new LinkedDocumentUnit()
   ) {
     const response = await httpClient.put<
-      ProceedingDecision,
-      Page<ProceedingDecision>
+      LinkedDocumentUnit,
+      Page<LinkedDocumentUnit>
     >(
       `caselaw/documentunits/search?pg=${page}&sz=${size}`,
       {
@@ -145,45 +143,14 @@ const service: DocumentUnitService = {
         title: `Die Suche nach passenden Dokumentationseinheit konnte nicht ausgeführt werden`,
       }
     }
-    response.data = response.data as Page<ProceedingDecision>
+    response.data = response.data as Page<LinkedDocumentUnit>
     return {
       status: response.status,
       data: {
         ...response.data,
         content: response.data.content.map(
-          (decision) => new ProceedingDecision({ ...decision })
-        ),
-      },
-    }
-  },
-
-  async searchByActiveCitationInput(
-    page: number,
-    size: number,
-    query = new ActiveCitation()
-  ) {
-    const response = await httpClient.put<ActiveCitation, Page<ActiveCitation>>(
-      `caselaw/documentunits/search?pg=${page}&sz=${size}`,
-      {
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-        },
-      },
-      query
-    )
-    if (response.status >= 300) {
-      response.error = {
-        title: `Die Suche nach passenden Dokumentationseinheit konnte nicht ausgeführt werden`,
-      }
-    }
-    response.data = response.data as Page<ActiveCitation>
-    return {
-      status: response.status,
-      data: {
-        ...response.data,
-        content: response.data.content.map(
-          (decision) => new ActiveCitation({ ...decision })
+          (decision: Partial<LinkedDocumentUnit> | undefined) =>
+            new LinkedDocumentUnit({ ...decision })
         ),
       },
     }

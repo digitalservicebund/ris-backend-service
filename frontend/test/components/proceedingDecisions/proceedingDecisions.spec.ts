@@ -101,7 +101,7 @@ describe("DocumentUnitProceedingDecisions", async () => {
 
   it("lists search results", async () => {
     const fetchSpy = vi
-      .spyOn(documentUnitService, "searchByProceedingDecisionInput")
+      .spyOn(documentUnitService, "searchByLinkedDocumentUnit")
       .mockImplementation(() =>
         Promise.resolve({
           status: 200,
@@ -162,7 +162,7 @@ describe("DocumentUnitProceedingDecisions", async () => {
   it("adds proceeding decision from search results and updates indicators"),
     async () => {
       const fetchSpy = vi
-        .spyOn(documentUnitService, "searchByProceedingDecisionInput")
+        .spyOn(documentUnitService, "searchByLinkedDocumentUnit")
         .mockImplementation(() =>
           Promise.resolve({
             status: 200,

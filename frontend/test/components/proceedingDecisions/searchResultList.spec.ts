@@ -19,6 +19,7 @@ function renderComponent(searchResults?: SearchResults<ProceedingDecision>) {
             documentNumber: "fooDocumentNumber",
           },
         }),
+
         isLinked: false,
       },
     ],

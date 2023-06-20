@@ -7,10 +7,6 @@ export default class ProceedingDecision extends LinkedDocumentUnit {
 
   static requiredFields = ["fileNumber", "court", "decisionDate"] as const
 
-  get hasLink(): boolean {
-    return this.dataSource !== "PROCEEDING_DECISION"
-  }
-
   constructor(data: Partial<ProceedingDecision> = {}) {
     super()
     Object.assign(this, data)
@@ -25,9 +21,14 @@ export default class ProceedingDecision extends LinkedDocumentUnit {
         ? [dayjs(this.decisionDate).format("DD.MM.YYYY")]
         : []),
       ...(this.fileNumber ? [this.fileNumber] : []),
-      ...(this.documentNumber && this.hasLink ? [this.documentNumber] : []),
+      ...(this.documentNumber && this.isDocUnit() ? [this.documentNumber] : []),
     ].join(", ")
   }
+
+  public isDocUnit(): boolean {
+    return this.dataSource !== "PROCEEDING_DECISION"
+  }
+
   get dateUnknown(): boolean {
     return !this.dateKnown
   }
