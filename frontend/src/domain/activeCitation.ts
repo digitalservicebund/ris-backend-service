@@ -12,7 +12,6 @@ export default class ActiveCitation extends LinkedDocumentUnit {
   }
 
   get renderDecision(): string {
-    console.log(this)
     return [
       ...(this.court?.label ? [`${this.court?.label}`] : []),
       ...(this.decisionDate
