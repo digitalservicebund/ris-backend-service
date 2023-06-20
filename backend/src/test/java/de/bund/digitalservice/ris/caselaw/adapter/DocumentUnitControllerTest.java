@@ -1,6 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
-import static de.bund.digitalservice.ris.caselaw.Utils.getMockLogin;
+import static de.bund.digitalservice.ris.caselaw.AuthUtils.getMockLogin;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;

@@ -13,7 +13,7 @@ import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.OidcLoginMutator;
 import reactor.core.publisher.Mono;
 
-public class Utils {
+public class AuthUtils {
 
   public static OidcLoginMutator getMockLogin() {
     return getMockLoginWithDocOffice("/DigitalService");

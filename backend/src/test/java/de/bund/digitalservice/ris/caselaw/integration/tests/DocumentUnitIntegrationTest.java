@@ -1,6 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.integration.tests;
 
-import static de.bund.digitalservice.ris.caselaw.Utils.getMockLogin;
+import static de.bund.digitalservice.ris.caselaw.AuthUtils.getMockLogin;
 import static de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatus.PUBLISHED;
 import static de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatus.UNPUBLISHED;
 import static org.assertj.core.api.Assertions.assertThat;

@@ -1,8 +1,8 @@
 package de.bund.digitalservice.ris.caselaw.adapter.authorization;
 
-import static de.bund.digitalservice.ris.caselaw.Utils.buildDocOffice;
-import static de.bund.digitalservice.ris.caselaw.Utils.getMockLoginWithDocOffice;
-import static de.bund.digitalservice.ris.caselaw.Utils.setUpDocumentationOfficeMocks;
+import static de.bund.digitalservice.ris.caselaw.AuthUtils.buildDocOffice;
+import static de.bund.digitalservice.ris.caselaw.AuthUtils.getMockLoginWithDocOffice;
+import static de.bund.digitalservice.ris.caselaw.AuthUtils.setUpDocumentationOfficeMocks;
 import static de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatus.PUBLISHED;
 import static de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatus.UNPUBLISHED;
 import static org.mockito.ArgumentMatchers.any;
