@@ -9,7 +9,9 @@ import ProceedingDecision from "@/domain/proceedingDecision"
 function renderSearchResults(
   searchResults?: SearchResults<ProceedingDecision | ActiveCitation>
 ) {
-  const props: { searchResults: SearchResults<ProceedingDecision> } = {
+  const props: {
+    searchResults: SearchResults<ProceedingDecision | ActiveCitation>
+  } = {
     searchResults: searchResults ?? [
       {
         decision: new ProceedingDecision({
