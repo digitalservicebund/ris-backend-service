@@ -23,7 +23,7 @@ public interface DatabaseDocumentUnitMetadataRepository
           + "(:courtType IS NULL OR gerichtstyp = :courtType) AND "
           + "(:courtLocation IS NULL OR gerichtssitz = :courtLocation) AND"
           + "(:decisionDate IS NULL OR decision_date = :decisionDate) AND"
-          + "(:docUnitIds IS NULL OR id IN (SELECT * FROM UNNEST(:docUnitIds))) AND "
+          + "(:docUnitIds IS NULL OR id = ANY(:docUnitIds)) AND "
           + "(:docTypeId IS NULL OR document_type_id = :docTypeId) AND "
           + "(status.status = 'PUBLISHED' OR status.status IS NULL) AND "
           + "data_source != 'PROCEEDING_DECISION' ";
