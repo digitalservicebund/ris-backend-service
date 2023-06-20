@@ -206,7 +206,7 @@ export type InputModelProps =
         <button
           v-if="inputText"
           class="input-close-icon"
-          tabindex="-1"
+          tabindex="0"
           @click="clearSelection"
         >
           <span
