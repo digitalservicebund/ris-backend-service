@@ -4,9 +4,12 @@ import static de.bund.digitalservice.ris.caselaw.AuthUtils.getMockLogin;
 import static de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatus.PUBLISHED;
 import static de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatus.UNPUBLISHED;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
 
 import com.jayway.jsonpath.JsonPath;
+import de.bund.digitalservice.ris.caselaw.AuthUtils;
 import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentNumberService;
 import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentUnitStatusService;
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentUnitController;
@@ -53,18 +56,19 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 import software.amazon.awssdk.services.s3.S3AsyncClient;
 
 @RISIntegrationTest(
     imports = {
       DocumentUnitService.class,
-      KeycloakUserService.class,
       DatabaseDocumentNumberService.class,
       DatabaseDocumentUnitStatusService.class,
       PostgresDocumentUnitRepositoryImpl.class,
@@ -99,7 +103,8 @@ class DocumentUnitIntegrationTest {
 
   @MockBean private S3AsyncClient s3AsyncClient;
   @MockBean private EmailPublishService publishService;
-  @MockBean DocxConverterService docxConverterService;
+  @MockBean private DocxConverterService docxConverterService;
+  @MockBean private KeycloakUserService keycloakUserService;
 
   @AfterEach
   void cleanUp() {
@@ -117,6 +122,9 @@ class DocumentUnitIntegrationTest {
 
   @Test
   void testForCorrectDbEntryAfterNewDocumentUnitCreation() {
+    when(keycloakUserService.getDocumentationOffice(any(OidcUser.class)))
+        .thenReturn(Mono.just(AuthUtils.buildDocOffice("DigitalService", "XX")));
+
     webClient
         .mutateWith(csrf())
         .mutateWith(getMockLogin())
