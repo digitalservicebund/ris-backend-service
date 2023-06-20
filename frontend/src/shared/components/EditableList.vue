@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import type { Component } from "vue"
-import { computed, nextTick, onMounted, ref, useAttrs, watch } from "vue"
+import { computed, nextTick, onMounted, ref, watch } from "vue"
 import DataSetSummary from "@/shared/components/DataSetSummary.vue"
 
 interface Props {
@@ -11,6 +11,8 @@ interface Props {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   defaultValue: any
   disableMultiEntry?: boolean
+  addEntryLabel?: string
+  noHorizontalSeparators?: boolean
 }
 
 interface Emits {
@@ -22,10 +24,11 @@ const props = withDefaults(defineProps<Props>(), {
   summaryComponent: DataSetSummary,
   modelValue: () => [],
   disableMultiEntry: false,
+  addEntryLabel: "Weitere Angabe",
+  noHorizontalSeparators: false,
 })
 
 const emit = defineEmits<Emits>()
-const attributes = useAttrs()
 
 const modelValueList = ref<undefined[]>([])
 const elementList = ref<HTMLElement[]>([])
@@ -62,7 +65,7 @@ async function focusFirstFocusableElementOfCurrentEditElement() {
     const firstFocusableElement = currentEditElement.value.querySelectorAll(
       'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
     )[0] as HTMLElement
-    firstFocusableElement.focus()
+    firstFocusableElement && firstFocusableElement.focus()
   }
 }
 
@@ -108,6 +111,7 @@ watch(editIndex, focusFirstFocusableElementOfCurrentEditElement)
         v-if="index !== editIndex"
         :key="index"
         class="cursor-pointer flex gap-8 group-first:pt-0 items-center justify-between py-8"
+        :class="{ '!border-none': noHorizontalSeparators }"
       >
         <component
           :is="summaryComponent"
@@ -140,7 +144,6 @@ watch(editIndex, focusFirstFocusableElementOfCurrentEditElement)
       <component
         :is="editComponent"
         v-else
-        v-bind="attributes"
         v-model="modelValueList[index]"
         class="group-first:pt-0 py-16"
         @keypress.enter="setEditIndex(undefined)"
