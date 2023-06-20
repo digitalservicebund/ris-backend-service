@@ -2,7 +2,6 @@ import dayjs from "dayjs"
 import LinkedDocumentUnit from "./linkedDocumentUnit"
 
 export default class ProceedingDecision extends LinkedDocumentUnit {
-  public dataSource?: "NEURIS" | "MIGRATION" | "PROCEEDING_DECISION"
   public dateKnown = true
 
   static requiredFields = ["fileNumber", "court", "decisionDate"] as const
@@ -23,10 +22,6 @@ export default class ProceedingDecision extends LinkedDocumentUnit {
       ...(this.fileNumber ? [this.fileNumber] : []),
       ...(this.documentNumber && this.isDocUnit() ? [this.documentNumber] : []),
     ].join(", ")
-  }
-
-  public isDocUnit(): boolean {
-    return this.dataSource !== "PROCEEDING_DECISION"
   }
 
   get dateUnknown(): boolean {

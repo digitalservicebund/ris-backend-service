@@ -2,7 +2,6 @@ import dayjs from "dayjs"
 import LinkedDocumentUnit from "./linkedDocumentUnit"
 
 export default class ActiveCitation extends LinkedDocumentUnit {
-  public dataSource?: "NEURIS" | "MIGRATION" | "ACTIVE_CITATION"
   public predicateList?: string
 
   static requiredFields = ["court"] as const
@@ -24,10 +23,6 @@ export default class ActiveCitation extends LinkedDocumentUnit {
       ...(this.predicateList ? [this.predicateList] : []),
       ...(this.documentNumber && this.isDocUnit() ? [this.documentNumber] : []),
     ].join(", ")
-  }
-
-  public isDocUnit(): boolean {
-    return this.dataSource !== "ACTIVE_CITATION"
   }
 
   get missingRequiredFields() {

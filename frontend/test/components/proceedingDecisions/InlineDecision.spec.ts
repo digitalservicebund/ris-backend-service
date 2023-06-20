@@ -2,13 +2,14 @@ import { render, screen } from "@testing-library/vue"
 import { createRouter, createWebHistory } from "vue-router"
 import InlineDecision from "@/components/proceedingDecisions/InlineDecision.vue"
 import { Court, DocumentType } from "@/domain/documentUnit"
+import LinkedDocumentUnit from "@/domain/linkedDocumentUnit"
 import ProceedingDecision from "@/domain/proceedingDecision"
 
 function renderComponent(options?: {
   court?: Court
   documentType?: DocumentType
   decisionDate?: string
-  dataSource?: ProceedingDecision["dataSource"]
+  dataSource?: LinkedDocumentUnit["dataSource"]
   documentNumber?: string
 }) {
   const props: { decision: ProceedingDecision } = {

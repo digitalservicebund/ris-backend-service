@@ -7,6 +7,11 @@ export default class LinkedDocumentUnit {
   public decisionDate?: string
   public fileNumber?: string
   public documentType?: DocumentType
+  public dataSource?:
+    | "NEURIS"
+    | "MIGRATION"
+    | "PROCEEDING_DECISION"
+    | "ACTIVE_CITATION"
 
   constructor(data: Partial<LinkedDocumentUnit> = {}) {
     Object.assign(this, data)
@@ -20,5 +25,9 @@ export default class LinkedDocumentUnit {
     return localDecisions.some(
       (localDecision) => localDecision.uuid == this.uuid
     )
+  }
+
+  public isDocUnit(): boolean {
+    return this.dataSource === "NEURIS" || this.dataSource === "MIGRATION"
   }
 }

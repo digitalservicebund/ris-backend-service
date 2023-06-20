@@ -17,9 +17,9 @@ function renderComponent(searchResults?: SearchResults<ProceedingDecision>) {
               label: "fooLabel",
             },
             documentNumber: "fooDocumentNumber",
+            dataSource: "NEURIS",
           },
         }),
-
         isLinked: false,
       },
     ],
