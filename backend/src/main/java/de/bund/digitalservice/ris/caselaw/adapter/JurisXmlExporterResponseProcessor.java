@@ -21,13 +21,11 @@ import java.util.Properties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Profile;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
 @Component
-@Profile("production")
 public class JurisXmlExporterResponseProcessor {
 
   private final List<MessageHandler> messageHandlers;
@@ -63,30 +61,34 @@ public class JurisXmlExporterResponseProcessor {
             new ProcessMessageHandler());
   }
 
-  @Scheduled(fixedRate = 60000)
+  @Scheduled(fixedRate = 60000, fixedDelay = 60000)
   public void readEmails() {
+    try (Store store = createStoreSession()) {
+      processInbox(store);
+    } catch (MessagingException e) {
+      throw new StatusImporterException("Error creating or closing the store session: " + e);
+    }
+  }
+
+  private Store createStoreSession() throws MessagingException {
     Properties props = new Properties();
     props.put("mail.store.protocol", mailboxProtocol);
-
     props.put("mail.imaps.host", mailboxHost);
     props.put("mail.imaps.port", mailboxPort);
-
     Session session = Session.getInstance(props);
-    Store store = null;
+
+    Store store = session.getStore();
+    store.connect(mailboxUsername, mailboxPassword);
+    return store;
+  }
+
+  private void processInbox(Store store) {
+    List<Message> processedMessages = new ArrayList<>();
+    List<Message> unprocessableMessages = new ArrayList<>();
 
     try {
-      store = session.getStore();
-      store.connect(mailboxUsername, mailboxPassword);
-
       Folder inbox = store.getFolder("INBOX");
       inbox.open(Folder.READ_WRITE);
-
-      Folder processed = store.getFolder("processed");
-
-      Folder unprocessable = store.getFolder("unprocessable");
-
-      List<Message> processedMessages = new ArrayList<>();
-      List<Message> unprocessableMessages = new ArrayList<>();
 
       for (Message message : inbox.getMessages()) {
         for (MessageHandler handler : this.messageHandlers) {
@@ -105,20 +107,11 @@ public class JurisXmlExporterResponseProcessor {
         }
       }
 
-      moveMessages(processedMessages, inbox, processed);
-      moveMessages(unprocessableMessages, inbox, unprocessable);
-
+      moveMessages(processedMessages, inbox, store.getFolder("processed"));
+      moveMessages(unprocessableMessages, inbox, store.getFolder("unprocessable"));
       inbox.expunge();
     } catch (MessagingException e) {
-      throw new StatusImporterException("Error connecting to exporter response mailbox: " + e);
-    } finally {
-      if (store != null) {
-        try {
-          store.close();
-        } catch (MessagingException e) {
-          LOGGER.error(e.toString());
-        }
-      }
+      throw new StatusImporterException("Error processing inbox: " + e);
     }
   }
 
