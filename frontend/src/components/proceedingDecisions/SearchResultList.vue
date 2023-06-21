@@ -1,16 +1,14 @@
 <script setup lang="ts">
 import InlineDecision from "./InlineDecision.vue"
-import ActiveCitation from "@/domain/activeCitation"
 import LinkedDocumentUnit from "@/domain/linkedDocumentUnit"
-import ProceedingDecision from "@/domain/proceedingDecision"
 import TextButton from "@/shared/components/input/TextButton.vue"
 
 defineProps<{
-  searchResults?: SearchResults<ProceedingDecision | ActiveCitation>
+  searchResults?: SearchResults<LinkedDocumentUnit>
 }>()
-const emits = defineEmits<{
-  (event: "linkDecision", uuid: string): void
-}>()
+
+const emits =
+  defineEmits<(event: "linkDecision", decision: LinkedDocumentUnit) => void>()
 </script>
 
 <script lang="ts">
@@ -40,7 +38,7 @@ export type SearchResults<Type extends LinkedDocumentUnit> = {
             class="ml-24"
             :disabled="searchResult.isLinked"
             label="Übernehmen"
-            @click="emits('linkDecision', searchResult.decision.uuid as string)"
+            @click="emits('linkDecision', searchResult.decision)"
           />
         </div>
         <span

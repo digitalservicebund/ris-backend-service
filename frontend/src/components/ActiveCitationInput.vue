@@ -5,6 +5,7 @@ import SearchResultList, {
 } from "./proceedingDecisions/SearchResultList.vue"
 import ComboboxInput from "@/components/ComboboxInput.vue"
 import ActiveCitation from "@/domain/activeCitation"
+import LinkedDocumentUnit from "@/domain/linkedDocumentUnit"
 import ComboboxItemService from "@/services/comboboxItemService"
 import documentUnitService from "@/services/documentUnitService"
 import DateInput from "@/shared/components/input/DateInput.vue"
@@ -44,6 +45,10 @@ const activeCitationPredicate = computed({
     emit("update:modelValue", activeCitationRef)
   },
 })
+
+const addActiveCitationFromSearch = (decision: LinkedDocumentUnit) => {
+  emit("update:modelValue", new ActiveCitation({ ...decision }))
+}
 
 const searchResultsCurrentPage = ref<Page<ActiveCitation>>()
 const searchResults = ref<SearchResults<ActiveCitation>>()
@@ -142,7 +147,10 @@ async function search(page = 0) {
         :page="searchResultsCurrentPage"
         @update-page="search"
       >
-        <SearchResultList :search-results="searchResults" />
+        <SearchResultList
+          :search-results="searchResults"
+          @link-decision="addActiveCitationFromSearch"
+        />
       </Pagination>
     </div>
   </div>

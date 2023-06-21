@@ -5,6 +5,7 @@ import ComboboxInput from "../ComboboxInput.vue"
 import DecisionList from "./DecisionList.vue"
 import SearchResultList, { SearchResults } from "./SearchResultList.vue"
 import ExpandableDataSet from "@/components/ExpandableDataSet.vue"
+import LinkedDocumentUnit from "@/domain/linkedDocumentUnit"
 import ProceedingDecision from "@/domain/proceedingDecision"
 import comboboxItemService from "@/services/comboboxItemService"
 import documentUnitService from "@/services/documentUnitService"
@@ -63,19 +64,21 @@ function resetInput() {
   input.value = new ProceedingDecision()
 }
 
-async function linkProceedingDecision(childUuid: string) {
-  const response = await proceedingDecisionService.linkProceedingDecision(
-    props.documentUnitUuid,
-    childUuid
-  )
-  if (response.data) {
-    localProceedingDecisions.value = response.data
+async function linkProceedingDecision(decision: LinkedDocumentUnit) {
+  if (decision.uuid) {
+    const response = await proceedingDecisionService.linkProceedingDecision(
+      props.documentUnitUuid,
+      decision.uuid
+    )
+    if (response.data) {
+      localProceedingDecisions.value = response.data
 
-    updateSearchResultsLinkStatus(childUuid)
-  } else {
-    console.error(response.error)
+      updateSearchResultsLinkStatus(decision.uuid)
+    } else {
+      console.error(response.error)
+    }
+    resetInput()
   }
-  resetInput()
 }
 
 async function removeProceedingDecision(decision: ProceedingDecision) {

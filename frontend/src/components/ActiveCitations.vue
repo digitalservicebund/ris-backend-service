@@ -4,7 +4,7 @@ import ActiveCitationInput from "@/components/ActiveCitationInput.vue"
 import ExpandableDataSet from "@/components/ExpandableDataSet.vue"
 import ActiveCitation from "@/domain/activeCitation"
 // import { withSummarizer } from "@/shared/components/DataSetSummary.vue"
-import EditableList from "@/shared/components/EditableList.vue"
+import EditableList from "@/shared/components/EditableListCaselaw.vue"
 
 const props = defineProps<{
   modelValue: ActiveCitation[] | undefined
