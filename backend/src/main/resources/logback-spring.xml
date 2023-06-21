@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
-    <springProfile name="local">
+    <springProfile name="!(staging | production)">
         <include resource="org/springframework/boot/logging/logback/base.xml" />
     </springProfile>
     <springProfile name="staging,production">

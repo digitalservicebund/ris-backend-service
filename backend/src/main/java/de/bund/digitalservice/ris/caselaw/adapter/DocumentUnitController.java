@@ -3,8 +3,8 @@ package de.bund.digitalservice.ris.caselaw.adapter;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitListEntry;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
+import de.bund.digitalservice.ris.caselaw.domain.LinkedDocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.MailResponse;
-import de.bund.digitalservice.ris.caselaw.domain.ProceedingDecision;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import de.bund.digitalservice.ris.caselaw.domain.docx.Docx2Html;
 import jakarta.validation.Valid;
@@ -119,12 +119,18 @@ public class DocumentUnitController {
   @PutMapping(value = "/{uuid}", consumes = MediaType.APPLICATION_JSON_VALUE)
   @PreAuthorize("@userHasWriteAccessByDocumentUnitUuid.apply(#uuid)")
   public Mono<ResponseEntity<DocumentUnit>> updateByUuid(
-      @PathVariable UUID uuid, @Valid @RequestBody DocumentUnit documentUnit) {
+      @PathVariable UUID uuid,
+      @Valid @RequestBody DocumentUnit documentUnit,
+      @AuthenticationPrincipal OidcUser oidcUser) {
+
     if (!uuid.equals(documentUnit.uuid())) {
       return Mono.just(ResponseEntity.unprocessableEntity().body(DocumentUnit.builder().build()));
     }
-    return service
-        .updateDocumentUnit(documentUnit)
+
+    return userService
+        .getDocumentationOffice(oidcUser)
+        .flatMap(
+            documentationOffice -> service.updateDocumentUnit(documentUnit, documentationOffice))
         .map(du -> ResponseEntity.status(HttpStatus.OK).body(du))
         .onErrorReturn(ResponseEntity.internalServerError().body(DocumentUnit.builder().build()));
   }
@@ -150,12 +156,13 @@ public class DocumentUnitController {
   }
 
   @PutMapping(value = "/search")
-  public Mono<Page<ProceedingDecision>> searchByProceedingDecision(
+  public Mono<Page<LinkedDocumentationUnit>> searchByLinkedDocumentationUnit(
       @RequestParam("pg") int page,
       @RequestParam("sz") int size,
-      @RequestBody ProceedingDecision proceedingDecision) {
+      @RequestBody LinkedDocumentationUnit linkedDocumentationUnit) {
 
-    return service.searchByProceedingDecision(proceedingDecision, PageRequest.of(page, size));
+    return service.searchByLinkedDocumentationUnit(
+        linkedDocumentationUnit, PageRequest.of(page, size));
   }
 
   @GetMapping(value = "/{uuid}/docx", produces = MediaType.APPLICATION_JSON_VALUE)

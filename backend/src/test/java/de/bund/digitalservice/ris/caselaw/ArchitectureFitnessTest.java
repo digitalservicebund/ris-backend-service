@@ -167,7 +167,7 @@ class ArchitectureFitnessTest {
         Set.of(
             "DocumentUnitController.generateNewDocumentUnit",
             "DocumentUnitController.getAll",
-            "DocumentUnitController.searchByProceedingDecision",
+            "DocumentUnitController.searchByLinkedDocumentationUnit",
             "AuthController.getUser",
             "FeatureToggleController.getFeatureToggleNames",
             "FeatureToggleController.isEnabled",

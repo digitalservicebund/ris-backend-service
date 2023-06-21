@@ -11,6 +11,4 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @DateKnownConstraint
-public class ProceedingDecision extends LinkedDocumentationUnit {
-  private boolean dateKnown;
-}
+public class ProceedingDecision extends LinkedDocumentationUnit {}

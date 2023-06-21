@@ -4,6 +4,7 @@ import static de.bund.digitalservice.ris.caselaw.AuthUtils.buildDocOffice;
 import static de.bund.digitalservice.ris.caselaw.AuthUtils.getMockLoginWithDocOffice;
 import static de.bund.digitalservice.ris.caselaw.AuthUtils.setUpDocumentationOfficeMocks;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
 
@@ -15,6 +16,7 @@ import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitLinkType;
 import de.bund.digitalservice.ris.caselaw.domain.ProceedingDecision;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
@@ -26,7 +28,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @ExtendWith(SpringExtension.class)
@@ -54,9 +55,12 @@ class ProceedingDecisionControllerAuthTest {
   @Test
   void testCreateProceedingDecision() {
     mockDocumentUnit(docOffice1);
-    when(service.createProceedingDecision(
-            any(UUID.class), any(ProceedingDecision.class), any(DocumentationOffice.class)))
-        .thenReturn(Flux.empty());
+    when(service.createLinkedDocumentationUnit(
+            any(UUID.class),
+            any(ProceedingDecision.class),
+            any(DocumentationOffice.class),
+            eq(DocumentationUnitLinkType.PREVIOUS_DECISION)))
+        .thenReturn(Mono.empty());
 
     String uri = "/api/v1/caselaw/documentunits/" + TEST_UUID + "/proceedingdecisions";
 
@@ -84,7 +88,9 @@ class ProceedingDecisionControllerAuthTest {
   @Test
   void testLinkProceedingDecision() {
     mockDocumentUnit(docOffice2);
-    when(service.linkProceedingDecision(any(UUID.class), any(UUID.class))).thenReturn(Mono.empty());
+    when(service.linkLinkedDocumentationUnit(
+            TEST_UUID, CHILD_UUID, DocumentationUnitLinkType.PREVIOUS_DECISION))
+        .thenReturn(Mono.empty());
 
     String uri =
         "/api/v1/caselaw/documentunits/" + TEST_UUID + "/proceedingdecisions/" + CHILD_UUID;
@@ -111,7 +117,8 @@ class ProceedingDecisionControllerAuthTest {
   @Test
   void testRemoveProceedingDecision() {
     mockDocumentUnit(docOffice1);
-    when(service.removeProceedingDecision(any(UUID.class), any(UUID.class)))
+    when(service.removeLinkedDocumentationUnit(
+            TEST_UUID, CHILD_UUID, DocumentationUnitLinkType.PREVIOUS_DECISION))
         .thenReturn(Mono.empty());
 
     String uri =

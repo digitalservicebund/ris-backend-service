@@ -239,8 +239,10 @@ public class DocumentUnitService {
                   .thenMany(
                       proceedingDecisions.flatMap(
                           proceedingDecision ->
-                              removeProceedingDecision(
-                                  documentUnitUuid, proceedingDecision.getUuid())))
+                              removeLinkedDocumentationUnit(
+                                  documentUnitUuid,
+                                  proceedingDecision.getUuid(),
+                                  DocumentationUnitLinkType.PREVIOUS_DECISION)))
                   .then(repository.delete(documentUnit))
                   .thenReturn(logMsg);
             })
@@ -260,10 +262,74 @@ public class DocumentUnitService {
             });
   }
 
-  public Mono<DocumentUnit> updateDocumentUnit(DocumentUnit documentUnit) {
-    return repository
-        .save(documentUnit)
+  public Mono<DocumentUnit> updateDocumentUnit(
+      DocumentUnit documentUnit, DocumentationOffice documentationOffice) {
+    Mono<DocumentUnit> documentUnitMono = Mono.just(documentUnit);
+    if (documentUnit.contentRelatedIndexing() != null
+        && documentUnit.contentRelatedIndexing().activeCitations() != null) {
+      documentUnitMono =
+          Flux.fromIterable(documentUnit.contentRelatedIndexing().activeCitations())
+              .flatMap(
+                  activeCitation -> {
+                    if (activeCitation.getUuid() == null && !activeCitation.isEmpty()) {
+                      return createLinkedDocumentationUnit(
+                              documentUnit.uuid(),
+                              activeCitation,
+                              documentationOffice,
+                              DocumentationUnitLinkType.ACTIVE_CITATION)
+                          .map(
+                              documentationUnitLink ->
+                                  activeCitation.toBuilder()
+                                      .uuid(documentationUnitLink.childDocumentationUnitUuid())
+                                      .build());
+                    } else {
+                      return linkLinkedDocumentationUnit(
+                              documentUnit.uuid(),
+                              activeCitation.getUuid(),
+                              DocumentationUnitLinkType.ACTIVE_CITATION)
+                          .thenReturn(activeCitation);
+                    }
+                  })
+              .collectList()
+              .map(
+                  activeCitations -> {
+                    ContentRelatedIndexing contentRelatedIndexing =
+                        documentUnit.contentRelatedIndexing().toBuilder()
+                            .activeCitations(activeCitations)
+                            .build();
+                    return documentUnit.toBuilder()
+                        .contentRelatedIndexing(contentRelatedIndexing)
+                        .build();
+                  });
+    }
+    return documentUnitMono
+        .flatMap(repository::save)
+        .flatMap(
+            savedDocumentationUnit ->
+                unlinkLinkedDocumentationUnit(
+                    savedDocumentationUnit, DocumentationUnitLinkType.ACTIVE_CITATION))
         .doOnError(ex -> log.error("Couldn't update the DocumentUnit", ex));
+  }
+
+  private Mono<DocumentUnit> unlinkLinkedDocumentationUnit(
+      DocumentUnit documentUnit, DocumentationUnitLinkType type) {
+    return repository
+        .findAllLinkedDocumentUnitsByParentDocumentUnitUuidAndType(documentUnit.uuid(), type)
+        .filter(
+            linkedDocumentationUnit ->
+                documentUnit.contentRelatedIndexing() != null
+                    && documentUnit.contentRelatedIndexing().activeCitations() != null
+                    && !documentUnit.contentRelatedIndexing().activeCitations().isEmpty()
+                    && documentUnit.contentRelatedIndexing().activeCitations().stream()
+                        .map(LinkedDocumentationUnit::getUuid)
+                        .noneMatch(
+                            linkedUuid -> linkedDocumentationUnit.getUuid().equals(linkedUuid)))
+        .flatMap(
+            linkedDocumentationUnit ->
+                repository.unlinkDocumentUnits(
+                    documentUnit.uuid(), linkedDocumentationUnit.getUuid(), type))
+        .then()
+        .thenReturn(documentUnit);
   }
 
   public Mono<MailResponse> publishAsEmail(UUID documentUnitUuid, String issuerAddress) {
@@ -295,75 +361,75 @@ public class DocumentUnitService {
     return publishService.getLastPublishedXml(documentUuid);
   }
 
-  public Mono<Page<ProceedingDecision>> searchByProceedingDecision(
-      ProceedingDecision proceedingDecision, Pageable pageable) {
+  public <T extends LinkedDocumentationUnit> Mono<Page<T>> searchByLinkedDocumentationUnit(
+      T linkedDocumentationUnit, Pageable pageable) {
 
     return repository
-        .searchByProceedingDecision(proceedingDecision, pageable)
+        .searchByLinkedDocumentationUnit(linkedDocumentationUnit, pageable)
         .collectList()
-        .zipWith(repository.countByProceedingDecision(proceedingDecision))
+        .zipWith(repository.countByProceedingDecision(linkedDocumentationUnit))
         .map(tuple -> new PageImpl<>(tuple.getT1(), pageable, tuple.getT2()));
   }
 
   @Transactional(transactionManager = "connectionFactoryTransactionManager")
-  public Flux<ProceedingDecision> createProceedingDecision(
-      UUID parentDocumentUnitUuid,
-      ProceedingDecision proceedingDecision,
-      DocumentationOffice documentationOffice) {
+  public <T extends LinkedDocumentationUnit>
+      Mono<DocumentationUnitLink> createLinkedDocumentationUnit(
+          UUID parentDocumentUnitUuid,
+          T linkedDocumentationUnit,
+          DocumentationOffice documentationOffice,
+          DocumentationUnitLinkType type) {
 
     return generateNewDocumentUnit(documentationOffice)
         .flatMap(
             childDocumentUnit ->
                 updateDocumentUnit(
-                    enrichNewDocumentUnitWithData(childDocumentUnit, proceedingDecision)))
+                    enrichNewDocumentUnitWithData(childDocumentUnit, linkedDocumentationUnit),
+                    documentationOffice))
         .flatMap(
             childDocumentUnit ->
                 repository.linkDocumentUnits(
-                    parentDocumentUnitUuid,
-                    childDocumentUnit.uuid(),
-                    DocumentationUnitLinkType.PREVIOUS_DECISION))
-        .flatMapMany(
-            documentUnit ->
-                repository.findAllLinkedDocumentUnitsByParentDocumentUnitIdAndType(
-                    parentDocumentUnitUuid, DocumentationUnitLinkType.PREVIOUS_DECISION));
+                    parentDocumentUnitUuid, childDocumentUnit.uuid(), type));
   }
 
-  public Mono<DocumentUnit> linkProceedingDecision(UUID parentUuid, UUID childUuid) {
-    return repository.linkDocumentUnits(
-        parentUuid, childUuid, DocumentationUnitLinkType.PREVIOUS_DECISION);
-  }
-
-  public Mono<String> removeProceedingDecision(UUID parentUuid, UUID childUuid) {
+  public Mono<DocumentUnit> linkLinkedDocumentationUnit(
+      UUID parentUuid, UUID childUuid, DocumentationUnitLinkType type) {
     return repository
-        .unlinkDocumentUnits(parentUuid, childUuid, DocumentationUnitLinkType.PREVIOUS_DECISION)
-        .doOnError(ex -> log.error("Couldn't unlink the ProceedingDecision", ex))
-        .then(deleteIfOrphanedProceedingDecision(childUuid))
+        .linkDocumentUnits(parentUuid, childUuid, type)
+        .flatMap(documentationUnitLink -> repository.findByUuid(parentUuid));
+  }
+
+  public Mono<String> removeLinkedDocumentationUnit(
+      UUID parentUuid, UUID childUuid, DocumentationUnitLinkType type) {
+    return repository
+        .unlinkDocumentUnits(parentUuid, childUuid, type)
+        .doOnError(ex -> log.error("Couldn't unlink the documentation unit", ex))
+        .then(deleteIfOrphanedLinkedDocumentationUnit(childUuid))
         .thenReturn("done");
   }
 
   private DocumentUnit enrichNewDocumentUnitWithData(
-      DocumentUnit documentUnit, ProceedingDecision proceedingDecision) {
+      DocumentUnit documentUnit, LinkedDocumentationUnit linkedDocumentationUnit) {
     List<String> fileNumbers = null;
-    if (!StringUtils.isBlank(proceedingDecision.getFileNumber())) {
-      fileNumbers = List.of(proceedingDecision.getFileNumber());
+    if (!StringUtils.isBlank(linkedDocumentationUnit.getFileNumber())) {
+      fileNumbers = List.of(linkedDocumentationUnit.getFileNumber());
     }
 
     CoreData coreData =
         documentUnit.coreData().toBuilder()
             .fileNumbers(fileNumbers)
-            .documentType(proceedingDecision.getDocumentType())
-            .decisionDate(proceedingDecision.getDecisionDate())
-            .court(proceedingDecision.getCourt())
-            .dateKnown(proceedingDecision.isDateKnown())
+            .documentType(linkedDocumentationUnit.getDocumentType())
+            .decisionDate(linkedDocumentationUnit.getDecisionDate())
+            .court(linkedDocumentationUnit.getCourt())
+            .dateKnown(linkedDocumentationUnit.isDateKnown())
             .build();
 
     return documentUnit.toBuilder()
-        .dataSource(DataSource.PROCEEDING_DECISION)
+        .dataSource(getDatasource(linkedDocumentationUnit))
         .coreData(coreData)
         .build();
   }
 
-  private Mono<Void> deleteIfOrphanedProceedingDecision(UUID documentUnitUuid) {
+  private Mono<Void> deleteIfOrphanedLinkedDocumentationUnit(UUID documentUnitUuid) {
     return repository
         .findByUuid(documentUnitUuid)
         .filter(
@@ -371,5 +437,24 @@ public class DocumentUnitService {
                 DataSource.PROCEEDING_DECISION.equals(childDocumentUnit.dataSource()))
         .flatMap(repository::filterUnlinkedDocumentUnit)
         .flatMap(repository::delete);
+  }
+
+  private static <T extends LinkedDocumentationUnit> DataSource getDatasource(
+      T linkedDocumentationUnit) {
+    if (linkedDocumentationUnit instanceof ActiveCitation) {
+      return DataSource.ACTIVE_CITATION;
+    } else if (linkedDocumentationUnit instanceof ProceedingDecision) {
+      return DataSource.PROCEEDING_DECISION;
+    } else {
+      throw new RuntimeException(
+          "Couldn't find data source for " + linkedDocumentationUnit.getClass());
+    }
+  }
+
+  public <T extends LinkedDocumentationUnit>
+      Flux<T> findAllLinkedDocumentUnitsByParentDocumentUnitUuidAndType(
+          UUID parentDocumentUnitUuid, DocumentationUnitLinkType type) {
+    return repository.findAllLinkedDocumentUnitsByParentDocumentUnitUuidAndType(
+        parentDocumentUnitUuid, type);
   }
 }

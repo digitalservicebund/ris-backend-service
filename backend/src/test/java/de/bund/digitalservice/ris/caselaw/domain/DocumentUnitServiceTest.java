@@ -306,10 +306,16 @@ class DocumentUnitServiceTest {
             .fileuploadtimestamp(Instant.now())
             .proceedingDecisions(null)
             .build();
+    DocumentationOffice documentationOffice = mock(DocumentationOffice.class);
     when(repository.save(documentUnit)).thenReturn(Mono.just(documentUnit));
-    StepVerifier.create(service.updateDocumentUnit(documentUnit))
+    when(repository.findAllLinkedDocumentUnitsByParentDocumentUnitUuidAndType(
+            any(UUID.class), eq(DocumentationUnitLinkType.ACTIVE_CITATION)))
+        .thenReturn(Flux.empty());
+
+    StepVerifier.create(service.updateDocumentUnit(documentUnit, documentationOffice))
         .consumeNextWith(du -> assertEquals(du, documentUnit))
         .verifyComplete();
+
     verify(repository).save(documentUnit);
   }
 
@@ -392,14 +398,14 @@ class DocumentUnitServiceTest {
     ProceedingDecision proceedingDecision = ProceedingDecision.builder().build();
     PageRequest pageRequest = PageRequest.of(0, 10);
 
-    when(repository.searchByProceedingDecision(proceedingDecision, pageRequest))
+    when(repository.searchByLinkedDocumentationUnit(proceedingDecision, pageRequest))
         .thenReturn(Flux.just(proceedingDecision));
     when(repository.countByProceedingDecision(proceedingDecision)).thenReturn(Mono.just(1L));
 
-    StepVerifier.create(service.searchByProceedingDecision(proceedingDecision, pageRequest))
+    StepVerifier.create(service.searchByLinkedDocumentationUnit(proceedingDecision, pageRequest))
         .consumeNextWith(pd -> assertEquals(pd.getContent().get(0), proceedingDecision))
         .verifyComplete();
-    verify(repository).searchByProceedingDecision(proceedingDecision, pageRequest);
+    verify(repository).searchByLinkedDocumentationUnit(proceedingDecision, pageRequest);
   }
 
   private CompletableFuture<DeleteObjectResponse> buildEmptyDeleteObjectResponse() {

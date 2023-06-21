@@ -2,6 +2,7 @@ package de.bund.digitalservice.ris.caselaw.adapter;
 
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitLinkType;
 import de.bund.digitalservice.ris.caselaw.domain.ProceedingDecision;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import jakarta.validation.Valid;
@@ -41,10 +42,18 @@ public class ProceedingDecisionController {
 
     return userService
         .getDocumentationOffice(oidcUser)
-        .flatMapMany(
+        .flatMap(
             documentationOffice ->
-                service.createProceedingDecision(
-                    documentUnitUuid, proceedingDecision, documentationOffice));
+                service.createLinkedDocumentationUnit(
+                    documentUnitUuid,
+                    proceedingDecision,
+                    documentationOffice,
+                    DocumentationUnitLinkType.PREVIOUS_DECISION))
+        .flatMapMany(
+            documentationUnitLink ->
+                service.findAllLinkedDocumentUnitsByParentDocumentUnitUuidAndType(
+                    documentationUnitLink.parentDocumentationUnitUuid(),
+                    DocumentationUnitLinkType.PREVIOUS_DECISION));
   }
 
   @PutMapping(value = "/{childUuid}")
@@ -52,7 +61,8 @@ public class ProceedingDecisionController {
   public Mono<ResponseEntity<DocumentUnit>> linkProceedingDecision(
       @PathVariable("uuid") UUID parentUuid, @PathVariable UUID childUuid) {
     return service
-        .linkProceedingDecision(parentUuid, childUuid)
+        .linkLinkedDocumentationUnit(
+            parentUuid, childUuid, DocumentationUnitLinkType.PREVIOUS_DECISION)
         .map(documentUnit -> ResponseEntity.status(HttpStatus.CREATED).body(documentUnit));
   }
 
@@ -62,7 +72,8 @@ public class ProceedingDecisionController {
       @PathVariable("uuid") UUID parentUuid, @PathVariable UUID childUuid) {
 
     return service
-        .removeProceedingDecision(parentUuid, childUuid)
+        .removeLinkedDocumentationUnit(
+            parentUuid, childUuid, DocumentationUnitLinkType.PREVIOUS_DECISION)
         .map(str -> ResponseEntity.status(HttpStatus.OK).body(str))
         .onErrorReturn(
             ResponseEntity.internalServerError().body("Couldn't remove the ProceedingDecision"));

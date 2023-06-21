@@ -15,7 +15,7 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitPublishException;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
-import de.bund.digitalservice.ris.caselaw.domain.ProceedingDecision;
+import de.bund.digitalservice.ris.caselaw.domain.LinkedDocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.PublishState;
 import de.bund.digitalservice.ris.caselaw.domain.User;
 import de.bund.digitalservice.ris.caselaw.domain.XmlMail;
@@ -226,9 +226,18 @@ class DocumentUnitControllerTest {
     documentUnitDTO.setDocumentnumber("ABCD202200001");
     documentUnitDTO.setUuid(TEST_UUID);
     DocumentUnit documentUnit = DocumentUnitTransformer.transformDTO(documentUnitDTO);
-    when(service.updateDocumentUnit(documentUnit)).thenReturn(Mono.empty());
+    DocumentationOffice documentationOffice =
+        DocumentationOffice.builder().label("DigitalService").abbreviation("XX").build();
+
+    when(userService.getDocumentationOffice(any(OidcUser.class)))
+        .thenReturn(Mono.just(documentationOffice));
+
+    when(service.updateDocumentUnit(eq(documentUnit), any(DocumentationOffice.class)))
+        .thenReturn(Mono.empty());
+
     webClient
         .mutateWith(csrf())
+        .mutateWith(getMockLogin())
         .put()
         .uri("/api/v1/caselaw/documentunits/" + TEST_UUID)
         .header(HttpHeaders.CONTENT_TYPE, "application/json")
@@ -236,7 +245,8 @@ class DocumentUnitControllerTest {
         .exchange()
         .expectStatus()
         .isOk();
-    verify(service).updateDocumentUnit(documentUnit);
+
+    verify(service).updateDocumentUnit(eq(documentUnit), any(DocumentationOffice.class));
   }
 
   @Test
@@ -380,24 +390,25 @@ class DocumentUnitControllerTest {
   }
 
   @Test
-  void testSearchByProceedingDecision() {
-    ProceedingDecision proceedingDecision = ProceedingDecision.builder().build();
+  void testSearchByLinkedDocumentationUnit() {
+    LinkedDocumentationUnit linkedDocumentationUnit = LinkedDocumentationUnit.builder().build();
     PageRequest pageRequest = PageRequest.of(0, 10);
 
-    when(service.searchByProceedingDecision(proceedingDecision, pageRequest))
+    when(service.searchByLinkedDocumentationUnit(linkedDocumentationUnit, pageRequest))
         .thenReturn(Mono.empty());
 
     webClient
         .mutateWith(csrf())
+        .mutateWith(getMockLogin())
         .put()
         .uri("/api/v1/caselaw/documentunits/search?pg=0&sz=10")
         .header(HttpHeaders.CONTENT_TYPE, "application/json")
-        .bodyValue(proceedingDecision)
+        .bodyValue(linkedDocumentationUnit)
         .exchange()
         .expectStatus()
         .isOk();
 
-    verify(service).searchByProceedingDecision(proceedingDecision, pageRequest);
+    verify(service).searchByLinkedDocumentationUnit(linkedDocumentationUnit, pageRequest);
   }
 
   @Test

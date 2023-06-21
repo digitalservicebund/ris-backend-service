@@ -164,11 +164,17 @@ public class JurisXmlExporterWrapperIntegrationTest {
                 .build());
 
     ContentRelatedIndexing indexing =
-        new ContentRelatedIndexing(
-            List.of("keyword1", "keyword2"),
-            List.of(
-                FieldOfLaw.builder().id(1L).identifier("SF-01").text("field of law text").build()),
-            List.of(DocumentUnitNorm.builder().singleNorm("01").build()));
+        ContentRelatedIndexing.builder()
+            .keywords(List.of("keyword1", "keyword2"))
+            .fieldsOfLaw(
+                List.of(
+                    FieldOfLaw.builder()
+                        .id(1L)
+                        .identifier("SF-01")
+                        .text("field of law text")
+                        .build()))
+            .norms(List.of(DocumentUnitNorm.builder().singleNorm("01").build()))
+            .build();
 
     DocumentUnit documentUnit =
         DocumentUnit.builder()

@@ -4,7 +4,7 @@ import static de.bund.digitalservice.ris.caselaw.AuthUtils.getMockLogin;
 import static de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatus.PUBLISHED;
 import static de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatus.UNPUBLISHED;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.any;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
 
@@ -14,7 +14,6 @@ import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentNumberService;
 import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentUnitStatusService;
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentUnitController;
 import de.bund.digitalservice.ris.caselaw.adapter.DocxConverterService;
-import de.bund.digitalservice.ris.caselaw.adapter.KeycloakUserService;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDeviatingDecisionDateRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentUnitMetadataRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentUnitRepository;
@@ -44,6 +43,7 @@ import de.bund.digitalservice.ris.caselaw.domain.EmailPublishService;
 import de.bund.digitalservice.ris.caselaw.domain.LegalEffect;
 import de.bund.digitalservice.ris.caselaw.domain.ProceedingDecision;
 import de.bund.digitalservice.ris.caselaw.domain.Texts;
+import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.court.Court;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
 import java.nio.charset.StandardCharsets;
@@ -53,6 +53,7 @@ import java.util.List;
 import java.util.UUID;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -104,7 +105,13 @@ class DocumentUnitIntegrationTest {
   @MockBean private S3AsyncClient s3AsyncClient;
   @MockBean private EmailPublishService publishService;
   @MockBean private DocxConverterService docxConverterService;
-  @MockBean private KeycloakUserService keycloakUserService;
+  @MockBean private UserService userService;
+
+  @BeforeEach
+  void setUp() {
+    when(userService.getDocumentationOffice(any(OidcUser.class)))
+        .thenReturn(Mono.just(AuthUtils.buildDocOffice("DigitalService", "XX")));
+  }
 
   @AfterEach
   void cleanUp() {
@@ -122,9 +129,6 @@ class DocumentUnitIntegrationTest {
 
   @Test
   void testForCorrectDbEntryAfterNewDocumentUnitCreation() {
-    when(keycloakUserService.getDocumentationOffice(any(OidcUser.class)))
-        .thenReturn(Mono.just(AuthUtils.buildDocOffice("DigitalService", "XX")));
-
     webClient
         .mutateWith(csrf())
         .mutateWith(getMockLogin())
@@ -180,6 +184,7 @@ class DocumentUnitIntegrationTest {
 
     webClient
         .mutateWith(csrf())
+        .mutateWith(getMockLogin())
         .put()
         .uri("/api/v1/caselaw/documentunits/" + uuid)
         .bodyValue(documentUnitFromFrontend)
@@ -229,6 +234,7 @@ class DocumentUnitIntegrationTest {
 
     webClient
         .mutateWith(csrf())
+        .mutateWith(getMockLogin())
         .put()
         .uri("/api/v1/caselaw/documentunits/" + uuid)
         .bodyValue(documentUnitFromFrontend)
@@ -288,6 +294,7 @@ class DocumentUnitIntegrationTest {
 
     webClient
         .mutateWith(csrf())
+        .mutateWith(getMockLogin())
         .put()
         .uri("/api/v1/caselaw/documentunits/" + uuid)
         .bodyValue(documentUnitFromFrontend)
@@ -361,6 +368,7 @@ class DocumentUnitIntegrationTest {
 
     webClient
         .mutateWith(csrf())
+        .mutateWith(getMockLogin())
         .put()
         .uri("/api/v1/caselaw/documentunits/" + uuid)
         .bodyValue(documentUnitFromFrontend)
@@ -398,6 +406,7 @@ class DocumentUnitIntegrationTest {
 
     webClient
         .mutateWith(csrf())
+        .mutateWith(getMockLogin())
         .put()
         .uri("/api/v1/caselaw/documentunits/" + documentUnitFromFrontend.uuid())
         .bodyValue(documentUnitFromFrontend)
@@ -421,6 +430,7 @@ class DocumentUnitIntegrationTest {
 
     webClient
         .mutateWith(csrf())
+        .mutateWith(getMockLogin())
         .put()
         .uri("/api/v1/caselaw/documentunits/" + documentUnitFromFrontend.uuid())
         .bodyValue(documentUnitFromFrontend)
@@ -443,6 +453,7 @@ class DocumentUnitIntegrationTest {
 
     webClient
         .mutateWith(csrf())
+        .mutateWith(getMockLogin())
         .put()
         .uri("/api/v1/caselaw/documentunits/" + documentUnitFromFrontend.uuid())
         .bodyValue(documentUnitFromFrontend)
@@ -466,6 +477,7 @@ class DocumentUnitIntegrationTest {
 
     webClient
         .mutateWith(csrf())
+        .mutateWith(getMockLogin())
         .put()
         .uri("/api/v1/caselaw/documentunits/" + documentUnitFromFrontend.uuid())
         .bodyValue(documentUnitFromFrontend)
@@ -581,6 +593,7 @@ class DocumentUnitIntegrationTest {
 
     webClient
         .mutateWith(csrf())
+        .mutateWith(getMockLogin())
         .put()
         .uri("/api/v1/caselaw/documentunits/" + documentUnitFromFrontend.uuid())
         .bodyValue(documentUnitFromFrontend)
@@ -623,6 +636,7 @@ class DocumentUnitIntegrationTest {
 
     webClient
         .mutateWith(csrf())
+        .mutateWith(getMockLogin())
         .put()
         .uri("/api/v1/caselaw/documentunits/" + documentUnitFromFrontend.uuid())
         .bodyValue(documentUnitFromFrontend)
@@ -680,6 +694,7 @@ class DocumentUnitIntegrationTest {
 
     webClient
         .mutateWith(csrf())
+        .mutateWith(getMockLogin())
         .put()
         .uri("/api/v1/caselaw/documentunits/" + documentUnitFromFrontend.uuid())
         .bodyValue(documentUnitFromFrontend)
@@ -736,6 +751,7 @@ class DocumentUnitIntegrationTest {
       DocumentUnit documentUnitFromFrontend) {
     webClient
         .mutateWith(csrf())
+        .mutateWith(getMockLogin())
         .put()
         .uri("/api/v1/caselaw/documentunits/" + documentUnitFromFrontend.uuid())
         .bodyValue(documentUnitFromFrontend)

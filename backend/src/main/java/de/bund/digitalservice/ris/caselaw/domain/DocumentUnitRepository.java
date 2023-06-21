@@ -25,24 +25,25 @@ public interface DocumentUnitRepository {
 
   Mono<Void> delete(DocumentUnit documentUnit);
 
-  Flux<ProceedingDecision> searchByProceedingDecision(
-      ProceedingDecision proceedingDecision, Pageable pageable);
+  <T extends LinkedDocumentationUnit> Flux<T> searchByLinkedDocumentationUnit(
+      T linkedDocumentationUnit, Pageable pageable);
 
   Mono<Long> count();
 
-  Mono<Long> countByProceedingDecision(ProceedingDecision proceedingDecision);
+  Mono<Long> countByProceedingDecision(LinkedDocumentationUnit linkedDocumentationUnit);
 
   Mono<Long> countByDataSourceAndDocumentationOffice(
       DataSource dataSource, DocumentationOffice documentationOfficeId);
 
   Flux<DocumentUnitListEntry> findAll(Pageable pageable, DocumentationOffice documentationOfficeId);
 
-  Flux<ProceedingDecision> findAllLinkedDocumentUnitsByParentDocumentUnitIdAndType(
-      UUID parentDocumentUnitUuid, DocumentationUnitLinkType type);
+  <T extends LinkedDocumentationUnit>
+      Flux<T> findAllLinkedDocumentUnitsByParentDocumentUnitUuidAndType(
+          UUID parentDocumentUnitUuid, DocumentationUnitLinkType type);
 
   Mono<DocumentUnit> filterUnlinkedDocumentUnit(DocumentUnit documentUnit);
 
-  Mono<DocumentUnit> linkDocumentUnits(
+  Mono<DocumentationUnitLink> linkDocumentUnits(
       UUID parentDocumentUnitUuid, UUID childDocumentUnitUuid, DocumentationUnitLinkType type);
 
   Mono<Void> unlinkDocumentUnits(

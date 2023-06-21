@@ -9,6 +9,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.FileNumberDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.IncorrectCourtDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.KeywordDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DocumentTypeDTO;
+import de.bund.digitalservice.ris.caselaw.domain.ActiveCitation;
 import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.DataSource;
@@ -161,37 +162,38 @@ public class DocumentUnitTransformer {
       dataSource = documentUnitMetadataDTO.getDataSource();
     }
 
-    return new DocumentUnit(
-        documentUnitMetadataDTO.getUuid(),
-        documentUnitMetadataDTO.getDocumentnumber(),
-        documentUnitMetadataDTO.getCreationtimestamp(),
-        documentUnitMetadataDTO.getFileuploadtimestamp(),
-        dataSource,
-        documentUnitMetadataDTO.getS3path(),
-        documentUnitMetadataDTO.getFiletype(),
-        documentUnitMetadataDTO.getFilename(),
-        new CoreData(
-            fileNumbers,
-            null,
-            getCourtObject(
-                documentUnitMetadataDTO.getCourtType(), documentUnitMetadataDTO.getCourtLocation()),
-            null,
-            documentType,
-            documentUnitMetadataDTO.getProcedure(),
-            documentUnitMetadataDTO.getEcli(),
-            null,
-            documentUnitMetadataDTO.getAppraisalBody(),
-            documentUnitMetadataDTO.getDecisionDate(),
-            documentUnitMetadataDTO.isDateKnown(),
-            null,
-            documentUnitMetadataDTO.getLegalEffect(),
-            documentUnitMetadataDTO.getInputType(),
-            getDocumentationOffice(documentUnitMetadataDTO.getDocumentationOffice()),
-            documentUnitMetadataDTO.getRegion()),
-        null,
-        null,
-        documentUnitMetadataDTO.getStatus(),
-        null);
+    CoreData coreData =
+        CoreData.builder()
+            .fileNumbers(fileNumbers)
+            .court(
+                getCourtObject(
+                    documentUnitMetadataDTO.getCourtType(),
+                    documentUnitMetadataDTO.getCourtLocation()))
+            .documentType(documentType)
+            .procedure(documentUnitMetadataDTO.getProcedure())
+            .ecli(documentUnitMetadataDTO.getEcli())
+            .appraisalBody(documentUnitMetadataDTO.getAppraisalBody())
+            .decisionDate(documentUnitMetadataDTO.getDecisionDate())
+            .dateKnown(documentUnitMetadataDTO.isDateKnown())
+            .legalEffect(documentUnitMetadataDTO.getLegalEffect())
+            .inputType(documentUnitMetadataDTO.getInputType())
+            .documentationOffice(
+                getDocumentationOffice(documentUnitMetadataDTO.getDocumentationOffice()))
+            .region(documentUnitMetadataDTO.getRegion())
+            .build();
+
+    return DocumentUnit.builder()
+        .uuid(documentUnitMetadataDTO.getUuid())
+        .coreData(coreData)
+        .documentNumber(documentUnitMetadataDTO.getDocumentnumber())
+        .creationtimestamp(documentUnitMetadataDTO.getCreationtimestamp())
+        .fileuploadtimestamp(documentUnitMetadataDTO.getFileuploadtimestamp())
+        .dataSource(dataSource)
+        .s3path(documentUnitMetadataDTO.getS3path())
+        .filetype(documentUnitMetadataDTO.getFiletype())
+        .filename(documentUnitMetadataDTO.getFilename())
+        .status(documentUnitMetadataDTO.getStatus())
+        .build();
   }
 
   public static DocumentUnit transformDTO(DocumentUnitDTO documentUnitDTO) {
@@ -211,6 +213,14 @@ public class DocumentUnitTransformer {
       proceedingDecisions =
           documentUnitDTO.getProceedingDecisions().stream()
               .map(ProceedingDecisionTransformer::transformToDomain)
+              .toList();
+    }
+
+    List<ActiveCitation> activeCitations = null;
+    if (documentUnitDTO.getActiveCitations() != null) {
+      activeCitations =
+          documentUnitDTO.getActiveCitations().stream()
+              .map(ActiveCitationTransformer::transformToDomain)
               .toList();
     }
 
@@ -274,43 +284,58 @@ public class DocumentUnitTransformer {
       keywords = documentUnitDTO.getKeywords().stream().map(KeywordDTO::keyword).toList();
     }
 
-    return new DocumentUnit(
-        documentUnitDTO.getUuid(),
-        documentUnitDTO.getDocumentnumber(),
-        documentUnitDTO.getCreationtimestamp(),
-        documentUnitDTO.getFileuploadtimestamp(),
-        dataSource,
-        documentUnitDTO.getS3path(),
-        documentUnitDTO.getFiletype(),
-        documentUnitDTO.getFilename(),
-        new CoreData(
-            fileNumbers,
-            deviatingFileNumbers,
-            getCourtObject(documentUnitDTO.getCourtType(), documentUnitDTO.getCourtLocation()),
-            incorrectCourts,
-            documentType,
-            documentUnitDTO.getProcedure(),
-            documentUnitDTO.getEcli(),
-            deviatingEclis,
-            documentUnitDTO.getAppraisalBody(),
-            documentUnitDTO.getDecisionDate(),
-            documentUnitDTO.isDateKnown(),
-            deviatingDecisionDates,
-            documentUnitDTO.getLegalEffect(),
-            documentUnitDTO.getInputType(),
-            getDocumentationOffice(documentUnitDTO.getDocumentationOffice()),
-            documentUnitDTO.getRegion()),
-        proceedingDecisions,
-        new Texts(
-            documentUnitDTO.getDecisionName(),
-            documentUnitDTO.getHeadline(),
-            documentUnitDTO.getGuidingPrinciple(),
-            documentUnitDTO.getHeadnote(),
-            documentUnitDTO.getTenor(),
-            documentUnitDTO.getReasons(),
-            documentUnitDTO.getCaseFacts(),
-            documentUnitDTO.getDecisionReasons()),
-        documentUnitDTO.getStatus(),
-        new ContentRelatedIndexing(keywords, fieldsOfLaw, norms));
+    CoreData coreData =
+        CoreData.builder()
+            .fileNumbers(fileNumbers)
+            .deviatingFileNumbers(deviatingFileNumbers)
+            .court(
+                getCourtObject(documentUnitDTO.getCourtType(), documentUnitDTO.getCourtLocation()))
+            .incorrectCourts(incorrectCourts)
+            .documentType(documentType)
+            .procedure(documentUnitDTO.getProcedure())
+            .ecli(documentUnitDTO.getEcli())
+            .deviatingEclis(deviatingEclis)
+            .appraisalBody(documentUnitDTO.getAppraisalBody())
+            .decisionDate(documentUnitDTO.getDecisionDate())
+            .dateKnown(documentUnitDTO.isDateKnown())
+            .deviatingDecisionDates(deviatingDecisionDates)
+            .legalEffect(documentUnitDTO.getLegalEffect())
+            .inputType(documentUnitDTO.getInputType())
+            .documentationOffice(getDocumentationOffice(documentUnitDTO.getDocumentationOffice()))
+            .region(documentUnitDTO.getRegion())
+            .build();
+    Texts texts =
+        Texts.builder()
+            .decisionName(documentUnitDTO.getDecisionName())
+            .headline(documentUnitDTO.getHeadline())
+            .guidingPrinciple(documentUnitDTO.getGuidingPrinciple())
+            .headnote(documentUnitDTO.getHeadnote())
+            .tenor(documentUnitDTO.getTenor())
+            .reasons(documentUnitDTO.getReasons())
+            .caseFacts(documentUnitDTO.getCaseFacts())
+            .decisionReasons(documentUnitDTO.getDecisionReasons())
+            .build();
+
+    return DocumentUnit.builder()
+        .uuid(documentUnitDTO.getUuid())
+        .documentNumber(documentUnitDTO.getDocumentnumber())
+        .creationtimestamp(documentUnitDTO.getCreationtimestamp())
+        .fileuploadtimestamp(documentUnitDTO.getFileuploadtimestamp())
+        .dataSource(dataSource)
+        .s3path(documentUnitDTO.getS3path())
+        .filetype(documentUnitDTO.getFiletype())
+        .filename(documentUnitDTO.getFilename())
+        .coreData(coreData)
+        .proceedingDecisions(proceedingDecisions)
+        .texts(texts)
+        .status(documentUnitDTO.getStatus())
+        .contentRelatedIndexing(
+            ContentRelatedIndexing.builder()
+                .keywords(keywords)
+                .fieldsOfLaw(fieldsOfLaw)
+                .norms(norms)
+                .activeCitations(activeCitations)
+                .build())
+        .build();
   }
 }

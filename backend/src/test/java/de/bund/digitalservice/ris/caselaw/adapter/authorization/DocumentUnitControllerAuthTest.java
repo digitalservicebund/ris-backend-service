@@ -167,7 +167,8 @@ class DocumentUnitControllerAuthTest {
   @Test
   void testUpdateByUuid() {
     DocumentUnit docUnit = mockDocumentUnit(docOffice2, null, null);
-    when(service.updateDocumentUnit(docUnit)).thenReturn(Mono.empty());
+    when(service.updateDocumentUnit(eq(docUnit), any(DocumentationOffice.class)))
+        .thenReturn(Mono.empty());
     when(service.getByUuid(TEST_UUID)).thenReturn(Mono.just(docUnit));
 
     String uri = "/api/v1/caselaw/documentunits/" + TEST_UUID;
