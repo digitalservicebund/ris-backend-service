@@ -11,7 +11,7 @@ describe("FootnoteInput", () => {
     })
 
     screen.getByText(
-      "Sie können mit @ den Fußnoten-Typ wählen (z.B. Änderungsfußnote, Kommentierende Fußnote)"
+      "Sie können mit # den Fußnoten-Typ wählen (z.B. Änderungsfußnote, Kommentierende Fußnote)"
     )
   })
 })

@@ -29,13 +29,13 @@ function summarizeFootnotePart(
   )
   const hasContent = part.content && part.content.trim().length > 0
   const content = hasContent ? contentText : contentEmptyHint
-  return h("div", [type, content])
+  return h("span", { class: "leading-loose" }, [type, content])
 }
 
 function summarizePrefix(prefix?: string): VNode | string {
   const prefixNode = h(
     "span",
-    { class: "pr-10" },
+    { class: ["pr-10", "font-bold"] },
     prefix?.trim().replaceAll(/\n/g, "<br>")
   )
   const hasPrefix = prefix && prefix.trim().length > 0
@@ -52,7 +52,7 @@ export function summarizeFootnotePerLine(data: Footnote): VNode {
       !Object.keys(footnote).includes(MetadatumType.FOOTNOTE_REFERENCE)
   )?.map((footnote) =>
     h(
-      "div",
+      "span",
       summarizeFootnotePart({
         type: MetadatumType[
           Object.keys(footnote)[0] as keyof typeof MetadatumType
@@ -61,8 +61,9 @@ export function summarizeFootnotePerLine(data: Footnote): VNode {
       })
     )
   )
+  const content = h("div", segments)
   return h("div", { class: ["flex", "flex-col", "gap-10"] }, [
     prefix ? summarizePrefix(prefix) : "",
-    segments,
+    content,
   ])
 }

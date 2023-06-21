@@ -66,7 +66,7 @@ function parseSegmentsAsFootnote(segments: Segment[]): Footnote {
 
 const options: SuggestionGroupOptions = {
   segmentType: FOOTNOTE_SEGMENT_TYPE,
-  trigger: "@",
+  trigger: "#",
   elementClasses: ["bg-yellow-300", "rounded", "px-10", "py-2"],
   callback: (input: string) =>
     Object.entries(FOOTNOTE_LABELS)
@@ -81,7 +81,7 @@ const options: SuggestionGroupOptions = {
 <template>
   <div>
     <span class="text-gray-900">
-      Sie können mit @ den Fußnoten-Typ wählen (z.B. Änderungsfußnote,
+      Sie können mit # den Fußnoten-Typ wählen (z.B. Änderungsfußnote,
       Kommentierende Fußnote)
     </span>
 
