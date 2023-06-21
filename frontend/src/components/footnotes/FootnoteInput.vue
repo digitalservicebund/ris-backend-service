@@ -4,7 +4,7 @@ import SegmentEditor, {
   Segment,
   SuggestionGroupOptions,
 } from "../SegmentEditor.vue"
-import { Footnote, FOOTNOTE_LABELS } from "@/components/Footnotes/types"
+import { Footnote, FOOTNOTE_LABELS } from "@/components/footnotes/types"
 import { MetadatumType } from "@/domain/Norm"
 
 const props = withDefaults(defineProps<Props>(), {

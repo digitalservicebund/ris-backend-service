@@ -1335,47 +1335,47 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
         },
       ],
     },
-    {
-      heading: "Fußnoten",
-      fields: [
-        {
-          type: FieldType.TEXT,
-          id: "otherFootnote",
-          label: "Sonstige Fußnote",
-          value: norm.otherFootnote,
-        },
-        {
-          type: FieldType.TEXT,
-          id: "footnoteChange",
-          label: "Änderungsfußnote",
-          value: norm.footnoteChange,
-        },
-        {
-          type: FieldType.TEXT,
-          id: "footnoteComment",
-          label: "Kommentierende Fußnote",
-          value: norm.footnoteComment,
-        },
-        {
-          type: FieldType.TEXT,
-          id: "footnoteDecision",
-          label: "BVerfG-Entscheidung",
-          value: norm.footnoteDecision,
-        },
-        {
-          type: FieldType.TEXT,
-          id: "footnoteStateLaw",
-          label: "Landesrecht",
-          value: norm.footnoteStateLaw,
-        },
-        {
-          type: FieldType.TEXT,
-          id: "footnoteEuLaw",
-          label: "EU/EG-Recht",
-          value: norm.footnoteEuLaw,
-        },
-      ],
-    },
+    // {
+    //   heading: "Fußnoten",
+    //   fields: [
+    //     {
+    //       type: FieldType.TEXT,
+    //       id: "otherFootnote",
+    //       label: "Sonstige Fußnote",
+    //       value: norm.otherFootnote,
+    //     },
+    //     {
+    //       type: FieldType.TEXT,
+    //       id: "footnoteChange",
+    //       label: "Änderungsfußnote",
+    //       value: norm.footnoteChange,
+    //     },
+    //     {
+    //       type: FieldType.TEXT,
+    //       id: "footnoteComment",
+    //       label: "Kommentierende Fußnote",
+    //       value: norm.footnoteComment,
+    //     },
+    //     {
+    //       type: FieldType.TEXT,
+    //       id: "footnoteDecision",
+    //       label: "BVerfG-Entscheidung",
+    //       value: norm.footnoteDecision,
+    //     },
+    //     {
+    //       type: FieldType.TEXT,
+    //       id: "footnoteStateLaw",
+    //       label: "Landesrecht",
+    //       value: norm.footnoteStateLaw,
+    //     },
+    //     {
+    //       type: FieldType.TEXT,
+    //       id: "footnoteEuLaw",
+    //       label: "EU/EG-Recht",
+    //       value: norm.footnoteEuLaw,
+    //     },
+    //   ],
+    // },
     {
       heading: "Gültigkeitsregelung",
       isSingleFieldSection: true,

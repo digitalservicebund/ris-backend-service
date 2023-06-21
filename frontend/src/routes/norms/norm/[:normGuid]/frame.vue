@@ -14,6 +14,8 @@ import DocumentTypeInputGroup from "@/components/DocumentTypeInputGroup.vue"
 import EntryIntoForceInputGroup from "@/components/EntryIntoForceInputGroup.vue"
 import ExpandableDataSet from "@/components/ExpandableDataSet.vue"
 import ExpirationInputGroup from "@/components/ExpirationInputGroup.vue"
+import FootnoteInput from "@/components/footnotes/FootnoteInput.vue"
+import { summarizeFootnotePerLine } from "@/components/footnotes/summarizer"
 import LeadInputGroup from "@/components/LeadInputGroup.vue"
 import NormProviderInputGroup from "@/components/NormProviderInputGroup.vue"
 import ParticipatingInstitutionInputGroup from "@/components/ParticipatingInstitutionInputGroup.vue"
@@ -31,7 +33,6 @@ import {
 import { documentStatus } from "@/fields/norms/documentStatus"
 import { documentTextProof } from "@/fields/norms/documentTextProof"
 import { otherDocumentNote } from "@/fields/norms/otherDocumentNote"
-import { otherFootnote } from "@/fields/norms/otherFootnote"
 import { otherStatusNote } from "@/fields/norms/otherStatusNote"
 import { reissue } from "@/fields/norms/reissue"
 import { repeal } from "@/fields/norms/repeal"
@@ -495,6 +496,7 @@ const GeneralSummary = withSummarizer(GeneralSummarizer)
 
 const ParticipationSummary = withSummarizer(participationSummarizer)
 const SubjectAreaSummary = withSummarizer(subjectAreaSummarizer)
+const footnoteLineSummary = withSummarizer(summarizeFootnotePerLine)
 </script>
 
 <template>
@@ -907,16 +909,20 @@ const SubjectAreaSummary = withSummarizer(subjectAreaSummarizer)
       />
     </ExpandableDataSet>
 
-    <fieldset class="mt-32">
-      <legend id="otherFootnoteFields" class="heading-02-regular mb-[1rem]">
-        Fußnoten
-      </legend>
-      <InputGroup
-        v-model="flatMetadata"
-        :column-count="1"
-        :fields="otherFootnote"
+    <ExpandableDataSet
+      id="footnotes"
+      border-bottom
+      :data-set="metadataSections.FOOTNOTES"
+      :summary-component="footnoteLineSummary"
+      title="Fußnoten"
+    >
+      <EditableList
+        v-model="metadataSections.FOOTNOTES"
+        :default-value="{}"
+        :edit-component="FootnoteInput"
+        :summary-component="footnoteLineSummary"
       />
-    </fieldset>
+    </ExpandableDataSet>
 
     <SingleDataFieldSection
       id="validityRules"

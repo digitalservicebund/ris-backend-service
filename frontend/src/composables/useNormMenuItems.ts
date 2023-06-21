@@ -56,7 +56,7 @@ export function useNormMenuItems(
           "documentProcessingStatusFields"
         ),
         getChildItem("Aktivverweisung", "categorizedReferences"),
-        getChildItem("Fußnoten", "otherFootnoteFields"),
+        getChildItem("Fußnoten", "footnotes"),
         getChildItem("Gültigkeitsregelung", "validityRules"),
         getChildItem("Elektronischer Nachweis", "digitalEvidence"),
         getChildItem("Aktenzeichen", "referenceNumbers"),

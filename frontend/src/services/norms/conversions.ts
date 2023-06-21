@@ -2,32 +2,32 @@ import dayjs from "dayjs"
 import timezone from "dayjs/plugin/timezone"
 import utc from "dayjs/plugin/utc"
 import {
-  MetadatumSchema,
-  MetadataSectionSchema,
-  NormResponseSchema,
   FlatMetadataRequestSchema,
+  MetadataSectionSchema,
+  MetadatumSchema,
+  NormResponseSchema,
 } from "./schemas"
 import {
+  compareOrder,
+  filterEntries,
   groupBy,
   mapValues,
-  compareOrder,
   mergeValues,
-  filterEntries,
 } from "./utilities"
 
 import {
-  MetadatumType,
-  MetadataSectionName,
+  FlatMetadata,
   Metadata,
+  MetadataSectionName,
   MetadataSections,
   MetadataValueType,
+  MetadatumType,
   Norm,
-  FlatMetadata,
   NormCategory,
-  UndefinedDate,
+  OtherType,
   ProofIndication,
   ProofType,
-  OtherType,
+  UndefinedDate,
 } from "@/domain/Norm"
 
 function identity<T>(data: T): T {
@@ -333,66 +333,190 @@ function encodeMetadata(metadata: Metadata): MetadatumSchema[] | null {
 }
 
 /**
- * Decodes a list of metadata sections from the API response schema to the
- * domain format. It does that by grouping and mapping them by their name,
- * sort them by order in each group and finally map them to their recursively
- * decoded sections and metadata.
+ * Decodes a list of metadata sections from the API response schema to take into account the extra layer of sections
+ * created in the frontend to handle footnotes and the order of the repeated metadata inside each of the sections.
+ * the function only modifies the footnote sections and return a list of MetadataSectionSchema.
  *
  * @example
  * ```ts
- * decodeMetadataSections([
+ * decodeFootnotesSections([
  *  {
- *    name: RELEASE,
- *     order: 2,
- *     metadata: [
- *       { type: DATE, value: "20-03-2001", order: 1 },
- *       { type: COMMENT, value: "text", order: 1 },
+ *    name: FOOTNOTES,
+ *    order: 1,
+ *    metadata: [
+ *       { type: FOOTNOTE_REFERENCE, value: "1", order: 1 },
+ *       { type: FOOTNOTE_COMMENT, value: "comment 1", order: 1 },
  *     ],
- *     sections: [{
- *       name: INSTITUTION,
- *       order: 1,
- *       metadata: [
- *         { type: NAME, value: "House", order: 1 }
- *       ],
- *     }],
  *  },
  *  {
  *    name: RELEASE:
  *    order: 1,
  *  },
  *  {
- *    name: PROOF,
- *    order: 1,
+ *    name: FOOTNOTES,
+ *    order: 2,
  *    metadata: [
- *     { type: DOCUMENT, value: "example.pdf", order: 1 }
- *     { type: DOCUMENT, value: "other.txt", order: 2 }
+ *      { type: FOOTNOTE_COMMENT, value: "comment 2", order: 1 },
+ *      { type: FOOTNOTE_COMMENT, value: "comment 3", order: 1 },
  *    ]
  *  }
  * ])
- * // =>
- * // {
- * //   RELEASE: [
- * //     { _ },
- * //     { DATE: ["20-03-2001"], COMMENT: ["text"], INSTITUTION: [{ NAME: ["House"] }]},
- * //   ],
- * //   PROOF: [
- * //     { DOCUMENT: ["example.pdf", "other.txt"] },
- * //   ],
- * // }
+ * =====>
+ * [
+ *  {
+ *    name: FOOTNOTES,
+ *    order: 1,
+ *    metadata: undefined,
+ *    sections: [
+ *        {
+ *          name: FOOTNOTE,
+ *          order: 1,
+ *          metadata: [
+ *              { type: FOOTNOTE_REFERENCE, value: "1", order: 1 },
+ *              { type: FOOTNOTE_COMMENT, value: "comment 1", order: 1 },
+ *          ]
+ *        },
+ *    ]
+ *  },
+ *  {
+ *    name: RELEASE:
+ *    order: 1,
+ *  },
+ *  {
+ *    name: FOOTNOTES,
+ *    order: 2,
+ *    metadata: undefined,
+ *    sections: [
+ *        {
+ *          name: FOOTNOTE,
+ *          order: 1,
+ *          metadata: [
+ *              { type: FOOTNOTE_COMMENT, value: "comment 2", order: 1 },
+ *              { type: FOOTNOTE_COMMENT, value: "comment 3", order: 1 },
+ *          ]
+ *        },
+ *    ]
+ *  },
+ * ]
  * ```
  *
  * @param sections to decode from response schema
- * @returns grouped, mapped, sorted metadata sections
+ * @returns modified sections including footnote sections metadata sections
  */
-export function decodeMetadataSections(
+
+function decodeFootnotesSections(
   sections: MetadataSectionSchema[]
-): MetadataSections {
-  const grouped = groupBy(sections, (section) => section.name)
-  return mapValues(grouped, (sections) =>
-    sections.sort(compareOrder).map((section) => ({
-      ...decodeMetadata(section.metadata ?? []),
-      ...decodeMetadataSections(section.sections ?? []),
-    }))
+): MetadataSectionSchema[] {
+  return sections.map(
+    (section: MetadataSectionSchema): MetadataSectionSchema => {
+      return section.name != MetadataSectionName.FOOTNOTES
+        ? section
+        : {
+            name: section.name,
+            order: section.order,
+            metadata: null,
+            sections: section.metadata?.map(
+              (metadata: MetadatumSchema): MetadataSectionSchema => ({
+                name: MetadataSectionName.FOOTNOTE,
+                order: metadata.order,
+                metadata: [metadata],
+                sections: null,
+              })
+            ),
+          }
+    }
+  )
+}
+
+/**
+ * Encode a list of metadata sections from the domain to take into account the extra layer of sections
+ * created in the frontend to handle footnotes and the order of the repeated metadata inside each of the sections.
+ * the function only modifies the footnote sections and return a list of MetadataSectionSchema.
+ *
+ * @example
+ * ```ts
+ * encodeFootnotesSections([
+ *  {
+ *    name: FOOTNOTES,
+ *    order: 1,
+ *    metadata: undefined,
+ *    sections: [
+ *        {
+ *          name: FOOTNOTE,
+ *          order: 1,
+ *          metadata: [
+ *              { type: FOOTNOTE_REFERENCE, value: "1", order: 1 },
+ *              { type: FOOTNOTE_COMMENT, value: "comment 1", order: 1 },
+ *          ]
+ *        },
+ *    ]
+ *  },
+ *  {
+ *    name: RELEASE:
+ *    order: 1,
+ *  },
+ *  {
+ *    name: FOOTNOTES,
+ *    order: 2,
+ *    metadata: undefined,
+ *    sections: [
+ *        {
+ *          name: FOOTNOTE,
+ *          order: 1,
+ *          metadata: [
+ *              { type: FOOTNOTE_COMMENT, value: "comment 2", order: 1 },
+ *              { type: FOOTNOTE_COMMENT, value: "comment 3", order: 1 },
+ *          ]
+ *        },
+ *    ]
+ *  },
+ * ])
+ * =====>
+ * [
+ *  {
+ *    name: FOOTNOTES,
+ *    order: 1,
+ *    metadata: [
+ *       { type: FOOTNOTE_REFERENCE, value: "1", order: 1 },
+ *       { type: FOOTNOTE_COMMENT, value: "comment 1", order: 1 },
+ *     ],
+ *  },
+ *  {
+ *    name: RELEASE:
+ *    order: 1,
+ *  },
+ *  {
+ *    name: FOOTNOTES,
+ *    order: 2,
+ *    metadata: [
+ *      { type: FOOTNOTE_COMMENT, value: "comment 2", order: 1 },
+ *      { type: FOOTNOTE_COMMENT, value: "comment 3", order: 1 },
+ *    ]
+ *  }
+ * ]
+ * ```
+ *
+ * @param sections to decode from response schema
+ * @returns modified sections including footnote sections metadata sections
+ */
+
+function encodeFootnotesSections(
+  sections: MetadataSectionSchema[]
+): MetadataSectionSchema[] {
+  return sections.map(
+    (section: MetadataSectionSchema): MetadataSectionSchema => {
+      return section.name != MetadataSectionName.FOOTNOTES
+        ? section
+        : {
+            name: section.name,
+            order: section.order,
+            metadata:
+              section.sections
+                ?.map((footnoteSection) => footnoteSection?.metadata ?? [])
+                ?.flat() ?? null,
+            sections: null,
+          }
+    }
   )
 }
 
@@ -454,7 +578,6 @@ export function encodeMetadataSections(
   if (Object.entries(sections).length == 0) {
     return null
   }
-
   const encodedMapping = mapValues(sections, (group, name) =>
     group?.map((value, index) => {
       const metadata = filterEntries(
@@ -479,12 +602,77 @@ export function encodeMetadataSections(
   )
 
   const encodedSections = mergeValues(encodedMapping)
-  const nonEmptySections = encodedSections.filter(
+  const nonEmptySections = encodeFootnotesSections(encodedSections).filter(
     (section) =>
       (section.metadata && section.metadata.length > 0) ||
       (section.sections && section.sections.length > 0)
   )
   return nonEmptySections
+}
+
+/**
+ * Decodes a list of metadata sections from the API response schema to the
+ * domain format. It does that by grouping and mapping them by their name,
+ * sort them by order in each group and finally map them to their recursively
+ * decoded sections and metadata.
+ *
+ * @example
+ * ```ts
+ * decodeMetadataSections([
+ *  {
+ *    name: RELEASE,
+ *     order: 2,
+ *     metadata: [
+ *       { type: DATE, value: "20-03-2001", order: 1 },
+ *       { type: COMMENT, value: "text", order: 1 },
+ *     ],
+ *     sections: [{
+ *       name: INSTITUTION,
+ *       order: 1,
+ *       metadata: [
+ *         { type: NAME, value: "House", order: 1 }
+ *       ],
+ *     }],
+ *  },
+ *  {
+ *    name: RELEASE:
+ *    order: 1,
+ *  },
+ *  {
+ *    name: PROOF,
+ *    order: 1,
+ *    metadata: [
+ *     { type: DOCUMENT, value: "example.pdf", order: 1 }
+ *     { type: DOCUMENT, value: "other.txt", order: 2 }
+ *    ]
+ *  }
+ * ])
+ * // =>
+ * // {
+ * //   RELEASE: [
+ * //     { _ },
+ * //     { DATE: ["20-03-2001"], COMMENT: ["text"], INSTITUTION: [{ NAME: ["House"] }]},
+ * //   ],
+ * //   PROOF: [
+ * //     { DOCUMENT: ["example.pdf", "other.txt"] },
+ * //   ],
+ * // }
+ * ```
+ *
+ * @param sections to decode from response schema
+ * @returns grouped, mapped, sorted metadata sections
+ */
+export function decodeMetadataSections(
+  sections: MetadataSectionSchema[]
+): MetadataSections {
+  const modifiedSections = decodeFootnotesSections(sections)
+  const grouped = groupBy(modifiedSections, (section) => section.name)
+  return mapValues(grouped, (sections) =>
+    sections.sort(compareOrder).map((section) => ({
+      ...decodeMetadata(section.metadata ?? []),
+      ...decodeMetadataSections(section.sections ?? []),
+    }))
+  )
 }
 
 export function decodeNorm(norm: NormResponseSchema): Norm {
