@@ -108,12 +108,12 @@ class NormsService(
 
     @Transactional(transactionManager = "connectionFactoryTransactionManager")
     override fun editNorm(command: EditNormOutputPort.Command): Mono<Boolean> {
-        val deleteNormRequest = normsRepository.deleteByGuid(command.norm.guid).cache()
-        val saveNormRequest = deleteNormRequest
-            .then(Mono.fromCallable { normToDto(command.norm) })
-            .flatMap(normsRepository::save).cache()
+        val normDto = normToDto(command.norm)
+        normDto.newEntry = false
 
-        val updateMetadataRequest = saveNormRequest.flatMapMany { normDto -> saveNormSectionsWithMetadata(command.norm, normDto) }
+        val saveNormRequest = normsRepository.save(normDto).cache()
+
+        val updateMetadataRequest = saveNormRequest.flatMapMany { normDtoSaved -> saveNormSectionsWithMetadata(command.norm, normDtoSaved) }
 
         return Mono.`when`(saveNormRequest, updateMetadataRequest).thenReturn(true)
     }
@@ -134,7 +134,7 @@ class NormsService(
     }
 
     private fun saveNormSectionsWithMetadata(norm: Norm, normDto: NormDto): Flux<MetadataSectionDto> {
-        return deleteOldMetadata(normDto.guid)
+        return metadataSectionsRepository.deleteByNormGuid(normDto.guid)
             .thenMany(Flux.fromIterable(norm.metadataSections))
             .flatMap { metadataSectionsRepository.save(metadataSectionToDto(it, normDto.guid)) }
             .flatMap { parentSectionDto ->
@@ -182,11 +182,6 @@ class NormsService(
     private fun saveSectionMetadata(metadataSectionDto: MetadataSectionDto, metadata: List<Metadatum<*>>): Flux<MetadatumDto> {
         return metadataRepository.saveAll(metadataListToDto(metadata, metadataSectionDto.guid))
     }
-
-    private fun deleteOldMetadata(normGuid: UUID): Mono<Void> = metadataSectionsRepository.findByNormGuid(normGuid)
-        .flatMap {
-            metadataRepository.deleteBySectionGuid(it.guid)
-        }.then(metadataSectionsRepository.deleteByNormGuid(normGuid))
 
     private fun saveArticleParagraphs(norm: Norm, article: ArticleDto): Flux<ParagraphDto> {
         return paragraphsRepository.saveAll(

@@ -1,0 +1,94 @@
+-- ARTICLES
+ALTER TABLE
+  articles
+ALTER COLUMN
+  marker
+SET NOT NULL;
+
+ALTER TABLE
+  articles
+ALTER COLUMN
+  norm_guid
+SET NOT NULL;
+
+-- PARAGRAPHS
+ALTER TABLE
+  paragraphs
+ALTER COLUMN
+  text
+SET NOT NULL;
+
+ALTER TABLE
+  paragraphs
+ALTER COLUMN
+  article_guid
+SET NOT NULL;
+
+-- FILES
+ALTER TABLE
+  files
+ALTER COLUMN
+  hash
+SET NOT NULL;
+
+ALTER TABLE
+  files
+ALTER COLUMN
+  name
+SET NOT NULL;
+
+ALTER TABLE
+  files
+ALTER COLUMN
+  created_at
+SET NOT NULL;
+
+ALTER TABLE
+  files
+ALTER COLUMN
+  norm_guid
+SET NOT NULL;
+
+-- METADATA_SECTIONS
+ALTER TABLE
+  metadata_sections
+ALTER COLUMN
+  name
+SET NOT NULL;
+
+ALTER TABLE
+  metadata_sections
+ALTER COLUMN
+  order_number
+SET NOT NULL;
+
+ALTER TABLE
+  metadata_sections
+ALTER COLUMN
+  norm_guid
+SET NOT NULL;
+
+-- METADATA
+ALTER TABLE
+  metadata
+ALTER COLUMN
+type
+SET NOT NULL;
+
+ALTER TABLE
+  metadata
+ALTER COLUMN
+  value
+SET NOT NULL;
+
+ALTER TABLE
+  metadata
+ALTER COLUMN
+  order_number
+SET NOT NULL;
+
+ALTER TABLE
+  metadata
+ALTER COLUMN
+  section_guid
+SET NOT NULL;
