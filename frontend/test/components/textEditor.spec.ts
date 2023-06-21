@@ -1,7 +1,8 @@
 /* eslint-disable testing-library/no-node-access */
 import { render, screen, fireEvent } from "@testing-library/vue"
+import { flushPromises } from "@vue/test-utils"
 import { createRouter, createWebHistory } from "vue-router"
-import TextEditor from "../../src/shared/components/input/TextEditor.vue"
+import TextEditor from "@/shared/components/input/TextEditor.vue"
 
 describe("text editor", async () => {
   global.ResizeObserver = require("resize-observer-polyfill")
@@ -39,11 +40,15 @@ describe("text editor", async () => {
       global: { plugins: [router] },
     })
 
-    screen.queryByText("Test Value")
+    await flushPromises()
+
+    expect(screen.getByText("Test Value")).toBeInTheDocument()
+
     expect(
       screen.queryByLabelText("Test Editor Feld Button Leiste")
     ).not.toBeInTheDocument()
-    screen.getByTestId("Test Editor Feld")
+
+    expect(screen.getByTestId("Test Editor Feld")).toBeInTheDocument()
   })
 
   test("show buttons on focus", async () => {
@@ -55,7 +60,8 @@ describe("text editor", async () => {
       },
       global: { plugins: [router] },
     })
-    await screen.findByText("Test Value")
+
+    await flushPromises()
 
     const editorField = screen.getByTestId("Test Editor Feld")
 
@@ -74,7 +80,7 @@ describe("text editor", async () => {
       global: { plugins: [router] },
     })
 
-    await screen.findByText("Test Value")
+    await flushPromises()
 
     const editorField = screen.getByTestId("Test Editor Feld")
 
@@ -109,7 +115,8 @@ describe("text editor", async () => {
       },
       global: { plugins: [router] },
     })
-    await screen.findByText("Test Value")
+
+    await flushPromises()
 
     const editorField = screen.getByTestId("Test Editor Feld")
 
