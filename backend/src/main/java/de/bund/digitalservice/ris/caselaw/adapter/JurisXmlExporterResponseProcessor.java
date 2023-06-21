@@ -21,11 +21,13 @@ import java.util.Properties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Profile;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
 @Component
+@Profile("production")
 public class JurisXmlExporterResponseProcessor {
 
   private final List<MessageHandler> messageHandlers;
@@ -61,7 +63,7 @@ public class JurisXmlExporterResponseProcessor {
             new ProcessMessageHandler());
   }
 
-  @Scheduled(fixedRate = 60000, fixedDelay = 60000)
+  @Scheduled(fixedRate = 60000)
   public void readEmails() {
     try (Store store = createStoreSession()) {
       processInbox(store);
