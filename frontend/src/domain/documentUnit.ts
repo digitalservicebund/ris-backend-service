@@ -105,6 +105,12 @@ export default class DocumentUnit {
         (norm) => new NormReference({ ...norm })
       )
 
+    if (data.contentRelatedIndexing?.activeCitations)
+      data.contentRelatedIndexing.activeCitations =
+        data.contentRelatedIndexing.activeCitations.map(
+          (activeCitations) => new ActiveCitation({ ...activeCitations })
+        )
+
     Object.assign(this, data)
   }
   get hasFile(): boolean {
