@@ -211,9 +211,6 @@ class JurisConverterTest {
             assertThat(norm?.reissueDate).isEqualTo(LocalDate.parse("2022-01-11"))
             assertThat(norm?.reissueReference).isEqualTo("test reissue reference")
             assertThat(norm?.otherStatusNote).isEqualTo("test other status note")
-            assertThat(norm?.documentStatusWorkNote).isEqualTo("test document status work note")
-            assertThat(norm?.documentStatusDescription).isEqualTo("test document status description")
-            assertThat(norm?.documentStatusDate).isEqualTo(LocalDate.parse("2022-01-12"))
             assertThat(norm?.celexNumber).isEqualTo("test celex number")
             assertThat(norm?.text).isEqualTo("test text")
             val metadata = norm?.metadataSections?.flatMap { it.metadata }

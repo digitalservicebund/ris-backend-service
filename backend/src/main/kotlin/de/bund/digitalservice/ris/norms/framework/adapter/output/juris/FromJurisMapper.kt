@@ -58,6 +58,7 @@ fun mapDataToDomain(guid: UUID, data: NormData): Norm {
         createSectionForDocumentType(data.documentType) +
         createSectionsFromMetadata(Section.PARTICIPATION, participationType + participationInstitution) +
         createSectionsForOfficialReference(data.digitalAnnouncementList, data.printAnnouncementList) +
+        createSectionsForDocumentStatus(data.documentStatusWorkNote, data.documentStatusDate, data.documentStatusDescription) +
         createSectionsForDivergentEntryIntoForce(data.divergentEntryIntoForceList) +
         createSectionsForDivergentExpiration(data.divergentExpirationsList) +
         citationDateSections + ageIndicationSections + categorizedReferenceSections +
@@ -87,12 +88,35 @@ fun mapDataToDomain(guid: UUID, data: NormData): Norm {
         reissueDate = parseDateString(data.reissueDate),
         reissueReference = data.reissueReference,
         otherStatusNote = data.otherStatusNote,
-        documentStatusWorkNote = data.documentStatusWorkNote,
-        documentStatusDescription = data.documentStatusDescription,
-        documentStatusDate = parseDateString(data.documentStatusDate),
         celexNumber = data.celexNumber,
         text = data.text,
     )
+}
+fun createSectionsForDocumentStatus(
+    documentStatusWorkNote: String?,
+    documentStatusDate: String?,
+    documentStatusDescription: String?,
+): MetadataSection? {
+    val metadata = mutableListOf<Metadatum<*>>()
+
+    if (documentStatusWorkNote != null) {
+        metadata.add(Metadatum(documentStatusWorkNote, MetadatumType.WORK_NOTE))
+    }
+
+    if (documentStatusDate != null) {
+        metadata.add(Metadatum(decodeLocalDate(documentStatusDate), MetadatumType.DATE))
+    }
+
+    if (documentStatusDescription != null) {
+        metadata.add(Metadatum(documentStatusDescription, MetadatumType.DESCRIPTION))
+    }
+    if (metadata.isNotEmpty()) {
+        val childSection = MetadataSection(MetadataSectionName.DOCUMENT_STATUS, metadata)
+        val parentSection = MetadataSection(MetadataSectionName.DOCUMENT_STATUS_SECTION, emptyList(), sections = listOf(childSection))
+
+        return parentSection
+    }
+    return null
 }
 
 private fun createSectionForDocumentType(documentType: DocumentType?): MetadataSection? {

@@ -10,6 +10,8 @@ import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName.DIVERGE
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName.DIVERGENT_ENTRY_INTO_FORCE_DEFINED
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName.DIVERGENT_EXPIRATION
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName.DIVERGENT_EXPIRATION_UNDEFINED
+import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName.DOCUMENT_STATUS
+import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName.DOCUMENT_STATUS_SECTION
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName.DOCUMENT_TYPE
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName.ENTRY_INTO_FORCE
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName.EXPIRATION
@@ -128,9 +130,6 @@ class FromJurisMapperTest {
         assertThat(domainNorm.officialAbbreviation).isEqualTo("officialAbbreviation")
         assertThat(domainNorm.announcementDate).isEqualTo(LocalDate.of(2020, 10, 10))
         assertThat(domainNorm.documentCategory).isEqualTo("documentCategory")
-        assertThat(domainNorm.documentStatusDate).isEqualTo(LocalDate.of(2021, 10, 10))
-        assertThat(domainNorm.documentStatusDescription).isEqualTo("documentStatusDescription")
-        assertThat(domainNorm.documentStatusWorkNote).isEqualTo("documentStatusWorkNote")
         assertThat(domainNorm.text).isEqualTo("text")
         assertThat(domainNorm.celexNumber).isEqualTo("celexNumber")
         assertThat(domainNorm.otherStatusNote).isEqualTo("otherStatusNote")
@@ -172,6 +171,10 @@ class FromJurisMapperTest {
         assertSectionsHasMetadata(sections, NORM_PROVIDER, MetadatumType.DECIDING_BODY, "providerBody")
         assertSectionsHasMetadata(sections, NORM_PROVIDER, MetadatumType.RESOLUTION_MAJORITY, true)
         assertSectionsHasMetadata(sections, ENTRY_INTO_FORCE, MetadatumType.DATE, LocalDate.of(2023, 6, 15))
+        val documentStatusSections = sections.filter { it.name == DOCUMENT_STATUS_SECTION }.flatMap { it.sections ?: emptyList() }
+        assertSectionsHasMetadata(documentStatusSections, DOCUMENT_STATUS, MetadatumType.DATE, LocalDate.of(2021, 10, 10))
+        assertSectionsHasMetadata(documentStatusSections, DOCUMENT_STATUS, MetadatumType.WORK_NOTE, "documentStatusWorkNote")
+        assertSectionsHasMetadata(documentStatusSections, DOCUMENT_STATUS, MetadatumType.DESCRIPTION, "documentStatusDescription")
         assertSectionsHasMetadata(sections, PRINCIPLE_ENTRY_INTO_FORCE, MetadatumType.DATE, LocalDate.of(2024, 10, 10))
         assertSectionsHasMetadata(sections, EXPIRATION, MetadatumType.DATE, LocalDate.of(2023, 7, 15))
         assertSectionsHasMetadata(sections, PRINCIPLE_EXPIRATION, MetadatumType.DATE, LocalDate.of(2020, 10, 10))
