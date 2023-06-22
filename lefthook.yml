@@ -8,19 +8,19 @@ commit-msg:
 pre-commit:
   parallel: true
   commands:
-    check-format-backend:
-      tags: style backend
+    format-backend:
+      tags: format backend
       root: backend/
-      run: ./gradlew spotlessCheck -DspotlessFiles=$(echo {staged_files} | sed 's/ /,/g')
+      run: ./gradlew spotlessApply -DspotlessFiles=$(echo {staged_files} | sed 's/ /,/g') && git add {staged_files}
     frontend-prettier:
-      tags: frontend format
+      tags: format frontend
       root: frontend/
-      run: npm run --silent prettier:check {staged_files}
+      run: npm run --silent prettier:fix {staged_files} && git add {staged_files}
     frontend-eslint:
       tags: frontend lint
       root: frontend/
       glob: "*.{vue,ts,js,json}"
-      run: npm run --silent eslint:check {staged_files}
+      run: npm run --silent eslint:fix {staged_files} && git add {staged_files}
     frontend-stylelint:
       tags: frontend lint
       root: frontend/
