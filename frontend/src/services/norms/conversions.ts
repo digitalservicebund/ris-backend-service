@@ -510,10 +510,26 @@ function encodeFootnotesSections(
         : {
             name: section.name,
             order: section.order,
-            metadata:
-              section.sections
-                ?.map((footnoteSection) => footnoteSection?.metadata ?? [])
-                ?.flat() ?? null,
+            metadata: section.sections
+              ? section.sections.reduce(
+                  (
+                    result: MetadatumSchema[],
+                    section: MetadataSectionSchema,
+                    index
+                  ) => {
+                    const footnote = section?.metadata?.at(0)
+                    if (footnote != undefined) {
+                      result.push({
+                        order: index + 1,
+                        value: footnote?.value,
+                        type: footnote?.type,
+                      })
+                    }
+                    return result
+                  },
+                  []
+                )
+              : null,
             sections: null,
           }
     }
