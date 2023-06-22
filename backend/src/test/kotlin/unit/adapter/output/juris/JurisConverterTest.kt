@@ -178,10 +178,6 @@ class JurisConverterTest {
                     documentStatusWorkNote = "test document status work note"
                     documentStatusDescription = "test document status description"
                     documentStatusDate = "2022-01-12"
-                    applicationScopeArea = "test application scope area"
-                    applicationScopeStartDate = "2022-01-13"
-                    applicationScopeEndDate = "2022-01-14"
-                    otherFootnote = "test other footnote"
                     validityRuleList = listOf("test validity rule")
                     referenceNumberList = listOf("test reference number")
                     celexNumber = "test celex number"
@@ -218,10 +214,6 @@ class JurisConverterTest {
             assertThat(norm?.documentStatusWorkNote).isEqualTo("test document status work note")
             assertThat(norm?.documentStatusDescription).isEqualTo("test document status description")
             assertThat(norm?.documentStatusDate).isEqualTo(LocalDate.parse("2022-01-12"))
-            assertThat(norm?.applicationScopeArea).isEqualTo("test application scope area")
-            assertThat(norm?.applicationScopeStartDate).isEqualTo(LocalDate.parse("2022-01-13"))
-            assertThat(norm?.applicationScopeEndDate).isEqualTo(LocalDate.parse("2022-01-14"))
-            assertThat(norm?.otherFootnote).isEqualTo("test other footnote")
             assertThat(norm?.celexNumber).isEqualTo("test celex number")
             assertThat(norm?.text).isEqualTo("test text")
             val metadata = norm?.metadataSections?.flatMap { it.metadata }

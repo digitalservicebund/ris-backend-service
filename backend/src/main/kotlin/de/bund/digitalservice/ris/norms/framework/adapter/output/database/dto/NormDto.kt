@@ -78,26 +78,6 @@ data class NormDto(
     @Column("other_document_note")
     var otherDocumentNote: String? = null,
 
-    @Column("application_scope_area")
-    var applicationScopeArea: String? = null,
-    @Column("application_scope_start_date")
-    var applicationScopeStartDate: LocalDate? = null,
-    @Column("application_scope_end_date")
-    var applicationScopeEndDate: LocalDate? = null,
-
-    @Column("other_footnote")
-    var otherFootnote: String? = null,
-    @Column("footnote_change")
-    var footnoteChange: String? = null,
-    @Column("footnote_comment")
-    var footnoteComment: String? = null,
-    @Column("footnote_decision")
-    var footnoteDecision: String? = null,
-    @Column("footnote_state_law")
-    var footnoteStateLaw: String? = null,
-    @Column("footnote_eu_law")
-    var footnoteEuLaw: String? = null,
-
     @Column("celex_number")
     var celexNumber: String? = null,
 

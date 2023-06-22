@@ -81,17 +81,6 @@ class EditNormFrameController(private val editNormFrameService: EditNormFrameUse
         var documentTextProof: String? = null
         var otherDocumentNote: String? = null
 
-        var applicationScopeArea: String? = null
-        var applicationScopeStartDate: String? = null
-        var applicationScopeEndDate: String? = null
-
-        var otherFootnote: String? = null
-        var footnoteChange: String? = null
-        var footnoteComment: String? = null
-        var footnoteDecision: String? = null
-        var footnoteStateLaw: String? = null
-        var footnoteEuLaw: String? = null
-
         var eli: String? = null
 
         var celexNumber: String? = null
@@ -130,15 +119,6 @@ class EditNormFrameController(private val editNormFrameService: EditNormFrameUse
             this.documentStatusProof,
             this.documentTextProof,
             this.otherDocumentNote,
-            this.applicationScopeArea,
-            decodeLocalDate(this.applicationScopeStartDate),
-            decodeLocalDate(this.applicationScopeEndDate),
-            this.otherFootnote,
-            this.footnoteChange,
-            this.footnoteComment,
-            this.footnoteDecision,
-            this.footnoteStateLaw,
-            this.footnoteEuLaw,
             this.celexNumber,
             this.text,
         )

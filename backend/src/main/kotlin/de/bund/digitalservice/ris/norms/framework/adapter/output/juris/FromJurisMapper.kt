@@ -90,10 +90,6 @@ fun mapDataToDomain(guid: UUID, data: NormData): Norm {
         documentStatusWorkNote = data.documentStatusWorkNote,
         documentStatusDescription = data.documentStatusDescription,
         documentStatusDate = parseDateString(data.documentStatusDate),
-        applicationScopeArea = data.applicationScopeArea,
-        applicationScopeStartDate = parseDateString(data.applicationScopeStartDate),
-        applicationScopeEndDate = parseDateString(data.applicationScopeEndDate),
-        otherFootnote = data.otherFootnote,
         celexNumber = data.celexNumber,
         text = data.text,
     )

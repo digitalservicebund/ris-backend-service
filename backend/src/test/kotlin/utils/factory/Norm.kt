@@ -42,15 +42,6 @@ class NormBuilder {
     var documentStatusProof = randomString()
     var documentTextProof = randomString()
     var otherDocumentNote = randomString()
-    var applicationScopeArea = randomString()
-    var applicationScopeStartDate = LocalDate.now()
-    var applicationScopeEndDate = LocalDate.now()
-    var otherFootnote = randomString()
-    var footnoteChange = randomString()
-    var footnoteComment = randomString()
-    var footnoteDecision = randomString()
-    var footnoteStateLaw = randomString()
-    var footnoteEuLaw = randomString()
     var celexNumber = randomString()
     var text = randomString()
 
@@ -97,15 +88,6 @@ class NormBuilder {
         documentStatusProof = documentStatusProof,
         documentTextProof = documentTextProof,
         otherDocumentNote = otherDocumentNote,
-        applicationScopeArea = applicationScopeArea,
-        applicationScopeStartDate = applicationScopeStartDate,
-        applicationScopeEndDate = applicationScopeEndDate,
-        otherFootnote = otherFootnote,
-        footnoteChange = footnoteChange,
-        footnoteComment = footnoteComment,
-        footnoteDecision = footnoteDecision,
-        footnoteStateLaw = footnoteStateLaw,
-        footnoteEuLaw = footnoteEuLaw,
         celexNumber = celexNumber,
         text = text,
     )

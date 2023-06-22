@@ -687,13 +687,6 @@ export function encodeFlatMetadata(
   flatMetadata: FlatMetadata
 ): FlatMetadataRequestSchema {
   return {
-    applicationScopeArea: encodeString(flatMetadata.applicationScopeArea),
-    applicationScopeEndDate: encodeNullDate(
-      flatMetadata.applicationScopeEndDate
-    ),
-    applicationScopeStartDate: encodeNullDate(
-      flatMetadata.applicationScopeStartDate
-    ),
     celexNumber: encodeString(flatMetadata.celexNumber),
     completeCitation: encodeString(flatMetadata.completeCitation),
     documentCategory: encodeString(flatMetadata.documentCategory),
@@ -714,12 +707,6 @@ export function encodeFlatMetadata(
     officialLongTitle: encodeString(flatMetadata.officialLongTitle) ?? "",
     officialShortTitle: encodeString(flatMetadata.officialShortTitle),
     otherDocumentNote: encodeString(flatMetadata.otherDocumentNote),
-    otherFootnote: encodeString(flatMetadata.otherFootnote),
-    footnoteChange: encodeString(flatMetadata.footnoteChange),
-    footnoteComment: encodeString(flatMetadata.footnoteComment),
-    footnoteDecision: encodeString(flatMetadata.footnoteDecision),
-    footnoteStateLaw: encodeString(flatMetadata.footnoteStateLaw),
-    footnoteEuLaw: encodeString(flatMetadata.footnoteEuLaw),
     otherStatusNote: encodeString(flatMetadata.otherStatusNote),
     announcementDate: encodeNullDate(flatMetadata.announcementDate),
     publicationDate: encodeNullDate(flatMetadata.publicationDate),

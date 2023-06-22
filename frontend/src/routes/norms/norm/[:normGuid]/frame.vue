@@ -79,12 +79,6 @@ watch(
   flatMetadata,
   (data) => {
     if (loadedNorm.value !== undefined && data !== undefined) {
-      loadedNorm.value.applicationScopeArea =
-        data.applicationScopeArea as string
-      loadedNorm.value.applicationScopeEndDate =
-        data.applicationScopeEndDate as string
-      loadedNorm.value.applicationScopeStartDate =
-        data.applicationScopeStartDate as string
       loadedNorm.value.celexNumber = data.celexNumber as string
       loadedNorm.value.completeCitation = data.completeCitation as string
       loadedNorm.value.documentCategory = data.documentCategory as string
@@ -106,12 +100,6 @@ watch(
       loadedNorm.value.officialLongTitle = data.officialLongTitle as string
       loadedNorm.value.officialShortTitle = data.officialShortTitle as string
       loadedNorm.value.otherDocumentNote = data.otherDocumentNote as string
-      loadedNorm.value.otherFootnote = data.otherFootnote as string
-      loadedNorm.value.footnoteChange = data.footnoteChange as string
-      loadedNorm.value.footnoteComment = data.footnoteComment as string
-      loadedNorm.value.footnoteDecision = data.footnoteDecision as string
-      loadedNorm.value.footnoteStateLaw = data.footnoteStateLaw as string
-      loadedNorm.value.footnoteEuLaw = data.footnoteEuLaw as string
       loadedNorm.value.otherStatusNote = data.otherStatusNote as string
       loadedNorm.value.announcementDate = data.announcementDate as string
       loadedNorm.value.publicationDate = data.publicationDate as string

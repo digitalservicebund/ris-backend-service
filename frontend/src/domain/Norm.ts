@@ -220,9 +220,6 @@ export type MetadataSections = {
 }
 
 export type FlatMetadata = {
-  applicationScopeArea?: string
-  applicationScopeEndDate?: string
-  applicationScopeStartDate?: string
   categorizedReference?: string
   celexNumber?: string
   completeCitation?: string
@@ -240,12 +237,6 @@ export type FlatMetadata = {
   officialLongTitle: string
   officialShortTitle?: string
   otherDocumentNote?: string
-  otherFootnote?: string
-  footnoteChange?: string
-  footnoteComment?: string
-  footnoteDecision?: string
-  footnoteStateLaw?: string
-  footnoteEuLaw?: string
   otherStatusNote?: string
   printAnnouncementGazette?: string
   printAnnouncementPage?: string

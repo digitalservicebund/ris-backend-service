@@ -58,9 +58,6 @@ class FromJurisMapperTest {
             ageIndicationStartList = listOf("ageIndicationStart"),
             ageOfMajorityIndicationList = listOf("ageOfMajorityIndication"),
             announcementDate = "2020-10-10",
-            applicationScopeArea = "applicationScopeArea",
-            applicationScopeEndDate = "2021-10-10",
-            applicationScopeStartDate = "2021-10-10",
             categorizedReferences = listOf(CategorizedReference("category")),
             celexNumber = "celexNumber",
             citationDateList = listOf("2020-10-01"),
@@ -84,7 +81,6 @@ class FromJurisMapperTest {
             officialAbbreviation = "officialAbbreviation",
             officialLongTitle = "officialLongTitle",
             officialShortTitle = "officialShortTitle",
-            otherFootnote = "otherFootnote",
             otherStatusNote = "otherStatusNote",
             participationList = listOf(Participation("participationType", "participationInstitution")),
             principleEntryIntoForceDate = "2024-10-10",
@@ -131,16 +127,12 @@ class FromJurisMapperTest {
         assertThat(domainNorm.officialShortTitle).isEqualTo("officialShortTitle")
         assertThat(domainNorm.officialAbbreviation).isEqualTo("officialAbbreviation")
         assertThat(domainNorm.announcementDate).isEqualTo(LocalDate.of(2020, 10, 10))
-        assertThat(domainNorm.applicationScopeArea).isEqualTo("applicationScopeArea")
-        assertThat(domainNorm.applicationScopeStartDate).isEqualTo(LocalDate.of(2021, 10, 10))
-        assertThat(domainNorm.applicationScopeEndDate).isEqualTo(LocalDate.of(2021, 10, 10))
         assertThat(domainNorm.documentCategory).isEqualTo("documentCategory")
         assertThat(domainNorm.documentStatusDate).isEqualTo(LocalDate.of(2021, 10, 10))
         assertThat(domainNorm.documentStatusDescription).isEqualTo("documentStatusDescription")
         assertThat(domainNorm.documentStatusWorkNote).isEqualTo("documentStatusWorkNote")
         assertThat(domainNorm.text).isEqualTo("text")
         assertThat(domainNorm.celexNumber).isEqualTo("celexNumber")
-        assertThat(domainNorm.otherFootnote).isEqualTo("otherFootnote")
         assertThat(domainNorm.otherStatusNote).isEqualTo("otherStatusNote")
         assertThat(domainNorm.risAbbreviation).isEqualTo("risAbbreviation")
         val sections = domainNorm.metadataSections

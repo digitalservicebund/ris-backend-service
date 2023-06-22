@@ -49,17 +49,6 @@ interface EditNormFrameUseCase {
         var documentTextProof: String? = null,
         var otherDocumentNote: String? = null,
 
-        var applicationScopeArea: String? = null,
-        var applicationScopeStartDate: LocalDate? = null,
-        var applicationScopeEndDate: LocalDate? = null,
-
-        var otherFootnote: String? = null,
-        var footnoteChange: String? = null,
-        var footnoteComment: String? = null,
-        var footnoteDecision: String? = null,
-        var footnoteStateLaw: String? = null,
-        var footnoteEuLaw: String? = null,
-
         var celexNumber: String? = null,
 
         var text: String? = null,

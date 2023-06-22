@@ -66,12 +66,6 @@ fun mapDomainToData(norm: Norm): NormData {
         reissueArticle = norm.reissueArticle,
         reissueDate = encodeLocalDate(norm.reissueDate),
         reissueReference = norm.reissueReference,
-        footnoteChange = norm.footnoteChange,
-        footnoteComment = norm.footnoteComment,
-        footnoteDecision = norm.footnoteDecision,
-        footnoteStateLaw = norm.footnoteStateLaw,
-        footnoteEuLaw = norm.footnoteEuLaw,
-        otherFootnote = norm.otherFootnote,
     )
 }
 
