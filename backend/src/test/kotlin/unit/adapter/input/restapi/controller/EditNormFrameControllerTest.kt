@@ -134,15 +134,6 @@ class EditNormFrameControllerTest {
         var reissueReference: String? = null
         var otherStatusNote: String? = null
 
-        var documentStatusWorkNote: String? = null
-        var documentStatusDescription: String? = null
-        var documentStatusDate: String? = null
-        var documentStatusReference: String? = null
-        var documentStatusEntryIntoForceDate: String? = null
-        var documentStatusProof: String? = null
-        var documentTextProof: String? = null
-        var otherDocumentNote: String? = null
-
         var applicationScopeArea: String? = null
         var applicationScopeStartDate: String? = null
         var applicationScopeEndDate: String? = null

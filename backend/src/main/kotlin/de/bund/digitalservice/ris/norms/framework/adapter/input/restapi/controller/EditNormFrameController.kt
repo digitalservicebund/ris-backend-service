@@ -72,15 +72,6 @@ class EditNormFrameController(private val editNormFrameService: EditNormFrameUse
         var reissueReference: String? = null
         var otherStatusNote: String? = null
 
-        var documentStatusWorkNote: String? = null
-        var documentStatusDescription: String? = null
-        var documentStatusDate: String? = null
-        var documentStatusReference: String? = null
-        var documentStatusEntryIntoForceDate: String? = null
-        var documentStatusProof: String? = null
-        var documentTextProof: String? = null
-        var otherDocumentNote: String? = null
-
         var eli: String? = null
 
         var celexNumber: String? = null
@@ -111,14 +102,6 @@ class EditNormFrameController(private val editNormFrameService: EditNormFrameUse
             decodeLocalDate(this.reissueDate),
             this.reissueReference,
             this.otherStatusNote,
-            this.documentStatusWorkNote,
-            this.documentStatusDescription,
-            decodeLocalDate(this.documentStatusDate),
-            this.documentStatusReference,
-            decodeLocalDate(this.documentStatusEntryIntoForceDate),
-            this.documentStatusProof,
-            this.documentTextProof,
-            this.otherDocumentNote,
             this.celexNumber,
             this.text,
         )

@@ -24,7 +24,6 @@ class NormTest {
         assertThat(norm.officialShortTitle).isNull()
         assertThat(norm.officialAbbreviation).isNull()
         assertThat(norm.risAbbreviation).isNull()
-        assertThat(norm.documentStatusDescription).isNull()
         assertThat(norm.text).isNull()
     }
 
@@ -88,7 +87,6 @@ class NormTest {
                 publicationDate = publicationDate,
                 announcementDate = announcementDate,
                 risAbbreviation = "ABC",
-                documentStatusDescription = "document status description",
                 text = "text",
                 metadataSections = listOf(citationDateSection, normProviderSection),
             )
@@ -101,7 +99,6 @@ class NormTest {
         assertThat(norm.metadataSections.flatMap { it.metadata }).contains(citationDate)
         assertThat(norm.metadataSections.flatMap { it.metadata }).contains(resolutionMajority)
         assertThat(norm.risAbbreviation).isEqualTo("ABC")
-        assertThat(norm.documentStatusDescription).isEqualTo("document status description")
         assertThat(norm.text).isEqualTo("text")
     }
 
