@@ -4,6 +4,7 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitPublishException;
 import de.bund.digitalservice.ris.caselaw.domain.HttpMailSender;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sendinblue.ApiClient;
@@ -31,8 +32,7 @@ public class SendInBlueHttpMailSender implements HttpMailSender {
       String receiverAddress,
       String subject,
       String content,
-      String fileName,
-      String fileContent,
+      List<Map.Entry<String, String>> attachments,
       String tag) {
 
     ApiClient defaultClient = Configuration.getDefaultApiClient();
@@ -48,11 +48,13 @@ public class SendInBlueHttpMailSender implements HttpMailSender {
     to.setEmail(receiverAddress);
     toList.add(to);
 
-    SendSmtpEmailAttachment attachment = new SendSmtpEmailAttachment();
-    attachment.setName(fileName);
-    attachment.setContent(fileContent.getBytes());
     List<SendSmtpEmailAttachment> attachmentList = new ArrayList<>();
-    attachmentList.add(attachment);
+    for (Map.Entry<String, String> a : attachments) {
+      SendSmtpEmailAttachment attachment = new SendSmtpEmailAttachment();
+      attachment.setName(a.getKey());
+      attachment.setContent(a.getValue().getBytes());
+      attachmentList.add(attachment);
+    }
 
     List<String> tags = new ArrayList<>();
     tags.add(tag);

@@ -17,6 +17,7 @@ import java.time.Clock;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.AbstractMap;
 import java.util.Collections;
 import java.util.Optional;
 import java.util.UUID;
@@ -122,8 +123,8 @@ public class XmlEMailPublishService implements EmailPublishService {
         xmlMail.receiverAddress(),
         xmlMail.mailSubject(),
         "neuris",
-        xmlMail.fileName(),
-        xmlMail.xml(),
+        Collections.singletonList(
+            new AbstractMap.SimpleImmutableEntry<>(xmlMail.fileName(), xmlMail.xml())),
         xmlMail.documentUnitUuid().toString());
   }
 

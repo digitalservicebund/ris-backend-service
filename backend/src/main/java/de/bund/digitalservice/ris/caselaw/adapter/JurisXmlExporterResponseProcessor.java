@@ -1,8 +1,11 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatusService;
+import de.bund.digitalservice.ris.caselaw.domain.ExporterHtmlReport;
+import de.bund.digitalservice.ris.caselaw.domain.ExporterHtmlReportRepository;
 import de.bund.digitalservice.ris.caselaw.domain.HttpMailSender;
 import de.bund.digitalservice.ris.domain.export.juris.response.ActionableMessageHandler;
+import de.bund.digitalservice.ris.domain.export.juris.response.MessageAttachment;
 import de.bund.digitalservice.ris.domain.export.juris.response.MessageHandler;
 import de.bund.digitalservice.ris.domain.export.juris.response.StatusImporterException;
 import jakarta.mail.Flags.Flag;
@@ -11,8 +14,11 @@ import jakarta.mail.Message;
 import jakarta.mail.MessagingException;
 import jakarta.mail.Store;
 import java.io.IOException;
+import java.time.Instant;
+import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Profile;
@@ -24,23 +30,25 @@ import reactor.core.publisher.Mono;
 @Profile("production")
 public class JurisXmlExporterResponseProcessor {
 
+  private static final Logger LOGGER =
+      LoggerFactory.getLogger(JurisXmlExporterResponseProcessor.class);
   private final List<MessageHandler> messageHandlers;
   private final HttpMailSender mailSender;
   private final DocumentUnitStatusService statusService;
   private final ImapStoreFactory storeFactory;
-
-  private static final Logger LOGGER =
-      LoggerFactory.getLogger(JurisXmlExporterResponseProcessor.class);
+  private final ExporterHtmlReportRepository reportRepository;
 
   public JurisXmlExporterResponseProcessor(
       List<MessageHandler> messageHandlers,
       HttpMailSender mailSender,
       DocumentUnitStatusService statusService,
-      ImapStoreFactory storeFactory) {
+      ImapStoreFactory storeFactory,
+      ExporterHtmlReportRepository reportRepository) {
     this.messageHandlers = messageHandlers;
     this.mailSender = mailSender;
     this.statusService = statusService;
     this.storeFactory = storeFactory;
+    this.reportRepository = reportRepository;
   }
 
   @Scheduled(fixedDelay = 60000, initialDelay = 60000)
@@ -68,11 +76,30 @@ public class JurisXmlExporterResponseProcessor {
             unprocessableMessages.add(message);
             continue;
           }
+          ActionableMessageHandler actionableHandler = (ActionableMessageHandler) handler;
 
-          forwardMessage(message, (ActionableMessageHandler) handler)
-              .doOnSuccess(result -> processedMessages.add(message))
-              .onErrorResume(e -> Mono.empty())
-              .block();
+          try {
+            String documentNumber = actionableHandler.getDocumentNumber(message);
+            String subject = message.getSubject();
+            List<Map.Entry<String, String>> attachments = new ArrayList<>();
+            for (MessageAttachment att : actionableHandler.getAttachments(message)) {
+              attachments.add(
+                  new AbstractMap.SimpleImmutableEntry<>(att.fileName(), att.fileContent()));
+            }
+
+            forwardMessage(documentNumber, subject, attachments)
+                .doOnSuccess(
+                    result -> {
+                      processedMessages.add(message);
+                      saveAttachments(documentNumber, attachments);
+                    })
+                .onErrorResume(e -> Mono.empty())
+                .log()
+                .block();
+
+          } catch (MessagingException | IOException e) {
+            throw new StatusImporterException("Error processing message: " + e);
+          }
           break;
         }
       }
@@ -87,31 +114,37 @@ public class JurisXmlExporterResponseProcessor {
     }
   }
 
-  private Mono<Void> forwardMessage(Message message, ActionableMessageHandler handler) {
-    try {
-      String documentNumber = handler.getDocumentNumber(message);
-      String subject = message.getSubject();
-      String fileName = handler.getFileName(message);
-      String fileContent = handler.getFileContent(message);
+  private Mono<Void> saveAttachments(
+      String documentNumber, List<Map.Entry<String, String>> attachments) {
+    List<ExporterHtmlReport> reports =
+        attachments.stream()
+            .map(
+                attachment ->
+                    ExporterHtmlReport.builder()
+                        .documentNumber(documentNumber)
+                        .receivedDate(Instant.now())
+                        .html(attachment.getValue())
+                        .build())
+            .toList();
 
-      return statusService
-          .getIssuerAddressOfLatestStatus(documentNumber)
-          .flatMap(
-              issuerAddress ->
-                  Mono.fromRunnable(
-                      () ->
-                          mailSender.sendMail(
-                              storeFactory.mailboxUsername,
-                              issuerAddress,
-                              "FWD: " + subject,
-                              "Anbei weitergeleitet von der jDV:",
-                              fileName,
-                              fileContent,
-                              "report-" + documentNumber)));
-    } catch (MessagingException | IOException e) {
-      LOGGER.error("Error forwarding message: " + e);
-      return Mono.error(e);
-    }
+    return reportRepository.saveAll(reports);
+  }
+
+  private Mono<Void> forwardMessage(
+      String documentNumber, String subject, List<Map.Entry<String, String>> attachments) {
+    return statusService
+        .getIssuerAddressOfLatestStatus(documentNumber)
+        .flatMap(
+            issuerAddress ->
+                Mono.fromRunnable(
+                    () ->
+                        mailSender.sendMail(
+                            storeFactory.mailboxUsername,
+                            issuerAddress,
+                            "FWD: " + subject,
+                            "Anbei weitergeleitet von der jDV:",
+                            attachments,
+                            "report-" + documentNumber)));
   }
 
   private void moveMessages(List<Message> messages, Folder from, Folder to) {

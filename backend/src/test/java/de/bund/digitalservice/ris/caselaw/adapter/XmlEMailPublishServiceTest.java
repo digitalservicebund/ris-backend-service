@@ -2,6 +2,7 @@ package de.bund.digitalservice.ris.caselaw.adapter;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
@@ -22,6 +23,8 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.AbstractMap;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import javax.xml.parsers.ParserConfigurationException;
@@ -111,8 +114,8 @@ class XmlEMailPublishServiceTest {
             RECEIVER_ADDRESS,
             SAVED_XML_MAIL.mailSubject(),
             "neuris",
-            SAVED_XML_MAIL.fileName(),
-            SAVED_XML_MAIL.xml(),
+            Collections.singletonList(
+                new AbstractMap.SimpleEntry<>(SAVED_XML_MAIL.fileName(), SAVED_XML_MAIL.xml())),
             SAVED_XML_MAIL.documentUnitUuid().toString());
   }
 
@@ -141,14 +144,7 @@ class XmlEMailPublishServiceTest {
 
     verify(repository, times(0)).save(any(XmlMail.class));
     verify(mailSender, times(0))
-        .sendMail(
-            anyString(),
-            anyString(),
-            anyString(),
-            anyString(),
-            anyString(),
-            anyString(),
-            anyString());
+        .sendMail(anyString(), anyString(), anyString(), anyString(), anyList(), anyString());
   }
 
   @Test
@@ -166,14 +162,7 @@ class XmlEMailPublishServiceTest {
 
     verify(repository, times(0)).save(any(XmlMail.class));
     verify(mailSender, times(0))
-        .sendMail(
-            anyString(),
-            anyString(),
-            anyString(),
-            anyString(),
-            anyString(),
-            anyString(),
-            anyString());
+        .sendMail(anyString(), anyString(), anyString(), anyString(), anyList(), anyString());
   }
 
   @Test
@@ -189,14 +178,7 @@ class XmlEMailPublishServiceTest {
 
     verify(repository, times(0)).save(any(XmlMail.class));
     verify(mailSender, times(0))
-        .sendMail(
-            anyString(),
-            anyString(),
-            anyString(),
-            anyString(),
-            anyString(),
-            anyString(),
-            anyString());
+        .sendMail(anyString(), anyString(), anyString(), anyString(), any(List.class), anyString());
   }
 
   @Test
@@ -209,14 +191,7 @@ class XmlEMailPublishServiceTest {
 
     verify(repository).save(any(XmlMail.class));
     verify(mailSender)
-        .sendMail(
-            anyString(),
-            anyString(),
-            anyString(),
-            anyString(),
-            anyString(),
-            anyString(),
-            anyString());
+        .sendMail(anyString(), anyString(), anyString(), anyString(), anyList(), anyString());
   }
 
   @Test
@@ -231,14 +206,7 @@ class XmlEMailPublishServiceTest {
 
     verify(repository, times(0)).save(any(XmlMail.class));
     verify(mailSender, times(0))
-        .sendMail(
-            anyString(),
-            anyString(),
-            anyString(),
-            anyString(),
-            anyString(),
-            anyString(),
-            anyString());
+        .sendMail(anyString(), anyString(), anyString(), anyString(), anyList(), anyString());
   }
 
   @Test
@@ -250,8 +218,7 @@ class XmlEMailPublishServiceTest {
             RECEIVER_ADDRESS,
             MAIL_SUBJECT,
             "neuris",
-            "test.xml",
-            "xml",
+            Collections.singletonList(new AbstractMap.SimpleEntry<>("test.xml", "xml")),
             TEST_UUID.toString());
 
     StepVerifier.create(service.publish(documentUnit, RECEIVER_ADDRESS))
@@ -265,8 +232,7 @@ class XmlEMailPublishServiceTest {
             RECEIVER_ADDRESS,
             MAIL_SUBJECT,
             "neuris",
-            "test.xml",
-            "xml",
+            Collections.singletonList(new AbstractMap.SimpleEntry<>("test.xml", "xml")),
             TEST_UUID.toString());
   }
 

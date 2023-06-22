@@ -1,6 +1,8 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
+import static org.junit.Assert.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -9,10 +11,13 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatusService;
+import de.bund.digitalservice.ris.caselaw.domain.ExporterHtmlReportRepository;
 import de.bund.digitalservice.ris.caselaw.domain.HttpMailSender;
 import de.bund.digitalservice.ris.domain.export.juris.response.ActionableMessageHandler;
 import de.bund.digitalservice.ris.domain.export.juris.response.ImportMessageHandler;
+import de.bund.digitalservice.ris.domain.export.juris.response.MessageAttachment;
 import jakarta.mail.BodyPart;
+import de.bund.digitalservice.ris.domain.export.juris.response.StatusImporterException;
 import jakarta.mail.Flags.Flag;
 import jakarta.mail.Folder;
 import jakarta.mail.Message;
@@ -24,6 +29,7 @@ import jakarta.mail.internet.MimeMultipart;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.AbstractMap;
 import java.util.Collections;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
@@ -41,6 +47,7 @@ public class JurisXmlExporterResponseProcessorTest {
   @MockBean private DocumentUnitStatusService statusService;
   @MockBean private HttpMailSender mailSender;
   @MockBean private ImapStoreFactory storeFactory;
+  @MockBean private ExporterHtmlReportRepository reportRepository;
 
   @Mock private Store store;
   @Mock private Folder inbox;
@@ -69,7 +76,11 @@ public class JurisXmlExporterResponseProcessorTest {
 
     responseProcessor =
         new JurisXmlExporterResponseProcessor(
-            Collections.singletonList(messageHandler), mailSender, statusService, storeFactory);
+            Collections.singletonList(messageHandler),
+            mailSender,
+            statusService,
+            storeFactory,
+            reportRepository);
   }
 
   @Test
@@ -82,7 +93,7 @@ public class JurisXmlExporterResponseProcessorTest {
     verify(storeFactory, times(1)).createStoreSession();
     verify(statusService, times(1)).getIssuerAddressOfLatestStatus(DOCUMENT_NUMBER);
     verify(mailSender, times(1))
-        .sendMail(any(), any(), any(), any(), any(), any(), eq("report-" + DOCUMENT_NUMBER));
+        .sendMail(any(), any(), any(), any(), any(), eq("report-" + DOCUMENT_NUMBER));
     verify(inbox, times(1)).copyMessages(new Message[] {message}, processed);
     verify(message, times(1)).setFlag(Flag.DELETED, true);
   }
@@ -91,7 +102,11 @@ public class JurisXmlExporterResponseProcessorTest {
   void testMessageEncoding() throws MessagingException, IOException {
     responseProcessor =
         new JurisXmlExporterResponseProcessor(
-            Collections.singletonList(importHandler), mailSender, statusService, storeFactory);
+            Collections.singletonList(importHandler),
+            mailSender,
+            statusService,
+            storeFactory,
+            reportRepository);
     when(statusService.getIssuerAddressOfLatestStatus(DOCUMENT_NUMBER))
         .thenReturn(Mono.just("test@digitalservice.bund.de"));
 
@@ -104,22 +119,35 @@ public class JurisXmlExporterResponseProcessorTest {
     BufferedReader reader =
         new BufferedReader(new InputStreamReader(attachmentPart.getInputStream()));
 
-    when(importHandler.getFileContent(message))
-        .thenReturn(reader.lines().collect(Collectors.joining("\n")));
+    when(importHandler.getAttachments(message))
+        .thenReturn(
+            Collections.singletonList(
+                new MessageAttachment(
+                    "test.txt", reader.lines().collect(Collectors.joining("\n")))));
     when(message.getContent()).thenReturn(multipart);
 
     responseProcessor.readEmails();
 
     verify(mailSender, times(1))
         .sendMail(
-            any(), any(), any(), any(), any(), eq("ÄÜÖäüöß"), eq("report-" + DOCUMENT_NUMBER));
+            any(),
+            any(),
+            any(),
+            any(),
+            argThat(
+                list -> list.get(0).equals(new AbstractMap.SimpleEntry<>("test.txt", "ÄÜÖäüöß"))),
+            eq("report-" + DOCUMENT_NUMBER));
   }
 
   @Test
   void testMessageGetsNotMovedIfNotForwarded() throws MessagingException {
     when(message.getSubject()).thenThrow(new MessagingException());
 
-    responseProcessor.readEmails();
+    assertThrows(
+        StatusImporterException.class,
+        () -> {
+          responseProcessor.readEmails();
+        });
 
     verifyNoInteractions(mailSender);
     verify(inbox, never()).getFolder("processed");
