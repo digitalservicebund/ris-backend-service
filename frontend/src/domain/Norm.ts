@@ -225,18 +225,10 @@ export type FlatMetadata = {
   completeCitation?: string
   documentCategory?: string
   documentNumber?: string
-  documentStatusDate?: string
-  documentStatusDescription?: string
-  documentStatusEntryIntoForceDate?: string
-  documentStatusProof?: string
-  documentStatusReference?: string
-  documentStatusWorkNote?: string
-  documentTextProof?: string
   eli?: string
   officialAbbreviation?: string
   officialLongTitle: string
   officialShortTitle?: string
-  otherDocumentNote?: string
   otherStatusNote?: string
   printAnnouncementGazette?: string
   printAnnouncementPage?: string

@@ -707,22 +707,10 @@ export function encodeFlatMetadata(
     completeCitation: encodeString(flatMetadata.completeCitation),
     documentCategory: encodeString(flatMetadata.documentCategory),
     documentNumber: encodeString(flatMetadata.documentNumber),
-    documentStatusDate: encodeNullDate(flatMetadata.documentStatusDate),
-    documentStatusDescription: encodeString(
-      flatMetadata.documentStatusDescription
-    ),
-    documentStatusEntryIntoForceDate: encodeNullDate(
-      flatMetadata.documentStatusEntryIntoForceDate
-    ),
-    documentStatusProof: encodeString(flatMetadata.documentStatusProof),
-    documentStatusReference: encodeString(flatMetadata.documentStatusReference),
-    documentStatusWorkNote: encodeString(flatMetadata.documentStatusWorkNote),
-    documentTextProof: encodeString(flatMetadata.documentTextProof),
     eli: encodeString(flatMetadata.eli),
     officialAbbreviation: encodeString(flatMetadata.officialAbbreviation),
     officialLongTitle: encodeString(flatMetadata.officialLongTitle) ?? "",
     officialShortTitle: encodeString(flatMetadata.officialShortTitle),
-    otherDocumentNote: encodeString(flatMetadata.otherDocumentNote),
     otherStatusNote: encodeString(flatMetadata.otherStatusNote),
     announcementDate: encodeNullDate(flatMetadata.announcementDate),
     publicationDate: encodeNullDate(flatMetadata.publicationDate),

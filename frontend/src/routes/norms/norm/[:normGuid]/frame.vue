@@ -81,23 +81,11 @@ watch(
       loadedNorm.value.completeCitation = data.completeCitation as string
       loadedNorm.value.documentCategory = data.documentCategory as string
       loadedNorm.value.documentNumber = data.documentNumber as string
-      loadedNorm.value.documentStatusDate = data.documentStatusDate as string
-      loadedNorm.value.documentStatusDescription =
-        data.documentStatusDescription as string
-      loadedNorm.value.documentStatusEntryIntoForceDate =
-        data.documentStatusEntryIntoForceDate as string
-      loadedNorm.value.documentStatusProof = data.documentStatusProof as string
-      loadedNorm.value.documentStatusReference =
-        data.documentStatusReference as string
-      loadedNorm.value.documentStatusWorkNote =
-        data.documentStatusWorkNote as string
-      loadedNorm.value.documentTextProof = data.documentTextProof as string
       loadedNorm.value.eli = data.eli as string
       loadedNorm.value.officialAbbreviation =
         data.officialAbbreviation as string
       loadedNorm.value.officialLongTitle = data.officialLongTitle as string
       loadedNorm.value.officialShortTitle = data.officialShortTitle as string
-      loadedNorm.value.otherDocumentNote = data.otherDocumentNote as string
       loadedNorm.value.otherStatusNote = data.otherStatusNote as string
       loadedNorm.value.announcementDate = data.announcementDate as string
       loadedNorm.value.publicationDate = data.publicationDate as string
