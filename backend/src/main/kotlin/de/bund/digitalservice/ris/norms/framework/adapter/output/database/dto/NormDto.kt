@@ -61,23 +61,6 @@ data class NormDto(
     @Column("other_status_note")
     var otherStatusNote: String? = null,
 
-    @Column("document_status_work_note")
-    var documentStatusWorkNote: String? = null,
-    @Column("document_status_description")
-    var documentStatusDescription: String? = null,
-    @Column("document_status_date")
-    var documentStatusDate: LocalDate? = null,
-    @Column("document_status_reference")
-    var documentStatusReference: String? = null,
-    @Column("document_status_entry_into_force_date")
-    var documentStatusEntryIntoForceDate: LocalDate? = null,
-    @Column("document_status_proof")
-    var documentStatusProof: String? = null,
-    @Column("document_text_proof")
-    var documentTextProof: String? = null,
-    @Column("other_document_note")
-    var otherDocumentNote: String? = null,
-
     @Column("celex_number")
     var celexNumber: String? = null,
 

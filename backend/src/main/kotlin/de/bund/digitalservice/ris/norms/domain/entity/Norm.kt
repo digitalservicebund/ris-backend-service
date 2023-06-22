@@ -39,15 +39,6 @@ data class Norm(
     var reissueReference: String? = null,
     var otherStatusNote: String? = null,
 
-    var documentStatusWorkNote: String? = null,
-    var documentStatusDescription: String? = null,
-    var documentStatusDate: LocalDate? = null,
-    var documentStatusReference: String? = null,
-    var documentStatusEntryIntoForceDate: LocalDate? = null,
-    var documentStatusProof: String? = null,
-    var documentTextProof: String? = null,
-    var otherDocumentNote: String? = null,
-
     var celexNumber: String? = null,
 
     var text: String? = null,

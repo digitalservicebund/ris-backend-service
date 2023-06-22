@@ -34,14 +34,6 @@ class NormBuilder {
     var reissueDate = LocalDate.now()
     var reissueReference = randomString()
     var otherStatusNote = randomString()
-    var documentStatusWorkNote = randomString()
-    var documentStatusDescription = randomString()
-    var documentStatusDate = LocalDate.now()
-    var documentStatusReference = randomString()
-    var documentStatusEntryIntoForceDate = LocalDate.now()
-    var documentStatusProof = randomString()
-    var documentTextProof = randomString()
-    var otherDocumentNote = randomString()
     var celexNumber = randomString()
     var text = randomString()
 
@@ -80,14 +72,6 @@ class NormBuilder {
         reissueDate = reissueDate,
         reissueReference = reissueReference,
         otherStatusNote = otherStatusNote,
-        documentStatusWorkNote = documentStatusWorkNote,
-        documentStatusDescription = documentStatusDescription,
-        documentStatusDate = documentStatusDate,
-        documentStatusReference = documentStatusReference,
-        documentStatusEntryIntoForceDate = documentStatusEntryIntoForceDate,
-        documentStatusProof = documentStatusProof,
-        documentTextProof = documentTextProof,
-        otherDocumentNote = otherDocumentNote,
         celexNumber = celexNumber,
         text = text,
     )
