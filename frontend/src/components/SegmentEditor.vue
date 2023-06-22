@@ -13,6 +13,7 @@ import {
 interface Props {
   modelValue?: Segment[]
   suggestions: SuggestionGroupOptions[]
+  label: string
 }
 interface Emits {
   (event: "update:modelValue", value: Segment[]): void
@@ -238,5 +239,5 @@ export type { SuggestionGroupOptions } from "@/shared/editor/suggestion"
 </script>
 
 <template>
-  <EditorContent :editor="editor" />
+  <EditorContent :data-testid="label" :editor="editor" />
 </template>

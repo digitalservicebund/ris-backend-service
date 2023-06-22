@@ -85,6 +85,10 @@ const options: SuggestionGroupOptions = {
       Kommentierende Fußnote)
     </span>
 
-    <SegmentEditor v-model="inputValue" :suggestions="[options]" />
+    <SegmentEditor
+      v-model="inputValue"
+      label="footnotes"
+      :suggestions="[options]"
+    />
   </div>
 </template>
