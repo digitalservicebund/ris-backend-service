@@ -79,10 +79,6 @@ watch(
 watch(modelValueList, () => emit("update:modelValue", modelValueList.value), {
   deep: true,
 })
-
-watch(editIndex, () => {
-  console.log(editIndex.value)
-})
 </script>
 
 <template>
@@ -133,12 +129,12 @@ watch(editIndex, () => {
         v-else
         v-model="modelValueList[index]"
         class="group-first:pt-0 py-16"
-        @keypress.enter="setEditIndex(undefined)"
+        @close-entry="setEditIndex(undefined)"
       />
     </div>
 
     <button
-      v-if="!disableMultiEntry"
+      v-if="!disableMultiEntry && editIndex === undefined"
       aria-label="Weitere Angabe"
       class="add-button bg-blue-300 flex focus:outline-4 font-bold gap-0.5 hover:bg-blue-800 hover:text-white items-center leading-18 mt-16 outline-0 outline-blue-800 outline-none outline-offset-4 px-8 py-2 text-14 text-blue-800 whitespace-nowrap"
       @click="addNewModelEntry"

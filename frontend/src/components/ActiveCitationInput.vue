@@ -14,16 +14,21 @@ import TextButton from "@/shared/components/input/TextButton.vue"
 import TextInput from "@/shared/components/input/TextInput.vue"
 import Pagination, { Page } from "@/shared/components/Pagination.vue"
 
+interface Emits {
+  (event: "update:modelValue", value: ActiveCitation): void
+  (event: "closeEntry"): void
+}
+
 const props = defineProps<{ modelValue?: ActiveCitation }>()
-const emit =
-  defineEmits<(e: "update:modelValue", value: ActiveCitation) => void>()
+const emit = defineEmits<Emits>()
+const activeCitationLocalValue = ref(props.modelValue)
 
 const activeCitation = computed({
   get() {
     return props.modelValue as ActiveCitation
   },
   set(value) {
-    emit("update:modelValue", value)
+    activeCitationLocalValue.value = value
   },
 })
 
@@ -42,12 +47,12 @@ const activeCitationPredicate = computed({
         predicateList: newValue.label,
       })
     } else delete activeCitationRef.predicateList
-    emit("update:modelValue", activeCitationRef)
   },
 })
 
 const addActiveCitationFromSearch = (decision: LinkedDocumentUnit) => {
   emit("update:modelValue", new ActiveCitation({ ...decision }))
+  emit("closeEntry")
 }
 
 const searchResultsCurrentPage = ref<Page<ActiveCitation>>()
@@ -74,6 +79,14 @@ async function search(page = 0) {
       }
     })
   }
+}
+
+async function addActiveCitation() {
+  emit(
+    "update:modelValue",
+    new ActiveCitation({ ...activeCitationLocalValue.value })
+  )
+  emit("closeEntry")
 }
 </script>
 
@@ -134,11 +147,17 @@ async function search(page = 0) {
     </div>
     <div>
       <TextButton
-        aria-label="Nach Entscheidungen suchen"
+        aria-label="Nach Entscheidung suchen"
         button-type="secondary"
         class="mr-28"
         label="Suchen"
         @click="search(0)"
+      />
+      <TextButton
+        aria-label="Aktivzitierung speichern"
+        class="mr-28"
+        label="Speichern"
+        @click="addActiveCitation"
       />
     </div>
     <div v-if="searchResultsCurrentPage" class="mb-10 mt-20">

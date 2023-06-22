@@ -109,7 +109,7 @@ describe("Active Citations", async () => {
       await screen.findByLabelText("Aktenzeichen Aktivzitierung"),
       "test fileNumber"
     )
-    await user.click(screen.getByLabelText("Nach Entscheidungen suchen"))
+    await user.click(screen.getByLabelText("Nach Entscheidung suchen"))
     expect(fetchSpy).toBeCalledTimes(1)
 
     expect(screen.getAllByText(/test fileNumber/).length).toBe(2)
