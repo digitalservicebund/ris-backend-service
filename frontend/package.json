@@ -86,7 +86,7 @@
     "@vitest/coverage-v8": "^0.32.2",
     "@vue/eslint-config-prettier": "^7.1.0",
     "@vue/eslint-config-typescript": "^11.0.2",
-    "@vue/test-utils": "^2.3.0",
+    "@vue/test-utils": "^2.4.0",
     "autoprefixer": "^10.4.13",
     "axe-playwright": "^1.2.3",
     "axios-mock-adapter": "^1.21.2",
