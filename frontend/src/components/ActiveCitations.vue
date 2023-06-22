@@ -1,7 +1,6 @@
 <script lang="ts" setup>
 import { h, computed } from "vue"
 import ActiveCitationInput from "@/components/ActiveCitationInput.vue"
-import ExpandableDataSet from "@/components/ExpandableDataSet.vue"
 import ActiveCitation from "@/domain/activeCitation"
 import { withSummarizer } from "@/shared/components/DataSetSummary.vue"
 import EditableList from "@/shared/components/EditableListCaselaw.vue"
@@ -33,18 +32,17 @@ const CitationsSummary = withSummarizer(decisionSummarizer)
 </script>
 
 <template>
-  <ExpandableDataSet
-    id="activeCitations"
-    as-column
-    :data-set="activeCitations"
-    :summary-component="CitationsSummary"
-    title="Aktivzitierung"
-  >
-    <EditableList
-      v-model="activeCitations"
-      :default-value="defaultValue"
-      :edit-component="ActiveCitationInput"
-      :summary-component="CitationsSummary"
-    />
-  </ExpandableDataSet>
+  <div class="bg-white p-16">
+    <h2 class="label-02-bold mb-[1rem]">Schlagwörter</h2>
+    <div class="flex flex-row">
+      <div class="flex-1">
+        <EditableList
+          v-model="activeCitations"
+          :default-value="defaultValue"
+          :edit-component="ActiveCitationInput"
+          :summary-component="CitationsSummary"
+        />
+      </div>
+    </div>
+  </div>
 </template>
