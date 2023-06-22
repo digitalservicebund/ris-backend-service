@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import type { Component } from "vue"
-import { computed, nextTick, onMounted, ref, watch } from "vue"
+import { onMounted, ref, watch } from "vue"
 import DataSetSummary from "@/shared/components/DataSetSummary.vue"
 
 interface Props {
@@ -34,10 +34,6 @@ const modelValueList = ref<undefined[]>([])
 const elementList = ref<HTMLElement[]>([])
 const editIndex = ref<number | undefined>(undefined)
 
-const currentEditElement = computed(() =>
-  editIndex.value !== undefined ? elementList.value[editIndex.value] : undefined
-)
-
 function setEditIndex(index: number | undefined) {
   editIndex.value = index
 }
@@ -55,17 +51,6 @@ function removeModelEntry(index: number) {
 
   if (editIndex.value !== undefined && index < editIndex.value) {
     editIndex.value -= 1
-  }
-}
-
-async function focusFirstFocusableElementOfCurrentEditElement() {
-  await nextTick()
-
-  if (currentEditElement.value) {
-    const firstFocusableElement = currentEditElement.value.querySelectorAll(
-      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
-    )[0] as HTMLElement
-    firstFocusableElement && firstFocusableElement.focus()
   }
 }
 
@@ -95,7 +80,9 @@ watch(modelValueList, () => emit("update:modelValue", modelValueList.value), {
   deep: true,
 })
 
-watch(editIndex, focusFirstFocusableElementOfCurrentEditElement)
+watch(editIndex, () => {
+  console.log(editIndex.value)
+})
 </script>
 
 <template>
