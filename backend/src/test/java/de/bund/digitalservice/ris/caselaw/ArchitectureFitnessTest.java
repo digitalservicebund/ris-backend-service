@@ -14,7 +14,6 @@ import com.tngtech.archunit.lang.SimpleConditionEvent;
 import com.tngtech.archunit.lang.syntax.ArchRuleDefinition;
 import com.tngtech.archunit.library.dependencies.SliceRule;
 import com.tngtech.archunit.library.dependencies.SlicesRuleDefinition;
-import java.util.Set;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -160,46 +159,17 @@ class ArchitectureFitnessTest {
   }
 
   @Test
-  void relevantControllerEndpointsAreSecuredWithPreAuthorize() {
-    // add your methods here if you are sure they don't need @PreAuthorize
-
-    Set<String> ignoreMethods =
-        Set.of(
-            "DocumentUnitController.generateNewDocumentUnit",
-            "DocumentUnitController.getAll",
-            "DocumentUnitController.searchByLinkedDocumentationUnit",
-            "AuthController.getUser",
-            "FeatureToggleController.getFeatureToggleNames",
-            "FeatureToggleController.isEnabled",
-            "FieldOfLawController.getChildrenOfFieldOfLaw",
-            "FieldOfLawController.getFieldsOfLawByIdentifierSearch",
-            "FieldOfLawController.getFieldsOfLawBySearchQuery",
-            "FieldOfLawController.getTreeForFieldOfLaw",
-            "LookupTableController.getCaselawDocumentTypes",
-            "LookupTableController.getCitationStyles",
-            "LookupTableController.getCourts",
-            "LookupTableImporterController.importCitationStyleLookupTable",
-            "LookupTableImporterController.importCourtLookupTable",
-            "LookupTableImporterController.importDocumentTypeLookupTable",
-            "LookupTableImporterController.importFieldOfLawLookupTable",
-            "LookupTableImporterController.importStateLookupTable",
-            "MailTrackingController.setPublishState",
-            "NormAbbreviationController.getAllNormAbbreviationsByAwesomeSearchQuery",
-            "NormAbbreviationController.getAllNormAbbreviationsBySearchQuery",
-            "NormAbbreviationController.getNormAbbreviationController");
-
+  void allRestControllerEndpointsUsePreAuthorize() {
     ArchRule rule =
         ArchRuleDefinition.classes()
             .that()
             .areAnnotatedWith(RestController.class)
             .should(
-                new ArchCondition<>("have relevant public methods annotated with @PreAuthorize") {
+                new ArchCondition<>("have all public methods annotated with @PreAuthorize") {
                   @Override
                   public void check(JavaClass javaClass, ConditionEvents conditionEvents) {
                     for (JavaMethod method : javaClass.getMethods()) {
-                      String methodIdentifier = javaClass.getSimpleName() + "." + method.getName();
-                      if (!ignoreMethods.contains(methodIdentifier)
-                          && method.getModifiers().contains(JavaModifier.PUBLIC)
+                      if (method.getModifiers().contains(JavaModifier.PUBLIC)
                           && !method.isAnnotatedWith(PreAuthorize.class)) {
                         conditionEvents.add(
                             new SimpleConditionEvent(
@@ -207,7 +177,7 @@ class ArchitectureFitnessTest {
                                 false,
                                 String.format(
                                     "Method %s is not annotated with @PreAuthorize",
-                                    methodIdentifier)));
+                                    javaClass.getSimpleName() + "." + method.getName())));
                       }
                     }
                   }

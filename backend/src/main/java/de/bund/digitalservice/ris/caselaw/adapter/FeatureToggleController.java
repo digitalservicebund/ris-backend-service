@@ -1,7 +1,7 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
 import de.bund.digitalservice.ris.caselaw.domain.FeatureToggleService;
-import java.util.List;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -16,11 +16,8 @@ public class FeatureToggleController {
     this.service = service;
   }
 
-  public List<String> getFeatureToggleNames() {
-    return service.getFeatureToggleNames();
-  }
-
   @GetMapping("/{toggleName}")
+  @PreAuthorize("isAuthenticated()")
   public Boolean isEnabled(@PathVariable String toggleName) {
     return service.isEnabled(toggleName);
   }

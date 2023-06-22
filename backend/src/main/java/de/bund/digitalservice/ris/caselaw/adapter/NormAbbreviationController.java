@@ -2,6 +2,7 @@ package de.bund.digitalservice.ris.caselaw.adapter;
 
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.NormAbbreviation;
 import java.util.UUID;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,6 +21,7 @@ public class NormAbbreviationController {
   }
 
   @GetMapping
+  @PreAuthorize("isAuthenticated()")
   public Flux<NormAbbreviation> getAllNormAbbreviationsBySearchQuery(
       @RequestParam(value = "q", required = false, defaultValue = "") String query,
       @RequestParam(value = "sz", required = false) Integer size,
@@ -29,11 +31,13 @@ public class NormAbbreviationController {
   }
 
   @GetMapping("/{uuid}")
+  @PreAuthorize("isAuthenticated()")
   public Mono<NormAbbreviation> getNormAbbreviationController(@PathVariable("uuid") UUID uuid) {
     return service.getNormAbbreviationById(uuid);
   }
 
   @GetMapping("/search")
+  @PreAuthorize("isAuthenticated()")
   public Flux<NormAbbreviation> getAllNormAbbreviationsByAwesomeSearchQuery(
       @RequestParam(value = "q", required = false, defaultValue = "") String query,
       @RequestParam(value = "sz", required = false) Integer size,

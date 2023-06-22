@@ -4,6 +4,7 @@ import java.nio.ByteBuffer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,6 +26,7 @@ public class LookupTableImporterController {
   // Can we use @RequestBody @Valid DocumentTypesXML directly instead of ByteBuffer?
 
   @PutMapping(value = "doktyp")
+  @PreAuthorize("isAuthenticated()")
   public Mono<ResponseEntity<String>> importDocumentTypeLookupTable(
       @RequestBody ByteBuffer byteBuffer) {
     return service
@@ -36,6 +38,7 @@ public class LookupTableImporterController {
   }
 
   @PutMapping(value = "gerichtdata")
+  @PreAuthorize("isAuthenticated()")
   public Mono<ResponseEntity<String>> importCourtLookupTable(@RequestBody ByteBuffer byteBuffer) {
     return service
         .importCourtLookupTable(byteBuffer)
@@ -45,6 +48,7 @@ public class LookupTableImporterController {
   }
 
   @PutMapping(value = "buland")
+  @PreAuthorize("isAuthenticated()")
   public Mono<ResponseEntity<String>> importStateLookupTable(@RequestBody ByteBuffer byteBuffer) {
     return service
         .importStateLookupTable(byteBuffer)
@@ -54,6 +58,7 @@ public class LookupTableImporterController {
   }
 
   @PutMapping(value = "fieldOfLaw")
+  @PreAuthorize("isAuthenticated()")
   public Mono<ResponseEntity<String>> importFieldOfLawLookupTable(
       @RequestBody ByteBuffer byteBuffer) {
     return service
@@ -65,6 +70,7 @@ public class LookupTableImporterController {
   }
 
   @PutMapping(value = "zitart")
+  @PreAuthorize("isAuthenticated()")
   public Mono<ResponseEntity<String>> importCitationStyleLookupTable(
       @RequestBody ByteBuffer byteBuffer) {
     return service

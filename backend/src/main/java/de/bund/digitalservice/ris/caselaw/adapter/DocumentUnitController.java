@@ -50,6 +50,7 @@ public class DocumentUnitController {
   }
 
   @GetMapping(value = "new")
+  @PreAuthorize("isAuthenticated()")
   public Mono<ResponseEntity<DocumentUnit>> generateNewDocumentUnit(
       @AuthenticationPrincipal OidcUser oidcUser) {
 
@@ -84,6 +85,8 @@ public class DocumentUnitController {
   }
 
   @GetMapping(value = "")
+  @PreAuthorize("isAuthenticated()")
+  // Access rights are being enforced through SQL filtering
   public Mono<Page<DocumentUnitListEntry>> getAll(
       @RequestParam("pg") int page,
       @RequestParam("sz") int size,
@@ -156,6 +159,7 @@ public class DocumentUnitController {
   }
 
   @PutMapping(value = "/search")
+  @PreAuthorize("isAuthenticated()")
   public Mono<Page<LinkedDocumentationUnit>> searchByLinkedDocumentationUnit(
       @RequestParam("pg") int page,
       @RequestParam("sz") int size,
