@@ -100,7 +100,7 @@ dependencies {
   implementation "io.r2dbc:r2dbc-pool:1.0.0.RELEASE"
 
   implementation "org.springframework.boot:spring-boot-starter-data-jpa"
-  implementation "org.postgresql:postgresql:42.5.4"
+  implementation "org.postgresql:postgresql:42.6.0"
 
   implementation "com.sendinblue:sib-api-v3-sdk:7.0.0"
   // CVE-2017-1000487
