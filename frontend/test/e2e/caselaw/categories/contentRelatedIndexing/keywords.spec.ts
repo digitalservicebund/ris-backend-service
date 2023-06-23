@@ -64,7 +64,7 @@ test.describe("keywords", () => {
     await expect(page.getByText(secondKeyword)).toBeVisible()
 
     await page
-      .locator("[aria-label='chip']", { hasText: firstKeyword })
+      .locator("[data-testid='chip']", { hasText: firstKeyword })
       .getByLabel("Löschen")
       .click()
 
@@ -111,7 +111,7 @@ test.describe("keywords", () => {
     await expect(page.getByText(secondKeyword)).toBeVisible()
 
     await page
-      .locator("[aria-label='chip']", { hasText: firstKeyword })
+      .locator("[data-testid='chip']", { hasText: firstKeyword })
       .getByLabel("Löschen")
       .click()
 

@@ -30,7 +30,7 @@ test.describe("core data", () => {
 
     await waitForSaving(
       async () => {
-        await page.locator("[aria-label='ECLI']").fill("one")
+        await page.locator("[aria-label='ECLI']").type("one")
         await expect(page.locator("text=one").first()).toBeVisible()
 
         await expect(page.locator("text=Abweichender ECLI>")).toBeHidden()
@@ -41,9 +41,9 @@ test.describe("core data", () => {
           page.locator("text=Abweichender ECLI").first()
         ).toBeVisible()
 
-        await page.locator("[aria-label='Abweichender ECLI']").fill("two")
+        await page.locator("[aria-label='Abweichender ECLI']").type("two")
         await page.keyboard.press("Enter")
-        await page.locator("[aria-label='Abweichender ECLI']").fill("three")
+        await page.locator("[aria-label='Abweichender ECLI']").type("three")
         await page.keyboard.press("Enter")
       },
       page,
@@ -68,10 +68,10 @@ test.describe("core data", () => {
 
     await waitForSaving(
       async () => {
-        await page.locator("[aria-label='Aktenzeichen']").fill("one")
+        await page.locator("[aria-label='Aktenzeichen']").type("one")
         await page.keyboard.press("Enter")
 
-        await page.locator("[aria-label='Aktenzeichen']").fill("two")
+        await page.locator("[aria-label='Aktenzeichen']").type("two")
         await page.keyboard.press("Enter")
 
         await expect(page.locator("text=one").first()).toBeVisible()
@@ -91,7 +91,7 @@ test.describe("core data", () => {
 
         await page
           .locator("[aria-label='Abweichendes Aktenzeichen']")
-          .fill("three")
+          .type("three")
         await page.keyboard.press("Enter")
       },
       page,
@@ -120,13 +120,13 @@ test.describe("core data", () => {
 
     await waitForSaving(
       async () => {
-        await page.locator("[aria-label='Aktenzeichen']").fill("testone")
+        await page.locator("[aria-label='Aktenzeichen']").type("testone")
         await page.keyboard.press("Enter")
 
-        await page.locator("[aria-label='Aktenzeichen']").fill("testtwo")
+        await page.locator("[aria-label='Aktenzeichen']").type("testtwo")
         await page.keyboard.press("Enter")
 
-        await page.locator("[aria-label='Aktenzeichen']").fill("testthree")
+        await page.locator("[aria-label='Aktenzeichen']").type("testthree")
         await page.keyboard.press("Enter")
 
         await expect(page.locator("text=testone").first()).toBeVisible()

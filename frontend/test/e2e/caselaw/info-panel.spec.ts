@@ -27,7 +27,9 @@ test.describe("info panel", () => {
     await expect(infoPanel.getByText("Aktenzeichen-firstChip")).toBeVisible()
 
     // delete first chip
-    await page.locator("div", { hasText: "-firstChip" }).nth(-2).click()
+    await page
+      .locator("[data-testid='chip']", { hasText: "-firstChip" })
+      .click()
     await page.keyboard.press("Enter")
     await expect(infoPanel.getByText("Aktenzeichen-secondChip")).toBeVisible()
   })

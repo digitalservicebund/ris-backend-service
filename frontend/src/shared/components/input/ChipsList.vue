@@ -82,6 +82,7 @@ const focusNext = () => {
 const setFocusedItemIndex = (index: number) => {
   focusedItemIndex.value = index
 }
+
 watch(props, () => {
   if (props.modelValue) chips.value = props.modelValue
   errorMessage.value = props.error
@@ -101,77 +102,39 @@ defineExpose({ focusPrevious, focusNext, resetFocus, focusFirst })
 
 <template>
   <div>
-    <div
+    <ul
       ref="containerRef"
-      class="flex flex-row flex-wrap items-center"
-      tabindex="-1"
+      class="flex flex-row flex-wrap gap-8 items-center mr-8 my-4"
     >
-      <div
+      <li
         v-for="(chip, i) in chips"
         :key="i"
-        aria-label="chip"
-        class="bg-blue-500 body-01-reg chip"
+        class="bg-blue-500 body-01-reg break-words flex group items-center outline-none pr-32 relative rounded-10"
+        data-testid="chip"
         tabindex="0"
-        @click="setFocusedItemIndex(i)"
+        @click.stop="setFocusedItemIndex(i)"
         @focus="setFocusedItemIndex(i)"
         @input="emitInputEvent"
         @keypress.enter.stop="enterDelete"
         @keyup.left="focusPrevious"
         @keyup.right="focusNext"
       >
-        <div class="label-wrapper whitespace-pre-wrap">{{ chip }}</div>
+        <div class="flex leading-24 px-6 py-4 whitespace-pre-wrap">
+          {{ chip }}
+        </div>
 
-        <div class="icon-wrapper">
+        <div
+          class="absolute flex group-focus:bg-blue-900 group-focus:text-white h-full iems-center inset-y-0 items-center p-4 right-0 rounded-r-10"
+        >
           <em
             aria-Label="Löschen"
-            class="material-icons"
+            class="cursor-pointer material-icons text-center"
             @click="deleteChip(i)"
             @keydown.enter="deleteChip(i)"
             >clear</em
           >
         </div>
-      </div>
-    </div>
+      </li>
+    </ul>
   </div>
 </template>
-
-<style lang="scss" scoped>
-.chip {
-  display: flex;
-  align-items: center;
-  border-radius: 10px;
-  margin: 4px 8px 4px 0;
-  word-break: break-word;
-
-  .icon-wrapper {
-    display: flex;
-    height: 100%;
-    align-items: center;
-    padding: 4px 3px;
-    border-radius: 0 10px 10px 0;
-
-    em {
-      cursor: pointer;
-      text-align: center;
-    }
-  }
-
-  .label-wrapper {
-    display: flex;
-    padding: 3px 0 3px 8px;
-    margin-right: 8px;
-  }
-
-  &:focus {
-    outline: none;
-
-    .icon-wrapper {
-      @apply bg-blue-900;
-
-      em {
-        color: white;
-      }
-    }
-  }
-}
-</style>

@@ -36,10 +36,10 @@ test.describe("a11y of categories page (/caselaw/documentunit/{documentNumber}/c
   test("aktenzeichen", async ({ page, documentNumber }) => {
     await navigateToCategories(page, documentNumber)
 
-    await page.locator("[aria-label='Aktenzeichen']").fill("testone")
+    await page.locator("[aria-label='Aktenzeichen']").type("testone")
     await page.keyboard.press("Enter")
 
-    await page.locator("[aria-label='Aktenzeichen']").fill("testtwo")
+    await page.locator("[aria-label='Aktenzeichen']").type("testtwo")
     await page.keyboard.press("Enter")
 
     await page
@@ -48,7 +48,7 @@ test.describe("a11y of categories page (/caselaw/documentunit/{documentNumber}/c
 
     await page
       .locator("[aria-label='Abweichendes Aktenzeichen']")
-      .fill("testthree")
+      .type("testthree")
 
     await page.keyboard.press("Enter")
 
@@ -98,13 +98,13 @@ test.describe("a11y of categories page (/caselaw/documentunit/{documentNumber}/c
   test("ecli", async ({ page, documentNumber }) => {
     await navigateToCategories(page, documentNumber)
 
-    await page.locator("[aria-label='ECLI']").fill("one")
+    await page.locator("[aria-label='ECLI']").type("one")
 
     await page.locator("[aria-label='Abweichender ECLI anzeigen']").click()
 
-    await page.locator("[aria-label='Abweichender ECLI']").fill("two")
+    await page.locator("[aria-label='Abweichender ECLI']").type("two")
     await page.keyboard.press("Enter")
-    await page.locator("[aria-label='Abweichender ECLI']").fill("three")
+    await page.locator("[aria-label='Abweichender ECLI']").type("three")
     await page.keyboard.press("Enter")
 
     const accessibilityScanResults = await new AxeBuilder({ page })

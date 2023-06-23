@@ -27,7 +27,7 @@ describe("Core Data", () => {
 
     const { screen } = renderComponent({ modelValue: documentUnit.coreData })
 
-    const chipList = screen.getAllByLabelText("chip")
+    const chipList = screen.getAllByRole("listitem")
     expect(chipList.length).toBe(2)
     expect(chipList[0]).toHaveTextContent("one")
     expect(chipList[1]).toHaveTextContent("two")

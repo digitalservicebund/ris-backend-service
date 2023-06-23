@@ -62,7 +62,7 @@ describe("DocumentTypeInputGroup", () => {
       templateNameInput,
     } = getControls()
 
-    const chips = screen.getAllByLabelText("chip")
+    const chips = screen.getAllByRole("listitem")
     const expectedValues = ["test value 1", "test value 2", "test value 3"]
     chips.forEach((chip, index) => {
       expect(chip).toHaveTextContent(expectedValues[index])
@@ -99,7 +99,7 @@ describe("DocumentTypeInputGroup", () => {
     await user.type(templateNameInput, "baz")
     await user.type(templateNameInput, "{enter}")
 
-    const chipList = screen.getAllByLabelText("chip")
+    const chipList = screen.getAllByRole("listitem")
     expect(chipList.length).toBe(3)
 
     await user.click(amendmentNormCheckBox)
@@ -159,7 +159,7 @@ describe("DocumentTypeInputGroup", () => {
       NormCategory.TRANSITIONAL_NORM
     )
 
-    const chipList = screen.getAllByLabelText("chip")
+    const chipList = screen.getAllByRole("listitem")
     expect(chipList.length).toBe(3)
     await user.click(chipList[0])
     await user.type(chipList[0], "{enter}")

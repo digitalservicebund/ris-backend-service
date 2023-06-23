@@ -75,7 +75,7 @@ describe("chips input as inline list", () => {
     await user.type(input, "one")
     await user.type(input, "{enter}")
 
-    const chipList = screen.getAllByLabelText("chip")
+    const chipList = screen.getAllByRole("listitem")
     expect(chipList.length).toBe(1)
 
     expect(input).toHaveValue("")
@@ -89,7 +89,7 @@ describe("chips input as inline list", () => {
     await user.type(input, " one ")
     await user.type(input, "{enter}")
 
-    const chipList = screen.getAllByLabelText("chip")
+    const chipList = screen.getAllByRole("listitem")
 
     expect(chipList.length).toBe(1)
     expect(chipList[0]).toHaveTextContent("one")
@@ -106,9 +106,9 @@ describe("chips input as inline list", () => {
     await user.type(input, "{enter}")
     await user.type(input, "two")
     await user.type(input, "{enter}")
-    screen.getAllByLabelText("chip")
+    screen.getAllByRole("listitem")
 
-    const chipList = screen.getAllByLabelText("chip")
+    const chipList = screen.getAllByRole("listitem")
     expect(chipList.length).toBe(2)
     expect(chipList[0]).toHaveTextContent("one")
     expect(chipList[1]).toHaveTextContent("two")
@@ -126,7 +126,7 @@ describe("chips input as inline list", () => {
     await user.type(input, "two")
     await user.type(input, "{enter}")
 
-    const chipList = screen.getAllByLabelText("chip")
+    const chipList = screen.getAllByRole("listitem")
     expect(chipList.length).toBe(2)
     expect(chipList[0]).toHaveTextContent("one")
     expect(chipList[1]).toHaveTextContent("two")
@@ -134,7 +134,7 @@ describe("chips input as inline list", () => {
     const deleteButton = screen.getAllByLabelText("Löschen")[0] as HTMLElement
     await user.click(deleteButton)
 
-    expect(screen.getAllByLabelText("chip").length).toBe(1)
+    expect(screen.getAllByRole("listitem").length).toBe(1)
     expect(chipList[0]).toHaveTextContent("two")
     expect(input).toHaveValue("")
   })
@@ -150,7 +150,7 @@ describe("chips input as inline list", () => {
     await user.type(input, "{enter}")
     await user.type(input, "three")
 
-    const chipList = screen.getAllByLabelText("chip")
+    const chipList = screen.getAllByRole("listitem")
     expect(chipList.length).toBe(2)
     expect(chipList[0]).toHaveTextContent("one")
     expect(chipList[1]).toHaveTextContent("two")
@@ -171,11 +171,12 @@ describe("chips input as inline list", () => {
     await user.type(input, "two")
     await user.type(input, "{enter}")
 
-    const chipList = screen.getAllByLabelText("chip")
+    const chipList = screen.getAllByRole("listitem")
     expect(chipList.length).toBe(2)
-    await user.type(input, "{arrowleft}")
+    await user.click(input)
+    await user.keyboard("{arrowleft}")
     expect(chipList[1]).toHaveFocus()
-    await user.type(input, "{arrowleft}")
+    await user.keyboard("{arrowleft}")
     expect(chipList[0]).toHaveFocus()
   })
 
@@ -189,7 +190,7 @@ describe("chips input as inline list", () => {
     await user.type(input, "two")
     await user.type(input, "{enter}")
 
-    const chipList = screen.getAllByLabelText("chip")
+    const chipList = screen.getAllByRole("listitem")
     expect(chipList.length).toBe(2)
     await user.keyboard("{Shift>}{Tab}{/Shift}")
     expect(chipList[1]).toHaveFocus()
@@ -203,7 +204,7 @@ describe("chips input as inline list", () => {
     await user.type(input, "one")
     await user.type(input, "{enter}")
 
-    const chipList = screen.getAllByLabelText("chip")
+    const chipList = screen.getAllByRole("listitem")
     await user.type(input, "{arrowLeft}")
     expect(chipList[0]).toHaveFocus()
 
@@ -221,17 +222,18 @@ describe("chips input as inline list", () => {
     await user.type(input, "two")
     await user.type(input, "{enter}")
 
-    const chipList = screen.getAllByLabelText("chip")
+    const chipList = screen.getAllByRole("listitem")
     expect(chipList.length).toBe(2)
     expect(chipList[0]).toHaveTextContent("one")
     expect(chipList[1]).toHaveTextContent("two")
 
-    await user.type(input, "{arrowleft}")
-    await user.type(input, "{arrowleft}")
+    await user.click(input)
+    await user.keyboard("{arrowleft}")
+    await user.keyboard("{arrowleft}")
     expect(chipList[0]).toHaveFocus()
 
     await user.type(chipList[0], "{enter}")
-    expect(screen.getAllByLabelText("chip").length).toBe(1)
+    expect(screen.getAllByRole("listitem").length).toBe(1)
     expect(chipList[0]).toHaveTextContent("two")
   })
 
@@ -245,19 +247,19 @@ describe("chips input as inline list", () => {
     await user.type(input, "two")
     await user.type(input, "{enter}")
 
-    const chipList = screen.getAllByLabelText("chip")
+    const chipList = screen.getAllByRole("listitem")
     expect(chipList.length).toBe(2)
 
     await user.type(chipList[0], "{enter}")
-    expect(screen.getAllByLabelText("chip").length).toBe(1)
+    expect(screen.getAllByRole("listitem").length).toBe(1)
 
     await user.type(input, "two")
     await user.type(input, "{enter}")
 
-    expect(screen.getAllByLabelText("chip").length).toBe(2)
+    expect(screen.getAllByRole("listitem").length).toBe(2)
 
     await user.type(chipList[0], "{enter}")
-    expect(screen.getAllByLabelText("chip").length).toBe(1)
+    expect(screen.getAllByRole("listitem").length).toBe(1)
   })
 
   it("focus via arrow keys behaves as expected", async () => {
@@ -272,7 +274,7 @@ describe("chips input as inline list", () => {
     await user.type(input, "x") // just text, not a confirmed chip
     expect(input).toHaveValue("x")
 
-    const chipList = screen.getAllByLabelText("chip")
+    const chipList = screen.getAllByRole("listitem")
     expect(chipList.length).toBe(2)
 
     // now happens: 2x arrowleft, click on chip "two", 2x arrowleft, 3x arrowright
@@ -313,7 +315,7 @@ describe("chips input as inline list", () => {
     await user.type(input, "two")
     await user.type(input, "{enter}")
 
-    const chipList = screen.getAllByLabelText("chip")
+    const chipList = screen.getAllByRole("listitem")
     expect(chipList.length).toBe(2)
 
     const chipOne = chipList[0] as HTMLElement
@@ -341,9 +343,9 @@ describe("chips input as inline list", () => {
     await user.type(input, "three")
     await user.type(input, "{enter}")
 
-    screen.getAllByLabelText("chip")
+    screen.getAllByRole("listitem")
 
-    const chipList = screen.getAllByLabelText("chip")
+    const chipList = screen.getAllByRole("listitem")
     expect(chipList.length).toBe(3)
 
     // now happens: click on chip "two", arrowright, click on chip "two", arrowleft
@@ -397,7 +399,7 @@ describe("chips input as bottom list", () => {
     await user.type(input, "one")
     await user.type(input, "{enter}")
 
-    const chipList = screen.getAllByLabelText("chip")
+    const chipList = screen.getAllByRole("listitem")
     expect(chipList.length).toBe(1)
 
     expect(input).toHaveValue("")
@@ -413,19 +415,19 @@ describe("chips input as bottom list", () => {
     await user.type(input, "two")
     await user.type(input, "{enter}")
 
-    const chipList = screen.getAllByLabelText("chip")
+    const chipList = screen.getAllByRole("listitem")
     expect(chipList.length).toBe(2)
 
     await user.type(chipList[1], "{enter}")
-    expect(screen.getAllByLabelText("chip").length).toBe(1)
+    expect(screen.getAllByRole("listitem").length).toBe(1)
 
     await user.type(input, "two")
     await user.type(input, "{enter}")
 
-    expect(screen.getAllByLabelText("chip").length).toBe(2)
+    expect(screen.getAllByRole("listitem").length).toBe(2)
 
     await user.type(chipList[0], "{enter}")
-    expect(screen.getAllByLabelText("chip").length).toBe(1)
+    expect(screen.getAllByRole("listitem").length).toBe(1)
 
     await user.type(chipList[0], "{enter}")
     expect(screen.queryByLabelText("chip")).not.toBeInTheDocument()
@@ -441,7 +443,7 @@ describe("chips input as bottom list", () => {
     await user.type(input, "one")
     await user.type(input, "{enter}")
 
-    const chipList = screen.getAllByLabelText("chip")
+    const chipList = screen.getAllByRole("listitem")
     expect(chipList.length).toBe(1)
 
     expect(screen.getByText("Schlagwort bereits vergeben.")).toBeInTheDocument()
@@ -455,7 +457,7 @@ describe("chips input as bottom list", () => {
     await user.type(input, "one")
     await user.type(input, "{enter}")
 
-    const chipList = screen.getAllByLabelText("chip")
+    const chipList = screen.getAllByRole("listitem")
     await user.type(input, "{arrowRight}")
     expect(chipList[0]).toHaveFocus()
   })
@@ -468,7 +470,7 @@ describe("chips input as bottom list", () => {
     await user.type(input, "one")
     await user.type(input, "{enter}")
 
-    const chipList = screen.getAllByLabelText("chip")
+    const chipList = screen.getAllByRole("listitem")
     await user.type(input, "{Tab}")
     expect(chipList[0]).toHaveFocus()
   })
@@ -481,7 +483,7 @@ describe("chips input as bottom list", () => {
     await user.type(input, "one")
     await user.type(input, "{enter}")
 
-    const chipList = screen.getAllByLabelText("chip")
+    const chipList = screen.getAllByRole("listitem")
     await user.type(input, "{arrowRight}")
     expect(chipList[0]).toHaveFocus()
 
@@ -501,7 +503,7 @@ describe("chips input as bottom list", () => {
     await user.type(input, "x") // just text, not a confirmed chip
     expect(input).toHaveValue("x")
 
-    const chipList = screen.getAllByLabelText("chip")
+    const chipList = screen.getAllByRole("listitem")
     expect(chipList.length).toBe(2)
 
     // now happens: 2x arrowleft, click on chip "two", 2x arrowleft, 3x arrowright
@@ -535,7 +537,7 @@ describe("chips input as bottom list", () => {
     await user.type(input, "two")
     await user.type(input, "{enter}")
 
-    const chipList = screen.getAllByLabelText("chip")
+    const chipList = screen.getAllByRole("listitem")
     expect(chipList.length).toBe(2)
 
     const chipOne = chipList[0] as HTMLElement

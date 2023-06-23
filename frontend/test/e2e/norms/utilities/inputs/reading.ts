@@ -52,7 +52,8 @@ const expectTextEditor: FieldExpecter<FootnoteInputType[]> = async (
 
 const expectChipsInput: FieldExpecter<string[]> = async (page, _, value) => {
   for (const subValue of (value ?? []) as string[]) {
-    const chip = page.locator(`div.label-wrapper:text-is("${subValue}")`)
+    const chips = page.getByTestId("chip")
+    const chip = chips.getByText(subValue, { exact: true })
     await expect(chip).toBeVisible()
   }
 }

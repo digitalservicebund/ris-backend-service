@@ -148,6 +148,9 @@ module.exports = {
         focus: "inset 0 0 0 2px bg-blue-900",
         hover: "inset 0 0 0 2px bg-blue-900",
       },
+      borderRadius: {
+        10: "0.625rem",
+      },
     },
   },
   plugins: [],

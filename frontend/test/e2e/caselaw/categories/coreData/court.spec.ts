@@ -43,7 +43,7 @@ test.describe("court", () => {
           .click()
         await page
           .locator("[aria-label='Fehlerhaftes Gericht']")
-          .fill("incorrectCourt1")
+          .type("incorrectCourt1")
         await page.keyboard.press("Enter")
       },
       page,
@@ -69,11 +69,11 @@ test.describe("court", () => {
           .click()
         await page
           .locator("[aria-label='Fehlerhaftes Gericht']")
-          .fill("incorrectCourt1")
+          .type("incorrectCourt1")
         await page.keyboard.press("Enter")
         await page
           .locator("[aria-label='Fehlerhaftes Gericht']")
-          .fill("incorrectCourt2")
+          .type("incorrectCourt2")
         await page.keyboard.press("Enter")
       },
       page,
