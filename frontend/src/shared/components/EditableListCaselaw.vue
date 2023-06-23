@@ -62,7 +62,11 @@ onMounted(editFirstEntryIfOnlyOne)
 
 watch(
   () => props.modelValue,
-  () => (modelValueList.value = props.modelValue),
+  () => {
+    modelValueList.value = props.modelValue
+    if (editIndex.value && editIndex.value >= props.modelValue.length)
+      addNewModelEntry()
+  },
   { immediate: true, deep: true }
 )
 

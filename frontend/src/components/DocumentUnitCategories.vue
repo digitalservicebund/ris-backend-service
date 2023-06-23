@@ -53,8 +53,9 @@ async function handleUpdateDocumentUnit(): Promise<ServiceResponse<void>> {
     JSON.stringify(updatedDocumentUnit.value) !== lastUpdatedDocumentUnit.value
 
   if (hasDataChange.value) {
+    const cleanedData = cleanUp(updatedDocumentUnit.value as DocumentUnit)
     const response = await documentUnitService.update(
-      updatedDocumentUnit.value as DocumentUnit
+      cleanedData as DocumentUnit
     )
     if (response?.error?.validationErrors) {
       validationErrors.value = response.error.validationErrors
@@ -69,6 +70,29 @@ async function handleUpdateDocumentUnit(): Promise<ServiceResponse<void>> {
     return response as ServiceResponse<void>
   }
   return { status: 200, data: undefined } as ServiceResponse<void>
+}
+
+function cleanUp(updatedDocumentUnit: DocumentUnit) {
+  const activeCitations =
+    updatedDocumentUnit?.contentRelatedIndexing?.activeCitations
+  if (activeCitations) {
+    const newValues = [...activeCitations]
+    const newActiveCitations = newValues.filter(
+      (value) => Object.keys(value).length !== 0
+    )
+
+    const newContentRelatedIndexing = {
+      ...updatedDocumentUnit?.contentRelatedIndexing,
+      activeCitations: newActiveCitations,
+    }
+
+    const cleanedDocUnit = {
+      ...updatedDocumentUnit,
+      contentRelatedIndexing: newContentRelatedIndexing,
+    }
+
+    return cleanedDocUnit
+  } else return updatedDocumentUnit
 }
 
 watch(
