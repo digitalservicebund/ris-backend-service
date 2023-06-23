@@ -49,11 +49,10 @@ const handleUpdateValueDocumentUnitTexts = async (
 }
 
 async function handleUpdateDocumentUnit(): Promise<ServiceResponse<void>> {
+  const cleanedData = cleanUp(updatedDocumentUnit.value as DocumentUnit)
   hasDataChange.value =
-    JSON.stringify(updatedDocumentUnit.value) !== lastUpdatedDocumentUnit.value
-
+    JSON.stringify(cleanedData) !== lastUpdatedDocumentUnit.value
   if (hasDataChange.value) {
-    const cleanedData = cleanUp(updatedDocumentUnit.value as DocumentUnit)
     const response = await documentUnitService.update(
       cleanedData as DocumentUnit
     )
