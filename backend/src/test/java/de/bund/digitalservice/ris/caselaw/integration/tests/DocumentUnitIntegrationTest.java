@@ -127,6 +127,8 @@ class DocumentUnitIntegrationTest {
     documentUnitStatusRepository.deleteAll().block();
   }
 
+  // TODO: write a test for add a document type with a wrong shortcut
+
   @Test
   void testForCorrectDbEntryAfterNewDocumentUnitCreation() {
     webClient

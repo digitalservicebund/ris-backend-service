@@ -41,13 +41,13 @@ public interface DocumentUnitRepository {
       Flux<T> findAllLinkedDocumentUnitsByParentDocumentUnitUuidAndType(
           UUID parentDocumentUnitUuid, DocumentationUnitLinkType type);
 
-  Mono<DocumentUnit> filterUnlinkedDocumentUnit(DocumentUnit documentUnit);
-
   Mono<DocumentationUnitLink> linkDocumentUnits(
       UUID parentDocumentUnitUuid, UUID childDocumentUnitUuid, DocumentationUnitLinkType type);
 
-  Mono<Void> unlinkDocumentUnits(
+  Mono<Void> unlinkDocumentUnit(
       UUID parentDocumentUnitUuid, UUID childDocumentUnitUuid, DocumentationUnitLinkType type);
 
   Mono<Long> countLinksByChildDocumentUnitUuid(UUID childDocumentUnitUuid);
+
+  Mono<Void> deleteIfOrphanedLinkedDocumentationUnit(UUID documentUnitUuid);
 }

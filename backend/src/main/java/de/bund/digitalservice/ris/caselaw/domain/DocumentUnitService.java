@@ -304,32 +304,7 @@ public class DocumentUnitService {
     }
     return documentUnitMono
         .flatMap(repository::save)
-        .flatMap(
-            savedDocumentationUnit ->
-                unlinkLinkedDocumentationUnit(
-                    savedDocumentationUnit, DocumentationUnitLinkType.ACTIVE_CITATION))
         .doOnError(ex -> log.error("Couldn't update the DocumentUnit", ex));
-  }
-
-  private Mono<DocumentUnit> unlinkLinkedDocumentationUnit(
-      DocumentUnit documentUnit, DocumentationUnitLinkType type) {
-    return repository
-        .findAllLinkedDocumentUnitsByParentDocumentUnitUuidAndType(documentUnit.uuid(), type)
-        .filter(
-            linkedDocumentationUnit ->
-                documentUnit.contentRelatedIndexing() != null
-                    && documentUnit.contentRelatedIndexing().activeCitations() != null
-                    && !documentUnit.contentRelatedIndexing().activeCitations().isEmpty()
-                    && documentUnit.contentRelatedIndexing().activeCitations().stream()
-                        .map(LinkedDocumentationUnit::getUuid)
-                        .noneMatch(
-                            linkedUuid -> linkedDocumentationUnit.getUuid().equals(linkedUuid)))
-        .flatMap(
-            linkedDocumentationUnit ->
-                repository.unlinkDocumentUnits(
-                    documentUnit.uuid(), linkedDocumentationUnit.getUuid(), type))
-        .then()
-        .thenReturn(documentUnit);
   }
 
   public Mono<MailResponse> publishAsEmail(UUID documentUnitUuid, String issuerAddress) {
@@ -401,7 +376,7 @@ public class DocumentUnitService {
   public Mono<String> removeLinkedDocumentationUnit(
       UUID parentUuid, UUID childUuid, DocumentationUnitLinkType type) {
     return repository
-        .unlinkDocumentUnits(parentUuid, childUuid, type)
+        .unlinkDocumentUnit(parentUuid, childUuid, type)
         .doOnError(ex -> log.error("Couldn't unlink the documentation unit", ex))
         .then(deleteIfOrphanedLinkedDocumentationUnit(childUuid))
         .thenReturn("done");
@@ -430,13 +405,7 @@ public class DocumentUnitService {
   }
 
   private Mono<Void> deleteIfOrphanedLinkedDocumentationUnit(UUID documentUnitUuid) {
-    return repository
-        .findByUuid(documentUnitUuid)
-        .filter(
-            childDocumentUnit ->
-                DataSource.PROCEEDING_DECISION.equals(childDocumentUnit.dataSource()))
-        .flatMap(repository::filterUnlinkedDocumentUnit)
-        .flatMap(repository::delete);
+    return repository.deleteIfOrphanedLinkedDocumentationUnit(documentUnitUuid);
   }
 
   private static <T extends LinkedDocumentationUnit> DataSource getDatasource(
@@ -446,7 +415,7 @@ public class DocumentUnitService {
     } else if (linkedDocumentationUnit instanceof ProceedingDecision) {
       return DataSource.PROCEEDING_DECISION;
     } else {
-      throw new RuntimeException(
+      throw new DocumentationUnitException(
           "Couldn't find data source for " + linkedDocumentationUnit.getClass());
     }
   }

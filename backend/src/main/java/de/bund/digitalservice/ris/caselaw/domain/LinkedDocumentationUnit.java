@@ -8,12 +8,14 @@ import java.util.UUID;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
 @SuperBuilder(toBuilder = true)
 @Getter
 @NoArgsConstructor
 @EqualsAndHashCode
+@ToString
 public class LinkedDocumentationUnit {
   protected UUID uuid;
   protected String documentNumber;

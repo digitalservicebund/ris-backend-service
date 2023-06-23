@@ -119,7 +119,7 @@ class ProceedingDecisionIntegrationTest {
 
     assertThat(
             linkRepository
-                .findAllByParentDocumentationUnitUuidAndType(
+                .findAllByParentDocumentationUnitUuidAndTypeOrderByIdAsc(
                     parentDocumentUnitDTO.getUuid(), DocumentationUnitLinkType.PREVIOUS_DECISION)
                 .collectList()
                 .block())
@@ -137,7 +137,7 @@ class ProceedingDecisionIntegrationTest {
 
     assertThat(
             linkRepository
-                .findAllByParentDocumentationUnitUuidAndType(
+                .findAllByParentDocumentationUnitUuidAndTypeOrderByIdAsc(
                     parentDocumentUnitDTO.getUuid(), DocumentationUnitLinkType.PREVIOUS_DECISION)
                 .collectList()
                 .block())
@@ -145,7 +145,7 @@ class ProceedingDecisionIntegrationTest {
 
     List<UUID> childUuids =
         linkRepository
-            .findAllByParentDocumentationUnitUuidAndType(
+            .findAllByParentDocumentationUnitUuidAndTypeOrderByIdAsc(
                 parentDocumentUnitDTO.getUuid(), DocumentationUnitLinkType.PREVIOUS_DECISION)
             .map(DocumentationUnitLinkDTO::childDocumentationUnitUuid)
             .collectList()

@@ -24,6 +24,7 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitNorm;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitRepository;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatus;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitException;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitLink;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitLinkType;
 import de.bund.digitalservice.ris.caselaw.domain.LegalEffect;
@@ -39,6 +40,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -46,6 +48,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Repository
+@Slf4j
 public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepository {
   private final DatabaseDocumentUnitRepository repository;
   private final DatabaseDocumentUnitMetadataRepository metadataRepository;
@@ -105,6 +108,10 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
 
   @Override
   public Mono<DocumentUnit> findByDocumentNumber(String documentNumber) {
+    if (log.isDebugEnabled()) {
+      log.debug("find by document number: {}", documentNumber);
+    }
+
     return repository
         .findByDocumentnumber(documentNumber)
         .flatMap(this::injectAdditionalInformation)
@@ -113,6 +120,10 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
 
   @Override
   public Mono<DocumentUnit> findByUuid(UUID uuid) {
+    if (log.isDebugEnabled()) {
+      log.debug("find by uuid: {}", uuid);
+    }
+
     return repository
         .findByUuid(uuid)
         .flatMap(this::injectAdditionalInformation)
@@ -199,7 +210,13 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
               documentUnitDTO.setDocumentTypeDTO(documentTypeDTO);
               documentUnitDTO.setDocumentTypeId(documentTypeDTO.getId());
               return documentUnitDTO;
-            });
+            })
+        .switchIfEmpty(
+            Mono.error(
+                new DocumentationUnitException(
+                    "no document type for the shortcut '"
+                        + documentType.jurisShortcut()
+                        + "' found.")));
   }
 
   private boolean hasCourtChanged(DocumentUnitDTO documentUnitDTO, DocumentUnit documentUnit) {
@@ -586,6 +603,10 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
 
   private Mono<DocumentUnitDTO> saveActiveCitations(
       DocumentUnitDTO documentUnitDTO, DocumentUnit documentUnit) {
+    if (log.isDebugEnabled()) {
+      log.debug("save active citations: {}", documentUnit.uuid());
+    }
+
     List<ActiveCitation> activeCitations = Collections.emptyList();
     if (documentUnit.contentRelatedIndexing() != null
         && documentUnit.contentRelatedIndexing().activeCitations() != null) {
@@ -606,12 +627,50 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
                         activeCitationDocumentationUnitDTO ->
                             updateLinkedDocumentationUnit(
                                 activeCitationDocumentationUnitDTO, activeCitation)))
-        .collectList()
-        .map(
-            updatedActiveCitations -> {
-              documentUnitDTO.setActiveCitations(updatedActiveCitations);
-              return documentUnitDTO;
-            });
+        .then(
+            unlinkLinkedDocumentationUnit(documentUnit, DocumentationUnitLinkType.ACTIVE_CITATION))
+        .then(injectActiveCitations(documentUnitDTO));
+  }
+
+  private Mono<DocumentUnit> unlinkLinkedDocumentationUnit(
+      DocumentUnit documentUnit, DocumentationUnitLinkType type) {
+    if (log.isDebugEnabled()) {
+      log.debug("unlink linked document unit of type {} for parent {}", type, documentUnit.uuid());
+    }
+
+    return findAllLinkedDocumentUnitsByParentDocumentUnitUuidAndType(documentUnit.uuid(), type)
+        .filter(
+            linkedDocumentationUnit ->
+                filterUnlinkedDocumentUnit(documentUnit, linkedDocumentationUnit, type))
+        .flatMap(
+            linkedDocumentationUnit ->
+                unlinkDocumentUnit(documentUnit.uuid(), linkedDocumentationUnit.getUuid(), type)
+                    .thenReturn(linkedDocumentationUnit.getUuid()))
+        .flatMap(this::deleteIfOrphanedLinkedDocumentationUnit)
+        .then()
+        .thenReturn(documentUnit);
+  }
+
+  private boolean filterUnlinkedDocumentUnit(
+      DocumentUnit documentUnit,
+      LinkedDocumentationUnit linkedDocumentationUnit,
+      DocumentationUnitLinkType type) {
+    if (type == DocumentationUnitLinkType.ACTIVE_CITATION) {
+      return documentUnit.contentRelatedIndexing() == null
+          || documentUnit.contentRelatedIndexing().activeCitations() == null
+          || documentUnit.contentRelatedIndexing().activeCitations().isEmpty()
+          || documentUnit.contentRelatedIndexing().activeCitations().stream()
+              .map(LinkedDocumentationUnit::getUuid)
+              .noneMatch(linkedUuid -> linkedDocumentationUnit.getUuid().equals(linkedUuid));
+    } else if (type == DocumentationUnitLinkType.PREVIOUS_DECISION) {
+      return documentUnit.proceedingDecisions() == null
+          || documentUnit.proceedingDecisions().isEmpty()
+          || documentUnit.proceedingDecisions().stream()
+              .map(LinkedDocumentationUnit::getUuid)
+              .noneMatch(linkedUuid -> linkedDocumentationUnit.getUuid().equals(linkedUuid));
+    } else {
+      throw new DocumentationUnitException("Couldn't filter for unknown link type '" + type + "'");
+    }
   }
 
   private Mono<DocumentUnitMetadataDTO> updateLinkedDocumentationUnit(
@@ -622,10 +681,11 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
               DocumentUnitDTOBuilder<?, ?> builder = documentUnitDTO.toBuilder();
 
               if (linkedDocumentationUnit.getCourt() != null) {
-                builder =
-                    builder
-                        .courtLocation(linkedDocumentationUnit.getCourt().location())
-                        .courtType(linkedDocumentationUnit.getCourt().type());
+                builder
+                    .courtLocation(linkedDocumentationUnit.getCourt().location())
+                    .courtType(linkedDocumentationUnit.getCourt().type());
+              } else {
+                builder.courtLocation(null).courtType(null);
               }
 
               return builder
@@ -686,6 +746,10 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
   }
 
   private Mono<DocumentUnitDTO> injectAdditionalInformation(DocumentUnitDTO documentUnitDTO) {
+    if (log.isDebugEnabled()) {
+      log.debug("inject additional information: {}", documentUnitDTO.getUuid());
+    }
+
     return injectMetadataInformation(documentUnitDTO)
         .flatMap(this::injectDeviatingFileNumbers)
         .flatMap(this::injectProceedingDecisions)
@@ -702,12 +766,17 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
 
   private <T extends DocumentUnitMetadataDTO> Mono<T> injectMetadataInformation(
       T documentUnitMetadataDTO) {
+
+    if (log.isDebugEnabled()) {
+      log.debug("inject metadata information: {}", documentUnitMetadataDTO.getUuid());
+    }
+
     return injectFileNumbers(documentUnitMetadataDTO).flatMap(this::injectDocumentType);
   }
 
   private Mono<DocumentUnitDTO> injectProceedingDecisions(DocumentUnitDTO documentUnitDTO) {
     return documentationUnitLinkRepository
-        .findAllByParentDocumentationUnitUuidAndType(
+        .findAllByParentDocumentationUnitUuidAndTypeOrderByIdAsc(
             documentUnitDTO.getUuid(), DocumentationUnitLinkType.PREVIOUS_DECISION)
         .map(DocumentationUnitLinkDTO::childDocumentationUnitUuid)
         .flatMap(metadataRepository::findByUuid)
@@ -721,12 +790,20 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
   }
 
   private Mono<DocumentUnitDTO> injectActiveCitations(DocumentUnitDTO documentUnitDTO) {
+    if (log.isDebugEnabled()) {
+      log.debug("inject active citations: {}", documentUnitDTO.getUuid());
+    }
+
     return documentationUnitLinkRepository
-        .findAllByParentDocumentationUnitUuidAndType(
+        .findAllByParentDocumentationUnitUuidAndTypeOrderByIdAsc(
             documentUnitDTO.getUuid(), DocumentationUnitLinkType.ACTIVE_CITATION)
-        .map(DocumentationUnitLinkDTO::childDocumentationUnitUuid)
-        .flatMap(metadataRepository::findByUuid)
-        .flatMap(this::injectMetadataInformation)
+        .map(
+            t -> {
+              log.debug("get child uuid: {}", t.id());
+              return t.childDocumentationUnitUuid();
+            })
+        .flatMapSequential(metadataRepository::findByUuid)
+        .flatMapSequential(this::injectMetadataInformation)
         .collectList()
         .map(
             activeCitationDTOs -> {
@@ -987,6 +1064,10 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
 
   public Flux<DocumentUnitListEntry> findAll(
       Pageable pageable, DocumentationOffice documentationOffice) {
+    if (log.isDebugEnabled()) {
+      log.debug("find all");
+    }
+
     return documentationOfficeRepository
         .findByLabel(documentationOffice.label())
         .flatMapMany(
@@ -1022,24 +1103,38 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
   @Override
   public Flux<LinkedDocumentationUnit> findAllLinkedDocumentUnitsByParentDocumentUnitUuidAndType(
       UUID parentDocumentUnitUuid, DocumentationUnitLinkType type) {
+    if (log.isDebugEnabled()) {
+      log.debug(
+          "find all linked documentation units by parent documentation uuid '{}' and type '{}'",
+          parentDocumentUnitUuid,
+          type);
+    }
+
     return documentationUnitLinkRepository
-        .findAllByParentDocumentationUnitUuidAndType(parentDocumentUnitUuid, type)
+        .findAllByParentDocumentationUnitUuidAndTypeOrderByIdAsc(parentDocumentUnitUuid, type)
         .map(DocumentationUnitLinkDTO::childDocumentationUnitUuid)
         .flatMap(metadataRepository::findByUuid)
         .flatMap(this::injectAdditionalInformation)
         .map(LinkedDocumentationUnitTransformer::transformToDomain);
   }
 
-  @Override
-  public Mono<DocumentUnit> filterUnlinkedDocumentUnit(DocumentUnit documentUnit) {
+  private Mono<DocumentUnitDTO> filterUnlinkedDocumentUnit(DocumentUnitDTO documentUnitDTO) {
+    if (log.isDebugEnabled()) {
+      log.debug("filter unlinked documentation unit: {}", documentUnitDTO.getUuid());
+    }
+
     return documentationUnitLinkRepository
-        .existsByChildDocumentationUnitUuid(documentUnit.uuid())
+        .existsByChildDocumentationUnitUuid(documentUnitDTO.getUuid())
         .filter(isLinked -> !isLinked)
-        .map(isLinked -> documentUnit);
+        .map(isLinked -> documentUnitDTO);
   }
 
   private Mono<DocumentUnitMetadataDTO> injectAdditionalInformation(
       DocumentUnitMetadataDTO documentUnitMetadataDTO) {
+    if (log.isDebugEnabled()) {
+      log.debug("inject addtional information: {}", documentUnitMetadataDTO.getUuid());
+    }
+
     return injectFileNumbers(documentUnitMetadataDTO)
         .flatMap(this::injectDocumentType)
         .flatMap(this::injectDocumentationOffice);
@@ -1048,6 +1143,17 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
   @Override
   public Mono<DocumentationUnitLink> linkDocumentUnits(
       UUID parentDocumentUnitUuid, UUID childDocumentUnitUuid, DocumentationUnitLinkType type) {
+    if (log.isDebugEnabled()) {
+      log.debug(
+          "link documentation unitst: {}, {}, {}",
+          parentDocumentUnitUuid,
+          childDocumentUnitUuid,
+          type);
+    }
+
+    if (parentDocumentUnitUuid == null || childDocumentUnitUuid == null || type == null) {
+      return Mono.empty();
+    }
 
     return documentationUnitLinkRepository
         .findByParentDocumentationUnitUuidAndChildDocumentationUnitUuidAndType(
@@ -1063,10 +1169,17 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
   }
 
   @Override
-  public Mono<Void> unlinkDocumentUnits(
+  public Mono<Void> unlinkDocumentUnit(
       UUID parentDocumentationUnitUuid,
       UUID childDocumentationUnitUuid,
       DocumentationUnitLinkType type) {
+    if (log.isDebugEnabled()) {
+      log.debug(
+          "unlink document unit: {}, {}, {}",
+          parentDocumentationUnitUuid,
+          childDocumentationUnitUuid,
+          type);
+    }
 
     return documentationUnitLinkRepository
         .findByParentDocumentationUnitUuidAndChildDocumentationUnitUuidAndType(
@@ -1077,6 +1190,10 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
 
   @Override
   public Mono<Long> countLinksByChildDocumentUnitUuid(UUID childDocumentUnitUuid) {
+    if (log.isDebugEnabled()) {
+      log.debug("count links by child documentation unit uuid: {}", childDocumentUnitUuid);
+    }
+
     return documentationUnitLinkRepository.countByChildDocumentationUnitUuid(childDocumentUnitUuid);
   }
 
@@ -1088,11 +1205,32 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
   @Override
   public Mono<Long> countByDataSourceAndDocumentationOffice(
       DataSource dataSource, DocumentationOffice documentationOffice) {
+    if (log.isDebugEnabled()) {
+      log.debug(
+          "count by data source and documentation office: {}, {}", dataSource, documentationOffice);
+    }
+
     return documentationOfficeRepository
         .findByLabel(documentationOffice.label())
         .flatMap(
             docOffice ->
                 metadataRepository.countByDataSourceAndDocumentationOfficeId(
                     dataSource, docOffice.getId()));
+  }
+
+  @Override
+  public Mono<Void> deleteIfOrphanedLinkedDocumentationUnit(UUID documentUnitUuid) {
+    if (log.isDebugEnabled()) {
+      log.debug("delete if orphaned linked documentation unit: {}", documentUnitUuid);
+    }
+
+    return repository
+        .findByUuid(documentUnitUuid)
+        .filter(
+            childDocumentUnit ->
+                DataSource.PROCEEDING_DECISION == childDocumentUnit.getDataSource()
+                    || DataSource.ACTIVE_CITATION == childDocumentUnit.getDataSource())
+        .flatMap(this::filterUnlinkedDocumentUnit)
+        .flatMap(repository::delete);
   }
 }

@@ -9,7 +9,7 @@ import reactor.core.publisher.Mono;
 public interface DatabaseDocumentationUnitLinkRepository
     extends R2dbcRepository<DocumentationUnitLinkDTO, Long> {
 
-  Flux<DocumentationUnitLinkDTO> findAllByParentDocumentationUnitUuidAndType(
+  Flux<DocumentationUnitLinkDTO> findAllByParentDocumentationUnitUuidAndTypeOrderByIdAsc(
       UUID parentDocumentUnitId, DocumentationUnitLinkType type);
 
   Mono<DocumentationUnitLinkDTO>

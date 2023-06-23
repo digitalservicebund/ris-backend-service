@@ -138,6 +138,7 @@ public class DocumentUnitTransformer {
 
   public static DocumentUnit transformMetadataToDomain(
       DocumentUnitMetadataDTO documentUnitMetadataDTO) {
+
     if (documentUnitMetadataDTO == null) {
       return DocumentUnit.builder().build();
     }
