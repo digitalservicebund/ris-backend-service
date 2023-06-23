@@ -156,7 +156,7 @@ async function addActiveCitation() {
       <TextButton
         aria-label="Aktivzitierung speichern"
         class="mr-28"
-        label="Speichern"
+        label="Hinzufügen"
         @click="addActiveCitation"
       />
     </div>
