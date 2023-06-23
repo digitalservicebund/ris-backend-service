@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.UUID;
 import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
 @Repository
 public class PostgresExporterHtmlReportRepositoryImpl implements ExporterHtmlReportRepository {
@@ -23,7 +22,7 @@ public class PostgresExporterHtmlReportRepositoryImpl implements ExporterHtmlRep
   }
 
   @Override
-  public Mono<String> saveAll(List<ExporterHtmlReport> reports) {
+  public Flux<ExporterHtmlReport> saveAll(List<ExporterHtmlReport> reports) {
     return Flux.fromIterable(reports)
         .flatMap(
             report ->
@@ -40,7 +39,12 @@ public class PostgresExporterHtmlReportRepositoryImpl implements ExporterHtmlRep
                                 .build()))
         .collectList()
         .flatMapMany(repository::saveAll)
-        .collectList()
-        .map(result -> "Done");
+        .map(
+            report ->
+                ExporterHtmlReport.builder()
+                    // TODO add documentNumber
+                    .receivedDate(report.getReceivedDate())
+                    .html(report.getHtml())
+                    .build());
   }
 }

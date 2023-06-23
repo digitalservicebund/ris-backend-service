@@ -16,8 +16,8 @@ import jakarta.mail.Message;
 import jakarta.mail.MessagingException;
 import jakarta.mail.Store;
 import java.io.IOException;
-import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -81,6 +81,7 @@ public class JurisXmlExporterResponseProcessor {
           try {
             String documentNumber = actionableHandler.getDocumentNumber(message);
             String subject = message.getSubject();
+            Date receivedDate = message.getReceivedDate();
             List<Attachment> attachments = new ArrayList<>();
             for (MessageAttachment att : actionableHandler.getAttachments(message)) {
               attachments.add(
@@ -93,9 +94,9 @@ public class JurisXmlExporterResponseProcessor {
             forwardMessage(documentNumber, subject, attachments)
                 .doOnSuccess(
                     result -> {
-                      if (actionableHandler instanceof ProcessMessageHandler)
-                        saveAttachments(documentNumber, attachments);
                       processedMessages.add(message);
+                      if (actionableHandler instanceof ProcessMessageHandler)
+                        saveAttachments(documentNumber, receivedDate, attachments);
                     })
                 .onErrorResume(e -> Mono.empty())
                 .block();
@@ -117,19 +118,20 @@ public class JurisXmlExporterResponseProcessor {
     }
   }
 
-  private void saveAttachments(String documentNumber, List<Attachment> attachments) {
-    List<ExporterHtmlReport> reports =
-        attachments.stream()
-            .map(
-                attachment ->
-                    ExporterHtmlReport.builder()
-                        .documentNumber(documentNumber)
-                        .receivedDate(Instant.now())
-                        .html(attachment.fileContent())
-                        .build())
-            .toList();
-
-    reportRepository.saveAll(reports).subscribe();
+  private void saveAttachments(
+      String documentNumber, Date receivedDate, List<Attachment> attachments) {
+    reportRepository
+        .saveAll(
+            attachments.stream()
+                .map(
+                    attachment ->
+                        ExporterHtmlReport.builder()
+                            .documentNumber(documentNumber)
+                            .receivedDate(receivedDate.toInstant())
+                            .html(attachment.fileContent())
+                            .build())
+                .toList())
+        .subscribe();
   }
 
   private Mono<Void> forwardMessage(

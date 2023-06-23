@@ -10,12 +10,15 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
+import de.bund.digitalservice.ris.caselaw.domain.Attachment;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatusService;
+import de.bund.digitalservice.ris.caselaw.domain.ExporterHtmlReport;
 import de.bund.digitalservice.ris.caselaw.domain.ExporterHtmlReportRepository;
 import de.bund.digitalservice.ris.caselaw.domain.HttpMailSender;
 import de.bund.digitalservice.ris.domain.export.juris.response.ActionableMessageHandler;
 import de.bund.digitalservice.ris.domain.export.juris.response.ImportMessageHandler;
 import de.bund.digitalservice.ris.domain.export.juris.response.MessageAttachment;
+import de.bund.digitalservice.ris.domain.export.juris.response.ProcessMessageHandler;
 import jakarta.mail.BodyPart;
 import de.bund.digitalservice.ris.domain.export.juris.response.StatusImporterException;
 import jakarta.mail.Flags.Flag;
@@ -32,6 +35,8 @@ import java.io.InputStreamReader;
 import java.util.AbstractMap;
 import java.util.Collections;
 import java.util.stream.Collectors;
+import java.util.Date;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -44,24 +49,22 @@ import reactor.core.publisher.Mono;
 @ExtendWith(SpringExtension.class)
 @Import({JurisXmlExporterResponseProcessor.class})
 public class JurisXmlExporterResponseProcessorTest {
+  private final String DOCUMENT_NUMBER = "KORE123456789";
   @MockBean private DocumentUnitStatusService statusService;
   @MockBean private HttpMailSender mailSender;
   @MockBean private ImapStoreFactory storeFactory;
   @MockBean private ExporterHtmlReportRepository reportRepository;
-
   @Mock private Store store;
   @Mock private Folder inbox;
   @Mock private Folder processed;
   @Mock private Folder unprocessable;
   @Mock private Message message;
-  @Mock private ActionableMessageHandler messageHandler;
   @Mock private ImportMessageHandler importHandler;
-
+  @Mock private ProcessMessageHandler messageHandler;
   private JurisXmlExporterResponseProcessor responseProcessor;
-  private final String DOCUMENT_NUMBER = "KORE123456789";
 
   @BeforeEach
-  void setup() throws MessagingException {
+  void setup() throws MessagingException, IOException {
     when(storeFactory.createStoreSession()).thenReturn(store);
     when(store.getFolder("INBOX")).thenReturn(inbox);
     when(store.getFolder("processed")).thenReturn(processed);
@@ -134,8 +137,7 @@ public class JurisXmlExporterResponseProcessorTest {
             any(),
             any(),
             any(),
-            argThat(
-                list -> list.get(0).equals(new AbstractMap.SimpleEntry<>("test.txt", "ÄÜÖäüöß"))),
+            argThat(list -> list.get(0).equals(new Attachment("test.txt", "ÄÜÖäüöß"))),
             eq("report-" + DOCUMENT_NUMBER));
   }
 
@@ -163,5 +165,37 @@ public class JurisXmlExporterResponseProcessorTest {
     verifyNoInteractions(mailSender);
     verify(inbox, times(1)).copyMessages(new Message[] {message}, unprocessable);
     verify(message, times(1)).setFlag(Flag.DELETED, true);
+  }
+
+  @Test
+  void testAttachmentsGetsPersisted() throws MessagingException, IOException {
+    Date now = new Date();
+    when(statusService.getIssuerAddressOfLatestStatus(DOCUMENT_NUMBER))
+        .thenReturn(Mono.just("test@digitalservice.bund.de"));
+    when(messageHandler.getAttachments(message))
+        .thenReturn(
+            List.of(
+                new MessageAttachment(String.format("%s.html", DOCUMENT_NUMBER), "report"),
+                new MessageAttachment(
+                    String.format("%s-spellcheck.html", DOCUMENT_NUMBER), "spellcheck")));
+    when(messageHandler.getDocumentNumber(message)).thenReturn(DOCUMENT_NUMBER);
+    when((message.getReceivedDate())).thenReturn(now);
+
+    responseProcessor.readEmails();
+
+    verify(inbox, times(1)).copyMessages(new Message[] {message}, processed);
+    verify(reportRepository)
+        .saveAll(
+            List.of(
+                ExporterHtmlReport.builder()
+                    .html("report")
+                    .documentNumber(DOCUMENT_NUMBER)
+                    .receivedDate(now.toInstant())
+                    .build(),
+                ExporterHtmlReport.builder()
+                    .html("spellcheck")
+                    .documentNumber(DOCUMENT_NUMBER)
+                    .receivedDate(now.toInstant())
+                    .build()));
   }
 }

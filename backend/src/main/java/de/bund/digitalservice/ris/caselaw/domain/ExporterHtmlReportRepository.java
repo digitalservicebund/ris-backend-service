@@ -1,9 +1,9 @@
 package de.bund.digitalservice.ris.caselaw.domain;
 
 import java.util.List;
-import reactor.core.publisher.Mono;
+import reactor.core.publisher.Flux;
 
 public interface ExporterHtmlReportRepository {
 
-  Mono<String> saveAll(List<ExporterHtmlReport> report);
+  Flux<ExporterHtmlReport> saveAll(List<ExporterHtmlReport> report);
 }
