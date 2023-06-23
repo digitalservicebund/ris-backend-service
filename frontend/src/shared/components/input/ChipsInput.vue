@@ -64,13 +64,20 @@ const focusInput = () => {
   if (chipsInput.value !== undefined) chipsInput.value.focus()
 }
 
-watch(
-  chips,
-  (next) => {
-    if (!next?.length) focusInput()
-  },
-  { deep: true }
-)
+// Temporarily disabled to prevent this from stealing focus from any input
+// on the page when the chips are empty. To fix this, we would need to either
+// react to the 'deleteChip' event or watch the chips list to see if it's empty.
+// However due to the way the chips list updates data, the list is not in the
+// state you'd expect when the events/watchers are triggered, so we'll need
+// to fix that first.
+// TODO: Re-enable this once modelValue is properly updated
+// watch(
+//   chips,
+//   (next) => {
+//     if (!next?.length) focusInput()
+//   },
+//   { deep: true }
+// )
 
 /* -------------------------------------------------- *
  * Input width management (needed for the enter icon) *
