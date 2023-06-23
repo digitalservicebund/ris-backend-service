@@ -11,12 +11,21 @@ import static org.mockito.Mockito.when;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatusService;
 import de.bund.digitalservice.ris.caselaw.domain.HttpMailSender;
 import de.bund.digitalservice.ris.domain.export.juris.response.ActionableMessageHandler;
+import de.bund.digitalservice.ris.domain.export.juris.response.ImportMessageHandler;
+import jakarta.mail.BodyPart;
 import jakarta.mail.Flags.Flag;
 import jakarta.mail.Folder;
 import jakarta.mail.Message;
 import jakarta.mail.MessagingException;
+import jakarta.mail.Multipart;
 import jakarta.mail.Store;
-import java.util.Arrays;
+import jakarta.mail.internet.MimeBodyPart;
+import jakarta.mail.internet.MimeMultipart;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.Collections;
+import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -39,6 +48,7 @@ public class JurisXmlExporterResponseProcessorTest {
   @Mock private Folder unprocessable;
   @Mock private Message message;
   @Mock private ActionableMessageHandler messageHandler;
+  @Mock private ImportMessageHandler importHandler;
 
   private JurisXmlExporterResponseProcessor responseProcessor;
   private final String DOCUMENT_NUMBER = "KORE123456789";
@@ -53,10 +63,13 @@ public class JurisXmlExporterResponseProcessorTest {
     when(messageHandler.canHandle(message)).thenReturn(true);
     when(messageHandler.messageIsActionable()).thenReturn(true);
     when(messageHandler.getDocumentNumber(message)).thenReturn(DOCUMENT_NUMBER);
+    when(importHandler.canHandle(message)).thenReturn(true);
+    when(importHandler.messageIsActionable()).thenReturn(true);
+    when(importHandler.getDocumentNumber(message)).thenReturn(DOCUMENT_NUMBER);
 
     responseProcessor =
         new JurisXmlExporterResponseProcessor(
-            Arrays.asList(messageHandler), mailSender, statusService, storeFactory);
+            Collections.singletonList(messageHandler), mailSender, statusService, storeFactory);
   }
 
   @Test
@@ -72,6 +85,34 @@ public class JurisXmlExporterResponseProcessorTest {
         .sendMail(any(), any(), any(), any(), any(), any(), eq("report-" + DOCUMENT_NUMBER));
     verify(inbox, times(1)).copyMessages(new Message[] {message}, processed);
     verify(message, times(1)).setFlag(Flag.DELETED, true);
+  }
+
+  @Test
+  void testMessageEncoding() throws MessagingException, IOException {
+    responseProcessor =
+        new JurisXmlExporterResponseProcessor(
+            Collections.singletonList(importHandler), mailSender, statusService, storeFactory);
+    when(statusService.getIssuerAddressOfLatestStatus(DOCUMENT_NUMBER))
+        .thenReturn(Mono.just("test@digitalservice.bund.de"));
+
+    Multipart multipart = new MimeMultipart();
+    BodyPart bodyPart = new MimeBodyPart();
+    multipart.addBodyPart(bodyPart);
+    MimeBodyPart attachmentPart = new MimeBodyPart();
+    attachmentPart.attachFile("src/test/resources/EXAMPLE-LOGFILE.log");
+    multipart.addBodyPart(attachmentPart);
+    BufferedReader reader =
+        new BufferedReader(new InputStreamReader(attachmentPart.getInputStream()));
+
+    when(importHandler.getFileContent(message))
+        .thenReturn(reader.lines().collect(Collectors.joining("\n")));
+    when(message.getContent()).thenReturn(multipart);
+
+    responseProcessor.readEmails();
+
+    verify(mailSender, times(1))
+        .sendMail(
+            any(), any(), any(), any(), any(), eq("ÄÜÖäüöß"), eq("report-" + DOCUMENT_NUMBER));
   }
 
   @Test

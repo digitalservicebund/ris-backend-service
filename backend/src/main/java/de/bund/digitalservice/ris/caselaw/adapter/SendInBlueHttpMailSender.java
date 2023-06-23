@@ -2,7 +2,6 @@ package de.bund.digitalservice.ris.caselaw.adapter;
 
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitPublishException;
 import de.bund.digitalservice.ris.caselaw.domain.HttpMailSender;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import org.slf4j.Logger;
@@ -51,7 +50,7 @@ public class SendInBlueHttpMailSender implements HttpMailSender {
 
     SendSmtpEmailAttachment attachment = new SendSmtpEmailAttachment();
     attachment.setName(fileName);
-    attachment.setContent(fileContent.getBytes(StandardCharsets.UTF_8));
+    attachment.setContent(fileContent.getBytes());
     List<SendSmtpEmailAttachment> attachmentList = new ArrayList<>();
     attachmentList.add(attachment);
 
