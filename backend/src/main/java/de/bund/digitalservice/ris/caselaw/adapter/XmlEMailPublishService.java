@@ -1,5 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
+import de.bund.digitalservice.ris.caselaw.domain.Attachment;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitPublishException;
@@ -17,7 +18,6 @@ import java.time.Clock;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.AbstractMap;
 import java.util.Collections;
 import java.util.Optional;
 import java.util.UUID;
@@ -124,7 +124,7 @@ public class XmlEMailPublishService implements EmailPublishService {
         xmlMail.mailSubject(),
         "neuris",
         Collections.singletonList(
-            new AbstractMap.SimpleImmutableEntry<>(xmlMail.fileName(), xmlMail.xml())),
+            Attachment.builder().fileName(xmlMail.fileName()).fileContent(xmlMail.xml()).build()),
         xmlMail.documentUnitUuid().toString());
   }
 

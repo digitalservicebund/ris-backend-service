@@ -5,5 +5,5 @@ import reactor.core.publisher.Mono;
 
 public interface ExporterHtmlReportRepository {
 
-  Mono<Void> saveAll(List<ExporterHtmlReport> report);
+  Mono<String> saveAll(List<ExporterHtmlReport> report);
 }

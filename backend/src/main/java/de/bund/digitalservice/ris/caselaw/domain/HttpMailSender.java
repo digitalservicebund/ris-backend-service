@@ -1,7 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.domain;
 
 import java.util.List;
-import java.util.Map;
 
 public interface HttpMailSender {
   void sendMail(
@@ -9,6 +8,6 @@ public interface HttpMailSender {
       String receiverAddress,
       String subject,
       String content,
-      List<Map.Entry<String, String>> attachments,
+      List<Attachment> attachments,
       String tag);
 }

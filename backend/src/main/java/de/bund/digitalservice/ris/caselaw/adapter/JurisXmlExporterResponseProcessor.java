@@ -1,5 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
+import de.bund.digitalservice.ris.caselaw.domain.Attachment;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatusService;
 import de.bund.digitalservice.ris.caselaw.domain.ExporterHtmlReport;
 import de.bund.digitalservice.ris.caselaw.domain.ExporterHtmlReportRepository;
@@ -7,6 +8,7 @@ import de.bund.digitalservice.ris.caselaw.domain.HttpMailSender;
 import de.bund.digitalservice.ris.domain.export.juris.response.ActionableMessageHandler;
 import de.bund.digitalservice.ris.domain.export.juris.response.MessageAttachment;
 import de.bund.digitalservice.ris.domain.export.juris.response.MessageHandler;
+import de.bund.digitalservice.ris.domain.export.juris.response.ProcessMessageHandler;
 import de.bund.digitalservice.ris.domain.export.juris.response.StatusImporterException;
 import jakarta.mail.Flags.Flag;
 import jakarta.mail.Folder;
@@ -15,10 +17,8 @@ import jakarta.mail.MessagingException;
 import jakarta.mail.Store;
 import java.io.IOException;
 import java.time.Instant;
-import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Profile;
@@ -81,20 +81,23 @@ public class JurisXmlExporterResponseProcessor {
           try {
             String documentNumber = actionableHandler.getDocumentNumber(message);
             String subject = message.getSubject();
-            List<Map.Entry<String, String>> attachments = new ArrayList<>();
+            List<Attachment> attachments = new ArrayList<>();
             for (MessageAttachment att : actionableHandler.getAttachments(message)) {
               attachments.add(
-                  new AbstractMap.SimpleImmutableEntry<>(att.fileName(), att.fileContent()));
+                  Attachment.builder()
+                      .fileName(att.fileName())
+                      .fileContent(att.fileContent())
+                      .build());
             }
 
             forwardMessage(documentNumber, subject, attachments)
                 .doOnSuccess(
                     result -> {
+                      if (actionableHandler instanceof ProcessMessageHandler)
+                        saveAttachments(documentNumber, attachments);
                       processedMessages.add(message);
-                      saveAttachments(documentNumber, attachments);
                     })
                 .onErrorResume(e -> Mono.empty())
-                .log()
                 .block();
 
           } catch (MessagingException | IOException e) {
@@ -114,8 +117,7 @@ public class JurisXmlExporterResponseProcessor {
     }
   }
 
-  private Mono<Void> saveAttachments(
-      String documentNumber, List<Map.Entry<String, String>> attachments) {
+  private void saveAttachments(String documentNumber, List<Attachment> attachments) {
     List<ExporterHtmlReport> reports =
         attachments.stream()
             .map(
@@ -123,15 +125,15 @@ public class JurisXmlExporterResponseProcessor {
                     ExporterHtmlReport.builder()
                         .documentNumber(documentNumber)
                         .receivedDate(Instant.now())
-                        .html(attachment.getValue())
+                        .html(attachment.fileContent())
                         .build())
             .toList();
 
-    return reportRepository.saveAll(reports);
+    reportRepository.saveAll(reports).subscribe();
   }
 
   private Mono<Void> forwardMessage(
-      String documentNumber, String subject, List<Map.Entry<String, String>> attachments) {
+      String documentNumber, String subject, List<Attachment> attachments) {
     return statusService
         .getIssuerAddressOfLatestStatus(documentNumber)
         .flatMap(

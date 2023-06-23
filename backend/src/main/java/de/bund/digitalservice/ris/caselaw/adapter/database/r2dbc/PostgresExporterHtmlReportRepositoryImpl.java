@@ -3,6 +3,7 @@ package de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc;
 import de.bund.digitalservice.ris.caselaw.domain.ExporterHtmlReport;
 import de.bund.digitalservice.ris.caselaw.domain.ExporterHtmlReportRepository;
 import java.util.List;
+import java.util.UUID;
 import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -22,7 +23,7 @@ public class PostgresExporterHtmlReportRepositoryImpl implements ExporterHtmlRep
   }
 
   @Override
-  public Mono<Void> saveAll(List<ExporterHtmlReport> reports) {
+  public Mono<String> saveAll(List<ExporterHtmlReport> reports) {
     return Flux.fromIterable(reports)
         .flatMap(
             report ->
@@ -31,12 +32,15 @@ public class PostgresExporterHtmlReportRepositoryImpl implements ExporterHtmlRep
                     .map(
                         documentUnit ->
                             ExporterHtmlReportDTO.builder()
+                                .id(UUID.randomUUID())
                                 .documentUnitId(documentUnit.getUuid())
                                 .receivedDate(report.receivedDate())
                                 .html(report.html())
+                                .newEntry(true)
                                 .build()))
         .collectList()
-        .map(repository::saveAll)
-        .flatMap(result -> Mono.empty());
+        .flatMapMany(repository::saveAll)
+        .collectList()
+        .map(result -> "Done");
   }
 }

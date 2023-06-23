@@ -9,6 +9,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import de.bund.digitalservice.ris.caselaw.domain.Attachment;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitPublishException;
 import de.bund.digitalservice.ris.caselaw.domain.HttpMailSender;
@@ -23,7 +24,6 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.AbstractMap;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
@@ -115,7 +115,10 @@ class XmlEMailPublishServiceTest {
             SAVED_XML_MAIL.mailSubject(),
             "neuris",
             Collections.singletonList(
-                new AbstractMap.SimpleEntry<>(SAVED_XML_MAIL.fileName(), SAVED_XML_MAIL.xml())),
+                Attachment.builder()
+                    .fileName(SAVED_XML_MAIL.fileName())
+                    .fileContent(SAVED_XML_MAIL.xml())
+                    .build()),
             SAVED_XML_MAIL.documentUnitUuid().toString());
   }
 
@@ -218,7 +221,8 @@ class XmlEMailPublishServiceTest {
             RECEIVER_ADDRESS,
             MAIL_SUBJECT,
             "neuris",
-            Collections.singletonList(new AbstractMap.SimpleEntry<>("test.xml", "xml")),
+            Collections.singletonList(
+                Attachment.builder().fileName("test.xml").fileContent("xml").build()),
             TEST_UUID.toString());
 
     StepVerifier.create(service.publish(documentUnit, RECEIVER_ADDRESS))
@@ -232,7 +236,8 @@ class XmlEMailPublishServiceTest {
             RECEIVER_ADDRESS,
             MAIL_SUBJECT,
             "neuris",
-            Collections.singletonList(new AbstractMap.SimpleEntry<>("test.xml", "xml")),
+            Collections.singletonList(
+                Attachment.builder().fileName("test.xml").fileContent("xml").build()),
             TEST_UUID.toString());
   }
 
