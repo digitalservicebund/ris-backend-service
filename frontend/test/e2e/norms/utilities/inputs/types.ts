@@ -5,9 +5,12 @@ export enum FieldType {
   CHIPS,
   DROPDOWN,
   TEXTAREA,
+  EDITOR,
 }
 
-export type FieldValue = string | boolean | string[]
+export type FootnoteInputType = { label: string; content: string }
+
+export type FieldValue = string | boolean | string[] | FootnoteInputType[]
 // FIXME: How to relate these two types to each other?
 export type FieldValueTypeMapping = {
   [FieldType.TEXT]: string
@@ -16,6 +19,7 @@ export type FieldValueTypeMapping = {
   [FieldType.CHIPS]: string[]
   [FieldType.DROPDOWN]: string
   [FieldType.TEXTAREA]: string
+  [FieldType.EDITOR]: FootnoteInputType[]
 }
 
 // FIXME: resolve awkward mixture with value and values.

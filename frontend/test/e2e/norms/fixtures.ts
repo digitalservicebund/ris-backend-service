@@ -8,6 +8,7 @@ import {
 import { importNormViaApi, loadJurisTestFile } from "./e2e-utils"
 import { normData } from "./testdata/norm_basic"
 import { FieldType, MetadataInputSection } from "./utilities"
+import { FOOTNOTE_LABELS } from "@/components/footnotes/types"
 
 type MyFixtures = {
   normData: NormData
@@ -1335,47 +1336,26 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
         },
       ],
     },
-    // {
-    //   heading: "Fußnoten",
-    //   fields: [
-    //     {
-    //       type: FieldType.TEXT,
-    //       id: "otherFootnote",
-    //       label: "Sonstige Fußnote",
-    //       value: norm.otherFootnote,
-    //     },
-    //     {
-    //       type: FieldType.TEXT,
-    //       id: "footnoteChange",
-    //       label: "Änderungsfußnote",
-    //       value: norm.footnoteChange,
-    //     },
-    //     {
-    //       type: FieldType.TEXT,
-    //       id: "footnoteComment",
-    //       label: "Kommentierende Fußnote",
-    //       value: norm.footnoteComment,
-    //     },
-    //     {
-    //       type: FieldType.TEXT,
-    //       id: "footnoteDecision",
-    //       label: "BVerfG-Entscheidung",
-    //       value: norm.footnoteDecision,
-    //     },
-    //     {
-    //       type: FieldType.TEXT,
-    //       id: "footnoteStateLaw",
-    //       label: "Landesrecht",
-    //       value: norm.footnoteStateLaw,
-    //     },
-    //     {
-    //       type: FieldType.TEXT,
-    //       id: "footnoteEuLaw",
-    //       label: "EU/EG-Recht",
-    //       value: norm.footnoteEuLaw,
-    //     },
-    //   ],
-    // },
+    {
+      heading: "Fußnoten",
+      isRepeatedSection: true,
+      isNotImported: true,
+      id: "footnotes",
+      fields: [
+        {
+          type: FieldType.EDITOR,
+          id: "footnotes",
+          label: "Fußnoten",
+          values: norm.metadataSections?.FOOTNOTES?.map(
+            (section) =>
+              section.FOOTNOTE?.map((note) => ({
+                label: FOOTNOTE_LABELS[Object.keys(note)[0]],
+                content: Object.values(note)[0][0] as string,
+              }))?.flat() ?? []
+          ),
+        },
+      ],
+    },
     {
       heading: "Gültigkeitsregelung",
       isSingleFieldSection: true,

@@ -225,6 +225,15 @@ export const newNorm: NormData = {
         APPENDIX: ["appendix"],
       },
     ],
+    FOOTNOTES: [
+      {
+        FOOTNOTE: [
+          { FOOTNOTE_REFERENCE: ["§ 7 Abs. 1a Satz 1 u. 2"] },
+          { FOOTNOTE_CHANGE: ["eine ganze Menge Text"] },
+          { FOOTNOTE_EU_LAW: ["irgendwas halt"] },
+        ],
+      },
+    ],
   },
   officialLongTitle:
     "Verordnung zur Anpassung von Rechtsverordnungen an das Tierarzneimittelrecht",
@@ -245,12 +254,6 @@ export const newNorm: NormData = {
   documentTextProof: "documentTextProof",
   eli: "europeanLegalIdentifier",
   otherDocumentNote: "otherDocumentNote",
-  // otherFootnote: "otherFootnote",
-  // footnoteChange: "footnoteChange",
-  // footnoteComment: "footnoteComment",
-  // footnoteDecision: "footnoteDecision",
-  // footnoteStateLaw: "footnoteStateLaw",
-  // footnoteEuLaw: "footnoteEuLaw",
   otherStatusNote: "otherStatusNote",
   reissueArticle: "reissueArticle",
   reissueDate: "01.11.2022",

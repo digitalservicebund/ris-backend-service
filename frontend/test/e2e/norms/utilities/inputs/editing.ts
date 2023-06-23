@@ -3,8 +3,11 @@ import {
   AnyField,
   FieldType,
   FieldValueTypeMapping,
+  FootnoteInputType,
   MetadataInputSection,
 } from "./types"
+import { FOOTNOTE_LABELS } from "@/components/footnotes/types"
+import { MetadatumType } from "@/domain/Norm"
 
 type FieldFiller<T> = (page: Page, id: string, value: T) => Promise<void>
 
@@ -22,6 +25,23 @@ const fillTextArea: FieldFiller<string> = async (page, id, value) => {
   const input = page.locator(`textarea#${id}`)
   await expect(input).toBeEditable()
   await input.fill(value)
+}
+
+const fillTextEditor: FieldFiller<FootnoteInputType[]> = async (
+  page,
+  id,
+  value
+) => {
+  const input = page.locator(`[data-testid='${id}']`)
+  await expect(input).toBeEditable()
+  await input.click()
+  for (const footnote of value) {
+    if (footnote.label != FOOTNOTE_LABELS[MetadatumType.FOOTNOTE_REFERENCE]) {
+      await input.type(` #${footnote.label}`)
+      await input.press("Enter")
+    }
+    await input.type(footnote.content)
+  }
 }
 
 const fillCheckbox: FieldFiller<boolean> = async (page, id, value) => {
@@ -81,6 +101,7 @@ const FIELD_FILLERS: FieldFillerMapping = {
   [FieldType.CHIPS]: fillChipsInput,
   [FieldType.DROPDOWN]: fillDropdown,
   [FieldType.TEXTAREA]: fillTextArea,
+  [FieldType.EDITOR]: fillTextEditor,
 }
 
 export function fillInputField<

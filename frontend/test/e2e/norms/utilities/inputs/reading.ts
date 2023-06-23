@@ -3,8 +3,11 @@ import {
   AnyField,
   FieldType,
   FieldValueTypeMapping,
+  FootnoteInputType,
   MetadataInputSection,
 } from "./types"
+import { FOOTNOTE_LABELS } from "@/components/footnotes/types"
+import { MetadatumType } from "@/domain/Norm"
 
 type FieldExpecter<T> = (page: Page, id: string, value: T) => Promise<void>
 
@@ -32,6 +35,21 @@ const expectRadioButton: FieldExpecter<boolean> = async (page, id, value) => {
   expect(checked).toBe(value)
 }
 
+const expectTextEditor: FieldExpecter<FootnoteInputType[]> = async (
+  page,
+  id,
+  value
+) => {
+  const input = page.locator(`[data-testid='${id}']`)
+  await expect(input).toBeVisible()
+  for (const footnote of value) {
+    if (footnote.label != FOOTNOTE_LABELS[MetadatumType.FOOTNOTE_REFERENCE]) {
+      expect(await input.innerText()).toContain(footnote.label)
+    }
+    expect(await input.innerText()).toContain(footnote.content)
+  }
+}
+
 const expectChipsInput: FieldExpecter<string[]> = async (page, _, value) => {
   for (const subValue of (value ?? []) as string[]) {
     const chip = page.locator(`div.label-wrapper:text-is("${subValue}")`)
@@ -51,6 +69,7 @@ const FIELD_EXPECTER: FieldExpectMapping = {
   [FieldType.RADIO]: expectRadioButton,
   [FieldType.CHIPS]: expectChipsInput,
   [FieldType.DROPDOWN]: expectDropdown,
+  [FieldType.EDITOR]: expectTextEditor,
 }
 
 export async function expectInputFieldHasCorrectValue<
@@ -71,8 +90,10 @@ export async function expectInputFieldGroupHasCorrectValues(
       valueIndex !== undefined ? field.values?.[valueIndex] : field.value
 
     if (value !== undefined) {
-      const label = page.locator(`label:has-text("${field.label}")`).first()
-      await expect(label).toBeVisible()
+      if (field.type !== FieldType.EDITOR) {
+        const label = page.locator(`label:has-text("${field.label}")`).first()
+        await expect(label).toBeVisible()
+      }
 
       await expectInputFieldHasCorrectValue(page, field.type, field.id, value)
     }
@@ -89,9 +110,11 @@ export async function expectRepeatedSectionListHasCorrectEntries(
 
   await expandable.click()
 
-  const numberOfSectionRepetition = Math.max(
-    ...(section.fields ?? []).map((field) => field.values?.length ?? 0)
-  )
+  const numberOfSectionRepetition = section.isNotImported
+    ? 1
+    : Math.max(
+        ...(section.fields ?? []).map((field) => field.values?.length ?? 0)
+      )
   const listEntries = expandable.getByLabel("Listen Eintrag")
   const entryCount = await listEntries.count()
   expect(entryCount).toBe(numberOfSectionRepetition)
