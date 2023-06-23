@@ -92,12 +92,11 @@ watch(modelValueList, () => emit("update:modelValue", modelValueList.value), {
       :key="index"
       ref="elementList"
       aria-label="Listen Eintrag"
-      class="border-b-1 border-gray-400 group"
     >
       <div
         v-if="index !== editIndex"
         :key="index"
-        class="cursor-pointer flex gap-8 group-first:pt-0 items-center justify-between py-8"
+        class="border-b-1 border-gray-400 cursor-pointer flex gap-8 group group-first:pt-0 items-center justify-between py-8"
         :class="{ '!border-none': noHorizontalSeparators }"
       >
         <component
