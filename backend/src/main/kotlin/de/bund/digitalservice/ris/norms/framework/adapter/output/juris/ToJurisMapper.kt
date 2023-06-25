@@ -55,7 +55,6 @@ fun mapDomainToData(norm: Norm): NormData {
         entryIntoForceDateState = extractEntryIntoForceState(norm),
         expirationDate = extractExpirationDate(norm),
         expirationDateState = extractExpirationState(norm),
-        documentTextProof = norm.documentTextProof,
         unofficialReferenceList = extractSimpleStringValuesFromNormSection(norm, MetadatumType.UNOFFICIAL_REFERENCE),
         statusDescription = norm.statusDescription,
         statusDate = encodeLocalDate(norm.statusDate),

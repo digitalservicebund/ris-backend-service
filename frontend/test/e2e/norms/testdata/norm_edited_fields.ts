@@ -1,4 +1,10 @@
-import { NormCategory, UndefinedDate } from "../../../../src/domain/Norm"
+import {
+  NormCategory,
+  // OtherType,
+  ProofIndication,
+  // ProofType,
+  UndefinedDate,
+} from "../../../../src/domain/Norm"
 import { NormData } from "../fixtures"
 
 export const newNorm: NormData = {
@@ -225,6 +231,28 @@ export const newNorm: NormData = {
         APPENDIX: ["appendix"],
       },
     ],
+    DOCUMENT_STATUS_SECTION: [
+      {
+        DOCUMENT_STATUS: [
+          {
+            WORK_NOTE: ["work note"],
+            DESCRIPTION: ["description"],
+            DATE: ["12.05.2022"],
+            REFERENCE: ["reference"],
+            ENTRY_INTO_FORCE_DATE_NOTE: ["400"],
+            PROOF_INDICATION: [ProofIndication.NOT_YET_CONSIDERED],
+          },
+        ],
+      },
+      // {
+      //   DOCUMENT_TEXT_PROOF: [
+      //     { PROOF_TYPE: [ProofType.TEXT_PROOF_FROM], TEXT: ["text"] },
+      //   ],
+      // },
+      // {
+      //   DOCUMENT_OTHER: [{ OTHER_TYPE: [OtherType.TEXT_IN_PROGRESS] }],
+      // },
+    ],
     FOOTNOTES: [
       {
         FOOTNOTE: [
@@ -245,15 +273,7 @@ export const newNorm: NormData = {
   completeCitation: "completeCitation",
   documentCategory: "documentCategory",
   documentNumber: "documentNumber",
-  documentStatusDate: "01.11.2022",
-  documentStatusDescription: "documentStatusDescription",
-  documentStatusEntryIntoForceDate: "01.11.2022",
-  documentStatusProof: "documentStatusProof",
-  documentStatusReference: "documentStatusReference",
-  documentStatusWorkNote: "documentStatusWorkNote",
-  documentTextProof: "documentTextProof",
   eli: "europeanLegalIdentifier",
-  otherDocumentNote: "otherDocumentNote",
   otherStatusNote: "otherStatusNote",
   reissueArticle: "reissueArticle",
   reissueDate: "01.11.2022",

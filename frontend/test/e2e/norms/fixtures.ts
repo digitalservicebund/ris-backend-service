@@ -3,6 +3,9 @@ import {
   MetadataSectionName,
   Norm,
   NormCategory,
+  OtherType,
+  ProofIndication,
+  ProofType,
   UndefinedDate,
 } from "../../../src/domain/Norm"
 import { importNormViaApi, loadJurisTestFile } from "./e2e-utils"
@@ -70,6 +73,41 @@ function undefinedDateToDropdownEntry(
       return "unbestimmt (zukünftig)"
     case UndefinedDate.UNDEFINED_NOT_PRESENT:
       return "nicht vorhanden"
+    default:
+      return undefined
+  }
+}
+
+function proofIndicationToDropdownEntry(
+  unit?: ProofIndication
+): string | undefined {
+  switch (unit) {
+    case ProofIndication.NOT_YET_CONSIDERED:
+      return "noch nicht berücksichtigt"
+    case ProofIndication.CONSIDERED:
+      return "ist berücksichtigt"
+    default:
+      return undefined
+  }
+}
+
+function proofTypeToDropdownEntry(unit?: ProofType): string | undefined {
+  switch (unit) {
+    case ProofType.TEXT_PROOF_FROM:
+      return "Textnachweis ab"
+    case ProofType.TEXT_PROOF_VALIDITY_FROM:
+      return "Textnachweis Geltung ab"
+    default:
+      return undefined
+  }
+}
+
+function otherTypeToDropdownEntry(unit?: OtherType): string | undefined {
+  switch (unit) {
+    case OtherType.TEXT_IN_PROGRESS:
+      return "Text in Bearbeitung"
+    case OtherType.TEXT_PROOFED_BUT_NOT_DONE:
+      return "Nachgewiesener Text dokumentarisch noch nicht abschließend bearbeitet"
     default:
       return undefined
   }
@@ -1254,70 +1292,119 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
     },
     {
       heading: "Stand der dokumentarischen Bearbeitung",
-      sections: [
+      id: "documentStatus",
+      isRepeatedSection: true,
+      isNotImported: true,
+      fields: [
         {
-          heading: "Stand der dokumentarischen Bearbeitung",
-          fields: [
-            {
-              type: FieldType.TEXT,
-              id: "documentStatusWorkNote",
-              label: "Bearbeitungshinweis",
-              value: norm.documentStatusWorkNote,
-            },
-            {
-              type: FieldType.TEXT,
-              id: "documentStatusDescription",
-              label: "Bezeichnung der Änderungsvorschrift",
-              value: norm.documentStatusDescription,
-            },
-            {
-              type: FieldType.TEXT,
-              id: "documentStatusDate",
-              label: "Datum der Änderungsvorschrift",
-              value: norm.documentStatusDate,
-            },
-            {
-              type: FieldType.TEXT,
-              id: "documentStatusReference",
-              label: "Fundstelle der Änderungsvorschrift",
-              value: norm.documentStatusReference,
-            },
-            {
-              type: FieldType.TEXT,
-              id: "documentStatusEntryIntoForceDate",
-              label: "Datum des Inkrafttretens der Änderung",
-              value: norm.documentStatusEntryIntoForceDate,
-            },
-            {
-              type: FieldType.TEXT,
-              id: "documentStatusProof",
-              label:
-                "Angaben zum textlichen und/oder dokumentarischen Nachweis",
-              value: norm.documentStatusProof,
-            },
-          ],
+          type: FieldType.RADIO,
+          id: "documentStatusSelection",
+          label: "Stand der dokumentarischen Bearbeitung",
+          values: norm.metadataSections?.DOCUMENT_STATUS_SECTION?.map(
+            (section) => !!section?.DOCUMENT_STATUS
+          ),
         },
         {
-          heading: "Textnachweis",
-          fields: [
-            {
-              type: FieldType.TEXT,
-              id: "documentTextProof",
-              label: "Textnachweis",
-              value: norm.documentTextProof,
-            },
-          ],
+          type: FieldType.CHIPS,
+          id: "workNoteChips",
+          label: "Bearbeitungshinweis",
+          values: norm.metadataSections?.DOCUMENT_STATUS_SECTION?.map(
+            (section) => section?.DOCUMENT_STATUS?.[0]
+          ).map((section) => section?.WORK_NOTE),
         },
         {
-          heading: "Sonstiger Hinweis",
-          fields: [
-            {
-              type: FieldType.TEXT,
-              id: "otherDocumentNote",
-              label: "Sonstiger Hinweis",
-              value: norm.otherDocumentNote,
-            },
-          ],
+          type: FieldType.TEXT,
+          id: "descriptionText",
+          label: "Bezeichnung der Änderungsvorschrift",
+          values: norm.metadataSections?.DOCUMENT_STATUS_SECTION?.map(
+            (section) => section?.DOCUMENT_STATUS?.[0]
+          ).map((section) => section?.TEXT?.[0]),
+        },
+        {
+          type: FieldType.TEXT,
+          id: "documentStatusDate",
+          label: "Datum",
+          values: norm.metadataSections?.DOCUMENT_STATUS_SECTION?.map(
+            (section) => section?.DOCUMENT_STATUS?.[0]
+          ).map((section) => section?.DATE?.[0]),
+        },
+        {
+          type: FieldType.TEXT,
+          id: "documentStatusYear",
+          label: "Jahr",
+          values: norm.metadataSections?.DOCUMENT_STATUS_SECTION?.map(
+            (section) => section?.DOCUMENT_STATUS?.[0]
+          ).map((section) => section?.YEAR?.[0]),
+        },
+        {
+          type: FieldType.TEXT,
+          id: "referenceText",
+          label: "Fundstelle der Änderungsvorschrift",
+          values: norm.metadataSections?.DOCUMENT_STATUS_SECTION?.map(
+            (section) => section?.DOCUMENT_STATUS?.[0]
+          ).map((section) => section?.REFERENCE?.[0]),
+        },
+        {
+          type: FieldType.CHIPS,
+          id: "entryIntoForceDateNoteChips",
+          label: "Datum des Inkrafttretens der Änderung",
+          values: norm.metadataSections?.DOCUMENT_STATUS_SECTION?.map(
+            (section) => section?.DOCUMENT_STATUS?.[0]
+          ).map((section) => section?.ENTRY_INTO_FORCE_DATE_NOTE),
+        },
+        {
+          type: FieldType.DROPDOWN,
+          id: "proofIndicationDropdown",
+          label: "Angaben zum textlichen und/oder dokumentarischen Nachweis",
+          values: norm.metadataSections?.DOCUMENT_STATUS_SECTION?.map(
+            (section) => section?.DOCUMENT_STATUS?.[0]
+          )
+            .map((section) => section?.PROOF_INDICATION?.[0])
+            .map(proofIndicationToDropdownEntry),
+        },
+        {
+          type: FieldType.RADIO,
+          id: "documentTextProofSelection",
+          label: "Textnachweis",
+          values: norm.metadataSections?.DOCUMENT_STATUS_SECTION?.map(
+            (section) => !!section?.DOCUMENT_TEXT_PROOF
+          ),
+        },
+        {
+          type: FieldType.DROPDOWN,
+          id: "proofTypeDropdown",
+          label: "Textnachweis",
+          values: norm.metadataSections?.DOCUMENT_STATUS_SECTION?.map(
+            (section) => section?.DOCUMENT_TEXT_PROOF?.[0]
+          )
+            .map((section) => section?.PROOF_TYPE?.[0])
+            .map(proofTypeToDropdownEntry),
+        },
+        {
+          type: FieldType.TEXT,
+          id: "textInput",
+          label: "Zusatz",
+          values: norm.metadataSections?.DOCUMENT_STATUS_SECTION?.map(
+            (section) => section?.DOCUMENT_TEXT_PROOF?.[0]
+          ).map((section) => section?.TEXT?.[0]),
+        },
+        {
+          type: FieldType.RADIO,
+          id: "documentOtherSelection",
+          label: "Sonstiger Hinweis",
+          values: norm.metadataSections?.DOCUMENT_STATUS_SECTION?.map(
+            (section) => !!section?.DOCUMENT_OTHER
+          ),
+        },
+        {
+          type: FieldType.DROPDOWN,
+          id: "otherTypeDropdown",
+          label: "Sonstiger Hinweis",
+          values: norm.metadataSections?.DOCUMENT_STATUS_SECTION?.map(
+            (section) => section?.DOCUMENT_OTHER?.[0]
+          )
+            .map((section) => section?.OTHER_TYPE?.[0])
+            .map(otherTypeToDropdownEntry),
         },
       ],
     },
