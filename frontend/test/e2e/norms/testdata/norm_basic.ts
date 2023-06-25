@@ -177,5 +177,8 @@ export const normData: NormData = {
   risAbbreviation: "Tierarznei",
   documentCategory: "NR",
   announcementDate: "06.01.2023",
+  printAnnouncementGazette: "BGBl I",
+  printAnnouncementYear: "2023",
+  printAnnouncementPage: "3",
   eli: "eli/bgbl-1/2023/s3",
 }
