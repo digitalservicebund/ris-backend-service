@@ -1,22 +1,21 @@
-<script lang="ts" setup>
-import type { Component } from "vue"
-import { onMounted, ref, watch } from "vue"
+<script lang="ts" setup generic="T extends LinkedDocumentUnit">
+import type { Component, Ref } from "vue"
+import { ref, watch } from "vue"
+import LinkedDocumentUnit from "@/domain/linkedDocumentUnit"
 import DataSetSummary from "@/shared/components/DataSetSummary.vue"
 
 interface Props {
   editComponent: Component
   summaryComponent?: Component
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  modelValue?: any[]
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  defaultValue: any
+  modelValue?: T[]
+  defaultValue: T
   disableMultiEntry?: boolean
   addEntryLabel?: string
   noHorizontalSeparators?: boolean
 }
 
 interface Emits {
-  (event: "update:modelValue", value: undefined[]): void
+  (event: "update:modelValue", value: T[]): void
   (event: "deleteLastEntry"): void
 }
 
@@ -30,7 +29,7 @@ const props = withDefaults(defineProps<Props>(), {
 
 const emit = defineEmits<Emits>()
 
-const modelValueList = ref<undefined[]>([])
+const modelValueList = ref<T[]>([]) as Ref<T[]>
 const elementList = ref<HTMLElement[]>([])
 const editIndex = ref<number | undefined>(undefined)
 
@@ -54,15 +53,10 @@ function removeModelEntry(index: number) {
   }
 }
 
-function editFirstEntryIfOnlyOne(): void {
-  if (modelValueList.value?.length == 1) setEditIndex(0)
-}
-
-onMounted(editFirstEntryIfOnlyOne)
-
 watch(
   () => props.modelValue,
   () => {
+    console.log(props.modelValue)
     modelValueList.value = props.modelValue
     if (editIndex.value && editIndex.value >= props.modelValue.length)
       addNewModelEntry()
@@ -110,6 +104,7 @@ watch(modelValueList, () => emit("update:modelValue", modelValueList.value), {
 
         <div class="flex gap-8">
           <button
+            v-if="!entry.isDocUnit()"
             aria-label="Eintrag bearbeiten"
             class="active:bg-blue-500 active:outline-none focus:outline-2 focus:outline-blue-800 hover:bg-blue-200 material-icons outline-none outline-offset-2 p-2 text-blue-800"
             @click="setEditIndex(index)"
