@@ -1,8 +1,8 @@
 import {
   NormCategory,
-  // OtherType,
+  OtherType,
   ProofIndication,
-  // ProofType,
+  ProofType,
   UndefinedDate,
 } from "../../../../src/domain/Norm"
 import { NormData } from "../fixtures"
@@ -244,14 +244,14 @@ export const newNorm: NormData = {
           },
         ],
       },
-      // {
-      //   DOCUMENT_TEXT_PROOF: [
-      //     { PROOF_TYPE: [ProofType.TEXT_PROOF_FROM], TEXT: ["text"] },
-      //   ],
-      // },
-      // {
-      //   DOCUMENT_OTHER: [{ OTHER_TYPE: [OtherType.TEXT_IN_PROGRESS] }],
-      // },
+      {
+        DOCUMENT_TEXT_PROOF: [
+          { PROOF_TYPE: [ProofType.TEXT_PROOF_FROM], TEXT: ["text"] },
+        ],
+      },
+      {
+        DOCUMENT_OTHER: [{ OTHER_TYPE: [OtherType.TEXT_IN_PROGRESS] }],
+      },
     ],
     FOOTNOTES: [
       {

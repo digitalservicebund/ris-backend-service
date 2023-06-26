@@ -45,6 +45,7 @@ export type MetadataInputSection = {
   isSingleFieldSection?: boolean
   isExpandableNotRepeatable?: boolean
   isNotImported?: boolean
+  numberEditedSections?: number
   fields?: AnyField[]
   sections?: MetadataInputSection[]
 }

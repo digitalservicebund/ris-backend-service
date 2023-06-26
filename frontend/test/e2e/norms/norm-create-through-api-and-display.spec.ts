@@ -4,7 +4,7 @@ import { openNorm } from "./e2e-utils"
 import { getNormBySections, testWithImportedNorm } from "./fixtures"
 import {
   MetadataInputSection,
-  expectMetadataInputSectionToHaveCorrectData,
+  expectMetadataInputSectionToHaveCorrectDataOnDisplay,
 } from "./utilities"
 
 async function expectSectionAppearsAfterScroll(
@@ -75,7 +75,7 @@ testWithImportedNorm(
     const sections = getNormBySections(normData)
 
     for (const section of sections) {
-      await expectMetadataInputSectionToHaveCorrectData(page, section)
+      await expectMetadataInputSectionToHaveCorrectDataOnDisplay(page, section)
     }
   }
 )

@@ -1295,6 +1295,7 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
       id: "documentStatus",
       isRepeatedSection: true,
       isNotImported: true,
+      numberEditedSections: 3,
       fields: [
         {
           type: FieldType.RADIO,
@@ -1427,6 +1428,7 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
       heading: "Fußnoten",
       isRepeatedSection: true,
       isNotImported: true,
+      numberEditedSections: 1,
       id: "footnotes",
       fields: [
         {

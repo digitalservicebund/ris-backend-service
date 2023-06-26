@@ -5,7 +5,7 @@ import { getNormBySections, testWithImportedNorm } from "./fixtures"
 import { newNorm } from "./testdata/norm_edited_fields"
 import {
   fillMetadataInputSection,
-  expectMetadataInputSectionToHaveCorrectData,
+  expectMetadataInputSectionToHaveCorrectDataOnEdit,
 } from "./utilities"
 
 testWithImportedNorm(
@@ -31,7 +31,7 @@ testWithImportedNorm(
     await page.reload()
 
     for (const section of sections) {
-      await expectMetadataInputSectionToHaveCorrectData(page, section)
+      await expectMetadataInputSectionToHaveCorrectDataOnEdit(page, section)
     }
   }
 )

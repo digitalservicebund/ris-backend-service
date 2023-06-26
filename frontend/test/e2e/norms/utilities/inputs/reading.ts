@@ -73,6 +73,34 @@ const FIELD_EXPECTER: FieldExpectMapping = {
   [FieldType.EDITOR]: expectTextEditor,
 }
 
+async function expectMetadataInputSectionToHaveCorrectData(
+  page: Page,
+  section: MetadataInputSection
+): Promise<void> {
+  if (section.isSingleFieldSection) {
+    await expectInputFieldGroupHasCorrectValues(page, section.fields ?? [])
+  } else if (section.isExpandableNotRepeatable) {
+    await expectExpandableSectionNotRepeatableToHaveCorrectValues(page, section)
+  } else {
+    const heading = page.locator(`a span:text-is("${section.heading}")`)
+    await expect(heading).toBeVisible()
+    const legend = page.locator(
+      `h2:text-is("${section.heading}"), legend:text-is("${section.heading}")`
+    )
+    await expect(legend.first()).toBeVisible()
+    await expectInputFieldGroupHasCorrectValues(page, section.fields ?? [])
+
+    for (const subSection of section.sections ?? []) {
+      const header = page
+        .locator(`legend:text-is("${subSection.heading}")`)
+        .first()
+      await expect(header).toBeVisible()
+      await header.click()
+      await expectInputFieldGroupHasCorrectValues(page, subSection.fields ?? [])
+    }
+  }
+}
+
 export async function expectInputFieldHasCorrectValue<
   Type extends FieldType,
   Value extends FieldValueTypeMapping[Type]
@@ -103,7 +131,8 @@ export async function expectInputFieldGroupHasCorrectValues(
 
 export async function expectRepeatedSectionListHasCorrectEntries(
   page: Page,
-  section: MetadataInputSection
+  section: MetadataInputSection,
+  numberOfEntries = 1
 ): Promise<void> {
   const expandable = page.locator(`#${section.id}`)
   await expect(expandable).toBeVisible()
@@ -112,7 +141,7 @@ export async function expectRepeatedSectionListHasCorrectEntries(
   await expandable.click()
 
   const numberOfSectionRepetition = section.isNotImported
-    ? 1
+    ? numberOfEntries
     : Math.max(
         ...(section.fields ?? []).map((field) => field.values?.length ?? 0)
       )
@@ -166,32 +195,27 @@ export async function expectExpandableSectionNotRepeatableToHaveCorrectValues(
   await finishButton.click()
 }
 
-export async function expectMetadataInputSectionToHaveCorrectData(
+export async function expectMetadataInputSectionToHaveCorrectDataOnDisplay(
   page: Page,
   section: MetadataInputSection
 ): Promise<void> {
   if (section.isRepeatedSection) {
     await expectRepeatedSectionListHasCorrectEntries(page, section)
-  } else if (section.isSingleFieldSection) {
-    await expectInputFieldGroupHasCorrectValues(page, section.fields ?? [])
-  } else if (section.isExpandableNotRepeatable) {
-    await expectExpandableSectionNotRepeatableToHaveCorrectValues(page, section)
   } else {
-    const heading = page.locator(`a span:text-is("${section.heading}")`)
-    await expect(heading).toBeVisible()
-    const legend = page.locator(
-      `h2:text-is("${section.heading}"), legend:text-is("${section.heading}")`
+    await expectMetadataInputSectionToHaveCorrectData(page, section)
+  }
+}
+export async function expectMetadataInputSectionToHaveCorrectDataOnEdit(
+  page: Page,
+  section: MetadataInputSection
+): Promise<void> {
+  if (section.isRepeatedSection) {
+    await expectRepeatedSectionListHasCorrectEntries(
+      page,
+      section,
+      section.numberEditedSections ?? 1
     )
-    await expect(legend.first()).toBeVisible()
-    await expectInputFieldGroupHasCorrectValues(page, section.fields ?? [])
-
-    for (const subSection of section.sections ?? []) {
-      const header = page
-        .locator(`legend:text-is("${subSection.heading}")`)
-        .first()
-      await expect(header).toBeVisible()
-      await header.click()
-      await expectInputFieldGroupHasCorrectValues(page, subSection.fields ?? [])
-    }
+  } else {
+    await expectMetadataInputSectionToHaveCorrectData(page, section)
   }
 }
