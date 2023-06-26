@@ -23,7 +23,7 @@ const activeCitations = computed({
   },
 })
 
-const defaultValue = {}
+const defaultValue = new ActiveCitation()
 
 function decisionSummarizer(activeCitation: ActiveCitation) {
   return h("div", { tabindex: activeCitation.isDocUnit() ? 0 : -1 }, [

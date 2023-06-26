@@ -56,7 +56,6 @@ function removeModelEntry(index: number) {
 watch(
   () => props.modelValue,
   () => {
-    console.log(props.modelValue)
     modelValueList.value = props.modelValue
     if (editIndex.value && editIndex.value >= props.modelValue.length)
       addNewModelEntry()
