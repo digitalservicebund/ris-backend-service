@@ -1,8 +1,10 @@
 package de.bund.digitalservice.ris.caselaw.integration.tests;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
 
+import de.bund.digitalservice.ris.caselaw.RisWebTestClient;
+import de.bund.digitalservice.ris.caselaw.TestConfig;
+import de.bund.digitalservice.ris.caselaw.adapter.AuthService;
 import de.bund.digitalservice.ris.caselaw.adapter.LookupTableController;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.CitationStyleDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.CourtDTO;
@@ -15,9 +17,12 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.Pos
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
+import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.EmailPublishService;
 import de.bund.digitalservice.ris.caselaw.domain.FieldOfLawRepository;
 import de.bund.digitalservice.ris.caselaw.domain.LookupTableService;
+import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.citation.CitationStyle;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.court.Court;
 import java.util.Arrays;
@@ -27,9 +32,9 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.security.oauth2.client.registration.ReactiveClientRegistrationRepository;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
-import org.springframework.test.web.reactive.server.WebTestClient;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import software.amazon.awssdk.services.s3.S3AsyncClient;
@@ -42,7 +47,10 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
       PostgresJPAConfig.class,
       PostgresDocumentTypeRepositoryImpl.class,
       PostgresCourtRepositoryImpl.class,
-      PostgresCitationStyleRepositoryImpl.class
+      PostgresCitationStyleRepositoryImpl.class,
+      SecurityConfig.class,
+      AuthService.class,
+      TestConfig.class
     },
     controllers = {LookupTableController.class})
 class LookupTableIntegrationTest {
@@ -58,13 +66,17 @@ class LookupTableIntegrationTest {
     registry.add("database.database", () -> postgreSQLContainer.getDatabaseName());
   }
 
-  @Autowired private WebTestClient webClient;
+  @Autowired private RisWebTestClient risWebTestClient;
   @Autowired private DatabaseCourtRepository databaseCourtRepository;
   @Autowired private DatabaseDocumentTypeRepository databaseDocumentTypeRepository;
   @Autowired private DatabaseCitationStyleRepository databaseCitationStyleRepository;
+
   @MockBean private FieldOfLawRepository fieldOfLawRepository;
   @MockBean private S3AsyncClient s3AsyncClient;
   @MockBean private EmailPublishService publishService;
+  @MockBean UserService userService;
+  @MockBean private DocumentUnitService documentUnitService;
+  @MockBean ReactiveClientRegistrationRepository clientRegistrationRepository;
 
   @AfterEach
   void cleanUp() {
@@ -86,8 +98,8 @@ class LookupTableIntegrationTest {
             .build();
     databaseCourtRepository.save(courtDTO).block();
 
-    webClient
-        .mutateWith(csrf())
+    risWebTestClient
+        .withDefaultLogin()
         .get()
         .uri("/api/v1/caselaw/lookuptable/courts")
         .exchange()
@@ -131,8 +143,8 @@ class LookupTableIntegrationTest {
             "Kammer für Baulandsachen Ulm" // [3]
             );
 
-    webClient
-        .mutateWith(csrf())
+    risWebTestClient
+        .withDefaultLogin()
         .get()
         .uri("/api/v1/caselaw/lookuptable/courts?q=land")
         .exchange()
@@ -179,8 +191,8 @@ class LookupTableIntegrationTest {
             .build();
     databaseCitationStyleRepository.save(citationStyleDTO).block();
 
-    webClient
-        .mutateWith(csrf())
+    risWebTestClient
+        .withDefaultLogin()
         .get()
         .uri("/api/v1/caselaw/lookuptable/zitart")
         .exchange()
@@ -226,8 +238,8 @@ class LookupTableIntegrationTest {
             .build();
     databaseCitationStyleRepository.save(citationStyleDTO).block();
 
-    webClient
-        .mutateWith(csrf())
+    risWebTestClient
+        .withDefaultLogin()
         .get()
         .uri("/api/v1/caselaw/lookuptable/zitart?q=Änd")
         .exchange()

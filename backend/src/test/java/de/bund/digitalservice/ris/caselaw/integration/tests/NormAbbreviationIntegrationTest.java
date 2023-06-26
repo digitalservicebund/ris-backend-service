@@ -1,8 +1,10 @@
 package de.bund.digitalservice.ris.caselaw.integration.tests;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
 
+import de.bund.digitalservice.ris.caselaw.RisWebTestClient;
+import de.bund.digitalservice.ris.caselaw.TestConfig;
+import de.bund.digitalservice.ris.caselaw.adapter.AuthService;
 import de.bund.digitalservice.ris.caselaw.adapter.NormAbbreviationController;
 import de.bund.digitalservice.ris.caselaw.adapter.NormAbbreviationService;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DatabaseDocumentCategoryRepository;
@@ -20,7 +22,10 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.Pos
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.RegionDTO;
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresConfig;
+import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.EmailPublishService;
+import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.DocumentTypeNew;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.NormAbbreviation;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.NormAbbreviation.NormAbbreviationBuilder;
@@ -35,9 +40,9 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.security.oauth2.client.registration.ReactiveClientRegistrationRepository;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
-import org.springframework.test.web.reactive.server.WebTestClient;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import software.amazon.awssdk.services.s3.S3AsyncClient;
@@ -47,7 +52,10 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
       NormAbbreviationService.class,
       FlywayConfig.class,
       PostgresConfig.class,
-      PostgresNormAbbreviationRepositoryImpl.class
+      PostgresNormAbbreviationRepositoryImpl.class,
+      SecurityConfig.class,
+      AuthService.class,
+      TestConfig.class
     },
     controllers = {NormAbbreviationController.class})
 class NormAbbreviationIntegrationTest {
@@ -88,8 +96,7 @@ class NormAbbreviationIntegrationTest {
     registry.add("database.database", () -> postgreSQLContainer.getDatabaseName());
   }
 
-  @Autowired private WebTestClient webClient;
-
+  @Autowired private RisWebTestClient risWebTestClient;
   @Autowired private DatabaseNormAbbreviationRepository repository;
   @Autowired private DatabaseDocumentTypeNewRepository documentTypeRepository;
   @Autowired private DatabaseDocumentCategoryRepository documentCategoryRepository;
@@ -99,6 +106,10 @@ class NormAbbreviationIntegrationTest {
   private DatabaseNormAbbreviationDocumentTypeRepository normAbbreviationDocumentTypeRepository;
 
   @Autowired private DatabaseNormAbbreviationRegionRepository normAbbreviationRegionRepository;
+
+  @MockBean UserService userService;
+  @MockBean private DocumentUnitService documentUnitService;
+  @MockBean ReactiveClientRegistrationRepository clientRegistrationRepository;
   @MockBean private S3AsyncClient s3AsyncClient;
   @MockBean private EmailPublishService publishService;
 
@@ -125,8 +136,8 @@ class NormAbbreviationIntegrationTest {
             .addRegion(REGION_UUID_1)
             .build();
 
-    webClient
-        .mutateWith(csrf())
+    risWebTestClient
+        .withDefaultLogin()
         .get()
         .uri("/api/v1/caselaw/normabbreviation/" + NORM_ABBREVIATION_UUID_1)
         .exchange()
@@ -150,8 +161,8 @@ class NormAbbreviationIntegrationTest {
             .addRegion(REGION_UUID_1)
             .build();
 
-    webClient
-        .mutateWith(csrf())
+    risWebTestClient
+        .withDefaultLogin()
         .get()
         .uri("/api/v1/caselaw/normabbreviation/" + NORM_ABBREVIATION_UUID_1)
         .exchange()
@@ -175,8 +186,8 @@ class NormAbbreviationIntegrationTest {
             .addDocumentType(DOCUMENT_TYPE_UUID_1, 'L')
             .build();
 
-    webClient
-        .mutateWith(csrf())
+    risWebTestClient
+        .withDefaultLogin()
         .get()
         .uri("/api/v1/caselaw/normabbreviation/" + NORM_ABBREVIATION_UUID_1)
         .exchange()
@@ -196,8 +207,8 @@ class NormAbbreviationIntegrationTest {
     NormAbbreviation expectedNormAbbreviation =
         new NormAbbreviationTestBuilder().getExpectedNormAbbreviation().build();
 
-    webClient
-        .mutateWith(csrf())
+    risWebTestClient
+        .withDefaultLogin()
         .get()
         .uri("/api/v1/caselaw/normabbreviation/" + NORM_ABBREVIATION_UUID_1)
         .exchange()
@@ -227,8 +238,8 @@ class NormAbbreviationIntegrationTest {
             .addRegion(REGION_UUID_2)
             .build();
 
-    webClient
-        .mutateWith(csrf())
+    risWebTestClient
+        .withDefaultLogin()
         .get()
         .uri("/api/v1/caselaw/normabbreviation/" + NORM_ABBREVIATION_UUID_1)
         .exchange()
@@ -245,8 +256,8 @@ class NormAbbreviationIntegrationTest {
   void testGetNormAbbreviationBySearchQuery() {
     generateLookupValues();
 
-    webClient
-        .mutateWith(csrf())
+    risWebTestClient
+        .withDefaultLogin()
         .get()
         .uri("/api/v1/caselaw/normabbreviation?q=search query")
         .exchange()
@@ -265,8 +276,8 @@ class NormAbbreviationIntegrationTest {
   void testGetNormAbbreviationBySearchQuery_returnInTheRightOrder() {
     generateLookupValues();
 
-    webClient
-        .mutateWith(csrf())
+    risWebTestClient
+        .withDefaultLogin()
         .get()
         .uri("/api/v1/caselaw/normabbreviation?q=Search")
         .exchange()

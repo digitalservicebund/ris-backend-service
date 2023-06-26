@@ -4,34 +4,37 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
 
+import de.bund.digitalservice.ris.caselaw.RisWebTestClient;
+import de.bund.digitalservice.ris.caselaw.TestConfig;
+import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
 import java.nio.ByteBuffer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.context.annotation.Import;
+import org.springframework.security.oauth2.client.registration.ReactiveClientRegistrationRepository;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.web.reactive.function.BodyInserters;
 import reactor.core.publisher.Mono;
 
 @ExtendWith(SpringExtension.class)
 @WebFluxTest(controllers = LookupTableImporterController.class)
-@WithMockUser
+@Import({SecurityConfig.class, TestConfig.class})
 class LookupTableImporterControllerTest {
-  @Autowired private WebTestClient webClient;
+  @Autowired private RisWebTestClient risWebTestClient;
 
   @MockBean private LookupTableImporterService service;
+  @MockBean private ReactiveClientRegistrationRepository clientRegistrationRepository;
 
   @Test
   void testImportDocumentTypeLookupTable() {
     when(service.importDocumentTypeLookupTable(any(ByteBuffer.class))).thenReturn(Mono.empty());
 
-    webClient
-        .mutateWith(csrf())
+    risWebTestClient
+        .withDefaultLogin()
         .put()
         .uri("/api/v1/caselaw/lookuptableimporter/doktyp")
         .bodyValue(BodyInserters.fromValue(new byte[] {}))
@@ -46,8 +49,8 @@ class LookupTableImporterControllerTest {
   void testImportCourtLookupTable() {
     when(service.importCourtLookupTable(any(ByteBuffer.class))).thenReturn(Mono.empty());
 
-    webClient
-        .mutateWith(csrf())
+    risWebTestClient
+        .withDefaultLogin()
         .put()
         .uri("/api/v1/caselaw/lookuptableimporter/gerichtdata")
         .bodyValue(BodyInserters.fromValue(new byte[] {}))
@@ -62,8 +65,8 @@ class LookupTableImporterControllerTest {
   void testImportStateLookupTable() {
     when(service.importStateLookupTable(any(ByteBuffer.class))).thenReturn(Mono.empty());
 
-    webClient
-        .mutateWith(csrf())
+    risWebTestClient
+        .withDefaultLogin()
         .put()
         .uri("/api/v1/caselaw/lookuptableimporter/buland")
         .bodyValue(BodyInserters.fromValue(new byte[] {}))
@@ -78,8 +81,8 @@ class LookupTableImporterControllerTest {
   void testImportCitationStyleLookupTable() {
     when(service.importCitationStyleLookupTable(any(ByteBuffer.class))).thenReturn(Mono.empty());
 
-    webClient
-        .mutateWith(csrf())
+    risWebTestClient
+        .withDefaultLogin()
         .put()
         .uri("/api/v1/caselaw/lookuptableimporter/zitart")
         .bodyValue(BodyInserters.fromValue(new byte[] {}))
@@ -94,8 +97,8 @@ class LookupTableImporterControllerTest {
   void testImportFieldOfLawLookupTable() {
     when(service.importFieldOfLawLookupTable(any(ByteBuffer.class))).thenReturn(Mono.empty());
 
-    webClient
-        .mutateWith(csrf())
+    risWebTestClient
+        .withDefaultLogin()
         .put()
         .uri("/api/v1/caselaw/lookuptableimporter/fieldOfLaw")
         .bodyValue(BodyInserters.fromValue(new byte[] {}))

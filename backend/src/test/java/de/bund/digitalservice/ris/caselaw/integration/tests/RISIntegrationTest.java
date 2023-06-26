@@ -10,7 +10,6 @@ import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWeb
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.annotation.AliasFor;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
 @Target(ElementType.TYPE)
@@ -19,7 +18,6 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 @Import({})
 @Tag("integration")
 @Testcontainers(disabledWithoutDocker = true)
-@WithMockUser
 @AutoConfigureDataR2dbc
 @AutoConfigureWebTestClient(timeout = "100000000000")
 public @interface RISIntegrationTest {

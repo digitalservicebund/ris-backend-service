@@ -1,10 +1,13 @@
 package de.bund.digitalservice.ris.caselaw.integration.tests;
 
-import static de.bund.digitalservice.ris.caselaw.AuthUtils.getMockLogin;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doReturn;
 
 import com.jayway.jsonpath.JsonPath;
+import de.bund.digitalservice.ris.caselaw.RisWebTestClient;
+import de.bund.digitalservice.ris.caselaw.TestConfig;
+import de.bund.digitalservice.ris.caselaw.adapter.AuthService;
 import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentNumberService;
 import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentUnitStatusService;
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentUnitController;
@@ -19,11 +22,14 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentationOf
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.FileNumberDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.FileNumberRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.PostgresDocumentUnitRepositoryImpl;
+import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationOfficeTransformer;
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresConfig;
+import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
 import de.bund.digitalservice.ris.caselaw.domain.DataSource;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.EmailPublishService;
+import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -36,12 +42,14 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.security.oauth2.client.registration.ReactiveClientRegistrationRepository;
+import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.reactive.server.EntityExchangeResult;
-import org.springframework.test.web.reactive.server.WebTestClient;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
+import reactor.core.publisher.Mono;
 import software.amazon.awssdk.services.s3.S3AsyncClient;
 
 @RISIntegrationTest(
@@ -52,10 +60,13 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
       DatabaseDocumentNumberService.class,
       PostgresDocumentUnitRepositoryImpl.class,
       FlywayConfig.class,
-      PostgresConfig.class
+      PostgresConfig.class,
+      SecurityConfig.class,
+      AuthService.class,
+      TestConfig.class
     },
     controllers = {DocumentUnitController.class})
-public class DocumentUnitListEntryIntegrationTest {
+class DocumentUnitListEntryIntegrationTest {
   @Container
   static PostgreSQLContainer postgreSQLContainer = new PostgreSQLContainer<>("postgres:12");
 
@@ -68,30 +79,36 @@ public class DocumentUnitListEntryIntegrationTest {
     registry.add("database.database", () -> postgreSQLContainer.getDatabaseName());
   }
 
-  @MockBean S3AsyncClient s3AsyncClient;
-  @MockBean EmailPublishService publishService;
-  @MockBean DocxConverterService docxConverterService;
-
-  @Autowired private WebTestClient webClient;
+  @Autowired private RisWebTestClient risWebTestClient;
   @Autowired private DatabaseDocumentUnitRepository repository;
   @Autowired private DatabaseDocumentUnitStatusRepository statusRepository;
   @Autowired private DatabaseDocumentUnitMetadataRepository listEntryRepository;
   @Autowired private FileNumberRepository fileNumberRepository;
   @Autowired private DatabaseDocumentationOfficeRepository documentationOfficeRepository;
 
+  @MockBean S3AsyncClient s3AsyncClient;
+  @MockBean EmailPublishService publishService;
+  @MockBean DocxConverterService docxConverterService;
+  @MockBean UserService userService;
+  @MockBean ReactiveClientRegistrationRepository clientRegistrationRepository;
+
+  private DocumentationOfficeDTO docOfficeDTO;
+
   @BeforeEach
   void setUp() {
     repository.deleteAll().block();
     fileNumberRepository.deleteAll().block();
     statusRepository.deleteAll().block();
+
+    docOfficeDTO = documentationOfficeRepository.findByLabel("DigitalService").block();
+
+    doReturn(Mono.just(DocumentationOfficeTransformer.transformDTO(docOfficeDTO)))
+        .when(userService)
+        .getDocumentationOffice(any(OidcUser.class));
   }
 
   @Test
   void testForCorrectResponseWhenRequestingAll() {
-    // created via db migration V0_79__caselaw_insert_default_documentation_offices
-    DocumentationOfficeDTO documentationOfficeDTO =
-        documentationOfficeRepository.findByLabel("BGH").block();
-
     DocumentUnitDTO neurisDto =
         repository
             .save(
@@ -100,7 +117,7 @@ public class DocumentUnitListEntryIntegrationTest {
                     .creationtimestamp(Instant.now())
                     .documentnumber("1234567890123")
                     .dataSource(DataSource.NEURIS)
-                    .documentationOfficeId(documentationOfficeDTO.getId())
+                    .documentationOfficeId(docOfficeDTO.getId())
                     .build())
             .block();
     DocumentUnitDTO migrationDto =
@@ -132,9 +149,8 @@ public class DocumentUnitListEntryIntegrationTest {
                 .build())
         .block();
 
-    webClient
-        .mutateWith(csrf())
-        .mutateWith(getMockLogin())
+    risWebTestClient
+        .withDefaultLogin()
         .get()
         .uri("/api/v1/caselaw/documentunits?pg=0&sz=3")
         .exchange()
@@ -150,7 +166,7 @@ public class DocumentUnitListEntryIntegrationTest {
         .jsonPath("$.content[0].fileNumber")
         .isEqualTo("AkteX")
         .jsonPath("$.content[0].documentationOffice.label")
-        .isEqualTo("BGH")
+        .isEqualTo("DigitalService")
         .jsonPath("$.content[0].status")
         .isEqualTo("PUBLISHED")
         .jsonPath("$.totalElements")
@@ -159,10 +175,6 @@ public class DocumentUnitListEntryIntegrationTest {
 
   @Test
   void testForCorrectOrdering() {
-    // created via db migration V0_79__caselaw_insert_default_documentation_offices
-    DocumentationOfficeDTO documentationOfficeDTO =
-        documentationOfficeRepository.findByLabel("DigitalService").block();
-
     List<Instant> timestampsExpected = new ArrayList<>();
     for (int i = 0; i < 11; i++) {
       timestampsExpected.add(Instant.now().minus(i, ChronoUnit.DAYS));
@@ -177,15 +189,14 @@ public class DocumentUnitListEntryIntegrationTest {
                   .creationtimestamp(timestampsExpected.get(i))
                   .documentnumber("123456789012" + i)
                   .dataSource(DataSource.NEURIS)
-                  .documentationOfficeId(documentationOfficeDTO.getId())
+                  .documentationOfficeId(docOfficeDTO.getId())
                   .build())
           .block();
     }
 
     EntityExchangeResult<String> result =
-        webClient
-            .mutateWith(csrf())
-            .mutateWith(getMockLogin())
+        risWebTestClient
+            .withDefaultLogin()
             .get()
             .uri("/api/v1/caselaw/documentunits?pg=0&sz=10")
             .exchange()
@@ -208,10 +219,6 @@ public class DocumentUnitListEntryIntegrationTest {
 
   @Test
   void testForCorrectPagination() {
-    // created via db migration V0_79__caselaw_insert_default_documentation_offices
-    DocumentationOfficeDTO documentationOfficeDTO =
-        documentationOfficeRepository.findByLabel("DigitalService").block();
-
     List<DocumentUnitDTO> documents =
         IntStream.range(0, 99)
             .mapToObj(
@@ -221,16 +228,15 @@ public class DocumentUnitListEntryIntegrationTest {
                         .creationtimestamp(Instant.now())
                         .documentnumber("123456780" + i)
                         .dataSource(DataSource.NEURIS)
-                        .documentationOfficeId(documentationOfficeDTO.getId())
+                        .documentationOfficeId(docOfficeDTO.getId())
                         .build())
             .collect(Collectors.toList());
 
     repository.saveAll(documents).blockLast();
 
     EntityExchangeResult<String> result =
-        webClient
-            .mutateWith(csrf())
-            .mutateWith(getMockLogin())
+        risWebTestClient
+            .withDefaultLogin()
             .get()
             .uri("/api/v1/caselaw/documentunits?pg=0&sz=1")
             .exchange()

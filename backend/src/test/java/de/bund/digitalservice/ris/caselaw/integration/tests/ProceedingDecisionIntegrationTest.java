@@ -1,9 +1,13 @@
 package de.bund.digitalservice.ris.caselaw.integration.tests;
 
-import static de.bund.digitalservice.ris.caselaw.AuthUtils.getMockLogin;
+import static de.bund.digitalservice.ris.caselaw.AuthUtils.buildDefaultDocOffice;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doReturn;
 
+import de.bund.digitalservice.ris.caselaw.RisWebTestClient;
+import de.bund.digitalservice.ris.caselaw.TestConfig;
+import de.bund.digitalservice.ris.caselaw.adapter.AuthService;
 import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentNumberService;
 import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentUnitStatusService;
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentUnitController;
@@ -27,13 +31,16 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.Dat
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DocumentTypeDTO;
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresConfig;
+import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
 import de.bund.digitalservice.ris.caselaw.domain.DataSource;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatus;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitLinkType;
 import de.bund.digitalservice.ris.caselaw.domain.EmailPublishService;
 import de.bund.digitalservice.ris.caselaw.domain.ProceedingDecision;
+import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.court.Court;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
 import java.time.Instant;
@@ -42,15 +49,18 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.security.oauth2.client.registration.ReactiveClientRegistrationRepository;
+import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
-import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.test.web.reactive.server.WebTestClient.BodyContentSpec;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
+import reactor.core.publisher.Mono;
 import software.amazon.awssdk.services.s3.S3AsyncClient;
 
 @RISIntegrationTest(
@@ -61,7 +71,10 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
       DatabaseDocumentNumberService.class,
       PostgresDocumentUnitRepositoryImpl.class,
       FlywayConfig.class,
-      PostgresConfig.class
+      PostgresConfig.class,
+      SecurityConfig.class,
+      AuthService.class,
+      TestConfig.class
     },
     controllers = {ProceedingDecisionController.class, DocumentUnitController.class})
 class ProceedingDecisionIntegrationTest {
@@ -77,7 +90,7 @@ class ProceedingDecisionIntegrationTest {
     registry.add("database.database", () -> postgreSQLContainer.getDatabaseName());
   }
 
-  @Autowired private WebTestClient webClient;
+  @Autowired private RisWebTestClient risWebTestClient;
   @Autowired private DatabaseDocumentUnitRepository repository;
   @Autowired private DatabaseDocumentUnitMetadataRepository metadataRepository;
   @Autowired private DatabaseDocumentationUnitLinkRepository linkRepository;
@@ -86,9 +99,21 @@ class ProceedingDecisionIntegrationTest {
   @Autowired private DatabaseDocumentationOfficeRepository documentationOfficeRepository;
   @Autowired private DatabaseDocumentUnitStatusRepository statusRepository;
 
+  @MockBean UserService userService;
+  @MockBean ReactiveClientRegistrationRepository clientRegistrationRepository;
   @MockBean private S3AsyncClient s3AsyncClient;
   @MockBean private EmailPublishService publishService;
   @MockBean DocxConverterService docxConverterService;
+
+  private final DocumentationOffice docOffice = buildDefaultDocOffice();
+  private UUID documentationOfficeUuid;
+
+  @BeforeEach
+  void setUp() {
+    documentationOfficeUuid =
+        documentationOfficeRepository.findByLabel(docOffice.label()).block().getId();
+    doReturn(Mono.just(docOffice)).when(userService).getDocumentationOffice(any(OidcUser.class));
+  }
 
   @AfterEach
   void cleanUp() {
@@ -108,6 +133,7 @@ class ProceedingDecisionIntegrationTest {
     DocumentUnitDTO parentDocumentUnitDTO =
         DocumentUnitDTO.builder()
             .uuid(parentUuid)
+            .documentationOfficeId(documentationOfficeUuid)
             .creationtimestamp(Instant.now())
             .documentnumber("documntnumber")
             .dataSource(DataSource.NEURIS)
@@ -125,9 +151,8 @@ class ProceedingDecisionIntegrationTest {
                 .block())
         .isEmpty();
 
-    webClient
-        .mutateWith(csrf())
-        .mutateWith(getMockLogin())
+    risWebTestClient
+        .withDefaultLogin()
         .put()
         .uri("/api/v1/caselaw/documentunits/" + parentUuid + "/proceedingdecisions")
         .bodyValue(proceedingDecision)
@@ -161,6 +186,7 @@ class ProceedingDecisionIntegrationTest {
     DocumentUnitDTO parentDocumentUnitDTO =
         DocumentUnitDTO.builder()
             .uuid(parentUuid)
+            .documentationOfficeId(documentationOfficeUuid)
             .creationtimestamp(Instant.now())
             .documentnumber("documntnumber")
             .dataSource(DataSource.NEURIS)
@@ -186,8 +212,8 @@ class ProceedingDecisionIntegrationTest {
     linkDTO = linkRepository.save(linkDTO).block();
     assertThat(linkDTO).isNotNull();
 
-    webClient
-        .mutateWith(csrf())
+    risWebTestClient
+        .withDefaultLogin()
         .get()
         .uri("/api/v1/caselaw/documentunits/documntnumber")
         .exchange()
@@ -207,6 +233,7 @@ class ProceedingDecisionIntegrationTest {
     DocumentUnitDTO parentDocumentUnitDTO =
         DocumentUnitDTO.builder()
             .uuid(parentUuid)
+            .documentationOfficeId(documentationOfficeUuid)
             .creationtimestamp(Instant.now())
             .documentnumber("1234567890123")
             .dataSource(DataSource.NEURIS)
@@ -232,8 +259,8 @@ class ProceedingDecisionIntegrationTest {
                 .block())
         .isNull();
 
-    webClient
-        .mutateWith(csrf())
+    risWebTestClient
+        .withDefaultLogin()
         .put()
         .uri("/api/v1/caselaw/documentunits/" + parentUuid + "/proceedingdecisions/" + childUuid)
         .exchange()
@@ -256,6 +283,7 @@ class ProceedingDecisionIntegrationTest {
     DocumentUnitDTO parentDocumentUnitDTO =
         DocumentUnitDTO.builder()
             .uuid(parentUuid)
+            .documentationOfficeId(documentationOfficeUuid)
             .creationtimestamp(Instant.now())
             .documentnumber("1234567890123")
             .dataSource(DataSource.NEURIS)
@@ -281,8 +309,8 @@ class ProceedingDecisionIntegrationTest {
     linkDTO = linkRepository.save(linkDTO).block();
     assertThat(linkDTO).isNotNull();
 
-    webClient
-        .mutateWith(csrf())
+    risWebTestClient
+        .withDefaultLogin()
         .delete()
         .uri("/api/v1/caselaw/documentunits/" + parentUuid + "/proceedingdecisions/" + childUuid)
         .exchange()
@@ -299,6 +327,7 @@ class ProceedingDecisionIntegrationTest {
     DocumentUnitDTO parentDocumentUnitDTO =
         DocumentUnitDTO.builder()
             .uuid(parentUuid)
+            .documentationOfficeId(documentationOfficeUuid)
             .creationtimestamp(Instant.now())
             .documentnumber("documntnumber")
             .dataSource(DataSource.NEURIS)
@@ -324,8 +353,8 @@ class ProceedingDecisionIntegrationTest {
     linkDTO = linkRepository.save(linkDTO).block();
     assertThat(linkDTO).isNotNull();
 
-    webClient
-        .mutateWith(csrf())
+    risWebTestClient
+        .withDefaultLogin()
         .delete()
         .uri("/api/v1/caselaw/documentunits/" + parentUuid + "/proceedingdecisions/" + childUuid)
         .exchange()
@@ -335,8 +364,8 @@ class ProceedingDecisionIntegrationTest {
     assertThat(linkRepository.findById(linkDTO.getId()).block()).isNull();
     assertThat(repository.findById(childDocumentUnitDTO.getId()).block()).isNotNull();
 
-    webClient
-        .mutateWith(csrf())
+    risWebTestClient
+        .withDefaultLogin()
         .get()
         .uri("/api/v1/caselaw/documentunits/documntnumber")
         .exchange()
@@ -356,6 +385,7 @@ class ProceedingDecisionIntegrationTest {
     DocumentUnitDTO parentDocumentUnitDTO =
         DocumentUnitDTO.builder()
             .uuid(parentUuid)
+            .documentationOfficeId(documentationOfficeUuid)
             .creationtimestamp(Instant.now())
             .documentnumber("1234567890123")
             .dataSource(DataSource.NEURIS)
@@ -381,8 +411,8 @@ class ProceedingDecisionIntegrationTest {
     linkDTO = linkRepository.save(linkDTO).block();
     assertThat(linkDTO).isNotNull();
 
-    webClient
-        .mutateWith(csrf())
+    risWebTestClient
+        .withDefaultLogin()
         .delete()
         .uri("/api/v1/caselaw/documentunits/" + parentUuid + "/proceedingdecisions/" + childUuid)
         .exchange()
@@ -399,6 +429,7 @@ class ProceedingDecisionIntegrationTest {
     DocumentUnitDTO parentDocumentUnitDTO1 =
         DocumentUnitDTO.builder()
             .uuid(parentUuid1)
+            .documentationOfficeId(documentationOfficeUuid)
             .creationtimestamp(Instant.now())
             .documentnumber("1234567890123")
             .dataSource(DataSource.NEURIS)
@@ -443,8 +474,8 @@ class ProceedingDecisionIntegrationTest {
     linkDTO2 = linkRepository.save(linkDTO2).block();
     assertThat(linkDTO2).isNotNull();
 
-    webClient
-        .mutateWith(csrf())
+    risWebTestClient
+        .withDefaultLogin()
         .delete()
         .uri("/api/v1/caselaw/documentunits/" + parentUuid1 + "/proceedingdecisions/" + childUuid)
         .exchange()
@@ -462,14 +493,15 @@ class ProceedingDecisionIntegrationTest {
     DocumentUnitDTO parentDocumentUnitDTO =
         DocumentUnitDTO.builder()
             .uuid(parentUuid)
+            .documentationOfficeId(documentationOfficeUuid)
             .creationtimestamp(Instant.now())
             .documentnumber("1234567890123")
             .dataSource(DataSource.NEURIS)
             .build();
     repository.save(parentDocumentUnitDTO).block();
 
-    webClient
-        .mutateWith(csrf())
+    risWebTestClient
+        .withDefaultLogin()
         .delete()
         .uri(
             "/api/v1/caselaw/documentunits/" + parentUuid + "/proceedingdecisions/" + "invalidUUID")
@@ -484,6 +516,7 @@ class ProceedingDecisionIntegrationTest {
     DocumentUnitDTO parentDocumentUnitDTO =
         DocumentUnitDTO.builder()
             .uuid(parentUuid)
+            .documentationOfficeId(documentationOfficeUuid)
             .creationtimestamp(Instant.now())
             .documentnumber("1234567890123")
             .dataSource(DataSource.NEURIS)
@@ -500,8 +533,8 @@ class ProceedingDecisionIntegrationTest {
             .build();
     childDocumentUnitDTO = repository.save(childDocumentUnitDTO).block();
 
-    webClient
-        .mutateWith(csrf())
+    risWebTestClient
+        .withDefaultLogin()
         .put()
         .uri("/api/v1/caselaw/documentunits/" + parentUuid + "/proceedingdecisions/" + childUuid)
         .exchange()
@@ -701,9 +734,8 @@ class ProceedingDecisionIntegrationTest {
   }
 
   private BodyContentSpec simulateAPICall(ProceedingDecision proceedingDecisionSearchInput) {
-    return webClient
-        .mutateWith(csrf())
-        .mutateWith(getMockLogin())
+    return risWebTestClient
+        .withDefaultLogin()
         .put()
         .uri("/api/v1/caselaw/documentunits/search?pg=0&sz=30")
         .bodyValue(proceedingDecisionSearchInput)
@@ -741,6 +773,7 @@ class ProceedingDecisionIntegrationTest {
     DocumentUnitMetadataDTO documentUnitMetadataDTO =
         DocumentUnitMetadataDTO.builder()
             .uuid(UUID.randomUUID())
+            .documentationOfficeId(documentOffice.getId())
             .documentnumber(RandomStringUtils.randomAlphanumeric(13))
             .creationtimestamp(Instant.now())
             .courtType(courtType)

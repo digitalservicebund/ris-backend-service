@@ -1,10 +1,11 @@
 package de.bund.digitalservice.ris.caselaw.integration.tests;
 
-import static de.bund.digitalservice.ris.caselaw.AuthUtils.getMockLogin;
 import static de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatus.PUBLISHED;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
 
+import de.bund.digitalservice.ris.caselaw.RisWebTestClient;
+import de.bund.digitalservice.ris.caselaw.TestConfig;
+import de.bund.digitalservice.ris.caselaw.adapter.AuthService;
 import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentNumberService;
 import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentUnitStatusService;
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentUnitController;
@@ -14,6 +15,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.MockXmlExporter;
 import de.bund.digitalservice.ris.caselaw.adapter.XmlEMailPublishService;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentUnitRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentUnitStatusRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentationOfficeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseXmlMailRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitStatusDTO;
@@ -22,6 +24,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.PostgresXmlMail
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.XmlMailDTO;
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresConfig;
+import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatus;
 import de.bund.digitalservice.ris.caselaw.domain.HttpMailSender;
@@ -36,12 +39,13 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.security.oauth2.client.registration.ReactiveClientRegistrationRepository;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
-import org.springframework.test.web.reactive.server.WebTestClient;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import software.amazon.awssdk.services.s3.S3AsyncClient;
@@ -57,7 +61,10 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
       DatabaseDocumentUnitStatusService.class,
       MockXmlExporter.class,
       FlywayConfig.class,
-      PostgresConfig.class
+      PostgresConfig.class,
+      SecurityConfig.class,
+      AuthService.class,
+      TestConfig.class
     },
     controllers = {DocumentUnitController.class})
 class PublishDocumentUnitIntegrationTest {
@@ -77,15 +84,23 @@ class PublishDocumentUnitIntegrationTest {
   private static final String DELIVER_DATE =
       LocalDate.now(Clock.system(ZoneId.of("Europe/Berlin"))).format(DATE_FORMATTER);
 
-  @Autowired private WebTestClient webClient;
-
+  @Autowired private RisWebTestClient risWebTestClient;
   @Autowired private DatabaseDocumentUnitRepository repository;
   @Autowired private DatabaseXmlMailRepository xmlMailRepository;
   @Autowired private DatabaseDocumentUnitStatusRepository documentUnitStatusRepository;
+  @Autowired private DatabaseDocumentationOfficeRepository documentationOfficeRepository;
 
+  @MockBean ReactiveClientRegistrationRepository clientRegistrationRepository;
   @MockBean private S3AsyncClient s3AsyncClient;
   @MockBean private HttpMailSender mailSender;
   @MockBean DocxConverterService docxConverterService;
+
+  private UUID docOfficeUuid;
+
+  @BeforeEach
+  void setUp() {
+    docOfficeUuid = documentationOfficeRepository.findByLabel("DigitalService").block().getId();
+  }
 
   @AfterEach
   void cleanUp() {
@@ -100,6 +115,7 @@ class PublishDocumentUnitIntegrationTest {
     DocumentUnitDTO documentUnitDTO =
         DocumentUnitDTO.builder()
             .uuid(documentUnitUuid1)
+            .documentationOfficeId(docOfficeUuid)
             .documentnumber("docnr12345678")
             .creationtimestamp(Instant.now())
             .decisionDate(Instant.now())
@@ -140,9 +156,8 @@ class PublishDocumentUnitIntegrationTest {
     XmlMailResponse expectedXmlResultObject =
         new XmlMailResponse(documentUnitUuid1, expectedXmlMail);
 
-    webClient
-        .mutateWith(csrf())
-        .mutateWith(getMockLogin())
+    risWebTestClient
+        .withDefaultLogin()
         .put()
         .uri("/api/v1/caselaw/documentunits/" + documentUnitUuid1 + "/publish")
         .exchange()
@@ -179,6 +194,7 @@ class PublishDocumentUnitIntegrationTest {
     DocumentUnitDTO documentUnitDTO =
         DocumentUnitDTO.builder()
             .uuid(documentUnitUuid)
+            .documentationOfficeId(docOfficeUuid)
             .documentnumber("docnr12345678")
             .creationtimestamp(Instant.now())
             .build();
@@ -211,9 +227,8 @@ class PublishDocumentUnitIntegrationTest {
     XmlMailResponse expectedXmlResultObject =
         new XmlMailResponse(documentUnitUuid, expectedXmlMail);
 
-    webClient
-        .mutateWith(csrf())
-        .mutateWith(getMockLogin())
+    risWebTestClient
+        .withDefaultLogin()
         .put()
         .uri("/api/v1/caselaw/documentunits/" + documentUnitUuid + "/publish")
         .exchange()
@@ -242,6 +257,7 @@ class PublishDocumentUnitIntegrationTest {
     DocumentUnitDTO documentUnitDTO =
         DocumentUnitDTO.builder()
             .uuid(documentUnitUuid1)
+            .documentationOfficeId(docOfficeUuid)
             .documentnumber("docnr12345678")
             .creationtimestamp(Instant.now())
             .build();
@@ -275,8 +291,8 @@ class PublishDocumentUnitIntegrationTest {
     XmlMailResponse expectedXmlResultObject =
         new XmlMailResponse(documentUnitUuid1, expectedXmlMail);
 
-    webClient
-        .mutateWith(csrf())
+    risWebTestClient
+        .withDefaultLogin()
         .get()
         .uri("/api/v1/caselaw/documentunits/" + documentUnitUuid1 + "/publish")
         .exchange()

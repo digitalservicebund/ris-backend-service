@@ -1,12 +1,12 @@
 package de.bund.digitalservice.ris.caselaw.integration.tests;
 
-import static de.bund.digitalservice.ris.caselaw.AuthUtils.getMockLoginWithDocOffice;
 import static de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatus.PUBLISHED;
 import static de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatus.UNPUBLISHED;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
 
 import com.jayway.jsonpath.JsonPath;
+import de.bund.digitalservice.ris.caselaw.RisWebTestClient;
+import de.bund.digitalservice.ris.caselaw.TestConfig;
 import de.bund.digitalservice.ris.caselaw.adapter.AuthService;
 import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentNumberService;
 import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentUnitStatusService;
@@ -38,10 +38,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.security.oauth2.client.registration.ReactiveClientRegistrationRepository;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.reactive.server.EntityExchangeResult;
-import org.springframework.test.web.reactive.server.WebTestClient;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import software.amazon.awssdk.services.s3.S3AsyncClient;
@@ -56,7 +56,9 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
       PostgresDocumentUnitRepositoryImpl.class,
       FlywayConfig.class,
       PostgresConfig.class,
-      SecurityConfig.class
+      SecurityConfig.class,
+      AuthService.class,
+      TestConfig.class
     },
     controllers = {DocumentUnitController.class})
 class DocumentUnitControllerAuthIntegrationTest {
@@ -72,7 +74,7 @@ class DocumentUnitControllerAuthIntegrationTest {
     registry.add("database.database", () -> postgreSQLContainer.getDatabaseName());
   }
 
-  @Autowired private WebTestClient webClient;
+  @Autowired private RisWebTestClient risWebTestClient;
   @Autowired private DatabaseDocumentUnitRepository repository;
   @Autowired private DatabaseDocumentUnitStatusRepository statusRepository;
   @Autowired private DatabaseDocumentationOfficeRepository documentationOfficeRepository;
@@ -80,6 +82,7 @@ class DocumentUnitControllerAuthIntegrationTest {
   @MockBean private S3AsyncClient s3AsyncClient;
   @MockBean private EmailPublishService publishService;
   @MockBean DocxConverterService docxConverterService;
+  @MockBean ReactiveClientRegistrationRepository clientRegistrationRepository;
 
   private final String docOffice1Group = "/CC-RIS";
   private final String docOffice2Group = "/caselaw/BGH";
@@ -126,9 +129,8 @@ class DocumentUnitControllerAuthIntegrationTest {
 
     // Documentation Office 1
     EntityExchangeResult<String> result =
-        webClient
-            .mutateWith(csrf())
-            .mutateWith(getMockLoginWithDocOffice(docOffice1Group))
+        risWebTestClient
+            .withLogin(docOffice1Group)
             .get()
             .uri("/api/v1/caselaw/documentunits?pg=0&sz=10")
             .exchange()
@@ -152,9 +154,8 @@ class DocumentUnitControllerAuthIntegrationTest {
 
     // Documentation Office 2
     result =
-        webClient
-            .mutateWith(csrf())
-            .mutateWith(getMockLoginWithDocOffice(docOffice2Group))
+        risWebTestClient
+            .withLogin(docOffice2Group)
             .get()
             .uri("/api/v1/caselaw/documentunits?pg=0&sz=10")
             .exchange()
@@ -185,9 +186,8 @@ class DocumentUnitControllerAuthIntegrationTest {
 
     // Documentation Office 1
     EntityExchangeResult<String> result =
-        webClient
-            .mutateWith(csrf())
-            .mutateWith(getMockLoginWithDocOffice(docOffice1Group))
+        risWebTestClient
+            .withLogin(docOffice1Group)
             .get()
             .uri("/api/v1/caselaw/documentunits/" + docUnit1.getDocumentnumber())
             .exchange()
@@ -199,9 +199,8 @@ class DocumentUnitControllerAuthIntegrationTest {
     assertThat(extractUuid(result.getResponseBody())).isEqualTo(docUnit1.getUuid().toString());
 
     // Documentation Office 2
-    webClient
-        .mutateWith(csrf())
-        .mutateWith(getMockLoginWithDocOffice(docOffice2Group))
+    risWebTestClient
+        .withLogin(docOffice2Group)
         .get()
         .uri("/api/v1/caselaw/documentunits/" + docUnit1.getDocumentnumber())
         .exchange()
@@ -212,9 +211,8 @@ class DocumentUnitControllerAuthIntegrationTest {
         docUnit1, docUnit1.getCreationtimestamp().plus(1, ChronoUnit.DAYS), PUBLISHED);
 
     result =
-        webClient
-            .mutateWith(csrf())
-            .mutateWith(getMockLoginWithDocOffice(docOffice2Group))
+        risWebTestClient
+            .withLogin(docOffice2Group)
             .get()
             .uri("/api/v1/caselaw/documentunits/" + docUnit1.getDocumentnumber())
             .exchange()

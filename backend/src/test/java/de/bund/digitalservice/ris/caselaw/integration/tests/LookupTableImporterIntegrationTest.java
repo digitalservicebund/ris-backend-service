@@ -1,8 +1,10 @@
 package de.bund.digitalservice.ris.caselaw.integration.tests;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
 
+import de.bund.digitalservice.ris.caselaw.RisWebTestClient;
+import de.bund.digitalservice.ris.caselaw.TestConfig;
+import de.bund.digitalservice.ris.caselaw.adapter.AuthService;
 import de.bund.digitalservice.ris.caselaw.adapter.LookupTableImporterController;
 import de.bund.digitalservice.ris.caselaw.adapter.LookupTableImporterService;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPADocumentTypeDTO;
@@ -24,7 +26,10 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.Sta
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
+import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.EmailPublishService;
+import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import java.util.Arrays;
 import java.util.List;
 import org.junit.jupiter.api.AfterEach;
@@ -32,9 +37,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.oauth2.client.registration.ReactiveClientRegistrationRepository;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
-import org.springframework.test.web.reactive.server.WebTestClient;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import software.amazon.awssdk.services.s3.S3AsyncClient;
@@ -44,7 +49,10 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
       LookupTableImporterService.class,
       FlywayConfig.class,
       PostgresConfig.class,
-      PostgresJPAConfig.class
+      PostgresJPAConfig.class,
+      SecurityConfig.class,
+      AuthService.class,
+      TestConfig.class
     },
     controllers = {LookupTableImporterController.class})
 class LookupTableImporterIntegrationTest {
@@ -60,7 +68,7 @@ class LookupTableImporterIntegrationTest {
     registry.add("database.database", () -> postgreSQLContainer.getDatabaseName());
   }
 
-  @Autowired private WebTestClient webClient;
+  @Autowired private RisWebTestClient risWebTestClient;
   @Autowired private JPADocumentTypeRepository jpaDocumentTypeRepository;
   @Autowired private DatabaseCourtRepository databaseCourtRepository;
   @Autowired private DatabaseCitationStyleRepository databaseCitationStyleRepository;
@@ -72,6 +80,9 @@ class LookupTableImporterIntegrationTest {
 
   @MockBean private S3AsyncClient s3AsyncClient;
   @MockBean private EmailPublishService publishService;
+  @MockBean UserService userService;
+  @MockBean private DocumentUnitService documentUnitService;
+  @MockBean ReactiveClientRegistrationRepository clientRegistrationRepository;
 
   @AfterEach
   void cleanUp() {
@@ -96,8 +107,8 @@ class LookupTableImporterIntegrationTest {
           </juris-doktyp>
         </juris-table>""";
 
-    webClient
-        .mutateWith(csrf())
+    risWebTestClient
+        .withDefaultLogin()
         .put()
         .uri("/api/v1/caselaw/lookuptableimporter/doktyp")
         .bodyValue(doktypXml)
@@ -133,8 +144,8 @@ class LookupTableImporterIntegrationTest {
           </juris-gericht>
         </juris-table>""";
 
-    webClient
-        .mutateWith(csrf())
+    risWebTestClient
+        .withDefaultLogin()
         .put()
         .uri("/api/v1/caselaw/lookuptableimporter/gerichtdata")
         .bodyValue(gerichtdataXml)
@@ -170,8 +181,8 @@ class LookupTableImporterIntegrationTest {
           </juris-buland>
         </juris-table>""";
 
-    webClient
-        .mutateWith(csrf())
+    risWebTestClient
+        .withDefaultLogin()
         .put()
         .uri("/api/v1/caselaw/lookuptableimporter/buland")
         .bodyValue(bulandXml)
@@ -208,8 +219,8 @@ class LookupTableImporterIntegrationTest {
                 </juris-table>
                 """;
 
-    webClient
-        .mutateWith(csrf())
+    risWebTestClient
+        .withDefaultLogin()
         .put()
         .uri("/api/v1/caselaw/lookuptableimporter/zitart")
         .bodyValue(citationStyleXml)
@@ -330,8 +341,8 @@ class LookupTableImporterIntegrationTest {
             </juris-table>
             """;
 
-    webClient
-        .mutateWith(csrf())
+    risWebTestClient
+        .withDefaultLogin()
         .put()
         .uri("/api/v1/caselaw/lookuptableimporter/fieldOfLaw")
         .bodyValue(fieldOfLawXml)

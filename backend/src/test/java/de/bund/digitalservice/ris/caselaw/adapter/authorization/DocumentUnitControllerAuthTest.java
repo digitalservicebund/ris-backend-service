@@ -1,15 +1,15 @@
 package de.bund.digitalservice.ris.caselaw.adapter.authorization;
 
 import static de.bund.digitalservice.ris.caselaw.AuthUtils.buildDocOffice;
-import static de.bund.digitalservice.ris.caselaw.AuthUtils.getMockLoginWithDocOffice;
 import static de.bund.digitalservice.ris.caselaw.AuthUtils.setUpDocumentationOfficeMocks;
 import static de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatus.PUBLISHED;
 import static de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatus.UNPUBLISHED;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
-import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
 
+import de.bund.digitalservice.ris.caselaw.RisWebTestClient;
+import de.bund.digitalservice.ris.caselaw.TestConfig;
 import de.bund.digitalservice.ris.caselaw.adapter.AuthService;
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentUnitController;
 import de.bund.digitalservice.ris.caselaw.adapter.DocxConverterService;
@@ -30,21 +30,22 @@ import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpHeaders;
+import org.springframework.security.oauth2.client.registration.ReactiveClientRegistrationRepository;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.web.reactive.function.BodyInserters;
 import reactor.core.publisher.Mono;
 
 @ExtendWith(SpringExtension.class)
 @WebFluxTest(controllers = DocumentUnitController.class)
-@Import({SecurityConfig.class, AuthService.class})
+@Import({SecurityConfig.class, AuthService.class, TestConfig.class})
 class DocumentUnitControllerAuthTest {
-  @Autowired private WebTestClient webClient;
+  @Autowired private RisWebTestClient risWebTestClient;
 
   @MockBean private DocumentUnitService service;
   @MockBean private KeycloakUserService userService;
   @MockBean private DocxConverterService docxConverterService;
+  @MockBean ReactiveClientRegistrationRepository clientRegistrationRepository;
 
   private static final UUID TEST_UUID = UUID.fromString("88888888-4444-4444-4444-121212121212");
   private final String docOffice1Group = "/CC-RIS";
@@ -63,18 +64,16 @@ class DocumentUnitControllerAuthTest {
     // testGetByDocumentNumber() is also in DocumentUnitControllerAuthIntegrationTest
     when(service.getByDocumentNumber(any(String.class))).thenReturn(Mono.empty());
 
-    webClient
-        .mutateWith(csrf())
-        .mutateWith(getMockLoginWithDocOffice(docOffice1Group))
+    risWebTestClient
+        .withLogin(docOffice1Group)
         .get()
         .uri("/api/v1/caselaw/documentunits/abc123")
         .exchange()
         .expectStatus()
         .isForbidden();
 
-    webClient
-        .mutateWith(csrf())
-        .mutateWith(getMockLoginWithDocOffice(docOffice2Group))
+    risWebTestClient
+        .withLogin(docOffice2Group)
         .get()
         .uri("/api/v1/caselaw/documentunits/abc123")
         .exchange()
@@ -91,9 +90,8 @@ class DocumentUnitControllerAuthTest {
 
     String uri = "/api/v1/caselaw/documentunits/" + TEST_UUID + "/file";
 
-    webClient
-        .mutateWith(csrf())
-        .mutateWith(getMockLoginWithDocOffice(docOffice1Group))
+    risWebTestClient
+        .withLogin(docOffice1Group)
         .put()
         .uri(uri)
         .body(BodyInserters.fromValue(new byte[] {}))
@@ -101,9 +99,8 @@ class DocumentUnitControllerAuthTest {
         .expectStatus()
         .isOk();
 
-    webClient
-        .mutateWith(csrf())
-        .mutateWith(getMockLoginWithDocOffice(docOffice2Group))
+    risWebTestClient
+        .withLogin(docOffice2Group)
         .put()
         .uri(uri)
         .body(BodyInserters.fromValue(new byte[] {}))
@@ -119,23 +116,15 @@ class DocumentUnitControllerAuthTest {
 
     String uri = "/api/v1/caselaw/documentunits/" + TEST_UUID + "/file";
 
-    webClient
-        .mutateWith(csrf())
-        .mutateWith(getMockLoginWithDocOffice(docOffice2Group))
-        .delete()
-        .uri(uri)
-        .exchange()
-        .expectStatus()
-        .isOk();
-
-    webClient
-        .mutateWith(csrf())
-        .mutateWith(getMockLoginWithDocOffice(docOffice1Group))
+    risWebTestClient
+        .withLogin(docOffice1Group)
         .delete()
         .uri(uri)
         .exchange()
         .expectStatus()
         .isForbidden();
+
+    risWebTestClient.withLogin(docOffice2Group).delete().uri(uri).exchange().expectStatus().isOk();
   }
 
   @Test
@@ -145,18 +134,10 @@ class DocumentUnitControllerAuthTest {
 
     String uri = "/api/v1/caselaw/documentunits/" + TEST_UUID;
 
-    webClient
-        .mutateWith(csrf())
-        .mutateWith(getMockLoginWithDocOffice(docOffice1Group))
-        .delete()
-        .uri(uri)
-        .exchange()
-        .expectStatus()
-        .isOk();
+    risWebTestClient.withLogin(docOffice1Group).delete().uri(uri).exchange().expectStatus().isOk();
 
-    webClient
-        .mutateWith(csrf())
-        .mutateWith(getMockLoginWithDocOffice(docOffice2Group))
+    risWebTestClient
+        .withLogin(docOffice2Group)
         .delete()
         .uri(uri)
         .exchange()
@@ -173,9 +154,8 @@ class DocumentUnitControllerAuthTest {
 
     String uri = "/api/v1/caselaw/documentunits/" + TEST_UUID;
 
-    webClient
-        .mutateWith(csrf())
-        .mutateWith(getMockLoginWithDocOffice(docOffice1Group))
+    risWebTestClient
+        .withLogin(docOffice1Group)
         .put()
         .uri(uri)
         .header(HttpHeaders.CONTENT_TYPE, "application/json")
@@ -184,9 +164,8 @@ class DocumentUnitControllerAuthTest {
         .expectStatus()
         .isForbidden();
 
-    webClient
-        .mutateWith(csrf())
-        .mutateWith(getMockLoginWithDocOffice(docOffice2Group))
+    risWebTestClient
+        .withLogin(docOffice2Group)
         .put()
         .uri(uri)
         .header(HttpHeaders.CONTENT_TYPE, "application/json")
@@ -199,9 +178,8 @@ class DocumentUnitControllerAuthTest {
     when(service.getByUuid(nonExistentUuid)).thenReturn(Mono.empty());
     uri = "/api/v1/caselaw/documentunits/" + nonExistentUuid;
 
-    webClient
-        .mutateWith(csrf())
-        .mutateWith(getMockLoginWithDocOffice(docOffice1Group))
+    risWebTestClient
+        .withLogin(docOffice1Group)
         .put()
         .uri(uri)
         .header(HttpHeaders.CONTENT_TYPE, "application/json")
@@ -210,9 +188,8 @@ class DocumentUnitControllerAuthTest {
         .expectStatus()
         .isForbidden();
 
-    webClient
-        .mutateWith(csrf())
-        .mutateWith(getMockLoginWithDocOffice(docOffice2Group))
+    risWebTestClient
+        .withLogin(docOffice2Group)
         .put()
         .uri(uri)
         .header(HttpHeaders.CONTENT_TYPE, "application/json")
@@ -229,29 +206,14 @@ class DocumentUnitControllerAuthTest {
 
     String uri = "/api/v1/caselaw/documentunits/" + TEST_UUID + "/docx";
 
-    webClient
-        .mutateWith(csrf())
-        .mutateWith(getMockLoginWithDocOffice(docOffice1Group))
-        .get()
-        .uri(uri)
-        .exchange()
-        .expectStatus()
-        .isOk();
+    risWebTestClient.withLogin(docOffice1Group).get().uri(uri).exchange().expectStatus().isOk();
 
-    webClient
-        .mutateWith(csrf())
-        .mutateWith(getMockLoginWithDocOffice(docOffice2Group))
-        .get()
-        .uri(uri)
-        .exchange()
-        .expectStatus()
-        .isOk();
+    risWebTestClient.withLogin(docOffice2Group).get().uri(uri).exchange().expectStatus().isOk();
 
     mockDocumentUnit(docOffice1, "123", UNPUBLISHED);
 
-    webClient
-        .mutateWith(csrf())
-        .mutateWith(getMockLoginWithDocOffice(docOffice2Group))
+    risWebTestClient
+        .withLogin(docOffice2Group)
         .get()
         .uri(uri)
         .exchange()
@@ -267,23 +229,15 @@ class DocumentUnitControllerAuthTest {
 
     String uri = "/api/v1/caselaw/documentunits/" + TEST_UUID + "/publish";
 
-    webClient
-        .mutateWith(csrf())
-        .mutateWith(getMockLoginWithDocOffice(docOffice1Group))
+    risWebTestClient
+        .withLogin(docOffice1Group)
         .put()
         .uri(uri)
         .exchange()
         .expectStatus()
         .isForbidden();
 
-    webClient
-        .mutateWith(csrf())
-        .mutateWith(getMockLoginWithDocOffice(docOffice2Group))
-        .put()
-        .uri(uri)
-        .exchange()
-        .expectStatus()
-        .isOk();
+    risWebTestClient.withLogin(docOffice2Group).put().uri(uri).exchange().expectStatus().isOk();
   }
 
   @Test
@@ -293,29 +247,14 @@ class DocumentUnitControllerAuthTest {
 
     String uri = "/api/v1/caselaw/documentunits/" + TEST_UUID + "/publish";
 
-    webClient
-        .mutateWith(csrf())
-        .mutateWith(getMockLoginWithDocOffice(docOffice1Group))
-        .get()
-        .uri(uri)
-        .exchange()
-        .expectStatus()
-        .isOk();
+    risWebTestClient.withLogin(docOffice1Group).get().uri(uri).exchange().expectStatus().isOk();
 
-    webClient
-        .mutateWith(csrf())
-        .mutateWith(getMockLoginWithDocOffice(docOffice2Group))
-        .get()
-        .uri(uri)
-        .exchange()
-        .expectStatus()
-        .isOk();
+    risWebTestClient.withLogin(docOffice2Group).get().uri(uri).exchange().expectStatus().isOk();
 
     mockDocumentUnit(docOffice1, null, UNPUBLISHED);
 
-    webClient
-        .mutateWith(csrf())
-        .mutateWith(getMockLoginWithDocOffice(docOffice2Group))
+    risWebTestClient
+        .withLogin(docOffice2Group)
         .get()
         .uri(uri)
         .exchange()

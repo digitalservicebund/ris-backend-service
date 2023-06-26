@@ -1,17 +1,19 @@
 package de.bund.digitalservice.ris.caselaw.integration.tests;
 
-import static de.bund.digitalservice.ris.caselaw.AuthUtils.getMockLogin;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
-import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
 
 import de.bund.digitalservice.ris.caselaw.AuthUtils;
+import de.bund.digitalservice.ris.caselaw.RisWebTestClient;
+import de.bund.digitalservice.ris.caselaw.TestConfig;
+import de.bund.digitalservice.ris.caselaw.adapter.AuthService;
 import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentNumberService;
 import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentUnitStatusService;
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentUnitController;
 import de.bund.digitalservice.ris.caselaw.adapter.DocxConverterService;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentUnitRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentationOfficeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentationUnitLinkRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentationUnitLinkDTO;
@@ -22,6 +24,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.Dat
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DocumentTypeDTO;
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresConfig;
+import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
 import de.bund.digitalservice.ris.caselaw.domain.ActiveCitation;
 import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
@@ -45,10 +48,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.security.oauth2.client.registration.ReactiveClientRegistrationRepository;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
-import org.springframework.test.web.reactive.server.WebTestClient;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import reactor.core.publisher.Mono;
@@ -62,7 +65,10 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
       DatabaseDocumentUnitStatusService.class,
       PostgresDocumentUnitRepositoryImpl.class,
       FlywayConfig.class,
-      PostgresConfig.class
+      PostgresConfig.class,
+      SecurityConfig.class,
+      AuthService.class,
+      TestConfig.class
     },
     controllers = {DocumentUnitController.class},
     timeout = "PT5M")
@@ -79,27 +85,32 @@ class ActiveCitationIntegrationTest {
     registry.add("database.database", () -> postgreSQLContainer.getDatabaseName());
   }
 
-  @Autowired private WebTestClient webClient;
+  @Autowired private RisWebTestClient risWebTestClient;
   @Autowired private DatabaseDocumentUnitRepository repository;
   @Autowired private DatabaseDocumentationUnitLinkRepository linkRepository;
   @Autowired private FileNumberRepository fileNumberRepository;
   @Autowired private DatabaseDocumentTypeRepository documentTypeRepository;
+  @Autowired private DatabaseDocumentationOfficeRepository documentationOfficeRepository;
 
   @MockBean private S3AsyncClient s3AsyncClient;
   @MockBean private EmailPublishService publishService;
   @MockBean private DocxConverterService docxConverterService;
   @MockBean private UserService userService;
+  @MockBean ReactiveClientRegistrationRepository clientRegistrationRepository;
 
   private static final String DOCUMENT_NUMBER_PREFIX = "XXRE20230000";
   private static final String UUID_PREFIX = "88888888-4444-4444-4444-11111111111";
   private static final Long DOCUMENT_TYPE_ID_OFFSET = 111111L;
   private static final Instant TIMESTAMP = Instant.parse("2000-02-01T20:13:36.00Z");
   private static final Instant DECISION_DATE = Instant.parse("1983-09-15T08:21:17.00Z");
+  private UUID docOfficeUuid;
 
   @BeforeEach
   void setUp() {
     when(userService.getDocumentationOffice(any(OidcUser.class)))
         .thenReturn(Mono.just(AuthUtils.buildDocOffice("DigitalService", "XX")));
+
+    docOfficeUuid = documentationOfficeRepository.findByLabel("DigitalService").block().getId();
   }
 
   @AfterEach
@@ -117,9 +128,8 @@ class ActiveCitationIntegrationTest {
 
     DocumentUnit documentUnit = generateDocumentUnit(List.of(activeCitation));
 
-    webClient
-        .mutateWith(csrf())
-        .mutateWith(getMockLogin())
+    risWebTestClient
+        .withDefaultLogin()
         .get()
         .uri("/api/v1/caselaw/documentunits/" + DOCUMENT_NUMBER_PREFIX + "0")
         .exchange()
@@ -147,9 +157,8 @@ class ActiveCitationIntegrationTest {
     DocumentUnit documentUnitResponse =
         generateDocumentUnit(List.of(activeCitation, newActiveCitationResponse));
 
-    webClient
-        .mutateWith(csrf())
-        .mutateWith(getMockLogin())
+    risWebTestClient
+        .withDefaultLogin()
         .put()
         .uri("/api/v1/caselaw/documentunits/" + UUID_PREFIX + "0")
         .bodyValue(documentUnitRequest)
@@ -186,9 +195,8 @@ class ActiveCitationIntegrationTest {
         generateDocumentUnit(List.of(activeCitation, newActiveCitationRequest));
     DocumentUnit documentUnitResponse = generateDocumentUnit(List.of(activeCitation));
 
-    webClient
-        .mutateWith(csrf())
-        .mutateWith(getMockLogin())
+    risWebTestClient
+        .withDefaultLogin()
         .put()
         .uri("/api/v1/caselaw/documentunits/" + UUID_PREFIX + "0")
         .bodyValue(documentUnitRequest)
@@ -215,9 +223,8 @@ class ActiveCitationIntegrationTest {
     DocumentUnit documentUnitRequest = generateDocumentUnit(List.of(activeCitation));
     DocumentUnit documentUnitResponse = generateDocumentUnit(List.of(activeCitation));
 
-    webClient
-        .mutateWith(csrf())
-        .mutateWith(getMockLogin())
+    risWebTestClient
+        .withDefaultLogin()
         .put()
         .uri("/api/v1/caselaw/documentunits/" + UUID_PREFIX + "0")
         .bodyValue(documentUnitRequest)
@@ -249,9 +256,8 @@ class ActiveCitationIntegrationTest {
     DocumentUnit documentUnitRequest = generateDocumentUnit(List.of(editableActiveCitation));
     DocumentUnit documentUnitResponse = generateDocumentUnit(List.of(editableActiveCitation));
 
-    webClient
-        .mutateWith(csrf())
-        .mutateWith(getMockLogin())
+    risWebTestClient
+        .withDefaultLogin()
         .put()
         .uri("/api/v1/caselaw/documentunits/" + UUID_PREFIX + "0")
         .bodyValue(documentUnitRequest)
@@ -283,9 +289,8 @@ class ActiveCitationIntegrationTest {
     DocumentUnit documentUnitRequest = generateDocumentUnit(Collections.emptyList());
     DocumentUnit documentUnitResponse = generateDocumentUnit(Collections.emptyList());
 
-    webClient
-        .mutateWith(csrf())
-        .mutateWith(getMockLogin())
+    risWebTestClient
+        .withDefaultLogin()
         .put()
         .uri("/api/v1/caselaw/documentunits/" + UUID_PREFIX + "0")
         .bodyValue(documentUnitRequest)
@@ -317,9 +322,8 @@ class ActiveCitationIntegrationTest {
     DocumentUnit documentUnitResponse =
         generateDocumentUnit(List.of(activeCitation, activeCitationResponse));
 
-    webClient
-        .mutateWith(csrf())
-        .mutateWith(getMockLogin())
+    risWebTestClient
+        .withDefaultLogin()
         .put()
         .uri("/api/v1/caselaw/documentunits/" + UUID_PREFIX + "0")
         .bodyValue(documentUnitRequest)
@@ -340,6 +344,7 @@ class ActiveCitationIntegrationTest {
     DocumentUnitDTO parentDTO =
         DocumentUnitDTO.builder()
             .uuid(UUID.fromString(UUID_PREFIX + "0"))
+            .documentationOfficeId(docOfficeUuid)
             .documentnumber(DOCUMENT_NUMBER_PREFIX + "0")
             .creationtimestamp(TIMESTAMP.plus(0, ChronoUnit.MINUTES))
             .decisionDate(DECISION_DATE)
@@ -372,6 +377,7 @@ class ActiveCitationIntegrationTest {
     DocumentUnitDTO activeCitationDTO =
         DocumentUnitDTO.builder()
             .uuid(UUID.fromString(UUID_PREFIX + offset))
+            .documentationOfficeId(docOfficeUuid)
             .documentnumber(DOCUMENT_NUMBER_PREFIX + offset)
             .creationtimestamp(TIMESTAMP.plus(offset * 10L, ChronoUnit.MINUTES))
             .decisionDate(DECISION_DATE.plus(offset * 10L, ChronoUnit.MINUTES))
@@ -465,6 +471,7 @@ class ActiveCitationIntegrationTest {
                         .build())
                 .decisionDate(DECISION_DATE)
                 .incorrectCourts(Collections.emptyList())
+                .documentationOffice(AuthUtils.buildDefaultDocOffice())
                 .build())
         .texts(Texts.builder().build())
         .creationtimestamp(TIMESTAMP)

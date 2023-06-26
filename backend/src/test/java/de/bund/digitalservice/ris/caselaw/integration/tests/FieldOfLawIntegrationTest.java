@@ -1,9 +1,11 @@
 package de.bund.digitalservice.ris.caselaw.integration.tests;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
 
 import com.jayway.jsonpath.JsonPath;
+import de.bund.digitalservice.ris.caselaw.RisWebTestClient;
+import de.bund.digitalservice.ris.caselaw.TestConfig;
+import de.bund.digitalservice.ris.caselaw.adapter.AuthService;
 import de.bund.digitalservice.ris.caselaw.adapter.FieldOfLawController;
 import de.bund.digitalservice.ris.caselaw.adapter.FieldOfLawService;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.PostgresFieldOfLawRepositoryImpl;
@@ -13,6 +15,9 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.Nor
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.NormRepository;
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresConfig;
+import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
+import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw.FieldOfLaw;
 import java.util.Arrays;
 import java.util.List;
@@ -21,10 +26,11 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.security.oauth2.client.registration.ReactiveClientRegistrationRepository;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.reactive.server.EntityExchangeResult;
-import org.springframework.test.web.reactive.server.WebTestClient;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 
@@ -33,7 +39,10 @@ import org.testcontainers.junit.jupiter.Container;
       FieldOfLawService.class,
       FlywayConfig.class,
       PostgresConfig.class,
-      PostgresFieldOfLawRepositoryImpl.class
+      PostgresFieldOfLawRepositoryImpl.class,
+      SecurityConfig.class,
+      AuthService.class,
+      TestConfig.class
     },
     controllers = {FieldOfLawController.class})
 class FieldOfLawIntegrationTest {
@@ -49,9 +58,13 @@ class FieldOfLawIntegrationTest {
     registry.add("database.database", () -> postgreSQLContainer.getDatabaseName());
   }
 
-  @Autowired private WebTestClient webClient;
+  @Autowired private RisWebTestClient risWebTestClient;
   @Autowired private DatabaseFieldOfLawRepository repository;
   @Autowired private NormRepository normRepository;
+
+  @MockBean private UserService userService;
+  @MockBean ReactiveClientRegistrationRepository clientRegistrationRepository;
+  @MockBean private DocumentUnitService service;
 
   @AfterEach
   void cleanUp() {
@@ -64,8 +77,8 @@ class FieldOfLawIntegrationTest {
     prepareDatabase();
 
     EntityExchangeResult<String> result =
-        webClient
-            .mutateWith(csrf())
+        risWebTestClient
+            .withDefaultLogin()
             .get()
             .uri("/api/v1/caselaw/fieldsoflaw?pg=0&sz=10")
             .exchange()
@@ -84,8 +97,8 @@ class FieldOfLawIntegrationTest {
     prepareDatabase();
 
     EntityExchangeResult<String> result =
-        webClient
-            .mutateWith(csrf())
+        risWebTestClient
+            .withDefaultLogin()
             .get()
             .uri("/api/v1/caselaw/fieldsoflaw?q=FL-01&pg=0&sz=10")
             .exchange()
@@ -103,8 +116,8 @@ class FieldOfLawIntegrationTest {
     prepareDatabase();
 
     EntityExchangeResult<String> result =
-        webClient
-            .mutateWith(csrf())
+        risWebTestClient
+            .withDefaultLogin()
             .get()
             .uri("/api/v1/caselaw/fieldsoflaw?q=FL-&pg=0&sz=3")
             .exchange()
@@ -125,8 +138,8 @@ class FieldOfLawIntegrationTest {
     assertThat(identifiers).containsExactly("FL-01-01", "FL-04", "FL-02");
 
     result =
-        webClient
-            .mutateWith(csrf())
+        risWebTestClient
+            .withDefaultLogin()
             .get()
             .uri("/api/v1/caselaw/fieldsoflaw?q=FL-&pg=1&sz=3")
             .exchange()
@@ -147,8 +160,8 @@ class FieldOfLawIntegrationTest {
     assertThat(identifiers).containsExactly("FL-01", "FL-03");
 
     result =
-        webClient
-            .mutateWith(csrf())
+        risWebTestClient
+            .withDefaultLogin()
             .get()
             .uri("/api/v1/caselaw/fieldsoflaw?q=FL-&pg=2&sz=3")
             .exchange()
@@ -179,8 +192,8 @@ class FieldOfLawIntegrationTest {
     prepareDatabase();
 
     EntityExchangeResult<String> result =
-        webClient
-            .mutateWith(csrf())
+        risWebTestClient
+            .withDefaultLogin()
             .get()
             .uri("/api/v1/caselaw/fieldsoflaw?q=norm:\"" + query + "\"&pg=0&sz=3")
             .exchange()
@@ -198,8 +211,8 @@ class FieldOfLawIntegrationTest {
     prepareDatabase();
 
     EntityExchangeResult<String> result =
-        webClient
-            .mutateWith(csrf())
+        risWebTestClient
+            .withDefaultLogin()
             .get()
             .uri("/api/v1/caselaw/fieldsoflaw?q=norm:\"def\" some here&pg=0&sz=3")
             .exchange()
@@ -217,8 +230,8 @@ class FieldOfLawIntegrationTest {
     prepareDatabase();
 
     EntityExchangeResult<String> result =
-        webClient
-            .mutateWith(csrf())
+        risWebTestClient
+            .withDefaultLogin()
             .get()
             .uri("/api/v1/caselaw/fieldsoflaw/search-by-identifier?q=FL-01")
             .exchange()
@@ -235,8 +248,8 @@ class FieldOfLawIntegrationTest {
   void testGetChildrenForFieldOfLawNumber() {
     prepareDatabase();
 
-    webClient
-        .mutateWith(csrf())
+    risWebTestClient
+        .withDefaultLogin()
         .get()
         .uri("/api/v1/caselaw/fieldsoflaw/FL/children")
         .exchange()
@@ -254,8 +267,8 @@ class FieldOfLawIntegrationTest {
   void testGetParentForFieldOfLaw() {
     prepareDatabase();
 
-    webClient
-        .mutateWith(csrf())
+    risWebTestClient
+        .withDefaultLogin()
         .get()
         .uri("/api/v1/caselaw/fieldsoflaw/FL-01-01/tree")
         .exchange()
@@ -397,8 +410,8 @@ class FieldOfLawIntegrationTest {
     }
 
     EntityExchangeResult<String> result =
-        webClient
-            .mutateWith(csrf())
+        risWebTestClient
+            .withDefaultLogin()
             .get()
             .uri("/api/v1/caselaw/fieldsoflaw?q=" + searchStr + "&pg=0&sz=10")
             .exchange()
@@ -430,8 +443,8 @@ class FieldOfLawIntegrationTest {
     }
 
     EntityExchangeResult<String> result =
-        webClient
-            .mutateWith(csrf())
+        risWebTestClient
+            .withDefaultLogin()
             .get()
             .uri("/api/v1/caselaw/fieldsoflaw/search-by-identifier?q=" + searchStr)
             .exchange()

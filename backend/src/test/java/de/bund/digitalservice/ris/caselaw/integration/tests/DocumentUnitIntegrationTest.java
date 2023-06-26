@@ -1,15 +1,16 @@
 package de.bund.digitalservice.ris.caselaw.integration.tests;
 
-import static de.bund.digitalservice.ris.caselaw.AuthUtils.getMockLogin;
+import static de.bund.digitalservice.ris.caselaw.AuthUtils.buildDefaultDocOffice;
 import static de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatus.PUBLISHED;
 import static de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatus.UNPUBLISHED;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
-import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.Mockito.doReturn;
 
 import com.jayway.jsonpath.JsonPath;
-import de.bund.digitalservice.ris.caselaw.AuthUtils;
+import de.bund.digitalservice.ris.caselaw.RisWebTestClient;
+import de.bund.digitalservice.ris.caselaw.TestConfig;
+import de.bund.digitalservice.ris.caselaw.adapter.AuthService;
 import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentNumberService;
 import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentUnitStatusService;
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentUnitController;
@@ -18,6 +19,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDeviati
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentUnitMetadataRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentUnitRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentUnitStatusRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentationOfficeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseIncorrectCourtRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DeviatingDecisionDateDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DeviatingEcliDTO;
@@ -36,9 +38,11 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.Sta
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.StateRepository;
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresConfig;
+import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.EmailPublishService;
 import de.bund.digitalservice.ris.caselaw.domain.LegalEffect;
 import de.bund.digitalservice.ris.caselaw.domain.ProceedingDecision;
@@ -50,6 +54,7 @@ import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.AfterEach;
@@ -57,10 +62,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.security.oauth2.client.registration.ReactiveClientRegistrationRepository;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
-import org.springframework.test.web.reactive.server.WebTestClient;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import reactor.core.publisher.Flux;
@@ -74,7 +79,10 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
       DatabaseDocumentUnitStatusService.class,
       PostgresDocumentUnitRepositoryImpl.class,
       FlywayConfig.class,
-      PostgresConfig.class
+      PostgresConfig.class,
+      SecurityConfig.class,
+      AuthService.class,
+      TestConfig.class
     },
     controllers = {DocumentUnitController.class})
 class DocumentUnitIntegrationTest {
@@ -90,7 +98,7 @@ class DocumentUnitIntegrationTest {
     registry.add("database.database", () -> postgreSQLContainer.getDatabaseName());
   }
 
-  @Autowired private WebTestClient webClient;
+  @Autowired private RisWebTestClient risWebTestClient;
   @Autowired private DatabaseDocumentUnitRepository repository;
   @Autowired private DatabaseDocumentUnitMetadataRepository previousDecisionRepository;
   @Autowired private FileNumberRepository fileNumberRepository;
@@ -101,16 +109,30 @@ class DocumentUnitIntegrationTest {
   @Autowired private DatabaseDocumentTypeRepository databaseDocumentTypeRepository;
   @Autowired private DatabaseIncorrectCourtRepository incorrectCourtRepository;
   @Autowired private DatabaseDocumentUnitStatusRepository documentUnitStatusRepository;
+  @Autowired private DatabaseDocumentationOfficeRepository documentationOfficeRepository;
 
   @MockBean private S3AsyncClient s3AsyncClient;
   @MockBean private EmailPublishService publishService;
   @MockBean private DocxConverterService docxConverterService;
   @MockBean private UserService userService;
+  @MockBean ReactiveClientRegistrationRepository clientRegistrationRepository;
+
+  private final DocumentationOffice docOffice = buildDefaultDocOffice();
+  private UUID documentationOfficeUuid;
 
   @BeforeEach
   void setUp() {
-    when(userService.getDocumentationOffice(any(OidcUser.class)))
-        .thenReturn(Mono.just(AuthUtils.buildDocOffice("DigitalService", "XX")));
+    documentationOfficeUuid =
+        documentationOfficeRepository.findByLabel(docOffice.label()).block().getId();
+
+    doReturn(Mono.just(docOffice))
+        .when(userService)
+        .getDocumentationOffice(
+            argThat(
+                (OidcUser user) -> {
+                  List<String> groups = user.getAttribute("groups");
+                  return Objects.requireNonNull(groups).get(0).equals("/DigitalService");
+                }));
   }
 
   @AfterEach
@@ -131,9 +153,8 @@ class DocumentUnitIntegrationTest {
 
   @Test
   void testForCorrectDbEntryAfterNewDocumentUnitCreation() {
-    webClient
-        .mutateWith(csrf())
-        .mutateWith(getMockLogin())
+    risWebTestClient
+        .withDefaultLogin()
         .get()
         .uri("/api/v1/caselaw/documentunits/new")
         .exchange()
@@ -171,6 +192,7 @@ class DocumentUnitIntegrationTest {
             .uuid(uuid)
             .creationtimestamp(Instant.now())
             .documentnumber("1234567890123")
+            .documentationOfficeId(documentationOfficeUuid)
             .build();
 
     DocumentUnitDTO savedDto = repository.save(dto).block();
@@ -180,13 +202,16 @@ class DocumentUnitIntegrationTest {
             .uuid(dto.getUuid())
             .creationtimestamp(dto.getCreationtimestamp())
             .documentNumber(dto.getDocumentnumber())
-            .coreData(CoreData.builder().fileNumbers(List.of("AkteX")).build())
+            .coreData(
+                CoreData.builder()
+                    .fileNumbers(List.of("AkteX"))
+                    .documentationOffice(docOffice)
+                    .build())
             .texts(Texts.builder().decisionName("decisionName").build())
             .build();
 
-    webClient
-        .mutateWith(csrf())
-        .mutateWith(getMockLogin())
+    risWebTestClient
+        .withDefaultLogin()
         .put()
         .uri("/api/v1/caselaw/documentunits/" + uuid)
         .bodyValue(documentUnitFromFrontend)
@@ -219,6 +244,7 @@ class DocumentUnitIntegrationTest {
     DocumentUnitDTO dto =
         DocumentUnitDTO.builder()
             .uuid(uuid)
+            .documentationOfficeId(documentationOfficeUuid)
             .creationtimestamp(Instant.now())
             .documentnumber("1234567890123")
             .build();
@@ -230,13 +256,20 @@ class DocumentUnitIntegrationTest {
             .uuid(dto.getUuid())
             .creationtimestamp(dto.getCreationtimestamp())
             .documentNumber(dto.getDocumentnumber())
-            .coreData(CoreData.builder().deviatingEclis(List.of("ecli123", "ecli456")).build())
+            .coreData(
+                CoreData.builder()
+                    .documentationOffice(
+                        DocumentationOffice.builder()
+                            .label("DigitalService")
+                            .abbreviation("XX")
+                            .build())
+                    .deviatingEclis(List.of("ecli123", "ecli456"))
+                    .build())
             .texts(Texts.builder().decisionName("decisionName").build()) // TODO why is this needed?
             .build();
 
-    webClient
-        .mutateWith(csrf())
-        .mutateWith(getMockLogin())
+    risWebTestClient
+        .withDefaultLogin()
         .put()
         .uri("/api/v1/caselaw/documentunits/" + uuid)
         .bodyValue(documentUnitFromFrontend)
@@ -275,6 +308,7 @@ class DocumentUnitIntegrationTest {
             .uuid(uuid)
             .creationtimestamp(Instant.now())
             .documentnumber("1234567890123")
+            .documentationOfficeId(documentationOfficeUuid)
             .build();
 
     repository.save(dto).block();
@@ -290,13 +324,13 @@ class DocumentUnitIntegrationTest {
                         (List.of(
                             Instant.parse("2022-01-31T23:00:00Z"),
                             Instant.parse("2022-01-31T23:00:00Z"))))
+                    .documentationOffice(docOffice)
                     .build())
             .texts(Texts.builder().decisionName("decisionName").build()) // TODO why is this needed?
             .build();
 
-    webClient
-        .mutateWith(csrf())
-        .mutateWith(getMockLogin())
+    risWebTestClient
+        .withDefaultLogin()
         .put()
         .uri("/api/v1/caselaw/documentunits/" + uuid)
         .bodyValue(documentUnitFromFrontend)
@@ -338,6 +372,7 @@ class DocumentUnitIntegrationTest {
             .uuid(uuid)
             .creationtimestamp(Instant.now())
             .documentnumber("1234567890123")
+            .documentationOfficeId(documentationOfficeUuid)
             .build();
 
     DocumentUnitDTO savedDto = repository.save(dto).block();
@@ -364,13 +399,13 @@ class DocumentUnitIntegrationTest {
                 CoreData.builder()
                     .incorrectCourts(
                         List.of("incorrectCourt1", "incorrectCourt3", "incorrectCourt4"))
+                    .documentationOffice(docOffice)
                     .build())
             .texts(Texts.builder().decisionName("decisionName").build()) // TODO why is this needed?
             .build();
 
-    webClient
-        .mutateWith(csrf())
-        .mutateWith(getMockLogin())
+    risWebTestClient
+        .withDefaultLogin()
         .put()
         .uri("/api/v1/caselaw/documentunits/" + uuid)
         .bodyValue(documentUnitFromFrontend)
@@ -406,9 +441,8 @@ class DocumentUnitIntegrationTest {
     DocumentUnit documentUnitFromFrontend =
         testRegionFilledBasedOnCourt("BE", "Berlin", "region123", false);
 
-    webClient
-        .mutateWith(csrf())
-        .mutateWith(getMockLogin())
+    risWebTestClient
+        .withDefaultLogin()
         .put()
         .uri("/api/v1/caselaw/documentunits/" + documentUnitFromFrontend.uuid())
         .bodyValue(documentUnitFromFrontend)
@@ -430,9 +464,8 @@ class DocumentUnitIntegrationTest {
     DocumentUnit documentUnitFromFrontend =
         testRegionFilledBasedOnCourt(null, null, "region123", false);
 
-    webClient
-        .mutateWith(csrf())
-        .mutateWith(getMockLogin())
+    risWebTestClient
+        .withDefaultLogin()
         .put()
         .uri("/api/v1/caselaw/documentunits/" + documentUnitFromFrontend.uuid())
         .bodyValue(documentUnitFromFrontend)
@@ -453,9 +486,8 @@ class DocumentUnitIntegrationTest {
   void testRegionFilledBasedOnCourt_courtHasNoStateShortcutAndNoRegion_shouldLeaveEmpty() {
     DocumentUnit documentUnitFromFrontend = testRegionFilledBasedOnCourt(null, null, null, false);
 
-    webClient
-        .mutateWith(csrf())
-        .mutateWith(getMockLogin())
+    risWebTestClient
+        .withDefaultLogin()
         .put()
         .uri("/api/v1/caselaw/documentunits/" + documentUnitFromFrontend.uuid())
         .bodyValue(documentUnitFromFrontend)
@@ -477,9 +509,8 @@ class DocumentUnitIntegrationTest {
     DocumentUnit documentUnitFromFrontend =
         testRegionFilledBasedOnCourt("BY", "Bayern", "region123", true);
 
-    webClient
-        .mutateWith(csrf())
-        .mutateWith(getMockLogin())
+    risWebTestClient
+        .withDefaultLogin()
         .put()
         .uri("/api/v1/caselaw/documentunits/" + documentUnitFromFrontend.uuid())
         .bodyValue(documentUnitFromFrontend)
@@ -522,7 +553,8 @@ class DocumentUnitIntegrationTest {
         DocumentUnitDTO.builder()
             .uuid(UUID.randomUUID())
             .creationtimestamp(Instant.now())
-            .documentnumber("1234567890123");
+            .documentnumber("1234567890123")
+            .documentationOfficeId(documentationOfficeUuid);
     if (sameCourt) {
       builder.courtType(courtDTO.getCourttype()).courtLocation(courtDTO.getCourtlocation());
     } else {
@@ -554,7 +586,7 @@ class DocumentUnitIntegrationTest {
         .uuid(dto.getUuid())
         .creationtimestamp(dto.getCreationtimestamp())
         .documentNumber(dto.getDocumentnumber())
-        .coreData(CoreData.builder().court(court).build())
+        .coreData(CoreData.builder().court(court).documentationOffice(docOffice).build())
         .texts(Texts.builder().decisionName("decisionName").build())
         .build();
   }
@@ -575,6 +607,7 @@ class DocumentUnitIntegrationTest {
             .uuid(UUID.randomUUID())
             .creationtimestamp(Instant.now())
             .documentnumber("1234567890123")
+            .documentationOfficeId(documentationOfficeUuid)
             .build();
     repository.save(dto).block();
 
@@ -590,12 +623,12 @@ class DocumentUnitIntegrationTest {
                             .jurisShortcut(documentTypeDTO.getJurisShortcut())
                             .label(documentTypeDTO.getLabel())
                             .build())
+                    .documentationOffice(docOffice)
                     .build())
             .build();
 
-    webClient
-        .mutateWith(csrf())
-        .mutateWith(getMockLogin())
+    risWebTestClient
+        .withDefaultLogin()
         .put()
         .uri("/api/v1/caselaw/documentunits/" + documentUnitFromFrontend.uuid())
         .bodyValue(documentUnitFromFrontend)
@@ -626,6 +659,7 @@ class DocumentUnitIntegrationTest {
             .creationtimestamp(Instant.now())
             .documentnumber("1234567890123")
             .documentTypeId(123L)
+            .documentationOfficeId(documentationOfficeUuid)
             .build();
     repository.save(dto).block();
 
@@ -634,11 +668,11 @@ class DocumentUnitIntegrationTest {
             .uuid(dto.getUuid())
             .creationtimestamp(dto.getCreationtimestamp())
             .documentNumber(dto.getDocumentnumber())
+            .coreData(CoreData.builder().documentationOffice(docOffice).build())
             .build();
 
-    webClient
-        .mutateWith(csrf())
-        .mutateWith(getMockLogin())
+    risWebTestClient
+        .withDefaultLogin()
         .put()
         .uri("/api/v1/caselaw/documentunits/" + documentUnitFromFrontend.uuid())
         .bodyValue(documentUnitFromFrontend)
@@ -687,6 +721,7 @@ class DocumentUnitIntegrationTest {
             .creationtimestamp(Instant.now())
             .documentnumber("1234567890123")
             .legalEffect(valueBefore.getLabel())
+            .documentationOfficeId(documentationOfficeUuid)
             .build();
 
     repository.save(dto).block();
@@ -694,9 +729,8 @@ class DocumentUnitIntegrationTest {
     DocumentUnit documentUnitFromFrontend =
         buildDocumentUnitFromFrontendWithLegalEffect(dto, courtType, valueBefore);
 
-    webClient
-        .mutateWith(csrf())
-        .mutateWith(getMockLogin())
+    risWebTestClient
+        .withDefaultLogin()
         .put()
         .uri("/api/v1/caselaw/documentunits/" + documentUnitFromFrontend.uuid())
         .bodyValue(documentUnitFromFrontend)
@@ -733,12 +767,17 @@ class DocumentUnitIntegrationTest {
       DocumentUnitDTO dto, String courtType, LegalEffect legalEffect) {
     CoreData coreData;
     if (courtType == null) {
-      coreData = CoreData.builder().legalEffect(legalEffect.getLabel()).build();
+      coreData =
+          CoreData.builder()
+              .legalEffect(legalEffect.getLabel())
+              .documentationOffice(docOffice)
+              .build();
     } else {
       coreData =
           CoreData.builder()
               .court(Court.builder().type(courtType).build())
               .legalEffect(legalEffect.getLabel())
+              .documentationOffice(docOffice)
               .build();
     }
     return DocumentUnit.builder()
@@ -751,9 +790,8 @@ class DocumentUnitIntegrationTest {
 
   private void testCorrectFEtoBECallBehaviourWithLegalEffect(
       DocumentUnit documentUnitFromFrontend) {
-    webClient
-        .mutateWith(csrf())
-        .mutateWith(getMockLogin())
+    risWebTestClient
+        .withDefaultLogin()
         .put()
         .uri("/api/v1/caselaw/documentunits/" + documentUnitFromFrontend.uuid())
         .bodyValue(documentUnitFromFrontend)
@@ -789,6 +827,7 @@ class DocumentUnitIntegrationTest {
                         .uuid(uuid)
                         .creationtimestamp(Instant.now())
                         .documentnumber(RandomStringUtils.random(10, true, true))
+                        .documentationOfficeId(documentationOfficeUuid)
                         .build())
             .flatMap(documentUnitDTO -> repository.save(documentUnitDTO));
 
@@ -798,8 +837,8 @@ class DocumentUnitIntegrationTest {
     List<UUID> responseUUIDs = new ArrayList<>();
 
     ProceedingDecision proceedingDecision = ProceedingDecision.builder().build();
-    webClient
-        .mutateWith(csrf())
+    risWebTestClient
+        .withDefaultLogin()
         .put()
         .uri("/api/v1/caselaw/documentunits/search?pg=0&sz=20")
         .bodyValue(proceedingDecision)
@@ -821,8 +860,8 @@ class DocumentUnitIntegrationTest {
               responseUUIDs.addAll(uuids.stream().map(UUID::fromString).toList());
             });
 
-    webClient
-        .mutateWith(csrf())
+    risWebTestClient
+        .withDefaultLogin()
         .put()
         .uri("/api/v1/caselaw/documentunits/search?pg=0&sz=20")
         .bodyValue(proceedingDecision)
@@ -855,14 +894,14 @@ class DocumentUnitIntegrationTest {
                     .uuid(UUID.randomUUID())
                     .creationtimestamp(Instant.now())
                     .documentnumber("1234567890123")
+                    .documentationOfficeId(documentationOfficeUuid)
                     .build())
             .block();
 
     assertThat(repository.findAll().collectList().block()).hasSize(1);
 
-    webClient
-        .mutateWith(csrf())
-        .mutateWith(getMockLogin())
+    risWebTestClient
+        .withDefaultLogin()
         .get()
         .uri("/api/v1/caselaw/documentunits/" + dto.getDocumentnumber())
         .exchange()

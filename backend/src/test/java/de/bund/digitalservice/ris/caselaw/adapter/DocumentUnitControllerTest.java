@@ -1,23 +1,27 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
-import static de.bund.digitalservice.ris.caselaw.AuthUtils.getMockLogin;
+import static de.bund.digitalservice.ris.caselaw.AuthUtils.buildDefaultDocOffice;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
 
+import de.bund.digitalservice.ris.caselaw.RisWebTestClient;
+import de.bund.digitalservice.ris.caselaw.TestConfig;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentUnitTransformer;
+import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
+import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitPublishException;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.LinkedDocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.PublishState;
-import de.bund.digitalservice.ris.caselaw.domain.User;
 import de.bund.digitalservice.ris.caselaw.domain.XmlMail;
 import de.bund.digitalservice.ris.caselaw.domain.XmlMailResponse;
 import java.nio.ByteBuffer;
@@ -33,62 +37,66 @@ import org.mockito.Captor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpHeaders;
+import org.springframework.security.oauth2.client.registration.ReactiveClientRegistrationRepository;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.web.reactive.function.BodyInserters;
 import reactor.core.publisher.Mono;
 
 @ExtendWith(SpringExtension.class)
 @WebFluxTest(controllers = DocumentUnitController.class)
-@WithMockUser
+@Import({SecurityConfig.class, AuthService.class, TestConfig.class})
 class DocumentUnitControllerTest {
-  @Autowired private WebTestClient webClient;
+  @Autowired private RisWebTestClient risWebClient;
 
   @MockBean private DocumentUnitService service;
   @MockBean private KeycloakUserService userService;
   @MockBean private DocxConverterService docxConverterService;
+  @MockBean private ReactiveClientRegistrationRepository clientRegistrationRepository;
 
   @Captor private ArgumentCaptor<ByteBuffer> captor;
 
   private static final UUID TEST_UUID = UUID.fromString("88888888-4444-4444-4444-121212121212");
   private static final String ISSUER_ADDRESS = "test-issuer@exporter.neuris";
+  private final DocumentationOffice docOffice = buildDefaultDocOffice();
 
   @BeforeEach
   void setup() {
-    when(userService.getUser(any(OidcUser.class)))
+    doReturn(Mono.just(docOffice))
+        .when(userService)
+        .getDocumentationOffice(
+            argThat(
+                (OidcUser user) -> {
+                  List<String> groups = user.getAttribute("groups");
+                  return Objects.requireNonNull(groups).get(0).equals("/DigitalService");
+                }));
+
+    when(service.getByUuid(TEST_UUID))
         .thenReturn(
             Mono.just(
-                User.builder()
-                    .documentationOffice(
-                        DocumentationOffice.builder().label("BGH").abbreviation("KO").build())
+                DocumentUnit.builder()
+                    .coreData(CoreData.builder().documentationOffice(docOffice).build())
                     .build()));
   }
 
   @Test
   void testGenerateNewDocumentUnit() {
-    DocumentationOffice documentationOffice =
-        DocumentationOffice.builder().label("DigitalService").abbreviation("XX").build();
-
-    when(userService.getDocumentationOffice(any(OidcUser.class)))
-        .thenReturn(Mono.just(documentationOffice));
-
-    when(service.generateNewDocumentUnit(documentationOffice))
+    // userService.getDocumentationOffice is mocked in @BeforeEach
+    when(service.generateNewDocumentUnit(docOffice))
         .thenReturn(Mono.just(DocumentUnit.builder().build()));
 
-    webClient
-        .mutateWith(csrf())
-        .mutateWith(getMockLogin())
+    risWebClient
+        .withDefaultLogin()
         .get()
         .uri("/api/v1/caselaw/documentunits/new")
         .exchange()
         .expectStatus()
         .isCreated();
 
-    verify(service, times(1)).generateNewDocumentUnit(documentationOffice);
+    verify(service, times(1)).generateNewDocumentUnit(docOffice);
     verify(userService, times(1)).getDocumentationOffice(any(OidcUser.class));
   }
 
@@ -98,8 +106,8 @@ class DocumentUnitControllerTest {
     when(service.attachFileToDocumentUnit(
             eq(TEST_UUID), any(ByteBuffer.class), any(HttpHeaders.class)))
         .thenReturn(Mono.empty());
-    webClient
-        .mutateWith(csrf())
+    risWebClient
+        .withDefaultLogin()
         .put()
         .uri("/api/v1/caselaw/documentunits/" + TEST_UUID + "/file")
         .body(BodyInserters.fromValue(new byte[] {}))
@@ -115,8 +123,8 @@ class DocumentUnitControllerTest {
 
   @Test
   void testAttachFileToDocumentUnit_withInvalidUuid() {
-    webClient
-        .mutateWith(csrf())
+    risWebClient
+        .withDefaultLogin()
         .put()
         .uri("/api/v1/caselaw/documentunits/abc/file")
         .exchange()
@@ -128,8 +136,8 @@ class DocumentUnitControllerTest {
   void testRemoveFileFromDocumentUnit() {
     when(service.removeFileFromDocumentUnit(TEST_UUID)).thenReturn(Mono.empty());
 
-    webClient
-        .mutateWith(csrf())
+    risWebClient
+        .withDefaultLogin()
         .delete()
         .uri("/api/v1/caselaw/documentunits/" + TEST_UUID + "/file")
         .exchange()
@@ -141,8 +149,8 @@ class DocumentUnitControllerTest {
 
   @Test
   void testRemoveFileFromDocumentUnit_withInvalidUuid() {
-    webClient
-        .mutateWith(csrf())
+    risWebClient
+        .withDefaultLogin()
         .delete()
         .uri("/api/v1/caselaw/documentunits/abc/file")
         .exchange()
@@ -152,13 +160,10 @@ class DocumentUnitControllerTest {
 
   @Test
   void testGetAll() {
-    var docOffice = DocumentationOffice.builder().abbreviation("KO").label("BGH").build();
-    when(userService.getDocumentationOffice(any(OidcUser.class))).thenReturn(Mono.just(docOffice));
-
+    // userService.getDocumentationOffice is mocked in @BeforeEach
     when(service.getAll(PageRequest.of(0, 10), docOffice)).thenReturn(Mono.empty());
-    webClient
-        .mutateWith(csrf())
-        .mutateWith(getMockLogin())
+    risWebClient
+        .withDefaultLogin()
         .get()
         .uri("/api/v1/caselaw/documentunits?pg=0&sz=10")
         .exchange()
@@ -170,23 +175,31 @@ class DocumentUnitControllerTest {
 
   @Test
   void testGetByDocumentnumber() {
-    when(service.getByDocumentNumber("ABCD202200001")).thenReturn(Mono.empty());
+    when(service.getByDocumentNumber("ABCD202200001"))
+        .thenReturn(
+            Mono.just(
+                DocumentUnit.builder()
+                    .coreData(CoreData.builder().documentationOffice(docOffice).build())
+                    .build()));
 
-    webClient
-        .mutateWith(csrf())
+    risWebClient
+        .withDefaultLogin()
         .get()
         .uri("/api/v1/caselaw/documentunits/ABCD202200001")
         .exchange()
         .expectStatus()
         .isOk();
 
-    verify(service).getByDocumentNumber("ABCD202200001");
+    // once by the AuthService and once by the controller asking the service
+    verify(service, times(2)).getByDocumentNumber("ABCD202200001");
   }
 
   @Test
-  void testGetByUuid_withInvalidUuid() {
-    webClient
-        .mutateWith(csrf())
+  void testGetByDocumentNumber_withInvalidDocumentNumber() {
+    when(service.getByDocumentNumber("abc")).thenReturn(Mono.empty());
+
+    risWebClient
+        .withDefaultLogin()
         .get()
         .uri("/api/v1/caselaw/documentunits/abc")
         .exchange()
@@ -198,8 +211,8 @@ class DocumentUnitControllerTest {
   void testDeleteByUuid() {
     when(service.deleteByUuid(TEST_UUID)).thenReturn(Mono.empty());
 
-    webClient
-        .mutateWith(csrf())
+    risWebClient
+        .withDefaultLogin()
         .delete()
         .uri("/api/v1/caselaw/documentunits/" + TEST_UUID)
         .exchange()
@@ -211,8 +224,10 @@ class DocumentUnitControllerTest {
 
   @Test
   void testDeleteByUuid_withInvalidUuid() {
-    webClient
-        .mutateWith(csrf())
+    when(service.getByDocumentNumber("abc")).thenReturn(Mono.empty());
+
+    risWebClient
+        .withDefaultLogin()
         .delete()
         .uri("/api/v1/caselaw/documentunits/abc")
         .exchange()
@@ -226,18 +241,12 @@ class DocumentUnitControllerTest {
     documentUnitDTO.setDocumentnumber("ABCD202200001");
     documentUnitDTO.setUuid(TEST_UUID);
     DocumentUnit documentUnit = DocumentUnitTransformer.transformDTO(documentUnitDTO);
-    DocumentationOffice documentationOffice =
-        DocumentationOffice.builder().label("DigitalService").abbreviation("XX").build();
-
-    when(userService.getDocumentationOffice(any(OidcUser.class)))
-        .thenReturn(Mono.just(documentationOffice));
 
     when(service.updateDocumentUnit(eq(documentUnit), any(DocumentationOffice.class)))
         .thenReturn(Mono.empty());
 
-    webClient
-        .mutateWith(csrf())
-        .mutateWith(getMockLogin())
+    risWebClient
+        .withDefaultLogin()
         .put()
         .uri("/api/v1/caselaw/documentunits/" + TEST_UUID)
         .header(HttpHeaders.CONTENT_TYPE, "application/json")
@@ -253,8 +262,8 @@ class DocumentUnitControllerTest {
   void testUpdateByUuid_withInvalidUuid() {
     DocumentUnitDTO documentUnitDTO = new DocumentUnitDTO();
     documentUnitDTO.setUuid(TEST_UUID);
-    webClient
-        .mutateWith(csrf())
+    risWebClient
+        .withDefaultLogin()
         .put()
         .uri("/api/v1/caselaw/documentunits/abc")
         .header(HttpHeaders.CONTENT_TYPE, "application/json")
@@ -283,9 +292,8 @@ class DocumentUnitControllerTest {
                         Instant.parse("2020-01-01T01:01:01.00Z"),
                         PublishState.UNKNOWN))));
 
-    webClient
-        .mutateWith(csrf())
-        .mutateWith(getMockLogin())
+    risWebClient
+        .withDefaultLogin()
         .put()
         .uri("/api/v1/caselaw/documentunits/" + TEST_UUID + "/publish")
         .exchange()
@@ -318,9 +326,8 @@ class DocumentUnitControllerTest {
     when(service.publishAsEmail(TEST_UUID, ISSUER_ADDRESS))
         .thenThrow(DocumentUnitPublishException.class);
 
-    webClient
-        .mutateWith(csrf())
-        .mutateWith(getMockLogin())
+    risWebClient
+        .withDefaultLogin()
         .put()
         .uri("/api/v1/caselaw/documentunits/" + TEST_UUID + "/publish")
         .exchange()
@@ -348,8 +355,8 @@ class DocumentUnitControllerTest {
                         Instant.parse("2020-01-01T01:01:01.00Z"),
                         PublishState.SENT))));
 
-    webClient
-        .mutateWith(csrf())
+    risWebClient
+        .withDefaultLogin()
         .get()
         .uri("/api/v1/caselaw/documentunits/" + TEST_UUID + "/publish")
         .exchange()
@@ -378,8 +385,8 @@ class DocumentUnitControllerTest {
   void testGetLastPublishedXml_withServiceThrowsException() {
     when(service.getLastPublishedXmlMail(TEST_UUID)).thenThrow(DocumentUnitPublishException.class);
 
-    webClient
-        .mutateWith(csrf())
+    risWebClient
+        .withDefaultLogin()
         .get()
         .uri("/api/v1/caselaw/documentunits/" + TEST_UUID + "/publish")
         .exchange()
@@ -397,9 +404,8 @@ class DocumentUnitControllerTest {
     when(service.searchByLinkedDocumentationUnit(linkedDocumentationUnit, pageRequest))
         .thenReturn(Mono.empty());
 
-    webClient
-        .mutateWith(csrf())
-        .mutateWith(getMockLogin())
+    risWebClient
+        .withDefaultLogin()
         .put()
         .uri("/api/v1/caselaw/documentunits/search?pg=0&sz=10")
         .header(HttpHeaders.CONTENT_TYPE, "application/json")
@@ -414,18 +420,24 @@ class DocumentUnitControllerTest {
   @Test
   void testHtml() {
     when(service.getByUuid(TEST_UUID))
-        .thenReturn(Mono.just(DocumentUnit.builder().s3path("123").build()));
+        .thenReturn(
+            Mono.just(
+                DocumentUnit.builder()
+                    .s3path("123")
+                    .coreData(CoreData.builder().documentationOffice(docOffice).build())
+                    .build()));
     when(docxConverterService.getConvertedObject("123")).thenReturn(Mono.empty());
 
-    webClient
-        .mutateWith(csrf())
+    risWebClient
+        .withDefaultLogin()
         .get()
         .uri("/api/v1/caselaw/documentunits/" + TEST_UUID + "/docx")
         .exchange()
         .expectStatus()
         .isOk();
 
-    verify(service).getByUuid(TEST_UUID);
+    // once by the AuthService and once by the controller asking the service
+    verify(service, times(2)).getByUuid(TEST_UUID);
     verify(docxConverterService).getConvertedObject("123");
   }
 }

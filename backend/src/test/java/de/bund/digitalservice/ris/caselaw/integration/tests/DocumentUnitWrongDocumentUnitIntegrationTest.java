@@ -1,5 +1,8 @@
 package de.bund.digitalservice.ris.caselaw.integration.tests;
 
+import de.bund.digitalservice.ris.caselaw.RisWebTestClient;
+import de.bund.digitalservice.ris.caselaw.TestConfig;
+import de.bund.digitalservice.ris.caselaw.adapter.AuthService;
 import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentNumberService;
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentUnitController;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentUnitMetadataRepository;
@@ -9,14 +12,16 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.FileNumberRepos
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.PostgresDocumentUnitRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresConfig;
+import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.EmailPublishService;
+import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import org.junit.jupiter.api.AfterEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.security.oauth2.client.registration.ReactiveClientRegistrationRepository;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
-import org.springframework.test.web.reactive.server.WebTestClient;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import software.amazon.awssdk.services.s3.S3AsyncClient;
@@ -27,7 +32,10 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
       DatabaseDocumentNumberService.class,
       PostgresDocumentUnitRepositoryImpl.class,
       FlywayConfig.class,
-      PostgresConfig.class
+      PostgresConfig.class,
+      SecurityConfig.class,
+      AuthService.class,
+      TestConfig.class
     },
     controllers = {DocumentUnitController.class})
 class DocumentUnitWrongDocumentUnitIntegrationTest {
@@ -43,12 +51,14 @@ class DocumentUnitWrongDocumentUnitIntegrationTest {
     registry.add("database.database", () -> postgreSQLContainer.getDatabaseName());
   }
 
-  @Autowired private WebTestClient webClient;
+  @Autowired private RisWebTestClient risWebTestClient;
   @Autowired private DatabaseDocumentUnitRepository repository;
   @Autowired private DatabaseDocumentUnitMetadataRepository previousDecisionRepository;
   @Autowired private FileNumberRepository fileNumberRepository;
   @Autowired private DeviatingEcliRepository deviatingEcliRepository;
 
+  @MockBean private UserService userService;
+  @MockBean ReactiveClientRegistrationRepository clientRegistrationRepository;
   @MockBean private S3AsyncClient s3AsyncClient;
   @MockBean private EmailPublishService publishService;
 
@@ -108,8 +118,8 @@ class DocumentUnitWrongDocumentUnitIntegrationTest {
                         .build()))
             .build();
 
-    webClient
-        .mutateWith(csrf())
+    risWebTestClient
+        .withDefaultLogin()
         .put()
         .uri("/api/v1/caselaw/documentunits/" + documentUnitUuid1)
         .bodyValue(documentUnit)

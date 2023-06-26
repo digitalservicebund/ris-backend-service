@@ -1,12 +1,12 @@
 package de.bund.digitalservice.ris.caselaw.adapter.authorization;
 
 import static de.bund.digitalservice.ris.caselaw.AuthUtils.buildDocOffice;
-import static de.bund.digitalservice.ris.caselaw.AuthUtils.getMockLoginWithDocOffice;
 import static de.bund.digitalservice.ris.caselaw.AuthUtils.setUpDocumentationOfficeMocks;
 import static de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatus.PUBLISHED;
 import static org.mockito.Mockito.when;
-import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
 
+import de.bund.digitalservice.ris.caselaw.RisWebTestClient;
+import de.bund.digitalservice.ris.caselaw.TestConfig;
 import de.bund.digitalservice.ris.caselaw.adapter.AuthService;
 import de.bund.digitalservice.ris.caselaw.adapter.ContentRelatedIndexingController;
 import de.bund.digitalservice.ris.caselaw.adapter.FieldOfLawService;
@@ -26,20 +26,21 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
+import org.springframework.security.oauth2.client.registration.ReactiveClientRegistrationRepository;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Mono;
 
 @ExtendWith(SpringExtension.class)
 @WebFluxTest(controllers = ContentRelatedIndexingController.class)
-@Import({SecurityConfig.class, AuthService.class})
+@Import({SecurityConfig.class, AuthService.class, TestConfig.class})
 class ContentRelatedIndexingControllerAuthTest {
-  @Autowired private WebTestClient webClient;
+  @Autowired private RisWebTestClient risWebTestClient;
 
   @MockBean private DocumentUnitService documentUnitService;
   @MockBean private FieldOfLawService fieldOfLawService;
   @MockBean private KeycloakUserService userService;
   @MockBean private KeywordService keywordService;
+  @MockBean ReactiveClientRegistrationRepository clientRegistrationRepository;
 
   private static final UUID TEST_UUID = UUID.fromString("88888888-4444-4444-4444-121212121212");
   private final String docOffice1Group = "/CC-RIS";
@@ -61,18 +62,10 @@ class ContentRelatedIndexingControllerAuthTest {
     String uri =
         "/api/v1/caselaw/documentunits/" + TEST_UUID + "/contentrelatedindexing/fieldsoflaw";
 
-    webClient
-        .mutateWith(csrf())
-        .mutateWith(getMockLoginWithDocOffice(docOffice1Group))
-        .get()
-        .uri(uri)
-        .exchange()
-        .expectStatus()
-        .isOk();
+    risWebTestClient.withLogin(docOffice1Group).get().uri(uri).exchange().expectStatus().isOk();
 
-    webClient
-        .mutateWith(csrf())
-        .mutateWith(getMockLoginWithDocOffice(docOffice2Group))
+    risWebTestClient
+        .withLogin(docOffice2Group)
         .get()
         .uri(uri)
         .exchange()
@@ -81,9 +74,8 @@ class ContentRelatedIndexingControllerAuthTest {
 
     mockDocumentUnit(docOffice1, null);
 
-    webClient
-        .mutateWith(csrf())
-        .mutateWith(getMockLoginWithDocOffice(docOffice2Group))
+    risWebTestClient
+        .withLogin(docOffice2Group)
         .get()
         .uri(uri)
         .exchange()
@@ -104,23 +96,15 @@ class ContentRelatedIndexingControllerAuthTest {
             + "/contentrelatedindexing/fieldsoflaw/"
             + identifier;
 
-    webClient
-        .mutateWith(csrf())
-        .mutateWith(getMockLoginWithDocOffice(docOffice1Group))
+    risWebTestClient
+        .withLogin(docOffice1Group)
         .put()
         .uri(uri)
         .exchange()
         .expectStatus()
         .isForbidden();
 
-    webClient
-        .mutateWith(csrf())
-        .mutateWith(getMockLoginWithDocOffice(docOffice2Group))
-        .put()
-        .uri(uri)
-        .exchange()
-        .expectStatus()
-        .isOk();
+    risWebTestClient.withLogin(docOffice2Group).put().uri(uri).exchange().expectStatus().isOk();
   }
 
   @Test
@@ -136,18 +120,10 @@ class ContentRelatedIndexingControllerAuthTest {
             + "/contentrelatedindexing/fieldsoflaw/"
             + identifier;
 
-    webClient
-        .mutateWith(csrf())
-        .mutateWith(getMockLoginWithDocOffice(docOffice1Group))
-        .delete()
-        .uri(uri)
-        .exchange()
-        .expectStatus()
-        .isOk();
+    risWebTestClient.withLogin(docOffice1Group).delete().uri(uri).exchange().expectStatus().isOk();
 
-    webClient
-        .mutateWith(csrf())
-        .mutateWith(getMockLoginWithDocOffice(docOffice2Group))
+    risWebTestClient
+        .withLogin(docOffice2Group)
         .delete()
         .uri(uri)
         .exchange()
@@ -162,29 +138,20 @@ class ContentRelatedIndexingControllerAuthTest {
 
     String uri = "/api/v1/caselaw/documentunits/" + TEST_UUID + "/contentrelatedindexing/keywords";
 
-    webClient
-        .mutateWith(csrf())
-        .mutateWith(getMockLoginWithDocOffice(docOffice1Group))
+    risWebTestClient
+        .withLogin(docOffice1Group)
         .get()
         .uri(uri)
         .exchange()
         .expectStatus()
         .isOk(); // because status is PUBLISHED
 
-    webClient
-        .mutateWith(csrf())
-        .mutateWith(getMockLoginWithDocOffice(docOffice2Group))
-        .get()
-        .uri(uri)
-        .exchange()
-        .expectStatus()
-        .isOk();
+    risWebTestClient.withLogin(docOffice2Group).get().uri(uri).exchange().expectStatus().isOk();
 
     mockDocumentUnit(docOffice2, null);
 
-    webClient
-        .mutateWith(csrf())
-        .mutateWith(getMockLoginWithDocOffice(docOffice1Group))
+    risWebTestClient
+        .withLogin(docOffice1Group)
         .get()
         .uri(uri)
         .exchange()
@@ -204,18 +171,10 @@ class ContentRelatedIndexingControllerAuthTest {
             + "/contentrelatedindexing/keywords/"
             + keyword;
 
-    webClient
-        .mutateWith(csrf())
-        .mutateWith(getMockLoginWithDocOffice(docOffice1Group))
-        .put()
-        .uri(uri)
-        .exchange()
-        .expectStatus()
-        .isOk();
+    risWebTestClient.withLogin(docOffice1Group).put().uri(uri).exchange().expectStatus().isOk();
 
-    webClient
-        .mutateWith(csrf())
-        .mutateWith(getMockLoginWithDocOffice(docOffice2Group))
+    risWebTestClient
+        .withLogin(docOffice2Group)
         .put()
         .uri(uri)
         .exchange()
@@ -235,23 +194,15 @@ class ContentRelatedIndexingControllerAuthTest {
             + "/contentrelatedindexing/keywords/"
             + keyword;
 
-    webClient
-        .mutateWith(csrf())
-        .mutateWith(getMockLoginWithDocOffice(docOffice1Group))
+    risWebTestClient
+        .withLogin(docOffice1Group)
         .delete()
         .uri(uri)
         .exchange()
         .expectStatus()
         .isForbidden();
 
-    webClient
-        .mutateWith(csrf())
-        .mutateWith(getMockLoginWithDocOffice(docOffice2Group))
-        .delete()
-        .uri(uri)
-        .exchange()
-        .expectStatus()
-        .isOk();
+    risWebTestClient.withLogin(docOffice2Group).delete().uri(uri).exchange().expectStatus().isOk();
   }
 
   private void mockDocumentUnit(DocumentationOffice docOffice, DocumentUnitStatus status) {

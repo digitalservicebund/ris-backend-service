@@ -2,8 +2,10 @@ package de.bund.digitalservice.ris.caselaw.adapter;
 
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
 
+import de.bund.digitalservice.ris.caselaw.RisWebTestClient;
+import de.bund.digitalservice.ris.caselaw.TestConfig;
+import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
 import de.bund.digitalservice.ris.caselaw.domain.MailTrackingService;
 import de.bund.digitalservice.ris.caselaw.domain.PublishState;
 import java.util.UUID;
@@ -14,19 +16,20 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.security.oauth2.client.registration.ReactiveClientRegistrationRepository;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Mono;
 
 @ExtendWith(SpringExtension.class)
 @WebFluxTest(controllers = MailTrackingController.class)
-@WithMockUser
+@Import({SecurityConfig.class, TestConfig.class})
 class MailTrackingControllerTest {
-  @Autowired private WebTestClient webClient;
+  @Autowired private RisWebTestClient risWebTestClient;
 
   @MockBean private MailTrackingService service;
+  @MockBean private ReactiveClientRegistrationRepository clientRegistrationRepository;
 
   private static final UUID TEST_UUID = UUID.fromString("88888888-4444-4444-4444-121212121212");
 
@@ -47,8 +50,8 @@ class MailTrackingControllerTest {
     when(service.getMappedPublishState(mailTrackingEvent)).thenReturn(expectedPublishState);
     when(service.setPublishState(TEST_UUID, expectedPublishState)).thenReturn(Mono.just(TEST_UUID));
 
-    webClient
-        .mutateWith(csrf())
+    risWebTestClient
+        .withDefaultLogin()
         .post()
         .uri("/admin/webhook")
         .contentType(MediaType.APPLICATION_JSON)
@@ -77,8 +80,8 @@ class MailTrackingControllerTest {
   void testSetPublishState_withInvalidPayload(String jsonString) {
     String sendInBlueResponse = String.format(jsonString, TEST_UUID);
 
-    webClient
-        .mutateWith(csrf())
+    risWebTestClient
+        .withDefaultLogin()
         .post()
         .uri("/admin/webhook")
         .contentType(MediaType.APPLICATION_JSON)

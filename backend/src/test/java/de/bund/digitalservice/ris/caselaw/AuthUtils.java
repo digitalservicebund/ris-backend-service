@@ -58,4 +58,8 @@ public class AuthUtils {
   public static DocumentationOffice buildDocOffice(String label, String abbr) {
     return DocumentationOffice.builder().label(label).abbreviation(abbr).build();
   }
+
+  public static DocumentationOffice buildDefaultDocOffice() {
+    return DocumentationOffice.builder().label("DigitalService").abbreviation("XX").build();
+  }
 }

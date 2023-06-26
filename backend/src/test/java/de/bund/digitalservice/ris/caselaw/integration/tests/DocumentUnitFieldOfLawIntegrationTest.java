@@ -1,33 +1,48 @@
 package de.bund.digitalservice.ris.caselaw.integration.tests;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
+import de.bund.digitalservice.ris.caselaw.AuthUtils;
+import de.bund.digitalservice.ris.caselaw.RisWebTestClient;
+import de.bund.digitalservice.ris.caselaw.TestConfig;
+import de.bund.digitalservice.ris.caselaw.adapter.AuthService;
 import de.bund.digitalservice.ris.caselaw.adapter.ContentRelatedIndexingController;
 import de.bund.digitalservice.ris.caselaw.adapter.FieldOfLawService;
 import de.bund.digitalservice.ris.caselaw.adapter.KeywordService;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentUnitFieldsOfLawRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentUnitRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentationOfficeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitFieldsOfLawDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentationOfficeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.PostgresDocumentUnitRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.PostgresFieldOfLawRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.PostgresKeywordRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DatabaseFieldOfLawRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.FieldOfLawDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentUnitTransformer;
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresConfig;
+import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
+import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw.FieldOfLaw;
 import java.time.Instant;
 import java.util.UUID;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.security.oauth2.client.registration.ReactiveClientRegistrationRepository;
+import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
-import org.springframework.test.web.reactive.server.WebTestClient;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
+import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 @RISIntegrationTest(
@@ -38,7 +53,10 @@ import reactor.test.StepVerifier;
       PostgresConfig.class,
       PostgresDocumentUnitRepositoryImpl.class,
       PostgresKeywordRepositoryImpl.class,
-      PostgresFieldOfLawRepositoryImpl.class
+      PostgresFieldOfLawRepositoryImpl.class,
+      SecurityConfig.class,
+      AuthService.class,
+      TestConfig.class
     },
     controllers = {ContentRelatedIndexingController.class})
 class DocumentUnitFieldOfLawIntegrationTest {
@@ -54,11 +72,25 @@ class DocumentUnitFieldOfLawIntegrationTest {
     registry.add("database.database", () -> postgreSQLContainer.getDatabaseName());
   }
 
-  @Autowired private WebTestClient webClient;
-
+  @Autowired private RisWebTestClient risWebTestClient;
   @Autowired private DatabaseFieldOfLawRepository fieldOfLawRepository;
   @Autowired private DatabaseDocumentUnitRepository documentUnitRepository;
   @Autowired private DatabaseDocumentUnitFieldsOfLawRepository documentUnitFieldsOfLawRepository;
+  @Autowired private DatabaseDocumentationOfficeRepository documentationOfficeRepository;
+
+  @MockBean private DocumentUnitService documentUnitService;
+  @MockBean private UserService userService;
+  @MockBean ReactiveClientRegistrationRepository clientRegistrationRepository;
+
+  private DocumentationOfficeDTO docOfficeDTO;
+
+  @BeforeEach
+  void setUp() {
+    when(userService.getDocumentationOffice(any(OidcUser.class)))
+        .thenReturn(Mono.just(AuthUtils.buildDocOffice("DigitalService", "XX")));
+
+    docOfficeDTO = documentationOfficeRepository.findByLabel("DigitalService").block();
+  }
 
   @AfterEach
   void cleanUp() {
@@ -71,17 +103,24 @@ class DocumentUnitFieldOfLawIntegrationTest {
   void testGetAllFieldsOfLawForDocumentUnit_withoutFieldOfLawLinked_shouldReturnEmptyList() {
     UUID documentUnitUuid = UUID.randomUUID();
     DocumentUnitDTO documentUnitDTO =
-        DocumentUnitDTO.builder()
-            .uuid(documentUnitUuid)
-            .documentnumber("docnr12345678")
-            .creationtimestamp(Instant.now())
-            .build();
-    documentUnitRepository.save(documentUnitDTO).block();
+        documentUnitRepository
+            .save(
+                documentUnitDTO =
+                    DocumentUnitDTO.builder()
+                        .uuid(documentUnitUuid)
+                        .documentationOffice(docOfficeDTO)
+                        .documentnumber("docnr12345678")
+                        .creationtimestamp(Instant.now())
+                        .build())
+            .block();
+
+    when(documentUnitService.getByUuid(documentUnitUuid))
+        .thenReturn(Mono.just(DocumentUnitTransformer.transformDTO(documentUnitDTO)));
 
     generateFieldsOfLaw("SF-01", "SF-02");
 
-    webClient
-        .mutateWith(csrf())
+    risWebTestClient
+        .withDefaultLogin()
         .get()
         .uri(
             "/api/v1/caselaw/documentunits/"
@@ -99,20 +138,26 @@ class DocumentUnitFieldOfLawIntegrationTest {
       testGetAllFieldsOfLawForDocumentUnit_withFirstFieldOfLawLinked_shouldReturnListWithLinkedFieldOfLaw() {
     UUID documentUnitUuid = UUID.randomUUID();
     DocumentUnitDTO documentUnitDTO =
-        DocumentUnitDTO.builder()
-            .uuid(documentUnitUuid)
-            .documentnumber("docnr12345678")
-            .creationtimestamp(Instant.now())
-            .build();
-    documentUnitDTO = documentUnitRepository.save(documentUnitDTO).block();
+        documentUnitRepository
+            .save(
+                DocumentUnitDTO.builder()
+                    .uuid(documentUnitUuid)
+                    .documentationOffice(docOfficeDTO)
+                    .documentnumber("docnr12345678")
+                    .creationtimestamp(Instant.now())
+                    .build())
+            .block();
+
+    when(documentUnitService.getByUuid(documentUnitUuid))
+        .thenReturn(Mono.just(DocumentUnitTransformer.transformDTO(documentUnitDTO)));
 
     assertThat(documentUnitDTO).isNotNull();
 
     generateAndAddFieldsOfLaw(documentUnitDTO.getId(), "SF-01");
     generateFieldsOfLaw("SF-02");
 
-    webClient
-        .mutateWith(csrf())
+    risWebTestClient
+        .withDefaultLogin()
         .get()
         .uri(
             "/api/v1/caselaw/documentunits/"
@@ -133,19 +178,25 @@ class DocumentUnitFieldOfLawIntegrationTest {
   void testGetAllFieldsOfLawForDocumentUnit_shouldReturnSortedList() {
     UUID documentUnitUuid = UUID.randomUUID();
     DocumentUnitDTO documentUnitDTO =
-        DocumentUnitDTO.builder()
-            .uuid(documentUnitUuid)
-            .documentnumber("docnr12345678")
-            .creationtimestamp(Instant.now())
-            .build();
-    documentUnitDTO = documentUnitRepository.save(documentUnitDTO).block();
+        documentUnitRepository
+            .save(
+                DocumentUnitDTO.builder()
+                    .uuid(documentUnitUuid)
+                    .documentationOffice(docOfficeDTO)
+                    .documentnumber("docnr12345678")
+                    .creationtimestamp(Instant.now())
+                    .build())
+            .block();
+
+    when(documentUnitService.getByUuid(documentUnitUuid))
+        .thenReturn(Mono.just(DocumentUnitTransformer.transformDTO(documentUnitDTO)));
 
     assertThat(documentUnitDTO).isNotNull();
 
     generateAndAddFieldsOfLaw(documentUnitDTO.getId(), "SF-01", "AR-02", "XR-03", "XR-01-02");
 
-    webClient
-        .mutateWith(csrf())
+    risWebTestClient
+        .withDefaultLogin()
         .get()
         .uri(
             "/api/v1/caselaw/documentunits/"
@@ -163,11 +214,13 @@ class DocumentUnitFieldOfLawIntegrationTest {
   }
 
   @Test
-  void testGetAllFieldsOfLawForDocumentUnit_forNotExistingDocumentUnit_shouldReturnEmptyList() {
+  void testGetAllFieldsOfLawForDocumentUnit_forNotExistingDocumentUnit_shouldReturnForbidden() {
     UUID documentUnitUuid = UUID.randomUUID();
 
-    webClient
-        .mutateWith(csrf())
+    when(documentUnitService.getByUuid(documentUnitUuid)).thenReturn(Mono.empty());
+
+    risWebTestClient
+        .withDefaultLogin()
         .get()
         .uri(
             "/api/v1/caselaw/documentunits/"
@@ -175,29 +228,33 @@ class DocumentUnitFieldOfLawIntegrationTest {
                 + "/contentrelatedindexing/fieldsoflaw")
         .exchange()
         .expectStatus()
-        .isOk()
-        .expectBody(FieldOfLaw[].class)
-        .consumeWith(response -> assertThat(response.getResponseBody()).isEmpty());
+        .isForbidden();
   }
 
   @Test
   void testAddFieldsOfLawForDocumentUnit_shouldReturnListWithAllLinkedFieldOfLaw() {
     UUID documentUnitUuid = UUID.randomUUID();
     DocumentUnitDTO documentUnitDTO =
-        DocumentUnitDTO.builder()
-            .uuid(documentUnitUuid)
-            .documentnumber("docnr12345678")
-            .creationtimestamp(Instant.now())
-            .build();
-    documentUnitDTO = documentUnitRepository.save(documentUnitDTO).block();
+        documentUnitRepository
+            .save(
+                DocumentUnitDTO.builder()
+                    .documentationOffice(docOfficeDTO)
+                    .uuid(documentUnitUuid)
+                    .documentnumber("docnr12345678")
+                    .creationtimestamp(Instant.now())
+                    .build())
+            .block();
+
+    when(documentUnitService.getByUuid(documentUnitUuid))
+        .thenReturn(Mono.just(DocumentUnitTransformer.transformDTO(documentUnitDTO)));
 
     assertThat(documentUnitDTO).isNotNull();
 
     generateAndAddFieldsOfLaw(documentUnitDTO.getId(), "SF-01");
     generateFieldsOfLaw("SF-02");
 
-    webClient
-        .mutateWith(csrf())
+    risWebTestClient
+        .withDefaultLogin()
         .put()
         .uri(
             "/api/v1/caselaw/documentunits/"
@@ -219,20 +276,26 @@ class DocumentUnitFieldOfLawIntegrationTest {
       testAddFieldsOfLawForDocumentUnit_withNotExistingFieldOfLaw_shouldReturnListWithAllLinkedFieldOfLaw() {
     UUID documentUnitUuid = UUID.randomUUID();
     DocumentUnitDTO documentUnitDTO =
-        DocumentUnitDTO.builder()
-            .uuid(documentUnitUuid)
-            .documentnumber("docnr12345678")
-            .creationtimestamp(Instant.now())
-            .build();
-    documentUnitDTO = documentUnitRepository.save(documentUnitDTO).block();
+        documentUnitRepository
+            .save(
+                DocumentUnitDTO.builder()
+                    .documentationOffice(docOfficeDTO)
+                    .uuid(documentUnitUuid)
+                    .documentnumber("docnr12345678")
+                    .creationtimestamp(Instant.now())
+                    .build())
+            .block();
+
+    when(documentUnitService.getByUuid(documentUnitUuid))
+        .thenReturn(Mono.just(DocumentUnitTransformer.transformDTO(documentUnitDTO)));
 
     assertThat(documentUnitDTO).isNotNull();
 
     generateAndAddFieldsOfLaw(documentUnitDTO.getId(), "SF-01");
     generateFieldsOfLaw("SF-02");
 
-    webClient
-        .mutateWith(csrf())
+    risWebTestClient
+        .withDefaultLogin()
         .put()
         .uri(
             "/api/v1/caselaw/documentunits/"
@@ -250,11 +313,13 @@ class DocumentUnitFieldOfLawIntegrationTest {
   }
 
   @Test
-  void testAddFieldsOfLawForDocumentUnit_withNotExistingDocumentUnit_shouldReturnEmptyMono() {
+  void testAddFieldsOfLawForDocumentUnit_withNotExistingDocumentUnit_shouldReturnForbidden() {
     UUID documentUnitUuid = UUID.randomUUID();
 
-    webClient
-        .mutateWith(csrf())
+    when(documentUnitService.getByUuid(documentUnitUuid)).thenReturn(Mono.empty());
+
+    risWebTestClient
+        .withDefaultLogin()
         .put()
         .uri(
             "/api/v1/caselaw/documentunits/"
@@ -262,9 +327,7 @@ class DocumentUnitFieldOfLawIntegrationTest {
                 + "/contentrelatedindexing/fieldsoflaw/ST-02")
         .exchange()
         .expectStatus()
-        .isOk()
-        .expectBody(FieldOfLaw[].class)
-        .consumeWith(response -> assertThat(response.getResponseBody()).isNull());
+        .isForbidden();
   }
 
   @Test
@@ -274,18 +337,22 @@ class DocumentUnitFieldOfLawIntegrationTest {
     DocumentUnitDTO documentUnitDTO =
         DocumentUnitDTO.builder()
             .uuid(documentUnitUuid)
+            .documentationOffice(docOfficeDTO)
             .documentnumber("docnr12345678")
             .creationtimestamp(Instant.now())
             .build();
     documentUnitDTO = documentUnitRepository.save(documentUnitDTO).block();
+
+    when(documentUnitService.getByUuid(documentUnitUuid))
+        .thenReturn(Mono.just(DocumentUnitTransformer.transformDTO(documentUnitDTO)));
 
     assertThat(documentUnitDTO).isNotNull();
 
     generateAndAddFieldsOfLaw(documentUnitDTO.getId(), "SF-01");
     generateFieldsOfLaw("SF-02");
 
-    webClient
-        .mutateWith(csrf())
+    risWebTestClient
+        .withDefaultLogin()
         .put()
         .uri(
             "/api/v1/caselaw/documentunits/"
@@ -306,20 +373,26 @@ class DocumentUnitFieldOfLawIntegrationTest {
   void testRemoveFieldsOfLawForDocumentUnit_shouldReturnListWithAllLinkedFieldOfLaw() {
     UUID documentUnitUuid = UUID.randomUUID();
     DocumentUnitDTO documentUnitDTO =
-        DocumentUnitDTO.builder()
-            .uuid(documentUnitUuid)
-            .documentnumber("docnr12345678")
-            .creationtimestamp(Instant.now())
-            .build();
-    documentUnitDTO = documentUnitRepository.save(documentUnitDTO).block();
+        documentUnitRepository
+            .save(
+                DocumentUnitDTO.builder()
+                    .uuid(documentUnitUuid)
+                    .documentationOffice(docOfficeDTO)
+                    .documentnumber("docnr12345678")
+                    .creationtimestamp(Instant.now())
+                    .build())
+            .block();
+
+    when(documentUnitService.getByUuid(documentUnitUuid))
+        .thenReturn(Mono.just(DocumentUnitTransformer.transformDTO(documentUnitDTO)));
 
     assertThat(documentUnitDTO).isNotNull();
 
     generateAndAddFieldsOfLaw(documentUnitDTO.getId(), "SF-01");
     generateFieldsOfLaw("SF-02");
 
-    webClient
-        .mutateWith(csrf())
+    risWebTestClient
+        .withDefaultLogin()
         .delete()
         .uri(
             "/api/v1/caselaw/documentunits/"
@@ -337,20 +410,26 @@ class DocumentUnitFieldOfLawIntegrationTest {
       testRemoveFieldsOfLawForDocumentUnit_withNotLinkedFieldOfLaw_shouldReturnListWithAllLinkedFieldOfLaw() {
     UUID documentUnitUuid = UUID.randomUUID();
     DocumentUnitDTO documentUnitDTO =
-        DocumentUnitDTO.builder()
-            .uuid(documentUnitUuid)
-            .documentnumber("docnr12345678")
-            .creationtimestamp(Instant.now())
-            .build();
-    documentUnitDTO = documentUnitRepository.save(documentUnitDTO).block();
+        documentUnitRepository
+            .save(
+                DocumentUnitDTO.builder()
+                    .uuid(documentUnitUuid)
+                    .documentationOffice(docOfficeDTO)
+                    .documentnumber("docnr12345678")
+                    .creationtimestamp(Instant.now())
+                    .build())
+            .block();
+
+    when(documentUnitService.getByUuid(documentUnitUuid))
+        .thenReturn(Mono.just(DocumentUnitTransformer.transformDTO(documentUnitDTO)));
 
     assertThat(documentUnitDTO).isNotNull();
 
     generateAndAddFieldsOfLaw(documentUnitDTO.getId(), "SF-01");
     generateFieldsOfLaw("SF-02");
 
-    webClient
-        .mutateWith(csrf())
+    risWebTestClient
+        .withDefaultLogin()
         .delete()
         .uri(
             "/api/v1/caselaw/documentunits/"
@@ -372,20 +451,26 @@ class DocumentUnitFieldOfLawIntegrationTest {
       testRemoveFieldsOfLawForDocumentUnit_withNotExistingFieldOfLaw_shouldReturnListWithAllLinkedFieldOfLaw() {
     UUID documentUnitUuid = UUID.randomUUID();
     DocumentUnitDTO documentUnitDTO =
-        DocumentUnitDTO.builder()
-            .uuid(documentUnitUuid)
-            .documentnumber("docnr12345678")
-            .creationtimestamp(Instant.now())
-            .build();
-    documentUnitDTO = documentUnitRepository.save(documentUnitDTO).block();
+        documentUnitRepository
+            .save(
+                DocumentUnitDTO.builder()
+                    .uuid(documentUnitUuid)
+                    .documentationOffice(docOfficeDTO)
+                    .documentnumber("docnr12345678")
+                    .creationtimestamp(Instant.now())
+                    .build())
+            .block();
+
+    when(documentUnitService.getByUuid(documentUnitUuid))
+        .thenReturn(Mono.just(DocumentUnitTransformer.transformDTO(documentUnitDTO)));
 
     assertThat(documentUnitDTO).isNotNull();
 
     generateAndAddFieldsOfLaw(documentUnitDTO.getId(), "SF-01");
     generateFieldsOfLaw("SF-02");
 
-    webClient
-        .mutateWith(csrf())
+    risWebTestClient
+        .withDefaultLogin()
         .delete()
         .uri(
             "/api/v1/caselaw/documentunits/"
@@ -403,11 +488,13 @@ class DocumentUnitFieldOfLawIntegrationTest {
   }
 
   @Test
-  void testRemoveFieldsOfLawForDocumentUnit_withNotExistingDocumentUnit_shouldReturnEmptyMono() {
+  void testRemoveFieldsOfLawForDocumentUnit_withNotExistingDocumentUnit_shouldReturnForbidden() {
     UUID documentUnitUuid = UUID.randomUUID();
 
-    webClient
-        .mutateWith(csrf())
+    when(documentUnitService.getByUuid(documentUnitUuid)).thenReturn(Mono.empty());
+
+    risWebTestClient
+        .withDefaultLogin()
         .delete()
         .uri(
             "/api/v1/caselaw/documentunits/"
@@ -415,9 +502,7 @@ class DocumentUnitFieldOfLawIntegrationTest {
                 + "/contentrelatedindexing/fieldsoflaw/ST-02")
         .exchange()
         .expectStatus()
-        .isOk()
-        .expectBody(FieldOfLaw[].class)
-        .consumeWith(response -> assertThat(response.getResponseBody()).isNull());
+        .isForbidden();
   }
 
   @Test
@@ -426,10 +511,14 @@ class DocumentUnitFieldOfLawIntegrationTest {
     DocumentUnitDTO documentUnitDTO =
         DocumentUnitDTO.builder()
             .uuid(documentUnitUuid)
+            .documentationOffice(docOfficeDTO)
             .documentnumber("docnr12345678")
             .creationtimestamp(Instant.now())
             .build();
     DocumentUnitDTO savedDocumentUnitDTO = documentUnitRepository.save(documentUnitDTO).block();
+
+    when(documentUnitService.getByUuid(documentUnitUuid))
+        .thenReturn(Mono.just(DocumentUnitTransformer.transformDTO(documentUnitDTO)));
 
     FieldOfLawDTO fieldOfLawDTO = FieldOfLawDTO.builder().identifier("SF-01").build();
     FieldOfLawDTO savedFieldOfLawDTO = fieldOfLawRepository.save(fieldOfLawDTO).block();
@@ -463,10 +552,14 @@ class DocumentUnitFieldOfLawIntegrationTest {
     DocumentUnitDTO documentUnitDTO =
         DocumentUnitDTO.builder()
             .uuid(documentUnitUuid)
+            .documentationOffice(docOfficeDTO)
             .documentnumber("docnr12345678")
             .creationtimestamp(Instant.now())
             .build();
     DocumentUnitDTO savedDocumentUnitDTO = documentUnitRepository.save(documentUnitDTO).block();
+
+    when(documentUnitService.getByUuid(documentUnitUuid))
+        .thenReturn(Mono.just(DocumentUnitTransformer.transformDTO(documentUnitDTO)));
 
     FieldOfLawDTO fieldOfLawDTO = FieldOfLawDTO.builder().identifier("SF-01").build();
     FieldOfLawDTO savedFieldOfLawDTO = fieldOfLawRepository.save(fieldOfLawDTO).block();
