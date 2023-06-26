@@ -151,7 +151,7 @@ onMounted(() => {
       <TextButton
         aria-label="Aktivzitierung speichern"
         class="mr-28"
-        label="Hinzufügen"
+        label="Übernehmen"
         @click="addActiveCitation"
       />
     </div>
