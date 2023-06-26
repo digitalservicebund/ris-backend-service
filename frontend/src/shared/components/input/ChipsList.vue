@@ -104,7 +104,7 @@ defineExpose({ focusPrevious, focusNext, resetFocus, focusFirst })
   <div>
     <ul
       ref="containerRef"
-      class="flex flex-row flex-wrap gap-8 items-center mr-8 my-4"
+      class="empty:m-0 flex flex-row flex-wrap gap-8 items-center mr-8 my-4"
     >
       <li
         v-for="(chip, i) in chips"

@@ -1,7 +1,7 @@
-function useResizeObserverMock() {
-  return {
-    width: 1000,
-  }
+export function useResizeObserverMock() {
+  global.ResizeObserver = vi.fn().mockImplementation(() => ({
+    observe: vi.fn(),
+    unobserve: vi.fn(),
+    disconnect: vi.fn(),
+  }))
 }
-
-export default useResizeObserverMock

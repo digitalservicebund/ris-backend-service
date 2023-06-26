@@ -1,5 +1,12 @@
 <script lang="ts" setup>
-import { nextTick, ref, watch, watchEffect } from "vue"
+import {
+  nextTick,
+  onBeforeUnmount,
+  onMounted,
+  ref,
+  watch,
+  watchEffect,
+} from "vue"
 import ChipsList from "@/shared/components/input/ChipsList.vue"
 import { ValidationError } from "@/shared/components/input/types"
 import { useInputModel } from "@/shared/composables/useInputModel"
@@ -83,7 +90,37 @@ const focusInput = () => {
  * Input width management (needed for the enter icon) *
  * -------------------------------------------------- */
 
-const width = ref<string | undefined>("auto")
+const wrapperEl = ref<HTMLElement | null>(null)
+
+// We're keeping the wrapper size to limit the width of the container of the
+// input field. Ideally we'd have CSS do this for us, but that can be tricky
+// with flexbox and we don't want that complexity to leak into the parent
+// component - better have it contained here.
+const wrapperContentWidth = ref<number | undefined>()
+
+function updateWrapperSize() {
+  if (!wrapperEl.value) return
+
+  const { paddingLeft, paddingRight } = getComputedStyle(wrapperEl.value)
+  const padding = parseInt(paddingLeft) + parseInt(paddingRight)
+  wrapperContentWidth.value = wrapperEl.value.clientWidth - padding
+}
+
+const wrapperResizeObserver = new ResizeObserver(() => {
+  updateWrapperSize()
+})
+
+onMounted(() => {
+  if (!wrapperEl.value) return
+  wrapperResizeObserver.observe(wrapperEl.value)
+  updateWrapperSize()
+})
+
+onBeforeUnmount(() => {
+  wrapperResizeObserver.disconnect()
+})
+
+const inputContentWidth = ref<string | undefined>("auto")
 
 async function determineInputWidth() {
   if (!chipsInput.value) return
@@ -91,7 +128,7 @@ async function determineInputWidth() {
   // We first need to reset the height to auto, so that the scrollHeight
   // is not limited by the current height. Then wait for the next tick
   // so that the textarea has time to resize.
-  width.value = undefined
+  inputContentWidth.value = undefined
   await nextTick()
 
   const { borderLeftWidth, borderRightWidth } = getComputedStyle(
@@ -101,7 +138,9 @@ async function determineInputWidth() {
   const borderLeft = parseInt(borderLeftWidth)
   const borderRight = parseInt(borderRightWidth)
 
-  width.value = `${chipsInput.value.scrollWidth + borderLeft + borderRight}px`
+  inputContentWidth.value = `${
+    chipsInput.value.scrollWidth + borderLeft + borderRight
+  }px`
 }
 
 watchEffect(() => {
@@ -121,7 +160,8 @@ watch(currentInput, async () => {
   just fine -->
   <!-- eslint-disable vuejs-accessibility/click-events-have-key-events -->
   <div
-    class="-outline-offset-4 [&:has(:focus)]:outline autofill:focus:shadow-white autofill:focus:text-inherit autofill:shadow-white autofill:text-inherit bg-white border-2 border-blue-800 border-solid cursor-text flex flex-wrap hover:outline items-center min-h-[3.75rem] outline-2 outline-blue-800 px-16 py-8 w-full"
+    ref="wrapperEl"
+    class="-outline-offset-4 [&:has(:focus)]:outline autofill:focus:shadow-white autofill:focus:text-inherit autofill:shadow-white autofill:text-inherit bg-white border-2 border-blue-800 border-solid cursor-text flex flex-wrap hover:outline items-center min-h-[3.75rem] outline-2 outline-blue-800 overflow-hidden px-16 py-8 w-full"
     @click="focusInput"
   >
     <ChipsList
@@ -129,7 +169,10 @@ watch(currentInput, async () => {
       v-model="chips"
       @next-clicked-on-last="focusInput"
     />
-    <span class="flex flex-auto items-center justify-start max-w-full no-wrap">
+    <span
+      class="flex flex-auto items-center justify-start max-w-full"
+      :style="{ maxWidth: `${wrapperContentWidth}px` }"
+    >
       <span :id="`enter-note-for-${id}`" class="sr-only">
         Enter drücken, um die Eingabe zu bestätigen
       </span>
@@ -140,7 +183,7 @@ watch(currentInput, async () => {
         :aria-describedby="`enter-note-for-${id}`"
         :aria-label="ariaLabel"
         class="bg-transparent border-none min-w-0 outline-none peer w-[1ch]"
-        :style="{ width }"
+        :style="{ width: inputContentWidth }"
         type="text"
         @input="emitInputEvent"
         @keypress.enter="saveChip"
