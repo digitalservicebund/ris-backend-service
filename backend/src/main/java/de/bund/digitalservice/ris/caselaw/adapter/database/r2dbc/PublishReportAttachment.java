@@ -15,11 +15,11 @@ import org.springframework.data.relational.core.mapping.Table;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table("exporter_html_report")
-public class ExporterHtmlReportDTO implements Persistable<UUID> {
+@Table("publish_report_attachment")
+public class PublishReportAttachment implements Persistable<UUID> {
   @Id UUID id;
   private UUID documentUnitId;
-  private String html;
+  private String content;
   private Instant receivedDate;
 
   @Transient private boolean newEntry;

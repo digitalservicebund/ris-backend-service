@@ -1,20 +1,21 @@
 package de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc;
 
-import de.bund.digitalservice.ris.caselaw.domain.ExporterHtmlReport;
-import de.bund.digitalservice.ris.caselaw.domain.ExporterHtmlReportRepository;
+import de.bund.digitalservice.ris.caselaw.domain.PublishReportAttachment;
+import de.bund.digitalservice.ris.caselaw.domain.PublishReportAttachmentRepository;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;
 
 @Repository
-public class PostgresExporterHtmlReportRepositoryImpl implements ExporterHtmlReportRepository {
+public class PostgresPublishReportAttachmentAttachmentRepositoryImpl
+    implements PublishReportAttachmentRepository {
 
-  private final DatabaseExporterHtmlReportRepository repository;
+  private final DatabasePublishReportAttachmentRepository repository;
   private final DatabaseDocumentUnitRepository documentUnitRepository;
 
-  public PostgresExporterHtmlReportRepositoryImpl(
-      DatabaseExporterHtmlReportRepository repository,
+  public PostgresPublishReportAttachmentAttachmentRepositoryImpl(
+      DatabasePublishReportAttachmentRepository repository,
       DatabaseDocumentUnitRepository documentUnitRepository) {
 
     this.repository = repository;
@@ -22,7 +23,7 @@ public class PostgresExporterHtmlReportRepositoryImpl implements ExporterHtmlRep
   }
 
   @Override
-  public Flux<ExporterHtmlReport> saveAll(List<ExporterHtmlReport> reports) {
+  public Flux<PublishReportAttachment> saveAll(List<PublishReportAttachment> reports) {
     return Flux.fromIterable(reports)
         .flatMap(
             report ->
@@ -30,21 +31,22 @@ public class PostgresExporterHtmlReportRepositoryImpl implements ExporterHtmlRep
                     .findByDocumentnumber(report.documentNumber())
                     .map(
                         documentUnit ->
-                            ExporterHtmlReportDTO.builder()
+                            de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc
+                                .PublishReportAttachment.builder()
                                 .id(UUID.randomUUID())
                                 .documentUnitId(documentUnit.getUuid())
                                 .receivedDate(report.receivedDate())
-                                .html(report.html())
+                                .content(report.content())
                                 .newEntry(true)
                                 .build()))
         .collectList()
         .flatMapMany(repository::saveAll)
         .map(
             report ->
-                ExporterHtmlReport.builder()
+                PublishReportAttachment.builder()
                     // TODO add documentNumber
                     .receivedDate(report.getReceivedDate())
-                    .html(report.getHtml())
+                    .content(report.getContent())
                     .build());
   }
 }

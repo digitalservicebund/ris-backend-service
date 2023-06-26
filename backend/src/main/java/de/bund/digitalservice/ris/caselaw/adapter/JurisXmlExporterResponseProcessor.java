@@ -2,13 +2,12 @@ package de.bund.digitalservice.ris.caselaw.adapter;
 
 import de.bund.digitalservice.ris.caselaw.domain.Attachment;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatusService;
-import de.bund.digitalservice.ris.caselaw.domain.ExporterHtmlReport;
-import de.bund.digitalservice.ris.caselaw.domain.ExporterHtmlReportRepository;
 import de.bund.digitalservice.ris.caselaw.domain.HttpMailSender;
+import de.bund.digitalservice.ris.caselaw.domain.PublishReportAttachment;
+import de.bund.digitalservice.ris.caselaw.domain.PublishReportAttachmentRepository;
 import de.bund.digitalservice.ris.domain.export.juris.response.ActionableMessageHandler;
 import de.bund.digitalservice.ris.domain.export.juris.response.MessageAttachment;
 import de.bund.digitalservice.ris.domain.export.juris.response.MessageHandler;
-import de.bund.digitalservice.ris.domain.export.juris.response.ProcessMessageHandler;
 import de.bund.digitalservice.ris.domain.export.juris.response.StatusImporterException;
 import jakarta.mail.Flags.Flag;
 import jakarta.mail.Folder;
@@ -36,14 +35,14 @@ public class JurisXmlExporterResponseProcessor {
   private final HttpMailSender mailSender;
   private final DocumentUnitStatusService statusService;
   private final ImapStoreFactory storeFactory;
-  private final ExporterHtmlReportRepository reportRepository;
+  private final PublishReportAttachmentRepository reportRepository;
 
   public JurisXmlExporterResponseProcessor(
       List<MessageHandler> messageHandlers,
       HttpMailSender mailSender,
       DocumentUnitStatusService statusService,
       ImapStoreFactory storeFactory,
-      ExporterHtmlReportRepository reportRepository) {
+      PublishReportAttachmentRepository reportRepository) {
     this.messageHandlers = messageHandlers;
     this.mailSender = mailSender;
     this.statusService = statusService;
@@ -95,8 +94,7 @@ public class JurisXmlExporterResponseProcessor {
                 .doOnSuccess(
                     result -> {
                       processedMessages.add(message);
-                      if (actionableHandler instanceof ProcessMessageHandler)
-                        saveAttachments(documentNumber, receivedDate, attachments);
+                      saveAttachments(documentNumber, receivedDate, attachments);
                     })
                 .onErrorResume(e -> Mono.empty())
                 .block();
@@ -123,12 +121,13 @@ public class JurisXmlExporterResponseProcessor {
     reportRepository
         .saveAll(
             attachments.stream()
+                .filter(attachment -> attachment.fileName().endsWith(".html"))
                 .map(
                     attachment ->
-                        ExporterHtmlReport.builder()
+                        PublishReportAttachment.builder()
                             .documentNumber(documentNumber)
                             .receivedDate(receivedDate.toInstant())
-                            .html(attachment.fileContent())
+                            .content(attachment.fileContent())
                             .build())
                 .toList())
         .subscribe();

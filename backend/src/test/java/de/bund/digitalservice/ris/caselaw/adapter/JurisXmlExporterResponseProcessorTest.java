@@ -12,15 +12,14 @@ import static org.mockito.Mockito.when;
 
 import de.bund.digitalservice.ris.caselaw.domain.Attachment;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatusService;
-import de.bund.digitalservice.ris.caselaw.domain.ExporterHtmlReport;
-import de.bund.digitalservice.ris.caselaw.domain.ExporterHtmlReportRepository;
 import de.bund.digitalservice.ris.caselaw.domain.HttpMailSender;
-import de.bund.digitalservice.ris.domain.export.juris.response.ActionableMessageHandler;
+import de.bund.digitalservice.ris.caselaw.domain.PublishReportAttachment;
+import de.bund.digitalservice.ris.caselaw.domain.PublishReportAttachmentRepository;
 import de.bund.digitalservice.ris.domain.export.juris.response.ImportMessageHandler;
 import de.bund.digitalservice.ris.domain.export.juris.response.MessageAttachment;
 import de.bund.digitalservice.ris.domain.export.juris.response.ProcessMessageHandler;
-import jakarta.mail.BodyPart;
 import de.bund.digitalservice.ris.domain.export.juris.response.StatusImporterException;
+import jakarta.mail.BodyPart;
 import jakarta.mail.Flags.Flag;
 import jakarta.mail.Folder;
 import jakarta.mail.Message;
@@ -32,11 +31,10 @@ import jakarta.mail.internet.MimeMultipart;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.AbstractMap;
 import java.util.Collections;
-import java.util.stream.Collectors;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -53,7 +51,7 @@ public class JurisXmlExporterResponseProcessorTest {
   @MockBean private DocumentUnitStatusService statusService;
   @MockBean private HttpMailSender mailSender;
   @MockBean private ImapStoreFactory storeFactory;
-  @MockBean private ExporterHtmlReportRepository reportRepository;
+  @MockBean private PublishReportAttachmentRepository reportRepository;
   @Mock private Store store;
   @Mock private Folder inbox;
   @Mock private Folder processed;
@@ -187,13 +185,13 @@ public class JurisXmlExporterResponseProcessorTest {
     verify(reportRepository)
         .saveAll(
             List.of(
-                ExporterHtmlReport.builder()
-                    .html("report")
+                PublishReportAttachment.builder()
+                    .content("report")
                     .documentNumber(DOCUMENT_NUMBER)
                     .receivedDate(now.toInstant())
                     .build(),
-                ExporterHtmlReport.builder()
-                    .html("spellcheck")
+                PublishReportAttachment.builder()
+                    .content("spellcheck")
                     .documentNumber(DOCUMENT_NUMBER)
                     .receivedDate(now.toInstant())
                     .build()));
