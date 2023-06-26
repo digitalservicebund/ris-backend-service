@@ -1,5 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.domain;
 
+import de.bund.digitalservice.ris.caselaw.domain.lookuptable.citation.CitationStyle;
 import de.bund.digitalservice.ris.caselaw.domain.validator.DateKnownConstraint;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -13,4 +14,6 @@ import lombok.experimental.SuperBuilder;
 @Getter
 @NoArgsConstructor
 @DateKnownConstraint
-public class ActiveCitation extends LinkedDocumentationUnit {}
+public class ActiveCitation extends LinkedDocumentationUnit {
+  private CitationStyle citationStyle;
+}

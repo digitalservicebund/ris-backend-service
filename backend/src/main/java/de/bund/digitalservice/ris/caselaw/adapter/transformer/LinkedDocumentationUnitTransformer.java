@@ -1,6 +1,7 @@
 package de.bund.digitalservice.ris.caselaw.adapter.transformer;
 
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitMetadataDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentationUnitLinkDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DocumentTypeDTO;
 import de.bund.digitalservice.ris.caselaw.domain.ActiveCitation;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
@@ -16,10 +17,10 @@ public class LinkedDocumentationUnitTransformer {
   LinkedDocumentationUnitTransformer() {}
 
   public static LinkedDocumentationUnit transformToDomain(
-      DocumentUnitMetadataDTO documentUnitMetadataDTO) {
+      DocumentUnitMetadataDTO documentUnitMetadataDTO, DocumentationUnitLinkDTO linkDTO) {
 
     if (documentUnitMetadataDTO.getDataSource() == DataSource.ACTIVE_CITATION) {
-      return ActiveCitationTransformer.transformToDomain(documentUnitMetadataDTO);
+      return ActiveCitationTransformer.transformToDomain(documentUnitMetadataDTO, linkDTO);
     } else if (documentUnitMetadataDTO.getDataSource() == DataSource.PROCEEDING_DECISION) {
       return ProceedingDecisionTransformer.transformToDomain(documentUnitMetadataDTO);
     }

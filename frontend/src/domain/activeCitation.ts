@@ -3,7 +3,7 @@ import { CitationStyle } from "./citationStyle"
 import LinkedDocumentUnit from "./linkedDocumentUnit"
 
 export default class ActiveCitation extends LinkedDocumentUnit {
-  public predicateList?: CitationStyle
+  public citationStyle?: CitationStyle
 
   static requiredFields = ["court"] as const
 
@@ -20,7 +20,7 @@ export default class ActiveCitation extends LinkedDocumentUnit {
         : []),
       ...(this.documentType ? [this.documentType.label] : []),
       ...(this.fileNumber ? [this.fileNumber] : []),
-      ...(this.predicateList ? [this.predicateList] : []),
+      ...(this.citationStyle ? [this.citationStyle] : []),
       ...(this.documentNumber && this.isDocUnit() ? [this.documentNumber] : []),
     ].join(", ")
   }

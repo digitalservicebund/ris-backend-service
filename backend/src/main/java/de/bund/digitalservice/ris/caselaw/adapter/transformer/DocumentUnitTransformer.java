@@ -219,10 +219,7 @@ public class DocumentUnitTransformer {
 
     List<ActiveCitation> activeCitations = null;
     if (documentUnitDTO.getActiveCitations() != null) {
-      activeCitations =
-          documentUnitDTO.getActiveCitations().stream()
-              .map(ActiveCitationTransformer::transformToDomain)
-              .toList();
+      activeCitations = documentUnitDTO.getActiveCitations();
     }
 
     List<String> fileNumbers = null;

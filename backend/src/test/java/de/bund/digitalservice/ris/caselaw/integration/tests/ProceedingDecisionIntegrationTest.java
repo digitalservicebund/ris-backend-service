@@ -147,7 +147,7 @@ class ProceedingDecisionIntegrationTest {
         linkRepository
             .findAllByParentDocumentationUnitUuidAndTypeOrderByIdAsc(
                 parentDocumentUnitDTO.getUuid(), DocumentationUnitLinkType.PREVIOUS_DECISION)
-            .map(DocumentationUnitLinkDTO::childDocumentationUnitUuid)
+            .map(DocumentationUnitLinkDTO::getChildDocumentationUnitUuid)
             .collectList()
             .block();
 
@@ -289,7 +289,7 @@ class ProceedingDecisionIntegrationTest {
         .expectStatus()
         .is2xxSuccessful();
 
-    assertThat(linkRepository.findById(linkDTO.id()).block()).isNull();
+    assertThat(linkRepository.findById(linkDTO.getId()).block()).isNull();
     assertThat(repository.findById(childDocumentUnitDTO.getId()).block()).isNotNull();
   }
 
@@ -332,7 +332,7 @@ class ProceedingDecisionIntegrationTest {
         .expectStatus()
         .is2xxSuccessful();
 
-    assertThat(linkRepository.findById(linkDTO.id()).block()).isNull();
+    assertThat(linkRepository.findById(linkDTO.getId()).block()).isNull();
     assertThat(repository.findById(childDocumentUnitDTO.getId()).block()).isNotNull();
 
     webClient
@@ -389,7 +389,7 @@ class ProceedingDecisionIntegrationTest {
         .expectStatus()
         .is2xxSuccessful();
 
-    assertThat(linkRepository.findById(linkDTO.id()).block()).isNull();
+    assertThat(linkRepository.findById(linkDTO.getId()).block()).isNull();
     assertThat(repository.findById(childDocumentUnitDTO.getId()).block()).isNull();
   }
 
@@ -451,8 +451,8 @@ class ProceedingDecisionIntegrationTest {
         .expectStatus()
         .is2xxSuccessful();
 
-    assertThat(linkRepository.findById(linkDTO1.id()).block()).isNull();
-    assertThat(linkRepository.findById(linkDTO2.id()).block()).isNotNull();
+    assertThat(linkRepository.findById(linkDTO1.getId()).block()).isNull();
+    assertThat(linkRepository.findById(linkDTO2.getId()).block()).isNotNull();
     assertThat(repository.findById(childDocumentUnitDTO.getId()).block()).isNotNull();
   }
 
@@ -518,9 +518,10 @@ class ProceedingDecisionIntegrationTest {
 
     List<DocumentationUnitLinkDTO> list = linkRepository.findAll().collectList().block();
     assertThat(list).hasSize(1);
-    assertThat(list.get(0).parentDocumentationUnitUuid())
+    assertThat(list.get(0).getParentDocumentationUnitUuid())
         .isEqualTo(parentDocumentUnitDTO.getUuid());
-    assertThat(list.get(0).childDocumentationUnitUuid()).isEqualTo(childDocumentUnitDTO.getUuid());
+    assertThat(list.get(0).getChildDocumentationUnitUuid())
+        .isEqualTo(childDocumentUnitDTO.getUuid());
   }
 
   @Test

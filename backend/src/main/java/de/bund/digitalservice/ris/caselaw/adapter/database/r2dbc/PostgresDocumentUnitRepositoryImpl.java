@@ -2,6 +2,7 @@ package de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc;
 
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitDTO.DocumentUnitDTOBuilder;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.CourtDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DatabaseCitationStyleRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DatabaseCourtRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DatabaseDocumentTypeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DatabaseFieldOfLawRepository;
@@ -10,6 +11,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.Doc
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.NormAbbreviationDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.StateDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.StateRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.transformer.ActiveCitationTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DeviatingDecisionDateTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentUnitTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationOfficeTransformer;
@@ -67,6 +69,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
   private final DatabaseDocumentUnitStatusRepository databaseDocumentUnitStatusRepository;
   private final DatabaseNormAbbreviationRepository normAbbreviationRepository;
   private final DatabaseDocumentationUnitLinkRepository documentationUnitLinkRepository;
+  private final DatabaseCitationStyleRepository citationStyleRepository;
 
   public PostgresDocumentUnitRepositoryImpl(
       DatabaseDocumentUnitRepository repository,
@@ -85,7 +88,8 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
       DatabaseDocumentationOfficeRepository documentationOfficeRepository,
       DatabaseDocumentUnitStatusRepository databaseDocumentUnitStatusRepository,
       DatabaseNormAbbreviationRepository normAbbreviationRepository,
-      DatabaseDocumentationUnitLinkRepository documentationUnitLinkRepository) {
+      DatabaseDocumentationUnitLinkRepository documentationUnitLinkRepository,
+      DatabaseCitationStyleRepository citationStyleRepository) {
 
     this.repository = repository;
     this.metadataRepository = metadataRepository;
@@ -104,6 +108,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
     this.databaseDocumentUnitStatusRepository = databaseDocumentUnitStatusRepository;
     this.normAbbreviationRepository = normAbbreviationRepository;
     this.documentationUnitLinkRepository = documentationUnitLinkRepository;
+    this.citationStyleRepository = citationStyleRepository;
   }
 
   @Override
@@ -607,7 +612,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
       log.debug("save active citations: {}", documentUnit.uuid());
     }
 
-    List<ActiveCitation> activeCitations = Collections.emptyList();
+    List<? extends LinkedDocumentationUnit> activeCitations = Collections.emptyList();
     if (documentUnit.contentRelatedIndexing() != null
         && documentUnit.contentRelatedIndexing().activeCitations() != null) {
       activeCitations = documentUnit.contentRelatedIndexing().activeCitations();
@@ -626,7 +631,32 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
                     .flatMap(
                         activeCitationDocumentationUnitDTO ->
                             updateLinkedDocumentationUnit(
-                                activeCitationDocumentationUnitDTO, activeCitation)))
+                                activeCitationDocumentationUnitDTO, activeCitation))
+                    .flatMap(
+                        documentUnitMetadataDTO ->
+                            documentationUnitLinkRepository
+                                .findByParentDocumentationUnitUuidAndChildDocumentationUnitUuidAndType(
+                                    documentUnitDTO.getUuid(),
+                                    documentUnitMetadataDTO.getUuid(),
+                                    DocumentationUnitLinkType.ACTIVE_CITATION)
+                                .flatMap(
+                                    documentationUnitLinkDTO -> {
+                                      UUID citationStyleUuid = null;
+
+                                      if (activeCitation instanceof ActiveCitation
+                                          && ((ActiveCitation) activeCitation).getCitationStyle()
+                                              != null) {
+                                        citationStyleUuid =
+                                            ((ActiveCitation) activeCitation)
+                                                .getCitationStyle()
+                                                .uuid();
+                                      }
+
+                                      return documentationUnitLinkRepository.save(
+                                          documentationUnitLinkDTO.toBuilder()
+                                              .citationStyleUuid(citationStyleUuid)
+                                              .build());
+                                    })))
         .then(
             unlinkLinkedDocumentationUnit(documentUnit, DocumentationUnitLinkType.ACTIVE_CITATION))
         .then(injectActiveCitations(documentUnitDTO));
@@ -778,7 +808,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
     return documentationUnitLinkRepository
         .findAllByParentDocumentationUnitUuidAndTypeOrderByIdAsc(
             documentUnitDTO.getUuid(), DocumentationUnitLinkType.PREVIOUS_DECISION)
-        .map(DocumentationUnitLinkDTO::childDocumentationUnitUuid)
+        .map(DocumentationUnitLinkDTO::getChildDocumentationUnitUuid)
         .flatMap(metadataRepository::findByUuid)
         .flatMap(this::injectMetadataInformation)
         .collectList()
@@ -789,27 +819,54 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
             });
   }
 
-  private Mono<DocumentUnitDTO> injectActiveCitations(DocumentUnitDTO documentUnitDTO) {
+  private Mono<DocumentUnitDTO> injectActiveCitations(DocumentUnitDTO parentDTO) {
     if (log.isDebugEnabled()) {
-      log.debug("inject active citations: {}", documentUnitDTO.getUuid());
+      log.debug("inject active citations: {}", parentDTO.getUuid());
     }
 
     return documentationUnitLinkRepository
         .findAllByParentDocumentationUnitUuidAndTypeOrderByIdAsc(
-            documentUnitDTO.getUuid(), DocumentationUnitLinkType.ACTIVE_CITATION)
-        .map(
-            t -> {
-              log.debug("get child uuid: {}", t.id());
-              return t.childDocumentationUnitUuid();
-            })
+            parentDTO.getUuid(), DocumentationUnitLinkType.ACTIVE_CITATION)
+        .map(DocumentationUnitLinkDTO::getChildDocumentationUnitUuid)
         .flatMapSequential(metadataRepository::findByUuid)
         .flatMapSequential(this::injectMetadataInformation)
+        .flatMapSequential(childDTO -> injectCitationStyle(parentDTO.getUuid(), childDTO))
         .collectList()
         .map(
-            activeCitationDTOs -> {
-              documentUnitDTO.setActiveCitations(activeCitationDTOs);
-              return documentUnitDTO;
+            activeCitations -> {
+              parentDTO.setActiveCitations(activeCitations);
+              return parentDTO;
             });
+  }
+
+  private Mono<ActiveCitation> injectCitationStyle(
+      UUID parentUUID, DocumentUnitMetadataDTO documentUnitMetadataDTO) {
+    if (log.isDebugEnabled()) {
+      log.debug(
+          "inject citation style in child '{}' for parent '{}'",
+          documentUnitMetadataDTO.getUuid(),
+          parentUUID);
+    }
+
+    return documentationUnitLinkRepository
+        .findByParentDocumentationUnitUuidAndChildDocumentationUnitUuidAndType(
+            parentUUID,
+            documentUnitMetadataDTO.getUuid(),
+            DocumentationUnitLinkType.ACTIVE_CITATION)
+        .flatMap(
+            documentationUnitLinkDTO ->
+                citationStyleRepository
+                    .findByUuid(documentationUnitLinkDTO.getCitationStyleUuid())
+                    .map(
+                        citationStyleDTO ->
+                            documentationUnitLinkDTO.toBuilder()
+                                .citationStyleDTO(citationStyleDTO)
+                                .build())
+                    .defaultIfEmpty(documentationUnitLinkDTO))
+        .map(
+            documentationUnitLinkDTO ->
+                ActiveCitationTransformer.transformToDomain(
+                    documentUnitMetadataDTO, documentationUnitLinkDTO));
   }
 
   private <T extends DocumentUnitMetadataDTO> Mono<T> injectFileNumbers(T documentUnitMetadataDTO) {
@@ -999,7 +1056,10 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
                   pageable.getOffset());
             })
         .flatMapSequential(this::injectAdditionalInformation)
-        .map(LinkedDocumentationUnitTransformer::transformToDomain);
+        .map(
+            documentUnitMetadataDTO ->
+                LinkedDocumentationUnitTransformer.transformToDomain(
+                    documentUnitMetadataDTO, null));
   }
 
   @Override
@@ -1112,10 +1172,15 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
 
     return documentationUnitLinkRepository
         .findAllByParentDocumentationUnitUuidAndTypeOrderByIdAsc(parentDocumentUnitUuid, type)
-        .map(DocumentationUnitLinkDTO::childDocumentationUnitUuid)
-        .flatMap(metadataRepository::findByUuid)
-        .flatMap(this::injectAdditionalInformation)
-        .map(LinkedDocumentationUnitTransformer::transformToDomain);
+        .flatMap(
+            linkDTO ->
+                metadataRepository
+                    .findByUuid(linkDTO.getChildDocumentationUnitUuid())
+                    .flatMap(this::injectAdditionalInformation)
+                    .zipWith(Mono.just(linkDTO)))
+        .map(
+            tuple ->
+                LinkedDocumentationUnitTransformer.transformToDomain(tuple.getT1(), tuple.getT2()));
   }
 
   private Mono<DocumentUnitDTO> filterUnlinkedDocumentUnit(DocumentUnitDTO documentUnitDTO) {
@@ -1132,7 +1197,9 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
   private Mono<DocumentUnitMetadataDTO> injectAdditionalInformation(
       DocumentUnitMetadataDTO documentUnitMetadataDTO) {
     if (log.isDebugEnabled()) {
-      log.debug("inject addtional information: {}", documentUnitMetadataDTO.getUuid());
+      log.debug(
+          "inject additional information for metadata documentation unit: {}",
+          documentUnitMetadataDTO.getUuid());
     }
 
     return injectFileNumbers(documentUnitMetadataDTO)
@@ -1184,7 +1251,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
     return documentationUnitLinkRepository
         .findByParentDocumentationUnitUuidAndChildDocumentationUnitUuidAndType(
             parentDocumentationUnitUuid, childDocumentationUnitUuid, type)
-        .map(DocumentationUnitLinkDTO::id)
+        .map(DocumentationUnitLinkDTO::getId)
         .flatMap(documentationUnitLinkRepository::deleteById);
   }
 

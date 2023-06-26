@@ -1,10 +1,25 @@
 package de.bund.digitalservice.ris.caselaw.adapter.transformer;
 
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitMetadataDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentationUnitLinkDTO;
 import de.bund.digitalservice.ris.caselaw.domain.ActiveCitation;
+import de.bund.digitalservice.ris.caselaw.domain.lookuptable.citation.CitationStyle;
 
 public class ActiveCitationTransformer extends LinkedDocumentationUnitTransformer {
-  public static ActiveCitation transformToDomain(DocumentUnitMetadataDTO documentUnitMetadataDTO) {
+  public static ActiveCitation transformToDomain(
+      DocumentUnitMetadataDTO documentUnitMetadataDTO, DocumentationUnitLinkDTO linkDTO) {
+    CitationStyle citationStyle = null;
+    if (linkDTO != null && linkDTO.getCitationStyleDTO() != null) {
+      citationStyle =
+          CitationStyle.builder()
+              .uuid(linkDTO.getCitationStyleDTO().getUuid())
+              .jurisShortcut(linkDTO.getCitationStyleDTO().getJurisShortcut())
+              .citationDocumentType(linkDTO.getCitationStyleDTO().getCitationDocumentType())
+              .label(linkDTO.getCitationStyleDTO().getLabel())
+              .documentType(linkDTO.getCitationStyleDTO().getDocumentType())
+              .build();
+    }
+
     return ActiveCitation.builder()
         .uuid(documentUnitMetadataDTO.getUuid())
         .documentNumber(documentUnitMetadataDTO.getDocumentnumber())
@@ -14,6 +29,7 @@ public class ActiveCitationTransformer extends LinkedDocumentationUnitTransforme
         .documentType(getDocumentTypeByDTO(documentUnitMetadataDTO.getDocumentTypeDTO()))
         .decisionDate(documentUnitMetadataDTO.getDecisionDate())
         .dateKnown(documentUnitMetadataDTO.isDateKnown())
+        .citationStyle(citationStyle)
         .build();
   }
 }

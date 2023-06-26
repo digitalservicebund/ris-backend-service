@@ -26,19 +26,19 @@ const activeCitation = ref(props.modelValue as ActiveCitation)
 
 const activeCitationPredicate = computed({
   get: () =>
-    activeCitation?.value?.predicateList
+    activeCitation?.value?.citationStyle
       ? {
-          label: activeCitation.value.predicateList.label,
-          value: activeCitation.value.predicateList,
+          label: activeCitation.value.citationStyle.label,
+          value: activeCitation.value.citationStyle,
           additionalInformation:
-            activeCitation.value.predicateList.jurisShortcut,
+            activeCitation.value.citationStyle.jurisShortcut,
         }
       : undefined,
   set: (newValue) => {
     const newActiveCitationStyle = { ...newValue } as CitationStyle
     const activeCitationRef = new ActiveCitation({
       ...activeCitation.value,
-      predicateList: newActiveCitationStyle,
+      citationStyle: newActiveCitationStyle,
     })
     activeCitation.value = activeCitationRef
   },

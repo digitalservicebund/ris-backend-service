@@ -7,9 +7,9 @@ public class DocumentationUnitLinkTransformer {
   public static DocumentationUnitLink transferToDomain(
       DocumentationUnitLinkDTO documentationUnitLinkDTO) {
     return DocumentationUnitLink.builder()
-        .parentDocumentationUnitUuid(documentationUnitLinkDTO.parentDocumentationUnitUuid())
-        .childDocumentationUnitUuid(documentationUnitLinkDTO.childDocumentationUnitUuid())
-        .type(documentationUnitLinkDTO.type())
+        .parentDocumentationUnitUuid(documentationUnitLinkDTO.getParentDocumentationUnitUuid())
+        .childDocumentationUnitUuid(documentationUnitLinkDTO.getChildDocumentationUnitUuid())
+        .type(documentationUnitLinkDTO.getType())
         .build();
   }
 }
