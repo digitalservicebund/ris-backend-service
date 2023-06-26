@@ -67,7 +67,7 @@ function parseSegmentsAsFootnote(segments: Segment[]): Footnote {
 const options: SuggestionGroupOptions = {
   segmentType: FOOTNOTE_SEGMENT_TYPE,
   trigger: "#",
-  elementClasses: ["bg-yellow-300", "rounded", "px-10", "py-2"],
+  elementClasses: ["bg-yellow-400", "rounded", "px-10", "py-2"],
   callback: (input: string) =>
     Object.entries(FOOTNOTE_LABELS)
       // eslint-disable-next-line @typescript-eslint/no-unused-vars

@@ -11,7 +11,7 @@ function summarizeFootnotePart(
   extraTypeClasses = [""]
 ): VNode {
   const typeClasses = [
-    "bg-yellow-300",
+    "bg-yellow-400",
     "rounded",
     "px-6",
     "py-2",
