@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { h, computed } from "vue"
+import { RouterLink } from "vue-router"
 import ActiveCitationInput from "@/components/ActiveCitationInput.vue"
 import ActiveCitation from "@/domain/activeCitation"
 import { withSummarizer } from "@/shared/components/DataSetSummary.vue"
@@ -25,7 +26,23 @@ const activeCitations = computed({
 const defaultValue = {}
 
 function decisionSummarizer(activeCitation: ActiveCitation) {
-  return h("div", { class: ["link-02-reg"] }, activeCitation.renderDecision)
+  return h("div", { tabindex: activeCitation.isDocUnit() ? 0 : -1 }, [
+    activeCitation.isDocUnit()
+      ? h(
+          RouterLink,
+          {
+            class: ["link-01-bold", "underline"],
+            target: "_blank",
+            tabindex: -1,
+            to: {
+              name: "caselaw-documentUnit-:documentNumber-categories",
+              params: { documentNumber: activeCitation.documentNumber },
+            },
+          },
+          activeCitation.renderDecision
+        )
+      : h("div", { class: ["link-02-reg"] }, activeCitation.renderDecision),
+  ])
 }
 
 const CitationsSummary = withSummarizer(decisionSummarizer)
