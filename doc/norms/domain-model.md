@@ -20,19 +20,6 @@ classDiagram
 
     String completeCitation
 
-    String statusNote
-    String statusDescription
-    Date statusDate
-    String statusReference
-    String repealNote
-    String repealArticle
-    Date repealDate
-    String repealReferences
-    String reissueNote
-    String reissueArticle
-    Date reissueDate
-    String reissueReference
-    String otherStatusNote
 
     String applicationScopeArea
     Date applicationScopeStartDate
@@ -136,6 +123,11 @@ classDiagram
      DOCUMENT_STATUS
      DOCUMENT_TEXT_PROOF
      DOCUMENT_OTHER
+     STATUS_INDICATION
+     STATUS
+     REISSUE
+     REPEAL
+     OTHER_STATUS
   }
 
   class MetadatumType  {
@@ -200,6 +192,8 @@ classDiagram
     PROOF_INDICATION
     PROOF_TYPE
     OTHER_TYPE
+    NOTE
+    ARTICLE
   }
 
   class FileReference {
