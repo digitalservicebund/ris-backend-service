@@ -30,7 +30,7 @@ public interface DocumentUnitRepository {
 
   Mono<Long> count();
 
-  Mono<Long> countByProceedingDecision(LinkedDocumentationUnit linkedDocumentationUnit);
+  Mono<Long> countByLinkedDocumentationUnit(LinkedDocumentationUnit linkedDocumentationUnit);
 
   Mono<Long> countByDataSourceAndDocumentationOffice(
       DataSource dataSource, DocumentationOffice documentationOfficeId);

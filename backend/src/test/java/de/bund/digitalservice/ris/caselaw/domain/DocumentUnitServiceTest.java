@@ -400,7 +400,7 @@ class DocumentUnitServiceTest {
 
     when(repository.searchByLinkedDocumentationUnit(proceedingDecision, pageRequest))
         .thenReturn(Flux.just(proceedingDecision));
-    when(repository.countByProceedingDecision(proceedingDecision)).thenReturn(Mono.just(1L));
+    when(repository.countByLinkedDocumentationUnit(proceedingDecision)).thenReturn(Mono.just(1L));
 
     StepVerifier.create(service.searchByLinkedDocumentationUnit(proceedingDecision, pageRequest))
         .consumeNextWith(pd -> assertEquals(pd.getContent().get(0), proceedingDecision))

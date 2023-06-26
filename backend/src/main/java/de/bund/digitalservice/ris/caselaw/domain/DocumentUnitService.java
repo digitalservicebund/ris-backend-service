@@ -342,7 +342,7 @@ public class DocumentUnitService {
     return repository
         .searchByLinkedDocumentationUnit(linkedDocumentationUnit, pageable)
         .collectList()
-        .zipWith(repository.countByProceedingDecision(linkedDocumentationUnit))
+        .zipWith(repository.countByLinkedDocumentationUnit(linkedDocumentationUnit))
         .map(tuple -> new PageImpl<>(tuple.getT1(), pageable, tuple.getT2()));
   }
 

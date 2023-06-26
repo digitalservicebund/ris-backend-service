@@ -1063,7 +1063,8 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
   }
 
   @Override
-  public Mono<Long> countByProceedingDecision(LinkedDocumentationUnit linkedDocumentationUnit) {
+  public Mono<Long> countByLinkedDocumentationUnit(
+      LinkedDocumentationUnit linkedDocumentationUnit) {
     return Mono.zip(
             extractDocumentUnitDTOIdsViaFileNumber(linkedDocumentationUnit).collectList(),
             extractDocumentTypeDTOId(linkedDocumentationUnit))
