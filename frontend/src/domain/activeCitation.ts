@@ -13,14 +13,15 @@ export default class ActiveCitation extends LinkedDocumentUnit {
   }
 
   get renderDecision(): string {
+    console.log(this.citationStyle)
     return [
+      ...(this.citationStyle?.label ? [this.citationStyle.label] : []),
       ...(this.court?.label ? [`${this.court?.label}`] : []),
       ...(this.decisionDate
         ? [dayjs(this.decisionDate).format("DD.MM.YYYY")]
         : []),
       ...(this.documentType ? [this.documentType.label] : []),
       ...(this.fileNumber ? [this.fileNumber] : []),
-      ...(this.citationStyle ? [this.citationStyle.label] : []),
       ...(this.documentNumber && this.isDocUnit() ? [this.documentNumber] : []),
     ].join(", ")
   }
