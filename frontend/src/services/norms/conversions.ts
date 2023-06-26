@@ -202,6 +202,8 @@ const DECODERS: MetadataValueDecoders = {
   [MetadatumType.PROOF_INDICATION]: decodeProofIndication,
   [MetadatumType.PROOF_TYPE]: decodeProofType,
   [MetadatumType.OTHER_TYPE]: decodeOtherType,
+  [MetadatumType.NOTE]: identity,
+  [MetadatumType.ARTICLE]: identity,
 }
 
 const ENCODERS: MetadataValueEncoders = {
@@ -266,6 +268,8 @@ const ENCODERS: MetadataValueEncoders = {
   [MetadatumType.PROOF_INDICATION]: encodeProofIndication,
   [MetadatumType.PROOF_TYPE]: encodeProofType,
   [MetadatumType.OTHER_TYPE]: encodeOtherType,
+  [MetadatumType.NOTE]: identity,
+  [MetadatumType.ARTICLE]: identity,
 }
 
 /**

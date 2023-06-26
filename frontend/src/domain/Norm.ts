@@ -89,6 +89,8 @@ export enum MetadatumType {
   PROOF_INDICATION = "PROOF_INDICATION",
   PROOF_TYPE = "PROOF_TYPE",
   OTHER_TYPE = "OTHER_TYPE",
+  NOTE = "NOTE",
+  ARTICLE = "ARTICLE",
 }
 
 export enum NormCategory {
@@ -175,6 +177,8 @@ export type MetadataValueType = {
   [MetadatumType.PROOF_INDICATION]: ProofIndication
   [MetadatumType.PROOF_TYPE]: ProofType
   [MetadatumType.OTHER_TYPE]: OtherType
+  [MetadatumType.NOTE]: string
+  [MetadatumType.ARTICLE]: string
 }
 
 export type Metadata = {
@@ -213,6 +217,11 @@ export enum MetadataSectionName {
   DOCUMENT_STATUS = "DOCUMENT_STATUS",
   DOCUMENT_TEXT_PROOF = "DOCUMENT_TEXT_PROOF",
   DOCUMENT_OTHER = "DOCUMENT_OTHER",
+  STATUS_INDICATION = "STATUS_INDICATION",
+  STATUS = "STATUS",
+  REISSUE = "REISSUE",
+  REPEAL = "REPEAL",
+  OTHER_STATUS = "OTHER_STATUS",
 }
 
 export type MetadataSections = {

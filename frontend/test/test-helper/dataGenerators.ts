@@ -89,6 +89,8 @@ const METADATA_VALUE_GENERATORS: MetadataValueGenerators = {
   [MetadatumType.PROOF_INDICATION]: pickRandomProofIndication,
   [MetadatumType.PROOF_TYPE]: pickRandomProofType,
   [MetadatumType.OTHER_TYPE]: pickRandomOtherType,
+  [MetadatumType.NOTE]: generateString,
+  [MetadatumType.ARTICLE]: generateString,
 }
 
 const ALPHABET_CHARACTERS = "abcdefghijklmnopqrstuvwxyz"
