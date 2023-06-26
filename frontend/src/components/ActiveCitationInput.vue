@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, ref } from "vue"
+import { computed, onMounted, ref } from "vue"
 import SearchResultList, {
   SearchResults,
 } from "./proceedingDecisions/SearchResultList.vue"
@@ -21,16 +21,7 @@ interface Emits {
 
 const props = defineProps<{ modelValue?: ActiveCitation }>()
 const emit = defineEmits<Emits>()
-const activeCitationLocalValue = ref(props.modelValue)
-
-const activeCitation = computed({
-  get() {
-    return props.modelValue as ActiveCitation
-  },
-  set(value) {
-    activeCitationLocalValue.value = value
-  },
-})
+const activeCitation = ref(props.modelValue as ActiveCitation)
 
 const activeCitationPredicate = computed({
   get: () =>
@@ -47,6 +38,7 @@ const activeCitationPredicate = computed({
         predicateList: newValue.label,
       })
     } else delete activeCitationRef.predicateList
+    activeCitation.value = activeCitationRef
   },
 })
 
@@ -82,12 +74,13 @@ async function search(page = 0) {
 }
 
 async function addActiveCitation() {
-  emit(
-    "update:modelValue",
-    new ActiveCitation({ ...activeCitationLocalValue.value })
-  )
+  emit("update:modelValue", new ActiveCitation({ ...activeCitation.value }))
   emit("closeEntry")
 }
+
+onMounted(() => {
+  activeCitation.value = props.modelValue as ActiveCitation
+})
 </script>
 
 <template>
