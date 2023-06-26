@@ -87,6 +87,10 @@ const proofIndication = computed({
   set: (data?: ProofIndication) =>
     data && (inputValue.value.PROOF_INDICATION = [data]),
 })
+
+const dateEnabled = computed(() => !inputValue.value.YEAR?.[0])
+const yearEnabled = computed(() => !inputValue.value.DATE?.[0])
+const disabledClass = "border-gray-800 read-only:!border-solid"
 </script>
 <template>
   <div>
@@ -120,6 +124,8 @@ const proofIndication = computed({
           id="documentStatusDate"
           v-model="date"
           aria-label="Dokument Datum"
+          :class="{ [disabledClass]: !dateEnabled }"
+          :disabled="!dateEnabled"
         />
       </InputField>
       <p>oder</p>
@@ -128,6 +134,8 @@ const proofIndication = computed({
           id="documentStatusYear"
           v-model="year"
           aria-label="Dokument Jahr"
+          :class="{ [disabledClass]: !yearEnabled }"
+          :disabled="!yearEnabled"
         />
       </InputField>
     </div>
