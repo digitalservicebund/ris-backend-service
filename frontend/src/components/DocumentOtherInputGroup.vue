@@ -8,9 +8,7 @@ interface Props {
   modelValue: Metadata
 }
 
-interface Emits {
-  (event: "update:modelValue", value: Metadata): void
-}
+type Emits = (event: "update:modelValue", value: Metadata) => void
 
 const props = defineProps<Props>()
 const emit = defineEmits<Emits>()

@@ -23,10 +23,7 @@ const isDocumentTextProof = computed(() => {
 interface Props {
   modelValue: MetadataSections
 }
-
-interface Emits {
-  (event: "update:modelValue", value: MetadataSections): void
-}
+type Emits = (event: "update:modelValue", value: MetadataSections) => void
 
 type ChildSectionName =
   | MetadataSectionName.DOCUMENT_STATUS
