@@ -70,9 +70,10 @@ const options: SuggestionGroupOptions = {
   elementClasses: ["bg-yellow-400", "rounded", "px-10", "py-2"],
   callback: (input: string) =>
     Object.entries(FOOTNOTE_LABELS)
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      .filter(([_, label]) =>
-        label.toLowerCase().startsWith(input.toLowerCase())
+      .filter(
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        ([_, label]) =>
+          label.toLowerCase().startsWith(input.toLowerCase()) && label != ""
       )
       .map(([id, label]) => ({ label, id })),
 }

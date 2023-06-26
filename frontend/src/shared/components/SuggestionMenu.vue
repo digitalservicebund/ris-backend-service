@@ -53,20 +53,23 @@ defineExpose({ onKeyDown })
 </script>
 
 <template>
-  <div
-    class="bg-white border-1 border-gray-400 drop-shadow-xl flex flex-col p-4"
-  >
+  <div class="bg-white border-1 border-gray-400 drop-shadow-xl flex flex-col">
     <template v-if="items.length">
       <button
         v-for="(item, index) in items"
         :key="item.id ?? index"
-        class="border-1 border-transparent item px-4 py-2 rounded text-left"
-        :class="{ '!border-gray-800': index == selectedIndex }"
+        class="border-b-1 border-gray-400 hover:bg-gray-400 item pl-16 pr-64 py-10 rounded-none text-left"
+        :class="{ '!bg-blue-200': index == selectedIndex }"
         @click="chooseItem(item)"
       >
         {{ item.label }}
       </button>
     </template>
-    <div v-else class="item">Keine Ergebnisse</div>
+    <div
+      v-else
+      class="!bg-gray-100 item pl-16 pr-[65px] py-10 rounded-none text-left"
+    >
+      Keine Ergebnisse
+    </div>
   </div>
 </template>
