@@ -27,7 +27,10 @@ const activeCitationPredicate = computed({
   get: () =>
     activeCitation?.value?.predicateList
       ? {
-          label: activeCitation.value.predicateList,
+          label: activeCitation.value.predicateList.label,
+          value: activeCitation.value.predicateList,
+          additionalInformation:
+            activeCitation.value.predicateList.jurisShortcut,
         }
       : undefined,
   set: (newValue) => {
@@ -35,7 +38,7 @@ const activeCitationPredicate = computed({
     if (newValue) {
       activeCitationRef = new ActiveCitation({
         ...activeCitation.value,
-        predicateList: newValue.label,
+        predicateList: newValue.value,
       })
     } else delete activeCitationRef.predicateList
     activeCitation.value = activeCitationRef

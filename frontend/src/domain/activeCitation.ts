@@ -1,8 +1,9 @@
 import dayjs from "dayjs"
+import { CitationStyle } from "./citationStyle"
 import LinkedDocumentUnit from "./linkedDocumentUnit"
 
 export default class ActiveCitation extends LinkedDocumentUnit {
-  public predicateList?: string
+  public predicateList?: CitationStyle
 
   static requiredFields = ["court"] as const
 
