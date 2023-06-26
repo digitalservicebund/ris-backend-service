@@ -21,6 +21,6 @@ public class MailConfig {
   @Bean
   @Profile({"!production & !staging"})
   public HttpMailSender httpMailSenderMock() {
-    return (senderAddress, receiverAddress, subject, content, fileName, fileContent, tag) -> {};
+    return (senderAddress, receiverAddress, subject, content, attachments, tag) -> {};
   }
 }

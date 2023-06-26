@@ -1,5 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
+import de.bund.digitalservice.ris.caselaw.domain.Attachment;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitPublishException;
 import de.bund.digitalservice.ris.caselaw.domain.HttpMailSender;
 import java.util.ArrayList;
@@ -31,8 +32,7 @@ public class SendInBlueHttpMailSender implements HttpMailSender {
       String receiverAddress,
       String subject,
       String content,
-      String fileName,
-      String fileContent,
+      List<Attachment> attachments,
       String tag) {
 
     ApiClient defaultClient = Configuration.getDefaultApiClient();
@@ -48,11 +48,13 @@ public class SendInBlueHttpMailSender implements HttpMailSender {
     to.setEmail(receiverAddress);
     toList.add(to);
 
-    SendSmtpEmailAttachment attachment = new SendSmtpEmailAttachment();
-    attachment.setName(fileName);
-    attachment.setContent(fileContent.getBytes());
     List<SendSmtpEmailAttachment> attachmentList = new ArrayList<>();
-    attachmentList.add(attachment);
+    for (Attachment a : attachments) {
+      SendSmtpEmailAttachment attachment = new SendSmtpEmailAttachment();
+      attachment.setName(a.fileName());
+      attachment.setContent(a.fileContent().getBytes());
+      attachmentList.add(attachment);
+    }
 
     List<String> tags = new ArrayList<>();
     tags.add(tag);

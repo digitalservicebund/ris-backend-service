@@ -131,11 +131,11 @@ dependencies {
   implementation "org.freehep:freehep-graphicsio-emf:2.4"
 
   // package served by private repo, requires authentication:
-  implementation("de.bund.digitalservice:neuris-juris-xml-export:0.6.3") {
+  implementation("de.bund.digitalservice:neuris-juris-xml-export:0.6.7") {
     exclude group: "org.slf4j", module: "slf4j-simple"
   }
   // for local development:
-  //  implementation files("../../neuris-juris-xml-export/build/libs/neuris-juris-xml-export-0.6.3.jar")
+  //implementation files("../../neuris-juris-xml-export/build/libs/neuris-juris-xml-export-0.6.6.jar")
 
   implementation("de.bund.digitalservice:ris-norms-juris-converter:0.12.2")
 
@@ -274,10 +274,10 @@ spotless {
     targetExclude "frontend/**", // Has its own prettier setup!
         "**/dist/**", "**/static/**"
     // spotless:off
-    prettier(["prettier": "2.8.4", "prettier-plugin-properties": "0.2.0", "prettier-plugin-sh": "0.12.8", "prettier-plugin-sql": "0.13.0"])   .config([
-          "keySeparator": "=", // for prettier-plugin-properties
-          "language": "postgresql", // for prettier-plugin-sql
-        ])
+    prettier(["prettier": "2.8.4", "prettier-plugin-properties": "0.2.0", "prettier-plugin-sh": "0.12.8", "prettier-plugin-sql": "0.13.0"]).config([
+      "keySeparator": "=", // for prettier-plugin-properties
+      "language"    : "postgresql", // for prettier-plugin-sql
+    ])
     // spotless:on
   }
 }
@@ -301,7 +301,8 @@ bootBuildImage {
   def containerImageVersion = System.getenv("CONTAINER_IMAGE_VERSION") ?: "latest"
 
   imageName = "${containerRegistry}/${containerImageName}:${containerImageVersion}"
-  builder = "paketobuildpacks/builder@sha256:367c3da5ae0a3caeb12e7e5bc317cb0b21e700c7f7bbb29204f70151cb5d8e66" // pin to version 0.1.341-tiny
+  builder = "paketobuildpacks/builder@sha256:367c3da5ae0a3caeb12e7e5bc317cb0b21e700c7f7bbb29204f70151cb5d8e66"
+  // pin to version 0.1.341-tiny
   publish = false
   docker {
     publishRegistry {

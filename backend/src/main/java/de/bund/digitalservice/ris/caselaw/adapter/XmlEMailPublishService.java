@@ -1,5 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
+import de.bund.digitalservice.ris.caselaw.domain.Attachment;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitPublishException;
@@ -122,8 +123,8 @@ public class XmlEMailPublishService implements EmailPublishService {
         xmlMail.receiverAddress(),
         xmlMail.mailSubject(),
         "neuris",
-        xmlMail.fileName(),
-        xmlMail.xml(),
+        Collections.singletonList(
+            Attachment.builder().fileName(xmlMail.fileName()).fileContent(xmlMail.xml()).build()),
         xmlMail.documentUnitUuid().toString());
   }
 
