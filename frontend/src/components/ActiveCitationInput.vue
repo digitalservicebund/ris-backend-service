@@ -5,6 +5,7 @@ import SearchResultList, {
 } from "./proceedingDecisions/SearchResultList.vue"
 import ComboboxInput from "@/components/ComboboxInput.vue"
 import ActiveCitation from "@/domain/activeCitation"
+import { CitationStyle } from "@/domain/citationStyle"
 import LinkedDocumentUnit from "@/domain/linkedDocumentUnit"
 import ComboboxItemService from "@/services/comboboxItemService"
 import documentUnitService from "@/services/documentUnitService"
@@ -34,13 +35,11 @@ const activeCitationPredicate = computed({
         }
       : undefined,
   set: (newValue) => {
-    let activeCitationRef = new ActiveCitation()
-    if (newValue) {
-      activeCitationRef = new ActiveCitation({
-        ...activeCitation.value,
-        predicateList: newValue.value,
-      })
-    } else delete activeCitationRef.predicateList
+    const newActiveCitationStyle = { ...newValue } as CitationStyle
+    const activeCitationRef = new ActiveCitation({
+      ...activeCitation.value,
+      predicateList: newActiveCitationStyle,
+    })
     activeCitation.value = activeCitationRef
   },
 })
