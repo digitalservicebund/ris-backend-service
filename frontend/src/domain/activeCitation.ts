@@ -20,7 +20,7 @@ export default class ActiveCitation extends LinkedDocumentUnit {
         : []),
       ...(this.documentType ? [this.documentType.label] : []),
       ...(this.fileNumber ? [this.fileNumber] : []),
-      ...(this.citationStyle ? [this.citationStyle] : []),
+      ...(this.citationStyle ? [this.citationStyle.label] : []),
       ...(this.documentNumber && this.isDocUnit() ? [this.documentNumber] : []),
     ].join(", ")
   }
