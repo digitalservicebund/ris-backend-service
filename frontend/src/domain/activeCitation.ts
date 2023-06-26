@@ -13,7 +13,6 @@ export default class ActiveCitation extends LinkedDocumentUnit {
   }
 
   get renderDecision(): string {
-    console.log(this.citationStyle)
     return [
       ...(this.citationStyle?.label ? [this.citationStyle.label] : []),
       ...(this.court?.label ? [`${this.court?.label}`] : []),
