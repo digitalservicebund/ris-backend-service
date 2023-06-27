@@ -4,7 +4,7 @@ import de.bund.digitalservice.ris.norms.domain.value.Eli
 import reactor.core.publisher.Flux
 import java.util.UUID
 
-interface ListNormsUseCase {
+fun interface ListNormsUseCase {
     fun listNorms(query: Query): Flux<NormData>
 
     data class Query(val searchTerm: String? = null)

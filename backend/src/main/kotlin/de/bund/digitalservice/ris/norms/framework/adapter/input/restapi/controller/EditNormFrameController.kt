@@ -29,13 +29,13 @@ class EditNormFrameController(private val editNormFrameService: EditNormFrameUse
     fun editNormFrame(
         @PathVariable guid: String,
         @RequestBody request: NormFramePropertiesRequestSchema,
-    ): Mono<ResponseEntity<Void>> {
+    ): Mono<ResponseEntity<Unit>> {
         val properties = request.toUseCaseData()
         val command = EditNormFrameUseCase.Command(decodeGuid(guid), properties)
 
         return editNormFrameService
             .editNormFrame(command)
-            .map { ResponseEntity.noContent().build<Void>() }
+            .map { ResponseEntity.noContent().build<Unit>() }
             .onErrorReturn(ResponseEntity.internalServerError().build())
     }
 

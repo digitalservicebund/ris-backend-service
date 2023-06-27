@@ -237,7 +237,7 @@ fun addProviderSections(normProviders: List<NormProvider>): List<MetadataSection
         if (normProvider.isResolutionMajority !== null) {
             metadata.add(Metadatum(normProvider.isResolutionMajority, MetadatumType.RESOLUTION_MAJORITY, 1))
         }
-        if (metadata.size > 0) MetadataSection(Section.NORM_PROVIDER, metadata, index + 1) else null
+        if (metadata.isNotEmpty()) MetadataSection(Section.NORM_PROVIDER, metadata, index + 1) else null
     }.filterNotNull()
 }
 
