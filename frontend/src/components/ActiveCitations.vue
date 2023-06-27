@@ -42,10 +42,10 @@ function decisionSummarizer(activeCitation: ActiveCitation) {
           activeCitation.renderDecision
         )
       : activeCitation.hasMissingRequiredFields
-      ? h("div", { class: ["flex flex-row"] }, [
+      ? h("div", { class: ["flex flex-row items-center"] }, [
           h(
             "span",
-            { class: ["material-icons pr-2 text-red-800"] },
+            { class: ["material-icons pr-8 text-red-800"] },
             "error_outline"
           ),
           h(

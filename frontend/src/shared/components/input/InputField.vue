@@ -76,7 +76,7 @@ export enum LabelPosition {
       :id="id"
     />
 
-    <div class="h-16 label-03-reg text-red-800">
+    <div v-if="errorMessage" class="h-16 label-03-reg my-8 text-red-800">
       {{ errorMessage }}
     </div>
   </div>

@@ -100,6 +100,7 @@ async function addActiveCitation() {
 
 onMounted(() => {
   activeCitation.value = props.modelValue as ActiveCitation
+  validateRequiredInput(activeCitation.value as ActiveCitation)
 })
 </script>
 
