@@ -26,7 +26,7 @@ public interface DatabaseDocumentUnitMetadataRepository
           + "(:docUnitIds IS NULL OR id = ANY(:docUnitIds)) AND "
           + "(:docTypeId IS NULL OR document_type_id = :docTypeId) AND "
           + "(status.status = 'PUBLISHED' OR status.status IS NULL) AND "
-          + "(data_source is NULL OR data_source in ('NEURIS', 'MIGRATION')) ";
+          + "data_source in ('NEURIS', 'MIGRATION') ";
   String ALL_QUERY =
       "LEFT JOIN ( "
           + "    SELECT DISTINCT ON (document_unit_id) document_unit_id, status "

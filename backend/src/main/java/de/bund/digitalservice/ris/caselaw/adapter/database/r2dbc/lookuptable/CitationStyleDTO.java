@@ -23,8 +23,8 @@ public class CitationStyleDTO implements Persistable<UUID> {
   Character changeIndicator;
   LocalDate changeDateMail;
   String version;
-  String documentType;
-  String citationDocumentType;
+  Character documentType;
+  Character citationDocumentType;
   String jurisShortcut;
   String label;
 

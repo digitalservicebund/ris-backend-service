@@ -110,30 +110,30 @@ class LookupTableServiceTest {
                 .jurisId(1L)
                 .changeIndicator('N')
                 .version("1.0")
-                .documentType("R")
-                .citationDocumentType("R")
+                .documentType('R')
+                .citationDocumentType('R')
                 .jurisShortcut("Änderung")
                 .label("Änderung")
                 .newEntry(true)
                 .build());
 
     when(databaseCitationStyleRepository
-            .findAllByDocumentTypeAndCitationDocumentTypeOrderByCitationDocumentTypeAsc('R', 'R'))
+            .findAllByDocumentTypeAndCitationDocumentTypeOrderByLabelAsc('R', 'R'))
         .thenReturn(Flux.fromIterable(citationStyleDTOS));
 
     StepVerifier.create(service.getCitationStyles(Optional.empty()))
         .consumeNextWith(
             citationStyle -> {
               assertThat(citationStyle).isInstanceOf(CitationStyle.class);
-              assertThat(citationStyle.documentType()).isEqualTo("R");
-              assertThat(citationStyle.citationDocumentType()).isEqualTo("R");
+              assertThat(citationStyle.documentType()).isEqualTo('R');
+              assertThat(citationStyle.citationDocumentType()).isEqualTo('R');
               assertThat(citationStyle.jurisShortcut()).isEqualTo("Änderung");
               assertThat(citationStyle.label()).isEqualTo("Änderung");
             })
         .verifyComplete();
 
     verify(databaseCitationStyleRepository)
-        .findAllByDocumentTypeAndCitationDocumentTypeOrderByCitationDocumentTypeAsc('R', 'R');
+        .findAllByDocumentTypeAndCitationDocumentTypeOrderByLabelAsc('R', 'R');
   }
 
   @Test
@@ -146,8 +146,8 @@ class LookupTableServiceTest {
                 .jurisId(1L)
                 .changeIndicator('N')
                 .version("1.0")
-                .documentType("R")
-                .citationDocumentType("R")
+                .documentType('R')
+                .citationDocumentType('R')
                 .jurisShortcut("Änderung")
                 .label("Änderung")
                 .newEntry(true)
@@ -160,8 +160,8 @@ class LookupTableServiceTest {
         .consumeNextWith(
             citationStyle -> {
               assertThat(citationStyle).isInstanceOf(CitationStyle.class);
-              assertThat(citationStyle.documentType()).isEqualTo("R");
-              assertThat(citationStyle.citationDocumentType()).isEqualTo("R");
+              assertThat(citationStyle.documentType()).isEqualTo('R');
+              assertThat(citationStyle.citationDocumentType()).isEqualTo('R');
               assertThat(citationStyle.jurisShortcut()).isEqualTo("Änderung");
               assertThat(citationStyle.label()).isEqualTo("Änderung");
             })

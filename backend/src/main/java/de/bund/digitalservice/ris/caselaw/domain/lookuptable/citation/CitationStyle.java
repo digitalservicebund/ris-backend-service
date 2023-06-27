@@ -6,7 +6,7 @@ import lombok.Builder;
 @Builder
 public record CitationStyle(
     UUID uuid,
-    String documentType,
-    String citationDocumentType,
+    Character documentType,
+    Character citationDocumentType,
     String jurisShortcut,
     String label) {}

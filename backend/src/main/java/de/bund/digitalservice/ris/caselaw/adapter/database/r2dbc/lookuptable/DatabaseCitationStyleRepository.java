@@ -10,11 +10,13 @@ import reactor.core.publisher.Mono;
 @Repository
 public interface DatabaseCitationStyleRepository extends R2dbcRepository<CitationStyleDTO, Long> {
 
-  Flux<CitationStyleDTO> findAllByDocumentTypeAndCitationDocumentTypeOrderByCitationDocumentTypeAsc(
+  Flux<CitationStyleDTO> findAllByDocumentTypeAndCitationDocumentTypeOrderByLabelAsc(
       char documentType, char citationDocumentType);
 
   @Query(
-      "SELECT * FROM citation_style WHERE label LIKE :searchStr || '%' AND document_type = 'R' AND citation_document_type = 'R'")
+      "SELECT * FROM citation_style WHERE LOWER(label) LIKE LOWER(:searchStr) || '%' "
+          + "AND document_type = 'R' AND citation_document_type = 'R' "
+          + "ORDER BY label")
   Flux<CitationStyleDTO> findBySearchStr(String searchStr);
 
   Mono<CitationStyleDTO> findByUuid(UUID citationStyleUuid);

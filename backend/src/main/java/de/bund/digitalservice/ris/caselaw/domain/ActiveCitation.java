@@ -16,4 +16,12 @@ import lombok.experimental.SuperBuilder;
 @DateKnownConstraint
 public class ActiveCitation extends LinkedDocumentationUnit {
   private CitationStyle citationStyle;
+
+  public boolean hasNoValues() {
+    return court == null
+        && decisionDate == null
+        && fileNumber == null
+        && documentType == null
+        && citationStyle == null;
+  }
 }

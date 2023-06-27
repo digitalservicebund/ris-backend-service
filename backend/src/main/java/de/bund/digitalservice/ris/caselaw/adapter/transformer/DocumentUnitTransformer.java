@@ -23,19 +23,25 @@ import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.Docume
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw.FieldOfLaw;
 import java.time.Instant;
 import java.util.List;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class DocumentUnitTransformer {
   private DocumentUnitTransformer() {}
 
   public static DocumentUnitDTO enrichDTO(
       DocumentUnitDTO documentUnitDTO, DocumentUnit documentUnit) {
 
+    if (log.isDebugEnabled()) {
+      log.debug("enrich database documentation unit '{}'", documentUnitDTO.getUuid());
+    }
+
     DataSource dataSource = DataSource.NEURIS;
     if (documentUnit.dataSource() != null) {
       dataSource = documentUnit.dataSource();
     }
 
-    DocumentUnitDTO.DocumentUnitDTOBuilder builder =
+    DocumentUnitDTO.DocumentUnitDTOBuilder<?, ?> builder =
         documentUnitDTO.toBuilder()
             .uuid(documentUnit.uuid())
             .documentnumber(documentUnit.documentNumber())
@@ -120,24 +126,37 @@ public class DocumentUnitTransformer {
   }
 
   public static Court getCourtObject(String courtType, String courtLocation) {
+    if (log.isDebugEnabled()) {
+      log.debug("get court object from '{}' and '{}", courtType, courtLocation);
+    }
+
     Court court = null;
     if (courtType != null) {
       String label = Court.generateLabel(courtType, courtLocation);
       court = new Court(courtType, courtLocation, label, null);
     }
+
     return court;
   }
 
   private static DocumentationOffice getDocumentationOffice(
       DocumentationOfficeDTO documentationOfficeDTO) {
+
     if (documentationOfficeDTO == null) {
       return null;
     }
+
     return DocumentationOfficeTransformer.transformDTO(documentationOfficeDTO);
   }
 
   public static DocumentUnit transformMetadataToDomain(
       DocumentUnitMetadataDTO documentUnitMetadataDTO) {
+
+    if (log.isDebugEnabled()) {
+      log.debug(
+          "transfer database metadata documentation unit '{}' to domain object",
+          documentUnitMetadataDTO.getUuid());
+    }
 
     if (documentUnitMetadataDTO == null) {
       return DocumentUnit.builder().build();
@@ -198,6 +217,11 @@ public class DocumentUnitTransformer {
   }
 
   public static DocumentUnit transformDTO(DocumentUnitDTO documentUnitDTO) {
+    if (log.isDebugEnabled()) {
+      log.debug(
+          "transfer database documentation unit '{}' to domain object", documentUnitDTO.getUuid());
+    }
+
     if (documentUnitDTO == null) {
       return DocumentUnit.builder().build();
     }

@@ -19,10 +19,10 @@ public class CitationStyleXML {
   String version;
 
   @JsonProperty(value = "dok_dokumentart")
-  String documentType;
+  Character documentType;
 
   @JsonProperty(value = "zit_dokumentart")
-  String citationDocumentType;
+  Character citationDocumentType;
 
   @JsonProperty(value = "abk")
   String jurisShortcut;

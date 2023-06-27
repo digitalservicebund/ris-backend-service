@@ -612,7 +612,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
       log.debug("save active citations: {}", documentUnit.uuid());
     }
 
-    List<? extends LinkedDocumentationUnit> activeCitations = Collections.emptyList();
+    List<ActiveCitation> activeCitations = Collections.emptyList();
     if (documentUnit.contentRelatedIndexing() != null
         && documentUnit.contentRelatedIndexing().activeCitations() != null) {
       activeCitations = documentUnit.contentRelatedIndexing().activeCitations();
@@ -621,8 +621,14 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
     return Flux.fromIterable(activeCitations)
         .filter(activeCitation -> activeCitation.getUuid() != null)
         .flatMap(
-            activeCitation ->
-                repository
+            activeCitation -> {
+              if (activeCitation.hasNoValues()) {
+                return unlinkDocumentUnit(
+                    documentUnitDTO.getUuid(),
+                    activeCitation.getUuid(),
+                    DocumentationUnitLinkType.ACTIVE_CITATION);
+              } else {
+                return repository
                     .findByUuid(activeCitation.getUuid())
                     .filter(
                         activeCitationDocumentationUnitDTO ->
@@ -643,20 +649,18 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
                                     documentationUnitLinkDTO -> {
                                       UUID citationStyleUuid = null;
 
-                                      if (activeCitation instanceof ActiveCitation
-                                          && ((ActiveCitation) activeCitation).getCitationStyle()
-                                              != null) {
+                                      if (activeCitation.getCitationStyle() != null) {
                                         citationStyleUuid =
-                                            ((ActiveCitation) activeCitation)
-                                                .getCitationStyle()
-                                                .uuid();
+                                            activeCitation.getCitationStyle().uuid();
                                       }
 
                                       return documentationUnitLinkRepository.save(
                                           documentationUnitLinkDTO.toBuilder()
                                               .citationStyleUuid(citationStyleUuid)
                                               .build());
-                                    })))
+                                    }));
+              }
+            })
         .then(
             unlinkLinkedDocumentationUnit(documentUnit, DocumentationUnitLinkType.ACTIVE_CITATION))
         .then(injectActiveCitations(documentUnitDTO));

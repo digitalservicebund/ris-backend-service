@@ -309,7 +309,7 @@ class ActiveCitationIntegrationTest {
   }
 
   @Test
-  void testUpdateDocumentationUnit_removeCourtInActiveCitation() {
+  void testUpdateDocumentationUnit_removeCourtInEditableActiveCitation() {
     prepareTestData(1, 1);
 
     ActiveCitation activeCitation = generateActiveCitation(1, false);
@@ -321,6 +321,100 @@ class ActiveCitationIntegrationTest {
         generateDocumentUnit(List.of(activeCitation, activeCitationRequest));
     DocumentUnit documentUnitResponse =
         generateDocumentUnit(List.of(activeCitation, activeCitationResponse));
+
+    risWebTestClient
+        .withDefaultLogin()
+        .put()
+        .uri("/api/v1/caselaw/documentunits/" + UUID_PREFIX + "0")
+        .bodyValue(documentUnitRequest)
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody(DocumentUnit.class)
+        .consumeWith(
+            response -> {
+              assertThat(response.getResponseBody()).isNotNull();
+              assertThat(response.getResponseBody()).isEqualTo(documentUnitResponse);
+            });
+  }
+
+  @Test
+  void testUpdateDocumentationUnit_removeCourtInRealActiveCitation() {
+    prepareTestData(1, 1);
+
+    ActiveCitation activeCitation = generateActiveCitation(1, false);
+    ActiveCitation editableActiveCitation = generateActiveCitation(2, true);
+
+    ActiveCitation activeCitationRequest = activeCitation.toBuilder().court(null).build();
+
+    DocumentUnit documentUnitRequest =
+        generateDocumentUnit(List.of(activeCitationRequest, editableActiveCitation));
+    DocumentUnit documentUnitResponse =
+        generateDocumentUnit(List.of(activeCitation, editableActiveCitation));
+
+    risWebTestClient
+        .withDefaultLogin()
+        .put()
+        .uri("/api/v1/caselaw/documentunits/" + UUID_PREFIX + "0")
+        .bodyValue(documentUnitRequest)
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody(DocumentUnit.class)
+        .consumeWith(
+            response -> {
+              assertThat(response.getResponseBody()).isNotNull();
+              assertThat(response.getResponseBody()).isEqualTo(documentUnitResponse);
+            });
+  }
+
+  @Test
+  void testUpdateDocumentationUnit_removeCitationStyleInEditableActiveCitation() {
+    prepareTestData(1, 1);
+
+    ActiveCitation activeCitation = generateActiveCitation(1, false);
+    ActiveCitation activeCitationRequest =
+        generateActiveCitation(2, true).toBuilder().court(null).build();
+    ActiveCitation activeCitationResponse = activeCitationRequest.toBuilder().build();
+
+    DocumentUnit documentUnitRequest =
+        generateDocumentUnit(List.of(activeCitation, activeCitationRequest));
+    DocumentUnit documentUnitResponse =
+        generateDocumentUnit(List.of(activeCitation, activeCitationResponse));
+
+    risWebTestClient
+        .withDefaultLogin()
+        .put()
+        .uri("/api/v1/caselaw/documentunits/" + UUID_PREFIX + "0")
+        .bodyValue(documentUnitRequest)
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody(DocumentUnit.class)
+        .consumeWith(
+            response -> {
+              assertThat(response.getResponseBody()).isNotNull();
+              assertThat(response.getResponseBody()).isEqualTo(documentUnitResponse);
+            });
+  }
+
+  @Test
+  void testUpdateDocumentationUnit_removeAllValuesInEditableActiveCitation() {
+    prepareTestData(1, 1);
+
+    ActiveCitation activeCitation = generateActiveCitation(1, false);
+    ActiveCitation activeCitationRequest =
+        generateActiveCitation(2, true).toBuilder()
+            .court(null)
+            .fileNumber(null)
+            .citationStyle(null)
+            .decisionDate(null)
+            .documentType(null)
+            .build();
+
+    DocumentUnit documentUnitRequest =
+        generateDocumentUnit(List.of(activeCitation, activeCitationRequest));
+    DocumentUnit documentUnitResponse = generateDocumentUnit(List.of(activeCitation));
 
     risWebTestClient
         .withDefaultLogin()

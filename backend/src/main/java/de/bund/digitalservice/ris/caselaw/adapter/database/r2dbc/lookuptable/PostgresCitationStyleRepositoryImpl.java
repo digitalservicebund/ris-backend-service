@@ -24,7 +24,7 @@ public class PostgresCitationStyleRepositoryImpl implements CitationStyleReposit
   @Override
   public Flux<CitationStyle> findAllByOrderByCitationDocumentTypeAsc() {
     return repository
-        .findAllByDocumentTypeAndCitationDocumentTypeOrderByCitationDocumentTypeAsc('R', 'R')
+        .findAllByDocumentTypeAndCitationDocumentTypeOrderByLabelAsc('R', 'R')
         .map(CitationStyleTransformer::transformToDomain);
   }
 }
