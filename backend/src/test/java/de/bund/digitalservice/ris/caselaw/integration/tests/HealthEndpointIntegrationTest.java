@@ -16,6 +16,7 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 
+@Testcontainers(disabledWithoutDocker = true)
 @SpringBootTest(
     webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
     properties = {
@@ -29,7 +30,6 @@ import org.testcontainers.utility.DockerImageName;
       "management.endpoint.health.group.readiness.include=readinessState,db,redis"
     })
 @Tag("integration")
-@Testcontainers(disabledWithoutDocker = true)
 class HealthEndpointIntegrationTest {
 
   @Container

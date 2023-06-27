@@ -13,6 +13,7 @@ import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
+@Testcontainers(disabledWithoutDocker = true)
 @SpringBootTest(
     webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
     properties = {
@@ -22,7 +23,6 @@ import org.testcontainers.junit.jupiter.Testcontainers;
       "mail.from.address=test@test.com"
     })
 @Tag("integration")
-@Testcontainers(disabledWithoutDocker = true)
 class SecurityIntegrationTest {
 
   @Container

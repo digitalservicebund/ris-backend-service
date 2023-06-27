@@ -21,6 +21,6 @@ class AKotlinStaticClass : DescribedPredicate<JavaClass>("an auto-generated Kotl
         val hasSpecialPostfix = item.name.endsWith("Kt")
         val everythingIsStatic = nonStaticMethods.size == 0 && nonStaticFields.size == 0
 
-        return hasSpecialPostfix && everythingIsStatic
+        return (hasSpecialPostfix && everythingIsStatic) || item.name.contains("$")
     }
 }
