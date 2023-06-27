@@ -1,6 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc;
 
-import de.bund.digitalservice.ris.caselaw.domain.PublishReportAttachment;
+import de.bund.digitalservice.ris.caselaw.domain.PublicationReport;
 import de.bund.digitalservice.ris.caselaw.domain.PublishReportAttachmentRepository;
 import java.util.List;
 import java.util.UUID;
@@ -23,7 +23,7 @@ public class PostgresPublishReportAttachmentAttachmentRepositoryImpl
   }
 
   @Override
-  public Flux<PublishReportAttachment> saveAll(List<PublishReportAttachment> reports) {
+  public Flux<PublicationReport> saveAll(List<PublicationReport> reports) {
     return Flux.fromIterable(reports)
         .flatMap(
             report ->
@@ -31,8 +31,7 @@ public class PostgresPublishReportAttachmentAttachmentRepositoryImpl
                     .findByDocumentnumber(report.documentNumber())
                     .map(
                         documentUnit ->
-                            de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc
-                                .PublishReportAttachment.builder()
+                            PublishReportAttachmentDTO.builder()
                                 .id(UUID.randomUUID())
                                 .documentUnitId(documentUnit.getUuid())
                                 .receivedDate(report.receivedDate())
@@ -43,8 +42,20 @@ public class PostgresPublishReportAttachmentAttachmentRepositoryImpl
         .flatMapMany(repository::saveAll)
         .map(
             report ->
-                PublishReportAttachment.builder()
-                    // TODO add documentNumber
+                PublicationReport.builder()
+                    // TODO add documentNumber?
+                    .receivedDate(report.getReceivedDate())
+                    .content(report.getContent())
+                    .build());
+  }
+
+  @Override
+  public Flux<PublicationReport> getAllForDocumentUnit(UUID documentUnitId) {
+    return repository
+        .findAllByDocumentUnitId(documentUnitId)
+        .map(
+            report ->
+                PublicationReport.builder()
                     .receivedDate(report.getReceivedDate())
                     .content(report.getContent())
                     .build());

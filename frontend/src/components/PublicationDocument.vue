@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { ref, computed } from "vue"
 import { RouterLink } from "vue-router"
+import ExpandableContent from "./ExpandableContent.vue"
 import CodeSnippet from "@/components/CodeSnippet.vue"
 import DocumentUnit from "@/domain/documentUnit"
 import NormReference, { normFieldLabels } from "@/domain/normReference"
@@ -17,7 +18,7 @@ import TextButton from "@/shared/components/input/TextButton.vue"
 const props = defineProps<{
   documentUnit: DocumentUnit
   publishResult?: XmlMail
-  lastPublishedXmlMail?: XmlMail
+  publicationLog?: XmlMail[]
   errorMessage?: ResponseError
   succeedMessage?: { title: string; description: string }
 }>()
@@ -31,7 +32,7 @@ const categoriesRoute = computed(() => ({
   params: { documentNumber: props.documentUnit.documentNumber },
 }))
 const isFirstTimePublication = computed(() => {
-  return !props.lastPublishedXmlMail
+  return !props.publicationLog
 })
 
 const frontendError = ref()
@@ -230,29 +231,46 @@ const fieldsMissing = computed(() =>
         Diese Dokumentationseinheit wurde bisher nicht veröffentlicht
       </p>
       <div v-else class="flex flex-col gap-24">
-        <div class="label-02-regular">
-          Letzte Veröffentlichung am
-          {{ props.lastPublishedXmlMail?.publishDate }}
-          (Zustellung:
-          {{ props.lastPublishedXmlMail?.publishStateDisplayText }})
+        <div v-for="(item, index) in publicationLog" :key="index">
+          <ExpandableContent
+            as-column
+            :data-set="item"
+            :header="
+              item.type == 'HTML'
+                ? 'Juris Antwortprotokoll'
+                : 'Veröffentlichung'
+            "
+            :is-expanded="index == 0"
+            :title="item.type"
+          >
+            <div
+              v-if="item.type == 'HTML'"
+              class="bg-white border-black border-solid p-20"
+              v-html="item.content"
+            />
+            <div v-else-if="item.type == 'XML'">
+              <div class="label-02-regular">
+                Veröffentlichung am
+                {{ item.date }}
+                (Zustellung:
+                {{ item.publishStateDisplayText }})
+              </div>
+              <div class="label-section text-gray-900">ÜBER</div>
+              <div class="label-02-regular">
+                <div>
+                  <span class="label-02-bold">E-Mail an:</span>
+                  {{ item.receiverAddress }}
+                </div>
+                <div>
+                  <span class="label-02-bold"> Betreff: </span>
+                  {{ item.mailSubject }}
+                </div>
+              </div>
+              <div class="label-section text-gray-900">ALS</div>
+              <CodeSnippet v-if="!!item?.xml" title="XML" :xml="item.xml" />
+            </div>
+          </ExpandableContent>
         </div>
-        <div class="label-section text-gray-900">ÜBER</div>
-        <div class="label-02-regular">
-          <div>
-            <span class="label-02-bold">E-Mail an:</span>
-            {{ props.lastPublishedXmlMail?.receiverAddress }}
-          </div>
-          <div>
-            <span class="label-02-bold"> Betreff: </span>
-            {{ props.lastPublishedXmlMail?.mailSubject }}
-          </div>
-        </div>
-        <div class="label-section text-gray-900">ALS</div>
-        <CodeSnippet
-          v-if="!!props.lastPublishedXmlMail?.xml"
-          title="XML"
-          :xml="props.lastPublishedXmlMail.xml"
-        />
       </div>
     </div>
   </div>

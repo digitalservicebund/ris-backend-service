@@ -3,7 +3,7 @@ package de.bund.digitalservice.ris.caselaw.adapter;
 import de.bund.digitalservice.ris.caselaw.domain.Attachment;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatusService;
 import de.bund.digitalservice.ris.caselaw.domain.HttpMailSender;
-import de.bund.digitalservice.ris.caselaw.domain.PublishReportAttachment;
+import de.bund.digitalservice.ris.caselaw.domain.PublicationReport;
 import de.bund.digitalservice.ris.caselaw.domain.PublishReportAttachmentRepository;
 import de.bund.digitalservice.ris.domain.export.juris.response.ActionableMessageHandler;
 import de.bund.digitalservice.ris.domain.export.juris.response.MessageAttachment;
@@ -124,7 +124,7 @@ public class JurisXmlExporterResponseProcessor {
                 .filter(attachment -> attachment.fileName().endsWith(".html"))
                 .map(
                     attachment ->
-                        PublishReportAttachment.builder()
+                        PublicationReport.builder()
                             .documentNumber(documentNumber)
                             .receivedDate(receivedDate.toInstant())
                             .content(attachment.fileContent())

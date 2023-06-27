@@ -7,6 +7,7 @@ import de.bund.digitalservice.ris.caselaw.domain.XmlMailRepository;
 import de.bund.digitalservice.ris.caselaw.domain.XmlMailResponse;
 import java.util.UUID;
 import org.springframework.stereotype.Repository;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Repository
@@ -34,12 +35,12 @@ public class PostgresXmlMailRepositoryImpl implements XmlMailRepository {
   }
 
   @Override
-  public Mono<MailResponse> getLastPublishedMailResponse(UUID documentUnitUuid) {
+  public Flux<MailResponse> getPublishedMailResponses(UUID documentUnitUuid) {
     return documentUnitRepository
         .findByUuid(documentUnitUuid)
-        .flatMap(
+        .flatMapMany(
             documentUnitDTO ->
-                repository.findTopByDocumentUnitIdOrderByPublishDateDesc(documentUnitDTO.getId()))
+                repository.findAllByDocumentUnitIdOrderByPublishDateDesc(documentUnitDTO.getId()))
         .map(
             xmlMailDTO ->
                 new XmlMailResponse(

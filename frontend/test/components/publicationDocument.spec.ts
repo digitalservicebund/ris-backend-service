@@ -19,15 +19,18 @@ const setupWithPublishedDocument = () =>
   render(PublicationDocument, {
     props: {
       documentUnit: new DocumentUnit("123", { documentNumber: "foo" }),
-      lastPublishedXmlMail: {
-        xml: '<?xml version="1.0"?>\n<!DOCTYPE juris-r SYSTEM "juris-r.dtd">\n<xml>content</xml>',
-        statusMessages: "success",
-        statusCode: "200",
-        receiverAddress: "receiver address",
-        mailSubject: "mail subject",
-        publishDate: "01.02.2000",
-        publishStateDisplayText: "erfolgreich angekommen",
-      },
+      publicationLog: [
+        {
+          type: "XML",
+          xml: '<?xml version="1.0"?>\n<!DOCTYPE juris-r SYSTEM "juris-r.dtd">\n<xml>content</xml>',
+          statusMessages: "success",
+          statusCode: "200",
+          receiverAddress: "receiver address",
+          mailSubject: "mail subject",
+          date: "01.02.2000",
+          publishStateDisplayText: "erfolgreich angekommen",
+        },
+      ],
     },
     global: {
       plugins: [router],
@@ -135,7 +138,7 @@ describe("PublicationDocument:", () => {
             statusCode: "400",
             receiverAddress: "receiver address",
             mailSubject: "mail subject",
-            publishDate: undefined,
+            date: undefined,
             publishStateDisplayText: "fehlgeschlagen",
           },
           errorMessage: {
@@ -224,15 +227,18 @@ describe("PublicationDocument:", () => {
             },
           },
         }),
-        lastPublishedXmlMail: {
-          xml: "xml content",
-          statusMessages: "success",
-          statusCode: "200",
-          receiverAddress: "receiver address",
-          mailSubject: "mail subject",
-          publishDate: "01.02.2000",
-          publishStateDisplayText: "erfolgreich angekommen",
-        },
+        publicationLog: [
+          {
+            type: "HTML",
+            xml: "xml content",
+            statusMessages: "success",
+            statusCode: "200",
+            receiverAddress: "receiver address",
+            mailSubject: "mail subject",
+            date: "01.02.2000",
+            publishStateDisplayText: "erfolgreich angekommen",
+          },
+        ],
       },
       global: {
         plugins: [router],

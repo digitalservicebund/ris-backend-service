@@ -37,6 +37,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
@@ -243,15 +244,15 @@ class XmlEMailPublishServiceTest {
 
   @Test
   void testGetLastPublishedXml() {
-    when(repository.getLastPublishedMailResponse(TEST_UUID))
-        .thenReturn(Mono.just(new XmlMailResponse(TEST_UUID, SAVED_XML_MAIL)));
+    when(repository.getPublishedMailResponses(TEST_UUID))
+        .thenReturn(Flux.just(new XmlMailResponse(TEST_UUID, SAVED_XML_MAIL)));
 
-    StepVerifier.create(service.getLastPublishedXml(TEST_UUID))
+    StepVerifier.create(service.getPublicationMails(TEST_UUID))
         .consumeNextWith(
             response ->
                 assertThat(response).usingRecursiveComparison().isEqualTo(EXPECTED_RESPONSE))
         .verifyComplete();
 
-    verify(repository).getLastPublishedMailResponse(TEST_UUID);
+    verify(repository).getPublishedMailResponses(TEST_UUID);
   }
 }

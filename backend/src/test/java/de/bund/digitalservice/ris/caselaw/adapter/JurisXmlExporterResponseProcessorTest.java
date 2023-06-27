@@ -13,7 +13,7 @@ import static org.mockito.Mockito.when;
 import de.bund.digitalservice.ris.caselaw.domain.Attachment;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatusService;
 import de.bund.digitalservice.ris.caselaw.domain.HttpMailSender;
-import de.bund.digitalservice.ris.caselaw.domain.PublishReportAttachment;
+import de.bund.digitalservice.ris.caselaw.domain.PublicationReport;
 import de.bund.digitalservice.ris.caselaw.domain.PublishReportAttachmentRepository;
 import de.bund.digitalservice.ris.domain.export.juris.response.ImportMessageHandler;
 import de.bund.digitalservice.ris.domain.export.juris.response.MessageAttachment;
@@ -185,12 +185,12 @@ public class JurisXmlExporterResponseProcessorTest {
     verify(reportRepository)
         .saveAll(
             List.of(
-                PublishReportAttachment.builder()
+                PublicationReport.builder()
                     .content("report")
                     .documentNumber(DOCUMENT_NUMBER)
                     .receivedDate(now.toInstant())
                     .build(),
-                PublishReportAttachment.builder()
+                PublicationReport.builder()
                     .content("spellcheck")
                     .documentNumber(DOCUMENT_NUMBER)
                     .receivedDate(now.toInstant())

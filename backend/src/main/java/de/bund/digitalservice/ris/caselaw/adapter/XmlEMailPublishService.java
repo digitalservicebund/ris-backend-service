@@ -30,6 +30,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Service
@@ -78,8 +79,8 @@ public class XmlEMailPublishService implements EmailPublishService {
   }
 
   @Override
-  public Mono<MailResponse> getLastPublishedXml(UUID documentUnitUuid) {
-    return repository.getLastPublishedMailResponse(documentUnitUuid);
+  public Flux<MailResponse> getPublicationMails(UUID documentUnitUuid) {
+    return repository.getPublishedMailResponses(documentUnitUuid);
   }
 
   private Mono<String> generateMailSubject(DocumentUnit documentUnit) {
