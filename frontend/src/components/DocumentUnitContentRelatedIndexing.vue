@@ -32,6 +32,5 @@ const contentRelatedIndexing = computed({
     <FieldOfLawMain :document-unit-uuid="props.documentUnitUuid" />
     <Norms v-model="contentRelatedIndexing.norms" />
     <ActiveCitations v-model="contentRelatedIndexing.activeCitations" />
-    <!-- Aktivzitierung -->
   </div>
 </template>

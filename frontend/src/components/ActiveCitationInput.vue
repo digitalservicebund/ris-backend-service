@@ -13,6 +13,7 @@ import DateInput from "@/shared/components/input/DateInput.vue"
 import InputField from "@/shared/components/input/InputField.vue"
 import TextButton from "@/shared/components/input/TextButton.vue"
 import TextInput from "@/shared/components/input/TextInput.vue"
+import { ValidationError } from "@/shared/components/input/types"
 import Pagination, { Page } from "@/shared/components/Pagination.vue"
 
 interface Emits {
@@ -20,9 +21,12 @@ interface Emits {
   (event: "closeEntry"): void
 }
 
-const props = defineProps<{ modelValue?: ActiveCitation }>()
+const props = defineProps<{
+  modelValue?: ActiveCitation
+}>()
 const emit = defineEmits<Emits>()
 const activeCitation = ref(props.modelValue as ActiveCitation)
+const validationErrors = ref<ValidationError[]>()
 
 const activeCitationPredicate = computed({
   get: () =>
@@ -75,8 +79,22 @@ async function search(page = 0) {
   }
 }
 
+async function validateRequiredInput(citation: ActiveCitation) {
+  validationErrors.value = []
+  if (citation.missingRequiredFields.length) {
+    citation.missingRequiredFields.forEach((missingField) => {
+      validationErrors.value?.push({
+        defaultMessage: "Pflichtfeld nicht befüllt",
+        field: missingField,
+      })
+    })
+  }
+}
+
 async function addActiveCitation() {
-  emit("update:modelValue", new ActiveCitation({ ...activeCitation.value }))
+  const citation = new ActiveCitation({ ...activeCitation.value })
+  validateRequiredInput(citation)
+  emit("update:modelValue", citation)
   emit("closeEntry")
 }
 
@@ -90,6 +108,10 @@ onMounted(() => {
     <InputField
       id="activeCitationPredicate"
       class="border-b-1 border-gray-400 mb-16"
+      :error-message="
+        validationErrors?.find((err) => err.field === 'citationStyle')
+          ?.defaultMessage
+      "
       label="Art der Zitierung"
     >
       <ComboboxInput
@@ -102,7 +124,14 @@ onMounted(() => {
       ></ComboboxInput>
     </InputField>
     <div class="flex gap-24 justify-between">
-      <InputField id="activeCitationDecisionDate" label="Entscheidungsdatum">
+      <InputField
+        id="activeCitationDecisionDate"
+        :error-message="
+          validationErrors?.find((err) => err.field === 'decisionDate')
+            ?.defaultMessage
+        "
+        label="Entscheidungsdatum"
+      >
         <DateInput
           id="activeCitationDecisionDate"
           v-model="activeCitation.decisionDate"
@@ -120,7 +149,14 @@ onMounted(() => {
       </InputField>
     </div>
     <div class="flex gap-24 justify-between">
-      <InputField id="activeCitationDocumentType" label="Aktenzeichen">
+      <InputField
+        id="activeCitationDocumentType"
+        :error-message="
+          validationErrors?.find((err) => err.field === 'fileNumber')
+            ?.defaultMessage
+        "
+        label="Aktenzeichen"
+      >
         <TextInput
           id="activeCitationDocumentType"
           v-model="activeCitation.fileNumber"
@@ -128,7 +164,13 @@ onMounted(() => {
           placeholder="Aktenzeichen"
         ></TextInput>
       </InputField>
-      <InputField id="activeCitationCourt" label="Gericht">
+      <InputField
+        id="activeCitationCourt"
+        :error-message="
+          validationErrors?.find((err) => err.field === 'court')?.defaultMessage
+        "
+        label="Gericht"
+      >
         <ComboboxInput
           id="activeCitationCourt"
           v-model="activeCitation.court"

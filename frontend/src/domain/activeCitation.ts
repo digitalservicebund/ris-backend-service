@@ -5,7 +5,12 @@ import LinkedDocumentUnit from "./linkedDocumentUnit"
 export default class ActiveCitation extends LinkedDocumentUnit {
   public citationStyle?: CitationStyle
 
-  static requiredFields = ["court"] as const
+  static requiredFields = [
+    "citationStyle",
+    "fileNumber",
+    "court",
+    "decisionDate",
+  ] as const
 
   constructor(data: Partial<ActiveCitation> = {}) {
     super()
