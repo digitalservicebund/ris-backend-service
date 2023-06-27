@@ -120,7 +120,9 @@ class JurisXmlExporterWrapperIntegrationTest {
   // in sync with the model.
   @Test
   void testDocumentUnitIsSyncedWithModel()
-      throws NoSuchFieldException, SecurityException, IllegalArgumentException,
+      throws NoSuchFieldException,
+          SecurityException,
+          IllegalArgumentException,
           IllegalAccessException {
     CoreData coreData =
         CoreData.builder()
