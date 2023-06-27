@@ -41,6 +41,19 @@ function decisionSummarizer(activeCitation: ActiveCitation) {
           },
           activeCitation.renderDecision
         )
+      : activeCitation.hasMissingRequiredFields
+      ? h("div", { class: ["flex flex-row"] }, [
+          h(
+            "span",
+            { class: ["material-icons pr-2 text-red-800"] },
+            "error_outline"
+          ),
+          h(
+            "div",
+            { class: ["label-02-bold text-red-800"] },
+            activeCitation.renderDecision
+          ),
+        ])
       : h("div", { class: ["link-02-reg"] }, activeCitation.renderDecision),
   ])
 }

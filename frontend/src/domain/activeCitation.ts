@@ -36,6 +36,10 @@ export default class ActiveCitation extends LinkedDocumentUnit {
     )
   }
 
+  get hasMissingRequiredFields(): boolean {
+    return this.missingRequiredFields.length > 0
+  }
+
   private requiredFieldIsEmpty(
     value: ActiveCitation[(typeof ActiveCitation.requiredFields)[number]]
   ) {
