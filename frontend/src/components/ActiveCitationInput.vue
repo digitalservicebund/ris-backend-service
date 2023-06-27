@@ -81,7 +81,7 @@ async function search(page = 0) {
 
 async function validateRequiredInput(citation: ActiveCitation) {
   validationErrors.value = []
-  if (citation.missingRequiredFields.length) {
+  if (citation.missingRequiredFields?.length) {
     citation.missingRequiredFields.forEach((missingField) => {
       validationErrors.value?.push({
         defaultMessage: "Pflichtfeld nicht befüllt",

@@ -40,7 +40,7 @@ export enum LabelPosition {
 </script>
 
 <template>
-  <div class="flex flex-start w-full" :class="wrapperClasses">
+  <div class="flex flex-start mb-16 w-full" :class="wrapperClasses">
     <!-- slot rendered BEFORE label if the label position should be to the right or bottom -->
     <slot
       v-if="
@@ -50,22 +50,31 @@ export enum LabelPosition {
       :id="id"
     />
 
-    <label
-      v-if="labelConverted.length !== 0"
-      :aria-label="id"
-      class="grid items-center label-03-reg text-gray-900"
-      :class="{ 'mb-4': labelPosition === LabelPosition.TOP }"
-      :for="id"
+    <div
+      class="flex flex-row items-center"
+      :class="{
+        'mb-4': labelPosition === LabelPosition.TOP,
+      }"
     >
-      <span v-for="(line, index) in labelConverted" :key="line">
-        {{ line }}
-        <span
-          v-if="index === labelConverted.length - 1 && !!required"
-          class="ml-4"
-          >*</span
-        >
-      </span>
-    </label>
+      <span v-if="errorMessage" class="material-icons pr-4 text-red-800"
+        >error_outline</span
+      >
+      <label
+        v-if="labelConverted.length !== 0"
+        :aria-label="id"
+        class="grid items-center label-03-reg text-gray-900"
+        :for="id"
+      >
+        <span v-for="(line, index) in labelConverted" :key="line">
+          {{ line }}
+          <span
+            v-if="index === labelConverted.length - 1 && !!required"
+            class="ml-4"
+            >*</span
+          >
+        </span>
+      </label>
+    </div>
 
     <!-- slot rendered AFTER label, if the label position should be to the left or top -->
     <slot
