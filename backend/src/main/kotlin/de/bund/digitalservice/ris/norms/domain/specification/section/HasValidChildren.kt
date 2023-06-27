@@ -28,10 +28,15 @@ import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName.NORM
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName.NORM_PROVIDER
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName.OFFICIAL_REFERENCE
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName.OTHER_OFFICIAL_ANNOUNCEMENT
+import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName.OTHER_STATUS
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName.PARTICIPATION
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName.PRINCIPLE_ENTRY_INTO_FORCE
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName.PRINCIPLE_EXPIRATION
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName.PRINT_ANNOUNCEMENT
+import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName.REISSUE
+import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName.REPEAL
+import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName.STATUS
+import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName.STATUS_INDICATION
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName.SUBJECT_AREA
 
 val hasValidChildren =
@@ -40,13 +45,17 @@ val hasValidChildren =
             NORM, NORM_PROVIDER, SUBJECT_AREA, LEAD, PARTICIPATION,
             CITATION_DATE, AGE_INDICATION, PRINT_ANNOUNCEMENT, DIGITAL_ANNOUNCEMENT,
             EU_ANNOUNCEMENT, OTHER_OFFICIAL_ANNOUNCEMENT, DOCUMENT_TYPE, DIVERGENT_ENTRY_INTO_FORCE_DEFINED,
-            DIVERGENT_ENTRY_INTO_FORCE_UNDEFINED, DIVERGENT_EXPIRATION_DEFINED, DIVERGENT_EXPIRATION_UNDEFINED, CATEGORIZED_REFERENCE, ENTRY_INTO_FORCE, PRINCIPLE_ENTRY_INTO_FORCE, EXPIRATION, PRINCIPLE_EXPIRATION, DIGITAL_EVIDENCE, FOOTNOTES, DOCUMENT_STATUS, DOCUMENT_TEXT_PROOF, DOCUMENT_OTHER,
+            DIVERGENT_ENTRY_INTO_FORCE_UNDEFINED, DIVERGENT_EXPIRATION_DEFINED, DIVERGENT_EXPIRATION_UNDEFINED,
+            CATEGORIZED_REFERENCE, ENTRY_INTO_FORCE, PRINCIPLE_ENTRY_INTO_FORCE, EXPIRATION, PRINCIPLE_EXPIRATION,
+            DIGITAL_EVIDENCE, FOOTNOTES, DOCUMENT_STATUS, DOCUMENT_TEXT_PROOF, DOCUMENT_OTHER, STATUS, REISSUE,
+            REPEAL, OTHER_STATUS,
             -> hasNone(instance)
 
             OFFICIAL_REFERENCE -> hasOneOfType(listOf(PRINT_ANNOUNCEMENT, DIGITAL_ANNOUNCEMENT, EU_ANNOUNCEMENT, OTHER_OFFICIAL_ANNOUNCEMENT), instance)
             DIVERGENT_ENTRY_INTO_FORCE -> hasOneOfType(listOf(DIVERGENT_ENTRY_INTO_FORCE_DEFINED, DIVERGENT_ENTRY_INTO_FORCE_UNDEFINED), instance)
             DIVERGENT_EXPIRATION -> hasOneOfType(listOf(DIVERGENT_EXPIRATION_DEFINED, DIVERGENT_EXPIRATION_UNDEFINED), instance)
             DOCUMENT_STATUS_SECTION -> hasOneOfType(listOf(DOCUMENT_STATUS, DOCUMENT_TEXT_PROOF, DOCUMENT_OTHER), instance)
+            STATUS_INDICATION -> hasOneOfType(listOf(STATUS, REISSUE, REPEAL, OTHER_STATUS), instance)
         }
 
         private fun hasNone(instance: MetadataSection): Boolean =

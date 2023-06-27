@@ -8,6 +8,7 @@ import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.ANNOUNCEMENT_
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.ANNOUNCEMENT_MEDIUM
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.APPENDIX
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.AREA_OF_PUBLICATION
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.ARTICLE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.DATE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.DECIDING_BODY
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.DEFINITION
@@ -31,6 +32,7 @@ import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.LEAD_JURISDIC
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.LEAD_UNIT
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.LINK
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.NORM_CATEGORY
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.NOTE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.NUMBER
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.NUMBER_OF_THE_PUBLICATION_IN_THE_RESPECTIVE_AREA
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.OTHER_OFFICIAL_REFERENCE
@@ -84,7 +86,8 @@ val hasValidValueType =
                 AREA_OF_PUBLICATION, NUMBER_OF_THE_PUBLICATION_IN_THE_RESPECTIVE_AREA,
                 SERIES, DECIDING_BODY, EU_GOVERNMENT_GAZETTE, OTHER_OFFICIAL_REFERENCE, ENTITY,
                 TYPE_NAME, TEMPLATE_NAME, EDITION, TEXT, LINK, RELATED_DATA, EXTERNAL_DATA_NOTE, APPENDIX, FOOTNOTE_REFERENCE, FOOTNOTE_CHANGE,
-                FOOTNOTE_COMMENT, FOOTNOTE_DECISION, FOOTNOTE_STATE_LAW, FOOTNOTE_EU_LAW, FOOTNOTE_OTHER, WORK_NOTE, DESCRIPTION, REFERENCE, ENTRY_INTO_FORCE_DATE_NOTE,
+                FOOTNOTE_COMMENT, FOOTNOTE_DECISION, FOOTNOTE_STATE_LAW, FOOTNOTE_EU_LAW, FOOTNOTE_OTHER,
+                WORK_NOTE, DESCRIPTION, REFERENCE, ENTRY_INTO_FORCE_DATE_NOTE, NOTE, ARTICLE,
                 -> instance.value is String
 
                 DATE -> instance.value is LocalDate

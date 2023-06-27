@@ -9,6 +9,7 @@ import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.ANNOUNCEMENT_
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.ANNOUNCEMENT_MEDIUM
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.APPENDIX
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.AREA_OF_PUBLICATION
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.ARTICLE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.DATE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.DECIDING_BODY
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.DEFINITION
@@ -32,6 +33,7 @@ import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.LEAD_JURISDIC
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.LEAD_UNIT
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.LINK
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.NORM_CATEGORY
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.NOTE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.NUMBER
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.NUMBER_OF_THE_PUBLICATION_IN_THE_RESPECTIVE_AREA
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.OTHER_OFFICIAL_REFERENCE
@@ -102,6 +104,11 @@ val hasValidMetadata =
             Section.DOCUMENT_STATUS -> hasType(listOf(WORK_NOTE, DESCRIPTION, DATE, YEAR, REFERENCE, ENTRY_INTO_FORCE_DATE_NOTE, PROOF_INDICATION), instance)
             Section.DOCUMENT_TEXT_PROOF -> hasType(listOf(PROOF_TYPE, TEXT), instance)
             Section.DOCUMENT_OTHER -> hasType(listOf(OTHER_TYPE), instance)
+            Section.STATUS_INDICATION -> hasNone(instance)
+            Section.STATUS -> hasType(listOf(NOTE, DESCRIPTION, DATE, REFERENCE), instance)
+            Section.REISSUE -> hasType(listOf(NOTE, ARTICLE, DATE, REFERENCE), instance)
+            Section.REPEAL -> hasType(listOf(TEXT), instance)
+            Section.OTHER_STATUS -> hasType(listOf(NOTE), instance)
         }
 
         private fun hasNone(instance: MetadataSection): Boolean =

@@ -370,4 +370,66 @@ class HasValidChildrenTest {
 
         Assertions.assertThat(hasValidChildren.isSatisfiedBy(instance)).isTrue()
     }
+
+    @Test
+    fun `it is satisfied that the status indication section only contains only one of the allowed children sections`() {
+        val instance = mockk<MetadataSection>()
+        every { instance.name } returns MetadataSectionName.STATUS_INDICATION
+        every { instance.sections } returns listOf(
+            MetadataSection(MetadataSectionName.STATUS, listOf(Metadatum("note", MetadatumType.NOTE))),
+            MetadataSection(MetadataSectionName.REISSUE, listOf(Metadatum("article", MetadatumType.ARTICLE))),
+            MetadataSection(MetadataSectionName.REPEAL, listOf(Metadatum("text", MetadatumType.TEXT))),
+            MetadataSection(MetadataSectionName.OTHER_STATUS, listOf(Metadatum("note", MetadatumType.NOTE))),
+        )
+
+        Assertions.assertThat(hasValidChildren.isSatisfiedBy(instance)).isFalse()
+    }
+
+    @Test
+    fun `it is not satisfied that the status indication section only contains allowed children sections`() {
+        val instance = mockk<MetadataSection>()
+        every { instance.name } returns MetadataSectionName.STATUS_INDICATION
+        every { instance.sections } returns listOf(
+            MetadataSection(MetadataSectionName.STATUS, listOf(Metadatum("note", MetadatumType.NOTE))),
+            MetadataSection(MetadataSectionName.NORM, listOf(Metadatum("keyword", MetadatumType.KEYWORD))),
+        )
+
+        Assertions.assertThat(hasValidChildren.isSatisfiedBy(instance)).isFalse()
+    }
+
+    @Test
+    fun `it is satisfied that the status section does not have any children sections`() {
+        val instance = mockk<MetadataSection>()
+        every { instance.name } returns MetadataSectionName.STATUS
+        every { instance.sections } returns null
+
+        Assertions.assertThat(hasValidChildren.isSatisfiedBy(instance)).isTrue()
+    }
+
+    @Test
+    fun `it is satisfied that the reissue section does not have any children sections`() {
+        val instance = mockk<MetadataSection>()
+        every { instance.name } returns MetadataSectionName.REISSUE
+        every { instance.sections } returns null
+
+        Assertions.assertThat(hasValidChildren.isSatisfiedBy(instance)).isTrue()
+    }
+
+    @Test
+    fun `it is satisfied that the repeal section does not have any children sections`() {
+        val instance = mockk<MetadataSection>()
+        every { instance.name } returns MetadataSectionName.REPEAL
+        every { instance.sections } returns null
+
+        Assertions.assertThat(hasValidChildren.isSatisfiedBy(instance)).isTrue()
+    }
+
+    @Test
+    fun `it is satisfied that the other status section does not have any children sections`() {
+        val instance = mockk<MetadataSection>()
+        every { instance.name } returns MetadataSectionName.OTHER_STATUS
+        every { instance.sections } returns null
+
+        Assertions.assertThat(hasValidChildren.isSatisfiedBy(instance)).isTrue()
+    }
 }

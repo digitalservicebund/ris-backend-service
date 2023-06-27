@@ -31,4 +31,9 @@ enum class MetadataSectionName {
     DOCUMENT_STATUS,
     DOCUMENT_TEXT_PROOF,
     DOCUMENT_OTHER,
+    STATUS_INDICATION,
+    STATUS,
+    REISSUE,
+    REPEAL,
+    OTHER_STATUS,
 }

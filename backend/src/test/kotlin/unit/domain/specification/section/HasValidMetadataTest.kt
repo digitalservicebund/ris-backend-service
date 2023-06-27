@@ -749,4 +749,112 @@ class HasValidMetadataTest {
 
         assertThat(hasValidMetadata.isSatisfiedBy(instance)).isFalse()
     }
+
+    @Test
+    fun `can generate status with right metadata`() {
+        val instance = mockk<MetadataSection>()
+        every { instance.name } returns MetadataSectionName.STATUS
+        every { instance.sections } returns null
+        every { instance.metadata } returns listOf(
+            Metadatum("note", MetadatumType.NOTE),
+            Metadatum("description", MetadatumType.DESCRIPTION),
+            Metadatum(LocalDate.now(), MetadatumType.DATE),
+            Metadatum("reference", MetadatumType.REFERENCE),
+        )
+
+        assertThat(hasValidMetadata.isSatisfiedBy(instance)).isTrue()
+    }
+
+    @Test
+    fun `it throws an error on status with right and wrong metadata`() {
+        val instance = mockk<MetadataSection>()
+        every { instance.name } returns MetadataSectionName.STATUS
+        every { instance.sections } returns null
+        every { instance.metadata } returns listOf(
+            Metadatum("note", MetadatumType.NOTE),
+            Metadatum("announcement medium", MetadatumType.ANNOUNCEMENT_MEDIUM),
+        )
+
+        assertThat(hasValidMetadata.isSatisfiedBy(instance)).isFalse()
+    }
+
+    @Test
+    fun `can generate reissue with right metadata`() {
+        val instance = mockk<MetadataSection>()
+        every { instance.name } returns MetadataSectionName.REISSUE
+        every { instance.sections } returns null
+        every { instance.metadata } returns listOf(
+            Metadatum("note", MetadatumType.NOTE),
+            Metadatum("article", MetadatumType.ARTICLE),
+            Metadatum(LocalDate.now(), MetadatumType.DATE),
+            Metadatum("reference", MetadatumType.REFERENCE),
+        )
+
+        assertThat(hasValidMetadata.isSatisfiedBy(instance)).isTrue()
+    }
+
+    @Test
+    fun `it throws an error on  reissue with right and wrong metadata`() {
+        val instance = mockk<MetadataSection>()
+        every { instance.name } returns MetadataSectionName.REISSUE
+        every { instance.sections } returns null
+        every { instance.metadata } returns listOf(
+            Metadatum("note", MetadatumType.NOTE),
+            Metadatum("article", MetadatumType.ARTICLE),
+            Metadatum(LocalDate.now(), MetadatumType.DATE),
+            Metadatum("announcement medium", MetadatumType.ANNOUNCEMENT_MEDIUM),
+        )
+
+        assertThat(hasValidMetadata.isSatisfiedBy(instance)).isFalse()
+    }
+
+    @Test
+    fun `can generate repeal with right metadata`() {
+        val instance = mockk<MetadataSection>()
+        every { instance.name } returns MetadataSectionName.REPEAL
+        every { instance.sections } returns null
+        every { instance.metadata } returns listOf(
+            Metadatum("text", MetadatumType.TEXT),
+        )
+
+        assertThat(hasValidMetadata.isSatisfiedBy(instance)).isTrue()
+    }
+
+    @Test
+    fun `it throws an error on  repeal with right and wrong metadata`() {
+        val instance = mockk<MetadataSection>()
+        every { instance.name } returns MetadataSectionName.REPEAL
+        every { instance.sections } returns null
+        every { instance.metadata } returns listOf(
+            Metadatum("text", MetadatumType.TEXT),
+            Metadatum(OtherType.TEXT_IN_PROGRESS, MetadatumType.OTHER_TYPE),
+        )
+
+        assertThat(hasValidMetadata.isSatisfiedBy(instance)).isFalse()
+    }
+
+    @Test
+    fun `can generate other status with right metadata`() {
+        val instance = mockk<MetadataSection>()
+        every { instance.name } returns MetadataSectionName.OTHER_STATUS
+        every { instance.sections } returns null
+        every { instance.metadata } returns listOf(
+            Metadatum("note", MetadatumType.NOTE),
+        )
+
+        assertThat(hasValidMetadata.isSatisfiedBy(instance)).isTrue()
+    }
+
+    @Test
+    fun `it throws an error on other status with right and wrong metadata`() {
+        val instance = mockk<MetadataSection>()
+        every { instance.name } returns MetadataSectionName.OTHER_STATUS
+        every { instance.sections } returns null
+        every { instance.metadata } returns listOf(
+            Metadatum("note", MetadatumType.NOTE),
+            Metadatum("text", MetadatumType.TEXT),
+        )
+
+        assertThat(hasValidMetadata.isSatisfiedBy(instance)).isFalse()
+    }
 }

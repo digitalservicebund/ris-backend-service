@@ -62,4 +62,6 @@ enum class MetadatumType {
     PROOF_INDICATION,
     PROOF_TYPE,
     OTHER_TYPE,
+    NOTE,
+    ARTICLE,
 }

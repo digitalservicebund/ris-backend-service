@@ -3,6 +3,7 @@ package de.bund.digitalservice.ris.norms.domain.specification.metadatum
 import de.bund.digitalservice.ris.norms.domain.entity.Metadatum
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.APPENDIX
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.ARTICLE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.DATE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.DESCRIPTION
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.ENTRY_INTO_FORCE_DATE_NOTE
@@ -17,6 +18,7 @@ import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.FOOTNOTE_STAT
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.KEYWORD
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.LINK
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.NORM_CATEGORY
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.NOTE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.OTHER_TYPE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.PROOF_INDICATION
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.PROOF_TYPE
@@ -331,6 +333,34 @@ class HasValidValueTypeTest {
     @Test
     fun `it is not satisfied if the value for other type is a string`() {
         val instance = getMockedMetadatum("test text", OTHER_TYPE)
+
+        assertThat(hasValidValueType.isSatisfiedBy(instance)).isFalse()
+    }
+
+    @Test
+    fun `it is satisfied if the value for note type is a string`() {
+        val instance = getMockedMetadatum("test text", NOTE)
+
+        assertThat(hasValidValueType.isSatisfiedBy(instance)).isTrue()
+    }
+
+    @Test
+    fun `it is not satisfied if the value for a note is not string`() {
+        val instance = getMockedMetadatum(123, NOTE)
+
+        assertThat(hasValidValueType.isSatisfiedBy(instance)).isFalse()
+    }
+
+    @Test
+    fun `it is satisfied if the value for article type is a string`() {
+        val instance = getMockedMetadatum("test text", ARTICLE)
+
+        assertThat(hasValidValueType.isSatisfiedBy(instance)).isTrue()
+    }
+
+    @Test
+    fun `it is not satisfied if the value for a article is not string`() {
+        val instance = getMockedMetadatum(123, ARTICLE)
 
         assertThat(hasValidValueType.isSatisfiedBy(instance)).isFalse()
     }
