@@ -28,7 +28,7 @@ const emit = defineEmits<Emits>()
 const activeCitation = ref(props.modelValue as ActiveCitation)
 const validationErrors = ref<ValidationError[]>()
 
-const activeCitationPredicate = computed({
+const activeCitationStyle = computed({
   get: () =>
     activeCitation?.value?.citationStyle
       ? {
@@ -48,20 +48,22 @@ const activeCitationPredicate = computed({
   },
 })
 
-const addActiveCitationFromSearch = (decision: LinkedDocumentUnit) => {
-  emit("update:modelValue", new ActiveCitation({ ...decision }))
-  emit("closeEntry")
-}
-
 const searchResultsCurrentPage = ref<Page<ActiveCitation>>()
 const searchResults = ref<SearchResults<ActiveCitation>>()
 const localActiveCitations = ref<ActiveCitation[]>()
 
 async function search(page = 0) {
+  const activeCitationRef = new ActiveCitation({
+    ...activeCitation.value,
+  })
+
+  if (activeCitationRef.citationStyle) {
+    delete activeCitationRef["citationStyle"]
+  }
   const response = await documentUnitService.searchByLinkedDocumentUnit(
     page,
     30,
-    activeCitation.value as ActiveCitation
+    activeCitationRef as ActiveCitation
   )
   if (response.data) {
     searchResultsCurrentPage.value = {
@@ -98,6 +100,18 @@ async function addActiveCitation() {
   emit("closeEntry")
 }
 
+async function addActiveCitationFromSearch(decision: LinkedDocumentUnit) {
+  const newActiveCitationStyle = {
+    ...activeCitationStyle.value,
+  } as CitationStyle
+  const decisionWithCitationStyle = new ActiveCitation({
+    ...decision,
+    citationStyle: newActiveCitationStyle,
+  })
+  emit("update:modelValue", decisionWithCitationStyle)
+  emit("closeEntry")
+}
+
 onMounted(() => {
   activeCitation.value = props.modelValue as ActiveCitation
   validateRequiredInput(activeCitation.value as ActiveCitation)
@@ -117,7 +131,7 @@ onMounted(() => {
     >
       <ComboboxInput
         id="activeCitationPredicate"
-        v-model="activeCitationPredicate"
+        v-model="activeCitationStyle"
         aria-label="Art der Zitierung"
         clear-on-choosing-item
         :item-service="ComboboxItemService.getCitationStyles"
