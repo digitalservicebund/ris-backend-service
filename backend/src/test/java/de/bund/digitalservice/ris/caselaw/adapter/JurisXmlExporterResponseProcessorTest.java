@@ -63,7 +63,7 @@ class JurisXmlExporterResponseProcessorTest {
 
   @BeforeEach
   void setup() throws MessagingException, IOException {
-    when(storeFactory.createStoreSession()).thenReturn(store);
+    when(storeFactory.createStore()).thenReturn(store);
     when(store.getFolder("INBOX")).thenReturn(inbox);
     when(store.getFolder("processed")).thenReturn(processed);
     when(store.getFolder("unprocessable")).thenReturn(unprocessable);
@@ -91,7 +91,7 @@ class JurisXmlExporterResponseProcessorTest {
 
     responseProcessor.readEmails();
 
-    verify(storeFactory, times(1)).createStoreSession();
+    verify(storeFactory, times(1)).createStore();
     verify(statusService, times(1)).getIssuerAddressOfLatestStatus(DOCUMENT_NUMBER);
     verify(mailSender, times(1))
         .sendMail(any(), any(), any(), any(), any(), eq("report-" + DOCUMENT_NUMBER));

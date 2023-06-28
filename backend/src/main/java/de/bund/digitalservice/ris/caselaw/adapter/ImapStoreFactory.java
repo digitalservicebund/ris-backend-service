@@ -1,14 +1,13 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
+import de.bund.digitalservice.ris.caselaw.domain.MailStoreFactory;
 import jakarta.mail.MessagingException;
 import jakarta.mail.Session;
 import jakarta.mail.Store;
 import java.util.Properties;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
 
-@Component
-public class ImapStoreFactory {
+public class ImapStoreFactory implements MailStoreFactory {
   @Value("${mail.exporter.response.mailbox.protocol:}")
   private String mailboxProtocol;
 
@@ -19,12 +18,12 @@ public class ImapStoreFactory {
   private String mailboxPort;
 
   @Value("${mail.exporter.response.mailbox.username:}")
-  public String mailboxUsername;
+  private String mailboxUsername;
 
   @Value("${mail.exporter.response.mailbox.password:}")
   private String mailboxPassword;
 
-  public Store createStoreSession() throws MessagingException {
+  public Store createStore() throws MessagingException {
     Properties props = new Properties();
     props.put("mail.store.protocol", mailboxProtocol);
     props.put("mail.imaps.host", mailboxHost);
@@ -34,5 +33,9 @@ public class ImapStoreFactory {
     Store store = session.getStore();
     store.connect(mailboxUsername, mailboxPassword);
     return store;
+  }
+
+  public String getUsername() {
+    return mailboxUsername;
   }
 }

@@ -32,7 +32,6 @@ import org.testcontainers.junit.jupiter.Container;
     },
     controllers = {AuthController.class})
 class AuthIntegrationTest {
-
   @Container
   static PostgreSQLContainer<?> postgreSQLContainer = new PostgreSQLContainer<>("postgres:12");
 

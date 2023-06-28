@@ -3,6 +3,7 @@ package de.bund.digitalservice.ris.caselaw.adapter;
 import de.bund.digitalservice.ris.caselaw.domain.Attachment;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatusService;
 import de.bund.digitalservice.ris.caselaw.domain.HttpMailSender;
+import de.bund.digitalservice.ris.caselaw.domain.MailStoreFactory;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationReport;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationReportRepository;
 import de.bund.digitalservice.ris.domain.export.juris.response.ActionableMessageHandler;
@@ -20,13 +21,11 @@ import java.util.Date;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.annotation.Profile;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
 @Component
-@Profile("production")
 public class JurisXmlExporterResponseProcessor {
 
   private static final Logger LOGGER =
@@ -34,14 +33,14 @@ public class JurisXmlExporterResponseProcessor {
   private final List<MessageHandler> messageHandlers;
   private final HttpMailSender mailSender;
   private final DocumentUnitStatusService statusService;
-  private final ImapStoreFactory storeFactory;
   private final PublicationReportRepository reportRepository;
+  private final MailStoreFactory storeFactory;
 
   public JurisXmlExporterResponseProcessor(
       List<MessageHandler> messageHandlers,
       HttpMailSender mailSender,
       DocumentUnitStatusService statusService,
-      ImapStoreFactory storeFactory,
+      MailStoreFactory storeFactory,
       PublicationReportRepository reportRepository) {
     this.messageHandlers = messageHandlers;
     this.mailSender = mailSender;
@@ -52,7 +51,7 @@ public class JurisXmlExporterResponseProcessor {
 
   @Scheduled(fixedDelay = 60000, initialDelay = 60000)
   public void readEmails() {
-    try (Store store = storeFactory.createStoreSession()) {
+    try (Store store = storeFactory.createStore()) {
       processInbox(store);
     } catch (MessagingException e) {
       throw new StatusImporterException("Error creating or closing the store session: " + e);
@@ -142,7 +141,7 @@ public class JurisXmlExporterResponseProcessor {
                 Mono.fromRunnable(
                     () ->
                         mailSender.sendMail(
-                            storeFactory.mailboxUsername,
+                            storeFactory.getUsername(),
                             issuerAddress,
                             "FWD: " + subject,
                             "Anbei weitergeleitet von der jDV:",

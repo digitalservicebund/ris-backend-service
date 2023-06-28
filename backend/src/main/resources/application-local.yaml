@@ -22,6 +22,12 @@ spring:
         provider:
           keycloak:
             issuer-uri: ${OAUTH2_CLIENT_ISSUER:}
+mail:
+  exporter:
+    response:
+      mailbox:
+        username: user@neuris.dev
+        password: pa55word
 #logging:
 #  level:
 #    io.r2dbc.postgresql.QUERY: DEBUG # for queries
