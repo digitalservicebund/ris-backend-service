@@ -129,18 +129,20 @@ onMounted(() => {
   <div>
     <InputField
       id="activeCitationPredicate"
+      v-slot="slotProps"
       class="border-b-1 border-gray-400 mb-16"
-      :error-message="
+      label="Art der Zitierung"
+      :validation-error="
         validationErrors?.find((err) => err.field === 'citationStyle')
           ?.defaultMessage
       "
-      label="Art der Zitierung"
     >
       <ComboboxInput
         id="activeCitationPredicate"
         v-model="activeCitationStyle"
         aria-label="Art der Zitierung"
         clear-on-choosing-item
+        :has-error="slotProps.hasError"
         :item-service="ComboboxItemService.getCitationStyles"
         placeholder="Bitte auswählen"
       ></ComboboxInput>
@@ -148,16 +150,18 @@ onMounted(() => {
     <div class="flex gap-24 justify-between">
       <InputField
         id="activeCitationDecisionDate"
-        :error-message="
+        v-slot="slotProps"
+        label="Entscheidungsdatum"
+        :validation-error="
           validationErrors?.find((err) => err.field === 'decisionDate')
             ?.defaultMessage
         "
-        label="Entscheidungsdatum"
       >
         <DateInput
           id="activeCitationDecisionDate"
           v-model="activeCitation.decisionDate"
           aria-label="Entscheidungsdatum Aktivzitierung"
+          :has-error="slotProps.hasError"
         ></DateInput>
       </InputField>
       <InputField id="activeCitationDecisionDocumentType" label="Dokumenttyp">
@@ -172,32 +176,36 @@ onMounted(() => {
     </div>
     <div class="flex gap-24 justify-between">
       <InputField
-        id="activeCitationDocumentType"
-        :error-message="
+        id="activeCitationFileNumber"
+        v-slot="slotProps"
+        label="Aktenzeichen"
+        :validation-error="
           validationErrors?.find((err) => err.field === 'fileNumber')
             ?.defaultMessage
         "
-        label="Aktenzeichen"
       >
         <TextInput
           id="activeCitationDocumentType"
           v-model="activeCitation.fileNumber"
           aria-label="Aktenzeichen Aktivzitierung"
+          :has-error="slotProps.hasError"
           placeholder="Aktenzeichen"
         ></TextInput>
       </InputField>
       <InputField
         id="activeCitationCourt"
-        :error-message="
+        v-slot="slotProps"
+        label="Gericht"
+        :validation-error="
           validationErrors?.find((err) => err.field === 'court')?.defaultMessage
         "
-        label="Gericht"
       >
         <ComboboxInput
           id="activeCitationCourt"
           v-model="activeCitation.court"
           aria-label="Gericht Aktivzitierung"
           clear-on-choosing-item
+          :has-error="slotProps.hasError"
           :item-service="ComboboxItemService.getCourts"
           placeholder="Aktivzitierung Gericht"
         >

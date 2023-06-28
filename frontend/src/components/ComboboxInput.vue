@@ -18,6 +18,7 @@ const props = defineProps<{
   ariaLabel: string
   placeholder?: string
   clearOnChoosingItem?: boolean
+  hasError?: boolean
 }>()
 
 const emit = defineEmits<Emits>()
@@ -35,6 +36,12 @@ const inputFieldRef = ref<HTMLInputElement>()
 const focusedItemIndex = ref<number>(0)
 const ariaLabelDropdownIcon = computed(() =>
   showDropdown.value ? "Dropdown schließen" : "Dropdown öffnen"
+)
+
+const conditionalClasses = computed(() =>
+  props.hasError
+    ? "border-red-800 bg-red-200 focus:shadow-red-800"
+    : "bg-white border-blue-800 focus:shadow-blue-800 h-[3.75rem] hover:shadow-blue-800"
 )
 
 const toggleDropdown = async () => {
@@ -180,22 +187,24 @@ export type InputModelProps =
 <template>
   <div
     ref="dropdownContainerRef"
-    class="dropdown-container"
+    class="relative"
     @keydown.esc="closeDropdownAndRevertToLastSavedValue"
   >
     <div
-      class="dropdown-container__open-dropdown"
       @keydown.enter="onEnter"
       @keydown.tab="closeDropdownAndRevertToLastSavedValue"
     >
-      <div class="bg-white input-container">
+      <div
+        class="border-2 border-solid flex flex-row focus:shadow-focus h-[3.75rem] hover:shadow-hover px-16 py-12 space-between whitespace-nowrap"
+        :class="conditionalClasses"
+      >
         <input
           :id="id"
           ref="inputFieldRef"
           v-model="inputText"
           :aria-label="ariaLabel"
           autocomplete="off"
-          class="text-input"
+          class="bg-transparent focus:outline-none w-full"
           :placeholder="placeholder"
           :readonly="false"
           tabindex="0"
@@ -205,7 +214,7 @@ export type InputModelProps =
         />
         <button
           v-if="inputText"
-          class="input-close-icon"
+          class="input-close-icon mt-[3px]"
           tabindex="0"
           @click="clearSelection"
         >
@@ -218,7 +227,7 @@ export type InputModelProps =
         </button>
         <button
           :aria-label="ariaLabelDropdownIcon"
-          class="input-expand-icon"
+          class="input-expand-icon mt-[3px]"
           tabindex="-1"
           @click="toggleDropdown"
         >
@@ -232,20 +241,17 @@ export type InputModelProps =
     <div
       v-if="showDropdown"
       ref="dropdownItemsRef"
-      class="dropdown-container__dropdown-items"
+      class="absolute bg-white drop-shadow-md flex flex-col left-0 max-h-[300px] overflow-y-scroll right-0 top-[100%] z-10"
       tabindex="-1"
     >
       <div
         v-for="(item, index) in currentlyDisplayedItems"
         :key="index"
         aria-label="dropdown-option"
-        class="dropdown-container__dropdown-item"
+        class="border-b-1 border-b-gray-400 cursor-pointer focus:bg-blue-200 focus:outline-none hover:bg-gray-400 last:border-b-0 px-[1.5rem] py-[1rem]"
         :class="{
           'bg-blue-200': candidateForSelection === item,
-          'dropdown-container__dropdown-item__currently-selected':
-            inputText === item.label,
-          'dropdown-container__dropdown-item__no-matching-entry':
-            item.label === NO_MATCHING_ENTRY,
+          'border-l-4 border-solid border-l-blue-800': inputText === item.label,
         }"
         role="button"
         tabindex="0"
@@ -269,80 +275,3 @@ export type InputModelProps =
     </div>
   </div>
 </template>
-`
-
-<style lang="scss" scoped>
-.dropdown-container {
-  position: relative;
-  display: inline-block;
-  width: 100%;
-  user-select: none;
-
-  &__open-dropdown {
-    .input-container {
-      @apply border-2 border-solid border-blue-800 hover:shadow-hover hover:shadow-blue-800 focus:shadow-focus focus:shadow-blue-800;
-
-      display: flex;
-      height: 3.75rem;
-      flex: row nowrap;
-      justify-content: space-between;
-      padding: 12px 16px;
-
-      .text-input {
-        width: 100%;
-
-        &:focus {
-          outline: none;
-        }
-      }
-
-      .input-close-icon,
-      .input-expand-icon {
-        height: 5px;
-        margin-top: 3px;
-      }
-    }
-  }
-
-  &__dropdown-items {
-    /** Always show on top after textbox and width equal to textbox */
-    position: absolute;
-    z-index: 1;
-    top: 100%;
-    right: 0;
-    left: 0;
-    display: flex;
-    max-height: 300px;
-    flex-direction: column;
-    filter: drop-shadow(0 1px 3px rgb(0 0 0 / 25%));
-    overflow-y: scroll;
-    scrollbar-width: none;
-  }
-
-  &__dropdown-item {
-    @apply bg-white border-b-1 border-b-gray-400 cursor-pointer py-[1.063rem] px-[1.5rem];
-
-    &:last-of-type {
-      @apply border-b-0;
-    }
-
-    &:not(&__no-matching-entry):hover {
-      @apply bg-gray-400;
-    }
-
-    &:not(&__no-matching-entry):focus {
-      @apply bg-blue-200;
-
-      outline: none;
-    }
-
-    &__no-matching-entry {
-      cursor: default !important;
-    }
-
-    &__currently-selected {
-      @apply border-l-4 border-solid border-l-blue-800;
-    }
-  }
-}
-</style>

@@ -7,7 +7,7 @@ function renderComponent(options?: {
   id?: string
   label?: string | string[]
   slot?: string
-  errorMessage?: string
+  validationError?: string
   required?: true
   labelPosition?: LabelPosition
 }) {
@@ -17,7 +17,7 @@ function renderComponent(options?: {
     id,
     label: options?.label,
     required: options?.required ?? options?.required,
-    errorMessage: options?.errorMessage,
+    validationError: options?.validationError,
     labelPosition: options?.labelPosition,
   }
 
@@ -44,11 +44,11 @@ describe("InputField", () => {
   })
 
   it("shows input with given error message", () => {
-    renderComponent({ errorMessage: "error message" })
+    renderComponent({ validationError: "error message" })
 
-    const icon = screen.queryByText("error message")
+    const text = screen.getByText("error message") as HTMLElement
 
-    expect(icon).toBeInTheDocument()
+    expect(text).toBeInTheDocument()
   })
 
   it("injects given input element into slot", () => {

@@ -4,13 +4,13 @@ import { computed } from "vue"
 interface Props {
   id: string
   label?: string | string[]
-  errorMessage?: string
   required?: boolean
   labelPosition?: LabelPosition
+  validationError?: string
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  errorMessage: undefined,
+  validationError: undefined,
   required: false,
   labelPosition: LabelPosition.TOP,
   label: undefined,
@@ -48,6 +48,7 @@ export enum LabelPosition {
         labelPosition === LabelPosition.BOTTOM
       "
       :id="id"
+      :has-error="!!validationError"
     />
 
     <div
@@ -56,7 +57,7 @@ export enum LabelPosition {
         'mb-4': labelPosition === LabelPosition.TOP,
       }"
     >
-      <span v-if="errorMessage" class="material-icons pr-4 text-red-800"
+      <span v-if="validationError" class="material-icons pr-4 text-red-800"
         >error_outline</span
       >
       <label
@@ -83,10 +84,11 @@ export enum LabelPosition {
         labelPosition === LabelPosition.TOP
       "
       :id="id"
+      :has-error="!!validationError"
     />
 
-    <div v-if="errorMessage" class="h-16 label-03-reg my-8 text-red-800">
-      {{ errorMessage }}
+    <div v-if="validationError" class="h-16 label-03-reg my-8 text-red-800">
+      {{ validationError }}
     </div>
   </div>
 </template>

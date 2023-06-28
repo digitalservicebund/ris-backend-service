@@ -1,6 +1,5 @@
 <script lang="ts" setup>
 import { computed, ref } from "vue"
-import { ValidationError } from "@/shared/components/input/types"
 import { useInputModel } from "@/shared/composables/useInputModel"
 
 interface Props {
@@ -9,9 +8,9 @@ interface Props {
   modelValue?: string
   ariaLabel: string
   placeholder?: string
-  validationError?: ValidationError
   readOnly?: boolean
   fullHeight?: boolean
+  hasError?: boolean
 }
 
 interface Emits {
@@ -31,7 +30,7 @@ const { inputValue, emitInputEvent } = useInputModel<string, Props, Emits>(
 )
 
 const conditionalClasses = computed(() => ({
-  input__error: props.validationError,
+  input__error: props.hasError,
   input__fullheight: props.fullHeight,
 }))
 
