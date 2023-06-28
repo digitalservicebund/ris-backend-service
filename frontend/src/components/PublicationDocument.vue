@@ -32,7 +32,7 @@ const categoriesRoute = computed(() => ({
   params: { documentNumber: props.documentUnit.documentNumber },
 }))
 const isFirstTimePublication = computed(() => {
-  return !props.publicationLog
+  return !props.publicationLog || props.publicationLog.length === 0
 })
 
 const frontendError = ref()
@@ -234,27 +234,23 @@ const fieldsMissing = computed(() =>
         <div v-for="(item, index) in publicationLog" :key="index">
           <ExpandableContent
             as-column
+            class="bg-white border-1 border-gray p-10"
             :data-set="item"
             :header="
               item.type == 'HTML'
-                ? 'Juris Antwortprotokoll'
-                : 'Veröffentlichung'
+                ? 'Juris Protokoll - ' + item.date
+                : 'Xml Email Abgabe - ' + item.date
             "
             :is-expanded="index == 0"
             :title="item.type"
           >
+            <!-- eslint-disable vue/no-v-html -->
             <div
               v-if="item.type == 'HTML'"
-              class="bg-white border-black border-solid p-20"
+              class="p-20"
               v-html="item.content"
             />
             <div v-else-if="item.type == 'XML'">
-              <div class="label-02-regular">
-                Veröffentlichung am
-                {{ item.date }}
-                (Zustellung:
-                {{ item.publishStateDisplayText }})
-              </div>
               <div class="label-section text-gray-900">ÜBER</div>
               <div class="label-02-regular">
                 <div>

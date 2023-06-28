@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
+import reactor.core.publisher.Mono;
 
 @Configuration
 public class FeatureToggleConfig {
@@ -46,8 +47,8 @@ public class FeatureToggleConfig {
       }
 
       @Override
-      public Boolean isEnabled(String toggleName) {
-        return true;
+      public Mono<Boolean> isEnabled(String toggleName) {
+        return Mono.just(true);
       }
     };
   }

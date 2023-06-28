@@ -61,7 +61,7 @@ class DocumentUnitServiceTest {
 
   @MockBean private DocumentUnitRepository repository;
 
-  @MockBean private PublishReportAttachmentRepository publishReportRepository;
+  @MockBean private PublicationReportRepository publishReportRepository;
 
   @MockBean private DatabaseDocumentationOfficeRepository documentationOfficeRepository;
 

@@ -1,21 +1,20 @@
 package de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc;
 
 import de.bund.digitalservice.ris.caselaw.domain.PublicationReport;
-import de.bund.digitalservice.ris.caselaw.domain.PublishReportAttachmentRepository;
+import de.bund.digitalservice.ris.caselaw.domain.PublicationReportRepository;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;
 
 @Repository
-public class PostgresPublishReportAttachmentAttachmentRepositoryImpl
-    implements PublishReportAttachmentRepository {
+public class PostgresPublishReportRepositoryImpl implements PublicationReportRepository {
 
-  private final DatabasePublishReportAttachmentRepository repository;
+  private final DatabasePublicationReportRepository repository;
   private final DatabaseDocumentUnitRepository documentUnitRepository;
 
-  public PostgresPublishReportAttachmentAttachmentRepositoryImpl(
-      DatabasePublishReportAttachmentRepository repository,
+  public PostgresPublishReportRepositoryImpl(
+      DatabasePublicationReportRepository repository,
       DatabaseDocumentUnitRepository documentUnitRepository) {
 
     this.repository = repository;
@@ -31,7 +30,7 @@ public class PostgresPublishReportAttachmentAttachmentRepositoryImpl
                     .findByDocumentnumber(report.documentNumber())
                     .map(
                         documentUnit ->
-                            PublishReportAttachmentDTO.builder()
+                            PublicationReportDTO.builder()
                                 .id(UUID.randomUUID())
                                 .documentUnitId(documentUnit.getUuid())
                                 .receivedDate(report.receivedDate())

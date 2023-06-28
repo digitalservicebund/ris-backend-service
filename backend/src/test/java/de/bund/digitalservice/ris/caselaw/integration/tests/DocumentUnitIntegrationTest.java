@@ -21,6 +21,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumen
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentUnitStatusRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentationOfficeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseIncorrectCourtRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabasePublicationReportRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DeviatingDecisionDateDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DeviatingEcliDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DeviatingEcliRepository;
@@ -30,6 +31,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.FileNumberDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.FileNumberRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.IncorrectCourtDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.PostgresDocumentUnitRepositoryImpl;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.PostgresPublishReportRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.CourtDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DatabaseCourtRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DatabaseDocumentTypeRepository;
@@ -78,6 +80,7 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
       DatabaseDocumentNumberService.class,
       DatabaseDocumentUnitStatusService.class,
       PostgresDocumentUnitRepositoryImpl.class,
+      PostgresPublishReportRepositoryImpl.class,
       FlywayConfig.class,
       PostgresConfig.class,
       SecurityConfig.class,
@@ -111,11 +114,13 @@ class DocumentUnitIntegrationTest {
   @Autowired private DatabaseDocumentUnitStatusRepository documentUnitStatusRepository;
   @Autowired private DatabaseDocumentationOfficeRepository documentationOfficeRepository;
 
+  @Autowired private DatabasePublicationReportRepository databasePublishReportRepository;
+
   @MockBean private S3AsyncClient s3AsyncClient;
   @MockBean private EmailPublishService publishService;
   @MockBean private DocxConverterService docxConverterService;
   @MockBean private UserService userService;
-  @MockBean ReactiveClientRegistrationRepository clientRegistrationRepository;
+  @MockBean private ReactiveClientRegistrationRepository clientRegistrationRepository;
 
   private final DocumentationOffice docOffice = buildDefaultDocOffice();
   private UUID documentationOfficeUuid;
@@ -147,6 +152,7 @@ class DocumentUnitIntegrationTest {
     repository.deleteAll().block();
     databaseDocumentTypeRepository.deleteAll().block();
     documentUnitStatusRepository.deleteAll().block();
+    databasePublishReportRepository.deleteAll().block();
   }
 
   // TODO: write a test for add a document type with a wrong shortcut

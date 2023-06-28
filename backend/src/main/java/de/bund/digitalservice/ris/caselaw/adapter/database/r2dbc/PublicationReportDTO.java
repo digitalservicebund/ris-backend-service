@@ -16,7 +16,7 @@ import org.springframework.data.relational.core.mapping.Table;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table("publish_report_attachment")
-public class PublishReportAttachmentDTO implements Persistable<UUID> {
+public class PublicationReportDTO implements Persistable<UUID> {
   @Id UUID id;
   private UUID documentUnitId;
   private String content;

@@ -16,10 +16,12 @@ import de.bund.digitalservice.ris.caselaw.adapter.KeycloakUserService;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentUnitRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentUnitStatusRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentationOfficeRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabasePublicationReportRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitStatusDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentationOfficeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.PostgresDocumentUnitRepositoryImpl;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.PostgresPublishReportRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresConfig;
 import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
@@ -54,6 +56,7 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
       DatabaseDocumentNumberService.class,
       DatabaseDocumentUnitStatusService.class,
       PostgresDocumentUnitRepositoryImpl.class,
+      PostgresPublishReportRepositoryImpl.class,
       FlywayConfig.class,
       PostgresConfig.class,
       SecurityConfig.class,
@@ -79,6 +82,8 @@ class DocumentUnitControllerAuthIntegrationTest {
   @Autowired private DatabaseDocumentUnitStatusRepository statusRepository;
   @Autowired private DatabaseDocumentationOfficeRepository documentationOfficeRepository;
 
+  @Autowired private DatabasePublicationReportRepository databasePublishReportRepository;
+
   @MockBean private S3AsyncClient s3AsyncClient;
   @MockBean private EmailPublishService publishService;
   @MockBean DocxConverterService docxConverterService;
@@ -100,6 +105,7 @@ class DocumentUnitControllerAuthIntegrationTest {
   void cleanUp() {
     repository.deleteAll().block();
     statusRepository.deleteAll().block();
+    databasePublishReportRepository.deleteAll().block();
   }
 
   @Test

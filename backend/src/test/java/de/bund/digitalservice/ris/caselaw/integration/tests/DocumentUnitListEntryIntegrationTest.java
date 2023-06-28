@@ -22,6 +22,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentationOf
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.FileNumberDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.FileNumberRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.PostgresDocumentUnitRepositoryImpl;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.PostgresPublishReportRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationOfficeTransformer;
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresConfig;
@@ -59,6 +60,7 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
       DatabaseDocumentUnitStatusService.class,
       DatabaseDocumentNumberService.class,
       PostgresDocumentUnitRepositoryImpl.class,
+      PostgresPublishReportRepositoryImpl.class,
       FlywayConfig.class,
       PostgresConfig.class,
       SecurityConfig.class,

@@ -59,12 +59,8 @@ onMounted(async () => {
   const response = await publishService.getPublicationLog(
     props.documentUnit.uuid
   )
-  if (!!response.error) {
-    loadDone.value = true
-    return
-  }
-
   if (!!response.data) {
+    loadDone.value = true
     publicationLog.value = response.data
   }
 

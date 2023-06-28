@@ -14,7 +14,7 @@ import de.bund.digitalservice.ris.caselaw.domain.Attachment;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatusService;
 import de.bund.digitalservice.ris.caselaw.domain.HttpMailSender;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationReport;
-import de.bund.digitalservice.ris.caselaw.domain.PublishReportAttachmentRepository;
+import de.bund.digitalservice.ris.caselaw.domain.PublicationReportRepository;
 import de.bund.digitalservice.ris.domain.export.juris.response.ImportMessageHandler;
 import de.bund.digitalservice.ris.domain.export.juris.response.MessageAttachment;
 import de.bund.digitalservice.ris.domain.export.juris.response.ProcessMessageHandler;
@@ -51,7 +51,7 @@ public class JurisXmlExporterResponseProcessorTest {
   @MockBean private DocumentUnitStatusService statusService;
   @MockBean private HttpMailSender mailSender;
   @MockBean private ImapStoreFactory storeFactory;
-  @MockBean private PublishReportAttachmentRepository reportRepository;
+  @MockBean private PublicationReportRepository reportRepository;
   @Mock private Store store;
   @Mock private Folder inbox;
   @Mock private Folder processed;
