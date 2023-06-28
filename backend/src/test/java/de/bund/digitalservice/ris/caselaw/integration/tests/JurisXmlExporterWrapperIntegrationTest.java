@@ -28,7 +28,7 @@ import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
 @Tag("IntegrationTest")
-public class JurisXmlExporterWrapperIntegrationTest {
+class JurisXmlExporterWrapperIntegrationTest {
 
   private JurisXmlExporter jurisXmlExporter;
   private String encryptedXml;

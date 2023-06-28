@@ -46,7 +46,7 @@ import reactor.core.publisher.Mono;
 
 @ExtendWith(SpringExtension.class)
 @Import({JurisXmlExporterResponseProcessor.class})
-public class JurisXmlExporterResponseProcessorTest {
+class JurisXmlExporterResponseProcessorTest {
   private final String DOCUMENT_NUMBER = "KORE123456789";
   @MockBean private DocumentUnitStatusService statusService;
   @MockBean private HttpMailSender mailSender;
