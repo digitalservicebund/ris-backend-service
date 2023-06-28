@@ -13,10 +13,10 @@ import org.springframework.context.annotation.Profile;
 
 @Configuration
 public class MailConfig {
-  @Value("${mail.exporter.response.mailbox.username}")
+  @Value("${mail.exporter.response.mailbox.username:username}")
   private String mailboxUsername;
 
-  @Value("${mail.exporter.response.mailbox.password}")
+  @Value("${mail.exporter.response.mailbox.password:password}")
   private String mailboxPassword;
 
   @Value("${mail.exporter.apiKey:apiKey}")
