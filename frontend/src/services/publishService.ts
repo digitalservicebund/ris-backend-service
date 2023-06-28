@@ -3,9 +3,9 @@ import XmlMail from "@/domain/xmlMail"
 
 interface publishService {
   publishDocument(documentUnitUuid: string): Promise<ServiceResponse<XmlMail>>
-  getLastPublishedXML(
+  getPublicationLog(
     documentUnitUuid: string
-  ): Promise<ServiceResponse<XmlMail>>
+  ): Promise<ServiceResponse<XmlMail[]>>
 }
 
 const service: publishService = {
@@ -32,8 +32,8 @@ const service: publishService = {
     return response
   },
 
-  async getLastPublishedXML(documentUnitUuid: string) {
-    const response = await httpClient.get<XmlMail>(
+  async getPublicationLog(documentUnitUuid: string) {
+    const response = await httpClient.get<XmlMail[]>(
       `caselaw/documentunits/${documentUnitUuid}/publish`
     )
 

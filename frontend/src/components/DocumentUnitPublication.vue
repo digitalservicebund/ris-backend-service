@@ -16,7 +16,7 @@ const emits = defineEmits<{
 }>()
 
 const loadDone = ref(false)
-const lastPublishedXmlMail = ref<XmlMail>()
+const publicationLog = ref<XmlMail[]>()
 const publishResult = ref<XmlMail>()
 const errorMessage = ref<ResponseError>()
 const succeedMessage = ref<{ title: string; description: string }>()
@@ -25,12 +25,10 @@ async function publishADocument() {
   const response = await publishService.publishDocument(props.documentUnit.uuid)
   publishResult.value = response.data
   if (response.data && Number(response.data?.statusCode) < 300) {
-    lastPublishedXmlMail.value = response.data
-    lastPublishedXmlMail.value.publishDate = formatDate(
-      lastPublishedXmlMail.value.publishDate
-    )
-    lastPublishedXmlMail.value.xml = lastPublishedXmlMail.value.xml
-      ? lastPublishedXmlMail.value.xml.replace(/[ \t]{2,}/g, "")
+    publicationLog.value = [response.data]
+    publicationLog.value[0].date = formatDate(publicationLog.value[0].date)
+    publicationLog.value[0].xml = publicationLog.value[0].xml
+      ? publicationLog.value[0].xml.replace(/[ \t]{2,}/g, "")
       : ""
     succeedMessage.value = {
       title: "Email wurde versendet",
@@ -58,24 +56,18 @@ function formatDate(date?: string): string {
 }
 
 onMounted(async () => {
-  const response = await publishService.getLastPublishedXML(
+  const response = await publishService.getPublicationLog(
     props.documentUnit.uuid
   )
-  if (!!response.error) {
-    loadDone.value = true
-    return
-  }
-
   if (!!response.data) {
-    lastPublishedXmlMail.value = response.data
+    loadDone.value = true
+    publicationLog.value = response.data
   }
 
-  if (!!lastPublishedXmlMail.value) {
-    lastPublishedXmlMail.value.publishDate = formatDate(
-      lastPublishedXmlMail.value.publishDate
-    )
-    lastPublishedXmlMail.value.xml = lastPublishedXmlMail.value.xml
-      ? lastPublishedXmlMail.value.xml
+  if (!!publicationLog.value) {
+    publicationLog.value[0].date = formatDate(publicationLog.value[0].date)
+    publicationLog.value[0].xml = publicationLog.value[0].xml
+      ? publicationLog.value[0].xml
       : ""
   }
 
@@ -92,7 +84,7 @@ onMounted(async () => {
           v-if="loadDone"
           :document-unit="documentUnit"
           :error-message="errorMessage"
-          :last-published-xml-mail="lastPublishedXmlMail"
+          :publication-log="publicationLog"
           :publish-result="publishResult"
           :succeed-message="succeedMessage"
           @publish-a-document="publishADocument"

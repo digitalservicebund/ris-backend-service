@@ -61,6 +61,8 @@ class DocumentUnitServiceTest {
 
   @MockBean private DocumentUnitRepository repository;
 
+  @MockBean private PublicationReportRepository publishReportRepository;
+
   @MockBean private DatabaseDocumentationOfficeRepository documentationOfficeRepository;
 
   @MockBean private DocumentNumberService documentNumberService;
@@ -380,17 +382,17 @@ class DocumentUnitServiceTest {
             "filename",
             null,
             PublishState.UNKNOWN);
-    when(publishService.getLastPublishedXml(TEST_UUID))
-        .thenReturn(Mono.just(new XmlMailResponse(TEST_UUID, xmlMail)));
+    when(publishService.getPublicationMails(TEST_UUID))
+        .thenReturn(Flux.just(new XmlMailResponse(TEST_UUID, xmlMail)));
 
-    StepVerifier.create(service.getLastPublishedXmlMail(TEST_UUID))
+    StepVerifier.create(service.getPublications(TEST_UUID))
         .consumeNextWith(
             xmlMailResponse ->
                 assertThat(xmlMailResponse)
                     .usingRecursiveComparison()
                     .isEqualTo(new XmlMailResponse(TEST_UUID, xmlMail)))
         .verifyComplete();
-    verify(publishService).getLastPublishedXml(TEST_UUID);
+    verify(publishService).getPublicationMails(TEST_UUID);
   }
 
   @Test

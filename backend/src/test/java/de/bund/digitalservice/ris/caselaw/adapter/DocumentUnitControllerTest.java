@@ -21,6 +21,7 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitPublishException;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.LinkedDocumentationUnit;
+import de.bund.digitalservice.ris.caselaw.domain.PublicationReport;
 import de.bund.digitalservice.ris.caselaw.domain.PublishState;
 import de.bund.digitalservice.ris.caselaw.domain.XmlMail;
 import de.bund.digitalservice.ris.caselaw.domain.XmlMailResponse;
@@ -44,6 +45,7 @@ import org.springframework.security.oauth2.client.registration.ReactiveClientReg
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.web.reactive.function.BodyInserters;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @ExtendWith(SpringExtension.class)
@@ -314,7 +316,7 @@ class DocumentUnitControllerTest {
         .isEqualTo("status-code")
         .jsonPath("statusMessages")
         .isEqualTo("status-messages")
-        .jsonPath("publishDate")
+        .jsonPath("date")
         .isEqualTo("2020-01-01T01:01:01Z");
 
     verify(service).publishAsEmail(TEST_UUID, ISSUER_ADDRESS);
@@ -339,9 +341,9 @@ class DocumentUnitControllerTest {
 
   @Test
   void testGetLastPublishedXml() {
-    when(service.getLastPublishedXmlMail(TEST_UUID))
+    when(service.getPublications(TEST_UUID))
         .thenReturn(
-            Mono.just(
+            Flux.just(
                 new XmlMailResponse(
                     TEST_UUID,
                     new XmlMail(
@@ -355,6 +357,19 @@ class DocumentUnitControllerTest {
                         Instant.parse("2020-01-01T01:01:01.00Z"),
                         PublishState.SENT))));
 
+    when(service.getPublicationReports(TEST_UUID))
+        .thenReturn(
+            Flux.fromIterable(
+                List.of(
+                    PublicationReport.builder()
+                        .content("<html>2019 Report</html>")
+                        .receivedDate(Instant.parse("2019-01-01T01:01:01.00Z"))
+                        .build(),
+                    PublicationReport.builder()
+                        .content("<html>2021 Report</html>")
+                        .receivedDate(Instant.parse("2021-01-01T01:01:01.00Z"))
+                        .build())));
+
     risWebClient
         .withDefaultLogin()
         .get()
@@ -363,27 +378,45 @@ class DocumentUnitControllerTest {
         .expectStatus()
         .isOk()
         .expectBody()
-        .jsonPath("documentUnitUuid")
+        .jsonPath("[0].type")
+        .isEqualTo("HTML")
+        .jsonPath("[0].content")
+        .isEqualTo("<html>2021 Report</html>")
+        .jsonPath("[0].date")
+        .isEqualTo("2021-01-01T01:01:01Z")
+        .jsonPath("[1].receivedDate")
+        .doesNotExist()
+        .jsonPath("[1].type")
+        .isEqualTo("XML")
+        .jsonPath("[1].documentUnitUuid")
         .isEqualTo(TEST_UUID.toString())
-        .jsonPath("receiverAddress")
+        .jsonPath("[1].receiverAddress")
         .isEqualTo("receiver address")
-        .jsonPath("mailSubject")
+        .jsonPath("[1].mailSubject")
         .isEqualTo("mailSubject")
-        .jsonPath("xml")
+        .jsonPath("[1].xml")
         .isEqualTo("xml")
-        .jsonPath("statusCode")
+        .jsonPath("[1].statusCode")
         .isEqualTo("status-code")
-        .jsonPath("statusMessages")
+        .jsonPath("[1].statusMessages")
         .isEqualTo("status-messages")
-        .jsonPath("publishDate")
-        .isEqualTo("2020-01-01T01:01:01Z");
+        .jsonPath("[1].date")
+        .isEqualTo("2020-01-01T01:01:01Z")
+        .jsonPath("[1].publishDate")
+        .doesNotExist()
+        .jsonPath("[2].type")
+        .isEqualTo("HTML")
+        .jsonPath("[2].content")
+        .isEqualTo("<html>2019 Report</html>")
+        .jsonPath("[2].date")
+        .isEqualTo("2019-01-01T01:01:01Z");
 
-    verify(service).getLastPublishedXmlMail(TEST_UUID);
+    verify(service).getPublications(TEST_UUID);
   }
 
   @Test
   void testGetLastPublishedXml_withServiceThrowsException() {
-    when(service.getLastPublishedXmlMail(TEST_UUID)).thenThrow(DocumentUnitPublishException.class);
+    when(service.getPublications(TEST_UUID)).thenThrow(DocumentUnitPublishException.class);
 
     risWebClient
         .withDefaultLogin()
@@ -393,7 +426,9 @@ class DocumentUnitControllerTest {
         .expectStatus()
         .is5xxServerError();
 
-    verify(service).getLastPublishedXmlMail(TEST_UUID);
+    verify(service).getByUuid(TEST_UUID);
+    verify(service).getPublications(TEST_UUID);
+    verify(service).getPublicationReports(TEST_UUID);
   }
 
   @Test

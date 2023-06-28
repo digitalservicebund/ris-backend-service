@@ -34,6 +34,7 @@ import org.springframework.security.oauth2.client.registration.ReactiveClientReg
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.web.reactive.function.BodyInserters;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @ExtendWith(SpringExtension.class)
@@ -241,9 +242,10 @@ class DocumentUnitControllerAuthTest {
   }
 
   @Test
-  void testGetLastPublishedXml() {
+  void testGetPublishedMails() {
     mockDocumentUnit(docOffice1, null, PUBLISHED);
-    when(service.getLastPublishedXmlMail(TEST_UUID)).thenReturn(Mono.empty());
+    when(service.getPublications(TEST_UUID)).thenReturn(Flux.empty());
+    when(service.getPublicationReports(TEST_UUID)).thenReturn(Flux.empty());
 
     String uri = "/api/v1/caselaw/documentunits/" + TEST_UUID + "/publish";
 

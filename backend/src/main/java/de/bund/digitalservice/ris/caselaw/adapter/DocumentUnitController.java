@@ -5,10 +5,12 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitListEntry;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.LinkedDocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.MailResponse;
+import de.bund.digitalservice.ris.caselaw.domain.PublicationEntry;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import de.bund.digitalservice.ris.caselaw.domain.docx.Docx2Html;
 import jakarta.validation.Valid;
 import java.nio.ByteBuffer;
+import java.util.Comparator;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -30,6 +32,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @RestController
@@ -151,11 +154,9 @@ public class DocumentUnitController {
 
   @GetMapping(value = "/{uuid}/publish", produces = MediaType.APPLICATION_JSON_VALUE)
   @PreAuthorize("@userHasReadAccessByDocumentUnitUuid.apply(#uuid)")
-  public Mono<ResponseEntity<MailResponse>> getLastPublishedXml(@PathVariable UUID uuid) {
-    return service
-        .getLastPublishedXmlMail(uuid)
-        .map(ResponseEntity::ok)
-        .doOnError(ex -> ResponseEntity.internalServerError().build());
+  public Flux<PublicationEntry> getPublicationHistory(@PathVariable UUID uuid) {
+    return Flux.concat(service.getPublicationReports(uuid), service.getPublications(uuid))
+        .sort(Comparator.comparing(PublicationEntry::getDate).reversed());
   }
 
   @PutMapping(value = "/search")

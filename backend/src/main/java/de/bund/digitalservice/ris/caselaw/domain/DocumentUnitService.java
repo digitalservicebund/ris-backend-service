@@ -46,6 +46,7 @@ import software.amazon.awssdk.services.s3.model.PutObjectResponse;
 public class DocumentUnitService {
 
   private final DocumentUnitRepository repository;
+  private final PublicationReportRepository publishReportRepository;
   private final DocumentNumberService documentNumberService;
   private final S3AsyncClient s3AsyncClient;
   private final EmailPublishService publishService;
@@ -62,13 +63,15 @@ public class DocumentUnitService {
       DocumentNumberService documentNumberService,
       S3AsyncClient s3AsyncClient,
       EmailPublishService publishService,
-      DocumentUnitStatusService documentUnitStatusService) {
+      DocumentUnitStatusService documentUnitStatusService,
+      PublicationReportRepository publishReportRepository) {
 
     this.repository = repository;
     this.documentNumberService = documentNumberService;
     this.s3AsyncClient = s3AsyncClient;
     this.publishService = publishService;
     this.documentUnitStatusService = documentUnitStatusService;
+    this.publishReportRepository = publishReportRepository;
   }
 
   public Mono<DocumentUnit> generateNewDocumentUnit(DocumentationOffice documentationOffice) {
@@ -332,8 +335,12 @@ public class DocumentUnitService {
                         }));
   }
 
-  public Mono<MailResponse> getLastPublishedXmlMail(UUID documentUuid) {
-    return publishService.getLastPublishedXml(documentUuid);
+  public Flux<MailResponse> getPublications(UUID documentUuid) {
+    return publishService.getPublicationMails(documentUuid);
+  }
+
+  public Flux<PublicationReport> getPublicationReports(UUID documentUuid) {
+    return publishReportRepository.getAllForDocumentUnit(documentUuid);
   }
 
   public <T extends LinkedDocumentationUnit> Mono<Page<T>> searchByLinkedDocumentationUnit(

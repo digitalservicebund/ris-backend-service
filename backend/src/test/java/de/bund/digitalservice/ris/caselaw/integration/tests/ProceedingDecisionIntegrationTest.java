@@ -19,6 +19,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumen
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentUnitStatusRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentationOfficeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentationUnitLinkRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabasePublicationReportRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitMetadataDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitStatusDTO;
@@ -27,6 +28,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentationUn
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.FileNumberDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.FileNumberRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.PostgresDocumentUnitRepositoryImpl;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.PostgresPublishReportRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DatabaseDocumentTypeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DocumentTypeDTO;
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
@@ -70,6 +72,7 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
       DatabaseDocumentUnitStatusService.class,
       DatabaseDocumentNumberService.class,
       PostgresDocumentUnitRepositoryImpl.class,
+      PostgresPublishReportRepositoryImpl.class,
       FlywayConfig.class,
       PostgresConfig.class,
       SecurityConfig.class,
@@ -99,6 +102,8 @@ class ProceedingDecisionIntegrationTest {
   @Autowired private DatabaseDocumentationOfficeRepository documentationOfficeRepository;
   @Autowired private DatabaseDocumentUnitStatusRepository statusRepository;
 
+  @Autowired private DatabasePublicationReportRepository databasePublishReportRepository;
+
   @MockBean UserService userService;
   @MockBean ReactiveClientRegistrationRepository clientRegistrationRepository;
   @MockBean private S3AsyncClient s3AsyncClient;
@@ -124,6 +129,7 @@ class ProceedingDecisionIntegrationTest {
     fileNumberRepository.deleteAll().block();
     databaseDocumentTypeRepository.deleteAll().block();
     statusRepository.deleteAll().block();
+    databasePublishReportRepository.deleteAll().block();
   }
 
   // This test is flaky if executed locally, but reliable in the pipeline

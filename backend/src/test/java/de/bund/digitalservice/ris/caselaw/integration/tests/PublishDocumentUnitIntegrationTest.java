@@ -16,10 +16,12 @@ import de.bund.digitalservice.ris.caselaw.adapter.XmlEMailPublishService;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentUnitRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentUnitStatusRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentationOfficeRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabasePublicationReportRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseXmlMailRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitStatusDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.PostgresDocumentUnitRepositoryImpl;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.PostgresPublishReportRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.PostgresXmlMailRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.XmlMailDTO;
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
@@ -57,6 +59,7 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
       DatabaseDocumentNumberService.class,
       PostgresDocumentUnitRepositoryImpl.class,
       PostgresXmlMailRepositoryImpl.class,
+      PostgresPublishReportRepositoryImpl.class,
       XmlEMailPublishService.class,
       DatabaseDocumentUnitStatusService.class,
       MockXmlExporter.class,
@@ -89,6 +92,7 @@ class PublishDocumentUnitIntegrationTest {
   @Autowired private DatabaseXmlMailRepository xmlMailRepository;
   @Autowired private DatabaseDocumentUnitStatusRepository documentUnitStatusRepository;
   @Autowired private DatabaseDocumentationOfficeRepository documentationOfficeRepository;
+  @Autowired private DatabasePublicationReportRepository databasePublishReportRepository;
 
   @MockBean ReactiveClientRegistrationRepository clientRegistrationRepository;
   @MockBean private S3AsyncClient s3AsyncClient;
@@ -107,6 +111,7 @@ class PublishDocumentUnitIntegrationTest {
     xmlMailRepository.deleteAll().block();
     repository.deleteAll().block();
     documentUnitStatusRepository.deleteAll().block();
+    databasePublishReportRepository.deleteAll().block();
   }
 
   @Test
@@ -288,8 +293,9 @@ class PublishDocumentUnitIntegrationTest {
             "text.xml",
             null,
             PublishState.SENT);
-    XmlMailResponse expectedXmlResultObject =
-        new XmlMailResponse(documentUnitUuid1, expectedXmlMail);
+    XmlMailResponse[] expectedXmlResultObject = {
+      new XmlMailResponse(documentUnitUuid1, expectedXmlMail)
+    };
 
     risWebTestClient
         .withDefaultLogin()
@@ -298,7 +304,7 @@ class PublishDocumentUnitIntegrationTest {
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(XmlMailResponse.class)
+        .expectBody(XmlMailResponse[].class)
         .consumeWith(
             response -> {
               assertThat(response.getResponseBody())

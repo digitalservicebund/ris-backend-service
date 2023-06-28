@@ -3,6 +3,7 @@ package de.bund.digitalservice.ris.caselaw.adapter;
 import de.bund.digitalservice.ris.caselaw.domain.FeatureToggleService;
 import io.getunleash.Unleash;
 import java.util.List;
+import reactor.core.publisher.Mono;
 
 public class UnleashService implements FeatureToggleService {
   private final Unleash unleash;
@@ -17,7 +18,7 @@ public class UnleashService implements FeatureToggleService {
   }
 
   @Override
-  public Boolean isEnabled(String toggleName) {
-    return unleash.isEnabled(toggleName);
+  public Mono<Boolean> isEnabled(String toggleName) {
+    return Mono.just(unleash.isEnabled(toggleName));
   }
 }
