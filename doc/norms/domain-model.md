@@ -7,27 +7,9 @@ classDiagram
     +List~MetadataSection~ metadataSections
     +List~Article~ articles
 
-    +String officialLongTitle
-    String risAbbreviation
-    String documentNumber
-    String documentCategory
-
-    String officialShortTitle
-    String officialAbbreviation
-
     Date announcementDate
     Date publicationDate
 
-    String completeCitation
-
-
-    String applicationScopeArea
-    Date applicationScopeStartDate
-    Date applicationScopeEndDate
-
-    String celexNumber
-
-    String text
     List~FileReference~ files
   }
 
@@ -194,6 +176,14 @@ classDiagram
     OTHER_TYPE
     NOTE
     ARTICLE
+    OFFICIAL_LONG_TITLE
+    RIS_ABBREVIATION
+    DOCUMENT_NUMBER
+    DOCUMENT_CATEGORY
+    OFFICIAL_SHORT_TITLE
+    OFFICIAL_ABBREVIATION
+    COMPLETE_CITATION
+    CELEX_NUMBER
   }
 
   class FileReference {

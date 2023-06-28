@@ -356,6 +356,14 @@ components:
         - OTHER_TYPE
         - NOTE
         - ARTICLE
+        - OFFICIAL_LONG_TITLE
+        - RIS_ABBREVIATION
+        - DOCUMENT_NUMBER
+        - DOCUMENT_CATEGORY
+        - OFFICIAL_SHORT_TITLE
+        - OFFICIAL_ABBREVIATION
+        - COMPLETE_CITATION
+        - CELEX_NUMBER
 
     MetadataSectionName:
       description: A field that indicates the name of the section
@@ -496,46 +504,8 @@ components:
     NormFrame:
       type: object
       properties:
-        officialLongTitle:
-          type: string
-          example: Gesetz über die Beschaffung sauberer Straßenfahrzeuge
-        officialShortTitle:
-          type: string
-          example: Saubere-Fahrzeuge-Beschaffungs-Gesetz
-        officialAbbreviation:
-          type: string
-          example: SaubFahrzeugBeschG
-        announcementDate:
-          $ref: '#/components/schemas/Date'
-        documentNumber:
-          type: string
-          example: ''
-        documentCategory:
-          type: string
-          example: ''
-        applicationScopeArea:
-          type: string
-          example: ''
-        applicationScopeStartDate:
-          $ref: '#/components/schemas/Date'
-        applicationScopeEndDate:
-          $ref: '#/components/schemas/Date'
-        celexNumber:
-          type: string
-          example: ''
-        risAbbreviation:
-          type: string
-          example: SaubFahrzeugBeschG
-        text:
-          type: string
-          example: text
-        publicationDate:
-          $ref: '#/components/schemas/Date'
         eli:
           $ref: '#/components/schemas/ELI'
-        completeCitation:
-          type: string
-          example: ''
         metadataSections:
           type: array
           items:
