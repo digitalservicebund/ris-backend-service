@@ -9,7 +9,7 @@ fileignoreconfig:
   ignore_detectors:
   - filecontent
 - filename: backend/src/test/java/de/bund/digitalservice/ris/caselaw/integration/tests/JurisXmlExporterWrapperIntegrationTest.java
-  checksum: aef09e19607dd38224eaa2c6cfd373d8d4079e61c29700a2a53fda4c7e2666c8
+  checksum: 9531ef9b0030e54598293518e8478fdf919ddce3f93e97278abb11b6c0e8c62f
 - filename: backend/src/test/kotlin/unit/adapter/input/restapi/controller/GenerateNormFileControllerTest.kt
   checksum: db0495a69e3732e28fadbdefb86602909400296a2557cc892a932115ca3c46f5
 - filename: doc/norms/backend-api.yaml
