@@ -17,7 +17,7 @@ import org.springframework.data.relational.core.mapping.Table;
 public class NormAbbreviationDocumentTypeDTO implements Persistable<UUID> {
   private UUID normAbbreviationId;
   private UUID documentTypeId;
-  @Transient private boolean newEntity = false;
+  @Transient private boolean newEntity;
 
   @Override
   public UUID getId() {

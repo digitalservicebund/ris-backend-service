@@ -30,7 +30,7 @@ public class DocumentTypeNewDTO implements Persistable<UUID> {
 
   private UUID documentCategoryId;
   @Transient private Character categoryLabel;
-  @Transient private boolean newEntity = false;
+  @Transient private boolean newEntity;
 
   @Override
   public boolean isNew() {

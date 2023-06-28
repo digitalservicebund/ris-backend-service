@@ -29,7 +29,7 @@ public class NormAbbreviationDTO implements Persistable<UUID> {
   Character source;
   @Transient List<DocumentTypeNewDTO> documentTypes;
   @Transient List<RegionDTO> regions;
-  @Transient boolean newEntity = false;
+  @Transient boolean newEntity;
 
   @Override
   public boolean isNew() {

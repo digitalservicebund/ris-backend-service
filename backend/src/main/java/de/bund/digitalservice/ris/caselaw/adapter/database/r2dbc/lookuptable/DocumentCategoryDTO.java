@@ -18,7 +18,7 @@ import org.springframework.data.relational.core.mapping.Table;
 public class DocumentCategoryDTO implements Persistable<UUID> {
   @Id private UUID id;
   private Character label;
-  @Transient private boolean newEntity = false;
+  @Transient private boolean newEntity;
 
   @Override
   public boolean isNew() {
