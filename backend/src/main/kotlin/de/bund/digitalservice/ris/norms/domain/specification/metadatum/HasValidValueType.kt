@@ -9,11 +9,15 @@ import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.ANNOUNCEMENT_
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.APPENDIX
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.AREA_OF_PUBLICATION
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.ARTICLE
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.CELEX_NUMBER
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.COMPLETE_CITATION
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.DATE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.DECIDING_BODY
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.DEFINITION
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.DESCRIPTION
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.DIVERGENT_DOCUMENT_NUMBER
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.DOCUMENT_CATEGORY
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.DOCUMENT_NUMBER
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.EDITION
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.ENTITY
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.ENTRY_INTO_FORCE_DATE_NOTE
@@ -35,6 +39,9 @@ import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.NORM_CATEGORY
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.NOTE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.NUMBER
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.NUMBER_OF_THE_PUBLICATION_IN_THE_RESPECTIVE_AREA
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.OFFICIAL_ABBREVIATION
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.OFFICIAL_LONG_TITLE
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.OFFICIAL_SHORT_TITLE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.OTHER_OFFICIAL_REFERENCE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.OTHER_TYPE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.PAGE
@@ -48,6 +55,7 @@ import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.REFERENCE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.REFERENCE_NUMBER
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.RELATED_DATA
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.RESOLUTION_MAJORITY
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.RIS_ABBREVIATION
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.RIS_ABBREVIATION_INTERNATIONAL_LAW
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.SERIES
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.SUBJECT_BGB_3
@@ -87,7 +95,9 @@ val hasValidValueType =
                 SERIES, DECIDING_BODY, EU_GOVERNMENT_GAZETTE, OTHER_OFFICIAL_REFERENCE, ENTITY,
                 TYPE_NAME, TEMPLATE_NAME, EDITION, TEXT, LINK, RELATED_DATA, EXTERNAL_DATA_NOTE, APPENDIX, FOOTNOTE_REFERENCE, FOOTNOTE_CHANGE,
                 FOOTNOTE_COMMENT, FOOTNOTE_DECISION, FOOTNOTE_STATE_LAW, FOOTNOTE_EU_LAW, FOOTNOTE_OTHER,
-                WORK_NOTE, DESCRIPTION, REFERENCE, ENTRY_INTO_FORCE_DATE_NOTE, NOTE, ARTICLE,
+                WORK_NOTE, DESCRIPTION, REFERENCE, ENTRY_INTO_FORCE_DATE_NOTE, NOTE, ARTICLE, OFFICIAL_LONG_TITLE,
+                OFFICIAL_SHORT_TITLE, OFFICIAL_ABBREVIATION, DOCUMENT_NUMBER, DOCUMENT_CATEGORY, COMPLETE_CITATION,
+                CELEX_NUMBER, RIS_ABBREVIATION,
                 -> instance.value is String
 
                 DATE -> instance.value is LocalDate
