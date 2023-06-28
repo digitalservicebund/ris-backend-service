@@ -27,6 +27,7 @@ const props = defineProps<{
 const emit = defineEmits<Emits>()
 const activeCitation = ref(props.modelValue as ActiveCitation)
 const validationErrors = ref<ValidationError[]>()
+const searchRunning = ref(false)
 
 const activeCitationStyle = computed({
   get: () =>
@@ -79,6 +80,12 @@ async function search(page = 0) {
       }
     })
   }
+  searchRunning.value = false
+}
+
+function handleSearch() {
+  searchRunning.value = true
+  search(0)
 }
 
 async function validateRequiredInput(citation: ActiveCitation) {
@@ -203,7 +210,7 @@ onMounted(() => {
         button-type="secondary"
         class="mr-28"
         label="Suchen"
-        @click="search(0)"
+        @click="handleSearch"
       />
       <TextButton
         aria-label="Aktivzitierung speichern"
@@ -223,6 +230,12 @@ onMounted(() => {
           @link-decision="addActiveCitationFromSearch"
         />
       </Pagination>
+    </div>
+    <div
+      v-if="searchRunning && !searchResultsCurrentPage"
+      class="mb-10 ml-40 mt-20"
+    >
+      ... Suche läuft ...
     </div>
   </div>
 </template>
