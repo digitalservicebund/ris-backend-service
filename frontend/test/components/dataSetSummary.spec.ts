@@ -44,18 +44,44 @@ describe("DataSetSummary", () => {
   })
 
   it("summarizes simple data set entries using the string conversion", () => {
-    renderComponent({ data: ["foo", 1, true] })
+    renderComponent({ data: ["foo", 1, true, "2020-01-01"] })
 
     const stringSummary = screen.queryByText("foo", { exact: true })
     const numberSummary = screen.queryByText("1", { exact: true })
     const booleanSummary = screen.queryByText("true", { exact: true })
+    const dateSummary = screen.queryByText("01.01.2020", { exact: true })
 
     expect(stringSummary).toBeInTheDocument()
     expect(numberSummary).toBeInTheDocument()
     expect(booleanSummary).toBeInTheDocument()
+    expect(dateSummary).toBeInTheDocument()
   })
 
-  it(" summarizes data set entries that are lists with a comma separator", () => {
+  it("summarizes data set entries that are dates in the YYYY-MM-DD format as formatted dates", () => {
+    renderComponent({ data: ["2020-01-01"] })
+
+    const summary = screen.queryByText("01.01.2020")
+
+    expect(summary).toBeInTheDocument()
+  })
+
+  it("summarizes data set entries that are serialized dates in ISO format as formatted dates", () => {
+    renderComponent({ data: ["2020-01-01T00:00:00.000Z"] })
+
+    const summary = screen.queryByText("01.01.2020")
+
+    expect(summary).toBeInTheDocument()
+  })
+
+  it("displays data set entries fail to serialize as valid dates as strings", () => {
+    renderComponent({ data: ["2022-0123-01"] })
+
+    const summary = screen.queryByText("2022-0123-01", { exact: true })
+
+    expect(summary).toBeInTheDocument()
+  })
+
+  it("summarizes data set entries that are lists with a comma separator", () => {
     renderComponent({ data: [["foo", "bar", "baz"]] })
 
     const summary = screen.queryByText("foo, bar, baz")
