@@ -638,27 +638,25 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
                         activeCitationDocumentationUnitDTO ->
                             updateLinkedDocumentationUnit(
                                 activeCitationDocumentationUnitDTO, activeCitation))
-                    .flatMap(
-                        documentUnitMetadataDTO ->
-                            documentationUnitLinkRepository
-                                .findByParentDocumentationUnitUuidAndChildDocumentationUnitUuidAndType(
-                                    documentUnitDTO.getUuid(),
-                                    documentUnitMetadataDTO.getUuid(),
-                                    DocumentationUnitLinkType.ACTIVE_CITATION)
-                                .flatMap(
-                                    documentationUnitLinkDTO -> {
-                                      UUID citationStyleUuid = null;
+                    .then(
+                        documentationUnitLinkRepository
+                            .findByParentDocumentationUnitUuidAndChildDocumentationUnitUuidAndType(
+                                documentUnitDTO.getUuid(),
+                                activeCitation.getUuid(),
+                                DocumentationUnitLinkType.ACTIVE_CITATION)
+                            .flatMap(
+                                documentationUnitLinkDTO -> {
+                                  UUID citationStyleUuid = null;
 
-                                      if (activeCitation.getCitationStyle() != null) {
-                                        citationStyleUuid =
-                                            activeCitation.getCitationStyle().uuid();
-                                      }
+                                  if (activeCitation.getCitationStyle() != null) {
+                                    citationStyleUuid = activeCitation.getCitationStyle().uuid();
+                                  }
 
-                                      return documentationUnitLinkRepository.save(
-                                          documentationUnitLinkDTO.toBuilder()
-                                              .citationStyleUuid(citationStyleUuid)
-                                              .build());
-                                    }));
+                                  return documentationUnitLinkRepository.save(
+                                      documentationUnitLinkDTO.toBuilder()
+                                          .citationStyleUuid(citationStyleUuid)
+                                          .build());
+                                }));
               }
             })
         .then(
