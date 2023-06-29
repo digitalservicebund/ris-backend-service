@@ -39,7 +39,7 @@ function decisionSummarizer(activeCitation: ActiveCitation) {
               params: { documentNumber: activeCitation.documentNumber },
             },
           },
-          activeCitation.renderDecision
+          () => activeCitation.renderDecision
         )
       : activeCitation.hasMissingRequiredFields
       ? h("div", { class: ["flex flex-row items-center"] }, [

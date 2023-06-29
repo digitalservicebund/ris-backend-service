@@ -143,7 +143,7 @@ function decisionSummarizer(dataEntry: ProceedingDecision) {
               params: { documentNumber: dataEntry.documentNumber },
             },
           },
-          dataEntry.renderDecision
+          () => dataEntry.renderDecision
         )
       : h("span", { class: ["link-02-reg"] }, dataEntry.renderDecision),
   ])
