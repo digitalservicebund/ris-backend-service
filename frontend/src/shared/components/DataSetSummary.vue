@@ -1,5 +1,4 @@
 <script lang="ts" setup generic="T">
-import dayjs from "dayjs"
 import { computed, h, defineComponent } from "vue"
 import type { VNode } from "vue"
 import Ourselves from "@/shared/components/DataSetSummary.vue"
@@ -25,10 +24,7 @@ function wrappedSummarizer(dataEntry: T): VNode {
 <script lang="ts">
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function defaultSummarizer(dataEntry: any): string {
-  if (typeof dataEntry == "string") {
-    const maybeDate = dayjs(dataEntry)
-    return maybeDate.isValid() ? maybeDate.format("DD.MM.YYYY") : dataEntry
-  } else if (["boolean", "number"].includes(typeof dataEntry)) {
+  if (["string", "boolean", "number"].includes(typeof dataEntry)) {
     return `${dataEntry}`
   } else if (Array.isArray(dataEntry)) {
     return dataEntry
