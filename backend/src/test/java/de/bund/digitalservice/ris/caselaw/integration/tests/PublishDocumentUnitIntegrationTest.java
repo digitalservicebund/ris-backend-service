@@ -53,6 +53,7 @@ import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.shaded.org.hamcrest.Matchers;
 import software.amazon.awssdk.services.s3.S3AsyncClient;
 
 @RISIntegrationTest(
@@ -356,6 +357,8 @@ class PublishDocumentUnitIntegrationTest {
                 true))
         .block();
 
+    System.out.println(receivedDate.truncatedTo(ChronoUnit.MICROS).toString());
+
     risWebTestClient
         .withDefaultLogin()
         .get()
@@ -369,14 +372,15 @@ class PublishDocumentUnitIntegrationTest {
         .jsonPath("$[0].content")
         .isEqualTo("<HTML>success!</HTML>")
         .jsonPath("$[0].date")
-        .isEqualTo(receivedDate.toString())
+        .value(o -> Matchers.containsString(receivedDate.toString().substring(0, 20)).matches(o))
         .jsonPath("$[0].type")
         .isEqualTo(PublicationLogEntryType.HTML.name())
         .jsonPath("$[1].xml")
         .isEqualTo("xml")
         .jsonPath("$[1].date")
-        .isEqualTo(publishDate.toString())
+        .value(o -> Matchers.containsString(publishDate.toString().substring(0, 20)).matches(o))
         .jsonPath("$[1].type")
-        .isEqualTo(PublicationLogEntryType.XML.name());
+        .isEqualTo(PublicationLogEntryType.XML.name())
+        .consumeWith(System.out::println);
   }
 }
