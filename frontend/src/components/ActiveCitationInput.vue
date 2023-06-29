@@ -117,6 +117,21 @@ async function addActiveCitationFromSearch(decision: LinkedDocumentUnit) {
   })
   emit("update:modelValue", decisionWithCitationStyle)
   emit("closeEntry")
+  scrollToTop()
+}
+
+function scrollToTop() {
+  const element = document.getElementById("activeCitations")
+  if (element) {
+    const headerOffset = 170
+    const elementPosition = element?.getBoundingClientRect().top
+    const offsetPosition = elementPosition + window.pageYOffset - headerOffset
+
+    window.scrollTo({
+      top: offsetPosition,
+      behavior: "smooth",
+    })
+  }
 }
 
 onMounted(() => {

@@ -63,7 +63,7 @@ const CitationsSummary = withSummarizer(decisionSummarizer)
 
 <template>
   <div class="bg-white p-16">
-    <h2 class="label-02-bold mb-[1rem]">Aktivzitierung</h2>
+    <h2 id="activeCitations" class="label-02-bold mb-[1rem]">Aktivzitierung</h2>
     <div class="flex flex-row">
       <div class="flex-1">
         <EditableList
