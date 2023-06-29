@@ -126,4 +126,15 @@ describe("InputField", () => {
 
     expect(spanLabelSecondPart.contains(spanLabelRequired)).toBe(true)
   })
+
+  it("updates the label when the label prop changes", async () => {
+    const { rerender } = renderComponent({ label: "test label" })
+
+    const label = screen.queryByText("test label", { exact: false })
+    expect(label).toBeInTheDocument()
+
+    await rerender({ label: "new label" })
+    const newLabel = screen.queryByText("new label", { exact: false })
+    expect(newLabel).toBeInTheDocument()
+  })
 })

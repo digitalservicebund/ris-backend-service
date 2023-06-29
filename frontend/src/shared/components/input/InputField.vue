@@ -25,9 +25,9 @@ const wrapperClasses = computed(() => ({
     props.labelPosition === LabelPosition.LEFT,
 }))
 
-const labelConverted = Array.isArray(props.label)
-  ? props.label
-  : Array.of(props.label)
+const labelConverted = computed(() =>
+  Array.isArray(props.label) ? props.label : Array.of(props.label)
+)
 </script>
 
 <script lang="ts">
