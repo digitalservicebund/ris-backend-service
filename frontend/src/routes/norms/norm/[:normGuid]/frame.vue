@@ -23,6 +23,8 @@ import ParticipatingInstitutionInputGroup from "@/components/ParticipatingInstit
 import PrincipleEntryIntoForceInputGroup from "@/components/PrincipleEntryIntoForceInputGroup.vue"
 import PrincipleExpirationInputGroup from "@/components/PrincipleExpirationInputGroup.vue"
 import SingleDataFieldSection from "@/components/SingleDataFieldSection.vue"
+import StatusIndicationInputGroup from "@/components/statusIndication/StatusIndicationInputGroup.vue"
+import { summarizeStatusIndication } from "@/components/statusIndication/summarizer"
 import SubjectAreaInputGroup from "@/components/SubjectAreaInputGroup.vue"
 import { useScrollToHash } from "@/composables/useScrollToHash"
 import {
@@ -31,13 +33,8 @@ import {
   MetadataSections,
   UndefinedDate,
 } from "@/domain/Norm"
-import { otherStatusNote } from "@/fields/norms/otherStatusNote"
-import { reissue } from "@/fields/norms/reissue"
-import { repeal } from "@/fields/norms/repeal"
-import { status } from "@/fields/norms/status"
 import { withSummarizer } from "@/shared/components/DataSetSummary.vue"
 import EditableList from "@/shared/components/EditableList.vue"
-import InputGroup from "@/shared/components/input/InputGroup.vue"
 import SaveButton from "@/shared/components/input/SaveButton.vue"
 import { InputType } from "@/shared/components/input/types"
 import { useLoadedNormStore } from "@/stores/loadedNorm"
@@ -600,6 +597,7 @@ const GeneralSummary = withSummarizer(GeneralSummarizer)
 const ParticipationSummary = withSummarizer(participationSummarizer)
 const SubjectAreaSummary = withSummarizer(subjectAreaSummarizer)
 const footnoteLineSummary = withSummarizer(summarizeFootnotePerLine)
+const StatusIndicationSummary = withSummarizer(summarizeStatusIndication)
 </script>
 
 <template>
@@ -924,40 +922,21 @@ const footnoteLineSummary = withSummarizer(summarizeFootnotePerLine)
       label="Vollzitat"
     />
 
-    <h2 id="statusIndicationFields" class="heading-02-regular mb-[1rem] mt-32">
-      Stand-Angabe
-    </h2>
-    <fieldset>
-      <legend id="statusFields" class="heading-03-regular mb-[1rem]">
-        Stand
-      </legend>
-      <InputGroup v-model="flatMetadata" :column-count="1" :fields="status" />
-    </fieldset>
-
-    <fieldset>
-      <legend id="repealFields" class="heading-03-regular mb-[1rem]">
-        Aufhebung
-      </legend>
-      <InputGroup v-model="flatMetadata" :column-count="1" :fields="repeal" />
-    </fieldset>
-
-    <fieldset>
-      <legend id="reissueFields" class="heading-03-regular mb-[1rem]">
-        Neufassung
-      </legend>
-      <InputGroup v-model="flatMetadata" :column-count="1" :fields="reissue" />
-    </fieldset>
-
-    <fieldset>
-      <legend id="otherStatusNoteFields" class="heading-03-regular mb-[1rem]">
-        Sonstiger Hinweis
-      </legend>
-      <InputGroup
-        v-model="flatMetadata"
-        :column-count="1"
-        :fields="otherStatusNote"
+    <ExpandableDataSet
+      id="statusIndication"
+      border-bottom
+      :data-set="metadataSections.STATUS_INDICATION"
+      :summary-component="StatusIndicationSummary"
+      test-id="a11y-expandable-dataset"
+      title="Stand-Angabe"
+    >
+      <EditableList
+        v-model="metadataSections.STATUS_INDICATION"
+        :default-value="{}"
+        :edit-component="StatusIndicationInputGroup"
+        :summary-component="StatusIndicationSummary"
       />
-    </fieldset>
+    </ExpandableDataSet>
 
     <ExpandableDataSet
       id="documentStatus"
