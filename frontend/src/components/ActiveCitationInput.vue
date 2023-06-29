@@ -109,7 +109,7 @@ async function addActiveCitation() {
 
 async function addActiveCitationFromSearch(decision: LinkedDocumentUnit) {
   const newActiveCitationStyle = {
-    ...activeCitationStyle.value,
+    ...activeCitationStyle.value?.value,
   } as CitationStyle
   const decisionWithCitationStyle = new ActiveCitation({
     ...decision,
