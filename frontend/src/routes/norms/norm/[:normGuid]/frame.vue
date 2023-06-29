@@ -60,6 +60,53 @@ const normSection = computed({
   set: (section: Metadata) => (metadataSections.value.NORM = [section]),
 })
 
+const officialLongTitle = computed({
+  get: () => normSection.value.OFFICIAL_LONG_TITLE?.[0] ?? "",
+  set: (title: string) => (normSection.value.OFFICIAL_LONG_TITLE = [title]),
+})
+
+const officialShortTitle = computed({
+  get: () => normSection.value.OFFICIAL_SHORT_TITLE?.[0] ?? "",
+  set: (title: string) => (normSection.value.OFFICIAL_SHORT_TITLE = [title]),
+})
+
+const completeCitation = computed({
+  get: () => normSection.value.COMPLETE_CITATION?.[0] ?? "",
+  set: (citation: string) => (normSection.value.COMPLETE_CITATION = [citation]),
+})
+
+const celexNumber = computed({
+  get: () => normSection.value.CELEX_NUMBER?.[0] ?? "",
+  set: (number: string) => (normSection.value.CELEX_NUMBER = [number]),
+})
+
+const text = computed({
+  get: () => normSection.value.TEXT?.[0] ?? "",
+  set: (text: string) => (normSection.value.TEXT = [text]),
+})
+
+const officialAbbreviation = computed({
+  get: () => normSection.value.OFFICIAL_ABBREVIATION?.[0] ?? "",
+  set: (abbreviation: string) =>
+    (normSection.value.OFFICIAL_ABBREVIATION = [abbreviation]),
+})
+
+const risAbbreviation = computed({
+  get: () => normSection.value.RIS_ABBREVIATION?.[0] ?? "",
+  set: (abbreviation: string) =>
+    (normSection.value.RIS_ABBREVIATION = [abbreviation]),
+})
+
+const documentNumber = computed({
+  get: () => normSection.value.DOCUMENT_NUMBER?.[0] ?? "",
+  set: (number: string) => (normSection.value.DOCUMENT_NUMBER = [number]),
+})
+
+const documentCategory = computed({
+  get: () => normSection.value.DOCUMENT_CATEGORY?.[0] ?? "",
+  set: (category: string) => (normSection.value.DOCUMENT_CATEGORY = [category]),
+})
+
 const flatMetadata = ref<FlatMetadata>({} as FlatMetadata)
 
 watch(
@@ -77,15 +124,7 @@ watch(
   flatMetadata,
   (data) => {
     if (loadedNorm.value !== undefined && data !== undefined) {
-      loadedNorm.value.celexNumber = data.celexNumber as string
-      loadedNorm.value.completeCitation = data.completeCitation as string
-      loadedNorm.value.documentCategory = data.documentCategory as string
-      loadedNorm.value.documentNumber = data.documentNumber as string
       loadedNorm.value.eli = data.eli as string
-      loadedNorm.value.officialAbbreviation =
-        data.officialAbbreviation as string
-      loadedNorm.value.officialLongTitle = data.officialLongTitle as string
-      loadedNorm.value.officialShortTitle = data.officialShortTitle as string
       loadedNorm.value.otherStatusNote = data.otherStatusNote as string
       loadedNorm.value.announcementDate = data.announcementDate as string
       loadedNorm.value.publicationDate = data.publicationDate as string
@@ -97,12 +136,10 @@ watch(
       loadedNorm.value.repealDate = data.repealDate as string
       loadedNorm.value.repealNote = data.repealNote as string
       loadedNorm.value.repealReferences = data.repealReferences as string
-      loadedNorm.value.risAbbreviation = data.risAbbreviation as string
       loadedNorm.value.statusDate = data.statusDate as string
       loadedNorm.value.statusDescription = data.statusDescription as string
       loadedNorm.value.statusNote = data.statusNote as string
       loadedNorm.value.statusReference = data.statusReference as string
-      loadedNorm.value.text = data.text as string
     }
   },
   { deep: true }
@@ -573,14 +610,14 @@ const footnoteLineSummary = withSummarizer(summarizeFootnotePerLine)
 
     <SingleDataFieldSection
       id="officialLongTitle"
-      v-model="flatMetadata.officialLongTitle"
+      v-model="officialLongTitle"
       label="Amtliche Langüberschrift"
       :type="InputType.TEXTAREA"
     />
 
     <SingleDataFieldSection
       id="risAbbreviation"
-      v-model="flatMetadata.risAbbreviation"
+      v-model="risAbbreviation"
       label="Juris-Abkürzung"
     />
 
@@ -593,7 +630,7 @@ const footnoteLineSummary = withSummarizer(summarizeFootnotePerLine)
 
     <SingleDataFieldSection
       id="documentNumber"
-      v-model="flatMetadata.documentNumber"
+      v-model="documentNumber"
       label="Dokumentnummer"
     />
 
@@ -606,7 +643,7 @@ const footnoteLineSummary = withSummarizer(summarizeFootnotePerLine)
 
     <SingleDataFieldSection
       id="documentCategory"
-      v-model="flatMetadata.documentCategory"
+      v-model="documentCategory"
       label="Dokumentart"
     />
 
@@ -698,13 +735,13 @@ const footnoteLineSummary = withSummarizer(summarizeFootnotePerLine)
 
     <SingleDataFieldSection
       id="officialShortTitle"
-      v-model="flatMetadata.officialShortTitle"
+      v-model="officialShortTitle"
       label="Amtliche Kurzüberschrift"
     />
 
     <SingleDataFieldSection
       id="officialAbbreviation"
-      v-model="flatMetadata.officialAbbreviation"
+      v-model="officialAbbreviation"
       label="Amtliche Buchstabenabkürzung"
     />
 
@@ -883,7 +920,7 @@ const footnoteLineSummary = withSummarizer(summarizeFootnotePerLine)
 
     <SingleDataFieldSection
       id="completeCitation"
-      v-model="flatMetadata.completeCitation"
+      v-model="completeCitation"
       label="Vollzitat"
     />
 
@@ -1005,7 +1042,7 @@ const footnoteLineSummary = withSummarizer(summarizeFootnotePerLine)
 
     <SingleDataFieldSection
       id="celexNumber"
-      v-model="flatMetadata.celexNumber"
+      v-model="celexNumber"
       label="CELEX-Nummer"
     />
 
@@ -1037,11 +1074,7 @@ const footnoteLineSummary = withSummarizer(summarizeFootnotePerLine)
       :type="InputType.CHIPS"
     />
 
-    <SingleDataFieldSection
-      id="text"
-      v-model="flatMetadata.text"
-      label="Text"
-    />
+    <SingleDataFieldSection id="text" v-model="text" label="Text" />
 
     <SaveButton
       aria-label="Rahmendaten Speichern Button"

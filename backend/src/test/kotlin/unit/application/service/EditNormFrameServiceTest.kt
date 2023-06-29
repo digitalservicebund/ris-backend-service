@@ -27,7 +27,7 @@ class EditNormFrameServiceTest {
         val editNormOutputPort = mockk<EditNormOutputPort>()
         val service = EditNormFrameService(editNormOutputPort)
         val guid = UUID.randomUUID()
-        val properties = EditNormFrameUseCase.NormFrameProperties("new title", emptyList())
+        val properties = EditNormFrameUseCase.NormFrameProperties(emptyList())
         val command = EditNormFrameUseCase.Command(guid, properties)
 
         every { editNormOutputPort.editNorm(any()) } returns Mono.just(true)

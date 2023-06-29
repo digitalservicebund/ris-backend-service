@@ -14,7 +14,7 @@ class EditNormFrameCommandTest {
     @Test
     fun `can create command with GUID and new long title`() {
         val guid = UUID.randomUUID()
-        val properties = EditNormFrameUseCase.NormFrameProperties("new title", emptyList())
+        val properties = EditNormFrameUseCase.NormFrameProperties(emptyList())
         val command = EditNormFrameUseCase.Command(guid, properties)
 
         assertThat(command.guid).isEqualTo(guid)

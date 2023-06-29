@@ -91,6 +91,14 @@ export enum MetadatumType {
   OTHER_TYPE = "OTHER_TYPE",
   NOTE = "NOTE",
   ARTICLE = "ARTICLE",
+  OFFICIAL_LONG_TITLE = "OFFICIAL_LONG_TITLE",
+  RIS_ABBREVIATION = "RIS_ABBREVIATION",
+  DOCUMENT_NUMBER = "DOCUMENT_NUMBER",
+  DOCUMENT_CATEGORY = "DOCUMENT_CATEGORY",
+  OFFICIAL_SHORT_TITLE = "OFFICIAL_SHORT_TITLE",
+  OFFICIAL_ABBREVIATION = "OFFICIAL_ABBREVIATION",
+  COMPLETE_CITATION = "COMPLETE_CITATION",
+  CELEX_NUMBER = "CELEX_NUMBER",
 }
 
 export enum NormCategory {
@@ -179,6 +187,14 @@ export type MetadataValueType = {
   [MetadatumType.OTHER_TYPE]: OtherType
   [MetadatumType.NOTE]: string
   [MetadatumType.ARTICLE]: string
+  [MetadatumType.OFFICIAL_LONG_TITLE]: string
+  [MetadatumType.RIS_ABBREVIATION]: string
+  [MetadatumType.DOCUMENT_NUMBER]: string
+  [MetadatumType.DOCUMENT_CATEGORY]: string
+  [MetadatumType.OFFICIAL_SHORT_TITLE]: string
+  [MetadatumType.OFFICIAL_ABBREVIATION]: string
+  [MetadatumType.COMPLETE_CITATION]: string
+  [MetadatumType.CELEX_NUMBER]: string
 }
 
 export type Metadata = {
@@ -230,14 +246,7 @@ export type MetadataSections = {
 
 export type FlatMetadata = {
   categorizedReference?: string
-  celexNumber?: string
-  completeCitation?: string
-  documentCategory?: string
-  documentNumber?: string
   eli?: string
-  officialAbbreviation?: string
-  officialLongTitle: string
-  officialShortTitle?: string
   otherStatusNote?: string
   printAnnouncementGazette?: string
   printAnnouncementPage?: string
@@ -252,12 +261,10 @@ export type FlatMetadata = {
   repealDate?: string
   repealNote?: string
   repealReferences?: string
-  risAbbreviation?: string
   statusDate?: string
   statusDescription?: string
   statusNote?: string
   statusReference?: string
-  text?: string
 }
 
 export enum UndefinedDate {

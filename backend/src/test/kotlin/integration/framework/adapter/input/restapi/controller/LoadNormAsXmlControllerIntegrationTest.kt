@@ -92,7 +92,6 @@ class LoadNormAsXmlControllerIntegrationTest : PostgresTestcontainerIntegrationT
         )
         val norm = Norm(
             guid = UUID.randomUUID(),
-            officialLongTitle = "officialLongTitle",
             metadataSections = listOf(citationDateSection, printAnnouncementSection),
         )
         val saveCommand = SaveNormOutputPort.Command(norm)

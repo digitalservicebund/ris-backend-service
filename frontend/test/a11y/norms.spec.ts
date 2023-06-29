@@ -15,7 +15,11 @@ test.describe("a11y of a norm complex (/norms/norm/{guid})", () => {
   testWithImportedNorm("norm complex", async ({ page, normData, guid }) => {
     await page.goto(`/norms/norm/${guid}`)
     await expect(
-      page.locator(`text=${normData["officialLongTitle"]}`)
+      page.locator(
+        `text=${
+          normData.metadataSections?.NORM?.[0]?.OFFICIAL_LONG_TITLE?.[0] ?? ""
+        }`
+      )
     ).toBeVisible()
     await injectAxe(page)
     await checkA11y(page)

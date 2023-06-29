@@ -7,7 +7,6 @@ import de.bund.digitalservice.ris.norms.application.port.output.GetNormByGuidOut
 import de.bund.digitalservice.ris.norms.application.port.output.SaveFileReferenceOutputPort
 import de.bund.digitalservice.ris.norms.application.port.output.SaveNormOutputPort
 import de.bund.digitalservice.ris.norms.application.port.output.SearchNormsOutputPort
-import de.bund.digitalservice.ris.norms.application.port.output.SearchNormsOutputPort.QueryFields.OFFICIAL_LONG_TITLE
 import de.bund.digitalservice.ris.norms.domain.entity.Article
 import de.bund.digitalservice.ris.norms.domain.entity.FileReference
 import de.bund.digitalservice.ris.norms.domain.entity.MetadataSection
@@ -16,8 +15,12 @@ import de.bund.digitalservice.ris.norms.domain.entity.Norm
 import de.bund.digitalservice.ris.norms.domain.entity.Paragraph
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.CELEX_NUMBER
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.COMPLETE_CITATION
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.DATE
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.DOCUMENT_NUMBER
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.KEYWORD
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.OFFICIAL_LONG_TITLE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.PARTICIPATION_INSTITUTION
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.PARTICIPATION_TYPE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.YEAR
@@ -41,6 +44,7 @@ import org.springframework.r2dbc.core.DatabaseClient
 import reactor.test.StepVerifier
 import utils.createRandomNorm
 import utils.createSimpleSections
+import utils.factory.norm
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
@@ -88,7 +92,17 @@ class NormsServiceTest : PostgresTestcontainerIntegrationTest() {
     @Test
     fun `save a norm with a text field exceeding 255 charachters`() {
         val longTextField = (1..200).joinToString("") { "Abc" }
-        val saveCommand = SaveNormOutputPort.Command(NORM.copy(text = longTextField))
+        val norm = norm {
+            metadataSections {
+                metadataSection {
+                    name = MetadataSectionName.NORM
+                    metadata {
+                        metadatum { value = longTextField; type = MetadatumType.TEXT }
+                    }
+                }
+            }
+        }
+        val saveCommand = SaveNormOutputPort.Command(norm)
 
         normsService.saveNorm(saveCommand)
             .`as`(StepVerifier::create)
@@ -99,7 +113,7 @@ class NormsServiceTest : PostgresTestcontainerIntegrationTest() {
     @Test
     fun `save simple norm and verify it was saved with a search to get all norms`() {
         val saveCommand = SaveNormOutputPort.Command(NORM)
-        val getAllQuery = SearchNormsOutputPort.Query(emptyList())
+        val getAllQuery = SearchNormsOutputPort.Query("")
 
         normsService.searchNorms(getAllQuery)
             .`as`(StepVerifier::create)
@@ -121,16 +135,16 @@ class NormsServiceTest : PostgresTestcontainerIntegrationTest() {
     fun `the search norm result includes their ELI property`() {
         val page = Metadatum("1125", MetadatumType.PAGE)
         val gazette = Metadatum("bg-1", MetadatumType.ANNOUNCEMENT_GAZETTE)
+        val officialLongTitle = Metadatum("test title", MetadatumType.OFFICIAL_LONG_TITLE)
         val printAnnouncement = MetadataSection(MetadataSectionName.PRINT_ANNOUNCEMENT, listOf(page, gazette))
         val officialReference = MetadataSection(MetadataSectionName.OFFICIAL_REFERENCE, emptyList(), 1, listOf(printAnnouncement))
+        val normSection = MetadataSection(MetadataSectionName.NORM, listOf(officialLongTitle))
         val normWithEli = NORM.copy(
-            officialLongTitle = "test title",
             announcementDate = LocalDate.parse("2022-02-02"),
-            metadataSections = listOf(officialReference),
+            metadataSections = listOf(officialReference, normSection),
         )
         val saveCommand = SaveNormOutputPort.Command(normWithEli)
-        val parameter = SearchNormsOutputPort.QueryParameter(OFFICIAL_LONG_TITLE, "test title")
-        val searchQuery = SearchNormsOutputPort.Query(listOf(parameter))
+        val searchQuery = SearchNormsOutputPort.Query(officialLongTitle.value)
 
         assertThat(normWithEli.eli.toString()).isNotNull()
 
@@ -143,6 +157,7 @@ class NormsServiceTest : PostgresTestcontainerIntegrationTest() {
             .`as`(StepVerifier::create)
             .assertNext {
                 assertThat(it.eli.toString()).isNotEqualTo("")
+                assertThat(it.metadataSections.first { it.name == MetadataSectionName.NORM }.metadata.first { it.type == OFFICIAL_LONG_TITLE }).isEqualTo(officialLongTitle)
             }
             .verifyComplete()
     }
@@ -162,7 +177,6 @@ class NormsServiceTest : PostgresTestcontainerIntegrationTest() {
             guid = UUID.randomUUID(),
             articles = listOf(),
             metadataSections = listOf(referenceSection1),
-            officialLongTitle = "Test Title",
             announcementDate = LocalDate.parse("2022-02-02"),
         )
         val saveCommand = SaveNormOutputPort.Command(norm)
@@ -193,7 +207,6 @@ class NormsServiceTest : PostgresTestcontainerIntegrationTest() {
             guid = UUID.randomUUID(),
             articles = listOf(),
             metadataSections = listOf(referenceSection1),
-            officialLongTitle = "Test Title",
             announcementDate = LocalDate.parse("2022-02-02"),
         )
         val printAnnouncementSection2 = MetadataSection(
@@ -208,7 +221,6 @@ class NormsServiceTest : PostgresTestcontainerIntegrationTest() {
             guid = UUID.randomUUID(),
             articles = listOf(),
             metadataSections = listOf(referenceSection2),
-            officialLongTitle = "Test Title 2",
             announcementDate = LocalDate.parse("2022-02-02"),
         )
         val saveFirstNormCommand = SaveNormOutputPort.Command(firstNorm)
@@ -246,7 +258,6 @@ class NormsServiceTest : PostgresTestcontainerIntegrationTest() {
         val norm = Norm(
             guid = UUID.randomUUID(),
             articles = listOf(),
-            officialLongTitle = "Test Title",
             metadataSections = listOf(citationDateSection, referenceSection1),
         )
         val saveCommand = SaveNormOutputPort.Command(norm)
@@ -278,7 +289,6 @@ class NormsServiceTest : PostgresTestcontainerIntegrationTest() {
         val norm = Norm(
             guid = UUID.randomUUID(),
             articles = listOf(),
-            officialLongTitle = "Test Title",
             metadataSections = listOf(citationDateSection, referenceSection1),
         )
         val saveCommand = SaveNormOutputPort.Command(norm)
@@ -330,7 +340,7 @@ class NormsServiceTest : PostgresTestcontainerIntegrationTest() {
         )
         val referenceSection1 = MetadataSection(MetadataSectionName.OFFICIAL_REFERENCE, listOf(), 1, listOf(printAnnouncementSection))
         val referenceSection2 = MetadataSection(MetadataSectionName.OFFICIAL_REFERENCE, listOf(), 2, listOf(digitalAnnouncementSection))
-        val norm = Norm(guid = UUID.randomUUID(), officialLongTitle = "title", metadataSections = listOf(referenceSection1, referenceSection2))
+        val norm = Norm(guid = UUID.randomUUID(), metadataSections = listOf(referenceSection1, referenceSection2))
         val saveCommand = SaveNormOutputPort.Command(norm)
         val guidQuery = GetNormByGuidOutputPort.Query(norm.guid)
 
@@ -451,10 +461,16 @@ class NormsServiceTest : PostgresTestcontainerIntegrationTest() {
             .verifyComplete()
 
         val updatedNorm = NORM.copy(
-            officialLongTitle = "new title",
-            documentNumber = "document number",
-            completeCitation = "complete citation",
-            celexNumber = "celex number",
+            metadataSections = listOf(
+                MetadataSection(
+                    name = MetadataSectionName.NORM,
+                    metadata = listOf(
+                        Metadatum("document number", MetadatumType.DOCUMENT_NUMBER),
+                        Metadatum("complete citation", MetadatumType.COMPLETE_CITATION),
+                        Metadatum("celex number", MetadatumType.CELEX_NUMBER),
+                    ),
+                ),
+            ),
         )
 
         val editCommand = EditNormOutputPort.Command(updatedNorm)
@@ -467,10 +483,10 @@ class NormsServiceTest : PostgresTestcontainerIntegrationTest() {
         normsService.getNormByGuid(guidQuery)
             .`as`(StepVerifier::create)
             .assertNext {
-                assertThat(it.officialLongTitle).isEqualTo(updatedNorm.officialLongTitle)
-                assertThat(it.documentNumber).isEqualTo(updatedNorm.documentNumber)
-                assertThat(it.completeCitation).isEqualTo(updatedNorm.completeCitation)
-                assertThat(it.celexNumber).isEqualTo(updatedNorm.celexNumber)
+                val metadata = it.metadataSections.first().metadata
+                assertThat(metadata.first { it.type == CELEX_NUMBER }.value).isEqualTo("celex number")
+                assertThat(metadata.first { it.type == COMPLETE_CITATION }.value).isEqualTo("complete citation")
+                assertThat(metadata.first { it.type == DOCUMENT_NUMBER }.value).isEqualTo("document number")
             }
             .verifyComplete()
     }
@@ -569,7 +585,6 @@ class NormsServiceTest : PostgresTestcontainerIntegrationTest() {
             guid = UUID.randomUUID(),
             articles = listOf(),
             metadataSections = listOf(referenceSection),
-            officialLongTitle = "Test Title 2",
             announcementDate = LocalDate.parse("2022-02-02"),
         )
         val saveNormCommand = SaveNormOutputPort.Command(norm)
@@ -601,7 +616,6 @@ class NormsServiceTest : PostgresTestcontainerIntegrationTest() {
             guid = UUID.randomUUID(),
             articles = listOf(),
             metadataSections = listOf(referenceSection),
-            officialLongTitle = "Test Title 2",
             announcementDate = LocalDate.parse("2022-02-02"),
         )
         val saveNormCommand = SaveNormOutputPort.Command(norm)
@@ -635,7 +649,6 @@ class NormsServiceTest : PostgresTestcontainerIntegrationTest() {
             guid = UUID.randomUUID(),
             articles = listOf(),
             metadataSections = listOf(referenceSection),
-            officialLongTitle = "Test Title 2",
             announcementDate = LocalDate.parse("2022-02-02"),
         )
         val saveNormCommand = SaveNormOutputPort.Command(norm)
@@ -675,7 +688,6 @@ class NormsServiceTest : PostgresTestcontainerIntegrationTest() {
             guid = UUID.randomUUID(),
             articles = listOf(),
             metadataSections = listOf(referenceSectionPrint, referenceSectionDigital),
-            officialLongTitle = "Test Title 2",
             announcementDate = LocalDate.parse("2022-02-02"),
         )
         val saveNormCommand = SaveNormOutputPort.Command(norm)
@@ -714,7 +726,6 @@ class NormsServiceTest : PostgresTestcontainerIntegrationTest() {
             guid = UUID.randomUUID(),
             articles = listOf(),
             metadataSections = listOf(referenceSectionPrint, referenceSectionDigital),
-            officialLongTitle = "Test Title 2",
             announcementDate = LocalDate.parse("2022-02-02"),
         )
         val saveNormCommand = SaveNormOutputPort.Command(norm)

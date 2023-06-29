@@ -7,21 +7,27 @@ import de.bund.digitalservice.ris.norms.domain.entity.Metadatum
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.AGE_OF_MAJORITY_INDICATION
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.ANNOUNCEMENT_GAZETTE
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.CELEX_NUMBER
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.DATE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.DECIDING_BODY
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.DEFINITION
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.DIVERGENT_DOCUMENT_NUMBER
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.DOCUMENT_CATEGORY
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.ENTITY
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.KEYWORD
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.LEAD_JURISDICTION
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.LEAD_UNIT
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.NORM_CATEGORY
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.OFFICIAL_ABBREVIATION
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.OFFICIAL_LONG_TITLE
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.OFFICIAL_SHORT_TITLE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.PAGE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.PARTICIPATION_INSTITUTION
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.PARTICIPATION_TYPE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.RANGE_START
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.REFERENCE_NUMBER
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.RESOLUTION_MAJORITY
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.RIS_ABBREVIATION
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.RIS_ABBREVIATION_INTERNATIONAL_LAW
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.SUBJECT_FNA
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.SUBJECT_GESTA
@@ -192,11 +198,6 @@ class JurisConverterTest {
 
             val norm = converter.parseJurisXml(query).block()
 
-            assertThat(norm?.officialLongTitle).isEqualTo("test official long title")
-            assertThat(norm?.risAbbreviation).isEqualTo("test ris abbreviation")
-            assertThat(norm?.documentCategory).isEqualTo("test document category")
-            assertThat(norm?.officialShortTitle).isEqualTo("test official short title")
-            assertThat(norm?.officialAbbreviation).isEqualTo("test official abbreviation")
             assertThat(norm?.announcementDate).isEqualTo(LocalDate.parse("2022-01-07"))
             assertThat(norm?.statusNote).isEqualTo("test status note")
             assertThat(norm?.statusDescription).isEqualTo("test status description")
@@ -211,10 +212,15 @@ class JurisConverterTest {
             assertThat(norm?.reissueDate).isEqualTo(LocalDate.parse("2022-01-11"))
             assertThat(norm?.reissueReference).isEqualTo("test reissue reference")
             assertThat(norm?.otherStatusNote).isEqualTo("test other status note")
-            assertThat(norm?.celexNumber).isEqualTo("test celex number")
-            assertThat(norm?.text).isEqualTo("test text")
             val metadata = norm?.metadataSections?.flatMap { it.metadata }
 
+            assertThat(metadata).usingRecursiveFieldByFieldElementComparatorIgnoringFields("guid").contains(Metadatum("test official long title", OFFICIAL_LONG_TITLE))
+            assertThat(metadata).usingRecursiveFieldByFieldElementComparatorIgnoringFields("guid").contains(Metadatum("test ris abbreviation", RIS_ABBREVIATION))
+            assertThat(metadata).usingRecursiveFieldByFieldElementComparatorIgnoringFields("guid").contains(Metadatum("test document category", DOCUMENT_CATEGORY))
+            assertThat(metadata).usingRecursiveFieldByFieldElementComparatorIgnoringFields("guid").contains(Metadatum("test official short title", OFFICIAL_SHORT_TITLE))
+            assertThat(metadata).usingRecursiveFieldByFieldElementComparatorIgnoringFields("guid").contains(Metadatum("test official abbreviation", OFFICIAL_ABBREVIATION))
+            assertThat(metadata).usingRecursiveFieldByFieldElementComparatorIgnoringFields("guid").contains(Metadatum("test celex number", CELEX_NUMBER))
+            assertThat(metadata).usingRecursiveFieldByFieldElementComparatorIgnoringFields("guid").contains(Metadatum("test text", TEXT))
             assertThat(metadata).usingRecursiveFieldByFieldElementComparatorIgnoringFields("guid").contains(Metadatum("test document number", DIVERGENT_DOCUMENT_NUMBER, 1))
             assertThat(metadata).usingRecursiveFieldByFieldElementComparatorIgnoringFields("guid").contains(Metadatum("test ris abbreviation international law", RIS_ABBREVIATION_INTERNATIONAL_LAW, 1))
             assertThat(metadata).usingRecursiveFieldByFieldElementComparatorIgnoringFields("guid").contains(Metadatum("test unofficial long title", UNOFFICIAL_LONG_TITLE, 1))
@@ -332,7 +338,7 @@ class JurisConverterTest {
 
             val norm = converter.parseJurisXml(query).block()
 
-            assertThat(norm?.officialLongTitle).isEqualTo("test official long title")
+            assertThat(norm?.metadataSections?.flatMap { it.metadata }?.first { it.type == OFFICIAL_LONG_TITLE }?.value.toString()).isEqualTo("test official long title")
             assertThat(norm?.metadataSections?.flatMap { it.metadata }).usingRecursiveFieldByFieldElementComparatorIgnoringFields("guid").contains(Metadatum("2022", YEAR, 1))
             assertThat(norm?.metadataSections?.flatMap { it.metadata }?.filter { it.type == DATE }).isEmpty()
         }
@@ -350,9 +356,9 @@ class JurisConverterTest {
 
             val norm = converter.parseJurisXml(query).block()
 
-            assertThat(norm?.officialLongTitle).isEqualTo("test official long title")
             assertThat(norm?.metadataSections?.flatMap { it.metadata }?.filter { it.type == DATE }).isEmpty()
             assertThat(norm?.metadataSections?.flatMap { it.metadata }?.filter { it.type == YEAR }).isEmpty()
+            assertThat(norm?.metadataSections?.flatMap { it.metadata }?.first { it.type == OFFICIAL_LONG_TITLE }?.value.toString()).isEqualTo("test official long title")
         }
 
         @Test
@@ -368,7 +374,7 @@ class JurisConverterTest {
 
             val norm = converter.parseJurisXml(query).block()
 
-            assertThat(norm?.officialLongTitle).isEqualTo("test official long title")
+            assertThat(norm?.metadataSections?.flatMap { it.metadata }?.first { it.type == OFFICIAL_LONG_TITLE }?.value.toString()).isEqualTo("test official long title")
             assertThat(norm?.metadataSections?.flatMap { it.metadata }?.filter { it.type == DATE }).isEmpty()
             assertThat(norm?.metadataSections?.flatMap { it.metadata }?.filter { it.type == YEAR }).isEmpty()
         }

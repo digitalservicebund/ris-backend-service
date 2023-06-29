@@ -11,7 +11,11 @@ import { FieldType, fillInputField } from "./utilities"
 testWithImportedNorm(
   "Check if norm zip can be generated properly after an edit",
   async ({ page, normData, guid }) => {
-    await openNorm(page, normData["officialLongTitle"], guid)
+    await openNorm(
+      page,
+      normData.metadataSections?.NORM?.[0]?.OFFICIAL_LONG_TITLE?.[0] ?? "",
+      guid
+    )
     const fileName = normData["jurisZipFileName"]
     const locatorFrameButton = page.locator("a:has-text('Rahmen')")
     await expect(locatorFrameButton).toBeVisible()

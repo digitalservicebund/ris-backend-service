@@ -13,4 +13,6 @@ interface MetadataSectionsRepository : ReactiveCrudRepository<MetadataSectionDto
     fun findByNormGuid(normGuid: UUID): Flux<MetadataSectionDto>
 
     fun deleteByNormGuid(normGuid: UUID): Mono<Void>
+
+    fun findByGuidIn(sectionGuids: List<UUID>): Flux<MetadataSectionDto>
 }

@@ -204,6 +204,14 @@ const DECODERS: MetadataValueDecoders = {
   [MetadatumType.OTHER_TYPE]: decodeOtherType,
   [MetadatumType.NOTE]: identity,
   [MetadatumType.ARTICLE]: identity,
+  [MetadatumType.OFFICIAL_LONG_TITLE]: identity,
+  [MetadatumType.RIS_ABBREVIATION]: identity,
+  [MetadatumType.DOCUMENT_NUMBER]: identity,
+  [MetadatumType.DOCUMENT_CATEGORY]: identity,
+  [MetadatumType.OFFICIAL_SHORT_TITLE]: identity,
+  [MetadatumType.OFFICIAL_ABBREVIATION]: identity,
+  [MetadatumType.COMPLETE_CITATION]: identity,
+  [MetadatumType.CELEX_NUMBER]: identity,
 }
 
 const ENCODERS: MetadataValueEncoders = {
@@ -270,6 +278,14 @@ const ENCODERS: MetadataValueEncoders = {
   [MetadatumType.OTHER_TYPE]: encodeOtherType,
   [MetadatumType.NOTE]: identity,
   [MetadatumType.ARTICLE]: identity,
+  [MetadatumType.OFFICIAL_LONG_TITLE]: identity,
+  [MetadatumType.RIS_ABBREVIATION]: identity,
+  [MetadatumType.DOCUMENT_NUMBER]: identity,
+  [MetadatumType.DOCUMENT_CATEGORY]: identity,
+  [MetadatumType.OFFICIAL_SHORT_TITLE]: identity,
+  [MetadatumType.OFFICIAL_ABBREVIATION]: identity,
+  [MetadatumType.COMPLETE_CITATION]: identity,
+  [MetadatumType.CELEX_NUMBER]: identity,
 }
 
 /**
@@ -707,14 +723,7 @@ export function encodeFlatMetadata(
   flatMetadata: FlatMetadata
 ): FlatMetadataRequestSchema {
   return {
-    celexNumber: encodeString(flatMetadata.celexNumber),
-    completeCitation: encodeString(flatMetadata.completeCitation),
-    documentCategory: encodeString(flatMetadata.documentCategory),
-    documentNumber: encodeString(flatMetadata.documentNumber),
     eli: encodeString(flatMetadata.eli),
-    officialAbbreviation: encodeString(flatMetadata.officialAbbreviation),
-    officialLongTitle: encodeString(flatMetadata.officialLongTitle) ?? "",
-    officialShortTitle: encodeString(flatMetadata.officialShortTitle),
     otherStatusNote: encodeString(flatMetadata.otherStatusNote),
     announcementDate: encodeNullDate(flatMetadata.announcementDate),
     publicationDate: encodeNullDate(flatMetadata.publicationDate),
@@ -726,11 +735,9 @@ export function encodeFlatMetadata(
     repealDate: encodeNullDate(flatMetadata.repealDate),
     repealNote: encodeString(flatMetadata.repealNote),
     repealReferences: encodeString(flatMetadata.repealReferences),
-    risAbbreviation: encodeString(flatMetadata.risAbbreviation),
     statusDate: encodeNullDate(flatMetadata.statusDate),
     statusDescription: encodeString(flatMetadata.statusDescription),
     statusNote: encodeString(flatMetadata.statusNote),
     statusReference: encodeString(flatMetadata.statusReference),
-    text: encodeString(flatMetadata.text),
   }
 }

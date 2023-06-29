@@ -44,7 +44,6 @@ class LoadNormControllerTest {
         val norm =
             Norm(
                 UUID.fromString("761b5537-5aa5-4901-81f7-fbf7e040a7c8"),
-                officialLongTitle = "long title",
             )
 
         every { loadNormService.loadNorm(any()) } returns Mono.just(norm)
@@ -65,7 +64,6 @@ class LoadNormControllerTest {
         val norm =
             Norm(
                 UUID.fromString("761b5537-5aa5-4901-81f7-fbf7e040a7c8"),
-                officialLongTitle = "long title",
             )
 
         every { loadNormService.loadNorm(any()) } returns Mono.just(norm)
@@ -130,15 +128,8 @@ class LoadNormControllerTest {
         val guid: String,
         val articles: List<ArticleResponseTestSchema>,
         val metadataSections: List<MetadataSectionResponseTestSchema>,
-        val officialLongTitle: String,
-        var risAbbreviation: String?,
-        var documentNumber: String?,
-        var documentCategory: String?,
-        var officialShortTitle: String?,
-        var officialAbbreviation: String?,
         var announcementDate: String?,
         var publicationDate: String?,
-        var completeCitation: String?,
         var statusNote: String?,
         var statusDescription: String?,
         var statusDate: String?,
@@ -153,8 +144,6 @@ class LoadNormControllerTest {
         var reissueReference: String?,
         var otherStatusNote: String?,
         var eli: String,
-        var celexNumber: String?,
-        var text: String?,
         var files: List<FileReferenceResponseTestSchema>,
     ) {
         companion object {
@@ -166,15 +155,8 @@ class LoadNormControllerTest {
                     encodeGuid(data.guid),
                     articles,
                     metadataSections,
-                    data.officialLongTitle,
-                    data.risAbbreviation,
-                    data.documentNumber,
-                    data.documentCategory,
-                    data.officialShortTitle,
-                    data.officialAbbreviation,
                     encodeLocalDate(data.announcementDate),
                     encodeLocalDate(data.publicationDate),
-                    data.completeCitation,
                     data.statusNote,
                     data.statusDescription,
                     encodeLocalDate(data.statusDate),
@@ -189,8 +171,6 @@ class LoadNormControllerTest {
                     data.reissueReference,
                     data.otherStatusNote,
                     encodeEli(data.eli),
-                    data.celexNumber,
-                    data.text,
                     files = files,
                 )
             }

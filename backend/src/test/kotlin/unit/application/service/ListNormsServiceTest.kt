@@ -2,7 +2,11 @@ package de.bund.digitalservice.ris.norms.application.service
 
 import de.bund.digitalservice.ris.norms.application.port.input.ListNormsUseCase
 import de.bund.digitalservice.ris.norms.application.port.output.SearchNormsOutputPort
+import de.bund.digitalservice.ris.norms.domain.entity.MetadataSection
+import de.bund.digitalservice.ris.norms.domain.entity.Metadatum
 import de.bund.digitalservice.ris.norms.domain.entity.Norm
+import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
@@ -23,7 +27,7 @@ class ListNormsServiceTest {
 
         service.listNorms(query).blockLast()
 
-        verify(exactly = 1) { searchNormsAdapter.searchNorms(withArg { assertThat(it.parameters).hasSize(0) }) }
+        verify(exactly = 1) { searchNormsAdapter.searchNorms(withArg { assertThat(it.searchTerm).isEmpty() }) }
     }
 
     @Test
@@ -36,7 +40,7 @@ class ListNormsServiceTest {
 
         service.listNorms(query).blockLast()
 
-        verify(exactly = 1) { searchNormsAdapter.searchNorms(withArg { assertThat(it.parameters).hasSize(0) }) }
+        verify(exactly = 1) { searchNormsAdapter.searchNorms(withArg { assertThat(it.searchTerm).isEmpty() }) }
     }
 
     @Test
@@ -52,19 +56,7 @@ class ListNormsServiceTest {
         verify(exactly = 1) {
             searchNormsAdapter.searchNorms(
                 withArg {
-                    assertThat(it.parameters).hasSize(2)
-
-                    assertThat(it.parameters.map { it.field }).isEqualTo(
-                        listOf(
-                            SearchNormsOutputPort.QueryFields.OFFICIAL_LONG_TITLE,
-                            SearchNormsOutputPort.QueryFields.OFFICIAL_SHORT_TITLE,
-                        ),
-                    )
-
-                    it.parameters.forEach {
-                        assertThat(it.value).isEqualTo("test")
-                        assertThat(it.isFuzzyMatch).isTrue()
-                    }
+                    assertThat(it.searchTerm).isEqualTo("test")
                 },
             )
         }
@@ -88,18 +80,16 @@ class ListNormsServiceTest {
         val norm =
             Norm(
                 UUID.fromString("761b5537-5aa5-4901-81f7-fbf7e040a7c8"),
-                officialLongTitle = "title",
             )
         val query = ListNormsUseCase.Query()
 
         every { searchNormsAdapter.searchNorms(any()) } returns Flux.fromArray(arrayOf(norm))
 
         service.listNorms(query).`as`(StepVerifier::create)
-            .expectNextMatches({
+            .expectNextMatches {
                 it.guid == UUID.fromString("761b5537-5aa5-4901-81f7-fbf7e040a7c8") &&
-                    it.officialLongTitle == "title" &&
                     it.eli == norm.eli
-            })
+            }
             .verifyComplete()
     }
 
@@ -110,17 +100,32 @@ class ListNormsServiceTest {
         val normOne =
             Norm(
                 UUID.fromString("761b5537-5aa5-4901-81f7-fbf7e040a7c8"),
-                officialLongTitle = "title one",
+                metadataSections = listOf(
+                    MetadataSection(
+                        name = MetadataSectionName.NORM,
+                        metadata = listOf(Metadatum("title one", MetadatumType.OFFICIAL_LONG_TITLE)),
+                    ),
+                ),
             )
         val normTwo =
             Norm(
                 UUID.fromString("53d29ef7-377c-4d14-864b-eb3a85769359"),
-                officialLongTitle = "title two",
+                metadataSections = listOf(
+                    MetadataSection(
+                        name = MetadataSectionName.NORM,
+                        metadata = listOf(Metadatum("title two", MetadatumType.OFFICIAL_LONG_TITLE)),
+                    ),
+                ),
             )
         val normThree =
             Norm(
                 UUID.fromString("2c7da53b-1d57-46b4-90b2-96bd746c268a"),
-                officialLongTitle = "title three",
+                metadataSections = listOf(
+                    MetadataSection(
+                        name = MetadataSectionName.NORM,
+                        metadata = listOf(Metadatum("title three", MetadatumType.OFFICIAL_LONG_TITLE)),
+                    ),
+                ),
             )
         val query = ListNormsUseCase.Query()
 
@@ -128,18 +133,18 @@ class ListNormsServiceTest {
             Flux.fromArray(arrayOf(normOne, normTwo, normThree))
 
         service.listNorms(query).`as`(StepVerifier::create)
-            .expectNextMatches({
+            .expectNextMatches {
                 it.guid == UUID.fromString("761b5537-5aa5-4901-81f7-fbf7e040a7c8") &&
                     it.officialLongTitle == "title one"
-            })
-            .expectNextMatches({
+            }
+            .expectNextMatches {
                 it.guid == UUID.fromString("53d29ef7-377c-4d14-864b-eb3a85769359") &&
                     it.officialLongTitle == "title two"
-            })
-            .expectNextMatches({
+            }
+            .expectNextMatches {
                 it.guid == UUID.fromString("2c7da53b-1d57-46b4-90b2-96bd746c268a") &&
                     it.officialLongTitle == "title three"
-            })
+            }
             .verifyComplete()
     }
 }

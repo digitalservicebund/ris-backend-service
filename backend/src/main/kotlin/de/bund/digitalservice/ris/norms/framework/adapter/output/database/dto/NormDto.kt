@@ -12,27 +12,11 @@ import java.util.*
 data class NormDto(
     @Id
     val guid: UUID,
-    @Column("official_long_title")
-    val officialLongTitle: String,
-    @Column("ris_abbreviation")
-    var risAbbreviation: String? = null,
-    @Column("document_number")
-    var documentNumber: String? = null,
-    @Column("document_category")
-    var documentCategory: String? = null,
-
-    @Column("official_short_title")
-    var officialShortTitle: String? = null,
-    @Column("official_abbreviation")
-    var officialAbbreviation: String? = null,
 
     @Column("announcement_date")
     var announcementDate: LocalDate? = null,
     @Column("publication_date")
     var publicationDate: LocalDate? = null,
-
-    @Column("complete_citation")
-    var completeCitation: String? = null,
 
     @Column("status_note")
     var statusNote: String? = null,
@@ -60,13 +44,6 @@ data class NormDto(
     var reissueReference: String? = null,
     @Column("other_status_note")
     var otherStatusNote: String? = null,
-
-    @Column("celex_number")
-    var celexNumber: String? = null,
-
-    @Column("text")
-    var text: String? = null,
-
 ) : Persistable<UUID> {
 
     @Transient

@@ -53,7 +53,9 @@ if (loadedNorm.value !== undefined) {
   <div v-if="loadedNorm">
     <div class="max-w-screen-md">
       <h1 class="heading-02-bold mb-44 text-center">
-        {{ loadedNorm.officialLongTitle }}
+        {{
+          loadedNorm.metadataSections?.NORM?.[0]?.OFFICIAL_LONG_TITLE?.[0] ?? ""
+        }}
       </h1>
       <div v-for="article in loadedNorm.articles" :key="article.guid">
         <h2

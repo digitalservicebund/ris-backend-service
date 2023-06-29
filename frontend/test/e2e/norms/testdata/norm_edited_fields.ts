@@ -28,6 +28,17 @@ export const newNorm: NormData = {
   metadataSections: {
     NORM: [
       {
+        OFFICIAL_LONG_TITLE: [
+          "Verordnung zur Anpassung von Rechtsverordnungen an das Tierarzneimittelrecht",
+        ],
+        OFFICIAL_SHORT_TITLE: ["officialShortTitle"],
+        OFFICIAL_ABBREVIATION: ["officialAbbreviation"],
+        RIS_ABBREVIATION: ["risAbbreviation"],
+        CELEX_NUMBER: ["celexNumber"],
+        COMPLETE_CITATION: ["completeCitation"],
+        DOCUMENT_CATEGORY: ["documentCategory"],
+        DOCUMENT_NUMBER: ["documentNumber"],
+        TEXT: ["text"],
         KEYWORD: ["Neues Schlagwort 1 ", "Neues Schlagwort 2"],
         DIVERGENT_DOCUMENT_NUMBER: [
           "Neue abweichende Dokumentennummer 1",
@@ -263,16 +274,7 @@ export const newNorm: NormData = {
       },
     ],
   },
-  officialLongTitle:
-    "Verordnung zur Anpassung von Rechtsverordnungen an das Tierarzneimittelrecht",
-  officialShortTitle: "officialShortTitle",
-  officialAbbreviation: "officialAbbreviation",
-  risAbbreviation: "risAbbreviation",
   publicationDate: "01.11.2022",
-  celexNumber: "celexNumber",
-  completeCitation: "completeCitation",
-  documentCategory: "documentCategory",
-  documentNumber: "documentNumber",
   eli: "europeanLegalIdentifier",
   otherStatusNote: "otherStatusNote",
   reissueArticle: "reissueArticle",
@@ -287,5 +289,4 @@ export const newNorm: NormData = {
   statusDescription: "statusDescription",
   statusNote: "statusNote",
   statusReference: "statusReference",
-  text: "text",
 }
