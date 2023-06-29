@@ -97,7 +97,11 @@ watch(modelValueList, () => emit("update:modelValue", modelValueList.value), {
           class="focus-visible:outline-blue-800 focus:outline-none"
           :data="entry"
           tabindex="0"
-          @click="setEditIndex(index)"
+          @click="
+            entry.isDocUnit()
+              ? (e: Event) => e.preventDefault()
+              : setEditIndex(index)
+          "
           @keypress.enter="setEditIndex(index)"
         />
 
