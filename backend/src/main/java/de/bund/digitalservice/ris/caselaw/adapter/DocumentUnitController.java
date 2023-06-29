@@ -178,4 +178,13 @@ public class DocumentUnitController {
         .map(ResponseEntity::ok)
         .onErrorReturn(ResponseEntity.internalServerError().build());
   }
+
+  @GetMapping(value = "/validateSingleNorm/{singleNormStr}")
+  @PreAuthorize("isAuthenticated()")
+  public Mono<ResponseEntity<String>> validateSingleNorm(@PathVariable String singleNormStr) {
+    return service
+        .validateSingleNorm(singleNormStr)
+        .map(ResponseEntity::ok)
+        .onErrorReturn(ResponseEntity.internalServerError().build());
+  }
 }

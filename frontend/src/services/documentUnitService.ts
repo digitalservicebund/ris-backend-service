@@ -19,6 +19,9 @@ interface DocumentUnitService {
     LinkedDocumentUnit,
     LinkedDocumentUnit
   >
+  validateSingleNorm(
+    singleNormString: string
+  ): Promise<ServiceResponse<unknown>>
 }
 
 const service: DocumentUnitService = {
@@ -154,6 +157,18 @@ const service: DocumentUnitService = {
         ),
       },
     }
+  },
+
+  async validateSingleNorm(singleNormString: string) {
+    const response = await httpClient.get(
+      `caselaw/documentunits/validateSingleNorm/${singleNormString}`
+    )
+    if (response.status >= 300) {
+      response.error = {
+        title: "Einzelnorm konnte nicht validiert werden.",
+      }
+    }
+    return response
   },
 }
 

@@ -3,6 +3,7 @@ import { computed, h } from "vue"
 import ExpandableDataSet from "@/components/ExpandableDataSet.vue"
 import NormReferenceInput from "@/components/NormReferenceInput.vue"
 import NormReference from "@/domain/normReference"
+import documentUnitService from "@/services/documentUnitService"
 import { withSummarizer } from "@/shared/components/DataSetSummary.vue"
 import EditableList from "@/shared/components/EditableList.vue"
 
@@ -31,11 +32,14 @@ function decisionSummarizer(normEntry: NormReference) {
 
 const NormsSummary = withSummarizer(decisionSummarizer)
 
-function validateSingleNorm() {
+async function validateSingleNorm() {
   if (props.modelValue) {
     const latestNormReference = props.modelValue[props.modelValue.length - 1]
     if (latestNormReference.singleNorm) {
-      console.log("single norm", latestNormReference.singleNorm)
+      const response = await documentUnitService.validateSingleNorm(
+        latestNormReference.singleNorm
+      )
+      console.log("response", response)
     }
   }
 }

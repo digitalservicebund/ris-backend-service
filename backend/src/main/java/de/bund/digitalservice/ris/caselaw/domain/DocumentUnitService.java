@@ -433,4 +433,8 @@ public class DocumentUnitService {
     return repository.findAllLinkedDocumentUnitsByParentDocumentUnitUuidAndType(
         parentDocumentUnitUuid, type);
   }
+
+  public Mono<String> validateSingleNorm(String singleNormStr) {
+    return Mono.just("TODO");
+  }
 }
