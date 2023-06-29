@@ -21,19 +21,6 @@ class NormBuilder {
     var announcementDate = LocalDate.now()
     var publicationDate = LocalDate.now()
     var completeCitation = randomString()
-    var statusNote = randomString()
-    var statusDescription = randomString()
-    var statusDate = LocalDate.now()
-    var statusReference = randomString()
-    var repealNote = randomString()
-    var repealArticle = randomString()
-    var repealDate = LocalDate.now()
-    var repealReferences = randomString()
-    var reissueNote = randomString()
-    var reissueArticle = randomString()
-    var reissueDate = LocalDate.now()
-    var reissueReference = randomString()
-    var otherStatusNote = randomString()
     var celexNumber = randomString()
     var text = randomString()
 
@@ -59,19 +46,6 @@ class NormBuilder {
         announcementDate = announcementDate,
         publicationDate = publicationDate,
         completeCitation = completeCitation,
-        statusNote = statusNote,
-        statusDescription = statusDescription,
-        statusDate = statusDate,
-        statusReference = statusReference,
-        repealNote = repealNote,
-        repealArticle = repealArticle,
-        repealDate = repealDate,
-        repealReferences = repealReferences,
-        reissueNote = reissueNote,
-        reissueArticle = reissueArticle,
-        reissueDate = reissueDate,
-        reissueReference = reissueReference,
-        otherStatusNote = otherStatusNote,
         celexNumber = celexNumber,
         text = text,
     )

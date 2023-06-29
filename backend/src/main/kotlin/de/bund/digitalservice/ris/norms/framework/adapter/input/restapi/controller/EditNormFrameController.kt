@@ -58,20 +58,6 @@ class EditNormFrameController(private val editNormFrameService: EditNormFrameUse
 
         var completeCitation: String? = null
 
-        var statusNote: String? = null
-        var statusDescription: String? = null
-        var statusDate: String? = null
-        var statusReference: String? = null
-        var repealNote: String? = null
-        var repealArticle: String? = null
-        var repealDate: String? = null
-        var repealReferences: String? = null
-        var reissueNote: String? = null
-        var reissueArticle: String? = null
-        var reissueDate: String? = null
-        var reissueReference: String? = null
-        var otherStatusNote: String? = null
-
         var eli: String? = null
 
         var celexNumber: String? = null
@@ -89,19 +75,6 @@ class EditNormFrameController(private val editNormFrameService: EditNormFrameUse
             decodeLocalDate(this.announcementDate),
             decodeLocalDate(this.publicationDate),
             this.completeCitation,
-            this.statusNote,
-            this.statusDescription,
-            decodeLocalDate(this.statusDate),
-            this.statusReference,
-            this.repealNote,
-            this.repealArticle,
-            decodeLocalDate(this.repealDate),
-            this.repealReferences,
-            this.reissueNote,
-            this.reissueArticle,
-            decodeLocalDate(this.reissueDate),
-            this.reissueReference,
-            this.otherStatusNote,
             this.celexNumber,
             this.text,
         )

@@ -25,20 +25,6 @@ data class Norm(
 
     var completeCitation: String? = null,
 
-    var statusNote: String? = null,
-    var statusDescription: String? = null,
-    var statusDate: LocalDate? = null,
-    var statusReference: String? = null,
-    var repealNote: String? = null,
-    var repealArticle: String? = null,
-    var repealDate: LocalDate? = null,
-    var repealReferences: String? = null,
-    var reissueNote: String? = null,
-    var reissueArticle: String? = null,
-    var reissueDate: LocalDate? = null,
-    var reissueReference: String? = null,
-    var otherStatusNote: String? = null,
-
     var celexNumber: String? = null,
 
     var text: String? = null,

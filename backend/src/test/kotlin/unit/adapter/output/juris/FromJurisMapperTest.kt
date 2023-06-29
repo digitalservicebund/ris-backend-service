@@ -132,7 +132,6 @@ class FromJurisMapperTest {
         assertThat(domainNorm.documentCategory).isEqualTo("documentCategory")
         assertThat(domainNorm.text).isEqualTo("text")
         assertThat(domainNorm.celexNumber).isEqualTo("celexNumber")
-        assertThat(domainNorm.otherStatusNote).isEqualTo("otherStatusNote")
         assertThat(domainNorm.risAbbreviation).isEqualTo("risAbbreviation")
         val sections = domainNorm.metadataSections
         assertSectionsHasMetadata(sections, NORM, MetadatumType.KEYWORD, "frameKeyword")
