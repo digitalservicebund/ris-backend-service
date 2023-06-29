@@ -1,5 +1,7 @@
 import userEvent from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
+import { vi } from "vitest"
+import { defineComponent } from "vue"
 import TextAreaInput from "@/shared/components/input/TextAreaInput.vue"
 
 type TextAreaInputProps = InstanceType<typeof TextAreaInput>["$props"]
@@ -112,6 +114,28 @@ describe("TextAreaInput", () => {
     renderComponent({ rows: 5 })
     const input: HTMLTextAreaElement = screen.getByRole("textbox")
     expect(input).toHaveAttribute("rows", "5")
+  })
+
+  it("stops propagation of the enter key event", async () => {
+    const wrapperHandler = vi.fn()
+
+    const wrapper = defineComponent({
+      components: { TextAreaInput },
+      data: () => ({ value: "" }),
+      methods: { wrapperHandler },
+      template: `
+        <div @keypress.enter="wrapperHandler">
+          <TextAreaInput id="textarea" v-model="value" aria-label="Test" />
+        </div>
+      `,
+    })
+
+    render(wrapper)
+
+    const user = userEvent.setup()
+    const input: HTMLTextAreaElement = screen.getByRole("textbox")
+    await user.type(input, "{enter}")
+    expect(wrapperHandler).not.toHaveBeenCalled()
   })
 
   // Autosizing is tested in the integration tests as it requires some
