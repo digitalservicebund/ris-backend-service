@@ -65,10 +65,10 @@ onMounted(async () => {
   }
 
   if (!!publicationLog.value) {
-    publicationLog.value[0].date = formatDate(publicationLog.value[0].date)
-    publicationLog.value[0].xml = publicationLog.value[0].xml
-      ? publicationLog.value[0].xml
-      : ""
+    for (const item of publicationLog.value) {
+      item.date = formatDate(item.date)
+      item.xml = item.xml ? item.xml : ""
+    }
   }
 
   errorMessage.value = response.error

@@ -1,4 +1,4 @@
-enum PublicationLogEntryType {
+export enum PublicationLogEntryType {
   Xml = "XML",
   Html = "HTML",
 }

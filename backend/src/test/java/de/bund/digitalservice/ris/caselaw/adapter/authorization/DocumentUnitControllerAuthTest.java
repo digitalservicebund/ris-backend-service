@@ -244,8 +244,7 @@ class DocumentUnitControllerAuthTest {
   @Test
   void testGetPublishedMails() {
     mockDocumentUnit(docOffice1, null, PUBLISHED);
-    when(service.getPublications(TEST_UUID)).thenReturn(Flux.empty());
-    when(service.getPublicationReports(TEST_UUID)).thenReturn(Flux.empty());
+    when(service.getPublicationLog(TEST_UUID)).thenReturn(Flux.empty());
 
     String uri = "/api/v1/caselaw/documentunits/" + TEST_UUID + "/publish";
 

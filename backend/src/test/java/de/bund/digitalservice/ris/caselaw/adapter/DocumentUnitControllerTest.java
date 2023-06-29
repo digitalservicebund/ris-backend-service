@@ -53,7 +53,6 @@ import reactor.core.publisher.Mono;
 @Import({SecurityConfig.class, AuthService.class, TestConfig.class})
 class DocumentUnitControllerTest {
   @Autowired private RisWebTestClient risWebClient;
-
   @MockBean private DocumentUnitService service;
   @MockBean private KeycloakUserService userService;
   @MockBean private DocxConverterService docxConverterService;
@@ -341,33 +340,30 @@ class DocumentUnitControllerTest {
 
   @Test
   void testGetLastPublishedXml() {
-    when(service.getPublications(TEST_UUID))
-        .thenReturn(
-            Flux.just(
-                new XmlMailResponse(
-                    TEST_UUID,
-                    new XmlMail(
-                        TEST_UUID,
-                        "receiver address",
-                        "mailSubject",
-                        "xml",
-                        "status-code",
-                        List.of("status-messages"),
-                        "test.xml",
-                        Instant.parse("2020-01-01T01:01:01.00Z"),
-                        PublishState.SENT))));
 
-    when(service.getPublicationReports(TEST_UUID))
+    when(service.getPublicationLog(TEST_UUID))
         .thenReturn(
             Flux.fromIterable(
                 List.of(
                     PublicationReport.builder()
-                        .content("<html>2019 Report</html>")
-                        .receivedDate(Instant.parse("2019-01-01T01:01:01.00Z"))
-                        .build(),
-                    PublicationReport.builder()
                         .content("<html>2021 Report</html>")
                         .receivedDate(Instant.parse("2021-01-01T01:01:01.00Z"))
+                        .build(),
+                    new XmlMailResponse(
+                        TEST_UUID,
+                        new XmlMail(
+                            TEST_UUID,
+                            "receiver address",
+                            "mailSubject",
+                            "xml",
+                            "status-code",
+                            List.of("status-messages"),
+                            "test.xml",
+                            Instant.parse("2020-01-01T01:01:01.00Z"),
+                            PublishState.SENT)),
+                    PublicationReport.builder()
+                        .content("<html>2019 Report</html>")
+                        .receivedDate(Instant.parse("2019-01-01T01:01:01.00Z"))
                         .build())));
 
     risWebClient
@@ -411,12 +407,12 @@ class DocumentUnitControllerTest {
         .jsonPath("[2].date")
         .isEqualTo("2019-01-01T01:01:01Z");
 
-    verify(service).getPublications(TEST_UUID);
+    verify(service).getPublicationLog(TEST_UUID);
   }
 
   @Test
   void testGetLastPublishedXml_withServiceThrowsException() {
-    when(service.getPublications(TEST_UUID)).thenThrow(DocumentUnitPublishException.class);
+    when(service.getPublicationLog(TEST_UUID)).thenThrow(DocumentUnitPublishException.class);
 
     risWebClient
         .withDefaultLogin()
@@ -427,8 +423,7 @@ class DocumentUnitControllerTest {
         .is5xxServerError();
 
     verify(service).getByUuid(TEST_UUID);
-    verify(service).getPublications(TEST_UUID);
-    verify(service).getPublicationReports(TEST_UUID);
+    verify(service).getPublicationLog(TEST_UUID);
   }
 
   @Test

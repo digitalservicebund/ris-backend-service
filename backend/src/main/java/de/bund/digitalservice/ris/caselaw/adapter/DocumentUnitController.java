@@ -10,7 +10,6 @@ import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import de.bund.digitalservice.ris.caselaw.domain.docx.Docx2Html;
 import jakarta.validation.Valid;
 import java.nio.ByteBuffer;
-import java.util.Comparator;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -155,8 +154,7 @@ public class DocumentUnitController {
   @GetMapping(value = "/{uuid}/publish", produces = MediaType.APPLICATION_JSON_VALUE)
   @PreAuthorize("@userHasReadAccessByDocumentUnitUuid.apply(#uuid)")
   public Flux<PublicationEntry> getPublicationHistory(@PathVariable UUID uuid) {
-    return Flux.concat(service.getPublicationReports(uuid), service.getPublications(uuid))
-        .sort(Comparator.comparing(PublicationEntry::getDate).reversed());
+    return service.getPublicationLog(uuid);
   }
 
   @PutMapping(value = "/search")

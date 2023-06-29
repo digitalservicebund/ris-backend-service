@@ -8,7 +8,7 @@ import NormReference, { normFieldLabels } from "@/domain/normReference"
 import ProceedingDecision, {
   proceedingDecisionFieldLabels,
 } from "@/domain/proceedingDecision"
-import XmlMail from "@/domain/xmlMail"
+import XmlMail, { PublicationLogEntryType } from "@/domain/xmlMail"
 import { fieldLabels } from "@/fields/caselaw"
 import { ResponseError } from "@/services/httpClient"
 import { InfoStatus } from "@/shared/components/enumInfoStatus"
@@ -237,7 +237,7 @@ const fieldsMissing = computed(() =>
             class="bg-white border-1 border-gray p-10"
             :data-set="item"
             :header="
-              item.type == 'HTML'
+              item.type == PublicationLogEntryType.Html
                 ? 'Juris Protokoll - ' + item.date
                 : 'Xml Email Abgabe - ' + item.date
             "
@@ -246,11 +246,11 @@ const fieldsMissing = computed(() =>
           >
             <!-- eslint-disable vue/no-v-html -->
             <div
-              v-if="item.type == 'HTML'"
+              v-if="item.type == PublicationLogEntryType.Html"
               class="p-20"
               v-html="item.content"
             />
-            <div v-else-if="item.type == 'XML'">
+            <div v-else-if="item.type == PublicationLogEntryType.Xml">
               <div class="label-section text-gray-900">ÜBER</div>
               <div class="label-02-regular">
                 <div>

@@ -7,6 +7,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.time.Duration;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -335,12 +336,11 @@ public class DocumentUnitService {
                         }));
   }
 
-  public Flux<MailResponse> getPublications(UUID documentUuid) {
-    return publishService.getPublicationMails(documentUuid);
-  }
-
-  public Flux<PublicationReport> getPublicationReports(UUID documentUuid) {
-    return publishReportRepository.getAllForDocumentUnit(documentUuid);
+  public Flux<PublicationEntry> getPublicationLog(UUID documentUuid) {
+    return Flux.concat(
+            publishService.getPublicationMails(documentUuid),
+            publishReportRepository.getAllForDocumentUnit(documentUuid))
+        .sort(Comparator.comparing(PublicationEntry::getDate).reversed());
   }
 
   public <T extends LinkedDocumentationUnit> Mono<Page<T>> searchByLinkedDocumentationUnit(

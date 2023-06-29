@@ -23,6 +23,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitSta
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.PostgresDocumentUnitRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.PostgresPublishReportRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.PostgresXmlMailRepositoryImpl;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.PublicationReportDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.XmlMailDTO;
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresConfig;
@@ -30,6 +31,7 @@ import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatus;
 import de.bund.digitalservice.ris.caselaw.domain.HttpMailSender;
+import de.bund.digitalservice.ris.caselaw.domain.PublicationLogEntryType;
 import de.bund.digitalservice.ris.caselaw.domain.PublishState;
 import de.bund.digitalservice.ris.caselaw.domain.XmlMail;
 import de.bund.digitalservice.ris.caselaw.domain.XmlMailResponse;
@@ -38,6 +40,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.AfterEach;
@@ -312,5 +315,68 @@ class PublishDocumentUnitIntegrationTest {
                   .ignoringFields("publishDate")
                   .isEqualTo(expectedXmlResultObject);
             });
+  }
+
+  @Test
+  void testPublishLogWithXmlAndReport() {
+    UUID documentUnitUuid1 = UUID.randomUUID();
+    DocumentUnitDTO documentUnitDTO =
+        DocumentUnitDTO.builder()
+            .uuid(documentUnitUuid1)
+            .documentationOfficeId(docOfficeUuid)
+            .documentnumber("docnr12345678")
+            .creationtimestamp(Instant.now())
+            .build();
+    DocumentUnitDTO savedDocumentUnitDTO = repository.save(documentUnitDTO).block();
+
+    Instant publishDate = Instant.now();
+    xmlMailRepository
+        .save(
+            new XmlMailDTO(
+                null,
+                savedDocumentUnitDTO.getId(),
+                "exporter@neuris.de",
+                "mailSubject",
+                "xml",
+                "200",
+                "message 1|message 2",
+                "test.xml",
+                publishDate,
+                PublishState.SENT))
+        .block();
+
+    Instant receivedDate = publishDate.plus(1, ChronoUnit.HOURS);
+    databasePublishReportRepository
+        .save(
+            new PublicationReportDTO(
+                UUID.randomUUID(),
+                savedDocumentUnitDTO.getUuid(),
+                "<HTML>success!</HTML>",
+                receivedDate,
+                true))
+        .block();
+
+    risWebTestClient
+        .withDefaultLogin()
+        .get()
+        .uri("/api/v1/caselaw/documentunits/" + documentUnitUuid1 + "/publish")
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody()
+        .jsonPath("$")
+        .isArray()
+        .jsonPath("$[0].content")
+        .isEqualTo("<HTML>success!</HTML>")
+        .jsonPath("$[0].date")
+        .isEqualTo(receivedDate.toString())
+        .jsonPath("$[0].type")
+        .isEqualTo(PublicationLogEntryType.HTML.name())
+        .jsonPath("$[1].xml")
+        .isEqualTo("xml")
+        .jsonPath("$[1].date")
+        .isEqualTo(publishDate.toString())
+        .jsonPath("$[1].type")
+        .isEqualTo(PublicationLogEntryType.XML.name());
   }
 }

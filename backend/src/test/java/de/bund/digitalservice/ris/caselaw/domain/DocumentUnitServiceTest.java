@@ -61,8 +61,6 @@ class DocumentUnitServiceTest {
 
   @MockBean private DocumentUnitRepository repository;
 
-  @MockBean private PublicationReportRepository publishReportRepository;
-
   @MockBean private DatabaseDocumentationOfficeRepository documentationOfficeRepository;
 
   @MockBean private DocumentNumberService documentNumberService;
@@ -70,6 +68,8 @@ class DocumentUnitServiceTest {
   @MockBean private S3AsyncClient s3AsyncClient;
 
   @MockBean private EmailPublishService publishService;
+
+  @MockBean private PublicationReportRepository publicationReportRepository;
 
   @MockBean private DatabaseDocumentUnitStatusService documentUnitStatusService;
 
@@ -384,13 +384,83 @@ class DocumentUnitServiceTest {
             PublishState.UNKNOWN);
     when(publishService.getPublicationMails(TEST_UUID))
         .thenReturn(Flux.just(new XmlMailResponse(TEST_UUID, xmlMail)));
+    when(publicationReportRepository.getAllForDocumentUnit(TEST_UUID)).thenReturn(Flux.empty());
 
-    StepVerifier.create(service.getPublications(TEST_UUID))
+    StepVerifier.create(service.getPublicationLog(TEST_UUID))
         .consumeNextWith(
             xmlMailResponse ->
                 assertThat(xmlMailResponse)
                     .usingRecursiveComparison()
                     .isEqualTo(new XmlMailResponse(TEST_UUID, xmlMail)))
+        .verifyComplete();
+    verify(publishService).getPublicationMails(TEST_UUID);
+  }
+
+  @Test
+  void testGetLastPublicationReport() {
+    PublicationReport report =
+        new PublicationReport("documentNumber", "<html></html>", Instant.now());
+    when(publicationReportRepository.getAllForDocumentUnit(TEST_UUID))
+        .thenReturn(Flux.just(report));
+    when(publishService.getPublicationMails(TEST_UUID)).thenReturn(Flux.empty());
+
+    StepVerifier.create(service.getPublicationLog(TEST_UUID))
+        .consumeNextWith(
+            publications -> assertThat(publications).usingRecursiveComparison().isEqualTo(report))
+        .verifyComplete();
+    verify(publishService).getPublicationMails(TEST_UUID);
+  }
+
+  @Test
+  void testGetSortedPublicationLog() {
+    Instant newest = Instant.now();
+    Instant secondNewest = newest.minusSeconds(61);
+    Instant thirdNewest = secondNewest.minusSeconds(61);
+    Instant fourthNewest = thirdNewest.minusSeconds(61);
+
+    PublicationReport report1 = new PublicationReport("documentNumber", "<html></html>", newest);
+
+    XmlMailResponse xml1 =
+        new XmlMailResponse(
+            TEST_UUID,
+            new XmlMail(
+                TEST_UUID,
+                "receiver address",
+                "subject",
+                "xml",
+                "200",
+                List.of("message"),
+                "filename",
+                secondNewest,
+                PublishState.UNKNOWN));
+
+    PublicationReport report2 =
+        new PublicationReport("documentNumber", "<html></html>", thirdNewest);
+
+    XmlMailResponse xml2 =
+        new XmlMailResponse(
+            TEST_UUID,
+            new XmlMail(
+                TEST_UUID,
+                "receiver address",
+                "subject",
+                "xml",
+                "200",
+                List.of("message"),
+                "filename",
+                fourthNewest,
+                PublishState.UNKNOWN));
+
+    when(publicationReportRepository.getAllForDocumentUnit(TEST_UUID))
+        .thenReturn(Flux.fromIterable(List.of(report2, report1)));
+    when(publishService.getPublicationMails(TEST_UUID))
+        .thenReturn(Flux.fromIterable(List.of(xml2, xml1)));
+
+    StepVerifier.create(service.getPublicationLog(TEST_UUID))
+        .consumeNextWith(entry -> assertThat(entry).usingRecursiveComparison().isEqualTo(report1))
+        .consumeNextWith(entry -> assertThat(entry).usingRecursiveComparison().isEqualTo(xml1))
+        .consumeNextWith(entry -> assertThat(entry).usingRecursiveComparison().isEqualTo(report2))
+        .consumeNextWith(entry -> assertThat(entry).usingRecursiveComparison().isEqualTo(xml2))
         .verifyComplete();
     verify(publishService).getPublicationMails(TEST_UUID);
   }
