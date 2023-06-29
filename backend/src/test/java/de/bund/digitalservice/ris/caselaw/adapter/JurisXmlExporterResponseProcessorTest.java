@@ -36,7 +36,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -199,47 +198,71 @@ class JurisXmlExporterResponseProcessorTest {
   }
 
   @Test
-  @Disabled
   void testAttachmentsGetSanitized() throws MessagingException, IOException {
     Date now = new Date();
     when(statusService.getIssuerAddressOfLatestStatus(DOCUMENT_NUMBER))
         .thenReturn(Mono.just("test@digitalservice.bund.de"));
-    String expectedHtml =
+    String providedHtml =
         """
 <html>
 <head>
-    <META http-equiv=\\"Content-Type\\" content=\\"text/html; charset=UTF-8\\">
+    <META http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <title>Title</title>
 </head>
 <body>
-    <p><img src=\\"http://placehold.it/120x120&text=image1\\" align=\\"right\\"><br></p>
+    <p><img src="https://placehold.it/120x120&text=image1" align="right"><br></p>
     <h2>Header</h2>
-    <table border=\\"0\\" width=\\"55%\\">
+    <table border="0" width="55%">
         <tbody>
             <tr>
-                <td width=\\"50%\\"><strong>ABC</strong></td>
-                <td width=\\"50%\\" align=\\"right\\"><strong>DEF</strong></td>
+                <td width="50%"><strong>ABC</strong></td>
+                <td width="50%" align="right"><strong>DEF</strong></td>
             </tr>
         </tbody>
     </table>
-    <hr width=\\"100%\\">
+    <hr width="100%">
     <p>Paragraph 1</p>
-    <p><strong>Paragraph 2<font color=\\"#ff0000\\" size=\\"+1\\">
-                <i>Italic</i></font><br>
-            <table hspace=\\"50\\" border=\\"0\\" width=\\"50%\\" cellSpacing=\\"8\\">
-                <tbody>Table</tbody>
+    <p><strong>Paragraph 2<font color="#ff0000" size="+1">
+                <i>Italic</i>
+            </font><br>
+            <table hspace="50" border="0" width="50%" cellSpacing="8">
+                <tbody></tbody>
             </table>Text
         </strong><br></p>
-    <hr width=\\"100%\\">
+    <hr width="100%">
 </body>
 </html>""";
+    String expectedHtml =
+        """
+<p><img src="https://placehold.it/120x120&amp;text&#61;image1" align="right" /><br /></p>
+<h2>Header</h2>
+<table border="0" width="55%">
+   <tbody>
+       <tr>
+           <td width="50%"><strong>ABC</strong></td>
+           <td width="50%" align="right"><strong>DEF</strong></td>
+       </tr>
+   </tbody>
+</table>
+<hr width="100%" />
+<p>Paragraph 1</p>
+<p><strong>Paragraph 2<font color="#ff0000">
+           <i>Italic</i>
+       </font><br />
+       <table hspace="50" border="0" width="50%" cellspacing="8">
+           <tbody></tbody>
+       </table>Text
+   </strong><br /></p>
+<hr width="100%" />""";
     when(messageHandler.getAttachments(message))
         .thenReturn(
             List.of(
-                new MessageAttachment(String.format("%s.html", DOCUMENT_NUMBER), expectedHtml),
+                new MessageAttachment(
+                    String.format("%s.html", DOCUMENT_NUMBER),
+                    providedHtml.replaceAll("\\s+", " ").replaceAll(">\\s+<", "><")),
                 new MessageAttachment(
                     String.format("%s-spellcheck.html", DOCUMENT_NUMBER),
-                    "<html><script>alert('sanitize me')</script></html>")));
+                    "<p><script>alert('sanitize me')</script></p>")));
     when(messageHandler.getDocumentNumber(message)).thenReturn(DOCUMENT_NUMBER);
     when((message.getReceivedDate())).thenReturn(now);
 
@@ -250,12 +273,12 @@ class JurisXmlExporterResponseProcessorTest {
         .saveAll(
             List.of(
                 PublicationReport.builder()
-                    .content(expectedHtml)
+                    .content(expectedHtml.replaceAll("\\s+", " ").replaceAll(">\\s+<", "><"))
                     .documentNumber(DOCUMENT_NUMBER)
                     .receivedDate(now.toInstant())
                     .build(),
                 PublicationReport.builder()
-                    .content("<html></html>")
+                    .content("<p></p>")
                     .documentNumber(DOCUMENT_NUMBER)
                     .receivedDate(now.toInstant())
                     .build()));

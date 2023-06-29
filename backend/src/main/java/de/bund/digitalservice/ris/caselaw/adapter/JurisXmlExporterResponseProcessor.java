@@ -19,6 +19,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import org.owasp.html.HtmlPolicyBuilder;
+import org.owasp.html.PolicyFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -117,6 +119,19 @@ public class JurisXmlExporterResponseProcessor {
 
   private void saveAttachments(
       String documentNumber, Date receivedDate, List<Attachment> attachments) {
+    PolicyFactory policy =
+        new HtmlPolicyBuilder()
+            .allowElements(
+                "a", "img", "br", "h2", "table", "tbody", "tr", "td", "hr", "p", "strong", "i",
+                "font")
+            .allowUrlProtocols("https")
+            .allowAttributes("src", "align")
+            .onElements("img")
+            .allowAttributes("width", "align", "hspace", "cellSpacing", "border")
+            .onElements("td", "hr", "table")
+            .allowAttributes("color")
+            .onElements("font")
+            .toFactory();
     reportRepository
         .saveAll(
             attachments.stream()
@@ -126,7 +141,7 @@ public class JurisXmlExporterResponseProcessor {
                         PublicationReport.builder()
                             .documentNumber(documentNumber)
                             .receivedDate(receivedDate.toInstant())
-                            .content(attachment.fileContent())
+                            .content(policy.sanitize(attachment.fileContent()))
                             .build())
                 .toList())
         .subscribe();
