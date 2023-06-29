@@ -3,13 +3,10 @@ package de.bund.digitalservice.ris.caselaw.domain;
 import static de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatus.PUBLISHED;
 import static de.bund.digitalservice.ris.caselaw.domain.ServiceUtils.byteBufferToArray;
 
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseNormElementRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.NormElementDTO;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.time.Duration;
-import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -17,7 +14,6 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import lombok.extern.slf4j.Slf4j;
@@ -56,7 +52,6 @@ public class DocumentUnitService {
   private final S3AsyncClient s3AsyncClient;
   private final EmailPublishService publishService;
   private final DocumentUnitStatusService documentUnitStatusService;
-  private final DatabaseNormElementRepository normElementRepository;
 
   @Value("${otc.obs.bucket-name}")
   private String bucketName;
@@ -70,8 +65,7 @@ public class DocumentUnitService {
       S3AsyncClient s3AsyncClient,
       EmailPublishService publishService,
       DocumentUnitStatusService documentUnitStatusService,
-      PublicationReportRepository publishReportRepository,
-      DatabaseNormElementRepository normElementRepository) {
+      PublicationReportRepository publishReportRepository) {
 
     this.repository = repository;
     this.documentNumberService = documentNumberService;
@@ -79,7 +73,6 @@ public class DocumentUnitService {
     this.publishService = publishService;
     this.documentUnitStatusService = documentUnitStatusService;
     this.publishReportRepository = publishReportRepository;
-    this.normElementRepository = normElementRepository;
   }
 
   public Mono<DocumentUnit> generateNewDocumentUnit(DocumentationOffice documentationOffice) {
@@ -442,52 +435,6 @@ public class DocumentUnitService {
   }
 
   public Mono<String> validateSingleNorm(String singleNormStr) {
-    return normElementRepository
-        .findAllByDocumentCategoryLabelR()
-        .collectList()
-        .map(
-            normElementDTOs -> {
-              Map<String, Boolean> normElementMap =
-                  normElementDTOs.stream()
-                      .collect(
-                          Collectors.toMap(
-                              NormElementDTO::getLabel, NormElementDTO::isHasNumberDesignation));
-              List<String> singleNorms =
-                  Arrays.stream(singleNormStr.split(",")).map(String::trim).toList();
-              for (String singleNorm : singleNorms) {
-                switch (singleNorm.split(" ").length) {
-                  case 1 -> {
-                    if (!normElementMap.containsKey(singleNorm)) {
-                      return singleNorm + " is not a valid single norm label";
-                    }
-                    if (Boolean.TRUE.equals(normElementMap.get(singleNorm))) {
-                      return singleNorm + " has to be followed by a number, but none was found";
-                    }
-                  }
-                  case 2 -> {
-                    String labelPart = singleNorm.split(" ")[0];
-                    String numberPart = singleNorm.split(" ")[1];
-                    try {
-                      Integer.parseInt(numberPart);
-                    } catch (NumberFormatException e) {
-                      return numberPart
-                          + " is not a valid number to follow the single norm label "
-                          + labelPart;
-                    }
-                    if (!normElementMap.containsKey(labelPart)) {
-                      return labelPart + " is not a valid single norm label";
-                    }
-                    if (Boolean.FALSE.equals(normElementMap.get(labelPart))) {
-                      return labelPart
-                          + " is a standalone single norm, but it was followed by a number";
-                    }
-                  }
-                  default -> {
-                    return "Found more than 2 words in single norm: " + singleNorm;
-                  }
-                }
-              }
-              return "OK";
-            });
+    return Mono.just("TODO");
   }
 }
