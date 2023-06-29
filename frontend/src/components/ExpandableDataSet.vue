@@ -14,6 +14,8 @@ interface Props {
   borderBottom?: boolean
 }
 
+type Emits = (event: "done-button-clicked") => void
+
 withDefaults(defineProps<Props>(), {
   summaryComponent: DataSetSummary,
   asColumn: false,
@@ -21,9 +23,12 @@ withDefaults(defineProps<Props>(), {
   borderBottom: false,
 })
 
+const emit = defineEmits<Emits>()
+
 const isExpanded = ref(false)
 
 function collapse(): void {
+  emit("done-button-clicked")
   isExpanded.value = false
 }
 </script>

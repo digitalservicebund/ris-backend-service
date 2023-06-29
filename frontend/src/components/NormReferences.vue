@@ -30,6 +30,15 @@ function decisionSummarizer(normEntry: NormReference) {
 }
 
 const NormsSummary = withSummarizer(decisionSummarizer)
+
+function validateSingleNorm() {
+  if (props.modelValue) {
+    const latestNormReference = props.modelValue[props.modelValue.length - 1]
+    if (latestNormReference.singleNorm) {
+      console.log("single norm", latestNormReference.singleNorm)
+    }
+  }
+}
 </script>
 
 <template>
@@ -39,6 +48,7 @@ const NormsSummary = withSummarizer(decisionSummarizer)
     :data-set="norms"
     :summary-component="NormsSummary"
     title="Normen"
+    @done-button-clicked="validateSingleNorm"
   >
     <EditableList
       v-model="norms"
