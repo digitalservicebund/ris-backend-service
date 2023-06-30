@@ -50,7 +50,7 @@ export function useNormMenuItems(
         getChildItem("Amtliche Fundstelle", "officialReferences"),
         getChildItem("Nichtamtliche Fundstelle", "unofficialReferences"),
         getChildItem("Vollzitat", "completeCitation"),
-        getChildItem("Stand-Angabe", "statusIndicationFields"),
+        getChildItem("Stand-Angabe", "statusIndication"),
         getChildItem(
           "Stand der dokumentarischen Bearbeitung",
           "documentStatus"
