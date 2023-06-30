@@ -564,8 +564,13 @@ function subjectAreaSummarizer(data: Metadata) {
   const gesta = data.SUBJECT_GESTA?.[0]
   const bgb3 = data.SUBJECT_BGB_3?.[0]
 
-  return [fna, previousFna, gesta, bgb3]
-    .filter((value) => value != "" && value != null)
+  return [
+    fna && `FNA-Nummer ${fna}`,
+    previousFna && `Frühere FNA-Nummber ${previousFna}`,
+    gesta && `GESTA-Nummer ${gesta}`,
+    bgb3 && `Bundesgesetzblatt Teil III ${bgb3}`,
+  ]
+    .filter(Boolean)
     .join(" | ")
 }
 
