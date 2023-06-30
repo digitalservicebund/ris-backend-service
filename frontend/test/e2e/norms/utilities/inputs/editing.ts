@@ -61,17 +61,18 @@ const fillRadioButton: FieldFiller<boolean> = async (page, id, value) => {
 }
 
 const fillChipsInput: FieldFiller<string[]> = async (page, id, value) => {
-  const input = page.locator(`input#${id}`)
-  const wrapper = page.locator("div .input", { has: input })
-
   // Clear all chips first
-  const chips = wrapper.getByLabel("chip")
+  const chips = page
+    .locator(`[data-testid='chips-input_${id}']`)
+    .locator('[data-testid="chip"]')
   const chipCount = await chips.count()
 
   // Delete backwards to avoid conflicts.
   for (let index = chipCount - 1; index >= 0; index--) {
     await chips.nth(index).getByLabel("Löschen").click()
   }
+
+  const input = page.locator(`input#${id}`)
 
   for (const subValue of value) {
     await input.fill(subValue)

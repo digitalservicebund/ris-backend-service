@@ -1534,7 +1534,7 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
           type: FieldType.CHIPS,
           id: "referenceNumbers",
           label: "Aktenzeichen",
-          value: "",
+          value: norm.metadataSections?.NORM?.[0]?.REFERENCE_NUMBER,
         },
       ],
     },
