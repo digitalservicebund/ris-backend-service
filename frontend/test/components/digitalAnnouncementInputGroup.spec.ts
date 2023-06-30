@@ -1,5 +1,5 @@
 import userEvent from "@testing-library/user-event"
-import { render, screen } from "@testing-library/vue"
+import { render, screen, within } from "@testing-library/vue"
 import DigitalAnnouncementInputGroup from "@/components/DigitalAnnouncementInputGroup.vue"
 import { Metadata } from "@/domain/Norm"
 
@@ -42,13 +42,29 @@ function getControls() {
     }
   ) as HTMLInputElement
 
-  const additionalInfoInputInput = screen.queryByRole("textbox", {
+  const additionalInfoInput = screen.queryByRole("textbox", {
     name: "Zusatzangaben",
   }) as HTMLInputElement
+
+  const additionalInfoChips = within(
+    screen.getByTestId("chips-input_digitalAnnouncementInfo")
+  ).queryAllByTestId("chip")
+
+  const additionalInfoChipValues = within(
+    screen.getByTestId("chips-input_digitalAnnouncementInfo")
+  ).queryAllByTestId("chip-value")
 
   const explanationInput = screen.queryByRole("textbox", {
     name: "Erläuterungen",
   }) as HTMLInputElement
+
+  const explanationChips = within(
+    screen.getByTestId("chips-input_digitalAnnouncementExplanations")
+  ).queryAllByTestId("chip")
+
+  const explanationChipValues = within(
+    screen.getByTestId("chips-input_digitalAnnouncementExplanations")
+  ).queryAllByTestId("chip-value")
 
   return {
     announcementMediumInput,
@@ -58,8 +74,12 @@ function getControls() {
     pageInput,
     areaOfPublicationInput,
     numberOfPublicationInRespectiveAreaInput,
-    additionalInfoInputInput,
+    additionalInfoInput,
+    additionalInfoChips,
+    additionalInfoChipValues,
     explanationInput,
+    explanationChips,
+    explanationChipValues,
   }
 }
 
@@ -67,15 +87,17 @@ describe("DigitalAnnouncementInputGroup", () => {
   it("renders all digital announcement inputs", () => {
     renderComponent({
       modelValue: {
-        ANNOUNCEMENT_MEDIUM: ["test value"],
+        ANNOUNCEMENT_MEDIUM: ["test announcement medium"],
         DATE: ["2023-01-01"],
-        EDITION: ["test value"],
-        YEAR: ["test value"],
-        PAGE: ["test value"],
-        AREA_OF_PUBLICATION: ["test value"],
-        NUMBER_OF_THE_PUBLICATION_IN_THE_RESPECTIVE_AREA: ["test value"],
-        ADDITIONAL_INFO: ["test value"],
-        EXPLANATION: ["test value"],
+        EDITION: ["test edition"],
+        YEAR: ["test year"],
+        PAGE: ["test page"],
+        AREA_OF_PUBLICATION: ["test area of publication"],
+        NUMBER_OF_THE_PUBLICATION_IN_THE_RESPECTIVE_AREA: [
+          "test number of publication in the respective area",
+        ],
+        ADDITIONAL_INFO: ["test additional info 1", "test additional info 2"],
+        EXPLANATION: ["test explanation 1", "test explanation 2"],
       },
     })
 
@@ -87,36 +109,46 @@ describe("DigitalAnnouncementInputGroup", () => {
       areaOfPublicationInput,
       pageInput,
       numberOfPublicationInRespectiveAreaInput,
-      additionalInfoInputInput,
+      additionalInfoInput,
+      additionalInfoChipValues,
       explanationInput,
+      explanationChipValues,
     } = getControls()
 
     expect(announcementMediumInput).toBeInTheDocument()
-    expect(announcementMediumInput).toHaveValue("test value")
+    expect(announcementMediumInput).toHaveValue("test announcement medium")
 
     expect(dateInput).toBeInTheDocument()
     expect(dateInput).toHaveValue("01.01.2023")
 
     expect(editionInput).toBeInTheDocument()
-    expect(editionInput).toHaveValue("test value")
+    expect(editionInput).toHaveValue("test edition")
 
     expect(yearInput).toBeInTheDocument()
-    expect(yearInput).toHaveValue("test value")
+    expect(yearInput).toHaveValue("test year")
 
     expect(pageInput).toBeInTheDocument()
-    expect(pageInput).toHaveValue("test value")
+    expect(pageInput).toHaveValue("test page")
 
     expect(areaOfPublicationInput).toBeInTheDocument()
-    expect(areaOfPublicationInput).toHaveValue("test value")
+    expect(areaOfPublicationInput).toHaveValue("test area of publication")
 
     expect(numberOfPublicationInRespectiveAreaInput).toBeInTheDocument()
-    expect(numberOfPublicationInRespectiveAreaInput).toHaveValue("test value")
+    expect(numberOfPublicationInRespectiveAreaInput).toHaveValue(
+      "test number of publication in the respective area"
+    )
 
-    expect(additionalInfoInputInput).toBeInTheDocument()
-    expect(additionalInfoInputInput).toHaveValue("test value")
+    expect(additionalInfoInput).toBeInTheDocument()
+    expect(additionalInfoChipValues.map((chip) => chip.textContent)).toEqual([
+      "test additional info 1",
+      "test additional info 2",
+    ])
 
     expect(explanationInput).toBeInTheDocument()
-    expect(explanationInput).toHaveValue("test value")
+    expect(explanationChipValues.map((chip) => chip.textContent)).toEqual([
+      "test explanation 1",
+      "test explanation 2",
+    ])
   })
 
   it("shows the correct model value entry in the associated input", () => {
@@ -159,12 +191,6 @@ describe("DigitalAnnouncementInputGroup", () => {
     const numberOfPublicationInRespectiveAreaInput =
       screen.queryByDisplayValue("baz")
     expect(numberOfPublicationInRespectiveAreaInput).toBeInTheDocument()
-
-    const additionalInfoInputInput = screen.queryByDisplayValue("foo bar")
-    expect(additionalInfoInputInput).toBeInTheDocument()
-
-    const explanationInput = screen.queryByDisplayValue("baz ban")
-    expect(explanationInput).toBeInTheDocument()
   })
 
   it("emits update model value event when input value changes", async () => {
@@ -180,7 +206,7 @@ describe("DigitalAnnouncementInputGroup", () => {
       areaOfPublicationInput,
       pageInput,
       numberOfPublicationInRespectiveAreaInput,
-      additionalInfoInputInput,
+      additionalInfoInput,
       explanationInput,
     } = getControls()
 
@@ -191,8 +217,14 @@ describe("DigitalAnnouncementInputGroup", () => {
     await user.type(areaOfPublicationInput, "baz baz")
     await user.type(pageInput, "foo bar")
     await user.type(numberOfPublicationInRespectiveAreaInput, "bar foo")
-    await user.type(additionalInfoInputInput, "foo baz")
-    await user.type(explanationInput, "ban baz")
+    await user.type(
+      additionalInfoInput,
+      "additional info 1{enter}additional info 2{enter}"
+    )
+    await user.type(
+      explanationInput,
+      "explanation 1{enter}explanation 2{enter}"
+    )
 
     expect(modelValue).toEqual({
       ANNOUNCEMENT_MEDIUM: ["foo"],
@@ -202,8 +234,8 @@ describe("DigitalAnnouncementInputGroup", () => {
       AREA_OF_PUBLICATION: ["baz baz"],
       PAGE: ["foo bar"],
       NUMBER_OF_THE_PUBLICATION_IN_THE_RESPECTIVE_AREA: ["bar foo"],
-      ADDITIONAL_INFO: ["foo baz"],
-      EXPLANATION: ["ban baz"],
+      ADDITIONAL_INFO: ["additional info 1", "additional info 2"],
+      EXPLANATION: ["explanation 1", "explanation 2"],
     })
   })
 
@@ -231,8 +263,8 @@ describe("DigitalAnnouncementInputGroup", () => {
       areaOfPublicationInput,
       pageInput,
       numberOfPublicationInRespectiveAreaInput,
-      additionalInfoInputInput,
-      explanationInput,
+      additionalInfoChips,
+      explanationChips,
     } = getControls()
 
     expect(announcementMediumInput).toHaveValue("foo")
@@ -265,12 +297,16 @@ describe("DigitalAnnouncementInputGroup", () => {
       undefined
     )
 
-    expect(additionalInfoInputInput).toHaveValue("foo baz")
-    await user.clear(additionalInfoInputInput)
-    expect(modelValue.ADDITIONAL_INFO).toBeUndefined()
+    for (const chip of additionalInfoChips) {
+      const clearButton = within(chip).getByLabelText("Löschen")
+      await user.click(clearButton)
+    }
+    expect(modelValue.ADDITIONAL_INFO).toStrictEqual([])
 
-    expect(explanationInput).toHaveValue("ban baz")
-    await user.clear(explanationInput)
-    expect(modelValue.EXPLANATION).toBeUndefined()
+    for (const chip of explanationChips) {
+      const clearButton = within(chip).getByLabelText("Löschen")
+      await user.click(clearButton)
+    }
+    expect(modelValue.EXPLANATION).toStrictEqual([])
   })
 })

@@ -1,5 +1,5 @@
 import userEvent from "@testing-library/user-event"
-import { render, screen } from "@testing-library/vue"
+import { render, screen, within } from "@testing-library/vue"
 import PrintAnnouncementInputGroup from "@/components/PrintAnnouncementInputGroup.vue"
 import { Metadata } from "@/domain/Norm"
 
@@ -33,9 +33,25 @@ function getControls() {
     name: "Zusatzangaben",
   }) as HTMLInputElement
 
+  const additionalInfoChips = within(
+    screen.getByTestId("chips-input_printAnnouncementInfo")
+  ).queryAllByTestId("chip")
+
+  const additionalInfoChipValues = within(
+    screen.getByTestId("chips-input_printAnnouncementInfo")
+  ).queryAllByTestId("chip-value")
+
   const explanationInput = screen.queryByRole("textbox", {
     name: "Erläuterungen",
   }) as HTMLInputElement
+
+  const explanationChips = within(
+    screen.getByTestId("chips-input_printAnnouncementExplanations")
+  ).queryAllByTestId("chip")
+
+  const explanationChipValues = within(
+    screen.getByTestId("chips-input_printAnnouncementExplanations")
+  ).queryAllByTestId("chip-value")
 
   return {
     announcementGazetteInput,
@@ -43,7 +59,11 @@ function getControls() {
     numberInput,
     pageInput,
     additionalInfoInput,
+    additionalInfoChips,
+    additionalInfoChipValues,
     explanationInput,
+    explanationChips,
+    explanationChipValues,
   }
 }
 
@@ -51,12 +71,12 @@ describe("PrintAnnouncementInputGroup", () => {
   it("renders all print announcement inputs", () => {
     renderComponent({
       modelValue: {
-        ANNOUNCEMENT_GAZETTE: ["test value"],
-        YEAR: ["test value"],
-        NUMBER: ["test value"],
-        PAGE: ["test value"],
-        ADDITIONAL_INFO: ["test value"],
-        EXPLANATION: ["test value"],
+        ANNOUNCEMENT_GAZETTE: ["test announcement gazette"],
+        YEAR: ["test year"],
+        NUMBER: ["test number"],
+        PAGE: ["test page"],
+        ADDITIONAL_INFO: ["test additional info 1", "test additional info 2"],
+        EXPLANATION: ["test explanation 1", "test explanation 2"],
       },
     })
 
@@ -66,26 +86,34 @@ describe("PrintAnnouncementInputGroup", () => {
       numberInput,
       pageInput,
       additionalInfoInput,
+      additionalInfoChipValues,
       explanationInput,
+      explanationChipValues,
     } = getControls()
 
     expect(announcementGazetteInput).toBeInTheDocument()
-    expect(announcementGazetteInput).toHaveValue("test value")
+    expect(announcementGazetteInput).toHaveValue("test announcement gazette")
 
     expect(yearInput).toBeInTheDocument()
-    expect(yearInput).toHaveValue("test value")
+    expect(yearInput).toHaveValue("test year")
 
     expect(numberInput).toBeInTheDocument()
-    expect(numberInput).toHaveValue("test value")
+    expect(numberInput).toHaveValue("test number")
 
     expect(pageInput).toBeInTheDocument()
-    expect(pageInput).toHaveValue("test value")
+    expect(pageInput).toHaveValue("test page")
 
     expect(additionalInfoInput).toBeInTheDocument()
-    expect(additionalInfoInput).toHaveValue("test value")
+    expect(additionalInfoChipValues.map((value) => value.textContent)).toEqual([
+      "test additional info 1",
+      "test additional info 2",
+    ])
 
     expect(explanationInput).toBeInTheDocument()
-    expect(explanationInput).toHaveValue("test value")
+    expect(explanationChipValues.map((chip) => chip.textContent)).toEqual([
+      "test explanation 1",
+      "test explanation 2",
+    ])
   })
 
   it("shows the correct model value entry in the associated input", () => {
@@ -111,12 +139,6 @@ describe("PrintAnnouncementInputGroup", () => {
 
     const pageInput = screen.queryByDisplayValue("2")
     expect(pageInput).toBeInTheDocument()
-
-    const additionalInfoInput = screen.queryByDisplayValue("Info Text")
-    expect(additionalInfoInput).toBeInTheDocument()
-
-    const explanationInput = screen.queryByDisplayValue("Explanation text")
-    expect(explanationInput).toBeInTheDocument()
   })
 
   it("emits update model value event when an input value changes", async () => {
@@ -137,20 +159,26 @@ describe("PrintAnnouncementInputGroup", () => {
     await user.type(yearInput, "2023")
     await user.type(numberInput, "ban")
     await user.type(pageInput, "baz")
-    await user.type(additionalInfoInput, "foo bar")
-    await user.type(explanationInput, "bar foo")
+    await user.type(
+      additionalInfoInput,
+      "additional info 1{enter}additional info 2{enter}"
+    )
+    await user.type(
+      explanationInput,
+      "explanation 1{enter}explanation 2{enter}"
+    )
 
     expect(modelValue).toEqual({
       ANNOUNCEMENT_GAZETTE: ["foo"],
       YEAR: ["2023"],
       NUMBER: ["ban"],
       PAGE: ["baz"],
-      ADDITIONAL_INFO: ["foo bar"],
-      EXPLANATION: ["bar foo"],
+      ADDITIONAL_INFO: ["additional info 1", "additional info 2"],
+      EXPLANATION: ["explanation 1", "explanation 2"],
     })
   })
 
-  it("emits update model value event when an input value changes", async () => {
+  it("emits update model value event when an input value is cleared", async () => {
     const user = userEvent.setup()
     const modelValue: Metadata = {
       ANNOUNCEMENT_GAZETTE: ["abc"],
@@ -167,8 +195,8 @@ describe("PrintAnnouncementInputGroup", () => {
       yearInput,
       numberInput,
       pageInput,
-      additionalInfoInput,
-      explanationInput,
+      additionalInfoChips,
+      explanationChips,
     } = getControls()
 
     expect(announcementGazetteInput).toHaveValue("abc")
@@ -187,12 +215,16 @@ describe("PrintAnnouncementInputGroup", () => {
     await user.clear(pageInput)
     expect(modelValue.PAGE).toBeUndefined()
 
-    expect(additionalInfoInput).toHaveValue("Info Text")
-    await user.clear(additionalInfoInput)
-    expect(modelValue.ADDITIONAL_INFO).toBeUndefined()
+    for (const chip of additionalInfoChips) {
+      const clearButton = within(chip).getByLabelText("Löschen")
+      await user.click(clearButton)
+    }
+    expect(modelValue.ADDITIONAL_INFO).toStrictEqual([])
 
-    expect(explanationInput).toHaveValue("Explanation text")
-    await user.clear(explanationInput)
-    expect(modelValue.EXPLANATION).toBeUndefined()
+    for (const chip of explanationChips) {
+      const clearButton = within(chip).getByLabelText("Löschen")
+      await user.click(clearButton)
+    }
+    expect(modelValue.EXPLANATION).toStrictEqual([])
   })
 })

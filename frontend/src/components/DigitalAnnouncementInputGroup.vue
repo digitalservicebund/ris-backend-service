@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { computed, ref, watch } from "vue"
 import { Metadata } from "@/domain/Norm"
+import ChipsInput from "@/shared/components/input/ChipsInput.vue"
 import DateInput from "@/shared/components/input/DateInput.vue"
 import InputField from "@/shared/components/input/InputField.vue"
 import TextInput from "@/shared/components/input/TextInput.vue"
@@ -35,56 +36,53 @@ watch(inputValue, () => emit("update:modelValue", inputValue.value), {
 
 const announcementMedium = computed({
   get: () => inputValue.value.ANNOUNCEMENT_MEDIUM?.[0],
-  set: (data?: string) =>
+  set: (data) =>
     (inputValue.value.ANNOUNCEMENT_MEDIUM = data ? [data] : undefined),
 })
 
 const date = computed({
   get: () => inputValue.value.DATE?.[0],
-  set: (data?: string) => (inputValue.value.DATE = data ? [data] : undefined),
+  set: (data) => (inputValue.value.DATE = data ? [data] : undefined),
 })
 
 const edition = computed({
   get: () => inputValue.value.EDITION?.[0],
-  set: (data?: string) =>
-    (inputValue.value.EDITION = data ? [data] : undefined),
+  set: (data) => (inputValue.value.EDITION = data ? [data] : undefined),
 })
 
 const year = computed({
   get: () => inputValue.value.YEAR?.[0],
-  set: (data?: string) => (inputValue.value.YEAR = data ? [data] : undefined),
+  set: (data) => (inputValue.value.YEAR = data ? [data] : undefined),
 })
 
 const pageNumber = computed({
   get: () => inputValue.value.PAGE?.[0],
-  set: (data?: string) => (inputValue.value.PAGE = data ? [data] : undefined),
+  set: (data) => (inputValue.value.PAGE = data ? [data] : undefined),
 })
 
 const areaOfPublication = computed({
   get: () => inputValue.value.AREA_OF_PUBLICATION?.[0],
-  set: (data?: string) =>
+  set: (data) =>
     (inputValue.value.AREA_OF_PUBLICATION = data ? [data] : undefined),
 })
 
 const numberOfThePublicationInTheRespectiveArea = computed({
   get: () =>
     inputValue.value.NUMBER_OF_THE_PUBLICATION_IN_THE_RESPECTIVE_AREA?.[0],
-  set: (data?: string) =>
+  set: (data) =>
     (inputValue.value.NUMBER_OF_THE_PUBLICATION_IN_THE_RESPECTIVE_AREA = data
       ? [data]
       : undefined),
 })
 
 const additionalInfo = computed({
-  get: () => inputValue.value.ADDITIONAL_INFO?.[0],
-  set: (data?: string) =>
-    (inputValue.value.ADDITIONAL_INFO = data ? [data] : undefined),
+  get: () => inputValue.value.ADDITIONAL_INFO,
+  set: (data) => (inputValue.value.ADDITIONAL_INFO = data),
 })
 
 const explanation = computed({
-  get: () => inputValue.value.EXPLANATION?.[0],
-  set: (data?: string) =>
-    (inputValue.value.EXPLANATION = data ? [data] : undefined),
+  get: () => inputValue.value.EXPLANATION,
+  set: (data) => (inputValue.value.EXPLANATION = data),
 })
 </script>
 <template>
@@ -191,7 +189,7 @@ const explanation = computed({
     aria-label="Zusatzangaben"
     label="Zusatzangaben"
   >
-    <TextInput
+    <ChipsInput
       id="digitalAnnouncementInfo"
       v-model="additionalInfo"
       aria-label="Zusatzangaben"
@@ -202,7 +200,7 @@ const explanation = computed({
     aria-label="Erläuterungen"
     label="Erläuterungen"
   >
-    <TextInput
+    <ChipsInput
       id="digitalAnnouncementExplanations"
       v-model="explanation"
       aria-label="Erläuterungen"

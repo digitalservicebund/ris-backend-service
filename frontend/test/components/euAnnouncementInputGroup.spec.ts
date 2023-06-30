@@ -1,5 +1,5 @@
 import userEvent from "@testing-library/user-event"
-import { render, screen } from "@testing-library/vue"
+import { within, render, screen } from "@testing-library/vue"
 import EuAnnouncementInputGroup from "@/components/EuAnnouncementInputGroup.vue"
 import { Metadata } from "@/domain/Norm"
 
@@ -37,9 +37,25 @@ function getControls() {
     name: "Zusatzangaben",
   }) as HTMLInputElement
 
+  const additionalInfoChips = within(
+    screen.getByTestId("chips-input_euAnnouncementInfo")
+  ).queryAllByTestId("chip")
+
+  const additionalInfoChipValues = within(
+    screen.getByTestId("chips-input_euAnnouncementInfo")
+  ).queryAllByTestId("chip-value")
+
   const explanationInput = screen.queryByRole("textbox", {
     name: "Erläuterungen",
   }) as HTMLInputElement
+
+  const explanationChips = within(
+    screen.getByTestId("chips-input_euAnnouncementExplanations")
+  ).queryAllByTestId("chip")
+
+  const explanationChipValues = within(
+    screen.getByTestId("chips-input_euAnnouncementExplanations")
+  ).queryAllByTestId("chip-value")
 
   return {
     euGovernmentGazetteInput,
@@ -48,7 +64,11 @@ function getControls() {
     numberInput,
     pageInput,
     additionalInfoInput,
+    additionalInfoChips,
+    additionalInfoChipValues,
     explanationInput,
+    explanationChips,
+    explanationChipValues,
   }
 }
 
@@ -57,12 +77,12 @@ describe("EuGovernmentGazetteInputGroup", () => {
     renderComponent({
       modelValue: {
         EU_GOVERNMENT_GAZETTE: ["Amtsblatt der EU"],
-        YEAR: ["test value"],
-        SERIES: ["test value"],
-        NUMBER: ["test value"],
-        PAGE: ["test value"],
-        ADDITIONAL_INFO: ["test value"],
-        EXPLANATION: ["test value"],
+        YEAR: ["test year"],
+        SERIES: ["test series"],
+        NUMBER: ["test number"],
+        PAGE: ["test page"],
+        ADDITIONAL_INFO: ["test additional info 1", "test additional info 2"],
+        EXPLANATION: ["test explanation 1", "test explanation 2"],
       },
     })
 
@@ -73,29 +93,37 @@ describe("EuGovernmentGazetteInputGroup", () => {
       numberInput,
       pageInput,
       additionalInfoInput,
+      additionalInfoChipValues,
       explanationInput,
+      explanationChipValues,
     } = getControls()
 
     expect(euGovernmentGazetteInput).toBeInTheDocument()
     expect(euGovernmentGazetteInput).toHaveValue("Amtsblatt der EU")
 
     expect(yearInput).toBeInTheDocument()
-    expect(yearInput).toHaveValue("test value")
+    expect(yearInput).toHaveValue("test year")
 
     expect(seriesInput).toBeInTheDocument()
-    expect(seriesInput).toHaveValue("test value")
+    expect(seriesInput).toHaveValue("test series")
 
     expect(numberInput).toBeInTheDocument()
-    expect(numberInput).toHaveValue("test value")
+    expect(numberInput).toHaveValue("test number")
 
     expect(pageInput).toBeInTheDocument()
-    expect(pageInput).toHaveValue("test value")
+    expect(pageInput).toHaveValue("test page")
 
     expect(additionalInfoInput).toBeInTheDocument()
-    expect(additionalInfoInput).toHaveValue("test value")
+    expect(additionalInfoChipValues.map((value) => value.textContent)).toEqual([
+      "test additional info 1",
+      "test additional info 2",
+    ])
 
     expect(explanationInput).toBeInTheDocument()
-    expect(explanationInput).toHaveValue("test value")
+    expect(explanationChipValues.map((value) => value.textContent)).toEqual([
+      "test explanation 1",
+      "test explanation 2",
+    ])
   })
 
   it("shows the correct model value entry in the associated input", () => {
@@ -126,12 +154,6 @@ describe("EuGovernmentGazetteInputGroup", () => {
 
     const pageInput = screen.queryByDisplayValue("2")
     expect(pageInput).toBeInTheDocument()
-
-    const additionalInfoInput = screen.queryByDisplayValue("test info")
-    expect(additionalInfoInput).toBeInTheDocument()
-
-    const explanationInput = screen.queryByDisplayValue("test explanation")
-    expect(explanationInput).toBeInTheDocument()
   })
 
   it("emits update model value event when an input value changes", async () => {
@@ -152,16 +174,22 @@ describe("EuGovernmentGazetteInputGroup", () => {
     await user.type(seriesInput, "0")
     await user.type(numberInput, "1")
     await user.type(pageInput, "2")
-    await user.type(additionalInfoInput, "foo bar")
-    await user.type(explanationInput, "bar foo")
+    await user.type(
+      additionalInfoInput,
+      "additional info 1{enter}additional info 2{enter}"
+    )
+    await user.type(
+      explanationInput,
+      "explanation 1{enter}explanation 2{enter}"
+    )
 
     expect(modelValue).toEqual({
       YEAR: ["2023"],
       SERIES: ["0"],
       NUMBER: ["1"],
       PAGE: ["2"],
-      ADDITIONAL_INFO: ["foo bar"],
-      EXPLANATION: ["bar foo"],
+      ADDITIONAL_INFO: ["additional info 1", "additional info 2"],
+      EXPLANATION: ["explanation 1", "explanation 2"],
     })
   })
 
@@ -183,8 +211,8 @@ describe("EuGovernmentGazetteInputGroup", () => {
       seriesInput,
       numberInput,
       pageInput,
-      additionalInfoInput,
-      explanationInput,
+      additionalInfoChips,
+      explanationChips,
     } = getControls()
 
     expect(yearInput).toHaveValue("2023")
@@ -203,12 +231,16 @@ describe("EuGovernmentGazetteInputGroup", () => {
     await user.clear(pageInput)
     expect(modelValue.PAGE).toBeUndefined()
 
-    expect(additionalInfoInput).toHaveValue("foo bar")
-    await user.clear(additionalInfoInput)
-    expect(modelValue.ADDITIONAL_INFO).toBeUndefined()
+    for (const chip of additionalInfoChips) {
+      const clearButton = within(chip).getByLabelText("Löschen")
+      await user.click(clearButton)
+    }
+    expect(modelValue.ADDITIONAL_INFO).toStrictEqual([])
 
-    expect(explanationInput).toHaveValue("bar foo")
-    await user.clear(explanationInput)
-    expect(modelValue.EXPLANATION).toBeUndefined()
+    for (const chip of explanationChips) {
+      const clearButton = within(chip).getByLabelText("Löschen")
+      await user.click(clearButton)
+    }
+    expect(modelValue.EXPLANATION).toStrictEqual([])
   })
 })
