@@ -130,6 +130,7 @@ watch(modelValueList, () => emit("update:modelValue", modelValueList.value), {
         v-else
         v-model="modelValueList[index]"
         class="group-first:pt-0 py-16"
+        :model-value-list="modelValue"
         @close-entry="setEditIndex(undefined)"
       />
     </div>

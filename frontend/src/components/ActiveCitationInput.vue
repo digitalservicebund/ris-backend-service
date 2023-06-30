@@ -23,6 +23,7 @@ interface Emits {
 
 const props = defineProps<{
   modelValue?: ActiveCitation
+  modelValueList?: ActiveCitation[]
 }>()
 const emit = defineEmits<Emits>()
 const activeCitation = ref(props.modelValue as ActiveCitation)
@@ -51,7 +52,6 @@ const activeCitationStyle = computed({
 
 const searchResultsCurrentPage = ref<Page<ActiveCitation>>()
 const searchResults = ref<SearchResults<ActiveCitation>>()
-const localActiveCitations = ref<ActiveCitation[]>()
 
 async function search(page = 0) {
   const activeCitationRef = new ActiveCitation({
@@ -76,7 +76,7 @@ async function search(page = 0) {
     searchResults.value = response.data.content.map((searchResult) => {
       return {
         decision: new ActiveCitation({ ...searchResult }),
-        isLinked: searchResult.isLinked(localActiveCitations.value),
+        isLinked: searchResult.isLinked(props.modelValueList),
       }
     })
   }
