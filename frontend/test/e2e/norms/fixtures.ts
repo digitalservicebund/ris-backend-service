@@ -896,13 +896,42 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
       ],
     },
     {
-      isSingleFieldSection: true,
+      heading: "Veröffentlichungsdatum",
+      isExpandableNotRepeatable: true,
+      isNotImported: true,
+      id: "publicationDate",
       fields: [
+        {
+          type: FieldType.RADIO,
+          id: "publicationTypeDate",
+          label: "Datum",
+          values: norm.metadataSections?.PUBLICATION_DATE?.map(
+            (section) => !!section?.DATE
+          ),
+        },
         {
           type: FieldType.TEXT,
           id: "publicationDate",
+          label: "Jahresangabe",
+          values: norm.metadataSections?.PUBLICATION_DATE?.map(
+            (section) => section?.DATE?.[0]
+          ),
+        },
+        {
+          type: FieldType.RADIO,
+          id: "publicationTypeYear",
+          label: "Jahresangabe",
+          values: norm.metadataSections?.PUBLICATION_DATE?.map(
+            (section) => !!section?.YEAR
+          ),
+        },
+        {
+          type: FieldType.TEXT,
+          id: "publicationYear",
           label: "Veröffentlichungsdatum",
-          value: norm.publicationDate,
+          values: norm.metadataSections?.PUBLICATION_DATE?.map(
+            (section) => section?.YEAR?.[0]
+          ),
         },
       ],
     },

@@ -22,6 +22,7 @@ import NormProviderInputGroup from "@/components/NormProviderInputGroup.vue"
 import ParticipatingInstitutionInputGroup from "@/components/ParticipatingInstitutionInputGroup.vue"
 import PrincipleEntryIntoForceInputGroup from "@/components/PrincipleEntryIntoForceInputGroup.vue"
 import PrincipleExpirationInputGroup from "@/components/PrincipleExpirationInputGroup.vue"
+import PublicationDateInputGroup from "@/components/PublicationDateInputGroup.vue"
 import SingleDataFieldSection from "@/components/SingleDataFieldSection.vue"
 import SubjectAreaInputGroup from "@/components/SubjectAreaInputGroup.vue"
 import { useScrollToHash } from "@/composables/useScrollToHash"
@@ -127,7 +128,6 @@ watch(
       loadedNorm.value.eli = data.eli as string
       loadedNorm.value.otherStatusNote = data.otherStatusNote as string
       loadedNorm.value.announcementDate = data.announcementDate as string
-      loadedNorm.value.publicationDate = data.publicationDate as string
       loadedNorm.value.reissueArticle = data.reissueArticle as string
       loadedNorm.value.reissueDate = data.reissueDate as string
       loadedNorm.value.reissueNote = data.reissueNote as string
@@ -872,12 +872,22 @@ const footnoteLineSummary = withSummarizer(summarizeFootnotePerLine)
       :type="InputType.DATE"
     />
 
-    <SingleDataFieldSection
+    <ExpandableDataSet
       id="publicationDate"
-      v-model="flatMetadata.publicationDate"
-      label="Veröffentlichungsdatum"
-      :type="InputType.DATE"
-    />
+      border-bottom
+      :data-set="metadataSections.PUBLICATION_DATE"
+      :summary-component="CitationDateSummary"
+      test-id="a11y-expandable-dataset"
+      title="Veröffentlichungsdatum"
+    >
+      <EditableList
+        v-model="metadataSections.PUBLICATION_DATE"
+        :default-value="{}"
+        disable-multi-entry
+        :edit-component="PublicationDateInputGroup"
+        :summary-component="CitationDateSummary"
+      />
+    </ExpandableDataSet>
 
     <ExpandableDataSet
       id="citationDates"

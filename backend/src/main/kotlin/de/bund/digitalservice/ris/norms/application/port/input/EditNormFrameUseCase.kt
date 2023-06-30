@@ -15,7 +15,6 @@ fun interface EditNormFrameUseCase {
         val metadataSections: List<MetadataSection>,
 
         var announcementDate: LocalDate? = null,
-        var publicationDate: LocalDate? = null,
 
         var statusNote: String? = null,
         var statusDescription: String? = null,

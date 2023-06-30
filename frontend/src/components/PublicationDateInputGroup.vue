@@ -21,8 +21,8 @@ watch(props.modelValue, () => emit("update:modelValue", props.modelValue), {
 
 <template>
   <DateOrYearInputGroup
-    id-prefix="citation"
-    label="Zitierdatum"
+    id-prefix="publication"
+    label="Veröffentlichungsdatum"
     :model-value="modelValue"
   />
 </template>

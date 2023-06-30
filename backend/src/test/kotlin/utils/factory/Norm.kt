@@ -13,7 +13,6 @@ fun norm(block: NormBuilder.() -> Unit): Norm = NormBuilder().apply(block).build
 class NormBuilder {
     var guid: UUID = UUID.randomUUID()
     var announcementDate = LocalDate.now()
-    var publicationDate = LocalDate.now()
     var statusNote = randomString()
     var statusDescription = randomString()
     var statusDate = LocalDate.now()
@@ -42,7 +41,6 @@ class NormBuilder {
         files = files,
         articles = articles,
         announcementDate = announcementDate,
-        publicationDate = publicationDate,
         statusNote = statusNote,
         statusDescription = statusDescription,
         statusDate = statusDate,

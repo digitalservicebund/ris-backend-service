@@ -726,7 +726,6 @@ export function encodeFlatMetadata(
     eli: encodeString(flatMetadata.eli),
     otherStatusNote: encodeString(flatMetadata.otherStatusNote),
     announcementDate: encodeNullDate(flatMetadata.announcementDate),
-    publicationDate: encodeNullDate(flatMetadata.publicationDate),
     reissueArticle: encodeString(flatMetadata.reissueArticle),
     reissueDate: encodeNullDate(flatMetadata.reissueDate),
     reissueNote: encodeString(flatMetadata.reissueNote),

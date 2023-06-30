@@ -238,6 +238,7 @@ export enum MetadataSectionName {
   REISSUE = "REISSUE",
   REPEAL = "REPEAL",
   OTHER_STATUS = "OTHER_STATUS",
+  PUBLICATION_DATE = "PUBLICATION_DATE",
 }
 
 export type MetadataSections = {
@@ -252,7 +253,6 @@ export type FlatMetadata = {
   printAnnouncementPage?: string
   printAnnouncementYear?: string
   announcementDate?: string
-  publicationDate?: string
   reissueArticle?: string
   reissueDate?: string
   reissueNote?: string

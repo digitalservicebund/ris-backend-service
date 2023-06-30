@@ -22,6 +22,7 @@ import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName.OFFICIA
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName.PARTICIPATION
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName.PRINCIPLE_ENTRY_INTO_FORCE
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName.PRINCIPLE_EXPIRATION
+import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName.PUBLICATION_DATE
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName.STATUS_INDICATION
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName.SUBJECT_AREA
 
@@ -51,6 +52,7 @@ val hasValidSections =
                 FOOTNOTES,
                 DOCUMENT_STATUS_SECTION,
                 STATUS_INDICATION,
+                PUBLICATION_DATE,
             )
         }
     }

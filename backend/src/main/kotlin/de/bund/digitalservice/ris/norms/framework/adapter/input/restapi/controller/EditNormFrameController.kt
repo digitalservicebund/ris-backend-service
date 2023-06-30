@@ -43,7 +43,6 @@ class EditNormFrameController(private val editNormFrameService: EditNormFrameUse
         lateinit var metadataSections: List<MetadataSectionRequestSchema>
 
         var announcementDate: String? = null
-        var publicationDate: String? = null
 
         var statusNote: String? = null
         var statusDescription: String? = null
@@ -64,7 +63,6 @@ class EditNormFrameController(private val editNormFrameService: EditNormFrameUse
         fun toUseCaseData(): EditNormFrameUseCase.NormFrameProperties = EditNormFrameUseCase.NormFrameProperties(
             this.metadataSections.map { it.toUseCaseData() },
             decodeLocalDate(this.announcementDate),
-            decodeLocalDate(this.publicationDate),
             this.statusNote,
             this.statusDescription,
             decodeLocalDate(this.statusDate),

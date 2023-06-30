@@ -116,7 +116,6 @@ class EditNormFrameControllerTest {
         var officialAbbreviation: String? = null
 
         var announcementDate: String? = null
-        var publicationDate: String? = null
 
         var completeCitation: String? = null
 

@@ -118,7 +118,8 @@ testWithImportedNorm(
         section.heading === "Datum des Inkrafttretens" ||
         section.heading === "Datum des Außerkrafttretens" ||
         section.heading === "Grundsätzliches Inkrafttretedatum" ||
-        section.heading === "Grundsätzliches Außerkrafttretedatum"
+        section.heading === "Grundsätzliches Außerkrafttretedatum" ||
+        section.heading === "Veröffentlichungsdatum"
       ) {
         continue
       }

@@ -9,6 +9,7 @@ import io.mockk.every
 import io.mockk.mockk
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
+import java.time.LocalDate
 import java.util.*
 
 class HasValidSectionsTest {
@@ -130,6 +131,22 @@ class HasValidSectionsTest {
                         listOf(Metadatum("note", MetadatumType.NOTE)),
                     ),
                 ),
+            ),
+        )
+
+        assertThat(hasValidSections.isSatisfiedBy(instance)).isTrue()
+    }
+
+    @Test
+    fun `it is satisfied if the publication date can be added directly to the Norm`() {
+        val instance = mockk<Norm>()
+        every { instance.guid } returns UUID.randomUUID()
+        every { instance.officialLongTitle } returns "officialLongTitle"
+
+        every { instance.metadataSections } returns listOf(
+            MetadataSection(
+                MetadataSectionName.PUBLICATION_DATE,
+                listOf(Metadatum(LocalDate.now(), MetadatumType.DATE)),
             ),
         )
 

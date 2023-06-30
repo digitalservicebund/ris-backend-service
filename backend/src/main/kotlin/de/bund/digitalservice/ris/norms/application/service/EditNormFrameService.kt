@@ -31,7 +31,6 @@ private fun getUpdatedNorm(guid: UUID, properties: EditNormFrameUseCase.NormFram
     articles = listOf(),
     metadataSections = properties.metadataSections,
     announcementDate = properties.announcementDate,
-    publicationDate = properties.publicationDate,
     statusNote = properties.statusNote,
     statusDescription = properties.statusDescription,
     statusDate = properties.statusDate,

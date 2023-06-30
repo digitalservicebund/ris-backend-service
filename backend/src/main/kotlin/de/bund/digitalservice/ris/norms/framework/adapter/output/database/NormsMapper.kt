@@ -57,7 +57,6 @@ interface NormsMapper {
             articles,
             listDomainSections,
             normDto.announcementDate,
-            normDto.publicationDate,
             normDto.statusNote,
             normDto.statusDescription,
             normDto.statusDate,
@@ -110,7 +109,6 @@ interface NormsMapper {
         return NormDto(
             norm.guid,
             norm.announcementDate,
-            norm.publicationDate,
             norm.statusNote,
             norm.statusDescription,
             norm.statusDate,

@@ -146,10 +146,13 @@ describe("normsService", () => {
               [MetadatumType.OFFICIAL_ABBREVIATION]: ["official abbreviation"],
             },
           ],
+          [MetadataSectionName.PUBLICATION_DATE]: [
+            {
+              [MetadatumType.DATE]: ["2022-11-14T23:00:00.000Z"],
+            },
+          ],
         },
-        {
-          publicationDate: "2022-11-14T23:00:00.000Z",
-        }
+        {}
       )
 
       expect(httpClientPut).toHaveBeenCalledOnce()
@@ -219,9 +222,20 @@ describe("normsService", () => {
                 },
               ],
             },
+            {
+              name: MetadataSectionName.PUBLICATION_DATE,
+              order: 1,
+              sections: null,
+              metadata: [
+                {
+                  type: MetadatumType.DATE,
+                  order: 1,
+                  value: "2022-11-14",
+                },
+              ],
+            },
           ],
           announcementDate: null,
-          publicationDate: "2022-11-14",
           eli: null,
           otherStatusNote: null,
           reissueArticle: null,

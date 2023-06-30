@@ -66,7 +66,6 @@ class NormTest {
 
     @Test
     fun `can create a norm with optional date and boolean fields`() {
-        val publicationDate = LocalDate.of(2022, 11, 17)
         val announcementDate = LocalDate.of(2022, 11, 18)
         val paragraph = Paragraph(UUID.randomUUID(), "marker", "text")
         val article = Article(UUID.randomUUID(), "title", "marker", listOf(paragraph))
@@ -86,14 +85,13 @@ class NormTest {
             Norm(
                 guid = guid,
                 articles = listOf(article),
-                publicationDate = publicationDate,
+
                 announcementDate = announcementDate,
                 metadataSections = listOf(citationDateSection, normProviderSection, normSection),
             )
 
         assertThat(norm.guid).isEqualTo(guid)
         assertThat(norm.articles).isEqualTo(listOf(article))
-        assertThat(norm.publicationDate).isEqualTo(publicationDate)
         assertThat(norm.announcementDate).isEqualTo(announcementDate)
         assertThat(norm.metadataSections.flatMap { it.metadata }).contains(citationDate)
         assertThat(norm.metadataSections.flatMap { it.metadata }).contains(resolutionMajority)

@@ -311,7 +311,6 @@ export function generateFlatMetadata(
     announcementDate: generateString(),
     eli: generateString(),
     otherStatusNote: generateString(),
-    publicationDate: generateString(),
     reissueArticle: generateString(),
     reissueDate: generateString(),
     reissueNote: generateString(),

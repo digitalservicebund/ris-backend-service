@@ -8,7 +8,6 @@ classDiagram
     +List~Article~ articles
 
     Date announcementDate
-    Date publicationDate
 
     List~FileReference~ files
   }
@@ -110,6 +109,7 @@ classDiagram
      REISSUE
      REPEAL
      OTHER_STATUS
+     PUBLICATION_DATE
   }
 
   class MetadatumType  {
