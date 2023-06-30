@@ -14,7 +14,7 @@ testWithImportedNorm(
     testWithImportedNorm.slow()
     await openNorm(
       page,
-      normData.metadataSections?.NORM?.[0]?.OFFICIAL_ABBREVIATION?.[0] ?? "",
+      normData.metadataSections?.NORM?.[0]?.OFFICIAL_LONG_TITLE?.[0] ?? "",
       guid
     )
 

@@ -79,10 +79,10 @@ export const openNorm = async (
   guid: string
 ) => {
   await page.goto("/norms")
-  await expect(page.getByText(officialLongTitle).first()).toBeVisible()
-  const locatorA = page.locator(`a[href*="/norms/norm/${guid}"]`)
-  await expect(locatorA).toBeVisible()
-  await locatorA.click()
+  const listEntry = page.locator(`a[href="/norms/norm/${guid}"]`)
+  await expect(listEntry).toBeVisible()
+  await expect(listEntry).toHaveText(officialLongTitle)
+  await listEntry.click()
 }
 
 export async function getDownloadedFileContent(page: Page, filename: string) {
