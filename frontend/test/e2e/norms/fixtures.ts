@@ -1192,101 +1192,19 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
       sections: [
         {
           heading: "Stand",
-          fields: [
-            {
-              type: FieldType.TEXT,
-              id: "statusNote",
-              label: "Änderungshinweis",
-              value: norm.statusNote,
-            },
-            {
-              type: FieldType.TEXT,
-              id: "statusDescription",
-              label: "Bezeichnung der Änderungsvorschrift",
-              value: norm.statusDescription,
-            },
-            {
-              type: FieldType.TEXT,
-              id: "statusDate",
-              label: "Datum der Änderungsvorschrift",
-              value: norm.statusDate,
-            },
-            {
-              type: FieldType.TEXT,
-              id: "statusReference",
-              label: "Fundstellen der Änderungsvorschrift",
-              value: norm.statusReference,
-            },
-          ],
+          fields: [],
         },
         {
           heading: "Aufhebung",
-          fields: [
-            {
-              type: FieldType.TEXT,
-              id: "repealNote",
-              label: "Änderungshinweis",
-              value: norm.repealNote,
-            },
-            {
-              type: FieldType.TEXT,
-              id: "repealArticle",
-              label: "Artikel der Änderungsvorschrift",
-              value: norm.repealArticle,
-            },
-            {
-              type: FieldType.TEXT,
-              id: "repealDate",
-              label: "Datum der Änderungsvorschrift",
-              value: norm.repealDate,
-            },
-            {
-              type: FieldType.TEXT,
-              id: "repealReferences",
-              label: "Fundstellen der Änderungsvorschrift",
-              value: norm.repealReferences,
-            },
-          ],
+          fields: [],
         },
         {
           heading: "Neufassung",
-          fields: [
-            {
-              type: FieldType.TEXT,
-              id: "reissueNote",
-              label: "Neufassungshinweis",
-              value: norm.reissueNote,
-            },
-            {
-              type: FieldType.TEXT,
-              id: "reissueArticle",
-              label: "Bezeichnung der Bekanntmachung",
-              value: norm.reissueArticle,
-            },
-            {
-              type: FieldType.TEXT,
-              id: "reissueDate",
-              label: "Datum der Bekanntmachung",
-              value: norm.reissueDate,
-            },
-            {
-              type: FieldType.TEXT,
-              id: "reissueReference",
-              label: "Fundstelle der Bekanntmachung",
-              value: norm.reissueReference,
-            },
-          ],
+          fields: [],
         },
         {
           heading: "Sonstiger Hinweis",
-          fields: [
-            {
-              type: FieldType.TEXT,
-              id: "otherStatusNote",
-              label: "Sonstiger Hinweis",
-              value: norm.otherStatusNote,
-            },
-          ],
+          fields: [],
         },
       ],
     },

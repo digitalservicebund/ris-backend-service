@@ -122,21 +122,8 @@ watch(
   (data) => {
     if (loadedNorm.value !== undefined && data !== undefined) {
       loadedNorm.value.eli = data.eli as string
-      loadedNorm.value.otherStatusNote = data.otherStatusNote as string
       loadedNorm.value.announcementDate = data.announcementDate as string
       loadedNorm.value.publicationDate = data.publicationDate as string
-      loadedNorm.value.reissueArticle = data.reissueArticle as string
-      loadedNorm.value.reissueDate = data.reissueDate as string
-      loadedNorm.value.reissueNote = data.reissueNote as string
-      loadedNorm.value.reissueReference = data.reissueReference as string
-      loadedNorm.value.repealArticle = data.repealArticle as string
-      loadedNorm.value.repealDate = data.repealDate as string
-      loadedNorm.value.repealNote = data.repealNote as string
-      loadedNorm.value.repealReferences = data.repealReferences as string
-      loadedNorm.value.statusDate = data.statusDate as string
-      loadedNorm.value.statusDescription = data.statusDescription as string
-      loadedNorm.value.statusNote = data.statusNote as string
-      loadedNorm.value.statusReference = data.statusReference as string
     }
   },
   { deep: true }

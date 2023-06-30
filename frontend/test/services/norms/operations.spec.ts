@@ -223,19 +223,6 @@ describe("normsService", () => {
           announcementDate: null,
           publicationDate: "2022-11-14",
           eli: null,
-          otherStatusNote: null,
-          reissueArticle: null,
-          reissueDate: null,
-          reissueNote: null,
-          reissueReference: null,
-          repealArticle: null,
-          repealDate: null,
-          repealNote: null,
-          repealReferences: null,
-          statusDate: null,
-          statusDescription: null,
-          statusNote: null,
-          statusReference: null,
         }
       )
     })
