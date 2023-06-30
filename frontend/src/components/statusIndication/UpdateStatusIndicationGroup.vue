@@ -106,7 +106,7 @@ const inputFields = computed(() => {
     props.type === MetadataSectionName.STATUS
       ? {
           id: "statusDate",
-          label: "Datum der Änderungungsvorschrift",
+          label: "Datum der Änderungsvorschrift",
           modelValue: date.value ?? "",
           updateModelValue: (value: string) => (date.value = value),
         }
@@ -121,7 +121,7 @@ const inputFields = computed(() => {
     props.type === MetadataSectionName.STATUS
       ? {
           id: "statusReference",
-          label: "Fundstellen der Änderungungsvorschrift",
+          label: "Fundstellen der Änderungsvorschrift",
           modelValue: multipleReferences.value ?? [],
           updateModelValue: (value: string[]) =>
             (multipleReferences.value = value),

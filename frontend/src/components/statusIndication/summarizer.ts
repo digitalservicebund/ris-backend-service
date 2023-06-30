@@ -14,17 +14,17 @@ function summarizeUpdate(
 ): string {
   const typeName = type === MetadataSectionName.STATUS ? "Stand" : "Neufassung"
 
-  const note = data.NOTE ? data.NOTE[0] : ""
-  const reference = data.REFERENCE ? data.REFERENCE : []
+  const note = data?.NOTE?.[0] ?? ""
+  const reference = data?.REFERENCE ?? []
 
   let descriptionOrArticle = ""
   if (type === MetadataSectionName.STATUS) {
-    descriptionOrArticle = data.DESCRIPTION ? data.DESCRIPTION[0] : ""
+    descriptionOrArticle = data?.DESCRIPTION?.[0] ?? ""
   } else if (type === MetadataSectionName.REISSUE) {
-    descriptionOrArticle = data.ARTICLE ? data.ARTICLE[0] : ""
+    descriptionOrArticle = data?.ARTICLE?.[0] ?? ""
   }
 
-  let date = data.DATE ? data.DATE[0] : ""
+  let date = data?.DATE?.[0] ?? ""
   if (date) date = dayjs(date).format("DD.MM.YYYY")
 
   return join(typeName, note, descriptionOrArticle, date, reference)
