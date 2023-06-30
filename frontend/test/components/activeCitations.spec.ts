@@ -2,7 +2,11 @@ import userEvent from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
 import ActiveCitations from "@/components/ActiveCitations.vue"
 import ActiveCitation from "@/domain/activeCitation"
+import { CitationStyle } from "@/domain/citationStyle"
+import { Court, DocumentType } from "@/domain/documentUnit"
+import comboboxItemService from "@/services/comboboxItemService"
 import documentUnitService from "@/services/documentUnitService"
+import { ComboboxItem } from "@/shared/components/input/types"
 
 function renderComponent(options?: { modelValue?: ActiveCitation[] }) {
   const props = {
@@ -21,16 +25,180 @@ function renderComponent(options?: { modelValue?: ActiveCitation[] }) {
   }
 }
 
-async function openExpandableArea(user: ReturnType<typeof userEvent.setup>) {
-  await user.click(screen.getByText("Aktivzitierung"))
+function generateActiveCitation(options?: {
+  uuid?: string
+  documentNumber?: string
+  court?: Court
+  decisionDate?: string
+  fileNumber?: string
+  documentType?: DocumentType
+  dataSource?:
+    | "NEURIS"
+    | "MIGRATION"
+    | "PROCEEDING_DECISION"
+    | "ACTIVE_CITATION"
+}) {
+  const activeCitation = new ActiveCitation({
+    uuid: options?.uuid ?? "123",
+    documentNumber: "ABC",
+    court: options?.court ?? {
+      type: "type1",
+      location: "location1",
+      label: "label1",
+    },
+    decisionDate: options?.decisionDate ?? "2022-02-01",
+    fileNumber: options?.fileNumber ?? "test fileNumber",
+    documentType: options?.documentType ?? {
+      jurisShortcut: "documentTypeShortcut1",
+      label: "documentType1",
+    },
+    dataSource: options?.dataSource ?? "NEURIS",
+  })
+  return activeCitation
 }
 
 describe("Active Citations", async () => {
   global.ResizeObserver = require("resize-observer-polyfill")
 
-  it("shows all input fields if expanded", async () => {
+  vi.spyOn(
+    documentUnitService,
+    "searchByLinkedDocumentUnit"
+  ).mockImplementation(() =>
+    Promise.resolve({
+      status: 200,
+      data: {
+        content: [
+          new ActiveCitation({
+            uuid: "123",
+            court: {
+              type: "type1",
+              location: "location1",
+              label: "label1",
+            },
+            decisionDate: "2022-02-01",
+            documentType: {
+              jurisShortcut: "documentTypeShortcut1",
+              label: "documentType1",
+            },
+            fileNumber: "test fileNumber1",
+          }),
+        ],
+        size: 0,
+        totalElements: 20,
+        totalPages: 2,
+        number: 0,
+        numberOfElements: 20,
+        first: true,
+        last: false,
+      },
+    })
+  )
+
+  vi.spyOn(window, "scrollTo").mockImplementation(() => vi.fn())
+
+  const court: Court = {
+    type: "AG",
+    location: "Test",
+    label: "AG Test",
+  }
+
+  const documentType: DocumentType = {
+    jurisShortcut: "Ant",
+    label: "EuGH-Vorlage",
+  }
+
+  const citationStyle: CitationStyle = {
+    uuid: "123",
+    jurisShortcut: "Änderungen",
+    label: "Änderungen",
+  }
+
+  const dropdownCourtItems: ComboboxItem[] = [
+    {
+      label: court.label,
+      value: court,
+      additionalInformation: court.revoked,
+    },
+  ]
+
+  const dropdownDocumentTypesItems: ComboboxItem[] = [
+    {
+      label: documentType.label,
+      value: documentType,
+      additionalInformation: documentType.jurisShortcut,
+    },
+  ]
+
+  const dropdownCitationStyleItems: ComboboxItem[] = [
+    {
+      label: citationStyle.label,
+      value: citationStyle,
+      additionalInformation: citationStyle.jurisShortcut,
+    },
+  ]
+  vi.spyOn(comboboxItemService, "getCourts").mockImplementation(() =>
+    Promise.resolve({ status: 200, data: dropdownCourtItems })
+  )
+
+  vi.spyOn(comboboxItemService, "getDocumentTypes").mockImplementation(() =>
+    Promise.resolve({ status: 200, data: dropdownDocumentTypesItems })
+  )
+
+  vi.spyOn(comboboxItemService, "getCitationStyles").mockImplementation(() =>
+    Promise.resolve({ status: 200, data: dropdownCitationStyleItems })
+  )
+
+  it("renders empty active citation in edit mode, when no activeCitations in list", async () => {
+    renderComponent()
+    expect(screen.getAllByLabelText("Listen Eintrag").length).toBe(1)
+    expect(screen.getByLabelText("Art der Zitierung")).toBeVisible()
+    expect(
+      screen.getByLabelText("Entscheidungsdatum Aktivzitierung")
+    ).toBeVisible()
+    expect(
+      screen.getByLabelText("Entscheidungsdatum Aktivzitierung")
+    ).toBeInTheDocument()
+    expect(
+      screen.getByLabelText("Aktenzeichen Aktivzitierung")
+    ).toBeInTheDocument()
+    expect(
+      screen.getByLabelText("Dokumenttyp Aktivzitierung")
+    ).toBeInTheDocument()
+  })
+
+  it("renders activeCitations as list entries", () => {
+    const modelValue: ActiveCitation[] = [
+      generateActiveCitation({ fileNumber: "123" }),
+      generateActiveCitation({ fileNumber: "345" }),
+    ]
+    renderComponent({ modelValue })
+
+    expect(screen.queryByLabelText("Art der Zitierung")).not.toBeInTheDocument()
+    expect(screen.getByText(/123/)).toBeInTheDocument()
+    expect(screen.getByText(/345/)).toBeInTheDocument()
+  })
+
+  it("creates new active citation manually", async () => {
     const { user } = renderComponent()
-    await openExpandableArea(user)
+    const input = screen.getByLabelText("Aktenzeichen Aktivzitierung")
+    await user.type(input, "123")
+    const button = screen.getByLabelText("Aktivzitierung speichern")
+    await user.click(button)
+
+    expect(screen.getAllByLabelText("Listen Eintrag").length).toBe(1)
+  })
+
+  it("click on edit icon, opens the list entry in edit mode", async () => {
+    const { user } = renderComponent({
+      modelValue: [
+        generateActiveCitation({
+          fileNumber: "123",
+          dataSource: "ACTIVE_CITATION",
+        }),
+      ],
+    })
+    const button = screen.getByLabelText("Eintrag bearbeiten")
+    await user.click(button)
 
     expect(screen.getByLabelText("Art der Zitierung")).toBeVisible()
     expect(
@@ -47,76 +215,194 @@ describe("Active Citations", async () => {
     ).toBeInTheDocument()
   })
 
-  it("creates new active citation", async () => {
-    //todo
+  it("click on delete icon, deletes the list entry", async () => {
+    const modelValue: ActiveCitation[] = [
+      generateActiveCitation({ fileNumber: "123" }),
+      generateActiveCitation({ fileNumber: "345" }),
+    ]
+    const { user } = renderComponent({ modelValue })
+    const activeCitations = screen.getAllByLabelText("Listen Eintrag")
+    expect(activeCitations.length).toBe(2)
+    const buttonList = screen.getAllByLabelText("Eintrag löschen")
+    await user.click(buttonList[0])
+    expect(screen.getAllByLabelText("Listen Eintrag").length).toBe(1)
   })
 
-  it("does not create active citation if undefined", async () => {
-    //todo
+  it("renders manually added active citations as editable list item", async () => {
+    renderComponent({
+      modelValue: [
+        generateActiveCitation({
+          dataSource: "ACTIVE_CITATION",
+        }),
+      ],
+    })
+    expect(screen.getByLabelText("Eintrag bearbeiten")).toBeInTheDocument()
+  })
+
+  it("correctly updates value citation style input", async () => {
+    const { user } = renderComponent({
+      modelValue: [
+        generateActiveCitation({
+          dataSource: "ACTIVE_CITATION",
+        }),
+      ],
+    })
+
+    expect(screen.queryByText(/Änderungen/)).not.toBeInTheDocument()
+
+    const editButton = screen.getByLabelText("Eintrag bearbeiten")
+    await user.click(editButton)
+
+    await user.type(
+      await screen.findByLabelText("Art der Zitierung"),
+      "Änderungen"
+    )
+    const dropdownItems = screen.getAllByLabelText("dropdown-option")
+    expect(dropdownItems[0]).toHaveTextContent("Änderungen")
+    await user.click(dropdownItems[0])
+    const button = screen.getByLabelText("Aktivzitierung speichern")
+    await user.click(button)
+
+    expect(screen.getByText(/Änderungen/)).toBeVisible()
+  })
+
+  it("correctly updates value document type input", async () => {
+    const { user } = renderComponent({
+      modelValue: [
+        generateActiveCitation({
+          dataSource: "ACTIVE_CITATION",
+        }),
+      ],
+    })
+
+    expect(screen.queryByText(/EuGH-Vorlage/)).not.toBeInTheDocument()
+
+    const editButton = screen.getByLabelText("Eintrag bearbeiten")
+    await user.click(editButton)
+
+    await user.type(
+      await screen.findByLabelText("Dokumenttyp Aktivzitierung"),
+      "Ant"
+    )
+    const dropdownItems = screen.getAllByLabelText("dropdown-option")
+    expect(dropdownItems[0]).toHaveTextContent("EuGH-Vorlage")
+    await user.click(dropdownItems[0])
+    const button = screen.getByLabelText("Aktivzitierung speichern")
+    await user.click(button)
+
+    expect(screen.getByText(/EuGH-Vorlage/)).toBeVisible()
+  })
+
+  it("correctly updates value court input", async () => {
+    const { user } = renderComponent({
+      modelValue: [
+        generateActiveCitation({
+          dataSource: "ACTIVE_CITATION",
+        }),
+      ],
+    })
+
+    expect(screen.queryByText(/AG Test/)).not.toBeInTheDocument()
+
+    const editButton = screen.getByLabelText("Eintrag bearbeiten")
+    await user.click(editButton)
+
+    await user.type(
+      await screen.findByLabelText("Gericht Aktivzitierung"),
+      "AG"
+    )
+    const dropdownItems = screen.getAllByLabelText("dropdown-option")
+    expect(dropdownItems[0]).toHaveTextContent("AG Test")
+    await user.click(dropdownItems[0])
+    const button = screen.getByLabelText("Aktivzitierung speichern")
+    await user.click(button)
+
+    expect(screen.getByText(/AG Test/)).toBeVisible()
+  })
+
+  it("correctly updates value of fileNumber input", async () => {
+    const { user } = renderComponent({
+      modelValue: [
+        generateActiveCitation({
+          dataSource: "ACTIVE_CITATION",
+        }),
+      ],
+    })
+
+    expect(screen.queryByText(/new fileNumber/)).not.toBeInTheDocument()
+    const editButton = screen.getByLabelText("Eintrag bearbeiten")
+    await user.click(editButton)
+
+    const fileNumberInput = await screen.findByLabelText(
+      "Aktenzeichen Aktivzitierung"
+    )
+
+    await user.clear(fileNumberInput)
+    await user.type(fileNumberInput, "new fileNumber")
+    const button = screen.getByLabelText("Aktivzitierung speichern")
+    await user.click(button)
+
+    expect(screen.getByText(/new fileNumber/)).toBeVisible()
+  })
+
+  it("correctly updates value of decision date input", async () => {
+    const { user } = renderComponent({
+      modelValue: [
+        generateActiveCitation({
+          dataSource: "ACTIVE_CITATION",
+        }),
+      ],
+    })
+
+    expect(screen.queryByText(/02.02.2022/)).not.toBeInTheDocument()
+    const editButton = screen.getByLabelText("Eintrag bearbeiten")
+    await user.click(editButton)
+
+    const fileNumberInput = await screen.findByLabelText(
+      "Entscheidungsdatum Aktivzitierung"
+    )
+
+    await user.clear(fileNumberInput)
+    await user.type(fileNumberInput, "02.02.2022")
+    const button = screen.getByLabelText("Aktivzitierung speichern")
+    await user.click(button)
+
+    expect(screen.getByText(/02.02.2022/)).toBeVisible()
+  })
+
+  it("renders from search added active citations as non-editable list item", async () => {
+    renderComponent({
+      modelValue: [generateActiveCitation()],
+    })
+    expect(
+      screen.queryByLabelText("Eintrag bearbeiten")
+    ).not.toBeInTheDocument()
   })
 
   it("lists search results", async () => {
-    const fetchSpy = vi
-      .spyOn(documentUnitService, "searchByLinkedDocumentUnit")
-      .mockImplementation(() =>
-        Promise.resolve({
-          status: 200,
-          data: {
-            content: [
-              new ActiveCitation({
-                court: {
-                  type: "type1",
-                  location: "location1",
-                  label: "label1",
-                },
-                decisionDate: "2022-02-01",
-                documentType: {
-                  jurisShortcut: "documentTypeShortcut1",
-                  label: "documentType1",
-                },
-                fileNumber: "test fileNumber",
-              }),
-              new ActiveCitation({
-                court: {
-                  type: "type2",
-                  location: "location2",
-                  label: "label2",
-                },
-                decisionDate: "2022-02-02",
-                documentType: {
-                  jurisShortcut: "documentTypeShortcut2",
-                  label: "documentType2",
-                },
-                fileNumber: "test fileNumber",
-              }),
-            ],
-            size: 0,
-            totalElements: 20,
-            totalPages: 2,
-            number: 0,
-            numberOfElements: 20,
-            first: true,
-            last: false,
-          },
-        })
-      )
     const { user } = renderComponent()
-    await openExpandableArea(user)
 
     expect(screen.queryByText(/test fileNumber/)).not.toBeInTheDocument()
-
-    await user.type(
-      await screen.findByLabelText("Aktenzeichen Aktivzitierung"),
-      "test fileNumber"
-    )
     await user.click(screen.getByLabelText("Nach Entscheidung suchen"))
-    expect(fetchSpy).toBeCalledTimes(1)
 
-    expect(screen.getAllByText(/test fileNumber/).length).toBe(2)
+    expect(screen.getAllByText(/test fileNumber/).length).toBe(1)
   })
 
-  it("adds proceeding decision from search results and updates indicators"),
-    async () => {
-      //todo
-    }
+  it("adds active citation from search results", async () => {
+    const { user } = renderComponent()
+
+    await user.click(screen.getByLabelText("Nach Entscheidung suchen"))
+    await user.click(screen.getByLabelText("Treffer übernehmen"))
+    expect(screen.getAllByText(/test fileNumber/).length).toBe(1)
+  })
+
+  it("indicates that search result already added to active citations", async () => {
+    const modelValue: ActiveCitation[] = [
+      generateActiveCitation({ uuid: "123" }),
+    ]
+    const { user } = renderComponent({ modelValue })
+    await user.click(screen.getByText(/Weitere Angabe/))
+    await user.click(screen.getByLabelText("Nach Entscheidung suchen"))
+    expect(screen.getByText(/Bereits hinzugefügt/)).toBeInTheDocument()
+  })
 })
