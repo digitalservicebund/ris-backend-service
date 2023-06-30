@@ -15,14 +15,33 @@ public class V0_100__norms_migrate_official_long_title_data_to_sections extends 
 
     final Connection connection = context.getConnection();
 
-    // GUIDs of norms without NORM section
-    final List<UUID> guidWithoutNormList = new ArrayList<>();
+    // GUIDs and long titles of norms without NORM section
+    final List<UUID> noNormSectionNorms = new ArrayList<>();
     try (final Statement stmt = connection.createStatement()) {
-      try (final ResultSet guidWithoutNormResult =
+      try (final ResultSet result =
           stmt.executeQuery(
               "SELECT guid FROM norms WHERE guid NOT IN (SELECT norm_guid FROM metadata_sections WHERE name = 'NORM')")) {
-        while (guidWithoutNormResult.next()) {
-          guidWithoutNormList.add(guidWithoutNormResult.getObject("guid", UUID.class));
+        while (result.next()) {
+          noNormSectionNorms.add(result.getObject("guid", UUID.class));
+        }
+      }
+    }
+
+    // GUIDs and long titles of norms with NORM section but without OFFICIAL_LONG_TITLE
+    final List<UUID> normsWithNormSectionButNotLongTitle = new ArrayList<>();
+    try (final Statement stmt = connection.createStatement()) {
+      try (final ResultSet result =
+          stmt.executeQuery(
+              "select guid "
+                  + "from norms n "
+                  + "where guid in (select ms.norm_guid "
+                  + "from metadata_sections ms "
+                  + "where ms.name = 'NORM' "
+                  + "and ms.guid not in (select section_guid "
+                  + "from metadata "
+                  + "where type = 'OFFICIAL_LONG_TITLE'))")) {
+        while (result.next()) {
+          normsWithNormSectionButNotLongTitle.add(result.getObject("guid", UUID.class));
         }
       }
     }
@@ -37,11 +56,11 @@ public class V0_100__norms_migrate_official_long_title_data_to_sections extends 
 
           // a. Get new sectionGUID (create new NORM section)
           UUID sectionGUID = null;
-          if (guidWithoutNormList.contains(normGuid)) {
+          if (noNormSectionNorms.contains(normGuid)) {
             try (final PreparedStatement change =
                 connection.prepareStatement(
                     "INSERT INTO metadata_sections (name, order_number, guid, section_guid, norm_guid) "
-                        + "VALUES ('NORM', 1, ?, NULL, ?);")) {
+                        + "VALUES ('NORM', 1, ?, NULL, ?)")) {
               sectionGUID = UUID.randomUUID();
               change.setObject(1, sectionGUID);
               change.setObject(2, normGuid);
@@ -49,10 +68,10 @@ public class V0_100__norms_migrate_official_long_title_data_to_sections extends 
             }
 
             // b. Get sectionGUID of already existing NORM section
-          } else {
+          } else if (normsWithNormSectionButNotLongTitle.contains(normGuid)) {
             try (final PreparedStatement findParent =
                 connection.prepareStatement(
-                    "SELECT guid FROM metadata_sections WHERE norm_guid=?")) {
+                    "SELECT guid FROM metadata_sections WHERE norm_guid=? and name='NORM'")) {
               findParent.setObject(1, normGuid);
               try (final ResultSet parentGuid = findParent.executeQuery()) {
                 parentGuid.next();
@@ -62,14 +81,16 @@ public class V0_100__norms_migrate_official_long_title_data_to_sections extends 
           }
 
           // Create metadatum
-          try (final PreparedStatement change =
-              connection.prepareStatement(
-                  "INSERT INTO metadata (value, type, order_number, guid, section_guid) "
-                      + "VALUES (?, 'OFFICIAL_LONG_TITLE', 1, ?, ?);")) {
-            change.setString(1, officialLongTitle);
-            change.setObject(2, UUID.randomUUID());
-            change.setObject(3, sectionGUID);
-            change.execute();
+          if (sectionGUID != null && officialLongTitle != null) {
+            try (final PreparedStatement change =
+                connection.prepareStatement(
+                    "INSERT INTO metadata (value, type, order_number, guid, section_guid) "
+                        + "VALUES (?, 'OFFICIAL_LONG_TITLE', 1, ?, ?)")) {
+              change.setString(1, officialLongTitle);
+              change.setObject(2, UUID.randomUUID());
+              change.setObject(3, sectionGUID);
+              change.execute();
+            }
           }
         }
       }
