@@ -141,7 +141,6 @@ class HasValidSectionsTest {
     fun `it is satisfied if the publication date can be added directly to the Norm`() {
         val instance = mockk<Norm>()
         every { instance.guid } returns UUID.randomUUID()
-        every { instance.officialLongTitle } returns "officialLongTitle"
 
         every { instance.metadataSections } returns listOf(
             MetadataSection(
