@@ -10,6 +10,7 @@ import de.bund.digitalservice.ris.norms.domain.entity.Article
 import de.bund.digitalservice.ris.norms.domain.entity.Metadatum
 import de.bund.digitalservice.ris.norms.domain.entity.Norm
 import de.bund.digitalservice.ris.norms.domain.value.Eli
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType
 import de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto.ArticleDto
 import de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto.FileReferenceDto
 import de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto.MetadataSectionDto
@@ -23,10 +24,6 @@ import de.bund.digitalservice.ris.norms.framework.adapter.output.database.reposi
 import de.bund.digitalservice.ris.norms.framework.adapter.output.database.repository.NormsRepository
 import de.bund.digitalservice.ris.norms.framework.adapter.output.database.repository.ParagraphsRepository
 import org.springframework.context.annotation.Primary
-import org.springframework.data.r2dbc.core.R2dbcEntityTemplate
-import org.springframework.data.r2dbc.dialect.PostgresDialect
-import org.springframework.data.relational.core.query.Query
-import org.springframework.r2dbc.core.DatabaseClient
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
 import reactor.core.publisher.Flux
@@ -42,7 +39,6 @@ class NormsService(
     val fileReferenceRepository: FileReferenceRepository,
     val metadataRepository: MetadataRepository,
     val metadataSectionsRepository: MetadataSectionsRepository,
-    client: DatabaseClient,
 ) : NormsMapper,
     GetNormByGuidOutputPort,
     SaveNormOutputPort,
@@ -50,9 +46,6 @@ class NormsService(
     SearchNormsOutputPort,
     GetNormByEliOutputPort,
     SaveFileReferenceOutputPort {
-
-    private val template: R2dbcEntityTemplate = R2dbcEntityTemplate(client, PostgresDialect.INSTANCE)
-    private val criteria: NormsCriteriaBuilder = NormsCriteriaBuilder()
 
     override fun getNormByEli(query: GetNormByEliOutputPort.Query): Mono<Norm> {
         return normsRepository.findNormByEli(Eli.parseGazette(query.gazette), query.year, query.page)
@@ -62,11 +55,25 @@ class NormsService(
     override fun searchNorms(
         query: SearchNormsOutputPort.Query,
     ): Flux<Norm> {
-        val selectQuery = Query.query(criteria.getSearchCriteria(query))
-        return template.select(NormDto::class.java)
-            .matching(selectQuery)
-            .all()
-            .flatMap(::getNormWithMetadata)
+        if (query.searchTerm.isEmpty()) {
+            return normsRepository.findAll().flatMap { getNormByGuid(GetNormByGuidOutputPort.Query(it.guid)) }
+        }
+
+        return metadataRepository.findByValueContainsAndTypeIn(
+            query.searchTerm,
+            listOf(
+                MetadatumType.OFFICIAL_LONG_TITLE.name,
+                MetadatumType.OFFICIAL_SHORT_TITLE.name,
+                MetadatumType.UNOFFICIAL_LONG_TITLE.name,
+                MetadatumType.UNOFFICIAL_SHORT_TITLE.name,
+            ),
+        ).collectList()
+            .flatMapMany {
+                metadataSectionsRepository.findByGuidIn(it.map { it.sectionGuid })
+            }
+            .collectList()
+            .flatMapMany { Flux.fromIterable(it.map { it.normGuid }.distinct()) }
+            .flatMap { getNormByGuid(GetNormByGuidOutputPort.Query(it)) }
     }
 
     override fun getNormByGuid(query: GetNormByGuidOutputPort.Query): Mono<Norm> {
@@ -192,19 +199,6 @@ class NormsService(
                 articleGuid = article.guid,
             ),
         )
-    }
-
-    private fun getNormWithMetadata(normDto: NormDto): Mono<Norm> {
-        val findSectionsRequest = metadataSectionsRepository.findByNormGuid(normDto.guid).collectList()
-        val findMetadataRequest = findSectionsRequest.flatMapMany { metadataRepository.findBySectionGuidIn(it.map { section -> section.guid }) }
-            .collectList()
-
-        return Mono.zip(
-            findSectionsRequest,
-            findMetadataRequest,
-        ).map {
-            normToEntity(normDto, emptyList(), emptyList(), it.t1, it.t2)
-        }
     }
 
     private fun getArticleWithParagraphs(articleDto: ArticleDto): Mono<Article> {

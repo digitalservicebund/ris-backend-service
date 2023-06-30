@@ -4,12 +4,17 @@ import { openNorm } from "./e2e-utils"
 import { testWithImportedNorm } from "./fixtures"
 import { normData as norm } from "./testdata/norm_basic"
 import { FieldType, fillInputField } from "./utilities"
+import { MetadataSectionName, MetadatumType } from "@/domain/Norm"
 
 testWithImportedNorm(
   "Check if XML can be retrieved by ELI and content is correct",
   async ({ page, normData, guid, request }) => {
     // Open frame data
-    await openNorm(page, normData["officialLongTitle"], guid)
+    await openNorm(
+      page,
+      normData.metadataSections?.NORM?.[0]?.OFFICIAL_LONG_TITLE?.[0] ?? "",
+      guid
+    )
     await page.locator("a:has-text('Rahmen')").click()
 
     // Update page of print announcement so that this norm we be retrieved for sure by the eli
@@ -114,12 +119,20 @@ testWithImportedNorm(
       xmlDOM.window.document
         .querySelector("akn\\:docTitle")
         ?.textContent?.trim()
-    ).toBe(norm.officialLongTitle)
+    ).toBe(
+      norm.metadataSections?.[MetadataSectionName.NORM]?.[0]?.[
+        MetadatumType.OFFICIAL_LONG_TITLE
+      ]?.[0]
+    )
     expect(
       xmlDOM.window.document
         ?.querySelector("akn\\:shortTitle")
         ?.textContent?.trim()
-    ).toBe(norm.officialShortTitle)
+    ).toBe(
+      norm.metadataSections?.[MetadataSectionName.NORM]?.[0]?.[
+        MetadatumType.OFFICIAL_SHORT_TITLE
+      ]?.[0]
+    )
 
     xmlDOM.window.document
       .querySelectorAll("akn\\:article")

@@ -91,6 +91,14 @@ const METADATA_VALUE_GENERATORS: MetadataValueGenerators = {
   [MetadatumType.OTHER_TYPE]: pickRandomOtherType,
   [MetadatumType.NOTE]: generateString,
   [MetadatumType.ARTICLE]: generateString,
+  [MetadatumType.OFFICIAL_LONG_TITLE]: generateString,
+  [MetadatumType.RIS_ABBREVIATION]: generateString,
+  [MetadatumType.DOCUMENT_NUMBER]: generateString,
+  [MetadatumType.DOCUMENT_CATEGORY]: generateString,
+  [MetadatumType.OFFICIAL_SHORT_TITLE]: generateString,
+  [MetadatumType.OFFICIAL_ABBREVIATION]: generateString,
+  [MetadatumType.COMPLETE_CITATION]: generateString,
+  [MetadatumType.CELEX_NUMBER]: generateString,
 }
 
 const ALPHABET_CHARACTERS = "abcdefghijklmnopqrstuvwxyz"
@@ -301,14 +309,7 @@ export function generateFlatMetadata(
 ): FlatMetadata {
   return {
     announcementDate: generateString(),
-    celexNumber: generateString(),
-    completeCitation: generateString(),
-    documentCategory: generateString(),
-    documentNumber: generateString(),
     eli: generateString(),
-    officialAbbreviation: generateString(),
-    officialLongTitle: generateString(),
-    officialShortTitle: generateString(),
     otherStatusNote: generateString(),
     publicationDate: generateString(),
     reissueArticle: generateString(),
@@ -319,12 +320,10 @@ export function generateFlatMetadata(
     repealDate: generateString(),
     repealNote: generateString(),
     repealReferences: generateString(),
-    risAbbreviation: generateString(),
     statusDate: generateString(),
     statusDescription: generateString(),
     statusNote: generateString(),
     statusReference: generateString(),
-    text: generateString(),
     ...partialFlatMetadata,
   }
 }

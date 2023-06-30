@@ -12,22 +12,8 @@ fun interface EditNormFrameUseCase {
 
     data class
     NormFrameProperties(
-        val officialLongTitle: String,
         val metadataSections: List<MetadataSection>,
-        var risAbbreviation: String? = null,
-        var documentNumber: String? = null,
-        var documentCategory: String? = null,
-
-        var officialShortTitle: String? = null,
-        var officialAbbreviation: String? = null,
-
         var announcementDate: LocalDate? = null,
         var publicationDate: LocalDate? = null,
-
-        var completeCitation: String? = null,
-
-        var celexNumber: String? = null,
-
-        var text: String? = null,
     )
 }

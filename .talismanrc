@@ -19,7 +19,7 @@ fileignoreconfig:
 - filename: frontend/FRONTEND_STYLEGUIDE.md
   checksum: e6b8194eba2012f2a769c5a5d3577715a573b441a7b94e744c32b3149d0d3a93
 - filename: frontend/test/test-helper/dataGenerators.ts
-  checksum: 3f4afd0669cd35103c3c8fe1f16378c4ba2f45866be6edcd5ef5a6a7cba80e3e
+  checksum: 23512abed9860d1f7950d72af42d3fd1150cc839d87dc36d1fa0798c276cd441
 scopeconfig:
 - scope: node
 allowed_patterns:

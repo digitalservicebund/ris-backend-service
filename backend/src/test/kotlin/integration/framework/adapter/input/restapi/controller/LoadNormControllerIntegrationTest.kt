@@ -102,6 +102,20 @@ class LoadNormControllerIntegrationTest : PostgresTestcontainerIntegrationTest()
                         }
                     }
                 }
+                metadataSection {
+                    name = MetadataSectionName.NORM
+                    metadata {
+                        metadatum { value = "officialLongTitle"; type = MetadatumType.OFFICIAL_LONG_TITLE }
+                        metadatum { value = "risAbbreviation"; type = MetadatumType.RIS_ABBREVIATION }
+                        metadatum { value = "documentNumber"; type = MetadatumType.DOCUMENT_NUMBER }
+                        metadatum { value = "documentCategory"; type = MetadatumType.DOCUMENT_CATEGORY }
+                        metadatum { value = "officialShortTitle"; type = MetadatumType.OFFICIAL_SHORT_TITLE }
+                        metadatum { value = "officialAbbreviation"; type = MetadatumType.OFFICIAL_ABBREVIATION }
+                        metadatum { value = "completeCitation"; type = MetadatumType.COMPLETE_CITATION }
+                        metadatum { value = "celexNumber"; type = MetadatumType.CELEX_NUMBER }
+                        metadatum { value = "text"; type = MetadatumType.TEXT }
+                    }
+                }
             }
         }
 
@@ -124,19 +138,10 @@ class LoadNormControllerIntegrationTest : PostgresTestcontainerIntegrationTest()
                 {
                   "guid":"${norm.guid}",
                   "articles":[],
-                  "metadataSections":[{"name":"CITATION_DATE","order":1,"metadata":[{"value":"${date.toLocalDate()}","type":"DATE","order":1}],"sections":null}, {"name":"DOCUMENT_TYPE","order":1,"metadata":[{"value":"BASE_NORM","type":"NORM_CATEGORY","order":1}, {"value":"documentTypeName","type":"TYPE_NAME","order":1}, {"value":"documentTemplateName","type":"TEMPLATE_NAME","order":1}],"sections":null}],
-                  "officialLongTitle":"${norm.officialLongTitle}",
-                  "risAbbreviation":"${norm.risAbbreviation}",
-                  "documentNumber": "${norm.documentNumber}",
-                  "documentCategory": "${norm.documentCategory}",
-                  "officialShortTitle": "${norm.officialShortTitle}",
-                  "officialAbbreviation": "${norm.officialAbbreviation}",
+                  "metadataSections":[{"name":"CITATION_DATE","order":1,"metadata":[{"value":"${date.toLocalDate()}","type":"DATE","order":1}],"sections":null}, {"name":"DOCUMENT_TYPE","order":1,"metadata":[{"value":"BASE_NORM","type":"NORM_CATEGORY","order":1}, {"value":"documentTypeName","type":"TYPE_NAME","order":1}, {"value":"documentTemplateName","type":"TEMPLATE_NAME","order":1}],"sections":null}, {"name":"NORM","order":1,"metadata":[{"value":"officialLongTitle","type":"OFFICIAL_LONG_TITLE","order":1}, {"value":"risAbbreviation","type":"RIS_ABBREVIATION","order":1}, {"value":"documentNumber","type":"DOCUMENT_NUMBER","order":1}, {"value":"documentCategory","type":"DOCUMENT_CATEGORY","order":1}, {"value":"officialShortTitle","type":"OFFICIAL_SHORT_TITLE","order":1}, {"value":"officialAbbreviation","type":"OFFICIAL_ABBREVIATION","order":1}, {"value":"completeCitation","type":"COMPLETE_CITATION","order":1}, {"value":"celexNumber","type":"CELEX_NUMBER","order":1}, {"value":"text","type":"TEXT","order":1}],"sections":null}],
                   "announcementDate": "${norm.announcementDate}",
                   "publicationDate": "${norm.publicationDate}",
-                  "completeCitation": "${norm.completeCitation}",
                   "eli":"",
-                  "celexNumber": "${norm.celexNumber}",
-                  "text": "${norm.text}",
                   "files":[{"name":"norm.zip","hash":"hash","createdAt":"$date"}]}
                 """.trimIndent(),
             )

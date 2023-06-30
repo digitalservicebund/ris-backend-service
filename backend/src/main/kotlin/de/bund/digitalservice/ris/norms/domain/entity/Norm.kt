@@ -12,22 +12,9 @@ data class Norm(
     val articles: List<Article> = emptyList(),
     val metadataSections: List<MetadataSection> = emptyList(),
 
-    val officialLongTitle: String,
-    var risAbbreviation: String? = null,
-    var documentNumber: String? = null,
-    var documentCategory: String? = null,
-
-    var officialShortTitle: String? = null,
-    var officialAbbreviation: String? = null,
-
     var announcementDate: LocalDate? = null,
     var publicationDate: LocalDate? = null,
 
-    var completeCitation: String? = null,
-
-    var celexNumber: String? = null,
-
-    var text: String? = null,
     var files: List<FileReference> = listOf(),
 
 ) {

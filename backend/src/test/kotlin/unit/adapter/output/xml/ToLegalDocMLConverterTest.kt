@@ -62,8 +62,21 @@ class ToLegalDocMLConverterTest {
         val norm =
             createRandomNormWithCitationDateAndArticles()
                 .copy(
-                    officialLongTitle = "test official long title",
-                    officialShortTitle = "test official short title",
+                    metadataSections = listOf(
+                        MetadataSection(
+                            name = MetadataSectionName.NORM,
+                            metadata = listOf(
+                                Metadatum(
+                                    type = MetadatumType.OFFICIAL_SHORT_TITLE,
+                                    value = "test official short title",
+                                ),
+                                Metadatum(
+                                    type = MetadatumType.OFFICIAL_LONG_TITLE,
+                                    value = "test official long title",
+                                ),
+                            ),
+                        ),
+                    ),
                 )
         val document = convertNormToLegalDocML(norm)
 

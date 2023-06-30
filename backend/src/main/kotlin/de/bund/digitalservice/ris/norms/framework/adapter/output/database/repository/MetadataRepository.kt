@@ -13,4 +13,6 @@ interface MetadataRepository : ReactiveCrudRepository<MetadatumDto, UUID> {
     fun deleteBySectionGuid(normGuid: UUID): Mono<Void>
 
     fun findBySectionGuidIn(sectionGuids: List<UUID>): Flux<MetadatumDto>
+
+    fun findByValueContainsAndTypeIn(value: String, types: List<String>): Flux<MetadatumDto>
 }

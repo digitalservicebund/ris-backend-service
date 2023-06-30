@@ -4,7 +4,6 @@ import de.bund.digitalservice.ris.norms.domain.entity.Article
 import de.bund.digitalservice.ris.norms.domain.entity.FileReference
 import de.bund.digitalservice.ris.norms.domain.entity.MetadataSection
 import de.bund.digitalservice.ris.norms.domain.entity.Norm
-import utils.randomString
 import java.time.LocalDate
 import java.util.UUID
 
@@ -12,17 +11,8 @@ fun norm(block: NormBuilder.() -> Unit): Norm = NormBuilder().apply(block).build
 
 class NormBuilder {
     var guid: UUID = UUID.randomUUID()
-    var officialLongTitle = randomString()
-    var risAbbreviation = randomString()
-    var documentNumber = randomString()
-    var documentCategory = randomString()
-    var officialShortTitle = randomString()
-    var officialAbbreviation = randomString()
     var announcementDate = LocalDate.now()
     var publicationDate = LocalDate.now()
-    var completeCitation = randomString()
-    var celexNumber = randomString()
-    var text = randomString()
 
     private val metadataSections = mutableListOf<MetadataSection>()
     private val articles = mutableListOf<Article>()
@@ -34,20 +24,11 @@ class NormBuilder {
 
     fun build(): Norm = Norm(
         guid = guid,
-        officialLongTitle = officialLongTitle,
         metadataSections = metadataSections,
         files = files,
         articles = articles,
-        risAbbreviation = risAbbreviation,
-        documentNumber = documentNumber,
-        documentCategory = documentCategory,
-        officialShortTitle = officialShortTitle,
-        officialAbbreviation = officialAbbreviation,
         announcementDate = announcementDate,
         publicationDate = publicationDate,
-        completeCitation = completeCitation,
-        celexNumber = celexNumber,
-        text = text,
     )
 }
 

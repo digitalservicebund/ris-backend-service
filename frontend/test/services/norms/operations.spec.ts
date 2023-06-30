@@ -139,11 +139,15 @@ describe("normsService", () => {
               [MetadatumType.ENTITY]: ["new provider entity"],
             },
           ],
+          [MetadataSectionName.NORM]: [
+            {
+              [MetadatumType.OFFICIAL_LONG_TITLE]: ["new title"],
+              [MetadatumType.OFFICIAL_SHORT_TITLE]: ["short title"],
+              [MetadatumType.OFFICIAL_ABBREVIATION]: ["official abbreviation"],
+            },
+          ],
         },
         {
-          officialLongTitle: "new title",
-          officialShortTitle: "",
-          officialAbbreviation: undefined,
           publicationDate: "2022-11-14T23:00:00.000Z",
         }
       )
@@ -193,17 +197,31 @@ describe("normsService", () => {
                 },
               ],
             },
+            {
+              name: MetadataSectionName.NORM,
+              order: 1,
+              sections: null,
+              metadata: [
+                {
+                  type: MetadatumType.OFFICIAL_LONG_TITLE,
+                  order: 1,
+                  value: "new title",
+                },
+                {
+                  type: MetadatumType.OFFICIAL_SHORT_TITLE,
+                  order: 1,
+                  value: "short title",
+                },
+                {
+                  type: MetadatumType.OFFICIAL_ABBREVIATION,
+                  order: 1,
+                  value: "official abbreviation",
+                },
+              ],
+            },
           ],
           announcementDate: null,
-          officialAbbreviation: null,
-          officialLongTitle: "new title",
           publicationDate: "2022-11-14",
-          officialShortTitle: null,
-          risAbbreviation: null,
-          celexNumber: null,
-          completeCitation: null,
-          documentCategory: null,
-          documentNumber: null,
           eli: null,
           otherStatusNote: null,
           reissueArticle: null,
@@ -218,7 +236,6 @@ describe("normsService", () => {
           statusDescription: null,
           statusNote: null,
           statusReference: null,
-          text: null,
         }
       )
     })
@@ -231,8 +248,14 @@ describe("normsService", () => {
 
       const response = await editNormFrame(
         "fake-guid",
-        {},
-        { officialLongTitle: "new title" }
+        {
+          [MetadataSectionName.NORM]: [
+            {
+              [MetadatumType.OFFICIAL_LONG_TITLE]: ["new title"],
+            },
+          ],
+        },
+        {}
       )
 
       expect(response.error?.title).toBe(
@@ -248,10 +271,14 @@ describe("normsService", () => {
 
       const response = await editNormFrame(
         "fake-guid",
-        {},
         {
-          officialLongTitle: "new title",
-        }
+          [MetadataSectionName.NORM]: [
+            {
+              [MetadatumType.OFFICIAL_LONG_TITLE]: ["new title"],
+            },
+          ],
+        },
+        {}
       )
 
       expect(response.error?.title).toBe(

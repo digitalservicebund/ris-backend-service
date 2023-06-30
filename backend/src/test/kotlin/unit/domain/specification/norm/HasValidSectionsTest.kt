@@ -16,7 +16,6 @@ class HasValidSectionsTest {
     fun `it is not satisfied if the section can not be added directly to the Norm`() {
         val instance = mockk<Norm>()
         every { instance.guid } returns UUID.randomUUID()
-        every { instance.officialLongTitle } returns "officialLongTitle"
 
         every { instance.metadataSections } returns listOf(
             MetadataSection(
@@ -44,7 +43,6 @@ class HasValidSectionsTest {
     fun `it is satisfied if the section can be added directly to the Norm`() {
         val instance = mockk<Norm>()
         every { instance.guid } returns UUID.randomUUID()
-        every { instance.officialLongTitle } returns "officialLongTitle"
 
         every { instance.metadataSections } returns listOf(
             MetadataSection(
@@ -77,7 +75,6 @@ class HasValidSectionsTest {
     fun `it is satisfied if the section footnote can be added directly to the Norm`() {
         val instance = mockk<Norm>()
         every { instance.guid } returns UUID.randomUUID()
-        every { instance.officialLongTitle } returns "officialLongTitle"
         every { instance.metadataSections } returns listOf(
             MetadataSection(
                 MetadataSectionName.FOOTNOTES,
@@ -91,7 +88,6 @@ class HasValidSectionsTest {
     fun `it is satisfied if the document status section can be added directly to the Norm`() {
         val instance = mockk<Norm>()
         every { instance.guid } returns UUID.randomUUID()
-        every { instance.officialLongTitle } returns "officialLongTitle"
 
         every { instance.metadataSections } returns listOf(
             MetadataSection(
@@ -118,7 +114,6 @@ class HasValidSectionsTest {
     fun `it is satisfied if the status indication can be added directly to the Norm`() {
         val instance = mockk<Norm>()
         every { instance.guid } returns UUID.randomUUID()
-        every { instance.officialLongTitle } returns "officialLongTitle"
 
         every { instance.metadataSections } returns listOf(
             MetadataSection(

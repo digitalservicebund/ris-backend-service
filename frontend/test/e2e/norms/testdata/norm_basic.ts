@@ -33,6 +33,12 @@ export const normData: NormData = {
   metadataSections: {
     NORM: [
       {
+        OFFICIAL_LONG_TITLE: [
+          "Verordnung zur Anpassung von Rechtsverordnungen an das Tierarzneimittelrecht",
+        ],
+        OFFICIAL_SHORT_TITLE: ["Angepasstes Tierarzneimittelrecht"],
+        RIS_ABBREVIATION: ["Tierarznei"],
+        DOCUMENT_CATEGORY: ["NR"],
         KEYWORD: ["Mantelverordnung", "BGBl I 2023, Nr 003"],
         DIVERGENT_DOCUMENT_NUMBER: ["BJNR0030A0023"],
         RIS_ABBREVIATION_INTERNATIONAL_LAW: [
@@ -171,11 +177,6 @@ export const normData: NormData = {
       { UNDEFINED_DATE: [UndefinedDate.UNDEFINED_UNKNOWN] },
     ],
   },
-  officialLongTitle:
-    "Verordnung zur Anpassung von Rechtsverordnungen an das Tierarzneimittelrecht",
-  officialShortTitle: "Angepasstes Tierarzneimittelrecht",
-  risAbbreviation: "Tierarznei",
-  documentCategory: "NR",
   announcementDate: "06.01.2023",
   printAnnouncementGazette: "BGBl I",
   printAnnouncementYear: "2023",

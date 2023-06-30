@@ -69,14 +69,7 @@ fun mapDataToDomain(guid: UUID, data: NormData): Norm {
         guid = guid,
         articles = mapArticlesToDomain(data.articles),
         metadataSections = sections.filterNotNull(),
-        officialLongTitle = data.officialLongTitle ?: "",
-        risAbbreviation = data.risAbbreviation,
-        documentCategory = data.documentCategory,
-        officialShortTitle = data.officialShortTitle,
-        officialAbbreviation = data.officialAbbreviation,
         announcementDate = parseDateString(data.announcementDate),
-        celexNumber = data.celexNumber,
-        text = data.text,
     )
 }
 fun createSectionsForDocumentStatus(
@@ -120,8 +113,10 @@ private fun createSectionForDocumentType(documentType: DocumentType?): MetadataS
     }
 }
 
+private fun createMetadatumForNullableString(string: String?, type: MetadatumType): List<Metadatum<String>> = string?.let { listOf(Metadatum(string, type)) } ?: listOf()
+
 private fun createSectionForNorm(data: NormData): MetadataSection {
-    val divergentDocumentNumber = data.divergentDocumentNumber?.let { listOf(Metadatum(data.divergentDocumentNumber, MetadatumType.DIVERGENT_DOCUMENT_NUMBER, 1)) } ?: listOf()
+    val divergentDocumentNumber = createMetadatumForNullableString(data.divergentDocumentNumber, MetadatumType.DIVERGENT_DOCUMENT_NUMBER)
     val frameKeywords = createMetadataForType(data.frameKeywordList, MetadatumType.KEYWORD)
     val risAbbreviationInternationalLaw = createMetadataForType(data.risAbbreviationInternationalLawList, MetadatumType.RIS_ABBREVIATION_INTERNATIONAL_LAW)
     val unofficialLongTitle = createMetadataForType(data.unofficialLongTitleList, MetadatumType.UNOFFICIAL_LONG_TITLE)
@@ -132,8 +127,15 @@ private fun createSectionForNorm(data: NormData): MetadataSection {
     val definition = createMetadataForType(data.definitionList, MetadatumType.DEFINITION)
     val ageOfMajorityIndication = createMetadataForType(data.ageOfMajorityIndicationList, MetadatumType.AGE_OF_MAJORITY_INDICATION)
     val validityRule = createMetadataForType(data.validityRuleList, MetadatumType.VALIDITY_RULE)
+    val officialLongTitle = createMetadatumForNullableString(data.officialLongTitle, MetadatumType.OFFICIAL_LONG_TITLE)
+    val risAbbreviation = createMetadatumForNullableString(data.risAbbreviation, MetadatumType.RIS_ABBREVIATION)
+    val documentCategory = createMetadatumForNullableString(data.documentCategory, MetadatumType.DOCUMENT_CATEGORY)
+    val officialShortTitle = createMetadatumForNullableString(data.officialShortTitle, MetadatumType.OFFICIAL_SHORT_TITLE)
+    val officialAbbreviation = createMetadatumForNullableString(data.officialAbbreviation, MetadatumType.OFFICIAL_ABBREVIATION)
+    val celexNumber = createMetadatumForNullableString(data.celexNumber, MetadatumType.CELEX_NUMBER)
+    val text = createMetadatumForNullableString(data.text, MetadatumType.TEXT)
 
-    return MetadataSection(Section.NORM, frameKeywords + divergentDocumentNumber + risAbbreviationInternationalLaw + unofficialAbbreviation + unofficialShortTitle + unofficialLongTitle + unofficialReference + referenceNumber + definition + ageOfMajorityIndication + validityRule)
+    return MetadataSection(Section.NORM, frameKeywords + divergentDocumentNumber + risAbbreviationInternationalLaw + unofficialAbbreviation + unofficialShortTitle + unofficialLongTitle + unofficialReference + referenceNumber + definition + ageOfMajorityIndication + validityRule + officialLongTitle + risAbbreviation + documentCategory + officialShortTitle + officialAbbreviation + celexNumber + text)
 }
 
 private fun createSectionsForDivergentEntryIntoForce(data: List<DivergentEntryIntoForce>): List<MetadataSection> {

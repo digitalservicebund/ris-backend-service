@@ -35,5 +35,7 @@ testWithImportedNorm(
 async function assertResponseOk(response: APIResponse) {
   expect(response.ok()).toBeTruthy()
   const norms = await response.json()
-  expect(norms.data[0].officialLongTitle).toBe(normData.officialLongTitle)
+  expect(norms.data[0]?.officialLongTitle).toBe(
+    normData?.metadataSections?.NORM?.[0]?.OFFICIAL_LONG_TITLE?.[0]
+  )
 }

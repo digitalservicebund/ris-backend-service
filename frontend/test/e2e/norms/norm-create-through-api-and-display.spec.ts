@@ -34,10 +34,18 @@ async function expectSectionAppearsAfterScroll(
 testWithImportedNorm(
   "Check display of norm complex",
   async ({ page, normData, guid }) => {
-    await openNorm(page, normData.officialLongTitle, guid)
+    await openNorm(
+      page,
+      normData.metadataSections?.NORM?.[0]?.OFFICIAL_LONG_TITLE?.[0] ?? "",
+      guid
+    )
 
     await expect(page).toHaveURL(`/norms/norm/${guid}`)
-    await expect(page.getByText(normData.officialLongTitle)).toBeVisible()
+    await expect(
+      page.getByText(
+        normData.metadataSections?.NORM?.[0]?.OFFICIAL_LONG_TITLE?.[0] ?? ""
+      )
+    ).toBeVisible()
 
     for (const article of Object.values(normData.articles)) {
       await expect(
@@ -60,7 +68,11 @@ testWithImportedNorm(
 testWithImportedNorm(
   "Check if frame fields are correctly displayed",
   async ({ page, normData, guid }) => {
-    await openNorm(page, normData.officialLongTitle, guid)
+    await openNorm(
+      page,
+      normData.metadataSections?.NORM?.[0]?.OFFICIAL_LONG_TITLE?.[0] ?? "",
+      guid
+    )
 
     // Outer menu
     await expect(page.locator("a:has-text('Normenkomplex')")).toBeVisible()
@@ -84,7 +96,11 @@ testWithImportedNorm(
   "Check if switching frame sections affects sections being inside or outside viewport",
   async ({ page, normData, guid }) => {
     testWithImportedNorm.slow()
-    await openNorm(page, normData.officialLongTitle, guid)
+    await openNorm(
+      page,
+      normData.metadataSections?.NORM?.[0]?.OFFICIAL_LONG_TITLE?.[0] ?? "",
+      guid
+    )
 
     const locatorFrameButton = page.locator("a:has-text('Rahmen')")
     await expect(locatorFrameButton).toBeVisible()

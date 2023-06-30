@@ -1,6 +1,5 @@
 package de.bund.digitalservice.ris.norms.framework.adapter.output.database
 
-import de.bund.digitalservice.ris.norms.application.port.output.SearchNormsOutputPort.QueryFields
 import de.bund.digitalservice.ris.norms.domain.entity.Article
 import de.bund.digitalservice.ris.norms.domain.entity.FileReference
 import de.bund.digitalservice.ris.norms.domain.entity.MetadataSection
@@ -57,17 +56,8 @@ interface NormsMapper {
             normDto.guid,
             articles,
             listDomainSections,
-            normDto.officialLongTitle,
-            normDto.risAbbreviation,
-            normDto.documentNumber,
-            normDto.documentCategory,
-            normDto.officialShortTitle,
-            normDto.officialAbbreviation,
             normDto.announcementDate,
             normDto.publicationDate,
-            normDto.completeCitation,
-            normDto.celexNumber,
-            normDto.text,
             fileReferences,
         )
     }
@@ -106,17 +96,8 @@ interface NormsMapper {
     fun normToDto(norm: Norm): NormDto {
         return NormDto(
             norm.guid,
-            norm.officialLongTitle,
-            norm.risAbbreviation,
-            norm.documentNumber,
-            norm.documentCategory,
-            norm.officialShortTitle,
-            norm.officialAbbreviation,
             norm.announcementDate,
             norm.publicationDate,
-            norm.completeCitation,
-            norm.celexNumber,
-            norm.text,
         )
     }
 
@@ -151,19 +132,6 @@ interface NormsMapper {
                 normGuid,
                 sectionGuid,
             )
-        }
-    }
-
-    // TODO RISDEV-1813 Add UNOFFICIAL_LONG_TITLE & UNOFFICIAL_SHORT_TITLE once all metadata are migrated
-    fun queryFieldToDbColumn(field: QueryFields): String {
-        return when (field) {
-            QueryFields.PRINT_ANNOUNCEMENT_PAGE -> "print_announcement_page"
-            QueryFields.ANNOUNCEMENT_DATE -> "announcement_date"
-            QueryFields.PRINT_ANNOUNCEMENT_GAZETTE -> "print_announcement_gazette"
-            QueryFields.CITATION_DATE -> "citation_date"
-            QueryFields.CITATION_YEAR -> "citation_year"
-            QueryFields.OFFICIAL_LONG_TITLE -> "official_long_title"
-            QueryFields.OFFICIAL_SHORT_TITLE -> "official_short_title"
         }
     }
 }

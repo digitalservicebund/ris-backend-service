@@ -40,43 +40,17 @@ class EditNormFrameController(private val editNormFrameService: EditNormFrameUse
     }
 
     class NormFramePropertiesRequestSchema {
-        lateinit var officialLongTitle: String
         lateinit var metadataSections: List<MetadataSectionRequestSchema>
-        var risAbbreviation: String? = null
-        var documentNumber: String? = null
-        var documentCategory: String? = null
-
-        var providerEntity: String? = null
-        var providerDecidingBody: String? = null
-        var providerIsResolutionMajority: Boolean? = null
-
-        var officialShortTitle: String? = null
-        var officialAbbreviation: String? = null
 
         var announcementDate: String? = null
         var publicationDate: String? = null
 
-        var completeCitation: String? = null
-
         var eli: String? = null
 
-        var celexNumber: String? = null
-
-        var text: String? = null
-
         fun toUseCaseData(): EditNormFrameUseCase.NormFrameProperties = EditNormFrameUseCase.NormFrameProperties(
-            this.officialLongTitle,
             this.metadataSections.map { it.toUseCaseData() },
-            this.risAbbreviation,
-            this.documentNumber,
-            this.documentCategory,
-            this.officialShortTitle,
-            this.officialAbbreviation,
             decodeLocalDate(this.announcementDate),
             decodeLocalDate(this.publicationDate),
-            this.completeCitation,
-            this.celexNumber,
-            this.text,
         )
     }
 

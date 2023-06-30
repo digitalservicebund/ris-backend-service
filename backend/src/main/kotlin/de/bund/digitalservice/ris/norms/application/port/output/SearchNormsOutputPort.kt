@@ -6,22 +6,5 @@ import reactor.core.publisher.Flux
 fun interface SearchNormsOutputPort {
     fun searchNorms(query: Query): Flux<Norm>
 
-    data class Query(val parameters: List<QueryParameter>)
-
-    data class QueryParameter(
-        val field: QueryFields,
-        val value: String?,
-        val isFuzzyMatch: Boolean = false,
-    )
-
-    // TODO RISDEV-1813 Add UNOFFICIAL_LONG_TITLE & UNOFFICIAL_SHORT_TITLE once all metadata are migrated
-    enum class QueryFields {
-        PRINT_ANNOUNCEMENT_GAZETTE,
-        ANNOUNCEMENT_DATE,
-        CITATION_DATE,
-        CITATION_YEAR,
-        PRINT_ANNOUNCEMENT_PAGE,
-        OFFICIAL_LONG_TITLE,
-        OFFICIAL_SHORT_TITLE,
-    }
+    data class Query(val searchTerm: String)
 }

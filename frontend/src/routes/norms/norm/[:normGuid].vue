@@ -106,7 +106,7 @@ onUnmounted(() => (loadedNorm.value = undefined))
     >
       <DocumentUnitInfoPanel
         :first-row="propertyInfos"
-        :heading="loadedNorm.risAbbreviation"
+        :heading="loadedNorm.metadataSections?.NORM?.[0]?.RIS_ABBREVIATION?.[0]"
       />
       <RouterView class="p-48" />
     </div>

@@ -16,15 +16,10 @@ class NormTest {
         val paragraph = Paragraph(UUID.randomUUID(), "marker", "text")
         val article = Article(UUID.randomUUID(), "title", "marker", listOf(paragraph))
         val guid = UUID.randomUUID()
-        val norm = Norm(guid = guid, articles = listOf(article), officialLongTitle = "long title")
+        val norm = Norm(guid = guid, articles = listOf(article))
 
         assertThat(norm.guid).isEqualTo(guid)
-        assertThat(norm.officialLongTitle).isEqualTo("long title")
         assertThat(norm.articles).isEqualTo(listOf(article))
-        assertThat(norm.officialShortTitle).isNull()
-        assertThat(norm.officialAbbreviation).isNull()
-        assertThat(norm.risAbbreviation).isNull()
-        assertThat(norm.text).isNull()
     }
 
     @Test
@@ -35,7 +30,6 @@ class NormTest {
             Norm(
                 guid = guid,
                 metadataSections = createSimpleSections(),
-                officialLongTitle = "long title",
             )
 
         assertThat(norm.metadataSections.flatMap { it.metadata }).hasSize(2)
@@ -51,18 +45,23 @@ class NormTest {
             Norm(
                 guid = guid,
                 articles = listOf(article),
-                officialLongTitle = "long title",
-                officialShortTitle = "short title",
-                officialAbbreviation = "ABC",
-                risAbbreviation = "ABC",
+                metadataSections = listOf(
+                    MetadataSection(
+                        name = MetadataSectionName.NORM,
+                        metadata = listOf(
+                            Metadatum("short title", MetadatumType.OFFICIAL_SHORT_TITLE),
+                            Metadatum("ABC", MetadatumType.OFFICIAL_ABBREVIATION),
+                            Metadatum("ABC", MetadatumType.RIS_ABBREVIATION),
+                        ),
+                    ),
+                ),
             )
 
         assertThat(norm.guid).isEqualTo(guid)
-        assertThat(norm.officialLongTitle).isEqualTo("long title")
         assertThat(norm.articles).isEqualTo(listOf(article))
-        assertThat(norm.officialShortTitle).isEqualTo("short title")
-        assertThat(norm.officialAbbreviation).isEqualTo("ABC")
-        assertThat(norm.risAbbreviation).isEqualTo("ABC")
+        assertThat(norm.getFirstMetadatum(MetadataSectionName.NORM, MetadatumType.OFFICIAL_SHORT_TITLE)?.value.toString()).isEqualTo("short title")
+        assertThat(norm.getFirstMetadatum(MetadataSectionName.NORM, MetadatumType.OFFICIAL_ABBREVIATION)?.value.toString()).isEqualTo("ABC")
+        assertThat(norm.getFirstMetadatum(MetadataSectionName.NORM, MetadatumType.RIS_ABBREVIATION)?.value.toString()).isEqualTo("ABC")
     }
 
     @Test
@@ -79,27 +78,27 @@ class NormTest {
         val resolutionMajority = Metadatum(true, MetadatumType.RESOLUTION_MAJORITY)
         val normProviderSection = MetadataSection(MetadataSectionName.NORM_PROVIDER, listOf(resolutionMajority))
 
+        val risAbbreviation = Metadatum("ABC", MetadatumType.RIS_ABBREVIATION)
+        val text = Metadatum("text", MetadatumType.TEXT)
+        val normSection = MetadataSection(MetadataSectionName.NORM, listOf(risAbbreviation, text))
+
         val norm =
             Norm(
                 guid = guid,
                 articles = listOf(article),
-                officialLongTitle = "long title",
                 publicationDate = publicationDate,
                 announcementDate = announcementDate,
-                risAbbreviation = "ABC",
-                text = "text",
-                metadataSections = listOf(citationDateSection, normProviderSection),
+                metadataSections = listOf(citationDateSection, normProviderSection, normSection),
             )
 
         assertThat(norm.guid).isEqualTo(guid)
-        assertThat(norm.officialLongTitle).isEqualTo("long title")
         assertThat(norm.articles).isEqualTo(listOf(article))
         assertThat(norm.publicationDate).isEqualTo(publicationDate)
         assertThat(norm.announcementDate).isEqualTo(announcementDate)
         assertThat(norm.metadataSections.flatMap { it.metadata }).contains(citationDate)
         assertThat(norm.metadataSections.flatMap { it.metadata }).contains(resolutionMajority)
-        assertThat(norm.risAbbreviation).isEqualTo("ABC")
-        assertThat(norm.text).isEqualTo("text")
+        assertThat(norm.metadataSections.flatMap { it.metadata }).contains(risAbbreviation)
+        assertThat(norm.metadataSections.flatMap { it.metadata }).contains(text)
     }
 
     @Test
@@ -132,7 +131,6 @@ class NormTest {
         val norm =
             Norm(
                 guid = guid,
-                officialLongTitle = "long title",
                 announcementDate = announcementDate,
                 metadataSections = listOf(printAnnouncementSection, citationDateSection),
             )
@@ -147,7 +145,6 @@ class NormTest {
     @Test
     fun `can create a norm using type safe builders`() {
         val norm = norm {
-            officialLongTitle = "officialLongTitle"
             articles {
                 article {
                     title = "Title"
@@ -180,7 +177,6 @@ class NormTest {
                 }
             }
         }
-        assertThat(norm.officialLongTitle).isEqualTo("officialLongTitle")
         assertThat(norm.articles.first().title).isEqualTo("Title")
         assertThat(norm.articles.first().paragraphs.first().text).isEqualTo("Paragraph")
         assertThat(norm.metadataSections.first().name).isEqualTo(MetadataSectionName.OFFICIAL_REFERENCE)
@@ -211,7 +207,6 @@ class NormTest {
         val norm =
             Norm(
                 guid = UUID.randomUUID(),
-                officialLongTitle = "long title",
                 metadataSections = listOf(leadSection, citationDateSection),
             )
 
@@ -243,7 +238,6 @@ class NormTest {
         val norm =
             Norm(
                 guid = UUID.randomUUID(),
-                officialLongTitle = "long title",
                 metadataSections = listOf(referenceSection1, referenceSection2),
             )
 
