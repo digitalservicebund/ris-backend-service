@@ -71,7 +71,7 @@ const yearValue = computed({
           :id="`${idPrefix}TypeDate`"
           v-model="selectedInputType"
           :aria-label="`Wählen Sie ${label} Datum`"
-          name="inputType"
+          :name="`${idPrefix}InputType`"
           type="radio"
           :value="InputType.DATE"
         />
@@ -82,7 +82,7 @@ const yearValue = computed({
           :id="`${idPrefix}TypeYear`"
           v-model="selectedInputType"
           :aria-label="`Wählen Sie ${label} Jahr`"
-          name="inputType"
+          :name="`${idPrefix}InputType`"
           type="radio"
           :value="InputType.YEAR"
         />

@@ -899,7 +899,7 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
       heading: "Veröffentlichungsdatum",
       isExpandableNotRepeatable: true,
       isNotImported: true,
-      id: "publicationDate",
+      id: "publicationDates",
       fields: [
         {
           type: FieldType.RADIO,

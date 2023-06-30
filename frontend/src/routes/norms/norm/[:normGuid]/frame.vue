@@ -873,7 +873,7 @@ const footnoteLineSummary = withSummarizer(summarizeFootnotePerLine)
     />
 
     <ExpandableDataSet
-      id="publicationDate"
+      id="publicationDates"
       border-bottom
       :data-set="metadataSections.PUBLICATION_DATE"
       :summary-component="CitationDateSummary"
