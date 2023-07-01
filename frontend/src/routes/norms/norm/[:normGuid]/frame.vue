@@ -22,6 +22,7 @@ import NormProviderInputGroup from "@/components/NormProviderInputGroup.vue"
 import ParticipatingInstitutionInputGroup from "@/components/ParticipatingInstitutionInputGroup.vue"
 import PrincipleEntryIntoForceInputGroup from "@/components/PrincipleEntryIntoForceInputGroup.vue"
 import PrincipleExpirationInputGroup from "@/components/PrincipleExpirationInputGroup.vue"
+import PublicationDateInputGroup from "@/components/PublicationDateInputGroup.vue"
 import SingleDataFieldSection from "@/components/SingleDataFieldSection.vue"
 import StatusIndicationInputGroup from "@/components/statusIndication/StatusIndicationInputGroup.vue"
 import { summarizeStatusIndication } from "@/components/statusIndication/summarizer"
@@ -154,78 +155,79 @@ function citationDateSummarizer(data: Metadata): string {
 }
 
 function printAnnouncementSummary(data: Metadata): string {
-  if (!data) return ""
+  if (data) {
+    const midSection = [
+      data.ANNOUNCEMENT_GAZETTE?.[0],
+      data.YEAR?.[0],
+      data.NUMBER?.[0],
+      data.PAGE?.[0],
+    ]
+      .filter(Boolean)
+      .join(", ")
 
-  const announcementGazette = data.ANNOUNCEMENT_GAZETTE?.[0]
-  const announcementYear = data.YEAR?.[0]
-  const announcementNumber = data.NUMBER?.[0]
-  const announcementPage = data.PAGE?.[0]
-  const announcementAdditionalInfo = data.ADDITIONAL_INFO?.[0]
-  const announcementExplanation = data.EXPLANATION?.[0]
-
-  return `Papierverkündungsblatt | ${[
-    announcementGazette,
-    announcementYear,
-    announcementNumber,
-    announcementPage,
-    announcementAdditionalInfo,
-    announcementExplanation,
-  ]
-    .filter(Boolean)
-    .join(", ")}`
+    return [
+      "Papierverkündungsblatt",
+      midSection,
+      data.ADDITIONAL_INFO?.join(", "),
+      data.EXPLANATION?.join(", "),
+    ]
+      .filter(Boolean)
+      .join(" | ")
+  } else {
+    return ""
+  }
 }
 
 function digitalAnnouncementSummary(data: Metadata): string {
-  if (!data) return ""
+  if (data) {
+    const midSection = [
+      data.ANNOUNCEMENT_MEDIUM?.[0],
+      formatDate([data.DATE?.[0]]),
+      data.YEAR?.[0],
+      data.PAGE?.[0],
+      data.EDITION?.[0],
+      data.AREA_OF_PUBLICATION?.[0],
+      data.NUMBER_OF_THE_PUBLICATION_IN_THE_RESPECTIVE_AREA?.[0],
+    ]
+      .filter(Boolean)
+      .join(", ")
 
-  const announcementMedium = data.ANNOUNCEMENT_MEDIUM?.[0]
-  const announcementDate = data.DATE?.[0]
-  const announcementYear = data.YEAR?.[0]
-  const announcementPage = data.PAGE?.[0]
-  const announcementEdition = data.EDITION?.[0]
-  const announcementAreaOfPub = data.AREA_OF_PUBLICATION?.[0]
-  const announcementNumberOfPub =
-    data.NUMBER_OF_THE_PUBLICATION_IN_THE_RESPECTIVE_AREA?.[0]
-  const announcementAdditionalInfo = data.ADDITIONAL_INFO?.[0]
-  const announcementExplanation = data.EXPLANATION?.[0]
-
-  return `Elektronisches Verkündungsblatt | ${[
-    announcementMedium,
-    formatDate([announcementDate]),
-    announcementEdition,
-    announcementYear,
-    announcementPage,
-    announcementAreaOfPub,
-    announcementNumberOfPub,
-    announcementAdditionalInfo,
-    announcementExplanation,
-  ]
-    .filter(Boolean)
-    .join(", ")}`
+    return [
+      "Elektronisches Verkündungsblatt",
+      midSection,
+      data.ADDITIONAL_INFO?.join(", "),
+      data.EXPLANATION?.join(", "),
+    ]
+      .filter(Boolean)
+      .join(" | ")
+  } else {
+    return ""
+  }
 }
 
 function euAnnouncementSummary(data: Metadata): string {
-  if (!data) return ""
+  if (data) {
+    const midSection = [
+      data.EU_GOVERNMENT_GAZETTE?.[0],
+      data.YEAR?.[0],
+      data.SERIES?.[0],
+      data.NUMBER?.[0],
+      data.PAGE?.[0],
+    ]
+      .filter(Boolean)
+      .join(", ")
 
-  const euGazette = data.EU_GOVERNMENT_GAZETTE?.[0]
-  const euYear = data.YEAR?.[0]
-  const euSeries = data.SERIES?.[0]
-  const euNumber = data.NUMBER?.[0]
-  const euPage = data.PAGE?.[0]
-  const euAdditionalInfo = data.ADDITIONAL_INFO?.[0]
-  const euExplanation = data.EXPLANATION?.[0]
-
-  return `Amtsblatt der EU | ${[
-    euGazette,
-    euYear,
-    euSeries,
-    euNumber,
-    euPage,
-    euAdditionalInfo,
-    euExplanation,
-  ]
-    .filter(Boolean)
-    .join(", ")}`
+    return [
+      "Amtsblatt der EU",
+      midSection,
+      data.ADDITIONAL_INFO?.join(", "),
+      data.EXPLANATION?.join(", "),
+    ]
+      .filter(Boolean)
+      .join(" | ")
+  } else {
+    return ""
+  }
 }
 
 function otherOfficialReferenceSummary(data: Metadata): string {
@@ -857,12 +859,22 @@ const StatusIndicationSummary = withSummarizer(summarizeStatusIndication)
       :type="InputType.DATE"
     />
 
-    <SingleDataFieldSection
-      id="publicationDate"
-      v-model="flatMetadata.publicationDate"
-      label="Veröffentlichungsdatum"
-      :type="InputType.DATE"
-    />
+    <ExpandableDataSet
+      id="publicationDates"
+      border-bottom
+      :data-set="metadataSections.PUBLICATION_DATE"
+      :summary-component="CitationDateSummary"
+      test-id="a11y-expandable-dataset"
+      title="Veröffentlichungsdatum"
+    >
+      <EditableList
+        v-model="metadataSections.PUBLICATION_DATE"
+        :default-value="{}"
+        disable-multi-entry
+        :edit-component="PublicationDateInputGroup"
+        :summary-component="CitationDateSummary"
+      />
+    </ExpandableDataSet>
 
     <ExpandableDataSet
       id="citationDates"

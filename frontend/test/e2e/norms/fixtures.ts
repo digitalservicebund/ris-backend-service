@@ -896,13 +896,42 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
       ],
     },
     {
-      isSingleFieldSection: true,
+      heading: "Veröffentlichungsdatum",
+      isExpandableNotRepeatable: true,
+      isNotImported: true,
+      id: "publicationDates",
       fields: [
+        {
+          type: FieldType.RADIO,
+          id: "publicationTypeDate",
+          label: "Datum",
+          values: norm.metadataSections?.PUBLICATION_DATE?.map(
+            (section) => !!section?.DATE
+          ),
+        },
         {
           type: FieldType.TEXT,
           id: "publicationDate",
+          label: "Jahresangabe",
+          values: norm.metadataSections?.PUBLICATION_DATE?.map(
+            (section) => section?.DATE?.[0]
+          ),
+        },
+        {
+          type: FieldType.RADIO,
+          id: "publicationTypeYear",
+          label: "Jahresangabe",
+          values: norm.metadataSections?.PUBLICATION_DATE?.map(
+            (section) => !!section?.YEAR
+          ),
+        },
+        {
+          type: FieldType.TEXT,
+          id: "publicationYear",
           label: "Veröffentlichungsdatum",
-          value: norm.publicationDate,
+          values: norm.metadataSections?.PUBLICATION_DATE?.map(
+            (section) => section?.YEAR?.[0]
+          ),
         },
       ],
     },
@@ -991,20 +1020,20 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
           ).map((section) => section?.PAGE?.[0]),
         },
         {
-          type: FieldType.TEXT,
+          type: FieldType.CHIPS,
           id: "printAnnouncementInfo",
           label: "Zusatzangaben",
           values: norm.metadataSections?.OFFICIAL_REFERENCE?.map(
             (section) => section?.PRINT_ANNOUNCEMENT?.[0]
-          ).map((section) => section?.ADDITIONAL_INFO?.[0]),
+          ).map((section) => section?.ADDITIONAL_INFO),
         },
         {
-          type: FieldType.TEXT,
+          type: FieldType.CHIPS,
           id: "printAnnouncementExplanations",
           label: "Erläuterungen",
           values: norm.metadataSections?.OFFICIAL_REFERENCE?.map(
             (section) => section?.PRINT_ANNOUNCEMENT?.[0]
-          ).map((section) => section?.EXPLANATION?.[0]),
+          ).map((section) => section?.EXPLANATION),
         },
         {
           type: FieldType.RADIO,
@@ -1066,20 +1095,20 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
           ),
         },
         {
-          type: FieldType.TEXT,
+          type: FieldType.CHIPS,
           id: "digitalAnnouncementInfo",
           label: "Zusatzangaben",
           values: norm.metadataSections?.OFFICIAL_REFERENCE?.map(
             (section) => section?.DIGITAL_ANNOUNCEMENT?.[0]
-          ).map((section) => section?.ADDITIONAL_INFO?.[0]),
+          ).map((section) => section?.ADDITIONAL_INFO),
         },
         {
-          type: FieldType.TEXT,
+          type: FieldType.CHIPS,
           id: "digitalAnnouncementExplanations",
           label: "Erläuterungen",
           values: norm.metadataSections?.OFFICIAL_REFERENCE?.map(
             (section) => section?.DIGITAL_ANNOUNCEMENT?.[0]
-          ).map((section) => section?.EXPLANATION?.[0]),
+          ).map((section) => section?.EXPLANATION),
         },
         {
           type: FieldType.RADIO,
@@ -1130,20 +1159,20 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
           ).map((section) => section?.PAGE?.[0]),
         },
         {
-          type: FieldType.TEXT,
+          type: FieldType.CHIPS,
           id: "euAnnouncementInfo",
           label: "Zusatzangaben",
           values: norm.metadataSections?.OFFICIAL_REFERENCE?.map(
             (section) => section?.EU_ANNOUNCEMENT?.[0]
-          ).map((section) => section?.ADDITIONAL_INFO?.[0]),
+          ).map((section) => section?.ADDITIONAL_INFO),
         },
         {
-          type: FieldType.TEXT,
+          type: FieldType.CHIPS,
           id: "euAnnouncementExplanations",
           label: "Erläuterungen",
           values: norm.metadataSections?.OFFICIAL_REFERENCE?.map(
             (section) => section?.EU_ANNOUNCEMENT?.[0]
-          ).map((section) => section?.EXPLANATION?.[0]),
+          ).map((section) => section?.EXPLANATION),
         },
         {
           type: FieldType.RADIO,
@@ -1423,7 +1452,7 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
           type: FieldType.CHIPS,
           id: "referenceNumbers",
           label: "Aktenzeichen",
-          value: "",
+          value: norm.metadataSections?.NORM?.[0]?.REFERENCE_NUMBER,
         },
       ],
     },

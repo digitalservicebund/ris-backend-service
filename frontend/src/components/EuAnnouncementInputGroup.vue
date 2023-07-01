@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { computed, ref, watch } from "vue"
 import { Metadata } from "@/domain/Norm"
+import ChipsInput from "@/shared/components/input/ChipsInput.vue"
 import InputField from "@/shared/components/input/InputField.vue"
 import TextInput from "@/shared/components/input/TextInput.vue"
 import YearInput from "@/shared/components/input/YearInput.vue"
@@ -36,34 +37,32 @@ const defaultValueEuGovernmentGazette = "Amtsblatt der EU"
 
 const year = computed({
   get: () => inputValue.value.YEAR?.[0],
-  set: (data?: string) => (inputValue.value.YEAR = data ? [data] : undefined),
+  set: (data) => (inputValue.value.YEAR = data ? [data] : undefined),
 })
 
 const series = computed({
   get: () => inputValue.value.SERIES?.[0],
-  set: (data?: string) => (inputValue.value.SERIES = data ? [data] : undefined),
+  set: (data) => (inputValue.value.SERIES = data ? [data] : undefined),
 })
 
 const number = computed({
   get: () => inputValue.value.NUMBER?.[0],
-  set: (data?: string) => (inputValue.value.NUMBER = data ? [data] : undefined),
+  set: (data) => (inputValue.value.NUMBER = data ? [data] : undefined),
 })
 
 const pageNumber = computed({
   get: () => inputValue.value.PAGE?.[0],
-  set: (data?: string) => (inputValue.value.PAGE = data ? [data] : undefined),
+  set: (data) => (inputValue.value.PAGE = data ? [data] : undefined),
 })
 
 const additionalInfo = computed({
-  get: () => inputValue.value.ADDITIONAL_INFO?.[0],
-  set: (data?: string) =>
-    (inputValue.value.ADDITIONAL_INFO = data ? [data] : undefined),
+  get: () => inputValue.value.ADDITIONAL_INFO,
+  set: (data) => (inputValue.value.ADDITIONAL_INFO = data),
 })
 
 const explanation = computed({
-  get: () => inputValue.value.EXPLANATION?.[0],
-  set: (data?: string) =>
-    (inputValue.value.EXPLANATION = data ? [data] : undefined),
+  get: () => inputValue.value.EXPLANATION,
+  set: (data) => (inputValue.value.EXPLANATION = data),
 })
 </script>
 <template>
@@ -140,7 +139,7 @@ const explanation = computed({
     aria-label="Zusatzangaben"
     label="Zusatzangaben"
   >
-    <TextInput
+    <ChipsInput
       id="euAnnouncementInfo"
       v-model="additionalInfo"
       aria-label="Zusatzangaben"
@@ -151,7 +150,7 @@ const explanation = computed({
     aria-label="Erläuterungen"
     label="Erläuterungen"
   >
-    <TextInput
+    <ChipsInput
       id="euAnnouncementExplanations"
       v-model="explanation"
       aria-label="Erläuterungen"

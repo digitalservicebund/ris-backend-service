@@ -123,6 +123,7 @@ val hasValidMetadata =
             Section.REISSUE -> hasType(listOf(NOTE, ARTICLE, DATE, REFERENCE), instance)
             Section.REPEAL -> hasType(listOf(TEXT), instance)
             Section.OTHER_STATUS -> hasType(listOf(NOTE), instance)
+            Section.PUBLICATION_DATE -> hasOneOfType(listOf(DATE, YEAR), instance)
         }
 
         private fun hasNone(instance: MetadataSection): Boolean =

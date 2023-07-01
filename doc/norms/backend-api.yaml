@@ -404,6 +404,7 @@ components:
         - REISSUE
         - REPEAL
         - OTHER_STATUS
+        - PUBLICATION_DATE
 
     MetadataSection:
       type: object

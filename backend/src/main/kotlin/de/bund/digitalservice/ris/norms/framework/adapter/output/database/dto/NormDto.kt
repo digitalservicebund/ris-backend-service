@@ -15,8 +15,6 @@ data class NormDto(
 
     @Column("announcement_date")
     var announcementDate: LocalDate? = null,
-    @Column("publication_date")
-    var publicationDate: LocalDate? = null,
 
 ) : Persistable<UUID> {
 

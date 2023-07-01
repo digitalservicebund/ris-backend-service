@@ -162,6 +162,7 @@ watch(currentInput, async () => {
   <div
     ref="wrapperEl"
     class="-outline-offset-4 [&:has(:focus)]:outline autofill:focus:shadow-white autofill:focus:text-inherit autofill:shadow-white autofill:text-inherit bg-white border-2 border-blue-800 border-solid cursor-text flex flex-wrap hover:outline items-center min-h-[3.75rem] outline-2 outline-blue-800 overflow-hidden px-16 py-8 w-full"
+    :data-testid="`chips-input_${id}`"
     @click="focusInput"
   >
     <ChipsList

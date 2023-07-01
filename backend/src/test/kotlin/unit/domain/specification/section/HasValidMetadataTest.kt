@@ -857,4 +857,53 @@ class HasValidMetadataTest {
 
         assertThat(hasValidMetadata.isSatisfiedBy(instance)).isFalse()
     }
+
+    @Test
+    fun `it throws an error if publication date has both date and year`() {
+        val instance = mockk<MetadataSection>()
+        every { instance.name } returns MetadataSectionName.PUBLICATION_DATE
+        every { instance.sections } returns null
+        every { instance.metadata } returns listOf(
+            Metadatum(LocalDate.now(), MetadatumType.DATE),
+            Metadatum("2020", MetadatumType.YEAR),
+        )
+
+        assertThat(hasValidMetadata.isSatisfiedBy(instance)).isFalse()
+    }
+
+    @Test
+    fun `it throws an error on publication date with wrong metadata`() {
+        val instance = mockk<MetadataSection>()
+        every { instance.name } returns MetadataSectionName.PUBLICATION_DATE
+        every { instance.sections } returns null
+        every { instance.metadata } returns listOf(
+            Metadatum("note", MetadatumType.NOTE),
+        )
+
+        assertThat(hasValidMetadata.isSatisfiedBy(instance)).isFalse()
+    }
+
+    @Test
+    fun `can generate publication date with date`() {
+        val instance = mockk<MetadataSection>()
+        every { instance.name } returns MetadataSectionName.PUBLICATION_DATE
+        every { instance.sections } returns null
+        every { instance.metadata } returns listOf(
+            Metadatum(LocalDate.now(), MetadatumType.DATE),
+        )
+
+        assertThat(hasValidMetadata.isSatisfiedBy(instance)).isTrue()
+    }
+
+    @Test
+    fun `can generate publication date with year`() {
+        val instance = mockk<MetadataSection>()
+        every { instance.name } returns MetadataSectionName.PUBLICATION_DATE
+        every { instance.sections } returns null
+        every { instance.metadata } returns listOf(
+            Metadatum("2020", MetadatumType.YEAR),
+        )
+
+        assertThat(hasValidMetadata.isSatisfiedBy(instance)).isTrue()
+    }
 }

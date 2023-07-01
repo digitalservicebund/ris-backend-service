@@ -13,7 +13,6 @@ data class Norm(
     val metadataSections: List<MetadataSection> = emptyList(),
 
     var announcementDate: LocalDate? = null,
-    var publicationDate: LocalDate? = null,
 
     var files: List<FileReference> = listOf(),
 

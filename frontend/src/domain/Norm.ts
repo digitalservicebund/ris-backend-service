@@ -238,6 +238,7 @@ export enum MetadataSectionName {
   REISSUE = "REISSUE",
   REPEAL = "REPEAL",
   OTHER_STATUS = "OTHER_STATUS",
+  PUBLICATION_DATE = "PUBLICATION_DATE",
 }
 
 export type MetadataSections = {

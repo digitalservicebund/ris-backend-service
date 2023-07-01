@@ -119,7 +119,10 @@ defineExpose({ focusPrevious, focusNext, resetFocus, focusFirst })
         @keyup.left="focusPrevious"
         @keyup.right="focusNext"
       >
-        <div class="flex leading-24 px-6 py-4 whitespace-pre-wrap">
+        <div
+          class="flex leading-24 px-6 py-4 whitespace-pre-wrap"
+          data-testid="chip-value"
+        >
           {{ chip }}
         </div>
 

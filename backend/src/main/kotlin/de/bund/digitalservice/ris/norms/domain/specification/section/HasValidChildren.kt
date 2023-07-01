@@ -33,6 +33,7 @@ import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName.PARTICI
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName.PRINCIPLE_ENTRY_INTO_FORCE
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName.PRINCIPLE_EXPIRATION
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName.PRINT_ANNOUNCEMENT
+import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName.PUBLICATION_DATE
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName.REISSUE
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName.REPEAL
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName.STATUS
@@ -48,7 +49,7 @@ val hasValidChildren =
             DIVERGENT_ENTRY_INTO_FORCE_UNDEFINED, DIVERGENT_EXPIRATION_DEFINED, DIVERGENT_EXPIRATION_UNDEFINED,
             CATEGORIZED_REFERENCE, ENTRY_INTO_FORCE, PRINCIPLE_ENTRY_INTO_FORCE, EXPIRATION, PRINCIPLE_EXPIRATION,
             DIGITAL_EVIDENCE, FOOTNOTES, DOCUMENT_STATUS, DOCUMENT_TEXT_PROOF, DOCUMENT_OTHER, STATUS, REISSUE,
-            REPEAL, OTHER_STATUS,
+            REPEAL, OTHER_STATUS, PUBLICATION_DATE,
             -> hasNone(instance)
 
             OFFICIAL_REFERENCE -> hasOneOfType(listOf(PRINT_ANNOUNCEMENT, DIGITAL_ANNOUNCEMENT, EU_ANNOUNCEMENT, OTHER_OFFICIAL_ANNOUNCEMENT), instance)

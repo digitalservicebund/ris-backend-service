@@ -50,11 +50,15 @@ const expectTextEditor: FieldExpecter<FootnoteInputType[]> = async (
   }
 }
 
-const expectChipsInput: FieldExpecter<string[]> = async (page, _, value) => {
-  for (const subValue of (value ?? []) as string[]) {
-    const chips = page.getByTestId("chip")
-    const chip = chips.getByText(subValue, { exact: true })
-    await expect(chip).toBeVisible()
+const expectChipsInput: FieldExpecter<string[]> = async (page, id, value) => {
+  const chipValues = page
+    .locator(`[data-testid='chips-input_${id}']`)
+    .locator(`[data-testid='chip-value']`)
+
+  await expect(chipValues).toHaveCount(value.length)
+
+  for (const [index, subValue] of value.entries()) {
+    await expect(chipValues.nth(index)).toHaveText(subValue)
   }
 }
 

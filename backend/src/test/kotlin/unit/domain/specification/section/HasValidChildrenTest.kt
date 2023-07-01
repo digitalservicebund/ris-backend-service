@@ -432,4 +432,13 @@ class HasValidChildrenTest {
 
         Assertions.assertThat(hasValidChildren.isSatisfiedBy(instance)).isTrue()
     }
+
+    @Test
+    fun `it is satisfied that the publication date section does not have any children sections`() {
+        val instance = mockk<MetadataSection>()
+        every { instance.name } returns MetadataSectionName.PUBLICATION_DATE
+        every { instance.sections } returns null
+
+        Assertions.assertThat(hasValidChildren.isSatisfiedBy(instance)).isTrue()
+    }
 }
