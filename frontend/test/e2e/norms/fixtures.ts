@@ -1218,22 +1218,122 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
     },
     {
       heading: "Stand-Angabe",
-      sections: [
+      id: "statusIndication",
+      isRepeatedSection: true,
+      isNotImported: true,
+      numberEditedSections: 4,
+      fields: [
         {
-          heading: "Stand",
-          fields: [],
+          type: FieldType.RADIO,
+          id: "statusSelection",
+          label: "Stand",
+          values: norm.metadataSections?.STATUS_INDICATION?.map(
+            (section) => !!section?.STATUS
+          ),
         },
         {
-          heading: "Aufhebung",
-          fields: [],
+          type: FieldType.TEXT,
+          id: "statusNote",
+          label: "Änderungshinweis",
+          values: norm.metadataSections?.STATUS_INDICATION?.map(
+            (section) => section?.STATUS?.[0]
+          ).map((section) => section?.NOTE?.[0]),
         },
         {
-          heading: "Neufassung",
-          fields: [],
+          type: FieldType.TEXT,
+          id: "statusDescription",
+          label: "Bezeichnung der Änderungsvorschrift",
+          values: norm.metadataSections?.STATUS_INDICATION?.map(
+            (section) => section?.STATUS?.[0]
+          ).map((section) => section?.DESCRIPTION?.[0]),
         },
         {
-          heading: "Sonstiger Hinweis",
-          fields: [],
+          type: FieldType.TEXT,
+          id: "statusDate",
+          label: "Datum der Änderungsvorschrift",
+          values: norm.metadataSections?.STATUS_INDICATION?.map(
+            (section) => section?.STATUS?.[0]
+          ).map((section) => section?.DATE?.[0]),
+        },
+        {
+          type: FieldType.CHIPS,
+          id: "statusReference",
+          label: "Fundstellen der Änderungsvorschrift",
+          values: norm.metadataSections?.STATUS_INDICATION?.map(
+            (section) => section?.STATUS?.[0]
+          ).map((section) => section?.REFERENCE),
+        },
+        {
+          type: FieldType.RADIO,
+          id: "reissueSelection",
+          label: "Neufassung",
+          values: norm.metadataSections?.STATUS_INDICATION?.map(
+            (section) => !!section?.REISSUE
+          ),
+        },
+        {
+          type: FieldType.TEXT,
+          id: "reissueNote",
+          label: "Neufassungshinweis",
+          values: norm.metadataSections?.STATUS_INDICATION?.map(
+            (section) => section?.REISSUE?.[0]
+          ).map((section) => section?.NOTE?.[0]),
+        },
+        {
+          type: FieldType.TEXT,
+          id: "reissueArticle",
+          label: "Bezeichnung der Bekanntmachung",
+          values: norm.metadataSections?.STATUS_INDICATION?.map(
+            (section) => section?.REISSUE?.[0]
+          ).map((section) => section?.ARTICLE?.[0]),
+        },
+        {
+          type: FieldType.TEXT,
+          id: "reissueDate",
+          label: "Datum der Bekanntmachung",
+          values: norm.metadataSections?.STATUS_INDICATION?.map(
+            (section) => section?.REISSUE?.[0]
+          ).map((section) => section?.DATE?.[0]),
+        },
+        {
+          type: FieldType.TEXT,
+          id: "reissueReference",
+          label: "Fundstelle der Bekanntmachung",
+          values: norm.metadataSections?.STATUS_INDICATION?.map(
+            (section) => section?.REISSUE?.[0]
+          ).map((section) => section?.REFERENCE?.[0]),
+        },
+        {
+          type: FieldType.RADIO,
+          id: "repealSelection",
+          label: "Aufhebung",
+          values: norm.metadataSections?.STATUS_INDICATION?.map(
+            (section) => !!section?.REPEAL
+          ),
+        },
+        {
+          type: FieldType.TEXTAREA,
+          id: "repealText",
+          label: "Aufhebung",
+          values: norm.metadataSections?.STATUS_INDICATION?.map(
+            (section) => section?.REPEAL?.[0]
+          ).map((section) => section?.TEXT?.[0]),
+        },
+        {
+          type: FieldType.RADIO,
+          id: "otherStatusSelection",
+          label: "Sonstiger Hinweis",
+          values: norm.metadataSections?.STATUS_INDICATION?.map(
+            (section) => !!section?.OTHER_STATUS
+          ),
+        },
+        {
+          type: FieldType.TEXTAREA,
+          id: "otherStatusNote",
+          label: "Sonstiger Hinweis",
+          values: norm.metadataSections?.STATUS_INDICATION?.map(
+            (section) => section?.OTHER_STATUS?.[0]
+          ).map((section) => section?.NOTE?.[0]),
         },
       ],
     },

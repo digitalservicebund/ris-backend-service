@@ -274,6 +274,38 @@ export const newNorm: NormData = {
       },
     ],
     PUBLICATION_DATE: [{ DATE: ["01.11.2022"] }],
+    STATUS_INDICATION: [
+      {
+        STATUS: [
+          {
+            NOTE: ["Status note"],
+            DESCRIPTION: ["Status description"],
+            DATE: ["09.11.2018"],
+            REFERENCE: ["Status reference 1", "Status reference 2"],
+          },
+        ],
+      },
+      {
+        REISSUE: [
+          {
+            NOTE: ["Reissue note"],
+            ARTICLE: ["Reissue article"],
+            DATE: ["09.11.2018"],
+            REFERENCE: ["Reissue reference"],
+          },
+        ],
+      },
+      {
+        REPEAL: [
+          {
+            TEXT: ["Repeal text"],
+          },
+        ],
+      },
+      {
+        OTHER_STATUS: [{ NOTE: ["Other status note"] }],
+      },
+    ],
   },
   eli: "europeanLegalIdentifier",
 }

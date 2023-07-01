@@ -129,7 +129,6 @@ class LoadNormControllerTest {
         val articles: List<ArticleResponseTestSchema>,
         val metadataSections: List<MetadataSectionResponseTestSchema>,
         var announcementDate: String?,
-        var publicationDate: String?,
         var eli: String,
         var files: List<FileReferenceResponseTestSchema>,
     ) {
@@ -143,7 +142,6 @@ class LoadNormControllerTest {
                     articles,
                     metadataSections,
                     encodeLocalDate(data.announcementDate),
-                    encodeLocalDate(data.publicationDate),
                     encodeEli(data.eli),
                     files = files,
                 )

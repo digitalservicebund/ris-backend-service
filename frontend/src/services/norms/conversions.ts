@@ -725,6 +725,5 @@ export function encodeFlatMetadata(
   return {
     eli: encodeString(flatMetadata.eli),
     announcementDate: encodeNullDate(flatMetadata.announcementDate),
-    publicationDate: encodeNullDate(flatMetadata.publicationDate),
   }
 }

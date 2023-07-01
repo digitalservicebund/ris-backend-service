@@ -252,7 +252,6 @@ export type FlatMetadata = {
   printAnnouncementPage?: string
   printAnnouncementYear?: string
   announcementDate?: string
-  publicationDate?: string
 }
 
 export enum UndefinedDate {

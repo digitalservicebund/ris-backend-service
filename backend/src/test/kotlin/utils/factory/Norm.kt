@@ -12,7 +12,6 @@ fun norm(block: NormBuilder.() -> Unit): Norm = NormBuilder().apply(block).build
 class NormBuilder {
     var guid: UUID = UUID.randomUUID()
     var announcementDate = LocalDate.now()
-    var publicationDate = LocalDate.now()
 
     private val metadataSections = mutableListOf<MetadataSection>()
     private val articles = mutableListOf<Article>()
@@ -28,7 +27,6 @@ class NormBuilder {
         files = files,
         articles = articles,
         announcementDate = announcementDate,
-        publicationDate = publicationDate,
     )
 }
 

@@ -43,7 +43,6 @@ class LoadNormController(private val loadNormService: LoadNormUseCase) {
         val articles: List<ArticleResponseSchema>,
         val metadataSections: List<MetadataSectionResponseSchema>,
         var announcementDate: String?,
-        var publicationDate: String?,
         var eli: String,
         var files: List<FileReferenceResponseSchema>,
     ) {
@@ -57,7 +56,6 @@ class LoadNormController(private val loadNormService: LoadNormUseCase) {
                     articles,
                     metadataSections,
                     encodeLocalDate(data.announcementDate),
-                    encodeLocalDate(data.publicationDate),
                     encodeEli(data.eli),
                     files = files,
                 )

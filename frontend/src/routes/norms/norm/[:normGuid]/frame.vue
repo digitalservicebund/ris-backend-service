@@ -124,7 +124,6 @@ watch(
     if (loadedNorm.value !== undefined && data !== undefined) {
       loadedNorm.value.eli = data.eli as string
       loadedNorm.value.announcementDate = data.announcementDate as string
-      loadedNorm.value.publicationDate = data.publicationDate as string
     }
   },
   { deep: true }
