@@ -724,19 +724,6 @@ export function encodeFlatMetadata(
 ): FlatMetadataRequestSchema {
   return {
     eli: encodeString(flatMetadata.eli),
-    otherStatusNote: encodeString(flatMetadata.otherStatusNote),
     announcementDate: encodeNullDate(flatMetadata.announcementDate),
-    reissueArticle: encodeString(flatMetadata.reissueArticle),
-    reissueDate: encodeNullDate(flatMetadata.reissueDate),
-    reissueNote: encodeString(flatMetadata.reissueNote),
-    reissueReference: encodeString(flatMetadata.reissueReference),
-    repealArticle: encodeString(flatMetadata.repealArticle),
-    repealDate: encodeNullDate(flatMetadata.repealDate),
-    repealNote: encodeString(flatMetadata.repealNote),
-    repealReferences: encodeString(flatMetadata.repealReferences),
-    statusDate: encodeNullDate(flatMetadata.statusDate),
-    statusDescription: encodeString(flatMetadata.statusDescription),
-    statusNote: encodeString(flatMetadata.statusNote),
-    statusReference: encodeString(flatMetadata.statusReference),
   }
 }

@@ -70,19 +70,6 @@ fun mapDataToDomain(guid: UUID, data: NormData): Norm {
         articles = mapArticlesToDomain(data.articles),
         metadataSections = sections.filterNotNull(),
         announcementDate = parseDateString(data.announcementDate),
-        statusNote = data.statusNote,
-        statusDescription = data.statusDescription,
-        statusDate = parseDateString(data.statusDate),
-        statusReference = data.statusReference,
-        repealNote = data.repealNote,
-        repealArticle = data.repealArticle,
-        repealDate = parseDateString(data.repealDate),
-        repealReferences = data.repealReferences,
-        reissueNote = data.reissueNote,
-        reissueArticle = data.reissueArticle,
-        reissueDate = parseDateString(data.reissueDate),
-        reissueReference = data.reissueReference,
-        otherStatusNote = data.otherStatusNote,
     )
 }
 fun createSectionsForDocumentStatus(

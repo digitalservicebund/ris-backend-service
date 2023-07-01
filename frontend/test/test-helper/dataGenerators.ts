@@ -310,19 +310,6 @@ export function generateFlatMetadata(
   return {
     announcementDate: generateString(),
     eli: generateString(),
-    otherStatusNote: generateString(),
-    reissueArticle: generateString(),
-    reissueDate: generateString(),
-    reissueNote: generateString(),
-    reissueReference: generateString(),
-    repealArticle: generateString(),
-    repealDate: generateString(),
-    repealNote: generateString(),
-    repealReferences: generateString(),
-    statusDate: generateString(),
-    statusDescription: generateString(),
-    statusNote: generateString(),
-    statusReference: generateString(),
     ...partialFlatMetadata,
   }
 }

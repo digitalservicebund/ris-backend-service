@@ -199,19 +199,6 @@ class JurisConverterTest {
             val norm = converter.parseJurisXml(query).block()
 
             assertThat(norm?.announcementDate).isEqualTo(LocalDate.parse("2022-01-07"))
-            assertThat(norm?.statusNote).isEqualTo("test status note")
-            assertThat(norm?.statusDescription).isEqualTo("test status description")
-            assertThat(norm?.statusDate).isEqualTo(LocalDate.parse("2022-01-09"))
-            assertThat(norm?.statusReference).isEqualTo("test status reference")
-            assertThat(norm?.repealNote).isEqualTo("test repeal note")
-            assertThat(norm?.repealArticle).isEqualTo("test repeal article")
-            assertThat(norm?.repealDate).isEqualTo(LocalDate.parse("2022-01-10"))
-            assertThat(norm?.repealReferences).isEqualTo("test repeal references")
-            assertThat(norm?.reissueNote).isEqualTo("test reissue note")
-            assertThat(norm?.reissueArticle).isEqualTo("test reissue article")
-            assertThat(norm?.reissueDate).isEqualTo(LocalDate.parse("2022-01-11"))
-            assertThat(norm?.reissueReference).isEqualTo("test reissue reference")
-            assertThat(norm?.otherStatusNote).isEqualTo("test other status note")
             val metadata = norm?.metadataSections?.flatMap { it.metadata }
 
             assertThat(metadata).usingRecursiveFieldByFieldElementComparatorIgnoringFields("guid").contains(Metadatum("test official long title", OFFICIAL_LONG_TITLE))

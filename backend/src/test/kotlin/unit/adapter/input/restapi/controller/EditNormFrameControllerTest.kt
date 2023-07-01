@@ -108,41 +108,12 @@ class EditNormFrameControllerTest {
         var documentNumber: String? = null
         var documentCategory: String? = null
 
-        var documentTypeName: String? = null
-        var documentNormCategory: String? = null
-        var documentTemplateName: String? = null
-
         var officialShortTitle: String? = null
         var officialAbbreviation: String? = null
 
         var announcementDate: String? = null
 
         var completeCitation: String? = null
-
-        var statusNote: String? = null
-        var statusDescription: String? = null
-        var statusDate: String? = null
-        var statusReference: String? = null
-        var repealNote: String? = null
-        var repealArticle: String? = null
-        var repealDate: String? = null
-        var repealReferences: String? = null
-        var reissueNote: String? = null
-        var reissueArticle: String? = null
-        var reissueDate: String? = null
-        var reissueReference: String? = null
-        var otherStatusNote: String? = null
-
-        var applicationScopeArea: String? = null
-        var applicationScopeStartDate: String? = null
-        var applicationScopeEndDate: String? = null
-
-        var otherFootnote: String? = null
-        var footnoteChange: String? = null
-        var footnoteComment: String? = null
-        var footnoteDecision: String? = null
-        var footnoteStateLaw: String? = null
-        var footnoteEuLaw: String? = null
 
         var celexNumber: String? = null
 

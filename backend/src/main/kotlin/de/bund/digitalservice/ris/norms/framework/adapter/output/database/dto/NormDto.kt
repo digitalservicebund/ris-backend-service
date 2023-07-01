@@ -16,32 +16,6 @@ data class NormDto(
     @Column("announcement_date")
     var announcementDate: LocalDate? = null,
 
-    @Column("status_note")
-    var statusNote: String? = null,
-    @Column("status_description")
-    var statusDescription: String? = null,
-    @Column("status_date")
-    var statusDate: LocalDate? = null,
-    @Column("status_reference")
-    var statusReference: String? = null,
-    @Column("repeal_note")
-    var repealNote: String? = null,
-    @Column("repeal_article")
-    var repealArticle: String? = null,
-    @Column("repeal_date")
-    var repealDate: LocalDate? = null,
-    @Column("repeal_references")
-    var repealReferences: String? = null,
-    @Column("reissue_note")
-    var reissueNote: String? = null,
-    @Column("reissue_article")
-    var reissueArticle: String? = null,
-    @Column("reissue_date")
-    var reissueDate: LocalDate? = null,
-    @Column("reissue_reference")
-    var reissueReference: String? = null,
-    @Column("other_status_note")
-    var otherStatusNote: String? = null,
 ) : Persistable<UUID> {
 
     @Transient

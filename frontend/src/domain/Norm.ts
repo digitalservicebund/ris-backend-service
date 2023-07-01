@@ -248,23 +248,10 @@ export type MetadataSections = {
 export type FlatMetadata = {
   categorizedReference?: string
   eli?: string
-  otherStatusNote?: string
   printAnnouncementGazette?: string
   printAnnouncementPage?: string
   printAnnouncementYear?: string
   announcementDate?: string
-  reissueArticle?: string
-  reissueDate?: string
-  reissueNote?: string
-  reissueReference?: string
-  repealArticle?: string
-  repealDate?: string
-  repealNote?: string
-  repealReferences?: string
-  statusDate?: string
-  statusDescription?: string
-  statusNote?: string
-  statusReference?: string
 }
 
 export enum UndefinedDate {

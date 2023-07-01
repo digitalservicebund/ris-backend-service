@@ -126,7 +126,6 @@ class FromJurisMapperTest {
         assertThat(domainNorm.articles[0].paragraphs[0].marker).isEqualTo("paragraphMarker")
         assertThat(domainNorm.articles[0].paragraphs[0].text).isEqualTo("paragraphText")
         assertThat(domainNorm.announcementDate).isEqualTo(LocalDate.of(2020, 10, 10))
-        assertThat(domainNorm.otherStatusNote).isEqualTo("otherStatusNote")
         val sections = domainNorm.metadataSections
         assertSectionsHasMetadata(sections, NORM, MetadatumType.OFFICIAL_LONG_TITLE, "officialLongTitle")
         assertSectionsHasMetadata(sections, NORM, MetadatumType.OFFICIAL_SHORT_TITLE, "officialShortTitle")

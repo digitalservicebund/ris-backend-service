@@ -57,19 +57,6 @@ interface NormsMapper {
             articles,
             listDomainSections,
             normDto.announcementDate,
-            normDto.statusNote,
-            normDto.statusDescription,
-            normDto.statusDate,
-            normDto.statusReference,
-            normDto.repealNote,
-            normDto.repealArticle,
-            normDto.repealDate,
-            normDto.repealReferences,
-            normDto.reissueNote,
-            normDto.reissueArticle,
-            normDto.reissueDate,
-            normDto.reissueReference,
-            normDto.otherStatusNote,
             fileReferences,
         )
     }
@@ -109,19 +96,6 @@ interface NormsMapper {
         return NormDto(
             norm.guid,
             norm.announcementDate,
-            norm.statusNote,
-            norm.statusDescription,
-            norm.statusDate,
-            norm.statusReference,
-            norm.repealNote,
-            norm.repealArticle,
-            norm.repealDate,
-            norm.repealReferences,
-            norm.reissueNote,
-            norm.reissueArticle,
-            norm.reissueDate,
-            norm.reissueReference,
-            norm.otherStatusNote,
         )
     }
 

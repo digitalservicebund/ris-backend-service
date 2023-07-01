@@ -22,7 +22,7 @@ const expectTextInput: FieldExpecter<string> = async (page, id, value) => {
 
 const expectTextArea: FieldExpecter<string> = async (page, id, value) => {
   const content = await page.locator(`textarea#${id}`).inputValue()
-  expect(content).toBe(value)
+  expect(content.trim()).toBe(value)
 }
 
 const expectCheckbox: FieldExpecter<boolean> = async (page, id, value) => {

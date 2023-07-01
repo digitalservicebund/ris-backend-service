@@ -56,15 +56,6 @@ fun mapDomainToData(norm: Norm): NormData {
         expirationDate = extractExpirationDate(norm),
         expirationDateState = extractExpirationState(norm),
         unofficialReferenceList = extractSimpleStringValuesFromNormSection(norm, MetadatumType.UNOFFICIAL_REFERENCE),
-        statusDescription = norm.statusDescription,
-        statusDate = encodeLocalDate(norm.statusDate),
-        statusReference = norm.statusReference,
-        repealArticle = norm.repealArticle,
-        repealDate = encodeLocalDate(norm.repealDate),
-        repealReferences = norm.repealReferences,
-        reissueArticle = norm.reissueArticle,
-        reissueDate = encodeLocalDate(norm.reissueDate),
-        reissueReference = norm.reissueReference,
     )
 }
 
