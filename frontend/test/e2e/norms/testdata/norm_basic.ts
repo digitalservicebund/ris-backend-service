@@ -176,6 +176,49 @@ export const normData: NormData = {
     PRINCIPLE_EXPIRATION: [
       { UNDEFINED_DATE: [UndefinedDate.UNDEFINED_UNKNOWN] },
     ],
+    STATUS_INDICATION: [
+      {
+        STATUS: [
+          {
+            NOTE: ["Zuletzt geändert durch Art. 6 G v. 22.12.2020 I 3328"],
+            DESCRIPTION: ["Art. 6 G"],
+            DATE: ["22.12.2020"],
+            REFERENCE: ["3328"],
+          },
+        ],
+      },
+      {
+        REISSUE: [
+          {
+            NOTE: ["Neufassung durch Art. 35 v. 15.7.1999 I 3249"],
+            ARTICLE: ["Art. 35"],
+            DATE: ["15.07.1999"],
+            REFERENCE: ["3249"],
+          },
+        ],
+      },
+      {
+        REPEAL: [
+          {
+            TEXT: [
+              "V aufgeh. durch Art. 4 Nr. 1 G v. 15.7.1999 I 1618 (StARefG) mWv 1.1.2000",
+            ],
+          },
+        ],
+      },
+      {
+        REPEAL: [
+          {
+            TEXT: [
+              "V aufgeh. durch Art. 10 Nr. 9 G v. 29.12.1999 I 8172 (StARefG) mWv 3.2.2001",
+            ],
+          },
+        ],
+      },
+      {
+        OTHER_STATUS: [{ NOTE: ["Eine sonstige Stand-Angabe"] }],
+      },
+    ],
   },
   announcementDate: "06.01.2023",
   printAnnouncementGazette: "BGBl I",

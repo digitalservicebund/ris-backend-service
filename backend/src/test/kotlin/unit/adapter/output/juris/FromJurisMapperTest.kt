@@ -38,6 +38,8 @@ import de.bund.digitalservice.ris.norms.juris.converter.model.NormProvider
 import de.bund.digitalservice.ris.norms.juris.converter.model.Paragraph
 import de.bund.digitalservice.ris.norms.juris.converter.model.Participation
 import de.bund.digitalservice.ris.norms.juris.converter.model.PrintAnnouncement
+import de.bund.digitalservice.ris.norms.juris.converter.model.Reissue
+import de.bund.digitalservice.ris.norms.juris.converter.model.Status
 import de.bund.digitalservice.ris.norms.juris.converter.model.SubjectArea
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
@@ -83,7 +85,6 @@ class FromJurisMapperTest {
             officialAbbreviation = "officialAbbreviation",
             officialLongTitle = "officialLongTitle",
             officialShortTitle = "officialShortTitle",
-            otherStatusNote = "otherStatusNote",
             participationList = listOf(Participation("participationType", "participationInstitution")),
             principleEntryIntoForceDate = "2024-10-10",
             principleEntryIntoForceDateState = null,
@@ -91,20 +92,12 @@ class FromJurisMapperTest {
             principleExpirationDateState = "UNDEFINED_FUTURE",
             printAnnouncementList = listOf(PrintAnnouncement("2020", "1", "bgbl")),
             referenceNumberList = listOf("referenceNumber"),
-            reissueArticle = "reissueArticle",
-            reissueDate = "reissueDate",
-            reissueNote = "reissueNote",
-            reissueReference = "reissueReference",
-            repealArticle = "repealArticle",
-            repealDate = "repealDate",
-            repealNote = "repealNote",
-            repealReferences = "repealReferences",
             risAbbreviation = "risAbbreviation",
             risAbbreviationInternationalLawList = listOf("risAbbreviationInternationalLaw"),
-            statusDate = "statusDate",
-            statusDescription = "statusDescription",
-            statusNote = "statusNote",
-            statusReference = "statusReference",
+            statusList = listOf(Status("statusNote", "statusDescription", "2010-02-03", "statusReference")),
+            reissueList = listOf(Reissue("reissueNote", "reissueArticle", "2011-12-15", "reissueReference")),
+            repealList = listOf("repealReferences"),
+            otherStatusList = listOf("otherStatusNote"),
             subjectAreaList = listOf(SubjectArea("subjectFna", "subjectGesta")),
             text = "text",
             unofficialAbbreviationList = listOf("unofficialAbbreviation"),

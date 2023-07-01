@@ -16,6 +16,8 @@ import de.bund.digitalservice.ris.norms.juris.converter.model.DivergentExpiratio
 import de.bund.digitalservice.ris.norms.juris.converter.model.DocumentType
 import de.bund.digitalservice.ris.norms.juris.converter.model.NormProvider
 import de.bund.digitalservice.ris.norms.juris.converter.model.PrintAnnouncement
+import de.bund.digitalservice.ris.norms.juris.converter.model.Reissue
+import de.bund.digitalservice.ris.norms.juris.converter.model.Status
 import java.time.LocalDate
 import java.time.format.DateTimeParseException
 import java.util.*
@@ -63,7 +65,8 @@ fun mapDataToDomain(guid: UUID, data: NormData): Norm {
         createSectionsForDivergentExpiration(data.divergentExpirationsList) +
         citationDateSections + ageIndicationSections + categorizedReferenceSections +
         addProviderSections(data.normProviderList) +
-        createSectionForEntryIntoForceAndExpiration(data)
+        createSectionForEntryIntoForceAndExpiration(data) +
+        createSectionForStatusIndication(data.statusList, data.reissueList, data.repealList, data.otherStatusList)
 
     return Norm(
         guid = guid,
@@ -212,6 +215,52 @@ private fun createSectionsForOfficialReference(digitalAnnouncement: List<Digital
         createSectionsFromMetadata(Section.DIGITAL_ANNOUNCEMENT, digitalAnnouncementNumber + digitalAnnouncementMedium + digitalAnnouncementYear)
 
     return referenceSections.mapIndexed { index, section -> MetadataSection(Section.OFFICIAL_REFERENCE, listOf(), index, listOf(section)) }
+}
+
+private fun createSectionForStatusIndication(statusList: List<Status>, reissueList: List<Reissue>, repealList: List<String>, otherStatusList: List<String>): List<MetadataSection> {
+    val statusSections = mutableListOf<MetadataSection>()
+
+    statusList.forEachIndexed { index, status ->
+        val metadata = mutableListOf<Metadatum<*>>()
+        if (status.statusNote !== null) {
+            metadata.add(Metadatum(status.statusNote, MetadatumType.NOTE))
+        }
+        if (status.statusDescription !== null) {
+            metadata.add(Metadatum(status.statusDescription, MetadatumType.DESCRIPTION))
+        }
+        if (status.statusDate !== null) {
+            metadata.add(Metadatum(decodeLocalDate(status.statusDate), MetadatumType.DATE))
+        }
+        if (status.statusReference !== null) {
+            metadata.add(Metadatum(status.statusReference, MetadatumType.REFERENCE))
+        }
+        if (metadata.isNotEmpty()) statusSections.add(MetadataSection(Section.STATUS, metadata, index + 1))
+    }
+
+    reissueList.forEachIndexed { index, reissue ->
+        val metadata = mutableListOf<Metadatum<*>>()
+        if (reissue.reissueNote !== null) {
+            metadata.add(Metadatum(reissue.reissueNote, MetadatumType.NOTE))
+        }
+        if (reissue.reissueArticle !== null) {
+            metadata.add(Metadatum(reissue.reissueArticle, MetadatumType.ARTICLE))
+        }
+        if (reissue.reissueDate !== null) {
+            metadata.add(Metadatum(decodeLocalDate(reissue.reissueDate), MetadatumType.DATE))
+        }
+        if (reissue.reissueReference !== null) {
+            metadata.add(Metadatum(reissue.reissueReference, MetadatumType.REFERENCE))
+        }
+        if (metadata.isNotEmpty()) statusSections.add(MetadataSection(Section.REISSUE, metadata, index + 1))
+    }
+
+    repealList.forEachIndexed { index, repeal ->
+        statusSections.add(MetadataSection(Section.REPEAL, listOf(Metadatum(repeal, MetadatumType.TEXT)), index + 1))
+    }
+    otherStatusList.forEachIndexed { index, otherStatus ->
+        statusSections.add(MetadataSection(Section.OTHER_STATUS, listOf(Metadatum(otherStatus, MetadatumType.NOTE)), index + 1))
+    }
+    return statusSections.mapIndexed { index, section -> MetadataSection(Section.STATUS_INDICATION, listOf(), index + 1, listOf(section)) }
 }
 
 fun addProviderSections(normProviders: List<NormProvider>): List<MetadataSection> {

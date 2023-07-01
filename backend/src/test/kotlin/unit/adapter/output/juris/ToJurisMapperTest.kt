@@ -433,6 +433,80 @@ class ToJurisMapperTest {
                     ),
                 ),
 
+                Section(
+                    MetadataSectionName.STATUS_INDICATION,
+                    emptyList(),
+                    order = 1,
+                    sections = listOf(
+                        Section(
+                            MetadataSectionName.STATUS,
+                            listOf(
+                                Metadatum("statusNote", MetadatumType.NOTE),
+                                Metadatum("statusDescription", MetadatumType.DESCRIPTION),
+                                Metadatum(LocalDate.parse("2010-01-01"), MetadatumType.DATE),
+                                Metadatum("statusReference1", MetadatumType.REFERENCE, 1),
+                                Metadatum("statusReference2", MetadatumType.REFERENCE, 2),
+                            ),
+                        ),
+                    ),
+                ),
+                Section(
+                    MetadataSectionName.STATUS_INDICATION,
+                    emptyList(),
+                    order = 2,
+                    sections = listOf(
+                        Section(
+                            MetadataSectionName.REISSUE,
+                            listOf(
+                                Metadatum("reissueNote", MetadatumType.NOTE),
+                                Metadatum("reissueArticle", MetadatumType.ARTICLE),
+                                Metadatum(LocalDate.parse("2012-02-02"), MetadatumType.DATE),
+                                Metadatum("reissueReference", MetadatumType.REFERENCE),
+                            ),
+                        ),
+                    ),
+                ),
+
+                Section(
+                    MetadataSectionName.STATUS_INDICATION,
+                    emptyList(),
+                    order = 3,
+                    sections = listOf(
+                        Section(
+                            MetadataSectionName.REPEAL,
+                            listOf(
+                                Metadatum("repealReference1", MetadatumType.TEXT),
+                            ),
+                        ),
+                    ),
+                ),
+                Section(
+                    MetadataSectionName.STATUS_INDICATION,
+                    emptyList(),
+                    order = 4,
+                    sections = listOf(
+                        Section(
+                            MetadataSectionName.OTHER_STATUS,
+                            listOf(
+                                Metadatum("otherStatusNote", MetadatumType.NOTE),
+                            ),
+                        ),
+                    ),
+                ),
+                Section(
+                    MetadataSectionName.STATUS_INDICATION,
+                    emptyList(),
+                    order = 5,
+                    sections = listOf(
+                        Section(
+                            MetadataSectionName.REPEAL,
+                            listOf(
+                                Metadatum("repealReference2", MetadatumType.TEXT),
+                            ),
+                        ),
+                    ),
+                ),
+
             ),
 
         )
@@ -577,5 +651,20 @@ class ToJurisMapperTest {
         assertThat(normData.divergentExpirationsList[2].date).isNull()
         assertThat(normData.divergentExpirationsList[2].state).isEqualTo("UNDEFINED_FUTURE")
         assertThat(normData.divergentExpirationsList[2].normCategory).isEqualTo("SN")
+
+        assertThat(normData.statusList).hasSize(1)
+        assertThat(normData.statusList[0].statusNote).isEqualTo("statusNote")
+        assertThat(normData.statusList[0].statusDescription).isEqualTo("statusDescription")
+        assertThat(normData.statusList[0].statusDate).isEqualTo("2010-01-01")
+        assertThat(normData.statusList[0].statusReference).isEqualTo("statusReference1, statusReference2")
+        assertThat(normData.reissueList).hasSize(1)
+        assertThat(normData.reissueList[0].reissueNote).isEqualTo("reissueNote")
+        assertThat(normData.reissueList[0].reissueArticle).isEqualTo("reissueArticle")
+        assertThat(normData.reissueList[0].reissueDate).isEqualTo("2012-02-02")
+        assertThat(normData.reissueList[0].reissueReference).isEqualTo("reissueReference")
+        assertThat(normData.repealList).hasSize(2)
+        assertThat(normData.repealList.containsAll(listOf("repealReference1", "repealReference2"))).isTrue()
+        assertThat(normData.otherStatusList).hasSize(1)
+        assertThat(normData.otherStatusList[0]).isEqualTo("otherStatusNote")
     }
 }

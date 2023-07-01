@@ -1220,7 +1220,6 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
       heading: "Stand-Angabe",
       id: "statusIndication",
       isRepeatedSection: true,
-      isNotImported: true,
       numberEditedSections: 4,
       fields: [
         {

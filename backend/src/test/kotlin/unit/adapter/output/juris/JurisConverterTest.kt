@@ -7,10 +7,12 @@ import de.bund.digitalservice.ris.norms.domain.entity.Metadatum
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.AGE_OF_MAJORITY_INDICATION
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.ANNOUNCEMENT_GAZETTE
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.ARTICLE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.CELEX_NUMBER
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.DATE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.DECIDING_BODY
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.DEFINITION
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.DESCRIPTION
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.DIVERGENT_DOCUMENT_NUMBER
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.DOCUMENT_CATEGORY
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.ENTITY
@@ -18,6 +20,7 @@ import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.KEYWORD
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.LEAD_JURISDICTION
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.LEAD_UNIT
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.NORM_CATEGORY
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.NOTE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.OFFICIAL_ABBREVIATION
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.OFFICIAL_LONG_TITLE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.OFFICIAL_SHORT_TITLE
@@ -25,6 +28,7 @@ import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.PAGE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.PARTICIPATION_INSTITUTION
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.PARTICIPATION_TYPE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.RANGE_START
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.REFERENCE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.REFERENCE_NUMBER
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.RESOLUTION_MAJORITY
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.RIS_ABBREVIATION
@@ -56,6 +60,8 @@ import de.bund.digitalservice.ris.norms.juris.converter.model.Lead
 import de.bund.digitalservice.ris.norms.juris.converter.model.NormProvider
 import de.bund.digitalservice.ris.norms.juris.converter.model.Participation
 import de.bund.digitalservice.ris.norms.juris.converter.model.PrintAnnouncement
+import de.bund.digitalservice.ris.norms.juris.converter.model.Reissue
+import de.bund.digitalservice.ris.norms.juris.converter.model.Status
 import de.bund.digitalservice.ris.norms.juris.converter.model.SubjectArea
 import io.mockk.clearAllMocks
 import io.mockk.every
@@ -168,19 +174,10 @@ class JurisConverterTest {
                     citationDateList = listOf("2022-01-08")
                     printAnnouncementList = listOf(PrintAnnouncement("test print announcement year", "test print announcement page", "test print announcement gazette"))
                     unofficialReferenceList = listOf("test unofficial reference")
-                    statusNote = "test status note"
-                    statusDescription = "test status description"
-                    statusDate = "2022-01-09"
-                    statusReference = "test status reference"
-                    repealNote = "test repeal note"
-                    repealArticle = "test repeal article"
-                    repealDate = "2022-01-10"
-                    repealReferences = "test repeal references"
-                    reissueNote = "test reissue note"
-                    reissueArticle = "test reissue article"
-                    reissueDate = "2022-01-11"
-                    reissueReference = "test reissue reference"
-                    otherStatusNote = "test other status note"
+                    statusList = listOf(Status("test status note", "test status description", "2022-01-09", "test status reference"))
+                    reissueList = listOf(Reissue("test reissue note", "test reissue article", "2022-01-11", "test reissue reference"))
+                    repealList = listOf("test repeal references 1", "test repeal references 2")
+                    otherStatusList = listOf("test other status note")
                     documentStatusWorkNote = "test document status work note"
                     documentStatusDescription = "test document status description"
                     documentStatusDate = "2022-01-12"
@@ -296,6 +293,36 @@ class JurisConverterTest {
             val principleExpirationMetadata = principleExpirationSection?.flatMap { it.metadata }
             assertThat(principleExpirationMetadata).hasSize(1)
             assertThat(principleExpirationMetadata).usingRecursiveFieldByFieldElementComparatorIgnoringFields("guid").contains(Metadatum(decodeLocalDate(data.principleExpirationDate), DATE, 1))
+
+            val statusIndications = norm?.metadataSections?.filter { it.name == MetadataSectionName.STATUS_INDICATION }
+            assertThat(statusIndications).hasSize(5)
+            val statusIndicationsChildren = statusIndications?.mapNotNull { it.sections }?.flatten()
+            val statusTypeSections = statusIndicationsChildren?.filter { it.name == MetadataSectionName.STATUS }
+            assertThat(statusTypeSections).hasSize(1)
+            val statusTypeMetadata = statusTypeSections?.get(0)?.metadata
+            assertThat(statusTypeMetadata).usingRecursiveFieldByFieldElementComparatorIgnoringFields("guid").contains(Metadatum("test status note", NOTE))
+            assertThat(statusTypeMetadata).usingRecursiveFieldByFieldElementComparatorIgnoringFields("guid").contains(Metadatum("test status description", DESCRIPTION))
+            assertThat(statusTypeMetadata).usingRecursiveFieldByFieldElementComparatorIgnoringFields("guid").contains(Metadatum(LocalDate.parse("2022-01-09"), DATE))
+            assertThat(statusTypeMetadata).usingRecursiveFieldByFieldElementComparatorIgnoringFields("guid").contains(Metadatum("test status reference", REFERENCE))
+
+            val reissueTypeSections = statusIndicationsChildren?.filter { it.name == MetadataSectionName.REISSUE }
+            assertThat(reissueTypeSections).hasSize(1)
+            val reissueTypeMetadata = reissueTypeSections?.get(0)?.metadata
+            assertThat(reissueTypeMetadata).usingRecursiveFieldByFieldElementComparatorIgnoringFields("guid").contains(Metadatum("test reissue note", NOTE))
+            assertThat(reissueTypeMetadata).usingRecursiveFieldByFieldElementComparatorIgnoringFields("guid").contains(Metadatum("test reissue article", ARTICLE))
+            assertThat(reissueTypeMetadata).usingRecursiveFieldByFieldElementComparatorIgnoringFields("guid").contains(Metadatum(LocalDate.parse("2022-01-11"), DATE))
+            assertThat(reissueTypeMetadata).usingRecursiveFieldByFieldElementComparatorIgnoringFields("guid").contains(Metadatum("test reissue reference", REFERENCE))
+
+            val repealTypeSections = statusIndicationsChildren?.filter { it.name == MetadataSectionName.REPEAL }
+            assertThat(repealTypeSections).hasSize(2)
+            val repealTypeMetadata = repealTypeSections?.map { it.metadata }?.flatten()
+            assertThat(repealTypeMetadata).usingRecursiveFieldByFieldElementComparatorIgnoringFields("guid").contains(Metadatum("test repeal references 1", TEXT))
+            assertThat(repealTypeMetadata).usingRecursiveFieldByFieldElementComparatorIgnoringFields("guid").contains(Metadatum("test repeal references 2", TEXT))
+
+            val otherTypeSections = statusIndicationsChildren?.filter { it.name == MetadataSectionName.OTHER_STATUS }
+            assertThat(otherTypeSections).hasSize(1)
+            val otherTypeMetadata = otherTypeSections?.get(0)?.metadata
+            assertThat(otherTypeMetadata).usingRecursiveFieldByFieldElementComparatorIgnoringFields("guid").contains(Metadatum("test other status note", NOTE))
         }
 
         @Test

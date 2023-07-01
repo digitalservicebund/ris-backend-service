@@ -14,6 +14,8 @@ import de.bund.digitalservice.ris.norms.juris.converter.model.Lead
 import de.bund.digitalservice.ris.norms.juris.converter.model.NormProvider
 import de.bund.digitalservice.ris.norms.juris.converter.model.Participation
 import de.bund.digitalservice.ris.norms.juris.converter.model.PrintAnnouncement
+import de.bund.digitalservice.ris.norms.juris.converter.model.Reissue
+import de.bund.digitalservice.ris.norms.juris.converter.model.Status
 import de.bund.digitalservice.ris.norms.juris.converter.model.SubjectArea
 import java.time.LocalDate
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName as Section
@@ -56,6 +58,10 @@ fun mapDomainToData(norm: Norm): NormData {
         expirationDate = extractExpirationDate(norm),
         expirationDateState = extractExpirationState(norm),
         unofficialReferenceList = extractSimpleStringValuesFromNormSection(norm, MetadatumType.UNOFFICIAL_REFERENCE),
+        statusList = extractStatus(norm),
+        reissueList = extractReissue(norm),
+        repealList = extractRepealStatus(norm),
+        otherStatusList = extractOtherStatus(norm),
     )
 }
 
@@ -98,6 +104,49 @@ private fun extractCategorizedReferences(norm: Norm): List<CategorizedReference>
             section.metadata.find { it.type == MetadatumType.TEXT }?.value.toString(),
         )
     }
+private fun extractStatus(norm: Norm): List<Status> = norm
+    .metadataSections
+    .filter { it.name == Section.STATUS_INDICATION }
+    .flatMap { it.sections ?: listOf() }
+    .filter { it.name == Section.STATUS }
+    .map { section ->
+        Status(
+            section.metadata.find { it.type == MetadatumType.NOTE }?.value.toString(),
+            section.metadata.find { it.type == MetadatumType.DESCRIPTION }?.value.toString(),
+            section.metadata.find { it.type == MetadatumType.DATE }?.let { found -> encodeLocalDate(found.value as LocalDate) },
+            section.metadata.filter { it.type == MetadatumType.REFERENCE }.joinToString { it.value.toString() },
+        )
+    }
+
+private fun extractReissue(norm: Norm): List<Reissue> = norm
+    .metadataSections
+    .filter { it.name == Section.STATUS_INDICATION }
+    .flatMap { it.sections ?: listOf() }
+    .filter { it.name == Section.REISSUE }
+    .map { section ->
+        Reissue(
+            section.metadata.find { it.type == MetadatumType.NOTE }?.value.toString(),
+            section.metadata.find { it.type == MetadatumType.ARTICLE }?.value.toString(),
+            section.metadata.find { it.type == MetadatumType.DATE }?.let { found -> encodeLocalDate(found.value as LocalDate) },
+            section.metadata.find { it.type == MetadatumType.REFERENCE }?.value.toString(),
+        )
+    }
+
+private fun extractRepealStatus(norm: Norm): List<String> = norm
+    .metadataSections
+    .filter { it.name == Section.STATUS_INDICATION }
+    .flatMap { it.sections ?: listOf() }
+    .filter { it.name == Section.REPEAL }
+    .flatMap { it.metadata }
+    .map { metadatum -> metadatum.value.toString() }
+
+private fun extractOtherStatus(norm: Norm): List<String> = norm
+    .metadataSections
+    .filter { it.name == Section.STATUS_INDICATION }
+    .flatMap { it.sections ?: listOf() }
+    .filter { it.name == Section.OTHER_STATUS }
+    .flatMap { it.metadata }
+    .map { metadatum -> metadatum.value.toString() }
 
 private fun extractNormProviders(norm: Norm): List<NormProvider> = norm
     .metadataSections
