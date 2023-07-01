@@ -42,7 +42,6 @@ function encodeString(data?: string | null): string | null {
 // format: `2022-11-14T23:00:00.000Z`. To comply with the expected date format
 // of the API, we only take the first 10 characters.
 //
-// TODO: Improve by working with enriched date type.
 function encodeDate(data?: string): string {
   dayjs.extend(utc)
   dayjs.extend(timezone)
@@ -344,7 +343,6 @@ function encodeMetadata(metadata: Metadata): MetadatumSchema[] | null {
     group?.map((value, index) => ({
       type,
       order: index + 1,
-      // FIXME: Type system is tricky here...
       value: ENCODERS[type](value as never),
     }))
   )
