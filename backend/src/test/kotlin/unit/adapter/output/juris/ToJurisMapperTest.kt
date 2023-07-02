@@ -506,6 +506,16 @@ class ToJurisMapperTest {
                         ),
                     ),
                 ),
+                Section(
+                    MetadataSectionName.FOOTNOTES,
+                    listOf(
+                        Metadatum("reference1", MetadatumType.FOOTNOTE_REFERENCE, order = 1),
+                        Metadatum("footnoteChangeA", MetadatumType.FOOTNOTE_CHANGE, order = 2),
+                        Metadatum("footnoteComment1", MetadatumType.FOOTNOTE_COMMENT, order = 3),
+                        Metadatum("footnoteChangeB", MetadatumType.FOOTNOTE_CHANGE, order = 4),
+                        Metadatum("footnoteDecision1", MetadatumType.FOOTNOTE_DECISION, order = 5),
+                    ),
+                ),
 
             ),
 
@@ -666,5 +676,16 @@ class ToJurisMapperTest {
         assertThat(normData.repealList.containsAll(listOf("repealReference1", "repealReference2"))).isTrue()
         assertThat(normData.otherStatusList).hasSize(1)
         assertThat(normData.otherStatusList[0]).isEqualTo("otherStatusNote")
+
+        assertThat(normData.footnotes).hasSize(1)
+        assertThat(normData.footnotes[0].reference).isEqualTo("reference1")
+        assertThat(normData.footnotes[0].footnoteChange[0].first).isEqualTo(2)
+        assertThat(normData.footnotes[0].footnoteChange[0].second).isEqualTo("footnoteChangeA")
+        assertThat(normData.footnotes[0].footnoteComment[0].first).isEqualTo(3)
+        assertThat(normData.footnotes[0].footnoteComment[0].second).isEqualTo("footnoteComment1")
+        assertThat(normData.footnotes[0].footnoteChange[1].first).isEqualTo(4)
+        assertThat(normData.footnotes[0].footnoteChange[1].second).isEqualTo("footnoteChangeB")
+        assertThat(normData.footnotes[0].footnoteDecision[0].first).isEqualTo(5)
+        assertThat(normData.footnotes[0].footnoteDecision[0].second).isEqualTo("footnoteDecision1")
     }
 }

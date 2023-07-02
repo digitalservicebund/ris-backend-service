@@ -15,14 +15,20 @@ import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName.DOCUMEN
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName.DOCUMENT_TYPE
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName.ENTRY_INTO_FORCE
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName.EXPIRATION
+import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName.FOOTNOTES
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName.LEAD
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName.NORM
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName.NORM_PROVIDER
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName.OFFICIAL_REFERENCE
+import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName.OTHER_STATUS
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName.PARTICIPATION
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName.PRINCIPLE_ENTRY_INTO_FORCE
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName.PRINCIPLE_EXPIRATION
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName.PRINT_ANNOUNCEMENT
+import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName.REISSUE
+import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName.REPEAL
+import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName.STATUS
+import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName.STATUS_INDICATION
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName.SUBJECT_AREA
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType
 import de.bund.digitalservice.ris.norms.domain.value.UndefinedDate
@@ -33,6 +39,7 @@ import de.bund.digitalservice.ris.norms.juris.converter.model.DigitalAnnouncemen
 import de.bund.digitalservice.ris.norms.juris.converter.model.DivergentEntryIntoForce
 import de.bund.digitalservice.ris.norms.juris.converter.model.DivergentExpiration
 import de.bund.digitalservice.ris.norms.juris.converter.model.DocumentType
+import de.bund.digitalservice.ris.norms.juris.converter.model.Footnote
 import de.bund.digitalservice.ris.norms.juris.converter.model.Lead
 import de.bund.digitalservice.ris.norms.juris.converter.model.NormProvider
 import de.bund.digitalservice.ris.norms.juris.converter.model.Paragraph
@@ -105,6 +112,18 @@ class FromJurisMapperTest {
             unofficialReferenceList = listOf("unofficialReference"),
             unofficialShortTitleList = listOf("unofficialShortTitle"),
             validityRuleList = listOf("validityRule"),
+            footnotes = listOf(
+                Footnote(
+                    reference = "reference 1",
+                    footnoteChange = listOf(Pair(1, "footnoteChange A"), Pair(3, "footnoteChange B")),
+                    footnoteComment = listOf(Pair(2, "footnoteComment A"), Pair(5, "footnoteComment B")),
+                    footnoteDecision = listOf(Pair(6, "footnoteDecision A"), Pair(4, "footnoteDecision B")),
+                    footnoteStateLaw = listOf(Pair(7, "footnoteStateLaw A"), Pair(8, "footnoteStateLaw B")),
+                    footnoteEuLaw = listOf(Pair(12, "footnoteEuLaw A"), Pair(10, "footnoteEuLaw B")),
+                    otherFootnote = listOf(Pair(9, "otherFootnote A"), Pair(11, "otherFootnote B")),
+                ),
+                Footnote(reference = "reference 2", footnoteChange = listOf(Pair(1, "another footnoteChange A"), Pair(2, "another footnoteChange B"))),
+            ),
         )
 
         val guid = UUID.randomUUID()
@@ -170,9 +189,44 @@ class FromJurisMapperTest {
         assertSectionsHasMetadata(sections, PRINCIPLE_ENTRY_INTO_FORCE, MetadatumType.DATE, LocalDate.of(2024, 10, 10))
         assertSectionsHasMetadata(sections, EXPIRATION, MetadatumType.DATE, LocalDate.of(2023, 7, 15))
         assertSectionsHasMetadata(sections, PRINCIPLE_EXPIRATION, MetadatumType.DATE, LocalDate.of(2020, 10, 10))
+
+        val statusIndicationSections = sections.filter { it.name == STATUS_INDICATION }.flatMap { it.sections ?: emptyList() }
+        assertSectionsHasMetadata(statusIndicationSections, STATUS, MetadatumType.NOTE, "statusNote")
+        assertSectionsHasMetadata(statusIndicationSections, STATUS, MetadatumType.DESCRIPTION, "statusDescription")
+        assertSectionsHasMetadata(statusIndicationSections, STATUS, MetadatumType.DATE, LocalDate.of(2010, 2, 3))
+        assertSectionsHasMetadata(statusIndicationSections, STATUS, MetadatumType.REFERENCE, "statusReference")
+        assertSectionsHasMetadata(statusIndicationSections, REISSUE, MetadatumType.NOTE, "reissueNote")
+        assertSectionsHasMetadata(statusIndicationSections, REISSUE, MetadatumType.ARTICLE, "reissueArticle")
+        assertSectionsHasMetadata(statusIndicationSections, REISSUE, MetadatumType.DATE, LocalDate.of(2011, 12, 15))
+        assertSectionsHasMetadata(statusIndicationSections, REISSUE, MetadatumType.REFERENCE, "reissueReference")
+        assertSectionsHasMetadata(statusIndicationSections, REPEAL, MetadatumType.TEXT, "repealReferences")
+        assertSectionsHasMetadata(statusIndicationSections, OTHER_STATUS, MetadatumType.NOTE, "otherStatusNote")
+
+        val footnotesSections = sections.filter { it.name == FOOTNOTES }
+        assertThat(footnotesSections).hasSize(2)
+        assertSectionHasMetadataWithCorrectOrder(footnotesSections[0], MetadatumType.FOOTNOTE_REFERENCE, "reference 1", 1)
+        assertSectionHasMetadataWithCorrectOrder(footnotesSections[0], MetadatumType.FOOTNOTE_CHANGE, "footnoteChange A", 2)
+        assertSectionHasMetadataWithCorrectOrder(footnotesSections[0], MetadatumType.FOOTNOTE_COMMENT, "footnoteComment A", 3)
+        assertSectionHasMetadataWithCorrectOrder(footnotesSections[0], MetadatumType.FOOTNOTE_CHANGE, "footnoteChange B", 4)
+        assertSectionHasMetadataWithCorrectOrder(footnotesSections[0], MetadatumType.FOOTNOTE_DECISION, "footnoteDecision B", 5)
+        assertSectionHasMetadataWithCorrectOrder(footnotesSections[0], MetadatumType.FOOTNOTE_COMMENT, "footnoteComment B", 6)
+        assertSectionHasMetadataWithCorrectOrder(footnotesSections[0], MetadatumType.FOOTNOTE_DECISION, "footnoteDecision A", 7)
+        assertSectionHasMetadataWithCorrectOrder(footnotesSections[0], MetadatumType.FOOTNOTE_STATE_LAW, "footnoteStateLaw A", 8)
+        assertSectionHasMetadataWithCorrectOrder(footnotesSections[0], MetadatumType.FOOTNOTE_STATE_LAW, "footnoteStateLaw B", 9)
+        assertSectionHasMetadataWithCorrectOrder(footnotesSections[0], MetadatumType.FOOTNOTE_OTHER, "otherFootnote A", 10)
+        assertSectionHasMetadataWithCorrectOrder(footnotesSections[0], MetadatumType.FOOTNOTE_EU_LAW, "footnoteEuLaw B", 11)
+        assertSectionHasMetadataWithCorrectOrder(footnotesSections[0], MetadatumType.FOOTNOTE_OTHER, "otherFootnote B", 12)
+        assertSectionHasMetadataWithCorrectOrder(footnotesSections[0], MetadatumType.FOOTNOTE_EU_LAW, "footnoteEuLaw A", 13)
+        assertSectionHasMetadataWithCorrectOrder(footnotesSections[1], MetadatumType.FOOTNOTE_REFERENCE, "reference 2", 1)
+        assertSectionHasMetadataWithCorrectOrder(footnotesSections[1], MetadatumType.FOOTNOTE_CHANGE, "another footnoteChange A", 2)
+        assertSectionHasMetadataWithCorrectOrder(footnotesSections[1], MetadatumType.FOOTNOTE_CHANGE, "another footnoteChange B", 3)
     }
 
     private fun assertSectionsHasMetadata(sections: List<MetadataSection>, name: MetadataSectionName, type: MetadatumType, value: Any?) {
         assertThat(sections.first { it.name == name }.metadata.first { it.type == type }.value).isEqualTo(value)
+    }
+
+    private fun assertSectionHasMetadataWithCorrectOrder(sections: MetadataSection, type: MetadatumType, value: Any?, order: Int) {
+        assertThat(sections.metadata.find { it.type == type && it.order == order }?.value).isEqualTo(value)
     }
 }

@@ -14,6 +14,7 @@ import de.bund.digitalservice.ris.norms.juris.converter.model.DigitalAnnouncemen
 import de.bund.digitalservice.ris.norms.juris.converter.model.DivergentEntryIntoForce
 import de.bund.digitalservice.ris.norms.juris.converter.model.DivergentExpiration
 import de.bund.digitalservice.ris.norms.juris.converter.model.DocumentType
+import de.bund.digitalservice.ris.norms.juris.converter.model.Footnote
 import de.bund.digitalservice.ris.norms.juris.converter.model.NormProvider
 import de.bund.digitalservice.ris.norms.juris.converter.model.PrintAnnouncement
 import de.bund.digitalservice.ris.norms.juris.converter.model.Reissue
@@ -66,7 +67,8 @@ fun mapDataToDomain(guid: UUID, data: NormData): Norm {
         citationDateSections + ageIndicationSections + categorizedReferenceSections +
         addProviderSections(data.normProviderList) +
         createSectionForEntryIntoForceAndExpiration(data) +
-        createSectionForStatusIndication(data.statusList, data.reissueList, data.repealList, data.otherStatusList)
+        createSectionForStatusIndication(data.statusList, data.reissueList, data.repealList, data.otherStatusList) +
+        createFootnoteSections(data.footnotes)
 
     return Norm(
         guid = guid,
@@ -75,6 +77,7 @@ fun mapDataToDomain(guid: UUID, data: NormData): Norm {
         announcementDate = parseDateString(data.announcementDate),
     )
 }
+
 fun createSectionsForDocumentStatus(
     documentStatusWorkNote: String?,
     documentStatusDate: String?,
@@ -215,6 +218,37 @@ private fun createSectionsForOfficialReference(digitalAnnouncement: List<Digital
         createSectionsFromMetadata(Section.DIGITAL_ANNOUNCEMENT, digitalAnnouncementNumber + digitalAnnouncementMedium + digitalAnnouncementYear)
 
     return referenceSections.mapIndexed { index, section -> MetadataSection(Section.OFFICIAL_REFERENCE, listOf(), index, listOf(section)) }
+}
+
+private fun createFootnoteSections(footnotes: List<Footnote>): List<MetadataSection> {
+    val footnoteSections = mutableListOf<MetadataSection>()
+
+    footnotes.forEachIndexed { index, footnoteGroup ->
+
+        fun addFootnotesToMetadata(footnoteList: List<Pair<Int, String>>, type: MetadatumType, metadata: MutableList<Metadatum<*>>, addToFootnoteOrder: Int) {
+            footnoteList.forEach { singleFootnote ->
+                metadata.add(Metadatum(singleFootnote.second, type, singleFootnote.first + addToFootnoteOrder))
+            }
+        }
+
+        val metadata = mutableListOf<Metadatum<*>>()
+
+        if (footnoteGroup.reference != null) {
+            metadata.add(Metadatum(footnoteGroup.reference, MetadatumType.FOOTNOTE_REFERENCE, 1))
+        }
+
+        val addToFootnotesOrder = if (footnoteGroup.reference != null) 1 else 0
+        addFootnotesToMetadata(footnoteGroup.footnoteChange, MetadatumType.FOOTNOTE_CHANGE, metadata, addToFootnotesOrder)
+        addFootnotesToMetadata(footnoteGroup.footnoteComment, MetadatumType.FOOTNOTE_COMMENT, metadata, addToFootnotesOrder)
+        addFootnotesToMetadata(footnoteGroup.footnoteDecision, MetadatumType.FOOTNOTE_DECISION, metadata, addToFootnotesOrder)
+        addFootnotesToMetadata(footnoteGroup.footnoteStateLaw, MetadatumType.FOOTNOTE_STATE_LAW, metadata, addToFootnotesOrder)
+        addFootnotesToMetadata(footnoteGroup.footnoteEuLaw, MetadatumType.FOOTNOTE_EU_LAW, metadata, addToFootnotesOrder)
+        addFootnotesToMetadata(footnoteGroup.otherFootnote, MetadatumType.FOOTNOTE_OTHER, metadata, addToFootnotesOrder)
+
+        if (metadata.isNotEmpty()) footnoteSections.add(MetadataSection(Section.FOOTNOTES, metadata, index + 1))
+    }
+
+    return footnoteSections
 }
 
 private fun createSectionForStatusIndication(statusList: List<Status>, reissueList: List<Reissue>, repealList: List<String>, otherStatusList: List<String>): List<MetadataSection> {

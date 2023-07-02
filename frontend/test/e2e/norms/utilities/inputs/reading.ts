@@ -43,10 +43,13 @@ const expectTextEditor: FieldExpecter<FootnoteInputType[]> = async (
   const input = page.locator(`[data-testid='${id}']`)
   await expect(input).toBeVisible()
   for (const footnote of value) {
+    const inputText = await input.innerText()
     if (footnote.label != FOOTNOTE_LABELS[MetadatumType.FOOTNOTE_REFERENCE]) {
-      expect(await input.innerText()).toContain(footnote.label)
+      expect(inputText).toContain(footnote.label)
     }
-    expect(await input.innerText()).toContain(footnote.content)
+    expect(inputText.replace(/[\n\r]/g, "")).toContain(
+      footnote.content.replace(/[\n\r]/g, "")
+    )
   }
 }
 

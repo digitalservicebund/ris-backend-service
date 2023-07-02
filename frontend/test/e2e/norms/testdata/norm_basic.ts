@@ -219,6 +219,101 @@ export const normData: NormData = {
         OTHER_STATUS: [{ NOTE: ["Eine sonstige Stand-Angabe"] }],
       },
     ],
+    FOOTNOTES: [
+      {
+        FOOTNOTE: [
+          {
+            FOOTNOTE_OTHER: [
+              "Überschrift: Das G ist gem. Art. 4 d. G v. 27.8.1986 I 1410\n" +
+                "am 1.11.1986 in Kraft getreten*.\n" +
+                "*&",
+            ],
+          },
+          {
+            FOOTNOTE_OTHER: [
+              "(+++ Textnachweis ab:                             1.11.1986 +++)",
+            ],
+          },
+          {
+            FOOTNOTE_OTHER: [
+              "(+++ Änderungen aufgrund EinigVtr vgl. §§ 8a, 9a, 10a u. 32 +++)",
+            ],
+          },
+          {
+            FOOTNOTE_OTHER: [
+              "(+++ Stand:    Änderung durch Art. 2 G v. 12. 9.1996 I 1354 +++)\n" +
+                "*&",
+            ],
+          },
+          {
+            FOOTNOTE_CHANGE: [
+              "G aufgeh. durch Art. 13 Satz 3 G v. 27.9.1994 I 2705 mWv 6.10.1996,\n" +
+                "§§ 5a und 5b nach Maßgabe d. § 64 KrW-/AbfG 2929-27-2 G v. 27.9.1994\n" +
+                "I 2705; §§ 5a u. 5b abgelöst durch § 11 V v. 27.10.1987 I 2335 idF\n" +
+                "d. Art. 1 Nr. 6 V v. 16.4.2002 I 1360 mWv 1.5.2002",
+            ],
+          },
+        ],
+      },
+      {
+        FOOTNOTE: [
+          {
+            FOOTNOTE_COMMENT: [
+              'Überschrift u. Art. 1 Satz 1 Kursivdruck: "Schwerbeschädigter" jetzt "Schwerbehinderter" gem. Art. III § 4 G v. 24.4.1974 I 981',
+            ],
+          },
+        ],
+      },
+      {
+        FOOTNOTE: [
+          {
+            FOOTNOTE_DECISION: [
+              "Nichtig gem. BVerfGE v. 25.6.1969 I 1444 - 2 BvR 128/66 -",
+            ],
+          },
+        ],
+      },
+      {
+        FOOTNOTE: [
+          {
+            FOOTNOTE_STATE_LAW: [
+              "Das G gilt nach Maßgabe d. Art. 9 Abs. 2 u. d. Art. 9 Abs. 5\n" +
+                "\n" +
+                "EinigVtr v. 31.8.1990 iVm Art. 1 G v. 23.9.1990 II 885, 1194 in den\n" +
+                "\n" +
+                "beigetretenen Bundesländern (Art. 1 Abs. 1 EinigVtr) als Landesrecht\n" +
+                "\n" +
+                "fort*",
+            ],
+          },
+          {
+            FOOTNOTE_OTHER: ["Nur mit Überschrift aufgenommen\n" + "\n" + "*&"],
+          },
+        ],
+      },
+      {
+        FOOTNOTE: [
+          { FOOTNOTE_EU_LAW: ["EGRL 81/2009 (CELEX Nr: 32009L0081)"] },
+          { FOOTNOTE_EU_LAW: ["EGRL 81/2009 (CELEX Nr: 32009L0081) vgl."] },
+          { FOOTNOTE_EU_LAW: ["Art. 2 d. G v. 25.3.2020 I 674"] },
+          { FOOTNOTE_EU_LAW: ["EURL 23/2014 (CELEX Nr: 32014L0023) vgl."] },
+          { FOOTNOTE_EU_LAW: ["Art. 2 d. G v. 25.3.2020 I 674"] },
+          { FOOTNOTE_EU_LAW: ["EURL 24/2014 (CELEX Nr: 32014L0024) vgl."] },
+          { FOOTNOTE_EU_LAW: ["Art. 2 d. G v. 25.3.2020 I 674"] },
+          { FOOTNOTE_EU_LAW: ["EURL 25/2014 (CELEX Nr: 32014L0025) vgl."] },
+          { FOOTNOTE_EU_LAW: ["Art. 2 d. G v. 25.3.2020 I 674"] },
+        ],
+      },
+      {
+        FOOTNOTE: [
+          {
+            FOOTNOTE_OTHER: [
+              "Das G wurde als Artikel 1 G v. 20.7.2000 I 1045 (SeuchRNeuG) vom Bundestag mit Zustimmung des Bundesrates beschlossen. Es ist gem. Art. 5 Abs. 1 Satz 1 dieses G mWv 1.1.2001, §§ 37 und 38 mWv 26.7.2000 in Kraft getreten.",
+            ],
+          },
+        ],
+      },
+    ],
   },
   announcementDate: "06.01.2023",
   printAnnouncementGazette: "BGBl I",

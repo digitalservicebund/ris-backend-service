@@ -1,5 +1,6 @@
 package de.bund.digitalservice.ris.norms.framework.adapter.output.juris
 
+import de.bund.digitalservice.ris.norms.domain.entity.MetadataSection
 import de.bund.digitalservice.ris.norms.domain.entity.Norm
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType
@@ -10,6 +11,7 @@ import de.bund.digitalservice.ris.norms.juris.converter.model.DigitalAnnouncemen
 import de.bund.digitalservice.ris.norms.juris.converter.model.DivergentEntryIntoForce
 import de.bund.digitalservice.ris.norms.juris.converter.model.DivergentExpiration
 import de.bund.digitalservice.ris.norms.juris.converter.model.DocumentType
+import de.bund.digitalservice.ris.norms.juris.converter.model.Footnote
 import de.bund.digitalservice.ris.norms.juris.converter.model.Lead
 import de.bund.digitalservice.ris.norms.juris.converter.model.NormProvider
 import de.bund.digitalservice.ris.norms.juris.converter.model.Participation
@@ -62,7 +64,31 @@ fun mapDomainToData(norm: Norm): NormData {
         reissueList = extractReissue(norm),
         repealList = extractRepealStatus(norm),
         otherStatusList = extractOtherStatus(norm),
+        footnotes = extractFootnotes(norm),
     )
+}
+
+private fun extractFootnotes(norm: Norm): List<Footnote> {
+    fun transformFootnotes(section: MetadataSection, type: MetadatumType): List<Pair<Int, String>> {
+        return section.metadata.filter { metadata -> metadata.type == type }.map { metadata ->
+            Pair(metadata.order, metadata.value.toString())
+        }
+    }
+    return norm
+        .metadataSections
+        .filter { section -> section.name == Section.FOOTNOTES }
+        .map { footnoteSection ->
+            val reference = footnoteSection.metadata.find { metadata -> metadata.type == MetadatumType.FOOTNOTE_REFERENCE }?.value.toString()
+            Footnote(
+                reference,
+                transformFootnotes(footnoteSection, MetadatumType.FOOTNOTE_CHANGE),
+                transformFootnotes(footnoteSection, MetadatumType.FOOTNOTE_COMMENT),
+                transformFootnotes(footnoteSection, MetadatumType.FOOTNOTE_DECISION),
+                transformFootnotes(footnoteSection, MetadatumType.FOOTNOTE_STATE_LAW),
+                transformFootnotes(footnoteSection, MetadatumType.FOOTNOTE_EU_LAW),
+                transformFootnotes(footnoteSection, MetadatumType.FOOTNOTE_OTHER),
+            )
+        }
 }
 
 fun extractCitationDates(norm: Norm): List<String> =

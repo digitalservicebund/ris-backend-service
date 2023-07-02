@@ -1473,7 +1473,6 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
     {
       heading: "Fußnoten",
       isRepeatedSection: true,
-      isNotImported: true,
       numberEditedSections: 1,
       id: "footnotes",
       fields: [
