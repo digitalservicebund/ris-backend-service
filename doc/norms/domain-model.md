@@ -110,6 +110,7 @@ classDiagram
      REPEAL
      OTHER_STATUS
      PUBLICATION_DATE
+     ANNOUNCEMENT_DATE
   }
 
   class MetadatumType  {
@@ -133,6 +134,7 @@ classDiagram
     SUBJECT_PREVIOUS_FNA
     SUBJECT_GESTA
     SUBJECT_BGB_3
+    TIME
     DATE
     YEAR
     RANGE_START

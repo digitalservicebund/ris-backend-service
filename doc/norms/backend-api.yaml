@@ -313,6 +313,7 @@ components:
         - SUBJECT_PREVIOUS_FNA
         - SUBJECT_GESTA
         - SUBJECT_BGB_3
+        - TIME
         - DATE
         - YEAR
         - RANGE_START
@@ -405,6 +406,7 @@ components:
         - REPEAL
         - OTHER_STATUS
         - PUBLICATION_DATE
+        - ANNOUNCEMENT_DATE
 
     MetadataSection:
       type: object
