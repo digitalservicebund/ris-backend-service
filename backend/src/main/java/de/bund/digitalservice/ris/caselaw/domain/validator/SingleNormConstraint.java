@@ -10,7 +10,7 @@ import java.lang.annotation.Target;
 
 @Documented
 @Constraint(validatedBy = SingleNormValidator.class)
-@Target({ElementType.METHOD, ElementType.FIELD, ElementType.PARAMETER})
+@Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface SingleNormConstraint {
   String message() default "Single norm string is not valid";
