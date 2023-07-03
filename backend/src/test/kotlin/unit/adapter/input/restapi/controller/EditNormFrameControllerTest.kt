@@ -21,6 +21,7 @@ import utils.assertEditNormFramePropertiesAndEditNormRequestSchema
 import utils.convertEditNormRequestTestSchemaToJson
 import utils.createRandomEditNormRequestTestSchema
 import java.time.LocalDate
+import java.time.LocalTime
 import java.util.UUID
 
 @ExtendWith(SpringExtension::class)
@@ -99,6 +100,15 @@ class EditNormFrameControllerTest {
         schema.type = MetadatumType.DATE
 
         assertThat(schema.toUseCaseData().value).isEqualTo(LocalDate.of(2022, 12, 1))
+    }
+
+    @Test
+    fun `it correctly maps the times from string to localtime in metadata`() {
+        val schema = EditNormFrameController.MetadatumRequestSchema()
+        schema.value = "13:55"
+        schema.type = MetadatumType.TIME
+
+        assertThat(schema.toUseCaseData().value).isEqualTo(LocalTime.of(13, 55))
     }
 
     class NormFramePropertiesTestRequestSchema {

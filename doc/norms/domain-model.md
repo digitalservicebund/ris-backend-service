@@ -7,8 +7,6 @@ classDiagram
     +List~MetadataSection~ metadataSections
     +List~Article~ articles
 
-    Date announcementDate
-
     List~FileReference~ files
   }
 

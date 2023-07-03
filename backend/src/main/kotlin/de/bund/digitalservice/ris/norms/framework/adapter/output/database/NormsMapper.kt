@@ -19,6 +19,7 @@ import de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto.Me
 import de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto.NormDto
 import de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto.ParagraphDto
 import java.time.LocalDate
+import java.time.LocalTime
 import java.util.UUID
 
 interface NormsMapper {
@@ -80,6 +81,7 @@ interface NormsMapper {
     fun metadatumToEntity(metadatumDto: MetadatumDto): Metadatum<*> {
         val value = when (metadatumDto.type) {
             MetadatumType.DATE -> LocalDate.parse(metadatumDto.value)
+            MetadatumType.TIME -> LocalTime.parse(metadatumDto.value)
             MetadatumType.RESOLUTION_MAJORITY -> metadatumDto.value.toBoolean()
             MetadatumType.NORM_CATEGORY -> NormCategory.valueOf(metadatumDto.value)
             MetadatumType.UNDEFINED_DATE -> UndefinedDate.valueOf(metadatumDto.value)

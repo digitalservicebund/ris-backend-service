@@ -13,6 +13,7 @@ import de.bund.digitalservice.ris.norms.domain.value.UndefinedDate
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.ApiConfiguration
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.decodeGuid
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.decodeLocalDate
+import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.decodeLocalTime
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PutMapping
@@ -73,6 +74,7 @@ class EditNormFrameController(private val editNormFrameService: EditNormFrameUse
         fun toUseCaseData(): Metadatum<*> {
             val value = when (this.type) {
                 MetadatumType.DATE -> decodeLocalDate(this.value)
+                MetadatumType.TIME -> decodeLocalTime(this.value)
                 MetadatumType.RESOLUTION_MAJORITY -> this.value.toBoolean()
                 MetadatumType.NORM_CATEGORY -> NormCategory.valueOf(this.value)
                 MetadatumType.UNDEFINED_DATE -> UndefinedDate.valueOf(this.value)
