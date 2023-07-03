@@ -72,4 +72,5 @@ enum class MetadatumType {
     OFFICIAL_ABBREVIATION,
     COMPLETE_CITATION,
     CELEX_NUMBER,
+    TIME,
 }

@@ -37,4 +37,5 @@ enum class MetadataSectionName {
     REPEAL,
     OTHER_STATUS,
     PUBLICATION_DATE,
+    ANNOUNCEMENT_DATE,
 }
