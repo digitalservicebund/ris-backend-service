@@ -19,6 +19,7 @@ import static org.mockito.Mockito.when;
 import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentUnitStatusService;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentationOfficeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentationOfficeDTO;
+import jakarta.validation.Validator;
 import java.nio.ByteBuffer;
 import java.time.Instant;
 import java.util.Arrays;
@@ -72,6 +73,8 @@ class DocumentUnitServiceTest {
   @MockBean private PublicationReportRepository publicationReportRepository;
 
   @MockBean private DatabaseDocumentUnitStatusService documentUnitStatusService;
+
+  @MockBean private Validator validator;
 
   @Test
   void testGenerateNewDocumentUnit() {

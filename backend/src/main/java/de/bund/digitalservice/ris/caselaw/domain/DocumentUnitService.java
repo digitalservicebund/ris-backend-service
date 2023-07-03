@@ -3,7 +3,6 @@ package de.bund.digitalservice.ris.caselaw.domain;
 import static de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatus.PUBLISHED;
 import static de.bund.digitalservice.ris.caselaw.domain.ServiceUtils.byteBufferToArray;
 
-import de.bund.digitalservice.ris.caselaw.adapter.SingleNormValidationInfo;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
 import java.io.ByteArrayInputStream;

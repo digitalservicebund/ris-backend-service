@@ -6,6 +6,7 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.LinkedDocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.MailResponse;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationEntry;
+import de.bund.digitalservice.ris.caselaw.domain.SingleNormValidationInfo;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import de.bund.digitalservice.ris.caselaw.domain.docx.Docx2Html;
 import jakarta.validation.Valid;
