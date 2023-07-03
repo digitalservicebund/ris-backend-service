@@ -146,7 +146,7 @@ onMounted(() => {
       id="activeCitationPredicate"
       v-slot="slotProps"
       class="border-b-1 border-gray-400 mb-16"
-      label="Art der Zitierung"
+      label="Art der Zitierung *"
       :validation-error="
         validationErrors?.find((err) => err.field === 'citationStyle')
           ?.defaultMessage
@@ -155,7 +155,7 @@ onMounted(() => {
       <ComboboxInput
         id="activeCitationPredicate"
         v-model="activeCitationStyle"
-        aria-label="Art der Zitierung *"
+        aria-label="Art der Zitierung"
         clear-on-choosing-item
         :has-error="slotProps.hasError"
         :item-service="ComboboxItemService.getCitationStyles"

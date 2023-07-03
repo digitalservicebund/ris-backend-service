@@ -170,6 +170,53 @@ export async function fillProceedingDecisionInputs(
   }
 }
 
+export async function fillActiveCitationInputs(
+  page: Page,
+  values?: {
+    citationStyle?: string
+    court?: string
+    decisionDate?: string
+    fileNumber?: string
+    documentType?: string
+  }
+): Promise<void> {
+  const fillInput = async (ariaLabel: string, value = generateString()) => {
+    const input = page.locator(`[aria-label='${ariaLabel}']`)
+    await input.fill(value ?? ariaLabel)
+    await waitForInputValue(page, `[aria-label='${ariaLabel}']`, value)
+  }
+
+  if (values?.citationStyle) {
+    await fillInput("Art der Zitierung", values?.citationStyle)
+    await page.getByRole("button", { name: "dropdown-option" }).click()
+    await waitForInputValue(
+      page,
+      "[aria-label='Art der Zitierung']",
+      values.citationStyle
+    )
+  }
+
+  if (values?.court) {
+    await fillInput("Gericht Aktivzitierung", values?.court)
+    await page.getByText(values.court, { exact: true }).click()
+    await waitForInputValue(
+      page,
+      "[aria-label='Gericht Aktivzitierung']",
+      values.court
+    )
+  }
+  if (values?.decisionDate) {
+    await fillInput("Entscheidungsdatum Aktivzitierung", values?.decisionDate)
+  }
+  if (values?.fileNumber) {
+    await fillInput("Aktenzeichen Aktivzitierung", values?.fileNumber)
+  }
+  if (values?.documentType) {
+    await fillInput("Dokumenttyp Aktivzitierung", values?.documentType)
+    await page.locator("[aria-label='dropdown-option']").first().click()
+  }
+}
+
 export async function checkIfProceedingDecisionCleared(page: Page) {
   ;[
     "Gericht Rechtszug",
