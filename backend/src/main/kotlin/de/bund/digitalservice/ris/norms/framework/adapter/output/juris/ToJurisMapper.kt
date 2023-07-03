@@ -22,6 +22,8 @@ import de.bund.digitalservice.ris.norms.juris.converter.model.Reissue
 import de.bund.digitalservice.ris.norms.juris.converter.model.Status
 import de.bund.digitalservice.ris.norms.juris.converter.model.SubjectArea
 import java.time.LocalDate
+import java.time.LocalTime
+import java.time.format.DateTimeFormatter
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName as Section
 import de.bund.digitalservice.ris.norms.juris.converter.model.Norm as NormData
 
@@ -42,7 +44,7 @@ fun mapDomainToData(norm: Norm): NormData {
         normProviderList = extractNormProviders(norm),
         officialShortTitle = extractSimpleStringValuesFromNormSection(norm, MetadatumType.OFFICIAL_SHORT_TITLE).firstOrNull(),
         officialAbbreviation = extractSimpleStringValuesFromNormSection(norm, MetadatumType.OFFICIAL_ABBREVIATION).firstOrNull(),
-        announcementDate = encodeLocalDate(norm.announcementDate),
+        announcementDate = extractAnnouncementDate(norm),
         citationDateList = extractCitationDates(norm),
         printAnnouncementList = extractPrintAnnouncementList(norm),
         digitalAnnouncementList = extractDigitalAnnouncementList(norm),
@@ -121,6 +123,29 @@ private fun extractFootnotes(norm: Norm): List<Footnote> {
                 transformFootnotes(footnoteSection, MetadatumType.FOOTNOTE_OTHER),
             )
         }
+}
+
+private fun extractAnnouncementDate(norm: Norm): String? {
+    val section = norm.metadataSections.firstOrNull { it.name == Section.ANNOUNCEMENT_DATE }
+
+    val year = section?.metadata?.firstOrNull { it.type == MetadatumType.YEAR }
+    val yearValue = year?.value?.toString()
+
+    val date = section?.metadata?.firstOrNull { it.type == MetadatumType.DATE }
+    val dateValue = encodeLocalDate(date?.value as LocalDate?)
+
+    val time = section?.metadata?.firstOrNull { it.type == MetadatumType.TIME }
+    val timeValue = encodeLocalTime(time?.value as LocalTime?)
+
+    return if (year != null) {
+        yearValue
+    } else if (date != null && time == null) {
+        dateValue
+    } else if (date != null && time !== null) {
+        "$dateValue $timeValue"
+    } else {
+        return null
+    }
 }
 
 fun extractCitationDates(norm: Norm): List<String> =
@@ -343,3 +368,5 @@ private fun parseDomainNormToData(normCategory: NormCategory?): String? = when (
     NormCategory.TRANSITIONAL_NORM -> "ÜN"
     else -> null
 }
+
+private fun encodeLocalTime(time: LocalTime?) = time?.let { it.format(DateTimeFormatter.ofPattern("HH:mm")) }

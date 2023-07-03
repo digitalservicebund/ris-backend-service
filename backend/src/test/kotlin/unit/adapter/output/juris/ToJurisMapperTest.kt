@@ -11,6 +11,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import utils.createRandomNorm
 import java.time.LocalDate
+import java.time.LocalTime
 import de.bund.digitalservice.ris.norms.domain.entity.MetadataSection as Section
 
 class ToJurisMapperTest {
@@ -546,6 +547,12 @@ class ToJurisMapperTest {
                         ),
                     ),
                 ),
+                Section(
+                    MetadataSectionName.ANNOUNCEMENT_DATE,
+                    listOf(
+                        Metadatum(LocalDate.parse("2022-01-07"), MetadatumType.DATE),
+                    ),
+                ),
 
             ),
 
@@ -723,5 +730,58 @@ class ToJurisMapperTest {
         assertThat(normData.documentStatus[0].documentStatusWorkNote[0]).isEqualTo("documentStatusNote")
         assertThat(normData.documentStatus[0].documentStatusDescription).isEqualTo("documentStatusDescription")
         assertThat(normData.documentStatus[0].documentStatusDateYear).isEqualTo("2010-03-04")
+
+        assertThat(normData.announcementDate).isEqualTo("2022-01-07")
+    }
+
+    @Test
+    fun `it correctly maps the announcement date if it is a year`() {
+        val norm = createRandomNorm().copy(
+            metadataSections = listOf(
+                Section(
+                    MetadataSectionName.ANNOUNCEMENT_DATE,
+                    listOf(Metadatum("2022", MetadatumType.YEAR)),
+                ),
+            ),
+        )
+
+        val normData = mapDomainToData(norm)
+
+        assertThat(normData.announcementDate).isEqualTo("2022")
+    }
+
+    @Test
+    fun `it correctly maps the announcement date if it is a date but without time`() {
+        val norm = createRandomNorm().copy(
+            metadataSections = listOf(
+                Section(
+                    MetadataSectionName.ANNOUNCEMENT_DATE,
+                    listOf(Metadatum(LocalDate.parse("2022-01-07"), MetadatumType.DATE)),
+                ),
+            ),
+        )
+
+        val normData = mapDomainToData(norm)
+
+        assertThat(normData.announcementDate).isEqualTo("2022-01-07")
+    }
+
+    @Test
+    fun `it correctly maps the announcement date if it is a date and has a time`() {
+        val norm = createRandomNorm().copy(
+            metadataSections = listOf(
+                Section(
+                    MetadataSectionName.ANNOUNCEMENT_DATE,
+                    listOf(
+                        Metadatum(LocalDate.parse("2022-01-07"), MetadatumType.DATE),
+                        Metadatum(LocalTime.parse("08:56"), MetadatumType.TIME),
+                    ),
+                ),
+            ),
+        )
+
+        val normData = mapDomainToData(norm)
+
+        assertThat(normData.announcementDate).isEqualTo("2022-01-07 08:56")
     }
 }

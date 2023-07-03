@@ -333,6 +333,11 @@ class JurisConverterTest {
             assertThat(documentStatusMetadata).usingRecursiveFieldByFieldElementComparatorIgnoringFields("guid").contains(Metadatum("test document status work note", WORK_NOTE))
             assertThat(documentStatusMetadata).usingRecursiveFieldByFieldElementComparatorIgnoringFields("guid").contains(Metadatum("test document status description", DESCRIPTION))
             assertThat(documentStatusMetadata).usingRecursiveFieldByFieldElementComparatorIgnoringFields("guid").contains(Metadatum("2022", YEAR))
+
+            val announcementDateSections = norm?.metadataSections?.filter { it.name == MetadataSectionName.ANNOUNCEMENT_DATE }
+            assertThat(announcementDateSections).hasSize(1)
+            val announcementDateMetadata = announcementDateSections?.get(0)?.metadata
+            assertThat(announcementDateMetadata).usingRecursiveFieldByFieldElementComparatorIgnoringFields("guid").contains(Metadatum(LocalDate.parse("2022-01-07"), DATE))
         }
 
         @Test

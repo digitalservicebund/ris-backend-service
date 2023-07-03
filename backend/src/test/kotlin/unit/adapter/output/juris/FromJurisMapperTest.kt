@@ -3,6 +3,7 @@ package unit.adapter.output.juris
 import de.bund.digitalservice.ris.norms.domain.entity.MetadataSection
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName.AGE_INDICATION
+import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName.ANNOUNCEMENT_DATE
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName.CATEGORIZED_REFERENCE
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName.CITATION_DATE
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName.DIGITAL_ANNOUNCEMENT
@@ -136,7 +137,6 @@ class FromJurisMapperTest {
         assertThat(domainNorm.articles[0].paragraphs).hasSize(1)
         assertThat(domainNorm.articles[0].paragraphs[0].marker).isEqualTo("paragraphMarker")
         assertThat(domainNorm.articles[0].paragraphs[0].text).isEqualTo("paragraphText")
-        assertThat(domainNorm.announcementDate).isEqualTo(LocalDate.of(2020, 10, 10))
         val sections = domainNorm.metadataSections
         assertSectionsHasMetadata(sections, NORM, MetadatumType.OFFICIAL_LONG_TITLE, "officialLongTitle")
         assertSectionsHasMetadata(sections, NORM, MetadatumType.OFFICIAL_SHORT_TITLE, "officialShortTitle")
@@ -219,6 +219,9 @@ class FromJurisMapperTest {
         assertSectionHasMetadataWithCorrectOrder(footnotesSections[1], MetadatumType.FOOTNOTE_REFERENCE, "reference 2", 1)
         assertSectionHasMetadataWithCorrectOrder(footnotesSections[1], MetadatumType.FOOTNOTE_CHANGE, "another footnoteChange A", 2)
         assertSectionHasMetadataWithCorrectOrder(footnotesSections[1], MetadatumType.FOOTNOTE_CHANGE, "another footnoteChange B", 3)
+
+        assertThat(sections.filter { it.name == ANNOUNCEMENT_DATE }).hasSize(1)
+        assertSectionsHasMetadata(sections, ANNOUNCEMENT_DATE, MetadatumType.DATE, LocalDate.parse("2020-10-10"))
     }
 
     private fun assertSectionsHasMetadata(sections: List<MetadataSection>, name: MetadataSectionName, type: MetadatumType, value: Any?) {

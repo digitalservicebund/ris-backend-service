@@ -70,7 +70,8 @@ fun mapDataToDomain(guid: UUID, data: NormData): Norm {
         addProviderSections(data.normProviderList) +
         createSectionForEntryIntoForceAndExpiration(data) +
         createSectionForStatusIndication(data.statusList, data.reissueList, data.repealList, data.otherStatusList) +
-        createFootnoteSections(data.footnotes)
+        createFootnoteSections(data.footnotes) +
+        listOfNotNull(createAnnoucementDateSection(data.announcementDate))
 
     return Norm(
         guid = guid,
@@ -330,6 +331,13 @@ fun addProviderSections(normProviders: List<NormProvider>): List<MetadataSection
         }
         if (metadata.isNotEmpty()) MetadataSection(Section.NORM_PROVIDER, metadata, index + 1) else null
     }.filterNotNull()
+}
+
+private fun createAnnoucementDateSection(announcementDate: String?): MetadataSection? {
+    return announcementDate?.let {
+        val date = Metadatum(parseDateString(it), MetadatumType.DATE)
+        MetadataSection(Section.ANNOUNCEMENT_DATE, listOf(date))
+    }
 }
 
 private fun createMetadataForType(data: List<*>, type: MetadatumType): List<Metadatum<*>> = data
