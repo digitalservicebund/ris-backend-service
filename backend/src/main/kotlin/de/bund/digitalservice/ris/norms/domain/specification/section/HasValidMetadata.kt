@@ -125,7 +125,7 @@ val hasValidMetadata =
             Section.REPEAL -> hasType(listOf(TEXT), instance)
             Section.OTHER_STATUS -> hasType(listOf(NOTE), instance)
             Section.PUBLICATION_DATE -> hasOneOfType(listOf(DATE, YEAR), instance)
-            Section.ANNOUNCEMENT_DATE -> hasOneCombination(listOf(listOf(DATE, TIME), listOf(YEAR)), instance)
+            Section.ANNOUNCEMENT_DATE -> hasValidAnnouncementDate(instance)
         }
 
         private fun hasNone(instance: MetadataSection): Boolean =
@@ -134,6 +134,13 @@ val hasValidMetadata =
             instance.metadata.all { it.type in types }
         private fun hasOneOfType(types: List<MetadatumType>, instance: MetadataSection): Boolean =
             instance.metadata.count() == 1 && hasType(types, instance)
-        private fun hasOneCombination(combinations: List<List<MetadatumType>>, instance: MetadataSection): Boolean =
-            combinations.map { combination -> hasType(combination, instance) }.count { true } == 1
+        private fun hasValidAnnouncementDate(instance: MetadataSection): Boolean {
+            return when (instance.metadata.count()) {
+                1 -> hasOneOfType(listOf(DATE, YEAR), instance)
+                2 -> hasType(listOf(DATE, TIME), instance)
+                else -> {
+                    false
+                }
+            }
+        }
     }

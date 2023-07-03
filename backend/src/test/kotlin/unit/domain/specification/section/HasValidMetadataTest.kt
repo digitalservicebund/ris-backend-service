@@ -14,6 +14,7 @@ import io.mockk.mockk
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
+import java.time.LocalTime
 
 class HasValidMetadataTest {
     @Test
@@ -905,5 +906,67 @@ class HasValidMetadataTest {
         )
 
         assertThat(hasValidMetadata.isSatisfiedBy(instance)).isTrue()
+    }
+
+    @Test
+    fun `announcement date can have a date and time`() {
+        val instance = mockk<MetadataSection>()
+        every { instance.name } returns MetadataSectionName.ANNOUNCEMENT_DATE
+        every { instance.sections } returns null
+        every { instance.metadata } returns listOf(
+            Metadatum(LocalDate.now(), MetadatumType.DATE),
+            Metadatum(LocalTime.now(), MetadatumType.TIME),
+        )
+
+        assertThat(hasValidMetadata.isSatisfiedBy(instance)).isTrue()
+    }
+
+    @Test
+    fun `announcement date can have just a date`() {
+        val instance = mockk<MetadataSection>()
+        every { instance.name } returns MetadataSectionName.ANNOUNCEMENT_DATE
+        every { instance.sections } returns null
+        every { instance.metadata } returns listOf(
+            Metadatum(LocalDate.now(), MetadatumType.DATE),
+        )
+
+        assertThat(hasValidMetadata.isSatisfiedBy(instance)).isTrue()
+    }
+
+    @Test
+    fun `announcement date can have just a year`() {
+        val instance = mockk<MetadataSection>()
+        every { instance.name } returns MetadataSectionName.ANNOUNCEMENT_DATE
+        every { instance.sections } returns null
+        every { instance.metadata } returns listOf(
+            Metadatum("2020", MetadatumType.YEAR),
+        )
+
+        assertThat(hasValidMetadata.isSatisfiedBy(instance)).isTrue()
+    }
+
+    @Test
+    fun `announcement date can not have a year and a time`() {
+        val instance = mockk<MetadataSection>()
+        every { instance.name } returns MetadataSectionName.ANNOUNCEMENT_DATE
+        every { instance.sections } returns null
+        every { instance.metadata } returns listOf(
+            Metadatum("2020", MetadatumType.YEAR),
+            Metadatum(LocalTime.now(), MetadatumType.TIME),
+        )
+
+        assertThat(hasValidMetadata.isSatisfiedBy(instance)).isFalse()
+    }
+
+    @Test
+    fun `announcement date can not have a just a time`() {
+        val instance = mockk<MetadataSection>()
+        every { instance.name } returns MetadataSectionName.ANNOUNCEMENT_DATE
+        every { instance.sections } returns null
+        every { instance.metadata } returns listOf(
+            Metadatum(LocalTime.now(), MetadatumType.TIME),
+        )
+
+        assertThat(hasValidMetadata.isSatisfiedBy(instance)).isFalse()
     }
 }
