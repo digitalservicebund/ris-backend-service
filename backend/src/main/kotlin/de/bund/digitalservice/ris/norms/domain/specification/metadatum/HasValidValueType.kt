@@ -64,6 +64,7 @@ import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.SUBJECT_GESTA
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.SUBJECT_PREVIOUS_FNA
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.TEMPLATE_NAME
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.TEXT
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.TIME
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.TYPE_NAME
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.UNDEFINED_DATE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.UNOFFICIAL_ABBREVIATION
@@ -79,6 +80,7 @@ import de.bund.digitalservice.ris.norms.domain.value.ProofIndication
 import de.bund.digitalservice.ris.norms.domain.value.ProofType
 import de.bund.digitalservice.ris.norms.domain.value.UndefinedDate
 import java.time.LocalDate
+import java.time.LocalTime
 
 val hasValidValueType =
     object : Specification<Metadatum<*>> {
@@ -97,7 +99,7 @@ val hasValidValueType =
                 FOOTNOTE_COMMENT, FOOTNOTE_DECISION, FOOTNOTE_STATE_LAW, FOOTNOTE_EU_LAW, FOOTNOTE_OTHER,
                 WORK_NOTE, DESCRIPTION, REFERENCE, ENTRY_INTO_FORCE_DATE_NOTE, NOTE, ARTICLE, OFFICIAL_LONG_TITLE,
                 OFFICIAL_SHORT_TITLE, OFFICIAL_ABBREVIATION, DOCUMENT_NUMBER, DOCUMENT_CATEGORY, COMPLETE_CITATION,
-                CELEX_NUMBER, RIS_ABBREVIATION,
+                CELEX_NUMBER, RIS_ABBREVIATION, TIME,
                 -> instance.value is String
 
                 DATE -> instance.value is LocalDate
@@ -113,6 +115,8 @@ val hasValidValueType =
                 PROOF_TYPE -> instance.value is ProofType
 
                 OTHER_TYPE -> instance.value is OtherType
+
+                TIME -> instance.value is LocalTime
             }
         }
     }
