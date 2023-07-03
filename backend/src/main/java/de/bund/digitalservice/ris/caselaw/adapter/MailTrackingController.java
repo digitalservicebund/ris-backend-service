@@ -26,7 +26,7 @@ public class MailTrackingController {
   }
 
   @PostMapping("/webhook")
-  @PreAuthorize("isAuthenticated()")
+  @PreAuthorize("permitAll")
   public Mono<ResponseEntity<String>> setPublishState(
       @RequestBody @Valid MailTrackingResponsePayload payload) {
     UUID documentUnitUuid = UUID.fromString(payload.tags().get(0));
