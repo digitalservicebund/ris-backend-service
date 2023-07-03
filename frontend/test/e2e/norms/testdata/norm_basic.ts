@@ -159,6 +159,7 @@ export const normData: NormData = {
         ],
       },
     ],
+    ANNOUNCEMENT_DATE: [{ DATE: ["06.01.2023"] }],
     DOCUMENT_TYPE: [
       { TYPE_NAME: ["RV"], NORM_CATEGORY: [NormCategory.BASE_NORM] },
     ],

@@ -4,6 +4,8 @@ import { computed, toRefs, ref, watch, h, VNode, createTextVNode } from "vue"
 import { useRoute } from "vue-router"
 import CheckMark from "@/assets/icons/ckeckbox_regular.svg"
 import AgeIndicationInputGroup from "@/components/AgeIndicationInputGroup.vue"
+import AnnouncementDateInputGroup from "@/components/announcementDate/AnnouncementDateInputGroup.vue"
+import { summarizeAnnouncementDate } from "@/components/announcementDate/summarizer"
 import AnnouncementGroup from "@/components/AnnouncementGroup.vue"
 import CategorizedReferenceInputGroup from "@/components/CategorizedReferenceInputGroup.vue"
 import CitationDateInputGroup from "@/components/CitationDateInputGroup.vue"
@@ -591,6 +593,7 @@ const ParticipationSummary = withSummarizer(participationSummarizer)
 const SubjectAreaSummary = withSummarizer(subjectAreaSummarizer)
 const footnoteLineSummary = withSummarizer(summarizeFootnotePerLine)
 const StatusIndicationSummary = withSummarizer(summarizeStatusIndication)
+const AnnouncementDateSummary = withSummarizer(summarizeAnnouncementDate)
 </script>
 
 <template>
@@ -856,12 +859,22 @@ const StatusIndicationSummary = withSummarizer(summarizeStatusIndication)
       />
     </ExpandableDataSet>
 
-    <SingleDataFieldSection
+    <ExpandableDataSet
       id="announcementDate"
-      v-model="flatMetadata.announcementDate"
-      label="Verkündungsdatum"
-      :type="InputType.DATE"
-    />
+      border-bottom
+      :data-set="metadataSections.ANNOUNCEMENT_DATE"
+      :summary-component="AnnouncementDateSummary"
+      test-id="a11y-expandable-dataset"
+      title="Verkündungsdatum"
+    >
+      <EditableList
+        v-model="metadataSections.ANNOUNCEMENT_DATE"
+        :default-value="{}"
+        disable-multi-entry
+        :edit-component="AnnouncementDateInputGroup"
+        :summary-component="AnnouncementDateSummary"
+      />
+    </ExpandableDataSet>
 
     <ExpandableDataSet
       id="publicationDates"

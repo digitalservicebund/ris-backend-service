@@ -885,13 +885,51 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
       ],
     },
     {
-      isSingleFieldSection: true,
+      heading: "Verkündungsdatum",
+      id: "announcementDate",
+      isExpandableNotRepeatable: true,
       fields: [
         {
-          type: FieldType.TEXT,
+          type: FieldType.RADIO,
           id: "announcementDate",
-          label: "Verkündungsdatum",
-          value: norm.announcementDate,
+          label: "Datum",
+          values: [
+            norm.metadataSections?.ANNOUNCEMENT_DATE?.some(
+              (section) => !!section?.DATE
+            ),
+          ],
+        },
+        {
+          type: FieldType.TEXT,
+          id: "announcementDateInput",
+          label: "Datum",
+          values: norm.metadataSections?.ANNOUNCEMENT_DATE?.map(
+            (section) => section?.DATE?.[0]
+          ),
+        },
+        {
+          type: FieldType.TEXT,
+          id: "announcementDateTime",
+          label: "Uhrzeit",
+          values: norm.metadataSections?.ANNOUNCEMENT_DATE?.map(
+            (section) => section?.TIME?.[0]
+          ),
+        },
+        {
+          type: FieldType.RADIO,
+          id: "announcementYear",
+          label: "Jahresangabe",
+          values: norm.metadataSections?.ANNOUNCEMENT_DATE?.map(
+            (section) => !!section?.YEAR
+          ),
+        },
+        {
+          type: FieldType.TEXT,
+          id: "announcementDateYearInput",
+          label: "Jahresangabe",
+          values: norm.metadataSections?.ANNOUNCEMENT_DATE?.map(
+            (section) => section?.YEAR?.[0]
+          ),
         },
       ],
     },
