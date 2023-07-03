@@ -65,6 +65,7 @@ import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.SUBJECT_GESTA
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.SUBJECT_PREVIOUS_FNA
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.TEMPLATE_NAME
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.TEXT
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.TIME
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.TYPE_NAME
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.UNDEFINED_DATE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.UNOFFICIAL_ABBREVIATION
@@ -124,6 +125,7 @@ val hasValidMetadata =
             Section.REPEAL -> hasType(listOf(TEXT), instance)
             Section.OTHER_STATUS -> hasType(listOf(NOTE), instance)
             Section.PUBLICATION_DATE -> hasOneOfType(listOf(DATE, YEAR), instance)
+            Section.ANNOUNCEMENT_DATE -> hasOneCombination(listOf(listOf(DATE, TIME), listOf(YEAR)), instance)
         }
 
         private fun hasNone(instance: MetadataSection): Boolean =
@@ -132,4 +134,6 @@ val hasValidMetadata =
             instance.metadata.all { it.type in types }
         private fun hasOneOfType(types: List<MetadatumType>, instance: MetadataSection): Boolean =
             instance.metadata.count() == 1 && hasType(types, instance)
+        private fun hasOneCombination(combinations: List<List<MetadatumType>>, instance: MetadataSection): Boolean =
+            combinations.map { combination -> hasType(combination, instance) }.count { true } == 1
     }

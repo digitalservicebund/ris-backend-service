@@ -3,6 +3,7 @@ package de.bund.digitalservice.ris.norms.domain.specification.norm
 import de.bund.digitalservice.ris.norms.domain.entity.Norm
 import de.bund.digitalservice.ris.norms.domain.specification.Specification
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName.AGE_INDICATION
+import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName.ANNOUNCEMENT_DATE
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName.CATEGORIZED_REFERENCE
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName.CITATION_DATE
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName.DIGITAL_EVIDENCE
@@ -53,6 +54,7 @@ val hasValidSections =
                 DOCUMENT_STATUS_SECTION,
                 STATUS_INDICATION,
                 PUBLICATION_DATE,
+                ANNOUNCEMENT_DATE,
             )
         }
     }
