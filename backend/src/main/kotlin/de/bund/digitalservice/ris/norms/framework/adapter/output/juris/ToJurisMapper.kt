@@ -5,11 +5,13 @@ import de.bund.digitalservice.ris.norms.domain.entity.Norm
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType
 import de.bund.digitalservice.ris.norms.domain.value.NormCategory
+import de.bund.digitalservice.ris.norms.domain.value.ProofType
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.encodeLocalDate
 import de.bund.digitalservice.ris.norms.juris.converter.model.CategorizedReference
 import de.bund.digitalservice.ris.norms.juris.converter.model.DigitalAnnouncement
 import de.bund.digitalservice.ris.norms.juris.converter.model.DivergentEntryIntoForce
 import de.bund.digitalservice.ris.norms.juris.converter.model.DivergentExpiration
+import de.bund.digitalservice.ris.norms.juris.converter.model.DocumentStatus
 import de.bund.digitalservice.ris.norms.juris.converter.model.DocumentType
 import de.bund.digitalservice.ris.norms.juris.converter.model.Footnote
 import de.bund.digitalservice.ris.norms.juris.converter.model.Lead
@@ -65,7 +67,37 @@ fun mapDomainToData(norm: Norm): NormData {
         repealList = extractRepealStatus(norm),
         otherStatusList = extractOtherStatus(norm),
         footnotes = extractFootnotes(norm),
+        documentTextProof = extractDocumentTextProof(norm),
+        documentStatus = extractDocumentStatus(norm),
     )
+}
+
+private fun extractDocumentStatus(norm: Norm): List<DocumentStatus> = norm
+    .metadataSections
+    .filter { it.name == Section.DOCUMENT_STATUS_SECTION }
+    .flatMap { it.sections ?: listOf() }
+    .filter { it.name == Section.DOCUMENT_STATUS }
+    .map { section ->
+        val date = section.metadata.find { it.type == MetadatumType.DATE }?.let { found -> encodeLocalDate(found.value as LocalDate) }
+        val year = section.metadata.find { it.type == MetadatumType.YEAR }?.value.toString()
+        DocumentStatus(
+            listOf(section.metadata.find { it.type == MetadatumType.WORK_NOTE }?.value.toString()),
+            section.metadata.find { it.type == MetadatumType.DESCRIPTION }?.value.toString(),
+            date ?: year,
+        )
+    }
+private fun extractDocumentTextProof(norm: Norm): String? {
+    val metadata = norm.metadataSections
+        .filter { it.name == Section.DOCUMENT_STATUS_SECTION }
+        .flatMap { it.sections ?: listOf() }
+        .find { it.name == Section.DOCUMENT_TEXT_PROOF }?.metadata
+    val proofType = metadata?.find { it.type == MetadatumType.PROOF_TYPE }?.value
+    val proofText = metadata?.find { it.type == MetadatumType.TEXT }?.value
+    return if (proofType != null && proofText != null) {
+        ProofType.valueOf(proofType.toString()).text + " " + proofText
+    } else {
+        null
+    }
 }
 
 private fun extractFootnotes(norm: Norm): List<Footnote> {

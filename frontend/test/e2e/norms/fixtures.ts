@@ -1,4 +1,8 @@
 import { expect, test } from "@playwright/test"
+import { importNormViaApi, loadJurisTestFile } from "./e2e-utils"
+import { normData } from "./testdata/norm_basic"
+import { FieldType, MetadataInputSection } from "./utilities"
+import { FOOTNOTE_LABELS } from "@/components/footnotes/types"
 import {
   MetadataSectionName,
   Norm,
@@ -7,11 +11,7 @@ import {
   ProofIndication,
   ProofType,
   UndefinedDate,
-} from "../../../src/domain/Norm"
-import { importNormViaApi, loadJurisTestFile } from "./e2e-utils"
-import { normData } from "./testdata/norm_basic"
-import { FieldType, MetadataInputSection } from "./utilities"
-import { FOOTNOTE_LABELS } from "@/components/footnotes/types"
+} from "@/domain/Norm"
 
 type MyFixtures = {
   normData: NormData
@@ -1340,7 +1340,6 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
       heading: "Stand der dokumentarischen Bearbeitung",
       id: "documentStatus",
       isRepeatedSection: true,
-      isNotImported: true,
       numberEditedSections: 3,
       fields: [
         {

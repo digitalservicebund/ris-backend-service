@@ -4,6 +4,7 @@ import de.bund.digitalservice.ris.norms.domain.entity.Metadatum
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType
 import de.bund.digitalservice.ris.norms.domain.value.NormCategory
+import de.bund.digitalservice.ris.norms.domain.value.ProofType
 import de.bund.digitalservice.ris.norms.domain.value.UndefinedDate
 import de.bund.digitalservice.ris.norms.framework.adapter.output.juris.mapDomainToData
 import org.assertj.core.api.Assertions.assertThat
@@ -516,6 +517,35 @@ class ToJurisMapperTest {
                         Metadatum("footnoteDecision1", MetadatumType.FOOTNOTE_DECISION, order = 5),
                     ),
                 ),
+                Section(
+                    MetadataSectionName.DOCUMENT_STATUS_SECTION,
+                    emptyList(),
+                    order = 1,
+                    sections = listOf(
+                        Section(
+                            MetadataSectionName.DOCUMENT_TEXT_PROOF,
+                            listOf(
+                                Metadatum(ProofType.TEXT_PROOF_FROM, MetadatumType.PROOF_TYPE),
+                                Metadatum("26.10.2001", MetadatumType.TEXT),
+                            ),
+                        ),
+                    ),
+                ),
+                Section(
+                    MetadataSectionName.DOCUMENT_STATUS_SECTION,
+                    emptyList(),
+                    order = 1,
+                    sections = listOf(
+                        Section(
+                            MetadataSectionName.DOCUMENT_STATUS,
+                            listOf(
+                                Metadatum("documentStatusNote", MetadatumType.WORK_NOTE),
+                                Metadatum("documentStatusDescription", MetadatumType.DESCRIPTION),
+                                Metadatum(LocalDate.parse("2010-03-04"), MetadatumType.DATE),
+                            ),
+                        ),
+                    ),
+                ),
 
             ),
 
@@ -687,5 +717,11 @@ class ToJurisMapperTest {
         assertThat(normData.footnotes[0].footnoteChange[1].second).isEqualTo("footnoteChangeB")
         assertThat(normData.footnotes[0].footnoteDecision[0].first).isEqualTo(5)
         assertThat(normData.footnotes[0].footnoteDecision[0].second).isEqualTo("footnoteDecision1")
+
+        assertThat(normData.documentTextProof).isEqualTo("Textnachweis ab: 26.10.2001")
+        assertThat(normData.documentStatus).hasSize(1)
+        assertThat(normData.documentStatus[0].documentStatusWorkNote[0]).isEqualTo("documentStatusNote")
+        assertThat(normData.documentStatus[0].documentStatusDescription).isEqualTo("documentStatusDescription")
+        assertThat(normData.documentStatus[0].documentStatusDateYear).isEqualTo("2010-03-04")
     }
 }

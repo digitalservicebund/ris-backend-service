@@ -1,5 +1,5 @@
 import { NormData } from "../fixtures"
-import { NormCategory, UndefinedDate } from "@/domain/Norm"
+import { NormCategory, ProofType, UndefinedDate } from "@/domain/Norm"
 
 export const normData: NormData = {
   jurisZipFileName: "Tierarznei.3-0_multi.zip",
@@ -310,6 +310,31 @@ export const normData: NormData = {
             FOOTNOTE_OTHER: [
               "Das G wurde als Artikel 1 G v. 20.7.2000 I 1045 (SeuchRNeuG) vom Bundestag mit Zustimmung des Bundesrates beschlossen. Es ist gem. Art. 5 Abs. 1 Satz 1 dieses G mWv 1.1.2001, §§ 37 und 38 mWv 26.7.2000 in Kraft getreten.",
             ],
+          },
+        ],
+      },
+    ],
+    DOCUMENT_STATUS_SECTION: [
+      {
+        DOCUMENT_TEXT_PROOF: [
+          { PROOF_TYPE: [ProofType.TEXT_PROOF_FROM], TEXT: ["26.6.2017"] },
+        ],
+      },
+      {
+        DOCUMENT_STATUS: [
+          {
+            WORK_NOTE: ["PRÄTEXT(2) BGBl I 2014, 610"],
+            DESCRIPTION: ["BGBl I 2014, 610"],
+            YEAR: ["2014"],
+          },
+        ],
+      },
+      {
+        DOCUMENT_STATUS: [
+          {
+            WORK_NOTE: ["PRÄTEXT(16) BGBl I 2008, 561"],
+            DESCRIPTION: ["BGBl I 2008, 561"],
+            YEAR: ["2008"],
           },
         ],
       },

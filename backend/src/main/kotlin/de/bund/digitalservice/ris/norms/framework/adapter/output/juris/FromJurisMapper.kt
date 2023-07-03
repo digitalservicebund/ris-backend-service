@@ -8,11 +8,13 @@ import de.bund.digitalservice.ris.norms.domain.entity.Paragraph
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType
 import de.bund.digitalservice.ris.norms.domain.value.NormCategory
+import de.bund.digitalservice.ris.norms.domain.value.ProofType
 import de.bund.digitalservice.ris.norms.domain.value.UndefinedDate
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.decodeLocalDate
 import de.bund.digitalservice.ris.norms.juris.converter.model.DigitalAnnouncement
 import de.bund.digitalservice.ris.norms.juris.converter.model.DivergentEntryIntoForce
 import de.bund.digitalservice.ris.norms.juris.converter.model.DivergentExpiration
+import de.bund.digitalservice.ris.norms.juris.converter.model.DocumentStatus
 import de.bund.digitalservice.ris.norms.juris.converter.model.DocumentType
 import de.bund.digitalservice.ris.norms.juris.converter.model.Footnote
 import de.bund.digitalservice.ris.norms.juris.converter.model.NormProvider
@@ -61,7 +63,7 @@ fun mapDataToDomain(guid: UUID, data: NormData): Norm {
         createSectionForDocumentType(data.documentType) +
         createSectionsFromMetadata(Section.PARTICIPATION, participationType + participationInstitution) +
         createSectionsForOfficialReference(data.digitalAnnouncementList, data.printAnnouncementList) +
-        createSectionsForDocumentStatus(data.documentStatusWorkNote, data.documentStatusDate, data.documentStatusDescription) +
+        createSectionsForDocumentStatus(data.documentStatus, data.documentTextProof) +
         createSectionsForDivergentEntryIntoForce(data.divergentEntryIntoForceList) +
         createSectionsForDivergentExpiration(data.divergentExpirationsList) +
         citationDateSections + ageIndicationSections + categorizedReferenceSections +
@@ -79,30 +81,44 @@ fun mapDataToDomain(guid: UUID, data: NormData): Norm {
 }
 
 fun createSectionsForDocumentStatus(
-    documentStatusWorkNote: String?,
-    documentStatusDate: String?,
-    documentStatusDescription: String?,
-): MetadataSection? {
-    val metadata = mutableListOf<Metadatum<*>>()
-
-    if (documentStatusWorkNote != null) {
-        metadata.add(Metadatum(documentStatusWorkNote, MetadatumType.WORK_NOTE))
+    documentStatus: List<DocumentStatus>,
+    documentTextProof: String?,
+): List<MetadataSection> {
+    val documentStatusSections = mutableListOf<MetadataSection>()
+    var raiseOrder = 1
+    if (documentTextProof != null && listOf(ProofType.TEXT_PROOF_FROM.text, ProofType.TEXT_PROOF_VALIDITY_FROM.text).any { documentTextProof.contains(it) }) {
+        val metadata = mutableListOf<Metadatum<*>>()
+        if (documentTextProof.contains(ProofType.TEXT_PROOF_FROM.text)) {
+            metadata.add(Metadatum(ProofType.TEXT_PROOF_FROM, MetadatumType.PROOF_TYPE))
+            metadata.add(Metadatum(documentTextProof.replace(ProofType.TEXT_PROOF_FROM.text, "").trim(), MetadatumType.TEXT))
+        } else if (documentTextProof.contains(ProofType.TEXT_PROOF_VALIDITY_FROM.text)) {
+            metadata.add(Metadatum(ProofType.TEXT_PROOF_VALIDITY_FROM, MetadatumType.PROOF_TYPE))
+            metadata.add(Metadatum(documentTextProof.replace(ProofType.TEXT_PROOF_VALIDITY_FROM.text, "").trim(), MetadatumType.TEXT))
+        }
+        val proofSection = MetadataSection(MetadataSectionName.DOCUMENT_TEXT_PROOF, metadata)
+        val parentSection = MetadataSection(MetadataSectionName.DOCUMENT_STATUS_SECTION, emptyList(), sections = listOf(proofSection))
+        documentStatusSections.add(parentSection)
+        raiseOrder++
     }
 
-    if (documentStatusDate != null) {
-        metadata.add(Metadatum(decodeLocalDate(documentStatusDate), MetadatumType.DATE))
+    documentStatus.forEachIndexed { index, documentStatusGroup ->
+        val metadata = mutableListOf<Metadatum<*>>()
+        if (documentStatusGroup.documentStatusWorkNote.isNotEmpty()) {
+            metadata.add(Metadatum(documentStatusGroup.documentStatusWorkNote[0], MetadatumType.WORK_NOTE))
+        }
+        if (documentStatusGroup.documentStatusDescription != null) {
+            metadata.add(Metadatum(documentStatusGroup.documentStatusDescription, MetadatumType.DESCRIPTION))
+        }
+        if (documentStatusGroup.documentStatusDateYear != null) {
+            metadata.add(Metadatum(documentStatusGroup.documentStatusDateYear, MetadatumType.YEAR))
+        }
+        if (metadata.isNotEmpty()) {
+            val childSection = MetadataSection(MetadataSectionName.DOCUMENT_STATUS, metadata)
+            val parentSection = MetadataSection(MetadataSectionName.DOCUMENT_STATUS_SECTION, emptyList(), index + raiseOrder, sections = listOf(childSection))
+            documentStatusSections.add(parentSection)
+        }
     }
-
-    if (documentStatusDescription != null) {
-        metadata.add(Metadatum(documentStatusDescription, MetadatumType.DESCRIPTION))
-    }
-    if (metadata.isNotEmpty()) {
-        val childSection = MetadataSection(MetadataSectionName.DOCUMENT_STATUS, metadata)
-        val parentSection = MetadataSection(MetadataSectionName.DOCUMENT_STATUS_SECTION, emptyList(), sections = listOf(childSection))
-
-        return parentSection
-    }
-    return null
+    return documentStatusSections
 }
 
 private fun createSectionForDocumentType(documentType: DocumentType?): MetadataSection? {

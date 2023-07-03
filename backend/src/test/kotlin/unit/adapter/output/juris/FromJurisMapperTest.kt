@@ -38,6 +38,7 @@ import de.bund.digitalservice.ris.norms.juris.converter.model.CategorizedReferen
 import de.bund.digitalservice.ris.norms.juris.converter.model.DigitalAnnouncement
 import de.bund.digitalservice.ris.norms.juris.converter.model.DivergentEntryIntoForce
 import de.bund.digitalservice.ris.norms.juris.converter.model.DivergentExpiration
+import de.bund.digitalservice.ris.norms.juris.converter.model.DocumentStatus
 import de.bund.digitalservice.ris.norms.juris.converter.model.DocumentType
 import de.bund.digitalservice.ris.norms.juris.converter.model.Footnote
 import de.bund.digitalservice.ris.norms.juris.converter.model.Lead
@@ -78,9 +79,7 @@ class FromJurisMapperTest {
             divergentEntryIntoForceList = listOf(DivergentEntryIntoForce("2020-10-01", null, "normCategory")),
             divergentExpirationsList = listOf(DivergentExpiration("2020-10-02", "UNDEFINED_FUTURE", "normCategory1")),
             documentCategory = "documentCategory",
-            documentStatusDate = "2021-10-10",
-            documentStatusDescription = "documentStatusDescription",
-            documentStatusWorkNote = "documentStatusWorkNote",
+            documentStatus = listOf(DocumentStatus(listOf("documentStatusWorkNote"), "documentStatusDescription", "2021")),
             documentType = DocumentType("documentName", listOf("documentTemplateName"), listOf("category")),
             entryIntoForceDate = "2023-06-15",
             entryIntoForceDateState = null,
@@ -183,7 +182,7 @@ class FromJurisMapperTest {
         assertSectionsHasMetadata(sections, NORM_PROVIDER, MetadatumType.RESOLUTION_MAJORITY, true)
         assertSectionsHasMetadata(sections, ENTRY_INTO_FORCE, MetadatumType.DATE, LocalDate.of(2023, 6, 15))
         val documentStatusSections = sections.filter { it.name == DOCUMENT_STATUS_SECTION }.flatMap { it.sections ?: emptyList() }
-        assertSectionsHasMetadata(documentStatusSections, DOCUMENT_STATUS, MetadatumType.DATE, LocalDate.of(2021, 10, 10))
+        assertSectionsHasMetadata(documentStatusSections, DOCUMENT_STATUS, MetadatumType.YEAR, "2021")
         assertSectionsHasMetadata(documentStatusSections, DOCUMENT_STATUS, MetadatumType.WORK_NOTE, "documentStatusWorkNote")
         assertSectionsHasMetadata(documentStatusSections, DOCUMENT_STATUS, MetadatumType.DESCRIPTION, "documentStatusDescription")
         assertSectionsHasMetadata(sections, PRINCIPLE_ENTRY_INTO_FORCE, MetadatumType.DATE, LocalDate.of(2024, 10, 10))

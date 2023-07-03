@@ -44,6 +44,7 @@ import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.UNOFFICIAL_LO
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.UNOFFICIAL_REFERENCE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.UNOFFICIAL_SHORT_TITLE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.VALIDITY_RULE
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.WORK_NOTE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.YEAR
 import de.bund.digitalservice.ris.norms.domain.value.NormCategory
 import de.bund.digitalservice.ris.norms.domain.value.UndefinedDate
@@ -55,6 +56,7 @@ import de.bund.digitalservice.ris.norms.juris.converter.generator.generateZip
 import de.bund.digitalservice.ris.norms.juris.converter.model.CategorizedReference
 import de.bund.digitalservice.ris.norms.juris.converter.model.DivergentEntryIntoForce
 import de.bund.digitalservice.ris.norms.juris.converter.model.DivergentExpiration
+import de.bund.digitalservice.ris.norms.juris.converter.model.DocumentStatus
 import de.bund.digitalservice.ris.norms.juris.converter.model.DocumentType
 import de.bund.digitalservice.ris.norms.juris.converter.model.Lead
 import de.bund.digitalservice.ris.norms.juris.converter.model.NormProvider
@@ -178,9 +180,7 @@ class JurisConverterTest {
                     reissueList = listOf(Reissue("test reissue note", "test reissue article", "2022-01-11", "test reissue reference"))
                     repealList = listOf("test repeal references 1", "test repeal references 2")
                     otherStatusList = listOf("test other status note")
-                    documentStatusWorkNote = "test document status work note"
-                    documentStatusDescription = "test document status description"
-                    documentStatusDate = "2022-01-12"
+                    documentStatus = listOf(DocumentStatus(listOf("test document status work note"), "test document status description", "2022"))
                     validityRuleList = listOf("test validity rule")
                     referenceNumberList = listOf("test reference number")
                     celexNumber = "test celex number"
@@ -323,6 +323,16 @@ class JurisConverterTest {
             assertThat(otherTypeSections).hasSize(1)
             val otherTypeMetadata = otherTypeSections?.get(0)?.metadata
             assertThat(otherTypeMetadata).usingRecursiveFieldByFieldElementComparatorIgnoringFields("guid").contains(Metadatum("test other status note", NOTE))
+
+            val documentStatusParentSections = norm?.metadataSections?.filter { it.name == MetadataSectionName.DOCUMENT_STATUS_SECTION }
+            assertThat(documentStatusParentSections).hasSize(1)
+            val documentStatusChildren = documentStatusParentSections?.mapNotNull { it.sections }?.flatten()
+            val documentStatusSections = documentStatusChildren?.filter { it.name == MetadataSectionName.DOCUMENT_STATUS }
+            assertThat(documentStatusSections).hasSize(1)
+            val documentStatusMetadata = documentStatusSections?.get(0)?.metadata
+            assertThat(documentStatusMetadata).usingRecursiveFieldByFieldElementComparatorIgnoringFields("guid").contains(Metadatum("test document status work note", WORK_NOTE))
+            assertThat(documentStatusMetadata).usingRecursiveFieldByFieldElementComparatorIgnoringFields("guid").contains(Metadatum("test document status description", DESCRIPTION))
+            assertThat(documentStatusMetadata).usingRecursiveFieldByFieldElementComparatorIgnoringFields("guid").contains(Metadatum("2022", YEAR))
         }
 
         @Test
