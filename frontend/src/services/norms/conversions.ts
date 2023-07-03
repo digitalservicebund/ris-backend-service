@@ -211,6 +211,7 @@ const DECODERS: MetadataValueDecoders = {
   [MetadatumType.OFFICIAL_ABBREVIATION]: identity,
   [MetadatumType.COMPLETE_CITATION]: identity,
   [MetadatumType.CELEX_NUMBER]: identity,
+  [MetadatumType.TIME]: identity,
 }
 
 const ENCODERS: MetadataValueEncoders = {
@@ -285,6 +286,7 @@ const ENCODERS: MetadataValueEncoders = {
   [MetadatumType.OFFICIAL_ABBREVIATION]: identity,
   [MetadatumType.COMPLETE_CITATION]: identity,
   [MetadatumType.CELEX_NUMBER]: identity,
+  [MetadatumType.TIME]: identity,
 }
 
 /**

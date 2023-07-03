@@ -99,6 +99,7 @@ export enum MetadatumType {
   OFFICIAL_ABBREVIATION = "OFFICIAL_ABBREVIATION",
   COMPLETE_CITATION = "COMPLETE_CITATION",
   CELEX_NUMBER = "CELEX_NUMBER",
+  TIME = "TIME",
 }
 
 export enum NormCategory {
@@ -195,6 +196,7 @@ export type MetadataValueType = {
   [MetadatumType.OFFICIAL_ABBREVIATION]: string
   [MetadatumType.COMPLETE_CITATION]: string
   [MetadatumType.CELEX_NUMBER]: string
+  [MetadatumType.TIME]: string
 }
 
 export type Metadata = {
@@ -239,6 +241,7 @@ export enum MetadataSectionName {
   REPEAL = "REPEAL",
   OTHER_STATUS = "OTHER_STATUS",
   PUBLICATION_DATE = "PUBLICATION_DATE",
+  ANNOUNCEMENT_DATE = "ANNOUNCEMENT_DATE",
 }
 
 export type MetadataSections = {

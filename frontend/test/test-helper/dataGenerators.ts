@@ -99,6 +99,7 @@ const METADATA_VALUE_GENERATORS: MetadataValueGenerators = {
   [MetadatumType.OFFICIAL_ABBREVIATION]: generateString,
   [MetadatumType.COMPLETE_CITATION]: generateString,
   [MetadatumType.CELEX_NUMBER]: generateString,
+  [MetadatumType.TIME]: generateString,
 }
 
 const ALPHABET_CHARACTERS = "abcdefghijklmnopqrstuvwxyz"
