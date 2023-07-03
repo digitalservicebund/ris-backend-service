@@ -37,8 +37,8 @@ async function validateSingleNorm() {
     const latestNormReference = props.modelValue[props.modelValue.length - 1]
     if (latestNormReference.singleNorm) {
       const singleNormValidationInfo: SingleNormValidationInfo = {
-        singleNormStr: latestNormReference.singleNorm,
-        normAbbreviationStr: undefined,
+        singleNorm: latestNormReference.singleNorm,
+        normAbbreviation: undefined,
       }
       const response = await documentUnitService.validateSingleNorm(
         singleNormValidationInfo

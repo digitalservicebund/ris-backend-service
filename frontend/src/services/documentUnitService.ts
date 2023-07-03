@@ -165,7 +165,7 @@ const service: DocumentUnitService = {
       `caselaw/documentunits/validateSingleNorm`,
       {
         headers: {
-          Accept: "application/json",
+          Accept: "text/plain",
           "Content-Type": "application/json",
         },
       },

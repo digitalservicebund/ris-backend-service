@@ -51,6 +51,6 @@ export const normFieldLabels: { [name: string]: string } = {
 }
 
 export type SingleNormValidationInfo = {
-  singleNormStr: string
-  normAbbreviationStr?: string
+  singleNorm: string
+  normAbbreviation?: string
 }
