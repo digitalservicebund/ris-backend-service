@@ -136,8 +136,42 @@ class NormTest {
         assertThat(norm.eli.gazetteOrMedium).isEqualTo("bgbl-1")
         assertThat(norm.eli.printAnnouncementGazette).isEqualTo("BGBl I")
         assertThat(norm.eli.citationDate).isEqualTo(LocalDate.of(2022, 11, 19))
-        assertThat(norm.eli.announcementDate).isEqualTo(LocalDate.of(2022, 11, 18))
+        assertThat(norm.eli.announcementYear).isEqualTo(2022)
         assertThat(norm.eli.toString()).isEqualTo("eli/bgbl-1/2022/s1102")
+    }
+
+    @Test
+    fun `it creates the eli with the year of the date from the announcement date section`() {
+        val norm = Norm(
+            guid = UUID.randomUUID(),
+            metadataSections = listOf(
+                MetadataSection(
+                    MetadataSectionName.ANNOUNCEMENT_DATE,
+                    listOf(
+                        Metadatum(LocalDate.of(2021, 11, 18), MetadatumType.DATE),
+                    ),
+                ),
+            ),
+        )
+
+        assertThat(norm.eli.announcementYear).isEqualTo(2021)
+    }
+
+    @Test
+    fun `it creates the eli with the year of the announcement date section`() {
+        val norm = Norm(
+            guid = UUID.randomUUID(),
+            metadataSections = listOf(
+                MetadataSection(
+                    MetadataSectionName.ANNOUNCEMENT_DATE,
+                    listOf(
+                        Metadatum("2012", MetadatumType.YEAR),
+                    ),
+                ),
+            ),
+        )
+
+        assertThat(norm.eli.announcementYear).isEqualTo(2012)
     }
 
     @Test

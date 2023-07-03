@@ -16,7 +16,6 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.springframework.test.web.reactive.server.WebTestClient
 import reactor.core.publisher.Flux
 import utils.factory.eli
-import java.time.LocalDate
 import java.util.UUID
 
 @ExtendWith(SpringExtension::class)
@@ -58,7 +57,7 @@ class ListNormsControllerTest {
 
     @Test
     fun `it reponds with a data property that holds the list of norms`() {
-        val norm = NormData(UUID.randomUUID(), "long title", eli { announcementDate = null; citationDate = null })
+        val norm = NormData(UUID.randomUUID(), "long title", eli { announcementYear = null; citationDate = null })
         every { listNormsService.listNorms(any()) } returns Flux.fromArray(arrayOf(norm))
 
         webClient
@@ -77,12 +76,12 @@ class ListNormsControllerTest {
     fun `it maps the norm entity to the expected data schema`() {
         val eliOne = eli {
             printAnnouncementGazette = "bgbl-1"
-            announcementDate = LocalDate.of(2022, 1, 1)
+            announcementYear = 2022
             printAnnouncementPage = "1"
         }
         val eliTwo = eli {
             printAnnouncementGazette = "bgbl-2"
-            announcementDate = LocalDate.of(2022, 1, 2)
+            announcementYear = 2022
             printAnnouncementPage = "2"
         }
         val normOne = NormData(UUID.fromString("761b5537-5aa5-4901-81f7-fbf7e040a7c8"), "first title", eliOne)

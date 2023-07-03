@@ -31,7 +31,7 @@ import java.time.LocalDate
 data class Eli(
     val printAnnouncementGazette: String?,
     val digitalAnnouncementMedium: String?,
-    val announcementDate: LocalDate?,
+    val announcementYear: Int?,
     val citationDate: LocalDate?,
     val citationYear: String?,
     val printAnnouncementPage: String?,
@@ -49,7 +49,7 @@ data class Eli(
     }
 
     val gazetteOrMedium: String? = printAnnouncementGazette?.let { gazetteOrMediumMap.getOrDefault(it, it) } ?: digitalAnnouncementMedium?.let { gazetteOrMediumMap.getOrDefault(it, it) }
-    private val year: Int? = announcementDate?.year ?: (citationDate?.year ?: citationYear?.toInt())
+    private val year: Int? = announcementYear ?: (citationDate?.year ?: citationYear?.toInt())
     private val page: String? = if (printAnnouncementGazette != null) printAnnouncementPage else digitalAnnouncementEdition ?: digitalAnnouncementPage
 
     override fun toString() = if (year != null && gazetteOrMedium != null && page != null) "eli/$gazetteOrMedium/$year/s$page" else ""

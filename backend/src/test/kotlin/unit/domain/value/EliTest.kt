@@ -64,7 +64,7 @@ class EliTest {
     fun `returns an eli with the year of the announcement date having all dates filled`() {
         val eli = eli {
             printAnnouncementGazette = "BGBl I"
-            announcementDate = LocalDate.of(1989, 12, 29)
+            announcementYear = 1989
             citationDate = LocalDate.of(1988, 6, 9)
             citationYear = "2001"
             printAnnouncementPage = "1234"
@@ -76,7 +76,7 @@ class EliTest {
     fun `returns an eli with the year of the announcement date having also only the citation date`() {
         val eli = eli {
             printAnnouncementGazette = "BGBl I"
-            announcementDate = LocalDate.of(1989, 12, 29)
+            announcementYear = 1989
             citationDate = LocalDate.of(1988, 6, 9)
             printAnnouncementPage = "1234"
         }
@@ -87,7 +87,7 @@ class EliTest {
     fun `returns an eli with the year of the announcement date having also only the citation year`() {
         val eli = eli {
             printAnnouncementGazette = "BGBl I"
-            announcementDate = LocalDate.of(1989, 12, 29)
+            announcementYear = 1989
             citationYear = "2001"
             printAnnouncementPage = "1234"
         }
@@ -98,7 +98,7 @@ class EliTest {
     fun `returns an eli with the year of the citation date`() {
         val eli = eli {
             printAnnouncementGazette = "BGBl I"
-            announcementDate = null
+            announcementYear = null
             citationDate = LocalDate.of(1988, 6, 9)
             citationYear = "2001"
             printAnnouncementPage = "1234"
@@ -110,7 +110,7 @@ class EliTest {
     fun `returns an eli with the year of the citation year`() {
         val eli = eli {
             printAnnouncementGazette = "BGBl I"
-            announcementDate = null
+            announcementYear = null
             citationDate = null
             citationYear = "2001"
             printAnnouncementPage = "1234"
