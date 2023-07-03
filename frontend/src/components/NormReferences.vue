@@ -2,7 +2,7 @@
 import { computed, h } from "vue"
 import ExpandableDataSet from "@/components/ExpandableDataSet.vue"
 import NormReferenceInput from "@/components/NormReferenceInput.vue"
-import NormReference from "@/domain/normReference"
+import NormReference, { SingleNormValidationInfo } from "@/domain/normReference"
 import documentUnitService from "@/services/documentUnitService"
 import { withSummarizer } from "@/shared/components/DataSetSummary.vue"
 import EditableList from "@/shared/components/EditableList.vue"
@@ -36,8 +36,12 @@ async function validateSingleNorm() {
   if (props.modelValue) {
     const latestNormReference = props.modelValue[props.modelValue.length - 1]
     if (latestNormReference.singleNorm) {
+      const singleNormValidationInfo: SingleNormValidationInfo = {
+        singleNormStr: latestNormReference.singleNorm,
+        normAbbreviationStr: undefined,
+      }
       const response = await documentUnitService.validateSingleNorm(
-        latestNormReference.singleNorm
+        singleNormValidationInfo
       )
       console.log("response", response)
     }

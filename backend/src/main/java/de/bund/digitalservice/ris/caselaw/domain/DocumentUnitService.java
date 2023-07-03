@@ -3,6 +3,9 @@ package de.bund.digitalservice.ris.caselaw.domain;
 import static de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatus.PUBLISHED;
 import static de.bund.digitalservice.ris.caselaw.domain.ServiceUtils.byteBufferToArray;
 
+import de.bund.digitalservice.ris.caselaw.adapter.SingleNormValidationInfo;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validator;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -11,6 +14,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
@@ -52,6 +56,7 @@ public class DocumentUnitService {
   private final S3AsyncClient s3AsyncClient;
   private final EmailPublishService publishService;
   private final DocumentUnitStatusService documentUnitStatusService;
+  private final Validator validator;
 
   @Value("${otc.obs.bucket-name}")
   private String bucketName;
@@ -65,7 +70,8 @@ public class DocumentUnitService {
       S3AsyncClient s3AsyncClient,
       EmailPublishService publishService,
       DocumentUnitStatusService documentUnitStatusService,
-      PublicationReportRepository publishReportRepository) {
+      PublicationReportRepository publishReportRepository,
+      Validator validator) {
 
     this.repository = repository;
     this.documentNumberService = documentNumberService;
@@ -73,6 +79,7 @@ public class DocumentUnitService {
     this.publishService = publishService;
     this.documentUnitStatusService = documentUnitStatusService;
     this.publishReportRepository = publishReportRepository;
+    this.validator = validator;
   }
 
   public Mono<DocumentUnit> generateNewDocumentUnit(DocumentationOffice documentationOffice) {
@@ -434,7 +441,12 @@ public class DocumentUnitService {
         parentDocumentUnitUuid, type);
   }
 
-  public Mono<String> validateSingleNorm(String singleNormStr) {
-    return Mono.just("TODO");
+  public Mono<String> validateSingleNorm(SingleNormValidationInfo singleNormValidationInfo) {
+    Set<ConstraintViolation<SingleNormValidationInfo>> violations =
+        validator.validate(singleNormValidationInfo);
+    if (violations.isEmpty()) {
+      return Mono.just("TODO");
+    }
+    return Mono.just("Validation error");
   }
 }

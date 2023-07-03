@@ -25,6 +25,7 @@ import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -179,11 +180,12 @@ public class DocumentUnitController {
         .onErrorReturn(ResponseEntity.internalServerError().build());
   }
 
-  @GetMapping(value = "/validateSingleNorm/{singleNormStr}")
+  @PostMapping(value = "/validateSingleNorm")
   @PreAuthorize("isAuthenticated()")
-  public Mono<ResponseEntity<String>> validateSingleNorm(@PathVariable String singleNormStr) {
+  public Mono<ResponseEntity<String>> validateSingleNorm(
+      @RequestBody SingleNormValidationInfo singleNormValidationInfo) {
     return service
-        .validateSingleNorm(singleNormStr)
+        .validateSingleNorm(singleNormValidationInfo)
         .map(ResponseEntity::ok)
         .onErrorReturn(ResponseEntity.internalServerError().build());
   }

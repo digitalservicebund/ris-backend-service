@@ -49,3 +49,8 @@ export const normFieldLabels: { [name: string]: string } = {
   dateOfVersion: "Fassungsdatum",
   dateOfRelevance: "Jahr",
 }
+
+export type SingleNormValidationInfo = {
+  singleNormStr: string
+  normAbbreviationStr?: string
+}

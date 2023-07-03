@@ -5,6 +5,7 @@ import httpClient, {
 import DocumentUnit from "@/domain/documentUnit"
 import { DocumentUnitListEntry } from "@/domain/documentUnitListEntry"
 import LinkedDocumentUnit from "@/domain/linkedDocumentUnit"
+import { SingleNormValidationInfo } from "@/domain/normReference"
 import { PageableService, Page } from "@/shared/components/Pagination.vue"
 
 interface DocumentUnitService {
@@ -20,7 +21,7 @@ interface DocumentUnitService {
     LinkedDocumentUnit
   >
   validateSingleNorm(
-    singleNormString: string
+    singleNormValidationInfo: SingleNormValidationInfo
   ): Promise<ServiceResponse<unknown>>
 }
 
@@ -159,9 +160,16 @@ const service: DocumentUnitService = {
     }
   },
 
-  async validateSingleNorm(singleNormString: string) {
-    const response = await httpClient.get(
-      `caselaw/documentunits/validateSingleNorm/${singleNormString}`
+  async validateSingleNorm(singleNormValidationInfo: SingleNormValidationInfo) {
+    const response = await httpClient.post(
+      `caselaw/documentunits/validateSingleNorm`,
+      {
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+      },
+      singleNormValidationInfo
     )
     if (response.status >= 300) {
       response.error = {

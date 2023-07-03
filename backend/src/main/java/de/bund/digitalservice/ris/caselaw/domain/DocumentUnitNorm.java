@@ -7,6 +7,7 @@ import lombok.Builder;
 @Builder(toBuilder = true)
 public record DocumentUnitNorm(
     NormAbbreviation normAbbreviation,
+    // @SingleNormConstraint
     String singleNorm,
     Instant dateOfVersion,
     String dateOfRelevance) {}
