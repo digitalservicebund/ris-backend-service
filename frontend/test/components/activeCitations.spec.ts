@@ -398,7 +398,7 @@ describe("Active Citations", async () => {
     })
 
     expect(
-      screen.getByText("label1, 01.02.2022, documentType1, test fileNumber")
+      screen.getByText("label1, 01.02.2022, test fileNumber, documentType1")
     ).toBeInTheDocument()
     const editButton = screen.getByLabelText("Eintrag bearbeiten")
     await user.click(editButton)
