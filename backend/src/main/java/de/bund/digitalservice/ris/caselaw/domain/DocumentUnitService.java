@@ -3,6 +3,7 @@ package de.bund.digitalservice.ris.caselaw.domain;
 import static de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatus.PUBLISHED;
 import static de.bund.digitalservice.ris.caselaw.domain.ServiceUtils.byteBufferToArray;
 
+import de.bund.digitalservice.ris.caselaw.domain.validator.SingleNormConstraint;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
 import java.io.ByteArrayInputStream;
@@ -441,11 +442,15 @@ public class DocumentUnitService {
   }
 
   public Mono<String> validateSingleNorm(SingleNormValidationInfo singleNormValidationInfo) {
-    Set<ConstraintViolation<SingleNormValidationInfo>> violations =
-        validator.validate(singleNormValidationInfo);
+    Set<ConstraintViolation<SingleNormValidation>> violations =
+        validator.validate(new SingleNormValidation(singleNormValidationInfo));
+
     if (violations.isEmpty()) {
-      return Mono.just("TODO");
+      return Mono.just("Ok");
     }
     return Mono.just("Validation error");
   }
+
+  private record SingleNormValidation(
+      @SingleNormConstraint SingleNormValidationInfo singleNormValidationInfo) {}
 }
