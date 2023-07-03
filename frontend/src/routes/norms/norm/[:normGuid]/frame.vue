@@ -566,7 +566,7 @@ function subjectAreaSummarizer(data: Metadata) {
 
   return [
     fna && `FNA-Nummer ${fna}`,
-    previousFna && `Frühere FNA-Nummber ${previousFna}`,
+    previousFna && `Frühere FNA-Nummer ${previousFna}`,
     gesta && `GESTA-Nummer ${gesta}`,
     bgb3 && `Bundesgesetzblatt Teil III ${bgb3}`,
   ]
