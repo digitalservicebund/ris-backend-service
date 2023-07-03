@@ -45,7 +45,10 @@ function decisionSummarizer(activeCitation: ActiveCitation) {
       ? h("div", { class: ["flex flex-row items-center"] }, [
           h(
             "span",
-            { class: ["material-icons pr-8 text-red-800"] },
+            {
+              "aria-label": "Fehlerhafte Eingabe",
+              class: ["material-icons pr-8 text-red-800"],
+            },
             "error_outline"
           ),
           h(

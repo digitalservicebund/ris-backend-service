@@ -215,19 +215,6 @@ describe("Active Citations", async () => {
     ).toBeInTheDocument()
   })
 
-  it("click on delete icon, deletes the list entry", async () => {
-    const modelValue: ActiveCitation[] = [
-      generateActiveCitation({ fileNumber: "123" }),
-      generateActiveCitation({ fileNumber: "345" }),
-    ]
-    const { user } = renderComponent({ modelValue })
-    const activeCitations = screen.getAllByLabelText("Listen Eintrag")
-    expect(activeCitations.length).toBe(2)
-    const buttonList = screen.getAllByLabelText("Eintrag löschen")
-    await user.click(buttonList[0])
-    expect(screen.getAllByLabelText("Listen Eintrag").length).toBe(1)
-  })
-
   it("renders manually added active citations as editable list item", async () => {
     renderComponent({
       modelValue: [
@@ -370,6 +357,73 @@ describe("Active Citations", async () => {
     expect(screen.getByText(/02.02.2022/)).toBeVisible()
   })
 
+  it("correctly deletes manually added active citations", async () => {
+    const { user } = renderComponent({
+      modelValue: [
+        generateActiveCitation({
+          dataSource: "ACTIVE_CITATION",
+        }),
+        generateActiveCitation({
+          dataSource: "ACTIVE_CITATION",
+        }),
+      ],
+    })
+    const activeCitations = screen.getAllByLabelText("Listen Eintrag")
+    expect(activeCitations.length).toBe(2)
+    const buttonList = screen.getAllByLabelText("Eintrag löschen")
+    await user.click(buttonList[0])
+    expect(screen.getAllByLabelText("Listen Eintrag").length).toBe(1)
+  })
+
+  it("correctly deletes active citations added by search", async () => {
+    const modelValue: ActiveCitation[] = [
+      generateActiveCitation(),
+      generateActiveCitation(),
+    ]
+    const { user } = renderComponent({ modelValue })
+    const activeCitations = screen.getAllByLabelText("Listen Eintrag")
+    expect(activeCitations.length).toBe(2)
+    const buttonList = screen.getAllByLabelText("Eintrag löschen")
+    await user.click(buttonList[0])
+    expect(screen.getAllByLabelText("Listen Eintrag").length).toBe(1)
+  })
+
+  it("correctly updates deleted values in active citations", async () => {
+    const { user } = renderComponent({
+      modelValue: [
+        generateActiveCitation({
+          dataSource: "ACTIVE_CITATION",
+        }),
+      ],
+    })
+
+    expect(
+      screen.getByText("label1, 01.02.2022, documentType1, test fileNumber")
+    ).toBeInTheDocument()
+    const editButton = screen.getByLabelText("Eintrag bearbeiten")
+    await user.click(editButton)
+
+    const fileNumberInput = await screen.findByLabelText(
+      "Aktenzeichen Aktivzitierung"
+    )
+    const courtInput = await screen.findByLabelText("Gericht Aktivzitierung")
+    const documentTypeInput = await screen.findByLabelText(
+      "Dokumenttyp Aktivzitierung"
+    )
+    const decisionDateInput = await screen.findByLabelText(
+      "Entscheidungsdatum Aktivzitierung"
+    )
+
+    await user.clear(fileNumberInput)
+    await user.clear(courtInput)
+    await user.clear(documentTypeInput)
+    await user.clear(decisionDateInput)
+
+    expect(
+      screen.queryByText(/label1, 01.02.2022, documentType1, test fileNumber/)
+    ).not.toBeInTheDocument()
+  })
+
   it("renders from search added active citations as non-editable list item", async () => {
     renderComponent({
       modelValue: [generateActiveCitation()],
@@ -404,5 +458,21 @@ describe("Active Citations", async () => {
     await user.click(screen.getByText(/Weitere Angabe/))
     await user.click(screen.getByLabelText("Nach Entscheidung suchen"))
     expect(screen.getByText(/Bereits hinzugefügt/)).toBeInTheDocument()
+  })
+
+  it("displays error in list and edit component when fields missing", async () => {
+    const modelValue: ActiveCitation[] = [
+      generateActiveCitation({ dataSource: "ACTIVE_CITATION" }),
+    ]
+    const { user } = renderComponent({ modelValue })
+    const editButton = screen.getByLabelText("Eintrag bearbeiten")
+    await user.click(editButton)
+
+    const courtInput = await screen.findByLabelText("Gericht Aktivzitierung")
+    await user.clear(courtInput)
+    await user.click(screen.getByLabelText("Aktivzitierung speichern"))
+    expect(screen.getByLabelText(/Fehlerhafte Eingabe/)).toBeInTheDocument()
+    await user.click(editButton)
+    expect(screen.getAllByText(/Pflichtfeld nicht befüllt/).length).toBe(1)
   })
 })
