@@ -234,14 +234,17 @@ const fieldsMissing = computed(() =>
         <div v-for="(item, index) in publicationLog" :key="index">
           <ExpandableContent
             as-column
-            class="bg-white border-1 border-gray p-10"
+            class="bg-white border-b-1 border-gray-400 border-r-1 p-10"
+            close-icon-name="keyboard_arrow_up"
             :data-set="item"
             :header="
               item.type == PublicationLogEntryType.Html
                 ? 'Juris Protokoll - ' + item.date
                 : 'Xml Email Abgabe - ' + item.date
             "
+            header-class="font-bold"
             :is-expanded="index == 0"
+            open-icon-name="keyboard_arrow_down"
             :title="item.type"
           >
             <!-- eslint-disable vue/no-v-html -->
@@ -251,7 +254,7 @@ const fieldsMissing = computed(() =>
               v-html="item.content"
             />
             <div v-else-if="item.type == PublicationLogEntryType.Xml">
-              <div class="label-section text-gray-900">ÜBER</div>
+              <div class="label-section pt-20 text-gray-900">ÜBER</div>
               <div class="label-02-regular">
                 <div>
                   <span class="label-02-bold">E-Mail an:</span>
@@ -260,6 +263,10 @@ const fieldsMissing = computed(() =>
                 <div>
                   <span class="label-02-bold"> Betreff: </span>
                   {{ item.mailSubject }}
+                </div>
+                <div>
+                  <span class="label-02-bold">Status:</span>
+                  {{ item.publishStateDisplayText }}
                 </div>
               </div>
               <div class="label-section text-gray-900">ALS</div>

@@ -3,6 +3,7 @@ import { computed, ref, watch } from "vue"
 
 interface Props {
   header?: string
+  headerClass?: string
   isExpanded?: boolean
   openIconName?: string
   closeIconName?: string
@@ -18,6 +19,7 @@ const props = withDefaults(defineProps<Props>(), {
   openIconName: "add",
   closeIconName: "horizontal_rule",
   headerId: "",
+  headerClass: "",
 })
 
 const emit = defineEmits<Emits>()
@@ -53,7 +55,7 @@ watch(localIsExpanded, () => emit("update:isExpanded", localIsExpanded.value))
       @click="toggleContentVisibility"
     >
       <slot name="header">
-        <span>{{ header }}</span>
+        <span :class="headerClass">{{ header }}</span>
       </slot>
 
       <span :aria-label="ariaLabel" class="icon material-icons">{{
