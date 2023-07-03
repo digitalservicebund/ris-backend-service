@@ -203,7 +203,7 @@ onMounted(() => {
       <InputField
         id="activeCitationFileNumber"
         v-slot="slotProps"
-        label="Aktenzeichen"
+        label="Aktenzeichen *"
         :validation-error="
           validationErrors?.find((err) => err.field === 'fileNumber')
             ?.defaultMessage
@@ -214,7 +214,7 @@ onMounted(() => {
           v-model="activeCitation.fileNumber"
           aria-label="Aktenzeichen Aktivzitierung"
           :has-error="slotProps.hasError"
-          placeholder="Aktenzeichen *"
+          placeholder="Aktenzeichen"
         ></TextInput>
       </InputField>
       <InputField id="activeCitationDecisionDocumentType" label="Dokumenttyp">

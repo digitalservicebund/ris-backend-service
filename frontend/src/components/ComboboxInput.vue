@@ -40,8 +40,12 @@ const ariaLabelDropdownIcon = computed(() =>
 
 const conditionalClasses = computed(() =>
   props.hasError
-    ? "border-red-800 bg-red-200 focus:shadow-red-800"
+    ? "border-red-800 bg-red-200 focus:shadow-red-800 placeholder-black"
     : "bg-white border-blue-800 focus:shadow-blue-800 h-[3.75rem] hover:shadow-blue-800"
+)
+
+const placeholderColor = computed(() =>
+  props.hasError ? "placeholder-black" : ""
 )
 
 const toggleDropdown = async () => {
@@ -205,6 +209,7 @@ export type InputModelProps =
           :aria-label="ariaLabel"
           autocomplete="off"
           class="bg-transparent focus:outline-none w-full"
+          :class="placeholderColor"
           :placeholder="placeholder"
           :readonly="false"
           tabindex="0"

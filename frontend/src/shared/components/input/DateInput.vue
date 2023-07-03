@@ -50,7 +50,8 @@ const hasError = computed(
 )
 
 const conditionalClasses = computed(() => ({
-  "border-red-800 bg-red-200": props.hasError || hasError.value,
+  "border-red-800 bg-red-200 placeholder-black":
+    props.hasError || hasError.value,
 }))
 
 function validateInput() {

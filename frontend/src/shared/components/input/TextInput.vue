@@ -63,7 +63,7 @@ defineExpose({ focusInput })
 <style lang="scss" scoped>
 .input {
   &__error {
-    @apply border-red-800 outline-red-800 bg-red-200;
+    @apply border-red-800 outline-red-800 bg-red-200 placeholder-black;
 
     &:autofill {
       @apply shadow-error text-inherit;
