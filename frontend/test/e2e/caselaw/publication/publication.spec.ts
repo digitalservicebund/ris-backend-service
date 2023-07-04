@@ -142,7 +142,7 @@ test.describe("ensuring the publishing of documentunits works as expected", () =
       { clickSaveButton: true }
     )
 
-    expect(await page.inputValue("[aria-label='Gericht']")).toBe("AG Aalen")
+    await expect(page).toHaveValue("[aria-label='Gericht']", "AG Aalen")
 
     await navigateToPublication(page, documentNumber)
     await expect(page.locator("li:has-text('Aktenzeichen')")).toBeHidden()
@@ -191,9 +191,9 @@ test.describe("ensuring the publishing of documentunits works as expected", () =
         await page
           .locator("[aria-label='Entscheidungsdatum']")
           .fill("03.02.2022")
-        expect(
-          await page.locator("[aria-label='Entscheidungsdatum']").inputValue()
-        ).toBe("03.02.2022")
+        await expect(
+          page.locator("[aria-label='Entscheidungsdatum']")
+        ).toHaveValue("03.02.2022")
         await page.keyboard.press("Tab")
       },
       page,
@@ -204,9 +204,7 @@ test.describe("ensuring the publishing of documentunits works as expected", () =
       async () => {
         await page.locator("[aria-label='Gericht']").fill("vgh mannheim")
         await page.locator("text=VGH Mannheim").click()
-        expect(await page.inputValue("[aria-label='Gericht']")).toBe(
-          "VGH Mannheim"
-        )
+        await expect(page).toHaveValue("[aria-label='Gericht']", "VGH Mannheim")
       },
       page,
       { clickSaveButton: true, reload: true }
