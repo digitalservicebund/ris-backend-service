@@ -69,8 +69,9 @@ testWithImportedNorm(
         // Our fixtures contain dates in the format a user would use (ie. DD.MM.YYYY),
         // so we need to convert them back into the format required by the XML.
         let announcementDate = ""
-        if (norm.announcementDate) {
-          const [day, month, year] = norm.announcementDate.split(".")
+        if (norm.metadataSections?.ANNOUNCEMENT_DATE?.[0]?.DATE?.[0]) {
+          const [day, month, year] =
+            norm.metadataSections?.ANNOUNCEMENT_DATE?.[0]?.DATE?.[0].split(".")
           announcementDate = `${year}-${month}-${day}`
         }
 
@@ -83,7 +84,9 @@ testWithImportedNorm(
       xmlDOM.window.document
         .querySelector("akn\\:FRBRnumber")
         ?.getAttribute("value")
-    ).toBe(`s${norm.printAnnouncementPage}`)
+    ).toBe(
+      `s${norm.metadataSections?.OFFICIAL_REFERENCE?.[0]?.PRINT_ANNOUNCEMENT?.[0]?.PAGE?.[0]}`
+    )
 
     // eslint-disable-next-line jest-dom/prefer-to-have-attribute
     expect(
