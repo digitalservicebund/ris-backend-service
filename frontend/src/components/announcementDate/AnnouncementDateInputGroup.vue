@@ -76,7 +76,7 @@ const yearValue = computed({
     <div class="flex gap-96 mb-24">
       <label class="form-control">
         <input
-          id="announcementDate"
+          id="announcementDateSelection"
           v-model="selectedInputType"
           aria-label="Wählen Sie ein Datum"
           name="announcementDateSelection"
@@ -87,7 +87,7 @@ const yearValue = computed({
       </label>
       <label class="form-control">
         <input
-          id="announcementYear"
+          id="announcementYearSelection"
           v-model="selectedInputType"
           aria-label="Wählen Sie ein Jahr"
           name="announcementDateSelection"

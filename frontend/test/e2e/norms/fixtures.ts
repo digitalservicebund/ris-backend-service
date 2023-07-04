@@ -891,7 +891,7 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
       fields: [
         {
           type: FieldType.RADIO,
-          id: "announcementDate",
+          id: "announcementDateSelection",
           label: "Datum",
           values: [
             norm.metadataSections?.ANNOUNCEMENT_DATE?.some(
@@ -917,7 +917,7 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
         },
         {
           type: FieldType.RADIO,
-          id: "announcementYear",
+          id: "announcementYearSelection",
           label: "Jahresangabe",
           values: norm.metadataSections?.ANNOUNCEMENT_DATE?.map(
             (section) => !!section?.YEAR
