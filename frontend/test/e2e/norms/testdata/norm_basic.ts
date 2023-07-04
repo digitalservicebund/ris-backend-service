@@ -188,6 +188,14 @@ export const normData: NormData = {
         ],
       },
       {
+        STATUS: [
+          {
+            NOTE: ["Zuletzt geändert durch Art. 7"],
+            DESCRIPTION: ["Art. 7"],
+          },
+        ],
+      },
+      {
         REISSUE: [
           {
             NOTE: ["Neufassung durch Art. 35 v. 15.7.1999 I 3249"],
