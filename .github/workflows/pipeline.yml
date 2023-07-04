@@ -7,6 +7,9 @@ on:
     branches: [main]
   # Allow to run this workflow manually
   workflow_dispatch:
+  schedule:
+    # 2pm UTC is 4pm in Berlin (with daylight saving)
+    - cron: "0 14 * * *"
 
 env:
   RUN_ID: ${{ github.run_id }}
@@ -777,15 +780,24 @@ jobs:
       mode: ${{ matrix.mode }}
     secrets: inherit
 
+  deployment-time-check:
+    runs-on: ubuntu-latest
+    outputs:
+      after-4pm: ${{ steps.check-time.outputs.after-4pm }}
+    steps:
+      - id: check-time
+        run: echo "after-4pm=$(if [ $(TZ="Europe/Berlin" date +'%H') -lt 16 ]; then echo 'false'; else echo 'true'; fi)" >> "$GITHUB_OUTPUT"
+
   deploy-production:
     runs-on: ubuntu-latest
-    if: ${{ false }}
+    if: ${{ github.ref == 'refs/heads/main' && needs.deployment-time-check.outputs.after-4pm == 'true' }}
     concurrency: deploy-production
     environment: production
     needs:
       - push-frontend-image-to-registry
       - push-backend-image-to-registry
       - e2e-tests
+      - deployment-time-check
     permissions:
       id-token: write # Enable OIDC for gitsign
     steps:
