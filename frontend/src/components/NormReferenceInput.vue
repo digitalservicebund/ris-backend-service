@@ -22,7 +22,7 @@ const emit = defineEmits<Emits>()
 
 const validationErrors = ref<ValidationError[]>()
 
-const norm = ref(props.modelValue as NormReference)
+const norm = ref((props.modelValue as NormReference) ?? {})
 
 const normAbbreviation = computed({
   get: () =>
@@ -53,7 +53,7 @@ onMounted(async () => {
 })
 
 async function validateSingleNorm() {
-  if (norm.value.singleNorm) {
+  if (norm.value?.singleNorm) {
     const singleNormValidationInfo: SingleNormValidationInfo = {
       singleNorm: norm.value.singleNorm,
       normAbbreviation: norm.value.normAbbreviation?.abbreviation,
@@ -79,8 +79,7 @@ async function addNormReference() {
 }
 
 onMounted(() => {
-  console.log("onMounted")
-  norm.value = props.modelValue as NormReference
+  norm.value = (props.modelValue as NormReference) ?? {}
   validateSingleNorm()
 })
 </script>
