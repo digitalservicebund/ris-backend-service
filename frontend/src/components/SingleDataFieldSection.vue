@@ -15,16 +15,15 @@ interface Props {
   readonly?: boolean
 }
 
-interface Emits {
-  (event: "update:modelValue", value: ModelType): void
-}
-
 const props = withDefaults(defineProps<Props>(), {
   type: InputType.TEXT,
   readonly: false,
 })
 
-const emit = defineEmits<Emits>()
+const emit = defineEmits<{
+  "update:modelValue": [value: ModelType]
+}>()
+
 const value = ref(props.modelValue)
 
 const inputAttributes = computed(

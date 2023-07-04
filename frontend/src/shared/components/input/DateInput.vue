@@ -14,13 +14,12 @@ interface Props {
   hasError?: boolean
 }
 
-interface Emits {
-  (event: "update:modelValue", value?: string): void
-  (event: "update:validationError", value?: ValidationError): void
-}
-
 const props = defineProps<Props>()
-const emit = defineEmits<Emits>()
+
+const emit = defineEmits<{
+  "update:modelValue": [value?: string]
+  "update:validationError": [value?: ValidationError]
+}>()
 
 const inputCompleted = ref<boolean>(false)
 const inputValue = ref(

@@ -12,13 +12,12 @@ import TextInput from "@/shared/components/input/TextInput.vue"
 import { ValidationError } from "@/shared/components/input/types"
 import YearInput from "@/shared/components/input/YearInput.vue"
 
-interface Emits {
-  (event: "update:modelValue", value: NormReference): void
-  (event: "closeEntry"): void
-}
-
 const props = defineProps<{ modelValue?: NormReference }>()
-const emit = defineEmits<Emits>()
+
+const emit = defineEmits<{
+  "update:modelValue": [value: NormReference]
+  closeEntry: [void]
+}>()
 
 const validationErrors = ref<ValidationError[]>()
 

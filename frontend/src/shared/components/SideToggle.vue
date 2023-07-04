@@ -7,18 +7,16 @@ interface Props {
   label?: string
 }
 
-interface Emits {
-  (event: "update:isExpanded", value: boolean): void
-  (event: "toggle"): void
-}
-
 const props = withDefaults(defineProps<Props>(), {
   isExpanded: false,
   openingDirection: OpeningDirection.RIGHT,
   label: "side toggle",
 })
 
-const emit = defineEmits<Emits>()
+const emit = defineEmits<{
+  "update:isExpanded": [value: boolean]
+  toggle: [void]
+}>()
 
 const localIsExpanded = ref(false)
 

@@ -17,16 +17,12 @@ interface Props {
   selectedInputType: string
 }
 
-interface Emits {
-  (event: "update:dateValue", value: string): void
-  (
-    event: "update:undefinedDateStateValue",
-    value: UndefinedDate | undefined
-  ): void
-}
-
 const props = defineProps<Props>()
-defineEmits<Emits>()
+
+defineEmits<{
+  "update:dateValue": [value: string]
+  "update:undefinedDateStateValue": [value?: UndefinedDate]
+}>()
 
 const undefineDateValue = ref(props.undefinedDateStateValue)
 const dateValue = ref(props.dateValue)

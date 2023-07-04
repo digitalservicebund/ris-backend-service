@@ -8,17 +8,15 @@ interface Props {
   iconClosing?: string
 }
 
-interface Emits {
-  (event: "update:isExpanded", value: boolean): void
-}
-
 const props = withDefaults(defineProps<Props>(), {
   isExpanded: false,
   iconExpanding: "add",
   iconClosing: "horizontal_rule",
 })
 
-const emit = defineEmits<Emits>()
+const emit = defineEmits<{
+  "update:isExpanded": [value: boolean]
+}>()
 
 const expandableContainer = ref()
 const containerHeight = ref(0)

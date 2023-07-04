@@ -14,10 +14,6 @@ type Props = {
   rows?: number
 }
 
-interface Emits {
-  (event: "update:modelValue", value: string): void
-}
-
 const props = withDefaults(defineProps<Props>(), {
   placeholder: "",
   validationError: undefined,
@@ -27,7 +23,9 @@ const props = withDefaults(defineProps<Props>(), {
   rows: 1,
 })
 
-const emit = defineEmits<Emits>()
+const emit = defineEmits<{
+  "update:modelValue": [value: string]
+}>()
 
 const localValue = computed({
   get() {

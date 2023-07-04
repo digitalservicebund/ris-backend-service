@@ -17,16 +17,14 @@ interface Props {
   validationErrors?: ValidationError[]
 }
 
-interface Emits {
-  (event: "update:modelValue", value: InputValues): void
-}
-
 const props = withDefaults(defineProps<Props>(), {
   columnCount: 1,
   validationErrors: undefined,
 })
 
-const emit = defineEmits<Emits>()
+const emit = defineEmits<{
+  "update:modelValue": [value: InputValues]
+}>()
 
 /*
  * As the gap is more versatile than margins/paddings, but does not get

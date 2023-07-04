@@ -8,12 +8,11 @@ interface Props {
   modelValue: MetadataSections
 }
 
-interface Emits {
-  (event: "update:modelValue", value: MetadataSections): void
-}
-
 const props = defineProps<Props>()
-const emit = defineEmits<Emits>()
+
+const emit = defineEmits<{
+  "update:modelValue": [value: MetadataSections]
+}>()
 
 type ChildSectionName =
   | MetadataSectionName.STATUS // Status + Reissue share the same component

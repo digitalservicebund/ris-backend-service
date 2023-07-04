@@ -9,15 +9,13 @@ interface Props {
   type: MetadataSectionName.REPEAL | MetadataSectionName.OTHER_STATUS
 }
 
-interface Emits {
-  (event: "update:modelValue", value: Metadata): void
-}
-
 const props = withDefaults(defineProps<Props>(), {
   type: MetadataSectionName.REPEAL,
 })
 
-const emit = defineEmits<Emits>()
+const emit = defineEmits<{
+  "update:modelValue": [value: Metadata]
+}>()
 
 const inputValue = ref(props.modelValue)
 

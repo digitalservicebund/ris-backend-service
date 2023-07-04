@@ -9,10 +9,6 @@ interface Props {
   closeIconName?: string
   headerId?: string
 }
-
-interface Emits {
-  (event: "update:isExpanded", value: boolean): void
-}
 const props = withDefaults(defineProps<Props>(), {
   header: undefined,
   isExpanded: false,
@@ -22,7 +18,9 @@ const props = withDefaults(defineProps<Props>(), {
   headerClass: "",
 })
 
-const emit = defineEmits<Emits>()
+const emit = defineEmits<{
+  "update:isExpanded": [value: boolean]
+}>()
 
 const localIsExpanded = ref(false)
 

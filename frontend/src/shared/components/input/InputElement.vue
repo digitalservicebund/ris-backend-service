@@ -26,11 +26,6 @@ interface Props {
   disableError?: boolean
 }
 
-interface Emits {
-  (event: "update:modelValue", value: ModelType): void
-  (event: "update:validationError", value: ValidationError | undefined): void
-}
-
 const props = withDefaults(defineProps<Props>(), {
   type: InputType.TEXT,
   modelValue: undefined,
@@ -38,7 +33,10 @@ const props = withDefaults(defineProps<Props>(), {
   disableError: false,
 })
 
-const emit = defineEmits<Emits>()
+const emit = defineEmits<{
+  "update:modelValue": [value: ModelType]
+  "update:validationError": [value: ValidationError | undefined]
+}>()
 
 const fallthroughAttributes = useAttrs()
 const combinedAttributes = computed(() => ({

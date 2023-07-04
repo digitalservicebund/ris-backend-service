@@ -11,13 +11,13 @@ interface Props {
   validationErrors?: ValidationError[]
 }
 
-interface Emits {
-  (event: "updateDocumentUnit"): void
-  (event: "update:modelValue", value: CoreData): void
-}
-
 const props = defineProps<Props>()
-const emit = defineEmits<Emits>()
+
+const emit = defineEmits<{
+  updateDocumentUnit: [void]
+  "update:modelValue": [value: CoreData]
+}>()
+
 const { modelValue } = toRefs(props)
 
 const values = useTransformNestedData(modelValue, coreDataFields, emit)

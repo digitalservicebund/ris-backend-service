@@ -6,11 +6,6 @@ import {
   ComboboxItem,
 } from "@/shared/components/input/types"
 
-interface Emits {
-  (event: "update:modelValue", value: ComboboxInputModelType | undefined): void
-  (event: "input", value: Event): void
-}
-
 const props = defineProps<{
   id: string
   itemService: ComboboxAttributes["itemService"]
@@ -21,7 +16,10 @@ const props = defineProps<{
   hasError?: boolean
 }>()
 
-const emit = defineEmits<Emits>()
+const emit = defineEmits<{
+  "update:modelValue": [value?: ComboboxInputModelType]
+  input: [value: Event]
+}>()
 
 const NO_MATCHING_ENTRY = "Kein passender Eintrag"
 

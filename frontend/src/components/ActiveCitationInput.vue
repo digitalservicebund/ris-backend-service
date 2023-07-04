@@ -16,16 +16,16 @@ import TextInput from "@/shared/components/input/TextInput.vue"
 import { ValidationError } from "@/shared/components/input/types"
 import Pagination, { Page } from "@/shared/components/Pagination.vue"
 
-interface Emits {
-  (event: "update:modelValue", value: ActiveCitation): void
-  (event: "closeEntry"): void
-}
-
 const props = defineProps<{
   modelValue?: ActiveCitation
   modelValueList?: ActiveCitation[]
 }>()
-const emit = defineEmits<Emits>()
+
+const emit = defineEmits<{
+  "update:modelValue": [value: ActiveCitation]
+  closeEntry: [void]
+}>()
+
 const activeCitation = ref(props.modelValue as ActiveCitation)
 const validationErrors = ref<ValidationError[]>()
 const searchRunning = ref(false)

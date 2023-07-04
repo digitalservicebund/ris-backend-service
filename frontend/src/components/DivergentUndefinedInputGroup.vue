@@ -12,17 +12,16 @@ interface Props {
   sectionName: MetadataSectionName
 }
 
-interface Emits {
-  (event: "update:modelValue", value: Metadata): void
-}
-
 interface DropdownItem {
   label: string
   value: string
 }
 
 const props = defineProps<Props>()
-const emit = defineEmits<Emits>()
+
+const emit = defineEmits<{
+  "update:modelValue": [value: Metadata]
+}>()
 
 const inputValue = ref(props.modelValue)
 

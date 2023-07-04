@@ -7,12 +7,11 @@ import TextInput from "@/shared/components/input/TextInput.vue"
 interface Props {
   modelValue: Metadata
 }
-
-interface Emits {
-  (event: "update:modelValue", value: Metadata): void
-}
 const props = defineProps<Props>()
-const emit = defineEmits<Emits>()
+
+const emit = defineEmits<{
+  "update:modelValue": [value: Metadata]
+}>()
 
 const inputValue = ref(props.modelValue)
 

@@ -10,12 +10,11 @@ interface Props {
   label: string
 }
 
-interface Emits {
-  (event: "update:modelValue", value: Metadata): void
-}
-
 const props = defineProps<Props>()
-const emit = defineEmits<Emits>()
+
+const emit = defineEmits<{
+  "update:modelValue": [value: Metadata]
+}>()
 
 enum InputType {
   DATE = "date",

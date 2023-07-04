@@ -15,11 +15,12 @@ interface Props {
   suggestions: SuggestionGroupOptions[]
   label: string
 }
-interface Emits {
-  (event: "update:modelValue", value: Segment[]): void
-}
 const props = defineProps<Props>()
-const emit = defineEmits<Emits>()
+
+const emit = defineEmits<{
+  "update:modelValue": [value: Segment[]]
+}>()
+
 const suggestionExtensions = props.suggestions.map((options) =>
   createSuggestionExtension(options)
 )

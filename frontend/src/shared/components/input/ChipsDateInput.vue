@@ -6,7 +6,11 @@ import { ref, watch, computed } from "vue"
 import { ValidationError } from "@/shared/components/input/types"
 
 const props = defineProps<Props>()
-const emit = defineEmits<Emits>()
+const emit = defineEmits<{
+  "update:modelValue": [value?: string[]]
+  "update:validationError": [value?: ValidationError]
+  input: [value: Event]
+}>()
 
 interface Props {
   id: string
@@ -16,12 +20,6 @@ interface Props {
   placeholder?: string
   isFutureDate?: boolean
   validationError?: ValidationError
-}
-
-interface Emits {
-  (event: "update:modelValue", value?: string[]): void
-  (event: "update:validationError", value?: ValidationError): void
-  (event: "input", value: Event): void
 }
 
 const chips = ref<string[]>(props.modelValue ?? [])

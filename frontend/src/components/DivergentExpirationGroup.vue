@@ -7,7 +7,11 @@ import { Metadata, MetadataSectionName, MetadataSections } from "@/domain/Norm"
 import { useLoadedNormStore } from "@/stores/loadedNorm"
 
 const props = defineProps<Props>()
-const emit = defineEmits<Emits>()
+
+const emit = defineEmits<{
+  "update:modelValue": [value: MetadataSections]
+}>()
+
 const store = useLoadedNormStore()
 const { loadedNorm } = storeToRefs(store)
 
@@ -21,10 +25,6 @@ const isDivergentExpirationUndefined = computed(() => {
 
 interface Props {
   modelValue: MetadataSections
-}
-
-interface Emits {
-  (event: "update:modelValue", value: MetadataSections): void
 }
 
 type ChildSectionName =

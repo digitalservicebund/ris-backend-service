@@ -13,11 +13,6 @@ interface Props {
   noHorizontalSeparators?: boolean
 }
 
-interface Emits {
-  (event: "update:modelValue", value: T[]): void
-  (event: "deleteLastEntry"): void
-}
-
 const props = withDefaults(defineProps<Props>(), {
   summaryComponent: DataSetSummary,
   modelValue: () => [],
@@ -26,7 +21,10 @@ const props = withDefaults(defineProps<Props>(), {
   noHorizontalSeparators: false,
 })
 
-const emit = defineEmits<Emits>()
+const emit = defineEmits<{
+  "update:modelValue": [value: T[]]
+  deleteLastEntry: [void]
+}>()
 
 const modelValueList = ref<T[]>([]) as Ref<T[]>
 const elementList = ref<HTMLElement[]>([])
