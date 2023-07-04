@@ -112,6 +112,9 @@ fun createSectionsForDocumentStatus(
         if (documentStatusGroup.documentStatusDateYear != null) {
             metadata.add(Metadatum(documentStatusGroup.documentStatusDateYear, MetadatumType.YEAR))
         }
+        if (documentStatusGroup.documentStatusReference != null) {
+            metadata.add(Metadatum(documentStatusGroup.documentStatusReference, MetadatumType.REFERENCE))
+        }
         if (metadata.isNotEmpty()) {
             val childSection = MetadataSection(MetadataSectionName.DOCUMENT_STATUS, metadata)
             val parentSection = MetadataSection(MetadataSectionName.DOCUMENT_STATUS_SECTION, emptyList(), index + raiseOrder, sections = listOf(childSection))
