@@ -81,11 +81,12 @@ private fun extractDocumentStatus(norm: Norm): List<DocumentStatus> = norm
     .filter { it.name == Section.DOCUMENT_STATUS }
     .map { section ->
         val date = section.metadata.find { it.type == MetadatumType.DATE }?.let { found -> encodeLocalDate(found.value as LocalDate) }
-        val year = section.metadata.find { it.type == MetadatumType.YEAR }?.value.toString()
+        val year = section.metadata.find { it.type == MetadatumType.YEAR }?.let { it.value.toString() }
         DocumentStatus(
-            listOf(section.metadata.find { it.type == MetadatumType.WORK_NOTE }?.value.toString()),
-            section.metadata.find { it.type == MetadatumType.DESCRIPTION }?.value.toString(),
+            section.metadata.filter { it.type == MetadatumType.WORK_NOTE }.mapNotNull { it.value.toString() },
+            section.metadata.find { it.type == MetadatumType.DESCRIPTION }?.let { it.value.toString() },
             date ?: year,
+            section.metadata.find { it.type == MetadatumType.REFERENCE }?.let { it.value.toString() },
         )
     }
 private fun extractDocumentTextProof(norm: Norm): String? {

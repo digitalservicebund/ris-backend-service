@@ -540,9 +540,11 @@ class ToJurisMapperTest {
                         Section(
                             MetadataSectionName.DOCUMENT_STATUS,
                             listOf(
-                                Metadatum("documentStatusNote", MetadatumType.WORK_NOTE),
+                                Metadatum("documentStatusNote1", MetadatumType.WORK_NOTE),
+                                Metadatum("documentStatusNote2", MetadatumType.WORK_NOTE),
                                 Metadatum("documentStatusDescription", MetadatumType.DESCRIPTION),
                                 Metadatum(LocalDate.parse("2010-03-04"), MetadatumType.DATE),
+                                Metadatum("documentStatusReference", MetadatumType.REFERENCE),
                             ),
                         ),
                     ),
@@ -727,9 +729,12 @@ class ToJurisMapperTest {
 
         assertThat(normData.documentTextProof).isEqualTo("Textnachweis ab: 26.10.2001")
         assertThat(normData.documentStatus).hasSize(1)
-        assertThat(normData.documentStatus[0].documentStatusWorkNote[0]).isEqualTo("documentStatusNote")
+        assertThat(normData.documentStatus[0].documentStatusWorkNote).hasSize(2)
+        assertThat(normData.documentStatus[0].documentStatusWorkNote[0]).isEqualTo("documentStatusNote1")
+        assertThat(normData.documentStatus[0].documentStatusWorkNote[1]).isEqualTo("documentStatusNote2")
         assertThat(normData.documentStatus[0].documentStatusDescription).isEqualTo("documentStatusDescription")
         assertThat(normData.documentStatus[0].documentStatusDateYear).isEqualTo("2010-03-04")
+        assertThat(normData.documentStatus[0].documentStatusReference).isEqualTo("documentStatusReference")
 
         assertThat(normData.announcementDate).isEqualTo("2022-01-07")
     }

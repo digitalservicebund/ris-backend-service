@@ -333,7 +333,7 @@ export const normData: NormData = {
         DOCUMENT_STATUS: [
           {
             WORK_NOTE: ["PRÄTEXT(2)"],
-            DESCRIPTION: ["BGBl I 2014, 610"],
+            DESCRIPTION: ["BGBl I"],
             YEAR: ["2014"],
             REFERENCE: ["610"],
           },
@@ -343,7 +343,7 @@ export const normData: NormData = {
         DOCUMENT_STATUS: [
           {
             WORK_NOTE: ["PRÄTEXT(16)"],
-            DESCRIPTION: ["BGBl I 2008, 561"],
+            DESCRIPTION: ["BGBl I"],
             YEAR: ["2008"],
             REFERENCE: ["561"],
           },
