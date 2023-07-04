@@ -116,13 +116,7 @@ class NormsService(
     @Transactional(transactionManager = "connectionFactoryTransactionManager")
     override fun editNorm(command: EditNormOutputPort.Command): Mono<Boolean> {
         val normDto = normToDto(command.norm)
-        normDto.newEntry = false
-
-        val saveNormRequest = normsRepository.save(normDto).cache()
-
-        val updateMetadataRequest = saveNormRequest.flatMapMany { normDtoSaved -> saveNormSectionsWithMetadata(command.norm, normDtoSaved) }
-
-        return Mono.`when`(saveNormRequest, updateMetadataRequest).thenReturn(true)
+        return Mono.`when`(saveNormSectionsWithMetadata(command.norm, normDto)).thenReturn(true)
     }
 
     @Transactional(transactionManager = "connectionFactoryTransactionManager")
