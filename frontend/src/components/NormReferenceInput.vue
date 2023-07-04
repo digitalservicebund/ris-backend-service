@@ -12,20 +12,17 @@ import TextInput from "@/shared/components/input/TextInput.vue"
 import { ValidationError } from "@/shared/components/input/types"
 import YearInput from "@/shared/components/input/YearInput.vue"
 
+interface Emits {
+  (event: "update:modelValue", value: NormReference): void
+  (event: "closeEntry"): void
+}
+
 const props = defineProps<{ modelValue?: NormReference }>()
-const emit =
-  defineEmits<(e: "update:modelValue", value: NormReference) => void>()
+const emit = defineEmits<Emits>()
 
 const validationErrors = ref<ValidationError[]>()
 
-const norm = computed({
-  get() {
-    return (props.modelValue as NormReference) ?? {}
-  },
-  set(value) {
-    emit("update:modelValue", value)
-  },
-})
+const norm = ref(props.modelValue as NormReference)
 
 const normAbbreviation = computed({
   get: () =>
@@ -73,6 +70,19 @@ async function validateSingleNorm() {
     }
   }
 }
+
+async function addNormReference() {
+  const normRef = new NormReference({ ...norm.value })
+  validateSingleNorm()
+  emit("update:modelValue", normRef)
+  emit("closeEntry")
+}
+
+onMounted(() => {
+  console.log("onMounted")
+  norm.value = props.modelValue as NormReference
+  validateSingleNorm()
+})
 </script>
 
 <template>
@@ -135,7 +145,7 @@ async function validateSingleNorm() {
       aria-label="Norm speichern"
       class="mr-28"
       label="Übernehmen"
-      @click="validateSingleNorm"
+      @click="addNormReference"
     />
   </div>
 </template>
