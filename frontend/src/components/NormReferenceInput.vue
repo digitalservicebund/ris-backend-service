@@ -21,7 +21,14 @@ const emit = defineEmits<{
 
 const validationErrors = ref<ValidationError[]>()
 
-const norm = ref((props.modelValue as NormReference) ?? {})
+const norm = computed({
+  get() {
+    return (props.modelValue as NormReference) ?? {}
+  },
+  set(value) {
+    emit("update:modelValue", value)
+  },
+})
 
 const normAbbreviation = computed({
   get: () =>
