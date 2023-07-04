@@ -1,17 +1,22 @@
 <script lang="ts" setup>
 import { computed, onMounted, ref } from "vue"
 import ComboboxInput from "@/components/ComboboxInput.vue"
-import NormReference from "@/domain/normReference"
+import NormReference, { SingleNormValidationInfo } from "@/domain/normReference"
 import ComboboxItemService from "@/services/comboboxItemService"
+import documentUnitService from "@/services/documentUnitService"
 import FeatureToggleService from "@/services/featureToggleService"
 import DateInput from "@/shared/components/input/DateInput.vue"
 import InputField from "@/shared/components/input/InputField.vue"
+import TextButton from "@/shared/components/input/TextButton.vue"
 import TextInput from "@/shared/components/input/TextInput.vue"
+import { ValidationError } from "@/shared/components/input/types"
 import YearInput from "@/shared/components/input/YearInput.vue"
 
 const props = defineProps<{ modelValue?: NormReference }>()
 const emit =
   defineEmits<(e: "update:modelValue", value: NormReference) => void>()
+
+const validationErrors = ref<ValidationError[]>()
 
 const norm = computed({
   get() {
@@ -49,6 +54,25 @@ onMounted(async () => {
   )
   disableRisAbbreviationInput.value = !!response.data
 })
+
+async function validateSingleNorm() {
+  if (norm.value.singleNorm) {
+    const singleNormValidationInfo: SingleNormValidationInfo = {
+      singleNorm: norm.value.singleNorm,
+      normAbbreviation: norm.value.normAbbreviation?.abbreviation,
+    }
+    const response = await documentUnitService.validateSingleNorm(
+      singleNormValidationInfo
+    )
+    validationErrors.value = []
+    if (response.data !== "Ok") {
+      validationErrors.value?.push({
+        defaultMessage: "Inhalt nicht valide",
+        field: "singleNorm",
+      })
+    }
+  }
+}
 </script>
 
 <template>
@@ -76,11 +100,20 @@ onMounted(async () => {
       </ComboboxInput>
     </InputField>
     <div class="flex gap-24 justify-between">
-      <InputField id="norm-reference-abbreviation-field" label="Einzelnorm">
+      <InputField
+        id="norm-reference-singleNorm-field"
+        v-slot="slotProps"
+        label="Einzelnorm"
+        :validation-error="
+          validationErrors?.find((err) => err.field === 'singleNorm')
+            ?.defaultMessage
+        "
+      >
         <TextInput
           id="norm-reference-singleNorm"
           v-model="norm.singleNorm"
           aria-label="Norm Einzelnorm"
+          :has-error="slotProps.hasError"
         ></TextInput>
       </InputField>
       <InputField id="norm-date-of-version" label="Fassungsdatum">
@@ -98,5 +131,11 @@ onMounted(async () => {
         />
       </InputField>
     </div>
+    <TextButton
+      aria-label="Norm speichern"
+      class="mr-28"
+      label="Übernehmen"
+      @click="validateSingleNorm"
+    />
   </div>
 </template>

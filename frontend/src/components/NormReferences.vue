@@ -1,11 +1,9 @@
 <script lang="ts" setup>
 import { computed, h } from "vue"
-import ExpandableDataSet from "@/components/ExpandableDataSet.vue"
 import NormReferenceInput from "@/components/NormReferenceInput.vue"
-import NormReference, { SingleNormValidationInfo } from "@/domain/normReference"
-import documentUnitService from "@/services/documentUnitService"
+import NormReference from "@/domain/normReference"
 import { withSummarizer } from "@/shared/components/DataSetSummary.vue"
-import EditableList from "@/shared/components/EditableList.vue"
+import EditableList from "@/shared/components/EditableListCaselaw.vue"
 
 const props = defineProps<{
   modelValue: NormReference[] | undefined
@@ -31,38 +29,19 @@ function decisionSummarizer(normEntry: NormReference) {
 }
 
 const NormsSummary = withSummarizer(decisionSummarizer)
-
-async function validateSingleNorm() {
-  if (props.modelValue) {
-    const latestNormReference = props.modelValue[props.modelValue.length - 1]
-    if (latestNormReference.singleNorm) {
-      const singleNormValidationInfo: SingleNormValidationInfo = {
-        singleNorm: latestNormReference.singleNorm,
-        normAbbreviation: undefined,
-      }
-      const response = await documentUnitService.validateSingleNorm(
-        singleNormValidationInfo
-      )
-      console.log("response", response)
-    }
-  }
-}
 </script>
-
 <template>
-  <ExpandableDataSet
-    id="normReferences"
-    as-column
-    :data-set="norms"
-    :summary-component="NormsSummary"
-    title="Normen"
-    @done-button-clicked="validateSingleNorm"
-  >
-    <EditableList
-      v-model="norms"
-      :default-value="defaultValue"
-      :edit-component="NormReferenceInput"
-      :summary-component="NormsSummary"
-    />
-  </ExpandableDataSet>
+  <div class="bg-white p-16">
+    <h2 id="norms" class="label-02-bold mb-[1rem]">Normen</h2>
+    <div class="flex flex-row">
+      <div class="flex-1">
+        <EditableList
+          v-model="norms"
+          :default-value="defaultValue"
+          :edit-component="NormReferenceInput"
+          :summary-component="NormsSummary"
+        />
+      </div>
+    </div>
+  </div>
 </template>
