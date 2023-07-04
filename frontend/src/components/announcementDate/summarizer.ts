@@ -6,11 +6,11 @@ export function summarizeAnnouncementDate(data: Metadata): string {
 
   let output = ""
 
-  if (data.YEAR) {
+  if (data.YEAR?.length) {
     output += data.YEAR.toString()
-  } else if (data.DATE) {
+  } else if (data.DATE?.length) {
     output += dayjs(data.DATE[0]).format("DD.MM.YYYY")
-    if (data.TIME) {
+    if (data.TIME?.length) {
       output += " " + data.TIME[0]
     }
   }
