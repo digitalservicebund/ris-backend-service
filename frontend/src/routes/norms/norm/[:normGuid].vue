@@ -105,6 +105,7 @@ onUnmounted(() => (loadedNorm.value = undefined))
       class="bg-gray-100 border-gray-400 border-l-1 w-full"
     >
       <DocumentUnitInfoPanel
+        alignment="baseline"
         :first-row="propertyInfos"
         :heading="loadedNorm.metadataSections?.NORM?.[0]?.RIS_ABBREVIATION?.[0]"
       />

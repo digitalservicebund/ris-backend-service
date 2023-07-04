@@ -11,12 +11,14 @@ interface Props {
   heading?: string
   firstRow?: (PropertyInfo | IconBadgeProps)[]
   secondRow?: (PropertyInfo | IconBadgeProps)[]
+  alignment?: "center" | "baseline"
 }
 
 withDefaults(defineProps<Props>(), {
   heading: "",
   firstRow: () => [],
   secondRow: () => [],
+  alignment: "center",
 })
 
 function isBadge(
@@ -32,7 +34,11 @@ function isBadge(
     :class="{ 'h-[8rem]': secondRow.length }"
   >
     <div class="-mt-1 flex flex-col gap-24 h-80 justify-center">
-      <div class="flex items-center space-x-[2rem]">
+      <div
+        class="flex space-x-[2rem]"
+        :class="alignment === 'center' ? 'items-center' : 'items-baseline'"
+        data-testid="document-unit-info-panel-items"
+      >
         <div class="text-30">{{ heading }}</div>
         <div v-for="entry in firstRow" :key="entry.label">
           <IconBadge

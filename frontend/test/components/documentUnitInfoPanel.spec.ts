@@ -58,4 +58,22 @@ describe("documentUnit InfoPanel", () => {
       Node.DOCUMENT_POSITION_PRECEDING
     )
   })
+
+  it("renders 'center' as the default alignment", () => {
+    render(DocumentUnitInfoPanel)
+    const items = screen.getByTestId("document-unit-info-panel-items")
+    expect(items).toHaveClass("items-center")
+  })
+
+  it("renders 'center' alignment if given", () => {
+    render(DocumentUnitInfoPanel, { props: { alignment: "center" } })
+    const items = screen.getByTestId("document-unit-info-panel-items")
+    expect(items).toHaveClass("items-center")
+  })
+
+  it("renders 'baseline' alignment if given", () => {
+    render(DocumentUnitInfoPanel, { props: { alignment: "baseline" } })
+    const items = screen.getByTestId("document-unit-info-panel-items")
+    expect(items).toHaveClass("items-baseline")
+  })
 })
