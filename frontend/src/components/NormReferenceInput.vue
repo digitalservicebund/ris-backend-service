@@ -7,6 +7,7 @@ import FeatureToggleService from "@/services/featureToggleService"
 import DateInput from "@/shared/components/input/DateInput.vue"
 import InputField from "@/shared/components/input/InputField.vue"
 import TextInput from "@/shared/components/input/TextInput.vue"
+import YearInput from "@/shared/components/input/YearInput.vue"
 
 const props = defineProps<{ modelValue?: NormReference }>()
 const emit =
@@ -57,7 +58,7 @@ onMounted(async () => {
       <ComboboxInput
         id="norm-reference-search"
         v-model="normAbbreviation"
-        aria-label="Suchfeld"
+        aria-label="Norm Suchfeld"
         clear-on-choosing-item
         :item-service="ComboboxItemService.getRisAbbreviationsAwesome"
         placeholder="Suchfeld"
@@ -67,7 +68,7 @@ onMounted(async () => {
       <ComboboxInput
         id="norm-reference-abbreviation"
         v-model="normAbbreviation"
-        aria-label="RIS-Abkürzung"
+        aria-label="Norm RIS-Abkürzung"
         clear-on-choosing-item
         :item-service="ComboboxItemService.getRisAbbreviations"
         placeholder="RIS Abkürzung"
@@ -79,22 +80,22 @@ onMounted(async () => {
         <TextInput
           id="norm-reference-singleNorm"
           v-model="norm.singleNorm"
-          aria-label="Einzelnorm"
+          aria-label="Norm Einzelnorm"
         ></TextInput>
       </InputField>
       <InputField id="norm-date-of-version" label="Fassungsdatum">
         <DateInput
           id="norm-date-of-version"
           v-model="norm.dateOfVersion"
-          aria-label="Fassungsdatum"
+          aria-label="Norm Fassungsdatum"
         />
       </InputField>
       <InputField id="norm-date-of-relevence" label="Jahr">
-        <TextInput
+        <YearInput
           id="norm-date-of-relevence"
           v-model="norm.dateOfRelevance"
-          aria-label="Jahr"
-        ></TextInput>
+          aria-label="Norm Jahr"
+        />
       </InputField>
     </div>
   </div>

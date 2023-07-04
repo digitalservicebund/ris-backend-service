@@ -23,10 +23,10 @@ describe("NormReferenceEntry", () => {
 
   it("render empty norm input entry", () => {
     renderComponent()
-    expect(screen.getByLabelText("RIS-Abkürzung")).toBeInTheDocument()
-    expect(screen.getByLabelText("Einzelnorm")).toBeInTheDocument()
-    expect(screen.getByLabelText("Fassungsdatum")).toBeInTheDocument()
-    expect(screen.getByLabelText("Jahr")).toBeInTheDocument()
+    expect(screen.getByLabelText("Norm RIS-Abkürzung")).toBeInTheDocument()
+    expect(screen.getByLabelText("Norm Einzelnorm")).toBeInTheDocument()
+    expect(screen.getByLabelText("Norm Fassungsdatum")).toBeInTheDocument()
+    expect(screen.getByLabelText("Norm Jahr")).toBeInTheDocument()
   })
 
   it("render values from modelValue prop", () => {
@@ -39,13 +39,13 @@ describe("NormReferenceEntry", () => {
       } as NormReference,
     })
 
-    const abbreviationField = screen.getByLabelText("RIS-Abkürzung")
+    const abbreviationField = screen.getByLabelText("Norm RIS-Abkürzung")
 
-    const singleNormField = screen.getByLabelText("Einzelnorm")
+    const singleNormField = screen.getByLabelText("Norm Einzelnorm")
 
-    const versionField = screen.getByLabelText("Fassungsdatum")
+    const versionField = screen.getByLabelText("Norm Fassungsdatum")
 
-    const relevanceField = screen.getByLabelText("Jahr")
+    const relevanceField = screen.getByLabelText("Norm Jahr")
 
     expect(abbreviationField).toHaveValue("ABC")
     expect(singleNormField).toHaveValue("12")
