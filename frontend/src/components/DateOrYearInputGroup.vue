@@ -25,7 +25,7 @@ enum InputType {
 const inputValue = ref(props.modelValue)
 const selectedInputType = ref<InputType>(InputType.DATE)
 function detectSelectedInputType(): void {
-  if (inputValue.value.YEAR && inputValue.value.YEAR.length > 0) {
+  if (inputValue.value.YEAR) {
     selectedInputType.value = InputType.YEAR
   } else selectedInputType.value = InputType.DATE
 }
@@ -57,7 +57,7 @@ const dateValue = computed({
 const yearValue = computed({
   get: () => inputValue.value.YEAR?.[0],
   set: (value) => {
-    inputValue.value.YEAR = value ? [value] : undefined
+    inputValue.value.YEAR = value ? [value] : []
     inputValue.value.DATE = undefined
   },
 })

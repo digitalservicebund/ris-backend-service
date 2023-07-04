@@ -151,7 +151,7 @@ describe("date/year field", () => {
 
       expect(yearInputField).toHaveValue("2023")
       await user.clear(yearInputField)
-      expect(modelValue.YEAR).toBeUndefined()
+      expect(modelValue.YEAR).toEqual([])
     })
   })
 
@@ -223,6 +223,20 @@ describe("date/year field", () => {
       ) as HTMLInputElement
 
       expect(yearInputFieldNew).not.toHaveValue()
+    })
+
+    it("doesn't automatically switch back to date when the year is cleared", async () => {
+      renderComponent({ modelValue: { YEAR: ["2020"] } })
+
+      const user = userEvent.setup()
+
+      const announcementYearInputField = screen.getByRole("textbox", {
+        name: "test-label Jahresangabe",
+      }) as HTMLInputElement
+
+      await user.clear(announcementYearInputField)
+
+      expect(announcementYearInputField).toBeVisible()
     })
   })
 })

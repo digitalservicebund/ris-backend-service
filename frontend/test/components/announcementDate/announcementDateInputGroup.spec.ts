@@ -181,5 +181,6 @@ describe("Announcement date/time/year fields", () => {
     await user.clear(announcementYearInputField)
 
     expect(modelValue).toEqual({ YEAR: [] })
+    expect(announcementYearInputField).toBeVisible()
   })
 })
