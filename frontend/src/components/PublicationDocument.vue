@@ -3,6 +3,7 @@ import { ref, computed } from "vue"
 import { RouterLink } from "vue-router"
 import ExpandableContent from "./ExpandableContent.vue"
 import CodeSnippet from "@/components/CodeSnippet.vue"
+import ActiveCitation, { activeCitationLabels } from "@/domain/activeCitation"
 import DocumentUnit from "@/domain/documentUnit"
 import NormReference, { normFieldLabels } from "@/domain/normReference"
 import ProceedingDecision, {
@@ -106,10 +107,31 @@ function getMissingNormsFields(normReference: NormReference) {
   }
 }
 
+//Required Active Citation fields
+const missingActiveCitationFields = ref(
+  props.documentUnit.contentRelatedIndexing?.activeCitations
+    ?.filter((activeCitation) => {
+      return getActiveCitationsFields(activeCitation).length > 0
+    })
+    .map((activeCitation) => {
+      return {
+        identifier: activeCitation.renderDecision,
+        missingFields: getActiveCitationsFields(activeCitation),
+      }
+    })
+)
+
+function getActiveCitationsFields(activeCitation: ActiveCitation) {
+  return activeCitation.missingRequiredFields.map(
+    (field) => activeCitationLabels[field]
+  )
+}
+
 const fieldsMissing = computed(() =>
   missingCoreDataFields.value.length ||
   missingProceedingDecisionFields.value?.length ||
-  missingNormsFields.value?.length
+  missingNormsFields.value?.length ||
+  missingActiveCitationFields.value?.length
     ? true
     : false
 )
@@ -174,6 +196,30 @@ const fieldsMissing = computed(() =>
                   <li
                     v-for="fields in missingNormsFields"
                     :key="missingNormsFields.indexOf(fields)"
+                    class="body-01-reg list-item ml-[1rem]"
+                  >
+                    <div v-if="fields && fields.missingFields.length > 0">
+                      <span>{{ fields.identifier }}</span>
+                      -
+                      <span class="label-02-bold">{{
+                        fields.missingFields.join(", ")
+                      }}</span>
+                    </div>
+                  </li>
+                </ul>
+              </li>
+              <li
+                v-if="
+                  missingActiveCitationFields &&
+                  missingActiveCitationFields.length > 0
+                "
+                class="body-01-reg list-item ml-[1rem]"
+              >
+                Aktivzitierung
+                <ul>
+                  <li
+                    v-for="fields in missingActiveCitationFields"
+                    :key="missingActiveCitationFields.indexOf(fields)"
                     class="body-01-reg list-item ml-[1rem]"
                   >
                     <div v-if="fields && fields.missingFields.length > 0">

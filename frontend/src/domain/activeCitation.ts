@@ -50,3 +50,10 @@ export default class ActiveCitation extends LinkedDocumentUnit {
     return false
   }
 }
+
+export const activeCitationLabels: { [name: string]: string } = {
+  citationStyle: "Art der Zitierung",
+  fileNumber: "Aktenzeichen",
+  court: "Gericht",
+  decisionDate: "Entscheidungsdatum",
+}
