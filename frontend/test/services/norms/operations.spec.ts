@@ -235,7 +235,6 @@ describe("normsService", () => {
               ],
             },
           ],
-          announcementDate: null,
           eli: null,
         }
       )
