@@ -309,7 +309,6 @@ export function generateFlatMetadata(
   partialFlatMetadata?: Partial<FlatMetadata>
 ): FlatMetadata {
   return {
-    announcementDate: generateString(),
     eli: generateString(),
     ...partialFlatMetadata,
   }

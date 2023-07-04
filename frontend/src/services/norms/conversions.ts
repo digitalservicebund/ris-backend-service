@@ -51,10 +51,6 @@ function encodeDate(data?: string): string {
     : ""
 }
 
-function encodeNullDate(data?: string | null): string | null {
-  return data ? encodeDate(data) : null
-}
-
 type MetadataValueDecoders = {
   [Property in keyof MetadataValueType]: (
     data: MetadatumSchema["value"]
@@ -724,6 +720,5 @@ export function encodeFlatMetadata(
 ): FlatMetadataRequestSchema {
   return {
     eli: encodeString(flatMetadata.eli),
-    announcementDate: encodeNullDate(flatMetadata.announcementDate),
   }
 }

@@ -125,7 +125,6 @@ watch(
   (data) => {
     if (loadedNorm.value !== undefined && data !== undefined) {
       loadedNorm.value.eli = data.eli as string
-      loadedNorm.value.announcementDate = data.announcementDate as string
     }
   },
   { deep: true }
