@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, ref, watch } from "vue"
+import { computed } from "vue"
 import { Metadata } from "@/domain/Norm"
 import DateInput from "@/shared/components/input/DateInput.vue"
 import TimeInput from "@/shared/components/input/TimeInput.vue"
@@ -21,52 +21,43 @@ enum InputType {
   YEAR = "year",
 }
 
-const inputValue = ref(props.modelValue)
-const selectedInputType = ref<InputType>(InputType.DATE_TIME)
-function detectSelectedInputType(): void {
-  if (inputValue.value.YEAR && inputValue.value.YEAR.length > 0) {
-    selectedInputType.value = InputType.YEAR
-  } else selectedInputType.value = InputType.DATE_TIME
-}
-
-watch(
-  () => props.modelValue,
-  (newValue) => {
-    if (newValue !== undefined) {
-      if (inputValue.value) inputValue.value = newValue
-    }
+const selectedInputType = computed({
+  get: () => (props.modelValue.YEAR ? InputType.YEAR : InputType.DATE_TIME),
+  set: (value) => {
+    emit(
+      "update:modelValue",
+      value === InputType.DATE_TIME ? { DATE: [], TIME: [] } : { YEAR: [] }
+    )
   },
-  { immediate: true }
-)
-
-watch(inputValue, () => emit("update:modelValue", inputValue.value), {
-  deep: true,
 })
 
-watch(inputValue, detectSelectedInputType, { immediate: true, deep: true })
-
 const dateValue = computed({
-  get: () => inputValue.value.DATE?.[0],
+  get: () => props.modelValue.DATE?.[0] ?? "",
   set: (value) => {
-    inputValue.value.DATE = value ? [value] : undefined
-    inputValue.value.YEAR = undefined
+    const next: Metadata = {
+      DATE: value ? [value] : undefined,
+      TIME: props.modelValue.TIME,
+    }
+    emit("update:modelValue", next)
   },
 })
 
 const timeValue = computed({
-  get: () => inputValue.value.TIME?.[0] ?? "",
+  get: () => props.modelValue.TIME?.[0] ?? "",
   set: (value) => {
-    inputValue.value.TIME = value ? [value] : undefined
-    inputValue.value.YEAR = undefined
+    const next: Metadata = {
+      TIME: value ? [value] : undefined,
+      DATE: props.modelValue.DATE,
+    }
+    emit("update:modelValue", next)
   },
 })
 
 const yearValue = computed({
-  get: () => inputValue.value.YEAR?.[0],
+  get: () => props.modelValue.YEAR?.[0] ?? "",
   set: (value) => {
-    inputValue.value.YEAR = value ? [value] : undefined
-    inputValue.value.DATE = undefined
-    inputValue.value.TIME = undefined
+    const next: Metadata = { YEAR: value ? [value] : [] }
+    emit("update:modelValue", next)
   },
 })
 </script>
@@ -117,9 +108,9 @@ const yearValue = computed({
       </div>
     </div>
     <div v-if="selectedInputType === InputType.YEAR" class="w-112">
-      <label class="label-03-reg" for="announcementDateYearInput"
-        >Jahresangabe</label
-      >
+      <label class="label-03-reg" for="announcementDateYearInput">
+        Jahresangabe
+      </label>
       <YearInput
         id="announcementDateYearInput"
         v-model="yearValue"
