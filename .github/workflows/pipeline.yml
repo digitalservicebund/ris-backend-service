@@ -779,7 +779,7 @@ jobs:
 
   deploy-production:
     runs-on: ubuntu-latest
-    if: ${{ github.ref == 'refs/heads/main' }}
+    if: ${{ false }}
     concurrency: deploy-production
     environment: production
     needs:
