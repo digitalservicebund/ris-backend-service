@@ -1,5 +1,6 @@
 import { expect } from "@playwright/test"
 import {
+  fillActiveCitationInputs,
   fillProceedingDecisionInputs,
   navigateToCategories,
   navigateToPublication,
@@ -51,6 +52,70 @@ test.describe("ensuring the publishing of documentunits works as expected", () =
     ).toBeVisible()
     await expect(
       page.locator("li:has-text('Rechtszug')").getByText("Aktenzeichen")
+    ).toBeVisible()
+  })
+
+  test("publication page shows missing required fields of norms", async ({
+    page,
+    documentNumber,
+  }) => {
+    await navigateToCategories(page, documentNumber)
+    await toggleNormsSection(page)
+
+    await waitForSaving(
+      async () => {
+        await page.locator("[aria-label='Einzelnorm']").fill("abc")
+      },
+      page,
+      { clickSaveButton: true }
+    )
+
+    await navigateToPublication(page, documentNumber)
+
+    await expect(page.locator("li:has-text('Normen')")).toBeVisible()
+
+    await expect(
+      page.locator("li:has-text('Normen')").getByText("RIS-Abkürzung")
+    ).toBeVisible()
+  })
+
+  test("publication page shows missing required fields of active citations", async ({
+    page,
+    documentNumber,
+    prefilledDocumentUnit,
+  }) => {
+    await navigateToCategories(page, documentNumber)
+    await waitForSaving(
+      async () => {
+        await fillActiveCitationInputs(page, {
+          documentType:
+            prefilledDocumentUnit.coreData.documentType?.jurisShortcut,
+        })
+        await page.getByLabel("Aktivzitierung speichern").click()
+      },
+      page,
+      { clickSaveButton: true }
+    )
+
+    await navigateToPublication(page, documentNumber)
+
+    await expect(page.locator("li:has-text('Aktivzitierung')")).toBeVisible()
+
+    await expect(
+      page
+        .locator("li:has-text('Aktivzitierung')")
+        .getByText("Art der Zitierung")
+    ).toBeVisible()
+    await expect(
+      page.locator("li:has-text('Aktivzitierung')").getByText("Gericht")
+    ).toBeVisible()
+    await expect(
+      page
+        .locator("li:has-text('Aktivzitierung')")
+        .getByText("Entscheidungsdatum")
+    ).toBeVisible()
+    await expect(
+      page.locator("li:has-text('Aktivzitierung')").getByText("Aktenzeichen")
     ).toBeVisible()
   })
 
