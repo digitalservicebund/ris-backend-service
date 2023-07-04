@@ -119,7 +119,12 @@ const disabledClass = "border-gray-800 read-only:!border-solid"
       />
     </InputField>
     <div class="flex gap-24 items-center">
-      <InputField id="date" aria-label="Datum" class="md:w-auto" label="Datum">
+      <InputField
+        id="date"
+        aria-label="Datum"
+        class="md:w-auto"
+        label="Datum der Änderungsvorschrift"
+      >
         <DateInput
           id="documentStatusDate"
           v-model="date"
