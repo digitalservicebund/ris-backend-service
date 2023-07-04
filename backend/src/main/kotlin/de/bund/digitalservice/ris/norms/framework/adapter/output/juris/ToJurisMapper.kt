@@ -110,7 +110,7 @@ private fun extractFootnotes(norm: Norm): List<Footnote> {
         .metadataSections
         .filter { section -> section.name == Section.FOOTNOTES }
         .map { footnoteSection ->
-            val reference = footnoteSection.metadata.find { metadata -> metadata.type == MetadatumType.FOOTNOTE_REFERENCE }?.value.toString()
+            val reference = footnoteSection.metadata.find { metadata -> metadata.type == MetadatumType.FOOTNOTE_REFERENCE }?.let { it.value.toString() }
             Footnote(
                 reference,
                 transformFootnotes(footnoteSection, MetadatumType.FOOTNOTE_CHANGE),
