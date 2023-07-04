@@ -4,14 +4,12 @@ import de.bund.digitalservice.ris.norms.domain.entity.Article
 import de.bund.digitalservice.ris.norms.domain.entity.FileReference
 import de.bund.digitalservice.ris.norms.domain.entity.MetadataSection
 import de.bund.digitalservice.ris.norms.domain.entity.Norm
-import java.time.LocalDate
 import java.util.UUID
 
 fun norm(block: NormBuilder.() -> Unit): Norm = NormBuilder().apply(block).build()
 
 class NormBuilder {
     var guid: UUID = UUID.randomUUID()
-    var announcementDate = LocalDate.now()
 
     private val metadataSections = mutableListOf<MetadataSection>()
     private val articles = mutableListOf<Article>()
@@ -26,7 +24,6 @@ class NormBuilder {
         metadataSections = metadataSections,
         files = files,
         articles = articles,
-        announcementDate = announcementDate,
     )
 }
 

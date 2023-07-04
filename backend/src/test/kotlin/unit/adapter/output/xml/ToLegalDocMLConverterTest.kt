@@ -21,7 +21,6 @@ import utils.createRandomNormWithCitationDateAndArticles
 import java.io.File
 import java.io.StringReader
 import java.io.StringWriter
-import java.time.LocalDate
 import java.util.*
 import javax.xml.XMLConstants
 import javax.xml.parsers.DocumentBuilderFactory
@@ -106,13 +105,20 @@ class ToLegalDocMLConverterTest {
                 ),
             ),
         )
+
+        val announcmentDateSection = MetadataSection(
+            MetadataSectionName.ANNOUNCEMENT_DATE,
+            listOf(Metadatum(decodeLocalDate("2001-01-01"), MetadatumType.DATE)),
+            2,
+            listOf(),
+
+        )
         val guid = UUID.randomUUID()
         val norm =
             createRandomNormWithCitationDateAndArticles()
                 .copy(
                     guid = guid,
-                    announcementDate = LocalDate.parse("2001-01-01"),
-                    metadataSections = listOf(printAnnouncementSection),
+                    metadataSections = listOf(printAnnouncementSection, announcmentDateSection),
                 )
         val document = convertNormToLegalDocML(norm)
 

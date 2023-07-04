@@ -2,7 +2,6 @@ package de.bund.digitalservice.ris.norms.application.port.input
 
 import de.bund.digitalservice.ris.norms.domain.entity.MetadataSection
 import reactor.core.publisher.Mono
-import java.time.LocalDate
 import java.util.UUID
 
 fun interface EditNormFrameUseCase {
@@ -13,6 +12,5 @@ fun interface EditNormFrameUseCase {
     data class
     NormFrameProperties(
         val metadataSections: List<MetadataSection>,
-        var announcementDate: LocalDate? = null,
     )
 }

@@ -77,7 +77,6 @@ fun mapDataToDomain(guid: UUID, data: NormData): Norm {
         guid = guid,
         articles = mapArticlesToDomain(data.articles),
         metadataSections = sections.filterNotNull(),
-        announcementDate = parseDateString(data.announcementDate),
     )
 }
 

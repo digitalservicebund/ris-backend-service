@@ -195,7 +195,6 @@ class JurisConverterTest {
 
             val norm = converter.parseJurisXml(query).block()
 
-            assertThat(norm?.announcementDate).isEqualTo(LocalDate.parse("2022-01-07"))
             val metadata = norm?.metadataSections?.flatMap { it.metadata }
 
             assertThat(metadata).usingRecursiveFieldByFieldElementComparatorIgnoringFields("guid").contains(Metadatum("test official long title", OFFICIAL_LONG_TITLE))

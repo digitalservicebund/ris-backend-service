@@ -2,6 +2,7 @@ package de.bund.digitalservice.ris.norms.domain.entity
 
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType
+import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.decodeLocalDate
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import utils.createSimpleSections
@@ -66,7 +67,6 @@ class NormTest {
 
     @Test
     fun `can create a norm with optional date and boolean fields`() {
-        val announcementDate = LocalDate.of(2022, 11, 18)
         val paragraph = Paragraph(UUID.randomUUID(), "marker", "text")
         val article = Article(UUID.randomUUID(), "title", "marker", listOf(paragraph))
         val guid = UUID.randomUUID()
@@ -86,13 +86,11 @@ class NormTest {
                 guid = guid,
                 articles = listOf(article),
 
-                announcementDate = announcementDate,
                 metadataSections = listOf(citationDateSection, normProviderSection, normSection),
             )
 
         assertThat(norm.guid).isEqualTo(guid)
         assertThat(norm.articles).isEqualTo(listOf(article))
-        assertThat(norm.announcementDate).isEqualTo(announcementDate)
         assertThat(norm.metadataSections.flatMap { it.metadata }).contains(citationDate)
         assertThat(norm.metadataSections.flatMap { it.metadata }).contains(resolutionMajority)
         assertThat(norm.metadataSections.flatMap { it.metadata }).contains(risAbbreviation)
@@ -123,14 +121,19 @@ class NormTest {
                 Metadatum(LocalDate.of(2022, 11, 19), MetadatumType.DATE),
             ),
         )
-        val announcementDate = LocalDate.of(2022, 11, 18)
+
+        val announcmentDateSection = MetadataSection(
+            MetadataSectionName.ANNOUNCEMENT_DATE,
+            listOf(
+                Metadatum(decodeLocalDate("2022-11-19"), MetadatumType.DATE),
+            ),
+        )
         val guid = UUID.randomUUID()
 
         val norm =
             Norm(
                 guid = guid,
-                announcementDate = announcementDate,
-                metadataSections = listOf(printAnnouncementSection, citationDateSection),
+                metadataSections = listOf(printAnnouncementSection, citationDateSection, announcmentDateSection),
             )
 
         assertThat(norm.eli.gazetteOrMedium).isEqualTo("bgbl-1")

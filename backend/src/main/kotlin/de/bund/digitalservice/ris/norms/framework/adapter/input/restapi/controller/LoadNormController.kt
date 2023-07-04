@@ -11,7 +11,6 @@ import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.ApiConfiguration
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.encodeEli
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.encodeGuid
-import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.encodeLocalDate
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.encodeLocalDateTime
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
@@ -42,7 +41,6 @@ class LoadNormController(private val loadNormService: LoadNormUseCase) {
         val guid: String,
         val articles: List<ArticleResponseSchema>,
         val metadataSections: List<MetadataSectionResponseSchema>,
-        var announcementDate: String?,
         var eli: String,
         var files: List<FileReferenceResponseSchema>,
     ) {
@@ -55,7 +53,6 @@ class LoadNormController(private val loadNormService: LoadNormUseCase) {
                     encodeGuid(data.guid),
                     articles,
                     metadataSections,
-                    encodeLocalDate(data.announcementDate),
                     encodeEli(data.eli),
                     files = files,
                 )

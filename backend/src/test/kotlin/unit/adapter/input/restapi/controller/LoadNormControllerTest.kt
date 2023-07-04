@@ -11,7 +11,6 @@ import de.bund.digitalservice.ris.norms.domain.entity.Paragraph
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.encodeEli
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.encodeGuid
-import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.encodeLocalDate
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.encodeLocalDateTime
 import io.mockk.every
 import io.mockk.slot
@@ -128,7 +127,6 @@ class LoadNormControllerTest {
         val guid: String,
         val articles: List<ArticleResponseTestSchema>,
         val metadataSections: List<MetadataSectionResponseTestSchema>,
-        var announcementDate: String?,
         var eli: String,
         var files: List<FileReferenceResponseTestSchema>,
     ) {
@@ -141,7 +139,6 @@ class LoadNormControllerTest {
                     encodeGuid(data.guid),
                     articles,
                     metadataSections,
-                    encodeLocalDate(data.announcementDate),
                     encodeEli(data.eli),
                     files = files,
                 )

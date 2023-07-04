@@ -12,8 +12,6 @@ data class Norm(
     val articles: List<Article> = emptyList(),
     val metadataSections: List<MetadataSection> = emptyList(),
 
-    var announcementDate: LocalDate? = null,
-
     var files: List<FileReference> = listOf(),
 
 ) {
@@ -43,7 +41,7 @@ data class Norm(
             val year = getFirstMetadatum(MetadataSectionName.ANNOUNCEMENT_DATE, MetadatumType.YEAR)
             val yearValue = (year?.value as String?)?.toInt()
 
-            return dateValue ?: yearValue ?: announcementDate?.year?.toInt()
+            return dateValue ?: yearValue
         }
 
     fun getFirstMetadatum(section: MetadataSectionName, type: MetadatumType, parent: MetadataSectionName? = null): Metadatum<*>? =

@@ -21,11 +21,16 @@ fun mapNormToDto(norm: Norm): NormDto {
     val firstCitationDate = norm.getFirstMetadatum(MetadataSectionName.CITATION_DATE, MetadatumType.DATE)?.let { encodeLocalDate(it.value as LocalDate) }
     val firstCitationYear = norm.getFirstMetadatum(MetadataSectionName.CITATION_DATE, MetadatumType.YEAR)?.let { it.value as String }
 
+    val firstAnnouncementDate = norm.getFirstMetadatum(MetadataSectionName.ANNOUNCEMENT_DATE, MetadatumType.DATE)?.let { encodeLocalDate(it.value as LocalDate) }
+    val firstAnnouncementYear = norm.getFirstMetadatum(MetadataSectionName.ANNOUNCEMENT_DATE, MetadatumType.YEAR)?.let { it.value as String }
+
+    val announcementDate = firstAnnouncementDate ?: firstAnnouncementYear
+
     return NormDto(
         guid = norm.guid.toString(),
         officialLongTitle = IdentifiedElement(norm.getFirstMetadatum(MetadataSectionName.NORM, MetadatumType.OFFICIAL_LONG_TITLE)?.value.toString()),
         officialShortTitle = IdentifiedElement(norm.getFirstMetadatum(MetadataSectionName.NORM, MetadatumType.OFFICIAL_SHORT_TITLE)?.value.toString()),
-        announcementDate = norm.announcementDate?.toString() ?: (firstCitationDate ?: firstCitationYear),
+        announcementDate = announcementDate ?: (firstCitationDate ?: firstCitationYear),
         documentTypeName = getMappedValue(
             Property.DOCUMENT_TYPE_NAME,
             norm.getFirstMetadatum(MetadataSectionName.DOCUMENT_TYPE, MetadatumType.TYPE_NAME)?.value.toString(),

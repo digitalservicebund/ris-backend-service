@@ -57,7 +57,6 @@ interface NormsMapper {
             normDto.guid,
             articles,
             listDomainSections,
-            normDto.announcementDate,
             fileReferences,
         )
     }
@@ -97,7 +96,6 @@ interface NormsMapper {
     fun normToDto(norm: Norm): NormDto {
         return NormDto(
             norm.guid,
-            norm.announcementDate,
         )
     }
 
