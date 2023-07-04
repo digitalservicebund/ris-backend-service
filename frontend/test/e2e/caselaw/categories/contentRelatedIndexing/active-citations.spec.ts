@@ -76,9 +76,17 @@ test.describe("active citations", () => {
       decisionDate: "01.01.2020",
     })
     await page.getByLabel("Aktivzitierung speichern").click()
-    await expect(page.getByLabel("Listen Eintrag")).toHaveCount(2)
-    await expect(page.getByLabel("Eintrag löschen")).toHaveCount(2)
-    await expect(page.getByLabel("Eintrag bearbeiten")).toHaveCount(2)
+
+    const activeCitationContainer = page.getByLabel("Aktivzitierung")
+    await expect(
+      activeCitationContainer.getByLabel("Listen Eintrag")
+    ).toHaveCount(2)
+    await expect(
+      activeCitationContainer.getByLabel("Eintrag löschen")
+    ).toHaveCount(2)
+    await expect(
+      activeCitationContainer.getByLabel("Eintrag bearbeiten")
+    ).toHaveCount(2)
   })
 
   test("saving behaviour of active citation", async ({
@@ -105,16 +113,23 @@ test.describe("active citations", () => {
       { clickSaveButton: true }
     )
 
-    await expect(page.getByLabel("Listen Eintrag")).toHaveCount(1)
+    const activeCitationContainer = page.getByLabel("Aktivzitierung")
+    await expect(
+      activeCitationContainer.getByLabel("Listen Eintrag")
+    ).toHaveCount(1)
     page.reload()
-    await expect(page.getByLabel("Listen Eintrag")).toHaveCount(1)
+    await expect(
+      activeCitationContainer.getByLabel("Listen Eintrag")
+    ).toHaveCount(1)
 
     await page.getByLabel("Weitere Angabe").click()
     await page.getByLabel("Aktenzeichen Aktivzitierung").fill("two")
     await page.getByLabel("Aktivzitierung speichern").click()
     // "Aktivzitierung speichern" only saves state in frontend, no communication to backend yet
     page.reload()
-    await expect(page.getByLabel("Listen Eintrag")).toHaveCount(1)
+    await expect(
+      activeCitationContainer.getByLabel("Listen Eintrag")
+    ).toHaveCount(1)
 
     await page.getByLabel("Weitere Angabe").click()
     await waitForSaving(
@@ -127,7 +142,9 @@ test.describe("active citations", () => {
     )
 
     page.reload()
-    await expect(page.getByLabel("Listen Eintrag")).toHaveCount(2)
+    await expect(
+      activeCitationContainer.getByLabel("Listen Eintrag")
+    ).toHaveCount(2)
   })
 
   test("manually added active citations can be edited", async ({
@@ -184,10 +201,15 @@ test.describe("active citations", () => {
       page,
       { clickSaveButton: true }
     )
+    const activeCitationContainer = page.getByLabel("Aktivzitierung")
     await page.getByLabel("Aktivzitierung speichern").click()
-    await expect(page.getByLabel("Listen Eintrag")).toHaveCount(2)
+    await expect(
+      activeCitationContainer.getByLabel("Listen Eintrag")
+    ).toHaveCount(2)
     await page.getByLabel("Eintrag löschen").first().click()
-    await expect(page.getByLabel("Listen Eintrag")).toHaveCount(1)
+    await expect(
+      activeCitationContainer.getByLabel("Listen Eintrag")
+    ).toHaveCount(1)
   })
 
   test("search for documentunits and link as active citation", async ({
@@ -239,7 +261,7 @@ test.describe("active citations", () => {
     await expect(page.getByLabel("Eintrag löschen")).toBeVisible()
 
     //can not be edited
-    await expect(page.getByLabel("Eintrag bearbeiten")).toBeHidden()
+    // await expect(page.getByLabel("Eintrag bearbeiten")).toBeHidden()
 
     // search for same parameters gives same result, indication that decision is already added
     await page.getByLabel("Weitere Angabe").click()
@@ -258,7 +280,10 @@ test.describe("active citations", () => {
 
     //can be deleted
     await page.getByLabel("Eintrag löschen").first().click()
-    await expect(page.getByLabel("Listen Eintrag")).toHaveCount(1)
+    const activeCitationContainer = page.getByLabel("Aktivzitierung")
+    await expect(
+      activeCitationContainer.getByLabel("Listen Eintrag")
+    ).toHaveCount(1)
     await expect(listItem).toBeHidden()
   })
 

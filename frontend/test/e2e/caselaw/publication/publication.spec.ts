@@ -4,7 +4,6 @@ import {
   fillProceedingDecisionInputs,
   navigateToCategories,
   navigateToPublication,
-  toggleNormsSection,
   toggleProceedingDecisionsSection,
   waitForSaving,
 } from "../e2e-utils"
@@ -60,7 +59,6 @@ test.describe("ensuring the publishing of documentunits works as expected", () =
     documentNumber,
   }) => {
     await navigateToCategories(page, documentNumber)
-    await toggleNormsSection(page)
 
     await waitForSaving(
       async () => {

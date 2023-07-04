@@ -1,7 +1,6 @@
 import { expect } from "@playwright/test"
 import {
   navigateToCategories,
-  toggleNormsSection,
   waitForInputValue,
 } from "~/e2e/caselaw/e2e-utils"
 import { caselawTest as test } from "~/e2e/caselaw/fixtures"
@@ -10,7 +9,6 @@ test.describe("norm", () => {
   test("rendering", async ({ page, documentNumber }) => {
     await navigateToCategories(page, documentNumber)
     await expect(page.getByRole("heading", { name: "Normen" })).toBeVisible()
-    await toggleNormsSection(page)
     await expect(page.getByLabel("RIS-Abkürzung")).toBeVisible()
     await expect(page.getByLabel("Einzelnorm")).toBeVisible()
     await expect(page.getByLabel("Fassungsdatum")).toBeVisible()
@@ -20,7 +18,6 @@ test.describe("norm", () => {
   // eslint-disable-next-line playwright/no-skipped-test
   test.skip("direct norm input", async ({ page, documentNumber }) => {
     await navigateToCategories(page, documentNumber)
-    await toggleNormsSection(page)
     await page.locator("[aria-label='RIS-Abkürzung']").fill("Bay")
     await expect(page.getByText("BayWaldNatPV BY")).toBeVisible()
     await page.getByText("BayWaldNatPV BY").click()
