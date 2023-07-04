@@ -158,7 +158,7 @@ talisman -c .github/workflows/pipeline.yml | sed -n '3,5p' | yq e '.fileignoreco
 ```
 
 **Note that Talisman calculates the checksum based on contents in the index!**
-
+(test)
 What's left is to paste the new checksum into `.talismanrc`:
 
 ```diff
