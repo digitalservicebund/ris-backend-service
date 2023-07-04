@@ -6,7 +6,7 @@ import reactor.core.publisher.Flux;
 
 public interface PublicationReportRepository {
 
-  Flux<PublicationReport> saveAll(List<PublicationReport> report);
+  Flux<PublicationReport> saveAll(List<PublicationReport> reports);
 
-  Flux<PublicationReport> getAllForDocumentUnit(UUID uuid);
+  Flux<PublicationReport> getAllByDocumentUnitUuid(UUID documentUnitUuid);
 }

@@ -50,10 +50,10 @@ import software.amazon.awssdk.services.s3.model.PutObjectResponse;
 public class DocumentUnitService {
 
   private final DocumentUnitRepository repository;
-  private final PublicationReportRepository publishReportRepository;
+  private final PublicationReportRepository publicationReportRepository;
   private final DocumentNumberService documentNumberService;
   private final S3AsyncClient s3AsyncClient;
-  private final EmailPublishService publishService;
+  private final EmailPublishService publicationService;
   private final DocumentUnitStatusService documentUnitStatusService;
   private final Validator validator;
 
@@ -67,17 +67,17 @@ public class DocumentUnitService {
       DocumentUnitRepository repository,
       DocumentNumberService documentNumberService,
       S3AsyncClient s3AsyncClient,
-      EmailPublishService publishService,
+      EmailPublishService publicationService,
       DocumentUnitStatusService documentUnitStatusService,
-      PublicationReportRepository publishReportRepository,
+      PublicationReportRepository publicationReportRepository,
       Validator validator) {
 
     this.repository = repository;
     this.documentNumberService = documentNumberService;
     this.s3AsyncClient = s3AsyncClient;
-    this.publishService = publishService;
+    this.publicationService = publicationService;
     this.documentUnitStatusService = documentUnitStatusService;
-    this.publishReportRepository = publishReportRepository;
+    this.publicationReportRepository = publicationReportRepository;
     this.validator = validator;
   }
 
@@ -317,12 +317,12 @@ public class DocumentUnitService {
         .doOnError(ex -> log.error("Couldn't update the DocumentUnit", ex));
   }
 
-  public Mono<MailResponse> publishAsEmail(UUID documentUnitUuid, String issuerAddress) {
+  public Mono<Publication> publishAsEmail(UUID documentUnitUuid, String issuerAddress) {
     return repository
         .findByUuid(documentUnitUuid)
         .flatMap(
             documentUnit ->
-                publishService
+                publicationService
                     .publish(documentUnit, recipientAddress)
                     .flatMap(
                         mailResponse -> {
@@ -342,11 +342,11 @@ public class DocumentUnitService {
                         }));
   }
 
-  public Flux<PublicationEntry> getPublicationLog(UUID documentUuid) {
+  public Flux<PublicationHistoryRecord> getPublicationHistory(UUID documentUuid) {
     return Flux.concat(
-            publishService.getPublicationMails(documentUuid),
-            publishReportRepository.getAllForDocumentUnit(documentUuid))
-        .sort(Comparator.comparing(PublicationEntry::getDate).reversed());
+            publicationService.getPublications(documentUuid),
+            publicationReportRepository.getAllByDocumentUnitUuid(documentUuid))
+        .sort(Comparator.comparing(PublicationHistoryRecord::getDate).reversed());
   }
 
   public <T extends LinkedDocumentationUnit> Mono<Page<T>> searchByLinkedDocumentationUnit(

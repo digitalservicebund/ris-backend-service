@@ -2,7 +2,7 @@ package de.bund.digitalservice.ris.caselaw.domain;
 
 import java.time.Instant;
 
-public interface MailResponse extends PublicationEntry {
+public interface Publication extends PublicationHistoryRecord {
 
   Instant getPublishDate();
 

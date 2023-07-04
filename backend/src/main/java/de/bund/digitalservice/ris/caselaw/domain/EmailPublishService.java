@@ -5,7 +5,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 public interface EmailPublishService {
-  Mono<MailResponse> publish(DocumentUnit documentUnit, String receiverAddress);
+  Mono<XmlPublication> publish(DocumentUnit documentUnit, String receiverAddress);
 
-  Flux<MailResponse> getPublicationMails(UUID documentUnitUuid);
+  Flux<Publication> getPublications(UUID documentUnitUuid);
 }

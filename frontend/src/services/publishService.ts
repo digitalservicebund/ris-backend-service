@@ -1,16 +1,18 @@
 import httpClient, { ServiceResponse } from "./httpClient"
-import XmlMail from "@/domain/xmlMail"
+import PublicationHistoryRecord from "@/domain/xmlMail"
 
 interface publishService {
-  publishDocument(documentUnitUuid: string): Promise<ServiceResponse<XmlMail>>
+  publishDocument(
+    documentUnitUuid: string
+  ): Promise<ServiceResponse<PublicationHistoryRecord>>
   getPublicationLog(
     documentUnitUuid: string
-  ): Promise<ServiceResponse<XmlMail[]>>
+  ): Promise<ServiceResponse<PublicationHistoryRecord[]>>
 }
 
 const service: publishService = {
   async publishDocument(documentUnitUuid: string) {
-    const response = await httpClient.put<string, XmlMail>(
+    const response = await httpClient.put<string, PublicationHistoryRecord>(
       `caselaw/documentunits/${documentUnitUuid}/publish`,
       {
         headers: { "Content-Type": "text/plain" },
@@ -33,7 +35,7 @@ const service: publishService = {
   },
 
   async getPublicationLog(documentUnitUuid: string) {
-    const response = await httpClient.get<XmlMail[]>(
+    const response = await httpClient.get<PublicationHistoryRecord[]>(
       `caselaw/documentunits/${documentUnitUuid}/publish`
     )
 

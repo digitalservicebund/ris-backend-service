@@ -17,24 +17,23 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumen
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentUnitStatusRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentationOfficeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabasePublicationReportRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseXmlMailRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseXmlPublicationRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitStatusDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.PostgresDocumentUnitRepositoryImpl;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.PostgresPublishReportRepositoryImpl;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.PostgresXmlMailRepositoryImpl;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.PostgresPublicationReportRepositoryImpl;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.PostgresXmlPublicationRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.PublicationReportDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.XmlMailDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.XmlPublicationDTO;
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresConfig;
 import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatus;
 import de.bund.digitalservice.ris.caselaw.domain.HttpMailSender;
-import de.bund.digitalservice.ris.caselaw.domain.PublicationLogEntryType;
+import de.bund.digitalservice.ris.caselaw.domain.PublicationHistoryRecordType;
 import de.bund.digitalservice.ris.caselaw.domain.PublishState;
-import de.bund.digitalservice.ris.caselaw.domain.XmlMail;
-import de.bund.digitalservice.ris.caselaw.domain.XmlMailResponse;
+import de.bund.digitalservice.ris.caselaw.domain.XmlPublication;
 import java.time.Clock;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -62,8 +61,8 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
       KeycloakUserService.class,
       DatabaseDocumentNumberService.class,
       PostgresDocumentUnitRepositoryImpl.class,
-      PostgresXmlMailRepositoryImpl.class,
-      PostgresPublishReportRepositoryImpl.class,
+      PostgresXmlPublicationRepositoryImpl.class,
+      PostgresPublicationReportRepositoryImpl.class,
       XmlEMailPublishService.class,
       DatabaseDocumentUnitStatusService.class,
       MockXmlExporter.class,
@@ -93,7 +92,7 @@ class PublishDocumentUnitIntegrationTest {
 
   @Autowired private RisWebTestClient risWebTestClient;
   @Autowired private DatabaseDocumentUnitRepository repository;
-  @Autowired private DatabaseXmlMailRepository xmlMailRepository;
+  @Autowired private DatabaseXmlPublicationRepository xmlPublicationRepository;
   @Autowired private DatabaseDocumentUnitStatusRepository documentUnitStatusRepository;
   @Autowired private DatabaseDocumentationOfficeRepository documentationOfficeRepository;
   @Autowired private DatabasePublicationReportRepository databasePublishReportRepository;
@@ -112,7 +111,7 @@ class PublishDocumentUnitIntegrationTest {
 
   @AfterEach
   void cleanUp() {
-    xmlMailRepository.deleteAll().block();
+    xmlPublicationRepository.deleteAll().block();
     repository.deleteAll().block();
     documentUnitStatusRepository.deleteAll().block();
     databasePublishReportRepository.deleteAll().block();
@@ -133,8 +132,8 @@ class PublishDocumentUnitIntegrationTest {
 
     assertThat(repository.findAll().collectList().block()).hasSize(1);
 
-    XmlMailDTO expectedXmlMailDTO =
-        new XmlMailDTO(
+    XmlPublicationDTO expectedXmlPublicationDTO =
+        new XmlPublicationDTO(
             1L,
             savedDocumentUnitDTO.getId(),
             "neuris@example.com",
@@ -148,23 +147,21 @@ class PublishDocumentUnitIntegrationTest {
             "test.xml",
             null,
             PublishState.SENT);
-    XmlMail expectedXmlMail =
-        new XmlMail(
-            documentUnitUuid1,
-            "neuris@example.com",
-            "id=juris name=NeuRIS da=R df=X dt=N mod=T ld="
-                + DELIVER_DATE
-                + " vg="
-                + savedDocumentUnitDTO.getDocumentnumber(),
-            "xml",
-            "200",
-            List.of("message 1", "message 2"),
-            "text.xml",
-            null,
-            PublishState.SENT);
-    XmlMailResponse expectedXmlResultObject =
-        new XmlMailResponse(documentUnitUuid1, expectedXmlMail);
-
+    XmlPublication expectedXmlResultObject =
+        XmlPublication.builder()
+            .documentUnitUuid(documentUnitUuid1)
+            .receiverAddress("neuris@example.com")
+            .mailSubject(
+                "id=juris name=NeuRIS da=R df=X dt=N mod=T ld="
+                    + DELIVER_DATE
+                    + " vg="
+                    + savedDocumentUnitDTO.getDocumentnumber())
+            .xml("xml")
+            .statusCode("200")
+            .statusMessages(List.of("message 1", "message 2"))
+            .fileName("test.xml")
+            .publishState(PublishState.SENT)
+            .build();
     risWebTestClient
         .withDefaultLogin()
         .put()
@@ -172,7 +169,7 @@ class PublishDocumentUnitIntegrationTest {
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(XmlMailResponse.class)
+        .expectBody(XmlPublication.class)
         .consumeWith(
             response ->
                 assertThat(response.getResponseBody())
@@ -180,20 +177,21 @@ class PublishDocumentUnitIntegrationTest {
                     .ignoringFields("publishDate")
                     .isEqualTo(expectedXmlResultObject));
 
-    List<XmlMailDTO> xmlMailList = xmlMailRepository.findAll().collectList().block();
-    assertThat(xmlMailList).hasSize(1);
-    XmlMailDTO xmlMail = xmlMailList.get(0);
-    assertThat(xmlMail)
+    List<XmlPublicationDTO> xmlPublicationList =
+        xmlPublicationRepository.findAll().collectList().block();
+    assertThat(xmlPublicationList).hasSize(1);
+    XmlPublicationDTO xmlPublicationDTO = xmlPublicationList.get(0);
+    assertThat(xmlPublicationDTO)
         .usingRecursiveComparison()
         .ignoringFields("publishDate", "id")
-        .isEqualTo(expectedXmlMailDTO);
+        .isEqualTo(expectedXmlPublicationDTO);
 
     List<DocumentUnitStatusDTO> statusList =
         documentUnitStatusRepository.findAll().collectList().block();
     DocumentUnitStatusDTO status = statusList.get(statusList.size() - 1);
     assertThat(status.getStatus()).isEqualTo(PUBLISHED);
     assertThat(status.getDocumentUnitId()).isEqualTo(documentUnitDTO.getUuid());
-    assertThat(status.getCreatedAt()).isEqualTo(xmlMail.publishDate());
+    assertThat(status.getCreatedAt()).isEqualTo(xmlPublicationDTO.publishDate());
     assertThat(status.getIssuerAddress()).isEqualTo("test@test.com");
   }
 
@@ -222,19 +220,13 @@ class PublishDocumentUnitIntegrationTest {
         .block();
     assertThat(documentUnitStatusRepository.findAll().collectList().block()).hasSize(1);
 
-    XmlMail expectedXmlMail =
-        new XmlMail(
-            documentUnitUuid,
-            null,
-            null,
-            null,
-            "400",
-            List.of("message 1", "message 2"),
-            "text.xml",
-            null,
-            PublishState.UNKNOWN);
-    XmlMailResponse expectedXmlResultObject =
-        new XmlMailResponse(documentUnitUuid, expectedXmlMail);
+    XmlPublication xmlPublication =
+        XmlPublication.builder()
+            .documentUnitUuid(documentUnitUuid)
+            .statusCode("400")
+            .statusMessages(List.of("message 1", "message 2"))
+            .publishState(PublishState.UNKNOWN)
+            .build();
 
     risWebTestClient
         .withDefaultLogin()
@@ -243,16 +235,17 @@ class PublishDocumentUnitIntegrationTest {
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(XmlMailResponse.class)
+        .expectBody(XmlPublication.class)
         .consumeWith(
             response ->
                 assertThat(response.getResponseBody())
                     .usingRecursiveComparison()
                     .ignoringFields("publishDate")
-                    .isEqualTo(expectedXmlResultObject));
+                    .isEqualTo(xmlPublication));
 
-    List<XmlMailDTO> xmlMailList = xmlMailRepository.findAll().collectList().block();
-    assertThat(xmlMailList).isEmpty();
+    List<XmlPublicationDTO> xmlPublicationList =
+        xmlPublicationRepository.findAll().collectList().block();
+    assertThat(xmlPublicationList).isEmpty();
 
     List<DocumentUnitStatusDTO> statusList =
         documentUnitStatusRepository.findAll().collectList().block();
@@ -272,8 +265,8 @@ class PublishDocumentUnitIntegrationTest {
             .build();
     DocumentUnitDTO savedDocumentUnitDTO = repository.save(documentUnitDTO).block();
 
-    XmlMailDTO xmlMailDTO =
-        new XmlMailDTO(
+    XmlPublicationDTO xmlPublicationDTO =
+        new XmlPublicationDTO(
             null,
             savedDocumentUnitDTO.getId(),
             "exporter@neuris.de",
@@ -284,22 +277,19 @@ class PublishDocumentUnitIntegrationTest {
             "test.xml",
             Instant.now(),
             PublishState.SENT);
-    xmlMailRepository.save(xmlMailDTO).block();
+    xmlPublicationRepository.save(xmlPublicationDTO).block();
 
-    XmlMail expectedXmlMail =
-        new XmlMail(
-            documentUnitUuid1,
-            "exporter@neuris.de",
-            "mailSubject",
-            "xml",
-            "200",
-            List.of("message 1", "message 2"),
-            "text.xml",
-            null,
-            PublishState.SENT);
-    XmlMailResponse[] expectedXmlResultObject = {
-      new XmlMailResponse(documentUnitUuid1, expectedXmlMail)
-    };
+    XmlPublication expectedXmlPublication =
+        XmlPublication.builder()
+            .documentUnitUuid(documentUnitUuid1)
+            .receiverAddress("exporter@neuris.de")
+            .mailSubject("mailSubject")
+            .xml("xml")
+            .statusCode("200")
+            .statusMessages(List.of("message 1", "message 2"))
+            .fileName("text.xml")
+            .publishState(PublishState.SENT)
+            .build();
 
     risWebTestClient
         .withDefaultLogin()
@@ -308,13 +298,13 @@ class PublishDocumentUnitIntegrationTest {
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(XmlMailResponse[].class)
+        .expectBody(XmlPublication[].class)
         .consumeWith(
             response -> {
               assertThat(response.getResponseBody())
                   .usingRecursiveComparison()
                   .ignoringFields("publishDate")
-                  .isEqualTo(expectedXmlResultObject);
+                  .isEqualTo(expectedXmlPublication);
             });
   }
 
@@ -331,9 +321,9 @@ class PublishDocumentUnitIntegrationTest {
     DocumentUnitDTO savedDocumentUnitDTO = repository.save(documentUnitDTO).block();
 
     Instant publishDate = Instant.now();
-    xmlMailRepository
+    xmlPublicationRepository
         .save(
-            new XmlMailDTO(
+            new XmlPublicationDTO(
                 null,
                 savedDocumentUnitDTO.getId(),
                 "exporter@neuris.de",
@@ -374,13 +364,13 @@ class PublishDocumentUnitIntegrationTest {
         .jsonPath("$[0].date")
         .value(o -> Matchers.containsString(receivedDate.toString().substring(0, 20)).matches(o))
         .jsonPath("$[0].type")
-        .isEqualTo(PublicationLogEntryType.HTML.name())
+        .isEqualTo(PublicationHistoryRecordType.PUBLICATION_REPORT.name())
         .jsonPath("$[1].xml")
         .isEqualTo("xml")
         .jsonPath("$[1].date")
         .value(o -> Matchers.containsString(publishDate.toString().substring(0, 20)).matches(o))
         .jsonPath("$[1].type")
-        .isEqualTo(PublicationLogEntryType.XML.name())
+        .isEqualTo(PublicationHistoryRecordType.PUBLICATION.name())
         .consumeWith(System.out::println);
   }
 }

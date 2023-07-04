@@ -6,12 +6,11 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitPublishException;
 import de.bund.digitalservice.ris.caselaw.domain.EmailPublishService;
 import de.bund.digitalservice.ris.caselaw.domain.HttpMailSender;
-import de.bund.digitalservice.ris.caselaw.domain.MailResponse;
+import de.bund.digitalservice.ris.caselaw.domain.Publication;
 import de.bund.digitalservice.ris.caselaw.domain.PublishState;
 import de.bund.digitalservice.ris.caselaw.domain.XmlExporter;
-import de.bund.digitalservice.ris.caselaw.domain.XmlMail;
-import de.bund.digitalservice.ris.caselaw.domain.XmlMailRepository;
-import de.bund.digitalservice.ris.caselaw.domain.XmlMailResponse;
+import de.bund.digitalservice.ris.caselaw.domain.XmlPublication;
+import de.bund.digitalservice.ris.caselaw.domain.XmlPublicationRepository;
 import de.bund.digitalservice.ris.caselaw.domain.XmlResultObject;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.court.Court;
 import java.time.Clock;
@@ -42,7 +41,7 @@ public class XmlEMailPublishService implements EmailPublishService {
 
   private final HttpMailSender mailSender;
 
-  private final XmlMailRepository repository;
+  private final XmlPublicationRepository repository;
 
   private final Environment env;
 
@@ -52,7 +51,7 @@ public class XmlEMailPublishService implements EmailPublishService {
   public XmlEMailPublishService(
       XmlExporter xmlExporter,
       HttpMailSender mailSender,
-      XmlMailRepository repository,
+      XmlPublicationRepository repository,
       Environment env) {
 
     this.xmlExporter = xmlExporter;
@@ -62,7 +61,7 @@ public class XmlEMailPublishService implements EmailPublishService {
   }
 
   @Override
-  public Mono<MailResponse> publish(DocumentUnit documentUnit, String receiverAddress) {
+  public Mono<XmlPublication> publish(DocumentUnit documentUnit, String receiverAddress) {
     XmlResultObject xml;
     try {
       xml = xmlExporter.generateXml(getTestDocumentUnit(documentUnit));
@@ -71,16 +70,17 @@ public class XmlEMailPublishService implements EmailPublishService {
     }
 
     return generateMailSubject(documentUnit)
-        .map(mailSubject -> generateXmlMail(documentUnit.uuid(), receiverAddress, mailSubject, xml))
+        .map(
+            mailSubject ->
+                generateXmlPublication(documentUnit.uuid(), receiverAddress, mailSubject, xml))
         .doOnNext(this::generateAndSendMail)
         .flatMap(this::savePublishInformation)
-        .doOnError(ex -> LOGGER.error("Error by generation of mail message", ex))
-        .map(xmlMail -> new XmlMailResponse(documentUnit.uuid(), xmlMail));
+        .doOnError(ex -> LOGGER.error("Error by generation of mail message", ex));
   }
 
   @Override
-  public Flux<MailResponse> getPublicationMails(UUID documentUnitUuid) {
-    return repository.getPublishedMailResponses(documentUnitUuid);
+  public Flux<Publication> getPublications(UUID documentUnitUuid) {
+    return repository.getPublicationsByDocumentUnitUuid(documentUnitUuid);
   }
 
   private Mono<String> generateMailSubject(DocumentUnit documentUnit) {
@@ -106,63 +106,60 @@ public class XmlEMailPublishService implements EmailPublishService {
     return Mono.just(subject);
   }
 
-  private void generateAndSendMail(XmlMail xmlMail) throws DocumentUnitPublishException {
-    if (xmlMail == null) {
+  private void generateAndSendMail(XmlPublication xmlPublication)
+      throws DocumentUnitPublishException {
+    if (xmlPublication == null) {
       throw new DocumentUnitPublishException("No xml mail is set");
     }
 
-    if (xmlMail.statusCode().equals("400")) {
+    if (xmlPublication.getStatusCode().equals("400")) {
       return;
     }
 
-    if (xmlMail.receiverAddress() == null) {
+    if (xmlPublication.receiverAddress() == null) {
       throw new DocumentUnitPublishException("No receiver mail address is set");
     }
 
     mailSender.sendMail(
         senderAddress,
-        xmlMail.receiverAddress(),
-        xmlMail.mailSubject(),
+        xmlPublication.receiverAddress(),
+        xmlPublication.mailSubject(),
         "neuris",
         Collections.singletonList(
-            Attachment.builder().fileName(xmlMail.fileName()).fileContent(xmlMail.xml()).build()),
-        xmlMail.documentUnitUuid().toString());
+            Attachment.builder()
+                .fileName(xmlPublication.fileName())
+                .fileContent(xmlPublication.xml())
+                .build()),
+        xmlPublication.documentUnitUuid().toString());
   }
 
-  private XmlMail generateXmlMail(
+  private XmlPublication generateXmlPublication(
       UUID documentUnitUuid, String receiverAddress, String mailSubject, XmlResultObject xml) {
+    var publication =
+        XmlPublication.builder()
+            .documentUnitUuid(documentUnitUuid)
+            .statusCode(xml.statusCode())
+            .statusMessages(xml.statusMessages());
 
     if (xml.statusCode().equals("400")) {
-      return new XmlMail(
-          documentUnitUuid,
-          null,
-          null,
-          null,
-          xml.statusCode(),
-          xml.statusMessages(),
-          null,
-          null,
-          PublishState.UNKNOWN);
+      return publication.publishState(PublishState.UNKNOWN).build();
     }
 
-    return new XmlMail(
-        documentUnitUuid,
-        receiverAddress,
-        mailSubject,
-        xml.xml(),
-        xml.statusCode(),
-        xml.statusMessages(),
-        xml.fileName(),
-        xml.publishDate(),
-        PublishState.SENT);
+    return publication
+        .receiverAddress(receiverAddress)
+        .mailSubject(mailSubject)
+        .xml(xml.xml())
+        .fileName(xml.fileName())
+        .publishDate(xml.publishDate())
+        .publishState(PublishState.SENT)
+        .build();
   }
 
-  private Mono<XmlMail> savePublishInformation(XmlMail xmlMail) {
-    if (xmlMail.statusCode().equals("400")) {
-      return Mono.just(xmlMail);
+  private Mono<XmlPublication> savePublishInformation(XmlPublication xmlPublication) {
+    if (xmlPublication.getStatusCode().equals("400")) {
+      return Mono.just(xmlPublication);
     }
-
-    return repository.save(xmlMail);
+    return repository.save(xmlPublication);
   }
 
   private DocumentUnit getTestDocumentUnit(DocumentUnit documentUnit) {

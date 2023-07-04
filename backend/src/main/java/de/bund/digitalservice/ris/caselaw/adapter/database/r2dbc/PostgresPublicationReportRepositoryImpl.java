@@ -8,12 +8,12 @@ import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;
 
 @Repository
-public class PostgresPublishReportRepositoryImpl implements PublicationReportRepository {
+public class PostgresPublicationReportRepositoryImpl implements PublicationReportRepository {
 
   private final DatabasePublicationReportRepository repository;
   private final DatabaseDocumentUnitRepository documentUnitRepository;
 
-  public PostgresPublishReportRepositoryImpl(
+  public PostgresPublicationReportRepositoryImpl(
       DatabasePublicationReportRepository repository,
       DatabaseDocumentUnitRepository documentUnitRepository) {
 
@@ -42,16 +42,15 @@ public class PostgresPublishReportRepositoryImpl implements PublicationReportRep
         .map(
             report ->
                 PublicationReport.builder()
-                    // TODO add documentNumber?
                     .receivedDate(report.getReceivedDate())
                     .content(report.getContent())
                     .build());
   }
 
   @Override
-  public Flux<PublicationReport> getAllForDocumentUnit(UUID documentUnitId) {
+  public Flux<PublicationReport> getAllByDocumentUnitUuid(UUID documentUnitUuid) {
     return repository
-        .findAllByDocumentUnitId(documentUnitId)
+        .findAllByDocumentUnitId(documentUnitUuid)
         .map(
             report ->
                 PublicationReport.builder()

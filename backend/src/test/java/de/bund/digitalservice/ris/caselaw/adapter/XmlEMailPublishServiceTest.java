@@ -15,9 +15,8 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitPublishException;
 import de.bund.digitalservice.ris.caselaw.domain.HttpMailSender;
 import de.bund.digitalservice.ris.caselaw.domain.PublishState;
 import de.bund.digitalservice.ris.caselaw.domain.XmlExporter;
-import de.bund.digitalservice.ris.caselaw.domain.XmlMail;
-import de.bund.digitalservice.ris.caselaw.domain.XmlMailRepository;
-import de.bund.digitalservice.ris.caselaw.domain.XmlMailResponse;
+import de.bund.digitalservice.ris.caselaw.domain.XmlPublication;
+import de.bund.digitalservice.ris.caselaw.domain.XmlPublicationRepository;
 import de.bund.digitalservice.ris.caselaw.domain.XmlResultObject;
 import java.time.Clock;
 import java.time.Instant;
@@ -54,30 +53,31 @@ class XmlEMailPublishServiceTest {
   private static final String MAIL_SUBJECT =
       "id=juris name=NeuRIS da=R df=X dt=N mod=T ld=" + DELIVER_DATE + " vg=test-document-number";
   private static final UUID TEST_UUID = UUID.fromString("88888888-4444-4444-4444-121212121212");
-  private static final XmlMail EXPECTED_BEFORE_SAVE =
-      new XmlMail(
-          TEST_UUID,
-          RECEIVER_ADDRESS,
-          MAIL_SUBJECT,
-          "xml",
-          "200",
-          List.of("succeed"),
-          "test.xml",
-          PUBLISH_DATE,
-          PublishState.SENT);
-  private static final XmlMail SAVED_XML_MAIL =
-      new XmlMail(
-          TEST_UUID,
-          RECEIVER_ADDRESS,
-          MAIL_SUBJECT,
-          "xml",
-          "200",
-          List.of("succeed"),
-          "test.xml",
-          PUBLISH_DATE,
-          PublishState.SENT);
-  private static final XmlMailResponse EXPECTED_RESPONSE =
-      new XmlMailResponse(TEST_UUID, SAVED_XML_MAIL);
+  private static final XmlPublication EXPECTED_BEFORE_SAVE =
+      XmlPublication.builder()
+          .documentUnitUuid(TEST_UUID)
+          .receiverAddress(RECEIVER_ADDRESS)
+          .mailSubject(MAIL_SUBJECT)
+          .xml("xml")
+          .statusCode("200")
+          .statusMessages(List.of("succeed"))
+          .fileName("test.xml")
+          .publishDate(PUBLISH_DATE)
+          .publishState(PublishState.SENT)
+          .build();
+  private static final XmlPublication SAVED_XML_MAIL =
+      XmlPublication.builder()
+          .documentUnitUuid(TEST_UUID)
+          .receiverAddress(RECEIVER_ADDRESS)
+          .mailSubject(MAIL_SUBJECT)
+          .xml("xml")
+          .statusCode("200")
+          .statusMessages(List.of("succeed"))
+          .fileName("test.xml")
+          .publishDate(PUBLISH_DATE)
+          .publishState(PublishState.SENT)
+          .build();
+  private static final XmlPublication EXPECTED_RESPONSE = SAVED_XML_MAIL;
   private static final XmlResultObject FORMATTED_XML =
       new XmlResultObject("xml", "200", List.of("succeed"), "test.xml", PUBLISH_DATE);
 
@@ -87,7 +87,7 @@ class XmlEMailPublishServiceTest {
 
   @MockBean private XmlExporter xmlExporter;
 
-  @MockBean private XmlMailRepository repository;
+  @MockBean private XmlPublicationRepository repository;
 
   @MockBean private HttpMailSender mailSender;
 
@@ -127,18 +127,14 @@ class XmlEMailPublishServiceTest {
   void testPublish_withValidationError() throws ParserConfigurationException, TransformerException {
     var xmlWithValidationError =
         new XmlResultObject("xml", "400", List.of("status-message"), "test.xml", PUBLISH_DATE);
-    var xmlMail =
-        new XmlMail(
-            TEST_UUID,
-            null,
-            null,
-            null,
-            "400",
-            List.of("status-message"),
-            null,
-            null,
-            PublishState.UNKNOWN);
-    var expected = new XmlMailResponse(TEST_UUID, xmlMail);
+    var expected =
+        XmlPublication.builder()
+            .documentUnitUuid(TEST_UUID)
+            .publishState(PublishState.UNKNOWN)
+            .statusMessages(List.of("status-message"))
+            .statusCode("400")
+            .build();
+
     when(xmlExporter.generateXml(any(DocumentUnit.class))).thenReturn(xmlWithValidationError);
 
     StepVerifier.create(service.publish(documentUnit, RECEIVER_ADDRESS))
@@ -146,7 +142,7 @@ class XmlEMailPublishServiceTest {
             response -> assertThat(response).usingRecursiveComparison().isEqualTo(expected))
         .verifyComplete();
 
-    verify(repository, times(0)).save(any(XmlMail.class));
+    verify(repository, times(0)).save(any(XmlPublication.class));
     verify(mailSender, times(0))
         .sendMail(anyString(), anyString(), anyString(), anyString(), anyList(), anyString());
   }
@@ -164,7 +160,7 @@ class XmlEMailPublishServiceTest {
                     && ex.getMessage().equals("Couldn't generate xml."))
         .verify();
 
-    verify(repository, times(0)).save(any(XmlMail.class));
+    verify(repository, times(0)).save(any(XmlPublication.class));
     verify(mailSender, times(0))
         .sendMail(anyString(), anyString(), anyString(), anyString(), anyList(), anyString());
   }
@@ -180,7 +176,7 @@ class XmlEMailPublishServiceTest {
                     && ex.getMessage().equals("No document number has set in the document unit."))
         .verify();
 
-    verify(repository, times(0)).save(any(XmlMail.class));
+    verify(repository, times(0)).save(any(XmlPublication.class));
     verify(mailSender, times(0))
         .sendMail(anyString(), anyString(), anyString(), anyString(), any(List.class), anyString());
   }
@@ -193,7 +189,7 @@ class XmlEMailPublishServiceTest {
         .expectErrorMatches(ex -> ex instanceof IllegalArgumentException)
         .verify();
 
-    verify(repository).save(any(XmlMail.class));
+    verify(repository).save(any(XmlPublication.class));
     verify(mailSender)
         .sendMail(anyString(), anyString(), anyString(), anyString(), anyList(), anyString());
   }
@@ -208,7 +204,7 @@ class XmlEMailPublishServiceTest {
                     && ex.getMessage().equals("No receiver mail address is set"))
         .verify();
 
-    verify(repository, times(0)).save(any(XmlMail.class));
+    verify(repository, times(0)).save(any(XmlPublication.class));
     verify(mailSender, times(0))
         .sendMail(anyString(), anyString(), anyString(), anyString(), anyList(), anyString());
   }
@@ -230,7 +226,7 @@ class XmlEMailPublishServiceTest {
         .expectErrorMatches(DocumentUnitPublishException.class::isInstance)
         .verify();
 
-    verify(repository, times(0)).save(any(XmlMail.class));
+    verify(repository, times(0)).save(any(XmlPublication.class));
     verify(mailSender)
         .sendMail(
             SENDER_ADDRESS,
@@ -244,15 +240,15 @@ class XmlEMailPublishServiceTest {
 
   @Test
   void testGetLastPublishedXml() {
-    when(repository.getPublishedMailResponses(TEST_UUID))
-        .thenReturn(Flux.just(new XmlMailResponse(TEST_UUID, SAVED_XML_MAIL)));
+    when(repository.getPublicationsByDocumentUnitUuid(TEST_UUID))
+        .thenReturn(Flux.just(SAVED_XML_MAIL));
 
-    StepVerifier.create(service.getPublicationMails(TEST_UUID))
+    StepVerifier.create(service.getPublications(TEST_UUID))
         .consumeNextWith(
             response ->
                 assertThat(response).usingRecursiveComparison().isEqualTo(EXPECTED_RESPONSE))
         .verifyComplete();
 
-    verify(repository).getPublishedMailResponses(TEST_UUID);
+    verify(repository).getPublicationsByDocumentUnitUuid(TEST_UUID);
   }
 }

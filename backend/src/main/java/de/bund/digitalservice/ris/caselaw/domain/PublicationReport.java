@@ -6,11 +6,11 @@ import lombok.Builder;
 
 @Builder(toBuilder = true)
 public record PublicationReport(
-    String documentNumber, String content, @JsonIgnore Instant receivedDate)
-    implements PublicationEntry {
+    @JsonIgnore String documentNumber, String content, @JsonIgnore Instant receivedDate)
+    implements PublicationHistoryRecord {
   @Override
-  public PublicationLogEntryType getType() {
-    return PublicationLogEntryType.HTML;
+  public PublicationHistoryRecordType getType() {
+    return PublicationHistoryRecordType.PUBLICATION_REPORT;
   }
 
   @Override

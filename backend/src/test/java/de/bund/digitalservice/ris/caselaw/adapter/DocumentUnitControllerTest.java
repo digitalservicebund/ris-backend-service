@@ -23,8 +23,7 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.LinkedDocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationReport;
 import de.bund.digitalservice.ris.caselaw.domain.PublishState;
-import de.bund.digitalservice.ris.caselaw.domain.XmlMail;
-import de.bund.digitalservice.ris.caselaw.domain.XmlMailResponse;
+import de.bund.digitalservice.ris.caselaw.domain.XmlPublication;
 import java.nio.ByteBuffer;
 import java.time.Instant;
 import java.util.List;
@@ -280,18 +279,17 @@ class DocumentUnitControllerTest {
     when(service.publishAsEmail(TEST_UUID, ISSUER_ADDRESS))
         .thenReturn(
             Mono.just(
-                new XmlMailResponse(
-                    TEST_UUID,
-                    new XmlMail(
-                        TEST_UUID,
-                        "receiver address",
-                        "mailSubject",
-                        "xml",
-                        "status-code",
-                        List.of("status-messages"),
-                        "test.xml",
-                        Instant.parse("2020-01-01T01:01:01.00Z"),
-                        PublishState.UNKNOWN))));
+                XmlPublication.builder()
+                    .documentUnitUuid(TEST_UUID)
+                    .receiverAddress("receiver address")
+                    .mailSubject("mailSubject")
+                    .xml("xml")
+                    .statusCode("status-code")
+                    .statusMessages(List.of("status-messages"))
+                    .fileName("test.xml")
+                    .publishDate(Instant.parse("2020-01-01T01:01:01.00Z"))
+                    .publishState(PublishState.UNKNOWN)
+                    .build()));
 
     risWebClient
         .withDefaultLogin()
@@ -341,7 +339,7 @@ class DocumentUnitControllerTest {
   @Test
   void testGetLastPublishedXml() {
 
-    when(service.getPublicationLog(TEST_UUID))
+    when(service.getPublicationHistory(TEST_UUID))
         .thenReturn(
             Flux.fromIterable(
                 List.of(
@@ -349,18 +347,17 @@ class DocumentUnitControllerTest {
                         .content("<html>2021 Report</html>")
                         .receivedDate(Instant.parse("2021-01-01T01:01:01.00Z"))
                         .build(),
-                    new XmlMailResponse(
-                        TEST_UUID,
-                        new XmlMail(
-                            TEST_UUID,
-                            "receiver address",
-                            "mailSubject",
-                            "xml",
-                            "status-code",
-                            List.of("status-messages"),
-                            "test.xml",
-                            Instant.parse("2020-01-01T01:01:01.00Z"),
-                            PublishState.SENT)),
+                    XmlPublication.builder()
+                        .documentUnitUuid(TEST_UUID)
+                        .receiverAddress("receiver address")
+                        .mailSubject("mailSubject")
+                        .xml("xml")
+                        .statusCode("status-code")
+                        .statusMessages(List.of("status-messages"))
+                        .fileName("test.xml")
+                        .publishDate(Instant.parse("2020-01-01T01:01:01.00Z"))
+                        .publishState(PublishState.SENT)
+                        .build(),
                     PublicationReport.builder()
                         .content("<html>2019 Report</html>")
                         .receivedDate(Instant.parse("2019-01-01T01:01:01.00Z"))
@@ -375,7 +372,7 @@ class DocumentUnitControllerTest {
         .isOk()
         .expectBody()
         .jsonPath("[0].type")
-        .isEqualTo("HTML")
+        .isEqualTo("PUBLICATION_REPORT")
         .jsonPath("[0].content")
         .isEqualTo("<html>2021 Report</html>")
         .jsonPath("[0].date")
@@ -383,7 +380,7 @@ class DocumentUnitControllerTest {
         .jsonPath("[1].receivedDate")
         .doesNotExist()
         .jsonPath("[1].type")
-        .isEqualTo("XML")
+        .isEqualTo("PUBLICATION")
         .jsonPath("[1].documentUnitUuid")
         .isEqualTo(TEST_UUID.toString())
         .jsonPath("[1].receiverAddress")
@@ -401,18 +398,18 @@ class DocumentUnitControllerTest {
         .jsonPath("[1].publishDate")
         .doesNotExist()
         .jsonPath("[2].type")
-        .isEqualTo("HTML")
+        .isEqualTo("PUBLICATION_REPORT")
         .jsonPath("[2].content")
         .isEqualTo("<html>2019 Report</html>")
         .jsonPath("[2].date")
         .isEqualTo("2019-01-01T01:01:01Z");
 
-    verify(service).getPublicationLog(TEST_UUID);
+    verify(service).getPublicationHistory(TEST_UUID);
   }
 
   @Test
   void testGetLastPublishedXml_withServiceThrowsException() {
-    when(service.getPublicationLog(TEST_UUID)).thenThrow(DocumentUnitPublishException.class);
+    when(service.getPublicationHistory(TEST_UUID)).thenThrow(DocumentUnitPublishException.class);
 
     risWebClient
         .withDefaultLogin()
@@ -423,7 +420,7 @@ class DocumentUnitControllerTest {
         .is5xxServerError();
 
     verify(service).getByUuid(TEST_UUID);
-    verify(service).getPublicationLog(TEST_UUID);
+    verify(service).getPublicationHistory(TEST_UUID);
   }
 
   @Test

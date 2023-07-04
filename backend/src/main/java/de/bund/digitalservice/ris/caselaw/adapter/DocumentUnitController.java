@@ -4,8 +4,8 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitListEntry;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.LinkedDocumentationUnit;
-import de.bund.digitalservice.ris.caselaw.domain.MailResponse;
-import de.bund.digitalservice.ris.caselaw.domain.PublicationEntry;
+import de.bund.digitalservice.ris.caselaw.domain.Publication;
+import de.bund.digitalservice.ris.caselaw.domain.PublicationHistoryRecord;
 import de.bund.digitalservice.ris.caselaw.domain.SingleNormValidationInfo;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import de.bund.digitalservice.ris.caselaw.domain.docx.Docx2Html;
@@ -144,7 +144,7 @@ public class DocumentUnitController {
 
   @PutMapping(value = "/{uuid}/publish", produces = MediaType.APPLICATION_JSON_VALUE)
   @PreAuthorize("@userHasWriteAccessByDocumentUnitUuid.apply(#uuid)")
-  public Mono<ResponseEntity<MailResponse>> publishDocumentUnitAsEmail(
+  public Mono<ResponseEntity<Publication>> publishDocumentUnitAsEmail(
       @PathVariable UUID uuid, @AuthenticationPrincipal OidcUser oidcUser) {
 
     return service
@@ -155,8 +155,8 @@ public class DocumentUnitController {
 
   @GetMapping(value = "/{uuid}/publish", produces = MediaType.APPLICATION_JSON_VALUE)
   @PreAuthorize("@userHasReadAccessByDocumentUnitUuid.apply(#uuid)")
-  public Flux<PublicationEntry> getPublicationHistory(@PathVariable UUID uuid) {
-    return service.getPublicationLog(uuid);
+  public Flux<PublicationHistoryRecord> getPublicationHistory(@PathVariable UUID uuid) {
+    return service.getPublicationHistory(uuid);
   }
 
   @PutMapping(value = "/search")

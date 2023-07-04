@@ -5,7 +5,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.PostgresXmlMailRepositoryImpl;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.PostgresXmlPublicationRepositoryImpl;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.UUID;
@@ -26,9 +26,9 @@ class SendInBlueMailTrackingServiceTest {
 
   @SpyBean private SendInBlueMailTrackingService service;
 
-  @MockBean private PostgresXmlMailRepositoryImpl mailRepository;
+  @MockBean private PostgresXmlPublicationRepositoryImpl mailRepository;
 
-  @Captor private ArgumentCaptor<XmlMail> xmlMailCaptor;
+  @Captor private ArgumentCaptor<XmlPublication> xmlPublicationCaptor;
 
   private static final UUID TEST_UUID = UUID.fromString("88888888-4444-4444-4444-121212121212");
 
@@ -52,38 +52,40 @@ class SendInBlueMailTrackingServiceTest {
   void testSetPublishState_withValidDocumentUnitUuid() {
     PublishState expectedPublishState = PublishState.SUCCESS;
     Instant initialPublishDate = Instant.now();
-    XmlMail xmlMail =
-        new XmlMail(
-            TEST_UUID,
-            "receiver",
-            "subject",
-            "xml",
-            "200",
-            new ArrayList<>(),
-            "file",
-            initialPublishDate,
-            PublishState.SENT);
+    XmlPublication xmlPublication =
+        XmlPublication.builder()
+            .documentUnitUuid(TEST_UUID)
+            .publishDate(initialPublishDate)
+            .receiverAddress("receiver")
+            .mailSubject("subject")
+            .xml("xml")
+            .statusCode("200")
+            .statusMessages(new ArrayList<>())
+            .fileName("file")
+            .publishState(PublishState.SENT)
+            .build();
 
-    when(mailRepository.getLastPublishedXmlMail(TEST_UUID)).thenReturn(Mono.just(xmlMail));
-    when(mailRepository.save(any(XmlMail.class))).thenReturn(Mono.just(XmlMail.EMPTY));
+    when(mailRepository.getLastXmlPublication(TEST_UUID)).thenReturn(Mono.just(xmlPublication));
+    when(mailRepository.save(any(XmlPublication.class)))
+        .thenReturn(Mono.just(XmlPublication.builder().build()));
 
     StepVerifier.create(service.setPublishState(TEST_UUID, expectedPublishState))
         .consumeNextWith(resultString -> assertThat(resultString).isEqualTo(TEST_UUID))
         .verifyComplete();
 
-    verify(mailRepository).getLastPublishedXmlMail(TEST_UUID);
-    verify(mailRepository).save(xmlMailCaptor.capture());
+    verify(mailRepository).getLastXmlPublication(TEST_UUID);
+    verify(mailRepository).save(xmlPublicationCaptor.capture());
 
-    assertThat(xmlMailCaptor.getValue().publishState()).isEqualTo(expectedPublishState);
-    assertThat(xmlMailCaptor.getValue().publishDate()).isAfter(initialPublishDate);
+    assertThat(xmlPublicationCaptor.getValue().publishState()).isEqualTo(expectedPublishState);
+    assertThat(xmlPublicationCaptor.getValue().getPublishDate()).isAfter(initialPublishDate);
   }
 
   @Test
   void testSetPublishState_withInvalidDocumentUnitUuid() {
-    when(mailRepository.getLastPublishedXmlMail(TEST_UUID)).thenReturn(Mono.empty());
+    when(mailRepository.getLastXmlPublication(TEST_UUID)).thenReturn(Mono.empty());
 
     StepVerifier.create(service.setPublishState(TEST_UUID, PublishState.SUCCESS)).verifyComplete();
 
-    verify(mailRepository).getLastPublishedXmlMail(TEST_UUID);
+    verify(mailRepository).getLastXmlPublication(TEST_UUID);
   }
 }

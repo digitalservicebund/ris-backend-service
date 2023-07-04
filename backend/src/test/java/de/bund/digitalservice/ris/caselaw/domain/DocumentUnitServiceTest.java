@@ -327,19 +327,20 @@ class DocumentUnitServiceTest {
   @Test
   void testPublishByEmail() {
     when(repository.findByUuid(TEST_UUID)).thenReturn(Mono.just(DocumentUnit.builder().build()));
-    XmlMail xmlMail =
-        new XmlMail(
-            TEST_UUID,
-            "receiver address",
-            "subject",
-            "xml",
-            "200",
-            List.of("status messages"),
-            "filename",
-            Instant.now(),
-            PublishState.UNKNOWN);
+    XmlPublication xmlPublication =
+        XmlPublication.builder()
+            .documentUnitUuid(TEST_UUID)
+            .receiverAddress("receiver address")
+            .mailSubject("subject")
+            .xml("xml")
+            .statusCode("200")
+            .statusMessages(List.of("status messages"))
+            .fileName("filename")
+            .publishDate(Instant.now())
+            .publishState(PublishState.UNKNOWN)
+            .build();
     when(publishService.publish(eq(DocumentUnit.builder().build()), anyString()))
-        .thenReturn(Mono.just(new XmlMailResponse(TEST_UUID, xmlMail)));
+        .thenReturn(Mono.just(xmlPublication));
     when(documentUnitStatusService.updateStatus(
             any(DocumentUnit.class),
             any(DocumentUnitStatus.class),
@@ -349,9 +350,7 @@ class DocumentUnitServiceTest {
     StepVerifier.create(service.publishAsEmail(TEST_UUID, ISSUER_ADDRESS))
         .consumeNextWith(
             mailResponse ->
-                assertThat(mailResponse)
-                    .usingRecursiveComparison()
-                    .isEqualTo(new XmlMailResponse(TEST_UUID, xmlMail)))
+                assertThat(mailResponse).usingRecursiveComparison().isEqualTo(xmlPublication))
         .verifyComplete();
     verify(repository).findByUuid(TEST_UUID);
     verify(publishService).publish(eq(DocumentUnit.builder().build()), anyString());
@@ -373,45 +372,41 @@ class DocumentUnitServiceTest {
   }
 
   @Test
-  void testGetLastPublishedXmlMail() {
-    XmlMail xmlMail =
-        new XmlMail(
-            TEST_UUID,
-            "receiver address",
-            "subject",
-            "xml",
-            "200",
-            List.of("message"),
-            "filename",
-            null,
-            PublishState.UNKNOWN);
-    when(publishService.getPublicationMails(TEST_UUID))
-        .thenReturn(Flux.just(new XmlMailResponse(TEST_UUID, xmlMail)));
-    when(publicationReportRepository.getAllForDocumentUnit(TEST_UUID)).thenReturn(Flux.empty());
+  void testGetLastXmlPublication() {
+    XmlPublication xmlPublication =
+        XmlPublication.builder()
+            .documentUnitUuid(TEST_UUID)
+            .receiverAddress("receiver address")
+            .mailSubject("subject")
+            .xml("xml")
+            .statusCode("200")
+            .statusMessages(List.of("message"))
+            .fileName("filename")
+            .publishState(PublishState.UNKNOWN)
+            .build();
+    when(publishService.getPublications(TEST_UUID)).thenReturn(Flux.just(xmlPublication));
+    when(publicationReportRepository.getAllByDocumentUnitUuid(TEST_UUID)).thenReturn(Flux.empty());
 
-    StepVerifier.create(service.getPublicationLog(TEST_UUID))
+    StepVerifier.create(service.getPublicationHistory(TEST_UUID))
         .consumeNextWith(
-            xmlMailResponse ->
-                assertThat(xmlMailResponse)
-                    .usingRecursiveComparison()
-                    .isEqualTo(new XmlMailResponse(TEST_UUID, xmlMail)))
+            actual -> assertThat(xmlPublication).usingRecursiveComparison().isEqualTo(actual))
         .verifyComplete();
-    verify(publishService).getPublicationMails(TEST_UUID);
+    verify(publishService).getPublications(TEST_UUID);
   }
 
   @Test
   void testGetLastPublicationReport() {
     PublicationReport report =
         new PublicationReport("documentNumber", "<html></html>", Instant.now());
-    when(publicationReportRepository.getAllForDocumentUnit(TEST_UUID))
+    when(publicationReportRepository.getAllByDocumentUnitUuid(TEST_UUID))
         .thenReturn(Flux.just(report));
-    when(publishService.getPublicationMails(TEST_UUID)).thenReturn(Flux.empty());
+    when(publishService.getPublications(TEST_UUID)).thenReturn(Flux.empty());
 
-    StepVerifier.create(service.getPublicationLog(TEST_UUID))
+    StepVerifier.create(service.getPublicationHistory(TEST_UUID))
         .consumeNextWith(
             publications -> assertThat(publications).usingRecursiveComparison().isEqualTo(report))
         .verifyComplete();
-    verify(publishService).getPublicationMails(TEST_UUID);
+    verify(publishService).getPublications(TEST_UUID);
   }
 
   @Test
@@ -423,49 +418,47 @@ class DocumentUnitServiceTest {
 
     PublicationReport report1 = new PublicationReport("documentNumber", "<html></html>", newest);
 
-    XmlMailResponse xml1 =
-        new XmlMailResponse(
-            TEST_UUID,
-            new XmlMail(
-                TEST_UUID,
-                "receiver address",
-                "subject",
-                "xml",
-                "200",
-                List.of("message"),
-                "filename",
-                secondNewest,
-                PublishState.UNKNOWN));
+    XmlPublication xml1 =
+        XmlPublication.builder()
+            .documentUnitUuid(TEST_UUID)
+            .receiverAddress("receiver address")
+            .mailSubject("subject")
+            .xml("xml")
+            .statusCode("200")
+            .statusMessages(List.of("message"))
+            .fileName("filename")
+            .publishDate(secondNewest)
+            .publishState(PublishState.UNKNOWN)
+            .build();
 
     PublicationReport report2 =
         new PublicationReport("documentNumber", "<html></html>", thirdNewest);
 
-    XmlMailResponse xml2 =
-        new XmlMailResponse(
-            TEST_UUID,
-            new XmlMail(
-                TEST_UUID,
-                "receiver address",
-                "subject",
-                "xml",
-                "200",
-                List.of("message"),
-                "filename",
-                fourthNewest,
-                PublishState.UNKNOWN));
+    XmlPublication xml2 =
+        XmlPublication.builder()
+            .documentUnitUuid(TEST_UUID)
+            .receiverAddress("receiver address")
+            .mailSubject("subject")
+            .xml("xml")
+            .statusCode("200")
+            .statusMessages(List.of("message"))
+            .fileName("filename")
+            .publishDate(fourthNewest)
+            .publishState(PublishState.UNKNOWN)
+            .build();
 
-    when(publicationReportRepository.getAllForDocumentUnit(TEST_UUID))
+    when(publicationReportRepository.getAllByDocumentUnitUuid(TEST_UUID))
         .thenReturn(Flux.fromIterable(List.of(report2, report1)));
-    when(publishService.getPublicationMails(TEST_UUID))
+    when(publishService.getPublications(TEST_UUID))
         .thenReturn(Flux.fromIterable(List.of(xml2, xml1)));
 
-    StepVerifier.create(service.getPublicationLog(TEST_UUID))
+    StepVerifier.create(service.getPublicationHistory(TEST_UUID))
         .consumeNextWith(entry -> assertThat(entry).usingRecursiveComparison().isEqualTo(report1))
         .consumeNextWith(entry -> assertThat(entry).usingRecursiveComparison().isEqualTo(xml1))
         .consumeNextWith(entry -> assertThat(entry).usingRecursiveComparison().isEqualTo(report2))
         .consumeNextWith(entry -> assertThat(entry).usingRecursiveComparison().isEqualTo(xml2))
         .verifyComplete();
-    verify(publishService).getPublicationMails(TEST_UUID);
+    verify(publishService).getPublications(TEST_UUID);
   }
 
   @Test

@@ -11,10 +11,10 @@ import sibModel.GetEmailEventReportEvents.EventEnum;
 @Slf4j
 public class SendInBlueMailTrackingService implements MailTrackingService {
 
-  private final XmlMailRepository mailRepository;
+  private final XmlPublicationRepository mailRepository;
 
-  public SendInBlueMailTrackingService(XmlMailRepository xmlMailRepository) {
-    this.mailRepository = xmlMailRepository;
+  public SendInBlueMailTrackingService(XmlPublicationRepository xmlPublicationRepository) {
+    this.mailRepository = xmlPublicationRepository;
   }
 
   @Override
@@ -29,9 +29,9 @@ public class SendInBlueMailTrackingService implements MailTrackingService {
   @Override
   public Mono<UUID> setPublishState(UUID documentUnitUuid, PublishState publishState) {
     return mailRepository
-        .getLastPublishedXmlMail(documentUnitUuid)
+        .getLastXmlPublication(documentUnitUuid)
         .map(
-            xmlMail -> {
+            xmlPublication -> {
               Instant publishDate = Instant.now();
               if (publishState == PublishState.SUCCESS) {
                 log.info("Mail delivery ({}) was successful ({})", documentUnitUuid, publishState);
@@ -39,15 +39,15 @@ public class SendInBlueMailTrackingService implements MailTrackingService {
                 log.warn(
                     "Mail delivery ({}) was not successful ({})", documentUnitUuid, publishState);
               }
-              return xmlMail.toBuilder()
+              return XmlPublication.builder()
                   .publishState(publishState)
                   .publishDate(publishDate)
                   .build();
             })
         .flatMap(mailRepository::save)
         .doOnSuccess(
-            xmlMail -> {
-              if (xmlMail == null) {
+            xmlPublication -> {
+              if (xmlPublication == null) {
                 log.warn(
                     "Mail publish state ({}) was not set: invalid DocumentUnitUuid",
                     documentUnitUuid);
@@ -55,7 +55,7 @@ public class SendInBlueMailTrackingService implements MailTrackingService {
                 log.info("Mail publish state ({}) was set", documentUnitUuid);
               }
             })
-        .map(xmlMail -> documentUnitUuid)
+        .map(xmlPublication -> documentUnitUuid)
         .doOnError(ex -> log.error("Could not set publish state"));
   }
 }

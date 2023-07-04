@@ -7,8 +7,8 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Table;
 
 @Builder(toBuilder = true)
-@Table(name = "xml_mail")
-public record XmlMailDTO(
+@Table(name = "xml_publication")
+public record XmlPublicationDTO(
     @Id Long id,
     Long documentUnitId,
     String receiverAddress,

@@ -1,10 +1,10 @@
-import XmlMail from "@/domain/xmlMail"
+import PublicationHistoryRecord from "@/domain/xmlMail"
 import service from "@/services/publishService"
 
 describe("publishService", () => {
   it("returns error message if xmlMail contains error but status is success", async () => {
     vi.mock("@/services/httpClient", () => {
-      const testXml: XmlMail = { statusCode: "400" }
+      const testXml: PublicationHistoryRecord = { statusCode: "400" }
       return {
         default: {
           put: vi.fn().mockReturnValue({ status: 200, data: testXml }),
