@@ -21,7 +21,7 @@ const setupWithPublishedDocument = () =>
       documentUnit: new DocumentUnit("123", { documentNumber: "foo" }),
       publicationLog: [
         {
-          type: "XML",
+          type: "PUBLICATION",
           xml: '<?xml version="1.0"?>\n<!DOCTYPE juris-r SYSTEM "juris-r.dtd">\n<xml>content</xml>',
           statusMessages: "success",
           statusCode: "200",
@@ -229,7 +229,7 @@ describe("PublicationDocument:", () => {
         }),
         publicationLog: [
           {
-            type: "XML",
+            type: "PUBLICATION",
             xml: "xml content",
             statusMessages: "success",
             statusCode: "200",
