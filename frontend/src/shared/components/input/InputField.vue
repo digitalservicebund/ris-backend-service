@@ -52,7 +52,7 @@ export enum LabelPosition {
     />
 
     <div
-      class="flex flex-row items-center"
+      class="flex flex-row items-center min-h-[24px]"
       :class="{
         'mb-4': labelPosition === LabelPosition.TOP,
       }"

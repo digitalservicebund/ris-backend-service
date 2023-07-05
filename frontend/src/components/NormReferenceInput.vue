@@ -49,7 +49,10 @@ const normAbbreviation = computed({
   },
 })
 
-async function validateSingleNorm() {
+async function validateNorm() {
+  validationErrors.value = []
+
+  //validate singleNorm
   if (norm.value?.singleNorm) {
     const singleNormValidationInfo: SingleNormValidationInfo = {
       singleNorm: norm.value.singleNorm,
@@ -58,7 +61,7 @@ async function validateSingleNorm() {
     const response = await documentUnitService.validateSingleNorm(
       singleNormValidationInfo
     )
-    validationErrors.value = []
+
     if (response.data !== "Ok") {
       validationErrors.value?.push({
         defaultMessage: "Inhalt nicht valide",
@@ -66,18 +69,28 @@ async function validateSingleNorm() {
       })
     }
   }
+
+  //validate required fields
+  if (norm.value.missingRequiredFields?.length) {
+    norm.value.missingRequiredFields.forEach((missingField) => {
+      validationErrors.value?.push({
+        defaultMessage: "Pflichtfeld nicht befüllt",
+        field: missingField,
+      })
+    })
+  }
 }
 
 async function addNormReference() {
   const normRef = new NormReference({ ...norm.value })
-  validateSingleNorm()
+  validateNorm()
   emit("update:modelValue", normRef)
   emit("closeEntry")
 }
 
 onMounted(() => {
   norm.value = (props.modelValue as NormReference) ?? {}
-  validateSingleNorm()
+  validateNorm()
 })
 </script>
 
@@ -93,12 +106,21 @@ onMounted(() => {
         placeholder="Suchfeld"
       ></ComboboxInput>
     </InputField>
-    <InputField id="norm-reference-abbreviation-field" label="RIS-Abkürzung">
+    <InputField
+      id="norm-reference-abbreviation-field"
+      v-slot="slotProps"
+      label="RIS-Abkürzung *"
+      :validation-error="
+        validationErrors?.find((err) => err.field === 'normAbbreviation')
+          ?.defaultMessage
+      "
+    >
       <ComboboxInput
         id="norm-reference-abbreviation"
         v-model="normAbbreviation"
         aria-label="Norm RIS-Abkürzung"
         clear-on-choosing-item
+        :has-error="slotProps.hasError"
         :item-service="ComboboxItemService.getRisAbbreviations"
         placeholder="RIS Abkürzung"
       >

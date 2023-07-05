@@ -25,7 +25,25 @@ const norms = computed({
 const defaultValue = {}
 
 function decisionSummarizer(normEntry: NormReference) {
-  return h("div", { class: ["link-02-reg"] }, normEntry.renderDecision)
+  return h("div", [
+    normEntry.hasMissingRequiredFields
+      ? h("div", { class: ["flex flex-row items-center"] }, [
+          h(
+            "span",
+            {
+              "aria-label": "Fehlerhafte Eingabe",
+              class: ["material-icons pr-8 text-red-800"],
+            },
+            "error_outline"
+          ),
+          h(
+            "div",
+            { class: ["label-02-bold text-red-800"] },
+            normEntry.renderDecision
+          ),
+        ])
+      : h("div", { class: ["link-02-reg"] }, normEntry.renderDecision),
+  ])
 }
 
 const NormsSummary = withSummarizer(decisionSummarizer)

@@ -26,6 +26,10 @@ export default class NormReference {
     ].join(", ")
   }
 
+  get hasMissingRequiredFields(): boolean {
+    return this.missingRequiredFields.length > 0
+  }
+
   get missingRequiredFields() {
     return NormReference.requiredFields.filter((field) =>
       this.requiredFieldIsEmpty(this[field])
