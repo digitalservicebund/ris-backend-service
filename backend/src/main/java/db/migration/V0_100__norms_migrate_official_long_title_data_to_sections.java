@@ -10,6 +10,7 @@ import java.util.UUID;
 import org.flywaydb.core.api.migration.BaseJavaMigration;
 import org.flywaydb.core.api.migration.Context;
 
+@SuppressWarnings("java:S101")
 public class V0_100__norms_migrate_official_long_title_data_to_sections extends BaseJavaMigration {
   public void migrate(Context context) throws Exception {
 

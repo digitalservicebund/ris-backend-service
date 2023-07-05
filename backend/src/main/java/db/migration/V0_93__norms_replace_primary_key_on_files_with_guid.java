@@ -8,6 +8,7 @@ import java.util.UUID;
 import org.flywaydb.core.api.migration.BaseJavaMigration;
 import org.flywaydb.core.api.migration.Context;
 
+@SuppressWarnings("java:S101")
 public class V0_93__norms_replace_primary_key_on_files_with_guid extends BaseJavaMigration {
   public void migrate(Context context) throws Exception {
 

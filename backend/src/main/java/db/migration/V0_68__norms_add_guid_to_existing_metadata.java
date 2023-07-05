@@ -7,6 +7,7 @@ import java.util.UUID;
 import org.flywaydb.core.api.migration.BaseJavaMigration;
 import org.flywaydb.core.api.migration.Context;
 
+@SuppressWarnings("java:S101")
 public class V0_68__norms_add_guid_to_existing_metadata extends BaseJavaMigration {
   public void migrate(Context context) throws Exception {
     try (Statement add = context.getConnection().createStatement()) {

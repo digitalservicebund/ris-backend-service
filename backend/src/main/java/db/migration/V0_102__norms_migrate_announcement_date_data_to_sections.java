@@ -2,6 +2,7 @@ package db.migration;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.HashMap;
 import java.util.Map;
@@ -9,6 +10,7 @@ import java.util.UUID;
 import org.flywaydb.core.api.migration.BaseJavaMigration;
 import org.flywaydb.core.api.migration.Context;
 
+@SuppressWarnings("java:S101")
 public class V0_102__norms_migrate_announcement_date_data_to_sections extends BaseJavaMigration {
   public void migrate(Context context) throws Exception {
     final Connection connection = context.getConnection();
@@ -25,8 +27,8 @@ public class V0_102__norms_migrate_announcement_date_data_to_sections extends Ba
 
   private HashMap<UUID, String>
       getNormGuidToFlatAnnouncementDateForNormsWithoutAnnoucementDateSection(
-          final Connection connection) throws Exception {
-    HashMap<UUID, String> normGuidToFlatAnnouncementDate = new HashMap();
+          final Connection connection) throws SQLException {
+    HashMap<UUID, String> normGuidToFlatAnnouncementDate = new HashMap<>();
 
     final String query =
         """
@@ -53,7 +55,7 @@ public class V0_102__norms_migrate_announcement_date_data_to_sections extends Ba
   }
 
   private UUID insertAnnouncementDateSection(final Connection connection, final UUID normGuid)
-      throws Exception {
+      throws SQLException {
     final UUID sectionGuid = UUID.randomUUID();
     final String query =
         String.format(
@@ -72,7 +74,7 @@ public class V0_102__norms_migrate_announcement_date_data_to_sections extends Ba
 
   private void insertAnnouncementDateMetadatum(
       final Connection connection, final UUID sectionGuid, final String announcementDate)
-      throws Exception {
+      throws SQLException {
     final UUID metadataGuid = UUID.randomUUID();
     final String query =
         String.format(
