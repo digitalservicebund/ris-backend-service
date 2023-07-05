@@ -76,18 +76,17 @@ watch(
 </script>
 
 <template>
-  <div class="input-group pb-[2rem]" :style="gapStyle">
+  <div class="flex flex-col w-full">
     <div
       v-for="(group, index) in fieldRows"
       :key="index"
-      class="input-group__row"
+      class="flex flex-wrap min-h-[120px]"
       :style="gapStyle"
     >
       <InputFieldComponent
         v-for="field in group"
         :id="field.name"
         :key="field.name"
-        class="input-group__row__field"
         :label="field.label"
         :label-position="field.inputAttributes.labelPosition"
         :required="field.required"
@@ -109,21 +108,3 @@ watch(
     </div>
   </div>
 </template>
-
-<style lang="scss" scoped>
-.input-group {
-  display: flex;
-  width: 100%;
-  flex-direction: column;
-
-  &__row {
-    display: flex;
-    width: 100%;
-    flex-wrap: wrap;
-
-    &__field {
-      min-width: 15rem;
-    }
-  }
-}
-</style>

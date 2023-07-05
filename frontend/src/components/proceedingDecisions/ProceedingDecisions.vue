@@ -190,7 +190,7 @@ watch(
       />
 
       <div class="fake-input-group">
-        <div class="fake-input-group__row pb-32">
+        <div class="fake-input-group__row">
           <InputField
             id="court"
             class="fake-input-group__row__field flex-col"

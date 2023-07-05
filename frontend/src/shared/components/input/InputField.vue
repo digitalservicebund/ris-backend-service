@@ -52,9 +52,10 @@ export enum LabelPosition {
     />
 
     <div
-      class="flex flex-row items-center min-h-[24px]"
+      class="flex flex-row items-center"
       :class="{
-        'mb-4': labelPosition === LabelPosition.TOP,
+        'mb-4': !id.includes('nested') && labelPosition === LabelPosition.TOP,
+        'min-h-[24px]': !id.includes('nested'),
       }"
     >
       <span v-if="validationError" class="material-icons pr-4 text-red-800"
