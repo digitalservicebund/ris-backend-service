@@ -83,7 +83,7 @@ private fun extractDocumentStatus(norm: Norm): List<DocumentStatus> = norm
         val date = section.metadata.find { it.type == MetadatumType.DATE }?.let { found -> encodeLocalDate(found.value as LocalDate) }
         val year = section.metadata.find { it.type == MetadatumType.YEAR }?.let { it.value.toString() }
         DocumentStatus(
-            section.metadata.filter { it.type == MetadatumType.WORK_NOTE }.mapNotNull { it.value.toString() },
+            section.metadata.filter { it.type == MetadatumType.WORK_NOTE }.map { it.value.toString() },
             section.metadata.find { it.type == MetadatumType.DESCRIPTION }?.let { it.value.toString() },
             date ?: year,
             section.metadata.find { it.type == MetadatumType.REFERENCE }?.let { it.value.toString() },
@@ -138,14 +138,11 @@ private fun extractAnnouncementDate(norm: Norm): String? {
     val time = section?.metadata?.firstOrNull { it.type == MetadatumType.TIME }
     val timeValue = encodeLocalTime(time?.value as LocalTime?)
 
-    return if (year != null) {
-        yearValue
-    } else if (date != null && time == null) {
-        dateValue
-    } else if (date != null && time !== null) {
-        "$dateValue $timeValue"
-    } else {
-        return null
+    return when {
+        year != null -> yearValue
+        date != null && time == null -> dateValue
+        date != null && time != null -> "$dateValue $timeValue"
+        else -> null
     }
 }
 
@@ -236,9 +233,9 @@ private fun extractNormProviders(norm: Norm): List<NormProvider> = norm
     .metadataSections
     .filter { section -> section.name == Section.NORM_PROVIDER }
     .map {
-        val entity = it.metadata.find { metadatum -> metadatum.type == MetadatumType.ENTITY }?.let { found -> found.value as String }
-        val decidingBody = it.metadata.find { metadatum -> metadatum.type == MetadatumType.DECIDING_BODY }?.let { found -> found.value as String }
-        val isResolutionMajority = it.metadata.find { metadatum -> metadatum.type == MetadatumType.RESOLUTION_MAJORITY }?.let { found -> found.value as Boolean }
+        val entity = it.metadata.find { metadatum -> metadatum.type == MetadatumType.ENTITY }?.let { found -> found.value.toString() }
+        val decidingBody = it.metadata.find { metadatum -> metadatum.type == MetadatumType.DECIDING_BODY }?.let { found -> found.value.toString() }
+        val isResolutionMajority = it.metadata.find { metadatum -> metadatum.type == MetadatumType.RESOLUTION_MAJORITY }?.let { found -> found.value.toString().toBoolean() }
         NormProvider(entity, decidingBody, isResolutionMajority)
     }
 
@@ -246,8 +243,8 @@ private fun extractParticipations(norm: Norm): List<Participation> = norm
     .metadataSections
     .filter { section -> section.name == Section.PARTICIPATION }
     .map {
-        val institution = it.metadata.find { metadatum -> metadatum.type == MetadatumType.PARTICIPATION_INSTITUTION }?.let { found -> found.value as String }
-        val type = it.metadata.find { metadatum -> metadatum.type == MetadatumType.PARTICIPATION_TYPE }?.let { found -> found.value as String }
+        val institution = it.metadata.find { metadatum -> metadatum.type == MetadatumType.PARTICIPATION_INSTITUTION }?.let { found -> found.value.toString() }
+        val type = it.metadata.find { metadatum -> metadatum.type == MetadatumType.PARTICIPATION_TYPE }?.let { found -> found.value.toString() }
         Participation(type, institution)
     }
 
@@ -255,8 +252,8 @@ private fun extractLeads(norm: Norm): List<Lead> = norm
     .metadataSections
     .filter { section -> section.name == Section.LEAD }
     .map {
-        val jurisdiction = it.metadata.find { metadatum -> metadatum.type == MetadatumType.LEAD_JURISDICTION }?.let { found -> found.value as String }
-        val unit = it.metadata.find { metadatum -> metadatum.type == MetadatumType.LEAD_UNIT }?.let { found -> found.value as String }
+        val jurisdiction = it.metadata.find { metadatum -> metadatum.type == MetadatumType.LEAD_JURISDICTION }?.let { found -> found.value.toString() }
+        val unit = it.metadata.find { metadatum -> metadatum.type == MetadatumType.LEAD_UNIT }?.let { found -> found.value.toString() }
         Lead(jurisdiction, unit)
     }
 
@@ -340,7 +337,7 @@ private fun extractAgeIndicationStarts(norm: Norm): List<String> = norm
     .metadataSections
     .filter { section -> section.name == Section.AGE_INDICATION }
     .mapNotNull {
-        it.metadata.find { metadatum -> metadatum.type == MetadatumType.RANGE_START }?.let { found -> found.value as String }
+        it.metadata.find { metadatum -> metadatum.type == MetadatumType.RANGE_START }?.let { found -> found.value.toString() }
     }
 
 private fun extractEntryIntoForceDate(norm: Norm): String? = norm
