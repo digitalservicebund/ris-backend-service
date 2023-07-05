@@ -24,12 +24,16 @@ const succeedMessage = ref<{ title: string; description: string }>()
 async function publishADocument() {
   const response = await publishService.publishDocument(props.documentUnit.uuid)
   publishResult.value = response.data
+  if (!publicationLog.value) publicationLog.value = []
   if (response.data && Number(response.data?.statusCode) < 300) {
-    publicationLog.value = [response.data]
-    publicationLog.value[0].date = formatDate(publicationLog.value[0].date)
-    publicationLog.value[0].xml = publicationLog.value[0].xml
-      ? publicationLog.value[0].xml.replace(/[ \t]{2,}/g, "")
+    const publication = response.data
+    publication.date = formatDate(publication.date)
+    publication.xml = publication.xml
+      ? publication.xml.replace(/[ \t]{2,}/g, "")
       : ""
+
+    publicationLog.value.unshift(publication)
+
     succeedMessage.value = {
       title: "Email wurde versendet",
       description: "",
