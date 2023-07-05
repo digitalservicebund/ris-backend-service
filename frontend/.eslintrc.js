@@ -105,11 +105,7 @@ module.exports = {
     {
       files: ["**/e2e/**/*.ts", "**/a11y/**/*.ts"],
       extends: ["plugin:playwright/playwright-test"],
-      rules: {
-        ...moduleImportRules,
-        // Accessibility tests with Axe **must not** use expects.
-        ["playwright/expect-expect"]: 0,
-      },
+      rules: { ...moduleImportRules },
     },
   ],
 }

@@ -25,9 +25,9 @@ test.describe("decision date", () => {
     await navigateToCategories(page, documentNumber)
 
     await page.locator("[aria-label='Entscheidungsdatum']").fill("03.02.2022")
-    await expect(page.locator("[aria-label='Entscheidungsdatum']")).toHaveValue(
-      "03.02.2022"
-    )
+    expect(
+      await page.locator("[aria-label='Entscheidungsdatum']").inputValue()
+    ).toBe("03.02.2022")
 
     const infoPanel = page.getByText(
       new RegExp(`${documentNumber}.*Entscheidungsdatum.*`)
@@ -37,9 +37,9 @@ test.describe("decision date", () => {
     await page.locator("[aria-label='Entscheidungsdatum']").click()
     await page.keyboard.press("Backspace")
 
-    await expect(page.locator("[aria-label='Entscheidungsdatum']")).toHaveValue(
-      ""
-    )
+    expect(
+      await page.locator("[aria-label='Entscheidungsdatum']").inputValue()
+    ).toBe("")
 
     await expect(
       infoPanel.getByText("Entscheidungsdatum - ", {
@@ -61,16 +61,20 @@ test.describe("decision date", () => {
     await page
       .locator("[aria-label='Abweichendes Entscheidungsdatum']")
       .fill("03.02.2022")
-    await expect(
-      page.locator("[aria-label='Abweichendes Entscheidungsdatum']")
-    ).toHaveValue("03.02.2022")
+    expect(
+      await page
+        .locator("[aria-label='Abweichendes Entscheidungsdatum']")
+        .inputValue()
+    ).toBe("03.02.2022")
 
     await page.keyboard.press("Backspace")
     await page.reload()
 
-    await expect(
-      page.locator("[aria-label='Abweichendes Entscheidungsdatum']")
-    ).toHaveValue("")
+    expect(
+      await page
+        .locator("[aria-label='Abweichendes Entscheidungsdatum']")
+        .inputValue()
+    ).toBe("")
   })
 
   test("nested decision date input toggles child input and correctly saves and displays data", async ({
@@ -84,9 +88,9 @@ test.describe("decision date", () => {
         await page
           .locator("[aria-label='Entscheidungsdatum']")
           .fill("03.02.2022")
-        await expect(
-          page.locator("[aria-label='Entscheidungsdatum']")
-        ).toHaveValue("03.02.2022")
+        expect(
+          await page.locator("[aria-label='Entscheidungsdatum']").inputValue()
+        ).toBe("03.02.2022")
 
         await expect(
           page.locator("text=Abweichendes Entscheidungsdatum>")

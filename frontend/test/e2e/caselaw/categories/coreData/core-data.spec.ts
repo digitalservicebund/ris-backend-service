@@ -18,8 +18,8 @@ test.describe("core data", () => {
     )
 
     await page.reload()
-    await expect(page).toHaveValue("[aria-label='Aktenzeichen']", "")
-    await expect(page).toHaveValue("[aria-label='ECLI']", "abc123")
+    expect(await page.inputValue("[aria-label='Aktenzeichen']")).toBe("")
+    expect(await page.inputValue("[aria-label='ECLI']")).toBe("abc123")
   })
 
   test("nested 'ECLI' input toggles child input and correctly saves and displays data", async ({
@@ -170,7 +170,9 @@ test.describe("core data", () => {
   test("test legal effect dropdown", async ({ page, documentNumber }) => {
     await navigateToCategories(page, documentNumber)
 
-    await expect(page).toHaveValue("[aria-label='Rechtskraft']", "Keine Angabe")
+    expect(await page.inputValue("[aria-label='Rechtskraft']")).toBe(
+      "Keine Angabe"
+    )
 
     await page
       .locator("[aria-label='Rechtskraft'] + button.input-expand-icon")
@@ -186,7 +188,7 @@ test.describe("core data", () => {
     const totalCaselawDocumentTypes = 43
 
     // on start: closed dropdown, no input text
-    await expect(page).toHaveValue("[aria-label='Dokumenttyp']", "")
+    expect(await page.inputValue("[aria-label='Dokumenttyp']")).toBe("")
     await expect(page.locator("text=AnU - Anerkenntnisurteil")).toBeHidden()
     await expect(page.locator("[aria-label='dropdown-option']")).toBeHidden()
 
@@ -202,12 +204,12 @@ test.describe("core data", () => {
 
     // type search string: 3 results for "zwischen"
     await page.locator("[aria-label='Dokumenttyp']").fill("zwischen")
-    await expect(page).toHaveValue("[aria-label='Dokumenttyp']", "zwischen")
+    expect(await page.inputValue("[aria-label='Dokumenttyp']")).toBe("zwischen")
     await expect(page.locator("[aria-label='dropdown-option']")).toHaveCount(3)
 
     // use the clear icon
     await page.locator("[aria-label='Auswahl zurücksetzen']").click()
-    await expect(page).toHaveValue("[aria-label='Dokumenttyp']", "")
+    expect(await page.inputValue("[aria-label='Dokumenttyp']")).toBe("")
     await expect(page.locator("[aria-label='dropdown-option']")).toHaveCount(
       totalCaselawDocumentTypes
     )
@@ -216,7 +218,7 @@ test.describe("core data", () => {
     await page
       .locator("[aria-label='Dokumenttyp'] + button.input-expand-icon")
       .click()
-    await expect(page).toHaveValue("[aria-label='Dokumenttyp']", "")
+    expect(await page.inputValue("[aria-label='Dokumenttyp']")).toBe("")
     await expect(page.locator("[aria-label='dropdown-option']")).toBeHidden()
 
     // open dropdown again by typing a search string
@@ -226,7 +228,7 @@ test.describe("core data", () => {
     // close dropdown using the esc key, user input text gets removed and last saved value restored
     await page.keyboard.down("Escape")
     await expect(page.locator("[aria-label='dropdown-option']")).toBeHidden()
-    await expect(page).toHaveValue("[aria-label='Dokumenttyp']", "")
+    expect(await page.inputValue("[aria-label='Dokumenttyp']")).toBe("")
   })
 
   test("ensure new docUnit has correct documentationOffice for DS user", async ({

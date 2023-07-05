@@ -68,8 +68,8 @@ test.describe("keywords", () => {
       .getByLabel("Löschen")
       .click()
 
-    await expect(page.getByText(secondKeyword)).toBeVisible()
-    await expect(page.getByText(firstKeyword)).toBeHidden()
+    await expect(await page.getByText(secondKeyword)).toBeVisible()
+    await expect(await page.getByText(firstKeyword)).toBeHidden()
   })
 
   test("add same keyword not working", async ({ page, documentNumber }) => {
@@ -115,7 +115,7 @@ test.describe("keywords", () => {
       .getByLabel("Löschen")
       .click()
 
-    await expect(page.getByText(secondKeyword)).toBeVisible()
-    await expect(page.getByText(firstKeyword)).toBeHidden()
+    await expect(await page.getByText(secondKeyword)).toBeVisible()
+    await expect(await page.getByText(firstKeyword)).toBeHidden()
   })
 })
