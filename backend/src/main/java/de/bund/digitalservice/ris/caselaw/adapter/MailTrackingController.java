@@ -29,7 +29,13 @@ public class MailTrackingController {
   @PreAuthorize("permitAll")
   public Mono<ResponseEntity<String>> setPublishState(
       @RequestBody @Valid MailTrackingResponsePayload payload) {
-    UUID documentUnitUuid = UUID.fromString(payload.tags().get(0));
+    UUID documentUnitUuid;
+    try {
+      documentUnitUuid = UUID.fromString(payload.tags().get(0));
+    } catch (IllegalArgumentException e) {
+      // We're not responsible for other sent mails
+      return Mono.just(ResponseEntity.status(HttpStatus.NO_CONTENT).build());
+    }
     PublishState publishState = service.getMappedPublishState(payload.event());
 
     return service

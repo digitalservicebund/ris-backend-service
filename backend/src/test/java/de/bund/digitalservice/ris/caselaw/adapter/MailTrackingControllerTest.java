@@ -90,4 +90,38 @@ class MailTrackingControllerTest {
         .expectStatus()
         .isBadRequest();
   }
+
+  @ParameterizedTest
+  @ValueSource(
+      strings = {
+        // no event
+        """
+                    {"tags": ["%s"]}""",
+        // no tags
+        """
+                    {"event": "%s"}""",
+        // empty tags
+        """
+                    {"event": "%s", "tags": []}""",
+      })
+  void testSetPublishState_withDifferentTags(String jsonString) {
+
+    String sendInBlueResponse =
+        """
+        {
+          "event": "delivered",
+          "tags": ["no-uuid"],
+          "ignoredKey": 123
+        }""";
+
+    risWebTestClient
+        .withDefaultLogin()
+        .post()
+        .uri("/admin/webhook")
+        .contentType(MediaType.APPLICATION_JSON)
+        .bodyValue(sendInBlueResponse)
+        .exchange()
+        .expectStatus()
+        .isNoContent();
+  }
 }
