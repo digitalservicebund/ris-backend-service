@@ -70,7 +70,9 @@ class SingleNormValidationTest {
         "IJ XY:EinigVtr",
         "MN:EinigVtr",
         "IJ XY OP MN KL 12: EinigVtr",
-        "AB XY:blafasel"
+        "AB XY:blafasel",
+        "AB XY 12 EF GH:",
+        "GH:"
       },
       delimiter = ':')
   void testValidate(String singleNorm, String normAbbreviation) {

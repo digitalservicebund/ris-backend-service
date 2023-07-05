@@ -1,61 +1,61 @@
-§ 198
-§ 339 Abs 1
-§ 196 Abs 3 Nr 1
-Art 9
-§§ 330ff
-§ 174 Abs 3 S 2
-§ 1 Abs 4 Buchst b
-§ 12 Abs 1 UAbs 1 Buchst b
-§ 15 Abs 1 DBuchst aa
-§ 118 Abs 1 Nr 2 Halbs 2
-§ 2 Anl 2
-§ 3 Abs B Nr 2
-§ 2 Abs 3 Buchst a Alt 1
-§ 3 Abs C Nr 4 Buchst a
-§ 41 Abs 2 Nr 7 Zeichen 274
-Art 6quinquies Abschn B Nr 2 Alt 1
-§ 433 Teil 1 Abschn 6 Abs 1
-Anh B Nr 1 Buchst a
-Anl A Nr 2002
-Anh F
-Kap 2 Nr 2
-Tarifnr 02.01
-Art 7 Abs 2 Buchst G
-§ 16 aF
-§ 9 Einzelanlage Nr 208
-Art 5 Abs 2 UAbschn 2
-§ 48 Abs 5 nF
-Sec 42
-§ 3 Abs 2 Anl 1 Nr 1111 Anm 1
-Nr 28 Ss 1
-Klasse 33
-Art L 133-1
-§ 3 Abs 2 Anl 1 Vorbem 2.1.3 Abs 1 S 2
-Einzelanlage Abschn D Abschn 1 Nr 1 Buchst b
-§ 3 Abs 3 Einzelanhang Nr 11
-Erwägungsgrund 34
-Ziff 8.6
-Nr 11.3.6 Tabelle 1c
-Regel 9
-Anlage I Kap III A III Nr 5 Buchst 1
-Bild 291
-Tit 4
-Art 4 Abschn H
-ZusArt 5
-R 10.7
-Anh 7 Teil E Nr 2 Buchst a
-§§ 8 bis 18
-Vorschr 11
-can 1117
-Einl 1 § 75
-Tarifst 5 Abs 6
-Buch 10 § 66 Abs 4
-ATV 3 Buchst b
-§ 4 Abs 1 Buchst K
-Klausel 2.1.2.2.1
-Art 1 Prot 1
-Anl 1 Liste B Pos 4 Buchst A
-§ 211 Abs 2 Fallgr 1 Alt 2
-Präambel
-Anh 3 Nr 4 Spalte 1
-§ 11d Abs 2 S 1 Nr 3 Teils 3
+§ 198:StPO DDR
+§ 339 Abs 1:ZGB DDR
+§ 196 Abs 3 Nr 1:StGB DDR
+Art 9:Verf DDR
+§§ 330ff:ZGB DDR
+§ 174 Abs 3 S 2:ZPO DDR
+§ 1 Abs 4 Buchst b:AVB/RG
+§ 12 Abs 1 UAbs 1 Buchst b:AKB
+§ 15 Abs 1 DBuchst aa:ARB
+§ 118 Abs 1 Nr 2 Halbs 2:BRAGebO
+§ 2 Anl 2:ZStoffZulV
+§ 3 Abs B Nr 2:VHB
+§ 2 Abs 3 Buchst a Alt 1:ARB
+§ 3 Abs C Nr 4 Buchst a:VHB
+§ 41 Abs 2 Nr 7 Zeichen 274:StVO
+Art 6quinquies Abschn B Nr 2 Alt 1:PVÜ
+§ 433 Teil 1 Abschn 6 Abs 1:BinTankSchT
+Anh B Nr 1 Buchst a:GGVS
+Anl A Nr 2002:GGVS
+Anh F:EWGRL 388/77
+Kap 2 Nr 2:GZT
+Tarifnr 02.01:GZT
+Art 7 Abs 2 Buchst G:EWGV 4056/86
+§ 16 aF:WoEigG
+§ 9 Einzelanlage Nr 208:GvKostG
+Art 5 Abs 2 UAbschn 2:EGV 593/2008
+§ 48 Abs 5 nF:WoEigG
+Sec 42:HFEA GBR
+§ 3 Abs 2 Anl 1 Nr 1111 Anm 1:FamGKG
+Nr 28 Ss 1:EGLeitl 1/2003
+Klasse 33:IntKlassAbk
+Art L 133-1:HGB FRA
+§ 3 Abs 2 Anl 1 Vorbem 2.1.3 Abs 1 S 2:GNotKG
+Einzelanlage Abschn D Abschn 1 Nr 1 Buchst b:VAG
+§ 3 Abs 3 Einzelanhang Nr 11:UWG
+Erwägungsgrund 34:EURL 2015/2302
+Ziff 8.6:VGB
+Nr 11.3.6 Tabelle 1c:BKatV
+Regel 9:SeeStrO
+Anlage I Kap III A III Nr 5 Buchst 1:EinigVtr
+Bild 291:StVO
+Tit 4:EWGV 404/93
+Art 4 Abschn H:PVÜ
+ZusArt 5:Const USA
+R 10.7:EStH
+Anh 7 Teil E Nr 2 Buchst a:EUV 1169/2011
+§§ 8 bis 18:GBOAV
+Vorschr 11:SeeStrO
+can 1117:CIC
+Einl 1 § 75:ALR PR
+Tarifst 5 Abs 6:KVBT
+Buch 10 § 66 Abs 4:SGB
+ATV 3 Buchst b:GZT
+§ 4 Abs 1 Buchst K:ARB
+Klausel 2.1.2.2.1:AUB
+Art 1 Prot 1:MRK
+Anl 1 Liste B Pos 4 Buchst A:EWGVtrArt67DRL 1
+§ 211 Abs 2 Fallgr 1 Alt 2:StGB
+Präambel:RGWALB
+Anh 3 Nr 4 Spalte 1:EWGRL 106/75
+§ 11d Abs 2 S 1 Nr 3 Teils 3:RdFunkVtr

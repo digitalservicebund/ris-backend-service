@@ -45,21 +45,27 @@ public class SingleNormValidator
       return true;
     }
 
-    boolean nextEntryIsDesignation = false;
+    boolean needDesignation = false;
+    boolean hasDesignation = true;
     for (String part : parts) {
       if (labelMap.containsKey(part)) {
-        if (nextEntryIsDesignation) {
+        if (needDesignation && !hasDesignation) {
           return false;
-        } else {
-          nextEntryIsDesignation = labelMap.get(part).hasNumberDesignation();
         }
-      } else if (!nextEntryIsDesignation) {
-        return false;
+
+        needDesignation = labelMap.get(part).hasNumberDesignation();
+        if (needDesignation) {
+          hasDesignation = false;
+        }
       } else {
-        nextEntryIsDesignation = false;
+        if (!needDesignation) {
+          return false;
+        }
+
+        hasDesignation = true;
       }
     }
 
-    return !nextEntryIsDesignation;
+    return hasDesignation;
   }
 }

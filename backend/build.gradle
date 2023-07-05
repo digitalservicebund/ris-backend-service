@@ -219,14 +219,17 @@ tasks.withType(Test).configureEach {
 
 test {
   useJUnitPlatform {
-    excludeTags "integration"
+    excludeTags "integration", "manual"
   }
 }
 
 task integrationTest(type: Test) {
   description = "Runs the integration tests."
   group = "verification"
-  useJUnitPlatform { includeTags "integration" }
+  useJUnitPlatform {
+    includeTags "integration"
+    excludeTags "manual"
+  }
 
   // So that running integration test require running unit tests first,
   // and we won"t even attempt running integration tests when there are
