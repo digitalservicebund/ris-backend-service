@@ -17,6 +17,9 @@ export enum InputType {
   NESTED = "nested",
   COMBOBOX = "combobox",
   TEXTAREA = "textarea",
+  DATE_TIME = "date_time",
+  YEAR = "year",
+  UNDEFINED_DATE = "undefined_date",
 }
 
 //BASE

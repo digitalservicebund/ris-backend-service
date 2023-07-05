@@ -2,9 +2,10 @@
 import { computed, ref, watch } from "vue"
 import { Metadata } from "@/domain/Norm"
 import ChipsInput from "@/shared/components/input/ChipsInput.vue"
-import DateInput from "@/shared/components/input/DateInput.vue"
+import InputElement from "@/shared/components/input/InputElement.vue"
 import InputField from "@/shared/components/input/InputField.vue"
 import TextInput from "@/shared/components/input/TextInput.vue"
+import { InputType } from "@/shared/components/input/types"
 import YearInput from "@/shared/components/input/YearInput.vue"
 
 interface Props {
@@ -105,12 +106,13 @@ const explanation = computed({
       class="w-1/2"
       label="Verkündungsdatum"
     >
-      <DateInput
+      <InputElement
         id="digitalAnnouncementDate"
         v-model="date"
         alt-text="Verkündungsdatum"
-        aria-label="Verkündungsdatum"
+        :attributes="{ ariaLabel: `Verkündungsdatum` }"
         is-future-date
+        :type="InputType.DATE"
       />
     </InputField>
   </div>

@@ -2,10 +2,11 @@
 import { computed, ref, watch } from "vue"
 import { Metadata, ProofIndication } from "@/domain/Norm"
 import ChipsInput from "@/shared/components/input/ChipsInput.vue"
-import DateInput from "@/shared/components/input/DateInput.vue"
 import DropdownInput from "@/shared/components/input/DropdownInput.vue"
+import InputElement from "@/shared/components/input/InputElement.vue"
 import InputField from "@/shared/components/input/InputField.vue"
 import TextInput from "@/shared/components/input/TextInput.vue"
+import { InputType } from "@/shared/components/input/types"
 import YearInput from "@/shared/components/input/YearInput.vue"
 
 interface Props {
@@ -125,12 +126,13 @@ const disabledClass = "border-gray-800 read-only:!border-solid"
         class="md:w-auto"
         label="Datum der Änderungsvorschrift"
       >
-        <DateInput
+        <InputElement
           id="documentStatusDate"
           v-model="date"
-          aria-label="Dokument Datum"
+          :attributes="{ ariaLabel: `Dokument Datum` }"
           :class="{ [disabledClass]: !dateEnabled }"
           :disabled="!dateEnabled"
+          :type="InputType.DATE"
         />
       </InputField>
       <p>oder</p>

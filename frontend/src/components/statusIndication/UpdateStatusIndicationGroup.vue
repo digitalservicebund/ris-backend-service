@@ -2,9 +2,10 @@
 import { computed, ref, watch } from "vue"
 import { Metadata, MetadataSectionName } from "@/domain/Norm"
 import ChipsInput from "@/shared/components/input/ChipsInput.vue"
-import DateInput from "@/shared/components/input/DateInput.vue"
+import InputElement from "@/shared/components/input/InputElement.vue"
 import InputField from "@/shared/components/input/InputField.vue"
 import TextInput from "@/shared/components/input/TextInput.vue"
+import { InputType } from "@/shared/components/input/types"
 
 interface Props {
   modelValue: Metadata
@@ -172,10 +173,11 @@ const inputFields = computed(() => {
       :aria-label="inputFields.dateField.label"
       :label="inputFields.dateField.label"
     >
-      <DateInput
+      <InputElement
         :id="inputFields.dateField.id"
-        :aria-label="inputFields.dateField.label"
-        :model-value="inputFields.dateField.modelValue"
+        v-model="inputFields.dateField.modelValue"
+        :attributes="{ ariaLabel: `${inputFields.dateField.label}` }"
+        :type="InputType.DATE"
         @update:model-value="inputFields.dateField.updateModelValue"
       />
     </InputField>

@@ -1,9 +1,10 @@
 <script lang="ts" setup>
 import { ref } from "vue"
 import { UndefinedDate } from "@/domain/Norm"
-import DateInput from "@/shared/components/input/DateInput.vue"
 import DropdownInput from "@/shared/components/input/DropdownInput.vue"
+import InputElement from "@/shared/components/input/InputElement.vue"
 import InputField from "@/shared/components/input/InputField.vue"
+import { InputType } from "@/shared/components/input/types"
 
 interface Props {
   dateId: string
@@ -44,11 +45,6 @@ interface DropdownItem {
   label: string
   value: string
 }
-
-enum InputType {
-  DATE = "date",
-  UNDEFINED_DATE = "undefined_date",
-}
 </script>
 
 <template>
@@ -59,11 +55,12 @@ enum InputType {
       :aria-label="dateInputFieldLabel"
       :label="dateInputFieldLabel"
     >
-      <DateInput
+      <InputElement
         :id="dateId"
-        :aria-label="dateInputAriaLabel"
+        v-model="dateValue"
+        :attributes="{ ariaLabel: dateInputAriaLabel }"
         is-future-date
-        :model-value="dateValue"
+        :type="InputType.DATE"
         @update:model-value="$emit('update:dateValue', $event)"
       />
     </InputField>

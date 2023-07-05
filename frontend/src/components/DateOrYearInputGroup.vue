@@ -1,7 +1,8 @@
 <script lang="ts" setup>
 import { computed, ref, watch } from "vue"
 import { Metadata } from "@/domain/Norm"
-import DateInput from "@/shared/components/input/DateInput.vue"
+import InputElement from "@/shared/components/input/InputElement.vue"
+import { InputType } from "@/shared/components/input/types"
 import YearInput from "@/shared/components/input/YearInput.vue"
 
 interface Props {
@@ -15,11 +16,6 @@ const props = defineProps<Props>()
 const emit = defineEmits<{
   "update:modelValue": [value: Metadata]
 }>()
-
-enum InputType {
-  DATE = "date",
-  YEAR = "year",
-}
 
 const inputValue = ref(props.modelValue)
 const selectedInputType = ref<InputType>(InputType.DATE)
@@ -97,13 +93,13 @@ const yearValue = computed({
       "
       >{{ label }}</label
     >
-    <DateInput
+    <InputElement
       v-if="selectedInputType === InputType.DATE"
       :id="`${idPrefix}Date`"
       v-model="dateValue"
       :alt-text="`${label} Datum`"
-      :aria-label="`${label} Datum`"
-      is-future-date
+      :attributes="{ ariaLabel: `${label} Datum` }"
+      :type="InputType.DATE"
     />
     <div>
       <YearInput

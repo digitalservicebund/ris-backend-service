@@ -2,8 +2,9 @@
 import { computed, ref, watch } from "vue"
 import DivergentCategoryInputGroup from "@/components/DivergentCategoryInputGroup.vue"
 import { Metadata, MetadataSectionName } from "@/domain/Norm"
-import DateInput from "@/shared/components/input/DateInput.vue"
+import InputElement from "@/shared/components/input/InputElement.vue"
 import InputField from "@/shared/components/input/InputField.vue"
+import { InputType } from "@/shared/components/input/types"
 
 interface Props {
   modelValue: Metadata
@@ -43,11 +44,13 @@ const date = computed({
 <template>
   <div class="flex flex-col gap-8 w-384">
     <InputField :id="id" :aria-label="label" :label="label">
-      <DateInput
+      <InputElement
         :id="id + 'DateInput'"
         v-model="date"
-        :aria-label="label + ' Date Input'"
+        :alt-text="`${label} Datum`"
+        :attributes="{ ariaLabel: label + ' Date Input' }"
         is-future-date
+        :type="InputType.DATE"
       />
     </InputField>
     <DivergentCategoryInputGroup
