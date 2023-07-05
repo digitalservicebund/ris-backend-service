@@ -275,45 +275,43 @@ private fun createSectionForStatusIndication(statusList: List<Status>, reissueLi
 
     statusList.forEachIndexed { index, status ->
         val metadata = mutableListOf<Metadatum<*>>()
-        if (status.statusNote !== null) {
-            metadata.add(Metadatum(status.statusNote, MetadatumType.NOTE))
+        status.statusNote?.let { metadata.add(Metadatum(it, MetadatumType.NOTE)) }
+        status.statusDescription?.let { metadata.add(Metadatum(it, MetadatumType.DESCRIPTION)) }
+        status.statusDate?.let { metadata.add(Metadatum(decodeLocalDate(it), MetadatumType.DATE)) }
+        status.statusReference?.let { metadata.add(Metadatum(it, MetadatumType.REFERENCE)) }
+
+        if (metadata.isNotEmpty()) {
+            statusSections.add(MetadataSection(Section.STATUS, metadata, index + 1))
         }
-        if (status.statusDescription !== null) {
-            metadata.add(Metadatum(status.statusDescription, MetadatumType.DESCRIPTION))
-        }
-        if (status.statusDate !== null) {
-            metadata.add(Metadatum(decodeLocalDate(status.statusDate), MetadatumType.DATE))
-        }
-        if (status.statusReference !== null) {
-            metadata.add(Metadatum(status.statusReference, MetadatumType.REFERENCE))
-        }
-        if (metadata.isNotEmpty()) statusSections.add(MetadataSection(Section.STATUS, metadata, index + 1))
     }
 
     reissueList.forEachIndexed { index, reissue ->
         val metadata = mutableListOf<Metadatum<*>>()
-        if (reissue.reissueNote !== null) {
-            metadata.add(Metadatum(reissue.reissueNote, MetadatumType.NOTE))
+        reissue.reissueNote?.let { metadata.add(Metadatum(it, MetadatumType.NOTE)) }
+        reissue.reissueArticle?.let { metadata.add(Metadatum(it, MetadatumType.ARTICLE)) }
+        reissue.reissueDate?.let { metadata.add(Metadatum(decodeLocalDate(it), MetadatumType.DATE)) }
+        reissue.reissueReference?.let { metadata.add(Metadatum(it, MetadatumType.REFERENCE)) }
+
+        if (metadata.isNotEmpty()) {
+            statusSections.add(MetadataSection(Section.REISSUE, metadata, index + 1))
         }
-        if (reissue.reissueArticle !== null) {
-            metadata.add(Metadatum(reissue.reissueArticle, MetadatumType.ARTICLE))
-        }
-        if (reissue.reissueDate !== null) {
-            metadata.add(Metadatum(decodeLocalDate(reissue.reissueDate), MetadatumType.DATE))
-        }
-        if (reissue.reissueReference !== null) {
-            metadata.add(Metadatum(reissue.reissueReference, MetadatumType.REFERENCE))
-        }
-        if (metadata.isNotEmpty()) statusSections.add(MetadataSection(Section.REISSUE, metadata, index + 1))
     }
 
-    repealList.forEachIndexed { index, repeal ->
-        statusSections.add(MetadataSection(Section.REPEAL, listOf(Metadatum(repeal, MetadatumType.TEXT)), index + 1))
+    statusSections.addAll(
+        repealList.mapIndexed { index, repeal ->
+            MetadataSection(Section.REPEAL, listOf(Metadatum(repeal, MetadatumType.TEXT)), index + 1)
+        },
+    )
+
+    statusSections.addAll(
+        otherStatusList.mapIndexed { index, otherStatus ->
+            MetadataSection(Section.OTHER_STATUS, listOf(Metadatum(otherStatus, MetadatumType.NOTE)), index + 1)
+        },
+    )
+
+    return statusSections.mapIndexed { index, section ->
+        MetadataSection(Section.STATUS_INDICATION, emptyList(), index + 1, listOf(section))
     }
-    otherStatusList.forEachIndexed { index, otherStatus ->
-        statusSections.add(MetadataSection(Section.OTHER_STATUS, listOf(Metadatum(otherStatus, MetadatumType.NOTE)), index + 1))
-    }
-    return statusSections.mapIndexed { index, section -> MetadataSection(Section.STATUS_INDICATION, listOf(), index + 1, listOf(section)) }
 }
 
 fun addProviderSections(normProviders: List<NormProvider>): List<MetadataSection> {
