@@ -4,7 +4,6 @@ import ComboboxInput from "@/components/ComboboxInput.vue"
 import NormReference, { SingleNormValidationInfo } from "@/domain/normReference"
 import ComboboxItemService from "@/services/comboboxItemService"
 import documentUnitService from "@/services/documentUnitService"
-import FeatureToggleService from "@/services/featureToggleService"
 import DateInput from "@/shared/components/input/DateInput.vue"
 import InputField from "@/shared/components/input/InputField.vue"
 import TextButton from "@/shared/components/input/TextButton.vue"
@@ -50,14 +49,6 @@ const normAbbreviation = computed({
   },
 })
 
-const disableRisAbbreviationInput = ref(false)
-onMounted(async () => {
-  const response = await FeatureToggleService.isEnabled(
-    "neuris.disable-ris-abbreviation-input"
-  )
-  disableRisAbbreviationInput.value = !!response.data
-})
-
 async function validateSingleNorm() {
   if (norm.value?.singleNorm) {
     const singleNormValidationInfo: SingleNormValidationInfo = {
@@ -92,7 +83,6 @@ onMounted(() => {
 
 <template>
   <div>
-    <span v-if="disableRisAbbreviationInput">feature toggle enabled</span>
     <InputField id="norm-reference-search-field" label="Suchfeld">
       <ComboboxInput
         id="norm-reference-search"
