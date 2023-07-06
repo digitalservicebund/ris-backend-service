@@ -1,14 +1,12 @@
 import dayjs from "dayjs"
 import EditableListItem from "./editableListItem"
 import { NormAbbreviation } from "./normAbbreviation"
-import { ValidationError } from "@/shared/components/input/types"
 
 export default class NormReference implements EditableListItem {
   public normAbbreviation?: NormAbbreviation
   public singleNorm?: string
   public dateOfVersion?: string
   public dateOfRelevance?: string
-  public validationErrors?: ValidationError[]
 
   static requiredFields = ["normAbbreviation"] as const
 

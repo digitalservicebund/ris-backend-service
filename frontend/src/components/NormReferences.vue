@@ -26,8 +26,7 @@ const defaultValue = new NormReference()
 
 function decisionSummarizer(normEntry: NormReference) {
   return h("div", [
-    normEntry.hasMissingRequiredFields ||
-    (normEntry.validationErrors && normEntry.validationErrors.length > 0)
+    normEntry.hasMissingRequiredFields
       ? h("div", { class: ["flex flex-row items-center"] }, [
           h(
             "span",

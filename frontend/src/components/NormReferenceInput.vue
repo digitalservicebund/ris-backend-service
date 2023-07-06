@@ -79,13 +79,6 @@ async function validateNorm() {
       })
     })
   }
-
-  // pass upwards if there are validation errors or not
-  const normRef = new NormReference({
-    ...norm.value,
-    validationErrors: validationErrors.value,
-  })
-  emit("update:modelValue", normRef)
 }
 
 async function addNormReference() {
