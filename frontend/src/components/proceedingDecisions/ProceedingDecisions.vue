@@ -130,8 +130,8 @@ async function search(page = 0) {
 }
 
 function decisionSummarizer(dataEntry: ProceedingDecision) {
-  return h("div", { tabindex: dataEntry.isDocUnit() ? 0 : -1 }, [
-    dataEntry.isDocUnit()
+  return h("div", { tabindex: dataEntry.isReadOnly ? 0 : -1 }, [
+    dataEntry.isReadOnly
       ? h(
           RouterLink,
           {

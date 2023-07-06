@@ -26,8 +26,8 @@ const activeCitations = computed({
 const defaultValue = new ActiveCitation()
 
 function decisionSummarizer(activeCitation: ActiveCitation) {
-  return h("div", { tabindex: activeCitation.isDocUnit() ? 0 : -1 }, [
-    activeCitation.isDocUnit()
+  return h("div", { tabindex: activeCitation.isReadOnly ? 0 : -1 }, [
+    activeCitation.isReadOnly
       ? h(
           RouterLink,
           {

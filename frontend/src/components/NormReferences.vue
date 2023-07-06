@@ -22,7 +22,7 @@ const norms = computed({
   },
 })
 
-const defaultValue = {}
+const defaultValue = new NormReference()
 
 function decisionSummarizer(normEntry: NormReference) {
   return h("div", [

@@ -1,7 +1,11 @@
 import dayjs from "dayjs"
+import EditableListItem from "./editableListItem"
 import LinkedDocumentUnit from "./linkedDocumentUnit"
 
-export default class ProceedingDecision extends LinkedDocumentUnit {
+export default class ProceedingDecision
+  extends LinkedDocumentUnit
+  implements EditableListItem
+{
   public dateKnown = true
 
   static requiredFields = ["fileNumber", "court", "decisionDate"] as const
@@ -20,7 +24,7 @@ export default class ProceedingDecision extends LinkedDocumentUnit {
         ? [dayjs(this.decisionDate).format("DD.MM.YYYY")]
         : []),
       ...(this.fileNumber ? [this.fileNumber] : []),
-      ...(this.documentNumber && this.isDocUnit() ? [this.documentNumber] : []),
+      ...(this.documentNumber && this.isReadOnly ? [this.documentNumber] : []),
     ].join(", ")
   }
 
@@ -31,9 +35,13 @@ export default class ProceedingDecision extends LinkedDocumentUnit {
     this.dateKnown = !dateUnknown
   }
 
+  get hasMissingRequiredFields(): boolean {
+    return this.missingRequiredFields.length > 0
+  }
+
   get missingRequiredFields() {
     return ProceedingDecision.requiredFields.filter((field) =>
-      this.requiredFieldIsEmpty(field, this[field] as keyof ProceedingDecision)
+      this.requiredFieldIsEmpty(field, this[field])
     )
   }
 

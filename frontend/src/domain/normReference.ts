@@ -1,8 +1,9 @@
 import dayjs from "dayjs"
+import EditableListItem from "./editableListItem"
 import { NormAbbreviation } from "./normAbbreviation"
 import { ValidationError } from "@/shared/components/input/types"
 
-export default class NormReference {
+export default class NormReference implements EditableListItem {
   public normAbbreviation?: NormAbbreviation
   public singleNorm?: string
   public dateOfVersion?: string
@@ -13,6 +14,10 @@ export default class NormReference {
 
   constructor(data: Partial<NormReference> = {}) {
     Object.assign(this, data)
+  }
+
+  get isReadOnly(): boolean {
+    return false
   }
 
   get renderDecision(): string {
@@ -32,7 +37,7 @@ export default class NormReference {
     return this.missingRequiredFields.length > 0
   }
 
-  get missingRequiredFields() {
+  get missingRequiredFields(): string[] {
     return NormReference.requiredFields.filter((field) =>
       this.requiredFieldIsEmpty(this[field])
     )
