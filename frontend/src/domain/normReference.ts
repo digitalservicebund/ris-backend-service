@@ -1,11 +1,13 @@
 import dayjs from "dayjs"
 import { NormAbbreviation } from "./normAbbreviation"
+import { ValidationError } from "@/shared/components/input/types"
 
 export default class NormReference {
   public normAbbreviation?: NormAbbreviation
   public singleNorm?: string
   public dateOfVersion?: string
   public dateOfRelevance?: string
+  public validationErrors?: ValidationError[]
 
   static requiredFields = ["normAbbreviation"] as const
 
