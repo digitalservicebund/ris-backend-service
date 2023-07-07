@@ -16,7 +16,7 @@ public interface DatabaseDocumentUnitMetadataRepository
   String SEARCH_QUERY =
       "LEFT JOIN ( "
           + "    SELECT DISTINCT ON (document_unit_id) document_unit_id, status "
-          + "    FROM public.document_unit_status "
+          + "    FROM public.publication_status "
           + "    ORDER BY document_unit_id, created_at DESC "
           + ") status ON uuid = status.document_unit_id "
           + "WHERE "
@@ -30,7 +30,7 @@ public interface DatabaseDocumentUnitMetadataRepository
   String ALL_QUERY =
       "LEFT JOIN ( "
           + "    SELECT DISTINCT ON (document_unit_id) document_unit_id, status "
-          + "    FROM public.document_unit_status "
+          + "    FROM public.publication_status "
           + "    ORDER BY document_unit_id, created_at DESC "
           + ") status ON uuid = status.document_unit_id "
           + "WHERE data_source = :dataSource AND ( "

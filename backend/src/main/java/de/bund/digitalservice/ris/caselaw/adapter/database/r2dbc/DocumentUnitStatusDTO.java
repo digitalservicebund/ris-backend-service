@@ -17,7 +17,7 @@ import org.springframework.data.relational.core.mapping.Table;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table("document_unit_status")
+@Table("publication_status")
 public class DocumentUnitStatusDTO implements Persistable<UUID> {
   @Id UUID id;
 
