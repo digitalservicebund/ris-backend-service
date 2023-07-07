@@ -25,7 +25,7 @@ class NotFoundExceptionHandler : ResponseEntityExceptionHandler() {
                 Mono.just(
                     ErrorResponse(
                         mutableListOf(
-                            ErrorDetails(ErrorCode.NOT_FOUND),
+                            ErrorDetails(ErrorCode.NOT_FOUND, ""),
                         ),
                     ),
                 ),

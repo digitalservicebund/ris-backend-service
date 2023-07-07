@@ -1,4 +1,4 @@
-package de.bund.digitalservice.ris.shared.exceptions
+package de.bund.digitalservice.ris.norms.exceptions
 
 import de.bund.digitalservice.ris.norms.exceptions.response.ErrorCode
 import de.bund.digitalservice.ris.norms.exceptions.response.ErrorDetails
@@ -8,24 +8,23 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestControllerAdvice
-import org.springframework.web.client.HttpServerErrorException
+import org.springframework.web.client.HttpClientErrorException
 import org.springframework.web.reactive.result.method.annotation.ResponseEntityExceptionHandler
 import reactor.core.publisher.Mono
-import java.util.*
 
 @RestControllerAdvice
-class ServerErrorExceptionHandler : ResponseEntityExceptionHandler() {
+class ForbiddenExceptionHandler : ResponseEntityExceptionHandler() {
 
-    @ExceptionHandler(HttpServerErrorException::class)
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ExceptionHandler(HttpClientErrorException.Forbidden::class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
     fun handleAllUncaughtException(exception: Exception): ResponseEntity<Mono<ErrorResponse>> =
         ResponseEntity
-            .status(HttpStatus.INTERNAL_SERVER_ERROR)
+            .status(HttpStatus.FORBIDDEN)
             .body(
                 Mono.just(
                     ErrorResponse(
                         mutableListOf(
-                            ErrorDetails(ErrorCode.SERVER_ERROR, ""),
+                            ErrorDetails(ErrorCode.NOT_AUTHENTICATED, ""),
                         ),
                     ),
                 ),
