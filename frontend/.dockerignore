@@ -2,3 +2,7 @@ node_modules
 dist
 Dockerfile
 Dockerfile.prod
+
+# Add ignore exception so we can include the fonts from the angie package
+# instead of having to include them manually
+!node_modules/@digitalservice4germany/angie/fonts
