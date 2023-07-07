@@ -989,9 +989,11 @@ jobs:
       # Push reports
       - name: Push reports
         run: |
+          COMMIT_MESSAGE="${{ github.event.head_commit.message }}"
+          ESCAPED_MESSAGE=$(echo $COMMIT_MESSAGE | sed 's/"/\\"/g')
           git diff-index --cached --quiet HEAD ||
             git commit \
-              -m '${{ github.event.head_commit.message }}' \
+              -m "${ESCAPED_MESSAGE}" \
               -m "From commit: ${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}" &&
             git push origin main &&
             echo "Pushed reports to ${{ github.server_url }}/${{ env.REPORTS_REPOSITORY }}" >> $GITHUB_STEP_SUMMARY
