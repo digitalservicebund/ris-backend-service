@@ -21,7 +21,7 @@ services:
       retries: 3
       start_period: 3s
       timeout: 3s
- 
+
   backend:
     image: gradle:7-jdk17
     user: ${MY_UID}:${MY_GID}
@@ -53,7 +53,7 @@ services:
       retries: 10
       start_period: 60s
       timeout: 3s
-  
+
   frontend:
     image: neuris/frontend
     extra_hosts:
@@ -97,7 +97,7 @@ services:
       timeout: 3s
 
   redis:
-    image: cgr.dev/chainguard/redis:7.0
+    image: cgr.dev/chainguard/redis:7.0@sha256:304aca7d02274ec04ffe6e6e9fe19da1c42d2c3e062ba35183290010b93feb8e
     extra_hosts:
       - localhost:host-gateway
     container_name: redis
