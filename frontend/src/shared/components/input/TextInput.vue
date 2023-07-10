@@ -11,6 +11,7 @@ interface Props {
   readOnly?: boolean
   fullHeight?: boolean
   hasError?: boolean
+  size?: "regular" | "medium" | "small"
 }
 
 interface Emits {
@@ -31,7 +32,9 @@ const { inputValue, emitInputEvent } = useInputModel<string, Props, Emits>(
 
 const conditionalClasses = computed(() => ({
   "has-error": props.hasError,
-  input__fullheight: props.fullHeight,
+  "h-full": props.fullHeight,
+  "ds-input-medium": props.size === "medium",
+  "ds-input-small": props.size === "small",
 }))
 
 const tabindex = computed(() => (props.readOnly ? -1 : 0))
@@ -59,64 +62,3 @@ defineExpose({ focusInput })
     @keyup.enter="emit('enter-released')"
   />
 </template>
-
-<style lang="scss" scoped>
-.input {
-  &__error {
-    @apply border-red-800 outline-red-800 bg-red-200 placeholder-black;
-
-    &:autofill {
-      @apply shadow-error text-inherit;
-    }
-
-    &:autofill:focus {
-      @apply shadow-error text-inherit;
-    }
-  }
-
-  &__fullheight {
-    @apply h-full;
-  }
-}
-
-.expand-enter-from {
-  max-height: 0;
-}
-
-.expand-enter-to {
-  max-height: 1000px;
-}
-
-.expand-enter-active {
-  overflow: hidden;
-  transition: all 0.5s ease-in-out;
-}
-
-.expand-leave-from {
-  max-height: 1000px;
-}
-
-.expand-leave-to {
-  max-height: 0;
-}
-
-.expand-leave-active {
-  overflow: hidden;
-  transition: all 0.5s ease-in-out;
-}
-
-.expandable-content {
-  width: 100%;
-
-  &__header {
-    display: flex;
-    width: 100%;
-    align-items: center;
-    justify-content: space-between;
-  }
-
-  .icon {
-    cursor: pointer;
-  }
-}
-</style>

@@ -9,6 +9,8 @@ interface Props {
   modelValue?: boolean
   ariaLabel: string
   validationError?: ValidationError
+  size?: "small" | "regular"
+  disabled?: boolean
 }
 
 interface Emits {
@@ -20,6 +22,7 @@ const props = withDefaults(defineProps<Props>(), {
   value: false,
   modelValue: false,
   validationError: undefined,
+  size: "regular",
 })
 const emit = defineEmits<Emits>()
 
@@ -30,31 +33,17 @@ const { inputValue, emitInputEvent } = useInputModel<boolean, Props, Emits>(
 
 const isInvalid = computed(() => props.validationError !== undefined)
 </script>
+
 <template>
   <input
     :id="id"
     v-model="inputValue"
     :aria-label="ariaLabel"
     class="ds-checkbox"
-    :class="{ 'has-error': isInvalid }"
+    :class="{ 'has-error': isInvalid, 'ds-checkbox-small': size === 'small' }"
+    :disabled="disabled"
     type="checkbox"
     @input="emitInputEvent"
   />
-  <label></label>
+  <label :for="id"></label>
 </template>
-
-<style lang="scss" scoped>
-input {
-  background-position: center;
-  background-repeat: no-repeat;
-  background-size: 60%;
-
-  &:checked {
-    background-image: url("@/assets/icons/ckeckbox_regular.svg");
-
-    &:disabled {
-      background-image: url("@/assets/icons/ckeckbox_disabled.svg");
-    }
-  }
-}
-</style>
