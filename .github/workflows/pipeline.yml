@@ -450,12 +450,6 @@ jobs:
   analyze-backend:
     runs-on: ubuntu-latest
     if: ${{ github.ref == 'refs/heads/main' }}
-    # needs:
-    #   - backend-build
-    #   - backend-unit-tests
-    #   - backend-integration-tests
-    #   - backend-build-image-and-scan
-    #   - audit-licenses-backend
     steps:
       - uses: actions/checkout@v3
         with:
@@ -509,9 +503,6 @@ jobs:
   analyze-frontend:
     runs-on: ubuntu-latest
     if: ${{ github.ref == 'refs/heads/main' }}
-    # needs:
-    #   - frontend-build
-    #   - frontend-build-image-and-scan
     steps:
       - uses: actions/checkout@v3
         with:
@@ -786,7 +777,13 @@ jobs:
       after-4pm: ${{ steps.check-time.outputs.after-4pm }}
     steps:
       - id: check-time
-        run: echo "after-4pm=$(if [ $(TZ="Europe/Berlin" date +'%H') -lt 16 ]; then echo 'false'; else echo 'true'; fi)" >> "$GITHUB_OUTPUT"
+        run: |
+          hour=$(TZ="Europe/Berlin" date +'%H')
+          if [ $hour -lt 4 -o $hour -ge 16 ]; then
+            echo "after-4pm=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "after-4pm=false" >> "$GITHUB_OUTPUT"
+          fi
 
   deploy-production:
     runs-on: ubuntu-latest
