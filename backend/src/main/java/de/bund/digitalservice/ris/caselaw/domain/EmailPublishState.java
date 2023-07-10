@@ -3,7 +3,7 @@ package de.bund.digitalservice.ris.caselaw.domain;
 import lombok.Getter;
 
 @Getter
-public enum PublishState {
+public enum EmailPublishState {
   SUCCESS("erfolgreich angekommen"),
   ERROR("fehlgeschlagen"),
   UNKNOWN("unbekannt"),
@@ -11,7 +11,7 @@ public enum PublishState {
 
   private final String displayText;
 
-  PublishState(String displayText) {
+  EmailPublishState(String displayText) {
     this.displayText = displayText;
   }
 }

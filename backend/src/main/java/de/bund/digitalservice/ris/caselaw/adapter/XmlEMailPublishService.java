@@ -5,9 +5,9 @@ import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitPublishException;
 import de.bund.digitalservice.ris.caselaw.domain.EmailPublishService;
+import de.bund.digitalservice.ris.caselaw.domain.EmailPublishState;
 import de.bund.digitalservice.ris.caselaw.domain.HttpMailSender;
 import de.bund.digitalservice.ris.caselaw.domain.Publication;
-import de.bund.digitalservice.ris.caselaw.domain.PublishState;
 import de.bund.digitalservice.ris.caselaw.domain.XmlExporter;
 import de.bund.digitalservice.ris.caselaw.domain.XmlPublication;
 import de.bund.digitalservice.ris.caselaw.domain.XmlPublicationRepository;
@@ -142,7 +142,7 @@ public class XmlEMailPublishService implements EmailPublishService {
             .statusMessages(xml.statusMessages());
 
     if (xml.statusCode().equals("400")) {
-      return publication.publishState(PublishState.UNKNOWN).build();
+      return publication.publishState(EmailPublishState.UNKNOWN).build();
     }
 
     return publication
@@ -151,7 +151,7 @@ public class XmlEMailPublishService implements EmailPublishService {
         .xml(xml.xml())
         .fileName(xml.fileName())
         .publishDate(xml.publishDate())
-        .publishState(PublishState.SENT)
+        .publishState(EmailPublishState.SENT)
         .build();
   }
 

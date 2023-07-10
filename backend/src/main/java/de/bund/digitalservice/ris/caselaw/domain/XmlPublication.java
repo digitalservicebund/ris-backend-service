@@ -16,7 +16,7 @@ public record XmlPublication(
     List<String> statusMessages,
     String fileName,
     @JsonIgnore Instant publishDate,
-    PublishState publishState,
+    EmailPublishState emailPublishState,
     String publishStateDisplayText)
     implements Publication {
   @Override
@@ -40,6 +40,6 @@ public record XmlPublication(
   }
 
   public String getPublishStateDisplayText() {
-    return publishState.getDisplayText();
+    return emailPublishState.getDisplayText();
   }
 }

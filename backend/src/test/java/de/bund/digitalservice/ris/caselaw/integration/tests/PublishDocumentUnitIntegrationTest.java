@@ -29,10 +29,10 @@ import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresConfig;
 import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
+import de.bund.digitalservice.ris.caselaw.domain.EmailPublishState;
 import de.bund.digitalservice.ris.caselaw.domain.HttpMailSender;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationHistoryRecordType;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
-import de.bund.digitalservice.ris.caselaw.domain.PublishState;
 import de.bund.digitalservice.ris.caselaw.domain.XmlPublication;
 import java.time.Clock;
 import java.time.Instant;
@@ -146,7 +146,7 @@ class PublishDocumentUnitIntegrationTest {
             "message 1|message 2",
             "test.xml",
             null,
-            PublishState.SENT);
+            EmailPublishState.SENT);
     XmlPublication expectedXmlResultObject =
         XmlPublication.builder()
             .documentUnitUuid(documentUnitUuid1)
@@ -160,7 +160,7 @@ class PublishDocumentUnitIntegrationTest {
             .statusCode("200")
             .statusMessages(List.of("message 1", "message 2"))
             .fileName("test.xml")
-            .publishState(PublishState.SENT)
+            .publishState(EmailPublishState.SENT)
             .build();
     risWebTestClient
         .withDefaultLogin()
@@ -225,7 +225,7 @@ class PublishDocumentUnitIntegrationTest {
             .documentUnitUuid(documentUnitUuid)
             .statusCode("400")
             .statusMessages(List.of("message 1", "message 2"))
-            .publishState(PublishState.UNKNOWN)
+            .publishState(EmailPublishState.UNKNOWN)
             .build();
 
     risWebTestClient
@@ -276,7 +276,7 @@ class PublishDocumentUnitIntegrationTest {
             "message 1|message 2",
             "test.xml",
             Instant.now(),
-            PublishState.SENT);
+            EmailPublishState.SENT);
     xmlPublicationRepository.save(xmlPublicationDTO).block();
 
     XmlPublication expectedXmlPublication =
@@ -288,7 +288,7 @@ class PublishDocumentUnitIntegrationTest {
             .statusCode("200")
             .statusMessages(List.of("message 1", "message 2"))
             .fileName("text.xml")
-            .publishState(PublishState.SENT)
+            .publishState(EmailPublishState.SENT)
             .build();
 
     risWebTestClient
@@ -333,7 +333,7 @@ class PublishDocumentUnitIntegrationTest {
                 "message 1|message 2",
                 "test.xml",
                 publishDate,
-                PublishState.SENT))
+                EmailPublishState.SENT))
         .block();
 
     Instant receivedDate = publishDate.plus(1, ChronoUnit.HOURS);

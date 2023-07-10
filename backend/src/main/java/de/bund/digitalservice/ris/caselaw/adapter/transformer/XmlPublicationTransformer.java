@@ -17,7 +17,7 @@ public class XmlPublicationTransformer {
         .xml(xmlPublication.xml())
         .receiverAddress(xmlPublication.receiverAddress())
         .publishDate(xmlPublication.getPublishDate())
-        .publishState(xmlPublication.publishState())
+        .publishState(xmlPublication.emailPublishState())
         .mailSubject(xmlPublication.mailSubject())
         .fileName(xmlPublication.fileName())
         .build();
@@ -32,8 +32,8 @@ public class XmlPublicationTransformer {
         .xml(xmlPublicationDTO.xml())
         .receiverAddress(xmlPublicationDTO.receiverAddress())
         .publishDate(xmlPublicationDTO.publishDate())
-        .publishState(xmlPublicationDTO.publishState())
-        .publishStateDisplayText(xmlPublicationDTO.publishState().getDisplayText())
+        .publishState(xmlPublicationDTO.emailPublishState())
+        .publishStateDisplayText(xmlPublicationDTO.emailPublishState().getDisplayText())
         .mailSubject(xmlPublicationDTO.mailSubject())
         .fileName(xmlPublicationDTO.fileName())
         .build();

@@ -12,8 +12,8 @@ import static org.mockito.Mockito.when;
 import de.bund.digitalservice.ris.caselaw.domain.Attachment;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitPublishException;
+import de.bund.digitalservice.ris.caselaw.domain.EmailPublishState;
 import de.bund.digitalservice.ris.caselaw.domain.HttpMailSender;
-import de.bund.digitalservice.ris.caselaw.domain.PublishState;
 import de.bund.digitalservice.ris.caselaw.domain.XmlExporter;
 import de.bund.digitalservice.ris.caselaw.domain.XmlPublication;
 import de.bund.digitalservice.ris.caselaw.domain.XmlPublicationRepository;
@@ -63,7 +63,7 @@ class XmlEMailPublishServiceTest {
           .statusMessages(List.of("succeed"))
           .fileName("test.xml")
           .publishDate(PUBLISH_DATE)
-          .publishState(PublishState.SENT)
+          .publishState(EmailPublishState.SENT)
           .build();
   private static final XmlPublication SAVED_XML_MAIL =
       XmlPublication.builder()
@@ -75,7 +75,7 @@ class XmlEMailPublishServiceTest {
           .statusMessages(List.of("succeed"))
           .fileName("test.xml")
           .publishDate(PUBLISH_DATE)
-          .publishState(PublishState.SENT)
+          .publishState(EmailPublishState.SENT)
           .build();
   private static final XmlPublication EXPECTED_RESPONSE = SAVED_XML_MAIL;
   private static final XmlResultObject FORMATTED_XML =
@@ -130,7 +130,7 @@ class XmlEMailPublishServiceTest {
     var expected =
         XmlPublication.builder()
             .documentUnitUuid(TEST_UUID)
-            .publishState(PublishState.UNKNOWN)
+            .publishState(EmailPublishState.UNKNOWN)
             .statusMessages(List.of("status-message"))
             .statusCode("400")
             .build();
