@@ -1,6 +1,5 @@
 package de.bund.digitalservice.ris.caselaw.domain;
 
-import static de.bund.digitalservice.ris.caselaw.domain.PublicationStatus.PUBLISHING;
 import static de.bund.digitalservice.ris.caselaw.domain.ServiceUtils.byteBufferToArray;
 
 import jakarta.validation.ConstraintViolation;
@@ -330,11 +329,8 @@ public class DocumentUnitService {
                               .getStatusCode()
                               .equals(String.valueOf(HttpStatus.OK.value()))) {
                             return documentUnitStatusService
-                                .updateStatus(
-                                    documentUnit,
-                                    DocumentUnitStatus.builder().status(PUBLISHING).build(),
-                                    mailResponse.getPublishDate(),
-                                    issuerAddress)
+                                .setToPublishing(
+                                    documentUnit, mailResponse.getPublishDate(), issuerAddress)
                                 .thenReturn(mailResponse);
                           } else {
                             return Mono.just(mailResponse);

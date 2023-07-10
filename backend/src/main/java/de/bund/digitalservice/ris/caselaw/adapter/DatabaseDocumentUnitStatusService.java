@@ -1,7 +1,5 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
-import static de.bund.digitalservice.ris.caselaw.domain.PublicationStatus.UNPUBLISHED;
-
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentUnitStatusRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitException;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitStatusDTO;
@@ -9,6 +7,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.PostgresDocumen
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatus;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatusService;
+import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import java.time.Instant;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
@@ -29,6 +28,7 @@ public class DatabaseDocumentUnitStatusService implements DocumentUnitStatusServ
     this.documentUnitRepository = documentUnitRepository;
   }
 
+  @Override
   public Mono<DocumentUnit> setInitialStatus(DocumentUnit documentUnit) {
     return repository
         .save(
@@ -37,16 +37,15 @@ public class DatabaseDocumentUnitStatusService implements DocumentUnitStatusServ
                 .id(UUID.randomUUID())
                 .createdAt(documentUnit.creationtimestamp())
                 .documentUnitId(documentUnit.uuid())
-                .status(UNPUBLISHED)
+                .status(PublicationStatus.UNPUBLISHED)
+                .withError(false)
                 .build())
         .then(documentUnitRepository.findByUuid(documentUnit.uuid()));
   }
 
-  public Mono<DocumentUnit> updateStatus(
-      DocumentUnit documentUnit,
-      DocumentUnitStatus status,
-      Instant publishDate,
-      String issuerAddress) {
+  @Override
+  public Mono<DocumentUnit> setToPublishing(
+      DocumentUnit documentUnit, Instant publishDate, String issuerAddress) {
     return repository
         .save(
             DocumentUnitStatusDTO.builder()
@@ -54,23 +53,45 @@ public class DatabaseDocumentUnitStatusService implements DocumentUnitStatusServ
                 .id(UUID.randomUUID())
                 .createdAt(publishDate)
                 .documentUnitId(documentUnit.uuid())
-                .status(status.status())
-                .withError(status.withError())
+                .status(PublicationStatus.PUBLISHING)
+                .withError(false)
                 .issuerAddress(issuerAddress)
                 .build())
         .then(documentUnitRepository.findByUuid(documentUnit.uuid()));
   }
 
-  public Mono<String> getIssuerAddressOfLatestStatus(String documentNumber) {
+  @Override
+  public Mono<Void> update(String documentNumber, DocumentUnitStatus status) {
+    return getLatestPublishing(documentNumber)
+        .flatMap(
+            previousStatusDTO ->
+                repository.save(
+                    DocumentUnitStatusDTO.builder()
+                        .newEntry(true)
+                        .id(UUID.randomUUID())
+                        .createdAt(Instant.now())
+                        .documentUnitId(previousStatusDTO.getDocumentUnitId())
+                        .issuerAddress(previousStatusDTO.getIssuerAddress())
+                        .status(status.status())
+                        .withError(status.withError())
+                        .build()))
+        .then();
+  }
+
+  public Mono<String> getLatestIssuerAddress(String documentNumber) {
+    return getLatestPublishing(documentNumber).map(DocumentUnitStatusDTO::getIssuerAddress);
+  }
+
+  private Mono<DocumentUnitStatusDTO> getLatestPublishing(String documentNumber) {
     return documentUnitRepository
         .findByDocumentNumber(documentNumber)
         .switchIfEmpty(
             Mono.error(
                 new DocumentUnitException(
-                    "Could not find Document Unit with documentNumber " + documentNumber)))
+                    "Could not find DocumentUnit with documentNumber " + documentNumber)))
         .flatMap(
             documentUnit ->
-                repository.findFirstByDocumentUnitIdOrderByCreatedAtDesc(documentUnit.uuid()))
-        .map(DocumentUnitStatusDTO::getIssuerAddress);
+                repository.findFirstByDocumentUnitIdAndStatusOrderByCreatedAtDesc(
+                    documentUnit.uuid(), PublicationStatus.PUBLISHING));
   }
 }

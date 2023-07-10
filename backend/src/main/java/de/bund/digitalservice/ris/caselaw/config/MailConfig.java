@@ -37,7 +37,7 @@ public class MailConfig {
   @Bean
   @Primary
   @Profile({"!production & !staging"})
-  public JurisStub jurisMock() {
+  public JurisStub jurisStub() {
     return new JurisStub(mailboxUsername, mailboxPassword);
   }
 }

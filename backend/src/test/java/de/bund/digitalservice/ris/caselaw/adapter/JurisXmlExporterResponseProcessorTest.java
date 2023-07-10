@@ -2,6 +2,7 @@ package de.bund.digitalservice.ris.caselaw.adapter;
 
 import static org.junit.Assert.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
@@ -11,6 +12,7 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import de.bund.digitalservice.ris.caselaw.domain.Attachment;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatus;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatusService;
 import de.bund.digitalservice.ris.caselaw.domain.HttpMailSender;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationReport;
@@ -42,6 +44,7 @@ import org.mockito.Mock;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @ExtendWith(SpringExtension.class)
@@ -75,6 +78,9 @@ class JurisXmlExporterResponseProcessorTest {
     when(importHandler.messageIsActionable()).thenReturn(true);
     when(importHandler.getDocumentNumber(message)).thenReturn(DOCUMENT_NUMBER);
 
+    when(reportRepository.saveAll(any())).thenReturn(Flux.empty());
+    when(statusService.update(anyString(), any(DocumentUnitStatus.class))).thenReturn(Mono.empty());
+
     responseProcessor =
         new JurisXmlExporterResponseProcessor(
             Collections.singletonList(messageHandler),
@@ -86,13 +92,13 @@ class JurisXmlExporterResponseProcessorTest {
 
   @Test
   void testMessageGetsForwarded() throws MessagingException {
-    when(statusService.getIssuerAddressOfLatestStatus(DOCUMENT_NUMBER))
+    when(statusService.getLatestIssuerAddress(DOCUMENT_NUMBER))
         .thenReturn(Mono.just("test@digitalservice.bund.de"));
 
     responseProcessor.readEmails();
 
     verify(storeFactory, times(1)).createStore();
-    verify(statusService, times(1)).getIssuerAddressOfLatestStatus(DOCUMENT_NUMBER);
+    verify(statusService, times(1)).getLatestIssuerAddress(DOCUMENT_NUMBER);
     verify(mailSender, times(1))
         .sendMail(any(), any(), any(), any(), any(), eq("report-" + DOCUMENT_NUMBER));
     verify(inbox, times(1)).copyMessages(new Message[] {message}, processed);
@@ -108,7 +114,7 @@ class JurisXmlExporterResponseProcessorTest {
             statusService,
             storeFactory,
             reportRepository);
-    when(statusService.getIssuerAddressOfLatestStatus(DOCUMENT_NUMBER))
+    when(statusService.getLatestIssuerAddress(DOCUMENT_NUMBER))
         .thenReturn(Mono.just("test@digitalservice.bund.de"));
 
     Multipart multipart = new MimeMultipart();
@@ -168,7 +174,7 @@ class JurisXmlExporterResponseProcessorTest {
   @Test
   void testAttachmentsGetsPersisted() throws MessagingException, IOException {
     Date now = new Date();
-    when(statusService.getIssuerAddressOfLatestStatus(DOCUMENT_NUMBER))
+    when(statusService.getLatestIssuerAddress(DOCUMENT_NUMBER))
         .thenReturn(Mono.just("test@digitalservice.bund.de"));
     when(messageHandler.getAttachments(message))
         .thenReturn(
@@ -200,7 +206,7 @@ class JurisXmlExporterResponseProcessorTest {
   @Test
   void testAttachmentsGetSanitized() throws MessagingException, IOException {
     Date now = new Date();
-    when(statusService.getIssuerAddressOfLatestStatus(DOCUMENT_NUMBER))
+    when(statusService.getLatestIssuerAddress(DOCUMENT_NUMBER))
         .thenReturn(Mono.just("test@digitalservice.bund.de"));
     String providedHtml =
         """

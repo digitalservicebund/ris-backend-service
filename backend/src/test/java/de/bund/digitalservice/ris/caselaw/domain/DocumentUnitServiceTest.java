@@ -341,11 +341,8 @@ class DocumentUnitServiceTest {
             .build();
     when(publishService.publish(eq(DocumentUnit.builder().build()), anyString()))
         .thenReturn(Mono.just(xmlPublication));
-    when(documentUnitStatusService.updateStatus(
-            any(DocumentUnit.class),
-            any(DocumentUnitStatus.class),
-            any(Instant.class),
-            anyString()))
+    when(documentUnitStatusService.setToPublishing(
+            any(DocumentUnit.class), any(Instant.class), anyString()))
         .thenReturn(Mono.just(DocumentUnit.builder().build()));
     StepVerifier.create(service.publishAsEmail(TEST_UUID, ISSUER_ADDRESS))
         .consumeNextWith(
@@ -355,11 +352,7 @@ class DocumentUnitServiceTest {
     verify(repository).findByUuid(TEST_UUID);
     verify(publishService).publish(eq(DocumentUnit.builder().build()), anyString());
     verify(documentUnitStatusService)
-        .updateStatus(
-            any(DocumentUnit.class),
-            any(DocumentUnitStatus.class),
-            any(Instant.class),
-            anyString());
+        .setToPublishing(any(DocumentUnit.class), any(Instant.class), anyString());
   }
 
   @Test
