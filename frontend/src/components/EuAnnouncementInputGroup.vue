@@ -74,7 +74,7 @@ const explanation = computed({
       id="euAnnouncementGazette"
       alt-text="Amtsblatt der EU"
       aria-label="Amtsblatt der EU"
-      class="border-gray-800 read-only:!border-solid"
+      class="border-gray-800 border-solid"
       read-only
       :value="defaultValueEuGovernmentGazette"
     />
