@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import org.owasp.html.HtmlPolicyBuilder;
 import org.owasp.html.PolicyFactory;
@@ -160,10 +161,7 @@ public class JurisXmlExporterResponseProcessor {
       return statusService.update(
           documentNumber,
           DocumentUnitStatus.builder()
-              .status(
-                  handler.isPublished(message)
-                      ? PublicationStatus.PUBLISHED
-                      : PublicationStatus.UNPUBLISHED)
+              .status(getPublicationStatus(handler.isPublished(message)))
               .withError(handler.hasErrors(message))
               .build());
     } catch (MessagingException | IOException e) {
@@ -207,5 +205,11 @@ public class JurisXmlExporterResponseProcessor {
             throw new StatusImporterException("Error deleting Message: " + e);
           }
         });
+  }
+
+  private PublicationStatus getPublicationStatus(Optional<Boolean> isPublished) {
+    return isPublished
+        .map(published -> published ? PublicationStatus.PUBLISHED : PublicationStatus.UNPUBLISHED)
+        .orElse(PublicationStatus.PUBLISHING);
   }
 }
