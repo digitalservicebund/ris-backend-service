@@ -1,6 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.domain;
 
-import static de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatus.PUBLISHED;
+import static de.bund.digitalservice.ris.caselaw.domain.PublicationStatus.PUBLISHING;
 import static de.bund.digitalservice.ris.caselaw.domain.ServiceUtils.byteBufferToArray;
 
 import jakarta.validation.ConstraintViolation;
@@ -332,7 +332,7 @@ public class DocumentUnitService {
                             return documentUnitStatusService
                                 .updateStatus(
                                     documentUnit,
-                                    PUBLISHED,
+                                    DocumentUnitStatus.builder().status(PUBLISHING).build(),
                                     mailResponse.getPublishDate(),
                                     issuerAddress)
                                 .thenReturn(mailResponse);

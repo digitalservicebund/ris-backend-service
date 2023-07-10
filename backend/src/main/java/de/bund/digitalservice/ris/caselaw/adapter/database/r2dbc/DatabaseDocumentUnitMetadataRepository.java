@@ -25,7 +25,7 @@ public interface DatabaseDocumentUnitMetadataRepository
           + "(:decisionDate IS NULL OR decision_date = :decisionDate) AND"
           + "(:docUnitIds IS NULL OR id = ANY(:docUnitIds)) AND "
           + "(:docTypeId IS NULL OR document_type_id = :docTypeId) AND "
-          + "(status.status = 'PUBLISHED' OR status.status IS NULL) AND "
+          + "(status.status = 'PUBLISHED' OR status.status = 'PUBLISHING' OR status.status IS NULL) AND "
           + "data_source in ('NEURIS', 'MIGRATION') ";
   String ALL_QUERY =
       "LEFT JOIN ( "
@@ -36,7 +36,8 @@ public interface DatabaseDocumentUnitMetadataRepository
           + "WHERE data_source = :dataSource AND ( "
           + "    documentation_office_id = :documentationOfficeId OR"
           + "    status.status IS NULL OR "
-          + "    status.status = 'PUBLISHED') ";
+          + "    status.status = 'PUBLISHED' OR "
+          + "    status.status = 'PUBLISHING') ";
 
   Mono<DocumentUnitMetadataDTO> findByUuid(UUID documentUnitUuid);
 

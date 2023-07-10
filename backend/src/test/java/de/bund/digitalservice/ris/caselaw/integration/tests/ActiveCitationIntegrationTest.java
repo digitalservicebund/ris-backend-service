@@ -35,6 +35,7 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatus;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitLinkType;
 import de.bund.digitalservice.ris.caselaw.domain.EmailPublishService;
+import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.Texts;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.court.Court;
@@ -853,7 +854,7 @@ class ActiveCitationIntegrationTest {
         .texts(Texts.builder().build())
         .creationtimestamp(TIMESTAMP)
         .contentRelatedIndexing(contentRelatedIndexing)
-        .status(DocumentUnitStatus.PUBLISHED)
+        .status(DocumentUnitStatus.builder().status(PublicationStatus.PUBLISHED).build())
         .proceedingDecisions(Collections.emptyList())
         .build();
   }

@@ -1,6 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
-import static de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatus.UNPUBLISHED;
+import static de.bund.digitalservice.ris.caselaw.domain.PublicationStatus.UNPUBLISHED;
 
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentUnitStatusRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitException;
@@ -54,7 +54,8 @@ public class DatabaseDocumentUnitStatusService implements DocumentUnitStatusServ
                 .id(UUID.randomUUID())
                 .createdAt(publishDate)
                 .documentUnitId(documentUnit.uuid())
-                .status(status)
+                .status(status.status())
+                .withError(status.withError())
                 .issuerAddress(issuerAddress)
                 .build())
         .then(documentUnitRepository.findByUuid(documentUnit.uuid()));

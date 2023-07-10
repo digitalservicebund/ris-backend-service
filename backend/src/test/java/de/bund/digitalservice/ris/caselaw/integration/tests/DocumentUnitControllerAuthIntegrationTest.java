@@ -1,7 +1,8 @@
 package de.bund.digitalservice.ris.caselaw.integration.tests;
 
-import static de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatus.PUBLISHED;
-import static de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatus.UNPUBLISHED;
+import static de.bund.digitalservice.ris.caselaw.domain.PublicationStatus.PUBLISHED;
+import static de.bund.digitalservice.ris.caselaw.domain.PublicationStatus.PUBLISHING;
+import static de.bund.digitalservice.ris.caselaw.domain.PublicationStatus.UNPUBLISHED;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.jayway.jsonpath.JsonPath;
@@ -110,28 +111,61 @@ class DocumentUnitControllerAuthIntegrationTest {
 
   @Test
   void testGetAll_correctFilteringDependingOnUser() {
-    DocumentUnitDTO docUnit1 = createNewDocumentUnitDTO(docOffice1DTO.getId());
-    saveToStatusRepository(docUnit1, docUnit1.getCreationtimestamp(), UNPUBLISHED);
+    DocumentUnitDTO office1Unpublished = createNewDocumentUnitDTO(docOffice1DTO.getId());
+    saveToStatusRepository(
+        office1Unpublished,
+        office1Unpublished.getCreationtimestamp(),
+        DocumentUnitStatus.builder().status(UNPUBLISHED).build());
 
-    DocumentUnitDTO docUnit2 = createNewDocumentUnitDTO(docOffice2DTO.getId());
-    saveToStatusRepository(docUnit2, docUnit2.getCreationtimestamp(), UNPUBLISHED);
-    saveToStatusRepository(docUnit2, Instant.now(), PUBLISHED);
+    DocumentUnitDTO office2Published = createNewDocumentUnitDTO(docOffice2DTO.getId());
+    saveToStatusRepository(
+        office2Published,
+        office2Published.getCreationtimestamp(),
+        DocumentUnitStatus.builder().status(UNPUBLISHED).build());
+    saveToStatusRepository(
+        office2Published, Instant.now(), DocumentUnitStatus.builder().status(PUBLISHED).build());
 
-    DocumentUnitDTO docUnit3 = createNewDocumentUnitDTO(docOffice2DTO.getId());
-    saveToStatusRepository(docUnit3, docUnit3.getCreationtimestamp(), UNPUBLISHED);
+    DocumentUnitDTO office2Publishing = createNewDocumentUnitDTO(docOffice2DTO.getId());
+    saveToStatusRepository(
+        office2Publishing,
+        office2Publishing.getCreationtimestamp(),
+        DocumentUnitStatus.builder().status(UNPUBLISHED).build());
+    saveToStatusRepository(
+        office2Publishing, Instant.now(), DocumentUnitStatus.builder().status(PUBLISHING).build());
 
-    DocumentUnitDTO docUnit4 = createNewDocumentUnitDTO(docOffice2DTO.getId());
-    saveToStatusRepository(docUnit4, docUnit4.getCreationtimestamp(), UNPUBLISHED);
-    saveToStatusRepository(docUnit4, Instant.now(), PUBLISHED);
+    DocumentUnitDTO office2Unpublished = createNewDocumentUnitDTO(docOffice2DTO.getId());
+    saveToStatusRepository(
+        office2Unpublished,
+        office2Unpublished.getCreationtimestamp(),
+        DocumentUnitStatus.builder().status(UNPUBLISHED).build());
 
-    DocumentUnitDTO docUnit5 = createNewDocumentUnitDTO(docOffice2DTO.getId());
+    DocumentUnitDTO office2LaterPublished = createNewDocumentUnitDTO(docOffice2DTO.getId());
+    saveToStatusRepository(
+        office2LaterPublished,
+        office2LaterPublished.getCreationtimestamp(),
+        DocumentUnitStatus.builder().status(UNPUBLISHED).build());
+    saveToStatusRepository(
+        office2LaterPublished,
+        Instant.now(),
+        DocumentUnitStatus.builder().status(PUBLISHED).build());
 
-    DocumentUnitDTO docUnit6 = createNewDocumentUnitDTO(null);
+    DocumentUnitDTO office2NoStatus = createNewDocumentUnitDTO(docOffice2DTO.getId());
 
-    DocumentUnitDTO docUnit7 = createNewDocumentUnitDTO(docOffice2DTO.getId());
-    saveToStatusRepository(docUnit7, docUnit7.getCreationtimestamp(), UNPUBLISHED);
-    saveToStatusRepository(docUnit7, Instant.now().plus(1, ChronoUnit.DAYS), PUBLISHED);
-    saveToStatusRepository(docUnit7, Instant.now().plus(2, ChronoUnit.DAYS), UNPUBLISHED);
+    DocumentUnitDTO withoutOffice = createNewDocumentUnitDTO(null);
+
+    DocumentUnitDTO office2LaterUnpublished = createNewDocumentUnitDTO(docOffice2DTO.getId());
+    saveToStatusRepository(
+        office2LaterUnpublished,
+        office2LaterUnpublished.getCreationtimestamp(),
+        DocumentUnitStatus.builder().status(UNPUBLISHED).build());
+    saveToStatusRepository(
+        office2LaterUnpublished,
+        Instant.now().plus(1, ChronoUnit.DAYS),
+        DocumentUnitStatus.builder().status(PUBLISHED).build());
+    saveToStatusRepository(
+        office2LaterUnpublished,
+        Instant.now().plus(2, ChronoUnit.DAYS),
+        DocumentUnitStatus.builder().status(UNPUBLISHED).build());
 
     // Documentation Office 1
     EntityExchangeResult<String> result =
@@ -145,18 +179,22 @@ class DocumentUnitControllerAuthIntegrationTest {
             .expectBody(String.class)
             .returnResult();
 
-    assertThat(extractStatusByUuid(result.getResponseBody(), docUnit1.getUuid()))
+    assertThat(extractStatusByUuid(result.getResponseBody(), office1Unpublished.getUuid()))
         .isEqualTo(UNPUBLISHED.toString());
-    assertThat(extractStatusByUuid(result.getResponseBody(), docUnit2.getUuid()))
+    assertThat(extractStatusByUuid(result.getResponseBody(), office2Published.getUuid()))
         .isEqualTo(PUBLISHED.toString());
-    assertThat(extractDocUnitsByUuid(result.getResponseBody(), docUnit3.getUuid())).isEmpty();
-    assertThat(extractStatusByUuid(result.getResponseBody(), docUnit4.getUuid()))
+    assertThat(extractStatusByUuid(result.getResponseBody(), office2Publishing.getUuid()))
+        .isEqualTo(PUBLISHING.toString());
+    assertThat(extractDocUnitsByUuid(result.getResponseBody(), office2Unpublished.getUuid()))
+        .isEmpty();
+    assertThat(extractStatusByUuid(result.getResponseBody(), office2LaterPublished.getUuid()))
         .isEqualTo(PUBLISHED.toString());
-    assertThat(extractStatusByUuid(result.getResponseBody(), docUnit5.getUuid()))
+    assertThat(extractStatusByUuid(result.getResponseBody(), office2NoStatus.getUuid()))
         .isEqualTo(PUBLISHED.toString());
-    assertThat(extractStatusByUuid(result.getResponseBody(), docUnit6.getUuid()))
+    assertThat(extractStatusByUuid(result.getResponseBody(), withoutOffice.getUuid()))
         .isEqualTo(PUBLISHED.toString());
-    assertThat(extractDocUnitsByUuid(result.getResponseBody(), docUnit7.getUuid())).isEmpty();
+    assertThat(extractDocUnitsByUuid(result.getResponseBody(), office2LaterUnpublished.getUuid()))
+        .isEmpty();
 
     // Documentation Office 2
     result =
@@ -170,25 +208,31 @@ class DocumentUnitControllerAuthIntegrationTest {
             .expectBody(String.class)
             .returnResult();
 
-    assertThat(extractDocUnitsByUuid(result.getResponseBody(), docUnit1.getUuid())).isEmpty();
-    assertThat(extractStatusByUuid(result.getResponseBody(), docUnit2.getUuid()))
+    assertThat(extractDocUnitsByUuid(result.getResponseBody(), office1Unpublished.getUuid()))
+        .isEmpty();
+    assertThat(extractStatusByUuid(result.getResponseBody(), office2Published.getUuid()))
         .isEqualTo(PUBLISHED.toString());
-    assertThat(extractStatusByUuid(result.getResponseBody(), docUnit3.getUuid()))
+    assertThat(extractStatusByUuid(result.getResponseBody(), office2Publishing.getUuid()))
+        .isEqualTo(PUBLISHING.toString());
+    assertThat(extractStatusByUuid(result.getResponseBody(), office2Unpublished.getUuid()))
         .isEqualTo(UNPUBLISHED.toString());
-    assertThat(extractStatusByUuid(result.getResponseBody(), docUnit4.getUuid()))
+    assertThat(extractStatusByUuid(result.getResponseBody(), office2LaterPublished.getUuid()))
         .isEqualTo(PUBLISHED.toString());
-    assertThat(extractStatusByUuid(result.getResponseBody(), docUnit5.getUuid()))
+    assertThat(extractStatusByUuid(result.getResponseBody(), office2NoStatus.getUuid()))
         .isEqualTo(PUBLISHED.toString());
-    assertThat(extractStatusByUuid(result.getResponseBody(), docUnit6.getUuid()))
+    assertThat(extractStatusByUuid(result.getResponseBody(), withoutOffice.getUuid()))
         .isEqualTo(PUBLISHED.toString());
-    assertThat(extractStatusByUuid(result.getResponseBody(), docUnit7.getUuid()))
+    assertThat(extractStatusByUuid(result.getResponseBody(), office2LaterUnpublished.getUuid()))
         .isEqualTo(UNPUBLISHED.toString());
   }
 
   @Test
-  void testGetByDocumentNumber() {
+  void testUnpublishedDocumentUnitIsForbiddenFOrOtherOffice() {
     DocumentUnitDTO docUnit1 = createNewDocumentUnitDTO(docOffice1DTO.getId());
-    saveToStatusRepository(docUnit1, docUnit1.getCreationtimestamp(), UNPUBLISHED);
+    saveToStatusRepository(
+        docUnit1,
+        docUnit1.getCreationtimestamp(),
+        DocumentUnitStatus.builder().status(UNPUBLISHED).build());
 
     // Documentation Office 1
     EntityExchangeResult<String> result =
@@ -214,7 +258,27 @@ class DocumentUnitControllerAuthIntegrationTest {
         .isForbidden();
 
     saveToStatusRepository(
-        docUnit1, docUnit1.getCreationtimestamp().plus(1, ChronoUnit.DAYS), PUBLISHED);
+        docUnit1,
+        docUnit1.getCreationtimestamp().plus(1, ChronoUnit.DAYS),
+        DocumentUnitStatus.builder().status(PUBLISHING).build());
+
+    result =
+        risWebTestClient
+            .withLogin(docOffice2Group)
+            .get()
+            .uri("/api/v1/caselaw/documentunits/" + docUnit1.getDocumentnumber())
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectBody(String.class)
+            .returnResult();
+
+    assertThat(extractUuid(result.getResponseBody())).hasToString(docUnit1.getUuid().toString());
+
+    saveToStatusRepository(
+        docUnit1,
+        docUnit1.getCreationtimestamp().plus(2, ChronoUnit.DAYS),
+        DocumentUnitStatus.builder().status(PUBLISHED).build());
 
     result =
         risWebTestClient
@@ -251,7 +315,8 @@ class DocumentUnitControllerAuthIntegrationTest {
         .save(
             DocumentUnitStatusDTO.builder()
                 .documentUnitId(docUnitDTO.getUuid())
-                .status(status)
+                .status(status.status())
+                .withError(status.withError())
                 .createdAt(createdAt)
                 .id(UUID.randomUUID())
                 .newEntry(true)
@@ -261,7 +326,8 @@ class DocumentUnitControllerAuthIntegrationTest {
 
   private String extractStatusByUuid(String responseBody, UUID uuid) {
     List<String> docUnitStatusResults =
-        JsonPath.read(responseBody, String.format("$.content[?(@.uuid=='%s')].status", uuid));
+        JsonPath.read(
+            responseBody, String.format("$.content[?(@.uuid=='%s')].status.status", uuid));
     assertThat(docUnitStatusResults).hasSize(1);
     return docUnitStatusResults.get(0);
   }

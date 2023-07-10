@@ -2,7 +2,7 @@ package de.bund.digitalservice.ris.caselaw.adapter.authorization;
 
 import static de.bund.digitalservice.ris.caselaw.AuthUtils.buildDocOffice;
 import static de.bund.digitalservice.ris.caselaw.AuthUtils.setUpDocumentationOfficeMocks;
-import static de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatus.PUBLISHED;
+import static de.bund.digitalservice.ris.caselaw.domain.PublicationStatus.PUBLISHED;
 import static org.mockito.Mockito.when;
 
 import de.bund.digitalservice.ris.caselaw.RisWebTestClient;
@@ -18,6 +18,7 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatus;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
+import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -205,12 +206,12 @@ class ContentRelatedIndexingControllerAuthTest {
     risWebTestClient.withLogin(docOffice2Group).delete().uri(uri).exchange().expectStatus().isOk();
   }
 
-  private void mockDocumentUnit(DocumentationOffice docOffice, DocumentUnitStatus status) {
+  private void mockDocumentUnit(DocumentationOffice docOffice, PublicationStatus status) {
     when(documentUnitService.getByUuid(TEST_UUID))
         .thenReturn(
             Mono.just(
                 DocumentUnit.builder()
-                    .status(status)
+                    .status(DocumentUnitStatus.builder().status(status).build())
                     .coreData(CoreData.builder().documentationOffice(docOffice).build())
                     .build()));
   }

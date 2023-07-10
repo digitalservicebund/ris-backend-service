@@ -52,12 +52,17 @@ export type Texts = {
   decisionReasons?: string
 }
 
+export type PublicationStatus = {
+  status: "PUBLISHED" | "UNPUBLISHED" | "PUBLISHING"
+  withError: boolean
+}
+
 export default class DocumentUnit {
   readonly uuid: string
   readonly id?: string
   readonly documentNumber?: string
   readonly creationtimestamp?: string
-  readonly status?: "PUBLISHED" | "UNPUBLISHED"
+  readonly status?: PublicationStatus
 
   public fileuploadtimestamp?: string
   public s3path?: string

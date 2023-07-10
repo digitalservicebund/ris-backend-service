@@ -1,6 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.integration.tests;
 
-import static de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatus.PUBLISHED;
+import static de.bund.digitalservice.ris.caselaw.domain.PublicationStatus.PUBLISHING;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import de.bund.digitalservice.ris.caselaw.RisWebTestClient;
@@ -29,9 +29,9 @@ import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresConfig;
 import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatus;
 import de.bund.digitalservice.ris.caselaw.domain.HttpMailSender;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationHistoryRecordType;
+import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.PublishState;
 import de.bund.digitalservice.ris.caselaw.domain.XmlPublication;
 import java.time.Clock;
@@ -189,7 +189,7 @@ class PublishDocumentUnitIntegrationTest {
     List<DocumentUnitStatusDTO> statusList =
         documentUnitStatusRepository.findAll().collectList().block();
     DocumentUnitStatusDTO status = statusList.get(statusList.size() - 1);
-    assertThat(status.getStatus()).isEqualTo(PUBLISHED);
+    assertThat(status.getStatus()).isEqualTo(PUBLISHING);
     assertThat(status.getDocumentUnitId()).isEqualTo(documentUnitDTO.getUuid());
     assertThat(status.getCreatedAt()).isEqualTo(xmlPublicationDTO.publishDate());
     assertThat(status.getIssuerAddress()).isEqualTo("test@test.com");
@@ -215,7 +215,7 @@ class PublishDocumentUnitIntegrationTest {
                 .id(UUID.randomUUID())
                 .documentUnitId(savedDocumentUnitDTO.getUuid())
                 .issuerAddress("test1@test.com")
-                .status(DocumentUnitStatus.UNPUBLISHED)
+                .status(PublicationStatus.UNPUBLISHED)
                 .build())
         .block();
     assertThat(documentUnitStatusRepository.findAll().collectList().block()).hasSize(1);
@@ -250,7 +250,7 @@ class PublishDocumentUnitIntegrationTest {
     List<DocumentUnitStatusDTO> statusList =
         documentUnitStatusRepository.findAll().collectList().block();
     assertThat(statusList).hasSize(1);
-    assertThat(statusList.get(0).getStatus()).isEqualTo(DocumentUnitStatus.UNPUBLISHED);
+    assertThat(statusList.get(0).getStatus()).isEqualTo(PublicationStatus.UNPUBLISHED);
   }
 
   @Test
@@ -309,7 +309,7 @@ class PublishDocumentUnitIntegrationTest {
   }
 
   @Test
-  void testPublishLogWithXmlAndReport() {
+  void testPublicationHistoryWithXmlAndReport() {
     UUID documentUnitUuid1 = UUID.randomUUID();
     DocumentUnitDTO documentUnitDTO =
         DocumentUnitDTO.builder()

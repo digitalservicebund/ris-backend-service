@@ -1,8 +1,8 @@
 package de.bund.digitalservice.ris.caselaw.integration.tests;
 
 import static de.bund.digitalservice.ris.caselaw.AuthUtils.buildDefaultDocOffice;
-import static de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatus.PUBLISHED;
-import static de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatus.UNPUBLISHED;
+import static de.bund.digitalservice.ris.caselaw.domain.PublicationStatus.PUBLISHED;
+import static de.bund.digitalservice.ris.caselaw.domain.PublicationStatus.UNPUBLISHED;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.doReturn;
@@ -917,7 +917,7 @@ class DocumentUnitIntegrationTest {
         .consumeWith(
             response -> {
               assertThat(response.getResponseBody()).isNotNull();
-              assertThat(response.getResponseBody().status()).isEqualTo(PUBLISHED);
+              assertThat(response.getResponseBody().status().status()).isEqualTo(PUBLISHED);
             });
   }
 }
