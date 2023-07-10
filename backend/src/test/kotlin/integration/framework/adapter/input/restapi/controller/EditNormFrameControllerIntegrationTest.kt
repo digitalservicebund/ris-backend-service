@@ -8,10 +8,10 @@ import de.bund.digitalservice.ris.norms.application.service.LoadNormService
 import de.bund.digitalservice.ris.norms.domain.entity.Norm
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType
+import de.bund.digitalservice.ris.norms.exceptions.handler.NotFoundExceptionHandler
 import de.bund.digitalservice.ris.norms.framework.adapter.output.database.NormsService
 import de.bund.digitalservice.ris.norms.framework.adapter.output.database.PostgresTestcontainerIntegrationTest
 import de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto.NormDto
-import de.bund.digitalservice.ris.shared.exceptions.NotFoundExceptionHandler
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test

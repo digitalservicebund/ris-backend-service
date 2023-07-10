@@ -1,4 +1,4 @@
-package de.bund.digitalservice.ris.norms.exceptions
+package de.bund.digitalservice.ris.norms.exceptions.handler
 
 import de.bund.digitalservice.ris.norms.exceptions.response.ErrorCode
 import de.bund.digitalservice.ris.norms.exceptions.response.ErrorDetails
