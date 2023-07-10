@@ -43,7 +43,7 @@ public class SendInBlueMailTrackingService implements MailTrackingService {
                     emailPublishState);
               }
               return XmlPublication.builder()
-                  .publishState(emailPublishState)
+                  .emailPublishState(emailPublishState)
                   .publishDate(publishDate)
                   .build();
             })

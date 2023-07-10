@@ -62,7 +62,7 @@ class SendInBlueMailTrackingServiceTest {
             .statusCode("200")
             .statusMessages(new ArrayList<>())
             .fileName("file")
-            .publishState(EmailPublishState.SENT)
+            .emailPublishState(EmailPublishState.SENT)
             .build();
 
     when(mailRepository.getLastXmlPublication(TEST_UUID)).thenReturn(Mono.just(xmlPublication));

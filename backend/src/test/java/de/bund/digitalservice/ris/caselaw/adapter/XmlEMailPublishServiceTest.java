@@ -63,7 +63,7 @@ class XmlEMailPublishServiceTest {
           .statusMessages(List.of("succeed"))
           .fileName("test.xml")
           .publishDate(PUBLISH_DATE)
-          .publishState(EmailPublishState.SENT)
+          .emailPublishState(EmailPublishState.SENT)
           .build();
   private static final XmlPublication SAVED_XML_MAIL =
       XmlPublication.builder()
@@ -75,7 +75,7 @@ class XmlEMailPublishServiceTest {
           .statusMessages(List.of("succeed"))
           .fileName("test.xml")
           .publishDate(PUBLISH_DATE)
-          .publishState(EmailPublishState.SENT)
+          .emailPublishState(EmailPublishState.SENT)
           .build();
   private static final XmlPublication EXPECTED_RESPONSE = SAVED_XML_MAIL;
   private static final XmlResultObject FORMATTED_XML =
@@ -130,7 +130,7 @@ class XmlEMailPublishServiceTest {
     var expected =
         XmlPublication.builder()
             .documentUnitUuid(TEST_UUID)
-            .publishState(EmailPublishState.UNKNOWN)
+            .emailPublishState(EmailPublishState.UNKNOWN)
             .statusMessages(List.of("status-message"))
             .statusCode("400")
             .build();

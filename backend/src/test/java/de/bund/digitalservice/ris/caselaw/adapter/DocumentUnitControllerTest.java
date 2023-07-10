@@ -288,7 +288,7 @@ class DocumentUnitControllerTest {
                     .statusMessages(List.of("status-messages"))
                     .fileName("test.xml")
                     .publishDate(Instant.parse("2020-01-01T01:01:01.00Z"))
-                    .publishState(EmailPublishState.UNKNOWN)
+                    .emailPublishState(EmailPublishState.UNKNOWN)
                     .build()));
 
     risWebClient
@@ -356,7 +356,7 @@ class DocumentUnitControllerTest {
                         .statusMessages(List.of("status-messages"))
                         .fileName("test.xml")
                         .publishDate(Instant.parse("2020-01-01T01:01:01.00Z"))
-                        .publishState(EmailPublishState.SENT)
+                        .emailPublishState(EmailPublishState.SENT)
                         .build(),
                     PublicationReport.builder()
                         .content("<html>2019 Report</html>")

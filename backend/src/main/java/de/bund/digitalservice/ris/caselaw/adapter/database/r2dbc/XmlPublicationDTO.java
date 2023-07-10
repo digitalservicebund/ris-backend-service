@@ -18,4 +18,4 @@ public record XmlPublicationDTO(
     String statusMessages,
     String fileName,
     Instant publishDate,
-    EmailPublishState emailPublishState) {}
+    EmailPublishState publishState) {}

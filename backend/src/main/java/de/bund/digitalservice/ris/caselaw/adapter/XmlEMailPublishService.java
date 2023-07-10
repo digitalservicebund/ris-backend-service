@@ -142,7 +142,7 @@ public class XmlEMailPublishService implements EmailPublishService {
             .statusMessages(xml.statusMessages());
 
     if (xml.statusCode().equals("400")) {
-      return publication.publishState(EmailPublishState.UNKNOWN).build();
+      return publication.emailPublishState(EmailPublishState.UNKNOWN).build();
     }
 
     return publication
@@ -151,7 +151,7 @@ public class XmlEMailPublishService implements EmailPublishService {
         .xml(xml.xml())
         .fileName(xml.fileName())
         .publishDate(xml.publishDate())
-        .publishState(EmailPublishState.SENT)
+        .emailPublishState(EmailPublishState.SENT)
         .build();
   }
 

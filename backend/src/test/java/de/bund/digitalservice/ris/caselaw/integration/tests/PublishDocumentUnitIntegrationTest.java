@@ -160,7 +160,7 @@ class PublishDocumentUnitIntegrationTest {
             .statusCode("200")
             .statusMessages(List.of("message 1", "message 2"))
             .fileName("test.xml")
-            .publishState(EmailPublishState.SENT)
+            .emailPublishState(EmailPublishState.SENT)
             .build();
     risWebTestClient
         .withDefaultLogin()
@@ -225,7 +225,7 @@ class PublishDocumentUnitIntegrationTest {
             .documentUnitUuid(documentUnitUuid)
             .statusCode("400")
             .statusMessages(List.of("message 1", "message 2"))
-            .publishState(EmailPublishState.UNKNOWN)
+            .emailPublishState(EmailPublishState.UNKNOWN)
             .build();
 
     risWebTestClient
@@ -288,7 +288,7 @@ class PublishDocumentUnitIntegrationTest {
             .statusCode("200")
             .statusMessages(List.of("message 1", "message 2"))
             .fileName("text.xml")
-            .publishState(EmailPublishState.SENT)
+            .emailPublishState(EmailPublishState.SENT)
             .build();
 
     risWebTestClient

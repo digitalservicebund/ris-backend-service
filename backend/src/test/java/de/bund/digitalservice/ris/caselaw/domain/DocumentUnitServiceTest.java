@@ -337,7 +337,7 @@ class DocumentUnitServiceTest {
             .statusMessages(List.of("status messages"))
             .fileName("filename")
             .publishDate(Instant.now())
-            .publishState(EmailPublishState.UNKNOWN)
+            .emailPublishState(EmailPublishState.UNKNOWN)
             .build();
     when(publishService.publish(eq(DocumentUnit.builder().build()), anyString()))
         .thenReturn(Mono.just(xmlPublication));
@@ -382,7 +382,7 @@ class DocumentUnitServiceTest {
             .statusCode("200")
             .statusMessages(List.of("message"))
             .fileName("filename")
-            .publishState(EmailPublishState.UNKNOWN)
+            .emailPublishState(EmailPublishState.UNKNOWN)
             .build();
     when(publishService.getPublications(TEST_UUID)).thenReturn(Flux.just(xmlPublication));
     when(publicationReportRepository.getAllByDocumentUnitUuid(TEST_UUID)).thenReturn(Flux.empty());
@@ -428,7 +428,7 @@ class DocumentUnitServiceTest {
             .statusMessages(List.of("message"))
             .fileName("filename")
             .publishDate(secondNewest)
-            .publishState(EmailPublishState.UNKNOWN)
+            .emailPublishState(EmailPublishState.UNKNOWN)
             .build();
 
     PublicationReport report2 =
@@ -444,7 +444,7 @@ class DocumentUnitServiceTest {
             .statusMessages(List.of("message"))
             .fileName("filename")
             .publishDate(fourthNewest)
-            .publishState(EmailPublishState.UNKNOWN)
+            .emailPublishState(EmailPublishState.UNKNOWN)
             .build();
 
     when(publicationReportRepository.getAllByDocumentUnitUuid(TEST_UUID))
