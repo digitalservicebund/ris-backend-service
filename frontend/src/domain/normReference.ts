@@ -1,12 +1,14 @@
 import dayjs from "dayjs"
 import EditableListItem from "./editableListItem"
 import { NormAbbreviation } from "./normAbbreviation"
+import documentUnitService from "@/services/documentUnitService"
 
 export default class NormReference implements EditableListItem {
   public normAbbreviation?: NormAbbreviation
   public singleNorm?: string
   public dateOfVersion?: string
   public dateOfRelevance?: string
+  private validationError = false
 
   static requiredFields = ["normAbbreviation"] as const
 
@@ -29,6 +31,34 @@ export default class NormReference implements EditableListItem {
         : []),
       ...(this.dateOfRelevance ? [this.dateOfRelevance] : []),
     ].join(", ")
+  }
+
+  public async updateValidationErrors(): Promise<boolean> {
+    //validate singleNorm
+    if (this.singleNorm) {
+      const singleNormValidationInfo: SingleNormValidationInfo = {
+        singleNorm: this.singleNorm,
+        normAbbreviation: this.normAbbreviation?.abbreviation,
+      }
+      const response = await documentUnitService.validateSingleNorm(
+        singleNormValidationInfo
+      )
+
+      if (response.data !== "Ok") {
+        this.validationError = true
+        return true
+      } else {
+        this.validationError = false
+        return false
+      }
+    } else {
+      this.validationError = false
+      return false
+    }
+  }
+
+  get hasValidationErrors(): boolean {
+    return this.validationError
   }
 
   get hasMissingRequiredFields(): boolean {

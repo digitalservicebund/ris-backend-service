@@ -1,9 +1,9 @@
 <script lang="ts" setup>
 import { computed, onMounted, ref } from "vue"
 import ComboboxInput from "@/components/ComboboxInput.vue"
-import NormReference, { SingleNormValidationInfo } from "@/domain/normReference"
+import { NormAbbreviation } from "@/domain/normAbbreviation"
+import NormReference from "@/domain/normReference"
 import ComboboxItemService from "@/services/comboboxItemService"
-import documentUnitService from "@/services/documentUnitService"
 import DateInput from "@/shared/components/input/DateInput.vue"
 import InputField from "@/shared/components/input/InputField.vue"
 import TextButton from "@/shared/components/input/TextButton.vue"
@@ -17,7 +17,6 @@ const emit = defineEmits<{
   "update:modelValue": [value: NormReference]
   closeEntry: [void]
 }>()
-
 const validationErrors = ref<ValidationError[]>()
 
 const norm = computed({
@@ -33,18 +32,17 @@ const normAbbreviation = computed({
   get: () =>
     norm?.value?.normAbbreviation
       ? {
-          ...norm.value.normAbbreviation,
           label: norm.value.normAbbreviation.abbreviation,
+          value: norm.value.normAbbreviation,
+          additionalInformation: norm.value.normAbbreviation.officialLongTitle,
         }
       : undefined,
   set: (newValue) => {
-    let normRef = new NormReference()
-    if (newValue) {
-      normRef = new NormReference({
-        ...norm.value,
-        normAbbreviation: newValue,
-      })
-    } else delete normRef.normAbbreviation
+    const newNormAbbreviation = { ...newValue } as NormAbbreviation
+    const normRef = new NormReference({
+      ...norm.value,
+      normAbbreviation: newNormAbbreviation,
+    })
     emit("update:modelValue", normRef)
   },
 })
@@ -52,45 +50,35 @@ const normAbbreviation = computed({
 async function validateNorm() {
   validationErrors.value = []
 
-  //validate singleNorm
-  if (norm.value?.singleNorm) {
-    const singleNormValidationInfo: SingleNormValidationInfo = {
-      singleNorm: norm.value.singleNorm,
-      normAbbreviation: norm.value.normAbbreviation?.abbreviation,
-    }
-    const response = await documentUnitService.validateSingleNorm(
-      singleNormValidationInfo
-    )
-
-    if (response.data !== "Ok") {
+  if (norm.value) {
+    if (await norm.value.updateValidationErrors()) {
       validationErrors.value?.push({
-        defaultMessage: "Inhalt nicht valide",
+        defaultMessage: "Pflichtfeld nicht befüllt",
         field: "singleNorm",
       })
     }
-  }
 
-  //validate required fields
-  if (norm.value.missingRequiredFields?.length) {
-    norm.value.missingRequiredFields.forEach((missingField) => {
-      validationErrors.value?.push({
-        defaultMessage: "Pflichtfeld nicht befüllt",
-        field: missingField,
+    //validate required fields
+    if (norm.value.missingRequiredFields?.length) {
+      norm.value.missingRequiredFields.forEach((missingField) => {
+        validationErrors.value?.push({
+          defaultMessage: "Pflichtfeld nicht befüllt",
+          field: missingField,
+        })
       })
-    })
+    }
   }
 }
 
 async function addNormReference() {
-  const normRef = new NormReference({ ...norm.value })
   validateNorm()
-  emit("update:modelValue", normRef)
+  emit("update:modelValue", norm.value as NormReference)
   emit("closeEntry")
 }
 
 onMounted(() => {
-  norm.value = (props.modelValue as NormReference) ?? {}
   validateNorm()
+  norm.value = (props.modelValue as NormReference) ?? {}
 })
 </script>
 
