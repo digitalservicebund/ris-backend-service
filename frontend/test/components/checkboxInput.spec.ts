@@ -2,37 +2,86 @@ import userEvent from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
 import CheckboxInput from "@/shared/components/input/CheckboxInput.vue"
 
-function renderComponent(options?: {
-  ariaLabel?: string
-  value?: string
-  modelValue?: string
-}) {
-  const user = userEvent.setup()
-  const props = {
-    id: "identifier",
-    value: options?.value,
-    modelValue: options?.modelValue,
-    ariaLabel: options?.ariaLabel ?? "aria-label",
+type CheckboxInputProps = InstanceType<typeof CheckboxInput>["$props"]
+
+function renderComponent(props?: Partial<CheckboxInputProps>) {
+  let modelValue = props?.modelValue ?? false
+
+  const effectiveProps: CheckboxInputProps = {
+    id: props?.id ?? "identifier",
+    value: props?.value,
+    modelValue,
+    "onUpdate:modelValue":
+      props?.["onUpdate:modelValue"] ??
+      ((value) => (modelValue = value ?? false)),
+    ariaLabel: props?.ariaLabel ?? "aria-label",
+    size: props?.size,
+    validationError: props?.validationError,
   }
-  const utils = render(CheckboxInput, { props })
-  return { user, props, ...utils }
+
+  return render(CheckboxInput, { props: effectiveProps })
 }
 
 describe("Checkbox Input", () => {
-  it("shows an Checkbox input element", () => {
+  it("renders a checkbox", () => {
     renderComponent()
-    const input: HTMLInputElement | null = screen.queryByRole("checkbox")
-
+    const input = screen.getByRole("checkbox")
     expect(input).toBeInTheDocument()
-    expect(input?.type).toBe("checkbox")
   })
 
-  it("shows Checkbox Input with an aria label", () => {
-    renderComponent({
-      ariaLabel: "test-label",
-    })
-    const input = screen.queryByLabelText("test-label")
-
+  it("renders an aria label", () => {
+    renderComponent({ ariaLabel: "test-label" })
+    const input = screen.getByLabelText("test-label")
     expect(input).toBeInTheDocument()
+  })
+
+  it("renders the the checkbox as checked", () => {
+    renderComponent({ modelValue: true })
+    const input = screen.getByRole("checkbox")
+    expect(input).toBeChecked()
+  })
+
+  it("renders the the checkbox as unchecked", () => {
+    renderComponent({ modelValue: false })
+    const input = screen.getByRole("checkbox")
+    expect(input).not.toBeChecked()
+  })
+
+  it("toggles the checkbox on click", async () => {
+    const user = userEvent.setup()
+    const { emitted } = renderComponent({ modelValue: false })
+
+    const input = screen.getByRole("checkbox") as HTMLInputElement
+    await user.click(input)
+    await user.click(input)
+
+    expect(emitted("update:modelValue")).toEqual([[true], [false]])
+  })
+
+  it("shows validation errors", () => {
+    renderComponent({
+      validationError: { defaultMessage: "test-error", field: "test-field" },
+    })
+
+    const input = screen.getByRole("checkbox")
+    expect(input).toHaveClass("has-error")
+  })
+
+  it("renders the regular variant by default", () => {
+    renderComponent()
+    const input = screen.getByRole("checkbox")
+    expect(input).not.toHaveClass("ds-checkbox-small")
+  })
+
+  it("renders the regular variant when specified", () => {
+    renderComponent({ size: "regular" })
+    const input = screen.getByRole("checkbox")
+    expect(input).not.toHaveClass("ds-checkbox-small")
+  })
+
+  it("renders the small variant when specified", () => {
+    renderComponent({ size: "small" })
+    const input = screen.getByRole("checkbox")
+    expect(input).toHaveClass("ds-checkbox-small")
   })
 })

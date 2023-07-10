@@ -35,15 +35,23 @@ const isInvalid = computed(() => props.validationError !== undefined)
 </script>
 
 <template>
-  <input
-    :id="id"
-    v-model="inputValue"
-    :aria-label="ariaLabel"
-    class="ds-checkbox"
-    :class="{ 'has-error': isInvalid, 'ds-checkbox-small': size === 'small' }"
-    :disabled="disabled"
-    type="checkbox"
-    @input="emitInputEvent"
-  />
-  <label :for="id"></label>
+  <!-- A note about the wrapper and block class in the label: Currently, Angie
+  positions checkboxes absolutely, which causes them to end up at the top of
+  the page, which in turn causes the page to jump when clicking them. We therefore
+  need to wrap them in a relatively positioned element to keep them within the
+  bounds of the component. This is a workaround and should be removed once the
+  issue is fixed in Angie. -->
+  <div class="relative">
+    <input
+      :id="id"
+      v-model="inputValue"
+      :aria-label="ariaLabel"
+      class="ds-checkbox"
+      :class="{ 'has-error': isInvalid, 'ds-checkbox-small': size === 'small' }"
+      :disabled="disabled"
+      type="checkbox"
+      @input="emitInputEvent"
+    />
+    <label class="!block" :for="id"></label>
+  </div>
 </template>
