@@ -11,13 +11,12 @@ const props = withDefaults(defineProps<Props>(), {
   modelValue: () => ({} as Footnote),
 })
 
-const emit = defineEmits<Emits>()
+const emit =
+  defineEmits<(event: "update:modelValue", value?: Footnote) => void>()
 interface Props {
   modelValue?: Footnote
 }
-interface Emits {
-  (event: "update:modelValue", value?: Footnote): void
-}
+
 const inputValue = computed({
   get: () => parseFootnoteAsSegments(props.modelValue),
   set: (segments: Segment[]) =>

@@ -6,9 +6,8 @@ interface Props {
 
 const props = defineProps<Props>()
 
-const emit = defineEmits<{
-  (event: "linkToken:clicked", content: string): void
-}>()
+const emit =
+  defineEmits<(event: "linkToken:clicked", content: string) => void>()
 
 type Token = {
   content: string

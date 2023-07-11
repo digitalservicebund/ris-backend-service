@@ -9,7 +9,7 @@ const props = defineProps<{
   file?: string
 }>()
 
-const emit = defineEmits<{ (e: "update:open", value: boolean): void }>()
+const emit = defineEmits<(e: "update:open", value: boolean) => void>()
 
 const localOpen = ref(false)
 

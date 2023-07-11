@@ -11,9 +11,7 @@ const props = withDefaults(
   { navigationPosition: "top" }
 )
 
-const emits = defineEmits<{
-  (e: "updatePage", page: number): void
-}>()
+const emits = defineEmits<(e: "updatePage", page: number) => void>()
 
 async function nextPage() {
   !props.page.last && emits("updatePage", props.page.number + 1)
@@ -36,11 +34,11 @@ export type Page<T> = {
   last: boolean
 }
 
-export type PageableService<TResult, TQuery = TResult> = {
-  (page: number, size: number, query?: TQuery): Promise<
-    ServiceResponse<Page<TResult>>
-  >
-}
+export type PageableService<TResult, TQuery = TResult> = (
+  page: number,
+  size: number,
+  query?: TQuery
+) => Promise<ServiceResponse<Page<TResult>>>
 </script>
 
 <template>

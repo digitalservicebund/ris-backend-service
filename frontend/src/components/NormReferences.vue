@@ -9,9 +9,8 @@ const props = defineProps<{
   modelValue: NormReference[] | undefined
 }>()
 
-const emit = defineEmits<{
-  (event: "update:modelValue", value?: NormReference[]): void
-}>()
+const emit =
+  defineEmits<(event: "update:modelValue", value?: NormReference[]) => void>()
 
 const norms = computed({
   get: () => {

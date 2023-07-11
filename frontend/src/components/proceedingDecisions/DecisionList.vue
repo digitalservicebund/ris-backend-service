@@ -6,9 +6,10 @@ defineProps<{
   decisions: ProceedingDecision[]
 }>()
 
-const emit = defineEmits<{
-  (e: "removeLink", decision: ProceedingDecision): Promise<void>
-}>()
+const emit =
+  defineEmits<
+    (e: "removeLink", decision: ProceedingDecision) => Promise<void>
+  >()
 </script>
 
 <template>
