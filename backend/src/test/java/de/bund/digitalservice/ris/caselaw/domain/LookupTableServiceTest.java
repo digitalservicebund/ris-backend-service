@@ -23,8 +23,6 @@ import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.context.annotation.Import;
@@ -50,11 +48,9 @@ class LookupTableServiceTest {
   @MockBean private NormRepository normRepository;
   @MockBean private FieldOfLawKeywordRepository fieldOfLawKeywordRepository;
 
-  @Captor private ArgumentCaptor<CitationStyleDTO> listCaptor;
-
   @Test
   void testGetDocumentTypes() {
-    DocumentTypeDTO documentTypeDTO = DocumentTypeDTO.EMPTY;
+    DocumentTypeDTO documentTypeDTO = DocumentTypeDTO.builder().build();
     documentTypeDTO.setJurisShortcut("ABC");
     documentTypeDTO.setLabel("LabelABC");
     when(databaseDocumentTypeRepository.findAllByDocumentTypeOrderByJurisShortcutAscLabelAsc('R'))
