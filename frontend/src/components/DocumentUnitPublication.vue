@@ -61,12 +61,12 @@ onMounted(async () => {
   const response = await publishService.getPublicationLog(
     props.documentUnit.uuid
   )
-  if (!!response.data) {
+  if (response.data) {
     loadDone.value = true
     publicationLog.value = response.data
   }
 
-  if (!!publicationLog.value) {
+  if (publicationLog.value) {
     for (const item of publicationLog.value) {
       item.date = formatDate(item.date)
       item.xml = item.xml ? item.xml : ""
