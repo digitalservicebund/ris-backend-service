@@ -2,7 +2,7 @@ import { expect, test } from "@playwright/test"
 import { importNormViaApi, loadJurisTestFile } from "./e2e-utils"
 import { normData } from "./testdata/norm_basic"
 import { FieldType, MetadataInputSection } from "./utilities"
-import { FOOTNOTE_LABELS } from "@/components/footnotes/types"
+import { FOOTNOTE_LABELS } from "@/components/footnote/types"
 import {
   MetadataSectionName,
   Norm,

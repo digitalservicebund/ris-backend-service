@@ -1,41 +1,45 @@
 <script lang="ts" setup>
 import { storeToRefs } from "pinia"
-import { computed, toRefs, ref, watch, h, VNode, createTextVNode } from "vue"
+import { computed, toRefs, ref, watch } from "vue"
 import { useRoute } from "vue-router"
-import CheckMark from "@/assets/icons/ckeckbox_regular.svg"
-import AgeIndicationInputGroup from "@/components/AgeIndicationInputGroup.vue"
+import AgeIndicationInputGroup from "@/components/ageIndication/AgeIndicationInputGroup.vue"
 import AnnouncementDateInputGroup from "@/components/announcementDate/AnnouncementDateInputGroup.vue"
 import { summarizeAnnouncementDate } from "@/components/announcementDate/summarizer"
-import AnnouncementGroup from "@/components/AnnouncementGroup.vue"
-import CategorizedReferenceInputGroup from "@/components/CategorizedReferenceInputGroup.vue"
-import CitationDateInputGroup from "@/components/CitationDateInputGroup.vue"
-import DigitalEvidenceInputGroup from "@/components/DigitalEvidenceInputGroup.vue"
-import DivergentEntryIntoForceGroup from "@/components/DivergentEntryIntoForceGroup.vue"
-import DivergentExpirationGroup from "@/components/DivergentExpirationGroup.vue"
-import DocumentStatusGroup from "@/components/DocumentStatusGroup.vue"
-import DocumentTypeInputGroup from "@/components/DocumentTypeInputGroup.vue"
-import EntryIntoForceInputGroup from "@/components/EntryIntoForceInputGroup.vue"
+import CategorizedReferenceInputGroup from "@/components/categorizedReference/CategorizedReferenceInputGroup.vue"
+import CitationDateInputGroup from "@/components/citationDate/CitationDateInputGroup.vue"
+import DigitalEvidenceInputGroup from "@/components/digitalEvidence/DigitalEvidenceInputGroup.vue"
+import DivergentEntryIntoForceGroup from "@/components/divergentGroup/divergentEntryIntoForce/DivergentEntryIntoForceGroup.vue"
+import { divergentEntryIntoForceSummarizer } from "@/components/divergentGroup/divergentEntryIntoForce/summarizer"
+import DivergentExpirationGroup from "@/components/divergentGroup/divergentExpiration/DivergentExpirationGroup.vue"
+import { DivergentExpirationSummarizer } from "@/components/divergentGroup/divergentExpiration/summarizer"
+import DocumentStatusGroup from "@/components/documentStatus/DocumentStatusGroup.vue"
+import { documentStatusSectionSummarizer } from "@/components/documentStatus/summarizer"
+import DocumentTypeInputGroup from "@/components/documentType/DocumentTypeInputGroup.vue"
+import { documentTypeSummarizer } from "@/components/documentType/summarizer"
+import EntryIntoForceInputGroup from "@/components/entryIntoForce/EntryIntoForceInputGroup.vue"
 import ExpandableDataSet from "@/components/ExpandableDataSet.vue"
-import ExpirationInputGroup from "@/components/ExpirationInputGroup.vue"
-import FootnoteInput from "@/components/footnotes/FootnoteInput.vue"
-import { summarizeFootnotePerLine } from "@/components/footnotes/summarizer"
-import LeadInputGroup from "@/components/LeadInputGroup.vue"
-import NormProviderInputGroup from "@/components/NormProviderInputGroup.vue"
-import ParticipatingInstitutionInputGroup from "@/components/ParticipatingInstitutionInputGroup.vue"
-import PrincipleEntryIntoForceInputGroup from "@/components/PrincipleEntryIntoForceInputGroup.vue"
-import PrincipleExpirationInputGroup from "@/components/PrincipleExpirationInputGroup.vue"
-import PublicationDateInputGroup from "@/components/PublicationDateInputGroup.vue"
+import ExpirationInputGroup from "@/components/expiration/ExpirationInputGroup.vue"
+import FootnoteInput from "@/components/footnote/FootnoteInput.vue"
+import { summarizeFootnotePerLine } from "@/components/footnote/summarizer"
+import LeadInputGroup from "@/components/lead/LeadInputGroup.vue"
+import NormProviderInputGroup from "@/components/normProvider/NormProviderInputGroup.vue"
+import { normProviderSummarizer } from "@/components/normProvider/summarizer"
+import AnnouncementGroup from "@/components/officialReference/AnnouncementGroup.vue"
+import { officialReferenceSummarizer } from "@/components/officialReference/summarizer"
+import ParticipatingInstitutionInputGroup from "@/components/participatingInstitution/ParticipatingInstitutionInputGroup.vue"
+import { participationSummarizer } from "@/components/participatingInstitution/summarizer"
+import PrincipleEntryIntoForceInputGroup from "@/components/principleEntryIntoForce/PrincipleEntryIntoForceInputGroup.vue"
+import PrincipleExpirationInputGroup from "@/components/principleExpiration/PrincipleExpirationInputGroup.vue"
+import PublicationDateInputGroup from "@/components/publicationDate/PublicationDateInputGroup.vue"
 import SingleDataFieldSection from "@/components/SingleDataFieldSection.vue"
 import StatusIndicationInputGroup from "@/components/statusIndication/StatusIndicationInputGroup.vue"
 import { summarizeStatusIndication } from "@/components/statusIndication/summarizer"
-import SubjectAreaInputGroup from "@/components/SubjectAreaInputGroup.vue"
+import SubjectAreaInputGroup from "@/components/subjectArea/SubjectAreaInputGroup.vue"
+import { subjectAreaSummarizer } from "@/components/subjectArea/summarizer"
 import { useScrollToHash } from "@/composables/useScrollToHash"
-import {
-  FlatMetadata,
-  Metadata,
-  MetadataSections,
-  UndefinedDate,
-} from "@/domain/Norm"
+import { FlatMetadata, Metadata, MetadataSections } from "@/domain/Norm"
+import { dateYearSummarizer } from "@/helpers/dateYearSummarizer"
+import { generalSummarizer } from "@/helpers/generalSummarizer"
 import { withSummarizer } from "@/shared/components/DataSetSummary.vue"
 import EditableList from "@/shared/components/EditableList.vue"
 import SaveButton from "@/shared/components/input/SaveButton.vue"
@@ -130,452 +134,7 @@ watch(
   { deep: true }
 )
 
-function formatDate(dateStrings: (string | undefined)[] | undefined): string {
-  const dateString = Array.isArray(dateStrings) ? dateStrings[0] : dateStrings
-
-  if (!dateString) {
-    return ""
-  }
-
-  const date = new Date(dateString)
-  const day = date.getDate().toString().padStart(2, "0")
-  const month = (date.getMonth() + 1).toString().padStart(2, "0")
-  const year = date.getFullYear().toString()
-  return `${day}.${month}.${year}`
-}
-
-function citationDateSummarizer(data: Metadata): string {
-  if (!data) return ""
-
-  if (data.YEAR) {
-    return data.YEAR.toString()
-  }
-
-  return formatDate(data.DATE)
-}
-
-function printAnnouncementSummary(data: Metadata): string {
-  if (data) {
-    const midSection = [
-      data.ANNOUNCEMENT_GAZETTE?.[0],
-      data.YEAR?.[0],
-      data.NUMBER?.[0],
-      data.PAGE?.[0],
-    ]
-      .filter(Boolean)
-      .join(", ")
-
-    return [
-      "Papierverkündungsblatt",
-      midSection,
-      data.ADDITIONAL_INFO?.join(", "),
-      data.EXPLANATION?.join(", "),
-    ]
-      .filter(Boolean)
-      .join(" | ")
-  } else {
-    return ""
-  }
-}
-
-function digitalAnnouncementSummary(data: Metadata): string {
-  if (data) {
-    const midSection = [
-      data.ANNOUNCEMENT_MEDIUM?.[0],
-      formatDate([data.DATE?.[0]]),
-      data.YEAR?.[0],
-      data.PAGE?.[0],
-      data.EDITION?.[0],
-      data.AREA_OF_PUBLICATION?.[0],
-      data.NUMBER_OF_THE_PUBLICATION_IN_THE_RESPECTIVE_AREA?.[0],
-    ]
-      .filter(Boolean)
-      .join(", ")
-
-    return [
-      "Elektronisches Verkündungsblatt",
-      midSection,
-      data.ADDITIONAL_INFO?.join(", "),
-      data.EXPLANATION?.join(", "),
-    ]
-      .filter(Boolean)
-      .join(" | ")
-  } else {
-    return ""
-  }
-}
-
-function euAnnouncementSummary(data: Metadata): string {
-  if (data) {
-    const midSection = [
-      data.EU_GOVERNMENT_GAZETTE?.[0],
-      data.YEAR?.[0],
-      data.SERIES?.[0],
-      data.NUMBER?.[0],
-      data.PAGE?.[0],
-    ]
-      .filter(Boolean)
-      .join(", ")
-
-    return [
-      "Amtsblatt der EU",
-      midSection,
-      data.ADDITIONAL_INFO?.join(", "),
-      data.EXPLANATION?.join(", "),
-    ]
-      .filter(Boolean)
-      .join(" | ")
-  } else {
-    return ""
-  }
-}
-
-function otherOfficialReferenceSummary(data: Metadata): string {
-  if (!data) return ""
-
-  const otherOfficialReference = data.OTHER_OFFICIAL_REFERENCE?.[0] ?? ""
-
-  return `Sonstige amtliche Fundstelle | ${otherOfficialReference}`
-}
-
-function officialReferenceSummarizer(data: MetadataSections): string {
-  if (!data) return ""
-
-  if (data.PRINT_ANNOUNCEMENT) {
-    return printAnnouncementSummary(data.PRINT_ANNOUNCEMENT[0])
-  } else if (data.DIGITAL_ANNOUNCEMENT) {
-    return digitalAnnouncementSummary(data.DIGITAL_ANNOUNCEMENT[0])
-  } else if (data.EU_ANNOUNCEMENT) {
-    return euAnnouncementSummary(data.EU_ANNOUNCEMENT[0])
-  } else if (data.OTHER_OFFICIAL_ANNOUNCEMENT) {
-    return otherOfficialReferenceSummary(data.OTHER_OFFICIAL_ANNOUNCEMENT[0])
-  } else return ""
-}
-
-function documentStatusSummary(data: Metadata): string {
-  const PROOF_INDICATION_TRANSLATIONS = {
-    NOT_YET_CONSIDERED: "noch nicht berücksichtigt",
-    CONSIDERED: "ist berücksichtigt",
-  }
-
-  if (!data) return ""
-
-  const workNote = data?.WORK_NOTE ?? []
-  const description = data?.DESCRIPTION?.[0]
-  const date = formatDate([data?.DATE?.[0]])
-  const year = data?.YEAR?.[0]
-  const reference = data?.REFERENCE?.[0]
-  const entryIntoForceDateState = data?.ENTRY_INTO_FORCE_DATE_NOTE ?? []
-  const proofIndication =
-    data?.PROOF_INDICATION?.filter((category) => category != null) ?? []
-
-  const translatedProofIndication = proofIndication.map(
-    (indication) => PROOF_INDICATION_TRANSLATIONS[indication] || indication
-  )
-  const resultArray = []
-
-  if (workNote) resultArray.push(...workNote)
-  if (description) resultArray.push(description)
-  if (date) resultArray.push(date)
-  if (year) resultArray.push(year)
-  if (reference) resultArray.push(reference)
-  if (entryIntoForceDateState) resultArray.push(...entryIntoForceDateState)
-
-  resultArray.push(...translatedProofIndication)
-
-  return resultArray.join(" ")
-}
-
-function documentTextProofSummary(data: Metadata): string {
-  const PROOF_TYPE_TRANSLATIONS = {
-    TEXT_PROOF_FROM: "Textnachweis ab",
-    TEXT_PROOF_VALIDITY_FROM: "Textnachweis Geltung ab",
-  }
-
-  if (!data) return ""
-
-  const proofType =
-    data?.PROOF_TYPE?.filter((category) => category != null) ?? []
-  const text = data?.TEXT?.[0]
-
-  const translatedProofType = proofType.map(
-    (type) => PROOF_TYPE_TRANSLATIONS[type] || type
-  )
-  const resultArray = [...translatedProofType]
-
-  if (text) {
-    resultArray.push(text)
-  }
-
-  return resultArray.join(" ")
-}
-
-function documentOtherSummary(data: Metadata): string {
-  const OTHER_TYPE_TRANSLATIONS = {
-    TEXT_IN_PROGRESS: "Text in Bearbeitung",
-    TEXT_PROOFED_BUT_NOT_DONE:
-      "Nachgewiesener Text dokumentarisch noch nicht abschließend bearbeitet",
-  }
-
-  if (!data) return ""
-
-  const otherType =
-    data?.OTHER_TYPE?.filter((category) => category != null) ?? []
-
-  const translatedOtherType = otherType.map(
-    (type) => OTHER_TYPE_TRANSLATIONS[type] || type
-  )
-
-  return translatedOtherType.join(" ")
-}
-
-function documentStatusSectionSummarizer(data: MetadataSections): string {
-  if (!data) return ""
-
-  if (data.DOCUMENT_STATUS) {
-    return documentStatusSummary(data.DOCUMENT_STATUS[0])
-  } else if (data.DOCUMENT_TEXT_PROOF) {
-    return documentTextProofSummary(data.DOCUMENT_TEXT_PROOF[0])
-  } else if (data.DOCUMENT_OTHER) {
-    return documentOtherSummary(data.DOCUMENT_OTHER[0])
-  } else return ""
-}
-
-function normProviderSummarizer(data: Metadata) {
-  if (!data) return ""
-
-  const entity = data.ENTITY?.[0]
-  const decidingBody = data.DECIDING_BODY?.[0]
-  const isResolutionMajority = data.RESOLUTION_MAJORITY?.[0]
-
-  const summaryLine = [entity, decidingBody]
-    .filter((value) => value != "" && value != null)
-    .join(" | ")
-
-  if (isResolutionMajority) {
-    return h("div", { class: ["flex", "gap-8"] }, [
-      h(
-        "span",
-        summaryLine.length == 0 ? summaryLine : summaryLine.concat(" | ")
-      ),
-      h("img", {
-        src: CheckMark,
-        width: "16",
-        alt: "Schwarzes Haken",
-      }),
-      h("span", "Beschlussfassung mit qual. Mehrheit"),
-    ])
-  } else {
-    return summaryLine
-  }
-}
-
-const NORM_CATEGORY_TRANSLATIONS = {
-  AMENDMENT_NORM: "Änderungsnorm",
-  BASE_NORM: "Stammnorm",
-  TRANSITIONAL_NORM: "Übergangsnorm",
-}
-
-function documentTypeSummarizer(data?: Metadata): VNode {
-  const propertyNodes = []
-
-  const typeName = data?.TYPE_NAME?.[0]
-  const categories =
-    data?.NORM_CATEGORY?.filter((category) => category != null) ?? []
-  const templateNames = data?.TEMPLATE_NAME ?? []
-
-  propertyNodes.push(typeName)
-
-  if (typeName && categories.length > 0) propertyNodes.push(h("div", "|"))
-
-  categories.forEach((category) =>
-    propertyNodes.push(
-      h("div", { class: ["flex", "gap-4"] }, [
-        h("img", { src: CheckMark, alt: "checkmark", width: "16" }),
-        h("span", NORM_CATEGORY_TRANSLATIONS[category]),
-      ])
-    )
-  )
-
-  if ((typeName || categories.length > 0) && templateNames.length > 0)
-    propertyNodes.push(h("div", "|"))
-
-  templateNames.forEach((templateName) =>
-    propertyNodes.push(
-      h(
-        "div",
-        { class: ["bg-blue-500", "rounded-lg", "px-8", "py-4"] },
-        templateName
-      )
-    )
-  )
-
-  return h(
-    "div",
-    { class: ["flex", "gap-8", "items-center", "flex-wrap"] },
-    propertyNodes
-  )
-}
-
-function divergentEntryIntoForceDefinedSummary(data: Metadata): VNode {
-  if (!data) return createTextVNode("")
-
-  const date = formatDate(data?.DATE)
-  const categories =
-    data?.NORM_CATEGORY?.filter((category) => category != null) ?? []
-
-  if (categories.length === 0 && date) {
-    return h("div", {}, date)
-  }
-
-  const elements = []
-
-  if (date) {
-    elements.push(h("div", {}, date))
-  }
-
-  if (date && categories.length > 0) {
-    elements.push(h("div", "|"))
-  }
-
-  categories.forEach((category) => {
-    elements.push(
-      h("div", { class: ["flex", "gap-8"] }, [
-        h("img", {
-          src: CheckMark,
-          width: "16",
-          alt: "Schwarzes Haken",
-        }),
-        h("span", {}, NORM_CATEGORY_TRANSLATIONS[category]),
-      ])
-    )
-  })
-
-  return h("div", { class: ["flex", "gap-8"] }, elements)
-}
-
-function getLabel(value: UndefinedDate): string {
-  switch (value) {
-    case UndefinedDate.UNDEFINED_UNKNOWN:
-      return "unbestimmt (unbekannt)"
-    case UndefinedDate.UNDEFINED_FUTURE:
-      return "unbestimmt (zukünftig)"
-    case UndefinedDate.UNDEFINED_NOT_PRESENT:
-      return "nicht vorhanden"
-    default:
-      return ""
-  }
-}
-
-function divergentEntryIntoForceUndefinedSummary(data: Metadata): VNode {
-  if (!data) return createTextVNode("")
-
-  const undefinedDate = data?.UNDEFINED_DATE?.[0]
-  const categories =
-    data?.NORM_CATEGORY?.filter((category) => category != null) ?? []
-
-  const elements = []
-
-  if (categories.length === 0 && undefinedDate) {
-    return h("div", {}, getLabel(undefinedDate))
-  }
-
-  if (undefinedDate) {
-    elements.push(h("div", {}, getLabel(undefinedDate)))
-  }
-
-  if (undefinedDate && categories.length > 0) {
-    elements.push(h("div", "|"))
-  }
-
-  categories.forEach((category) => {
-    elements.push(
-      h("div", { class: ["flex", "gap-8"] }, [
-        h("img", {
-          src: CheckMark,
-          width: "16",
-          alt: "Schwarzes Haken",
-        }),
-        h("span", {}, NORM_CATEGORY_TRANSLATIONS[category]),
-      ])
-    )
-  })
-
-  return h("div", { class: ["flex", "gap-8"] }, elements)
-}
-
-function DivergentEntryIntoForceSummarizer(
-  data: MetadataSections
-): VNode | string {
-  if (!data) return ""
-
-  if (data.DIVERGENT_ENTRY_INTO_FORCE_DEFINED) {
-    return divergentEntryIntoForceDefinedSummary(
-      data.DIVERGENT_ENTRY_INTO_FORCE_DEFINED[0]
-    )
-  } else if (data.DIVERGENT_ENTRY_INTO_FORCE_UNDEFINED) {
-    return divergentEntryIntoForceUndefinedSummary(
-      data.DIVERGENT_ENTRY_INTO_FORCE_UNDEFINED[0]
-    )
-  } else return ""
-}
-
-function DivergentExpirationSummarizer(data: MetadataSections): VNode | string {
-  if (!data) return ""
-
-  if (data.DIVERGENT_EXPIRATION_DEFINED) {
-    return divergentEntryIntoForceDefinedSummary(
-      data.DIVERGENT_EXPIRATION_DEFINED[0]
-    )
-  } else if (data.DIVERGENT_EXPIRATION_UNDEFINED) {
-    return divergentEntryIntoForceUndefinedSummary(
-      data.DIVERGENT_EXPIRATION_UNDEFINED[0]
-    )
-  } else return ""
-}
-
-function GeneralSummarizer(data: Metadata): string {
-  if (!data) return ""
-
-  const undefinedDate = data?.UNDEFINED_DATE?.[0]
-
-  if (undefinedDate) {
-    return getLabel(undefinedDate)
-  } else {
-    return formatDate(data.DATE)
-  }
-}
-
-function participationSummarizer(data: Metadata) {
-  if (!data) return ""
-
-  const type = data.PARTICIPATION_TYPE?.[0]
-  const institution = data.PARTICIPATION_INSTITUTION?.[0]
-
-  return [type, institution]
-    .filter((value) => value != "" && value != null)
-    .join(" | ")
-}
-
-function subjectAreaSummarizer(data: Metadata) {
-  if (!data) return ""
-
-  const fna = data.SUBJECT_FNA?.[0]
-  const previousFna = data.SUBJECT_PREVIOUS_FNA?.[0]
-  const gesta = data.SUBJECT_GESTA?.[0]
-  const bgb3 = data.SUBJECT_BGB_3?.[0]
-
-  return [
-    fna && `FNA-Nummer ${fna}`,
-    previousFna && `Frühere FNA-Nummer ${previousFna}`,
-    gesta && `GESTA-Nummer ${gesta}`,
-    bgb3 && `Bundesgesetzblatt Teil III ${bgb3}`,
-  ]
-    .filter(Boolean)
-    .join(" | ")
-}
-
-const CitationDateSummary = withSummarizer(citationDateSummarizer)
+const DateYearSummary = withSummarizer(dateYearSummarizer)
 const OfficialReferenceSummary = withSummarizer(officialReferenceSummarizer)
 const DocumentStatusSectionSummary = withSummarizer(
   documentStatusSectionSummarizer
@@ -583,11 +142,10 @@ const DocumentStatusSectionSummary = withSummarizer(
 const NormProviderSummary = withSummarizer(normProviderSummarizer)
 const DocumentTypeSummary = withSummarizer(documentTypeSummarizer)
 const DivergentEntryIntoForceSummary = withSummarizer(
-  DivergentEntryIntoForceSummarizer
+  divergentEntryIntoForceSummarizer
 )
 const DivergentExpirationSummary = withSummarizer(DivergentExpirationSummarizer)
-const GeneralSummary = withSummarizer(GeneralSummarizer)
-
+const GeneralSummary = withSummarizer(generalSummarizer)
 const ParticipationSummary = withSummarizer(participationSummarizer)
 const SubjectAreaSummary = withSummarizer(subjectAreaSummarizer)
 const footnoteLineSummary = withSummarizer(summarizeFootnotePerLine)
@@ -879,7 +437,7 @@ const AnnouncementDateSummary = withSummarizer(summarizeAnnouncementDate)
       id="publicationDates"
       border-bottom
       :data-set="metadataSections.PUBLICATION_DATE"
-      :summary-component="CitationDateSummary"
+      :summary-component="DateYearSummary"
       test-id="a11y-expandable-dataset"
       title="Veröffentlichungsdatum"
     >
@@ -888,7 +446,7 @@ const AnnouncementDateSummary = withSummarizer(summarizeAnnouncementDate)
         :default-value="{}"
         disable-multi-entry
         :edit-component="PublicationDateInputGroup"
-        :summary-component="CitationDateSummary"
+        :summary-component="DateYearSummary"
       />
     </ExpandableDataSet>
 
@@ -896,7 +454,7 @@ const AnnouncementDateSummary = withSummarizer(summarizeAnnouncementDate)
       id="citationDates"
       border-bottom
       :data-set="metadataSections.CITATION_DATE"
-      :summary-component="CitationDateSummary"
+      :summary-component="DateYearSummary"
       test-id="a11y-expandable-dataset"
       title="Zitierdatum"
     >
@@ -904,7 +462,7 @@ const AnnouncementDateSummary = withSummarizer(summarizeAnnouncementDate)
         v-model="metadataSections.CITATION_DATE"
         :default-value="{}"
         :edit-component="CitationDateInputGroup"
-        :summary-component="CitationDateSummary"
+        :summary-component="DateYearSummary"
       />
     </ExpandableDataSet>
 
