@@ -15,7 +15,9 @@ const emit = defineEmits<{
 
 const norms = computed({
   get: () => {
-    props.modelValue?.map(async (norm) => await norm.updateValidationErrors())
+    props.modelValue?.map(async (norm) => {
+      if (norm.updateValidationErrors) await norm.updateValidationErrors()
+    })
     return props.modelValue
   },
   set: (value) => {
