@@ -25,23 +25,22 @@ const staticContainerClass =
   "border-l-[0.125rem] flex gap-[0.625rem] px-[1.25rem] py-[1.125rem] w-full"
 const staticIconClass = "material-icons pt-1"
 const modalAttribute = computed((): ModalAttribute => {
-  switch (props.status) {
-    case InfoStatus.SUCCEED:
-      return {
-        borderClass: "border-l-green-700",
-        backgroundColorClass: "bg-white",
-        textColorClass: "text-green-700",
-        icon: "done",
-      }
-    default:
-      return {
-        borderClass: "border-l-red-800",
-        backgroundColorClass: "bg-red-200",
-        textColorClass: "text-red-800",
-        icon: "error",
-      }
+  if (props.status === InfoStatus.SUCCEED) {
+    return {
+      borderClass: "border-l-green-700",
+      backgroundColorClass: "bg-white",
+      textColorClass: "text-green-700",
+      icon: "done",
+    }
+  }
+  return {
+    borderClass: "border-l-red-800",
+    backgroundColorClass: "bg-red-200",
+    textColorClass: "text-red-800",
+    icon: "error",
   }
 })
+
 const ariaLabelIcon = props.title + " icon"
 </script>
 
