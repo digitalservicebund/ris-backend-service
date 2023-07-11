@@ -38,7 +38,7 @@ const formatDateTime = function (date: string): string {
 
 async function getFileLink() {
   isLoading.value = true
-  const guid = loadedNorm.value?.guid || ""
+  const guid = loadedNorm.value?.guid ?? ""
   try {
     const response = await triggerFileGeneration(guid)
     await new Promise((res) => setTimeout(res, 300))
