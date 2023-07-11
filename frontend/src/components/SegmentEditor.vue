@@ -220,7 +220,7 @@ export interface Segment {
    * Type descriptor of segment. Is `"text"` for anything except for suggestions
    * the user chose. In that case it is the custom type of the suggestion group.
    */
-  type: string | "text"
+  type: string
   /**
    * The user facing content visible in the editor. For text segments this is
    * just the text as is. For suggestions the user chose, this is the label of
