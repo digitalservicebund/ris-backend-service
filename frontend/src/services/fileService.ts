@@ -1,7 +1,7 @@
 import httpClient, { ServiceResponse } from "./httpClient"
 import DocumentUnit from "@/domain/documentUnit"
 
-interface fileService {
+interface FileService {
   upload(
     documentUnitUuid: string,
     file: File
@@ -10,7 +10,7 @@ interface fileService {
   getDocxFileAsHtml(uuid: string): Promise<ServiceResponse<string>>
 }
 
-const service: fileService = {
+const service: FileService = {
   async upload(documentUnitUuid: string, file: File) {
     const extension = file.name?.split(".").pop()
     if (!extension || extension.toLowerCase() !== "docx") {
