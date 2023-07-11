@@ -7,5 +7,5 @@ public interface XmlExporter {
   XmlResultObject generateXml(DocumentUnit documentUnit)
       throws ParserConfigurationException, TransformerException;
 
-  String generateEncryptedXMLString(DocumentUnit documentUnit) throws Exception;
+  String generateEncryptedXMLString(DocumentUnit documentUnit) throws XmlExporterException;
 }

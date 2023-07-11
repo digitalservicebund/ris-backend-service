@@ -2,6 +2,7 @@ package de.bund.digitalservice.ris.caselaw.adapter;
 
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.XmlExporter;
+import de.bund.digitalservice.ris.caselaw.domain.XmlExporterException;
 import de.bund.digitalservice.ris.caselaw.domain.XmlResultObject;
 import java.time.Instant;
 import java.util.List;
@@ -19,8 +20,7 @@ public class MockXmlExporter implements XmlExporter {
   }
 
   @Override
-  public String generateEncryptedXMLString(DocumentUnit documentUnit)
-      throws ParserConfigurationException, TransformerException {
+  public String generateEncryptedXMLString(DocumentUnit documentUnit) throws XmlExporterException {
     String resultObject = "";
     return resultObject;
   }
