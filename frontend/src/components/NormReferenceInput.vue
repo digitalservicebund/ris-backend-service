@@ -50,7 +50,7 @@ const normAbbreviation = computed({
 async function validateNorm() {
   validationErrors.value = []
 
-  if (norm.value && norm.value.updateValidationErrors) {
+  if (norm.value?.updateValidationErrors) {
     if (await norm.value.updateValidationErrors()) {
       validationErrors.value?.push({
         defaultMessage: "Pflichtfeld nicht befüllt",
@@ -72,7 +72,7 @@ async function validateNorm() {
 
 async function addNormReference() {
   validateNorm()
-  emit("update:modelValue", norm.value as NormReference)
+  emit("update:modelValue", norm.value)
   emit("closeEntry")
 }
 
