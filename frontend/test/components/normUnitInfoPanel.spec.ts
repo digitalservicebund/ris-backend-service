@@ -1,9 +1,9 @@
 import { render, screen } from "@testing-library/vue"
-import DocumentUnitInfoPanel from "@/components/DocumentUnitInfoPanel.vue"
+import NormUnitInfoPanel from "@/components/NormUnitInfoPanel.vue"
 
-describe("documentUnit InfoPanel", () => {
+describe("normUnit InfoPanel", () => {
   it("renders heading if given", async () => {
-    render(DocumentUnitInfoPanel, {
+    render(NormUnitInfoPanel, {
       props: {
         heading: "test heading",
       },
@@ -13,9 +13,9 @@ describe("documentUnit InfoPanel", () => {
   })
 
   it("renders all given property infos in correct order", async () => {
-    render(DocumentUnitInfoPanel, {
+    render(NormUnitInfoPanel, {
       props: {
-        secondRow: [
+        propertyInfos: [
           { label: "foo", value: "value-foo" },
           { label: "bar", value: "value-bar" },
         ],
@@ -44,9 +44,9 @@ describe("documentUnit InfoPanel", () => {
   })
 
   it("renders a placeholder for an undefined property info value", async () => {
-    render(DocumentUnitInfoPanel, {
+    render(NormUnitInfoPanel, {
       props: {
-        secondRow: [{ label: "foo", value: undefined }],
+        propertyInfos: [{ label: "foo", value: undefined }],
       },
     })
 
