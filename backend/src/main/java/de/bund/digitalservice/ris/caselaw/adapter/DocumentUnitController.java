@@ -46,7 +46,7 @@ public class DocumentUnitController {
   private final ConverterService converterService;
 
   public DocumentUnitController(
-      DocumentUnitService service, UserService userService, DocxConverterService converterService) {
+      DocumentUnitService service, UserService userService, ConverterService converterService) {
     this.service = service;
     this.userService = userService;
     this.converterService = converterService;

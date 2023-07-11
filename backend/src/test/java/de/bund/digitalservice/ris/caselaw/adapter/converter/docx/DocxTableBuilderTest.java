@@ -176,10 +176,7 @@ class DocxTableBuilderTest {
     // cell should take insideV from table
     assertThat(result)
         .contains(
-            "<td style=\"border-left: 6px solid #000; border-right: 6px solid #000; border-top: 1.5px solid #ghijkl; min-width: 5px; padding: 5px;\">");
-
-    // insideV from table should not overwrite cell's border
-    assertThat(result)
+            "<td style=\"border-left: 6px solid #000; border-right: 6px solid #000; border-top: 1.5px solid #ghijkl; min-width: 5px; padding: 5px;\">")
         .contains(
             "<td colspan=\"2\" style=\"background-color: #111222; border-left: 6px solid #000; border-right: 3px solid #foo; border-top: 1.5px solid #mnopqr; min-width: 5px; padding: 5px;\"><p>foo</p></td>");
   }

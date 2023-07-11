@@ -13,6 +13,8 @@ import org.freehep.graphicsio.emf.EMFRenderer;
 
 @Slf4j
 public class EMF2PNGConverter {
+  private EMF2PNGConverter() {}
+
   public static byte[] convertEMF2PNG(byte[] originalBytes, Dimension size) {
     try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
       EMFInputStream emf = new EMFInputStream(new ByteArrayInputStream(originalBytes));

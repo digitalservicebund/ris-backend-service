@@ -21,7 +21,6 @@ import org.springframework.data.relational.core.mapping.Table;
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 public class DocumentUnitDTO extends DocumentUnitMetadataDTO {
-  public static final DocumentUnitDTO EMPTY = new DocumentUnitDTO();
 
   // RUBRIKEN
   // - Kurz- & Langtexte

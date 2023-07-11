@@ -15,7 +15,6 @@ import org.springframework.data.relational.core.mapping.Table;
 @AllArgsConstructor
 @Table("lookuptable_documenttype")
 public class DocumentTypeDTO implements Persistable<Long> {
-  public static final DocumentTypeDTO EMPTY = new DocumentTypeDTO();
   @Id Long id;
   String changeDateMail;
   String changeDateClient;

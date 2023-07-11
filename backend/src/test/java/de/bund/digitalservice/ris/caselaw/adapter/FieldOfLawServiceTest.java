@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import org.junit.Ignore;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -232,5 +233,18 @@ class FieldOfLawServiceTest {
         .verifyComplete();
 
     verify(repository).findAllByParentIdentifierOrderByIdentifierAsc("TS-01-01");
+  }
+
+  @Test
+  @Ignore
+  void testSearchAndOrderByScore_pageableOffsetGreaterThanResultListSize() {
+    FieldOfLaw databaseFieldOfLaw = FieldOfLaw.builder().build();
+
+    when(repository.findBySearchTerms(any(String[].class)))
+        .thenReturn(Flux.just(databaseFieldOfLaw));
+
+    StepVerifier.create(service.searchAndOrderByScore("foo", PageRequest.of(1, 5)))
+        .consumeNextWith(page -> assertThat(page.getContent()).isEmpty())
+        .verifyComplete();
   }
 }
