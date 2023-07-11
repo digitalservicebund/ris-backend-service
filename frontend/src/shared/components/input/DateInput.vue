@@ -55,20 +55,21 @@ const conditionalClasses = computed(() => ({
 
 function validateInput() {
   if (inputCompleted.value) {
-    //check for valid dates
-    !isValidDate.value
-      ? emit("update:validationError", {
-          defaultMessage: "Kein valides Datum",
-          field: props.id,
-        })
-      : // if valid date, check for future dates
-      !isInPast.value && !props.isFutureDate && isValidDate.value
-      ? emit("update:validationError", {
+    if (isValidDate.value) {
+      // if valid date, check for future dates
+      if (!isInPast.value && !props.isFutureDate && isValidDate.value)
+        emit("update:validationError", {
           defaultMessage:
             "Das " + props.ariaLabel + " darf nicht in der Zukunft liegen",
           field: props.id,
         })
-      : emit("update:validationError", undefined)
+      else emit("update:validationError", undefined)
+    } else {
+      emit("update:validationError", {
+        defaultMessage: "Kein valides Datum",
+        field: props.id,
+      })
+    }
   } else {
     emit("update:validationError", undefined)
   }
