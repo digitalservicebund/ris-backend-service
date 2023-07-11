@@ -307,8 +307,8 @@ const ENCODERS: MetadataValueEncoders = {
 function decodeMetadata(metadata: MetadatumSchema[]): Metadata {
   const grouped = groupBy(metadata, (datum) => datum.type)
   return mapValues(grouped, (data) => {
-    const sortedData = data.sort(compareOrder)
-    return sortedData.map((datum) => DECODERS[datum.type](datum.value))
+    data.sort(compareOrder)
+    return data.map((datum) => DECODERS[datum.type](datum.value))
   })
 }
 
@@ -699,12 +699,13 @@ export function decodeMetadataSections(
 ): MetadataSections {
   const modifiedSections = decodeFootnotesSections(sections)
   const grouped = groupBy(modifiedSections, (section) => section.name)
-  return mapValues(grouped, (sections) =>
-    sections.sort(compareOrder).map((section) => ({
+  return mapValues(grouped, (sections) => {
+    sections.sort(compareOrder)
+    return sections.map((section) => ({
       ...decodeMetadata(section.metadata ?? []),
       ...decodeMetadataSections(section.sections ?? []),
     }))
-  )
+  })
 }
 
 export function decodeNorm(norm: NormResponseSchema): Norm {
