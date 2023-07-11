@@ -35,25 +35,26 @@ const service: fileService = {
       },
       file
     )
-    response.error =
-      response.status === 413
-        ? {
-            title: "Die Datei darf max. 20 MB groß sein.",
-            description: "Bitte laden Sie eine kleinere Datei hoch.",
-          }
-        : response.status === 415
-        ? {
-            title: "Das ausgewählte Dateiformat ist nicht korrekt.",
-            description:
-              "Versuchen Sie eine .docx-Version dieser Datei hochzuladen.",
-          }
-        : response.status >= 300
-        ? {
-            title: "Leider ist ein Fehler aufgetreten.",
-            description:
-              "Bitte versuchen Sie es zu einem späteren Zeitpunkt erneut.",
-          }
-        : undefined
+    if (response.status === 413) {
+      response.error = {
+        title: "Die Datei darf max. 20 MB groß sein.",
+        description: "Bitte laden Sie eine kleinere Datei hoch.",
+      }
+    } else if (response.status === 415) {
+      response.error = {
+        title: "Das ausgewählte Dateiformat ist nicht korrekt.",
+        description:
+          "Versuchen Sie eine .docx-Version dieser Datei hochzuladen.",
+      }
+    } else if (response.status >= 300) {
+      response.error = {
+        title: "Leider ist ein Fehler aufgetreten.",
+        description:
+          "Bitte versuchen Sie es zu einem späteren Zeitpunkt erneut.",
+      }
+    } else {
+      response.error = undefined
+    }
 
     return response
   },
