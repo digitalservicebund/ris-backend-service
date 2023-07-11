@@ -160,7 +160,7 @@ const hasError = computed(
 )
 
 const conditionalClasses = computed(() => ({
-  input__error: props.validationError || hasError.value,
+  input__error: props.validationError ?? hasError.value,
 }))
 
 function validateInput() {
