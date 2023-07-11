@@ -395,14 +395,10 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
   }
 
   private boolean isEmptyNorm(DocumentUnitNorm currentNorm) {
-    if (currentNorm.singleNorm() == null
+    return currentNorm.singleNorm() == null
         && currentNorm.normAbbreviation() == null
         && currentNorm.dateOfRelevance() == null
-        && currentNorm.dateOfVersion() == null) {
-      return true;
-    } else {
-      return false;
-    }
+        && currentNorm.dateOfVersion() == null;
   }
 
   private Mono<DocumentUnitDTO> saveDeviatingFileNumbers(

@@ -21,7 +21,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import org.owasp.html.HtmlPolicyBuilder;
 import org.owasp.html.PolicyFactory;
 import org.slf4j.Logger;
@@ -151,7 +150,7 @@ public class JurisXmlExporterResponseProcessor {
                     .fileName(attachment.fileName())
                     .fileContent(attachment.fileContent())
                     .build())
-        .collect(Collectors.toList());
+        .toList();
   }
 
   private Mono<Void> setPublicationStatus(

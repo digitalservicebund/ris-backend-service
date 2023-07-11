@@ -66,7 +66,7 @@ public class JurisStub implements MailStoreFactory, HttpMailSender {
       String tag) {
 
     if (!isPublication(subject)) {
-      LOGGER.info("Message sent: " + subject);
+      LOGGER.info("Message sent: {}", subject);
       return;
     }
 
@@ -101,7 +101,7 @@ public class JurisStub implements MailStoreFactory, HttpMailSender {
       message.addRecipient(Message.RecipientType.TO, new InternetAddress(username));
       Transport.send(message);
     } catch (MessagingException e) {
-      LOGGER.error("Error adding Message to JurisMock: " + message);
+      LOGGER.error("Error adding Message to JurisMock: {}", message);
     }
   }
 

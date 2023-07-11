@@ -8,29 +8,18 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullSource;
+import org.junit.jupiter.params.provider.ValueSource;
 
 class StyleDocxConverterTest {
-  @Test
-  void testGetListFromString_withNullString() {
 
-    List<Style> styleList = StyleConverter.getListFromString(null);
+  @ParameterizedTest(name = "#{index} - Run test with args={0}")
+  @NullSource
+  @ValueSource(strings = {"", "wrong style string; another wrong style"})
+  void testGetListFromString(String stylesStr) {
 
-    assertThat(styleList).isEmpty();
-  }
-
-  @Test
-  void testGetListFromString_withEmptyString() {
-
-    List<Style> styleList = StyleConverter.getListFromString("");
-
-    assertThat(styleList).isEmpty();
-  }
-
-  @Test
-  void testGetListFromString_withStringWithoutColon() {
-
-    List<Style> styleList =
-        StyleConverter.getListFromString("wrong style string; another wrong style");
+    List<Style> styleList = StyleConverter.getListFromString(stylesStr);
 
     assertThat(styleList).isEmpty();
   }

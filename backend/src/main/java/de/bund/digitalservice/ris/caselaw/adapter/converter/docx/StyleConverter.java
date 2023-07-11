@@ -4,9 +4,12 @@ import de.bund.digitalservice.ris.caselaw.domain.docx.Style;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import lombok.experimental.UtilityClass;
 
+@UtilityClass
 public class StyleConverter {
-  public static List<Style> getListFromString(String styles) {
+
+  public List<Style> getListFromString(String styles) {
     if (styles == null || styles.isBlank() || !styles.contains(":")) {
       return Collections.emptyList();
     }
@@ -30,7 +33,7 @@ public class StyleConverter {
     return styleList;
   }
 
-  private static Style parseStyleParts(String style) {
+  private Style parseStyleParts(String style) {
     String[] parts = style.split(":");
 
     if (parts.length != 2) {

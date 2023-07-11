@@ -1,7 +1,5 @@
 package de.bund.digitalservice.ris.caselaw.domain;
 
-import static de.bund.digitalservice.ris.caselaw.domain.ServiceUtils.byteBufferToArray;
-
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
 import java.io.ByteArrayInputStream;
@@ -130,7 +128,8 @@ public class DocumentUnitService {
   }
 
   void checkDocx(ByteBuffer byteBuffer) {
-    var zip = new ZipInputStream(new ByteArrayInputStream(byteBufferToArray(byteBuffer)));
+    var zip =
+        new ZipInputStream(new ByteArrayInputStream(ServiceUtils.byteBufferToArray(byteBuffer)));
     ZipEntry entry;
     try {
       while ((entry = zip.getNextEntry()) != null) {

@@ -551,7 +551,7 @@ class ProceedingDecisionIntegrationTest {
         .consumeWith(
             response -> {
               assertThat(response.getResponseBody()).isNotNull();
-              assertThat(response.getResponseBody().proceedingDecisions().size()).isEqualTo(1);
+              assertThat(response.getResponseBody().proceedingDecisions()).hasSize(1);
               assertThat(response.getResponseBody().proceedingDecisions().get(0).getUuid())
                   .isEqualTo(childUuid);
             });

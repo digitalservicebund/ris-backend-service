@@ -15,7 +15,6 @@ import org.springframework.data.relational.core.mapping.Table;
 @AllArgsConstructor
 @Table("lookuptable_state")
 public class StateDTO implements Persistable<Long> {
-  public static final StateDTO EMPTY = new StateDTO();
   @Id Long id;
   Character changeindicator;
   String version;

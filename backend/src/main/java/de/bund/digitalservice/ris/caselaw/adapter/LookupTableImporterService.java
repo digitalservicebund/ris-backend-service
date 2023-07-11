@@ -1,7 +1,5 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
-import static de.bund.digitalservice.ris.caselaw.domain.ServiceUtils.byteBufferToArray;
-
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPADocumentTypeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPADocumentTypeRepository;
@@ -13,10 +11,10 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.Cit
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.CourtDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DatabaseCitationStyleRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DatabaseCourtRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DatabaseDocumentTypeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.StateDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.StateRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.FieldOfLawTransformer;
+import de.bund.digitalservice.ris.caselaw.domain.ServiceUtils;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.citation.CitationsStyleXML;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.court.CourtsXML;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentTypesXML;
@@ -47,7 +45,6 @@ import reactor.core.publisher.Mono;
 @Slf4j
 public class LookupTableImporterService {
 
-  private final DatabaseDocumentTypeRepository databaseDocumentTypeRepository;
   private final JPADocumentTypeRepository jpaDocumentTypeRepository;
   private final DatabaseCourtRepository databaseCourtRepository;
   private final StateRepository stateRepository;
@@ -58,14 +55,12 @@ public class LookupTableImporterService {
       Pattern.compile("\\p{Lu}{2}(-\\d{2})+(?![\\p{L}\\d-])");
 
   public LookupTableImporterService(
-      DatabaseDocumentTypeRepository databaseDocumentTypeRepository,
       JPADocumentTypeRepository jpaDocumentTypeRepository,
       DatabaseCourtRepository databaseCourtRepository,
       StateRepository stateRepository,
       DatabaseCitationStyleRepository databaseCitationStyleRepository,
       JPAFieldOfLawRepository jpaFieldOfLawRepository,
       JPAFieldOfLawLinkRepository jpaFieldOfLawLinkRepository) {
-    this.databaseDocumentTypeRepository = databaseDocumentTypeRepository;
     this.jpaDocumentTypeRepository = jpaDocumentTypeRepository;
     this.databaseCourtRepository = databaseCourtRepository;
     this.stateRepository = stateRepository;
@@ -79,36 +74,14 @@ public class LookupTableImporterService {
     XmlMapper mapper = new XmlMapper();
     DocumentTypesXML documentTypesXML;
     try {
-      documentTypesXML = mapper.readValue(byteBufferToArray(byteBuffer), DocumentTypesXML.class);
+      documentTypesXML =
+          mapper.readValue(ServiceUtils.byteBufferToArray(byteBuffer), DocumentTypesXML.class);
     } catch (IOException e) {
       throw new ResponseStatusException(
           HttpStatus.NOT_ACCEPTABLE, "Could not map ByteBuffer-content to DocumentTypesXML", e);
     }
 
     importDocumentTypeJPA(documentTypesXML);
-
-    //    List<DocumentTypeDTO> documentTypeDTOs =
-    //        documentTypesXML.getList().stream()
-    //            .map(
-    //                documentTypeXML ->
-    //                    DocumentTypeDTO.builder()
-    //                        .id(documentTypeXML.getId())
-    //                        .changeDateClient(documentTypeXML.getChangeDateClient())
-    //                        .changeIndicator(documentTypeXML.getChangeIndicator())
-    //                        .version(documentTypeXML.getVersion())
-    //                        .jurisShortcut(documentTypeXML.getJurisShortcut())
-    //                        .documentType(documentTypeXML.getDocumentType())
-    //                        .multiple(documentTypeXML.getMultiple())
-    //                        .label(documentTypeXML.getLabel())
-    //                        .superlabel1(documentTypeXML.getSuperlabel1())
-    //                        .superlabel2(documentTypeXML.getSuperlabel2())
-    //                        .build())
-    //            .toList();
-    //
-    //    documentTypeRepository
-    //        .deleteAll()
-    //        .thenMany(documentTypeRepository.saveAll(documentTypeDTOs))
-    //        .subscribe();
 
     return Mono.just("Successfully imported the document type lookup table");
   }
@@ -139,7 +112,7 @@ public class LookupTableImporterService {
     XmlMapper mapper = new XmlMapper();
     CourtsXML courtsXML;
     try {
-      courtsXML = mapper.readValue(byteBufferToArray(byteBuffer), CourtsXML.class);
+      courtsXML = mapper.readValue(ServiceUtils.byteBufferToArray(byteBuffer), CourtsXML.class);
     } catch (IOException e) {
       throw new ResponseStatusException(
           HttpStatus.NOT_ACCEPTABLE, "Could not map ByteBuffer-content to CourtsXML", e);
@@ -201,7 +174,7 @@ public class LookupTableImporterService {
     XmlMapper mapper = new XmlMapper();
     StatesXML statesXML;
     try {
-      statesXML = mapper.readValue(byteBufferToArray(byteBuffer), StatesXML.class);
+      statesXML = mapper.readValue(ServiceUtils.byteBufferToArray(byteBuffer), StatesXML.class);
     } catch (IOException e) {
       throw new ResponseStatusException(
           HttpStatus.NOT_ACCEPTABLE, "Could not map ByteBuffer-content to StatesXML", e);
@@ -232,7 +205,8 @@ public class LookupTableImporterService {
     XmlMapper mapper = new XmlMapper();
     CitationsStyleXML citationsStyleXML;
     try {
-      citationsStyleXML = mapper.readValue(byteBufferToArray(byteBuffer), CitationsStyleXML.class);
+      citationsStyleXML =
+          mapper.readValue(ServiceUtils.byteBufferToArray(byteBuffer), CitationsStyleXML.class);
     } catch (IOException e) {
       throw new ResponseStatusException(
           HttpStatus.NOT_ACCEPTABLE, "Could not map ByteBuffer-content to CitationsXML", e);
@@ -270,7 +244,8 @@ public class LookupTableImporterService {
     XmlMapper mapper = new XmlMapper();
     FieldsOfLawXml fieldsOfLawXml;
     try {
-      fieldsOfLawXml = mapper.readValue(byteBufferToArray(byteBuffer), FieldsOfLawXml.class);
+      fieldsOfLawXml =
+          mapper.readValue(ServiceUtils.byteBufferToArray(byteBuffer), FieldsOfLawXml.class);
     } catch (IOException e) {
       throw new ResponseStatusException(
           HttpStatus.NOT_ACCEPTABLE, "Could not map ByteBuffer-content to FieldsOfLawXml", e);

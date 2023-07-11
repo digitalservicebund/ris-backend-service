@@ -15,7 +15,7 @@ public class RunTextElement extends TextElement implements RunElement {
   public String toHtmlString() {
     StringBuilder sb = new StringBuilder();
 
-    var hasStyle = hasStyle();
+    boolean hasStyle = hasStyle();
     if (hasStyle) {
       sb.append("<span");
       sb.append(getStyleString());
