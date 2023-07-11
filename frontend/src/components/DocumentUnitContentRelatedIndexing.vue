@@ -11,9 +11,10 @@ const props = defineProps<{
   modelValue: ContentRelatedIndexing
 }>()
 
-const emit = defineEmits<{
-  (event: "update:modelValue", value?: ContentRelatedIndexing): void
-}>()
+const emit =
+  defineEmits<
+    (event: "update:modelValue", value?: ContentRelatedIndexing) => void
+  >()
 
 const contentRelatedIndexing = computed({
   get: () => {

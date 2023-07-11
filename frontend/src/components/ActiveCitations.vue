@@ -10,9 +10,8 @@ const props = defineProps<{
   modelValue: ActiveCitation[] | undefined
 }>()
 
-const emit = defineEmits<{
-  (event: "update:modelValue", value?: ActiveCitation[]): void
-}>()
+const emit =
+  defineEmits<(event: "update:modelValue", value?: ActiveCitation[]) => void>()
 
 const activeCitations = computed({
   get: () => {

@@ -11,9 +11,7 @@ const props = defineProps<{
   documentUnit: DocumentUnit
 }>()
 
-const emits = defineEmits<{
-  (event: "updateDocumentUnit"): void
-}>()
+const emits = defineEmits<(event: "updateDocumentUnit") => void>()
 
 const loadDone = ref(false)
 const publicationLog = ref<XmlMail[]>()
