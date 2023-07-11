@@ -6,7 +6,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import de.bund.digitalservice.ris.caselaw.domain.docx.TableElement;
 import de.bund.digitalservice.ris.caselaw.domain.docx.TextElement;
 import jakarta.xml.bind.JAXBElement;
-import java.util.Collections;
 import javax.xml.namespace.QName;
 import org.docx4j.wml.P;
 import org.docx4j.wml.R;
@@ -46,16 +45,6 @@ class DocxParagraphDocxConverterTest {
     var result = converter.convert(paragraph);
 
     assertTrue(result instanceof TextElement);
-  }
-
-  @Test
-  void textSetStyles() {
-    converter.setStyles(Collections.emptyMap());
-  }
-
-  @Test
-  void textSetImages() {
-    converter.setImages(Collections.emptyMap());
   }
 
   @Test

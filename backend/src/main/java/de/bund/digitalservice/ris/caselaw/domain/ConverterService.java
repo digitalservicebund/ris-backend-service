@@ -1,5 +1,8 @@
 package de.bund.digitalservice.ris.caselaw.domain;
 
-public interface ConverterService<ORIGINAL, CONVERTED> {
-  CONVERTED getConvertedObject(String fileName);
+import de.bund.digitalservice.ris.caselaw.domain.docx.Docx2Html;
+import reactor.core.publisher.Mono;
+
+public interface ConverterService {
+  Mono<Docx2Html> getConvertedObject(String fileName);
 }

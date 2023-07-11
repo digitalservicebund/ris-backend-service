@@ -1,5 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
+import de.bund.digitalservice.ris.caselaw.domain.ConverterService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitListEntry;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
@@ -42,15 +43,13 @@ import reactor.core.publisher.Mono;
 public class DocumentUnitController {
   private final DocumentUnitService service;
   private final UserService userService;
-  private final DocxConverterService docxConverterService;
+  private final ConverterService converterService;
 
   public DocumentUnitController(
-      DocumentUnitService service,
-      UserService userService,
-      DocxConverterService docxConverterService) {
+      DocumentUnitService service, UserService userService, DocxConverterService converterService) {
     this.service = service;
     this.userService = userService;
-    this.docxConverterService = docxConverterService;
+    this.converterService = converterService;
   }
 
   @GetMapping(value = "new")
@@ -176,7 +175,7 @@ public class DocumentUnitController {
     return service
         .getByUuid(uuid)
         .map(DocumentUnit::s3path)
-        .flatMap(docxConverterService::getConvertedObject)
+        .flatMap(converterService::getConvertedObject)
         .map(ResponseEntity::ok)
         .onErrorReturn(ResponseEntity.internalServerError().build());
   }

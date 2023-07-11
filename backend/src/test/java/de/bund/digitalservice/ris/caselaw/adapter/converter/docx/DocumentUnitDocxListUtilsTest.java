@@ -28,7 +28,7 @@ class DocumentUnitDocxListUtilsTest {
   void testPostprocessBorderNumbers_withEmptyList_shouldDoNothing() {
     List<DocumentUnitDocx> list = new ArrayList<>();
 
-    DocumentUnitDocxListUtils.postprocessBorderNumbers(list);
+    DocumentUnitDocxListUtils.postProcessBorderNumbers(list);
 
     assertThat(list).isEmpty();
   }
@@ -36,7 +36,7 @@ class DocumentUnitDocxListUtilsTest {
   @Test
   void testPostprocessBorderNumbers_withNull_shouldDoNothing() {
 
-    DocumentUnitDocxListUtils.postprocessBorderNumbers(null);
+    DocumentUnitDocxListUtils.postProcessBorderNumbers(null);
   }
 
   @Test
@@ -45,7 +45,7 @@ class DocumentUnitDocxListUtilsTest {
     list.add(createNumberlessBorderNumberWithNumId(7));
     list.add(createNumberlessBorderNumberWithNumId(7));
 
-    DocumentUnitDocxListUtils.postprocessBorderNumbers(list);
+    DocumentUnitDocxListUtils.postProcessBorderNumbers(list);
 
     assertThat(list).hasSize(2);
     assertThat(list.get(0)).isInstanceOf(BorderNumber.class);
@@ -66,7 +66,7 @@ class DocumentUnitDocxListUtilsTest {
     list.add(createNumberlessBorderNumberWithNumId(7));
     list.add(createNumberlessBorderNumberWithNumId(8));
 
-    DocumentUnitDocxListUtils.postprocessBorderNumbers(list);
+    DocumentUnitDocxListUtils.postProcessBorderNumbers(list);
 
     assertThat(list).hasSize(2);
     assertThat(list.get(0)).isInstanceOf(BorderNumber.class);

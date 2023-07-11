@@ -102,7 +102,7 @@ public class CourtXML {
   String contactperson;
 
   @JsonProperty(value = "liefertlrs")
-  String deliverslrs; // TODO
+  String deliverslrs;
 
   @JsonProperty(value = "bemerkung")
   String remark;

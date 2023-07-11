@@ -4,6 +4,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DeviatingDecisi
 import java.time.Instant;
 
 public class DeviatingDecisionDateTransformer {
+  private DeviatingDecisionDateTransformer() {}
 
   public static DeviatingDecisionDateDTO enrichDTO(
       DeviatingDecisionDateDTO deviatingDecisionDateDTO, Instant deviationDecisionDate) {

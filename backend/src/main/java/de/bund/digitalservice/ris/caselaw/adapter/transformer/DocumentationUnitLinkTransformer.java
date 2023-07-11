@@ -4,6 +4,8 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentationUn
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitLink;
 
 public class DocumentationUnitLinkTransformer {
+  private DocumentationUnitLinkTransformer() {}
+
   public static DocumentationUnitLink transferToDomain(
       DocumentationUnitLinkDTO documentationUnitLinkDTO) {
     return DocumentationUnitLink.builder()
