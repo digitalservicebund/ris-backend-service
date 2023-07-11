@@ -6,7 +6,7 @@ import java.util.stream.Collectors;
 public class TableCellElement extends BlockElement implements DocumentUnitDocx {
   public final List<DocumentUnitDocx> paragraphElements;
   private final Integer usedStyles;
-  public Integer columnSpan;
+  private Integer columnSpan;
 
   public TableCellElement(List<DocumentUnitDocx> paragraphElements, Integer usedStyles) {
     this.paragraphElements = paragraphElements;

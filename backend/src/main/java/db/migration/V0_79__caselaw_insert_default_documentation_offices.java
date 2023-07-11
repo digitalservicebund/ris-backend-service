@@ -6,6 +6,7 @@ import java.util.UUID;
 import org.flywaydb.core.api.migration.BaseJavaMigration;
 import org.flywaydb.core.api.migration.Context;
 
+@SuppressWarnings("java:S101")
 public class V0_79__caselaw_insert_default_documentation_offices extends BaseJavaMigration {
   public void migrate(Context context) throws SQLException {
     try (PreparedStatement statement =

@@ -20,7 +20,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
@@ -179,7 +178,7 @@ public class XmlEMailPublishService implements EmailPublishService {
                                 Stream.concat(
                                         Stream.of("TEST"),
                                         documentUnit.coreData().fileNumbers().stream())
-                                    .collect(Collectors.toList()))
+                                    .toList())
                             .build())
                 .orElseGet(
                     () ->
