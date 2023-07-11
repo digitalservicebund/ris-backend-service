@@ -22,9 +22,6 @@ export type CoreData = {
 }
 
 export type ContentRelatedIndexing = {
-  // TODO: keywords and fieldsOfLaw still have their own endpoints --> refactor
-  // keywords?: string[]
-  // fieldsOfLaw?: FieldOfLaw[]
   norms?: NormReference[]
   activeCitations?: ActiveCitation[]
 }

@@ -43,7 +43,6 @@ const deleteKeyword = async (keyword: string | undefined) => {
   }
 }
 
-//Todo: get keywords via documentunit
 watch(
   props,
   async () => {
