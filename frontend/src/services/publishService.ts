@@ -1,7 +1,7 @@
 import httpClient, { ServiceResponse } from "./httpClient"
 import PublicationHistoryRecord from "@/domain/xmlMail"
 
-interface publishService {
+interface PublishService {
   publishDocument(
     documentUnitUuid: string
   ): Promise<ServiceResponse<PublicationHistoryRecord>>
@@ -10,7 +10,7 @@ interface publishService {
   ): Promise<ServiceResponse<PublicationHistoryRecord[]>>
 }
 
-const service: publishService = {
+const service: PublishService = {
   async publishDocument(documentUnitUuid: string) {
     const response = await httpClient.put<string, PublicationHistoryRecord>(
       `caselaw/documentunits/${documentUnitUuid}/publish`,
