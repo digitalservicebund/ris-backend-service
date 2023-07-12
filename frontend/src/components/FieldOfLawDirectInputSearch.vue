@@ -4,7 +4,9 @@ import ComboboxInput from "@/components/ComboboxInput.vue"
 import { FieldOfLawNode } from "@/domain/fieldOfLaw"
 import ComboboxItemService from "@/services/comboboxItemService"
 
-const emit = defineEmits<(event: "add-to-list", identifier: string) => void>()
+const emit = defineEmits<{
+  "add-to-list": [identifier: string]
+}>()
 const fieldOfLawNode = ref()
 
 function handleUpdateModelValue(item: FieldOfLawNode) {

@@ -11,8 +11,10 @@ const props = withDefaults(defineProps<Props>(), {
   modelValue: () => ({} as Footnote),
 })
 
-const emit =
-  defineEmits<(event: "update:modelValue", value?: Footnote) => void>()
+const emit = defineEmits<{
+  "update:modelValue": [value?: Footnote]
+}>()
+
 interface Props {
   modelValue?: Footnote
 }

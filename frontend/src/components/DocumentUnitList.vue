@@ -9,13 +9,10 @@ import PopupModal from "@/shared/components/PopupModal.vue"
 const props = defineProps<{
   documentUnitListEntries: DocumentUnitListEntry[]
 }>()
-const emit =
-  defineEmits<
-    (
-      e: "deleteDocumentUnit",
-      documentUnitListEntry: DocumentUnitListEntry
-    ) => void
-  >()
+
+const emit = defineEmits<{
+  deleteDocumentUnit: [documentUnitListEntry: DocumentUnitListEntry]
+}>()
 
 const listEntriesWithStatus = computed(() =>
   props.documentUnitListEntries.map((entry) => ({

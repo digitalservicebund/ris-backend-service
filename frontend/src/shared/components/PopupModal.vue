@@ -10,9 +10,10 @@ defineProps<{
   cancelButtonType?: string
   confirmButtonType?: string
 }>()
+
 defineEmits<{
-  (e: "closeModal"): void
-  (e: "confirmAction"): void
+  closeModal: []
+  confirmAction: []
 }>()
 
 onMounted(() => {

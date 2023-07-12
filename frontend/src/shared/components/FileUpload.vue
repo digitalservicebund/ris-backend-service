@@ -8,7 +8,10 @@ const props = defineProps<{
   isLoading?: boolean
   accept?: string
 }>()
-const emits = defineEmits<(e: "fileSelected", file: File) => void>()
+
+const emits = defineEmits<{
+  fileSelected: [file: File]
+}>()
 
 interface Status {
   file: File | null

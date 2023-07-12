@@ -58,7 +58,9 @@ const props = withDefaults(defineProps<Props>(), {
   ariaLabel: "Editor Feld",
 })
 
-const emit = defineEmits<(e: "updateValue", newValue: string) => void>()
+const emit = defineEmits<{
+  updateValue: [newValue: string]
+}>()
 
 const hasFocus = ref(false)
 

@@ -12,12 +12,11 @@ interface Props {
 }
 
 const props = defineProps<Props>()
-
 const emit = defineEmits<{
-  (event: "node:toggle", node: FieldOfLawNode): void
-  (event: "node:select", node: FieldOfLawNode): void
-  (event: "node:unselect", identifier: string): void
-  (event: "linkedField:clicked", identifier: string): void
+  "node:toggle": [node: FieldOfLawNode]
+  "node:select": [node: FieldOfLawNode]
+  "node:unselect": [identifier: string]
+  "linkedField:clicked": [identifier: string]
 }>()
 
 const node = computed(() => props.node)
