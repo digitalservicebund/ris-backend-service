@@ -71,7 +71,7 @@
   },
   "devDependencies": {
     "@babel/core": "^7.22.1",
-    "@digitalservice4germany/angie": "^0.5.0",
+    "@digitalservice4germany/angie": "^0.5.1",
     "@digitalservice4germany/style-dictionary": "^2.0.0",
     "@namics/stylelint-bem": "^8.1.0",
     "@playwright/test": "^1.35.0",
