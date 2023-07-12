@@ -26,8 +26,37 @@ public class SingleNormValidator
       return true;
     }
 
+    Map<String, NormElement> labelMap = generateNormAbbreviationLabelMap(value.normAbbreviation());
+
+    String[] parts = value.singleNorm().replaceAll("\\p{Z}", " ").split(" ");
+
+    if (parts.length == 0) {
+      return true;
+    }
+
+    boolean lastWasDesignation = false;
+    boolean isLabel = false;
+    for (int i = parts.length - 1; i >= 0; i--) {
+      isLabel = labelMap.containsKey(parts[i]);
+
+      if (isLabel) {
+        boolean withDesignation = labelMap.get(parts[i]).hasNumberDesignation();
+
+        if (withDesignation ^ lastWasDesignation) {
+          return false;
+        }
+      }
+
+      lastWasDesignation = !isLabel;
+    }
+
+    return isLabel;
+  }
+
+  private Map<String, NormElement> generateNormAbbreviationLabelMap(String normAbbreviation) {
     Stream<NormElement> stream = normElementRepository.findAllByDocumentCategoryLabelR().stream();
-    if ("EinigVtr".equals(value.normAbbreviation())) {
+
+    if ("EinigVtr".equals(normAbbreviation)) {
       stream =
           stream.filter(
               normElement -> NormCode.EINIGUNGS_VERTRAG.name().equals(normElement.normCode()));
@@ -36,36 +65,7 @@ public class SingleNormValidator
           stream.filter(
               normElement -> !NormCode.EINIGUNGS_VERTRAG.name().equals(normElement.normCode()));
     }
-    Map<String, NormElement> labelMap =
-        stream.collect(Collectors.toMap(NormElement::label, Function.identity()));
 
-    String[] parts = value.singleNorm().replaceAll("\\p{Z}", " ").split(" ");
-
-    if (parts.length == 0) {
-      return true;
-    }
-
-    boolean needDesignation = false;
-    boolean hasDesignation = true;
-    for (String part : parts) {
-      if (labelMap.containsKey(part)) {
-        if (needDesignation && !hasDesignation) {
-          return false;
-        }
-
-        needDesignation = labelMap.get(part).hasNumberDesignation();
-        if (needDesignation) {
-          hasDesignation = false;
-        }
-      } else {
-        if (!needDesignation) {
-          return false;
-        }
-
-        hasDesignation = true;
-      }
-    }
-
-    return hasDesignation;
+    return stream.collect(Collectors.toMap(NormElement::label, Function.identity()));
   }
 }

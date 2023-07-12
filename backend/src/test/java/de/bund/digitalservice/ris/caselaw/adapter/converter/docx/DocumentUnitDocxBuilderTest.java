@@ -1122,7 +1122,8 @@ class DocumentUnitDocxBuilderTest {
 
   @Test
   void testBuild_withNumberingList_withNotAllowedNumberingFormat() {
-    TestMemoryAppender memoryAppender = new TestMemoryAppender(DocumentUnitDocxBuilder.class);
+    TestMemoryAppender memoryAppender =
+        new TestMemoryAppender(NumberingListEntryIndexGenerator.class);
     DocumentUnitDocxBuilder builder = DocumentUnitDocxBuilder.newInstance();
     PPr pPr = new PPr();
     NumPr numPr = new NumPr();
