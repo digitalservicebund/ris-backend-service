@@ -8,8 +8,13 @@ const router = createRouter({
   history: createWebHistory(),
   routes: [
     {
-      path: "",
+      path: "/caselaw/documentUnit/:documentNumber/categories",
       name: "caselaw-documentUnit-:documentNumber-categories",
+      component: {},
+    },
+    {
+      path: "/",
+      name: "caselaw",
       component: {},
     },
   ],

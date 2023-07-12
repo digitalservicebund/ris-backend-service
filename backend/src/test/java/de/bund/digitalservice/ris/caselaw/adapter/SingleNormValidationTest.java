@@ -72,7 +72,8 @@ class SingleNormValidationTest {
         "IJ XY OP MN KL 12: EinigVtr",
         "AB XY:blafasel",
         "AB XY 12 EF GH:",
-        "GH:"
+        "GH:",
+        "AB\u2007these\u202Fare\u2060special\uFEFFwhitespace\u00A0characters:"
       },
       delimiter = ':')
   void testValidate(String singleNorm, String normAbbreviation) {

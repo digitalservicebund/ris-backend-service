@@ -32,13 +32,18 @@ function renderComponent(
           history: createWebHistory(),
           routes: [
             {
-              path: "",
+              path: "/caselaw/documentUnit/:documentNumber/files",
               name: "caselaw-documentUnit-:documentNumber-files",
               component: {},
             },
             {
-              path: "",
+              path: "/caselaw/documentUnit/:documentNumber/categories",
               name: "caselaw-documentUnit-:documentNumber-categories",
+              component: {},
+            },
+            {
+              path: "/",
+              name: "caselaw",
               component: {},
             },
           ],

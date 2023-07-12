@@ -2,7 +2,7 @@ plugins {
   id "org.springframework.boot" version "3.1.1"
   id "io.spring.dependency-management" version "1.1.0"
   id "java"
-  id "org.jetbrains.kotlin.jvm" version "1.8.22"
+  id "org.jetbrains.kotlin.jvm" version "1.9.0"
   id "org.jetbrains.kotlin.plugin.spring" version "1.8.22"
   id "com.diffplug.spotless" version "6.19.0"
   id "jacoco"
@@ -13,7 +13,7 @@ plugins {
   id "com.github.ben-manes.versions" version "0.46.0"
   id "org.jetbrains.dokka" version "1.8.10"
   id "io.franzbecker.gradle-lombok" version "5.0.0"
-  id "org.flywaydb.flyway" version "9.18.0"
+  id "org.flywaydb.flyway" version "9.20.0"
 }
 
 group = "de.bund.digitalservice"
@@ -146,7 +146,7 @@ dependencies {
   implementation "io.micrometer:micrometer-registry-prometheus:1.10.4"
   implementation "io.micrometer:micrometer-core:1.10.4"
 
-  implementation "io.sentry:sentry-spring-boot-starter:6.21.0"
+  implementation "io.sentry:sentry-spring-boot-starter:6.25.0"
   implementation "org.springframework.boot:spring-boot-starter-validation"
 
   implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
@@ -182,7 +182,7 @@ dependencies {
 
   implementation "org.jetbrains.kotlin:kotlin-reflect"
 
-  implementation "org.jsoup:jsoup:1.15.4"
+  implementation "org.jsoup:jsoup:1.16.1"
 
   implementation "com.github.loki4j:loki-logback-appender:1.4.0"
 
