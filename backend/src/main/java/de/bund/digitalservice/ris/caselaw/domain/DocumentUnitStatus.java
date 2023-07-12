@@ -1,6 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.domain;
 
-public enum DocumentUnitStatus {
-  UNPUBLISHED,
-  PUBLISHED
-}
+import lombok.Builder;
+
+@Builder
+public record DocumentUnitStatus(PublicationStatus status, boolean withError) {}

@@ -17,7 +17,6 @@ import org.springframework.data.relational.core.mapping.Table;
 @AllArgsConstructor
 @Table("citation_style")
 public class CitationStyleDTO implements Persistable<UUID> {
-  public static final CitationStyleDTO EMPTY = new CitationStyleDTO();
   @Id UUID uuid;
   Long jurisId;
   Character changeIndicator;

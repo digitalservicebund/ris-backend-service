@@ -17,7 +17,6 @@ import org.springframework.data.relational.core.mapping.Table;
 @AllArgsConstructor
 @Table("document_unit_norm")
 public class DocumentUnitNormDTO {
-  public static final DocumentUnitNormDTO EMPTY = new DocumentUnitNormDTO();
 
   @Id Long id;
   Long documentUnitId;

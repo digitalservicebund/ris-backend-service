@@ -9,9 +9,10 @@ import { ResponseError } from "@/services/httpClient"
 import FileUpload from "@/shared/components/FileUpload.vue"
 
 const props = defineProps<{ documentUnit: DocumentUnit }>()
-const emit = defineEmits<{
-  (e: "updateDocumentUnit", updatedDocumentUnit: DocumentUnit): void
-}>()
+const emit =
+  defineEmits<
+    (e: "updateDocumentUnit", updatedDocumentUnit: DocumentUnit) => void
+  >()
 const error = ref<ResponseError>()
 const isUploading = ref(false)
 

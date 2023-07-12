@@ -5,6 +5,8 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import java.util.Optional;
 
 public class DocumentationOfficeTransformer {
+  private DocumentationOfficeTransformer() {}
+
   public static DocumentationOffice transformDTO(DocumentationOfficeDTO documentationOfficeDTO) {
     return Optional.ofNullable(documentationOfficeDTO)
         .map(

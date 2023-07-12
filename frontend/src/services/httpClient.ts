@@ -67,7 +67,7 @@ async function baseHttp<T>(
     return {
       status: Number((error as AxiosError).code) || 500,
       error: {
-        title: (error as AxiosError).status?.toString() || "Network Error",
+        title: (error as AxiosError).status?.toString() ?? "Network Error",
         description: String((error as AxiosError).cause),
       },
     }

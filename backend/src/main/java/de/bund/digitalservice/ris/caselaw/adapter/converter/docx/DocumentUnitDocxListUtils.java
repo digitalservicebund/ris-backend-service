@@ -16,7 +16,7 @@ public class DocumentUnitDocxListUtils {
 
   private DocumentUnitDocxListUtils() {}
 
-  public static void postprocessBorderNumbers(List<DocumentUnitDocx> documentUnitDocxList) {
+  public static void postProcessBorderNumbers(List<DocumentUnitDocx> documentUnitDocxList) {
     if (documentUnitDocxList == null) {
       return;
     }

@@ -18,7 +18,7 @@ function renderComponent(
             fileName: "",
             fileNumber: "",
             documentationOffice: { label: "testOffice" },
-            status: "PUBLISHED",
+            status: { status: "PUBLISHED", withError: false },
             ...options,
           },
         ]

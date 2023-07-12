@@ -10,9 +10,8 @@ const props = defineProps<{
   modelValue: ActiveCitation[] | undefined
 }>()
 
-const emit = defineEmits<{
-  (event: "update:modelValue", value?: ActiveCitation[]): void
-}>()
+const emit =
+  defineEmits<(event: "update:modelValue", value?: ActiveCitation[]) => void>()
 
 const activeCitations = computed({
   get: () => {
@@ -26,39 +25,41 @@ const activeCitations = computed({
 const defaultValue = new ActiveCitation()
 
 function decisionSummarizer(activeCitation: ActiveCitation) {
-  return h("div", { tabindex: activeCitation.isDocUnit() ? 0 : -1 }, [
-    activeCitation.isDocUnit()
-      ? h(
-          RouterLink,
+  if (activeCitation.isReadOnly) {
+    return h(
+      RouterLink,
+      {
+        class: ["link-01-bold", "underline"],
+        target: "_blank",
+        tabindex: -1,
+        to: {
+          name: "caselaw-documentUnit-:documentNumber-categories",
+          params: { documentNumber: activeCitation.documentNumber },
+        },
+      },
+      () => activeCitation.renderDecision
+    )
+  } else {
+    if (activeCitation.hasMissingRequiredFields) {
+      return h("div", { class: ["flex flex-row items-center"] }, [
+        h(
+          "span",
           {
-            class: ["link-01-bold", "underline"],
-            target: "_blank",
-            tabindex: -1,
-            to: {
-              name: "caselaw-documentUnit-:documentNumber-categories",
-              params: { documentNumber: activeCitation.documentNumber },
-            },
+            "aria-label": "Fehlerhafte Eingabe",
+            class: ["material-icons pr-8 text-red-800"],
           },
-          () => activeCitation.renderDecision
-        )
-      : activeCitation.hasMissingRequiredFields
-      ? h("div", { class: ["flex flex-row items-center"] }, [
-          h(
-            "span",
-            {
-              "aria-label": "Fehlerhafte Eingabe",
-              class: ["material-icons pr-8 text-red-800"],
-            },
-            "error_outline"
-          ),
-          h(
-            "div",
-            { class: ["label-02-bold text-red-800"] },
-            activeCitation.renderDecision
-          ),
-        ])
-      : h("div", { class: ["link-02-reg"] }, activeCitation.renderDecision),
-  ])
+          "error_outline"
+        ),
+        h(
+          "div",
+          { class: ["label-02-bold text-red-800"] },
+          activeCitation.renderDecision
+        ),
+      ])
+    } else {
+      return h("div", { class: ["link-02-reg"] }, activeCitation.renderDecision)
+    }
+  }
 }
 
 const CitationsSummary = withSummarizer(decisionSummarizer)

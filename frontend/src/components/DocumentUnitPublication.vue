@@ -11,9 +11,7 @@ const props = defineProps<{
   documentUnit: DocumentUnit
 }>()
 
-const emits = defineEmits<{
-  (event: "updateDocumentUnit"): void
-}>()
+const emits = defineEmits<(event: "updateDocumentUnit") => void>()
 
 const loadDone = ref(false)
 const publicationLog = ref<XmlMail[]>()
@@ -63,12 +61,12 @@ onMounted(async () => {
   const response = await publishService.getPublicationLog(
     props.documentUnit.uuid
   )
-  if (!!response.data) {
+  if (response.data) {
     loadDone.value = true
     publicationLog.value = response.data
   }
 
-  if (!!publicationLog.value) {
+  if (publicationLog.value) {
     for (const item of publicationLog.value) {
       item.date = formatDate(item.date)
       item.xml = item.xml ? item.xml : ""

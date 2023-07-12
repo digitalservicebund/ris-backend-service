@@ -9,7 +9,7 @@ defineProps<{
 <template>
   <div>
     <router-link
-      v-if="decision.isDocUnit()"
+      v-if="decision.isReadOnly"
       class="link-01-bold underline"
       tabindex="-1"
       target="_blank"

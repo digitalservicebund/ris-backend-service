@@ -1,13 +1,14 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
 import de.bund.digitalservice.ris.caselaw.domain.Attachment;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatus;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatusService;
 import de.bund.digitalservice.ris.caselaw.domain.HttpMailSender;
 import de.bund.digitalservice.ris.caselaw.domain.MailStoreFactory;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationReport;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationReportRepository;
+import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import de.bund.digitalservice.ris.domain.export.juris.response.ActionableMessageHandler;
-import de.bund.digitalservice.ris.domain.export.juris.response.MessageAttachment;
 import de.bund.digitalservice.ris.domain.export.juris.response.MessageHandler;
 import de.bund.digitalservice.ris.domain.export.juris.response.StatusImporterException;
 import jakarta.mail.Flags.Flag;
@@ -19,6 +20,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import org.owasp.html.HtmlPolicyBuilder;
 import org.owasp.html.PolicyFactory;
 import org.slf4j.Logger;
@@ -80,23 +82,13 @@ public class JurisXmlExporterResponseProcessor {
 
           try {
             String documentNumber = actionableHandler.getDocumentNumber(message);
-            String subject = message.getSubject();
-            Date receivedDate = message.getReceivedDate();
-            List<Attachment> attachments = new ArrayList<>();
-            for (MessageAttachment att : actionableHandler.getAttachments(message)) {
-              attachments.add(
-                  Attachment.builder()
-                      .fileName(att.fileName())
-                      .fileContent(att.fileContent())
-                      .build());
-            }
-
-            forwardMessage(documentNumber, subject, attachments)
-                .doOnSuccess(
-                    result -> {
-                      processedMessages.add(message);
-                      saveAttachments(documentNumber, receivedDate, attachments);
-                    })
+            List<Attachment> attachments = collectAttachments(message, actionableHandler);
+            Mono.when(
+                    forwardMessage(documentNumber, message.getSubject(), attachments),
+                    setPublicationStatus(message, actionableHandler, documentNumber),
+                    saveAttachments(documentNumber, message.getReceivedDate(), attachments))
+                .doOnSuccess(result -> processedMessages.add(message))
+                .doOnError(e -> LOGGER.error("Error processing message: ", e))
                 .onErrorResume(e -> Mono.empty())
                 .block();
 
@@ -117,8 +109,9 @@ public class JurisXmlExporterResponseProcessor {
     }
   }
 
-  private void saveAttachments(
+  private Mono<Void> saveAttachments(
       String documentNumber, Date receivedDate, List<Attachment> attachments) {
+
     PolicyFactory policy =
         new HtmlPolicyBuilder()
             .allowElements(
@@ -132,7 +125,8 @@ public class JurisXmlExporterResponseProcessor {
             .allowAttributes("color")
             .onElements("font")
             .toFactory();
-    reportRepository
+
+    return reportRepository
         .saveAll(
             attachments.stream()
                 .filter(attachment -> attachment.fileName().endsWith(".html"))
@@ -144,13 +138,40 @@ public class JurisXmlExporterResponseProcessor {
                             .content(policy.sanitize(attachment.fileContent()))
                             .build())
                 .toList())
-        .subscribe();
+        .then();
+  }
+
+  private List<Attachment> collectAttachments(Message message, ActionableMessageHandler handler)
+      throws MessagingException, IOException {
+    return handler.getAttachments(message).stream()
+        .map(
+            attachment ->
+                Attachment.builder()
+                    .fileName(attachment.fileName())
+                    .fileContent(attachment.fileContent())
+                    .build())
+        .toList();
+  }
+
+  private Mono<Void> setPublicationStatus(
+      Message message, ActionableMessageHandler handler, String documentNumber) {
+    try {
+
+      return statusService.update(
+          documentNumber,
+          DocumentUnitStatus.builder()
+              .status(getPublicationStatus(handler.isPublished(message)))
+              .withError(handler.hasErrors(message))
+              .build());
+    } catch (MessagingException | IOException e) {
+      throw new StatusImporterException("Could not update status" + e);
+    }
   }
 
   private Mono<Void> forwardMessage(
       String documentNumber, String subject, List<Attachment> attachments) {
     return statusService
-        .getIssuerAddressOfLatestStatus(documentNumber)
+        .getLatestIssuerAddress(documentNumber)
         .flatMap(
             issuerAddress ->
                 Mono.fromRunnable(
@@ -183,5 +204,11 @@ public class JurisXmlExporterResponseProcessor {
             throw new StatusImporterException("Error deleting Message: " + e);
           }
         });
+  }
+
+  private PublicationStatus getPublicationStatus(Optional<Boolean> isPublished) {
+    return isPublished
+        .map(published -> published ? PublicationStatus.PUBLISHED : PublicationStatus.UNPUBLISHED)
+        .orElse(PublicationStatus.PUBLISHING);
   }
 }

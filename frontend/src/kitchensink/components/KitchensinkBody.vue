@@ -16,6 +16,7 @@ import FootnotesView from "@/kitchensink/views/FootnotesView.vue"
 import InfoModalView from "@/kitchensink/views/InfoModalView.vue"
 import InputView from "@/kitchensink/views/InputView.vue"
 import NavbarView from "@/kitchensink/views/NavbarView.vue"
+import NormUnitInfoPanelView from "@/kitchensink/views/NormUnitInfoPanelView.vue"
 import OriginalFileSidePanelView from "@/kitchensink/views/OriginalFileSidePanelView.vue"
 import PaginationView from "@/kitchensink/views/PaginationView.vue"
 import PopupModalView from "@/kitchensink/views/PopupModalView.vue"
@@ -61,6 +62,8 @@ const component = computed(() => {
       return SideToggleView
     case "DocumentUnitInfoPanelView":
       return DocumentUnitInfoPanelView
+    case "NormUnitInfoPanelView":
+      return NormUnitInfoPanelView
     case "PropertyInfoView":
       return PropertyInfoView
     case "EditableList":

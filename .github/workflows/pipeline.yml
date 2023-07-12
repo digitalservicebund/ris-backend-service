@@ -450,12 +450,6 @@ jobs:
   analyze-backend:
     runs-on: ubuntu-latest
     if: ${{ github.ref == 'refs/heads/main' }}
-    # needs:
-    #   - backend-build
-    #   - backend-unit-tests
-    #   - backend-integration-tests
-    #   - backend-build-image-and-scan
-    #   - audit-licenses-backend
     steps:
       - uses: actions/checkout@v3
         with:
@@ -509,9 +503,6 @@ jobs:
   analyze-frontend:
     runs-on: ubuntu-latest
     if: ${{ github.ref == 'refs/heads/main' }}
-    # needs:
-    #   - frontend-build
-    #   - frontend-build-image-and-scan
     steps:
       - uses: actions/checkout@v3
         with:
@@ -786,7 +777,13 @@ jobs:
       after-4pm: ${{ steps.check-time.outputs.after-4pm }}
     steps:
       - id: check-time
-        run: echo "after-4pm=$(if [ $(TZ="Europe/Berlin" date +'%H') -lt 16 ]; then echo 'false'; else echo 'true'; fi)" >> "$GITHUB_OUTPUT"
+        run: |
+          hour=$(TZ="Europe/Berlin" date +'%H')
+          if [ $hour -lt 4 -o $hour -ge 16 ]; then
+            echo "after-4pm=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "after-4pm=false" >> "$GITHUB_OUTPUT"
+          fi
 
   deploy-production:
     runs-on: ubuntu-latest
@@ -861,7 +858,7 @@ jobs:
           path: _site
       - run: mv _site/profile*.html _site/profile-report.html
       - name: Upload GitHub licence page
-        uses: actions/upload-pages-artifact@v1.0.7
+        uses: actions/upload-pages-artifact@v2.0.0
         with:
           path: _site
       - name: Deploy to GitHub Pages
@@ -988,10 +985,11 @@ jobs:
           destinationDir: performance-reports/ris-backend-service
       # Push reports
       - name: Push reports
+        # we use `toJSON(...)` below to escape double quotation marks
         run: |
           git diff-index --cached --quiet HEAD ||
             git commit \
-              -m '${{ github.event.head_commit.message }}' \
+              -m ${{ toJSON(github.event.head_commit.message) }} \
               -m "From commit: ${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}" &&
             git push origin main &&
             echo "Pushed reports to ${{ github.server_url }}/${{ env.REPORTS_REPOSITORY }}" >> $GITHUB_STEP_SUMMARY

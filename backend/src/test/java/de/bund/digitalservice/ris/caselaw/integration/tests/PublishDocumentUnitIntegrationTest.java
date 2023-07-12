@@ -1,6 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.integration.tests;
 
-import static de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatus.PUBLISHED;
+import static de.bund.digitalservice.ris.caselaw.domain.PublicationStatus.PUBLISHING;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import de.bund.digitalservice.ris.caselaw.RisWebTestClient;
@@ -29,10 +29,10 @@ import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresConfig;
 import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatus;
+import de.bund.digitalservice.ris.caselaw.domain.EmailPublishState;
 import de.bund.digitalservice.ris.caselaw.domain.HttpMailSender;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationHistoryRecordType;
-import de.bund.digitalservice.ris.caselaw.domain.PublishState;
+import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.XmlPublication;
 import java.time.Clock;
 import java.time.Instant;
@@ -146,7 +146,7 @@ class PublishDocumentUnitIntegrationTest {
             "message 1|message 2",
             "test.xml",
             null,
-            PublishState.SENT);
+            EmailPublishState.SENT);
     XmlPublication expectedXmlResultObject =
         XmlPublication.builder()
             .documentUnitUuid(documentUnitUuid1)
@@ -160,7 +160,7 @@ class PublishDocumentUnitIntegrationTest {
             .statusCode("200")
             .statusMessages(List.of("message 1", "message 2"))
             .fileName("test.xml")
-            .publishState(PublishState.SENT)
+            .emailPublishState(EmailPublishState.SENT)
             .build();
     risWebTestClient
         .withDefaultLogin()
@@ -189,7 +189,7 @@ class PublishDocumentUnitIntegrationTest {
     List<DocumentUnitStatusDTO> statusList =
         documentUnitStatusRepository.findAll().collectList().block();
     DocumentUnitStatusDTO status = statusList.get(statusList.size() - 1);
-    assertThat(status.getStatus()).isEqualTo(PUBLISHED);
+    assertThat(status.getStatus()).isEqualTo(PUBLISHING);
     assertThat(status.getDocumentUnitId()).isEqualTo(documentUnitDTO.getUuid());
     assertThat(status.getCreatedAt()).isEqualTo(xmlPublicationDTO.publishDate());
     assertThat(status.getIssuerAddress()).isEqualTo("test@test.com");
@@ -215,7 +215,7 @@ class PublishDocumentUnitIntegrationTest {
                 .id(UUID.randomUUID())
                 .documentUnitId(savedDocumentUnitDTO.getUuid())
                 .issuerAddress("test1@test.com")
-                .status(DocumentUnitStatus.UNPUBLISHED)
+                .status(PublicationStatus.UNPUBLISHED)
                 .build())
         .block();
     assertThat(documentUnitStatusRepository.findAll().collectList().block()).hasSize(1);
@@ -225,7 +225,7 @@ class PublishDocumentUnitIntegrationTest {
             .documentUnitUuid(documentUnitUuid)
             .statusCode("400")
             .statusMessages(List.of("message 1", "message 2"))
-            .publishState(PublishState.UNKNOWN)
+            .emailPublishState(EmailPublishState.UNKNOWN)
             .build();
 
     risWebTestClient
@@ -250,7 +250,7 @@ class PublishDocumentUnitIntegrationTest {
     List<DocumentUnitStatusDTO> statusList =
         documentUnitStatusRepository.findAll().collectList().block();
     assertThat(statusList).hasSize(1);
-    assertThat(statusList.get(0).getStatus()).isEqualTo(DocumentUnitStatus.UNPUBLISHED);
+    assertThat(statusList.get(0).getStatus()).isEqualTo(PublicationStatus.UNPUBLISHED);
   }
 
   @Test
@@ -276,7 +276,7 @@ class PublishDocumentUnitIntegrationTest {
             "message 1|message 2",
             "test.xml",
             Instant.now(),
-            PublishState.SENT);
+            EmailPublishState.SENT);
     xmlPublicationRepository.save(xmlPublicationDTO).block();
 
     XmlPublication expectedXmlPublication =
@@ -288,7 +288,7 @@ class PublishDocumentUnitIntegrationTest {
             .statusCode("200")
             .statusMessages(List.of("message 1", "message 2"))
             .fileName("text.xml")
-            .publishState(PublishState.SENT)
+            .emailPublishState(EmailPublishState.SENT)
             .build();
 
     risWebTestClient
@@ -309,7 +309,7 @@ class PublishDocumentUnitIntegrationTest {
   }
 
   @Test
-  void testPublishLogWithXmlAndReport() {
+  void testPublicationHistoryWithXmlAndReport() {
     UUID documentUnitUuid1 = UUID.randomUUID();
     DocumentUnitDTO documentUnitDTO =
         DocumentUnitDTO.builder()
@@ -333,7 +333,7 @@ class PublishDocumentUnitIntegrationTest {
                 "message 1|message 2",
                 "test.xml",
                 publishDate,
-                PublishState.SENT))
+                EmailPublishState.SENT))
         .block();
 
     Instant receivedDate = publishDate.plus(1, ChronoUnit.HOURS);

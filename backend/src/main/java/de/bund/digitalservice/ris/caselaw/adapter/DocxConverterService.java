@@ -7,9 +7,6 @@ import de.bund.digitalservice.ris.caselaw.domain.ConverterService;
 import de.bund.digitalservice.ris.caselaw.domain.docx.DocumentUnitDocx;
 import de.bund.digitalservice.ris.caselaw.domain.docx.Docx2Html;
 import de.bund.digitalservice.ris.caselaw.domain.docx.DocxImagePart;
-import java.awt.Dimension;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
@@ -30,7 +27,6 @@ import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.docx4j.model.listnumbering.ListNumberingDefinition;
-import org.docx4j.openpackaging.contenttype.ContentTypes;
 import org.docx4j.openpackaging.exceptions.Docx4JException;
 import org.docx4j.openpackaging.packages.WordprocessingMLPackage;
 import org.docx4j.openpackaging.parts.WordprocessingML.BinaryPartAbstractImage;
@@ -38,12 +34,6 @@ import org.docx4j.openpackaging.parts.WordprocessingML.ImageJpegPart;
 import org.docx4j.openpackaging.parts.WordprocessingML.ImagePngPart;
 import org.docx4j.openpackaging.parts.WordprocessingML.MetafileEmfPart;
 import org.docx4j.wml.Style;
-import org.freehep.graphics2d.VectorGraphics;
-import org.freehep.graphicsio.ImageConstants;
-import org.freehep.graphicsio.ImageGraphics2D;
-import org.freehep.graphicsio.emf.EMFInputStream;
-import org.freehep.graphicsio.emf.EMFPanel;
-import org.freehep.graphicsio.emf.EMFRenderer;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.w3c.dom.Document;
@@ -165,7 +155,7 @@ public class DocxConverterService implements ConverterService {
             .filter(Objects::nonNull)
             .toList();
 
-    DocumentUnitDocxListUtils.postprocessBorderNumbers(documentUnitDocxList);
+    DocumentUnitDocxListUtils.postProcessBorderNumbers(documentUnitDocxList);
 
     return documentUnitDocxList;
   }
@@ -196,7 +186,7 @@ public class DocxConverterService implements ConverterService {
         .getJaxbElement()
         .getStyle()
         .stream()
-        .collect(Collectors.toMap(k -> k.getStyleId(), Function.identity()));
+        .collect(Collectors.toMap(Style::getStyleId, Function.identity()));
   }
 
   private Map<String, DocxImagePart> readImages(WordprocessingMLPackage mlPackage) {
@@ -222,7 +212,6 @@ public class DocxConverterService implements ConverterService {
                                 relationship.getId(),
                                 new DocxImagePart(jpegPart.getContentType(), jpegPart.getBytes())));
               } else if (part instanceof MetafileEmfPart emfPart) {
-                //                convertEMF(mlPackage, images, emfPart);
                 part.getSourceRelationships()
                     .forEach(
                         relationship ->
@@ -243,40 +232,5 @@ public class DocxConverterService implements ConverterService {
             });
 
     return images;
-  }
-
-  private void convertEMF(
-      WordprocessingMLPackage mlPackage,
-      Map<String, DocxImagePart> images,
-      MetafileEmfPart emfPart) {
-    try {
-      EMFInputStream emf = new EMFInputStream(new ByteArrayInputStream(emfPart.getBytes()));
-      EMFRenderer renderer = new EMFRenderer(emf);
-
-      EMFPanel emfPanel = new EMFPanel();
-      emfPanel.setRenderer(renderer);
-
-      ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-      VectorGraphics g =
-          new ImageGraphics2D(
-              byteArrayOutputStream,
-              new Dimension(emfPanel.getWidth(), emfPanel.getHeight()),
-              ImageConstants.PNG);
-      g.startExport();
-      emfPanel.print(g);
-      g.endExport();
-      byteArrayOutputStream.close();
-
-      emfPart
-          .getSourceRelationships()
-          .forEach(
-              relationship ->
-                  images.put(
-                      relationship.getId(),
-                      new DocxImagePart(
-                          ContentTypes.IMAGE_PNG, byteArrayOutputStream.toByteArray())));
-    } catch (Exception ex) {
-      log.error("Couldn't convert emf to png", ex);
-    }
   }
 }

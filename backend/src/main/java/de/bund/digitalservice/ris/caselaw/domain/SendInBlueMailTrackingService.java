@@ -18,29 +18,32 @@ public class SendInBlueMailTrackingService implements MailTrackingService {
   }
 
   @Override
-  public PublishState getMappedPublishState(String mailTrackingEvent) {
+  public EmailPublishState getMappedPublishState(String mailTrackingEvent) {
     if (mailTrackingEvent.equals(EventEnum.DELIVERED.getValue())) {
-      return PublishState.SUCCESS;
+      return EmailPublishState.SUCCESS;
     } else {
-      return PublishState.ERROR;
+      return EmailPublishState.ERROR;
     }
   }
 
   @Override
-  public Mono<UUID> setPublishState(UUID documentUnitUuid, PublishState publishState) {
+  public Mono<UUID> setPublishState(UUID documentUnitUuid, EmailPublishState emailPublishState) {
     return mailRepository
         .getLastXmlPublication(documentUnitUuid)
         .map(
             xmlPublication -> {
               Instant publishDate = Instant.now();
-              if (publishState == PublishState.SUCCESS) {
-                log.info("Mail delivery ({}) was successful ({})", documentUnitUuid, publishState);
+              if (emailPublishState == EmailPublishState.SUCCESS) {
+                log.info(
+                    "Mail delivery ({}) was successful ({})", documentUnitUuid, emailPublishState);
               } else {
                 log.warn(
-                    "Mail delivery ({}) was not successful ({})", documentUnitUuid, publishState);
+                    "Mail delivery ({}) was not successful ({})",
+                    documentUnitUuid,
+                    emailPublishState);
               }
               return XmlPublication.builder()
-                  .publishState(publishState)
+                  .emailPublishState(emailPublishState)
                   .publishDate(publishDate)
                   .build();
             })

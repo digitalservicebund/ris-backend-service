@@ -34,7 +34,7 @@ const showDocPanel = useToggleStateInRouteQuery(
   false
 )
 const hasDataChange = ref(false)
-const lastUpdatedDocumentUnit = ref(JSON.stringify(props.documentUnit))
+const lastUpdatedDocumentUnit = ref()
 
 const handleUpdateValueDocumentUnitTexts = async (
   updatedValue: [keyof Texts, string]
@@ -49,12 +49,12 @@ const handleUpdateValueDocumentUnitTexts = async (
 }
 
 async function handleUpdateDocumentUnit(): Promise<ServiceResponse<void>> {
-  const cleanedData = cleanUp(updatedDocumentUnit.value as DocumentUnit)
   hasDataChange.value =
-    JSON.stringify(cleanedData) !== lastUpdatedDocumentUnit.value
+    JSON.stringify(updatedDocumentUnit.value) !==
+    JSON.stringify(lastUpdatedDocumentUnit.value)
   if (hasDataChange.value) {
     const response = await documentUnitService.update(
-      cleanedData as DocumentUnit
+      updatedDocumentUnit.value as DocumentUnit
     )
     if (response?.error?.validationErrors) {
       validationErrors.value = response.error.validationErrors
@@ -63,35 +63,12 @@ async function handleUpdateDocumentUnit(): Promise<ServiceResponse<void>> {
     }
     if (response.data) {
       updatedDocumentUnit.value = response.data as DocumentUnit
+      lastUpdatedDocumentUnit.value = updatedDocumentUnit.value
     }
     hasDataChange.value = false
-    lastUpdatedDocumentUnit.value = JSON.stringify(updatedDocumentUnit.value)
     return response as ServiceResponse<void>
   }
   return { status: 200, data: undefined } as ServiceResponse<void>
-}
-
-function cleanUp(updatedDocumentUnit: DocumentUnit) {
-  const activeCitations =
-    updatedDocumentUnit?.contentRelatedIndexing?.activeCitations
-  if (activeCitations) {
-    const newValues = [...activeCitations]
-    const newActiveCitations = newValues.filter(
-      (value) => Object.keys(value).length !== 0
-    )
-
-    const newContentRelatedIndexing = {
-      ...updatedDocumentUnit?.contentRelatedIndexing,
-      activeCitations: newActiveCitations,
-    }
-
-    const cleanedDocUnit = {
-      ...updatedDocumentUnit,
-      contentRelatedIndexing: newContentRelatedIndexing,
-    }
-
-    return cleanedDocUnit
-  } else return updatedDocumentUnit
 }
 
 watch(

@@ -9,12 +9,14 @@ const props = defineProps<{
   modelValue: NormReference[] | undefined
 }>()
 
-const emit = defineEmits<{
-  (event: "update:modelValue", value?: NormReference[]): void
-}>()
+const emit =
+  defineEmits<(event: "update:modelValue", value?: NormReference[]) => void>()
 
 const norms = computed({
   get: () => {
+    props.modelValue?.map(async (norm) => {
+      if (norm.updateValidationErrors) await norm.updateValidationErrors()
+    })
     return props.modelValue
   },
   set: (value) => {
@@ -22,12 +24,11 @@ const norms = computed({
   },
 })
 
-const defaultValue = {}
+const defaultValue = new NormReference()
 
 function decisionSummarizer(normEntry: NormReference) {
   return h("div", [
-    normEntry.hasMissingRequiredFields ||
-    (normEntry.validationErrors && normEntry.validationErrors.length > 0)
+    normEntry.hasMissingRequiredFields || normEntry.hasValidationErrors
       ? h("div", { class: ["flex flex-row items-center"] }, [
           h(
             "span",

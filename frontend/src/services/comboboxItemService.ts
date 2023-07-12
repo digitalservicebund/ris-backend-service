@@ -53,13 +53,7 @@ function formatDropdownItems(
         additionalInformation: item.text,
       }))
     }
-    case Endpoint.risAbbreviations: {
-      return (responseData as NormAbbreviation[]).map((item) => ({
-        label: item.abbreviation,
-        value: item,
-        additionalInformation: item.officialLongTitle,
-      }))
-    }
+    case Endpoint.risAbbreviations:
     case Endpoint.risAbbreviationsAwesome: {
       return (responseData as NormAbbreviation[]).map((item) => ({
         label: item.abbreviation,

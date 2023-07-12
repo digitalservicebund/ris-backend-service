@@ -91,7 +91,7 @@ const component = computed(() => {
             id="printAnnouncementSelection"
             v-model="selectedChildSectionName"
             aria-label="Papierverkündungsblatt"
-            name="OfficialAnnouncement"
+            name="OfficialAnnouncementPrint"
             type="radio"
             :value="MetadataSectionName.PRINT_ANNOUNCEMENT"
           />
@@ -102,7 +102,7 @@ const component = computed(() => {
             id="euAnnouncementSelection"
             v-model="selectedChildSectionName"
             aria-label="Amtsblatt der EU"
-            name="OfficialAnnouncement"
+            name="OfficialAnnouncementEU"
             type="radio"
             :value="MetadataSectionName.EU_ANNOUNCEMENT"
           />
@@ -115,7 +115,7 @@ const component = computed(() => {
             id="digitalAnnouncementSelection"
             v-model="selectedChildSectionName"
             aria-label="Elektronisches Verkündungsblatt"
-            name="OfficialAnnouncement"
+            name="OfficialAnnouncementDigital"
             type="radio"
             :value="MetadataSectionName.DIGITAL_ANNOUNCEMENT"
           />

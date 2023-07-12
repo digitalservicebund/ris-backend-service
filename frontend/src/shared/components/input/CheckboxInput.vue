@@ -5,8 +5,8 @@ import { useInputModel } from "@/shared/composables/useInputModel"
 
 interface Props {
   id: string
-  value?: boolean | undefined
-  modelValue?: boolean | undefined
+  value?: boolean
+  modelValue?: boolean
   ariaLabel: string
   validationError?: ValidationError
 }
@@ -17,8 +17,8 @@ interface Emits {
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  value: undefined,
-  modelValue: undefined,
+  value: false,
+  modelValue: false,
   validationError: undefined,
 })
 const emit = defineEmits<Emits>()

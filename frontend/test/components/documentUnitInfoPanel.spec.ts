@@ -1,5 +1,5 @@
 import { render, screen } from "@testing-library/vue"
-import DocumentUnitInfoPanel from "@/shared/components/DocumentUnitInfoPanel.vue"
+import DocumentUnitInfoPanel from "@/components/DocumentUnitInfoPanel.vue"
 
 describe("documentUnit InfoPanel", () => {
   it("renders heading if given", async () => {
@@ -57,23 +57,5 @@ describe("documentUnit InfoPanel", () => {
     expect(value.compareDocumentPosition(label)).toBe(
       Node.DOCUMENT_POSITION_PRECEDING
     )
-  })
-
-  it("renders 'center' as the default alignment", () => {
-    render(DocumentUnitInfoPanel)
-    const items = screen.getByTestId("document-unit-info-panel-items")
-    expect(items).toHaveClass("items-center")
-  })
-
-  it("renders 'center' alignment if given", () => {
-    render(DocumentUnitInfoPanel, { props: { alignment: "center" } })
-    const items = screen.getByTestId("document-unit-info-panel-items")
-    expect(items).toHaveClass("items-center")
-  })
-
-  it("renders 'baseline' alignment if given", () => {
-    render(DocumentUnitInfoPanel, { props: { alignment: "baseline" } })
-    const items = screen.getByTestId("document-unit-info-panel-items")
-    expect(items).toHaveClass("items-baseline")
   })
 })

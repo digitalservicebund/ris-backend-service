@@ -6,8 +6,6 @@ import de.bund.digitalservice.ris.caselaw.domain.HttpMailSender;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import sendinblue.ApiClient;
 import sendinblue.ApiException;
 import sendinblue.Configuration;
@@ -19,8 +17,6 @@ import sibModel.SendSmtpEmailSender;
 import sibModel.SendSmtpEmailTo;
 
 public class SendInBlueHttpMailSender implements HttpMailSender {
-  private static final Logger LOGGER = LoggerFactory.getLogger(SendInBlueHttpMailSender.class);
-
   private final String apiKey;
 
   public SendInBlueHttpMailSender(String apiKey) {

@@ -10,7 +10,7 @@ import reactor.core.publisher.Mono;
 @Service
 public class DatabaseDocumentNumberService implements DocumentNumberService {
   private final DatabaseDocumentNumberCounterRepository repository;
-  private final String CASELAW_ABBREVIATION = "RE";
+  private static final String CASELAW_ABBREVIATION = "RE";
 
   public DatabaseDocumentNumberService(DatabaseDocumentNumberCounterRepository repository) {
     this.repository = repository;

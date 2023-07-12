@@ -65,7 +65,7 @@ async function focusFirstFocusableElementOfCurrentEditElement() {
     const firstFocusableElement = currentEditElement.value.querySelectorAll(
       'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
     )[0] as HTMLElement
-    firstFocusableElement && firstFocusableElement.focus()
+    firstFocusableElement?.focus()
   }
 }
 
@@ -161,11 +161,3 @@ watch(editIndex, focusFirstFocusableElementOfCurrentEditElement)
     </button>
   </div>
 </template>
-
-<style lang="scss" scoped>
-.add-button {
-  &:focus:not(:focus-visible) {
-    @apply outline-transparent;
-  }
-}
-</style>

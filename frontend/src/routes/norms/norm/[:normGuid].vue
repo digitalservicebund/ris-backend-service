@@ -3,9 +3,9 @@ import dayjs from "dayjs"
 import { storeToRefs } from "pinia"
 import { toRefs, watchEffect, onUnmounted, computed } from "vue"
 import { RouterView, useRoute, useRouter } from "vue-router"
+import NormUnitInfoPanel from "@/components/NormUnitInfoPanel.vue"
 import { useNormMenuItems } from "@/composables/useNormMenuItems"
 import { useToggleStateInRouteQuery } from "@/composables/useToggleStateInRouteQuery"
-import DocumentUnitInfoPanel from "@/shared/components/DocumentUnitInfoPanel.vue"
 import NavbarSide from "@/shared/components/NavbarSide.vue"
 import SideToggle from "@/shared/components/SideToggle.vue"
 import { useLoadedNormStore } from "@/stores/loadedNorm"
@@ -104,10 +104,9 @@ onUnmounted(() => (loadedNorm.value = undefined))
       v-if="loadedNorm"
       class="bg-gray-100 border-gray-400 border-l-1 w-full"
     >
-      <DocumentUnitInfoPanel
-        alignment="baseline"
-        :first-row="propertyInfos"
+      <NormUnitInfoPanel
         :heading="loadedNorm.metadataSections?.NORM?.[0]?.RIS_ABBREVIATION?.[0]"
+        :property-infos="propertyInfos"
       />
       <RouterView class="p-48" />
     </div>

@@ -6,8 +6,8 @@ import static org.mockito.Mockito.when;
 import de.bund.digitalservice.ris.caselaw.RisWebTestClient;
 import de.bund.digitalservice.ris.caselaw.TestConfig;
 import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
+import de.bund.digitalservice.ris.caselaw.domain.EmailPublishState;
 import de.bund.digitalservice.ris.caselaw.domain.MailTrackingService;
-import de.bund.digitalservice.ris.caselaw.domain.PublishState;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -35,7 +35,7 @@ class MailTrackingControllerTest {
 
   @Test
   void testSetPublishState_withValidPayload() {
-    PublishState expectedPublishState = PublishState.SUCCESS;
+    EmailPublishState expectedEmailPublishState = EmailPublishState.SUCCESS;
     String mailTrackingEvent = "delivered";
     String sendInBlueResponse =
         String.format(
@@ -47,8 +47,9 @@ class MailTrackingControllerTest {
             }""",
             mailTrackingEvent, TEST_UUID);
 
-    when(service.getMappedPublishState(mailTrackingEvent)).thenReturn(expectedPublishState);
-    when(service.setPublishState(TEST_UUID, expectedPublishState)).thenReturn(Mono.just(TEST_UUID));
+    when(service.getMappedPublishState(mailTrackingEvent)).thenReturn(expectedEmailPublishState);
+    when(service.setPublishState(TEST_UUID, expectedEmailPublishState))
+        .thenReturn(Mono.just(TEST_UUID));
 
     risWebTestClient
         .withDefaultLogin()
@@ -61,7 +62,7 @@ class MailTrackingControllerTest {
         .isOk();
 
     verify(service).getMappedPublishState(mailTrackingEvent);
-    verify(service).setPublishState(TEST_UUID, expectedPublishState);
+    verify(service).setPublishState(TEST_UUID, expectedEmailPublishState);
   }
 
   @ParameterizedTest

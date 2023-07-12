@@ -64,7 +64,7 @@ async function search(page = 0) {
   const response = await documentUnitService.searchByLinkedDocumentUnit(
     page,
     30,
-    activeCitationRef as ActiveCitation
+    activeCitationRef
   )
   if (response.data) {
     searchResultsCurrentPage.value = {
@@ -125,7 +125,7 @@ function scrollToTop() {
   if (element) {
     const headerOffset = 170
     const elementPosition = element?.getBoundingClientRect().top
-    const offsetPosition = elementPosition + window.pageYOffset - headerOffset
+    const offsetPosition = elementPosition + window.scrollY - headerOffset
 
     window.scrollTo({
       top: offsetPosition,

@@ -424,14 +424,14 @@ describe("Active Citations", async () => {
     ).not.toBeInTheDocument()
   })
 
-  /*it("renders from search added active citations as non-editable list item", async () => {
+  it("renders from search added active citations as non-editable list item", async () => {
     renderComponent({
       modelValue: [generateActiveCitation()],
     })
     expect(
       screen.queryByLabelText("Eintrag bearbeiten")
     ).not.toBeInTheDocument()
-  })*/
+  })
 
   it("lists search results", async () => {
     const { user } = renderComponent()

@@ -31,6 +31,7 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitLink;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitLinkType;
 import de.bund.digitalservice.ris.caselaw.domain.LegalEffect;
 import de.bund.digitalservice.ris.caselaw.domain.LinkedDocumentationUnit;
+import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.court.Court;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
 import java.time.Instant;
@@ -394,14 +395,10 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
   }
 
   private boolean isEmptyNorm(DocumentUnitNorm currentNorm) {
-    if (currentNorm.singleNorm() == null
+    return currentNorm.singleNorm() == null
         && currentNorm.normAbbreviation() == null
         && currentNorm.dateOfRelevance() == null
-        && currentNorm.dateOfVersion() == null) {
-      return true;
-    } else {
-      return false;
-    }
+        && currentNorm.dateOfVersion() == null;
   }
 
   private Mono<DocumentUnitDTO> saveDeviatingFileNumbers(
@@ -1019,13 +1016,21 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
                     .findFirstByDocumentUnitIdOrderByCreatedAtDesc(documentUnitDTO.uuid)
                     .map(
                         statusDTO -> {
-                          dto.setStatus(statusDTO.getStatus());
+                          dto.setStatus(
+                              DocumentUnitStatus.builder()
+                                  .status(statusDTO.getStatus())
+                                  .withError(statusDTO.isWithError())
+                                  .build());
                           return dto;
                         })
                     .switchIfEmpty(
                         Mono.defer(
                             () -> {
-                              dto.setStatus(DocumentUnitStatus.PUBLISHED);
+                              dto.setStatus(
+                                  DocumentUnitStatus.builder()
+                                      .status(PublicationStatus.PUBLISHED)
+                                      .withError(false)
+                                      .build());
                               return Mono.just(dto);
                             })));
   }

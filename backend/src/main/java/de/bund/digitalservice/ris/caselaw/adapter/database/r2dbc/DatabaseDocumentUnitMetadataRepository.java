@@ -16,7 +16,7 @@ public interface DatabaseDocumentUnitMetadataRepository
   String SEARCH_QUERY =
       "LEFT JOIN ( "
           + "    SELECT DISTINCT ON (document_unit_id) document_unit_id, status "
-          + "    FROM public.document_unit_status "
+          + "    FROM public.publication_status "
           + "    ORDER BY document_unit_id, created_at DESC "
           + ") status ON uuid = status.document_unit_id "
           + "WHERE "
@@ -25,18 +25,19 @@ public interface DatabaseDocumentUnitMetadataRepository
           + "(:decisionDate IS NULL OR decision_date = :decisionDate) AND"
           + "(:docUnitIds IS NULL OR id = ANY(:docUnitIds)) AND "
           + "(:docTypeId IS NULL OR document_type_id = :docTypeId) AND "
-          + "(status.status = 'PUBLISHED' OR status.status IS NULL) AND "
+          + "(status.status = 'PUBLISHED' OR status.status = 'PUBLISHING' OR status.status IS NULL) AND "
           + "data_source in ('NEURIS', 'MIGRATION') ";
   String ALL_QUERY =
       "LEFT JOIN ( "
           + "    SELECT DISTINCT ON (document_unit_id) document_unit_id, status "
-          + "    FROM public.document_unit_status "
+          + "    FROM public.publication_status "
           + "    ORDER BY document_unit_id, created_at DESC "
           + ") status ON uuid = status.document_unit_id "
           + "WHERE data_source = :dataSource AND ( "
           + "    documentation_office_id = :documentationOfficeId OR"
           + "    status.status IS NULL OR "
-          + "    status.status = 'PUBLISHED') ";
+          + "    status.status = 'PUBLISHED' OR "
+          + "    status.status = 'PUBLISHING') ";
 
   Mono<DocumentUnitMetadataDTO> findByUuid(UUID documentUnitUuid);
 

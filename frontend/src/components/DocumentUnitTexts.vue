@@ -3,13 +3,13 @@ import { computed } from "vue"
 import { Texts } from "../domain/documentUnit"
 import TextEditor from "../shared/components/input/TextEditor.vue"
 import { texts as textsFields } from "@/fields/caselaw"
-import { FieldSize } from "@/shared/components/input/FieldSize"
 
 const props = defineProps<{ texts: Texts }>()
 
-const emit = defineEmits<{
-  (e: "updateValue", updatedValue: [keyof Texts, string]): Promise<void>
-}>()
+const emit =
+  defineEmits<
+    (e: "updateValue", updatedValue: [keyof Texts, string]) => Promise<void>
+  >()
 
 const data = computed(() =>
   textsFields.map((item) => {
@@ -18,7 +18,7 @@ const data = computed(() =>
       name: item.name,
       label: item.label,
       aria: item.label,
-      fieldSize: item.fieldSize as FieldSize,
+      fieldSize: item.fieldSize,
       value: props.texts[item.name as keyof Texts],
     }
   })

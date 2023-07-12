@@ -1,10 +1,12 @@
 package de.bund.digitalservice.ris.caselaw.domain;
 
 import java.nio.ByteBuffer;
+import lombok.experimental.UtilityClass;
 
+@UtilityClass
 public class ServiceUtils {
 
-  public static byte[] byteBufferToArray(ByteBuffer byteBuffer) {
+  public byte[] byteBufferToArray(ByteBuffer byteBuffer) {
     byteBuffer.rewind();
     byte[] byteBufferArray = new byte[byteBuffer.remaining()];
     byteBuffer.get(byteBufferArray);

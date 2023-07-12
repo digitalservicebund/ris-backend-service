@@ -34,7 +34,7 @@ public abstract class StyledElement implements DocumentUnitDocx {
     return styles.containsKey(property);
   }
 
-  public Boolean hasStyle() {
+  public boolean hasStyle() {
     return !styles.isEmpty();
   }
 

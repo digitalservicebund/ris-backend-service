@@ -1,7 +1,7 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
+import de.bund.digitalservice.ris.caselaw.domain.EmailPublishState;
 import de.bund.digitalservice.ris.caselaw.domain.MailTrackingService;
-import de.bund.digitalservice.ris.caselaw.domain.PublishState;
 import jakarta.validation.Valid;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,10 +36,10 @@ public class MailTrackingController {
       // We're not responsible for other sent mails
       return Mono.just(ResponseEntity.status(HttpStatus.NO_CONTENT).build());
     }
-    PublishState publishState = service.getMappedPublishState(payload.event());
+    EmailPublishState emailPublishState = service.getMappedPublishState(payload.event());
 
     return service
-        .setPublishState(documentUnitUuid, publishState)
+        .setPublishState(documentUnitUuid, emailPublishState)
         .map(
             uuid -> ResponseEntity.status(HttpStatus.OK).body("Publish state was set successfully"))
         .defaultIfEmpty(

@@ -28,7 +28,7 @@ export default class LinkedDocumentUnit {
     )
   }
 
-  public isDocUnit(): boolean {
+  get isReadOnly(): boolean {
     return this.dataSource === "NEURIS" || this.dataSource === "MIGRATION"
   }
 
@@ -40,7 +40,7 @@ export default class LinkedDocumentUnit {
         : []),
       ...(this.documentType ? [this.documentType.label] : []),
       ...(this.fileNumber ? [this.fileNumber] : []),
-      ...(this.documentNumber && this.isDocUnit() ? [this.documentNumber] : []),
+      ...(this.documentNumber && this.isReadOnly ? [this.documentNumber] : []),
     ].join(", ")
   }
 }

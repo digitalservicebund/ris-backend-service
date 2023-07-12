@@ -29,12 +29,11 @@ const mockValidationError: ValidationError = {
   field: "coreData.decisionDate",
 }
 const nestedInputFields: NestedInputAttributes["fields"] = {
-  parent: defineDateField("field", "Input", "Input", undefined),
+  parent: defineDateField("field", "Input", "Input"),
   child: defineDateField(
     "deviatingField",
     "Abweichender Input",
-    "Abweichender Input",
-    undefined
+    "Abweichender Input"
   ),
 }
 

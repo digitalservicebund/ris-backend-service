@@ -1,6 +1,7 @@
-<script lang="ts" setup generic="T">
+<script lang="ts" setup generic="T extends ListItem">
 import type { Component, Ref } from "vue"
 import { ref, watch } from "vue"
+import ListItem from "@/domain/editableListItem"
 import DataSetSummary from "@/shared/components/DataSetSummary.vue"
 
 interface Props {
@@ -94,11 +95,17 @@ watch(modelValueList, () => emit("update:modelValue", modelValueList.value), {
           class="focus-visible:outline-blue-800 focus:outline-none"
           :data="entry"
           tabindex="0"
+          @click="
+            entry.isReadOnly
+              ? (e: Event) => e.preventDefault()
+              : setEditIndex(index)
+          "
           @keypress.enter="setEditIndex(index)"
         />
 
         <div class="flex gap-8">
           <button
+            v-if="!entry.isReadOnly"
             aria-label="Eintrag bearbeiten"
             class="active:bg-blue-500 active:outline-none focus:outline-2 focus:outline-blue-800 hover:bg-blue-200 material-icons outline-none outline-offset-2 p-2 text-blue-800"
             @click="setEditIndex(index)"

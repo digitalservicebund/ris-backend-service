@@ -42,7 +42,7 @@ test.describe("active citations", () => {
     await expect(page.locator("text=Email wurde versendet")).toBeVisible()
 
     await expect(page.locator("text=Xml Email Abgabe -")).toBeVisible()
-    await expect(page.locator("text=veröffentlicht")).toBeVisible()
+    await expect(page.locator("text=in Veröffentlichung")).toBeVisible()
 
     await navigateToCategories(page, documentNumber)
     await expect(page.getByText(documentNumber)).toBeVisible()
@@ -228,7 +228,7 @@ test.describe("active citations", () => {
     await expect(page.locator("text=Email wurde versendet")).toBeVisible()
 
     await expect(page.locator("text=Xml Email Abgabe -")).toBeVisible()
-    await expect(page.locator("text=veröffentlicht")).toBeVisible()
+    await expect(page.locator("text=in Veröffentlichung")).toBeVisible()
 
     await navigateToCategories(page, documentNumber)
     await expect(page.getByText(documentNumber)).toBeVisible()
@@ -261,7 +261,7 @@ test.describe("active citations", () => {
     await expect(page.getByLabel("Eintrag löschen")).toBeVisible()
 
     //can not be edited
-    // await expect(page.getByLabel("Eintrag bearbeiten")).toBeHidden()
+    await expect(page.getByLabel("Eintrag bearbeiten")).toBeHidden()
 
     // search for same parameters gives same result, indication that decision is already added
     await page.getByLabel("Weitere Angabe").click()

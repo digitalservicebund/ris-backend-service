@@ -637,10 +637,8 @@ public class DocumentUnitDocxBuilder extends DocxBuilder {
           && paragraph.getPPr().getPStyle() != null) {
         var style = styles.get(paragraph.getPPr().getPStyle().getVal());
 
-        if (style != null) {
-          if (style.getRPr() != null) {
-            RunElementStyleAdapter.addStyles(textElement, style.getRPr());
-          }
+        if (style != null && style.getRPr() != null) {
+          RunElementStyleAdapter.addStyles(textElement, style.getRPr());
         }
       }
     }

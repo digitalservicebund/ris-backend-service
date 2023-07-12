@@ -1,21 +1,30 @@
 <script lang="ts" setup>
-import DocumentUnit from "@/domain/documentUnit"
-import DocumentUnitInfoPanel from "@/shared/components/DocumentUnitInfoPanel.vue"
+import DocumentUnitInfoPanel from "@/components/DocumentUnitInfoPanel.vue"
 
-const documentUnit = new DocumentUnit("123", {
-  documentNumber: "KORE202200466",
-  coreData: {
-    fileNumbers: ["AZ-98230234"],
-    court: {
-      type: "BVerfG",
-      location: "Karlsruhe",
-      label: "BVerfG Karlsruhe",
-    },
-    decisionDate: "1668349205",
+const firstRowInfos = [
+  {
+    label: "status",
+    value: "veröffentlicht",
+    icon: "campaign",
+    color: "black",
   },
-})
+  {
+    label: "Dokumentationsstelle",
+    value: "BVerfG",
+  },
+]
+
+const secondRowInfos = [
+  { label: "Aktenzeichen", value: "AZ-98230234" },
+  { label: "Entscheidungsdatum", value: "01.01.2000" },
+  { label: "Gericht", value: "BVerfG" },
+]
 </script>
 
 <template>
-  <DocumentUnitInfoPanel :document-unit="documentUnit"> </DocumentUnitInfoPanel>
+  <DocumentUnitInfoPanel
+    :first-row="firstRowInfos"
+    heading="XXRE202300002"
+    :second-row="secondRowInfos"
+  />
 </template>

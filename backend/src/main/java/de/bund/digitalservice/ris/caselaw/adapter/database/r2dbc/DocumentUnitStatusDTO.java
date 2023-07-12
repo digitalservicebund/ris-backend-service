@@ -1,6 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc;
 
-import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatus;
+import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import java.time.Instant;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
@@ -17,14 +17,16 @@ import org.springframework.data.relational.core.mapping.Table;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table("document_unit_status")
+@Table("publication_status")
 public class DocumentUnitStatusDTO implements Persistable<UUID> {
   @Id UUID id;
 
   @Column("created_at")
   private Instant createdAt;
 
-  private DocumentUnitStatus status;
+  private PublicationStatus status;
+
+  private boolean withError;
 
   @Column("document_unit_id")
   private UUID documentUnitId;

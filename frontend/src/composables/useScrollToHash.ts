@@ -7,7 +7,7 @@ export function useScrollToHash(routeHash: Ref<string | undefined>) {
     setTimeout(() => {
       if (routeHash.value) {
         const hashElement = document.querySelector(routeHash.value)
-        hashElement && hashElement.scrollIntoView({ behavior: "smooth" })
+        hashElement?.scrollIntoView({ behavior: "smooth" })
       }
     })
   }

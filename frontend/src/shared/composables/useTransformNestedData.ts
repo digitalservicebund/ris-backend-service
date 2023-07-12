@@ -74,9 +74,7 @@ function flattenData(newValues: Record<string, ModelType>) {
   return flatData
 }
 
-interface Emits {
-  (event: "update:modelValue", value: FieldData): void
-}
+type Emits = (event: "update:modelValue", value: FieldData) => void
 
 export function useTransformNestedData<E extends Emits>(
   data: Ref<FieldData>,

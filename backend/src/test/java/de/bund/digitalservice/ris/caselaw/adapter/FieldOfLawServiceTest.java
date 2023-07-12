@@ -233,4 +233,16 @@ class FieldOfLawServiceTest {
 
     verify(repository).findAllByParentIdentifierOrderByIdentifierAsc("TS-01-01");
   }
+
+  @Test
+  void testSearchAndOrderByScore_pageableOffsetGreaterThanResultListSize() {
+    FieldOfLaw databaseFieldOfLaw = FieldOfLaw.builder().build();
+
+    when(repository.findBySearchTerms(any(String[].class)))
+        .thenReturn(Flux.just(databaseFieldOfLaw));
+
+    StepVerifier.create(service.searchAndOrderByScore("foo", PageRequest.of(1, 5)))
+        .consumeNextWith(page -> assertThat(page.getContent()).isEmpty())
+        .verifyComplete();
+  }
 }

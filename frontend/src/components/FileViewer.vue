@@ -14,7 +14,7 @@ const props = defineProps<{
   uploadTimeStamp?: string
 }>()
 
-defineEmits<{ (e: "deleteFile"): void }>()
+defineEmits<(e: "deleteFile") => void>()
 
 const showModal = ref(false)
 

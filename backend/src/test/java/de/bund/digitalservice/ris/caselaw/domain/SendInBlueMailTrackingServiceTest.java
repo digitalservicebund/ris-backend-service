@@ -34,23 +34,23 @@ class SendInBlueMailTrackingServiceTest {
 
   @Test
   void testGetMappedPublishState_withSuccessfulState() {
-    PublishState expectedPublishState = PublishState.SUCCESS;
-    PublishState mappedPublishState = service.getMappedPublishState("delivered");
+    EmailPublishState expectedEmailPublishState = EmailPublishState.SUCCESS;
+    EmailPublishState mappedEmailPublishState = service.getMappedPublishState("delivered");
 
-    assertThat(mappedPublishState).isEqualTo(expectedPublishState);
+    assertThat(mappedEmailPublishState).isEqualTo(expectedEmailPublishState);
   }
 
   @Test
   void testGetMappedPublishState_withUnsuccessfulState() {
-    PublishState expectedPublishState = PublishState.ERROR;
-    PublishState mappedPublishState = service.getMappedPublishState("bounced");
+    EmailPublishState expectedEmailPublishState = EmailPublishState.ERROR;
+    EmailPublishState mappedEmailPublishState = service.getMappedPublishState("bounced");
 
-    assertThat(mappedPublishState).isEqualTo(expectedPublishState);
+    assertThat(mappedEmailPublishState).isEqualTo(expectedEmailPublishState);
   }
 
   @Test
   void testSetPublishState_withValidDocumentUnitUuid() {
-    PublishState expectedPublishState = PublishState.SUCCESS;
+    EmailPublishState expectedEmailPublishState = EmailPublishState.SUCCESS;
     Instant initialPublishDate = Instant.now();
     XmlPublication xmlPublication =
         XmlPublication.builder()
@@ -62,21 +62,22 @@ class SendInBlueMailTrackingServiceTest {
             .statusCode("200")
             .statusMessages(new ArrayList<>())
             .fileName("file")
-            .publishState(PublishState.SENT)
+            .emailPublishState(EmailPublishState.SENT)
             .build();
 
     when(mailRepository.getLastXmlPublication(TEST_UUID)).thenReturn(Mono.just(xmlPublication));
     when(mailRepository.save(any(XmlPublication.class)))
         .thenReturn(Mono.just(XmlPublication.builder().build()));
 
-    StepVerifier.create(service.setPublishState(TEST_UUID, expectedPublishState))
+    StepVerifier.create(service.setPublishState(TEST_UUID, expectedEmailPublishState))
         .consumeNextWith(resultString -> assertThat(resultString).isEqualTo(TEST_UUID))
         .verifyComplete();
 
     verify(mailRepository).getLastXmlPublication(TEST_UUID);
     verify(mailRepository).save(xmlPublicationCaptor.capture());
 
-    assertThat(xmlPublicationCaptor.getValue().publishState()).isEqualTo(expectedPublishState);
+    assertThat(xmlPublicationCaptor.getValue().emailPublishState())
+        .isEqualTo(expectedEmailPublishState);
     assertThat(xmlPublicationCaptor.getValue().getPublishDate()).isAfter(initialPublishDate);
   }
 
@@ -84,7 +85,8 @@ class SendInBlueMailTrackingServiceTest {
   void testSetPublishState_withInvalidDocumentUnitUuid() {
     when(mailRepository.getLastXmlPublication(TEST_UUID)).thenReturn(Mono.empty());
 
-    StepVerifier.create(service.setPublishState(TEST_UUID, PublishState.SUCCESS)).verifyComplete();
+    StepVerifier.create(service.setPublishState(TEST_UUID, EmailPublishState.SUCCESS))
+        .verifyComplete();
 
     verify(mailRepository).getLastXmlPublication(TEST_UUID);
   }

@@ -337,15 +337,12 @@ class DocumentUnitServiceTest {
             .statusMessages(List.of("status messages"))
             .fileName("filename")
             .publishDate(Instant.now())
-            .publishState(PublishState.UNKNOWN)
+            .emailPublishState(EmailPublishState.UNKNOWN)
             .build();
     when(publishService.publish(eq(DocumentUnit.builder().build()), anyString()))
         .thenReturn(Mono.just(xmlPublication));
-    when(documentUnitStatusService.updateStatus(
-            any(DocumentUnit.class),
-            any(DocumentUnitStatus.class),
-            any(Instant.class),
-            anyString()))
+    when(documentUnitStatusService.setToPublishing(
+            any(DocumentUnit.class), any(Instant.class), anyString()))
         .thenReturn(Mono.just(DocumentUnit.builder().build()));
     StepVerifier.create(service.publishAsEmail(TEST_UUID, ISSUER_ADDRESS))
         .consumeNextWith(
@@ -355,11 +352,7 @@ class DocumentUnitServiceTest {
     verify(repository).findByUuid(TEST_UUID);
     verify(publishService).publish(eq(DocumentUnit.builder().build()), anyString());
     verify(documentUnitStatusService)
-        .updateStatus(
-            any(DocumentUnit.class),
-            any(DocumentUnitStatus.class),
-            any(Instant.class),
-            anyString());
+        .setToPublishing(any(DocumentUnit.class), any(Instant.class), anyString());
   }
 
   @Test
@@ -382,7 +375,7 @@ class DocumentUnitServiceTest {
             .statusCode("200")
             .statusMessages(List.of("message"))
             .fileName("filename")
-            .publishState(PublishState.UNKNOWN)
+            .emailPublishState(EmailPublishState.UNKNOWN)
             .build();
     when(publishService.getPublications(TEST_UUID)).thenReturn(Flux.just(xmlPublication));
     when(publicationReportRepository.getAllByDocumentUnitUuid(TEST_UUID)).thenReturn(Flux.empty());
@@ -428,7 +421,7 @@ class DocumentUnitServiceTest {
             .statusMessages(List.of("message"))
             .fileName("filename")
             .publishDate(secondNewest)
-            .publishState(PublishState.UNKNOWN)
+            .emailPublishState(EmailPublishState.UNKNOWN)
             .build();
 
     PublicationReport report2 =
@@ -444,7 +437,7 @@ class DocumentUnitServiceTest {
             .statusMessages(List.of("message"))
             .fileName("filename")
             .publishDate(fourthNewest)
-            .publishState(PublishState.UNKNOWN)
+            .emailPublishState(EmailPublishState.UNKNOWN)
             .build();
 
     when(publicationReportRepository.getAllByDocumentUnitUuid(TEST_UUID))

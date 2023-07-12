@@ -6,7 +6,7 @@ import NormReference from "@/domain/normReference"
 function renderComponent(options?: { modelValue?: NormReference }) {
   const user = userEvent.setup()
   const props = {
-    modelValue: options?.modelValue,
+    modelValue: new NormReference({ ...options?.modelValue }),
   }
   const utils = render(NormReferenceInput, { props })
   return { screen, user, props, ...utils }

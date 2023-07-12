@@ -15,7 +15,6 @@ import org.springframework.data.relational.core.mapping.Table;
 @AllArgsConstructor
 @Table("lookuptable_court")
 public class CourtDTO implements Persistable<Long> {
-  public static final CourtDTO EMPTY = new CourtDTO();
   @Id Long id;
   String changedatemail;
   String changedateclient;

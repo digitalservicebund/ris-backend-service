@@ -24,9 +24,7 @@ const props = defineProps<{
   succeedMessage?: { title: string; description: string }
 }>()
 
-const emits = defineEmits<{
-  (e: "publishADocument"): void
-}>()
+const emits = defineEmits<(e: "publishADocument") => void>()
 
 const categoriesRoute = computed(() => ({
   name: "caselaw-documentUnit-:documentNumber-categories",

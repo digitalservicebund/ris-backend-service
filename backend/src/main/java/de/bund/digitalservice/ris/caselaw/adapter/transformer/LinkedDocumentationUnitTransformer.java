@@ -1,5 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.adapter.transformer;
 
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitException;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitMetadataDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentationUnitLinkDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DocumentTypeDTO;
@@ -99,7 +100,7 @@ public class LinkedDocumentationUnitTransformer {
     } else if (linkedDocumentationUnit instanceof ProceedingDecision) {
       return DataSource.PROCEEDING_DECISION;
     } else {
-      throw new RuntimeException(
+      throw new DocumentUnitException(
           "Couldn't find data source for " + linkedDocumentationUnit.getClass());
     }
   }

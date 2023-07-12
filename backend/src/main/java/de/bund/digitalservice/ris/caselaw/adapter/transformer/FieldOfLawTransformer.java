@@ -10,6 +10,7 @@ import de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw.Keyword;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw.Norm;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw.NormXml;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -74,7 +75,7 @@ public class FieldOfLawTransformer {
 
   private static Set<JPAKeywordDTO> transformKeywordsToJPADTOs(Set<String> keywordXmls) {
     if (keywordXmls == null) {
-      return null;
+      return Collections.emptySet();
     }
 
     Set<JPAKeywordDTO> jpaKeywordDTOs = new HashSet<>();
@@ -85,7 +86,7 @@ public class FieldOfLawTransformer {
 
   private static Set<JPANormDTO> transformNormsToJPADTOs(Set<NormXml> normXmls) {
     if (normXmls == null) {
-      return null;
+      return Collections.emptySet();
     }
 
     Set<JPANormDTO> jpaNormDTOs = new HashSet<>();

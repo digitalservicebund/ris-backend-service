@@ -4,7 +4,7 @@ import java.util.UUID;
 import reactor.core.publisher.Mono;
 
 public interface MailTrackingService {
-  PublishState getMappedPublishState(String mailTrackingEvent);
+  EmailPublishState getMappedPublishState(String mailTrackingEvent);
 
-  Mono<UUID> setPublishState(UUID documentUnitUuid, PublishState publishState);
+  Mono<UUID> setPublishState(UUID documentUnitUuid, EmailPublishState emailPublishState);
 }

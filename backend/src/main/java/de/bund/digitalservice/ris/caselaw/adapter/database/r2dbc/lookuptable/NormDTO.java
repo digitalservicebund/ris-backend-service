@@ -13,9 +13,6 @@ import org.springframework.data.relational.core.mapping.Table;
 @AllArgsConstructor
 @Table("lookuptable_field_of_law_norm")
 public class NormDTO {
-
-  public static final NormDTO EMPTY = new NormDTO();
-
   @Id Long id;
   Long fieldOfLawId;
   String abbreviation;

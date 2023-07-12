@@ -22,9 +22,6 @@ export type CoreData = {
 }
 
 export type ContentRelatedIndexing = {
-  // TODO: keywords and fieldsOfLaw still have their own endpoints --> refactor
-  // keywords?: string[]
-  // fieldsOfLaw?: FieldOfLaw[]
   norms?: NormReference[]
   activeCitations?: ActiveCitation[]
 }
@@ -52,12 +49,17 @@ export type Texts = {
   decisionReasons?: string
 }
 
+export type PublicationStatus = {
+  status: "PUBLISHED" | "UNPUBLISHED" | "PUBLISHING"
+  withError: boolean
+}
+
 export default class DocumentUnit {
   readonly uuid: string
   readonly id?: string
   readonly documentNumber?: string
   readonly creationtimestamp?: string
-  readonly status?: "PUBLISHED" | "UNPUBLISHED"
+  readonly status?: PublicationStatus
 
   public fileuploadtimestamp?: string
   public s3path?: string

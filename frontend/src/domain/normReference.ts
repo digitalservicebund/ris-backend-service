@@ -1,18 +1,23 @@
 import dayjs from "dayjs"
+import EditableListItem from "./editableListItem"
 import { NormAbbreviation } from "./normAbbreviation"
-import { ValidationError } from "@/shared/components/input/types"
+import documentUnitService from "@/services/documentUnitService"
 
-export default class NormReference {
+export default class NormReference implements EditableListItem {
   public normAbbreviation?: NormAbbreviation
   public singleNorm?: string
   public dateOfVersion?: string
   public dateOfRelevance?: string
-  public validationErrors?: ValidationError[]
+  private validationError = false
 
   static requiredFields = ["normAbbreviation"] as const
 
   constructor(data: Partial<NormReference> = {}) {
     Object.assign(this, data)
+  }
+
+  get isReadOnly(): boolean {
+    return false
   }
 
   get renderDecision(): string {
@@ -28,11 +33,39 @@ export default class NormReference {
     ].join(", ")
   }
 
+  public async updateValidationErrors(): Promise<boolean> {
+    //validate singleNorm
+    if (this.singleNorm) {
+      const singleNormValidationInfo: SingleNormValidationInfo = {
+        singleNorm: this.singleNorm,
+        normAbbreviation: this.normAbbreviation?.abbreviation,
+      }
+      const response = await documentUnitService.validateSingleNorm(
+        singleNormValidationInfo
+      )
+
+      if (response.data !== "Ok") {
+        this.validationError = true
+        return true
+      } else {
+        this.validationError = false
+        return false
+      }
+    } else {
+      this.validationError = false
+      return false
+    }
+  }
+
+  get hasValidationErrors(): boolean {
+    return this.validationError
+  }
+
   get hasMissingRequiredFields(): boolean {
     return this.missingRequiredFields.length > 0
   }
 
-  get missingRequiredFields() {
+  get missingRequiredFields(): string[] {
     return NormReference.requiredFields.filter((field) =>
       this.requiredFieldIsEmpty(this[field])
     )

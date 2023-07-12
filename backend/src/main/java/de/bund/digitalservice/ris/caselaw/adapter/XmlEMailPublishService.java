@@ -5,9 +5,9 @@ import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitPublishException;
 import de.bund.digitalservice.ris.caselaw.domain.EmailPublishService;
+import de.bund.digitalservice.ris.caselaw.domain.EmailPublishState;
 import de.bund.digitalservice.ris.caselaw.domain.HttpMailSender;
 import de.bund.digitalservice.ris.caselaw.domain.Publication;
-import de.bund.digitalservice.ris.caselaw.domain.PublishState;
 import de.bund.digitalservice.ris.caselaw.domain.XmlExporter;
 import de.bund.digitalservice.ris.caselaw.domain.XmlPublication;
 import de.bund.digitalservice.ris.caselaw.domain.XmlPublicationRepository;
@@ -20,7 +20,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
@@ -142,7 +141,7 @@ public class XmlEMailPublishService implements EmailPublishService {
             .statusMessages(xml.statusMessages());
 
     if (xml.statusCode().equals("400")) {
-      return publication.publishState(PublishState.UNKNOWN).build();
+      return publication.emailPublishState(EmailPublishState.UNKNOWN).build();
     }
 
     return publication
@@ -151,7 +150,7 @@ public class XmlEMailPublishService implements EmailPublishService {
         .xml(xml.xml())
         .fileName(xml.fileName())
         .publishDate(xml.publishDate())
-        .publishState(PublishState.SENT)
+        .emailPublishState(EmailPublishState.SENT)
         .build();
   }
 
@@ -179,7 +178,7 @@ public class XmlEMailPublishService implements EmailPublishService {
                                 Stream.concat(
                                         Stream.of("TEST"),
                                         documentUnit.coreData().fileNumbers().stream())
-                                    .collect(Collectors.toList()))
+                                    .toList())
                             .build())
                 .orElseGet(
                     () ->

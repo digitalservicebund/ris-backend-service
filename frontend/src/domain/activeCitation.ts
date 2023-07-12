@@ -1,8 +1,12 @@
 import dayjs from "dayjs"
 import { CitationStyle } from "./citationStyle"
+import EditableListItem from "./editableListItem"
 import LinkedDocumentUnit from "./linkedDocumentUnit"
 
-export default class ActiveCitation extends LinkedDocumentUnit {
+export default class ActiveCitation
+  extends LinkedDocumentUnit
+  implements EditableListItem
+{
   public citationStyle?: CitationStyle
 
   static requiredFields = [
@@ -26,23 +30,23 @@ export default class ActiveCitation extends LinkedDocumentUnit {
         : []),
       ...(this.fileNumber ? [this.fileNumber] : []),
       ...(this.documentType ? [this.documentType.label] : []),
-      ...(this.documentNumber && this.isDocUnit() ? [this.documentNumber] : []),
+      ...(this.documentNumber && this.isReadOnly ? [this.documentNumber] : []),
     ].join(", ")
-  }
-
-  get missingRequiredFields() {
-    return ActiveCitation.requiredFields.filter((field) =>
-      this.requiredFieldIsEmpty(this[field])
-    )
   }
 
   get hasMissingRequiredFields(): boolean {
     return this.missingRequiredFields.length > 0
   }
 
+  get missingRequiredFields(): string[] {
+    return ActiveCitation.requiredFields.filter((field) =>
+      this.requiredFieldIsEmpty(this[field])
+    )
+  }
+
   private requiredFieldIsEmpty(
     value: ActiveCitation[(typeof ActiveCitation.requiredFields)[number]]
-  ) {
+  ): boolean {
     if (value === undefined || !value || value === null) {
       return true
     }

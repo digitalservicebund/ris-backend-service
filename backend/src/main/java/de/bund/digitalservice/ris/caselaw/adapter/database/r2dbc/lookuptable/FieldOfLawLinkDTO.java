@@ -15,7 +15,6 @@ import org.springframework.data.relational.core.mapping.Table;
 @AllArgsConstructor
 @Table("lookuptable_field_of_law_link")
 public class FieldOfLawLinkDTO implements Persistable<Long> {
-  public static final FieldOfLawLinkDTO EMPTY = new FieldOfLawLinkDTO();
   @Id Long id;
   Long fieldOfLawId;
   Long linkedFieldOfLawId;

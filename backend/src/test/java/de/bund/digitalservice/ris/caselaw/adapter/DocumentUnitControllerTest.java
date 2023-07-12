@@ -20,9 +20,9 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitPublishException;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
+import de.bund.digitalservice.ris.caselaw.domain.EmailPublishState;
 import de.bund.digitalservice.ris.caselaw.domain.LinkedDocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationReport;
-import de.bund.digitalservice.ris.caselaw.domain.PublishState;
 import de.bund.digitalservice.ris.caselaw.domain.XmlPublication;
 import java.nio.ByteBuffer;
 import java.time.Instant;
@@ -288,7 +288,7 @@ class DocumentUnitControllerTest {
                     .statusMessages(List.of("status-messages"))
                     .fileName("test.xml")
                     .publishDate(Instant.parse("2020-01-01T01:01:01.00Z"))
-                    .publishState(PublishState.UNKNOWN)
+                    .emailPublishState(EmailPublishState.UNKNOWN)
                     .build()));
 
     risWebClient
@@ -356,7 +356,7 @@ class DocumentUnitControllerTest {
                         .statusMessages(List.of("status-messages"))
                         .fileName("test.xml")
                         .publishDate(Instant.parse("2020-01-01T01:01:01.00Z"))
-                        .publishState(PublishState.SENT)
+                        .emailPublishState(EmailPublishState.SENT)
                         .build(),
                     PublicationReport.builder()
                         .content("<html>2019 Report</html>")

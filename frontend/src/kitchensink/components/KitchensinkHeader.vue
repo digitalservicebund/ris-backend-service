@@ -7,9 +7,7 @@ const props = defineProps<{
   selectedComponent: risComponent
 }>()
 
-defineEmits<{
-  (e: "setSelectedComponent", component: risComponent): void
-}>()
+defineEmits<(e: "setSelectedComponent", component: risComponent) => void>()
 
 const isSelectedComponent = (component: risComponent) => {
   return component.name === props.selectedComponent.name
