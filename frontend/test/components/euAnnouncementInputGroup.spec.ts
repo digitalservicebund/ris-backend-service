@@ -38,11 +38,11 @@ function getControls() {
   }) as HTMLInputElement
 
   const additionalInfoChips = within(
-    screen.getByTestId("chips-input_euAnnouncementInfo")
+    screen.getByTestId("chips-input_euAnnouncementInfo"),
   ).queryAllByTestId("chip")
 
   const additionalInfoChipValues = within(
-    screen.getByTestId("chips-input_euAnnouncementInfo")
+    screen.getByTestId("chips-input_euAnnouncementInfo"),
   ).queryAllByTestId("chip-value")
 
   const explanationInput = screen.queryByRole("textbox", {
@@ -50,11 +50,11 @@ function getControls() {
   }) as HTMLInputElement
 
   const explanationChips = within(
-    screen.getByTestId("chips-input_euAnnouncementExplanations")
+    screen.getByTestId("chips-input_euAnnouncementExplanations"),
   ).queryAllByTestId("chip")
 
   const explanationChipValues = within(
-    screen.getByTestId("chips-input_euAnnouncementExplanations")
+    screen.getByTestId("chips-input_euAnnouncementExplanations"),
   ).queryAllByTestId("chip-value")
 
   return {
@@ -176,11 +176,11 @@ describe("EuGovernmentGazetteInputGroup", () => {
     await user.type(pageInput, "2")
     await user.type(
       additionalInfoInput,
-      "additional info 1{enter}additional info 2{enter}"
+      "additional info 1{enter}additional info 2{enter}",
     )
     await user.type(
       explanationInput,
-      "explanation 1{enter}explanation 2{enter}"
+      "explanation 1{enter}explanation 2{enter}",
     )
 
     expect(modelValue).toEqual({

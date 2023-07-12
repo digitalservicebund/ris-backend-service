@@ -8,7 +8,7 @@ test.describe("test the different layout options", () => {
     await expect(page.getByLabel("Navigation schließen")).toBeVisible()
     await expect(page.getByLabel("Originaldokument öffnen")).toBeVisible()
     await expect(
-      page.locator("text=Es wurde noch kein Originaldokument hochgeladen")
+      page.locator("text=Es wurde noch kein Originaldokument hochgeladen"),
     ).toBeHidden()
   })
 
@@ -19,7 +19,7 @@ test.describe("test the different layout options", () => {
     await navigateToCategories(page, documentNumber)
     await page.getByLabel("Originaldokument öffnen").click()
     await expect(
-      page.locator("text=Es wurde noch kein Originaldokument hochgeladen")
+      page.locator("text=Es wurde noch kein Originaldokument hochgeladen"),
     ).toBeVisible()
     await expect(page).toHaveURL(/showDocPanel=true/)
   })

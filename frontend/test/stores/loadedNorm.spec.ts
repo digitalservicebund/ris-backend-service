@@ -34,7 +34,7 @@ describe("loadedNorm", () => {
 
   it("first unset the loaded norm before loading the next one", async () => {
     vi.mocked(getNormByGuid).mockImplementation(
-      (guid: string) => new Promise(() => guid)
+      (guid: string) => new Promise(() => guid),
     ) // Never resolves, so loading takes for ever.
     const store = useLoadedNormStore()
     store.loadedNorm = generateNorm()
@@ -78,7 +78,7 @@ describe("loadedNorm", () => {
     expect(editNormFrame).toHaveBeenLastCalledWith(
       "guid",
       metadataSections,
-      flatMetadata
+      flatMetadata,
     )
   })
 })

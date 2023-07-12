@@ -17,7 +17,7 @@ const getCurrentTime = (dateSaved: Date) => {
 
 const { triggerSave, lastSaveError, lastSavedOn, timer } = useSaveToRemote(
   props.serviceCallback,
-  10000
+  10000,
 )
 
 onUnmounted(() => {

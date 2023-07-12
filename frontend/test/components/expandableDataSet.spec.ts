@@ -23,7 +23,7 @@ function renderComponent(options?: {
     title: options?.title ?? "title",
     dataSet: options?.dataSet ?? [],
     summaryComponent: markRaw(
-      options?.summaryComponent ?? JsonStringifySummary
+      options?.summaryComponent ?? JsonStringifySummary,
     ),
   }
 

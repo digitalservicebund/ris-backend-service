@@ -26,7 +26,7 @@ describe("text editor", async () => {
     expect(screen.getAllByTestId("Editor Feld").length).toBe(1)
 
     expect(
-      screen.queryByLabelText("Editor Feld Button Leiste")
+      screen.queryByLabelText("Editor Feld Button Leiste"),
     ).not.toBeInTheDocument()
   })
 
@@ -45,7 +45,7 @@ describe("text editor", async () => {
     expect(screen.getByText("Test Value")).toBeInTheDocument()
 
     expect(
-      screen.queryByLabelText("Test Editor Feld Button Leiste")
+      screen.queryByLabelText("Test Editor Feld Button Leiste"),
     ).not.toBeInTheDocument()
 
     expect(screen.getByTestId("Test Editor Feld")).toBeInTheDocument()
@@ -70,7 +70,7 @@ describe("text editor", async () => {
     }
 
     expect(
-      screen.getByLabelText("Test Editor Feld Button Leiste")
+      screen.getByLabelText("Test Editor Feld Button Leiste"),
     ).toBeInTheDocument()
   })
 
@@ -89,7 +89,7 @@ describe("text editor", async () => {
     }
 
     expect(
-      screen.queryByLabelText("Test Editor Feld Button Leiste")
+      screen.queryByLabelText("Test Editor Feld Button Leiste"),
     ).not.toBeInTheDocument()
   })
 

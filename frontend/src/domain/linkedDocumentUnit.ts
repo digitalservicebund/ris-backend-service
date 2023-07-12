@@ -19,12 +19,12 @@ export default class LinkedDocumentUnit {
   }
 
   public isLinked<Type extends LinkedDocumentUnit>(
-    localDecisions: Type[] | undefined
+    localDecisions: Type[] | undefined,
   ): boolean {
     if (!localDecisions) return false
 
     return localDecisions.some(
-      (localDecision) => localDecision.uuid == this.uuid
+      (localDecision) => localDecision.uuid == this.uuid,
     )
   }
 

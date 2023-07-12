@@ -26,7 +26,7 @@ watch(
       inputValue.value = newValue
     }
   },
-  { immediate: true }
+  { immediate: true },
 )
 
 watch(inputValue, () => emit("update:modelValue", inputValue.value), {
@@ -40,7 +40,7 @@ const NORM_CATEGORY_NAMES = {
 }
 
 const selectedNormCategories = ref<Record<NormCategory, boolean>>(
-  {} as Record<NormCategory, boolean>
+  {} as Record<NormCategory, boolean>,
 )
 
 watch(
@@ -50,7 +50,7 @@ watch(
       Object.keys(selectedNormCategories.value) as NormCategory[]
     ).filter((category) => selectedNormCategories.value[category])
   },
-  { deep: true }
+  { deep: true },
 )
 
 watch(
@@ -61,7 +61,7 @@ watch(
         categories?.includes(category) ?? false
     }
   },
-  { immediate: true, deep: true }
+  { immediate: true, deep: true },
 )
 </script>
 

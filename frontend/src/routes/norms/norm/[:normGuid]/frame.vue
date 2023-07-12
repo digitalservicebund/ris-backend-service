@@ -117,7 +117,7 @@ watch(
 
     flatMetadata.value = data as FlatMetadata
   },
-  { immediate: true, deep: true }
+  { immediate: true, deep: true },
 )
 
 watch(
@@ -127,7 +127,7 @@ watch(
       loadedNorm.value.eli = data.eli as string
     }
   },
-  { deep: true }
+  { deep: true },
 )
 
 function formatDate(dateStrings: (string | undefined)[] | undefined): string {
@@ -270,7 +270,7 @@ function documentStatusSummary(data: Metadata): string {
     data?.PROOF_INDICATION?.filter((category) => category != null) ?? []
 
   const translatedProofIndication = proofIndication.map(
-    (indication) => PROOF_INDICATION_TRANSLATIONS[indication] || indication
+    (indication) => PROOF_INDICATION_TRANSLATIONS[indication] || indication,
   )
   const resultArray = []
 
@@ -299,7 +299,7 @@ function documentTextProofSummary(data: Metadata): string {
   const text = data?.TEXT?.[0]
 
   const translatedProofType = proofType.map(
-    (type) => PROOF_TYPE_TRANSLATIONS[type] || type
+    (type) => PROOF_TYPE_TRANSLATIONS[type] || type,
   )
   const resultArray = [...translatedProofType]
 
@@ -323,7 +323,7 @@ function documentOtherSummary(data: Metadata): string {
     data?.OTHER_TYPE?.filter((category) => category != null) ?? []
 
   const translatedOtherType = otherType.map(
-    (type) => OTHER_TYPE_TRANSLATIONS[type] || type
+    (type) => OTHER_TYPE_TRANSLATIONS[type] || type,
   )
 
   return translatedOtherType.join(" ")
@@ -356,7 +356,7 @@ function normProviderSummarizer(data: Metadata) {
     return h("div", { class: ["flex", "gap-8"] }, [
       h(
         "span",
-        summaryLine.length == 0 ? summaryLine : summaryLine.concat(" | ")
+        summaryLine.length == 0 ? summaryLine : summaryLine.concat(" | "),
       ),
       h("img", {
         src: CheckMark,
@@ -393,8 +393,8 @@ function documentTypeSummarizer(data?: Metadata): VNode {
       h("div", { class: ["flex", "gap-4"] }, [
         h("img", { src: CheckMark, alt: "checkmark", width: "16" }),
         h("span", NORM_CATEGORY_TRANSLATIONS[category]),
-      ])
-    )
+      ]),
+    ),
   )
 
   if ((typeName || categories.length > 0) && templateNames.length > 0)
@@ -405,15 +405,15 @@ function documentTypeSummarizer(data?: Metadata): VNode {
       h(
         "div",
         { class: ["bg-blue-500", "rounded-lg", "px-8", "py-4"] },
-        templateName
-      )
-    )
+        templateName,
+      ),
+    ),
   )
 
   return h(
     "div",
     { class: ["flex", "gap-8", "items-center", "flex-wrap"] },
-    propertyNodes
+    propertyNodes,
   )
 }
 
@@ -447,7 +447,7 @@ function divergentEntryIntoForceDefinedSummary(data: Metadata): VNode {
           alt: "Schwarzes Haken",
         }),
         h("span", {}, NORM_CATEGORY_TRANSLATIONS[category]),
-      ])
+      ]),
     )
   })
 
@@ -497,7 +497,7 @@ function divergentEntryIntoForceUndefinedSummary(data: Metadata): VNode {
           alt: "Schwarzes Haken",
         }),
         h("span", {}, NORM_CATEGORY_TRANSLATIONS[category]),
-      ])
+      ]),
     )
   })
 
@@ -505,17 +505,17 @@ function divergentEntryIntoForceUndefinedSummary(data: Metadata): VNode {
 }
 
 function DivergentEntryIntoForceSummarizer(
-  data: MetadataSections
+  data: MetadataSections,
 ): VNode | string {
   if (!data) return ""
 
   if (data.DIVERGENT_ENTRY_INTO_FORCE_DEFINED) {
     return divergentEntryIntoForceDefinedSummary(
-      data.DIVERGENT_ENTRY_INTO_FORCE_DEFINED[0]
+      data.DIVERGENT_ENTRY_INTO_FORCE_DEFINED[0],
     )
   } else if (data.DIVERGENT_ENTRY_INTO_FORCE_UNDEFINED) {
     return divergentEntryIntoForceUndefinedSummary(
-      data.DIVERGENT_ENTRY_INTO_FORCE_UNDEFINED[0]
+      data.DIVERGENT_ENTRY_INTO_FORCE_UNDEFINED[0],
     )
   } else return ""
 }
@@ -525,11 +525,11 @@ function DivergentExpirationSummarizer(data: MetadataSections): VNode | string {
 
   if (data.DIVERGENT_EXPIRATION_DEFINED) {
     return divergentEntryIntoForceDefinedSummary(
-      data.DIVERGENT_EXPIRATION_DEFINED[0]
+      data.DIVERGENT_EXPIRATION_DEFINED[0],
     )
   } else if (data.DIVERGENT_EXPIRATION_UNDEFINED) {
     return divergentEntryIntoForceUndefinedSummary(
-      data.DIVERGENT_EXPIRATION_UNDEFINED[0]
+      data.DIVERGENT_EXPIRATION_UNDEFINED[0],
     )
   } else return ""
 }
@@ -578,12 +578,12 @@ function subjectAreaSummarizer(data: Metadata) {
 const CitationDateSummary = withSummarizer(citationDateSummarizer)
 const OfficialReferenceSummary = withSummarizer(officialReferenceSummarizer)
 const DocumentStatusSectionSummary = withSummarizer(
-  documentStatusSectionSummarizer
+  documentStatusSectionSummarizer,
 )
 const NormProviderSummary = withSummarizer(normProviderSummarizer)
 const DocumentTypeSummary = withSummarizer(documentTypeSummarizer)
 const DivergentEntryIntoForceSummary = withSummarizer(
-  DivergentEntryIntoForceSummarizer
+  DivergentEntryIntoForceSummarizer,
 )
 const DivergentExpirationSummary = withSummarizer(DivergentExpirationSummarizer)
 const GeneralSummary = withSummarizer(GeneralSummarizer)

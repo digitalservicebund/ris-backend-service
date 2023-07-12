@@ -39,7 +39,7 @@ const buildDirectPathTreeTo = async (clickedIdentifier: string) => {
   if (!clickedIdentifier) return
 
   const response = await FieldOfLawService.getTreeForIdentifier(
-    clickedIdentifier
+    clickedIdentifier,
   )
   if (!response.data) return
 
@@ -78,7 +78,7 @@ const buildDirectPathTreeTo = async (clickedIdentifier: string) => {
     :node="root"
     :selected="
       props.selectedNodes.some(
-        ({ identifier }) => identifier === root.identifier
+        ({ identifier }) => identifier === root.identifier,
       )
     "
     :selected-nodes="selectedNodes"

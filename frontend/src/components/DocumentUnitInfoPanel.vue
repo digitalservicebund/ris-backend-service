@@ -20,7 +20,7 @@ withDefaults(defineProps<Props>(), {
 })
 
 function isBadge(
-  entry: PropertyInfoType | IconBadgeProps
+  entry: PropertyInfoType | IconBadgeProps,
 ): entry is IconBadgeProps {
   return "icon" in entry
 }

@@ -28,7 +28,7 @@ describe("originalFile SidePanel", () => {
     screen.getByText("Originaldokument")
     expect(screen.queryByText("Dokument wird geladen")).not.toBeInTheDocument()
     expect(
-      screen.queryByText("Es wurde noch kein Originaldokument hochgeladen.")
+      screen.queryByText("Es wurde noch kein Originaldokument hochgeladen."),
     ).not.toBeInTheDocument()
   })
 

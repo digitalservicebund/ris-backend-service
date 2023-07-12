@@ -8,16 +8,17 @@ const { loadedNorm } = storeToRefs(store)
 
 if (loadedNorm.value !== undefined) {
   const preamble: Article[] = loadedNorm.value.articles.filter(
-    (article) => article.marker === "Eingangsformel"
+    (article) => article.marker === "Eingangsformel",
   )
 
   const close: Article[] = loadedNorm.value.articles.filter(
-    (article) => article.marker === "Schlussformel"
+    (article) => article.marker === "Schlussformel",
   )
 
   const articlesWithoutPreambleAndClose: Article[] =
     loadedNorm.value.articles.filter(
-      (article) => !["Eingangsformel", "Schlussformel"].includes(article.marker)
+      (article) =>
+        !["Eingangsformel", "Schlussformel"].includes(article.marker),
     )
 
   articlesWithoutPreambleAndClose.sort((a, b) => {
@@ -42,7 +43,7 @@ if (loadedNorm.value !== undefined) {
         Number(a.marker.substring(1, a.marker.length - 1)) <
         Number(b.marker.substring(1, b.marker.length - 1))
           ? -1
-          : 1
+          : 1,
       )
     }
   })

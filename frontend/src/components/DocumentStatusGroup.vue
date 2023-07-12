@@ -15,7 +15,7 @@ const { loadedNorm } = storeToRefs(store)
 const isDocumentTextProof = computed(() => {
   return (
     loadedNorm.value?.metadataSections?.DOCUMENT_STATUS_SECTION?.some(
-      (entry) => entry.DOCUMENT_TEXT_PROOF
+      (entry) => entry.DOCUMENT_TEXT_PROOF,
     ) ?? false
   )
 })
@@ -32,7 +32,7 @@ type ChildSectionName =
 
 const childSection = ref<Metadata>({})
 const selectedChildSectionName = ref<ChildSectionName>(
-  MetadataSectionName.DOCUMENT_STATUS
+  MetadataSectionName.DOCUMENT_STATUS,
 )
 
 watch(
@@ -43,7 +43,7 @@ watch(
     }),
   {
     deep: true,
-  }
+  },
 )
 
 watch(
@@ -63,7 +63,7 @@ watch(
   {
     immediate: true,
     deep: true,
-  }
+  },
 )
 
 watch(selectedChildSectionName, () => (childSection.value = {}))
@@ -78,7 +78,7 @@ const component = computed(() => {
       return DocumentOtherInputGroup
     default:
       throw new Error(
-        `Unknown document status child section: "${selectedChildSectionName.value}"`
+        `Unknown document status child section: "${selectedChildSectionName.value}"`,
       )
   }
 })

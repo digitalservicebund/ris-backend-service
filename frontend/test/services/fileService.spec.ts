@@ -6,7 +6,7 @@ describe("fileService", () => {
 
     const result = await service.upload("123", testFile)
     expect(result.error?.title).toEqual(
-      "Das ausgewählte Dateiformat ist nicht korrekt."
+      "Das ausgewählte Dateiformat ist nicht korrekt.",
     )
   })
 })

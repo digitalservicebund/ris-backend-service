@@ -42,13 +42,13 @@ async function handleToggle() {
         node.value.children = response.data
         if (!childToReattach) return
         const parentToReattachTo = node.value.children.find(
-          (node) => node.identifier === childToReattach.identifier
+          (node) => node.identifier === childToReattach.identifier,
         )
         if (!parentToReattachTo) return
         parentToReattachTo.children = childToReattach.children
         parentToReattachTo.isExpanded = true
         parentToReattachTo.inDirectPathMode = true
-      }
+      },
     )
   }
   if (node.value.inDirectPathMode) {
@@ -134,7 +134,7 @@ async function handleToggle() {
         :node="child"
         :selected="
           props.selectedNodes.some(
-            ({ identifier }) => identifier === child.identifier
+            ({ identifier }) => identifier === child.identifier,
           )
         "
         :selected-nodes="selectedNodes"

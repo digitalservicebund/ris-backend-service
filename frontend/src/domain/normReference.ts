@@ -41,7 +41,7 @@ export default class NormReference implements EditableListItem {
         normAbbreviation: this.normAbbreviation?.abbreviation,
       }
       const response = await documentUnitService.validateSingleNorm(
-        singleNormValidationInfo
+        singleNormValidationInfo,
       )
 
       if (response.data !== "Ok") {
@@ -67,12 +67,12 @@ export default class NormReference implements EditableListItem {
 
   get missingRequiredFields(): string[] {
     return NormReference.requiredFields.filter((field) =>
-      this.requiredFieldIsEmpty(this[field])
+      this.requiredFieldIsEmpty(this[field]),
     )
   }
 
   private requiredFieldIsEmpty(
-    value: NormReference[(typeof NormReference.requiredFields)[number]]
+    value: NormReference[(typeof NormReference.requiredFields)[number]],
   ) {
     if (value === undefined || !value || value === null) {
       return true

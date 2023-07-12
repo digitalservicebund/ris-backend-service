@@ -49,7 +49,7 @@ describe("NavbarSide", () => {
     await renderComponent({ menuItems })
     const firstSubItem = screen.getByLabelText("first level two") as HTMLElement
     const secondSubItem = screen.getByLabelText(
-      "second level two"
+      "second level two",
     ) as HTMLElement
 
     expect(firstSubItem).toBeVisible()
@@ -83,7 +83,7 @@ describe("NavbarSide", () => {
 
       expect(screen.getByLabelText("active item")).toHaveClass("bg-blue-200")
       expect(screen.getByLabelText("passive item")).not.toHaveClass(
-        "bg-blue-200"
+        "bg-blue-200",
       )
     })
 
@@ -99,7 +99,7 @@ describe("NavbarSide", () => {
 
       expect(screen.getByLabelText("active item")).toHaveClass("bg-blue-200")
       expect(screen.getByLabelText("passive item")).not.toHaveClass(
-        "bg-blue-200"
+        "bg-blue-200",
       )
     })
 
@@ -115,7 +115,7 @@ describe("NavbarSide", () => {
 
       expect(screen.getByLabelText("active item")).toHaveClass("bg-blue-200")
       expect(screen.getByLabelText("passive item")).not.toHaveClass(
-        "bg-blue-200"
+        "bg-blue-200",
       )
     })
 
@@ -146,7 +146,7 @@ describe("NavbarSide", () => {
 
       expect(screen.getByLabelText("active item")).toHaveClass("bg-blue-200")
       expect(screen.getByLabelText("passive item")).not.toHaveClass(
-        "bg-blue-200"
+        "bg-blue-200",
       )
     })
 
@@ -169,10 +169,10 @@ describe("NavbarSide", () => {
 
       expect(screen.getByLabelText("level one")).not.toHaveClass("bg-blue-200")
       expect(screen.getByLabelText("first level two")).toHaveClass(
-        "bg-blue-200"
+        "bg-blue-200",
       )
       expect(screen.getByLabelText("second level two")).not.toHaveClass(
-        "bg-blue-200"
+        "bg-blue-200",
       )
     })
   })
@@ -290,7 +290,7 @@ async function renderComponent(options?: {
 
 function buildRouter(
   goBackRoute: RouteLocationRaw,
-  menuItems: MenuItem[]
+  menuItems: MenuItem[],
 ): Router {
   const routes = []
   routes.push(generateRouterRoute({ path: "/" }))

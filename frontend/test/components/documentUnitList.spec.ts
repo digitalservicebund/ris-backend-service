@@ -4,7 +4,7 @@ import DocumentUnitList from "@/components/DocumentUnitList.vue"
 import { DocumentUnitListEntry } from "@/domain/documentUnitListEntry"
 
 function renderComponent(
-  options?: Partial<DocumentUnitListEntry> | DocumentUnitListEntry[]
+  options?: Partial<DocumentUnitListEntry> | DocumentUnitListEntry[],
 ) {
   const documentUnitListEntries: DocumentUnitListEntry[] =
     options instanceof Array
@@ -66,7 +66,7 @@ describe("documentUnit list", () => {
     await screen.findByText("123")
     await screen.findByText("10.02.2022")
     expect(
-      screen.queryByText("Keine Dokumentationseinheiten gefunden")
+      screen.queryByText("Keine Dokumentationseinheiten gefunden"),
     ).not.toBeInTheDocument()
   })
 
@@ -81,7 +81,7 @@ describe("documentUnit list", () => {
     await screen.findByText("foo")
     await screen.findByText("test.docx")
     expect(
-      screen.queryByText("Keine Dokumentationseinheiten gefunden")
+      screen.queryByText("Keine Dokumentationseinheiten gefunden"),
     ).not.toBeInTheDocument()
   })
 
@@ -91,7 +91,7 @@ describe("documentUnit list", () => {
     const items = await screen.findAllByText(/-/)
     expect(items).toHaveLength(2)
     expect(
-      screen.queryByText("Keine Dokumentationseinheiten gefunden")
+      screen.queryByText("Keine Dokumentationseinheiten gefunden"),
     ).not.toBeInTheDocument()
   })
 
@@ -111,7 +111,7 @@ describe("documentUnit list", () => {
     const { emitted } = renderComponent({ id: "123" })
 
     await fireEvent.click(
-      screen.getByLabelText("Dokumentationseinheit löschen")
+      screen.getByLabelText("Dokumentationseinheit löschen"),
     )
     const confirmButton = screen.getByRole("button", { name: "Löschen" })
     expect(confirmButton).toBeInTheDocument()

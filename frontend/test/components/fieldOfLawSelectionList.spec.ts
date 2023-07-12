@@ -3,7 +3,7 @@ import FieldOfLawSelectionList from "@/components/FieldOfLawSelectionList.vue"
 import { FieldOfLawNode } from "@/domain/fieldOfLaw"
 
 function renderComponent(
-  selectedFieldsOfLaw: Partial<FieldOfLawNode>[]
+  selectedFieldsOfLaw: Partial<FieldOfLawNode>[],
 ): RenderResult {
   const props = {
     selectedFieldsOfLaw,
@@ -28,17 +28,17 @@ describe("FieldOfLawSelectionList", () => {
     ])
 
     expect(
-      screen.queryByText("Die Liste ist aktuell leer")
+      screen.queryByText("Die Liste ist aktuell leer"),
     ).not.toBeInTheDocument()
     expect(screen.getByText("ST-01-02-03")).toBeInTheDocument()
     expect(screen.getByText("Steuerrecht 1-2-3")).toBeInTheDocument()
     expect(
       screen.getByLabelText(
-        "ST-01-02-03 Steuerrecht 1-2-3 im Sachgebietsbaum anzeigen"
-      )
+        "ST-01-02-03 Steuerrecht 1-2-3 im Sachgebietsbaum anzeigen",
+      ),
     ).toBeInTheDocument()
     expect(
-      screen.getByLabelText("ST-01-02-03 Steuerrecht 1-2-3 entfernen")
+      screen.getByLabelText("ST-01-02-03 Steuerrecht 1-2-3 entfernen"),
     ).toBeInTheDocument()
   })
 
@@ -51,7 +51,7 @@ describe("FieldOfLawSelectionList", () => {
     ])
 
     await fireEvent.click(
-      screen.getByLabelText("ST-01-02-03 Steuerrecht 1-2-3 entfernen")
+      screen.getByLabelText("ST-01-02-03 Steuerrecht 1-2-3 entfernen"),
     )
 
     expect(emitted()["remove-from-list"]).toBeTruthy()
@@ -67,8 +67,8 @@ describe("FieldOfLawSelectionList", () => {
 
     await fireEvent.click(
       screen.getByLabelText(
-        "ST-01-02-03 Steuerrecht 1-2-3 im Sachgebietsbaum anzeigen"
-      )
+        "ST-01-02-03 Steuerrecht 1-2-3 im Sachgebietsbaum anzeigen",
+      ),
     )
 
     expect(emitted()["node-clicked"]).toBeTruthy()

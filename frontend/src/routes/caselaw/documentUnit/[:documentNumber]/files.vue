@@ -9,7 +9,7 @@ const props = defineProps<{ documentNumber: string }>()
 
 async function loadDocumentUnit() {
   const response = await documentUnitService.getByDocumentNumber(
-    props.documentNumber
+    props.documentNumber,
   )
   return {
     documentUnit: ref(response.data),
@@ -22,7 +22,7 @@ const { documentUnit, error } = await loadDocumentUnit()
 <template>
   <DocumentUnitFiles
     v-if="documentUnit"
-    :document-unit="(documentUnit as DocumentUnit)"
+    :document-unit="documentUnit as DocumentUnit"
     @update-document-unit="Object.assign(documentUnit as DocumentUnit, $event)"
   />
   <RouteErrorDisplay v-else :error="error" />

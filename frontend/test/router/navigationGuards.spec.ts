@@ -61,10 +61,10 @@ describe("router's auth navigation guards", () => {
     vi.mocked(isAuthenticated).mockResolvedValueOnce(false)
 
     await routerBeforeEach(
-      router.resolve("/caselaw/documentunit/123456/categories")
+      router.resolve("/caselaw/documentunit/123456/categories"),
     )
     expect(document.cookie).toEqual(
-      "location=/caselaw/documentunit/123456/categories"
+      "location=/caselaw/documentunit/123456/categories",
     )
   })
 

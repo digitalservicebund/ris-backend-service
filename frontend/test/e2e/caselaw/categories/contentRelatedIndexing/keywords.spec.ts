@@ -12,7 +12,7 @@ test.describe("keywords", () => {
     await navigateToCategories(page, documentNumber)
 
     await expect(
-      page.getByRole("heading", { name: "Schlagwörter" })
+      page.getByRole("heading", { name: "Schlagwörter" }),
     ).toBeVisible()
   })
 
@@ -85,7 +85,7 @@ test.describe("keywords", () => {
         await page.keyboard.press("Enter")
       },
       page,
-      { clickSaveButton: true }
+      { clickSaveButton: true },
     )
     await expect(page.getByText(keyword)).toBeVisible()
 

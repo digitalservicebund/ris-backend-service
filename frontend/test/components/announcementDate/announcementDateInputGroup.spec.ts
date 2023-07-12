@@ -48,7 +48,7 @@ describe("Announcement date/time/year fields", () => {
     }) as HTMLInputElement
 
     const announcementDateTimeInputField = screen.getByLabelText(
-      "Uhrzeit"
+      "Uhrzeit",
     ) as HTMLInputElement
 
     expect(announcementDateInputField).toBeVisible()

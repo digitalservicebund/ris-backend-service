@@ -43,7 +43,7 @@ test.describe("a11y of document page (/caselaw/documentunit/{documentNumber}/fil
     await navigateToFiles(page, documentNumber)
     await uploadTestfile(page, "sample.png")
     await expect(
-      page.locator("text=Das ausgewählte Dateiformat ist nicht korrekt.")
+      page.locator("text=Das ausgewählte Dateiformat ist nicht korrekt."),
     ).toBeVisible()
 
     const accessibilityScanResults = await new AxeBuilder({ page }).analyze()
@@ -64,7 +64,7 @@ test.describe("a11y of publication page (/caselaw/documentunit/{documentNumber}/
       .locator("[aria-label='Dokumentationseinheit veröffentlichen']")
       .click()
     await expect(
-      page.locator("text=Es sind noch nicht alle Pflichtfelder befüllt.")
+      page.locator("text=Es sind noch nicht alle Pflichtfelder befüllt."),
     ).toBeVisible()
 
     const accessibilityScanResults = await new AxeBuilder({ page }).analyze()

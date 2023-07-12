@@ -54,7 +54,7 @@ async function datermineTextareHeight() {
   await nextTick()
 
   const { borderTopWidth, borderBottomWidth } = getComputedStyle(
-    textareaRef.value as Element
+    textareaRef.value as Element,
   )
 
   const borderTop = parseInt(borderTopWidth)

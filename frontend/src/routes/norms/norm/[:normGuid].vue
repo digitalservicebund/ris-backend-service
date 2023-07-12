@@ -19,13 +19,13 @@ const goBackRoute = { name: "norms" }
 const navigationIsOpen = useToggleStateInRouteQuery(
   "showNavBar",
   route,
-  router.replace
+  router.replace,
 )
 const store = useLoadedNormStore()
 const { loadedNorm } = storeToRefs(store)
 
 const normIsExportable = computed(
-  () => (loadedNorm.value?.files ?? []).length > 0
+  () => (loadedNorm.value?.files ?? []).length > 0,
 )
 const menuItems = useNormMenuItems(normGuid, route, normIsExportable)
 
@@ -64,11 +64,11 @@ const ENTRY_INTO_FORCE_DATE_MAP: Record<string, string> = {
 const entryIntoForceInfo = computed(() => {
   const entryIntoForceItem =
     loadedNorm.value?.metadataSections?.ENTRY_INTO_FORCE?.find(
-      (item) => item.DATE
+      (item) => item.DATE,
     )
   const undefinedDateItem =
     loadedNorm.value?.metadataSections?.ENTRY_INTO_FORCE?.find(
-      (item) => item.UNDEFINED_DATE
+      (item) => item.UNDEFINED_DATE,
     )
 
   if (entryIntoForceItem) {

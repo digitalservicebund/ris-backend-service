@@ -53,13 +53,13 @@ function encodeDate(data?: string): string {
 
 type MetadataValueDecoders = {
   [Property in keyof MetadataValueType]: (
-    data: MetadatumSchema["value"]
+    data: MetadatumSchema["value"],
   ) => MetadataValueType[Property]
 }
 
 type MetadataValueEncoders = {
   [Property in keyof MetadataValueType]: (
-    data: MetadataValueType[Property]
+    data: MetadataValueType[Property],
   ) => MetadatumSchema["value"]
 }
 
@@ -73,7 +73,7 @@ function encodeBoolean(data: boolean): string {
 
 function decodeNormCategory(data: string): NormCategory {
   const decodedCategory = Object.values(NormCategory).find(
-    (category) => category == data
+    (category) => category == data,
   )
   if (decodedCategory) return decodedCategory
   else throw new Error(`Unknown Norm Category: "${data}"`)
@@ -337,12 +337,14 @@ function encodeMetadata(metadata: Metadata): MetadatumSchema[] | null {
     return null
   }
 
-  const encodedMapping = mapValues(metadata, (group, type) =>
-    group?.map((value, index) => ({
-      type,
-      order: index + 1,
-      value: ENCODERS[type](value as never),
-    }))
+  const encodedMapping = mapValues(
+    metadata,
+    (group, type) =>
+      group?.map((value, index) => ({
+        type,
+        order: index + 1,
+        value: ENCODERS[type](value as never),
+      })),
   )
 
   return mergeValues(encodedMapping)
@@ -421,7 +423,7 @@ function encodeMetadata(metadata: Metadata): MetadatumSchema[] | null {
  */
 
 function decodeFootnotesSections(
-  sections: MetadataSectionSchema[]
+  sections: MetadataSectionSchema[],
 ): MetadataSectionSchema[] {
   return sections.map(
     (section: MetadataSectionSchema): MetadataSectionSchema => {
@@ -437,10 +439,10 @@ function decodeFootnotesSections(
                 order: metadata.order,
                 metadata: [metadata],
                 sections: null,
-              })
+              }),
             ),
           }
-    }
+    },
   )
 }
 
@@ -517,7 +519,7 @@ function decodeFootnotesSections(
  */
 
 function encodeFootnotesSections(
-  sections: MetadataSectionSchema[]
+  sections: MetadataSectionSchema[],
 ): MetadataSectionSchema[] {
   return sections.map(
     (section: MetadataSectionSchema): MetadataSectionSchema => {
@@ -531,7 +533,7 @@ function encodeFootnotesSections(
                   (
                     result: MetadatumSchema[],
                     section: MetadataSectionSchema,
-                    index
+                    index,
                   ) => {
                     const footnote = section?.metadata?.at(0)
                     if (footnote != undefined) {
@@ -543,12 +545,12 @@ function encodeFootnotesSections(
                     }
                     return result
                   },
-                  []
+                  [],
                 )
               : null,
             sections: null,
           }
-    }
+    },
   )
 }
 
@@ -605,39 +607,42 @@ function encodeFootnotesSections(
  * @returns un-grouped metadata section object collection
  */
 export function encodeMetadataSections(
-  sections: MetadataSections
+  sections: MetadataSections,
 ): MetadataSectionSchema[] | null {
   if (Object.entries(sections).length == 0) {
     return null
   }
-  const encodedMapping = mapValues(sections, (group, name) =>
-    group?.map((value, index) => {
-      const metadata = filterEntries(
-        value,
-        (data, key) =>
-          Object.keys(MetadatumType).includes(key) && data !== undefined
-      ) as Metadata
+  const encodedMapping = mapValues(
+    sections,
+    (group, name) =>
+      group?.map((value, index) => {
+        const metadata = filterEntries(
+          value,
+          (data, key) =>
+            Object.keys(MetadatumType).includes(key) && data !== undefined,
+        ) as Metadata
 
-      const childSections = filterEntries(
-        value,
-        (data, key) =>
-          Object.keys(MetadataSectionName).includes(key) && data !== undefined
-      ) as MetadataSections
+        const childSections = filterEntries(
+          value,
+          (data, key) =>
+            Object.keys(MetadataSectionName).includes(key) &&
+            data !== undefined,
+        ) as MetadataSections
 
-      return {
-        name,
-        order: index + 1,
-        metadata: encodeMetadata(metadata),
-        sections: encodeMetadataSections(childSections),
-      }
-    })
+        return {
+          name,
+          order: index + 1,
+          metadata: encodeMetadata(metadata),
+          sections: encodeMetadataSections(childSections),
+        }
+      }),
   )
 
   const encodedSections = mergeValues(encodedMapping)
   const nonEmptySections = encodeFootnotesSections(encodedSections).filter(
     (section) =>
       (section.metadata && section.metadata.length > 0) ||
-      (section.sections && section.sections.length > 0)
+      (section.sections && section.sections.length > 0),
   )
   return nonEmptySections
 }
@@ -695,7 +700,7 @@ export function encodeMetadataSections(
  * @returns grouped, mapped, sorted metadata sections
  */
 export function decodeMetadataSections(
-  sections: MetadataSectionSchema[]
+  sections: MetadataSectionSchema[],
 ): MetadataSections {
   const modifiedSections = decodeFootnotesSections(sections)
   const grouped = groupBy(modifiedSections, (section) => section.name)
@@ -717,7 +722,7 @@ export function decodeNorm(norm: NormResponseSchema): Norm {
 }
 
 export function encodeFlatMetadata(
-  flatMetadata: FlatMetadata
+  flatMetadata: FlatMetadata,
 ): FlatMetadataRequestSchema {
   return {
     eli: encodeString(flatMetadata.eli),

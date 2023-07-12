@@ -13,28 +13,28 @@ test.describe("ensuring the publishing of documentunits works as expected", () =
     pageWithBghUser,
   }) => {
     await pageWithBghUser.goto(
-      `/caselaw/documentunit/${documentNumber}/categories`
+      `/caselaw/documentunit/${documentNumber}/categories`,
     )
     await expect(
       pageWithBghUser.locator(
-        "text=Diese Dokumentationseinheit existiert nicht oder sie haben keine Berechtigung"
-      )
+        "text=Diese Dokumentationseinheit existiert nicht oder sie haben keine Berechtigung",
+      ),
     ).toBeVisible()
 
     await pageWithBghUser.goto(`/caselaw/documentunit/${documentNumber}/files`)
     await expect(
       pageWithBghUser.locator(
-        "text=Diese Dokumentationseinheit existiert nicht oder sie haben keine Berechtigung"
-      )
+        "text=Diese Dokumentationseinheit existiert nicht oder sie haben keine Berechtigung",
+      ),
     ).toBeVisible()
 
     await pageWithBghUser.goto(
-      `/caselaw/documentunit/${documentNumber}/publication`
+      `/caselaw/documentunit/${documentNumber}/publication`,
     )
     await expect(
       pageWithBghUser.locator(
-        "text=Diese Dokumentationseinheit existiert nicht oder sie haben keine Berechtigung"
-      )
+        "text=Diese Dokumentationseinheit existiert nicht oder sie haben keine Berechtigung",
+      ),
     ).toBeVisible()
   })
 
@@ -46,7 +46,7 @@ test.describe("ensuring the publishing of documentunits works as expected", () =
     await test.step("publish as authorized user", async () => {
       await navigateToPublication(
         page,
-        prefilledDocumentUnit.documentNumber as string
+        prefilledDocumentUnit.documentNumber as string,
       )
       await page
         .locator("[aria-label='Dokumentationseinheit veröffentlichen']")
@@ -57,7 +57,7 @@ test.describe("ensuring the publishing of documentunits works as expected", () =
     await test.step("attempt to edit categories as unauthorized user", async () => {
       await navigateToCategories(
         pageWithBghUser,
-        prefilledDocumentUnit.documentNumber as string
+        prefilledDocumentUnit.documentNumber as string,
       )
       await pageWithBghUser
         .locator("[aria-label='Entscheidungsdatum']")
@@ -68,8 +68,8 @@ test.describe("ensuring the publishing of documentunits works as expected", () =
       // saving should be forbidden
       await expect(
         pageWithBghUser.locator(
-          "text=Fehler beim Speichern: Keine Berechtigung"
-        )
+          "text=Fehler beim Speichern: Keine Berechtigung",
+        ),
       ).toBeVisible()
 
       // expect the old date
@@ -77,31 +77,31 @@ test.describe("ensuring the publishing of documentunits works as expected", () =
       expect(
         await pageWithBghUser
           .locator("[aria-label='Entscheidungsdatum']")
-          .inputValue()
+          .inputValue(),
       ).toBe("01.01.2020")
     })
 
     await test.step("attempt to upload a file as unauthorized user", async () => {
       await navigateToFiles(
         pageWithBghUser,
-        prefilledDocumentUnit.documentNumber as string
+        prefilledDocumentUnit.documentNumber as string,
       )
       await uploadTestfile(pageWithBghUser, "sample.docx")
       await expect(
-        pageWithBghUser.locator("text=Leider ist ein Fehler aufgetreten.")
+        pageWithBghUser.locator("text=Leider ist ein Fehler aufgetreten."),
       ).toBeVisible()
     })
 
     await test.step("attempt to publish as unauthorized user", async () => {
       await navigateToPublication(
         pageWithBghUser,
-        prefilledDocumentUnit.documentNumber as string
+        prefilledDocumentUnit.documentNumber as string,
       )
       await pageWithBghUser
         .locator("[aria-label='Dokumentationseinheit veröffentlichen']")
         .click()
       await expect(
-        pageWithBghUser.locator("text=Leider ist ein Fehler aufgetreten.")
+        pageWithBghUser.locator("text=Leider ist ein Fehler aufgetreten."),
       ).toBeVisible()
     })
   })

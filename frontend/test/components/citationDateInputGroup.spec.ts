@@ -21,7 +21,7 @@ describe("Citation date/year field", () => {
     renderComponent({ modelValue: { DATE: ["01.01.2020"] } })
 
     const citationDateInputField = screen.getByLabelText(
-      "Zitierdatum Datum"
+      "Zitierdatum Datum",
     ) as HTMLInputElement
 
     expect(citationDateInputField).toBeInTheDocument()
@@ -33,7 +33,7 @@ describe("Citation date/year field", () => {
     renderComponent({ modelValue: { YEAR: ["2013"] } })
 
     const citationYearInputField = screen.getByLabelText(
-      "Zitierdatum Jahresangabe"
+      "Zitierdatum Jahresangabe",
     ) as HTMLInputElement
 
     expect(citationYearInputField).toBeInTheDocument()

@@ -8,7 +8,7 @@ import FieldOfLawService from "@/services/fieldOfLawService"
 function renderComponent(
   options: {
     selectedNodes?: FieldOfLawNode[]
-  } = {}
+  } = {},
 ) {
   return render(FieldOfLawTreeVue, {
     props: {
@@ -46,7 +46,7 @@ describe("FieldOfLawTree", () => {
             isExpanded: false,
           },
         ],
-      })
+      }),
     )
 
   it("Tree is fully closed upon at start", async () => {
@@ -54,7 +54,7 @@ describe("FieldOfLawTree", () => {
     expect(fetchSpy).toBeCalledTimes(0)
     expect(screen.getByText("Alle Sachgebiete anzeigen")).toBeInTheDocument()
     const expandIcons = screen.getAllByLabelText(
-      "root Alle Sachgebiete anzeigen aufklappen"
+      "root Alle Sachgebiete anzeigen aufklappen",
     )
     expect(expandIcons).toHaveLength(1)
     expect(screen.queryByText("Text for AB")).not.toBeInTheDocument()
@@ -66,8 +66,8 @@ describe("FieldOfLawTree", () => {
 
     await user.click(
       screen.getAllByLabelText(
-        "root Alle Sachgebiete anzeigen aufklappen"
-      )[0] as HTMLElement
+        "root Alle Sachgebiete anzeigen aufklappen",
+      )[0] as HTMLElement,
     )
 
     expect(fetchSpy).toBeCalledTimes(1)
@@ -81,8 +81,8 @@ describe("FieldOfLawTree", () => {
 
     await user.click(
       screen.getAllByLabelText(
-        "root Alle Sachgebiete anzeigen aufklappen"
-      )[0] as HTMLElement
+        "root Alle Sachgebiete anzeigen aufklappen",
+      )[0] as HTMLElement,
     )
 
     const node1ids = screen.getAllByText("AB-01")

@@ -20,7 +20,7 @@ const data = computed(() =>
       fieldSize: item.fieldSize,
       value: props.texts[item.name as keyof Texts],
     }
-  })
+  }),
 )
 </script>
 

@@ -64,13 +64,13 @@ async function search(page = 0) {
   const response = await documentUnitService.searchByLinkedDocumentUnit(
     page,
     30,
-    activeCitationRef
+    activeCitationRef,
   )
   if (response.data) {
     searchResultsCurrentPage.value = {
       ...response.data,
       content: response.data.content.map(
-        (decision) => new ActiveCitation({ ...decision })
+        (decision) => new ActiveCitation({ ...decision }),
       ),
     }
     searchResults.value = response.data.content.map((searchResult) => {

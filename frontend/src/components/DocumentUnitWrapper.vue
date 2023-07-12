@@ -19,21 +19,21 @@ const goBackRoute = { name: "caselaw" }
 const navigationIsOpen = useToggleStateInRouteQuery(
   "showNavBar",
   route,
-  router.replace
+  router.replace,
 )
 
 const fileNumberInfo = computed(
-  () => props.documentUnit.coreData.fileNumbers?.[0]
+  () => props.documentUnit.coreData.fileNumbers?.[0],
 )
 
 const decisionDateInfo = computed(() =>
   props.documentUnit.coreData.decisionDate
     ? dayjs(props.documentUnit.coreData.decisionDate).format("DD.MM.YYYY")
-    : undefined
+    : undefined,
 )
 
 const documentationOffice = computed(
-  () => props.documentUnit.coreData.documentationOffice?.label
+  () => props.documentUnit.coreData.documentationOffice?.label,
 )
 
 const courtInfo = computed(() => props.documentUnit.coreData.court?.label)

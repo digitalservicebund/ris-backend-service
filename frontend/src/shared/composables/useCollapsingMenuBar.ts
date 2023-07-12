@@ -34,13 +34,13 @@ export interface MenuButton {
 
 export function useCollapsingMenuBar(
   buttons: Ref<MenuButton[]>,
-  maxBarEntries: Ref<number>
+  maxBarEntries: Ref<number>,
 ) {
   const collapsedButtons = computed(() => {
     let buttonList = new Array(...buttons.value)
     while (buttonList.length > maxBarEntries.value) {
       const collapsableButtonsWithGroup = buttonList.filter(
-        (button) => button.group != undefined && button.isCollapsable === true
+        (button) => button.group != undefined && button.isCollapsable === true,
       )
       if (collapsableButtonsWithGroup.length == 0) {
         const flatButtonList = flattenList(buttonList)
@@ -53,7 +53,7 @@ export function useCollapsingMenuBar(
           childButtons: secondRow,
         }
         buttonList = flatButtonList.filter(
-          (button) => !secondRow.includes(button)
+          (button) => !secondRow.includes(button),
         )
         buttonList.push(moreButton)
         return buttonList
@@ -64,13 +64,13 @@ export function useCollapsingMenuBar(
           .group
 
       const buttonsOfGroup = buttonList.filter(
-        (button) => button.group == lastGroupName
+        (button) => button.group == lastGroupName,
       )
 
       const menuButtonIndex = buttonList.indexOf(buttonsOfGroup[0])
 
       buttonList = buttonList.filter(
-        (button) => !buttonsOfGroup.includes(button)
+        (button) => !buttonsOfGroup.includes(button),
       )
       const menuButton = {
         type: "menu",

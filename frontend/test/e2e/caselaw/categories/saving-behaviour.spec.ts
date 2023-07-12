@@ -36,7 +36,7 @@ test.describe("saving behaviour", () => {
         await waitForInputValue(page, "[aria-label='Spruchkörper']", "VG-001")
       },
       page,
-      { clickSaveButton: true }
+      { clickSaveButton: true },
     )
 
     await waitForSaving(
@@ -45,7 +45,7 @@ test.describe("saving behaviour", () => {
         await waitForInputValue(page, "[aria-label='Spruchkörper']", "VG-002")
       },
       page,
-      { clickSaveButton: true, reload: true }
+      { clickSaveButton: true, reload: true },
     )
 
     await page.reload()
@@ -69,22 +69,22 @@ test.describe("saving behaviour", () => {
         await page.keyboard.press("Enter")
       },
       page,
-      { clickSaveButton: true }
+      { clickSaveButton: true },
     )
 
     await page.goto("/")
     await expect(
-      page.locator(`a[href*="/caselaw/documentunit/${documentNumber}/files"]`)
+      page.locator(`a[href*="/caselaw/documentunit/${documentNumber}/files"]`),
     ).toBeVisible()
     await expect(
       page.locator(".table-row", {
         hasText: documentNumber,
-      })
+      }),
     ).toBeVisible()
     await expect(
       page.locator(".table-row", {
         hasText: fileNumber,
-      })
+      }),
     ).toBeVisible()
   })
 })

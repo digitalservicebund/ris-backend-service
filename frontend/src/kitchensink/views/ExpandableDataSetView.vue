@@ -10,7 +10,7 @@ function chipSummarizer(dataEntry: undefined) {
   return h(
     "div",
     { class: `bg-yellow-700 rounded-full py-4 px-10 text-white font-bold` },
-    defaultSummarizer(dataEntry)
+    defaultSummarizer(dataEntry),
   )
 }
 

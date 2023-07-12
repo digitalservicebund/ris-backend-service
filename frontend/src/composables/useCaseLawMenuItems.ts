@@ -4,7 +4,7 @@ import type { RouteLocationNormalizedLoaded } from "vue-router"
 
 export function useCaseLawMenuItems(
   documentNumber: Ref<string | undefined>,
-  route: RouteLocationNormalizedLoaded
+  route: RouteLocationNormalizedLoaded,
 ) {
   const baseRoute = {
     params: { id: documentNumber.value },

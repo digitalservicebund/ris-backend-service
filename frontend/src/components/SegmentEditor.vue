@@ -22,7 +22,7 @@ const emit = defineEmits<{
 }>()
 
 const suggestionExtensions = props.suggestions.map((options) =>
-  createSuggestionExtension(options)
+  createSuggestionExtension(options),
 )
 const EDITOR_CLASSES = [
   "p-16",
@@ -84,7 +84,7 @@ function parseEditorContentAsSegments(data?: JSONContent): Segment[] {
  * ```
  */
 function insertMewLineTextNodeBetweenParagraphs(
-  paragraphs: JSONContent[]
+  paragraphs: JSONContent[],
 ): JSONContent[] {
   return paragraphs.map((paragraph, index) => {
     const content = paragraph.content ?? []
@@ -98,7 +98,7 @@ function getAllNodes(paragraphs: JSONContent[]): JSONContent[] {
       ...allContentNodes,
       ...(paragraph.content ?? []),
     ],
-    [] as JSONContent[]
+    [] as JSONContent[],
   )
 }
 /**
@@ -186,7 +186,7 @@ function groupEditorNodesByNewLines(nodes: JSONContent[]): JSONContent {
       nodesToAdd.splice(1).forEach((node) => groups.push([node]))
       return groups
     },
-    [[]] as JSONContent[][]
+    [[]] as JSONContent[][],
   )
 }
 function parseSegmentsAsEditorContent(segments?: Segment[]): JSONContent {
@@ -195,13 +195,13 @@ function parseSegmentsAsEditorContent(segments?: Segment[]): JSONContent {
   // TipTap throws errors for empty text nodes. Such can be a result from the
   // former splitting across paragraphs.
   const nodeGroupdsWithoutEmptyTexts = nodeGroups?.map((group: JSONContent[]) =>
-    group.filter(({ text }) => text == undefined || text.length > 0)
+    group.filter(({ text }) => text == undefined || text.length > 0),
   )
   const paragraphs = nodeGroupdsWithoutEmptyTexts?.map(
     (nodeGroup: JSONContent) => ({
       type: "paragraph",
       content: nodeGroup,
-    })
+    }),
   )
   return { type: "doc", content: paragraphs }
 }

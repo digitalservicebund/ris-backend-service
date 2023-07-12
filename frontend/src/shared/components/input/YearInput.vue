@@ -29,7 +29,7 @@ watch(
       inputValue.value = newValue
     }
   },
-  { immediate: true }
+  { immediate: true },
 )
 
 const handlePaste = async (event: ClipboardEvent) => {

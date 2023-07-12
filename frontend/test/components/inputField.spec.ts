@@ -84,7 +84,7 @@ describe("InputField", () => {
     expect(label).toBeInTheDocument()
 
     expect(input.compareDocumentPosition(label)).toBe(
-      Node.DOCUMENT_POSITION_FOLLOWING
+      Node.DOCUMENT_POSITION_FOLLOWING,
     )
   })
 
@@ -95,12 +95,12 @@ describe("InputField", () => {
     const spanLabelFirstPart = screen.queryByText("test label 1") as HTMLElement
     expect(spanLabelFirstPart).toBeInTheDocument()
     const spanLabelSecondPart = screen.queryByText(
-      "test label 2"
+      "test label 2",
     ) as HTMLElement
     expect(spanLabelSecondPart).toBeInTheDocument()
 
     expect(
-      spanLabelFirstPart.compareDocumentPosition(spanLabelSecondPart)
+      spanLabelFirstPart.compareDocumentPosition(spanLabelSecondPart),
     ).toBe(Node.DOCUMENT_POSITION_FOLLOWING)
   })
 
@@ -113,12 +113,12 @@ describe("InputField", () => {
     const spanLabelFirstPart = screen.queryByText("test label 1") as HTMLElement
     expect(spanLabelFirstPart).toBeInTheDocument()
     const spanLabelSecondPart = screen.queryByText(
-      "test label 2"
+      "test label 2",
     ) as HTMLElement
     expect(spanLabelSecondPart).toBeInTheDocument()
 
     expect(
-      spanLabelFirstPart.compareDocumentPosition(spanLabelSecondPart)
+      spanLabelFirstPart.compareDocumentPosition(spanLabelSecondPart),
     ).toBe(Node.DOCUMENT_POSITION_FOLLOWING)
 
     const spanLabelRequired = screen.queryByText("*") as HTMLElement

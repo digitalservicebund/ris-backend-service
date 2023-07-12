@@ -13,7 +13,7 @@ const error = ref<ResponseError>()
 
 async function loadDocumentUnit() {
   const response = await documentUnitService.getByDocumentNumber(
-    props.documentNumber
+    props.documentNumber,
   )
 
   documentUnit.value = response.data
@@ -26,7 +26,7 @@ onMounted(() => loadDocumentUnit())
 <template>
   <DocumentUnitPublication
     v-if="documentUnit"
-    :document-unit="(documentUnit as DocumentUnit)"
+    :document-unit="documentUnit as DocumentUnit"
     @update-document-unit="loadDocumentUnit"
   />
   <RouteErrorDisplay v-else :error="error" />

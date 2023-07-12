@@ -132,7 +132,7 @@ async function determineInputWidth() {
   await nextTick()
 
   const { borderLeftWidth, borderRightWidth } = getComputedStyle(
-    chipsInput.value as Element
+    chipsInput.value as Element,
   )
 
   const borderLeft = parseInt(borderLeftWidth)

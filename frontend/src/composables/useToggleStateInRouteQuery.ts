@@ -5,7 +5,7 @@ export function useToggleStateInRouteQuery(
   queryParameterName: string,
   route: RouteLocationNormalizedLoaded,
   routerCallback: Router["replace"],
-  defaultState = true
+  defaultState = true,
 ) {
   const toggleState = ref(defaultState)
   const queryParameter = computed(() => route.query[queryParameterName])
@@ -17,7 +17,7 @@ export function useToggleStateInRouteQuery(
         toggleState.value = parameter === "true"
       }
     },
-    { immediate: true }
+    { immediate: true },
   )
 
   watch(toggleState, async () => {

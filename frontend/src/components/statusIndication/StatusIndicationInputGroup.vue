@@ -22,7 +22,7 @@ type ChildSectionName =
 
 const childSection = ref<Metadata>({})
 const selectedChildSectionName = ref<ChildSectionName>(
-  MetadataSectionName.REPEAL
+  MetadataSectionName.REPEAL,
 )
 
 watch(
@@ -33,7 +33,7 @@ watch(
     }),
   {
     deep: true,
-  }
+  },
 )
 
 watch(
@@ -56,7 +56,7 @@ watch(
   {
     immediate: true,
     deep: true,
-  }
+  },
 )
 
 watch(selectedChildSectionName, () => (childSection.value = {}))
@@ -71,7 +71,7 @@ const component = computed(() => {
       return NoteStatusIndicationGroup
     default:
       throw new Error(
-        `Unknown announcement child section: "${selectedChildSectionName.value}"`
+        `Unknown announcement child section: "${selectedChildSectionName.value}"`,
       )
   }
 })

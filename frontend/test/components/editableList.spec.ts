@@ -43,7 +43,7 @@ async function renderComponent(options?: {
   const props = {
     editComponent: markRaw(options?.editComponent ?? SimpleTextEditComponent),
     summaryComponent: markRaw(
-      options?.summaryComponent ?? JsonStringifySummary
+      options?.summaryComponent ?? JsonStringifySummary,
     ),
     modelValue: options?.modelValue,
     defaultValue: options?.defaultValue ?? "",
@@ -56,7 +56,7 @@ async function renderComponent(options?: {
 
 async function clickEditButtonOfEntry(
   entryIndex: number,
-  user?: ReturnType<typeof userEvent.setup>
+  user?: ReturnType<typeof userEvent.setup>,
 ): Promise<void> {
   user = user ?? userEvent.setup()
   const allEditButtons = screen.getAllByRole("button", {
@@ -68,7 +68,7 @@ async function clickEditButtonOfEntry(
 
 async function clickDeleteButtonOfEntry(
   entryIndex: number,
-  user?: ReturnType<typeof userEvent.setup>
+  user?: ReturnType<typeof userEvent.setup>,
 ): Promise<void> {
   user = user ?? userEvent.setup()
   const allDeleteButtons = screen.getAllByRole("button", {
@@ -295,7 +295,7 @@ describe("EditableList", () => {
     })
 
     expect(
-      screen.queryByRole("button", { name: "Weitere Angabe" })
+      screen.queryByRole("button", { name: "Weitere Angabe" }),
     ).not.toBeInTheDocument()
   })
 })

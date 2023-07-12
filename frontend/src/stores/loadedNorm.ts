@@ -20,7 +20,7 @@ export const useLoadedNormStore = defineStore("loaded-norm", () => {
       return editNormFrame(
         loadedNorm.value.guid,
         metadataSections ?? {},
-        flatMetadata
+        flatMetadata,
       )
     } else {
       return { status: 404, data: undefined }

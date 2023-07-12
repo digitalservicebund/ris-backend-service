@@ -26,7 +26,7 @@ const wrapperClasses = computed(() => ({
 }))
 
 const labelConverted = computed(() =>
-  Array.isArray(props.label) ? props.label : Array.of(props.label)
+  Array.isArray(props.label) ? props.label : Array.of(props.label),
 )
 </script>
 

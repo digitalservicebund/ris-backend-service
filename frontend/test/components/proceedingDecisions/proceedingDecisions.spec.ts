@@ -43,7 +43,7 @@ describe("DocumentUnitProceedingDecisions", async () => {
 
     expect(screen.getByLabelText("Gericht Rechtszug")).toBeVisible()
     expect(
-      screen.getByLabelText("Entscheidungsdatum Rechtszug")
+      screen.getByLabelText("Entscheidungsdatum Rechtszug"),
     ).toBeInTheDocument()
     expect(screen.getByLabelText("Aktenzeichen Rechtszug")).toBeInTheDocument()
     expect(screen.getByLabelText("Dokumenttyp Rechtszug")).toBeInTheDocument()
@@ -70,7 +70,7 @@ describe("DocumentUnitProceedingDecisions", async () => {
               fileNumber: "testFileNumber1",
             }),
           ],
-        })
+        }),
       )
     const { user } = renderComponent()
     await openExpandableArea(user)
@@ -79,7 +79,7 @@ describe("DocumentUnitProceedingDecisions", async () => {
 
     await user.type(
       await screen.findByLabelText("Aktenzeichen Rechtszug"),
-      "testFileNumber1"
+      "testFileNumber1",
     )
     await user.click(screen.getByLabelText("Entscheidung manuell hinzufügen"))
     expect(fetchSpy).toBeCalledTimes(1)
@@ -90,7 +90,7 @@ describe("DocumentUnitProceedingDecisions", async () => {
   it("does not create decision if undefined", async () => {
     const fetchSpy = vi.spyOn(
       proceedingDecisionService,
-      "createProceedingDecision"
+      "createProceedingDecision",
     )
     const { user } = renderComponent()
     await openExpandableArea(user)
@@ -142,7 +142,7 @@ describe("DocumentUnitProceedingDecisions", async () => {
             first: true,
             last: false,
           },
-        })
+        }),
       )
     const { user } = renderComponent()
     await openExpandableArea(user)
@@ -151,7 +151,7 @@ describe("DocumentUnitProceedingDecisions", async () => {
 
     await user.type(
       await screen.findByLabelText("Aktenzeichen Rechtszug"),
-      "test fileNumber"
+      "test fileNumber",
     )
     await user.click(screen.getByLabelText("Nach Entscheidungen suchen"))
     expect(fetchSpy).toBeCalledTimes(1)
@@ -190,7 +190,7 @@ describe("DocumentUnitProceedingDecisions", async () => {
               first: true,
               last: false,
             },
-          })
+          }),
         )
       const { user } = renderComponent()
       await openExpandableArea(user)

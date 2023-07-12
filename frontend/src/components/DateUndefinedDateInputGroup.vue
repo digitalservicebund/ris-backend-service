@@ -36,7 +36,7 @@ const ENTRY_INTO_FORCE_DATE_TRANSLATIONS: { [Value in UndefinedDate]: string } =
   }
 
 const dropdownItems: DropdownItem[] = Object.entries(
-  ENTRY_INTO_FORCE_DATE_TRANSLATIONS
+  ENTRY_INTO_FORCE_DATE_TRANSLATIONS,
 ).map(([value, label]) => {
   return { label, value }
 })

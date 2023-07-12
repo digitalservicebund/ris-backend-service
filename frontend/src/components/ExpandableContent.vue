@@ -25,11 +25,11 @@ const emit = defineEmits<{
 const localIsExpanded = ref(false)
 
 const iconName = computed(() =>
-  localIsExpanded.value ? props.closeIconName : props.openIconName
+  localIsExpanded.value ? props.closeIconName : props.openIconName,
 )
 
 const ariaLabel = computed(() =>
-  localIsExpanded.value ? "Zuklappen" : "Aufklappen"
+  localIsExpanded.value ? "Zuklappen" : "Aufklappen",
 )
 
 function toggleContentVisibility(): void {
@@ -39,7 +39,7 @@ function toggleContentVisibility(): void {
 watch(
   () => props.isExpanded,
   () => (localIsExpanded.value = props.isExpanded ?? false),
-  { immediate: true }
+  { immediate: true },
 )
 
 watch(localIsExpanded, () => emit("update:isExpanded", localIsExpanded.value))

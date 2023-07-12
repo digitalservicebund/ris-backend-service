@@ -11,7 +11,7 @@ function renderComponent(
     value?: string
     ariaLabel?: string
     items?: DropdownItem[]
-  } = {}
+  } = {},
 ) {
   return render(DropdownInput, {
     props: {

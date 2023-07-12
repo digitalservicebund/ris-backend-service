@@ -61,7 +61,7 @@ function formatDate(date?: string): string {
 
 onMounted(async () => {
   const response = await publishService.getPublicationLog(
-    props.documentUnit.uuid
+    props.documentUnit.uuid,
   )
   if (response.data) {
     loadDone.value = true

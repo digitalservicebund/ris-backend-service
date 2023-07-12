@@ -21,7 +21,7 @@ const fileInput = ref<HTMLInputElement>()
 
 const { inputValue, emitInputEvent } = useInputModel<FileList, Props, Emits>(
   props,
-  emit
+  emit,
 )
 
 function onEnter() {

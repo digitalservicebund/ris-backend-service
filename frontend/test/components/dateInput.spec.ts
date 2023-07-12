@@ -65,7 +65,7 @@ describe("DateInput", () => {
       modelValue: "2022-05-13T18:08:14.036Z",
     })
     const input: HTMLInputElement = screen.queryByLabelText(
-      "aria-label"
+      "aria-label",
     ) as HTMLInputElement
     expect(input).toHaveValue("13.05.2022")
     await userEvent.clear(input)
@@ -84,7 +84,7 @@ describe("DateInput", () => {
       modelValue: "2022-05-13T18:08:14.036Z",
     })
     const input: HTMLInputElement = screen.queryByLabelText(
-      "aria-label"
+      "aria-label",
     ) as HTMLInputElement
     expect(input).toHaveValue("13.05.2022")
     await userEvent.type(input, "{backspace}")
@@ -103,7 +103,7 @@ describe("DateInput", () => {
   it("does not allow dates in the future", async () => {
     const { emitted } = renderComponent()
     const input: HTMLInputElement = screen.queryByLabelText(
-      "aria-label"
+      "aria-label",
     ) as HTMLInputElement
     expect(input).toHaveValue("")
     await userEvent.type(input, "14.05.2099")
@@ -118,14 +118,14 @@ describe("DateInput", () => {
     const array = emitted()["update:validationError"] as ValidationError[][]
 
     expect(
-      array.filter((element) => element[0] !== undefined)[0][0].defaultMessage
+      array.filter((element) => element[0] !== undefined)[0][0].defaultMessage,
     ).toBe("Das aria-label darf nicht in der Zukunft liegen")
   })
 
   it("it allows dates in the future if flag is set", async () => {
     const { emitted } = renderComponent({ isFutureDate: true })
     const input: HTMLInputElement = screen.queryByLabelText(
-      "aria-label"
+      "aria-label",
     ) as HTMLInputElement
     expect(input).toHaveValue("")
     await userEvent.type(input, "14.05.2099")
@@ -139,7 +139,7 @@ describe("DateInput", () => {
   it("does not allow invalid dates", async () => {
     const { emitted } = renderComponent()
     const input: HTMLInputElement = screen.queryByLabelText(
-      "aria-label"
+      "aria-label",
     ) as HTMLInputElement
     await userEvent.type(input, "29.02.2001")
     await nextTick()
@@ -153,7 +153,7 @@ describe("DateInput", () => {
     const array = emitted()["update:validationError"] as ValidationError[][]
 
     expect(
-      array.filter((element) => element[0] !== undefined)[0][0].defaultMessage
+      array.filter((element) => element[0] !== undefined)[0][0].defaultMessage,
     ).toBe("Kein valides Datum")
   })
 

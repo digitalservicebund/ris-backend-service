@@ -9,7 +9,7 @@ import {
 
 async function expectSectionAppearsAfterScroll(
   page: Page,
-  section: MetadataInputSection
+  section: MetadataInputSection,
 ) {
   const locator = page.locator(`a span:text-is('${section.heading}')`)
   await expect(locator).toBeVisible()
@@ -18,15 +18,15 @@ async function expectSectionAppearsAfterScroll(
   if (section.isSingleFieldSection) {
     const firstFieldLabel = section.fields?.[0].label ?? ""
     await expect(
-      page.locator(`h2:text-is("${firstFieldLabel}")`)
+      page.locator(`h2:text-is("${firstFieldLabel}")`),
     ).toBeInViewport()
   } else {
     await expect(
       page
         .locator(
-          `legend:text-is("${section.heading}"), h2:text-is("${section.heading}")`
+          `legend:text-is("${section.heading}"), h2:text-is("${section.heading}")`,
         )
-        .first()
+        .first(),
     ).toBeInViewport()
   }
 }
@@ -37,19 +37,19 @@ testWithImportedNorm(
     await openNorm(
       page,
       normData.metadataSections?.NORM?.[0]?.OFFICIAL_LONG_TITLE?.[0] ?? "",
-      guid
+      guid,
     )
 
     await expect(page).toHaveURL(`/norms/norm/${guid}`)
     await expect(
       page.getByText(
-        normData.metadataSections?.NORM?.[0]?.OFFICIAL_LONG_TITLE?.[0] ?? ""
-      )
+        normData.metadataSections?.NORM?.[0]?.OFFICIAL_LONG_TITLE?.[0] ?? "",
+      ),
     ).toBeVisible()
 
     for (const article of Object.values(normData.articles)) {
       await expect(
-        page.getByText(article.marker, { exact: true })
+        page.getByText(article.marker, { exact: true }),
       ).toBeVisible()
       await expect(page.getByText(article.title, { exact: true })).toBeVisible()
       for (const paragraph of Object.values(article.paragraphs)) {
@@ -57,12 +57,12 @@ testWithImportedNorm(
           await expect(page.getByText(paragraph.text)).toBeVisible()
         } else {
           await expect(
-            page.getByText(paragraph.marker + " " + paragraph.text)
+            page.getByText(paragraph.marker + " " + paragraph.text),
           ).toBeVisible()
         }
       }
     }
-  }
+  },
 )
 
 testWithImportedNorm(
@@ -71,7 +71,7 @@ testWithImportedNorm(
     await openNorm(
       page,
       normData.metadataSections?.NORM?.[0]?.OFFICIAL_LONG_TITLE?.[0] ?? "",
-      guid
+      guid,
     )
 
     // Outer menu
@@ -89,7 +89,7 @@ testWithImportedNorm(
     for (const section of sections) {
       await expectMetadataInputSectionToHaveCorrectDataOnDisplay(page, section)
     }
-  }
+  },
 )
 
 testWithImportedNorm(
@@ -99,7 +99,7 @@ testWithImportedNorm(
     await openNorm(
       page,
       normData.metadataSections?.NORM?.[0]?.OFFICIAL_LONG_TITLE?.[0] ?? "",
-      guid
+      guid,
     )
 
     const locatorFrameButton = page.locator("a:has-text('Rahmen')")
@@ -125,5 +125,5 @@ testWithImportedNorm(
       }
       await expectSectionAppearsAfterScroll(page, section)
     }
-  }
+  },
 )

@@ -18,7 +18,7 @@ const localOpen = ref(false)
 watch(
   () => props.open,
   () => (localOpen.value = props.open ?? false),
-  { immediate: true }
+  { immediate: true },
 )
 
 watch(localOpen, () => emit("update:open", localOpen.value))

@@ -8,7 +8,7 @@ import { MetadatumType } from "@/domain/Norm"
 
 function summarizeFootnotePart(
   part: FootnoteSection,
-  extraTypeClasses = [""]
+  extraTypeClasses = [""],
 ): VNode {
   const typeClasses = [
     "bg-yellow-400",
@@ -25,7 +25,7 @@ function summarizeFootnotePart(
   const contentEmptyHint = h(
     "span",
     { class: [...contentClasses, "text-gray-600"] },
-    "leer"
+    "leer",
   )
   const hasContent = part.content && part.content.trim().length > 0
   const content = hasContent ? contentText : contentEmptyHint
@@ -36,7 +36,7 @@ function summarizePrefix(prefix?: string): VNode | string {
   const prefixNode = h(
     "span",
     { class: ["pr-10", "font-bold"] },
-    prefix?.trim().replaceAll(/\n/g, "<br>")
+    prefix?.trim().replaceAll(/\n/g, "<br>"),
   )
   const hasPrefix = prefix && prefix.trim().length > 0
   return hasPrefix ? prefixNode : ""
@@ -45,11 +45,11 @@ function summarizePrefix(prefix?: string): VNode | string {
 export function summarizeFootnotePerLine(data: Footnote): VNode {
   const prefix =
     data?.FOOTNOTE?.filter((footnote) =>
-      Object.keys(footnote).includes(MetadatumType.FOOTNOTE_REFERENCE)
+      Object.keys(footnote).includes(MetadatumType.FOOTNOTE_REFERENCE),
     )[0]?.FOOTNOTE_REFERENCE[0] ?? undefined
   const segments = data?.FOOTNOTE?.filter(
     (footnote) =>
-      !Object.keys(footnote).includes(MetadatumType.FOOTNOTE_REFERENCE)
+      !Object.keys(footnote).includes(MetadatumType.FOOTNOTE_REFERENCE),
   )?.map((footnote) =>
     h(
       "span",
@@ -58,8 +58,8 @@ export function summarizeFootnotePerLine(data: Footnote): VNode {
           Object.keys(footnote)[0] as keyof typeof MetadatumType
         ],
         content: Object.values(footnote)[0][0],
-      })
-    )
+      }),
+    ),
   )
   const content = h("div", segments)
   return h("div", { class: ["flex", "flex-col", "gap-10"] }, [

@@ -10,7 +10,7 @@ function join(...data: (string | string[])[]): string {
 
 function summarizeUpdate(
   type: MetadataSectionName.STATUS | MetadataSectionName.REISSUE,
-  data: Metadata
+  data: Metadata,
 ): string {
   const typeName = type === MetadataSectionName.STATUS ? "Stand" : "Neufassung"
 

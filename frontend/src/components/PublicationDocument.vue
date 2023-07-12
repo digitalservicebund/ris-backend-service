@@ -53,7 +53,7 @@ function publishDocumentUnit() {
 
 //Required Core Data fields
 const missingCoreDataFields = ref(
-  props.documentUnit.missingRequiredFields.map((field) => fieldLabels[field])
+  props.documentUnit.missingRequiredFields.map((field) => fieldLabels[field]),
 )
 
 //Required Proceeding Decision fields
@@ -67,14 +67,14 @@ const missingProceedingDecisionFields = ref(
         identifier: proceedingDecision.renderDecision,
         missingFields: getMissingProceedingDecisionFields(proceedingDecision),
       }
-    })
+    }),
 )
 
 function getMissingProceedingDecisionFields(
-  proceedingDecision: ProceedingDecision
+  proceedingDecision: ProceedingDecision,
 ) {
   return proceedingDecision.missingRequiredFields.map(
-    (field) => proceedingDecisionFieldLabels[field]
+    (field) => proceedingDecisionFieldLabels[field],
   )
 }
 
@@ -89,7 +89,7 @@ const missingNormsFields = ref(
         identifier: normReference.renderDecision,
         missingFields: getMissingNormsFields(normReference),
       }
-    })
+    }),
 )
 
 function getMissingNormsFields(normReference: NormReference) {
@@ -102,7 +102,7 @@ function getMissingNormsFields(normReference: NormReference) {
     return []
   else {
     return normReference.missingRequiredFields.map(
-      (field) => normFieldLabels[field]
+      (field) => normFieldLabels[field],
     )
   }
 }
@@ -118,12 +118,12 @@ const missingActiveCitationFields = ref(
         identifier: activeCitation.renderDecision,
         missingFields: getActiveCitationsFields(activeCitation),
       }
-    })
+    }),
 )
 
 function getActiveCitationsFields(activeCitation: ActiveCitation) {
   return activeCitation.missingRequiredFields.map(
-    (field) => activeCitationLabels[field]
+    (field) => activeCitationLabels[field],
   )
 }
 
@@ -133,7 +133,7 @@ const fieldsMissing = computed(() =>
   missingNormsFields.value?.length ||
   missingActiveCitationFields.value?.length
     ? true
-    : false
+    : false,
 )
 </script>
 

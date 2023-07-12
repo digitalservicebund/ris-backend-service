@@ -24,7 +24,7 @@ test.describe("norm", () => {
     await waitForInputValue(
       page,
       "[aria-label='RIS-Abkürzung']",
-      "BayWaldNatPV BY"
+      "BayWaldNatPV BY",
     )
   })
 })

@@ -156,7 +156,7 @@ describe("DocumentTypeInputGroup", () => {
     expect(transitionalNormCheckBox).toBeChecked()
     await user.click(transitionalNormCheckBox)
     expect(modelValue.NORM_CATEGORY).not.toContain(
-      NormCategory.TRANSITIONAL_NORM
+      NormCategory.TRANSITIONAL_NORM,
     )
 
     const chipList = screen.getAllByRole("listitem")
