@@ -18,7 +18,7 @@ const clickedIdentifier = ref("")
 const showNorms = ref(false)
 
 const response = await FieldOfLawService.getSelectedFieldsOfLaw(
-  props.documentUnitUuid
+  props.documentUnitUuid,
 )
 
 if (response.data) {
@@ -28,7 +28,7 @@ if (response.data) {
 const handleAdd = async (identifier: string) => {
   const response = await FieldOfLawService.addFieldOfLaw(
     props.documentUnitUuid,
-    identifier
+    identifier,
   )
 
   if (response.data) {
@@ -39,7 +39,7 @@ const handleAdd = async (identifier: string) => {
 const handleRemoveByIdentifier = async (identifier: string) => {
   const response = await FieldOfLawService.removeFieldOfLaw(
     props.documentUnitUuid,
-    identifier
+    identifier,
   )
 
   if (response.data) {
@@ -74,7 +74,7 @@ function selectedFieldsOfLawSummarizer(dataEntry: any) {
         class: "text-blue-800",
         onClick: () => handleIdentifierClickInSummary(dataEntry.identifier),
       },
-      dataEntry.identifier
+      dataEntry.identifier,
     ),
     ", " + dataEntry.text,
   ])

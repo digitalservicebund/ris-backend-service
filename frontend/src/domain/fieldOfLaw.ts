@@ -36,7 +36,7 @@ export function getDescendants(node: FieldOfLawNode) {
   const collect: FieldOfLawNode[] = []
   const collectRecursively = (
     node: FieldOfLawNode,
-    collect: FieldOfLawNode[]
+    collect: FieldOfLawNode[],
   ) => {
     collect.push(node)
     node.children.forEach((child) => collectRecursively(child, collect))

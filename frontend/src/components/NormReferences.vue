@@ -37,12 +37,12 @@ function decisionSummarizer(normEntry: NormReference) {
               "aria-label": "Fehlerhafte Eingabe",
               class: ["material-icons pr-8 text-red-800"],
             },
-            "error_outline"
+            "error_outline",
           ),
           h(
             "div",
             { class: ["label-02-bold text-red-800"] },
-            normEntry.renderDecision
+            normEntry.renderDecision,
           ),
         ])
       : h("div", { class: ["link-02-reg"] }, normEntry.renderDecision),

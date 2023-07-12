@@ -14,7 +14,7 @@ testWithImportedNorm(
     await openNorm(
       page,
       normData.metadataSections?.NORM?.[0]?.OFFICIAL_LONG_TITLE?.[0] ?? "",
-      guid
+      guid,
     )
     const fileName = normData["jurisZipFileName"]
     const locatorFrameButton = page.locator("a:has-text('Rahmen')")
@@ -26,7 +26,7 @@ testWithImportedNorm(
 
     await page.locator("[aria-label='Rahmendaten Speichern Button']").click()
     await expect(
-      page.locator("text=Zuletzt gespeichert um").first()
+      page.locator("text=Zuletzt gespeichert um").first(),
     ).toBeVisible()
 
     const locatorExportMenu = page.locator("a:has-text('Export')")
@@ -34,22 +34,22 @@ testWithImportedNorm(
     await locatorExportMenu.click()
     await expect(page).toHaveURL(`/norms/norm/${guid}/export`)
     const locatorNewGeneration = page.locator(
-      "a:has-text('Neue Zip-Datei generieren')"
+      "a:has-text('Neue Zip-Datei generieren')",
     )
     await expect(locatorNewGeneration).toBeVisible()
     await locatorNewGeneration.click()
 
     const locatorExportButton = page.locator(
-      'a:has-text("Zip Datei speichern")'
+      'a:has-text("Zip Datei speichern")',
     )
     await expect(locatorExportButton).toBeVisible()
 
     const downloadFileContent = await getDownloadedFileContent(page, fileName)
 
     const metadataFileDownloaded = await getMetaDataFileAsString(
-      downloadFileContent
+      downloadFileContent,
     )
 
     expect(metadataFileDownloaded.includes(newValue)).toBeTruthy()
-  }
+  },
 )

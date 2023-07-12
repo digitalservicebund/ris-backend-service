@@ -22,12 +22,12 @@ function renderComponent(options?: {
       parent: defineTextField(
         "text input 1",
         "text input 1",
-        "text input 1 label"
+        "text input 1 label",
       ),
       child: defineTextField(
         "text input 2",
         "text input 2",
-        "text input 2 label"
+        "text input 2 label",
       ),
     },
   }
@@ -42,10 +42,10 @@ describe("NestedInput", () => {
     renderComponent()
 
     const input1 = screen.queryByLabelText(
-      "text input 1 label"
+      "text input 1 label",
     ) as HTMLInputElement
     const input2 = screen.queryByLabelText(
-      "text input 2 label"
+      "text input 2 label",
     ) as HTMLInputElement
 
     expect(input1).toBeInTheDocument()
@@ -61,10 +61,10 @@ describe("NestedInput", () => {
     })
 
     const input1 = screen.queryByLabelText(
-      "text input 1 label"
+      "text input 1 label",
     ) as HTMLInputElement
     const input2 = screen.queryByLabelText(
-      "text input 2 label"
+      "text input 2 label",
     ) as HTMLInputElement
 
     await user.type(input1, " bar")
@@ -83,22 +83,22 @@ describe("NestedInput", () => {
         parent: defineTextField(
           "text input 1",
           "text input 1",
-          "text input label"
+          "text input label",
         ),
         child: defineChipsField(
           "chips input",
           "chips input",
           "chips input label",
-          ""
+          "",
         ),
       },
     })
 
     const input1 = screen.queryByLabelText(
-      "text input label"
+      "text input label",
     ) as HTMLInputElement
     const input2 = screen.queryByLabelText(
-      "chips input label"
+      "chips input label",
     ) as HTMLInputElement
 
     expect(input1).toHaveAttribute("type", "text")

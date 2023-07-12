@@ -22,7 +22,7 @@ async function submitSearch(page: number) {
   const response = await service.searchForFieldsOfLaw(
     page,
     itemsPerPage,
-    searchStr.value
+    searchStr.value,
   )
   if (response.data) {
     currentPage.value = response.data

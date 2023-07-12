@@ -20,14 +20,17 @@
 export function groupBy<
   Key extends PropertyKey,
   Entry,
-  Selector extends (entry: Entry) => Key
+  Selector extends (entry: Entry) => Key,
 >(collection: Entry[], keySelector: Selector): Record<Key, Entry[]> {
-  return collection.reduce((grouped, entry) => {
-    const key = keySelector(entry)
-    const group = grouped[key] ?? []
-    group.push(entry)
-    return { ...grouped, [key]: group }
-  }, {} as Record<Key, Entry[]>)
+  return collection.reduce(
+    (grouped, entry) => {
+      const key = keySelector(entry)
+      const group = grouped[key] ?? []
+      group.push(entry)
+      return { ...grouped, [key]: group }
+    },
+    {} as Record<Key, Entry[]>,
+  )
 }
 
 /**
@@ -47,13 +50,13 @@ export function groupBy<
  */
 export function mapValues<Key extends PropertyKey, Value, Transformed>(
   object: Partial<Record<Key, Value>>,
-  transformer: (value: Value, key: Key) => Transformed
+  transformer: (value: Value, key: Key) => Transformed,
 ): Record<Key, Transformed> {
   return Object.entries(object)
     .map(([key, value]) => [key, transformer(value as Value, key as Key)])
     .reduce(
       (merged, [key, value]) => ({ ...merged, [key as Key]: value }),
-      {} as Record<Key, Transformed>
+      {} as Record<Key, Transformed>,
     )
 }
 
@@ -73,14 +76,14 @@ export function mapValues<Key extends PropertyKey, Value, Transformed>(
  * @returns collection of all values
  */
 export function mergeValues<Type>(
-  object: Record<PropertyKey, Type | Type[]>
+  object: Record<PropertyKey, Type | Type[]>,
 ): Type[] {
   return Object.values(object).reduce(
     (collection: Type[], entry) => [
       ...collection,
       ...(Array.isArray(entry) ? entry : [entry]),
     ],
-    []
+    [],
   )
 }
 
@@ -102,13 +105,13 @@ export function mergeValues<Type>(
  */
 export function filterEntries<Key extends PropertyKey, Value>(
   object: Partial<Record<Key, Value>>,
-  predicate: (value: Value, key: Key) => boolean
+  predicate: (value: Value, key: Key) => boolean,
 ): Record<Key, Value> {
   return Object.entries(object)
     .filter(([key, value]) => predicate(value as Value, key as Key))
     .reduce(
       (merged, [key, value]) => ({ ...merged, [key]: value }),
-      {} as Record<Key, Value>
+      {} as Record<Key, Value>,
     )
 }
 
@@ -128,7 +131,7 @@ export function filterEntries<Key extends PropertyKey, Value>(
  */
 export function compareOrder(
   left: { order: number },
-  right: { order: number }
+  right: { order: number },
 ): number {
   return left.order - right.order
 }

@@ -15,30 +15,30 @@ type RequestOptions = {
 interface HttpClient {
   get<TResponse>(
     url: string,
-    config?: RequestOptions
+    config?: RequestOptions,
   ): Promise<ServiceResponse<TResponse>>
 
   post<TRequest, TResponse>(
     url: string,
     config?: RequestOptions,
-    data?: TRequest
+    data?: TRequest,
   ): Promise<ServiceResponse<TResponse>>
 
   put<TRequest, TResponse>(
     url: string,
     config?: RequestOptions,
-    data?: TRequest
+    data?: TRequest,
   ): Promise<ServiceResponse<TResponse>>
 
   patch<TRequest, TResponse>(
     url: string,
     config?: RequestOptions,
-    data?: TRequest
+    data?: TRequest,
   ): Promise<ServiceResponse<TResponse>>
 
   delete<TResponse>(
     url: string,
-    config?: RequestOptions
+    config?: RequestOptions,
   ): Promise<ServiceResponse<TResponse>>
 }
 
@@ -46,7 +46,7 @@ async function baseHttp<T>(
   url: string,
   method: string,
   options?: RequestOptions,
-  data?: T
+  data?: T,
 ) {
   try {
     const response = await axiosInstance.request({

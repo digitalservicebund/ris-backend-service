@@ -29,7 +29,7 @@ describe("SaveButton", () => {
     })
     await renderAndClick()
     expect(
-      screen.getByText("Zuletzt gespeichert um", { exact: false })
+      screen.getByText("Zuletzt gespeichert um", { exact: false }),
     ).toBeVisible()
   })
 

@@ -28,7 +28,7 @@ async function handleDelete(documentUnitListEntry: DocumentUnitListEntry) {
     const response = await service.delete(documentUnitListEntry.uuid)
     if (response.status === 200) {
       documentUnitListEntries.value = documentUnitListEntries.value.filter(
-        (item) => item != documentUnitListEntry
+        (item) => item != documentUnitListEntry,
       )
     } else {
       alert("Fehler beim Löschen der Dokumentationseinheit: " + response.data)

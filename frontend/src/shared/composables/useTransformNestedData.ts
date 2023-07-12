@@ -38,7 +38,7 @@ function getKeysFromNestedInputKey(combinedKey: string) {
 function mapData(
   data: Record<string, ModelType>,
   parentKey: string,
-  childKey: string
+  childKey: string,
 ): Record<string, ModelType> {
   const nestedData = { ...data }
   delete nestedData[parentKey]
@@ -79,20 +79,20 @@ type Emits = (event: "update:modelValue", value: FieldData) => void
 export function useTransformNestedData<E extends Emits>(
   data: Ref<FieldData>,
   fields: InputField[],
-  emit: E
+  emit: E,
 ) {
   return computed({
     get: () => {
       let nestedData = data.value
       fields
         .filter(
-          (field): field is NestedInputField => field.type === InputType.NESTED
+          (field): field is NestedInputField => field.type === InputType.NESTED,
         )
         .forEach((item) => {
           nestedData = mapData(
             nestedData,
             item.inputAttributes.fields.parent.name,
-            item.inputAttributes.fields.child.name
+            item.inputAttributes.fields.child.name,
           )
         })
       return nestedData

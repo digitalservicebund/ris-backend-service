@@ -29,7 +29,7 @@ const nestedInputFields: NestedInputAttributes["fields"] = {
   child: defineDateField(
     "deviatingField",
     "Abweichender Input",
-    "Abweichender Input"
+    "Abweichender Input",
   ),
 }
 

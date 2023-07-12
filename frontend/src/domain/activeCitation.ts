@@ -40,12 +40,12 @@ export default class ActiveCitation
 
   get missingRequiredFields(): string[] {
     return ActiveCitation.requiredFields.filter((field) =>
-      this.requiredFieldIsEmpty(this[field])
+      this.requiredFieldIsEmpty(this[field]),
     )
   }
 
   private requiredFieldIsEmpty(
-    value: ActiveCitation[(typeof ActiveCitation.requiredFields)[number]]
+    value: ActiveCitation[(typeof ActiveCitation.requiredFields)[number]],
   ): boolean {
     if (value === undefined || !value || value === null) {
       return true

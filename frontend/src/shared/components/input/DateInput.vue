@@ -23,7 +23,7 @@ const emit = defineEmits<{
 
 const inputCompleted = ref<boolean>(false)
 const inputValue = ref(
-  props.modelValue ? dayjs(props.modelValue).format("DD.MM.YYYY") : undefined
+  props.modelValue ? dayjs(props.modelValue).format("DD.MM.YYYY") : undefined,
 )
 
 dayjs.extend(customParseFormat)
@@ -45,7 +45,7 @@ const effectiveHasError = computed(
   () =>
     props.hasError ||
     (inputCompleted.value && !isInPast.value && !props.isFutureDate) ||
-    (inputCompleted.value && !isValidDate.value)
+    (inputCompleted.value && !isValidDate.value),
 )
 
 const conditionalClasses = computed(() => ({
@@ -95,7 +95,7 @@ watch(inputValue, () => {
     isInPast.value &&
     emit(
       "update:modelValue",
-      dayjs(inputValue.value, "DD.MM.YYYY").toISOString()
+      dayjs(inputValue.value, "DD.MM.YYYY").toISOString(),
     )
 })
 

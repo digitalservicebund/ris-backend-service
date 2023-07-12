@@ -20,7 +20,7 @@ function renderComponent(options?: {
 
 function getControls() {
   const dateInput = screen.getByLabelText(
-    "Bestimmtes abweichendes Außerkrafttretedatum Date Input"
+    "Bestimmtes abweichendes Außerkrafttretedatum Date Input",
   ) as HTMLInputElement
 
   const amendmentNormCheckBox = screen.getByRole("checkbox", {
@@ -149,7 +149,7 @@ describe("DivergentExpirationDefinedInputGroup", () => {
     expect(transitionalNormCheckBox).toBeChecked()
     await user.click(transitionalNormCheckBox)
     expect(modelValue.NORM_CATEGORY).not.toContain(
-      NormCategory.TRANSITIONAL_NORM
+      NormCategory.TRANSITIONAL_NORM,
     )
   })
 })

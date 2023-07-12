@@ -29,7 +29,7 @@ describe("Date or UndefinedDate InputGroup Component", () => {
     expect(dateInput).toBeInTheDocument()
 
     const undefinedDateDropdown = screen.queryByLabelText(
-      "undefinedDateDropdownAriaLabel"
+      "undefinedDateDropdownAriaLabel",
     )
     expect(undefinedDateDropdown).not.toBeInTheDocument()
   })
@@ -40,7 +40,7 @@ describe("Date or UndefinedDate InputGroup Component", () => {
     })
 
     const undefinedDateDropdown = screen.getByLabelText(
-      "undefinedDateDropdownAriaLabel"
+      "undefinedDateDropdownAriaLabel",
     )
     expect(undefinedDateDropdown).toHaveAttribute("id", "3")
     expect(undefinedDateDropdown).toBeInTheDocument()

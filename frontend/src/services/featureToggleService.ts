@@ -7,7 +7,7 @@ interface FeatureToggleService {
 const service: FeatureToggleService = {
   async isEnabled(toggleName: string) {
     const response = await httpClient.get<boolean>(
-      "feature-toggles/" + toggleName
+      "feature-toggles/" + toggleName,
     )
     if (response.status >= 300) {
       response.error = {

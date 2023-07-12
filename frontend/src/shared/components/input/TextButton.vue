@@ -67,7 +67,7 @@ const render = () => {
       download,
       target,
     },
-    [renderIcon(), renderLabel()]
+    [renderIcon(), renderLabel()],
   )
 }
 </script>

@@ -7,7 +7,7 @@ import ActiveCitation from "@/domain/activeCitation"
 import ProceedingDecision from "@/domain/proceedingDecision"
 
 function renderSearchResults(
-  searchResults?: SearchResults<ProceedingDecision | ActiveCitation>
+  searchResults?: SearchResults<ProceedingDecision | ActiveCitation>,
 ) {
   const props: {
     searchResults: SearchResults<ProceedingDecision | ActiveCitation>

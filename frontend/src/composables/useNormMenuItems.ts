@@ -5,7 +5,7 @@ import type { RouteLocationNormalizedLoaded } from "vue-router"
 export function useNormMenuItems(
   normGuid: Ref<string>,
   route: RouteLocationNormalizedLoaded,
-  exportIsEnabled?: Ref<boolean>
+  exportIsEnabled?: Ref<boolean>,
 ) {
   const baseRoute = {
     params: { guid: normGuid.value },
@@ -53,7 +53,7 @@ export function useNormMenuItems(
         getChildItem("Stand-Angabe", "statusIndication"),
         getChildItem(
           "Stand der dokumentarischen Bearbeitung",
-          "documentStatus"
+          "documentStatus",
         ),
         getChildItem("Aktivverweisung", "categorizedReferences"),
         getChildItem("Fußnoten", "footnotes"),

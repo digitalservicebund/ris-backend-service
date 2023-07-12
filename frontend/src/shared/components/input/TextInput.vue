@@ -27,7 +27,7 @@ const inputRef = ref<HTMLInputElement | null>()
 
 const { inputValue, emitInputEvent } = useInputModel<string, Props, Emits>(
   props,
-  emit
+  emit,
 )
 
 const conditionalClasses = computed(() => ({

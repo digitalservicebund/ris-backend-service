@@ -5,7 +5,7 @@ import { caselawTest as test } from "../../fixtures"
 // eslint-disable-next-line playwright/no-skipped-test
 test.skip(
   ({ browserName }) => browserName !== "chromium",
-  "Skipping in engines other than chromium, reason playwright diriven for firefox and safari does not support copy paste type='text/html' from clipboard"
+  "Skipping in engines other than chromium, reason playwright diriven for firefox and safari does not support copy paste type='text/html' from clipboard",
 )
 
 test.beforeEach(async ({ page, documentNumber }) => {

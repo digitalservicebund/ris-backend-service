@@ -15,7 +15,7 @@ testWithImportedNorm(
     await openNorm(
       page,
       normData.metadataSections?.NORM?.[0]?.OFFICIAL_LONG_TITLE?.[0] ?? "",
-      guid
+      guid,
     )
 
     const locatorFrameButton = page.locator("a:has-text('Rahmen')")
@@ -30,12 +30,12 @@ testWithImportedNorm(
 
     await page.locator("[aria-label='Rahmendaten Speichern Button']").click()
     await expect(
-      page.locator("text=Zuletzt gespeichert um").first()
+      page.locator("text=Zuletzt gespeichert um").first(),
     ).toBeVisible()
     await page.reload()
 
     for (const section of sections) {
       await expectMetadataInputSectionToHaveCorrectDataOnEdit(page, section)
     }
-  }
+  },
 )

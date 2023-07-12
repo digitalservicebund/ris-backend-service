@@ -20,7 +20,7 @@ type ChildSectionName =
 
 const childSection = ref<Metadata>({})
 const selectedChildSectionName = ref<ChildSectionName>(
-  MetadataSectionName.DIVERGENT_ENTRY_INTO_FORCE_DEFINED
+  MetadataSectionName.DIVERGENT_ENTRY_INTO_FORCE_DEFINED,
 )
 
 watch(
@@ -31,7 +31,7 @@ watch(
     }),
   {
     deep: true,
-  }
+  },
 )
 
 watch(
@@ -50,7 +50,7 @@ watch(
   {
     immediate: true,
     deep: true,
-  }
+  },
 )
 
 watch(selectedChildSectionName, () => (childSection.value = {}))

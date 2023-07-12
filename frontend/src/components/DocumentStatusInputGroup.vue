@@ -27,7 +27,7 @@ watch(
       inputValue.value = newValue
     }
   },
-  { immediate: true }
+  { immediate: true },
 )
 
 watch(inputValue, () => emit("update:modelValue", inputValue.value), {
@@ -45,7 +45,7 @@ interface DropdownItem {
 }
 
 const dropdownItems: DropdownItem[] = Object.entries(
-  PROOF_INDICATION_TRANSLATIONS
+  PROOF_INDICATION_TRANSLATIONS,
 ).map(([value, label]) => {
   return { label, value }
 })

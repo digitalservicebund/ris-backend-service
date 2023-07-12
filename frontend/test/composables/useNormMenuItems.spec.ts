@@ -29,7 +29,7 @@ describe("useNormMenuItems", () => {
   it("lists all expected parent menu items", () => {
     const menuItems = useNormMenuItems(
       ref(""),
-      {} as unknown as RouteLocationNormalizedLoaded
+      {} as unknown as RouteLocationNormalizedLoaded,
     )
 
     const topLebelNames = menuItems.value.map((item) => item.label)
@@ -42,11 +42,11 @@ describe("useNormMenuItems", () => {
   it("disables the export item per default", () => {
     const menuItems = useNormMenuItems(
       ref(""),
-      {} as unknown as RouteLocationNormalizedLoaded
+      {} as unknown as RouteLocationNormalizedLoaded,
     )
 
     const exportMenuItem = menuItems.value.find(
-      (item) => item.label == "Export"
+      (item) => item.label == "Export",
     )
 
     expect(exportMenuItem).toBeDefined()
@@ -58,11 +58,11 @@ describe("useNormMenuItems", () => {
     const menuItems = useNormMenuItems(
       ref(""),
       {} as unknown as RouteLocationNormalizedLoaded,
-      exportIsEnabled
+      exportIsEnabled,
     )
 
     const exportMenuItem = menuItems.value.find(
-      (item) => item.label == "Export"
+      (item) => item.label == "Export",
     )
 
     expect(exportMenuItem).toBeDefined()

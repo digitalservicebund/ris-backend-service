@@ -21,7 +21,7 @@ const selectedInputType = computed({
   set: (value) => {
     emit(
       "update:modelValue",
-      value === InputType.DATE_TIME ? { DATE: [], TIME: [] } : { YEAR: [] }
+      value === InputType.DATE_TIME ? { DATE: [], TIME: [] } : { YEAR: [] },
     )
   },
 })

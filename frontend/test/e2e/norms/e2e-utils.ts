@@ -13,7 +13,7 @@ async function getLocalJurisTestFileFolderPath(): Promise<string> {
   const folderPath = path.join(
     tmpdir(),
     "ris-norms_juris-test-files",
-    VERSION_TAG
+    VERSION_TAG,
   )
   await fs.promises.mkdir(folderPath, { recursive: true })
   return folderPath
@@ -22,7 +22,7 @@ async function getLocalJurisTestFileFolderPath(): Promise<string> {
 async function downloadJurisTestFile(
   request: APIRequestContext,
   fileName: string,
-  localPath: string
+  localPath: string,
 ): Promise<void> {
   const username = process.env.GH_PACKAGES_REPOSITORY_USER
   const password = process.env.GH_PACKAGES_REPOSITORY_TOKEN
@@ -44,7 +44,7 @@ async function downloadJurisTestFile(
 
 export async function loadJurisTestFile(
   request: APIRequestContext,
-  fileName: string
+  fileName: string,
 ): Promise<{ filePath: string; fileContent: Buffer }> {
   const folderPath = await getLocalJurisTestFileFolderPath()
   const filePath = path.join(folderPath, fileName)
@@ -60,7 +60,7 @@ export async function loadJurisTestFile(
 export async function importNormViaApi(
   request: APIRequestContext,
   fileContent: Buffer,
-  fileName: string
+  fileName: string,
 ): Promise<{ guid: string }> {
   const response = await request.post(`/api/v1/norms`, {
     headers: { "Content-Type": "application/zip", "X-Filename": fileName },
@@ -76,7 +76,7 @@ export async function importNormViaApi(
 export const openNorm = async (
   page: Page,
   officialLongTitle: string,
-  guid: string
+  guid: string,
 ) => {
   await page.goto("/norms")
   const listEntry = page.locator(`a[href="/norms/norm/${guid}"]`)
@@ -93,7 +93,7 @@ export async function getDownloadedFileContent(page: Page, filename: string) {
 
   expect(download.suggestedFilename()).toBe(filename)
   expect(
-    (await fs.promises.stat((await download.path()) as string)).size
+    (await fs.promises.stat((await download.path()) as string)).size,
   ).toBeGreaterThan(0)
   const readable = await download.createReadStream()
   const chunks = []
@@ -105,12 +105,12 @@ export async function getDownloadedFileContent(page: Page, filename: string) {
 }
 
 export async function getMetaDataFileAsString(
-  content: Buffer
+  content: Buffer,
 ): Promise<string> {
   return jsZip.loadAsync(content).then(function (zip) {
     const metadataFileName = Object.keys(zip.files)
       .filter(
-        (filename) => filename.endsWith(".xml") && !filename.includes("BJNE")
+        (filename) => filename.endsWith(".xml") && !filename.includes("BJNE"),
       )
       .pop()
     return zip.files[metadataFileName as string]

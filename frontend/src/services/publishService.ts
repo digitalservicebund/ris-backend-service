@@ -3,10 +3,10 @@ import PublicationHistoryRecord from "@/domain/xmlMail"
 
 interface PublishService {
   publishDocument(
-    documentUnitUuid: string
+    documentUnitUuid: string,
   ): Promise<ServiceResponse<PublicationHistoryRecord>>
   getPublicationLog(
-    documentUnitUuid: string
+    documentUnitUuid: string,
   ): Promise<ServiceResponse<PublicationHistoryRecord[]>>
 }
 
@@ -16,7 +16,7 @@ const service: PublishService = {
       `caselaw/documentunits/${documentUnitUuid}/publish`,
       {
         headers: { "Content-Type": "text/plain" },
-      }
+      },
     )
 
     if (response.status >= 300 || Number(response.data?.statusCode) >= 300) {
@@ -36,7 +36,7 @@ const service: PublishService = {
 
   async getPublicationLog(documentUnitUuid: string) {
     const response = await httpClient.get<PublicationHistoryRecord[]>(
-      `caselaw/documentunits/${documentUnitUuid}/publish`
+      `caselaw/documentunits/${documentUnitUuid}/publish`,
     )
 
     response.error =

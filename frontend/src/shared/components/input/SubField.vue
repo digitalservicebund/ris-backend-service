@@ -22,7 +22,7 @@ const expandableContainer = ref()
 const containerHeight = ref(0)
 const localIsExpanded = ref(false)
 const iconName = computed(() =>
-  localIsExpanded.value ? props.iconClosing : props.iconExpanding
+  localIsExpanded.value ? props.iconClosing : props.iconExpanding,
 )
 
 function toggleContentVisibility(): void {
@@ -32,7 +32,7 @@ function toggleContentVisibility(): void {
 watch(
   () => props.isExpanded,
   () => (localIsExpanded.value = props.isExpanded ?? false),
-  { immediate: true }
+  { immediate: true },
 )
 
 watch(localIsExpanded, () => emit("update:isExpanded", localIsExpanded.value))

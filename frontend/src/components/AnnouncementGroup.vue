@@ -24,7 +24,7 @@ type ChildSectionName =
 
 const childSection = ref<Metadata>({})
 const selectedChildSectionName = ref<ChildSectionName>(
-  MetadataSectionName.PRINT_ANNOUNCEMENT
+  MetadataSectionName.PRINT_ANNOUNCEMENT,
 )
 
 watch(
@@ -35,7 +35,7 @@ watch(
     }),
   {
     deep: true,
-  }
+  },
 )
 
 watch(
@@ -59,7 +59,7 @@ watch(
   {
     immediate: true,
     deep: true,
-  }
+  },
 )
 
 watch(selectedChildSectionName, () => (childSection.value = {}))
@@ -76,7 +76,7 @@ const component = computed(() => {
       return OtherOfficialAnnouncementInputGroup
     default:
       throw new Error(
-        `Unknown announcement child section: "${selectedChildSectionName.value}"`
+        `Unknown announcement child section: "${selectedChildSectionName.value}"`,
       )
   }
 })

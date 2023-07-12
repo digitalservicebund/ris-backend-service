@@ -48,7 +48,7 @@ describe("normsService", () => {
       const response = await getAllNorms()
 
       expect(response.error?.title).toBe(
-        "Dokumentationseinheiten konnten nicht geladen werden."
+        "Dokumentationseinheiten konnten nicht geladen werden.",
       )
     })
 
@@ -61,7 +61,7 @@ describe("normsService", () => {
       const response = await getAllNorms()
 
       expect(response.error?.title).toBe(
-        "Dokumentationseinheiten konnten nicht geladen werden."
+        "Dokumentationseinheiten konnten nicht geladen werden.",
       )
     })
   })
@@ -101,7 +101,7 @@ describe("normsService", () => {
       const response = await getNormByGuid("fake-guid")
 
       expect(response.error?.title).toBe(
-        "Dokumentationseinheit konnte nicht geladen werden."
+        "Dokumentationseinheit konnte nicht geladen werden.",
       )
     })
 
@@ -114,7 +114,7 @@ describe("normsService", () => {
       const response = await getNormByGuid("fake-guid")
 
       expect(response.error?.title).toBe(
-        "Dokumentationseinheit konnte nicht geladen werden."
+        "Dokumentationseinheit konnte nicht geladen werden.",
       )
     })
   })
@@ -152,7 +152,7 @@ describe("normsService", () => {
             },
           ],
         },
-        {}
+        {},
       )
 
       expect(httpClientPut).toHaveBeenCalledOnce()
@@ -236,7 +236,7 @@ describe("normsService", () => {
             },
           ],
           eli: null,
-        }
+        },
       )
     })
 
@@ -255,11 +255,11 @@ describe("normsService", () => {
             },
           ],
         },
-        {}
+        {},
       )
 
       expect(response.error?.title).toBe(
-        "Dokumentationseinheit konnte nicht bearbeitet werden."
+        "Dokumentationseinheit konnte nicht bearbeitet werden.",
       )
     })
 
@@ -278,11 +278,11 @@ describe("normsService", () => {
             },
           ],
         },
-        {}
+        {},
       )
 
       expect(response.error?.title).toBe(
-        "Dokumentationseinheit konnte nicht bearbeitet werden."
+        "Dokumentationseinheit konnte nicht bearbeitet werden.",
       )
     })
   })
@@ -306,7 +306,7 @@ describe("normsService", () => {
             "X-Filename": "test.zip",
           },
         },
-        file
+        file,
       )
     })
 

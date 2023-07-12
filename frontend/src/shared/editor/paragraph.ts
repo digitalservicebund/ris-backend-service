@@ -21,17 +21,17 @@ export const CustomParagraph = Paragraph.extend({
                 .filter(
                   (s) =>
                     s.length > 0 &&
-                    (s.includes("display") || s.includes("text-align"))
-                )
+                    (s.includes("display") || s.includes("text-align")),
+                ),
             ),
           ]
           const display = listIndexStyle.filter((style) =>
-            style.includes("display")
+            style.includes("display"),
           )
           const displayStyle =
             display.length > 0 ? display[display.length - 1] + ";" : ""
           const textAlign = listIndexStyle.filter((style) =>
-            style.includes("text-align")
+            style.includes("text-align"),
           )
           const textAlignStyle =
             !JSON.stringify(attributes).includes("textAlign") &&

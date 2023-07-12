@@ -5,14 +5,14 @@ interface KeywordService {
   addKeyword(uuid: string, keyword: string): Promise<ServiceResponse<string[]>>
   deleteKeyword(
     uuid: string,
-    keyword: string
+    keyword: string,
   ): Promise<ServiceResponse<string[]>>
 }
 
 const service: KeywordService = {
   async getKeywords(uuid: string) {
     const response = await httpClient.get<string[]>(
-      `caselaw/documentunits/${uuid}/contentrelatedindexing/keywords`
+      `caselaw/documentunits/${uuid}/contentrelatedindexing/keywords`,
     )
     if (response.status >= 300) {
       response.error = {

@@ -4,19 +4,19 @@ import { Page, PageableService } from "@/shared/components/Pagination.vue"
 
 interface FieldOfLawService {
   getSelectedFieldsOfLaw(
-    uuid: string
+    uuid: string,
   ): Promise<ServiceResponse<FieldOfLawNode[]>>
   addFieldOfLaw(
     uuid: string,
-    identifier: string
+    identifier: string,
   ): Promise<ServiceResponse<FieldOfLawNode[]>>
   removeFieldOfLaw(
     uuid: string,
-    identifier: string
+    identifier: string,
   ): Promise<ServiceResponse<FieldOfLawNode[]>>
   getChildrenOf(identifier: string): Promise<ServiceResponse<FieldOfLawNode[]>>
   getTreeForIdentifier(
-    identifier: string
+    identifier: string,
   ): Promise<ServiceResponse<FieldOfLawNode>>
   searchForFieldsOfLaw: PageableService<FieldOfLawNode, string>
 }
@@ -24,7 +24,7 @@ interface FieldOfLawService {
 const service: FieldOfLawService = {
   async getSelectedFieldsOfLaw(uuid: string) {
     const response = await httpClient.get<FieldOfLawNode[]>(
-      `caselaw/documentunits/${uuid}/contentrelatedindexing/fieldsoflaw`
+      `caselaw/documentunits/${uuid}/contentrelatedindexing/fieldsoflaw`,
     )
     if (response.status >= 300) {
       response.error = {
@@ -35,7 +35,7 @@ const service: FieldOfLawService = {
   },
   async addFieldOfLaw(uuid: string, identifier: string) {
     const response = await httpClient.put<undefined, FieldOfLawNode[]>(
-      `caselaw/documentunits/${uuid}/contentrelatedindexing/fieldsoflaw/${identifier}`
+      `caselaw/documentunits/${uuid}/contentrelatedindexing/fieldsoflaw/${identifier}`,
     )
     if (response.status >= 300) {
       response.error = {
@@ -47,7 +47,7 @@ const service: FieldOfLawService = {
   },
   async removeFieldOfLaw(uuid: string, identifier: string) {
     const response = await httpClient.delete<FieldOfLawNode[]>(
-      `caselaw/documentunits/${uuid}/contentrelatedindexing/fieldsoflaw/${identifier}`
+      `caselaw/documentunits/${uuid}/contentrelatedindexing/fieldsoflaw/${identifier}`,
     )
     if (response.status >= 300) {
       response.error = {
@@ -59,7 +59,7 @@ const service: FieldOfLawService = {
   },
   async getChildrenOf(identifier: string) {
     const response = await httpClient.get<FieldOfLawNode[]>(
-      `caselaw/fieldsoflaw/${identifier}/children`
+      `caselaw/fieldsoflaw/${identifier}/children`,
     )
     if (response.status >= 300) {
       response.error = {
@@ -73,7 +73,7 @@ const service: FieldOfLawService = {
   },
   async getTreeForIdentifier(identifier: string) {
     const response = await httpClient.get<FieldOfLawNode>(
-      `caselaw/fieldsoflaw/${identifier}/tree`
+      `caselaw/fieldsoflaw/${identifier}/tree`,
     )
     if (response.status >= 300) {
       response.error = {
@@ -85,7 +85,7 @@ const service: FieldOfLawService = {
   async searchForFieldsOfLaw(page: number, size: number, query?: string) {
     const response = await httpClient.get<Page<FieldOfLawNode>>(
       `caselaw/fieldsoflaw?pg=${page}&sz=${size}`,
-      { params: { q: query ?? "" } }
+      { params: { q: query ?? "" } },
     )
     if (response.status >= 300) {
       response.error = {

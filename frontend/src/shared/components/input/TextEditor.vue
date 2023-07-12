@@ -286,16 +286,16 @@ const editorButtons = computed(() =>
       button.group == "alignment"
         ? editor.isActive({ textAlign: button.type })
         : editor.isActive(button.type),
-  }))
+  })),
 )
 const buttonSize = 48 //px
 const containerWidth = ref()
 const maxButtonEntries = computed(() =>
-  Math.floor((containerWidth.value - 100) / buttonSize)
+  Math.floor((containerWidth.value - 100) / buttonSize),
 )
 const { collapsedButtons } = useCollapsingMenuBar(
   editorButtons,
-  maxButtonEntries
+  maxButtonEntries,
 )
 const showSecondRow = ref(false)
 
@@ -314,7 +314,7 @@ watch(
     }
     // incoming changes
     editor.commands.setContent(value, false)
-  }
+  },
 )
 
 const showButtons = () => {

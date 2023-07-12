@@ -13,7 +13,7 @@ const props = withDefaults(
     ariaLabel: "Infomodal",
     description: "",
     status: InfoStatus.ERROR,
-  }
+  },
 )
 type ModalAttribute = {
   borderClass: string

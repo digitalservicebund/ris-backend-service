@@ -28,7 +28,7 @@ const emit = defineEmits<Emits>()
 
 const { inputValue, emitInputEvent } = useInputModel<boolean, Props, Emits>(
   props,
-  emit
+  emit,
 )
 
 const isInvalid = computed(() => props.validationError !== undefined)

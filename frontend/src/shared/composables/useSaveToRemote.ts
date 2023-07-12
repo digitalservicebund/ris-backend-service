@@ -3,7 +3,7 @@ import { ServiceResponse, ResponseError } from "@/services/httpClient"
 
 export function useSaveToRemote(
   saveCallback: () => Promise<ServiceResponse<void>>,
-  autoSaveInterval = 0
+  autoSaveInterval = 0,
 ) {
   const saveIsInProgress = ref(false)
   const lastSaveError = ref<ResponseError | undefined>(undefined)

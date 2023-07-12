@@ -18,7 +18,7 @@ const listEntriesWithStatus = computed(() =>
   props.documentUnitListEntries.map((entry) => ({
     ...entry,
     status: useStatusBadge(entry.status).value,
-  }))
+  })),
 )
 
 const showModal = ref(false)
@@ -43,7 +43,7 @@ function toggleModal() {
   }
 }
 function setSelectedDocumentUnitListEntry(
-  documentUnitListEntry: DocumentUnitListEntry
+  documentUnitListEntry: DocumentUnitListEntry,
 ) {
   selectedDocumentUnitListEntry.value = documentUnitListEntry
   popupModalText.value = `Möchten Sie die Dokumentationseinheit ${selectedDocumentUnitListEntry.value.documentNumber} wirklich dauerhaft löschen?`
@@ -135,15 +135,15 @@ function onDelete() {
             @click="
               setSelectedDocumentUnitListEntry(
                 documentUnitListEntries.find(
-                  (entry) => entry.uuid == listEntry.uuid
-                ) as DocumentUnitListEntry
+                  (entry) => entry.uuid == listEntry.uuid,
+                ) as DocumentUnitListEntry,
               )
             "
             @keyup.enter="
               setSelectedDocumentUnitListEntry(
                 documentUnitListEntries.find(
-                  (entry) => entry.uuid == listEntry.uuid
-                ) as DocumentUnitListEntry
+                  (entry) => entry.uuid == listEntry.uuid,
+                ) as DocumentUnitListEntry,
               )
             "
           >

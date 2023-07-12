@@ -15,7 +15,7 @@ function renderComponent(
     modelValue?: ComboboxItem
     itemService?: ComboboxAttributes["itemService"]
     ariaLabel?: string
-  } = {}
+  } = {},
 ) {
   return render(ComboboxInput, {
     props: {
@@ -172,7 +172,7 @@ describe("Combobox Element", () => {
     expect(input).toHaveValue("testItem2")
 
     const openDropdownContainer = screen.getByLabelText(
-      "Dropdown öffnen"
+      "Dropdown öffnen",
     ) as HTMLElement
     await user.click(openDropdownContainer)
     // the filter is still set to "testItem2", so we expect only that one item
@@ -194,7 +194,7 @@ describe("Combobox Element", () => {
               },
             },
           ],
-        })
+        }),
       )
 
     renderComponent({
@@ -227,7 +227,7 @@ describe("Combobox Element", () => {
     const fetchSpy = vi
       .spyOn(service, "getCourts")
       .mockImplementation(() =>
-        Promise.resolve({ status: 200, data: dropdownItems })
+        Promise.resolve({ status: 200, data: dropdownItems }),
       )
 
     renderComponent({
@@ -261,7 +261,7 @@ describe("Combobox Element", () => {
     const fetchSpy = vi
       .spyOn(service, "getCourts")
       .mockImplementation(() =>
-        Promise.resolve({ status: 200, data: dropdownItems })
+        Promise.resolve({ status: 200, data: dropdownItems }),
       )
 
     renderComponent({
@@ -296,7 +296,7 @@ describe("Combobox Element", () => {
     const fetchSpy = vi
       .spyOn(service, "getCourts")
       .mockImplementation(() =>
-        Promise.resolve({ status: 200, data: dropdownItems })
+        Promise.resolve({ status: 200, data: dropdownItems }),
       )
 
     renderComponent({
@@ -313,7 +313,7 @@ describe("Combobox Element", () => {
     expect(dropdownItemElements[0]).toHaveTextContent("ABC")
 
     const additionalInfoElement = screen.getAllByLabelText(
-      "additional-dropdown-info"
+      "additional-dropdown-info",
     )
     expect(additionalInfoElement.length).toBe(1)
     expect(additionalInfoElement[0]).toHaveTextContent("aufgehoben seit: 1973")

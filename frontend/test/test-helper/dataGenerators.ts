@@ -124,7 +124,7 @@ export function generateString(options?: {
 
   for (let i = 0; i < length; i++) {
     output += characterSet.charAt(
-      generateRandomNumber(0, characterSet.length - 1)
+      generateRandomNumber(0, characterSet.length - 1),
     )
   }
 
@@ -132,7 +132,7 @@ export function generateString(options?: {
 }
 
 export function generateBaseInputAttributes(
-  partialAttributes?: Partial<BaseInputAttributes>
+  partialAttributes?: Partial<BaseInputAttributes>,
 ): BaseInputAttributes {
   return {
     ariaLabel: generateString({ prefix: "aria-label-" }),
@@ -141,7 +141,7 @@ export function generateBaseInputAttributes(
 }
 
 export function generateTextInputAttributes(
-  partialAttributes?: Partial<TextInputAttributes>
+  partialAttributes?: Partial<TextInputAttributes>,
 ): TextInputAttributes {
   return {
     ...generateBaseInputAttributes(),
@@ -151,7 +151,7 @@ export function generateTextInputAttributes(
 }
 
 export function generateBaseInputField(
-  partialField?: Partial<BaseInputField>
+  partialField?: Partial<BaseInputField>,
 ): BaseInputField {
   return {
     type: InputType.TEXT,
@@ -163,7 +163,7 @@ export function generateBaseInputField(
 }
 
 export function generateTextInputField(
-  partialField?: Partial<TextInputField>
+  partialField?: Partial<TextInputField>,
 ): TextInputField {
   return {
     ...generateBaseInputField(),
@@ -197,7 +197,7 @@ export function generateGuid(): string {
 }
 
 export function generateParagraph(
-  partialParagraph?: Partial<Paragraph>
+  partialParagraph?: Partial<Paragraph>,
 ): Paragraph {
   return {
     guid: generateGuid(),
@@ -286,7 +286,7 @@ export function pickRandomMetadataSectionName(): MetadataSectionName {
 }
 
 export function generateMetadataSections(
-  partialSections?: Partial<MetadataSections>
+  partialSections?: Partial<MetadataSections>,
 ): MetadataSections {
   const sections = {} as MetadataSections
 
@@ -306,7 +306,7 @@ export function generateMetadataSections(
 }
 
 export function generateFlatMetadata(
-  partialFlatMetadata?: Partial<FlatMetadata>
+  partialFlatMetadata?: Partial<FlatMetadata>,
 ): FlatMetadata {
   return {
     eli: generateString(),

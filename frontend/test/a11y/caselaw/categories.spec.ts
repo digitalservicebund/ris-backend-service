@@ -21,7 +21,7 @@ test.describe("a11y of categories page (/caselaw/documentunit/{documentNumber}/c
       .locator("[aria-label='Gericht'] + button.input-expand-icon")
       .click()
     await expect(page.locator("[aria-label='dropdown-option']")).toHaveCount(
-      3925
+      3925,
     )
 
     await expect(page.locator("text=AG Aachen")).toBeVisible()
@@ -138,7 +138,7 @@ test.describe("a11y of categories page (/caselaw/documentunit/{documentNumber}/c
         })
       },
       page,
-      { clickSaveButton: true }
+      { clickSaveButton: true },
     )
     await page.reload()
     await toggleProceedingDecisionsSection(page)

@@ -50,7 +50,7 @@ describe("keywordsService", () => {
 
     const getResult = await service.getKeywords("docunit123")
     expect(getResult.error?.title).toEqual(
-      "Schlagwörter konnten nicht geladen werden."
+      "Schlagwörter konnten nicht geladen werden.",
     )
   })
 
@@ -62,7 +62,7 @@ describe("keywordsService", () => {
 
     const putResult = await service.addKeyword("docunit123", "three")
     expect(putResult.error?.title).toEqual(
-      "Schlagwort three konnte nicht hinzugefügt werden"
+      "Schlagwort three konnte nicht hinzugefügt werden",
     )
   })
 
@@ -74,7 +74,7 @@ describe("keywordsService", () => {
 
     const deleteResult = await service.deleteKeyword("docunit123", "three")
     expect(deleteResult.error?.title).toEqual(
-      "Schlagwort three konnte nicht entfernt werden"
+      "Schlagwort three konnte nicht entfernt werden",
     )
   })
 })

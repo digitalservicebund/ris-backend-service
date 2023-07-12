@@ -33,17 +33,17 @@ const dropdownItemsRef = ref<HTMLElement>()
 const inputFieldRef = ref<HTMLInputElement>()
 const focusedItemIndex = ref<number>(0)
 const ariaLabelDropdownIcon = computed(() =>
-  showDropdown.value ? "Dropdown schließen" : "Dropdown öffnen"
+  showDropdown.value ? "Dropdown schließen" : "Dropdown öffnen",
 )
 
 const conditionalClasses = computed(() =>
   props.hasError
     ? "border-red-800 bg-red-200 focus:shadow-red-800 placeholder-black"
-    : "bg-white border-blue-800 focus:shadow-blue-800 h-64 hover:shadow-blue-800"
+    : "bg-white border-blue-800 focus:shadow-blue-800 h-64 hover:shadow-blue-800",
 )
 
 const placeholderColor = computed(() =>
-  props.hasError ? "placeholder-black" : ""
+  props.hasError ? "placeholder-black" : "",
 )
 
 const toggleDropdown = async () => {
@@ -166,7 +166,7 @@ watch(
   () => {
     inputText.value = props.modelValue?.label
   },
-  { immediate: true }
+  { immediate: true },
 )
 
 onMounted(() => {

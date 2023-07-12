@@ -4,7 +4,7 @@ export async function createDataTransfer(
   page: Page,
   fileContent: Buffer,
   fileName: string,
-  fileType: string
+  fileType: string,
 ): Promise<JSHandle<DataTransfer>> {
   return page.evaluateHandle(
     async ({ buffer, fileName, fileType }) => {
@@ -16,10 +16,10 @@ export async function createDataTransfer(
     },
     {
       buffer: `data:application/octet-stream;base64,${fileContent.toString(
-        "base64"
+        "base64",
       )}`,
       fileName,
       fileType,
-    }
+    },
   )
 }

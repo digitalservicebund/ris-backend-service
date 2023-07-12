@@ -22,7 +22,7 @@ watch(
       inputValue.value = newValue
     }
   },
-  { immediate: true }
+  { immediate: true },
 )
 
 const OTHER_TYPE_TRANSLATIONS: { [Value in OtherType]: string } = {
@@ -37,7 +37,7 @@ interface DropdownItem {
 }
 
 const dropdownItems: DropdownItem[] = Object.entries(
-  OTHER_TYPE_TRANSLATIONS
+  OTHER_TYPE_TRANSLATIONS,
 ).map(([value, label]) => {
   return { label, value }
 })

@@ -54,7 +54,7 @@ class SuggestionMenuRenderer {
 }
 
 function createSuggestionExtensionOptions(
-  options: SuggestionGroupOptions
+  options: SuggestionGroupOptions,
 ): MentionOptions {
   return {
     HTMLAttributes: {
@@ -128,7 +128,7 @@ export interface SuggestionGroupOptions {
  * functionality by TipTap.
  */
 export function createSuggestionExtension(
-  options: SuggestionGroupOptions
+  options: SuggestionGroupOptions,
 ): AnyExtension {
   const extension = Mention.extend({ name: options.segmentType })
   const extensionOptions = createSuggestionExtensionOptions(options)

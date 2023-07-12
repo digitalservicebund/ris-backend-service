@@ -25,11 +25,11 @@ const enhancedActiveMenuItems = computed(() =>
           ...levelTwoItem,
           classes: getClassesForMenuItem(levelTwoItem),
         })),
-    }))
+    })),
 )
 
 function getClassesForMenuItem(
-  menuItem: LevelOneMenuItem | LevelTwoMenuItem
+  menuItem: LevelOneMenuItem | LevelTwoMenuItem,
 ): Record<string, boolean> {
   const { isDisabled } = menuItem
   const isActive = checkIfMenuItemIsActive(menuItem)
@@ -40,7 +40,7 @@ function getClassesForMenuItem(
 }
 
 function checkIfLevelOneItemIsExpanded(
-  levelOneItem: LevelOneMenuItem
+  levelOneItem: LevelOneMenuItem,
 ): boolean {
   const activeChilds = levelOneItem.children?.filter((item) => {
     return checkIfMenuItemIsActive(item)
@@ -51,7 +51,7 @@ function checkIfLevelOneItemIsExpanded(
 }
 
 function checkIfMenuItemIsActive(
-  menuItem: LevelOneMenuItem & LevelTwoMenuItem
+  menuItem: LevelOneMenuItem & LevelTwoMenuItem,
 ): boolean {
   const activeChilds = menuItem.children?.filter((item) => {
     return checkIfMenuItemIsActive(item)
@@ -74,7 +74,7 @@ function checkIfMenuItemIsActive(
  */
 function routesAreMatching(
   routeOne: RouteLocationRaw,
-  routeTwo: RouteLocationRaw
+  routeTwo: RouteLocationRaw,
 ): boolean {
   const parsedRouteOne = parseRouteLocation(routeOne)
   const parsedRouteTwo = parseRouteLocation(routeTwo)

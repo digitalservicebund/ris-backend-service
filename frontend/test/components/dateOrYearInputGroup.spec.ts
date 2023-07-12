@@ -22,7 +22,7 @@ function renderComponent(options?: {
 
 async function changeToYearInput() {
   const yearRadioButton = screen.getByLabelText(
-    "Jahresangabe"
+    "Jahresangabe",
   ) as HTMLInputElement
   expect(yearRadioButton).toBeInTheDocument()
   expect(yearRadioButton).toBeVisible()
@@ -50,10 +50,10 @@ describe("date/year field", () => {
       renderComponent()
       const dateRadioButton = screen.getByLabelText("Datum") as HTMLInputElement
       const yearRadioButton = screen.getByLabelText(
-        "Jahresangabe"
+        "Jahresangabe",
       ) as HTMLInputElement
       const dateInputField = screen.getByLabelText(
-        "test-label Datum"
+        "test-label Datum",
       ) as HTMLInputElement
 
       expect(dateRadioButton).toBeInTheDocument()
@@ -71,7 +71,7 @@ describe("date/year field", () => {
     it("User can enter a date input", async () => {
       renderComponent()
       const dateInputField = screen.getByLabelText(
-        "test-label Datum"
+        "test-label Datum",
       ) as HTMLInputElement
 
       expect(dateInputField).toBeInTheDocument()
@@ -88,7 +88,7 @@ describe("date/year field", () => {
       renderComponent({ modelValue })
 
       const dateInputField = screen.getByLabelText(
-        "test-label Datum"
+        "test-label Datum",
       ) as HTMLInputElement
 
       expect(dateInputField).toHaveValue("12.05.2020")
@@ -102,7 +102,7 @@ describe("date/year field", () => {
       renderComponent()
       await changeToYearInput()
       const yearInputField = screen.getByLabelText(
-        "test-label"
+        "test-label",
       ) as HTMLInputElement
 
       expect(yearInputField).toBeInTheDocument()
@@ -113,7 +113,7 @@ describe("date/year field", () => {
       renderComponent()
       await changeToYearInput()
       const yearInputField = screen.getByLabelText(
-        "test-label"
+        "test-label",
       ) as HTMLInputElement
 
       expect(yearInputField).toBeInTheDocument()
@@ -129,7 +129,7 @@ describe("date/year field", () => {
       renderComponent()
       await changeToYearInput()
       const yearInputField = screen.getByLabelText(
-        "test-label"
+        "test-label",
       ) as HTMLInputElement
 
       expect(yearInputField).toBeInTheDocument()
@@ -146,7 +146,7 @@ describe("date/year field", () => {
       renderComponent({ modelValue })
 
       const yearInputField = screen.getByLabelText(
-        "test-label"
+        "test-label",
       ) as HTMLInputElement
 
       expect(yearInputField).toHaveValue("2023")
@@ -160,7 +160,7 @@ describe("date/year field", () => {
       renderComponent()
 
       const dateInputField = screen.getByLabelText(
-        "test-label Datum"
+        "test-label Datum",
       ) as HTMLInputElement
 
       expect(dateInputField).toBeInTheDocument()
@@ -174,7 +174,7 @@ describe("date/year field", () => {
       await changeToYearInput()
 
       const yearInputFieldNew = screen.getByLabelText(
-        "test-label"
+        "test-label",
       ) as HTMLInputElement
 
       await userEvent.type(yearInputFieldNew, "1989")
@@ -183,7 +183,7 @@ describe("date/year field", () => {
       await changeToDateInput()
 
       const dateInputFieldNew = screen.getByLabelText(
-        "test-label Datum"
+        "test-label Datum",
       ) as HTMLInputElement
 
       expect(dateInputFieldNew).not.toHaveValue()
@@ -193,7 +193,7 @@ describe("date/year field", () => {
       renderComponent()
       await changeToYearInput()
       const yearInputField = screen.getByLabelText(
-        "test-label"
+        "test-label",
       ) as HTMLInputElement
 
       expect(yearInputField).toBeInTheDocument()
@@ -205,7 +205,7 @@ describe("date/year field", () => {
       await changeToDateInput()
 
       const dateInputField = screen.getByLabelText(
-        "test-label Datum"
+        "test-label Datum",
       ) as HTMLInputElement
 
       expect(dateInputField).toBeInTheDocument()
@@ -219,7 +219,7 @@ describe("date/year field", () => {
       await changeToYearInput()
 
       const yearInputFieldNew = screen.getByLabelText(
-        "test-label"
+        "test-label",
       ) as HTMLInputElement
 
       expect(yearInputFieldNew).not.toHaveValue()

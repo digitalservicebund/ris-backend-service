@@ -99,18 +99,18 @@ export default class DocumentUnit {
 
     if (data.proceedingDecisions)
       data.proceedingDecisions = data.proceedingDecisions.map(
-        (decision) => new ProceedingDecision({ ...decision })
+        (decision) => new ProceedingDecision({ ...decision }),
       )
 
     if (data.contentRelatedIndexing?.norms)
       data.contentRelatedIndexing.norms = data.contentRelatedIndexing.norms.map(
-        (norm) => new NormReference({ ...norm })
+        (norm) => new NormReference({ ...norm }),
       )
 
     if (data.contentRelatedIndexing?.activeCitations)
       data.contentRelatedIndexing.activeCitations =
         data.contentRelatedIndexing.activeCitations.map(
-          (activeCitations) => new ActiveCitation({ ...activeCitations })
+          (activeCitations) => new ActiveCitation({ ...activeCitations }),
         )
 
     Object.assign(this, data)
@@ -120,16 +120,16 @@ export default class DocumentUnit {
   }
   get missingRequiredFields() {
     return DocumentUnit.requiredFields.filter((field) =>
-      this.isEmpty(this.coreData[field])
+      this.isEmpty(this.coreData[field]),
     )
   }
   public static isRequiredField(fieldName: string) {
     return DocumentUnit.requiredFields.some(
-      (requiredfieldName) => requiredfieldName === fieldName
+      (requiredfieldName) => requiredfieldName === fieldName,
     )
   }
   public isEmpty(
-    value: CoreData[(typeof DocumentUnit.requiredFields)[number]]
+    value: CoreData[(typeof DocumentUnit.requiredFields)[number]],
   ) {
     if (value === undefined || !value) {
       return true

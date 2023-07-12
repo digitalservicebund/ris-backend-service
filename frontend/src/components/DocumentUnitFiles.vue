@@ -18,7 +18,7 @@ const isUploading = ref(false)
 async function handleDeleteFile() {
   if ((await fileService.delete(props.documentUnit.uuid)).status < 300) {
     const updateResponse = await documentUnitService.getByDocumentNumber(
-      props.documentUnit.documentNumber as string
+      props.documentUnit.documentNumber as string,
     )
     if (updateResponse.error) {
       console.error(updateResponse.error)

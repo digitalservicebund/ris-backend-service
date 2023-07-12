@@ -17,7 +17,7 @@ export function defineTextField(
   ariaLabel: string,
   placeholder?: string,
   validationError?: ValidationError,
-  readOnly?: boolean
+  readOnly?: boolean,
 ): InputField {
   return {
     name,
@@ -37,7 +37,7 @@ export function defineChipsField(
   name: string,
   label: string,
   ariaLabel: string,
-  placeholder?: string
+  placeholder?: string,
 ): InputField {
   return {
     name,
@@ -55,7 +55,7 @@ export function defineChipsDateField(
   name: string,
   label: string,
   ariaLabel: string,
-  placeholder?: string
+  placeholder?: string,
 ): InputField {
   return {
     name,
@@ -73,7 +73,7 @@ export function defineDateField(
   name: string,
   label: string,
   ariaLabel: string,
-  validationError?: ValidationError
+  validationError?: ValidationError,
 ): InputField {
   return {
     name,
@@ -90,7 +90,7 @@ export function defineComboboxField(
   ariaLabel: string,
   itemService: ComboboxAttributes["itemService"],
   placeholder?: string,
-  validationError?: ValidationError
+  validationError?: ValidationError,
 ): InputField {
   return {
     name,
@@ -112,7 +112,7 @@ export function defineDropdownField(
   ariaLabel: string,
   items: DropdownItem[],
   placeholder?: string,
-  validationError?: ValidationError
+  validationError?: ValidationError,
 ): InputField {
   return {
     name,
@@ -131,7 +131,7 @@ export function defineDropdownField(
 export function defineNestedInputField(
   ariaLabel: string,
   name: NestedInputField["name"],
-  fields: NestedInputAttributes["fields"]
+  fields: NestedInputAttributes["fields"],
 ): InputField {
   return {
     name,
@@ -153,15 +153,15 @@ export const courtFields: InputField[] = [
         "Gericht",
         "Gericht",
         comboboxItemService.getCourts,
-        "Gerichtstyp Gerichtsort"
+        "Gerichtstyp Gerichtsort",
       ),
       child: defineChipsField(
         "incorrectCourts",
         "Fehlerhaftes Gericht",
         "Fehlerhaftes Gericht",
-        ""
+        "",
       ),
-    }
+    },
   ),
 ]
 export const coreDataFields: InputField[] = [
@@ -173,15 +173,15 @@ export const coreDataFields: InputField[] = [
         "fileNumbers",
         "Aktenzeichen",
         "Aktenzeichen",
-        ""
+        "",
       ),
       child: defineChipsField(
         "deviatingFileNumbers",
         "Abweichendes Aktenzeichen",
         "Abweichendes Aktenzeichen",
-        ""
+        "",
       ),
-    }
+    },
   ),
   defineNestedInputField(
     "Abweichendes Entscheidungsdatum",
@@ -190,14 +190,14 @@ export const coreDataFields: InputField[] = [
       parent: defineDateField(
         "decisionDate",
         "Entscheidungsdatum",
-        "Entscheidungsdatum"
+        "Entscheidungsdatum",
       ),
       child: defineChipsDateField(
         "deviatingDecisionDates",
         "Abweichendes Entscheidungsdatum",
-        "Abweichendes Entscheidungsdatum"
+        "Abweichendes Entscheidungsdatum",
       ),
-    }
+    },
   ),
   defineTextField("appraisalBody", "Spruchkörper", "Spruchkörper"),
   defineComboboxField(
@@ -205,7 +205,7 @@ export const coreDataFields: InputField[] = [
     "Dokumenttyp",
     "Dokumenttyp",
     comboboxItemService.getDocumentTypes,
-    "Bitte auswählen"
+    "Bitte auswählen",
   ),
   defineNestedInputField(
     "Abweichender ECLI",
@@ -216,16 +216,16 @@ export const coreDataFields: InputField[] = [
         "deviatingEclis",
         "Abweichender ECLI",
         "Abweichender ECLI",
-        ""
+        "",
       ),
-    }
+    },
   ),
   defineTextField("procedure", "Vorgang", "Vorgang"),
   defineDropdownField(
     "legalEffect",
     "Rechtskraft",
     "Rechtskraft",
-    legalEffectTypes.items
+    legalEffectTypes.items,
   ),
   defineTextField(
     "region",
@@ -233,7 +233,7 @@ export const coreDataFields: InputField[] = [
     "Region",
     "",
     { defaultMessage: "", field: "" },
-    true
+    true,
   ),
 ]
 
@@ -248,5 +248,5 @@ export const fieldLabels: { [name: string]: string } = Object.assign(
 
       return flatArray
     }, [] as InputField[])
-    .map((field) => ({ [field.name]: field.label as string }))
+    .map((field) => ({ [field.name]: field.label as string })),
 )

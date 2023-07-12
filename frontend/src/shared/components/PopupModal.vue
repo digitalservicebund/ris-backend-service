@@ -18,7 +18,7 @@ defineEmits<{
 
 onMounted(() => {
   const popupModalElem = document.getElementsByClassName(
-    "popup-modal-wrapper"
+    "popup-modal-wrapper",
   )[0] as HTMLElement
   popupModalElem.focus()
   const focusableElemsSelector = ".modal-buttons-container button"

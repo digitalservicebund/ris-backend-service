@@ -12,7 +12,7 @@ test.describe("import a norm by uploading a file", () => {
   test("upload Juris Zip file per file chooser", async ({ page, request }) => {
     const { filePath } = await loadJurisTestFile(
       request,
-      normData.jurisZipFileName
+      normData.jurisZipFileName,
     )
 
     const fileChooserEvent = page.waitForEvent("filechooser")
@@ -24,12 +24,10 @@ test.describe("import a norm by uploading a file", () => {
 
     await expect(
       page.locator(
-        `text=${
-          normData.metadataSections?.[MetadataSectionName.NORM]?.[0]?.[
-            MetadatumType.OFFICIAL_LONG_TITLE
-          ]?.[0]
-        }`
-      )
+        `text=${normData.metadataSections?.[MetadataSectionName.NORM]?.[0]?.[
+          MetadatumType.OFFICIAL_LONG_TITLE
+        ]?.[0]}`,
+      ),
     ).toBeVisible()
   })
 
@@ -43,7 +41,7 @@ test.describe("import a norm by uploading a file", () => {
       page,
       fileContent,
       fileName,
-      "application/zip"
+      "application/zip",
     )
 
     await page.dispatchEvent(".upload-drop-area", "drop", { dataTransfer })
@@ -52,12 +50,10 @@ test.describe("import a norm by uploading a file", () => {
 
     await expect(
       page.locator(
-        `text=${
-          normData.metadataSections?.[MetadataSectionName.NORM]?.[0]?.[
-            MetadatumType.OFFICIAL_LONG_TITLE
-          ]?.[0]
-        }`
-      )
+        `text=${normData.metadataSections?.[MetadataSectionName.NORM]?.[0]?.[
+          MetadatumType.OFFICIAL_LONG_TITLE
+        ]?.[0]}`,
+      ),
     ).toBeVisible()
   })
 })

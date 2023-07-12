@@ -27,7 +27,7 @@ const typeName = computed({
 })
 
 const selectedNormCategories = ref<Record<NormCategory, boolean>>(
-  {} as Record<NormCategory, boolean>
+  {} as Record<NormCategory, boolean>,
 )
 
 watch(
@@ -37,7 +37,7 @@ watch(
       Object.keys(selectedNormCategories.value) as NormCategory[]
     ).filter((category) => selectedNormCategories.value[category])
   },
-  { deep: true }
+  { deep: true },
 )
 
 watch(
@@ -48,7 +48,7 @@ watch(
         categories?.includes(category) ?? false
     }
   },
-  { immediate: true, deep: true }
+  { immediate: true, deep: true },
 )
 
 const templateName = computed({

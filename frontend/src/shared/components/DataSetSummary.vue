@@ -9,7 +9,7 @@ const props = defineProps<{
 }>()
 
 const dataAsList = computed(() =>
-  Array.isArray(props.data) ? props.data : [props.data]
+  Array.isArray(props.data) ? props.data : [props.data],
 )
 
 const summarizer = computed(() => props.summarizer ?? defaultSummarizer)
@@ -52,7 +52,7 @@ export function defaultSummarizer(dataEntry: any): string {
  */
 export function withSummarizer(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  summarizer: (dataEntry: any) => string | VNode
+  summarizer: (dataEntry: any) => string | VNode,
 ) {
   return defineComponent({
     props: {

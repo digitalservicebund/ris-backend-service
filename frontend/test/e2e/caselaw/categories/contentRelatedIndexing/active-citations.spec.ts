@@ -15,12 +15,12 @@ test.describe("active citations", () => {
   }) => {
     await navigateToCategories(page, documentNumber)
     await expect(
-      page.getByRole("heading", { name: "Aktivzitierung" })
+      page.getByRole("heading", { name: "Aktivzitierung" }),
     ).toBeVisible()
     await expect(page.getByLabel("Art der Zitierung")).toBeVisible()
     await expect(page.getByLabel("Gericht Aktivzitierung")).toBeVisible()
     await expect(
-      page.getByLabel("Entscheidungsdatum Aktivzitierung")
+      page.getByLabel("Entscheidungsdatum Aktivzitierung"),
     ).toBeVisible()
     await expect(page.getByLabel("Aktenzeichen Aktivzitierung")).toBeVisible()
     await expect(page.getByLabel("Dokumenttyp Aktivzitierung")).toBeVisible()
@@ -33,7 +33,7 @@ test.describe("active citations", () => {
   }) => {
     await navigateToPublication(
       page,
-      prefilledDocumentUnit.documentNumber || ""
+      prefilledDocumentUnit.documentNumber || "",
     )
 
     await page
@@ -61,8 +61,8 @@ test.describe("active citations", () => {
         `Änderung, AG Aachen, 01.01.2020, ${prefilledDocumentUnit.coreData.fileNumbers?.[0]}, Anerkenntnisurteil`,
         {
           exact: true,
-        }
-      )
+        },
+      ),
     ).toBeVisible()
     await expect(page.getByLabel("Eintrag löschen")).toHaveCount(1)
     await expect(page.getByLabel("Eintrag bearbeiten")).toHaveCount(1)
@@ -79,13 +79,13 @@ test.describe("active citations", () => {
 
     const activeCitationContainer = page.getByLabel("Aktivzitierung")
     await expect(
-      activeCitationContainer.getByLabel("Listen Eintrag")
+      activeCitationContainer.getByLabel("Listen Eintrag"),
     ).toHaveCount(2)
     await expect(
-      activeCitationContainer.getByLabel("Eintrag löschen")
+      activeCitationContainer.getByLabel("Eintrag löschen"),
     ).toHaveCount(2)
     await expect(
-      activeCitationContainer.getByLabel("Eintrag bearbeiten")
+      activeCitationContainer.getByLabel("Eintrag bearbeiten"),
     ).toHaveCount(2)
   })
 
@@ -110,16 +110,16 @@ test.describe("active citations", () => {
         await page.getByLabel("Aktivzitierung speichern").click()
       },
       page,
-      { clickSaveButton: true }
+      { clickSaveButton: true },
     )
 
     const activeCitationContainer = page.getByLabel("Aktivzitierung")
     await expect(
-      activeCitationContainer.getByLabel("Listen Eintrag")
+      activeCitationContainer.getByLabel("Listen Eintrag"),
     ).toHaveCount(1)
     page.reload()
     await expect(
-      activeCitationContainer.getByLabel("Listen Eintrag")
+      activeCitationContainer.getByLabel("Listen Eintrag"),
     ).toHaveCount(1)
 
     await page.getByLabel("Weitere Angabe").click()
@@ -128,7 +128,7 @@ test.describe("active citations", () => {
     // "Aktivzitierung speichern" only saves state in frontend, no communication to backend yet
     page.reload()
     await expect(
-      activeCitationContainer.getByLabel("Listen Eintrag")
+      activeCitationContainer.getByLabel("Listen Eintrag"),
     ).toHaveCount(1)
 
     await page.getByLabel("Weitere Angabe").click()
@@ -138,12 +138,12 @@ test.describe("active citations", () => {
         await page.getByLabel("Aktivzitierung speichern").click()
       },
       page,
-      { clickSaveButton: true }
+      { clickSaveButton: true },
     )
 
     page.reload()
     await expect(
-      activeCitationContainer.getByLabel("Listen Eintrag")
+      activeCitationContainer.getByLabel("Listen Eintrag"),
     ).toHaveCount(2)
   })
 
@@ -160,7 +160,7 @@ test.describe("active citations", () => {
         await page.getByLabel("Aktenzeichen Aktivzitierung").fill(fileNumber1)
       },
       page,
-      { clickSaveButton: true }
+      { clickSaveButton: true },
     )
     await page.getByLabel("Aktivzitierung speichern").click()
     await expect(page.getByText(fileNumber1)).toBeVisible()
@@ -171,7 +171,7 @@ test.describe("active citations", () => {
         await page.getByLabel("Aktenzeichen Aktivzitierung").fill(fileNumber2)
       },
       page,
-      { clickSaveButton: true }
+      { clickSaveButton: true },
     )
     await page.getByLabel("Aktivzitierung speichern").click()
     await expect(page.getByText(fileNumber1)).toBeHidden()
@@ -189,7 +189,7 @@ test.describe("active citations", () => {
         await page.getByLabel("Aktenzeichen Aktivzitierung").fill("one")
       },
       page,
-      { clickSaveButton: true }
+      { clickSaveButton: true },
     )
 
     await page.getByLabel("Aktivzitierung speichern").click()
@@ -199,16 +199,16 @@ test.describe("active citations", () => {
         await page.getByLabel("Aktenzeichen Aktivzitierung").fill("two")
       },
       page,
-      { clickSaveButton: true }
+      { clickSaveButton: true },
     )
     const activeCitationContainer = page.getByLabel("Aktivzitierung")
     await page.getByLabel("Aktivzitierung speichern").click()
     await expect(
-      activeCitationContainer.getByLabel("Listen Eintrag")
+      activeCitationContainer.getByLabel("Listen Eintrag"),
     ).toHaveCount(2)
     await page.getByLabel("Eintrag löschen").first().click()
     await expect(
-      activeCitationContainer.getByLabel("Listen Eintrag")
+      activeCitationContainer.getByLabel("Listen Eintrag"),
     ).toHaveCount(1)
   })
 
@@ -219,7 +219,7 @@ test.describe("active citations", () => {
   }) => {
     await navigateToPublication(
       page,
-      prefilledDocumentUnit.documentNumber || ""
+      prefilledDocumentUnit.documentNumber || "",
     )
 
     await page
@@ -247,7 +247,7 @@ test.describe("active citations", () => {
 
     //citation style ignored in search results
     const result = page.getByText(
-      `AG Aachen, 01.01.2020, ${prefilledDocumentUnit.coreData.fileNumbers?.[0]}, Anerkenntnisurteil, ${prefilledDocumentUnit.documentNumber}`
+      `AG Aachen, 01.01.2020, ${prefilledDocumentUnit.coreData.fileNumbers?.[0]}, Anerkenntnisurteil, ${prefilledDocumentUnit.documentNumber}`,
     )
 
     await expect(result).toBeVisible()
@@ -255,7 +255,7 @@ test.describe("active citations", () => {
 
     //make sure to have citation style in list
     const listItem = page.getByText(
-      `Änderung, AG Aachen, 01.01.2020, ${prefilledDocumentUnit.coreData.fileNumbers?.[0]}, Anerkenntnisurteil, ${prefilledDocumentUnit.documentNumber}`
+      `Änderung, AG Aachen, 01.01.2020, ${prefilledDocumentUnit.coreData.fileNumbers?.[0]}, Anerkenntnisurteil, ${prefilledDocumentUnit.documentNumber}`,
     )
     await expect(listItem).toBeVisible()
     await expect(page.getByLabel("Eintrag löschen")).toBeVisible()
@@ -282,7 +282,7 @@ test.describe("active citations", () => {
     await page.getByLabel("Eintrag löschen").first().click()
     const activeCitationContainer = page.getByLabel("Aktivzitierung")
     await expect(
-      activeCitationContainer.getByLabel("Listen Eintrag")
+      activeCitationContainer.getByLabel("Listen Eintrag"),
     ).toHaveCount(1)
     await expect(listItem).toBeHidden()
   })

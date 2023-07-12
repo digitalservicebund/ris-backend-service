@@ -29,7 +29,7 @@ type DropdownType =
 
 function formatDropdownItems(
   responseData: DropdownType,
-  endpoint: Endpoint
+  endpoint: Endpoint,
 ): ComboboxItem[] {
   switch (endpoint) {
     case Endpoint.documentTypes: {
@@ -74,7 +74,7 @@ function formatDropdownItems(
 async function fetchFromEndpoint(endpoint: Endpoint, filter?: string) {
   const response = await httpClient.get<DropdownType>(
     `caselaw/${endpoint}`,
-    filter ? { params: { q: filter } } : undefined
+    filter ? { params: { q: filter } } : undefined,
   )
   if (response.data) {
     return {
@@ -94,11 +94,11 @@ async function fetchFromEndpoint(endpoint: Endpoint, filter?: string) {
 
 type ComboboxItemService = {
   [key in keyof typeof Endpoint as `get${Capitalize<key>}`]: (
-    filter?: string
+    filter?: string,
   ) => Promise<ServiceResponse<ComboboxItem[]>>
 } & {
   filterItems: (
-    items: ComboboxItem[]
+    items: ComboboxItem[],
   ) => (filter?: string) => Promise<ServiceResponse<ComboboxItem[]>>
 }
 

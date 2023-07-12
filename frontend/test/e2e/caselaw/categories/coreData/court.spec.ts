@@ -17,13 +17,13 @@ test.describe("court", () => {
       async () => {
         await page.locator("[aria-label='Gericht']").fill("BGH")
         await expect(
-          page.locator("[aria-label='dropdown-option']")
+          page.locator("[aria-label='dropdown-option']"),
         ).toHaveCount(1)
         await page.keyboard.press("ArrowDown")
         await page.keyboard.press("Enter")
       },
       page,
-      { clickSaveButton: true }
+      { clickSaveButton: true },
     )
 
     await page.reload()
@@ -47,7 +47,7 @@ test.describe("court", () => {
         await page.keyboard.press("Enter")
       },
       page,
-      { clickSaveButton: true }
+      { clickSaveButton: true },
     )
 
     await page.reload()
@@ -77,7 +77,7 @@ test.describe("court", () => {
         await page.keyboard.press("Enter")
       },
       page,
-      { clickSaveButton: true }
+      { clickSaveButton: true },
     )
 
     await waitForSaving(
@@ -94,7 +94,7 @@ test.describe("court", () => {
           .click()
       },
       page,
-      { clickSaveButton: true, reload: true }
+      { clickSaveButton: true, reload: true },
     )
 
     await page.reload()
@@ -117,7 +117,7 @@ test.describe("court", () => {
       .locator("[aria-label='Gericht'] + button.input-expand-icon")
       .click()
     await expect(page.locator("[aria-label='dropdown-option']")).toHaveCount(
-      totalCourts
+      totalCourts,
     )
     await expect(page.locator("text=AG Aachen")).toBeVisible()
     await expect(page.locator("text=AG Aalen")).toBeVisible()
@@ -131,7 +131,7 @@ test.describe("court", () => {
     await page.locator("[aria-label='Auswahl zurücksetzen']").click()
     await waitForInputValue(page, "[aria-label='Gericht']", "")
     await expect(page.locator("[aria-label='dropdown-option']")).toHaveCount(
-      totalCourts
+      totalCourts,
     )
 
     // close dropdown
@@ -199,7 +199,7 @@ test.describe("court", () => {
         await waitForInputValue(page, "[aria-label='Gericht']", "AG Aalen")
       },
       page,
-      { clickSaveButton: true }
+      { clickSaveButton: true },
     )
 
     await expect(page.locator("text=Region")).toBeVisible()
@@ -215,11 +215,11 @@ test.describe("court", () => {
         await waitForInputValue(page, "[aria-label='Gericht']", "")
         // dropdown should not open
         await expect(
-          page.locator("[aria-label='dropdown-option']")
+          page.locator("[aria-label='dropdown-option']"),
         ).toBeHidden()
       },
       page,
-      { clickSaveButton: true, reload: true }
+      { clickSaveButton: true, reload: true },
     )
 
     await expect(page.locator("text=Region")).toBeVisible()
@@ -242,7 +242,7 @@ test.describe("court", () => {
         await waitForInputValue(page, "[aria-label='Rechtskraft']", "Ja")
       },
       page,
-      { clickSaveButton: true, reload: true }
+      { clickSaveButton: true, reload: true },
     )
 
     await waitForSaving(
@@ -253,7 +253,7 @@ test.describe("court", () => {
         await page.locator("text=Nein").click()
       },
       page,
-      { clickSaveButton: true, reload: true }
+      { clickSaveButton: true, reload: true },
     )
 
     await waitForInputValue(page, "[aria-label='Rechtskraft']", "Nein")
@@ -273,7 +273,7 @@ test.describe("court", () => {
         await waitForInputValue(page, "[aria-label='Gericht']", "AG Aachen")
       },
       page,
-      { clickSaveButton: true }
+      { clickSaveButton: true },
     )
 
     await waitForInputValue(page, "[aria-label='Rechtskraft']", "Keine Angabe")

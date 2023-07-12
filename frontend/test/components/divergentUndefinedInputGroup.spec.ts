@@ -41,7 +41,7 @@ describe("DivergentEntryIntoForceUndefinedInputGroup", () => {
     })
 
     const dropdown = screen.getByLabelText(
-      "Unbestimmtes abweichendes Inkrafttretedatum Dropdown"
+      "Unbestimmtes abweichendes Inkrafttretedatum Dropdown",
     ) as HTMLInputElement
 
     const amendmentNormCheckBox = screen.getByRole("checkbox", {
@@ -73,7 +73,7 @@ describe("DivergentEntryIntoForceUndefinedInputGroup", () => {
     })
 
     const dropdown = screen.getByLabelText(
-      "Unbestimmtes abweichendes Inkrafttretedatum Dropdown"
+      "Unbestimmtes abweichendes Inkrafttretedatum Dropdown",
     ) as HTMLInputElement
 
     await userEvent.click(dropdown)

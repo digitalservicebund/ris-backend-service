@@ -32,7 +32,7 @@ watch(
       inputValue.value = newValue
     }
   },
-  { immediate: true }
+  { immediate: true },
 )
 
 watch(inputValue, () => emit("update:modelValue", inputValue.value), {
@@ -47,7 +47,7 @@ const ENTRY_INTO_FORCE_DATE_TRANSLATIONS: { [Value in UndefinedDate]: string } =
   }
 
 const dropdownItems: DropdownItem[] = Object.entries(
-  ENTRY_INTO_FORCE_DATE_TRANSLATIONS
+  ENTRY_INTO_FORCE_DATE_TRANSLATIONS,
 ).map(([value, label]) => {
   return { label, value }
 })

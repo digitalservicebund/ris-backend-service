@@ -37,7 +37,7 @@ describe("useCollapsingMenuBar", () => {
 
     const { collapsedButtons } = useCollapsingMenuBar(
       ref(buttons),
-      maxBarEntries
+      maxBarEntries,
     )
 
     expect(collapsedButtons.value).toHaveLength(3)

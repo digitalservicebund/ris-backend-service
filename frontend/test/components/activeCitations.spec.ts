@@ -62,7 +62,7 @@ describe("Active Citations", async () => {
 
   vi.spyOn(
     documentUnitService,
-    "searchByLinkedDocumentUnit"
+    "searchByLinkedDocumentUnit",
   ).mockImplementation(() =>
     Promise.resolve({
       status: 200,
@@ -91,7 +91,7 @@ describe("Active Citations", async () => {
         first: true,
         last: false,
       },
-    })
+    }),
   )
 
   vi.spyOn(window, "scrollTo").mockImplementation(() => vi.fn())
@@ -137,15 +137,15 @@ describe("Active Citations", async () => {
     },
   ]
   vi.spyOn(comboboxItemService, "getCourts").mockImplementation(() =>
-    Promise.resolve({ status: 200, data: dropdownCourtItems })
+    Promise.resolve({ status: 200, data: dropdownCourtItems }),
   )
 
   vi.spyOn(comboboxItemService, "getDocumentTypes").mockImplementation(() =>
-    Promise.resolve({ status: 200, data: dropdownDocumentTypesItems })
+    Promise.resolve({ status: 200, data: dropdownDocumentTypesItems }),
   )
 
   vi.spyOn(comboboxItemService, "getCitationStyles").mockImplementation(() =>
-    Promise.resolve({ status: 200, data: dropdownCitationStyleItems })
+    Promise.resolve({ status: 200, data: dropdownCitationStyleItems }),
   )
 
   it("renders empty active citation in edit mode, when no activeCitations in list", async () => {
@@ -153,16 +153,16 @@ describe("Active Citations", async () => {
     expect(screen.getAllByLabelText("Listen Eintrag").length).toBe(1)
     expect(screen.getByLabelText("Art der Zitierung")).toBeVisible()
     expect(
-      screen.getByLabelText("Entscheidungsdatum Aktivzitierung")
+      screen.getByLabelText("Entscheidungsdatum Aktivzitierung"),
     ).toBeVisible()
     expect(
-      screen.getByLabelText("Entscheidungsdatum Aktivzitierung")
+      screen.getByLabelText("Entscheidungsdatum Aktivzitierung"),
     ).toBeInTheDocument()
     expect(
-      screen.getByLabelText("Aktenzeichen Aktivzitierung")
+      screen.getByLabelText("Aktenzeichen Aktivzitierung"),
     ).toBeInTheDocument()
     expect(
-      screen.getByLabelText("Dokumenttyp Aktivzitierung")
+      screen.getByLabelText("Dokumenttyp Aktivzitierung"),
     ).toBeInTheDocument()
   })
 
@@ -202,16 +202,16 @@ describe("Active Citations", async () => {
 
     expect(screen.getByLabelText("Art der Zitierung")).toBeVisible()
     expect(
-      screen.getByLabelText("Entscheidungsdatum Aktivzitierung")
+      screen.getByLabelText("Entscheidungsdatum Aktivzitierung"),
     ).toBeVisible()
     expect(
-      screen.getByLabelText("Entscheidungsdatum Aktivzitierung")
+      screen.getByLabelText("Entscheidungsdatum Aktivzitierung"),
     ).toBeInTheDocument()
     expect(
-      screen.getByLabelText("Aktenzeichen Aktivzitierung")
+      screen.getByLabelText("Aktenzeichen Aktivzitierung"),
     ).toBeInTheDocument()
     expect(
-      screen.getByLabelText("Dokumenttyp Aktivzitierung")
+      screen.getByLabelText("Dokumenttyp Aktivzitierung"),
     ).toBeInTheDocument()
   })
 
@@ -242,7 +242,7 @@ describe("Active Citations", async () => {
 
     await user.type(
       await screen.findByLabelText("Art der Zitierung"),
-      "Änderungen"
+      "Änderungen",
     )
     const dropdownItems = screen.getAllByLabelText("dropdown-option")
     expect(dropdownItems[0]).toHaveTextContent("Änderungen")
@@ -269,7 +269,7 @@ describe("Active Citations", async () => {
 
     await user.type(
       await screen.findByLabelText("Dokumenttyp Aktivzitierung"),
-      "Ant"
+      "Ant",
     )
     const dropdownItems = screen.getAllByLabelText("dropdown-option")
     expect(dropdownItems[0]).toHaveTextContent("EuGH-Vorlage")
@@ -296,7 +296,7 @@ describe("Active Citations", async () => {
 
     await user.type(
       await screen.findByLabelText("Gericht Aktivzitierung"),
-      "AG"
+      "AG",
     )
     const dropdownItems = screen.getAllByLabelText("dropdown-option")
     expect(dropdownItems[0]).toHaveTextContent("AG Test")
@@ -321,7 +321,7 @@ describe("Active Citations", async () => {
     await user.click(editButton)
 
     const fileNumberInput = await screen.findByLabelText(
-      "Aktenzeichen Aktivzitierung"
+      "Aktenzeichen Aktivzitierung",
     )
 
     await user.clear(fileNumberInput)
@@ -346,7 +346,7 @@ describe("Active Citations", async () => {
     await user.click(editButton)
 
     const fileNumberInput = await screen.findByLabelText(
-      "Entscheidungsdatum Aktivzitierung"
+      "Entscheidungsdatum Aktivzitierung",
     )
 
     await user.clear(fileNumberInput)
@@ -398,20 +398,20 @@ describe("Active Citations", async () => {
     })
 
     expect(
-      screen.getByText("label1, 01.02.2022, test fileNumber, documentType1")
+      screen.getByText("label1, 01.02.2022, test fileNumber, documentType1"),
     ).toBeInTheDocument()
     const editButton = screen.getByLabelText("Eintrag bearbeiten")
     await user.click(editButton)
 
     const fileNumberInput = await screen.findByLabelText(
-      "Aktenzeichen Aktivzitierung"
+      "Aktenzeichen Aktivzitierung",
     )
     const courtInput = await screen.findByLabelText("Gericht Aktivzitierung")
     const documentTypeInput = await screen.findByLabelText(
-      "Dokumenttyp Aktivzitierung"
+      "Dokumenttyp Aktivzitierung",
     )
     const decisionDateInput = await screen.findByLabelText(
-      "Entscheidungsdatum Aktivzitierung"
+      "Entscheidungsdatum Aktivzitierung",
     )
 
     await user.clear(fileNumberInput)
@@ -420,7 +420,7 @@ describe("Active Citations", async () => {
     await user.clear(decisionDateInput)
 
     expect(
-      screen.queryByText(/label1, 01.02.2022, documentType1, test fileNumber/)
+      screen.queryByText(/label1, 01.02.2022, documentType1, test fileNumber/),
     ).not.toBeInTheDocument()
   })
 
@@ -429,7 +429,7 @@ describe("Active Citations", async () => {
       modelValue: [generateActiveCitation()],
     })
     expect(
-      screen.queryByLabelText("Eintrag bearbeiten")
+      screen.queryByLabelText("Eintrag bearbeiten"),
     ).not.toBeInTheDocument()
   })
 

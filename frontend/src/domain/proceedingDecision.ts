@@ -41,13 +41,13 @@ export default class ProceedingDecision
 
   get missingRequiredFields() {
     return ProceedingDecision.requiredFields.filter((field) =>
-      this.requiredFieldIsEmpty(field, this[field])
+      this.requiredFieldIsEmpty(field, this[field]),
     )
   }
 
   private requiredFieldIsEmpty(
     fieldName: keyof ProceedingDecision,
-    value: ProceedingDecision[(typeof ProceedingDecision.requiredFields)[number]]
+    value: ProceedingDecision[(typeof ProceedingDecision.requiredFields)[number]],
   ) {
     if (fieldName === "decisionDate" && !value && !this.dateKnown) {
       return false

@@ -31,13 +31,13 @@ const inputAttributes = computed(
     ariaLabel: props.label,
     readOnly: props.readonly,
     autosize: props.type === InputType.TEXTAREA,
-  })
+  }),
 )
 
 watch(
   () => props.modelValue,
   () => (value.value = props.modelValue),
-  { deep: true }
+  { deep: true },
 )
 
 watch(value, () => emit("update:modelValue", value.value), { deep: true })

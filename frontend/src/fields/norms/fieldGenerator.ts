@@ -22,7 +22,7 @@ export const undefinedDropDownItems: DropdownItem[] = [
 export function dropdown(
   name: string,
   label: string,
-  items: DropdownItem[]
+  items: DropdownItem[],
 ): DropdownInputField {
   return {
     name: name,

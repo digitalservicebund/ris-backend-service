@@ -10,12 +10,12 @@ test.describe("info panel", () => {
     await navigateToCategories(page, documentNumber)
 
     const infoPanel = page.getByText(
-      new RegExp(`${documentNumber}.*Aktenzeichen.*`)
+      new RegExp(`${documentNumber}.*Aktenzeichen.*`),
     )
     await expect(
       infoPanel.getByText("Aktenzeichen - ", {
         exact: true,
-      })
+      }),
     ).toBeVisible()
 
     await page.locator("[aria-label='Aktenzeichen']").fill("-firstChip")
@@ -44,7 +44,7 @@ test.describe("info panel", () => {
     await expect(
       infoPanel.getByText("Gericht - ", {
         exact: true,
-      })
+      }),
     ).toBeVisible()
 
     await page.locator("[aria-label='Gericht']").fill("aalen")
@@ -60,17 +60,17 @@ test.describe("info panel", () => {
     await navigateToCategories(page, documentNumber)
 
     const infoPanel = page.getByText(
-      new RegExp(`${documentNumber}.*Entscheidungsdatum.*`)
+      new RegExp(`${documentNumber}.*Entscheidungsdatum.*`),
     )
     await expect(
       infoPanel.getByText("Entscheidungsdatum - ", {
         exact: true,
-      })
+      }),
     ).toBeVisible()
 
     await page.locator("[aria-label='Entscheidungsdatum']").fill("03.02.2022")
     expect(
-      await page.locator("[aria-label='Entscheidungsdatum']").inputValue()
+      await page.locator("[aria-label='Entscheidungsdatum']").inputValue(),
     ).toBe("03.02.2022")
 
     //when using the .fill() method, we need 3 tabs to leave the field

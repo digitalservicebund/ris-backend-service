@@ -35,13 +35,13 @@ describe("DocumentStatusGroup", () => {
     renderComponent()
 
     const documentStatusSelection = screen.queryByLabelText(
-      "Stand der dokumentarischen Bearbeitung"
+      "Stand der dokumentarischen Bearbeitung",
     ) as HTMLInputElement
     const documentTextProofSelection = screen.queryByLabelText(
-      "Textnachweis"
+      "Textnachweis",
     ) as HTMLInputElement
     const documentOtherSelection = screen.queryByLabelText(
-      "Sonstiger Hinweis"
+      "Sonstiger Hinweis",
     ) as HTMLInputElement
 
     expect(documentStatusSelection).toBeInTheDocument()
@@ -58,13 +58,13 @@ describe("DocumentStatusGroup", () => {
     renderComponent()
 
     const documentStatusSelection = screen.queryByLabelText(
-      "Stand der dokumentarischen Bearbeitung"
+      "Stand der dokumentarischen Bearbeitung",
     ) as HTMLInputElement
     const documentTextProofSelection = screen.queryByLabelText(
-      "Textnachweis"
+      "Textnachweis",
     ) as HTMLInputElement
     const documentOtherSelection = screen.queryByLabelText(
-      "Sonstiger Hinweis"
+      "Sonstiger Hinweis",
     ) as HTMLInputElement
 
     expect(documentStatusSelection).toBeChecked()
@@ -77,7 +77,7 @@ describe("DocumentStatusGroup", () => {
     expect(documentOtherSelection).not.toBeChecked()
 
     const dropDownInputField = screen.getByLabelText(
-      "Textnachweis Dropdown"
+      "Textnachweis Dropdown",
     ) as HTMLInputElement
 
     expect(dropDownInputField).toBeInTheDocument()
@@ -89,7 +89,7 @@ describe("DocumentStatusGroup", () => {
     expect(documentTextProofSelection).not.toBeChecked()
 
     const newDropDownInputField = screen.getByLabelText(
-      "Sonstiger Hinweis Dropdown"
+      "Sonstiger Hinweis Dropdown",
     ) as HTMLInputElement
 
     expect(newDropDownInputField).toBeInTheDocument()
@@ -100,11 +100,11 @@ describe("DocumentStatusGroup", () => {
     renderComponent()
 
     const documentOtherSelection = screen.queryByLabelText(
-      "Sonstiger Hinweis"
+      "Sonstiger Hinweis",
     ) as HTMLInputElement
 
     const textInput = screen.getByLabelText(
-      "Bezeichnung der Änderungsvorschrift Description"
+      "Bezeichnung der Änderungsvorschrift Description",
     ) as HTMLInputElement
 
     expect(textInput).toBeInTheDocument()
@@ -118,7 +118,7 @@ describe("DocumentStatusGroup", () => {
     await fireEvent.click(documentOtherSelection)
 
     const dropDownInputField = screen.getByLabelText(
-      "Sonstiger Hinweis Dropdown"
+      "Sonstiger Hinweis Dropdown",
     ) as HTMLInputElement
 
     await userEvent.click(dropDownInputField)
@@ -126,13 +126,13 @@ describe("DocumentStatusGroup", () => {
     expect(dropDownInputField).toHaveValue("Text in Bearbeitung")
 
     const documentStatusSelection = screen.queryByLabelText(
-      "Stand der dokumentarischen Bearbeitung"
+      "Stand der dokumentarischen Bearbeitung",
     ) as HTMLInputElement
 
     await fireEvent.click(documentStatusSelection)
 
     const textInputNew = screen.getByLabelText(
-      "Bezeichnung der Änderungsvorschrift Description"
+      "Bezeichnung der Änderungsvorschrift Description",
     ) as HTMLInputElement
 
     expect(textInputNew).not.toHaveValue()
@@ -142,7 +142,7 @@ describe("DocumentStatusGroup", () => {
     renderComponent({ modelValue: {} })
 
     const description = screen.getByLabelText(
-      "Bezeichnung der Änderungsvorschrift Description"
+      "Bezeichnung der Änderungsvorschrift Description",
     ) as HTMLInputElement
 
     expect(description).toBeInTheDocument()
@@ -178,7 +178,7 @@ describe("DocumentStatusGroup", () => {
     expect(store.loadedNorm).toEqual(norm)
 
     const documentTextProofSelection = screen.queryByLabelText(
-      "Textnachweis"
+      "Textnachweis",
     ) as HTMLInputElement
 
     await expect(documentTextProofSelection).toBeDisabled()

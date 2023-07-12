@@ -29,7 +29,7 @@ watch(
       inputValue.value = newValue
     }
   },
-  { immediate: true }
+  { immediate: true },
 )
 
 watch(inputValue, () => emit("update:modelValue", inputValue.value), {
@@ -199,7 +199,7 @@ const inputFields = computed(() => {
         v-else-if="inputFields.referenceField.multi === true"
         :id="inputFields.referenceField.id"
         :aria-label="inputFields.referenceField.label"
-        :model-value="(inputFields.referenceField.modelValue as string[])"
+        :model-value="inputFields.referenceField.modelValue as string[]"
         @update:model-value="inputFields.referenceField.updateModelValue"
       />
     </InputField>

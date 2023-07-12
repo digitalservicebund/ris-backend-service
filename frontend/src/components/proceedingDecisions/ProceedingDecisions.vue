@@ -39,17 +39,17 @@ function isNotEmpty({
   documentType,
 }: ProceedingDecision): boolean {
   return [court, decisionDate, fileNumber, documentType].some(
-    (property) => property != undefined
+    (property) => property != undefined,
   )
 }
 
 async function createProceedingDecision(
-  proceedingDecision: ProceedingDecision
+  proceedingDecision: ProceedingDecision,
 ) {
   if (isNotEmpty(proceedingDecision)) {
     const response = await proceedingDecisionService.createProceedingDecision(
       props.documentUnitUuid,
-      proceedingDecision
+      proceedingDecision,
     )
     if (response.data) {
       localProceedingDecisions.value = response.data
@@ -68,7 +68,7 @@ async function linkProceedingDecision(decision: LinkedDocumentUnit) {
   if (decision.uuid) {
     const response = await proceedingDecisionService.linkProceedingDecision(
       props.documentUnitUuid,
-      decision.uuid
+      decision.uuid,
     )
     if (response.data) {
       localProceedingDecisions.value = response.data
@@ -84,11 +84,11 @@ async function linkProceedingDecision(decision: LinkedDocumentUnit) {
 async function removeProceedingDecision(decision: ProceedingDecision) {
   const response = await proceedingDecisionService.removeProceedingDecision(
     props.documentUnitUuid,
-    decision.uuid as string
+    decision.uuid as string,
   )
   if (response.data) {
     localProceedingDecisions.value = localProceedingDecisions.value?.filter(
-      (listItem) => listItem.uuid !== decision.uuid
+      (listItem) => listItem.uuid !== decision.uuid,
     )
     updateSearchResultsLinkStatus(decision.uuid as string)
   } else {
@@ -111,13 +111,13 @@ async function search(page = 0) {
   const response = await documentUnitService.searchByLinkedDocumentUnit(
     page,
     searchResultsPerPage,
-    input.value as ProceedingDecision
+    input.value as ProceedingDecision,
   )
   if (response.data) {
     searchResultsCurrentPage.value = {
       ...response.data,
       content: response.data.content.map(
-        (decision) => new ProceedingDecision({ ...decision })
+        (decision) => new ProceedingDecision({ ...decision }),
       ),
     }
     searchResults.value = response.data.content.map((searchResult) => {
@@ -143,7 +143,7 @@ function decisionSummarizer(dataEntry: ProceedingDecision) {
               params: { documentNumber: dataEntry.documentNumber },
             },
           },
-          () => dataEntry.renderDecision
+          () => dataEntry.renderDecision,
         )
       : h("span", { class: ["link-02-reg"] }, dataEntry.renderDecision),
   ])
@@ -158,7 +158,7 @@ watch(
   },
   {
     immediate: true,
-  }
+  },
 )
 
 watch(
@@ -169,7 +169,7 @@ watch(
   {
     immediate: true,
     deep: true,
-  }
+  },
 )
 </script>
 

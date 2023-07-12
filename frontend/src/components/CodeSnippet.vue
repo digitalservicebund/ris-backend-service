@@ -17,7 +17,7 @@ watch(
   () => props.xml,
   () => {
     codeLines.value = getCodeLines()
-  }
+  },
 )
 </script>
 

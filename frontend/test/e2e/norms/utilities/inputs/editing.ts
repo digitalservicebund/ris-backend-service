@@ -30,7 +30,7 @@ const fillTextArea: FieldFiller<string> = async (page, id, value) => {
 const fillTextEditor: FieldFiller<FootnoteInputType[]> = async (
   page,
   id,
-  value
+  value,
 ) => {
   const input = page.locator(`[data-testid='${id}']`)
   await expect(input).toBeEditable()
@@ -107,7 +107,7 @@ const FIELD_FILLERS: FieldFillerMapping = {
 
 export function fillInputField<
   Type extends FieldType,
-  Value extends FieldValueTypeMapping[Type]
+  Value extends FieldValueTypeMapping[Type],
 >(page: Page, type: Type, id: string, value: Value): Promise<void> {
   const filler = FIELD_FILLERS[type]
   return filler(page, id, value)
@@ -116,7 +116,7 @@ export function fillInputField<
 export async function fillInputFieldGroup(
   page: Page,
   fields: AnyField[],
-  valueIndex?: number
+  valueIndex?: number,
 ) {
   for (const field of fields) {
     const value =
@@ -135,7 +135,7 @@ export async function fillInputFieldGroup(
  */
 export async function clearRepeatedMetadataSectionList(
   page: Page,
-  section: MetadataInputSection
+  section: MetadataInputSection,
 ): Promise<void> {
   const expandable = page.locator(`#${section.id}`)
   await expandable.click()
@@ -167,7 +167,7 @@ export async function clearRepeatedMetadataSectionList(
 
 export async function fillRepeatedMetadataSectionList(
   page: Page,
-  section: MetadataInputSection
+  section: MetadataInputSection,
 ): Promise<void> {
   if (section.isNotImported !== true) {
     await clearRepeatedMetadataSectionList(page, section)
@@ -177,7 +177,7 @@ export async function fillRepeatedMetadataSectionList(
   await expandable.click()
 
   const numberOfSectionRepetition = Math.max(
-    ...(section.fields ?? []).map((field) => field.values?.length ?? 0)
+    ...(section.fields ?? []).map((field) => field.values?.length ?? 0),
   )
 
   if (numberOfSectionRepetition > 0) {
@@ -198,7 +198,7 @@ export async function fillRepeatedMetadataSectionList(
 
 export async function fillExpandableSectionNotRepeatable(
   page: Page,
-  section: MetadataInputSection
+  section: MetadataInputSection,
 ): Promise<void> {
   if (!section.isNotImported) {
     await clearRepeatedMetadataSectionList(page, section)
@@ -215,7 +215,7 @@ export async function fillExpandableSectionNotRepeatable(
 
 export async function fillMetadataInputSection(
   page: Page,
-  section: MetadataInputSection
+  section: MetadataInputSection,
 ): Promise<void> {
   if (section.isRepeatedSection) {
     await fillRepeatedMetadataSectionList(page, section)
