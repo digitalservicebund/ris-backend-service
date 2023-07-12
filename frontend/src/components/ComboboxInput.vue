@@ -39,7 +39,7 @@ const ariaLabelDropdownIcon = computed(() =>
 const conditionalClasses = computed(() =>
   props.hasError
     ? "border-red-800 bg-red-200 focus:shadow-red-800 placeholder-black"
-    : "bg-white border-blue-800 focus:shadow-blue-800 h-[3.75rem] hover:shadow-blue-800"
+    : "bg-white border-blue-800 focus:shadow-blue-800 h-64 hover:shadow-blue-800"
 )
 
 const placeholderColor = computed(() =>
@@ -197,7 +197,7 @@ export type InputModelProps =
       @keydown.tab="closeDropdownAndRevertToLastSavedValue"
     >
       <div
-        class="border-2 border-solid flex flex-row focus:shadow-focus h-[3.75rem] hover:shadow-hover px-16 py-12 space-between whitespace-nowrap"
+        class="border-2 border-solid flex flex-row focus:shadow-focus h-64 hover:shadow-hover px-16 py-12 space-between whitespace-nowrap"
         :class="conditionalClasses"
       >
         <input
@@ -217,7 +217,7 @@ export type InputModelProps =
         />
         <button
           v-if="inputText"
-          class="input-close-icon mt-[3px]"
+          class="flex input-close-icon items-center"
           tabindex="0"
           @click="clearSelection"
         >
@@ -230,7 +230,7 @@ export type InputModelProps =
         </button>
         <button
           :aria-label="ariaLabelDropdownIcon"
-          class="input-expand-icon mt-[3px]"
+          class="flex input-expand-icon items-center"
           tabindex="-1"
           @click="toggleDropdown"
         >

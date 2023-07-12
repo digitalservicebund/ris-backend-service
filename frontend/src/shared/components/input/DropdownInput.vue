@@ -117,7 +117,7 @@ const computedStyle = computed(() => {
         />
         <button
           :aria-labelledby="`labelDropdownIcon` + id"
-          class="focus:outline-2 input-expand-icon mt-4 outline-0 outline-blue-800 outline-none"
+          class="flex focus:outline-2 input-expand-icon items-center outline-0 outline-blue-800 outline-none"
           tabindex="0"
           @keydown.enter="toggleDropdown"
         >
@@ -173,7 +173,7 @@ const computedStyle = computed(() => {
 
   &__open-dropdown {
     .input-container {
-      @apply flex border-2 border-blue-800 disabled:focus:outline-0 focus-within:outline-2 h-[3.75rem] hover:outline-2 outline-offset-[-4px] outline-0 outline-blue-800 outline-none px-16;
+      @apply flex border-2 border-blue-800 disabled:focus:outline-0 focus-within:outline-2 h-64 hover:outline-2 outline-offset-[-4px] outline-0 outline-blue-800 outline-none px-16;
     }
   }
 

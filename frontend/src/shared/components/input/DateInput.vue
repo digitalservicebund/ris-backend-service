@@ -41,7 +41,7 @@ const onMaska = (event: CustomEvent<MaskaDetail>) => {
   inputCompleted.value = event.detail.completed
 }
 
-const hasError = computed(
+const effectiveHasError = computed(
   () =>
     props.hasError ||
     (inputCompleted.value && !isInPast.value && !props.isFutureDate) ||
@@ -49,8 +49,7 @@ const hasError = computed(
 )
 
 const conditionalClasses = computed(() => ({
-  "border-red-800 bg-red-200 placeholder-black":
-    props.hasError || hasError.value,
+  "has-error": props.hasError || effectiveHasError.value,
 }))
 
 function validateInput() {
@@ -111,7 +110,7 @@ watch(inputCompleted, () => {
     v-model="inputValue"
     v-maska
     :aria-label="ariaLabel"
-    class="-outline-offset-4 autofill:focus:shadow-white autofill:focus:text-inherit autofill:shadow-white autofill:text-inherit border-2 border-blue-800 content-between flex flex-wrap focus:outline h-[3.75rem] hover:outline input outline-2 outline-blue-800 px-16 read-only:border-none read-only:hover:outline-0 readonly:focus:outline-none w-full"
+    class="ds-input"
     :class="conditionalClasses"
     data-maska="##.##.####"
     placeholder="TT.MM.JJJJ"

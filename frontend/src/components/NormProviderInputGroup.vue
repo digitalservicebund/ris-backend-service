@@ -44,11 +44,6 @@ watch(props, () => (inputValue.value = props.modelValue), {
 watch(inputValue, () => emit("update:modelValue", inputValue.value), {
   deep: true,
 })
-
-const checkboxStyle = ref({
-  width: "24px",
-  height: "24px",
-})
 </script>
 
 <template>
@@ -95,7 +90,7 @@ const checkboxStyle = ref({
           id="normProviderIsResolutionMajority"
           v-model="isResolutionMajority"
           aria-label="Beschlussfassung mit qualifizierter Mehrheit"
-          :style="checkboxStyle"
+          size="small"
         />
       </InputField>
     </div>

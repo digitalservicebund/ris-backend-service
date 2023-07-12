@@ -6,7 +6,7 @@ import TextButton from "@/shared/components/input/TextButton.vue"
   <div class="flex flex-col gap-20 items-start w-full">
     <h2 class="heading-02-regular">Text Button</h2>
 
-    <div class="flex gap-20 w-full">
+    <div class="flex gap-20 items-start w-full">
       <TextButton button-type="primary" label="Button Primary" />
 
       <TextButton
@@ -20,7 +20,22 @@ import TextButton from "@/shared/components/input/TextButton.vue"
       <TextButton button-type="primary" disabled label="Disabled" />
     </div>
 
-    <div class="flex gap-20 w-full">
+    <div class="flex gap-20 items-start w-full">
+      <TextButton
+        button-type="primary"
+        icon="close"
+        label="Button Small"
+        size="small"
+      />
+      <TextButton
+        button-type="primary"
+        icon="close"
+        label="Button Medium"
+        size="medium"
+      />
+    </div>
+
+    <div class="flex gap-20 items-start w-full">
       <TextButton button-type="secondary" label="Button Secondary" />
 
       <TextButton
@@ -34,7 +49,7 @@ import TextButton from "@/shared/components/input/TextButton.vue"
       <TextButton button-type="secondary" disabled label="Disabled" />
     </div>
 
-    <div class="flex gap-20 w-full">
+    <div class="flex gap-20 items-start w-full">
       <TextButton button-type="tertiary" label="Button Tertiary" />
 
       <TextButton
@@ -48,7 +63,7 @@ import TextButton from "@/shared/components/input/TextButton.vue"
       <TextButton button-type="tertiary" disabled label="Disabled" />
     </div>
 
-    <div class="flex gap-20 w-full">
+    <div class="flex gap-20 items-start w-full">
       <TextButton button-type="ghost" label="Button Ghost" />
 
       <TextButton
