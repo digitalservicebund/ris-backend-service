@@ -11,11 +11,11 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{
-  (event: "add-to-list", identifier: string): void
-  (event: "remove-from-list", identifier: string): void
-  (event: "reset-clicked-node"): void
-  (event: "toggle-show-norms"): void
-  (event: "linkedField:clicked", identifier: string): void
+  "add-to-list": [identifier: string]
+  "remove-from-list": [identifier: string]
+  "reset-clicked-node": []
+  "toggle-show-norms": []
+  "linkedField:clicked": [identifier: string]
 }>()
 
 const root = ref(buildRoot())

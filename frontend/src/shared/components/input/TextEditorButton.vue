@@ -13,7 +13,10 @@ interface MenuButton {
   callback?: () => void
 }
 const props = defineProps<MenuButton>()
-const emits = defineEmits<(e: "toggle", value: MenuButton) => void>()
+
+const emits = defineEmits<{
+  toggle: [value: MenuButton]
+}>()
 
 const showDropdown = ref(false)
 

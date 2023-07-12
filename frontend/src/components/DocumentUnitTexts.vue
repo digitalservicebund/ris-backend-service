@@ -6,10 +6,9 @@ import { texts as textsFields } from "@/fields/caselaw"
 
 const props = defineProps<{ texts: Texts }>()
 
-const emit =
-  defineEmits<
-    (e: "updateValue", updatedValue: [keyof Texts, string]) => Promise<void>
-  >()
+const emit = defineEmits<{
+  updateValue: [updatedValue: [keyof Texts, string]]
+}>()
 
 const data = computed(() =>
   textsFields.map((item) => {

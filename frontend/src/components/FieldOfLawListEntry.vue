@@ -10,9 +10,9 @@ interface Props {
 const props = defineProps<Props>()
 
 const emit = defineEmits<{
-  (event: "remove-from-list"): void
-  (event: "node-clicked"): void
-  (event: "linkedField:clicked", identifier: string): void
+  "remove-from-list": []
+  "node-clicked": []
+  "linkedField:clicked": [identifier: string]
 }>()
 
 function handleTokenClick(tokenContent: string) {

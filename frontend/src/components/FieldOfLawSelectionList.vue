@@ -5,10 +5,11 @@ import { FieldOfLawNode } from "@/domain/fieldOfLaw"
 const props = defineProps<{
   selectedFieldsOfLaw: FieldOfLawNode[]
 }>()
+
 const emit = defineEmits<{
-  (event: "remove-from-list", identifier: string): void
-  (event: "node-clicked", identifier: string): void
-  (event: "linkedField:clicked", identifier: string): void
+  "remove-from-list": [identifier: string]
+  "node-clicked": [identifier: string]
+  "linkedField:clicked": [identifier: string]
 }>()
 </script>
 
