@@ -858,7 +858,7 @@ jobs:
           path: _site
       - run: mv _site/profile*.html _site/profile-report.html
       - name: Upload GitHub licence page
-        uses: actions/upload-pages-artifact@v1.0.7
+        uses: actions/upload-pages-artifact@v2.0.0
         with:
           path: _site
       - name: Deploy to GitHub Pages
