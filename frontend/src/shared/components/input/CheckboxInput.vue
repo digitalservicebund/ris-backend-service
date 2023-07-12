@@ -35,23 +35,34 @@ const isInvalid = computed(() => props.validationError !== undefined)
 </script>
 
 <template>
-  <!-- A note about the wrapper and block class in the label: Currently, Angie
-  positions checkboxes absolutely, which causes them to end up at the top of
-  the page, which in turn causes the page to jump when clicking them. We therefore
-  need to wrap them in a relatively positioned element to keep them within the
-  bounds of the component. This is a workaround and should be removed once the
-  issue is fixed in Angie. -->
-  <div class="relative">
-    <input
-      :id="id"
-      v-model="inputValue"
-      :aria-label="ariaLabel"
-      class="ds-checkbox"
-      :class="{ 'has-error': isInvalid, 'ds-checkbox-small': size === 'small' }"
-      :disabled="disabled"
-      type="checkbox"
-      @input="emitInputEvent"
-    />
-    <label class="!block" :for="id"></label>
-  </div>
+  <input
+    :id="id"
+    v-model="inputValue"
+    :aria-label="ariaLabel"
+    class="appearance-none border-2 border-blue-800 disabled:border-gray-600 disabled:focus:outline-0 disabled:hover:outline-0 focus:outline-2 h-40 hover:outline-2 mr-8 outline-0 outline-blue-800 outline-none outline-offset-[-4px] w-40"
+    :class="{
+      'border-red-800': isInvalid,
+      'outline-red-800': isInvalid,
+      'w-40 h-40': size === 'regular',
+      'w-24 h-24': size === 'small',
+    }"
+    type="checkbox"
+    @input="emitInputEvent"
+  />
 </template>
+
+<style lang="scss" scoped>
+input {
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: 60%;
+
+  &:checked {
+    background-image: url("@/assets/icons/ckeckbox_regular.svg");
+
+    &:disabled {
+      background-image: url("@/assets/icons/ckeckbox_disabled.svg");
+    }
+  }
+}
+</style>

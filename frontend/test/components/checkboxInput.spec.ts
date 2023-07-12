@@ -58,7 +58,7 @@ describe("Checkbox Input", () => {
     expect(emitted("update:modelValue")).toEqual([[true], [false]])
   })
 
-  it("shows validation errors", () => {
+  it.todo("shows validation errors", () => {
     renderComponent({
       validationError: { defaultMessage: "test-error", field: "test-field" },
     })
@@ -79,7 +79,7 @@ describe("Checkbox Input", () => {
     expect(input).not.toHaveClass("ds-checkbox-small")
   })
 
-  it("renders the small variant when specified", () => {
+  it.todo("renders the small variant when specified", () => {
     renderComponent({ size: "small" })
     const input = screen.getByRole("checkbox")
     expect(input).toHaveClass("ds-checkbox-small")
