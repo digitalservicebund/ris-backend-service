@@ -12,11 +12,6 @@ const router = createRouter({
       name: "caselaw-documentUnit-:documentNumber-categories",
       component: {},
     },
-    {
-      path: "",
-      name: "caselaw-documentUnit-:documentNumber-publication",
-      component: {},
-    },
   ],
 })
 
@@ -116,9 +111,9 @@ describe("PublicationDocument:", () => {
       ).toBeInTheDocument()
 
       await userEvent.click(screen.getByLabelText("Rubriken bearbeiten"))
-      // expect(router.currentRoute.value.name).toBe(
-      //   "caselaw-documentUnit-:documentNumber-categories"
-      // )
+      expect(router.currentRoute.value.name).toBe(
+        "caselaw-documentUnit-:documentNumber-categories"
+      )
     })
   })
 
