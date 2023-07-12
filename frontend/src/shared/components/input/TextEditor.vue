@@ -361,7 +361,7 @@ const resizeObserver = new ResizeObserver((entries) => {
           />
         </div>
       </div>
-      <hr />
+      <hr class="border-t-black" />
     </div>
     <div v-if="showButtons() && showSecondRow">
       <div
