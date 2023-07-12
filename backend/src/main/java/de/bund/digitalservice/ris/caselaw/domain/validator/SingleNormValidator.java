@@ -39,7 +39,7 @@ public class SingleNormValidator
     Map<String, NormElement> labelMap =
         stream.collect(Collectors.toMap(NormElement::label, Function.identity()));
 
-    String[] parts = value.singleNorm().split(" ");
+    String[] parts = value.singleNorm().replaceAll("\\p{Z}", " ").split(" ");
 
     if (parts.length == 0) {
       return true;
