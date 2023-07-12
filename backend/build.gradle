@@ -182,7 +182,7 @@ dependencies {
 
   implementation "org.jetbrains.kotlin:kotlin-reflect"
 
-  implementation "org.jsoup:jsoup:1.15.4"
+  implementation "org.jsoup:jsoup:1.16.1"
 
   implementation "com.github.loki4j:loki-logback-appender:1.4.0"
 
