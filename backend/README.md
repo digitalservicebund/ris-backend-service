@@ -59,6 +59,12 @@ curl -v -X PUT -H 'Content-Type: application/xml' -H "cookie: SESSION=$SESSION_V
 curl -v -X PUT -H 'Content-Type: application/xml' -H "cookie: SESSION=$SESSION_VALUE" --data "@$PATH_TO_XML_FILES/zitartdata_gesamt.xml" http://127.0.0.1/api/v1/caselaw/lookuptableimporter/zitart
 ```
 
+### Refresh materialized views
+
+```bash
+curl -v -X PUT -H "cookie: SESSION=$SESSION_VALUE" http://127.0.0.1/api/v1/caselaw/lookuptableimporter/refreshMaterializedViews
+```
+
 ### Database Setup & Migration with Flyway
 
 The application uses Flyway for maintaining and versioning database migrations. In order to create a change in the database you should follow one of the two methods:
