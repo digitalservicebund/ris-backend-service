@@ -19,7 +19,7 @@ import java.util.UUID
 
 @RestController
 @RequestMapping(ApiConfiguration.API_NORMS_PATH)
-@Tag(name = OpenApiConfiguration.Companion.Tags.NORMS)
+@Tag(name = OpenApiConfiguration.NORMS_TAG)
 class ImportNormController(private val importNormService: ImportNormUseCase) {
 
     @PostMapping

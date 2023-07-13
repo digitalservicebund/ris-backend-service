@@ -1,6 +1,8 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.NormAbbreviation;
+import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.OpenApiConfiguration;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.UUID;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,6 +15,7 @@ import reactor.core.publisher.Mono;
 
 @RestController
 @RequestMapping("api/v1/caselaw/normabbreviation")
+@Tag(name = OpenApiConfiguration.CASELAW_TAG)
 public class NormAbbreviationController {
   private final NormAbbreviationService service;
 

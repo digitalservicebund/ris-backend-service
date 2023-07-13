@@ -17,7 +17,7 @@ import reactor.core.publisher.Mono
 
 @RestController
 @RequestMapping(ApiConfiguration.API_BASE_PATH)
-@Tag(name = OpenApiConfiguration.Companion.Tags.NORMS)
+@Tag(name = OpenApiConfiguration.NORMS_TAG)
 class LoadNormAsXmlController(private val loadNormAsXmlService: LoadNormAsXmlUseCase) {
 
     @GetMapping(

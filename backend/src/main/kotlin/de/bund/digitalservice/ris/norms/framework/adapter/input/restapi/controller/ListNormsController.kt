@@ -19,7 +19,7 @@ import reactor.core.publisher.Mono
 
 @RestController
 @RequestMapping(ApiConfiguration.API_BASE_PATH)
-@Tag(name = OpenApiConfiguration.Companion.Tags.NORMS)
+@Tag(name = OpenApiConfiguration.NORMS_TAG)
 class ListNormsController(private val listNormsService: ListNormsUseCase) {
 
     @GetMapping(path = ["/norms", "/open/norms"])

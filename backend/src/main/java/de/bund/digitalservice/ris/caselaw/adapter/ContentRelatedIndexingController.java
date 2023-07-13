@@ -1,6 +1,8 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw.FieldOfLaw;
+import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.OpenApiConfiguration;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -14,6 +16,7 @@ import reactor.core.publisher.Mono;
 
 @RestController
 @RequestMapping("api/v1/caselaw/documentunits/{uuid}/contentrelatedindexing")
+@Tag(name = OpenApiConfiguration.CASELAW_TAG)
 public class ContentRelatedIndexingController {
   private final FieldOfLawService fieldOfLawService;
   private final KeywordService keywordService;

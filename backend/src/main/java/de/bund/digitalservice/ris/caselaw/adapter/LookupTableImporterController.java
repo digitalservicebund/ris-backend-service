@@ -1,5 +1,7 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
+import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.OpenApiConfiguration;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.nio.ByteBuffer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -14,6 +16,7 @@ import reactor.core.publisher.Mono;
 @RestController
 @RequestMapping("api/v1/caselaw/lookuptableimporter")
 @Slf4j
+@Tag(name = OpenApiConfiguration.CASELAW_TAG)
 public class LookupTableImporterController {
 
   private final LookupTableImporterService service;

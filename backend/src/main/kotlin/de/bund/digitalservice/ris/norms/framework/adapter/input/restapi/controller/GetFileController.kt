@@ -17,7 +17,7 @@ import java.util.*
 
 @RestController
 @RequestMapping(ApiConfiguration.API_NORMS_PATH)
-@Tag(name = OpenApiConfiguration.Companion.Tags.NORMS)
+@Tag(name = OpenApiConfiguration.NORMS_TAG)
 class GetFileController(private val getFileService: GetFileUseCase) {
 
     @GetMapping(path = ["/{guid}/files/{hash}"], produces = ["application/zip"])

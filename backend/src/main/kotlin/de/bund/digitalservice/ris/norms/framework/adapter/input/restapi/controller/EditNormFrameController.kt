@@ -29,7 +29,7 @@ import reactor.core.publisher.Mono
 
 @RestController
 @RequestMapping(ApiConfiguration.API_NORMS_PATH)
-@Tag(name = OpenApiConfiguration.Companion.Tags.NORMS)
+@Tag(name = OpenApiConfiguration.NORMS_TAG)
 class EditNormFrameController(private val editNormFrameService: EditNormFrameUseCase) {
 
     @PutMapping(path = ["/{guid}"])

@@ -56,12 +56,10 @@ spring:
               - profile
 
 springdoc:
-  packagesToScan: de.bund.digitalservice.ris.norms
   api-docs:
     path: /api/docs.json
   swagger-ui:
     path: /api/docs.html
-    operationsSorter: method
 
 unleash:
   appName: unleash-proxy
