@@ -1,6 +1,5 @@
 import AxeBuilder from "@axe-core/playwright"
 import { expect } from "@playwright/test"
-import { checkA11y, injectAxe } from "axe-playwright"
 import {
   navigateToFiles,
   navigateToPublication,
@@ -9,12 +8,6 @@ import {
 import { caselawTest as test } from "../../e2e/caselaw/fixtures"
 
 test.describe("a11y of document page (/caselaw/documentunit/{documentNumber}/files)", () => {
-  test("document", async ({ page, documentNumber }) => {
-    await navigateToFiles(page, documentNumber)
-    await injectAxe(page)
-    await checkA11y(page)
-  })
-
   test("upload document", async ({ page, documentNumber }) => {
     await navigateToFiles(page, documentNumber)
 

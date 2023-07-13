@@ -257,6 +257,7 @@ test.describe("court", () => {
     )
 
     await waitForInputValue(page, "[aria-label='Rechtskraft']", "Nein")
+    await expect(page.getByLabel("Rechtskraft")).toHaveValue("Nein")
   })
 
   test("test that setting a non-special court leaves legal effect unchanged", async ({
@@ -277,5 +278,8 @@ test.describe("court", () => {
     )
 
     await waitForInputValue(page, "[aria-label='Rechtskraft']", "Keine Angabe")
+    await expect(page.locator("[aria-label='Rechtskraft']")).toHaveValue(
+      "Keine Angabe",
+    )
   })
 })
