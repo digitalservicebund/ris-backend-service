@@ -37,6 +37,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Pageable;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.oauth2.client.registration.ReactiveClientRegistrationRepository;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
@@ -83,6 +84,7 @@ class LookupTableImporterIntegrationTest {
   @MockBean UserService userService;
   @MockBean private DocumentUnitService documentUnitService;
   @MockBean ReactiveClientRegistrationRepository clientRegistrationRepository;
+  @MockBean private JdbcTemplate jdbcTemplate;
 
   @AfterEach
   void cleanUp() {

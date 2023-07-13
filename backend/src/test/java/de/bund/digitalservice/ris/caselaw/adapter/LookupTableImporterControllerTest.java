@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.oauth2.client.registration.ReactiveClientRegistrationRepository;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.web.reactive.function.BodyInserters;
@@ -28,6 +29,7 @@ class LookupTableImporterControllerTest {
 
   @MockBean private LookupTableImporterService service;
   @MockBean private ReactiveClientRegistrationRepository clientRegistrationRepository;
+  @MockBean private JdbcTemplate jdbcTemplate;
 
   @Test
   void testImportDocumentTypeLookupTable() {
