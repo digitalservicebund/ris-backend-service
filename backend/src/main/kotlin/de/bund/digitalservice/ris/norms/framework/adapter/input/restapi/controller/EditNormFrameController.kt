@@ -11,9 +11,14 @@ import de.bund.digitalservice.ris.norms.domain.value.ProofIndication
 import de.bund.digitalservice.ris.norms.domain.value.ProofType
 import de.bund.digitalservice.ris.norms.domain.value.UndefinedDate
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.ApiConfiguration
+import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.OpenApiConfiguration
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.decodeGuid
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.decodeLocalDate
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.decodeLocalTime
+import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.responses.ApiResponse
+import io.swagger.v3.oas.annotations.responses.ApiResponses
+import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PutMapping
@@ -24,9 +29,15 @@ import reactor.core.publisher.Mono
 
 @RestController
 @RequestMapping(ApiConfiguration.API_NORMS_PATH)
+@Tag(name = OpenApiConfiguration.Companion.Tags.NORMS)
 class EditNormFrameController(private val editNormFrameService: EditNormFrameUseCase) {
 
     @PutMapping(path = ["/{guid}"])
+    @Operation(summary = "Edit the frame data of a norm", description = "Edits a norm given its unique guid identifier")
+    @ApiResponses(
+            ApiResponse(responseCode = "204", description = "Norm was updated"),
+            ApiResponse(responseCode = "400")
+    )
     fun editNormFrame(
         @PathVariable guid: String,
         @RequestBody request: NormFramePropertiesRequestSchema,

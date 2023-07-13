@@ -2,8 +2,18 @@ package de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.control
 
 import de.bund.digitalservice.ris.norms.application.port.input.ListNormsUseCase
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.ApiConfiguration
+import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.OpenApiConfiguration
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.encodeEli
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.encodeGuid
+import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.Parameter
+import io.swagger.v3.oas.annotations.media.ArraySchema
+import io.swagger.v3.oas.annotations.media.Content
+import io.swagger.v3.oas.annotations.media.Schema
+import io.swagger.v3.oas.annotations.media.SchemaProperty
+import io.swagger.v3.oas.annotations.responses.ApiResponse
+import io.swagger.v3.oas.annotations.responses.ApiResponses
+import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
@@ -13,10 +23,23 @@ import reactor.core.publisher.Mono
 
 @RestController
 @RequestMapping(ApiConfiguration.API_BASE_PATH)
+@Tag(name = OpenApiConfiguration.Companion.Tags.NORMS)
 class ListNormsController(private val listNormsService: ListNormsUseCase) {
 
     @GetMapping(path = ["/norms", "/open/norms"])
-    fun listNorms(@RequestParam q: String?): Mono<ResponseEntity<PaginatedNormListResponseSchema>> {
+    @Operation(summary = "Get a list of norms filtered by a query", description = "If no query is provided, all available norms are listed.")
+    @ApiResponses(
+            ApiResponse(responseCode = "200", description = "Successful response with list of norms")
+    )
+    fun listNorms(
+            @Parameter(name = "q", example = "Koordinierung der Systeme", description = "Searches for a substring in the following properties of a norm:\n" +
+                    "  - officialLongTitle\n" +
+                    "  - officialShortTitle\n" +
+                    "  - unofficialLongTitle\n" +
+                    "  - unofficialShortTitle\n" +
+                    "\nThe search term is used as is without any postprocessing and is case sensitive.")
+            @RequestParam q: String?
+    ): Mono<ResponseEntity<PaginatedNormListResponseSchema>> {
         val query = ListNormsUseCase.Query(searchTerm = q)
 
         return listNormsService

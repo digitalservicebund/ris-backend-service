@@ -109,6 +109,7 @@ dependencies {
   implementation platform("software.amazon.awssdk:bom:2.20.12")
   implementation "software.amazon.awssdk:netty-nio-client"
   implementation "software.amazon.awssdk:s3"
+  implementation "org.springdoc:springdoc-openapi-starter-webflux-ui:2.0.4"
   implementation "org.springdoc:springdoc-openapi-webflux-ui:1.7.0"
 
   // CVE-2022-42004, CVE-2022-42003
