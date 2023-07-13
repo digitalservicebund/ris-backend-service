@@ -27,7 +27,7 @@ test.describe("a11y of categories page (/caselaw/documentunit/{documentNumber}/c
     await expect(page.locator("text=AG Aachen")).toBeVisible()
     await expect(page.locator("text=AG Aalen")).toBeVisible()
     await page.locator("[aria-label='Gericht']").fill("bayern")
-    await expect(page.getByLabel("Gericht")).toHaveValue("bayern")
+    await expect(page.locator("[aria-label='Gericht']")).toHaveValue("bayern")
     await expect(page.locator("[aria-label='dropdown-option']")).toHaveCount(2)
     const accessibilityScanResults = await new AxeBuilder({ page }).analyze()
     expect(accessibilityScanResults.violations).toEqual([])
