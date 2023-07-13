@@ -49,7 +49,7 @@ test.describe("info panel", () => {
 
     await page.locator("[aria-label='Gericht']").fill("aalen")
     await page.locator("text=AG Aalen").click()
-    expect(await page.inputValue("[aria-label='Gericht']")).toBe("AG Aalen")
+    await expect(page.locator("[aria-label='Gericht']")).toHaveValue("AG Aalen")
     await expect(infoPanel.getByText("AG Aalen")).toBeVisible()
   })
 
@@ -69,9 +69,9 @@ test.describe("info panel", () => {
     ).toBeVisible()
 
     await page.locator("[aria-label='Entscheidungsdatum']").fill("03.02.2022")
-    expect(
-      await page.locator("[aria-label='Entscheidungsdatum']").inputValue(),
-    ).toBe("03.02.2022")
+    await expect(page.locator("[aria-label='Entscheidungsdatum']")).toHaveValue(
+      "03.02.2022",
+    )
 
     //when using the .fill() method, we need 3 tabs to leave the field
     await page.keyboard.press("Tab")

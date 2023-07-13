@@ -74,11 +74,9 @@ test.describe("ensuring the publishing of documentunits works as expected", () =
 
       // expect the old date
       await pageWithBghUser.reload()
-      expect(
-        await pageWithBghUser
-          .locator("[aria-label='Entscheidungsdatum']")
-          .inputValue(),
-      ).toBe("01.01.2020")
+      await expect(
+        pageWithBghUser.locator("[aria-label='Entscheidungsdatum']"),
+      ).toHaveValue("01.01.2020")
     })
 
     await test.step("attempt to upload a file as unauthorized user", async () => {

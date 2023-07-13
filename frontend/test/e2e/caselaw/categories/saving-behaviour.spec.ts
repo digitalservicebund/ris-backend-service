@@ -49,7 +49,9 @@ test.describe("saving behaviour", () => {
     )
 
     await page.reload()
-    expect(await page.inputValue("[aria-label='Spruchkörper']")).toBe("VG-002")
+    await expect(page.locator("[aria-label='Spruchkörper']")).toHaveValue(
+      "VG-002",
+    )
   })
 
   test("saved changes also visible in document unit entry list", async ({
