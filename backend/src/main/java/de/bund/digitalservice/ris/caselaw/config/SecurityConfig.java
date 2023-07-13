@@ -19,7 +19,12 @@ public class SecurityConfig {
     return http.authorizeExchange(
             exchanges ->
                 exchanges
-                    .pathMatchers("/actuator/**", "/api/v1/open/norms/**", "/admin/webhook", "/api/webjars/**", "/api/docs.*/**")
+                    .pathMatchers(
+                        "/actuator/**",
+                        "/api/v1/open/norms/**",
+                        "/admin/webhook",
+                        "/api/webjars/**",
+                        "/api/docs.*/**")
                     .permitAll()
                     .anyExchange()
                     .authenticated())
