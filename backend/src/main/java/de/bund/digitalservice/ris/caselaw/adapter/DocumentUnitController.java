@@ -108,7 +108,8 @@ public class DocumentUnitController {
   public Mono<ResponseEntity<DocumentUnit>> getByDocumentNumber(
       @NonNull @PathVariable String documentNumber) {
 
-    if (documentNumber.length() != 13 && documentNumber.length() != 14) {
+    // migrated document units can have a document number of 11 characters, e.g. INO-1234567
+    if (documentNumber.length() < 11 || documentNumber.length() > 14) {
       return Mono.just(ResponseEntity.unprocessableEntity().body(DocumentUnit.builder().build()));
     }
 
