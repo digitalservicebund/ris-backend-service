@@ -7,10 +7,6 @@ import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.encodeEl
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.encodeGuid
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
-import io.swagger.v3.oas.annotations.media.ArraySchema
-import io.swagger.v3.oas.annotations.media.Content
-import io.swagger.v3.oas.annotations.media.Schema
-import io.swagger.v3.oas.annotations.media.SchemaProperty
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.tags.Tag
@@ -29,16 +25,20 @@ class ListNormsController(private val listNormsService: ListNormsUseCase) {
     @GetMapping(path = ["/norms", "/open/norms"])
     @Operation(summary = "Get a list of norms filtered by a query", description = "If no query is provided, all available norms are listed.")
     @ApiResponses(
-            ApiResponse(responseCode = "200", description = "Successful response with list of norms")
+        ApiResponse(responseCode = "200", description = "Successful response with list of norms"),
     )
     fun listNorms(
-            @Parameter(name = "q", example = "Koordinierung der Systeme", description = "Searches for a substring in the following properties of a norm:\n" +
-                    "  - officialLongTitle\n" +
-                    "  - officialShortTitle\n" +
-                    "  - unofficialLongTitle\n" +
-                    "  - unofficialShortTitle\n" +
-                    "\nThe search term is used as is without any postprocessing and is case sensitive.")
-            @RequestParam q: String?
+        @Parameter(
+            name = "q",
+            example = "Koordinierung der Systeme",
+            description = "Searches for a substring in the following properties of a norm:\n" +
+                "  - officialLongTitle\n" +
+                "  - officialShortTitle\n" +
+                "  - unofficialLongTitle\n" +
+                "  - unofficialShortTitle\n" +
+                "\nThe search term is used as is without any postprocessing and is case sensitive.",
+        )
+        @RequestParam q: String?,
     ): Mono<ResponseEntity<PaginatedNormListResponseSchema>> {
         val query = ListNormsUseCase.Query(searchTerm = q)
 

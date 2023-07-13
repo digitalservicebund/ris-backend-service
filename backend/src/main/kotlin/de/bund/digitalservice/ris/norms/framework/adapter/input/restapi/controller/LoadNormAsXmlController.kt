@@ -28,8 +28,8 @@ class LoadNormAsXmlController(private val loadNormAsXmlService: LoadNormAsXmlUse
     )
     @Operation(summary = "Load a single as XML in LegalDocML.de format by eli", description = "Retrieves a single norm in LegalDocML.de xml format using its ELI")
     @ApiResponses(
-            ApiResponse(responseCode = "200", description = "Norm was found"),
-            ApiResponse(responseCode = "404", description = "No norm found for this query")
+        ApiResponse(responseCode = "200", description = "Norm was found"),
+        ApiResponse(responseCode = "404", description = "No norm found for this query"),
     )
     fun loadNormAsXml(
         @PathVariable printAnnouncementGazette: String,

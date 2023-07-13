@@ -23,8 +23,8 @@ class GetFileController(private val getFileService: GetFileUseCase) {
     @GetMapping(path = ["/{guid}/files/{hash}"], produces = ["application/zip"])
     @Operation(summary = "Download the exported ZIP file of a norm", description = "Downloads a norm in a compressed ZIP file containing all juris xml files")
     @ApiResponses(
-            ApiResponse(responseCode = "200", description = "Download ZIP file"),
-            ApiResponse(responseCode = "404", description = "Norm with the given guid or given hash file name not found")
+        ApiResponse(responseCode = "200", description = "Download ZIP file"),
+        ApiResponse(responseCode = "404", description = "Norm with the given guid or given hash file name not found"),
     )
     fun getFile(@PathVariable guid: String, @PathVariable hash: String): Mono<ResponseEntity<ByteArray>> {
         val command = GetFileUseCase.Command(UUID.fromString(guid), hash)

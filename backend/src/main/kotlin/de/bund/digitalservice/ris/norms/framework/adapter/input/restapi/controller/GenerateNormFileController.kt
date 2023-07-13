@@ -26,8 +26,8 @@ class GenerateNormFileController(private val generateNormFileService: GenerateNo
     @PostMapping(path = ["/{guid}/files"])
     @Operation(summary = "Generate a new juris zip export for the norm", description = "Generate a new compressed ZIP file containing all juris xml files for the latest edits of a norm")
     @ApiResponses(
-            ApiResponse(responseCode = "201", description = "Zip File Created"),
-            ApiResponse(responseCode = "400")
+        ApiResponse(responseCode = "201", description = "Zip File Created"),
+        ApiResponse(responseCode = "400"),
     )
     fun generateNormFile(@PathVariable guid: String): Mono<ResponseEntity<FileReferenceResponseSchema>> {
         val command = GenerateNormFileUseCase.Command(UUID.fromString(guid))

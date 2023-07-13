@@ -35,8 +35,8 @@ class EditNormFrameController(private val editNormFrameService: EditNormFrameUse
     @PutMapping(path = ["/{guid}"])
     @Operation(summary = "Edit the frame data of a norm", description = "Edits a norm given its unique guid identifier")
     @ApiResponses(
-            ApiResponse(responseCode = "204", description = "Norm was updated"),
-            ApiResponse(responseCode = "400")
+        ApiResponse(responseCode = "204", description = "Norm was updated"),
+        ApiResponse(responseCode = "400"),
     )
     fun editNormFrame(
         @PathVariable guid: String,
