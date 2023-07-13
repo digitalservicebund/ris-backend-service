@@ -64,7 +64,7 @@ watch(selectedChildSectionName, () => (childSection.value = {}))
           id="divergentEntryIntoForceDefinedSelection"
           v-model="selectedChildSectionName"
           aria-label="Bestimmtes abweichendes Inkrafttretedatum"
-          name="DivergentEntryIntoForceDefined"
+          name="divergentEntryIntoForce"
           type="radio"
           :value="MetadataSectionName.DIVERGENT_ENTRY_INTO_FORCE_DEFINED"
         />
@@ -75,7 +75,7 @@ watch(selectedChildSectionName, () => (childSection.value = {}))
           id="divergentEntryIntoForceUndefinedSelection"
           v-model="selectedChildSectionName"
           aria-label="Unbestimmtes Abweichendes Inkrafttretedatum"
-          name="DivergentEntryIntoForceUndefined"
+          name="divergentEntryIntoForce"
           type="radio"
           :value="MetadataSectionName.DIVERGENT_ENTRY_INTO_FORCE_UNDEFINED"
         />

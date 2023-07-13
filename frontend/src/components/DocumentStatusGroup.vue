@@ -93,7 +93,7 @@ const component = computed(() => {
             id="documentStatusSelection"
             v-model="selectedChildSectionName"
             aria-label="Stand der dokumentarischen Bearbeitung"
-            name="DocumentStatusSection"
+            name="documentStatusSection"
             type="radio"
             :value="MetadataSectionName.DOCUMENT_STATUS"
           />
@@ -111,7 +111,7 @@ const component = computed(() => {
                 MetadataSectionName.DOCUMENT_TEXT_PROOF
               )
             "
-            name="DocumentStatusSection"
+            name="documentStatusSection"
             type="radio"
             :value="MetadataSectionName.DOCUMENT_TEXT_PROOF"
           />
@@ -122,7 +122,7 @@ const component = computed(() => {
             id="documentOtherSelection"
             v-model="selectedChildSectionName"
             aria-label="Sonstiger Hinweis"
-            name="DocumentStatusSection"
+            name="documentStatusSection"
             type="radio"
             :value="MetadataSectionName.DOCUMENT_OTHER"
           />

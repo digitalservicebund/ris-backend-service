@@ -77,7 +77,7 @@ watch(selectedChildSectionName, () => (childSection.value = {}))
           id="divergentExpirationDefinedSelection"
           v-model="selectedChildSectionName"
           aria-label="Bestimmtes abweichendes Außerkrafttretedatum Radio"
-          name="DivergentExpirationDefined"
+          name="divergentExpiration"
           type="radio"
           :value="MetadataSectionName.DIVERGENT_EXPIRATION_DEFINED"
         />
@@ -95,7 +95,7 @@ watch(selectedChildSectionName, () => (childSection.value = {}))
               MetadataSectionName.DIVERGENT_EXPIRATION_UNDEFINED
             )
           "
-          name="DivergentExpirationUndefined"
+          name="divergentExpiration"
           type="radio"
           :value="MetadataSectionName.DIVERGENT_EXPIRATION_UNDEFINED"
         />

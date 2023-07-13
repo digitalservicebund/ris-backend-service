@@ -70,7 +70,7 @@ const dateValue = computed({
           id="expirationSelection"
           v-model="selectedInputType"
           aria-label="Auswahl bestimmtes Datum des Außerkrafttretens"
-          name="expirationDefined"
+          name="expiration"
           type="radio"
           :value="InputType.DATE"
         />
@@ -81,7 +81,7 @@ const dateValue = computed({
           id="expirationUndefinedSelection"
           v-model="selectedInputType"
           aria-label="Auswahl unbestimmtes Datum des Außerkrafttretens"
-          name="expirationUndefined"
+          name="expiration"
           type="radio"
           :value="InputType.UNDEFINED_DATE"
         />

@@ -86,7 +86,7 @@ const component = computed(() => {
             id="statusSelection"
             v-model="selectedChildSectionName"
             aria-label="Stand"
-            name="StatusIndication"
+            name="statusIndication"
             type="radio"
             :value="MetadataSectionName.STATUS"
           />
@@ -97,7 +97,7 @@ const component = computed(() => {
             id="reissueSelection"
             v-model="selectedChildSectionName"
             aria-label="Neufassung"
-            name="StatusIndication"
+            name="statusIndication"
             type="radio"
             :value="MetadataSectionName.REISSUE"
           />
@@ -110,7 +110,7 @@ const component = computed(() => {
             id="repealSelection"
             v-model="selectedChildSectionName"
             aria-label="Aufhebung"
-            name="StatusIndication"
+            name="statusIndication"
             type="radio"
             :value="MetadataSectionName.REPEAL"
           />
@@ -121,7 +121,7 @@ const component = computed(() => {
             id="otherStatusSelection"
             v-model="selectedChildSectionName"
             aria-label="Sonstiger Hinweis"
-            name="StatusIndication"
+            name="statusIndication"
             type="radio"
             :value="MetadataSectionName.OTHER_STATUS"
           />
