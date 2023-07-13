@@ -138,7 +138,7 @@ const fieldsMissing = computed(() =>
 </script>
 
 <template>
-  <div class="flex flex-col flex-start gap-40 justify-start max-w-[42rem]">
+  <div class="flex flex-col flex-start gap-40 justify-start max-w-[80rem]">
     <h1 class="heading-02-regular">Veröffentlichen</h1>
     <div aria-label="Plausibilitätsprüfung" class="flex flex-row gap-16">
       <div class="w-[15.625rem]">
