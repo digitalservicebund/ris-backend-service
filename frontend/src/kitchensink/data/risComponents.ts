@@ -4,6 +4,7 @@ export const risComponents: risComponent[] = [
   { name: "Button", view: "ButtonView" },
   { name: "Text Editor", view: "TextEditorView" },
   { name: "Input", view: "InputView" },
+  { name: "Radio", view: "RadioView" },
   { name: "Chips", view: "ChipsView" },
   { name: "Dropdown", view: "DropdownView" },
   { name: "Pagination", view: "PaginationView" },

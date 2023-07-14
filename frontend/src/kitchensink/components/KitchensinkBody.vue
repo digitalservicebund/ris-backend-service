@@ -21,6 +21,7 @@ import OriginalFileSidePanelView from "@/kitchensink/views/OriginalFileSidePanel
 import PaginationView from "@/kitchensink/views/PaginationView.vue"
 import PopupModalView from "@/kitchensink/views/PopupModalView.vue"
 import PropertyInfoView from "@/kitchensink/views/PropertyInfoView.vue"
+import RadioView from "@/kitchensink/views/RadioView.vue"
 import SideToggleView from "@/kitchensink/views/SideToggleView.vue"
 import TextEditorView from "@/kitchensink/views/TextEditorView.vue"
 
@@ -72,6 +73,8 @@ const component = computed(() => {
       return PaginationView
     case "FootnotesView":
       return FootnotesView
+    case "RadioView":
+      return RadioView
     default:
       return ErrorView
   }
