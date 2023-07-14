@@ -75,7 +75,7 @@ describe("InputElement", () => {
     })
 
     expect(
-      screen.getByText("Entscheidungsdatum ist kein valides Datum")
+      screen.getByText("Entscheidungsdatum ist kein valides Datum"),
     ).toBeInTheDocument()
   })
 
@@ -93,8 +93,8 @@ describe("InputElement", () => {
 
     expect(
       screen.getByText(
-        "Das Entscheidungsdatum darf nicht in der Zukunft liegen"
-      )
+        "Das Entscheidungsdatum darf nicht in der Zukunft liegen",
+      ),
     ).toBeInTheDocument()
   })
 })

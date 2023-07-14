@@ -27,7 +27,7 @@ const typeName = computed({
 })
 
 const selectedNormCategories = ref<Record<NormCategory, boolean>>(
-  {} as Record<NormCategory, boolean>
+  {} as Record<NormCategory, boolean>,
 )
 
 watch(
@@ -37,7 +37,7 @@ watch(
       Object.keys(selectedNormCategories.value) as NormCategory[]
     ).filter((category) => selectedNormCategories.value[category])
   },
-  { deep: true }
+  { deep: true },
 )
 
 watch(
@@ -48,7 +48,7 @@ watch(
         categories?.includes(category) ?? false
     }
   },
-  { immediate: true, deep: true }
+  { immediate: true, deep: true },
 )
 
 const templateName = computed({
@@ -69,11 +69,6 @@ watch(props, () => (inputValue.value = props.modelValue), {
 
 watch(inputValue, () => emit("update:modelValue", inputValue.value), {
   deep: true,
-})
-
-const checkboxStyle = ref({
-  width: "24px",
-  height: "24px",
 })
 </script>
 
@@ -111,7 +106,7 @@ const checkboxStyle = ref({
             :id="category"
             v-model="selectedNormCategories[category]"
             :aria-label="NORM_CATEGORY_NAMES[category]"
-            :style="checkboxStyle"
+            size="small"
           />
         </InputField>
       </div>

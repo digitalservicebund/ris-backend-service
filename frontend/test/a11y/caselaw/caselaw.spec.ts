@@ -14,7 +14,7 @@ test.describe("a11y of start page (/caselaw)", () => {
     await page.goto("/")
     await expect(page.locator("text=Neue Dokumentationseinheit")).toBeVisible()
     await expect(
-      page.locator(`a[href*="/caselaw/documentunit/${documentNumber}/files"]`)
+      page.locator(`a[href*="/caselaw/documentunit/${documentNumber}/files"]`),
     ).toBeVisible()
     await page
       .locator(".table-row", {

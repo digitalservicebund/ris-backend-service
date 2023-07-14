@@ -18,8 +18,8 @@ test.describe("a11y of a norm complex (/norms/norm/{guid})", () => {
       page.locator(
         `text=${
           normData.metadataSections?.NORM?.[0]?.OFFICIAL_LONG_TITLE?.[0] ?? ""
-        }`
-      )
+        }`,
+      ),
     ).toBeVisible()
     await injectAxe(page)
     await checkA11y(page)
@@ -30,7 +30,7 @@ test.describe("a11y of a norm frame data (/norms/norm/{guid}/frame)", () => {
   testWithImportedNorm("norm frame data", async ({ page, guid }) => {
     await page.goto(`/norms/norm/${guid}/frame`)
     await expect(
-      page.locator("text=Dokumentation des Rahmenelements")
+      page.locator("text=Dokumentation des Rahmenelements"),
     ).toBeVisible()
 
     // eslint-disable-next-line playwright/no-element-handle
@@ -41,7 +41,7 @@ test.describe("a11y of a norm frame data (/norms/norm/{guid}/frame)", () => {
         await aufklappenButton.click()
 
         const editButtons = await section.$$(
-          '[aria-label="Eintrag bearbeiten"]'
+          '[aria-label="Eintrag bearbeiten"]',
         )
         if (editButtons.length > 0) {
           await editButtons[0].click()
@@ -59,8 +59,8 @@ test.describe("a11y of a norm export (/norms/norm/{guid}/export)", () => {
     await page.goto(`/norms/norm/${guid}/export`)
     await expect(
       page.locator(
-        "text=Exportieren Sie die Dokumentationseinheit zur Abgabe an die jDV."
-      )
+        "text=Exportieren Sie die Dokumentationseinheit zur Abgabe an die jDV.",
+      ),
     ).toBeVisible()
     await injectAxe(page)
     await checkA11y(page)

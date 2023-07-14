@@ -1,9 +1,12 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
+import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.OpenApiConfiguration;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.nio.ByteBuffer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -14,12 +17,17 @@ import reactor.core.publisher.Mono;
 @RestController
 @RequestMapping("api/v1/caselaw/lookuptableimporter")
 @Slf4j
+@Tag(name = OpenApiConfiguration.CASELAW_TAG)
 public class LookupTableImporterController {
 
   private final LookupTableImporterService service;
 
-  public LookupTableImporterController(LookupTableImporterService service) {
+  private final JdbcTemplate jdbcTemplate;
+
+  public LookupTableImporterController(
+      LookupTableImporterService service, JdbcTemplate jdbcTemplate) {
     this.service = service;
+    this.jdbcTemplate = jdbcTemplate;
   }
 
   // In Postman go to "Body", select "raw" and "XML" and paste the XML-contents.
@@ -79,5 +87,21 @@ public class LookupTableImporterController {
         .onErrorReturn(
             ResponseEntity.internalServerError()
                 .body("Could not import the citation lookup table"));
+  }
+
+  @PutMapping("/refreshMaterializedViews")
+  @PreAuthorize("isAuthenticated()")
+  public Mono<ResponseEntity<String>> refreshMaterializedViews() {
+    String msg;
+    try {
+      jdbcTemplate.execute("REFRESH MATERIALIZED VIEW norm_abbreviation_search");
+    } catch (Exception e) {
+      msg = "Could not refresh the materialized view 'norm_abbreviation_search'";
+      log.error(msg, e);
+      return Mono.just(ResponseEntity.internalServerError().body(msg));
+    }
+    msg = "Successfully refreshed the materialized view 'norm_abbreviation_search'";
+    log.info(msg);
+    return Mono.just(ResponseEntity.ok(msg));
   }
 }

@@ -1,4 +1,4 @@
-import { VNode } from "vue"
+import { createTextVNode, VNode } from "vue"
 import {
   divergentDefinedSummary,
   divergentUndefinedSummary,
@@ -6,15 +6,15 @@ import {
 import { MetadataSections } from "@/domain/Norm"
 
 export function divergentEntryIntoForceSummarizer(
-  data: MetadataSections
-): VNode | string {
-  if (!data) return ""
+  data?: MetadataSections,
+): VNode {
+  if (!data) return createTextVNode("")
 
   if (data.DIVERGENT_ENTRY_INTO_FORCE_DEFINED) {
     return divergentDefinedSummary(data.DIVERGENT_ENTRY_INTO_FORCE_DEFINED[0])
   } else if (data.DIVERGENT_ENTRY_INTO_FORCE_UNDEFINED) {
     return divergentUndefinedSummary(
-      data.DIVERGENT_ENTRY_INTO_FORCE_UNDEFINED[0]
+      data.DIVERGENT_ENTRY_INTO_FORCE_UNDEFINED[0],
     )
-  } else return ""
+  } else return createTextVNode("")
 }

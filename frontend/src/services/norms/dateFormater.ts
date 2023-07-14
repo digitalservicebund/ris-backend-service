@@ -1,5 +1,5 @@
 export function formatDate(
-  dateStrings: (string | undefined)[] | undefined
+  dateStrings: (string | undefined)[] | undefined,
 ): string {
   const dateString = Array.isArray(dateStrings) ? dateStrings[0] : dateStrings
 

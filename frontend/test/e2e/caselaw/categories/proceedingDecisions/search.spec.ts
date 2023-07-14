@@ -17,7 +17,7 @@ test.describe("Search proceeding decisions", () => {
   }) => {
     await navigateToPublication(
       page,
-      prefilledDocumentUnit.documentNumber || ""
+      prefilledDocumentUnit.documentNumber || "",
     )
 
     await page
@@ -55,8 +55,8 @@ test.describe("Search proceeding decisions", () => {
 
     await expect(
       page.getByText(
-        `AG Aachen, AnU, 01.01.2020, ${prefilledDocumentUnit.coreData.fileNumbers?.[0]}`
-      )
+        `AG Aachen, AnU, 01.01.2020, ${prefilledDocumentUnit.coreData.fileNumbers?.[0]}`,
+      ),
     ).toHaveCount(2)
 
     await expect(page.getByText("Bereits hinzugefügt")).toBeVisible()
@@ -79,7 +79,7 @@ test.describe("Search proceeding decisions", () => {
       .click()
 
     await expect(
-      page.getByText("Suche hat keine Treffer ergeben")
+      page.getByText("Suche hat keine Treffer ergeben"),
     ).toBeVisible()
   })
 })

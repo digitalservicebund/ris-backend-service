@@ -34,11 +34,11 @@ function getControls() {
   }) as HTMLInputElement
 
   const additionalInfoChips = within(
-    screen.getByTestId("chips-input_printAnnouncementInfo")
+    screen.getByTestId("chips-input_printAnnouncementInfo"),
   ).queryAllByTestId("chip")
 
   const additionalInfoChipValues = within(
-    screen.getByTestId("chips-input_printAnnouncementInfo")
+    screen.getByTestId("chips-input_printAnnouncementInfo"),
   ).queryAllByTestId("chip-value")
 
   const explanationInput = screen.queryByRole("textbox", {
@@ -46,11 +46,11 @@ function getControls() {
   }) as HTMLInputElement
 
   const explanationChips = within(
-    screen.getByTestId("chips-input_printAnnouncementExplanations")
+    screen.getByTestId("chips-input_printAnnouncementExplanations"),
   ).queryAllByTestId("chip")
 
   const explanationChipValues = within(
-    screen.getByTestId("chips-input_printAnnouncementExplanations")
+    screen.getByTestId("chips-input_printAnnouncementExplanations"),
   ).queryAllByTestId("chip-value")
 
   return {
@@ -161,11 +161,11 @@ describe("PrintAnnouncementInputGroup", () => {
     await user.type(pageInput, "baz")
     await user.type(
       additionalInfoInput,
-      "additional info 1{enter}additional info 2{enter}"
+      "additional info 1{enter}additional info 2{enter}",
     )
     await user.type(
       explanationInput,
-      "explanation 1{enter}explanation 2{enter}"
+      "explanation 1{enter}explanation 2{enter}",
     )
 
     expect(modelValue).toEqual({

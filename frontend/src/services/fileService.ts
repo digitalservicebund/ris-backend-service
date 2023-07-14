@@ -4,7 +4,7 @@ import DocumentUnit from "@/domain/documentUnit"
 interface FileService {
   upload(
     documentUnitUuid: string,
-    file: File
+    file: File,
   ): Promise<ServiceResponse<DocumentUnit>>
   delete(documentUnitUuid: string): Promise<ServiceResponse<unknown>>
   getDocxFileAsHtml(uuid: string): Promise<ServiceResponse<string>>
@@ -33,7 +33,7 @@ const service: FileService = {
           "X-Filename": file.name,
         },
       },
-      file
+      file,
     )
     if (response.status === 413) {
       response.error = {
@@ -61,7 +61,7 @@ const service: FileService = {
 
   async delete(documentUnitUuid: string) {
     const response = await httpClient.delete(
-      `caselaw/documentunits/${documentUnitUuid}/file`
+      `caselaw/documentunits/${documentUnitUuid}/file`,
     )
     response.error =
       response.status >= 300
@@ -73,7 +73,7 @@ const service: FileService = {
 
   async getDocxFileAsHtml(uuid: string) {
     const response = await httpClient.get<string>(
-      `caselaw/documentunits/${uuid}/docx`
+      `caselaw/documentunits/${uuid}/docx`,
     )
     response.error =
       response.status >= 300

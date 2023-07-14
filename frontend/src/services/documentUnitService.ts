@@ -11,7 +11,7 @@ import { PageableService, Page } from "@/shared/components/Pagination.vue"
 interface DocumentUnitService {
   getAllListEntries: PageableService<DocumentUnitListEntry>
   getByDocumentNumber(
-    documentNumber: string
+    documentNumber: string,
   ): Promise<ServiceResponse<DocumentUnit>>
   createNew(): Promise<ServiceResponse<DocumentUnit>>
   update(documentUnit: DocumentUnit): Promise<ServiceResponse<unknown>>
@@ -21,14 +21,14 @@ interface DocumentUnitService {
     LinkedDocumentUnit
   >
   validateSingleNorm(
-    singleNormValidationInfo: SingleNormValidationInfo
+    singleNormValidationInfo: SingleNormValidationInfo,
   ): Promise<ServiceResponse<unknown>>
 }
 
 const service: DocumentUnitService = {
   async getAllListEntries(page: number, size: number) {
     const response = await httpClient.get<Page<DocumentUnitListEntry>>(
-      `caselaw/documentunits?pg=${page}&sz=${size}`
+      `caselaw/documentunits?pg=${page}&sz=${size}`,
     )
     if (response.status >= 300) {
       response.error = {
@@ -40,7 +40,7 @@ const service: DocumentUnitService = {
 
   async getByDocumentNumber(documentNumber: string) {
     const response = await httpClient.get<DocumentUnit>(
-      `caselaw/documentunits/${documentNumber}`
+      `caselaw/documentunits/${documentNumber}`,
     )
     if (response.status >= 300 || response.error) {
       response.data = undefined
@@ -58,7 +58,7 @@ const service: DocumentUnitService = {
 
   async createNew() {
     const response = await httpClient.get<DocumentUnit>(
-      "caselaw/documentunits/new"
+      "caselaw/documentunits/new",
     )
     if (response.status >= 300) {
       response.error = {
@@ -84,7 +84,7 @@ const service: DocumentUnitService = {
           "Content-Type": "application/json",
         },
       },
-      documentUnit
+      documentUnit,
     )
     if (response.status >= 300) {
       response.error = {
@@ -114,7 +114,7 @@ const service: DocumentUnitService = {
 
   async delete(documentUnitUuid: string) {
     const response = await httpClient.delete(
-      `caselaw/documentunits/${documentUnitUuid}`
+      `caselaw/documentunits/${documentUnitUuid}`,
     )
     if (response.status >= 300) {
       response.error = {
@@ -127,7 +127,7 @@ const service: DocumentUnitService = {
   async searchByLinkedDocumentUnit(
     page: number,
     size: number,
-    query = new LinkedDocumentUnit()
+    query = new LinkedDocumentUnit(),
   ) {
     const response = await httpClient.put<
       LinkedDocumentUnit,
@@ -140,7 +140,7 @@ const service: DocumentUnitService = {
           "Content-Type": "application/json",
         },
       },
-      query
+      query,
     )
     if (response.status >= 300) {
       response.error = {
@@ -154,7 +154,7 @@ const service: DocumentUnitService = {
         ...response.data,
         content: response.data.content.map(
           (decision: Partial<LinkedDocumentUnit> | undefined) =>
-            new LinkedDocumentUnit({ ...decision })
+            new LinkedDocumentUnit({ ...decision }),
         ),
       },
     }
@@ -169,7 +169,7 @@ const service: DocumentUnitService = {
           "Content-Type": "application/json",
         },
       },
-      singleNormValidationInfo
+      singleNormValidationInfo,
     )
     if (response.status >= 300) {
       response.error = {

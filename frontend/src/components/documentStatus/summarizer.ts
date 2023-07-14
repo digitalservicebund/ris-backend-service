@@ -21,7 +21,7 @@ function documentStatusSummary(data: Metadata): string {
     data?.PROOF_INDICATION?.filter((category) => category != null) ?? []
 
   const translatedProofIndication = proofIndication.map(
-    (indication) => PROOF_INDICATION_TRANSLATIONS[indication] || indication
+    (indication) => PROOF_INDICATION_TRANSLATIONS[indication] || indication,
   )
   const resultArray = []
 
@@ -50,7 +50,7 @@ function documentTextProofSummary(data: Metadata): string {
   const text = data?.TEXT?.[0]
 
   const translatedProofType = proofType.map(
-    (type) => PROOF_TYPE_TRANSLATIONS[type] || type
+    (type) => PROOF_TYPE_TRANSLATIONS[type] || type,
   )
   const resultArray = [...translatedProofType]
 
@@ -74,14 +74,14 @@ function documentOtherSummary(data: Metadata): string {
     data?.OTHER_TYPE?.filter((category) => category != null) ?? []
 
   const translatedOtherType = otherType.map(
-    (type) => OTHER_TYPE_TRANSLATIONS[type] || type
+    (type) => OTHER_TYPE_TRANSLATIONS[type] || type,
   )
 
   return translatedOtherType.join(" ")
 }
 
 export function documentStatusSectionSummarizer(
-  data: MetadataSections
+  data: MetadataSections,
 ): string {
   if (!data) return ""
 

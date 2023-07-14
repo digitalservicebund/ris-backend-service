@@ -12,7 +12,7 @@ test.describe("keywords", () => {
     await navigateToCategories(page, documentNumber)
 
     await expect(
-      page.getByRole("heading", { name: "Schlagwörter" })
+      page.getByRole("heading", { name: "Schlagwörter" }),
     ).toBeVisible()
   })
 
@@ -68,8 +68,8 @@ test.describe("keywords", () => {
       .getByLabel("Löschen")
       .click()
 
-    await expect(await page.getByText(secondKeyword)).toBeVisible()
-    await expect(await page.getByText(firstKeyword)).toBeHidden()
+    await expect(page.getByText(secondKeyword)).toBeVisible()
+    await expect(page.getByText(firstKeyword)).toBeHidden()
   })
 
   test("add same keyword not working", async ({ page, documentNumber }) => {
@@ -85,7 +85,7 @@ test.describe("keywords", () => {
         await page.keyboard.press("Enter")
       },
       page,
-      { clickSaveButton: true }
+      { clickSaveButton: true },
     )
     await expect(page.getByText(keyword)).toBeVisible()
 
@@ -115,7 +115,7 @@ test.describe("keywords", () => {
       .getByLabel("Löschen")
       .click()
 
-    await expect(await page.getByText(secondKeyword)).toBeVisible()
-    await expect(await page.getByText(firstKeyword)).toBeHidden()
+    await expect(page.getByText(secondKeyword)).toBeVisible()
+    await expect(page.getByText(firstKeyword)).toBeHidden()
   })
 })

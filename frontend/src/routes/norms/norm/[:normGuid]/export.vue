@@ -28,7 +28,7 @@ const fileName = computed(() => fileReference.value?.name)
 const downloadUrl = computed(() =>
   loadedNorm.value && fileReference.value
     ? getFileUrl(loadedNorm.value.guid, fileReference.value.hash)
-    : undefined
+    : undefined,
 )
 const downloadIsPossible = computed(() => downloadUrl.value != undefined)
 

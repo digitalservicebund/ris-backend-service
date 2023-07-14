@@ -32,7 +32,7 @@ watch(
       inputValue.value = newValue
     }
   },
-  { immediate: true }
+  { immediate: true },
 )
 
 watch(inputValue, () => emit("update:modelValue", inputValue.value), {
@@ -66,7 +66,7 @@ const yearValue = computed({
           :id="`${idPrefix}TypeDate`"
           v-model="selectedInputType"
           :aria-label="`Wählen Sie ${label} Datum`"
-          :name="`${idPrefix}InputTypeDate`"
+          :name="`${idPrefix}InputType`"
           type="radio"
           :value="InputType.DATE"
         />
@@ -77,7 +77,7 @@ const yearValue = computed({
           :id="`${idPrefix}TypeYear`"
           v-model="selectedInputType"
           :aria-label="`Wählen Sie ${label} Jahr`"
-          :name="`${idPrefix}InputTypeYear`"
+          :name="`${idPrefix}InputType`"
           type="radio"
           :value="InputType.YEAR"
         />

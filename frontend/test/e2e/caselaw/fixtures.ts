@@ -44,13 +44,13 @@ export const caselawTest = test.extend<MyFixtures>({
             decisionDate: "2019-12-31T23:00:00Z",
           },
         },
-      }
+      },
     )
 
     await use(await updateResponse.json())
 
     await request.delete(
-      `/api/v1/caselaw/documentunits/${prefilledDocumentUnit.uuid}`
+      `/api/v1/caselaw/documentunits/${prefilledDocumentUnit.uuid}`,
     )
   },
 

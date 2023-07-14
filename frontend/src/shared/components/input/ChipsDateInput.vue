@@ -36,7 +36,7 @@ watch(
       : []),
   {
     immediate: true,
-  }
+  },
 )
 
 function updateModelValue() {
@@ -45,8 +45,8 @@ function updateModelValue() {
     chips.value.length === 0
       ? undefined
       : chips.value.map((value) =>
-          dayjs(value, "DD.MM.YYYY", true).toISOString()
-        )
+          dayjs(value, "DD.MM.YYYY", true).toISOString(),
+        ),
   )
 }
 
@@ -156,7 +156,7 @@ const hasError = computed(
   () =>
     props.validationError ||
     (inputCompleted.value && !isInPast.value && !props.isFutureDate) ||
-    (inputCompleted.value && !isValidDate.value)
+    (inputCompleted.value && !isValidDate.value),
 )
 
 const conditionalClasses = computed(() => ({

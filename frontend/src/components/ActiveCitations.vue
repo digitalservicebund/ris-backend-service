@@ -10,8 +10,7 @@ const props = defineProps<{
   modelValue: ActiveCitation[] | undefined
 }>()
 
-const emit =
-  defineEmits<(event: "update:modelValue", value?: ActiveCitation[]) => void>()
+const emit = defineEmits<{ "update:modelValue": [value?: ActiveCitation[]] }>()
 
 const activeCitations = computed({
   get: () => {
@@ -37,7 +36,7 @@ function decisionSummarizer(activeCitation: ActiveCitation) {
           params: { documentNumber: activeCitation.documentNumber },
         },
       },
-      () => activeCitation.renderDecision
+      () => activeCitation.renderDecision,
     )
   } else {
     if (activeCitation.hasMissingRequiredFields) {
@@ -48,12 +47,12 @@ function decisionSummarizer(activeCitation: ActiveCitation) {
             "aria-label": "Fehlerhafte Eingabe",
             class: ["material-icons pr-8 text-red-800"],
           },
-          "error_outline"
+          "error_outline",
         ),
         h(
           "div",
           { class: ["label-02-bold text-red-800"] },
-          activeCitation.renderDecision
+          activeCitation.renderDecision,
         ),
       ])
     } else {

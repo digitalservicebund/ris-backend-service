@@ -8,7 +8,7 @@ const props = withDefaults(
     page: Page<any> // eslint-disable-line @typescript-eslint/no-explicit-any
     navigationPosition?: "top" | "bottom"
   }>(),
-  { navigationPosition: "top" }
+  { navigationPosition: "top" },
 )
 
 const emits = defineEmits<(e: "updatePage", page: number) => void>()
@@ -37,7 +37,7 @@ export type Page<T> = {
 export type PageableService<TResult, TQuery = TResult> = (
   page: number,
   size: number,
-  query?: TQuery
+  query?: TQuery,
 ) => Promise<ServiceResponse<Page<TResult>>>
 </script>
 
@@ -69,7 +69,7 @@ export type PageableService<TResult, TQuery = TResult> = (
         </PaginationButton>
       </div>
     </div>
-    <div class="-ml-144 label-02-reg mt-2 text-[#4E596A]">
+    <div class="-ml-144 label-02-reg mt-2 text-gray-900">
       Total {{ page?.totalElements }} Items
     </div>
   </div>

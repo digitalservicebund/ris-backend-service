@@ -9,8 +9,9 @@ const props = defineProps<{
   modelValue: NormReference[] | undefined
 }>()
 
-const emit =
-  defineEmits<(event: "update:modelValue", value?: NormReference[]) => void>()
+const emit = defineEmits<{
+  "update:modelValue": [value?: NormReference[]]
+}>()
 
 const norms = computed({
   get: () => {
@@ -36,12 +37,12 @@ function decisionSummarizer(normEntry: NormReference) {
               "aria-label": "Fehlerhafte Eingabe",
               class: ["material-icons pr-8 text-red-800"],
             },
-            "error_outline"
+            "error_outline",
           ),
           h(
             "div",
             { class: ["label-02-bold text-red-800"] },
-            normEntry.renderDecision
+            normEntry.renderDecision,
           ),
         ])
       : h("div", { class: ["link-02-reg"] }, normEntry.renderDecision),

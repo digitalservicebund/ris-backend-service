@@ -61,7 +61,7 @@ const inputValues = ref<InputValues>({})
 watch(
   () => props.modelValue,
   () => (inputValues.value = props.modelValue ? props.modelValue : {}),
-  { immediate: true, deep: true }
+  { immediate: true, deep: true },
 )
 
 watch(
@@ -71,7 +71,7 @@ watch(
   },
   {
     deep: true,
-  }
+  },
 )
 </script>
 
@@ -100,7 +100,7 @@ watch(
           :validation-error="
             props.validationErrors &&
             props.validationErrors.find(
-              (err) => err.field.split('\.')[1] === field.name
+              (err) => err.field.split('\.')[1] === field.name,
             )
           "
         />

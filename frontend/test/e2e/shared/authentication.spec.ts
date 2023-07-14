@@ -58,7 +58,7 @@ test.describe("authentication", () => {
     await page.goto("/")
 
     await expect(page).toHaveURL(
-      `/caselaw/documentunit/${documentNumber}/categories`
+      `/caselaw/documentunit/${documentNumber}/categories`,
     )
   })
 
@@ -75,9 +75,9 @@ test.describe("authentication", () => {
     expect(
       (
         await page.request.get(
-          `https://${process.env.E2E_TEST_BASIC_AUTH_USER}:${process.env.E2E_TEST_BASIC_AUTH_PASSWORD}@${hostname}/api/v1/open/norms`
+          `https://${process.env.E2E_TEST_BASIC_AUTH_USER}:${process.env.E2E_TEST_BASIC_AUTH_PASSWORD}@${hostname}/api/v1/open/norms`,
         )
-      ).status()
+      ).status(),
     ).toEqual(200)
   })
 })

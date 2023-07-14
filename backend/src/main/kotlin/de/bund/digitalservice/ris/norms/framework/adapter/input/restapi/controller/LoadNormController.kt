@@ -9,9 +9,14 @@ import de.bund.digitalservice.ris.norms.domain.entity.Norm
 import de.bund.digitalservice.ris.norms.domain.entity.Paragraph
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.ApiConfiguration
+import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.OpenApiConfiguration
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.encodeEli
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.encodeGuid
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.encodeLocalDateTime
+import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.responses.ApiResponse
+import io.swagger.v3.oas.annotations.responses.ApiResponses
+import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -22,9 +27,15 @@ import java.util.UUID
 
 @RestController
 @RequestMapping(ApiConfiguration.API_NORMS_PATH)
+@Tag(name = OpenApiConfiguration.NORMS_TAG)
 class LoadNormController(private val loadNormService: LoadNormUseCase) {
 
     @GetMapping(path = ["/{guid}"])
+    @Operation(summary = "Load a single norm", description = "Retrieves a single norm given its guid")
+    @ApiResponses(
+        ApiResponse(responseCode = "200", description = "Norm was found"),
+        ApiResponse(responseCode = "404", description = "No norm found for this query"),
+    )
     fun getNormByGuid(@PathVariable guid: String): Mono<ResponseEntity<NormResponseSchema>> {
         val query = LoadNormUseCase.Query(UUID.fromString(guid))
 

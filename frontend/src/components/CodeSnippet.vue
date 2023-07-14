@@ -17,7 +17,7 @@ watch(
   () => props.xml,
   () => {
     codeLines.value = getCodeLines()
-  }
+  },
 )
 </script>
 
@@ -46,7 +46,7 @@ watch(
 .xml-container {
   .code-lines {
     overflow: auto;
-    width: 60vw;
+    width: 65vw;
     white-space: nowrap;
   }
 

@@ -25,7 +25,7 @@ export type FieldValueTypeMapping = {
 // FIXME: resolve awkward mixture with value and values.
 export type Field<
   Type extends FieldType,
-  Value extends FieldValueTypeMapping[Type]
+  Value extends FieldValueTypeMapping[Type],
 > = {
   type: Type
   id: string

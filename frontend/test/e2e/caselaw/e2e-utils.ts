@@ -3,7 +3,7 @@ import { generateString } from "../../test-helper/dataGenerators"
 
 export const navigateToCategories = async (
   page: Page,
-  documentNumber: string
+  documentNumber: string,
 ) => {
   await page.goto(`/caselaw/documentunit/${documentNumber}/categories`)
   await expect(page.locator("text=Spruchkörper")).toBeVisible()
@@ -16,7 +16,7 @@ export const navigateToFiles = async (page: Page, documentNumber: string) => {
 
 export const navigateToPublication = async (
   page: Page,
-  documentNumber: string
+  documentNumber: string,
 ) => {
   await page.goto(`/caselaw/documentunit/${documentNumber}/publication`)
   await expect(page.locator("h1:has-text('Veröffentlichen')")).toBeVisible()
@@ -35,7 +35,7 @@ export const uploadTestfile = async (page: Page, filename: string) => {
 export async function waitForSaving(
   body: () => Promise<void>,
   page: Page,
-  options?: { clickSaveButton?: boolean; reload?: boolean }
+  options?: { clickSaveButton?: boolean; reload?: boolean },
 ) {
   if (options?.reload) {
     await page.reload()
@@ -45,7 +45,7 @@ export async function waitForSaving(
   let lastSaving: string | undefined = undefined
   if (await saveStatus.isVisible()) {
     lastSaving = /Zuletzt (.*) Uhr/.exec(
-      await saveStatus.innerText()
+      await saveStatus.innerText(),
     )?.[1] as string
   }
 
@@ -59,7 +59,7 @@ export async function waitForSaving(
     await expect(page.getByText(`Zuletzt`).first()).toBeVisible(),
     lastSaving ??
       (await expect(
-        page.getByText(`Zuletzt ${lastSaving} Uhr`).first()
+        page.getByText(`Zuletzt ${lastSaving} Uhr`).first(),
       ).toBeHidden()),
   ])
 }
@@ -71,7 +71,7 @@ export async function toggleFieldOfLawSection(page: Page): Promise<void> {
 export async function deleteDocumentUnit(page: Page, documentNumber: string) {
   await page.goto("/")
   await expect(
-    page.locator(`a[href*="/caselaw/documentunit/${documentNumber}/files"]`)
+    page.locator(`a[href*="/caselaw/documentunit/${documentNumber}/files"]`),
   ).toBeVisible()
   await page
     .locator(".table-row", {
@@ -81,13 +81,13 @@ export async function deleteDocumentUnit(page: Page, documentNumber: string) {
     .click()
   await page.locator('button:has-text("Löschen")').click()
   await expect(
-    page.locator(`a[href*="/caselaw/documentunit/${documentNumber}/files"]`)
+    page.locator(`a[href*="/caselaw/documentunit/${documentNumber}/files"]`),
   ).toBeHidden()
 }
 
 export async function documentUnitExists(
   page: Page,
-  documentNumber: string
+  documentNumber: string,
 ): Promise<boolean> {
   return (
     await (
@@ -99,19 +99,19 @@ export async function documentUnitExists(
 export async function waitForInputValue(
   page: Page,
   selector: string,
-  expectedValue: string
+  expectedValue: string,
 ) {
   await page.waitForFunction(
     ({ selector, expectedValue }) => {
       const input = document.querySelector(selector) as HTMLInputElement
       return input && input.value === expectedValue
     },
-    { selector, expectedValue }
+    { selector, expectedValue },
   )
 }
 
 export async function toggleProceedingDecisionsSection(
-  page: Page
+  page: Page,
 ): Promise<void> {
   await page.locator("text=Vorgehende Entscheidungen").click()
 }
@@ -129,7 +129,7 @@ export async function fillProceedingDecisionInputs(
     documentType?: string
     dateUnknown?: boolean
   },
-  decisionIndex = 0
+  decisionIndex = 0,
 ): Promise<void> {
   const fillInput = async (ariaLabel: string, value = generateString()) => {
     const input = page.locator(`[aria-label='${ariaLabel}']`).nth(decisionIndex)
@@ -143,7 +143,7 @@ export async function fillProceedingDecisionInputs(
     await waitForInputValue(
       page,
       "[aria-label='Gericht Rechtszug']",
-      values.court
+      values.court,
     )
   }
   if (values?.decisionDate) {
@@ -164,7 +164,7 @@ export async function fillProceedingDecisionInputs(
       await waitForInputValue(
         page,
         "[aria-label='Entscheidungsdatum Rechtszug']",
-        ""
+        "",
       )
     }
   }
@@ -178,7 +178,7 @@ export async function fillNormInputs(
     decisionDate?: string
     fileNumber?: string
     documentType?: string
-  }
+  },
 ): Promise<void> {
   const fillInput = async (ariaLabel: string, value = generateString()) => {
     const input = page.locator(`[aria-label='${ariaLabel}']`)
@@ -192,7 +192,7 @@ export async function fillNormInputs(
     await waitForInputValue(
       page,
       "[aria-label='Art der Zitierung']",
-      values.citationStyle
+      values.citationStyle,
     )
   }
 
@@ -202,7 +202,7 @@ export async function fillNormInputs(
     await waitForInputValue(
       page,
       "[aria-label='Gericht Aktivzitierung']",
-      values.court
+      values.court,
     )
   }
   if (values?.decisionDate) {
@@ -225,7 +225,7 @@ export async function fillActiveCitationInputs(
     decisionDate?: string
     fileNumber?: string
     documentType?: string
-  }
+  },
 ): Promise<void> {
   const fillInput = async (ariaLabel: string, value = generateString()) => {
     const input = page.locator(`[aria-label='${ariaLabel}']`)
@@ -239,7 +239,7 @@ export async function fillActiveCitationInputs(
     await waitForInputValue(
       page,
       "[aria-label='Art der Zitierung']",
-      values.citationStyle
+      values.citationStyle,
     )
   }
 
@@ -249,7 +249,7 @@ export async function fillActiveCitationInputs(
     await waitForInputValue(
       page,
       "[aria-label='Gericht Aktivzitierung']",
-      values.court
+      values.court,
     )
   }
   if (values?.decisionDate) {
@@ -271,6 +271,6 @@ export async function checkIfProceedingDecisionCleared(page: Page) {
     "Aktenzeichen Rechtszug",
     "Dokumenttyp Rechtszug",
   ].forEach((ariaLabel) =>
-    waitForInputValue(page, `[aria-label='${ariaLabel}']`, "")
+    waitForInputValue(page, `[aria-label='${ariaLabel}']`, ""),
   )
 }

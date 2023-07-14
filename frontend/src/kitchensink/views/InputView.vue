@@ -13,7 +13,6 @@ import NestedInput from "@/shared/components/input/NestedInput.vue"
 import TextAreaInput from "@/shared/components/input/TextAreaInput.vue"
 import TextInput from "@/shared/components/input/TextInput.vue"
 import {
-  ValidationError,
   NestedInputAttributes,
   BaseInputAttributes,
   InputType,
@@ -24,16 +23,13 @@ const multilineTextInputModel = ref("")
 
 const chipsModelValue = ref<ChipsInputModelType>(["one", "two"])
 const chipsDateModelValue = ref<ChipsInputModelType>(["2022-01-31T23:00:00Z"])
-const mockValidationError: ValidationError = {
-  defaultMessage: "wrong date",
-  field: "coreData.decisionDate",
-}
+
 const nestedInputFields: NestedInputAttributes["fields"] = {
   parent: defineDateField("field", "Input", "Input"),
   child: defineDateField(
     "deviatingField",
     "Abweichender Input",
-    "Abweichender Input"
+    "Abweichender Input",
   ),
 }
 
@@ -81,7 +77,7 @@ const dateInputAttributes: BaseInputAttributes = {
     <TextInput
       id="textInputError"
       aria-label="invalid text input"
-      :validation-error="mockValidationError"
+      has-error
       value="Loremipsum"
     />
 
@@ -90,6 +86,22 @@ const dateInputAttributes: BaseInputAttributes = {
       id="readonlyTextInput"
       aria-label="readonly text input"
       read-only
+      value="Loremipsum"
+    />
+
+    <h2>Medium Text Input</h2>
+    <TextInput
+      id="readonlyTextInput"
+      aria-label="readonly text input"
+      size="medium"
+      value="Loremipsum"
+    />
+
+    <h2>Small Text Input</h2>
+    <TextInput
+      id="readonlyTextInput"
+      aria-label="readonly text input"
+      size="small"
       value="Loremipsum"
     />
 
@@ -191,7 +203,7 @@ const dateInputAttributes: BaseInputAttributes = {
       :label-position="LabelPosition.RIGHT"
     >
       <InputElement
-        id="test"
+        id="inputCheckBox"
         :attributes="checkboxInputAttributes"
         :type="InputType.CHECKBOX"
       />

@@ -12,12 +12,12 @@ test.describe("field of law", () => {
     await toggleFieldOfLawSection(page)
 
     await expect(
-      page.getByRole("heading", { name: "Ausgewählte Sachgebiete" })
+      page.getByRole("heading", { name: "Ausgewählte Sachgebiete" }),
     ).toBeVisible()
     await expect(page.getByText("Die Liste ist aktuell leer")).toBeVisible()
     await expect(page.getByText("Normen anzeigen")).toBeVisible()
     await expect(
-      page.getByRole("heading", { name: "Sachgebietsbaum" })
+      page.getByRole("heading", { name: "Sachgebietsbaum" }),
     ).toBeVisible()
     await expect(page.getByText("Alle Sachgebiete anzeigen")).toBeVisible()
     await expect(page.getByRole("heading", { name: "Suche" })).toBeVisible()
@@ -133,22 +133,22 @@ test.describe("field of law", () => {
     await expect(page.getByText("Die Liste ist aktuell leer")).toBeHidden()
     await expect(
       page.getByLabel(
-        "SR-07 Ordnungswidrigkeitenrecht im Sachgebietsbaum anzeigen"
-      )
+        "SR-07 Ordnungswidrigkeitenrecht im Sachgebietsbaum anzeigen",
+      ),
     ).toBeVisible()
     await expect(
       page
         .getByRole("button", {
           name: "SR-07 Ordnungswidrigkeitenrecht entfernen",
         })
-        .filter({ hasText: "delete_outline" })
+        .filter({ hasText: "delete_outline" }),
     ).toBeVisible()
     await expect(
       page
         .getByRole("button", {
           name: "SR-07 Ordnungswidrigkeitenrecht entfernen",
         })
-        .filter({ hasText: "done" })
+        .filter({ hasText: "done" }),
     ).toBeVisible()
   })
 
@@ -182,7 +182,7 @@ test.describe("field of law", () => {
         .getByRole("button", {
           name: "SR-07 Ordnungswidrigkeitenrecht entfernen",
         })
-        .filter({ hasText: "done" })
+        .filter({ hasText: "done" }),
     ).toBeVisible()
 
     await page
@@ -196,7 +196,7 @@ test.describe("field of law", () => {
     await expect(
       page.getByRole("button", {
         name: "SR-07 Ordnungswidrigkeitenrecht hinzufügen",
-      })
+      }),
     ).toBeVisible()
   })
 
@@ -238,7 +238,7 @@ test.describe("field of law", () => {
     await expect(
       page.getByRole("button", {
         name: "SR-07 Ordnungswidrigkeitenrecht hinzufügen",
-      })
+      }),
     ).toBeVisible()
   })
 
@@ -270,7 +270,7 @@ test.describe("field of law", () => {
 
     await expect(page.getByText("1 von 3")).toBeVisible()
     await expect(
-      page.getByRole("button", { name: "vorherige Ergebnisse" })
+      page.getByRole("button", { name: "vorherige Ergebnisse" }),
     ).toBeDisabled()
 
     await page
@@ -281,7 +281,7 @@ test.describe("field of law", () => {
 
     await expect(page.getByText("2 von 3")).toBeVisible()
     await expect(
-      page.getByRole("button", { name: "vorherige Ergebnisse" })
+      page.getByRole("button", { name: "vorherige Ergebnisse" }),
     ).toBeEnabled()
 
     await page
@@ -292,7 +292,7 @@ test.describe("field of law", () => {
 
     await expect(page.getByText("3 von 3")).toBeVisible()
     await expect(
-      page.getByRole("button", { name: "nächste Ergebnisse" })
+      page.getByRole("button", { name: "nächste Ergebnisse" }),
     ).toBeDisabled()
   })
 
@@ -309,7 +309,7 @@ test.describe("field of law", () => {
     // if these two are visible, it must mean that the tree opened automatically with the first result
     await expect(page.getByText("Bürgerliches Recht")).toBeVisible()
     await expect(
-      page.getByText("Fallgruppen der Leistungskondiktion")
+      page.getByText("Fallgruppen der Leistungskondiktion"),
     ).toBeVisible()
   })
 
@@ -327,8 +327,8 @@ test.describe("field of law", () => {
 
     await expect(
       page.getByLabel(
-        "BR-05-01-06 entgangener Gewinn im Sachgebietsbaum anzeigen"
-      )
+        "BR-05-01-06 entgangener Gewinn im Sachgebietsbaum anzeigen",
+      ),
     ).toBeVisible()
 
     // if this is visible, it means that the "Normen anzeigen" checkbox got set to true
@@ -356,8 +356,8 @@ test.describe("field of law", () => {
     // it was added to the selection list
     await expect(
       page.getByLabel(
-        "AR-01 Arbeitsvertrag: Abschluss, Klauseln, Arten, Betriebsübergang im Sachgebietsbaum anzeigen"
-      )
+        "AR-01 Arbeitsvertrag: Abschluss, Klauseln, Arten, Betriebsübergang im Sachgebietsbaum anzeigen",
+      ),
     ).toBeVisible()
   })
 })

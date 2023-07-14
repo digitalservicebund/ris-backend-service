@@ -36,10 +36,10 @@ describe("DataSetSummary", () => {
     expect(secondSummary).toBeInTheDocument()
     expect(thirdSummary).toBeInTheDocument()
     expect(firstSummary.compareDocumentPosition(secondSummary)).toBe(
-      Node.DOCUMENT_POSITION_FOLLOWING
+      Node.DOCUMENT_POSITION_FOLLOWING,
     )
     expect(secondSummary.compareDocumentPosition(thirdSummary)).toBe(
-      Node.DOCUMENT_POSITION_FOLLOWING
+      Node.DOCUMENT_POSITION_FOLLOWING,
     )
   })
 

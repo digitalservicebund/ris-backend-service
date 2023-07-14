@@ -24,7 +24,9 @@ const props = defineProps<{
   succeedMessage?: { title: string; description: string }
 }>()
 
-const emits = defineEmits<(e: "publishADocument") => void>()
+const emits = defineEmits<{
+  publishADocument: []
+}>()
 
 const categoriesRoute = computed(() => ({
   name: "caselaw-documentUnit-:documentNumber-categories",
@@ -51,7 +53,7 @@ function publishDocumentUnit() {
 
 //Required Core Data fields
 const missingCoreDataFields = ref(
-  props.documentUnit.missingRequiredFields.map((field) => fieldLabels[field])
+  props.documentUnit.missingRequiredFields.map((field) => fieldLabels[field]),
 )
 
 //Required Proceeding Decision fields
@@ -65,14 +67,14 @@ const missingProceedingDecisionFields = ref(
         identifier: proceedingDecision.renderDecision,
         missingFields: getMissingProceedingDecisionFields(proceedingDecision),
       }
-    })
+    }),
 )
 
 function getMissingProceedingDecisionFields(
-  proceedingDecision: ProceedingDecision
+  proceedingDecision: ProceedingDecision,
 ) {
   return proceedingDecision.missingRequiredFields.map(
-    (field) => proceedingDecisionFieldLabels[field]
+    (field) => proceedingDecisionFieldLabels[field],
   )
 }
 
@@ -87,7 +89,7 @@ const missingNormsFields = ref(
         identifier: normReference.renderDecision,
         missingFields: getMissingNormsFields(normReference),
       }
-    })
+    }),
 )
 
 function getMissingNormsFields(normReference: NormReference) {
@@ -100,7 +102,7 @@ function getMissingNormsFields(normReference: NormReference) {
     return []
   else {
     return normReference.missingRequiredFields.map(
-      (field) => normFieldLabels[field]
+      (field) => normFieldLabels[field],
     )
   }
 }
@@ -116,12 +118,12 @@ const missingActiveCitationFields = ref(
         identifier: activeCitation.renderDecision,
         missingFields: getActiveCitationsFields(activeCitation),
       }
-    })
+    }),
 )
 
 function getActiveCitationsFields(activeCitation: ActiveCitation) {
   return activeCitation.missingRequiredFields.map(
-    (field) => activeCitationLabels[field]
+    (field) => activeCitationLabels[field],
   )
 }
 
@@ -131,12 +133,12 @@ const fieldsMissing = computed(() =>
   missingNormsFields.value?.length ||
   missingActiveCitationFields.value?.length
     ? true
-    : false
+    : false,
 )
 </script>
 
 <template>
-  <div class="flex flex-col flex-start gap-40 justify-start max-w-[42rem]">
+  <div class="flex flex-col flex-start gap-40 justify-start max-w-[80rem]">
     <h1 class="heading-02-regular">Veröffentlichen</h1>
     <div aria-label="Plausibilitätsprüfung" class="flex flex-row gap-16">
       <div class="w-[15.625rem]">

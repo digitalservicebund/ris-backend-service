@@ -37,7 +37,7 @@ watch(
       inputValue.value = newValue
     }
   },
-  { immediate: true }
+  { immediate: true },
 )
 
 watch(inputValue, () => emit("update:modelValue", inputValue.value), {
@@ -73,7 +73,7 @@ const dateValue = computed({
           id="entryIntoForceSelection"
           v-model="selectedInputType"
           aria-label="Auswahl bestimmtes Datum des Inkrafttretens"
-          name="EntryIntoForceDefined"
+          name="entryIntoForce"
           type="radio"
           :value="InputType.DATE"
         />
@@ -84,7 +84,7 @@ const dateValue = computed({
           id="entryIntoForceUndefinedSelection"
           v-model="selectedInputType"
           aria-label="Auswahl unbestimmtes Datum des Inkrafttretens"
-          name="EntryIntoForceUndefined"
+          name="entryIntoForce"
           type="radio"
           :value="InputType.UNDEFINED_DATE"
         />

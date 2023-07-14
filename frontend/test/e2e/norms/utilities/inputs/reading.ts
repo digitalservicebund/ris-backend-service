@@ -38,7 +38,7 @@ const expectRadioButton: FieldExpecter<boolean> = async (page, id, value) => {
 const expectTextEditor: FieldExpecter<FootnoteInputType[]> = async (
   page,
   id,
-  value
+  value,
 ) => {
   const input = page.locator(`[data-testid='${id}']`)
   await expect(input).toBeVisible()
@@ -48,7 +48,7 @@ const expectTextEditor: FieldExpecter<FootnoteInputType[]> = async (
       expect(inputText).toContain(footnote.label)
     }
     expect(inputText.replace(/[\n\r]/g, "")).toContain(
-      footnote.content.replace(/[\n\r]/g, "")
+      footnote.content.replace(/[\n\r]/g, ""),
     )
   }
 }
@@ -82,7 +82,7 @@ const FIELD_EXPECTER: FieldExpectMapping = {
 
 async function expectMetadataInputSectionToHaveCorrectData(
   page: Page,
-  section: MetadataInputSection
+  section: MetadataInputSection,
 ): Promise<void> {
   if (section.isSingleFieldSection) {
     await expectInputFieldGroupHasCorrectValues(page, section.fields ?? [])
@@ -92,7 +92,7 @@ async function expectMetadataInputSectionToHaveCorrectData(
     const heading = page.locator(`a span:text-is("${section.heading}")`)
     await expect(heading).toBeVisible()
     const legend = page.locator(
-      `h2:text-is("${section.heading}"), legend:text-is("${section.heading}")`
+      `h2:text-is("${section.heading}"), legend:text-is("${section.heading}")`,
     )
     await expect(legend.first()).toBeVisible()
     await expectInputFieldGroupHasCorrectValues(page, section.fields ?? [])
@@ -110,7 +110,7 @@ async function expectMetadataInputSectionToHaveCorrectData(
 
 export async function expectInputFieldHasCorrectValue<
   Type extends FieldType,
-  Value extends FieldValueTypeMapping[Type]
+  Value extends FieldValueTypeMapping[Type],
 >(page: Page, type: Type, id: string, value: Value): Promise<void> {
   const expecter = FIELD_EXPECTER[type]
   return expecter(page, id, value)
@@ -119,7 +119,7 @@ export async function expectInputFieldHasCorrectValue<
 export async function expectInputFieldGroupHasCorrectValues(
   page: Page,
   fields: AnyField[],
-  valueIndex?: number
+  valueIndex?: number,
 ): Promise<void> {
   for (const field of fields ?? []) {
     const value =
@@ -139,7 +139,7 @@ export async function expectInputFieldGroupHasCorrectValues(
 export async function expectRepeatedSectionListHasCorrectEntries(
   page: Page,
   section: MetadataInputSection,
-  numberOfEntries = 1
+  numberOfEntries = 1,
 ): Promise<void> {
   const expandable = page.locator(`#${section.id}`)
   await expect(expandable).toBeVisible()
@@ -150,7 +150,7 @@ export async function expectRepeatedSectionListHasCorrectEntries(
   const numberOfSectionRepetition = section.isNotImported
     ? numberOfEntries
     : Math.max(
-        ...(section.fields ?? []).map((field) => field.values?.length ?? 0)
+        ...(section.fields ?? []).map((field) => field.values?.length ?? 0),
       )
   const listEntries = expandable.getByLabel("Listen Eintrag")
   const entryCount = await listEntries.count()
@@ -177,7 +177,7 @@ export async function expectRepeatedSectionListHasCorrectEntries(
 
 export async function expectExpandableSectionNotRepeatableToHaveCorrectValues(
   page: Page,
-  section: MetadataInputSection
+  section: MetadataInputSection,
 ): Promise<void> {
   const expandable = page.locator(`#${section.id}`)
   await expect(expandable).toBeVisible()
@@ -194,7 +194,7 @@ export async function expectExpandableSectionNotRepeatableToHaveCorrectValues(
         page,
         field.type,
         field.id,
-        field.values[0]
+        field.values[0],
       )
     }
   }
@@ -204,7 +204,7 @@ export async function expectExpandableSectionNotRepeatableToHaveCorrectValues(
 
 export async function expectMetadataInputSectionToHaveCorrectDataOnDisplay(
   page: Page,
-  section: MetadataInputSection
+  section: MetadataInputSection,
 ): Promise<void> {
   if (section.isRepeatedSection) {
     await expectRepeatedSectionListHasCorrectEntries(page, section)
@@ -214,13 +214,13 @@ export async function expectMetadataInputSectionToHaveCorrectDataOnDisplay(
 }
 export async function expectMetadataInputSectionToHaveCorrectDataOnEdit(
   page: Page,
-  section: MetadataInputSection
+  section: MetadataInputSection,
 ): Promise<void> {
   if (section.isRepeatedSection) {
     await expectRepeatedSectionListHasCorrectEntries(
       page,
       section,
-      section.numberEditedSections ?? 1
+      section.numberEditedSections ?? 1,
     )
   } else {
     await expectMetadataInputSectionToHaveCorrectData(page, section)

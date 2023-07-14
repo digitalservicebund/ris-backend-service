@@ -42,11 +42,15 @@ export function divergentDefinedSummary(data: Metadata): VNode {
           alt: "Schwarzes Haken",
         }),
         h("span", {}, NORM_CATEGORY_TRANSLATIONS[category]),
-      ])
+      ]),
     )
   })
 
-  return h("div", { class: ["flex", "gap-8"] }, elements)
+  if (elements.length === 0) {
+    return createTextVNode("")
+  } else {
+    return h("div", { class: ["flex", "gap-8"] }, elements)
+  }
 }
 export function divergentUndefinedSummary(data: Metadata): VNode {
   if (!data) return createTextVNode("")
@@ -78,7 +82,7 @@ export function divergentUndefinedSummary(data: Metadata): VNode {
           alt: "Schwarzes Haken",
         }),
         h("span", {}, NORM_CATEGORY_TRANSLATIONS[category]),
-      ])
+      ]),
     )
   })
 

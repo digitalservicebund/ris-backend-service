@@ -13,7 +13,7 @@ testWithImportedNorm(
     await openNorm(
       page,
       normData.metadataSections?.NORM?.[0]?.OFFICIAL_LONG_TITLE?.[0] ?? "",
-      guid
+      guid,
     )
     await page.locator("a:has-text('Rahmen')").click()
 
@@ -31,7 +31,7 @@ testWithImportedNorm(
       page,
       FieldType.TEXT,
       "printAnnouncementGazette",
-      newRandomGazette
+      newRandomGazette,
     )
     const finishButton = officialReferencesExpandable.getByRole("button", {
       name: "Fertig",
@@ -39,7 +39,7 @@ testWithImportedNorm(
     await finishButton.click()
     await page.locator("[aria-label='Rahmendaten Speichern Button']").click()
     await expect(
-      page.locator("text=Zuletzt gespeichert um").first()
+      page.locator("text=Zuletzt gespeichert um").first(),
     ).toBeVisible()
     await page.reload()
 
@@ -59,7 +59,7 @@ testWithImportedNorm(
       .forEach((frbrThis) => {
         // eslint-disable-next-line jest-dom/prefer-to-have-attribute
         expect(frbrThis.getAttribute("value")).toMatch(
-          new RegExp(`^${eliInputValue}`)
+          new RegExp(`^${eliInputValue}`),
         )
       })
 
@@ -83,68 +83,68 @@ testWithImportedNorm(
     expect(
       xmlDOM.window.document
         .querySelector("akn\\:FRBRnumber")
-        ?.getAttribute("value")
+        ?.getAttribute("value"),
     ).toBe(
-      `s${norm.metadataSections?.OFFICIAL_REFERENCE?.[0]?.PRINT_ANNOUNCEMENT?.[0]?.PAGE?.[0]}`
+      `s${norm.metadataSections?.OFFICIAL_REFERENCE?.[0]?.PRINT_ANNOUNCEMENT?.[0]?.PAGE?.[0]}`,
     )
 
     // eslint-disable-next-line jest-dom/prefer-to-have-attribute
     expect(
       xmlDOM.window.document
         .querySelector("akn\\:FRBRname")
-        ?.getAttribute("value")
+        ?.getAttribute("value"),
     ).toBe(newRandomGazette)
 
     const proprietary =
       xmlDOM.window.document.querySelector("akn\\:proprietary")
     expect(proprietary?.querySelector("meta\\:typ")?.textContent?.trim()).toBe(
-      "verordnung"
+      "verordnung",
     )
     expect(proprietary?.querySelector("meta\\:form")?.textContent?.trim()).toBe(
-      "stammform"
+      "stammform",
     )
     expect(
-      proprietary?.querySelector("meta\\:fassung")?.textContent?.trim()
+      proprietary?.querySelector("meta\\:fassung")?.textContent?.trim(),
     ).toBe("verkuendungsfassung")
     expect(proprietary?.querySelector("meta\\:art")?.textContent?.trim()).toBe(
-      "rechtsetzungsdokument"
+      "rechtsetzungsdokument",
     )
     expect(
-      proprietary?.querySelector("meta\\:initiant")?.textContent?.trim()
+      proprietary?.querySelector("meta\\:initiant")?.textContent?.trim(),
     ).toBe("bundestag")
     expect(
       proprietary
         ?.querySelector("meta\\:bearbeitendeInstitution")
-        ?.textContent?.trim()
+        ?.textContent?.trim(),
     ).toBe("bundesrat")
 
     expect(
       xmlDOM.window.document
         .querySelector("akn\\:docTitle")
-        ?.textContent?.trim()
+        ?.textContent?.trim(),
     ).toBe(
       norm.metadataSections?.[MetadataSectionName.NORM]?.[0]?.[
         MetadatumType.OFFICIAL_LONG_TITLE
-      ]?.[0]
+      ]?.[0],
     )
     expect(
       xmlDOM.window.document
         ?.querySelector("akn\\:shortTitle")
-        ?.textContent?.trim()
+        ?.textContent?.trim(),
     ).toBe(
       norm.metadataSections?.[MetadataSectionName.NORM]?.[0]?.[
         MetadatumType.OFFICIAL_SHORT_TITLE
-      ]?.[0]
+      ]?.[0],
     )
 
     xmlDOM.window.document
       .querySelectorAll("akn\\:article")
       .forEach((article, articleIndex) => {
         expect(article.querySelector("akn\\:marker")?.textContent?.trim()).toBe(
-          norm.articles[articleIndex].marker
+          norm.articles[articleIndex].marker,
         )
         expect(
-          article.querySelector("akn\\:heading")?.textContent?.trim()
+          article.querySelector("akn\\:heading")?.textContent?.trim(),
         ).toBe(norm.articles[articleIndex].title)
 
         article
@@ -155,18 +155,18 @@ testWithImportedNorm(
               undefined
             ) {
               expect(
-                paragraph.querySelector("akn\\:marker")?.textContent?.trim()
+                paragraph.querySelector("akn\\:marker")?.textContent?.trim(),
               ).toBe(
-                norm.articles[articleIndex].paragraphs[paragraphIndex].marker
+                norm.articles[articleIndex].paragraphs[paragraphIndex].marker,
               )
             }
             expect(
               paragraph
                 .querySelector("akn\\:p")
                 ?.textContent?.trim()
-                .replace(/\n/, "")
+                .replace(/\n/, ""),
             ).toBe(norm.articles[articleIndex].paragraphs[paragraphIndex].text)
           })
       })
-  }
+  },
 )

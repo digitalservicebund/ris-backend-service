@@ -13,7 +13,7 @@ describe("text editor", async () => {
   it("scrolls element into view if element with hash exists", async () => {
     const hashElement = { scrollIntoView: vi.fn() }
     document.querySelector = vi.fn((hash: string) =>
-      hash === "test-hash" ? hashElement : undefined
+      hash === "test-hash" ? hashElement : undefined,
     )
 
     useScrollToHash(ref("test-hash"))
@@ -26,7 +26,7 @@ describe("text editor", async () => {
   it("does not scroll if no element exists for this hash", async () => {
     const hashElement = { scrollIntoView: vi.fn() }
     document.querySelector = vi.fn((hash: string) =>
-      hash === "test-hash" ? hashElement : undefined
+      hash === "test-hash" ? hashElement : undefined,
     )
 
     useScrollToHash(ref("unknown-hash"))

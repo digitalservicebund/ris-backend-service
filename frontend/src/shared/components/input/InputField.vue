@@ -20,13 +20,13 @@ const wrapperClasses = computed(() => ({
   "flex-col":
     props.labelPosition === LabelPosition.TOP ||
     props.labelPosition === LabelPosition.BOTTOM,
-  "flex-row gap-4":
+  "flex-row":
     props.labelPosition === LabelPosition.RIGHT ||
     props.labelPosition === LabelPosition.LEFT,
 }))
 
 const labelConverted = computed(() =>
-  Array.isArray(props.label) ? props.label : Array.of(props.label)
+  Array.isArray(props.label) ? props.label : Array.of(props.label),
 )
 </script>
 
@@ -65,6 +65,10 @@ export enum LabelPosition {
         v-if="labelConverted.length !== 0"
         :aria-label="id"
         class="grid items-center label-03-reg text-gray-900"
+        :class="{
+          'pr-4': labelPosition === LabelPosition.LEFT,
+          'pl-4': labelPosition === LabelPosition.RIGHT,
+        }"
         :for="id"
       >
         <span v-for="(line, index) in labelConverted" :key="line">

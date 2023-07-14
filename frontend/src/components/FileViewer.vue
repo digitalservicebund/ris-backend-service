@@ -14,12 +14,14 @@ const props = defineProps<{
   uploadTimeStamp?: string
 }>()
 
-defineEmits<(e: "deleteFile") => void>()
+defineEmits<{
+  deleteFile: []
+}>()
 
 const showModal = ref(false)
 
 const popupModalText = computed(
-  () => `Möchten Sie die ausgewählte Datei ${props.fileName} wirklich löschen?`
+  () => `Möchten Sie die ausgewählte Datei ${props.fileName} wirklich löschen?`,
 )
 
 const fileInfos = computed(() => [

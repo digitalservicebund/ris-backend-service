@@ -14,20 +14,20 @@ test.describe("Proceeding decisions", () => {
     await navigateToCategories(page, documentNumber)
 
     await expect(
-      page.getByRole("heading", { name: "Vorgehende Entscheidungen" })
+      page.getByRole("heading", { name: "Vorgehende Entscheidungen" }),
     ).toBeVisible()
 
     await toggleProceedingDecisionsSection(page)
 
     await expect(page.locator("[aria-label='Gericht Rechtszug']")).toBeVisible()
     await expect(
-      page.locator("[aria-label='Dokumenttyp Rechtszug']")
+      page.locator("[aria-label='Dokumenttyp Rechtszug']"),
     ).toBeVisible()
     await expect(
-      page.locator("[aria-label='Aktenzeichen Rechtszug']")
+      page.locator("[aria-label='Aktenzeichen Rechtszug']"),
     ).toBeVisible()
     await expect(
-      page.locator("[aria-label='Entscheidungsdatum Rechtszug']")
+      page.locator("[aria-label='Entscheidungsdatum Rechtszug']"),
     ).toBeVisible()
   })
 
@@ -54,14 +54,14 @@ test.describe("Proceeding decisions", () => {
     await expect(
       page.getByText(`AG Aalen, AnU, 03.12.2004, ${fileNumber}`, {
         exact: true,
-      })
+      }),
     ).toBeVisible()
 
     await page.reload()
     await toggleProceedingDecisionsSection(page)
 
     await expect(
-      page.getByText(`AG Aalen, AnU, 03.12.2004, ${fileNumber}`)
+      page.getByText(`AG Aalen, AnU, 03.12.2004, ${fileNumber}`),
     ).toHaveCount(1)
 
     // delete proceedingDecision
@@ -71,14 +71,14 @@ test.describe("Proceeding decisions", () => {
       .click()
 
     await expect(
-      page.getByText(`AG Aalen, AnU, 03.12.2004, ${fileNumber}`)
+      page.getByText(`AG Aalen, AnU, 03.12.2004, ${fileNumber}`),
     ).toHaveCount(0)
 
     page.reload()
     await toggleProceedingDecisionsSection(page)
 
     await expect(
-      page.getByText(`AG Aalen, AnU, 03.12.2004, ${fileNumber}`)
+      page.getByText(`AG Aalen, AnU, 03.12.2004, ${fileNumber}`),
     ).toHaveCount(0)
   })
 
@@ -100,7 +100,7 @@ test.describe("Proceeding decisions", () => {
     await checkIfProceedingDecisionCleared(page)
 
     await expect(
-      page.getByText("AG Aalen, AnU, 03.12.2004, 1a2b3c", { exact: true })
+      page.getByText("AG Aalen, AnU, 03.12.2004, 1a2b3c", { exact: true }),
     ).toBeVisible()
 
     await fillProceedingDecisionInputs(page, {
@@ -115,7 +115,7 @@ test.describe("Proceeding decisions", () => {
     await checkIfProceedingDecisionCleared(page)
 
     await expect(
-      page.getByText("AG Aalen, AnU, 03.12.2004, 1a2b3c")
+      page.getByText("AG Aalen, AnU, 03.12.2004, 1a2b3c"),
     ).toHaveCount(2)
   })
 
@@ -146,8 +146,8 @@ test.describe("Proceeding decisions", () => {
         `AG Aalen, AnU, unbekanntes Entscheidungsdatum, ${fileNumber}`,
         {
           exact: true,
-        }
-      )
+        },
+      ),
     ).toBeVisible()
 
     await page.reload()
@@ -155,8 +155,8 @@ test.describe("Proceeding decisions", () => {
 
     await expect(
       page.getByText(
-        `AG Aalen, AnU, unbekanntes Entscheidungsdatum, ${fileNumber}`
-      )
+        `AG Aalen, AnU, unbekanntes Entscheidungsdatum, ${fileNumber}`,
+      ),
     ).toHaveCount(1)
   })
 })

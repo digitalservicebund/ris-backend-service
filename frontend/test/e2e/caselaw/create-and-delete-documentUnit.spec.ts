@@ -8,12 +8,12 @@ test.describe("create a doc unit and delete it again", () => {
     await page.locator("button >> text=Neue Dokumentationseinheit").click()
     await page.waitForSelector("text=oder Datei auswählen")
     await expect(page).toHaveURL(
-      /\/caselaw\/documentunit\/[A-Z0-9]{13}\/files$/
+      /\/caselaw\/documentunit\/[A-Z0-9]{13}\/files$/,
     )
 
     // Given the earlier expectation we can assume that the regex will match...
     const documentNumber = /caselaw\/documentunit\/(.*)\/files/g.exec(
-      page.url()
+      page.url(),
     )?.[1] as string
 
     await deleteDocumentUnit(page, documentNumber)
@@ -22,7 +22,7 @@ test.describe("create a doc unit and delete it again", () => {
   caselawTest("cancel delete doc unit", async ({ page, documentNumber }) => {
     await page.goto("/")
     await expect(
-      page.locator(`a[href*="/caselaw/documentunit/${documentNumber}/files"]`)
+      page.locator(`a[href*="/caselaw/documentunit/${documentNumber}/files"]`),
     ).toBeVisible()
     await page
       .locator(".table-row", {
@@ -32,7 +32,7 @@ test.describe("create a doc unit and delete it again", () => {
       .click()
     await page.locator('button:has-text("Abbrechen")').click()
     await expect(
-      page.locator(`a[href*="/caselaw/documentunit/${documentNumber}/files"]`)
+      page.locator(`a[href*="/caselaw/documentunit/${documentNumber}/files"]`),
     ).toBeVisible()
   })
 })

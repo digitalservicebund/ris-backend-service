@@ -11,7 +11,7 @@ import DigitalEvidenceInputGroup from "@/components/digitalEvidence/DigitalEvide
 import DivergentEntryIntoForceGroup from "@/components/divergentGroup/divergentEntryIntoForce/DivergentEntryIntoForceGroup.vue"
 import { divergentEntryIntoForceSummarizer } from "@/components/divergentGroup/divergentEntryIntoForce/summarizer"
 import DivergentExpirationGroup from "@/components/divergentGroup/divergentExpiration/DivergentExpirationGroup.vue"
-import { DivergentExpirationSummarizer } from "@/components/divergentGroup/divergentExpiration/summarizer"
+import { divergentExpirationSummarizer } from "@/components/divergentGroup/divergentExpiration/summarizer"
 import DocumentStatusGroup from "@/components/documentStatus/DocumentStatusGroup.vue"
 import { documentStatusSectionSummarizer } from "@/components/documentStatus/summarizer"
 import DocumentTypeInputGroup from "@/components/documentType/DocumentTypeInputGroup.vue"
@@ -121,7 +121,7 @@ watch(
 
     flatMetadata.value = data as FlatMetadata
   },
-  { immediate: true, deep: true }
+  { immediate: true, deep: true },
 )
 
 watch(
@@ -131,20 +131,20 @@ watch(
       loadedNorm.value.eli = data.eli as string
     }
   },
-  { deep: true }
+  { deep: true },
 )
 
 const DateYearSummary = withSummarizer(dateYearSummarizer)
 const OfficialReferenceSummary = withSummarizer(officialReferenceSummarizer)
 const DocumentStatusSectionSummary = withSummarizer(
-  documentStatusSectionSummarizer
+  documentStatusSectionSummarizer,
 )
 const NormProviderSummary = withSummarizer(normProviderSummarizer)
 const DocumentTypeSummary = withSummarizer(documentTypeSummarizer)
 const DivergentEntryIntoForceSummary = withSummarizer(
-  divergentEntryIntoForceSummarizer
+  divergentEntryIntoForceSummarizer,
 )
-const DivergentExpirationSummary = withSummarizer(DivergentExpirationSummarizer)
+const DivergentExpirationSummary = withSummarizer(divergentExpirationSummarizer)
 const GeneralSummary = withSummarizer(generalSummarizer)
 const ParticipationSummary = withSummarizer(participationSummarizer)
 const SubjectAreaSummary = withSummarizer(subjectAreaSummarizer)

@@ -18,7 +18,7 @@ const { loadedNorm } = storeToRefs(store)
 const isDivergentExpirationUndefined = computed(() => {
   return (
     loadedNorm.value?.metadataSections?.DIVERGENT_EXPIRATION?.some(
-      (entry) => entry.DIVERGENT_EXPIRATION_UNDEFINED
+      (entry) => entry.DIVERGENT_EXPIRATION_UNDEFINED,
     ) ?? false
   )
 })
@@ -33,7 +33,7 @@ type ChildSectionName =
 
 const childSection = ref<Metadata>({})
 const selectedChildSectionName = ref<ChildSectionName>(
-  MetadataSectionName.DIVERGENT_EXPIRATION_DEFINED
+  MetadataSectionName.DIVERGENT_EXPIRATION_DEFINED,
 )
 
 watch(
@@ -44,7 +44,7 @@ watch(
     }),
   {
     deep: true,
-  }
+  },
 )
 
 watch(
@@ -63,7 +63,7 @@ watch(
   {
     immediate: true,
     deep: true,
-  }
+  },
 )
 
 watch(selectedChildSectionName, () => (childSection.value = {}))
@@ -77,7 +77,7 @@ watch(selectedChildSectionName, () => (childSection.value = {}))
           id="divergentExpirationDefinedSelection"
           v-model="selectedChildSectionName"
           aria-label="Bestimmtes abweichendes Außerkrafttretedatum Radio"
-          name="DivergentExpirationDefined"
+          name="divergentExpiration"
           type="radio"
           :value="MetadataSectionName.DIVERGENT_EXPIRATION_DEFINED"
         />
@@ -95,7 +95,7 @@ watch(selectedChildSectionName, () => (childSection.value = {}))
               MetadataSectionName.DIVERGENT_EXPIRATION_UNDEFINED
             )
           "
-          name="DivergentExpirationUndefined"
+          name="divergentExpiration"
           type="radio"
           :value="MetadataSectionName.DIVERGENT_EXPIRATION_UNDEFINED"
         />

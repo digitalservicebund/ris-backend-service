@@ -21,13 +21,13 @@ test.describe("a11y of categories page (/caselaw/documentunit/{documentNumber}/c
       .locator("[aria-label='Gericht'] + button.input-expand-icon")
       .click()
     await expect(page.locator("[aria-label='dropdown-option']")).toHaveCount(
-      3925
+      3925,
     )
 
     await expect(page.locator("text=AG Aachen")).toBeVisible()
     await expect(page.locator("text=AG Aalen")).toBeVisible()
     await page.locator("[aria-label='Gericht']").fill("bayern")
-    expect(await page.inputValue("[aria-label='Gericht']")).toBe("bayern")
+    await expect(page.locator("[aria-label='Gericht']")).toHaveValue("bayern")
     await expect(page.locator("[aria-label='dropdown-option']")).toHaveCount(2)
     const accessibilityScanResults = await new AxeBuilder({ page }).analyze()
     expect(accessibilityScanResults.violations).toEqual([])
@@ -88,7 +88,9 @@ test.describe("a11y of categories page (/caselaw/documentunit/{documentNumber}/c
 
     // type search string: 3 results for "zwischen"
     await page.locator("[aria-label='Dokumenttyp']").fill("zwischen")
-    expect(await page.inputValue("[aria-label='Dokumenttyp']")).toBe("zwischen")
+    await expect(page.locator("[aria-label='Dokumenttyp']")).toHaveValue(
+      "zwischen",
+    )
     await expect(page.locator("[aria-label='dropdown-option']")).toHaveCount(3)
 
     const accessibilityScanResults = await new AxeBuilder({ page }).analyze()
@@ -138,7 +140,7 @@ test.describe("a11y of categories page (/caselaw/documentunit/{documentNumber}/c
         })
       },
       page,
-      { clickSaveButton: true }
+      { clickSaveButton: true },
     )
     await page.reload()
     await toggleProceedingDecisionsSection(page)

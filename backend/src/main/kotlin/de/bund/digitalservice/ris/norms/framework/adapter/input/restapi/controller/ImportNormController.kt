@@ -2,7 +2,11 @@ package de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.control
 
 import de.bund.digitalservice.ris.norms.application.port.input.ImportNormUseCase
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.ApiConfiguration
+import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.OpenApiConfiguration
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.encodeGuid
+import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.responses.ApiResponse
+import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.http.HttpHeaders
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.PostMapping
@@ -11,13 +15,16 @@ import org.springframework.web.bind.annotation.RequestHeader
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import reactor.core.publisher.Mono
-import java.util.*
+import java.util.UUID
 
 @RestController
 @RequestMapping(ApiConfiguration.API_NORMS_PATH)
+@Tag(name = OpenApiConfiguration.NORMS_TAG)
 class ImportNormController(private val importNormService: ImportNormUseCase) {
 
     @PostMapping
+    @Operation(summary = "Import a norm using a ZIP", description = "Importing all xml files of a norm in juris format in a compressed ZIP file")
+    @ApiResponse(responseCode = "201", description = "Norm was successfully imported")
     fun createNorm(@RequestBody zipFile: ByteArray, @RequestHeader headers: HttpHeaders): Mono<ResponseEntity<ResponseSchema>> {
         val filename = headers.getFirst("X-Filename") ?: "norm.zip"
         val command = ImportNormUseCase.Command(zipFile, filename, headers.contentLength)

@@ -1,6 +1,8 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw.FieldOfLaw;
+import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.OpenApiConfiguration;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -15,6 +17,7 @@ import reactor.core.publisher.Mono;
 
 @RestController
 @RequestMapping("api/v1/caselaw/fieldsoflaw")
+@Tag(name = OpenApiConfiguration.CASELAW_TAG)
 public class FieldOfLawController {
   private final FieldOfLawService service;
 

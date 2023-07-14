@@ -10,10 +10,10 @@ test.describe("content related indexing", () => {
     await navigateToCategories(page, documentNumber)
 
     await expect(
-      page.getByRole("link", { name: "Inhaltliche Erschließung" })
+      page.getByRole("link", { name: "Inhaltliche Erschließung" }),
     ).toBeVisible()
     await expect(
-      page.getByRole("heading", { name: "Inhaltliche Erschließung" })
+      page.getByRole("heading", { name: "Inhaltliche Erschließung" }),
     ).toBeVisible()
   })
 

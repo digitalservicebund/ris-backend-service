@@ -10,6 +10,8 @@ import de.bund.digitalservice.ris.caselaw.domain.PublicationHistoryRecord;
 import de.bund.digitalservice.ris.caselaw.domain.SingleNormValidationInfo;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import de.bund.digitalservice.ris.caselaw.domain.docx.Docx2Html;
+import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.OpenApiConfiguration;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.nio.ByteBuffer;
 import java.util.UUID;
@@ -40,6 +42,7 @@ import reactor.core.publisher.Mono;
 @RestController
 @RequestMapping("api/v1/caselaw/documentunits")
 @Slf4j
+@Tag(name = OpenApiConfiguration.CASELAW_TAG)
 public class DocumentUnitController {
   private final DocumentUnitService service;
   private final UserService userService;
@@ -105,7 +108,8 @@ public class DocumentUnitController {
   public Mono<ResponseEntity<DocumentUnit>> getByDocumentNumber(
       @NonNull @PathVariable String documentNumber) {
 
-    if (documentNumber.length() != 13 && documentNumber.length() != 14) {
+    // migrated document units can have a document number of 11 characters, e.g. INO-1234567
+    if (documentNumber.length() < 11 || documentNumber.length() > 14) {
       return Mono.just(ResponseEntity.unprocessableEntity().body(DocumentUnit.builder().build()));
     }
 

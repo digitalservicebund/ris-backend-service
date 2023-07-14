@@ -13,7 +13,7 @@ describe("FootnoteInput", () => {
     })
 
     screen.getByText(
-      "Sie können mit # den Fußnoten-Typ wählen (z.B. Änderungsfußnote, Kommentierende Fußnote)"
+      "Sie können mit # den Fußnoten-Typ wählen (z.B. Änderungsfußnote, Kommentierende Fußnote)",
     )
   })
 
@@ -40,33 +40,33 @@ describe("FootnoteInput", () => {
     await flushPromises()
 
     expect(
-      screen.getByText("§ 7 Abs. 1a Satz 1 u. 2", { exact: false })
+      screen.getByText("§ 7 Abs. 1a Satz 1 u. 2", { exact: false }),
     ).toBeInTheDocument()
 
     expect(
-      screen.getByText("eine ganze Menge Text", { exact: false })
+      screen.getByText("eine ganze Menge Text", { exact: false }),
     ).toBeInTheDocument()
 
     expect(
-      screen.getByText("irgendwas halt", { exact: false })
+      screen.getByText("irgendwas halt", { exact: false }),
     ).toBeInTheDocument()
 
     expect(screen.getByText("state law", { exact: false })).toBeInTheDocument()
 
     expect(
-      screen.getByText("einfach nur ein Kommentar", { exact: false })
+      screen.getByText("einfach nur ein Kommentar", { exact: false }),
     ).toBeInTheDocument()
 
     expect(
-      screen.getByText("das wurde halt so entschieden", { exact: false })
+      screen.getByText("das wurde halt so entschieden", { exact: false }),
     ).toBeInTheDocument()
 
     expect(
-      screen.getByText("ach nochmal eben etwas", { exact: false })
+      screen.getByText("ach nochmal eben etwas", { exact: false }),
     ).toBeInTheDocument()
 
     expect(
-      screen.getByText("ach nochmal eben etwas2", { exact: false })
+      screen.getByText("ach nochmal eben etwas2", { exact: false }),
     ).toBeInTheDocument()
   })
 })

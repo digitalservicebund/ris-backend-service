@@ -28,7 +28,7 @@ const emits = defineEmits<Emits>()
 
 const { inputValue } = useInputModel<NestedInputModelType, Props, Emits>(
   props,
-  emits
+  emits,
 )
 
 const parentValue = computed({

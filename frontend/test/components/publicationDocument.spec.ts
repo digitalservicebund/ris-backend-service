@@ -8,8 +8,13 @@ const router = createRouter({
   history: createWebHistory(),
   routes: [
     {
-      path: "",
+      path: "/caselaw/documentUnit/:documentNumber/categories",
       name: "caselaw-documentUnit-:documentNumber-categories",
+      component: {},
+    },
+    {
+      path: "/",
+      name: "caselaw",
       component: {},
     },
   ],
@@ -64,12 +69,12 @@ describe("PublicationDocument:", () => {
       setupWithAllRequiredFields()
 
       expect(
-        screen.getByText("Alle Pflichtfelder sind korrekt ausgefüllt")
+        screen.getByText("Alle Pflichtfelder sind korrekt ausgefüllt"),
       ).toBeInTheDocument()
       expect(
         screen.queryByText(
-          "Die folgenden Rubriken-Pflichtfelder sind nicht befüllt:"
-        )
+          "Die folgenden Rubriken-Pflichtfelder sind nicht befüllt:",
+        ),
       ).not.toBeInTheDocument()
     })
 
@@ -86,8 +91,8 @@ describe("PublicationDocument:", () => {
       })
       expect(
         await screen.findByText(
-          "Die folgenden Rubriken-Pflichtfelder sind nicht befüllt:"
-        )
+          "Die folgenden Rubriken-Pflichtfelder sind nicht befüllt:",
+        ),
       ).toBeInTheDocument()
 
       expect(screen.getByText("Aktenzeichen")).toBeInTheDocument()
@@ -107,12 +112,12 @@ describe("PublicationDocument:", () => {
         },
       })
       expect(
-        await screen.findByLabelText("Rubriken bearbeiten")
+        await screen.findByLabelText("Rubriken bearbeiten"),
       ).toBeInTheDocument()
 
       await userEvent.click(screen.getByLabelText("Rubriken bearbeiten"))
       expect(router.currentRoute.value.name).toBe(
-        "caselaw-documentUnit-:documentNumber-categories"
+        "caselaw-documentUnit-:documentNumber-categories",
       )
     })
   })
@@ -152,10 +157,10 @@ describe("PublicationDocument:", () => {
       })
 
       expect(
-        screen.queryByLabelText("Erfolg der Veröffentlichung")
+        screen.queryByLabelText("Erfolg der Veröffentlichung"),
       ).not.toBeInTheDocument()
       expect(
-        screen.getByLabelText("Fehler bei Veröffentlichung")
+        screen.getByLabelText("Fehler bei Veröffentlichung"),
       ).toHaveTextContent(`errorerror message titleerror message description`)
     })
 
@@ -175,12 +180,12 @@ describe("PublicationDocument:", () => {
       await fireEvent.click(publishButton)
 
       expect(
-        screen.queryByLabelText("Erfolg der Veröffentlichung")
+        screen.queryByLabelText("Erfolg der Veröffentlichung"),
       ).not.toBeInTheDocument()
       expect(
-        screen.getByLabelText("Fehler bei Veröffentlichung")
+        screen.getByLabelText("Fehler bei Veröffentlichung"),
       ).toHaveTextContent(
-        `errorEs sind noch nicht alle Pflichtfelder befüllt.Die Dokumentationseinheit kann nicht veröffentlicht werden.`
+        `errorEs sind noch nicht alle Pflichtfelder befüllt.Die Dokumentationseinheit kann nicht veröffentlicht werden.`,
       )
     })
   })
@@ -189,9 +194,9 @@ describe("PublicationDocument:", () => {
     it("with earlier published document unit", async () => {
       setupWithPublishedDocument()
       expect(
-        screen.getByLabelText("Letzte Veröffentlichungen")
+        screen.getByLabelText("Letzte Veröffentlichungen"),
       ).toHaveTextContent(
-        `Letzte VeröffentlichungenXml Email Abgabe - 01.02.2000keyboard_arrow_upÜBERE-Mail an: receiver address Betreff: mail subjectStatus: erfolgreich angekommenALSXML1<?xml version="1.0"?>2<!DOCTYPE juris-r SYSTEM "juris-r.dtd">3<xml>content</xml>`
+        `Letzte VeröffentlichungenXml Email Abgabe - 01.02.2000keyboard_arrow_upÜBERE-Mail an: receiver address Betreff: mail subjectStatus: erfolgreich angekommenALSXML1<?xml version="1.0"?>2<!DOCTYPE juris-r SYSTEM "juris-r.dtd">3<xml>content</xml>`,
       )
     })
 
@@ -205,9 +210,9 @@ describe("PublicationDocument:", () => {
         },
       })
       expect(
-        screen.getByLabelText("Letzte Veröffentlichungen")
+        screen.getByLabelText("Letzte Veröffentlichungen"),
       ).toHaveTextContent(
-        `Letzte Veröffentlichungen Diese Dokumentationseinheit wurde bisher nicht veröffentlicht`
+        `Letzte Veröffentlichungen Diese Dokumentationseinheit wurde bisher nicht veröffentlicht`,
       )
     })
   })
@@ -251,7 +256,7 @@ describe("PublicationDocument:", () => {
     })
 
     expect(container).toHaveTextContent(
-      `VeröffentlichenPlausibilitätsprüfung check Alle Pflichtfelder sind korrekt ausgefülltcampaignDokumentationseinheit veröffentlichenLetzte VeröffentlichungenXml Email Abgabe - 01.02.2000keyboard_arrow_upÜBERE-Mail an: receiver address Betreff: mail subjectStatus: erfolgreich angekommenALS`
+      `VeröffentlichenPlausibilitätsprüfung check Alle Pflichtfelder sind korrekt ausgefülltcampaignDokumentationseinheit veröffentlichenLetzte VeröffentlichungenXml Email Abgabe - 01.02.2000keyboard_arrow_upÜBERE-Mail an: receiver address Betreff: mail subjectStatus: erfolgreich angekommenALS`,
     )
 
     const codeSnippet = screen.queryByTestId("code-snippet")

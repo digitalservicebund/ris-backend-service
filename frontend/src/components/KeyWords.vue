@@ -15,7 +15,7 @@ const addKeyword = async (keyword: string | undefined) => {
   if (keyword !== undefined) {
     const response = await KeywordsService.addKeyword(
       props.documentUnitUuid,
-      keyword
+      keyword,
     )
     if (response.error) {
       errorMessage.value = response.error
@@ -31,7 +31,7 @@ const deleteKeyword = async (keyword: string | undefined) => {
   if (keyword !== undefined) {
     const response = await KeywordsService.deleteKeyword(
       props.documentUnitUuid,
-      keyword
+      keyword,
     )
     if (response.error) {
       errorMessage.value = response.error
@@ -57,7 +57,7 @@ watch(
   },
   {
     immediate: true,
-  }
+  },
 )
 </script>
 

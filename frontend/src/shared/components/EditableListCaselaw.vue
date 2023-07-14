@@ -58,7 +58,7 @@ watch(
     if (editIndex.value && editIndex.value >= props.modelValue.length)
       addNewModelEntry()
   },
-  { immediate: true, deep: true }
+  { immediate: true, deep: true },
 )
 
 watch(
@@ -68,7 +68,7 @@ watch(
       addNewModelEntry()
     }
   },
-  { deep: true, immediate: true }
+  { deep: true, immediate: true },
 )
 
 watch(modelValueList, () => emit("update:modelValue", modelValueList.value), {

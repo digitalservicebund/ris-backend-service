@@ -58,7 +58,9 @@ const props = withDefaults(defineProps<Props>(), {
   ariaLabel: "Editor Feld",
 })
 
-const emit = defineEmits<(e: "updateValue", newValue: string) => void>()
+const emit = defineEmits<{
+  updateValue: [newValue: string]
+}>()
 
 const hasFocus = ref(false)
 
@@ -284,16 +286,16 @@ const editorButtons = computed(() =>
       button.group == "alignment"
         ? editor.isActive({ textAlign: button.type })
         : editor.isActive(button.type),
-  }))
+  })),
 )
 const buttonSize = 48 //px
 const containerWidth = ref()
 const maxButtonEntries = computed(() =>
-  Math.floor((containerWidth.value - 100) / buttonSize)
+  Math.floor((containerWidth.value - 100) / buttonSize),
 )
 const { collapsedButtons } = useCollapsingMenuBar(
   editorButtons,
-  maxButtonEntries
+  maxButtonEntries,
 )
 const showSecondRow = ref(false)
 
@@ -312,7 +314,7 @@ watch(
     }
     // incoming changes
     editor.commands.setContent(value, false)
-  }
+  },
 )
 
 const showButtons = () => {
@@ -359,7 +361,7 @@ const resizeObserver = new ResizeObserver((entries) => {
           />
         </div>
       </div>
-      <hr />
+      <hr class="border-t-black" />
     </div>
     <div v-if="showButtons() && showSecondRow">
       <div

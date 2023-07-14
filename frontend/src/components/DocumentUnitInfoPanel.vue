@@ -2,15 +2,15 @@
 import IconBadge, { IconBadgeProps } from "@/shared/components/IconBadge.vue"
 import PropertyInfo from "@/shared/components/PropertyInfo.vue"
 
-interface PropertyInfo {
+interface PropertyInfoType {
   label: string
   value?: string
 }
 
 interface Props {
   heading?: string
-  firstRow?: (PropertyInfo | IconBadgeProps)[]
-  secondRow?: (PropertyInfo | IconBadgeProps)[]
+  firstRow?: (PropertyInfoType | IconBadgeProps)[]
+  secondRow?: (PropertyInfoType | IconBadgeProps)[]
 }
 
 withDefaults(defineProps<Props>(), {
@@ -20,7 +20,7 @@ withDefaults(defineProps<Props>(), {
 })
 
 function isBadge(
-  entry: PropertyInfo | IconBadgeProps
+  entry: PropertyInfoType | IconBadgeProps,
 ): entry is IconBadgeProps {
   return "icon" in entry
 }

@@ -27,7 +27,7 @@ watch(
       inputValue.value = newValue
     }
   },
-  { immediate: true }
+  { immediate: true },
 )
 
 watch(inputValue, () => emit("update:modelValue", inputValue.value), {
@@ -45,7 +45,7 @@ interface DropdownItem {
 }
 
 const dropdownItems: DropdownItem[] = Object.entries(
-  PROOF_INDICATION_TRANSLATIONS
+  PROOF_INDICATION_TRANSLATIONS,
 ).map(([value, label]) => {
   return { label, value }
 })
@@ -91,7 +91,6 @@ const proofIndication = computed({
 
 const dateEnabled = computed(() => !inputValue.value.YEAR?.[0])
 const yearEnabled = computed(() => !inputValue.value.DATE?.[0])
-const disabledClass = "border-gray-800 read-only:!border-solid"
 </script>
 <template>
   <div>
@@ -119,7 +118,7 @@ const disabledClass = "border-gray-800 read-only:!border-solid"
         aria-label="Bezeichnung der Änderungsvorschrift Description"
       />
     </InputField>
-    <div class="flex gap-24 items-center">
+    <div class="flex gap-24">
       <InputField
         id="date"
         aria-label="Datum"
@@ -130,18 +129,16 @@ const disabledClass = "border-gray-800 read-only:!border-solid"
           id="documentStatusDate"
           v-model="date"
           :attributes="{ ariaLabel: `Dokument Datum` }"
-          :class="{ [disabledClass]: !dateEnabled }"
           :disabled="!dateEnabled"
           :type="InputType.DATE"
         />
       </InputField>
-      <p>oder</p>
+      <p class="my-auto">oder</p>
       <InputField id="year" aria-label="Jahr" class="md:w-auto" label="Jahr">
         <YearInput
           id="documentStatusYear"
           v-model="year"
           aria-label="Dokument Jahr"
-          :class="{ [disabledClass]: !yearEnabled }"
           :disabled="!yearEnabled"
         />
       </InputField>

@@ -115,7 +115,7 @@ describe("ChipsInput", () => {
   it("resets date input on backspace delete", async () => {
     renderComponent()
     const input: HTMLInputElement = screen.queryByLabelText(
-      "aria-label"
+      "aria-label",
     ) as HTMLInputElement
     await userEvent.type(input, "13.05.2022")
     expect(input).toHaveValue("13.05.2022")

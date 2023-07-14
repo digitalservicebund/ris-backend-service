@@ -64,7 +64,7 @@ type RecursiveOmit<Type, KeyToOmit extends PropertyKey> = Type extends {
   : RecursiveOmitHelper<Type, KeyToOmit>
 
 function undefinedDateToDropdownEntry(
-  unit?: UndefinedDate
+  unit?: UndefinedDate,
 ): string | undefined {
   switch (unit) {
     case UndefinedDate.UNDEFINED_UNKNOWN:
@@ -79,7 +79,7 @@ function undefinedDateToDropdownEntry(
 }
 
 function proofIndicationToDropdownEntry(
-  unit?: ProofIndication
+  unit?: ProofIndication,
 ): string | undefined {
   switch (unit) {
     case ProofIndication.NOT_YET_CONSIDERED:
@@ -222,7 +222,7 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
           id: "documentTypeName",
           label: "Typbezeichnung",
           values: norm.metadataSections?.DOCUMENT_TYPE?.map(
-            (section) => section?.TYPE_NAME?.[0]
+            (section) => section?.TYPE_NAME?.[0],
           ),
         },
         {
@@ -232,8 +232,8 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
           values: norm.metadataSections?.DOCUMENT_TYPE?.map(
             (section) =>
               !!section?.NORM_CATEGORY?.find(
-                (category) => category == NormCategory.AMENDMENT_NORM
-              )
+                (category) => category == NormCategory.AMENDMENT_NORM,
+              ),
           ),
         },
         {
@@ -243,8 +243,8 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
           values: norm.metadataSections?.DOCUMENT_TYPE?.map(
             (section) =>
               !!section?.NORM_CATEGORY?.find(
-                (category) => category == NormCategory.BASE_NORM
-              )
+                (category) => category == NormCategory.BASE_NORM,
+              ),
           ),
         },
         {
@@ -254,8 +254,8 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
           values: norm.metadataSections?.DOCUMENT_TYPE?.map(
             (section) =>
               !!section?.NORM_CATEGORY?.find(
-                (category) => category == NormCategory.TRANSITIONAL_NORM
-              )
+                (category) => category == NormCategory.TRANSITIONAL_NORM,
+              ),
           ),
         },
         {
@@ -263,7 +263,7 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
           id: "documentTemplateName",
           label: "Bezeichnung gemäß Vorlage",
           values: norm.metadataSections?.DOCUMENT_TYPE?.map(
-            (section) => section?.TEMPLATE_NAME
+            (section) => section?.TEMPLATE_NAME,
           ),
         },
       ],
@@ -279,7 +279,7 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
           label:
             "Staat, Land, Stadt, Landkreis oder juristische Person, deren Hoheitsgewalt oder Rechtsmacht die Norm trägt",
           values: norm.metadataSections?.NORM_PROVIDER?.map(
-            (section) => section?.ENTITY?.[0]
+            (section) => section?.ENTITY?.[0],
           ),
         },
         {
@@ -287,7 +287,7 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
           id: "normProviderDecidingBody",
           label: "Beschließendes Organ",
           values: norm.metadataSections?.NORM_PROVIDER?.map(
-            (section) => section?.DECIDING_BODY?.[0]
+            (section) => section?.DECIDING_BODY?.[0],
           ),
         },
         {
@@ -295,7 +295,7 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
           id: "normProviderIsResolutionMajority",
           label: "Beschlussfassung mit qualifizierter Mehrheit",
           values: norm.metadataSections?.NORM_PROVIDER?.map(
-            (section) => section?.RESOLUTION_MAJORITY?.[0]
+            (section) => section?.RESOLUTION_MAJORITY?.[0],
           ),
         },
       ],
@@ -310,7 +310,7 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
           id: "participationType",
           label: "Art der Mitwirkung",
           values: norm.metadataSections?.PARTICIPATION?.map(
-            (section) => section?.PARTICIPATION_TYPE?.[0]
+            (section) => section?.PARTICIPATION_TYPE?.[0],
           ),
         },
         {
@@ -318,7 +318,7 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
           id: "participationInstitution",
           label: "Mitwirkendes Organ",
           values: norm.metadataSections?.PARTICIPATION?.map(
-            (section) => section?.PARTICIPATION_INSTITUTION?.[0]
+            (section) => section?.PARTICIPATION_INSTITUTION?.[0],
           ),
         },
       ],
@@ -333,7 +333,7 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
           id: "leadJurisdiction",
           label: "Ressort",
           values: norm.metadataSections?.LEAD?.map(
-            (section) => section?.LEAD_JURISDICTION?.[0]
+            (section) => section?.LEAD_JURISDICTION?.[0],
           ),
         },
         {
@@ -341,7 +341,7 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
           id: "leadUnit",
           label: "Organisationseinheit",
           values: norm.metadataSections?.LEAD?.map(
-            (section) => section?.LEAD_UNIT?.[0]
+            (section) => section?.LEAD_UNIT?.[0],
           ),
         },
       ],
@@ -356,7 +356,7 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
           id: "subjectFna",
           label: "FNA-Nummer",
           values: norm.metadataSections?.SUBJECT_AREA?.map(
-            (section) => section?.SUBJECT_FNA?.[0]
+            (section) => section?.SUBJECT_FNA?.[0],
           ),
         },
         {
@@ -364,7 +364,7 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
           id: "subjectPreviousFna",
           label: "Frühere FNA-Nummer",
           values: norm.metadataSections?.SUBJECT_AREA?.map(
-            (section) => section?.SUBJECT_PREVIOUS_FNA?.[0]
+            (section) => section?.SUBJECT_PREVIOUS_FNA?.[0],
           ),
         },
         {
@@ -372,7 +372,7 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
           id: "subjectGesta",
           label: "GESTA-Nummer",
           values: norm.metadataSections?.SUBJECT_AREA?.map(
-            (section) => section?.SUBJECT_GESTA?.[0]
+            (section) => section?.SUBJECT_GESTA?.[0],
           ),
         },
         {
@@ -380,7 +380,7 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
           id: "subjectBgb3",
           label: "Bundesgesetzblatt Teil III",
           values: norm.metadataSections?.SUBJECT_AREA?.map(
-            (section) => section?.SUBJECT_BGB_3?.[0]
+            (section) => section?.SUBJECT_BGB_3?.[0],
           ),
         },
       ],
@@ -451,7 +451,7 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
           id: "entryIntoForceSelection",
           label: "bestimmt",
           values: norm.metadataSections?.ENTRY_INTO_FORCE?.map(
-            (section) => !!section?.DATE
+            (section) => !!section?.DATE,
           ),
         },
         {
@@ -459,7 +459,7 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
           id: "entryIntoForceDate",
           label: "Bestimmtes Inkrafttretedatum",
           values: norm.metadataSections?.ENTRY_INTO_FORCE?.map(
-            (section) => section?.DATE?.[0]
+            (section) => section?.DATE?.[0],
           ),
         },
         {
@@ -467,7 +467,7 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
           id: "entryIntoForceUndefinedSelection",
           label: "unbestimmt",
           values: norm.metadataSections?.ENTRY_INTO_FORCE?.map(
-            (section) => !!section?.UNDEFINED_DATE
+            (section) => !!section?.UNDEFINED_DATE,
           ),
         },
         {
@@ -475,7 +475,7 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
           id: "entryIntoForceUndefinedDateState",
           label: "Unbestimmtes Inkrafttretedatum",
           values: norm.metadataSections?.ENTRY_INTO_FORCE?.map((section) =>
-            undefinedDateToDropdownEntry(section?.UNDEFINED_DATE?.[0])
+            undefinedDateToDropdownEntry(section?.UNDEFINED_DATE?.[0]),
           ),
         },
       ],
@@ -490,7 +490,7 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
           id: "principleEntryIntoForceSelection",
           label: "bestimmt",
           values: norm.metadataSections?.PRINCIPLE_ENTRY_INTO_FORCE?.map(
-            (section) => !!section?.DATE
+            (section) => !!section?.DATE,
           ),
         },
         {
@@ -498,7 +498,7 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
           id: "principleEntryIntoForceDate",
           label: "Bestimmtes grundsätzliches Inkrafttretedatum",
           values: norm.metadataSections?.PRINCIPLE_ENTRY_INTO_FORCE?.map(
-            (section) => section?.DATE?.[0]
+            (section) => section?.DATE?.[0],
           ),
         },
         {
@@ -506,7 +506,7 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
           id: "principleEntryIntoForceUndefinedSelection",
           label: "unbestimmt",
           values: norm.metadataSections?.PRINCIPLE_ENTRY_INTO_FORCE?.map(
-            (section) => !!section?.UNDEFINED_DATE
+            (section) => !!section?.UNDEFINED_DATE,
           ),
         },
         {
@@ -515,7 +515,7 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
           label: "Unbestimmtes grundsätzliches Inkrafttretedatum",
           values: norm.metadataSections?.PRINCIPLE_ENTRY_INTO_FORCE?.map(
             (section) =>
-              undefinedDateToDropdownEntry(section?.UNDEFINED_DATE?.[0])
+              undefinedDateToDropdownEntry(section?.UNDEFINED_DATE?.[0]),
           ),
         },
       ],
@@ -530,7 +530,7 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
           id: "divergentEntryIntoForceDefinedSelection",
           label: "bestimmt",
           values: norm.metadataSections?.DIVERGENT_ENTRY_INTO_FORCE?.map(
-            (section) => !!section?.DIVERGENT_ENTRY_INTO_FORCE_DEFINED
+            (section) => !!section?.DIVERGENT_ENTRY_INTO_FORCE_DEFINED,
           ),
         },
         {
@@ -538,7 +538,7 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
           id: "divergentEntryIntoForceDefinedDateDateInput",
           label: "Bestimmtes abweichendes Inkrafttretedatum",
           values: norm.metadataSections?.DIVERGENT_ENTRY_INTO_FORCE?.map(
-            (section) => section?.DIVERGENT_ENTRY_INTO_FORCE_DEFINED?.[0]
+            (section) => section?.DIVERGENT_ENTRY_INTO_FORCE_DEFINED?.[0],
           ).map((section) => section?.DATE?.[0]),
         },
         {
@@ -549,13 +549,13 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
           ].join("-"),
           label: "Änderungsnorm",
           values: norm.metadataSections?.DIVERGENT_ENTRY_INTO_FORCE?.map(
-            (section) => section?.DIVERGENT_ENTRY_INTO_FORCE_DEFINED?.[0]
+            (section) => section?.DIVERGENT_ENTRY_INTO_FORCE_DEFINED?.[0],
           ).map((section) =>
             section === undefined
               ? undefined
               : !!section?.NORM_CATEGORY?.find(
-                  (category) => category == NormCategory.AMENDMENT_NORM
-                )
+                  (category) => category == NormCategory.AMENDMENT_NORM,
+                ),
           ),
         },
         {
@@ -566,13 +566,13 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
           ].join("-"),
           label: "Stammnorm",
           values: norm.metadataSections?.DIVERGENT_ENTRY_INTO_FORCE?.map(
-            (section) => section?.DIVERGENT_ENTRY_INTO_FORCE_DEFINED?.[0]
+            (section) => section?.DIVERGENT_ENTRY_INTO_FORCE_DEFINED?.[0],
           ).map((section) =>
             section === undefined
               ? undefined
               : !!section?.NORM_CATEGORY?.find(
-                  (category) => category == NormCategory.BASE_NORM
-                )
+                  (category) => category == NormCategory.BASE_NORM,
+                ),
           ),
         },
         {
@@ -583,13 +583,13 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
           ].join("-"),
           label: "Übergangsnorm",
           values: norm.metadataSections?.DIVERGENT_ENTRY_INTO_FORCE?.map(
-            (section) => section?.DIVERGENT_ENTRY_INTO_FORCE_DEFINED?.[0]
+            (section) => section?.DIVERGENT_ENTRY_INTO_FORCE_DEFINED?.[0],
           ).map((section) =>
             section === undefined
               ? undefined
               : !!section?.NORM_CATEGORY?.find(
-                  (category) => category == NormCategory.TRANSITIONAL_NORM
-                )
+                  (category) => category == NormCategory.TRANSITIONAL_NORM,
+                ),
           ),
         },
         {
@@ -597,7 +597,7 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
           id: "divergentEntryIntoForceUndefinedSelection",
           label: "unbestimmt",
           values: norm.metadataSections?.DIVERGENT_ENTRY_INTO_FORCE?.map(
-            (section) => !!section?.DIVERGENT_ENTRY_INTO_FORCE_UNDEFINED
+            (section) => !!section?.DIVERGENT_ENTRY_INTO_FORCE_UNDEFINED,
           ),
         },
         {
@@ -605,9 +605,9 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
           id: "divergentEntryIntoForceUndefinedDateDropdown",
           label: "Unbestimmtes abweichendes Inkrafttretedatum",
           values: norm.metadataSections?.DIVERGENT_ENTRY_INTO_FORCE?.map(
-            (section) => section?.DIVERGENT_ENTRY_INTO_FORCE_UNDEFINED?.[0]
+            (section) => section?.DIVERGENT_ENTRY_INTO_FORCE_UNDEFINED?.[0],
           ).map((section) =>
-            undefinedDateToDropdownEntry(section?.UNDEFINED_DATE?.[0])
+            undefinedDateToDropdownEntry(section?.UNDEFINED_DATE?.[0]),
           ),
         },
         {
@@ -618,13 +618,13 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
           ].join("-"),
           label: "Änderungsnorm",
           values: norm.metadataSections?.DIVERGENT_ENTRY_INTO_FORCE?.map(
-            (section) => section?.DIVERGENT_ENTRY_INTO_FORCE_UNDEFINED?.[0]
+            (section) => section?.DIVERGENT_ENTRY_INTO_FORCE_UNDEFINED?.[0],
           ).map((section) =>
             section === undefined
               ? undefined
               : !!section?.NORM_CATEGORY?.find(
-                  (category) => category == NormCategory.AMENDMENT_NORM
-                )
+                  (category) => category == NormCategory.AMENDMENT_NORM,
+                ),
           ),
         },
         {
@@ -635,13 +635,13 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
           ].join("-"),
           label: "Stammnorm",
           values: norm.metadataSections?.DIVERGENT_ENTRY_INTO_FORCE?.map(
-            (section) => section?.DIVERGENT_ENTRY_INTO_FORCE_UNDEFINED?.[0]
+            (section) => section?.DIVERGENT_ENTRY_INTO_FORCE_UNDEFINED?.[0],
           ).map((section) =>
             section === undefined
               ? undefined
               : !!section?.NORM_CATEGORY?.find(
-                  (category) => category == NormCategory.BASE_NORM
-                )
+                  (category) => category == NormCategory.BASE_NORM,
+                ),
           ),
         },
         {
@@ -652,13 +652,13 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
           ].join("-"),
           label: "Übergangsnorm",
           values: norm.metadataSections?.DIVERGENT_ENTRY_INTO_FORCE?.map(
-            (section) => section?.DIVERGENT_ENTRY_INTO_FORCE_UNDEFINED?.[0]
+            (section) => section?.DIVERGENT_ENTRY_INTO_FORCE_UNDEFINED?.[0],
           ).map((section) =>
             section === undefined
               ? undefined
               : !!section?.NORM_CATEGORY?.find(
-                  (category) => category == NormCategory.TRANSITIONAL_NORM
-                )
+                  (category) => category == NormCategory.TRANSITIONAL_NORM,
+                ),
           ),
         },
       ],
@@ -673,7 +673,7 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
           id: "expirationSelection",
           label: "bestimmt",
           values: norm.metadataSections?.EXPIRATION?.map(
-            (section) => !!section?.DATE
+            (section) => !!section?.DATE,
           ),
         },
         {
@@ -681,7 +681,7 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
           id: "expirationDate",
           label: "Bestimmtes Außerkrafttretedatum",
           values: norm.metadataSections?.EXPIRATION?.map(
-            (section) => section?.DATE?.[0]
+            (section) => section?.DATE?.[0],
           ),
         },
         {
@@ -689,7 +689,7 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
           id: "expirationUndefinedSelection",
           label: "unbestimmt",
           values: norm.metadataSections?.EXPIRATION?.map(
-            (section) => !!section?.UNDEFINED_DATE
+            (section) => !!section?.UNDEFINED_DATE,
           ),
         },
         {
@@ -697,7 +697,7 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
           id: "expirationUndefinedDate",
           label: "Unbestimmtes Außerkrafttretedatum",
           values: norm.metadataSections?.EXPIRATION?.map((section) =>
-            undefinedDateToDropdownEntry(section?.UNDEFINED_DATE?.[0])
+            undefinedDateToDropdownEntry(section?.UNDEFINED_DATE?.[0]),
           ),
         },
       ],
@@ -712,7 +712,7 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
           id: "principleExpirationSelection",
           label: "bestimmt",
           values: norm.metadataSections?.PRINCIPLE_EXPIRATION?.map(
-            (section) => !!section?.DATE
+            (section) => !!section?.DATE,
           ),
         },
         {
@@ -720,7 +720,7 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
           id: "principleExpirationDate",
           label: "Bestimmtes grundsätzliches Außerkrafttretedatum",
           values: norm.metadataSections?.PRINCIPLE_EXPIRATION?.map(
-            (section) => section?.DATE?.[0]
+            (section) => section?.DATE?.[0],
           ),
         },
         {
@@ -728,7 +728,7 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
           id: "principleExpirationUndefinedSelection",
           label: "unbestimmt",
           values: norm.metadataSections?.PRINCIPLE_EXPIRATION?.map(
-            (section) => !!section?.UNDEFINED_DATE
+            (section) => !!section?.UNDEFINED_DATE,
           ),
         },
         {
@@ -736,7 +736,7 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
           id: "principleExpirationUndefinedDate",
           label: "Unbestimmtes grundsätzliches Außerkrafttretedatum",
           values: norm.metadataSections?.PRINCIPLE_EXPIRATION?.map((section) =>
-            undefinedDateToDropdownEntry(section?.UNDEFINED_DATE?.[0])
+            undefinedDateToDropdownEntry(section?.UNDEFINED_DATE?.[0]),
           ),
         },
       ],
@@ -751,7 +751,7 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
           id: "divergentExpirationDefinedSelection",
           label: "bestimmt",
           values: norm.metadataSections?.DIVERGENT_EXPIRATION?.map(
-            (section) => !!section?.DIVERGENT_EXPIRATION_DEFINED
+            (section) => !!section?.DIVERGENT_EXPIRATION_DEFINED,
           ),
         },
         {
@@ -759,7 +759,7 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
           id: "divergentExpirationDefinedDateDateInput",
           label: "Bestimmtes abweichendes Außerkrafttretedatum",
           values: norm.metadataSections?.DIVERGENT_EXPIRATION?.map(
-            (section) => section?.DIVERGENT_EXPIRATION_DEFINED?.[0]
+            (section) => section?.DIVERGENT_EXPIRATION_DEFINED?.[0],
           ).map((section) => section?.DATE?.[0]),
         },
         {
@@ -770,13 +770,13 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
           ].join("-"),
           label: "Änderungsnorm",
           values: norm.metadataSections?.DIVERGENT_EXPIRATION?.map(
-            (section) => section?.DIVERGENT_EXPIRATION_DEFINED?.[0]
+            (section) => section?.DIVERGENT_EXPIRATION_DEFINED?.[0],
           ).map((section) =>
             section === undefined
               ? undefined
               : !!section?.NORM_CATEGORY?.find(
-                  (category) => category == NormCategory.AMENDMENT_NORM
-                )
+                  (category) => category == NormCategory.AMENDMENT_NORM,
+                ),
           ),
         },
         {
@@ -787,13 +787,13 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
           ].join("-"),
           label: "Stammnorm",
           values: norm.metadataSections?.DIVERGENT_EXPIRATION?.map(
-            (section) => section?.DIVERGENT_EXPIRATION_DEFINED?.[0]
+            (section) => section?.DIVERGENT_EXPIRATION_DEFINED?.[0],
           ).map((section) =>
             section === undefined
               ? undefined
               : !!section?.NORM_CATEGORY?.find(
-                  (category) => category == NormCategory.BASE_NORM
-                )
+                  (category) => category == NormCategory.BASE_NORM,
+                ),
           ),
         },
         {
@@ -804,13 +804,13 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
           ].join("-"),
           label: "Übergangsnorm",
           values: norm.metadataSections?.DIVERGENT_EXPIRATION?.map(
-            (section) => section?.DIVERGENT_EXPIRATION_DEFINED?.[0]
+            (section) => section?.DIVERGENT_EXPIRATION_DEFINED?.[0],
           ).map((section) =>
             section === undefined
               ? undefined
               : !!section?.NORM_CATEGORY?.find(
-                  (category) => category == NormCategory.TRANSITIONAL_NORM
-                )
+                  (category) => category == NormCategory.TRANSITIONAL_NORM,
+                ),
           ),
         },
         {
@@ -818,7 +818,7 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
           id: "divergentExpirationUndefinedSelection",
           label: "unbestimmt",
           values: norm.metadataSections?.DIVERGENT_EXPIRATION?.map(
-            (section) => !!section?.DIVERGENT_EXPIRATION_UNDEFINED
+            (section) => !!section?.DIVERGENT_EXPIRATION_UNDEFINED,
           ),
         },
         {
@@ -826,7 +826,7 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
           id: "divergentExpirationUndefinedDateDropdown",
           label: "Unbestimmtes abweichendes Außerkrafttretedatum",
           values: norm.metadataSections?.DIVERGENT_EXPIRATION?.map(
-            (section) => section?.DIVERGENT_EXPIRATION_UNDEFINED?.[0]
+            (section) => section?.DIVERGENT_EXPIRATION_UNDEFINED?.[0],
           )
             .map((section) => section?.UNDEFINED_DATE?.[0])
             .map(undefinedDateToDropdownEntry),
@@ -839,13 +839,13 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
           ].join("-"),
           label: "Änderungsnorm",
           values: norm.metadataSections?.DIVERGENT_EXPIRATION?.map(
-            (section) => section?.DIVERGENT_EXPIRATION_UNDEFINED?.[0]
+            (section) => section?.DIVERGENT_EXPIRATION_UNDEFINED?.[0],
           ).map((section) =>
             section === undefined
               ? undefined
               : !!section?.NORM_CATEGORY?.find(
-                  (category) => category == NormCategory.AMENDMENT_NORM
-                )
+                  (category) => category == NormCategory.AMENDMENT_NORM,
+                ),
           ),
         },
         {
@@ -856,13 +856,13 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
           ].join("-"),
           label: "Stammnorm",
           values: norm.metadataSections?.DIVERGENT_EXPIRATION?.map(
-            (section) => section?.DIVERGENT_EXPIRATION_UNDEFINED?.[0]
+            (section) => section?.DIVERGENT_EXPIRATION_UNDEFINED?.[0],
           ).map((section) =>
             section === undefined
               ? undefined
               : !!section?.NORM_CATEGORY?.find(
-                  (category) => category == NormCategory.BASE_NORM
-                )
+                  (category) => category == NormCategory.BASE_NORM,
+                ),
           ),
         },
         {
@@ -873,13 +873,13 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
           ].join("-"),
           label: "Übergangsnorm",
           values: norm.metadataSections?.DIVERGENT_EXPIRATION?.map(
-            (section) => section?.DIVERGENT_EXPIRATION_UNDEFINED?.[0]
+            (section) => section?.DIVERGENT_EXPIRATION_UNDEFINED?.[0],
           ).map((section) =>
             section === undefined
               ? undefined
               : !!section?.NORM_CATEGORY?.find(
-                  (category) => category == NormCategory.TRANSITIONAL_NORM
-                )
+                  (category) => category == NormCategory.TRANSITIONAL_NORM,
+                ),
           ),
         },
       ],
@@ -895,7 +895,7 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
           label: "Datum",
           values: [
             norm.metadataSections?.ANNOUNCEMENT_DATE?.some(
-              (section) => !!section?.DATE
+              (section) => !!section?.DATE,
             ),
           ],
         },
@@ -904,7 +904,7 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
           id: "announcementDateInput",
           label: "Datum",
           values: norm.metadataSections?.ANNOUNCEMENT_DATE?.map(
-            (section) => section?.DATE?.[0]
+            (section) => section?.DATE?.[0],
           ),
         },
         {
@@ -912,7 +912,7 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
           id: "announcementDateTime",
           label: "Uhrzeit",
           values: norm.metadataSections?.ANNOUNCEMENT_DATE?.map(
-            (section) => section?.TIME?.[0]
+            (section) => section?.TIME?.[0],
           ),
         },
         {
@@ -920,7 +920,7 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
           id: "announcementYearSelection",
           label: "Jahresangabe",
           values: norm.metadataSections?.ANNOUNCEMENT_DATE?.map(
-            (section) => !!section?.YEAR
+            (section) => !!section?.YEAR,
           ),
         },
         {
@@ -928,7 +928,7 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
           id: "announcementDateYearInput",
           label: "Jahresangabe",
           values: norm.metadataSections?.ANNOUNCEMENT_DATE?.map(
-            (section) => section?.YEAR?.[0]
+            (section) => section?.YEAR?.[0],
           ),
         },
       ],
@@ -944,7 +944,7 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
           id: "publicationTypeDate",
           label: "Datum",
           values: norm.metadataSections?.PUBLICATION_DATE?.map(
-            (section) => !!section?.DATE
+            (section) => !!section?.DATE,
           ),
         },
         {
@@ -952,7 +952,7 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
           id: "publicationDate",
           label: "Jahresangabe",
           values: norm.metadataSections?.PUBLICATION_DATE?.map(
-            (section) => section?.DATE?.[0]
+            (section) => section?.DATE?.[0],
           ),
         },
         {
@@ -960,7 +960,7 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
           id: "publicationTypeYear",
           label: "Jahresangabe",
           values: norm.metadataSections?.PUBLICATION_DATE?.map(
-            (section) => !!section?.YEAR
+            (section) => !!section?.YEAR,
           ),
         },
         {
@@ -968,7 +968,7 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
           id: "publicationYear",
           label: "Veröffentlichungsdatum",
           values: norm.metadataSections?.PUBLICATION_DATE?.map(
-            (section) => section?.YEAR?.[0]
+            (section) => section?.YEAR?.[0],
           ),
         },
       ],
@@ -983,7 +983,7 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
           id: "citationTypeDate",
           label: "Datum",
           values: norm.metadataSections?.CITATION_DATE?.map(
-            (section) => !!section?.DATE
+            (section) => !!section?.DATE,
           ),
         },
         {
@@ -991,7 +991,7 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
           id: "citationDate",
           label: "Jahresangabe",
           values: norm.metadataSections?.CITATION_DATE?.map(
-            (section) => section?.DATE?.[0]
+            (section) => section?.DATE?.[0],
           ),
         },
         {
@@ -999,7 +999,7 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
           id: "citationTypeYear",
           label: "Jahresangabe",
           values: norm.metadataSections?.CITATION_DATE?.map(
-            (section) => !!section?.YEAR
+            (section) => !!section?.YEAR,
           ),
         },
         {
@@ -1007,7 +1007,7 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
           id: "citationYear",
           label: "Zitierdatum",
           values: norm.metadataSections?.CITATION_DATE?.map(
-            (section) => section?.YEAR?.[0]
+            (section) => section?.YEAR?.[0],
           ),
         },
       ],
@@ -1022,7 +1022,7 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
           id: "printAnnouncementSelection",
           label: "Papierverkündungsblatt",
           values: norm.metadataSections?.OFFICIAL_REFERENCE?.map(
-            (section) => !!section?.PRINT_ANNOUNCEMENT
+            (section) => !!section?.PRINT_ANNOUNCEMENT,
           ),
         },
         {
@@ -1030,7 +1030,7 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
           id: "printAnnouncementGazette",
           label: "Verkündungsblatt",
           values: norm.metadataSections?.OFFICIAL_REFERENCE?.map(
-            (section) => section?.PRINT_ANNOUNCEMENT?.[0]
+            (section) => section?.PRINT_ANNOUNCEMENT?.[0],
           ).map((section) => section?.ANNOUNCEMENT_GAZETTE?.[0]),
         },
         {
@@ -1038,7 +1038,7 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
           id: "printAnnouncementYear",
           label: "Jahr",
           values: norm.metadataSections?.OFFICIAL_REFERENCE?.map(
-            (section) => section?.PRINT_ANNOUNCEMENT?.[0]
+            (section) => section?.PRINT_ANNOUNCEMENT?.[0],
           ).map((section) => section?.YEAR?.[0]),
         },
         {
@@ -1046,7 +1046,7 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
           id: "printAnnouncementNumber",
           label: "Nummer",
           values: norm.metadataSections?.OFFICIAL_REFERENCE?.map(
-            (section) => section?.PRINT_ANNOUNCEMENT?.[0]
+            (section) => section?.PRINT_ANNOUNCEMENT?.[0],
           ).map((section) => section?.NUMBER?.[0]),
         },
         {
@@ -1054,7 +1054,7 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
           id: "printAnnouncementPage",
           label: "Seitenzahl",
           values: norm.metadataSections?.OFFICIAL_REFERENCE?.map(
-            (section) => section?.PRINT_ANNOUNCEMENT?.[0]
+            (section) => section?.PRINT_ANNOUNCEMENT?.[0],
           ).map((section) => section?.PAGE?.[0]),
         },
         {
@@ -1062,7 +1062,7 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
           id: "printAnnouncementInfo",
           label: "Zusatzangaben",
           values: norm.metadataSections?.OFFICIAL_REFERENCE?.map(
-            (section) => section?.PRINT_ANNOUNCEMENT?.[0]
+            (section) => section?.PRINT_ANNOUNCEMENT?.[0],
           ).map((section) => section?.ADDITIONAL_INFO),
         },
         {
@@ -1070,7 +1070,7 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
           id: "printAnnouncementExplanations",
           label: "Erläuterungen",
           values: norm.metadataSections?.OFFICIAL_REFERENCE?.map(
-            (section) => section?.PRINT_ANNOUNCEMENT?.[0]
+            (section) => section?.PRINT_ANNOUNCEMENT?.[0],
           ).map((section) => section?.EXPLANATION),
         },
         {
@@ -1078,7 +1078,7 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
           id: "digitalAnnouncementSelection",
           label: "Elektronisches Verkündungsblatt",
           values: norm.metadataSections?.OFFICIAL_REFERENCE?.map(
-            (section) => !!section?.DIGITAL_ANNOUNCEMENT
+            (section) => !!section?.DIGITAL_ANNOUNCEMENT,
           ),
         },
         {
@@ -1086,7 +1086,7 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
           id: "digitalAnnouncementMedium",
           label: "Verkündungsmedium",
           values: norm.metadataSections?.OFFICIAL_REFERENCE?.map(
-            (section) => section?.DIGITAL_ANNOUNCEMENT?.[0]
+            (section) => section?.DIGITAL_ANNOUNCEMENT?.[0],
           ).map((section) => section?.ANNOUNCEMENT_MEDIUM?.[0]),
         },
         {
@@ -1094,7 +1094,7 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
           id: "digitalAnnouncementDate",
           label: "Verkündungsdatum",
           values: norm.metadataSections?.OFFICIAL_REFERENCE?.map(
-            (section) => section?.DIGITAL_ANNOUNCEMENT?.[0]
+            (section) => section?.DIGITAL_ANNOUNCEMENT?.[0],
           ).map((section) => section?.DATE?.[0]),
         },
         {
@@ -1102,7 +1102,7 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
           id: "digitalAnnouncementEdition",
           label: "Ausgabenummer",
           values: norm.metadataSections?.OFFICIAL_REFERENCE?.map(
-            (section) => section?.DIGITAL_ANNOUNCEMENT?.[0]
+            (section) => section?.DIGITAL_ANNOUNCEMENT?.[0],
           ).map((section) => section?.EDITION?.[0]),
         },
         {
@@ -1110,7 +1110,7 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
           id: "digitalAnnouncementYear",
           label: "Jahr",
           values: norm.metadataSections?.OFFICIAL_REFERENCE?.map(
-            (section) => section?.DIGITAL_ANNOUNCEMENT?.[0]
+            (section) => section?.DIGITAL_ANNOUNCEMENT?.[0],
           ).map((section) => section?.YEAR?.[0]),
         },
         {
@@ -1118,7 +1118,7 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
           id: "digitalAnnouncementArea",
           label: "Bereich der Veröffentlichung",
           values: norm.metadataSections?.OFFICIAL_REFERENCE?.map(
-            (section) => section?.DIGITAL_ANNOUNCEMENT?.[0]
+            (section) => section?.DIGITAL_ANNOUNCEMENT?.[0],
           ).map((section) => section?.AREA_OF_PUBLICATION?.[0]),
         },
         {
@@ -1126,10 +1126,10 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
           id: "digitalAnnouncementAreaNumber",
           label: "Nummer der Veröffentlichung im jeweiligen Bereich",
           values: norm.metadataSections?.OFFICIAL_REFERENCE?.map(
-            (section) => section?.DIGITAL_ANNOUNCEMENT?.[0]
+            (section) => section?.DIGITAL_ANNOUNCEMENT?.[0],
           ).map(
             (section) =>
-              section?.NUMBER_OF_THE_PUBLICATION_IN_THE_RESPECTIVE_AREA?.[0]
+              section?.NUMBER_OF_THE_PUBLICATION_IN_THE_RESPECTIVE_AREA?.[0],
           ),
         },
         {
@@ -1137,7 +1137,7 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
           id: "digitalAnnouncementInfo",
           label: "Zusatzangaben",
           values: norm.metadataSections?.OFFICIAL_REFERENCE?.map(
-            (section) => section?.DIGITAL_ANNOUNCEMENT?.[0]
+            (section) => section?.DIGITAL_ANNOUNCEMENT?.[0],
           ).map((section) => section?.ADDITIONAL_INFO),
         },
         {
@@ -1145,7 +1145,7 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
           id: "digitalAnnouncementExplanations",
           label: "Erläuterungen",
           values: norm.metadataSections?.OFFICIAL_REFERENCE?.map(
-            (section) => section?.DIGITAL_ANNOUNCEMENT?.[0]
+            (section) => section?.DIGITAL_ANNOUNCEMENT?.[0],
           ).map((section) => section?.EXPLANATION),
         },
         {
@@ -1153,7 +1153,7 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
           id: "euAnnouncementSelection",
           label: "Amtsblatt der EU",
           values: norm.metadataSections?.OFFICIAL_REFERENCE?.map(
-            (section) => !!section?.EU_ANNOUNCEMENT
+            (section) => !!section?.EU_ANNOUNCEMENT,
           ),
         },
         {
@@ -1161,7 +1161,7 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
           id: "euAnnouncementGazette",
           label: "Amtsblatt der EU",
           values: norm.metadataSections?.OFFICIAL_REFERENCE?.map(
-            (section) => section?.EU_ANNOUNCEMENT?.[0]
+            (section) => section?.EU_ANNOUNCEMENT?.[0],
           ).map((section) => section?.EU_GOVERNMENT_GAZETTE?.[0]),
         },
         {
@@ -1169,7 +1169,7 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
           id: "euAnnouncementYear",
           label: "Jahresangabe",
           values: norm.metadataSections?.OFFICIAL_REFERENCE?.map(
-            (section) => section?.EU_ANNOUNCEMENT?.[0]
+            (section) => section?.EU_ANNOUNCEMENT?.[0],
           ).map((section) => section?.YEAR?.[0]),
         },
         {
@@ -1177,7 +1177,7 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
           id: "euAnnouncementSeries",
           label: "Reihe",
           values: norm.metadataSections?.OFFICIAL_REFERENCE?.map(
-            (section) => section?.EU_ANNOUNCEMENT?.[0]
+            (section) => section?.EU_ANNOUNCEMENT?.[0],
           ).map((section) => section?.SERIES?.[0]),
         },
         {
@@ -1185,7 +1185,7 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
           id: "euAnnouncementNumber",
           label: "Nummer des Amtsblatts",
           values: norm.metadataSections?.OFFICIAL_REFERENCE?.map(
-            (section) => section?.EU_ANNOUNCEMENT?.[0]
+            (section) => section?.EU_ANNOUNCEMENT?.[0],
           ).map((section) => section?.NUMBER?.[0]),
         },
         {
@@ -1193,7 +1193,7 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
           id: "euAnnouncementPage",
           label: "Seitenzahl",
           values: norm.metadataSections?.OFFICIAL_REFERENCE?.map(
-            (section) => section?.EU_ANNOUNCEMENT?.[0]
+            (section) => section?.EU_ANNOUNCEMENT?.[0],
           ).map((section) => section?.PAGE?.[0]),
         },
         {
@@ -1201,7 +1201,7 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
           id: "euAnnouncementInfo",
           label: "Zusatzangaben",
           values: norm.metadataSections?.OFFICIAL_REFERENCE?.map(
-            (section) => section?.EU_ANNOUNCEMENT?.[0]
+            (section) => section?.EU_ANNOUNCEMENT?.[0],
           ).map((section) => section?.ADDITIONAL_INFO),
         },
         {
@@ -1209,7 +1209,7 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
           id: "euAnnouncementExplanations",
           label: "Erläuterungen",
           values: norm.metadataSections?.OFFICIAL_REFERENCE?.map(
-            (section) => section?.EU_ANNOUNCEMENT?.[0]
+            (section) => section?.EU_ANNOUNCEMENT?.[0],
           ).map((section) => section?.EXPLANATION),
         },
         {
@@ -1217,7 +1217,7 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
           id: "otherAnnouncementSelection",
           label: "Sonstige amtliche Fundstelle",
           values: norm.metadataSections?.OFFICIAL_REFERENCE?.map(
-            (section) => !!section?.OTHER_OFFICIAL_ANNOUNCEMENT
+            (section) => !!section?.OTHER_OFFICIAL_ANNOUNCEMENT,
           ),
         },
         {
@@ -1225,7 +1225,7 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
           id: "otherOfficialAnnouncement",
           label: "Sonstige amtliche Fundstelle",
           values: norm.metadataSections?.OFFICIAL_REFERENCE?.map(
-            (section) => section?.OTHER_OFFICIAL_ANNOUNCEMENT?.[0]
+            (section) => section?.OTHER_OFFICIAL_ANNOUNCEMENT?.[0],
           ).map((section) => section?.OTHER_OFFICIAL_REFERENCE?.[0]),
         },
       ],
@@ -1265,7 +1265,7 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
           id: "statusSelection",
           label: "Stand",
           values: norm.metadataSections?.STATUS_INDICATION?.map(
-            (section) => !!section?.STATUS
+            (section) => !!section?.STATUS,
           ),
         },
         {
@@ -1273,7 +1273,7 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
           id: "statusNote",
           label: "Änderungshinweis",
           values: norm.metadataSections?.STATUS_INDICATION?.map(
-            (section) => section?.STATUS?.[0]
+            (section) => section?.STATUS?.[0],
           ).map((section) => section?.NOTE?.[0]),
         },
         {
@@ -1281,7 +1281,7 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
           id: "statusDescription",
           label: "Bezeichnung der Änderungsvorschrift",
           values: norm.metadataSections?.STATUS_INDICATION?.map(
-            (section) => section?.STATUS?.[0]
+            (section) => section?.STATUS?.[0],
           ).map((section) => section?.DESCRIPTION?.[0]),
         },
         {
@@ -1289,7 +1289,7 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
           id: "statusDate",
           label: "Datum der Änderungsvorschrift",
           values: norm.metadataSections?.STATUS_INDICATION?.map(
-            (section) => section?.STATUS?.[0]
+            (section) => section?.STATUS?.[0],
           ).map((section) => section?.DATE?.[0]),
         },
         {
@@ -1297,7 +1297,7 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
           id: "statusReference",
           label: "Fundstellen der Änderungsvorschrift",
           values: norm.metadataSections?.STATUS_INDICATION?.map(
-            (section) => section?.STATUS?.[0]
+            (section) => section?.STATUS?.[0],
           ).map((section) => section?.REFERENCE),
         },
         {
@@ -1305,7 +1305,7 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
           id: "reissueSelection",
           label: "Neufassung",
           values: norm.metadataSections?.STATUS_INDICATION?.map(
-            (section) => !!section?.REISSUE
+            (section) => !!section?.REISSUE,
           ),
         },
         {
@@ -1313,7 +1313,7 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
           id: "reissueNote",
           label: "Neufassungshinweis",
           values: norm.metadataSections?.STATUS_INDICATION?.map(
-            (section) => section?.REISSUE?.[0]
+            (section) => section?.REISSUE?.[0],
           ).map((section) => section?.NOTE?.[0]),
         },
         {
@@ -1321,7 +1321,7 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
           id: "reissueArticle",
           label: "Bezeichnung der Bekanntmachung",
           values: norm.metadataSections?.STATUS_INDICATION?.map(
-            (section) => section?.REISSUE?.[0]
+            (section) => section?.REISSUE?.[0],
           ).map((section) => section?.ARTICLE?.[0]),
         },
         {
@@ -1329,7 +1329,7 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
           id: "reissueDate",
           label: "Datum der Bekanntmachung",
           values: norm.metadataSections?.STATUS_INDICATION?.map(
-            (section) => section?.REISSUE?.[0]
+            (section) => section?.REISSUE?.[0],
           ).map((section) => section?.DATE?.[0]),
         },
         {
@@ -1337,7 +1337,7 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
           id: "reissueReference",
           label: "Fundstelle der Bekanntmachung",
           values: norm.metadataSections?.STATUS_INDICATION?.map(
-            (section) => section?.REISSUE?.[0]
+            (section) => section?.REISSUE?.[0],
           ).map((section) => section?.REFERENCE?.[0]),
         },
         {
@@ -1345,7 +1345,7 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
           id: "repealSelection",
           label: "Aufhebung",
           values: norm.metadataSections?.STATUS_INDICATION?.map(
-            (section) => !!section?.REPEAL
+            (section) => !!section?.REPEAL,
           ),
         },
         {
@@ -1353,7 +1353,7 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
           id: "repealText",
           label: "Aufhebung",
           values: norm.metadataSections?.STATUS_INDICATION?.map(
-            (section) => section?.REPEAL?.[0]
+            (section) => section?.REPEAL?.[0],
           ).map((section) => section?.TEXT?.[0]),
         },
         {
@@ -1361,7 +1361,7 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
           id: "otherStatusSelection",
           label: "Sonstiger Hinweis",
           values: norm.metadataSections?.STATUS_INDICATION?.map(
-            (section) => !!section?.OTHER_STATUS
+            (section) => !!section?.OTHER_STATUS,
           ),
         },
         {
@@ -1369,7 +1369,7 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
           id: "otherStatusNote",
           label: "Sonstiger Hinweis",
           values: norm.metadataSections?.STATUS_INDICATION?.map(
-            (section) => section?.OTHER_STATUS?.[0]
+            (section) => section?.OTHER_STATUS?.[0],
           ).map((section) => section?.NOTE?.[0]),
         },
       ],
@@ -1385,7 +1385,7 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
           id: "documentStatusSelection",
           label: "Stand der dokumentarischen Bearbeitung",
           values: norm.metadataSections?.DOCUMENT_STATUS_SECTION?.map(
-            (section) => !!section?.DOCUMENT_STATUS
+            (section) => !!section?.DOCUMENT_STATUS,
           ),
         },
         {
@@ -1393,7 +1393,7 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
           id: "workNoteChips",
           label: "Bearbeitungshinweis",
           values: norm.metadataSections?.DOCUMENT_STATUS_SECTION?.map(
-            (section) => section?.DOCUMENT_STATUS?.[0]
+            (section) => section?.DOCUMENT_STATUS?.[0],
           ).map((section) => section?.WORK_NOTE),
         },
         {
@@ -1401,7 +1401,7 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
           id: "descriptionText",
           label: "Bezeichnung der Änderungsvorschrift",
           values: norm.metadataSections?.DOCUMENT_STATUS_SECTION?.map(
-            (section) => section?.DOCUMENT_STATUS?.[0]
+            (section) => section?.DOCUMENT_STATUS?.[0],
           ).map((section) => section?.TEXT?.[0]),
         },
         {
@@ -1409,7 +1409,7 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
           id: "documentStatusDate",
           label: "Datum",
           values: norm.metadataSections?.DOCUMENT_STATUS_SECTION?.map(
-            (section) => section?.DOCUMENT_STATUS?.[0]
+            (section) => section?.DOCUMENT_STATUS?.[0],
           ).map((section) => section?.DATE?.[0]),
         },
         {
@@ -1417,7 +1417,7 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
           id: "documentStatusYear",
           label: "Jahr",
           values: norm.metadataSections?.DOCUMENT_STATUS_SECTION?.map(
-            (section) => section?.DOCUMENT_STATUS?.[0]
+            (section) => section?.DOCUMENT_STATUS?.[0],
           ).map((section) => section?.YEAR?.[0]),
         },
         {
@@ -1425,7 +1425,7 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
           id: "referenceText",
           label: "Fundstelle der Änderungsvorschrift",
           values: norm.metadataSections?.DOCUMENT_STATUS_SECTION?.map(
-            (section) => section?.DOCUMENT_STATUS?.[0]
+            (section) => section?.DOCUMENT_STATUS?.[0],
           ).map((section) => section?.REFERENCE?.[0]),
         },
         {
@@ -1433,7 +1433,7 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
           id: "entryIntoForceDateNoteChips",
           label: "Datum des Inkrafttretens der Änderung",
           values: norm.metadataSections?.DOCUMENT_STATUS_SECTION?.map(
-            (section) => section?.DOCUMENT_STATUS?.[0]
+            (section) => section?.DOCUMENT_STATUS?.[0],
           ).map((section) => section?.ENTRY_INTO_FORCE_DATE_NOTE),
         },
         {
@@ -1441,7 +1441,7 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
           id: "proofIndicationDropdown",
           label: "Angaben zum textlichen und/oder dokumentarischen Nachweis",
           values: norm.metadataSections?.DOCUMENT_STATUS_SECTION?.map(
-            (section) => section?.DOCUMENT_STATUS?.[0]
+            (section) => section?.DOCUMENT_STATUS?.[0],
           )
             .map((section) => section?.PROOF_INDICATION?.[0])
             .map(proofIndicationToDropdownEntry),
@@ -1451,7 +1451,7 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
           id: "documentTextProofSelection",
           label: "Textnachweis",
           values: norm.metadataSections?.DOCUMENT_STATUS_SECTION?.map(
-            (section) => !!section?.DOCUMENT_TEXT_PROOF
+            (section) => !!section?.DOCUMENT_TEXT_PROOF,
           ),
         },
         {
@@ -1459,7 +1459,7 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
           id: "proofTypeDropdown",
           label: "Textnachweis",
           values: norm.metadataSections?.DOCUMENT_STATUS_SECTION?.map(
-            (section) => section?.DOCUMENT_TEXT_PROOF?.[0]
+            (section) => section?.DOCUMENT_TEXT_PROOF?.[0],
           )
             .map((section) => section?.PROOF_TYPE?.[0])
             .map(proofTypeToDropdownEntry),
@@ -1469,7 +1469,7 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
           id: "textInput",
           label: "Zusatz",
           values: norm.metadataSections?.DOCUMENT_STATUS_SECTION?.map(
-            (section) => section?.DOCUMENT_TEXT_PROOF?.[0]
+            (section) => section?.DOCUMENT_TEXT_PROOF?.[0],
           ).map((section) => section?.TEXT?.[0]),
         },
         {
@@ -1477,7 +1477,7 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
           id: "documentOtherSelection",
           label: "Sonstiger Hinweis",
           values: norm.metadataSections?.DOCUMENT_STATUS_SECTION?.map(
-            (section) => !!section?.DOCUMENT_OTHER
+            (section) => !!section?.DOCUMENT_OTHER,
           ),
         },
         {
@@ -1485,7 +1485,7 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
           id: "otherTypeDropdown",
           label: "Sonstiger Hinweis",
           values: norm.metadataSections?.DOCUMENT_STATUS_SECTION?.map(
-            (section) => section?.DOCUMENT_OTHER?.[0]
+            (section) => section?.DOCUMENT_OTHER?.[0],
           )
             .map((section) => section?.OTHER_TYPE?.[0])
             .map(otherTypeToDropdownEntry),
@@ -1502,7 +1502,7 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
           id: "categorizedReferenceText",
           label: "Aktivverweisung",
           values: norm.metadataSections?.CATEGORIZED_REFERENCE?.map(
-            (section) => section?.TEXT?.[0]
+            (section) => section?.TEXT?.[0],
           ),
         },
       ],
@@ -1522,7 +1522,7 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
               section.FOOTNOTE?.map((note) => ({
                 label: FOOTNOTE_LABELS[Object.keys(note)[0]],
                 content: Object.values(note)[0][0] as string,
-              }))?.flat() ?? []
+              }))?.flat() ?? [],
           ),
         },
       ],
@@ -1550,7 +1550,7 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
           id: "digitalEvidenceLink",
           label: "Verlinkung",
           values: norm.metadataSections?.DIGITAL_EVIDENCE?.map(
-            (section) => section?.LINK?.[0]
+            (section) => section?.LINK?.[0],
           ),
         },
         {
@@ -1558,7 +1558,7 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
           id: "digitalEvidenceRelatedData",
           label: "Zugehörige Daten",
           values: norm.metadataSections?.DIGITAL_EVIDENCE?.map(
-            (section) => section?.RELATED_DATA?.[0]
+            (section) => section?.RELATED_DATA?.[0],
           ),
         },
         {
@@ -1566,7 +1566,7 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
           id: "digitalEvidenceExternalDataNote",
           label: "Hinweis auf fremde Verlinkung oder Daten",
           values: norm.metadataSections?.DIGITAL_EVIDENCE?.map(
-            (section) => section?.EXTERNAL_DATA_NOTE?.[0]
+            (section) => section?.EXTERNAL_DATA_NOTE?.[0],
           ),
         },
         {
@@ -1574,7 +1574,7 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
           id: "digitalEvidenceAppendix",
           label: "Zusatz zum Nachweis",
           values: norm.metadataSections?.DIGITAL_EVIDENCE?.map(
-            (section) => section?.APPENDIX?.[0]
+            (section) => section?.APPENDIX?.[0],
           ),
         },
       ],
@@ -1613,7 +1613,7 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
           id: "ageIndicationStart",
           label: "Anfang",
           values: norm.metadataSections?.AGE_INDICATION?.map(
-            (section) => section?.RANGE_START?.[0]
+            (section) => section?.RANGE_START?.[0],
           ),
         },
         {
@@ -1621,7 +1621,7 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
           id: "ageIndicationEnd",
           label: "Ende",
           values: norm.metadataSections?.AGE_INDICATION?.map(
-            (section) => section?.RANGE_END?.[0]
+            (section) => section?.RANGE_END?.[0],
           ),
         },
       ],

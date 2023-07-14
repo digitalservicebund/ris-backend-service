@@ -53,7 +53,7 @@ async function validateNorm() {
   if (norm.value?.updateValidationErrors) {
     if (await norm.value.updateValidationErrors()) {
       validationErrors.value?.push({
-        defaultMessage: "Pflichtfeld nicht befüllt",
+        defaultMessage: "Inhalt nicht valide",
         field: "singleNorm",
       })
     }

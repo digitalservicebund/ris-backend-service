@@ -19,16 +19,16 @@ describe("AnnouncementInputGroup", () => {
   it("should render the component with 4 radio buttons each for different sections ", () => {
     renderComponent()
     const printRadio = screen.queryByLabelText(
-      "Papierverkündungsblatt"
+      "Papierverkündungsblatt",
     ) as HTMLInputElement
     const euRadio = screen.queryByLabelText(
-      "Amtsblatt der EU"
+      "Amtsblatt der EU",
     ) as HTMLInputElement
     const digitalRadio = screen.queryByLabelText(
-      "Elektronisches Verkündungsblatt"
+      "Elektronisches Verkündungsblatt",
     ) as HTMLInputElement
     const otherRadio = screen.queryByLabelText(
-      "Sonstige amtliche Fundstelle"
+      "Sonstige amtliche Fundstelle",
     ) as HTMLInputElement
 
     expect(printRadio).toBeInTheDocument()
@@ -48,16 +48,16 @@ describe("AnnouncementInputGroup", () => {
     renderComponent()
 
     const printRadio = screen.queryByLabelText(
-      "Papierverkündungsblatt"
+      "Papierverkündungsblatt",
     ) as HTMLInputElement
     const digitalRadio = screen.queryByLabelText(
-      "Elektronisches Verkündungsblatt"
+      "Elektronisches Verkündungsblatt",
     ) as HTMLInputElement
     const euRadio = screen.queryByLabelText(
-      "Amtsblatt der EU"
+      "Amtsblatt der EU",
     ) as HTMLInputElement
     const otherRadio = screen.queryByLabelText(
-      "Sonstige amtliche Fundstelle"
+      "Sonstige amtliche Fundstelle",
     ) as HTMLInputElement
 
     expect(printRadio).toBeChecked()
@@ -71,7 +71,7 @@ describe("AnnouncementInputGroup", () => {
     expect(
       screen.getByRole("textbox", {
         name: "Verkündungsmedium",
-      }) as HTMLInputElement
+      }) as HTMLInputElement,
     ).toBeInTheDocument()
 
     await fireEvent.click(euRadio)
@@ -80,7 +80,7 @@ describe("AnnouncementInputGroup", () => {
     expect(
       screen.getByRole("textbox", {
         name: "Amtsblatt der EU",
-      }) as HTMLInputElement
+      }) as HTMLInputElement,
     ).toBeInTheDocument()
   })
 
@@ -88,10 +88,10 @@ describe("AnnouncementInputGroup", () => {
     renderComponent()
 
     const printRadio = screen.queryByLabelText(
-      "Papierverkündungsblatt"
+      "Papierverkündungsblatt",
     ) as HTMLInputElement
     const digitalRadio = screen.queryByLabelText(
-      "Elektronisches Verkündungsblatt"
+      "Elektronisches Verkündungsblatt",
     ) as HTMLInputElement
 
     const announcementGazetteInput = screen.queryByRole("textbox", {
@@ -127,16 +127,16 @@ describe("AnnouncementInputGroup", () => {
     renderComponent()
 
     const printRadio = screen.queryByLabelText(
-      "Papierverkündungsblatt"
+      "Papierverkündungsblatt",
     ) as HTMLInputElement
     const euRadio = screen.queryByLabelText(
-      "Amtsblatt der EU"
+      "Amtsblatt der EU",
     ) as HTMLInputElement
     const digitalRadio = screen.queryByLabelText(
-      "Elektronisches Verkündungsblatt"
+      "Elektronisches Verkündungsblatt",
     ) as HTMLInputElement
     const otherRadio = screen.queryByLabelText(
-      "Sonstige amtliche Fundstelle"
+      "Sonstige amtliche Fundstelle",
     ) as HTMLInputElement
 
     expect(printRadio).toBeChecked()
@@ -204,7 +204,7 @@ describe("AnnouncementInputGroup", () => {
     })
 
     const digitalRadio = screen.queryByLabelText(
-      "Elektronisches Verkündungsblatt"
+      "Elektronisches Verkündungsblatt",
     ) as HTMLInputElement
     expect(digitalRadio).toBeChecked()
 
@@ -219,7 +219,7 @@ describe("AnnouncementInputGroup", () => {
     renderComponent({ modelValue: {} })
 
     const printRadio = screen.queryByLabelText(
-      "Papierverkündungsblatt"
+      "Papierverkündungsblatt",
     ) as HTMLInputElement
     expect(printRadio).toBeChecked()
 

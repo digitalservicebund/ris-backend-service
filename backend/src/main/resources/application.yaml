@@ -54,5 +54,12 @@ spring:
             scope:
               - openid
               - profile
+
+springdoc:
+  api-docs:
+    path: /api/docs.json
+  swagger-ui:
+    path: /api/docs.html
+
 unleash:
   appName: unleash-proxy

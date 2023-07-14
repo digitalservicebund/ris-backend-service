@@ -13,8 +13,8 @@ test.describe("decision date", () => {
 
     await expect(
       page.locator(
-        "text=Das Entscheidungsdatum darf nicht in der Zukunft liegen"
-      )
+        "text=Das Entscheidungsdatum darf nicht in der Zukunft liegen",
+      ),
     ).toBeVisible()
   })
 
@@ -25,26 +25,26 @@ test.describe("decision date", () => {
     await navigateToCategories(page, documentNumber)
 
     await page.locator("[aria-label='Entscheidungsdatum']").fill("03.02.2022")
-    expect(
-      await page.locator("[aria-label='Entscheidungsdatum']").inputValue()
-    ).toBe("03.02.2022")
+    await expect(page.locator("[aria-label='Entscheidungsdatum']")).toHaveValue(
+      "03.02.2022",
+    )
 
     const infoPanel = page.getByText(
-      new RegExp(`${documentNumber}.*Entscheidungsdatum.*`)
+      new RegExp(`${documentNumber}.*Entscheidungsdatum.*`),
     )
     await expect(infoPanel.getByText("03.02.2022")).toBeVisible()
 
     await page.locator("[aria-label='Entscheidungsdatum']").click()
     await page.keyboard.press("Backspace")
 
-    expect(
-      await page.locator("[aria-label='Entscheidungsdatum']").inputValue()
-    ).toBe("")
+    await expect(page.locator("[aria-label='Entscheidungsdatum']")).toHaveValue(
+      "",
+    )
 
     await expect(
       infoPanel.getByText("Entscheidungsdatum - ", {
         exact: true,
-      })
+      }),
     ).toBeVisible()
   })
 
@@ -61,20 +61,16 @@ test.describe("decision date", () => {
     await page
       .locator("[aria-label='Abweichendes Entscheidungsdatum']")
       .fill("03.02.2022")
-    expect(
-      await page
-        .locator("[aria-label='Abweichendes Entscheidungsdatum']")
-        .inputValue()
-    ).toBe("03.02.2022")
+    await expect(
+      page.locator("[aria-label='Abweichendes Entscheidungsdatum']"),
+    ).toHaveValue("03.02.2022")
 
     await page.keyboard.press("Backspace")
     await page.reload()
 
-    expect(
-      await page
-        .locator("[aria-label='Abweichendes Entscheidungsdatum']")
-        .inputValue()
-    ).toBe("")
+    await expect(page.locator("[aria-label='Entscheidungsdatum']")).toHaveValue(
+      "",
+    )
   })
 
   test("nested decision date input toggles child input and correctly saves and displays data", async ({
@@ -88,12 +84,12 @@ test.describe("decision date", () => {
         await page
           .locator("[aria-label='Entscheidungsdatum']")
           .fill("03.02.2022")
-        expect(
-          await page.locator("[aria-label='Entscheidungsdatum']").inputValue()
-        ).toBe("03.02.2022")
+        await expect(
+          page.locator("[aria-label='Entscheidungsdatum']"),
+        ).toHaveValue("03.02.2022")
 
         await expect(
-          page.locator("text=Abweichendes Entscheidungsdatum>")
+          page.locator("text=Abweichendes Entscheidungsdatum>"),
         ).toBeHidden()
 
         await page
@@ -101,7 +97,7 @@ test.describe("decision date", () => {
           .click()
 
         await expect(
-          page.locator("text=Abweichendes Entscheidungsdatum").first()
+          page.locator("text=Abweichendes Entscheidungsdatum").first(),
         ).toBeVisible()
 
         await page
@@ -114,7 +110,7 @@ test.describe("decision date", () => {
         await page.keyboard.press("Enter")
       },
       page,
-      { clickSaveButton: true }
+      { clickSaveButton: true },
     )
 
     await page.reload()
@@ -132,7 +128,7 @@ test.describe("decision date", () => {
       .click()
 
     await expect(
-      page.locator("text=Abweichendes Entscheidungsdatum").first()
+      page.locator("text=Abweichendes Entscheidungsdatum").first(),
     ).toBeHidden()
   })
 })

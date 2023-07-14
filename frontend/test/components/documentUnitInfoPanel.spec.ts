@@ -33,13 +33,13 @@ describe("documentUnit InfoPanel", () => {
     expect(barValue).toBeInTheDocument()
 
     expect(fooLabel.compareDocumentPosition(fooValue)).toBe(
-      Node.DOCUMENT_POSITION_FOLLOWING
+      Node.DOCUMENT_POSITION_FOLLOWING,
     )
     expect(fooValue.compareDocumentPosition(barLabel)).toBe(
-      Node.DOCUMENT_POSITION_FOLLOWING
+      Node.DOCUMENT_POSITION_FOLLOWING,
     )
     expect(barLabel.compareDocumentPosition(barValue)).toBe(
-      Node.DOCUMENT_POSITION_FOLLOWING
+      Node.DOCUMENT_POSITION_FOLLOWING,
     )
   })
 
@@ -55,7 +55,7 @@ describe("documentUnit InfoPanel", () => {
 
     expect(value).toBeInTheDocument()
     expect(value.compareDocumentPosition(label)).toBe(
-      Node.DOCUMENT_POSITION_PRECEDING
+      Node.DOCUMENT_POSITION_PRECEDING,
     )
   })
 })

@@ -23,7 +23,7 @@ watch(
       inputValue.value = newValue
     }
   },
-  { immediate: true }
+  { immediate: true },
 )
 
 const PROOF_TYPE_TRANSLATIONS: { [Value in ProofType]: string } = {
@@ -37,7 +37,7 @@ interface DropdownItem {
 }
 
 const dropdownItems: DropdownItem[] = Object.entries(
-  PROOF_TYPE_TRANSLATIONS
+  PROOF_TYPE_TRANSLATIONS,
 ).map(([value, label]) => {
   return { label, value }
 })

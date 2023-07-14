@@ -6,20 +6,20 @@ testWithImportedNorm(
   "Check norm can be retrieved by search in long title",
   async ({ request }) => {
     const response = await request.get(
-      `/api/v1/norms?q=Verordnung zur Anpassung`
+      `/api/v1/norms?q=Verordnung zur Anpassung`,
     )
     await assertResponseOk(response)
-  }
+  },
 )
 
 testWithImportedNorm(
   "Check norm can be retrieved by search in short title",
   async ({ request }) => {
     const response = await request.get(
-      `/api/v1/norms?q=Angepasstes Tierarzneimittelrecht`
+      `/api/v1/norms?q=Angepasstes Tierarzneimittelrecht`,
     )
     await assertResponseOk(response)
-  }
+  },
 )
 
 testWithImportedNorm(
@@ -29,13 +29,13 @@ testWithImportedNorm(
     expect(response.ok()).toBeTruthy()
     const norms = await response.json()
     expect(norms.data.length).toBe(0)
-  }
+  },
 )
 
 async function assertResponseOk(response: APIResponse) {
   expect(response.ok()).toBeTruthy()
   const norms = await response.json()
   expect(norms.data[0]?.officialLongTitle).toBe(
-    normData?.metadataSections?.NORM?.[0]?.OFFICIAL_LONG_TITLE?.[0]
+    normData?.metadataSections?.NORM?.[0]?.OFFICIAL_LONG_TITLE?.[0],
   )
 }

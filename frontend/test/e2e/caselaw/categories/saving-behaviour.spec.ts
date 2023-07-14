@@ -36,7 +36,7 @@ test.describe("saving behaviour", () => {
         await waitForInputValue(page, "[aria-label='Spruchkörper']", "VG-001")
       },
       page,
-      { clickSaveButton: true }
+      { clickSaveButton: true },
     )
 
     await waitForSaving(
@@ -45,11 +45,13 @@ test.describe("saving behaviour", () => {
         await waitForInputValue(page, "[aria-label='Spruchkörper']", "VG-002")
       },
       page,
-      { clickSaveButton: true, reload: true }
+      { clickSaveButton: true, reload: true },
     )
 
     await page.reload()
-    expect(await page.inputValue("[aria-label='Spruchkörper']")).toBe("VG-002")
+    await expect(page.locator("[aria-label='Spruchkörper']")).toHaveValue(
+      "VG-002",
+    )
   })
 
   test("saved changes also visible in document unit entry list", async ({
@@ -69,22 +71,22 @@ test.describe("saving behaviour", () => {
         await page.keyboard.press("Enter")
       },
       page,
-      { clickSaveButton: true }
+      { clickSaveButton: true },
     )
 
     await page.goto("/")
     await expect(
-      page.locator(`a[href*="/caselaw/documentunit/${documentNumber}/files"]`)
+      page.locator(`a[href*="/caselaw/documentunit/${documentNumber}/files"]`),
     ).toBeVisible()
     await expect(
       page.locator(".table-row", {
         hasText: documentNumber,
-      })
+      }),
     ).toBeVisible()
     await expect(
       page.locator(".table-row", {
         hasText: fileNumber,
-      })
+      }),
     ).toBeVisible()
   })
 })

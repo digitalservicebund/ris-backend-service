@@ -8,11 +8,13 @@ import { Footnote, FOOTNOTE_LABELS } from "@/components/footnote/types"
 import { MetadatumType } from "@/domain/Norm"
 
 const props = withDefaults(defineProps<Props>(), {
-  modelValue: () => ({} as Footnote),
+  modelValue: () => ({}) as Footnote,
 })
 
-const emit =
-  defineEmits<(event: "update:modelValue", value?: Footnote) => void>()
+const emit = defineEmits<{
+  "update:modelValue": [value?: Footnote]
+}>()
+
 interface Props {
   modelValue?: Footnote
 }
@@ -72,7 +74,7 @@ const options: SuggestionGroupOptions = {
       .filter(
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         ([_, label]) =>
-          label.toLowerCase().startsWith(input.toLowerCase()) && label != ""
+          label.toLowerCase().startsWith(input.toLowerCase()) && label != "",
       )
       .map(([id, label]) => ({ label, id })),
 }

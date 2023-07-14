@@ -26,7 +26,7 @@ describe("useSaveToRemote", () => {
     const callback = vi
       .fn()
       .mockImplementation(
-        () => new Promise((resolve) => (resolveCallback = resolve))
+        () => new Promise((resolve) => (resolveCallback = resolve)),
       )
     const { triggerSave } = useSaveToRemote(callback)
 
@@ -44,7 +44,7 @@ describe("useSaveToRemote", () => {
     const callback = vi
       .fn()
       .mockImplementation(
-        () => new Promise((resolve) => (resolveCallback = resolve))
+        () => new Promise((resolve) => (resolveCallback = resolve)),
       )
     const { triggerSave, saveIsInProgress } = useSaveToRemote(callback)
 

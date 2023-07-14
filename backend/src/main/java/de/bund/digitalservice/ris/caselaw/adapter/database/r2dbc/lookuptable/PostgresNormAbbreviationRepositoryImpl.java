@@ -53,7 +53,7 @@ public class PostgresNormAbbreviationRepositoryImpl implements NormAbbreviationR
 
   @Override
   public Flux<NormAbbreviation> findByAwesomeSearchQuery(String query, Integer size, Integer page) {
-    String[] queryBlocks = query.replace(",", "").replace(";", "").split(" ");
+    String[] queryBlocks = query.trim().replace(",", "").replace(";", "").split(" ");
     StringBuilder tsQuery = new StringBuilder();
     for (int i = 0; i < queryBlocks.length; i++) {
       if (queryBlocks[i].isBlank()) continue;

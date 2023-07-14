@@ -12,7 +12,7 @@ describe("useToggleStateInRouteQuery", () => {
       "parameter",
       route,
       vi.fn(),
-      true
+      true,
     )
 
     expect(toggleState.value).toBe(true)
@@ -27,7 +27,7 @@ describe("useToggleStateInRouteQuery", () => {
       "parameter",
       route,
       vi.fn(),
-      false
+      false,
     )
 
     expect(toggleState.value).toBe(true)
@@ -44,7 +44,7 @@ describe("useToggleStateInRouteQuery", () => {
       "parameter",
       route,
       routerCallback,
-      false
+      false,
     )
     toggleState.value = true
     await nextTick()

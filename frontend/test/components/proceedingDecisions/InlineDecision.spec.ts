@@ -84,7 +84,7 @@ describe("Decision ListItem", () => {
     })
     expect(screen.getByRole("link")).toHaveAttribute(
       "href",
-      expect.stringMatching(/fooDocumentNumber/)
+      expect.stringMatching(/fooDocumentNumber/),
     )
   })
 })

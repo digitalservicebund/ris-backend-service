@@ -13,7 +13,7 @@ interface InputModelEmits<T> {
 export function useInputModel<
   T,
   P extends InputModelProps<T>,
-  E extends InputModelEmits<T>
+  E extends InputModelEmits<T>,
 >(props: P, emit: E) {
   const inputValue = ref<T>()
 
@@ -24,7 +24,7 @@ export function useInputModel<
   watch(inputValue, () => {
     emit(
       "update:modelValue",
-      inputValue.value === "" ? undefined : inputValue.value
+      inputValue.value === "" ? undefined : inputValue.value,
     )
   })
 

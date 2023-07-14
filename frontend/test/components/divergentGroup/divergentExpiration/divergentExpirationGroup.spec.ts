@@ -35,10 +35,10 @@ describe("DivergentExpirationGroup", () => {
     renderComponent()
 
     const divergentExpirationDefinedSelection = screen.queryByLabelText(
-      "bestimmt"
+      "bestimmt",
     ) as HTMLInputElement
     const divergentExpirationUndefinedSelection = screen.queryByLabelText(
-      "unbestimmt"
+      "unbestimmt",
     ) as HTMLInputElement
 
     expect(divergentExpirationDefinedSelection).toBeInTheDocument()
@@ -52,10 +52,10 @@ describe("DivergentExpirationGroup", () => {
     renderComponent()
 
     const divergentExpirationDefinedSelection = screen.queryByLabelText(
-      "bestimmt"
+      "bestimmt",
     ) as HTMLInputElement
     const divergentExpirationUndefinedSelection = screen.queryByLabelText(
-      "unbestimmt"
+      "unbestimmt",
     ) as HTMLInputElement
 
     expect(divergentExpirationDefinedSelection).toBeChecked()
@@ -66,7 +66,7 @@ describe("DivergentExpirationGroup", () => {
     expect(divergentExpirationDefinedSelection).not.toBeChecked()
 
     const dropDownInputField = screen.getByLabelText(
-      "Unbestimmtes abweichendes Außerkrafttretedatum Dropdown"
+      "Unbestimmtes abweichendes Außerkrafttretedatum Dropdown",
     ) as HTMLInputElement
 
     expect(dropDownInputField).toBeInTheDocument()
@@ -77,11 +77,11 @@ describe("DivergentExpirationGroup", () => {
     renderComponent()
 
     const divergentExpirationUndefinedSelection = screen.queryByLabelText(
-      "unbestimmt"
+      "unbestimmt",
     ) as HTMLInputElement
 
     const Date = screen.getByLabelText(
-      "Bestimmtes abweichendes Außerkrafttretedatum Date Input"
+      "Bestimmtes abweichendes Außerkrafttretedatum Date Input",
     ) as HTMLInputElement
 
     expect(Date).toBeInTheDocument()
@@ -95,7 +95,7 @@ describe("DivergentExpirationGroup", () => {
     await fireEvent.click(divergentExpirationUndefinedSelection)
 
     const dropDownInputField = screen.getByLabelText(
-      "Unbestimmtes abweichendes Außerkrafttretedatum Dropdown"
+      "Unbestimmtes abweichendes Außerkrafttretedatum Dropdown",
     ) as HTMLInputElement
 
     await userEvent.click(dropDownInputField)
@@ -103,13 +103,13 @@ describe("DivergentExpirationGroup", () => {
     expect(dropDownInputField).toHaveValue("unbestimmt (unbekannt)")
 
     const divergentExpirationDefinedSelection = screen.queryByLabelText(
-      "bestimmt"
+      "bestimmt",
     ) as HTMLInputElement
 
     await fireEvent.click(divergentExpirationDefinedSelection)
 
     const dateNew = screen.getByLabelText(
-      "Bestimmtes abweichendes Außerkrafttretedatum Date Input"
+      "Bestimmtes abweichendes Außerkrafttretedatum Date Input",
     ) as HTMLInputElement
 
     expect(dateNew).not.toHaveValue()
@@ -127,12 +127,12 @@ describe("DivergentExpirationGroup", () => {
     })
 
     const divergentExpirationDefinedSelection = screen.queryByLabelText(
-      "bestimmt"
+      "bestimmt",
     ) as HTMLInputElement
     expect(divergentExpirationDefinedSelection).toBeChecked()
 
     const divergentExpirationDefinedDate = screen.getByLabelText(
-      "Bestimmtes abweichendes Außerkrafttretedatum Date Input"
+      "Bestimmtes abweichendes Außerkrafttretedatum Date Input",
     ) as HTMLInputElement
 
     expect(divergentExpirationDefinedDate).toBeVisible()
@@ -143,13 +143,13 @@ describe("DivergentExpirationGroup", () => {
     renderComponent({ modelValue: {} })
 
     const divergentExpirationDefinedSelection = screen.queryByLabelText(
-      "bestimmt"
+      "bestimmt",
     ) as HTMLInputElement
 
     expect(divergentExpirationDefinedSelection).toBeChecked()
 
     const divergentExpirationDefinedDate = screen.getByLabelText(
-      "Bestimmtes abweichendes Außerkrafttretedatum Date Input"
+      "Bestimmtes abweichendes Außerkrafttretedatum Date Input",
     ) as HTMLInputElement
 
     expect(divergentExpirationDefinedDate).toBeInTheDocument()
@@ -185,7 +185,7 @@ describe("DivergentExpirationGroup", () => {
     expect(store.loadedNorm).toEqual(norm)
 
     const divergentExpirationUndefinedSelection = screen.queryByLabelText(
-      "unbestimmt"
+      "unbestimmt",
     ) as HTMLInputElement
 
     await expect(divergentExpirationUndefinedSelection).toBeDisabled()

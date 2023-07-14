@@ -16,7 +16,7 @@ test.describe("a11y of publication page (/caselaw/documentunit/{documentNumber}/
       .locator("[aria-label='Dokumentationseinheit veröffentlichen']")
       .click()
     await expect(
-      page.locator("text=Es sind noch nicht alle Pflichtfelder befüllt.")
+      page.locator("text=Es sind noch nicht alle Pflichtfelder befüllt."),
     ).toBeVisible()
 
     const accessibilityScanResults = await new AxeBuilder({ page }).analyze()

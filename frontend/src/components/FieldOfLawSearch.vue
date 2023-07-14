@@ -8,9 +8,9 @@ import TextInput from "@/shared/components/input/TextInput.vue"
 import Pagination, { Page } from "@/shared/components/Pagination.vue"
 
 const emit = defineEmits<{
-  (event: "linkedField:clicked", identifier: string): void
-  (event: "node-clicked", identifier: string): void
-  (event: "do-show-norms"): void
+  "linkedField:clicked": [identifier: string]
+  "node-clicked": [identifier: string]
+  "do-show-norms": []
 }>()
 
 const searchStr = ref("")
@@ -22,7 +22,7 @@ async function submitSearch(page: number) {
   const response = await service.searchForFieldsOfLaw(
     page,
     itemsPerPage,
-    searchStr.value
+    searchStr.value,
   )
   if (response.data) {
     currentPage.value = response.data

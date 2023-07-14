@@ -13,7 +13,7 @@ testWithImportedNorm(
     await openNorm(
       page,
       normData.metadataSections?.NORM?.[0]?.OFFICIAL_LONG_TITLE?.[0] ?? "",
-      guid
+      guid,
     )
 
     const fileName = normData["jurisZipFileName"]
@@ -24,7 +24,7 @@ testWithImportedNorm(
     await expect(page).toHaveURL(`/norms/norm/${guid}/export`)
 
     const locatorExportButton = page.locator(
-      'a:has-text("Zip Datei speichern")'
+      'a:has-text("Zip Datei speichern")',
     )
     await expect(locatorExportButton).toBeVisible()
     await expect(locatorExportButton).toHaveAttribute("download", fileName)
@@ -34,8 +34,8 @@ testWithImportedNorm(
     expect(
       Buffer.compare(
         fileContent,
-        await getDownloadedFileContent(page, fileName)
-      )
+        await getDownloadedFileContent(page, fileName),
+      ),
     ).toBe(0)
-  }
+  },
 )

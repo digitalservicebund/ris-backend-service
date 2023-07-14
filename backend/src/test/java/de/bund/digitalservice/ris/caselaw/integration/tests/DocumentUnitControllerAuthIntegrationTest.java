@@ -78,6 +78,15 @@ class DocumentUnitControllerAuthIntegrationTest {
     registry.add("database.database", () -> postgreSQLContainer.getDatabaseName());
   }
 
+  private static final UUID OFFICE1_UNPUBLISHED_UUID = UUID.randomUUID();
+  private static final UUID OFFICE2_PUBLISHED_UUID = UUID.randomUUID();
+  private static final UUID OFFICE2_PUBLISHING_UUID = UUID.randomUUID();
+  private static final UUID OFFICE2_UNPUBLISHED_UUID = UUID.randomUUID();
+  private static final UUID OFFICE2_LATER_PUBLISHED_UUID = UUID.randomUUID();
+  private static final UUID OFFICE2_NO_STATUS_UUID = UUID.randomUUID();
+  private static final UUID WITHOUT_OFFICE_UUID = UUID.randomUUID();
+  private static final UUID OFFICE2_LATER_UNPUBLISHED_UUID = UUID.randomUUID();
+
   @Autowired private RisWebTestClient risWebTestClient;
   @Autowired private DatabaseDocumentUnitRepository repository;
   @Autowired private DatabaseDocumentUnitStatusRepository statusRepository;
@@ -110,62 +119,8 @@ class DocumentUnitControllerAuthIntegrationTest {
   }
 
   @Test
-  void testGetAll_correctFilteringDependingOnUser() {
-    DocumentUnitDTO office1Unpublished = createNewDocumentUnitDTO(docOffice1DTO.getId());
-    saveToStatusRepository(
-        office1Unpublished,
-        office1Unpublished.getCreationtimestamp(),
-        DocumentUnitStatus.builder().status(UNPUBLISHED).build());
-
-    DocumentUnitDTO office2Published = createNewDocumentUnitDTO(docOffice2DTO.getId());
-    saveToStatusRepository(
-        office2Published,
-        office2Published.getCreationtimestamp(),
-        DocumentUnitStatus.builder().status(UNPUBLISHED).build());
-    saveToStatusRepository(
-        office2Published, Instant.now(), DocumentUnitStatus.builder().status(PUBLISHED).build());
-
-    DocumentUnitDTO office2Publishing = createNewDocumentUnitDTO(docOffice2DTO.getId());
-    saveToStatusRepository(
-        office2Publishing,
-        office2Publishing.getCreationtimestamp(),
-        DocumentUnitStatus.builder().status(UNPUBLISHED).build());
-    saveToStatusRepository(
-        office2Publishing, Instant.now(), DocumentUnitStatus.builder().status(PUBLISHING).build());
-
-    DocumentUnitDTO office2Unpublished = createNewDocumentUnitDTO(docOffice2DTO.getId());
-    saveToStatusRepository(
-        office2Unpublished,
-        office2Unpublished.getCreationtimestamp(),
-        DocumentUnitStatus.builder().status(UNPUBLISHED).build());
-
-    DocumentUnitDTO office2LaterPublished = createNewDocumentUnitDTO(docOffice2DTO.getId());
-    saveToStatusRepository(
-        office2LaterPublished,
-        office2LaterPublished.getCreationtimestamp(),
-        DocumentUnitStatus.builder().status(UNPUBLISHED).build());
-    saveToStatusRepository(
-        office2LaterPublished,
-        Instant.now(),
-        DocumentUnitStatus.builder().status(PUBLISHED).build());
-
-    DocumentUnitDTO office2NoStatus = createNewDocumentUnitDTO(docOffice2DTO.getId());
-
-    DocumentUnitDTO withoutOffice = createNewDocumentUnitDTO(null);
-
-    DocumentUnitDTO office2LaterUnpublished = createNewDocumentUnitDTO(docOffice2DTO.getId());
-    saveToStatusRepository(
-        office2LaterUnpublished,
-        office2LaterUnpublished.getCreationtimestamp(),
-        DocumentUnitStatus.builder().status(UNPUBLISHED).build());
-    saveToStatusRepository(
-        office2LaterUnpublished,
-        Instant.now().plus(1, ChronoUnit.DAYS),
-        DocumentUnitStatus.builder().status(PUBLISHED).build());
-    saveToStatusRepository(
-        office2LaterUnpublished,
-        Instant.now().plus(2, ChronoUnit.DAYS),
-        DocumentUnitStatus.builder().status(UNPUBLISHED).build());
+  void testGetAll_correctFilteringDependingOnUserOffice1() {
+    initializeGetAllTests();
 
     // Documentation Office 1
     EntityExchangeResult<String> result =
@@ -179,25 +134,29 @@ class DocumentUnitControllerAuthIntegrationTest {
             .expectBody(String.class)
             .returnResult();
 
-    assertThat(extractStatusByUuid(result.getResponseBody(), office1Unpublished.getUuid()))
+    assertThat(extractStatusByUuid(result.getResponseBody(), OFFICE1_UNPUBLISHED_UUID))
         .isEqualTo(UNPUBLISHED.toString());
-    assertThat(extractStatusByUuid(result.getResponseBody(), office2Published.getUuid()))
+    assertThat(extractStatusByUuid(result.getResponseBody(), OFFICE2_PUBLISHED_UUID))
         .isEqualTo(PUBLISHED.toString());
-    assertThat(extractStatusByUuid(result.getResponseBody(), office2Publishing.getUuid()))
+    assertThat(extractStatusByUuid(result.getResponseBody(), OFFICE2_PUBLISHING_UUID))
         .isEqualTo(PUBLISHING.toString());
-    assertThat(extractDocUnitsByUuid(result.getResponseBody(), office2Unpublished.getUuid()))
+    assertThat(extractDocUnitsByUuid(result.getResponseBody(), OFFICE2_UNPUBLISHED_UUID)).isEmpty();
+    assertThat(extractStatusByUuid(result.getResponseBody(), OFFICE2_LATER_PUBLISHED_UUID))
+        .isEqualTo(PUBLISHED.toString());
+    assertThat(extractStatusByUuid(result.getResponseBody(), OFFICE2_NO_STATUS_UUID))
+        .isEqualTo(PUBLISHED.toString());
+    assertThat(extractStatusByUuid(result.getResponseBody(), WITHOUT_OFFICE_UUID))
+        .isEqualTo(PUBLISHED.toString());
+    assertThat(extractDocUnitsByUuid(result.getResponseBody(), OFFICE2_LATER_UNPUBLISHED_UUID))
         .isEmpty();
-    assertThat(extractStatusByUuid(result.getResponseBody(), office2LaterPublished.getUuid()))
-        .isEqualTo(PUBLISHED.toString());
-    assertThat(extractStatusByUuid(result.getResponseBody(), office2NoStatus.getUuid()))
-        .isEqualTo(PUBLISHED.toString());
-    assertThat(extractStatusByUuid(result.getResponseBody(), withoutOffice.getUuid()))
-        .isEqualTo(PUBLISHED.toString());
-    assertThat(extractDocUnitsByUuid(result.getResponseBody(), office2LaterUnpublished.getUuid()))
-        .isEmpty();
+  }
+
+  @Test
+  void testGetAll_correctFilteringDependingOnUserOffice2() {
+    initializeGetAllTests();
 
     // Documentation Office 2
-    result =
+    EntityExchangeResult<String> result =
         risWebTestClient
             .withLogin(docOffice2Group)
             .get()
@@ -208,27 +167,90 @@ class DocumentUnitControllerAuthIntegrationTest {
             .expectBody(String.class)
             .returnResult();
 
-    assertThat(extractDocUnitsByUuid(result.getResponseBody(), office1Unpublished.getUuid()))
-        .isEmpty();
-    assertThat(extractStatusByUuid(result.getResponseBody(), office2Published.getUuid()))
+    assertThat(extractDocUnitsByUuid(result.getResponseBody(), OFFICE1_UNPUBLISHED_UUID)).isEmpty();
+    assertThat(extractStatusByUuid(result.getResponseBody(), OFFICE2_PUBLISHED_UUID))
         .isEqualTo(PUBLISHED.toString());
-    assertThat(extractStatusByUuid(result.getResponseBody(), office2Publishing.getUuid()))
+    assertThat(extractStatusByUuid(result.getResponseBody(), OFFICE2_PUBLISHING_UUID))
         .isEqualTo(PUBLISHING.toString());
-    assertThat(extractStatusByUuid(result.getResponseBody(), office2Unpublished.getUuid()))
+    assertThat(extractStatusByUuid(result.getResponseBody(), OFFICE2_UNPUBLISHED_UUID))
         .isEqualTo(UNPUBLISHED.toString());
-    assertThat(extractStatusByUuid(result.getResponseBody(), office2LaterPublished.getUuid()))
+    assertThat(extractStatusByUuid(result.getResponseBody(), OFFICE2_LATER_PUBLISHED_UUID))
         .isEqualTo(PUBLISHED.toString());
-    assertThat(extractStatusByUuid(result.getResponseBody(), office2NoStatus.getUuid()))
+    assertThat(extractStatusByUuid(result.getResponseBody(), OFFICE2_NO_STATUS_UUID))
         .isEqualTo(PUBLISHED.toString());
-    assertThat(extractStatusByUuid(result.getResponseBody(), withoutOffice.getUuid()))
+    assertThat(extractStatusByUuid(result.getResponseBody(), WITHOUT_OFFICE_UUID))
         .isEqualTo(PUBLISHED.toString());
-    assertThat(extractStatusByUuid(result.getResponseBody(), office2LaterUnpublished.getUuid()))
+    assertThat(extractStatusByUuid(result.getResponseBody(), OFFICE2_LATER_UNPUBLISHED_UUID))
         .isEqualTo(UNPUBLISHED.toString());
+  }
+
+  private void initializeGetAllTests() {
+    DocumentUnitDTO office1Unpublished =
+        createNewDocumentUnitDTO(OFFICE1_UNPUBLISHED_UUID, docOffice1DTO.getId());
+    saveToStatusRepository(
+        office1Unpublished,
+        office1Unpublished.getCreationtimestamp(),
+        DocumentUnitStatus.builder().status(UNPUBLISHED).build());
+
+    DocumentUnitDTO office2Published =
+        createNewDocumentUnitDTO(OFFICE2_PUBLISHED_UUID, docOffice2DTO.getId());
+    saveToStatusRepository(
+        office2Published,
+        office2Published.getCreationtimestamp(),
+        DocumentUnitStatus.builder().status(UNPUBLISHED).build());
+    saveToStatusRepository(
+        office2Published, Instant.now(), DocumentUnitStatus.builder().status(PUBLISHED).build());
+
+    DocumentUnitDTO office2Publishing =
+        createNewDocumentUnitDTO(OFFICE2_PUBLISHING_UUID, docOffice2DTO.getId());
+    saveToStatusRepository(
+        office2Publishing,
+        office2Publishing.getCreationtimestamp(),
+        DocumentUnitStatus.builder().status(UNPUBLISHED).build());
+    saveToStatusRepository(
+        office2Publishing, Instant.now(), DocumentUnitStatus.builder().status(PUBLISHING).build());
+
+    DocumentUnitDTO office2Unpublished =
+        createNewDocumentUnitDTO(OFFICE2_UNPUBLISHED_UUID, docOffice2DTO.getId());
+    saveToStatusRepository(
+        office2Unpublished,
+        office2Unpublished.getCreationtimestamp(),
+        DocumentUnitStatus.builder().status(UNPUBLISHED).build());
+
+    DocumentUnitDTO office2LaterPublished =
+        createNewDocumentUnitDTO(OFFICE2_LATER_PUBLISHED_UUID, docOffice2DTO.getId());
+    saveToStatusRepository(
+        office2LaterPublished,
+        office2LaterPublished.getCreationtimestamp(),
+        DocumentUnitStatus.builder().status(UNPUBLISHED).build());
+    saveToStatusRepository(
+        office2LaterPublished,
+        Instant.now(),
+        DocumentUnitStatus.builder().status(PUBLISHED).build());
+
+    createNewDocumentUnitDTO(OFFICE2_NO_STATUS_UUID, docOffice2DTO.getId());
+
+    createNewDocumentUnitDTO(WITHOUT_OFFICE_UUID, null);
+
+    DocumentUnitDTO office2LaterUnpublished =
+        createNewDocumentUnitDTO(OFFICE2_LATER_UNPUBLISHED_UUID, docOffice2DTO.getId());
+    saveToStatusRepository(
+        office2LaterUnpublished,
+        office2LaterUnpublished.getCreationtimestamp(),
+        DocumentUnitStatus.builder().status(UNPUBLISHED).build());
+    saveToStatusRepository(
+        office2LaterUnpublished,
+        Instant.now().plus(1, ChronoUnit.DAYS),
+        DocumentUnitStatus.builder().status(PUBLISHED).build());
+    saveToStatusRepository(
+        office2LaterUnpublished,
+        Instant.now().plus(2, ChronoUnit.DAYS),
+        DocumentUnitStatus.builder().status(UNPUBLISHED).build());
   }
 
   @Test
   void testUnpublishedDocumentUnitIsForbiddenFOrOtherOffice() {
-    DocumentUnitDTO docUnit1 = createNewDocumentUnitDTO(docOffice1DTO.getId());
+    DocumentUnitDTO docUnit1 = createNewDocumentUnitDTO(UUID.randomUUID(), docOffice1DTO.getId());
     saveToStatusRepository(
         docUnit1,
         docUnit1.getCreationtimestamp(),
@@ -294,13 +316,14 @@ class DocumentUnitControllerAuthIntegrationTest {
     assertThat(extractUuid(result.getResponseBody())).hasToString(docUnit1.getUuid().toString());
   }
 
-  private DocumentUnitDTO createNewDocumentUnitDTO(UUID documentationOfficeId) {
+  private DocumentUnitDTO createNewDocumentUnitDTO(
+      UUID documentationUnitUuid, UUID documentationOfficeId) {
     String documentNumber =
         new Random().ints(13, 0, 10).mapToObj(Integer::toString).collect(Collectors.joining());
     return repository
         .save(
             DocumentUnitDTO.builder()
-                .uuid(UUID.randomUUID())
+                .uuid(documentationUnitUuid)
                 .creationtimestamp(Instant.now())
                 .documentnumber(documentNumber)
                 .dataSource(DataSource.NEURIS)

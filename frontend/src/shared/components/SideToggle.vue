@@ -33,7 +33,7 @@ const openIconNames = {
 const iconName = computed(() =>
   localIsExpanded.value
     ? closeIconNames[props.openingDirection]
-    : openIconNames[props.openingDirection]
+    : openIconNames[props.openingDirection],
 )
 
 const postFix = computed(() => (localIsExpanded.value ? "schließen" : "öffnen"))
@@ -54,7 +54,7 @@ function toggleContentVisibility(): void {
 watch(
   () => props.isExpanded,
   () => (localIsExpanded.value = props.isExpanded ?? false),
-  { immediate: true }
+  { immediate: true },
 )
 
 watch(localIsExpanded, () => emit("update:isExpanded", localIsExpanded.value))

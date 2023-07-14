@@ -36,7 +36,6 @@ import org.docx4j.vml.CTShape;
 import org.docx4j.wml.Drawing;
 import org.docx4j.wml.Jc;
 import org.docx4j.wml.JcEnumeration;
-import org.docx4j.wml.Lvl;
 import org.docx4j.wml.P;
 import org.docx4j.wml.PPr;
 import org.docx4j.wml.PPrBase.NumPr;
@@ -225,75 +224,7 @@ public class DocumentUnitDocxBuilder extends DocxBuilder {
   }
 
   private NumberingListEntryIndex setNumberingListEntryIndex(ListLevel listLevel, String iLvl) {
-    DocumentUnitNumberingListNumberFormat numberFormat;
-
-    switch (listLevel.getNumFmt()) {
-      case BULLET -> numberFormat = DocumentUnitNumberingListNumberFormat.BULLET;
-      case DECIMAL -> numberFormat = DocumentUnitNumberingListNumberFormat.DECIMAL;
-      case UPPER_LETTER -> numberFormat = DocumentUnitNumberingListNumberFormat.UPPER_LETTER;
-      case LOWER_LETTER -> numberFormat = DocumentUnitNumberingListNumberFormat.LOWER_LETTER;
-      case UPPER_ROMAN -> numberFormat = DocumentUnitNumberingListNumberFormat.UPPER_ROMAN;
-      case LOWER_ROMAN -> numberFormat = DocumentUnitNumberingListNumberFormat.LOWER_ROMAN;
-      default -> {
-        LOGGER.error(
-            "not implemented number format ({}) in list. use default bullet list",
-            listLevel.getNumFmt());
-        numberFormat = DocumentUnitNumberingListNumberFormat.BULLET;
-      }
-    }
-
-    String restartNummerAfterBreak = "";
-    String lvlText = "";
-    String suff = "tab";
-    String fontColor = "";
-    String fontSize = "";
-    String fontStyle = "";
-    boolean lvlPickBullet = false;
-    String startVal = "1";
-    JcEnumeration lvlJc = JcEnumeration.RIGHT;
-    boolean isLgl = false;
-
-    Lvl lvl = listLevel.getJaxbAbstractLvl();
-    if (lvl != null) {
-      suff = lvl.getSuff() != null ? lvl.getSuff().getVal() : "tab";
-      lvlJc = lvl.getLvlJc() != null ? lvl.getLvlJc().getVal() : JcEnumeration.RIGHT;
-
-      if (listLevel.IsBullet()) {
-        lvlPickBullet = lvl.getLvlPicBulletId() != null;
-      }
-
-      startVal = lvl.getStart() != null ? lvl.getStart().getVal().toString() : "1";
-      lvlText =
-          listLevel.getLevelText() == null || listLevel.getLevelText().isBlank()
-              ? ""
-              : listLevel.getLevelText();
-      restartNummerAfterBreak =
-          lvl.getLvlRestart() != null ? lvl.getLvlRestart().getVal().toString() : "";
-      isLgl = lvl.getIsLgl() != null && lvl.getIsLgl().isVal();
-
-      if (lvl.getRPr() != null) {
-        fontColor = lvl.getRPr().getColor() != null ? lvl.getRPr().getColor().getVal() : "";
-        fontSize = lvl.getRPr().getSz() != null ? lvl.getRPr().getSz().getVal().toString() : "";
-        fontStyle =
-            lvl.getRPr().getRFonts() != null && lvl.getRPr().getRFonts().getAscii() != null
-                ? lvl.getRPr().getRFonts().getAscii()
-                : "";
-      }
-    }
-
-    return new NumberingListEntryIndex(
-        lvlText,
-        startVal,
-        restartNummerAfterBreak,
-        fontColor,
-        fontStyle,
-        fontSize,
-        lvlPickBullet,
-        isLgl,
-        numberFormat,
-        iLvl,
-        lvlJc,
-        suff);
+    return NumberingListEntryIndexGenerator.generate(listLevel, iLvl);
   }
 
   private boolean isParagraph() {

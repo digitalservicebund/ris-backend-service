@@ -9,17 +9,16 @@ import { ResponseError } from "@/services/httpClient"
 import FileUpload from "@/shared/components/FileUpload.vue"
 
 const props = defineProps<{ documentUnit: DocumentUnit }>()
-const emit =
-  defineEmits<
-    (e: "updateDocumentUnit", updatedDocumentUnit: DocumentUnit) => void
-  >()
+const emit = defineEmits<{
+  updateDocumentUnit: [updatedDocumentUnit: DocumentUnit]
+}>()
 const error = ref<ResponseError>()
 const isUploading = ref(false)
 
 async function handleDeleteFile() {
   if ((await fileService.delete(props.documentUnit.uuid)).status < 300) {
     const updateResponse = await documentUnitService.getByDocumentNumber(
-      props.documentUnit.documentNumber as string
+      props.documentUnit.documentNumber as string,
     )
     if (updateResponse.error) {
       console.error(updateResponse.error)

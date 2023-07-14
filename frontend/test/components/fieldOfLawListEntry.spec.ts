@@ -4,7 +4,7 @@ import { FieldOfLawNode } from "@/domain/fieldOfLaw"
 
 function renderComponent(
   fieldOfLaw: Partial<FieldOfLawNode>,
-  showBin: boolean
+  showBin: boolean,
 ): RenderResult {
   const props = {
     fieldOfLaw,
@@ -21,18 +21,18 @@ describe("FieldOfLawListEntry", () => {
         identifier: "ST-01-02-03",
         text: "Steuerrecht 1-2-3",
       },
-      true
+      true,
     )
 
     expect(screen.getByText("ST-01-02-03")).toBeInTheDocument()
     expect(screen.getByText("Steuerrecht 1-2-3")).toBeInTheDocument()
     expect(
       screen.getByLabelText(
-        "ST-01-02-03 Steuerrecht 1-2-3 im Sachgebietsbaum anzeigen"
-      )
+        "ST-01-02-03 Steuerrecht 1-2-3 im Sachgebietsbaum anzeigen",
+      ),
     ).toBeInTheDocument()
     expect(
-      screen.getByLabelText("ST-01-02-03 Steuerrecht 1-2-3 entfernen")
+      screen.getByLabelText("ST-01-02-03 Steuerrecht 1-2-3 entfernen"),
     ).toBeInTheDocument()
   })
 
@@ -42,11 +42,11 @@ describe("FieldOfLawListEntry", () => {
         identifier: "ST-01-02-03",
         text: "Steuerrecht 1-2-3",
       },
-      true
+      true,
     )
 
     await fireEvent.click(
-      screen.getByLabelText("ST-01-02-03 Steuerrecht 1-2-3 entfernen")
+      screen.getByLabelText("ST-01-02-03 Steuerrecht 1-2-3 entfernen"),
     )
 
     expect(emitted()["remove-from-list"]).toBeTruthy()
@@ -58,13 +58,13 @@ describe("FieldOfLawListEntry", () => {
         identifier: "ST-01-02-03",
         text: "Steuerrecht 1-2-3",
       },
-      false
+      false,
     )
 
     await fireEvent.click(
       screen.getByLabelText(
-        "ST-01-02-03 Steuerrecht 1-2-3 im Sachgebietsbaum anzeigen"
-      )
+        "ST-01-02-03 Steuerrecht 1-2-3 im Sachgebietsbaum anzeigen",
+      ),
     )
 
     expect(emitted()["node-clicked"]).toBeTruthy()

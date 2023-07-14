@@ -31,13 +31,13 @@ const showDocPanel = useToggleStateInRouteQuery(
   "showDocPanel",
   route,
   router.replace,
-  false
+  false,
 )
 const hasDataChange = ref(false)
 const lastUpdatedDocumentUnit = ref()
 
 const handleUpdateValueDocumentUnitTexts = async (
-  updatedValue: [keyof Texts, string]
+  updatedValue: [keyof Texts, string],
 ) => {
   const divElem = document.createElement("div")
   divElem.innerHTML = updatedValue[1]
@@ -54,7 +54,7 @@ async function handleUpdateDocumentUnit(): Promise<ServiceResponse<void>> {
     JSON.stringify(lastUpdatedDocumentUnit.value)
   if (hasDataChange.value) {
     const response = await documentUnitService.update(
-      updatedDocumentUnit.value as DocumentUnit
+      updatedDocumentUnit.value as DocumentUnit,
     )
     if (response?.error?.validationErrors) {
       validationErrors.value = response.error.validationErrors
@@ -78,7 +78,7 @@ watch(
       await getOriginalDocumentUnit()
     }
   },
-  { immediate: true }
+  { immediate: true },
 )
 
 const coreData = computed({
@@ -111,7 +111,7 @@ async function getOriginalDocumentUnit() {
   if (fileAsHTML.value.length > 0) return
   if (props.documentUnit.s3path) {
     const htmlResponse = await fileService.getDocxFileAsHtml(
-      props.documentUnit.uuid
+      props.documentUnit.uuid,
     )
     if (htmlResponse.error === undefined) fileAsHTML.value = htmlResponse.data
   }
@@ -123,7 +123,7 @@ onMounted(async () => {
 </script>
 
 <template>
-  <DocumentUnitWrapper :document-unit="(updatedDocumentUnit as DocumentUnit)">
+  <DocumentUnitWrapper :document-unit="updatedDocumentUnit as DocumentUnit">
     <template #default="{ classes }">
       <div
         class="-mt-96 grid h-[6rem] justify-items-end pb-8 pr-[2rem] sticky top-[2rem] w-full z-30"
@@ -141,7 +141,7 @@ onMounted(async () => {
             v-model="coreData"
             :validation-errors="
               validationErrors.filter(
-                (err) => err.field.split('\.')[0] === 'coreData'
+                (err) => err.field.split('\.')[0] === 'coreData',
               )
             "
           />

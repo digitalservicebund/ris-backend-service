@@ -5,22 +5,22 @@ import ProceedingDecision from "@/domain/proceedingDecision"
 interface ProceedingDecisionService {
   createProceedingDecision(
     uuid: string,
-    proceedingDecision: ProceedingDecision
+    proceedingDecision: ProceedingDecision,
   ): Promise<ServiceResponse<ProceedingDecision[]>>
   linkProceedingDecision(
     parentUuid: string,
-    childUuid: string
+    childUuid: string,
   ): Promise<ServiceResponse<ProceedingDecision[]>>
   removeProceedingDecision(
     parentUuid: string,
-    childUuid: string
+    childUuid: string,
   ): Promise<ServiceResponse<unknown>>
 }
 
 const service: ProceedingDecisionService = {
   async createProceedingDecision(
     uuid: string,
-    proceedingDecision: ProceedingDecision
+    proceedingDecision: ProceedingDecision,
   ) {
     const response = await httpClient.put<
       ProceedingDecision,
@@ -33,7 +33,7 @@ const service: ProceedingDecisionService = {
           "Content-Type": "application/json",
         },
       },
-      proceedingDecision
+      proceedingDecision,
     )
     if (response.status >= 300) {
       return {
@@ -47,7 +47,7 @@ const service: ProceedingDecisionService = {
       return {
         status: 200,
         data: (response.data as ProceedingDecision[]).map(
-          (decision) => new ProceedingDecision({ ...decision })
+          (decision) => new ProceedingDecision({ ...decision }),
         ),
       }
     }
@@ -55,7 +55,7 @@ const service: ProceedingDecisionService = {
 
   async linkProceedingDecision(parentUuid: string, childUuid: string) {
     const response = await httpClient.put<undefined, DocumentUnit>(
-      `caselaw/documentunits/${parentUuid}/proceedingdecisions/${childUuid}`
+      `caselaw/documentunits/${parentUuid}/proceedingdecisions/${childUuid}`,
     )
     if (response.status >= 300) {
       return {
@@ -77,7 +77,7 @@ const service: ProceedingDecisionService = {
 
   async removeProceedingDecision(parentUuid: string, childUuid: string) {
     const response = await httpClient.delete(
-      `caselaw/documentunits/${parentUuid}/proceedingdecisions/${childUuid}`
+      `caselaw/documentunits/${parentUuid}/proceedingdecisions/${childUuid}`,
     )
     if (response.status >= 300) {
       response.error = {

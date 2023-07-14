@@ -29,7 +29,7 @@ describe("useCaseLawMenuItems", () => {
   it("lists all expected menu items", () => {
     const menuItems = useCaseLawMenuItems(
       ref(""),
-      {} as unknown as RouteLocationNormalizedLoaded
+      {} as unknown as RouteLocationNormalizedLoaded,
     )
 
     const topLebelNames = menuItems.value.map((item) => item.label)

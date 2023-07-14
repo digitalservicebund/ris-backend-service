@@ -35,7 +35,9 @@ const elementList = ref<HTMLElement[]>([])
 const editIndex = ref<number | undefined>(undefined)
 
 const currentEditElement = computed(() =>
-  editIndex.value !== undefined ? elementList.value[editIndex.value] : undefined
+  editIndex.value !== undefined
+    ? elementList.value[editIndex.value]
+    : undefined,
 )
 
 function setEditIndex(index: number | undefined) {
@@ -63,7 +65,7 @@ async function focusFirstFocusableElementOfCurrentEditElement() {
 
   if (currentEditElement.value) {
     const firstFocusableElement = currentEditElement.value.querySelectorAll(
-      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
     )[0] as HTMLElement
     firstFocusableElement?.focus()
   }
@@ -78,7 +80,7 @@ onMounted(editFirstEntryIfOnlyOne)
 watch(
   () => props.modelValue,
   () => (modelValueList.value = props.modelValue),
-  { immediate: true, deep: true }
+  { immediate: true, deep: true },
 )
 
 watch(
@@ -88,7 +90,7 @@ watch(
       addNewModelEntry()
     }
   },
-  { deep: true, immediate: true }
+  { deep: true, immediate: true },
 )
 
 watch(modelValueList, () => emit("update:modelValue", modelValueList.value), {

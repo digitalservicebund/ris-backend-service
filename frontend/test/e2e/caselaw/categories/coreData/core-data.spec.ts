@@ -14,12 +14,12 @@ test.describe("core data", () => {
         await page.keyboard.press("Enter")
       },
       page,
-      { clickSaveButton: true }
+      { clickSaveButton: true },
     )
 
     await page.reload()
-    expect(await page.inputValue("[aria-label='Aktenzeichen']")).toBe("")
-    expect(await page.inputValue("[aria-label='ECLI']")).toBe("abc123")
+    await expect(page.locator("[aria-label='Aktenzeichen']")).toHaveValue("")
+    await expect(page.locator("[aria-label='ECLI']")).toHaveValue("abc123")
   })
 
   test("nested 'ECLI' input toggles child input and correctly saves and displays data", async ({
@@ -38,7 +38,7 @@ test.describe("core data", () => {
         await page.locator("[aria-label='Abweichender ECLI anzeigen']").click()
 
         await expect(
-          page.locator("text=Abweichender ECLI").first()
+          page.locator("text=Abweichender ECLI").first(),
         ).toBeVisible()
 
         await page.locator("[aria-label='Abweichender ECLI']").type("two")
@@ -47,7 +47,7 @@ test.describe("core data", () => {
         await page.keyboard.press("Enter")
       },
       page,
-      { clickSaveButton: true }
+      { clickSaveButton: true },
     )
 
     await page.reload()
@@ -78,7 +78,7 @@ test.describe("core data", () => {
         await expect(page.locator("text=two").first()).toBeVisible()
 
         await expect(
-          page.locator("text=Abweichendes Aktenzeichen>")
+          page.locator("text=Abweichendes Aktenzeichen>"),
         ).toBeHidden()
 
         await page
@@ -86,7 +86,7 @@ test.describe("core data", () => {
           .click()
 
         await expect(
-          page.locator("text=Abweichendes Aktenzeichen").first()
+          page.locator("text=Abweichendes Aktenzeichen").first(),
         ).toBeVisible()
 
         await page
@@ -95,7 +95,7 @@ test.describe("core data", () => {
         await page.keyboard.press("Enter")
       },
       page,
-      { clickSaveButton: true }
+      { clickSaveButton: true },
     )
 
     await page.reload()
@@ -108,7 +108,7 @@ test.describe("core data", () => {
       .locator("[aria-label='Abweichendes Aktenzeichen schließen']")
       .click()
     await expect(
-      page.locator("text=Abweichendes Aktenzeichen").first()
+      page.locator("text=Abweichendes Aktenzeichen").first(),
     ).toBeHidden()
   })
 
@@ -160,7 +160,7 @@ test.describe("core data", () => {
         await expect(page.locator("text=testone").first()).toBeHidden()
       },
       page,
-      { clickSaveButton: true }
+      { clickSaveButton: true },
     )
 
     await page.reload()
@@ -170,8 +170,8 @@ test.describe("core data", () => {
   test("test legal effect dropdown", async ({ page, documentNumber }) => {
     await navigateToCategories(page, documentNumber)
 
-    expect(await page.inputValue("[aria-label='Rechtskraft']")).toBe(
-      "Keine Angabe"
+    await expect(page.locator("[aria-label='Rechtskraft']")).toHaveValue(
+      "Keine Angabe",
     )
 
     await page
@@ -188,7 +188,7 @@ test.describe("core data", () => {
     const totalCaselawDocumentTypes = 43
 
     // on start: closed dropdown, no input text
-    expect(await page.inputValue("[aria-label='Dokumenttyp']")).toBe("")
+    await expect(page.locator("[aria-label='Dokumenttyp']")).toHaveValue("")
     await expect(page.locator("text=AnU - Anerkenntnisurteil")).toBeHidden()
     await expect(page.locator("[aria-label='dropdown-option']")).toBeHidden()
 
@@ -197,28 +197,30 @@ test.describe("core data", () => {
       .locator("[aria-label='Dokumenttyp'] + button.input-expand-icon")
       .click()
     await expect(page.locator("[aria-label='dropdown-option']")).toHaveCount(
-      totalCaselawDocumentTypes
+      totalCaselawDocumentTypes,
     )
     await expect(page.locator("text=Anerkenntnisurteil")).toBeVisible()
     await expect(page.locator("text=Anhängiges Verfahren")).toBeVisible()
 
     // type search string: 3 results for "zwischen"
     await page.locator("[aria-label='Dokumenttyp']").fill("zwischen")
-    expect(await page.inputValue("[aria-label='Dokumenttyp']")).toBe("zwischen")
+    await expect(page.locator("[aria-label='Dokumenttyp']")).toHaveValue(
+      "zwischen",
+    )
     await expect(page.locator("[aria-label='dropdown-option']")).toHaveCount(3)
 
     // use the clear icon
     await page.locator("[aria-label='Auswahl zurücksetzen']").click()
-    expect(await page.inputValue("[aria-label='Dokumenttyp']")).toBe("")
+    await expect(page.locator("[aria-label='Dokumenttyp']")).toHaveValue("")
     await expect(page.locator("[aria-label='dropdown-option']")).toHaveCount(
-      totalCaselawDocumentTypes
+      totalCaselawDocumentTypes,
     )
 
     // close dropdown
     await page
       .locator("[aria-label='Dokumenttyp'] + button.input-expand-icon")
       .click()
-    expect(await page.inputValue("[aria-label='Dokumenttyp']")).toBe("")
+    await expect(page.locator("[aria-label='Dokumenttyp']")).toHaveValue("")
     await expect(page.locator("[aria-label='dropdown-option']")).toBeHidden()
 
     // open dropdown again by typing a search string
@@ -228,7 +230,7 @@ test.describe("core data", () => {
     // close dropdown using the esc key, user input text gets removed and last saved value restored
     await page.keyboard.down("Escape")
     await expect(page.locator("[aria-label='dropdown-option']")).toBeHidden()
-    expect(await page.inputValue("[aria-label='Dokumenttyp']")).toBe("")
+    await expect(page.locator("[aria-label='Dokumenttyp']")).toHaveValue("")
   })
 
   test("ensure new docUnit has correct documentationOffice for DS user", async ({
@@ -239,12 +241,12 @@ test.describe("core data", () => {
       await page.getByText("Neue Dokumentationseinheit").click()
 
       await expect(
-        page.getByText("Aktuell ist keine Datei hinterlegt")
+        page.getByText("Aktuell ist keine Datei hinterlegt"),
       ).toBeVisible()
 
       await page.getByText("Rubriken").click()
       await expect(
-        page.getByText("DOKUMENTATIONSSTELLEDigitalService")
+        page.getByText("DOKUMENTATIONSSTELLEDigitalService"),
       ).toBeVisible()
     })
   })
@@ -257,12 +259,12 @@ test.describe("core data", () => {
       await pageWithBghUser.getByText("Neue Dokumentationseinheit").click()
 
       await expect(
-        pageWithBghUser.getByText("Aktuell ist keine Datei hinterlegt")
+        pageWithBghUser.getByText("Aktuell ist keine Datei hinterlegt"),
       ).toBeVisible()
 
       await pageWithBghUser.getByText("Rubriken").click()
       await expect(
-        pageWithBghUser.getByText("DOKUMENTATIONSSTELLEBGH")
+        pageWithBghUser.getByText("DOKUMENTATIONSSTELLEBGH"),
       ).toBeVisible()
     })
   })

@@ -83,6 +83,6 @@ describe("TextButton", () => {
       const anchor = wrapper.get("a")
 
       expect(anchor.attributes("target")).toBe(target)
-    }
+    },
   )
 })

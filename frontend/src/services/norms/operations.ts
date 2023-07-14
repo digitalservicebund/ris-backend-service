@@ -57,10 +57,10 @@ export async function getAllNorms(): Promise<
 }
 
 export async function getNormByGuid(
-  guid: string
+  guid: string,
 ): Promise<ServiceResponse<Norm>> {
   const { status, data, error } = await httpClient.get<NormResponseSchema>(
-    `norms/${guid}`
+    `norms/${guid}`,
   )
   if (status >= 300 || error || data == undefined) {
     return {
@@ -78,7 +78,7 @@ export async function getNormByGuid(
 export async function editNormFrame(
   guid: string,
   metadataSections: MetadataSections,
-  flatMetadata: FlatMetadata
+  flatMetadata: FlatMetadata,
 ): Promise<ServiceResponse<void>> {
   const headers = {
     Accept: "application/json",
@@ -93,7 +93,7 @@ export async function editNormFrame(
   const { status, error } = await httpClient.put(
     `norms/${guid}`,
     { headers },
-    body
+    body,
   )
 
   if (status >= 300 || error) {
@@ -150,7 +150,7 @@ export function getFileUrl(guid: string, hash: string): string {
 }
 
 export async function triggerFileGeneration(
-  guid: string
+  guid: string,
 ): Promise<ServiceResponse<string>> {
   const { status, error } = await httpClient.post(`norms/${guid}/files`)
   if (status >= 400 || error) {
