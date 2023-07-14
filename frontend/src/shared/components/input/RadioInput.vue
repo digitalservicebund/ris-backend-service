@@ -8,16 +8,14 @@ interface Props {
   size?: "large" | "medium" | "small"
 }
 
-interface Emits {
-  (event: "update:modelValue", value: string): void
-}
-
 const props = withDefaults(defineProps<Props>(), {
   validationError: undefined,
   size: "large",
 })
 
-const emit = defineEmits<Emits>()
+const emit = defineEmits<{
+  "update:modelValue": [value: string]
+}>()
 
 const localModelValue = computed({
   get: () => props.modelValue,
