@@ -4,22 +4,22 @@ import CheckboxInput from "@/shared/components/input/CheckboxInput.vue"
 
 type CheckboxInputProps = InstanceType<typeof CheckboxInput>["$props"]
 
-function renderComponent(props?: Partial<CheckboxInputProps>) {
+function renderComponent(
+  props?: Partial<CheckboxInputProps>,
+  attrs?: Record<string, unknown>,
+) {
   let modelValue = props?.modelValue ?? false
 
   const effectiveProps: CheckboxInputProps = {
-    id: props?.id ?? "identifier",
-    value: props?.value,
     modelValue,
     "onUpdate:modelValue":
       props?.["onUpdate:modelValue"] ??
       ((value) => (modelValue = value ?? false)),
-    ariaLabel: props?.ariaLabel ?? "aria-label",
     size: props?.size,
     validationError: props?.validationError,
   }
 
-  return render(CheckboxInput, { props: effectiveProps })
+  return render(CheckboxInput, { props: effectiveProps, attrs })
 }
 
 describe("Checkbox Input", () => {
@@ -29,8 +29,14 @@ describe("Checkbox Input", () => {
     expect(input).toBeInTheDocument()
   })
 
+  it("renders the ID", () => {
+    renderComponent(undefined, { id: "test-id" })
+    const input = screen.getByRole("checkbox")
+    expect(input).toHaveAttribute("id", "test-id")
+  })
+
   it("renders an aria label", () => {
-    renderComponent({ ariaLabel: "test-label" })
+    renderComponent(undefined, { "aria-label": "test-label" })
     const input = screen.getByLabelText("test-label")
     expect(input).toBeInTheDocument()
   })
@@ -83,5 +89,17 @@ describe("Checkbox Input", () => {
     renderComponent({ size: "small" })
     const input = screen.getByRole("checkbox")
     expect(input).toHaveClass("ds-checkbox-small")
+  })
+
+  it("renders the checkbox as disabled", () => {
+    renderComponent(undefined, { disabled: true })
+    const input = screen.getByRole("checkbox")
+    expect(input).toBeDisabled()
+  })
+
+  it("renders the checkbox as enabled", () => {
+    renderComponent(undefined, { disabled: false })
+    const input = screen.getByRole("checkbox")
+    expect(input).toBeEnabled()
   })
 })

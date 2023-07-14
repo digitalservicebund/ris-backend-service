@@ -169,7 +169,11 @@ const dateInputAttributes: BaseInputAttributes = {
     <CheckboxInput id="regularCheckbox" aria-label="regular checkbox" />
 
     Checked Checkbox
-    <CheckboxInput id="checkedCheckbox" aria-label="checked checkbox" value />
+    <CheckboxInput
+      id="checkedCheckbox"
+      aria-label="checked checkbox"
+      model-value
+    />
 
     Disabled Checkbox
     <CheckboxInput
@@ -183,7 +187,7 @@ const dateInputAttributes: BaseInputAttributes = {
       id="disabledAndCheckedCheckbox"
       aria-label="disabled checkbox"
       disabled
-      value
+      model-value
     />
 
     Invalid Checkbox

@@ -4,13 +4,9 @@ import { ValidationError } from "@/shared/components/input/types"
 import { useInputModel } from "@/shared/composables/useInputModel"
 
 interface Props {
-  id: string
-  value?: boolean
   modelValue?: boolean
-  ariaLabel: string
   validationError?: ValidationError
   size?: "small" | "regular"
-  disabled?: boolean
 }
 
 interface Emits {
@@ -35,13 +31,12 @@ const isInvalid = computed(() => props.validationError !== undefined)
 </script>
 
 <template>
+  <!-- Label should come from the surrounding context, e.g. InputField component -->
+  <!-- eslint-disable vuejs-accessibility/form-control-has-label -->
   <input
-    :id="id"
     v-model="inputValue"
-    :aria-label="ariaLabel"
-    class="ds-checkbox mr-8"
+    class="ds-checkbox mr-4"
     :class="{ 'has-error': isInvalid, 'ds-checkbox-small': size === 'small' }"
-    :disabled="disabled"
     type="checkbox"
     @input="emitInputEvent"
   />
