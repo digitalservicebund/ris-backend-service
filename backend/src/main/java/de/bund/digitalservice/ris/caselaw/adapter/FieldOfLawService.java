@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import lombok.extern.slf4j.Slf4j;
@@ -72,21 +73,22 @@ public class FieldOfLawService {
 
     return unorderedList
         .map(
-            list -> {
-              totalElements.set(list.size());
-              list =
-                  list.stream()
-                      .map(fieldOfLaw -> calculateScore(searchTerms, normStr, fieldOfLaw))
-                      .sorted((f1, f2) -> f2.score().compareTo(f1.score()))
-                      .toList();
-              int fromIdx = (int) pageable.getOffset();
-              int toIdx =
-                  (int) Math.min(pageable.getOffset() + pageable.getPageSize(), list.size());
-              if (fromIdx > toIdx) {
-                return new ArrayList<FieldOfLaw>();
-              }
-              return list.subList(fromIdx, toIdx);
-            })
+            (Function<List<FieldOfLaw>, List<FieldOfLaw>>)
+                list -> {
+                  totalElements.set(list.size());
+                  list =
+                      list.stream()
+                          .map(fieldOfLaw -> calculateScore(searchTerms, normStr, fieldOfLaw))
+                          .sorted((f1, f2) -> f2.score().compareTo(f1.score()))
+                          .toList();
+                  int fromIdx = (int) pageable.getOffset();
+                  int toIdx =
+                      (int) Math.min(pageable.getOffset() + pageable.getPageSize(), list.size());
+                  if (fromIdx > toIdx) {
+                    return new ArrayList<>();
+                  }
+                  return list.subList(fromIdx, toIdx);
+                })
         .map(list -> new PageImpl<>(list, pageable, totalElements.get()));
   }
 
