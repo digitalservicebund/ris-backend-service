@@ -6,7 +6,10 @@ import TextAreaInput from "@/shared/components/input/TextAreaInput.vue"
 
 type TextAreaInputProps = InstanceType<typeof TextAreaInput>["$props"]
 
-function renderComponent(props: Partial<TextAreaInputProps>) {
+function renderComponent(
+  props: Partial<TextAreaInputProps>,
+  attrs?: Record<string, unknown>,
+) {
   let modelValue = ""
 
   const defaultProps: TextAreaInputProps = {
@@ -17,7 +20,7 @@ function renderComponent(props: Partial<TextAreaInputProps>) {
     ...props,
   }
 
-  return render(TextAreaInput, { props: defaultProps })
+  return render(TextAreaInput, { props: defaultProps, attrs })
 }
 
 describe("TextAreaInput", () => {
@@ -103,9 +106,7 @@ describe("TextAreaInput", () => {
   })
 
   it("sets the tabindex to the given value", () => {
-    // @ts-expect-error It's not a prop we declared but still allowed in
-    // practice as a fall-thorugh attribute, so we want to test it.
-    renderComponent({ readOnly: true, tabindex: 815 })
+    renderComponent({}, { tabindex: 815 })
     const input: HTMLTextAreaElement = screen.getByRole("textbox")
     expect(input).toHaveAttribute("tabindex", "815")
   })

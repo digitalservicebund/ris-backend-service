@@ -45,7 +45,11 @@ describe("Radio Input", () => {
   it("renders the value", () => {
     renderComponent(undefined, { value: "test-value" })
     const input = screen.getByRole("radio")
-    expect(input).toHaveValue("test-value")
+
+    // This is a false positive, 'value' here doesn't mean the checked state
+    // of the radio, but the value it has in the form when checked.
+    /* eslint-disable-next-line jest-dom/prefer-to-have-value */
+    expect(input).toHaveAttribute("value", "test-value")
   })
 
   it("renders an aria label", () => {
