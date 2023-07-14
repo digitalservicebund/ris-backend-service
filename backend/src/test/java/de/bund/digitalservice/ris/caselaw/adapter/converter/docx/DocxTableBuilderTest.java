@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import de.bund.digitalservice.ris.caselaw.domain.docx.DocumentUnitDocx;
 import de.bund.digitalservice.ris.caselaw.domain.docx.TableElement;
 import jakarta.xml.bind.JAXBElement;
 import java.math.BigInteger;
@@ -37,6 +38,7 @@ import org.docx4j.wml.TcPrInner.TcBorders;
 import org.docx4j.wml.Tr;
 import org.docx4j.wml.U;
 import org.docx4j.wml.UnderlineEnumeration;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 class DocxTableBuilderTest {
@@ -312,110 +314,68 @@ class DocxTableBuilderTest {
                 + "</table>");
   }
 
-  @Test
-  void testBuild_withExternalTableStyleContainsTableStylePropertiesAndAllPropertySet() {
-    Tbl table = generateTable(List.of(List.of("table cell")));
-    TblPr tblPr = new TblPr();
-    TblStyle tblStyle = new TblStyle();
-    tblStyle.setVal("external-style");
-    tblPr.setTblStyle(tblStyle);
-    table.setTblPr(tblPr);
+  @SuppressWarnings("java:S5976") // Disable warning for tests that could be parametrized
+  @Nested
+  class TestBuildWithExternalTableStyleContainsTableStyleProperties {
+    private String htmlFromTableElement(float borderLeft) {
+      return String.format(
+          "<table style=\"border-collapse: collapse;\">"
+              + "<tr>"
+              + "<td style=\"border-left: %spx solid #000; min-width: 5px; padding: 5px;\"><p>table cell</p></td>"
+              + "</tr>"
+              + "</table>",
+          borderLeft);
+    }
 
-    Map<String, Style> styles = new HashMap<>();
-    Style style = new Style();
-    putTableStylePrToStyle(style);
-    Tr tr = (Tr) table.getContent().get(0);
-    JAXBElement<Tc> tcJAXBElement = (JAXBElement<Tc>) tr.getContent().get(0);
-    TcPr tcPr = new TcPr();
-    CTCnf ctCnf = new CTCnf();
-    ctCnf.setVal(Integer.toBinaryString(4097));
-    tcPr.setCnfStyle(ctCnf);
-    tcJAXBElement.getValue().setTcPr(tcPr);
-    styles.put("external-style", style);
+    private DocumentUnitDocx documentUnit(Integer ctCnfInt) {
+      Tbl table = generateTable(List.of(List.of("table cell")));
+      TblPr tblPr = new TblPr();
+      TblStyle tblStyle = new TblStyle();
+      tblStyle.setVal("external-style");
+      tblPr.setTblStyle(tblStyle);
+      table.setTblPr(tblPr);
 
-    var result = DocxTableBuilder.newInstance().setTable(table).useStyles(styles).build();
+      Map<String, Style> styles = new HashMap<>();
+      Style style = new Style();
+      putTableStylePrToStyle(style);
+      Tr tr = (Tr) table.getContent().get(0);
+      JAXBElement<Tc> tcJAXBElement = (JAXBElement<Tc>) tr.getContent().get(0);
+      TcPr tcPr = new TcPr();
+      CTCnf ctCnf = new CTCnf();
+      ctCnf.setVal(Integer.toBinaryString(ctCnfInt));
+      tcPr.setCnfStyle(ctCnf);
+      tcJAXBElement.getValue().setTcPr(tcPr);
+      styles.put("external-style", style);
 
-    assertThat(result).isInstanceOf(TableElement.class);
-    TableElement tableElement = (TableElement) result;
-    assertThat(tableElement.toHtmlString())
-        .isEqualTo(
-            "<table style=\"border-collapse: collapse;\">"
-                + "<tr>"
-                + "<td style=\"border-left: 3.25px solid #000; min-width: 5px; padding: 5px;\"><p>table cell</p></td>"
-                + "</tr>"
-                + "</table>");
-  }
+      return DocxTableBuilder.newInstance().setTable(table).useStyles(styles).build();
+    }
 
-  @Test
-  void
-      testBuild_withExternalTableStyleContainsTableStylePropertiesAndOnePropertySetWhichDoesntMatchCell() {
-    Tbl table = generateTable(List.of(List.of("table cell")));
-    TblPr tblPr = new TblPr();
-    TblStyle tblStyle = new TblStyle();
-    tblStyle.setVal("external-style");
-    tblPr.setTblStyle(tblStyle);
-    table.setTblPr(tblPr);
+    @Test
+    void testAllPropertySet() {
+      var result = documentUnit(4097);
 
-    Map<String, Style> styles = new HashMap<>();
-    Style style = new Style();
-    putTableStylePrToStyle(style);
-    Tr tr = (Tr) table.getContent().get(0);
-    JAXBElement<Tc> tcJAXBElement = (JAXBElement<Tc>) tr.getContent().get(0);
-    TcPr tcPr = new TcPr();
-    CTCnf ctCnf = new CTCnf();
-    // BAND_2_VERT (odd columns)
-    ctCnf.setVal(Integer.toBinaryString(32));
-    tcPr.setCnfStyle(ctCnf);
-    tcJAXBElement.getValue().setTcPr(tcPr);
-    styles.put("external-style", style);
+      assertThat(result).isInstanceOf(TableElement.class);
+      TableElement tableElement = (TableElement) result;
+      assertThat(tableElement.toHtmlString()).isEqualTo(htmlFromTableElement(3.25f));
+    }
 
-    var result = DocxTableBuilder.newInstance().setTable(table).useStyles(styles).build();
+    @Test
+    void testOnePropertySetWhichDoesntMatchCell() {
+      var result = documentUnit(32);
 
-    assertThat(result).isInstanceOf(TableElement.class);
-    TableElement tableElement = (TableElement) result;
-    assertThat(tableElement.toHtmlString())
-        .isEqualTo(
-            "<table style=\"border-collapse: collapse;\">"
-                + "<tr>"
-                + "<td style=\"border-left: 0.25px solid #000; min-width: 5px; padding: 5px;\"><p>table cell</p></td>"
-                + "</tr>"
-                + "</table>");
-  }
+      assertThat(result).isInstanceOf(TableElement.class);
+      TableElement tableElement = (TableElement) result;
+      assertThat(tableElement.toHtmlString()).isEqualTo(htmlFromTableElement(0.25f));
+    }
 
-  @Test
-  void
-      testBuild_withExternalTableStyleContainsTableStylePropertiesAndOnePropertySetWhichMatchCell() {
-    Tbl table = generateTable(List.of(List.of("table cell")));
-    TblPr tblPr = new TblPr();
-    TblStyle tblStyle = new TblStyle();
-    tblStyle.setVal("external-style");
-    tblPr.setTblStyle(tblStyle);
-    table.setTblPr(tblPr);
+    @Test
+    void testOnePropertySetWhichMatchesCell() {
+      var result = documentUnit(512);
 
-    Map<String, Style> styles = new HashMap<>();
-    Style style = new Style();
-    putTableStylePrToStyle(style);
-    Tr tr = (Tr) table.getContent().get(0);
-    JAXBElement<Tc> tcJAXBElement = (JAXBElement<Tc>) tr.getContent().get(0);
-    TcPr tcPr = new TcPr();
-    CTCnf ctCnf = new CTCnf();
-    // FIRST_COLUMN (first columns)
-    ctCnf.setVal(Integer.toBinaryString(512));
-    tcPr.setCnfStyle(ctCnf);
-    tcJAXBElement.getValue().setTcPr(tcPr);
-    styles.put("external-style", style);
-
-    var result = DocxTableBuilder.newInstance().setTable(table).useStyles(styles).build();
-
-    assertThat(result).isInstanceOf(TableElement.class);
-    TableElement tableElement = (TableElement) result;
-    assertThat(tableElement.toHtmlString())
-        .isEqualTo(
-            "<table style=\"border-collapse: collapse;\">"
-                + "<tr>"
-                + "<td style=\"border-left: 1.5px solid #000; min-width: 5px; padding: 5px;\"><p>table cell</p></td>"
-                + "</tr>"
-                + "</table>");
+      assertThat(result).isInstanceOf(TableElement.class);
+      TableElement tableElement = (TableElement) result;
+      assertThat(tableElement.toHtmlString()).isEqualTo(htmlFromTableElement(1.5f));
+    }
   }
 
   private void putTableStylePrToStyle(Style style) {
