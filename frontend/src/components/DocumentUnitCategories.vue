@@ -63,8 +63,8 @@ async function handleUpdateDocumentUnit(): Promise<ServiceResponse<void>> {
     }
     if (response.data) {
       updatedDocumentUnit.value = response.data as DocumentUnit
-      lastUpdatedDocumentUnit.value = updatedDocumentUnit.value
     }
+    lastUpdatedDocumentUnit.value = updatedDocumentUnit.value
     hasDataChange.value = false
     return response as ServiceResponse<void>
   }
