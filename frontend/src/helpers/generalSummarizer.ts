@@ -24,6 +24,6 @@ export function generalSummarizer(data: Metadata): string {
     const date = data.DATE?.[0]
       ? dayjs(data.DATE[0]).format("DD.MM.YYYY")
       : undefined
-    return date || ""
+    return date ?? ""
   }
 }
