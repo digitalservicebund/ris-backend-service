@@ -50,8 +50,11 @@ const handleUpdateValueDocumentUnitTexts = async (
 
 async function handleUpdateDocumentUnit(): Promise<ServiceResponse<void>> {
   hasDataChange.value =
-    JSON.stringify(updatedDocumentUnit.value) !==
+    JSON.stringify(updatedDocumentUnit.value)
+      .replaceAll('"norms":[{"validationError":false}]', '"norms":[]')
+      .replaceAll('"activeCitations":[{}]', '"activeCitations":[]') !==
     JSON.stringify(lastUpdatedDocumentUnit.value)
+
   if (hasDataChange.value) {
     const response = await documentUnitService.update(
       updatedDocumentUnit.value as DocumentUnit,
@@ -64,7 +67,10 @@ async function handleUpdateDocumentUnit(): Promise<ServiceResponse<void>> {
     if (response.data) {
       updatedDocumentUnit.value = response.data as DocumentUnit
     }
-    lastUpdatedDocumentUnit.value = updatedDocumentUnit.value
+    lastUpdatedDocumentUnit.value = JSON.parse(
+      JSON.stringify(updatedDocumentUnit.value),
+    )
+
     hasDataChange.value = false
     return response as ServiceResponse<void>
   }

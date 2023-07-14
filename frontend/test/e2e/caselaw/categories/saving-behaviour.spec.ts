@@ -3,6 +3,7 @@ import {
   navigateToCategories,
   waitForSaving,
   waitForInputValue,
+  fillActiveCitationInputs,
 } from "../e2e-utils"
 import { caselawTest as test } from "../fixtures"
 import { generateString } from "~/test-helper/dataGenerators"
@@ -52,6 +53,27 @@ test.describe("saving behaviour", () => {
     await expect(page.locator("[aria-label='Spruchkörper']")).toHaveValue(
       "VG-002",
     )
+  })
+
+  test("change Aktivzitierung to test saving of nested elements", async ({
+    page,
+    documentNumber,
+  }) => {
+    await navigateToCategories(page, documentNumber)
+
+    await waitForSaving(
+      async () => {
+        await fillActiveCitationInputs(page, {
+          documentType: "AnU",
+        })
+        await page.getByLabel("Aktivzitierung speichern").click()
+      },
+      page,
+      { clickSaveButton: true },
+    )
+
+    await page.reload()
+    await expect(page.getByText("Anerkenntnisurteil")).toBeVisible()
   })
 
   test("saved changes also visible in document unit entry list", async ({
