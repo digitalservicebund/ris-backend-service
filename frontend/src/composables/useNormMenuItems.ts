@@ -8,7 +8,7 @@ export function useNormMenuItems(
   exportIsEnabled?: Ref<boolean>,
 ) {
   const baseRoute = {
-    params: { guid: normGuid.value },
+    params: { normGuid: normGuid.value },
     query: route.query,
   }
 
@@ -16,7 +16,7 @@ export function useNormMenuItems(
     label: label,
     route: {
       ...baseRoute,
-      name: "norms-norm-:normGuid-frame",
+      name: "norms-norm-normGuid-frame",
       hash: `#${id}`,
     },
   })
@@ -26,14 +26,14 @@ export function useNormMenuItems(
       label: "Normenkomplex",
       route: {
         ...baseRoute,
-        name: "norms-norm-:normGuid",
+        name: "norms-norm-normGuid",
       },
     },
     {
       label: "Rahmen",
       route: {
         ...baseRoute,
-        name: "norms-norm-:normGuid-frame",
+        name: "norms-norm-normGuid-frame",
       },
       children: [
         getChildItem("Allgemeine Angaben", "officialLongTitle"),
@@ -72,14 +72,14 @@ export function useNormMenuItems(
       label: "Bestand",
       route: {
         ...baseRoute,
-        name: "norms",
+        name: "norms-norm-normGuid-frame",
       },
     },
     {
       label: "Export",
       route: {
         ...baseRoute,
-        name: "norms-norm-:normGuid-export",
+        name: "norms-norm-normGuid-export",
       },
       isDisabled: !(exportIsEnabled?.value ?? false),
     },

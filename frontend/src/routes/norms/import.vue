@@ -17,7 +17,7 @@ async function upload(file: File) {
     const response = await importNorm(file)
     if (response.status === 201 && response.data) {
       await router.replace({
-        name: "norms-norm-:normGuid",
+        name: "norms-norm-normGuid",
         params: { normGuid: response.data },
       })
     } else {

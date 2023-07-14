@@ -41,8 +41,8 @@ function renderComponent(options?: {
         component: {},
       },
       {
-        path: "/:documentNumber/categories",
-        name: "caselaw-documentUnit-:documentNumber-categories",
+        path: "/caselaw/documentUnit/:documentNumber/categories",
+        name: "caselaw-documentUnit-documentNumber-categories",
         component: {},
       },
     ],

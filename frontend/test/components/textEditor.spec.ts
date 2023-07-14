@@ -10,8 +10,13 @@ describe("text editor", async () => {
     history: createWebHistory(),
     routes: [
       {
-        path: "",
-        name: "caselaw-documentUnit-:documentNumber-categories#coreData",
+        path: "/",
+        name: "home",
+        component: {},
+      },
+      {
+        path: "/caselaw/documentUnit/:documentNumber/categories#coreData",
+        name: "caselaw-documentUnit-documentNumber-categories#coreData",
         component: {},
       },
     ],

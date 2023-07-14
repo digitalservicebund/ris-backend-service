@@ -9,7 +9,7 @@ onBeforeMount(async () => {
   const createResponse = await documentUnitService.createNew()
   if (createResponse.data)
     await router.replace({
-      name: "caselaw-documentUnit-:documentNumber-files",
+      name: "caselaw-documentUnit-documentNumber-files",
       params: { documentNumber: createResponse.data.documentNumber },
     })
 })

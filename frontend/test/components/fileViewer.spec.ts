@@ -21,8 +21,13 @@ describe("file viewer", async () => {
     history: createWebHistory(),
     routes: [
       {
-        path: "",
-        name: "caselaw-documentUnit-:documentNumber-files",
+        path: "/",
+        name: "home",
+        component: {},
+      },
+      {
+        path: "/caselaw/documentUnit/:documentNumber/files",
+        name: "caselaw-documentUnit-documentNumber-files",
         component: {},
       },
     ],

@@ -25,11 +25,15 @@ watch(localOpen, () => emit("update:open", localOpen.value))
 
 const route = useRoute()
 
-const uploadFileRoute = computed(() => ({
-  name: "caselaw-documentUnit-:documentNumber-files",
-  params: { documentNumber: route.params.documentNumber },
-  query: route.query,
-}))
+const uploadFileRoute = computed(() =>
+  route.params?.documentNumber
+    ? {
+        name: "caselaw-documentUnit-documentNumber-files",
+        params: { documentNumber: route.params.documentNumber },
+        query: route.query,
+      }
+    : undefined,
+)
 </script>
 
 <template>
@@ -45,6 +49,7 @@ const uploadFileRoute = computed(() => ({
         Es wurde noch kein Originaldokument hochgeladen.
 
         <router-link
+          v-if="uploadFileRoute"
           class="flex gap-2 items-center link-01-bold"
           :to="uploadFileRoute"
         >

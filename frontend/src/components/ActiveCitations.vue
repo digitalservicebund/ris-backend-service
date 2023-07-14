@@ -32,7 +32,7 @@ function decisionSummarizer(activeCitation: ActiveCitation) {
         target: "_blank",
         tabindex: -1,
         to: {
-          name: "caselaw-documentUnit-:documentNumber-categories",
+          name: "caselaw-documentUnit-documentNumber-categories",
           params: { documentNumber: activeCitation.documentNumber },
         },
       },

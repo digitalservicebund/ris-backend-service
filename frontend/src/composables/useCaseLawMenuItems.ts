@@ -7,7 +7,7 @@ export function useCaseLawMenuItems(
   route: RouteLocationNormalizedLoaded,
 ) {
   const baseRoute = {
-    params: { id: documentNumber.value },
+    params: { documentNumber: documentNumber.value },
     query: route.query,
   }
 
@@ -16,14 +16,14 @@ export function useCaseLawMenuItems(
       label: "Rubriken",
       route: {
         ...baseRoute,
-        name: "caselaw-documentUnit-:documentNumber-categories",
+        name: "caselaw-documentUnit-documentNumber-categories",
       },
       children: [
         {
           label: "Stammdaten",
           route: {
             ...baseRoute,
-            name: "caselaw-documentUnit-:documentNumber-categories",
+            name: "caselaw-documentUnit-documentNumber-categories",
             hash: "#coreData",
           },
         },
@@ -31,7 +31,7 @@ export function useCaseLawMenuItems(
           label: "Rechtszug",
           route: {
             ...baseRoute,
-            name: "caselaw-documentUnit-:documentNumber-categories",
+            name: "caselaw-documentUnit-documentNumber-categories",
             hash: "#proceedingDecisions",
           },
         },
@@ -39,7 +39,7 @@ export function useCaseLawMenuItems(
           label: "Inhaltliche Erschließung",
           route: {
             ...baseRoute,
-            name: "caselaw-documentUnit-:documentNumber-categories",
+            name: "caselaw-documentUnit-documentNumber-categories",
             hash: "#contentRelatedIndexing",
           },
         },
@@ -47,7 +47,7 @@ export function useCaseLawMenuItems(
           label: "Kurz- & Langtexte",
           route: {
             ...baseRoute,
-            name: "caselaw-documentUnit-:documentNumber-categories",
+            name: "caselaw-documentUnit-documentNumber-categories",
             hash: "#texts",
           },
         },
@@ -57,14 +57,14 @@ export function useCaseLawMenuItems(
       label: "Dokumente",
       route: {
         ...baseRoute,
-        name: "caselaw-documentUnit-:documentNumber-files",
+        name: "caselaw-documentUnit-documentNumber-files",
       },
     },
     {
       label: "Veröffentlichen",
       route: {
         ...baseRoute,
-        name: "caselaw-documentUnit-:documentNumber-publication",
+        name: "caselaw-documentUnit-documentNumber-publication",
       },
     },
   ])

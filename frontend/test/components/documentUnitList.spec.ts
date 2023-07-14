@@ -33,12 +33,12 @@ function renderComponent(
           routes: [
             {
               path: "/caselaw/documentUnit/:documentNumber/files",
-              name: "caselaw-documentUnit-:documentNumber-files",
+              name: "caselaw-documentUnit-documentNumber-files",
               component: {},
             },
             {
               path: "/caselaw/documentUnit/:documentNumber/categories",
-              name: "caselaw-documentUnit-:documentNumber-categories",
+              name: "caselaw-documentUnit-documentNumber-categories",
               component: {},
             },
             {

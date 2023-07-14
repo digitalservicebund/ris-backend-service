@@ -95,8 +95,8 @@ function onDelete() {
             class="underline"
             :to="{
               name: listEntry.fileName
-                ? 'caselaw-documentUnit-:documentNumber-categories'
-                : 'caselaw-documentUnit-:documentNumber-files',
+                ? 'caselaw-documentUnit-documentNumber-categories'
+                : 'caselaw-documentUnit-documentNumber-files',
               params: { documentNumber: listEntry.documentNumber },
             }"
           >

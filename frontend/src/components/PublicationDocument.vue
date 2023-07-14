@@ -29,7 +29,7 @@ const emits = defineEmits<{
 }>()
 
 const categoriesRoute = computed(() => ({
-  name: "caselaw-documentUnit-:documentNumber-categories",
+  name: "caselaw-documentUnit-documentNumber-categories",
   params: { documentNumber: props.documentUnit.documentNumber },
 }))
 const isFirstTimePublication = computed(() => {

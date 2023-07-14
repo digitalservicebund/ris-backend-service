@@ -1,19 +1,41 @@
 import { render, screen } from "@testing-library/vue"
 import { describe, test } from "vitest"
-import { createRouter, createWebHistory } from "vue-router"
+import { Router, createRouter, createWebHistory } from "vue-router"
 import OriginalFileSidePanel from "@/components/OriginalFileSidePanel.vue"
 
 describe("originalFile SidePanel", () => {
-  global.ResizeObserver = require("resize-observer-polyfill")
-  const router = createRouter({
-    history: createWebHistory(),
-    routes: [
-      {
-        path: "",
-        name: "caselaw-documentUnit-:documentNumber-files",
-        component: {},
-      },
-    ],
+  let router: Router
+  beforeAll(() => {
+    vi.mock("vue-router", async () => {
+      const router = (await vi.importActual("vue-router")) as Record<
+        string,
+        unknown
+      >
+      return {
+        ...router,
+        useRoute: vi.fn().mockReturnValue({
+          params: {
+            documentNumber: "123",
+          },
+        }),
+      }
+    })
+
+    router = createRouter({
+      history: createWebHistory(),
+      routes: [
+        {
+          path: "/",
+          name: "home",
+          component: {},
+        },
+        {
+          path: "/caselaw/documentUnit/:documentNumber/files",
+          name: "caselaw-documentUnit-documentNumber-files",
+          component: {},
+        },
+      ],
+    })
   })
 
   test("panel not visible if closed", () => {

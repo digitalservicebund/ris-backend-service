@@ -14,7 +14,7 @@ defineProps<{
       tabindex="-1"
       target="_blank"
       :to="{
-        name: 'caselaw-documentUnit-:documentNumber-categories',
+        name: 'caselaw-documentUnit-documentNumber-categories',
         params: { documentNumber: decision.documentNumber },
       }"
     >

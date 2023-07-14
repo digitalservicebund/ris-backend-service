@@ -10,7 +10,7 @@ describe("useCaseLawMenuItems", () => {
     const menuItems = useCaseLawMenuItems(documentNumber, route)
 
     for (const menuItem of menuItems.value) {
-      expect(menuItem.route.params).toContain({ id: "fake-number" })
+      expect(menuItem.route.params).toContain({ documentNumber: "fake-number" })
     }
   })
 

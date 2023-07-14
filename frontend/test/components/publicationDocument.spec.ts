@@ -9,7 +9,7 @@ const router = createRouter({
   routes: [
     {
       path: "/caselaw/documentUnit/:documentNumber/categories",
-      name: "caselaw-documentUnit-:documentNumber-categories",
+      name: "caselaw-documentUnit-documentNumber-categories",
       component: {},
     },
     {
@@ -117,7 +117,7 @@ describe("PublicationDocument:", () => {
 
       await userEvent.click(screen.getByLabelText("Rubriken bearbeiten"))
       expect(router.currentRoute.value.name).toBe(
-        "caselaw-documentUnit-:documentNumber-categories",
+        "caselaw-documentUnit-documentNumber-categories",
       )
     })
   })
