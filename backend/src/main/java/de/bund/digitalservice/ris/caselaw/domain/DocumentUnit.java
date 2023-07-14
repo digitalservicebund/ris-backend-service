@@ -11,7 +11,7 @@ import lombok.Builder;
 @Builder(toBuilder = true)
 public record DocumentUnit(
     UUID uuid,
-    @Size(min = 11, max = 14, message = "documentNumber has to be 11 or 14 characters long")
+    @Size(min = 13, max = 14, message = "documentNumber has to be 13 or 14 characters long")
         String documentNumber,
     @PastOrPresent Instant creationtimestamp,
     @PastOrPresent Instant fileuploadtimestamp,
