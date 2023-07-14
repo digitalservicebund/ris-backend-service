@@ -51,20 +51,20 @@ onMounted(() => {
 <template>
   <div
     :aria-label="ariaLabel"
-    class="bg-background fixed flex h-full items-center justify-center left-0 popup-modal-wrapper top-0 w-screen z-999"
+    class="popup-modal-wrapper z-999 fixed left-0 top-0 flex h-full w-screen items-center justify-center bg-background"
     role="dialog"
     tabindex="0"
     @click.self="$emit('closeModal')"
     @keydown.esc="$emit('closeModal')"
   >
     <div
-      class="bg-white border-2 border-blue-800 border-solid box-border flex flex-col gap-[1rem] items-start modal-container px-[3.5rem] py-[2.5rem]"
+      class="modal-container box-border flex flex-col items-start gap-[1rem] border-2 border-solid border-blue-800 bg-white px-[3.5rem] py-[2.5rem]"
     >
       <div class="label-01-bold text-black">
         {{ headerText }}
       </div>
       <div class="label-03-reg text-black">{{ contentText }}</div>
-      <div class="flex flex-row gap-[1rem] modal-buttons-container">
+      <div class="modal-buttons-container flex flex-row gap-[1rem]">
         <TextButton
           :button-type="cancelButtonType"
           label="Abbrechen"

@@ -60,7 +60,7 @@ const undefinedDateState = computed({
 </script>
 
 <template>
-  <div class="flex flex-col gap-8 w-384">
+  <div class="flex w-384 flex-col gap-8">
     <InputField :id="id" :aria-label="label" :label="label">
       <DropdownInput
         :id="id + 'Dropdown'"

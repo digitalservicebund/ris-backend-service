@@ -19,7 +19,7 @@ const emit = defineEmits<{
       Die Liste ist aktuell leer
     </div>
     <div v-else>
-      <hr class="border-blue-500 mt-20 w-full" />
+      <hr class="mt-20 w-full border-blue-500" />
       <FieldOfLawListEntry
         v-for="fieldOfLaw in props.selectedFieldsOfLaw"
         :key="fieldOfLaw.identifier"

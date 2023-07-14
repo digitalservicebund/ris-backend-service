@@ -40,7 +40,7 @@ export enum LabelPosition {
 </script>
 
 <template>
-  <div class="flex flex-start mb-16 w-full" :class="wrapperClasses">
+  <div class="flex-start mb-16 flex w-full" :class="wrapperClasses">
     <!-- slot rendered BEFORE label if the label position should be to the right or bottom -->
     <slot
       v-if="
@@ -64,7 +64,7 @@ export enum LabelPosition {
       <label
         v-if="labelConverted.length !== 0"
         :aria-label="id"
-        class="grid items-center label-03-reg text-gray-900"
+        class="label-03-reg grid items-center text-gray-900"
         :class="{
           'pr-4': labelPosition === LabelPosition.LEFT,
           'pl-4': labelPosition === LabelPosition.RIGHT,
@@ -92,7 +92,7 @@ export enum LabelPosition {
       :has-error="!!validationError"
     />
 
-    <div v-if="validationError" class="h-16 label-03-reg my-8 text-red-800">
+    <div v-if="validationError" class="label-03-reg my-8 h-16 text-red-800">
       {{ validationError }}
     </div>
   </div>

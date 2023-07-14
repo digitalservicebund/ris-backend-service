@@ -61,7 +61,7 @@ function onFileSelect(event: Event) {
 <template>
   <div
     id="upload-drop-area"
-    class="bg-white border-3 border-blue-300 border-dashed flex flex-col hover:border-3 items-center p-[3.125rem] rounded-lg text-center upload-drop-area w-full"
+    class="upload-drop-area flex w-full flex-col items-center rounded-lg border-3 border-dashed border-blue-300 bg-white p-[3.125rem] text-center hover:border-3"
     :class="{
       'upload-drop-area__in-drag': status.inDrag,
     }"
@@ -86,7 +86,7 @@ function onFileSelect(event: Event) {
         aria-label="Upload File"
         @input="onFileSelect"
       >
-        <span class="hover:underline link-03-bold mt-[0.438rem]"
+        <span class="link-03-bold mt-[0.438rem] hover:underline"
           >oder Datei auswählen</span
         >
       </FileInput>

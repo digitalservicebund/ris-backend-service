@@ -46,35 +46,35 @@ onUnmounted(() => {
 <template>
   <div
     :aria-label="ariaLabel"
-    class="cursor-pointer editor-button flex flex-row-reverse hover:bg-blue-200 items-center text-blue-900"
+    class="editor-button flex cursor-pointer flex-row-reverse items-center text-blue-900 hover:bg-blue-200"
     :class="{
       'bg-blue-200': isActive && !childButtons,
-      'border-r-1 border-gray-400 border-solid': isLast,
+      'border-r-1 border-solid border-gray-400': isLast,
     }"
     @click="onClickToggle(props)"
     @keydown.m="onClickToggle(props)"
     @mousedown.prevent=""
   >
     <span
-      class="leading-default px-[0.5rem]"
+      class="px-[0.5rem] leading-default"
       :class="{ dropdown: type == 'menu', 'material-icons': icon }"
       >{{ icon }}</span
     >
     <div
       v-if="showDropdown"
-      class="absolute bg-white border-1 border-blue-800 border-solid flex flex-row mt-80 pa-1 z-50"
+      class="pa-1 absolute z-50 mt-80 flex flex-row border-1 border-solid border-blue-800 bg-white"
     >
       <div
         v-for="(childButton, index) in childButtons"
         :key="index"
         :aria-label="childButton.ariaLabel"
-        class="cursor-pointer dropdown-item hover:bg-blue-200 text-blue-900 z-50"
+        class="dropdown-item z-50 cursor-pointer text-blue-900 hover:bg-blue-200"
         :class="{ 'bg-blue-200': isActive, 'bg-red-800': isSecondRow }"
         @click="emits('toggle', childButton)"
         @keydown.m="emits('toggle', childButton)"
         @mousedown.prevent=""
       >
-        <span class="leading-default material-icons px-2">{{
+        <span class="material-icons px-2 leading-default">{{
           childButton.icon
         }}</span>
       </div>

@@ -64,7 +64,7 @@ const inputFields = computed(() => {
 </script>
 
 <template>
-  <div class="flex ful-w gap-16 justify-between">
+  <div class="ful-w flex justify-between gap-16">
     <InputField
       :id="inputFields.textOrNoteField.id"
       :aria-label="inputFields.textOrNoteField.label"

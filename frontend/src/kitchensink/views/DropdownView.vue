@@ -14,8 +14,8 @@ const dropdownItems: DropdownItem[] = [
 </script>
 
 <template>
-  <div class="flex flex-col gap-y-20 h-full w-full">
-    <h1 class="font-bold text-24">Dropdown Input ohne Vorauswahl</h1>
+  <div class="flex h-full w-full flex-col gap-y-20">
+    <h1 class="text-24 font-bold">Dropdown Input ohne Vorauswahl</h1>
     <div class="pb-4">
       <DropdownInput
         id="comboboxInput"
@@ -26,7 +26,7 @@ const dropdownItems: DropdownItem[] = [
         :value="comboboxModelValue1"
       />
     </div>
-    <h1 class="font-bold text-24">Dropdown Input mit Vorauswahl</h1>
+    <h1 class="text-24 font-bold">Dropdown Input mit Vorauswahl</h1>
     <div class="h-[20rem] pb-4">
       <DropdownInput
         id="comboboxInput"

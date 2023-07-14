@@ -154,8 +154,8 @@ const AnnouncementDateSummary = withSummarizer(summarizeAnnouncementDate)
 </script>
 
 <template>
-  <div class="flex flex-col gap-8 max-w-screen-lg">
-    <h1 class="h-[1px] overflow-hidden w-[1px]">
+  <div class="flex max-w-screen-lg flex-col gap-8">
+    <h1 class="h-[1px] w-[1px] overflow-hidden">
       Dokumentation des Rahmenelements
     </h1>
 

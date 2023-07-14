@@ -161,7 +161,7 @@ watch(currentInput, async () => {
   <!-- eslint-disable vuejs-accessibility/click-events-have-key-events -->
   <div
     ref="wrapperEl"
-    class="-outline-offset-4 [&:has(:focus)]:outline autofill:focus:shadow-white autofill:focus:text-inherit autofill:shadow-white autofill:text-inherit bg-white border-2 border-blue-800 border-solid cursor-text flex flex-wrap hover:outline items-center min-h-[4rem] outline-2 outline-blue-800 overflow-hidden px-16 py-8 w-full"
+    class="flex min-h-[4rem] w-full cursor-text flex-wrap items-center overflow-hidden border-2 border-solid border-blue-800 bg-white px-16 py-8 outline-2 -outline-offset-4 outline-blue-800 autofill:text-inherit autofill:shadow-white hover:outline autofill:focus:text-inherit autofill:focus:shadow-white [&:has(:focus)]:outline"
     :data-testid="`chips-input_${id}`"
     @click="focusInput"
   >
@@ -171,7 +171,7 @@ watch(currentInput, async () => {
       @next-clicked-on-last="focusInput"
     />
     <span
-      class="flex flex-auto items-center justify-start max-w-full"
+      class="flex max-w-full flex-auto items-center justify-start"
       :style="{ maxWidth: `${wrapperContentWidth}px` }"
     >
       <span :id="`enter-note-for-${id}`" class="sr-only">
@@ -183,7 +183,7 @@ watch(currentInput, async () => {
         v-model="currentInput"
         :aria-describedby="`enter-note-for-${id}`"
         :aria-label="ariaLabel"
-        class="bg-transparent border-none min-w-0 outline-none peer w-[0.5ch]"
+        class="peer w-[0.5ch] min-w-0 border-none bg-transparent outline-none"
         :style="{ width: inputContentWidth }"
         type="text"
         @input="emitInputEvent"
@@ -191,7 +191,7 @@ watch(currentInput, async () => {
         @keyup.left="focusPrevious"
       />
       <span
-        class="flex-none material-icons peer-focus:text-gray-900 text-16 text-transparent"
+        class="material-icons flex-none text-16 text-transparent peer-focus:text-gray-900"
       >
         subdirectory_arrow_left
       </span>

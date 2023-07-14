@@ -53,12 +53,12 @@ defineExpose({ onKeyDown })
 </script>
 
 <template>
-  <div class="bg-white border-1 border-gray-400 drop-shadow-xl flex flex-col">
+  <div class="flex flex-col border-1 border-gray-400 bg-white drop-shadow-xl">
     <template v-if="items.length">
       <button
         v-for="(item, index) in items"
         :key="item.id ?? index"
-        class="border-b-1 border-gray-400 hover:bg-gray-400 item pl-16 pr-64 py-10 rounded-none text-left"
+        class="item rounded-none border-b-1 border-gray-400 py-10 pl-16 pr-64 text-left hover:bg-gray-400"
         :class="{ '!bg-blue-200': index == selectedIndex }"
         @click="chooseItem(item)"
       >
@@ -67,7 +67,7 @@ defineExpose({ onKeyDown })
     </template>
     <div
       v-else
-      class="!bg-gray-100 item pl-16 pr-[65px] py-10 rounded-none text-left"
+      class="item rounded-none !bg-gray-100 py-10 pl-16 pr-[65px] text-left"
     >
       Keine Ergebnisse
     </div>

@@ -107,17 +107,17 @@ watch(editIndex, focusFirstFocusableElementOfCurrentEditElement)
       :key="index"
       ref="elementList"
       aria-label="Listen Eintrag"
-      class="border-b-1 border-gray-400 group"
+      class="group border-b-1 border-gray-400"
     >
       <div
         v-if="index !== editIndex"
         :key="index"
-        class="cursor-pointer flex gap-8 group-first:pt-0 items-center justify-between py-8"
+        class="flex cursor-pointer items-center justify-between gap-8 py-8 group-first:pt-0"
         :class="{ '!border-none': noHorizontalSeparators }"
       >
         <component
           :is="summaryComponent"
-          class="focus-visible:outline-blue-800 focus:outline-none"
+          class="focus:outline-none focus-visible:outline-blue-800"
           :data="entry"
           tabindex="0"
           @click="setEditIndex(index)"
@@ -127,7 +127,7 @@ watch(editIndex, focusFirstFocusableElementOfCurrentEditElement)
         <div class="flex gap-8">
           <button
             aria-label="Eintrag bearbeiten"
-            class="active:bg-blue-500 active:outline-none focus:outline-2 focus:outline-blue-800 hover:bg-blue-200 material-icons outline-none outline-offset-2 p-2 text-blue-800"
+            class="material-icons p-2 text-blue-800 outline-none outline-offset-2 hover:bg-blue-200 focus:outline-2 focus:outline-blue-800 active:bg-blue-500 active:outline-none"
             @click="setEditIndex(index)"
           >
             edit_note
@@ -135,7 +135,7 @@ watch(editIndex, focusFirstFocusableElementOfCurrentEditElement)
 
           <button
             aria-label="Eintrag löschen"
-            class="active:bg-blue-500 active:outline-none focus:outline-2 focus:outline-blue-800 hover:bg-blue-200 material-icons outline-none outline-offset-2 p-2 text-blue-800"
+            class="material-icons p-2 text-blue-800 outline-none outline-offset-2 hover:bg-blue-200 focus:outline-2 focus:outline-blue-800 active:bg-blue-500 active:outline-none"
             @click="removeModelEntry(index)"
           >
             delete_outline
@@ -147,7 +147,7 @@ watch(editIndex, focusFirstFocusableElementOfCurrentEditElement)
         :is="editComponent"
         v-else
         v-model="modelValueList[index]"
-        class="group-first:pt-0 py-16"
+        class="py-16 group-first:pt-0"
         @keypress.enter="setEditIndex(undefined)"
       />
     </div>
@@ -155,7 +155,7 @@ watch(editIndex, focusFirstFocusableElementOfCurrentEditElement)
     <button
       v-if="!disableMultiEntry"
       aria-label="Weitere Angabe"
-      class="add-button bg-blue-300 flex focus:outline-4 font-bold gap-0.5 hover:bg-blue-800 hover:text-white items-center leading-18 mt-16 outline-0 outline-blue-800 outline-none outline-offset-4 px-8 py-2 text-14 text-blue-800 whitespace-nowrap"
+      class="add-button gap-0.5 mt-16 flex items-center whitespace-nowrap bg-blue-300 px-8 py-2 text-14 font-bold leading-18 text-blue-800 outline-none outline-0 outline-offset-4 outline-blue-800 hover:bg-blue-800 hover:text-white focus:outline-4"
       @click="addNewModelEntry"
     >
       <span class="material-icons text-14">add</span>

@@ -126,7 +126,7 @@ onMounted(async () => {
   <DocumentUnitWrapper :document-unit="updatedDocumentUnit as DocumentUnit">
     <template #default="{ classes }">
       <div
-        class="-mt-96 grid h-[6rem] justify-items-end pb-8 pr-[2rem] sticky top-[2rem] w-full z-30"
+        class="sticky top-[2rem] z-30 -mt-96 grid h-[6rem] w-full justify-items-end pb-8 pr-[2rem]"
       >
         <SaveButton
           aria-label="Speichern Button"
@@ -134,8 +134,8 @@ onMounted(async () => {
         />
       </div>
 
-      <div class="flex flex-grow w-full">
-        <div class="bg-gray-100 flex flex-col" :class="classes">
+      <div class="flex w-full flex-grow">
+        <div class="flex flex-col bg-gray-100" :class="classes">
           <DocumentUnitCoreData
             id="coreData"
             v-model="coreData"
@@ -166,7 +166,7 @@ onMounted(async () => {
         </div>
 
         <div
-          class="bg-white border-gray-400 border-l-1 border-solid flex flex-col"
+          class="flex flex-col border-l-1 border-solid border-gray-400 bg-white"
           :class="{ full: showDocPanel }"
         >
           <SideToggle

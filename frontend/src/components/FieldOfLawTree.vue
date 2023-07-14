@@ -59,7 +59,7 @@ const buildDirectPathTreeTo = async (clickedIdentifier: string) => {
     <div class="flex items-center">
       <button
         aria-label="Normen anzeigen"
-        class="align-top appearance-none border-2 focus:outline-2 h-24 hover:outline-2 outline-0 outline-blue-800 outline-none outline-offset-[-4px] rounded-sm text-blue-800 w-24"
+        class="h-24 w-24 appearance-none rounded-sm border-2 align-top text-blue-800 outline-none outline-0 outline-offset-[-4px] outline-blue-800 hover:outline-2 focus:outline-2"
         @click="emit('toggle-show-norms')"
       >
         <span

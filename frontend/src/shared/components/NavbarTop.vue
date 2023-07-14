@@ -16,12 +16,12 @@ onMounted(async () => {
 
 <template>
   <nav
-    class="border-gray-400 border-y flex items-center justify-between px-16 py-24"
+    class="flex items-center justify-between border-y border-gray-400 px-16 py-24"
   >
-    <div class="flex gap-44 items-center">
+    <div class="flex items-center gap-44">
       <div class="flex items-center">
         <img alt="Neuris Logo" :src="Logo" />
-        <span class="leading-20 px-[1rem] text-16">
+        <span class="px-[1rem] text-16 leading-20">
           <span aria-hidden="true" class="font-bold"> Rechtsinformationen</span>
           <br />
           <span aria-hidden="true">des Bundes</span>
@@ -29,20 +29,20 @@ onMounted(async () => {
       </div>
 
       <router-link
-        class="hover:bg-yellow-500 hover:underline p-8"
+        class="p-8 hover:bg-yellow-500 hover:underline"
         :class="{ underline: route.path.includes('caselaw') }"
         :to="{ name: 'caselaw' }"
         >Rechtsprechung</router-link
       >
       <router-link
-        class="hover:bg-yellow-500 hover:underline p-8"
+        class="p-8 hover:bg-yellow-500 hover:underline"
         :class="{ underline: route.path.includes('norms') }"
         :to="{ name: 'norms' }"
         >Normen</router-link
       >
     </div>
 
-    <div v-if="user" class="gap-10 grid grid-cols-[auto,1fr]">
+    <div v-if="user" class="grid grid-cols-[auto,1fr] gap-10">
       <span aria-hidden="true" class="material-icons"> perm_identity </span>
       <div>
         <div class="label-03-bold">

@@ -1,6 +1,6 @@
 <template>
   <button
-    class="active:bg-[#ECF1F4] active:border-transparent active:disabled:bg-transparent border-2 border-transparent disabled:opacity-25 flex focus:outline-blue-800 hover:border-[#B8BDC3] hover:disabled:border-transparent items-center link-01-bold mx-8 outline-8 outline-offset-6 px-8 py-2 rounded-none"
+    class="link-01-bold outline-offset-6 mx-8 flex items-center rounded-none border-2 border-transparent px-8 py-2 outline-8 hover:border-[#B8BDC3] focus:outline-blue-800 active:border-transparent active:bg-[#ECF1F4] disabled:opacity-25 hover:disabled:border-transparent active:disabled:bg-transparent"
   >
     <slot></slot>
   </button>

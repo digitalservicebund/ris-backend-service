@@ -114,7 +114,7 @@ onMounted(() => {
       >
       </ComboboxInput>
     </InputField>
-    <div class="flex gap-24 justify-between">
+    <div class="flex justify-between gap-24">
       <InputField
         id="norm-reference-singleNorm-field"
         v-slot="slotProps"

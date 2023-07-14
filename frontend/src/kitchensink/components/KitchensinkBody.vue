@@ -80,10 +80,10 @@ const component = computed(() => {
 
 <template>
   <div
-    class="flex flex-nowrap flex-row items-center justify-center overflow-y-hidden"
+    class="flex flex-row flex-nowrap items-center justify-center overflow-y-hidden"
   >
     <div
-      class="flex flex-col flex-nowrap gap-y-10 justify-start py-10 text-justify w-2/3"
+      class="flex w-2/3 flex-col flex-nowrap justify-start gap-y-10 py-10 text-justify"
     >
       <div class="content-container flex flex-col">
         <component :is="component" />

@@ -59,7 +59,7 @@ async function upload(file: File) {
           @delete-file="handleDeleteFile"
         />
 
-        <div v-else class="flex flex-col items-start w-[40rem]">
+        <div v-else class="flex w-[40rem] flex-col items-start">
           <div class="mb-14">
             Aktuell ist keine Datei hinterlegt. Wählen Sie die Datei des
             Originaldokumentes aus

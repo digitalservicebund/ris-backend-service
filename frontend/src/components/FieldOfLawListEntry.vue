@@ -21,10 +21,10 @@ function handleTokenClick(tokenContent: string) {
 </script>
 
 <template>
-  <div class="flex mt-20">
-    <div class="flex flex-col grow">
+  <div class="mt-20 flex">
+    <div class="flex grow flex-col">
       <div class="flex">
-        <div class="flex label-02-reg pt-8 text-blue-800">
+        <div class="label-02-reg flex pt-8 text-blue-800">
           <span
             :aria-label="
               props.fieldOfLaw.identifier +
@@ -60,7 +60,7 @@ function handleTokenClick(tokenContent: string) {
       </button>
     </div>
   </div>
-  <hr class="border-blue-500 mt-8 w-full" />
+  <hr class="mt-8 w-full border-blue-500" />
 </template>
 
 <style lang="scss" scoped>

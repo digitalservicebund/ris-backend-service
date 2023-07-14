@@ -72,10 +72,10 @@ function onDelete() {
     />
     <div
       v-if="documentUnitListEntries.length"
-      class="border-collapse document-unit-list-table table w-full"
+      class="document-unit-list-table table w-full border-collapse"
     >
       <div
-        class="bg-gray-400 font-bold leading-[3] table-row text-18 text-center"
+        class="table-row bg-gray-400 text-center text-18 font-bold leading-[3]"
       >
         <div class="table-cell">Dokumentnummer</div>
         <div class="table-cell">Angelegt am</div>
@@ -88,9 +88,9 @@ function onDelete() {
       <div
         v-for="listEntry in listEntriesWithStatus"
         :key="listEntry.id"
-        class="border-b-2 border-b-gray-100 hover:bg-gray-100 leading-[3] table-row text-18"
+        class="table-row border-b-2 border-b-gray-100 text-18 leading-[3] hover:bg-gray-100"
       >
-        <div class="px-[16px] py-0 table-cell">
+        <div class="table-cell px-[16px] py-0">
           <router-link
             class="underline"
             :to="{
@@ -103,20 +103,20 @@ function onDelete() {
             {{ listEntry.documentNumber }}
           </router-link>
         </div>
-        <div class="px-[16px] py-0 table-cell">
+        <div class="table-cell px-[16px] py-0">
           {{ dayjs(listEntry.creationTimestamp).format("DD.MM.YYYY") }}
         </div>
-        <div class="px-[16px] py-0 table-cell">
+        <div class="table-cell px-[16px] py-0">
           {{ listEntry.fileNumber ? listEntry.fileNumber : "-" }}
         </div>
-        <div class="px-[16px] py-0 table-cell">
+        <div class="table-cell px-[16px] py-0">
           {{
             listEntry.documentationOffice
               ? listEntry.documentationOffice.label
               : "-"
           }}
         </div>
-        <div class="px-[16px] py-0 table-cell">
+        <div class="table-cell px-[16px] py-0">
           <IconBadge
             v-if="listEntry.status"
             :color="listEntry.status.color"
@@ -124,13 +124,13 @@ function onDelete() {
             :value="listEntry.status.value"
           />
         </div>
-        <div class="px-16 py-0 table-cell">
+        <div class="table-cell px-16 py-0">
           {{ listEntry.fileName ? listEntry.fileName : "-" }}
         </div>
         <div class="table-cell text-center">
           <span
             aria-label="Dokumentationseinheit löschen"
-            class="cursor-pointer material-icons"
+            class="material-icons cursor-pointer"
             tabindex="0"
             @click="
               setSelectedDocumentUnitListEntry(

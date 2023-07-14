@@ -19,16 +19,16 @@ const isSelectedComponent = (component: risComponent) => {
 <template>
   <!-- Header -->
   <div
-    class="border-b-4 border-b-black flex flex-nowrap flex-row items-center justify-center w-full"
+    class="flex w-full flex-row flex-nowrap items-center justify-center border-b-4 border-b-black"
   >
     <div
-      class="flex flex-col flex-nowrap gap-y-10 justify-start overflow-hidden py-10 relative w-2/3"
+      class="relative flex w-2/3 flex-col flex-nowrap justify-start gap-y-10 overflow-hidden py-10"
     >
       <!-- Title -->
-      <h1 class="font-bold text-64">Kitchensink</h1>
+      <h1 class="text-64 font-bold">Kitchensink</h1>
       <!-- Navbar -->
       <div
-        class="flex flex-row flex-wrap gap-x-20 gap-y-20 justify-start navbar overflow-x-scroll overflow-y-hidden"
+        class="navbar flex flex-row flex-wrap justify-start gap-x-20 gap-y-20 overflow-y-hidden overflow-x-scroll"
       >
         <TextButton
           v-for="(component, index) in components"

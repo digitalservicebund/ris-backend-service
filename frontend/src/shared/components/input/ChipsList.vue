@@ -104,12 +104,12 @@ defineExpose({ focusPrevious, focusNext, resetFocus, focusFirst })
   <div>
     <ul
       ref="containerRef"
-      class="empty:m-0 flex flex-row flex-wrap gap-8 items-center mr-8 my-4"
+      class="my-4 mr-8 flex flex-row flex-wrap items-center gap-8 empty:m-0"
     >
       <li
         v-for="(chip, i) in chips"
         :key="i"
-        class="bg-blue-500 body-01-reg break-words flex group items-center outline-none pr-32 relative rounded-10"
+        class="body-01-reg group relative flex items-center break-words rounded-10 bg-blue-500 pr-32 outline-none"
         data-testid="chip"
         tabindex="0"
         @click.stop="setFocusedItemIndex(i)"
@@ -120,18 +120,18 @@ defineExpose({ focusPrevious, focusNext, resetFocus, focusFirst })
         @keyup.right="focusNext"
       >
         <div
-          class="flex leading-24 px-6 py-4 whitespace-pre-wrap"
+          class="flex whitespace-pre-wrap px-6 py-4 leading-24"
           data-testid="chip-value"
         >
           {{ chip }}
         </div>
 
         <div
-          class="absolute flex group-focus:bg-blue-900 group-focus:text-white h-full iems-center inset-y-0 items-center p-4 right-0 rounded-r-10"
+          class="iems-center absolute inset-y-0 right-0 flex h-full items-center rounded-r-10 p-4 group-focus:bg-blue-900 group-focus:text-white"
         >
           <em
             aria-Label="Löschen"
-            class="cursor-pointer material-icons text-center"
+            class="material-icons cursor-pointer text-center"
             @click="deleteChip(i)"
             @keydown.enter="deleteChip(i)"
             >clear</em

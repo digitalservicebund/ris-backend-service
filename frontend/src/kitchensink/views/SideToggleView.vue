@@ -6,7 +6,7 @@ const visible = ref(false)
 </script>
 
 <template>
-  <div class="flex flex-row gap-[3rem] h-[10rem] justify-between w-full">
+  <div class="flex h-[10rem] w-full flex-row justify-between gap-[3rem]">
     <div class="flex h-[10rem]">
       <SideToggle from-side="left" :is-expanded="visible" label="Inhalt"
         ><div class="flex w-full">

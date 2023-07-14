@@ -59,7 +59,7 @@ const yearValue = computed({
 
 <template>
   <div>
-    <div class="flex gap-96 mb-24">
+    <div class="mb-24 flex gap-96">
       <label class="form-control">
         <input
           id="announcementDateSelection"

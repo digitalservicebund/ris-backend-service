@@ -67,7 +67,7 @@ const dateValue = computed({
 
 <template>
   <div class="w-320">
-    <div class="flex justify-between mb-24">
+    <div class="mb-24 flex justify-between">
       <label class="form-control">
         <input
           id="principleEntryIntoForceSelection"

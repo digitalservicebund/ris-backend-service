@@ -80,7 +80,7 @@ const component = computed(() => {
 <template>
   <div class="flex flex-col gap-8">
     <div class="flex flex-wrap gap-176">
-      <div class="flex flex-col gap-24 mb-24">
+      <div class="mb-24 flex flex-col gap-24">
         <label class="form-control">
           <input
             id="statusSelection"
@@ -104,8 +104,8 @@ const component = computed(() => {
           Neufassung
         </label>
       </div>
-      <div class="flex flex-col gap-24 mb-24">
-        <label class="flex form-control items-start">
+      <div class="mb-24 flex flex-col gap-24">
+        <label class="form-control flex items-start">
           <input
             id="repealSelection"
             v-model="selectedChildSectionName"

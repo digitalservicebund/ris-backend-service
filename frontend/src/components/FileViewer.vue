@@ -70,9 +70,9 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="flex flex-col gap-32 grow">
-    <div class="bg-white flex flex-col items-start px-[2rem] py-[1.5rem]">
-      <div class="flex pb-[1rem] w-full">
+  <div class="flex grow flex-col gap-32">
+    <div class="flex flex-col items-start bg-white px-[2rem] py-[1.5rem]">
+      <div class="flex w-full pb-[1rem]">
         <div v-for="entry in fileInfos" :key="entry.label" class="grow">
           <PropertyInfo
             direction="column"
@@ -85,7 +85,7 @@ onMounted(async () => {
       <TextButton icon="delete" label="Datei löschen" @click="toggleModal" />
     </div>
 
-    <TextEditor class="bg-white grow" field-size="max" :value="fileAsHtml" />
+    <TextEditor class="grow bg-white" field-size="max" :value="fileAsHtml" />
 
     <PopupModal
       v-if="showModal"

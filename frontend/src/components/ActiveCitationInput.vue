@@ -145,7 +145,7 @@ onMounted(() => {
     <InputField
       id="activeCitationPredicate"
       v-slot="slotProps"
-      class="border-b-1 border-gray-400 mb-16"
+      class="mb-16 border-b-1 border-gray-400"
       label="Art der Zitierung *"
       :validation-error="
         validationErrors?.find((err) => err.field === 'citationStyle')
@@ -162,7 +162,7 @@ onMounted(() => {
         placeholder="Bitte auswählen"
       ></ComboboxInput>
     </InputField>
-    <div class="flex gap-24 justify-between">
+    <div class="flex justify-between gap-24">
       <InputField
         id="activeCitationCourt"
         v-slot="slotProps"
@@ -199,7 +199,7 @@ onMounted(() => {
         ></DateInput>
       </InputField>
     </div>
-    <div class="flex gap-24 justify-between">
+    <div class="flex justify-between gap-24">
       <InputField
         id="activeCitationFileNumber"
         v-slot="slotProps"

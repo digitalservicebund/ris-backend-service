@@ -51,14 +51,14 @@ const resizeObserver = new ResizeObserver((entries) => {
 <template>
   <div class="expandable-content">
     <button
-      class="-mt-[4.625rem] expandable-content__header h-[1.25rem] text-white"
+      class="expandable-content__header -mt-[4.625rem] h-[1.25rem] text-white"
       @click="toggleContentVisibility"
     >
       <span
         :aria-label="
           localIsExpanded ? ariaLabel + ' schließen' : ariaLabel + ' anzeigen'
         "
-        class="bg-blue-800 material-icons rounded-full w-icon"
+        class="material-icons w-icon rounded-full bg-blue-800"
         >{{ iconName }}</span
       >
     </button>

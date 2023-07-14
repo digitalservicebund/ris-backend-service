@@ -10,7 +10,7 @@ const router = useRouter()
 </script>
 
 <template>
-  <div class="bg-gray-100 flex flex-col gap-16">
+  <div class="flex flex-col gap-16 bg-gray-100">
     <div class="flex justify-between p-16 pl-64">
       <h1 class="heading-02-regular">Dokumentationseinheiten</h1>
       <TextButton
@@ -20,7 +20,7 @@ const router = useRouter()
     </div>
     <NormsList
       v-if="norms && norms.length !== 0"
-      class="grow max-w-screen-lg"
+      class="max-w-screen-lg grow"
       :norms="norms"
     />
     <span v-else class="pl-64 pt-[3.5rem]">Keine Normen gefunden</span>

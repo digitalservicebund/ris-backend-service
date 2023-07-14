@@ -135,7 +135,7 @@ export interface LevelTwoMenuItem {
     <span id="sidebarNavigation" hidden>SideBar Navigation</span>
     <router-link
       aria-labelledby="toOverviewButton"
-      class="border-b-1 border-gray-400 flex gap-12 h-80 items-center link-01-bold px-14 text-blue-800"
+      class="link-01-bold flex h-80 items-center gap-12 border-b-1 border-gray-400 px-14 text-blue-800"
       :to="goBackRoute"
     >
       <span class="material-icons">arrow_back</span>
@@ -149,7 +149,7 @@ export interface LevelTwoMenuItem {
     >
       <router-link
         :aria-labelledby="`levelOneSideMenuItem` + levelOneIndex"
-        class="block focus:bg-blue-200 focus:underline hover:bg-blue-200 hover:underline label-02-bold pl-[1rem] py-[1.25rem]"
+        class="label-02-bold block py-[1.25rem] pl-[1rem] hover:bg-blue-200 hover:underline focus:bg-blue-200 focus:underline"
         :class="levelOneItem.classes"
         :to="levelOneItem.route"
       >
@@ -163,7 +163,7 @@ export interface LevelTwoMenuItem {
           v-for="(levelTwoItem, levelTwoIndex) in levelOneItem.children"
           :key="levelTwoItem.label"
           :aria-labelledby="`levelTwoSideMenuItem` + levelTwoIndex"
-          class="block focus:bg-blue-200 focus:underline hover:bg-blue-200 hover:underline label-02-reg pl-[2rem] py-[1rem]"
+          class="label-02-reg block py-[1rem] pl-[2rem] hover:bg-blue-200 hover:underline focus:bg-blue-200 focus:underline"
           :class="levelTwoItem.classes"
           :to="levelTwoItem.route"
         >

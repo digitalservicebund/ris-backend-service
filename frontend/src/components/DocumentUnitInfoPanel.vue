@@ -28,10 +28,10 @@ function isBadge(
 
 <template>
   <div
-    class="bg-blue-200 border-b border-gray-400 border-solid flex flex-row items-center justify-between px-[2rem] sticky top-0 z-10"
+    class="sticky top-0 z-10 flex flex-row items-center justify-between border-b border-solid border-gray-400 bg-blue-200 px-[2rem]"
     :class="{ 'h-[8rem]': secondRow.length }"
   >
-    <div class="-mt-1 flex flex-col gap-24 h-80 justify-center">
+    <div class="-mt-1 flex h-80 flex-col justify-center gap-24">
       <div
         class="flex items-center space-x-[2rem]"
         data-testid="document-unit-info-panel-items"

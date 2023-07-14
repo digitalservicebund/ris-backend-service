@@ -91,7 +91,7 @@ onUnmounted(() => (loadedNorm.value = undefined))
 </script>
 
 <template>
-  <div class="flex grow overflow-hidden w-screen">
+  <div class="flex w-screen grow overflow-hidden">
     <SideToggle v-model:is-expanded="navigationIsOpen" label="Navigation">
       <NavbarSide
         go-back-label="Zur Übersicht"
@@ -102,7 +102,7 @@ onUnmounted(() => (loadedNorm.value = undefined))
 
     <div
       v-if="loadedNorm"
-      class="bg-gray-100 border-gray-400 border-l-1 w-full"
+      class="w-full border-l-1 border-gray-400 bg-gray-100"
     >
       <NormUnitInfoPanel
         :heading="loadedNorm.metadataSections?.NORM?.[0]?.RIS_ABBREVIATION?.[0]"

@@ -71,7 +71,7 @@ watch(selectedChildSectionName, () => (childSection.value = {}))
 
 <template>
   <div>
-    <div class="flex justify-between mb-24 w-320">
+    <div class="mb-24 flex w-320 justify-between">
       <label class="form-control">
         <input
           id="divergentExpirationDefinedSelection"

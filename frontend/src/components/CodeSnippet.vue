@@ -23,9 +23,9 @@ watch(
 
 <!-- TODO use tiptap with XML plugin instead of building it ourselves -->
 <template>
-  <div class="flex flex-col gap-24 text-base xml-container">
+  <div class="xml-container flex flex-col gap-24 text-base">
     <p class="label-03-bold">{{ title }}</p>
-    <div class="border-1 border-solid border-white code-lines">
+    <div class="code-lines border-1 border-solid border-white">
       <div v-for="(line, index) in codeLines" :key="index" class="code-line">
         <code
           class="line-number"

@@ -68,15 +68,15 @@ export enum OpeningDirection {
 </script>
 
 <template>
-  <div class="bg-white pr-[1.25rem] relative">
+  <div class="relative bg-white pr-[1.25rem]">
     <button
       :aria-label="label"
-      class="absolute flex items-center top-28 z-20"
+      class="absolute top-28 z-20 flex items-center"
       :class="classes"
       @click="toggleContentVisibility"
     >
       <span
-        class="bg-white border-1 border-gray-400 border-solid material-icons rounded-full text-22 text-gray-900 w-icon"
+        class="material-icons w-icon rounded-full border-1 border-solid border-gray-400 bg-white text-22 text-gray-900"
         >{{ iconName }}</span
       >
     </button>

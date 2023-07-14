@@ -43,9 +43,9 @@ export type PageableService<TResult, TQuery = TResult> = (
 
 <template>
   <slot v-if="props.navigationPosition == 'bottom'"></slot>
-  <div v-if="page?.content" class="flex flex-col items-center my-32">
+  <div v-if="page?.content" class="my-32 flex flex-col items-center">
     <div class="flex items-center">
-      <div class="flex flex-grow items-center justify-center relative">
+      <div class="relative flex flex-grow items-center justify-center">
         <PaginationButton
           aria-label="vorherige Ergebnisse"
           :disabled="page?.first"
@@ -69,7 +69,7 @@ export type PageableService<TResult, TQuery = TResult> = (
         </PaginationButton>
       </div>
     </div>
-    <div class="-ml-144 label-02-reg mt-2 text-gray-900">
+    <div class="label-02-reg -ml-144 mt-2 text-gray-900">
       Total {{ page?.totalElements }} Items
     </div>
   </div>

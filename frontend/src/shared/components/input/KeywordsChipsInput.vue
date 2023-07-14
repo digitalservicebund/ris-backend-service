@@ -102,7 +102,7 @@ watch(currentInput, () => {
       @keyup.right="focusFirst"
     />
     <div v-if="errorMessage" class="flex flex-row items-center">
-      <span class="leading-default material-icons text-gray-900"
+      <span class="material-icons leading-default text-gray-900"
         >error_outline</span
       >
       <p class="label-02-reg m-4 text-gray-900">{{ errorMessage?.title }}</p>
@@ -134,11 +134,11 @@ watch(currentInput, () => {
   }
 
   &:autofill {
-    @apply shadow-white text-inherit;
+    @apply text-inherit shadow-white;
   }
 
   &:autofill:focus {
-    @apply shadow-white text-inherit;
+    @apply text-inherit shadow-white;
   }
 
   input {

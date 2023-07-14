@@ -9,14 +9,14 @@ const chipsValue2 = ref<ChipsInputModelType>(["one", "two"])
 </script>
 
 <template>
-  <div class="flex flex-col gap-y-20 h-auto w-1/2">
-    <h1 class="font-bold text-24">Chips Input Variante 1</h1>
+  <div class="flex h-auto w-1/2 flex-col gap-y-20">
+    <h1 class="text-24 font-bold">Chips Input Variante 1</h1>
     <ChipsInput
       id="ChipsInput"
       aria-label="chips input 1"
       :model-value="chipsValue1"
     ></ChipsInput>
-    <h1 class="font-bold text-24">Chips Input Variante 2</h1>
+    <h1 class="text-24 font-bold">Chips Input Variante 2</h1>
     <ChipsInputBottom
       id="ChipsInput"
       aria-label="chips input 2"

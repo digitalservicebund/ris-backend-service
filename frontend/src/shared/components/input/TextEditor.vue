@@ -338,11 +338,11 @@ const resizeObserver = new ResizeObserver((entries) => {
 </script>
 
 <template>
-  <div ref="container" class="bg-white editor" fluid>
+  <div ref="container" class="editor bg-white" fluid>
     <div v-if="showButtons()">
       <div
         :aria-label="props.ariaLabel + ' Button Leiste'"
-        class="flex flex-row flex-wrap justify-between pa-1"
+        class="pa-1 flex flex-row flex-wrap justify-between"
       >
         <div class="flex flex-row">
           <TextEditorButton
@@ -366,7 +366,7 @@ const resizeObserver = new ResizeObserver((entries) => {
     <div v-if="showButtons() && showSecondRow">
       <div
         :aria-label="ariaLabel + ' Editor Button Leiste'"
-        class="flex flex-row flex-wrap pa-1"
+        class="pa-1 flex flex-row flex-wrap"
       >
         <TextEditorButton
           v-for="(button, index) in collapsedButtons[

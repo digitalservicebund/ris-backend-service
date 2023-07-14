@@ -30,7 +30,7 @@ async function upload(file: File) {
 </script>
 
 <template>
-  <div class="bg-gray-100 flex justify-center">
+  <div class="flex justify-center bg-gray-100">
     <div>
       <div class="pb-[5rem] pt-[4rem]">
         <h1 class="heading-02-regular">Neue Dokumentationseinheit erstellen</h1>

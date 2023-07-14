@@ -138,7 +138,7 @@ const fieldsMissing = computed(() =>
 </script>
 
 <template>
-  <div class="flex flex-col flex-start gap-40 justify-start max-w-[80rem]">
+  <div class="flex-start flex max-w-[80rem] flex-col justify-start gap-40">
     <h1 class="heading-02-regular">Veröffentlichen</h1>
     <div aria-label="Plausibilitätsprüfung" class="flex flex-row gap-16">
       <div class="w-[15.625rem]">
@@ -146,7 +146,7 @@ const fieldsMissing = computed(() =>
       </div>
       <div v-if="fieldsMissing" class="flex flex-row gap-8">
         <div>
-          <span class="bg-red-800 material-icons rounded-full text-white">
+          <span class="material-icons rounded-full bg-red-800 text-white">
             error
           </span>
         </div>
@@ -159,7 +159,7 @@ const fieldsMissing = computed(() =>
               <li
                 v-for="field in missingCoreDataFields"
                 :key="field"
-                class="body-01-reg list-item ml-[1rem]"
+                class="body-01-reg ml-[1rem] list-item"
               >
                 {{ field }}
               </li>
@@ -168,14 +168,14 @@ const fieldsMissing = computed(() =>
                   missingProceedingDecisionFields &&
                   missingProceedingDecisionFields.length > 0
                 "
-                class="body-01-reg list-item ml-[1rem]"
+                class="body-01-reg ml-[1rem] list-item"
               >
                 Rechtszug
                 <ul>
                   <li
                     v-for="fields in missingProceedingDecisionFields"
                     :key="missingProceedingDecisionFields.indexOf(fields)"
-                    class="body-01-reg list-item ml-[1rem]"
+                    class="body-01-reg ml-[1rem] list-item"
                   >
                     <div v-if="fields && fields.missingFields.length > 0">
                       <span>{{ fields.identifier }}</span>
@@ -189,14 +189,14 @@ const fieldsMissing = computed(() =>
               </li>
               <li
                 v-if="missingNormsFields && missingNormsFields.length > 0"
-                class="body-01-reg list-item ml-[1rem]"
+                class="body-01-reg ml-[1rem] list-item"
               >
                 Normen
                 <ul>
                   <li
                     v-for="fields in missingNormsFields"
                     :key="missingNormsFields.indexOf(fields)"
-                    class="body-01-reg list-item ml-[1rem]"
+                    class="body-01-reg ml-[1rem] list-item"
                   >
                     <div v-if="fields && fields.missingFields.length > 0">
                       <span>{{ fields.identifier }}</span>
@@ -213,14 +213,14 @@ const fieldsMissing = computed(() =>
                   missingActiveCitationFields &&
                   missingActiveCitationFields.length > 0
                 "
-                class="body-01-reg list-item ml-[1rem]"
+                class="body-01-reg ml-[1rem] list-item"
               >
                 Aktivzitierung
                 <ul>
                   <li
                     v-for="fields in missingActiveCitationFields"
                     :key="missingActiveCitationFields.indexOf(fields)"
-                    class="body-01-reg list-item ml-[1rem]"
+                    class="body-01-reg ml-[1rem] list-item"
                   >
                     <div v-if="fields && fields.missingFields.length > 0">
                       <span>{{ fields.identifier }}</span>
@@ -280,7 +280,7 @@ const fieldsMissing = computed(() =>
         <div v-for="(item, index) in publicationLog" :key="index">
           <ExpandableContent
             as-column
-            class="bg-white border-b-1 border-gray-400 border-r-1 p-10"
+            class="border-b-1 border-r-1 border-gray-400 bg-white p-10"
             close-icon-name="keyboard_arrow_up"
             :data-set="item"
             :header="

@@ -74,12 +74,12 @@ const explanation = computed({
       id="euAnnouncementGazette"
       alt-text="Amtsblatt der EU"
       aria-label="Amtsblatt der EU"
-      class="border-gray-800 border-solid"
+      class="border-solid border-gray-800"
       read-only
       :value="defaultValueEuGovernmentGazette"
     />
   </InputField>
-  <div class="flex gap-16 justify-between">
+  <div class="flex justify-between gap-16">
     <InputField
       id="euAnnouncementYear"
       aria-label="Jahresangabe"

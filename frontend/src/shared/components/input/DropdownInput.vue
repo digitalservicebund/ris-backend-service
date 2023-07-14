@@ -99,17 +99,17 @@ const computedStyle = computed(() => {
     @keydown.esc="closeDropdown"
   >
     <div
-      class="cursor-pointer dropdown-container__open-dropdown"
+      class="dropdown-container__open-dropdown cursor-pointer"
       @click="toggleDropdown"
       @keydown.enter="toggleDropdown"
     >
-      <div class="bg-white input-container" :style="computedStyle">
+      <div class="input-container bg-white" :style="computedStyle">
         <input
           :id="id"
           v-model="selectedLabel"
           :aria-label="ariaLabel"
           autocomplete="off"
-          class="cursor-pointer outline-none w-full"
+          class="w-full cursor-pointer outline-none"
           :placeholder="placeholder"
           :readonly="true"
           tabindex="0"
@@ -117,7 +117,7 @@ const computedStyle = computed(() => {
         />
         <button
           :aria-labelledby="`labelDropdownIcon` + id"
-          class="flex focus:outline-2 input-expand-icon items-center outline-0 outline-blue-800 outline-none"
+          class="input-expand-icon flex items-center outline-none outline-0 outline-blue-800 focus:outline-2"
           tabindex="0"
           @keydown.enter="toggleDropdown"
         >
@@ -125,7 +125,7 @@ const computedStyle = computed(() => {
             expand_more
             <span
               :id="`labelDropdownIcon` + id"
-              class="block h-[1px] overflow-hidden w-[1px]"
+              class="block h-[1px] w-[1px] overflow-hidden"
               >Dropdown öffnen</span
             >
           </span>
@@ -134,7 +134,7 @@ const computedStyle = computed(() => {
             expand_less
             <span
               :id="`labelDropdownIcon` + id"
-              class="block h-[1px] overflow-hidden w-[1px]"
+              class="block h-[1px] w-[1px] overflow-hidden"
               >Dropdown schließen</span
             >
           </span>
@@ -173,7 +173,7 @@ const computedStyle = computed(() => {
 
   &__open-dropdown {
     .input-container {
-      @apply flex border-2 border-blue-800 disabled:focus:outline-0 focus-within:outline-2 h-64 hover:outline-2 outline-offset-[-4px] outline-0 outline-blue-800 outline-none px-16;
+      @apply flex h-64 border-2 border-blue-800 px-16 outline-none outline-0 outline-offset-[-4px] outline-blue-800 focus-within:outline-2 hover:outline-2 disabled:focus:outline-0;
     }
   }
 
@@ -193,7 +193,7 @@ const computedStyle = computed(() => {
   }
 
   &__dropdown-item {
-    @apply bg-white border-b-1 border-b-gray-400 cursor-pointer py-[1.063rem] px-[1.5rem];
+    @apply cursor-pointer border-b-1 border-b-gray-400 bg-white px-[1.5rem] py-[1.063rem];
 
     &:last-of-type {
       @apply border-b-0;

@@ -31,18 +31,18 @@ function collapse(): void {
 <template>
   <ExpandableContent
     v-model:is-expanded="isExpanded"
-    class="bg-white border-gray-400 p-16 pt-20"
+    class="border-gray-400 bg-white p-16 pt-20"
     :class="{
-      'hover:bg-blue-200 hover:border-blue-500': !isExpanded,
+      'hover:border-blue-500 hover:bg-blue-200': !isExpanded,
       'border-b': borderBottom,
     }"
     close-icon-name="expand_less"
     open-icon-name="expand_more"
   >
     <template #header>
-      <div class="flex gap-8 w-full" :class="{ 'flex-col': asColumn }">
+      <div class="flex w-full gap-8" :class="{ 'flex-col': asColumn }">
         <h2
-          class="flex-none label-02-bold text-left w-[15rem]"
+          class="label-02-bold w-[15rem] flex-none text-left"
           :class="{ 'mb-24': asColumn && !isExpanded }"
         >
           {{ title }}
@@ -57,7 +57,7 @@ function collapse(): void {
     </template>
 
     <div
-      class="flex flex-col gap-32 items-start"
+      class="flex flex-col items-start gap-32"
       :class="{ 'mt-24': isExpanded }"
     >
       <slot />

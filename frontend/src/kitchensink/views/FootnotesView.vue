@@ -51,7 +51,7 @@ const footnoteLineSummary = withSummarizer(summarizeFootnotePerLine)
 </script>
 
 <template>
-  <div class="flex flex-col p-64 w-[60rem]">
+  <div class="flex w-[60rem] flex-col p-64">
     <ExpandableDataSet
       :data-set="inputValueForExamples"
       :summary-component="footnoteLineSummary"

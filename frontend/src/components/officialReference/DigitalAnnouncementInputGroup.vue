@@ -86,7 +86,7 @@ const explanation = computed({
 })
 </script>
 <template>
-  <div class="flex ful-w gap-16">
+  <div class="ful-w flex gap-16">
     <InputField
       id="digitalAnnouncementMedium"
       aria-label="Verkündungsmedium"
@@ -116,7 +116,7 @@ const explanation = computed({
       />
     </InputField>
   </div>
-  <div class="flex ful-w gap-16">
+  <div class="ful-w flex gap-16">
     <InputField
       id="digitalAnnouncementEdition"
       aria-label="Ausgabenummer"
@@ -157,7 +157,7 @@ const explanation = computed({
       />
     </InputField>
   </div>
-  <div class="flex ful-w gap-16">
+  <div class="ful-w flex gap-16">
     <InputField
       id="digitalAnnouncementArea"
       aria-label="Bereich der Veröffentlichung"

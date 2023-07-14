@@ -38,9 +38,9 @@ const uploadFileRoute = computed(() =>
 
 <template>
   <div v-bind="$attrs">
-    <div class="flex flex-col gap-40 sticky top-0 w-full">
+    <div class="sticky top-0 flex w-full flex-col gap-40">
       <div class="flex items-center">
-        <h2 class="grow heading-02-regular">Originaldokument</h2>
+        <h2 class="heading-02-regular grow">Originaldokument</h2>
       </div>
 
       <div v-if="!hasFile" class="flex flex-col gap-24">
@@ -50,7 +50,7 @@ const uploadFileRoute = computed(() =>
 
         <router-link
           v-if="uploadFileRoute"
-          class="flex gap-2 items-center link-01-bold"
+          class="link-01-bold flex items-center gap-2"
           :to="uploadFileRoute"
         >
           <span class="material-icons">arrow_forward</span>
@@ -62,7 +62,7 @@ const uploadFileRoute = computed(() =>
 
       <div
         v-else
-        class="border-1 border-gray-400 border-solid h-[65vh] overflow-scroll"
+        class="h-[65vh] overflow-scroll border-1 border-solid border-gray-400"
       >
         <TextEditor element-id="odoc" field-size="max" :value="file" />
       </div>

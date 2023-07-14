@@ -200,13 +200,13 @@ watch(inputCompleted, () => {
 </script>
 
 <template>
-  <div class="bg-white input" :class="conditionalClasses">
+  <div class="input bg-white" :class="conditionalClasses">
     <div ref="containerRef" class="flex flex-row flex-wrap" tabindex="-1">
       <div
         v-for="(chip, i) in chips"
         :key="i"
         aria-label="chip"
-        class="bg-blue-500 body-01-reg chip"
+        class="body-01-reg chip bg-blue-500"
         tabindex="0"
         @click="setFocusedItemIndex(i)"
         @keydown.delete="backspaceDelete"
@@ -262,11 +262,11 @@ watch(inputCompleted, () => {
   }
 
   &:autofill {
-    @apply shadow-white text-inherit;
+    @apply text-inherit shadow-white;
   }
 
   &:autofill:focus {
-    @apply shadow-white text-inherit;
+    @apply text-inherit shadow-white;
   }
 
   &__error {
@@ -274,11 +274,11 @@ watch(inputCompleted, () => {
     @apply border-red-800 bg-red-200;
 
     &:autofill {
-      @apply shadow-error text-inherit;
+      @apply text-inherit shadow-error;
     }
 
     &:autofill:focus {
-      @apply shadow-error text-inherit;
+      @apply text-inherit shadow-error;
     }
   }
 

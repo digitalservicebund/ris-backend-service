@@ -52,8 +52,8 @@ const dateInputAttributes: BaseInputAttributes = {
 </script>
 
 <template>
-  <div class="flex flex-col gap-y-20 h-auto w-1/2">
-    <h1 class="font-bold text-24">Text Input</h1>
+  <div class="flex h-auto w-1/2 flex-col gap-y-20">
+    <h1 class="text-24 font-bold">Text Input</h1>
 
     <h2>Regular Text Input</h2>
     <TextInput id="regularTextInput" aria-label="regular text input" value="" />
@@ -105,7 +105,7 @@ const dateInputAttributes: BaseInputAttributes = {
       value="Loremipsum"
     />
 
-    <h1 class="font-bold text-24">Multiline text input (aka. textarea)</h1>
+    <h1 class="text-24 font-bold">Multiline text input (aka. textarea)</h1>
     <TextAreaInput
       id="multilineTextInput"
       v-model="multilineTextInputModel"
@@ -120,7 +120,7 @@ const dateInputAttributes: BaseInputAttributes = {
       autosize
     />
 
-    <h1 class="font-bold text-24">Dropdown Input</h1>
+    <h1 class="text-24 font-bold">Dropdown Input</h1>
 
     <h2>Regular Dropdown</h2>
     <Dropdown
@@ -130,7 +130,7 @@ const dateInputAttributes: BaseInputAttributes = {
       value=""
     />
 
-    <h1 class="font-bold text-24">Date Input</h1>
+    <h1 class="text-24 font-bold">Date Input</h1>
     <InputField id="dateInputField">
       <InputElement
         id="dateInput"
@@ -139,7 +139,7 @@ const dateInputAttributes: BaseInputAttributes = {
       />
     </InputField>
 
-    <h1 class="font-bold text-24">Chips Input</h1>
+    <h1 class="text-24 font-bold">Chips Input</h1>
     <ChipsInput
       id="ChipsInput"
       aria-label="chips input"
@@ -147,7 +147,7 @@ const dateInputAttributes: BaseInputAttributes = {
       :value="chipsModelValue"
     ></ChipsInput>
 
-    <h1 class="font-bold text-24">Chips Date Input</h1>
+    <h1 class="text-24 font-bold">Chips Date Input</h1>
     <ChipsDateInput
       id="ChipsDateInput"
       aria-label="chips date input"
@@ -155,7 +155,7 @@ const dateInputAttributes: BaseInputAttributes = {
       :value="chipsDateModelValue"
     ></ChipsDateInput>
 
-    <h1 class="font-bold text-24">Nested Input</h1>
+    <h1 class="text-24 font-bold">Nested Input</h1>
     <div class="mb-24">
       <NestedInput
         aria-label="Nested Input"
@@ -163,7 +163,7 @@ const dateInputAttributes: BaseInputAttributes = {
       ></NestedInput>
     </div>
 
-    <h1 class="font-bold text-24">Checkbox Input</h1>
+    <h1 class="text-24 font-bold">Checkbox Input</h1>
 
     Regular Checkbox
     <CheckboxInput id="regularCheckbox" aria-label="regular checkbox" />

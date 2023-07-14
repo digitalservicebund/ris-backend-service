@@ -26,7 +26,7 @@ const contentRelatedIndexing = computed({
 </script>
 
 <template>
-  <div class="flex flex-col gap-32 mb-32">
+  <div class="mb-32 flex flex-col gap-32">
     <h1 class="heading-02-regular mb-[1rem]">Inhaltliche Erschließung</h1>
     <KeyWords :document-unit-uuid="props.documentUnitUuid" />
     <FieldOfLawMain :document-unit-uuid="props.documentUnitUuid" />

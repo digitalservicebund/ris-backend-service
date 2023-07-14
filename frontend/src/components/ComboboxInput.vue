@@ -197,7 +197,7 @@ export type InputModelProps =
       @keydown.tab="closeDropdownAndRevertToLastSavedValue"
     >
       <div
-        class="border-2 border-solid flex flex-row focus:shadow-focus h-64 hover:shadow-hover px-16 py-12 space-between whitespace-nowrap"
+        class="space-between flex h-64 flex-row whitespace-nowrap border-2 border-solid px-16 py-12 hover:shadow-hover focus:shadow-focus"
         :class="conditionalClasses"
       >
         <input
@@ -206,7 +206,7 @@ export type InputModelProps =
           v-model="inputText"
           :aria-label="ariaLabel"
           autocomplete="off"
-          class="bg-transparent focus:outline-none w-full"
+          class="w-full bg-transparent focus:outline-none"
           :class="placeholderColor"
           :placeholder="placeholder"
           :readonly="false"
@@ -217,7 +217,7 @@ export type InputModelProps =
         />
         <button
           v-if="inputText"
-          class="flex input-close-icon items-center"
+          class="input-close-icon flex items-center"
           tabindex="0"
           @click="clearSelection"
         >
@@ -230,7 +230,7 @@ export type InputModelProps =
         </button>
         <button
           :aria-label="ariaLabelDropdownIcon"
-          class="flex input-expand-icon items-center"
+          class="input-expand-icon flex items-center"
           tabindex="-1"
           @click="toggleDropdown"
         >
@@ -244,14 +244,14 @@ export type InputModelProps =
     <div
       v-if="showDropdown"
       ref="dropdownItemsRef"
-      class="absolute bg-white drop-shadow-md flex flex-col left-0 max-h-[300px] overflow-y-scroll right-0 top-[100%] z-10"
+      class="absolute left-0 right-0 top-[100%] z-10 flex max-h-[300px] flex-col overflow-y-scroll bg-white drop-shadow-md"
       tabindex="-1"
     >
       <div
         v-for="(item, index) in currentlyDisplayedItems"
         :key="index"
         aria-label="dropdown-option"
-        class="border-b-1 border-b-gray-400 cursor-pointer focus:bg-blue-200 focus:outline-none hover:bg-gray-400 last:border-b-0 px-[1.5rem] py-[1rem]"
+        class="cursor-pointer border-b-1 border-b-gray-400 px-[1.5rem] py-[1rem] last:border-b-0 hover:bg-gray-400 focus:bg-blue-200 focus:outline-none"
         :class="{
           'bg-blue-200': candidateForSelection === item,
           'border-l-4 border-solid border-l-blue-800': inputText === item.label,

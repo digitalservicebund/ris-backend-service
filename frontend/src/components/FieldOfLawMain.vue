@@ -92,14 +92,14 @@ const SelectedFieldsOfLawSummary = withSummarizer(selectedFieldsOfLawSummarizer)
   >
     <div class="w-full">
       <div class="flex flex-row">
-        <div class="bg-white flex flex-1 flex-col p-20">
+        <div class="flex flex-1 flex-col bg-white p-20">
           <FieldOfLawSearch
             :show-norms="showNorms"
             @do-show-norms="showNorms = true"
             @node-clicked="handleNodeClicked"
           />
         </div>
-        <div class="bg-white flex-1 p-20">
+        <div class="flex-1 bg-white p-20">
           <FieldOfLawTree
             :clicked-identifier="clickedIdentifier"
             :selected-nodes="selectedFieldsOfLaw"
@@ -112,7 +112,7 @@ const SelectedFieldsOfLawSummary = withSummarizer(selectedFieldsOfLawSummarizer)
           ></FieldOfLawTree>
         </div>
       </div>
-      <hr class="border-blue-700 w-full" />
+      <hr class="w-full border-blue-700" />
       <div class="bg-white p-20">
         <h1 class="heading-03-regular pb-8">Ausgewählte Sachgebiete</h1>
         <FieldOfLawDirectInputSearch @add-to-list="handleAdd" />

@@ -60,9 +60,9 @@ watchEffect(() => {
 </script>
 
 <template>
-  <div class="flex grow w-screen">
+  <div class="flex w-screen grow">
     <div
-      class="bg-white border-gray-400 border-r-1 border-solid flex flex-col sticky top-0 z-20"
+      class="sticky top-0 z-20 flex flex-col border-r-1 border-solid border-gray-400 bg-white"
     >
       <SideToggle
         v-model:is-expanded="navigationIsOpen"
@@ -76,7 +76,7 @@ watchEffect(() => {
         />
       </SideToggle>
     </div>
-    <div class="bg-gray-100 flex flex-col w-full">
+    <div class="flex w-full flex-col bg-gray-100">
       <DocumentUnitInfoPanel
         :document-unit="documentUnit"
         :first-row="firstRowInfos"
@@ -84,7 +84,7 @@ watchEffect(() => {
         :second-row="secondRowInfos"
       />
 
-      <div class="flex flex-col grow items-start">
+      <div class="flex grow flex-col items-start">
         <slot :classes="['p-[2rem] w-full grow']" />
       </div>
     </div>

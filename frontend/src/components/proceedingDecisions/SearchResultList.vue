@@ -32,7 +32,7 @@ export type SearchResults<Type extends LinkedDocumentUnit> = {
         <div class="table-cell">
           <InlineDecision :decision="searchResult.decision" />
         </div>
-        <div class="p-8 table-cell">
+        <div class="table-cell p-8">
           <TextButton
             aria-label="Treffer übernehmen"
             class="ml-24"
@@ -43,7 +43,7 @@ export type SearchResults<Type extends LinkedDocumentUnit> = {
         </div>
         <span
           v-if="searchResult.isLinked"
-          class="bg-green-700 label-03-reg ml-24 px-24 py-4 rounded-full text-white"
+          class="label-03-reg ml-24 rounded-full bg-green-700 px-24 py-4 text-white"
           >Bereits hinzugefügt</span
         >
       </div>

@@ -11,21 +11,21 @@ route.params["documentNumber"] = "AABB2022000057"
 
 <template>
   <div
-    class="flex flex-row flex-wrap gap-[2rem] grow h-max justify-end pb-4 w-full"
+    class="flex h-max w-full grow flex-row flex-wrap justify-end gap-[2rem] pb-4"
   >
-    <div class="flex flex-col min-h-[300px]">
+    <div class="flex min-h-[300px] flex-col">
       <OriginalFileSidePanel
         id="odoc-panel-element"
-        class="bg-white grow p-[2rem] pl-40 w-full"
+        class="w-full grow bg-white p-[2rem] pl-40"
         file="This is some file content"
         :has-file="hasFile"
         :open="isOpen"
       />
     </div>
-    <div class="flex flex-col min-h-[300px]">
+    <div class="flex min-h-[300px] flex-col">
       <OriginalFileSidePanel
         id="odoc-panel-element"
-        class="bg-white grow p-[2rem] pl-40 w-full"
+        class="w-full grow bg-white p-[2rem] pl-40"
         file="This is some file content"
         :has-file="!hasFile"
         :open="isOpen"

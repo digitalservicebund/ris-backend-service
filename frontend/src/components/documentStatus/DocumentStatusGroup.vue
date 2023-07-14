@@ -87,7 +87,7 @@ const component = computed(() => {
 <template>
   <div class="flex flex-col gap-8">
     <div class="flex flex-wrap gap-176">
-      <div class="flex gap-24 mb-24">
+      <div class="mb-24 flex gap-24">
         <label class="form-control">
           <input
             id="documentStatusSelection"

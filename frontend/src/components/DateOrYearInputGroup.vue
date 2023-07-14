@@ -60,7 +60,7 @@ const yearValue = computed({
 
 <template>
   <div class="w-320">
-    <div class="flex justify-between mb-24">
+    <div class="mb-24 flex justify-between">
       <label class="form-control">
         <input
           :id="`${idPrefix}TypeDate`"
@@ -85,7 +85,7 @@ const yearValue = computed({
       </label>
     </div>
     <label
-      class="flex gap-4 items-center label-03-reg mb-2 text-gray-900"
+      class="label-03-reg mb-2 flex items-center gap-4 text-gray-900"
       :for="
         selectedInputType === InputType.DATE
           ? `${idPrefix}Date`

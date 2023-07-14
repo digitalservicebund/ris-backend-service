@@ -4,13 +4,13 @@ import InfoModal from "@/shared/components/InfoModal.vue"
 </script>
 
 <template>
-  <div class="flex flex-col gap-y-20 items-start">
-    <h1 class="font-bold text-20">Error Modal</h1>
+  <div class="flex flex-col items-start gap-y-20">
+    <h1 class="text-20 font-bold">Error Modal</h1>
     <InfoModal
       description="The messages are shown here."
       title="The messages title is shown here"
     ></InfoModal>
-    <h1 class="font-bold text-20">Succeed Modal</h1>
+    <h1 class="text-20 font-bold">Succeed Modal</h1>
     <InfoModal
       description="The messages are shown here."
       :status="InfoStatus.SUCCEED"

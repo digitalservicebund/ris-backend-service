@@ -69,7 +69,7 @@ async function handleToggle() {
       <div v-else>
         <button
           :aria-label="node.identifier + ' ' + node.text + ' aufklappen'"
-          class="bg-blue-200 material-icons rounded-full text-blue-800 w-icon"
+          class="material-icons w-icon rounded-full bg-blue-200 text-blue-800"
           @click="handleToggle"
         >
           {{
@@ -85,7 +85,7 @@ async function handleToggle() {
             node.text +
             (selected ? ' entfernen' : ' hinzufügen')
           "
-          class="align-top appearance-none border-2 focus:outline-2 h-24 hover:outline-2 ml-12 outline-0 outline-blue-800 outline-none outline-offset-[-4px] rounded-sm text-blue-800 w-24"
+          class="ml-12 h-24 w-24 appearance-none rounded-sm border-2 align-top text-blue-800 outline-none outline-0 outline-offset-[-4px] outline-blue-800 hover:outline-2 focus:outline-2"
           @click="
             selected
               ? emit('node:unselect', node.identifier)
@@ -117,7 +117,7 @@ async function handleToggle() {
           </div>
         </div>
         <div v-if="showNorms" class="flex flex-col pb-6 pl-8">
-          <div class="flex flex-row flex-wrap font-size-14px norms-font-color">
+          <div class="font-size-14px norms-font-color flex flex-row flex-wrap">
             <span v-for="(norm, idx) in node.norms" :key="idx">
               <strong>{{ norm.singleNormDescription }}</strong>
               {{ norm.abbreviation

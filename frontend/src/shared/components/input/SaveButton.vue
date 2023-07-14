@@ -32,10 +32,10 @@ onUnmounted(() => {
     />
     <div class="flex flex-row items-end justify-start">
       <div v-if="saveIsInProgress">
-        <div class="flex flex-wrap h-[25px] items-center w-[30px]">
+        <div class="flex h-[25px] w-[30px] flex-wrap items-center">
           <span class="material-icons"> cloud_upload </span>
         </div>
-        <p class="font-normal text-sm tracking-[0.16px]">
+        <p class="text-sm font-normal tracking-[0.16px]">
           Daten werden gespeichert
         </p>
       </div>
@@ -43,15 +43,15 @@ onUnmounted(() => {
         <div class="icon text-red-900">
           <span class="material-icons"> error_outline </span>
         </div>
-        <p class="font-normal text-base tracking-[0.16px]">
+        <p class="text-base font-normal tracking-[0.16px]">
           Fehler beim Speichern
         </p>
       </div>
       <div v-if="lastSavedOn !== undefined && !saveIsInProgress">
-        <p class="font-normal text-sm tracking-[0.16px]">
+        <p class="text-sm font-normal tracking-[0.16px]">
           Zuletzt gespeichert um
           <span
-            class="delay-1000 duration-2000 ease-in scale-87 text-base transition"
+            class="duration-2000 scale-87 text-base transition delay-1000 ease-in"
             >{{ getCurrentTime(lastSavedOn) }}</span
           >
           Uhr
