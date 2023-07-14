@@ -129,11 +129,20 @@ onMounted(() => {
           :has-error="slotProps.hasError"
         ></TextInput>
       </InputField>
-      <InputField id="norm-date-of-version" label="Fassungsdatum">
+      <InputField
+        id="norm-date-of-version"
+        v-slot="slotProps"
+        label="Fassungsdatum"
+        :validation-error="
+          validationErrors?.find((err) => err.field === 'dateOfVersion')
+        "
+      >
         <DateInput
           id="norm-date-of-version"
           v-model="norm.dateOfVersion"
           aria-label="Norm Fassungsdatum"
+          :has-error="slotProps.hasError"
+          @update:validation-error="slotProps.updateValidationError"
         />
       </InputField>
       <InputField id="norm-date-of-relevence" label="Jahr">
