@@ -100,7 +100,6 @@ onMounted(() => {
       label="RIS-Abkürzung *"
       :validation-error="
         validationErrors?.find((err) => err.field === 'normAbbreviation')
-          ?.defaultMessage
       "
     >
       <ComboboxInput
@@ -121,7 +120,6 @@ onMounted(() => {
         label="Einzelnorm"
         :validation-error="
           validationErrors?.find((err) => err.field === 'singleNorm')
-            ?.defaultMessage
         "
       >
         <TextInput

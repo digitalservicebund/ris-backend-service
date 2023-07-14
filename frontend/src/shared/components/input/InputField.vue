@@ -1,12 +1,13 @@
 <script lang="ts" setup>
-import { computed } from "vue"
+import { computed, ref, watch } from "vue"
+import { ValidationError } from "@/shared/components/input/types"
 
 interface Props {
   id: string
   label?: string | string[]
   required?: boolean
   labelPosition?: LabelPosition
-  validationError?: string
+  validationError?: ValidationError
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -15,6 +16,8 @@ const props = withDefaults(defineProps<Props>(), {
   labelPosition: LabelPosition.TOP,
   label: undefined,
 })
+
+const localValidationError = ref()
 
 const wrapperClasses = computed(() => ({
   "flex-col":
@@ -27,6 +30,18 @@ const wrapperClasses = computed(() => ({
 
 const labelConverted = computed(() =>
   Array.isArray(props.label) ? props.label : Array.of(props.label),
+)
+
+function updateValidationError(newValidationError: ValidationError) {
+  localValidationError.value = newValidationError
+}
+
+watch(
+  props,
+  () => {
+    localValidationError.value = props.validationError ?? undefined
+  },
+  { immediate: true },
 )
 </script>
 
@@ -49,6 +64,7 @@ export enum LabelPosition {
       "
       :id="id"
       :has-error="!!validationError"
+      :update-validation-error="updateValidationError"
     />
 
     <div
@@ -58,7 +74,7 @@ export enum LabelPosition {
         'min-h-[24px]': !id.includes('nested'),
       }"
     >
-      <span v-if="validationError" class="material-icons pr-4 text-red-800"
+      <span v-if="localValidationError" class="material-icons pr-4 text-red-800"
         >error_outline</span
       >
       <label
@@ -90,10 +106,14 @@ export enum LabelPosition {
       "
       :id="id"
       :has-error="!!validationError"
+      :update-validation-error="updateValidationError"
     />
 
-    <div v-if="validationError" class="label-03-reg my-8 h-16 text-red-800">
-      {{ validationError }}
+    <div
+      v-if="localValidationError"
+      class="label-03-reg my-6 h-16 text-red-800"
+    >
+      {{ localValidationError.defaultMessage }}
     </div>
   </div>
 </template>

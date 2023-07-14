@@ -149,7 +149,6 @@ onMounted(() => {
       label="Art der Zitierung *"
       :validation-error="
         validationErrors?.find((err) => err.field === 'citationStyle')
-          ?.defaultMessage
       "
     >
       <ComboboxInput
@@ -168,7 +167,7 @@ onMounted(() => {
         v-slot="slotProps"
         label="Gericht *"
         :validation-error="
-          validationErrors?.find((err) => err.field === 'court')?.defaultMessage
+          validationErrors?.find((err) => err.field === 'court')
         "
       >
         <ComboboxInput
@@ -188,7 +187,6 @@ onMounted(() => {
         label="Entscheidungsdatum *"
         :validation-error="
           validationErrors?.find((err) => err.field === 'decisionDate')
-            ?.defaultMessage
         "
       >
         <DateInput
@@ -196,6 +194,7 @@ onMounted(() => {
           v-model="activeCitation.decisionDate"
           aria-label="Entscheidungsdatum Aktivzitierung"
           :has-error="slotProps.hasError"
+          @update:validation-error="slotProps.updateValidationError"
         ></DateInput>
       </InputField>
     </div>
@@ -206,7 +205,6 @@ onMounted(() => {
         label="Aktenzeichen *"
         :validation-error="
           validationErrors?.find((err) => err.field === 'fileNumber')
-            ?.defaultMessage
         "
       >
         <TextInput

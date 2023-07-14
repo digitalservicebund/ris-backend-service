@@ -31,7 +31,7 @@ const { inputValue, emitInputEvent } = useInputModel<string, Props, Emits>(
 )
 
 const conditionalClasses = computed(() => ({
-  "has-error": props.hasError,
+  "has-error placeholder-black": props.hasError,
   "h-full": props.fullHeight,
   "ds-input-medium": props.size === "medium",
   "ds-input-small": props.size === "small",

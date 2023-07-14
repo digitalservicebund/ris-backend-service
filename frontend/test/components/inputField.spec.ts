@@ -2,12 +2,13 @@ import { render, screen } from "@testing-library/vue"
 import InputField, {
   LabelPosition,
 } from "@/shared/components/input/InputField.vue"
+import { ValidationError } from "@/shared/components/input/types"
 
 function renderComponent(options?: {
   id?: string
   label?: string | string[]
   slot?: string
-  validationError?: string
+  validationError?: ValidationError
   required?: true
   labelPosition?: LabelPosition
 }) {
@@ -44,7 +45,9 @@ describe("InputField", () => {
   })
 
   it("shows input with given error message", () => {
-    renderComponent({ validationError: "error message" })
+    renderComponent({
+      validationError: { defaultMessage: "error message", field: "identifier" },
+    })
 
     const text = screen.getByText("error message") as HTMLElement
 
