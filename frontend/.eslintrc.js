@@ -23,6 +23,7 @@ const moduleImportRules = {
    */
   "vuejs-accessibility/label-has-for": "off",
 }
+
 module.exports = {
   root: true,
   env: {
@@ -75,7 +76,6 @@ module.exports = {
         "vue/no-unused-refs": "error",
         "vue/no-useless-v-bind": "error",
         "vue/prefer-separate-static-class": "error",
-        "vue/static-class-names-order": "error",
         "vue/v-for-delimiter-style": "error",
         "vue/v-on-function-call": "error",
         "vue-scoped-css/enforce-style-type": [
