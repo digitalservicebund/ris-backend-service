@@ -6,7 +6,7 @@ import {
   FootnoteInputType,
   MetadataInputSection,
 } from "./types"
-import { FOOTNOTE_LABELS } from "@/components/footnotes/types"
+import { FOOTNOTE_LABELS } from "@/components/footnote/types"
 import { MetadatumType } from "@/domain/Norm"
 
 type FieldExpecter<T> = (page: Page, id: string, value: T) => Promise<void>

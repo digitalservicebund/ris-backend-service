@@ -1,9 +1,9 @@
 <script lang="ts" setup>
 import { ref } from "vue"
 import ExpandableDataSet from "@/components/ExpandableDataSet.vue"
-import FootnoteInput from "@/components/footnotes/FootnoteInput.vue"
-import { summarizeFootnotePerLine } from "@/components/footnotes/summarizer"
-import { Footnote } from "@/components/footnotes/types"
+import FootnoteInput from "@/components/footnote/FootnoteInput.vue"
+import { summarizeFootnotePerLine } from "@/components/footnote/summarizer"
+import { Footnote } from "@/components/footnote/types"
 import { withSummarizer } from "@/shared/components/DataSetSummary.vue"
 import EditableList from "@/shared/components/EditableList.vue"
 
