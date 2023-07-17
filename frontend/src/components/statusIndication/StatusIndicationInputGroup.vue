@@ -3,6 +3,10 @@ import { computed, ref, watch } from "vue"
 import NoteStatusIndicationGroup from "@/components/statusIndication/NoteStatusIndicationGroup.vue"
 import UpdateStatusIndicationGroup from "@/components/statusIndication/UpdateStatusIndicationGroup.vue"
 import { Metadata, MetadataSectionName, MetadataSections } from "@/domain/Norm"
+import InputField, {
+  LabelPosition,
+} from "@/shared/components/input/InputField.vue"
+import RadioInput from "@/shared/components/input/RadioInput.vue"
 
 interface Props {
   modelValue: MetadataSections
@@ -80,55 +84,71 @@ const component = computed(() => {
 <template>
   <div class="flex flex-col gap-8">
     <div class="flex flex-wrap gap-176">
-      <div class="mb-24 flex flex-col gap-24">
-        <label class="form-control">
-          <input
-            id="statusSelection"
+      <div class="mb-8 flex flex-col gap-8">
+        <InputField
+          id="statusSelection"
+          v-slot="{ id }"
+          label="Stand"
+          :label-position="LabelPosition.RIGHT"
+        >
+          <RadioInput
+            :id="id"
             v-model="selectedChildSectionName"
-            aria-label="Stand"
             name="statusIndication"
-            type="radio"
+            size="medium"
             :value="MetadataSectionName.STATUS"
           />
-          Stand
-        </label>
-        <label class="form-control">
-          <input
-            id="reissueSelection"
+        </InputField>
+
+        <InputField
+          id="reissueSelection"
+          v-slot="{ id }"
+          label="Neufassung"
+          :label-position="LabelPosition.RIGHT"
+        >
+          <RadioInput
+            :id="id"
             v-model="selectedChildSectionName"
-            aria-label="Neufassung"
             name="statusIndication"
-            type="radio"
+            size="medium"
             :value="MetadataSectionName.REISSUE"
           />
-          Neufassung
-        </label>
+        </InputField>
       </div>
-      <div class="mb-24 flex flex-col gap-24">
-        <label class="form-control flex items-start">
-          <input
-            id="repealSelection"
+
+      <div class="mb-8 flex flex-col gap-8">
+        <InputField
+          id="repealSelection"
+          v-slot="{ id }"
+          label="Aufhebung"
+          :label-position="LabelPosition.RIGHT"
+        >
+          <RadioInput
+            :id="id"
             v-model="selectedChildSectionName"
-            aria-label="Aufhebung"
             name="statusIndication"
-            type="radio"
+            size="medium"
             :value="MetadataSectionName.REPEAL"
           />
-          Aufhebung
-        </label>
-        <label class="form-control">
-          <input
-            id="otherStatusSelection"
+        </InputField>
+
+        <InputField
+          id="otherStatusSelection"
+          v-slot="{ id }"
+          label="Sonstiger Hinweis"
+          :label-position="LabelPosition.RIGHT"
+        >
+          <RadioInput
+            :id="id"
             v-model="selectedChildSectionName"
-            aria-label="Sonstiger Hinweis"
             name="statusIndication"
-            type="radio"
+            size="medium"
             :value="MetadataSectionName.OTHER_STATUS"
           />
-          Sonstiger Hinweis
-        </label>
+        </InputField>
       </div>
     </div>
+
     <component
       :is="component"
       v-model="childSection"
@@ -136,43 +156,3 @@ const component = computed(() => {
     />
   </div>
 </template>
-
-<style lang="scss" scoped>
-.form-control {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-}
-
-input[type="radio"] {
-  display: grid;
-  width: 1.5em;
-  height: 1.5em;
-  border: 0.15em solid currentcolor;
-  border-radius: 50%;
-  margin-right: 10px;
-  appearance: none;
-  background-color: white;
-  color: #004b76;
-  place-content: center;
-}
-
-input[type="radio"]::before {
-  width: 0.9em;
-  height: 0.9em;
-  border-radius: 50%;
-  background-color: #004b76;
-  content: "";
-  transform: scale(0);
-}
-
-input[type="radio"]:hover,
-input[type="radio"]:focus {
-  border: 4px solid #004b76;
-  outline: none;
-}
-
-input[type="radio"]:checked::before {
-  transform: scale(1);
-}
-</style>
