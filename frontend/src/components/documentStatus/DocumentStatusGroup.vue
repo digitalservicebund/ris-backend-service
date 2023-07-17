@@ -5,6 +5,10 @@ import DocumentOtherInputGroup from "@/components/documentStatus/DocumentOtherIn
 import DocumentStatusInputGroup from "@/components/documentStatus/DocumentStatusInputGroup.vue"
 import DocumentTextProofInputGroup from "@/components/documentStatus/DocumentTextProofInputGroup.vue"
 import { Metadata, MetadataSectionName, MetadataSections } from "@/domain/Norm"
+import InputField, {
+  LabelPosition,
+} from "@/shared/components/input/InputField.vue"
+import RadioInput from "@/shared/components/input/RadioInput.vue"
 import { useLoadedNormStore } from "@/stores/loadedNorm"
 
 const props = defineProps<Props>()
@@ -86,24 +90,34 @@ const component = computed(() => {
 
 <template>
   <div class="flex flex-col gap-8">
-    <div class="flex flex-wrap gap-176">
-      <div class="mb-24 flex gap-24">
-        <label class="form-control">
-          <input
-            id="documentStatusSelection"
+    <div class="mb-8 flex flex-row flex-wrap gap-24">
+      <div>
+        <InputField
+          id="documentStatusSelection"
+          v-slot="{ id }"
+          label="Stand der dokumentarischen Bearbeitung"
+          :label-position="LabelPosition.RIGHT"
+        >
+          <RadioInput
+            :id="id"
             v-model="selectedChildSectionName"
-            aria-label="Stand der dokumentarischen Bearbeitung"
             name="documentStatusSection"
-            type="radio"
+            size="medium"
             :value="MetadataSectionName.DOCUMENT_STATUS"
           />
-          Stand der dokumentarischen Bearbeitung
-        </label>
-        <label class="form-control">
-          <input
-            id="documentTextProofSelection"
+        </InputField>
+      </div>
+
+      <div>
+        <InputField
+          id="documentTextProofSelection"
+          v-slot="{ id }"
+          label="Textnachweis"
+          :label-position="LabelPosition.RIGHT"
+        >
+          <RadioInput
+            :id="id"
             v-model="selectedChildSectionName"
-            aria-label="Textnachweis"
             :disabled="
               isDocumentTextProof &&
               !(
@@ -112,78 +126,30 @@ const component = computed(() => {
               )
             "
             name="documentStatusSection"
-            type="radio"
+            size="medium"
             :value="MetadataSectionName.DOCUMENT_TEXT_PROOF"
           />
-          <span>Textnachweis</span>
-        </label>
-        <label class="form-control">
-          <input
-            id="documentOtherSelection"
+        </InputField>
+      </div>
+
+      <div>
+        <InputField
+          id="documentOtherSelection"
+          v-slot="{ id }"
+          label="Sonstiger Hinweis"
+          :label-position="LabelPosition.RIGHT"
+        >
+          <RadioInput
+            :id="id"
             v-model="selectedChildSectionName"
-            aria-label="Sonstiger Hinweis"
             name="documentStatusSection"
-            type="radio"
+            size="medium"
             :value="MetadataSectionName.DOCUMENT_OTHER"
           />
-          Sonstiger Hinweis
-        </label>
+        </InputField>
       </div>
     </div>
+
     <component :is="component" v-model="childSection" />
   </div>
 </template>
-
-<style lang="scss" scoped>
-.form-control {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-}
-
-input[type="radio"] {
-  display: grid;
-  width: 1.5em;
-  height: 1.5em;
-  border: 0.15em solid currentcolor;
-  border-radius: 50%;
-  margin-right: 10px;
-  appearance: none;
-  background-color: white;
-  color: #004b76;
-  place-content: center;
-}
-
-input[type="radio"]::before {
-  width: 0.9em;
-  height: 0.9em;
-  border-radius: 50%;
-  background-color: #004b76;
-  content: "";
-  transform: scale(0);
-}
-
-input[type="radio"]:hover,
-input[type="radio"]:focus {
-  border: 4px solid #004b76;
-  outline: none;
-}
-
-input[type="radio"]:checked::before {
-  transform: scale(1);
-}
-
-input[type="radio"]:disabled {
-  color: #717a88;
-}
-
-input[type="radio"]:disabled + span {
-  color: #717a88;
-}
-
-input[type="radio"]:disabled:hover {
-  border-width: 0.15em;
-  border-color: #717a88;
-  outline: none;
-}
-</style>
