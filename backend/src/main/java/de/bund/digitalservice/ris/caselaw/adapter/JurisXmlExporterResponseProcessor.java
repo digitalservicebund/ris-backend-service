@@ -71,41 +71,42 @@ public class JurisXmlExporterResponseProcessor {
       inbox.open(Folder.READ_WRITE);
 
       for (Message message : inbox.getMessages()) {
-        for (MessageHandler handler : this.messageHandlers) {
-          if (!handler.canHandle(message)) continue;
+        Optional<MessageHandler> handler = getResponsibleHandler(message);
 
-          if (!handler.messageIsActionable()) {
-            unprocessableMessages.add(message);
-            continue;
-          }
-          ActionableMessageHandler actionableHandler = (ActionableMessageHandler) handler;
-
-          try {
-            String documentNumber = actionableHandler.getDocumentNumber(message);
-            List<Attachment> attachments = collectAttachments(message, actionableHandler);
-            Mono.when(
-                    forwardMessage(documentNumber, message.getSubject(), attachments),
-                    setPublicationStatus(message, actionableHandler, documentNumber),
-                    saveAttachments(documentNumber, message.getReceivedDate(), attachments))
-                .doOnSuccess(result -> processedMessages.add(message))
-                .doOnError(e -> LOGGER.error("Error processing message: ", e))
-                .onErrorResume(e -> Mono.empty())
-                .block();
-
-          } catch (MessagingException | IOException e) {
-            throw new StatusImporterException("Error processing message: " + e);
-          }
-          break;
+        if (handler.isEmpty() || !handler.get().messageIsActionable()) {
+          unprocessableMessages.add(message);
+          continue;
         }
+
+        processMessage(message, (ActionableMessageHandler) handler.get(), processedMessages);
       }
 
       if (!processedMessages.isEmpty())
         moveMessages(processedMessages, inbox, store.getFolder("processed"));
       if (!unprocessableMessages.isEmpty())
         moveMessages(unprocessableMessages, inbox, store.getFolder("unprocessable"));
+
       inbox.expunge();
     } catch (MessagingException e) {
       throw new StatusImporterException("Error processing inbox: " + e);
+    }
+  }
+
+  private void processMessage(
+      Message message, ActionableMessageHandler handler, List<Message> processedMessages) {
+    try {
+      String documentNumber = handler.getDocumentNumber(message);
+      List<Attachment> attachments = collectAttachments(message, handler);
+      Mono.when(
+              forwardMessage(documentNumber, message.getSubject(), attachments),
+              setPublicationStatus(message, handler, documentNumber),
+              saveAttachments(documentNumber, message.getReceivedDate(), attachments))
+          .doOnSuccess(result -> processedMessages.add(message))
+          .doOnError(e -> LOGGER.error("Error processing message: ", e))
+          .onErrorResume(e -> Mono.empty())
+          .block();
+    } catch (MessagingException | IOException e) {
+      throw new StatusImporterException("Error processing message: " + e);
     }
   }
 
@@ -204,6 +205,10 @@ public class JurisXmlExporterResponseProcessor {
             throw new StatusImporterException("Error deleting Message: " + e);
           }
         });
+  }
+
+  private Optional<MessageHandler> getResponsibleHandler(Message message) {
+    return this.messageHandlers.stream().filter(handler -> handler.canHandle(message)).findFirst();
   }
 
   private PublicationStatus getPublicationStatus(Optional<Boolean> isPublished) {
