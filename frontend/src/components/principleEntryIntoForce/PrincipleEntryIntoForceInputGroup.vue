@@ -2,6 +2,10 @@
 import { computed, ref, watch } from "vue"
 import DateUndefinedDateInputGroup from "@/components/DateUndefinedDateInputGroup.vue"
 import { Metadata, UndefinedDate } from "@/domain/Norm"
+import InputField, {
+  LabelPosition,
+} from "@/shared/components/input/InputField.vue"
+import RadioInput from "@/shared/components/input/RadioInput.vue"
 
 interface Props {
   modelValue: Metadata
@@ -67,30 +71,38 @@ const dateValue = computed({
 
 <template>
   <div class="w-320">
-    <div class="mb-24 flex justify-between">
-      <label class="form-control">
-        <input
-          id="principleEntryIntoForceSelection"
+    <div class="mb-8 flex justify-between">
+      <InputField
+        id="principleEntryIntoForceSelection"
+        v-slot="{ id }"
+        label="bestimmt"
+        :label-position="LabelPosition.RIGHT"
+      >
+        <RadioInput
+          :id="id"
           v-model="selectedInputType"
-          aria-label="Auswahl bestimmtes grundsätzliches Inkrafttretedatum"
           name="principleEntryIntoForce"
-          type="radio"
+          size="medium"
           :value="InputType.DATE"
         />
-        bestimmt
-      </label>
-      <label class="form-control">
-        <input
-          id="principleEntryIntoForceUndefinedSelection"
+      </InputField>
+
+      <InputField
+        id="principleEntryIntoForceUndefinedSelection"
+        v-slot="{ id }"
+        label="unbestimmt"
+        :label-position="LabelPosition.RIGHT"
+      >
+        <RadioInput
+          :id="id"
           v-model="selectedInputType"
-          aria-label="Auswahl unbestimmtes grundsätzliches Inkrafttretedatum"
           name="principleEntryIntoForce"
-          type="radio"
+          size="medium"
           :value="InputType.UNDEFINED_DATE"
         />
-        unbestimmt
-      </label>
+      </InputField>
     </div>
+
     <DateUndefinedDateInputGroup
       v-model:date-value="dateValue"
       v-model:undefined-date-state-value="undefinedDateState"
@@ -104,43 +116,3 @@ const dateValue = computed({
     />
   </div>
 </template>
-
-<style lang="scss" scoped>
-.form-control {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-}
-
-input[type="radio"] {
-  display: grid;
-  width: 1.5em;
-  height: 1.5em;
-  border: 0.15em solid currentcolor;
-  border-radius: 50%;
-  margin-right: 10px;
-  appearance: none;
-  background-color: white;
-  color: #004b76;
-  place-content: center;
-}
-
-input[type="radio"]:hover,
-input[type="radio"]:focus {
-  border: 4px solid #004b76;
-  outline: none;
-}
-
-input[type="radio"]::before {
-  width: 0.9em;
-  height: 0.9em;
-  border-radius: 50%;
-  background-color: #004b76;
-  content: "";
-  transform: scale(0);
-}
-
-input[type="radio"]:checked::before {
-  transform: scale(1);
-}
-</style>
