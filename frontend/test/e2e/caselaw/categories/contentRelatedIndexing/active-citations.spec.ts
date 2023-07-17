@@ -312,4 +312,30 @@ test.describe("active citations", () => {
 
     await expect(page.getByLabel("Fehlerhafte Eingabe")).toBeHidden()
   })
+
+  test("incomplete date input shows error message and does not persist", async ({
+    page,
+    documentNumber,
+  }) => {
+    await navigateToCategories(page, documentNumber)
+    await expect(page.getByText(documentNumber)).toBeVisible()
+
+    await page
+      .locator("[aria-label='Entscheidungsdatum Aktivzitierung']")
+      .fill("03")
+
+    await page.keyboard.press("Tab")
+
+    await expect(
+      page.locator("[aria-label='Entscheidungsdatum Aktivzitierung']"),
+    ).toHaveValue("03")
+
+    await expect(page.locator("text=Unvollständiges Datum")).toBeVisible()
+
+    await page.reload()
+
+    await expect(
+      page.locator("[aria-label='Entscheidungsdatum Aktivzitierung']"),
+    ).toHaveValue("")
+  })
 })

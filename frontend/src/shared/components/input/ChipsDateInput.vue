@@ -181,7 +181,14 @@ function validateInput() {
       })
     }
   } else {
-    emit("update:validationError", undefined)
+    if (currentInput.value) {
+      emit("update:validationError", {
+        defaultMessage: "Unvollständiges Datum",
+        field: props.id,
+      })
+    } else {
+      emit("update:validationError", undefined)
+    }
   }
 }
 

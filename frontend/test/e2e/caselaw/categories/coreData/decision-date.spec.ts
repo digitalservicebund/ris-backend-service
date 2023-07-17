@@ -73,6 +73,29 @@ test.describe("decision date", () => {
     )
   })
 
+  test("incomplete input shows error onblur", async ({
+    page,
+    documentNumber,
+  }) => {
+    await navigateToCategories(page, documentNumber)
+
+    await page.locator("[aria-label='Entscheidungsdatum']").fill("03")
+
+    await page.keyboard.press("Tab")
+
+    await expect(page.locator("[aria-label='Entscheidungsdatum']")).toHaveValue(
+      "03",
+    )
+
+    await expect(page.locator("text=Unvollständiges Datum")).toBeVisible()
+
+    await page.reload()
+
+    await expect(page.locator("[aria-label='Entscheidungsdatum']")).toHaveValue(
+      "",
+    )
+  })
+
   test("nested decision date input toggles child input and correctly saves and displays data", async ({
     page,
     documentNumber,

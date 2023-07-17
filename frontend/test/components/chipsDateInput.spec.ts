@@ -173,4 +173,23 @@ describe("ChipsInput", () => {
 
     expect(screen.queryAllByLabelText("chip").length).toBe(0)
   })
+
+  it("does not allow incomplete dates", async () => {
+    const { emitted } = renderComponent()
+    const input = screen.queryByLabelText("aria-label") as HTMLInputElement
+
+    await userEvent.type(input, "03")
+    await userEvent.type(input, "{tab}")
+    await nextTick()
+
+    expect(emitted()["update:modelValue"]).not.toBeTruthy()
+    expect(emitted()["update:validationError"]).toEqual([
+      [
+        {
+          defaultMessage: "Unvollständiges Datum",
+          field: "identifier",
+        },
+      ],
+    ])
+  })
 })
