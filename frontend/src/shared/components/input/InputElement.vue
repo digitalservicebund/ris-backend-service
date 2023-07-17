@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, useAttrs, ref } from "vue"
+import { computed, ref, useAttrs } from "vue"
 import ComboboxInput from "@/components/ComboboxInput.vue"
 import CheckboxInput from "@/shared/components/input/CheckboxInput.vue"
 import ChipsDateInput from "@/shared/components/input/ChipsDateInput.vue"
@@ -10,12 +10,14 @@ import FileInput from "@/shared/components/input/FileInput.vue"
 import NestedInput from "@/shared/components/input/NestedInput.vue"
 import TextAreaInput from "@/shared/components/input/TextAreaInput.vue"
 import TextInput from "@/shared/components/input/TextInput.vue"
+import TimeInput from "@/shared/components/input/TimeInput.vue"
 import {
   InputAttributes,
-  ModelType,
   InputType,
+  ModelType,
   ValidationError,
 } from "@/shared/components/input/types"
+import YearInput from "@/shared/components/input/YearInput.vue"
 
 interface Props {
   id: string
@@ -66,6 +68,10 @@ const component = computed(() => {
       return ComboboxInput
     case InputType.TEXTAREA:
       return TextAreaInput
+    case InputType.YEAR:
+      return YearInput
+    case InputType.TIME:
+      return TimeInput
     default:
       throw new Error(`Unknown input type: ${props.type}`)
   }

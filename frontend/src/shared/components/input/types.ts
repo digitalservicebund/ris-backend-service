@@ -19,6 +19,7 @@ export enum InputType {
   TEXTAREA = "textarea",
   DATE_TIME = "date_time",
   YEAR = "year",
+  TIME = "time",
   UNDEFINED_DATE = "undefined_date",
 }
 
