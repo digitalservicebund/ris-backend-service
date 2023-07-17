@@ -5,6 +5,10 @@ import EuAnnouncementInputGroup from "@/components/officialReference/EuAnnouncem
 import OtherOfficialAnnouncementInputGroup from "@/components/officialReference/OtherOfficialAnnouncementInputGroup.vue"
 import PrintAnnouncementInputGroup from "@/components/officialReference/PrintAnnouncementInputGroup.vue"
 import { Metadata, MetadataSectionName, MetadataSections } from "@/domain/Norm"
+import InputField, {
+  LabelPosition,
+} from "@/shared/components/input/InputField.vue"
+import RadioInput from "@/shared/components/input/RadioInput.vue"
 
 interface Props {
   modelValue: MetadataSections
@@ -85,95 +89,71 @@ const component = computed(() => {
 <template>
   <div class="flex flex-col gap-8">
     <div class="flex flex-wrap gap-176">
-      <div class="mb-24 flex flex-col gap-24">
-        <label class="form-control">
-          <input
-            id="printAnnouncementSelection"
+      <div class="mb-8 flex flex-col gap-8">
+        <InputField
+          id="printAnnouncementSelection"
+          v-slot="{ id }"
+          label="Papierverkündungsblatt"
+          :label-position="LabelPosition.RIGHT"
+        >
+          <RadioInput
+            :id="id"
             v-model="selectedChildSectionName"
-            aria-label="Papierverkündungsblatt"
             name="officialAnnouncement"
-            type="radio"
+            size="medium"
             :value="MetadataSectionName.PRINT_ANNOUNCEMENT"
           />
-          Papierverkündungsblatt
-        </label>
-        <label class="form-control">
-          <input
-            id="euAnnouncementSelection"
+        </InputField>
+
+        <InputField
+          id="euAnnouncementSelection"
+          v-slot="{ id }"
+          label="Amtsblatt der EU"
+          :label-position="LabelPosition.RIGHT"
+        >
+          <RadioInput
+            :id="id"
             v-model="selectedChildSectionName"
-            aria-label="Amtsblatt der EU"
             name="officialAnnouncement"
-            type="radio"
+            size="medium"
             :value="MetadataSectionName.EU_ANNOUNCEMENT"
           />
-          Amtsblatt der EU
-        </label>
+        </InputField>
       </div>
-      <div class="mb-24 flex flex-col gap-24">
-        <label class="form-control flex items-start">
-          <input
-            id="digitalAnnouncementSelection"
+
+      <div class="mb-8 flex flex-col gap-8">
+        <InputField
+          id="digitalAnnouncementSelection"
+          v-slot="{ id }"
+          label="Elektronisches Verkündungsblatt"
+          :label-position="LabelPosition.RIGHT"
+        >
+          <RadioInput
+            :id="id"
             v-model="selectedChildSectionName"
-            aria-label="Elektronisches Verkündungsblatt"
             name="officialAnnouncement"
-            type="radio"
+            size="medium"
             :value="MetadataSectionName.DIGITAL_ANNOUNCEMENT"
           />
-          Elektronisches Verkündungsblatt
-        </label>
-        <label class="form-control">
-          <input
-            id="otherAnnouncementSelection"
+        </InputField>
+
+        <InputField
+          id="otherAnnouncementSelection"
+          v-slot="{ id }"
+          label="Sonstige amtliche Fundstelle"
+          :label-position="LabelPosition.RIGHT"
+        >
+          <RadioInput
+            :id="id"
             v-model="selectedChildSectionName"
-            aria-label="Sonstige amtliche Fundstelle"
             name="officialAnnouncement"
-            type="radio"
+            size="medium"
             :value="MetadataSectionName.OTHER_OFFICIAL_ANNOUNCEMENT"
           />
-          Sonstige amtliche Fundstelle
-        </label>
+        </InputField>
       </div>
     </div>
+
     <component :is="component" v-model="childSection" />
   </div>
 </template>
-
-<style lang="scss" scoped>
-.form-control {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-}
-
-input[type="radio"] {
-  display: grid;
-  width: 1.5em;
-  height: 1.5em;
-  border: 0.15em solid currentcolor;
-  border-radius: 50%;
-  margin-right: 10px;
-  appearance: none;
-  background-color: white;
-  color: #004b76;
-  place-content: center;
-}
-
-input[type="radio"]::before {
-  width: 0.9em;
-  height: 0.9em;
-  border-radius: 50%;
-  background-color: #004b76;
-  content: "";
-  transform: scale(0);
-}
-
-input[type="radio"]:hover,
-input[type="radio"]:focus {
-  border: 4px solid #004b76;
-  outline: none;
-}
-
-input[type="radio"]:checked::before {
-  transform: scale(1);
-}
-</style>
