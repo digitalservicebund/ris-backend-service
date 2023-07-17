@@ -20,8 +20,8 @@ async function mockedItemService(page: number, size: number) {
       totalPages: totalElements / size,
       number: page,
       numberOfElements: 100,
-      first: page == 0 ? true : false,
-      last: page + 1 >= totalElements / size ? true : false,
+      first: page === 0,
+      last: page + 1 >= totalElements / size,
     },
   }
 }

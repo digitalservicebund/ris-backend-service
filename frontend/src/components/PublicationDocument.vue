@@ -127,13 +127,12 @@ function getActiveCitationsFields(activeCitation: ActiveCitation) {
   )
 }
 
-const fieldsMissing = computed(() =>
-  missingCoreDataFields.value.length ||
-  missingProceedingDecisionFields.value?.length ||
-  missingNormsFields.value?.length ||
-  missingActiveCitationFields.value?.length
-    ? true
-    : false,
+const fieldsMissing = computed(
+  () =>
+    missingCoreDataFields.value.length ||
+    missingProceedingDecisionFields.value?.length ||
+    missingNormsFields.value?.length ||
+    missingActiveCitationFields.value?.length,
 )
 </script>
 
