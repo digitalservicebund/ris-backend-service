@@ -17,6 +17,14 @@ const props = withDefaults(defineProps<Props>(), {
   label: undefined,
 })
 
+defineSlots<{
+  default(props: {
+    id: Props["id"]
+    hasError: boolean
+    updateValidationError: typeof updateValidationError
+  }): any // eslint-disable-line @typescript-eslint/no-explicit-any
+}>()
+
 const localValidationError = ref()
 
 const wrapperClasses = computed(() => ({
