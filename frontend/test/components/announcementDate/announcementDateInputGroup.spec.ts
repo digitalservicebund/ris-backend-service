@@ -23,7 +23,7 @@ describe("Announcement date/time/year fields", () => {
   it("defaults to the date selection", () => {
     renderComponent({})
     const dateRadio = screen.getByRole("radio", {
-      name: "Wählen Sie ein Datum",
+      name: "Datum",
     })
 
     expect(dateRadio).toBeChecked()
@@ -67,11 +67,11 @@ describe("Announcement date/time/year fields", () => {
 
     const user = userEvent.setup()
 
-    const yearRadio = screen.getByRole("radio", { name: "Wählen Sie ein Jahr" })
+    const yearRadio = screen.getByRole("radio", { name: "Jahresangabe" })
     expect(yearRadio).toBeChecked()
 
     const dateRadio = screen.getByRole("radio", {
-      name: "Wählen Sie ein Datum",
+      name: "Datum",
     })
     await user.click(dateRadio)
     expect(dateRadio).toBeChecked()
@@ -93,11 +93,11 @@ describe("Announcement date/time/year fields", () => {
     const user = userEvent.setup()
 
     const dateRadio = screen.getByRole("radio", {
-      name: "Wählen Sie ein Datum",
+      name: "Datum",
     })
     expect(dateRadio).toBeChecked()
 
-    const yearRadio = screen.getByRole("radio", { name: "Wählen Sie ein Jahr" })
+    const yearRadio = screen.getByRole("radio", { name: "Jahresangabe" })
     await user.click(yearRadio)
     expect(yearRadio).toBeChecked()
 
@@ -142,7 +142,7 @@ describe("Announcement date/time/year fields", () => {
 
     const user = userEvent.setup()
 
-    const yearRadio = screen.getByRole("radio", { name: "Wählen Sie ein Jahr" })
+    const yearRadio = screen.getByRole("radio", { name: "Jahresangabe" })
     await user.click(yearRadio)
 
     expect(modelValue).toEqual({ YEAR: [] })
@@ -158,7 +158,7 @@ describe("Announcement date/time/year fields", () => {
     const user = userEvent.setup()
 
     const dateRadio = screen.getByRole("radio", {
-      name: "Wählen Sie ein Datum",
+      name: "Datum",
     })
     await user.click(dateRadio)
 
