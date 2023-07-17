@@ -1,5 +1,6 @@
 package de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.controller
 
+import de.bund.digitalservice.ris.exceptions.exception.NotFoundWithInstanceException
 import de.bund.digitalservice.ris.norms.application.port.input.GenerateNormFileUseCase
 import de.bund.digitalservice.ris.norms.domain.entity.FileReference
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.ApiConfiguration
@@ -10,6 +11,7 @@ import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.tags.Tag
+import java.net.URI
 import java.util.UUID
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.PathVariable
@@ -42,8 +44,7 @@ class GenerateNormFileController(private val generateNormFileService: GenerateNo
         .map { fileReferenceResponseSchema ->
           ResponseEntity.ok().body(fileReferenceResponseSchema)
         }
-        .defaultIfEmpty(ResponseEntity.notFound().build())
-        .onErrorReturn(ResponseEntity.internalServerError().build())
+        .switchIfEmpty(Mono.error(NotFoundWithInstanceException(URI.create(guid))))
   }
 
   data class FileReferenceResponseSchema

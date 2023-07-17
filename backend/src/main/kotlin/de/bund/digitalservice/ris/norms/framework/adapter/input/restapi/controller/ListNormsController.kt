@@ -51,7 +51,6 @@ class ListNormsController(private val listNormsService: ListNormsUseCase) {
         .collectList()
         .map { normDataList -> PaginatedNormListResponseSchema.fromUseCaseData(normDataList) }
         .map { paginationData -> ResponseEntity.ok(paginationData) }
-        .onErrorReturn(ResponseEntity.internalServerError().build())
   }
 
   data class PaginatedNormListResponseSchema

@@ -91,7 +91,7 @@ class EditNormFrameControllerTest {
         .body(BodyInserters.fromValue("""{ "officialLongTitle": "new title" }"""))
         .exchange()
         .expectStatus()
-        .is5xxServerError()
+        .is5xxServerError
   }
 
   @Test
