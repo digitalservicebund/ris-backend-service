@@ -65,7 +65,7 @@ class LoadNormAsXmlControllerTest {
   }
 
   @Test
-  fun `it sends a not found response with empty body if the load service responds with empty`() {
+  fun `it sends a not found response with json error list body if the load service responds with empty`() {
     every { loadNormAsXmlService.loadNormAsXml(any()) } returns Mono.empty()
 
     webClient
@@ -76,7 +76,16 @@ class LoadNormAsXmlControllerTest {
         .expectStatus()
         .isNotFound()
         .expectBody()
-        .isEmpty()
+        .json(
+            """
+                {
+                  "errors" : [
+                      {"code":"NOT_FOUND","instance":"gazette/bg-1/year/2022/page/1125","message":""}
+                  ]
+                }
+                """
+                .trimIndent(),
+        )
   }
 
   @Test

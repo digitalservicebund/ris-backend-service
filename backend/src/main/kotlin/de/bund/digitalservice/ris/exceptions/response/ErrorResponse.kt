@@ -1,4 +1,4 @@
-package de.bund.digitalservice.ris.norms.exceptions.response
+package de.bund.digitalservice.ris.exceptions.response
 data class ErrorResponse(
     val errors: MutableList<ErrorDetails>? = null,
 )

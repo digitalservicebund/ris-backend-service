@@ -98,7 +98,7 @@ class LoadNormControllerTest {
   }
 
   @Test
-  fun `it sends a not found response with empty body if the load norm service responds with empty`() {
+  fun `it sends a not found response with an json error list if the load norm service responds with empty`() {
     every { loadNormService.loadNorm(any()) } returns Mono.empty()
 
     webClient
@@ -109,7 +109,20 @@ class LoadNormControllerTest {
         .expectStatus()
         .isNotFound()
         .expectBody()
-        .isEmpty()
+        .json(
+            """
+                {
+                  "errors" : [
+                      {
+                        "code" : "NOT_FOUND",
+                        "instance" : "72631e54-78a4-11d0-bcf7-00aa00b7b32a",
+                        "message": ""
+                      }
+                  ]
+                }
+                """
+                .trimIndent(),
+        )
   }
 
   @Test

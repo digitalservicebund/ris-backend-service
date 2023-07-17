@@ -1,5 +1,6 @@
 package de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.controller
 
+import de.bund.digitalservice.ris.exceptions.exception.NotFoundWithInstanceException
 import de.bund.digitalservice.ris.norms.application.port.input.LoadNormUseCase
 import de.bund.digitalservice.ris.norms.domain.entity.Article
 import de.bund.digitalservice.ris.norms.domain.entity.FileReference
@@ -17,6 +18,7 @@ import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.tags.Tag
+import java.net.URI
 import java.util.UUID
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
@@ -43,8 +45,7 @@ class LoadNormController(private val loadNormService: LoadNormUseCase) {
         .loadNorm(query)
         .map { norm -> NormResponseSchema.fromUseCaseData(norm) }
         .map { normResponseSchema -> ResponseEntity.ok(normResponseSchema) }
-        .defaultIfEmpty(ResponseEntity.notFound().build<NormResponseSchema>())
-        .onErrorReturn(ResponseEntity.internalServerError().build())
+        .switchIfEmpty(Mono.error(NotFoundWithInstanceException(URI(guid))))
   }
 
   data class NormResponseSchema

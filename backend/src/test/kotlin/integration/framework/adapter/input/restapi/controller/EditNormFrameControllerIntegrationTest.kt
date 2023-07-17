@@ -2,13 +2,13 @@ package de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.control
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig
+import de.bund.digitalservice.ris.exceptions.handler.NotFoundExceptionHandler
 import de.bund.digitalservice.ris.norms.application.port.output.SaveNormOutputPort
 import de.bund.digitalservice.ris.norms.application.service.EditNormFrameService
 import de.bund.digitalservice.ris.norms.application.service.LoadNormService
 import de.bund.digitalservice.ris.norms.domain.entity.Norm
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType
-import de.bund.digitalservice.ris.norms.exceptions.handler.NotFoundExceptionHandler
 import de.bund.digitalservice.ris.norms.framework.adapter.output.database.NormsService
 import de.bund.digitalservice.ris.norms.framework.adapter.output.database.PostgresTestcontainerIntegrationTest
 import de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto.NormDto

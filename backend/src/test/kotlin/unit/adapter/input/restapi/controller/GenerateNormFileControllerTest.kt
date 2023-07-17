@@ -90,7 +90,7 @@ class GenerateNormFileControllerTest {
   }
 
   @Test
-  fun `it sends a not found response with empty body if the the norm with the guid was not found in the service`() {
+  fun `it sends a not found response with an error list if the the norm with the guid was not found in the service`() {
     every { generateNormFileService.generateNormFile(any()) } returns Mono.empty()
 
     webClient
@@ -101,7 +101,20 @@ class GenerateNormFileControllerTest {
         .expectStatus()
         .isNotFound()
         .expectBody()
-        .isEmpty()
+        .json(
+            """
+                {
+                  "errors" : [
+                      {
+                        "code" : "NOT_FOUND",
+                        "instance" : "72631e54-78a4-11d0-bcf7-00aa00b7b32a",
+                        "message": ""
+                      }
+                  ]
+                }
+                """
+                .trimIndent(),
+        )
   }
 
   @Test

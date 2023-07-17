@@ -1,5 +1,6 @@
 package de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.controller
 
+import de.bund.digitalservice.ris.exceptions.exception.NotFoundWithInstanceException
 import de.bund.digitalservice.ris.norms.application.port.input.LoadNormAsXmlUseCase
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.ApiConfiguration
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.OpenApiConfiguration
@@ -7,6 +8,7 @@ import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.tags.Tag
+import java.net.URI
 import org.springframework.http.MediaType.APPLICATION_XML
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
@@ -46,7 +48,13 @@ class LoadNormAsXmlController(private val loadNormAsXmlService: LoadNormAsXmlUse
     return loadNormAsXmlService
         .loadNormAsXml(query)
         .map { normAsXml -> ResponseEntity.ok().contentType(APPLICATION_XML).body(normAsXml) }
-        .defaultIfEmpty(ResponseEntity.notFound().build())
-        .onErrorReturn(ResponseEntity.internalServerError().build())
+        .switchIfEmpty(
+            Mono.error(
+                NotFoundWithInstanceException(
+                    URI(
+                        "gazette/$printAnnouncementGazette/year/$announcementYear/page/$printAnnouncementPage"),
+                ),
+            ),
+        )
   }
 }

@@ -44,10 +44,9 @@ class EditNormFrameController(private val editNormFrameService: EditNormFrameUse
     val properties = request.toUseCaseData()
     val command = EditNormFrameUseCase.Command(decodeGuid(guid), properties)
 
-    return editNormFrameService
-        .editNormFrame(command)
-        .map { ResponseEntity.noContent().build<Unit>() }
-        .onErrorReturn(ResponseEntity.internalServerError().build())
+    return editNormFrameService.editNormFrame(command).map {
+      ResponseEntity.noContent().build<Unit>()
+    }
   }
 
   class NormFramePropertiesRequestSchema {
