@@ -87,7 +87,6 @@ export enum LabelPosition {
       >
       <label
         v-if="labelConverted.length !== 0"
-        :aria-label="id"
         class="ds-label-02-reg grid items-center"
         :class="{
           'pr-4': labelPosition === LabelPosition.LEFT,
