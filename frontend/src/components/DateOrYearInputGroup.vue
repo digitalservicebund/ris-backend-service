@@ -2,8 +2,11 @@
 import { computed, ref, watch } from "vue"
 import { Metadata } from "@/domain/Norm"
 import InputElement from "@/shared/components/input/InputElement.vue"
+import InputField, {
+  LabelPosition,
+} from "@/shared/components/input/InputField.vue"
+import RadioInput from "@/shared/components/input/RadioInput.vue"
 import { InputType } from "@/shared/components/input/types"
-import YearInput from "@/shared/components/input/YearInput.vue"
 
 interface Props {
   modelValue: Metadata
@@ -60,94 +63,63 @@ const yearValue = computed({
 
 <template>
   <div class="w-320">
-    <div class="mb-24 flex justify-between">
-      <label class="form-control">
-        <input
-          :id="`${idPrefix}TypeDate`"
+    <div class="mb-8 flex justify-between">
+      <InputField
+        :id="`${idPrefix}TypeDate`"
+        v-slot="{ id }"
+        label="Datum"
+        :label-position="LabelPosition.RIGHT"
+      >
+        <RadioInput
+          :id="id"
           v-model="selectedInputType"
-          :aria-label="`Wählen Sie ${label} Datum`"
           :name="`${idPrefix}InputType`"
-          type="radio"
+          size="medium"
           :value="InputType.DATE"
         />
-        Datum
-      </label>
-      <label class="form-control">
-        <input
-          :id="`${idPrefix}TypeYear`"
+      </InputField>
+
+      <InputField
+        :id="`${idPrefix}TypeYear`"
+        v-slot="{ id }"
+        label="Jahresangabe"
+        :label-position="LabelPosition.RIGHT"
+      >
+        <RadioInput
+          :id="id"
           v-model="selectedInputType"
-          :aria-label="`Wählen Sie ${label} Jahr`"
           :name="`${idPrefix}InputType`"
-          type="radio"
+          size="medium"
           :value="InputType.YEAR"
         />
-        Jahresangabe
-      </label>
+      </InputField>
     </div>
-    <label
-      class="label-03-reg mb-2 flex items-center gap-4 text-gray-900"
-      :for="
+
+    <InputField
+      :id="
         selectedInputType === InputType.DATE
           ? `${idPrefix}Date`
           : `${idPrefix}Year`
       "
-      >{{ label }}</label
+      v-slot="{ id }"
+      class="mb-0"
+      :label="label"
+      :label-position="LabelPosition.TOP"
     >
-    <InputElement
-      v-if="selectedInputType === InputType.DATE"
-      :id="`${idPrefix}Date`"
-      v-model="dateValue"
-      :alt-text="`${label} Datum`"
-      :attributes="{ ariaLabel: `${label} Datum` }"
-      :type="InputType.DATE"
-    />
-    <div>
-      <YearInput
-        v-if="selectedInputType === InputType.YEAR"
-        :id="`${idPrefix}Year`"
-        v-model="yearValue"
-        :aria-label="`${label} Jahresangabe`"
+      <InputElement
+        v-if="selectedInputType === InputType.DATE"
+        :id="id"
+        v-model="dateValue"
+        :attributes="{ ariaLabel: `${label} Datum` }"
+        :type="InputType.DATE"
       />
-    </div>
+      <InputElement
+        v-else-if="selectedInputType === InputType.YEAR"
+        :id="id"
+        v-model="yearValue"
+        :attributes="{ ariaLabel: `${label} Jahresangabe` }"
+        :type="InputType.YEAR"
+      />
+    </InputField>
   </div>
 </template>
-
-<style lang="scss" scoped>
-.form-control {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-}
-
-input[type="radio"] {
-  display: grid;
-  width: 1.5em;
-  height: 1.5em;
-  border: 0.15em solid currentcolor;
-  border-radius: 50%;
-  margin-right: 10px;
-  appearance: none;
-  background-color: white;
-  color: #004b76;
-  place-content: center;
-}
-
-input[type="radio"]:hover,
-input[type="radio"]:focus {
-  border: 4px solid #004b76;
-  outline: none;
-}
-
-input[type="radio"]::before {
-  width: 0.9em;
-  height: 0.9em;
-  border-radius: 50%;
-  background-color: #004b76;
-  content: "";
-  transform: scale(0);
-}
-
-input[type="radio"]:checked::before {
-  transform: scale(1);
-}
-</style>
