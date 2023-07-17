@@ -62,7 +62,7 @@ watch(selectedChildSectionName, () => (childSection.value = {}))
 
 <template>
   <div>
-    <div class="mb-24 flex w-320 justify-between">
+    <div class="mb-8 flex w-320 justify-between">
       <InputField
         id="divergentEntryIntoForceDefinedSelection"
         v-slot="{ id }"
