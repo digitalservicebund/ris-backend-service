@@ -66,8 +66,7 @@ const singleReference = computed({
 
 const multipleReferences = computed({
   get: () => inputValue.value.REFERENCE,
-  set: (data?: string[]) =>
-    (inputValue.value.REFERENCE = data ? data : undefined),
+  set: (data?: string[]) => (inputValue.value.REFERENCE = data ?? undefined),
 })
 
 const inputFields = computed(() => {
