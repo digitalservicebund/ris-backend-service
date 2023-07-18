@@ -11,6 +11,7 @@ import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import java.time.Instant;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
@@ -63,19 +64,33 @@ public class DatabaseDocumentUnitStatusService implements DocumentUnitStatusServ
   @Override
   public Mono<Void> update(String documentNumber, DocumentUnitStatus status) {
     return getLatestPublishing(documentNumber)
-        .flatMap(
-            previousStatusDTO ->
-                repository.save(
-                    DocumentUnitStatusDTO.builder()
-                        .newEntry(true)
-                        .id(UUID.randomUUID())
-                        .createdAt(Instant.now())
-                        .documentUnitId(previousStatusDTO.getDocumentUnitId())
-                        .issuerAddress(previousStatusDTO.getIssuerAddress())
-                        .status(status.status())
-                        .withError(status.withError())
-                        .build()))
+        .flatMap(previousStatusDTO -> saveStatus(status, previousStatusDTO))
         .then();
+  }
+
+  @Override
+  public Mono<Void> update(UUID documentUuid, DocumentUnitStatus status) {
+    if (status.withError()) {
+      log.warn("Mail delivery ({}) was not successful", documentUuid);
+    }
+    return getLatestPublishing(documentUuid)
+        .flatMap(previousStatusDTO -> saveStatus(status, previousStatusDTO))
+        .then();
+  }
+
+  @NotNull
+  private Mono<DocumentUnitStatusDTO> saveStatus(
+      DocumentUnitStatus status, DocumentUnitStatusDTO previousStatusDTO) {
+    return repository.save(
+        DocumentUnitStatusDTO.builder()
+            .newEntry(true)
+            .id(UUID.randomUUID())
+            .createdAt(Instant.now())
+            .documentUnitId(previousStatusDTO.getDocumentUnitId())
+            .issuerAddress(previousStatusDTO.getIssuerAddress())
+            .status(status.status())
+            .withError(status.withError())
+            .build());
   }
 
   public Mono<String> getLatestIssuerAddress(String documentNumber) {
@@ -93,5 +108,10 @@ public class DatabaseDocumentUnitStatusService implements DocumentUnitStatusServ
             documentUnit ->
                 repository.findFirstByDocumentUnitIdAndStatusOrderByCreatedAtDesc(
                     documentUnit.uuid(), PublicationStatus.PUBLISHING));
+  }
+
+  private Mono<DocumentUnitStatusDTO> getLatestPublishing(UUID documentUuid) {
+    return repository.findFirstByDocumentUnitIdAndStatusOrderByCreatedAtDesc(
+        documentUuid, PublicationStatus.PUBLISHING);
   }
 }

@@ -1,11 +1,14 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
+import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatus;
 import de.bund.digitalservice.ris.caselaw.domain.EmailPublishState;
 import de.bund.digitalservice.ris.caselaw.domain.MailTrackingService;
+import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.OpenApiConfiguration;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.UUID;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,14 +21,19 @@ import reactor.core.publisher.Mono;
 
 @RestController
 @RequestMapping("admin")
+@Slf4j
 @Tag(name = OpenApiConfiguration.CASELAW_TAG)
 public class MailTrackingController {
 
   private final MailTrackingService service;
 
+  private final DatabaseDocumentUnitStatusService statusService;
+
   @Autowired
-  public MailTrackingController(MailTrackingService service) {
+  public MailTrackingController(
+      MailTrackingService service, DatabaseDocumentUnitStatusService statusService) {
     this.service = service;
+    this.statusService = statusService;
   }
 
   @PostMapping("/webhook")
@@ -39,17 +47,15 @@ public class MailTrackingController {
       // We're not responsible for other sent mails
       return Mono.just(ResponseEntity.status(HttpStatus.NO_CONTENT).build());
     }
-    EmailPublishState emailPublishState = service.getMappedPublishState(payload.event());
 
-    return service
-        .setPublishState(documentUnitUuid, emailPublishState)
-        .map(
-            uuid -> ResponseEntity.status(HttpStatus.OK).body("Publish state was set successfully"))
-        .defaultIfEmpty(
-            ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body("Publish state could not be set: invalid payload"))
-        .onErrorReturn(
-            ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body("Publish state could not be set"));
+    return statusService
+        .update(
+            documentUnitUuid,
+            DocumentUnitStatus.builder()
+                .status(PublicationStatus.PUBLISHING)
+                .withError(
+                    service.getMappedPublishState(payload.event()) == EmailPublishState.ERROR)
+                .build())
+        .thenReturn(ResponseEntity.status(HttpStatus.OK).build());
   }
 }

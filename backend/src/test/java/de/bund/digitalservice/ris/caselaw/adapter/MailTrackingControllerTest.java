@@ -6,8 +6,10 @@ import static org.mockito.Mockito.when;
 import de.bund.digitalservice.ris.caselaw.RisWebTestClient;
 import de.bund.digitalservice.ris.caselaw.TestConfig;
 import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatus;
 import de.bund.digitalservice.ris.caselaw.domain.EmailPublishState;
 import de.bund.digitalservice.ris.caselaw.domain.MailTrackingService;
+import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -27,8 +29,8 @@ import reactor.core.publisher.Mono;
 @Import({SecurityConfig.class, TestConfig.class})
 class MailTrackingControllerTest {
   @Autowired private RisWebTestClient risWebTestClient;
-
   @MockBean private MailTrackingService service;
+  @MockBean private DatabaseDocumentUnitStatusService statusService;
   @MockBean private ReactiveClientRegistrationRepository clientRegistrationRepository;
 
   private static final UUID TEST_UUID = UUID.fromString("88888888-4444-4444-4444-121212121212");
@@ -48,8 +50,13 @@ class MailTrackingControllerTest {
             mailTrackingEvent, TEST_UUID);
 
     when(service.getMappedPublishState(mailTrackingEvent)).thenReturn(expectedEmailPublishState);
-    when(service.setPublishState(TEST_UUID, expectedEmailPublishState))
-        .thenReturn(Mono.just(TEST_UUID));
+    when(statusService.update(
+            TEST_UUID,
+            DocumentUnitStatus.builder()
+                .withError(false)
+                .status(PublicationStatus.PUBLISHING)
+                .build()))
+        .thenReturn(Mono.empty());
 
     risWebTestClient
         .withDefaultLogin()
@@ -62,7 +69,13 @@ class MailTrackingControllerTest {
         .isOk();
 
     verify(service).getMappedPublishState(mailTrackingEvent);
-    verify(service).setPublishState(TEST_UUID, expectedEmailPublishState);
+    verify(statusService)
+        .update(
+            TEST_UUID,
+            DocumentUnitStatus.builder()
+                .withError(false)
+                .status(PublicationStatus.PUBLISHING)
+                .build());
   }
 
   @ParameterizedTest
