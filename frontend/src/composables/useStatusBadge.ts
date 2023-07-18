@@ -29,8 +29,13 @@ export function useStatusBadge(status: DocumentUnit["status"]) {
       }
     }
     if (status?.status == "PUBLISHING") {
-      badge.value = "in Veröffentlichung"
-      badge.icon = "access_time"
+      if (status?.withError) {
+        badge.value = "Fehler beim veröffentlichen"
+        badge.icon = "error_outline"
+      } else {
+        badge.value = "in Veröffentlichung"
+        badge.icon = "access_time"
+      }
     }
     return badge
   })

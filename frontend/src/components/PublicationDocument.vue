@@ -314,10 +314,10 @@ const fieldsMissing = computed(() =>
                   <span class="ds-label-02-bold"> Betreff: </span>
                   {{ item.mailSubject }}
                 </div>
-                <div>
+                <!-- <div>
                   <span class="ds-label-02-bold">Status:</span>
                   {{ item.publishStateDisplayText }}
-                </div>
+                </div> -->
               </div>
               <div class="ds-label-section text-gray-900">ALS</div>
               <CodeSnippet v-if="!!item?.xml" title="XML" :xml="item.xml" />
