@@ -135,7 +135,7 @@ describe("DivergentExpirationDefinedInputGroup", () => {
     } = getControls()
 
     expect(dateInput).toHaveValue("12.05.2020")
-    await user.type(dateInput, "{backspace}")
+    await userEvent.clear(dateInput)
     expect(modelValue.DATE).toBeUndefined()
 
     expect(amendmentNormCheckBox).toBeChecked()

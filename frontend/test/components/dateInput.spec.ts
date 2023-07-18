@@ -1,5 +1,5 @@
 import userEvent from "@testing-library/user-event"
-import { fireEvent, render, screen } from "@testing-library/vue"
+import { render, screen } from "@testing-library/vue"
 import { nextTick } from "vue"
 import DateInput from "@/shared/components/input/DateInput.vue"
 import { ValidationError } from "@/shared/components/input/types"
@@ -75,11 +75,12 @@ describe("DateInput", () => {
     expect(input).toHaveValue("14.05.2022")
 
     expect(emitted()["update:modelValue"]).toEqual([
+      [undefined],
       ["2022-05-14T00:00:00.000Z"],
     ])
   })
 
-  it("emits undefined on backspace delete", async () => {
+  it("removes validation errors on backspace delete", async () => {
     const { emitted } = renderComponent({
       modelValue: "2022-05-13T18:08:14.036Z",
     })
@@ -88,16 +89,8 @@ describe("DateInput", () => {
     ) as HTMLInputElement
     expect(input).toHaveValue("13.05.2022")
     await userEvent.type(input, "{backspace}")
-    await fireEvent.update(input)
-    await nextTick()
 
-    expect(input).toHaveValue("")
-
-    expect(emitted()["update:modelValue"]).toBeTruthy()
-
-    const array = emitted()["update:modelValue"] as ValidationError[][]
-
-    expect(array.filter((element) => element[0] === undefined)).toHaveLength(1)
+    expect(emitted()["update:validationError"]).toBeTruthy()
   })
 
   it("does not allow dates in the future", async () => {
@@ -158,13 +151,13 @@ describe("DateInput", () => {
   })
 
   it("does not allow letters", async () => {
-    const { emitted } = renderComponent()
+    renderComponent()
     const input = screen.queryByLabelText("aria-label") as HTMLInputElement
 
-    await userEvent.type(input, "FO.OO.2001")
+    await userEvent.type(input, "AB.CD.EFGH")
     await nextTick()
 
-    expect(emitted()["update:modelValue"]).not.toBeTruthy()
+    expect(input).toHaveValue("")
   })
 
   it("does not allow incomplete dates", async () => {

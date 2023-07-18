@@ -194,7 +194,6 @@ function validateInput() {
 
 function inputDelete() {
   emit("update:validationError", undefined)
-  currentInput.value = undefined
 }
 
 function onBlur() {

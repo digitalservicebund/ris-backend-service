@@ -78,7 +78,8 @@ describe("UpdateStatusIndicationGroup in status mode", () => {
       name: "Datum der Änderungsvorschrift",
     })
     expect(dateInput).toHaveValue("29.06.2023")
-    await user.type(dateInput, "{backspace}30.05.2022")
+    await userEvent.clear(dateInput)
+    await user.type(dateInput, "30.05.2022")
     expect(modelValue.DATE).toEqual(["2022-05-30T00:00:00.000Z"])
 
     const referencesInput = screen.getByRole("textbox", {
@@ -115,7 +116,7 @@ describe("UpdateStatusIndicationGroup in status mode", () => {
       name: "Datum der Änderungsvorschrift",
     })
     expect(dateInput).toHaveValue("29.06.2023")
-    await user.type(dateInput, "{backspace}")
+    await userEvent.clear(dateInput)
     expect(modelValue.DATE).toBeUndefined()
 
     const references = screen.getAllByRole("listitem")
@@ -193,7 +194,8 @@ describe("UpdateStatusIndicationGroup in reissue mode", () => {
       name: "Datum der Bekanntmachung",
     })
     expect(dateInput).toHaveValue("29.06.2023")
-    await user.type(dateInput, "{backspace}30.05.2022")
+    await userEvent.clear(dateInput)
+    await user.type(dateInput, "30.05.2022")
     expect(modelValue.DATE).toEqual(["2022-05-30T00:00:00.000Z"])
 
     const referencesInput = screen.getByRole("textbox", {
@@ -232,7 +234,7 @@ describe("UpdateStatusIndicationGroup in reissue mode", () => {
       name: "Datum der Bekanntmachung",
     })
     expect(dateInput).toHaveValue("29.06.2023")
-    await user.type(dateInput, "{backspace}")
+    await userEvent.clear(dateInput)
     expect(modelValue.DATE).toBeUndefined()
 
     const referencesInput = screen.getByRole("textbox", {

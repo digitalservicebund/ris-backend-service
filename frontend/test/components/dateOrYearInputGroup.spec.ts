@@ -82,7 +82,7 @@ describe("date/year field", () => {
       expect(dateInputField).toHaveValue("12.05.2020")
     })
 
-    it("User can clear the date input", async () => {
+    it("User can delete the date input", async () => {
       const user = userEvent.setup()
       const modelValue: Metadata = { DATE: ["2020-05-12"] }
       renderComponent({ modelValue })
@@ -93,7 +93,7 @@ describe("date/year field", () => {
 
       expect(dateInputField).toHaveValue("12.05.2020")
       await user.type(dateInputField, "{backspace}")
-      expect(modelValue.DATE).toBeUndefined()
+      expect(dateInputField).toHaveValue("12.05.202")
     })
   })
 

@@ -156,7 +156,7 @@ describe("StatusIndicationInputGroup", () => {
           {
             NOTE: ["foo"],
             ARTICLE: ["bar"],
-            DATE: ["baz"],
+            DATE: [""],
             REFERENCE: ["qux"],
           },
         ],

@@ -18,7 +18,7 @@ test.describe("decision date", () => {
     ).toBeVisible()
   })
 
-  test("backspace delete resets decision date", async ({
+  test("backspace deletes decision date character by character", async ({
     page,
     documentNumber,
   }) => {
@@ -38,14 +38,8 @@ test.describe("decision date", () => {
     await page.keyboard.press("Backspace")
 
     await expect(page.locator("[aria-label='Entscheidungsdatum']")).toHaveValue(
-      "",
+      "03.02.202",
     )
-
-    await expect(
-      infoPanel.getByText("Entscheidungsdatum - ", {
-        exact: true,
-      }),
-    ).toBeVisible()
   })
 
   test("backspace delete in deviating decision date", async ({

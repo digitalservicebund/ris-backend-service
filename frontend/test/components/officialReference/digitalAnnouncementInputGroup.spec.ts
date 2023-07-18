@@ -272,7 +272,7 @@ describe("DigitalAnnouncementInputGroup", () => {
     expect(modelValue.ANNOUNCEMENT_MEDIUM).toBeUndefined()
 
     expect(dateInput).toHaveValue("05.04.2023")
-    await user.type(dateInput, "{backspace}")
+    await userEvent.clear(dateInput)
     expect(modelValue.DATE).toBeUndefined()
 
     expect(editionInput).toHaveValue("1")

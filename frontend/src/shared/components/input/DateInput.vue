@@ -83,8 +83,7 @@ function validateInput() {
 
 function backspaceDelete() {
   emit("update:validationError", undefined)
-  emit("update:modelValue", undefined)
-  inputValue.value = undefined
+  if (inputValue.value === "") emit("update:modelValue", inputValue.value)
 }
 
 function onBlur() {
@@ -98,6 +97,7 @@ watch(props, () => {
 })
 
 watch(inputValue, () => {
+  if (inputValue.value === "") emit("update:modelValue", undefined)
   isValidDate.value &&
     isInPast.value &&
     emit(
@@ -107,7 +107,7 @@ watch(inputValue, () => {
 })
 
 watch(inputCompleted, () => {
-  validateInput()
+  if (inputCompleted.value === true) validateInput()
 })
 </script>
 
