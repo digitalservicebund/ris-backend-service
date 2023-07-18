@@ -26,7 +26,7 @@ const inputValue = ref(props.modelValue)
 const selectedInputType = ref<InputType>(InputType.UNDEFINED_DATE)
 
 function detectSelectedInputType(): void {
-  if (inputValue.value.DATE && inputValue.value.DATE.length > 0) {
+  if (inputValue.value.DATE) {
     selectedInputType.value = InputType.DATE
   } else selectedInputType.value = InputType.UNDEFINED_DATE
 }
@@ -47,12 +47,10 @@ watch(inputValue, () => emit("update:modelValue", inputValue.value), {
 
 watch(inputValue, detectSelectedInputType, { immediate: true, deep: true })
 
-const undefinedDateState = computed({
+const undefinedDateValue = computed({
   get: () => inputValue.value.UNDEFINED_DATE?.[0],
   set: (data?: UndefinedDate) => {
-    if (data) {
-      inputValue.value.UNDEFINED_DATE = [data]
-    }
+    if (data) inputValue.value.UNDEFINED_DATE = [data]
     inputValue.value.DATE = undefined
   },
 })
@@ -60,7 +58,7 @@ const undefinedDateState = computed({
 const dateValue = computed({
   get: () => inputValue.value.DATE?.[0],
   set: (value) => {
-    inputValue.value.DATE = value ? [value] : undefined
+    inputValue.value.DATE = value ? [value] : []
     inputValue.value.UNDEFINED_DATE = undefined
   },
 })
@@ -102,7 +100,7 @@ const dateValue = computed({
 
     <DateUndefinedDateInputGroup
       v-model:date-value="dateValue"
-      v-model:undefined-date-state-value="undefinedDateState"
+      v-model:undefined-date-state-value="undefinedDateValue"
       date-id="expirationDate"
       date-input-aria-label="Bestimmtes Außerkrafttretedatum Date Input"
       date-input-field-label="Bestimmtes Außerkrafttretedatum"

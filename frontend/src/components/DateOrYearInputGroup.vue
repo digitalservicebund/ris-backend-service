@@ -22,6 +22,7 @@ const emit = defineEmits<{
 
 const inputValue = ref(props.modelValue)
 const selectedInputType = ref<InputType>(InputType.DATE)
+
 function detectSelectedInputType(): void {
   if (inputValue.value.YEAR) {
     selectedInputType.value = InputType.YEAR
