@@ -23,4 +23,5 @@ export const risComponents: risComponent[] = [
   { name: "Property Info", view: "PropertyInfoView" },
   { name: "Editable List", view: "EditableList" },
   { name: "Footnotes", view: "FootnotesView" },
+  { name: "Typography", view: "TypographyView" },
 ]

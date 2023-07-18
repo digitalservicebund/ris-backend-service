@@ -24,6 +24,7 @@ import PropertyInfoView from "@/kitchensink/views/PropertyInfoView.vue"
 import RadioView from "@/kitchensink/views/RadioView.vue"
 import SideToggleView from "@/kitchensink/views/SideToggleView.vue"
 import TextEditorView from "@/kitchensink/views/TextEditorView.vue"
+import TypographyView from "@/kitchensink/views/TypographyView.vue"
 
 const props = defineProps<{
   selectedComponent: risComponent
@@ -75,6 +76,8 @@ const component = computed(() => {
       return FootnotesView
     case "RadioView":
       return RadioView
+    case "TypographyView":
+      return TypographyView
     default:
       return ErrorView
   }
