@@ -88,70 +88,68 @@ const component = computed(() => {
 
 <template>
   <div class="flex flex-col gap-8">
-    <div class="flex flex-wrap gap-176">
-      <div class="mb-8 flex flex-col gap-8">
-        <InputField
-          id="printAnnouncementSelection"
-          v-slot="{ id }"
-          label="Papierverkündungsblatt"
-          :label-position="LabelPosition.RIGHT"
-        >
-          <RadioInput
-            :id="id"
-            v-model="selectedChildSectionName"
-            name="officialAnnouncement"
-            size="medium"
-            :value="MetadataSectionName.PRINT_ANNOUNCEMENT"
-          />
-        </InputField>
+    <div
+      class="mb-8 grid grid-cols-[repeat(2,minmax(0,max-content))] gap-x-176 gap-y-8"
+    >
+      <InputField
+        id="printAnnouncementSelection"
+        v-slot="{ id }"
+        label="Papierverkündungsblatt"
+        :label-position="LabelPosition.RIGHT"
+      >
+        <RadioInput
+          :id="id"
+          v-model="selectedChildSectionName"
+          name="officialAnnouncement"
+          size="medium"
+          :value="MetadataSectionName.PRINT_ANNOUNCEMENT"
+        />
+      </InputField>
 
-        <InputField
-          id="euAnnouncementSelection"
-          v-slot="{ id }"
-          label="Amtsblatt der EU"
-          :label-position="LabelPosition.RIGHT"
-        >
-          <RadioInput
-            :id="id"
-            v-model="selectedChildSectionName"
-            name="officialAnnouncement"
-            size="medium"
-            :value="MetadataSectionName.EU_ANNOUNCEMENT"
-          />
-        </InputField>
-      </div>
+      <InputField
+        id="digitalAnnouncementSelection"
+        v-slot="{ id }"
+        label="Elektronisches Verkündungsblatt"
+        :label-position="LabelPosition.RIGHT"
+      >
+        <RadioInput
+          :id="id"
+          v-model="selectedChildSectionName"
+          name="officialAnnouncement"
+          size="medium"
+          :value="MetadataSectionName.DIGITAL_ANNOUNCEMENT"
+        />
+      </InputField>
 
-      <div class="mb-8 flex flex-col gap-8">
-        <InputField
-          id="digitalAnnouncementSelection"
-          v-slot="{ id }"
-          label="Elektronisches Verkündungsblatt"
-          :label-position="LabelPosition.RIGHT"
-        >
-          <RadioInput
-            :id="id"
-            v-model="selectedChildSectionName"
-            name="officialAnnouncement"
-            size="medium"
-            :value="MetadataSectionName.DIGITAL_ANNOUNCEMENT"
-          />
-        </InputField>
+      <InputField
+        id="euAnnouncementSelection"
+        v-slot="{ id }"
+        label="Amtsblatt der EU"
+        :label-position="LabelPosition.RIGHT"
+      >
+        <RadioInput
+          :id="id"
+          v-model="selectedChildSectionName"
+          name="officialAnnouncement"
+          size="medium"
+          :value="MetadataSectionName.EU_ANNOUNCEMENT"
+        />
+      </InputField>
 
-        <InputField
-          id="otherAnnouncementSelection"
-          v-slot="{ id }"
-          label="Sonstige amtliche Fundstelle"
-          :label-position="LabelPosition.RIGHT"
-        >
-          <RadioInput
-            :id="id"
-            v-model="selectedChildSectionName"
-            name="officialAnnouncement"
-            size="medium"
-            :value="MetadataSectionName.OTHER_OFFICIAL_ANNOUNCEMENT"
-          />
-        </InputField>
-      </div>
+      <InputField
+        id="otherAnnouncementSelection"
+        v-slot="{ id }"
+        label="Sonstige amtliche Fundstelle"
+        :label-position="LabelPosition.RIGHT"
+      >
+        <RadioInput
+          :id="id"
+          v-model="selectedChildSectionName"
+          name="officialAnnouncement"
+          size="medium"
+          :value="MetadataSectionName.OTHER_OFFICIAL_ANNOUNCEMENT"
+        />
+      </InputField>
     </div>
 
     <component :is="component" v-model="childSection" />

@@ -83,70 +83,68 @@ const component = computed(() => {
 
 <template>
   <div class="flex flex-col gap-8">
-    <div class="flex flex-wrap gap-176">
-      <div class="mb-8 flex flex-col gap-8">
-        <InputField
-          id="statusSelection"
-          v-slot="{ id }"
-          label="Stand"
-          :label-position="LabelPosition.RIGHT"
-        >
-          <RadioInput
-            :id="id"
-            v-model="selectedChildSectionName"
-            name="statusIndication"
-            size="medium"
-            :value="MetadataSectionName.STATUS"
-          />
-        </InputField>
+    <div
+      class="mb-8 grid grid-cols-[repeat(2,minmax(0,max-content))] gap-x-176 gap-y-8"
+    >
+      <InputField
+        id="statusSelection"
+        v-slot="{ id }"
+        label="Stand"
+        :label-position="LabelPosition.RIGHT"
+      >
+        <RadioInput
+          :id="id"
+          v-model="selectedChildSectionName"
+          name="statusIndication"
+          size="medium"
+          :value="MetadataSectionName.STATUS"
+        />
+      </InputField>
 
-        <InputField
-          id="reissueSelection"
-          v-slot="{ id }"
-          label="Neufassung"
-          :label-position="LabelPosition.RIGHT"
-        >
-          <RadioInput
-            :id="id"
-            v-model="selectedChildSectionName"
-            name="statusIndication"
-            size="medium"
-            :value="MetadataSectionName.REISSUE"
-          />
-        </InputField>
-      </div>
+      <InputField
+        id="repealSelection"
+        v-slot="{ id }"
+        label="Aufhebung"
+        :label-position="LabelPosition.RIGHT"
+      >
+        <RadioInput
+          :id="id"
+          v-model="selectedChildSectionName"
+          name="statusIndication"
+          size="medium"
+          :value="MetadataSectionName.REPEAL"
+        />
+      </InputField>
 
-      <div class="mb-8 flex flex-col gap-8">
-        <InputField
-          id="repealSelection"
-          v-slot="{ id }"
-          label="Aufhebung"
-          :label-position="LabelPosition.RIGHT"
-        >
-          <RadioInput
-            :id="id"
-            v-model="selectedChildSectionName"
-            name="statusIndication"
-            size="medium"
-            :value="MetadataSectionName.REPEAL"
-          />
-        </InputField>
+      <InputField
+        id="reissueSelection"
+        v-slot="{ id }"
+        label="Neufassung"
+        :label-position="LabelPosition.RIGHT"
+      >
+        <RadioInput
+          :id="id"
+          v-model="selectedChildSectionName"
+          name="statusIndication"
+          size="medium"
+          :value="MetadataSectionName.REISSUE"
+        />
+      </InputField>
 
-        <InputField
-          id="otherStatusSelection"
-          v-slot="{ id }"
-          label="Sonstiger Hinweis"
-          :label-position="LabelPosition.RIGHT"
-        >
-          <RadioInput
-            :id="id"
-            v-model="selectedChildSectionName"
-            name="statusIndication"
-            size="medium"
-            :value="MetadataSectionName.OTHER_STATUS"
-          />
-        </InputField>
-      </div>
+      <InputField
+        id="otherStatusSelection"
+        v-slot="{ id }"
+        label="Sonstiger Hinweis"
+        :label-position="LabelPosition.RIGHT"
+      >
+        <RadioInput
+          :id="id"
+          v-model="selectedChildSectionName"
+          name="statusIndication"
+          size="medium"
+          :value="MetadataSectionName.OTHER_STATUS"
+        />
+      </InputField>
     </div>
 
     <component
