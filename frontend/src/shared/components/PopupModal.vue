@@ -60,10 +60,10 @@ onMounted(() => {
     <div
       class="modal-container box-border flex flex-col items-start gap-[1rem] border-2 border-solid border-blue-800 bg-white px-[3.5rem] py-[2.5rem]"
     >
-      <div class="label-01-bold text-black">
+      <div class="ds-label-01-bold text-black">
         {{ headerText }}
       </div>
-      <div class="label-03-reg text-black">{{ contentText }}</div>
+      <div class="ds-label-03-reg text-black">{{ contentText }}</div>
       <div class="modal-buttons-container flex flex-row gap-[1rem]">
         <TextButton
           :button-type="cancelButtonType"

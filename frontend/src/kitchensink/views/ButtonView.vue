@@ -4,7 +4,7 @@ import TextButton from "@/shared/components/input/TextButton.vue"
 
 <template>
   <div class="flex w-full flex-col items-start gap-20">
-    <h2 class="heading-02-regular">Text Button</h2>
+    <h2 class="ds-heading-02-reg">Text Button</h2>
 
     <div class="flex w-full items-start gap-20">
       <TextButton button-type="primary" label="Button Primary" />

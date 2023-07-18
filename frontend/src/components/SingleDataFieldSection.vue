@@ -47,7 +47,7 @@ watch(value, () => emit("update:modelValue", value.value), { deep: true })
   <div
     class="flex items-start gap-8 border-b border-gray-400 bg-white p-8 pl-16"
   >
-    <label class="label-02-bold my-12 w-[15rem] flex-none" :for="id">
+    <label class="ds-label-02-bold my-12 w-[15rem] flex-none" :for="id">
       <h2>{{ label }}</h2>
     </label>
 
@@ -55,7 +55,7 @@ watch(value, () => emit("update:modelValue", value.value), { deep: true })
       :id="id"
       v-model="value"
       :attributes="inputAttributes"
-      class="label-02-reg"
+      class="ds-label-02-reg"
       disable-error
       :type="type"
     />

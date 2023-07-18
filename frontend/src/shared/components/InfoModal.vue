@@ -60,8 +60,8 @@ const ariaLabelIcon = props.title + " icon"
     >
 
     <div class="flex flex-col">
-      <span class="label-02-bold">{{ title }}</span>
-      <span class="body-01-reg">{{ description }}</span>
+      <span class="ds-label-02-bold">{{ title }}</span>
+      <span class="ds-body-01-reg">{{ description }}</span>
     </div>
   </div>
 </template>

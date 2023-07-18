@@ -109,7 +109,7 @@ defineExpose({ focusPrevious, focusNext, resetFocus, focusFirst })
       <li
         v-for="(chip, i) in chips"
         :key="i"
-        class="body-01-reg group relative flex items-center break-words rounded-10 bg-blue-500 pr-32 outline-none"
+        class="group ds-body-01-reg relative flex items-center break-words rounded-10 bg-blue-500 pr-32 outline-none"
         data-testid="chip"
         tabindex="0"
         @click.stop="setFocusedItemIndex(i)"

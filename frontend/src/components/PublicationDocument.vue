@@ -139,10 +139,10 @@ const fieldsMissing = computed(() =>
 
 <template>
   <div class="flex-start flex max-w-[80rem] flex-col justify-start gap-40">
-    <h1 class="heading-02-regular">Veröffentlichen</h1>
+    <h1 class="ds-heading-02-reg">Veröffentlichen</h1>
     <div aria-label="Plausibilitätsprüfung" class="flex flex-row gap-16">
       <div class="w-[15.625rem]">
-        <p class="subheading">Plausibilitätsprüfung</p>
+        <p class="ds-subhead">Plausibilitätsprüfung</p>
       </div>
       <div v-if="fieldsMissing" class="flex flex-row gap-8">
         <div>
@@ -152,14 +152,14 @@ const fieldsMissing = computed(() =>
         </div>
         <div class="flex flex-col gap-32">
           <div>
-            <p class="body-01-reg">
+            <p class="ds-body-01-reg">
               Die folgenden Rubriken-Pflichtfelder sind nicht befüllt:
             </p>
             <ul class="list-disc">
               <li
                 v-for="field in missingCoreDataFields"
                 :key="field"
-                class="body-01-reg ml-[1rem] list-item"
+                class="ds-body-01-reg ml-[1rem] list-item"
               >
                 {{ field }}
               </li>
@@ -168,19 +168,19 @@ const fieldsMissing = computed(() =>
                   missingProceedingDecisionFields &&
                   missingProceedingDecisionFields.length > 0
                 "
-                class="body-01-reg ml-[1rem] list-item"
+                class="ds-body-01-reg ml-[1rem] list-item"
               >
                 Rechtszug
                 <ul>
                   <li
                     v-for="fields in missingProceedingDecisionFields"
                     :key="missingProceedingDecisionFields.indexOf(fields)"
-                    class="body-01-reg ml-[1rem] list-item"
+                    class="ds-body-01-reg ml-[1rem] list-item"
                   >
                     <div v-if="fields && fields.missingFields.length > 0">
                       <span>{{ fields.identifier }}</span>
                       -
-                      <span class="label-02-bold">{{
+                      <span class="ds-label-02-bold">{{
                         fields.missingFields.join(", ")
                       }}</span>
                     </div>
@@ -189,19 +189,19 @@ const fieldsMissing = computed(() =>
               </li>
               <li
                 v-if="missingNormsFields && missingNormsFields.length > 0"
-                class="body-01-reg ml-[1rem] list-item"
+                class="ds-body-01-reg ml-[1rem] list-item"
               >
                 Normen
                 <ul>
                   <li
                     v-for="fields in missingNormsFields"
                     :key="missingNormsFields.indexOf(fields)"
-                    class="body-01-reg ml-[1rem] list-item"
+                    class="ds-body-01-reg ml-[1rem] list-item"
                   >
                     <div v-if="fields && fields.missingFields.length > 0">
                       <span>{{ fields.identifier }}</span>
                       -
-                      <span class="label-02-bold">{{
+                      <span class="ds-label-02-bold">{{
                         fields.missingFields.join(", ")
                       }}</span>
                     </div>
@@ -213,19 +213,19 @@ const fieldsMissing = computed(() =>
                   missingActiveCitationFields &&
                   missingActiveCitationFields.length > 0
                 "
-                class="body-01-reg ml-[1rem] list-item"
+                class="ds-body-01-reg ml-[1rem] list-item"
               >
                 Aktivzitierung
                 <ul>
                   <li
                     v-for="fields in missingActiveCitationFields"
                     :key="missingActiveCitationFields.indexOf(fields)"
-                    class="body-01-reg ml-[1rem] list-item"
+                    class="ds-body-01-reg ml-[1rem] list-item"
                   >
                     <div v-if="fields && fields.missingFields.length > 0">
                       <span>{{ fields.identifier }}</span>
                       -
-                      <span class="label-02-bold">{{
+                      <span class="ds-label-02-bold">{{
                         fields.missingFields.join(", ")
                       }}</span>
                     </div>
@@ -246,7 +246,7 @@ const fieldsMissing = computed(() =>
       </div>
       <div v-else class="flex flex-row gap-8">
         <span class="material-icons text-green-700"> check </span>
-        <p class="body-01-reg">Alle Pflichtfelder sind korrekt ausgefüllt</p>
+        <p class="ds-body-01-reg">Alle Pflichtfelder sind korrekt ausgefüllt</p>
       </div>
     </div>
     <div class="border-b-1 border-b-gray-400"></div>
@@ -272,7 +272,7 @@ const fieldsMissing = computed(() =>
       @click="publishDocumentUnit"
     />
     <div aria-label="Letzte Veröffentlichungen" class="flex flex-col gap-24">
-      <h2 class="heading-03-regular">Letzte Veröffentlichungen</h2>
+      <h2 class="ds-heading-03-reg">Letzte Veröffentlichungen</h2>
       <p v-if="isFirstTimePublication">
         Diese Dokumentationseinheit wurde bisher nicht veröffentlicht
       </p>
@@ -304,22 +304,22 @@ const fieldsMissing = computed(() =>
             <div
               v-else-if="item.type == PublicationHistoryRecordType.PUBLICATION"
             >
-              <div class="label-section pt-20 text-gray-900">ÜBER</div>
-              <div class="label-02-regular">
+              <div class="ds-label-section pt-20 text-gray-900">ÜBER</div>
+              <div class="ds-label-02-reg">
                 <div>
-                  <span class="label-02-bold">E-Mail an:</span>
+                  <span class="ds-label-02-bold">E-Mail an:</span>
                   {{ item.receiverAddress }}
                 </div>
                 <div>
-                  <span class="label-02-bold"> Betreff: </span>
+                  <span class="ds-label-02-bold"> Betreff: </span>
                   {{ item.mailSubject }}
                 </div>
                 <div>
-                  <span class="label-02-bold">Status:</span>
+                  <span class="ds-label-02-bold">Status:</span>
                   {{ item.publishStateDisplayText }}
                 </div>
               </div>
-              <div class="label-section text-gray-900">ALS</div>
+              <div class="ds-label-section text-gray-900">ALS</div>
               <CodeSnippet v-if="!!item?.xml" title="XML" :xml="item.xml" />
             </div>
           </ExpandableContent>

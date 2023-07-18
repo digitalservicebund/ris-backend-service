@@ -135,7 +135,7 @@ function decisionSummarizer(dataEntry: ProceedingDecision) {
       ? h(
           RouterLink,
           {
-            class: ["link-01-bold", "underline"],
+            class: ["ds-link-01-bold", "underline"],
             target: "_blank",
             tabindex: -1,
             to: {
@@ -175,7 +175,7 @@ watch(
 
 <template>
   <div class="mb-[4rem]">
-    <h1 class="heading-02-regular mb-[1rem]">Rechtszug</h1>
+    <h1 class="ds-heading-02-reg mb-[1rem]">Rechtszug</h1>
     <ExpandableDataSet
       as-column
       :data-set="localProceedingDecisions"

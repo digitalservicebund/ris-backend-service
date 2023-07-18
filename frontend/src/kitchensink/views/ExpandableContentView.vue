@@ -5,7 +5,7 @@ import ExpandableContent from "@/components/ExpandableContent.vue"
 <template>
   <ExpandableContent>
     <template #header>
-      <h1 class="heading-03-bold">Expandable Content</h1>
+      <h1 class="ds-heading-03-bold">Expandable Content</h1>
     </template>
 
     <div>

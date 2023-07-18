@@ -10,7 +10,7 @@ defineProps<{
   <div>
     <router-link
       v-if="decision.isReadOnly"
-      class="link-01-bold underline"
+      class="ds-link-01-bold underline"
       tabindex="-1"
       target="_blank"
       :to="{
@@ -23,6 +23,6 @@ defineProps<{
       </button>
     </router-link>
 
-    <span v-else class="label-02-reg">{{ decision.renderDecision }}</span>
+    <span v-else class="ds-label-02-reg">{{ decision.renderDecision }}</span>
   </div>
 </template>

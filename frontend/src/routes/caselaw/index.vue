@@ -44,7 +44,7 @@ onMounted(async () => {
 <template>
   <div class="flex flex-col gap-16 p-16">
     <div class="flex justify-between">
-      <h1 class="heading-02-regular">Übersicht Rechtsprechung</h1>
+      <h1 class="ds-heading-02-reg">Übersicht Rechtsprechung</h1>
 
       <TextButton
         label="Neue Dokumentationseinheit"

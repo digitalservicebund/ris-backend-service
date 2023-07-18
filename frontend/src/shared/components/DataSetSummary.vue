@@ -73,7 +73,7 @@ export function withSummarizer(
     <div
       v-for="(summary, index) in summaries"
       :key="index"
-      class="flex-start label-02-reg flex w-full border-b-1 border-b-gray-400 py-10 first:pt-0 last:border-none last:pb-0"
+      class="flex-start ds-label-02-reg flex w-full border-b-1 border-b-gray-400 py-10 first:pt-0 last:border-none last:pb-0"
     >
       <component :is="summary" />
     </div>

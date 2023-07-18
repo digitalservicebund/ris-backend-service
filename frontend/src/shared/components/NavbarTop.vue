@@ -45,10 +45,10 @@ onMounted(async () => {
     <div v-if="user" class="grid grid-cols-[auto,1fr] gap-10">
       <span aria-hidden="true" class="material-icons"> perm_identity </span>
       <div>
-        <div class="label-03-bold">
+        <div class="ds-label-01-bold">
           {{ user.name }}
         </div>
-        <div v-if="user.documentationOffice" class="label-03-reg">
+        <div v-if="user.documentationOffice" class="ds-label-03-reg">
           {{ user.documentationOffice.label }}
         </div>
       </div>

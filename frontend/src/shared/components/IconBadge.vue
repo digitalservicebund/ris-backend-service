@@ -17,7 +17,7 @@ export interface IconBadgeProps {
 
 <template>
   <div
-    class="label-03-reg flex w-[fit-content] items-center rounded-md border-1 border-black bg-white px-8 py-2"
+    class="ds-label-03-reg flex w-[fit-content] items-center rounded-md border-1 border-black bg-white px-8 py-2"
     :style="{ color }"
   >
     <span class="material-icons mr-8">{{ icon }}</span

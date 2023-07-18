@@ -71,13 +71,13 @@ function onFileSelect(event: Event) {
   >
     <span v-if="isLoading">
       <span class="material-icons text-72 text-blue-800"> refresh </span>
-      <div class="heading-03-regular mt-[0.5rem]">Upload läuft</div>
+      <div class="ds-heading-03-reg mt-[0.5rem]">Upload läuft</div>
       <div>{{ status.file ? status.file.name : "" }}</div>
     </span>
     <span v-else>
       <span class="material-icons text-72 text-blue-800"> upload_file </span>
 
-      <div class="heading-03-regular mt-[0.5rem]">
+      <div class="ds-heading-03-reg mt-[0.5rem]">
         Datei in diesen Bereich ziehen
       </div>
       <FileInput
@@ -86,7 +86,7 @@ function onFileSelect(event: Event) {
         aria-label="Upload File"
         @input="onFileSelect"
       >
-        <span class="link-03-bold mt-[0.438rem] hover:underline"
+        <span class="ds-link-03-bold mt-[0.438rem] hover:underline"
           >oder Datei auswählen</span
         >
       </FileInput>

@@ -42,7 +42,7 @@ const resizeObserver = new ResizeObserver((entries) => {
   <div v-if="!modelValue">Loading...</div>
 
   <div v-else class="mb-[4rem]">
-    <h1 class="core-data heading-02-regular mb-[1rem]">Stammdaten</h1>
+    <h1 class="core-data ds-heading-02-reg mb-[1rem]">Stammdaten</h1>
 
     <InputGroup
       v-model="courtValues"

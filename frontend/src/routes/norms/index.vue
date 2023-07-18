@@ -12,7 +12,7 @@ const router = useRouter()
 <template>
   <div class="flex flex-col gap-16 bg-gray-100">
     <div class="flex justify-between p-16 pl-64">
-      <h1 class="heading-02-regular">Dokumentationseinheiten</h1>
+      <h1 class="ds-heading-02-reg">Dokumentationseinheiten</h1>
       <TextButton
         label="Neue Dokumentationseinheit"
         @click="router.push({ name: 'norms-import' })"

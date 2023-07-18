@@ -16,7 +16,7 @@ function formatTitle(title?: string): string {
     <div v-for="norm in norms" :key="norm.guid">
       <div class="mb-24">
         <router-link
-          class="heading-03-regular"
+          class="ds-heading-03-reg"
           :to="{
             name: 'norms-norm-normGuid',
             params: { normGuid: norm.guid },

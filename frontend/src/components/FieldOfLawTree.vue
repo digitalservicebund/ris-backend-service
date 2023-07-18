@@ -55,7 +55,7 @@ const buildDirectPathTreeTo = async (clickedIdentifier: string) => {
 
 <template>
   <div class="flex items-center justify-between pb-10">
-    <h1 class="heading-03-regular">Sachgebietsbaum</h1>
+    <h1 class="ds-heading-03-reg">Sachgebietsbaum</h1>
     <div class="flex items-center">
       <button
         aria-label="Normen anzeigen"

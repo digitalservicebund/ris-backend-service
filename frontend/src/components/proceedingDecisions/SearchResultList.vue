@@ -20,7 +20,7 @@ export type SearchResults<Type extends LinkedDocumentUnit> = {
 
 <template>
   <div>
-    <span v-if="!searchResults?.length" class="label-03-bold"
+    <span v-if="!searchResults?.length" class="ds-label-01-bold"
       >Suche hat keine Treffer ergeben</span
     >
     <div class="mt-16 table">
@@ -43,7 +43,7 @@ export type SearchResults<Type extends LinkedDocumentUnit> = {
         </div>
         <span
           v-if="searchResult.isLinked"
-          class="label-03-reg ml-24 rounded-full bg-green-700 px-24 py-4 text-white"
+          class="ds-label-03-reg ml-24 rounded-full bg-green-700 px-24 py-4 text-white"
           >Bereits hinzugefügt</span
         >
       </div>

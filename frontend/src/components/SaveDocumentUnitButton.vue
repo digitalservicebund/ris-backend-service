@@ -45,13 +45,13 @@ const getErrorDetails = () => {
     />
     <div class="justify-start">
       <div v-if="lastSaveError !== undefined">
-        <p class="label-03-reg text-red-800">
+        <p class="ds-label-03-reg text-red-800">
           Fehler beim Speichern{{ getErrorDetails() }}
         </p>
       </div>
 
       <div v-if="lastSavedOn !== undefined && lastSaveError === undefined">
-        <p class="label-03-reg">
+        <p class="ds-label-03-reg">
           Zuletzt
           <span>{{ getCurrentTime(lastSavedOn) }}</span>
           Uhr

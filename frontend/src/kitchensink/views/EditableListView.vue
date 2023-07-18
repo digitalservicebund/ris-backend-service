@@ -10,7 +10,7 @@ const defaultValue = ""
 
 <template>
   <div class="mb-56">
-    <h2 class="heading-02-regular mb-[1rem]">Editable List with entries</h2>
+    <h2 class="ds-heading-02-reg mb-[1rem]">Editable List with entries</h2>
     <EditableList
       v-model="listWithEntries"
       :default-value="defaultValue"
@@ -18,7 +18,7 @@ const defaultValue = ""
     />
   </div>
 
-  <h2 class="heading-02-regular mb-[1rem]">Editable List without entries</h2>
+  <h2 class="ds-heading-02-reg mb-[1rem]">Editable List without entries</h2>
   <EditableList
     v-model="emptyList"
     :default-value="defaultValue"

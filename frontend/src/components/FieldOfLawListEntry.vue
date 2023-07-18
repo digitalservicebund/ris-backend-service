@@ -24,7 +24,7 @@ function handleTokenClick(tokenContent: string) {
   <div class="mt-20 flex">
     <div class="flex grow flex-col">
       <div class="flex">
-        <div class="label-02-reg flex pt-8 text-blue-800">
+        <div class="ds-label-02-reg flex pt-8 text-blue-800">
           <span
             :aria-label="
               props.fieldOfLaw.identifier +

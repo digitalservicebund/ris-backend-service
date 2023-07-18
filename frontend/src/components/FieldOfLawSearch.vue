@@ -38,7 +38,7 @@ async function submitSearch(page: number) {
 </script>
 
 <template>
-  <h1 class="heading-03-regular pb-8">Suche</h1>
+  <h1 class="ds-heading-03-reg pb-8">Suche</h1>
   <div class="flex flex-col">
     <div class="pb-28">
       <div class="flex flex-row items-stretch">

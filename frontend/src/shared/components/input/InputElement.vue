@@ -108,7 +108,7 @@ export default {
     v-model:validation-error="validationError"
   />
   <!-- TODO this is a workaround, errors shoudld be displayes in in the InputField component in the future -->
-  <div v-if="!disableError" class="label-03-reg h-16 text-red-800">
+  <div v-if="!disableError" class="ds-label-03-reg h-16 text-red-800">
     {{ errorMessage?.defaultMessage }}
   </div>
 </template>

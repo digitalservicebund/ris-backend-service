@@ -53,7 +53,7 @@ if (loadedNorm.value !== undefined) {
 <template>
   <div v-if="loadedNorm">
     <div class="max-w-screen-md">
-      <h1 class="heading-02-bold mb-44 text-center">
+      <h1 class="ds-heading-02-reg mb-44 text-center font-bold">
         {{
           loadedNorm.metadataSections?.NORM?.[0]?.OFFICIAL_LONG_TITLE?.[0] ?? ""
         }}
@@ -63,15 +63,15 @@ if (loadedNorm.value !== undefined) {
           class="mt-40 text-center"
           :class="[
             ['Eingangsformel', 'Schlussformel'].includes(article.marker)
-              ? 'label-01-bold mb-16'
-              : 'label-01-regular',
+              ? 'ds-label-01-bold mb-16'
+              : 'ds-label-01-reg',
           ]"
         >
           {{ article.marker }}
         </h2>
         <h2
           v-if="article.title != null"
-          class="label-01-bold mb-16 text-center"
+          class="ds-label-01-bold mb-16 text-center"
         >
           {{ article.title }}
         </h2>

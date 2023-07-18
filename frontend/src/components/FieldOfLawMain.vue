@@ -114,7 +114,7 @@ const SelectedFieldsOfLawSummary = withSummarizer(selectedFieldsOfLawSummarizer)
       </div>
       <hr class="w-full border-blue-700" />
       <div class="bg-white p-20">
-        <h1 class="heading-03-regular pb-8">Ausgewählte Sachgebiete</h1>
+        <h1 class="ds-heading-03-reg pb-8">Ausgewählte Sachgebiete</h1>
         <FieldOfLawDirectInputSearch @add-to-list="handleAdd" />
         <FieldOfLawSelectionList
           :selected-fields-of-law="selectedFieldsOfLaw"

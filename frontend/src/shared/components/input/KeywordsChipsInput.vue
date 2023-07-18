@@ -105,7 +105,7 @@ watch(currentInput, () => {
       <span class="material-icons leading-default text-gray-900"
         >error_outline</span
       >
-      <p class="label-02-reg m-4 text-gray-900">{{ errorMessage?.title }}</p>
+      <p class="ds-label-02-reg m-4 text-gray-900">{{ errorMessage?.title }}</p>
     </div>
 
     <ChipsList

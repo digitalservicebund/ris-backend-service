@@ -57,13 +57,13 @@ async function getFileLink() {
 <template>
   <div class="max-w-screen-lg">
     <div>
-      <h1 class="heading-02-regular mb-[1rem]">Export</h1>
+      <h1 class="ds-heading-02-reg mb-[1rem]">Export</h1>
       <p>Exportieren Sie die Dokumentationseinheit zur Abgabe an die jDV.</p>
     </div>
     <div class="mt-[2rem] bg-white p-[2rem]">
       <div class="mb-32">
-        <h2 class="heading-03-regular">Zip-Datei steht zum Download bereit.</h2>
-        <p v-if="fileReference" class="body-01-reg">
+        <h2 class="ds-heading-03-reg">Zip-Datei steht zum Download bereit.</h2>
+        <p v-if="fileReference" class="ds-body-01-reg">
           zuletzt generiert am
           {{ formatDateTime(fileReference.createdAt) }}
         </p>
@@ -78,7 +78,10 @@ async function getFileLink() {
       />
 
       <div class="mt-[1rem]">
-        <a class="link-01-bold underline" href="#" @click.prevent="getFileLink"
+        <a
+          class="ds-link-01-bold underline"
+          href="#"
+          @click.prevent="getFileLink"
           >Neue Zip-Datei generieren
           <span
             v-if="isLoading"

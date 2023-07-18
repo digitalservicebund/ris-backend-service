@@ -33,7 +33,7 @@ async function upload(file: File) {
   <div class="flex justify-center bg-gray-100">
     <div>
       <div class="pb-[5rem] pt-[4rem]">
-        <h1 class="heading-02-regular">Neue Dokumentationseinheit erstellen</h1>
+        <h1 class="ds-heading-02-reg">Neue Dokumentationseinheit erstellen</h1>
         <p>
           Importieren Sie eine Zip-Datei, um die Dokumentationseinheit zu
           erstellen.

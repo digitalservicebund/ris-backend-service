@@ -26,11 +26,11 @@ const data = computed(() =>
 
 <template>
   <div class="mb-[4rem]">
-    <h1 class="heading-02-regular mb-[1rem]">Kurz- & Langtexte</h1>
+    <h1 class="ds-heading-02-reg mb-[1rem]">Kurz- & Langtexte</h1>
 
     <div class="flex flex-col gap-36">
       <div v-for="item in data" :key="item.id" class="">
-        <label class="label-02-regular mb-2" :for="item.id">{{
+        <label class="ds-label-02-reg mb-2" :for="item.id">{{
           item.label
         }}</label>
 

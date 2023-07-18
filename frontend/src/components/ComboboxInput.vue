@@ -269,7 +269,7 @@ export type InputModelProps =
           <div
             v-if="item.additionalInformation"
             aria-label="additional-dropdown-info"
-            class="body-02-reg text-neutral-700"
+            class="ds-body-02-reg text-neutral-700"
           >
             {{ item.additionalInformation }}
           </div>

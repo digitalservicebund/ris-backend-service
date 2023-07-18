@@ -118,7 +118,7 @@ export enum LabelPosition {
 
     <div
       v-if="localValidationError"
-      class="label-03-reg my-6 h-16 text-red-800"
+      class="ds-label-03-reg my-6 h-16 text-red-800"
     >
       {{ localValidationError.defaultMessage }}
     </div>

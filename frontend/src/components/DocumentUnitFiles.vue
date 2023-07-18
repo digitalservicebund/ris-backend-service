@@ -48,7 +48,7 @@ async function upload(file: File) {
   <DocumentUnitWrapper :document-unit="documentUnit">
     <template #default="{ classes }">
       <div class="flex flex-col" :class="classes">
-        <h1 class="heading-02-regular mb-[1rem]">Dokumente</h1>
+        <h1 class="ds-heading-02-reg mb-[1rem]">Dokumente</h1>
 
         <FileViewer
           v-if="documentUnit.hasFile"

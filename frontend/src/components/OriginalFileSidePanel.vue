@@ -40,7 +40,7 @@ const uploadFileRoute = computed(() =>
   <div v-bind="$attrs">
     <div class="sticky top-0 flex w-full flex-col gap-40">
       <div class="flex items-center">
-        <h2 class="heading-02-regular grow">Originaldokument</h2>
+        <h2 class="ds-heading-02-reg grow">Originaldokument</h2>
       </div>
 
       <div v-if="!hasFile" class="flex flex-col gap-24">
@@ -50,7 +50,7 @@ const uploadFileRoute = computed(() =>
 
         <router-link
           v-if="uploadFileRoute"
-          class="link-01-bold flex items-center gap-2"
+          class="ds-link-01-bold flex items-center gap-2"
           :to="uploadFileRoute"
         >
           <span class="material-icons">arrow_forward</span>

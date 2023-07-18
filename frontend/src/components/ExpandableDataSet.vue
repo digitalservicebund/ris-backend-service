@@ -42,14 +42,14 @@ function collapse(): void {
     <template #header>
       <div class="flex w-full gap-8" :class="{ 'flex-col': asColumn }">
         <h2
-          class="label-02-bold w-[15rem] flex-none text-left"
+          class="ds-label-02-bold w-[15rem] flex-none text-left"
           :class="{ 'mb-24': asColumn && !isExpanded }"
         >
           {{ title }}
         </h2>
         <span
           v-if="dataSet?.length === 0 && fallbackText !== undefined"
-          class="label-02-reg text-start"
+          class="ds-label-02-reg text-start"
           >{{ fallbackText }}</span
         >
         <Component :is="summaryComponent" v-if="!isExpanded" :data="dataSet" />

@@ -21,7 +21,7 @@ const classes = computed(() => ({
 
 <template>
   <div class="flex items-baseline" :class="classes">
-    <div class="label-03-caps pr-[0.4rem]">{{ label }}</div>
-    <div class="label-03-bold">{{ noValue ? " - " : value }}</div>
+    <div class="ds-label-03-reg pr-[0.4rem] uppercase">{{ label }}</div>
+    <div class="ds-label-01-bold">{{ noValue ? " - " : value }}</div>
   </div>
 </template>
