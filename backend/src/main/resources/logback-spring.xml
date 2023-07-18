@@ -14,10 +14,16 @@
                     <pattern>app=ris-backend,level=%level</pattern>
                 </label>
                 <message>
-                    <pattern>l=%level c=%logger{20} t=%thread | %msg %ex</pattern>
+                    <pattern>l=%level c=%logger{20} t=%thread | %msg</pattern>
                 </message>
                 <sortByTime>true</sortByTime>
             </format>
+        </appender>
+        <appender name="SENTRY" class="io.sentry.logback.SentryAppender">
+            <options>
+                <dsn>${SENTRY_DSN}</dsn>
+                <environment>logger</environment>
+            </options>
         </appender>
         <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
             <encoder>
@@ -27,6 +33,7 @@
 
         <root level="INFO">
             <appender-ref ref="LOKI" />
+            <appender-ref ref="SENTRY" />
         </root>
     </springProfile>
 </configuration>

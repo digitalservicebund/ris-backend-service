@@ -91,6 +91,10 @@
     },
     {
       "moduleLicense": null,
+      "moduleName": "io.sentry:sentry-bom"
+    },
+    {
+      "moduleLicense": null,
       "moduleVersion": "3.0.0",
       "moduleName": "com.squareup.okio:okio"
     },

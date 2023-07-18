@@ -27,8 +27,10 @@ management:
 otc:
   obs:
     endpoint: https://obs.eu-de.otc.t-systems.com
+
 sentry:
-  dsn: ${SENTRY_DSN:}
+  exception-resolver-order: -2147483647
+
 server:
   shutdown: graceful
   reactive:
