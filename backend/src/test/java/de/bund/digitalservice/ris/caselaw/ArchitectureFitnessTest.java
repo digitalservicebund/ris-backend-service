@@ -1,5 +1,6 @@
 package de.bund.digitalservice.ris.caselaw;
 
+import com.tngtech.archunit.base.DescribedPredicate;
 import com.tngtech.archunit.core.domain.JavaClass;
 import com.tngtech.archunit.core.domain.JavaClass.Predicates;
 import com.tngtech.archunit.core.domain.JavaClasses;
@@ -21,6 +22,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.repository.reactive.ReactiveCrudRepository;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
+import org.springframework.stereotype.Repository;
+import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RestController;
 
 class ArchitectureFitnessTest {
@@ -125,6 +128,39 @@ class ArchitectureFitnessTest {
             .beInterfaces()
             .andShould()
             .notBeAssignableTo(Object.class);
+    rule.check(classes);
+  }
+
+  @Test
+  @Disabled("Domain service interfaces should only be implemented in the adapter package")
+  void ImplementationOfDomainServiceInterfacesOnlyAllowedInTheAdapterPackage() {
+    DescribedPredicate<JavaClass> predicate =
+        Predicates.resideInAPackage(DOMAIN_LAYER_PACKAGES).and(Predicates.INTERFACES);
+    ArchRule rule =
+        ArchRuleDefinition.classes()
+            .that()
+            .implement(predicate)
+            .and()
+            .areAnnotatedWith(Service.class)
+            .should()
+            .resideInAPackage(ADAPTER_LAYER_PACKAGES);
+    rule.check(classes);
+  }
+
+  @Test
+  void ImplementationOfDomainRepositoryInterfacesOnlyAllowedInTheAdapterPackage() {
+    DescribedPredicate<JavaClass> predicate =
+        Predicates.resideInAPackage(DOMAIN_LAYER_PACKAGES)
+            .and(Predicates.INTERFACES)
+            .and(Predicates.simpleNameEndingWith("Repository"));
+    ArchRule rule =
+        ArchRuleDefinition.classes()
+            .that()
+            .implement(predicate)
+            .and()
+            .areAnnotatedWith(Repository.class)
+            .should()
+            .resideInAPackage(ADAPTER_LAYER_PACKAGES);
     rule.check(classes);
   }
 

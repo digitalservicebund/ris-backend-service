@@ -3,21 +3,27 @@ package de.bund.digitalservice.ris.caselaw.adapter.converter.docx;
 import java.math.BigInteger;
 
 /**
- * TWIP
+ * Convert some unit formats which are used in the docx specification to screen pixel.
  *
- * <p>https://en.wikipedia.org/wiki/Twip https://www.pixelto.net/px-to-twip-converter
+ * <p>
  *
- * <p>twip is known as twentieth of a point twip is equal to 1/1440 inch
+ * <h1>twip</h1>
  *
- * <p>for 96 dpi 1 px = 1 in / 96
+ * Find more information: <a href="https://en.wikipedia.org/wiki/Twip">twip</a> and <a
+ * href="https://www.pixelto.net/px-to-twip-converter">twip converter</a>
  *
- * <p>1 px = (1440 twip) / 96 Than we get the twip pixel equation
+ * <ul>
+ *   <li>twip is known as twentieth of a point twip is equal to 1/1440 inch
+ *   <li>for 96 dpi 1 px = 1 in / 96
+ *   <li>1 px = (1440 twip) / 96 Than we get the twip pixel equation
+ *   <li>1 px = 15 twip
+ * </ul>
  *
- * <p>1px = 15 twip
+ * <h1>EMU (English Metric Unit)</h1>
  *
- * <p>EMU (English Metric Unit
- *
- * <p>1 in = 914400 EMU 1 cm = 360000 EMU
+ * <ul>
+ *   <li>1 in = 914400 EMU 1 cm = 360000 EMU
+ * </ul>
  */
 public class DocxUnitConverter {
   private DocxUnitConverter() {}
