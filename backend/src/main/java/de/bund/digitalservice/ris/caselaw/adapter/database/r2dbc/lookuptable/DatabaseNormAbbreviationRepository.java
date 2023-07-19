@@ -17,7 +17,9 @@ public interface DatabaseNormAbbreviationRepository
   Flux<NormAbbreviationDTO> findBySearchQuery(String query, Integer size, Integer pageOffset);
 
   @Query(
-      "select"
+      "select *"
+          + " from ("
+          + " select"
           + " id,"
           + " abbreviation,"
           + " decision_date,"
@@ -28,15 +30,18 @@ public interface DatabaseNormAbbreviationRepository
           + " official_short_title,"
           + " source,"
           + " case"
+          + "  when lower(abbreviation) = :directInput then 4"
+          + "  when lower(official_letter_abbreviation) = :directInput then 3"
           + "  when lower(abbreviation) like '' || :directInput || '%' then 2"
           + "  when lower(official_letter_abbreviation) like '' || :directInput || '%' then 1"
           + "  else 0"
           + " end +"
           + " ts_rank_cd(weighted_vector, to_tsquery('german', '' || :tsQuery || '')) rank"
           + " from norm_abbreviation_search"
-          + " where weighted_vector @@ to_tsquery('german', '' || :tsQuery || '')"
           + " order by rank desc"
-          + " limit :size offset :pageOffset")
+          + " limit :size offset :pageOffset"
+          + " ) subquery"
+          + " where rank > 0")
   Flux<NormAbbreviationDTO> findByAwesomeSearchQuery(
       String directInput, String tsQuery, Integer size, Integer pageOffset);
 
