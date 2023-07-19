@@ -33,18 +33,20 @@ public class NumberingListEntryIndexGenerator {
       return DocumentUnitNumberingListNumberFormat.BULLET;
     }
 
-    DocumentUnitNumberingListNumberFormat numberFormat =
-        DocumentUnitNumberingListNumberFormat.BULLET;
-
+    DocumentUnitNumberingListNumberFormat numberFormat;
     switch (listLevel.getNumFmt()) {
+      case BULLET -> numberFormat = DocumentUnitNumberingListNumberFormat.BULLET;
       case DECIMAL -> numberFormat = DocumentUnitNumberingListNumberFormat.DECIMAL;
       case UPPER_LETTER -> numberFormat = DocumentUnitNumberingListNumberFormat.UPPER_LETTER;
       case LOWER_LETTER -> numberFormat = DocumentUnitNumberingListNumberFormat.LOWER_LETTER;
       case UPPER_ROMAN -> numberFormat = DocumentUnitNumberingListNumberFormat.UPPER_ROMAN;
       case LOWER_ROMAN -> numberFormat = DocumentUnitNumberingListNumberFormat.LOWER_ROMAN;
-      default -> log.error(
-          "not implemented number format ({}) in list. use default bullet list",
-          listLevel.getNumFmt());
+      default -> {
+        log.error(
+            "not implemented number format ({}) in list. use default bullet list",
+            listLevel.getNumFmt());
+        numberFormat = DocumentUnitNumberingListNumberFormat.BULLET;
+      }
     }
 
     return numberFormat;
