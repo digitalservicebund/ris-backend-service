@@ -79,6 +79,7 @@ async function addNormReference() {
 onMounted(() => {
   validateNorm()
   norm.value = (props.modelValue as NormReference) ?? {}
+  console.log(norm.value)
 })
 </script>
 
@@ -156,6 +157,7 @@ onMounted(() => {
     <TextButton
       aria-label="Norm speichern"
       class="mr-28"
+      :disabled="norm.isEmpty"
       label="Übernehmen"
       @click="addNormReference"
     />

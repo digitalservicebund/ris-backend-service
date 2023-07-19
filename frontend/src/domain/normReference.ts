@@ -11,6 +11,12 @@ export default class NormReference implements EditableListItem {
   private validationError = false
 
   static requiredFields = ["normAbbreviation"] as const
+  static fields = [
+    "normAbbreviation",
+    "singleNorm",
+    "dateOfVersion",
+    "dateOfRelevance",
+  ] as const
 
   constructor(data: Partial<NormReference> = {}) {
     Object.assign(this, data)
@@ -67,12 +73,24 @@ export default class NormReference implements EditableListItem {
 
   get missingRequiredFields(): string[] {
     return NormReference.requiredFields.filter((field) =>
-      this.requiredFieldIsEmpty(this[field]),
+      this.fieldIsEmpty(this[field]),
     )
   }
 
-  private requiredFieldIsEmpty(
-    value: NormReference[(typeof NormReference.requiredFields)[number]],
+  get isEmpty(): boolean {
+    let isEmpty = true
+
+    NormReference.fields.map((key) => {
+      this.fieldIsEmpty(this[key])
+      if (!this.fieldIsEmpty(this[key])) {
+        isEmpty = false
+      }
+    })
+    return isEmpty
+  }
+
+  private fieldIsEmpty(
+    value: NormReference[(typeof NormReference.fields)[number]],
   ) {
     if (value === undefined || !value || value === null) {
       return true
