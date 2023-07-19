@@ -26,7 +26,7 @@ type ChildSectionName =
 
 const childSection = ref<Metadata>({})
 const selectedChildSectionName = ref<ChildSectionName>(
-  MetadataSectionName.REPEAL,
+  MetadataSectionName.STATUS,
 )
 
 watch(

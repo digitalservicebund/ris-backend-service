@@ -21,9 +21,9 @@ describe("StatusIndicationInputGroup", () => {
     renderComponent({})
   })
 
-  it("defaults to the repeal group", () => {
+  it("defaults to the status group", () => {
     renderComponent({})
-    const typeRadio = screen.getByRole("radio", { name: "Aufhebung" })
+    const typeRadio = screen.getByRole("radio", { name: "Stand" })
     expect(typeRadio).toBeChecked()
   })
 
