@@ -79,7 +79,6 @@ async function addNormReference() {
 onMounted(() => {
   validateNorm()
   norm.value = (props.modelValue as NormReference) ?? {}
-  console.log(norm.value)
 })
 </script>
 
