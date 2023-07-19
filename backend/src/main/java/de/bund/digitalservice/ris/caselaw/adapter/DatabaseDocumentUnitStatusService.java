@@ -70,9 +70,6 @@ public class DatabaseDocumentUnitStatusService implements DocumentUnitStatusServ
 
   @Override
   public Mono<Void> update(UUID documentUuid, DocumentUnitStatus status) {
-    if (status.withError()) {
-      log.warn("Mail delivery ({}) was not successful", documentUuid);
-    }
     return getLatestPublishing(documentUuid)
         .flatMap(previousStatusDTO -> saveStatus(status, previousStatusDTO))
         .then();
@@ -95,6 +92,13 @@ public class DatabaseDocumentUnitStatusService implements DocumentUnitStatusServ
 
   public Mono<String> getLatestIssuerAddress(String documentNumber) {
     return getLatestPublishing(documentNumber).map(DocumentUnitStatusDTO::getIssuerAddress);
+  }
+
+  @Override
+  public Mono<PublicationStatus> getLatestStatus(UUID documentUuid) {
+    return repository
+        .findFirstByDocumentUnitIdOrderByCreatedAtDesc(documentUuid)
+        .map(DocumentUnitStatusDTO::getStatus);
   }
 
   private Mono<DocumentUnitStatusDTO> getLatestPublishing(String documentNumber) {

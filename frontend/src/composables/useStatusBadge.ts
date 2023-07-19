@@ -30,7 +30,7 @@ export function useStatusBadge(status: DocumentUnit["status"]) {
     }
     if (status?.status == "PUBLISHING") {
       if (status?.withError) {
-        badge.value = "Fehler beim veröffentlichen"
+        badge.value = "Fehler beim Veröffentlichen"
         badge.icon = "error_outline"
       } else {
         badge.value = "in Veröffentlichung"

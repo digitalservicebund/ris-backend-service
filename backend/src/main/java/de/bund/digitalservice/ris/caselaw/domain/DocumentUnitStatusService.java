@@ -16,4 +16,6 @@ public interface DocumentUnitStatusService {
   Mono<Void> update(UUID documentUuid, DocumentUnitStatus status);
 
   Mono<String> getLatestIssuerAddress(String documentNumber);
+
+  Mono<PublicationStatus> getLatestStatus(UUID documentUuid);
 }

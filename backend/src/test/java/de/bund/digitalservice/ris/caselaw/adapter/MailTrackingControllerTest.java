@@ -6,10 +6,8 @@ import static org.mockito.Mockito.when;
 import de.bund.digitalservice.ris.caselaw.RisWebTestClient;
 import de.bund.digitalservice.ris.caselaw.TestConfig;
 import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatus;
 import de.bund.digitalservice.ris.caselaw.domain.EmailPublishState;
 import de.bund.digitalservice.ris.caselaw.domain.MailTrackingService;
-import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -20,6 +18,7 @@ import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.client.registration.ReactiveClientRegistrationRepository;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.core.publisher.Mono;
@@ -30,7 +29,6 @@ import reactor.core.publisher.Mono;
 class MailTrackingControllerTest {
   @Autowired private RisWebTestClient risWebTestClient;
   @MockBean private MailTrackingService service;
-  @MockBean private DatabaseDocumentUnitStatusService statusService;
   @MockBean private ReactiveClientRegistrationRepository clientRegistrationRepository;
 
   private static final UUID TEST_UUID = UUID.fromString("88888888-4444-4444-4444-121212121212");
@@ -50,13 +48,8 @@ class MailTrackingControllerTest {
             mailTrackingEvent, TEST_UUID);
 
     when(service.getMappedPublishState(mailTrackingEvent)).thenReturn(expectedEmailPublishState);
-    when(statusService.update(
-            TEST_UUID,
-            DocumentUnitStatus.builder()
-                .withError(false)
-                .status(PublicationStatus.PUBLISHING)
-                .build()))
-        .thenReturn(Mono.empty());
+    when(service.updatePublishingState(TEST_UUID, mailTrackingEvent))
+        .thenReturn(Mono.just(ResponseEntity.ok().build()));
 
     risWebTestClient
         .withDefaultLogin()
@@ -68,14 +61,7 @@ class MailTrackingControllerTest {
         .expectStatus()
         .isOk();
 
-    verify(service).getMappedPublishState(mailTrackingEvent);
-    verify(statusService)
-        .update(
-            TEST_UUID,
-            DocumentUnitStatus.builder()
-                .withError(false)
-                .status(PublicationStatus.PUBLISHING)
-                .build());
+    verify(service).updatePublishingState(TEST_UUID, mailTrackingEvent);
   }
 
   @ParameterizedTest
@@ -127,6 +113,8 @@ class MailTrackingControllerTest {
           "tags": ["no-uuid"],
           "ignoredKey": 123
         }""";
+
+    when(service.getMappedPublishState("delivered")).thenReturn(EmailPublishState.SUCCESS);
 
     risWebTestClient
         .withDefaultLogin()

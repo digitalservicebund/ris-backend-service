@@ -1,9 +1,7 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
-import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatus;
 import de.bund.digitalservice.ris.caselaw.domain.EmailPublishState;
 import de.bund.digitalservice.ris.caselaw.domain.MailTrackingService;
-import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.OpenApiConfiguration;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -27,35 +25,25 @@ public class MailTrackingController {
 
   private final MailTrackingService service;
 
-  private final DatabaseDocumentUnitStatusService statusService;
-
   @Autowired
-  public MailTrackingController(
-      MailTrackingService service, DatabaseDocumentUnitStatusService statusService) {
+  public MailTrackingController(MailTrackingService service) {
     this.service = service;
-    this.statusService = statusService;
   }
 
   @PostMapping("/webhook")
   @PreAuthorize("permitAll")
   public Mono<ResponseEntity<String>> setPublishState(
       @RequestBody @Valid MailTrackingResponsePayload payload) {
-    UUID documentUnitUuid;
     try {
-      documentUnitUuid = UUID.fromString(payload.tags().get(0));
+      UUID documentUnitUuid = UUID.fromString(payload.tags().get(0));
+      return service.updatePublishingState(documentUnitUuid, payload.event());
+
     } catch (IllegalArgumentException e) {
-      // We're not responsible for other sent mails
+      // No UUID in tag == it's about a forwarded report mail and not the mail to juris
+      if (service.getMappedPublishState(payload.event()) == EmailPublishState.ERROR) {
+        log.warn("Received Mail sending error {} with tags {}", payload.event(), payload.tags());
+      }
       return Mono.just(ResponseEntity.status(HttpStatus.NO_CONTENT).build());
     }
-
-    return statusService
-        .update(
-            documentUnitUuid,
-            DocumentUnitStatus.builder()
-                .status(PublicationStatus.PUBLISHING)
-                .withError(
-                    service.getMappedPublishState(payload.event()) == EmailPublishState.ERROR)
-                .build())
-        .thenReturn(ResponseEntity.status(HttpStatus.OK).build());
   }
 }
