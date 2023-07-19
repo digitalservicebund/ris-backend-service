@@ -105,7 +105,7 @@ onMounted(() => {
       <ComboboxInput
         id="norm-reference-abbreviation"
         v-model="normAbbreviation"
-        aria-label="Norm RIS-Abkürzung"
+        aria-label="RIS-Abkürzung der Norm"
         clear-on-choosing-item
         :has-error="slotProps.hasError"
         :item-service="ComboboxItemService.getRisAbbreviations"
@@ -125,7 +125,7 @@ onMounted(() => {
         <TextInput
           id="norm-reference-singleNorm"
           v-model="norm.singleNorm"
-          aria-label="Norm Einzelnorm"
+          aria-label="Einzelnorm der Norm"
           :has-error="slotProps.hasError"
         ></TextInput>
       </InputField>
@@ -140,7 +140,7 @@ onMounted(() => {
         <DateInput
           id="norm-date-of-version"
           v-model="norm.dateOfVersion"
-          aria-label="Norm Fassungsdatum"
+          aria-label="Fassungsdatum der Norm"
           :has-error="slotProps.hasError"
           @update:validation-error="slotProps.updateValidationError"
         />
@@ -149,7 +149,7 @@ onMounted(() => {
         <YearInput
           id="norm-date-of-relevence"
           v-model="norm.dateOfRelevance"
-          aria-label="Norm Jahr"
+          aria-label="Jahr der Norm"
         />
       </InputField>
     </div>

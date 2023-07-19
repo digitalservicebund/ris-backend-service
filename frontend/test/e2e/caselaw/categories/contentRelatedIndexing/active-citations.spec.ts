@@ -18,12 +18,16 @@ test.describe("active citations", () => {
       page.getByRole("heading", { name: "Aktivzitierung" }),
     ).toBeVisible()
     await expect(page.getByLabel("Art der Zitierung")).toBeVisible()
-    await expect(page.getByLabel("Gericht Aktivzitierung")).toBeVisible()
+    await expect(page.getByLabel("Gericht der Aktivzitierung")).toBeVisible()
     await expect(
-      page.getByLabel("Entscheidungsdatum Aktivzitierung"),
+      page.getByLabel("Entscheidungsdatum der Aktivzitierung"),
     ).toBeVisible()
-    await expect(page.getByLabel("Aktenzeichen Aktivzitierung")).toBeVisible()
-    await expect(page.getByLabel("Dokumenttyp Aktivzitierung")).toBeVisible()
+    await expect(
+      page.getByLabel("Aktenzeichen der Aktivzitierung"),
+    ).toBeVisible()
+    await expect(
+      page.getByLabel("Dokumenttyp der Aktivzitierung"),
+    ).toBeVisible()
   })
 
   test("create and renders new active citations in list", async ({
@@ -123,7 +127,7 @@ test.describe("active citations", () => {
     ).toHaveCount(1)
 
     await page.getByLabel("Weitere Angabe").click()
-    await page.getByLabel("Aktenzeichen Aktivzitierung").fill("two")
+    await page.getByLabel("Aktenzeichen der Aktivzitierung").fill("two")
     await page.getByLabel("Aktivzitierung speichern").click()
     // "Aktivzitierung speichern" only saves state in frontend, no communication to backend yet
     page.reload()
@@ -134,7 +138,7 @@ test.describe("active citations", () => {
     await page.getByLabel("Weitere Angabe").click()
     await waitForSaving(
       async () => {
-        await page.getByLabel("Aktenzeichen Aktivzitierung").fill("two")
+        await page.getByLabel("Aktenzeichen der Aktivzitierung").fill("two")
         await page.getByLabel("Aktivzitierung speichern").click()
       },
       page,
@@ -157,7 +161,9 @@ test.describe("active citations", () => {
 
     await waitForSaving(
       async () => {
-        await page.getByLabel("Aktenzeichen Aktivzitierung").fill(fileNumber1)
+        await page
+          .getByLabel("Aktenzeichen der Aktivzitierung")
+          .fill(fileNumber1)
       },
       page,
       { clickSaveButton: true },
@@ -168,7 +174,9 @@ test.describe("active citations", () => {
     await page.getByLabel("Eintrag bearbeiten").click()
     await waitForSaving(
       async () => {
-        await page.getByLabel("Aktenzeichen Aktivzitierung").fill(fileNumber2)
+        await page
+          .getByLabel("Aktenzeichen der Aktivzitierung")
+          .fill(fileNumber2)
       },
       page,
       { clickSaveButton: true },
@@ -186,7 +194,7 @@ test.describe("active citations", () => {
 
     await waitForSaving(
       async () => {
-        await page.getByLabel("Aktenzeichen Aktivzitierung").fill("one")
+        await page.getByLabel("Aktenzeichen der Aktivzitierung").fill("one")
       },
       page,
       { clickSaveButton: true },
@@ -196,7 +204,7 @@ test.describe("active citations", () => {
     await page.getByLabel("Weitere Angabe").click()
     await waitForSaving(
       async () => {
-        await page.getByLabel("Aktenzeichen Aktivzitierung").fill("two")
+        await page.getByLabel("Aktenzeichen der Aktivzitierung").fill("two")
       },
       page,
       { clickSaveButton: true },
@@ -321,13 +329,13 @@ test.describe("active citations", () => {
     await expect(page.getByText(documentNumber)).toBeVisible()
 
     await page
-      .locator("[aria-label='Entscheidungsdatum Aktivzitierung']")
+      .locator("[aria-label='Entscheidungsdatum der Aktivzitierung']")
       .fill("03")
 
     await page.keyboard.press("Tab")
 
     await expect(
-      page.locator("[aria-label='Entscheidungsdatum Aktivzitierung']"),
+      page.locator("[aria-label='Entscheidungsdatum der Aktivzitierung']"),
     ).toHaveValue("03")
 
     await expect(page.locator("text=Unvollständiges Datum")).toBeVisible()
@@ -335,7 +343,7 @@ test.describe("active citations", () => {
     await page.reload()
 
     await expect(
-      page.locator("[aria-label='Entscheidungsdatum Aktivzitierung']"),
+      page.locator("[aria-label='Entscheidungsdatum der Aktivzitierung']"),
     ).toHaveValue("")
   })
 })

@@ -153,16 +153,16 @@ describe("Active Citations", async () => {
     expect(screen.getAllByLabelText("Listen Eintrag").length).toBe(1)
     expect(screen.getByLabelText("Art der Zitierung")).toBeVisible()
     expect(
-      screen.getByLabelText("Entscheidungsdatum Aktivzitierung"),
+      screen.getByLabelText("Entscheidungsdatum der Aktivzitierung"),
     ).toBeVisible()
     expect(
-      screen.getByLabelText("Entscheidungsdatum Aktivzitierung"),
+      screen.getByLabelText("Entscheidungsdatum der Aktivzitierung"),
     ).toBeInTheDocument()
     expect(
-      screen.getByLabelText("Aktenzeichen Aktivzitierung"),
+      screen.getByLabelText("Aktenzeichen der Aktivzitierung"),
     ).toBeInTheDocument()
     expect(
-      screen.getByLabelText("Dokumenttyp Aktivzitierung"),
+      screen.getByLabelText("Dokumenttyp der Aktivzitierung"),
     ).toBeInTheDocument()
   })
 
@@ -180,7 +180,7 @@ describe("Active Citations", async () => {
 
   it("creates new active citation manually", async () => {
     const { user } = renderComponent()
-    const input = screen.getByLabelText("Aktenzeichen Aktivzitierung")
+    const input = screen.getByLabelText("Aktenzeichen der Aktivzitierung")
     await user.type(input, "123")
     const button = screen.getByLabelText("Aktivzitierung speichern")
     await user.click(button)
@@ -202,16 +202,16 @@ describe("Active Citations", async () => {
 
     expect(screen.getByLabelText("Art der Zitierung")).toBeVisible()
     expect(
-      screen.getByLabelText("Entscheidungsdatum Aktivzitierung"),
+      screen.getByLabelText("Entscheidungsdatum der Aktivzitierung"),
     ).toBeVisible()
     expect(
-      screen.getByLabelText("Entscheidungsdatum Aktivzitierung"),
+      screen.getByLabelText("Entscheidungsdatum der Aktivzitierung"),
     ).toBeInTheDocument()
     expect(
-      screen.getByLabelText("Aktenzeichen Aktivzitierung"),
+      screen.getByLabelText("Aktenzeichen der Aktivzitierung"),
     ).toBeInTheDocument()
     expect(
-      screen.getByLabelText("Dokumenttyp Aktivzitierung"),
+      screen.getByLabelText("Dokumenttyp der Aktivzitierung"),
     ).toBeInTheDocument()
   })
 
@@ -268,7 +268,7 @@ describe("Active Citations", async () => {
     await user.click(editButton)
 
     await user.type(
-      await screen.findByLabelText("Dokumenttyp Aktivzitierung"),
+      await screen.findByLabelText("Dokumenttyp der Aktivzitierung"),
       "Ant",
     )
     const dropdownItems = screen.getAllByLabelText("dropdown-option")
@@ -295,7 +295,7 @@ describe("Active Citations", async () => {
     await user.click(editButton)
 
     await user.type(
-      await screen.findByLabelText("Gericht Aktivzitierung"),
+      await screen.findByLabelText("Gericht der Aktivzitierung"),
       "AG",
     )
     const dropdownItems = screen.getAllByLabelText("dropdown-option")
@@ -321,7 +321,7 @@ describe("Active Citations", async () => {
     await user.click(editButton)
 
     const fileNumberInput = await screen.findByLabelText(
-      "Aktenzeichen Aktivzitierung",
+      "Aktenzeichen der Aktivzitierung",
     )
 
     await user.clear(fileNumberInput)
@@ -346,7 +346,7 @@ describe("Active Citations", async () => {
     await user.click(editButton)
 
     const fileNumberInput = await screen.findByLabelText(
-      "Entscheidungsdatum Aktivzitierung",
+      "Entscheidungsdatum der Aktivzitierung",
     )
 
     await user.clear(fileNumberInput)
@@ -404,14 +404,16 @@ describe("Active Citations", async () => {
     await user.click(editButton)
 
     const fileNumberInput = await screen.findByLabelText(
-      "Aktenzeichen Aktivzitierung",
+      "Aktenzeichen der Aktivzitierung",
     )
-    const courtInput = await screen.findByLabelText("Gericht Aktivzitierung")
+    const courtInput = await screen.findByLabelText(
+      "Gericht der Aktivzitierung",
+    )
     const documentTypeInput = await screen.findByLabelText(
-      "Dokumenttyp Aktivzitierung",
+      "Dokumenttyp der Aktivzitierung",
     )
     const decisionDateInput = await screen.findByLabelText(
-      "Entscheidungsdatum Aktivzitierung",
+      "Entscheidungsdatum der Aktivzitierung",
     )
 
     await user.clear(fileNumberInput)
@@ -468,7 +470,9 @@ describe("Active Citations", async () => {
     const editButton = screen.getByLabelText("Eintrag bearbeiten")
     await user.click(editButton)
 
-    const courtInput = await screen.findByLabelText("Gericht Aktivzitierung")
+    const courtInput = await screen.findByLabelText(
+      "Gericht der Aktivzitierung",
+    )
     await user.clear(courtInput)
     await user.click(screen.getByLabelText("Aktivzitierung speichern"))
     expect(screen.getByLabelText(/Fehlerhafte Eingabe/)).toBeInTheDocument()

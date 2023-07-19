@@ -244,22 +244,25 @@ export async function fillActiveCitationInputs(
   }
 
   if (values?.court) {
-    await fillInput("Gericht Aktivzitierung", values?.court)
+    await fillInput("Gericht der Aktivzitierung", values?.court)
     await page.getByText(values.court, { exact: true }).click()
     await waitForInputValue(
       page,
-      "[aria-label='Gericht Aktivzitierung']",
+      "[aria-label='Gericht der Aktivzitierung']",
       values.court,
     )
   }
   if (values?.decisionDate) {
-    await fillInput("Entscheidungsdatum Aktivzitierung", values?.decisionDate)
+    await fillInput(
+      "Entscheidungsdatum der Aktivzitierung",
+      values?.decisionDate,
+    )
   }
   if (values?.fileNumber) {
-    await fillInput("Aktenzeichen Aktivzitierung", values?.fileNumber)
+    await fillInput("Aktenzeichen der Aktivzitierung", values?.fileNumber)
   }
   if (values?.documentType) {
-    await fillInput("Dokumenttyp Aktivzitierung", values?.documentType)
+    await fillInput("Dokumenttyp der Aktivzitierung", values?.documentType)
     await page.locator("[aria-label='dropdown-option']").first().click()
   }
 }
