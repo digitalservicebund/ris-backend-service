@@ -62,7 +62,7 @@ test.describe("ensuring the publishing of documentunits works as expected", () =
 
     await waitForSaving(
       async () => {
-        await page.locator("[aria-label='Norm Einzelnorm']").fill("abc")
+        await page.locator("[aria-label='Einzelnorm der Norm']").fill("abc")
       },
       page,
       { clickSaveButton: true },
