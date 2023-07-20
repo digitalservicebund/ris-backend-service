@@ -1,49 +1,48 @@
 <script lang="ts" setup>
+import { computed } from "vue"
 import {
   DropdownInputModelType,
   DropdownItem,
 } from "@/shared/components/input/types"
-import { useInputModel } from "@/shared/composables/useInputModel"
 
 interface Props {
-  id: string
   items: DropdownItem[]
-  modelValue?: DropdownInputModelType
-  value?: DropdownInputModelType
-  ariaLabel: string
+  modelValue: DropdownInputModelType | undefined
   placeholder?: string
 }
 
 interface Emits {
-  (event: "update:modelValue", value?: DropdownInputModelType): void
-  (event: "input", value: Event): void
+  (event: "update:modelValue", value: DropdownInputModelType | undefined): void
 }
 
 const props = defineProps<Props>()
-const emits = defineEmits<Emits>()
+const emit = defineEmits<Emits>()
 
-const { inputValue } = useInputModel<string, Props, Emits>(props, emits)
+const localModelValue = computed({
+  get: () => props.modelValue ?? "",
+  set: (value) => {
+    emit("update:modelValue", value)
+  },
+})
 
+const hasPlaceholder = computed(() =>
+  Boolean(!props.modelValue && props.placeholder),
+)
 </script>
 
 <template>
+  <!-- Label should come from the surrounding context, e.g. InputField component -->
+  <!-- eslint-disable vuejs-accessibility/form-control-has-label -->
   <select
-    :id="id"
-    v-model="inputValue"
-    :aria-label="ariaLabel"
-    class="ds-select outline-none w-full"
+    v-model="localModelValue"
+    class="ds-select data-[placeholder]:font-font-family-serif data-[placeholder]:italic data-[placeholder]:text-gray-800 data-[placeholder]:text-opacity-25"
+    :data-placeholder="hasPlaceholder ? true : undefined"
     tabindex="0"
   >
-    <option
-        v-if="placeholder"
-        disabled
-        value=""
-      >{{ placeholder }}</option>
-    <option
-      v-for="(item, index) in items"
-      :key="index"
-      :value="item.value"
-    >
+    <option v-if="placeholder && !localModelValue" disabled value="">
+      {{ placeholder }}
+    </option>
+    <option v-for="item in items" :key="item.value" :value="item.value">
       {{ item.label }}
     </option>
   </select>
