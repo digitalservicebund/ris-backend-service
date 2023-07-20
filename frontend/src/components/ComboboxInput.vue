@@ -9,6 +9,7 @@ import {
 const props = defineProps<{
   id: string
   itemService: ComboboxAttributes["itemService"]
+  throttleItemServiceThroughput?: boolean
   modelValue: T
   ariaLabel: string
   placeholder?: string
@@ -53,7 +54,7 @@ const toggleDropdown = async () => {
     if (inputText.value) {
       filter.value = inputText.value
     }
-    await updateCurrentItems()
+    await updateCurrentItems(filter.value)
     inputFieldRef.value?.focus()
   }
 }
@@ -64,7 +65,7 @@ const clearSelection = async () => {
   inputText.value = ""
   focusedItemIndex.value = 0
   if (showDropdown.value) {
-    await updateCurrentItems()
+    await updateCurrentItems("")
   }
   inputFieldRef.value?.focus()
 }
@@ -115,19 +116,32 @@ const updateFocusedItem = () => {
   if (item && item.innerText !== NO_MATCHING_ENTRY) item.focus()
 }
 
-const onTextChange = async () => {
+let timer: ReturnType<typeof setTimeout>
+
+const onTextChange = () => {
   focusedItemIndex.value = 0
   showDropdown.value = true
   filter.value = inputText.value
-  await updateCurrentItems()
+  if (timer) clearTimeout(timer)
+  if (props.throttleItemServiceThroughput) {
+    timer = setTimeout(() => updateCurrentItems(filter.value), 300)
+  } else {
+    updateCurrentItems(filter.value)
+  }
 }
 
-const updateCurrentItems = async () => {
-  const response = await props.itemService(filter.value)
+const updateCurrentItems = async (searchStr: string | undefined) => {
+  const response = await props.itemService(searchStr)
   if (!response.data) {
     console.error(response.error)
     return
   }
+
+  if (props.throttleItemServiceThroughput && searchStr !== filter.value) {
+    // this request is outdated, ignore its result
+    return
+  }
+
   currentlyDisplayedItems.value = response.data
   if (
     !currentlyDisplayedItems.value ||
@@ -174,6 +188,7 @@ onMounted(() => {
 })
 
 onBeforeUnmount(() => {
+  if (timer) clearTimeout(timer)
   window.removeEventListener("click", handleClickOutside)
 })
 </script>

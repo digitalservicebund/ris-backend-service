@@ -92,6 +92,7 @@ onMounted(() => {
         clear-on-choosing-item
         :item-service="ComboboxItemService.getRisAbbreviationsAwesome"
         placeholder="Suchfeld"
+        throttle-item-service-throughput
       ></ComboboxInput>
     </InputField>
     <InputField
