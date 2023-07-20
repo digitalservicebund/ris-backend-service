@@ -367,4 +367,4 @@ private fun parseDomainNormToData(normCategory: NormCategory?): String? = when (
     else -> null
 }
 
-private fun encodeLocalTime(time: LocalTime?) = time?.let { it.format(DateTimeFormatter.ofPattern("HH:mm")) }
+private fun encodeLocalTime(time: LocalTime?) = time?.format(DateTimeFormatter.ofPattern("HH:mm"))
