@@ -76,7 +76,6 @@ import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.WORK_NOTE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.YEAR
 import de.bund.digitalservice.ris.norms.domain.value.NormCategory
 import de.bund.digitalservice.ris.norms.domain.value.OtherType
-import de.bund.digitalservice.ris.norms.domain.value.ProofIndication
 import de.bund.digitalservice.ris.norms.domain.value.ProofType
 import de.bund.digitalservice.ris.norms.domain.value.UndefinedDate
 import java.time.LocalDate
@@ -99,7 +98,7 @@ val hasValidValueType =
                 FOOTNOTE_COMMENT, FOOTNOTE_DECISION, FOOTNOTE_STATE_LAW, FOOTNOTE_EU_LAW, FOOTNOTE_OTHER,
                 WORK_NOTE, DESCRIPTION, REFERENCE, ENTRY_INTO_FORCE_DATE_NOTE, NOTE, ARTICLE, OFFICIAL_LONG_TITLE,
                 OFFICIAL_SHORT_TITLE, OFFICIAL_ABBREVIATION, DOCUMENT_NUMBER, DOCUMENT_CATEGORY, COMPLETE_CITATION,
-                CELEX_NUMBER, RIS_ABBREVIATION,
+                CELEX_NUMBER, RIS_ABBREVIATION, PROOF_INDICATION,
                 -> instance.value is String
 
                 DATE -> instance.value is LocalDate
@@ -109,8 +108,6 @@ val hasValidValueType =
                 RESOLUTION_MAJORITY -> instance.value is Boolean
 
                 UNDEFINED_DATE -> instance.value is UndefinedDate
-
-                PROOF_INDICATION -> instance.value is ProofIndication
 
                 PROOF_TYPE -> instance.value is ProofType
 

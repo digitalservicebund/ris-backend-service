@@ -8,7 +8,6 @@ import {
   Norm,
   NormCategory,
   OtherType,
-  ProofIndication,
   ProofType,
   UndefinedDate,
 } from "@/domain/Norm"
@@ -73,19 +72,6 @@ function undefinedDateToDropdownEntry(
       return "unbestimmt (zukünftig)"
     case UndefinedDate.UNDEFINED_NOT_PRESENT:
       return "nicht vorhanden"
-    default:
-      return undefined
-  }
-}
-
-function proofIndicationToDropdownEntry(
-  unit?: ProofIndication,
-): string | undefined {
-  switch (unit) {
-    case ProofIndication.NOT_YET_CONSIDERED:
-      return "noch nicht berücksichtigt"
-    case ProofIndication.CONSIDERED:
-      return "ist berücksichtigt"
     default:
       return undefined
   }
@@ -1453,14 +1439,12 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
           ).map((section) => section?.ENTRY_INTO_FORCE_DATE_NOTE),
         },
         {
-          type: FieldType.DROPDOWN,
-          id: "proofIndicationDropdown",
+          type: FieldType.TEXT,
+          id: "proofIndicationText",
           label: "Angaben zum textlichen und/oder dokumentarischen Nachweis",
           values: norm.metadataSections?.DOCUMENT_STATUS_SECTION?.map(
             (section) => section?.DOCUMENT_STATUS?.[0],
-          )
-            .map((section) => section?.PROOF_INDICATION?.[0])
-            .map(proofIndicationToDropdownEntry),
+          ).map((section) => section?.PROOF_INDICATION?.[0]),
         },
         {
           type: FieldType.RADIO,

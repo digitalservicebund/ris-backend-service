@@ -9,7 +9,6 @@ import de.bund.digitalservice.ris.norms.domain.entity.Paragraph
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType
 import de.bund.digitalservice.ris.norms.domain.value.NormCategory
 import de.bund.digitalservice.ris.norms.domain.value.OtherType
-import de.bund.digitalservice.ris.norms.domain.value.ProofIndication
 import de.bund.digitalservice.ris.norms.domain.value.ProofType
 import de.bund.digitalservice.ris.norms.domain.value.UndefinedDate
 import de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto.ArticleDto
@@ -84,7 +83,6 @@ interface NormsMapper {
             MetadatumType.RESOLUTION_MAJORITY -> metadatumDto.value.toBoolean()
             MetadatumType.NORM_CATEGORY -> NormCategory.valueOf(metadatumDto.value)
             MetadatumType.UNDEFINED_DATE -> UndefinedDate.valueOf(metadatumDto.value)
-            MetadatumType.PROOF_INDICATION -> ProofIndication.valueOf(metadatumDto.value)
             MetadatumType.PROOF_TYPE -> ProofType.valueOf(metadatumDto.value)
             MetadatumType.OTHER_TYPE -> OtherType.valueOf(metadatumDto.value)
             else -> metadatumDto.value

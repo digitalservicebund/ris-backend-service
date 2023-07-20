@@ -1,8 +1,7 @@
 <script lang="ts" setup>
 import { computed, ref, watch } from "vue"
-import { Metadata, ProofIndication } from "@/domain/Norm"
+import { Metadata } from "@/domain/Norm"
 import ChipsInput from "@/shared/components/input/ChipsInput.vue"
-import DropdownInput from "@/shared/components/input/DropdownInput.vue"
 import InputElement from "@/shared/components/input/InputElement.vue"
 import InputField from "@/shared/components/input/InputField.vue"
 import TextInput from "@/shared/components/input/TextInput.vue"
@@ -32,22 +31,6 @@ watch(
 
 watch(inputValue, () => emit("update:modelValue", inputValue.value), {
   deep: true,
-})
-
-const PROOF_INDICATION_TRANSLATIONS: { [Value in ProofIndication]: string } = {
-  [ProofIndication.NOT_YET_CONSIDERED]: "noch nicht berücksichtigt",
-  [ProofIndication.CONSIDERED]: "ist berücksichtigt",
-}
-
-interface DropdownItem {
-  label: string
-  value: string
-}
-
-const dropdownItems: DropdownItem[] = Object.entries(
-  PROOF_INDICATION_TRANSLATIONS,
-).map(([value, label]) => {
-  return { label, value }
 })
 
 const workNote = computed({
@@ -85,8 +68,7 @@ const entryIntoForceDateNote = computed({
 
 const proofIndication = computed({
   get: () => inputValue.value.PROOF_INDICATION?.[0],
-  set: (data?: ProofIndication) =>
-    data && (inputValue.value.PROOF_INDICATION = [data]),
+  set: (data?: string) => data && (inputValue.value.PROOF_INDICATION = [data]),
 })
 
 const dateEnabled = computed(() => !inputValue.value.YEAR?.[0])
@@ -173,13 +155,10 @@ const yearEnabled = computed(() => !inputValue.value.DATE?.[0])
       class="md:w-auto"
       label="Angaben zum textlichen und/oder dokumentarischen Nachweis"
     >
-      <DropdownInput
-        id="proofIndicationDropdown"
+      <TextInput
+        id="proofIndicationText"
         v-model="proofIndication"
         aria-label="Angaben zum textlichen und/oder dokumentarischen Nachweis Dropdown"
-        has-smaller-height
-        :items="dropdownItems"
-        placeholder="Bitte auswählen"
       />
     </InputField>
   </div>

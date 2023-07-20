@@ -6,7 +6,6 @@ import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType
 import de.bund.digitalservice.ris.norms.domain.value.NormCategory
 import de.bund.digitalservice.ris.norms.domain.value.OtherType
-import de.bund.digitalservice.ris.norms.domain.value.ProofIndication
 import de.bund.digitalservice.ris.norms.domain.value.ProofType
 import de.bund.digitalservice.ris.norms.domain.value.UndefinedDate
 import io.mockk.every
@@ -681,7 +680,7 @@ class HasValidMetadataTest {
             Metadatum("year", MetadatumType.YEAR),
             Metadatum("reference", MetadatumType.REFERENCE),
             Metadatum("entry into force date note", MetadatumType.ENTRY_INTO_FORCE_DATE_NOTE),
-            Metadatum(ProofIndication.NOT_YET_CONSIDERED, MetadatumType.PROOF_INDICATION),
+            Metadatum("not considered yet", MetadatumType.PROOF_INDICATION),
         )
 
         assertThat(hasValidMetadata.isSatisfiedBy(instance)).isTrue()

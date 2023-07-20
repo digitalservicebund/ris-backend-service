@@ -317,8 +317,8 @@ class HasValidValueTypeTest {
     }
 
     @Test
-    fun `it is not satisfied if the value for a proof indication type is a string`() {
-        val instance = getMockedMetadatum("test text", PROOF_INDICATION)
+    fun `it is not satisfied if the value for a proof indication type is not a string`() {
+        val instance = getMockedMetadatum(123, PROOF_INDICATION)
 
         assertThat(hasValidValueType.isSatisfiedBy(instance)).isFalse()
     }

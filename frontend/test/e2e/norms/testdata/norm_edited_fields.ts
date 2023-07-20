@@ -2,7 +2,6 @@ import { NormData } from "../fixtures"
 import {
   NormCategory,
   OtherType,
-  ProofIndication,
   ProofType,
   UndefinedDate,
 } from "@/domain/Norm"
@@ -251,7 +250,7 @@ export const newNorm: NormData = {
             DATE: ["12.05.2022"],
             REFERENCE: ["reference"],
             ENTRY_INTO_FORCE_DATE_NOTE: ["400"],
-            PROOF_INDICATION: [ProofIndication.NOT_YET_CONSIDERED],
+            PROOF_INDICATION: ["not considered yet"],
           },
         ],
       },

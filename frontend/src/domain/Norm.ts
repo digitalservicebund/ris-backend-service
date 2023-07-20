@@ -108,11 +108,6 @@ export enum NormCategory {
   TRANSITIONAL_NORM = "TRANSITIONAL_NORM",
 }
 
-export enum ProofIndication {
-  NOT_YET_CONSIDERED = "NOT_YET_CONSIDERED",
-  CONSIDERED = "CONSIDERED",
-}
-
 export enum ProofType {
   TEXT_PROOF_FROM = "TEXT_PROOF_FROM",
   TEXT_PROOF_VALIDITY_FROM = "TEXT_PROOF_VALIDITY_FROM",
@@ -183,7 +178,7 @@ export type MetadataValueType = {
   [MetadatumType.DESCRIPTION]: string
   [MetadatumType.REFERENCE]: string
   [MetadatumType.ENTRY_INTO_FORCE_DATE_NOTE]: string
-  [MetadatumType.PROOF_INDICATION]: ProofIndication
+  [MetadatumType.PROOF_INDICATION]: string
   [MetadatumType.PROOF_TYPE]: ProofType
   [MetadatumType.OTHER_TYPE]: OtherType
   [MetadatumType.NOTE]: string

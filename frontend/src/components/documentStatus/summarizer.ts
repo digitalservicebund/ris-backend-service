@@ -40,13 +40,7 @@ function documentStatusSummary(data: Metadata): VNode {
 
   const proofIndication = data?.PROOF_INDICATION?.[0]
   if (proofIndication) {
-    const PROOF_INDICATION_TRANSLATIONS = {
-      NOT_YET_CONSIDERED: "noch nicht berücksichtigt",
-      CONSIDERED: "ist berücksichtigt",
-    }
-    const translatedProofIndication =
-      PROOF_INDICATION_TRANSLATIONS[proofIndication]
-    summarizerData.push(new SummarizerDataSet([translatedProofIndication]))
+    summarizerData.push(new SummarizerDataSet([proofIndication]))
   }
 
   return normsMetadataSummarizer(summarizerData)
