@@ -7,7 +7,6 @@ import {
   MetadataSectionName,
   Norm,
   NormCategory,
-  OtherType,
   ProofType,
   UndefinedDate,
 } from "@/domain/Norm"
@@ -83,17 +82,6 @@ function proofTypeToDropdownEntry(unit?: ProofType): string | undefined {
       return "Textnachweis ab"
     case ProofType.TEXT_PROOF_VALIDITY_FROM:
       return "Textnachweis Geltung ab"
-    default:
-      return undefined
-  }
-}
-
-function otherTypeToDropdownEntry(unit?: OtherType): string | undefined {
-  switch (unit) {
-    case OtherType.TEXT_IN_PROGRESS:
-      return "Text in Bearbeitung"
-    case OtherType.TEXT_PROOFED_BUT_NOT_DONE:
-      return "Nachgewiesener Text dokumentarisch noch nicht abschließend bearbeitet"
     default:
       return undefined
   }
@@ -1481,14 +1469,12 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
           ),
         },
         {
-          type: FieldType.DROPDOWN,
-          id: "otherTypeDropdown",
+          type: FieldType.TEXT,
+          id: "otherText",
           label: "Sonstiger Hinweis",
           values: norm.metadataSections?.DOCUMENT_STATUS_SECTION?.map(
             (section) => section?.DOCUMENT_OTHER?.[0],
-          )
-            .map((section) => section?.OTHER_TYPE?.[0])
-            .map(otherTypeToDropdownEntry),
+          ).map((section) => section?.TEXT?.[0]),
         },
       ],
     },

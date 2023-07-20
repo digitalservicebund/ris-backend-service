@@ -1,7 +1,6 @@
 import { NormData } from "../fixtures"
 import {
   NormCategory,
-  OtherType,
   ProofType,
   UndefinedDate,
 } from "@/domain/Norm"
@@ -260,7 +259,7 @@ export const newNorm: NormData = {
         ],
       },
       {
-        DOCUMENT_OTHER: [{ OTHER_TYPE: [OtherType.TEXT_IN_PROGRESS] }],
+        DOCUMENT_OTHER: [{ TEXT: ["text in progress"] }],
       },
     ],
     FOOTNOTES: [

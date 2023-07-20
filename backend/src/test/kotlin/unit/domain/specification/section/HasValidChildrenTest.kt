@@ -4,7 +4,6 @@ import de.bund.digitalservice.ris.norms.domain.entity.MetadataSection
 import de.bund.digitalservice.ris.norms.domain.entity.Metadatum
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType
-import de.bund.digitalservice.ris.norms.domain.value.OtherType
 import de.bund.digitalservice.ris.norms.domain.value.UndefinedDate
 import io.mockk.every
 import io.mockk.mockk
@@ -326,7 +325,7 @@ class HasValidChildrenTest {
         every { instance.sections } returns listOf(
             MetadataSection(MetadataSectionName.DOCUMENT_STATUS, listOf(Metadatum("work note", MetadatumType.WORK_NOTE))),
             MetadataSection(MetadataSectionName.DOCUMENT_TEXT_PROOF, listOf(Metadatum("text", MetadatumType.TEXT))),
-            MetadataSection(MetadataSectionName.DOCUMENT_OTHER, listOf(Metadatum(OtherType.TEXT_IN_PROGRESS, MetadatumType.OTHER_TYPE))),
+            MetadataSection(MetadataSectionName.DOCUMENT_OTHER, listOf(Metadatum("text in progress", MetadatumType.TEXT))),
         )
 
         Assertions.assertThat(hasValidChildren.isSatisfiedBy(instance)).isFalse()

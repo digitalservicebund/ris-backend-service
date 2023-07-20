@@ -1,8 +1,8 @@
 <script lang="ts" setup>
 import { computed, ref, watch } from "vue"
-import { Metadata, OtherType } from "@/domain/Norm"
-import DropdownInput from "@/shared/components/input/DropdownInput.vue"
+import { Metadata } from "@/domain/Norm"
 import InputField from "@/shared/components/input/InputField.vue"
+import TextInput from "@/shared/components/input/TextInput.vue"
 
 interface Props {
   modelValue: Metadata
@@ -25,46 +25,26 @@ watch(
   { immediate: true },
 )
 
-const OTHER_TYPE_TRANSLATIONS: { [Value in OtherType]: string } = {
-  [OtherType.TEXT_IN_PROGRESS]: "Text in Bearbeitung",
-  [OtherType.TEXT_PROOFED_BUT_NOT_DONE]:
-    "Nachgewiesener Text dokumentarisch noch nicht abschließend bearbeitet",
-}
-
-interface DropdownItem {
-  label: string
-  value: string
-}
-
-const dropdownItems: DropdownItem[] = Object.entries(
-  OTHER_TYPE_TRANSLATIONS,
-).map(([value, label]) => {
-  return { label, value }
-})
-
 watch(inputValue, () => emit("update:modelValue", inputValue.value), {
   deep: true,
 })
 
-const otherType = computed({
-  get: () => inputValue.value.OTHER_TYPE?.[0],
-  set: (data?: OtherType) => data && (inputValue.value.OTHER_TYPE = [data]),
+const text = computed({
+  get: () => inputValue.value.TEXT?.[0],
+  set: (data?: string) => data && (inputValue.value.TEXT = [data]),
 })
 </script>
 <template>
   <InputField
-    id="otherType"
+    id="otherText"
     aria-label="Zusatz"
     class="md:w-auto"
     label="Sonstiger Hinweis"
   >
-    <DropdownInput
-      id="otherTypeDropdown"
-      v-model="otherType"
-      aria-label="Sonstiger Hinweis Dropdown"
-      has-smaller-height
-      :items="dropdownItems"
-      placeholder="Bitte auswählen"
+    <TextInput
+      id="otherText"
+      v-model="text"
+      aria-label="Sonstiger Hinweis Text"
     />
   </InputField>
 </template>

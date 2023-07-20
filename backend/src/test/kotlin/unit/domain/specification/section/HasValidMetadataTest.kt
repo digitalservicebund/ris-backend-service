@@ -5,7 +5,6 @@ import de.bund.digitalservice.ris.norms.domain.entity.Metadatum
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType
 import de.bund.digitalservice.ris.norms.domain.value.NormCategory
-import de.bund.digitalservice.ris.norms.domain.value.OtherType
 import de.bund.digitalservice.ris.norms.domain.value.ProofType
 import de.bund.digitalservice.ris.norms.domain.value.UndefinedDate
 import io.mockk.every
@@ -731,7 +730,7 @@ class HasValidMetadataTest {
         every { instance.name } returns MetadataSectionName.DOCUMENT_OTHER
         every { instance.sections } returns null
         every { instance.metadata } returns listOf(
-            Metadatum(OtherType.TEXT_IN_PROGRESS, MetadatumType.OTHER_TYPE),
+            Metadatum("text in progress", MetadatumType.TEXT),
         )
 
         assertThat(hasValidMetadata.isSatisfiedBy(instance)).isTrue()
@@ -743,8 +742,8 @@ class HasValidMetadataTest {
         every { instance.name } returns MetadataSectionName.DOCUMENT_OTHER
         every { instance.sections } returns null
         every { instance.metadata } returns listOf(
-            Metadatum("work note", MetadatumType.TEXT),
-            Metadatum(OtherType.TEXT_IN_PROGRESS, MetadatumType.OTHER_TYPE),
+            Metadatum("not supported", MetadatumType.DEFINITION),
+            Metadatum("text in progress", MetadatumType.TEXT),
         )
 
         assertThat(hasValidMetadata.isSatisfiedBy(instance)).isFalse()
@@ -828,8 +827,8 @@ class HasValidMetadataTest {
         every { instance.name } returns MetadataSectionName.REPEAL
         every { instance.sections } returns null
         every { instance.metadata } returns listOf(
-            Metadatum("text", MetadatumType.TEXT),
-            Metadatum(OtherType.TEXT_IN_PROGRESS, MetadatumType.OTHER_TYPE),
+            Metadatum("not supported", MetadatumType.DEFINITION),
+            Metadatum("text in progress", MetadatumType.TEXT),
         )
 
         assertThat(hasValidMetadata.isSatisfiedBy(instance)).isFalse()

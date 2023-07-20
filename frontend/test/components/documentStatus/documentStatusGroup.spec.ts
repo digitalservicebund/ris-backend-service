@@ -88,12 +88,12 @@ describe("DocumentStatusGroup", () => {
     expect(documentStatusSelection).not.toBeChecked()
     expect(documentTextProofSelection).not.toBeChecked()
 
-    const newDropDownInputField = screen.getByLabelText(
-      "Sonstiger Hinweis Dropdown",
+    const otherTextInput = screen.getByLabelText(
+      "Sonstiger Hinweis Text",
     ) as HTMLInputElement
 
-    expect(newDropDownInputField).toBeInTheDocument()
-    expect(newDropDownInputField).toBeVisible()
+    expect(otherTextInput).toBeInTheDocument()
+    expect(otherTextInput).toBeVisible()
   })
 
   it("clears the child section data when a different radio button is selected ", async () => {
@@ -103,27 +103,26 @@ describe("DocumentStatusGroup", () => {
       "Sonstiger Hinweis",
     ) as HTMLInputElement
 
-    const textInput = screen.getByLabelText(
+    const descriptionTextInput = screen.getByLabelText(
       "Bezeichnung der Änderungsvorschrift Description",
     ) as HTMLInputElement
 
-    expect(textInput).toBeInTheDocument()
-    expect(textInput).toBeVisible()
+    expect(descriptionTextInput).toBeInTheDocument()
+    expect(descriptionTextInput).toBeVisible()
 
-    await userEvent.type(textInput, "test text")
+    await userEvent.type(descriptionTextInput, "test text")
     await userEvent.tab()
 
-    expect(textInput).toHaveValue("test text")
+    expect(descriptionTextInput).toHaveValue("test text")
 
     await fireEvent.click(documentOtherSelection)
 
-    const dropDownInputField = screen.getByLabelText(
-      "Sonstiger Hinweis Dropdown",
+    const otherTextInput = screen.getByLabelText(
+      "Sonstiger Hinweis Text",
     ) as HTMLInputElement
 
-    await userEvent.click(dropDownInputField)
-    await userEvent.click(screen.getByText("Text in Bearbeitung"))
-    expect(dropDownInputField).toHaveValue("Text in Bearbeitung")
+    await userEvent.type(otherTextInput, "Text in Bearbeitung")
+    expect(otherTextInput).toHaveValue("Text in Bearbeitung")
 
     const documentStatusSelection = screen.queryByLabelText(
       "Stand der dokumentarischen Bearbeitung",

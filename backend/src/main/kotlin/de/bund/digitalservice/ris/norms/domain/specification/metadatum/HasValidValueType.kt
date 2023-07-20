@@ -43,7 +43,6 @@ import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.OFFICIAL_ABBR
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.OFFICIAL_LONG_TITLE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.OFFICIAL_SHORT_TITLE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.OTHER_OFFICIAL_REFERENCE
-import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.OTHER_TYPE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.PAGE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.PARTICIPATION_INSTITUTION
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.PARTICIPATION_TYPE
@@ -75,7 +74,6 @@ import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.VALIDITY_RULE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.WORK_NOTE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.YEAR
 import de.bund.digitalservice.ris.norms.domain.value.NormCategory
-import de.bund.digitalservice.ris.norms.domain.value.OtherType
 import de.bund.digitalservice.ris.norms.domain.value.ProofType
 import de.bund.digitalservice.ris.norms.domain.value.UndefinedDate
 import java.time.LocalDate
@@ -110,8 +108,6 @@ val hasValidValueType =
                 UNDEFINED_DATE -> instance.value is UndefinedDate
 
                 PROOF_TYPE -> instance.value is ProofType
-
-                OTHER_TYPE -> instance.value is OtherType
 
                 TIME -> instance.value is LocalTime
             }

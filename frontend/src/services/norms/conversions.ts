@@ -24,7 +24,6 @@ import {
   MetadatumType,
   Norm,
   NormCategory,
-  OtherType,
   ProofType,
   UndefinedDate,
 } from "@/domain/Norm"
@@ -98,25 +97,11 @@ function decodeProofType(data: string): ProofType {
   } else throw new Error(`Could not decode ProofType: '${data}'`)
 }
 
-function decodeOtherType(data: string): OtherType {
-  const indexOfKeyPassed = Object.keys(OtherType).indexOf(data)
-
-  const unit = Object.values(OtherType)[indexOfKeyPassed]
-
-  if (unit) {
-    return unit
-  } else throw new Error(`Could not decode OtherType: '${data}'`)
-}
-
 function encodeUndefinedDate(data: UndefinedDate): string {
   return data
 }
 
 function encodeProofType(data: ProofType): string {
-  return data
-}
-
-function encodeOtherType(data: OtherType): string {
   return data
 }
 
@@ -181,7 +166,6 @@ const DECODERS: MetadataValueDecoders = {
   [MetadatumType.ENTRY_INTO_FORCE_DATE_NOTE]: identity,
   [MetadatumType.PROOF_INDICATION]: identity,
   [MetadatumType.PROOF_TYPE]: decodeProofType,
-  [MetadatumType.OTHER_TYPE]: decodeOtherType,
   [MetadatumType.NOTE]: identity,
   [MetadatumType.ARTICLE]: identity,
   [MetadatumType.OFFICIAL_LONG_TITLE]: identity,
@@ -256,7 +240,6 @@ const ENCODERS: MetadataValueEncoders = {
   [MetadatumType.ENTRY_INTO_FORCE_DATE_NOTE]: identity,
   [MetadatumType.PROOF_INDICATION]: identity,
   [MetadatumType.PROOF_TYPE]: encodeProofType,
-  [MetadatumType.OTHER_TYPE]: encodeOtherType,
   [MetadatumType.NOTE]: identity,
   [MetadatumType.ARTICLE]: identity,
   [MetadatumType.OFFICIAL_LONG_TITLE]: identity,

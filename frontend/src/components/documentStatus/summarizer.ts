@@ -71,16 +71,10 @@ function documentTextProofSummary(data: Metadata): VNode {
 function documentOtherSummary(data: Metadata): VNode {
   const summarizerData: SummarizerDataSet[] = []
 
-  const otherType = data?.OTHER_TYPE?.[0]
-  if (otherType) {
-    const OTHER_TYPE_TRANSLATIONS = {
-      TEXT_IN_PROGRESS: "Text in Bearbeitung",
-      TEXT_PROOFED_BUT_NOT_DONE:
-        "Nachgewiesener Text dokumentarisch noch nicht abschließend bearbeitet",
-    }
-    const translatedOtherType = OTHER_TYPE_TRANSLATIONS[otherType]
+  const otherType = data?.TEXT?.[0]
 
-    summarizerData.push(new SummarizerDataSet([translatedOtherType]))
+  if (otherType) {
+    summarizerData.push(new SummarizerDataSet([otherType]))
   }
 
   return normsMetadataSummarizer(summarizerData)

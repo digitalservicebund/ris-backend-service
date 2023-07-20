@@ -88,7 +88,6 @@ export enum MetadatumType {
   ENTRY_INTO_FORCE_DATE_NOTE = "ENTRY_INTO_FORCE_DATE_NOTE",
   PROOF_INDICATION = "PROOF_INDICATION",
   PROOF_TYPE = "PROOF_TYPE",
-  OTHER_TYPE = "OTHER_TYPE",
   NOTE = "NOTE",
   ARTICLE = "ARTICLE",
   OFFICIAL_LONG_TITLE = "OFFICIAL_LONG_TITLE",
@@ -111,11 +110,6 @@ export enum NormCategory {
 export enum ProofType {
   TEXT_PROOF_FROM = "TEXT_PROOF_FROM",
   TEXT_PROOF_VALIDITY_FROM = "TEXT_PROOF_VALIDITY_FROM",
-}
-
-export enum OtherType {
-  TEXT_IN_PROGRESS = "TEXT_IN_PROGRESS",
-  TEXT_PROOFED_BUT_NOT_DONE = "TEXT_PROOFED_BUT_NOT_DONE",
 }
 
 // TODO: Establish typing that requires all `MetadatumType`s to be listed.
@@ -180,7 +174,6 @@ export type MetadataValueType = {
   [MetadatumType.ENTRY_INTO_FORCE_DATE_NOTE]: string
   [MetadatumType.PROOF_INDICATION]: string
   [MetadatumType.PROOF_TYPE]: ProofType
-  [MetadatumType.OTHER_TYPE]: OtherType
   [MetadatumType.NOTE]: string
   [MetadatumType.ARTICLE]: string
   [MetadatumType.OFFICIAL_LONG_TITLE]: string
