@@ -39,7 +39,7 @@ const text = computed({
     id="proofText"
     aria-label="Textnachweis"
     class="md:w-auto"
-    label="Nextnachweis"
+    label="Textnachweis"
   >
     <TextInput id="proofText" v-model="text" aria-label="Textnachweis Text" />
   </InputField>

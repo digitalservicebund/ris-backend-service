@@ -158,7 +158,7 @@ const yearEnabled = computed(() => !inputValue.value.DATE?.[0])
       <TextInput
         id="proofIndicationText"
         v-model="proofIndication"
-        aria-label="Angaben zum textlichen und/oder dokumentarischen Nachweis Dropdown"
+        aria-label="Angaben zum textlichen und/oder dokumentarischen Nachweis Text"
       />
     </InputField>
   </div>
