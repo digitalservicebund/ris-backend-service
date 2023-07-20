@@ -5,18 +5,15 @@ import {
   DropdownItem,
 } from "@/shared/components/input/types"
 
-interface Props {
+const props = defineProps<{
   items: DropdownItem[]
   modelValue: DropdownInputModelType | undefined
   placeholder?: string
-}
+}>()
 
-interface Emits {
-  (event: "update:modelValue", value: DropdownInputModelType | undefined): void
-}
-
-const props = defineProps<Props>()
-const emit = defineEmits<Emits>()
+const emit = defineEmits<{
+  "update:modelValue": [DropdownInputModelType | undefined]
+}>()
 
 const localModelValue = computed({
   get: () => props.modelValue ?? "",

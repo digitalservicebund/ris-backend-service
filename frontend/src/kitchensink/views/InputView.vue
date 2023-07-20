@@ -127,7 +127,7 @@ const dateInputAttributes: BaseInputAttributes = {
       id="regularDropdown"
       aria-label="regular dropdown"
       :items="dropdownItems"
-      value=""
+      :model-value="dropdownItems[0].value"
     />
 
     <h1 class="text-24 font-bold">Date Input</h1>
