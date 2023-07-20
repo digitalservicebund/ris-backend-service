@@ -29,7 +29,6 @@ import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresConfig;
 import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
-import de.bund.digitalservice.ris.caselaw.domain.EmailPublishState;
 import de.bund.digitalservice.ris.caselaw.domain.HttpMailSender;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationHistoryRecordType;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
@@ -145,8 +144,7 @@ class PublishDocumentUnitIntegrationTest {
             "200",
             "message 1|message 2",
             "test.xml",
-            null,
-            EmailPublishState.SENT);
+            null);
     XmlPublication expectedXmlResultObject =
         XmlPublication.builder()
             .documentUnitUuid(documentUnitUuid1)
@@ -160,7 +158,6 @@ class PublishDocumentUnitIntegrationTest {
             .statusCode("200")
             .statusMessages(List.of("message 1", "message 2"))
             .fileName("test.xml")
-            .emailPublishState(EmailPublishState.SENT)
             .build();
     risWebTestClient
         .withDefaultLogin()
@@ -225,7 +222,6 @@ class PublishDocumentUnitIntegrationTest {
             .documentUnitUuid(documentUnitUuid)
             .statusCode("400")
             .statusMessages(List.of("message 1", "message 2"))
-            .emailPublishState(EmailPublishState.UNKNOWN)
             .build();
 
     risWebTestClient
@@ -275,8 +271,7 @@ class PublishDocumentUnitIntegrationTest {
             "200",
             "message 1|message 2",
             "test.xml",
-            Instant.now(),
-            EmailPublishState.SENT);
+            Instant.now());
     xmlPublicationRepository.save(xmlPublicationDTO).block();
 
     XmlPublication expectedXmlPublication =
@@ -288,7 +283,6 @@ class PublishDocumentUnitIntegrationTest {
             .statusCode("200")
             .statusMessages(List.of("message 1", "message 2"))
             .fileName("text.xml")
-            .emailPublishState(EmailPublishState.SENT)
             .build();
 
     risWebTestClient
@@ -332,8 +326,7 @@ class PublishDocumentUnitIntegrationTest {
                 "200",
                 "message 1|message 2",
                 "test.xml",
-                publishDate,
-                EmailPublishState.SENT))
+                publishDate))
         .block();
 
     Instant receivedDate = publishDate.plus(1, ChronoUnit.HOURS);

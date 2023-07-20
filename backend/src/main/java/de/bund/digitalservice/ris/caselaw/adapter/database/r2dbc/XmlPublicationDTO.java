@@ -1,6 +1,5 @@
 package de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc;
 
-import de.bund.digitalservice.ris.caselaw.domain.EmailPublishState;
 import java.time.Instant;
 import lombok.Builder;
 import org.springframework.data.annotation.Id;
@@ -17,5 +16,4 @@ public record XmlPublicationDTO(
     String statusCode,
     String statusMessages,
     String fileName,
-    Instant publishDate,
-    EmailPublishState publishState) {}
+    Instant publishDate) {}

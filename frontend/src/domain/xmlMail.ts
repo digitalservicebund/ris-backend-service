@@ -12,5 +12,4 @@ export default class PublicationHistoryRecord {
   public statusCode?: string
   public receiverAddress?: string
   public mailSubject?: string
-  public publishStateDisplayText?: string
 }

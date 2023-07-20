@@ -33,7 +33,6 @@ const setupWithPublishedDocument = () =>
           receiverAddress: "receiver address",
           mailSubject: "mail subject",
           date: "01.02.2000",
-          publishStateDisplayText: "erfolgreich angekommen",
         },
       ],
     },
@@ -144,7 +143,6 @@ describe("PublicationDocument:", () => {
             receiverAddress: "receiver address",
             mailSubject: "mail subject",
             date: undefined,
-            publishStateDisplayText: "fehlgeschlagen",
           },
           errorMessage: {
             title: "error message title",
@@ -241,7 +239,6 @@ describe("PublicationDocument:", () => {
             receiverAddress: "receiver address",
             mailSubject: "mail subject",
             date: "01.02.2000",
-            publishStateDisplayText: "erfolgreich angekommen",
           },
         ],
       },
