@@ -235,7 +235,7 @@ const yearEnabled = computed(() => !inputValue.value.DATE?.[0])
       :label="inputFields.referenceField.label"
     >
       <TextInput
-        v-if="inputFields.referenceField.multi === false"
+        v-if="!inputFields.referenceField.multi"
         :id="inputFields.referenceField.id"
         :aria-label="inputFields.referenceField.label"
         :model-value="inputFields.referenceField.modelValue?.toString()"
@@ -243,7 +243,7 @@ const yearEnabled = computed(() => !inputValue.value.DATE?.[0])
       />
 
       <ChipsInput
-        v-else-if="inputFields.referenceField.multi === true"
+        v-else-if="inputFields.referenceField.multi"
         :id="inputFields.referenceField.id"
         :aria-label="inputFields.referenceField.label"
         :model-value="inputFields.referenceField.modelValue as string[]"

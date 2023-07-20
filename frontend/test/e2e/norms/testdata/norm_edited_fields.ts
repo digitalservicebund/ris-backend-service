@@ -1,11 +1,11 @@
+import { NormData } from "../fixtures"
 import {
   NormCategory,
   OtherType,
   ProofIndication,
   ProofType,
   UndefinedDate,
-} from "../../../../src/domain/Norm"
-import { NormData } from "../fixtures"
+} from "@/domain/Norm"
 
 export const newNorm: NormData = {
   jurisZipFileName: "",
