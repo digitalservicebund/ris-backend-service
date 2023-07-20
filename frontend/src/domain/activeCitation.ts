@@ -16,6 +16,14 @@ export default class ActiveCitation
     "decisionDate",
   ] as const
 
+  static fields = [
+    "citationStyle",
+    "fileNumber",
+    "court",
+    "decisionDate",
+    "documentType",
+  ] as const
+
   constructor(data: Partial<ActiveCitation> = {}) {
     super()
     Object.assign(this, data)
@@ -40,12 +48,23 @@ export default class ActiveCitation
 
   get missingRequiredFields(): string[] {
     return ActiveCitation.requiredFields.filter((field) =>
-      this.requiredFieldIsEmpty(this[field]),
+      this.fieldIsEmpty(this[field]),
     )
   }
 
-  private requiredFieldIsEmpty(
-    value: ActiveCitation[(typeof ActiveCitation.requiredFields)[number]],
+  get isEmpty(): boolean {
+    let isEmpty = true
+
+    ActiveCitation.fields.map((field) => {
+      if (!this.fieldIsEmpty(this[field])) {
+        isEmpty = false
+      }
+    })
+    return isEmpty
+  }
+
+  private fieldIsEmpty(
+    value: ActiveCitation[(typeof ActiveCitation.fields)[number]],
   ): boolean {
     if (value === undefined || !value || value === null) {
       return true

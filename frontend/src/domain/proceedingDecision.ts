@@ -9,6 +9,12 @@ export default class ProceedingDecision
   public dateKnown = true
 
   static requiredFields = ["fileNumber", "court", "decisionDate"] as const
+  static fields = [
+    "fileNumber",
+    "court",
+    "decisionDate",
+    "documentType",
+  ] as const
 
   constructor(data: Partial<ProceedingDecision> = {}) {
     super()
@@ -41,13 +47,24 @@ export default class ProceedingDecision
 
   get missingRequiredFields() {
     return ProceedingDecision.requiredFields.filter((field) =>
-      this.requiredFieldIsEmpty(field, this[field]),
+      this.fieldIsEmpty(field, this[field]),
     )
   }
 
-  private requiredFieldIsEmpty(
+  get isEmpty(): boolean {
+    let isEmpty = true
+
+    ProceedingDecision.fields.map((field) => {
+      if (!this.fieldIsEmpty(field, this[field])) {
+        isEmpty = false
+      }
+    })
+    return isEmpty
+  }
+
+  private fieldIsEmpty(
     fieldName: keyof ProceedingDecision,
-    value: ProceedingDecision[(typeof ProceedingDecision.requiredFields)[number]],
+    value: ProceedingDecision[(typeof ProceedingDecision.fields)[number]],
   ) {
     if (fieldName === "decisionDate" && !value && !this.dateKnown) {
       return false

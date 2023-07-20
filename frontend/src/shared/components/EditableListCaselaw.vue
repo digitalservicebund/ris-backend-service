@@ -1,6 +1,6 @@
 <script lang="ts" setup generic="T extends ListItem">
 import type { Component, Ref } from "vue"
-import { ref, watch } from "vue"
+import { ref, watch, onMounted } from "vue"
 import ListItem from "@/domain/editableListItem"
 import DataSetSummary from "@/shared/components/DataSetSummary.vue"
 
@@ -67,13 +67,19 @@ watch(
     if (modelValueList.value.length == 0) {
       addNewModelEntry()
     }
+    ;() => emit("update:modelValue", modelValueList.value)
   },
   { deep: true, immediate: true },
 )
 
-watch(modelValueList, () => emit("update:modelValue", modelValueList.value), {
-  deep: true,
-})
+function setEmptyEntryInEditMode(): void {
+  const emptyItemIndex = modelValueList.value.findIndex(
+    (element) => element.isEmpty,
+  )
+  if (emptyItemIndex !== -1) setEditIndex(emptyItemIndex)
+}
+
+onMounted(setEmptyEntryInEditMode)
 </script>
 
 <template>

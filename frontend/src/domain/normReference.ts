@@ -81,7 +81,6 @@ export default class NormReference implements EditableListItem {
     let isEmpty = true
 
     NormReference.fields.map((key) => {
-      this.fieldIsEmpty(this[key])
       if (!this.fieldIsEmpty(this[key])) {
         isEmpty = false
       }
@@ -92,7 +91,12 @@ export default class NormReference implements EditableListItem {
   private fieldIsEmpty(
     value: NormReference[(typeof NormReference.fields)[number]],
   ) {
-    if (value === undefined || !value || value === null) {
+    if (
+      value === undefined ||
+      !value ||
+      value === null ||
+      Object.keys(value).length === 0
+    ) {
       return true
     }
 
