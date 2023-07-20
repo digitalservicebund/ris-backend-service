@@ -19,7 +19,7 @@ public class JurisMessageWrapperFactory {
   public Optional<MessageWrapper> getResponsibleWrapper(Message message) {
     for (Class<? extends MessageWrapper> wrapper : messageWrappers) {
       try {
-        if ((Boolean) wrapper.getMethod("canHandle", Message.class).invoke(null, message)) {
+        if ((boolean) wrapper.getMethod("canHandle", Message.class).invoke(null, message)) {
           return Optional.of(wrapper.getConstructor(Message.class).newInstance(message));
         }
       } catch (InstantiationException

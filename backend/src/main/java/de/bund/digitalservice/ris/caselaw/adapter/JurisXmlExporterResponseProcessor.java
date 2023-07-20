@@ -96,7 +96,7 @@ public class JurisXmlExporterResponseProcessor {
         .flatMap(this::forwardMessage)
         .flatMap(this::setPublicationStatus)
         .flatMap(this::saveAttachments)
-        .doOnSuccess(result -> LOGGER.info("Message processed for: " + messageWrapper))
+        .doOnSuccess(result -> LOGGER.info("Message processed for: {}", messageWrapper))
         .doOnError(e -> LOGGER.error("Error processing message: ", e))
         .block();
   }
