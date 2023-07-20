@@ -121,8 +121,8 @@ val hasValidMetadata =
             Section.DOCUMENT_STATUS -> hasType(listOf(WORK_NOTE, DESCRIPTION, DATE, YEAR, REFERENCE, ENTRY_INTO_FORCE_DATE_NOTE, PROOF_INDICATION), instance)
             Section.DOCUMENT_TEXT_PROOF -> hasType(listOf(PROOF_TYPE, TEXT), instance)
             Section.DOCUMENT_OTHER -> hasType(listOf(OTHER_TYPE), instance)
-            Section.STATUS -> hasType(listOf(NOTE, DESCRIPTION, DATE, REFERENCE), instance)
-            Section.REISSUE -> hasType(listOf(NOTE, ARTICLE, DATE, REFERENCE), instance)
+            Section.STATUS -> hasType(listOf(NOTE, DESCRIPTION, DATE, YEAR, REFERENCE), instance)
+            Section.REISSUE -> hasType(listOf(NOTE, ARTICLE, DATE, YEAR, REFERENCE), instance)
             Section.OTHER_STATUS -> hasType(listOf(NOTE), instance)
             Section.ANNOUNCEMENT_DATE -> hasValidAnnouncementDate(instance)
         }

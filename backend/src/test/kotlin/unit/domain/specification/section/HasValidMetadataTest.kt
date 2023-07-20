@@ -760,6 +760,7 @@ class HasValidMetadataTest {
             Metadatum("note", MetadatumType.NOTE),
             Metadatum("description", MetadatumType.DESCRIPTION),
             Metadatum(LocalDate.now(), MetadatumType.DATE),
+            Metadatum("2020", MetadatumType.YEAR),
             Metadatum("reference", MetadatumType.REFERENCE),
         )
 
@@ -788,6 +789,7 @@ class HasValidMetadataTest {
             Metadatum("note", MetadatumType.NOTE),
             Metadatum("article", MetadatumType.ARTICLE),
             Metadatum(LocalDate.now(), MetadatumType.DATE),
+            Metadatum("2020", MetadatumType.YEAR),
             Metadatum("reference", MetadatumType.REFERENCE),
         )
 

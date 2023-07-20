@@ -1293,6 +1293,14 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
           ).map((section) => section?.DATE?.[0]),
         },
         {
+          type: FieldType.TEXT,
+          id: "statusYear",
+          label: "Jahr",
+          values: norm.metadataSections?.STATUS_INDICATION?.map(
+            (section) => section?.STATUS?.[0],
+          ).map((section) => section?.YEAR?.[0]),
+        },
+        {
           type: FieldType.CHIPS,
           id: "statusReference",
           label: "Fundstellen der Änderungsvorschrift",
@@ -1331,6 +1339,14 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
           values: norm.metadataSections?.STATUS_INDICATION?.map(
             (section) => section?.REISSUE?.[0],
           ).map((section) => section?.DATE?.[0]),
+        },
+        {
+          type: FieldType.TEXT,
+          id: "reissueYear",
+          label: "Jahr",
+          values: norm.metadataSections?.STATUS_INDICATION?.map(
+            (section) => section?.REISSUE?.[0],
+          ).map((section) => section?.YEAR?.[0]),
         },
         {
           type: FieldType.TEXT,

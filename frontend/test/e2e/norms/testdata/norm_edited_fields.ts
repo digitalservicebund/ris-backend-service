@@ -280,7 +280,7 @@ export const newNorm: NormData = {
           {
             NOTE: ["Status note"],
             DESCRIPTION: ["Status description"],
-            DATE: ["09.11.2018"],
+            YEAR: ["2021"],
             REFERENCE: ["Status reference 1", "Status reference 2"],
           },
         ],
@@ -290,7 +290,7 @@ export const newNorm: NormData = {
           {
             NOTE: ["Reissue note"],
             ARTICLE: ["Reissue article"],
-            DATE: ["09.11.2018"],
+            YEAR: ["2010"],
             REFERENCE: ["Reissue reference"],
           },
         ],

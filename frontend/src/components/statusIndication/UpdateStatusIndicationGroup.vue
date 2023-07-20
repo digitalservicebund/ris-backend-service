@@ -6,6 +6,7 @@ import InputElement from "@/shared/components/input/InputElement.vue"
 import InputField from "@/shared/components/input/InputField.vue"
 import TextInput from "@/shared/components/input/TextInput.vue"
 import { InputType } from "@/shared/components/input/types"
+import YearInput from "@/shared/components/input/YearInput.vue"
 
 interface Props {
   modelValue: Metadata
@@ -56,6 +57,11 @@ const article = computed({
 const date = computed({
   get: () => inputValue.value.DATE?.[0],
   set: (data?: string) => (inputValue.value.DATE = data ? [data] : undefined),
+})
+
+const year = computed({
+  get: () => inputValue.value.YEAR?.[0],
+  set: (data?: string) => (inputValue.value.YEAR = data ? [data] : undefined),
 })
 
 const singleReference = computed({
@@ -115,6 +121,21 @@ const inputFields = computed(() => {
           updateModelValue: (value: string) => (date.value = value),
         }
 
+  const yearField =
+    props.type === MetadataSectionName.STATUS
+      ? {
+          id: "statusYear",
+          label: "Jahr",
+          modelValue: year.value ?? "",
+          updateModelValue: (value: string) => (year.value = value),
+        }
+      : {
+          id: "reissueYear",
+          label: "Jahr",
+          modelValue: year.value ?? "",
+          updateModelValue: (value: string) => (year.value = value),
+        }
+
   const referenceField =
     props.type === MetadataSectionName.STATUS
       ? {
@@ -133,8 +154,16 @@ const inputFields = computed(() => {
           multi: false,
         }
 
-  return { noteField, descriptionOrArticleField, dateField, referenceField }
+  return {
+    noteField,
+    descriptionOrArticleField,
+    dateField,
+    yearField,
+    referenceField,
+  }
 })
+const dateEnabled = computed(() => !inputValue.value.YEAR?.[0])
+const yearEnabled = computed(() => !inputValue.value.DATE?.[0])
 </script>
 
 <template>
@@ -167,19 +196,38 @@ const inputFields = computed(() => {
       />
     </InputField>
 
-    <InputField
-      :id="inputFields.dateField.id"
-      :aria-label="inputFields.dateField.label"
-      :label="inputFields.dateField.label"
-    >
-      <InputElement
+    <div class="flex gap-24">
+      <InputField
         :id="inputFields.dateField.id"
-        v-model="inputFields.dateField.modelValue"
-        :attributes="{ ariaLabel: `${inputFields.dateField.label}` }"
-        :type="InputType.DATE"
-        @update:model-value="inputFields.dateField.updateModelValue"
-      />
-    </InputField>
+        :aria-label="inputFields.dateField.label"
+        class="md:w-auto"
+        :label="inputFields.dateField.label"
+      >
+        <InputElement
+          :id="inputFields.dateField.id"
+          v-model="inputFields.dateField.modelValue"
+          :attributes="{ ariaLabel: `${inputFields.dateField.label}` }"
+          :disabled="!dateEnabled"
+          :type="InputType.DATE"
+          @update:model-value="inputFields.dateField.updateModelValue"
+        />
+      </InputField>
+      <p class="my-auto">oder</p>
+      <InputField
+        :id="inputFields.yearField.id"
+        :aria-label="inputFields.yearField.label"
+        class="md:w-auto"
+        :label="inputFields.yearField.label"
+      >
+        <YearInput
+          :id="inputFields.yearField.id"
+          v-model="inputFields.yearField.modelValue"
+          :aria-label="inputFields.yearField.label"
+          :disabled="!yearEnabled"
+          @update:model-value="inputFields.yearField.updateModelValue"
+        />
+      </InputField>
+    </div>
 
     <InputField
       :id="inputFields.referenceField.id"

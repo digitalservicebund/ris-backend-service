@@ -27,7 +27,9 @@ function summarizeUpdate(
   let date = data?.DATE?.[0] ?? ""
   if (date) date = dayjs(date).format("DD.MM.YYYY")
 
-  return join(typeName, note, descriptionOrArticle, date, reference)
+  const year = data?.YEAR?.[0] ?? ""
+
+  return join(typeName, note, descriptionOrArticle, date, year, reference)
 }
 
 export function summarizeStatusIndication(data: MetadataSections): string {
