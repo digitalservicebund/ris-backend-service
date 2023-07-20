@@ -2,7 +2,6 @@ package de.bund.digitalservice.ris.norms.framework.adapter.output.juris
 
 import de.bund.digitalservice.ris.norms.domain.entity.MetadataSection
 import de.bund.digitalservice.ris.norms.domain.entity.Norm
-import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType
 import de.bund.digitalservice.ris.norms.domain.value.NormCategory
 import de.bund.digitalservice.ris.norms.domain.value.ProofType
@@ -36,7 +35,7 @@ fun mapDomainToData(norm: Norm): NormData {
         unofficialLongTitleList = extractSimpleStringValuesFromNormSection(norm, MetadatumType.UNOFFICIAL_LONG_TITLE),
         unofficialShortTitleList = extractSimpleStringValuesFromNormSection(norm, MetadatumType.UNOFFICIAL_SHORT_TITLE),
         unofficialAbbreviationList = extractSimpleStringValuesFromNormSection(norm, MetadatumType.UNOFFICIAL_ABBREVIATION),
-        divergentDocumentNumber = extractFirstStringValue(norm, Section.NORM, MetadatumType.DIVERGENT_DOCUMENT_NUMBER),
+        divergentDocumentNumber = extractFirstDivergentDocumentNumber(norm),
         documentCategory = extractSimpleStringValuesFromNormSection(norm, MetadatumType.DOCUMENT_CATEGORY).firstOrNull(),
         participationList = extractParticipations(norm),
         leadList = extractLeads(norm),
@@ -170,11 +169,11 @@ private fun extractSimpleStringValuesFromNormSection(norm: Norm, metadatumType: 
         .map { it.value.toString() }
 }
 
-private fun extractFirstStringValue(norm: Norm, sectionName: MetadataSectionName, metadatumType: MetadatumType): String {
+private fun extractFirstDivergentDocumentNumber(norm: Norm): String {
     return norm.metadataSections
-        .filter { it.name == sectionName }
+        .filter { it.name == Section.NORM }
         .flatMap { it.metadata }
-        .filter { it.type == metadatumType }
+        .filter { it.type == MetadatumType.DIVERGENT_DOCUMENT_NUMBER }
         .minByOrNull { it.order }?.value.toString()
 }
 
