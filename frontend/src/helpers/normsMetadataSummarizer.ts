@@ -33,8 +33,7 @@ export function normsMetadataSummarizer(
   metadataTypeSeparator: string = "|",
 ): VNode {
   const propertyNodes: VNode[] = []
-  let prefix = null
-  const footnotes: VNode[] = []
+  const footnotes: [VNode | undefined, VNode[]] = [undefined, []]
 
   data.forEach((data, index) => {
     if (index > 0 && metadataTypeSeparator !== "") {
@@ -81,10 +80,10 @@ export function normsMetadataSummarizer(
     }
 
     const processBoldInOneLineValue = (value: string) => {
-      prefix = h(
+      footnotes[0] = h(
         "span",
         { class: ["pr-10", "font-bold"] },
-        value.trim().replaceAll(/\n/g, "<br>"),
+        value.trim().replace(/\n/g, "<br>"),
       )
     }
 
@@ -101,7 +100,7 @@ export function normsMetadataSummarizer(
         { class: ["pl-6", "pr-10", "inline", "whitespace-pre-wrap"] },
         content,
       )
-      footnotes.push(
+      footnotes[1].push(
         h("span", { class: "leading-loose" }, [typeNode, contentTextNode]),
       )
     }
@@ -134,10 +133,10 @@ export function normsMetadataSummarizer(
     }
   })
 
-  if (footnotes.length > 0) {
+  if (footnotes[1].length > 0) {
     return h("div", { class: ["flex", "flex-col", "gap-10"] }, [
-      prefix,
-      h("div", footnotes),
+      footnotes[0],
+      h("div", footnotes[1]),
     ])
   }
 
