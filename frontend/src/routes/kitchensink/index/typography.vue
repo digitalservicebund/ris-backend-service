@@ -1,5 +1,9 @@
+<script setup lang="ts">
+import KitchensinkPage from "@/kitchensink/components/KitchensinkPage.vue"
+</script>
+
 <template>
-  <div class="space-y-32">
+  <KitchensinkPage name="Typography">
     <h1 class="ds-heading-01-reg">.ds-heading-01-reg</h1>
     <h2 class="ds-heading-02-reg">.ds-heading-02-reg</h2>
     <h3 class="ds-heading-03-reg">.ds-heading-03-reg</h3>
@@ -17,5 +21,5 @@
     <div><a class="ds-link-01-bold" href="#">.ds-link-01-bold</a></div>
     <div><a class="ds-link-02-bold" href="#">.ds-link-02-bold</a></div>
     <div><a class="ds-link-03-bold" href="#">.ds-link-03-bold</a></div>
-  </div>
+  </KitchensinkPage>
 </template>

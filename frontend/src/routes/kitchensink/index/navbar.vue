@@ -1,4 +1,6 @@
 <script lang="ts" setup>
+import KitchensinkPage from "@/kitchensink/components/KitchensinkPage.vue"
+import KitchensinkStory from "@/kitchensink/components/KitchensinkStory.vue"
 import NavbarSide, {
   LevelOneMenuItem,
 } from "@/shared/components/NavbarSide.vue"
@@ -31,18 +33,17 @@ const menuItems: LevelOneMenuItem[] = [
 </script>
 
 <template>
-  <div class="flex flex-col items-start gap-y-20">
-    <h1 class="text-32 font-bold">Navbar Top</h1>
-    <div class="min-w-full">
+  <KitchensinkPage name="Navbar">
+    <KitchensinkStory name="Top">
       <Navbar></Navbar>
-    </div>
-    <h1 class="text-32 font-bold">Navbar Side</h1>
-    <div class="min-h-[200px] pb-4">
+    </KitchensinkStory>
+
+    <KitchensinkStory name="Side">
       <NavbarSide
         go-back-label="Zurück"
         :go-back-route="goBackRoute"
         :menu-items="menuItems"
       />
-    </div>
-  </div>
+    </KitchensinkStory>
+  </KitchensinkPage>
 </template>

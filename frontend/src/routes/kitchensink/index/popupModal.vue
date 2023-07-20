@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { ref } from "vue"
+import KitchensinkPage from "@/kitchensink/components/KitchensinkPage.vue"
 import TextButton from "@/shared/components/input/TextButton.vue"
 import PopupModal from "@/shared/components/PopupModal.vue"
 
@@ -10,16 +11,8 @@ const toggleModal = () => {
 </script>
 
 <template>
-  <div>
-    <div class="flex flex-col gap-y-20">
-      <div>
-        <TextButton
-          button-type="primary"
-          label="Open Modal"
-          @click="toggleModal"
-        />
-      </div>
-    </div>
+  <KitchensinkPage name="Popup modal">
+    <TextButton button-type="primary" label="Open Modal" @click="toggleModal" />
     <PopupModal
       v-if="showModal"
       aria-label="Popup Modal"
@@ -31,5 +24,5 @@ const toggleModal = () => {
       @close-modal="toggleModal"
       @confirm-action="toggleModal"
     />
-  </div>
+  </KitchensinkPage>
 </template>

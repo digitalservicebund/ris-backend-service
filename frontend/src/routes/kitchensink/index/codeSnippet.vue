@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import CodeSnippet from "@/components/CodeSnippet.vue"
+import KitchensinkPage from "@/kitchensink/components/KitchensinkPage.vue"
 
 const xml =
   '<?xml version="1.0" encoding="UTF-8"?>\n' +
@@ -27,5 +28,7 @@ const xml =
 </script>
 
 <template>
-  <CodeSnippet title="XML" :xml="xml" />
+  <KitchensinkPage name="Code snippet">
+    <CodeSnippet title="XML" :xml="xml" />
+  </KitchensinkPage>
 </template>
