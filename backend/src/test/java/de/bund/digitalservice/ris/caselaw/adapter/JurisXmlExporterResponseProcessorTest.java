@@ -18,9 +18,9 @@ import de.bund.digitalservice.ris.caselaw.domain.HttpMailSender;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationReport;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationReportRepository;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
-import de.bund.digitalservice.ris.domain.export.juris.response.ImportMessageHandler;
+import de.bund.digitalservice.ris.domain.export.juris.response.ImportMessageWrapper;
 import de.bund.digitalservice.ris.domain.export.juris.response.MessageAttachment;
-import de.bund.digitalservice.ris.domain.export.juris.response.ProcessMessageHandler;
+import de.bund.digitalservice.ris.domain.export.juris.response.ProcessMessageWrapper;
 import de.bund.digitalservice.ris.domain.export.juris.response.StatusImporterException;
 import jakarta.mail.BodyPart;
 import jakarta.mail.Flags.Flag;
@@ -34,7 +34,6 @@ import jakarta.mail.internet.MimeMultipart;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -43,7 +42,9 @@ import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InOrder;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -51,7 +52,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @ExtendWith(SpringExtension.class)
-@Import({JurisXmlExporterResponseProcessor.class})
+@Import({JurisXmlExporterResponseProcessor.class, JurisMessageWrapperFactory.class})
 class JurisXmlExporterResponseProcessorTest {
   private final String DOCUMENT_NUMBER = "KORE123456789";
   @MockBean private DocumentUnitStatusService statusService;
@@ -62,24 +63,31 @@ class JurisXmlExporterResponseProcessorTest {
   @Mock private Folder inbox;
   @Mock private Folder processed;
   @Mock private Folder unprocessable;
-  @Mock private Message message;
-  @Mock private ImportMessageHandler importMessageHandler;
-  @Mock private ProcessMessageHandler processMessageHandler;
+  @Mock private Message importMessage;
+  @Mock private ImportMessageWrapper importMessageWrapper;
+  @Mock private Message processMessage;
+  @Mock private ProcessMessageWrapper processMessageWrapper;
+  @Mock private JurisMessageWrapperFactory wrapperFactory;
   private JurisXmlExporterResponseProcessor responseProcessor;
 
   @BeforeEach
-  void setup() throws MessagingException, IOException {
+  void setup() throws MessagingException {
     when(storeFactory.createStore()).thenReturn(store);
     when(store.getFolder("INBOX")).thenReturn(inbox);
     when(store.getFolder("processed")).thenReturn(processed);
     when(store.getFolder("unprocessable")).thenReturn(unprocessable);
-    when(inbox.getMessages()).thenReturn(new Message[] {message});
-    when(processMessageHandler.canHandle(message)).thenReturn(true);
-    when(processMessageHandler.messageIsActionable()).thenReturn(true);
-    when(processMessageHandler.getDocumentNumber(message)).thenReturn(DOCUMENT_NUMBER);
-    when(importMessageHandler.canHandle(message)).thenReturn(true);
-    when(importMessageHandler.messageIsActionable()).thenReturn(true);
-    when(importMessageHandler.getDocumentNumber(message)).thenReturn(DOCUMENT_NUMBER);
+
+    when(importMessageWrapper.getMessage()).thenReturn(importMessage);
+    when(importMessageWrapper.messageIsActionable()).thenReturn(true);
+    when(importMessageWrapper.getDocumentNumber()).thenReturn(DOCUMENT_NUMBER);
+    when(wrapperFactory.getResponsibleWrapper(importMessage))
+        .thenReturn(Optional.of(importMessageWrapper));
+
+    when(processMessageWrapper.getMessage()).thenReturn(processMessage);
+    when(processMessageWrapper.messageIsActionable()).thenReturn(true);
+    when(processMessageWrapper.getDocumentNumber()).thenReturn(DOCUMENT_NUMBER);
+    when(wrapperFactory.getResponsibleWrapper(processMessage))
+        .thenReturn(Optional.of(processMessageWrapper));
 
     when(reportRepository.saveAll(any())).thenReturn(Flux.empty());
     when(statusService.update(anyString(), any(DocumentUnitStatus.class))).thenReturn(Mono.empty());
@@ -88,28 +96,42 @@ class JurisXmlExporterResponseProcessorTest {
 
     responseProcessor =
         new JurisXmlExporterResponseProcessor(
-            Arrays.asList(processMessageHandler, importMessageHandler),
-            mailSender,
-            statusService,
-            storeFactory,
-            reportRepository);
+            mailSender, statusService, storeFactory, reportRepository, wrapperFactory);
   }
 
   @Test
   void testMessageGetsForwarded() throws MessagingException {
+    when(inbox.getMessages()).thenReturn(new Message[] {importMessage});
+
     responseProcessor.readEmails();
 
     verify(storeFactory, times(1)).createStore();
     verify(statusService, times(1)).getLatestIssuerAddress(DOCUMENT_NUMBER);
     verify(mailSender, times(1))
         .sendMail(any(), any(), any(), any(), any(), eq("report-" + DOCUMENT_NUMBER));
-    verify(inbox, times(1)).copyMessages(new Message[] {message}, processed);
-    verify(message, times(1)).setFlag(Flag.DELETED, true);
+    verify(inbox, times(1)).copyMessages(new Message[] {importMessage}, processed);
+    verify(importMessage, times(1)).setFlag(Flag.DELETED, true);
+  }
+
+  @Test
+  void testMessageGetsNotMovedIfNotForwarded() throws MessagingException {
+    when(inbox.getMessages()).thenReturn(new Message[] {importMessage});
+    when(importMessageWrapper.getSubject()).thenThrow(new MessagingException());
+
+    assertThrows(
+        StatusImporterException.class,
+        () -> {
+          responseProcessor.readEmails();
+        });
+
+    verifyNoInteractions(mailSender);
+    verify(inbox, never()).getFolder("processed");
+    verify(importMessage, never()).setFlag(Flag.DELETED, true);
   }
 
   @Test
   void testMessageEncoding() throws MessagingException, IOException {
-    when(processMessageHandler.canHandle(message)).thenReturn(false);
+    when(inbox.getMessages()).thenReturn(new Message[] {importMessage});
     when(statusService.getLatestIssuerAddress(DOCUMENT_NUMBER))
         .thenReturn(Mono.just("test@digitalservice.bund.de"));
 
@@ -122,12 +144,12 @@ class JurisXmlExporterResponseProcessorTest {
     BufferedReader reader =
         new BufferedReader(new InputStreamReader(attachmentPart.getInputStream()));
 
-    when(importMessageHandler.getAttachments(message))
+    when(importMessageWrapper.getAttachments())
         .thenReturn(
             Collections.singletonList(
                 new MessageAttachment(
                     "test.txt", reader.lines().collect(Collectors.joining("\n")))));
-    when(message.getContent()).thenReturn(multipart);
+    when(importMessage.getContent()).thenReturn(multipart);
 
     responseProcessor.readEmails();
 
@@ -142,49 +164,36 @@ class JurisXmlExporterResponseProcessorTest {
   }
 
   @Test
-  void testMessageGetsNotMovedIfNotForwarded() throws MessagingException {
-    when(message.getSubject()).thenThrow(new MessagingException());
-
-    assertThrows(
-        StatusImporterException.class,
-        () -> {
-          responseProcessor.readEmails();
-        });
-
-    verifyNoInteractions(mailSender);
-    verify(inbox, never()).getFolder("processed");
-    verify(message, never()).setFlag(Flag.DELETED, true);
-  }
-
-  @Test
   void testMessageGetsNotProcessedIfNotActionable() throws MessagingException {
-    when(processMessageHandler.messageIsActionable()).thenReturn(false);
-    when(importMessageHandler.canHandle(message)).thenReturn(false);
+    when(inbox.getMessages()).thenReturn(new Message[] {processMessage});
+    when(processMessageWrapper.messageIsActionable()).thenReturn(false);
 
     responseProcessor.readEmails();
 
     verifyNoInteractions(mailSender);
-    verify(inbox, times(1)).copyMessages(new Message[] {message}, unprocessable);
-    verify(message, times(1)).setFlag(Flag.DELETED, true);
+    verify(inbox, times(1)).copyMessages(new Message[] {processMessage}, unprocessable);
+    verify(processMessage, times(1)).setFlag(Flag.DELETED, true);
   }
 
   @Test
   void testAttachmentsGetsPersisted() throws MessagingException, IOException {
+    when(inbox.getMessages()).thenReturn(new Message[] {processMessage});
+
     Date now = new Date();
     when(statusService.getLatestIssuerAddress(DOCUMENT_NUMBER))
         .thenReturn(Mono.just("test@digitalservice.bund.de"));
-    when(processMessageHandler.getAttachments(message))
+    when(processMessageWrapper.getAttachments())
         .thenReturn(
             List.of(
                 new MessageAttachment(String.format("%s.html", DOCUMENT_NUMBER), "report"),
                 new MessageAttachment(
                     String.format("%s-spellcheck.html", DOCUMENT_NUMBER), "spellcheck")));
-    when(processMessageHandler.getDocumentNumber(message)).thenReturn(DOCUMENT_NUMBER);
-    when((message.getReceivedDate())).thenReturn(now);
+    when(processMessageWrapper.getDocumentNumber()).thenReturn(DOCUMENT_NUMBER);
+    when((processMessageWrapper.getReceivedDate())).thenReturn(now.toInstant());
 
     responseProcessor.readEmails();
 
-    verify(inbox, times(1)).copyMessages(new Message[] {message}, processed);
+    verify(inbox, times(1)).copyMessages(new Message[] {processMessage}, processed);
     verify(reportRepository)
         .saveAll(
             List.of(
@@ -202,6 +211,7 @@ class JurisXmlExporterResponseProcessorTest {
 
   @Test
   void testAttachmentsGetSanitized() throws MessagingException, IOException {
+    when(inbox.getMessages()).thenReturn(new Message[] {processMessage});
     Date now = new Date();
     when(statusService.getLatestIssuerAddress(DOCUMENT_NUMBER))
         .thenReturn(Mono.just("test@digitalservice.bund.de"));
@@ -257,7 +267,7 @@ class JurisXmlExporterResponseProcessorTest {
        </table>Text
    </strong><br /></p>
 <hr width="100%" />""";
-    when(processMessageHandler.getAttachments(message))
+    when(processMessageWrapper.getAttachments())
         .thenReturn(
             List.of(
                 new MessageAttachment(
@@ -266,12 +276,12 @@ class JurisXmlExporterResponseProcessorTest {
                 new MessageAttachment(
                     String.format("%s-spellcheck.html", DOCUMENT_NUMBER),
                     "<p><script>alert('sanitize me')</script></p>")));
-    when(processMessageHandler.getDocumentNumber(message)).thenReturn(DOCUMENT_NUMBER);
-    when((message.getReceivedDate())).thenReturn(now);
+    when(processMessageWrapper.getDocumentNumber()).thenReturn(DOCUMENT_NUMBER);
+    when((processMessageWrapper.getReceivedDate())).thenReturn(now.toInstant());
 
     responseProcessor.readEmails();
 
-    verify(inbox, times(1)).copyMessages(new Message[] {message}, processed);
+    verify(inbox, times(1)).copyMessages(new Message[] {processMessage}, processed);
     verify(reportRepository)
         .saveAll(
             List.of(
@@ -288,11 +298,11 @@ class JurisXmlExporterResponseProcessorTest {
   }
 
   @Test
-  void testProcessMessageSetsPublishingStatus() {
-    when(processMessageHandler.canHandle(message)).thenReturn(true);
-    when(processMessageHandler.messageIsActionable()).thenReturn(true);
-    when(processMessageHandler.isPublished(message)).thenReturn(Optional.empty());
-    when(processMessageHandler.hasErrors(message)).thenReturn(false);
+  void testProcessMessageSetsPublishingStatus() throws MessagingException {
+    when(inbox.getMessages()).thenReturn(new Message[] {importMessage});
+
+    when(processMessageWrapper.isPublished()).thenReturn(Optional.empty());
+    when(processMessageWrapper.hasErrors()).thenReturn(false);
 
     responseProcessor.readEmails();
 
@@ -307,13 +317,11 @@ class JurisXmlExporterResponseProcessorTest {
   }
 
   @Test
-  void testProcessMessageSetsUnpublishedStatus() {
-    when(processMessageHandler.canHandle(message)).thenReturn(true);
-    when(processMessageHandler.messageIsActionable()).thenReturn(true);
-    when(processMessageHandler.isPublished(message)).thenReturn(Optional.of(false));
-    when(processMessageHandler.hasErrors(message)).thenReturn(true);
+  void testProcessMessageSetsUnpublishedStatus() throws MessagingException {
+    when(inbox.getMessages()).thenReturn(new Message[] {processMessage});
 
-    when(importMessageHandler.canHandle(message)).thenReturn(false);
+    when(processMessageWrapper.isPublished()).thenReturn(Optional.of(false));
+    when(processMessageWrapper.hasErrors()).thenReturn(true);
 
     responseProcessor.readEmails();
 
@@ -328,13 +336,12 @@ class JurisXmlExporterResponseProcessorTest {
   }
 
   @Test
-  void testImportMessageSetsPublishedStatus() {
-    when(processMessageHandler.canHandle(message)).thenReturn(false);
+  void testImportMessageSetsPublishedStatus() throws MessagingException {
+    when(inbox.getMessages()).thenReturn(new Message[] {processMessage});
 
-    when(importMessageHandler.canHandle(message)).thenReturn(true);
-    when(importMessageHandler.messageIsActionable()).thenReturn(true);
-    when(importMessageHandler.isPublished(message)).thenReturn(Optional.of(true));
-    when(importMessageHandler.hasErrors(message)).thenReturn(false);
+    when(processMessageWrapper.messageIsActionable()).thenReturn(true);
+    when(processMessageWrapper.isPublished()).thenReturn(Optional.of(true));
+    when(processMessageWrapper.hasErrors()).thenReturn(false);
 
     responseProcessor.readEmails();
 
@@ -349,13 +356,11 @@ class JurisXmlExporterResponseProcessorTest {
   }
 
   @Test
-  void testImportMessageSetsPublishedWithErrorsStatus() {
-    when(processMessageHandler.canHandle(message)).thenReturn(false);
+  void testImportMessageSetsPublishedWithErrorsStatus() throws MessagingException {
+    when(inbox.getMessages()).thenReturn(new Message[] {processMessage});
 
-    when(importMessageHandler.canHandle(message)).thenReturn(true);
-    when(importMessageHandler.messageIsActionable()).thenReturn(true);
-    when(importMessageHandler.isPublished(message)).thenReturn(Optional.of(true));
-    when(importMessageHandler.hasErrors(message)).thenReturn(true);
+    when(processMessageWrapper.isPublished()).thenReturn(Optional.of(true));
+    when(processMessageWrapper.hasErrors()).thenReturn(true);
 
     responseProcessor.readEmails();
 
@@ -370,13 +375,11 @@ class JurisXmlExporterResponseProcessorTest {
   }
 
   @Test
-  void testImportMessageSetsUnpublishedStatus() {
-    when(processMessageHandler.canHandle(message)).thenReturn(false);
+  void testImportMessageSetsUnpublishedStatus() throws MessagingException {
+    when(inbox.getMessages()).thenReturn(new Message[] {importMessage});
 
-    when(importMessageHandler.canHandle(message)).thenReturn(true);
-    when(importMessageHandler.messageIsActionable()).thenReturn(true);
-    when(importMessageHandler.isPublished(message)).thenReturn(Optional.of(false));
-    when(importMessageHandler.hasErrors(message)).thenReturn(true);
+    when(importMessageWrapper.isPublished()).thenReturn(Optional.of(false));
+    when(importMessageWrapper.hasErrors()).thenReturn(true);
 
     responseProcessor.readEmails();
 
@@ -388,5 +391,42 @@ class JurisXmlExporterResponseProcessorTest {
                     .status(PublicationStatus.UNPUBLISHED)
                     .withError(true)
                     .build()));
+  }
+
+  @Test
+  void testImportMessagesGetProcessedFirst() throws MessagingException {
+    when(inbox.getMessages()).thenReturn(new Message[] {processMessage, importMessage});
+
+    when(processMessageWrapper.hasErrors()).thenReturn(false);
+    when(processMessageWrapper.isPublished()).thenReturn(Optional.empty());
+
+    when(importMessageWrapper.hasErrors()).thenReturn(false);
+    when(importMessageWrapper.isPublished()).thenReturn(Optional.of(true));
+
+    responseProcessor.readEmails();
+
+    InOrder inOrder = Mockito.inOrder(statusService);
+
+    inOrder
+        .verify(statusService, times(1))
+        .update(
+            anyString(),
+            eq(
+                DocumentUnitStatus.builder()
+                    .status(PublicationStatus.PUBLISHING)
+                    .withError(false)
+                    .build()));
+
+    inOrder
+        .verify(statusService, times(1))
+        .update(
+            anyString(),
+            eq(
+                DocumentUnitStatus.builder()
+                    .status(PublicationStatus.PUBLISHED)
+                    .withError(false)
+                    .build()));
+
+    inOrder.verifyNoMoreInteractions();
   }
 }

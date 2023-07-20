@@ -8,8 +8,8 @@ import de.bund.digitalservice.ris.caselaw.domain.MailStoreFactory;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationReport;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationReportRepository;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
-import de.bund.digitalservice.ris.domain.export.juris.response.ActionableMessageHandler;
-import de.bund.digitalservice.ris.domain.export.juris.response.MessageHandler;
+import de.bund.digitalservice.ris.domain.export.juris.response.MessageWrapper;
+import de.bund.digitalservice.ris.domain.export.juris.response.ProcessMessageWrapper;
 import de.bund.digitalservice.ris.domain.export.juris.response.StatusImporterException;
 import jakarta.mail.Flags.Flag;
 import jakarta.mail.Folder;
@@ -17,10 +17,13 @@ import jakarta.mail.Message;
 import jakarta.mail.MessagingException;
 import jakarta.mail.Store;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Date;
+import java.time.Instant;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import org.owasp.html.HtmlPolicyBuilder;
 import org.owasp.html.PolicyFactory;
 import org.slf4j.Logger;
@@ -34,23 +37,23 @@ public class JurisXmlExporterResponseProcessor {
 
   private static final Logger LOGGER =
       LoggerFactory.getLogger(JurisXmlExporterResponseProcessor.class);
-  private final List<MessageHandler> messageHandlers;
   private final HttpMailSender mailSender;
   private final DocumentUnitStatusService statusService;
   private final PublicationReportRepository reportRepository;
   private final MailStoreFactory storeFactory;
+  private final JurisMessageWrapperFactory wrapperFactory;
 
   public JurisXmlExporterResponseProcessor(
-      List<MessageHandler> messageHandlers,
       HttpMailSender mailSender,
       DocumentUnitStatusService statusService,
       MailStoreFactory storeFactory,
-      PublicationReportRepository reportRepository) {
-    this.messageHandlers = messageHandlers;
+      PublicationReportRepository reportRepository,
+      JurisMessageWrapperFactory wrapperFactory) {
     this.mailSender = mailSender;
     this.statusService = statusService;
     this.storeFactory = storeFactory;
     this.reportRepository = reportRepository;
+    this.wrapperFactory = wrapperFactory;
   }
 
   @Scheduled(fixedDelay = 60000, initialDelay = 60000)
@@ -63,56 +66,42 @@ public class JurisXmlExporterResponseProcessor {
   }
 
   private void processInbox(Store store) {
-    List<Message> processedMessages = new ArrayList<>();
-    List<Message> unprocessableMessages = new ArrayList<>();
-
     try {
       Folder inbox = store.getFolder("INBOX");
       inbox.open(Folder.READ_WRITE);
 
-      for (Message message : inbox.getMessages()) {
-        Optional<MessageHandler> handler = getResponsibleHandler(message);
+      Map<Boolean, List<MessageWrapper>> partitionedMessages =
+          Arrays.stream(inbox.getMessages())
+              .map(wrapperFactory::getResponsibleWrapper)
+              .flatMap(Optional::stream)
+              .collect(Collectors.partitioningBy(MessageWrapper::messageIsActionable));
 
-        if (handler.isEmpty() || !handler.get().messageIsActionable()) {
-          unprocessableMessages.add(message);
-          continue;
-        }
+      List<MessageWrapper> unprocessableMessages = partitionedMessages.get(false);
+      moveMessages(unprocessableMessages, inbox, store.getFolder("unprocessable"));
 
-        processMessage(message, (ActionableMessageHandler) handler.get(), processedMessages);
-      }
-
-      if (!processedMessages.isEmpty())
-        moveMessages(processedMessages, inbox, store.getFolder("processed"));
-      if (!unprocessableMessages.isEmpty())
-        moveMessages(unprocessableMessages, inbox, store.getFolder("unprocessable"));
-
-      inbox.expunge();
+      List<MessageWrapper> processedMessages =
+          partitionedMessages.get(true).stream()
+              .sorted(
+                  Comparator.comparing(wrapper -> wrapper instanceof ProcessMessageWrapper ? 0 : 1))
+              .map(this::processMessage)
+              .toList();
+      moveMessages(processedMessages, inbox, store.getFolder("processed"));
     } catch (MessagingException e) {
       throw new StatusImporterException("Error processing inbox: " + e);
     }
   }
 
-  private void processMessage(
-      Message message, ActionableMessageHandler handler, List<Message> processedMessages) {
-    try {
-      String documentNumber = handler.getDocumentNumber(message);
-      List<Attachment> attachments = collectAttachments(message, handler);
-      Mono.when(
-              forwardMessage(documentNumber, message.getSubject(), attachments),
-              setPublicationStatus(message, handler, documentNumber),
-              saveAttachments(documentNumber, message.getReceivedDate(), attachments))
-          .doOnSuccess(result -> processedMessages.add(message))
-          .doOnError(e -> LOGGER.error("Error processing message: ", e))
-          .onErrorResume(e -> Mono.empty())
-          .block();
-    } catch (MessagingException | IOException e) {
-      throw new StatusImporterException("Error processing message: " + e);
-    }
+  private MessageWrapper processMessage(MessageWrapper messageWrapper) {
+    return Mono.just(messageWrapper)
+        .flatMap(this::forwardMessage)
+        .flatMap(this::setPublicationStatus)
+        .flatMap(this::saveAttachments)
+        .doOnSuccess(result -> LOGGER.info("Message processed for: " + messageWrapper))
+        .doOnError(e -> LOGGER.error("Error processing message: ", e))
+        .block();
   }
 
-  private Mono<Void> saveAttachments(
-      String documentNumber, Date receivedDate, List<Attachment> attachments) {
-
+  private Mono<MessageWrapper> saveAttachments(MessageWrapper messageWrapper) {
     PolicyFactory policy =
         new HtmlPolicyBuilder()
             .allowElements(
@@ -127,24 +116,32 @@ public class JurisXmlExporterResponseProcessor {
             .onElements("font")
             .toFactory();
 
-    return reportRepository
-        .saveAll(
-            attachments.stream()
-                .filter(attachment -> attachment.fileName().endsWith(".html"))
-                .map(
-                    attachment ->
-                        PublicationReport.builder()
-                            .documentNumber(documentNumber)
-                            .receivedDate(receivedDate.toInstant())
-                            .content(policy.sanitize(attachment.fileContent()))
-                            .build())
-                .toList())
-        .then();
+    try {
+      List<Attachment> attachments = collectAttachments(messageWrapper);
+      String documentNumber = messageWrapper.getDocumentNumber();
+      Instant receivedDate = messageWrapper.getReceivedDate();
+      return reportRepository
+          .saveAll(
+              attachments.stream()
+                  .filter(attachment -> attachment.fileName().endsWith(".html"))
+                  .map(
+                      attachment ->
+                          PublicationReport.builder()
+                              .documentNumber(documentNumber)
+                              .receivedDate(receivedDate)
+                              .content(policy.sanitize(attachment.fileContent()))
+                              .build())
+                  .toList())
+          .collectList()
+          .thenReturn(messageWrapper);
+    } catch (MessagingException | IOException e) {
+      return Mono.error(new StatusImporterException("Error saving attachments"));
+    }
   }
 
-  private List<Attachment> collectAttachments(Message message, ActionableMessageHandler handler)
+  private List<Attachment> collectAttachments(MessageWrapper messageWrapper)
       throws MessagingException, IOException {
-    return handler.getAttachments(message).stream()
+    return messageWrapper.getAttachments().stream()
         .map(
             attachment ->
                 Attachment.builder()
@@ -154,43 +151,56 @@ public class JurisXmlExporterResponseProcessor {
         .toList();
   }
 
-  private Mono<Void> setPublicationStatus(
-      Message message, ActionableMessageHandler handler, String documentNumber) {
+  private Mono<MessageWrapper> setPublicationStatus(MessageWrapper messageWrapper) {
     try {
-
-      return statusService.update(
-          documentNumber,
-          DocumentUnitStatus.builder()
-              .status(getPublicationStatus(handler.isPublished(message)))
-              .withError(handler.hasErrors(message))
-              .build());
+      return statusService
+          .update(
+              messageWrapper.getDocumentNumber(),
+              DocumentUnitStatus.builder()
+                  .status(getPublicationStatus(messageWrapper.isPublished()))
+                  .withError(messageWrapper.hasErrors())
+                  .build())
+          .thenReturn(messageWrapper);
     } catch (MessagingException | IOException e) {
-      throw new StatusImporterException("Could not update status" + e);
+      return Mono.error(new StatusImporterException("Could not update status" + e));
     }
   }
 
-  private Mono<Void> forwardMessage(
-      String documentNumber, String subject, List<Attachment> attachments) {
-    return statusService
-        .getLatestIssuerAddress(documentNumber)
-        .flatMap(
-            issuerAddress ->
-                Mono.fromRunnable(
-                    () ->
-                        mailSender.sendMail(
-                            storeFactory.getUsername(),
-                            issuerAddress,
-                            "FWD: " + subject,
-                            "Anbei weitergeleitet von der jDV:",
-                            attachments,
-                            "report-" + documentNumber)));
+  private Mono<MessageWrapper> forwardMessage(MessageWrapper messageWrapper) {
+    try {
+      String documentNumber = messageWrapper.getDocumentNumber();
+      String subject = messageWrapper.getSubject();
+      List<Attachment> attachments = collectAttachments(messageWrapper);
+
+      return statusService
+          .getLatestIssuerAddress(documentNumber)
+          .flatMap(
+              issuerAddress ->
+                  Mono.fromRunnable(
+                      () ->
+                          mailSender.sendMail(
+                              storeFactory.getUsername(),
+                              issuerAddress,
+                              "FWD: " + subject,
+                              "Anbei weitergeleitet von der jDV:",
+                              attachments,
+                              "report-" + documentNumber)))
+          .thenReturn(messageWrapper);
+    } catch (MessagingException | IOException e) {
+      return Mono.error(new StatusImporterException("Could not forward Message"));
+    }
   }
 
-  private void moveMessages(List<Message> messages, Folder from, Folder to) {
+  private void moveMessages(List<MessageWrapper> messageWrappers, Folder from, Folder to) {
+    if (messageWrappers.isEmpty()) return;
+
     try {
       if (!from.isOpen()) from.open(Folder.READ_WRITE);
+      List<Message> messages = messageWrappers.stream().map(MessageWrapper::getMessage).toList();
       from.copyMessages(messages.toArray(new Message[0]), to);
+
       deleteMessages(messages);
+      from.expunge();
     } catch (MessagingException e) {
       throw new StatusImporterException("Error moving message: " + e);
     }
@@ -205,10 +215,6 @@ public class JurisXmlExporterResponseProcessor {
             throw new StatusImporterException("Error deleting Message: " + e);
           }
         });
-  }
-
-  private Optional<MessageHandler> getResponsibleHandler(Message message) {
-    return this.messageHandlers.stream().filter(handler -> handler.canHandle(message)).findFirst();
   }
 
   private PublicationStatus getPublicationStatus(Optional<Boolean> isPublished) {
