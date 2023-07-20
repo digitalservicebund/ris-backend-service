@@ -3,12 +3,7 @@ import { importNormViaApi, loadJurisTestFile } from "./e2e-utils"
 import { normData } from "./testdata/norm_basic"
 import { FieldType, MetadataInputSection } from "./utilities"
 import { FOOTNOTE_LABELS } from "@/components/footnote/types"
-import {
-  MetadataSectionName,
-  Norm,
-  NormCategory,
-  UndefinedDate,
-} from "@/domain/Norm"
+import { MetadataSectionName, Norm, NormCategory } from "@/domain/Norm"
 
 type MyFixtures = {
   normData: NormData
@@ -59,21 +54,6 @@ type RecursiveOmit<Type, KeyToOmit extends PropertyKey> = Type extends {
 }
   ? NullUnionOmit<RecursiveOmitHelper<Type, KeyToOmit>, KeyToOmit>
   : RecursiveOmitHelper<Type, KeyToOmit>
-
-function undefinedDateToDropdownEntry(
-  unit?: UndefinedDate,
-): string | undefined {
-  switch (unit) {
-    case UndefinedDate.UNDEFINED_UNKNOWN:
-      return "unbestimmt (unbekannt)"
-    case UndefinedDate.UNDEFINED_FUTURE:
-      return "unbestimmt (zukünftig)"
-    case UndefinedDate.UNDEFINED_NOT_PRESENT:
-      return "nicht vorhanden"
-    default:
-      return undefined
-  }
-}
 
 export type NormData = RecursiveOmit<Norm, "guid"> & {
   jurisZipFileName: string
@@ -436,8 +416,8 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
           type: FieldType.DROPDOWN,
           id: "entryIntoForceUndefinedDateState",
           label: "Unbestimmtes Inkrafttretedatum",
-          values: norm.metadataSections?.ENTRY_INTO_FORCE?.map((section) =>
-            undefinedDateToDropdownEntry(section?.UNDEFINED_DATE?.[0]),
+          values: norm.metadataSections?.ENTRY_INTO_FORCE?.map(
+            (section) => section?.UNDEFINED_DATE?.[0],
           ),
         },
       ],
@@ -476,8 +456,7 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
           id: "principleEntryIntoForceUndefinedDateState",
           label: "Unbestimmtes grundsätzliches Inkrafttretedatum",
           values: norm.metadataSections?.PRINCIPLE_ENTRY_INTO_FORCE?.map(
-            (section) =>
-              undefinedDateToDropdownEntry(section?.UNDEFINED_DATE?.[0]),
+            (section) => section?.UNDEFINED_DATE?.[0],
           ),
         },
       ],
@@ -568,9 +547,7 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
           label: "Unbestimmtes abweichendes Inkrafttretedatum",
           values: norm.metadataSections?.DIVERGENT_ENTRY_INTO_FORCE?.map(
             (section) => section?.DIVERGENT_ENTRY_INTO_FORCE_UNDEFINED?.[0],
-          ).map((section) =>
-            undefinedDateToDropdownEntry(section?.UNDEFINED_DATE?.[0]),
-          ),
+          ).map((section) => section?.UNDEFINED_DATE?.[0]),
         },
         {
           type: FieldType.CHECKBOX,
@@ -658,8 +635,8 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
           type: FieldType.DROPDOWN,
           id: "expirationUndefinedDate",
           label: "Unbestimmtes Außerkrafttretedatum",
-          values: norm.metadataSections?.EXPIRATION?.map((section) =>
-            undefinedDateToDropdownEntry(section?.UNDEFINED_DATE?.[0]),
+          values: norm.metadataSections?.EXPIRATION?.map(
+            (section) => section?.UNDEFINED_DATE?.[0],
           ),
         },
       ],
@@ -697,8 +674,8 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
           type: FieldType.DROPDOWN,
           id: "principleExpirationUndefinedDate",
           label: "Unbestimmtes grundsätzliches Außerkrafttretedatum",
-          values: norm.metadataSections?.PRINCIPLE_EXPIRATION?.map((section) =>
-            undefinedDateToDropdownEntry(section?.UNDEFINED_DATE?.[0]),
+          values: norm.metadataSections?.PRINCIPLE_EXPIRATION?.map(
+            (section) => section?.UNDEFINED_DATE?.[0],
           ),
         },
       ],
@@ -789,9 +766,7 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
           label: "Unbestimmtes abweichendes Außerkrafttretedatum",
           values: norm.metadataSections?.DIVERGENT_EXPIRATION?.map(
             (section) => section?.DIVERGENT_EXPIRATION_UNDEFINED?.[0],
-          )
-            .map((section) => section?.UNDEFINED_DATE?.[0])
-            .map(undefinedDateToDropdownEntry),
+          ).map((section) => section?.UNDEFINED_DATE?.[0]),
         },
         {
           type: FieldType.CHECKBOX,

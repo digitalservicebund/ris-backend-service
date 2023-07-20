@@ -66,8 +66,8 @@ const expectChipsInput: FieldExpecter<string[]> = async (page, id, value) => {
 }
 
 const expectDropdown: FieldExpecter<string> = async (page, id, value) => {
-  const inputValue = await page.locator(`input#${id}`).inputValue()
-  expect(inputValue).toBe(value)
+  const dropdownValue = await page.locator(`select#${id}`).inputValue()
+  expect(dropdownValue).toBe(value)
 }
 
 const FIELD_EXPECTER: FieldExpectMapping = {

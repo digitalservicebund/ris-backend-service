@@ -117,9 +117,7 @@ test.describe("a11y of categories page (/caselaw/documentunit/{documentNumber}/c
 
   test("rechtskraft", async ({ page, documentNumber }) => {
     await navigateToCategories(page, documentNumber)
-    await page
-      .locator("[aria-label='Rechtskraft'] + button.input-expand-icon")
-      .click()
+    await page.locator("[aria-label='Rechtskraft']").click()
 
     const accessibilityScanResults = await new AxeBuilder({ page })
       .disableRules(["duplicate-id-aria"])

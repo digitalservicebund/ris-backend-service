@@ -169,18 +169,14 @@ test.describe("core data", () => {
 
   test("test legal effect dropdown", async ({ page, documentNumber }) => {
     await navigateToCategories(page, documentNumber)
+    const dropdown = page.getByRole("combobox", { name: "Rechtskraft" })
+    await expect(dropdown).toHaveValue("Keine Angabe")
 
-    await expect(page.locator("[aria-label='Rechtskraft']")).toHaveValue(
-      "Keine Angabe",
-    )
-
-    await page
-      .locator("[aria-label='Rechtskraft'] + button.input-expand-icon")
-      .click()
-
-    await expect(page.getByText("Ja", { exact: true })).toBeVisible()
-    await expect(page.locator("text=Nein")).toBeVisible()
-    await expect(page.locator("text=Keine Angabe")).toBeVisible()
+    await expect(dropdown.getByRole("option", { name: "Ja" })).toHaveCount(1)
+    await expect(dropdown.getByRole("option", { name: "Nein" })).toHaveCount(1)
+    await expect(
+      dropdown.getByRole("option", { name: "Keine Angabe" }),
+    ).toHaveCount(1)
   })
 
   test("test document type dropdown", async ({ page, documentNumber }) => {

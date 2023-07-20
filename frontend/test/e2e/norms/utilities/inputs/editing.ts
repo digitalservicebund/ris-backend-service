@@ -81,18 +81,9 @@ const fillChipsInput: FieldFiller<string[]> = async (page, id, value) => {
 }
 
 const fillDropdown: FieldFiller<string> = async (page, id, value) => {
-  await page.locator(`input#${id} + button`).click()
-  const locatorDropdownOptions = page.locator('[aria-label="dropdown-option"]')
-  const count = await locatorDropdownOptions.count()
-
-  for (let i = 0; i < count; i++) {
-    const locatorOption = locatorDropdownOptions.nth(i)
-
-    if ((await locatorOption.innerText()) === value) {
-      await locatorOption.click()
-      break
-    }
-  }
+  const select = page.locator(`select#${id}`)
+  await expect(select).toBeEditable()
+  await select.selectOption({ value })
 }
 
 const FIELD_FILLERS: FieldFillerMapping = {

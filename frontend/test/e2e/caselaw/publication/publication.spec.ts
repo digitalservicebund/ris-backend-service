@@ -225,9 +225,8 @@ test.describe("ensuring the publishing of documentunits works as expected", () =
     await waitForSaving(
       async () => {
         await page
-          .locator("[aria-label='Rechtskraft'] + button.input-expand-icon")
-          .click()
-        await page.getByText("Ja", { exact: true }).click()
+          .getByRole("combobox", { name: "Rechtskraft" })
+          .selectOption("Ja")
       },
       page,
       { clickSaveButton: true, reload: true },

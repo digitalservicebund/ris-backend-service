@@ -232,14 +232,14 @@ test.describe("court", () => {
     documentNumber,
   }) => {
     await navigateToCategories(page, documentNumber)
-    await waitForInputValue(page, "[aria-label='Rechtskraft']", "Keine Angabe")
+    await waitForInputValue(page, "select#legalEffect", "Keine Angabe")
 
     await waitForSaving(
       async () => {
         await page.locator("[aria-label='Gericht']").fill("bgh")
         await page.locator("text=BGH").click()
         await waitForInputValue(page, "[aria-label='Gericht']", "BGH")
-        await waitForInputValue(page, "[aria-label='Rechtskraft']", "Ja")
+        await waitForInputValue(page, "select#legalEffect", "Ja")
       },
       page,
       { clickSaveButton: true, reload: true },
@@ -248,15 +248,14 @@ test.describe("court", () => {
     await waitForSaving(
       async () => {
         await page
-          .locator("[aria-label='Rechtskraft'] + button.input-expand-icon")
-          .click()
-        await page.locator("text=Nein").click()
+          .getByRole("combobox", { name: "Rechtskraft" })
+          .selectOption("Nein")
       },
       page,
       { clickSaveButton: true, reload: true },
     )
 
-    await waitForInputValue(page, "[aria-label='Rechtskraft']", "Nein")
+    await waitForInputValue(page, "select#legalEffect", "Nein")
     await expect(page.getByLabel("Rechtskraft")).toHaveValue("Nein")
   })
 
@@ -265,7 +264,7 @@ test.describe("court", () => {
     documentNumber,
   }) => {
     await navigateToCategories(page, documentNumber)
-    await waitForInputValue(page, "[aria-label='Rechtskraft']", "Keine Angabe")
+    await waitForInputValue(page, "select#legalEffect", "Keine Angabe")
 
     await waitForSaving(
       async () => {
@@ -277,9 +276,9 @@ test.describe("court", () => {
       { clickSaveButton: true },
     )
 
-    await waitForInputValue(page, "[aria-label='Rechtskraft']", "Keine Angabe")
-    await expect(page.locator("[aria-label='Rechtskraft']")).toHaveValue(
-      "Keine Angabe",
-    )
+    await waitForInputValue(page, "select#legalEffect", "Keine Angabe")
+    await expect(
+      page.getByRole("combobox", { name: "Rechtskraft" }),
+    ).toHaveValue("Keine Angabe")
   })
 })
