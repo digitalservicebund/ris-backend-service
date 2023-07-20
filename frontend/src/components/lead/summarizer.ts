@@ -5,17 +5,17 @@ import {
   SummarizerDataSet,
 } from "@/helpers/normsMetadataSummarizer"
 
-export function participationSummarizer(data: Metadata): VNode {
+export function leadSummarizer(data: Metadata): VNode {
   if (!data) return createTextVNode("")
   const summarizerData: SummarizerDataSet[] = []
 
-  const type = data.PARTICIPATION_TYPE?.[0]
-  if (type) {
-    summarizerData.push(new SummarizerDataSet([type]))
+  const jurisdiction = data.LEAD_JURISDICTION?.[0]
+  if (jurisdiction) {
+    summarizerData.push(new SummarizerDataSet([jurisdiction]))
   }
-  const institution = data.PARTICIPATION_INSTITUTION?.[0]
-  if (institution) {
-    summarizerData.push(new SummarizerDataSet([institution]))
+  const unit = data.LEAD_UNIT?.[0]
+  if (unit) {
+    summarizerData.push(new SummarizerDataSet([unit]))
   }
   return normsMetadataSummarizer(summarizerData)
 }

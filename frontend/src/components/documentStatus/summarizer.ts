@@ -1,89 +1,99 @@
-import dayjs from "dayjs"
+import { createTextVNode, VNode } from "vue"
 import { Metadata, MetadataSections } from "@/domain/Norm"
+import {
+  normsMetadataSummarizer,
+  SummarizerDataSet,
+  Type,
+} from "@/helpers/normsMetadataSummarizer"
 
-function documentStatusSummary(data: Metadata): string {
-  const PROOF_INDICATION_TRANSLATIONS = {
-    NOT_YET_CONSIDERED: "noch nicht berücksichtigt",
-    CONSIDERED: "ist berücksichtigt",
-  }
-
-  if (!data) return ""
+function documentStatusSummary(data: Metadata): VNode {
+  const summarizerData: SummarizerDataSet[] = []
 
   const workNote = data?.WORK_NOTE ?? []
+  if (workNote.length > 0) {
+    summarizerData.push(new SummarizerDataSet(workNote, { type: Type.CHIP }))
+  }
   const description = data?.DESCRIPTION?.[0]
+  if (description) {
+    summarizerData.push(new SummarizerDataSet([description]))
+  }
   const date = data.DATE?.[0]
-    ? dayjs(data.DATE[0]).format("DD.MM.YYYY")
-    : undefined
+  if (date) {
+    summarizerData.push(
+      new SummarizerDataSet([date], { type: Type.DATE, format: "DD.MM.YYYY" }),
+    )
+  }
   const year = data?.YEAR?.[0]
+  if (year) {
+    summarizerData.push(new SummarizerDataSet([year]))
+  }
   const reference = data?.REFERENCE?.[0]
+  if (reference) {
+    summarizerData.push(new SummarizerDataSet([reference]))
+  }
   const entryIntoForceDateState = data?.ENTRY_INTO_FORCE_DATE_NOTE ?? []
-  const proofIndication =
-    data?.PROOF_INDICATION?.filter((category) => category != null) ?? []
-
-  const translatedProofIndication = proofIndication.map(
-    (indication) => PROOF_INDICATION_TRANSLATIONS[indication] || indication,
-  )
-  const resultArray = []
-
-  if (workNote) resultArray.push(...workNote)
-  if (description) resultArray.push(description)
-  if (date) resultArray.push(date)
-  if (year) resultArray.push(year)
-  if (reference) resultArray.push(reference)
-  if (entryIntoForceDateState) resultArray.push(...entryIntoForceDateState)
-
-  resultArray.push(...translatedProofIndication)
-
-  return resultArray.join(" ")
-}
-
-function documentTextProofSummary(data: Metadata): string {
-  const PROOF_TYPE_TRANSLATIONS = {
-    TEXT_PROOF_FROM: "Textnachweis ab",
-    TEXT_PROOF_VALIDITY_FROM: "Textnachweis Geltung ab",
+  if (entryIntoForceDateState.length > 0) {
+    summarizerData.push(
+      new SummarizerDataSet(entryIntoForceDateState, { type: Type.CHIP }),
+    )
   }
 
-  if (!data) return ""
+  const proofIndication = data?.PROOF_INDICATION?.[0]
+  if (proofIndication) {
+    const PROOF_INDICATION_TRANSLATIONS = {
+      NOT_YET_CONSIDERED: "noch nicht berücksichtigt",
+      CONSIDERED: "ist berücksichtigt",
+    }
+    const translatedProofIndication =
+      PROOF_INDICATION_TRANSLATIONS[proofIndication]
+    summarizerData.push(new SummarizerDataSet([translatedProofIndication]))
+  }
 
-  const proofType =
-    data?.PROOF_TYPE?.filter((category) => category != null) ?? []
+  return normsMetadataSummarizer(summarizerData)
+}
+
+function documentTextProofSummary(data: Metadata): VNode {
+  const summarizerData: SummarizerDataSet[] = []
+
+  const proofType = data?.PROOF_TYPE?.[0]
+  if (proofType) {
+    const PROOF_TYPE_TRANSLATIONS = {
+      TEXT_PROOF_FROM: "Textnachweis ab",
+      TEXT_PROOF_VALIDITY_FROM: "Textnachweis Geltung ab",
+    }
+    const translatedProofType = PROOF_TYPE_TRANSLATIONS[proofType]
+
+    summarizerData.push(new SummarizerDataSet([translatedProofType]))
+  }
+
   const text = data?.TEXT?.[0]
-
-  const translatedProofType = proofType.map(
-    (type) => PROOF_TYPE_TRANSLATIONS[type] || type,
-  )
-  const resultArray = [...translatedProofType]
-
   if (text) {
-    resultArray.push(text)
+    summarizerData.push(new SummarizerDataSet([text]))
   }
 
-  return resultArray.join(" ")
+  return normsMetadataSummarizer(summarizerData, "")
 }
 
-function documentOtherSummary(data: Metadata): string {
-  const OTHER_TYPE_TRANSLATIONS = {
-    TEXT_IN_PROGRESS: "Text in Bearbeitung",
-    TEXT_PROOFED_BUT_NOT_DONE:
-      "Nachgewiesener Text dokumentarisch noch nicht abschließend bearbeitet",
+function documentOtherSummary(data: Metadata): VNode {
+  const summarizerData: SummarizerDataSet[] = []
+
+  const otherType = data?.OTHER_TYPE?.[0]
+  if (otherType) {
+    const OTHER_TYPE_TRANSLATIONS = {
+      TEXT_IN_PROGRESS: "Text in Bearbeitung",
+      TEXT_PROOFED_BUT_NOT_DONE:
+        "Nachgewiesener Text dokumentarisch noch nicht abschließend bearbeitet",
+    }
+    const translatedOtherType = OTHER_TYPE_TRANSLATIONS[otherType]
+
+    summarizerData.push(new SummarizerDataSet([translatedOtherType]))
   }
 
-  if (!data) return ""
-
-  const otherType =
-    data?.OTHER_TYPE?.filter((category) => category != null) ?? []
-
-  const translatedOtherType = otherType.map(
-    (type) => OTHER_TYPE_TRANSLATIONS[type] || type,
-  )
-
-  return translatedOtherType.join(" ")
+  return normsMetadataSummarizer(summarizerData)
 }
 
-export function documentStatusSectionSummarizer(
-  data: MetadataSections,
-): string {
-  if (!data) return ""
+export function documentStatusSectionSummarizer(data: MetadataSections): VNode {
+  if (!data) return createTextVNode("")
 
   if (data.DOCUMENT_STATUS) {
     return documentStatusSummary(data.DOCUMENT_STATUS[0])
@@ -91,5 +101,6 @@ export function documentStatusSectionSummarizer(
     return documentTextProofSummary(data.DOCUMENT_TEXT_PROOF[0])
   } else if (data.DOCUMENT_OTHER) {
     return documentOtherSummary(data.DOCUMENT_OTHER[0])
-  } else return ""
+  }
+  return createTextVNode("")
 }

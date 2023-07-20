@@ -1,19 +1,29 @@
-import dayjs from "dayjs"
+import { createTextVNode, VNode } from "vue"
 import { Metadata } from "@/domain/Norm"
+import {
+  normsMetadataSummarizer,
+  SummarizerDataSet,
+  Type,
+} from "@/helpers/normsMetadataSummarizer"
 
-export function summarizeAnnouncementDate(data: Metadata): string {
-  if (!data) return ""
+export function summarizeAnnouncementDate(data: Metadata): VNode {
+  if (!data) return createTextVNode("")
 
-  let output = ""
+  const summarizerData: SummarizerDataSet[] = []
 
   if (data.YEAR?.length) {
-    output += data.YEAR.toString()
+    summarizerData.push(new SummarizerDataSet([data.YEAR.toString()]))
   } else if (data.DATE?.length) {
-    output += dayjs(data.DATE[0]).format("DD.MM.YYYY")
+    summarizerData.push(
+      new SummarizerDataSet([data.DATE[0]], {
+        type: Type.DATE,
+        format: "DD.MM.YYYY",
+      }),
+    )
     if (data.TIME?.length) {
-      output += " " + data.TIME[0]
+      summarizerData.push(new SummarizerDataSet([data.TIME[0]]))
     }
   }
 
-  return output
+  return normsMetadataSummarizer(summarizerData, "")
 }

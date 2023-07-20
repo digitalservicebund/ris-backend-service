@@ -22,6 +22,7 @@ import ExpirationInputGroup from "@/components/expiration/ExpirationInputGroup.v
 import FootnoteInput from "@/components/footnote/FootnoteInput.vue"
 import { summarizeFootnotePerLine } from "@/components/footnote/summarizer"
 import LeadInputGroup from "@/components/lead/LeadInputGroup.vue"
+import { leadSummarizer } from "@/components/lead/summarizer"
 import NormProviderInputGroup from "@/components/normProvider/NormProviderInputGroup.vue"
 import { normProviderSummarizer } from "@/components/normProvider/summarizer"
 import AnnouncementGroup from "@/components/officialReference/AnnouncementGroup.vue"
@@ -147,6 +148,7 @@ const DivergentEntryIntoForceSummary = withSummarizer(
 const DivergentExpirationSummary = withSummarizer(divergentExpirationSummarizer)
 const GeneralSummary = withSummarizer(generalSummarizer)
 const ParticipationSummary = withSummarizer(participationSummarizer)
+const LeadSummary = withSummarizer(leadSummarizer)
 const SubjectAreaSummary = withSummarizer(subjectAreaSummarizer)
 const footnoteLineSummary = withSummarizer(summarizeFootnotePerLine)
 const StatusIndicationSummary = withSummarizer(summarizeStatusIndication)
@@ -258,6 +260,7 @@ const AnnouncementDateSummary = withSummarizer(summarizeAnnouncementDate)
       id="leads"
       border-bottom
       :data-set="metadataSections.LEAD"
+      :summary-component="LeadSummary"
       test-id="a11y-expandable-dataset"
       title="Federführung"
     >
@@ -265,6 +268,7 @@ const AnnouncementDateSummary = withSummarizer(summarizeAnnouncementDate)
         v-model="metadataSections.LEAD"
         :default-value="{}"
         :edit-component="LeadInputGroup"
+        :summary-component="LeadSummary"
       />
     </ExpandableDataSet>
 

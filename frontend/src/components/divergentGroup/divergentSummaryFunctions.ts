@@ -1,8 +1,11 @@
-import dayjs from "dayjs"
-import { createTextVNode, h, VNode } from "vue"
-import CheckMark from "@/assets/icons/ckeckbox_regular.svg"
+import { createTextVNode, VNode } from "vue"
 import { Metadata } from "@/domain/Norm"
 import { getLabel } from "@/helpers/generalSummarizer"
+import {
+  normsMetadataSummarizer,
+  SummarizerDataSet,
+  Type,
+} from "@/helpers/normsMetadataSummarizer"
 
 export const NORM_CATEGORY_TRANSLATIONS = {
   AMENDMENT_NORM: "Änderungsnorm",
@@ -13,78 +16,51 @@ export const NORM_CATEGORY_TRANSLATIONS = {
 export function divergentDefinedSummary(data: Metadata): VNode {
   if (!data) return createTextVNode("")
 
+  const summarizerData: SummarizerDataSet[] = []
+
   const date = data.DATE?.[0]
-    ? dayjs(data.DATE[0]).format("DD.MM.YYYY")
-    : undefined
+
+  if (date) {
+    summarizerData.push(
+      new SummarizerDataSet([date], { type: Type.DATE, format: "DD.MM.YYYY" }),
+    )
+  }
   const categories =
     data?.NORM_CATEGORY?.filter((category) => category != null) ?? []
 
-  if (categories.length === 0 && date) {
-    return h("div", {}, date)
-  }
-
-  const elements = []
-
-  if (date) {
-    elements.push(h("div", {}, date))
-  }
-
-  if (date && categories.length > 0) {
-    elements.push(h("div", "|"))
-  }
-
-  categories.forEach((category) => {
-    elements.push(
-      h("div", { class: ["flex", "gap-8"] }, [
-        h("img", {
-          src: CheckMark,
-          width: "16",
-          alt: "Schwarzes Haken",
-        }),
-        h("span", {}, NORM_CATEGORY_TRANSLATIONS[category]),
-      ]),
+  if (categories.length > 0) {
+    summarizerData.push(
+      new SummarizerDataSet(
+        categories.map((category) => NORM_CATEGORY_TRANSLATIONS[category]),
+        { type: Type.CHECKMARK },
+      ),
     )
-  })
-
-  if (elements.length === 0) {
-    return createTextVNode("")
-  } else {
-    return h("div", { class: ["flex", "gap-8"] }, elements)
   }
+
+  return normsMetadataSummarizer(summarizerData)
 }
+
 export function divergentUndefinedSummary(data: Metadata): VNode {
   if (!data) return createTextVNode("")
 
+  const summarizerData: SummarizerDataSet[] = []
+
   const undefinedDate = data?.UNDEFINED_DATE?.[0]
+
+  if (undefinedDate) {
+    summarizerData.push(new SummarizerDataSet([getLabel(undefinedDate)]))
+  }
   const categories =
     data?.NORM_CATEGORY?.filter((category) => category != null) ?? []
 
-  const elements = []
-
-  if (categories.length === 0 && undefinedDate) {
-    return h("div", {}, getLabel(undefinedDate))
-  }
-
-  if (undefinedDate) {
-    elements.push(h("div", {}, getLabel(undefinedDate)))
-  }
-
-  if (undefinedDate && categories.length > 0) {
-    elements.push(h("div", "|"))
-  }
-
-  categories.forEach((category) => {
-    elements.push(
-      h("div", { class: ["flex", "gap-8"] }, [
-        h("img", {
-          src: CheckMark,
-          width: "16",
-          alt: "Schwarzes Haken",
-        }),
-        h("span", {}, NORM_CATEGORY_TRANSLATIONS[category]),
-      ]),
+  if (categories.length > 0) {
+    summarizerData.push(
+      new SummarizerDataSet(
+        categories.map((category) => NORM_CATEGORY_TRANSLATIONS[category]),
+        { type: Type.CHECKMARK },
+      ),
     )
-  })
+  }
 
-  return h("div", { class: ["flex", "gap-8"] }, elements)
+  return normsMetadataSummarizer(summarizerData)
 }
