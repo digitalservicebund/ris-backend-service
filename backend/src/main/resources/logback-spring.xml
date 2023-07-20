@@ -4,6 +4,7 @@
         <include resource="org/springframework/boot/logging/logback/base.xml" />
     </springProfile>
     <springProfile name="staging,production">
+        <!--
         <springProperty name="lokiUrl" source="neuris.loki.url"/>
         <appender name="LOKI" class="com.github.loki4j.logback.Loki4jAppender">
             <http>
@@ -19,6 +20,7 @@
                 <sortByTime>true</sortByTime>
             </format>
         </appender>
+        -->
         <appender name="SENTRY" class="io.sentry.logback.SentryAppender">
             <options>
                 <dsn>${SENTRY_DSN}</dsn>
@@ -32,7 +34,7 @@
         </appender>
 
         <root level="INFO">
-            <appender-ref ref="LOKI" />
+            <!-- <appender-ref ref="LOKI" /> -->
             <appender-ref ref="SENTRY" />
         </root>
     </springProfile>
