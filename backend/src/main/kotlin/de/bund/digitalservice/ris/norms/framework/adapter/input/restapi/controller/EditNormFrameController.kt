@@ -6,7 +6,6 @@ import de.bund.digitalservice.ris.norms.domain.entity.Metadatum
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType
 import de.bund.digitalservice.ris.norms.domain.value.NormCategory
-import de.bund.digitalservice.ris.norms.domain.value.ProofType
 import de.bund.digitalservice.ris.norms.domain.value.UndefinedDate
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.ApiConfiguration
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.OpenApiConfiguration
@@ -84,7 +83,6 @@ class EditNormFrameController(private val editNormFrameService: EditNormFrameUse
                 MetadatumType.RESOLUTION_MAJORITY -> this.value.toBoolean()
                 MetadatumType.NORM_CATEGORY -> NormCategory.valueOf(this.value)
                 MetadatumType.UNDEFINED_DATE -> UndefinedDate.valueOf(this.value)
-                MetadatumType.PROOF_TYPE -> ProofType.valueOf(this.value)
                 else -> this.value
             }
             return Metadatum(value = value, type = this.type, order = this.order)

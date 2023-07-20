@@ -7,7 +7,6 @@ import {
   MetadataSectionName,
   Norm,
   NormCategory,
-  ProofType,
   UndefinedDate,
 } from "@/domain/Norm"
 
@@ -71,17 +70,6 @@ function undefinedDateToDropdownEntry(
       return "unbestimmt (zukünftig)"
     case UndefinedDate.UNDEFINED_NOT_PRESENT:
       return "nicht vorhanden"
-    default:
-      return undefined
-  }
-}
-
-function proofTypeToDropdownEntry(unit?: ProofType): string | undefined {
-  switch (unit) {
-    case ProofType.TEXT_PROOF_FROM:
-      return "Textnachweis ab"
-    case ProofType.TEXT_PROOF_VALIDITY_FROM:
-      return "Textnachweis Geltung ab"
     default:
       return undefined
   }
@@ -1443,19 +1431,9 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
           ),
         },
         {
-          type: FieldType.DROPDOWN,
-          id: "proofTypeDropdown",
-          label: "Textnachweis",
-          values: norm.metadataSections?.DOCUMENT_STATUS_SECTION?.map(
-            (section) => section?.DOCUMENT_TEXT_PROOF?.[0],
-          )
-            .map((section) => section?.PROOF_TYPE?.[0])
-            .map(proofTypeToDropdownEntry),
-        },
-        {
           type: FieldType.TEXT,
-          id: "textInput",
-          label: "Zusatz",
+          id: "proofText",
+          label: "Textnachweis",
           values: norm.metadataSections?.DOCUMENT_STATUS_SECTION?.map(
             (section) => section?.DOCUMENT_TEXT_PROOF?.[0],
           ).map((section) => section?.TEXT?.[0]),

@@ -5,7 +5,6 @@ import de.bund.digitalservice.ris.norms.domain.entity.Metadatum
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType
 import de.bund.digitalservice.ris.norms.domain.value.NormCategory
-import de.bund.digitalservice.ris.norms.domain.value.ProofType
 import de.bund.digitalservice.ris.norms.domain.value.UndefinedDate
 import io.mockk.every
 import io.mockk.mockk
@@ -705,7 +704,6 @@ class HasValidMetadataTest {
         every { instance.sections } returns null
         every { instance.metadata } returns listOf(
             Metadatum("work note", MetadatumType.TEXT),
-            Metadatum(ProofType.TEXT_PROOF_FROM, MetadatumType.PROOF_TYPE),
         )
 
         assertThat(hasValidMetadata.isSatisfiedBy(instance)).isTrue()

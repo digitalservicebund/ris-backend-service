@@ -8,7 +8,6 @@ import de.bund.digitalservice.ris.norms.domain.entity.Paragraph
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType
 import de.bund.digitalservice.ris.norms.domain.value.NormCategory
-import de.bund.digitalservice.ris.norms.domain.value.ProofType
 import de.bund.digitalservice.ris.norms.domain.value.UndefinedDate
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.decodeLocalDate
 import de.bund.digitalservice.ris.norms.juris.converter.model.DigitalAnnouncement
@@ -86,15 +85,9 @@ fun createSectionsForDocumentStatus(
 ): List<MetadataSection> {
     val documentStatusSections = mutableListOf<MetadataSection>()
     var raiseOrder = 1
-    if (documentTextProof != null && listOf(ProofType.TEXT_PROOF_FROM.text, ProofType.TEXT_PROOF_VALIDITY_FROM.text).any { documentTextProof.contains(it) }) {
-        val metadata = mutableListOf<Metadatum<*>>()
-        if (documentTextProof.contains(ProofType.TEXT_PROOF_FROM.text)) {
-            metadata.add(Metadatum(ProofType.TEXT_PROOF_FROM, MetadatumType.PROOF_TYPE))
-            metadata.add(Metadatum(documentTextProof.replace(ProofType.TEXT_PROOF_FROM.text, "").trim(), MetadatumType.TEXT))
-        } else if (documentTextProof.contains(ProofType.TEXT_PROOF_VALIDITY_FROM.text)) {
-            metadata.add(Metadatum(ProofType.TEXT_PROOF_VALIDITY_FROM, MetadatumType.PROOF_TYPE))
-            metadata.add(Metadatum(documentTextProof.replace(ProofType.TEXT_PROOF_VALIDITY_FROM.text, "").trim(), MetadatumType.TEXT))
-        }
+
+    if (documentTextProof != null) {
+        val metadata = listOf(Metadatum(documentTextProof, MetadatumType.TEXT))
         val proofSection = MetadataSection(MetadataSectionName.DOCUMENT_TEXT_PROOF, metadata)
         val parentSection = MetadataSection(MetadataSectionName.DOCUMENT_STATUS_SECTION, emptyList(), sections = listOf(proofSection))
         documentStatusSections.add(parentSection)

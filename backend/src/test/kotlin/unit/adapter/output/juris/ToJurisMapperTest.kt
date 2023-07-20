@@ -4,7 +4,6 @@ import de.bund.digitalservice.ris.norms.domain.entity.Metadatum
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType
 import de.bund.digitalservice.ris.norms.domain.value.NormCategory
-import de.bund.digitalservice.ris.norms.domain.value.ProofType
 import de.bund.digitalservice.ris.norms.domain.value.UndefinedDate
 import de.bund.digitalservice.ris.norms.framework.adapter.output.juris.mapDomainToData
 import org.assertj.core.api.Assertions.assertThat
@@ -526,8 +525,7 @@ class ToJurisMapperTest {
                         Section(
                             MetadataSectionName.DOCUMENT_TEXT_PROOF,
                             listOf(
-                                Metadatum(ProofType.TEXT_PROOF_FROM, MetadatumType.PROOF_TYPE),
-                                Metadatum("26.10.2001", MetadatumType.TEXT),
+                                Metadatum("Textnachweis ab: 26.10.2001", MetadatumType.TEXT),
                             ),
                         ),
                     ),

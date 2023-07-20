@@ -9,7 +9,6 @@ import {
   Norm,
   NormCategory,
   Paragraph,
-  ProofType,
   UndefinedDate,
 } from "@/domain/Norm"
 import {
@@ -85,7 +84,6 @@ const METADATA_VALUE_GENERATORS: MetadataValueGenerators = {
   [MetadatumType.REFERENCE]: generateString,
   [MetadatumType.ENTRY_INTO_FORCE_DATE_NOTE]: generateString,
   [MetadatumType.PROOF_INDICATION]: generateString,
-  [MetadatumType.PROOF_TYPE]: pickRandomProofType,
   [MetadatumType.NOTE]: generateString,
   [MetadatumType.ARTICLE]: generateString,
   [MetadatumType.OFFICIAL_LONG_TITLE]: generateString,
@@ -214,12 +212,6 @@ export function generateArticle(partialArticle?: Partial<Article>): Article {
   }
 }
 
-export function pickRandomProofType(): ProofType {
-  const options = Object.values(ProofType)
-  const index = generateRandomNumber(0, options.length - 1)
-  return options[index]
-}
-
 export function pickRandomNormCategory(): NormCategory {
   const options = Object.values(NormCategory)
   const index = generateRandomNumber(0, options.length - 1)
@@ -250,8 +242,7 @@ export function generateMetadata(partialMetadata?: Partial<Metadata>) {
       .map(METADATA_VALUE_GENERATORS[type]) as string[] &
       boolean[] &
       NormCategory[] &
-      UndefinedDate[] &
-      ProofType[]
+      UndefinedDate[]
     metadata[type] = values
   }
 

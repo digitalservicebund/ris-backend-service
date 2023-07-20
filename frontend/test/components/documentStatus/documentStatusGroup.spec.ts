@@ -7,7 +7,6 @@ import {
   MetadataSectionName,
   MetadataSections,
   MetadatumType,
-  ProofType,
 } from "@/domain/Norm"
 import { getNormByGuid } from "@/services/norms"
 import { useLoadedNormStore } from "@/stores/loadedNorm"
@@ -76,12 +75,12 @@ describe("DocumentStatusGroup", () => {
     expect(documentStatusSelection).not.toBeChecked()
     expect(documentOtherSelection).not.toBeChecked()
 
-    const dropDownInputField = screen.getByLabelText(
-      "Textnachweis Dropdown",
+    const proofTextInput = screen.getByLabelText(
+      "Textnachweis Text",
     ) as HTMLInputElement
 
-    expect(dropDownInputField).toBeInTheDocument()
-    expect(dropDownInputField).toBeVisible()
+    expect(proofTextInput).toBeInTheDocument()
+    expect(proofTextInput).toBeVisible()
 
     await fireEvent.click(documentOtherSelection)
     expect(documentOtherSelection).toBeChecked()
@@ -157,9 +156,7 @@ describe("DocumentStatusGroup", () => {
           {
             [MetadataSectionName.DOCUMENT_TEXT_PROOF]: [
               {
-                [MetadatumType.PROOF_TYPE]: [
-                  ProofType.TEXT_PROOF_VALIDITY_FROM,
-                ],
+                [MetadatumType.TEXT]: ["Textnachweis ab 16.07.2008"],
               },
             ],
           },

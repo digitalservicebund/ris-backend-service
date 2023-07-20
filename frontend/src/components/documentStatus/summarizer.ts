@@ -49,18 +49,8 @@ function documentStatusSummary(data: Metadata): VNode {
 function documentTextProofSummary(data: Metadata): VNode {
   const summarizerData: SummarizerDataSet[] = []
 
-  const proofType = data?.PROOF_TYPE?.[0]
-  if (proofType) {
-    const PROOF_TYPE_TRANSLATIONS = {
-      TEXT_PROOF_FROM: "Textnachweis ab",
-      TEXT_PROOF_VALIDITY_FROM: "Textnachweis Geltung ab",
-    }
-    const translatedProofType = PROOF_TYPE_TRANSLATIONS[proofType]
-
-    summarizerData.push(new SummarizerDataSet([translatedProofType]))
-  }
-
   const text = data?.TEXT?.[0]
+
   if (text) {
     summarizerData.push(new SummarizerDataSet([text]))
   }
@@ -71,10 +61,10 @@ function documentTextProofSummary(data: Metadata): VNode {
 function documentOtherSummary(data: Metadata): VNode {
   const summarizerData: SummarizerDataSet[] = []
 
-  const otherType = data?.TEXT?.[0]
+  const text = data?.TEXT?.[0]
 
-  if (otherType) {
-    summarizerData.push(new SummarizerDataSet([otherType]))
+  if (text) {
+    summarizerData.push(new SummarizerDataSet([text]))
   }
 
   return normsMetadataSummarizer(summarizerData)

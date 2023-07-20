@@ -49,7 +49,6 @@ import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.PAGE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.PARTICIPATION_INSTITUTION
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.PARTICIPATION_TYPE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.PROOF_INDICATION
-import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.PROOF_TYPE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.RANGE_END
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.RANGE_START
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.REFERENCE
@@ -223,7 +222,7 @@ val hasValidMetadata =
                                         ),
                                         instance
                                 )
-                        Section.DOCUMENT_TEXT_PROOF -> hasType(listOf(PROOF_TYPE, TEXT), instance)
+                        Section.DOCUMENT_TEXT_PROOF -> hasType(listOf(TEXT), instance)
                         Section.DOCUMENT_OTHER -> hasType(listOf(TEXT), instance)
                         Section.STATUS ->
                                 hasType(listOf(NOTE, DESCRIPTION, DATE, YEAR, REFERENCE), instance)

@@ -4,7 +4,6 @@ import de.bund.digitalservice.ris.norms.domain.entity.MetadataSection
 import de.bund.digitalservice.ris.norms.domain.entity.Norm
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType
 import de.bund.digitalservice.ris.norms.domain.value.NormCategory
-import de.bund.digitalservice.ris.norms.domain.value.ProofType
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.encodeLocalDate
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.encodeLocalDateToGermanFormat
 import de.bund.digitalservice.ris.norms.juris.converter.model.CategorizedReference
@@ -94,13 +93,7 @@ private fun extractDocumentTextProof(norm: Norm): String? {
         .filter { it.name == Section.DOCUMENT_STATUS_SECTION }
         .flatMap { it.sections ?: listOf() }
         .find { it.name == Section.DOCUMENT_TEXT_PROOF }?.metadata
-    val proofType = metadata?.find { it.type == MetadatumType.PROOF_TYPE }?.value
-    val proofText = metadata?.find { it.type == MetadatumType.TEXT }?.value
-    return if (proofType != null && proofText != null) {
-        ProofType.valueOf(proofType.toString()).text + " " + proofText
-    } else {
-        null
-    }
+    return metadata?.find { it.type == MetadatumType.TEXT }?.value as String?
 }
 
 private fun extractFootnotes(norm: Norm): List<Footnote> {

@@ -1,9 +1,5 @@
+import { NormCategory, UndefinedDate } from "../../../../src/domain/Norm"
 import { NormData } from "../fixtures"
-import {
-  NormCategory,
-  ProofType,
-  UndefinedDate,
-} from "@/domain/Norm"
 
 export const newNorm: NormData = {
   jurisZipFileName: "",
@@ -254,9 +250,7 @@ export const newNorm: NormData = {
         ],
       },
       {
-        DOCUMENT_TEXT_PROOF: [
-          { PROOF_TYPE: [ProofType.TEXT_PROOF_FROM], TEXT: ["text"] },
-        ],
+        DOCUMENT_TEXT_PROOF: [{ TEXT: ["Textnachweis ab: 17.02.2011"] }],
       },
       {
         DOCUMENT_OTHER: [{ TEXT: ["text in progress"] }],

@@ -1,5 +1,5 @@
 import { NormData } from "../fixtures"
-import { NormCategory, ProofType, UndefinedDate } from "@/domain/Norm"
+import { NormCategory, UndefinedDate } from "@/domain/Norm"
 
 export const normData: NormData = {
   jurisZipFileName: "Tierarznei.3-0_multi.zip",
@@ -325,9 +325,7 @@ export const normData: NormData = {
     ],
     DOCUMENT_STATUS_SECTION: [
       {
-        DOCUMENT_TEXT_PROOF: [
-          { PROOF_TYPE: [ProofType.TEXT_PROOF_FROM], TEXT: ["26.6.2017"] },
-        ],
+        DOCUMENT_TEXT_PROOF: [{ TEXT: ["Textnachweis ab: 26.6.2017"] }],
       },
       {
         DOCUMENT_STATUS: [

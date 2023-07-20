@@ -1,7 +1,6 @@
 <script lang="ts" setup>
 import { computed, ref, watch } from "vue"
-import { Metadata, ProofType } from "@/domain/Norm"
-import DropdownInput from "@/shared/components/input/DropdownInput.vue"
+import { Metadata } from "@/domain/Norm"
 import InputField from "@/shared/components/input/InputField.vue"
 import TextInput from "@/shared/components/input/TextInput.vue"
 
@@ -26,29 +25,8 @@ watch(
   { immediate: true },
 )
 
-const PROOF_TYPE_TRANSLATIONS: { [Value in ProofType]: string } = {
-  [ProofType.TEXT_PROOF_FROM]: "Textnachweis ab",
-  [ProofType.TEXT_PROOF_VALIDITY_FROM]: "Textnachweis Geltung ab",
-}
-
-interface DropdownItem {
-  label: string
-  value: string
-}
-
-const dropdownItems: DropdownItem[] = Object.entries(
-  PROOF_TYPE_TRANSLATIONS,
-).map(([value, label]) => {
-  return { label, value }
-})
-
 watch(inputValue, () => emit("update:modelValue", inputValue.value), {
   deep: true,
-})
-
-const proofType = computed({
-  get: () => inputValue.value.PROOF_TYPE?.[0],
-  set: (data?: ProofType) => data && (inputValue.value.PROOF_TYPE = [data]),
 })
 
 const text = computed({
@@ -58,21 +36,11 @@ const text = computed({
 </script>
 <template>
   <InputField
-    id="proofType"
+    id="proofText"
     aria-label="Textnachweis"
     class="md:w-auto"
-    label="Textnachweis"
+    label="Nextnachweis"
   >
-    <DropdownInput
-      id="proofTypeDropdown"
-      v-model="proofType"
-      aria-label="Textnachweis Dropdown"
-      has-smaller-height
-      :items="dropdownItems"
-      placeholder="Bitte auswählen"
-    />
-  </InputField>
-  <InputField id="text" aria-label="Zusatz" class="md:w-auto" label="Zusatz">
-    <TextInput id="textInput" v-model="text" aria-label="Zusatz Text" />
+    <TextInput id="proofText" v-model="text" aria-label="Textnachweis Text" />
   </InputField>
 </template>

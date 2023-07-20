@@ -60,7 +60,6 @@ enum class MetadatumType {
     REFERENCE,
     ENTRY_INTO_FORCE_DATE_NOTE,
     PROOF_INDICATION,
-    PROOF_TYPE,
     NOTE,
     ARTICLE,
     OFFICIAL_LONG_TITLE,

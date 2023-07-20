@@ -20,7 +20,6 @@ import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.LINK
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.NORM_CATEGORY
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.NOTE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.PROOF_INDICATION
-import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.PROOF_TYPE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.RANGE_END
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.RANGE_START
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.REFERENCE
@@ -318,13 +317,6 @@ class HasValidValueTypeTest {
     @Test
     fun `it is not satisfied if the value for a proof indication type is not a string`() {
         val instance = getMockedMetadatum(123, PROOF_INDICATION)
-
-        assertThat(hasValidValueType.isSatisfiedBy(instance)).isFalse()
-    }
-
-    @Test
-    fun `it is not satisfied if the value for a proof type is a string`() {
-        val instance = getMockedMetadatum("test text", PROOF_TYPE)
 
         assertThat(hasValidValueType.isSatisfiedBy(instance)).isFalse()
     }
