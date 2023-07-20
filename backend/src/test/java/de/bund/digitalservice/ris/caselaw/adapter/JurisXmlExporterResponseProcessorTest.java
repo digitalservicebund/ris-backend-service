@@ -398,10 +398,10 @@ class JurisXmlExporterResponseProcessorTest {
     when(inbox.getMessages()).thenReturn(new Message[] {processMessage, importMessage});
 
     when(processMessageWrapper.hasErrors()).thenReturn(false);
-    when(processMessageWrapper.isPublished()).thenReturn(Optional.empty());
+    when(processMessageWrapper.isPublished()).thenReturn(Optional.of(true));
 
     when(importMessageWrapper.hasErrors()).thenReturn(false);
-    when(importMessageWrapper.isPublished()).thenReturn(Optional.of(true));
+    when(importMessageWrapper.isPublished()).thenReturn(Optional.empty());
 
     responseProcessor.readEmails();
 

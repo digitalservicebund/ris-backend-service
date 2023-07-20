@@ -8,8 +8,8 @@ import de.bund.digitalservice.ris.caselaw.domain.MailStoreFactory;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationReport;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationReportRepository;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
+import de.bund.digitalservice.ris.domain.export.juris.response.ImportMessageWrapper;
 import de.bund.digitalservice.ris.domain.export.juris.response.MessageWrapper;
-import de.bund.digitalservice.ris.domain.export.juris.response.ProcessMessageWrapper;
 import de.bund.digitalservice.ris.domain.export.juris.response.StatusImporterException;
 import jakarta.mail.Flags.Flag;
 import jakarta.mail.Folder;
@@ -82,7 +82,7 @@ public class JurisXmlExporterResponseProcessor {
       List<MessageWrapper> processedMessages =
           partitionedMessages.get(true).stream()
               .sorted(
-                  Comparator.comparing(wrapper -> wrapper instanceof ProcessMessageWrapper ? 0 : 1))
+                  Comparator.comparing(wrapper -> wrapper instanceof ImportMessageWrapper ? 0 : 1))
               .map(this::processMessage)
               .toList();
       moveMessages(processedMessages, inbox, store.getFolder("processed"));
