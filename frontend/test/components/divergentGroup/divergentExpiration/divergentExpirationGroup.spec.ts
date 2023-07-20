@@ -98,9 +98,11 @@ describe("DivergentExpirationGroup", () => {
       "Unbestimmtes abweichendes Außerkrafttretedatum Dropdown",
     ) as HTMLInputElement
 
-    await userEvent.click(dropDownInputField)
-    await userEvent.click(screen.getByText("unbestimmt (unbekannt)"))
-    expect(dropDownInputField).toHaveValue("unbestimmt (unbekannt)")
+    await userEvent.selectOptions(
+      dropDownInputField,
+      UndefinedDate.UNDEFINED_UNKNOWN,
+    )
+    expect(dropDownInputField).toHaveValue(UndefinedDate.UNDEFINED_UNKNOWN)
 
     const divergentExpirationDefinedSelection = screen.queryByLabelText(
       "bestimmt",

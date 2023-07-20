@@ -55,7 +55,7 @@ describe("DivergentEntryIntoForceUndefinedInputGroup", () => {
     }) as HTMLInputElement
 
     expect(dropdown).toBeInTheDocument()
-    expect(dropdown).toHaveValue("nicht vorhanden")
+    expect(dropdown).toHaveValue(UndefinedDate.UNDEFINED_NOT_PRESENT)
 
     expect(amendmentNormCheckBox).toBeChecked()
     expect(baseNormCheckBox).toBeChecked()
@@ -76,8 +76,8 @@ describe("DivergentEntryIntoForceUndefinedInputGroup", () => {
       "Unbestimmtes abweichendes Inkrafttretedatum Dropdown",
     ) as HTMLInputElement
 
-    await userEvent.click(dropdown)
-    await userEvent.click(screen.getByText("unbestimmt (unbekannt)"))
+    await userEvent.selectOptions(dropdown, UndefinedDate.UNDEFINED_UNKNOWN)
+    expect(dropdown).toHaveValue(UndefinedDate.UNDEFINED_UNKNOWN)
 
     const checkBoxInputs = screen.getAllByRole("checkbox")
     await user.click(checkBoxInputs[0])

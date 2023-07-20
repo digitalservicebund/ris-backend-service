@@ -5,6 +5,7 @@ import {
   MetadataSectionName,
   MetadataSections,
   MetadatumType,
+  UndefinedDate,
 } from "@/domain/Norm"
 
 function renderComponent(options?: { modelValue?: MetadataSections }) {
@@ -82,9 +83,11 @@ describe("DivergentEntryIntoForceGroup", () => {
       "Unbestimmtes abweichendes Inkrafttretedatum Dropdown",
     ) as HTMLInputElement
 
-    await userEvent.click(dropDownInputFieldNew)
-    await userEvent.click(screen.getByText("unbestimmt (unbekannt)"))
-    expect(dropDownInputFieldNew).toHaveValue("unbestimmt (unbekannt)")
+    await userEvent.selectOptions(
+      dropDownInputFieldNew,
+      UndefinedDate.UNDEFINED_UNKNOWN,
+    )
+    expect(dropDownInputFieldNew).toHaveValue(UndefinedDate.UNDEFINED_UNKNOWN)
 
     const divergentEntryIntoForceDefinedSelection = screen.queryByLabelText(
       "bestimmt",
