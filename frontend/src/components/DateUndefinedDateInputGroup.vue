@@ -73,7 +73,6 @@ interface DropdownItem {
       <DropdownInput
         :id="undefinedDateId"
         :aria-label="undefinedDateDropdownAriaLabel"
-        has-smaller-height
         :items="dropdownItems"
         :model-value="undefineDateValue"
         placeholder="Bitte auswählen"

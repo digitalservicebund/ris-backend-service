@@ -66,7 +66,6 @@ const undefinedDateState = computed({
         :id="id + 'Dropdown'"
         v-model="undefinedDateState"
         :aria-label="label + ' Dropdown'"
-        has-smaller-height
         :items="dropdownItems"
         placeholder="Bitte auswählen"
       />
