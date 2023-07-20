@@ -53,7 +53,7 @@ describe("date/year field", () => {
         "Jahresangabe",
       ) as HTMLInputElement
       const dateInputField = screen.getByLabelText(
-        "test-label Datum",
+        "test-label",
       ) as HTMLInputElement
 
       expect(dateRadioButton).toBeInTheDocument()
@@ -71,7 +71,7 @@ describe("date/year field", () => {
     it("User can enter a date input", async () => {
       renderComponent()
       const dateInputField = screen.getByLabelText(
-        "test-label Datum",
+        "test-label",
       ) as HTMLInputElement
 
       expect(dateInputField).toBeInTheDocument()
@@ -88,7 +88,7 @@ describe("date/year field", () => {
       renderComponent({ modelValue })
 
       const dateInputField = screen.getByLabelText(
-        "test-label Datum",
+        "test-label",
       ) as HTMLInputElement
 
       expect(dateInputField).toHaveValue("12.05.2020")
@@ -160,7 +160,7 @@ describe("date/year field", () => {
       renderComponent()
 
       const dateInputField = screen.getByLabelText(
-        "test-label Datum",
+        "test-label",
       ) as HTMLInputElement
 
       expect(dateInputField).toBeInTheDocument()
@@ -183,7 +183,7 @@ describe("date/year field", () => {
       await changeToDateInput()
 
       const dateInputFieldNew = screen.getByLabelText(
-        "test-label Datum",
+        "test-label",
       ) as HTMLInputElement
 
       expect(dateInputFieldNew).not.toHaveValue()
@@ -205,7 +205,7 @@ describe("date/year field", () => {
       await changeToDateInput()
 
       const dateInputField = screen.getByLabelText(
-        "test-label Datum",
+        "test-label",
       ) as HTMLInputElement
 
       expect(dateInputField).toBeInTheDocument()

@@ -21,7 +21,7 @@ describe("Publication date/year field", () => {
     renderComponent({ modelValue: { DATE: ["05.05.2021"] } })
 
     const publicationDateInputField = screen.getByLabelText(
-      "Veröffentlichungsdatum Datum",
+      "Veröffentlichungsdatum",
     ) as HTMLInputElement
 
     expect(publicationDateInputField).toBeInTheDocument()

@@ -111,7 +111,7 @@ const yearValue = computed({
         v-if="selectedInputType === InputType.DATE"
         :id="id"
         v-model="dateValue"
-        :attributes="{ ariaLabel: `${label} Datum` }"
+        :attributes="{ ariaLabel: `${label}` }"
         :type="InputType.DATE"
       />
       <InputElement
