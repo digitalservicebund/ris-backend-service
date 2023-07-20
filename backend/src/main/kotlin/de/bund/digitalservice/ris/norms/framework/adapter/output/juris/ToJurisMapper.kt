@@ -7,6 +7,7 @@ import de.bund.digitalservice.ris.norms.domain.value.MetadatumType
 import de.bund.digitalservice.ris.norms.domain.value.NormCategory
 import de.bund.digitalservice.ris.norms.domain.value.ProofType
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.encodeLocalDate
+import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.encodeLocalDateToGermanFormat
 import de.bund.digitalservice.ris.norms.juris.converter.model.CategorizedReference
 import de.bund.digitalservice.ris.norms.juris.converter.model.DigitalAnnouncement
 import de.bund.digitalservice.ris.norms.juris.converter.model.DivergentEntryIntoForce
@@ -194,7 +195,7 @@ private fun extractStatus(norm: Norm): List<Status> = norm
         Status(
             section.metadata.find { it.type == MetadatumType.NOTE }?.value.toString(),
             section.metadata.find { it.type == MetadatumType.DESCRIPTION }?.value.toString(),
-            section.metadata.find { it.type == MetadatumType.DATE }?.let { found -> encodeLocalDate(found.value as LocalDate) },
+            section.metadata.find { it.type == MetadatumType.DATE }?.let { found -> encodeLocalDateToGermanFormat(found.value as LocalDate) },
             section.metadata.filter { it.type == MetadatumType.REFERENCE }.joinToString { it.value.toString() },
         )
     }
@@ -208,7 +209,7 @@ private fun extractReissue(norm: Norm): List<Reissue> = norm
         Reissue(
             section.metadata.find { it.type == MetadatumType.NOTE }?.value.toString(),
             section.metadata.find { it.type == MetadatumType.ARTICLE }?.value.toString(),
-            section.metadata.find { it.type == MetadatumType.DATE }?.let { found -> encodeLocalDate(found.value as LocalDate) },
+            section.metadata.find { it.type == MetadatumType.DATE }?.let { found -> encodeLocalDateToGermanFormat(found.value as LocalDate) },
             section.metadata.find { it.type == MetadatumType.REFERENCE }?.value.toString(),
         )
     }
