@@ -124,7 +124,7 @@ const onTextChange = () => {
   filter.value = inputText.value
   if (timer) clearTimeout(timer)
   if (props.throttleItemServiceThroughput) {
-    timer = setTimeout(() => updateCurrentItems(filter.value), 300)
+    timer = setTimeout(() => void updateCurrentItems(filter.value), 300)
   } else {
     updateCurrentItems(filter.value)
   }
