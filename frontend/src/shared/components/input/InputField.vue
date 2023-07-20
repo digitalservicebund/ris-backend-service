@@ -40,7 +40,7 @@ const labelConverted = computed(() =>
   Array.isArray(props.label) ? props.label : Array.of(props.label),
 )
 
-function updateValidationError(newValidationError: ValidationError) {
+function updateValidationError(newValidationError?: ValidationError) {
   localValidationError.value = newValidationError
 }
 
