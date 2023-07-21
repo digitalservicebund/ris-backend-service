@@ -16,7 +16,7 @@ import org.springframework.context.annotation.Profile;
 
 @Configuration
 public class JurisConfig {
-  @Value("${mail.exporter.response.mailbox.username:username}")
+  @Value("${mail.exporter.response.mailbox.username:user@neuris.dev}")
   private String mailboxUsername;
 
   @Value("${mail.exporter.response.mailbox.password:password}")
