@@ -1,12 +1,13 @@
 <script lang="ts" setup>
 import { computed, ref, watch } from "vue"
 import { Metadata } from "@/domain/Norm"
-import InputElement from "@/shared/components/input/InputElement.vue"
+import DateInput from "@/shared/components/input/DateInput.vue"
 import InputField, {
   LabelPosition,
 } from "@/shared/components/input/InputField.vue"
 import RadioInput from "@/shared/components/input/RadioInput.vue"
 import { InputType } from "@/shared/components/input/types"
+import YearInput from "@/shared/components/input/YearInput.vue"
 
 interface Props {
   modelValue: Metadata
@@ -102,23 +103,24 @@ const yearValue = computed({
           ? `${idPrefix}Date`
           : `${idPrefix}Year`
       "
-      v-slot="{ id }"
+      v-slot="{ id, hasError, updateValidationError }"
       class="mb-0"
       :label="label"
       :label-position="LabelPosition.TOP"
     >
-      <InputElement
+      <DateInput
         v-if="selectedInputType === InputType.DATE"
         :id="id"
         v-model="dateValue"
-        :attributes="{ ariaLabel: `${label}` }"
-        :type="InputType.DATE"
+        :aria-label="label"
+        :has-error="hasError"
+        @update:validation-error="updateValidationError"
       />
-      <InputElement
+      <YearInput
         v-else-if="selectedInputType === InputType.YEAR"
         :id="id"
         v-model="yearValue"
-        :attributes="{ ariaLabel: `${label} Jahresangabe` }"
+        :aria-label="`${label} Jahresangabe`"
         :type="InputType.YEAR"
       />
     </InputField>

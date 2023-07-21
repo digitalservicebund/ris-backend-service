@@ -1,8 +1,8 @@
 <script lang="ts" setup>
 import { ref } from "vue"
 import { UndefinedDate } from "@/domain/Norm"
+import DateInput from "@/shared/components/input/DateInput.vue"
 import DropdownInput from "@/shared/components/input/DropdownInput.vue"
-import InputElement from "@/shared/components/input/InputElement.vue"
 import InputField from "@/shared/components/input/InputField.vue"
 import { InputType } from "@/shared/components/input/types"
 
@@ -52,26 +52,29 @@ interface DropdownItem {
     <InputField
       v-if="selectedInputType === InputType.DATE"
       :id="dateId"
+      v-slot="{ id, hasError, updateValidationError }"
       :aria-label="dateInputFieldLabel"
       :label="dateInputFieldLabel"
     >
-      <InputElement
-        :id="dateId"
+      <DateInput
+        :id="id"
         v-model="dateValue"
-        :attributes="{ ariaLabel: dateInputAriaLabel }"
+        :aria-label="dateInputAriaLabel"
+        :has-error="hasError"
         is-future-date
-        :type="InputType.DATE"
         @update:model-value="$emit('update:dateValue', $event)"
+        @update:validation-error="updateValidationError"
       />
     </InputField>
     <InputField
       v-if="selectedInputType === InputType.UNDEFINED_DATE"
       :id="undefinedDateId"
+      v-slot="{ id }"
       :aria-label="undefinedDateInputFieldLabel"
       :label="undefinedDateInputFieldLabel"
     >
       <DropdownInput
-        :id="undefinedDateId"
+        :id="id"
         :aria-label="undefinedDateDropdownAriaLabel"
         :items="dropdownItems"
         :model-value="undefineDateValue"

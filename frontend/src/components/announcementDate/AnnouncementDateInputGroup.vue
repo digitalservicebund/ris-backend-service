@@ -1,12 +1,14 @@
 <script lang="ts" setup>
 import { computed } from "vue"
 import { Metadata } from "@/domain/Norm"
-import InputElement from "@/shared/components/input/InputElement.vue"
+import DateInput from "@/shared/components/input/DateInput.vue"
 import InputField, {
   LabelPosition,
 } from "@/shared/components/input/InputField.vue"
 import RadioInput from "@/shared/components/input/RadioInput.vue"
+import TimeInput from "@/shared/components/input/TimeInput.vue"
 import { InputType } from "@/shared/components/input/types"
+import YearInput from "@/shared/components/input/YearInput.vue"
 
 interface Props {
   modelValue: Metadata
@@ -99,25 +101,25 @@ const yearValue = computed({
 
     <div v-if="selectedInputType === InputType.DATE_TIME" class="flex gap-24">
       <div class="w-288">
-        <InputField id="announcementDateInput" v-slot="{ id }" label="Datum">
-          <InputElement
+        <InputField
+          id="announcementDateInput"
+          v-slot="{ id, hasError, updateValidationError }"
+          label="Datum"
+        >
+          <DateInput
             :id="id"
             v-model="dateValue"
-            :attributes="{ ariaLabel: 'Datum' }"
+            aria-label="Datum"
+            :has-error="hasError"
             is-future-date
-            :type="InputType.DATE"
+            @update:validation-error="updateValidationError"
           />
         </InputField>
       </div>
 
       <div class="w-288">
         <InputField id="announcementDateTime" v-slot="{ id }" label="Uhrzeit">
-          <InputElement
-            :id="id"
-            v-model="timeValue"
-            :attributes="{ ariaLabel: 'Uhrzeit' }"
-            :type="InputType.TIME"
-          />
+          <TimeInput :id="id" v-model="timeValue" aria-label="Uhrzeit" />
         </InputField>
       </div>
     </div>
@@ -128,12 +130,7 @@ const yearValue = computed({
         v-slot="{ id }"
         label="Jahresangabe"
       >
-        <InputElement
-          :id="id"
-          v-model="yearValue"
-          :attributes="{ ariaLabel: 'Jahresangabe' }"
-          :type="InputType.YEAR"
-        />
+        <YearInput :id="id" v-model="yearValue" aria-label="Jahresangabe" />
       </InputField>
     </div>
   </div>

@@ -2,10 +2,9 @@
 import { computed, ref, watch } from "vue"
 import { Metadata } from "@/domain/Norm"
 import ChipsInput from "@/shared/components/input/ChipsInput.vue"
-import InputElement from "@/shared/components/input/InputElement.vue"
+import DateInput from "@/shared/components/input/DateInput.vue"
 import InputField from "@/shared/components/input/InputField.vue"
 import TextInput from "@/shared/components/input/TextInput.vue"
-import { InputType } from "@/shared/components/input/types"
 import YearInput from "@/shared/components/input/YearInput.vue"
 
 interface Props {
@@ -77,48 +76,58 @@ const yearEnabled = computed(() => !inputValue.value.DATE?.[0])
 <template>
   <div>
     <InputField
-      id="workNote"
+      id="workNoteChips"
+      v-slot="{ id }"
       aria-label="Bearbeitungshinweis"
       class="w-1/3"
       label="Bearbeitungshinweis"
     >
       <ChipsInput
-        id="workNoteChips"
+        :id="id"
         v-model="workNote"
         aria-label="Bearbeitungshinweis Chips"
       />
     </InputField>
     <InputField
-      id="description"
+      id="descriptionText"
+      v-slot="{ id }"
       aria-label="Bezeichnung der Änderungsvorschrift"
       class="w-1/3"
       label="Bezeichnung der Änderungsvorschrift"
     >
       <TextInput
-        id="descriptionText"
+        :id="id"
         v-model="description"
         aria-label="Bezeichnung der Änderungsvorschrift Description"
       />
     </InputField>
     <div class="flex gap-24">
       <InputField
-        id="date"
+        id="documentStatusDate"
+        v-slot="{ id, hasError, updateValidationError }"
         aria-label="Datum"
         class="md:w-auto"
         label="Datum der Änderungsvorschrift"
       >
-        <InputElement
-          id="documentStatusDate"
+        <DateInput
+          :id="id"
           v-model="date"
-          :attributes="{ ariaLabel: `Dokument Datum` }"
+          aria-label="Dokument Datum"
           :disabled="!dateEnabled"
-          :type="InputType.DATE"
+          :has-error="hasError"
+          @update:validation-error="updateValidationError"
         />
       </InputField>
       <p class="my-auto">oder</p>
-      <InputField id="year" aria-label="Jahr" class="md:w-auto" label="Jahr">
+      <InputField
+        id="documentStatusYear"
+        v-slot="{ id }"
+        aria-label="Jahr"
+        class="md:w-auto"
+        label="Jahr"
+      >
         <YearInput
-          id="documentStatusYear"
+          :id="id"
           v-model="year"
           aria-label="Dokument Jahr"
           :disabled="!yearEnabled"
@@ -126,37 +135,40 @@ const yearEnabled = computed(() => !inputValue.value.DATE?.[0])
       </InputField>
     </div>
     <InputField
-      id="reference"
+      id="referenceText"
+      v-slot="{ id }"
       aria-label="Fundstelle der Änderungsvorschrift"
       class="md:w-auto"
       label="Fundstelle der Änderungsvorschrift"
     >
       <TextInput
-        id="referenceText"
+        :id="id"
         v-model="reference"
         aria-label="Fundstelle der Änderungsvorschrift Text"
       />
     </InputField>
     <InputField
-      id="entryIntoForceDateNote"
+      id="entryIntoForceDateNoteChips"
+      v-slot="{ id }"
       aria-label="Datum des Inkrafttretens der Änderung"
       class="md:w-auto"
       label="Datum des Inkrafttretens der Änderung"
     >
       <ChipsInput
-        id="entryIntoForceDateNoteChips"
+        :id="id"
         v-model="entryIntoForceDateNote"
         aria-label="Datum des Inkrafttretens der Änderung Chips"
       />
     </InputField>
     <InputField
-      id="proofIndication"
+      id="proofIndicationText"
+      v-slot="{ id }"
       aria-label="Angaben zum textlichen und/oder dokumentarischen Nachweis"
       class="md:w-auto"
       label="Angaben zum textlichen und/oder dokumentarischen Nachweis"
     >
       <TextInput
-        id="proofIndicationText"
+        :id="id"
         v-model="proofIndication"
         aria-label="Angaben zum textlichen und/oder dokumentarischen Nachweis Text"
       />

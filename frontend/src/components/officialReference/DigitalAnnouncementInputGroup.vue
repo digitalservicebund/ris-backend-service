@@ -2,10 +2,9 @@
 import { computed, ref, watch } from "vue"
 import { Metadata } from "@/domain/Norm"
 import ChipsInput from "@/shared/components/input/ChipsInput.vue"
-import InputElement from "@/shared/components/input/InputElement.vue"
+import DateInput from "@/shared/components/input/DateInput.vue"
 import InputField from "@/shared/components/input/InputField.vue"
 import TextInput from "@/shared/components/input/TextInput.vue"
-import { InputType } from "@/shared/components/input/types"
 import YearInput from "@/shared/components/input/YearInput.vue"
 
 interface Props {
@@ -89,12 +88,13 @@ const explanation = computed({
   <div class="ful-w flex gap-16">
     <InputField
       id="digitalAnnouncementMedium"
+      v-slot="{ id }"
       aria-label="Verkündungsmedium"
       class="w-1/2"
       label="Verkündungsmedium"
     >
       <TextInput
-        id="digitalAnnouncementMedium"
+        :id="id"
         v-model="announcementMedium"
         alt-text="Verkündungsmedium"
         aria-label="Verkündungsmedium"
@@ -102,29 +102,31 @@ const explanation = computed({
     </InputField>
     <InputField
       id="digitalAnnouncementDate"
+      v-slot="{ id, hasError, updateValidationError }"
       aria-label="Verkündungsdatum"
       class="w-1/2"
       label="Verkündungsdatum"
     >
-      <InputElement
-        id="digitalAnnouncementDate"
+      <DateInput
+        :id="id"
         v-model="date"
-        alt-text="Verkündungsdatum"
-        :attributes="{ ariaLabel: `Verkündungsdatum` }"
+        aria-label="Verkündungsdatum"
+        :has-error="hasError"
         is-future-date
-        :type="InputType.DATE"
+        @update:validation-error="updateValidationError"
       />
     </InputField>
   </div>
   <div class="ful-w flex gap-16">
     <InputField
       id="digitalAnnouncementEdition"
+      v-slot="{ id }"
       aria-label="Ausgabenummer"
       class="w-1/3"
       label="Ausgabenummer"
     >
       <TextInput
-        id="digitalAnnouncementEdition"
+        :id="id"
         v-model="edition"
         alt-text="Ausgabenummer"
         aria-label="Ausgabenummer"
@@ -132,25 +134,22 @@ const explanation = computed({
     </InputField>
     <InputField
       id="digitalAnnouncementYear"
+      v-slot="{ id }"
       aria-label="Jahr"
       class="w-1/3"
       label="Jahr"
     >
-      <YearInput
-        id="digitalAnnouncementYear"
-        v-model="year"
-        alt-text="Jahr"
-        aria-label="Jahr"
-      />
+      <YearInput :id="id" v-model="year" alt-text="Jahr" aria-label="Jahr" />
     </InputField>
     <InputField
       id="digitalAnnouncementPageNumber"
+      v-slot="{ id }"
       aria-label="Seitenzahl"
       class="w-1/3"
       label="Seitenzahl"
     >
       <TextInput
-        id="digitalAnnouncementPageNumber"
+        :id="id"
         v-model="pageNumber"
         alt-text="Seitenzahl"
         aria-label="Seitenzahl"
@@ -160,12 +159,13 @@ const explanation = computed({
   <div class="ful-w flex gap-16">
     <InputField
       id="digitalAnnouncementArea"
+      v-slot="{ id }"
       aria-label="Bereich der Veröffentlichung"
       class="w-1/2"
       label="Bereich der Veröffentlichung"
     >
       <TextInput
-        id="digitalAnnouncementArea"
+        :id="id"
         v-model="areaOfPublication"
         alt-text="Bereich der Veröffentlichung"
         aria-label="Bereich der Veröffentlichung"
@@ -173,12 +173,13 @@ const explanation = computed({
     </InputField>
     <InputField
       id="digitalAnnouncementAreaNumber"
+      v-slot="{ id }"
       aria-label="Nummer der Veröffentlichung im jeweiligen Bereich"
       class="w-1/2"
       label="Nummer der Veröffentlichung im jeweiligen Bereich"
     >
       <TextInput
-        id="digitalAnnouncementAreaNumber"
+        :id="id"
         v-model="numberOfThePublicationInTheRespectiveArea"
         alt-text="Nummer der Veröffentlichung im jeweiligen Bereich"
         aria-label="Nummer der Veröffentlichung im jeweiligen Bereich"
@@ -187,24 +188,18 @@ const explanation = computed({
   </div>
   <InputField
     id="digitalAnnouncementInfo"
+    v-slot="{ id }"
     aria-label="Zusatzangaben"
     label="Zusatzangaben"
   >
-    <ChipsInput
-      id="digitalAnnouncementInfo"
-      v-model="additionalInfo"
-      aria-label="Zusatzangaben"
-    />
+    <ChipsInput :id="id" v-model="additionalInfo" aria-label="Zusatzangaben" />
   </InputField>
   <InputField
     id="digitalAnnouncementExplanations"
+    v-slot="{ id }"
     aria-label="Erläuterungen"
     label="Erläuterungen"
   >
-    <ChipsInput
-      id="digitalAnnouncementExplanations"
-      v-model="explanation"
-      aria-label="Erläuterungen"
-    />
+    <ChipsInput :id="id" v-model="explanation" aria-label="Erläuterungen" />
   </InputField>
 </template>

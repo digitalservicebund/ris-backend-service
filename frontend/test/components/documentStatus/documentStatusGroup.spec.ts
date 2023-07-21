@@ -136,7 +136,7 @@ describe("DocumentStatusGroup", () => {
     expect(textInputNew).not.toHaveValue()
   })
 
-  it("should by default render the  DocumentStatus Input Group if modelValue is empty", function () {
+  it("should by default render the DocumentStatus Input Group if modelValue is empty", function () {
     renderComponent({ modelValue: {} })
 
     const description = screen.getByLabelText(

@@ -2,10 +2,9 @@
 import { computed, ref, watch } from "vue"
 import { Metadata, MetadataSectionName } from "@/domain/Norm"
 import ChipsInput from "@/shared/components/input/ChipsInput.vue"
-import InputElement from "@/shared/components/input/InputElement.vue"
+import DateInput from "@/shared/components/input/DateInput.vue"
 import InputField from "@/shared/components/input/InputField.vue"
 import TextInput from "@/shared/components/input/TextInput.vue"
-import { InputType } from "@/shared/components/input/types"
 import YearInput from "@/shared/components/input/YearInput.vue"
 
 interface Props {
@@ -199,28 +198,31 @@ const yearEnabled = computed(() => !inputValue.value.DATE?.[0])
     <div class="flex gap-24">
       <InputField
         :id="inputFields.dateField.id"
+        v-slot="{ id, hasError, updateValidationError }"
         :aria-label="inputFields.dateField.label"
         class="md:w-auto"
         :label="inputFields.dateField.label"
       >
-        <InputElement
-          :id="inputFields.dateField.id"
+        <DateInput
+          :id="id"
           v-model="inputFields.dateField.modelValue"
-          :attributes="{ ariaLabel: `${inputFields.dateField.label}` }"
+          :aria-label="`${inputFields.dateField.label}`"
           :disabled="!dateEnabled"
-          :type="InputType.DATE"
+          :has-error="hasError"
           @update:model-value="inputFields.dateField.updateModelValue"
+          @update:validation-error="updateValidationError"
         />
       </InputField>
       <p class="my-auto">oder</p>
       <InputField
         :id="inputFields.yearField.id"
+        v-slot="{ id }"
         :aria-label="inputFields.yearField.label"
         class="md:w-auto"
         :label="inputFields.yearField.label"
       >
         <YearInput
-          :id="inputFields.yearField.id"
+          :id="id"
           v-model="inputFields.yearField.modelValue"
           :aria-label="inputFields.yearField.label"
           :disabled="!yearEnabled"
@@ -231,12 +233,13 @@ const yearEnabled = computed(() => !inputValue.value.DATE?.[0])
 
     <InputField
       :id="inputFields.referenceField.id"
+      v-slot="{ id }"
       :aria-label="inputFields.referenceField.label"
       :label="inputFields.referenceField.label"
     >
       <TextInput
         v-if="!inputFields.referenceField.multi"
-        :id="inputFields.referenceField.id"
+        :id="id"
         :aria-label="inputFields.referenceField.label"
         :model-value="inputFields.referenceField.modelValue?.toString()"
         @update:model-value="inputFields.referenceField.updateModelValue"
@@ -244,7 +247,7 @@ const yearEnabled = computed(() => !inputValue.value.DATE?.[0])
 
       <ChipsInput
         v-else-if="inputFields.referenceField.multi"
-        :id="inputFields.referenceField.id"
+        :id="id"
         :aria-label="inputFields.referenceField.label"
         :model-value="inputFields.referenceField.modelValue as string[]"
         @update:model-value="inputFields.referenceField.updateModelValue"
