@@ -2,8 +2,9 @@
 import { computed, onMounted, ref } from "vue"
 import ComboboxInput from "@/components/ComboboxInput.vue"
 import { NormAbbreviation } from "@/domain/normAbbreviation"
-import NormReference from "@/domain/normReference"
+import NormReference, { SingleNormValidationInfo } from "@/domain/normReference"
 import ComboboxItemService from "@/services/comboboxItemService"
+import documentUnitService from "@/services/documentUnitService"
 import DateInput from "@/shared/components/input/DateInput.vue"
 import InputField from "@/shared/components/input/InputField.vue"
 import TextButton from "@/shared/components/input/TextButton.vue"
@@ -12,11 +13,13 @@ import { ValidationError } from "@/shared/components/input/types"
 import YearInput from "@/shared/components/input/YearInput.vue"
 
 const props = defineProps<{ modelValue?: NormReference }>()
-
 const emit = defineEmits<{
   "update:modelValue": [value: NormReference]
   closeEntry: [void]
 }>()
+
+const hasValidationError = ref()
+
 const validationErrors = ref<ValidationError[]>()
 
 const norm = computed({
@@ -50,23 +53,37 @@ const normAbbreviation = computed({
 async function validateNorm() {
   validationErrors.value = []
 
-  if (norm.value?.updateValidationErrors) {
-    if (await norm.value.updateValidationErrors()) {
+  //validate singleNorm
+  if (norm.value.singleNorm) {
+    const singleNormValidationInfo: SingleNormValidationInfo = {
+      singleNorm: norm.value.singleNorm,
+      normAbbreviation: norm.value.normAbbreviation?.abbreviation,
+    }
+    const response = await documentUnitService.validateSingleNorm(
+      singleNormValidationInfo,
+    )
+
+    if (response.data !== "Ok") {
       validationErrors.value?.push({
         defaultMessage: "Inhalt nicht valide",
         field: "singleNorm",
       })
+      hasValidationError.value = true
+    } else {
+      hasValidationError.value = false
     }
+  } else {
+    hasValidationError.value = false
+  }
 
-    //validate required fields
-    if (norm.value.missingRequiredFields?.length) {
-      norm.value.missingRequiredFields.forEach((missingField) => {
-        validationErrors.value?.push({
-          defaultMessage: "Pflichtfeld nicht befüllt",
-          field: missingField,
-        })
+  //validate required fields
+  if (norm.value.missingRequiredFields?.length) {
+    norm.value.missingRequiredFields.forEach((missingField) => {
+      validationErrors.value?.push({
+        defaultMessage: "Pflichtfeld nicht befüllt",
+        field: missingField,
       })
-    }
+    })
   }
 }
 
@@ -111,6 +128,7 @@ onMounted(() => {
         :has-error="slotProps.hasError"
         :item-service="ComboboxItemService.getRisAbbreviations"
         placeholder="RIS Abkürzung"
+        @input="validateNorm"
       >
       </ComboboxInput>
     </InputField>
@@ -122,6 +140,7 @@ onMounted(() => {
         :validation-error="
           validationErrors?.find((err) => err.field === 'singleNorm')
         "
+        @input="validateNorm"
       >
         <TextInput
           id="norm-reference-singleNorm"
@@ -157,7 +176,7 @@ onMounted(() => {
     <TextButton
       aria-label="Norm speichern"
       class="mr-28"
-      :disabled="norm.isEmpty"
+      :disabled="norm.isEmpty || hasValidationError"
       label="Übernehmen"
       @click="addNormReference"
     />
