@@ -28,7 +28,7 @@ const localModelValue = computed({
   <!-- eslint-disable vuejs-accessibility/form-control-has-label -->
   <input
     v-model="localModelValue"
-    class="ds-radio"
+    class="ds-radio focus:!shadow-[inset_0_0_0_0.25rem] focus:!shadow-blue-800"
     :class="{
       'has-error': !!props.validationError,
       'mr-12': props.size === 'large',
