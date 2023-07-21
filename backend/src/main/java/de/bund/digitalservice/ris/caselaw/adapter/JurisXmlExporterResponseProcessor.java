@@ -189,8 +189,8 @@ public class JurisXmlExporterResponseProcessor {
               Mono.fromRunnable(
                   () ->
                       LOGGER.info(
-                          "Could not forward JurisResponse (DocumentUnit not found): "
-                              + documentNumber)))
+                          "Could not forward JurisResponse (DocumentUnit not found): {}",
+                          documentNumber)))
           .thenReturn(messageWrapper);
     } catch (MessagingException | IOException e) {
       return Mono.error(new StatusImporterException("Could not forward Message"));
