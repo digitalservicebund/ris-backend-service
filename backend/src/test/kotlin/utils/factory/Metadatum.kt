@@ -8,7 +8,7 @@ import java.util.UUID
 fun metadatum(block: MetadatumBuilder.() -> Unit): Metadatum<*> = MetadatumBuilder().apply(block).build()
 
 class MetadatumBuilder {
-    var value: Any? = randomString()
+    var value: Any = randomString()
     var type: MetadatumType = MetadatumType.LEAD_UNIT
     var order: Int = 1
     var guid: UUID = UUID.randomUUID()

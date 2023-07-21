@@ -40,8 +40,9 @@ fun mapDataToDomain(guid: UUID, data: NormData): Norm {
     val citationDateSections = data.citationDateList.mapIndexed { index, value ->
         if (value.length == 4 && value.toIntOrNull() != null) {
             MetadataSection(Section.CITATION_DATE, listOf(Metadatum(value, MetadatumType.YEAR, 1)), index)
-        } else if (value.length > 4 && parseDateString(value) != null) {
-            MetadataSection(Section.CITATION_DATE, listOf(Metadatum(parseDateString(value), MetadatumType.DATE, 1)), index)
+        } else if (value.length > 4) {
+            val date = parseDateString(value)
+            date?.let { MetadataSection(Section.CITATION_DATE, listOf(Metadatum(date, MetadatumType.DATE, 1)), index) }
         } else {
             null
         }
@@ -51,8 +52,8 @@ fun mapDataToDomain(guid: UUID, data: NormData): Norm {
         MetadataSection(Section.AGE_INDICATION, listOf(Metadatum(value, MetadatumType.RANGE_START, 1)), index)
     }
 
-    val categorizedReferenceSections = data.categorizedReferences.mapIndexed { index, value ->
-        MetadataSection(Section.CATEGORIZED_REFERENCE, listOf(Metadatum(value.text, MetadatumType.TEXT)), index)
+    val categorizedReferenceSections = data.categorizedReferences.map { it.text }.filterNotNull().mapIndexed { index, value ->
+        MetadataSection(Section.CATEGORIZED_REFERENCE, listOf(Metadatum(value, MetadatumType.TEXT)), index)
     }
 
     val sections = listOf(createSectionForNorm(data)) +
@@ -95,24 +96,22 @@ fun createSectionsForDocumentStatus(
 
     documentStatus.forEachIndexed { index, documentStatusGroup ->
         val metadata = mutableListOf<Metadatum<*>>()
+
         if (documentStatusGroup.documentStatusWorkNote.isNotEmpty()) {
             metadata.add(Metadatum(documentStatusGroup.documentStatusWorkNote[0], MetadatumType.WORK_NOTE))
         }
-        if (documentStatusGroup.documentStatusDescription != null) {
-            metadata.add(Metadatum(documentStatusGroup.documentStatusDescription, MetadatumType.DESCRIPTION))
-        }
-        if (documentStatusGroup.documentStatusDateYear != null) {
-            metadata.add(Metadatum(documentStatusGroup.documentStatusDateYear, MetadatumType.YEAR))
-        }
-        if (documentStatusGroup.documentStatusReference != null) {
-            metadata.add(Metadatum(documentStatusGroup.documentStatusReference, MetadatumType.REFERENCE))
-        }
+
+        documentStatusGroup.documentStatusDescription?.let { metadata.add(Metadatum(it, MetadatumType.DESCRIPTION)) }
+        documentStatusGroup.documentStatusDateYear?.let { metadata.add(Metadatum(it, MetadatumType.YEAR)) }
+        documentStatusGroup.documentStatusReference?.let { metadata.add(Metadatum(it, MetadatumType.REFERENCE)) }
+
         if (metadata.isNotEmpty()) {
             val childSection = MetadataSection(MetadataSectionName.DOCUMENT_STATUS, metadata)
             val parentSection = MetadataSection(MetadataSectionName.DOCUMENT_STATUS_SECTION, emptyList(), index + raiseOrder, sections = listOf(childSection))
             documentStatusSections.add(parentSection)
         }
     }
+
     return documentStatusSections
 }
 
@@ -156,7 +155,7 @@ private fun createSectionForNorm(data: NormData): MetadataSection {
 }
 
 private fun createSectionsForDivergentEntryIntoForce(data: List<DivergentEntryIntoForce>): List<MetadataSection> {
-    val definedDate = createMetadataForType(data.filter { it.state == null }.mapNotNull { parseDateString(it.date) }, MetadatumType.DATE)
+    val definedDate = createMetadataForType(data.filter { it.state == null }.map { it.date }.filterNotNull().map { parseDateString(it) }, MetadatumType.DATE)
     val definedCategory = createMetadataForType(data.filter { it.state == null }.mapNotNull { parseNormCategory(it.normCategory) }, MetadatumType.NORM_CATEGORY)
     val undefinedDate = createMetadataForType(data.mapNotNull { parseDateStateString(it.state) }, MetadatumType.UNDEFINED_DATE)
     val undefinedCategory = createMetadataForType(data.filter { it.state != null }.mapNotNull { parseNormCategory(it.normCategory) }, MetadatumType.NORM_CATEGORY)
@@ -168,7 +167,7 @@ private fun createSectionsForDivergentEntryIntoForce(data: List<DivergentEntryIn
 }
 
 private fun createSectionsForDivergentExpiration(data: List<DivergentExpiration>): List<MetadataSection> {
-    val definedDate = createMetadataForType(data.filter { it.state == null }.mapNotNull { parseDateString(it.date) }, MetadatumType.DATE)
+    val definedDate = createMetadataForType(data.filter { it.state == null }.map { it.date }.filterNotNull().map { parseDateString(it) }, MetadatumType.DATE)
     val definedCategory = createMetadataForType(data.filter { it.state == null }.mapNotNull { parseNormCategory(it.normCategory) }, MetadatumType.NORM_CATEGORY)
     val undefinedDate = createMetadataForType(data.mapNotNull { parseDateStateString(it.state) }, MetadatumType.UNDEFINED_DATE)
     val undefinedCategory = createMetadataForType(data.filter { it.state != null }.mapNotNull { parseNormCategory(it.normCategory) }, MetadatumType.NORM_CATEGORY)
@@ -186,32 +185,44 @@ fun createSectionForEntryIntoForceAndExpiration(data: NormData): List<MetadataSe
         val metadata = Metadatum(LocalDate.parse(data.entryIntoForceDate), MetadatumType.DATE)
         sectionList.add(MetadataSection(Section.ENTRY_INTO_FORCE, listOf(metadata)))
     } else if (data.entryIntoForceDateState !== null) {
-        val metadata = Metadatum(LocalDate.parse(data.entryIntoForceDateState), MetadatumType.UNDEFINED_DATE)
-        sectionList.add(MetadataSection(Section.ENTRY_INTO_FORCE, listOf(metadata)))
+        val dateState = parseDateStateString(data.entryIntoForceDateState)
+        dateState?.let {
+            val metadata = Metadatum(it, MetadatumType.UNDEFINED_DATE)
+            sectionList.add(MetadataSection(Section.ENTRY_INTO_FORCE, listOf(metadata)))
+        }
     }
 
     if (data.principleEntryIntoForceDate !== null) {
         val metadata = Metadatum(LocalDate.parse(data.principleEntryIntoForceDate), MetadatumType.DATE)
         sectionList.add(MetadataSection(Section.PRINCIPLE_ENTRY_INTO_FORCE, listOf(metadata)))
     } else if (data.principleEntryIntoForceDateState !== null) {
-        val metadata = Metadatum(LocalDate.parse(data.principleEntryIntoForceDateState), MetadatumType.UNDEFINED_DATE)
-        sectionList.add(MetadataSection(Section.PRINCIPLE_ENTRY_INTO_FORCE, listOf(metadata)))
+        val dateState = parseDateStateString(data.principleEntryIntoForceDateState)
+        dateState?.let {
+            val metadata = Metadatum(it, MetadatumType.UNDEFINED_DATE)
+            sectionList.add(MetadataSection(Section.PRINCIPLE_ENTRY_INTO_FORCE, listOf(metadata)))
+        }
     }
 
     if (data.expirationDate !== null) {
         val metadata = Metadatum(LocalDate.parse(data.expirationDate), MetadatumType.DATE)
         sectionList.add(MetadataSection(Section.EXPIRATION, listOf(metadata)))
     } else if (data.expirationDateState !== null) {
-        val metadata = Metadatum(LocalDate.parse(data.expirationDateState), MetadatumType.UNDEFINED_DATE)
-        sectionList.add(MetadataSection(Section.EXPIRATION, listOf(metadata)))
+        val dateState = parseDateStateString(data.expirationDateState)
+        dateState?.let {
+            val metadata = Metadatum(it, MetadatumType.UNDEFINED_DATE)
+            sectionList.add(MetadataSection(Section.EXPIRATION, listOf(metadata)))
+        }
     }
 
     if (data.principleExpirationDate !== null) {
         val metadata = Metadatum(LocalDate.parse(data.principleExpirationDate), MetadatumType.DATE)
         sectionList.add(MetadataSection(Section.PRINCIPLE_EXPIRATION, listOf(metadata)))
     } else if (data.principleExpirationDateState !== null) {
-        val metadata = Metadatum(LocalDate.parse(data.principleExpirationDateState), MetadatumType.UNDEFINED_DATE)
-        sectionList.add(MetadataSection(Section.PRINCIPLE_EXPIRATION, listOf(metadata)))
+        val dateState = parseDateStateString(data.principleExpirationDateState)
+        dateState?.let {
+            val metadata = Metadatum(it, MetadatumType.UNDEFINED_DATE)
+            sectionList.add(MetadataSection(Section.PRINCIPLE_EXPIRATION, listOf(metadata)))
+        }
     }
 
     return sectionList
@@ -244,9 +255,7 @@ private fun createFootnoteSections(footnotes: List<Footnote>): List<MetadataSect
 
         val metadata = mutableListOf<Metadatum<*>>()
 
-        if (footnoteGroup.reference != null) {
-            metadata.add(Metadatum(footnoteGroup.reference, MetadatumType.FOOTNOTE_REFERENCE, 1))
-        }
+        footnoteGroup.reference?.let { metadata.add(Metadatum(it, MetadatumType.FOOTNOTE_REFERENCE, 1)) }
 
         val addToFootnotesOrder = if (footnoteGroup.reference != null) 1 else 0
         addFootnotesToMetadata(footnoteGroup.footnoteChange, MetadatumType.FOOTNOTE_CHANGE, metadata, addToFootnotesOrder)
@@ -309,28 +318,28 @@ private fun createSectionForStatusIndication(statusList: List<Status>, reissueLi
 fun addProviderSections(normProviders: List<NormProvider>): List<MetadataSection> {
     return normProviders.mapIndexed { index, normProvider ->
         val metadata = mutableListOf<Metadatum<*>>()
-        if (normProvider.entity !== null) {
-            metadata.add(Metadatum(normProvider.entity, MetadatumType.ENTITY, 1))
-        }
-        if (normProvider.decidingBody !== null) {
-            metadata.add(Metadatum(normProvider.decidingBody, MetadatumType.DECIDING_BODY, 1))
-        }
-        if (normProvider.isResolutionMajority !== null) {
-            metadata.add(Metadatum(normProvider.isResolutionMajority, MetadatumType.RESOLUTION_MAJORITY, 1))
-        }
+
+        normProvider.entity?.let { metadata.add(Metadatum(it, MetadatumType.ENTITY, 1)) }
+
+        normProvider.decidingBody?.let { metadata.add(Metadatum(it, MetadatumType.DECIDING_BODY, 1)) }
+        normProvider.isResolutionMajority?.let { metadata.add(Metadatum(it, MetadatumType.RESOLUTION_MAJORITY, 1)) }
+
         if (metadata.isNotEmpty()) MetadataSection(Section.NORM_PROVIDER, metadata, index + 1) else null
     }.filterNotNull()
 }
 
 private fun createAnnoucementDateSection(announcementDate: String?): MetadataSection? {
     return announcementDate?.let {
-        val date = Metadatum(parseDateString(it), MetadatumType.DATE)
-        MetadataSection(Section.ANNOUNCEMENT_DATE, listOf(date))
+        val date = parseDateString(it)
+        date?.let {
+            val metadatum = Metadatum(it, MetadatumType.DATE)
+            MetadataSection(Section.ANNOUNCEMENT_DATE, listOf(metadatum))
+        }
     }
 }
 
 private fun createMetadataForType(data: List<*>, type: MetadatumType): List<Metadatum<*>> = data
-    .mapIndexed { index, value -> Metadatum(value, type, index + 1) }
+    .filterNotNull().mapIndexed { index, value -> Metadatum(value, type, index + 1) }
 
 fun mapArticlesToDomain(articles: List<ArticleData>): List<Article> {
     return articles.map { article ->
@@ -353,7 +362,7 @@ fun mapParagraphsToDomain(paragraphs: List<ParagraphData>): List<Paragraph> {
     }
 }
 
-fun parseDateString(value: String?): LocalDate? = value?.let { try { LocalDate.parse(value) } catch (e: DateTimeParseException) { null } }
+fun parseDateString(value: String): LocalDate? = try { LocalDate.parse(value) } catch (e: DateTimeParseException) { null }
 
 fun parseNormCategory(value: String?): NormCategory? = when (value) {
     "SN" -> NormCategory.BASE_NORM

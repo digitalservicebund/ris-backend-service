@@ -11,11 +11,9 @@ fun decodeGuid(guidString: String): UUID = UUID.fromString(guidString)
 
 fun encodeGuid(guid: UUID): String = guid.toString()
 
-fun decodeLocalDate(dateString: String?): LocalDate? =
-    if (dateString != null) LocalDate.parse(dateString) else null
+fun decodeLocalDate(dateString: String) = LocalDate.parse(dateString)
 
-fun decodeLocalTime(timeString: String?): LocalTime? =
-    if (timeString != null) LocalTime.parse(timeString) else null
+fun decodeLocalTime(timeString: String) = LocalTime.parse(timeString)
 
 fun encodeLocalDate(date: LocalDate?): String? = date?.toString()
 

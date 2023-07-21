@@ -356,7 +356,7 @@ class HasValidValueTypeTest {
  * possible to create an instance that is not satisfying this specification. To still being able to
  * independently and fully test this specification, we use a mocked version of the instance type.
  */
-private fun <T> getMockedMetadatum(value: T, type: MetadatumType): Metadatum<T> {
+private fun <T : Any> getMockedMetadatum(value: T, type: MetadatumType): Metadatum<T> {
     val instance = mockk<Metadatum<T>>()
     every { instance.value } returns value
     every { instance.type } returns type
