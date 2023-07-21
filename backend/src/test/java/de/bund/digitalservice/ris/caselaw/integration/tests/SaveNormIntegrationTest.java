@@ -229,7 +229,7 @@ class SaveNormIntegrationTest {
 
     DocumentUnitNormDTO normDTO =
         DocumentUnitNormDTO.builder()
-            .uuid(UUID.fromString("22222222-2222-2222-2222-22222222222" + index))
+            //            .uuid(UUID.fromString("22222222-2222-2222-2222-22222222222" + index))
             .documentUnitId(parentId)
             .normAbbreviationUuid(UUID.fromString("11111111-1111-1111-1111-11111111111" + index))
             .build();
