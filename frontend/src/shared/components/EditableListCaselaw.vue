@@ -67,7 +67,7 @@ watch(
     if (modelValueList.value.length == 0) {
       addNewModelEntry()
     }
-    ;() => emit("update:modelValue", modelValueList.value)
+    emit("update:modelValue", modelValueList.value)
   },
   { deep: true, immediate: true },
 )

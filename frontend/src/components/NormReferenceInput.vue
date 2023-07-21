@@ -95,7 +95,7 @@ async function addNormReference() {
 
 onMounted(() => {
   validateNorm()
-  norm.value = new NormReference({ ...props.modelValue }) ?? {}
+  norm.value = new NormReference({ ...props.modelValue })
 })
 </script>
 
