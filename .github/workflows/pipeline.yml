@@ -924,6 +924,49 @@ jobs:
           retention-days: 3
           path: latest.mmd
 
+  generate-backend-code-documentation:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          java-version: "17.0"
+          distribution: "temurin"
+          cache: gradle
+      - name: Grant execute permission for gradlew
+        working-directory: ./backend
+        run: chmod +x gradlew
+      - name: Run Javadoc
+        working-directory: ./backend
+        run: ./gradlew javadoc
+      - name: Run Dokka
+        working-directory: ./backend
+        run: ./gradlew dokkaJavadoc
+      - name: Upload documentation
+        uses: actions/upload-artifact@v3
+        with:
+          name: backend-code-documentation
+          retention-days: 3
+          path: |
+            backend/build/dokka/javadoc/
+            backend/build/docs/javadoc/
+#      - name: Send status to Slack
+#        # Third-party action, pin to commit SHA!
+#        # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
+#        uses: lazy-actions/slatify@c4847b8c84e3e8076fd3c42cc00517a10426ed65
+#        if: ${{ failure() && github.ref == 'refs/heads/main' && env.SLACK_WEBHOOK_URL }}
+#        env:
+#          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+#        with:
+#          type: ${{ job.status }}
+#          job_name: "License audit backend :point_right:"
+#          mention: "here"
+#          mention_if: "failure"
+#          commit: true
+#          url: ${{ secrets.SLACK_WEBHOOK_URL }}
+#          token: ${{ secrets.GITHUB_TOKEN }}
+
   push-reports:
     runs-on: ubuntu-latest
     needs:
@@ -932,6 +975,7 @@ jobs:
       - audit-licenses-backend
       - audit-licenses-frontend
       - e2e-tests
+      - generate-backend-code-documentation
     if: ${{ github.ref == 'refs/heads/main' }}
     steps:
       # Setup
@@ -983,6 +1027,17 @@ jobs:
         with:
           filePath: tmp/performance-reports/profile-report.html
           destinationDir: performance-reports/ris-backend-service
+      # Javadoc
+#      - name: Javadoc (Java) - Download
+#        uses: actions/download-artifact@v3
+#        with:
+#          name: backend-code-documentation
+#          path: tmp/backend-code-documentation/
+#      - name: Performance report - git add report
+#        uses: digitalservicebund/ris-reports/actions/git-add-report@728043a0126de421396dde2b11e7c61dfe5c1892
+#        with:
+#          filePath: tmp/backend-code-documentation/
+#          destinationDir: backend-code-documentation/
       # Push reports
       - name: Push reports
         # we use `toJSON(...)` below to escape double quotation marks
