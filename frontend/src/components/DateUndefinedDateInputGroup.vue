@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import { ref } from "vue"
 import { UndefinedDate } from "@/domain/Norm"
 import DateInput from "@/shared/components/input/DateInput.vue"
 import DropdownInput from "@/shared/components/input/DropdownInput.vue"
@@ -18,15 +17,12 @@ interface Props {
   selectedInputType: string
 }
 
-const props = defineProps<Props>()
+defineProps<Props>()
 
 defineEmits<{
   "update:dateValue": [value: string]
   "update:undefinedDateStateValue": [value?: UndefinedDate]
 }>()
-
-const undefineDateValue = ref(props.undefinedDateStateValue)
-const dateValue = ref(props.dateValue)
 
 const ENTRY_INTO_FORCE_DATE_TRANSLATIONS: { [Value in UndefinedDate]: string } =
   {
@@ -58,10 +54,10 @@ interface DropdownItem {
     >
       <DateInput
         :id="id"
-        v-model="dateValue"
         :aria-label="dateInputAriaLabel"
         :has-error="hasError"
         is-future-date
+        :model-value="dateValue"
         @update:model-value="$emit('update:dateValue', $event)"
         @update:validation-error="updateValidationError"
       />
@@ -77,7 +73,7 @@ interface DropdownItem {
         :id="id"
         :aria-label="undefinedDateDropdownAriaLabel"
         :items="dropdownItems"
-        :model-value="undefineDateValue"
+        :model-value="undefinedDateStateValue"
         placeholder="Bitte auswählen"
         @update:model-value="$emit('update:undefinedDateStateValue', $event)"
       />
