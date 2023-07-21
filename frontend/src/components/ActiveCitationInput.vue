@@ -26,7 +26,7 @@ const emit = defineEmits<{
   closeEntry: [void]
 }>()
 
-const activeCitation = ref(props.modelValue as ActiveCitation)
+const activeCitation = ref(new ActiveCitation({ ...props.modelValue }))
 const validationErrors = ref<ValidationError[]>()
 const searchRunning = ref(false)
 
@@ -88,10 +88,10 @@ function handleSearch() {
   search(0)
 }
 
-async function validateRequiredInput(citation: ActiveCitation) {
+async function validateRequiredInput() {
   validationErrors.value = []
-  if (citation.missingRequiredFields?.length) {
-    citation.missingRequiredFields.forEach((missingField) => {
+  if (activeCitation.value.missingRequiredFields?.length) {
+    activeCitation.value.missingRequiredFields.forEach((missingField) => {
       validationErrors.value?.push({
         defaultMessage: "Pflichtfeld nicht befüllt",
         field: missingField,
@@ -101,9 +101,8 @@ async function validateRequiredInput(citation: ActiveCitation) {
 }
 
 async function addActiveCitation() {
-  const citation = new ActiveCitation({ ...activeCitation.value })
-  validateRequiredInput(citation)
-  emit("update:modelValue", citation)
+  validateRequiredInput()
+  emit("update:modelValue", activeCitation.value as ActiveCitation)
   emit("closeEntry")
 }
 
@@ -135,8 +134,10 @@ function scrollToTop() {
 }
 
 onMounted(() => {
-  activeCitation.value = props.modelValue as ActiveCitation
-  validateRequiredInput(activeCitation.value as ActiveCitation)
+  if (props.modelValue?.isEmpty !== undefined) {
+    validateRequiredInput()
+  }
+  activeCitation.value = new ActiveCitation({ ...props.modelValue })
 })
 </script>
 
@@ -236,6 +237,7 @@ onMounted(() => {
       <TextButton
         aria-label="Aktivzitierung speichern"
         class="mr-28"
+        :disabled="activeCitation.isEmpty"
         label="Übernehmen"
         @click="addActiveCitation"
       />

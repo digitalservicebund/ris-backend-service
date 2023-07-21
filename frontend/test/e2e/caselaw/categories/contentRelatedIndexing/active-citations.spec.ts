@@ -303,13 +303,16 @@ test.describe("active citations", () => {
     await navigateToCategories(page, documentNumber)
     await expect(page.getByText(documentNumber)).toBeVisible()
 
+    await fillActiveCitationInputs(page, {
+      fileNumber: "abc",
+    })
     await page.getByLabel("Aktivzitierung speichern").click()
 
     await expect(page.getByLabel("Fehlerhafte Eingabe")).toBeVisible()
     await page.getByLabel("Eintrag bearbeiten").click()
     await expect(
       page.getByLabel("Aktivzitierung").getByText("Pflichtfeld nicht befüllt"),
-    ).toHaveCount(4)
+    ).toHaveCount(3)
 
     await fillActiveCitationInputs(page, {
       citationStyle: "Änderung",
@@ -321,6 +324,16 @@ test.describe("active citations", () => {
     await page.getByLabel("Aktivzitierung speichern").click()
 
     await expect(page.getByLabel("Fehlerhafte Eingabe")).toBeHidden()
+  })
+
+  test("adding empty active citation not possible", async ({
+    page,
+    documentNumber,
+  }) => {
+    await navigateToCategories(page, documentNumber)
+    await expect(page.getByText(documentNumber)).toBeVisible()
+
+    await page.getByLabel("Aktivzitierung speichern").isDisabled()
   })
 
   test("incomplete date input shows error message and does not persist", async ({

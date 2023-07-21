@@ -173,11 +173,10 @@ export async function fillProceedingDecisionInputs(
 export async function fillNormInputs(
   page: Page,
   values?: {
-    citationStyle?: string
-    court?: string
-    decisionDate?: string
-    fileNumber?: string
-    documentType?: string
+    normAbbreviation?: string
+    singleNorm?: string
+    dateOfVersion?: string
+    dateOfRelevance?: string
   },
 ): Promise<void> {
   const fillInput = async (ariaLabel: string, value = generateString()) => {
@@ -186,34 +185,24 @@ export async function fillNormInputs(
     await waitForInputValue(page, `[aria-label='${ariaLabel}']`, value)
   }
 
-  if (values?.citationStyle) {
-    await fillInput("Art der Zitierung", values?.citationStyle)
+  if (values?.normAbbreviation) {
+    await fillInput("RIS-Abkürzung der Norm", values?.normAbbreviation)
     await page.getByRole("button", { name: "dropdown-option" }).click()
     await waitForInputValue(
       page,
-      "[aria-label='Art der Zitierung']",
-      values.citationStyle,
+      "[aria-label='RIS-Abkürzung der Norm']",
+      values.normAbbreviation,
     )
   }
 
-  if (values?.court) {
-    await fillInput("Gericht Aktivzitierung", values?.court)
-    await page.getByText(values.court, { exact: true }).click()
-    await waitForInputValue(
-      page,
-      "[aria-label='Gericht Aktivzitierung']",
-      values.court,
-    )
+  if (values?.singleNorm) {
+    await fillInput("Einzelnorm der Norm", values?.singleNorm)
   }
-  if (values?.decisionDate) {
-    await fillInput("Entscheidungsdatum Aktivzitierung", values?.decisionDate)
+  if (values?.dateOfVersion) {
+    await fillInput("Fassungsdatum der Norm", values?.dateOfVersion)
   }
-  if (values?.fileNumber) {
-    await fillInput("Aktenzeichen Aktivzitierung", values?.fileNumber)
-  }
-  if (values?.documentType) {
-    await fillInput("Dokumenttyp Aktivzitierung", values?.documentType)
-    await page.locator("[aria-label='dropdown-option']").first().click()
+  if (values?.dateOfRelevance) {
+    await fillInput("Jahr der Norm", values?.dateOfRelevance)
   }
 }
 

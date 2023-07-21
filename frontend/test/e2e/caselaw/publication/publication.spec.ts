@@ -1,6 +1,7 @@
 import { expect } from "@playwright/test"
 import {
   fillActiveCitationInputs,
+  fillNormInputs,
   fillProceedingDecisionInputs,
   navigateToCategories,
   navigateToPublication,
@@ -62,7 +63,10 @@ test.describe("ensuring the publishing of documentunits works as expected", () =
 
     await waitForSaving(
       async () => {
-        await page.locator("[aria-label='Einzelnorm der Norm']").fill("abc")
+        await fillNormInputs(page, {
+          dateOfRelevance: "123",
+        })
+        await page.getByLabel("Norm speichern").click()
       },
       page,
       { clickSaveButton: true },
