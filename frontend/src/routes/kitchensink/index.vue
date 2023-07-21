@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed } from "vue"
+import { computed, watchEffect, watch } from "vue"
 import { useRouter } from "vue-router"
 import NavbarSide, {
   LevelOneMenuItem,
@@ -7,6 +7,14 @@ import NavbarSide, {
 
 const router = useRouter()
 
+// Generates the navigation items based on the children within the kitchensink-
+// index route. This will:
+//
+// - Filter out all routes that are not children of kitchensink-index
+// - Guess the name by removing the prefix and converting the rest to title case
+// - Sort the items alphabetically
+//
+// To add a new page to the kitchensink, simply add a new page in /kitchensink/index.
 const navigation = computed<LevelOneMenuItem[]>(() =>
   router
     .getRoutes()
@@ -25,6 +33,23 @@ const navigation = computed<LevelOneMenuItem[]>(() =>
     })
     .sort((a, b) => (a.label < b.label ? -1 : 1)),
 )
+
+// Redirect to the first page in the kitchensink if the user navigates to the
+// kitchensink index.
+watchEffect(() => {
+  if (
+    router.currentRoute.value.name === "kitchensink" &&
+    navigation.value.length > 0
+  ) {
+    router.replace(navigation.value[0].route)
+  }
+})
+
+// Scroll to the top of the page when the user navigates to a new page. (because
+// the navigation is quite long).
+watch(router.currentRoute, () => {
+  window.scrollTo(0, 0)
+})
 </script>
 
 <template>
