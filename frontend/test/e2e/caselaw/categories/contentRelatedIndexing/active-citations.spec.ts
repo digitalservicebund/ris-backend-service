@@ -307,7 +307,9 @@ test.describe("active citations", () => {
 
     await expect(page.getByLabel("Fehlerhafte Eingabe")).toBeVisible()
     await page.getByLabel("Eintrag bearbeiten").click()
-    await expect(page.getByText("Pflichtfeld nicht befüllt")).toHaveCount(4)
+    await expect(
+      page.getByLabel("Aktivzitierung").getByText("Pflichtfeld nicht befüllt"),
+    ).toHaveCount(4)
 
     await fillActiveCitationInputs(page, {
       citationStyle: "Änderung",

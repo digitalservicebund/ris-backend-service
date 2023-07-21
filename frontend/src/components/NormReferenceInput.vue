@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, onMounted, ref } from "vue"
+import { computed, onMounted, ref, watch } from "vue"
 import ComboboxInput from "@/components/ComboboxInput.vue"
 import { NormAbbreviation } from "@/domain/normAbbreviation"
 import NormReference, { SingleNormValidationInfo } from "@/domain/normReference"
@@ -22,28 +22,22 @@ const hasValidationError = ref()
 
 const validationErrors = ref<ValidationError[]>()
 
-const norm = computed({
-  get() {
-    return (props.modelValue as NormReference) ?? {}
-  },
-  set(value) {
-    emit("update:modelValue", value)
-  },
-})
+const norm = ref(new NormReference({ ...props.modelValue }))
 
 const normAbbreviation = computed({
   get: () =>
-    norm?.value?.normAbbreviation
+    props.modelValue?.normAbbreviation
       ? {
-          label: norm.value.normAbbreviation.abbreviation,
+          label: props.modelValue.normAbbreviation.abbreviation,
           value: norm.value.normAbbreviation,
-          additionalInformation: norm.value.normAbbreviation.officialLongTitle,
+          additionalInformation:
+            props.modelValue.normAbbreviation.officialLongTitle,
         }
       : undefined,
   set: (newValue) => {
     const newNormAbbreviation = { ...newValue } as NormAbbreviation
     const normRef = new NormReference({
-      ...norm.value,
+      ...norm,
       normAbbreviation: newNormAbbreviation,
     })
     emit("update:modelValue", normRef)
@@ -54,10 +48,10 @@ async function validateNorm() {
   validationErrors.value = []
 
   //validate singleNorm
-  if (norm.value.singleNorm) {
+  if (norm.value?.singleNorm) {
     const singleNormValidationInfo: SingleNormValidationInfo = {
       singleNorm: norm.value.singleNorm,
-      normAbbreviation: norm.value.normAbbreviation?.abbreviation,
+      normAbbreviation: norm.value?.normAbbreviation?.abbreviation,
     }
     const response = await documentUnitService.validateSingleNorm(
       singleNormValidationInfo,
@@ -77,8 +71,8 @@ async function validateNorm() {
   }
 
   //validate required fields
-  if (norm.value.missingRequiredFields?.length) {
-    norm.value.missingRequiredFields.forEach((missingField) => {
+  if (norm.value?.missingRequiredFields?.length) {
+    norm.value?.missingRequiredFields.forEach((missingField) => {
       validationErrors.value?.push({
         defaultMessage: "Pflichtfeld nicht befüllt",
         field: missingField,
@@ -88,14 +82,32 @@ async function validateNorm() {
 }
 
 async function addNormReference() {
-  validateNorm()
-  emit("update:modelValue", norm.value)
-  emit("closeEntry")
+  const validation = validateNorm()
+  validation.then(() => {
+    if (!hasValidationError.value) {
+      emit("update:modelValue", norm.value as NormReference)
+      emit("closeEntry")
+    }
+  })
+}
+
+function resetValidationError(field: string) {
+  validationErrors.value = validationErrors.value?.filter(
+    (error) => error.field !== field,
+  )
 }
 
 onMounted(() => {
   validateNorm()
   norm.value = new NormReference({ ...props.modelValue })
+})
+
+watch(props, () => {
+  if (
+    props.modelValue?.normAbbreviation?.abbreviation !==
+    norm.value?.normAbbreviation?.abbreviation
+  )
+    norm.value = new NormReference({ ...props.modelValue })
 })
 </script>
 
@@ -128,7 +140,7 @@ onMounted(() => {
         :has-error="slotProps.hasError"
         :item-service="ComboboxItemService.getRisAbbreviations"
         placeholder="RIS Abkürzung"
-        @input="validateNorm"
+        @click="resetValidationError('normAbbreviation')"
       >
       </ComboboxInput>
     </InputField>
@@ -140,13 +152,13 @@ onMounted(() => {
         :validation-error="
           validationErrors?.find((err) => err.field === 'singleNorm')
         "
-        @input="validateNorm"
       >
         <TextInput
           id="norm-reference-singleNorm"
           v-model="norm.singleNorm"
           aria-label="Einzelnorm der Norm"
           :has-error="slotProps.hasError"
+          @input="resetValidationError('singleNorm')"
         ></TextInput>
       </InputField>
       <InputField
@@ -176,7 +188,7 @@ onMounted(() => {
     <TextButton
       aria-label="Norm speichern"
       class="mr-28"
-      :disabled="norm.isEmpty || hasValidationError"
+      :disabled="norm.isEmpty"
       label="Übernehmen"
       @click="addNormReference"
     />
