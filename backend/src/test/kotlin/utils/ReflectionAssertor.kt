@@ -4,7 +4,6 @@ import de.bund.digitalservice.ris.norms.application.port.input.EditNormFrameUseC
 import de.bund.digitalservice.ris.norms.domain.entity.MetadataSection
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.controller.EditNormFrameControllerTest
-import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.decodeLocalDate
 import org.assertj.core.api.Assertions.assertThat
 import java.time.LocalDate
 import kotlin.reflect.full.memberProperties
@@ -32,7 +31,7 @@ fun assertEditNormFramePropertiesAndEditNormRequestSchema(
             is LocalDate ->
                 assertThat(normFramePropertiesMemberValue)
                     .isEqualTo(
-                        decodeLocalDate(found?.get(normFrameRequestSchema).toString()),
+                        found?.let { LocalDate.parse(it.get(normFrameRequestSchema).toString()) },
                     )
             else -> {
                 assertThat(normFramePropertiesMemberValue).isEqualTo(found?.get(normFrameRequestSchema))

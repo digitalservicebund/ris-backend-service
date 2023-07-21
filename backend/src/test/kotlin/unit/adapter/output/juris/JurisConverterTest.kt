@@ -48,7 +48,6 @@ import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.WORK_NOTE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.YEAR
 import de.bund.digitalservice.ris.norms.domain.value.NormCategory
 import de.bund.digitalservice.ris.norms.domain.value.UndefinedDate
-import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.decodeLocalDate
 import de.bund.digitalservice.ris.norms.framework.adapter.output.juris.JurisConverter
 import de.bund.digitalservice.ris.norms.framework.adapter.output.juris.mapDomainToData
 import de.bund.digitalservice.ris.norms.juris.converter.extractor.extractData
@@ -220,7 +219,7 @@ class JurisConverterTest {
             assertThat(metadata).usingRecursiveFieldByFieldElementComparatorIgnoringFields("guid").contains(Metadatum("test lead unit", LEAD_UNIT, 1))
             assertThat(metadata).usingRecursiveFieldByFieldElementComparatorIgnoringFields("guid").contains(Metadatum("test subject FNA", SUBJECT_FNA, 1))
             assertThat(metadata).usingRecursiveFieldByFieldElementComparatorIgnoringFields("guid").contains(Metadatum("test subject Gesta", SUBJECT_GESTA, 1))
-            assertThat(metadata).usingRecursiveFieldByFieldElementComparatorIgnoringFields("guid").contains(Metadatum(decodeLocalDate("2022-01-08"), DATE, 1))
+            assertThat(metadata).usingRecursiveFieldByFieldElementComparatorIgnoringFields("guid").contains(Metadatum(LocalDate.parse("2022-01-08"), DATE, 1))
             assertThat(metadata).usingRecursiveFieldByFieldElementComparatorIgnoringFields("guid").contains(Metadatum("test provider entity", ENTITY, 1))
             assertThat(metadata).usingRecursiveFieldByFieldElementComparatorIgnoringFields("guid").contains(Metadatum("test provider deciding body", DECIDING_BODY, 1))
             assertThat(metadata).usingRecursiveFieldByFieldElementComparatorIgnoringFields("guid").contains(Metadatum(true, RESOLUTION_MAJORITY, 1))
@@ -273,7 +272,7 @@ class JurisConverterTest {
             assertThat(entryIntoForceSection).hasSize(1)
             val entryIntoForceMetadata = entryIntoForceSection?.flatMap { it.metadata }
             assertThat(entryIntoForceMetadata).hasSize(1)
-            assertThat(entryIntoForceMetadata).usingRecursiveFieldByFieldElementComparatorIgnoringFields("guid").contains(Metadatum(decodeLocalDate(data.entryIntoForceDate), DATE, 1))
+            assertThat(entryIntoForceMetadata).usingRecursiveFieldByFieldElementComparatorIgnoringFields("guid").contains(Metadatum(LocalDate.parse(data.entryIntoForceDate), DATE, 1))
 
             val principleEntryIntoForceSection = norm?.metadataSections?.filter { it.name == MetadataSectionName.PRINCIPLE_ENTRY_INTO_FORCE }
             assertThat(principleEntryIntoForceSection).hasSize(1)
@@ -291,7 +290,7 @@ class JurisConverterTest {
             assertThat(principleExpirationSection).hasSize(1)
             val principleExpirationMetadata = principleExpirationSection?.flatMap { it.metadata }
             assertThat(principleExpirationMetadata).hasSize(1)
-            assertThat(principleExpirationMetadata).usingRecursiveFieldByFieldElementComparatorIgnoringFields("guid").contains(Metadatum(decodeLocalDate(data.principleExpirationDate), DATE, 1))
+            assertThat(principleExpirationMetadata).usingRecursiveFieldByFieldElementComparatorIgnoringFields("guid").contains(Metadatum(LocalDate.parse(data.principleExpirationDate), DATE, 1))
 
             val statusIndications = norm?.metadataSections?.filter { it.name == MetadataSectionName.STATUS_INDICATION }
             assertThat(statusIndications).hasSize(5)

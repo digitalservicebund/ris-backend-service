@@ -9,7 +9,6 @@ import de.bund.digitalservice.ris.norms.domain.entity.Paragraph
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType
 import de.bund.digitalservice.ris.norms.domain.value.NormCategory
-import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.decodeLocalDate
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.w3c.dom.Document
@@ -21,7 +20,8 @@ import utils.createRandomNormWithCitationDateAndArticles
 import java.io.File
 import java.io.StringReader
 import java.io.StringWriter
-import java.util.*
+import java.time.LocalDate
+import java.util.UUID
 import javax.xml.XMLConstants
 import javax.xml.parsers.DocumentBuilderFactory
 import javax.xml.transform.Transformer
@@ -108,7 +108,7 @@ class ToLegalDocMLConverterTest {
 
         val announcmentDateSection = MetadataSection(
             MetadataSectionName.ANNOUNCEMENT_DATE,
-            listOf(Metadatum(decodeLocalDate("2001-01-01"), MetadatumType.DATE)),
+            listOf(Metadatum(LocalDate.parse("2001-01-01"), MetadatumType.DATE)),
             2,
             listOf(),
 
@@ -188,7 +188,7 @@ class ToLegalDocMLConverterTest {
                 .copy(
                     metadataSections = listOf(
                         MetadataSection(MetadataSectionName.PARTICIPATION, listOf(Metadatum("participationInstitution", MetadatumType.PARTICIPATION_INSTITUTION))),
-                        MetadataSection(MetadataSectionName.CITATION_DATE, listOf(Metadatum(decodeLocalDate("2002-02-02"), MetadatumType.DATE))),
+                        MetadataSection(MetadataSectionName.CITATION_DATE, listOf(Metadatum(LocalDate.parse("2002-02-02"), MetadatumType.DATE))),
                         MetadataSection(MetadataSectionName.NORM_PROVIDER, listOf(Metadatum("providerDecidingBody", MetadatumType.DECIDING_BODY))),
                         MetadataSection(
                             MetadataSectionName.DOCUMENT_TYPE,
@@ -236,7 +236,7 @@ class ToLegalDocMLConverterTest {
                 .copy(
                     metadataSections = listOf(
                         MetadataSection(MetadataSectionName.PARTICIPATION, listOf(Metadatum("Bundeskanzleramt", MetadatumType.PARTICIPATION_INSTITUTION))),
-                        MetadataSection(MetadataSectionName.CITATION_DATE, listOf(Metadatum(decodeLocalDate("2002-02-02"), MetadatumType.DATE))),
+                        MetadataSection(MetadataSectionName.CITATION_DATE, listOf(Metadatum(LocalDate.parse("2002-02-02"), MetadatumType.DATE))),
                         MetadataSection(MetadataSectionName.NORM_PROVIDER, listOf(Metadatum("Präsident des Deutschen Bundestages", MetadatumType.DECIDING_BODY))),
                         MetadataSection(
                             MetadataSectionName.DOCUMENT_TYPE,
@@ -269,7 +269,7 @@ class ToLegalDocMLConverterTest {
                 .copy(
                     metadataSections = listOf(
                         MetadataSection(MetadataSectionName.PARTICIPATION, listOf(Metadatum("BMinisterium", MetadatumType.PARTICIPATION_INSTITUTION))),
-                        MetadataSection(MetadataSectionName.CITATION_DATE, listOf(Metadatum(decodeLocalDate("2002-02-02"), MetadatumType.DATE))),
+                        MetadataSection(MetadataSectionName.CITATION_DATE, listOf(Metadatum(LocalDate.parse("2002-02-02"), MetadatumType.DATE))),
                         MetadataSection(MetadataSectionName.NORM_PROVIDER, listOf(Metadatum("Bundesministerinnen", MetadatumType.DECIDING_BODY))),
                     ),
                 ),

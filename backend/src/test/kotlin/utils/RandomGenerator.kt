@@ -11,7 +11,6 @@ import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType
 import de.bund.digitalservice.ris.norms.domain.value.NormCategory
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.controller.EditNormFrameControllerTest
-import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.decodeLocalDate
 import org.apache.commons.lang3.RandomStringUtils
 import org.jeasy.random.EasyRandom
 import org.jeasy.random.EasyRandomParameters
@@ -61,7 +60,7 @@ fun createRandomNorm(): Norm {
 fun createRandomNormWithCitationDateAndArticles(): Norm {
     return createRandomNorm().copy(
         metadataSections = listOf(
-            MetadataSection(MetadataSectionName.CITATION_DATE, listOf(Metadatum(decodeLocalDate("2002-02-02"), MetadatumType.DATE))),
+            MetadataSection(MetadataSectionName.CITATION_DATE, listOf(Metadatum(LocalDate.parse("2002-02-02"), MetadatumType.DATE))),
         ),
         articles = listOf(
             createRandomArticle().copy(paragraphs = listOf(createRandomParagraph())),

@@ -9,7 +9,6 @@ import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType
 import de.bund.digitalservice.ris.norms.domain.value.NormCategory
 import de.bund.digitalservice.ris.norms.domain.value.UndefinedDate
-import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.decodeLocalDate
 import de.bund.digitalservice.ris.norms.juris.converter.model.DigitalAnnouncement
 import de.bund.digitalservice.ris.norms.juris.converter.model.DivergentEntryIntoForce
 import de.bund.digitalservice.ris.norms.juris.converter.model.DivergentExpiration
@@ -184,34 +183,34 @@ fun createSectionForEntryIntoForceAndExpiration(data: NormData): List<MetadataSe
     val sectionList = mutableListOf<MetadataSection>()
 
     if (data.entryIntoForceDate !== null) {
-        val metadata = Metadatum(decodeLocalDate(data.entryIntoForceDate), MetadatumType.DATE)
+        val metadata = Metadatum(LocalDate.parse(data.entryIntoForceDate), MetadatumType.DATE)
         sectionList.add(MetadataSection(Section.ENTRY_INTO_FORCE, listOf(metadata)))
     } else if (data.entryIntoForceDateState !== null) {
-        val metadata = Metadatum(parseDateStateString(data.entryIntoForceDateState), MetadatumType.UNDEFINED_DATE)
+        val metadata = Metadatum(LocalDate.parse(data.entryIntoForceDateState), MetadatumType.UNDEFINED_DATE)
         sectionList.add(MetadataSection(Section.ENTRY_INTO_FORCE, listOf(metadata)))
     }
 
     if (data.principleEntryIntoForceDate !== null) {
-        val metadata = Metadatum(decodeLocalDate(data.principleEntryIntoForceDate), MetadatumType.DATE)
+        val metadata = Metadatum(LocalDate.parse(data.principleEntryIntoForceDate), MetadatumType.DATE)
         sectionList.add(MetadataSection(Section.PRINCIPLE_ENTRY_INTO_FORCE, listOf(metadata)))
     } else if (data.principleEntryIntoForceDateState !== null) {
-        val metadata = Metadatum(parseDateStateString(data.principleEntryIntoForceDateState), MetadatumType.UNDEFINED_DATE)
+        val metadata = Metadatum(LocalDate.parse(data.principleEntryIntoForceDateState), MetadatumType.UNDEFINED_DATE)
         sectionList.add(MetadataSection(Section.PRINCIPLE_ENTRY_INTO_FORCE, listOf(metadata)))
     }
 
     if (data.expirationDate !== null) {
-        val metadata = Metadatum(decodeLocalDate(data.expirationDate), MetadatumType.DATE)
+        val metadata = Metadatum(LocalDate.parse(data.expirationDate), MetadatumType.DATE)
         sectionList.add(MetadataSection(Section.EXPIRATION, listOf(metadata)))
     } else if (data.expirationDateState !== null) {
-        val metadata = Metadatum(parseDateStateString(data.expirationDateState), MetadatumType.UNDEFINED_DATE)
+        val metadata = Metadatum(LocalDate.parse(data.expirationDateState), MetadatumType.UNDEFINED_DATE)
         sectionList.add(MetadataSection(Section.EXPIRATION, listOf(metadata)))
     }
 
     if (data.principleExpirationDate !== null) {
-        val metadata = Metadatum(decodeLocalDate(data.principleExpirationDate), MetadatumType.DATE)
+        val metadata = Metadatum(LocalDate.parse(data.principleExpirationDate), MetadatumType.DATE)
         sectionList.add(MetadataSection(Section.PRINCIPLE_EXPIRATION, listOf(metadata)))
     } else if (data.principleExpirationDateState !== null) {
-        val metadata = Metadatum(parseDateStateString(data.principleExpirationDateState), MetadatumType.UNDEFINED_DATE)
+        val metadata = Metadatum(LocalDate.parse(data.principleExpirationDateState), MetadatumType.UNDEFINED_DATE)
         sectionList.add(MetadataSection(Section.PRINCIPLE_EXPIRATION, listOf(metadata)))
     }
 
@@ -270,7 +269,7 @@ private fun createSectionForStatusIndication(statusList: List<Status>, reissueLi
         val metadata = mutableListOf<Metadatum<*>>()
         status.statusNote?.let { metadata.add(Metadatum(it, MetadatumType.NOTE)) }
         status.statusDescription?.let { metadata.add(Metadatum(it, MetadatumType.DESCRIPTION)) }
-        status.statusDate?.let { metadata.add(Metadatum(decodeLocalDate(it), MetadatumType.DATE)) }
+        status.statusDate?.let { metadata.add(Metadatum(LocalDate.parse(it), MetadatumType.DATE)) }
         status.statusReference?.let { metadata.add(Metadatum(it, MetadatumType.REFERENCE)) }
 
         if (metadata.isNotEmpty()) {
@@ -282,7 +281,7 @@ private fun createSectionForStatusIndication(statusList: List<Status>, reissueLi
         val metadata = mutableListOf<Metadatum<*>>()
         reissue.reissueNote?.let { metadata.add(Metadatum(it, MetadatumType.NOTE)) }
         reissue.reissueArticle?.let { metadata.add(Metadatum(it, MetadatumType.ARTICLE)) }
-        reissue.reissueDate?.let { metadata.add(Metadatum(decodeLocalDate(it), MetadatumType.DATE)) }
+        reissue.reissueDate?.let { metadata.add(Metadatum(LocalDate.parse(it), MetadatumType.DATE)) }
         reissue.reissueReference?.let { metadata.add(Metadatum(it, MetadatumType.REFERENCE)) }
 
         if (metadata.isNotEmpty()) {

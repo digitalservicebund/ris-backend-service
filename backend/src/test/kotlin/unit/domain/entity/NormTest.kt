@@ -2,7 +2,6 @@ package de.bund.digitalservice.ris.norms.domain.entity
 
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType
-import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.decodeLocalDate
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import utils.createSimpleSections
@@ -125,7 +124,7 @@ class NormTest {
         val announcmentDateSection = MetadataSection(
             MetadataSectionName.ANNOUNCEMENT_DATE,
             listOf(
-                Metadatum(decodeLocalDate("2022-11-19"), MetadatumType.DATE),
+                Metadatum(LocalDate.parse("2022-11-19"), MetadatumType.DATE),
             ),
         )
         val guid = UUID.randomUUID()
