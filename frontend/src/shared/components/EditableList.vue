@@ -61,13 +61,31 @@ function removeModelEntry(index: number) {
 }
 
 async function focusFirstFocusableElementOfCurrentEditElement() {
+  if (!currentEditElement.value) return
   await nextTick()
 
-  if (currentEditElement.value) {
-    const firstFocusableElement = currentEditElement.value.querySelectorAll(
+  const firstFocusableElement =
+    currentEditElement.value.querySelector<HTMLElement>(
       'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
-    )[0] as HTMLElement
-    firstFocusableElement?.focus()
+    )
+
+  let selectedGroupElement: HTMLInputElement | null = null
+
+  if (
+    firstFocusableElement instanceof HTMLInputElement &&
+    firstFocusableElement.type === "radio" &&
+    firstFocusableElement.name
+  ) {
+    selectedGroupElement =
+      currentEditElement.value.querySelector<HTMLInputElement>(
+        `input[type="radio"][name="${firstFocusableElement.name}"]:checked`,
+      )
+  }
+
+  if (selectedGroupElement) {
+    selectedGroupElement.focus()
+  } else if (firstFocusableElement) {
+    firstFocusableElement.focus()
   }
 }
 

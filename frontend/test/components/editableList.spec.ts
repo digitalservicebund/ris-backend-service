@@ -1,7 +1,14 @@
 /* eslint-disable vue/one-component-per-file */
 import userEvent from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
-import { Component, computed, nextTick, defineComponent, markRaw } from "vue"
+import {
+  Component,
+  computed,
+  nextTick,
+  defineComponent,
+  markRaw,
+  ref,
+} from "vue"
 import EditableList from "@/shared/components/EditableList.vue"
 
 const SimpleTextEditComponent = defineComponent({
@@ -20,7 +27,45 @@ const SimpleTextEditComponent = defineComponent({
 
     return { value }
   },
-  template: "<input v-model='value' />",
+  template: `<input v-model='value' />`,
+})
+
+const SimpleRadioGroupComponent = defineComponent({
+  components: { SimpleTextEditComponent },
+  props: {
+    modelValue: {
+      type: String,
+      required: true,
+    },
+  },
+  emits: ["update:modelValue"],
+  setup(props, { emit }) {
+    const value = computed({
+      get: () => props.modelValue,
+      set: (newValue) => emit("update:modelValue", newValue),
+    })
+
+    const text = ref("")
+
+    return { value, text }
+  },
+  template: `
+    <div>
+      <label>
+        <input type="radio" value="foo" v-model="value" name="group" />
+        Foo
+      </label>
+      <label>
+        <input type="radio" value="bar" v-model="value" name="group" />
+        Bar
+      </label>
+      <label>
+        <input type="radio" value="baz" v-model="value" name="group" />
+        Baz
+      </label>
+      <SimpleTextEditComponent v-model="text" />
+    </div>
+  `,
 })
 
 const JsonStringifySummary = defineComponent({
@@ -244,6 +289,18 @@ describe("EditableList", () => {
     await clickEditButtonOfEntry(0)
 
     expect(screen.getByRole("textbox")).toHaveFocus()
+  })
+
+  it("automatically focuses the first selected group member if the edit component starts with radios", async () => {
+    await renderComponent({
+      editComponent: SimpleRadioGroupComponent,
+      modelValue: ["bar", "baz"],
+    })
+
+    await clickEditButtonOfEntry(0)
+
+    expect(screen.getByRole("radio", { name: "Foo" })).not.toHaveFocus()
+    expect(screen.getByRole("radio", { name: "Bar" })).toHaveFocus()
   })
 
   it("updates the model value entry on editing it", async () => {
