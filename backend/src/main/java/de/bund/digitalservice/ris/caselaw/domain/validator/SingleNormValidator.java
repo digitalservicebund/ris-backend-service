@@ -56,16 +56,12 @@ public class SingleNormValidator
   private Map<String, NormElement> generateNormAbbreviationLabelMap(String normAbbreviation) {
     Stream<NormElement> stream = normElementRepository.findAllByDocumentCategoryLabelR().stream();
 
-    if ("EinigVtr".equals(normAbbreviation)) {
-      stream =
-          stream.filter(
-              normElement -> NormCode.EINIGUNGS_VERTRAG.name().equals(normElement.normCode()));
-    } else {
-      stream =
-          stream.filter(
-              normElement -> !NormCode.EINIGUNGS_VERTRAG.name().equals(normElement.normCode()));
-    }
-
-    return stream.collect(Collectors.toMap(NormElement::label, Function.identity()));
+    return stream
+        .filter(
+            normElement ->
+                // for "EinigVtr" normAbbreviation, only get EINIGUNGS_VERTRAG codes
+                "EinigVtr".equals(normAbbreviation)
+                    == NormCode.EINIGUNGS_VERTRAG.name().equals(normElement.normCode()))
+        .collect(Collectors.toMap(NormElement::label, Function.identity()));
   }
 }
