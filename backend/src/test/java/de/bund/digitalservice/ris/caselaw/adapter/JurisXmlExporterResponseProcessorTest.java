@@ -1,6 +1,7 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
 import static org.junit.Assert.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.argThat;
@@ -428,5 +429,13 @@ class JurisXmlExporterResponseProcessorTest {
                     .build()));
 
     inOrder.verifyNoMoreInteractions();
+  }
+
+  @Test
+  void testLoggingForUnknownDocumentNumber() throws MessagingException {
+    when(inbox.getMessages()).thenReturn(new Message[] {processMessage});
+    when(statusService.getLatestIssuerAddress(DOCUMENT_NUMBER)).thenReturn(Mono.empty());
+
+    assertDoesNotThrow(responseProcessor::readEmails);
   }
 }

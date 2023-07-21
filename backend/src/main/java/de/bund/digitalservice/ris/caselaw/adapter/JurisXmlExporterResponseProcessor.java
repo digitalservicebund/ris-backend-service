@@ -185,6 +185,12 @@ public class JurisXmlExporterResponseProcessor {
                               "Anbei weitergeleitet von der jDV:",
                               attachments,
                               "report-" + documentNumber)))
+          .switchIfEmpty(
+              Mono.fromRunnable(
+                  () ->
+                      LOGGER.info(
+                          "Could not forward JurisResponse (DocumentUnit not found): "
+                              + documentNumber)))
           .thenReturn(messageWrapper);
     } catch (MessagingException | IOException e) {
       return Mono.error(new StatusImporterException("Could not forward Message"));

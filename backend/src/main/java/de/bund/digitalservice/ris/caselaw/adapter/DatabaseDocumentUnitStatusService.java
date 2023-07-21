@@ -1,7 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentUnitStatusRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitException;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitStatusDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.PostgresDocumentUnitRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
@@ -104,10 +103,6 @@ public class DatabaseDocumentUnitStatusService implements DocumentUnitStatusServ
   private Mono<DocumentUnitStatusDTO> getLatestPublishing(String documentNumber) {
     return documentUnitRepository
         .findByDocumentNumber(documentNumber)
-        .switchIfEmpty(
-            Mono.error(
-                new DocumentUnitException(
-                    "Could not find DocumentUnit with documentNumber " + documentNumber)))
         .flatMap(
             documentUnit ->
                 repository.findFirstByDocumentUnitIdAndStatusOrderByCreatedAtDesc(
