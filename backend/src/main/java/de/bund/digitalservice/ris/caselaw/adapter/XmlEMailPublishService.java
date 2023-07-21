@@ -124,17 +124,17 @@ public class XmlEMailPublishService implements EmailPublishService {
 
   private XmlPublication generateXmlPublication(
       UUID documentUnitUuid, String receiverAddress, String mailSubject, XmlResultObject xml) {
-    var publication =
+    var publicationBuilder =
         XmlPublication.builder()
             .documentUnitUuid(documentUnitUuid)
             .statusCode(xml.statusCode())
             .statusMessages(xml.statusMessages());
 
     if (xml.statusCode().equals("400")) {
-      return publication.build();
+      return publicationBuilder.build();
     }
 
-    return publication
+    return publicationBuilder
         .receiverAddress(receiverAddress)
         .mailSubject(mailSubject)
         .xml(xml.xml())

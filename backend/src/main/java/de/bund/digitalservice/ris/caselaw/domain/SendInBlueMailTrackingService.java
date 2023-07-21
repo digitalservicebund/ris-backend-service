@@ -1,6 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.domain;
 
-import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -21,7 +21,7 @@ public class SendInBlueMailTrackingService implements MailTrackingService {
 
   @Override
   public EmailPublishState getMappedPublishState(String mailTrackingEvent) {
-    if (Arrays.asList(
+    if (List.of(
             EventEnum.BOUNCES,
             EventEnum.HARDBOUNCES,
             EventEnum.SOFTBOUNCES,
@@ -43,7 +43,6 @@ public class SendInBlueMailTrackingService implements MailTrackingService {
     EmailPublishState state = getMappedPublishState(event);
 
     if (state == EmailPublishState.UNKNOWN) {
-      log.info("Got Mail event {} for {} that doesn't change the status", event, documentUnitUuid);
       return Mono.just(ResponseEntity.status(HttpStatus.NO_CONTENT).build());
     }
 
