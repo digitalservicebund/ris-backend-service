@@ -2,6 +2,8 @@
 import { ref } from "vue"
 import { useRoute } from "vue-router"
 import OriginalFileSidePanel from "@/components/OriginalFileSidePanel.vue"
+import KitchensinkPage from "@/kitchensink/components/KitchensinkPage.vue"
+import KitchensinkStory from "@/kitchensink/components/KitchensinkStory.vue"
 
 const route = useRoute()
 const hasFile = ref(true)
@@ -10,10 +12,8 @@ route.params["documentNumber"] = "AABB2022000057"
 </script>
 
 <template>
-  <div
-    class="flex h-max w-full grow flex-row flex-wrap justify-end gap-[2rem] pb-4"
-  >
-    <div class="flex min-h-[300px] flex-col">
+  <KitchensinkPage name="Original file side panel">
+    <KitchensinkStory name="Has file">
       <OriginalFileSidePanel
         id="odoc-panel-element"
         class="w-full grow bg-white p-[2rem] pl-40"
@@ -21,8 +21,9 @@ route.params["documentNumber"] = "AABB2022000057"
         :has-file="hasFile"
         :open="isOpen"
       />
-    </div>
-    <div class="flex min-h-[300px] flex-col">
+    </KitchensinkStory>
+
+    <KitchensinkStory name="Doesn't have file">
       <OriginalFileSidePanel
         id="odoc-panel-element"
         class="w-full grow bg-white p-[2rem] pl-40"
@@ -30,6 +31,6 @@ route.params["documentNumber"] = "AABB2022000057"
         :has-file="!hasFile"
         :open="isOpen"
       />
-    </div>
-  </div>
+    </KitchensinkStory>
+  </KitchensinkPage>
 </template>

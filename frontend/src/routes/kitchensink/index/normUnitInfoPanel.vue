@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import NormUnitInfoPanel from "@/components/NormUnitInfoPanel.vue"
+import KitchensinkPage from "@/kitchensink/components/KitchensinkPage.vue"
 
 const propertyInfos = [
   { label: "Fundstelle", value: "BGBl I S. 3" },
@@ -9,6 +10,7 @@ const propertyInfos = [
 </script>
 
 <template>
-  <NormUnitInfoPanel heading="Tierarznei" :property-infos="propertyInfos">
-  </NormUnitInfoPanel>
+  <KitchensinkPage name="Norm unit info panel">
+    <NormUnitInfoPanel heading="Tierarznei" :property-infos="propertyInfos" />
+  </KitchensinkPage>
 </template>

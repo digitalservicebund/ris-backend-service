@@ -4,6 +4,7 @@ import ExpandableDataSet from "@/components/ExpandableDataSet.vue"
 import FootnoteInput from "@/components/footnote/FootnoteInput.vue"
 import { summarizeFootnotePerLine } from "@/components/footnote/summarizer"
 import { Footnote } from "@/components/footnote/types"
+import KitchensinkPage from "@/kitchensink/components/KitchensinkPage.vue"
 import { withSummarizer } from "@/shared/components/DataSetSummary.vue"
 import EditableList from "@/shared/components/EditableList.vue"
 
@@ -51,8 +52,9 @@ const footnoteLineSummary = withSummarizer(summarizeFootnotePerLine)
 </script>
 
 <template>
-  <div class="flex w-[60rem] flex-col p-64">
+  <KitchensinkPage name="Footnotes">
     <ExpandableDataSet
+      border-bottom
       :data-set="inputValueForExamples"
       :summary-component="footnoteLineSummary"
       title="Fußnoten"
@@ -64,5 +66,5 @@ const footnoteLineSummary = withSummarizer(summarizeFootnotePerLine)
         :summary-component="footnoteLineSummary"
       />
     </ExpandableDataSet>
-  </div>
+  </KitchensinkPage>
 </template>

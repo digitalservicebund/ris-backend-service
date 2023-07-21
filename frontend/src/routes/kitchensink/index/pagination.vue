@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { onMounted, ref } from "vue"
+import KitchensinkPage from "@/kitchensink/components/KitchensinkPage.vue"
 import Pagination, { Page } from "@/shared/components/Pagination.vue"
 
 const itemsPerPage = 10
@@ -38,15 +39,17 @@ onMounted(() => updateItems(0))
 </script>
 
 <template>
-  <div>
-    <Pagination
-      v-if="currentPage"
-      :page="currentPage"
-      @update-page="updateItems"
-    >
-      <ul v-for="item in items" :key="item">
-        <span>{{ item }}</span>
-      </ul>
-    </Pagination>
-  </div>
+  <KitchensinkPage name="Pagination">
+    <div>
+      <Pagination
+        v-if="currentPage"
+        :page="currentPage"
+        @update-page="updateItems"
+      >
+        <ul v-for="item in items" :key="item">
+          <span>{{ item }}</span>
+        </ul>
+      </Pagination>
+    </div>
+  </KitchensinkPage>
 </template>

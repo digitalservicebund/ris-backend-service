@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import DocumentUnitInfoPanel from "@/components/DocumentUnitInfoPanel.vue"
+import KitchensinkPage from "@/kitchensink/components/KitchensinkPage.vue"
 
 const firstRowInfos = [
   {
@@ -22,9 +23,11 @@ const secondRowInfos = [
 </script>
 
 <template>
-  <DocumentUnitInfoPanel
-    :first-row="firstRowInfos"
-    heading="XXRE202300002"
-    :second-row="secondRowInfos"
-  />
+  <KitchensinkPage name="Document unit info panel">
+    <DocumentUnitInfoPanel
+      :first-row="firstRowInfos"
+      heading="XXRE202300002"
+      :second-row="secondRowInfos"
+    />
+  </KitchensinkPage>
 </template>
