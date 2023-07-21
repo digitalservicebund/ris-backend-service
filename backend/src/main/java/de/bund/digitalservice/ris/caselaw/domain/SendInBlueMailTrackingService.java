@@ -21,6 +21,10 @@ public class SendInBlueMailTrackingService implements MailTrackingService {
 
   @Override
   public EmailPublishState getMappedPublishState(String mailTrackingEvent) {
+    var event = EventEnum.fromValue(mailTrackingEvent);
+    if (event == null) {
+      return EmailPublishState.UNKNOWN;
+    }
     if (List.of(
             EventEnum.BOUNCES,
             EventEnum.HARDBOUNCES,
@@ -29,10 +33,10 @@ public class SendInBlueMailTrackingService implements MailTrackingService {
             EventEnum.SPAM,
             EventEnum.BLOCKED,
             EventEnum.ERROR)
-        .contains(EventEnum.fromValue(mailTrackingEvent))) {
+        .contains(event)) {
       return EmailPublishState.ERROR;
     }
-    if (EventEnum.fromValue(mailTrackingEvent) == EventEnum.DELIVERED) {
+    if (event == EventEnum.DELIVERED) {
       return EmailPublishState.SUCCESS;
     }
     return EmailPublishState.UNKNOWN;

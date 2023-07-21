@@ -9,6 +9,8 @@ import static org.mockito.Mockito.when;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.context.annotation.Import;
@@ -109,9 +111,16 @@ class SendInBlueMailTrackingServiceTest {
                 .build());
   }
 
-  @Test
-  void testUpdatePublishingState_noReactionOnOtherState() {
-    StepVerifier.create(service.updatePublishingState(TEST_UUID, "clicked"))
+  @ParameterizedTest
+  @ValueSource(
+      strings = {
+        // no-op event
+        "clicks",
+        // unknown event
+        "randomEvent"
+      })
+  void testUpdatePublishingState_noReactionOnOtherState(String event) {
+    StepVerifier.create(service.updatePublishingState(TEST_UUID, event))
         .consumeNextWith(
             responseEntity -> {
               assertThat(responseEntity.getStatusCode().isSameCodeAs(HttpStatusCode.valueOf(204)))

@@ -123,13 +123,16 @@ public class JurisXmlExporterResponseProcessor {
       return reportRepository
           .saveAll(
               attachments.stream()
-                  .filter(attachment -> attachment.fileName().endsWith(".html"))
                   .map(
                       attachment ->
                           PublicationReport.builder()
                               .documentNumber(documentNumber)
                               .receivedDate(receivedDate)
-                              .content(policy.sanitize(attachment.fileContent()))
+                              .content(
+                                  policy.sanitize(
+                                      attachment.fileName().endsWith(".html")
+                                          ? attachment.fileContent()
+                                          : stringToHTML(attachment.fileContent())))
                               .build())
                   .toList())
           .collectList()
@@ -137,6 +140,14 @@ public class JurisXmlExporterResponseProcessor {
     } catch (MessagingException | IOException e) {
       return Mono.error(new StatusImporterException("Error saving attachments"));
     }
+  }
+
+  public static String stringToHTML(String input) {
+    return "<html>"
+        + String.join(
+            "",
+            Arrays.stream(input.split("\n")).map(s -> "<p>" + s + "</p>").toArray(String[]::new))
+        + "</html>";
   }
 
   private List<Attachment> collectAttachments(MessageWrapper messageWrapper)
