@@ -12,9 +12,7 @@ test.describe("decision date", () => {
     await page.locator("[aria-label='Entscheidungsdatum']").fill("03.02.2099")
 
     await expect(
-      page.locator(
-        "text=Das Entscheidungsdatum darf nicht in der Zukunft liegen",
-      ),
+      page.locator("text=Das Datum darf nicht in der Zukunft liegen"),
     ).toBeVisible()
   })
 

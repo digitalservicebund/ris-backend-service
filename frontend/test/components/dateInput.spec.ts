@@ -112,7 +112,7 @@ describe("DateInput", () => {
 
     expect(
       array.filter((element) => element[0] !== undefined)[0][0].defaultMessage,
-    ).toBe("Das aria-label darf nicht in der Zukunft liegen")
+    ).toBe("Das Datum darf nicht in der Zukunft liegen")
   })
 
   it("it allows dates in the future if flag is set", async () => {

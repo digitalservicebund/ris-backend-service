@@ -58,8 +58,7 @@ function validateInput() {
       // if valid date, check for future dates
       if (!isInPast.value && !props.isFutureDate && isValidDate.value)
         emit("update:validationError", {
-          defaultMessage:
-            "Das " + props.ariaLabel + " darf nicht in der Zukunft liegen",
+          defaultMessage: "Das Datum darf nicht in der Zukunft liegen",
           field: props.id,
         })
       else emit("update:validationError", undefined)
