@@ -22,9 +22,9 @@ const dropdownItems: DropdownItem[] = [
       <InputField id="emptyDropdown" v-slot="{ id }" label="Dropdown">
         <DropdownInput
           :id="id"
+          v-model="emptyDropdown"
           aria-label="dropdown input"
           :items="dropdownItems"
-          :model-value="emptyDropdown"
           placeholder="Bitte auswählen"
         />
       </InputField>
@@ -34,9 +34,9 @@ const dropdownItems: DropdownItem[] = [
       <InputField id="preselectedDropdown" v-slot="{ id }" label="Dropdown">
         <DropdownInput
           :id="id"
+          v-model="preselectedDropdown"
           aria-label="dropdown input"
           :items="dropdownItems"
-          :model-value="preselectedDropdown"
           placeholder="Bitte auswählen"
         />
       </InputField>
