@@ -184,11 +184,20 @@ watch(props, () => {
           @update:validation-error="slotProps.updateValidationError"
         />
       </InputField>
-      <InputField id="norm-date-of-relevence" label="Jahr">
+      <InputField
+        id="norm-date-of-relevance"
+        v-slot="slotProps"
+        label="Jahr"
+        :validation-error="
+          validationErrors?.find((err) => err.field === 'dateOfRelevance')
+        "
+      >
         <YearInput
-          id="norm-date-of-relevence"
+          id="norm-date-of-relevance"
           v-model="norm.dateOfRelevance"
           aria-label="Jahr der Norm"
+          :has-error="slotProps.hasError"
+          @update:validation-error="slotProps.updateValidationError"
         />
       </InputField>
     </div>

@@ -5,6 +5,7 @@ import ChipsInput from "@/shared/components/input/ChipsInput.vue"
 import DateInput from "@/shared/components/input/DateInput.vue"
 import InputField from "@/shared/components/input/InputField.vue"
 import TextInput from "@/shared/components/input/TextInput.vue"
+import { ValidationError } from "@/shared/components/input/types"
 import YearInput from "@/shared/components/input/YearInput.vue"
 
 interface Props {
@@ -20,6 +21,7 @@ const emit = defineEmits<{
   "update:modelValue": [value: Metadata]
 }>()
 
+const validationErrors = ref<ValidationError[]>()
 const inputValue = ref(props.modelValue)
 
 watch(
@@ -217,17 +219,24 @@ const yearEnabled = computed(() => !inputValue.value.DATE?.[0])
       <p class="my-auto">oder</p>
       <InputField
         :id="inputFields.yearField.id"
-        v-slot="{ id }"
+        v-slot="slotProps"
         :aria-label="inputFields.yearField.label"
         class="md:w-auto"
         :label="inputFields.yearField.label"
+        :validation-error="
+          validationErrors?.find(
+            (err) => err.field === inputFields.yearField.id,
+          )
+        "
       >
         <YearInput
-          :id="id"
+          :id="slotProps.id"
           v-model="inputFields.yearField.modelValue"
           :aria-label="inputFields.yearField.label"
           :disabled="!yearEnabled"
+          :has-error="slotProps.hasError"
           @update:model-value="inputFields.yearField.updateModelValue"
+          @update:validation-error="slotProps.updateValidationError"
         />
       </InputField>
     </div>

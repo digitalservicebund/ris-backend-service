@@ -4,6 +4,7 @@ import { Metadata } from "@/domain/Norm"
 import ChipsInput from "@/shared/components/input/ChipsInput.vue"
 import InputField from "@/shared/components/input/InputField.vue"
 import TextInput from "@/shared/components/input/TextInput.vue"
+import { ValidationError } from "@/shared/components/input/types"
 import YearInput from "@/shared/components/input/YearInput.vue"
 
 interface Props {
@@ -17,6 +18,7 @@ const emit = defineEmits<{
 }>()
 
 const inputValue = ref(props.modelValue)
+const validationErrors = ref<ValidationError[]>()
 
 watch(
   () => props.modelValue,
@@ -82,15 +84,21 @@ const explanation = computed({
   <div class="flex justify-between gap-16">
     <InputField
       id="euAnnouncementYear"
+      v-slot="slotProps"
       aria-label="Jahresangabe"
       class="w-full"
       label="Jahresangabe"
+      :validation-error="
+        validationErrors?.find((err) => err.field === 'euAnnouncementYear')
+      "
     >
       <YearInput
         id="euAnnouncementYear"
         v-model="year"
         alt-text="Jahresangabe"
         aria-label="Jahresangabe"
+        :has-error="slotProps.hasError"
+        @update:validation-error="slotProps.updateValidationError"
       />
     </InputField>
     <InputField
