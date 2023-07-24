@@ -1,6 +1,6 @@
 <script lang="ts" setup generic="T extends ListItem">
 import type { Component, Ref } from "vue"
-import { ref, watch, onMounted } from "vue"
+import { ref, watch, onMounted, computed } from "vue"
 import ListItem from "@/domain/editableListItem"
 import DataSetSummary from "@/shared/components/DataSetSummary.vue"
 
@@ -28,6 +28,7 @@ const emit = defineEmits<{
 }>()
 
 const modelValueList = ref<T[]>([]) as Ref<T[]>
+const localList = computed(() => [...modelValueList.value])
 const elementList = ref<HTMLElement[]>([])
 const editIndex = ref<number | undefined>(undefined)
 
@@ -35,20 +36,26 @@ function setEditIndex(index: number | undefined) {
   editIndex.value = index
 }
 
-function addNewModelEntry() {
+function addNewListEntry() {
   const { defaultValue } = props
   const newEntry =
     typeof defaultValue === "object" ? { ...defaultValue } : defaultValue
-  modelValueList.value.push(newEntry)
-  editIndex.value = modelValueList.value.length - 1
+  localList.value.push(newEntry)
+  editIndex.value = localList.value.length - 1
 }
 
-function removeModelEntry(index: number) {
-  modelValueList.value.splice(index, 1)
+function removeListEntry(index: number) {
+  localList.value.splice(index, 1)
+  modelValueList.value = localList.value
 
   if (editIndex.value !== undefined && index < editIndex.value) {
     editIndex.value -= 1
   }
+}
+
+function updateModel() {
+  setEditIndex(undefined)
+  modelValueList.value = localList.value
 }
 
 watch(
@@ -56,7 +63,7 @@ watch(
   () => {
     modelValueList.value = props.modelValue
     if (editIndex.value && editIndex.value >= props.modelValue.length)
-      addNewModelEntry()
+      addNewListEntry()
   },
   { immediate: true, deep: true },
 )
@@ -65,7 +72,7 @@ watch(
   modelValueList,
   () => {
     if (modelValueList.value.length == 0) {
-      addNewModelEntry()
+      addNewListEntry()
     }
     emit("update:modelValue", modelValueList.value)
   },
@@ -85,7 +92,7 @@ onMounted(setEmptyEntryInEditMode)
 <template>
   <div class="w-full">
     <div
-      v-for="(entry, index) in modelValueList"
+      v-for="(entry, index) in localList"
       :key="index"
       ref="elementList"
       aria-label="Listen Eintrag"
@@ -122,7 +129,7 @@ onMounted(setEmptyEntryInEditMode)
           <button
             aria-label="Eintrag löschen"
             class="material-icons p-2 text-blue-800 outline-none outline-offset-2 hover:bg-blue-200 focus:outline-2 focus:outline-blue-800 active:bg-blue-500 active:outline-none"
-            @click="removeModelEntry(index)"
+            @click="removeListEntry(index)"
           >
             delete_outline
           </button>
@@ -132,10 +139,10 @@ onMounted(setEmptyEntryInEditMode)
       <component
         :is="editComponent"
         v-else
-        v-model="modelValueList[index]"
+        v-model="localList[index]"
         class="py-16 group-first:pt-0"
-        :model-value-list="modelValue"
-        @close-entry="setEditIndex(undefined)"
+        :model-value-list="localList"
+        @add-entry="updateModel"
       />
     </div>
 
@@ -143,7 +150,7 @@ onMounted(setEmptyEntryInEditMode)
       v-if="!disableMultiEntry && editIndex === undefined"
       aria-label="Weitere Angabe"
       class="add-button gap-0.5 mt-16 flex items-center whitespace-nowrap bg-blue-300 px-8 py-2 text-14 font-bold leading-18 text-blue-800 outline-none outline-0 outline-offset-4 outline-blue-800 hover:bg-blue-800 hover:text-white focus:outline-4"
-      @click="addNewModelEntry"
+      @click="addNewListEntry"
     >
       <span class="material-icons text-14">add</span>
       Weitere Angabe

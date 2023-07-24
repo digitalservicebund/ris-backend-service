@@ -23,7 +23,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   "update:modelValue": [value: ActiveCitation]
-  closeEntry: [void]
+  addEntry: [void]
 }>()
 
 const activeCitation = ref(new ActiveCitation({ ...props.modelValue }))
@@ -103,7 +103,7 @@ async function validateRequiredInput() {
 async function addActiveCitation() {
   validateRequiredInput()
   emit("update:modelValue", activeCitation.value as ActiveCitation)
-  emit("closeEntry")
+  emit("addEntry")
 }
 
 async function addActiveCitationFromSearch(decision: LinkedDocumentUnit) {
@@ -115,7 +115,7 @@ async function addActiveCitationFromSearch(decision: LinkedDocumentUnit) {
     citationStyle: newActiveCitationStyle,
   })
   emit("update:modelValue", decisionWithCitationStyle)
-  emit("closeEntry")
+  emit("addEntry")
   scrollToTop()
 }
 

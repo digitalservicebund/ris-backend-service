@@ -15,7 +15,7 @@ import YearInput from "@/shared/components/input/YearInput.vue"
 const props = defineProps<{ modelValue?: NormReference }>()
 const emit = defineEmits<{
   "update:modelValue": [value: NormReference]
-  closeEntry: [void]
+  addEntry: [void]
 }>()
 
 const hasValidationError = ref()
@@ -86,7 +86,7 @@ async function addNormReference() {
   validation.then(() => {
     if (!hasValidationError.value) {
       emit("update:modelValue", norm.value as NormReference)
-      emit("closeEntry")
+      emit("addEntry")
     }
   })
 }
