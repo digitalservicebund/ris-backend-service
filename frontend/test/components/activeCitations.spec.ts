@@ -152,12 +152,10 @@ describe("Active Citations", async () => {
     renderComponent()
     expect(screen.getAllByLabelText("Listen Eintrag").length).toBe(1)
     expect(screen.getByLabelText("Art der Zitierung")).toBeVisible()
+    expect(screen.getByLabelText("Gericht der Aktivzitierung")).toBeVisible()
     expect(
       screen.getByLabelText("Entscheidungsdatum der Aktivzitierung"),
     ).toBeVisible()
-    expect(
-      screen.getByLabelText("Entscheidungsdatum der Aktivzitierung"),
-    ).toBeInTheDocument()
     expect(
       screen.getByLabelText("Aktenzeichen der Aktivzitierung"),
     ).toBeInTheDocument()

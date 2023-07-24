@@ -1,6 +1,6 @@
 <script lang="ts" setup generic="T extends ListItem">
 import type { Component, Ref } from "vue"
-import { ref, watch, onMounted, computed } from "vue"
+import { ref, watch, onMounted } from "vue"
 import ListItem from "@/domain/editableListItem"
 import DataSetSummary from "@/shared/components/DataSetSummary.vue"
 
@@ -28,7 +28,7 @@ const emit = defineEmits<{
 }>()
 
 const modelValueList = ref<T[]>([]) as Ref<T[]>
-const localList = computed(() => [...modelValueList.value])
+const localList = ref([...props.modelValue]) as Ref<T[]>
 const elementList = ref<HTMLElement[]>([])
 const editIndex = ref<number | undefined>(undefined)
 
@@ -62,8 +62,6 @@ watch(
   () => props.modelValue,
   () => {
     modelValueList.value = props.modelValue
-    if (editIndex.value && editIndex.value >= props.modelValue.length)
-      addNewListEntry()
   },
   { immediate: true, deep: true },
 )
@@ -71,22 +69,33 @@ watch(
 watch(
   modelValueList,
   () => {
-    if (modelValueList.value.length == 0) {
-      addNewListEntry()
-    }
     emit("update:modelValue", modelValueList.value)
   },
   { deep: true, immediate: true },
 )
 
+watch(
+  localList,
+  () => {
+    setEmptyEntryInEditMode()
+    if (localList.value.length == 0) {
+      addNewListEntry()
+    }
+  },
+  { deep: true, immediate: true },
+)
+
 function setEmptyEntryInEditMode(): void {
-  const emptyItemIndex = modelValueList.value.findIndex(
-    (element) => element.isEmpty,
-  )
+  const emptyItemIndex = localList.value.findIndex((element) => element.isEmpty)
   if (emptyItemIndex !== -1) setEditIndex(emptyItemIndex)
 }
 
-onMounted(setEmptyEntryInEditMode)
+onMounted(() => {
+  localList.value = [...props.modelValue]
+  if (localList.value.length == 0) {
+    addNewListEntry()
+  }
+})
 </script>
 
 <template>
