@@ -575,10 +575,14 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: Publish backend container image
         run: docker push ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}:${{ env.CONTAINER_IMAGE_VERSION }}
+        env:
+          CONTAINER_IMAGE_VERSION: ${{ github.event.pull_request.head.sha || github.sha }}
       - name: Install cosign
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
         uses: sigstore/cosign-installer@ef0e9691595ea19ec990a46b1a591dcafe568f34
+        with:
+          cosign-release: "v1.13.1"
       - name: Sign the published Docker image
         env:
           COSIGN_EXPERIMENTAL: "true"
@@ -644,10 +648,14 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: Publish backend container image
         run: docker push ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}/frontend:${{ env.CONTAINER_IMAGE_VERSION }}
+        env:
+          CONTAINER_IMAGE_VERSION: ${{ github.event.pull_request.head.sha || github.sha }}
       - name: Install cosign
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
         uses: sigstore/cosign-installer@ef0e9691595ea19ec990a46b1a591dcafe568f34
+        with:
+          cosign-release: "v1.13.1"
       - name: Sign the published Docker image
         env:
           COSIGN_EXPERIMENTAL: "true"
@@ -951,21 +959,21 @@ jobs:
           path: |
             backend/build/dokka/javadoc/
             backend/build/docs/javadoc/
-#      - name: Send status to Slack
-#        # Third-party action, pin to commit SHA!
-#        # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
-#        uses: lazy-actions/slatify@c4847b8c84e3e8076fd3c42cc00517a10426ed65
-#        if: ${{ failure() && github.ref == 'refs/heads/main' && env.SLACK_WEBHOOK_URL }}
-#        env:
-#          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-#        with:
-#          type: ${{ job.status }}
-#          job_name: "License audit backend :point_right:"
-#          mention: "here"
-#          mention_if: "failure"
-#          commit: true
-#          url: ${{ secrets.SLACK_WEBHOOK_URL }}
-#          token: ${{ secrets.GITHUB_TOKEN }}
+  #      - name: Send status to Slack
+  #        # Third-party action, pin to commit SHA!
+  #        # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
+  #        uses: lazy-actions/slatify@c4847b8c84e3e8076fd3c42cc00517a10426ed65
+  #        if: ${{ failure() && github.ref == 'refs/heads/main' && env.SLACK_WEBHOOK_URL }}
+  #        env:
+  #          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+  #        with:
+  #          type: ${{ job.status }}
+  #          job_name: "License audit backend :point_right:"
+  #          mention: "here"
+  #          mention_if: "failure"
+  #          commit: true
+  #          url: ${{ secrets.SLACK_WEBHOOK_URL }}
+  #          token: ${{ secrets.GITHUB_TOKEN }}
 
   push-reports:
     runs-on: ubuntu-latest
@@ -1028,16 +1036,16 @@ jobs:
           filePath: tmp/performance-reports/profile-report.html
           destinationDir: performance-reports/ris-backend-service
       # Javadoc
-#      - name: Javadoc (Java) - Download
-#        uses: actions/download-artifact@v3
-#        with:
-#          name: backend-code-documentation
-#          path: tmp/backend-code-documentation/
-#      - name: Performance report - git add report
-#        uses: digitalservicebund/ris-reports/actions/git-add-report@728043a0126de421396dde2b11e7c61dfe5c1892
-#        with:
-#          filePath: tmp/backend-code-documentation/
-#          destinationDir: backend-code-documentation/
+      #      - name: Javadoc (Java) - Download
+      #        uses: actions/download-artifact@v3
+      #        with:
+      #          name: backend-code-documentation
+      #          path: tmp/backend-code-documentation/
+      #      - name: Performance report - git add report
+      #        uses: digitalservicebund/ris-reports/actions/git-add-report@728043a0126de421396dde2b11e7c61dfe5c1892
+      #        with:
+      #          filePath: tmp/backend-code-documentation/
+      #          destinationDir: backend-code-documentation/
       # Push reports
       - name: Push reports
         # we use `toJSON(...)` below to escape double quotation marks
