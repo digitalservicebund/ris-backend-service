@@ -1028,19 +1028,16 @@ jobs:
           filePath: tmp/performance-reports/profile-report.html
           destinationDir: performance-reports/ris-backend-service
       # Javadoc
-      - name: Backend Code Documentation - Download
-        uses: actions/download-artifact@v3
-        with:
-          name: backend-code-documentation
-          path: tmp/backend-code-documentation/
-      - run: |
-          mv tmp/backend-code-documentation/docs/javadoc tmp/backend-code-documentation/java
-          mv tmp/backend-code-documentation/dokka/javadoc tmp/backend-code-documentation/kotlin
-      - name: Backend Code Documentation - git add report
-        uses: digitalservicebund/ris-reports/actions/git-add-report@728043a0126de421396dde2b11e7c61dfe5c1892
-        with:
-          filePath: tmp/backend-code-documentation/
-          destinationDir: backend-code-documentation/
+#      - name: Javadoc (Java) - Download
+#        uses: actions/download-artifact@v3
+#        with:
+#          name: backend-code-documentation
+#          path: tmp/backend-code-documentation/
+#      - name: Performance report - git add report
+#        uses: digitalservicebund/ris-reports/actions/git-add-report@728043a0126de421396dde2b11e7c61dfe5c1892
+#        with:
+#          filePath: tmp/backend-code-documentation/
+#          destinationDir: backend-code-documentation/
       # Push reports
       - name: Push reports
         # we use `toJSON(...)` below to escape double quotation marks
