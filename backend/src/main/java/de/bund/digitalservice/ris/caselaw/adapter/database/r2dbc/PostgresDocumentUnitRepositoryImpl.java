@@ -193,7 +193,6 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
         .flatMap(this::injectProceedingDecisions)
         .flatMap(this::injectKeywords)
         .flatMap(this::injectFieldsOfLaw)
-        .flatMap(this::injectNorms)
         .flatMap(documentUnitDTO -> saveActiveCitations(documentUnitDTO, documentUnit))
         .map(DocumentUnitTransformer::transformDTO);
   }
@@ -384,7 +383,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
                   .then(
                       documentUnitNormRepository
                           .saveAll(toSave)
-                          .flatMap(this::injectNormAbbreviation)
+                          .flatMapSequential(this::injectNormAbbreviation)
                           .collectList())
                   .map(
                       savedNormList -> {
@@ -966,7 +965,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
   private Mono<DocumentUnitDTO> injectNorms(DocumentUnitDTO documentUnitDTO) {
     return documentUnitNormRepository
         .findAllByDocumentUnitId(documentUnitDTO.getId())
-        .flatMap(this::injectNormAbbreviation)
+        .flatMapSequential(this::injectNormAbbreviation)
         .collectList()
         .map(
             documentUnitNormDTOs -> {

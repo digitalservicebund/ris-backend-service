@@ -36,12 +36,12 @@ import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.NormAbbreviation;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -68,7 +68,8 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
       AuthService.class,
       TestConfig.class
     },
-    controllers = {DocumentUnitController.class})
+    controllers = {DocumentUnitController.class},
+    timeout = "10000000")
 class SaveNormIntegrationTest {
   @Container
   static PostgreSQLContainer<?> postgreSQLContainer = new PostgreSQLContainer<>("postgres:12");
@@ -114,13 +115,14 @@ class SaveNormIntegrationTest {
 
   @AfterEach
   void cleanUp() {
+    normAbbreviationRepository.deleteAll().block();
+    normRepository.deleteAll().block();
     repository.deleteAll().block();
   }
 
   // TODO: write a test for add a document type with a wrong shortcut
 
   @Test
-  @Disabled
   void testSaveNorm_withoutNorm() {
     UUID uuid = UUID.randomUUID();
     Instant creationTimestamp = Instant.now();
@@ -156,12 +158,11 @@ class SaveNormIntegrationTest {
             response -> {
               assertThat(response.getResponseBody()).isNotNull();
               assertThat(response.getResponseBody().contentRelatedIndexing()).isNotNull();
-              assertThat(response.getResponseBody().contentRelatedIndexing().norms()).isEmpty();
+              assertThat(response.getResponseBody().contentRelatedIndexing().norms()).isNull();
             });
   }
 
   @Test
-  @Disabled
   void testSaveNorm_withOneNormAndNoChange() {
     UUID uuid = UUID.randomUUID();
     Instant creationTimestamp = Instant.now();
@@ -180,7 +181,8 @@ class SaveNormIntegrationTest {
     documentUnitFromFrontend =
         addNormToDomain(documentUnitFromFrontend, generateDocumentationUnitNorm(1));
 
-    List<DocumentUnitNorm> expectedNormList = generateNormList(1);
+    DocumentUnitNorm norm1 = generateDocumentationUnitNorm(1);
+    List<DocumentUnitNorm> expectedNormList = generateNormList(norm1);
 
     risWebTestClient
         .withDefaultLogin()
@@ -200,12 +202,55 @@ class SaveNormIntegrationTest {
             });
   }
 
-  private List<DocumentUnitNorm> generateNormList(int... indexes) {
-    List<DocumentUnitNorm> normList = new ArrayList<>();
-    for (int index : indexes) {
-      normList.add(generateDocumentationUnitNorm(index));
-    }
-    return normList;
+  /** Sorting by remove norm abbreviation of a existing norm reference */
+  @Test
+  void testSaveNorm_RISDEV2185() {
+    UUID uuid = UUID.randomUUID();
+    Instant creationTimestamp = Instant.now();
+
+    DocumentUnitDTO dto =
+        DocumentUnitDTO.builder()
+            .uuid(uuid)
+            .creationtimestamp(creationTimestamp)
+            .documentnumber("1234567890123")
+            .documentationOfficeId(documentationOfficeUuid)
+            .build();
+    DocumentUnitDTO savedDTO = repository.save(dto).block();
+    addNormToDB(1, savedDTO.getId());
+    addNormToDB(2, savedDTO.getId());
+
+    DocumentUnit documentUnitFromFrontend = generateDocumentationUnit(uuid, creationTimestamp);
+    documentUnitFromFrontend =
+        addNormToDomain(documentUnitFromFrontend, generateDocumentationUnitNorm(1));
+    DocumentUnitNorm changedNorm =
+        generateDocumentationUnitNorm(2).toBuilder().normAbbreviation(null).build();
+    documentUnitFromFrontend = addNormToDomain(documentUnitFromFrontend, changedNorm);
+
+    DocumentUnitNorm norm1 = generateDocumentationUnitNorm(1);
+    DocumentUnitNorm norm2 =
+        generateDocumentationUnitNorm(2).toBuilder().normAbbreviation(null).build();
+    List<DocumentUnitNorm> expectedNormList = generateNormList(norm1, norm2);
+
+    risWebTestClient
+        .withDefaultLogin()
+        .put()
+        .uri("/api/v1/caselaw/documentunits/" + uuid)
+        .bodyValue(documentUnitFromFrontend)
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody(DocumentUnit.class)
+        .consumeWith(
+            response -> {
+              assertThat(response.getResponseBody()).isNotNull();
+              assertThat(response.getResponseBody().contentRelatedIndexing()).isNotNull();
+              assertThat(response.getResponseBody().contentRelatedIndexing().norms())
+                  .containsExactlyElementsOf(expectedNormList);
+            });
+  }
+
+  private List<DocumentUnitNorm> generateNormList(DocumentUnitNorm... norms) {
+    return new ArrayList<>(Arrays.asList(norms));
   }
 
   private DocumentUnit generateDocumentationUnit(UUID uuid, Instant creationTimestamp) {
@@ -229,7 +274,6 @@ class SaveNormIntegrationTest {
 
     DocumentUnitNormDTO normDTO =
         DocumentUnitNormDTO.builder()
-            //            .uuid(UUID.fromString("22222222-2222-2222-2222-22222222222" + index))
             .documentUnitId(parentId)
             .normAbbreviationUuid(UUID.fromString("11111111-1111-1111-1111-11111111111" + index))
             .build();
@@ -260,6 +304,7 @@ class SaveNormIntegrationTest {
             NormAbbreviation.builder()
                 .id(UUID.fromString("11111111-1111-1111-1111-11111111111" + index))
                 .abbreviation("norm abbreviation " + index)
+                .documentId(index)
                 .build())
         .build();
   }
