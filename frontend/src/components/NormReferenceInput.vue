@@ -37,7 +37,7 @@ const normAbbreviation = computed({
   set: (newValue) => {
     const newNormAbbreviation = { ...newValue } as NormAbbreviation
     const normRef = new NormReference({
-      ...norm,
+      ...norm.value,
       normAbbreviation: newNormAbbreviation,
     })
     emit("update:modelValue", normRef)
