@@ -575,6 +575,8 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: Publish backend container image
         run: docker push ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}:${{ env.CONTAINER_IMAGE_VERSION }}
+        env:
+          CONTAINER_IMAGE_VERSION: ${{ github.event.pull_request.head.sha || github.sha }}
       - name: Install cosign
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
@@ -646,6 +648,8 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: Publish backend container image
         run: docker push ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}/frontend:${{ env.CONTAINER_IMAGE_VERSION }}
+        env:
+          CONTAINER_IMAGE_VERSION: ${{ github.event.pull_request.head.sha || github.sha }}
       - name: Install cosign
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
