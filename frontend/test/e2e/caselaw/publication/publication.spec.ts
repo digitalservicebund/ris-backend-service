@@ -1,4 +1,4 @@
-import { expect } from "@playwright/test"
+import { Page, expect } from "@playwright/test"
 import {
   fillActiveCitationInputs,
   fillNormInputs,
@@ -30,6 +30,40 @@ test.describe("ensuring the publishing of documentunits works as expected", () =
     documentNumber,
   }) => {
     await navigateToCategories(page, documentNumber)
+    await toggleProceedingDecisionsSection(page)
+
+    await fillProceedingDecisionInputs(page, {
+      court: "AG Aalen",
+    })
+
+    await page.getByText("Manuell Hinzufügen").click()
+
+    await expect(
+      page.getByText(`AG Aalen`, {
+        exact: true,
+      }),
+    ).toBeVisible()
+    await navigateToPublication(page, documentNumber)
+
+    await expect(page.locator("li:has-text('Rechtszug')")).toBeVisible()
+
+    await expect(
+      page.locator("li:has-text('Rechtszug')").getByText("Entscheidungsdatum"),
+    ).toBeVisible()
+    await expect(
+      page.locator("li:has-text('Rechtszug')").getByText("Aktenzeichen"),
+    ).toBeVisible()
+  })
+
+  // RISDEV-2183
+  test("publication page shows missing required fields of proceeding decisions with only missing fields in proceeding decisions", async ({
+    page,
+    documentNumber,
+  }) => {
+    await navigateToCategories(page, documentNumber)
+
+    await fillAllRequiredCoreData(page)
+
     await toggleProceedingDecisionsSection(page)
 
     await fillProceedingDecisionInputs(page, {
@@ -180,6 +214,32 @@ test.describe("ensuring the publishing of documentunits works as expected", () =
     await navigateToPublication(page, documentNumber)
     await page.locator("[aria-label='Rubriken bearbeiten']").click()
 
+    await fillAllRequiredCoreData(page)
+
+    await navigateToPublication(page, documentNumber)
+
+    await expect(
+      page.locator("text=Alle Pflichtfelder sind korrekt ausgefüllt"),
+    ).toBeVisible()
+
+    await expect(
+      page.locator(
+        "text=Diese Dokumentationseinheit wurde bisher nicht veröffentlicht",
+      ),
+    ).toBeVisible()
+
+    await page
+      .locator("[aria-label='Dokumentationseinheit veröffentlichen']")
+      .click()
+
+    await expect(page.locator("text=Email wurde versendet")).toBeVisible()
+
+    await expect(page.locator("text=Xml Email Abgabe -")).toBeVisible()
+
+    await expect(page.locator("text=in Veröffentlichung")).toBeVisible()
+  })
+
+  const fillAllRequiredCoreData = async (page: Page) => {
     await waitForSaving(
       async () => {
         await page.locator("[aria-label='Aktenzeichen']").fill("abc")
@@ -235,27 +295,5 @@ test.describe("ensuring the publishing of documentunits works as expected", () =
       page,
       { clickSaveButton: true, reload: true },
     )
-
-    await navigateToPublication(page, documentNumber)
-
-    await expect(
-      page.locator("text=Alle Pflichtfelder sind korrekt ausgefüllt"),
-    ).toBeVisible()
-
-    await expect(
-      page.locator(
-        "text=Diese Dokumentationseinheit wurde bisher nicht veröffentlicht",
-      ),
-    ).toBeVisible()
-
-    await page
-      .locator("[aria-label='Dokumentationseinheit veröffentlichen']")
-      .click()
-
-    await expect(page.locator("text=Email wurde versendet")).toBeVisible()
-
-    await expect(page.locator("text=Xml Email Abgabe -")).toBeVisible()
-
-    await expect(page.locator("text=in Veröffentlichung")).toBeVisible()
-  })
+  }
 })
