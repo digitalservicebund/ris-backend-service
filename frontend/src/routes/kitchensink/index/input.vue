@@ -174,18 +174,28 @@ const values = reactive({
         />
       </InputField>
 
-      <InputField id="yearInput" v-slot="{ id }" label="Year input">
+      <InputField
+        id="yearInput"
+        v-slot="{ id, hasError, updateValidationError }"
+        label="Year input"
+      >
         <YearInput
           :id="id"
           v-model="values.yearInput"
           aria-label="Year input"
+          :has-error="hasError"
+          @update:validation-error="updateValidationError"
         />
       </InputField>
+      <div class="mb-12">
+        <span class="ds-label-03-bold mr-8">Current year value:</span>
+        <span class="ds-label-03-reg">{{ values.yearInput }}</span>
+      </div>
 
       <InputField id="timeInput" v-slot="{ id }" label="Time input">
         <TimeInput
           :id="id"
-          v-model="values.yearInput"
+          v-model="values.timeInput"
           aria-label="Time input"
         />
       </InputField>

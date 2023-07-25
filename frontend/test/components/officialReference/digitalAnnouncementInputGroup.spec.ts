@@ -90,7 +90,7 @@ describe("DigitalAnnouncementInputGroup", () => {
         ANNOUNCEMENT_MEDIUM: ["test announcement medium"],
         DATE: ["2023-01-01"],
         EDITION: ["test edition"],
-        YEAR: ["test year"],
+        YEAR: ["4711"],
         PAGE: ["test page"],
         AREA_OF_PUBLICATION: ["test area of publication"],
         NUMBER_OF_THE_PUBLICATION_IN_THE_RESPECTIVE_AREA: [
@@ -125,7 +125,7 @@ describe("DigitalAnnouncementInputGroup", () => {
     expect(editionInput).toHaveValue("test edition")
 
     expect(yearInput).toBeInTheDocument()
-    expect(yearInput).toHaveValue("test year")
+    expect(yearInput).toHaveValue("4711")
 
     expect(pageInput).toBeInTheDocument()
     expect(pageInput).toHaveValue("test page")

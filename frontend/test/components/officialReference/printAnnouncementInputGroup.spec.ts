@@ -72,7 +72,7 @@ describe("PrintAnnouncementInputGroup", () => {
     renderComponent({
       modelValue: {
         ANNOUNCEMENT_GAZETTE: ["test announcement gazette"],
-        YEAR: ["test year"],
+        YEAR: ["4711"],
         NUMBER: ["test number"],
         PAGE: ["test page"],
         ADDITIONAL_INFO: ["test additional info 1", "test additional info 2"],
@@ -95,7 +95,7 @@ describe("PrintAnnouncementInputGroup", () => {
     expect(announcementGazetteInput).toHaveValue("test announcement gazette")
 
     expect(yearInput).toBeInTheDocument()
-    expect(yearInput).toHaveValue("test year")
+    expect(yearInput).toHaveValue("4711")
 
     expect(numberInput).toBeInTheDocument()
     expect(numberInput).toHaveValue("test number")

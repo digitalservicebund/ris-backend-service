@@ -5,7 +5,6 @@ import ChipsInput from "@/shared/components/input/ChipsInput.vue"
 import DateInput from "@/shared/components/input/DateInput.vue"
 import InputField from "@/shared/components/input/InputField.vue"
 import TextInput from "@/shared/components/input/TextInput.vue"
-import { ValidationError } from "@/shared/components/input/types"
 import YearInput from "@/shared/components/input/YearInput.vue"
 
 interface Props {
@@ -19,7 +18,6 @@ const emit = defineEmits<{
 }>()
 
 const inputValue = ref(props.modelValue)
-const validationErrors = ref<ValidationError[]>()
 
 watch(
   () => props.modelValue,
@@ -136,21 +134,18 @@ const explanation = computed({
     </InputField>
     <InputField
       id="digitalAnnouncementYear"
-      v-slot="slotProps"
+      v-slot="{ id, hasError, updateValidationError }"
       aria-label="Jahr"
       class="w-1/3"
       label="Jahr"
-      :validation-error="
-        validationErrors?.find((err) => err.field === 'digitalAnnouncementYear')
-      "
     >
       <YearInput
-        :id="slotProps.id"
+        :id="id"
         v-model="year"
         alt-text="Jahr"
         aria-label="Jahr"
-        :has-error="slotProps.hasError"
-        @update:validation-error="slotProps.updateValidationError"
+        :has-error="hasError"
+        @update:validation-error="updateValidationError"
       />
     </InputField>
     <InputField

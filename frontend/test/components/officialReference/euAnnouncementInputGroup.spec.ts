@@ -77,7 +77,7 @@ describe("EuGovernmentGazetteInputGroup", () => {
     renderComponent({
       modelValue: {
         EU_GOVERNMENT_GAZETTE: ["Amtsblatt der EU"],
-        YEAR: ["test year"],
+        YEAR: ["4711"],
         SERIES: ["test series"],
         NUMBER: ["test number"],
         PAGE: ["test page"],
@@ -102,7 +102,7 @@ describe("EuGovernmentGazetteInputGroup", () => {
     expect(euGovernmentGazetteInput).toHaveValue("Amtsblatt der EU")
 
     expect(yearInput).toBeInTheDocument()
-    expect(yearInput).toHaveValue("test year")
+    expect(yearInput).toHaveValue("4711")
 
     expect(seriesInput).toBeInTheDocument()
     expect(seriesInput).toHaveValue("test series")
@@ -130,7 +130,7 @@ describe("EuGovernmentGazetteInputGroup", () => {
     renderComponent({
       modelValue: {
         EU_GOVERNMENT_GAZETTE: ["Amtsblatt der EU"],
-        YEAR: ["01-01-2023"],
+        YEAR: ["2023"],
         SERIES: ["foo"],
         NUMBER: ["1"],
         PAGE: ["2"],
@@ -143,7 +143,7 @@ describe("EuGovernmentGazetteInputGroup", () => {
       screen.queryByDisplayValue("Amtsblatt der EU")
     expect(euGovernmentGazetteInput).toBeInTheDocument()
 
-    const yearInput = screen.queryByDisplayValue("01-01-2023")
+    const yearInput = screen.queryByDisplayValue("2023")
     expect(yearInput).toBeInTheDocument()
 
     const seriesInput = screen.queryByDisplayValue("foo")

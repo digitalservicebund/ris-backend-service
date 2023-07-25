@@ -4,7 +4,6 @@ import { Metadata } from "@/domain/Norm"
 import ChipsInput from "@/shared/components/input/ChipsInput.vue"
 import InputField from "@/shared/components/input/InputField.vue"
 import TextInput from "@/shared/components/input/TextInput.vue"
-import { ValidationError } from "@/shared/components/input/types"
 import YearInput from "@/shared/components/input/YearInput.vue"
 
 interface Props {
@@ -18,7 +17,6 @@ const emit = defineEmits<{
 }>()
 
 const inputValue = ref(props.modelValue)
-const validationErrors = ref<ValidationError[]>()
 
 watch(
   () => props.modelValue,
@@ -69,36 +67,34 @@ const explanation = computed({
 <template>
   <InputField
     id="euAnnouncementGazette"
+    v-slot="{ id }"
     aria-label="Amtsblatt der EU"
     label="Amtsblatt der EU"
   >
     <TextInput
-      id="euAnnouncementGazette"
+      :id="id"
       alt-text="Amtsblatt der EU"
       aria-label="Amtsblatt der EU"
       class="border-solid border-gray-800"
+      :model-value="defaultValueEuGovernmentGazette"
       read-only
-      :value="defaultValueEuGovernmentGazette"
     />
   </InputField>
   <div class="flex justify-between gap-16">
     <InputField
       id="euAnnouncementYear"
-      v-slot="slotProps"
+      v-slot="{ id, hasError, updateValidationError }"
       aria-label="Jahresangabe"
       class="w-full"
       label="Jahresangabe"
-      :validation-error="
-        validationErrors?.find((err) => err.field === 'euAnnouncementYear')
-      "
     >
       <YearInput
-        id="euAnnouncementYear"
+        :id="id"
         v-model="year"
         alt-text="Jahresangabe"
         aria-label="Jahresangabe"
-        :has-error="slotProps.hasError"
-        @update:validation-error="slotProps.updateValidationError"
+        :has-error="hasError"
+        @update:validation-error="updateValidationError"
       />
     </InputField>
     <InputField
