@@ -953,7 +953,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
 
   private Mono<DocumentUnitDTO> injectKeywords(DocumentUnitDTO documentUnitDTO) {
     return keywordRepository
-        .findAllByDocumentUnitId(documentUnitDTO.getId())
+        .findAllByDocumentUnitIdOrderById(documentUnitDTO.getId())
         .collectList()
         .map(
             keywordDTO -> {

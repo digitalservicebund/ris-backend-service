@@ -62,7 +62,7 @@ public class PostgresKeywordRepositoryImpl implements KeywordRepository {
 
   private Flux<String> getAllKeywordsByDocumentUnit(UUID documentUnitUuid) {
     return getDocumentUnitId(documentUnitUuid)
-        .flatMapMany(databaseKeywordRepository::findAllByDocumentUnitId)
+        .flatMapMany(databaseKeywordRepository::findAllByDocumentUnitIdOrderById)
         .map(KeywordDTO::keyword);
   }
 }

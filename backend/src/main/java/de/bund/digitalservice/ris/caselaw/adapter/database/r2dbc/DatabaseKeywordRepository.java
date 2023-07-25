@@ -7,7 +7,7 @@ import reactor.core.publisher.Mono;
 
 @Repository
 public interface DatabaseKeywordRepository extends R2dbcRepository<KeywordDTO, Long> {
-  Flux<KeywordDTO> findAllByDocumentUnitId(Long documentUnitId);
+  Flux<KeywordDTO> findAllByDocumentUnitIdOrderById(Long documentUnitId);
 
   Mono<KeywordDTO> findByDocumentUnitIdAndKeyword(Long documentUnitId, String keyword);
 }
