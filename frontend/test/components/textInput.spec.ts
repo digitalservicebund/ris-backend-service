@@ -1,5 +1,6 @@
 import userEvent from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
+import { defineComponent } from "vue"
 import TextInput from "@/shared/components/input/TextInput.vue"
 
 type TextInputProps = InstanceType<typeof TextInput>["$props"]
@@ -44,13 +45,29 @@ describe("TextInput", () => {
   })
 
   it("emits input events when user types into input", async () => {
+    const handleInput = vi.fn()
+
+    const withInputEvent = defineComponent({
+      components: { TextInput },
+      data: () => ({ value: "" }),
+      methods: { handleInput },
+      template: `
+        <TextInput
+          aria-label="aria-label"
+          id="identifier"
+          v-model="value"
+          @input="handleInput"
+        />`,
+    })
+
     const user = userEvent.setup()
-    const { emitted } = renderComponent()
+    render(withInputEvent)
     const input: HTMLInputElement = screen.getByRole("textbox")
 
     await user.type(input, "ab")
-    expect(emitted().input).toHaveLength(2)
-    expect(emitted().input).toEqual([[expect.any(Event)], [expect.any(Event)]])
+    expect(handleInput).toHaveBeenCalledTimes(2)
+    expect(handleInput).toHaveBeenNthCalledWith(1, expect.any(InputEvent))
+    expect(handleInput).toHaveBeenNthCalledWith(2, expect.any(InputEvent))
   })
 
   it("emits model update event when user types into input", async () => {

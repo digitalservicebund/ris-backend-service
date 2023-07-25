@@ -1,6 +1,5 @@
 <script lang="ts" setup>
 import { computed, ref } from "vue"
-import { useInputModel } from "@/shared/composables/useInputModel"
 
 interface Props {
   id: string
@@ -14,21 +13,19 @@ interface Props {
   size?: "regular" | "medium" | "small"
 }
 
-interface Emits {
-  (event: "update:modelValue", value: string | undefined): void
-  (event: "input", value: Event): void
-  (event: "enter-released"): void
-}
-
 const props = defineProps<Props>()
-const emit = defineEmits<Emits>()
+
+const emit = defineEmits<{
+  "update:modelValue": [value: string | undefined]
+  "enter-released": []
+}>()
 
 const inputRef = ref<HTMLInputElement | null>()
 
-const { inputValue, emitInputEvent } = useInputModel<string, Props, Emits>(
-  props,
-  emit,
-)
+const localModelValue = computed({
+  get: () => props.modelValue,
+  set: (value) => emit("update:modelValue", value),
+})
 
 const conditionalClasses = computed(() => ({
   "has-error placeholder-black": props.hasError,
@@ -50,7 +47,7 @@ defineExpose({ focusInput })
   <input
     :id="id"
     ref="inputRef"
-    v-model="inputValue"
+    v-model="localModelValue"
     :aria-label="ariaLabel"
     class="ds-input"
     :class="conditionalClasses"
@@ -58,7 +55,6 @@ defineExpose({ focusInput })
     :readonly="readOnly"
     :tabindex="tabindex"
     type="text"
-    @input="emitInputEvent"
     @keyup.enter="emit('enter-released')"
   />
 </template>
