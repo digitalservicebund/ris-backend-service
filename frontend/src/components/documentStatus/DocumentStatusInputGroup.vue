@@ -115,6 +115,7 @@ const yearEnabled = computed(() => !inputValue.value.DATE?.[0])
           aria-label="Dokument Datum"
           :disabled="!dateEnabled"
           :has-error="hasError"
+          is-future-date
           @update:validation-error="updateValidationError"
         />
       </InputField>

@@ -209,6 +209,7 @@ const yearEnabled = computed(() => !inputValue.value.DATE?.[0])
           :aria-label="`${inputFields.dateField.label}`"
           :disabled="!dateEnabled"
           :has-error="hasError"
+          is-future-date
           @update:model-value="inputFields.dateField.updateModelValue"
           @update:validation-error="updateValidationError"
         />
