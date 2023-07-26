@@ -28,6 +28,6 @@ describe("navbar top", () => {
     expect(screen.getByText("Rechtsinformationen")).toBeInTheDocument()
     expect(screen.getByText("Normen")).toBeInTheDocument()
     expect(screen.getByText("Rechtsinformationen")).toBeInTheDocument()
-    expect(screen.getByText("des Bundes")).toBeInTheDocument()
+    expect(screen.getByText("des Bundes - Dev Env")).toBeInTheDocument()
   })
 })
