@@ -47,16 +47,17 @@ Fill these variables with your values:
 ```bash
 export PATH_TO_XML_FILES="/path/to/xml/files"    # where you placed the xml files
 export SESSION_VALUE="your-session-cookie-value" # copied from Browser Developer Tools
+export HOST="http://127.0.0.1"                   # backend host
 ```
 
 Then do the requests with curl:
 
 ```bash
-curl -v -X PUT -H 'Content-Type: application/xml' -H "cookie: SESSION=$SESSION_VALUE" --data "@$PATH_TO_XML_FILES/doktyp.xml" http://127.0.0.1/api/v1/caselaw/lookuptableimporter/doktyp
-curl -v -X PUT -H 'Content-Type: application/xml' -H "cookie: SESSION=$SESSION_VALUE" --data "@$PATH_TO_XML_FILES/gerichtdata_gesamt.xml" http://127.0.0.1/api/v1/caselaw/lookuptableimporter/gerichtdata
-curl -v -X PUT -H 'Content-Type: application/xml' -H "cookie: SESSION=$SESSION_VALUE" --data "@$PATH_TO_XML_FILES/buland.xml" http://127.0.0.1/api/v1/caselaw/lookuptableimporter/buland
-curl -v -X PUT -H 'Content-Type: application/xml' -H "cookie: SESSION=$SESSION_VALUE" --data "@$PATH_TO_XML_FILES/sachneudata_gesamt.xml" http://127.0.0.1/api/v1/caselaw/lookuptableimporter/fieldOfLaw
-curl -v -X PUT -H 'Content-Type: application/xml' -H "cookie: SESSION=$SESSION_VALUE" --data "@$PATH_TO_XML_FILES/zitartdata_gesamt.xml" http://127.0.0.1/api/v1/caselaw/lookuptableimporter/zitart
+curl -v -X PUT -H 'Content-Type: application/xml' -H "cookie: SESSION=$SESSION_VALUE" --data "@$PATH_TO_XML_FILES/doktyp.xml" $HOST/api/v1/caselaw/lookuptableimporter/doktyp
+curl -v -X PUT -H 'Content-Type: application/xml' -H "cookie: SESSION=$SESSION_VALUE" --data "@$PATH_TO_XML_FILES/gerichtdata_gesamt.xml" $HOST/api/v1/caselaw/lookuptableimporter/gerichtdata
+curl -v -X PUT -H 'Content-Type: application/xml' -H "cookie: SESSION=$SESSION_VALUE" --data "@$PATH_TO_XML_FILES/buland.xml" $HOST/api/v1/caselaw/lookuptableimporter/buland
+curl -v -X PUT -H 'Content-Type: application/xml' -H "cookie: SESSION=$SESSION_VALUE" --data "@$PATH_TO_XML_FILES/sachneudata_gesamt.xml" $HOST/api/v1/caselaw/lookuptableimporter/fieldOfLaw
+curl -v -X PUT -H 'Content-Type: application/xml' -H "cookie: SESSION=$SESSION_VALUE" --data "@$PATH_TO_XML_FILES/zitartdata_gesamt.xml" $HOST/api/v1/caselaw/lookuptableimporter/zitart
 ```
 
 ### Refresh materialized views

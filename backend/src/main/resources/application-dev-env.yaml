@@ -1,0 +1,8 @@
+otc:
+  obs:
+    bucket-name: local
+local:
+  file-storage: .local-storage
+error:
+  nodes:
+    active: true

@@ -24,10 +24,31 @@ const service: PublishService = {
         ? Number(response.data.statusCode)
         : response.status
 
+      let description =
+        "Die Dokumentationseinheit kann nicht veröffentlicht werden."
+      if (
+        response.data?.statusMessages &&
+        response.data.statusMessages.length > 0
+      ) {
+        description += '<ul class="list-disc">'
+      }
+      response.data?.statusMessages?.forEach(
+        (value) =>
+          (description +=
+            '<li class="ds-body-02-reg font-bold ml-[1rem] list-item">' +
+            value +
+            "</li>"),
+      )
+      if (
+        response.data?.statusMessages &&
+        response.data.statusMessages.length > 0
+      ) {
+        description += "</ul>"
+      }
+
       response.error = {
         title: "Leider ist ein Fehler aufgetreten.",
-        description:
-          "Die Dokumentationseinheit kann nicht veröffentlicht werden.",
+        description,
       }
     }
 

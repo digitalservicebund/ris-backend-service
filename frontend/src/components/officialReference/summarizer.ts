@@ -117,10 +117,6 @@ export function euAnnouncementSummary(data: Metadata): VNode {
     data.NUMBER?.[0],
     data.PAGE?.[0],
   ].filter((f): f is string => f !== undefined)
-  if (midSection.length > 0) {
-    summarizerData.push(new SummarizerDataSet(midSection, { separator: "," }))
-  }
-
   const additionalInfos = data.ADDITIONAL_INFO ?? []
   const explanations = data.EXPLANATION ?? []
 
@@ -131,7 +127,9 @@ export function euAnnouncementSummary(data: Metadata): VNode {
   ) {
     summarizerData.push(new SummarizerDataSet(["Amtsblatt der EU"]))
   }
-
+  if (midSection.length > 0) {
+    summarizerData.push(new SummarizerDataSet(midSection, { separator: "," }))
+  }
   if (additionalInfos.length > 0) {
     summarizerData.push(
       new SummarizerDataSet(additionalInfos, { type: Type.CHIP }),
