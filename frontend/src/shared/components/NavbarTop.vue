@@ -24,7 +24,7 @@ onMounted(async () => {
         <span class="px-[1rem] text-16 leading-20">
           <span aria-hidden="true" class="font-bold"> Rechtsinformationen</span>
           <br />
-          <span aria-hidden="true">des Bundes</span>
+          <span aria-hidden="true">des Bundes - Dev Env</span>
         </span>
       </div>
 
