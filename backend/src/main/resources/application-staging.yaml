@@ -1,0 +1,17 @@
+otc:
+  obs:
+    bucket-name: neuris-document-storage-staging
+
+error:
+  nodes:
+    active: true
+
+spring:
+  data:
+    redis:
+      host: redis
+      username: redis
+
+sentry:
+  environment: staging
+  traces-sample-rate: 0.1
