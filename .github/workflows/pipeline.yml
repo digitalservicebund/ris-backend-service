@@ -1072,23 +1072,23 @@ jobs:
           filePath: tmp/performance-reports/profile-report.html
           destinationDir: performance-reports/ris-backend-service
       # Javadoc
-      - name: Javadoc - Download
-        uses: actions/download-artifact@v3
-        with:
-          name: backend-code-documentation
-          path: tmp/backend-code-documentation/
-      - name: Javadoc (Java) - git add report
-        uses: digitalservicebund/ris-reports/actions/git-add-report@dcb7b4571e4ae3a3065edaca30c8451cb3843103
-        with:
-          filePath: tmp/backend-code-documentation/docs/javadoc
-          destinationDir: backend-code-documentation/java
-          reportIsDirectory: true
-      - name: Javadoc (Kotlin) - git add report
-        uses: digitalservicebund/ris-reports/actions/git-add-report@dcb7b4571e4ae3a3065edaca30c8451cb3843103
-        with:
-          filePath: tmp/backend-code-documentation/dokka/javadoc
-          destinationDir: backend-code-documentation/kotlin
-          reportIsDirectory: true
+#      - name: Javadoc - Download
+#        uses: actions/download-artifact@v3
+#        with:
+#          name: backend-code-documentation
+#          path: tmp/backend-code-documentation/
+#      - name: Javadoc (Java) - git add report
+#        uses: digitalservicebund/ris-reports/actions/git-add-report@dcb7b4571e4ae3a3065edaca30c8451cb3843103
+#        with:
+#          filePath: tmp/backend-code-documentation/docs/javadoc
+#          destinationDir: backend-code-documentation/java
+#          reportIsDirectory: true
+#      - name: Javadoc (Kotlin) - git add report
+#        uses: digitalservicebund/ris-reports/actions/git-add-report@dcb7b4571e4ae3a3065edaca30c8451cb3843103
+#        with:
+#          filePath: tmp/backend-code-documentation/dokka/javadoc
+#          destinationDir: backend-code-documentation/kotlin
+#          reportIsDirectory: true
       # Push reports
       - name: Push reports
         # we use `toJSON(...)` below to escape double quotation marks
