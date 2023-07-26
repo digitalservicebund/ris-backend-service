@@ -41,9 +41,14 @@ function summarizeUpdate(
   if (year) {
     summarizerData.push(new SummarizerDataSet([year]))
   }
+
   const reference = data?.REFERENCE ?? []
   if (reference?.length > 0) {
-    summarizerData.push(new SummarizerDataSet(reference, { type: Type.CHIP }))
+    if (typeName === "Stand") {
+      summarizerData.push(new SummarizerDataSet(reference, { type: Type.CHIP }))
+    } else {
+      summarizerData.push(new SummarizerDataSet(reference))
+    }
   }
   return normsMetadataSummarizer(summarizerData)
 }
