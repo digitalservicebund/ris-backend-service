@@ -98,7 +98,7 @@ test.describe("ensuring the publishing of documentunits works as expected", () =
     await waitForSaving(
       async () => {
         await fillNormInputs(page, {
-          dateOfRelevance: "123",
+          dateOfRelevance: "1234",
         })
         await page.getByLabel("Norm speichern").click()
       },
