@@ -127,10 +127,16 @@ const yearValue = computed({
     <div v-if="selectedInputType === InputType.YEAR" class="w-112">
       <InputField
         id="announcementDateYearInput"
-        v-slot="{ id }"
+        v-slot="{ id, hasError, updateValidationError }"
         label="Jahresangabe"
       >
-        <YearInput :id="id" v-model="yearValue" aria-label="Jahresangabe" />
+        <YearInput
+          :id="id"
+          v-model="yearValue"
+          aria-label="Jahresangabe"
+          :has-error="hasError"
+          @update:validation-error="updateValidationError"
+        />
       </InputField>
     </div>
   </div>

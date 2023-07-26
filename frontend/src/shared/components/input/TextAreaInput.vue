@@ -92,7 +92,7 @@ defineExpose({ focus })
     ref="textareaRef"
     v-model="localValue"
     :aria-label="ariaLabel"
-    class="input readonly:focus:outline-none block w-full overflow-hidden border-2 border-blue-800 bg-white px-16 py-12 outline-2 -outline-offset-4 outline-blue-800 autofill:text-inherit autofill:shadow-white read-only:border-none hover:outline read-only:hover:outline-0 focus:outline autofill:focus:text-inherit autofill:focus:shadow-white"
+    class="input readonly:focus:outline-none block w-full overflow-hidden border-2 border-blue-800 bg-white px-20 py-12 outline-2 -outline-offset-4 outline-blue-800 autofill:text-inherit autofill:shadow-white read-only:border-none hover:outline read-only:hover:outline-0 focus:outline autofill:focus:text-inherit autofill:focus:shadow-white"
     :class="{ 'overflow-hidden': autosize, [$style.textarea]: true }"
     :placeholder="placeholder"
     :readonly="readOnly"

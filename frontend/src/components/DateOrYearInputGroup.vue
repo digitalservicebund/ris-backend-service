@@ -122,7 +122,8 @@ const yearValue = computed({
         :id="id"
         v-model="yearValue"
         :aria-label="`${label} Jahresangabe`"
-        :type="InputType.YEAR"
+        :has-error="hasError"
+        @update:validation-error="updateValidationError"
       />
     </InputField>
   </div>
