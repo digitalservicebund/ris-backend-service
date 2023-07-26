@@ -164,15 +164,16 @@ export interface CheckboxInputField extends BaseInputField {
 //TEXTAREA
 export type TextaraInputModelType = string
 
-export interface TextaraInputAttqributes extends BaseInputAttributes {
+export interface TextaraInputAttributes extends BaseInputAttributes {
   placeholder?: string
   readOnly?: boolean
   autosize?: boolean
+  rows?: number
 }
 
 export interface TextaraInputField extends BaseInputField {
   type: InputType.TEXTAREA
-  inputAttributes: TextaraInputAttqributes
+  inputAttributes: TextaraInputAttributes
 }
 
 export type InputField =
@@ -193,7 +194,7 @@ export type InputAttributes =
   | NestedInputAttributes
   | DateAttributes
   | ComboboxAttributes
-  | TextaraInputAttqributes
+  | TextaraInputAttributes
 
 export type ModelType =
   | TextInputModelType

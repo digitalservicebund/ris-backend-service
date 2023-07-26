@@ -13,11 +13,13 @@ interface Props {
   type?: InputType
   modelValue: ModelType
   readonly?: boolean
+  inputAttributes?: InputAttributes
 }
 
 const props = withDefaults(defineProps<Props>(), {
   type: InputType.TEXT,
   readonly: false,
+  inputAttributes: undefined,
 })
 
 const emit = defineEmits<{
@@ -31,6 +33,7 @@ const inputAttributes = computed(
     ariaLabel: props.label,
     readOnly: props.readonly,
     autosize: props.type === InputType.TEXTAREA,
+    ...props.inputAttributes,
   }),
 )
 

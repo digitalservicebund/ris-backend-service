@@ -164,6 +164,7 @@ const AnnouncementDateSummary = withSummarizer(summarizeAnnouncementDate)
     <SingleDataFieldSection
       id="officialLongTitle"
       v-model="officialLongTitle"
+      :input-attributes="{ ariaLabel: 'Amtliche Langüberschrift', rows: 1 }"
       label="Amtliche Langüberschrift"
       :type="InputType.TEXTAREA"
     />

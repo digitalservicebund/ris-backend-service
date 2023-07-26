@@ -20,7 +20,7 @@ const props = withDefaults(defineProps<Props>(), {
   readOnly: false,
   autosize: false,
   resize: "none",
-  rows: 1,
+  rows: 2,
 })
 
 const emit = defineEmits<{
