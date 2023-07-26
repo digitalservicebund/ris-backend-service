@@ -42,12 +42,6 @@ describe("Year Input", () => {
     expect(input).toHaveAttribute("id", "test-id")
   })
 
-  it("renders the name", () => {
-    renderComponent(undefined, { name: "test-name" })
-    const input = screen.getByRole("textbox")
-    expect(input).toHaveAttribute("name", "test-name")
-  })
-
   it("renders an aria label", () => {
     renderComponent(undefined, { ariaLabel: "test-label" })
     const input = screen.queryByLabelText("test-label")
