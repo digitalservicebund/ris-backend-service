@@ -45,6 +45,9 @@ function onKeyDown({ event }: { event: KeyboardEvent }) {
       chooseSelectedItem()
       event.stopPropagation()
       return true
+    case "Tab":
+      // Ignore and prevent "tabbing".
+      return true
     default:
       return false
   }

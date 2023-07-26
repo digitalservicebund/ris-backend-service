@@ -24,6 +24,7 @@ const emit = defineEmits<{
 const suggestionExtensions = props.suggestions.map((options) =>
   createSuggestionExtension(options),
 )
+
 const EDITOR_CLASSES = [
   "p-16",
   "border-2",
@@ -38,6 +39,7 @@ const EDITOR_CLASSES = [
   "input",
   "overflow-y-auto",
 ]
+
 const editor = new Editor({
   editorProps: {
     attributes: {
@@ -53,14 +55,16 @@ function emitEditorContentAsModelValue(): void {
   const segments = parseEditorContentAsSegments(editorContent)
   emit("update:modelValue", segments)
 }
+
 function parseEditorContentAsSegments(data?: JSONContent): Segment[] {
   let paragraphs =
     data?.content?.filter(({ type }) => type == "paragraph") ?? []
-  paragraphs = insertMewLineTextNodeBetweenParagraphs(paragraphs)
+  paragraphs = insertNewLineTextNodeBetweenParagraphs(paragraphs)
   let nodes = getAllNodes(paragraphs)
   nodes = mergeSequencesOfTextNodes(nodes)
   return nodes.map(mapEditorNodeToSegment)
 }
+
 /**
  * Inserts a new text node with a new line character as text in front of each
  * paragraph that is not the first one. This is helpful to convert from a list
@@ -69,7 +73,7 @@ function parseEditorContentAsSegments(data?: JSONContent): Segment[] {
  *
  * @example
  * ```ts
- * insertMewLineTextNodeBetweenParagraphs([
+ * insertNewLineTextNodeBetweenParagraphs([
  *  { type: "paragraph", content: [{ type: "text", text: "a" }] }
  *  { type: "paragraph", content: [{ type: "text", text: "b" }] }
  * ])
@@ -83,7 +87,7 @@ function parseEditorContentAsSegments(data?: JSONContent): Segment[] {
  * // ]
  * ```
  */
-function insertMewLineTextNodeBetweenParagraphs(
+function insertNewLineTextNodeBetweenParagraphs(
   paragraphs: JSONContent[],
 ): JSONContent[] {
   return paragraphs.map((paragraph, index) => {
@@ -92,6 +96,7 @@ function insertMewLineTextNodeBetweenParagraphs(
     return { ...paragraph, content }
   })
 }
+
 function getAllNodes(paragraphs: JSONContent[]): JSONContent[] {
   return paragraphs.reduce(
     (allContentNodes, paragraph) => [
@@ -101,6 +106,7 @@ function getAllNodes(paragraphs: JSONContent[]): JSONContent[] {
     [] as JSONContent[],
   )
 }
+
 /**
  * Shrinks the list of nodes by merging the text of consecutive text nodes together.
  *
@@ -131,6 +137,7 @@ function mergeSequencesOfTextNodes(nodes: JSONContent[]): JSONContent[] {
     return nodes
   }, [] as JSONContent[])
 }
+
 function mapEditorNodeToSegment(node: JSONContent): Segment {
   const { type, attrs, text } = node
   return {
@@ -139,13 +146,16 @@ function mapEditorNodeToSegment(node: JSONContent): Segment {
     id: attrs?.id,
   }
 }
+
 watch(() => props.modelValue, updateEditorContent, { immediate: true })
+
 function updateEditorContent(): void {
   const editorContent = parseSegmentsAsEditorContent(props.modelValue)
   const cursorPosition = editor.state.selection
   editor.commands.setContent(editorContent, false)
   editor.commands.setTextSelection(cursorPosition)
 }
+
 function mapSegmentToEditorNode(segment: Segment): JSONContent {
   const isSuggestion = segment.type != "text"
   const content = isSuggestion
@@ -153,6 +163,7 @@ function mapSegmentToEditorNode(segment: Segment): JSONContent {
     : { text: segment.content }
   return { type: segment.type, ...content }
 }
+
 /**
  * Divides a list of editor nodes into groups based on lines. That means it
  * collects all nodes up to a text node that includes a new line character. Then
@@ -189,6 +200,7 @@ function groupEditorNodesByNewLines(nodes: JSONContent[]): JSONContent {
     [[]] as JSONContent[][],
   )
 }
+
 function parseSegmentsAsEditorContent(segments?: Segment[]): JSONContent {
   const nodes = segments?.map(mapSegmentToEditorNode) ?? []
   const nodeGroups = groupEditorNodesByNewLines(nodes)
@@ -236,6 +248,7 @@ export interface Segment {
   // component interface having multiple suggestion groups.
   id?: string
 }
+
 export type { SuggestionGroupOptions } from "@/shared/editor/suggestion"
 </script>
 
