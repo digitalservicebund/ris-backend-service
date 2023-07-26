@@ -61,8 +61,9 @@ function removeModelEntry(index: number) {
 }
 
 async function focusFirstFocusableElementOfCurrentEditElement() {
-  if (!currentEditElement.value) return
   await nextTick()
+
+  if (!currentEditElement.value) return
 
   const firstFocusableElement =
     currentEditElement.value.querySelector<HTMLElement>(
