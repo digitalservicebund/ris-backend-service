@@ -1,42 +1,25 @@
 <script lang="ts" setup>
-import { computed } from "vue"
-import { ValidationError } from "@/shared/components/input/types"
+import TextInput from "@/shared/components/input/TextInput.vue"
 
-interface Props {
+defineProps<{
   id: string
-  value?: string
   modelValue: string
-  ariaLabel: string
-  hasError?: boolean
-}
-
-const props = defineProps<Props>()
+}>()
 
 const emit = defineEmits<{
   "update:modelValue": [value?: string]
-  "update:validationError": [value?: ValidationError]
 }>()
-
-const inputValue = computed({
-  get: () => props.modelValue,
-  set: (value) => {
-    emit("update:modelValue", value)
-  },
-})
-
-const conditionalClasses = computed(() => ({
-  "border-red-800 bg-red-200": props.hasError,
-}))
 </script>
 
 <template>
-  <input
+  <TextInput
     :id="id"
-    v-model="inputValue"
-    :aria-label="ariaLabel"
+    :aria-label="($attrs.ariaLabel as string) ?? ''"
     class="ds-input"
-    :class="conditionalClasses"
+    :model-value="modelValue"
     placeholder="HH:MM"
+    role="textbox"
     type="time"
+    @update:model-value="emit('update:modelValue', $event)"
   />
 </template>

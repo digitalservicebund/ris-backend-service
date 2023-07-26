@@ -1,9 +1,8 @@
 <script lang="ts" setup>
-import { computed, ref } from "vue"
+import { InputHTMLAttributes, computed, ref } from "vue"
 
 interface Props {
   id: string
-  value?: string
   modelValue?: string
   ariaLabel: string
   placeholder?: string
@@ -11,9 +10,15 @@ interface Props {
   fullHeight?: boolean
   hasError?: boolean
   size?: "regular" | "medium" | "small"
+  type?: InputHTMLAttributes["type"]
 }
 
-const props = defineProps<Props>()
+const props = withDefaults(defineProps<Props>(), {
+  modelValue: "",
+  placeholder: undefined,
+  size: "regular",
+  type: "text",
+})
 
 const emit = defineEmits<{
   "update:modelValue": [value: string | undefined]
@@ -54,7 +59,7 @@ defineExpose({ focusInput })
     :placeholder="placeholder"
     :readonly="readOnly"
     :tabindex="tabindex"
-    type="text"
+    :type="type"
     @keyup.enter="emit('enter-released')"
   />
 </template>

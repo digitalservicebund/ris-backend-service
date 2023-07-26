@@ -182,7 +182,6 @@ const values = reactive({
         <YearInput
           :id="id"
           v-model="values.yearInput"
-          aria-label="Year input"
           :has-error="hasError"
           @update:validation-error="updateValidationError"
         />
@@ -193,11 +192,7 @@ const values = reactive({
       </div>
 
       <InputField id="timeInput" v-slot="{ id }" label="Time input">
-        <TimeInput
-          :id="id"
-          v-model="values.timeInput"
-          aria-label="Time input"
-        />
+        <TimeInput :id="id" v-model="values.timeInput" />
       </InputField>
     </KitchensinkStory>
 

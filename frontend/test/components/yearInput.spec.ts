@@ -1,12 +1,14 @@
 import userEvent from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
+import TextInput from "@/shared/components/input/TextInput.vue"
 import YearInput from "@/shared/components/input/YearInput.vue"
 
 type YearInputProps = InstanceType<typeof YearInput>["$props"]
+type TextInputProps = InstanceType<typeof TextInput>["$props"]
 
 function renderComponent(
   props?: Partial<YearInputProps>,
-  attrs?: Record<string, unknown>,
+  attrs?: Partial<TextInputProps>,
 ) {
   let modelValue: string | undefined = ""
 
@@ -26,6 +28,12 @@ describe("Year Input", () => {
     renderComponent()
     const input = screen.getByRole("textbox")
     expect(input).toBeInTheDocument()
+  })
+
+  it("shows the value", () => {
+    renderComponent({ modelValue: "1989" })
+    const input: HTMLInputElement = screen.getByRole("textbox")
+    expect(input).toHaveValue("1989")
   })
 
   it("renders the ID", () => {
@@ -179,5 +187,45 @@ describe("Year Input", () => {
     expect(input).toHaveClass("has-error")
     await userEvent.type(input, "{backspace}")
     expect(input).not.toHaveClass("has-error")
+  })
+
+  it("renders a read-only input", () => {
+    renderComponent(undefined, { readOnly: true })
+    const input = screen.getByRole("textbox")
+    expect(input).toHaveAttribute("readonly")
+  })
+
+  it("does not rennder a read-only input", () => {
+    renderComponent(undefined, { readOnly: false })
+    const input = screen.getByRole("textbox")
+    expect(input).not.toHaveAttribute("readonly")
+  })
+
+  it("renders the regular variant by default", () => {
+    renderComponent()
+    const input = screen.getByRole("textbox")
+    expect(input).not.toHaveClass("ds-input-medium")
+    expect(input).not.toHaveClass("ds-input-small")
+  })
+
+  it("renders the regular variant", () => {
+    renderComponent(undefined, { size: "regular" })
+    const input = screen.getByRole("textbox")
+    expect(input).not.toHaveClass("ds-input-medium")
+    expect(input).not.toHaveClass("ds-input-small")
+  })
+
+  it("renders the medium variant", () => {
+    renderComponent(undefined, { size: "medium" })
+    const input = screen.getByRole("textbox")
+    expect(input).toHaveClass("ds-input-medium")
+    expect(input).not.toHaveClass("ds-input-small")
+  })
+
+  it("renders the small variant", () => {
+    renderComponent(undefined, { size: "small" })
+    const input = screen.getByRole("textbox")
+    expect(input).not.toHaveClass("ds-input-medium")
+    expect(input).toHaveClass("ds-input-small")
   })
 })
