@@ -114,6 +114,7 @@ const yearValue = computed({
         v-model="dateValue"
         :aria-label="label"
         :has-error="hasError"
+        is-future-date
         @update:validation-error="updateValidationError"
       />
       <YearInput
