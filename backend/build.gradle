@@ -66,7 +66,6 @@ dependencies {
   implementation "org.springframework.boot:spring-boot-actuator-autoconfigure"
   implementation "org.springframework.boot:spring-boot-starter-security"
   // => CVE-2023-34035
-  implementation "org.springframework.security:spring-security-config:6.1.2"
   implementation "org.springframework.security:spring-security-core:6.1.2"
   implementation "org.springframework.boot:spring-boot-starter-oauth2-client"
   // => CVE-2023-1370
