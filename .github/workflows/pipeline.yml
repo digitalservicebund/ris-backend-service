@@ -15,7 +15,7 @@ env:
   RUN_ID: ${{ github.run_id }}
   CONTAINER_REGISTRY: ghcr.io
   CONTAINER_IMAGE_NAME: ${{ github.repository }}
-  CONTAINER_IMAGE_VERSION: ${{ github.event.pull_request.head.sha || github.sha }}
+  CONTAINER_IMAGE_VERSION: ${{ github.event.pull_request.head.sha || github.sha }} # Use PR head SHA if available
   GH_PACKAGES_REPOSITORY_USER: ${{ secrets.GH_PACKAGES_REPOSITORY_USER }} # Secrets must not start with "GITHUB_"..
   GH_PACKAGES_REPOSITORY_TOKEN: ${{ secrets.GH_PACKAGES_REPOSITORY_TOKEN }}
   SENTRY_DSN: ${{ secrets.SENTRY_DSN }}

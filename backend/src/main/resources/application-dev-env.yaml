@@ -2,7 +2,12 @@ otc:
   obs:
     bucket-name: local
 local:
-  file-storage: .local-storage
+  file-storage: /tmp/.local-storage
 error:
   nodes:
     active: true
+spring:
+  data:
+    redis:
+      host: redis
+      username: redis
