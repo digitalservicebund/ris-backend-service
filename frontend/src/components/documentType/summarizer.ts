@@ -32,7 +32,7 @@ export function documentTypeSummarizer(data?: Metadata): VNode {
 
   if (templateNames.length > 0) {
     summarizerData.push(
-      new SummarizerDataSet(templateNames, { type: Type.CHIP }),
+      new SummarizerDataSet(templateNames, { separator: "," }),
     )
   }
 

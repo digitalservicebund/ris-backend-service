@@ -11,7 +11,7 @@ function documentStatusSummary(data: Metadata): VNode {
 
   const workNote = data?.WORK_NOTE ?? []
   if (workNote.length > 0) {
-    summarizerData.push(new SummarizerDataSet(workNote, { type: Type.CHIP }))
+    summarizerData.push(new SummarizerDataSet(workNote, { separator: "," }))
   }
   const description = data?.DESCRIPTION?.[0]
   if (description) {
@@ -34,7 +34,7 @@ function documentStatusSummary(data: Metadata): VNode {
   const entryIntoForceDateState = data?.ENTRY_INTO_FORCE_DATE_NOTE ?? []
   if (entryIntoForceDateState.length > 0) {
     summarizerData.push(
-      new SummarizerDataSet(entryIntoForceDateState, { type: Type.CHIP }),
+      new SummarizerDataSet(entryIntoForceDateState, { separator: "," }),
     )
   }
 

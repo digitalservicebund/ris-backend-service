@@ -4,7 +4,6 @@ import { Metadata, MetadataSections } from "@/domain/Norm"
 import {
   normsMetadataSummarizer,
   SummarizerDataSet,
-  Type,
 } from "@/helpers/normsMetadataSummarizer"
 
 export function officialReferenceSummarizer(data: MetadataSections): VNode {
@@ -47,13 +46,11 @@ export function printAnnouncementSummary(data: Metadata): VNode {
 
   if (additionalInfos.length > 0) {
     summarizerData.push(
-      new SummarizerDataSet(additionalInfos, { type: Type.CHIP }),
+      new SummarizerDataSet(additionalInfos, { separator: "," }),
     )
   }
   if (explanations.length > 0) {
-    summarizerData.push(
-      new SummarizerDataSet(explanations, { type: Type.CHIP }),
-    )
+    summarizerData.push(new SummarizerDataSet(explanations, { separator: "," }))
   }
 
   return normsMetadataSummarizer(summarizerData)
@@ -95,13 +92,11 @@ export function digitalAnnouncementSummary(data: Metadata): VNode {
 
   if (additionalInfos.length > 0) {
     summarizerData.push(
-      new SummarizerDataSet(additionalInfos, { type: Type.CHIP }),
+      new SummarizerDataSet(additionalInfos, { separator: "," }),
     )
   }
   if (explanations.length > 0) {
-    summarizerData.push(
-      new SummarizerDataSet(explanations, { type: Type.CHIP }),
-    )
+    summarizerData.push(new SummarizerDataSet(explanations, { separator: "," }))
   }
 
   return normsMetadataSummarizer(summarizerData)
@@ -132,13 +127,11 @@ export function euAnnouncementSummary(data: Metadata): VNode {
   }
   if (additionalInfos.length > 0) {
     summarizerData.push(
-      new SummarizerDataSet(additionalInfos, { type: Type.CHIP }),
+      new SummarizerDataSet(additionalInfos, { separator: "," }),
     )
   }
   if (explanations.length > 0) {
-    summarizerData.push(
-      new SummarizerDataSet(explanations, { type: Type.CHIP }),
-    )
+    summarizerData.push(new SummarizerDataSet(explanations, { separator: "," }))
   }
 
   return normsMetadataSummarizer(summarizerData)

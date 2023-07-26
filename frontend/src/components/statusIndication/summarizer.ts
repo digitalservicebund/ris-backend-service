@@ -45,7 +45,7 @@ function summarizeUpdate(
   const reference = data?.REFERENCE ?? []
   if (reference?.length > 0) {
     if (typeName === "Stand") {
-      summarizerData.push(new SummarizerDataSet(reference, { type: Type.CHIP }))
+      summarizerData.push(new SummarizerDataSet(reference, { separator: "," }))
     } else {
       summarizerData.push(new SummarizerDataSet(reference))
     }
