@@ -1,16 +1,14 @@
 <script lang="ts" setup>
 import dayjs from "dayjs"
 import customParseFormat from "dayjs/plugin/customParseFormat"
-import { vMaska } from "maska"
+import { vMaska, MaskaDetail } from "maska"
 import { computed, ref, watch, watchEffect } from "vue"
 import TextInput from "@/shared/components/input/TextInput.vue"
 import { ValidationError } from "@/shared/components/input/types"
 
 interface Props {
-  id: string // TODO: Test
-  // value?: string // TODO: Test
+  id: string
   modelValue: string | undefined
-  // ariaLabel: string // TODO: Test
   hasError?: boolean
 }
 
@@ -65,6 +63,10 @@ dayjs.extend(customParseFormat)
 // This will be true if maska emits that the mask is completed
 const inputCompleted = ref<boolean>(false)
 
+function checkInputCompleted(event: CustomEvent<MaskaDetail>) {
+  inputCompleted.value = event.detail.completed
+}
+
 // This will be true if we think that the user is no longer working on the
 // input, e.g. on blur. We'll set it to false if the local value changes, i.e.
 // the user is typing. We'll try not to annoy users with validation errors
@@ -111,7 +113,7 @@ function validateYear(input: string | undefined): boolean {
     placeholder="JJJJ"
     type="text"
     @blur="userHasFinished = true"
-    @maska="inputCompleted = $event.detail.completed"
+    @maska="checkInputCompleted"
     @update:model-value="emitModelValue"
   />
 </template>
