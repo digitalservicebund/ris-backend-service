@@ -52,8 +52,11 @@ public class PostgresNormAbbreviationRepositoryImpl implements NormAbbreviationR
   }
 
   @Override
-  public Flux<NormAbbreviation> findByAwesomeSearchQuery(String query, Integer size, Integer page) {
-    String[] queryBlocks = query.trim().replace(",", "").replace(";", "").split(" ");
+  public Mono<List<NormAbbreviation>> findByAwesomeSearchQuery(
+      String query, Integer size, Integer page) {
+    String cleanedQuery = query.trim().replace(",", "").replace(";", "");
+    String directInput = cleanedQuery.toLowerCase();
+    String[] queryBlocks = cleanedQuery.split(" ");
     StringBuilder tsQuery = new StringBuilder();
     for (int i = 0; i < queryBlocks.length; i++) {
       if (queryBlocks[i].isBlank()) continue;
@@ -64,15 +67,75 @@ public class PostgresNormAbbreviationRepositoryImpl implements NormAbbreviationR
 
       tsQuery.append(queryBlocks[i]).append(":*");
     }
-    String directInput = "";
-    if (queryBlocks[0] != null && !queryBlocks[0].isBlank()) {
-      directInput = queryBlocks[0].toLowerCase();
-    }
 
     return repository
-        .findByAwesomeSearchQuery(directInput, tsQuery.toString(), size, page)
-        .flatMapSequential(this::injectAdditionalInformation)
-        .map(NormAbbreviationTransformer::transformDTO);
+        .findByAwesomeSearchQuery_rank4(directInput, size)
+        .collectList()
+        .flatMap(
+            list -> {
+              if (list.size() < size) {
+                return repository
+                    .findByAwesomeSearchQuery_rank3(directInput, size - list.size())
+                    .collectList()
+                    .map(
+                        rank3list -> {
+                          list.addAll(rank3list);
+                          return list;
+                        });
+              }
+              return Mono.just(list);
+            })
+        .flatMap(
+            list -> {
+              if (list.size() < size) {
+                return repository
+                    .findByAwesomeSearchQuery_rank2(directInput, size - list.size())
+                    .collectList()
+                    .map(
+                        rank2list -> {
+                          list.addAll(rank2list);
+                          return list;
+                        });
+              }
+              return Mono.just(list);
+            })
+        .flatMap(
+            list -> {
+              if (list.size() < size) {
+                return repository
+                    .findByAwesomeSearchQuery_rank1(directInput, size - list.size())
+                    .collectList()
+                    .map(
+                        rank1list -> {
+                          list.addAll(rank1list);
+                          return list;
+                        });
+              }
+              return Mono.just(list);
+            })
+        .flatMap(
+            list -> {
+              if (list.size() < size) {
+                return repository
+                    .findByAwesomeSearchQuery_rankWeightedVector(
+                        tsQuery.toString(), size - list.size())
+                    .collectList()
+                    .map(
+                        rankWeightedList -> {
+                          list.addAll(rankWeightedList);
+                          return list;
+                        });
+              }
+              return Mono.just(list);
+            })
+        .flatMap(
+            list ->
+                Flux.fromIterable(list)
+                    .flatMapSequential(
+                        normAbbreviationDTO ->
+                            injectAdditionalInformation(normAbbreviationDTO)
+                                .map(NormAbbreviationTransformer::transformDTO))
+                    .collectList());
   }
 
   private Mono<NormAbbreviationDTO> injectAdditionalInformation(

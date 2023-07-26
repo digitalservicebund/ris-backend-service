@@ -17,9 +17,71 @@ public interface DatabaseNormAbbreviationRepository
   Flux<NormAbbreviationDTO> findBySearchQuery(String query, Integer size, Integer pageOffset);
 
   @Query(
-      "select *"
-          + " from ("
-          + " select"
+      "select"
+          + " id,"
+          + " abbreviation,"
+          + " decision_date,"
+          + " document_id,"
+          + " document_number,"
+          + " official_letter_abbreviation,"
+          + " official_long_title,"
+          + " official_short_title,"
+          + " source"
+          + " from norm_abbreviation_search"
+          + " where lower(abbreviation) = :directInput"
+          + " limit :size")
+  Flux<NormAbbreviationDTO> findByAwesomeSearchQuery_rank4(String directInput, Integer size);
+
+  @Query(
+      "select"
+          + " id,"
+          + " abbreviation,"
+          + " decision_date,"
+          + " document_id,"
+          + " document_number,"
+          + " official_letter_abbreviation,"
+          + " official_long_title,"
+          + " official_short_title,"
+          + " source"
+          + " from norm_abbreviation_search"
+          + " where lower(official_letter_abbreviation) = :directInput"
+          + " limit :size")
+  Flux<NormAbbreviationDTO> findByAwesomeSearchQuery_rank3(String directInput, Integer size);
+
+  @Query(
+      "select"
+          + " id,"
+          + " abbreviation,"
+          + " decision_date,"
+          + " document_id,"
+          + " document_number,"
+          + " official_letter_abbreviation,"
+          + " official_long_title,"
+          + " official_short_title,"
+          + " source"
+          + " from norm_abbreviation_search"
+          + " where lower(abbreviation) like :directInput || '%'"
+          + " limit :size")
+  Flux<NormAbbreviationDTO> findByAwesomeSearchQuery_rank2(String directInput, Integer size);
+
+  @Query(
+      "select"
+          + " id,"
+          + " abbreviation,"
+          + " decision_date,"
+          + " document_id,"
+          + " document_number,"
+          + " official_letter_abbreviation,"
+          + " official_long_title,"
+          + " official_short_title,"
+          + " source"
+          + " from norm_abbreviation_search"
+          + " where lower(official_letter_abbreviation) like :directInput || '%'"
+          + " limit :size")
+  Flux<NormAbbreviationDTO> findByAwesomeSearchQuery_rank1(String directInput, Integer size);
+
+  @Query(
+      "select"
           + " id,"
           + " abbreviation,"
           + " decision_date,"
@@ -29,21 +91,13 @@ public interface DatabaseNormAbbreviationRepository
           + " official_long_title,"
           + " official_short_title,"
           + " source,"
-          + " case"
-          + "  when lower(abbreviation) = :directInput then 4"
-          + "  when lower(official_letter_abbreviation) = :directInput then 3"
-          + "  when lower(abbreviation) like '' || :directInput || '%' then 2"
-          + "  when lower(official_letter_abbreviation) like '' || :directInput || '%' then 1"
-          + "  else 0"
-          + " end +"
           + " ts_rank_cd(weighted_vector, to_tsquery('german', '' || :tsQuery || '')) rank"
           + " from norm_abbreviation_search"
+          + " where weighted_vector @@ to_tsquery('german', '' || :tsQuery || '')"
           + " order by rank desc"
-          + " limit :size offset :pageOffset"
-          + " ) subquery"
-          + " where rank > 0")
-  Flux<NormAbbreviationDTO> findByAwesomeSearchQuery(
-      String directInput, String tsQuery, Integer size, Integer pageOffset);
+          + " limit :size")
+  Flux<NormAbbreviationDTO> findByAwesomeSearchQuery_rankWeightedVector(
+      String tsQuery, Integer size);
 
   Mono<NormAbbreviationDTO> findById(UUID normAbbreviationUuid);
 }

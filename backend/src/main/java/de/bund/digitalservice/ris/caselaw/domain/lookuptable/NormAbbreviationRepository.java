@@ -1,5 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.domain.lookuptable;
 
+import java.util.List;
 import java.util.UUID;
 import org.springframework.data.repository.NoRepositoryBean;
 import reactor.core.publisher.Flux;
@@ -11,5 +12,5 @@ public interface NormAbbreviationRepository {
 
   Flux<NormAbbreviation> findBySearchQuery(String query, Integer size, Integer page);
 
-  Flux<NormAbbreviation> findByAwesomeSearchQuery(String query, Integer size, Integer page);
+  Mono<List<NormAbbreviation>> findByAwesomeSearchQuery(String query, Integer size, Integer page);
 }

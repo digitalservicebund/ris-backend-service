@@ -3,6 +3,7 @@ package de.bund.digitalservice.ris.caselaw.adapter;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.NormAbbreviation;
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.OpenApiConfiguration;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.util.List;
 import java.util.UUID;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -41,7 +42,7 @@ public class NormAbbreviationController {
 
   @GetMapping("/search")
   @PreAuthorize("isAuthenticated()")
-  public Flux<NormAbbreviation> getAllNormAbbreviationsByAwesomeSearchQuery(
+  public Mono<List<NormAbbreviation>> getAllNormAbbreviationsByAwesomeSearchQuery(
       @RequestParam(value = "q", required = false, defaultValue = "") String query,
       @RequestParam(value = "sz", required = false) Integer size,
       @RequestParam(value = "pg", required = false) Integer page) {
