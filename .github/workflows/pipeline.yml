@@ -1078,13 +1078,13 @@ jobs:
           name: backend-code-documentation
           path: tmp/backend-code-documentation/
       - name: Javadoc (Java) - git add report
-        uses: digitalservicebund/ris-reports/actions/git-add-report@0b0dc5ba3a75aaccb1d3fa1088283da665c07376
+        uses: digitalservicebund/ris-reports/actions/git-add-report@22fde6e2cedf6de5bda43cee761037d27fcdbe54
         with:
           filePath: tmp/backend-code-documentation/docs/javadoc
           destinationDir: backend-code-documentation/java
           reportIsDirectory: true
       - name: Javadoc (Kotlin) - git add report
-        uses: digitalservicebund/ris-reports/actions/git-add-report@0b0dc5ba3a75aaccb1d3fa1088283da665c07376
+        uses: digitalservicebund/ris-reports/actions/git-add-report@22fde6e2cedf6de5bda43cee761037d27fcdbe54
         with:
           filePath: tmp/backend-code-documentation/dokka/javadoc
           destinationDir: backend-code-documentation/kotlin
