@@ -1088,7 +1088,7 @@ jobs:
         with:
           filePath: tmp/backend-code-documentation/dokka/javadoc
           destinationDir: backend-code-documentation/kotlin
-          reportIsDirectory: true
+          reportIsDirectory: false
       # Push reports
 #      - name: Push reports
 #        # we use `toJSON(...)` below to escape double quotation marks
