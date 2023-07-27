@@ -12,10 +12,6 @@ function summarizeUpdate(
 ): VNode {
   const summarizerData: SummarizerDataSet[] = []
 
-  const typeName = type === MetadataSectionName.STATUS ? "Stand" : "Neufassung"
-  if (typeName) {
-    summarizerData.push(new SummarizerDataSet([typeName]))
-  }
   const note = data?.NOTE?.[0]
   if (note) {
     summarizerData.push(new SummarizerDataSet([note]))
@@ -44,7 +40,7 @@ function summarizeUpdate(
 
   const reference = data?.REFERENCE ?? []
   if (reference?.length > 0) {
-    if (typeName === "Stand") {
+    if (type === MetadataSectionName.STATUS) {
       summarizerData.push(new SummarizerDataSet(reference, { separator: "," }))
     } else {
       summarizerData.push(new SummarizerDataSet(reference))
@@ -53,17 +49,9 @@ function summarizeUpdate(
   return normsMetadataSummarizer(summarizerData)
 }
 
-function summarizeNote(
-  type: MetadataSectionName.REPEAL | MetadataSectionName.OTHER_STATUS,
-  data: string | undefined,
-): VNode {
+function summarizeNote(data: string | undefined): VNode {
   const summarizerData: SummarizerDataSet[] = []
 
-  const typeName =
-    type === MetadataSectionName.REPEAL ? "Aufhebung" : "Sonstiger Hinweis"
-  if (typeName) {
-    summarizerData.push(new SummarizerDataSet([typeName]))
-  }
   if (data) {
     summarizerData.push(new SummarizerDataSet([data]))
   }
@@ -79,15 +67,9 @@ export function summarizeStatusIndication(data: MetadataSections): VNode {
   } else if (data.REISSUE) {
     return summarizeUpdate(MetadataSectionName.REISSUE, data.REISSUE[0])
   } else if (data.REPEAL) {
-    return summarizeNote(
-      MetadataSectionName.REPEAL,
-      data.REPEAL?.[0]?.TEXT?.[0],
-    )
+    return summarizeNote(data.REPEAL?.[0]?.TEXT?.[0])
   } else if (data.OTHER_STATUS) {
-    return summarizeNote(
-      MetadataSectionName.OTHER_STATUS,
-      data.OTHER_STATUS?.[0]?.NOTE?.[0],
-    )
+    return summarizeNote(data.OTHER_STATUS?.[0]?.NOTE?.[0])
   }
   return createTextVNode("")
 }

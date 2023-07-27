@@ -119,20 +119,6 @@ const explanation = computed({
   </div>
   <div class="ful-w flex gap-16">
     <InputField
-      id="digitalAnnouncementEdition"
-      v-slot="{ id }"
-      aria-label="Ausgabenummer"
-      class="w-1/3"
-      label="Ausgabenummer"
-    >
-      <TextInput
-        :id="id"
-        v-model="edition"
-        alt-text="Ausgabenummer"
-        aria-label="Ausgabenummer"
-      />
-    </InputField>
-    <InputField
       id="digitalAnnouncementYear"
       v-slot="{ id, hasError, updateValidationError }"
       aria-label="Jahr"
@@ -146,6 +132,20 @@ const explanation = computed({
         aria-label="Jahr"
         :has-error="hasError"
         @update:validation-error="updateValidationError"
+      />
+    </InputField>
+    <InputField
+      id="digitalAnnouncementEdition"
+      v-slot="{ id }"
+      aria-label="Ausgabenummer"
+      class="w-1/3"
+      label="Ausgabenummer"
+    >
+      <TextInput
+        :id="id"
+        v-model="edition"
+        alt-text="Ausgabenummer"
+        aria-label="Ausgabenummer"
       />
     </InputField>
     <InputField

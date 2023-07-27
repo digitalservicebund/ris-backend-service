@@ -23,37 +23,35 @@ export function officialReferenceSummarizer(data: MetadataSections): VNode {
 export function printAnnouncementSummary(data: Metadata): VNode {
   const summarizerData: SummarizerDataSet[] = []
 
-  const midSection = [
+  const firstPart = [
     data.ANNOUNCEMENT_GAZETTE?.[0],
     data.YEAR?.[0],
     data.NUMBER?.[0],
-    data.PAGE?.[0],
   ].filter((f): f is string => f !== undefined)
+
+  const page = data?.PAGE?.[0]
+
+  if (firstPart.length > 0) {
+    if (page) {
+      firstPart[firstPart.length - 1] = `${firstPart[firstPart.length - 1]},`
+    }
+    summarizerData.push(new SummarizerDataSet(firstPart))
+  }
+  if (page) {
+    summarizerData.push(new SummarizerDataSet([page]))
+  }
 
   const additionalInfos = data.ADDITIONAL_INFO ?? []
   const explanations = data.EXPLANATION ?? []
 
-  if (
-    midSection.length > 0 ||
-    additionalInfos.length > 0 ||
-    explanations.length > 0
-  ) {
-    summarizerData.push(new SummarizerDataSet(["Papierverkündungsblatt"]))
-  }
-  if (midSection.length > 0) {
-    summarizerData.push(new SummarizerDataSet(midSection, { separator: "," }))
-  }
-
   if (additionalInfos.length > 0) {
-    summarizerData.push(
-      new SummarizerDataSet(additionalInfos, { separator: "," }),
-    )
+    summarizerData.push(new SummarizerDataSet(additionalInfos))
   }
   if (explanations.length > 0) {
-    summarizerData.push(new SummarizerDataSet(explanations, { separator: "," }))
+    summarizerData.push(new SummarizerDataSet(explanations))
   }
 
-  return normsMetadataSummarizer(summarizerData)
+  return normsMetadataSummarizer(summarizerData, "")
 }
 
 export function digitalAnnouncementSummary(data: Metadata): VNode {
@@ -63,43 +61,47 @@ export function digitalAnnouncementSummary(data: Metadata): VNode {
     ? dayjs(data.DATE[0]).format("DD.MM.YYYY")
     : undefined
 
-  const midSection = [
+  const firstPart = [
     data.ANNOUNCEMENT_MEDIUM?.[0],
     date,
-    data.EDITION?.[0],
     data.YEAR?.[0],
-    data.PAGE?.[0],
-    data.AREA_OF_PUBLICATION?.[0],
-    data.NUMBER_OF_THE_PUBLICATION_IN_THE_RESPECTIVE_AREA?.[0],
+    data.EDITION?.[0],
   ].filter((f): f is string => f !== undefined)
+
+  const page = data?.PAGE?.[0]
+
+  if (firstPart.length > 0) {
+    if (page) {
+      firstPart[firstPart.length - 1] = `${firstPart[firstPart.length - 1]},`
+    }
+    summarizerData.push(new SummarizerDataSet(firstPart))
+  }
+  if (page) {
+    summarizerData.push(new SummarizerDataSet([page]))
+  }
+
+  const areaOfPublication = data?.AREA_OF_PUBLICATION?.[0]
+  if (areaOfPublication) {
+    summarizerData.push(new SummarizerDataSet([areaOfPublication]))
+  }
+
+  const numberOfPublication =
+    data?.NUMBER_OF_THE_PUBLICATION_IN_THE_RESPECTIVE_AREA?.[0]
+  if (numberOfPublication) {
+    summarizerData.push(new SummarizerDataSet([numberOfPublication]))
+  }
 
   const additionalInfos = data.ADDITIONAL_INFO ?? []
   const explanations = data.EXPLANATION ?? []
 
-  if (
-    midSection.length > 0 ||
-    additionalInfos.length > 0 ||
-    explanations.length > 0
-  ) {
-    summarizerData.push(
-      new SummarizerDataSet(["Elektronisches Verkündungsblatt"]),
-    )
-  }
-
-  if (midSection.length > 0) {
-    summarizerData.push(new SummarizerDataSet(midSection, { separator: "," }))
-  }
-
   if (additionalInfos.length > 0) {
-    summarizerData.push(
-      new SummarizerDataSet(additionalInfos, { separator: "," }),
-    )
+    summarizerData.push(new SummarizerDataSet(additionalInfos))
   }
   if (explanations.length > 0) {
-    summarizerData.push(new SummarizerDataSet(explanations, { separator: "," }))
+    summarizerData.push(new SummarizerDataSet(explanations))
   }
 
-  return normsMetadataSummarizer(summarizerData)
+  return normsMetadataSummarizer(summarizerData, "")
 }
 
 export function euAnnouncementSummary(data: Metadata): VNode {
@@ -115,13 +117,6 @@ export function euAnnouncementSummary(data: Metadata): VNode {
   const additionalInfos = data.ADDITIONAL_INFO ?? []
   const explanations = data.EXPLANATION ?? []
 
-  if (
-    midSection.length > 0 ||
-    additionalInfos.length > 0 ||
-    explanations.length > 0
-  ) {
-    summarizerData.push(new SummarizerDataSet(["Amtsblatt der EU"]))
-  }
   if (midSection.length > 0) {
     summarizerData.push(new SummarizerDataSet(midSection, { separator: "," }))
   }
@@ -142,7 +137,6 @@ export function otherOfficialReferenceSummary(data: Metadata): VNode {
   const otherOfficialReference = data.OTHER_OFFICIAL_REFERENCE?.[0]
 
   if (otherOfficialReference) {
-    summarizerData.push(new SummarizerDataSet(["Sonstige amtliche Fundstelle"]))
     summarizerData.push(new SummarizerDataSet([otherOfficialReference]))
   }
 

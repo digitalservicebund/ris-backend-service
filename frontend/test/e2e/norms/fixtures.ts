@@ -1036,19 +1036,19 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
         },
         {
           type: FieldType.TEXT,
-          id: "digitalAnnouncementEdition",
-          label: "Ausgabenummer",
-          values: norm.metadataSections?.OFFICIAL_REFERENCE?.map(
-            (section) => section?.DIGITAL_ANNOUNCEMENT?.[0],
-          ).map((section) => section?.EDITION?.[0]),
-        },
-        {
-          type: FieldType.TEXT,
           id: "digitalAnnouncementYear",
           label: "Jahr",
           values: norm.metadataSections?.OFFICIAL_REFERENCE?.map(
             (section) => section?.DIGITAL_ANNOUNCEMENT?.[0],
           ).map((section) => section?.YEAR?.[0]),
+        },
+        {
+          type: FieldType.TEXT,
+          id: "digitalAnnouncementEdition",
+          label: "Ausgabenummer",
+          values: norm.metadataSections?.OFFICIAL_REFERENCE?.map(
+            (section) => section?.DIGITAL_ANNOUNCEMENT?.[0],
+          ).map((section) => section?.EDITION?.[0]),
         },
         {
           type: FieldType.TEXT,
