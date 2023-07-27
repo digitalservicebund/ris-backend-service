@@ -92,7 +92,7 @@ class FromJurisMapperTest {
                 DocumentType("documentName", listOf("documentTemplateName"), listOf("category")),
             entryIntoForceDate = "2023-06-15",
             entryIntoForceDateState = null,
-            expirationDate = "2023-07-15",
+            expirationDate = null,
             expirationDateState = "UNDEFINED_UNKNOWN",
             frameKeywordList = listOf("frameKeyword"),
             leadList = listOf(Lead("jurisdiction", "unit")),
@@ -105,7 +105,7 @@ class FromJurisMapperTest {
             principleEntryIntoForceDate = "2024-10-10",
             principleEntryIntoForceDateState = null,
             principleExpirationDate = "2020-10-10",
-            principleExpirationDateState = "UNDEFINED_FUTURE",
+            principleExpirationDateState = null,
             printAnnouncementList = listOf(PrintAnnouncement("2020", "1", "bgbl")),
             referenceNumberList = listOf("referenceNumber"),
             risAbbreviation = "risAbbreviation",
@@ -270,10 +270,10 @@ class FromJurisMapperTest {
         "documentStatusDescription")
     assertSectionsHasMetadata(
         sections, PRINCIPLE_ENTRY_INTO_FORCE, MetadatumType.DATE, LocalDate.of(2024, 10, 10))
-    assertSectionsHasMetadata(sections, EXPIRATION, MetadatumType.DATE, LocalDate.of(2023, 7, 15))
+    assertSectionHasNotMetadataType(sections, EXPIRATION, MetadatumType.DATE)
     assertSectionsHasMetadata(
         sections, PRINCIPLE_EXPIRATION, MetadatumType.DATE, LocalDate.of(2020, 10, 10))
-
+    assertSectionHasNotMetadataType(sections, PRINCIPLE_EXPIRATION, MetadatumType.UNDEFINED_DATE)
     val statusIndicationSections =
         sections.filter { it.name == STATUS_INDICATION }.flatMap { it.sections ?: emptyList() }
     assertSectionsHasMetadata(statusIndicationSections, STATUS, MetadatumType.NOTE, "statusNote")
@@ -333,6 +333,14 @@ class FromJurisMapperTest {
     assertThat(sections.filter { it.name == ANNOUNCEMENT_DATE }).hasSize(1)
     assertSectionsHasMetadata(
         sections, ANNOUNCEMENT_DATE, MetadatumType.DATE, LocalDate.parse("2020-10-10"))
+  }
+
+  private fun assertSectionHasNotMetadataType(
+      sections: List<MetadataSection>,
+      name: MetadataSectionName,
+      type: MetadatumType,
+  ) {
+    assertThat(sections.first { it.name == name }.metadata.find { it.type == type }).isNull()
   }
 
   private fun assertSectionsHasMetadata(

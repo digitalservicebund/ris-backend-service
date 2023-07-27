@@ -26,6 +26,7 @@ import de.bund.digitalservice.ris.norms.juris.converter.model.Status
 import java.time.LocalDate
 import java.time.format.DateTimeParseException
 import java.util.*
+import org.apache.commons.lang3.StringUtils
 
 fun mapDataToDomain(guid: UUID, data: NormData): Norm {
   val participationType =
@@ -169,7 +170,7 @@ private fun createSectionForDocumentType(documentType: DocumentType?): MetadataS
     val documentTemplateNames =
         createMetadataForType(documentType.templateNames.map { it }, MetadatumType.TEMPLATE_NAME)
     val metadata = (documentNormCategories + documentTemplateNames).toMutableList()
-    if (documentType.name != null) {
+    if (StringUtils.isNotEmpty(documentType.name)) {
       metadata += createMetadataForType(listOf(documentType.name), MetadatumType.TYPE_NAME)
     }
     MetadataSection(Section.DOCUMENT_TYPE, metadata)
@@ -314,10 +315,10 @@ private fun createSectionsForDivergentExpiration(
 fun createSectionForEntryIntoForceAndExpiration(data: NormData): List<MetadataSection> {
   val sectionList = mutableListOf<MetadataSection>()
 
-  if (data.entryIntoForceDate !== null) {
+  if (StringUtils.isNotEmpty(data.entryIntoForceDate)) {
     val metadata = Metadatum(LocalDate.parse(data.entryIntoForceDate), MetadatumType.DATE)
     sectionList.add(MetadataSection(Section.ENTRY_INTO_FORCE, listOf(metadata)))
-  } else if (data.entryIntoForceDateState !== null) {
+  } else if (StringUtils.isNotEmpty(data.entryIntoForceDateState)) {
     val dateState = parseDateStateString(data.entryIntoForceDateState)
     dateState?.let {
       val metadata = Metadatum(it, MetadatumType.UNDEFINED_DATE)
@@ -325,10 +326,10 @@ fun createSectionForEntryIntoForceAndExpiration(data: NormData): List<MetadataSe
     }
   }
 
-  if (data.principleEntryIntoForceDate !== null) {
+  if (StringUtils.isNotEmpty(data.principleEntryIntoForceDate)) {
     val metadata = Metadatum(LocalDate.parse(data.principleEntryIntoForceDate), MetadatumType.DATE)
     sectionList.add(MetadataSection(Section.PRINCIPLE_ENTRY_INTO_FORCE, listOf(metadata)))
-  } else if (data.principleEntryIntoForceDateState !== null) {
+  } else if (StringUtils.isNotEmpty(data.principleEntryIntoForceDateState)) {
     val dateState = parseDateStateString(data.principleEntryIntoForceDateState)
     dateState?.let {
       val metadata = Metadatum(it, MetadatumType.UNDEFINED_DATE)
@@ -336,10 +337,10 @@ fun createSectionForEntryIntoForceAndExpiration(data: NormData): List<MetadataSe
     }
   }
 
-  if (data.expirationDate !== null) {
+  if (StringUtils.isNotEmpty(data.expirationDate)) {
     val metadata = Metadatum(LocalDate.parse(data.expirationDate), MetadatumType.DATE)
     sectionList.add(MetadataSection(Section.EXPIRATION, listOf(metadata)))
-  } else if (data.expirationDateState !== null) {
+  } else if (StringUtils.isNotEmpty(data.expirationDateState)) {
     val dateState = parseDateStateString(data.expirationDateState)
     dateState?.let {
       val metadata = Metadatum(it, MetadatumType.UNDEFINED_DATE)
@@ -347,10 +348,10 @@ fun createSectionForEntryIntoForceAndExpiration(data: NormData): List<MetadataSe
     }
   }
 
-  if (data.principleExpirationDate !== null) {
+  if (StringUtils.isNotEmpty(data.principleExpirationDate)) {
     val metadata = Metadatum(LocalDate.parse(data.principleExpirationDate), MetadatumType.DATE)
     sectionList.add(MetadataSection(Section.PRINCIPLE_EXPIRATION, listOf(metadata)))
-  } else if (data.principleExpirationDateState !== null) {
+  } else if (StringUtils.isNotEmpty(data.principleExpirationDateState)) {
     val dateState = parseDateStateString(data.principleExpirationDateState)
     dateState?.let {
       val metadata = Metadatum(it, MetadatumType.UNDEFINED_DATE)
