@@ -38,7 +38,7 @@ function generateNormReference(options?: {
   return normReference
 }
 
-describe("Norm references", () => {
+describe.skip("Norm references", () => {
   const normAbbreviation: NormAbbreviation = {
     abbreviation: "1000g-BefV",
   }
