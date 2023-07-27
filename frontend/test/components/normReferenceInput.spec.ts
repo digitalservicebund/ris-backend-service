@@ -4,6 +4,7 @@ import NormReferenceInput from "@/components/NormReferenceInput.vue"
 import { NormAbbreviation } from "@/domain/normAbbreviation"
 import NormReference from "@/domain/normReference"
 import comboboxItemService from "@/services/comboboxItemService"
+import documentUnitService from "@/services/documentUnitService"
 import { ComboboxItem } from "@/shared/components/input/types"
 
 function renderComponent(options?: { modelValue?: NormReference }) {
@@ -15,7 +16,7 @@ function renderComponent(options?: { modelValue?: NormReference }) {
   return { screen, user, props, ...utils }
 }
 
-describe.skip("NormReferenceEntry", () => {
+describe("NormReferenceEntry", () => {
   const normAbbreviation: NormAbbreviation = {
     abbreviation: "1000g-BefV",
   }
@@ -27,6 +28,9 @@ describe.skip("NormReferenceEntry", () => {
   ]
   vi.spyOn(comboboxItemService, "getRisAbbreviations").mockImplementation(() =>
     Promise.resolve({ status: 200, data: dropdownAbbreviationItems }),
+  )
+  vi.spyOn(documentUnitService, "validateSingleNorm").mockImplementation(() =>
+    Promise.resolve({ status: 200, data: "Ok" }),
   )
   it("render empty norm input group on initial load", () => {
     renderComponent()
@@ -72,6 +76,10 @@ describe.skip("NormReferenceEntry", () => {
         singleNorm: "12",
       } as NormReference,
     })
+
+    vi.spyOn(documentUnitService, "validateSingleNorm").mockImplementation(() =>
+      Promise.resolve({ status: 200, data: "Validation error" }),
+    )
 
     const singleNormInput = await screen.findByLabelText("Einzelnorm der Norm")
     expect(singleNormInput).toHaveValue("12")

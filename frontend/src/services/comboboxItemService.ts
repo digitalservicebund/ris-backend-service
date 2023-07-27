@@ -109,17 +109,18 @@ const service: ComboboxItemService = {
       : items
     return Promise.resolve({ status: 200, data: filteredItems })
   },
-  getCourts: (filter?: string) => fetchFromEndpoint(Endpoint.courts, filter),
-  getDocumentTypes: (filter?: string) =>
-    fetchFromEndpoint(Endpoint.documentTypes, filter),
-  getFieldOfLawSearchByIdentifier: (filter?: string) =>
-    fetchFromEndpoint(Endpoint.fieldOfLawSearchByIdentifier, filter),
-  getRisAbbreviations: (filter?: string) =>
-    fetchFromEndpoint(Endpoint.risAbbreviations, filter),
-  getRisAbbreviationsAwesome: (filter?: string) =>
-    fetchFromEndpoint(Endpoint.risAbbreviationsAwesome, filter),
-  getCitationStyles: (filter?: string) =>
-    fetchFromEndpoint(Endpoint.citationStyles, filter),
+  getCourts: async (filter?: string) =>
+    await fetchFromEndpoint(Endpoint.courts, filter),
+  getDocumentTypes: async (filter?: string) =>
+    await fetchFromEndpoint(Endpoint.documentTypes, filter),
+  getFieldOfLawSearchByIdentifier: async (filter?: string) =>
+    await fetchFromEndpoint(Endpoint.fieldOfLawSearchByIdentifier, filter),
+  getRisAbbreviations: async (filter?: string) =>
+    await fetchFromEndpoint(Endpoint.risAbbreviations, filter),
+  getRisAbbreviationsAwesome: async (filter?: string) =>
+    await fetchFromEndpoint(Endpoint.risAbbreviationsAwesome, filter),
+  getCitationStyles: async (filter?: string) =>
+    await fetchFromEndpoint(Endpoint.citationStyles, filter),
 }
 
 export default service

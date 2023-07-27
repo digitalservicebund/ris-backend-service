@@ -4,6 +4,7 @@ import NormReferences from "@/components/NormReferences.vue"
 import { NormAbbreviation } from "@/domain/normAbbreviation"
 import NormReference from "@/domain/normReference"
 import comboboxItemService from "@/services/comboboxItemService"
+import documentUnitService from "@/services/documentUnitService"
 import { ComboboxItem } from "@/shared/components/input/types"
 
 function renderComponent(options?: { modelValue?: NormReference[] }) {
@@ -38,7 +39,7 @@ function generateNormReference(options?: {
   return normReference
 }
 
-describe.skip("Norm references", () => {
+describe("Norm references", () => {
   const normAbbreviation: NormAbbreviation = {
     abbreviation: "1000g-BefV",
   }
@@ -84,6 +85,9 @@ describe.skip("Norm references", () => {
   })
 
   it("click on edit icon, opens the list entry in edit mode", async () => {
+    vi.spyOn(documentUnitService, "validateSingleNorm").mockImplementation(() =>
+      Promise.resolve({ status: 200, data: "Ok" }),
+    )
     const { user } = renderComponent({
       modelValue: [
         generateNormReference({

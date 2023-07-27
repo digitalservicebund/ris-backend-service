@@ -97,14 +97,14 @@ function resetValidationError(field: string) {
   )
 }
 
-onMounted(() => {
+onMounted(async () => {
   // On first mount, we don't need to validate. When the props.modelValue do not
   // have the isEmpty getter, we can be sure that it has not been initialized as
   // NormReference and is therefore the inital load. As soons as we are using
   // uuid for norms, the check should be 'props.modelValue?.uuid !== undefined'
 
   if (props.modelValue?.isEmpty !== undefined) {
-    validateNorm()
+    await validateNorm()
   }
   norm.value = new NormReference({ ...props.modelValue })
 })
