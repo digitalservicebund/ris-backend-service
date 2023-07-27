@@ -13,4 +13,6 @@ public interface NormAbbreviationRepository {
   Flux<NormAbbreviation> findBySearchQuery(String query, Integer size, Integer page);
 
   Mono<List<NormAbbreviation>> findByAwesomeSearchQuery(String query, Integer size, Integer page);
+
+  Mono<Void> refreshMaterializedViews();
 }

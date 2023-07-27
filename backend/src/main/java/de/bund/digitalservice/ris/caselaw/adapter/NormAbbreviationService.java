@@ -41,4 +41,8 @@ public class NormAbbreviationService {
 
     return repository.findByAwesomeSearchQuery(query, size, pageOffset);
   }
+
+  public Mono<Void> refreshMaterializedViews() {
+    return repository.refreshMaterializedViews();
+  }
 }

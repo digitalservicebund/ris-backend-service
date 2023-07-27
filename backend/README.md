@@ -63,7 +63,7 @@ curl -v -X PUT -H 'Content-Type: application/xml' -H "cookie: SESSION=$SESSION_V
 ### Refresh materialized views
 
 ```bash
-curl -v -X PUT -H "cookie: SESSION=$SESSION_VALUE" http://127.0.0.1/api/v1/caselaw/lookuptableimporter/refreshMaterializedViews
+curl -v -X PUT -H "cookie: SESSION=$SESSION_VALUE" http://127.0.0.1/api/v1/caselaw/normabbreviation/refreshMaterializedViews
 ```
 
 ### Database Setup & Migration with Flyway

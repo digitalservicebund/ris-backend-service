@@ -138,6 +138,11 @@ public class PostgresNormAbbreviationRepositoryImpl implements NormAbbreviationR
                     .collectList());
   }
 
+  @Override
+  public Mono<Void> refreshMaterializedViews() {
+    return repository.refreshMaterializedViews();
+  }
+
   private Mono<NormAbbreviationDTO> injectAdditionalInformation(
       NormAbbreviationDTO normAbbreviationDTO) {
     Mono<List<DocumentTypeNewDTO>> documentTypes =

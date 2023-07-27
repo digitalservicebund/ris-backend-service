@@ -100,4 +100,7 @@ public interface DatabaseNormAbbreviationRepository
       String tsQuery, Integer size);
 
   Mono<NormAbbreviationDTO> findById(UUID normAbbreviationUuid);
+
+  @Query("REFRESH MATERIALIZED VIEW norm_abbreviation_search")
+  Mono<Void> refreshMaterializedViews();
 }

@@ -22,12 +22,9 @@ public class LookupTableImporterController {
 
   private final LookupTableImporterService service;
 
-  private final JdbcTemplate jdbcTemplate;
-
   public LookupTableImporterController(
       LookupTableImporterService service, JdbcTemplate jdbcTemplate) {
     this.service = service;
-    this.jdbcTemplate = jdbcTemplate;
   }
 
   // In Postman go to "Body", select "raw" and "XML" and paste the XML-contents.
@@ -87,21 +84,5 @@ public class LookupTableImporterController {
         .onErrorReturn(
             ResponseEntity.internalServerError()
                 .body("Could not import the citation lookup table"));
-  }
-
-  @PutMapping("/refreshMaterializedViews")
-  @PreAuthorize("isAuthenticated()")
-  public Mono<ResponseEntity<String>> refreshMaterializedViews() {
-    String msg;
-    try {
-      jdbcTemplate.execute("REFRESH MATERIALIZED VIEW norm_abbreviation_search");
-    } catch (Exception e) {
-      msg = "Could not refresh the materialized view 'norm_abbreviation_search'";
-      log.error(msg, e);
-      return Mono.just(ResponseEntity.internalServerError().body(msg));
-    }
-    msg = "Successfully refreshed the materialized view 'norm_abbreviation_search'";
-    log.info(msg);
-    return Mono.just(ResponseEntity.ok(msg));
   }
 }
