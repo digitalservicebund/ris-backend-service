@@ -4,7 +4,7 @@ import de.bund.digitalservice.ris.norms.domain.entity.Norm
 import reactor.core.publisher.Mono
 
 fun interface SaveNormOutputPort {
-    fun saveNorm(command: Command): Mono<Boolean>
+  fun saveNorm(command: Command): Mono<Boolean>
 
-    data class Command(val norm: Norm)
+  data class Command(val norm: Norm)
 }

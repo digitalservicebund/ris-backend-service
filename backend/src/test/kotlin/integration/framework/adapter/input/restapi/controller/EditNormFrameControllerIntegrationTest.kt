@@ -12,6 +12,7 @@ import de.bund.digitalservice.ris.norms.exceptions.handler.NotFoundExceptionHand
 import de.bund.digitalservice.ris.norms.framework.adapter.output.database.NormsService
 import de.bund.digitalservice.ris.norms.framework.adapter.output.database.PostgresTestcontainerIntegrationTest
 import de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto.NormDto
+import java.time.Duration
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
@@ -32,76 +33,77 @@ import org.springframework.test.web.reactive.server.WebTestClient
 import org.springframework.web.reactive.function.BodyInserters
 import reactor.test.StepVerifier
 import utils.createRandomNorm
-import java.time.Duration
 
 @ExtendWith(SpringExtension::class)
-@Import(FlywayConfig::class, NormsService::class, EditNormFrameService::class, LoadNormService::class, NotFoundExceptionHandler::class)
+@Import(
+    FlywayConfig::class,
+    NormsService::class,
+    EditNormFrameService::class,
+    LoadNormService::class,
+    NotFoundExceptionHandler::class)
 @WebFluxTest(controllers = [LoadNormController::class, EditNormFrameController::class])
 @WithMockUser
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @AutoConfigureDataR2dbc
 class EditNormFrameControllerIntegrationTest : PostgresTestcontainerIntegrationTest() {
-    @Autowired
-    lateinit var webClient: WebTestClient
+  @Autowired lateinit var webClient: WebTestClient
 
-    @Autowired
-    private lateinit var client: DatabaseClient
+  @Autowired private lateinit var client: DatabaseClient
 
-    @Autowired
-    lateinit var normsService: NormsService
+  @Autowired lateinit var normsService: NormsService
 
-    private lateinit var template: R2dbcEntityTemplate
+  private lateinit var template: R2dbcEntityTemplate
 
-    @BeforeAll
-    fun setup() {
-        template = R2dbcEntityTemplate(client, PostgresDialect.INSTANCE)
-    }
+  @BeforeAll
+  fun setup() {
+    template = R2dbcEntityTemplate(client, PostgresDialect.INSTANCE)
+  }
 
-    @AfterEach
-    fun cleanUp() {
-        template.delete(NormDto::class.java).all().block(Duration.ofSeconds(1))
-    }
+  @AfterEach
+  fun cleanUp() {
+    template.delete(NormDto::class.java).all().block(Duration.ofSeconds(1))
+  }
 
-    companion object {
-        private val NORM: Norm = createRandomNorm()
-    }
+  companion object {
+    private val NORM: Norm = createRandomNorm()
+  }
 
-    @Test
-    fun `it correctly saves a metadata with sections then calls it back via api`() {
-        val saveCommand = SaveNormOutputPort.Command(NORM)
-        normsService.saveNorm(saveCommand)
-            .`as`(StepVerifier::create)
-            .expectNextCount(1)
-            .verifyComplete()
+  @Test
+  fun `it correctly saves a metadata with sections then calls it back via api`() {
+    val saveCommand = SaveNormOutputPort.Command(NORM)
+    normsService
+        .saveNorm(saveCommand)
+        .`as`(StepVerifier::create)
+        .expectNextCount(1)
+        .verifyComplete()
 
-        val metadata = EditNormFrameController.MetadatumRequestSchema()
-        metadata.type = MetadatumType.DATE
-        metadata.value = "2023-12-25"
-        val section = EditNormFrameController.MetadataSectionRequestSchema()
-        section.name = MetadataSectionName.CITATION_DATE
-        section.metadata = listOf(metadata)
-        val editedNorm = NormFramePropertiesTestRequestSchema()
-        editedNorm.officialLongTitle = "officialLongTitle"
-        editedNorm.metadataSections = listOf()
+    val metadata = EditNormFrameController.MetadatumRequestSchema()
+    metadata.type = MetadatumType.DATE
+    metadata.value = "2023-12-25"
+    val section = EditNormFrameController.MetadataSectionRequestSchema()
+    section.name = MetadataSectionName.CITATION_DATE
+    section.metadata = listOf(metadata)
+    val editedNorm = NormFramePropertiesTestRequestSchema()
+    editedNorm.officialLongTitle = "officialLongTitle"
+    editedNorm.metadataSections = listOf()
 
-        webClient
-            .mutateWith(csrf())
-            .put()
-            .uri("/api/v1/norms/" + NORM.guid.toString())
-            .contentType(MediaType.APPLICATION_JSON)
-            .body(BodyInserters.fromValue(editedNorm))
-            .exchange()
-            .expectStatus()
-            .isNoContent
-    }
+    webClient
+        .mutateWith(csrf())
+        .put()
+        .uri("/api/v1/norms/" + NORM.guid.toString())
+        .contentType(MediaType.APPLICATION_JSON)
+        .body(BodyInserters.fromValue(editedNorm))
+        .exchange()
+        .expectStatus()
+        .isNoContent
+  }
 
-    class NormFramePropertiesTestRequestSchema {
-        lateinit var officialLongTitle: String
-        lateinit var metadataSections: List<EditNormFrameController.MetadataSectionRequestSchema>
-        var documentNumber: String? = null
+  class NormFramePropertiesTestRequestSchema {
+    lateinit var officialLongTitle: String
+    lateinit var metadataSections: List<EditNormFrameController.MetadataSectionRequestSchema>
+    var documentNumber: String? = null
 
-        @get:JsonProperty("isExpirationDateTemp")
-        var eli: String? = null
-        var text: String? = null
-    }
+    @get:JsonProperty("isExpirationDateTemp") var eli: String? = null
+    var text: String? = null
+  }
 }

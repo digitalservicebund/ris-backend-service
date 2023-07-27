@@ -10,16 +10,16 @@ class HaveAMethodWithNameLikeClassPrefix(private val classPostfix: String) :
     ArchCondition<JavaClass>(
         "have a method named like class prefix where prefix is '$classPostfix'",
     ) {
-    override fun check(item: JavaClass, events: ConditionEvents) {
-        val predicate = HaveAMethodWithNameLikeClassPrefix(this.classPostfix)
-        val methodExists = predicate.test(item)
+  override fun check(item: JavaClass, events: ConditionEvents) {
+    val predicate = HaveAMethodWithNameLikeClassPrefix(this.classPostfix)
+    val methodExists = predicate.test(item)
 
-        if (!methodExists) {
-            val expecteMethodName = predicate.getExpectedMethodName(item)
-            val message =
-                "expected '${item.simpleName}' to end with '${this.classPostfix}' and have method with name '$expecteMethodName'"
-            val event = SimpleConditionEvent.violated(item, message)
-            events.add(event)
-        }
+    if (!methodExists) {
+      val expecteMethodName = predicate.getExpectedMethodName(item)
+      val message =
+          "expected '${item.simpleName}' to end with '${this.classPostfix}' and have method with name '$expecteMethodName'"
+      val event = SimpleConditionEvent.violated(item, message)
+      events.add(event)
     }
+  }
 }

@@ -11,9 +11,8 @@ data class FileReference(
     val guid: UUID,
 )
 
-fun getHashFromContent(bytes: ByteArray): String = HexFormat
-    .of().formatHex(
-        MessageDigest
-            .getInstance("SHA-256")
-            .digest(bytes),
-    )
+fun getHashFromContent(bytes: ByteArray): String =
+    HexFormat.of()
+        .formatHex(
+            MessageDigest.getInstance("SHA-256").digest(bytes),
+        )

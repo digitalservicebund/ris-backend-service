@@ -6,6 +6,8 @@ import de.bund.digitalservice.ris.norms.application.port.output.GetFileOutputPor
 import io.mockk.every
 import io.mockk.slot
 import io.mockk.verify
+import java.nio.ByteBuffer
+import java.util.*
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -16,79 +18,61 @@ import org.springframework.security.test.web.reactive.server.SecurityMockServerC
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.springframework.test.web.reactive.server.WebTestClient
 import reactor.core.publisher.Mono
-import java.nio.ByteBuffer
-import java.util.*
 
 @ExtendWith(SpringExtension::class)
 @WebFluxTest(controllers = [GetFileController::class])
 @WithMockUser
 class GetFileControllerTest {
-    @Autowired lateinit var webClient: WebTestClient
+  @Autowired lateinit var webClient: WebTestClient
 
-    @MockkBean lateinit var getFileService: GetFileUseCase
+  @MockkBean lateinit var getFileService: GetFileUseCase
 
-    @MockkBean lateinit var getFileOutputPort: GetFileOutputPort
+  @MockkBean lateinit var getFileOutputPort: GetFileOutputPort
 
-    private val file: ByteBuffer = ByteBuffer.allocate(0)
+  private val file: ByteBuffer = ByteBuffer.allocate(0)
 
-    private val guidExample = "761b5537-5aa5-4901-81f7-fbf7e040a7c8"
-    private val hashExample = "1c47461aea72b7d4f36c075fe09ae283e78477d261e5b1141c510cb46c941d10"
-    private val uriExample = "/api/v1/norms/$guidExample/files/$hashExample"
+  private val guidExample = "761b5537-5aa5-4901-81f7-fbf7e040a7c8"
+  private val hashExample = "1c47461aea72b7d4f36c075fe09ae283e78477d261e5b1141c510cb46c941d10"
+  private val uriExample = "/api/v1/norms/$guidExample/files/$hashExample"
 
-    @Test
-    fun `it calls the export norm service with the correct command`() {
-        every { getFileService.getFile(any()) } returns Mono.empty()
+  @Test
+  fun `it calls the export norm service with the correct command`() {
+    every { getFileService.getFile(any()) } returns Mono.empty()
 
-        webClient
-            .mutateWith(csrf())
-            .get()
-            .uri(uriExample)
-            .exchange()
+    webClient.mutateWith(csrf()).get().uri(uriExample).exchange()
 
-        val query = slot<GetFileUseCase.Command>()
-        verify(exactly = 1) { getFileService.getFile(capture(query)) }
-        assertThat(query.captured.guid.toString()).isEqualTo(guidExample)
-        assertThat(query.captured.hash).isEqualTo(hashExample)
-    }
+    val query = slot<GetFileUseCase.Command>()
+    verify(exactly = 1) { getFileService.getFile(capture(query)) }
+    assertThat(query.captured.guid.toString()).isEqualTo(guidExample)
+    assertThat(query.captured.hash).isEqualTo(hashExample)
+  }
 
-    @Test
-    fun `it responds with file`() {
-        every { getFileService.getFile(any()) } returns Mono.just(file.array())
+  @Test
+  fun `it responds with file`() {
+    every { getFileService.getFile(any()) } returns Mono.just(file.array())
 
-        webClient
-            .mutateWith(csrf())
-            .get()
-            .uri(uriExample)
-            .exchange()
-            .expectStatus()
-            .isOk
-            .expectBody(ByteArray::class.java)
-            .isEqualTo(file.array())
-    }
+    webClient
+        .mutateWith(csrf())
+        .get()
+        .uri(uriExample)
+        .exchange()
+        .expectStatus()
+        .isOk
+        .expectBody(ByteArray::class.java)
+        .isEqualTo(file.array())
+  }
 
-    @Test
-    fun `it sends an internal error response if the export norm service throws an exception`() {
-        every { getFileService.getFile(any()) } throws Error()
+  @Test
+  fun `it sends an internal error response if the export norm service throws an exception`() {
+    every { getFileService.getFile(any()) } throws Error()
 
-        webClient
-            .mutateWith(csrf())
-            .get()
-            .uri(uriExample)
-            .exchange()
-            .expectStatus()
-            .is5xxServerError
-    }
+    webClient.mutateWith(csrf()).get().uri(uriExample).exchange().expectStatus().is5xxServerError
+  }
 
-    @Test
-    fun `it sends an internal error response if the get file port throws an exception`() {
-        every { getFileOutputPort.getFile(any()) } throws Error()
+  @Test
+  fun `it sends an internal error response if the get file port throws an exception`() {
+    every { getFileOutputPort.getFile(any()) } throws Error()
 
-        webClient
-            .mutateWith(csrf())
-            .get()
-            .uri(uriExample)
-            .exchange()
-            .expectStatus()
-            .is5xxServerError
-    }
+    webClient.mutateWith(csrf()).get().uri(uriExample).exchange().expectStatus().is5xxServerError
+  }
 }

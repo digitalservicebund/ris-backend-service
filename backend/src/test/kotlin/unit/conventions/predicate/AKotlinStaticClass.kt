@@ -13,14 +13,14 @@ import java.lang.reflect.Modifier
  * treatment.
  */
 class AKotlinStaticClass : DescribedPredicate<JavaClass>("an auto-generated Kotlin static class") {
-    // TODO: Check why these classes are not identifiable as synthetic classes.
-    override fun test(item: JavaClass): Boolean {
-        val nonStaticMethods = item.methods.filter { !Modifier.isStatic(it.reflect().getModifiers()) }
-        val nonStaticFields = item.fields.filter { !Modifier.isStatic(it.reflect().getModifiers()) }
+  // TODO: Check why these classes are not identifiable as synthetic classes.
+  override fun test(item: JavaClass): Boolean {
+    val nonStaticMethods = item.methods.filter { !Modifier.isStatic(it.reflect().getModifiers()) }
+    val nonStaticFields = item.fields.filter { !Modifier.isStatic(it.reflect().getModifiers()) }
 
-        val hasSpecialPostfix = item.name.endsWith("Kt")
-        val everythingIsStatic = nonStaticMethods.size == 0 && nonStaticFields.size == 0
+    val hasSpecialPostfix = item.name.endsWith("Kt")
+    val everythingIsStatic = nonStaticMethods.size == 0 && nonStaticFields.size == 0
 
-        return (hasSpecialPostfix && everythingIsStatic) || item.name.contains("$")
-    }
+    return (hasSpecialPostfix && everythingIsStatic) || item.name.contains("$")
+  }
 }

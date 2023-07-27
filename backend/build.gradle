@@ -260,7 +260,7 @@ jacocoTestReport {
 }
 
 spotless {
-  kotlin { ktlint() }
+  kotlin { ktfmt() }
   java {
     removeUnusedImports()
     googleJavaFormat()

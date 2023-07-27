@@ -4,7 +4,7 @@ import de.bund.digitalservice.ris.norms.domain.entity.Norm
 import reactor.core.publisher.Mono
 
 fun interface GetNormByEliOutputPort {
-    fun getNormByEli(query: Query): Mono<Norm>
+  fun getNormByEli(query: Query): Mono<Norm>
 
-    data class Query(val gazette: String, val year: String, val page: String)
+  data class Query(val gazette: String, val year: String, val page: String)
 }

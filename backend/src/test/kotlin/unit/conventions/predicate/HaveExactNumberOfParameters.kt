@@ -5,7 +5,7 @@ import com.tngtech.archunit.core.domain.JavaMethod
 
 class HaveExactNumberOfParameters(private val number: Int) :
     DescribedPredicate<JavaMethod>("have exactly $number parameter(s)") {
-    override fun test(item: JavaMethod): Boolean {
-        return item.parameters.size == this.number
-    }
+  override fun test(item: JavaMethod): Boolean {
+    return item.parameters.size == this.number
+  }
 }

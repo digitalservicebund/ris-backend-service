@@ -15,18 +15,17 @@ import reactor.core.publisher.Mono
 @RestControllerAdvice
 class ForbiddenExceptionHandler : ResponseEntityExceptionHandler() {
 
-    @ExceptionHandler(HttpClientErrorException.Forbidden::class)
-    @ResponseStatus(HttpStatus.FORBIDDEN)
-    fun handleAllUncaughtException(exception: Exception): ResponseEntity<Mono<ErrorResponse>> =
-        ResponseEntity
-            .status(HttpStatus.FORBIDDEN)
-            .body(
-                Mono.just(
-                    ErrorResponse(
-                        mutableListOf(
-                            ErrorDetails(ErrorCode.NOT_AUTHENTICATED, ""),
-                        ),
-                    ),
-                ),
-            )
+  @ExceptionHandler(HttpClientErrorException.Forbidden::class)
+  @ResponseStatus(HttpStatus.FORBIDDEN)
+  fun handleAllUncaughtException(exception: Exception): ResponseEntity<Mono<ErrorResponse>> =
+      ResponseEntity.status(HttpStatus.FORBIDDEN)
+          .body(
+              Mono.just(
+                  ErrorResponse(
+                      mutableListOf(
+                          ErrorDetails(ErrorCode.NOT_AUTHENTICATED, ""),
+                      ),
+                  ),
+              ),
+          )
 }

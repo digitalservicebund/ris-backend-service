@@ -16,28 +16,28 @@ class ImplementInterfaceWithSamePrefix(
     DescribedPredicate<JavaClass>(
         "with postfix '$classPostfix' has the same prefix as the interface it implements with postfix '$interfacePostfix'",
     ) {
-    override fun test(item: JavaClass): Boolean {
-        val classHasPostfix = simpleNameEndingWith(this.classPostfix).test(item)
-        val classImplementsSingleInterface = implementASingleInterface().test(item)
+  override fun test(item: JavaClass): Boolean {
+    val classHasPostfix = simpleNameEndingWith(this.classPostfix).test(item)
+    val classImplementsSingleInterface = implementASingleInterface().test(item)
 
-        if (!classHasPostfix || !classImplementsSingleInterface) {
-            return false
-        }
-
-        val interfaceHasPostfix =
-            simpleNameEndingWith(this.interfacePostfix).test(item.rawInterfaces.elementAt(0))
-
-        if (!interfaceHasPostfix) {
-            return false
-        }
-
-        val expectedClassName = this.getExpectedClassName(item)
-        return item.simpleName == expectedClassName
+    if (!classHasPostfix || !classImplementsSingleInterface) {
+      return false
     }
 
-    fun getExpectedClassName(item: JavaClass): String {
-        val firstInterface = item.rawInterfaces.elementAt(0)
-        val interfacePrefix = firstInterface.simpleName.replace(this.interfacePostfix, "")
-        return interfacePrefix + classPostfix
+    val interfaceHasPostfix =
+        simpleNameEndingWith(this.interfacePostfix).test(item.rawInterfaces.elementAt(0))
+
+    if (!interfaceHasPostfix) {
+      return false
     }
+
+    val expectedClassName = this.getExpectedClassName(item)
+    return item.simpleName == expectedClassName
+  }
+
+  fun getExpectedClassName(item: JavaClass): String {
+    val firstInterface = item.rawInterfaces.elementAt(0)
+    val interfacePrefix = firstInterface.simpleName.replace(this.interfacePostfix, "")
+    return interfacePrefix + classPostfix
+  }
 }

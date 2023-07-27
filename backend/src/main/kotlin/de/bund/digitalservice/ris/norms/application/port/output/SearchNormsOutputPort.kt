@@ -4,7 +4,7 @@ import de.bund.digitalservice.ris.norms.domain.entity.Norm
 import reactor.core.publisher.Flux
 
 fun interface SearchNormsOutputPort {
-    fun searchNorms(query: Query): Flux<Norm>
+  fun searchNorms(query: Query): Flux<Norm>
 
-    data class Query(val searchTerm: String)
+  data class Query(val searchTerm: String)
 }

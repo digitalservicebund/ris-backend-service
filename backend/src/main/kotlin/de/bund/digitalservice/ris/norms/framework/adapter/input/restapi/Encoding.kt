@@ -17,7 +17,8 @@ fun decodeLocalTime(timeString: String) = LocalTime.parse(timeString)
 
 fun encodeLocalDate(date: LocalDate?): String? = date?.toString()
 
-fun encodeLocalDateToGermanFormat(date: LocalDate?): String? = date?.format(DateTimeFormatter.ofPattern("d.M.yyyy"))
+fun encodeLocalDateToGermanFormat(date: LocalDate?): String? =
+    date?.format(DateTimeFormatter.ofPattern("d.M.yyyy"))
 
 fun encodeLocalDateTime(dateTime: LocalDateTime): String = dateTime.toString()
 

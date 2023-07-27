@@ -6,11 +6,11 @@ import utils.createRandomNorm
 
 class SaveNormCommandTest {
 
-    @Test
-    fun `can create command with a norm`() {
-        val norm = createRandomNorm()
-        val command = SaveNormOutputPort.Command(norm)
+  @Test
+  fun `can create command with a norm`() {
+    val norm = createRandomNorm()
+    val command = SaveNormOutputPort.Command(norm)
 
-        assertThat(command.norm).isEqualTo(norm)
-    }
+    assertThat(command.norm).isEqualTo(norm)
+  }
 }

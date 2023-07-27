@@ -29,63 +29,71 @@ import reactor.core.publisher.Mono
 @Tag(name = OpenApiConfiguration.NORMS_TAG)
 class EditNormFrameController(private val editNormFrameService: EditNormFrameUseCase) {
 
-    @PutMapping(path = ["/{guid}"])
-    @Operation(summary = "Edit the frame data of a norm", description = "Edits a norm given its unique guid identifier")
-    @ApiResponses(
-        ApiResponse(responseCode = "204", description = "Norm was updated"),
-        ApiResponse(responseCode = "400"),
-    )
-    fun editNormFrame(
-        @PathVariable guid: String,
-        @RequestBody request: NormFramePropertiesRequestSchema,
-    ): Mono<ResponseEntity<Unit>> {
-        val properties = request.toUseCaseData()
-        val command = EditNormFrameUseCase.Command(decodeGuid(guid), properties)
+  @PutMapping(path = ["/{guid}"])
+  @Operation(
+      summary = "Edit the frame data of a norm",
+      description = "Edits a norm given its unique guid identifier")
+  @ApiResponses(
+      ApiResponse(responseCode = "204", description = "Norm was updated"),
+      ApiResponse(responseCode = "400"),
+  )
+  fun editNormFrame(
+      @PathVariable guid: String,
+      @RequestBody request: NormFramePropertiesRequestSchema,
+  ): Mono<ResponseEntity<Unit>> {
+    val properties = request.toUseCaseData()
+    val command = EditNormFrameUseCase.Command(decodeGuid(guid), properties)
 
-        return editNormFrameService
-            .editNormFrame(command)
-            .map { ResponseEntity.noContent().build<Unit>() }
-            .onErrorReturn(ResponseEntity.internalServerError().build())
-    }
+    return editNormFrameService
+        .editNormFrame(command)
+        .map { ResponseEntity.noContent().build<Unit>() }
+        .onErrorReturn(ResponseEntity.internalServerError().build())
+  }
 
-    class NormFramePropertiesRequestSchema {
-        lateinit var metadataSections: List<MetadataSectionRequestSchema>
+  class NormFramePropertiesRequestSchema {
+    lateinit var metadataSections: List<MetadataSectionRequestSchema>
 
-        var eli: String? = null
+    var eli: String? = null
 
-        fun toUseCaseData(): EditNormFrameUseCase.NormFrameProperties = EditNormFrameUseCase.NormFrameProperties(
+    fun toUseCaseData(): EditNormFrameUseCase.NormFrameProperties =
+        EditNormFrameUseCase.NormFrameProperties(
             this.metadataSections.map { it.toUseCaseData() },
         )
+  }
+
+  class MetadataSectionRequestSchema {
+    lateinit var name: MetadataSectionName
+    var metadata: List<MetadatumRequestSchema>? = null
+    var order: Int = 1
+    var sections: List<MetadataSectionRequestSchema>? = null
+
+    fun toUseCaseData(): MetadataSection {
+      val metadata = this.metadata?.map { it.toUseCaseData() }
+      val childSections = this.sections?.map { it.toUseCaseData() }
+      return MetadataSection(
+          name = this.name,
+          order = order,
+          metadata = metadata ?: emptyList(),
+          sections = childSections)
     }
+  }
 
-    class MetadataSectionRequestSchema {
-        lateinit var name: MetadataSectionName
-        var metadata: List<MetadatumRequestSchema>? = null
-        var order: Int = 1
-        var sections: List<MetadataSectionRequestSchema>? = null
+  class MetadatumRequestSchema {
+    lateinit var value: String
+    lateinit var type: MetadatumType
+    var order: Int = 1
 
-        fun toUseCaseData(): MetadataSection {
-            val metadata = this.metadata?.map { it.toUseCaseData() }
-            val childSections = this.sections?.map { it.toUseCaseData() }
-            return MetadataSection(name = this.name, order = order, metadata = metadata ?: emptyList(), sections = childSections)
-        }
+    fun toUseCaseData(): Metadatum<*> {
+      val value =
+          when (this.type) {
+            MetadatumType.DATE -> decodeLocalDate(this.value)
+            MetadatumType.TIME -> decodeLocalTime(this.value)
+            MetadatumType.RESOLUTION_MAJORITY -> this.value.toBoolean()
+            MetadatumType.NORM_CATEGORY -> NormCategory.valueOf(this.value)
+            MetadatumType.UNDEFINED_DATE -> UndefinedDate.valueOf(this.value)
+            else -> this.value
+          }
+      return Metadatum(value = value, type = this.type, order = this.order)
     }
-
-    class MetadatumRequestSchema {
-        lateinit var value: String
-        lateinit var type: MetadatumType
-        var order: Int = 1
-
-        fun toUseCaseData(): Metadatum<*> {
-            val value = when (this.type) {
-                MetadatumType.DATE -> decodeLocalDate(this.value)
-                MetadatumType.TIME -> decodeLocalTime(this.value)
-                MetadatumType.RESOLUTION_MAJORITY -> this.value.toBoolean()
-                MetadatumType.NORM_CATEGORY -> NormCategory.valueOf(this.value)
-                MetadatumType.UNDEFINED_DATE -> UndefinedDate.valueOf(this.value)
-                else -> this.value
-            }
-            return Metadatum(value = value, type = this.type, order = this.order)
-        }
-    }
+  }
 }

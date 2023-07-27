@@ -18,35 +18,42 @@ import java.time.LocalDateTime
 fun convertEditNormRequestTestSchemaToJson(
     editNormRequestSchema: EditNormFrameControllerTest.NormFramePropertiesTestRequestSchema,
 ): String {
-    return Gson().toJson(editNormRequestSchema)
+  return Gson().toJson(editNormRequestSchema)
 }
 
-fun convertLoadNormResponseTestSchemaToJson(norm: LoadNormControllerTest.NormResponseTestSchema): String {
-    class LocalDateSerializer : JsonSerializer<LocalDate> {
-        override fun serialize(
-            src: LocalDate?,
-            typeOfSrc: Type?,
-            context: JsonSerializationContext?,
-        ): JsonElement {
-            return JsonPrimitive(encodeLocalDate(src))
-        }
+fun convertLoadNormResponseTestSchemaToJson(
+    norm: LoadNormControllerTest.NormResponseTestSchema
+): String {
+  class LocalDateSerializer : JsonSerializer<LocalDate> {
+    override fun serialize(
+        src: LocalDate?,
+        typeOfSrc: Type?,
+        context: JsonSerializationContext?,
+    ): JsonElement {
+      return JsonPrimitive(encodeLocalDate(src))
     }
-    val gson: Gson =
-        GsonBuilder().registerTypeAdapter(LocalDate::class.java, LocalDateSerializer()).serializeNulls().create()
-    return gson.toJson(norm)
+  }
+  val gson: Gson =
+      GsonBuilder()
+          .registerTypeAdapter(LocalDate::class.java, LocalDateSerializer())
+          .serializeNulls()
+          .create()
+  return gson.toJson(norm)
 }
 
 fun convertFileReferenceToJson(fileReference: FileReference): String {
-    class LocalDateTimeSerializer : JsonSerializer<LocalDateTime> {
-        override fun serialize(
-            src: LocalDateTime,
-            typeOfSrc: Type?,
-            context: JsonSerializationContext?,
-        ): JsonElement {
-            return JsonPrimitive(encodeLocalDateTime(src))
-        }
+  class LocalDateTimeSerializer : JsonSerializer<LocalDateTime> {
+    override fun serialize(
+        src: LocalDateTime,
+        typeOfSrc: Type?,
+        context: JsonSerializationContext?,
+    ): JsonElement {
+      return JsonPrimitive(encodeLocalDateTime(src))
     }
-    val gson: Gson =
-        GsonBuilder().registerTypeAdapter(LocalDateTime::class.java, LocalDateTimeSerializer()).create()
-    return gson.toJson(fileReference)
+  }
+  val gson: Gson =
+      GsonBuilder()
+          .registerTypeAdapter(LocalDateTime::class.java, LocalDateTimeSerializer())
+          .create()
+  return gson.toJson(fileReference)
 }

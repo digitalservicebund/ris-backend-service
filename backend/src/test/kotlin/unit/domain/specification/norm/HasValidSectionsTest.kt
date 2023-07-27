@@ -7,18 +7,19 @@ import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType
 import io.mockk.every
 import io.mockk.mockk
-import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.Test
 import java.time.LocalDate
 import java.util.*
+import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.Test
 
 class HasValidSectionsTest {
-    @Test
-    fun `it is not satisfied if the section can not be added directly to the Norm`() {
-        val instance = mockk<Norm>()
-        every { instance.guid } returns UUID.randomUUID()
+  @Test
+  fun `it is not satisfied if the section can not be added directly to the Norm`() {
+    val instance = mockk<Norm>()
+    every { instance.guid } returns UUID.randomUUID()
 
-        every { instance.metadataSections } returns listOf(
+    every { instance.metadataSections } returns
+        listOf(
             MetadataSection(
                 MetadataSectionName.PRINT_ANNOUNCEMENT,
                 listOf(Metadatum("announcement gazette", MetadatumType.ANNOUNCEMENT_GAZETTE)),
@@ -33,19 +34,21 @@ class HasValidSectionsTest {
             ),
             MetadataSection(
                 MetadataSectionName.OTHER_OFFICIAL_ANNOUNCEMENT,
-                listOf(Metadatum("other official reference", MetadatumType.OTHER_OFFICIAL_REFERENCE)),
+                listOf(
+                    Metadatum("other official reference", MetadatumType.OTHER_OFFICIAL_REFERENCE)),
             ),
         )
 
-        assertThat(hasValidSections.isSatisfiedBy(instance)).isFalse()
-    }
+    assertThat(hasValidSections.isSatisfiedBy(instance)).isFalse()
+  }
 
-    @Test
-    fun `it is satisfied if the section can be added directly to the Norm`() {
-        val instance = mockk<Norm>()
-        every { instance.guid } returns UUID.randomUUID()
+  @Test
+  fun `it is satisfied if the section can be added directly to the Norm`() {
+    val instance = mockk<Norm>()
+    every { instance.guid } returns UUID.randomUUID()
 
-        every { instance.metadataSections } returns listOf(
+    every { instance.metadataSections } returns
+        listOf(
             MetadataSection(
                 MetadataSectionName.NORM,
                 listOf(Metadatum("unofficial short title", MetadatumType.UNOFFICIAL_SHORT_TITLE)),
@@ -69,28 +72,30 @@ class HasValidSectionsTest {
             ),
         )
 
-        assertThat(hasValidSections.isSatisfiedBy(instance)).isTrue()
-    }
+    assertThat(hasValidSections.isSatisfiedBy(instance)).isTrue()
+  }
 
-    @Test
-    fun `it is satisfied if the section footnote can be added directly to the Norm`() {
-        val instance = mockk<Norm>()
-        every { instance.guid } returns UUID.randomUUID()
-        every { instance.metadataSections } returns listOf(
+  @Test
+  fun `it is satisfied if the section footnote can be added directly to the Norm`() {
+    val instance = mockk<Norm>()
+    every { instance.guid } returns UUID.randomUUID()
+    every { instance.metadataSections } returns
+        listOf(
             MetadataSection(
                 MetadataSectionName.FOOTNOTES,
                 listOf(Metadatum("footnote reference", MetadatumType.FOOTNOTE_REFERENCE)),
             ),
         )
-        assertThat(hasValidSections.isSatisfiedBy(instance)).isTrue()
-    }
+    assertThat(hasValidSections.isSatisfiedBy(instance)).isTrue()
+  }
 
-    @Test
-    fun `it is satisfied if the document status section can be added directly to the Norm`() {
-        val instance = mockk<Norm>()
-        every { instance.guid } returns UUID.randomUUID()
+  @Test
+  fun `it is satisfied if the document status section can be added directly to the Norm`() {
+    val instance = mockk<Norm>()
+    every { instance.guid } returns UUID.randomUUID()
 
-        every { instance.metadataSections } returns listOf(
+    every { instance.metadataSections } returns
+        listOf(
             MetadataSection(
                 MetadataSectionName.NORM,
                 listOf(Metadatum("unofficial short title", MetadatumType.UNOFFICIAL_SHORT_TITLE)),
@@ -108,15 +113,16 @@ class HasValidSectionsTest {
             ),
         )
 
-        assertThat(hasValidSections.isSatisfiedBy(instance)).isTrue()
-    }
+    assertThat(hasValidSections.isSatisfiedBy(instance)).isTrue()
+  }
 
-    @Test
-    fun `it is satisfied if the status indication can be added directly to the Norm`() {
-        val instance = mockk<Norm>()
-        every { instance.guid } returns UUID.randomUUID()
+  @Test
+  fun `it is satisfied if the status indication can be added directly to the Norm`() {
+    val instance = mockk<Norm>()
+    every { instance.guid } returns UUID.randomUUID()
 
-        every { instance.metadataSections } returns listOf(
+    every { instance.metadataSections } returns
+        listOf(
             MetadataSection(
                 MetadataSectionName.NORM,
                 listOf(Metadatum("unofficial short title", MetadatumType.UNOFFICIAL_SHORT_TITLE)),
@@ -134,21 +140,22 @@ class HasValidSectionsTest {
             ),
         )
 
-        assertThat(hasValidSections.isSatisfiedBy(instance)).isTrue()
-    }
+    assertThat(hasValidSections.isSatisfiedBy(instance)).isTrue()
+  }
 
-    @Test
-    fun `it is satisfied if the publication date can be added directly to the Norm`() {
-        val instance = mockk<Norm>()
-        every { instance.guid } returns UUID.randomUUID()
+  @Test
+  fun `it is satisfied if the publication date can be added directly to the Norm`() {
+    val instance = mockk<Norm>()
+    every { instance.guid } returns UUID.randomUUID()
 
-        every { instance.metadataSections } returns listOf(
+    every { instance.metadataSections } returns
+        listOf(
             MetadataSection(
                 MetadataSectionName.PUBLICATION_DATE,
                 listOf(Metadatum(LocalDate.now(), MetadatumType.DATE)),
             ),
         )
 
-        assertThat(hasValidSections.isSatisfiedBy(instance)).isTrue()
-    }
+    assertThat(hasValidSections.isSatisfiedBy(instance)).isTrue()
+  }
 }

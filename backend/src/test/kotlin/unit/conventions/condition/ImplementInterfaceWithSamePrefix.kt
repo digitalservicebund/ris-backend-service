@@ -14,15 +14,15 @@ class ImplementInterfaceWithSamePrefix(
         "have the same prefix as the interface it implements for the class postfix '$classPostfix'" +
             " and interface postfix '$interfacePostfix'",
     ) {
-    override fun check(item: JavaClass, events: ConditionEvents) {
-        val predicate = ImplementInterfaceWithSamePrefix(this.classPostfix, this.interfacePostfix)
-        val prefixIsCorrect = predicate.test(item)
+  override fun check(item: JavaClass, events: ConditionEvents) {
+    val predicate = ImplementInterfaceWithSamePrefix(this.classPostfix, this.interfacePostfix)
+    val prefixIsCorrect = predicate.test(item)
 
-        if (!prefixIsCorrect) {
-            val expectedClassName = predicate.getExpectedClassName(item)
-            val message = "expected class '${item.simpleName}' to have name '$expectedClassName'"
-            val event = SimpleConditionEvent.violated(item, message)
-            events.add(event)
-        }
+    if (!prefixIsCorrect) {
+      val expectedClassName = predicate.getExpectedClassName(item)
+      val message = "expected class '${item.simpleName}' to have name '$expectedClassName'"
+      val event = SimpleConditionEvent.violated(item, message)
+      events.add(event)
     }
+  }
 }

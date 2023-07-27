@@ -12,17 +12,17 @@ class LoadNormAsXmlService(
     private val convertNormToXmlAdapter: ConvertNormToXmlOutputPort,
 ) : LoadNormAsXmlUseCase {
 
-    override fun loadNormAsXml(query: LoadNormAsXmlUseCase.Query): Mono<String> {
-        val eliQuery =
-            GetNormByEliOutputPort.Query(
-                query.printAnnouncementGazette,
-                query.announcementOrCitationYear,
-                query.printAnnouncementPage,
-            )
+  override fun loadNormAsXml(query: LoadNormAsXmlUseCase.Query): Mono<String> {
+    val eliQuery =
+        GetNormByEliOutputPort.Query(
+            query.printAnnouncementGazette,
+            query.announcementOrCitationYear,
+            query.printAnnouncementPage,
+        )
 
-        return getNormByEliAdapter
-            .getNormByEli(eliQuery)
-            .map { norm -> ConvertNormToXmlOutputPort.Command(norm) }
-            .flatMap { command -> convertNormToXmlAdapter.convertNormToXml(command) }
-    }
+    return getNormByEliAdapter
+        .getNormByEli(eliQuery)
+        .map { norm -> ConvertNormToXmlOutputPort.Command(norm) }
+        .flatMap { command -> convertNormToXmlAdapter.convertNormToXml(command) }
+  }
 }

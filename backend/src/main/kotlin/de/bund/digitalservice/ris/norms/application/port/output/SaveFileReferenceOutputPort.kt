@@ -5,7 +5,7 @@ import de.bund.digitalservice.ris.norms.domain.entity.Norm
 import reactor.core.publisher.Mono
 
 fun interface SaveFileReferenceOutputPort {
-    fun saveFileReference(command: Command): Mono<Boolean>
+  fun saveFileReference(command: Command): Mono<Boolean>
 
-    data class Command(val fileReference: FileReference, val norm: Norm)
+  data class Command(val fileReference: FileReference, val norm: Norm)
 }

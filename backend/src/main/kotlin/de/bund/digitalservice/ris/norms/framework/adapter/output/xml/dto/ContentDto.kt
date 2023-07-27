@@ -15,12 +15,12 @@ data class ContentDto(
     var listMarkerGrandparent: String? = null,
     var listMarkerParent: String? = null,
 ) {
-    var markerClean: String? = null
-        get() {
-            return if (field == null) {
-                marker?.replace(Regex("[^a-zA-Z0-9]"), "")
-            } else {
-                field
-            }
-        }
+  var markerClean: String? = null
+    get() {
+      return if (field == null) {
+        marker?.replace(Regex("[^a-zA-Z0-9]"), "")
+      } else {
+        field
+      }
+    }
 }

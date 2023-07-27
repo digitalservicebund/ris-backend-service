@@ -10,15 +10,14 @@ import reactor.core.publisher.Mono
 @Service
 class LoadNormService(private val getNormByGuidPort: GetNormByGuidOutputPort) : LoadNormUseCase {
 
-    companion object {
-        private val logger = LoggerFactory.getLogger(LoadNormService::class.java)
-    }
+  companion object {
+    private val logger = LoggerFactory.getLogger(LoadNormService::class.java)
+  }
 
-    override fun loadNorm(query: LoadNormUseCase.Query): Mono<Norm> {
-        val guidQuery = GetNormByGuidOutputPort.Query(query.guid)
-        return getNormByGuidPort.getNormByGuid(guidQuery).doOnError {
-                exception ->
-            logger.error("Error occurred while loading a norm:", exception)
-        }
+  override fun loadNorm(query: LoadNormUseCase.Query): Mono<Norm> {
+    val guidQuery = GetNormByGuidOutputPort.Query(query.guid)
+    return getNormByGuidPort.getNormByGuid(guidQuery).doOnError { exception ->
+      logger.error("Error occurred while loading a norm:", exception)
     }
+  }
 }

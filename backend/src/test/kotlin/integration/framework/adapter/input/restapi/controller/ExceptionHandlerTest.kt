@@ -28,31 +28,30 @@ import org.springframework.web.client.HttpServerErrorException
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @AutoConfigureDataR2dbc
 class ExceptionHandlerTest : PostgresTestcontainerIntegrationTest() {
-    @Autowired
-    lateinit var webClient: WebTestClient
+  @Autowired lateinit var webClient: WebTestClient
 
-    @MockkBean
-    lateinit var loadNormService: LoadNormUseCase
+  @MockkBean lateinit var loadNormService: LoadNormUseCase
 
-    @Test
-    fun `it shows proper message on internal server error`() {
-        val message = "Internal Server Error"
-        val exception = HttpServerErrorException(
+  @Test
+  fun `it shows proper message on internal server error`() {
+    val message = "Internal Server Error"
+    val exception =
+        HttpServerErrorException(
             HttpStatus.INTERNAL_SERVER_ERROR,
             message,
         )
-        every { loadNormService.loadNorm(any()) } throws exception
+    every { loadNormService.loadNorm(any()) } throws exception
 
-        webClient
-            .mutateWith(csrf())
-            .get()
-            .uri("/api/v1/norms/" + "2fb72e06-60c4-4912-9f27-0a776a91852d")
-            .exchange()
-            .expectStatus()
-            .is5xxServerError
-            .expectBody()
-            .json(
-                """
+    webClient
+        .mutateWith(csrf())
+        .get()
+        .uri("/api/v1/norms/" + "2fb72e06-60c4-4912-9f27-0a776a91852d")
+        .exchange()
+        .expectStatus()
+        .is5xxServerError
+        .expectBody()
+        .json(
+            """
                 {
                   "errors" : [
                       {
@@ -62,18 +61,13 @@ class ExceptionHandlerTest : PostgresTestcontainerIntegrationTest() {
                       }
                   ]
                 }
-                """.trimIndent(),
-            )
-    }
+                """
+                .trimIndent(),
+        )
+  }
 
-    @Test
-    fun `it shows proper message on page not found`() {
-        webClient
-            .mutateWith(csrf())
-            .get()
-            .uri("/api/v1/normss")
-            .exchange()
-            .expectStatus()
-            .isNotFound
-    }
+  @Test
+  fun `it shows proper message on page not found`() {
+    webClient.mutateWith(csrf()).get().uri("/api/v1/normss").exchange().expectStatus().isNotFound
+  }
 }

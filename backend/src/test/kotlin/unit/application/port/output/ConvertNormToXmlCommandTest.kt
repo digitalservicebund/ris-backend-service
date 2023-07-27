@@ -6,11 +6,11 @@ import utils.createRandomNorm
 
 class ConvertNormToXmlCommandTest {
 
-    @Test
-    fun `can create command with a norm`() {
-        val norm = createRandomNorm()
-        val command = ConvertNormToXmlOutputPort.Command(norm)
+  @Test
+  fun `can create command with a norm`() {
+    val norm = createRandomNorm()
+    val command = ConvertNormToXmlOutputPort.Command(norm)
 
-        assertThat(command.norm).isEqualTo(norm)
-    }
+    assertThat(command.norm).isEqualTo(norm)
+  }
 }

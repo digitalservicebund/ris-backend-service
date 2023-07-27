@@ -8,33 +8,39 @@ import de.bund.digitalservice.ris.norms.conventions.predicate.AKotlinStaticClass
 import de.bund.digitalservice.ris.norms.conventions.predicate.Predicates
 
 object Conditions {
-    fun beAKotlinStaticClass() = ArchCondition.from<JavaClass>(be(AKotlinStaticClass()))
+  fun beAKotlinStaticClass() = ArchCondition.from<JavaClass>(be(AKotlinStaticClass()))
 
-    fun haveAMethodWithName(methodName: String) =
-        ArchCondition.from<JavaClass>(Predicates.haveAMethodWithName(methodName))
+  fun haveAMethodWithName(methodName: String) =
+      ArchCondition.from<JavaClass>(Predicates.haveAMethodWithName(methodName))
 
-    fun haveExactNumberOfMethods(number: Int) =
-        ArchCondition.from<JavaClass>(Predicates.haveExactNumberOfMethods(number))
-    fun haveNoMethod() = ArchCondition.from<JavaClass>(Predicates.haveNoMethod())
-    fun haveASingleMethod() = ArchCondition.from<JavaClass>(Predicates.haveASingleMethod())
+  fun haveExactNumberOfMethods(number: Int) =
+      ArchCondition.from<JavaClass>(Predicates.haveExactNumberOfMethods(number))
 
-    fun haveExactNumberOfParameters(number: Int) =
-        ArchCondition.from<JavaMethod>(Predicates.haveExactNumberOfParameters(number))
-    fun haveNoParameter() = ArchCondition.from<JavaMethod>(Predicates.haveNoParameter())
-    fun haveASingleParameter() = ArchCondition.from<JavaMethod>(Predicates.haveASingleParameter())
+  fun haveNoMethod() = ArchCondition.from<JavaClass>(Predicates.haveNoMethod())
 
-    fun haveAParameterWithTypeName(typeName: String) =
-        ArchCondition.from<JavaMethod>(Predicates.haveAParameterWithTypeName(typeName))
+  fun haveASingleMethod() = ArchCondition.from<JavaClass>(Predicates.haveASingleMethod())
 
-    fun haveAMethodWithNameLikeClassPrefix(classPostfix: String) =
-        HaveAMethodWithNameLikeClassPrefix(classPostfix)
+  fun haveExactNumberOfParameters(number: Int) =
+      ArchCondition.from<JavaMethod>(Predicates.haveExactNumberOfParameters(number))
 
-    fun implementExactNumberOfInterfaces(number: Int) =
-        ArchCondition.from<JavaClass>(Predicates.implementExactNumberOfInterfaces(number))
-    fun implementNoInterface() = ArchCondition.from<JavaClass>(Predicates.implementNoInterface())
-    fun implementASingleInterface() =
-        ArchCondition.from<JavaClass>(Predicates.implementASingleInterface())
+  fun haveNoParameter() = ArchCondition.from<JavaMethod>(Predicates.haveNoParameter())
 
-    fun implementInterfaceWithSamePrefix(classPostfix: String, interfacePostfix: String) =
-        ImplementInterfaceWithSamePrefix(classPostfix, interfacePostfix)
+  fun haveASingleParameter() = ArchCondition.from<JavaMethod>(Predicates.haveASingleParameter())
+
+  fun haveAParameterWithTypeName(typeName: String) =
+      ArchCondition.from<JavaMethod>(Predicates.haveAParameterWithTypeName(typeName))
+
+  fun haveAMethodWithNameLikeClassPrefix(classPostfix: String) =
+      HaveAMethodWithNameLikeClassPrefix(classPostfix)
+
+  fun implementExactNumberOfInterfaces(number: Int) =
+      ArchCondition.from<JavaClass>(Predicates.implementExactNumberOfInterfaces(number))
+
+  fun implementNoInterface() = ArchCondition.from<JavaClass>(Predicates.implementNoInterface())
+
+  fun implementASingleInterface() =
+      ArchCondition.from<JavaClass>(Predicates.implementASingleInterface())
+
+  fun implementInterfaceWithSamePrefix(classPostfix: String, interfacePostfix: String) =
+      ImplementInterfaceWithSamePrefix(classPostfix, interfacePostfix)
 }

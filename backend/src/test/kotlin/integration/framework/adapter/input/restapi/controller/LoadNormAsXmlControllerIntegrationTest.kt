@@ -12,6 +12,9 @@ import de.bund.digitalservice.ris.norms.framework.adapter.output.database.NormsS
 import de.bund.digitalservice.ris.norms.framework.adapter.output.database.PostgresTestcontainerIntegrationTest
 import de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto.NormDto
 import de.bund.digitalservice.ris.norms.framework.adapter.output.xml.ToLegalDocMLConverter
+import java.time.Duration
+import java.time.LocalDate
+import java.util.*
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeAll
@@ -31,52 +34,50 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.springframework.test.web.reactive.server.WebTestClient
 import reactor.test.StepVerifier
 import utils.factory.norm
-import java.time.Duration
-import java.time.LocalDate
-import java.util.*
 
 @ExtendWith(SpringExtension::class)
-@Import(FlywayConfig::class, NormsService::class, ToLegalDocMLConverter::class, LoadNormAsXmlService::class)
+@Import(
+    FlywayConfig::class,
+    NormsService::class,
+    ToLegalDocMLConverter::class,
+    LoadNormAsXmlService::class)
 @WebFluxTest(controllers = [LoadNormAsXmlController::class])
 @WithMockUser
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @AutoConfigureDataR2dbc
 class LoadNormAsXmlControllerIntegrationTest : PostgresTestcontainerIntegrationTest() {
-    @Autowired
-    lateinit var webClient: WebTestClient
+  @Autowired lateinit var webClient: WebTestClient
 
-    @Autowired
-    private lateinit var client: DatabaseClient
+  @Autowired private lateinit var client: DatabaseClient
 
-    @Autowired
-    lateinit var normsService: NormsService
+  @Autowired lateinit var normsService: NormsService
 
-    @Autowired
-    lateinit var loadNormAsXmlService: LoadNormAsXmlService
+  @Autowired lateinit var loadNormAsXmlService: LoadNormAsXmlService
 
-    @Autowired
-    lateinit var toLegalDocMLConverter: ToLegalDocMLConverter
+  @Autowired lateinit var toLegalDocMLConverter: ToLegalDocMLConverter
 
-    private lateinit var template: R2dbcEntityTemplate
+  private lateinit var template: R2dbcEntityTemplate
 
-    @BeforeAll
-    fun setup() {
-        template = R2dbcEntityTemplate(client, PostgresDialect.INSTANCE)
-    }
+  @BeforeAll
+  fun setup() {
+    template = R2dbcEntityTemplate(client, PostgresDialect.INSTANCE)
+  }
 
-    @AfterEach
-    fun cleanUp() {
-        template.delete(NormDto::class.java).all().block(Duration.ofSeconds(1))
-    }
+  @AfterEach
+  fun cleanUp() {
+    template.delete(NormDto::class.java).all().block(Duration.ofSeconds(1))
+  }
 
-    @Test
-    fun `it correctly loads a norm with metadata sections via api`() {
-        val date = LocalDate.of(2022, 10, 10)
-        val citationDateSection = MetadataSection(
+  @Test
+  fun `it correctly loads a norm with metadata sections via api`() {
+    val date = LocalDate.of(2022, 10, 10)
+    val citationDateSection =
+        MetadataSection(
             MetadataSectionName.CITATION_DATE,
             listOf(Metadatum(date, MetadatumType.DATE)),
         )
-        val printAnnouncementSection = MetadataSection(
+    val printAnnouncementSection =
+        MetadataSection(
             MetadataSectionName.OFFICIAL_REFERENCE,
             listOf(),
             1,
@@ -90,17 +91,20 @@ class LoadNormAsXmlControllerIntegrationTest : PostgresTestcontainerIntegrationT
                 ),
             ),
         )
-        val norm = Norm(
+    val norm =
+        Norm(
             guid = UUID.randomUUID(),
             metadataSections = listOf(citationDateSection, printAnnouncementSection),
         )
-        val saveCommand = SaveNormOutputPort.Command(norm)
-        normsService.saveNorm(saveCommand)
-            .`as`(StepVerifier::create)
-            .expectNextCount(1)
-            .verifyComplete()
+    val saveCommand = SaveNormOutputPort.Command(norm)
+    normsService
+        .saveNorm(saveCommand)
+        .`as`(StepVerifier::create)
+        .expectNextCount(1)
+        .verifyComplete()
 
-        val result = webClient
+    val result =
+        webClient
             .mutateWith(csrf())
             .get()
             .uri("/api/v1/norms/xml/eli/bgbl-1/2022/s3")
@@ -110,6 +114,6 @@ class LoadNormAsXmlControllerIntegrationTest : PostgresTestcontainerIntegrationT
             .expectBody()
             .returnResult()
 
-        assertThat(result.toString()).contains("<akn:FRBRuri value=\"eli/bgbl-1/2022/s3\"/>")
-    }
+    assertThat(result.toString()).contains("<akn:FRBRuri value=\"eli/bgbl-1/2022/s3\"/>")
+  }
 }

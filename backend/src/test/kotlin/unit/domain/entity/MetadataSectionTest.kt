@@ -9,65 +9,67 @@ import org.assertj.core.api.Assertions.catchException
 import org.junit.jupiter.api.Test
 
 class MetadataSectionTest {
-    private val unofficialLongTitle = Metadatum("unofficialLongTitle", UNOFFICIAL_LONG_TITLE)
-    private val unofficialShortTitle = Metadatum("unofficialShortTitle", UNOFFICIAL_SHORT_TITLE)
+  private val unofficialLongTitle = Metadatum("unofficialLongTitle", UNOFFICIAL_LONG_TITLE)
+  private val unofficialShortTitle = Metadatum("unofficialShortTitle", UNOFFICIAL_SHORT_TITLE)
 
-    @Test
-    fun `can create metadataSection for headings and abbreviations`() {
-        val section = MetadataSection(
+  @Test
+  fun `can create metadataSection for headings and abbreviations`() {
+    val section =
+        MetadataSection(
             MetadataSectionName.NORM,
             listOf(unofficialLongTitle, unofficialShortTitle),
         )
 
-        assertThat(section.name).isEqualTo(MetadataSectionName.NORM)
-        assertThat(section.metadata).isEqualTo(listOf(unofficialLongTitle, unofficialShortTitle))
-        assertThat(section.sections).isNull()
-        assertThat(section.order).isEqualTo(1)
-    }
+    assertThat(section.name).isEqualTo(MetadataSectionName.NORM)
+    assertThat(section.metadata).isEqualTo(listOf(unofficialLongTitle, unofficialShortTitle))
+    assertThat(section.sections).isNull()
+    assertThat(section.order).isEqualTo(1)
+  }
 
-    @Test
-    fun `can create metadataSection with different order`() {
-        val section = MetadataSection(
+  @Test
+  fun `can create metadataSection with different order`() {
+    val section =
+        MetadataSection(
             MetadataSectionName.NORM,
             listOf(unofficialLongTitle, unofficialShortTitle),
             5,
         )
 
-        assertThat(section.order).isEqualTo(5)
-    }
+    assertThat(section.order).isEqualTo(5)
+  }
 
-    @Test
-    fun `it throws an illegal argument exception if child sections are incorrect`() {
-        val section = MetadataSection(
+  @Test
+  fun `it throws an illegal argument exception if child sections are incorrect`() {
+    val section =
+        MetadataSection(
             MetadataSectionName.NORM,
             listOf(unofficialLongTitle, unofficialShortTitle),
         )
-        val exception = catchException {
-            MetadataSection(
-                MetadataSectionName.NORM,
-                listOf(unofficialLongTitle, unofficialShortTitle),
-                1,
-                listOf(section),
-            )
-        }
-
-        assertThat(exception).isInstanceOf(IllegalArgumentException::class.java)
-        assertThat(exception.message)
-            .isEqualTo("Incorrect children for section '${section.name}'")
+    val exception = catchException {
+      MetadataSection(
+          MetadataSectionName.NORM,
+          listOf(unofficialLongTitle, unofficialShortTitle),
+          1,
+          listOf(section),
+      )
     }
 
-    @Test
-    fun `it throws an illegal argument exception if metadata do not belong`() {
-        val unofficialReference = Metadatum("unofficialReference", UNOFFICIAL_REFERENCE)
-        val exception = catchException {
-            MetadataSection(
-                MetadataSectionName.LEAD,
-                listOf(unofficialLongTitle, unofficialReference),
-            )
-        }
+    assertThat(exception).isInstanceOf(IllegalArgumentException::class.java)
+    assertThat(exception.message).isEqualTo("Incorrect children for section '${section.name}'")
+  }
 
-        assertThat(exception).isInstanceOf(IllegalArgumentException::class.java)
-        assertThat(exception.message)
-            .isEqualTo("Incorrect metadata for section '${MetadataSectionName.LEAD}'")
+  @Test
+  fun `it throws an illegal argument exception if metadata do not belong`() {
+    val unofficialReference = Metadatum("unofficialReference", UNOFFICIAL_REFERENCE)
+    val exception = catchException {
+      MetadataSection(
+          MetadataSectionName.LEAD,
+          listOf(unofficialLongTitle, unofficialReference),
+      )
     }
+
+    assertThat(exception).isInstanceOf(IllegalArgumentException::class.java)
+    assertThat(exception.message)
+        .isEqualTo("Incorrect metadata for section '${MetadataSectionName.LEAD}'")
+  }
 }

@@ -11,15 +11,14 @@ class GetFileService(
     private val getFileOutputPort: GetFileOutputPort,
 ) : GetFileUseCase {
 
-    companion object {
-        private val logger = LoggerFactory.getLogger(GetFileService::class.java)
+  companion object {
+    private val logger = LoggerFactory.getLogger(GetFileService::class.java)
+  }
+
+  override fun getFile(command: GetFileUseCase.Command): Mono<ByteArray> {
+    val queryGetFile = GetFileOutputPort.Query(command.hash)
+    return getFileOutputPort.getFile(queryGetFile).doOnError { exception ->
+      logger.error("Error occurred while retrieving file:", exception)
     }
-    override fun getFile(command: GetFileUseCase.Command): Mono<ByteArray> {
-        val queryGetFile = GetFileOutputPort.Query(command.hash)
-        return getFileOutputPort.getFile(queryGetFile)
-            .doOnError {
-                    exception ->
-                logger.error("Error occurred while retrieving file:", exception)
-            }
-    }
+  }
 }

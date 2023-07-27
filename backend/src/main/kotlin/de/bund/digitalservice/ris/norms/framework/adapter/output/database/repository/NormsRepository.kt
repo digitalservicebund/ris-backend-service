@@ -1,20 +1,21 @@
 package de.bund.digitalservice.ris.norms.framework.adapter.output.database.repository
 
 import de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto.NormDto
+import java.util.*
 import org.springframework.data.r2dbc.repository.Query
 import org.springframework.data.repository.reactive.ReactiveCrudRepository
 import org.springframework.stereotype.Repository
 import reactor.core.publisher.Mono
-import java.util.*
 
 @Repository
 interface NormsRepository : ReactiveCrudRepository<NormDto, UUID> {
 
-    fun deleteByGuid(normGuid: UUID): Mono<Void>
-    fun findByGuid(norm: UUID): Mono<NormDto>
+  fun deleteByGuid(normGuid: UUID): Mono<Void>
 
-    @Query(
-        """
+  fun findByGuid(norm: UUID): Mono<NormDto>
+
+  @Query(
+      """
         SELECT DISTINCT n.guid
         FROM norms n
         LEFT JOIN metadata_sections ms ON n.guid = ms.norm_guid
@@ -68,6 +69,6 @@ interface NormsRepository : ReactiveCrudRepository<NormDto, UUID> {
                 )
         LIMIT 1
     """,
-    )
-    fun findNormByEli(gazette: String, year: String, page: String): Mono<String>
+  )
+  fun findNormByEli(gazette: String, year: String, page: String): Mono<String>
 }

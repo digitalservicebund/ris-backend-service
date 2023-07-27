@@ -11,96 +11,97 @@ import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType
 import de.bund.digitalservice.ris.norms.domain.value.NormCategory
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.controller.EditNormFrameControllerTest
+import java.time.LocalDate
+import java.util.Random
 import org.apache.commons.lang3.RandomStringUtils
 import org.jeasy.random.EasyRandom
 import org.jeasy.random.EasyRandomParameters
 import org.jeasy.random.FieldPredicates.inClass
 import org.jeasy.random.FieldPredicates.named
-import java.time.LocalDate
-import java.util.Random
 
 fun createRandomNormFameProperties(): EditNormFrameUseCase.NormFrameProperties {
-    val parameters: EasyRandomParameters =
-        EasyRandomParameters()
-            .randomize(named("metadataSections")) {
-                createSimpleSections()
-            }
-    return EasyRandom(parameters).nextObject(EditNormFrameUseCase.NormFrameProperties::class.java)
+  val parameters: EasyRandomParameters =
+      EasyRandomParameters().randomize(named("metadataSections")) { createSimpleSections() }
+  return EasyRandom(parameters).nextObject(EditNormFrameUseCase.NormFrameProperties::class.java)
 }
 
-fun createRandomEditNormRequestTestSchema(): EditNormFrameControllerTest.NormFramePropertiesTestRequestSchema {
-    val parameters: EasyRandomParameters =
-        EasyRandomParameters().randomize(named(".+Date\$")) {
+fun createRandomEditNormRequestTestSchema():
+    EditNormFrameControllerTest.NormFramePropertiesTestRequestSchema {
+  val parameters: EasyRandomParameters =
+      EasyRandomParameters()
+          .randomize(named(".+Date\$")) {
             // needed for string date fields
             createRandomLocalDateInString()
-        }
-            .randomize(named("metadataSections")) {
-                createSimpleSections()
-            }.randomize(named("documentNormCategory")) {
-                NormCategory.values().random().name
-            }
-    return EasyRandom(parameters)
-        .nextObject(EditNormFrameControllerTest.NormFramePropertiesTestRequestSchema::class.java)
+          }
+          .randomize(named("metadataSections")) { createSimpleSections() }
+          .randomize(named("documentNormCategory")) { NormCategory.values().random().name }
+  return EasyRandom(parameters)
+      .nextObject(EditNormFrameControllerTest.NormFramePropertiesTestRequestSchema::class.java)
 }
 
 fun createRandomNorm(): Norm {
-    val parameters: EasyRandomParameters =
-        EasyRandomParameters().randomize(named("citationYear")) {
-            EasyRandom(EasyRandomParameters().stringLengthRange(4, 4)).nextObject(String::class.java)
-        }.randomize(named("metadataSections")) {
-            emptyList<MetadataSection>()
-        }.randomize(named("files")) {
-            emptyList<FileReference>()
-        }.randomize(named("articles")) {
-            emptyList<FileReference>()
-        }
-    return EasyRandom(parameters).nextObject(Norm::class.java)
+  val parameters: EasyRandomParameters =
+      EasyRandomParameters()
+          .randomize(named("citationYear")) {
+            EasyRandom(EasyRandomParameters().stringLengthRange(4, 4))
+                .nextObject(String::class.java)
+          }
+          .randomize(named("metadataSections")) { emptyList<MetadataSection>() }
+          .randomize(named("files")) { emptyList<FileReference>() }
+          .randomize(named("articles")) { emptyList<FileReference>() }
+  return EasyRandom(parameters).nextObject(Norm::class.java)
 }
 
 fun createRandomNormWithCitationDateAndArticles(): Norm {
-    return createRandomNorm().copy(
-        metadataSections = listOf(
-            MetadataSection(MetadataSectionName.CITATION_DATE, listOf(Metadatum(LocalDate.parse("2002-02-02"), MetadatumType.DATE))),
-        ),
-        articles = listOf(
-            createRandomArticle().copy(paragraphs = listOf(createRandomParagraph())),
-            createRandomArticle().copy(paragraphs = listOf(createRandomParagraph())),
-        ),
-    )
+  return createRandomNorm()
+      .copy(
+          metadataSections =
+              listOf(
+                  MetadataSection(
+                      MetadataSectionName.CITATION_DATE,
+                      listOf(Metadatum(LocalDate.parse("2002-02-02"), MetadatumType.DATE))),
+              ),
+          articles =
+              listOf(
+                  createRandomArticle().copy(paragraphs = listOf(createRandomParagraph())),
+                  createRandomArticle().copy(paragraphs = listOf(createRandomParagraph())),
+              ),
+      )
 }
 
 fun createRandomFileReference(): FileReference {
-    return EasyRandom().nextObject(FileReference::class.java)
+  return EasyRandom().nextObject(FileReference::class.java)
 }
 
 fun createRandomArticle(): Article {
-    val parameters: EasyRandomParameters =
-        EasyRandomParameters().randomize(named("marker").and(inClass(Article::class.java))) {
-            "§ " + Random().nextInt(1, 50).toString()
-        }
-    return EasyRandom(parameters).nextObject(Article::class.java)
+  val parameters: EasyRandomParameters =
+      EasyRandomParameters().randomize(named("marker").and(inClass(Article::class.java))) {
+        "§ " + Random().nextInt(1, 50).toString()
+      }
+  return EasyRandom(parameters).nextObject(Article::class.java)
 }
 
 fun createRandomParagraph(): Paragraph {
-    val parameters: EasyRandomParameters =
-        EasyRandomParameters().randomize(named("marker").and(inClass(Paragraph::class.java))) {
-            "(" + Random().nextInt(1, 50).toString() + ")"
-        }
-    return EasyRandom(parameters).nextObject(Paragraph::class.java)
+  val parameters: EasyRandomParameters =
+      EasyRandomParameters().randomize(named("marker").and(inClass(Paragraph::class.java))) {
+        "(" + Random().nextInt(1, 50).toString() + ")"
+      }
+  return EasyRandom(parameters).nextObject(Paragraph::class.java)
 }
 
 private fun createRandomLocalDateInString(): String {
-    return EasyRandom().nextObject(LocalDate::class.java).toString()
+  return EasyRandom().nextObject(LocalDate::class.java).toString()
 }
 
-fun createSimpleSections(): List<MetadataSection> = listOf(
-    MetadataSection(
-        MetadataSectionName.NORM,
-        listOf(
-            Metadatum("foo", MetadatumType.KEYWORD, 0),
-            Metadatum("bar", MetadatumType.KEYWORD, 1),
+fun createSimpleSections(): List<MetadataSection> =
+    listOf(
+        MetadataSection(
+            MetadataSectionName.NORM,
+            listOf(
+                Metadatum("foo", MetadatumType.KEYWORD, 0),
+                Metadatum("bar", MetadatumType.KEYWORD, 1),
+            ),
         ),
-    ),
-)
+    )
 
 fun randomString(length: Int = 10): String = RandomStringUtils.randomAlphabetic(length)

@@ -20,30 +20,33 @@ import reactor.core.publisher.Mono
 @Tag(name = OpenApiConfiguration.NORMS_TAG)
 class LoadNormAsXmlController(private val loadNormAsXmlService: LoadNormAsXmlUseCase) {
 
-    @GetMapping(
-        path = [
-            "/norms/xml/eli/{printAnnouncementGazette}/{announcementYear}/s{printAnnouncementPage}",
-            "/open/norms/xml/eli/{printAnnouncementGazette}/{announcementYear}/s{printAnnouncementPage}",
-        ],
-    )
-    @Operation(summary = "Load a single as XML in LegalDocML.de format by eli", description = "Retrieves a single norm in LegalDocML.de xml format using its ELI")
-    @ApiResponses(
-        ApiResponse(responseCode = "200", description = "Norm was found"),
-        ApiResponse(responseCode = "404", description = "No norm found for this query"),
-    )
-    fun loadNormAsXml(
-        @PathVariable printAnnouncementGazette: String,
-        @PathVariable announcementYear: String,
-        @PathVariable printAnnouncementPage: String,
-    ): Mono<ResponseEntity<String>> {
-        val query = LoadNormAsXmlUseCase.Query(printAnnouncementGazette, announcementYear, printAnnouncementPage)
+  @GetMapping(
+      path =
+          [
+              "/norms/xml/eli/{printAnnouncementGazette}/{announcementYear}/s{printAnnouncementPage}",
+              "/open/norms/xml/eli/{printAnnouncementGazette}/{announcementYear}/s{printAnnouncementPage}",
+          ],
+  )
+  @Operation(
+      summary = "Load a single as XML in LegalDocML.de format by eli",
+      description = "Retrieves a single norm in LegalDocML.de xml format using its ELI")
+  @ApiResponses(
+      ApiResponse(responseCode = "200", description = "Norm was found"),
+      ApiResponse(responseCode = "404", description = "No norm found for this query"),
+  )
+  fun loadNormAsXml(
+      @PathVariable printAnnouncementGazette: String,
+      @PathVariable announcementYear: String,
+      @PathVariable printAnnouncementPage: String,
+  ): Mono<ResponseEntity<String>> {
+    val query =
+        LoadNormAsXmlUseCase.Query(
+            printAnnouncementGazette, announcementYear, printAnnouncementPage)
 
-        return loadNormAsXmlService
-            .loadNormAsXml(query)
-            .map { normAsXml ->
-                ResponseEntity.ok().contentType(APPLICATION_XML).body(normAsXml)
-            }
-            .defaultIfEmpty(ResponseEntity.notFound().build())
-            .onErrorReturn(ResponseEntity.internalServerError().build())
-    }
+    return loadNormAsXmlService
+        .loadNormAsXml(query)
+        .map { normAsXml -> ResponseEntity.ok().contentType(APPLICATION_XML).body(normAsXml) }
+        .defaultIfEmpty(ResponseEntity.notFound().build())
+        .onErrorReturn(ResponseEntity.internalServerError().build())
+  }
 }

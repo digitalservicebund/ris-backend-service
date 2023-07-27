@@ -1,17 +1,17 @@
 package utils.factory
 
 import de.bund.digitalservice.ris.norms.domain.entity.FileReference
-import utils.randomString
 import java.time.LocalDateTime
 import java.util.*
+import utils.randomString
 
 fun file(block: FileBuilder.() -> Unit): FileReference = FileBuilder().apply(block).build()
 
 class FileBuilder {
-    var name: String = randomString(10) + ".zip"
-    var hash: String = randomString(32)
-    var createdAt: LocalDateTime = LocalDateTime.now()
-    var guid: UUID = UUID.randomUUID()
+  var name: String = randomString(10) + ".zip"
+  var hash: String = randomString(32)
+  var createdAt: LocalDateTime = LocalDateTime.now()
+  var guid: UUID = UUID.randomUUID()
 
-    fun build(): FileReference = FileReference(name, hash, createdAt, guid)
+  fun build(): FileReference = FileReference(name, hash, createdAt, guid)
 }
