@@ -293,6 +293,48 @@ class NormAbbreviationIntegrationTest {
             });
   }
 
+  @Test
+  void testGetNormAbbreviationByAwesomeSearchQuery_returnInTheRightOrder() {
+    generateLookupValues();
+    repository.refreshMaterializedViews().block();
+
+    String query = "search query";
+
+    risWebTestClient
+        .withDefaultLogin()
+        .get()
+        .uri("/api/v1/caselaw/normabbreviation/search?q=" + query + "&pg=0&sz=30")
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody(NormAbbreviation[].class)
+        .consumeWith(
+            response -> {
+              assertThat(response.getResponseBody())
+                  .extracting("id")
+                  .containsExactly(
+                      NORM_ABBREVIATION_UUID_2, NORM_ABBREVIATION_UUID_4, NORM_ABBREVIATION_UUID_3);
+            });
+
+    query = "letter abbreviation query";
+
+    risWebTestClient
+        .withDefaultLogin()
+        .get()
+        .uri("/api/v1/caselaw/normabbreviation/search?q=" + query + "&pg=0&sz=30")
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody(NormAbbreviation[].class)
+        .consumeWith(
+            response -> {
+              assertThat(response.getResponseBody())
+                  .extracting("id")
+                  .containsExactly(
+                      NORM_ABBREVIATION_UUID_3, NORM_ABBREVIATION_UUID_2, NORM_ABBREVIATION_UUID_4);
+            });
+  }
+
   private void generateLookupValues() {
     NormAbbreviationDTO normAbbreviationDTO =
         NormAbbreviationDTO.builder()
