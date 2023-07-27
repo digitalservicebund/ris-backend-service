@@ -118,18 +118,16 @@ export function euAnnouncementSummary(data: Metadata): VNode {
   const explanations = data.EXPLANATION ?? []
 
   if (midSection.length > 0) {
-    summarizerData.push(new SummarizerDataSet(midSection, { separator: "," }))
+    summarizerData.push(new SummarizerDataSet(midSection))
   }
   if (additionalInfos.length > 0) {
-    summarizerData.push(
-      new SummarizerDataSet(additionalInfos, { separator: "," }),
-    )
+    summarizerData.push(new SummarizerDataSet(additionalInfos))
   }
   if (explanations.length > 0) {
-    summarizerData.push(new SummarizerDataSet(explanations, { separator: "," }))
+    summarizerData.push(new SummarizerDataSet(explanations))
   }
 
-  return normsMetadataSummarizer(summarizerData)
+  return normsMetadataSummarizer(summarizerData, "")
 }
 
 export function otherOfficialReferenceSummary(data: Metadata): VNode {
