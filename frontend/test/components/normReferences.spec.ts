@@ -38,7 +38,7 @@ function generateNormReference(options?: {
   return normReference
 }
 
-describe.skip("Norm references", async () => {
+describe("Norm references", async () => {
   const normAbbreviation: NormAbbreviation = {
     abbreviation: "1000g-BefV",
   }
@@ -52,7 +52,7 @@ describe.skip("Norm references", async () => {
     Promise.resolve({ status: 200, data: dropdownAbbreviationItems }),
   )
 
-  it("renders empty normreference in edit mode, when no normReferences in list", async () => {
+  it("renders empty norm reference in edit mode, when no norm references in list", async () => {
     renderComponent()
     expect(screen.getAllByLabelText("Listen Eintrag").length).toBe(1)
     expect(screen.getByLabelText("RIS-Abkürzung der Norm")).toBeInTheDocument()
@@ -66,7 +66,7 @@ describe.skip("Norm references", async () => {
     ).not.toBeInTheDocument()
   })
 
-  it("renders norms as list entries", () => {
+  it("renders norm references as list entries", () => {
     const modelValue: NormReference[] = [
       generateNormReference({ singleNorm: "§ 123" }),
       generateNormReference({ singleNorm: "§ 345" }),
@@ -106,19 +106,6 @@ describe.skip("Norm references", async () => {
     })
 
     expect(screen.getAllByLabelText("Listen Eintrag").length).toBe(2)
-    const buttonList = screen.getAllByLabelText("Eintrag löschen")
-    await user.click(buttonList[0])
-    expect(screen.getAllByLabelText("Listen Eintrag").length).toBe(1)
-  })
-
-  it("correctly deletes no added by search", async () => {
-    const modelValue: NormReference[] = [
-      generateNormReference(),
-      generateNormReference(),
-    ]
-    const { user } = renderComponent({ modelValue })
-    const normsRefernces = screen.getAllByLabelText("Listen Eintrag")
-    expect(normsRefernces.length).toBe(2)
     const buttonList = screen.getAllByLabelText("Eintrag löschen")
     await user.click(buttonList[0])
     expect(screen.getAllByLabelText("Listen Eintrag").length).toBe(1)
