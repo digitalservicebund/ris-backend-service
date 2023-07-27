@@ -178,7 +178,7 @@ dependencies {
   // 1.0.23 as that is affected by CVE-2022-31684
   implementation "io.projectreactor.netty:reactor-netty-http:1.1.8"
 
-  def flywayCore = "org.flywaydb:flyway-core:9.18.0"
+  def flywayCore = "org.flywaydb:flyway-core:9.21.1"
   implementation flywayCore
   migrationImplementation flywayCore
 
