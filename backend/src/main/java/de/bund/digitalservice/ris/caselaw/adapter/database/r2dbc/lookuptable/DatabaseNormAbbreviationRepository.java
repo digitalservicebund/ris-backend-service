@@ -27,7 +27,7 @@ public interface DatabaseNormAbbreviationRepository
           + " official_long_title,"
           + " official_short_title,"
           + " source"
-          + " from norm_abbreviation_search"
+          + " from norm_abbreviation"
           + " where lower(abbreviation) = :directInput"
           + " limit :size")
   Flux<NormAbbreviationDTO> findByAwesomeSearchQuery_rank4(String directInput, Integer size);
@@ -43,7 +43,7 @@ public interface DatabaseNormAbbreviationRepository
           + " official_long_title,"
           + " official_short_title,"
           + " source"
-          + " from norm_abbreviation_search"
+          + " from norm_abbreviation"
           + " where lower(official_letter_abbreviation) = :directInput"
           + " limit :size")
   Flux<NormAbbreviationDTO> findByAwesomeSearchQuery_rank3(String directInput, Integer size);
@@ -59,7 +59,7 @@ public interface DatabaseNormAbbreviationRepository
           + " official_long_title,"
           + " official_short_title,"
           + " source"
-          + " from norm_abbreviation_search"
+          + " from norm_abbreviation"
           + " where lower(abbreviation) like :directInput || '%'"
           + " limit :size")
   Flux<NormAbbreviationDTO> findByAwesomeSearchQuery_rank2(String directInput, Integer size);
@@ -75,7 +75,7 @@ public interface DatabaseNormAbbreviationRepository
           + " official_long_title,"
           + " official_short_title,"
           + " source"
-          + " from norm_abbreviation_search"
+          + " from norm_abbreviation"
           + " where lower(official_letter_abbreviation) like :directInput || '%'"
           + " limit :size")
   Flux<NormAbbreviationDTO> findByAwesomeSearchQuery_rank1(String directInput, Integer size);
