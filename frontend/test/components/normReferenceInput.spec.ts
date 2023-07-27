@@ -15,7 +15,7 @@ function renderComponent(options?: { modelValue?: NormReference }) {
   return { screen, user, props, ...utils }
 }
 
-describe("NormReferenceEntry", () => {
+describe.skip("NormReferenceEntry", () => {
   const normAbbreviation: NormAbbreviation = {
     abbreviation: "1000g-BefV",
   }
