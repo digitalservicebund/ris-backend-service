@@ -79,7 +79,7 @@ public class PostgresNormAbbreviationRepositoryImpl implements NormAbbreviationR
                     .collectList()
                     .map(
                         rank3list -> {
-                          list.addAll(rank3list);
+                          rank3list.stream().filter(e -> !list.contains(e)).forEach(list::add);
                           return list;
                         });
               }
@@ -93,7 +93,7 @@ public class PostgresNormAbbreviationRepositoryImpl implements NormAbbreviationR
                     .collectList()
                     .map(
                         rank2list -> {
-                          list.addAll(rank2list);
+                          rank2list.stream().filter(e -> !list.contains(e)).forEach(list::add);
                           return list;
                         });
               }
@@ -107,7 +107,7 @@ public class PostgresNormAbbreviationRepositoryImpl implements NormAbbreviationR
                     .collectList()
                     .map(
                         rank1list -> {
-                          list.addAll(rank1list);
+                          rank1list.stream().filter(e -> !list.contains(e)).forEach(list::add);
                           return list;
                         });
               }
@@ -122,7 +122,9 @@ public class PostgresNormAbbreviationRepositoryImpl implements NormAbbreviationR
                     .collectList()
                     .map(
                         rankWeightedList -> {
-                          list.addAll(rankWeightedList);
+                          rankWeightedList.stream()
+                              .filter(e -> !list.contains(e))
+                              .forEach(list::add);
                           return list;
                         });
               }
