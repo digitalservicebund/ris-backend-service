@@ -66,7 +66,7 @@ describe("Norm references", async () => {
     ).not.toBeInTheDocument()
   })
 
-  it("renders activeCitations as list entries", () => {
+  it("renders norms as list entries", () => {
     const modelValue: NormReference[] = [
       generateNormReference({ singleNorm: "§ 123" }),
       generateNormReference({ singleNorm: "§ 345" }),
@@ -111,14 +111,14 @@ describe("Norm references", async () => {
     expect(screen.getAllByLabelText("Listen Eintrag").length).toBe(1)
   })
 
-  it("correctly deletes active citations added by search", async () => {
+  it("correctly deletes no added by search", async () => {
     const modelValue: NormReference[] = [
       generateNormReference(),
       generateNormReference(),
     ]
     const { user } = renderComponent({ modelValue })
-    const activeCitations = screen.getAllByLabelText("Listen Eintrag")
-    expect(activeCitations.length).toBe(2)
+    const normsRefernces = screen.getAllByLabelText("Listen Eintrag")
+    expect(normsRefernces.length).toBe(2)
     const buttonList = screen.getAllByLabelText("Eintrag löschen")
     await user.click(buttonList[0])
     expect(screen.getAllByLabelText("Listen Eintrag").length).toBe(1)
@@ -130,8 +130,8 @@ describe("Norm references", async () => {
       generateNormReference(),
     ]
     const { user } = renderComponent({ modelValue })
-    const activeCitations = screen.getAllByLabelText("Listen Eintrag")
-    expect(activeCitations.length).toBe(2)
+    const normsRefernces = screen.getAllByLabelText("Listen Eintrag")
+    expect(normsRefernces.length).toBe(2)
     const button = screen.getByLabelText("Weitere Angabe")
     await user.click(button)
     expect(screen.getAllByLabelText("Listen Eintrag").length).toBe(3)
