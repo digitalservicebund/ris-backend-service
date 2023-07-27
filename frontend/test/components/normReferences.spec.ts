@@ -38,7 +38,7 @@ function generateNormReference(options?: {
   return normReference
 }
 
-describe("Norm references", async () => {
+describe("Norm references", () => {
   const normAbbreviation: NormAbbreviation = {
     abbreviation: "1000g-BefV",
   }
@@ -52,7 +52,7 @@ describe("Norm references", async () => {
     Promise.resolve({ status: 200, data: dropdownAbbreviationItems }),
   )
 
-  it("renders empty norm reference in edit mode, when no norm references in list", async () => {
+  it("renders empty norm reference in edit mode, when no norm references in list", () => {
     renderComponent()
     expect(screen.getAllByLabelText("Listen Eintrag").length).toBe(1)
     expect(screen.getByLabelText("RIS-Abkürzung der Norm")).toBeInTheDocument()
@@ -125,16 +125,20 @@ describe("Norm references", async () => {
   })
 
   it("displays error in list and edit component when fields missing", async () => {
-    const modelValue: NormReference[] = [generateNormReference()]
+    const modelValue: NormReference[] = [
+      generateNormReference({
+        normAbbreviation: { abbreviation: "CDE" },
+      }),
+    ]
     const { user } = renderComponent({ modelValue })
-    await screen.findByText(/ABC, 01.02.2022, 2022/)
+    await screen.findByText(/CDE, 01.02.2022, 2022/)
     const editButton = screen.getByLabelText("Eintrag bearbeiten")
     await user.click(editButton)
 
     const abbreviationInput = await screen.findByLabelText(
       "RIS-Abkürzung der Norm",
     )
-    await screen.getAllByLabelText("Auswahl zurücksetzen")[1].click()
+    screen.getAllByLabelText("Auswahl zurücksetzen")[1].click()
     await user.clear(abbreviationInput)
     expect(abbreviationInput).toHaveValue("")
     await user.click(screen.getByLabelText("Norm speichern"))
