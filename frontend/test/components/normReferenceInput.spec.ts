@@ -120,8 +120,9 @@ describe("NormReferenceEntry", () => {
     const abbreviationField = screen.getByLabelText("RIS-Abkürzung der Norm")
 
     await user.type(abbreviationField, "1000")
-    const dropdownItems = screen.getByLabelText("dropdown-option")
-    expect(dropdownItems).toBeInTheDocument()
+    const dropdownItems = screen.getAllByLabelText(
+      "dropdown-option",
+    ) as HTMLElement[]
     expect(dropdownItems[0]).toHaveTextContent("1000g-BefV")
     await user.click(dropdownItems[0])
 
