@@ -6,7 +6,6 @@ import java.nio.ByteBuffer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -22,8 +21,7 @@ public class LookupTableImporterController {
 
   private final LookupTableImporterService service;
 
-  public LookupTableImporterController(
-      LookupTableImporterService service, JdbcTemplate jdbcTemplate) {
+  public LookupTableImporterController(LookupTableImporterService service) {
     this.service = service;
   }
 
