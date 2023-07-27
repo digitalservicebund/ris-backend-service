@@ -79,13 +79,11 @@ class JurisXmlExporterResponseProcessorTest {
     when(store.getFolder("unprocessable")).thenReturn(unprocessable);
 
     when(importMessageWrapper.getMessage()).thenReturn(importMessage);
-    when(importMessageWrapper.messageIsActionable()).thenReturn(true);
     when(importMessageWrapper.getDocumentNumber()).thenReturn(DOCUMENT_NUMBER);
     when(wrapperFactory.getResponsibleWrapper(importMessage))
         .thenReturn(Optional.of(importMessageWrapper));
 
     when(processMessageWrapper.getMessage()).thenReturn(processMessage);
-    when(processMessageWrapper.messageIsActionable()).thenReturn(true);
     when(processMessageWrapper.getDocumentNumber()).thenReturn(DOCUMENT_NUMBER);
     when(wrapperFactory.getResponsibleWrapper(processMessage))
         .thenReturn(Optional.of(processMessageWrapper));
@@ -162,18 +160,6 @@ class JurisXmlExporterResponseProcessorTest {
             any(),
             argThat(list -> list.get(0).equals(new Attachment("test.txt", "ÄÜÖäüöß"))),
             eq("report-" + DOCUMENT_NUMBER));
-  }
-
-  @Test
-  void testMessageGetsNotProcessedIfNotActionable() throws MessagingException {
-    when(inbox.getMessages()).thenReturn(new Message[] {processMessage});
-    when(processMessageWrapper.messageIsActionable()).thenReturn(false);
-
-    responseProcessor.readEmails();
-
-    verifyNoInteractions(mailSender);
-    verify(inbox, times(1)).copyMessages(new Message[] {processMessage}, unprocessable);
-    verify(processMessage, times(1)).setFlag(Flag.DELETED, true);
   }
 
   @Test
@@ -340,7 +326,6 @@ class JurisXmlExporterResponseProcessorTest {
   void testImportMessageSetsPublishedStatus() throws MessagingException {
     when(inbox.getMessages()).thenReturn(new Message[] {processMessage});
 
-    when(processMessageWrapper.messageIsActionable()).thenReturn(true);
     when(processMessageWrapper.isPublished()).thenReturn(Optional.of(true));
     when(processMessageWrapper.hasErrors()).thenReturn(false);
 

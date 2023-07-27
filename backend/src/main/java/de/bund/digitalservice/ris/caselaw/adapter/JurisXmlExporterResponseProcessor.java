@@ -21,9 +21,7 @@ import java.time.Instant;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import org.owasp.html.HtmlPolicyBuilder;
 import org.owasp.html.PolicyFactory;
 import org.slf4j.Logger;
@@ -70,17 +68,10 @@ public class JurisXmlExporterResponseProcessor {
       Folder inbox = store.getFolder("INBOX");
       inbox.open(Folder.READ_WRITE);
 
-      Map<Boolean, List<MessageWrapper>> partitionedMessages =
+      List<MessageWrapper> processedMessages =
           Arrays.stream(inbox.getMessages())
               .map(wrapperFactory::getResponsibleWrapper)
               .flatMap(Optional::stream)
-              .collect(Collectors.partitioningBy(MessageWrapper::messageIsActionable));
-
-      List<MessageWrapper> unprocessableMessages = partitionedMessages.get(false);
-      moveMessages(unprocessableMessages, inbox, store.getFolder("unprocessable"));
-
-      List<MessageWrapper> processedMessages =
-          partitionedMessages.get(true).stream()
               .sorted(
                   Comparator.comparing(wrapper -> wrapper instanceof ImportMessageWrapper ? 0 : 1))
               .map(this::processMessage)

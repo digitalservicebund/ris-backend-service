@@ -7,7 +7,6 @@ import de.bund.digitalservice.ris.caselaw.domain.HttpMailSender;
 import de.bund.digitalservice.ris.caselaw.domain.MailStoreFactory;
 import de.bund.digitalservice.ris.domain.export.juris.response.ImportMessageWrapper;
 import de.bund.digitalservice.ris.domain.export.juris.response.ProcessMessageWrapper;
-import de.bund.digitalservice.ris.domain.export.juris.response.StagingProcessMessageWrapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -52,10 +51,5 @@ public class JurisConfig {
   @Bean
   public Class<ProcessMessageWrapper> processMessageHandler() {
     return ProcessMessageWrapper.class;
-  }
-
-  @Bean
-  public Class<StagingProcessMessageWrapper> stagingProcessMessageHandler() {
-    return StagingProcessMessageWrapper.class;
   }
 }
