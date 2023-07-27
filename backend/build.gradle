@@ -84,7 +84,6 @@ dependencies {
   implementation "org.springframework.boot:spring-boot-starter-data-r2dbc"
   implementation "org.springframework.boot:spring-boot-starter-data-jpa"
 
-
   // => CVE-2023-1370
   implementation "net.minidev:json-smart:2.5.0"
   // CVE-2022-3171
@@ -108,7 +107,6 @@ dependencies {
   implementation platform("software.amazon.awssdk:bom:2.20.12")
   implementation "software.amazon.awssdk:netty-nio-client"
   implementation "software.amazon.awssdk:s3"
-
 
   // CVE-2022-42004, CVE-2022-42003
   implementation "com.fasterxml.jackson:jackson-bom:2.15.2"
@@ -238,7 +236,7 @@ task integrationTest(type: Test) {
   // So that running integration test require running unit tests first,
   // and we won"t even attempt running integration tests when there are
   // failing unit tests.
-  // dependsOn test
+  dependsOn test
   finalizedBy jacocoTestReport
 }
 check.dependsOn integrationTest
