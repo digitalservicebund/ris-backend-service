@@ -29,6 +29,9 @@ configurations {
 repositories {
   mavenCentral()
   maven {
+    url "https://plugins.gradle.org/m2/"
+  }
+  maven {
     url = uri("https://maven.pkg.github.com/digitalservicebund/neuris-juris-xml-export")
     credentials {
       username = System.getenv("GH_PACKAGES_REPOSITORY_USER")
@@ -62,28 +65,30 @@ testlogger { theme "mocha" }
 dependencies {
 
   implementation "org.springframework.boot:spring-boot-starter-actuator"
-  // => CVE-2023-20873
-  implementation "org.springframework.boot:spring-boot-actuator-autoconfigure"
   implementation "org.springframework.boot:spring-boot-starter-security"
-  // => CVE-2023-34035
-  implementation "org.springframework.security:spring-security-core:6.1.2"
   implementation "org.springframework.boot:spring-boot-starter-oauth2-client"
-  // => CVE-2023-1370
-  implementation "net.minidev:json-smart:2.5.0"
-  // => CVE-2023-20863
-  implementation "org.springframework:spring-core:6.0.8"
+  // => CVE-2023-34035
+  implementation "org.springframework.security:spring-security-web:6.1.2"
+  implementation "org.springframework.security:spring-security-config:6.1.2"
+  implementation "org.springframework:spring-web:6.0.11"
+  implementation "org.springframework:spring-webflux:6.0.11"
+  implementation "org.springdoc:springdoc-openapi-starter-webflux-ui:2.1.0"
+
   implementation("org.springframework.boot:spring-boot-starter-webflux") {
     exclude group: "io.netty", module: "netty-tcnative-classes"
     because("CVE-2021-43797, not using Tomcat")
   }
   implementation "org.springframework.cloud:spring-cloud-starter-kubernetes-client-config:2.1.3"
-
   implementation "org.springframework.boot:spring-boot-starter-data-redis"
   implementation "org.springframework.session:spring-session-data-redis"
+  implementation "org.springframework.boot:spring-boot-starter-data-r2dbc"
+  implementation "org.springframework.boot:spring-boot-starter-data-jpa"
 
+
+  // => CVE-2023-1370
+  implementation "net.minidev:json-smart:2.5.0"
   // CVE-2022-3171
   implementation "com.google.protobuf:protobuf-java:3.23.3"
-
   // => CVE-2021-37136, CVE-2021-37137, CVE-2021-43797
   implementation("io.netty:netty-all:4.1.94.Final") {
     exclude group: "io.netty", module: "netty-tcnative-classes"
@@ -91,27 +96,19 @@ dependencies {
   }
   implementation "io.projectreactor.netty:reactor-netty-core:1.1.8"
   implementation("org.yaml:snakeyaml:2.0")
-
   implementation "ch.qos.logback:logback-classic:1.4.5"
   implementation "ch.qos.logback:logback-core:1.4.5"
-
-  implementation "org.springframework.boot:spring-boot-starter-data-r2dbc"
   implementation "org.postgresql:r2dbc-postgresql:1.0.1.RELEASE"
   implementation "io.r2dbc:r2dbc-spi:1.0.0.RELEASE"
   implementation "io.r2dbc:r2dbc-pool:1.0.0.RELEASE"
-
-  implementation "org.springframework.boot:spring-boot-starter-data-jpa"
   implementation "org.postgresql:postgresql:42.6.0"
-
   implementation "com.sendinblue:sib-api-v3-sdk:7.0.0"
   // CVE-2017-1000487
   implementation "org.codehaus.plexus:plexus-utils:3.0.16"
-
   implementation platform("software.amazon.awssdk:bom:2.20.12")
   implementation "software.amazon.awssdk:netty-nio-client"
   implementation "software.amazon.awssdk:s3"
-  implementation "org.springdoc:springdoc-openapi-starter-webflux-ui:2.0.4"
-  implementation "org.springdoc:springdoc-openapi-webflux-ui:1.7.0"
+
 
   // CVE-2022-42004, CVE-2022-42003
   implementation "com.fasterxml.jackson:jackson-bom:2.15.2"
@@ -241,7 +238,7 @@ task integrationTest(type: Test) {
   // So that running integration test require running unit tests first,
   // and we won"t even attempt running integration tests when there are
   // failing unit tests.
-  dependsOn test
+  // dependsOn test
   finalizedBy jacocoTestReport
 }
 check.dependsOn integrationTest
