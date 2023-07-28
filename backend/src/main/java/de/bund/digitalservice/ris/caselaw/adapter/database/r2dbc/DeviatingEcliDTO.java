@@ -7,6 +7,9 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Table;
 
+/**
+ * Abweichender <a href="https://de.wikipedia.org/wiki/European_Case_Law_Identifier">ECLI</a> einer Dokumentationseinheit.
+ */
 @Data
 @Builder
 @NoArgsConstructor
