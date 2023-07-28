@@ -3,6 +3,7 @@ import { generateString } from "../../../../test-helper/dataGenerators"
 import {
   fillActiveCitationInputs,
   navigateToCategories,
+  navigateToPublication,
   waitForSaving,
 } from "~/e2e/caselaw/e2e-utils"
 import { caselawTest as test } from "~/e2e/caselaw/fixtures"
@@ -211,6 +212,19 @@ test.describe("active citations", () => {
     documentNumber,
     prefilledDocumentUnit,
   }) => {
+    await navigateToPublication(
+      page,
+      prefilledDocumentUnit.documentNumber || "",
+    )
+
+    await page
+      .locator("[aria-label='Dokumentationseinheit veröffentlichen']")
+      .click()
+    await expect(page.locator("text=Email wurde versendet")).toBeVisible()
+
+    await expect(page.locator("text=Xml Email Abgabe -")).toBeVisible()
+    await expect(page.locator("text=in Veröffentlichung")).toBeVisible()
+
     await navigateToCategories(page, documentNumber)
     await expect(page.getByText(documentNumber)).toBeVisible()
 

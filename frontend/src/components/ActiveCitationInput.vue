@@ -146,7 +146,6 @@ onMounted(() => {
 watch(
   activeCitation,
   () => {
-    validateRequiredInput()
     if (
       !activeCitation.value.citationStyleIsSet &&
       !activeCitation.value.isEmpty
