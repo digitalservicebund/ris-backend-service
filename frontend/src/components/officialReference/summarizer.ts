@@ -110,21 +110,30 @@ export function euAnnouncementSummary(data: Metadata): VNode {
   const firstPart = [data.YEAR?.[0], data.SERIES?.[0], data.NUMBER?.[0]].filter(
     (f): f is string => f !== undefined,
   )
-
   const page = data?.PAGE?.[0]
+  const additionalInfos = data.ADDITIONAL_INFO ?? []
+  const explanations = data.EXPLANATION ?? []
+
+  if (
+    firstPart.length > 0 ||
+    page ||
+    additionalInfos.length > 0 ||
+    explanations.length > 0
+  ) {
+    summarizerData.push(new SummarizerDataSet(["Amtsblatt der EU"]))
+  }
 
   if (firstPart.length > 0) {
     if (page) {
       firstPart[firstPart.length - 1] = `${firstPart[firstPart.length - 1]},`
     }
     summarizerData.push(new SummarizerDataSet(firstPart))
+  } else if (summarizerData.length === 1 && page) {
+    summarizerData[0] = new SummarizerDataSet(["Amtsblatt der EU,"])
   }
   if (page) {
     summarizerData.push(new SummarizerDataSet([page]))
   }
-
-  const additionalInfos = data.ADDITIONAL_INFO ?? []
-  const explanations = data.EXPLANATION ?? []
 
   if (additionalInfos.length > 0) {
     summarizerData.push(new SummarizerDataSet(additionalInfos))
