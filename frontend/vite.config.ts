@@ -1,4 +1,5 @@
 import path from "path"
+import { sentryVitePlugin } from "@sentry/vite-plugin"
 import vue from "@vitejs/plugin-vue"
 import { defineConfig } from "vite"
 import EnvironmentPlugin from "vite-plugin-environment"
@@ -6,6 +7,9 @@ import Pages from "vite-plugin-pages"
 
 // https://vitejs.dev/config/
 export default defineConfig({
+  build: {
+    sourcemap: true, // Source map generation must be turned on
+  },
   server: {
     port: 3000, // Required for vite to be accessible when running as part of docker compose setup
   },
@@ -15,6 +19,11 @@ export default defineConfig({
       dirs: "src/routes",
     }),
     EnvironmentPlugin({ BACKEND_HOST: "" }),
+    sentryVitePlugin({
+      authToken: process.env.SENTRY_AUTH_TOKEN,
+      org: "digitalservice",
+      project: "ris-frontend",
+    }),
   ],
   test: {
     setupFiles: ["test/setup.ts"],

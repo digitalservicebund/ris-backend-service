@@ -24,6 +24,8 @@ fileignoreconfig:
   checksum: 4f1b9d21ab8630ae8ffb0feae26fb6054ce586bfffd0048f4c1aeaab73694b28
 - filename: backend/src/test/kotlin/unit/application/service/GetFileServiceTest.kt
   checksum: d96870998f33fa027c52da99d9eb8192d161b3585eae9a272a2777cdf2d524af
+- filename: frontend/src/main.ts
+  checksum: d9868da0cf94aea46ddde4aa46d09ddce39be6ad31843cdb98a46f78bf95ade5
 scopeconfig:
 - scope: node
 allowed_patterns:
