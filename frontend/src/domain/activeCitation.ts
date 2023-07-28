@@ -46,7 +46,7 @@ export default class ActiveCitation
     return this.missingRequiredFields.length > 0
   }
 
-  get missingRequiredFields(): string[] {
+  get missingRequiredFields() {
     return ActiveCitation.requiredFields.filter((field) =>
       this.fieldIsEmpty(this[field]),
     )
@@ -58,14 +58,14 @@ export default class ActiveCitation
     )
   }
 
+  get citationStyleIsSet(): boolean {
+    return !!this.citationStyle?.uuid
+  }
+
   private fieldIsEmpty(
     value: ActiveCitation[(typeof ActiveCitation.fields)[number]],
   ): boolean {
-    if (value === undefined || !value || value === null) {
-      return true
-    }
-
-    return false
+    return !value
   }
 }
 

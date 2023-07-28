@@ -1,9 +1,10 @@
 <script lang="ts" setup>
-import { computed, onMounted, ref } from "vue"
+import { computed, onMounted, ref, watch } from "vue"
 import SearchResultList, {
   SearchResults,
 } from "./proceedingDecisions/SearchResultList.vue"
 import ComboboxInput from "@/components/ComboboxInput.vue"
+import { useValidations } from "@/composables/useValidations"
 import ActiveCitation from "@/domain/activeCitation"
 import { CitationStyle } from "@/domain/citationStyle"
 import LinkedDocumentUnit from "@/domain/linkedDocumentUnit"
@@ -13,7 +14,6 @@ import DateInput from "@/shared/components/input/DateInput.vue"
 import InputField from "@/shared/components/input/InputField.vue"
 import TextButton from "@/shared/components/input/TextButton.vue"
 import TextInput from "@/shared/components/input/TextInput.vue"
-import { ValidationError } from "@/shared/components/input/types"
 import Pagination, { Page } from "@/shared/components/Pagination.vue"
 
 const props = defineProps<{
@@ -27,7 +27,15 @@ const emit = defineEmits<{
 }>()
 
 const activeCitation = ref(new ActiveCitation({ ...props.modelValue }))
-const validationErrors = ref<ValidationError[]>()
+
+const {
+  validationErrors,
+  addValidationError,
+  removeValidationError,
+  getValidationErrors,
+  resetValidations,
+} = useValidations<(typeof ActiveCitation.fields)[number]>()
+
 const searchRunning = ref(false)
 
 const activeCitationStyle = computed({
@@ -41,12 +49,11 @@ const activeCitationStyle = computed({
         }
       : undefined,
   set: (newValue) => {
-    const newActiveCitationStyle = { ...newValue } as CitationStyle
-    const activeCitationRef = new ActiveCitation({
-      ...activeCitation.value,
-      citationStyle: newActiveCitationStyle,
-    })
-    activeCitation.value = activeCitationRef
+    if (newValue?.label) {
+      activeCitation.value.citationStyle = { ...newValue }
+    } else {
+      activeCitation.value.citationStyle = undefined
+    }
   },
 })
 
@@ -89,15 +96,11 @@ function handleSearch() {
 }
 
 async function validateRequiredInput() {
-  validationErrors.value = []
-  if (activeCitation.value.missingRequiredFields?.length) {
-    activeCitation.value.missingRequiredFields.forEach((missingField) => {
-      validationErrors.value?.push({
-        defaultMessage: "Pflichtfeld nicht befüllt",
-        field: missingField,
-      })
-    })
-  }
+  resetValidations()
+
+  activeCitation.value.missingRequiredFields.forEach((missingField) =>
+    addValidationError("Pflichtfeld nicht befüllt", missingField),
+  )
 }
 
 async function addActiveCitation() {
@@ -139,6 +142,22 @@ onMounted(() => {
   }
   activeCitation.value = new ActiveCitation({ ...props.modelValue })
 })
+
+watch(
+  activeCitation,
+  () => {
+    validateRequiredInput()
+    if (
+      !activeCitation.value.citationStyleIsSet &&
+      !activeCitation.value.isEmpty
+    ) {
+      addValidationError("Pflichtfeld nicht befüllt", "citationStyle")
+    } else if (activeCitation.value.citationStyleIsSet) {
+      removeValidationError("Pflichtfeld nicht befüllt", "citationStyle")
+    }
+  },
+  { deep: true },
+)
 </script>
 
 <template>
@@ -148,9 +167,7 @@ onMounted(() => {
       v-slot="slotProps"
       class="mb-16 border-b-1 border-gray-400"
       label="Art der Zitierung *"
-      :validation-error="
-        validationErrors?.find((err) => err.field === 'citationStyle')
-      "
+      :validation-error="getValidationErrors('citationStyle')"
     >
       <ComboboxInput
         id="activeCitationPredicate"
@@ -167,9 +184,7 @@ onMounted(() => {
         id="activeCitationCourt"
         v-slot="slotProps"
         label="Gericht *"
-        :validation-error="
-          validationErrors?.find((err) => err.field === 'court')
-        "
+        :validation-error="getValidationErrors('court')"
       >
         <ComboboxInput
           id="activeCitationCourt"
@@ -186,9 +201,7 @@ onMounted(() => {
         id="activeCitationDecisionDate"
         v-slot="slotProps"
         label="Entscheidungsdatum *"
-        :validation-error="
-          validationErrors?.find((err) => err.field === 'decisionDate')
-        "
+        :validation-error="getValidationErrors('decisionDate')"
       >
         <DateInput
           id="activeCitationDecisionDate"
