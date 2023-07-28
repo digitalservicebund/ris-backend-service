@@ -53,14 +53,9 @@ export default class ActiveCitation
   }
 
   get isEmpty(): boolean {
-    let isEmpty = true
-
-    ActiveCitation.fields.map((field) => {
-      if (!this.fieldIsEmpty(this[field])) {
-        isEmpty = false
-      }
-    })
-    return isEmpty
+    return ActiveCitation.fields.every((field) =>
+      this.fieldIsEmpty(this[field]),
+    )
   }
 
   private fieldIsEmpty(
