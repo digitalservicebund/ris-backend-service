@@ -2,6 +2,7 @@ package de.bund.digitalservice.ris.norms.domain.specification.metadatum
 
 import de.bund.digitalservice.ris.norms.domain.entity.Metadatum
 import de.bund.digitalservice.ris.norms.domain.specification.Specification
+import de.bund.digitalservice.ris.norms.domain.specification.SpecificationResult
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.ADDITIONAL_INFO
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.AGE_OF_MAJORITY_INDICATION
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.ANNOUNCEMENT_GAZETTE
@@ -79,78 +80,84 @@ import java.time.LocalTime
 
 val hasValidValueType =
     object : Specification<Metadatum<*>> {
-      override fun isSatisfiedBy(instance: Metadatum<*>): Boolean {
-        return when (instance.type) {
-          KEYWORD,
-          UNOFFICIAL_LONG_TITLE,
-          UNOFFICIAL_SHORT_TITLE,
-          UNOFFICIAL_ABBREVIATION,
-          UNOFFICIAL_REFERENCE,
-          DIVERGENT_DOCUMENT_NUMBER,
-          REFERENCE_NUMBER,
-          DEFINITION,
-          RIS_ABBREVIATION_INTERNATIONAL_LAW,
-          AGE_OF_MAJORITY_INDICATION,
-          VALIDITY_RULE,
-          LEAD_JURISDICTION,
-          LEAD_UNIT,
-          PARTICIPATION_TYPE,
-          PARTICIPATION_INSTITUTION,
-          SUBJECT_FNA,
-          SUBJECT_PREVIOUS_FNA,
-          SUBJECT_GESTA,
-          SUBJECT_BGB_3,
-          YEAR,
-          RANGE_START,
-          RANGE_END,
-          ANNOUNCEMENT_GAZETTE,
-          NUMBER,
-          PAGE,
-          ADDITIONAL_INFO,
-          EXPLANATION,
-          ANNOUNCEMENT_MEDIUM,
-          AREA_OF_PUBLICATION,
-          NUMBER_OF_THE_PUBLICATION_IN_THE_RESPECTIVE_AREA,
-          SERIES,
-          DECIDING_BODY,
-          EU_GOVERNMENT_GAZETTE,
-          OTHER_OFFICIAL_REFERENCE,
-          ENTITY,
-          TYPE_NAME,
-          TEMPLATE_NAME,
-          EDITION,
-          TEXT,
-          LINK,
-          RELATED_DATA,
-          EXTERNAL_DATA_NOTE,
-          APPENDIX,
-          FOOTNOTE_REFERENCE,
-          FOOTNOTE_CHANGE,
-          FOOTNOTE_COMMENT,
-          FOOTNOTE_DECISION,
-          FOOTNOTE_STATE_LAW,
-          FOOTNOTE_EU_LAW,
-          FOOTNOTE_OTHER,
-          WORK_NOTE,
-          DESCRIPTION,
-          REFERENCE,
-          ENTRY_INTO_FORCE_DATE_NOTE,
-          NOTE,
-          ARTICLE,
-          OFFICIAL_LONG_TITLE,
-          OFFICIAL_SHORT_TITLE,
-          OFFICIAL_ABBREVIATION,
-          DOCUMENT_NUMBER,
-          DOCUMENT_CATEGORY,
-          COMPLETE_CITATION,
-          CELEX_NUMBER,
-          RIS_ABBREVIATION,
-          PROOF_INDICATION, -> instance.value is String
-          DATE -> instance.value is LocalDate
-          NORM_CATEGORY -> instance.value is NormCategory
-          RESOLUTION_MAJORITY -> instance.value is Boolean
-          UNDEFINED_DATE -> instance.value is UndefinedDate
-          TIME -> instance.value is LocalTime
-        }
+      override fun evaluate(instance: Metadatum<*>): SpecificationResult {
+        val typeIsCorreect =
+            when (instance.type) {
+              KEYWORD,
+              UNOFFICIAL_LONG_TITLE,
+              UNOFFICIAL_SHORT_TITLE,
+              UNOFFICIAL_ABBREVIATION,
+              UNOFFICIAL_REFERENCE,
+              DIVERGENT_DOCUMENT_NUMBER,
+              REFERENCE_NUMBER,
+              DEFINITION,
+              RIS_ABBREVIATION_INTERNATIONAL_LAW,
+              AGE_OF_MAJORITY_INDICATION,
+              VALIDITY_RULE,
+              LEAD_JURISDICTION,
+              LEAD_UNIT,
+              PARTICIPATION_TYPE,
+              PARTICIPATION_INSTITUTION,
+              SUBJECT_FNA,
+              SUBJECT_PREVIOUS_FNA,
+              SUBJECT_GESTA,
+              SUBJECT_BGB_3,
+              YEAR,
+              RANGE_START,
+              RANGE_END,
+              ANNOUNCEMENT_GAZETTE,
+              NUMBER,
+              PAGE,
+              ADDITIONAL_INFO,
+              EXPLANATION,
+              ANNOUNCEMENT_MEDIUM,
+              AREA_OF_PUBLICATION,
+              NUMBER_OF_THE_PUBLICATION_IN_THE_RESPECTIVE_AREA,
+              SERIES,
+              DECIDING_BODY,
+              EU_GOVERNMENT_GAZETTE,
+              OTHER_OFFICIAL_REFERENCE,
+              ENTITY,
+              TYPE_NAME,
+              TEMPLATE_NAME,
+              EDITION,
+              TEXT,
+              LINK,
+              RELATED_DATA,
+              EXTERNAL_DATA_NOTE,
+              APPENDIX,
+              FOOTNOTE_REFERENCE,
+              FOOTNOTE_CHANGE,
+              FOOTNOTE_COMMENT,
+              FOOTNOTE_DECISION,
+              FOOTNOTE_STATE_LAW,
+              FOOTNOTE_EU_LAW,
+              FOOTNOTE_OTHER,
+              WORK_NOTE,
+              DESCRIPTION,
+              REFERENCE,
+              ENTRY_INTO_FORCE_DATE_NOTE,
+              NOTE,
+              ARTICLE,
+              OFFICIAL_LONG_TITLE,
+              OFFICIAL_SHORT_TITLE,
+              OFFICIAL_ABBREVIATION,
+              DOCUMENT_NUMBER,
+              DOCUMENT_CATEGORY,
+              COMPLETE_CITATION,
+              CELEX_NUMBER,
+              RIS_ABBREVIATION,
+              PROOF_INDICATION, -> instance.value is String
+              DATE -> instance.value is LocalDate
+              NORM_CATEGORY -> instance.value is NormCategory
+              RESOLUTION_MAJORITY -> instance.value is Boolean
+              UNDEFINED_DATE -> instance.value is UndefinedDate
+              TIME -> instance.value is LocalTime
+            }
+
+        return SpecificationResult.from(
+            instance, "INVLID_METADATUM_VALUE_TYPE", "metatum has not the correct value type") {
+              typeIsCorreect
+            }
       }
     }

@@ -14,7 +14,7 @@ data class Norm(
     var files: List<FileReference> = listOf(),
 ) {
   init {
-    require(hasValidSections.isSatisfiedBy(this)) { "Incorrect section for metadata" }
+    hasValidSections.evaluate(this).throwWhenUnsatisfied()
   }
 
   val eli: Eli

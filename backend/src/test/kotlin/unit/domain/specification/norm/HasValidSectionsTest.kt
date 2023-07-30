@@ -39,7 +39,7 @@ class HasValidSectionsTest {
             ),
         )
 
-    assertThat(hasValidSections.isSatisfiedBy(instance)).isFalse()
+    assertThat(hasValidSections.evaluate(instance).isSatisfied).isFalse()
   }
 
   @Test
@@ -72,7 +72,7 @@ class HasValidSectionsTest {
             ),
         )
 
-    assertThat(hasValidSections.isSatisfiedBy(instance)).isTrue()
+    assertThat(hasValidSections.evaluate(instance).isSatisfied).isTrue()
   }
 
   @Test
@@ -86,7 +86,7 @@ class HasValidSectionsTest {
                 listOf(Metadatum("footnote reference", MetadatumType.FOOTNOTE_REFERENCE)),
             ),
         )
-    assertThat(hasValidSections.isSatisfiedBy(instance)).isTrue()
+    assertThat(hasValidSections.evaluate(instance).isSatisfied).isTrue()
   }
 
   @Test
@@ -113,7 +113,7 @@ class HasValidSectionsTest {
             ),
         )
 
-    assertThat(hasValidSections.isSatisfiedBy(instance)).isTrue()
+    assertThat(hasValidSections.evaluate(instance).isSatisfied).isTrue()
   }
 
   @Test
@@ -140,7 +140,7 @@ class HasValidSectionsTest {
             ),
         )
 
-    assertThat(hasValidSections.isSatisfiedBy(instance)).isTrue()
+    assertThat(hasValidSections.evaluate(instance).isSatisfied).isTrue()
   }
 
   @Test
@@ -156,6 +156,6 @@ class HasValidSectionsTest {
             ),
         )
 
-    assertThat(hasValidSections.isSatisfiedBy(instance)).isTrue()
+    assertThat(hasValidSections.evaluate(instance).isSatisfied).isTrue()
   }
 }

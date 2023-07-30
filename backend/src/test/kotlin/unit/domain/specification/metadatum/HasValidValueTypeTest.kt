@@ -38,315 +38,315 @@ class HasValidValueTypeTest {
   fun `it is satisfied if the value for a keyword is a string`() {
     val instance = getMockedMetadatum("foo", KEYWORD)
 
-    assertThat(hasValidValueType.isSatisfiedBy(instance)).isTrue()
+    assertThat(hasValidValueType.evaluate(instance).isSatisfied).isTrue()
   }
 
   @Test
   fun `it is not satisfied if the value for a keyword is not a string`() {
     val instance = getMockedMetadatum(103, KEYWORD)
 
-    assertThat(hasValidValueType.isSatisfiedBy(instance)).isFalse()
+    assertThat(hasValidValueType.evaluate(instance).isSatisfied).isFalse()
   }
 
   @Test
   fun `it is not satisfied if the value for a date is a string`() {
     val instance = getMockedMetadatum("citation date", DATE)
 
-    assertThat(hasValidValueType.isSatisfiedBy(instance)).isFalse()
+    assertThat(hasValidValueType.evaluate(instance).isSatisfied).isFalse()
   }
 
   @Test
   fun `it is not satisfied if the value for a range start is not a string`() {
     val instance = getMockedMetadatum(123, RANGE_START)
 
-    assertThat(hasValidValueType.isSatisfiedBy(instance)).isFalse()
+    assertThat(hasValidValueType.evaluate(instance).isSatisfied).isFalse()
   }
 
   @Test
   fun `it is not satisfied if the value for a range end is not a string`() {
     val instance = getMockedMetadatum(123, RANGE_END)
 
-    assertThat(hasValidValueType.isSatisfiedBy(instance)).isFalse()
+    assertThat(hasValidValueType.evaluate(instance).isSatisfied).isFalse()
   }
 
   @Test
   fun `it is not satisfied if the value for a resolution majority is a string`() {
     val instance = getMockedMetadatum("resolution majority", RESOLUTION_MAJORITY)
 
-    assertThat(hasValidValueType.isSatisfiedBy(instance)).isFalse()
+    assertThat(hasValidValueType.evaluate(instance).isSatisfied).isFalse()
   }
 
   @Test
   fun `it is not satisfied if the value for a norm category is a string`() {
     val instance = getMockedMetadatum("norm category", NORM_CATEGORY)
 
-    assertThat(hasValidValueType.isSatisfiedBy(instance)).isFalse()
+    assertThat(hasValidValueType.evaluate(instance).isSatisfied).isFalse()
   }
 
   @Test
   fun `it is not satisfied if the value for an undefined date is a string`() {
     val instance = getMockedMetadatum("undefined date", UNDEFINED_DATE)
 
-    assertThat(hasValidValueType.isSatisfiedBy(instance)).isFalse()
+    assertThat(hasValidValueType.evaluate(instance).isSatisfied).isFalse()
   }
 
   @Test
   fun `it is satisfied if the value for a text is a string`() {
     val instance = getMockedMetadatum("test text", TEXT)
 
-    assertThat(hasValidValueType.isSatisfiedBy(instance)).isTrue()
+    assertThat(hasValidValueType.evaluate(instance).isSatisfied).isTrue()
   }
 
   @Test
   fun `it is not satisfied if the value for a text is not string`() {
     val instance = getMockedMetadatum(123, TEXT)
 
-    assertThat(hasValidValueType.isSatisfiedBy(instance)).isFalse()
+    assertThat(hasValidValueType.evaluate(instance).isSatisfied).isFalse()
   }
 
   @Test
   fun `it is satisfied if the value for a link is a string`() {
     val instance = getMockedMetadatum("test link", LINK)
 
-    assertThat(hasValidValueType.isSatisfiedBy(instance)).isTrue()
+    assertThat(hasValidValueType.evaluate(instance).isSatisfied).isTrue()
   }
 
   @Test
   fun `it is not satisfied if the value for a link is not string`() {
     val instance = getMockedMetadatum(123, LINK)
 
-    assertThat(hasValidValueType.isSatisfiedBy(instance)).isFalse()
+    assertThat(hasValidValueType.evaluate(instance).isSatisfied).isFalse()
   }
 
   @Test
   fun `it is satisfied if the value for related data is a string`() {
     val instance = getMockedMetadatum("test related data", RELATED_DATA)
 
-    assertThat(hasValidValueType.isSatisfiedBy(instance)).isTrue()
+    assertThat(hasValidValueType.evaluate(instance).isSatisfied).isTrue()
   }
 
   @Test
   fun `it is not satisfied if the value for related data is not string`() {
     val instance = getMockedMetadatum(123, RELATED_DATA)
 
-    assertThat(hasValidValueType.isSatisfiedBy(instance)).isFalse()
+    assertThat(hasValidValueType.evaluate(instance).isSatisfied).isFalse()
   }
 
   @Test
   fun `it is satisfied if the value for an external data note is a string`() {
     val instance = getMockedMetadatum("test external data note", EXTERNAL_DATA_NOTE)
 
-    assertThat(hasValidValueType.isSatisfiedBy(instance)).isTrue()
+    assertThat(hasValidValueType.evaluate(instance).isSatisfied).isTrue()
   }
 
   @Test
   fun `it is not satisfied if the value for an external data note is not string`() {
     val instance = getMockedMetadatum(123, EXTERNAL_DATA_NOTE)
 
-    assertThat(hasValidValueType.isSatisfiedBy(instance)).isFalse()
+    assertThat(hasValidValueType.evaluate(instance).isSatisfied).isFalse()
   }
 
   @Test
   fun `it is satisfied if the value for appendix is a string`() {
     val instance = getMockedMetadatum("test appendix", APPENDIX)
 
-    assertThat(hasValidValueType.isSatisfiedBy(instance)).isTrue()
+    assertThat(hasValidValueType.evaluate(instance).isSatisfied).isTrue()
   }
 
   @Test
   fun `it is not satisfied if the value for an appendix is not string`() {
     val instance = getMockedMetadatum(123, APPENDIX)
 
-    assertThat(hasValidValueType.isSatisfiedBy(instance)).isFalse()
+    assertThat(hasValidValueType.evaluate(instance).isSatisfied).isFalse()
   }
 
   @Test
   fun `it is satisfied if the value for a footnote reference is a string`() {
     val instance = getMockedMetadatum("test text", FOOTNOTE_REFERENCE)
 
-    assertThat(hasValidValueType.isSatisfiedBy(instance)).isTrue()
+    assertThat(hasValidValueType.evaluate(instance).isSatisfied).isTrue()
   }
 
   @Test
   fun `it is not satisfied if the value for a footnote reference is not string`() {
     val instance = getMockedMetadatum(123, FOOTNOTE_REFERENCE)
 
-    assertThat(hasValidValueType.isSatisfiedBy(instance)).isFalse()
+    assertThat(hasValidValueType.evaluate(instance).isSatisfied).isFalse()
   }
 
   @Test
   fun `it is satisfied if the value for a footnote change is a string`() {
     val instance = getMockedMetadatum("test text", FOOTNOTE_CHANGE)
 
-    assertThat(hasValidValueType.isSatisfiedBy(instance)).isTrue()
+    assertThat(hasValidValueType.evaluate(instance).isSatisfied).isTrue()
   }
 
   @Test
   fun `it is not satisfied if the value for a footnote change is not string`() {
     val instance = getMockedMetadatum(123, FOOTNOTE_CHANGE)
 
-    assertThat(hasValidValueType.isSatisfiedBy(instance)).isFalse()
+    assertThat(hasValidValueType.evaluate(instance).isSatisfied).isFalse()
   }
 
   @Test
   fun `it is satisfied if the value for a footnote comment is a string`() {
     val instance = getMockedMetadatum("test text", FOOTNOTE_COMMENT)
 
-    assertThat(hasValidValueType.isSatisfiedBy(instance)).isTrue()
+    assertThat(hasValidValueType.evaluate(instance).isSatisfied).isTrue()
   }
 
   @Test
   fun `it is not satisfied if the value for a footnote comment is not string`() {
     val instance = getMockedMetadatum(123, FOOTNOTE_COMMENT)
 
-    assertThat(hasValidValueType.isSatisfiedBy(instance)).isFalse()
+    assertThat(hasValidValueType.evaluate(instance).isSatisfied).isFalse()
   }
 
   @Test
   fun `it is satisfied if the value for a footnote decision is a string`() {
     val instance = getMockedMetadatum("test text", FOOTNOTE_DECISION)
 
-    assertThat(hasValidValueType.isSatisfiedBy(instance)).isTrue()
+    assertThat(hasValidValueType.evaluate(instance).isSatisfied).isTrue()
   }
 
   @Test
   fun `it is not satisfied if the value for a footnote decision is not string`() {
     val instance = getMockedMetadatum(123, FOOTNOTE_DECISION)
 
-    assertThat(hasValidValueType.isSatisfiedBy(instance)).isFalse()
+    assertThat(hasValidValueType.evaluate(instance).isSatisfied).isFalse()
   }
 
   @Test
   fun `it is satisfied if the value for a footnote state law is a string`() {
     val instance = getMockedMetadatum("test text", FOOTNOTE_STATE_LAW)
 
-    assertThat(hasValidValueType.isSatisfiedBy(instance)).isTrue()
+    assertThat(hasValidValueType.evaluate(instance).isSatisfied).isTrue()
   }
 
   @Test
   fun `it is not satisfied if the value for a footnote state law is not string`() {
     val instance = getMockedMetadatum(123, FOOTNOTE_STATE_LAW)
 
-    assertThat(hasValidValueType.isSatisfiedBy(instance)).isFalse()
+    assertThat(hasValidValueType.evaluate(instance).isSatisfied).isFalse()
   }
 
   @Test
   fun `it is satisfied if the value for a footnote eu law is a string`() {
     val instance = getMockedMetadatum("test text", FOOTNOTE_EU_LAW)
 
-    assertThat(hasValidValueType.isSatisfiedBy(instance)).isTrue()
+    assertThat(hasValidValueType.evaluate(instance).isSatisfied).isTrue()
   }
 
   @Test
   fun `it is not satisfied if the value for a footnote eu law is not string`() {
     val instance = getMockedMetadatum(123, FOOTNOTE_EU_LAW)
 
-    assertThat(hasValidValueType.isSatisfiedBy(instance)).isFalse()
+    assertThat(hasValidValueType.evaluate(instance).isSatisfied).isFalse()
   }
 
   @Test
   fun `it is satisfied if the value for a footnote other is a string`() {
     val instance = getMockedMetadatum("test text", FOOTNOTE_OTHER)
 
-    assertThat(hasValidValueType.isSatisfiedBy(instance)).isTrue()
+    assertThat(hasValidValueType.evaluate(instance).isSatisfied).isTrue()
   }
 
   @Test
   fun `it is not satisfied if the value for a footnote other is not string`() {
     val instance = getMockedMetadatum(123, FOOTNOTE_OTHER)
 
-    assertThat(hasValidValueType.isSatisfiedBy(instance)).isFalse()
+    assertThat(hasValidValueType.evaluate(instance).isSatisfied).isFalse()
   }
 
   @Test
   fun `it is satisfied if the value for a work note is a string`() {
     val instance = getMockedMetadatum("test text", WORK_NOTE)
 
-    assertThat(hasValidValueType.isSatisfiedBy(instance)).isTrue()
+    assertThat(hasValidValueType.evaluate(instance).isSatisfied).isTrue()
   }
 
   @Test
   fun `it is not satisfied if the value for a work note is not string`() {
     val instance = getMockedMetadatum(123, WORK_NOTE)
 
-    assertThat(hasValidValueType.isSatisfiedBy(instance)).isFalse()
+    assertThat(hasValidValueType.evaluate(instance).isSatisfied).isFalse()
   }
 
   @Test
   fun `it is satisfied if the value for a description is a string`() {
     val instance = getMockedMetadatum("test text", DESCRIPTION)
 
-    assertThat(hasValidValueType.isSatisfiedBy(instance)).isTrue()
+    assertThat(hasValidValueType.evaluate(instance).isSatisfied).isTrue()
   }
 
   @Test
   fun `it is not satisfied if the value for a description is not string`() {
     val instance = getMockedMetadatum(123, DESCRIPTION)
 
-    assertThat(hasValidValueType.isSatisfiedBy(instance)).isFalse()
+    assertThat(hasValidValueType.evaluate(instance).isSatisfied).isFalse()
   }
 
   @Test
   fun `it is satisfied if the value for a reference is a string`() {
     val instance = getMockedMetadatum("test text", REFERENCE)
 
-    assertThat(hasValidValueType.isSatisfiedBy(instance)).isTrue()
+    assertThat(hasValidValueType.evaluate(instance).isSatisfied).isTrue()
   }
 
   @Test
   fun `it is not satisfied if the value for a reference is not string`() {
     val instance = getMockedMetadatum(123, REFERENCE)
 
-    assertThat(hasValidValueType.isSatisfiedBy(instance)).isFalse()
+    assertThat(hasValidValueType.evaluate(instance).isSatisfied).isFalse()
   }
 
   @Test
   fun `it is satisfied if the value for an entry into force date note is a string`() {
     val instance = getMockedMetadatum("test text", ENTRY_INTO_FORCE_DATE_NOTE)
 
-    assertThat(hasValidValueType.isSatisfiedBy(instance)).isTrue()
+    assertThat(hasValidValueType.evaluate(instance).isSatisfied).isTrue()
   }
 
   @Test
   fun `it is not satisfied if the value for an entry into force date note  is not string`() {
     val instance = getMockedMetadatum(123, ENTRY_INTO_FORCE_DATE_NOTE)
 
-    assertThat(hasValidValueType.isSatisfiedBy(instance)).isFalse()
+    assertThat(hasValidValueType.evaluate(instance).isSatisfied).isFalse()
   }
 
   @Test
   fun `it is not satisfied if the value for a proof indication type is not a string`() {
     val instance = getMockedMetadatum(123, PROOF_INDICATION)
 
-    assertThat(hasValidValueType.isSatisfiedBy(instance)).isFalse()
+    assertThat(hasValidValueType.evaluate(instance).isSatisfied).isFalse()
   }
 
   @Test
   fun `it is satisfied if the value for note type is a string`() {
     val instance = getMockedMetadatum("test text", NOTE)
 
-    assertThat(hasValidValueType.isSatisfiedBy(instance)).isTrue()
+    assertThat(hasValidValueType.evaluate(instance).isSatisfied).isTrue()
   }
 
   @Test
   fun `it is not satisfied if the value for a note is not string`() {
     val instance = getMockedMetadatum(123, NOTE)
 
-    assertThat(hasValidValueType.isSatisfiedBy(instance)).isFalse()
+    assertThat(hasValidValueType.evaluate(instance).isSatisfied).isFalse()
   }
 
   @Test
   fun `it is satisfied if the value for article type is a string`() {
     val instance = getMockedMetadatum("test text", ARTICLE)
 
-    assertThat(hasValidValueType.isSatisfiedBy(instance)).isTrue()
+    assertThat(hasValidValueType.evaluate(instance).isSatisfied).isTrue()
   }
 
   @Test
   fun `it is not satisfied if the value for a article is not string`() {
     val instance = getMockedMetadatum(123, ARTICLE)
 
-    assertThat(hasValidValueType.isSatisfiedBy(instance)).isFalse()
+    assertThat(hasValidValueType.evaluate(instance).isSatisfied).isFalse()
   }
 }
 

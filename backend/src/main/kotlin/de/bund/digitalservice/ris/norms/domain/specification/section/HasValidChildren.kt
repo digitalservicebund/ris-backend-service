@@ -2,6 +2,7 @@ package de.bund.digitalservice.ris.norms.domain.specification.section
 
 import de.bund.digitalservice.ris.norms.domain.entity.MetadataSection
 import de.bund.digitalservice.ris.norms.domain.specification.Specification
+import de.bund.digitalservice.ris.norms.domain.specification.SpecificationResult
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName.AGE_INDICATION
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName.ANNOUNCEMENT_DATE
@@ -43,61 +44,70 @@ import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName.SUBJECT
 
 val hasValidChildren =
     object : Specification<MetadataSection> {
-      override fun isSatisfiedBy(instance: MetadataSection): Boolean =
-          when (instance.name) {
-            NORM,
-            NORM_PROVIDER,
-            SUBJECT_AREA,
-            LEAD,
-            PARTICIPATION,
-            CITATION_DATE,
-            AGE_INDICATION,
-            PRINT_ANNOUNCEMENT,
-            DIGITAL_ANNOUNCEMENT,
-            EU_ANNOUNCEMENT,
-            OTHER_OFFICIAL_ANNOUNCEMENT,
-            DOCUMENT_TYPE,
-            DIVERGENT_ENTRY_INTO_FORCE_DEFINED,
-            DIVERGENT_ENTRY_INTO_FORCE_UNDEFINED,
-            DIVERGENT_EXPIRATION_DEFINED,
-            DIVERGENT_EXPIRATION_UNDEFINED,
-            CATEGORIZED_REFERENCE,
-            ENTRY_INTO_FORCE,
-            PRINCIPLE_ENTRY_INTO_FORCE,
-            EXPIRATION,
-            PRINCIPLE_EXPIRATION,
-            DIGITAL_EVIDENCE,
-            FOOTNOTES,
-            DOCUMENT_STATUS,
-            DOCUMENT_TEXT_PROOF,
-            DOCUMENT_OTHER,
-            STATUS,
-            REISSUE,
-            REPEAL,
-            OTHER_STATUS,
-            PUBLICATION_DATE,
-            ANNOUNCEMENT_DATE, -> hasNone(instance)
-            OFFICIAL_REFERENCE ->
-                hasOneOfType(
-                    listOf(
-                        PRINT_ANNOUNCEMENT,
-                        DIGITAL_ANNOUNCEMENT,
-                        EU_ANNOUNCEMENT,
-                        OTHER_OFFICIAL_ANNOUNCEMENT),
-                    instance)
-            DIVERGENT_ENTRY_INTO_FORCE ->
-                hasOneOfType(
-                    listOf(
-                        DIVERGENT_ENTRY_INTO_FORCE_DEFINED, DIVERGENT_ENTRY_INTO_FORCE_UNDEFINED),
-                    instance)
-            DIVERGENT_EXPIRATION ->
-                hasOneOfType(
-                    listOf(DIVERGENT_EXPIRATION_DEFINED, DIVERGENT_EXPIRATION_UNDEFINED), instance)
-            DOCUMENT_STATUS_SECTION ->
-                hasOneOfType(listOf(DOCUMENT_STATUS, DOCUMENT_TEXT_PROOF, DOCUMENT_OTHER), instance)
-            STATUS_INDICATION ->
-                hasOneOfType(listOf(STATUS, REISSUE, REPEAL, OTHER_STATUS), instance)
-          }
+      override fun evaluate(instance: MetadataSection): SpecificationResult {
+        val hasValidChildren =
+            when (instance.name) {
+              NORM,
+              NORM_PROVIDER,
+              SUBJECT_AREA,
+              LEAD,
+              PARTICIPATION,
+              CITATION_DATE,
+              AGE_INDICATION,
+              PRINT_ANNOUNCEMENT,
+              DIGITAL_ANNOUNCEMENT,
+              EU_ANNOUNCEMENT,
+              OTHER_OFFICIAL_ANNOUNCEMENT,
+              DOCUMENT_TYPE,
+              DIVERGENT_ENTRY_INTO_FORCE_DEFINED,
+              DIVERGENT_ENTRY_INTO_FORCE_UNDEFINED,
+              DIVERGENT_EXPIRATION_DEFINED,
+              DIVERGENT_EXPIRATION_UNDEFINED,
+              CATEGORIZED_REFERENCE,
+              ENTRY_INTO_FORCE,
+              PRINCIPLE_ENTRY_INTO_FORCE,
+              EXPIRATION,
+              PRINCIPLE_EXPIRATION,
+              DIGITAL_EVIDENCE,
+              FOOTNOTES,
+              DOCUMENT_STATUS,
+              DOCUMENT_TEXT_PROOF,
+              DOCUMENT_OTHER,
+              STATUS,
+              REISSUE,
+              REPEAL,
+              OTHER_STATUS,
+              PUBLICATION_DATE,
+              ANNOUNCEMENT_DATE, -> hasNone(instance)
+              OFFICIAL_REFERENCE ->
+                  hasOneOfType(
+                      listOf(
+                          PRINT_ANNOUNCEMENT,
+                          DIGITAL_ANNOUNCEMENT,
+                          EU_ANNOUNCEMENT,
+                          OTHER_OFFICIAL_ANNOUNCEMENT),
+                      instance)
+              DIVERGENT_ENTRY_INTO_FORCE ->
+                  hasOneOfType(
+                      listOf(
+                          DIVERGENT_ENTRY_INTO_FORCE_DEFINED, DIVERGENT_ENTRY_INTO_FORCE_UNDEFINED),
+                      instance)
+              DIVERGENT_EXPIRATION ->
+                  hasOneOfType(
+                      listOf(DIVERGENT_EXPIRATION_DEFINED, DIVERGENT_EXPIRATION_UNDEFINED),
+                      instance)
+              DOCUMENT_STATUS_SECTION ->
+                  hasOneOfType(
+                      listOf(DOCUMENT_STATUS, DOCUMENT_TEXT_PROOF, DOCUMENT_OTHER), instance)
+              STATUS_INDICATION ->
+                  hasOneOfType(listOf(STATUS, REISSUE, REPEAL, OTHER_STATUS), instance)
+            }
+
+        return SpecificationResult.from(
+            instance, "INVALID_CHILD_SECTION", "metadata section has invalid child section") {
+              hasValidChildren
+            }
+      }
 
       private fun hasNone(instance: MetadataSection): Boolean = instance.sections.isNullOrEmpty()
 

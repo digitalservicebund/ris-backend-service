@@ -13,7 +13,7 @@ data class MetadataSection(
     val guid: UUID = UUID.randomUUID(),
 ) {
   init {
-    require(hasValidChildren.isSatisfiedBy(this)) { "Incorrect children for section '$name'" }
-    require(hasValidMetadata.isSatisfiedBy(this)) { "Incorrect metadata for section '$name'" }
+    hasValidChildren.evaluate(this).throwWhenUnsatisfied()
+    hasValidMetadata.evaluate(this).throwWhenUnsatisfied()
   }
 }

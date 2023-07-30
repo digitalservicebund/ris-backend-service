@@ -11,8 +11,6 @@ data class Metadatum<T : Any>(
     val guid: UUID = UUID.randomUUID()
 ) {
   init {
-    require(hasValidValueType.isSatisfiedBy(this)) {
-      "Incorrect value type '${value::class.java.simpleName}' for datum type '$type'"
-    }
+    hasValidValueType.evaluate(this).throwWhenUnsatisfied()
   }
 }

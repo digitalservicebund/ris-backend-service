@@ -2,6 +2,7 @@ package de.bund.digitalservice.ris.norms.domain.specification.norm
 
 import de.bund.digitalservice.ris.norms.domain.entity.Norm
 import de.bund.digitalservice.ris.norms.domain.specification.Specification
+import de.bund.digitalservice.ris.norms.domain.specification.SpecificationResult
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName.AGE_INDICATION
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName.ANNOUNCEMENT_DATE
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName.CATEGORIZED_REFERENCE
@@ -29,34 +30,43 @@ import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName.SUBJECT
 
 val hasValidSections =
     object : Specification<Norm> {
-      override fun isSatisfiedBy(instance: Norm): Boolean =
-          instance.metadataSections.all {
-            it.name in
-                listOf(
-                    NORM,
-                    SUBJECT_AREA,
-                    LEAD,
-                    PARTICIPATION,
-                    CITATION_DATE,
-                    AGE_INDICATION,
-                    OFFICIAL_REFERENCE,
-                    NORM_PROVIDER,
-                    DOCUMENT_TYPE,
-                    DIVERGENT_ENTRY_INTO_FORCE,
-                    DIVERGENT_ENTRY_INTO_FORCE_UNDEFINED,
-                    DIVERGENT_EXPIRATION,
-                    DIVERGENT_EXPIRATION_UNDEFINED,
-                    CATEGORIZED_REFERENCE,
-                    ENTRY_INTO_FORCE,
-                    PRINCIPLE_ENTRY_INTO_FORCE,
-                    EXPIRATION,
-                    PRINCIPLE_EXPIRATION,
-                    DIGITAL_EVIDENCE,
-                    FOOTNOTES,
-                    DOCUMENT_STATUS_SECTION,
-                    STATUS_INDICATION,
-                    PUBLICATION_DATE,
-                    ANNOUNCEMENT_DATE,
-                )
-          }
+      override fun evaluate(instance: Norm): SpecificationResult {
+        val invalidSections =
+            instance.metadataSections.filterNot { it.name in TOP_LEVEL_SECTION_NAMES }
+
+        return SpecificationResult.from(
+            instance,
+            "INVALID_TOP_LEVEL_SECTIONS",
+            "the following sections are not allowed on the top level: '$invalidSections'") {
+              invalidSections.isEmpty()
+            }
+      }
     }
+
+val TOP_LEVEL_SECTION_NAMES =
+    arrayOf(
+        NORM,
+        SUBJECT_AREA,
+        LEAD,
+        PARTICIPATION,
+        CITATION_DATE,
+        AGE_INDICATION,
+        OFFICIAL_REFERENCE,
+        NORM_PROVIDER,
+        DOCUMENT_TYPE,
+        DIVERGENT_ENTRY_INTO_FORCE,
+        DIVERGENT_ENTRY_INTO_FORCE_UNDEFINED,
+        DIVERGENT_EXPIRATION,
+        DIVERGENT_EXPIRATION_UNDEFINED,
+        CATEGORIZED_REFERENCE,
+        ENTRY_INTO_FORCE,
+        PRINCIPLE_ENTRY_INTO_FORCE,
+        EXPIRATION,
+        PRINCIPLE_EXPIRATION,
+        DIGITAL_EVIDENCE,
+        FOOTNOTES,
+        DOCUMENT_STATUS_SECTION,
+        STATUS_INDICATION,
+        PUBLICATION_DATE,
+        ANNOUNCEMENT_DATE,
+    )

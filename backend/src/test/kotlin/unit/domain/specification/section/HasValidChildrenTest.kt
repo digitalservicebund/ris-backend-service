@@ -19,7 +19,7 @@ class HasValidChildrenTest {
     every { instance.name } returns MetadataSectionName.NORM
     every { instance.sections } returns null
 
-    Assertions.assertThat(hasValidChildren.isSatisfiedBy(instance)).isTrue()
+    Assertions.assertThat(hasValidChildren.evaluate(instance).isSatisfied).isTrue()
   }
 
   @Test
@@ -28,7 +28,7 @@ class HasValidChildrenTest {
     every { instance.name } returns MetadataSectionName.NORM_PROVIDER
     every { instance.sections } returns null
 
-    Assertions.assertThat(hasValidChildren.isSatisfiedBy(instance)).isTrue()
+    Assertions.assertThat(hasValidChildren.evaluate(instance).isSatisfied).isTrue()
   }
 
   @Test
@@ -37,7 +37,7 @@ class HasValidChildrenTest {
     every { instance.name } returns MetadataSectionName.SUBJECT_AREA
     every { instance.sections } returns null
 
-    Assertions.assertThat(hasValidChildren.isSatisfiedBy(instance)).isTrue()
+    Assertions.assertThat(hasValidChildren.evaluate(instance).isSatisfied).isTrue()
   }
 
   @Test
@@ -46,7 +46,7 @@ class HasValidChildrenTest {
     every { instance.name } returns MetadataSectionName.LEAD
     every { instance.sections } returns null
 
-    Assertions.assertThat(hasValidChildren.isSatisfiedBy(instance)).isTrue()
+    Assertions.assertThat(hasValidChildren.evaluate(instance).isSatisfied).isTrue()
   }
 
   @Test
@@ -55,7 +55,7 @@ class HasValidChildrenTest {
     every { instance.name } returns MetadataSectionName.PARTICIPATION
     every { instance.sections } returns null
 
-    Assertions.assertThat(hasValidChildren.isSatisfiedBy(instance)).isTrue()
+    Assertions.assertThat(hasValidChildren.evaluate(instance).isSatisfied).isTrue()
   }
 
   @Test
@@ -64,7 +64,7 @@ class HasValidChildrenTest {
     every { instance.name } returns MetadataSectionName.CITATION_DATE
     every { instance.sections } returns null
 
-    Assertions.assertThat(hasValidChildren.isSatisfiedBy(instance)).isTrue()
+    Assertions.assertThat(hasValidChildren.evaluate(instance).isSatisfied).isTrue()
   }
 
   @Test
@@ -73,7 +73,7 @@ class HasValidChildrenTest {
     every { instance.name } returns MetadataSectionName.AGE_INDICATION
     every { instance.sections } returns null
 
-    Assertions.assertThat(hasValidChildren.isSatisfiedBy(instance)).isTrue()
+    Assertions.assertThat(hasValidChildren.evaluate(instance).isSatisfied).isTrue()
   }
 
   @Test
@@ -82,7 +82,7 @@ class HasValidChildrenTest {
     every { instance.name } returns MetadataSectionName.PRINT_ANNOUNCEMENT
     every { instance.sections } returns null
 
-    Assertions.assertThat(hasValidChildren.isSatisfiedBy(instance)).isTrue()
+    Assertions.assertThat(hasValidChildren.evaluate(instance).isSatisfied).isTrue()
   }
 
   @Test
@@ -91,7 +91,7 @@ class HasValidChildrenTest {
     every { instance.name } returns MetadataSectionName.DIGITAL_ANNOUNCEMENT
     every { instance.sections } returns null
 
-    Assertions.assertThat(hasValidChildren.isSatisfiedBy(instance)).isTrue()
+    Assertions.assertThat(hasValidChildren.evaluate(instance).isSatisfied).isTrue()
   }
 
   @Test
@@ -100,7 +100,7 @@ class HasValidChildrenTest {
     every { instance.name } returns MetadataSectionName.EU_ANNOUNCEMENT
     every { instance.sections } returns null
 
-    Assertions.assertThat(hasValidChildren.isSatisfiedBy(instance)).isTrue()
+    Assertions.assertThat(hasValidChildren.evaluate(instance).isSatisfied).isTrue()
   }
 
   @Test
@@ -109,7 +109,7 @@ class HasValidChildrenTest {
     every { instance.name } returns MetadataSectionName.OTHER_OFFICIAL_ANNOUNCEMENT
     every { instance.sections } returns null
 
-    Assertions.assertThat(hasValidChildren.isSatisfiedBy(instance)).isTrue()
+    Assertions.assertThat(hasValidChildren.evaluate(instance).isSatisfied).isTrue()
   }
 
   @Test
@@ -133,7 +133,7 @@ class HasValidChildrenTest {
                     Metadatum("other official reference", MetadatumType.OTHER_OFFICIAL_REFERENCE))),
         )
 
-    Assertions.assertThat(hasValidChildren.isSatisfiedBy(instance)).isFalse()
+    Assertions.assertThat(hasValidChildren.evaluate(instance).isSatisfied).isFalse()
   }
 
   @Test
@@ -147,7 +147,7 @@ class HasValidChildrenTest {
                 listOf(Metadatum("announcement gazette", MetadatumType.ANNOUNCEMENT_GAZETTE))),
         )
 
-    Assertions.assertThat(hasValidChildren.isSatisfiedBy(instance)).isTrue()
+    Assertions.assertThat(hasValidChildren.evaluate(instance).isSatisfied).isTrue()
   }
 
   @Test
@@ -163,7 +163,7 @@ class HasValidChildrenTest {
                 MetadataSectionName.NORM, listOf(Metadatum("keyword", MetadatumType.KEYWORD))),
         )
 
-    Assertions.assertThat(hasValidChildren.isSatisfiedBy(instance)).isFalse()
+    Assertions.assertThat(hasValidChildren.evaluate(instance).isSatisfied).isFalse()
   }
 
   @Test
@@ -172,7 +172,7 @@ class HasValidChildrenTest {
     every { instance.name } returns MetadataSectionName.DIVERGENT_ENTRY_INTO_FORCE_DEFINED
     every { instance.sections } returns null
 
-    Assertions.assertThat(hasValidChildren.isSatisfiedBy(instance)).isTrue()
+    Assertions.assertThat(hasValidChildren.evaluate(instance).isSatisfied).isTrue()
   }
 
   @Test
@@ -181,7 +181,7 @@ class HasValidChildrenTest {
     every { instance.name } returns MetadataSectionName.DIVERGENT_ENTRY_INTO_FORCE_UNDEFINED
     every { instance.sections } returns null
 
-    Assertions.assertThat(hasValidChildren.isSatisfiedBy(instance)).isTrue()
+    Assertions.assertThat(hasValidChildren.evaluate(instance).isSatisfied).isTrue()
   }
 
   @Test
@@ -190,7 +190,7 @@ class HasValidChildrenTest {
     every { instance.name } returns MetadataSectionName.DIVERGENT_EXPIRATION_DEFINED
     every { instance.sections } returns null
 
-    Assertions.assertThat(hasValidChildren.isSatisfiedBy(instance)).isTrue()
+    Assertions.assertThat(hasValidChildren.evaluate(instance).isSatisfied).isTrue()
   }
 
   @Test
@@ -199,7 +199,7 @@ class HasValidChildrenTest {
     every { instance.name } returns MetadataSectionName.DIVERGENT_EXPIRATION_UNDEFINED
     every { instance.sections } returns null
 
-    Assertions.assertThat(hasValidChildren.isSatisfiedBy(instance)).isTrue()
+    Assertions.assertThat(hasValidChildren.evaluate(instance).isSatisfied).isTrue()
   }
 
   @Test
@@ -216,7 +216,7 @@ class HasValidChildrenTest {
                 listOf(Metadatum(UndefinedDate.UNDEFINED_UNKNOWN, MetadatumType.UNDEFINED_DATE))),
         )
 
-    Assertions.assertThat(hasValidChildren.isSatisfiedBy(instance)).isFalse()
+    Assertions.assertThat(hasValidChildren.evaluate(instance).isSatisfied).isFalse()
   }
 
   @Test
@@ -230,7 +230,7 @@ class HasValidChildrenTest {
                 listOf(Metadatum(UndefinedDate.UNDEFINED_FUTURE, MetadatumType.UNDEFINED_DATE))),
         )
 
-    Assertions.assertThat(hasValidChildren.isSatisfiedBy(instance)).isTrue()
+    Assertions.assertThat(hasValidChildren.evaluate(instance).isSatisfied).isTrue()
   }
 
   @Test
@@ -246,7 +246,7 @@ class HasValidChildrenTest {
                 MetadataSectionName.NORM, listOf(Metadatum("keyword", MetadatumType.KEYWORD))),
         )
 
-    Assertions.assertThat(hasValidChildren.isSatisfiedBy(instance)).isFalse()
+    Assertions.assertThat(hasValidChildren.evaluate(instance).isSatisfied).isFalse()
   }
 
   @Test
@@ -263,7 +263,7 @@ class HasValidChildrenTest {
                 listOf(Metadatum(UndefinedDate.UNDEFINED_UNKNOWN, MetadatumType.UNDEFINED_DATE))),
         )
 
-    Assertions.assertThat(hasValidChildren.isSatisfiedBy(instance)).isFalse()
+    Assertions.assertThat(hasValidChildren.evaluate(instance).isSatisfied).isFalse()
   }
 
   @Test
@@ -277,7 +277,7 @@ class HasValidChildrenTest {
                 listOf(Metadatum(UndefinedDate.UNDEFINED_FUTURE, MetadatumType.UNDEFINED_DATE))),
         )
 
-    Assertions.assertThat(hasValidChildren.isSatisfiedBy(instance)).isTrue()
+    Assertions.assertThat(hasValidChildren.evaluate(instance).isSatisfied).isTrue()
   }
 
   @Test
@@ -293,7 +293,7 @@ class HasValidChildrenTest {
                 MetadataSectionName.NORM, listOf(Metadatum("keyword", MetadatumType.KEYWORD))),
         )
 
-    Assertions.assertThat(hasValidChildren.isSatisfiedBy(instance)).isFalse()
+    Assertions.assertThat(hasValidChildren.evaluate(instance).isSatisfied).isFalse()
   }
 
   @Test
@@ -302,7 +302,7 @@ class HasValidChildrenTest {
     every { instance.name } returns MetadataSectionName.CATEGORIZED_REFERENCE
     every { instance.sections } returns null
 
-    Assertions.assertThat(hasValidChildren.isSatisfiedBy(instance)).isTrue()
+    Assertions.assertThat(hasValidChildren.evaluate(instance).isSatisfied).isTrue()
   }
 
   @Test
@@ -311,7 +311,7 @@ class HasValidChildrenTest {
     every { instance.name } returns MetadataSectionName.ENTRY_INTO_FORCE
     every { instance.sections } returns null
 
-    Assertions.assertThat(hasValidChildren.isSatisfiedBy(instance)).isTrue()
+    Assertions.assertThat(hasValidChildren.evaluate(instance).isSatisfied).isTrue()
   }
 
   @Test
@@ -320,7 +320,7 @@ class HasValidChildrenTest {
     every { instance.name } returns MetadataSectionName.PRINCIPLE_ENTRY_INTO_FORCE
     every { instance.sections } returns null
 
-    Assertions.assertThat(hasValidChildren.isSatisfiedBy(instance)).isTrue()
+    Assertions.assertThat(hasValidChildren.evaluate(instance).isSatisfied).isTrue()
   }
 
   @Test
@@ -329,7 +329,7 @@ class HasValidChildrenTest {
     every { instance.name } returns MetadataSectionName.EXPIRATION
     every { instance.sections } returns null
 
-    Assertions.assertThat(hasValidChildren.isSatisfiedBy(instance)).isTrue()
+    Assertions.assertThat(hasValidChildren.evaluate(instance).isSatisfied).isTrue()
   }
 
   @Test
@@ -338,7 +338,7 @@ class HasValidChildrenTest {
     every { instance.name } returns MetadataSectionName.PRINCIPLE_EXPIRATION
     every { instance.sections } returns null
 
-    Assertions.assertThat(hasValidChildren.isSatisfiedBy(instance)).isTrue()
+    Assertions.assertThat(hasValidChildren.evaluate(instance).isSatisfied).isTrue()
   }
 
   @Test
@@ -347,7 +347,7 @@ class HasValidChildrenTest {
     every { instance.name } returns MetadataSectionName.DIGITAL_EVIDENCE
     every { instance.sections } returns null
 
-    Assertions.assertThat(hasValidChildren.isSatisfiedBy(instance)).isTrue()
+    Assertions.assertThat(hasValidChildren.evaluate(instance).isSatisfied).isTrue()
   }
 
   @Test
@@ -356,7 +356,7 @@ class HasValidChildrenTest {
     every { instance.name } returns MetadataSectionName.FOOTNOTES
     every { instance.sections } returns null
 
-    Assertions.assertThat(hasValidChildren.isSatisfiedBy(instance)).isTrue()
+    Assertions.assertThat(hasValidChildren.evaluate(instance).isSatisfied).isTrue()
   }
 
   @Test
@@ -376,7 +376,7 @@ class HasValidChildrenTest {
                 listOf(Metadatum("text in progress", MetadatumType.TEXT))),
         )
 
-    Assertions.assertThat(hasValidChildren.isSatisfiedBy(instance)).isFalse()
+    Assertions.assertThat(hasValidChildren.evaluate(instance).isSatisfied).isFalse()
   }
 
   @Test
@@ -392,7 +392,7 @@ class HasValidChildrenTest {
                 MetadataSectionName.NORM, listOf(Metadatum("keyword", MetadatumType.KEYWORD))),
         )
 
-    Assertions.assertThat(hasValidChildren.isSatisfiedBy(instance)).isFalse()
+    Assertions.assertThat(hasValidChildren.evaluate(instance).isSatisfied).isFalse()
   }
 
   @Test
@@ -401,7 +401,7 @@ class HasValidChildrenTest {
     every { instance.name } returns MetadataSectionName.DOCUMENT_STATUS
     every { instance.sections } returns null
 
-    Assertions.assertThat(hasValidChildren.isSatisfiedBy(instance)).isTrue()
+    Assertions.assertThat(hasValidChildren.evaluate(instance).isSatisfied).isTrue()
   }
 
   @Test
@@ -410,7 +410,7 @@ class HasValidChildrenTest {
     every { instance.name } returns MetadataSectionName.DOCUMENT_TEXT_PROOF
     every { instance.sections } returns null
 
-    Assertions.assertThat(hasValidChildren.isSatisfiedBy(instance)).isTrue()
+    Assertions.assertThat(hasValidChildren.evaluate(instance).isSatisfied).isTrue()
   }
 
   @Test
@@ -419,7 +419,7 @@ class HasValidChildrenTest {
     every { instance.name } returns MetadataSectionName.DOCUMENT_OTHER
     every { instance.sections } returns null
 
-    Assertions.assertThat(hasValidChildren.isSatisfiedBy(instance)).isTrue()
+    Assertions.assertThat(hasValidChildren.evaluate(instance).isSatisfied).isTrue()
   }
 
   @Test
@@ -438,7 +438,7 @@ class HasValidChildrenTest {
                 MetadataSectionName.OTHER_STATUS, listOf(Metadatum("note", MetadatumType.NOTE))),
         )
 
-    Assertions.assertThat(hasValidChildren.isSatisfiedBy(instance)).isFalse()
+    Assertions.assertThat(hasValidChildren.evaluate(instance).isSatisfied).isFalse()
   }
 
   @Test
@@ -453,7 +453,7 @@ class HasValidChildrenTest {
                 MetadataSectionName.NORM, listOf(Metadatum("keyword", MetadatumType.KEYWORD))),
         )
 
-    Assertions.assertThat(hasValidChildren.isSatisfiedBy(instance)).isFalse()
+    Assertions.assertThat(hasValidChildren.evaluate(instance).isSatisfied).isFalse()
   }
 
   @Test
@@ -462,7 +462,7 @@ class HasValidChildrenTest {
     every { instance.name } returns MetadataSectionName.STATUS
     every { instance.sections } returns null
 
-    Assertions.assertThat(hasValidChildren.isSatisfiedBy(instance)).isTrue()
+    Assertions.assertThat(hasValidChildren.evaluate(instance).isSatisfied).isTrue()
   }
 
   @Test
@@ -471,7 +471,7 @@ class HasValidChildrenTest {
     every { instance.name } returns MetadataSectionName.REISSUE
     every { instance.sections } returns null
 
-    Assertions.assertThat(hasValidChildren.isSatisfiedBy(instance)).isTrue()
+    Assertions.assertThat(hasValidChildren.evaluate(instance).isSatisfied).isTrue()
   }
 
   @Test
@@ -480,7 +480,7 @@ class HasValidChildrenTest {
     every { instance.name } returns MetadataSectionName.REPEAL
     every { instance.sections } returns null
 
-    Assertions.assertThat(hasValidChildren.isSatisfiedBy(instance)).isTrue()
+    Assertions.assertThat(hasValidChildren.evaluate(instance).isSatisfied).isTrue()
   }
 
   @Test
@@ -489,7 +489,7 @@ class HasValidChildrenTest {
     every { instance.name } returns MetadataSectionName.OTHER_STATUS
     every { instance.sections } returns null
 
-    Assertions.assertThat(hasValidChildren.isSatisfiedBy(instance)).isTrue()
+    Assertions.assertThat(hasValidChildren.evaluate(instance).isSatisfied).isTrue()
   }
 
   @Test
@@ -498,6 +498,6 @@ class HasValidChildrenTest {
     every { instance.name } returns MetadataSectionName.PUBLICATION_DATE
     every { instance.sections } returns null
 
-    Assertions.assertThat(hasValidChildren.isSatisfiedBy(instance)).isTrue()
+    Assertions.assertThat(hasValidChildren.evaluate(instance).isSatisfied).isTrue()
   }
 }

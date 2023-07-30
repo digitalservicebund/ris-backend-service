@@ -1,5 +1,6 @@
 package de.bund.digitalservice.ris.norms.domain.entity
 
+import de.bund.digitalservice.ris.norms.domain.specification.SpecificationError
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.UNOFFICIAL_LONG_TITLE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.UNOFFICIAL_REFERENCE
@@ -54,8 +55,7 @@ class MetadataSectionTest {
       )
     }
 
-    assertThat(exception).isInstanceOf(IllegalArgumentException::class.java)
-    assertThat(exception.message).isEqualTo("Incorrect children for section '${section.name}'")
+    assertThat(exception).isInstanceOf(SpecificationError::class.java)
   }
 
   @Test
@@ -68,8 +68,6 @@ class MetadataSectionTest {
       )
     }
 
-    assertThat(exception).isInstanceOf(IllegalArgumentException::class.java)
-    assertThat(exception.message)
-        .isEqualTo("Incorrect metadata for section '${MetadataSectionName.LEAD}'")
+    assertThat(exception).isInstanceOf(SpecificationError::class.java)
   }
 }

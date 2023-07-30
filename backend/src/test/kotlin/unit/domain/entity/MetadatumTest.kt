@@ -1,8 +1,9 @@
 package de.bund.digitalservice.ris.norms.domain.entity
 
+import de.bund.digitalservice.ris.norms.domain.specification.SpecificationError
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.KEYWORD
 import org.assertj.core.api.Assertions.assertThat
-import org.assertj.core.api.Assertions.catchException
+import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Test
 
 class MetadatumTest {
@@ -24,10 +25,6 @@ class MetadatumTest {
 
   @Test
   fun `it throws an illegal argument exception of value type is not correct`() {
-    val exception = catchException { Metadatum(1, KEYWORD) }
-
-    assertThat(exception).isInstanceOf(IllegalArgumentException::class.java)
-    assertThat(exception.message)
-        .isEqualTo("Incorrect value type 'Integer' for datum type 'KEYWORD'")
+    assertThatThrownBy { Metadatum(1, KEYWORD) }.isInstanceOf(SpecificationError::class.java)
   }
 }

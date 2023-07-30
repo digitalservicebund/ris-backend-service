@@ -25,7 +25,7 @@ class HasValidMetadataTest {
             Metadatum("divergentDocumentNumber", MetadatumType.DIVERGENT_DOCUMENT_NUMBER),
         )
 
-    assertThat(hasValidMetadata.isSatisfiedBy(instance)).isTrue()
+    assertThat(hasValidMetadata.evaluate(instance).isSatisfied).isTrue()
   }
 
   @Test
@@ -39,7 +39,7 @@ class HasValidMetadataTest {
             Metadatum("divergentDocumentNumber", MetadatumType.UNOFFICIAL_REFERENCE),
         )
 
-    assertThat(hasValidMetadata.isSatisfiedBy(instance)).isFalse()
+    assertThat(hasValidMetadata.evaluate(instance).isSatisfied).isFalse()
   }
 
   @Test
@@ -52,7 +52,7 @@ class HasValidMetadataTest {
             Metadatum("range start", MetadatumType.RANGE_START),
         )
 
-    assertThat(hasValidMetadata.isSatisfiedBy(instance)).isTrue()
+    assertThat(hasValidMetadata.evaluate(instance).isSatisfied).isTrue()
   }
 
   @Test
@@ -66,7 +66,7 @@ class HasValidMetadataTest {
             Metadatum("range end", MetadatumType.RANGE_END),
         )
 
-    assertThat(hasValidMetadata.isSatisfiedBy(instance)).isTrue()
+    assertThat(hasValidMetadata.evaluate(instance).isSatisfied).isTrue()
   }
 
   @Test
@@ -79,7 +79,7 @@ class HasValidMetadataTest {
             Metadatum(LocalDate.now(), MetadatumType.DATE),
         )
 
-    assertThat(hasValidMetadata.isSatisfiedBy(instance)).isTrue()
+    assertThat(hasValidMetadata.evaluate(instance).isSatisfied).isTrue()
   }
 
   @Test
@@ -92,7 +92,7 @@ class HasValidMetadataTest {
             Metadatum("citation year", MetadatumType.YEAR),
         )
 
-    assertThat(hasValidMetadata.isSatisfiedBy(instance)).isTrue()
+    assertThat(hasValidMetadata.evaluate(instance).isSatisfied).isTrue()
   }
 
   @Test
@@ -106,7 +106,7 @@ class HasValidMetadataTest {
             Metadatum("citation year", MetadatumType.YEAR),
         )
 
-    assertThat(hasValidMetadata.isSatisfiedBy(instance)).isFalse()
+    assertThat(hasValidMetadata.evaluate(instance).isSatisfied).isFalse()
   }
 
   @Test
@@ -119,7 +119,7 @@ class HasValidMetadataTest {
             Metadatum("something other", MetadatumType.LEAD_JURISDICTION),
         )
 
-    assertThat(hasValidMetadata.isSatisfiedBy(instance)).isFalse()
+    assertThat(hasValidMetadata.evaluate(instance).isSatisfied).isFalse()
   }
 
   @Test
@@ -133,7 +133,7 @@ class HasValidMetadataTest {
             Metadatum("something other", MetadatumType.LEAD_UNIT),
         )
 
-    assertThat(hasValidMetadata.isSatisfiedBy(instance)).isFalse()
+    assertThat(hasValidMetadata.evaluate(instance).isSatisfied).isFalse()
   }
 
   @Test
@@ -153,7 +153,7 @@ class HasValidMetadataTest {
             Metadatum("explanation #2", MetadatumType.EXPLANATION),
         )
 
-    assertThat(hasValidMetadata.isSatisfiedBy(instance)).isTrue()
+    assertThat(hasValidMetadata.evaluate(instance).isSatisfied).isTrue()
   }
 
   @Test
@@ -167,7 +167,7 @@ class HasValidMetadataTest {
             Metadatum("announcement medium", MetadatumType.ANNOUNCEMENT_MEDIUM),
         )
 
-    assertThat(hasValidMetadata.isSatisfiedBy(instance)).isFalse()
+    assertThat(hasValidMetadata.evaluate(instance).isSatisfied).isFalse()
   }
 
   @Test
@@ -191,7 +191,7 @@ class HasValidMetadataTest {
             Metadatum("explanation #2", MetadatumType.EXPLANATION),
         )
 
-    assertThat(hasValidMetadata.isSatisfiedBy(instance)).isTrue()
+    assertThat(hasValidMetadata.evaluate(instance).isSatisfied).isTrue()
   }
 
   @Test
@@ -205,7 +205,7 @@ class HasValidMetadataTest {
             Metadatum("announcement medium", MetadatumType.ANNOUNCEMENT_MEDIUM),
         )
 
-    assertThat(hasValidMetadata.isSatisfiedBy(instance)).isFalse()
+    assertThat(hasValidMetadata.evaluate(instance).isSatisfied).isFalse()
   }
 
   @Test
@@ -226,7 +226,7 @@ class HasValidMetadataTest {
             Metadatum("explanation #2", MetadatumType.EXPLANATION),
         )
 
-    assertThat(hasValidMetadata.isSatisfiedBy(instance)).isTrue()
+    assertThat(hasValidMetadata.evaluate(instance).isSatisfied).isTrue()
   }
 
   @Test
@@ -240,7 +240,7 @@ class HasValidMetadataTest {
             Metadatum("announcement medium", MetadatumType.ANNOUNCEMENT_MEDIUM),
         )
 
-    assertThat(hasValidMetadata.isSatisfiedBy(instance)).isFalse()
+    assertThat(hasValidMetadata.evaluate(instance).isSatisfied).isFalse()
   }
 
   @Test
@@ -253,7 +253,7 @@ class HasValidMetadataTest {
             Metadatum("other official reference", MetadatumType.OTHER_OFFICIAL_REFERENCE),
         )
 
-    assertThat(hasValidMetadata.isSatisfiedBy(instance)).isTrue()
+    assertThat(hasValidMetadata.evaluate(instance).isSatisfied).isTrue()
   }
 
   @Test
@@ -267,7 +267,7 @@ class HasValidMetadataTest {
             Metadatum("announcement medium", MetadatumType.ANNOUNCEMENT_MEDIUM),
         )
 
-    assertThat(hasValidMetadata.isSatisfiedBy(instance)).isFalse()
+    assertThat(hasValidMetadata.evaluate(instance).isSatisfied).isFalse()
   }
 
   @Test
@@ -282,7 +282,7 @@ class HasValidMetadataTest {
             Metadatum(true, MetadatumType.RESOLUTION_MAJORITY),
         )
 
-    assertThat(hasValidMetadata.isSatisfiedBy(instance)).isTrue()
+    assertThat(hasValidMetadata.evaluate(instance).isSatisfied).isTrue()
   }
 
   @Test
@@ -296,7 +296,7 @@ class HasValidMetadataTest {
             Metadatum("announcement medium", MetadatumType.ANNOUNCEMENT_MEDIUM),
         )
 
-    assertThat(hasValidMetadata.isSatisfiedBy(instance)).isFalse()
+    assertThat(hasValidMetadata.evaluate(instance).isSatisfied).isFalse()
   }
 
   @Test
@@ -312,7 +312,7 @@ class HasValidMetadataTest {
             Metadatum("template name", MetadatumType.TEMPLATE_NAME),
         )
 
-    assertThat(hasValidMetadata.isSatisfiedBy(instance)).isTrue()
+    assertThat(hasValidMetadata.evaluate(instance).isSatisfied).isTrue()
   }
 
   @Test
@@ -326,7 +326,7 @@ class HasValidMetadataTest {
             Metadatum("announcement medium", MetadatumType.ANNOUNCEMENT_MEDIUM),
         )
 
-    assertThat(hasValidMetadata.isSatisfiedBy(instance)).isFalse()
+    assertThat(hasValidMetadata.evaluate(instance).isSatisfied).isFalse()
   }
 
   @Test
@@ -335,7 +335,7 @@ class HasValidMetadataTest {
     every { instance.name } returns MetadataSectionName.DIVERGENT_ENTRY_INTO_FORCE
     every { instance.metadata } returns emptyList()
 
-    assertThat(hasValidMetadata.isSatisfiedBy(instance)).isTrue()
+    assertThat(hasValidMetadata.evaluate(instance).isSatisfied).isTrue()
   }
 
   @Test
@@ -350,7 +350,7 @@ class HasValidMetadataTest {
             Metadatum(NormCategory.TRANSITIONAL_NORM, MetadatumType.NORM_CATEGORY),
         )
 
-    assertThat(hasValidMetadata.isSatisfiedBy(instance)).isTrue()
+    assertThat(hasValidMetadata.evaluate(instance).isSatisfied).isTrue()
   }
 
   @Test
@@ -364,7 +364,7 @@ class HasValidMetadataTest {
             Metadatum("announcement medium", MetadatumType.ANNOUNCEMENT_MEDIUM),
         )
 
-    assertThat(hasValidMetadata.isSatisfiedBy(instance)).isFalse()
+    assertThat(hasValidMetadata.evaluate(instance).isSatisfied).isFalse()
   }
 
   @Test
@@ -379,7 +379,7 @@ class HasValidMetadataTest {
             Metadatum(NormCategory.TRANSITIONAL_NORM, MetadatumType.NORM_CATEGORY),
         )
 
-    assertThat(hasValidMetadata.isSatisfiedBy(instance)).isTrue()
+    assertThat(hasValidMetadata.evaluate(instance).isSatisfied).isTrue()
   }
 
   @Test
@@ -393,7 +393,7 @@ class HasValidMetadataTest {
             Metadatum("announcement medium", MetadatumType.ANNOUNCEMENT_MEDIUM),
         )
 
-    assertThat(hasValidMetadata.isSatisfiedBy(instance)).isFalse()
+    assertThat(hasValidMetadata.evaluate(instance).isSatisfied).isFalse()
   }
 
   @Test
@@ -402,7 +402,7 @@ class HasValidMetadataTest {
     every { instance.name } returns MetadataSectionName.DIVERGENT_EXPIRATION
     every { instance.metadata } returns emptyList()
 
-    assertThat(hasValidMetadata.isSatisfiedBy(instance)).isTrue()
+    assertThat(hasValidMetadata.evaluate(instance).isSatisfied).isTrue()
   }
 
   @Test
@@ -417,7 +417,7 @@ class HasValidMetadataTest {
             Metadatum(NormCategory.TRANSITIONAL_NORM, MetadatumType.NORM_CATEGORY),
         )
 
-    assertThat(hasValidMetadata.isSatisfiedBy(instance)).isTrue()
+    assertThat(hasValidMetadata.evaluate(instance).isSatisfied).isTrue()
   }
 
   @Test
@@ -431,7 +431,7 @@ class HasValidMetadataTest {
             Metadatum("announcement medium", MetadatumType.ANNOUNCEMENT_MEDIUM),
         )
 
-    assertThat(hasValidMetadata.isSatisfiedBy(instance)).isFalse()
+    assertThat(hasValidMetadata.evaluate(instance).isSatisfied).isFalse()
   }
 
   @Test
@@ -446,7 +446,7 @@ class HasValidMetadataTest {
             Metadatum(NormCategory.TRANSITIONAL_NORM, MetadatumType.NORM_CATEGORY),
         )
 
-    assertThat(hasValidMetadata.isSatisfiedBy(instance)).isTrue()
+    assertThat(hasValidMetadata.evaluate(instance).isSatisfied).isTrue()
   }
 
   @Test
@@ -460,7 +460,7 @@ class HasValidMetadataTest {
             Metadatum("announcement medium", MetadatumType.ANNOUNCEMENT_MEDIUM),
         )
 
-    assertThat(hasValidMetadata.isSatisfiedBy(instance)).isFalse()
+    assertThat(hasValidMetadata.evaluate(instance).isSatisfied).isFalse()
   }
 
   @Test
@@ -473,7 +473,7 @@ class HasValidMetadataTest {
             Metadatum("test reference", MetadatumType.TEXT),
         )
 
-    assertThat(hasValidMetadata.isSatisfiedBy(instance)).isTrue()
+    assertThat(hasValidMetadata.evaluate(instance).isSatisfied).isTrue()
   }
 
   @Test
@@ -487,7 +487,7 @@ class HasValidMetadataTest {
             Metadatum("test medium", MetadatumType.ANNOUNCEMENT_MEDIUM),
         )
 
-    assertThat(hasValidMetadata.isSatisfiedBy(instance)).isFalse()
+    assertThat(hasValidMetadata.evaluate(instance).isSatisfied).isFalse()
   }
 
   @Test
@@ -500,7 +500,7 @@ class HasValidMetadataTest {
             Metadatum(LocalDate.now(), MetadatumType.DATE),
         )
 
-    assertThat(hasValidMetadata.isSatisfiedBy(instance)).isTrue()
+    assertThat(hasValidMetadata.evaluate(instance).isSatisfied).isTrue()
   }
 
   @Test
@@ -513,7 +513,7 @@ class HasValidMetadataTest {
             Metadatum(UndefinedDate.UNDEFINED_UNKNOWN, MetadatumType.UNDEFINED_DATE),
         )
 
-    assertThat(hasValidMetadata.isSatisfiedBy(instance)).isTrue()
+    assertThat(hasValidMetadata.evaluate(instance).isSatisfied).isTrue()
   }
 
   @Test
@@ -527,7 +527,7 @@ class HasValidMetadataTest {
             Metadatum(UndefinedDate.UNDEFINED_UNKNOWN, MetadatumType.UNDEFINED_DATE),
         )
 
-    assertThat(hasValidMetadata.isSatisfiedBy(instance)).isFalse()
+    assertThat(hasValidMetadata.evaluate(instance).isSatisfied).isFalse()
   }
 
   @Test
@@ -540,7 +540,7 @@ class HasValidMetadataTest {
             Metadatum(LocalDate.now(), MetadatumType.DATE),
         )
 
-    assertThat(hasValidMetadata.isSatisfiedBy(instance)).isTrue()
+    assertThat(hasValidMetadata.evaluate(instance).isSatisfied).isTrue()
   }
 
   @Test
@@ -553,7 +553,7 @@ class HasValidMetadataTest {
             Metadatum(UndefinedDate.UNDEFINED_UNKNOWN, MetadatumType.UNDEFINED_DATE),
         )
 
-    assertThat(hasValidMetadata.isSatisfiedBy(instance)).isTrue()
+    assertThat(hasValidMetadata.evaluate(instance).isSatisfied).isTrue()
   }
 
   @Test
@@ -567,7 +567,7 @@ class HasValidMetadataTest {
             Metadatum(UndefinedDate.UNDEFINED_UNKNOWN, MetadatumType.UNDEFINED_DATE),
         )
 
-    assertThat(hasValidMetadata.isSatisfiedBy(instance)).isFalse()
+    assertThat(hasValidMetadata.evaluate(instance).isSatisfied).isFalse()
   }
 
   @Test
@@ -580,7 +580,7 @@ class HasValidMetadataTest {
             Metadatum(LocalDate.now(), MetadatumType.DATE),
         )
 
-    assertThat(hasValidMetadata.isSatisfiedBy(instance)).isTrue()
+    assertThat(hasValidMetadata.evaluate(instance).isSatisfied).isTrue()
   }
 
   @Test
@@ -593,7 +593,7 @@ class HasValidMetadataTest {
             Metadatum(UndefinedDate.UNDEFINED_UNKNOWN, MetadatumType.UNDEFINED_DATE),
         )
 
-    assertThat(hasValidMetadata.isSatisfiedBy(instance)).isTrue()
+    assertThat(hasValidMetadata.evaluate(instance).isSatisfied).isTrue()
   }
 
   @Test
@@ -607,7 +607,7 @@ class HasValidMetadataTest {
             Metadatum(UndefinedDate.UNDEFINED_UNKNOWN, MetadatumType.UNDEFINED_DATE),
         )
 
-    assertThat(hasValidMetadata.isSatisfiedBy(instance)).isFalse()
+    assertThat(hasValidMetadata.evaluate(instance).isSatisfied).isFalse()
   }
 
   @Test
@@ -620,7 +620,7 @@ class HasValidMetadataTest {
             Metadatum(LocalDate.now(), MetadatumType.DATE),
         )
 
-    assertThat(hasValidMetadata.isSatisfiedBy(instance)).isTrue()
+    assertThat(hasValidMetadata.evaluate(instance).isSatisfied).isTrue()
   }
 
   @Test
@@ -633,7 +633,7 @@ class HasValidMetadataTest {
             Metadatum(UndefinedDate.UNDEFINED_UNKNOWN, MetadatumType.UNDEFINED_DATE),
         )
 
-    assertThat(hasValidMetadata.isSatisfiedBy(instance)).isTrue()
+    assertThat(hasValidMetadata.evaluate(instance).isSatisfied).isTrue()
   }
 
   @Test
@@ -647,7 +647,7 @@ class HasValidMetadataTest {
             Metadatum(UndefinedDate.UNDEFINED_UNKNOWN, MetadatumType.UNDEFINED_DATE),
         )
 
-    assertThat(hasValidMetadata.isSatisfiedBy(instance)).isFalse()
+    assertThat(hasValidMetadata.evaluate(instance).isSatisfied).isFalse()
   }
 
   @Test
@@ -663,7 +663,7 @@ class HasValidMetadataTest {
             Metadatum("appendix", MetadatumType.APPENDIX),
         )
 
-    assertThat(hasValidMetadata.isSatisfiedBy(instance)).isTrue()
+    assertThat(hasValidMetadata.evaluate(instance).isSatisfied).isTrue()
   }
 
   @Test
@@ -677,7 +677,7 @@ class HasValidMetadataTest {
             Metadatum("announcement medium", MetadatumType.ANNOUNCEMENT_MEDIUM),
         )
 
-    assertThat(hasValidMetadata.isSatisfiedBy(instance)).isFalse()
+    assertThat(hasValidMetadata.evaluate(instance).isSatisfied).isFalse()
   }
 
   @Test
@@ -696,7 +696,7 @@ class HasValidMetadataTest {
             Metadatum("footnote other", MetadatumType.FOOTNOTE_OTHER),
         )
 
-    assertThat(hasValidMetadata.isSatisfiedBy(instance)).isTrue()
+    assertThat(hasValidMetadata.evaluate(instance).isSatisfied).isTrue()
   }
 
   @Test
@@ -712,7 +712,7 @@ class HasValidMetadataTest {
             Metadatum("gazette", MetadatumType.ANNOUNCEMENT_GAZETTE),
         )
 
-    assertThat(hasValidMetadata.isSatisfiedBy(instance)).isFalse()
+    assertThat(hasValidMetadata.evaluate(instance).isSatisfied).isFalse()
   }
 
   @Test
@@ -731,7 +731,7 @@ class HasValidMetadataTest {
             Metadatum("not considered yet", MetadatumType.PROOF_INDICATION),
         )
 
-    assertThat(hasValidMetadata.isSatisfiedBy(instance)).isTrue()
+    assertThat(hasValidMetadata.evaluate(instance).isSatisfied).isTrue()
   }
 
   @Test
@@ -745,7 +745,7 @@ class HasValidMetadataTest {
             Metadatum("announcement medium", MetadatumType.ANNOUNCEMENT_MEDIUM),
         )
 
-    assertThat(hasValidMetadata.isSatisfiedBy(instance)).isFalse()
+    assertThat(hasValidMetadata.evaluate(instance).isSatisfied).isFalse()
   }
 
   @Test
@@ -758,7 +758,7 @@ class HasValidMetadataTest {
             Metadatum("work note", MetadatumType.TEXT),
         )
 
-    assertThat(hasValidMetadata.isSatisfiedBy(instance)).isTrue()
+    assertThat(hasValidMetadata.evaluate(instance).isSatisfied).isTrue()
   }
 
   @Test
@@ -772,7 +772,7 @@ class HasValidMetadataTest {
             Metadatum("announcement medium", MetadatumType.ANNOUNCEMENT_MEDIUM),
         )
 
-    assertThat(hasValidMetadata.isSatisfiedBy(instance)).isFalse()
+    assertThat(hasValidMetadata.evaluate(instance).isSatisfied).isFalse()
   }
 
   @Test
@@ -785,7 +785,7 @@ class HasValidMetadataTest {
             Metadatum("text in progress", MetadatumType.TEXT),
         )
 
-    assertThat(hasValidMetadata.isSatisfiedBy(instance)).isTrue()
+    assertThat(hasValidMetadata.evaluate(instance).isSatisfied).isTrue()
   }
 
   @Test
@@ -799,7 +799,7 @@ class HasValidMetadataTest {
             Metadatum("text in progress", MetadatumType.TEXT),
         )
 
-    assertThat(hasValidMetadata.isSatisfiedBy(instance)).isFalse()
+    assertThat(hasValidMetadata.evaluate(instance).isSatisfied).isFalse()
   }
 
   @Test
@@ -816,7 +816,7 @@ class HasValidMetadataTest {
             Metadatum("reference", MetadatumType.REFERENCE),
         )
 
-    assertThat(hasValidMetadata.isSatisfiedBy(instance)).isTrue()
+    assertThat(hasValidMetadata.evaluate(instance).isSatisfied).isTrue()
   }
 
   @Test
@@ -830,7 +830,7 @@ class HasValidMetadataTest {
             Metadatum("announcement medium", MetadatumType.ANNOUNCEMENT_MEDIUM),
         )
 
-    assertThat(hasValidMetadata.isSatisfiedBy(instance)).isFalse()
+    assertThat(hasValidMetadata.evaluate(instance).isSatisfied).isFalse()
   }
 
   @Test
@@ -847,7 +847,7 @@ class HasValidMetadataTest {
             Metadatum("reference", MetadatumType.REFERENCE),
         )
 
-    assertThat(hasValidMetadata.isSatisfiedBy(instance)).isTrue()
+    assertThat(hasValidMetadata.evaluate(instance).isSatisfied).isTrue()
   }
 
   @Test
@@ -863,7 +863,7 @@ class HasValidMetadataTest {
             Metadatum("announcement medium", MetadatumType.ANNOUNCEMENT_MEDIUM),
         )
 
-    assertThat(hasValidMetadata.isSatisfiedBy(instance)).isFalse()
+    assertThat(hasValidMetadata.evaluate(instance).isSatisfied).isFalse()
   }
 
   @Test
@@ -876,7 +876,7 @@ class HasValidMetadataTest {
             Metadatum("text", MetadatumType.TEXT),
         )
 
-    assertThat(hasValidMetadata.isSatisfiedBy(instance)).isTrue()
+    assertThat(hasValidMetadata.evaluate(instance).isSatisfied).isTrue()
   }
 
   @Test
@@ -890,7 +890,7 @@ class HasValidMetadataTest {
             Metadatum("text in progress", MetadatumType.TEXT),
         )
 
-    assertThat(hasValidMetadata.isSatisfiedBy(instance)).isFalse()
+    assertThat(hasValidMetadata.evaluate(instance).isSatisfied).isFalse()
   }
 
   @Test
@@ -903,7 +903,7 @@ class HasValidMetadataTest {
             Metadatum("note", MetadatumType.NOTE),
         )
 
-    assertThat(hasValidMetadata.isSatisfiedBy(instance)).isTrue()
+    assertThat(hasValidMetadata.evaluate(instance).isSatisfied).isTrue()
   }
 
   @Test
@@ -917,7 +917,7 @@ class HasValidMetadataTest {
             Metadatum("text", MetadatumType.TEXT),
         )
 
-    assertThat(hasValidMetadata.isSatisfiedBy(instance)).isFalse()
+    assertThat(hasValidMetadata.evaluate(instance).isSatisfied).isFalse()
   }
 
   @Test
@@ -931,7 +931,7 @@ class HasValidMetadataTest {
             Metadatum("2020", MetadatumType.YEAR),
         )
 
-    assertThat(hasValidMetadata.isSatisfiedBy(instance)).isFalse()
+    assertThat(hasValidMetadata.evaluate(instance).isSatisfied).isFalse()
   }
 
   @Test
@@ -944,7 +944,7 @@ class HasValidMetadataTest {
             Metadatum("note", MetadatumType.NOTE),
         )
 
-    assertThat(hasValidMetadata.isSatisfiedBy(instance)).isFalse()
+    assertThat(hasValidMetadata.evaluate(instance).isSatisfied).isFalse()
   }
 
   @Test
@@ -957,7 +957,7 @@ class HasValidMetadataTest {
             Metadatum(LocalDate.now(), MetadatumType.DATE),
         )
 
-    assertThat(hasValidMetadata.isSatisfiedBy(instance)).isTrue()
+    assertThat(hasValidMetadata.evaluate(instance).isSatisfied).isTrue()
   }
 
   @Test
@@ -970,7 +970,7 @@ class HasValidMetadataTest {
             Metadatum("2020", MetadatumType.YEAR),
         )
 
-    assertThat(hasValidMetadata.isSatisfiedBy(instance)).isTrue()
+    assertThat(hasValidMetadata.evaluate(instance).isSatisfied).isTrue()
   }
 
   @Test
@@ -984,7 +984,7 @@ class HasValidMetadataTest {
             Metadatum(LocalTime.now(), MetadatumType.TIME),
         )
 
-    assertThat(hasValidMetadata.isSatisfiedBy(instance)).isTrue()
+    assertThat(hasValidMetadata.evaluate(instance).isSatisfied).isTrue()
   }
 
   @Test
@@ -997,7 +997,7 @@ class HasValidMetadataTest {
             Metadatum(LocalDate.now(), MetadatumType.DATE),
         )
 
-    assertThat(hasValidMetadata.isSatisfiedBy(instance)).isTrue()
+    assertThat(hasValidMetadata.evaluate(instance).isSatisfied).isTrue()
   }
 
   @Test
@@ -1010,7 +1010,7 @@ class HasValidMetadataTest {
             Metadatum("2020", MetadatumType.YEAR),
         )
 
-    assertThat(hasValidMetadata.isSatisfiedBy(instance)).isTrue()
+    assertThat(hasValidMetadata.evaluate(instance).isSatisfied).isTrue()
   }
 
   @Test
@@ -1024,7 +1024,7 @@ class HasValidMetadataTest {
             Metadatum(LocalTime.now(), MetadatumType.TIME),
         )
 
-    assertThat(hasValidMetadata.isSatisfiedBy(instance)).isFalse()
+    assertThat(hasValidMetadata.evaluate(instance).isSatisfied).isFalse()
   }
 
   @Test
@@ -1037,6 +1037,6 @@ class HasValidMetadataTest {
             Metadatum(LocalTime.now(), MetadatumType.TIME),
         )
 
-    assertThat(hasValidMetadata.isSatisfiedBy(instance)).isFalse()
+    assertThat(hasValidMetadata.evaluate(instance).isSatisfied).isFalse()
   }
 }
