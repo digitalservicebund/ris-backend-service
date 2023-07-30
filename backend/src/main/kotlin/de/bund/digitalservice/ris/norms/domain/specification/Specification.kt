@@ -33,6 +33,7 @@ package de.bund.digitalservice.ris.norms.domain.specification
  * implementation only supports the in-memory validation use-case.
  *
  * @sample de.bund.digitalservice.ris.norms.domain.specification.SpecificationSamples.alternativeSpecificationDefinitions
+ * @sample de.bund.digitalservice.ris.norms.domain.specification.SpecificationSamples.fluidSyntaxWithChainedSpecifications
  */
 interface Specification<T : Any> {
   /** Core function that must be implemented to evaluate a single instance. */
@@ -59,7 +60,7 @@ interface Specification<T : Any> {
 
   /**
    * Convenience implementation of the [and] function to use with the infix `+` operator. Becomes
-   * handy at certain usages to keep the code easy to read.
+   * handy at certain usages to keep the code easy to read (see [chain]).
    */
   operator fun plus(other: Specification<T>) = and(other)
 

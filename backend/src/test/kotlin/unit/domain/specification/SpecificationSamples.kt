@@ -45,6 +45,17 @@ class SpecificationSamples {
 
     assertThat(lessThanSeven.evaluate(6).isSatisfied).isTrue()
   }
+
+  fun fluidSyntaxWithChainedSpecifications() {
+    chain(isPositive + greaterThanFive + LessThan(20))
+        .with(7)
+        .and(GreaterThan(2) + lessThanSeven)
+        .with(3, *someNumbers.toTypedArray())
+        .and(isSuperSpecial)
+        .with(listOfSomething)
+        .evaluateAll()
+        .throwWhenUnsatisfied()
+  }
 }
 
 private val someNumbers = listOf(8, 9)
