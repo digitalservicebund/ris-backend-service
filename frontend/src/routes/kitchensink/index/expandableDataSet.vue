@@ -1,6 +1,10 @@
 <script lang="ts" setup>
-import { h } from "vue"
 import ExpandableDataSet from "@/components/ExpandableDataSet.vue"
+import {
+  normsMetadataSummarizer,
+  SummarizerDataSet,
+  Type,
+} from "@/helpers/normsMetadataSummarizer"
 import KitchensinkPage from "@/kitchensink/components/KitchensinkPage.vue"
 import KitchensinkStory from "@/kitchensink/components/KitchensinkStory.vue"
 import DataSetSummary, {
@@ -8,15 +12,17 @@ import DataSetSummary, {
   defaultSummarizer,
 } from "@/shared/components/DataSetSummary.vue"
 
-function chipSummarizer(dataEntry: undefined) {
-  return h(
-    "div",
-    { class: `bg-yellow-700 rounded-full py-4 px-10 text-white font-bold` },
-    defaultSummarizer(dataEntry),
+function checkMarkSummarizer(dataEntry: undefined) {
+  const summarizerData: SummarizerDataSet[] = []
+  summarizerData.push(
+    new SummarizerDataSet([defaultSummarizer(dataEntry)], {
+      type: Type.CHECKMARK,
+    }),
   )
+  return normsMetadataSummarizer(summarizerData)
 }
 
-const ChipSummary = withSummarizer(chipSummarizer)
+const CheckmarkSummary = withSummarizer(checkMarkSummarizer)
 </script>
 
 <template>
@@ -42,8 +48,8 @@ const ChipSummary = withSummarizer(chipSummarizer)
 
     <KitchensinkStory name="Special section">
       <ExpandableDataSet
-        :data-set="['First Value', 'Second Value']"
-        :summary-component="ChipSummary"
+        :data-set="['Checkbox example value']"
+        :summary-component="CheckmarkSummary"
         title="Special Section"
       >
         <div class="h-64">Content</div>
