@@ -1342,12 +1342,12 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
           ),
         },
         {
-          type: FieldType.CHIPS,
-          id: "workNoteChips",
+          type: FieldType.TEXT,
+          id: "workNoteText",
           label: "Bearbeitungshinweis",
           values: norm.metadataSections?.DOCUMENT_STATUS_SECTION?.map(
             (section) => section?.DOCUMENT_STATUS?.[0],
-          ).map((section) => section?.WORK_NOTE),
+          ).map((section) => section?.WORK_NOTE?.[0]),
         },
         {
           type: FieldType.TEXT,

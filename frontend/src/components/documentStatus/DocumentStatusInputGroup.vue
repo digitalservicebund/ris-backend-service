@@ -32,8 +32,9 @@ watch(inputValue, () => emit("update:modelValue", inputValue.value), {
 })
 
 const workNote = computed({
-  get: () => inputValue.value.WORK_NOTE,
-  set: (data?: string[]) => data && (inputValue.value.WORK_NOTE = data),
+  get: () => inputValue.value.WORK_NOTE?.[0],
+  set: (data?: string) =>
+    (inputValue.value.WORK_NOTE = data ? [data] : undefined),
 })
 
 const description = computed({
@@ -75,17 +76,13 @@ const yearEnabled = computed(() => !inputValue.value.DATE?.[0])
 <template>
   <div>
     <InputField
-      id="workNoteChips"
+      id="workNoteText"
       v-slot="{ id }"
       aria-label="Bearbeitungshinweis"
       class="w-1/3"
       label="Bearbeitungshinweis"
     >
-      <ChipsInput
-        :id="id"
-        v-model="workNote"
-        aria-label="Bearbeitungshinweis Chips"
-      />
+      <TextInput :id="id" v-model="workNote" aria-label="Bearbeitungshinweis" />
     </InputField>
     <InputField
       id="descriptionText"
