@@ -4,112 +4,19 @@ Date: 2023-06-28
 
 ## Status
 
-Proposed
+Accepted
 
 ## Context
 
 Currently many of our components are using `v-model`s in a way that is likely to cause issues. Specifically, we frequently pass around objects and arrays as models (which in itself is fine), but then work on the **references** to the objects. This means the underlying data changes immediately, breaking [one-way data flow](https://vuejs.org/guide/components/props.html#one-way-data-flow). This is harder to reason about, hard to debug, and leads to issues with Vue's reactivity system.
 
-> [!info] TL;DR
->
-> - We're mutating prop values when we really shouldn't
-> - This makes our data flow hard to understand and leads to errors that are hard to debug
->
-> Proposed solution:
->
-> - Make sure models are always treated as immutable, using [Immer](https://immerjs.github.io/immer/) for efficiently updating immutable data structures
-> - Do this from now on for all new components
-> - Refactor existing components as we go along (perhaps schedule a first batch in cases where it's already causing issues)
-
-### Simplified example
-
-Say we have a parent component and a child component, and the parent passes some data in the form of an object to the child via a `v-model`:
-
-Parent component:
-
-```vue
-<script>
-import { ref } from "vue";
-
-const someData = ref({
-  id: "4711",
-  title: "some title",
-  items: ["one", "two", "three"],
-});
-</script>
-
-<template>
-  <ChildComponent v-model="someData" />
-</template>
-```
-
-Child component:
-
-```vue
-<script>
-import { watch, ref } from "vue"
-
-const props = defineProps<{
-  modelValue: Data;
-}>()
-
-const emit = defineEmits<{
-  ("update:modelValue", value: Data) => void;
-}>()
-
-const value = ref(props.modelValue);
-
-watch(
-  () => props.modelValue,
-  () => { value = props.modelValue },
-  { deep: true }
-)
-
-watch(value, () => {
-  emit("update:modelValue", value)
-})
-</script>
-
-<template>
-  <input v-model="value.title" />
-</template>
-```
-
-### Expectation
-
-At first look you might think that this:
-
-1. Copies the `modelValue` from the props to the local `value`
-2. Wires that up with the input, changes the value when the user types
-3. Then emits the updated value to let the parent know what changed
-4. The parent stores the updated value
-5. ...which is again passed as a prop to the child, thereby updating the value of the input
-
-### Reality
-
-The problem is that's not what happens. In reality:
-
-1. The value is not a copy, but a **reference** to the data in the parent component
-2. The input directly mutates data in the _parent_, bypassing the emit event and breaking one-way data flow
-   - This is **not allowed** but Vue doesn't detect this for objects and arrays
-   - If you tried this with primitive types, Vue would complain
-3. The update event either is...
-   - Never fired at all (but the data is still updated), or
-   - It is fired but redundant, as the data has already been mutated at this point
-
-### Issues
+This causes a number of issues:
 
 1. Data changes in unpredictable ways, bypassing all update events or checks, which...
    - leads to issues that are very hard to debug
    - means we don't have a central authority that can take care of cleaning up, ensuring consistency, or triggering behavior if certain states are reached
 2. Vue's reactivity system often fails to detect these changes (a workaround is to use deep watchers, but they're [discouraged](https://vuejs.org/guide/essentials/watchers.html#deep-watchers) because of their performance overhead)
 3. It breaks features such as the `current` and `previous` value parameters in watchers, since they will both point to the same thing. Because of that it's impossible to compare versions and track changes.
-
-Some practical examples of where this causes problems in our app:
-
-- We'll sometimes post garbage data to the API because our forms directly change that root app state, even if the user is still working on it and data is incomplete or wrong. Norms solves this by cleaning up the data before posting to the API, which seems like unnecessary and error-prone work. Caselaw ran into the same issue, where data was changed even though they removed **all** update events.
-
-- The chips component should focus the input control when the last chip is deleted. However it currently can't because 1) the watcher doesn't trigger when the chips list is changed, 2) if you try to fix this using a deep watcher or one of the events provided by the chips list, you'll find that the data doesn't have the content you'd expect (e.g. outdated, "previous" and "current" are the same, ...)
 
 ## Decision
 
@@ -123,10 +30,6 @@ Some practical examples of where this causes problems in our app:
 4. Prefer, where possible, props with primitive types over reference types, even if that results in more props. This is more straightforward to implement and results in better performance, because we don't need to worry about immutability in the first place.
 
 ### Example
-
-Parent component: Can stay the same
-
-Child component:
 
 ```vue
 <script>
@@ -143,9 +46,7 @@ const emit = defineEmits<{
 
 const localModelValue = computed({
   get() {
-    // readonly is a helper from Vue that returns an immutable
-    // proxy to the original object
-    return readonly(props.modelValue);
+    return props.modelValue;
   },
   set(value) {
     emit("update:modelValue", value);
@@ -168,6 +69,8 @@ updateTitle(newTitle: string) {
   />
 </template>
 ```
+
+In the future, we will be able to further simplify this thanks to the (currently experimental) [`defineModel` compiler macro](https://github.com/vuejs/rfcs/discussions/503).
 
 ## Consequences
 
