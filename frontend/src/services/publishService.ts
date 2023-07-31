@@ -1,5 +1,6 @@
 import httpClient, { ServiceResponse } from "./httpClient"
 import PublicationHistoryRecord from "@/domain/xmlMail"
+import errorMessages from "@/shared/i18n/errors.json"
 
 interface PublishService {
   publishDocument(
@@ -47,7 +48,7 @@ const service: PublishService = {
       }
 
       response.error = {
-        title: "Leider ist ein Fehler aufgetreten.",
+        title: errorMessages.DOCUMENT_UNIT_PUBLISH_FAILED.title,
         description,
       }
     }
@@ -63,9 +64,10 @@ const service: PublishService = {
     response.error =
       response.status >= 300
         ? {
-            title: "Fehler beim Laden der letzten Veröffentlichung",
+            title: errorMessages.DOCUMENT_UNIT_LOADING_PUBLICATION_FAILED.title,
             description:
-              "Die Daten der letzten Veröffentlichung konnten nicht geladen werden.",
+              errorMessages.DOCUMENT_UNIT_LOADING_PUBLICATION_FAILED
+                .description,
           }
         : undefined
 

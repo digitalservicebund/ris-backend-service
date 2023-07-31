@@ -1,4 +1,5 @@
 import httpClient, { ServiceResponse } from "./httpClient"
+import errorMessages from "@/shared/i18n/errors.json"
 
 interface KeywordService {
   getKeywords(uuid: string): Promise<ServiceResponse<string[]>>
@@ -16,7 +17,7 @@ const service: KeywordService = {
     )
     if (response.status >= 300) {
       response.error = {
-        title: `Schlagwörter konnten nicht geladen werden.`,
+        title: errorMessages.KEYWORDS_COULD_NOT_BE_LOADED.title,
       }
     }
     return response
@@ -28,7 +29,10 @@ const service: KeywordService = {
     const response = await httpClient.put<string, string[]>(encodedString)
     if (response.status >= 300) {
       response.error = {
-        title: `Schlagwort ${keyword} konnte nicht hinzugefügt werden`,
+        title: errorMessages.KEYWORD_COULD_NOT_BE_ADDED.title.replace(
+          "${keyword}",
+          keyword,
+        ),
       }
     }
     return response
@@ -40,7 +44,10 @@ const service: KeywordService = {
     const response = await httpClient.delete<string[]>(encodedString)
     if (response.status >= 300) {
       response.error = {
-        title: `Schlagwort ${keyword} konnte nicht entfernt werden`,
+        title: errorMessages.KEYWORD_COULD_NOT_BE_DELETED.title.replace(
+          "${keyword}",
+          keyword,
+        ),
       }
     }
     return response

@@ -4,6 +4,7 @@ import { Court } from "@/domain/documentUnit"
 import { FieldOfLawNode } from "@/domain/fieldOfLaw"
 import { NormAbbreviation } from "@/domain/normAbbreviation"
 import { ComboboxItem } from "@/shared/components/input/types"
+import errorMessages from "@/shared/i18n/errors.json"
 
 enum Endpoint {
   documentTypes = "lookuptable/documentTypes",
@@ -85,8 +86,8 @@ async function fetchFromEndpoint(endpoint: Endpoint, filter?: string) {
     return {
       status: response.status,
       error: {
-        title: "Serverfehler.",
-        description: "Dropdown Items konnten nicht geladen werden.",
+        title: errorMessages.SERVER_ERROR_DROPDOWN.title,
+        description: errorMessages.SERVER_ERROR_DROPDOWN.description,
       },
     }
   }

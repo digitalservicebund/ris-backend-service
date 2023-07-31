@@ -1,6 +1,7 @@
 import httpClient, { ServiceResponse } from "./httpClient"
 import { FieldOfLawNode } from "@/domain/fieldOfLaw"
 import { Page, PageableService } from "@/shared/components/Pagination.vue"
+import errorMessages from "@/shared/i18n/errors.json"
 
 interface FieldOfLawService {
   getSelectedFieldsOfLaw(
@@ -28,7 +29,11 @@ const service: FieldOfLawService = {
     )
     if (response.status >= 300) {
       response.error = {
-        title: `Sachgebiete für die Dokumentationseinheit ${uuid} konnten nicht geladen werden.`,
+        title:
+          errorMessages.DOCUMENT_UNIT_FIELDS_OF_LAW_COULD_NOT_BE_LOADED.title.replace(
+            "${uuid}",
+            uuid,
+          ),
       }
     }
     return response
@@ -39,8 +44,10 @@ const service: FieldOfLawService = {
     )
     if (response.status >= 300) {
       response.error = {
-        title: `Sachgebiet ${identifier} konnte nicht zu
-          Dokumentationseinheit ${uuid} hinzugefügt werden`,
+        title:
+          errorMessages.DOCUMENT_UNIT_FIELDS_OF_LAW_COULD_NOT_BE_ADDED.title
+            .replace("${identifier}", identifier)
+            .replace("${uuid}", uuid),
       }
     }
     return response
@@ -51,8 +58,10 @@ const service: FieldOfLawService = {
     )
     if (response.status >= 300) {
       response.error = {
-        title: `Sachgebiet ${identifier} konnte nicht von der
-        Dokumentationseinheit ${uuid} entfernt werden`,
+        title:
+          errorMessages.DOCUMENT_UNIT_FIELDS_OF_LAW_COULD_NOT_BE_DELETED.title
+            .replace("${identifier}", identifier)
+            .replace("${uuid}", uuid),
       }
     }
     return response
@@ -63,10 +72,10 @@ const service: FieldOfLawService = {
     )
     if (response.status >= 300) {
       response.error = {
-        title:
-          "Sachgebiete unterhalb von " +
-          identifier +
-          " konnten nicht geladen werden.",
+        title: errorMessages.FIELDS_OF_LAW_COULD_NOT_BE_LOADED.title.replace(
+          "${identifier}",
+          identifier,
+        ),
       }
     }
     return response
@@ -77,7 +86,7 @@ const service: FieldOfLawService = {
     )
     if (response.status >= 300) {
       response.error = {
-        title: "Pfad zu ausgewähltem Sachgebiet konnte nicht geladen werden.",
+        title: errorMessages.FIELD_OF_LAW_COULD_NOT_BE_LOADED.title,
       }
     }
     return response
@@ -89,7 +98,7 @@ const service: FieldOfLawService = {
     )
     if (response.status >= 300) {
       response.error = {
-        title: "Die Suche nach Sachgebieten konnte nicht ausgeführt werden.",
+        title: errorMessages.FIELD_OF_LAW_SEARCH_FAILED.title,
       }
     }
     return response

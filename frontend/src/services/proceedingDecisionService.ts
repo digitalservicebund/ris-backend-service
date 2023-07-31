@@ -1,6 +1,7 @@
 import httpClient, { ServiceResponse } from "./httpClient"
 import DocumentUnit from "@/domain/documentUnit"
 import ProceedingDecision from "@/domain/proceedingDecision"
+import errorMessages from "@/shared/i18n/errors.json"
 
 interface ProceedingDecisionService {
   createProceedingDecision(
@@ -39,8 +40,11 @@ const service: ProceedingDecisionService = {
       return {
         status: 500,
         error: {
-          title: `Vorgehende Entscheidung konnte nicht zu
-          Dokumentationseinheit ${uuid} hinzugefügt werden`,
+          title:
+            errorMessages.PROCEEDING_DECISION_COULD_NOT_BE_ADDED.title.replace(
+              "${uuid}",
+              uuid,
+            ),
         },
       }
     } else {
@@ -61,7 +65,10 @@ const service: ProceedingDecisionService = {
       return {
         status: 500,
         error: {
-          title: `Vorgehende Entscheidung ${childUuid} konnte der Dokumentationseinheit ${parentUuid} nicht hinzugefügt werden.`,
+          title:
+            errorMessages.DOCUMENT_UNIT_PROCEEDING_DECISION_COULD_NOT_BE_ADDED.title
+              .replace("${childUuid}", childUuid)
+              .replace("${parentUuid}", parentUuid),
         },
       }
     } else {
@@ -81,7 +88,10 @@ const service: ProceedingDecisionService = {
     )
     if (response.status >= 300) {
       response.error = {
-        title: `Vorgehende Entscheidung ${childUuid} für die Dokumentationseinheit ${parentUuid} konnten nicht entfernt werden.`,
+        title:
+          errorMessages.DOCUMENT_UNIT_PROCEEDING_DECISION_COULD_NOT_BE_DELETED.title
+            .replace("${childUuid}", childUuid)
+            .replace("${parentUuid}", parentUuid),
       }
     }
 

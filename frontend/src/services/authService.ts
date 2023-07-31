@@ -1,5 +1,6 @@
 import httpClient, { ServiceResponse } from "./httpClient"
 import { User } from "@/domain/user"
+import errorMessages from "@/shared/i18n/errors.json"
 
 export const loginEndpoint = "/oauth2/authorization/oidcclient"
 
@@ -15,7 +16,7 @@ export async function getName(): Promise<ServiceResponse<User>> {
   const response = await httpClient.get<User>("auth/me")
   if (response.status != 200) {
     response.error = {
-      title: "Name konnte nicht geladen werden.",
+      title: errorMessages.NAME_COULD_NOT_BE_LOADED.title,
     }
   }
   return response

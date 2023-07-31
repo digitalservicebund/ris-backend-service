@@ -1,5 +1,6 @@
 import httpClient, { ServiceResponse } from "./httpClient"
 import DocumentUnit from "@/domain/documentUnit"
+import errorMessages from "@/shared/i18n/errors.json"
 
 interface FileService {
   upload(
@@ -17,9 +18,8 @@ const service: FileService = {
       return {
         status: 415,
         error: {
-          title: "Das ausgewählte Dateiformat ist nicht korrekt.",
-          description:
-            "Versuchen Sie eine .docx-Version dieser Datei hochzuladen.",
+          title: errorMessages.WRONG_MEDIA_TYPE_DOCX_REQUIRED.title,
+          description: errorMessages.WRONG_MEDIA_TYPE_DOCX_REQUIRED.description,
         },
       }
     }
@@ -37,20 +37,18 @@ const service: FileService = {
     )
     if (response.status === 413) {
       response.error = {
-        title: "Die Datei darf max. 20 MB groß sein.",
-        description: "Bitte laden Sie eine kleinere Datei hoch.",
+        title: errorMessages.FILE_TOO_LARGE_CASELAW.title,
+        description: errorMessages.FILE_TOO_LARGE_CASELAW.description,
       }
     } else if (response.status === 415) {
       response.error = {
-        title: "Das ausgewählte Dateiformat ist nicht korrekt.",
-        description:
-          "Versuchen Sie eine .docx-Version dieser Datei hochzuladen.",
+        title: errorMessages.WRONG_MEDIA_TYPE_DOCX_REQUIRED.title,
+        description: errorMessages.WRONG_MEDIA_TYPE_DOCX_REQUIRED.description,
       }
     } else if (response.status >= 300) {
       response.error = {
-        title: "Leider ist ein Fehler aufgetreten.",
-        description:
-          "Bitte versuchen Sie es zu einem späteren Zeitpunkt erneut.",
+        title: errorMessages.SERVER_ERROR.title,
+        description: errorMessages.SERVER_ERROR.description,
       }
     } else {
       response.error = undefined
@@ -65,7 +63,7 @@ const service: FileService = {
     )
     response.error =
       response.status >= 300
-        ? { title: "Datei konnte nicht gelöscht werden." }
+        ? { title: errorMessages.FILE_DELETE_FAILED.title }
         : undefined
 
     return response
@@ -77,7 +75,7 @@ const service: FileService = {
     )
     response.error =
       response.status >= 300
-        ? { title: "Docx konnte nicht als html geladen werden." }
+        ? { title: errorMessages.DOCX_COULD_NOT_BE_LOADED.title }
         : undefined
 
     return response

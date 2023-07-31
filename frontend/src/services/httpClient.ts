@@ -1,5 +1,6 @@
 import axios, { AxiosError } from "axios"
 import { ValidationError } from "@/shared/components/input/types"
+import errorMessages from "@/shared/i18n/errors.json"
 
 type RequestOptions = {
   headers?: {
@@ -67,7 +68,9 @@ async function baseHttp<T>(
     return {
       status: Number((error as AxiosError).code) || 500,
       error: {
-        title: (error as AxiosError).status?.toString() ?? "Network Error",
+        title:
+          (error as AxiosError).status?.toString() ??
+          errorMessages.NETWORK_ERROR.title,
         description: String((error as AxiosError).cause),
       },
     }

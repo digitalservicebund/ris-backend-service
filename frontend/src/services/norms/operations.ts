@@ -6,33 +6,7 @@ import {
 import { NormListResponseSchema, NormResponseSchema } from "./schemas"
 import { FlatMetadata, MetadataSections, Norm } from "@/domain/Norm"
 import httpClient, { ServiceResponse } from "@/services/httpClient"
-
-const errorMessages = {
-  FILE_TOO_BIG: {
-    title: "Die Datei überschreitet die maximale Dateigröße von 20 MB.",
-  },
-  NO_INTERNET_CONNECTION: {
-    title: "Der Upload ist fehlgeschlagen.",
-    description:
-      "Bitte prüfen Sie Ihre Internetverbindung und versuchen Sie es erneut.",
-  },
-  WRONG_FILE_FORMAT: {
-    title: "Das Dateiformat wird nicht unterstützt.",
-    description: "Bitte verwenden Sie eine Zip-Datei.",
-  },
-  IMPORT_ERROR: {
-    title: "Datei konnte nicht importiert werden.",
-  },
-  GENERATION_ERROR: {
-    title: "Zip-Datei konnte nicht generiert werden.",
-  },
-  LOADING_ERROR: {
-    title: "Dokumentationseinheit konnte nicht geladen werden.",
-  },
-  EDIT_ERROR: {
-    title: "Dokumentationseinheit konnte nicht bearbeitet werden.",
-  },
-}
+import errorMessages from "@/shared/i18n/errors.json"
 
 export async function getAllNorms(): Promise<
   ServiceResponse<NormListResponseSchema>

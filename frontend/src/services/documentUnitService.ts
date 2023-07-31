@@ -7,6 +7,7 @@ import { DocumentUnitListEntry } from "@/domain/documentUnitListEntry"
 import LinkedDocumentUnit from "@/domain/linkedDocumentUnit"
 import { SingleNormValidationInfo } from "@/domain/normReference"
 import { PageableService, Page } from "@/shared/components/Pagination.vue"
+import errorMessages from "@/shared/i18n/errors.json"
 
 interface DocumentUnitService {
   getAllListEntries: PageableService<DocumentUnitListEntry>
@@ -32,7 +33,7 @@ const service: DocumentUnitService = {
     )
     if (response.status >= 300) {
       response.error = {
-        title: "Dokumentationseinheiten konnten nicht geladen werden.",
+        title: errorMessages.DOCUMENT_UNIT_COULD_NOT_BE_LOADED.title,
       }
     }
     return response
@@ -47,8 +48,8 @@ const service: DocumentUnitService = {
       response.error = {
         title:
           response.status == 403
-            ? "Diese Dokumentationseinheit existiert nicht oder sie haben keine Berechtigung"
-            : "Dokumentationseinheit konnte nicht geladen werden.",
+            ? errorMessages.DOCUMENT_UNIT_NOT_ALLOWED.title
+            : errorMessages.DOCUMENT_UNIT_COULD_NOT_BE_LOADED.title,
       }
     } else {
       response.data = new DocumentUnit(response.data.uuid, { ...response.data })
@@ -62,7 +63,7 @@ const service: DocumentUnitService = {
     )
     if (response.status >= 300) {
       response.error = {
-        title: "Neue Dokumentationseinheit konnte nicht erstellt werden.",
+        title: errorMessages.DOCUMENT_UNIT_CREATION_FAILED.title,
       }
     } else {
       response.data = new DocumentUnit((response.data as DocumentUnit).uuid, {
@@ -90,8 +91,8 @@ const service: DocumentUnitService = {
       response.error = {
         title:
           response.status == 403
-            ? "Keine Berechtigung"
-            : "Dokumentationseinheit konnte nicht aktualisiert werden.",
+            ? errorMessages.NOT_ALLOWED.title
+            : errorMessages.DOCUMENT_UNIT_UPDATE_FAILED.title,
       }
       // good enough condition to detect validation errors (@Valid)?
       if (
@@ -118,7 +119,7 @@ const service: DocumentUnitService = {
     )
     if (response.status >= 300) {
       response.error = {
-        title: "Dokumentationseinheit konnte nicht gelöscht werden.",
+        title: errorMessages.DOCUMENT_UNIT_DELETE_FAILED.title,
       }
     }
     return response
@@ -144,7 +145,7 @@ const service: DocumentUnitService = {
     )
     if (response.status >= 300) {
       response.error = {
-        title: `Die Suche nach passenden Dokumentationseinheit konnte nicht ausgeführt werden`,
+        title: errorMessages.DOCUMENT_UNIT_SEARCH_FAILED.title,
       }
     }
     response.data = response.data as Page<LinkedDocumentUnit>
@@ -173,7 +174,7 @@ const service: DocumentUnitService = {
     )
     if (response.status >= 300) {
       response.error = {
-        title: "Einzelnorm konnte nicht validiert werden.",
+        title: errorMessages.NORM_COULD_NOT_BE_VALIDATED.title,
       }
     }
     return response

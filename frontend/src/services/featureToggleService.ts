@@ -1,4 +1,5 @@
 import httpClient, { ServiceResponse } from "./httpClient"
+import errorMessages from "@/shared/i18n/errors.json"
 
 interface FeatureToggleService {
   isEnabled(toggleName: string): Promise<ServiceResponse<boolean>>
@@ -11,7 +12,7 @@ const service: FeatureToggleService = {
     )
     if (response.status >= 300) {
       response.error = {
-        title: `Feature toggle konnten nicht geladen werden.`,
+        title: errorMessages.FEATURE_TOGGLE_COULD_NOT_BE_LOADED.title,
       }
     }
     return response

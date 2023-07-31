@@ -1,0 +1,158 @@
+{
+  "NETWORK_ERROR": {
+    "title": "Network Error",
+    "description": ""
+  },
+  "NOT_ALLOWED": {
+    "title": "Keine Berechtigung",
+    "description": ""
+  },
+  "SERVER_ERROR": {
+    "title": "Leider ist ein Fehler aufgetreten.",
+    "description": "Bitte versuchen Sie es zu einem späteren Zeitpunkt erneut."
+  },
+  "SERVER_ERROR_DROPDOWN": {
+    "title": "Serverfehler.",
+    "description": "Dropdown Items konnten nicht geladen werden."
+  },
+  "FEATURE_TOGGLE_COULD_NOT_BE_LOADED": {
+    "title": "Feature toggle konnten nicht geladen werden.",
+    "description": ""
+  },
+  "WRONG_MEDIA_TYPE_DOCX_REQUIRED": {
+    "title": "Das ausgewählte Dateiformat ist nicht korrekt.",
+    "description": "Versuchen Sie eine .docx-Version dieser Datei hochzuladen."
+  },
+  "WRONG_MEDIA_TYPE_ZIP_REQUIRED": {
+    "title": "Das Dateiformat wird nicht unterstützt.",
+    "description": "Bitte verwenden Sie eine Zip-Datei."
+  },
+  "FILE_TOO_LARGE_CASELAW": {
+    "title": "Die Datei darf max. 20 MB groß sein.",
+    "description": "Bitte laden Sie eine kleinere Datei hoch."
+  },
+  "FILE_TOO_LARGE_NORMS": {
+    "title": "Die Datei überschreitet die maximale Dateigröße von 20 MB.",
+    "description": ""
+  },
+  "NAME_COULD_NOT_BE_LOADED": {
+    "title": "Name konnte nicht geladen werden.",
+    "description": ""
+  },
+  "DOCUMENT_UNIT_COULD_NOT_BE_LOADED": {
+    "title": "Dokumentationseinheiten konnten nicht geladen werden.",
+    "description": ""
+  },
+  "DOCUMENT_UNIT_NOT_ALLOWED": {
+    "title": "Diese Dokumentationseinheit existiert nicht oder sie haben keine Berechtigung",
+    "description": ""
+  },
+  "DOCUMENT_UNIT_CREATION_FAILED": {
+    "title": "Neue Dokumentationseinheit konnte nicht erstellt werden.",
+    "description": ""
+  },
+  "DOCUMENT_UNIT_UPDATE_FAILED": {
+    "title": "Dokumentationseinheit konnte nicht aktualisiert werden.",
+    "description": ""
+  },
+  "DOCUMENT_UNIT_DELETE_FAILED": {
+    "title": "Dokumentationseinheit konnte nicht gelöscht werden.",
+    "description": ""
+  },
+  "DOCUMENT_UNIT_SEARCH_FAILED": {
+    "title": "Die Suche nach passenden Dokumentationseinheit konnte nicht ausgeführt werden.",
+    "description": ""
+  },
+  "DOCUMENT_UNIT_PUBLISH_FAILED": {
+    "title": "Leider ist ein Fehler aufgetreten.",
+    "description": "Die Dokumentationseinheit kann nicht veröffentlicht werden."
+  },
+  "DOCUMENT_UNIT_LOADING_PUBLICATION_FAILED": {
+    "title": "Fehler beim Laden der letzten Veröffentlichung",
+    "description": "Die Daten der letzten Veröffentlichung konnten nicht geladen werden."
+  },
+  "NORM_COULD_NOT_BE_VALIDATED": {
+    "title": "Einzelnorm konnte nicht validiert werden.",
+    "description": ""
+  },
+  "FILE_DELETE_FAILED": {
+    "title": "Datei konnte nicht gelöscht werden.",
+    "description": ""
+  },
+  "DOCX_COULD_NOT_BE_LOADED": {
+    "title": "Docx konnte nicht als html geladen werden.",
+    "description": ""
+  },
+  "DOCUMENT_UNIT_FIELDS_OF_LAW_COULD_NOT_BE_LOADED": {
+    "title": "Sachgebiete für die Dokumentationseinheit ${uuid} konnten nicht geladen werden.",
+    "description": ""
+  },
+  "DOCUMENT_UNIT_FIELDS_OF_LAW_COULD_NOT_BE_ADDED": {
+    "title": "Sachgebiet ${identifier} konnte nicht zu\n Dokumentationseinheit ${uuid} hinzugefügt werden",
+    "description": ""
+  },
+  "DOCUMENT_UNIT_FIELDS_OF_LAW_COULD_NOT_BE_DELETED": {
+    "title": "Sachgebiet ${identifier} konnte nicht von der\n Dokumentationseinheit ${uuid} entfernt werden",
+    "description": ""
+  },
+  "FIELDS_OF_LAW_COULD_NOT_BE_LOADED": {
+    "title": "Sachgebiete unterhalb von ${identifier} konnten nicht geladen werden.",
+    "description": ""
+  },
+  "FIELD_OF_LAW_COULD_NOT_BE_LOADED": {
+    "title": "Pfad zu ausgewähltem Sachgebiet konnte nicht geladen werden.",
+    "description": ""
+  },
+  "FIELD_OF_LAW_SEARCH_FAILED": {
+    "title": "Die Suche nach Sachgebieten konnte nicht ausgeführt werden.",
+    "description": ""
+  },
+  "KEYWORD_COULD_NOT_BE_ADDED": {
+    "title": "Schlagwort ${keyword} konnte nicht hinzugefügt werden",
+    "description": ""
+  },
+  "KEYWORD_COULD_NOT_BE_DELETED": {
+    "title": "Schlagwort ${keyword} konnte nicht entfernt werden",
+    "description": ""
+  },
+  "KEYWORDS_COULD_NOT_BE_LOADED": {
+    "title": "Schlagwörter konnten nicht geladen werden.",
+    "description": ""
+  },
+  "PROCEEDING_DECISION_COULD_NOT_BE_ADDED": {
+    "title": "Vorgehende Entscheidung konnte nicht zu\n Dokumentationseinheit ${uuid} hinzugefügt werden",
+    "description": ""
+  },
+  "DOCUMENT_UNIT_PROCEEDING_DECISION_COULD_NOT_BE_ADDED": {
+    "title": "Vorgehende Entscheidung ${childUuid} konnte der Dokumentationseinheit ${parentUuid} nicht hinzugefügt werden.",
+    "description": ""
+  },
+  "DOCUMENT_UNIT_PROCEEDING_DECISION_COULD_NOT_BE_DELETED": {
+    "title": "Vorgehende Entscheidung ${childUuid} für die Dokumentationseinheit ${parentUuid} konnten nicht entfernt werden.",
+    "description": ""
+  },
+  "FILE_TOO_BIG": {
+    "title": "Die Datei überschreitet die maximale Dateigröße von 20 MB.",
+    "description": ""
+  },
+  "NO_INTERNET_CONNECTION": {
+    "title": "Der Upload ist fehlgeschlagen.",
+    "description": "Bitte prüfen Sie Ihre Internetverbindung und versuchen Sie es erneut."
+  },
+  "IMPORT_ERROR": {
+    "title": "Datei konnte nicht importiert werden.",
+    "description": ""
+  },
+  "GENERATION_ERROR": {
+    "title": "Zip-Datei konnte nicht generiert werden.",
+    "description": ""
+  },
+  "LOADING_ERROR": {
+    "title": "Dokumentationseinheit konnte nicht geladen werden.",
+    "description": ""
+  },
+  "EDIT_ERROR": {
+    "title": "Dokumentationseinheit konnte nicht bearbeitet werden.",
+    "description": ""
+  }
+}
