@@ -73,6 +73,9 @@
       "moduleLicense": "BlueOak-1.0.0"
     },
     {
+      "moduleLicense": "0BSD"
+    },
+    {
       "moduleLicense": null,
       "moduleName": "com.fasterxml.jackson:jackson-bom"
     },
