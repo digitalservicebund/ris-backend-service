@@ -19,8 +19,8 @@ const dateChips = ref<ChipsInputModelType>(["2023-07-20", "2023-07-21"])
       <InputField id="inlineChipsInput" v-slot="{ id }" label="Inline chips">
         <ChipsInput
           :id="id"
+          v-model="inlineChips"
           aria-label="Inline chips input"
-          :model-value="inlineChips"
         />
       </InputField>
     </KitchensinkStory>
@@ -29,8 +29,8 @@ const dateChips = ref<ChipsInputModelType>(["2023-07-20", "2023-07-21"])
       <InputField id="stackedChipsInput" v-slot="{ id }" label="Stacked chips">
         <ChipsInputBottom
           :id="id"
+          v-model="stackedChips"
           aria-label="Stacked chips input"
-          :model-value="stackedChips"
         />
       </InputField>
     </KitchensinkStory>
@@ -39,8 +39,8 @@ const dateChips = ref<ChipsInputModelType>(["2023-07-20", "2023-07-21"])
       <InputField id="dateChipsInput" v-slot="{ id }" label="Date chips">
         <ChipsDateInput
           :id="id"
+          v-model="dateChips"
           aria-label="Date chips input"
-          :model-value="dateChips"
         />
       </InputField>
     </KitchensinkStory>

@@ -298,15 +298,15 @@ describe("DigitalAnnouncementInputGroup", () => {
     )
 
     for (const chip of additionalInfoChips) {
-      const clearButton = within(chip).getByLabelText("Löschen")
+      const clearButton = within(chip).getByRole("button")
       await user.click(clearButton)
     }
-    expect(modelValue.ADDITIONAL_INFO).toStrictEqual([])
+    expect(modelValue.ADDITIONAL_INFO).toBeUndefined()
 
     for (const chip of explanationChips) {
-      const clearButton = within(chip).getByLabelText("Löschen")
+      const clearButton = within(chip).getByRole("button")
       await user.click(clearButton)
     }
-    expect(modelValue.EXPLANATION).toStrictEqual([])
+    expect(modelValue.EXPLANATION).toBeUndefined()
   })
 })

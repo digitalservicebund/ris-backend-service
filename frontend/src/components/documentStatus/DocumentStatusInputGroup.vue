@@ -33,7 +33,7 @@ watch(inputValue, () => emit("update:modelValue", inputValue.value), {
 
 const workNote = computed({
   get: () => inputValue.value.WORK_NOTE,
-  set: (data?: string[]) => data && (inputValue.value.WORK_NOTE = data),
+  set: (data?: string[]) => (inputValue.value.WORK_NOTE = data),
 })
 
 const description = computed({

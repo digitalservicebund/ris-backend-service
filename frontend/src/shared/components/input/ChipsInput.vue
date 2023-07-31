@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import { produce } from "immer"
 import {
   nextTick,
   onBeforeUnmount,
@@ -8,83 +9,70 @@ import {
   watchEffect,
 } from "vue"
 import ChipsList from "@/shared/components/input/ChipsList.vue"
-import { ValidationError } from "@/shared/components/input/types"
-import { useInputModel } from "@/shared/composables/useInputModel"
 
 interface Props {
   id: string
-  value?: string[]
   modelValue?: string[]
-  ariaLabel: string
-  placeholder?: string
-  validationError?: ValidationError
-}
-
-interface Emits {
-  (event: "update:modelValue", value?: string[]): void
-  (event: "input", value: Event): void
+  ariaLabel?: string
 }
 
 const props = defineProps<Props>()
-const emits = defineEmits<Emits>()
+
+const emit = defineEmits<{
+  "update:modelValue": [value?: string[]]
+  chipAdded: [value: string]
+  chipDeleted: [value: string]
+}>()
 
 /* -------------------------------------------------- *
  * Data handling                                      *
  * -------------------------------------------------- */
 
-const { emitInputEvent } = useInputModel<string[], Props, Emits>(props, emits)
-const chips = ref<string[]>(props.modelValue ?? [])
-const currentInput = ref<string>("")
+const newChipText = ref<string>("")
 
-function updateModelValue() {
-  emits("update:modelValue", chips.value.length === 0 ? undefined : chips.value)
+function addChip() {
+  const chip = newChipText.value.trim()
+  if (!chip) return
+
+  const next = props.modelValue
+    ? produce(props.modelValue, (draft) => {
+        draft.push(chip)
+      })
+    : [chip]
+
+  emit("chipAdded", chip)
+  emit("update:modelValue", next)
+  newChipText.value = ""
 }
 
-function saveChip(event: Event) {
-  const trimmed = currentInput.value.trim()
-  if (trimmed.length > 0) {
-    event.stopPropagation()
-    chips.value.push(trimmed)
-    updateModelValue()
-    currentInput.value = ""
-  }
+function onDeleteChip(chip: string) {
+  focusInputIfEmpty()
+  emit("chipDeleted", chip)
 }
-
-watch(props, () => {
-  if (props.modelValue) chips.value = props.modelValue
-})
 
 /* -------------------------------------------------- *
  * Focus management                                   *
  * -------------------------------------------------- */
 
-const chipsList = ref<typeof ChipsList>()
-const chipsInput = ref<HTMLInputElement>()
+const chipsInput = ref<HTMLInputElement | null>(null)
 
-const focusPrevious = () => {
-  if (chipsList.value !== undefined && currentInput.value === "")
-    chipsList.value.focusPrevious()
+const focusedChip = ref<number | undefined>(undefined)
+
+function maybeFocusPrevious() {
+  if (chipsInput.value?.selectionStart === 0) {
+    focusedChip.value =
+      props.modelValue !== undefined ? props.modelValue.length - 1 : undefined
+  }
 }
 
 const focusInput = () => {
-  if (chipsList.value !== undefined) chipsList.value.resetFocus()
-  if (chipsInput.value !== undefined) chipsInput.value.focus()
+  focusedChip.value = undefined
+  chipsInput.value?.focus()
 }
 
-// Temporarily disabled to prevent this from stealing focus from any input
-// on the page when the chips are empty. To fix this, we would need to either
-// react to the 'deleteChip' event or watch the chips list to see if it's empty.
-// However due to the way the chips list updates data, the list is not in the
-// state you'd expect when the events/watchers are triggered, so we'll need
-// to fix that first.
-// TODO: Re-enable this once modelValue is properly updated
-// watch(
-//   chips,
-//   (next) => {
-//     if (!next?.length) focusInput()
-//   },
-//   { deep: true }
-// )
+async function focusInputIfEmpty() {
+  if (props.modelValue?.length === 1) focusInput()
+}
 
 /* -------------------------------------------------- *
  * Input width management (needed for the enter icon) *
@@ -127,7 +115,7 @@ async function determineInputWidth() {
 
   // We first need to reset the height to auto, so that the scrollHeight
   // is not limited by the current height. Then wait for the next tick
-  // so that the textarea has time to resize.
+  // so that the input has time to resize.
   inputContentWidth.value = undefined
   await nextTick()
 
@@ -149,7 +137,7 @@ watchEffect(() => {
   })
 })
 
-watch(currentInput, async () => {
+watch(newChipText, async () => {
   await determineInputWidth()
 })
 </script>
@@ -166,10 +154,13 @@ watch(currentInput, async () => {
     @click="focusInput"
   >
     <ChipsList
-      ref="chipsList"
-      v-model="chips"
+      v-model:focused-item="focusedChip"
+      :model-value="modelValue"
+      @chip-deleted="(_, value) => onDeleteChip(value)"
       @next-clicked-on-last="focusInput"
+      @update:model-value="$emit('update:modelValue', $event)"
     />
+
     <span
       class="flex max-w-full flex-auto items-center justify-start"
       :style="{ maxWidth: `${wrapperContentWidth}px` }"
@@ -180,15 +171,15 @@ watch(currentInput, async () => {
       <input
         :id="id"
         ref="chipsInput"
-        v-model="currentInput"
+        v-model="newChipText"
         :aria-describedby="`enter-note-for-${id}`"
         :aria-label="ariaLabel"
-        class="peer w-[0.5ch] min-w-0 border-none bg-transparent outline-none"
+        class="peer w-4 min-w-0 border-none bg-transparent outline-none"
         :style="{ width: inputContentWidth }"
         type="text"
-        @input="emitInputEvent"
-        @keypress.enter="saveChip"
-        @keyup.left="focusPrevious"
+        @focus="focusedChip = undefined"
+        @keydown.enter.stop.prevent="addChip"
+        @keydown.left="maybeFocusPrevious"
       />
       <span
         class="material-icons flex-none text-16 text-transparent peer-focus:text-gray-900"

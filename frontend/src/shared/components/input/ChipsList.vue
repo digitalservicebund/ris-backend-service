@@ -1,143 +1,143 @@
 <script lang="ts" setup>
+import { produce } from "immer"
 import { ref, watch } from "vue"
-import { ResponseError } from "@/services/httpClient"
-import { useInputModel } from "@/shared/composables/useInputModel"
 
 interface Props {
-  modelValue?: string[]
-  error?: ResponseError
-}
-
-interface Emits {
-  (event: "update:modelValue", value?: string[]): void
-  (event: "previousClickedOnFirst"): void
-  (event: "nextClickedOnLast"): void
-  (event: "deleteChip", value?: string): void
-  (event: "input", value: Event): void
+  modelValue: string[] | undefined
+  focusedItem?: number
 }
 
 const props = defineProps<Props>()
-const emits = defineEmits<Emits>()
 
-const { emitInputEvent } = useInputModel<string[], Props, Emits>(props, emits)
-const chips = ref<string[]>(props.modelValue ?? [])
-const errorMessage = ref<ResponseError>()
-const focusedItemIndex = ref<number>()
+const emit = defineEmits<{
+  chipDeleted: [index: number, value: string]
+  nextClickedOnLast: []
+  previousClickedOnFirst: []
+  "update:modelValue": [value?: string[]]
+  "update:focusedItem": [index: number | undefined]
+}>()
+
+/* -------------------------------------------------- *
+ * Model value                                        *
+ * -------------------------------------------------- */
+
+function deleteChip(index: number, value: string) {
+  if (!props.modelValue || index >= props.modelValue.length) return
+  const next = produce(props.modelValue, (draft) => {
+    draft.splice(index, 1)
+  })
+
+  emit("update:modelValue", next.length === 0 ? undefined : next)
+  emit("chipDeleted", index, value)
+}
+
+/* -------------------------------------------------- *
+ * Focus management                                   *
+ * -------------------------------------------------- */
+
 const containerRef = ref<HTMLElement>()
 
-function updateModelValue() {
-  emits("update:modelValue", chips.value)
-}
+// Decoupling the local state for the focused item from the model value allows
+// us to manage the focus even if no model value has been passed. Parents are
+// free to pass a model value though if they want to take control of the focus.
+const localFocusedItem = ref<number | undefined>(props.focusedItem)
 
-function deleteChip(index: number) {
-  emits("deleteChip", chips.value[index])
-  chips.value.splice(index, 1)
-  updateModelValue()
-  resetFocus()
-}
+// Sync prop to local state, making sure it's within the bounds of the model
+// value
+watch(
+  () => props.focusedItem,
+  (is) => {
+    if (is === localFocusedItem.value) return
+    localFocusedItem.value = is !== undefined ? toExistingIndex(is) : undefined
+  },
+)
 
-function resetFocus() {
-  focusedItemIndex.value = undefined
-}
+// Sync local state to prop
+watch(
+  () => localFocusedItem.value,
+  (is) => {
+    if (is === props.focusedItem) return
+    emit("update:focusedItem", is)
+  },
+)
 
-function enterDelete() {
-  if (focusedItemIndex.value !== undefined) {
-    emits("deleteChip", chips.value[focusedItemIndex.value])
-    chips.value.splice(focusedItemIndex.value, 1)
-    // bring focus on second last item if last item was deleted
-    if (focusedItemIndex.value === chips.value.length) {
-      focusPrevious()
-    }
-  }
-  updateModelValue()
-}
+// Adjust local state when model value changes to make sure it's still adressing
+// a valid item
+watch(
+  () => props.modelValue,
+  (is) => {
+    if (!is) localFocusedItem.value = undefined
+    else localFocusedItem.value = toExistingIndex(localFocusedItem.value)
+  },
+)
 
-const focusFirst = () => {
-  focusedItemIndex.value = 0
-}
-
-const focusPrevious = () => {
-  if (focusedItemIndex.value === 0) {
-    emits("previousClickedOnFirst")
-    return
-  }
-  focusedItemIndex.value =
-    focusedItemIndex.value === undefined
-      ? chips.value.length - 1
-      : focusedItemIndex.value - 1
-}
-
-const focusNext = () => {
-  if (focusedItemIndex.value === undefined) {
-    return
-  }
-  if (focusedItemIndex.value == chips.value.length - 1) {
-    emits("nextClickedOnLast")
-    return
-  }
-  focusedItemIndex.value =
-    focusedItemIndex.value === undefined ? 0 : focusedItemIndex.value + 1
-}
-
-const setFocusedItemIndex = (index: number) => {
-  focusedItemIndex.value = index
-}
-
-watch(props, () => {
-  if (props.modelValue) chips.value = props.modelValue
-  errorMessage.value = props.error
+watch(localFocusedItem, (is) => {
+  // TODO: Remove focus when changing to undefined
+  if (is === undefined) return
+  const item = containerRef.value?.children?.[is] as HTMLElement
+  item?.focus()
 })
 
-watch(focusedItemIndex, () => {
-  if (focusedItemIndex.value !== undefined) {
-    const item = containerRef.value?.children[
-      focusedItemIndex.value
-    ] as HTMLElement
-    if (item) item.focus()
-  }
-})
+/**
+ * Returns the value if it falls within the bounds of the model value, or the
+ * closest valid value otherwise.
+ */
+function toExistingIndex(index: number | undefined): number | undefined {
+  if (!props.modelValue?.length || index === undefined) return undefined
+  else if (index < 0) return 0
+  else if (index >= props.modelValue.length) return props.modelValue.length - 1
+  else return index
+}
 
-defineExpose({ focusPrevious, focusNext, resetFocus, focusFirst })
+function focusPrevious() {
+  if (localFocusedItem.value === undefined) return
+  if (localFocusedItem.value === 0) emit("previousClickedOnFirst")
+  localFocusedItem.value = Math.max(0, localFocusedItem.value - 1)
+}
+
+function focusNext() {
+  if (localFocusedItem.value === undefined || !props.modelValue) return
+  if (localFocusedItem.value === props.modelValue.length - 1) {
+    emit("nextClickedOnLast")
+  }
+  const next = Math.min(props.modelValue.length - 1, localFocusedItem.value + 1)
+  localFocusedItem.value = next
+}
 </script>
 
 <template>
-  <div>
-    <ul
-      ref="containerRef"
-      class="my-4 mr-8 flex flex-row flex-wrap items-center gap-8 empty:m-0"
-    >
+  <ul
+    ref="containerRef"
+    class="my-4 mr-8 flex flex-row flex-wrap items-center gap-8 empty:m-0"
+  >
+    <template v-if="modelValue">
       <li
-        v-for="(chip, i) in chips"
+        v-for="(chip, i) in modelValue"
         :key="i"
-        class="group ds-body-01-reg relative flex items-center break-words rounded-10 bg-blue-500 pr-32 outline-none"
+        class="group ds-body-01-reg relative flex cursor-pointer items-center break-words rounded-10 bg-blue-500 pr-32 outline-none"
         data-testid="chip"
         tabindex="0"
-        @click.stop="setFocusedItemIndex(i)"
-        @focus="setFocusedItemIndex(i)"
-        @input="emitInputEvent"
-        @keypress.enter.stop="enterDelete"
-        @keyup.left="focusPrevious"
-        @keyup.right="focusNext"
+        @click.stop="localFocusedItem = i"
+        @focus="localFocusedItem = i"
+        @keydown.enter.stop.prevent="deleteChip(i, chip)"
+        @keydown.left.stop.prevent="focusPrevious"
+        @keydown.right.stop.prevent="focusNext"
       >
-        <div
-          class="flex whitespace-pre-wrap px-6 py-4 leading-24"
+        <span
+          class="flex min-h-[2rem] whitespace-pre-wrap px-6 py-4 leading-24"
           data-testid="chip-value"
-        >
-          {{ chip }}
-        </div>
-
-        <div
+          >{{ chip }}
+        </span>
+        <button
+          aria-label="Löschen"
           class="iems-center absolute inset-y-0 right-0 flex h-full items-center rounded-r-10 p-4 group-focus:bg-blue-900 group-focus:text-white"
+          tabindex="-1"
+          type="button"
+          @click="deleteChip(i, chip)"
         >
-          <em
-            aria-Label="Löschen"
-            class="material-icons cursor-pointer text-center"
-            @click="deleteChip(i)"
-            @keydown.enter="deleteChip(i)"
-            >clear</em
-          >
-        </div>
+          <em class="material-icons text-center">clear</em>
+        </button>
       </li>
-    </ul>
-  </div>
+    </template>
+  </ul>
 </template>

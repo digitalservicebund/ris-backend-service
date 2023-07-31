@@ -90,7 +90,7 @@ test.describe("court", () => {
         await expect(page.locator("text=IncorrectCourt2")).toBeVisible()
 
         await page
-          .locator(":text('IncorrectCourt1') + div > [aria-label='Löschen']")
+          .locator(":text('IncorrectCourt1') + button[aria-label='Löschen']")
           .click()
       },
       page,

@@ -1,106 +1,107 @@
 <script lang="ts" setup>
+import { produce } from "immer"
 import { ref, watch } from "vue"
 import { ResponseError } from "@/services/httpClient"
 import ChipsList from "@/shared/components/input/ChipsList.vue"
+import TextInput from "@/shared/components/input/TextInput.vue"
 import { ValidationError } from "@/shared/components/input/types"
-import { useInputModel } from "@/shared/composables/useInputModel"
 
 interface Props {
   id: string
-  value?: string[]
   modelValue?: string[]
+  ariaLabel?: string
   error?: ResponseError
-  ariaLabel: string
-  placeholder?: string
   validationError?: ValidationError
 }
 
-interface Emits {
-  (event: "update:modelValue", value?: string[]): void
-  (event: "addChip", value?: string): void
-  (event: "deleteChip", value?: string): void
-  (event: "input", value: Event): void
-}
-
 const props = defineProps<Props>()
-const emits = defineEmits<Emits>()
 
-const { emitInputEvent } = useInputModel<string[], Props, Emits>(props, emits)
-const chips = ref<string[]>(props.modelValue ?? [])
-const errorMessage = ref<ResponseError>()
-const currentInput = ref<string>("")
+const emit = defineEmits<{
+  "update:modelValue": [value?: string[]]
+  chipAdded: [value: string]
+  chipDeleted: [value: string]
+}>()
 
-const chipsList = ref<typeof ChipsList>()
-const chipsInput = ref<HTMLInputElement>()
+/* -------------------------------------------------- *
+ * Data handling                                      *
+ * -------------------------------------------------- */
 
-function updateModelValue() {
-  emits("update:modelValue", chips.value.length === 0 ? undefined : chips.value)
-}
+const newChipText = ref<string>("")
 
-function saveChip() {
-  const trimmed = currentInput.value.trim()
-  if (trimmed.length > 0) {
-    if (chips.value.includes(trimmed)) {
-      errorMessage.value = { title: "Schlagwort bereits vergeben." }
-      currentInput.value = ""
-      return
-    }
-    emits("addChip", trimmed)
-    if (!errorMessage.value) {
-      chips.value.push(trimmed)
-      updateModelValue()
-    }
-    currentInput.value = ""
-  }
-}
+const errorMessage = ref<ResponseError | undefined>(props.error)
 
-function deleteChip(keyword: string | undefined) {
-  emits("deleteChip", keyword)
-}
+watch(
+  () => props.error,
+  (error) => {
+    errorMessage.value = error
+  },
+)
 
 const handleOnBlur = () => {
   errorMessage.value = undefined
 }
 
-const focusFirst = () => {
-  if (chipsList.value !== undefined && currentInput.value === "")
-    chipsList.value.focusFirst()
+watch(newChipText, (is) => {
+  if (errorMessage.value && is !== "") errorMessage.value = undefined
+})
+
+function addChip() {
+  const chip = newChipText.value.trim()
+  if (!chip) return
+
+  if (props.modelValue?.includes(chip)) {
+    errorMessage.value = { title: "Schlagwort bereits vergeben." }
+    newChipText.value = ""
+    return
+  }
+
+  const next = props.modelValue
+    ? produce(props.modelValue, (draft) => {
+        draft?.push(chip)
+      })
+    : [chip]
+
+  emit("chipAdded", chip)
+  emit("update:modelValue", next)
+
+  newChipText.value = ""
+}
+
+/* -------------------------------------------------- *
+ * Focus management                                   *
+ * -------------------------------------------------- */
+
+const chipsInput = ref<InstanceType<typeof TextInput>>()
+
+const focusedChip = ref<number | undefined>(undefined)
+
+function maybeFocusFirst() {
+  const inputEl = chipsInput.value?.inputRef
+
+  if (inputEl?.selectionStart === newChipText.value.length) {
+    focusedChip.value = props.modelValue !== undefined ? 0 : undefined
+  }
 }
 
 const focusInput = () => {
-  if (chipsList.value !== undefined) chipsList.value.resetFocus()
-  if (chipsInput.value !== undefined) chipsInput.value.focus()
+  focusedChip.value = undefined
+  chipsInput.value?.focusInput()
 }
-
-watch(props, () => {
-  if (props.modelValue) chips.value = props.modelValue
-  errorMessage.value = props.error
-})
-
-watch(chips, () => {
-  if (chips.value === undefined) focusInput()
-})
-
-watch(currentInput, () => {
-  if (errorMessage.value && currentInput.value !== "")
-    errorMessage.value = undefined
-})
 </script>
 
 <template>
   <div>
-    <input
+    <TextInput
       :id="id"
       ref="chipsInput"
-      v-model="currentInput"
-      :aria-label="ariaLabel"
-      class="input mb-[0.5rem]"
-      type="text"
+      v-model="newChipText"
+      :aria-label="ariaLabel ?? ''"
+      class="mb-8"
       @blur="handleOnBlur"
-      @input="emitInputEvent"
-      @keypress.enter="saveChip"
-      @keyup.right="focusFirst"
+      @keydown.enter.stop="addChip"
+      @keydown.right.stop="maybeFocusFirst"
     />
+
     <div v-if="errorMessage" class="flex flex-row items-center">
       <span class="material-icons leading-default text-gray-900"
         >error_outline</span
@@ -109,44 +110,11 @@ watch(currentInput, () => {
     </div>
 
     <ChipsList
-      ref="chipsList"
-      v-model="chips"
-      :error="errorMessage"
-      @delete-chip="deleteChip"
+      v-model:focused-item="focusedChip"
+      :model-value="modelValue"
+      @chip-deleted="(_, keyword) => $emit('chipDeleted', keyword)"
       @previous-clicked-on-first="focusInput"
+      @update:model-value="$emit('update:modelValue', $event)"
     />
   </div>
 </template>
-
-<style lang="scss" scoped>
-.input {
-  display: flex;
-  width: 100%;
-  min-height: 3.75rem;
-  flex-wrap: wrap;
-  align-content: space-between;
-  padding: 8px 16px;
-  background-color: white;
-  @apply border-2 border-solid border-blue-800;
-
-  &:focus {
-    outline: none;
-  }
-
-  &:autofill {
-    @apply text-inherit shadow-white;
-  }
-
-  &:autofill:focus {
-    @apply text-inherit shadow-white;
-  }
-
-  input {
-    width: 30px;
-    flex: 1 1 auto;
-    padding: 4px;
-    border: none;
-    outline: none;
-  }
-}
-</style>

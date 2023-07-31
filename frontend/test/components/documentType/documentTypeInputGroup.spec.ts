@@ -167,6 +167,6 @@ describe("DocumentTypeInputGroup", () => {
     await user.type(chipList[0], "{enter}")
     await user.click(chipList[0])
     await user.type(chipList[0], "{enter}")
-    expect(modelValue.TEMPLATE_NAME).toHaveLength(0)
+    expect(modelValue.TEMPLATE_NAME).toBeUndefined()
   })
 })
