@@ -103,10 +103,11 @@ class LoadNormController(private val loadNormService: LoadNormUseCase) {
   }
 
   data class FileReferenceResponseSchema
-  private constructor(val name: String, val hash: String, val createdAt: String) {
+  private constructor(val guid: String, val name: String, val hash: String, val createdAt: String) {
     companion object {
       fun fromUseCaseData(data: FileReference) =
           FileReferenceResponseSchema(
+              encodeGuid(data.guid),
               data.name,
               data.hash,
               encodeLocalDateTime(data.createdAt),
@@ -116,6 +117,7 @@ class LoadNormController(private val loadNormService: LoadNormUseCase) {
 
   data class MetadataSectionResponseSchema
   private constructor(
+      val guid: String,
       val name: MetadataSectionName,
       val order: Int,
       val metadata: List<MetadatumResponseSchema>,
@@ -126,6 +128,7 @@ class LoadNormController(private val loadNormService: LoadNormUseCase) {
         val metadata = metadataSection.metadata.map { MetadatumResponseSchema.fromUseCaseData(it) }
         val childSections = metadataSection.sections?.map { fromUseCaseData(it) }
         return MetadataSectionResponseSchema(
+            guid = encodeGuid(metadataSection.guid),
             name = metadataSection.name,
             order = metadataSection.order,
             metadata = metadata,
@@ -135,12 +138,13 @@ class LoadNormController(private val loadNormService: LoadNormUseCase) {
   }
 
   data class MetadatumResponseSchema
-  private constructor(val value: String, val type: String, val order: Int) {
+  private constructor(val guid: String, val value: String, val type: String, val order: Int) {
     companion object {
       fun fromUseCaseData(metadatum: Metadatum<*>): MetadatumResponseSchema {
         val value: String = metadatum.value.toString()
         val type = metadatum.type.name
-        return MetadatumResponseSchema(value = value, type = type, order = metadatum.order)
+        return MetadatumResponseSchema(
+            guid = encodeGuid(metadatum.guid), value = value, type = type, order = metadatum.order)
       }
     }
   }

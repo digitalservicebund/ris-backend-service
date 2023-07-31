@@ -193,10 +193,11 @@ class LoadNormControllerTest {
   }
 
   data class FileReferenceResponseTestSchema
-  private constructor(val name: String, val hash: String, val createdAt: String) {
+  private constructor(val guid: String, val name: String, val hash: String, val createdAt: String) {
     companion object {
       fun fromUseCaseData(data: FileReference) =
           FileReferenceResponseTestSchema(
+              encodeGuid(data.guid),
               data.name,
               data.hash,
               encodeLocalDateTime(data.createdAt),
@@ -206,6 +207,7 @@ class LoadNormControllerTest {
 
   data class MetadataSectionResponseTestSchema
   private constructor(
+      val guid: String,
       val name: MetadataSectionName,
       val order: Int,
       val metadata: List<MetadatumResponseTestSchema>,
@@ -217,6 +219,7 @@ class LoadNormControllerTest {
             metadataSection.metadata.map { MetadatumResponseTestSchema.fromUseCaseData(it) }
         val childSections = metadataSection.sections?.map { fromUseCaseData(it) }
         return MetadataSectionResponseTestSchema(
+            guid = encodeGuid(metadataSection.guid),
             name = metadataSection.name,
             order = metadataSection.order,
             metadata = metadata,
@@ -226,12 +229,13 @@ class LoadNormControllerTest {
   }
 
   data class MetadatumResponseTestSchema
-  private constructor(val value: String, val type: String, val order: Int) {
+  private constructor(val guid: String, val value: String, val type: String, val order: Int) {
     companion object {
       fun fromUseCaseData(metadatum: Metadatum<*>): MetadatumResponseTestSchema {
         val value: String = metadatum.value as String
         val type = metadatum.type.name
-        return MetadatumResponseTestSchema(value = value, type = type, order = metadatum.order)
+        return MetadatumResponseTestSchema(
+            guid = encodeGuid(metadatum.guid), value = value, type = type, order = metadatum.order)
       }
     }
   }
