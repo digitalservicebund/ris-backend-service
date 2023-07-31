@@ -25,7 +25,7 @@ if (import.meta.env.PROD) {
   Sentry.init({
     app,
     environment: envName(),
-    dsn: process.env.SENTRY_DSN_FRONTEND,
+    dsn: "https://26a9485d49884fd1aaa8be1489916aa3@o1248831.ingest.sentry.io/4505600659619840",
     integrations: [
       new Sentry.BrowserTracing({
         // Set 'tracePropagationTargets' to control for which URLs distributed tracing should be enabled

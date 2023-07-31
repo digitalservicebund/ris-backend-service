@@ -63,7 +63,6 @@ services:
       - ./frontend/src/:/usr/src/app/src
     environment:
       - BACKEND_HOST=http://127.0.0.1
-      - SENTRY_DSN=${SENTRY_DSN_FRONTEND}
     command: npm run dev -- --host
     depends_on:
       - traefik
