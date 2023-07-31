@@ -45,7 +45,7 @@ function focusInput() {
   inputRef.value?.focus()
 }
 
-defineExpose({ focusInput })
+defineExpose({ focusInput, inputRef })
 </script>
 
 <template>

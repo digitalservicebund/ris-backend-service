@@ -125,7 +125,7 @@ describe("UpdateStatusIndicationGroup in status mode", () => {
     await user.type(references[0], "{enter}")
     await user.click(references[0])
     await user.type(references[0], "{enter}")
-    expect(modelValue.REFERENCE).toHaveLength(0)
+    expect(modelValue.REFERENCE).toBeUndefined()
   })
 })
 

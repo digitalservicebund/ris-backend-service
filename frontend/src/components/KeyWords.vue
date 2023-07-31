@@ -71,8 +71,8 @@ watch(
           aria-label="Schlagwörter"
           :error="errorMessage"
           :model-value="keywords"
-          @add-chip="addKeyword"
-          @delete-chip="deleteKeyword"
+          @chip-added="addKeyword"
+          @chip-deleted="deleteKeyword"
         ></KeywordsChipsInput>
       </div>
     </div>

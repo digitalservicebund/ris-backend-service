@@ -53,7 +53,7 @@ watch(
 
 const templateName = computed({
   get: () => inputValue.value.TEMPLATE_NAME,
-  set: (data?: string[]) => data && (inputValue.value.TEMPLATE_NAME = data),
+  set: (data?: string[]) => (inputValue.value.TEMPLATE_NAME = data),
 })
 
 const NORM_CATEGORY_NAMES = {
