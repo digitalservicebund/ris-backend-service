@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import { produce } from "immer"
 import { computed } from "vue"
 import { Metadata } from "@/domain/Norm"
 import DateInput from "@/shared/components/input/DateInput.vue"
@@ -33,10 +34,10 @@ const selectedInputType = computed({
 const dateValue = computed({
   get: () => props.modelValue.DATE?.[0] ?? "",
   set: (value) => {
-    const next: Metadata = {
-      DATE: value ? [value] : undefined,
-      TIME: props.modelValue.TIME,
-    }
+    const next = produce(props.modelValue, (draft) => {
+      draft.DATE = value ? [value] : undefined
+      draft.TIME = props.modelValue.TIME
+    })
     emit("update:modelValue", next)
   },
 })
@@ -44,10 +45,10 @@ const dateValue = computed({
 const timeValue = computed({
   get: () => props.modelValue.TIME?.[0] ?? "",
   set: (value) => {
-    const next: Metadata = {
-      TIME: value ? [value] : undefined,
-      DATE: props.modelValue.DATE,
-    }
+    const next = produce(props.modelValue, (draft) => {
+      draft.TIME = value ? [value] : undefined
+      draft.DATE = props.modelValue.DATE
+    })
     emit("update:modelValue", next)
   },
 })
@@ -55,7 +56,9 @@ const timeValue = computed({
 const yearValue = computed({
   get: () => props.modelValue.YEAR?.[0] ?? "",
   set: (value) => {
-    const next: Metadata = { YEAR: value ? [value] : [] }
+    const next = produce(props.modelValue, (draft) => {
+      draft.YEAR = value ? [value] : []
+    })
     emit("update:modelValue", next)
   },
 })
