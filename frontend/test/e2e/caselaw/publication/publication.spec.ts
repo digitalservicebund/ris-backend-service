@@ -5,7 +5,6 @@ import {
   fillProceedingDecisionInputs,
   navigateToCategories,
   navigateToPublication,
-  toggleProceedingDecisionsSection,
   waitForSaving,
 } from "../e2e-utils"
 import { caselawTest as test } from "../fixtures"
@@ -30,13 +29,18 @@ test.describe("ensuring the publishing of documentunits works as expected", () =
     documentNumber,
   }) => {
     await navigateToCategories(page, documentNumber)
-    await toggleProceedingDecisionsSection(page)
+    await expect(page.getByText(documentNumber)).toBeVisible()
 
-    await fillProceedingDecisionInputs(page, {
-      court: "AG Aalen",
-    })
-
-    await page.getByText("Manuell Hinzufügen").click()
+    await waitForSaving(
+      async () => {
+        await fillProceedingDecisionInputs(page, {
+          court: "AG Aalen",
+        })
+        await page.getByLabel("Vorgehende Entscheidung speichern").click()
+      },
+      page,
+      { clickSaveButton: true },
+    )
 
     await expect(
       page.getByText(`AG Aalen`, {
@@ -64,19 +68,26 @@ test.describe("ensuring the publishing of documentunits works as expected", () =
 
     await fillAllRequiredCoreData(page)
 
-    await toggleProceedingDecisionsSection(page)
+    await navigateToCategories(page, documentNumber)
+    await expect(page.getByText(documentNumber)).toBeVisible()
 
-    await fillProceedingDecisionInputs(page, {
-      court: "AG Aalen",
-    })
-
-    await page.getByText("Manuell Hinzufügen").click()
+    await waitForSaving(
+      async () => {
+        await fillProceedingDecisionInputs(page, {
+          court: "AG Aalen",
+        })
+        await page.getByLabel("Vorgehende Entscheidung speichern").click()
+      },
+      page,
+      { clickSaveButton: true },
+    )
 
     await expect(
       page.getByText(`AG Aalen`, {
         exact: true,
       }),
     ).toBeVisible()
+
     await navigateToPublication(page, documentNumber)
 
     await expect(page.locator("li:has-text('Rechtszug')")).toBeVisible()

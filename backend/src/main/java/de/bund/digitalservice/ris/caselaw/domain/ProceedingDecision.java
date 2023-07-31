@@ -6,9 +6,13 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
-@SuperBuilder
+@SuperBuilder(toBuilder = true)
 @Getter
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @DateKnownConstraint
-public class ProceedingDecision extends LinkedDocumentationUnit {}
+public class ProceedingDecision extends LinkedDocumentationUnit {
+  public boolean hasNoValues() {
+    return court == null && decisionDate == null && fileNumber == null && documentType == null;
+  }
+}

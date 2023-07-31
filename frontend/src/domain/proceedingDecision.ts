@@ -24,12 +24,12 @@ export default class ProceedingDecision
   get renderDecision(): string {
     return [
       ...(this.court ? [`${this.court.label}`] : []),
-      ...(this.documentType ? [this.documentType?.jurisShortcut] : []),
-      ...(this.dateUnknown === true ? ["unbekanntes Entscheidungsdatum"] : []),
       ...(this.decisionDate
         ? [dayjs(this.decisionDate).format("DD.MM.YYYY")]
         : []),
+      ...(this.dateUnknown === true ? ["unbekanntes Entscheidungsdatum"] : []),
       ...(this.fileNumber ? [this.fileNumber] : []),
+      ...(this.documentType ? [this.documentType?.jurisShortcut] : []),
       ...(this.documentNumber && this.isReadOnly ? [this.documentNumber] : []),
     ].join(", ")
   }

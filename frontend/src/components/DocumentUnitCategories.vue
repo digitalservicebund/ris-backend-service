@@ -11,6 +11,7 @@ import SaveButton from "@/components/SaveDocumentUnitButton.vue"
 import { useScrollToHash } from "@/composables/useScrollToHash"
 import { useToggleStateInRouteQuery } from "@/composables/useToggleStateInRouteQuery"
 import DocumentUnit, { Texts } from "@/domain/documentUnit"
+import ProceedingDecision from "@/domain/proceedingDecision"
 import documentUnitService from "@/services/documentUnitService"
 import fileService from "@/services/fileService"
 import { ServiceResponse } from "@/services/httpClient"
@@ -103,6 +104,14 @@ const coreData = computed({
   },
 })
 
+const proceedingDecisions = computed({
+  get: () =>
+    updatedDocumentUnit.value.proceedingDecisions as ProceedingDecision[],
+  set: (newValues) => {
+    updatedDocumentUnit.value.proceedingDecisions = newValues
+  },
+})
+
 const contentRelatedIndexing = computed({
   get: () => (updatedDocumentUnit.value as DocumentUnit).contentRelatedIndexing,
   set: (newValues) => {
@@ -152,11 +161,7 @@ onMounted(async () => {
             "
           />
 
-          <DocumentUnitProceedingDecision
-            id="proceedingDecisions"
-            :document-unit-uuid="updatedDocumentUnit.uuid"
-            :proceeding-decisions="documentUnit.proceedingDecisions"
-          />
+          <DocumentUnitProceedingDecision v-model="proceedingDecisions" />
 
           <DocumentUnitContentRelatedIndexing
             id="contentRelatedIndexing"

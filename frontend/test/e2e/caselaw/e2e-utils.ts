@@ -110,12 +110,6 @@ export async function waitForInputValue(
   )
 }
 
-export async function toggleProceedingDecisionsSection(
-  page: Page,
-): Promise<void> {
-  await page.locator("text=Vorgehende Entscheidungen").click()
-}
-
 export async function toggleNormsSection(page: Page): Promise<void> {
   await page.getByRole("button", { name: "Normen Aufklappen" }).click()
 }

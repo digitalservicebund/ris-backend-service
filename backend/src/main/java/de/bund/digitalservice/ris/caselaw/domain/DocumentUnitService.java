@@ -273,44 +273,79 @@ public class DocumentUnitService {
   public Mono<DocumentUnit> updateDocumentUnit(
       DocumentUnit documentUnit, DocumentationOffice documentationOffice) {
     Mono<DocumentUnit> documentUnitMono = Mono.just(documentUnit);
-    if (documentUnit.contentRelatedIndexing() != null
-        && documentUnit.contentRelatedIndexing().activeCitations() != null) {
-      documentUnitMono =
-          Flux.fromIterable(documentUnit.contentRelatedIndexing().activeCitations())
-              .flatMap(
-                  activeCitation -> {
-                    if (activeCitation.getUuid() == null && !activeCitation.isEmpty()) {
-                      return createLinkedDocumentationUnit(
-                              documentUnit.uuid(),
-                              activeCitation,
-                              documentationOffice,
-                              DocumentationUnitLinkType.ACTIVE_CITATION)
-                          .map(
-                              documentationUnitLink ->
-                                  activeCitation.toBuilder()
-                                      .uuid(documentationUnitLink.childDocumentationUnitUuid())
-                                      .build());
-                    } else {
-                      return linkLinkedDocumentationUnit(
-                              documentUnit.uuid(),
-                              activeCitation.getUuid(),
-                              DocumentationUnitLinkType.ACTIVE_CITATION)
-                          .thenReturn(activeCitation);
-                    }
-                  })
-              .collectList()
-              .map(
-                  activeCitations -> {
-                    ContentRelatedIndexing contentRelatedIndexing =
-                        documentUnit.contentRelatedIndexing().toBuilder()
-                            .activeCitations(activeCitations)
-                            .build();
-                    return documentUnit.toBuilder()
-                        .contentRelatedIndexing(contentRelatedIndexing)
-                        .build();
-                  });
-    }
+
     return documentUnitMono
+        .flatMap(
+            documentUnit1 -> {
+              if (documentUnit1.proceedingDecisions() == null) return Mono.just(documentUnit1);
+              return Flux.fromIterable(documentUnit1.proceedingDecisions())
+                  .flatMap(
+                      proceedingDecision -> {
+                        if (proceedingDecision.getUuid() == null && !proceedingDecision.isEmpty()) {
+                          return createLinkedDocumentationUnit(
+                                  documentUnit1.uuid(),
+                                  proceedingDecision,
+                                  documentationOffice,
+                                  DocumentationUnitLinkType.PREVIOUS_DECISION)
+                              .map(
+                                  documentationUnitLink ->
+                                      proceedingDecision.toBuilder()
+                                          .uuid(documentationUnitLink.childDocumentationUnitUuid())
+                                          .build());
+                        } else {
+                          return linkLinkedDocumentationUnit(
+                                  documentUnit1.uuid(),
+                                  proceedingDecision.getUuid(),
+                                  DocumentationUnitLinkType.PREVIOUS_DECISION)
+                              .thenReturn(proceedingDecision);
+                        }
+                      })
+                  .collectList()
+                  .map(
+                      proceedingDecisions ->
+                          documentUnit1.toBuilder()
+                              .proceedingDecisions(proceedingDecisions)
+                              .build());
+            })
+        .flatMap(
+            documentUnit1 -> {
+              if (documentUnit1.contentRelatedIndexing() == null
+                  || documentUnit1.contentRelatedIndexing().activeCitations() == null)
+                return Mono.just(documentUnit1);
+              return Flux.fromIterable(documentUnit1.contentRelatedIndexing().activeCitations())
+                  .flatMap(
+                      activeCitation -> {
+                        if (activeCitation.getUuid() == null && !activeCitation.isEmpty()) {
+                          return createLinkedDocumentationUnit(
+                                  documentUnit1.uuid(),
+                                  activeCitation,
+                                  documentationOffice,
+                                  DocumentationUnitLinkType.ACTIVE_CITATION)
+                              .map(
+                                  documentationUnitLink ->
+                                      activeCitation.toBuilder()
+                                          .uuid(documentationUnitLink.childDocumentationUnitUuid())
+                                          .build());
+                        } else {
+                          return linkLinkedDocumentationUnit(
+                                  documentUnit1.uuid(),
+                                  activeCitation.getUuid(),
+                                  DocumentationUnitLinkType.ACTIVE_CITATION)
+                              .thenReturn(activeCitation);
+                        }
+                      })
+                  .collectList()
+                  .map(
+                      activeCitations -> {
+                        ContentRelatedIndexing contentRelatedIndexing =
+                            documentUnit1.contentRelatedIndexing().toBuilder()
+                                .activeCitations(activeCitations)
+                                .build();
+                        return documentUnit1.toBuilder()
+                            .contentRelatedIndexing(contentRelatedIndexing)
+                            .build();
+                      });
+            })
         .flatMap(repository::save)
         .doOnError(ex -> log.error("Couldn't update the DocumentUnit", ex));
   }

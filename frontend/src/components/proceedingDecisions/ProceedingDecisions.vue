@@ -1,313 +1,85 @@
 <script lang="ts" setup>
-import { h, watch, ref } from "vue"
+import { h, computed } from "vue"
 import { RouterLink } from "vue-router"
-import ComboboxInput from "../ComboboxInput.vue"
-import DecisionList from "./DecisionList.vue"
-import SearchResultList, { SearchResults } from "./SearchResultList.vue"
-import ExpandableDataSet from "@/components/ExpandableDataSet.vue"
-import LinkedDocumentUnit from "@/domain/linkedDocumentUnit"
+import ProceedingDecisionInputGroup from "./ProceedingDecisionInputGroup.vue"
 import ProceedingDecision from "@/domain/proceedingDecision"
-import comboboxItemService from "@/services/comboboxItemService"
-import documentUnitService from "@/services/documentUnitService"
-import proceedingDecisionService from "@/services/proceedingDecisionService"
 import { withSummarizer } from "@/shared/components/DataSetSummary.vue"
-import CheckboxInput from "@/shared/components/input/CheckboxInput.vue"
-import DateInput from "@/shared/components/input/DateInput.vue"
-import InputField, {
-  LabelPosition,
-} from "@/shared/components/input/InputField.vue"
-import TextButton from "@/shared/components/input/TextButton.vue"
-import TextInput from "@/shared/components/input/TextInput.vue"
-import Pagination, { Page } from "@/shared/components/Pagination.vue"
+import EditableList from "@/shared/components/EditableListCaselaw.vue"
 
 const props = defineProps<{
-  documentUnitUuid: string
-  proceedingDecisions?: ProceedingDecision[]
+  modelValue: ProceedingDecision[] | undefined
 }>()
 
-const localProceedingDecisions = ref<ProceedingDecision[]>()
+const emit = defineEmits<{
+  "update:modelValue": [value?: ProceedingDecision[]]
+}>()
 
-const searchResults = ref<SearchResults<ProceedingDecision>>()
-const searchResultsCurrentPage = ref<Page<ProceedingDecision>>()
-const searchResultsPerPage = 30
-const input = ref<ProceedingDecision>(new ProceedingDecision())
-
-function isNotEmpty({
-  court,
-  decisionDate,
-  fileNumber,
-  documentType,
-}: ProceedingDecision): boolean {
-  return [court, decisionDate, fileNumber, documentType].some(
-    (property) => property != undefined,
-  )
-}
-
-async function createProceedingDecision(
-  proceedingDecision: ProceedingDecision,
-) {
-  if (isNotEmpty(proceedingDecision)) {
-    const response = await proceedingDecisionService.createProceedingDecision(
-      props.documentUnitUuid,
-      proceedingDecision,
-    )
-    if (response.data) {
-      localProceedingDecisions.value = response.data
-    } else {
-      console.error(response.error)
-    }
-  }
-  resetInput()
-}
-
-function resetInput() {
-  input.value = new ProceedingDecision()
-}
-
-async function linkProceedingDecision(decision: LinkedDocumentUnit) {
-  if (decision.uuid) {
-    const response = await proceedingDecisionService.linkProceedingDecision(
-      props.documentUnitUuid,
-      decision.uuid,
-    )
-    if (response.data) {
-      localProceedingDecisions.value = response.data
-
-      updateSearchResultsLinkStatus(decision.uuid)
-    } else {
-      console.error(response.error)
-    }
-    resetInput()
-  }
-}
-
-async function removeProceedingDecision(decision: ProceedingDecision) {
-  const response = await proceedingDecisionService.removeProceedingDecision(
-    props.documentUnitUuid,
-    decision.uuid as string,
-  )
-  if (response.data) {
-    localProceedingDecisions.value = localProceedingDecisions.value?.filter(
-      (listItem) => listItem.uuid !== decision.uuid,
-    )
-    updateSearchResultsLinkStatus(decision.uuid as string)
-  } else {
-    console.error(response.error)
-  }
-}
-
-function updateSearchResultsLinkStatus(uuid: string) {
-  if (searchResults.value == undefined) return
-
-  searchResults.value = searchResults.value.map((searchResult) => {
-    if (searchResult.decision.uuid === uuid) {
-      searchResult.isLinked = !searchResult.isLinked
-    }
-    return searchResult
-  })
-}
-
-async function search(page = 0) {
-  const response = await documentUnitService.searchByLinkedDocumentUnit(
-    page,
-    searchResultsPerPage,
-    input.value as ProceedingDecision,
-  )
-  if (response.data) {
-    searchResultsCurrentPage.value = {
-      ...response.data,
-      content: response.data.content.map(
-        (decision) => new ProceedingDecision({ ...decision }),
-      ),
-    }
-    searchResults.value = response.data.content.map((searchResult) => {
-      return {
-        decision: new ProceedingDecision({ ...searchResult }),
-        isLinked: searchResult.isLinked(localProceedingDecisions.value),
-      }
-    })
-  }
-}
+const proceedingDecisions = computed({
+  get: () => {
+    return props.modelValue
+  },
+  set: (value) => {
+    if (value) emit("update:modelValue", value)
+  },
+})
+const defaultValue = new ProceedingDecision()
 
 function decisionSummarizer(dataEntry: ProceedingDecision) {
-  return h("div", { tabindex: dataEntry.isReadOnly ? 0 : -1 }, [
-    dataEntry.isReadOnly
-      ? h(
-          RouterLink,
+  if (dataEntry.isReadOnly) {
+    return h(
+      RouterLink,
+      {
+        class: ["ds-link-01-bold", "underline"],
+        target: "_blank",
+        tabindex: -1,
+        to: {
+          name: "caselaw-documentUnit-documentNumber-categories",
+          params: { documentNumber: dataEntry.documentNumber },
+        },
+      },
+      () => dataEntry.renderDecision,
+    )
+  } else {
+    if (dataEntry.hasMissingRequiredFields) {
+      return h("div", { class: ["flex flex-row items-center"] }, [
+        h(
+          "span",
           {
-            class: ["ds-link-01-bold", "underline"],
-            target: "_blank",
-            tabindex: -1,
-            to: {
-              name: "caselaw-documentUnit-documentNumber-categories",
-              params: { documentNumber: dataEntry.documentNumber },
-            },
+            "aria-label": "Fehlerhafte Eingabe",
+            class: ["material-icons pr-8 text-red-800"],
           },
-          () => dataEntry.renderDecision,
-        )
-      : h("span", { class: ["link-02-reg"] }, dataEntry.renderDecision),
-  ])
+          "error_outline",
+        ),
+        h(
+          "div",
+          { class: ["ds-label-02-bold text-red-800"] },
+          dataEntry.renderDecision,
+        ),
+      ])
+    } else {
+      return h("div", { class: ["link-02-reg"] }, dataEntry.renderDecision)
+    }
+  }
 }
 
 const DecisionSummary = withSummarizer(decisionSummarizer)
-
-watch(
-  props,
-  () => {
-    localProceedingDecisions.value = props.proceedingDecisions
-  },
-  {
-    immediate: true,
-  },
-)
-
-watch(
-  input,
-  () => {
-    if (!input.value.dateKnown) input.value.decisionDate = undefined
-  },
-  {
-    immediate: true,
-    deep: true,
-  },
-)
 </script>
 
 <template>
-  <div class="mb-[4rem]">
-    <h1 class="ds-heading-02-reg mb-[1rem]">Rechtszug</h1>
-    <ExpandableDataSet
-      as-column
-      :data-set="localProceedingDecisions"
-      fallback-text="Noch keine vorhergehende Entscheidung hinzugefügt."
-      :summary-component="DecisionSummary"
-      title="Vorgehende Entscheidungen"
-    >
-      <DecisionList
-        v-if="localProceedingDecisions"
-        :decisions="localProceedingDecisions"
-        @remove-link="removeProceedingDecision"
-      />
-
-      <div class="fake-input-group">
-        <div class="fake-input-group__row">
-          <InputField
-            id="court"
-            class="fake-input-group__row__field flex-col"
-            label="Gericht *"
-          >
-            <ComboboxInput
-              id="court"
-              v-model="input.court"
-              aria-label="Gericht Rechtszug"
-              :item-service="comboboxItemService.getCourts"
-              placeholder="Gerichtstyp Gerichtsort"
-            ></ComboboxInput>
-          </InputField>
-
-          <div class="fake-input-group__row__field flex-col">
-            <InputField id="date" class="w-full" label="Entscheidungsdatum *">
-              <DateInput
-                id="decisionDate"
-                v-model="input.decisionDate"
-                aria-label="Entscheidungsdatum Rechtszug"
-                :disabled="input.dateUnknown"
-              ></DateInput>
-            </InputField>
-            <InputField
-              id="dateUnknown"
-              label="Datum unbekannt"
-              :label-position="LabelPosition.RIGHT"
-            >
-              <CheckboxInput
-                id="dateUnknown"
-                v-model="input.dateUnknown"
-                aria-label="Datum Unbekannt"
-              ></CheckboxInput>
-            </InputField>
-          </div>
-        </div>
-
-        <div class="fake-input-group__row pb-32">
-          <InputField
-            id="fileNumber"
-            class="fake-input-group__row__field flex-col"
-            label="Aktenzeichen *"
-          >
-            <TextInput
-              id="fileNumber"
-              v-model="input.fileNumber"
-              aria-label="Aktenzeichen Rechtszug"
-            ></TextInput>
-          </InputField>
-
-          <InputField
-            id="documentType"
-            class="fake-input-group__row__field flex-col"
-            label="Dokumenttyp"
-          >
-            <ComboboxInput
-              id="documentType"
-              v-model="input.documentType"
-              aria-label="Dokumenttyp Rechtszug"
-              :item-service="comboboxItemService.getDocumentTypes"
-              placeholder="Bitte auswählen"
-            ></ComboboxInput>
-          </InputField>
-        </div>
-      </div>
-
-      <div>
-        <TextButton
-          aria-label="Nach Entscheidungen suchen"
-          button-type="secondary"
-          class="mr-28"
-          label="Suchen"
-          @click="search(0)"
-        />
-
-        <TextButton
-          aria-label="Entscheidung manuell hinzufügen"
-          button-type="tertiary"
-          label="Manuell Hinzufügen"
-          @click="createProceedingDecision(input as ProceedingDecision)"
+  <h2 id="proceedingDecisions" class="ds-heading-02-reg mb-[1rem]">
+    Rechtszug
+  </h2>
+  <div aria-label="Rechtszug" class="mb-32 bg-white p-16">
+    <h2 class="ds-label-02-bold mb-[1rem]">Vorgehende Entscheidung</h2>
+    <div class="flex flex-row">
+      <div class="flex-1">
+        <EditableList
+          v-model="proceedingDecisions"
+          :default-value="defaultValue"
+          :edit-component="ProceedingDecisionInputGroup"
+          :summary-component="DecisionSummary"
         />
       </div>
-
-      <div v-if="searchResultsCurrentPage" class="mb-10 mt-20">
-        <Pagination
-          navigation-position="bottom"
-          :page="searchResultsCurrentPage"
-          @update-page="search"
-        >
-          <SearchResultList
-            :search-results="searchResults"
-            @link-decision="linkProceedingDecision"
-          />
-        </Pagination>
-      </div>
-    </ExpandableDataSet>
+    </div>
   </div>
 </template>
-
-<style lang="scss" scoped>
-.fake-input-group {
-  display: flex;
-  width: 100%;
-  flex-direction: column;
-
-  &__row {
-    display: flex;
-    width: 100%;
-    flex-wrap: wrap;
-    gap: 2rem;
-
-    &__field {
-      display: flex;
-      width: calc((100% - 2rem) / 2);
-      min-width: 15rem;
-      align-items: start;
-    }
-  }
-}
-</style>

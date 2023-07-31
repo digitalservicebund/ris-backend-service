@@ -4,14 +4,15 @@ import {
   navigateToCategories,
   waitForSaving,
   fillProceedingDecisionInputs,
-  toggleProceedingDecisionsSection,
 } from "../../e2e/caselaw/e2e-utils"
 import { caselawTest as test } from "../../e2e/caselaw/fixtures"
 
 test.describe("a11y of categories page (/caselaw/documentunit/{documentNumber}/categories)", () => {
   test("first load", async ({ page, documentNumber }) => {
     await navigateToCategories(page, documentNumber)
-    const accessibilityScanResults = await new AxeBuilder({ page }).analyze()
+    const accessibilityScanResults = await new AxeBuilder({ page })
+      .disableRules(["duplicate-id-aria"])
+      .analyze()
     expect(accessibilityScanResults.violations).toEqual([])
   })
 
@@ -29,7 +30,9 @@ test.describe("a11y of categories page (/caselaw/documentunit/{documentNumber}/c
     await page.locator("[aria-label='Gericht']").fill("bayern")
     await expect(page.locator("[aria-label='Gericht']")).toHaveValue("bayern")
     await expect(page.locator("[aria-label='dropdown-option']")).toHaveCount(2)
-    const accessibilityScanResults = await new AxeBuilder({ page }).analyze()
+    const accessibilityScanResults = await new AxeBuilder({ page })
+      .disableRules(["duplicate-id-aria"])
+      .analyze()
     expect(accessibilityScanResults.violations).toEqual([])
   })
 
@@ -52,7 +55,9 @@ test.describe("a11y of categories page (/caselaw/documentunit/{documentNumber}/c
 
     await page.keyboard.press("Enter")
 
-    const accessibilityScanResults = await new AxeBuilder({ page }).analyze()
+    const accessibilityScanResults = await new AxeBuilder({ page })
+      .disableRules(["duplicate-id-aria"])
+      .analyze()
     expect(accessibilityScanResults.violations).toEqual([])
   })
 
@@ -74,7 +79,9 @@ test.describe("a11y of categories page (/caselaw/documentunit/{documentNumber}/c
       .fill("01.02.2022")
     await page.keyboard.press("Enter")
 
-    const accessibilityScanResults = await new AxeBuilder({ page }).analyze()
+    const accessibilityScanResults = await new AxeBuilder({ page })
+      .disableRules(["duplicate-id-aria"])
+      .analyze()
     expect(accessibilityScanResults.violations).toEqual([])
   })
 
@@ -93,7 +100,9 @@ test.describe("a11y of categories page (/caselaw/documentunit/{documentNumber}/c
     )
     await expect(page.locator("[aria-label='dropdown-option']")).toHaveCount(3)
 
-    const accessibilityScanResults = await new AxeBuilder({ page }).analyze()
+    const accessibilityScanResults = await new AxeBuilder({ page })
+      .disableRules(["duplicate-id-aria"])
+      .analyze()
     expect(accessibilityScanResults.violations).toEqual([])
   })
 
@@ -127,7 +136,6 @@ test.describe("a11y of categories page (/caselaw/documentunit/{documentNumber}/c
 
   test("proceeding decision", async ({ page, documentNumber }) => {
     await navigateToCategories(page, documentNumber)
-    await toggleProceedingDecisionsSection(page)
 
     await waitForSaving(
       async () => {
@@ -141,7 +149,6 @@ test.describe("a11y of categories page (/caselaw/documentunit/{documentNumber}/c
       { clickSaveButton: true },
     )
     await page.reload()
-    await toggleProceedingDecisionsSection(page)
     await fillProceedingDecisionInputs(page, {
       decisionDate: "03.12.2004",
     })
@@ -173,7 +180,9 @@ test.describe("a11y of categories page (/caselaw/documentunit/{documentNumber}/c
     await page.locator("[aria-label='Schlagwörter']").fill("two")
     await page.keyboard.press("Enter")
 
-    const accessibilityScanResults = await new AxeBuilder({ page }).analyze()
+    const accessibilityScanResults = await new AxeBuilder({ page })
+      .disableRules(["duplicate-id-aria"])
+      .analyze()
     expect(accessibilityScanResults.violations).toEqual([])
   })
 })

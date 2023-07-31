@@ -1,36 +1,30 @@
 import { expect } from "@playwright/test"
-import { generateString } from "../../../../test-helper/dataGenerators"
+import { generateString } from "../../../test-helper/dataGenerators"
 import {
-  fillActiveCitationInputs,
+  fillProceedingDecisionInputs,
   navigateToCategories,
   navigateToPublication,
   waitForSaving,
 } from "~/e2e/caselaw/e2e-utils"
 import { caselawTest as test } from "~/e2e/caselaw/fixtures"
 
-test.describe("active citations", () => {
-  test("renders empty active citation in edit mode, when no activeCitations in list", async ({
+test.describe("previous decisions", () => {
+  test("renders empty proceeding decision in edit mode, when none in list", async ({
     page,
     documentNumber,
   }) => {
     await navigateToCategories(page, documentNumber)
     await expect(
-      page.getByRole("heading", { name: "Aktivzitierung" }),
+      page.getByRole("heading", { name: "Vorgehende Entscheidung " }),
     ).toBeVisible()
-    await expect(page.getByLabel("Art der Zitierung")).toBeVisible()
-    await expect(page.getByLabel("Gericht der Aktivzitierung")).toBeVisible()
-    await expect(
-      page.getByLabel("Entscheidungsdatum der Aktivzitierung"),
-    ).toBeVisible()
-    await expect(
-      page.getByLabel("Aktenzeichen der Aktivzitierung"),
-    ).toBeVisible()
-    await expect(
-      page.getByLabel("Dokumenttyp der Aktivzitierung"),
-    ).toBeVisible()
+    await expect(page.getByLabel("Gericht Rechtszug")).toBeVisible()
+    await expect(page.getByLabel("Entscheidungsdatum Rechtszug")).toBeVisible()
+    await expect(page.getByLabel("Aktenzeichen Rechtszug")).toBeVisible()
+    await expect(page.getByLabel("Dokumenttyp Rechtszug")).toBeVisible()
+    await expect(page.getByLabel("Datum unbekannt")).toBeVisible()
   })
 
-  test("create and renders new active citations in list", async ({
+  test("create and renders new proceeding decision in list", async ({
     page,
     documentNumber,
     prefilledDocumentUnit,
@@ -38,18 +32,17 @@ test.describe("active citations", () => {
     await navigateToCategories(page, documentNumber)
     await expect(page.getByText(documentNumber)).toBeVisible()
 
-    await fillActiveCitationInputs(page, {
-      citationStyle: "Änderung",
+    await fillProceedingDecisionInputs(page, {
       court: prefilledDocumentUnit.coreData.court?.label,
       fileNumber: prefilledDocumentUnit.coreData.fileNumbers?.[0],
       documentType: prefilledDocumentUnit.coreData.documentType?.jurisShortcut,
       decisionDate: "01.01.2020",
     })
 
-    await page.getByLabel("Aktivzitierung speichern").click()
+    await page.getByLabel("Vorgehende Entscheidung speichern").click()
     await expect(
       page.getByText(
-        `Änderung, AG Aachen, 01.01.2020, ${prefilledDocumentUnit.coreData.fileNumbers?.[0]}, Anerkenntnisurteil`,
+        `AG Aachen, 01.01.2020, ${prefilledDocumentUnit.coreData.fileNumbers?.[0]}, AnU`,
         {
           exact: true,
         },
@@ -59,28 +52,28 @@ test.describe("active citations", () => {
     await expect(page.getByLabel("Eintrag bearbeiten")).toHaveCount(1)
 
     await page.getByLabel("Weitere Angabe").click()
-    await fillActiveCitationInputs(page, {
-      citationStyle: "Änderung",
+    await fillProceedingDecisionInputs(page, {
       court: prefilledDocumentUnit.coreData.court?.label,
       fileNumber: prefilledDocumentUnit.coreData.fileNumbers?.[0],
       documentType: prefilledDocumentUnit.coreData.documentType?.jurisShortcut,
       decisionDate: "01.01.2020",
     })
-    await page.getByLabel("Aktivzitierung speichern").click()
 
-    const activeCitationContainer = page.getByLabel("Aktivzitierung")
+    await page.getByLabel("Vorgehende Entscheidung speichern").click()
+
+    const proceedingDecisionContainer = page.getByLabel("Rechtszug")
     await expect(
-      activeCitationContainer.getByLabel("Listen Eintrag"),
+      proceedingDecisionContainer.getByLabel("Listen Eintrag"),
     ).toHaveCount(2)
     await expect(
-      activeCitationContainer.getByLabel("Eintrag löschen"),
+      proceedingDecisionContainer.getByLabel("Eintrag löschen"),
     ).toHaveCount(2)
     await expect(
-      activeCitationContainer.getByLabel("Eintrag bearbeiten"),
+      proceedingDecisionContainer.getByLabel("Eintrag bearbeiten"),
     ).toHaveCount(2)
   })
 
-  test("saving behaviour of active citation", async ({
+  test("saving behaviour of proceeding decision", async ({
     page,
     documentNumber,
     prefilledDocumentUnit,
@@ -90,43 +83,42 @@ test.describe("active citations", () => {
 
     await waitForSaving(
       async () => {
-        await fillActiveCitationInputs(page, {
-          citationStyle: "Änderung",
+        await fillProceedingDecisionInputs(page, {
           court: prefilledDocumentUnit.coreData.court?.label,
           fileNumber: prefilledDocumentUnit.coreData.fileNumbers?.[0],
           documentType:
             prefilledDocumentUnit.coreData.documentType?.jurisShortcut,
           decisionDate: "01.01.2020",
         })
-        await page.getByLabel("Aktivzitierung speichern").click()
+        await page.getByLabel("Vorgehende Entscheidung speichern").click()
       },
       page,
       { clickSaveButton: true },
     )
 
-    const activeCitationContainer = page.getByLabel("Aktivzitierung")
+    const proceedingDecisionContainer = page.getByLabel("Rechtszug")
     await expect(
-      activeCitationContainer.getByLabel("Listen Eintrag"),
+      proceedingDecisionContainer.getByLabel("Listen Eintrag"),
     ).toHaveCount(1)
     page.reload()
     await expect(
-      activeCitationContainer.getByLabel("Listen Eintrag"),
+      proceedingDecisionContainer.getByLabel("Listen Eintrag"),
     ).toHaveCount(1)
 
     await page.getByLabel("Weitere Angabe").click()
-    await page.getByLabel("Aktenzeichen der Aktivzitierung").fill("two")
-    await page.getByLabel("Aktivzitierung speichern").click()
-    // "Aktivzitierung speichern" only saves state in frontend, no communication to backend yet
+    await page.getByLabel("Aktenzeichen Rechtszug").fill("two")
+    await page.getByLabel("Vorgehende Entscheidung speichern").click()
+    // "Vorgehende Entscheidung speichern" only saves state in frontend, no communication to backend yet
     page.reload()
     await expect(
-      activeCitationContainer.getByLabel("Listen Eintrag"),
+      proceedingDecisionContainer.getByLabel("Listen Eintrag"),
     ).toHaveCount(1)
 
     await page.getByLabel("Weitere Angabe").click()
     await waitForSaving(
       async () => {
-        await page.getByLabel("Aktenzeichen der Aktivzitierung").fill("two")
-        await page.getByLabel("Aktivzitierung speichern").click()
+        await page.getByLabel("Aktenzeichen Rechtszug").fill("two")
+        await page.getByLabel("Vorgehende Entscheidung speichern").click()
       },
       page,
       { clickSaveButton: true },
@@ -134,11 +126,11 @@ test.describe("active citations", () => {
 
     page.reload()
     await expect(
-      activeCitationContainer.getByLabel("Listen Eintrag"),
+      proceedingDecisionContainer.getByLabel("Listen Eintrag"),
     ).toHaveCount(2)
   })
 
-  test("manually added active citations can be edited", async ({
+  test("manually added proceeding decision can be edited", async ({
     page,
     documentNumber,
   }) => {
@@ -148,32 +140,28 @@ test.describe("active citations", () => {
 
     await waitForSaving(
       async () => {
-        await page
-          .getByLabel("Aktenzeichen der Aktivzitierung")
-          .fill(fileNumber1)
+        await page.getByLabel("Aktenzeichen Rechtszug").fill(fileNumber1)
       },
       page,
       { clickSaveButton: true },
     )
-    await page.getByLabel("Aktivzitierung speichern").click()
+    await page.getByLabel("Vorgehende Entscheidung speichern").click()
     await expect(page.getByText(fileNumber1)).toBeVisible()
 
     await page.getByLabel("Eintrag bearbeiten").click()
     await waitForSaving(
       async () => {
-        await page
-          .getByLabel("Aktenzeichen der Aktivzitierung")
-          .fill(fileNumber2)
+        await page.getByLabel("Aktenzeichen Rechtszug").fill(fileNumber2)
       },
       page,
       { clickSaveButton: true },
     )
-    await page.getByLabel("Aktivzitierung speichern").click()
+    await page.getByLabel("Vorgehende Entscheidung speichern").click()
     await expect(page.getByText(fileNumber1)).toBeHidden()
     await expect(page.getByText(fileNumber2)).toBeVisible()
   })
 
-  test("manually added active citations can be deleted", async ({
+  test("manually added proceeding decision can be deleted", async ({
     page,
     documentNumber,
   }) => {
@@ -181,33 +169,33 @@ test.describe("active citations", () => {
 
     await waitForSaving(
       async () => {
-        await page.getByLabel("Aktenzeichen der Aktivzitierung").fill("one")
+        await page.getByLabel("Aktenzeichen Rechtszug").fill("one")
       },
       page,
       { clickSaveButton: true },
     )
 
-    await page.getByLabel("Aktivzitierung speichern").click()
+    await page.getByLabel("Vorgehende Entscheidung speichern").click()
     await page.getByLabel("Weitere Angabe").click()
     await waitForSaving(
       async () => {
-        await page.getByLabel("Aktenzeichen der Aktivzitierung").fill("two")
+        await page.getByLabel("Aktenzeichen Rechtszug").fill("two")
       },
       page,
       { clickSaveButton: true },
     )
-    const activeCitationContainer = page.getByLabel("Aktivzitierung")
-    await page.getByLabel("Aktivzitierung speichern").click()
+    const proceedingDecisionContainer = page.getByLabel("Rechtszug")
+    await page.getByLabel("Vorgehende Entscheidung speichern").click()
     await expect(
-      activeCitationContainer.getByLabel("Listen Eintrag"),
+      proceedingDecisionContainer.getByLabel("Listen Eintrag"),
     ).toHaveCount(2)
     await page.getByLabel("Eintrag löschen").first().click()
     await expect(
-      activeCitationContainer.getByLabel("Listen Eintrag"),
+      proceedingDecisionContainer.getByLabel("Listen Eintrag"),
     ).toHaveCount(1)
   })
 
-  test("search for documentunits and link as active citation", async ({
+  test("search for documentunits and link as proceeding decision", async ({
     page,
     documentNumber,
     prefilledDocumentUnit,
@@ -228,21 +216,19 @@ test.describe("active citations", () => {
     await navigateToCategories(page, documentNumber)
     await expect(page.getByText(documentNumber)).toBeVisible()
 
-    await fillActiveCitationInputs(page, {
-      citationStyle: "Änderung",
+    await fillProceedingDecisionInputs(page, {
       court: prefilledDocumentUnit.coreData.court?.label,
       fileNumber: prefilledDocumentUnit.coreData.fileNumbers?.[0],
       documentType: prefilledDocumentUnit.coreData.documentType?.jurisShortcut,
       decisionDate: "01.01.2020",
     })
+    const proceedingDecisionContainer = page.getByLabel("Rechtszug")
+    await proceedingDecisionContainer
+      .getByLabel("Nach Entscheidung suchen")
+      .click()
 
-    const activeCitationContainer = page.getByLabel("Aktivzitierung")
-    await activeCitationContainer.getByLabel("Nach Entscheidung suchen").click()
-    await expect(
-      activeCitationContainer.getByText("Total 1 Items"),
-    ).toBeVisible()
+    await expect(page.getByText("Total 1 Items")).toBeVisible()
 
-    //citation style ignored in search results
     const result = page.getByText(
       `AG Aachen, 01.01.2020, ${prefilledDocumentUnit.coreData.fileNumbers?.[0]}, Anerkenntnisurteil, ${prefilledDocumentUnit.documentNumber}`,
     )
@@ -252,7 +238,7 @@ test.describe("active citations", () => {
 
     //make sure to have citation style in list
     const listItem = page.getByText(
-      `Änderung, AG Aachen, 01.01.2020, ${prefilledDocumentUnit.coreData.fileNumbers?.[0]}, Anerkenntnisurteil, ${prefilledDocumentUnit.documentNumber}`,
+      `AG Aachen, 01.01.2020, ${prefilledDocumentUnit.coreData.fileNumbers?.[0]}, Anerkenntnisurteil, ${prefilledDocumentUnit.documentNumber}`,
     )
     await expect(listItem).toBeVisible()
     await expect(page.getByLabel("Eintrag löschen")).toBeVisible()
@@ -261,28 +247,25 @@ test.describe("active citations", () => {
     await expect(page.getByLabel("Eintrag bearbeiten")).toBeHidden()
 
     // search for same parameters gives same result, indication that decision is already added
-    await activeCitationContainer.getByLabel("Weitere Angabe").click()
-    await fillActiveCitationInputs(page, {
-      citationStyle: "Änderung",
+    await page.getByLabel("Weitere Angabe").click()
+    await fillProceedingDecisionInputs(page, {
       court: prefilledDocumentUnit.coreData.court?.label,
       fileNumber: prefilledDocumentUnit.coreData.fileNumbers?.[0],
       documentType: prefilledDocumentUnit.coreData.documentType?.jurisShortcut,
       decisionDate: "01.01.2020",
     })
 
-    await activeCitationContainer.getByLabel("Nach Entscheidung suchen").click()
+    await proceedingDecisionContainer
+      .getByLabel("Nach Entscheidung suchen")
+      .click()
 
-    await expect(
-      activeCitationContainer.getByText("Total 1 Items"),
-    ).toBeVisible()
-    await expect(
-      activeCitationContainer.getByText("Bereits hinzugefügt"),
-    ).toBeVisible()
+    await expect(page.getByText("Total 1 Items")).toBeVisible()
+    await expect(page.getByText("Bereits hinzugefügt")).toBeVisible()
 
     //can be deleted
     await page.getByLabel("Eintrag löschen").first().click()
     await expect(
-      activeCitationContainer.getByLabel("Listen Eintrag"),
+      proceedingDecisionContainer.getByLabel("Listen Eintrag"),
     ).toHaveCount(1)
     await expect(listItem).toBeHidden()
   })
@@ -295,37 +278,36 @@ test.describe("active citations", () => {
     await navigateToCategories(page, documentNumber)
     await expect(page.getByText(documentNumber)).toBeVisible()
 
-    await fillActiveCitationInputs(page, {
+    await fillProceedingDecisionInputs(page, {
       fileNumber: "abc",
     })
-    await page.getByLabel("Aktivzitierung speichern").click()
+    await page.getByLabel("Vorgehende Entscheidung speichern").click()
 
     await expect(page.getByLabel("Fehlerhafte Eingabe")).toBeVisible()
     await page.getByLabel("Eintrag bearbeiten").click()
     await expect(
-      page.getByLabel("Aktivzitierung").getByText("Pflichtfeld nicht befüllt"),
-    ).toHaveCount(3)
+      page.getByLabel("Rechtszug").getByText("Pflichtfeld nicht befüllt"),
+    ).toHaveCount(2)
 
-    await fillActiveCitationInputs(page, {
-      citationStyle: "Änderung",
+    await fillProceedingDecisionInputs(page, {
       court: prefilledDocumentUnit.coreData.court?.label,
       fileNumber: prefilledDocumentUnit.coreData.fileNumbers?.[0],
       documentType: prefilledDocumentUnit.coreData.documentType?.jurisShortcut,
       decisionDate: "01.01.2020",
     })
-    await page.getByLabel("Aktivzitierung speichern").click()
+    await page.getByLabel("Vorgehende Entscheidung speichern").click()
 
     await expect(page.getByLabel("Fehlerhafte Eingabe")).toBeHidden()
   })
 
-  test("adding empty active citation not possible", async ({
+  test("adding empty proceeding decision not possible", async ({
     page,
     documentNumber,
   }) => {
     await navigateToCategories(page, documentNumber)
     await expect(page.getByText(documentNumber)).toBeVisible()
 
-    await page.getByLabel("Aktivzitierung speichern").isDisabled()
+    await page.getByLabel("Vorgehende Entscheidung speichern").isDisabled()
   })
 
   test("incomplete date input shows error message and does not persist", async ({
@@ -335,14 +317,12 @@ test.describe("active citations", () => {
     await navigateToCategories(page, documentNumber)
     await expect(page.getByText(documentNumber)).toBeVisible()
 
-    await page
-      .locator("[aria-label='Entscheidungsdatum der Aktivzitierung']")
-      .fill("03")
+    await page.locator("[aria-label='Entscheidungsdatum Rechtszug']").fill("03")
 
     await page.keyboard.press("Tab")
 
     await expect(
-      page.locator("[aria-label='Entscheidungsdatum der Aktivzitierung']"),
+      page.locator("[aria-label='Entscheidungsdatum Rechtszug']"),
     ).toHaveValue("03")
 
     await expect(page.locator("text=Unvollständiges Datum")).toBeVisible()
@@ -350,7 +330,7 @@ test.describe("active citations", () => {
     await page.reload()
 
     await expect(
-      page.locator("[aria-label='Entscheidungsdatum der Aktivzitierung']"),
+      page.locator("[aria-label='Entscheidungsdatum Rechtszug']"),
     ).toHaveValue("")
   })
 })

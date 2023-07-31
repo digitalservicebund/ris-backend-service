@@ -31,6 +31,7 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitLink;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitLinkType;
 import de.bund.digitalservice.ris.caselaw.domain.LegalEffect;
 import de.bund.digitalservice.ris.caselaw.domain.LinkedDocumentationUnit;
+import de.bund.digitalservice.ris.caselaw.domain.ProceedingDecision;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.court.Court;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
@@ -190,10 +191,10 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
         .flatMap(documentUnitDTO -> saveIncorrectCourt(documentUnitDTO, documentUnit))
         .flatMap(documentUnitDTO -> saveNorms(documentUnitDTO, documentUnit))
         .flatMap(this::injectStatus)
-        .flatMap(this::injectProceedingDecisions)
         .flatMap(this::injectKeywords)
         .flatMap(this::injectFieldsOfLaw)
         .flatMap(documentUnitDTO -> saveActiveCitations(documentUnitDTO, documentUnit))
+        .flatMap(documentUnitDTO -> saveProceedingDecisions(documentUnitDTO, documentUnit))
         .map(DocumentUnitTransformer::transformDTO);
   }
 
@@ -658,6 +659,50 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
         .then(
             unlinkLinkedDocumentationUnit(documentUnit, DocumentationUnitLinkType.ACTIVE_CITATION))
         .then(injectActiveCitations(documentUnitDTO));
+  }
+
+  private Mono<DocumentUnitDTO> saveProceedingDecisions(
+      DocumentUnitDTO documentUnitDTO, DocumentUnit documentUnit) {
+    if (log.isDebugEnabled()) {
+      log.debug("save precious decisions: {}", documentUnit.uuid());
+    }
+
+    List<ProceedingDecision> proceedingDecisions = Collections.emptyList();
+    if (documentUnit.proceedingDecisions() != null) {
+      proceedingDecisions = documentUnit.proceedingDecisions();
+    }
+
+    return Flux.fromIterable(proceedingDecisions)
+        .filter(proceedingDecision -> proceedingDecision.getUuid() != null)
+        .flatMap(
+            proceedingDecision -> {
+              if (proceedingDecision.hasNoValues()) {
+                return unlinkDocumentUnit(
+                    documentUnitDTO.getUuid(),
+                    proceedingDecision.getUuid(),
+                    DocumentationUnitLinkType.PREVIOUS_DECISION);
+              } else {
+                return repository
+                    .findByUuid(proceedingDecision.getUuid())
+                    .filter(
+                        proceedingDecisionDTO ->
+                            proceedingDecisionDTO.getDataSource() == DataSource.PROCEEDING_DECISION)
+                    .flatMap(
+                        proceedingDecisionDTO ->
+                            updateLinkedDocumentationUnit(
+                                proceedingDecisionDTO, proceedingDecision))
+                    .then(
+                        documentationUnitLinkRepository
+                            .findByParentDocumentationUnitUuidAndChildDocumentationUnitUuidAndType(
+                                documentUnitDTO.getUuid(),
+                                proceedingDecision.getUuid(),
+                                DocumentationUnitLinkType.PREVIOUS_DECISION));
+              }
+            })
+        .then(
+            unlinkLinkedDocumentationUnit(
+                documentUnit, DocumentationUnitLinkType.PREVIOUS_DECISION))
+        .then(injectProceedingDecisions(documentUnitDTO));
   }
 
   private Mono<DocumentUnit> unlinkLinkedDocumentationUnit(

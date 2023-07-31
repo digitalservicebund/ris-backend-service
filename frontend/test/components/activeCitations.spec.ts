@@ -37,6 +37,7 @@ function generateActiveCitation(options?: {
     | "MIGRATION"
     | "PROCEEDING_DECISION"
     | "ACTIVE_CITATION"
+  citationStyle?: CitationStyle
 }) {
   const activeCitation = new ActiveCitation({
     uuid: options?.uuid ?? "123",
@@ -53,11 +54,16 @@ function generateActiveCitation(options?: {
       label: "documentType1",
     },
     dataSource: options?.dataSource ?? "NEURIS",
+    citationStyle: options?.citationStyle ?? {
+      uuid: "123",
+      jurisShortcut: "Änderungen",
+      label: "Änderungen",
+    },
   })
   return activeCitation
 }
 
-describe("Active Citations", async () => {
+describe("Active Citations", () => {
   global.ResizeObserver = require("resize-observer-polyfill")
 
   vi.spyOn(
@@ -162,6 +168,7 @@ describe("Active Citations", async () => {
     expect(
       screen.getByLabelText("Dokumenttyp der Aktivzitierung"),
     ).toBeInTheDocument()
+    expect(screen.getByLabelText("Aktivzitierung speichern")).toBeDisabled()
   })
 
   it("renders activeCitations as list entries", () => {
@@ -228,6 +235,11 @@ describe("Active Citations", async () => {
     const { user } = renderComponent({
       modelValue: [
         generateActiveCitation({
+          citationStyle: {
+            uuid: "123",
+            jurisShortcut: "ABC",
+            label: "ABC",
+          },
           dataSource: "ACTIVE_CITATION",
         }),
       ],
@@ -396,7 +408,9 @@ describe("Active Citations", async () => {
     })
 
     expect(
-      screen.getByText("label1, 01.02.2022, test fileNumber, documentType1"),
+      screen.getByText(
+        "Änderungen, label1, 01.02.2022, test fileNumber, documentType1",
+      ),
     ).toBeInTheDocument()
     const editButton = screen.getByLabelText("Eintrag bearbeiten")
     await user.click(editButton)
@@ -407,20 +421,14 @@ describe("Active Citations", async () => {
     const courtInput = await screen.findByLabelText(
       "Gericht der Aktivzitierung",
     )
-    const documentTypeInput = await screen.findByLabelText(
-      "Dokumenttyp der Aktivzitierung",
-    )
-    const decisionDateInput = await screen.findByLabelText(
-      "Entscheidungsdatum der Aktivzitierung",
-    )
 
     await user.clear(fileNumberInput)
     await user.clear(courtInput)
-    await user.clear(documentTypeInput)
-    await user.clear(decisionDateInput)
+
+    await user.click(screen.getByLabelText("Aktivzitierung speichern"))
 
     expect(
-      screen.queryByText(/label1, 01.02.2022, documentType1, test fileNumber/),
+      screen.queryByText(/Änderungen, 01.02.2022, documentType1/),
     ).not.toBeInTheDocument()
   })
 
@@ -468,10 +476,10 @@ describe("Active Citations", async () => {
     const editButton = screen.getByLabelText("Eintrag bearbeiten")
     await user.click(editButton)
 
-    const courtInput = await screen.findByLabelText(
-      "Gericht der Aktivzitierung",
+    const fileInput = await screen.findByLabelText(
+      "Aktenzeichen der Aktivzitierung",
     )
-    await user.clear(courtInput)
+    await user.clear(fileInput)
     await user.click(screen.getByLabelText("Aktivzitierung speichern"))
     expect(screen.getByLabelText(/Fehlerhafte Eingabe/)).toBeInTheDocument()
     await user.click(editButton)
