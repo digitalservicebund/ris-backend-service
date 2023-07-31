@@ -1,4 +1,5 @@
 import path from "path"
+import * as process from "process"
 import { sentryVitePlugin } from "@sentry/vite-plugin"
 import vue from "@vitejs/plugin-vue"
 import { defineConfig } from "vite"
@@ -18,7 +19,10 @@ export default defineConfig({
     Pages({
       dirs: "src/routes",
     }),
-    EnvironmentPlugin({ BACKEND_HOST: "" }),
+    EnvironmentPlugin({
+      BACKEND_HOST: "",
+      SENTRY_DSN_FRONTEND: "",
+    }),
     sentryVitePlugin({
       authToken: process.env.SENTRY_AUTH_TOKEN,
       org: "digitalservice",

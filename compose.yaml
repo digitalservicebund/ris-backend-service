@@ -21,7 +21,7 @@ services:
       retries: 3
       start_period: 3s
       timeout: 3s
- 
+
   backend:
     image: gradle:7-jdk17
     user: ${MY_UID}:${MY_GID}
@@ -53,7 +53,7 @@ services:
       retries: 10
       start_period: 60s
       timeout: 3s
-  
+
   frontend:
     image: neuris/frontend
     extra_hosts:
@@ -63,6 +63,7 @@ services:
       - ./frontend/src/:/usr/src/app/src
     environment:
       - BACKEND_HOST=http://127.0.0.1
+      - SENTRY_DSN=${SENTRY_DSN_FRONTEND}
     command: npm run dev -- --host
     depends_on:
       - traefik

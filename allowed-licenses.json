@@ -70,6 +70,9 @@
       "moduleLicense": "CDDL + GPLv2 with classpath exception"
     },
     {
+      "moduleLicense": "BlueOak-1.0.0"
+    },
+    {
       "moduleLicense": null,
       "moduleName": "com.fasterxml.jackson:jackson-bom"
     },
