@@ -854,7 +854,7 @@ class ActiveCitationIntegrationTest {
         .texts(Texts.builder().build())
         .creationtimestamp(TIMESTAMP)
         .contentRelatedIndexing(contentRelatedIndexing)
-        .status(DocumentUnitStatus.builder().status(PublicationStatus.PUBLISHED).build())
+        .status(DocumentUnitStatus.builder().publicationStatus(PublicationStatus.PUBLISHED).build())
         .proceedingDecisions(Collections.emptyList())
         .build();
   }

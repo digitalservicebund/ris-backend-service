@@ -18,7 +18,7 @@ function renderComponent(
             fileName: "",
             fileNumber: "",
             documentationOffice: { label: "testOffice" },
-            status: { status: "PUBLISHED", withError: false },
+            status: { publicationStatus: "PUBLISHED", withError: false },
             ...options,
           },
         ]
@@ -101,7 +101,7 @@ describe("documentUnit list", () => {
     await screen.findByText("testOffice")
   })
 
-  test("renders status", async () => {
+  test("renders publication status", async () => {
     renderComponent()
 
     await screen.findByText("veröffentlicht")

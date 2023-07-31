@@ -65,8 +65,8 @@ public class AuthService {
 
   private Mono<Boolean> userHasReadAccess(DocumentUnit documentUnit) {
     return (documentUnit.status() != null // legacy documents are published
-                && (documentUnit.status().status() == PUBLISHED
-                    || documentUnit.status().status() == PUBLISHING)
+                && (documentUnit.status().publicationStatus() == PUBLISHED
+                    || documentUnit.status().publicationStatus() == PUBLISHING)
             ? Mono.just(true)
             : userHasSameDocOfficeAsDocument(documentUnit))
         .defaultIfEmpty(false)

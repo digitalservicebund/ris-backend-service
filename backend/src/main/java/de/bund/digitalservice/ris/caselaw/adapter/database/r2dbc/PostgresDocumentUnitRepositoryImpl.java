@@ -1017,7 +1017,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
                         statusDTO -> {
                           dto.setStatus(
                               DocumentUnitStatus.builder()
-                                  .status(statusDTO.getStatus())
+                                  .publicationStatus(statusDTO.getPublicationStatus())
                                   .withError(statusDTO.isWithError())
                                   .build());
                           return dto;
@@ -1027,7 +1027,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
                             () -> {
                               dto.setStatus(
                                   DocumentUnitStatus.builder()
-                                      .status(PublicationStatus.PUBLISHED)
+                                      .publicationStatus(PublicationStatus.PUBLISHED)
                                       .withError(false)
                                       .build());
                               return Mono.just(dto);

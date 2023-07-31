@@ -50,7 +50,7 @@ export type Texts = {
 }
 
 export type PublicationStatus = {
-  status: "PUBLISHED" | "UNPUBLISHED" | "PUBLISHING"
+  publicationStatus: "PUBLISHED" | "UNPUBLISHED" | "PUBLISHING"
   withError: boolean
 }
 

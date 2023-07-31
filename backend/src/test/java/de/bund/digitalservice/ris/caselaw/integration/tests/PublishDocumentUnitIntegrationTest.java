@@ -186,7 +186,7 @@ class PublishDocumentUnitIntegrationTest {
     List<DocumentUnitStatusDTO> statusList =
         documentUnitStatusRepository.findAll().collectList().block();
     DocumentUnitStatusDTO status = statusList.get(statusList.size() - 1);
-    assertThat(status.getStatus()).isEqualTo(PUBLISHING);
+    assertThat(status.getPublicationStatus()).isEqualTo(PUBLISHING);
     assertThat(status.getDocumentUnitId()).isEqualTo(documentUnitDTO.getUuid());
     assertThat(status.getCreatedAt()).isEqualTo(xmlPublicationDTO.publishDate());
     assertThat(status.getIssuerAddress()).isEqualTo("test@test.com");
@@ -212,7 +212,7 @@ class PublishDocumentUnitIntegrationTest {
                 .id(UUID.randomUUID())
                 .documentUnitId(savedDocumentUnitDTO.getUuid())
                 .issuerAddress("test1@test.com")
-                .status(PublicationStatus.UNPUBLISHED)
+                .publicationStatus(PublicationStatus.UNPUBLISHED)
                 .build())
         .block();
     assertThat(documentUnitStatusRepository.findAll().collectList().block()).hasSize(1);
@@ -246,7 +246,7 @@ class PublishDocumentUnitIntegrationTest {
     List<DocumentUnitStatusDTO> statusList =
         documentUnitStatusRepository.findAll().collectList().block();
     assertThat(statusList).hasSize(1);
-    assertThat(statusList.get(0).getStatus()).isEqualTo(PublicationStatus.UNPUBLISHED);
+    assertThat(statusList.get(0).getPublicationStatus()).isEqualTo(PublicationStatus.UNPUBLISHED);
   }
 
   @Test

@@ -51,7 +51,7 @@ public class SendInBlueMailTrackingService implements MailTrackingService {
     }
 
     if (state == EmailPublishState.ERROR) {
-      log.warn("Failed to send Mail for {} because of event {}", documentUnitUuid, event);
+      log.error("Failed to send Mail for {} because of event {}", documentUnitUuid, event);
     }
 
     return statusService
@@ -62,7 +62,7 @@ public class SendInBlueMailTrackingService implements MailTrackingService {
                 statusService.update(
                     documentUnitUuid,
                     DocumentUnitStatus.builder()
-                        .status(documentUnitStatusDTO)
+                        .publicationStatus(documentUnitStatusDTO)
                         .withError(state == EmailPublishState.ERROR)
                         .build()))
         .thenReturn(ResponseEntity.status(HttpStatus.OK).build());

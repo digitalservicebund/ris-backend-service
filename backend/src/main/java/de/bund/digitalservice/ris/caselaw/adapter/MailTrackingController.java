@@ -41,7 +41,7 @@ public class MailTrackingController {
     } catch (IllegalArgumentException e) {
       // No UUID in tag == it's about a forwarded report mail and not the mail to juris
       if (service.getMappedPublishState(payload.event()) == EmailPublishState.ERROR) {
-        log.warn("Received Mail sending error {} with tags {}", payload.event(), payload.tags());
+        log.error("Received Mail sending error {} with tags {}", payload.event(), payload.tags());
       }
       return Mono.just(ResponseEntity.status(HttpStatus.NO_CONTENT).build());
     }

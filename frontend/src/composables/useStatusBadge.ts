@@ -4,13 +4,13 @@ import DocumentUnit from "@/domain/documentUnit"
 export function useStatusBadge(status: DocumentUnit["status"]) {
   const badge = {
     label: "status",
-    value: "veröffentlicht",
-    icon: "campaign",
+    value: "",
+    icon: "",
     color: "black",
   }
 
   return computed(() => {
-    if (status?.status == "PUBLISHED") {
+    if (status?.publicationStatus == "PUBLISHED") {
       if (status?.withError) {
         badge.value = "veröffentlicht mit Fehlern"
         badge.icon = "error_outline"
@@ -19,7 +19,7 @@ export function useStatusBadge(status: DocumentUnit["status"]) {
         badge.icon = "campaign"
       }
     }
-    if (status?.status == "UNPUBLISHED") {
+    if (status?.publicationStatus == "UNPUBLISHED") {
       if (status?.withError) {
         badge.value = "Nicht veröffentlicht (Fehler)"
         badge.icon = "error_outline"
@@ -28,7 +28,7 @@ export function useStatusBadge(status: DocumentUnit["status"]) {
         badge.icon = "disabled_visible"
       }
     }
-    if (status?.status == "PUBLISHING") {
+    if (status?.publicationStatus == "PUBLISHING") {
       if (status?.withError) {
         badge.value = "Fehler beim Veröffentlichen"
         badge.icon = "error_outline"

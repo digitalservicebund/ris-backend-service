@@ -71,7 +71,7 @@ class ContentRelatedIndexingControllerAuthTest {
         .uri(uri)
         .exchange()
         .expectStatus()
-        .isOk(); // because status is PUBLISHED
+        .isOk(); // because publicationStatus is PUBLISHED
 
     mockDocumentUnit(docOffice1, null);
 
@@ -145,7 +145,7 @@ class ContentRelatedIndexingControllerAuthTest {
         .uri(uri)
         .exchange()
         .expectStatus()
-        .isOk(); // because status is PUBLISHED
+        .isOk(); // because publicationStatus is PUBLISHED
 
     risWebTestClient.withLogin(docOffice2Group).get().uri(uri).exchange().expectStatus().isOk();
 
@@ -211,7 +211,7 @@ class ContentRelatedIndexingControllerAuthTest {
         .thenReturn(
             Mono.just(
                 DocumentUnit.builder()
-                    .status(DocumentUnitStatus.builder().status(status).build())
+                    .status(DocumentUnitStatus.builder().publicationStatus(status).build())
                     .coreData(CoreData.builder().documentationOffice(docOffice).build())
                     .build()));
   }

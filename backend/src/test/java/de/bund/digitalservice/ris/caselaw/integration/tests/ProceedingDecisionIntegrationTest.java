@@ -653,7 +653,7 @@ class ProceedingDecisionIntegrationTest {
             List.of("AkteZ"),
             "EF",
             "DigitalService",
-            DocumentUnitStatus.builder().status(PublicationStatus.UNPUBLISHED).build());
+            DocumentUnitStatus.builder().publicationStatus(PublicationStatus.UNPUBLISHED).build());
     var du2 =
         createDocumentUnit(
             "Court2",
@@ -662,7 +662,7 @@ class ProceedingDecisionIntegrationTest {
             List.of("AkteZ"),
             "EF",
             "DigitalService",
-            DocumentUnitStatus.builder().status(PublicationStatus.PUBLISHED).build());
+            DocumentUnitStatus.builder().publicationStatus(PublicationStatus.PUBLISHED).build());
     var du3 =
         createDocumentUnit(
             "Court3", "Berlin", date, List.of("AkteZ"), "EF", "DigitalService", null);
@@ -675,7 +675,7 @@ class ProceedingDecisionIntegrationTest {
             List.of("AkteZ"),
             "EF",
             "CC-RIS",
-            DocumentUnitStatus.builder().status(PublicationStatus.UNPUBLISHED).build());
+            DocumentUnitStatus.builder().publicationStatus(PublicationStatus.UNPUBLISHED).build());
 
     var du5 =
         createDocumentUnit(
@@ -685,7 +685,7 @@ class ProceedingDecisionIntegrationTest {
             List.of("AkteZ"),
             "EF",
             "CC-RIS",
-            DocumentUnitStatus.builder().status(PublicationStatus.PUBLISHED).build());
+            DocumentUnitStatus.builder().publicationStatus(PublicationStatus.PUBLISHED).build());
     var du6 = createDocumentUnit("Court6", "Berlin", date, List.of("AkteZ"), "EF", "CC-RIS", null);
 
     simulateAPICall(ProceedingDecision.builder().fileNumber("AkteZ").build())
@@ -715,7 +715,7 @@ class ProceedingDecisionIntegrationTest {
             List.of("AkteX", "AkteY"),
             "CD",
             "DigitalService",
-            DocumentUnitStatus.builder().status(PublicationStatus.PUBLISHED).build());
+            DocumentUnitStatus.builder().publicationStatus(PublicationStatus.PUBLISHED).build());
 
     Instant date2 = Instant.parse("2023-02-03T00:00:00.00Z");
     DocumentUnitMetadataDTO documentUnit2 =
@@ -726,7 +726,7 @@ class ProceedingDecisionIntegrationTest {
             null,
             "EF",
             "DigitalService",
-            DocumentUnitStatus.builder().status(PublicationStatus.PUBLISHED).build());
+            DocumentUnitStatus.builder().publicationStatus(PublicationStatus.PUBLISHED).build());
 
     Instant date3 = Instant.parse("2023-03-04T00:00:00.00Z");
     DocumentUnitMetadataDTO documentUnit3 =
@@ -737,7 +737,7 @@ class ProceedingDecisionIntegrationTest {
             List.of("AkteX"),
             "GH",
             "DigitalService",
-            DocumentUnitStatus.builder().status(PublicationStatus.PUBLISHED).build());
+            DocumentUnitStatus.builder().publicationStatus(PublicationStatus.PUBLISHED).build());
     return date1;
   }
 
@@ -812,7 +812,7 @@ class ProceedingDecisionIntegrationTest {
                     DocumentUnitStatusDTO.builder()
                         .id(UUID.randomUUID())
                         .documentUnitId(documentUnitMetadataDTO.getUuid())
-                        .status(status.status())
+                        .publicationStatus(status.publicationStatus())
                         .withError(status.withError())
                         .newEntry(true)
                         .build())

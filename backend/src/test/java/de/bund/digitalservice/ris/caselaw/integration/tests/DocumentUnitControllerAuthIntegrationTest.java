@@ -20,7 +20,6 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumen
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabasePublicationReportRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitStatusDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentationOfficeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.PostgresDocumentUnitRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.PostgresPublicationReportRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
@@ -30,15 +29,20 @@ import de.bund.digitalservice.ris.caselaw.domain.DataSource;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatus;
 import de.bund.digitalservice.ris.caselaw.domain.EmailPublishService;
+import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Random;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.oauth2.client.registration.ReactiveClientRegistrationRepository;
@@ -99,16 +103,19 @@ class DocumentUnitControllerAuthIntegrationTest {
   @MockBean DocxConverterService docxConverterService;
   @MockBean ReactiveClientRegistrationRepository clientRegistrationRepository;
 
-  private final String docOffice1Group = "/CC-RIS";
-  private final String docOffice2Group = "/caselaw/BGH";
-  private DocumentationOfficeDTO docOffice1DTO;
-  private DocumentationOfficeDTO docOffice2DTO;
+  private static final String docOffice1 = "CC-RIS";
+  private static final String docOffice1Group = "/" + docOffice1;
+
+  private static final String docOffice2 = "BGH";
+  private static final String docOffice2Group = "/caselaw/" + docOffice2;
+  private UUID docOffice1Id;
+  private UUID docOffice2Id;
 
   @BeforeEach
   void setUp() {
     // created via db migration V0_79__caselaw_insert_default_documentation_offices
-    docOffice1DTO = documentationOfficeRepository.findByLabel("CC-RIS").block();
-    docOffice2DTO = documentationOfficeRepository.findByLabel("BGH").block();
+    docOffice1Id = documentationOfficeRepository.findByLabel(docOffice1).block().getId();
+    docOffice2Id = documentationOfficeRepository.findByLabel(docOffice2).block().getId();
   }
 
   @AfterEach
@@ -118,14 +125,36 @@ class DocumentUnitControllerAuthIntegrationTest {
     databasePublishReportRepository.deleteAll().block();
   }
 
-  @Test
-  void testGetAll_correctFilteringDependingOnUserOffice1() {
-    initializeGetAllTests();
+  @ParameterizedTest
+  @MethodSource("getAuthorizedCases")
+  void testGetAll_shouldBeAccessible(
+      String docUnitOffice, String userDocOffice, List<PublicationStatus> publicationStatus) {
 
-    // Documentation Office 1
+    UUID docUnitOfficeId = null;
+    if (docUnitOffice.equals(userDocOffice)) {
+      docUnitOfficeId = docOffice1Id;
+    } else if (docUnitOffice.equals(docOffice2)) {
+      docUnitOfficeId = docOffice2Id;
+    }
+
+    String userOfficeId = null;
+    if (userDocOffice.equals(userDocOffice)) {
+      userOfficeId = docOffice1Group;
+    } else if (userDocOffice.equals(docOffice2)) {
+      userOfficeId = docOffice2Group;
+    }
+
+    DocumentUnitDTO docUnit = createNewDocumentUnitDTO(UUID.randomUUID(), docUnitOfficeId);
+    for (int i = 0; i < publicationStatus.size(); i++) {
+      saveToStatusRepository(
+          docUnit,
+          docUnit.getCreationtimestamp().plusSeconds(60 + i),
+          DocumentUnitStatus.builder().publicationStatus(publicationStatus.get(i)).build());
+    }
+
     EntityExchangeResult<String> result =
         risWebTestClient
-            .withLogin(docOffice1Group)
+            .withLogin(userOfficeId)
             .get()
             .uri("/api/v1/caselaw/documentunits?pg=0&sz=10")
             .exchange()
@@ -134,31 +163,45 @@ class DocumentUnitControllerAuthIntegrationTest {
             .expectBody(String.class)
             .returnResult();
 
-    assertThat(extractStatusByUuid(result.getResponseBody(), OFFICE1_UNPUBLISHED_UUID))
-        .isEqualTo(UNPUBLISHED.toString());
-    assertThat(extractStatusByUuid(result.getResponseBody(), OFFICE2_PUBLISHED_UUID))
-        .isEqualTo(PUBLISHED.toString());
-    assertThat(extractStatusByUuid(result.getResponseBody(), OFFICE2_PUBLISHING_UUID))
-        .isEqualTo(PUBLISHING.toString());
-    assertThat(extractDocUnitsByUuid(result.getResponseBody(), OFFICE2_UNPUBLISHED_UUID)).isEmpty();
-    assertThat(extractStatusByUuid(result.getResponseBody(), OFFICE2_LATER_PUBLISHED_UUID))
-        .isEqualTo(PUBLISHED.toString());
-    assertThat(extractStatusByUuid(result.getResponseBody(), OFFICE2_NO_STATUS_UUID))
-        .isEqualTo(PUBLISHED.toString());
-    assertThat(extractStatusByUuid(result.getResponseBody(), WITHOUT_OFFICE_UUID))
-        .isEqualTo(PUBLISHED.toString());
-    assertThat(extractDocUnitsByUuid(result.getResponseBody(), OFFICE2_LATER_UNPUBLISHED_UUID))
-        .isEmpty();
+    if (publicationStatus.size() == 0) {
+      assertThat(extractStatusByUuid(result.getResponseBody(), docUnit.getUuid()))
+          .isEqualTo(PUBLISHED.toString());
+    } else {
+      assertThat(extractStatusByUuid(result.getResponseBody(), docUnit.getUuid()))
+          .isEqualTo(publicationStatus.get(publicationStatus.size() - 1).toString());
+    }
   }
 
-  @Test
-  void testGetAll_correctFilteringDependingOnUserOffice2() {
-    initializeGetAllTests();
+  @ParameterizedTest
+  @MethodSource("getUnauthorizedCases")
+  void testGetAll_shouldNotBeAccessible(
+      String docUnitOffice, String userDocOffice, List<PublicationStatus> publicationStatus) {
 
-    // Documentation Office 2
+    UUID docUnitOfficeId = null;
+    if (docUnitOffice.equals(userDocOffice)) {
+      docUnitOfficeId = docOffice1Id;
+    } else if (docUnitOffice.equals(docOffice2)) {
+      docUnitOfficeId = docOffice2Id;
+    }
+
+    String userOfficeId = null;
+    if (userDocOffice.equals(userDocOffice)) {
+      userOfficeId = docOffice1Group;
+    } else if (userDocOffice.equals(docOffice2)) {
+      userOfficeId = docOffice2Group;
+    }
+
+    DocumentUnitDTO docUnit = createNewDocumentUnitDTO(UUID.randomUUID(), docUnitOfficeId);
+    for (int i = 0; i < publicationStatus.size(); i++) {
+      saveToStatusRepository(
+          docUnit,
+          docUnit.getCreationtimestamp().plusSeconds(60 + i),
+          DocumentUnitStatus.builder().publicationStatus(publicationStatus.get(i)).build());
+    }
+
     EntityExchangeResult<String> result =
         risWebTestClient
-            .withLogin(docOffice2Group)
+            .withLogin(userOfficeId)
             .get()
             .uri("/api/v1/caselaw/documentunits?pg=0&sz=10")
             .exchange()
@@ -167,94 +210,35 @@ class DocumentUnitControllerAuthIntegrationTest {
             .expectBody(String.class)
             .returnResult();
 
-    assertThat(extractDocUnitsByUuid(result.getResponseBody(), OFFICE1_UNPUBLISHED_UUID)).isEmpty();
-    assertThat(extractStatusByUuid(result.getResponseBody(), OFFICE2_PUBLISHED_UUID))
-        .isEqualTo(PUBLISHED.toString());
-    assertThat(extractStatusByUuid(result.getResponseBody(), OFFICE2_PUBLISHING_UUID))
-        .isEqualTo(PUBLISHING.toString());
-    assertThat(extractStatusByUuid(result.getResponseBody(), OFFICE2_UNPUBLISHED_UUID))
-        .isEqualTo(UNPUBLISHED.toString());
-    assertThat(extractStatusByUuid(result.getResponseBody(), OFFICE2_LATER_PUBLISHED_UUID))
-        .isEqualTo(PUBLISHED.toString());
-    assertThat(extractStatusByUuid(result.getResponseBody(), OFFICE2_NO_STATUS_UUID))
-        .isEqualTo(PUBLISHED.toString());
-    assertThat(extractStatusByUuid(result.getResponseBody(), WITHOUT_OFFICE_UUID))
-        .isEqualTo(PUBLISHED.toString());
-    assertThat(extractStatusByUuid(result.getResponseBody(), OFFICE2_LATER_UNPUBLISHED_UUID))
-        .isEqualTo(UNPUBLISHED.toString());
+    assertThat(extractDocUnitsByUuid(result.getResponseBody(), docUnit.getUuid())).isEmpty();
   }
 
-  private void initializeGetAllTests() {
-    DocumentUnitDTO office1Unpublished =
-        createNewDocumentUnitDTO(OFFICE1_UNPUBLISHED_UUID, docOffice1DTO.getId());
-    saveToStatusRepository(
-        office1Unpublished,
-        office1Unpublished.getCreationtimestamp(),
-        DocumentUnitStatus.builder().status(UNPUBLISHED).build());
+  static Stream<Arguments> getUnauthorizedCases() {
+    return Stream.of(
+        Arguments.of("CC_RIS", "NEURIS", List.of(UNPUBLISHED)),
+        Arguments.of("NEURIS", "CC_RIS", List.of(UNPUBLISHED)));
+  }
 
-    DocumentUnitDTO office2Published =
-        createNewDocumentUnitDTO(OFFICE2_PUBLISHED_UUID, docOffice2DTO.getId());
-    saveToStatusRepository(
-        office2Published,
-        office2Published.getCreationtimestamp(),
-        DocumentUnitStatus.builder().status(UNPUBLISHED).build());
-    saveToStatusRepository(
-        office2Published, Instant.now(), DocumentUnitStatus.builder().status(PUBLISHED).build());
-
-    DocumentUnitDTO office2Publishing =
-        createNewDocumentUnitDTO(OFFICE2_PUBLISHING_UUID, docOffice2DTO.getId());
-    saveToStatusRepository(
-        office2Publishing,
-        office2Publishing.getCreationtimestamp(),
-        DocumentUnitStatus.builder().status(UNPUBLISHED).build());
-    saveToStatusRepository(
-        office2Publishing, Instant.now(), DocumentUnitStatus.builder().status(PUBLISHING).build());
-
-    DocumentUnitDTO office2Unpublished =
-        createNewDocumentUnitDTO(OFFICE2_UNPUBLISHED_UUID, docOffice2DTO.getId());
-    saveToStatusRepository(
-        office2Unpublished,
-        office2Unpublished.getCreationtimestamp(),
-        DocumentUnitStatus.builder().status(UNPUBLISHED).build());
-
-    DocumentUnitDTO office2LaterPublished =
-        createNewDocumentUnitDTO(OFFICE2_LATER_PUBLISHED_UUID, docOffice2DTO.getId());
-    saveToStatusRepository(
-        office2LaterPublished,
-        office2LaterPublished.getCreationtimestamp(),
-        DocumentUnitStatus.builder().status(UNPUBLISHED).build());
-    saveToStatusRepository(
-        office2LaterPublished,
-        Instant.now(),
-        DocumentUnitStatus.builder().status(PUBLISHED).build());
-
-    createNewDocumentUnitDTO(OFFICE2_NO_STATUS_UUID, docOffice2DTO.getId());
-
-    createNewDocumentUnitDTO(WITHOUT_OFFICE_UUID, null);
-
-    DocumentUnitDTO office2LaterUnpublished =
-        createNewDocumentUnitDTO(OFFICE2_LATER_UNPUBLISHED_UUID, docOffice2DTO.getId());
-    saveToStatusRepository(
-        office2LaterUnpublished,
-        office2LaterUnpublished.getCreationtimestamp(),
-        DocumentUnitStatus.builder().status(UNPUBLISHED).build());
-    saveToStatusRepository(
-        office2LaterUnpublished,
-        Instant.now().plus(1, ChronoUnit.DAYS),
-        DocumentUnitStatus.builder().status(PUBLISHED).build());
-    saveToStatusRepository(
-        office2LaterUnpublished,
-        Instant.now().plus(2, ChronoUnit.DAYS),
-        DocumentUnitStatus.builder().status(UNPUBLISHED).build());
+  static Stream<Arguments> getAuthorizedCases() {
+    return Stream.of(
+        Arguments.of("CC_RIS", "NEURIS", List.of(PUBLISHED)),
+        Arguments.of("CC_RIS", "NEURIS", List.of(PUBLISHING)),
+        Arguments.of("NEURIS", "NEURIS", List.of(UNPUBLISHED)),
+        Arguments.of("NEURIS", "NEURIS", List.of(PUBLISHED)),
+        Arguments.of("NEURIS", "NEURIS", List.of(UNPUBLISHED, PUBLISHED)),
+        Arguments.of("NEURIS", "NEURIS", List.of(PUBLISHING)),
+        Arguments.of("NEURIS", "NEURIS", List.of(UNPUBLISHED, PUBLISHING)),
+        Arguments.of("NEURIS", "NEURIS", List.of(UNPUBLISHED, PUBLISHED, UNPUBLISHED)),
+        Arguments.of("NEURIS", "NEURIS", List.of()));
   }
 
   @Test
   void testUnpublishedDocumentUnitIsForbiddenFOrOtherOffice() {
-    DocumentUnitDTO docUnit1 = createNewDocumentUnitDTO(UUID.randomUUID(), docOffice1DTO.getId());
+    DocumentUnitDTO docUnit1 = createNewDocumentUnitDTO(UUID.randomUUID(), docOffice1Id);
     saveToStatusRepository(
         docUnit1,
         docUnit1.getCreationtimestamp(),
-        DocumentUnitStatus.builder().status(UNPUBLISHED).build());
+        DocumentUnitStatus.builder().publicationStatus(UNPUBLISHED).build());
 
     // Documentation Office 1
     EntityExchangeResult<String> result =
@@ -282,7 +266,7 @@ class DocumentUnitControllerAuthIntegrationTest {
     saveToStatusRepository(
         docUnit1,
         docUnit1.getCreationtimestamp().plus(1, ChronoUnit.DAYS),
-        DocumentUnitStatus.builder().status(PUBLISHING).build());
+        DocumentUnitStatus.builder().publicationStatus(PUBLISHING).build());
 
     result =
         risWebTestClient
@@ -300,7 +284,7 @@ class DocumentUnitControllerAuthIntegrationTest {
     saveToStatusRepository(
         docUnit1,
         docUnit1.getCreationtimestamp().plus(2, ChronoUnit.DAYS),
-        DocumentUnitStatus.builder().status(PUBLISHED).build());
+        DocumentUnitStatus.builder().publicationStatus(PUBLISHED).build());
 
     result =
         risWebTestClient
@@ -338,7 +322,7 @@ class DocumentUnitControllerAuthIntegrationTest {
         .save(
             DocumentUnitStatusDTO.builder()
                 .documentUnitId(docUnitDTO.getUuid())
-                .status(status.status())
+                .publicationStatus(status.publicationStatus())
                 .withError(status.withError())
                 .createdAt(createdAt)
                 .id(UUID.randomUUID())
@@ -350,7 +334,8 @@ class DocumentUnitControllerAuthIntegrationTest {
   private String extractStatusByUuid(String responseBody, UUID uuid) {
     List<String> docUnitStatusResults =
         JsonPath.read(
-            responseBody, String.format("$.content[?(@.uuid=='%s')].status.status", uuid));
+            responseBody,
+            String.format("$.content[?(@.uuid=='%s')].status.publicationStatus", uuid));
     assertThat(docUnitStatusResults).hasSize(1);
     return docUnitStatusResults.get(0);
   }
@@ -361,5 +346,13 @@ class DocumentUnitControllerAuthIntegrationTest {
 
   private String extractUuid(String responseBody) {
     return JsonPath.read(responseBody, "$.uuid");
+  }
+
+  public static String getDocOfficeFromGroup(String input) {
+    int lastSlashIndex = input.lastIndexOf("/");
+    if (lastSlashIndex != -1 && lastSlashIndex < input.length() - 1) {
+      return input.substring(lastSlashIndex + 1);
+    }
+    return ""; // Return an empty string if there is no slash or it's the last character.
   }
 }

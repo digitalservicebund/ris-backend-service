@@ -12,6 +12,6 @@ public interface DatabaseDocumentUnitStatusRepository
 
   Mono<DocumentUnitStatusDTO> findFirstByDocumentUnitIdOrderByCreatedAtDesc(UUID documentUnitUuid);
 
-  Mono<DocumentUnitStatusDTO> findFirstByDocumentUnitIdAndStatusOrderByCreatedAtDesc(
-      UUID documentUnitUuid, PublicationStatus status);
+  Mono<DocumentUnitStatusDTO> findFirstByDocumentUnitIdAndPublicationStatusOrderByCreatedAtDesc(
+      UUID documentUnitUuid, PublicationStatus publicationStatus);
 }

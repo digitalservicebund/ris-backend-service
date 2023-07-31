@@ -159,12 +159,12 @@ public class JurisXmlExporterResponseProcessor {
           .update(
               messageWrapper.getDocumentNumber(),
               DocumentUnitStatus.builder()
-                  .status(getPublicationStatus(messageWrapper.isPublished()))
+                  .publicationStatus(getPublicationStatus(messageWrapper.isPublished()))
                   .withError(messageWrapper.hasErrors())
                   .build())
           .thenReturn(messageWrapper);
     } catch (MessagingException | IOException e) {
-      return Mono.error(new StatusImporterException("Could not update status" + e));
+      return Mono.error(new StatusImporterException("Could not update publicationStatus" + e));
     }
   }
 

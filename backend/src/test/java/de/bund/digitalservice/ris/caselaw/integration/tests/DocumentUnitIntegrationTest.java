@@ -184,7 +184,7 @@ class DocumentUnitIntegrationTest {
         documentUnitStatusRepository.findAll().collectList().block();
     assertThat(statusList).hasSize(1);
     DocumentUnitStatusDTO status = statusList.get(0);
-    assertThat(status.getStatus()).isEqualTo(UNPUBLISHED);
+    assertThat(status.getPublicationStatus()).isEqualTo(UNPUBLISHED);
     assertThat(status.getDocumentUnitId()).isEqualTo(documentUnitDTO.getUuid());
     assertThat(status.getCreatedAt()).isEqualTo(documentUnitDTO.getCreationtimestamp());
   }
@@ -917,7 +917,8 @@ class DocumentUnitIntegrationTest {
         .consumeWith(
             response -> {
               assertThat(response.getResponseBody()).isNotNull();
-              assertThat(response.getResponseBody().status().status()).isEqualTo(PUBLISHED);
+              assertThat(response.getResponseBody().status().publicationStatus())
+                  .isEqualTo(PUBLISHED);
             });
   }
 }

@@ -298,7 +298,7 @@ class JurisXmlExporterResponseProcessorTest {
             anyString(),
             eq(
                 DocumentUnitStatus.builder()
-                    .status(PublicationStatus.PUBLISHING)
+                    .publicationStatus(PublicationStatus.PUBLISHING)
                     .withError(false)
                     .build()));
   }
@@ -317,7 +317,7 @@ class JurisXmlExporterResponseProcessorTest {
             anyString(),
             eq(
                 DocumentUnitStatus.builder()
-                    .status(PublicationStatus.UNPUBLISHED)
+                    .publicationStatus(PublicationStatus.UNPUBLISHED)
                     .withError(true)
                     .build()));
   }
@@ -336,7 +336,7 @@ class JurisXmlExporterResponseProcessorTest {
             anyString(),
             eq(
                 DocumentUnitStatus.builder()
-                    .status(PublicationStatus.PUBLISHED)
+                    .publicationStatus(PublicationStatus.PUBLISHED)
                     .withError(false)
                     .build()));
   }
@@ -355,7 +355,7 @@ class JurisXmlExporterResponseProcessorTest {
             anyString(),
             eq(
                 DocumentUnitStatus.builder()
-                    .status(PublicationStatus.PUBLISHED)
+                    .publicationStatus(PublicationStatus.PUBLISHED)
                     .withError(true)
                     .build()));
   }
@@ -374,7 +374,7 @@ class JurisXmlExporterResponseProcessorTest {
             anyString(),
             eq(
                 DocumentUnitStatus.builder()
-                    .status(PublicationStatus.UNPUBLISHED)
+                    .publicationStatus(PublicationStatus.UNPUBLISHED)
                     .withError(true)
                     .build()));
   }
@@ -399,7 +399,7 @@ class JurisXmlExporterResponseProcessorTest {
             anyString(),
             eq(
                 DocumentUnitStatus.builder()
-                    .status(PublicationStatus.PUBLISHING)
+                    .publicationStatus(PublicationStatus.PUBLISHING)
                     .withError(false)
                     .build()));
 
@@ -409,7 +409,7 @@ class JurisXmlExporterResponseProcessorTest {
             anyString(),
             eq(
                 DocumentUnitStatus.builder()
-                    .status(PublicationStatus.PUBLISHED)
+                    .publicationStatus(PublicationStatus.PUBLISHED)
                     .withError(false)
                     .build()));
 

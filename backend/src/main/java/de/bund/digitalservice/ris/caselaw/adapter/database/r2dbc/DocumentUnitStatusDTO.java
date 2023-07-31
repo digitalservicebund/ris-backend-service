@@ -17,14 +17,14 @@ import org.springframework.data.relational.core.mapping.Table;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table("publication_status")
+@Table("status")
 public class DocumentUnitStatusDTO implements Persistable<UUID> {
   @Id UUID id;
 
   @Column("created_at")
   private Instant createdAt;
 
-  private PublicationStatus status;
+  private PublicationStatus publicationStatus;
 
   private boolean withError;
 

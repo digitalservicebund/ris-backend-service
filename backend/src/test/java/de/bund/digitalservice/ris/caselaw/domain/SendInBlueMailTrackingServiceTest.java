@@ -60,7 +60,7 @@ class SendInBlueMailTrackingServiceTest {
     when(documentUnitStatusService.update(
             TEST_UUID,
             DocumentUnitStatus.builder()
-                .status(PublicationStatus.PUBLISHING)
+                .publicationStatus(PublicationStatus.PUBLISHING)
                 .withError(false)
                 .build()))
         .thenReturn(Mono.empty());
@@ -77,7 +77,7 @@ class SendInBlueMailTrackingServiceTest {
         .update(
             TEST_UUID,
             DocumentUnitStatus.builder()
-                .status(PublicationStatus.PUBLISHING)
+                .publicationStatus(PublicationStatus.PUBLISHING)
                 .withError(false)
                 .build());
   }
@@ -89,7 +89,7 @@ class SendInBlueMailTrackingServiceTest {
     when(documentUnitStatusService.update(
             TEST_UUID,
             DocumentUnitStatus.builder()
-                .status(PublicationStatus.PUBLISHING)
+                .publicationStatus(PublicationStatus.PUBLISHING)
                 .withError(true)
                 .build()))
         .thenReturn(Mono.empty());
@@ -106,7 +106,7 @@ class SendInBlueMailTrackingServiceTest {
         .update(
             TEST_UUID,
             DocumentUnitStatus.builder()
-                .status(PublicationStatus.PUBLISHING)
+                .publicationStatus(PublicationStatus.PUBLISHING)
                 .withError(true)
                 .build());
   }

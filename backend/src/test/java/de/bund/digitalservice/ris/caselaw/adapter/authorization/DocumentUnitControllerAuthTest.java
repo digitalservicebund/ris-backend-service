@@ -202,7 +202,8 @@ class DocumentUnitControllerAuthTest {
 
   @Test
   void testHtml() {
-    mockDocumentUnit(docOffice1, "123", DocumentUnitStatus.builder().status(PUBLISHED).build());
+    mockDocumentUnit(
+        docOffice1, "123", DocumentUnitStatus.builder().publicationStatus(PUBLISHED).build());
     when(docxConverterService.getConvertedObject("123")).thenReturn(Mono.empty());
 
     String uri = "/api/v1/caselaw/documentunits/" + TEST_UUID + "/docx";
@@ -211,7 +212,8 @@ class DocumentUnitControllerAuthTest {
 
     risWebTestClient.withLogin(docOffice2Group).get().uri(uri).exchange().expectStatus().isOk();
 
-    mockDocumentUnit(docOffice1, "123", DocumentUnitStatus.builder().status(UNPUBLISHED).build());
+    mockDocumentUnit(
+        docOffice1, "123", DocumentUnitStatus.builder().publicationStatus(UNPUBLISHED).build());
 
     risWebTestClient
         .withLogin(docOffice2Group)
@@ -243,7 +245,8 @@ class DocumentUnitControllerAuthTest {
 
   @Test
   void testGetPublishedMails() {
-    mockDocumentUnit(docOffice1, null, DocumentUnitStatus.builder().status(PUBLISHED).build());
+    mockDocumentUnit(
+        docOffice1, null, DocumentUnitStatus.builder().publicationStatus(PUBLISHED).build());
     when(service.getPublicationHistory(TEST_UUID)).thenReturn(Flux.empty());
 
     String uri = "/api/v1/caselaw/documentunits/" + TEST_UUID + "/publish";
@@ -252,7 +255,8 @@ class DocumentUnitControllerAuthTest {
 
     risWebTestClient.withLogin(docOffice2Group).get().uri(uri).exchange().expectStatus().isOk();
 
-    mockDocumentUnit(docOffice1, null, DocumentUnitStatus.builder().status(UNPUBLISHED).build());
+    mockDocumentUnit(
+        docOffice1, null, DocumentUnitStatus.builder().publicationStatus(UNPUBLISHED).build());
 
     risWebTestClient
         .withLogin(docOffice2Group)

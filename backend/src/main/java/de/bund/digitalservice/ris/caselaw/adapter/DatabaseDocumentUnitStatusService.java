@@ -37,7 +37,7 @@ public class DatabaseDocumentUnitStatusService implements DocumentUnitStatusServ
                 .id(UUID.randomUUID())
                 .createdAt(documentUnit.creationtimestamp())
                 .documentUnitId(documentUnit.uuid())
-                .status(PublicationStatus.UNPUBLISHED)
+                .publicationStatus(PublicationStatus.UNPUBLISHED)
                 .withError(false)
                 .build())
         .then(documentUnitRepository.findByUuid(documentUnit.uuid()));
@@ -53,7 +53,7 @@ public class DatabaseDocumentUnitStatusService implements DocumentUnitStatusServ
                 .id(UUID.randomUUID())
                 .createdAt(publishDate)
                 .documentUnitId(documentUnit.uuid())
-                .status(PublicationStatus.PUBLISHING)
+                .publicationStatus(PublicationStatus.PUBLISHING)
                 .withError(false)
                 .issuerAddress(issuerAddress)
                 .build())
@@ -84,7 +84,7 @@ public class DatabaseDocumentUnitStatusService implements DocumentUnitStatusServ
             .createdAt(Instant.now())
             .documentUnitId(previousStatusDTO.getDocumentUnitId())
             .issuerAddress(previousStatusDTO.getIssuerAddress())
-            .status(status.status())
+            .publicationStatus(status.publicationStatus())
             .withError(status.withError())
             .build());
   }
@@ -97,7 +97,7 @@ public class DatabaseDocumentUnitStatusService implements DocumentUnitStatusServ
   public Mono<PublicationStatus> getLatestStatus(UUID documentUuid) {
     return repository
         .findFirstByDocumentUnitIdOrderByCreatedAtDesc(documentUuid)
-        .map(DocumentUnitStatusDTO::getStatus);
+        .map(DocumentUnitStatusDTO::getPublicationStatus);
   }
 
   private Mono<DocumentUnitStatusDTO> getLatestPublishing(String documentNumber) {
@@ -105,12 +105,12 @@ public class DatabaseDocumentUnitStatusService implements DocumentUnitStatusServ
         .findByDocumentNumber(documentNumber)
         .flatMap(
             documentUnit ->
-                repository.findFirstByDocumentUnitIdAndStatusOrderByCreatedAtDesc(
+                repository.findFirstByDocumentUnitIdAndPublicationStatusOrderByCreatedAtDesc(
                     documentUnit.uuid(), PublicationStatus.PUBLISHING));
   }
 
   private Mono<DocumentUnitStatusDTO> getLatestPublishing(UUID documentUuid) {
-    return repository.findFirstByDocumentUnitIdAndStatusOrderByCreatedAtDesc(
+    return repository.findFirstByDocumentUnitIdAndPublicationStatusOrderByCreatedAtDesc(
         documentUuid, PublicationStatus.PUBLISHING);
   }
 }
