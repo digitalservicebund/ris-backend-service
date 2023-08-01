@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import * as Sentry from "@sentry/vue"
 import dayjs from "dayjs"
 import timezone from "dayjs/plugin/timezone"
 import utc from "dayjs/plugin/utc"
@@ -47,6 +48,11 @@ async function getFileLink() {
     } else {
       Object.assign(error, response.error)
       hasError.value = true
+      Sentry.captureException(error, {
+        tags: {
+          type: "zip_creation_failed",
+        },
+      })
     }
   } finally {
     isLoading.value = false
