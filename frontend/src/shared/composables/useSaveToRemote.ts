@@ -1,3 +1,4 @@
+import * as Sentry from "@sentry/vue"
 import { ref } from "vue"
 import { ServiceResponse, ResponseError } from "@/services/httpClient"
 
@@ -23,6 +24,12 @@ export function useSaveToRemote(
       if (lastSaveError.value == undefined) {
         lastSavedOn.value = new Date()
         lastSaveError.value = undefined
+      } else {
+        Sentry.captureException(lastSaveError.value, {
+          tags: {
+            type: "save_failed",
+          },
+        })
       }
     } catch (error) {
       lastSaveError.value = { title: "Verbindung fehlgeschlagen" }
