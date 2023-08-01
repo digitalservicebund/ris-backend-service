@@ -32,8 +32,10 @@ package de.bund.digitalservice.ris.norms.domain.specification
  * in-memory validation, bulk editing or construction-to-order. So far, this specification
  * implementation only supports the in-memory validation use-case.
  *
- * @sample de.bund.digitalservice.ris.norms.domain.specification.SpecificationSamples.alternativeSpecificationDefinitions
- * @sample de.bund.digitalservice.ris.norms.domain.specification.SpecificationSamples.fluidSyntaxWithChainedSpecifications
+ * @sample
+ *   de.bund.digitalservice.ris.norms.domain.specification.SpecificationSamples.alternativeSpecificationDefinitions
+ * @sample
+ *   de.bund.digitalservice.ris.norms.domain.specification.SpecificationSamples.fluidSyntaxWithChainedSpecifications
  */
 interface Specification<T : Any> {
   /** Core function that must be implemented to evaluate a single instance. */
