@@ -1014,6 +1014,19 @@ class HasValidMetadataTest {
   }
 
   @Test
+  fun `announcement date can have just a time`() {
+    val instance = mockk<MetadataSection>()
+    every { instance.name } returns MetadataSectionName.ANNOUNCEMENT_DATE
+    every { instance.sections } returns null
+    every { instance.metadata } returns
+        listOf(
+            Metadatum(LocalTime.now(), MetadatumType.TIME),
+        )
+
+    assertThat(hasValidMetadata.evaluate(instance).isSatisfied).isTrue()
+  }
+
+  @Test
   fun `announcement date can not have a year and a time`() {
     val instance = mockk<MetadataSection>()
     every { instance.name } returns MetadataSectionName.ANNOUNCEMENT_DATE
@@ -1021,19 +1034,6 @@ class HasValidMetadataTest {
     every { instance.metadata } returns
         listOf(
             Metadatum("2020", MetadatumType.YEAR),
-            Metadatum(LocalTime.now(), MetadatumType.TIME),
-        )
-
-    assertThat(hasValidMetadata.evaluate(instance).isSatisfied).isFalse()
-  }
-
-  @Test
-  fun `announcement date can not have a just a time`() {
-    val instance = mockk<MetadataSection>()
-    every { instance.name } returns MetadataSectionName.ANNOUNCEMENT_DATE
-    every { instance.sections } returns null
-    every { instance.metadata } returns
-        listOf(
             Metadatum(LocalTime.now(), MetadatumType.TIME),
         )
 

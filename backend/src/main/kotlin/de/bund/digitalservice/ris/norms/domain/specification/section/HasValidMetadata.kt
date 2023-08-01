@@ -249,7 +249,7 @@ val hasValidMetadata =
 
       private fun hasValidAnnouncementDate(instance: MetadataSection): Boolean {
         return when (instance.metadata.count()) {
-          1 -> hasOneOfType(listOf(DATE, YEAR), instance)
+          1 -> hasOneOfType(listOf(DATE, TIME, YEAR), instance)
           2 -> hasType(listOf(DATE, TIME), instance)
           else -> {
             false
