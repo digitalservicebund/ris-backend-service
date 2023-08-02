@@ -2,6 +2,7 @@
 import { onMounted, ref } from "vue"
 import SearchResultList, { SearchResults } from "./SearchResultList.vue"
 import ComboboxInput from "@/components/ComboboxInput.vue"
+import values from "@/data/values.json"
 import LinkedDocumentUnit from "@/domain/linkedDocumentUnit"
 import ProceedingDecision from "@/domain/proceedingDecision"
 import ComboboxItemService from "@/services/comboboxItemService"
@@ -89,7 +90,7 @@ async function addProceedingDecisionFromSearch(decision: LinkedDocumentUnit) {
 function scrollToTop() {
   const element = document.getElementById("proceedingDecisions")
   if (element) {
-    const headerOffset = 170
+    const headerOffset = values.headerOffset
     const elementPosition = element?.getBoundingClientRect().top
     const offsetPosition = elementPosition + window.scrollY - headerOffset
 

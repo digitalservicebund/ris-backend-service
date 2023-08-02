@@ -5,6 +5,7 @@ import SearchResultList, {
 } from "./proceedingDecisions/SearchResultList.vue"
 import ComboboxInput from "@/components/ComboboxInput.vue"
 import { useValidations } from "@/composables/useValidations"
+import values from "@/data/values.json"
 import ActiveCitation from "@/domain/activeCitation"
 import { CitationStyle } from "@/domain/citationStyle"
 import LinkedDocumentUnit from "@/domain/linkedDocumentUnit"
@@ -125,7 +126,7 @@ async function addActiveCitationFromSearch(decision: LinkedDocumentUnit) {
 function scrollToTop() {
   const element = document.getElementById("activeCitations")
   if (element) {
-    const headerOffset = 170
+    const headerOffset = values.headerOffset
     const elementPosition = element?.getBoundingClientRect().top
     const offsetPosition = elementPosition + window.scrollY - headerOffset
 
