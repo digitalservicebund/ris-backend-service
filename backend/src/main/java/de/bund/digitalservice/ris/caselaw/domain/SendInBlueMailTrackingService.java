@@ -43,7 +43,18 @@ public class SendInBlueMailTrackingService implements MailTrackingService {
   }
 
   @Override
-  public Mono<ResponseEntity<String>> updatePublishingState(UUID documentUnitUuid, String event) {
+  public Mono<ResponseEntity<String>> updatePublishingState(String payloadTag, String event) {
+
+    final UUID documentUnitUuid = parseDocUnitUUID(payloadTag);
+
+    if (documentUnitUuid == null) {
+      // No UUID in tag == it's about a forwarded report mail and not the mail to juris
+      if (getMappedPublishState(event) == EmailPublishState.ERROR) {
+        log.error("Received Mail sending error {} with tag {}", event, payloadTag);
+      }
+      return Mono.just(ResponseEntity.status(HttpStatus.NO_CONTENT).build());
+    }
+
     EmailPublishState state = getMappedPublishState(event);
 
     if (state == EmailPublishState.UNKNOWN) {
@@ -66,5 +77,13 @@ public class SendInBlueMailTrackingService implements MailTrackingService {
                         .withError(state == EmailPublishState.ERROR)
                         .build()))
         .thenReturn(ResponseEntity.status(HttpStatus.OK).build());
+  }
+
+  private UUID parseDocUnitUUID(String string) {
+    try {
+      return UUID.fromString(string);
+    } catch (IllegalArgumentException e) {
+      return null;
+    }
   }
 }

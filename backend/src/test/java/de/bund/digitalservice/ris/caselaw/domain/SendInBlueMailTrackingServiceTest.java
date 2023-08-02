@@ -65,7 +65,8 @@ class SendInBlueMailTrackingServiceTest {
                 .build()))
         .thenReturn(Mono.empty());
 
-    StepVerifier.create(service.updatePublishingState(TEST_UUID, "delivered"))
+    StepVerifier.create(
+            service.updatePublishingState("88888888-4444-4444-4444-121212121212", "delivered"))
         .consumeNextWith(
             responseEntity -> {
               assertThat(responseEntity.getStatusCode().is2xxSuccessful()).isTrue();
@@ -94,7 +95,7 @@ class SendInBlueMailTrackingServiceTest {
                 .build()))
         .thenReturn(Mono.empty());
 
-    StepVerifier.create(service.updatePublishingState(TEST_UUID, "error"))
+    StepVerifier.create(service.updatePublishingState(TEST_UUID.toString(), "error"))
         .consumeNextWith(
             responseEntity -> {
               assertThat(responseEntity.getStatusCode().is2xxSuccessful()).isTrue();
@@ -120,7 +121,7 @@ class SendInBlueMailTrackingServiceTest {
         "randomEvent"
       })
   void testUpdatePublishingState_noReactionOnOtherState(String event) {
-    StepVerifier.create(service.updatePublishingState(TEST_UUID, event))
+    StepVerifier.create(service.updatePublishingState(TEST_UUID.toString(), event))
         .consumeNextWith(
             responseEntity -> {
               assertThat(responseEntity.getStatusCode().isSameCodeAs(HttpStatusCode.valueOf(204)))
@@ -136,7 +137,7 @@ class SendInBlueMailTrackingServiceTest {
     when(documentUnitStatusService.getLatestStatus(TEST_UUID))
         .thenReturn(Mono.just(PublicationStatus.PUBLISHED));
 
-    StepVerifier.create(service.updatePublishingState(TEST_UUID, "error"))
+    StepVerifier.create(service.updatePublishingState(TEST_UUID.toString(), "error"))
         .consumeNextWith(
             responseEntity -> {
               assertThat(responseEntity.getStatusCode().is2xxSuccessful()).isTrue();
