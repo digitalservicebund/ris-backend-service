@@ -26,6 +26,10 @@ export function useSaveToRemote(
         lastSaveError.value = undefined
       } else {
         Sentry.captureException(lastSaveError.value, {
+          extra: {
+            title: "Could not save the norm",
+            description: "An error occurred while saving",
+          },
           tags: {
             type: "save_failed",
           },

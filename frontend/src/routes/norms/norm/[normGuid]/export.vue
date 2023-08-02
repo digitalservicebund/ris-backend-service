@@ -49,6 +49,10 @@ async function getFileLink() {
       Object.assign(error, response.error)
       hasError.value = true
       Sentry.captureException(error, {
+        extra: {
+          title: "Could not generate new zip file",
+          description: "An error occurred while generating a new zip file.",
+        },
         tags: {
           type: "zip_creation_failed",
         },

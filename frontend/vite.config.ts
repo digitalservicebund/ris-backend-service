@@ -26,6 +26,7 @@ export default defineConfig({
       authToken: process.env.SENTRY_AUTH_TOKEN,
       org: "digitalservice",
       project: "ris-frontend",
+      telemetry: process.env.VITEST !== "true",
     }),
   ],
   test: {
