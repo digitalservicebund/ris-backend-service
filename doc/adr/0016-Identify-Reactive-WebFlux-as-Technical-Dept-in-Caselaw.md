@@ -6,7 +6,7 @@ Date: 2023-07-20
 
 Accepted
 
-This ADR revises the decision made in [ADR 3 (Use Spring WebFlux reactive stack)](0003-use-spring-webflux-reactive-stack.md) for the Caselaw backend. 
+Supersedes [3. Use Spring WebFlux reactive stack](0003-use-spring-webflux-reactive-stack.md)
 
 ## Context
 

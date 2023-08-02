@@ -4,7 +4,7 @@ Date: 2021-10-06
 
 ## Status
 
-Accepted
+Superseded by [16. Identify Reactive WebFlux as Technical Debt in Caselaw](0016-Identify-Reactive-WebFlux-as-Technical-Dept-in-Caselaw.md)
 
 ## Context
 
