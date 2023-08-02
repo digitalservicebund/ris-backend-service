@@ -2,7 +2,6 @@
 import { onMounted, ref } from "vue"
 import SearchResultList, { SearchResults } from "./SearchResultList.vue"
 import ComboboxInput from "@/components/ComboboxInput.vue"
-import ActiveCitation from "@/domain/activeCitation"
 import LinkedDocumentUnit from "@/domain/linkedDocumentUnit"
 import ProceedingDecision from "@/domain/proceedingDecision"
 import ComboboxItemService from "@/services/comboboxItemService"
@@ -28,11 +27,11 @@ const emit = defineEmits<{
 const proceedingDecision = ref(new ProceedingDecision({ ...props.modelValue }))
 const validationErrors = ref<ValidationError[]>()
 const searchRunning = ref(false)
-const searchResultsCurrentPage = ref<Page<ActiveCitation>>()
-const searchResults = ref<SearchResults<ActiveCitation>>()
+const searchResultsCurrentPage = ref<Page<ProceedingDecision>>()
+const searchResults = ref<SearchResults<ProceedingDecision>>()
 
 async function search(page = 0) {
-  const proceedingDecisionRef = new ActiveCitation({
+  const proceedingDecisionRef = new ProceedingDecision({
     ...proceedingDecision.value,
   })
 
@@ -45,12 +44,12 @@ async function search(page = 0) {
     searchResultsCurrentPage.value = {
       ...response.data,
       content: response.data.content.map(
-        (decision) => new ActiveCitation({ ...decision }),
+        (decision) => new ProceedingDecision({ ...decision }),
       ),
     }
     searchResults.value = response.data.content.map((searchResult) => {
       return {
-        decision: new ActiveCitation({ ...searchResult }),
+        decision: new ProceedingDecision({ ...searchResult }),
         isLinked: searchResult.isLinked(props.modelValueList),
       }
     })
