@@ -65,8 +65,6 @@ sealed class SpecificationResult(
   operator fun plus(other: SpecificationResult) = and(other)
 
   companion object {
-    fun from(violation: SpecificationViolation, predicate: () -> Boolean) =
-        if (predicate()) Satisfied else Unsatisfied(violation)
 
     fun from(instance: Any, code: String, message: String, predicate: () -> Boolean) =
         if (predicate()) {

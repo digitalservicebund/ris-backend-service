@@ -84,8 +84,8 @@ interface Specification<T : Any> {
     ) =
         object : Specification<T> {
           override fun evaluate(instance: T): SpecificationResult {
-            val violation = SpecificationViolation(instance, violationCode, violationMessage)
-            return SpecificationResult.from(violation, { predicate(instance) })
+            return SpecificationResult.from(
+                instance, violationCode, violationMessage, { predicate(instance) })
           }
         }
   }
