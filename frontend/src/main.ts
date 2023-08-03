@@ -10,17 +10,21 @@ const storeManager = createPinia()
 const app = createApp(App)
 
 function envName(): string | undefined {
-  switch (window.location.host) {
-    case "ris.prod.ds4g.net":
-      return "production"
-    case "ris.dev.ds4g.net":
-      return "staging"
-    case "ris-uat.prod.ds4g.net":
-      return "uat"
-    default:
-      return undefined
+  if (window.location.host.includes("ris-uat")) {
+    return "uat"
+  } else if (window.location.host.includes("dev")) {
+    return "staging"
+  } else if (window.location.host.includes("prod")) {
+    return "production"
+  } else {
+    return undefined
   }
 }
+
+function targets(): string[] {
+  return [`${window.location.origin}/api`]
+}
+
 if (import.meta.env.PROD) {
   Sentry.init({
     app,
@@ -29,12 +33,7 @@ if (import.meta.env.PROD) {
     integrations: [
       new Sentry.BrowserTracing({
         // Set 'tracePropagationTargets' to control for which URLs distributed tracing should be enabled
-        tracePropagationTargets: [
-          "http://127.0.0.1/api",
-          "https://ris.prod.ds4g.net/api",
-          "https://ris.dev.ds4g.net/api",
-          "https://ris-uat.prod.ds4g.net/api",
-        ],
+        tracePropagationTargets: targets(),
         routingInstrumentation: Sentry.vueRouterInstrumentation(router),
       }),
     ],
