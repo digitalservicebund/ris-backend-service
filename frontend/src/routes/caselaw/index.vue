@@ -16,6 +16,7 @@ const itemsPerPage = 30
 async function getEntries(page: number) {
   const response = await service.getAllListEntries(page, itemsPerPage)
   if (response.data) {
+    console.log(response.data)
     documentUnitListEntries.value = response.data.content
     currentPage.value = response.data
   } else {

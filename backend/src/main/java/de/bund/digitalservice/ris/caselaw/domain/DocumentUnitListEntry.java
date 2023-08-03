@@ -1,5 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.domain;
 
+import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
 import java.time.Instant;
 import java.util.UUID;
 import lombok.Builder;
@@ -12,5 +13,6 @@ public record DocumentUnitListEntry(
     DataSource dataSource,
     String fileName,
     String fileNumber,
+    DocumentType documentType,
     DocumentationOffice documentationOffice,
     DocumentUnitStatus status) {}

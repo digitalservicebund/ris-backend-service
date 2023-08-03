@@ -13,6 +13,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.Sta
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.StateRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.ActiveCitationTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DeviatingDecisionDateTransformer;
+import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentTypeTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentUnitTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationOfficeTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationUnitLinkTransformer;
@@ -1190,6 +1191,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
                     pageable.getPageSize(),
                     pageable.getOffset()))
         .flatMapSequential(this::injectFileNumbers)
+        .flatMapSequential(this::injectDocumentType)
         .flatMapSequential(this::injectDocumentationOffice)
         .flatMapSequential(this::injectStatus)
         .map(
@@ -1200,6 +1202,11 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
                     .creationTimestamp(documentUnitDTO.getCreationtimestamp())
                     .dataSource(documentUnitDTO.getDataSource())
                     .fileName(documentUnitDTO.getFilename())
+                    .documentType(
+                        documentUnitDTO.getDocumentTypeDTO() == null
+                            ? null
+                            : DocumentTypeTransformer.transformDTO(
+                                documentUnitDTO.getDocumentTypeDTO()))
                     .fileNumber(
                         documentUnitDTO.getFileNumbers() == null
                                 || documentUnitDTO.getFileNumbers().isEmpty()

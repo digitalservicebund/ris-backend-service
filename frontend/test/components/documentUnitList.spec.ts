@@ -18,6 +18,7 @@ function renderComponent(
             fileName: "",
             fileNumber: "",
             documentationOffice: { label: "testOffice" },
+            documentType: { label: "Testlabel", jurisShortcut: "Test" },
             status: { publicationStatus: "PUBLISHED", withError: false },
             ...options,
           },
@@ -70,35 +71,41 @@ describe("documentUnit list", () => {
     ).not.toBeInTheDocument()
   })
 
-  test("renders documentUnits with file number and file name", async () => {
+  test("renders documentUnits with file number", async () => {
     renderComponent({
       fileNumber: "foo",
-      fileName: "test.docx",
     })
 
     await screen.findByText("123")
     await screen.findByText("10.02.2022")
     await screen.findByText("foo")
-    await screen.findByText("test.docx")
     expect(
       screen.queryByText("Keine Dokumentationseinheiten gefunden"),
     ).not.toBeInTheDocument()
   })
 
-  test("renders placeholder for missing file number and file name", async () => {
-    renderComponent()
+  test("renders documentUnits with document type", async () => {
+    renderComponent({
+      documentType: { label: "Test123", jurisShortcut: "Test" },
+    })
 
-    const items = await screen.findAllByText(/-/)
-    expect(items).toHaveLength(2)
+    await screen.findByText("123")
+    await screen.findByText("10.02.2022")
+    await screen.findByText("Test")
     expect(
       screen.queryByText("Keine Dokumentationseinheiten gefunden"),
     ).not.toBeInTheDocument()
   })
 
-  test("renders documentationOffice", async () => {
-    renderComponent()
+  test("renders icon when file attached", async () => {
+    renderComponent({
+      fileName: "test.docx",
+    })
 
-    await screen.findByText("testOffice")
+    await screen.findByText("123")
+    await screen.findByText("10.02.2022")
+
+    expect(screen.getByText("attach_file")).toBeInTheDocument()
   })
 
   test("renders publication status", async () => {

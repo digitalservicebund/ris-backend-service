@@ -1,5 +1,6 @@
 import DocumentationOffice from "./documentationOffice"
 import DocumentUnit from "./documentUnit"
+import { DocumentType } from "@/domain/documentUnit"
 
 export type DocumentUnitListEntry = {
   id: string
@@ -10,4 +11,5 @@ export type DocumentUnitListEntry = {
   fileName?: string
   fileNumber?: string
   documentationOffice?: DocumentationOffice
+  documentType?: DocumentType
 }

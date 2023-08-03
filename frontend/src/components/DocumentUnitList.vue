@@ -74,23 +74,23 @@ function onDelete() {
       v-if="documentUnitListEntries.length"
       class="document-unit-list-table table w-full border-collapse"
     >
-      <div
-        class="table-row bg-gray-400 text-center text-18 font-bold leading-[3]"
-      >
-        <div class="table-cell">Dokumentnummer</div>
-        <div class="table-cell">Angelegt am</div>
-        <div class="table-cell">Aktenzeichen</div>
-        <div class="table-cell">DokStelle</div>
-        <div class="table-cell">Status</div>
-        <div class="table-cell">Dokumente</div>
-        <div class="table-cell">Löschen</div>
+      <div class="ds-label-01-bold table-row bg-gray-400">
+        <div class="table-cell p-16">Dokumentnummer</div>
+        <div class="table-cell p-16"></div>
+        <div class="table-cell p-16">Gerichtstyp</div>
+        <div class="table-cell p-16">Ort</div>
+        <div class="table-cell p-16">Datum</div>
+        <div class="table-cell p-16">Aktenzeichen</div>
+        <div class="table-cell p-16">Typ</div>
+        <div class="table-cell p-16">Status</div>
+        <div class="table-cell p-16">Löschen</div>
       </div>
       <div
         v-for="listEntry in listEntriesWithStatus"
         :key="listEntry.id"
-        class="table-row border-b-2 border-b-gray-100 text-18 leading-[3] hover:bg-gray-100"
+        class="ds-label-01-reg table-row border-b-2 border-b-gray-100 px-16 hover:bg-gray-100"
       >
-        <div class="table-cell px-[16px] py-0">
+        <div class="table-cell p-16">
           <router-link
             class="underline"
             :to="{
@@ -103,20 +103,26 @@ function onDelete() {
             {{ listEntry.documentNumber }}
           </router-link>
         </div>
-        <div class="table-cell px-[16px] py-0">
+        <div class="table-cell p-16">
+          <span v-if="listEntry.fileName" class="material-icons">
+            attach_file
+          </span>
+          <span v-else>-</span>
+        </div>
+        <div class="table-cell p-16">-</div>
+        <div class="table-cell p-16">-</div>
+        <div class="table-cell p-16">
           {{ dayjs(listEntry.creationTimestamp).format("DD.MM.YYYY") }}
         </div>
-        <div class="table-cell px-[16px] py-0">
+        <div class="table-cell p-16">
           {{ listEntry.fileNumber ? listEntry.fileNumber : "-" }}
         </div>
-        <div class="table-cell px-[16px] py-0">
+        <div class="table-cell p-16">
           {{
-            listEntry.documentationOffice
-              ? listEntry.documentationOffice.label
-              : "-"
+            listEntry.documentType ? listEntry.documentType.jurisShortcut : "-"
           }}
         </div>
-        <div class="table-cell px-[16px] py-0">
+        <div class="table-cell p-16">
           <IconBadge
             v-if="listEntry.status"
             :color="listEntry.status.color"
@@ -124,10 +130,7 @@ function onDelete() {
             :value="listEntry.status.value"
           />
         </div>
-        <div class="table-cell px-16 py-0">
-          {{ listEntry.fileName ? listEntry.fileName : "-" }}
-        </div>
-        <div class="table-cell text-center">
+        <div class="table-cell p-16">
           <span
             aria-label="Dokumentationseinheit löschen"
             class="material-icons cursor-pointer"
