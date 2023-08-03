@@ -25,30 +25,31 @@ const defaultValue = new ActiveCitation()
 
 function decisionSummarizer(activeCitation: ActiveCitation) {
   if (activeCitation.isReadOnly) {
-    return h(
-      RouterLink,
-      {
-        class: ["ds-link-01-bold", "underline"],
-        target: "_blank",
-        tabindex: -1,
-        to: {
-          name: "caselaw-documentUnit-documentNumber-categories",
-          params: { documentNumber: activeCitation.documentNumber },
+    return h("div", { class: ["flex flex-row items-center"] }, [
+      !activeCitation.citationStyleIsSet &&
+        renderValidationAlert("Art der Zitierung"),
+      h(
+        RouterLink,
+        {
+          class: [
+            "ds-link-01-bold",
+            "underline",
+            !activeCitation.citationStyleIsSet && "pl-32",
+          ],
+          target: "_blank",
+          tabindex: -1,
+          to: {
+            name: "caselaw-documentUnit-documentNumber-categories",
+            params: { documentNumber: activeCitation.documentNumber },
+          },
         },
-      },
-      () => activeCitation.renderDecision,
-    )
+        () => activeCitation.renderDecision,
+      ),
+    ])
   } else {
     if (activeCitation.hasMissingRequiredFields) {
       return h("div", { class: ["flex flex-row items-center"] }, [
-        h(
-          "span",
-          {
-            "aria-label": "Fehlerhafte Eingabe",
-            class: ["material-icons pr-8 text-red-800"],
-          },
-          "error_outline",
-        ),
+        renderValidationAlert(),
         h(
           "div",
           { class: ["ds-label-02-bold text-red-800"] },
@@ -59,6 +60,20 @@ function decisionSummarizer(activeCitation: ActiveCitation) {
       return h("div", { class: ["link-02-reg"] }, activeCitation.renderDecision)
     }
   }
+}
+
+function renderValidationAlert(message?: string) {
+  return [
+    h(
+      "span",
+      {
+        "aria-label": "Fehlerhafte Eingabe",
+        class: ["material-icons pr-8 text-red-800"],
+      },
+      "error_outline",
+    ),
+    message,
+  ]
 }
 
 const CitationsSummary = withSummarizer(decisionSummarizer)

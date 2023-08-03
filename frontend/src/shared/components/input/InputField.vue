@@ -119,6 +119,7 @@ export enum LabelPosition {
     <div
       v-if="localValidationError"
       class="ds-label-03-reg my-6 h-16 text-red-800"
+      :data-testid="id + '-validationError'"
     >
       {{ localValidationError.defaultMessage }}
     </div>

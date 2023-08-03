@@ -485,4 +485,36 @@ describe("Active Citations", () => {
     await user.click(editButton)
     expect(screen.getAllByText(/Pflichtfeld nicht befüllt/).length).toBe(1)
   })
+
+  it("shows missing citationStyle validation on entry in other field", async () => {
+    const { user } = renderComponent()
+
+    const getStyleValidation = () =>
+      screen.queryByTestId("activeCitationPredicate-validationError")
+
+    expect(getStyleValidation()).not.toBeInTheDocument()
+
+    await user.type(
+      await screen.findByLabelText("Aktenzeichen der Aktivzitierung"),
+      "test",
+    )
+
+    expect(getStyleValidation()).toBeVisible()
+  })
+
+  it("shows missing citationStyle validation for linked decision", async () => {
+    renderComponent({
+      modelValue: [
+        generateActiveCitation({
+          citationStyle: {
+            uuid: undefined,
+            jurisShortcut: undefined,
+            label: "invalid",
+          },
+        }),
+      ],
+    })
+
+    expect(screen.getByText("Art der Zitierung")).toBeVisible()
+  })
 })
