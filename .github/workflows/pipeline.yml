@@ -812,7 +812,6 @@ jobs:
       - push-frontend-image-to-registry
       - push-backend-image-to-registry
       - e2e-tests
-      - deployment-time-check
     permissions:
       id-token: write # Enable OIDC for gitsign
     steps:
