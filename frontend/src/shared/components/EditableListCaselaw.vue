@@ -1,6 +1,6 @@
 <script lang="ts" setup generic="T extends ListItem">
 import type { Component, Ref } from "vue"
-import { ref, watch, onMounted } from "vue"
+import { ref, watch, onMounted, nextTick } from "vue"
 import ListItem from "@/domain/editableListItem"
 import DataSetSummary from "@/shared/components/DataSetSummary.vue"
 
@@ -31,6 +31,22 @@ const modelValueList = ref<T[]>([]) as Ref<T[]>
 const localList = ref([...props.modelValue]) as Ref<T[]>
 const elementList = ref<HTMLElement[]>([])
 const editIndex = ref<number | undefined>(undefined)
+
+const focusFirstFocusableElementOfCurrentEditElement = async () => {
+  await nextTick()
+
+  if (!editIndex.value) {
+    return
+  }
+
+  const editElement = elementList.value[editIndex.value]
+  editElement
+    ?.querySelector<HTMLElement>(
+      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
+    )
+    ?.focus()
+}
+watch(editIndex, focusFirstFocusableElementOfCurrentEditElement)
 
 function setEditIndex(index: number | undefined) {
   editIndex.value = index
