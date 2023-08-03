@@ -3,6 +3,8 @@ import { reactive } from "vue"
 import { defineDateField } from "@/fields/caselaw"
 import KitchensinkPage from "@/kitchensink/components/KitchensinkPage.vue"
 import KitchensinkStory from "@/kitchensink/components/KitchensinkStory.vue"
+import { InfoStatus } from "@/shared/components/enumInfoStatus"
+import InfoModal from "@/shared/components/InfoModal.vue"
 import DateInput from "@/shared/components/input/DateInput.vue"
 import InputField from "@/shared/components/input/InputField.vue"
 import NestedInput from "@/shared/components/input/NestedInput.vue"
@@ -37,6 +39,11 @@ const values = reactive({
 
 <template>
   <KitchensinkPage name="Input">
+    <InfoModal
+      description="In order to ensure a consistent layout for inputs, the actual input field must always be wrapped with an InputField containing the label and (if necessary) the error message."
+      :status="InfoStatus.INFO"
+      title="Code convention for usage of inputs"
+    />
     <KitchensinkStory class="w-320" name="Regular">
       <InputField
         id="regularTextInput"

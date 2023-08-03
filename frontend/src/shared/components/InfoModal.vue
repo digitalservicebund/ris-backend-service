@@ -32,6 +32,13 @@ const modalAttribute = computed((): ModalAttribute => {
       textColorClass: "text-green-700",
       icon: "done",
     }
+  } else if (props.status === InfoStatus.INFO) {
+    return {
+      borderClass: "border-l-blue-800",
+      backgroundColorClass: "bg-white",
+      textColorClass: "text-blue-800",
+      icon: "info",
+    }
   }
   return {
     borderClass: "border-l-red-800",
