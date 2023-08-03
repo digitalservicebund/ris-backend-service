@@ -803,23 +803,9 @@ jobs:
       mode: ${{ matrix.mode }}
     secrets: inherit
 
-  deployment-time-check:
-    runs-on: ubuntu-latest
-    outputs:
-      after-4pm: ${{ steps.check-time.outputs.after-4pm }}
-    steps:
-      - id: check-time
-        run: |
-          hour=$(TZ="Europe/Berlin" date +'%H')
-          if [ $hour -lt 4 -o $hour -ge 16 ]; then
-            echo "after-4pm=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "after-4pm=false" >> "$GITHUB_OUTPUT"
-          fi
-
   deploy-production:
     runs-on: ubuntu-latest
-    if: ${{ github.ref == 'refs/heads/main' && needs.deployment-time-check.outputs.after-4pm == 'true' }}
+    if: ${{ github.ref == 'refs/heads/main' }}
     concurrency: deploy-production
     environment: production
     needs:
@@ -867,7 +853,7 @@ jobs:
 
   deploy-uat:
     runs-on: ubuntu-latest
-    if: ${{ github.ref == 'refs/heads/main'}}
+    if: ${{ github.ref == 'refs/heads/main' }}
     concurrency: deploy-uat
     environment: uat
     needs:
