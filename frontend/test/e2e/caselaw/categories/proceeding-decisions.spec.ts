@@ -230,7 +230,7 @@ test.describe("previous decisions", () => {
     await expect(page.getByText("Total 1 Items")).toBeVisible()
 
     const result = page.getByText(
-      `AG Aachen, 01.01.2020, ${prefilledDocumentUnit.coreData.fileNumbers?.[0]}, Anerkenntnisurteil, ${prefilledDocumentUnit.documentNumber}`,
+      `AG Aachen, 01.01.2020, ${prefilledDocumentUnit.coreData.fileNumbers?.[0]}, AnU, ${prefilledDocumentUnit.documentNumber}`,
     )
 
     await expect(result).toBeVisible()
@@ -238,7 +238,7 @@ test.describe("previous decisions", () => {
 
     //make sure to have citation style in list
     const listItem = page.getByText(
-      `AG Aachen, 01.01.2020, ${prefilledDocumentUnit.coreData.fileNumbers?.[0]}, Anerkenntnisurteil, ${prefilledDocumentUnit.documentNumber}`,
+      `AG Aachen, 01.01.2020, ${prefilledDocumentUnit.coreData.fileNumbers?.[0]}, AnU, ${prefilledDocumentUnit.documentNumber}`,
     )
     await expect(listItem).toBeVisible()
     await expect(page.getByLabel("Eintrag löschen")).toBeVisible()
