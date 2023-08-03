@@ -1021,7 +1021,7 @@ jobs:
           name: backend-code-documentation
           retention-days: 3
           path: |
-            backend/build/dokka/javadoc/
+            backend/build/dokka/html/
             backend/build/docs/javadoc/
       - name: Send status to Slack
         # Third-party action, pin to commit SHA!
