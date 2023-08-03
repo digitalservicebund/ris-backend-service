@@ -41,7 +41,7 @@ export default class NormReference implements EditableListItem {
     return this.missingRequiredFields.length > 0
   }
 
-  get missingRequiredFields(): string[] {
+  get missingRequiredFields() {
     return NormReference.requiredFields.filter((field) =>
       this.fieldIsEmpty(this[field]),
     )

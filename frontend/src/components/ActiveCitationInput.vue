@@ -4,7 +4,7 @@ import SearchResultList, {
   SearchResults,
 } from "./proceedingDecisions/SearchResultList.vue"
 import ComboboxInput from "@/components/ComboboxInput.vue"
-import { useValidations } from "@/composables/useValidations"
+import { useValidationStore } from "@/composables/useValidationStore"
 import values from "@/data/values.json"
 import ActiveCitation from "@/domain/activeCitation"
 import { CitationStyle } from "@/domain/citationStyle"
@@ -29,13 +29,8 @@ const emit = defineEmits<{
 
 const activeCitation = ref(new ActiveCitation({ ...props.modelValue }))
 
-const {
-  validationErrors,
-  addValidationError,
-  removeValidationError,
-  getValidationErrors,
-  resetValidations,
-} = useValidations<(typeof ActiveCitation.fields)[number]>()
+const validationStore =
+  useValidationStore<(typeof ActiveCitation.fields)[number]>()
 
 const searchRunning = ref(false)
 
@@ -97,10 +92,10 @@ function handleSearch() {
 }
 
 async function validateRequiredInput() {
-  resetValidations()
+  validationStore.reset()
 
   activeCitation.value.missingRequiredFields.forEach((missingField) =>
-    addValidationError("Pflichtfeld nicht befüllt", missingField),
+    validationStore.add("Pflichtfeld nicht befüllt", missingField),
   )
 }
 
@@ -151,9 +146,9 @@ watch(
       !activeCitation.value.citationStyleIsSet &&
       !activeCitation.value.isEmpty
     ) {
-      addValidationError("Pflichtfeld nicht befüllt", "citationStyle")
+      validationStore.add("Pflichtfeld nicht befüllt", "citationStyle")
     } else if (activeCitation.value.citationStyleIsSet) {
-      removeValidationError("Pflichtfeld nicht befüllt", "citationStyle")
+      validationStore.remove("citationStyle")
     }
   },
   { deep: true },
@@ -167,7 +162,7 @@ watch(
       v-slot="slotProps"
       class="mb-16 border-b-1 border-gray-400"
       label="Art der Zitierung *"
-      :validation-error="getValidationErrors('citationStyle')"
+      :validation-error="validationStore.getByField('citationStyle')"
     >
       <ComboboxInput
         id="activeCitationPredicate"
@@ -184,7 +179,7 @@ watch(
         id="activeCitationCourt"
         v-slot="slotProps"
         label="Gericht *"
-        :validation-error="getValidationErrors('court')"
+        :validation-error="validationStore.getByField('court')"
       >
         <ComboboxInput
           id="activeCitationCourt"
@@ -201,7 +196,7 @@ watch(
         id="activeCitationDecisionDate"
         v-slot="slotProps"
         label="Entscheidungsdatum *"
-        :validation-error="getValidationErrors('decisionDate')"
+        :validation-error="validationStore.getByField('decisionDate')"
       >
         <DateInput
           id="activeCitationDecisionDate"
@@ -217,9 +212,7 @@ watch(
         id="activeCitationFileNumber"
         v-slot="slotProps"
         label="Aktenzeichen *"
-        :validation-error="
-          validationErrors?.find((err) => err.field === 'fileNumber')
-        "
+        :validation-error="validationStore.getByField('fileNumber')"
       >
         <TextInput
           id="activeCitationDocumentType"

@@ -2,6 +2,7 @@
 import { onMounted, ref } from "vue"
 import SearchResultList, { SearchResults } from "./SearchResultList.vue"
 import ComboboxInput from "@/components/ComboboxInput.vue"
+import { useValidationStore } from "@/composables/useValidationStore"
 import values from "@/data/values.json"
 import LinkedDocumentUnit from "@/domain/linkedDocumentUnit"
 import ProceedingDecision from "@/domain/proceedingDecision"
@@ -12,7 +13,6 @@ import DateInput from "@/shared/components/input/DateInput.vue"
 import InputField from "@/shared/components/input/InputField.vue"
 import TextButton from "@/shared/components/input/TextButton.vue"
 import TextInput from "@/shared/components/input/TextInput.vue"
-import { ValidationError } from "@/shared/components/input/types"
 import Pagination, { Page } from "@/shared/components/Pagination.vue"
 
 const props = defineProps<{
@@ -26,7 +26,8 @@ const emit = defineEmits<{
 }>()
 
 const proceedingDecision = ref(new ProceedingDecision({ ...props.modelValue }))
-const validationErrors = ref<ValidationError[]>()
+const validationStore =
+  useValidationStore<(typeof ProceedingDecision.fields)[number]>()
 const searchRunning = ref(false)
 const searchResultsCurrentPage = ref<Page<ProceedingDecision>>()
 const searchResults = ref<SearchResults<ProceedingDecision>>()
@@ -64,13 +65,10 @@ function handleSearch() {
 }
 
 async function validateRequiredInput() {
-  validationErrors.value = []
+  validationStore.reset()
   if (proceedingDecision.value.missingRequiredFields?.length) {
     proceedingDecision.value.missingRequiredFields.forEach((missingField) => {
-      validationErrors.value?.push({
-        defaultMessage: "Pflichtfeld nicht befüllt",
-        field: missingField,
-      })
+      validationStore.add("Pflichtfeld nicht befüllt", missingField)
     })
   }
 }
@@ -121,9 +119,7 @@ onMounted(() => {
         id="court"
         v-slot="slotProps"
         label="Gericht *"
-        :validation-error="
-          validationErrors?.find((err) => err.field === 'court')
-        "
+        :validation-error="validationStore.getByField('court')"
       >
         <ComboboxInput
           id="court"
@@ -133,6 +129,7 @@ onMounted(() => {
           :has-error="slotProps.hasError"
           :item-service="ComboboxItemService.getCourts"
           placeholder="Gerichtstyp Gerichtsort"
+          @click="validationStore.remove('court')"
         ></ComboboxInput>
       </InputField>
       <div class="flex w-full justify-between gap-24">
@@ -140,17 +137,15 @@ onMounted(() => {
           id="date"
           v-slot="slotProps"
           label="Entscheidungsdatum *"
-          :validation-error="
-            validationErrors?.find((err) => err.field === 'decisionDate')
-          "
+          :validation-error="validationStore.getByField('decisionDate')"
         >
           <DateInput
             id="decisionDate"
             v-model="proceedingDecision.decisionDate"
             aria-label="Entscheidungsdatum Rechtszug"
-            clear-on-choosing-item
             :disabled="proceedingDecision.dateUnknown"
             :has-error="slotProps.hasError"
+            @focus="validationStore.remove('decisionDate')"
             @update:validation-error="slotProps.updateValidationError"
           ></DateInput>
         </InputField>
@@ -174,9 +169,7 @@ onMounted(() => {
         v-slot="slotProps"
         class="fake-input-group__row__field flex-col"
         label="Aktenzeichen *"
-        :validation-error="
-          validationErrors?.find((err) => err.field === 'fileNumber')
-        "
+        :validation-error="validationStore.getByField('fileNumber')"
       >
         <TextInput
           id="fileNumber"
@@ -184,6 +177,7 @@ onMounted(() => {
           aria-label="Aktenzeichen Rechtszug"
           :has-error="slotProps.hasError"
           placeholder="Aktenzeichen"
+          @input="validationStore.remove('fileNumber')"
         ></TextInput>
       </InputField>
 

@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { computed, onMounted, ref, watch } from "vue"
 import ComboboxInput from "@/components/ComboboxInput.vue"
+import { useValidationStore } from "@/composables/useValidationStore"
 import { NormAbbreviation } from "@/domain/normAbbreviation"
 import NormReference, { SingleNormValidationInfo } from "@/domain/normReference"
 import ComboboxItemService from "@/services/comboboxItemService"
@@ -9,7 +10,6 @@ import DateInput from "@/shared/components/input/DateInput.vue"
 import InputField from "@/shared/components/input/InputField.vue"
 import TextButton from "@/shared/components/input/TextButton.vue"
 import TextInput from "@/shared/components/input/TextInput.vue"
-import { ValidationError } from "@/shared/components/input/types"
 import YearInput from "@/shared/components/input/YearInput.vue"
 
 const props = defineProps<{ modelValue?: NormReference }>()
@@ -18,9 +18,8 @@ const emit = defineEmits<{
   addEntry: [void]
 }>()
 
-const hasValidationError = ref()
-
-const validationErrors = ref<ValidationError[]>()
+const validationStore =
+  useValidationStore<(typeof NormReference.fields)[number]>()
 
 const norm = ref(new NormReference({ ...props.modelValue }))
 
@@ -45,7 +44,7 @@ const normAbbreviation = computed({
 })
 
 async function validateNorm() {
-  validationErrors.value = []
+  validationStore.reset()
 
   //validate singleNorm
   if (norm.value?.singleNorm) {
@@ -57,44 +56,25 @@ async function validateNorm() {
       singleNormValidationInfo,
     )
 
-    if (response.data !== "Ok") {
-      validationErrors.value?.push({
-        defaultMessage: "Inhalt nicht valide",
-        field: "singleNorm",
-      })
-      hasValidationError.value = true
-    } else {
-      hasValidationError.value = false
-    }
-  } else {
-    hasValidationError.value = false
+    if (response.data !== "Ok")
+      validationStore.add("Inhalt nicht valide", "singleNorm")
   }
 
   //validate required fields
   if (norm.value?.missingRequiredFields?.length) {
     norm.value?.missingRequiredFields.forEach((missingField) => {
-      validationErrors.value?.push({
-        defaultMessage: "Pflichtfeld nicht befüllt",
-        field: missingField,
-      })
+      validationStore.add("Pflichtfeld nicht befüllt", missingField)
     })
   }
 }
 
 async function addNormReference() {
-  const validation = validateNorm()
-  validation.then(() => {
-    if (!hasValidationError.value) {
-      emit("update:modelValue", norm.value as NormReference)
-      emit("addEntry")
-    }
-  })
-}
+  await validateNorm()
 
-function resetValidationError(field: string) {
-  validationErrors.value = validationErrors.value?.filter(
-    (error) => error.field !== field,
-  )
+  if (!validationStore.getByMessage("Inhalt nicht valide").length) {
+    emit("update:modelValue", norm.value as NormReference)
+    emit("addEntry")
+  }
 }
 
 onMounted(async () => {
@@ -135,9 +115,7 @@ watch(props, () => {
       id="norm-reference-abbreviation-field"
       v-slot="slotProps"
       label="RIS-Abkürzung *"
-      :validation-error="
-        validationErrors?.find((err) => err.field === 'normAbbreviation')
-      "
+      :validation-error="validationStore.getByField('normAbbreviation')"
     >
       <ComboboxInput
         id="norm-reference-abbreviation"
@@ -147,7 +125,7 @@ watch(props, () => {
         :has-error="slotProps.hasError"
         :item-service="ComboboxItemService.getRisAbbreviations"
         placeholder="RIS Abkürzung"
-        @click="resetValidationError('normAbbreviation')"
+        @click="validationStore.remove('normAbbreviation')"
       >
       </ComboboxInput>
     </InputField>
@@ -156,25 +134,21 @@ watch(props, () => {
         id="norm-reference-singleNorm-field"
         v-slot="slotProps"
         label="Einzelnorm"
-        :validation-error="
-          validationErrors?.find((err) => err.field === 'singleNorm')
-        "
+        :validation-error="validationStore.getByField('singleNorm')"
       >
         <TextInput
           id="norm-reference-singleNorm"
           v-model="norm.singleNorm"
           aria-label="Einzelnorm der Norm"
           :has-error="slotProps.hasError"
-          @input="resetValidationError('singleNorm')"
+          @input="validationStore.remove('singleNorm')"
         ></TextInput>
       </InputField>
       <InputField
         id="norm-date-of-version"
         v-slot="slotProps"
         label="Fassungsdatum"
-        :validation-error="
-          validationErrors?.find((err) => err.field === 'dateOfVersion')
-        "
+        :validation-error="validationStore.getByField('dateOfVersion')"
       >
         <DateInput
           id="norm-date-of-version"
@@ -188,9 +162,7 @@ watch(props, () => {
         id="norm-date-of-relevance"
         v-slot="slotProps"
         label="Jahr"
-        :validation-error="
-          validationErrors?.find((err) => err.field === 'dateOfRelevance')
-        "
+        :validation-error="validationStore.getByField('dateOfRelevance')"
       >
         <YearInput
           id="norm-date-of-relevance"
