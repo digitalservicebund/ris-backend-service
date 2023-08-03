@@ -41,6 +41,7 @@ import org.docx4j.wml.PPr;
 import org.docx4j.wml.PPrBase.NumPr;
 import org.docx4j.wml.Pict;
 import org.docx4j.wml.R;
+import org.docx4j.wml.R.LastRenderedPageBreak;
 import org.docx4j.wml.RPr;
 import org.docx4j.wml.RPrAbstract;
 import org.docx4j.wml.Style;
@@ -300,6 +301,8 @@ public class DocumentUnitDocxBuilder extends DocxBuilder {
         paragraphElement.addRunElement(new RunTabElement());
       } else if (declaredType == Pict.class) {
         parsePict(paragraphElement, (Pict) jaxbElement.getValue());
+      } else if (declaredType == LastRenderedPageBreak.class) {
+        // ignored because in our web presentation of the docx file there are no page breaks
       } else {
         LOGGER.error("unknown run element: {}", declaredType.getName());
         paragraphElement.addRunElement(new ErrorRunElement(declaredType.getName()));
