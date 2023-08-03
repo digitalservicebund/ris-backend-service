@@ -54,7 +54,18 @@ public class PostgresNormAbbreviationRepositoryImpl implements NormAbbreviationR
   @Override
   public Mono<List<NormAbbreviation>> findByAwesomeSearchQuery(
       String query, Integer size, Integer page) {
-    String cleanedQuery = query.trim().replace(",", "").replace(";", "");
+    String cleanedQuery =
+        query
+            .trim()
+            .replace(",", "")
+            .replace(";", "")
+            .replace("(", "")
+            .replace(")", "")
+            .replace("*", "")
+            .replace("+", "")
+            .replace("-", "")
+            .replace(":", "")
+            .replace("/", " ");
     String directInput = cleanedQuery.toLowerCase();
     String[] queryBlocks = cleanedQuery.split(" ");
     StringBuilder tsQuery = new StringBuilder();

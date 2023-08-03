@@ -324,7 +324,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
       DocumentUnitDTO documentUnitDTO, DocumentUnit documentUnit) {
 
     return documentUnitNormRepository
-        .findAllByDocumentUnitId(documentUnitDTO.getId())
+        .findAllByDocumentUnitIdOrderById(documentUnitDTO.getId())
         .collectList()
         .flatMap(
             documentUnitNormDTOs -> {
@@ -1009,7 +1009,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
 
   private Mono<DocumentUnitDTO> injectNorms(DocumentUnitDTO documentUnitDTO) {
     return documentUnitNormRepository
-        .findAllByDocumentUnitId(documentUnitDTO.getId())
+        .findAllByDocumentUnitIdOrderById(documentUnitDTO.getId())
         .flatMapSequential(this::injectNormAbbreviation)
         .collectList()
         .map(

@@ -7,5 +7,5 @@ import reactor.core.publisher.Flux;
 @Repository
 public interface DatabaseDocumentUnitNormRepository
     extends R2dbcRepository<DocumentUnitNormDTO, Long> {
-  Flux<DocumentUnitNormDTO> findAllByDocumentUnitId(Long documentUnitId);
+  Flux<DocumentUnitNormDTO> findAllByDocumentUnitIdOrderById(Long documentationUnitId);
 }
