@@ -70,7 +70,7 @@ function removeListEntry(index: number) {
 }
 
 function updateModel() {
-  setEditIndex(undefined)
+  setEditIndex()
   modelValueList.value = localList.value
 }
 
