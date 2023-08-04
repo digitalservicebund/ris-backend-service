@@ -1207,6 +1207,9 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
                             ? null
                             : DocumentTypeTransformer.transformDTO(
                                 documentUnitDTO.getDocumentTypeDTO()))
+                    .court(
+                        DocumentUnitTransformer.getCourtObject(
+                            documentUnitDTO.getCourtType(), documentUnitDTO.getCourtLocation()))
                     .fileNumber(
                         documentUnitDTO.getFileNumbers() == null
                                 || documentUnitDTO.getFileNumbers().isEmpty()

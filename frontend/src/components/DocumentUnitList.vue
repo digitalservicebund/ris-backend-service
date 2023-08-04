@@ -109,8 +109,12 @@ function onDelete() {
           </span>
           <span v-else>-</span>
         </div>
-        <div class="table-cell p-16">-</div>
-        <div class="table-cell p-16">-</div>
+        <div class="table-cell p-16">
+          {{ listEntry.court?.type ? listEntry.court.type : "-" }}
+        </div>
+        <div class="table-cell p-16">
+          {{ listEntry.court?.location ? listEntry.court.location : "-" }}
+        </div>
         <div class="table-cell p-16">
           {{ dayjs(listEntry.creationTimestamp).format("DD.MM.YYYY") }}
         </div>

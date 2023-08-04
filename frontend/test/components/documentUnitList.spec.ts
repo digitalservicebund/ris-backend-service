@@ -19,6 +19,7 @@ function renderComponent(
             fileNumber: "",
             documentationOffice: { label: "testOffice" },
             documentType: { label: "Testlabel", jurisShortcut: "Test" },
+            court: { type: "typeA", location: "locB", label: "typeA locB" },
             status: { publicationStatus: "PUBLISHED", withError: false },
             ...options,
           },
@@ -95,6 +96,15 @@ describe("documentUnit list", () => {
     expect(
       screen.queryByText("Keine Dokumentationseinheiten gefunden"),
     ).not.toBeInTheDocument()
+  })
+
+  test("renders documentUnits with court", async () => {
+    renderComponent({
+      court: { type: "typeA", location: "locB", label: "typeA locB" },
+    })
+
+    await screen.findByText("typeA")
+    await screen.findByText("locB")
   })
 
   test("renders icon when file attached", async () => {
