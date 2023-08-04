@@ -7,12 +7,9 @@ info:
     name: 'DigitalService GmbH des Bundes'
     url: 'https://digitalservice.bund.de/'
     email: 'hallo@digitalservice.bund.de'
-  license:
-    name: MIT
-    url: 'https://mit-license.org'
 servers:
-  - url: 'https://ris.prod.ds4g.net/api/v1'
-    description: Public production server
+  - url: 'http://127.0.0.1/api/v1'
+    description: Local development server
 paths:
   /norms:
     get:

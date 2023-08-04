@@ -28,11 +28,7 @@ class OpenApiConfiguration {
                         .name("DigitalService GmbH des Bundes")
                         .url("https://digitalservice.bund.de")
                         .email("hallo@digitalservice.bund.de")),
-            //                .license(License().name("MIT
-            // License").url("https://mit-license.org")),
         )
-        .addServersItem(
-            Server().description("Public production server").url("https://ris.prod.ds4g.net"))
         .addServersItem(Server().description("Local development server").url("http://127.0.0.1"))
         .addTagsItem(Tag().name(NORMS_TAG).description("Endpoints regarding norms"))
         .addTagsItem(Tag().name(CASELAW_TAG).description("Endpoints regarding caselaw"))
