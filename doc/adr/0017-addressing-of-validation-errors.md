@@ -37,13 +37,12 @@ a validation error to avoid and implicit interpretation for the addressing.
 Example error response object based on [ADR 0014](./0014-error-handling-concept.md) plus
 this ADR. The exact URI schemas are just early ideas.
 
-```
+```json
 [
   {
     "code": "ERROR_CODE_FOO",
     "message": "something is not foo",
-    "instance":
-"norm/8a4ebde6-0a52-40e9-a491-2971314cfccd/metadata/3d2ad4b5-71c6-47ca-a3ab-a4f8af946cb4"
+    "instance": "norm/8a4ebde6-0a52-40e9-a491-2971314cfccd/metadata/3d2ad4b5-71c6-47ca-a3ab-a4f8af946cb4"
   },
   {
     "code": "ERROR_CODE_BAR",
@@ -62,10 +61,8 @@ this ADR. The exact URI schemas are just early ideas.
 
 - Validation error objects can be safely linked to data fields and used by the
   user facing application (frontend).
-
 - Each domain needs to develop is URI schema. The schema must be owed by the
   backend service, but understood by the frontend. The backend needs to (be able
   to) provide the `instance` property for validation errors.
-
 - The identification on a global level including scoping allows for
   simplifications yet powerful operations in the usage across domains.
