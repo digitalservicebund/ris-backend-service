@@ -56,6 +56,10 @@ spring:
             scope:
               - openid
               - profile
+      resourceserver:
+        jwt:
+          issuer-uri: ${OAUTH2_CLIENT_ISSUER:}
+          jwk-set-uri: ${spring.security.oauth2.resourceserver.jwt.issuer-uri}/protocol/openid-connect/certs
 
 springdoc:
   api-docs:

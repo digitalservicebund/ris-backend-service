@@ -1,14 +1,19 @@
 package de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.controller
 
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig
+import de.bund.digitalservice.ris.norms.application.port.output.GetNormByGuidOutputPort
 import de.bund.digitalservice.ris.norms.application.service.MigrateNormService
+import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType
 import de.bund.digitalservice.ris.norms.framework.adapter.output.database.NormsService
 import de.bund.digitalservice.ris.norms.framework.adapter.output.database.PostgresTestcontainerIntegrationTest
 import de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto.NormDto
 import de.bund.digitalservice.ris.norms.framework.adapter.output.juris.JurisConverter
 import de.bund.digitalservice.ris.norms.juris.converter.model.Norm
+import de.bund.digitalservice.ris.norms.juris.converter.model.NormProvider
 import java.time.Duration
 import java.util.*
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
@@ -66,7 +71,13 @@ class MigrateNormControllerIntegrationTest : PostgresTestcontainerIntegrationTes
     private val data =
         ConverterNormsSchema(
             norms =
-                listOf(ConverterNormSchema(UUID.randomUUID(), Norm(officialLongTitle = "Test"))))
+                listOf(
+                    ConverterNormSchema(
+                        UUID.randomUUID(),
+                        Norm(
+                            officialLongTitle = "Test",
+                            normProviderList = listOf(NormProvider("entity", "decidingBody", true)),
+                        ))))
   }
 
   @Test
@@ -80,6 +91,28 @@ class MigrateNormControllerIntegrationTest : PostgresTestcontainerIntegrationTes
         .exchange()
         .expectStatus()
         .isCreated
+
+    val norm = normService.getNormByGuid(GetNormByGuidOutputPort.Query(data.norms[0].guid)).block()
+
+    assertThat(
+            norm
+                ?.getFirstMetadatum(MetadataSectionName.NORM, MetadatumType.OFFICIAL_LONG_TITLE)
+                ?.value)
+        .isEqualTo("Test")
+    assertThat(
+            norm?.getFirstMetadatum(MetadataSectionName.NORM_PROVIDER, MetadatumType.ENTITY)?.value)
+        .isEqualTo("entity")
+    assertThat(
+            norm
+                ?.getFirstMetadatum(MetadataSectionName.NORM_PROVIDER, MetadatumType.DECIDING_BODY)
+                ?.value)
+        .isEqualTo("decidingBody")
+    assertThat(
+            norm
+                ?.getFirstMetadatum(
+                    MetadataSectionName.NORM_PROVIDER, MetadatumType.RESOLUTION_MAJORITY)
+                ?.value)
+        .isEqualTo(true)
   }
 
   data class ConverterNormsSchema(var norms: List<ConverterNormSchema> = emptyList())
