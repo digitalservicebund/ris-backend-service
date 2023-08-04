@@ -257,8 +257,8 @@ test.describe("active citations", () => {
     await expect(listItem).toBeVisible()
     await expect(page.getByLabel("Eintrag löschen")).toBeVisible()
 
-    //can not be edited
-    await expect(page.getByLabel("Eintrag bearbeiten")).toBeHidden()
+    //can be edited
+    await expect(page.getByLabel("Eintrag bearbeiten")).toBeVisible()
 
     // search for same parameters gives same result, indication that decision is already added
     await activeCitationContainer.getByLabel("Weitere Angabe").click()

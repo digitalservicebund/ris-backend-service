@@ -30,7 +30,9 @@ export default class ProceedingDecision
       ...(this.dateUnknown === true ? ["unbekanntes Entscheidungsdatum"] : []),
       ...(this.fileNumber ? [this.fileNumber] : []),
       ...(this.documentType ? [this.documentType?.jurisShortcut] : []),
-      ...(this.documentNumber && this.isReadOnly ? [this.documentNumber] : []),
+      ...(this.documentNumber && this.hasForeignSource
+        ? [this.documentNumber]
+        : []),
     ].join(", ")
   }
 
@@ -43,6 +45,10 @@ export default class ProceedingDecision
 
   get hasMissingRequiredFields(): boolean {
     return this.missingRequiredFields.length > 0
+  }
+
+  get isReadOnly(): boolean {
+    return this.hasForeignSource
   }
 
   get missingRequiredFields() {

@@ -24,7 +24,7 @@ const activeCitations = computed({
 const defaultValue = new ActiveCitation()
 
 function decisionSummarizer(activeCitation: ActiveCitation) {
-  if (activeCitation.isReadOnly) {
+  if (activeCitation.hasForeignSource) {
     return h("div", { class: ["flex flex-row items-center"] }, [
       !activeCitation.citationStyleIsSet &&
         renderValidationAlert("Art der Zitierung"),

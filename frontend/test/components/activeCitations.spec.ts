@@ -432,13 +432,23 @@ describe("Active Citations", () => {
     ).not.toBeInTheDocument()
   })
 
-  it("renders from search added active citations as non-editable list item", async () => {
-    renderComponent({
+  it("renders limited edit view if linked document unit", async () => {
+    const { user } = renderComponent({
       modelValue: [generateActiveCitation()],
     })
-    expect(
-      screen.queryByLabelText("Eintrag bearbeiten"),
-    ).not.toBeInTheDocument()
+
+    await user.click(screen.getByLabelText("Eintrag bearbeiten"))
+
+    expect(screen.getByLabelText("Art der Zitierung")).toBeVisible()
+    ;[
+      "Gericht der Aktivzitierung",
+      "Entscheidungsdatum der Aktivzitierung",
+      "Aktenzeichen der Aktivzitierung",
+      "Dokumenttyp der Aktivzitierung",
+      "Nach Entscheidung suchen",
+    ].forEach((label) =>
+      expect(screen.queryByLabelText(label)).not.toBeInTheDocument(),
+    )
   })
 
   it("lists search results", async () => {

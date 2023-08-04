@@ -9,7 +9,7 @@ defineProps<{
 <template>
   <div>
     <router-link
-      v-if="decision.isReadOnly"
+      v-if="decision.hasForeignSource"
       class="ds-link-01-bold underline"
       tabindex="-1"
       target="_blank"

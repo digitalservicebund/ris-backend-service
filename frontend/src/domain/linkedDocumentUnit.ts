@@ -18,7 +18,7 @@ export default class LinkedDocumentUnit {
     Object.assign(this, data)
   }
 
-  public isLinked<Type extends LinkedDocumentUnit>(
+  public isLinkedWith<Type extends LinkedDocumentUnit>(
     localDecisions: Type[] | undefined,
   ): boolean {
     if (!localDecisions) return false
@@ -28,7 +28,7 @@ export default class LinkedDocumentUnit {
     )
   }
 
-  get isReadOnly(): boolean {
+  get hasForeignSource(): boolean {
     return this.dataSource === "NEURIS" || this.dataSource === "MIGRATION"
   }
 
@@ -40,7 +40,9 @@ export default class LinkedDocumentUnit {
         : []),
       ...(this.documentType ? [this.documentType.label] : []),
       ...(this.fileNumber ? [this.fileNumber] : []),
-      ...(this.documentNumber && this.isReadOnly ? [this.documentNumber] : []),
+      ...(this.documentNumber && this.hasForeignSource
+        ? [this.documentNumber]
+        : []),
     ].join(", ")
   }
 }

@@ -38,7 +38,9 @@ export default class ActiveCitation
         : []),
       ...(this.fileNumber ? [this.fileNumber] : []),
       ...(this.documentType ? [this.documentType.label] : []),
-      ...(this.documentNumber && this.isReadOnly ? [this.documentNumber] : []),
+      ...(this.documentNumber && this.hasForeignSource
+        ? [this.documentNumber]
+        : []),
     ].join(", ")
   }
 
@@ -56,6 +58,10 @@ export default class ActiveCitation
     return ActiveCitation.fields.every((field) =>
       this.fieldIsEmpty(this[field]),
     )
+  }
+
+  get isReadOnly(): boolean {
+    return false
   }
 
   get citationStyleIsSet(): boolean {

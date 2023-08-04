@@ -48,7 +48,7 @@ const focusFirstFocusableElementOfCurrentEditElement = async () => {
 }
 watch(editIndex, focusFirstFocusableElementOfCurrentEditElement)
 
-function setEditIndex(index: number | undefined) {
+function setEditIndex(index?: number) {
   editIndex.value = index
 }
 
@@ -134,7 +134,7 @@ onMounted(() => {
           :data="entry"
           tabindex="0"
           @click="
-            entry.isReadOnly
+            entry.hasForeignSource
               ? (e: Event) => e.preventDefault()
               : setEditIndex(index)
           "

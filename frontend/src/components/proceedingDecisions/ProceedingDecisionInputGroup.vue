@@ -52,7 +52,7 @@ async function search(page = 0) {
     searchResults.value = response.data.content.map((searchResult) => {
       return {
         decision: new ProceedingDecision({ ...searchResult }),
-        isLinked: searchResult.isLinked(props.modelValueList),
+        isLinked: searchResult.isLinkedWith(props.modelValueList),
       }
     })
   }

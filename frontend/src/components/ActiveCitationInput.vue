@@ -79,7 +79,7 @@ async function search(page = 0) {
     searchResults.value = response.data.content.map((searchResult) => {
       return {
         decision: new ActiveCitation({ ...searchResult }),
-        isLinked: searchResult.isLinked(props.modelValueList),
+        isLinked: searchResult.isLinkedWith(props.modelValueList),
       }
     })
   }
@@ -157,6 +157,12 @@ watch(
 
 <template>
   <div>
+    <div
+      v-if="activeCitation.hasForeignSource"
+      class="ds-link-01-bold mb-24 underline"
+    >
+      {{ activeCitation.renderDecision }}
+    </div>
     <InputField
       id="activeCitationPredicate"
       v-slot="slotProps"
@@ -174,66 +180,69 @@ watch(
         placeholder="Bitte auswählen"
       ></ComboboxInput>
     </InputField>
-    <div class="flex justify-between gap-24">
-      <InputField
-        id="activeCitationCourt"
-        v-slot="slotProps"
-        label="Gericht *"
-        :validation-error="validationStore.getByField('court')"
-      >
-        <ComboboxInput
+    <div v-if="!activeCitation.hasForeignSource">
+      <div class="flex justify-between gap-24">
+        <InputField
           id="activeCitationCourt"
-          v-model="activeCitation.court"
-          aria-label="Gericht der Aktivzitierung"
-          clear-on-choosing-item
-          :has-error="slotProps.hasError"
-          :item-service="ComboboxItemService.getCourts"
-          placeholder="Aktivzitierung Gericht"
+          v-slot="slotProps"
+          label="Gericht *"
+          :validation-error="validationStore.getByField('court')"
         >
-        </ComboboxInput>
-      </InputField>
-      <InputField
-        id="activeCitationDecisionDate"
-        v-slot="slotProps"
-        label="Entscheidungsdatum *"
-        :validation-error="validationStore.getByField('decisionDate')"
-      >
-        <DateInput
+          <ComboboxInput
+            id="activeCitationCourt"
+            v-model="activeCitation.court"
+            aria-label="Gericht der Aktivzitierung"
+            clear-on-choosing-item
+            :has-error="slotProps.hasError"
+            :item-service="ComboboxItemService.getCourts"
+            placeholder="Aktivzitierung Gericht"
+          >
+          </ComboboxInput>
+        </InputField>
+        <InputField
           id="activeCitationDecisionDate"
-          v-model="activeCitation.decisionDate"
-          aria-label="Entscheidungsdatum der Aktivzitierung"
-          :has-error="slotProps.hasError"
-          @update:validation-error="slotProps.updateValidationError"
-        ></DateInput>
-      </InputField>
-    </div>
-    <div class="flex justify-between gap-24">
-      <InputField
-        id="activeCitationFileNumber"
-        v-slot="slotProps"
-        label="Aktenzeichen *"
-        :validation-error="validationStore.getByField('fileNumber')"
-      >
-        <TextInput
-          id="activeCitationDocumentType"
-          v-model="activeCitation.fileNumber"
-          aria-label="Aktenzeichen der Aktivzitierung"
-          :has-error="slotProps.hasError"
-          placeholder="Aktenzeichen"
-        ></TextInput>
-      </InputField>
-      <InputField id="activeCitationDecisionDocumentType" label="Dokumenttyp">
-        <ComboboxInput
-          id="activeCitationDecisionDocumentType"
-          v-model="activeCitation.documentType"
-          aria-label="Dokumenttyp der Aktivzitierung"
-          :item-service="ComboboxItemService.getDocumentTypes"
-          placeholder="Bitte auswählen"
-        ></ComboboxInput>
-      </InputField>
+          v-slot="slotProps"
+          label="Entscheidungsdatum *"
+          :validation-error="validationStore.getByField('decisionDate')"
+        >
+          <DateInput
+            id="activeCitationDecisionDate"
+            v-model="activeCitation.decisionDate"
+            aria-label="Entscheidungsdatum der Aktivzitierung"
+            :has-error="slotProps.hasError"
+            @update:validation-error="slotProps.updateValidationError"
+          ></DateInput>
+        </InputField>
+      </div>
+      <div class="flex justify-between gap-24">
+        <InputField
+          id="activeCitationFileNumber"
+          v-slot="slotProps"
+          label="Aktenzeichen *"
+          :validation-error="validationStore.getByField('fileNumber')"
+        >
+          <TextInput
+            id="activeCitationDocumentType"
+            v-model="activeCitation.fileNumber"
+            aria-label="Aktenzeichen der Aktivzitierung"
+            :has-error="slotProps.hasError"
+            placeholder="Aktenzeichen"
+          ></TextInput>
+        </InputField>
+        <InputField id="activeCitationDecisionDocumentType" label="Dokumenttyp">
+          <ComboboxInput
+            id="activeCitationDecisionDocumentType"
+            v-model="activeCitation.documentType"
+            aria-label="Dokumenttyp der Aktivzitierung"
+            :item-service="ComboboxItemService.getDocumentTypes"
+            placeholder="Bitte auswählen"
+          ></ComboboxInput>
+        </InputField>
+      </div>
     </div>
     <div>
       <TextButton
+        v-if="!activeCitation.hasForeignSource"
         aria-label="Nach Entscheidung suchen"
         button-type="secondary"
         class="mr-28"
