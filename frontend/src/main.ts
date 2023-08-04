@@ -9,18 +9,6 @@ const storeManager = createPinia()
 
 const app = createApp(App)
 
-function envName(): string | undefined {
-  if (window.location.host.includes("ris-uat")) {
-    return "uat"
-  } else if (window.location.host.includes("dev")) {
-    return "staging"
-  } else if (window.location.host.includes("prod")) {
-    return "production"
-  } else {
-    return undefined
-  }
-}
-
 function targets(): string[] {
   return [`${window.location.origin}/api`]
 }
@@ -28,7 +16,7 @@ function targets(): string[] {
 if (import.meta.env.PROD) {
   Sentry.init({
     app,
-    environment: envName(),
+    environment: window.location.host,
     dsn: "https://26a9485d49884fd1aaa8be1489916aa3@o1248831.ingest.sentry.io/4505600659619840",
     integrations: [
       new Sentry.BrowserTracing({
