@@ -11,6 +11,9 @@ import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType
 import de.bund.digitalservice.ris.norms.domain.value.NormCategory
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.controller.EditNormFrameControllerTest
+import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.controller.ValidateNormFrameControllerTest
+import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.schema.MetadataSectionRequestSchema
+import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.schema.MetadatumRequestSchema
 import java.time.LocalDate
 import java.util.Random
 import org.apache.commons.lang3.RandomStringUtils
@@ -37,6 +40,46 @@ fun createRandomEditNormRequestTestSchema():
           .randomize(named("documentNormCategory")) { NormCategory.values().random().name }
   return EasyRandom(parameters)
       .nextObject(EditNormFrameControllerTest.NormFramePropertiesTestRequestSchema::class.java)
+}
+
+fun createMetadatumRequestSchema(
+    value: String,
+    type: MetadatumType,
+    order: Int = 1
+): MetadatumRequestSchema {
+  val metadatum = MetadatumRequestSchema()
+  metadatum.value = value
+  metadatum.type = type
+  metadatum.order = order
+  return metadatum
+}
+
+fun createMetadataSectionRequestSchema(
+    name: MetadataSectionName,
+    metadata: List<MetadatumRequestSchema>
+): MetadataSectionRequestSchema {
+  val section = MetadataSectionRequestSchema()
+  section.name = name
+  section.metadata = metadata
+  return section
+}
+
+fun createValidValidateNormFrameTestRequestSchema():
+    ValidateNormFrameControllerTest.ValidateNormFrameTestRequestSchema {
+
+  val m11 = createMetadatumRequestSchema("official long title", MetadatumType.OFFICIAL_LONG_TITLE)
+  val s1 = createMetadataSectionRequestSchema(MetadataSectionName.NORM, listOf(m11))
+
+  val m21 = createMetadatumRequestSchema("type name", MetadatumType.TYPE_NAME)
+  val m22 =
+      createMetadatumRequestSchema(NormCategory.BASE_NORM.toString(), MetadatumType.NORM_CATEGORY)
+  val s2 = createMetadataSectionRequestSchema(MetadataSectionName.DOCUMENT_TYPE, listOf(m21, m22))
+
+  val m31 = createMetadatumRequestSchema("entity", MetadatumType.ENTITY)
+  val m32 = createMetadatumRequestSchema("deciding body", MetadatumType.DECIDING_BODY)
+  val s3 = createMetadataSectionRequestSchema(MetadataSectionName.NORM_PROVIDER, listOf(m31, m32))
+
+  return ValidateNormFrameControllerTest.ValidateNormFrameTestRequestSchema(listOf(s1, s2, s3))
 }
 
 fun createRandomNorm(): Norm {

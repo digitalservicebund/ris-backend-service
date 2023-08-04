@@ -9,6 +9,8 @@ import de.bund.digitalservice.ris.norms.application.service.LoadNormService
 import de.bund.digitalservice.ris.norms.domain.entity.Norm
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType
+import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.schema.MetadataSectionRequestSchema
+import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.schema.MetadatumRequestSchema
 import de.bund.digitalservice.ris.norms.framework.adapter.output.database.NormsService
 import de.bund.digitalservice.ris.norms.framework.adapter.output.database.PostgresTestcontainerIntegrationTest
 import de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto.NormDto
@@ -77,10 +79,10 @@ class EditNormFrameControllerIntegrationTest : PostgresTestcontainerIntegrationT
         .expectNextCount(1)
         .verifyComplete()
 
-    val metadata = EditNormFrameController.MetadatumRequestSchema()
+    val metadata = MetadatumRequestSchema()
     metadata.type = MetadatumType.DATE
     metadata.value = "2023-12-25"
-    val section = EditNormFrameController.MetadataSectionRequestSchema()
+    val section = MetadataSectionRequestSchema()
     section.name = MetadataSectionName.CITATION_DATE
     section.metadata = listOf(metadata)
     val editedNorm = NormFramePropertiesTestRequestSchema()
@@ -100,7 +102,7 @@ class EditNormFrameControllerIntegrationTest : PostgresTestcontainerIntegrationT
 
   class NormFramePropertiesTestRequestSchema {
     lateinit var officialLongTitle: String
-    lateinit var metadataSections: List<EditNormFrameController.MetadataSectionRequestSchema>
+    lateinit var metadataSections: List<MetadataSectionRequestSchema>
     var documentNumber: String? = null
 
     @get:JsonProperty("isExpirationDateTemp") var eli: String? = null

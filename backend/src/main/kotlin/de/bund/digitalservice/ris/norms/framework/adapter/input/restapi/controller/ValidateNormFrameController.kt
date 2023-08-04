@@ -1,17 +1,18 @@
 package de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.controller
 
-import de.bund.digitalservice.ris.norms.application.port.input.EditNormFrameUseCase
+import de.bund.digitalservice.ris.norms.application.port.input.ValidateNormFrameUseCase
+import de.bund.digitalservice.ris.norms.domain.entity.MetadataSection
+import de.bund.digitalservice.ris.norms.domain.specification.SpecificationViolation
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.ApiConfiguration
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.OpenApiConfiguration
-import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.decodeGuid
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.schema.MetadataSectionRequestSchema
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.tags.Tag
+import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.PutMapping
+import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
@@ -20,36 +21,31 @@ import reactor.core.publisher.Mono
 @RestController
 @RequestMapping(ApiConfiguration.API_NORMS_PATH)
 @Tag(name = OpenApiConfiguration.NORMS_TAG)
-class EditNormFrameController(private val editNormFrameService: EditNormFrameUseCase) {
+class ValidateNormFrameController(private val validateNormFrameUseCase: ValidateNormFrameUseCase) {
 
-  @PutMapping(path = ["/{guid}"])
+  @PostMapping(path = ["/norm/validation"])
   @Operation(
-      summary = "Edit the frame data of a norm",
-      description = "Edits a norm given its unique guid identifier")
+      summary = "Validate a norm",
+      description =
+          "Parse the norm frame data against the specification to check if the values are valid")
   @ApiResponses(
       ApiResponse(responseCode = "204", description = "Norm was updated"),
       ApiResponse(responseCode = "400"),
   )
-  fun editNormFrame(
-      @PathVariable guid: String,
+  fun validateNormFrame(
       @RequestBody request: NormFramePropertiesRequestSchema,
-  ): Mono<ResponseEntity<Unit>> {
-    val properties = request.toUseCaseData()
-    val command = EditNormFrameUseCase.Command(decodeGuid(guid), properties)
+  ): Mono<ResponseEntity<List<SpecificationViolation>>> {
+    val metadataSections = request.toUseCaseData()
+    val command = ValidateNormFrameUseCase.Command(metadataSections)
 
-    return editNormFrameService.editNormFrame(command).map {
-      ResponseEntity.noContent().build<Unit>()
+    return validateNormFrameUseCase.validateNormFrame(command).map {
+      ResponseEntity.status(HttpStatus.OK).body(it.violations)
     }
   }
 
   class NormFramePropertiesRequestSchema {
     lateinit var metadataSections: List<MetadataSectionRequestSchema>
 
-    var eli: String? = null
-
-    fun toUseCaseData(): EditNormFrameUseCase.NormFrameProperties =
-        EditNormFrameUseCase.NormFrameProperties(
-            this.metadataSections.map { it.toUseCaseData() },
-        )
+    fun toUseCaseData(): List<MetadataSection> = this.metadataSections.map { it.toUseCaseData() }
   }
 }

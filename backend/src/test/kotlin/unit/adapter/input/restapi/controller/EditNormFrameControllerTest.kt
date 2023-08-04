@@ -3,6 +3,8 @@ package de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.control
 import com.ninjasquad.springmockk.MockkBean
 import de.bund.digitalservice.ris.norms.application.port.input.EditNormFrameUseCase
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType
+import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.schema.MetadataSectionRequestSchema
+import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.schema.MetadatumRequestSchema
 import io.mockk.every
 import io.mockk.verify
 import java.time.LocalDate
@@ -96,7 +98,7 @@ class EditNormFrameControllerTest {
 
   @Test
   fun `it correctly maps the dates from string to localdate in metadata`() {
-    val schema = EditNormFrameController.MetadatumRequestSchema()
+    val schema = MetadatumRequestSchema()
     schema.value = "2022-12-01"
     schema.type = MetadatumType.DATE
 
@@ -105,7 +107,7 @@ class EditNormFrameControllerTest {
 
   @Test
   fun `it correctly maps the times from string to localtime in metadata`() {
-    val schema = EditNormFrameController.MetadatumRequestSchema()
+    val schema = MetadatumRequestSchema()
     schema.value = "13:55"
     schema.type = MetadatumType.TIME
 
@@ -114,7 +116,7 @@ class EditNormFrameControllerTest {
 
   class NormFramePropertiesTestRequestSchema {
     lateinit var officialLongTitle: String
-    lateinit var metadataSections: List<EditNormFrameController.MetadataSectionRequestSchema>
+    lateinit var metadataSections: List<MetadataSectionRequestSchema>
     var risAbbreviation: String? = null
     var documentNumber: String? = null
     var documentCategory: String? = null
