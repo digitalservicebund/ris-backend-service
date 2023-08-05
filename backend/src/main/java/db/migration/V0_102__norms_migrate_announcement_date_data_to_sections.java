@@ -15,7 +15,7 @@ public class V0_102__norms_migrate_announcement_date_data_to_sections extends Ba
   public void migrate(Context context) throws Exception {
     final Connection connection = context.getConnection();
     final HashMap<UUID, String> normGuidToFlatAnnouncementDate =
-        this.getNormGuidToFlatAnnouncementDateForNormsWithoutAnnoucementDateSection(connection);
+        this.getNormGuidToFlatAnnouncementDateForNormsWithoutAnnouncementDateSection(connection);
 
     for (Map.Entry<UUID, String> entry : normGuidToFlatAnnouncementDate.entrySet()) {
       final UUID normGuid = entry.getKey();
@@ -26,7 +26,7 @@ public class V0_102__norms_migrate_announcement_date_data_to_sections extends Ba
   }
 
   private HashMap<UUID, String>
-      getNormGuidToFlatAnnouncementDateForNormsWithoutAnnoucementDateSection(
+  getNormGuidToFlatAnnouncementDateForNormsWithoutAnnouncementDateSection(
           final Connection connection) throws SQLException {
     HashMap<UUID, String> normGuidToFlatAnnouncementDate = new HashMap<>();
 
