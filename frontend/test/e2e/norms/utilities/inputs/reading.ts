@@ -8,6 +8,7 @@ import {
 } from "./types"
 import { FOOTNOTE_LABELS } from "@/components/footnote/types"
 import { MetadatumType } from "@/domain/Norm"
+import { expectSummaryToContainMetadata } from "~/e2e/norms/e2e-utils"
 
 type FieldExpecter<T> = (page: Page, id: string, value: T) => Promise<void>
 
@@ -87,6 +88,7 @@ async function expectMetadataInputSectionToHaveCorrectData(
   if (section.isSingleFieldSection) {
     await expectInputFieldGroupHasCorrectValues(page, section.fields ?? [])
   } else if (section.isExpandableNotRepeatable) {
+    await expectSummaryToContainMetadata(page, section)
     await expectExpandableSectionNotRepeatableToHaveCorrectValues(page, section)
   } else {
     const heading = page.locator(`a span:text-is("${section.heading}")`)
@@ -207,6 +209,7 @@ export async function expectMetadataInputSectionToHaveCorrectDataOnDisplay(
   section: MetadataInputSection,
 ): Promise<void> {
   if (section.isRepeatedSection) {
+    await expectSummaryToContainMetadata(page, section)
     await expectRepeatedSectionListHasCorrectEntries(page, section)
   } else {
     await expectMetadataInputSectionToHaveCorrectData(page, section)
@@ -217,6 +220,7 @@ export async function expectMetadataInputSectionToHaveCorrectDataOnEdit(
   section: MetadataInputSection,
 ): Promise<void> {
   if (section.isRepeatedSection) {
+    await expectSummaryToContainMetadata(page, section)
     await expectRepeatedSectionListHasCorrectEntries(
       page,
       section,

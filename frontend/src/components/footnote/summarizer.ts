@@ -47,7 +47,7 @@ export function summarizeFootnotePerLine(data?: Footnote): VNode {
         const contentTextNode = h(
           "p",
           { class: ["pl-6", "pr-10", "inline", "whitespace-pre-wrap"] },
-          content,
+          content.trim(),
         )
         footnotesWithPrefix[1].push(
           h("span", { class: "leading-loose" }, [typeNode, contentTextNode]),

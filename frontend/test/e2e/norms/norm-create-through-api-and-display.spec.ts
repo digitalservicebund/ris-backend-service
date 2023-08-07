@@ -87,7 +87,12 @@ testWithImportedNorm(
     const sections = getNormBySections(normData)
 
     for (const section of sections) {
-      await expectMetadataInputSectionToHaveCorrectDataOnDisplay(page, section)
+      if (!section.isNotImported) {
+        await expectMetadataInputSectionToHaveCorrectDataOnDisplay(
+          page,
+          section,
+        )
+      }
     }
   },
 )

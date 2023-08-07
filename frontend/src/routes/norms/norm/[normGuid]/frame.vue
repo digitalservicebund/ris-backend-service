@@ -3,11 +3,13 @@ import { storeToRefs } from "pinia"
 import { computed, toRefs, ref, watch } from "vue"
 import { useRoute } from "vue-router"
 import AgeIndicationInputGroup from "@/components/ageIndication/AgeIndicationInputGroup.vue"
+import { ageIndicationSummarizer } from "@/components/ageIndication/summarizer"
 import AnnouncementDateInputGroup from "@/components/announcementDate/AnnouncementDateInputGroup.vue"
 import { summarizeAnnouncementDate } from "@/components/announcementDate/summarizer"
 import CategorizedReferenceInputGroup from "@/components/categorizedReference/CategorizedReferenceInputGroup.vue"
 import CitationDateInputGroup from "@/components/citationDate/CitationDateInputGroup.vue"
 import DigitalEvidenceInputGroup from "@/components/digitalEvidence/DigitalEvidenceInputGroup.vue"
+import { digitalEvidenceSummarizer } from "@/components/digitalEvidence/summarizer"
 import DivergentEntryIntoForceGroup from "@/components/divergentGroup/divergentEntryIntoForce/DivergentEntryIntoForceGroup.vue"
 import { divergentEntryIntoForceSummarizer } from "@/components/divergentGroup/divergentEntryIntoForce/summarizer"
 import DivergentExpirationGroup from "@/components/divergentGroup/divergentExpiration/DivergentExpirationGroup.vue"
@@ -153,6 +155,8 @@ const SubjectAreaSummary = withSummarizer(subjectAreaSummarizer)
 const footnoteLineSummary = withSummarizer(summarizeFootnotePerLine)
 const StatusIndicationSummary = withSummarizer(summarizeStatusIndication)
 const AnnouncementDateSummary = withSummarizer(summarizeAnnouncementDate)
+const DigitalEvidenceSummary = withSummarizer(digitalEvidenceSummarizer)
+const AgeIndicationSummary = withSummarizer(ageIndicationSummarizer)
 </script>
 
 <template>
@@ -572,6 +576,7 @@ const AnnouncementDateSummary = withSummarizer(summarizeAnnouncementDate)
       id="digitalEvidence"
       border-bottom
       :data-set="metadataSections.DIGITAL_EVIDENCE"
+      :summary-component="DigitalEvidenceSummary"
       test-id="a11y-expandable-dataset"
       title="Elektronischer Nachweis"
     >
@@ -580,6 +585,7 @@ const AnnouncementDateSummary = withSummarizer(summarizeAnnouncementDate)
         :default-value="{}"
         disable-multi-entry
         :edit-component="DigitalEvidenceInputGroup"
+        :summary-component="DigitalEvidenceSummary"
       />
     </ExpandableDataSet>
 
@@ -607,6 +613,7 @@ const AnnouncementDateSummary = withSummarizer(summarizeAnnouncementDate)
       id="ageIndications"
       border-bottom
       :data-set="metadataSections.AGE_INDICATION"
+      :summary-component="AgeIndicationSummary"
       test-id="a11y-expandable-dataset"
       title="Altersangabe"
     >
@@ -614,6 +621,7 @@ const AnnouncementDateSummary = withSummarizer(summarizeAnnouncementDate)
         v-model="metadataSections.AGE_INDICATION"
         :default-value="{}"
         :edit-component="AgeIndicationInputGroup"
+        :summary-component="AgeIndicationSummary"
       />
     </ExpandableDataSet>
 

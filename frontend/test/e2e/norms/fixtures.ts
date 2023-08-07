@@ -1355,7 +1355,7 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
           label: "Bezeichnung der Änderungsvorschrift",
           values: norm.metadataSections?.DOCUMENT_STATUS_SECTION?.map(
             (section) => section?.DOCUMENT_STATUS?.[0],
-          ).map((section) => section?.TEXT?.[0]),
+          ).map((section) => section?.DESCRIPTION?.[0]),
         },
         {
           type: FieldType.TEXT,

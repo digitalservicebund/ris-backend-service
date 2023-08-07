@@ -69,13 +69,13 @@ export function withSummarizer(
 </script>
 
 <template>
-  <div class="flex w-full flex-col items-start text-start">
-    <div
+  <ul class="flex w-full flex-col items-start text-start">
+    <li
       v-for="(summary, index) in summaries"
       :key="index"
       class="flex-start ds-label-02-reg flex w-full border-b-1 border-b-gray-400 py-10 first:pt-0 last:border-none last:pb-0"
     >
       <component :is="summary" />
-    </div>
-  </div>
+    </li>
+  </ul>
 </template>
