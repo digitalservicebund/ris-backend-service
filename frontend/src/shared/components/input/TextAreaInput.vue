@@ -1,17 +1,18 @@
 <script lang="ts" setup>
 import { computed, nextTick, ref, watch, watchEffect } from "vue"
-import { ValidationError } from "./types"
+import { ValidationError } from "@/shared/components/input/types"
 
 type Props = {
   id: string
   modelValue: string
   ariaLabel: string
   placeholder?: string
-  validationError?: ValidationError
   readOnly?: boolean
   autosize?: boolean
   resize?: "none" | "both" | "horizontal" | "vertical"
   rows?: number
+  size?: "regular" | "medium" | "small"
+  hasError?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -21,10 +22,12 @@ const props = withDefaults(defineProps<Props>(), {
   autosize: false,
   resize: "none",
   rows: 2,
+  size: "regular",
 })
 
 const emit = defineEmits<{
   "update:modelValue": [value: string]
+  "update:validationError": [value: ValidationError | undefined]
 }>()
 
 const localValue = computed({
@@ -92,8 +95,15 @@ defineExpose({ focus })
     ref="textareaRef"
     v-model="localValue"
     :aria-label="ariaLabel"
-    class="input readonly:focus:outline-none block w-full overflow-hidden border-2 border-blue-800 bg-white px-20 py-12 outline-2 -outline-offset-4 outline-blue-800 autofill:text-inherit autofill:shadow-white read-only:border-none hover:outline read-only:hover:outline-0 focus:outline autofill:focus:text-inherit autofill:focus:shadow-white"
-    :class="{ 'overflow-hidden': autosize, [$style.textarea]: true }"
+    class="ds-input h-unset py-12"
+    :class="{
+      'has-error': hasError,
+      'overflow-hidden': autosize,
+      'px-16': size === 'small',
+      'px-20': size === 'medium',
+      'px-24': size === 'regular',
+      [$style.textarea]: true,
+    }"
     :placeholder="placeholder"
     :readonly="readOnly"
     :rows="rows"
