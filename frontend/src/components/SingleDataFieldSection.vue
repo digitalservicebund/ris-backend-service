@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { computed, ref, watch } from "vue"
 import InputElement from "@/shared/components/input/InputElement.vue"
+import InputField from "@/shared/components/input/InputField.vue"
 import {
   InputAttributes,
   InputType,
@@ -48,19 +49,29 @@ watch(value, () => emit("update:modelValue", value.value), { deep: true })
 
 <template>
   <div
-    class="flex items-start gap-8 border-b border-gray-400 bg-white p-8 pl-16"
+    class="border-l-red-800 [&:has(.has-error)]:border-l-8 [&:has(.has-error)]:pl-8"
   >
-    <label class="ds-label-02-bold my-12 w-[15rem] flex-none" :for="id">
-      <h2>{{ label }}</h2>
-    </label>
-
-    <InputElement
-      :id="id"
-      v-model="value"
-      :attributes="inputAttributes"
-      class="ds-label-02-reg"
-      disable-error
-      :type="type"
-    />
+    <div
+      class="flex items-start gap-8 border-b border-gray-400 bg-white p-8 pl-16"
+    >
+      <label class="ds-label-02-bold my-12 w-240 flex-none" :for="id">
+        <h2>{{ label }}</h2>
+      </label>
+      <InputField
+        :id="id"
+        v-slot="{ id: inputElementId, hasError }"
+        class="!mb-0"
+      >
+        <InputElement
+          :id="inputElementId"
+          v-model="value"
+          :attributes="inputAttributes"
+          class="ds-label-02-reg"
+          :disable-error="!hasError"
+          :has-error="hasError"
+          :type="type"
+        />
+      </InputField>
+    </div>
   </div>
 </template>
