@@ -62,6 +62,9 @@ module.exports = {
           700: "#253858",
         },
       },
+      spacing: {
+        unset: "unset",
+      },
     },
   },
 }
