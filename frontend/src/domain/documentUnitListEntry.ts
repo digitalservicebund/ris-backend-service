@@ -6,7 +6,7 @@ export type DocumentUnitListEntry = {
   id: string
   uuid: string
   documentNumber: string
-  decisionDate: string
+  decisionDate?: string
   status: NonNullable<DocumentUnit["status"]>
   fileName?: string
   fileNumber?: string
