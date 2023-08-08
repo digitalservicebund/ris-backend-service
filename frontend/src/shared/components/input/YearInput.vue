@@ -84,8 +84,8 @@ const isValid = computed(() => validateYear(localModelValue.value))
 watchEffect(() => {
   if (!isValid.value && shouldShowValidationState.value) {
     emit("update:validationError", {
-      defaultMessage: "Kein valides Jahr",
-      field: props.id,
+      message: "Kein valides Jahr",
+      instance: props.id,
     })
   } else {
     emit("update:validationError", undefined)

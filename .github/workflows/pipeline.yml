@@ -973,7 +973,7 @@ jobs:
           connectionString: postgresql://${{ env.POSTGRES_USER }}:${{ env.POSTGRES_PASSWORD }}@localhost:5432/${{ env.POSTGRES_DB }}
           outputFile: latest.mmd
           flags: --debug
-          version: 0.8.0
+          version: 0.9.0
       - name: Upload mermaid ER-diagram
         uses: actions/upload-artifact@v3
         with:

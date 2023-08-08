@@ -24,8 +24,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.domain.Sort.Order;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -186,15 +184,25 @@ public class DocumentUnitService {
       Pageable pageable, DocumentationOffice documentationOffice) {
     return repository
         .findAll(
-            PageRequest.of(
-                pageable.getPageNumber(),
-                pageable.getPageSize(),
-                Sort.by(Order.desc("creationtimestamp"))),
-            documentationOffice)
+            PageRequest.of(pageable.getPageNumber(), pageable.getPageSize()), documentationOffice)
         .collectList()
         .zipWith(
             repository.countByDataSourceAndDocumentationOffice(
                 DataSource.NEURIS, documentationOffice))
+        .map(tuple -> new PageImpl<>(tuple.getT1(), pageable, tuple.getT2()));
+  }
+
+  public Mono<Page<DocumentUnitListEntry>> getByOverviewSearch(
+      Pageable pageable,
+      DocumentationOffice documentationOffice,
+      DocumentUnitListEntry searchInput) {
+    return repository
+        .getByOverviewSearch(
+            PageRequest.of(pageable.getPageNumber(), pageable.getPageSize()),
+            documentationOffice,
+            searchInput)
+        .collectList()
+        .zipWith(repository.countGetByOverviewSearch(documentationOffice, searchInput))
         .map(tuple -> new PageImpl<>(tuple.getT1(), pageable, tuple.getT2()));
   }
 

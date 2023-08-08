@@ -121,7 +121,7 @@ export enum LabelPosition {
       class="ds-label-03-reg my-6 h-16 text-red-800"
       :data-testid="id + '-validationError'"
     >
-      {{ localValidationError.defaultMessage }}
+      {{ localValidationError.message }}
     </div>
   </div>
 </template>

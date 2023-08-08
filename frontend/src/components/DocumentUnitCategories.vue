@@ -156,7 +156,7 @@ onMounted(async () => {
             v-model="coreData"
             :validation-errors="
               validationErrors.filter(
-                (err) => err.field.split('\.')[0] === 'coreData',
+                (err) => err.instance.split('\.')[0] === 'coreData',
               )
             "
           />

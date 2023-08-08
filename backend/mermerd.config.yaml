@@ -1,5 +1,6 @@
 schema: public
 useAllTables: True
 showDescriptions:
-  - columnComments
+  - notNull
   - enumValues
+  - columnComments

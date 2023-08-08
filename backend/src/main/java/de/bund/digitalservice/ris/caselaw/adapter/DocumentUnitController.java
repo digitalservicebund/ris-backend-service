@@ -103,6 +103,21 @@ public class DocumentUnitController {
         .flatMap(user -> service.getAll(PageRequest.of(page, size), user));
   }
 
+  @GetMapping(value = "/overview-search")
+  @PreAuthorize("isAuthenticated()")
+  // Access rights are being enforced through SQL filtering
+  public Mono<Page<DocumentUnitListEntry>> getByOverviewSearch(
+      @RequestParam("pg") int page,
+      @RequestParam("sz") int size,
+      @RequestBody DocumentUnitListEntry searchInput,
+      @AuthenticationPrincipal OidcUser oidcUser) {
+
+    return userService
+        .getDocumentationOffice(oidcUser)
+        .flatMap(
+            user -> service.getByOverviewSearch(PageRequest.of(page, size), user, searchInput));
+  }
+
   @GetMapping(value = "/{documentNumber}")
   @PreAuthorize("@userHasReadAccessByDocumentNumber.apply(#documentNumber)")
   public Mono<ResponseEntity<DocumentUnit>> getByDocumentNumber(

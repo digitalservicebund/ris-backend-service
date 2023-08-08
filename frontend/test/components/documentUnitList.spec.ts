@@ -14,7 +14,7 @@ function renderComponent(
             id: "id",
             uuid: "1",
             documentNumber: "123",
-            creationTimestamp: "2022-02-10",
+            decisionDate: "2022-02-10",
             fileName: "",
             fileNumber: "",
             documentationOffice: { label: "testOffice" },

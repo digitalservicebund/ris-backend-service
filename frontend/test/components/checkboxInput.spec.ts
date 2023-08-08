@@ -66,7 +66,10 @@ describe("Checkbox Input", () => {
 
   it("shows validation errors", () => {
     renderComponent({
-      validationError: { defaultMessage: "test-error", field: "test-field" },
+      validationError: {
+        message: "test-error",
+        instance: "test-field",
+      },
     })
 
     const input = screen.getByRole("checkbox")

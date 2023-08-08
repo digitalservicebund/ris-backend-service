@@ -111,7 +111,7 @@ describe("DateInput", () => {
     const array = emitted()["update:validationError"] as ValidationError[][]
 
     expect(
-      array.filter((element) => element[0] !== undefined)[0][0].defaultMessage,
+      array.filter((element) => element[0] !== undefined)[0][0].message,
     ).toBe("Das Datum darf nicht in der Zukunft liegen")
   })
 
@@ -146,7 +146,7 @@ describe("DateInput", () => {
     const array = emitted()["update:validationError"] as ValidationError[][]
 
     expect(
-      array.filter((element) => element[0] !== undefined)[0][0].defaultMessage,
+      array.filter((element) => element[0] !== undefined)[0][0].message,
     ).toBe("Kein valides Datum")
   })
 
@@ -172,8 +172,8 @@ describe("DateInput", () => {
     expect(emitted()["update:validationError"]).toEqual([
       [
         {
-          defaultMessage: "Unvollständiges Datum",
-          field: "identifier",
+          message: "Unvollständiges Datum",
+          instance: "identifier",
         },
       ],
     ])

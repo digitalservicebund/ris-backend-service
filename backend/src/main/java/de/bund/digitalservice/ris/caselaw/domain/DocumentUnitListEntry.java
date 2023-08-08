@@ -10,7 +10,7 @@ import lombok.Builder;
 public record DocumentUnitListEntry(
     UUID uuid,
     String documentNumber,
-    Instant creationTimestamp,
+    Instant decisionDate,
     DataSource dataSource,
     String fileName,
     String fileNumber,

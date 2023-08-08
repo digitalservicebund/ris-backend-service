@@ -32,9 +32,7 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.EmailPublishService;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import java.time.Instant;
-import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -177,19 +175,15 @@ class DocumentUnitListEntryIntegrationTest {
 
   @Test
   void testForCorrectOrdering() {
-    List<Instant> timestampsExpected = new ArrayList<>();
-    for (int i = 0; i < 11; i++) {
-      timestampsExpected.add(Instant.now().minus(i, ChronoUnit.DAYS));
-    }
-    Collections.shuffle(timestampsExpected);
+    List<String> documentNumbers = Arrays.asList("ABCD202300007", "EFGH202200123", "IJKL202300099");
 
-    for (int i = 0; i < 11; i++) {
+    for (String documentNumber : documentNumbers) {
       repository
           .save(
               DocumentUnitDTO.builder()
                   .uuid(UUID.randomUUID())
-                  .creationtimestamp(timestampsExpected.get(i))
-                  .documentnumber("123456789012" + i)
+                  .creationtimestamp(Instant.now())
+                  .documentnumber(documentNumber)
                   .dataSource(DataSource.NEURIS)
                   .documentationOfficeId(docOfficeDTO.getId())
                   .build())
@@ -207,16 +201,11 @@ class DocumentUnitListEntryIntegrationTest {
             .expectBody(String.class)
             .returnResult();
 
-    List<String> timestampActualStrings =
-        JsonPath.read(result.getResponseBody(), "$.content[*].creationTimestamp");
-    List<Instant> timestampsActual = timestampActualStrings.stream().map(Instant::parse).toList();
-    assertThat(timestampsActual).hasSize(10);
-
-    for (int i = 0; i < timestampsActual.size() - 1; i++) {
-      Instant tThis = timestampsActual.get(i);
-      Instant tNext = timestampsActual.get(i + 1);
-      assertThat(tThis).isAfter(tNext);
-    }
+    List<String> documentNumbersActual =
+        JsonPath.read(result.getResponseBody(), "$.content[*].documentNumber");
+    assertThat(documentNumbersActual)
+        .hasSize(3)
+        .containsExactly("IJKL202300099", "ABCD202300007", "EFGH202200123");
   }
 
   @Test
