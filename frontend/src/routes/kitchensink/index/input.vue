@@ -108,8 +108,8 @@ const values = reactive({
         v-slot="{ id, hasError }"
         label="This has an error message"
         :validation-error="{
-          defaultMessage: 'Error message',
-          field: 'errorMessageTextInput',
+          message: 'Error message',
+          instance: 'errorMessageTextInput',
         }"
       >
         <TextInput

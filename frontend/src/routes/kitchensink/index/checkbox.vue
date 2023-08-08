@@ -72,8 +72,8 @@ const values = reactive({
           :id="id"
           v-model="values.invalid"
           :validation-error="{
-            field: 'invalidCheckbox',
-            defaultMessage: 'Error',
+            message: 'Error',
+            instance: 'invalidCheckbox',
           }"
         />
       </InputField>
@@ -88,8 +88,8 @@ const values = reactive({
           :id="id"
           v-model="values.invalidChecked"
           :validation-error="{
-            field: 'invalidCheckedCheckbox',
-            defaultMessage: 'Error',
+            message: 'Error',
+            instance: 'invalidCheckedCheckbox',
           }"
         />
       </InputField>

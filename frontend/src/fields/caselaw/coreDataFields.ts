@@ -232,7 +232,7 @@ export const coreDataFields: InputField[] = [
     "Region",
     "Region",
     "",
-    { defaultMessage: "", field: "" },
+    { message: "", instance: "" },
     true,
   ),
 ]

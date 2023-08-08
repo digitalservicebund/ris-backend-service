@@ -8,7 +8,7 @@ describe("useValidationStore", () => {
     store.add("error2", "field1")
     store.add("error3", "field1")
 
-    expect(store.getByField("field1")?.defaultMessage).toBe("error3")
+    expect(store.getByField("field1")?.message).toBe("error3")
   })
 
   it("keeps multiple errors for different fields", () => {
@@ -17,8 +17,8 @@ describe("useValidationStore", () => {
     store.add("error1", "field1")
     store.add("error2", "field2")
 
-    expect(store.getByField("field1")?.defaultMessage).toBe("error1")
-    expect(store.getByField("field2")?.defaultMessage).toBe("error2")
+    expect(store.getByField("field1")?.message).toBe("error1")
+    expect(store.getByField("field2")?.message).toBe("error2")
   })
 
   it("does not throw when removing from empty", () => {

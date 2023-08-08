@@ -169,22 +169,22 @@ function validateInput() {
       // if valid date, check for future dates
       if (!isInPast.value && !props.isFutureDate && isValidDate.value)
         emit("update:validationError", {
-          defaultMessage:
+          message:
             "Das " + props.ariaLabel + " darf nicht in der Zukunft liegen",
-          field: props.id,
+          instance: props.id,
         })
       else emit("update:validationError", undefined)
     } else {
       emit("update:validationError", {
-        defaultMessage: "Kein valides Datum",
-        field: props.id,
+        message: "Kein valides Datum",
+        instance: props.id,
       })
     }
   } else {
     if (currentInput.value) {
       emit("update:validationError", {
-        defaultMessage: "Unvollständiges Datum",
-        field: props.id,
+        message: "Unvollständiges Datum",
+        instance: props.id,
       })
     } else {
       emit("update:validationError", undefined)

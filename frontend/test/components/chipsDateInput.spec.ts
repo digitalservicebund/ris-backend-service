@@ -186,8 +186,8 @@ describe("ChipsInput", () => {
     expect(emitted()["update:validationError"]).toEqual([
       [
         {
-          defaultMessage: "Unvollständiges Datum",
-          field: "identifier",
+          message: "Unvollständiges Datum",
+          instance: "identifier",
         },
       ],
     ])

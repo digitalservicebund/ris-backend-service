@@ -46,7 +46,7 @@ describe("InputField", () => {
 
   it("shows input with given error message", () => {
     renderComponent({
-      validationError: { defaultMessage: "error message", field: "identifier" },
+      validationError: { message: "error message", instance: "identifier" },
     })
 
     const text = screen.getByText("error message") as HTMLElement

@@ -1,8 +1,6 @@
 import { setActivePinia, createPinia } from "pinia"
-import {
-  GlobalValidationError,
-  useGlobalValidationErrorStore,
-} from "@/stores/useGlobalValidationErrorStore"
+import { ValidationError } from "@/shared/components/input/types"
+import { useGlobalValidationErrorStore } from "@/stores/globalValidationErrorStore"
 
 describe("validationErrorStore", () => {
   beforeEach(() => {
@@ -11,18 +9,18 @@ describe("validationErrorStore", () => {
 
   it("is empty on initialization", () => {
     const store = useGlobalValidationErrorStore()
-    expect(store.validationErrors).toEqual([])
+    expect(store.getAll().value).toEqual([])
   })
 
   it("adds all errors", () => {
     const store = useGlobalValidationErrorStore()
-    const error1: GlobalValidationError = {
+    const error1: ValidationError = {
       code: "ERROR_CODE",
       message: "Some error message",
       instance: "foo/bar",
     }
 
-    const error2: GlobalValidationError = {
+    const error2: ValidationError = {
       code: "ERROR_CODE",
       message: "Some error message",
       instance: "foo/die",
@@ -30,7 +28,7 @@ describe("validationErrorStore", () => {
 
     store.add(error1, error2)
 
-    const error3: GlobalValidationError = {
+    const error3: ValidationError = {
       code: "ERROR_CODE",
       message: "Some error message",
       instance: "other",
@@ -38,7 +36,7 @@ describe("validationErrorStore", () => {
 
     store.add(error3)
 
-    expect(store.validationErrors).toEqual([error1, error2, error3])
+    expect(store.getAll().value).toEqual([error1, error2, error3])
     expect(store.getByScope("foo").value).toEqual([error1, error2])
     expect(store.getByInstance("foo/bar").value).toEqual([error1])
     expect(store.getByInstance("foo/die").value).toEqual([error2])
@@ -46,7 +44,7 @@ describe("validationErrorStore", () => {
 
   it("retrieve errors after adding single errors by instance", () => {
     const store = useGlobalValidationErrorStore()
-    const error: GlobalValidationError = {
+    const error: ValidationError = {
       code: "ERROR_CODE",
       message: "Some error message",
       instance: "norms/1234/title",
@@ -66,7 +64,7 @@ describe("validationErrorStore", () => {
 
   it("retrieve errors by scope", () => {
     const store = useGlobalValidationErrorStore()
-    const fooBar: GlobalValidationError = {
+    const fooBar: ValidationError = {
       code: "ERROR_CODE",
       message: "Some error message",
       instance: "foo/bar",
@@ -74,7 +72,7 @@ describe("validationErrorStore", () => {
 
     store.add(fooBar)
 
-    const fooBarBaz: GlobalValidationError = {
+    const fooBarBaz: ValidationError = {
       code: "ERROR_CODE",
       message: "Some error message",
       instance: "foo/bar/baz",
@@ -83,7 +81,7 @@ describe("validationErrorStore", () => {
     store.add(fooBarBaz)
 
     // instance 'foobar' should not be in the same scope as 'foo' (same prefix)
-    const foobar: GlobalValidationError = {
+    const foobar: ValidationError = {
       code: "ERROR_CODE",
       message: "Some error message",
       instance: "foobar",
@@ -97,7 +95,7 @@ describe("validationErrorStore", () => {
 
   it("retrieve children", () => {
     const store = useGlobalValidationErrorStore()
-    const fooBar: GlobalValidationError = {
+    const fooBar: ValidationError = {
       code: "ERROR_CODE",
       message: "Some error message",
       instance: "foo/bar",
@@ -105,7 +103,7 @@ describe("validationErrorStore", () => {
 
     store.add(fooBar)
 
-    const fooBarBaz: GlobalValidationError = {
+    const fooBarBaz: ValidationError = {
       code: "ERROR_CODE",
       message: "Some error message",
       instance: "foo/bar/baz",
@@ -114,7 +112,7 @@ describe("validationErrorStore", () => {
     store.add(fooBarBaz)
 
     // instance 'foobar' should not be in the same scope as 'foo' (same prefix)
-    const foobar: GlobalValidationError = {
+    const foobar: ValidationError = {
       code: "ERROR_CODE",
       message: "Some error message",
       instance: "foobar",
@@ -135,35 +133,42 @@ describe("validationErrorStore", () => {
     })
 
     store.add({
-      code: "ERROR_CODE",
+      code: "ERROR_CODE_1",
       message: "Some error message",
       instance: "norms/1234",
     })
 
-    store.add({
+    const matchingPrefixError: ValidationError = {
       code: "ERROR_CODE",
+      message: "Some error message",
+      instance: "norms/12345",
+    }
+    store.add(matchingPrefixError)
+
+    store.add({
+      code: "ERROR_CODE_2",
       message: "Some error message",
       instance: "norms/1234/title",
     })
 
     store.add({
-      code: "ERROR_CODE",
+      code: "ERROR_CODE_3",
       message: "Some error message",
       instance: "norms/1234/sub",
     })
 
-    const unrelatedError: GlobalValidationError = {
+    const unrelatedError: ValidationError = {
       code: "ERROR_CODE",
       message: "Some error message",
       instance: "norms/9999/title",
     }
-
     store.add(unrelatedError)
 
     store.removeByScope("norms/1234")
 
     expect(store.getByScope("norms/1234").value).toEqual([])
     expect(store.getByScope("norms/9999").value).toEqual([unrelatedError])
+    expect(store.getByScope("norms/12345").value).toEqual([matchingPrefixError])
   })
 
   it("reset removes all entries", () => {
@@ -189,7 +194,7 @@ describe("validationErrorStore", () => {
 
     store.reset()
 
-    expect(store.validationErrors).toEqual([])
+    expect(store.getAll().value).toEqual([])
     expect(store.getByScope("norms").value).toEqual([])
     expect(store.getByInstance("norms/1234/title").value).toEqual([])
   })

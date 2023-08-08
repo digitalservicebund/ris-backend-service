@@ -1,8 +1,11 @@
 import userEvent from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
-import { ValidationError } from "../../src/shared/components/input/types"
 import InputElement from "@/shared/components/input/InputElement.vue"
-import { InputType, ModelType } from "@/shared/components/input/types"
+import {
+  ValidationError,
+  InputType,
+  ModelType,
+} from "@/shared/components/input/types"
 
 function renderComponent(options?: {
   id?: string
@@ -69,8 +72,8 @@ describe("InputElement", () => {
       type: InputType.DATE,
       modelValue: "2021-02-29",
       validationError: {
-        defaultMessage: "Entscheidungsdatum ist kein valides Datum",
-        field: "Testfeld",
+        message: "Entscheidungsdatum ist kein valides Datum",
+        instance: "Testfeld",
       },
     })
 
@@ -85,9 +88,8 @@ describe("InputElement", () => {
       type: InputType.DATE,
       modelValue: "2034-02-10",
       validationError: {
-        defaultMessage:
-          "Das Entscheidungsdatum darf nicht in der Zukunft liegen",
-        field: "Testfeld",
+        message: "Das Entscheidungsdatum darf nicht in der Zukunft liegen",
+        instance: "Testfeld",
       },
     })
 

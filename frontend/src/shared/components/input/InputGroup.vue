@@ -100,7 +100,7 @@ watch(
           :validation-error="
             props.validationErrors &&
             props.validationErrors.find(
-              (err) => err.field.split('\.')[1] === field.name,
+              (err) => err.instance.split('\.')[1] === field.name,
             )
           "
         />

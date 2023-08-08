@@ -209,6 +209,7 @@ export type ModelType =
   | TextaraInputModelType
 
 export type ValidationError = {
-  defaultMessage: string
-  field: string
+  code?: string
+  message: string
+  instance: string
 }
