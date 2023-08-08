@@ -4,7 +4,6 @@ import ComboboxInput from "@/components/ComboboxInput.vue"
 import { PublicationState } from "@/domain/documentUnit"
 import { DocumentUnitListEntry } from "@/domain/documentUnitListEntry"
 import ComboboxItemService from "@/services/comboboxItemService"
-import Checkbox from "@/shared/components/input/CheckboxInput.vue"
 import DateInput from "@/shared/components/input/DateInput.vue"
 import DropdownInput from "@/shared/components/input/DropdownInput.vue"
 import InputField from "@/shared/components/input/InputField.vue"
@@ -75,17 +74,6 @@ const publishingStateModel = computed({
       </InputField>
     </div>
     <div>
-      <InputField
-        id="documentationOffice"
-        v-slot="{ id }"
-        label="Nur meine Dokstelle"
-      >
-        <Checkbox
-          :id="id"
-          v-model="undefined"
-          aria-label="Nur meine Dokstelle"
-        />
-      </InputField>
       <TextButton
         label="Ergebnisse anzeigen"
         @click="emit('search', searchEntry)"
