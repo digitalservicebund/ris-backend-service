@@ -33,7 +33,7 @@ export interface BaseInputAttributes {
 export interface BaseInputField {
   name: string
   type: InputType
-  label?: string
+  label: string
   required?: boolean
   inputAttributes: BaseInputAttributes
 }

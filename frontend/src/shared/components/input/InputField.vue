@@ -4,17 +4,17 @@ import { ValidationError } from "@/shared/components/input/types"
 
 interface Props {
   id: string
-  label?: string | string[]
+  label: string | string[]
   required?: boolean
   labelPosition?: LabelPosition
   validationError?: ValidationError
+  visuallyHideLabel?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
   validationError: undefined,
   required: false,
   labelPosition: LabelPosition.TOP,
-  label: undefined,
 })
 
 defineSlots<{
@@ -22,32 +22,38 @@ defineSlots<{
     id: Props["id"]
     hasError: boolean
     updateValidationError: typeof updateValidationError
-  }): any // eslint-disable-line @typescript-eslint/no-explicit-any
+  }): unknown
 }>()
 
-const localValidationError = ref()
+/* -------------------------------------------------- *
+ * Label                                              *
+ * -------------------------------------------------- */
 
 const wrapperClasses = computed(() => ({
-  "flex-col":
-    props.labelPosition === LabelPosition.TOP ||
-    props.labelPosition === LabelPosition.BOTTOM,
-  "flex-row":
-    props.labelPosition === LabelPosition.RIGHT ||
-    props.labelPosition === LabelPosition.LEFT,
+  "flex-col": props.labelPosition === LabelPosition.TOP,
+  "flex-row": props.labelPosition === LabelPosition.RIGHT,
 }))
 
-const labelConverted = computed(() =>
-  Array.isArray(props.label) ? props.label : Array.of(props.label),
-)
+const labelConverted = computed(() => {
+  if (props.label) {
+    return Array.isArray(props.label) ? props.label : [props.label]
+  } else return []
+})
+
+/* -------------------------------------------------- *
+ * Validation error handling                          *
+ * -------------------------------------------------- */
+
+const localValidationError = ref()
 
 function updateValidationError(newValidationError?: ValidationError) {
   localValidationError.value = newValidationError
 }
 
 watch(
-  props,
-  () => {
-    localValidationError.value = props.validationError ?? undefined
+  () => props.validationError,
+  (next) => {
+    localValidationError.value = next
   },
   { immediate: true },
 )
@@ -56,42 +62,30 @@ watch(
 <script lang="ts">
 export enum LabelPosition {
   TOP = "top",
-  BOTTOM = "bottom",
   RIGHT = "right",
-  LEFT = "left",
 }
 </script>
 
 <template>
-  <div class="flex-start mb-16 flex w-full" :class="wrapperClasses">
-    <!-- slot rendered BEFORE label if the label position should be to the right or bottom -->
-    <slot
-      v-if="
-        labelPosition === LabelPosition.RIGHT ||
-        labelPosition === LabelPosition.BOTTOM
-      "
-      :id="id"
-      :has-error="!!validationError"
-      :update-validation-error="updateValidationError"
-    />
-
+  <div class="flex-start mb-16 flex w-full gap-4" :class="wrapperClasses">
     <div
+      v-if="labelConverted.length !== 0"
       class="flex flex-row items-center"
       :class="{
-        'mb-4': !id.includes('nested') && labelPosition === LabelPosition.TOP,
-        'min-h-[24px]': !id.includes('nested'),
+        'order-1': labelPosition === LabelPosition.RIGHT,
+        'sr-only': visuallyHideLabel,
       }"
     >
-      <span v-if="localValidationError" class="material-icons pr-4 text-red-800"
-        >error_outline</span
+      <span
+        v-if="localValidationError"
+        class="material-icons pr-4 text-red-800"
       >
+        error_outline
+      </span>
+
       <label
-        v-if="labelConverted.length !== 0"
         class="ds-label-02-reg grid items-center"
-        :class="{
-          'pr-4': labelPosition === LabelPosition.LEFT,
-          'pl-4': labelPosition === LabelPosition.RIGHT,
-        }"
+        :class="{ 'pl-4': labelPosition === LabelPosition.RIGHT }"
         :for="id"
       >
         <span v-for="(line, index) in labelConverted" :key="line">
@@ -105,12 +99,7 @@ export enum LabelPosition {
       </label>
     </div>
 
-    <!-- slot rendered AFTER label, if the label position should be to the left or top -->
     <slot
-      v-if="
-        labelPosition === LabelPosition.LEFT ||
-        labelPosition === LabelPosition.TOP
-      "
       :id="id"
       :has-error="!!validationError"
       :update-validation-error="updateValidationError"
@@ -118,7 +107,7 @@ export enum LabelPosition {
 
     <div
       v-if="localValidationError"
-      class="ds-label-03-reg my-6 h-16 text-red-800"
+      class="ds-label-03-reg h-16 text-red-800"
       :data-testid="id + '-validationError'"
     >
       {{ localValidationError.message }}

@@ -63,7 +63,7 @@ const error = ref("")
         id="errorTextarea"
         v-slot="{ id, hasError, updateValidationError }"
         label="Textarea"
-        :validation-error="{ defaultMessage: 'Error', field: 'errorTextarea' }"
+        :validation-error="{ message: 'Error', instance: 'errorTextarea' }"
       >
         <TextAreaInput
           :id="id"

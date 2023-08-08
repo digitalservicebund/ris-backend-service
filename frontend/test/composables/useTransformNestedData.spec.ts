@@ -13,15 +13,18 @@ const oneField: InputField[] = [
   {
     name: "nestedInputOfTestKey1AndTestKey2",
     type: InputType.NESTED,
+    label: "",
     inputAttributes: {
       ariaLabel: "baz",
       fields: {
         parent: {
+          label: "",
           name: "testKey1",
           type: InputType.TEXT,
           inputAttributes: { ariaLabel: "foo" },
         },
         child: {
+          label: "",
           name: "testKey2",
           type: InputType.TEXT,
           inputAttributes: { ariaLabel: "bar" },
@@ -36,17 +39,20 @@ const twoFields = [
   {
     name: "nestedInputOfTestKey3AndTestKey4",
     type: InputType.NESTED,
+    label: "",
     inputAttributes: {
       ariaLabel: "baz",
       fields: {
         parent: {
           name: "testKey3",
           type: InputType.TEXT,
+          label: "",
           inputAttributes: { ariaLabel: "foo" },
         },
         child: {
           name: "testKey4",
           type: InputType.TEXT,
+          label: "",
           inputAttributes: { ariaLabel: "bar" },
         },
       },

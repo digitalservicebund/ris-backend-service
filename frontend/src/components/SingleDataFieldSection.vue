@@ -61,6 +61,8 @@ watch(value, () => emit("update:modelValue", value.value), { deep: true })
         :id="id"
         v-slot="{ id: inputElementId, hasError }"
         class="!mb-0"
+        :label="label"
+        visually-hide-label
       >
         <InputElement
           :id="inputElementId"
