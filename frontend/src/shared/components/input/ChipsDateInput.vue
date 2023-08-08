@@ -180,15 +180,13 @@ function validateInput() {
         instance: props.id,
       })
     }
+  } else if (currentInput.value) {
+    emit("update:validationError", {
+      message: "Unvollständiges Datum",
+      instance: props.id,
+    })
   } else {
-    if (currentInput.value) {
-      emit("update:validationError", {
-        message: "Unvollständiges Datum",
-        instance: props.id,
-      })
-    } else {
-      emit("update:validationError", undefined)
-    }
+    emit("update:validationError", undefined)
   }
 }
 
