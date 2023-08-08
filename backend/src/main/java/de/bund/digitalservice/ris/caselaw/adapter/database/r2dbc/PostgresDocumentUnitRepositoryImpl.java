@@ -1199,7 +1199,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
                 DocumentUnitListEntry.builder()
                     .uuid(documentUnitDTO.getUuid())
                     .documentNumber(documentUnitDTO.getDocumentnumber())
-                    .creationTimestamp(documentUnitDTO.getCreationtimestamp())
+                    .decisionDate(documentUnitDTO.getCreationtimestamp())
                     .dataSource(documentUnitDTO.getDataSource())
                     .fileName(documentUnitDTO.getFilename())
                     .documentType(

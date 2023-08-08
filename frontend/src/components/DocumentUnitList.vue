@@ -116,7 +116,7 @@ function onDelete() {
           {{ listEntry.court?.location ? listEntry.court.location : "-" }}
         </div>
         <div class="table-cell p-16">
-          {{ dayjs(listEntry.creationTimestamp).format("DD.MM.YYYY") }}
+          {{ dayjs(listEntry.decisionDate).format("DD.MM.YYYY") }}
         </div>
         <div class="table-cell p-16">
           {{ listEntry.fileNumber ? listEntry.fileNumber : "-" }}
