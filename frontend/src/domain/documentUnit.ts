@@ -49,8 +49,14 @@ export type Texts = {
   decisionReasons?: string
 }
 
+export enum PublicationState {
+  PUBLISHED = "PUBLISHED",
+  UNPUBLISHED = "UNPUBLISHED",
+  PUBLISHING = "PUBLISHING",
+}
+
 export type PublicationStatus = {
-  publicationStatus: "PUBLISHED" | "UNPUBLISHED" | "PUBLISHING"
+  publicationStatus: PublicationState
   withError: boolean
 }
 

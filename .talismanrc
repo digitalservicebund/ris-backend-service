@@ -21,11 +21,13 @@ fileignoreconfig:
 - filename: frontend/test/test-helper/dataGenerators.ts
   checksum: f18eec08456f9d7acdedc51fba7649928e49fe752caaceba5862c8196cc70c8e
 - filename: backend/src/test/kotlin/unit/adapter/input/restapi/controller/GetFileControllerTest.kt
-  checksum: 4f1b9d21ab8630ae8ffb0feae26fb6054ce586bfffd0048f4c1aeaab73694b28
+  checksum: 527612bd680d9d2b7be5b55ad201bfbd94aea3b55d8dd97ae0ceedbee8cfe76d
 - filename: backend/src/test/kotlin/unit/application/service/GetFileServiceTest.kt
-  checksum: d96870998f33fa027c52da99d9eb8192d161b3585eae9a272a2777cdf2d524af
+  checksum: 8133265c6f388df84a3e0f61050428e8628853e0ba80b432e4723750a34b781e
 - filename: frontend/src/main.ts
   checksum: 6da41131746ac5689a7b0a5b65d2967ba0285abe20a20e341ffc92a83218ed0b
+- filename: _site/prototype-footnotes/assets/index-086108b4.js
+  checksum: 0bd435f734159482c18b1f78fbde74f6b3be56604f380ac59405dc240cf8a270
 scopeconfig:
 - scope: node
 allowed_patterns:
