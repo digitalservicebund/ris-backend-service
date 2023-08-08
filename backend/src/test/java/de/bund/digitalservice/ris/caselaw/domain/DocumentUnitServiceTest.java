@@ -34,8 +34,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.domain.Sort.Order;
 import org.springframework.http.HttpHeaders;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -198,7 +196,7 @@ class DocumentUnitServiceTest {
 
   @Test
   void testGetAll() {
-    PageRequest pageRequest = PageRequest.of(0, 10, Sort.by(Order.desc("creationtimestamp")));
+    PageRequest pageRequest = PageRequest.of(0, 10);
     var docOffice = DocumentationOffice.builder().label("do1").build();
 
     UUID docOfficeUuid = UUID.randomUUID();
