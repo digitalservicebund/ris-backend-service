@@ -31,9 +31,9 @@ const localModelValue = computed({
     class="ds-radio focus:!shadow-[inset_0_0_0_0.25rem] focus:!shadow-blue-800"
     :class="{
       'has-error': !!props.validationError,
-      'mr-12': props.size === 'large',
-      'ds-radio-small mr-8': props.size === 'medium',
-      'ds-radio-mini mr-6': props.size === 'small',
+      'mr-8': props.size === 'large',
+      'ds-radio-small mr-4': props.size === 'medium',
+      'ds-radio-mini mr-2': props.size === 'small',
     }"
     type="radio"
   />
