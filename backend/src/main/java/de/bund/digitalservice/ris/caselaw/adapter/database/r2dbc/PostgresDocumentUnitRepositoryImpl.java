@@ -1178,18 +1178,47 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
   public Flux<DocumentUnitListEntry> findAll(
       Pageable pageable, DocumentationOffice documentationOffice) {
     if (log.isDebugEnabled()) {
-      log.debug("find all");
+      log.debug("Find all: {}", documentationOffice);
     }
 
+    return getDocumentUnitListEntries(pageable, documentationOffice, null);
+  }
+
+  public Flux<DocumentUnitListEntry> getByOverviewSearch(
+      Pageable pageable,
+      DocumentationOffice documentationOffice,
+      DocumentUnitListEntry searchInput) {
+    if (log.isDebugEnabled()) {
+      log.debug("Find by overview search: {}, {}", documentationOffice, searchInput);
+    }
+
+    return getDocumentUnitListEntries(pageable, documentationOffice, searchInput);
+  }
+
+  @SuppressWarnings("java:S3358")
+  private Flux<DocumentUnitListEntry> getDocumentUnitListEntries(
+      Pageable pageable,
+      DocumentationOffice documentationOffice,
+      DocumentUnitListEntry searchInput) {
     return documentationOfficeRepository
         .findByLabel(documentationOffice.label())
         .flatMapMany(
             docOffice ->
-                metadataRepository.findAllByDataSourceAndDocumentationOfficeId(
-                    DataSource.NEURIS.name(),
-                    docOffice.getId(),
-                    pageable.getPageSize(),
-                    pageable.getOffset()))
+                searchInput == null
+                    ? metadataRepository.findAllByDataSourceAndDocumentationOfficeId(
+                        DataSource.NEURIS.name(),
+                        docOffice.getId(),
+                        pageable.getPageSize(),
+                        pageable.getOffset())
+                    : metadataRepository.findByOverviewSearch(
+                        docOffice.getId(),
+                        pageable.getPageSize(),
+                        pageable.getOffset(),
+                        searchInput.documentNumber(), // can also be fileNumber
+                        searchInput.court() == null ? null : searchInput.court().type(),
+                        searchInput.court() == null ? null : searchInput.court().location(),
+                        searchInput.decisionDate(),
+                        searchInput.status()))
         .flatMapSequential(this::injectFileNumbers)
         .flatMapSequential(this::injectDocumentType)
         .flatMapSequential(this::injectDocumentationOffice)
@@ -1199,7 +1228,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
                 DocumentUnitListEntry.builder()
                     .uuid(documentUnitDTO.getUuid())
                     .documentNumber(documentUnitDTO.getDocumentnumber())
-                    .decisionDate(documentUnitDTO.getCreationtimestamp())
+                    .decisionDate(documentUnitDTO.getDecisionDate())
                     .dataSource(documentUnitDTO.getDataSource())
                     .fileName(documentUnitDTO.getFilename())
                     .documentType(
@@ -1345,6 +1374,26 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
             docOffice ->
                 metadataRepository.countByDataSourceAndDocumentationOfficeId(
                     dataSource, docOffice.getId()));
+  }
+
+  @Override
+  public Mono<Long> countGetByOverviewSearch(
+      DocumentationOffice documentationOffice, DocumentUnitListEntry searchInput) {
+    if (log.isDebugEnabled()) {
+      log.debug("count for overview search: {}, {}", documentationOffice, searchInput);
+    }
+
+    return documentationOfficeRepository
+        .findByLabel(documentationOffice.label())
+        .flatMap(
+            docOffice ->
+                metadataRepository.countOverviewSearch(
+                    docOffice.getId(),
+                    searchInput.documentNumber(),
+                    searchInput.court() == null ? null : searchInput.court().type(),
+                    searchInput.court() == null ? null : searchInput.court().location(),
+                    searchInput.decisionDate(),
+                    searchInput.status()));
   }
 
   @Override

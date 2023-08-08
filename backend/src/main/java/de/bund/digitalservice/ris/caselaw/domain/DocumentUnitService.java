@@ -198,6 +198,20 @@ public class DocumentUnitService {
         .map(tuple -> new PageImpl<>(tuple.getT1(), pageable, tuple.getT2()));
   }
 
+  public Mono<Page<DocumentUnitListEntry>> getByOverviewSearch(
+      Pageable pageable,
+      DocumentationOffice documentationOffice,
+      DocumentUnitListEntry searchInput) {
+    return repository
+        .getByOverviewSearch(
+            PageRequest.of(pageable.getPageNumber(), pageable.getPageSize()),
+            documentationOffice,
+            searchInput)
+        .collectList()
+        .zipWith(repository.countGetByOverviewSearch(documentationOffice, searchInput))
+        .map(tuple -> new PageImpl<>(tuple.getT1(), pageable, tuple.getT2()));
+  }
+
   public Mono<DocumentUnit> getByDocumentNumber(String documentNumber) {
     return repository.findByDocumentNumber(documentNumber);
   }
