@@ -58,13 +58,17 @@ public interface DatabaseDocumentUnitMetadataRepository
           + "    documentation_office_id = :documentationOfficeId OR"
           + "    status.publication_status IS NULL OR "
           + "    status.publication_status IN ('PUBLISHED', 'PUBLISHING') )";
+  String ORDER_BY_DOCUMENTNUMBER =
+      "ORDER BY "
+          + "SUBSTRING(documentnumber, LENGTH(documentnumber) - 8, 4) DESC, "
+          + "RIGHT(documentnumber, 5) DESC ";
 
   Mono<DocumentUnitMetadataDTO> findByUuid(UUID documentUnitUuid);
 
   @Query(
       "SELECT * FROM doc_unit "
           + ALL_QUERY
-          + "ORDER BY creationtimestamp DESC "
+          + ORDER_BY_DOCUMENTNUMBER
           + "LIMIT :pageSize OFFSET :offset")
   Flux<DocumentUnitMetadataDTO> findAllByDataSourceAndDocumentationOfficeId(
       String dataSource, UUID documentationOfficeId, Integer pageSize, Long offset);
@@ -72,7 +76,7 @@ public interface DatabaseDocumentUnitMetadataRepository
   @Query(
       "SELECT * FROM doc_unit "
           + OVERVIEW_SEARCH_QUERY
-          + "ORDER BY creationtimestamp DESC "
+          + ORDER_BY_DOCUMENTNUMBER
           + "LIMIT :pageSize OFFSET :offset")
   Flux<DocumentUnitMetadataDTO> findByOverviewSearch(
       UUID documentationOfficeId,
