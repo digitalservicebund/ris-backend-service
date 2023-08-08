@@ -192,7 +192,7 @@ public class DocumentUnitService {
         .map(tuple -> new PageImpl<>(tuple.getT1(), pageable, tuple.getT2()));
   }
 
-  public Mono<Page<DocumentUnitListEntry>> getByOverviewSearch(
+  public Mono<Page<DocumentUnitListEntry>> searchByDocumentUnitListEntry(
       Pageable pageable,
       DocumentationOffice documentationOffice,
       DocumentUnitListEntry searchInput) {

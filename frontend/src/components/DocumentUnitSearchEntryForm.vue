@@ -59,7 +59,7 @@ const publishingStateModel = computed({
       <InputField id="date" label="Entscheidungsdatum">
         <DateInput
           id="decisionDate"
-          v-model="searchEntry.creationTimestamp"
+          v-model="searchEntry.decisionDate"
           aria-label="Entscheidungsdatum Suche"
         ></DateInput>
       </InputField>
