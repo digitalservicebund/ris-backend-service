@@ -11,6 +11,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Repository
+@SuppressWarnings("java:S1192")
 public interface DatabaseDocumentUnitMetadataRepository
     extends R2dbcRepository<DocumentUnitMetadataDTO, Long> {
 
