@@ -1,6 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.domain.validator;
 
-import de.bund.digitalservice.ris.caselaw.domain.InvalidSingleNormValue;
+import de.bund.digitalservice.ris.caselaw.domain.InvalidSingleNormValueException;
 import de.bund.digitalservice.ris.caselaw.domain.NormElement;
 import de.bund.digitalservice.ris.caselaw.domain.NormElementRepository;
 import de.bund.digitalservice.ris.caselaw.domain.SingleNormValidationInfo;
@@ -34,7 +34,7 @@ public class SingleNormValidator
 
     try {
       validateSingleNormString(normalizedString, labelNumberDesignationMap);
-    } catch (InvalidSingleNormValue e) {
+    } catch (InvalidSingleNormValueException e) {
       return false;
     }
 
@@ -42,18 +42,23 @@ public class SingleNormValidator
   }
 
   private void validateSingleNormString(String s, Map<String, Boolean> labelNumberDesignationMap)
-      throws InvalidSingleNormValue {
+      throws InvalidSingleNormValueException {
     String remainingString = s;
 
     while (remainingString.length() > 0) {
       String label = longestMatchingPrefix(remainingString, labelNumberDesignationMap.keySet());
 
       if (label == null) {
-        throw new InvalidSingleNormValue(
+        throw new InvalidSingleNormValueException(
             "Expected norm label but found unexpected character sequence.");
       }
 
-      remainingString = stripPrefix(remainingString, label.length());
+      try {
+        remainingString = remainingString.substring(label.length());
+      } catch (StringIndexOutOfBoundsException e) {
+        throw new InvalidSingleNormValueException(
+            "Encountered error when trying to strip label from string.", e);
+      }
 
       if (Boolean.TRUE.equals(labelNumberDesignationMap.get(label))) {
         remainingString = stripOneLeadingWhitespace(remainingString, false);
@@ -82,18 +87,6 @@ public class SingleNormValidator
 		.collect(Collectors.toMap(NormElement::label, NormElement::hasNumberDesignation));
   }
 
-  private String stripPrefix(String s, int length) throws InvalidSingleNormValue {
-    if (s.length() < length) {
-      throw new InvalidSingleNormValue("Prefix longer than string.");
-    }
-
-    if (s.length() == length) {
-      return "";
-    }
-
-    return s.substring(length);
-  }
-
   private String stripOneLeadingWhitespace(String s, boolean relaxed) {
     if (s.startsWith(" ")) {
       return s.substring(1);
@@ -101,13 +94,13 @@ public class SingleNormValidator
       if (relaxed) {
         return s;
       } else {
-        throw new InvalidSingleNormValue("Expected whitespace character missing.");
+        throw new InvalidSingleNormValueException("Expected whitespace character missing.");
       }
     }
   }
 
   private String stripNumberDesignation(String s, Set<String> normLabels)
-      throws InvalidSingleNormValue {
+      throws InvalidSingleNormValueException {
     int numberDesignationEndIndex = s.length() - 1;
     for (String nextLabel : normLabels) {
       int labelIndex = s.indexOf(nextLabel);
@@ -117,9 +110,15 @@ public class SingleNormValidator
     }
 
     if (numberDesignationEndIndex > -1) {
-      return stripPrefix(s, numberDesignationEndIndex + 1);
+      try {
+        return s.substring(numberDesignationEndIndex + 1);
+      } catch (StringIndexOutOfBoundsException e) {
+        throw new InvalidSingleNormValueException(
+            "Encountered error when trying to strip number designation from string.", e);
+      }
     } else {
-      throw new InvalidSingleNormValue("Expected number designation but found a norm label.");
+      throw new InvalidSingleNormValueException(
+          "Expected number designation but found a norm label.");
     }
   }
 
