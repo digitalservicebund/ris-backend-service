@@ -13,8 +13,14 @@ test.describe("a11y of start page (/caselaw)", () => {
   test("delete documentUnit popup", async ({ page, documentNumber }) => {
     await page.goto("/")
     await expect(page.locator("text=Neue Dokumentationseinheit")).toBeVisible()
+    await page
+      .getByLabel("Dokumentnummer oder Aktenzeichen Suche")
+      .fill(documentNumber)
+    await page.getByLabel("Nach Dokumentationseinheiten suchen").click()
     await expect(
-      page.locator(`a[href*="/caselaw/documentunit/${documentNumber}/files"]`),
+      page.locator(".table-row", {
+        hasText: documentNumber,
+      }),
     ).toBeVisible()
     await page
       .locator(".table-row", {
