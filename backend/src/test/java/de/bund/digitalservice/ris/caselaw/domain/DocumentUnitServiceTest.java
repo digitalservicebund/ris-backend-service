@@ -465,6 +465,27 @@ class DocumentUnitServiceTest {
     verify(repository).searchByLinkedDocumentationUnit(proceedingDecision, pageRequest);
   }
 
+  @Test
+  void testSearchByDocumentUnitListEntry() {
+    DocumentationOffice documentationOffice = DocumentationOffice.builder().build();
+    DocumentUnitListEntry documentUnitListEntry = DocumentUnitListEntry.builder().build();
+    PageRequest pageRequest = PageRequest.of(0, 10);
+
+    when(repository.searchByDocumentUnitListEntry(
+            pageRequest, documentationOffice, documentUnitListEntry))
+        .thenReturn(Flux.just(documentUnitListEntry));
+    when(repository.countSearchByDocumentUnitListEntry(documentationOffice, documentUnitListEntry))
+        .thenReturn(Mono.just(1L));
+
+    StepVerifier.create(
+            service.searchByDocumentUnitListEntry(
+                pageRequest, documentationOffice, documentUnitListEntry))
+        .consumeNextWith(pd -> assertEquals(pd.getContent().get(0), documentUnitListEntry))
+        .verifyComplete();
+    verify(repository)
+        .searchByDocumentUnitListEntry(pageRequest, documentationOffice, documentUnitListEntry);
+  }
+
   private CompletableFuture<DeleteObjectResponse> buildEmptyDeleteObjectResponse() {
     return CompletableFuture.completedFuture(DeleteObjectResponse.builder().build());
   }
