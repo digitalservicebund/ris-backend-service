@@ -12,12 +12,8 @@ const searchRunning = ref(false)
 
 const itemsPerPage = 30
 
-async function search(page = 0, listEntry?: DocumentUnitListEntry) {
-  const response = await service.searchByDocumentUnitListEntry(
-    page,
-    itemsPerPage,
-    listEntry,
-  )
+async function getEntries(page: number) {
+  const response = await service.getAllListEntries(page, itemsPerPage)
   if (response.data) {
     documentUnitListEntries.value = response.data.content
     currentPage.value = response.data
@@ -41,7 +37,8 @@ async function handleDelete(documentUnitListEntry: DocumentUnitListEntry) {
 
 async function handleSearch(listEntry: DocumentUnitListEntry) {
   searchRunning.value = true
-  await search(0, listEntry)
+  console.log(listEntry)
+  await getEntries(0)
   searchRunning.value = false
 }
 </script>
@@ -53,7 +50,7 @@ async function handleSearch(listEntry: DocumentUnitListEntry) {
       v-if="currentPage"
       navigation-position="bottom"
       :page="currentPage"
-      @update-page="search"
+      @update-page="getEntries"
     >
       <DocumentUnitList
         v-if="documentUnitListEntries"

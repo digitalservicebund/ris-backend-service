@@ -11,7 +11,6 @@ import errorMessages from "@/shared/i18n/errors.json"
 
 interface DocumentUnitService {
   getAllListEntries: PageableService<DocumentUnitListEntry>
-  searchByDocumentUnitListEntry: PageableService<DocumentUnitListEntry>
   getByDocumentNumber(
     documentNumber: string,
   ): Promise<ServiceResponse<DocumentUnit>>
@@ -38,36 +37,6 @@ const service: DocumentUnitService = {
       }
     }
     return response
-  },
-
-  async searchByDocumentUnitListEntry(
-    page: number,
-    size: number,
-    query: DocumentUnitListEntry,
-  ) {
-    const response = await httpClient.put<
-      DocumentUnitListEntry,
-      Page<DocumentUnitListEntry>
-    >(
-      `caselaw/documentunits/searchByDocumentUnitListEntry?pg=${page}&sz=${size}`,
-      {
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-        },
-      },
-      query,
-    )
-    if (response.status >= 300) {
-      response.error = {
-        title: errorMessages.DOCUMENT_UNIT_SEARCH_FAILED.title,
-      }
-    }
-    response.data = response.data as Page<DocumentUnitListEntry>
-    return {
-      status: response.status,
-      data: response.data,
-    }
   },
 
   async getByDocumentNumber(documentNumber: string) {
@@ -165,7 +134,7 @@ const service: DocumentUnitService = {
       LinkedDocumentUnit,
       Page<LinkedDocumentUnit>
     >(
-      `caselaw/documentunits/searchByLinkedDocumentUnit?pg=${page}&sz=${size}`,
+      `caselaw/documentunits/search?pg=${page}&sz=${size}`,
       {
         headers: {
           Accept: "application/json",

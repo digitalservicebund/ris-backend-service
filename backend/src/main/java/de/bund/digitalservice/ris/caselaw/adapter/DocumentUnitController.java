@@ -103,10 +103,10 @@ public class DocumentUnitController {
         .flatMap(user -> service.getAll(PageRequest.of(page, size), user));
   }
 
-  @PutMapping(value = "/searchByDocumentUnitListEntry")
+  @GetMapping(value = "/overview-search")
   @PreAuthorize("isAuthenticated()")
   // Access rights are being enforced through SQL filtering
-  public Mono<Page<DocumentUnitListEntry>> searchByDocumentUnitListEntry(
+  public Mono<Page<DocumentUnitListEntry>> getByOverviewSearch(
       @RequestParam("pg") int page,
       @RequestParam("sz") int size,
       @RequestBody DocumentUnitListEntry searchInput,
@@ -115,9 +115,7 @@ public class DocumentUnitController {
     return userService
         .getDocumentationOffice(oidcUser)
         .flatMap(
-            user ->
-                service.searchByDocumentUnitListEntry(
-                    PageRequest.of(page, size), user, searchInput));
+            user -> service.getByOverviewSearch(PageRequest.of(page, size), user, searchInput));
   }
 
   @GetMapping(value = "/{documentNumber}")
@@ -178,7 +176,7 @@ public class DocumentUnitController {
     return service.getPublicationHistory(uuid);
   }
 
-  @PutMapping(value = "/searchByLinkedDocumentationUnit")
+  @PutMapping(value = "/search")
   @PreAuthorize("isAuthenticated()")
   public Mono<Page<LinkedDocumentationUnit>> searchByLinkedDocumentationUnit(
       @RequestParam("pg") int page,
