@@ -2,7 +2,7 @@
 import { computed, ref } from "vue"
 import ComboboxInput from "@/components/ComboboxInput.vue"
 import { PublicationState } from "@/domain/documentUnit"
-import { DocumentUnitListEntry } from "@/domain/documentUnitListEntry"
+import DocumentUnitListEntry from "@/domain/documentUnitListEntry"
 import ComboboxItemService from "@/services/comboboxItemService"
 import DateInput from "@/shared/components/input/DateInput.vue"
 import DropdownInput from "@/shared/components/input/DropdownInput.vue"
@@ -18,9 +18,9 @@ const emit = defineEmits<{
 const searchEntry = ref<DocumentUnitListEntry>({} as DocumentUnitListEntry)
 
 const dropdownItems: DropdownItem[] = [
-  { label: "Veröffentlicht", value: "Veröffentlicht" },
-  { label: "Unveröffentlicht", value: "Unveröffentlicht" },
-  { label: "In Veröffentlichung", value: "In Veröffentlichung" },
+  { label: "Veröffentlicht", value: PublicationState.PUBLISHED },
+  { label: "Unveröffentlicht", value: PublicationState.UNPUBLISHED },
+  { label: "In Veröffentlichung", value: PublicationState.PUBLISHING },
 ]
 
 const publishingStateModel = computed({
@@ -59,7 +59,7 @@ const publishingStateModel = computed({
       <InputField id="date" label="Entscheidungsdatum">
         <DateInput
           id="decisionDate"
-          v-model="searchEntry.creationTimestamp"
+          v-model="searchEntry.decisionDate"
           aria-label="Entscheidungsdatum Suche"
         ></DateInput>
       </InputField>

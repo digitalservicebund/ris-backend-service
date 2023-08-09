@@ -103,7 +103,7 @@ public class DocumentUnitController {
         .flatMap(user -> service.getAllDocumentUnitListEntries(PageRequest.of(page, size), user));
   }
 
-  @GetMapping(value = "/search-by-document-unit-list-entry")
+  @PutMapping(value = "/search-by-documentation-unit-list-entry")
   @PreAuthorize("isAuthenticated()")
   // Access rights are being enforced through SQL filtering
   public Mono<Page<DocumentUnitListEntry>> searchByDocumentUnitListEntry(
