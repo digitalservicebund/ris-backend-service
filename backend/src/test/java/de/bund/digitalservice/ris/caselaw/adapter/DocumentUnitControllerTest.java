@@ -17,6 +17,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentUnitTransf
 import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitListEntry;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitPublishException;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
@@ -440,6 +441,27 @@ class DocumentUnitControllerTest {
         .isOk();
 
     verify(service).searchByLinkedDocumentationUnit(linkedDocumentationUnit, pageRequest);
+  }
+
+  @Test
+  void testSearchByDocumentUnitListEntry() {
+    DocumentUnitListEntry documentUnitListEntry = DocumentUnitListEntry.builder().build();
+    PageRequest pageRequest = PageRequest.of(0, 10);
+
+    when(service.searchByDocumentUnitListEntry(pageRequest, docOffice, documentUnitListEntry))
+        .thenReturn(Mono.empty());
+
+    risWebClient
+        .withDefaultLogin()
+        .put()
+        .uri("/api/v1/caselaw/documentunits/search-by-documentation-unit-list-entry?pg=0&sz=10")
+        .header(HttpHeaders.CONTENT_TYPE, "application/json")
+        .bodyValue(documentUnitListEntry)
+        .exchange()
+        .expectStatus()
+        .isOk();
+
+    verify(service).searchByDocumentUnitListEntry(pageRequest, docOffice, documentUnitListEntry);
   }
 
   @Test
