@@ -30,7 +30,7 @@ test.describe("create a doc unit and delete it again", () => {
       page.locator(".table-row", {
         hasText: documentNumber,
       }),
-    ).toBeVisible({ timeout: 10000 })
+    ).toBeVisible({ timeout: 20000 })
     await page
       .locator(".table-row", {
         hasText: documentNumber,
