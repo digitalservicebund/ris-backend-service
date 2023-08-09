@@ -135,7 +135,7 @@ const service: DocumentUnitService = {
       LinkedDocumentUnit,
       Page<LinkedDocumentUnit>
     >(
-      `caselaw/documentunits/search-by-linked-documentationunit?pg=${page}&sz=${size}`,
+      `caselaw/documentunits/search-by-linked-documentation-unit?pg=${page}&sz=${size}`,
       {
         headers: {
           Accept: "application/json",
