@@ -159,22 +159,6 @@ class DocumentUnitControllerTest {
   }
 
   @Test
-  void testGetAll() {
-    // userService.getDocumentationOffice is mocked in @BeforeEach
-    when(service.getAllDocumentUnitListEntries(PageRequest.of(0, 10), docOffice))
-        .thenReturn(Mono.empty());
-    risWebClient
-        .withDefaultLogin()
-        .get()
-        .uri("/api/v1/caselaw/documentunits?pg=0&sz=10")
-        .exchange()
-        .expectStatus()
-        .isOk();
-
-    verify(service).getAllDocumentUnitListEntries(PageRequest.of(0, 10), docOffice);
-  }
-
-  @Test
   void testGetByDocumentnumber() {
     when(service.getByDocumentNumber("ABCD202200001"))
         .thenReturn(
@@ -454,7 +438,7 @@ class DocumentUnitControllerTest {
     risWebClient
         .withDefaultLogin()
         .put()
-        .uri("/api/v1/caselaw/documentunits/search-by-documentation-unit-list-entry?pg=0&sz=10")
+        .uri("/api/v1/caselaw/documentunits/search-by-document-unit-list-entry?pg=0&sz=10")
         .header(HttpHeaders.CONTENT_TYPE, "application/json")
         .bodyValue(documentUnitListEntry)
         .exchange()

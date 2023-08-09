@@ -3,7 +3,6 @@ package de.bund.digitalservice.ris.caselaw.domain;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.any;
@@ -18,11 +17,9 @@ import static org.mockito.Mockito.when;
 
 import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentUnitStatusService;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentationOfficeRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentationOfficeDTO;
 import jakarta.validation.Validator;
 import java.nio.ByteBuffer;
 import java.time.Instant;
-import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
@@ -192,35 +189,6 @@ class DocumentUnitServiceTest {
 
     verify(s3AsyncClient).putObject(any(PutObjectRequest.class), any(AsyncRequestBody.class));
     verify(repository, times(0)).save(any(DocumentUnit.class));
-  }
-
-  @Test
-  void testGetAll() {
-    PageRequest pageRequest = PageRequest.of(0, 10);
-    var docOffice = DocumentationOffice.builder().label("do1").build();
-
-    UUID docOfficeUuid = UUID.randomUUID();
-    List<DocumentUnitListEntry> entries =
-        Arrays.asList(
-            DocumentUnitListEntry.builder().documentationOffice(docOffice).build(),
-            DocumentUnitListEntry.builder().documentationOffice(docOffice).build());
-    when(documentationOfficeRepository.findByLabel("do1"))
-        .thenReturn(
-            Mono.just(DocumentationOfficeDTO.builder().label("do1").id(docOfficeUuid).build()));
-    when(repository.getAllDocumentUnitListEntries(pageRequest, docOffice))
-        .thenReturn(Flux.fromIterable(entries));
-    when(repository.countGetAllDocumentUnitListEntries(DataSource.NEURIS, docOffice))
-        .thenReturn(Mono.just((long) entries.size()));
-
-    StepVerifier.create(service.getAllDocumentUnitListEntries(pageRequest, docOffice))
-        .assertNext(
-            page -> {
-              assertEquals(entries.size(), page.getNumberOfElements());
-              assertTrue(entries.containsAll(page.getContent()));
-            })
-        .verifyComplete();
-
-    verify(repository).getAllDocumentUnitListEntries(pageRequest, docOffice);
   }
 
   @Test

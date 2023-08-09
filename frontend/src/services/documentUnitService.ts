@@ -171,7 +171,7 @@ const service: DocumentUnitService = {
       DocumentUnitListEntry,
       Page<DocumentUnitListEntry>
     >(
-      `caselaw/documentunits/search-by-documentation-unit-list-entry?pg=${page}&sz=${size}`,
+      `caselaw/documentunits/search-by-document-unit-list-entry?pg=${page}&sz=${size}`,
       {
         headers: {
           Accept: "application/json",

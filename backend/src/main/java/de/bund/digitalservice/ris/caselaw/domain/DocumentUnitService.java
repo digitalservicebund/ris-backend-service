@@ -180,17 +180,6 @@ public class DocumentUnitService {
         .flatMap(Function.identity());
   }
 
-  public Mono<Page<DocumentUnitListEntry>> getAllDocumentUnitListEntries(
-      Pageable pageable, DocumentationOffice documentationOffice) {
-    return repository
-        .getAllDocumentUnitListEntries(
-            PageRequest.of(pageable.getPageNumber(), pageable.getPageSize()), documentationOffice)
-        .collectList()
-        .zipWith(
-            repository.countGetAllDocumentUnitListEntries(DataSource.NEURIS, documentationOffice))
-        .map(tuple -> new PageImpl<>(tuple.getT1(), pageable, tuple.getT2()));
-  }
-
   public Mono<Page<DocumentUnitListEntry>> searchByDocumentUnitListEntry(
       Pageable pageable,
       DocumentationOffice documentationOffice,

@@ -90,20 +90,7 @@ public class DocumentUnitController {
         .onErrorReturn(ResponseEntity.internalServerError().body(DocumentUnit.builder().build()));
   }
 
-  @GetMapping(value = "")
-  @PreAuthorize("isAuthenticated()")
-  // Access rights are being enforced through SQL filtering
-  public Mono<Page<DocumentUnitListEntry>> getAllDocumentUnitListEntries(
-      @RequestParam("pg") int page,
-      @RequestParam("sz") int size,
-      @AuthenticationPrincipal OidcUser oidcUser) {
-
-    return userService
-        .getDocumentationOffice(oidcUser)
-        .flatMap(user -> service.getAllDocumentUnitListEntries(PageRequest.of(page, size), user));
-  }
-
-  @PutMapping(value = "/search-by-documentation-unit-list-entry")
+  @PutMapping(value = "/search-by-document-unit-list-entry")
   @PreAuthorize("isAuthenticated()")
   // Access rights are being enforced through SQL filtering
   public Mono<Page<DocumentUnitListEntry>> searchByDocumentUnitListEntry(

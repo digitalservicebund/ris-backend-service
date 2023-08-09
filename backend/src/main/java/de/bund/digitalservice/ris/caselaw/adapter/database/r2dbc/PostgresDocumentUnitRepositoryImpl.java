@@ -1175,15 +1175,6 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
     return list.isEmpty() ? null : list.toArray(Long[]::new);
   }
 
-  public Flux<DocumentUnitListEntry> getAllDocumentUnitListEntries(
-      Pageable pageable, DocumentationOffice documentationOffice) {
-    if (log.isDebugEnabled()) {
-      log.debug("Find all: {}", documentationOffice);
-    }
-
-    return getDocumentUnitListEntries(pageable, documentationOffice, null);
-  }
-
   public Flux<DocumentUnitListEntry> searchByDocumentUnitListEntry(
       Pageable pageable,
       DocumentationOffice documentationOffice,
@@ -1192,35 +1183,19 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
       log.debug("Find by overview search: {}, {}", documentationOffice, searchInput);
     }
 
-    return getDocumentUnitListEntries(pageable, documentationOffice, searchInput);
-  }
-
-  @SuppressWarnings("java:S3358")
-  private Flux<DocumentUnitListEntry> getDocumentUnitListEntries(
-      Pageable pageable,
-      DocumentationOffice documentationOffice,
-      DocumentUnitListEntry searchInput) {
     return documentationOfficeRepository
         .findByLabel(documentationOffice.label())
         .flatMapMany(
             docOffice ->
-                searchInput == null
-                    ? metadataRepository.getAllDocumentUnitListEntries(
-                        DataSource.NEURIS.name(),
-                        docOffice.getId(),
-                        pageable.getPageSize(),
-                        pageable.getOffset())
-                    : metadataRepository.searchByDocumentUnitListEntry(
-                        docOffice.getId(),
-                        pageable.getPageSize(),
-                        pageable.getOffset(),
-                        searchInput.documentNumber(), // can also be fileNumber
-                        searchInput.court() == null ? null : searchInput.court().type(),
-                        searchInput.court() == null ? null : searchInput.court().location(),
-                        searchInput.decisionDate(),
-                        searchInput.status() == null
-                            ? null
-                            : searchInput.status().publicationStatus()))
+                metadataRepository.searchByDocumentUnitListEntry(
+                    docOffice.getId(),
+                    pageable.getPageSize(),
+                    pageable.getOffset(),
+                    searchInput.documentNumber(), // can also be fileNumber
+                    searchInput.court() == null ? null : searchInput.court().type(),
+                    searchInput.court() == null ? null : searchInput.court().location(),
+                    searchInput.decisionDate(),
+                    searchInput.status() == null ? null : searchInput.status().publicationStatus()))
         .flatMapSequential(this::injectFileNumbers)
         .flatMapSequential(this::injectDocumentType)
         .flatMapSequential(this::injectDocumentationOffice)
@@ -1360,22 +1335,6 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
   @Override
   public Mono<Long> count() {
     return metadataRepository.count();
-  }
-
-  @Override
-  public Mono<Long> countGetAllDocumentUnitListEntries(
-      DataSource dataSource, DocumentationOffice documentationOffice) {
-    if (log.isDebugEnabled()) {
-      log.debug(
-          "count by data source and documentation office: {}, {}", dataSource, documentationOffice);
-    }
-
-    return documentationOfficeRepository
-        .findByLabel(documentationOffice.label())
-        .flatMap(
-            docOffice ->
-                metadataRepository.countGetAllDocumentUnitListEntries(
-                    dataSource, docOffice.getId()));
   }
 
   @Override
