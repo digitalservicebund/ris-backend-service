@@ -10,10 +10,6 @@ test.skip(
 
 test.beforeEach(async ({ page, documentNumber }) => {
   await navigateToFiles(page, documentNumber)
-  await page.goto("/")
-  await page
-    .locator(`a[href*="/caselaw/documentunit/${documentNumber}/files"]`)
-    .click()
 })
 
 test("copy-paste from side panel", async ({ page }) => {

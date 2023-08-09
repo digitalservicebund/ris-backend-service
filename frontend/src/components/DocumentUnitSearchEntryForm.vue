@@ -42,8 +42,8 @@ const publishingStateModel = computed({
         <TextInput
           id="documentNumber"
           v-model="searchEntry.documentNumber"
-          aria-label="Dokumentnummer Suche"
-          placeholder="Dokumentnummer"
+          aria-label="Dokumentnummer oder Aktenzeichen Suche"
+          placeholder="Dokumentnummeroder Aktenzeichen"
         ></TextInput>
       </InputField>
       <InputField id="court" label="Gericht">
@@ -75,6 +75,7 @@ const publishingStateModel = computed({
     </div>
     <div>
       <TextButton
+        aria-label="Nach Dokumentationseinheiten suchen"
         label="Ergebnisse anzeigen"
         @click="emit('search', searchEntry)"
       />
