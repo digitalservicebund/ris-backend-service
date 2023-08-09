@@ -84,7 +84,7 @@ public class SingleNormValidator
                 // for "EinigVtr" normAbbreviation, only get EINIGUNGS_VERTRAG codes
                 "EinigVtr".equals(normAbbreviation)
                     == NormCode.EINIGUNGS_VERTRAG.name().equals(normElement.normCode()))
-		.collect(Collectors.toMap(NormElement::label, NormElement::hasNumberDesignation));
+        .collect(Collectors.toMap(NormElement::label, NormElement::hasNumberDesignation));
   }
 
   private String stripOneLeadingWhitespace(String s, boolean relaxed) {
