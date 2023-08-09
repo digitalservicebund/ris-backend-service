@@ -75,7 +75,7 @@ class PostgresDocumentUnitRepositoryImplTest {
     Sort sort = Sort.unsorted();
     var documentationOfficeId = UUID.randomUUID();
     Mockito.when(
-            metadataRepository.findAllByDataSourceAndDocumentationOfficeId(
+            metadataRepository.getAllDocumentUnitListEntries(
                 DataSource.NEURIS.name(), documentationOfficeId, 10, 0L))
         .thenReturn(Flux.empty());
 
@@ -85,12 +85,11 @@ class PostgresDocumentUnitRepositoryImplTest {
                 DocumentationOfficeDTO.builder().id(documentationOfficeId).label("Test").build()));
 
     StepVerifier.create(
-            postgresDocumentUnitRepository.findAll(
+            postgresDocumentUnitRepository.getAllDocumentUnitListEntries(
                 PageRequest.of(0, 10, sort), DocumentationOffice.builder().label("Test").build()))
         .verifyComplete();
 
     verify(metadataRepository)
-        .findAllByDataSourceAndDocumentationOfficeId(
-            DataSource.NEURIS.name(), documentationOfficeId, 10, 0L);
+        .getAllDocumentUnitListEntries(DataSource.NEURIS.name(), documentationOfficeId, 10, 0L);
   }
 }

@@ -160,7 +160,8 @@ class DocumentUnitControllerTest {
   @Test
   void testGetAll() {
     // userService.getDocumentationOffice is mocked in @BeforeEach
-    when(service.getAll(PageRequest.of(0, 10), docOffice)).thenReturn(Mono.empty());
+    when(service.getAllDocumentUnitListEntries(PageRequest.of(0, 10), docOffice))
+        .thenReturn(Mono.empty());
     risWebClient
         .withDefaultLogin()
         .get()
@@ -169,7 +170,7 @@ class DocumentUnitControllerTest {
         .expectStatus()
         .isOk();
 
-    verify(service).getAll(PageRequest.of(0, 10), docOffice);
+    verify(service).getAllDocumentUnitListEntries(PageRequest.of(0, 10), docOffice);
   }
 
   @Test
@@ -431,7 +432,7 @@ class DocumentUnitControllerTest {
     risWebClient
         .withDefaultLogin()
         .put()
-        .uri("/api/v1/caselaw/documentunits/search?pg=0&sz=10")
+        .uri("/api/v1/caselaw/documentunits/search-by-linked-documentation-unit?pg=0&sz=10")
         .header(HttpHeaders.CONTENT_TYPE, "application/json")
         .bodyValue(linkedDocumentationUnit)
         .exchange()

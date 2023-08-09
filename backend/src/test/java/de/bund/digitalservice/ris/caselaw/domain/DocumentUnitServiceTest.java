@@ -207,11 +207,12 @@ class DocumentUnitServiceTest {
     when(documentationOfficeRepository.findByLabel("do1"))
         .thenReturn(
             Mono.just(DocumentationOfficeDTO.builder().label("do1").id(docOfficeUuid).build()));
-    when(repository.findAll(pageRequest, docOffice)).thenReturn(Flux.fromIterable(entries));
-    when(repository.countByDataSourceAndDocumentationOffice(DataSource.NEURIS, docOffice))
+    when(repository.getAllDocumentUnitListEntries(pageRequest, docOffice))
+        .thenReturn(Flux.fromIterable(entries));
+    when(repository.countGetAllDocumentUnitListEntries(DataSource.NEURIS, docOffice))
         .thenReturn(Mono.just((long) entries.size()));
 
-    StepVerifier.create(service.getAll(pageRequest, docOffice))
+    StepVerifier.create(service.getAllDocumentUnitListEntries(pageRequest, docOffice))
         .assertNext(
             page -> {
               assertEquals(entries.size(), page.getNumberOfElements());
@@ -219,7 +220,7 @@ class DocumentUnitServiceTest {
             })
         .verifyComplete();
 
-    verify(repository).findAll(pageRequest, docOffice);
+    verify(repository).getAllDocumentUnitListEntries(pageRequest, docOffice);
   }
 
   @Test
@@ -455,7 +456,8 @@ class DocumentUnitServiceTest {
 
     when(repository.searchByLinkedDocumentationUnit(proceedingDecision, pageRequest))
         .thenReturn(Flux.just(proceedingDecision));
-    when(repository.countByLinkedDocumentationUnit(proceedingDecision)).thenReturn(Mono.just(1L));
+    when(repository.countSearchByLinkedDocumentationUnit(proceedingDecision))
+        .thenReturn(Mono.just(1L));
 
     StepVerifier.create(service.searchByLinkedDocumentationUnit(proceedingDecision, pageRequest))
         .consumeNextWith(pd -> assertEquals(pd.getContent().get(0), proceedingDecision))

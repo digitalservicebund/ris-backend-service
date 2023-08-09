@@ -71,7 +71,7 @@ public interface DatabaseDocumentUnitMetadataRepository
           + ALL_QUERY
           + ORDER_BY_DOCUMENTNUMBER
           + "LIMIT :pageSize OFFSET :offset")
-  Flux<DocumentUnitMetadataDTO> findAllByDataSourceAndDocumentationOfficeId(
+  Flux<DocumentUnitMetadataDTO> getAllDocumentUnitListEntries(
       String dataSource, UUID documentationOfficeId, Integer pageSize, Long offset);
 
   @Query(
@@ -79,7 +79,7 @@ public interface DatabaseDocumentUnitMetadataRepository
           + OVERVIEW_SEARCH_QUERY
           + ORDER_BY_DOCUMENTNUMBER
           + "LIMIT :pageSize OFFSET :offset")
-  Flux<DocumentUnitMetadataDTO> findByOverviewSearch(
+  Flux<DocumentUnitMetadataDTO> searchByDocumentUnitListEntry(
       UUID documentationOfficeId,
       Integer pageSize,
       Long offset,
@@ -94,7 +94,7 @@ public interface DatabaseDocumentUnitMetadataRepository
           + SEARCH_QUERY
           + "ORDER BY decision_date DESC, id DESC "
           + "LIMIT :pageSize OFFSET :offset")
-  Flux<DocumentUnitMetadataDTO> findByCourtDateFileNumberAndDocumentType(
+  Flux<DocumentUnitMetadataDTO> searchByLinkedDocumentationUnit(
       String courtType,
       String courtLocation,
       Instant decisionDate,
@@ -104,7 +104,7 @@ public interface DatabaseDocumentUnitMetadataRepository
       Long offset);
 
   @Query("SELECT COUNT(*) FROM doc_unit " + SEARCH_QUERY)
-  Mono<Long> countByCourtDateFileNumberAndDocumentType(
+  Mono<Long> countSearchByLinkedDocumentationUnit(
       String courtType,
       String courtLocation,
       Instant decisionDate,
@@ -112,11 +112,10 @@ public interface DatabaseDocumentUnitMetadataRepository
       Long docTypeId);
 
   @Query("SELECT COUNT(*) FROM doc_unit " + ALL_QUERY)
-  Mono<Long> countByDataSourceAndDocumentationOfficeId(
-      DataSource dataSource, UUID documentationOfficeId);
+  Mono<Long> countGetAllDocumentUnitListEntries(DataSource dataSource, UUID documentationOfficeId);
 
   @Query("SELECT COUNT(*) FROM doc_unit " + OVERVIEW_SEARCH_QUERY)
-  Mono<Long> countOverviewSearch(
+  Mono<Long> countSearchByDocumentUnitListEntry(
       UUID documentationOfficeId,
       String documentNumberOrFileNumber,
       String courtType,

@@ -1098,7 +1098,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
               if (documentTypeDTOId == null && linkedDocumentationUnit.getDocumentType() != null)
                 return Flux.empty();
 
-              return metadataRepository.findByCourtDateFileNumberAndDocumentType(
+              return metadataRepository.searchByLinkedDocumentationUnit(
                   extractCourtType(linkedDocumentationUnit),
                   extractCourtLocation(linkedDocumentationUnit),
                   extractDecisionDate(linkedDocumentationUnit),
@@ -1115,7 +1115,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
   }
 
   @Override
-  public Mono<Long> countByLinkedDocumentationUnit(
+  public Mono<Long> countSearchByLinkedDocumentationUnit(
       LinkedDocumentationUnit linkedDocumentationUnit) {
     return Mono.zip(
             extractDocumentUnitDTOIdsViaFileNumber(linkedDocumentationUnit).collectList(),
@@ -1131,7 +1131,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
               if (documentTypeDTOId == null && linkedDocumentationUnit.getDocumentType() != null)
                 return Mono.just(0L);
 
-              return metadataRepository.countByCourtDateFileNumberAndDocumentType(
+              return metadataRepository.countSearchByLinkedDocumentationUnit(
                   extractCourtType(linkedDocumentationUnit),
                   extractCourtLocation(linkedDocumentationUnit),
                   extractDecisionDate(linkedDocumentationUnit),
@@ -1175,7 +1175,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
     return list.isEmpty() ? null : list.toArray(Long[]::new);
   }
 
-  public Flux<DocumentUnitListEntry> findAll(
+  public Flux<DocumentUnitListEntry> getAllDocumentUnitListEntries(
       Pageable pageable, DocumentationOffice documentationOffice) {
     if (log.isDebugEnabled()) {
       log.debug("Find all: {}", documentationOffice);
@@ -1184,7 +1184,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
     return getDocumentUnitListEntries(pageable, documentationOffice, null);
   }
 
-  public Flux<DocumentUnitListEntry> getByOverviewSearch(
+  public Flux<DocumentUnitListEntry> searchByDocumentUnitListEntry(
       Pageable pageable,
       DocumentationOffice documentationOffice,
       DocumentUnitListEntry searchInput) {
@@ -1205,12 +1205,12 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
         .flatMapMany(
             docOffice ->
                 searchInput == null
-                    ? metadataRepository.findAllByDataSourceAndDocumentationOfficeId(
+                    ? metadataRepository.getAllDocumentUnitListEntries(
                         DataSource.NEURIS.name(),
                         docOffice.getId(),
                         pageable.getPageSize(),
                         pageable.getOffset())
-                    : metadataRepository.findByOverviewSearch(
+                    : metadataRepository.searchByDocumentUnitListEntry(
                         docOffice.getId(),
                         pageable.getPageSize(),
                         pageable.getOffset(),
@@ -1361,7 +1361,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
   }
 
   @Override
-  public Mono<Long> countByDataSourceAndDocumentationOffice(
+  public Mono<Long> countGetAllDocumentUnitListEntries(
       DataSource dataSource, DocumentationOffice documentationOffice) {
     if (log.isDebugEnabled()) {
       log.debug(
@@ -1372,12 +1372,12 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
         .findByLabel(documentationOffice.label())
         .flatMap(
             docOffice ->
-                metadataRepository.countByDataSourceAndDocumentationOfficeId(
+                metadataRepository.countGetAllDocumentUnitListEntries(
                     dataSource, docOffice.getId()));
   }
 
   @Override
-  public Mono<Long> countGetByOverviewSearch(
+  public Mono<Long> countSearchByDocumentUnitListEntry(
       DocumentationOffice documentationOffice, DocumentUnitListEntry searchInput) {
     if (log.isDebugEnabled()) {
       log.debug("count for overview search: {}, {}", documentationOffice, searchInput);
@@ -1387,7 +1387,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
         .findByLabel(documentationOffice.label())
         .flatMap(
             docOffice ->
-                metadataRepository.countOverviewSearch(
+                metadataRepository.countSearchByDocumentUnitListEntry(
                     docOffice.getId(),
                     searchInput.documentNumber(),
                     searchInput.court() == null ? null : searchInput.court().type(),
