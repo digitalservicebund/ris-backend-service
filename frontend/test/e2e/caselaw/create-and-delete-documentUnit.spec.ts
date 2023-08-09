@@ -25,6 +25,7 @@ test.describe("create a doc unit and delete it again", () => {
       .getByLabel("Dokumentnummer oder Aktenzeichen Suche")
       .fill(documentNumber)
     await page.getByLabel("Nach Dokumentationseinheiten suchen").click()
+    await page.getByText(documentNumber).isVisible()
     await expect(
       page.locator(".table-row", {
         hasText: documentNumber,

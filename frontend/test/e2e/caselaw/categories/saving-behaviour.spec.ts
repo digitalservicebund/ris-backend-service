@@ -98,6 +98,7 @@ test.describe("saving behaviour", () => {
       .getByLabel("Dokumentnummer oder Aktenzeichen Suche")
       .fill(fileNumber)
     await page.getByLabel("Nach Dokumentationseinheiten suchen").click()
+    await page.getByText(documentNumber).isVisible()
     await expect(
       page.locator(".table-row", {
         hasText: documentNumber,

@@ -74,6 +74,7 @@ export async function deleteDocumentUnit(page: Page, documentNumber: string) {
     .getByLabel("Dokumentnummer oder Aktenzeichen Suche")
     .fill(documentNumber)
   await page.getByLabel("Nach Dokumentationseinheiten suchen").click()
+  await page.getByText(documentNumber).isVisible()
   await expect(
     page.locator(".table-row", {
       hasText: documentNumber,

@@ -17,6 +17,7 @@ test.describe("a11y of start page (/caselaw)", () => {
       .getByLabel("Dokumentnummer oder Aktenzeichen Suche")
       .fill(documentNumber)
     await page.getByLabel("Nach Dokumentationseinheiten suchen").click()
+    await page.getByText(documentNumber).isVisible()
     await expect(
       page.locator(".table-row", {
         hasText: documentNumber,
