@@ -63,6 +63,8 @@ class SingleNormValidationTest {
       value = {
         ":",
         "AB XY:",
+        "AB  XY:",
+        "AB XYCD VW:",
         "EF:",
         "AB XY EF GH CD 12:",
         "EF GH:",
@@ -92,6 +94,9 @@ class SingleNormValidationTest {
         "EF XY:",
         "AB EF XY GH:",
         "MN OP:",
+        "AB 1CD.2:",
+        "ABXY:",
+        "XY:",
         "IJ KL:EinigVtr",
         "IJ XY KL MN: EinigVtr",
         "AB XY: EinigVtr"
