@@ -92,13 +92,17 @@ test.describe("saving behaviour", () => {
       page,
       { clickSaveButton: true },
     )
-
     await page.goto("/")
     await page
       .getByLabel("Dokumentnummer oder Aktenzeichen Suche")
       .fill(fileNumber)
     await page.getByLabel("Nach Dokumentationseinheiten suchen").click()
-    await page.getByText(documentNumber).isVisible()
+    //TODO: remove the timeout when search performance get better
+    await expect(
+      page.locator(".table-row", {
+        hasText: documentNumber,
+      }),
+    ).toBeVisible({ timeout: 10000 })
     await expect(
       page.locator(".table-row", {
         hasText: documentNumber,
