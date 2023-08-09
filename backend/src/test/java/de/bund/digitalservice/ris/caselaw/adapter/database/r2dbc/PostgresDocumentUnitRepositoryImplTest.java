@@ -8,7 +8,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.Dat
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DatabaseFieldOfLawRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DatabaseNormAbbreviationRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.StateRepository;
-import de.bund.digitalservice.ris.caselaw.domain.DataSource;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitListEntry;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
@@ -71,12 +71,15 @@ class PostgresDocumentUnitRepositoryImplTest {
   }
 
   @Test
-  void testFindAll() {
+  void testSearchByDocumentUnitListEntry() {
     Sort sort = Sort.unsorted();
     var documentationOfficeId = UUID.randomUUID();
+
+    DocumentUnitListEntry documentUnitListEntry = DocumentUnitListEntry.builder().build();
+
     Mockito.when(
-            metadataRepository.findAllByDataSourceAndDocumentationOfficeId(
-                DataSource.NEURIS.name(), documentationOfficeId, 10, 0L))
+            metadataRepository.searchByDocumentUnitListEntry(
+                documentationOfficeId, 10, 0L, null, null, null, null, null))
         .thenReturn(Flux.empty());
 
     Mockito.when(documentationOfficeRepository.findByLabel("Test"))
@@ -85,12 +88,13 @@ class PostgresDocumentUnitRepositoryImplTest {
                 DocumentationOfficeDTO.builder().id(documentationOfficeId).label("Test").build()));
 
     StepVerifier.create(
-            postgresDocumentUnitRepository.findAll(
-                PageRequest.of(0, 10, sort), DocumentationOffice.builder().label("Test").build()))
+            postgresDocumentUnitRepository.searchByDocumentUnitListEntry(
+                PageRequest.of(0, 10, sort),
+                DocumentationOffice.builder().label("Test").build(),
+                documentUnitListEntry))
         .verifyComplete();
 
     verify(metadataRepository)
-        .findAllByDataSourceAndDocumentationOfficeId(
-            DataSource.NEURIS.name(), documentationOfficeId, 10, 0L);
+        .searchByDocumentUnitListEntry(documentationOfficeId, 10, 0L, null, null, null, null, null);
   }
 }

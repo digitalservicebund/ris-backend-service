@@ -30,19 +30,14 @@ public interface DocumentUnitRepository {
 
   Mono<Long> count();
 
-  Mono<Long> countByLinkedDocumentationUnit(LinkedDocumentationUnit linkedDocumentationUnit);
+  Mono<Long> countSearchByLinkedDocumentationUnit(LinkedDocumentationUnit linkedDocumentationUnit);
 
-  Mono<Long> countByDataSourceAndDocumentationOffice(
-      DataSource dataSource, DocumentationOffice documentationOfficeId);
+  Mono<Long> countSearchByDocumentUnitListEntry(
+      DocumentationOffice documentationOffice, DocumentUnitListEntry searchInput);
 
-  Mono<Long> countGetByOverviewSearch(
-      DocumentationOffice documentationOfficeId, DocumentUnitListEntry searchInput);
-
-  Flux<DocumentUnitListEntry> findAll(Pageable pageable, DocumentationOffice documentationOfficeId);
-
-  Flux<DocumentUnitListEntry> getByOverviewSearch(
+  Flux<DocumentUnitListEntry> searchByDocumentUnitListEntry(
       Pageable pageable,
-      DocumentationOffice documentationOfficeId,
+      DocumentationOffice documentationOffice,
       DocumentUnitListEntry searchInput);
 
   <T extends LinkedDocumentationUnit>

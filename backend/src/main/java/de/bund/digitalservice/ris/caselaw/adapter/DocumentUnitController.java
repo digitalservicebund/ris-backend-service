@@ -90,23 +90,10 @@ public class DocumentUnitController {
         .onErrorReturn(ResponseEntity.internalServerError().body(DocumentUnit.builder().build()));
   }
 
-  @GetMapping(value = "")
+  @PutMapping(value = "/search-by-document-unit-list-entry")
   @PreAuthorize("isAuthenticated()")
   // Access rights are being enforced through SQL filtering
-  public Mono<Page<DocumentUnitListEntry>> getAll(
-      @RequestParam("pg") int page,
-      @RequestParam("sz") int size,
-      @AuthenticationPrincipal OidcUser oidcUser) {
-
-    return userService
-        .getDocumentationOffice(oidcUser)
-        .flatMap(user -> service.getAll(PageRequest.of(page, size), user));
-  }
-
-  @GetMapping(value = "/overview-search")
-  @PreAuthorize("isAuthenticated()")
-  // Access rights are being enforced through SQL filtering
-  public Mono<Page<DocumentUnitListEntry>> getByOverviewSearch(
+  public Mono<Page<DocumentUnitListEntry>> searchByDocumentUnitListEntry(
       @RequestParam("pg") int page,
       @RequestParam("sz") int size,
       @RequestBody DocumentUnitListEntry searchInput,
@@ -115,7 +102,9 @@ public class DocumentUnitController {
     return userService
         .getDocumentationOffice(oidcUser)
         .flatMap(
-            user -> service.getByOverviewSearch(PageRequest.of(page, size), user, searchInput));
+            user ->
+                service.searchByDocumentUnitListEntry(
+                    PageRequest.of(page, size), user, searchInput));
   }
 
   @GetMapping(value = "/{documentNumber}")
@@ -176,7 +165,7 @@ public class DocumentUnitController {
     return service.getPublicationHistory(uuid);
   }
 
-  @PutMapping(value = "/search")
+  @PutMapping(value = "/search-by-linked-documentation-unit")
   @PreAuthorize("isAuthenticated()")
   public Mono<Page<LinkedDocumentationUnit>> searchByLinkedDocumentationUnit(
       @RequestParam("pg") int page,

@@ -21,8 +21,14 @@ test.describe("create a doc unit and delete it again", () => {
 
   caselawTest("cancel delete doc unit", async ({ page, documentNumber }) => {
     await page.goto("/")
+    await page
+      .getByLabel("Dokumentnummer oder Aktenzeichen Suche")
+      .fill(documentNumber)
+    await page.getByLabel("Nach Dokumentationseinheiten suchen").click()
     await expect(
-      page.locator(`a[href*="/caselaw/documentunit/${documentNumber}/files"]`),
+      page.locator(".table-row", {
+        hasText: documentNumber,
+      }),
     ).toBeVisible()
     await page
       .locator(".table-row", {

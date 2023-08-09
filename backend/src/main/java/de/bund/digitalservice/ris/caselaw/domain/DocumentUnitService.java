@@ -180,29 +180,17 @@ public class DocumentUnitService {
         .flatMap(Function.identity());
   }
 
-  public Mono<Page<DocumentUnitListEntry>> getAll(
-      Pageable pageable, DocumentationOffice documentationOffice) {
-    return repository
-        .findAll(
-            PageRequest.of(pageable.getPageNumber(), pageable.getPageSize()), documentationOffice)
-        .collectList()
-        .zipWith(
-            repository.countByDataSourceAndDocumentationOffice(
-                DataSource.NEURIS, documentationOffice))
-        .map(tuple -> new PageImpl<>(tuple.getT1(), pageable, tuple.getT2()));
-  }
-
-  public Mono<Page<DocumentUnitListEntry>> getByOverviewSearch(
+  public Mono<Page<DocumentUnitListEntry>> searchByDocumentUnitListEntry(
       Pageable pageable,
       DocumentationOffice documentationOffice,
       DocumentUnitListEntry searchInput) {
     return repository
-        .getByOverviewSearch(
+        .searchByDocumentUnitListEntry(
             PageRequest.of(pageable.getPageNumber(), pageable.getPageSize()),
             documentationOffice,
             searchInput)
         .collectList()
-        .zipWith(repository.countGetByOverviewSearch(documentationOffice, searchInput))
+        .zipWith(repository.countSearchByDocumentUnitListEntry(documentationOffice, searchInput))
         .map(tuple -> new PageImpl<>(tuple.getT1(), pageable, tuple.getT2()));
   }
 
@@ -393,7 +381,7 @@ public class DocumentUnitService {
     return repository
         .searchByLinkedDocumentationUnit(linkedDocumentationUnit, pageable)
         .collectList()
-        .zipWith(repository.countByLinkedDocumentationUnit(linkedDocumentationUnit))
+        .zipWith(repository.countSearchByLinkedDocumentationUnit(linkedDocumentationUnit))
         .map(tuple -> new PageImpl<>(tuple.getT1(), pageable, tuple.getT2()));
   }
 

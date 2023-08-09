@@ -3,7 +3,7 @@ import httpClient, {
   FailedValidationServerResponse,
 } from "./httpClient"
 import DocumentUnit from "@/domain/documentUnit"
-import { DocumentUnitListEntry } from "@/domain/documentUnitListEntry"
+import DocumentUnitListEntry from "@/domain/documentUnitListEntry"
 import LinkedDocumentUnit from "@/domain/linkedDocumentUnit"
 import { SingleNormValidationInfo } from "@/domain/normReference"
 import { PageableService, Page } from "@/shared/components/Pagination.vue"
@@ -21,6 +21,7 @@ interface DocumentUnitService {
     LinkedDocumentUnit,
     LinkedDocumentUnit
   >
+  searchByDocumentUnitListEntry: PageableService<DocumentUnitListEntry>
   validateSingleNorm(
     singleNormValidationInfo: SingleNormValidationInfo,
   ): Promise<ServiceResponse<unknown>>
@@ -134,7 +135,7 @@ const service: DocumentUnitService = {
       LinkedDocumentUnit,
       Page<LinkedDocumentUnit>
     >(
-      `caselaw/documentunits/search?pg=${page}&sz=${size}`,
+      `caselaw/documentunits/search-by-linked-documentation-unit?pg=${page}&sz=${size}`,
       {
         headers: {
           Accept: "application/json",
@@ -158,6 +159,36 @@ const service: DocumentUnitService = {
             new LinkedDocumentUnit({ ...decision }),
         ),
       },
+    }
+  },
+
+  async searchByDocumentUnitListEntry(
+    page: number,
+    size: number,
+    query = new DocumentUnitListEntry(),
+  ) {
+    const response = await httpClient.put<
+      DocumentUnitListEntry,
+      Page<DocumentUnitListEntry>
+    >(
+      `caselaw/documentunits/search-by-document-unit-list-entry?pg=${page}&sz=${size}`,
+      {
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+      },
+      query,
+    )
+    if (response.status >= 300) {
+      response.error = {
+        title: errorMessages.DOCUMENT_UNIT_SEARCH_FAILED.title,
+      }
+    }
+    response.data = response.data as Page<DocumentUnitListEntry>
+    return {
+      status: response.status,
+      data: response.data,
     }
   },
 

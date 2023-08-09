@@ -83,13 +83,10 @@ test.describe("saving behaviour", () => {
     await navigateToCategories(page, documentNumber)
 
     const fileNumber = generateString()
-    const ecli = generateString()
 
     await waitForSaving(
       async () => {
         await page.locator("[aria-label='Aktenzeichen']").fill(fileNumber)
-        await page.keyboard.press("Enter")
-        await page.locator("[aria-label='ECLI']").fill(ecli)
         await page.keyboard.press("Enter")
       },
       page,
@@ -97,9 +94,10 @@ test.describe("saving behaviour", () => {
     )
 
     await page.goto("/")
-    await expect(
-      page.locator(`a[href*="/caselaw/documentunit/${documentNumber}/files"]`),
-    ).toBeVisible()
+    await page
+      .getByLabel("Dokumentnummer oder Aktenzeichen Suche")
+      .fill(fileNumber)
+    await page.getByLabel("Nach Dokumentationseinheiten suchen").click()
     await expect(
       page.locator(".table-row", {
         hasText: documentNumber,

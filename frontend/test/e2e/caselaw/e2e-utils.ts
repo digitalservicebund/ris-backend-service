@@ -70,8 +70,14 @@ export async function toggleFieldOfLawSection(page: Page): Promise<void> {
 
 export async function deleteDocumentUnit(page: Page, documentNumber: string) {
   await page.goto("/")
+  await page
+    .getByLabel("Dokumentnummer oder Aktenzeichen Suche")
+    .fill(documentNumber)
+  await page.getByLabel("Nach Dokumentationseinheiten suchen").click()
   await expect(
-    page.locator(`a[href*="/caselaw/documentunit/${documentNumber}/files"]`),
+    page.locator(".table-row", {
+      hasText: documentNumber,
+    }),
   ).toBeVisible()
   await page
     .locator(".table-row", {

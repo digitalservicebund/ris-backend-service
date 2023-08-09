@@ -1098,7 +1098,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
               if (documentTypeDTOId == null && linkedDocumentationUnit.getDocumentType() != null)
                 return Flux.empty();
 
-              return metadataRepository.findByCourtDateFileNumberAndDocumentType(
+              return metadataRepository.searchByLinkedDocumentationUnit(
                   extractCourtType(linkedDocumentationUnit),
                   extractCourtLocation(linkedDocumentationUnit),
                   extractDecisionDate(linkedDocumentationUnit),
@@ -1115,7 +1115,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
   }
 
   @Override
-  public Mono<Long> countByLinkedDocumentationUnit(
+  public Mono<Long> countSearchByLinkedDocumentationUnit(
       LinkedDocumentationUnit linkedDocumentationUnit) {
     return Mono.zip(
             extractDocumentUnitDTOIdsViaFileNumber(linkedDocumentationUnit).collectList(),
@@ -1131,7 +1131,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
               if (documentTypeDTOId == null && linkedDocumentationUnit.getDocumentType() != null)
                 return Mono.just(0L);
 
-              return metadataRepository.countByCourtDateFileNumberAndDocumentType(
+              return metadataRepository.countSearchByLinkedDocumentationUnit(
                   extractCourtType(linkedDocumentationUnit),
                   extractCourtLocation(linkedDocumentationUnit),
                   extractDecisionDate(linkedDocumentationUnit),
@@ -1175,16 +1175,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
     return list.isEmpty() ? null : list.toArray(Long[]::new);
   }
 
-  public Flux<DocumentUnitListEntry> findAll(
-      Pageable pageable, DocumentationOffice documentationOffice) {
-    if (log.isDebugEnabled()) {
-      log.debug("Find all: {}", documentationOffice);
-    }
-
-    return getDocumentUnitListEntries(pageable, documentationOffice, null);
-  }
-
-  public Flux<DocumentUnitListEntry> getByOverviewSearch(
+  public Flux<DocumentUnitListEntry> searchByDocumentUnitListEntry(
       Pageable pageable,
       DocumentationOffice documentationOffice,
       DocumentUnitListEntry searchInput) {
@@ -1192,33 +1183,19 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
       log.debug("Find by overview search: {}, {}", documentationOffice, searchInput);
     }
 
-    return getDocumentUnitListEntries(pageable, documentationOffice, searchInput);
-  }
-
-  @SuppressWarnings("java:S3358")
-  private Flux<DocumentUnitListEntry> getDocumentUnitListEntries(
-      Pageable pageable,
-      DocumentationOffice documentationOffice,
-      DocumentUnitListEntry searchInput) {
     return documentationOfficeRepository
         .findByLabel(documentationOffice.label())
         .flatMapMany(
             docOffice ->
-                searchInput == null
-                    ? metadataRepository.findAllByDataSourceAndDocumentationOfficeId(
-                        DataSource.NEURIS.name(),
-                        docOffice.getId(),
-                        pageable.getPageSize(),
-                        pageable.getOffset())
-                    : metadataRepository.findByOverviewSearch(
-                        docOffice.getId(),
-                        pageable.getPageSize(),
-                        pageable.getOffset(),
-                        searchInput.documentNumber(), // can also be fileNumber
-                        searchInput.court() == null ? null : searchInput.court().type(),
-                        searchInput.court() == null ? null : searchInput.court().location(),
-                        searchInput.decisionDate(),
-                        searchInput.status()))
+                metadataRepository.searchByDocumentUnitListEntry(
+                    docOffice.getId(),
+                    pageable.getPageSize(),
+                    pageable.getOffset(),
+                    searchInput.documentNumber(), // can also be fileNumber
+                    searchInput.court() == null ? null : searchInput.court().type(),
+                    searchInput.court() == null ? null : searchInput.court().location(),
+                    searchInput.decisionDate(),
+                    searchInput.status() == null ? null : searchInput.status().publicationStatus()))
         .flatMapSequential(this::injectFileNumbers)
         .flatMapSequential(this::injectDocumentType)
         .flatMapSequential(this::injectDocumentationOffice)
@@ -1361,23 +1338,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
   }
 
   @Override
-  public Mono<Long> countByDataSourceAndDocumentationOffice(
-      DataSource dataSource, DocumentationOffice documentationOffice) {
-    if (log.isDebugEnabled()) {
-      log.debug(
-          "count by data source and documentation office: {}, {}", dataSource, documentationOffice);
-    }
-
-    return documentationOfficeRepository
-        .findByLabel(documentationOffice.label())
-        .flatMap(
-            docOffice ->
-                metadataRepository.countByDataSourceAndDocumentationOfficeId(
-                    dataSource, docOffice.getId()));
-  }
-
-  @Override
-  public Mono<Long> countGetByOverviewSearch(
+  public Mono<Long> countSearchByDocumentUnitListEntry(
       DocumentationOffice documentationOffice, DocumentUnitListEntry searchInput) {
     if (log.isDebugEnabled()) {
       log.debug("count for overview search: {}, {}", documentationOffice, searchInput);
@@ -1387,13 +1348,15 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
         .findByLabel(documentationOffice.label())
         .flatMap(
             docOffice ->
-                metadataRepository.countOverviewSearch(
+                metadataRepository.countSearchByDocumentUnitListEntry(
                     docOffice.getId(),
                     searchInput.documentNumber(),
                     searchInput.court() == null ? null : searchInput.court().type(),
                     searchInput.court() == null ? null : searchInput.court().location(),
                     searchInput.decisionDate(),
-                    searchInput.status()));
+                    searchInput.status() == null
+                        ? null
+                        : searchInput.status().publicationStatus()));
   }
 
   @Override

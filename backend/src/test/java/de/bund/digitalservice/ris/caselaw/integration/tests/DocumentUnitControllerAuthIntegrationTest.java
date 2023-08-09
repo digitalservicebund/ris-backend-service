@@ -26,6 +26,7 @@ import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresConfig;
 import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
 import de.bund.digitalservice.ris.caselaw.domain.DataSource;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitListEntry;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatus;
 import de.bund.digitalservice.ris.caselaw.domain.EmailPublishService;
@@ -155,15 +156,16 @@ class DocumentUnitControllerAuthIntegrationTest {
     EntityExchangeResult<String> result =
         risWebTestClient
             .withLogin(userOfficeId)
-            .get()
-            .uri("/api/v1/caselaw/documentunits?pg=0&sz=10")
+            .put()
+            .uri("/api/v1/caselaw/documentunits/search-by-document-unit-list-entry?pg=0&sz=10")
+            .bodyValue(DocumentUnitListEntry.builder().build())
             .exchange()
             .expectStatus()
             .isOk()
             .expectBody(String.class)
             .returnResult();
 
-    if (publicationStatus.size() == 0) {
+    if (publicationStatus.isEmpty()) {
       assertThat(extractStatusByUuid(result.getResponseBody(), docUnit.getUuid()))
           .isEqualTo(PUBLISHED.toString());
     } else {
@@ -202,8 +204,9 @@ class DocumentUnitControllerAuthIntegrationTest {
     EntityExchangeResult<String> result =
         risWebTestClient
             .withLogin(userOfficeId)
-            .get()
-            .uri("/api/v1/caselaw/documentunits?pg=0&sz=10")
+            .put()
+            .uri("/api/v1/caselaw/documentunits/search-by-document-unit-list-entry?pg=0&sz=10")
+            .bodyValue(DocumentUnitListEntry.builder().build())
             .exchange()
             .expectStatus()
             .isOk()

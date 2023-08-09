@@ -17,6 +17,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentUnitTransf
 import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitListEntry;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitPublishException;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
@@ -155,21 +156,6 @@ class DocumentUnitControllerTest {
         .exchange()
         .expectStatus()
         .is4xxClientError();
-  }
-
-  @Test
-  void testGetAll() {
-    // userService.getDocumentationOffice is mocked in @BeforeEach
-    when(service.getAll(PageRequest.of(0, 10), docOffice)).thenReturn(Mono.empty());
-    risWebClient
-        .withDefaultLogin()
-        .get()
-        .uri("/api/v1/caselaw/documentunits?pg=0&sz=10")
-        .exchange()
-        .expectStatus()
-        .isOk();
-
-    verify(service).getAll(PageRequest.of(0, 10), docOffice);
   }
 
   @Test
@@ -431,7 +417,7 @@ class DocumentUnitControllerTest {
     risWebClient
         .withDefaultLogin()
         .put()
-        .uri("/api/v1/caselaw/documentunits/search?pg=0&sz=10")
+        .uri("/api/v1/caselaw/documentunits/search-by-linked-documentation-unit?pg=0&sz=10")
         .header(HttpHeaders.CONTENT_TYPE, "application/json")
         .bodyValue(linkedDocumentationUnit)
         .exchange()
@@ -439,6 +425,27 @@ class DocumentUnitControllerTest {
         .isOk();
 
     verify(service).searchByLinkedDocumentationUnit(linkedDocumentationUnit, pageRequest);
+  }
+
+  @Test
+  void testSearchByDocumentUnitListEntry() {
+    DocumentUnitListEntry documentUnitListEntry = DocumentUnitListEntry.builder().build();
+    PageRequest pageRequest = PageRequest.of(0, 10);
+
+    when(service.searchByDocumentUnitListEntry(pageRequest, docOffice, documentUnitListEntry))
+        .thenReturn(Mono.empty());
+
+    risWebClient
+        .withDefaultLogin()
+        .put()
+        .uri("/api/v1/caselaw/documentunits/search-by-document-unit-list-entry?pg=0&sz=10")
+        .header(HttpHeaders.CONTENT_TYPE, "application/json")
+        .bodyValue(documentUnitListEntry)
+        .exchange()
+        .expectStatus()
+        .isOk();
+
+    verify(service).searchByDocumentUnitListEntry(pageRequest, docOffice, documentUnitListEntry);
   }
 
   @Test

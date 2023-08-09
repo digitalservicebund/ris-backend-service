@@ -28,6 +28,7 @@ import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresConfig;
 import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
 import de.bund.digitalservice.ris.caselaw.domain.DataSource;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitListEntry;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.EmailPublishService;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
@@ -115,7 +116,7 @@ class DocumentUnitListEntryIntegrationTest {
                 DocumentUnitDTO.builder()
                     .uuid(UUID.randomUUID())
                     .creationtimestamp(Instant.now())
-                    .documentnumber("1234567890123")
+                    .documentnumber("NEUR202300007")
                     .dataSource(DataSource.NEURIS)
                     .documentationOfficeId(docOfficeDTO.getId())
                     .build())
@@ -126,7 +127,7 @@ class DocumentUnitListEntryIntegrationTest {
                 DocumentUnitDTO.builder()
                     .uuid(UUID.randomUUID())
                     .creationtimestamp(Instant.now())
-                    .documentnumber("MIGRATION")
+                    .documentnumber("MIGR202200012")
                     .dataSource(DataSource.MIGRATION)
                     .build())
             .block();
@@ -151,8 +152,9 @@ class DocumentUnitListEntryIntegrationTest {
 
     risWebTestClient
         .withDefaultLogin()
-        .get()
-        .uri("/api/v1/caselaw/documentunits?pg=0&sz=3")
+        .put()
+        .uri("/api/v1/caselaw/documentunits/search-by-document-unit-list-entry?pg=0&sz=3")
+        .bodyValue(DocumentUnitListEntry.builder().build())
         .exchange()
         .expectStatus()
         .isOk()
@@ -160,7 +162,7 @@ class DocumentUnitListEntryIntegrationTest {
         .jsonPath("$.content")
         .isArray()
         .jsonPath("$.content[0].documentNumber")
-        .isEqualTo("1234567890123")
+        .isEqualTo("NEUR202300007")
         .jsonPath("$.content[0].uuid")
         .isEqualTo(neurisDto.getUuid().toString())
         .jsonPath("$.content[0].fileNumber")
@@ -170,7 +172,7 @@ class DocumentUnitListEntryIntegrationTest {
         .jsonPath("$.content[0].status.publicationStatus")
         .isEqualTo("PUBLISHED")
         .jsonPath("$.totalElements")
-        .isEqualTo(1);
+        .isEqualTo(2);
   }
 
   @Test
@@ -193,8 +195,9 @@ class DocumentUnitListEntryIntegrationTest {
     EntityExchangeResult<String> result =
         risWebTestClient
             .withDefaultLogin()
-            .get()
-            .uri("/api/v1/caselaw/documentunits?pg=0&sz=10")
+            .put()
+            .uri("/api/v1/caselaw/documentunits/search-by-document-unit-list-entry?pg=0&sz=10")
+            .bodyValue(DocumentUnitListEntry.builder().build())
             .exchange()
             .expectStatus()
             .isOk()
@@ -228,8 +231,9 @@ class DocumentUnitListEntryIntegrationTest {
     EntityExchangeResult<String> result =
         risWebTestClient
             .withDefaultLogin()
-            .get()
-            .uri("/api/v1/caselaw/documentunits?pg=0&sz=1")
+            .put()
+            .uri("/api/v1/caselaw/documentunits/search-by-document-unit-list-entry?pg=0&sz=1")
+            .bodyValue(DocumentUnitListEntry.builder().build())
             .exchange()
             .expectStatus()
             .isOk()
