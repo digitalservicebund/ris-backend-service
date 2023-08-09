@@ -2,7 +2,7 @@
 import { ref } from "vue"
 import DocumentUnitList from "@/components/DocumentUnitList.vue"
 import DocumentUnitSearchEntryForm from "@/components/DocumentUnitSearchEntryForm.vue"
-import { DocumentUnitListEntry } from "@/domain/documentUnitListEntry"
+import DocumentUnitListEntry from "@/domain/documentUnitListEntry"
 import service from "@/services/documentUnitService"
 import Pagination, { Page } from "@/shared/components/Pagination.vue"
 
@@ -28,7 +28,7 @@ async function search(page = 0, listEntry?: DocumentUnitListEntry) {
 
 async function handleDelete(documentUnitListEntry: DocumentUnitListEntry) {
   if (documentUnitListEntries.value) {
-    const response = await service.delete(documentUnitListEntry.uuid)
+    const response = await service.delete(documentUnitListEntry.uuid as string)
     if (response.status === 200) {
       documentUnitListEntries.value = documentUnitListEntries.value.filter(
         (item) => item != documentUnitListEntry,

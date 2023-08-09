@@ -1,7 +1,8 @@
 import { fireEvent, render, screen } from "@testing-library/vue"
 import { createRouter, createWebHistory } from "vue-router"
 import DocumentUnitList from "@/components/DocumentUnitList.vue"
-import { DocumentUnitListEntry } from "@/domain/documentUnitListEntry"
+import { PublicationState } from "@/domain/documentUnit"
+import DocumentUnitListEntry from "@/domain/documentUnitListEntry"
 
 function renderComponent(
   options?: Partial<DocumentUnitListEntry> | DocumentUnitListEntry[],
@@ -20,7 +21,10 @@ function renderComponent(
             documentationOffice: { label: "testOffice" },
             documentType: { label: "Testlabel", jurisShortcut: "Test" },
             court: { type: "typeA", location: "locB", label: "typeA locB" },
-            status: { publicationStatus: "PUBLISHED", withError: false },
+            status: {
+              publicationStatus: PublicationState.PUBLISHED,
+              withError: false,
+            },
             ...options,
           },
         ]

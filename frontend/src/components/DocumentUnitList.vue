@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import dayjs from "dayjs"
 import { computed, ref } from "vue"
-import { DocumentUnitListEntry } from "../domain/documentUnitListEntry"
+import DocumentUnitListEntry from "../domain/documentUnitListEntry"
 import { useStatusBadge } from "@/composables/useStatusBadge"
 import IconBadge from "@/shared/components/IconBadge.vue"
 import PopupModal from "@/shared/components/PopupModal.vue"
