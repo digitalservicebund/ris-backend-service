@@ -75,6 +75,7 @@ export enum LabelPosition {
         'order-1': labelPosition === LabelPosition.RIGHT,
         'sr-only': visuallyHideLabel,
       }"
+      data-testid="label-wrapper"
     >
       <span
         v-if="localValidationError"

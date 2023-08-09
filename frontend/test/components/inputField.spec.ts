@@ -1,126 +1,191 @@
+import userEvent from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
 import InputField, {
   LabelPosition,
 } from "@/shared/components/input/InputField.vue"
-import { ValidationError } from "@/shared/components/input/types"
 
-function renderComponent(options?: {
-  id?: string
-  label?: string | string[]
-  slot?: string
-  validationError?: ValidationError
-  required?: true
-  labelPosition?: LabelPosition
-}) {
-  const id = options?.id ?? "identifier"
-  const slots = { default: options?.slot ?? `<input id="${id}" />` }
-  const props = {
+type InputFieldProps = InstanceType<typeof InputField>["$props"]
+
+function renderComponent(
+  props?: Partial<InputFieldProps>,
+  slots?: Record<string, unknown>,
+) {
+  const id = props?.id ?? "identifier"
+
+  const effectiveSlots = { default: `<input id="${id}" />`, ...slots }
+
+  const effectiveProps: InputFieldProps = {
     id,
-    label: options?.label ?? "",
-    required: options?.required ?? options?.required,
-    validationError: options?.validationError,
-    labelPosition: options?.labelPosition,
+    label: props?.label ?? "",
+    ...props,
   }
 
-  return render(InputField, { slots, props })
+  return render(InputField, { props: effectiveProps, slots: effectiveSlots })
 }
 
 describe("InputField", () => {
-  it("shows input with given label", () => {
+  it("renders the component with a label", () => {
     renderComponent({ label: "test label" })
-
-    const input = screen.queryByLabelText("test label", { exact: false })
-
-    expect(input).toBeInTheDocument()
+    const element = screen.getByLabelText("test label")
+    expect(element).toBeInTheDocument()
   })
 
-  it("shows input with given label and required text", () => {
+  it("does not render an empty label", () => {
+    renderComponent({})
+    expect(screen.queryByTestId("label-wrapper")).not.toBeInTheDocument()
+  })
+
+  it("visually hides the label", () => {
+    renderComponent({ label: "test", visuallyHideLabel: true })
+    const element = screen.getByTestId("label-wrapper")
+    expect(element).toBeInTheDocument()
+    expect(element).toHaveClass("sr-only")
+  })
+
+  it("renders a label with multiple lines", () => {
+    renderComponent({ label: ["test label 1", "test label 2"] })
+    const element = screen.getByLabelText("test label 1 test label 2")
+    expect(element).toBeInTheDocument()
+  })
+
+  it("renders a label with multiple lines and marks as required", () => {
     renderComponent({
-      label: "test label",
+      label: ["test label 1", "test label 2"],
       required: true,
     })
 
-    const input = screen.queryByLabelText("test label *", { exact: false })
-    expect(input).toBeInTheDocument()
+    const element = screen.getByLabelText("test label 1 test label 2 *")
+    expect(element).toBeInTheDocument()
   })
 
-  it("shows input with given error message", () => {
+  it("renders the label at the top by default", () => {
+    renderComponent({ label: "test" })
+    const element = screen.getByTestId("label-wrapper")
+    expect(element).not.toHaveClass("order", { exact: false })
+  })
+
+  it("sets the correct order when rendering the label at the top", () => {
+    renderComponent({ label: "test" })
+    const element = screen.getByTestId("label-wrapper")
+    expect(element).not.toHaveClass("order", { exact: false })
+  })
+
+  it("sets the correct order when rendering the label to the right", () => {
+    renderComponent({ label: "test", labelPosition: LabelPosition.RIGHT })
+    const element = screen.getByTestId("label-wrapper")
+    expect(element).toHaveClass("order-1")
+  })
+
+  it("marks the component as requied", () => {
+    renderComponent({ label: "test label", required: true })
+    const element = screen.getByLabelText("test label *")
+    expect(element).toBeInTheDocument()
+  })
+
+  it("renders the error message", () => {
     renderComponent({
       validationError: { message: "error message", instance: "identifier" },
     })
 
-    const text = screen.getByText("error message") as HTMLElement
-
-    expect(text).toBeInTheDocument()
+    const element = screen.getByText("error message")
+    expect(element).toBeInTheDocument()
   })
 
-  it("injects given input element into slot", () => {
-    renderComponent({
-      slot: "<template v-slot='slotProps'><input aria-label='test-input' v-bind='slotProps' type='radio' /></template>",
-      id: "test-identifier",
-      label: "test label",
+  it("renders the slot content", () => {
+    renderComponent(
+      { id: "test-identifier", label: "test label" },
+      {
+        default: `
+          <template v-slot="slotProps">
+            <input type='radio' :id="slotProps.id" />
+          </template>
+        `,
+      },
+    )
+
+    const element = screen.getByRole<HTMLInputElement>("radio")
+    expect(element).toBeInTheDocument()
+  })
+
+  it("forwards the ID to the slot", () => {
+    renderComponent(
+      { id: "test-identifier", label: "test label" },
+      {
+        default: `
+          <template v-slot="slotProps">
+            ID is {{ slotProps.id }}
+          </template>
+        `,
+      },
+    )
+
+    const element = screen.getByText("ID is test-identifier")
+    expect(element).toBeInTheDocument()
+  })
+
+  it("tells the slot content that there is an error", () => {
+    renderComponent(
+      { validationError: { instance: "foo", message: "bar" } },
+      {
+        default: `
+          <template v-slot="slotProps">
+            Has error is {{ slotProps.hasError }}
+          </template>
+        `,
+      },
+    )
+
+    const element = screen.getByText("Has error is true")
+    expect(element).toBeInTheDocument()
+  })
+
+  it("doesn't tell the slot content that there is an error if there is none", () => {
+    renderComponent(undefined, {
+      default: `
+          <template v-slot="slotProps">
+            Has error is {{ slotProps.hasError }}
+          </template>
+        `,
     })
 
-    const input = screen.getByLabelText("test-input") as HTMLInputElement
-
-    expect(input).toBeInTheDocument()
-    expect(input?.type).toBe("radio")
+    const element = screen.getByText("Has error is false")
+    expect(element).toBeInTheDocument()
   })
 
-  it("does not render label if not given", () => {
-    renderComponent({
-      id: "test",
-    })
-    expect(screen.queryByLabelText("test")).not.toBeInTheDocument
-  })
-
-  it("shows input with given label in two lines", () => {
-    renderComponent({
-      label: ["test label 1", "test label 2"],
-    })
-    const spanLabelFirstPart = screen.queryByText("test label 1") as HTMLElement
-    expect(spanLabelFirstPart).toBeInTheDocument()
-    const spanLabelSecondPart = screen.queryByText(
-      "test label 2",
-    ) as HTMLElement
-    expect(spanLabelSecondPart).toBeInTheDocument()
-
-    expect(
-      spanLabelFirstPart.compareDocumentPosition(spanLabelSecondPart),
-    ).toBe(Node.DOCUMENT_POSITION_FOLLOWING)
-  })
-
-  it("shows input with given label in two lines and required", () => {
-    renderComponent({
-      label: ["test label 1", "test label 2"],
-      required: true,
+  it("sets the validation error based on the slot events", async () => {
+    const user = userEvent.setup()
+    renderComponent(undefined, {
+      default: `
+          <template v-slot="slotProps">
+            <button @click="slotProps.updateValidationError({ instance: 'foo', message: 'bar' })">
+              Create error
+            </button>
+          </template>
+        `,
     })
 
-    const spanLabelFirstPart = screen.queryByText("test label 1") as HTMLElement
-    expect(spanLabelFirstPart).toBeInTheDocument()
-    const spanLabelSecondPart = screen.queryByText(
-      "test label 2",
-    ) as HTMLElement
-    expect(spanLabelSecondPart).toBeInTheDocument()
-
-    expect(
-      spanLabelFirstPart.compareDocumentPosition(spanLabelSecondPart),
-    ).toBe(Node.DOCUMENT_POSITION_FOLLOWING)
-
-    const spanLabelRequired = screen.queryByText("*") as HTMLElement
-    expect(spanLabelRequired).toBeInTheDocument()
-
-    expect(spanLabelSecondPart.contains(spanLabelRequired)).toBe(true)
+    await user.click(screen.getByRole("button"))
+    expect(screen.getByText("bar")).toBeInTheDocument()
   })
 
-  it("updates the label when the label prop changes", async () => {
-    const { rerender } = renderComponent({ label: "test label" })
+  it("removes the validation error based on the slot events", async () => {
+    const user = userEvent.setup()
+    renderComponent(
+      { validationError: { instance: "foo", message: "bar" } },
+      {
+        default: `
+          <template v-slot="slotProps">
+            <button @click="slotProps.updateValidationError(undefined)">
+              Remove error
+            </button>
+          </template>
+        `,
+      },
+    )
 
-    const label = screen.queryByText("test label", { exact: false })
-    expect(label).toBeInTheDocument()
-
-    await rerender({ label: "new label" })
-    const newLabel = screen.queryByText("new label", { exact: false })
-    expect(newLabel).toBeInTheDocument()
+    const element = screen.getByText("bar")
+    expect(element).toBeInTheDocument()
+    await user.click(screen.getByRole("button"))
+    expect(element).not.toBeInTheDocument()
   })
 })
