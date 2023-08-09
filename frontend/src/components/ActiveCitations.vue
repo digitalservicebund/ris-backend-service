@@ -46,19 +46,17 @@ function decisionSummarizer(activeCitation: ActiveCitation) {
         () => activeCitation.renderDecision,
       ),
     ])
+  } else if (activeCitation.hasMissingRequiredFields) {
+    return h("div", { class: ["flex flex-row items-center"] }, [
+      renderValidationAlert(),
+      h(
+        "div",
+        { class: ["ds-label-02-bold text-red-800"] },
+        activeCitation.renderDecision,
+      ),
+    ])
   } else {
-    if (activeCitation.hasMissingRequiredFields) {
-      return h("div", { class: ["flex flex-row items-center"] }, [
-        renderValidationAlert(),
-        h(
-          "div",
-          { class: ["ds-label-02-bold text-red-800"] },
-          activeCitation.renderDecision,
-        ),
-      ])
-    } else {
-      return h("div", { class: ["link-02-reg"] }, activeCitation.renderDecision)
-    }
+    return h("div", { class: ["link-02-reg"] }, activeCitation.renderDecision)
   }
 }
 

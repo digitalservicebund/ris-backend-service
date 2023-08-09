@@ -135,6 +135,7 @@ export function defineNestedInputField(
 ): InputField {
   return {
     name,
+    label: "",
     type: InputType.NESTED,
     inputAttributes: {
       ariaLabel,

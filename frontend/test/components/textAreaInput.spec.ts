@@ -38,34 +38,64 @@ describe("TextAreaInput", () => {
     expect(input).toHaveAttribute("id", "test-id")
   })
 
-  it("shows input with an aria label", () => {
+  it("shows textarea with an aria label", () => {
     renderComponent({ ariaLabel: "test-label" })
-    const input = screen.queryByLabelText("test-label")
-    expect(input).toBeInTheDocument()
+    const textarea = screen.queryByLabelText("test-label")
+    expect(textarea).toBeInTheDocument()
   })
 
-  it("shows input with a placeholder", () => {
+  it("shows textarea with a placeholder", () => {
     renderComponent({ placeholder: "Test Placeholder" })
-    const input = screen.queryByPlaceholderText("Test Placeholder")
-    expect(input).toBeInTheDocument()
+    const textarea = screen.queryByPlaceholderText("Test Placeholder")
+    expect(textarea).toBeInTheDocument()
   })
 
-  it("allows to type text inside input", async () => {
+  it("shows textarea with an error state", () => {
+    renderComponent({ hasError: true })
+    const textarea = screen.queryByRole("textbox")
+    expect(textarea).toHaveClass("has-error")
+  })
+
+  it("renders the 'regular' variant by default", () => {
+    renderComponent({ size: "regular" })
+    const textarea = screen.queryByRole("textbox")
+    expect(textarea).toHaveClass("px-24")
+  })
+
+  it("renders the 'regular' variant", () => {
+    renderComponent({ size: "regular" })
+    const textarea = screen.queryByRole("textbox")
+    expect(textarea).toHaveClass("px-24")
+  })
+
+  it("renders the 'small' variant", () => {
+    renderComponent({ size: "small" })
+    const textarea = screen.queryByRole("textbox")
+    expect(textarea).toHaveClass("px-16")
+  })
+
+  it("renders the 'medium' variant", () => {
+    renderComponent({ size: "medium" })
+    const textarea = screen.queryByRole("textbox")
+    expect(textarea).toHaveClass("px-20")
+  })
+
+  it("allows to type text inside textarea", async () => {
     const user = userEvent.setup()
     renderComponent({ modelValue: "one" })
-    const input: HTMLTextAreaElement = screen.getByRole("textbox")
+    const textarea: HTMLTextAreaElement = screen.getByRole("textbox")
 
-    expect(input).toHaveValue("one")
+    expect(textarea).toHaveValue("one")
 
-    await user.type(input, " two")
-    expect(input).toHaveValue("one two")
+    await user.type(textarea, " two")
+    expect(textarea).toHaveValue("one two")
   })
 
   it("displays the model value", () => {
     renderComponent({ modelValue: "one" })
-    const input: HTMLTextAreaElement = screen.getByRole("textbox")
+    const textarea: HTMLTextAreaElement = screen.getByRole("textbox")
 
-    expect(input).toHaveValue("one")
+    expect(textarea).toHaveValue("one")
   })
 
   it("updates the model value", async () => {
@@ -75,46 +105,46 @@ describe("TextAreaInput", () => {
       modelValue: testModel,
       "onUpdate:modelValue": (value) => (testModel = value),
     })
-    const input: HTMLTextAreaElement = screen.getByRole("textbox")
+    const textarea: HTMLTextAreaElement = screen.getByRole("textbox")
 
-    await user.type(input, " two")
+    await user.type(textarea, " two")
     expect(testModel).toBe("one two")
   })
 
   it("sets the textarea to readonly", () => {
     renderComponent({ readOnly: true })
-    const input: HTMLTextAreaElement = screen.getByRole("textbox")
-    expect(input).toHaveAttribute("readonly")
+    const textarea: HTMLTextAreaElement = screen.getByRole("textbox")
+    expect(textarea).toHaveAttribute("readonly")
   })
 
   it("sets the tabindex to -1 when readonly", () => {
     renderComponent({ readOnly: true })
-    const input: HTMLTextAreaElement = screen.getByRole("textbox")
-    expect(input).toHaveAttribute("tabindex", "-1")
+    const textarea: HTMLTextAreaElement = screen.getByRole("textbox")
+    expect(textarea).toHaveAttribute("tabindex", "-1")
   })
 
   it("doesn't set the textarea to readonly", () => {
     renderComponent({ readOnly: false })
-    const input: HTMLTextAreaElement = screen.getByRole("textbox")
-    expect(input).not.toHaveAttribute("readonly")
+    const textarea: HTMLTextAreaElement = screen.getByRole("textbox")
+    expect(textarea).not.toHaveAttribute("readonly")
   })
 
   it("leaves the tabindex alone when not readonly", () => {
     renderComponent({ readOnly: false })
-    const input: HTMLTextAreaElement = screen.getByRole("textbox")
-    expect(input).not.toHaveAttribute("tabindex")
+    const textarea: HTMLTextAreaElement = screen.getByRole("textbox")
+    expect(textarea).not.toHaveAttribute("tabindex")
   })
 
   it("sets the tabindex to the given value", () => {
     renderComponent({}, { tabindex: 815 })
-    const input: HTMLTextAreaElement = screen.getByRole("textbox")
-    expect(input).toHaveAttribute("tabindex", "815")
+    const textarea: HTMLTextAreaElement = screen.getByRole("textbox")
+    expect(textarea).toHaveAttribute("tabindex", "815")
   })
 
   it("renders the number of rows", () => {
     renderComponent({ rows: 5 })
-    const input: HTMLTextAreaElement = screen.getByRole("textbox")
-    expect(input).toHaveAttribute("rows", "5")
+    const textarea: HTMLTextAreaElement = screen.getByRole("textbox")
+    expect(textarea).toHaveAttribute("rows", "5")
   })
 
   it("stops propagation of the enter key event", async () => {
@@ -134,8 +164,8 @@ describe("TextAreaInput", () => {
     render(wrapper)
 
     const user = userEvent.setup()
-    const input: HTMLTextAreaElement = screen.getByRole("textbox")
-    await user.type(input, "{enter}")
+    const textarea: HTMLTextAreaElement = screen.getByRole("textbox")
+    await user.type(textarea, "{enter}")
     expect(wrapperHandler).not.toHaveBeenCalled()
   })
 

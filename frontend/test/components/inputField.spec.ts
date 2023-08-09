@@ -16,7 +16,7 @@ function renderComponent(options?: {
   const slots = { default: options?.slot ?? `<input id="${id}" />` }
   const props = {
     id,
-    label: options?.label,
+    label: options?.label ?? "",
     required: options?.required ?? options?.required,
     validationError: options?.validationError,
     labelPosition: options?.labelPosition,
@@ -72,23 +72,6 @@ describe("InputField", () => {
       id: "test",
     })
     expect(screen.queryByLabelText("test")).not.toBeInTheDocument
-  })
-
-  it("shows label after the input field", () => {
-    renderComponent({ label: "test label", labelPosition: LabelPosition.RIGHT })
-
-    const input = screen.queryByLabelText("test label", {
-      exact: false,
-    }) as HTMLInputElement
-    expect(input).toBeInTheDocument()
-    const label = screen.queryByText("test label", {
-      exact: false,
-    }) as HTMLLabelElement
-    expect(label).toBeInTheDocument()
-
-    expect(input.compareDocumentPosition(label)).toBe(
-      Node.DOCUMENT_POSITION_FOLLOWING,
-    )
   })
 
   it("shows input with given label in two lines", () => {

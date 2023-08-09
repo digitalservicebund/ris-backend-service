@@ -33,15 +33,13 @@ onMounted(() => {
           ;(focusableElems[focusableElems.length - 1] as HTMLElement).focus()
           e.preventDefault()
         }
-      } else {
-        if (
-          /** Jump to first button */
-          document.activeElement ===
-          (focusableElems[focusableElems.length - 1] as HTMLElement)
-        ) {
-          ;(focusableElems[0] as HTMLElement).focus()
-          e.preventDefault()
-        }
+      } else if (
+        /** Jump to first button */
+        document.activeElement ===
+        (focusableElems[focusableElems.length - 1] as HTMLElement)
+      ) {
+        ;(focusableElems[0] as HTMLElement).focus()
+        e.preventDefault()
       }
     }
   })

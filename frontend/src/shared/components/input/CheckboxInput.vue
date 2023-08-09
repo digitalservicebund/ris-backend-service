@@ -33,7 +33,7 @@ const isInvalid = computed(() => props.validationError !== undefined)
   <!-- eslint-disable vuejs-accessibility/form-control-has-label -->
   <input
     v-model="localModelValue"
-    class="ds-checkbox mr-4"
+    class="ds-checkbox"
     :class="{ 'has-error': isInvalid, 'ds-checkbox-small': size === 'small' }"
     type="checkbox"
   />
