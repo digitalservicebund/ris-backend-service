@@ -1,7 +1,9 @@
 package de.bund.digitalservice.ris.caselaw.integration.tests;
 
 import static de.bund.digitalservice.ris.caselaw.AuthUtils.buildDefaultDocOffice;
+import static de.bund.digitalservice.ris.caselaw.AuthUtils.buildDocOffice;
 import static de.bund.digitalservice.ris.caselaw.domain.PublicationStatus.PUBLISHED;
+import static de.bund.digitalservice.ris.caselaw.domain.PublicationStatus.PUBLISHING;
 import static de.bund.digitalservice.ris.caselaw.domain.PublicationStatus.UNPUBLISHED;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.argThat;
@@ -43,11 +45,14 @@ import de.bund.digitalservice.ris.caselaw.config.PostgresConfig;
 import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitListEntry;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatus;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.EmailPublishService;
 import de.bund.digitalservice.ris.caselaw.domain.LegalEffect;
 import de.bund.digitalservice.ris.caselaw.domain.ProceedingDecision;
+import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.Texts;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.court.Court;
@@ -68,6 +73,7 @@ import org.springframework.security.oauth2.client.registration.ReactiveClientReg
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.test.web.reactive.server.EntityExchangeResult;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import reactor.core.publisher.Flux;
@@ -920,5 +926,125 @@ class DocumentUnitIntegrationTest {
               assertThat(response.getResponseBody().status().publicationStatus())
                   .isEqualTo(PUBLISHED);
             });
+  }
+
+  @Test
+  void testSearchByDocumentUnitListEntry() {
+    DocumentationOffice otherDocOffice = buildDocOffice("BGH", "CO");
+    UUID otherDocOfficeUuid =
+        documentationOfficeRepository.findByLabel(otherDocOffice.label()).block().getId();
+
+    List<UUID> docOfficeIds =
+        List.of(
+            documentationOfficeUuid,
+            documentationOfficeUuid,
+            documentationOfficeUuid,
+            documentationOfficeUuid,
+            otherDocOfficeUuid);
+    List<String> documentNumbers =
+        List.of(
+            "ABCD202300007", "EFGH202200123", "IJKL202101234", "MNOP202300099", "QRST202200102");
+    List<String> fileNumbers = List.of("jkl", "ghi", "def", "abc", "mno");
+    List<String> courtTypes = List.of("MNO", "PQR", "STU", "VWX", "YZA");
+    List<String> courtLocations = List.of("Hamburg", "München", "Berlin", "Frankfurt", "Köln");
+    List<Instant> decisionDates =
+        List.of(
+            Instant.parse("2021-01-02T00:00:00.00Z"),
+            Instant.parse("2022-02-03T00:00:00.00Z"),
+            Instant.parse("2023-03-04T00:00:00.00Z"),
+            Instant.parse("2023-08-01T00:00:00.00Z"),
+            Instant.parse("2023-08-10T00:00:00.00Z"));
+    List<PublicationStatus> statuses =
+        List.of(PUBLISHED, UNPUBLISHED, PUBLISHING, PUBLISHED, UNPUBLISHED);
+
+    for (int i = 0; i < 5; i++) {
+      DocumentUnitDTO dto =
+          repository
+              .save(
+                  DocumentUnitDTO.builder()
+                      .uuid(UUID.randomUUID())
+                      .creationtimestamp(Instant.now())
+                      .documentnumber(documentNumbers.get(i))
+                      .courtType(courtTypes.get(i))
+                      .courtLocation(courtLocations.get(i))
+                      .decisionDate(decisionDates.get(i))
+                      .documentationOfficeId(docOfficeIds.get(i))
+                      .build())
+              .block();
+
+      documentUnitStatusRepository
+          .save(
+              DocumentUnitStatusDTO.builder()
+                  .id(UUID.randomUUID())
+                  .newEntry(true)
+                  .documentUnitId(dto.getUuid())
+                  .publicationStatus(statuses.get(i))
+                  .build())
+          .block();
+
+      fileNumberRepository
+          .save(
+              FileNumberDTO.builder()
+                  .documentUnitId(dto.getId())
+                  .fileNumber(fileNumbers.get(i))
+                  .isDeviating(false)
+                  .build())
+          .block();
+    }
+
+    // no search criteria
+    DocumentUnitListEntry searchInput = DocumentUnitListEntry.builder().build();
+    // the unpublished one from the other docoffice is not in it, the others are ordered
+    // by documentNumber
+    assertThat(extractDocumentNumbersFromSearchCall(searchInput))
+        .containsExactly("MNOP202300099", "ABCD202300007", "EFGH202200123", "IJKL202101234");
+
+    // by documentNumber / fileNumber
+    searchInput = DocumentUnitListEntry.builder().documentNumber("abc").build();
+    assertThat(extractDocumentNumbersFromSearchCall(searchInput))
+        .containsExactly("MNOP202300099", "ABCD202300007");
+
+    // by court
+    searchInput =
+        DocumentUnitListEntry.builder()
+            .court(Court.builder().type("PQR").location("München").build())
+            .build();
+    assertThat(extractDocumentNumbersFromSearchCall(searchInput)).containsExactly("EFGH202200123");
+
+    // by decisionDate
+    searchInput = DocumentUnitListEntry.builder().decisionDate(decisionDates.get(2)).build();
+    assertThat(extractDocumentNumbersFromSearchCall(searchInput)).containsExactly("IJKL202101234");
+
+    // by status
+    searchInput =
+        DocumentUnitListEntry.builder()
+            .status(DocumentUnitStatus.builder().publicationStatus(PUBLISHING).build())
+            .build();
+    assertThat(extractDocumentNumbersFromSearchCall(searchInput)).containsExactly("IJKL202101234");
+
+    // all combined
+    searchInput =
+        DocumentUnitListEntry.builder()
+            .documentNumber("abc")
+            .court(Court.builder().type("MNO").location("Hamburg").build())
+            .decisionDate(decisionDates.get(0))
+            .status(DocumentUnitStatus.builder().publicationStatus(PUBLISHED).build())
+            .build();
+    assertThat(extractDocumentNumbersFromSearchCall(searchInput)).containsExactly("ABCD202300007");
+  }
+
+  private List<String> extractDocumentNumbersFromSearchCall(DocumentUnitListEntry searchInput) {
+    EntityExchangeResult<String> result =
+        risWebTestClient
+            .withDefaultLogin()
+            .put()
+            .uri("/api/v1/caselaw/documentunits/search-by-document-unit-list-entry?pg=0&sz=10")
+            .bodyValue(searchInput)
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectBody(String.class)
+            .returnResult();
+    return JsonPath.read(result.getResponseBody(), "$.content[*].documentNumber");
   }
 }
