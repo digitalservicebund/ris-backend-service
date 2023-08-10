@@ -39,6 +39,7 @@ import StatusIndicationInputGroup from "@/components/statusIndication/StatusIndi
 import { summarizeStatusIndication } from "@/components/statusIndication/summarizer"
 import SubjectAreaInputGroup from "@/components/subjectArea/SubjectAreaInputGroup.vue"
 import { subjectAreaSummarizer } from "@/components/subjectArea/summarizer"
+import { useLocator } from "@/composables/useLocator"
 import { useScrollToHash } from "@/composables/useScrollToHash"
 import { FlatMetadata, Metadata, MetadataSections } from "@/domain/Norm"
 import { dateYearSummarizer } from "@/helpers/dateYearSummarizer"
@@ -55,6 +56,9 @@ useScrollToHash(routeHash)
 
 const store = useLoadedNormStore()
 const { loadedNorm } = storeToRefs(store)
+
+const { addSegment } = useLocator()
+addSegment(["norm", "frame"])
 
 const metadataSections = computed({
   get: () => loadedNorm.value?.metadataSections ?? {},
@@ -166,7 +170,7 @@ const AgeIndicationSummary = withSummarizer(ageIndicationSummarizer)
     </h1>
 
     <SingleDataFieldSection
-      id="officialLongTitle"
+      id="OFFICIAL_LONG_TITLE"
       v-model="officialLongTitle"
       :input-attributes="{ ariaLabel: 'Amtliche Langüberschrift', rows: 1 }"
       label="Amtliche Langüberschrift"

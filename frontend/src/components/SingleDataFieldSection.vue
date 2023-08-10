@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { computed, ref, watch } from "vue"
+import { useLocator } from "@/composables/useLocator"
 import InputElement from "@/shared/components/input/InputElement.vue"
 import InputField from "@/shared/components/input/InputField.vue"
 import {
@@ -45,6 +46,9 @@ watch(
 )
 
 watch(value, () => emit("update:modelValue", value.value), { deep: true })
+
+const { getLocator } = useLocator()
+const inputFieldId = getLocator(() => [props.id])
 </script>
 
 <template>
@@ -54,11 +58,11 @@ watch(value, () => emit("update:modelValue", value.value), { deep: true })
     <div
       class="flex items-start gap-8 border-b border-gray-400 bg-white p-8 pl-16"
     >
-      <label class="ds-label-02-bold my-12 w-240 flex-none" :for="id">
+      <label class="ds-label-02-bold my-12 w-240 flex-none" :for="inputFieldId">
         <h2>{{ label }}</h2>
       </label>
       <InputField
-        :id="id"
+        :id="inputFieldId"
         v-slot="{ id: inputElementId, hasError }"
         class="!mb-0"
         :label="label"
