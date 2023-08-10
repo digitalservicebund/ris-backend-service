@@ -32,8 +32,34 @@ class HasAllMandatoryFields() : Specification<List<MetadataSection>> {
           //              true)
       )
 
-  override fun evaluate(instance: List<MetadataSection>): SpecificationResult {
+  private fun evaluateMandatoryMetadatumType(
+      section: MetadataSection,
+      mandatoryMetadatumType: MetadatumType,
+      hasOrder: Boolean,
+      missingFields: MutableList<MissingMandatoryField>
+  ) {
+    val metadatum =
+        section.metadata.firstOrNull { metadatum -> metadatum.type == mandatoryMetadatumType }
+    if (metadatum == null) {
+      val existingPair = missingFields.find { it.sectionName == section.name }
 
+      if (existingPair != null) {
+        val existingList = existingPair.metadatumTypes
+        existingList.add(mandatoryMetadatumType)
+      } else {
+        val newMissing =
+            MissingMandatoryField(
+                section.name,
+                mutableListOf(mandatoryMetadatumType),
+                if (hasOrder) section.order else null)
+        missingFields.add(newMissing)
+      }
+    }
+  }
+
+  private fun parseMissingMandatoryFields(
+      instance: List<MetadataSection>
+  ): List<MissingMandatoryField> {
     val missingFields = mutableListOf<MissingMandatoryField>()
 
     mandatoryFields.forEach { mandatoryField ->
@@ -46,30 +72,17 @@ class HasAllMandatoryFields() : Specification<List<MetadataSection>> {
                 if (mandatoryField.hasOrder) 1 else null))
       } else {
         sections.forEach { section ->
-          mandatoryField.metadatumTypes.forEach { mandatoryMetadatumType ->
-            val metadatum =
-                section.metadata.firstOrNull { metadatum ->
-                  metadatum.type == mandatoryMetadatumType
-                }
-            if (metadatum == null) {
-              val existingPair = missingFields.find { it.sectionName == section.name }
-
-              if (existingPair != null) {
-                val existingList = existingPair.metadatumTypes
-                existingList.add(mandatoryMetadatumType)
-              } else {
-                val newMissing =
-                    MissingMandatoryField(
-                        section.name,
-                        mutableListOf(mandatoryMetadatumType),
-                        if (mandatoryField.hasOrder) section.order else null)
-                missingFields.add(newMissing)
-              }
-            }
+          mandatoryField.metadatumTypes.forEach {
+            evaluateMandatoryMetadatumType(section, it, mandatoryField.hasOrder, missingFields)
           }
         }
       }
     }
+    return missingFields.toList()
+  }
+
+  override fun evaluate(instance: List<MetadataSection>): SpecificationResult {
+    val missingFields = parseMissingMandatoryFields(instance)
 
     return if (missingFields.isEmpty()) {
       SpecificationResult.Satisfied
