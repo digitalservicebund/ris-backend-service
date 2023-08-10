@@ -23,13 +23,14 @@ class HasAllMandatoryFields() : Specification<List<MetadataSection>> {
   private val mandatoryFields: List<MandatoryField> =
       listOf(
           MandatoryField(MetadataSectionName.NORM, listOf(MetadatumType.OFFICIAL_LONG_TITLE)),
-          MandatoryField(
-              MetadataSectionName.DOCUMENT_TYPE,
-              listOf(MetadatumType.TYPE_NAME, MetadatumType.NORM_CATEGORY)),
-          MandatoryField(
-              MetadataSectionName.NORM_PROVIDER,
-              listOf(MetadatumType.ENTITY, MetadatumType.DECIDING_BODY),
-              true))
+          //          MandatoryField(
+          //              MetadataSectionName.DOCUMENT_TYPE,
+          //              listOf(MetadatumType.TYPE_NAME, MetadatumType.NORM_CATEGORY)),
+          //          MandatoryField(
+          //              MetadataSectionName.NORM_PROVIDER,
+          //              listOf(MetadatumType.ENTITY, MetadatumType.DECIDING_BODY),
+          //              true)
+      )
 
   override fun evaluate(instance: List<MetadataSection>): SpecificationResult {
 

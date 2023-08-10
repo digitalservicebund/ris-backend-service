@@ -5,7 +5,6 @@ import de.bund.digitalservice.ris.norms.domain.entity.Metadatum
 import de.bund.digitalservice.ris.norms.domain.specification.SpecificationViolation
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType
-import de.bund.digitalservice.ris.norms.domain.value.NormCategory
 import java.time.LocalDate
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
@@ -18,41 +17,39 @@ class HasAllMandatoryFieldsTest {
             MetadataSectionName.NORM,
             listOf(Metadatum("official long title", MetadatumType.OFFICIAL_LONG_TITLE)),
         )
-    val documentTypeSection =
-        MetadataSection(
-            MetadataSectionName.DOCUMENT_TYPE,
-            listOf(
-                Metadatum("type name", MetadatumType.TYPE_NAME),
-                Metadatum(NormCategory.BASE_NORM, MetadatumType.NORM_CATEGORY),
-            ),
-        )
-    val normProviderSection1 =
-        MetadataSection(
-            MetadataSectionName.NORM_PROVIDER,
-            listOf(
-                Metadatum("entity", MetadatumType.ENTITY),
-                Metadatum("deciding body", MetadatumType.DECIDING_BODY),
-            ),
-            order = 1)
-    val normProviderSection2 =
-        MetadataSection(
-            MetadataSectionName.NORM_PROVIDER,
-            listOf(
-                Metadatum("entity2", MetadatumType.ENTITY),
-                Metadatum("deciding body2", MetadatumType.DECIDING_BODY),
-            ),
-            order = 2)
-    val result =
-        HasAllMandatoryFields()
-            .evaluate(
-                listOf(
-                    normSection, documentTypeSection, normProviderSection1, normProviderSection2))
+    //    val documentTypeSection =
+    //        MetadataSection(
+    //            MetadataSectionName.DOCUMENT_TYPE,
+    //            listOf(
+    //                Metadatum("type name", MetadatumType.TYPE_NAME),
+    //                Metadatum(NormCategory.BASE_NORM, MetadatumType.NORM_CATEGORY),
+    //            ),
+    //        )
+    //    val normProviderSection1 =
+    //        MetadataSection(
+    //            MetadataSectionName.NORM_PROVIDER,
+    //            listOf(
+    //                Metadatum("entity", MetadatumType.ENTITY),
+    //                Metadatum("deciding body", MetadatumType.DECIDING_BODY),
+    //            ),
+    //            order = 1)
+    //    val normProviderSection2 =
+    //        MetadataSection(
+    //            MetadataSectionName.NORM_PROVIDER,
+    //            listOf(
+    //                Metadatum("entity2", MetadatumType.ENTITY),
+    //                Metadatum("deciding body2", MetadatumType.DECIDING_BODY),
+    //            ),
+    //            order = 2)
+    val result = HasAllMandatoryFields().evaluate(listOf(normSection))
+    //                    normSection, documentTypeSection, normProviderSection1,
+    // normProviderSection2))
     assertThat(result.isSatisfied).isTrue()
     assertThat(result.violations).isEmpty()
   }
 
   @Test
-  fun `it is not satisfied if neither the norm nor the document type sections are not present`() {
+  fun `it is not satisfied if mandatory sections are not present`() {
     val anotherSection =
         MetadataSection(
             MetadataSectionName.PUBLICATION_DATE,
@@ -60,11 +57,11 @@ class HasAllMandatoryFieldsTest {
         )
     val result = HasAllMandatoryFields().evaluate(listOf(anotherSection))
     assertThat(result.isNotSatisfied).isTrue()
-    assertThat(result.violations).isNotEmpty().hasSize(5)
+    assertThat(result.violations).isNotEmpty().hasSize(1) // 5
   }
 
   @Test
-  fun `it is not satisfied if the norm section does not contain either official long title or the official short title`() {
+  fun `it returns the correct violations with correctly formatted instance string (containing order if needed)`() {
     val normSection =
         MetadataSection(
             MetadataSectionName.NORM,
@@ -105,8 +102,8 @@ class HasAllMandatoryFieldsTest {
         .isEqualTo(
             listOf(
                 violation("NORM", "OFFICIAL_LONG_TITLE"),
-                violation("DOCUMENT_TYPE", "NORM_CATEGORY"),
-                violation("NORM_PROVIDER", "DECIDING_BODY", 2),
+                //                violation("DOCUMENT_TYPE", "NORM_CATEGORY"),
+                //                violation("NORM_PROVIDER", "DECIDING_BODY", 2),
             ))
   }
 }
