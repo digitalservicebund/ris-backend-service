@@ -1,13 +1,14 @@
 package de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.controller
 
+import de.bund.digitalservice.ris.OpenApiConfiguration
 import de.bund.digitalservice.ris.exceptions.exception.NotFoundWithInstanceException
 import de.bund.digitalservice.ris.norms.application.port.input.GenerateNormFileUseCase
 import de.bund.digitalservice.ris.norms.domain.entity.FileReference
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.ApiConfiguration
-import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.OpenApiConfiguration
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.encodeGuid
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.encodeLocalDateTime
 import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.tags.Tag
@@ -35,7 +36,10 @@ class GenerateNormFileController(private val generateNormFileService: GenerateNo
       ApiResponse(responseCode = "400"),
   )
   fun generateNormFile(
-      @PathVariable guid: String
+      @Parameter(
+          name = "guid", description = "the unique guid identifier of a norm", required = true)
+      @PathVariable
+      guid: String
   ): Mono<ResponseEntity<FileReferenceResponseSchema>> {
     val command = GenerateNormFileUseCase.Command(UUID.fromString(guid))
     return generateNormFileService

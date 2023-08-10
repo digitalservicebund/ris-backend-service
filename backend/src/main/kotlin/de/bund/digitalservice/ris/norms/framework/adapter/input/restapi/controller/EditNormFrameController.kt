@@ -1,11 +1,12 @@
 package de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.controller
 
+import de.bund.digitalservice.ris.OpenApiConfiguration
 import de.bund.digitalservice.ris.norms.application.port.input.EditNormFrameUseCase
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.ApiConfiguration
-import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.OpenApiConfiguration
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.decodeGuid
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.schema.MetadataSectionRequestSchema
 import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.tags.Tag
@@ -31,7 +32,10 @@ class EditNormFrameController(private val editNormFrameService: EditNormFrameUse
       ApiResponse(responseCode = "400"),
   )
   fun editNormFrame(
-      @PathVariable guid: String,
+      @Parameter(
+          name = "guid", description = "the unique guid identifier of a norm", required = true)
+      @PathVariable
+      guid: String,
       @RequestBody request: NormFramePropertiesRequestSchema,
   ): Mono<ResponseEntity<Unit>> {
     val properties = request.toUseCaseData()

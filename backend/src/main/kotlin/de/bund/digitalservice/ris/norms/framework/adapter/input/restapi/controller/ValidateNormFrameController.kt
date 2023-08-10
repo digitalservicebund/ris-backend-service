@@ -1,10 +1,10 @@
 package de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.controller
 
+import de.bund.digitalservice.ris.OpenApiConfiguration
 import de.bund.digitalservice.ris.norms.application.port.input.ValidateNormFrameUseCase
 import de.bund.digitalservice.ris.norms.domain.entity.MetadataSection
 import de.bund.digitalservice.ris.norms.domain.specification.SpecificationViolation
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.ApiConfiguration
-import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.OpenApiConfiguration
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.schema.MetadataSectionRequestSchema
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.responses.ApiResponse

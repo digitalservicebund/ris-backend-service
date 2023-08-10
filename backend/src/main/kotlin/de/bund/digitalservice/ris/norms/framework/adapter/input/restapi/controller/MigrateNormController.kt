@@ -1,9 +1,9 @@
 package de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.controller
 
+import de.bund.digitalservice.ris.OpenApiConfiguration
 import de.bund.digitalservice.ris.norms.application.port.input.MigrateNormUseCase
 import de.bund.digitalservice.ris.norms.application.port.input.MigrateNormUseCase.ConverterNorms
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.ApiConfiguration
-import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.OpenApiConfiguration
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity

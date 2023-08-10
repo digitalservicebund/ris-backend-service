@@ -28,6 +28,8 @@ fileignoreconfig:
   checksum: 6da41131746ac5689a7b0a5b65d2967ba0285abe20a20e341ffc92a83218ed0b
 - filename: _site/prototype-footnotes/assets/index-086108b4.js
   checksum: 0bd435f734159482c18b1f78fbde74f6b3be56604f380ac59405dc240cf8a270
+- filename: backend/src/main/kotlin/de/bund/digitalservice/ris/norms/framework/adapter/input/restapi/controller/GetFileController.kt
+  checksum: f989b3c9c176b1b985c2f78ca6ca13fa1403cbb69f367ae9b1cb8ea64d5f6747
 scopeconfig:
 - scope: node
 allowed_patterns:

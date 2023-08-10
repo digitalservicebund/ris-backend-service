@@ -1,9 +1,10 @@
 package de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.controller
 
+import de.bund.digitalservice.ris.OpenApiConfiguration
 import de.bund.digitalservice.ris.norms.application.port.input.GetFileUseCase
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.ApiConfiguration
-import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.OpenApiConfiguration
 import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.tags.Tag
@@ -31,8 +32,17 @@ class GetFileController(private val getFileService: GetFileUseCase) {
           description = "Norm with the given guid or given hash file name not found"),
   )
   fun getFile(
-      @PathVariable guid: String,
-      @PathVariable hash: String
+      @Parameter(
+          name = "guid", description = "the unique guid identifier of a norm", required = true)
+      @PathVariable
+      guid: String,
+      @Parameter(
+          name = "hash",
+          description = "the hash of the file",
+          required = true,
+          example = "867d0a6301f1276bac069e00c7cc196bb15eea3f962ce5a86c256616ef0773fe")
+      @PathVariable
+      hash: String
   ): Mono<ResponseEntity<ByteArray>> {
     val command = GetFileUseCase.Command(UUID.fromString(guid), hash)
     return getFileService

@@ -1,10 +1,13 @@
 package de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.controller
 
+import de.bund.digitalservice.ris.OpenApiConfiguration
 import de.bund.digitalservice.ris.norms.application.port.input.ImportNormUseCase
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.ApiConfiguration
-import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.OpenApiConfiguration
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.encodeGuid
 import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.Parameter
+import io.swagger.v3.oas.annotations.enums.ParameterIn
+import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.tags.Tag
 import java.util.UUID
@@ -26,8 +29,15 @@ class ImportNormController(private val importNormService: ImportNormUseCase) {
   @Operation(
       summary = "Import a norm using a ZIP",
       description = "Importing all xml files of a norm in juris format in a compressed ZIP file")
+  @Parameter(
+      name = "X-Filename",
+      required = false,
+      example = "norm.zip",
+      `in` = ParameterIn.HEADER,
+      schema = Schema(implementation = String::class),
+      description = "Filename used for storing the zip in the system")
   @ApiResponse(responseCode = "201", description = "Norm was successfully imported")
-  fun createNorm(
+  fun importNorm(
       @RequestBody zipFile: ByteArray,
       @RequestHeader headers: HttpHeaders
   ): Mono<ResponseEntity<ResponseSchema>> {

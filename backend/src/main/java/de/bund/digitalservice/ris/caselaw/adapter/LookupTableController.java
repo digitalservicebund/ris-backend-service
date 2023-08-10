@@ -1,10 +1,10 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
+import de.bund.digitalservice.ris.OpenApiConfiguration;
 import de.bund.digitalservice.ris.caselaw.domain.LookupTableService;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.citation.CitationStyle;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.court.Court;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
-import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.OpenApiConfiguration;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;

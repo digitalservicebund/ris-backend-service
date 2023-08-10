@@ -1,5 +1,6 @@
 package de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.controller
 
+import de.bund.digitalservice.ris.OpenApiConfiguration
 import de.bund.digitalservice.ris.exceptions.exception.NotFoundWithInstanceException
 import de.bund.digitalservice.ris.norms.application.port.input.LoadNormUseCase
 import de.bund.digitalservice.ris.norms.domain.entity.Article
@@ -10,11 +11,11 @@ import de.bund.digitalservice.ris.norms.domain.entity.Norm
 import de.bund.digitalservice.ris.norms.domain.entity.Paragraph
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.ApiConfiguration
-import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.OpenApiConfiguration
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.encodeEli
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.encodeGuid
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.encodeLocalDateTime
 import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.tags.Tag
@@ -38,7 +39,12 @@ class LoadNormController(private val loadNormService: LoadNormUseCase) {
       ApiResponse(responseCode = "200", description = "Norm was found"),
       ApiResponse(responseCode = "404", description = "No norm found for this query"),
   )
-  fun getNormByGuid(@PathVariable guid: String): Mono<ResponseEntity<NormResponseSchema>> {
+  fun getNormByGuid(
+      @Parameter(
+          name = "guid", description = "the unique guid identifier of a norm", required = true)
+      @PathVariable
+      guid: String
+  ): Mono<ResponseEntity<NormResponseSchema>> {
     val query = LoadNormUseCase.Query(UUID.fromString(guid))
 
     return loadNormService

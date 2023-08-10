@@ -1,4 +1,4 @@
-package de.bund.digitalservice.ris.norms.framework.adapter.input.restapi
+package de.bund.digitalservice.ris
 
 import io.swagger.v3.oas.models.OpenAPI
 import io.swagger.v3.oas.models.info.Contact

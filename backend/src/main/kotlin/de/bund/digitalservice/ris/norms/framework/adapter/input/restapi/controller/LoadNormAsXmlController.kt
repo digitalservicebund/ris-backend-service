@@ -1,10 +1,11 @@
 package de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.controller
 
+import de.bund.digitalservice.ris.OpenApiConfiguration
 import de.bund.digitalservice.ris.exceptions.exception.NotFoundWithInstanceException
 import de.bund.digitalservice.ris.norms.application.port.input.LoadNormAsXmlUseCase
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.ApiConfiguration
-import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.OpenApiConfiguration
 import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.tags.Tag
@@ -37,9 +38,27 @@ class LoadNormAsXmlController(private val loadNormAsXmlService: LoadNormAsXmlUse
       ApiResponse(responseCode = "404", description = "No norm found for this query"),
   )
   fun loadNormAsXml(
-      @PathVariable printAnnouncementGazette: String,
-      @PathVariable announcementYear: String,
-      @PathVariable printAnnouncementPage: String,
+      @Parameter(
+          name = "printAnnouncementGazette",
+          description = "First part of the ELI, the gazette of the print announcement version",
+          required = true,
+          example = "bgbl-1")
+      @PathVariable
+      printAnnouncementGazette: String,
+      @Parameter(
+          name = "announcementYear",
+          description = "Second part of the ELI, the publication year",
+          required = true,
+          example = "1976")
+      @PathVariable
+      announcementYear: String,
+      @Parameter(
+          name = "printAnnouncementPage",
+          description = "Third part of the ELI, the page of the print announcement version",
+          required = true,
+          example = "3341")
+      @PathVariable
+      printAnnouncementPage: String,
   ): Mono<ResponseEntity<String>> {
     val query =
         LoadNormAsXmlUseCase.Query(
