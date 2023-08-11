@@ -22,7 +22,12 @@ testWithImportedNorm(
     await locatorFrameButton.click()
 
     const newValue = "fake-Juris-Abkürzung"
-    await fillInputField(page, FieldType.TEXT, "risAbbreviation", newValue)
+    await fillInputField(
+      page,
+      FieldType.TEXT,
+      "norm/frame/risAbbreviation",
+      newValue,
+    )
 
     await page.locator("[aria-label='Rahmendaten Speichern Button']").click()
     await expect(

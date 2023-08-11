@@ -44,7 +44,7 @@ testWithImportedNorm(
     await page.reload()
 
     // retrieve by new eli
-    const eliInputValue = await page.inputValue("input#eli")
+    const eliInputValue = await page.inputValue('input[id="norm/frame/eli"]')
     await page.goto(`/api/v1/norms/xml/${eliInputValue}`)
 
     const response = await request.get(`/api/v1/norms/xml/${eliInputValue}`)

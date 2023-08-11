@@ -99,5 +99,21 @@ While the implementation details of the `useLocator` composable outside the scop
 
 ## Consequences
 
-- Components will have a way of knowing where they are
-- We will need to update a bunch of IDs (mostly in tests)
+Components will have a way of knowing where they are.
+
+### IDs
+
+We will need to update a bunch of IDs (mostly in tests). We will also need to change the selectors and methods we use when querying IDs. Read [this article on MDN about IDs]() for more information, but the gist is:
+
+- `/` is allowed in IDs per the HTML and URL specs
+- However `/` is not a valid character in CSS selectors outside of attributes
+
+This means whenever we use a CSS selector with an ID, we will need to use a specific syntax. For example:
+
+- `document.querySelector("#example/locator")` 🚫 will not work
+- In CSS: `#example/locator {...` 🚫 will not work
+- `document.getElementById("example/locator")` ✅ will work
+- `document.querySelector("[id=example/locator]")` ✅ will work
+
+It's a tradeoff, but worth it since we should avoid using IDs (especially in CSS selectors) anyway, and being consistent with the paths returned by the backend is more important.
+

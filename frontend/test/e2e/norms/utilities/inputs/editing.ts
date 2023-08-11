@@ -16,13 +16,13 @@ type FieldFillerMapping = {
 }
 
 const fillTextInput: FieldFiller<string> = async (page, id, value) => {
-  const input = page.locator(`input#${id}`)
+  const input = page.locator(`input[id="${id}"]`)
   await expect(input).toBeEditable()
   await input.fill(value)
 }
 
 const fillTextArea: FieldFiller<string> = async (page, id, value) => {
-  const input = page.locator(`textarea#${id}`)
+  const input = page.locator(`textarea[id="${id}"]`)
   await expect(input).toBeEditable()
   await input.fill(value)
 }
@@ -45,7 +45,7 @@ const fillTextEditor: FieldFiller<FootnoteInputType[]> = async (
 }
 
 const fillCheckbox: FieldFiller<boolean> = async (page, id, value) => {
-  const input = page.locator(`input#${id}`)
+  const input = page.locator(`input[id="${id}"]`)
   await expect(input).toBeEditable()
   await input.setChecked(value)
 }
@@ -54,7 +54,7 @@ const fillRadioButton: FieldFiller<boolean> = async (page, id, value) => {
   // You can not "uncheck" a radio button. You must click a different one in the
   // same radio button group.
   if (value) {
-    const input = page.locator(`input#${id}`)
+    const input = page.locator(`input[id="${id}"]`)
     await expect(input).toBeEditable()
     await input.check()
   }
@@ -72,7 +72,7 @@ const fillChipsInput: FieldFiller<string[]> = async (page, id, value) => {
     await chips.nth(index).getByLabel("Löschen").click()
   }
 
-  const input = page.locator(`input#${id}`)
+  const input = page.locator(`input[id="${id}"]`)
 
   for (const subValue of value) {
     await input.fill(subValue)
@@ -81,7 +81,7 @@ const fillChipsInput: FieldFiller<string[]> = async (page, id, value) => {
 }
 
 const fillDropdown: FieldFiller<string> = async (page, id, value) => {
-  const select = page.locator(`select#${id}`)
+  const select = page.locator(`select[id="${id}"]`)
   await expect(select).toBeEditable()
   await select.selectOption({ value })
 }

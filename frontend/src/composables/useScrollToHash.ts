@@ -5,10 +5,10 @@ export function useScrollToHash(routeHash: Ref<string | undefined>) {
   function jumpToHash() {
     // scrollIntoView with smooth behavior only works inside of a timeout
     setTimeout(() => {
-      if (routeHash.value) {
-        const hashElement = document.querySelector(routeHash.value)
-        hashElement?.scrollIntoView({ behavior: "smooth" })
-      }
+      if (!routeHash.value) return
+      const idFromHash = routeHash.value.replace(/^#/, "")
+      const hashElement = document.getElementById(idFromHash)
+      hashElement?.scrollIntoView({ behavior: "smooth" })
     })
   }
 

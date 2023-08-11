@@ -17,22 +17,22 @@ type FieldExpectMapping = {
 }
 
 const expectTextInput: FieldExpecter<string> = async (page, id, value) => {
-  const content = await page.locator(`input#${id}`).inputValue()
+  const content = await page.locator(`input[id="${id}"]`).inputValue()
   expect(content).toBe(value)
 }
 
 const expectTextArea: FieldExpecter<string> = async (page, id, value) => {
-  const content = await page.locator(`textarea#${id}`).inputValue()
+  const content = await page.locator(`textarea[id="${id}"]`).inputValue()
   expect(content.trim()).toBe(value)
 }
 
 const expectCheckbox: FieldExpecter<boolean> = async (page, id, value) => {
-  const checked = await page.locator(`input#${id}`).isChecked()
+  const checked = await page.locator(`input[id="${id}"]`).isChecked()
   expect(checked).toBe(value)
 }
 
 const expectRadioButton: FieldExpecter<boolean> = async (page, id, value) => {
-  const checked = await page.locator(`input#${id}`).isChecked()
+  const checked = await page.locator(`input[id="${id}"]`).isChecked()
   expect(checked).toBe(value)
 }
 
