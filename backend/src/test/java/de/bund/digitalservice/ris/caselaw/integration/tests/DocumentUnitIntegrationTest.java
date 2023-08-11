@@ -997,7 +997,7 @@ class DocumentUnitIntegrationTest {
     // the unpublished one from the other docoffice is not in it, the others are ordered
     // by documentNumber
     assertThat(extractDocumentNumbersFromSearchCall(searchInput))
-        .containsExactly("MNOP202300099", "ABCD202300007", "EFGH202200123", "IJKL202101234");
+        .containsExactly("MNOP202300099", "IJKL202101234", "EFGH202200123", "ABCD202300007");
 
     // by documentNumber / fileNumber
     searchInput = DocumentUnitListEntry.builder().documentNumber("abc").build();

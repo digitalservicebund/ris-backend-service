@@ -110,6 +110,16 @@ class DocumentUnitListEntryIntegrationTest {
 
   @Test
   void testForCorrectResponseWhenRequestingAll() {
+    DocumentUnitDTO migrationDto =
+        repository
+            .save(
+                DocumentUnitDTO.builder()
+                    .uuid(UUID.randomUUID())
+                    .creationtimestamp(Instant.now())
+                    .documentnumber("MIGR202200012")
+                    .dataSource(DataSource.MIGRATION)
+                    .build())
+            .block();
     DocumentUnitDTO neurisDto =
         repository
             .save(
@@ -119,16 +129,6 @@ class DocumentUnitListEntryIntegrationTest {
                     .documentnumber("NEUR202300007")
                     .dataSource(DataSource.NEURIS)
                     .documentationOfficeId(docOfficeDTO.getId())
-                    .build())
-            .block();
-    DocumentUnitDTO migrationDto =
-        repository
-            .save(
-                DocumentUnitDTO.builder()
-                    .uuid(UUID.randomUUID())
-                    .creationtimestamp(Instant.now())
-                    .documentnumber("MIGR202200012")
-                    .dataSource(DataSource.MIGRATION)
                     .build())
             .block();
 
@@ -208,7 +208,7 @@ class DocumentUnitListEntryIntegrationTest {
         JsonPath.read(result.getResponseBody(), "$.content[*].documentNumber");
     assertThat(documentNumbersActual)
         .hasSize(3)
-        .containsExactly("IJKL202300099", "ABCD202300007", "EFGH202200123");
+        .containsExactly("IJKL202300099", "EFGH202200123", "ABCD202300007");
   }
 
   @Test
