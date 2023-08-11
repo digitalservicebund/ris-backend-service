@@ -44,6 +44,7 @@ const labelConverted = computed(() => {
 /* -------------------------------------------------- *
  * Validation error handling                          *
  * -------------------------------------------------- */
+
 const { getByInstance } = useGlobalValidationErrorStore()
 const localValidationError = ref(props.validationError)
 
@@ -112,7 +113,7 @@ export enum LabelPosition {
     <div class="flex flex-row items-center">
       <slot
         :id="id"
-        :has-error="!!validationError"
+        :has-error="!!localValidationError"
         :update-validation-error="updateValidationError"
       />
     </div>

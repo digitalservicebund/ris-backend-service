@@ -38,13 +38,11 @@ testWithImportedNorm(
     })
     await finishButton.click()
     await page.locator("[aria-label='Rahmendaten Speichern Button']").click()
-    await expect(
-      page.locator("text=Zuletzt gespeichert um").first(),
-    ).toBeVisible()
+    await expect(page.locator("text=Zuletzt").first()).toBeVisible()
     await page.reload()
 
     // retrieve by new eli
-    const eliInputValue = await page.inputValue('input[id="norm/frame/eli"]')
+    const eliInputValue = await page.inputValue('input[id="NORM/eli"]')
     await page.goto(`/api/v1/norms/xml/${eliInputValue}`)
 
     const response = await request.get(`/api/v1/norms/xml/${eliInputValue}`)

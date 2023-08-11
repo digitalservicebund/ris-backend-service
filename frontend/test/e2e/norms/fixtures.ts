@@ -81,7 +81,7 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
       fields: [
         {
           type: FieldType.TEXTAREA,
-          id: "norm/frame/OFFICIAL_LONG_TITLE",
+          id: "NORM/OFFICIAL_LONG_TITLE",
           label: "Amtliche Langüberschrift",
           value: norm.metadataSections?.NORM?.[0]?.OFFICIAL_LONG_TITLE?.[0],
         },
@@ -92,7 +92,7 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
       fields: [
         {
           type: FieldType.TEXT,
-          id: "norm/frame/risAbbreviation",
+          id: "NORM/risAbbreviation",
           label: "Juris-Abkürzung",
           value: norm.metadataSections?.NORM?.[0]?.RIS_ABBREVIATION?.[0],
         },
@@ -103,7 +103,7 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
       fields: [
         {
           type: FieldType.CHIPS,
-          id: "norm/frame/risAbbreviationInternationalLaw",
+          id: "NORM/risAbbreviationInternationalLaw",
           label: "Juris-Abkürzung für völkerrechtliche Vereinbarungen",
           value:
             norm.metadataSections?.NORM?.[0].RIS_ABBREVIATION_INTERNATIONAL_LAW,
@@ -115,7 +115,7 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
       fields: [
         {
           type: FieldType.TEXT,
-          id: "norm/frame/documentNumber",
+          id: "NORM/documentNumber",
           label: "Dokumentnummer",
           value: norm.metadataSections?.NORM?.[0]?.DOCUMENT_NUMBER?.[0],
         },
@@ -126,7 +126,7 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
       fields: [
         {
           type: FieldType.CHIPS,
-          id: "norm/frame/divergentDocumentNumbers",
+          id: "NORM/divergentDocumentNumbers",
           label: "Abweichende Dokumentnummer",
           value: norm.metadataSections?.NORM?.[0].DIVERGENT_DOCUMENT_NUMBER,
         },
@@ -137,7 +137,7 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
       fields: [
         {
           type: FieldType.TEXT,
-          id: "norm/frame/documentCategory",
+          id: "NORM/documentCategory",
           label: "Dokumentart",
           value: norm.metadataSections?.NORM?.[0]?.DOCUMENT_CATEGORY?.[0],
         },
@@ -148,7 +148,7 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
       fields: [
         {
           type: FieldType.CHIPS,
-          id: "norm/frame/frameKeywords",
+          id: "NORM/frameKeywords",
           label: "Schlagwörter im Rahmenelement",
           value: norm.metadataSections?.NORM?.[0].KEYWORD,
         },
@@ -333,7 +333,7 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
       fields: [
         {
           type: FieldType.TEXT,
-          id: "norm/frame/officialShortTitle",
+          id: "NORM/officialShortTitle",
           label: "Amtliche Kurzüberschrift",
           value: norm.metadataSections?.NORM?.[0]?.OFFICIAL_SHORT_TITLE?.[0],
         },
@@ -344,7 +344,7 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
       fields: [
         {
           type: FieldType.TEXT,
-          id: "norm/frame/officialAbbreviation",
+          id: "NORM/officialAbbreviation",
           label: "Amtliche Buchstabenabkürzung",
           value: norm.metadataSections?.NORM?.[0]?.OFFICIAL_ABBREVIATION?.[0],
         },
@@ -355,7 +355,7 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
       fields: [
         {
           type: FieldType.CHIPS,
-          id: "norm/frame/unofficialLongTitles",
+          id: "NORM/unofficialLongTitles",
           label: "Nichtamtliche Langüberschrift",
           value: norm.metadataSections?.NORM?.[0].UNOFFICIAL_LONG_TITLE,
         },
@@ -366,7 +366,7 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
       fields: [
         {
           type: FieldType.CHIPS,
-          id: "norm/frame/unofficialShortTitles",
+          id: "NORM/unofficialShortTitles",
           label: "Nichtamtliche Kurzüberschrift",
           value: norm.metadataSections?.NORM?.[0].UNOFFICIAL_SHORT_TITLE,
         },
@@ -377,7 +377,7 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
       fields: [
         {
           type: FieldType.CHIPS,
-          id: "norm/frame/unofficialAbbreviations",
+          id: "NORM/unofficialAbbreviations",
           label: "Nichtamtliche Buchstabenabkürzung",
           value: norm.metadataSections?.NORM?.[0].UNOFFICIAL_ABBREVIATION,
         },
@@ -1173,7 +1173,7 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
       fields: [
         {
           type: FieldType.CHIPS,
-          id: "norm/frame/unofficialReferences",
+          id: "NORM/unofficialReferences",
           label: "Nichtamtliche Fundstelle",
           value: norm.metadataSections?.NORM?.[0].UNOFFICIAL_REFERENCE,
         },
@@ -1185,7 +1185,7 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
       fields: [
         {
           type: FieldType.TEXT,
-          id: "norm/frame/completeCitation",
+          id: "NORM/completeCitation",
           label: "Vollzitat",
           value: norm.metadataSections?.NORM?.[0]?.COMPLETE_CITATION?.[0],
         },
@@ -1472,7 +1472,7 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
       fields: [
         {
           type: FieldType.CHIPS,
-          id: "norm/frame/validityRules",
+          id: "NORM/validityRules",
           label: "Gültigkeitsregelung",
           value: norm.metadataSections?.NORM?.[0].VALIDITY_RULE,
         },
@@ -1524,7 +1524,7 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
       fields: [
         {
           type: FieldType.CHIPS,
-          id: "norm/frame/referenceNumbers",
+          id: "NORM/referenceNumbers",
           label: "Aktenzeichen",
           value: norm.metadataSections?.NORM?.[0]?.REFERENCE_NUMBER,
         },
@@ -1536,7 +1536,7 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
       fields: [
         {
           type: FieldType.TEXT,
-          id: "norm/frame/celexNumber",
+          id: "NORM/celexNumber",
           label: "CELEX-Nummer",
           value: norm.metadataSections?.NORM?.[0]?.CELEX_NUMBER?.[0],
         },
@@ -1571,7 +1571,7 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
       fields: [
         {
           type: FieldType.CHIPS,
-          id: "norm/frame/definitions",
+          id: "NORM/definitions",
           label: "Definition",
           value: norm.metadataSections?.NORM?.[0]?.DEFINITION,
         },
@@ -1583,7 +1583,7 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
       fields: [
         {
           type: FieldType.CHIPS,
-          id: "norm/frame/ageOfMajorityIndications",
+          id: "NORM/ageOfMajorityIndications",
           label: "Angaben zur Volljährigkeit",
           value: norm.metadataSections?.NORM?.[0]?.AGE_OF_MAJORITY_INDICATION,
         },
@@ -1595,7 +1595,7 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
       fields: [
         {
           type: FieldType.TEXT,
-          id: "norm/frame/text",
+          id: "NORM/text",
           label: "Text",
           value: norm.metadataSections?.NORM?.[0]?.TEXT?.[0],
         },

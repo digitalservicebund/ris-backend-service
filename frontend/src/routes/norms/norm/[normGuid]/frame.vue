@@ -58,7 +58,7 @@ const { hash: routeHash } = toRefs(route)
 useScrollToHash(routeHash)
 
 const { addSegment } = useLocator()
-addSegment(["norm", "frame"])
+addSegment(["NORM"])
 
 const metadataSections = computed({
   get: () => loadedNorm.value?.metadataSections ?? {},

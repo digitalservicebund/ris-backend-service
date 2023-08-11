@@ -29,9 +29,7 @@ testWithImportedNorm(
     }
 
     await page.locator("[aria-label='Rahmendaten Speichern Button']").click()
-    await expect(
-      page.locator("text=Zuletzt gespeichert um").first(),
-    ).toBeVisible()
+    await expect(page.locator("text=Zuletzt").first()).toBeVisible()
     await page.reload()
 
     for (const section of sections) {

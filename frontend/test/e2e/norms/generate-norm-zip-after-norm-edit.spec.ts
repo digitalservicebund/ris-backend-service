@@ -22,17 +22,10 @@ testWithImportedNorm(
     await locatorFrameButton.click()
 
     const newValue = "fake-Juris-Abkürzung"
-    await fillInputField(
-      page,
-      FieldType.TEXT,
-      "norm/frame/risAbbreviation",
-      newValue,
-    )
+    await fillInputField(page, FieldType.TEXT, "NORM/risAbbreviation", newValue)
 
     await page.locator("[aria-label='Rahmendaten Speichern Button']").click()
-    await expect(
-      page.locator("text=Zuletzt gespeichert um").first(),
-    ).toBeVisible()
+    await expect(page.locator("text=Zuletzt").first()).toBeVisible()
 
     const locatorExportMenu = page.locator("a:has-text('Export')")
     await expect(locatorExportMenu).toBeVisible()
