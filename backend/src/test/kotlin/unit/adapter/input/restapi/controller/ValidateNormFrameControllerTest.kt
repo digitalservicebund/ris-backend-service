@@ -78,7 +78,7 @@ class ValidateNormFrameControllerTest {
   }
 
   @Test
-  fun `it sends an server internal error response if the edit norm frame service throws an exception`() {
+  fun `it sends an server internal error response if the validate norm frame service throws an exception`() {
     every { validateNormFrameService.validateNormFrame(any()) } throws Error()
 
     webClient

@@ -29,7 +29,7 @@ class ValidateNormFrameController(private val validateNormFrameUseCase: Validate
       description =
           "Parse the norm frame data against the specification to check if the values are valid")
   @ApiResponses(
-      ApiResponse(responseCode = "204", description = "Norm was updated"),
+      ApiResponse(responseCode = "200", description = "Norm was updated"),
       ApiResponse(responseCode = "400"),
   )
   fun validateNormFrame(
