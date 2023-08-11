@@ -40,7 +40,7 @@ class HasAllMandatoryFields() : Specification<List<MetadataSection>> {
   ) {
     val metadatum =
         section.metadata.firstOrNull { metadatum -> metadatum.type == mandatoryMetadatumType }
-    if (metadatum == null) {
+    if (metadatum == null || (metadatum.value is String && metadatum.value.isBlank())) {
       val existingPair = missingFields.find { it.sectionName == section.name }
 
       if (existingPair != null) {

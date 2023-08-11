@@ -61,6 +61,20 @@ class HasAllMandatoryFieldsTest {
   }
 
   @Test
+  fun `it is not satisfied if mandatory sections have empty string`() {
+    val emptyStringSection =
+        MetadataSection(
+            MetadataSectionName.NORM,
+            listOf(Metadatum(" ", MetadatumType.OFFICIAL_LONG_TITLE)),
+        )
+    val result = HasAllMandatoryFields().evaluate(listOf(emptyStringSection))
+    assertThat(result.isNotSatisfied).isTrue()
+    assertThat(result.violations).isNotEmpty()
+    assertThat(result.violations.first { it.instance.toString().contains("OFFICIAL_LONG_TITLE") })
+        .isEqualTo(violation("NORM", "OFFICIAL_LONG_TITLE"))
+  }
+
+  @Test
   fun `it returns the correct violations with correctly formatted instance string (containing order if needed)`() {
     val normSection =
         MetadataSection(
