@@ -32,8 +32,8 @@ export type DocumentType = {
 }
 
 export type Court = {
-  type: string
-  location: string
+  type?: string
+  location?: string
   label: string
   revoked?: string
 }

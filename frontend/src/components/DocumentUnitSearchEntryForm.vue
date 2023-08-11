@@ -1,9 +1,7 @@
 <script lang="ts" setup>
 import { computed, ref } from "vue"
-import ComboboxInput from "@/components/ComboboxInput.vue"
 import { PublicationState } from "@/domain/documentUnit"
 import DocumentUnitListEntry from "@/domain/documentUnitListEntry"
-import ComboboxItemService from "@/services/comboboxItemService"
 import Checkbox from "@/shared/components/input/CheckboxInput.vue"
 import DateInput from "@/shared/components/input/DateInput.vue"
 import DropdownInput from "@/shared/components/input/DropdownInput.vue"
@@ -35,13 +33,47 @@ const publishingStateModel = computed({
     }
   },
 })
+
+const courtType = computed({
+  get: () => searchEntry.value?.court?.type,
+  set: (data) => {
+    if (data) {
+      if (searchEntry.value.court) {
+        searchEntry.value.court.type = data
+      } else {
+        searchEntry.value.court = { type: data, label: data }
+      }
+    } else {
+      if (searchEntry.value.court) {
+        delete searchEntry.value.court.type
+      }
+    }
+  },
+})
+
+const courtLocation = computed({
+  get: () => searchEntry.value?.court?.location,
+  set: (data) => {
+    if (data) {
+      if (searchEntry.value.court) {
+        searchEntry.value.court.location = data
+      } else {
+        searchEntry.value.court = { location: data, label: data }
+      }
+    } else {
+      if (searchEntry.value.court) {
+        delete searchEntry.value.court.location
+      }
+    }
+  },
+})
 </script>
 
 <template>
   <div class="mb-32 flex flex-col bg-blue-200 py-24">
     <!-- TODO: remove mb-16 from InputField to geive generel gap-20 here  -->
     <div
-      class="m-32 grid grid-flow-col grid-cols-[180px_auto_180px_auto] grid-rows-3 gap-x-20 gap-y-4"
+      class="m-32 grid grid-flow-col grid-cols-[180px_1fr_180px_1fr] grid-rows-3 gap-x-20 gap-y-4"
     >
       <!-- Column 1 -->
       <div class="ds-body-01-reg pl-32">Dokumentnummer/ Aktenzeichen</div>
@@ -63,15 +95,22 @@ const publishingStateModel = computed({
         </InputField>
       </div>
       <div class="flex flex-row gap-20 pr-32">
-        <InputField id="court" label="Gericht" visually-hide-label>
-          <ComboboxInput
-            id="court"
-            v-model="searchEntry.court"
-            aria-label="Gericht Suche"
-            clear-on-choosing-item
-            :item-service="ComboboxItemService.getCourts"
-            placeholder="Gerichtstyp Gerichtsort"
-          ></ComboboxInput>
+        <InputField id="courtType" label="Gerichtstyp" visually-hide-label>
+          <TextInput
+            id="courtType"
+            v-model="courtType"
+            aria-label="Gerichtstyp"
+            placeholder="Gerichtstyp"
+          ></TextInput>
+        </InputField>
+
+        <InputField id="courtLocation" label="Gerichtsort" visually-hide-label>
+          <TextInput
+            id="courtLocation"
+            v-model="courtLocation"
+            aria-label="Gerichtsort"
+            placeholder="Gerichtsort"
+          ></TextInput>
         </InputField>
       </div>
       <div class="flex flex-row gap-20 pr-32">
