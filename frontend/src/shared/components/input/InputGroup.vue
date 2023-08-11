@@ -96,6 +96,7 @@ watch(
           :id="field.name"
           v-model="inputValues[field.name]"
           :attributes="field.inputAttributes"
+          class="w-full"
           :type="field.type"
           :validation-error="
             props.validationErrors &&

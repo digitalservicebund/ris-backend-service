@@ -100,11 +100,13 @@ export enum LabelPosition {
       </label>
     </div>
 
-    <slot
-      :id="id"
-      :has-error="!!validationError"
-      :update-validation-error="updateValidationError"
-    />
+    <div class="flex flex-row items-center">
+      <slot
+        :id="id"
+        :has-error="!!validationError"
+        :update-validation-error="updateValidationError"
+      />
+    </div>
 
     <div
       v-if="localValidationError"
