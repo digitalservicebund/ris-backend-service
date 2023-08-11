@@ -49,10 +49,10 @@ public interface DatabaseDocumentUnitMetadataRepository
           + "(:docTypeId IS NULL OR document_type_id = :docTypeId) AND "
           + "(status.publication_status IS NULL OR status.publication_status IN ('PUBLISHED', 'PUBLISHING')) AND "
           + "data_source in ('NEURIS', 'MIGRATION') ";
-  String ORDER_BY_DOCNR =
-      "ORDER BY "
-          + "SUBSTRING(documentnumber, LENGTH(documentnumber) - 8, 4) DESC, "
-          + "RIGHT(documentnumber, 5) DESC ";
+  String ORDER_BY_DOCNR = "ORDER BY id DESC ";
+
+  // + "SUBSTRING(documentnumber, LENGTH(documentnumber) - 8, 4) DESC, "
+  // + "RIGHT(documentnumber, 5) DESC ";
 
   Mono<DocumentUnitMetadataDTO> findByUuid(UUID documentUnitUuid);
 
