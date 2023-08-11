@@ -5,6 +5,7 @@ Date: 2023-05-11
 ## Status
 
 Accepted
+Extended by [ADR 0017](./0017-addressing-of-validation-errors.md)
 
 ## Context
 
@@ -16,12 +17,12 @@ follow standards and best practices.
 
 We decided for the following:
 
-* For each error the API will return an error code and an optional human-readable message in english that is meant to
+- For each error the API will return an error code and an optional human-readable message in english that is meant to
   help developers.
-* Error codes are strings and not numbers in order to give them some meaning and readability.
-* The creation of human-readable message (and their translations) for users has to be done by the frontend.
-* The status code for validation errors is 422.
-* The reponse will structured like this:
+- Error codes are strings and not numbers in order to give them some meaning and readability.
+- The creation of human-readable message (and their translations) for users has to be done by the frontend.
+- The status code for validation errors is 422.
+- The reponse will structured like this:
 
 ```
 header: <status>
@@ -35,9 +36,13 @@ body: {
 
 }
 ```
+
 ### Examples
+
 Be aware: The error codes in the following examples still need to be defined and are not final.
+
 #### 404 error - Response:
+
 ```
 header - status: 404
 
@@ -49,7 +54,9 @@ body:  {
 
 }
 ```
+
 #### 422 error - Response (Validation error):
+
 ```
 header - status: 422
 body:  {
@@ -62,13 +69,15 @@ body:  {
 ```
 
 ## Consequences
-* We need to define error codes and messages for all status codes and validation errors in the backend
-* We need to add a translation json and maybe a i18n-library to our frontend code that maps error codes to translated strings.
-* We need to adapt the backend API code to return the correct response.
-* We need to adapt the frontend to deal with the new API response.
+
+- We need to define error codes and messages for all status codes and validation errors in the backend
+- We need to add a translation json and maybe a i18n-library to our frontend code that maps error codes to translated strings.
+- We need to adapt the backend API code to return the correct response.
+- We need to adapt the frontend to deal with the new API response.
 
 ## References
-* [Best Practices for REST API Error Handling | Baeldung](https://www.baeldung.com/rest-api-error-handling-best-practices)
-* [ControllerAdvice (Spring Framework 6.0.9 API)](https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/web/bind/annotation/ControllerAdvice.html)
-* [Spring Web and WebFlux exception handling best practices](https://medium.com/codex/spring-web-and-webflux-exception-handling-best-practices-b2c3cd7e3acf)
-* [Complete Guide to Exception Handling in Spring Boot](https://reflectoring.io/spring-boot-exception-handling/)
+
+- [Best Practices for REST API Error Handling | Baeldung](https://www.baeldung.com/rest-api-error-handling-best-practices)
+- [ControllerAdvice (Spring Framework 6.0.9 API)](https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/web/bind/annotation/ControllerAdvice.html)
+- [Spring Web and WebFlux exception handling best practices](https://medium.com/codex/spring-web-and-webflux-exception-handling-best-practices-b2c3cd7e3acf)
+- [Complete Guide to Exception Handling in Spring Boot](https://reflectoring.io/spring-boot-exception-handling/)
