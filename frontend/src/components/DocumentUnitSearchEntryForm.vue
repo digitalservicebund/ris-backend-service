@@ -63,6 +63,15 @@ const courtLocation = computed({
     }
   },
 })
+
+const myDocOfficeOnly = computed({
+  get: () => searchEntry.value?.myDocOfficeOnly,
+  set: (data) => {
+    data
+      ? (searchEntry.value.myDocOfficeOnly = true)
+      : (searchEntry.value.myDocOfficeOnly = false)
+  },
+})
 </script>
 
 <template>
@@ -94,7 +103,7 @@ const courtLocation = computed({
           <TextInput
             id="courtType"
             v-model="courtType"
-            aria-label="Gerichtstyp"
+            aria-label="Gerichtstyp Suche"
             placeholder="Gerichtstyp"
           ></TextInput>
         </InputField>
@@ -103,7 +112,7 @@ const courtLocation = computed({
           <TextInput
             id="courtLocation"
             v-model="courtLocation"
-            aria-label="Gerichtsort"
+            aria-label="Gerichtsort Suche"
             placeholder="Gerichtsort"
           ></TextInput>
         </InputField>
@@ -133,7 +142,7 @@ const courtLocation = computed({
           />
         </InputField>
       </div>
-      <div class="pr-32">
+      <div class="flex flex-row gap-20 pr-32">
         <InputField
           id="documentationOffice"
           v-slot="{ id }"
@@ -142,8 +151,21 @@ const courtLocation = computed({
         >
           <Checkbox
             :id="id"
+            v-model="myDocOfficeOnly"
+            aria-label="Nur meine Dokstelle Filter"
+          />
+        </InputField>
+        <InputField
+          v-if="myDocOfficeOnly"
+          id="hasError"
+          v-slot="{ id }"
+          label="Nur fehlerhafte Dokumentationseinheiten"
+          :label-position="LabelPosition.RIGHT"
+        >
+          <Checkbox
+            :id="id"
             v-model="undefined"
-            aria-label="Nur meine Dokstelle"
+            aria-label="Nur fehlerhafte Dokumentationseinheiten"
           />
         </InputField>
       </div>

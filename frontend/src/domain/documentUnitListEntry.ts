@@ -13,6 +13,7 @@ export default class DocumentUnitListEntry {
   documentationOffice?: DocumentationOffice
   documentType?: DocumentType
   court?: Court
+  myDocOfficeOnly: boolean = false
 
   constructor(data: Partial<DocumentUnitListEntry> = {}) {
     Object.assign(this, data)
