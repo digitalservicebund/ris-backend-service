@@ -1,5 +1,6 @@
 import userEvent from "@testing-library/user-event"
 import { render, screen, within } from "@testing-library/vue"
+import { createPinia, setActivePinia } from "pinia"
 import DigitalAnnouncementInputGroup from "@/components/officialReference/DigitalAnnouncementInputGroup.vue"
 import { Metadata } from "@/domain/Norm"
 
@@ -84,6 +85,9 @@ function getControls() {
 }
 
 describe("DigitalAnnouncementInputGroup", () => {
+  beforeEach(async () => {
+    setActivePinia(createPinia())
+  })
   it("renders all digital announcement inputs", () => {
     renderComponent({
       modelValue: {

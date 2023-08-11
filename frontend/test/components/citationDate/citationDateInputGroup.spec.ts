@@ -1,5 +1,6 @@
 import userEvent from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
+import { createPinia, setActivePinia } from "pinia"
 import CitationDateInputGroup from "@/components/citationDate/CitationDateInputGroup.vue"
 import { Metadata } from "@/domain/Norm"
 
@@ -17,6 +18,9 @@ function renderComponent(options?: {
 }
 
 describe("Citation date/year field", () => {
+  beforeEach(async () => {
+    setActivePinia(createPinia())
+  })
   it("Shows date label and passed date value", () => {
     renderComponent({ modelValue: { DATE: ["01.01.2020"] } })
 

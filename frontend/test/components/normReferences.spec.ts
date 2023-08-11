@@ -1,5 +1,6 @@
 import userEvent from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
+import { createPinia, setActivePinia } from "pinia"
 import NormReferences from "@/components/NormReferences.vue"
 import { NormAbbreviation } from "@/domain/normAbbreviation"
 import NormReference from "@/domain/normReference"
@@ -40,6 +41,9 @@ function generateNormReference(options?: {
 }
 
 describe("Norm references", () => {
+  beforeEach(async () => {
+    setActivePinia(createPinia())
+  })
   const normAbbreviation: NormAbbreviation = {
     abbreviation: "1000g-BefV",
   }

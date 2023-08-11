@@ -1,5 +1,6 @@
 import userEvent from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
+import { createPinia, setActivePinia } from "pinia"
 import NormProviderInputGroup from "@/components/normProvider/NormProviderInputGroup.vue"
 import { Metadata } from "@/domain/Norm"
 
@@ -28,6 +29,9 @@ function getControls() {
 }
 
 describe("NormProviderInputGroup", () => {
+  beforeEach(async () => {
+    setActivePinia(createPinia())
+  })
   it("renders an input field for the entity value", async () => {
     renderComponent({ modelValue: { ENTITY: ["test entity"] } })
 

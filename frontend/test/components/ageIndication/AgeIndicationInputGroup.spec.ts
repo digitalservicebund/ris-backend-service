@@ -1,5 +1,6 @@
 import userEvent from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
+import { createPinia, setActivePinia } from "pinia"
 import AgeIndicationInputGroup from "@/components/ageIndication/AgeIndicationInputGroup.vue"
 import { Metadata, MetadatumType } from "@/domain/Norm"
 
@@ -12,6 +13,9 @@ function renderComponent(options?: { modelValue?: Metadata }) {
 }
 
 describe("AgeIndicationInputGroup", () => {
+  beforeEach(async () => {
+    setActivePinia(createPinia())
+  })
   it("renders an input field for the Starting Age value", async () => {
     renderComponent({
       modelValue: { [MetadatumType.RANGE_START]: ["test value"] },

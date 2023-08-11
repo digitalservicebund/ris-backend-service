@@ -1,5 +1,6 @@
 import userEvent from "@testing-library/user-event"
 import { within, render, screen } from "@testing-library/vue"
+import { createPinia, setActivePinia } from "pinia"
 import EuAnnouncementInputGroup from "@/components/officialReference/EuAnnouncementInputGroup.vue"
 import { Metadata } from "@/domain/Norm"
 
@@ -73,6 +74,9 @@ function getControls() {
 }
 
 describe("EuGovernmentGazetteInputGroup", () => {
+  beforeEach(async () => {
+    setActivePinia(createPinia())
+  })
   it("renders all inputs", () => {
     renderComponent({
       modelValue: {

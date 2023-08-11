@@ -1,5 +1,6 @@
 import userEvent from "@testing-library/user-event"
 import { render, screen, fireEvent } from "@testing-library/vue"
+import { createPinia, setActivePinia } from "pinia"
 import DivergentEntryIntoForceGroup from "@/components/divergentGroup/divergentEntryIntoForce/DivergentEntryIntoForceGroup.vue"
 import {
   MetadataSectionName,
@@ -17,6 +18,9 @@ function renderComponent(options?: { modelValue?: MetadataSections }) {
 }
 
 describe("DivergentEntryIntoForceGroup", () => {
+  beforeEach(async () => {
+    setActivePinia(createPinia())
+  })
   it("should render the component with 2 radio buttons each for different sections ", () => {
     renderComponent()
     const divergentEntryIntoForceDefinedSelection = screen.queryByLabelText(

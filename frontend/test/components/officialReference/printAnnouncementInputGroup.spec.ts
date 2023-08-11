@@ -1,5 +1,6 @@
 import userEvent from "@testing-library/user-event"
 import { render, screen, within } from "@testing-library/vue"
+import { createPinia, setActivePinia } from "pinia"
 import PrintAnnouncementInputGroup from "@/components/officialReference/PrintAnnouncementInputGroup.vue"
 import { Metadata } from "@/domain/Norm"
 
@@ -68,6 +69,9 @@ function getControls() {
 }
 
 describe("PrintAnnouncementInputGroup", () => {
+  beforeEach(async () => {
+    setActivePinia(createPinia())
+  })
   it("renders all print announcement inputs", () => {
     renderComponent({
       modelValue: {

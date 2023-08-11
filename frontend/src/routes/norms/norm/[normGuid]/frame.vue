@@ -25,6 +25,7 @@ import FootnoteInput from "@/components/footnote/FootnoteInput.vue"
 import { summarizeFootnotePerLine } from "@/components/footnote/summarizer"
 import LeadInputGroup from "@/components/lead/LeadInputGroup.vue"
 import { leadSummarizer } from "@/components/lead/summarizer"
+import NormFrameFooter from "@/components/NormFrameFooter.vue"
 import NormProviderInputGroup from "@/components/normProvider/NormProviderInputGroup.vue"
 import { normProviderSummarizer } from "@/components/normProvider/summarizer"
 import AnnouncementGroup from "@/components/officialReference/AnnouncementGroup.vue"
@@ -46,16 +47,15 @@ import { dateYearSummarizer } from "@/helpers/dateYearSummarizer"
 import { generalSummarizer } from "@/helpers/generalSummarizer"
 import { withSummarizer } from "@/shared/components/DataSetSummary.vue"
 import EditableList from "@/shared/components/EditableList.vue"
-import SaveButton from "@/shared/components/input/SaveButton.vue"
 import { InputType } from "@/shared/components/input/types"
 import { useLoadedNormStore } from "@/stores/loadedNorm"
+
+const loadedNormStore = useLoadedNormStore()
+const { loadedNorm } = storeToRefs(loadedNormStore)
 
 const route = useRoute()
 const { hash: routeHash } = toRefs(route)
 useScrollToHash(routeHash)
-
-const store = useLoadedNormStore()
-const { loadedNorm } = storeToRefs(store)
 
 const { addSegment } = useLocator()
 addSegment(["norm", "frame"])
@@ -644,11 +644,6 @@ const AgeIndicationSummary = withSummarizer(ageIndicationSummarizer)
     />
 
     <SingleDataFieldSection id="text" v-model="text" label="Text" />
-
-    <SaveButton
-      aria-label="Rahmendaten Speichern Button"
-      class="mt-8"
-      :service-callback="store.update"
-    />
+    <NormFrameFooter />
   </div>
 </template>

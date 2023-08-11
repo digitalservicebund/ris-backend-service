@@ -1,5 +1,6 @@
 import userEvent from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
+import { createPinia, setActivePinia } from "pinia"
 import OtherOfficialAnnouncementInputGroup from "@/components/officialReference/OtherOfficialAnnouncementInputGroup.vue"
 import { Metadata, MetadatumType } from "@/domain/Norm"
 
@@ -11,6 +12,9 @@ function renderComponent(options?: { modelValue?: Metadata }) {
 }
 
 describe("OtherOfficialReferenceInputGroup", () => {
+  beforeEach(async () => {
+    setActivePinia(createPinia())
+  })
   it("renders all inputs", () => {
     renderComponent({
       modelValue: {

@@ -1,5 +1,6 @@
 import userEvent from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
+import { createPinia, setActivePinia } from "pinia"
 import { describe, test } from "vitest"
 import NoteStatusIndicationGroup from "@/components/statusIndication/NoteStatusIndicationGroup.vue"
 import { MetadataSectionName } from "@/domain/Norm"
@@ -18,6 +19,9 @@ function renderComponent(props: Partial<NoteStatusIndicationGroupProps>) {
 }
 
 describe("NoteStatusIndicationGroup in repeal mode", () => {
+  beforeEach(async () => {
+    setActivePinia(createPinia())
+  })
   test("should render", () => {
     renderComponent({ type: MetadataSectionName.REPEAL })
   })

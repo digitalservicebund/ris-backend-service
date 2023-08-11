@@ -1,5 +1,6 @@
 import userEvent from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
+import { createPinia, setActivePinia } from "pinia"
 import {
   defineTextField,
   defineChipsField,
@@ -37,6 +38,9 @@ function renderComponent(options?: {
 }
 
 describe("NestedInput", () => {
+  beforeEach(async () => {
+    setActivePinia(createPinia())
+  })
   global.ResizeObserver = require("resize-observer-polyfill")
   it("renders nested input with two text input fields", async () => {
     renderComponent()

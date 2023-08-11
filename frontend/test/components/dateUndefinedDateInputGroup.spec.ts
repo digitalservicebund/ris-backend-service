@@ -1,5 +1,6 @@
 import userEvent from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
+import { createPinia, setActivePinia } from "pinia"
 import DateUndefinedDateInputGroup from "@/components/DateUndefinedDateInputGroup.vue"
 
 function renderComponent(overrides = {}) {
@@ -21,6 +22,9 @@ function renderComponent(overrides = {}) {
 }
 
 describe("Date or UndefinedDate InputGroup Component", () => {
+  beforeEach(async () => {
+    setActivePinia(createPinia())
+  })
   it('renders DateInput when selectedInputType is "date" and the other input is not in the document', async () => {
     renderComponent()
 

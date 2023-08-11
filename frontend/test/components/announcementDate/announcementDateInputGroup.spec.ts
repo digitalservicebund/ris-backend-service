@@ -1,5 +1,6 @@
 import userEvent from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
+import { createPinia, setActivePinia } from "pinia"
 import AnnouncementDateInputGroup from "@/components/announcementDate/AnnouncementDateInputGroup.vue"
 import { Metadata } from "@/domain/Norm"
 
@@ -20,6 +21,9 @@ function renderComponent(props?: Partial<AnnouncementDateInputGroupProps>) {
 }
 
 describe("Announcement date/time/year fields", () => {
+  beforeEach(async () => {
+    setActivePinia(createPinia())
+  })
   it("defaults to the date selection", () => {
     renderComponent({})
 

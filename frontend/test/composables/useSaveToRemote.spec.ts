@@ -1,7 +1,11 @@
 import { flushPromises } from "@vue/test-utils"
+import { createPinia, setActivePinia } from "pinia"
 import { useSaveToRemote } from "@/shared/composables/useSaveToRemote"
 
 describe("useSaveToRemote", () => {
+  beforeEach(async () => {
+    setActivePinia(createPinia())
+  })
   beforeEach(() => {
     vi.useFakeTimers()
   })
@@ -108,27 +112,27 @@ describe("useSaveToRemote", () => {
 
   it("sets the last save on date only after each successfully callback call", async () => {
     const callback = vi.fn()
-    const { triggerSave, lastSavedOn } = useSaveToRemote(callback)
+    const { triggerSave, formattedLastSavedOn } = useSaveToRemote(callback)
 
-    expect(lastSavedOn.value).toBeUndefined()
+    expect(formattedLastSavedOn.value).toBeUndefined()
 
     vi.setSystemTime(1000)
     callback.mockResolvedValueOnce({ status: 200, data: undefined })
     await triggerSave()
 
-    expect(lastSavedOn.value?.getTime()).toBe(1000)
+    expect(formattedLastSavedOn.value).toBe(1000)
 
     vi.setSystemTime(2000)
     callback.mockResolvedValueOnce({ status: 400, error: { title: "error" } })
     await triggerSave()
 
-    expect(lastSavedOn.value?.getTime()).toBe(1000)
+    expect(formattedLastSavedOn.value).toBe(1000)
 
     vi.setSystemTime(3000)
     callback.mockResolvedValueOnce({ status: 200, data: undefined })
     await triggerSave()
 
-    expect(lastSavedOn.value?.getTime()).toBe(3000)
+    expect(formattedLastSavedOn.value).toBe(3000)
   })
 
   it("automatically triggers the callback once per set interval", async () => {

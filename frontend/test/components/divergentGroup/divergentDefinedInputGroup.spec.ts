@@ -1,5 +1,6 @@
 import userEvent from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
+import { createPinia, setActivePinia } from "pinia"
 import DivergentDefinedInputGroup from "@/components/divergentGroup/DivergentDefinedInputGroup.vue"
 import { Metadata, MetadataSectionName, NormCategory } from "@/domain/Norm"
 
@@ -44,6 +45,9 @@ function getControls() {
 }
 
 describe("DivergentExpirationDefinedInputGroup", () => {
+  beforeEach(async () => {
+    setActivePinia(createPinia())
+  })
   it("renders all inputs and correct model value entry", () => {
     renderComponent({
       id: "divergentExpirationDefinedInputGroup",

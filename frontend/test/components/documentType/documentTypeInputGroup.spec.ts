@@ -1,5 +1,6 @@
 import userEvent from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
+import { createPinia, setActivePinia } from "pinia"
 import DocumentTypeInputGroup from "@/components/documentType/DocumentTypeInputGroup.vue"
 import { Metadata, NormCategory } from "@/domain/Norm"
 
@@ -41,6 +42,9 @@ function getControls() {
 }
 
 describe("DocumentTypeInputGroup", () => {
+  beforeEach(async () => {
+    setActivePinia(createPinia())
+  })
   it("should render the components with the initial state of the modelvalue", () => {
     renderComponent({
       modelValue: {

@@ -291,11 +291,19 @@ function encodeMetadata(metadata: Metadata): MetadatumSchema[] | null {
   const encodedMapping = mapValues(
     metadata,
     (group, type) =>
-      group?.map((value, index) => ({
-        type,
-        order: index + 1,
-        value: ENCODERS[type](value as never),
-      })),
+      group
+        ?.map((value, index) => {
+          if (typeof value === "string" && value.trim() === "") {
+            return null
+          }
+
+          return {
+            type,
+            order: index + 1,
+            value: ENCODERS[type](value as never),
+          }
+        })
+        .filter((item) => item !== null) as MetadatumSchema[],
   )
 
   return mergeValues(encodedMapping)

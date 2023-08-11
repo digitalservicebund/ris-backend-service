@@ -1,5 +1,6 @@
 import userEvent from "@testing-library/user-event"
 import { render, screen, fireEvent } from "@testing-library/vue"
+import { createPinia, setActivePinia } from "pinia"
 import AnnouncementGroup from "@/components/officialReference/AnnouncementGroup.vue"
 import {
   MetadataSectionName,
@@ -16,6 +17,9 @@ function renderComponent(options?: { modelValue?: MetadataSections }) {
 }
 
 describe("AnnouncementInputGroup", () => {
+  beforeEach(async () => {
+    setActivePinia(createPinia())
+  })
   it("should render the component with 4 radio buttons each for different sections ", () => {
     renderComponent()
     const printRadio = screen.queryByLabelText(

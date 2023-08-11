@@ -1,5 +1,6 @@
 import userEvent from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
+import { createPinia, setActivePinia } from "pinia"
 import { describe, test } from "vitest"
 import StatusIndicationInputGroup from "@/components/statusIndication/StatusIndicationInputGroup.vue"
 
@@ -17,6 +18,9 @@ function renderComponent(props: Partial<StatusIndicationInputGroup>) {
 }
 
 describe("StatusIndicationInputGroup", () => {
+  beforeEach(async () => {
+    setActivePinia(createPinia())
+  })
   test("should render", () => {
     renderComponent({})
   })

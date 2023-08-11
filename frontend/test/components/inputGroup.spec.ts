@@ -1,5 +1,6 @@
 import userEvent from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
+import { createPinia, setActivePinia } from "pinia"
 import InputGroup from "@/shared/components/input/InputGroup.vue"
 import { InputField } from "@/shared/components/input/types"
 import { generateTextInputField } from "~/test-helper/dataGenerators"
@@ -18,6 +19,9 @@ function renderComponent(options?: {
 }
 
 describe("InputFieldGroup", () => {
+  beforeEach(async () => {
+    setActivePinia(createPinia())
+  })
   it("renders an input for each defined field", () => {
     const fields = [
       generateTextInputField({ inputAttributes: { ariaLabel: "Foo Label" } }),

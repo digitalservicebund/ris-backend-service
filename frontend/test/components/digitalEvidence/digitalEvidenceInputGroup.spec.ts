@@ -1,5 +1,6 @@
 import userEvent from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
+import { createPinia, setActivePinia } from "pinia"
 import DigitalEvidenceInputGroup from "@/components/digitalEvidence/DigitalEvidenceInputGroup.vue"
 import { Metadata } from "@/domain/Norm"
 
@@ -36,6 +37,9 @@ function getControls() {
 }
 
 describe("DigitalEvidenceInputGroup", () => {
+  beforeEach(async () => {
+    setActivePinia(createPinia())
+  })
   it("should render the components with the initial state of the modelvalue", () => {
     renderComponent({
       modelValue: {

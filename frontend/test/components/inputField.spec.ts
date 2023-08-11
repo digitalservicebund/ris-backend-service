@@ -1,5 +1,6 @@
 import userEvent from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
+import { createPinia, setActivePinia } from "pinia"
 import InputField, {
   LabelPosition,
 } from "@/shared/components/input/InputField.vue"
@@ -24,6 +25,10 @@ function renderComponent(
 }
 
 describe("InputField", () => {
+  beforeEach(async () => {
+    setActivePinia(createPinia())
+  })
+
   it("renders the component with a label", () => {
     renderComponent({ label: "test label" })
     const element = screen.getByLabelText("test label")

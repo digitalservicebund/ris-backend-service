@@ -1,3 +1,4 @@
+import * as Sentry from "@sentry/vue"
 import {
   decodeNorm,
   encodeMetadataSections,
@@ -6,6 +7,7 @@ import {
 import { NormListResponseSchema, NormResponseSchema } from "./schemas"
 import { FlatMetadata, MetadataSections, Norm } from "@/domain/Norm"
 import httpClient, { ServiceResponse } from "@/services/httpClient"
+import { ValidationError } from "@/shared/components/input/types"
 import errorMessages from "@/shared/i18n/errors.json"
 
 export async function getAllNorms(): Promise<
@@ -71,6 +73,11 @@ export async function editNormFrame(
   )
 
   if (status >= 300 || error) {
+    Sentry.captureException(error, {
+      tags: {
+        type: "save_failed",
+      },
+    })
     return {
       status: status,
       error: errorMessages.EDIT_ERROR,
@@ -128,6 +135,11 @@ export async function triggerFileGeneration(
 ): Promise<ServiceResponse<string>> {
   const { status, error } = await httpClient.post(`norms/${guid}/files`)
   if (status >= 400 || error) {
+    Sentry.captureException(error, {
+      tags: {
+        type: "zip_creation_failed",
+      },
+    })
     return {
       status,
       error: errorMessages.GENERATION_ERROR,
@@ -136,6 +148,43 @@ export async function triggerFileGeneration(
     return {
       status,
       data: "Datei wurde erstellt.",
+    }
+  }
+}
+
+export async function validateNormFrame(
+  metadataSections?: MetadataSections,
+): Promise<ServiceResponse<ValidationError[]>> {
+  const headers = {
+    Accept: "application/json",
+    "Content-Type": "application/json",
+  }
+
+  const body = {
+    metadataSections: encodeMetadataSections(metadataSections ?? {}) ?? [],
+  }
+
+  try {
+    const { status, error, data } = await httpClient.post<
+      unknown,
+      ValidationError[]
+    >("norms/norm/validation", { headers }, body)
+
+    if (status === 200) {
+      return {
+        status,
+        data: data ?? [],
+      }
+    } else {
+      return {
+        status,
+        error: error ?? errorMessages.NORM_COULD_NOT_BE_VALIDATED,
+      }
+    }
+  } catch (error) {
+    return {
+      status: 500,
+      error: errorMessages.SERVER_ERROR,
     }
   }
 }

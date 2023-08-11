@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { onUnmounted, toRaw } from "vue"
+import { toRaw } from "vue"
 import { ServiceResponse } from "@/services/httpClient"
 import TextButton from "@/shared/components/input/TextButton.vue"
 import { useSaveToRemote } from "@/shared/composables/useSaveToRemote"
@@ -9,20 +9,10 @@ const props = defineProps<{
   serviceCallback: () => Promise<ServiceResponse<void>>
 }>()
 
-const getCurrentTime = (dateSaved: Date) => {
-  const fullHour = ("0" + dateSaved.getHours()).slice(-2)
-  const fullMinute = ("0" + dateSaved.getMinutes()).slice(-2)
-  return `${fullHour}:${fullMinute}`
-}
-
-const { triggerSave, lastSaveError, lastSavedOn, timer } = useSaveToRemote(
+const { triggerSave, lastSaveError, formattedLastSavedOn } = useSaveToRemote(
   props.serviceCallback,
   10000,
 )
-
-onUnmounted(() => {
-  clearInterval(timer)
-})
 
 const getErrorDetails = () => {
   if (
@@ -50,10 +40,12 @@ const getErrorDetails = () => {
         </p>
       </div>
 
-      <div v-if="lastSavedOn !== undefined && lastSaveError === undefined">
+      <div
+        v-if="formattedLastSavedOn !== undefined && lastSaveError === undefined"
+      >
         <p class="ds-label-03-reg">
           Zuletzt
-          <span>{{ getCurrentTime(lastSavedOn) }}</span>
+          <span>{{ formattedLastSavedOn }}</span>
           Uhr
         </p>
       </div>

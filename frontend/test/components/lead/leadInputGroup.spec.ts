@@ -1,5 +1,6 @@
 import userEvent from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
+import { createPinia, setActivePinia } from "pinia"
 import LeadInputGroup from "@/components/lead/LeadInputGroup.vue"
 import { Metadata } from "@/domain/Norm"
 
@@ -24,6 +25,9 @@ function getControls() {
 }
 
 describe("LeadInputGroup", () => {
+  beforeEach(async () => {
+    setActivePinia(createPinia())
+  })
   it("renders an input field for the jurisdiction value", async () => {
     renderComponent({ modelValue: { LEAD_JURISDICTION: ["test value"] } })
 

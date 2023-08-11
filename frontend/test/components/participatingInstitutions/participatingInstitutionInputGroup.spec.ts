@@ -1,5 +1,6 @@
 import userEvent from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
+import { createPinia, setActivePinia } from "pinia"
 import ParticipatingInstitutionsInputGroup from "@/components/participatingInstitution/ParticipatingInstitutionInputGroup.vue"
 import { Metadata } from "@/domain/Norm"
 
@@ -27,6 +28,9 @@ function getControls() {
 }
 
 describe("ParticipatingInstitutionsInputGroup", () => {
+  beforeEach(async () => {
+    setActivePinia(createPinia())
+  })
   it("renders an input field for the type value", async () => {
     renderComponent({ modelValue: { PARTICIPATION_TYPE: ["test value"] } })
 

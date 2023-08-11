@@ -1,5 +1,6 @@
 import userEvent from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
+import { createPinia, setActivePinia } from "pinia"
 import { describe, test } from "vitest"
 import UpdateStatusIndicationGroup from "@/components/statusIndication/UpdateStatusIndicationGroup.vue"
 import { MetadataSectionName } from "@/domain/Norm"
@@ -18,6 +19,9 @@ function renderComponent(props: Partial<UpdateStatusIndicationGroupProps>) {
 }
 
 describe("UpdateStatusIndicationGroup in status mode", () => {
+  beforeEach(async () => {
+    setActivePinia(createPinia())
+  })
   test("should render", () => {
     renderComponent({ type: MetadataSectionName.STATUS })
   })

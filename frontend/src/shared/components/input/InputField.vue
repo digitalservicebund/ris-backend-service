@@ -1,6 +1,7 @@
 <script lang="ts" setup>
-import { computed, ref, watch } from "vue"
+import { computed, ref, watchEffect } from "vue"
 import { ValidationError } from "@/shared/components/input/types"
+import { useGlobalValidationErrorStore } from "@/stores/globalValidationErrorStore"
 
 interface Props {
   id: string
@@ -43,20 +44,28 @@ const labelConverted = computed(() => {
 /* -------------------------------------------------- *
  * Validation error handling                          *
  * -------------------------------------------------- */
-
-const localValidationError = ref()
+const { getByInstance } = useGlobalValidationErrorStore()
+const localValidationError = ref(props.validationError)
 
 function updateValidationError(newValidationError?: ValidationError) {
   localValidationError.value = newValidationError
 }
 
-watch(
-  () => props.validationError,
-  (next) => {
-    localValidationError.value = next
-  },
-  { immediate: true },
-)
+const storeValidationError = computed(() => getByInstance(props.id).value[0])
+
+watchEffect(() => {
+  if (props.validationError) {
+    localValidationError.value = props.validationError
+  }
+
+  if (getByInstance(props.id).value[0]) {
+    localValidationError.value = storeValidationError.value
+  }
+
+  if (!props.validationError && !storeValidationError.value) {
+    localValidationError.value = undefined
+  }
+})
 </script>
 
 <script lang="ts">

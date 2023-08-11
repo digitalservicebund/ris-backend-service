@@ -1,5 +1,6 @@
 import userEvent from "@testing-library/user-event"
 import { render, screen, fireEvent } from "@testing-library/vue"
+import { createPinia, setActivePinia } from "pinia"
 import DateOrYearInputGroup from "@/components/DateOrYearInputGroup.vue"
 import { Metadata } from "@/domain/Norm"
 
@@ -45,6 +46,9 @@ async function changeToDateInput() {
 }
 
 describe("date/year field", () => {
+  beforeEach(async () => {
+    setActivePinia(createPinia())
+  })
   describe("Default date component", () => {
     it("Shows 2 radio buttons with 1 selected by default and corresponding field displayed", () => {
       renderComponent()

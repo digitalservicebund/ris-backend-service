@@ -1,5 +1,6 @@
 import userEvent from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
+import { createPinia, setActivePinia } from "pinia"
 import SubjectAreaInputGroup from "@/components/subjectArea/SubjectAreaInputGroup.vue"
 import { Metadata } from "@/domain/Norm"
 
@@ -32,6 +33,9 @@ function getControls() {
 }
 
 describe("SubjectAreaInputGroup", () => {
+  beforeEach(async () => {
+    setActivePinia(createPinia())
+  })
   it("renders an input field for the FNA value", async () => {
     renderComponent({ modelValue: { SUBJECT_FNA: ["test value"] } })
 

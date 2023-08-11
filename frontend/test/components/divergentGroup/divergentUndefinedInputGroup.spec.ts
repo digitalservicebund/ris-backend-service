@@ -1,5 +1,6 @@
 import userEvent from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
+import { createPinia, setActivePinia } from "pinia"
 import DivergentUndefinedInputGroup from "@/components/divergentGroup/DivergentUndefinedInputGroup.vue"
 import {
   Metadata,
@@ -25,6 +26,9 @@ function renderComponent(options?: {
 }
 
 describe("DivergentEntryIntoForceUndefinedInputGroup", () => {
+  beforeEach(async () => {
+    setActivePinia(createPinia())
+  })
   it("renders all inputs and correct model value entry", () => {
     renderComponent({
       modelValue: {
