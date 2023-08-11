@@ -249,5 +249,5 @@ export const fieldLabels: { [name: string]: string } = Object.assign(
 
       return flatArray
     }, [] as InputField[])
-    .map((field) => ({ [field.name]: field.label as string })),
+    .map((field) => ({ [field.name]: field.label })),
 )

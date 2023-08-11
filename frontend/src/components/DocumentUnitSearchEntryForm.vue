@@ -44,9 +44,7 @@ const courtType = computed({
         searchEntry.value.court = { type: data, label: data }
       }
     } else {
-      if (searchEntry.value.court) {
-        delete searchEntry.value.court.type
-      }
+      searchEntry.value.court && delete searchEntry.value.court.type
     }
   },
 })
@@ -61,9 +59,7 @@ const courtLocation = computed({
         searchEntry.value.court = { location: data, label: data }
       }
     } else {
-      if (searchEntry.value.court) {
-        delete searchEntry.value.court.location
-      }
+      searchEntry.value.court && delete searchEntry.value.court.location
     }
   },
 })
@@ -71,7 +67,6 @@ const courtLocation = computed({
 
 <template>
   <div class="mb-32 flex flex-col bg-blue-200 py-24">
-    <!-- TODO: remove mb-16 from InputField to geive generel gap-20 here  -->
     <div
       class="m-32 grid grid-flow-col grid-cols-[180px_1fr_180px_1fr] grid-rows-3 gap-x-20 gap-y-4"
     >
@@ -152,22 +147,6 @@ const courtLocation = computed({
           />
         </InputField>
       </div>
-
-      <!-- <div class="pr-32">
-        <InputField
-          id="hasError"
-          v-slot="{ id }"
-          label="Nur fehlerhafte Dokumentationseinheiten"
-          :label-position="LabelPosition.RIGHT"
-        >
-          <Checkbox
-            :id="id"
-            v-model="undefined"
-            aria-label="Nur fehlerhafte Dokumentationseinheiten"
-            disabled
-          />
-        </InputField>
-      </div> -->
     </div>
 
     <div class="flex w-full flex-row justify-end pr-64">
