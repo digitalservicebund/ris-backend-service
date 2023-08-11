@@ -8,15 +8,18 @@ import Pagination, { Page } from "@/shared/components/Pagination.vue"
 
 const documentUnitListEntries = ref<DocumentUnitListEntry[]>()
 const currentPage = ref<Page<DocumentUnitListEntry>>()
-const searchRunning = ref(false)
+const searchInput = ref<DocumentUnitListEntry | undefined>(undefined)
 
 const itemsPerPage = 30
 
 async function search(page = 0, listEntry?: DocumentUnitListEntry) {
+  if (listEntry) {
+    searchInput.value = listEntry
+  }
   const response = await service.searchByDocumentUnitListEntry(
     page,
     itemsPerPage,
-    listEntry,
+    searchInput.value,
   )
   if (response.data) {
     documentUnitListEntries.value = response.data.content
@@ -40,9 +43,7 @@ async function handleDelete(documentUnitListEntry: DocumentUnitListEntry) {
 }
 
 async function handleSearch(listEntry: DocumentUnitListEntry) {
-  searchRunning.value = true
   await search(0, listEntry)
-  searchRunning.value = false
 }
 </script>
 
