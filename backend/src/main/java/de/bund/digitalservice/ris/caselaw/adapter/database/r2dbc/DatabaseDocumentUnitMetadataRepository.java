@@ -51,9 +51,6 @@ public interface DatabaseDocumentUnitMetadataRepository
           + "data_source in ('NEURIS', 'MIGRATION') ";
   String ORDER_BY_DOCNR = "ORDER BY id DESC ";
 
-  // + "SUBSTRING(documentnumber, LENGTH(documentnumber) - 8, 4) DESC, "
-  // + "RIGHT(documentnumber, 5) DESC ";
-
   Mono<DocumentUnitMetadataDTO> findByUuid(UUID documentUnitUuid);
 
   @Query(
