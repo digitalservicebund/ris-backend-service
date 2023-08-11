@@ -177,6 +177,9 @@ index df6f840..de8d552 100644
    - filename: .github/workflows/scan.yml
 ```
 
+## API Documentation
+To access the api documentation, start the application and navigate to `/api/docs.html` or `/api/docs.json` in your browser.
+
 ## Architecture Decision Records
 
 [Architecture decisions](https://cognitect.com/blog/2011/11/15/documenting-architecture-decisions) are kept in the [doc/adr](doc/adr) directory and are managed with [adr-tools](https://github.com/npryce/adr-tools).
