@@ -1,13 +1,13 @@
 package de.bund.digitalservice.ris.caselaw.adapter.transformer;
 
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentationOfficeDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPADocumentationOfficeDTO;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import java.util.Optional;
 
 public class DocumentationOfficeTransformer {
   private DocumentationOfficeTransformer() {}
 
-  public static DocumentationOffice transformDTO(DocumentationOfficeDTO documentationOfficeDTO) {
+  public static DocumentationOffice transformDTO(JPADocumentationOfficeDTO documentationOfficeDTO) {
     return Optional.ofNullable(documentationOfficeDTO)
         .map(
             dto ->
@@ -18,11 +18,11 @@ public class DocumentationOfficeTransformer {
         .orElse(null);
   }
 
-  public static DocumentationOfficeDTO transform(DocumentationOffice documentationOffice) {
+  public static JPADocumentationOfficeDTO transform(DocumentationOffice documentationOffice) {
     return Optional.ofNullable(documentationOffice)
         .map(
             domainObject ->
-                DocumentationOfficeDTO.builder()
+                JPADocumentationOfficeDTO.builder()
                     .label(domainObject.label())
                     .abbreviation(domainObject.abbreviation())
                     .build())

@@ -13,12 +13,12 @@ import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentUnitStatusServ
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentUnitController;
 import de.bund.digitalservice.ris.caselaw.adapter.DocxConverterService;
 import de.bund.digitalservice.ris.caselaw.adapter.KeycloakUserService;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPADocumentationOfficeDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPADocumentationOfficeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentUnitMetadataRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentUnitRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentUnitStatusRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentationOfficeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentationOfficeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.FileNumberDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.FileNumberRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.PostgresDocumentUnitRepositoryImpl;
@@ -26,6 +26,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.PostgresPublica
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationOfficeTransformer;
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresConfig;
+import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
 import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
 import de.bund.digitalservice.ris.caselaw.domain.DataSource;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitListEntry;
@@ -62,6 +63,7 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
       PostgresPublicationReportRepositoryImpl.class,
       FlywayConfig.class,
       PostgresConfig.class,
+      PostgresJPAConfig.class,
       SecurityConfig.class,
       AuthService.class,
       TestConfig.class
@@ -85,7 +87,7 @@ class DocumentUnitListEntryIntegrationTest {
   @Autowired private DatabaseDocumentUnitStatusRepository statusRepository;
   @Autowired private DatabaseDocumentUnitMetadataRepository listEntryRepository;
   @Autowired private FileNumberRepository fileNumberRepository;
-  @Autowired private DatabaseDocumentationOfficeRepository documentationOfficeRepository;
+  @Autowired private JPADocumentationOfficeRepository documentationOfficeRepository;
 
   @MockBean S3AsyncClient s3AsyncClient;
   @MockBean EmailPublishService publishService;
@@ -93,7 +95,7 @@ class DocumentUnitListEntryIntegrationTest {
   @MockBean UserService userService;
   @MockBean ReactiveClientRegistrationRepository clientRegistrationRepository;
 
-  private DocumentationOfficeDTO docOfficeDTO;
+  private JPADocumentationOfficeDTO docOfficeDTO;
 
   @BeforeEach
   void setUp() {
@@ -101,7 +103,7 @@ class DocumentUnitListEntryIntegrationTest {
     fileNumberRepository.deleteAll().block();
     statusRepository.deleteAll().block();
 
-    docOfficeDTO = documentationOfficeRepository.findByLabel("DigitalService").block();
+    docOfficeDTO = documentationOfficeRepository.findByLabel("DigitalService");
 
     doReturn(Mono.just(DocumentationOfficeTransformer.transformDTO(docOfficeDTO)))
         .when(userService)

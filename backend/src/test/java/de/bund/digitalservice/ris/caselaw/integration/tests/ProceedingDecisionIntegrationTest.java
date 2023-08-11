@@ -14,16 +14,16 @@ import de.bund.digitalservice.ris.caselaw.adapter.DocumentUnitController;
 import de.bund.digitalservice.ris.caselaw.adapter.DocxConverterService;
 import de.bund.digitalservice.ris.caselaw.adapter.KeycloakUserService;
 import de.bund.digitalservice.ris.caselaw.adapter.ProceedingDecisionController;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPADocumentationOfficeDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPADocumentationOfficeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentUnitMetadataRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentUnitRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentUnitStatusRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentationOfficeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentationUnitLinkRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabasePublicationReportRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitMetadataDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitStatusDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentationOfficeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentationUnitLinkDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.FileNumberDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.FileNumberRepository;
@@ -33,6 +33,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.Dat
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DocumentTypeDTO;
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresConfig;
+import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
 import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
 import de.bund.digitalservice.ris.caselaw.domain.DataSource;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
@@ -76,6 +77,7 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
       PostgresPublicationReportRepositoryImpl.class,
       FlywayConfig.class,
       PostgresConfig.class,
+      PostgresJPAConfig.class,
       SecurityConfig.class,
       AuthService.class,
       TestConfig.class
@@ -100,7 +102,7 @@ class ProceedingDecisionIntegrationTest {
   @Autowired private DatabaseDocumentationUnitLinkRepository linkRepository;
   @Autowired private FileNumberRepository fileNumberRepository;
   @Autowired private DatabaseDocumentTypeRepository databaseDocumentTypeRepository;
-  @Autowired private DatabaseDocumentationOfficeRepository documentationOfficeRepository;
+  @Autowired private JPADocumentationOfficeRepository documentationOfficeRepository;
   @Autowired private DatabaseDocumentUnitStatusRepository statusRepository;
 
   @Autowired private DatabasePublicationReportRepository databasePublishReportRepository;
@@ -116,8 +118,7 @@ class ProceedingDecisionIntegrationTest {
 
   @BeforeEach
   void setUp() {
-    documentationOfficeUuid =
-        documentationOfficeRepository.findByLabel(docOffice.label()).block().getId();
+    documentationOfficeUuid = documentationOfficeRepository.findByLabel(docOffice.label()).getId();
     doReturn(Mono.just(docOffice)).when(userService).getDocumentationOffice(any(OidcUser.class));
   }
 
@@ -774,8 +775,8 @@ class ProceedingDecisionIntegrationTest {
       documentTypeId = databaseDocumentTypeRepository.save(documentTypeDTO).block().getId();
     }
 
-    DocumentationOfficeDTO documentOffice =
-        documentationOfficeRepository.findByLabel(documentOfficeLabel).block();
+    JPADocumentationOfficeDTO documentOffice =
+        documentationOfficeRepository.findByLabel(documentOfficeLabel);
     assertThat(documentOffice).isNotNull();
 
     DocumentUnitMetadataDTO documentUnitMetadataDTO =

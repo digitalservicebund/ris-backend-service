@@ -12,8 +12,8 @@ import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentNumberService;
 import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentUnitStatusService;
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentUnitController;
 import de.bund.digitalservice.ris.caselaw.adapter.DocxConverterService;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPADocumentationOfficeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentUnitRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentationOfficeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentationUnitLinkRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentationUnitLinkDTO;
@@ -25,6 +25,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.Dat
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DocumentTypeDTO;
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresConfig;
+import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
 import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
 import de.bund.digitalservice.ris.caselaw.domain.ActiveCitation;
 import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
@@ -69,6 +70,7 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
       PostgresPublicationReportRepositoryImpl.class,
       FlywayConfig.class,
       PostgresConfig.class,
+      PostgresJPAConfig.class,
       SecurityConfig.class,
       AuthService.class,
       TestConfig.class
@@ -93,7 +95,7 @@ class ActiveCitationIntegrationTest {
   @Autowired private DatabaseDocumentationUnitLinkRepository linkRepository;
   @Autowired private FileNumberRepository fileNumberRepository;
   @Autowired private DatabaseDocumentTypeRepository documentTypeRepository;
-  @Autowired private DatabaseDocumentationOfficeRepository documentationOfficeRepository;
+  @Autowired private JPADocumentationOfficeRepository documentationOfficeRepository;
 
   @MockBean private S3AsyncClient s3AsyncClient;
   @MockBean private EmailPublishService publishService;
@@ -113,7 +115,7 @@ class ActiveCitationIntegrationTest {
     when(userService.getDocumentationOffice(any(OidcUser.class)))
         .thenReturn(Mono.just(AuthUtils.buildDocOffice("DigitalService", "XX")));
 
-    docOfficeUuid = documentationOfficeRepository.findByLabel("DigitalService").block().getId();
+    docOfficeUuid = documentationOfficeRepository.findByLabel("DigitalService").getId();
   }
 
   @AfterEach

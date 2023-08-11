@@ -13,9 +13,9 @@ import de.bund.digitalservice.ris.caselaw.adapter.DocxConverterService;
 import de.bund.digitalservice.ris.caselaw.adapter.KeycloakUserService;
 import de.bund.digitalservice.ris.caselaw.adapter.MockXmlExporter;
 import de.bund.digitalservice.ris.caselaw.adapter.XmlEMailPublishService;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPADocumentationOfficeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentUnitRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentUnitStatusRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentationOfficeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabasePublicationReportRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseXmlPublicationRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitDTO;
@@ -27,6 +27,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.PublicationRepo
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.XmlPublicationDTO;
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresConfig;
+import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
 import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.HttpMailSender;
@@ -67,6 +68,7 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
       MockXmlExporter.class,
       FlywayConfig.class,
       PostgresConfig.class,
+      PostgresJPAConfig.class,
       SecurityConfig.class,
       AuthService.class,
       TestConfig.class
@@ -93,7 +95,7 @@ class PublishDocumentUnitIntegrationTest {
   @Autowired private DatabaseDocumentUnitRepository repository;
   @Autowired private DatabaseXmlPublicationRepository xmlPublicationRepository;
   @Autowired private DatabaseDocumentUnitStatusRepository documentUnitStatusRepository;
-  @Autowired private DatabaseDocumentationOfficeRepository documentationOfficeRepository;
+  @Autowired private JPADocumentationOfficeRepository documentationOfficeRepository;
   @Autowired private DatabasePublicationReportRepository databasePublishReportRepository;
 
   @MockBean ReactiveClientRegistrationRepository clientRegistrationRepository;
@@ -105,7 +107,7 @@ class PublishDocumentUnitIntegrationTest {
 
   @BeforeEach
   void setUp() {
-    docOfficeUuid = documentationOfficeRepository.findByLabel("DigitalService").block().getId();
+    docOfficeUuid = documentationOfficeRepository.findByLabel("DigitalService").getId();
   }
 
   @AfterEach

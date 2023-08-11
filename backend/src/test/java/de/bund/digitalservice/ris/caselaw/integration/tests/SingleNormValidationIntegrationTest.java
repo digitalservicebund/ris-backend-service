@@ -9,8 +9,8 @@ import de.bund.digitalservice.ris.caselaw.TestConfig;
 import de.bund.digitalservice.ris.caselaw.adapter.AuthService;
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentUnitController;
 import de.bund.digitalservice.ris.caselaw.adapter.DocxConverterService;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPADocumentationOfficeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPAPostgresNormElementRepositoryImpl;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentationOfficeRepository;
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
@@ -82,7 +82,7 @@ class SingleNormValidationIntegrationTest {
 
   @Autowired private RisWebTestClient risWebTestClient;
 
-  @Autowired private DatabaseDocumentationOfficeRepository documentationOfficeRepository;
+  @Autowired private JPADocumentationOfficeRepository documentationOfficeRepository;
 
   @MockBean private S3AsyncClient s3AsyncClient;
   @MockBean private EmailPublishService publishService;
@@ -118,8 +118,7 @@ class SingleNormValidationIntegrationTest {
 
   @BeforeEach
   void setUp() {
-    documentationOfficeUuid =
-        documentationOfficeRepository.findByLabel(docOffice.label()).block().getId();
+    documentationOfficeUuid = documentationOfficeRepository.findByLabel(docOffice.label()).getId();
 
     doReturn(Mono.just(docOffice))
         .when(userService)

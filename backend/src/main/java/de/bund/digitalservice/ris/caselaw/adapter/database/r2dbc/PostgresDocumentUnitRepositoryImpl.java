@@ -1,5 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc;
 
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPADocumentationOfficeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitDTO.DocumentUnitDTOBuilder;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.CourtDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DatabaseCitationStyleRepository;
@@ -68,7 +69,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
   private final DatabaseDocumentUnitFieldsOfLawRepository documentUnitFieldsOfLawRepository;
   private final DatabaseKeywordRepository keywordRepository;
   private final DatabaseDocumentUnitNormRepository documentUnitNormRepository;
-  private final DatabaseDocumentationOfficeRepository documentationOfficeRepository;
+  private final JPADocumentationOfficeRepository documentationOfficeRepository;
   private final DatabaseDocumentUnitStatusRepository databaseDocumentUnitStatusRepository;
   private final DatabaseNormAbbreviationRepository normAbbreviationRepository;
   private final DatabaseDocumentationUnitLinkRepository documentationUnitLinkRepository;
@@ -88,11 +89,11 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
       DatabaseDocumentUnitFieldsOfLawRepository documentUnitFieldsOfLawRepository,
       DatabaseKeywordRepository keywordRepository,
       DatabaseDocumentUnitNormRepository documentUnitNormRepository,
-      DatabaseDocumentationOfficeRepository documentationOfficeRepository,
       DatabaseDocumentUnitStatusRepository databaseDocumentUnitStatusRepository,
       DatabaseNormAbbreviationRepository normAbbreviationRepository,
       DatabaseDocumentationUnitLinkRepository documentationUnitLinkRepository,
-      DatabaseCitationStyleRepository citationStyleRepository) {
+      DatabaseCitationStyleRepository citationStyleRepository,
+      JPADocumentationOfficeRepository documentationOfficeRepository) {
 
     this.repository = repository;
     this.metadataRepository = metadataRepository;
@@ -142,8 +143,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
   public Mono<DocumentUnit> createNewDocumentUnit(
       String documentNumber, DocumentationOffice documentationOffice) {
 
-    return documentationOfficeRepository
-        .findByLabel(documentationOffice.label())
+    return Mono.just(documentationOfficeRepository.findByLabel(documentationOffice.label()))
         .flatMap(
             documentationOfficeDTO ->
                 metadataRepository.save(
@@ -1038,19 +1038,12 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
 
   private <T extends DocumentUnitMetadataDTO> Mono<T> injectDocumentationOffice(
       T documentUnitMetadataDTO) {
-    if (documentUnitMetadataDTO.getDocumentationOfficeId() == null) {
-      return Mono.just(documentUnitMetadataDTO);
-    }
 
-    return documentationOfficeRepository
-        .findById(documentUnitMetadataDTO.getDocumentationOfficeId())
-        .defaultIfEmpty(DocumentationOfficeDTO.builder().build())
-        .map(
-            documentationOfficeDTO -> {
-              if (documentationOfficeDTO.getLabel() != null)
-                documentUnitMetadataDTO.setDocumentationOffice(documentationOfficeDTO);
-              return documentUnitMetadataDTO;
-            });
+    Optional.ofNullable(documentUnitMetadataDTO.getDocumentationOfficeId())
+        .flatMap(documentationOfficeRepository::findById)
+        .ifPresent(documentUnitMetadataDTO::setDocumentationOffice);
+
+    return Mono.just(documentUnitMetadataDTO);
   }
 
   private <T extends DocumentUnitMetadataDTO> Mono<T> injectStatus(T documentUnitDTO) {
@@ -1183,8 +1176,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
       log.debug("Find by overview search: {}, {}", documentationOffice, searchInput);
     }
 
-    return documentationOfficeRepository
-        .findByLabel(documentationOffice.label())
+    return Mono.just(documentationOfficeRepository.findByLabel(documentationOffice.label()))
         .flatMapMany(
             docOffice ->
                 metadataRepository.searchByDocumentUnitListEntry(
@@ -1344,8 +1336,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
       log.debug("count for overview search: {}, {}", documentationOffice, searchInput);
     }
 
-    return documentationOfficeRepository
-        .findByLabel(documentationOffice.label())
+    return Mono.just(documentationOfficeRepository.findByLabel(documentationOffice.label()))
         .flatMap(
             docOffice ->
                 metadataRepository.countSearchByDocumentUnitListEntry(

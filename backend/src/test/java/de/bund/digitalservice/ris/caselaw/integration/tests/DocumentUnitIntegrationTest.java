@@ -17,11 +17,11 @@ import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentNumberService;
 import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentUnitStatusService;
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentUnitController;
 import de.bund.digitalservice.ris.caselaw.adapter.DocxConverterService;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPADocumentationOfficeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDeviatingDecisionDateRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentUnitMetadataRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentUnitRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentUnitStatusRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentationOfficeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseIncorrectCourtRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabasePublicationReportRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DeviatingDecisionDateDTO;
@@ -42,6 +42,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.Sta
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.StateRepository;
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresConfig;
+import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
 import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
@@ -89,6 +90,7 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
       PostgresPublicationReportRepositoryImpl.class,
       FlywayConfig.class,
       PostgresConfig.class,
+      PostgresJPAConfig.class,
       SecurityConfig.class,
       AuthService.class,
       TestConfig.class
@@ -118,7 +120,7 @@ class DocumentUnitIntegrationTest {
   @Autowired private DatabaseDocumentTypeRepository databaseDocumentTypeRepository;
   @Autowired private DatabaseIncorrectCourtRepository incorrectCourtRepository;
   @Autowired private DatabaseDocumentUnitStatusRepository documentUnitStatusRepository;
-  @Autowired private DatabaseDocumentationOfficeRepository documentationOfficeRepository;
+  @Autowired private JPADocumentationOfficeRepository documentationOfficeRepository;
 
   @Autowired private DatabasePublicationReportRepository databasePublishReportRepository;
 
@@ -133,8 +135,7 @@ class DocumentUnitIntegrationTest {
 
   @BeforeEach
   void setUp() {
-    documentationOfficeUuid =
-        documentationOfficeRepository.findByLabel(docOffice.label()).block().getId();
+    documentationOfficeUuid = documentationOfficeRepository.findByLabel(docOffice.label()).getId();
 
     doReturn(Mono.just(docOffice))
         .when(userService)
@@ -932,7 +933,7 @@ class DocumentUnitIntegrationTest {
   void testSearchByDocumentUnitListEntry() {
     DocumentationOffice otherDocOffice = buildDocOffice("BGH", "CO");
     UUID otherDocOfficeUuid =
-        documentationOfficeRepository.findByLabel(otherDocOffice.label()).block().getId();
+        documentationOfficeRepository.findByLabel(otherDocOffice.label()).getId();
 
     List<UUID> docOfficeIds =
         List.of(

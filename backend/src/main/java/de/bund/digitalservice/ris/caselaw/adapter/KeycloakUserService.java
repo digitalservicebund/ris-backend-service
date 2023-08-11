@@ -1,19 +1,20 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentationOfficeRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPADocumentationOfficeRepository;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.User;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
 @Service
 public class KeycloakUserService implements UserService {
-  private final DatabaseDocumentationOfficeRepository documentationOfficeRepository;
+  private final JPADocumentationOfficeRepository documentationOfficeRepository;
 
   private static final Map<String, String> documentationCenterClaims =
       Map.ofEntries(
@@ -29,7 +30,7 @@ public class KeycloakUserService implements UserService {
           Map.entry("/DigitalService", "DigitalService"),
           Map.entry("/CC-RIS", "CC-RIS"));
 
-  public KeycloakUserService(DatabaseDocumentationOfficeRepository documentationOfficeRepository) {
+  public KeycloakUserService(JPADocumentationOfficeRepository documentationOfficeRepository) {
     this.documentationOfficeRepository = documentationOfficeRepository;
   }
 
@@ -64,13 +65,14 @@ public class KeycloakUserService implements UserService {
             .map(documentationCenterClaims::get)
             .orElse(null);
 
-    return documentationOfficeRepository
-        .findByLabel(documentationOfficeKey)
+    return Optional.ofNullable(documentationOfficeRepository.findByLabel(documentationOfficeKey))
         .map(
             documentationOfficeDTO ->
                 DocumentationOffice.builder()
                     .label(documentationOfficeDTO.getLabel())
                     .abbreviation(documentationOfficeDTO.getAbbreviation())
-                    .build());
+                    .build())
+        .map(Mono::just)
+        .orElse(Mono.empty());
   }
 }

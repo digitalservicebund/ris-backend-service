@@ -11,11 +11,11 @@ import de.bund.digitalservice.ris.caselaw.adapter.AuthService;
 import de.bund.digitalservice.ris.caselaw.adapter.ContentRelatedIndexingController;
 import de.bund.digitalservice.ris.caselaw.adapter.FieldOfLawService;
 import de.bund.digitalservice.ris.caselaw.adapter.KeywordService;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPADocumentationOfficeDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPADocumentationOfficeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentUnitRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentationOfficeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseKeywordRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentationOfficeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.KeywordDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.PostgresDocumentUnitRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.PostgresFieldOfLawRepositoryImpl;
@@ -24,6 +24,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentUnitTransf
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationOfficeTransformer;
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresConfig;
+import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
 import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
@@ -48,12 +49,13 @@ import reactor.core.publisher.Mono;
       FieldOfLawService.class,
       FlywayConfig.class,
       PostgresConfig.class,
+      PostgresJPAConfig.class,
       PostgresDocumentUnitRepositoryImpl.class,
       PostgresKeywordRepositoryImpl.class,
       PostgresFieldOfLawRepositoryImpl.class,
       SecurityConfig.class,
       AuthService.class,
-      TestConfig.class
+      TestConfig.class,
     },
     controllers = {ContentRelatedIndexingController.class})
 class DocumentUnitKeywordIntegrationTest {
@@ -72,18 +74,18 @@ class DocumentUnitKeywordIntegrationTest {
   @Autowired private RisWebTestClient risWebTestClient;
   @Autowired private DatabaseKeywordRepository keywordRepository;
   @Autowired private DatabaseDocumentUnitRepository documentUnitRepository;
-  @Autowired private DatabaseDocumentationOfficeRepository documentationOfficeRepository;
+  @Autowired private JPADocumentationOfficeRepository documentationOfficeRepository;
 
   @MockBean private DocumentUnitService documentUnitService;
   @MockBean private UserService userService;
   @MockBean ReactiveClientRegistrationRepository clientRegistrationRepository;
 
   private static final UUID TEST_UUID = UUID.fromString("88888888-4444-4444-4444-121212121212");
-  private DocumentationOfficeDTO docOfficeDTO;
+  private JPADocumentationOfficeDTO docOfficeDTO;
 
   @BeforeEach
   void setUp() {
-    docOfficeDTO = documentationOfficeRepository.findByLabel("DigitalService").block();
+    docOfficeDTO = documentationOfficeRepository.findByLabel("DigitalService");
 
     doReturn(Mono.just(DocumentationOfficeTransformer.transformDTO(docOfficeDTO)))
         .when(userService)

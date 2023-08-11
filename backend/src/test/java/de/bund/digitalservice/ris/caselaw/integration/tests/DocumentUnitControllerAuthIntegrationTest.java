@@ -14,9 +14,9 @@ import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentUnitStatusServ
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentUnitController;
 import de.bund.digitalservice.ris.caselaw.adapter.DocxConverterService;
 import de.bund.digitalservice.ris.caselaw.adapter.KeycloakUserService;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPADocumentationOfficeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentUnitRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentUnitStatusRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentationOfficeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabasePublicationReportRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitStatusDTO;
@@ -24,6 +24,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.PostgresDocumen
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.PostgresPublicationReportRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresConfig;
+import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
 import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
 import de.bund.digitalservice.ris.caselaw.domain.DataSource;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitListEntry;
@@ -65,6 +66,7 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
       PostgresPublicationReportRepositoryImpl.class,
       FlywayConfig.class,
       PostgresConfig.class,
+      PostgresJPAConfig.class,
       SecurityConfig.class,
       AuthService.class,
       TestConfig.class
@@ -95,7 +97,7 @@ class DocumentUnitControllerAuthIntegrationTest {
   @Autowired private RisWebTestClient risWebTestClient;
   @Autowired private DatabaseDocumentUnitRepository repository;
   @Autowired private DatabaseDocumentUnitStatusRepository statusRepository;
-  @Autowired private DatabaseDocumentationOfficeRepository documentationOfficeRepository;
+  @Autowired private JPADocumentationOfficeRepository documentationOfficeRepository;
 
   @Autowired private DatabasePublicationReportRepository databasePublishReportRepository;
 
@@ -115,8 +117,8 @@ class DocumentUnitControllerAuthIntegrationTest {
   @BeforeEach
   void setUp() {
     // created via db migration V0_79__caselaw_insert_default_documentation_offices
-    docOffice1Id = documentationOfficeRepository.findByLabel(docOffice1).block().getId();
-    docOffice2Id = documentationOfficeRepository.findByLabel(docOffice2).block().getId();
+    docOffice1Id = documentationOfficeRepository.findByLabel(docOffice1).getId();
+    docOffice2Id = documentationOfficeRepository.findByLabel(docOffice2).getId();
   }
 
   @AfterEach

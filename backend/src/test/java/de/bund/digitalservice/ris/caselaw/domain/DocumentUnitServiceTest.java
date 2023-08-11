@@ -16,7 +16,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentUnitStatusService;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentationOfficeRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPADocumentationOfficeRepository;
 import jakarta.validation.Validator;
 import java.nio.ByteBuffer;
 import java.time.Instant;
@@ -57,7 +57,7 @@ class DocumentUnitServiceTest {
 
   @MockBean private DocumentUnitRepository repository;
 
-  @MockBean private DatabaseDocumentationOfficeRepository documentationOfficeRepository;
+  @MockBean private JPADocumentationOfficeRepository documentationOfficeRepository;
 
   @MockBean private DocumentNumberService documentNumberService;
 

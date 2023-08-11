@@ -2,6 +2,8 @@ package de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc;
 
 import static org.mockito.Mockito.verify;
 
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPADocumentationOfficeDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPADocumentationOfficeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DatabaseCitationStyleRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DatabaseCourtRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DatabaseDocumentTypeRepository;
@@ -20,7 +22,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 @ExtendWith(SpringExtension.class)
@@ -41,7 +42,7 @@ class PostgresDocumentUnitRepositoryImplTest {
   @MockBean private DatabaseDocumentUnitFieldsOfLawRepository documentUnitFieldsOfLawRepository;
   @MockBean private DatabaseKeywordRepository keywordRepository;
   @MockBean private DatabaseDocumentUnitNormRepository documentUnitNormRepository;
-  @MockBean private DatabaseDocumentationOfficeRepository documentationOfficeRepository;
+  @MockBean private JPADocumentationOfficeRepository documentationOfficeRepository;
   @MockBean private DatabaseDocumentUnitStatusRepository databaseDocumentUnitStatusRepository;
   @MockBean private DatabaseNormAbbreviationRepository normAbbreviationRepository;
   @MockBean private DatabaseCitationStyleRepository citationStyleRepository;
@@ -63,11 +64,11 @@ class PostgresDocumentUnitRepositoryImplTest {
             documentUnitFieldsOfLawRepository,
             keywordRepository,
             documentUnitNormRepository,
-            documentationOfficeRepository,
             databaseDocumentUnitStatusRepository,
             normAbbreviationRepository,
             documentationUnitLinkRepository,
-            citationStyleRepository);
+            citationStyleRepository,
+            documentationOfficeRepository);
   }
 
   @Test
@@ -84,8 +85,7 @@ class PostgresDocumentUnitRepositoryImplTest {
 
     Mockito.when(documentationOfficeRepository.findByLabel("Test"))
         .thenReturn(
-            Mono.just(
-                DocumentationOfficeDTO.builder().id(documentationOfficeId).label("Test").build()));
+            JPADocumentationOfficeDTO.builder().id(documentationOfficeId).label("Test").build());
 
     StepVerifier.create(
             postgresDocumentUnitRepository.searchByDocumentUnitListEntry(
