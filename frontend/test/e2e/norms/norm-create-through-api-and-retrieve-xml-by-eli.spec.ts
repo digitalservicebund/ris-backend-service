@@ -38,7 +38,11 @@ testWithImportedNorm(
     })
     await finishButton.click()
     await page.locator("[aria-label='Rahmendaten Speichern Button']").click()
-    await expect(page.locator("text=Zuletzt").first()).toBeVisible()
+    await expect(
+      page.locator(
+        "button[aria-label='Rahmendaten Speichern Button']:not(:disabled)",
+      ),
+    ).toBeVisible()
     await page.reload()
 
     // retrieve by new eli

@@ -24,7 +24,14 @@ testWithImportedNorm(
     const newValue = "fake-Juris-Abkürzung"
     await fillInputField(page, FieldType.TEXT, "NORM/risAbbreviation", newValue)
 
-    await page.locator("[aria-label='Rahmendaten Speichern Button']").click()
+    await page
+      .locator("[aria-label='Rahmendaten Speichern Button']:not(:disabled)")
+      .click()
+    await expect(
+      page.locator(
+        "[aria-label='Rahmendaten Speichern Button']:not(:disabled)",
+      ),
+    ).toBeVisible()
     await expect(page.locator("text=Zuletzt").first()).toBeVisible()
 
     const locatorExportMenu = page.locator("a:has-text('Export')")
@@ -36,11 +43,6 @@ testWithImportedNorm(
     )
     await expect(locatorNewGeneration).toBeVisible()
     await locatorNewGeneration.click()
-
-    const locatorExportButton = page.locator(
-      'a:has-text("Zip Datei speichern")',
-    )
-    await expect(locatorExportButton).toBeVisible()
 
     const downloadFileContent = await getDownloadedFileContent(page, fileName)
 

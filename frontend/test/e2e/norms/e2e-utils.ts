@@ -95,7 +95,7 @@ export const openNorm = async (
 export async function getDownloadedFileContent(page: Page, filename: string) {
   const [download] = await Promise.all([
     page.waitForEvent("download"),
-    page.locator('a:has-text("Zip Datei speichern")').click(),
+    page.locator('a:has-text("Zip Datei speichern"):not(:disabled)').click(),
   ])
 
   expect(download.suggestedFilename()).toBe(filename)

@@ -30,6 +30,7 @@ const { triggerSave, saveIsInProgress, lastSaveError, formattedLastSavedOn } =
     <div class="flex flex-col">
       <TextButton
         aria-label="Rahmendaten Speichern Button"
+        :disabled="saveIsInProgress"
         label="Speichern"
         @click="triggerSave"
       />
