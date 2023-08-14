@@ -25,6 +25,7 @@ function renderComponent(
               publicationStatus: PublicationState.PUBLISHED,
               withError: false,
             },
+            myDocOfficeOnly: false,
             ...options,
           },
         ]
