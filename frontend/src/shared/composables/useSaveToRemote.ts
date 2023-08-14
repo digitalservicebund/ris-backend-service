@@ -7,6 +7,7 @@ function getCurrentTime(dateSaved: Date) {
   const fullMinute = ("0" + dateSaved.getMinutes()).slice(-2)
   return `${fullHour}:${fullMinute}`
 }
+
 export function useSaveToRemote(
   saveCallback: () => Promise<ServiceResponse<void>>,
   autoSaveInterval = 0,
@@ -14,14 +15,13 @@ export function useSaveToRemote(
   const saveIsInProgress = ref(false)
   const lastSaveError = ref<ResponseError | undefined>(undefined)
   const lastSavedOn = ref<Date | undefined>(undefined)
+
   const formattedLastSavedOn = computed(
     () => lastSavedOn.value && getCurrentTime(lastSavedOn.value),
   )
 
   async function triggerSave(): Promise<void> {
-    if (saveIsInProgress.value) {
-      return
-    }
+    if (saveIsInProgress.value) return
 
     saveIsInProgress.value = true
     lastSaveError.value = undefined
@@ -34,9 +34,7 @@ export function useSaveToRemote(
         lastSavedOn.value = new Date()
       } else {
         Sentry.captureException(lastSaveError.value, {
-          tags: {
-            type: "save_failed",
-          },
+          tags: { type: "save_failed" },
         })
       }
     } catch (error) {
