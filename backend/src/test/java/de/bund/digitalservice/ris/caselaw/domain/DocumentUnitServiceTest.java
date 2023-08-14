@@ -436,22 +436,24 @@ class DocumentUnitServiceTest {
   @Test
   void testSearchByDocumentUnitListEntry() {
     DocumentationOffice documentationOffice = DocumentationOffice.builder().build();
+    DocumentUnitSearchInput documentUnitSearchInput = DocumentUnitSearchInput.builder().build();
     DocumentUnitListEntry documentUnitListEntry = DocumentUnitListEntry.builder().build();
     PageRequest pageRequest = PageRequest.of(0, 10);
 
-    when(repository.searchByDocumentUnitListEntry(
-            pageRequest, documentationOffice, documentUnitListEntry))
+    when(repository.searchByDocumentUnitSearchInput(
+            pageRequest, documentationOffice, documentUnitSearchInput))
         .thenReturn(Flux.just(documentUnitListEntry));
-    when(repository.countSearchByDocumentUnitListEntry(documentationOffice, documentUnitListEntry))
+    when(repository.countSearchByDocumentUnitSearchInput(
+            documentationOffice, documentUnitSearchInput))
         .thenReturn(Mono.just(1L));
 
     StepVerifier.create(
-            service.searchByDocumentUnitListEntry(
-                pageRequest, documentationOffice, documentUnitListEntry))
+            service.searchByDocumentUnitSearchInput(
+                pageRequest, documentationOffice, documentUnitSearchInput))
         .consumeNextWith(pd -> assertEquals(pd.getContent().get(0), documentUnitListEntry))
         .verifyComplete();
     verify(repository)
-        .searchByDocumentUnitListEntry(pageRequest, documentationOffice, documentUnitListEntry);
+        .searchByDocumentUnitSearchInput(pageRequest, documentationOffice, documentUnitSearchInput);
   }
 
   private CompletableFuture<DeleteObjectResponse> buildEmptyDeleteObjectResponse() {

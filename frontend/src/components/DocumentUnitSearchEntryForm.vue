@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { computed, ref } from "vue"
 import { PublicationState } from "@/domain/documentUnit"
-import DocumentUnitListEntry from "@/domain/documentUnitListEntry"
+import DocumentUnitSearchInput from "@/domain/documentUnitSearchInput"
 import Checkbox from "@/shared/components/input/CheckboxInput.vue"
 import DateInput from "@/shared/components/input/DateInput.vue"
 import DropdownInput from "@/shared/components/input/DropdownInput.vue"
@@ -13,10 +13,10 @@ import TextInput from "@/shared/components/input/TextInput.vue"
 import { DropdownItem } from "@/shared/components/input/types"
 
 const emit = defineEmits<{
-  search: [value: DocumentUnitListEntry]
+  search: [value: DocumentUnitSearchInput]
 }>()
 
-const searchEntry = ref<DocumentUnitListEntry>({} as DocumentUnitListEntry)
+const searchEntry = ref<DocumentUnitSearchInput>({} as DocumentUnitSearchInput)
 
 const dropdownItems: DropdownItem[] = [
   { label: "Veröffentlicht", value: PublicationState.PUBLISHED },
@@ -92,7 +92,7 @@ const myDocOfficeOnly = computed({
         >
           <TextInput
             id="documentNumber"
-            v-model="searchEntry.documentNumber"
+            v-model="searchEntry.documentNumberOrFileNumber"
             aria-label="Dokumentnummer oder Aktenzeichen Suche"
             placeholder="Dokumentnummeroder Aktenzeichen"
           ></TextInput>

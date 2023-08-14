@@ -32,13 +32,13 @@ public interface DocumentUnitRepository {
 
   Mono<Long> countSearchByLinkedDocumentationUnit(LinkedDocumentationUnit linkedDocumentationUnit);
 
-  Mono<Long> countSearchByDocumentUnitListEntry(
-      DocumentationOffice documentationOffice, DocumentUnitListEntry searchInput);
+  Mono<Long> countSearchByDocumentUnitSearchInput(
+      DocumentationOffice documentationOffice, DocumentUnitSearchInput searchInput);
 
-  Flux<DocumentUnitListEntry> searchByDocumentUnitListEntry(
+  Flux<DocumentUnitListEntry> searchByDocumentUnitSearchInput(
       Pageable pageable,
       DocumentationOffice documentationOffice,
-      DocumentUnitListEntry searchInput);
+      DocumentUnitSearchInput searchInput);
 
   <T extends LinkedDocumentationUnit>
       Flux<T> findAllLinkedDocumentUnitsByParentDocumentUnitUuidAndType(

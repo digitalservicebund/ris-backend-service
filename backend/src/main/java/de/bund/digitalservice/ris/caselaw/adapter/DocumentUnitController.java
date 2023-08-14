@@ -4,6 +4,7 @@ import de.bund.digitalservice.ris.OpenApiConfiguration;
 import de.bund.digitalservice.ris.caselaw.domain.ConverterService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitListEntry;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitSearchInput;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.LinkedDocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.Publication;
@@ -90,20 +91,20 @@ public class DocumentUnitController {
         .onErrorReturn(ResponseEntity.internalServerError().body(DocumentUnit.builder().build()));
   }
 
-  @PutMapping(value = "/search-by-document-unit-list-entry")
+  @PutMapping(value = "/search")
   @PreAuthorize("isAuthenticated()")
   // Access rights are being enforced through SQL filtering
   public Mono<Page<DocumentUnitListEntry>> searchByDocumentUnitListEntry(
       @RequestParam("pg") int page,
       @RequestParam("sz") int size,
-      @RequestBody DocumentUnitListEntry searchInput,
+      @RequestBody DocumentUnitSearchInput searchInput,
       @AuthenticationPrincipal OidcUser oidcUser) {
 
     return userService
         .getDocumentationOffice(oidcUser)
         .flatMap(
             user ->
-                service.searchByDocumentUnitListEntry(
+                service.searchByDocumentUnitSearchInput(
                     PageRequest.of(page, size), user, searchInput));
   }
 

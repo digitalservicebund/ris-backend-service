@@ -4,13 +4,13 @@ import httpClient, {
 } from "./httpClient"
 import DocumentUnit from "@/domain/documentUnit"
 import DocumentUnitListEntry from "@/domain/documentUnitListEntry"
+import DocumentUnitSearchInput from "@/domain/documentUnitSearchInput"
 import LinkedDocumentUnit from "@/domain/linkedDocumentUnit"
 import { SingleNormValidationInfo } from "@/domain/normReference"
 import { PageableService, Page } from "@/shared/components/Pagination.vue"
 import errorMessages from "@/shared/i18n/errors.json"
 
 interface DocumentUnitService {
-  getAllListEntries: PageableService<DocumentUnitListEntry>
   getByDocumentNumber(
     documentNumber: string,
   ): Promise<ServiceResponse<DocumentUnit>>
@@ -21,25 +21,13 @@ interface DocumentUnitService {
     LinkedDocumentUnit,
     LinkedDocumentUnit
   >
-  searchByDocumentUnitListEntry: PageableService<DocumentUnitListEntry>
+  searchByDocumentUnitSearchInput: PageableService<DocumentUnitSearchInput>
   validateSingleNorm(
     singleNormValidationInfo: SingleNormValidationInfo,
   ): Promise<ServiceResponse<unknown>>
 }
 
 const service: DocumentUnitService = {
-  async getAllListEntries(page: number, size: number) {
-    const response = await httpClient.get<Page<DocumentUnitListEntry>>(
-      `caselaw/documentunits?pg=${page}&sz=${size}`,
-    )
-    if (response.status >= 300) {
-      response.error = {
-        title: errorMessages.DOCUMENT_UNIT_COULD_NOT_BE_LOADED.title,
-      }
-    }
-    return response
-  },
-
   async getByDocumentNumber(documentNumber: string) {
     const response = await httpClient.get<DocumentUnit>(
       `caselaw/documentunits/${documentNumber}`,
@@ -162,16 +150,16 @@ const service: DocumentUnitService = {
     }
   },
 
-  async searchByDocumentUnitListEntry(
+  async searchByDocumentUnitSearchInput(
     page: number,
     size: number,
-    query = new DocumentUnitListEntry(),
+    query = new DocumentUnitSearchInput(),
   ) {
     const response = await httpClient.put<
-      DocumentUnitListEntry,
+      DocumentUnitSearchInput,
       Page<DocumentUnitListEntry>
     >(
-      `caselaw/documentunits/search-by-document-unit-list-entry?pg=${page}&sz=${size}`,
+      `caselaw/documentunits/search?pg=${page}&sz=${size}`,
       {
         headers: {
           Accept: "application/json",
@@ -186,10 +174,7 @@ const service: DocumentUnitService = {
       }
     }
     response.data = response.data as Page<DocumentUnitListEntry>
-    return {
-      status: response.status,
-      data: response.data,
-    }
+    return response
   },
 
   async validateSingleNorm(singleNormValidationInfo: SingleNormValidationInfo) {

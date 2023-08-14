@@ -17,8 +17,8 @@ import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentUnitTransf
 import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitListEntry;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitPublishException;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitSearchInput;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.LinkedDocumentationUnit;
@@ -429,23 +429,24 @@ class DocumentUnitControllerTest {
 
   @Test
   void testSearchByDocumentUnitListEntry() {
-    DocumentUnitListEntry documentUnitListEntry = DocumentUnitListEntry.builder().build();
+    DocumentUnitSearchInput documentUnitSearchInput = DocumentUnitSearchInput.builder().build();
     PageRequest pageRequest = PageRequest.of(0, 10);
 
-    when(service.searchByDocumentUnitListEntry(pageRequest, docOffice, documentUnitListEntry))
+    when(service.searchByDocumentUnitSearchInput(pageRequest, docOffice, documentUnitSearchInput))
         .thenReturn(Mono.empty());
 
     risWebClient
         .withDefaultLogin()
         .put()
-        .uri("/api/v1/caselaw/documentunits/search-by-document-unit-list-entry?pg=0&sz=10")
+        .uri("/api/v1/caselaw/documentunits/search?pg=0&sz=10")
         .header(HttpHeaders.CONTENT_TYPE, "application/json")
-        .bodyValue(documentUnitListEntry)
+        .bodyValue(documentUnitSearchInput)
         .exchange()
         .expectStatus()
         .isOk();
 
-    verify(service).searchByDocumentUnitListEntry(pageRequest, docOffice, documentUnitListEntry);
+    verify(service)
+        .searchByDocumentUnitSearchInput(pageRequest, docOffice, documentUnitSearchInput);
   }
 
   @Test

@@ -159,7 +159,7 @@ class DocumentUnitControllerAuthIntegrationTest {
         risWebTestClient
             .withLogin(userOfficeId)
             .put()
-            .uri("/api/v1/caselaw/documentunits/search-by-document-unit-list-entry?pg=0&sz=10")
+            .uri("/api/v1/caselaw/documentunits/search?pg=0&sz=10")
             .bodyValue(DocumentUnitListEntry.builder().build())
             .exchange()
             .expectStatus()
@@ -207,7 +207,7 @@ class DocumentUnitControllerAuthIntegrationTest {
         risWebTestClient
             .withLogin(userOfficeId)
             .put()
-            .uri("/api/v1/caselaw/documentunits/search-by-document-unit-list-entry?pg=0&sz=10")
+            .uri("/api/v1/caselaw/documentunits/search?pg=0&sz=10")
             .bodyValue(DocumentUnitListEntry.builder().build())
             .exchange()
             .expectStatus()

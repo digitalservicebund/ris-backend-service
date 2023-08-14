@@ -9,15 +9,15 @@ describe("documentUnitService", () => {
     }
     return {
       default: {
-        get: vi.fn().mockReturnValue(testResponse),
+        put: vi.fn().mockReturnValue(testResponse),
       },
     }
   })
 
   it("appends correct error message if status 500", async () => {
-    const result = await service.getAllListEntries(0, 20)
+    const result = await service.searchByDocumentUnitSearchInput(0, 20)
     expect(result.error?.title).toEqual(
-      "Dokumentationseinheiten konnten nicht geladen werden.",
+      "Die Suche nach passenden Dokumentationseinheit konnte nicht ausgeführt werden.",
     )
   })
 })

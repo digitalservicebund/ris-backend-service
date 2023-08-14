@@ -26,6 +26,7 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitListEntry;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitNorm;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitRepository;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitSearchInput;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatus;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitException;
@@ -1168,10 +1169,10 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
     return list.isEmpty() ? null : list.toArray(Long[]::new);
   }
 
-  public Flux<DocumentUnitListEntry> searchByDocumentUnitListEntry(
+  public Flux<DocumentUnitListEntry> searchByDocumentUnitSearchInput(
       Pageable pageable,
       DocumentationOffice documentationOffice,
-      DocumentUnitListEntry searchInput) {
+      DocumentUnitSearchInput searchInput) {
     if (log.isDebugEnabled()) {
       log.debug("Find by overview search: {}, {}", documentationOffice, searchInput);
     }
@@ -1179,11 +1180,11 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
     return Mono.just(documentationOfficeRepository.findByLabel(documentationOffice.label()))
         .flatMapMany(
             docOffice ->
-                metadataRepository.searchByDocumentUnitListEntry(
+                metadataRepository.searchByDocumentUnitSearchInput(
                     docOffice.getId(),
                     pageable.getPageSize(),
                     pageable.getOffset(),
-                    searchInput.documentNumber(), // can also be fileNumber
+                    searchInput.documentNumberOrFileNumber(),
                     searchInput.court() == null ? null : searchInput.court().type(),
                     searchInput.court() == null ? null : searchInput.court().location(),
                     searchInput.decisionDate(),
@@ -1331,8 +1332,8 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
   }
 
   @Override
-  public Mono<Long> countSearchByDocumentUnitListEntry(
-      DocumentationOffice documentationOffice, DocumentUnitListEntry searchInput) {
+  public Mono<Long> countSearchByDocumentUnitSearchInput(
+      DocumentationOffice documentationOffice, DocumentUnitSearchInput searchInput) {
     if (log.isDebugEnabled()) {
       log.debug("count for overview search: {}, {}", documentationOffice, searchInput);
     }
@@ -1340,9 +1341,9 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
     return Mono.just(documentationOfficeRepository.findByLabel(documentationOffice.label()))
         .flatMap(
             docOffice ->
-                metadataRepository.countSearchByDocumentUnitListEntry(
+                metadataRepository.countSearchByDocumentUnitSearchInput(
                     docOffice.getId(),
-                    searchInput.documentNumber(),
+                    searchInput.documentNumberOrFileNumber(),
                     searchInput.court() == null ? null : searchInput.court().type(),
                     searchInput.court() == null ? null : searchInput.court().location(),
                     searchInput.decisionDate(),

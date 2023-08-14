@@ -59,7 +59,7 @@ public interface DatabaseDocumentUnitMetadataRepository
           + DOCLISTENTRY_QUERY
           + ORDER_BY_DOCNR
           + "LIMIT :pageSize OFFSET :offset")
-  Flux<DocumentUnitMetadataDTO> searchByDocumentUnitListEntry(
+  Flux<DocumentUnitMetadataDTO> searchByDocumentUnitSearchInput(
       UUID documentationOfficeId,
       Integer pageSize,
       Long offset,
@@ -93,7 +93,7 @@ public interface DatabaseDocumentUnitMetadataRepository
       Long docTypeId);
 
   @Query("SELECT COUNT(*) FROM doc_unit " + DOCLISTENTRY_QUERY)
-  Mono<Long> countSearchByDocumentUnitListEntry(
+  Mono<Long> countSearchByDocumentUnitSearchInput(
       UUID documentationOfficeId,
       String documentNumberOrFileNumber,
       String courtType,

@@ -1,20 +1,17 @@
 import DocumentationOffice from "./documentationOffice"
 import DocumentUnit, { Court } from "./documentUnit"
-import { DocumentType } from "@/domain/documentUnit"
 
-export default class DocumentUnitListEntry {
+export default class DocumentUnitSearchInput {
   public id?: string
   uuid?: string
-  documentNumber?: string
+  documentNumberOrFileNumber?: string
+  court?: Court
   decisionDate?: string
   status?: NonNullable<DocumentUnit["status"]>
-  fileName?: string
-  fileNumber?: string
   documentationOffice?: DocumentationOffice
-  documentType?: DocumentType
-  court?: Court
+  myDocOfficeOnly?: boolean = false
 
-  constructor(data: Partial<DocumentUnitListEntry> = {}) {
+  constructor(data: Partial<DocumentUnitSearchInput> = {}) {
     Object.assign(this, data)
   }
 }

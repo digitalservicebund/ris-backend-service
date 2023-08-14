@@ -17,5 +17,4 @@ public record DocumentUnitListEntry(
     DocumentType documentType,
     Court court,
     DocumentationOffice documentationOffice,
-    DocumentUnitStatus status,
-    boolean myDocOfficeOnly) {}
+    DocumentUnitStatus status) {}

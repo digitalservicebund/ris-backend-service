@@ -46,7 +46,7 @@ import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
 import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitListEntry;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitSearchInput;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatus;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
@@ -930,7 +930,7 @@ class DocumentUnitIntegrationTest {
   }
 
   @Test
-  void testSearchByDocumentUnitListEntry() {
+  void testSearchByDocumentUnitSearchInput() {
     DocumentationOffice otherDocOffice = buildDocOffice("BGH", "CO");
     UUID otherDocOfficeUuid =
         documentationOfficeRepository.findByLabel(otherDocOffice.label()).getId();
@@ -994,39 +994,44 @@ class DocumentUnitIntegrationTest {
     }
 
     // no search criteria
-    DocumentUnitListEntry searchInput = DocumentUnitListEntry.builder().build();
+    DocumentUnitSearchInput searchInput = DocumentUnitSearchInput.builder().build();
     // the unpublished one from the other docoffice is not in it, the others are ordered
     // by documentNumber
     assertThat(extractDocumentNumbersFromSearchCall(searchInput))
         .containsExactly("MNOP202300099", "IJKL202101234", "EFGH202200123", "ABCD202300007");
 
     // by documentNumber / fileNumber
-    searchInput = DocumentUnitListEntry.builder().documentNumber("abc").build();
+    searchInput = DocumentUnitSearchInput.builder().documentNumberOrFileNumber("abc").build();
     assertThat(extractDocumentNumbersFromSearchCall(searchInput))
         .containsExactly("MNOP202300099", "ABCD202300007");
 
     // by court
     searchInput =
-        DocumentUnitListEntry.builder()
+        DocumentUnitSearchInput.builder()
             .court(Court.builder().type("PQR").location("München").build())
             .build();
     assertThat(extractDocumentNumbersFromSearchCall(searchInput)).containsExactly("EFGH202200123");
 
     // by decisionDate
-    searchInput = DocumentUnitListEntry.builder().decisionDate(decisionDates.get(2)).build();
+    searchInput = DocumentUnitSearchInput.builder().decisionDate(decisionDates.get(2)).build();
     assertThat(extractDocumentNumbersFromSearchCall(searchInput)).containsExactly("IJKL202101234");
 
     // by status
     searchInput =
-        DocumentUnitListEntry.builder()
+        DocumentUnitSearchInput.builder()
             .status(DocumentUnitStatus.builder().publicationStatus(PUBLISHING).build())
             .build();
     assertThat(extractDocumentNumbersFromSearchCall(searchInput)).containsExactly("IJKL202101234");
 
+    // by documentation office
+    searchInput = DocumentUnitSearchInput.builder().myDocOfficeOnly(true).build();
+    assertThat(extractDocumentNumbersFromSearchCall(searchInput))
+        .containsExactly("MNOP202300099", "IJKL202101234", "EFGH202200123", "ABCD202300007");
+
     // all combined
     searchInput =
-        DocumentUnitListEntry.builder()
-            .documentNumber("abc")
+        DocumentUnitSearchInput.builder()
+            .documentNumberOrFileNumber("abc")
             .court(Court.builder().type("MNO").location("Hamburg").build())
             .decisionDate(decisionDates.get(0))
             .status(DocumentUnitStatus.builder().publicationStatus(PUBLISHED).build())
@@ -1034,12 +1039,12 @@ class DocumentUnitIntegrationTest {
     assertThat(extractDocumentNumbersFromSearchCall(searchInput)).containsExactly("ABCD202300007");
   }
 
-  private List<String> extractDocumentNumbersFromSearchCall(DocumentUnitListEntry searchInput) {
+  private List<String> extractDocumentNumbersFromSearchCall(DocumentUnitSearchInput searchInput) {
     EntityExchangeResult<String> result =
         risWebTestClient
             .withDefaultLogin()
             .put()
-            .uri("/api/v1/caselaw/documentunits/search-by-document-unit-list-entry?pg=0&sz=10")
+            .uri("/api/v1/caselaw/documentunits/search?pg=0&sz=10")
             .bodyValue(searchInput)
             .exchange()
             .expectStatus()

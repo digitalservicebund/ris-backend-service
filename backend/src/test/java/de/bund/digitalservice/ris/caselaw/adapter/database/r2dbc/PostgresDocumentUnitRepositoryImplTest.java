@@ -10,7 +10,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.Dat
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DatabaseFieldOfLawRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DatabaseNormAbbreviationRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.StateRepository;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitListEntry;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitSearchInput;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
@@ -76,10 +76,10 @@ class PostgresDocumentUnitRepositoryImplTest {
     Sort sort = Sort.unsorted();
     var documentationOfficeId = UUID.randomUUID();
 
-    DocumentUnitListEntry documentUnitListEntry = DocumentUnitListEntry.builder().build();
+    DocumentUnitSearchInput documentUnitListEntry = DocumentUnitSearchInput.builder().build();
 
     Mockito.when(
-            metadataRepository.searchByDocumentUnitListEntry(
+            metadataRepository.searchByDocumentUnitSearchInput(
                 documentationOfficeId, 10, 0L, null, null, null, null, null, false))
         .thenReturn(Flux.empty());
 
@@ -88,14 +88,14 @@ class PostgresDocumentUnitRepositoryImplTest {
             JPADocumentationOfficeDTO.builder().id(documentationOfficeId).label("Test").build());
 
     StepVerifier.create(
-            postgresDocumentUnitRepository.searchByDocumentUnitListEntry(
+            postgresDocumentUnitRepository.searchByDocumentUnitSearchInput(
                 PageRequest.of(0, 10, sort),
                 DocumentationOffice.builder().label("Test").build(),
                 documentUnitListEntry))
         .verifyComplete();
 
     verify(metadataRepository)
-        .searchByDocumentUnitListEntry(
+        .searchByDocumentUnitSearchInput(
             documentationOfficeId, 10, 0L, null, null, null, null, null, false);
   }
 }

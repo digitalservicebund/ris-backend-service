@@ -155,7 +155,7 @@ class DocumentUnitListEntryIntegrationTest {
     risWebTestClient
         .withDefaultLogin()
         .put()
-        .uri("/api/v1/caselaw/documentunits/search-by-document-unit-list-entry?pg=0&sz=3")
+        .uri("/api/v1/caselaw/documentunits/search?pg=0&sz=3")
         .bodyValue(DocumentUnitListEntry.builder().build())
         .exchange()
         .expectStatus()
@@ -175,50 +175,6 @@ class DocumentUnitListEntryIntegrationTest {
         .isEqualTo("PUBLISHED")
         .jsonPath("$.totalElements")
         .isEqualTo(2);
-  }
-
-  @Test
-  void testForCorrectResponseWhenRequesting_onlyMyDocOffice() {
-    DocumentUnitDTO Dto1 =
-        repository
-            .save(
-                DocumentUnitDTO.builder()
-                    .uuid(UUID.randomUUID())
-                    .creationtimestamp(Instant.now())
-                    .documentnumber("NEUR202300007")
-                    .dataSource(DataSource.NEURIS)
-                    .documentationOfficeId(docOfficeDTO.getId())
-                    .build())
-            .block();
-
-    DocumentUnitDTO Dto2 =
-        repository
-            .save(
-                DocumentUnitDTO.builder()
-                    .uuid(UUID.randomUUID())
-                    .creationtimestamp(Instant.now())
-                    .documentnumber("BGH202300008")
-                    .dataSource(DataSource.NEURIS)
-                    .documentationOfficeId(
-                        documentationOfficeRepository.findByLabel("BGH").block().getId())
-                    .build())
-            .block();
-
-    risWebTestClient
-        .withDefaultLogin()
-        .put()
-        .uri("/api/v1/caselaw/documentunits/search-by-document-unit-list-entry?pg=0&sz=3")
-        .bodyValue(DocumentUnitListEntry.builder().myDocOfficeOnly(true).build())
-        .exchange()
-        .expectStatus()
-        .isOk()
-        .expectBody()
-        .jsonPath("$.content")
-        .isArray()
-        .jsonPath("$.content[0].documentationOffice.label")
-        .isEqualTo("DigitalService")
-        .jsonPath("$.totalElements")
-        .isEqualTo(1);
   }
 
   @Test
@@ -242,7 +198,7 @@ class DocumentUnitListEntryIntegrationTest {
         risWebTestClient
             .withDefaultLogin()
             .put()
-            .uri("/api/v1/caselaw/documentunits/search-by-document-unit-list-entry?pg=0&sz=10")
+            .uri("/api/v1/caselaw/documentunits/search?pg=0&sz=10")
             .bodyValue(DocumentUnitListEntry.builder().build())
             .exchange()
             .expectStatus()
@@ -278,7 +234,7 @@ class DocumentUnitListEntryIntegrationTest {
         risWebTestClient
             .withDefaultLogin()
             .put()
-            .uri("/api/v1/caselaw/documentunits/search-by-document-unit-list-entry?pg=0&sz=1")
+            .uri("/api/v1/caselaw/documentunits/search?pg=0&sz=1")
             .bodyValue(DocumentUnitListEntry.builder().build())
             .exchange()
             .expectStatus()
