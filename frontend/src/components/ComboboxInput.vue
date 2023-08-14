@@ -14,7 +14,7 @@ const props = defineProps<{
   ariaLabel: string
   placeholder?: string
   clearOnChoosingItem?: boolean
-  manualEntry: boolean
+  manualEntry?: boolean
   hasError?: boolean
 }>()
 
