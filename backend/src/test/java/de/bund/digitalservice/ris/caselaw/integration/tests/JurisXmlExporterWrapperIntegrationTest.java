@@ -13,6 +13,7 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitNorm;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatus;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
+import de.bund.digitalservice.ris.caselaw.domain.Procedure;
 import de.bund.digitalservice.ris.caselaw.domain.ProceedingDecision;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.Texts;
@@ -129,7 +130,7 @@ class JurisXmlExporterWrapperIntegrationTest {
         CoreData.builder()
             .fileNumbers(List.of("fileNumber"))
             .documentType(DocumentType.builder().jurisShortcut("ca").label("category").build())
-            .procedure("procedure")
+            .procedure(Procedure.builder().label("procedure").build())
             .ecli("ecli")
             .deviatingEclis(List.of("dev-ecli-1", "dev-ecli-2"))
             .appraisalBody("appraisalBody")

@@ -14,6 +14,7 @@ const props = defineProps<{
   ariaLabel: string
   placeholder?: string
   clearOnChoosingItem?: boolean
+  manualEntry: boolean
   hasError?: boolean
 }>()
 
@@ -130,7 +131,7 @@ const onTextChange = () => {
   }
 }
 
-const updateCurrentItems = async (searchStr: string | undefined) => {
+const updateCurrentItems = async (searchStr?: string) => {
   const response = await props.itemService(searchStr)
   if (!response.data) {
     console.error(response.error)
@@ -147,11 +148,22 @@ const updateCurrentItems = async (searchStr: string | undefined) => {
     !currentlyDisplayedItems.value ||
     currentlyDisplayedItems.value.length === 0
   ) {
-    currentlyDisplayedItems.value = [{ label: NO_MATCHING_ENTRY }]
-    candidateForSelection.value = undefined
+    handleNoSearchResults(searchStr)
   } else {
     candidateForSelection.value = currentlyDisplayedItems.value[0]
     focusedItemIndex.value = 1
+  }
+}
+
+function handleNoSearchResults(searchStr?: string) {
+  if (props.manualEntry && searchStr) {
+    currentlyDisplayedItems.value = [
+      { label: `${searchStr} neu erstellen`, value: { label: searchStr } },
+    ]
+    candidateForSelection.value = { label: searchStr }
+  } else {
+    currentlyDisplayedItems.value = [{ label: NO_MATCHING_ENTRY }]
+    candidateForSelection.value = undefined
   }
 }
 

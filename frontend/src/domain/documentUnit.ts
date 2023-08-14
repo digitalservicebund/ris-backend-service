@@ -9,7 +9,7 @@ export type CoreData = {
   court?: Court
   incorrectCourts?: string[]
   documentType?: DocumentType
-  procedure?: string
+  procedure?: Procedure
   ecli?: string
   deviatingEclis?: string[]
   appraisalBody?: string
@@ -36,6 +36,10 @@ export type Court = {
   location?: string
   label: string
   revoked?: string
+}
+
+export type Procedure = {
+  label: string
 }
 
 export type Texts = {

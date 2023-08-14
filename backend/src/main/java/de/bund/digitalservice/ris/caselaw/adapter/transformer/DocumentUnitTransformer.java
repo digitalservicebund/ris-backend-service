@@ -17,6 +17,7 @@ import de.bund.digitalservice.ris.caselaw.domain.DataSource;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitNorm;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
+import de.bund.digitalservice.ris.caselaw.domain.Procedure;
 import de.bund.digitalservice.ris.caselaw.domain.ProceedingDecision;
 import de.bund.digitalservice.ris.caselaw.domain.Texts;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.court.Court;
@@ -140,8 +141,10 @@ public class DocumentUnitTransformer {
     return court;
   }
 
-  static String getProcedure(JPAProcedureDTO procedureDTO) {
-    return Optional.ofNullable(procedureDTO).map(JPAProcedureDTO::getName).orElse(null);
+  static Procedure getProcedure(JPAProcedureDTO procedureDTO) {
+    return Optional.ofNullable(procedureDTO)
+        .map(dto -> Procedure.builder().label(dto.getLabel()).build())
+        .orElse(null);
   }
 
   private static DocumentationOffice getDocumentationOffice(

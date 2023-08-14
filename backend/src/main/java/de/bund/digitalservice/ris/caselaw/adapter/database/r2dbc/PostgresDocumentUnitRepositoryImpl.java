@@ -37,6 +37,7 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitLink;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitLinkType;
 import de.bund.digitalservice.ris.caselaw.domain.LegalEffect;
 import de.bund.digitalservice.ris.caselaw.domain.LinkedDocumentationUnit;
+import de.bund.digitalservice.ris.caselaw.domain.Procedure;
 import de.bund.digitalservice.ris.caselaw.domain.ProceedingDecision;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.court.Court;
@@ -720,7 +721,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
 
     String documentationOfficeLabel = documentUnit.coreData().documentationOffice().label();
     Optional.ofNullable(documentUnit.coreData().procedure())
-        .map(name -> findOrCreateProcedure(name, documentationOfficeLabel))
+        .map(procedure -> findOrCreateProcedure(procedure, documentationOfficeLabel))
         .ifPresent(
             procedureDTO -> {
               documentUnitDTO.setProcedure(procedureDTO);
@@ -730,17 +731,19 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
     return Mono.just(documentUnitDTO);
   }
 
-  private JPAProcedureDTO findOrCreateProcedure(String name, String documentationOfficeLabel) {
+  private JPAProcedureDTO findOrCreateProcedure(
+      Procedure procedure, String documentationOfficeLabel) {
     JPADocumentationOfficeDTO documentationOfficeDTO =
         documentationOfficeRepository.findByLabel(documentationOfficeLabel);
 
     return Optional.ofNullable(
-            procedureRepository.findByNameAndDocumentationOffice(name, documentationOfficeDTO))
+            procedureRepository.findByLabelAndDocumentationOffice(
+                procedure.label(), documentationOfficeDTO))
         .orElseGet(
             () ->
                 procedureRepository.save(
                     JPAProcedureDTO.builder()
-                        .name(name)
+                        .label(procedure.label())
                         .documentationOffice(documentationOfficeDTO)
                         .build()));
   }

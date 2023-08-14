@@ -1,6 +1,6 @@
 import { CitationStyle } from "@/domain/citationStyle"
 import DocumentationOffice from "@/domain/documentationOffice"
-import { Court, DocumentType } from "@/domain/documentUnit"
+import { Court, DocumentType, Procedure } from "@/domain/documentUnit"
 import { FieldOfLawNode } from "@/domain/fieldOfLaw"
 import { NormAbbreviation } from "@/domain/normAbbreviation"
 import { LabelPosition } from "@/shared/components/input/InputField.vue"
@@ -126,6 +126,7 @@ export type ComboboxInputModelType =
   | NormAbbreviation
   | FieldOfLawNode
   | CitationStyle
+  | Procedure
 
 export type ComboboxItem = {
   label: string
@@ -144,6 +145,7 @@ export interface ComboboxAttributes extends BaseInputAttributes {
     }
   }>
   placeholder?: string
+  manualEntry?: boolean
 }
 
 export interface ComboboxInputField extends BaseInputField {

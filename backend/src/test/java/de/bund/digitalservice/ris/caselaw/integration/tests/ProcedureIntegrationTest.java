@@ -29,6 +29,7 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatusService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.EmailPublishService;
+import de.bund.digitalservice.ris.caselaw.domain.Procedure;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationReportRepository;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import java.time.Instant;
@@ -115,16 +116,15 @@ class ProcedureIntegrationTest {
                     .build())
             .block();
 
+    Procedure procedure = Procedure.builder().label("testProcedure").build();
+
     DocumentUnit documentUnitFromFrontend =
         DocumentUnit.builder()
             .uuid(dto.getUuid())
             .creationtimestamp(dto.getCreationtimestamp())
             .documentNumber(dto.getDocumentnumber())
             .coreData(
-                CoreData.builder()
-                    .procedure("testProcedure")
-                    .documentationOffice(docOffice)
-                    .build())
+                CoreData.builder().procedure(procedure).documentationOffice(docOffice).build())
             .build();
 
     risWebTestClient
@@ -138,11 +138,10 @@ class ProcedureIntegrationTest {
         .expectBody(DocumentUnit.class)
         .consumeWith(
             response ->
-                assertThat(response.getResponseBody().coreData().procedure())
-                    .isEqualTo("testProcedure"));
+                assertThat(response.getResponseBody().coreData().procedure()).isEqualTo(procedure));
 
     assertThat(repository.findAll()).hasSize(1);
-    assertThat(repository.findAll().get(0).getName()).isEqualTo("testProcedure");
+    assertThat(repository.findAll().get(0).getLabel()).isEqualTo("testProcedure");
     assertThat(repository.findAll().get(0).getDocumentationOffice().getLabel())
         .isEqualTo(docOffice.label());
   }
@@ -153,7 +152,7 @@ class ProcedureIntegrationTest {
         repository.save(
             JPAProcedureDTO.builder()
                 .documentationOffice(documentationOfficeDTO)
-                .name("testProcedure")
+                .label("testProcedure")
                 .build());
 
     assertThat(repository.findAll()).hasSize(1);
@@ -169,16 +168,15 @@ class ProcedureIntegrationTest {
                     .build())
             .block();
 
+    Procedure procedure = Procedure.builder().label("testProcedure").build();
+
     DocumentUnit documentUnitFromFrontend =
         DocumentUnit.builder()
             .uuid(dto.getUuid())
             .creationtimestamp(dto.getCreationtimestamp())
             .documentNumber(dto.getDocumentnumber())
             .coreData(
-                CoreData.builder()
-                    .procedure("testProcedure")
-                    .documentationOffice(docOffice)
-                    .build())
+                CoreData.builder().procedure(procedure).documentationOffice(docOffice).build())
             .build();
 
     risWebTestClient
@@ -192,8 +190,7 @@ class ProcedureIntegrationTest {
         .expectBody(DocumentUnit.class)
         .consumeWith(
             response ->
-                assertThat(response.getResponseBody().coreData().procedure())
-                    .isEqualTo("testProcedure"));
+                assertThat(response.getResponseBody().coreData().procedure()).isEqualTo(procedure));
 
     assertThat(repository.findAll()).hasSize(1);
     assertThat(documentUnitRepository.findByUuid(dto.getUuid()).block().getProcedureId())
@@ -208,7 +205,7 @@ class ProcedureIntegrationTest {
         repository.save(
             JPAProcedureDTO.builder()
                 .documentationOffice(bghDocOfficeDTO)
-                .name("testProcedure")
+                .label("testProcedure")
                 .build());
 
     assertThat(repository.findAll()).hasSize(1);
@@ -224,16 +221,15 @@ class ProcedureIntegrationTest {
                     .build())
             .block();
 
+    Procedure procedure = Procedure.builder().label("testProcedure").build();
+
     DocumentUnit documentUnitFromFrontend =
         DocumentUnit.builder()
             .uuid(dto.getUuid())
             .creationtimestamp(dto.getCreationtimestamp())
             .documentNumber(dto.getDocumentnumber())
             .coreData(
-                CoreData.builder()
-                    .procedure("testProcedure")
-                    .documentationOffice(docOffice)
-                    .build())
+                CoreData.builder().procedure(procedure).documentationOffice(docOffice).build())
             .build();
 
     risWebTestClient
@@ -247,8 +243,7 @@ class ProcedureIntegrationTest {
         .expectBody(DocumentUnit.class)
         .consumeWith(
             response ->
-                assertThat(response.getResponseBody().coreData().procedure())
-                    .isEqualTo("testProcedure"));
+                assertThat(response.getResponseBody().coreData().procedure()).isEqualTo(procedure));
 
     assertThat(repository.findAll()).hasSize(2);
   }

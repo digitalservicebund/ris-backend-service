@@ -1,9 +1,12 @@
 import httpClient, { ServiceResponse } from "./httpClient"
 import { CitationStyle } from "@/domain/citationStyle"
-import { Court } from "@/domain/documentUnit"
+import { Court, Procedure } from "@/domain/documentUnit"
 import { FieldOfLawNode } from "@/domain/fieldOfLaw"
 import { NormAbbreviation } from "@/domain/normAbbreviation"
-import { ComboboxItem } from "@/shared/components/input/types"
+import {
+  ComboboxInputModelType,
+  ComboboxItem,
+} from "@/shared/components/input/types"
 import errorMessages from "@/shared/i18n/errors.json"
 
 enum Endpoint {
@@ -13,6 +16,7 @@ enum Endpoint {
   fieldOfLawSearchByIdentifier = "fieldsoflaw/search-by-identifier",
   risAbbreviations = `normabbreviation?pg=0&sz=30`,
   risAbbreviationsAwesome = `normabbreviation/search?pg=0&sz=30`,
+  procedures = `procedure`,
 }
 
 type DocumentType = {
@@ -21,15 +25,8 @@ type DocumentType = {
   label: string
 }
 
-type DropdownType =
-  | DocumentType[]
-  | Court[]
-  | FieldOfLawNode[]
-  | NormAbbreviation[]
-  | CitationStyle[]
-
 function formatDropdownItems(
-  responseData: DropdownType,
+  responseData: ComboboxInputModelType[],
   endpoint: Endpoint,
 ): ComboboxItem[] {
   switch (endpoint) {
@@ -69,11 +66,17 @@ function formatDropdownItems(
         additionalInformation: item.jurisShortcut,
       }))
     }
+    case Endpoint.procedures: {
+      return (responseData as Procedure[]).map((item) => ({
+        label: item.label,
+        value: item,
+      }))
+    }
   }
 }
 
 async function fetchFromEndpoint(endpoint: Endpoint, filter?: string) {
-  const response = await httpClient.get<DropdownType>(
+  const response = await httpClient.get<ComboboxInputModelType[]>(
     `caselaw/${endpoint}`,
     filter ? { params: { q: filter } } : undefined,
   )
@@ -122,6 +125,8 @@ const service: ComboboxItemService = {
     await fetchFromEndpoint(Endpoint.risAbbreviationsAwesome, filter),
   getCitationStyles: async (filter?: string) =>
     await fetchFromEndpoint(Endpoint.citationStyles, filter),
+  getProcedures: async (filter?: string) =>
+    await fetchFromEndpoint(Endpoint.procedures, filter),
 }
 
 export default service

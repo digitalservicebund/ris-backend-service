@@ -15,7 +15,7 @@ public record CoreData(
     Court court,
     List<String> incorrectCourts,
     DocumentType documentType,
-    String procedure,
+    Procedure procedure,
     String ecli,
     List<String> deviatingEclis,
     String appraisalBody,

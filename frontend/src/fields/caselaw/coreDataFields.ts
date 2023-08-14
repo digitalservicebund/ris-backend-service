@@ -90,6 +90,7 @@ export function defineComboboxField(
   ariaLabel: string,
   itemService: ComboboxAttributes["itemService"],
   placeholder?: string,
+  manualEntry?: boolean,
   validationError?: ValidationError,
 ): InputField {
   return {
@@ -102,6 +103,7 @@ export function defineComboboxField(
       placeholder,
       itemService,
       validationError,
+      manualEntry,
     },
   }
 }
@@ -221,7 +223,14 @@ export const coreDataFields: InputField[] = [
       ),
     },
   ),
-  defineTextField("procedure", "Vorgang", "Vorgang"),
+  defineComboboxField(
+    "procedure",
+    "Vorgang",
+    "Vorgang",
+    comboboxItemService.getProcedures,
+    "Bitte auswählen",
+    true,
+  ),
   defineDropdownField(
     "legalEffect",
     "Rechtskraft",

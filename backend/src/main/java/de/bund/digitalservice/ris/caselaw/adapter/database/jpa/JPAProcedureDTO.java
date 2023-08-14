@@ -21,7 +21,7 @@ public class JPAProcedureDTO {
   @Id @GeneratedValue private UUID id;
 
   @Column(name = "name")
-  String name;
+  String label;
 
   @ManyToOne()
   @JoinColumn(name = "documentation_office_id", referencedColumnName = "id")
