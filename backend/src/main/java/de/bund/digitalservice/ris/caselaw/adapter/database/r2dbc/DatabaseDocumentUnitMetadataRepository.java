@@ -31,7 +31,6 @@ public interface DatabaseDocumentUnitMetadataRepository
           + "(:status IS NULL OR status_subquery.publication_status = :status) AND "
           + "(:documentNumberOrFileNumber IS NULL OR"
           + "   (UPPER(CONCAT(documentnumber, ' ', file_number_subquery.file_number)) LIKE UPPER('%'||:documentNumberOrFileNumber||'%'))) AND "
-          + "(:myDocOfficeOnly IS NULL OR :myDocOfficeOnly IS TRUE AND documentation_office_id = :documentationOfficeId)"
           + "data_source in ('NEURIS', 'MIGRATION') AND ("
           + "   documentation_office_id = :documentationOfficeId OR"
           + "   (status_subquery.publication_status IS NULL OR status_subquery.publication_status IN ('PUBLISHED', 'PUBLISHING')) "
@@ -67,8 +66,7 @@ public interface DatabaseDocumentUnitMetadataRepository
       String courtType,
       String courtLocation,
       Instant decisionDate,
-      PublicationStatus status,
-      Boolean myDocOfficeOnly);
+      PublicationStatus status);
 
   @Query(
       "SELECT * FROM doc_unit "
@@ -99,6 +97,5 @@ public interface DatabaseDocumentUnitMetadataRepository
       String courtType,
       String courtLocation,
       Instant decisionDate,
-      PublicationStatus status,
-      Boolean myDocOfficeOnly);
+      PublicationStatus status);
 }

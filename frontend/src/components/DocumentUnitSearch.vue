@@ -16,13 +16,11 @@ async function search(page = 0, listEntry?: DocumentUnitListEntry) {
   if (listEntry) {
     searchInput.value = listEntry
   }
-  console.log(searchInput.value)
   const response = await service.searchByDocumentUnitListEntry(
     page,
     itemsPerPage,
     searchInput.value,
   )
-  console.log(response)
   if (response.data) {
     documentUnitListEntries.value = response.data.content
     currentPage.value = response.data

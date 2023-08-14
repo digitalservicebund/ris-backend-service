@@ -79,7 +79,7 @@ class PostgresDocumentUnitRepositoryImplTest {
 
     Mockito.when(
             metadataRepository.searchByDocumentUnitListEntry(
-                documentationOfficeId, 10, 0L, null, null, null, null, null, false))
+                documentationOfficeId, 10, 0L, null, null, null, null, null))
         .thenReturn(Flux.empty());
 
     Mockito.when(documentationOfficeRepository.findByLabel("Test"))
@@ -95,7 +95,6 @@ class PostgresDocumentUnitRepositoryImplTest {
         .verifyComplete();
 
     verify(metadataRepository)
-        .searchByDocumentUnitListEntry(
-            documentationOfficeId, 10, 0L, null, null, null, null, null, false);
+        .searchByDocumentUnitListEntry(documentationOfficeId, 10, 0L, null, null, null, null, null);
   }
 }
