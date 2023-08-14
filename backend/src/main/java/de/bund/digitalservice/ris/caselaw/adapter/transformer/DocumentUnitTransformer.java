@@ -1,6 +1,7 @@
 package de.bund.digitalservice.ris.caselaw.adapter.transformer;
 
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPADocumentationOfficeDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPAProcedureDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DeviatingDecisionDateDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DeviatingEcliDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitDTO;
@@ -23,6 +24,7 @@ import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.Docume
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw.FieldOfLaw;
 import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -56,7 +58,6 @@ public class DocumentUnitTransformer {
       CoreData coreData = documentUnit.coreData();
 
       builder
-          .procedure(coreData.procedure())
           .ecli(coreData.ecli())
           .appraisalBody(coreData.appraisalBody())
           .decisionDate(coreData.decisionDate())
@@ -139,6 +140,10 @@ public class DocumentUnitTransformer {
     return court;
   }
 
+  static String getProcedure(JPAProcedureDTO procedureDTO) {
+    return Optional.ofNullable(procedureDTO).map(JPAProcedureDTO::getName).orElse(null);
+  }
+
   private static DocumentationOffice getDocumentationOffice(
       JPADocumentationOfficeDTO documentationOfficeDTO) {
 
@@ -190,7 +195,6 @@ public class DocumentUnitTransformer {
                     documentUnitMetadataDTO.getCourtType(),
                     documentUnitMetadataDTO.getCourtLocation()))
             .documentType(documentType)
-            .procedure(documentUnitMetadataDTO.getProcedure())
             .ecli(documentUnitMetadataDTO.getEcli())
             .appraisalBody(documentUnitMetadataDTO.getAppraisalBody())
             .decisionDate(documentUnitMetadataDTO.getDecisionDate())
@@ -314,7 +318,7 @@ public class DocumentUnitTransformer {
                 getCourtObject(documentUnitDTO.getCourtType(), documentUnitDTO.getCourtLocation()))
             .incorrectCourts(incorrectCourts)
             .documentType(documentType)
-            .procedure(documentUnitDTO.getProcedure())
+            .procedure(getProcedure(documentUnitDTO.getProcedure()))
             .ecli(documentUnitDTO.getEcli())
             .deviatingEclis(deviatingEclis)
             .appraisalBody(documentUnitDTO.getAppraisalBody())

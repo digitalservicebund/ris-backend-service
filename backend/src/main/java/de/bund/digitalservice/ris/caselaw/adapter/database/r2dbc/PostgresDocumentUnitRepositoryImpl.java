@@ -1,6 +1,9 @@
 package de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc;
 
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPADocumentationOfficeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPADocumentationOfficeRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPAProcedureDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPAProcedureRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitDTO.DocumentUnitDTOBuilder;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.CourtDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DatabaseCitationStyleRepository;
@@ -76,6 +79,8 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
   private final DatabaseDocumentationUnitLinkRepository documentationUnitLinkRepository;
   private final DatabaseCitationStyleRepository citationStyleRepository;
 
+  private final JPAProcedureRepository procedureRepository;
+
   public PostgresDocumentUnitRepositoryImpl(
       DatabaseDocumentUnitRepository repository,
       DatabaseDocumentUnitMetadataRepository metadataRepository,
@@ -94,7 +99,8 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
       DatabaseNormAbbreviationRepository normAbbreviationRepository,
       DatabaseDocumentationUnitLinkRepository documentationUnitLinkRepository,
       DatabaseCitationStyleRepository citationStyleRepository,
-      JPADocumentationOfficeRepository documentationOfficeRepository) {
+      JPADocumentationOfficeRepository documentationOfficeRepository,
+      JPAProcedureRepository procedureRepository) {
 
     this.repository = repository;
     this.metadataRepository = metadataRepository;
@@ -114,6 +120,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
     this.normAbbreviationRepository = normAbbreviationRepository;
     this.documentationUnitLinkRepository = documentationUnitLinkRepository;
     this.citationStyleRepository = citationStyleRepository;
+    this.procedureRepository = procedureRepository;
   }
 
   @Override
@@ -177,6 +184,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
         .flatMap(documentUnitDTO -> enrichLegalEffect(documentUnitDTO, documentUnit))
         .flatMap(documentUnitDTO -> enrichRegion(documentUnitDTO, documentUnit))
         .map(documentUnitDTO -> DocumentUnitTransformer.enrichDTO(documentUnitDTO, documentUnit))
+        .flatMap(documentUnitDTO -> saveProcedure(documentUnitDTO, documentUnit))
         .flatMap(repository::save)
         .flatMap(
             documentUnitDTO -> {
@@ -707,6 +715,36 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
         .then(injectProceedingDecisions(documentUnitDTO));
   }
 
+  private Mono<DocumentUnitDTO> saveProcedure(
+      DocumentUnitDTO documentUnitDTO, DocumentUnit documentUnit) {
+
+    String documentationOfficeLabel = documentUnit.coreData().documentationOffice().label();
+    Optional.ofNullable(documentUnit.coreData().procedure())
+        .map(name -> findOrCreateProcedure(name, documentationOfficeLabel))
+        .ifPresent(
+            procedureDTO -> {
+              documentUnitDTO.setProcedure(procedureDTO);
+              documentUnitDTO.setProcedureId(procedureDTO.getId());
+            });
+
+    return Mono.just(documentUnitDTO);
+  }
+
+  private JPAProcedureDTO findOrCreateProcedure(String name, String documentationOfficeLabel) {
+    JPADocumentationOfficeDTO documentationOfficeDTO =
+        documentationOfficeRepository.findByLabel(documentationOfficeLabel);
+
+    return Optional.ofNullable(
+            procedureRepository.findByNameAndDocumentationOffice(name, documentationOfficeDTO))
+        .orElseGet(
+            () ->
+                procedureRepository.save(
+                    JPAProcedureDTO.builder()
+                        .name(name)
+                        .documentationOffice(documentationOfficeDTO)
+                        .build()));
+  }
+
   private Mono<DocumentUnit> unlinkLinkedDocumentationUnit(
       DocumentUnit documentUnit, DocumentationUnitLinkType type) {
     if (log.isDebugEnabled()) {
@@ -836,7 +874,8 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
         .flatMap(this::injectFieldsOfLaw)
         .flatMap(this::injectDocumentationOffice)
         .flatMap(this::injectStatus)
-        .flatMap(this::injectActiveCitations);
+        .flatMap(this::injectActiveCitations)
+        .flatMap(this::injectProcedure);
   }
 
   private <T extends DocumentUnitMetadataDTO> Mono<T> injectMetadataInformation(
@@ -1072,6 +1111,14 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
                                       .build());
                               return Mono.just(dto);
                             })));
+  }
+
+  private <T extends DocumentUnitMetadataDTO> Mono<T> injectProcedure(T documentUnitDTO) {
+    Optional.ofNullable(documentUnitDTO.getProcedureId())
+        .flatMap(procedureRepository::findById)
+        .ifPresent(documentUnitDTO::setProcedure);
+
+    return Mono.just(documentUnitDTO);
   }
 
   @Override

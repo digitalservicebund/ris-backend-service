@@ -4,6 +4,7 @@ import static org.mockito.Mockito.verify;
 
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPADocumentationOfficeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPADocumentationOfficeRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPAProcedureRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DatabaseCitationStyleRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DatabaseCourtRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DatabaseDocumentTypeRepository;
@@ -46,6 +47,7 @@ class PostgresDocumentUnitRepositoryImplTest {
   @MockBean private DatabaseDocumentUnitStatusRepository databaseDocumentUnitStatusRepository;
   @MockBean private DatabaseNormAbbreviationRepository normAbbreviationRepository;
   @MockBean private DatabaseCitationStyleRepository citationStyleRepository;
+  @MockBean private JPAProcedureRepository procedureRepository;
 
   @BeforeEach
   public void setup() {
@@ -68,7 +70,8 @@ class PostgresDocumentUnitRepositoryImplTest {
             normAbbreviationRepository,
             documentationUnitLinkRepository,
             citationStyleRepository,
-            documentationOfficeRepository);
+            documentationOfficeRepository,
+            procedureRepository);
   }
 
   @Test

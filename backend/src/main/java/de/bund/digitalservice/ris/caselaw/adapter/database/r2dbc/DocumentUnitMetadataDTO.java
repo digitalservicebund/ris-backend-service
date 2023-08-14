@@ -1,6 +1,7 @@
 package de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc;
 
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPADocumentationOfficeDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPAProcedureDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DocumentTypeDTO;
 import de.bund.digitalservice.ris.caselaw.domain.DataSource;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatus;
@@ -44,9 +45,6 @@ public class DocumentUnitMetadataDTO {
 
   @Transient private DocumentTypeDTO documentTypeDTO;
 
-  @Column("vorgang")
-  private String procedure;
-
   @Column("ecli")
   private String ecli;
 
@@ -74,9 +72,14 @@ public class DocumentUnitMetadataDTO {
   @Column("documentation_office_id")
   private UUID documentationOfficeId;
 
+  @Column("procedure_id")
+  private UUID procedureId;
+
   @Transient private JPADocumentationOfficeDTO documentationOffice;
 
   @Transient private List<FileNumberDTO> fileNumbers;
 
   @Transient private DocumentUnitStatus status;
+
+  @Transient private JPAProcedureDTO procedure;
 }
