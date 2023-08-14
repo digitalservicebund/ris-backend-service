@@ -1195,7 +1195,8 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
                     searchInput.court() == null ? null : searchInput.court().type(),
                     searchInput.court() == null ? null : searchInput.court().location(),
                     searchInput.decisionDate(),
-                    searchInput.status() == null ? null : searchInput.status().publicationStatus()))
+                    searchInput.status() == null ? null : searchInput.status().publicationStatus(),
+                    searchInput.myDocOfficeOnly()))
         .flatMapSequential(this::injectFileNumbers)
         .flatMapSequential(this::injectDocumentType)
         .flatMapSequential(this::injectDocumentationOffice)
@@ -1354,9 +1355,8 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
                     searchInput.court() == null ? null : searchInput.court().type(),
                     searchInput.court() == null ? null : searchInput.court().location(),
                     searchInput.decisionDate(),
-                    searchInput.status() == null
-                        ? null
-                        : searchInput.status().publicationStatus()));
+                    searchInput.status() == null ? null : searchInput.status().publicationStatus(),
+                    searchInput.myDocOfficeOnly()));
   }
 
   @Override
