@@ -22,6 +22,7 @@ const emit = defineEmits<{
 }>()
 
 const inputCompleted = ref<boolean>(false)
+
 const inputValue = ref(
   props.modelValue ? dayjs(props.modelValue).format("DD.MM.YYYY") : undefined,
 )
@@ -87,24 +88,22 @@ function onBlur() {
   validateInput()
 }
 
-watch(props, () => {
-  inputValue.value = props.modelValue
-    ? dayjs(props.modelValue).format("DD.MM.YYYY")
-    : undefined
-})
+watch(
+  () => props.modelValue,
+  (is) => {
+    inputValue.value = is ? dayjs(is).format("DD.MM.YYYY") : undefined
+  },
+)
 
-watch(inputValue, () => {
-  if (inputValue.value === "") emit("update:modelValue", undefined)
+watch(inputValue, (is) => {
+  if (is === "") emit("update:modelValue", undefined)
   isValidDate.value &&
     isInPast.value &&
-    emit(
-      "update:modelValue",
-      dayjs(inputValue.value, "DD.MM.YYYY").toISOString(),
-    )
+    emit("update:modelValue", dayjs(is, "DD.MM.YYYY").toISOString())
 })
 
-watch(inputCompleted, () => {
-  if (inputCompleted.value === true) validateInput()
+watch(inputCompleted, (is) => {
+  if (is) validateInput()
 })
 </script>
 

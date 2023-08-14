@@ -1,9 +1,11 @@
 import userEvent from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
 import { createPinia, setActivePinia } from "pinia"
+import { nextTick } from "vue"
 import InputField, {
   LabelPosition,
 } from "@/shared/components/input/InputField.vue"
+import { useGlobalValidationErrorStore } from "@/stores/globalValidationErrorStore"
 
 type InputFieldProps = InstanceType<typeof InputField>["$props"]
 
@@ -87,13 +89,123 @@ describe("InputField", () => {
     expect(element).toBeInTheDocument()
   })
 
-  it("renders the error message", () => {
+  it("renders the error message from a prop", () => {
     renderComponent({
       validationError: { message: "error message", instance: "identifier" },
     })
 
-    const element = screen.getByText("error message")
-    expect(element).toBeInTheDocument()
+    expect(screen.getByText("error message")).toBeInTheDocument()
+  })
+
+  it("renders the error message from the store", () => {
+    const { add } = useGlobalValidationErrorStore()
+    add({ message: "error message", instance: "identifier" })
+    renderComponent({ id: "identifier" })
+
+    expect(screen.getByText("error message")).toBeInTheDocument()
+  })
+
+  it("initially shows the error from the props if both are set", () => {
+    const { add } = useGlobalValidationErrorStore()
+    add({ message: "from store", instance: "identifier" })
+    renderComponent({
+      id: "identifier",
+      validationError: { message: "from props", instance: "identifier" },
+    })
+
+    expect(screen.getByText("from props")).toBeInTheDocument()
+  })
+
+  it("replaces the error message from the props if an error is set in the store", async () => {
+    renderComponent({
+      id: "identifier",
+      validationError: { message: "from props", instance: "identifier" },
+    })
+
+    expect(screen.getByText("from props")).toBeInTheDocument()
+
+    const { add } = useGlobalValidationErrorStore()
+    add({ message: "from store", instance: "identifier" })
+    await nextTick()
+
+    expect(screen.queryByText("from props")).not.toBeInTheDocument()
+    expect(screen.getByText("from store")).toBeInTheDocument()
+  })
+
+  it("replaces the error message from the store if a prop is set", async () => {
+    const { add } = useGlobalValidationErrorStore()
+    add({ message: "from store", instance: "identifier" })
+    const { rerender } = renderComponent({ id: "identifier" })
+
+    expect(screen.getByText("from store")).toBeInTheDocument()
+
+    await rerender({
+      validationError: { message: "from props", instance: "identifier" },
+    })
+
+    expect(screen.queryByText("from store")).not.toBeInTheDocument()
+    expect(screen.getByText("from props")).toBeInTheDocument()
+  })
+
+  it("falls back to the error message from the store if the prop is removed", async () => {
+    const { add } = useGlobalValidationErrorStore()
+    add({ message: "from store", instance: "identifier" })
+    const { rerender } = renderComponent({
+      id: "identifier",
+      validationError: { message: "from props", instance: "identifier" },
+    })
+
+    expect(screen.getByText("from props")).toBeInTheDocument()
+
+    await rerender({ validationError: undefined })
+
+    expect(screen.queryByText("from props")).not.toBeInTheDocument()
+    expect(screen.getByText("from store")).toBeInTheDocument()
+  })
+
+  it("falls back to the error message from the props if the store is reset", async () => {
+    renderComponent({
+      id: "identifier",
+      validationError: { message: "from props", instance: "identifier" },
+    })
+
+    expect(screen.getByText("from props")).toBeInTheDocument()
+
+    const { reset, add } = useGlobalValidationErrorStore()
+    add({ message: "from store", instance: "identifier" })
+    await nextTick()
+
+    expect(screen.queryByText("from props")).not.toBeInTheDocument()
+    expect(screen.getByText("from store")).toBeInTheDocument()
+
+    reset()
+    await nextTick()
+    expect(screen.getByText("from props")).toBeInTheDocument()
+    expect(screen.queryByText("from store")).not.toBeInTheDocument()
+  })
+
+  it("removes the error message from the prop", async () => {
+    const { rerender } = renderComponent({
+      id: "identifier",
+      validationError: { message: "from props", instance: "identifier" },
+    })
+
+    expect(screen.getByText("from props")).toBeInTheDocument()
+
+    await rerender({ validationError: undefined })
+    expect(screen.queryByText("from props")).not.toBeInTheDocument()
+  })
+
+  it("removes the error message from the store", async () => {
+    const { add, reset } = useGlobalValidationErrorStore()
+    add({ message: "from store", instance: "identifier" })
+    renderComponent({ id: "identifier" })
+
+    expect(screen.getByText("from store")).toBeInTheDocument()
+
+    reset()
+    await nextTick()
+    expect(screen.queryByText("from store")).not.toBeInTheDocument()
   })
 
   it("renders the slot content", () => {

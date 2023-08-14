@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, ref, watchEffect } from "vue"
+import { computed, ref, toValue, watch } from "vue"
 import { ValidationError } from "@/shared/components/input/types"
 import { useGlobalValidationErrorStore } from "@/stores/globalValidationErrorStore"
 
@@ -46,24 +46,36 @@ const labelConverted = computed(() => {
  * -------------------------------------------------- */
 
 const { getByInstance } = useGlobalValidationErrorStore()
-const localValidationError = ref(props.validationError)
+const errorsFromStore = getByInstance(props.id)
+const storeValidationError = computed(() => errorsFromStore.value[0])
 
 function updateValidationError(newValidationError?: ValidationError) {
   localValidationError.value = newValidationError
 }
 
-const storeValidationError = computed(() => getByInstance(props.id).value[0])
+const localValidationError = ref<ValidationError | undefined>(
+  props.validationError ?? toValue(storeValidationError),
+)
 
-watchEffect(() => {
-  if (props.validationError) {
+watch(
+  () => props.validationError,
+  (is, was) => {
+    if (is) {
+      localValidationError.value = is
+    } else if (!is && was && storeValidationError.value) {
+      localValidationError.value = storeValidationError.value
+    } else {
+      localValidationError.value = undefined
+    }
+  },
+)
+
+watch(storeValidationError, (is, was) => {
+  if (is) {
+    localValidationError.value = is
+  } else if (!is && was && props.validationError) {
     localValidationError.value = props.validationError
-  }
-
-  if (getByInstance(props.id).value[0]) {
-    localValidationError.value = storeValidationError.value
-  }
-
-  if (!props.validationError && !storeValidationError.value) {
+  } else {
     localValidationError.value = undefined
   }
 })
