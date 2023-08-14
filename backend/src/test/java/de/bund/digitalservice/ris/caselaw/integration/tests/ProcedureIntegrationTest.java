@@ -99,6 +99,7 @@ class ProcedureIntegrationTest {
   @AfterEach
   void cleanUp() {
     documentUnitRepository.deleteAll().block();
+    repository.deleteAll();
   }
 
   @Test
