@@ -74,7 +74,7 @@
     "@playwright/test": "^1.35.0",
     "@sentry/vite-plugin": "^2.5.0",
     "@testing-library/dom": "^9.3.0",
-    "@testing-library/jest-dom": "^5.16.5",
+    "@testing-library/jest-dom": "^6.0.0",
     "@testing-library/user-event": "^14.4.3",
     "@testing-library/vue": "^7.0.0",
     "@types/jsdom": "^21.1.1",
