@@ -91,7 +91,7 @@ export enum LabelPosition {
 <template>
   <div class="flex-start mb-16 flex w-full gap-4" :class="wrapperClasses">
     <div
-      v-if="labelConverted.length !== 0"
+      v-if="labelConverted && labelConverted.length !== 0"
       class="flex flex-row items-center"
       :class="{
         'order-1': labelPosition === LabelPosition.RIGHT,
@@ -132,7 +132,7 @@ export enum LabelPosition {
 
     <div
       v-if="localValidationError"
-      class="ds-label-03-reg h-16 text-red-800"
+      class="ds-label-03-reg min-h-[1rem] text-red-800"
       :data-testid="id + '-validationError'"
     >
       {{ localValidationError.message }}
