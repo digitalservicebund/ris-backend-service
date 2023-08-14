@@ -63,7 +63,7 @@ const inputFieldId = getLocator(() => [props.id])
       </label>
       <InputField
         :id="inputFieldId"
-        v-slot="{ id: inputElementId, hasError }"
+        v-slot="{ id: inputElementId, hasError, updateValidationError }"
         class="!mb-0"
         :label="label"
         visually-hide-label
@@ -76,6 +76,7 @@ const inputFieldId = getLocator(() => [props.id])
           disable-error
           :has-error="hasError"
           :type="type"
+          @update:validation-error="updateValidationError"
         />
       </InputField>
     </div>

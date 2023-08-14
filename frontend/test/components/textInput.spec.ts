@@ -100,6 +100,13 @@ describe("TextInput", () => {
     expect(input).toHaveClass("has-error")
   })
 
+  it("clears errors on type", async () => {
+    const { emitted } = renderComponent({ hasError: true })
+    const input: HTMLInputElement = screen.getByRole("textbox")
+    await userEvent.type(input, "a")
+    expect(emitted("update:validationError")).toEqual([[undefined]])
+  })
+
   it("renders a read-only input", () => {
     renderComponent({ readOnly: true })
     const input = screen.getByRole("textbox")

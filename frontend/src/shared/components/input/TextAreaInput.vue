@@ -108,6 +108,7 @@ defineExpose({ focus })
     :readonly="readOnly"
     :rows="rows"
     :tabindex="readOnly ? -1 : ($attrs.tabindex as number)"
+    @input="$emit('update:validationError', undefined)"
     @keypress.enter.stop="() => {}"
   ></textarea>
   <!-- No-op keypress handler for preventing other enter-based event handlers such as

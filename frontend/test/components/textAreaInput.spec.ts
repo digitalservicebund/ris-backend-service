@@ -56,6 +56,13 @@ describe("TextAreaInput", () => {
     expect(textarea).toHaveClass("has-error")
   })
 
+  it("clears errors on type", async () => {
+    const { emitted } = renderComponent({ hasError: true })
+    const input: HTMLTextAreaElement = screen.getByRole("textbox")
+    await userEvent.type(input, "a")
+    expect(emitted("update:validationError")).toEqual([[undefined]])
+  })
+
   it("renders the 'regular' variant by default", () => {
     renderComponent({ size: "regular" })
     const textarea = screen.queryByRole("textbox")

@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { InputHTMLAttributes, computed, ref } from "vue"
+import { ValidationError } from "@/shared/components/input/types"
 
 interface Props {
   id: string
@@ -22,6 +23,7 @@ const props = withDefaults(defineProps<Props>(), {
 
 const emit = defineEmits<{
   "update:modelValue": [value: string | undefined]
+  "update:validationError": [value: ValidationError | undefined]
   "enter-released": []
 }>()
 
@@ -60,6 +62,7 @@ defineExpose({ focusInput, inputRef })
     :readonly="readOnly"
     :tabindex="tabindex"
     :type="type"
-    @keyup.enter="emit('enter-released')"
+    @input="$emit('update:validationError', undefined)"
+    @keyup.enter="$emit('enter-released')"
   />
 </template>

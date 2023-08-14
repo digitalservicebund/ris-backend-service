@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { reactive } from "vue"
+import { reactive, ref } from "vue"
 import { defineDateField } from "@/fields/caselaw"
 import KitchensinkPage from "@/kitchensink/components/KitchensinkPage.vue"
 import KitchensinkStory from "@/kitchensink/components/KitchensinkStory.vue"
@@ -10,7 +10,10 @@ import InputField from "@/shared/components/input/InputField.vue"
 import NestedInput from "@/shared/components/input/NestedInput.vue"
 import TextInput from "@/shared/components/input/TextInput.vue"
 import TimeInput from "@/shared/components/input/TimeInput.vue"
-import { NestedInputAttributes } from "@/shared/components/input/types"
+import {
+  NestedInputAttributes,
+  ValidationError,
+} from "@/shared/components/input/types"
 import YearInput from "@/shared/components/input/YearInput.vue"
 
 const nestedInputFields: NestedInputAttributes["fields"] = {
@@ -21,6 +24,11 @@ const nestedInputFields: NestedInputAttributes["fields"] = {
     "Abweichender Input",
   ),
 }
+
+const validationError = ref<ValidationError>({
+  message: "Invalid value",
+  instance: "errorMessageTextInput",
+})
 
 const values = reactive({
   regularTextInput: "",
@@ -105,18 +113,16 @@ const values = reactive({
     <KitchensinkStory class="w-320" name="With error message">
       <InputField
         id="errorMessageTextInput"
-        v-slot="{ id, hasError }"
+        v-slot="{ id, hasError, updateValidationError }"
         label="This has an error message"
-        :validation-error="{
-          message: 'Error message',
-          instance: 'errorMessageTextInput',
-        }"
+        :validation-error="validationError"
       >
         <TextInput
           :id="id"
           v-model="values.errorMessageTextInput"
           aria-label="invalid text input"
           :has-error="hasError"
+          @update:validation-error="updateValidationError"
         />
       </InputField>
     </KitchensinkStory>

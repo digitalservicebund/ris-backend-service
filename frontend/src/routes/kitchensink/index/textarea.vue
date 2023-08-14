@@ -4,6 +4,12 @@ import KitchensinkPage from "@/kitchensink/components/KitchensinkPage.vue"
 import KitchensinkStory from "@/kitchensink/components/KitchensinkStory.vue"
 import InputField from "@/shared/components/input/InputField.vue"
 import TextAreaInput from "@/shared/components/input/TextAreaInput.vue"
+import { ValidationError } from "@/shared/components/input/types"
+
+const validationError = ref<ValidationError>({
+  message: "Invalid value",
+  instance: "errorMessageTextInput",
+})
 
 const fixed = ref("")
 const autosize = ref("")
@@ -63,7 +69,7 @@ const error = ref("")
         id="errorTextarea"
         v-slot="{ id, hasError, updateValidationError }"
         label="Textarea"
-        :validation-error="{ message: 'Error', instance: 'errorTextarea' }"
+        :validation-error="validationError"
       >
         <TextAreaInput
           :id="id"
