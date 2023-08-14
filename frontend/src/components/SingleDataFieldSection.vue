@@ -53,32 +53,28 @@ const inputFieldId = getLocator(() => [props.id])
 
 <template>
   <div
-    class="border-l-red-800 [&:has(.has-error)]:border-l-8 [&:has(.has-error)]:pl-8"
+    class="flex items-start gap-8 border-b border-gray-400 bg-white p-8 pl-16"
   >
-    <div
-      class="flex items-start gap-8 border-b border-gray-400 bg-white p-8 pl-16"
+    <label class="ds-label-02-bold my-12 w-240 flex-none" :for="inputFieldId">
+      <h2>{{ label }}</h2>
+    </label>
+    <InputField
+      :id="inputFieldId"
+      v-slot="{ id: inputElementId, hasError, updateValidationError }"
+      class="!mb-0"
+      :label="label"
+      visually-hide-label
     >
-      <label class="ds-label-02-bold my-12 w-240 flex-none" :for="inputFieldId">
-        <h2>{{ label }}</h2>
-      </label>
-      <InputField
-        :id="inputFieldId"
-        v-slot="{ id: inputElementId, hasError, updateValidationError }"
-        class="!mb-0"
-        :label="label"
-        visually-hide-label
-      >
-        <InputElement
-          :id="inputElementId"
-          v-model="value"
-          :attributes="inputAttributes"
-          class="ds-label-02-reg"
-          disable-error
-          :has-error="hasError"
-          :type="type"
-          @update:validation-error="updateValidationError"
-        />
-      </InputField>
-    </div>
+      <InputElement
+        :id="inputElementId"
+        v-model="value"
+        :attributes="inputAttributes"
+        class="ds-label-02-reg"
+        disable-error
+        :has-error="hasError"
+        :type="type"
+        @update:validation-error="updateValidationError"
+      />
+    </InputField>
   </div>
 </template>
