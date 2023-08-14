@@ -1,6 +1,8 @@
 <script lang="ts" setup>
 import { computed, ref, toValue, watch } from "vue"
 import { ValidationError } from "@/shared/components/input/types"
+import errors from "@/shared/i18n/errors.json"
+import { isErrorCode } from "@/shared/i18n/utils"
 import { useGlobalValidationErrorStore } from "@/stores/globalValidationErrorStore"
 
 interface Props {
@@ -56,6 +58,14 @@ function updateValidationError(newValidationError?: ValidationError) {
 const localValidationError = ref<ValidationError | undefined>(
   props.validationError ?? toValue(storeValidationError),
 )
+
+const errorMessage = computed(() => {
+  if (!localValidationError.value) return undefined
+
+  const { code, message } = localValidationError.value
+  if (code && isErrorCode(code)) return errors[code].title
+  else return message
+})
 
 watch(
   () => props.validationError,
@@ -135,7 +145,7 @@ export enum LabelPosition {
       class="ds-label-03-reg min-h-[1rem] text-red-800"
       :data-testid="id + '-validationError'"
     >
-      {{ localValidationError.message }}
+      {{ errorMessage }}
     </div>
   </div>
 </template>

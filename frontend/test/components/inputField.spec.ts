@@ -5,6 +5,7 @@ import { nextTick } from "vue"
 import InputField, {
   LabelPosition,
 } from "@/shared/components/input/InputField.vue"
+import { MANDATORY_FIELD_MISSING } from "@/shared/i18n/errors.json"
 import { useGlobalValidationErrorStore } from "@/stores/globalValidationErrorStore"
 
 type InputFieldProps = InstanceType<typeof InputField>["$props"]
@@ -184,7 +185,7 @@ describe("InputField", () => {
     expect(screen.queryByText("from store")).not.toBeInTheDocument()
   })
 
-  it("removes the error message from the prop", async () => {
+  it("removes the error message when the prop is cleared", async () => {
     const { rerender } = renderComponent({
       id: "identifier",
       validationError: { message: "from props", instance: "identifier" },
@@ -196,7 +197,7 @@ describe("InputField", () => {
     expect(screen.queryByText("from props")).not.toBeInTheDocument()
   })
 
-  it("removes the error message from the store", async () => {
+  it("removes the error message when the store is reset", async () => {
     const { add, reset } = useGlobalValidationErrorStore()
     add({ message: "from store", instance: "identifier" })
     renderComponent({ id: "identifier" })
@@ -206,6 +207,38 @@ describe("InputField", () => {
     reset()
     await nextTick()
     expect(screen.queryByText("from store")).not.toBeInTheDocument()
+  })
+
+  it("shows the error's own message if no code exists", () => {
+    renderComponent({
+      validationError: { message: "error message", instance: "identifier" },
+    })
+
+    expect(screen.getByText("error message")).toBeInTheDocument()
+  })
+
+  it("shows the error's own message if the code is not found", () => {
+    renderComponent({
+      validationError: {
+        code: "NOT_FOUND",
+        instance: "identifier",
+        message: "error message",
+      },
+    })
+
+    expect(screen.getByText("error message")).toBeInTheDocument()
+  })
+
+  it("maps the error code to a message if possible", () => {
+    renderComponent({
+      validationError: {
+        code: "MANDATORY_FIELD_MISSING",
+        instance: "identifier",
+        message: "This should not be visible",
+      },
+    })
+
+    expect(screen.getByText(MANDATORY_FIELD_MISSING.title)).toBeInTheDocument()
   })
 
   it("renders the slot content", () => {

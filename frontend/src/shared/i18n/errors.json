@@ -154,5 +154,9 @@
   "EDIT_ERROR": {
     "title": "Dokumentationseinheit konnte nicht bearbeitet werden.",
     "description": ""
+  },
+  "MANDATORY_FIELD_MISSING": {
+    "title": "Feld muss befüllt sein",
+    "description": ""
   }
 }
