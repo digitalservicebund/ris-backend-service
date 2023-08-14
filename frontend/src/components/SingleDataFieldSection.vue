@@ -73,7 +73,7 @@ const inputFieldId = getLocator(() => [props.id])
           v-model="value"
           :attributes="inputAttributes"
           class="ds-label-02-reg"
-          :disable-error="!hasError"
+          disable-error
           :has-error="hasError"
           :type="type"
         />
