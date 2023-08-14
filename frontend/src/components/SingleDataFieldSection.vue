@@ -16,12 +16,14 @@ interface Props {
   modelValue: ModelType
   readonly?: boolean
   inputAttributes?: InputAttributes
+  required?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
   type: InputType.TEXT,
   readonly: false,
   inputAttributes: undefined,
+  required: false,
 })
 
 const emit = defineEmits<{
@@ -56,7 +58,8 @@ const inputFieldId = getLocator(() => [props.id])
     class="flex items-start gap-8 border-b border-gray-400 bg-white p-8 pl-16"
   >
     <label class="ds-label-02-bold my-12 w-240 flex-none" :for="inputFieldId">
-      <h2>{{ label }}</h2>
+      <h2 class="mr-8 inline-block">{{ label }}</h2>
+      <span v-if="required">*</span>
     </label>
     <InputField
       :id="inputFieldId"

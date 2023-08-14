@@ -174,6 +174,7 @@ const AgeIndicationSummary = withSummarizer(ageIndicationSummarizer)
       v-model="officialLongTitle"
       :input-attributes="{ ariaLabel: 'Amtliche Langüberschrift', rows: 1 }"
       label="Amtliche Langüberschrift"
+      required
       :type="InputType.TEXTAREA"
     />
 
