@@ -84,6 +84,7 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
           id: "NORM/OFFICIAL_LONG_TITLE",
           label: "Amtliche Langüberschrift",
           value: norm.metadataSections?.NORM?.[0]?.OFFICIAL_LONG_TITLE?.[0],
+          isMandatory: true,
         },
       ],
     },

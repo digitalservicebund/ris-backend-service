@@ -30,6 +30,7 @@ export type Field<
   type: Type
   id: string
   label: string
+  isMandatory?: boolean
 } & (
   | { value: Value; values?: never }
   | { value?: never; values?: (Value | undefined)[] }
