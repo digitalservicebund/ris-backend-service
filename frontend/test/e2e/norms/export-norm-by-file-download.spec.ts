@@ -10,11 +10,7 @@ import { testWithImportedNorm } from "./fixtures"
 testWithImportedNorm(
   "Check if norm can be exported",
   async ({ page, normData, guid, request }) => {
-    await openNorm(
-      page,
-      normData.metadataSections?.NORM?.[0]?.OFFICIAL_LONG_TITLE?.[0] ?? "",
-      guid,
-    )
+    await openNorm(page, guid)
 
     const fileName = normData["jurisZipFileName"]
 

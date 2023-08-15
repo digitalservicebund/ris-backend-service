@@ -1,6 +1,6 @@
 import { expect } from "@playwright/test"
 import jsdom from "jsdom"
-import { openNorm } from "./e2e-utils"
+import { openNorm, saveNormFrame } from "./e2e-utils"
 import { testWithImportedNorm } from "./fixtures"
 import { normData as norm } from "./testdata/norm_basic"
 import { FieldType, fillInputField } from "./utilities"
@@ -8,13 +8,9 @@ import { MetadataSectionName, MetadatumType } from "@/domain/Norm"
 
 testWithImportedNorm(
   "Check if XML can be retrieved by ELI and content is correct",
-  async ({ page, normData, guid, request }) => {
+  async ({ page, guid, request }) => {
     // Open frame data
-    await openNorm(
-      page,
-      normData.metadataSections?.NORM?.[0]?.OFFICIAL_LONG_TITLE?.[0] ?? "",
-      guid,
-    )
+    await openNorm(page, guid)
     await page.locator("a:has-text('Rahmen')").click()
 
     // Update page of print announcement so that this norm we be retrieved for sure by the eli
@@ -37,12 +33,7 @@ testWithImportedNorm(
       name: "Fertig",
     })
     await finishButton.click()
-    await page.locator("[aria-label='Rahmendaten Speichern Button']").click()
-    await expect(
-      page.locator(
-        "button[aria-label='Rahmendaten Speichern Button']:not(:disabled)",
-      ),
-    ).toBeVisible()
+    await saveNormFrame(page)
     await page.reload()
 
     // retrieve by new eli

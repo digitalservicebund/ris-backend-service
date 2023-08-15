@@ -80,16 +80,8 @@ export async function importNormViaApi(
   return JSON.parse(body)
 }
 
-export const openNorm = async (
-  page: Page,
-  officialLongTitle: string,
-  guid: string,
-) => {
-  await page.goto("/norms")
-  const listEntry = page.locator(`a[href="/norms/norm/${guid}"]`)
-  await expect(listEntry).toBeVisible()
-  await expect(listEntry).toHaveText(officialLongTitle)
-  await listEntry.click()
+export const openNorm = async (page: Page, guid: string) => {
+  await page.goto(`/norms/norm/${guid}`)
 }
 
 export async function getDownloadedFileContent(page: Page, filename: string) {
@@ -251,4 +243,13 @@ export async function expectSummaryToContainMetadata(
       expect(summaryValues[i]).toBe(value)
     }
   }
+}
+
+export async function saveNormFrame(page: Page) {
+  await page
+    .locator("[aria-label='Rahmendaten Speichern Button']:not(:disabled)")
+    .click()
+  await expect(
+    page.locator("[aria-label='Rahmendaten Speichern Button']:not(:disabled)"),
+  ).toBeVisible()
 }

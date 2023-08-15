@@ -1,6 +1,6 @@
 import { expect } from "@playwright/test"
 
-import { openNorm } from "./e2e-utils"
+import { openNorm, saveNormFrame } from "./e2e-utils"
 import { getNormBySections, testWithImportedNorm } from "./fixtures"
 import { newNorm } from "./testdata/norm_edited_fields"
 import {
@@ -10,13 +10,9 @@ import {
 
 testWithImportedNorm(
   "Check if fields can be edited",
-  async ({ page, normData, guid }) => {
+  async ({ page, guid }) => {
     testWithImportedNorm.slow()
-    await openNorm(
-      page,
-      normData.metadataSections?.NORM?.[0]?.OFFICIAL_LONG_TITLE?.[0] ?? "",
-      guid,
-    )
+    await openNorm(page, guid)
 
     const locatorFrameButton = page.locator("a:has-text('Rahmen')")
     await expect(locatorFrameButton).toBeVisible()
@@ -28,7 +24,7 @@ testWithImportedNorm(
       await fillMetadataInputSection(page, section)
     }
 
-    await page.locator("[aria-label='Rahmendaten Speichern Button']").click()
+    await saveNormFrame(page)
     await expect(page.locator("text=Zuletzt").first()).toBeVisible()
     await page.reload()
 

@@ -1,5 +1,5 @@
 import { expect, Page } from "@playwright/test"
-import { openNorm } from "./e2e-utils"
+import { openNorm, saveNormFrame } from "./e2e-utils"
 import { getNormBySections, testWithImportedNorm } from "./fixtures"
 import { newNorm } from "./testdata/norm_edited_fields"
 import { normEmptyMandatoryFields } from "./testdata/norm_empty_mandatory_fields"
@@ -19,24 +19,17 @@ async function isValidatonErrorPresent(
   }
 }
 
-async function saveNormFrame(page: Page) {
-  await page
-    .locator("[aria-label='Rahmendaten Speichern Button']:not(:disabled)")
-    .click()
+async function validateNormFrame(page: Page) {
+  await page.locator("[aria-label='Daten prüfen']:not(:disabled)").click()
   await expect(
-    page.locator("[aria-label='Rahmendaten Speichern Button']:not(:disabled)"),
+    page.locator("[aria-label='Daten prüfen']:not(:disabled)"),
   ).toBeVisible()
-  await page.reload()
 }
 
 testWithImportedNorm(
   "Check if missing mandatory fields are correctly validated",
-  async ({ page, normData, guid }) => {
-    await openNorm(
-      page,
-      normData.metadataSections?.NORM?.[0]?.OFFICIAL_LONG_TITLE?.[0] ?? "",
-      guid,
-    )
+  async ({ page, guid }) => {
+    await openNorm(page, guid)
     const locatorFrameButton = page.locator("a:has-text('Rahmen')")
     await expect(locatorFrameButton).toBeVisible()
 
@@ -52,9 +45,7 @@ testWithImportedNorm(
       await fillMetadataInputSection(page, section)
     }
 
-    await saveNormFrame(page)
-
-    await page.locator("[aria-label='Daten prüfen']").click()
+    await validateNormFrame(page)
     for (const section of sectionsWithMandatoryFields) {
       const mandatoryFields = (section.fields ?? []).filter(
         (field: AnyField) => field.isMandatory,
@@ -77,8 +68,9 @@ testWithImportedNorm(
     }
 
     await saveNormFrame(page)
+    await page.reload()
 
-    await page.locator("[aria-label='Daten prüfen']").click()
+    await validateNormFrame(page)
     for (const section of sectionsWithMandatoryFields) {
       const mandatoryFields = (section.fields ?? []).filter(
         (field) => field.isMandatory,
