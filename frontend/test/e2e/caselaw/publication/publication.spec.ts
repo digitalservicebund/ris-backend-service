@@ -1,4 +1,4 @@
-import { Page, expect } from "@playwright/test"
+import { expect } from "@playwright/test"
 import {
   fillActiveCitationInputs,
   fillNormInputs,
@@ -62,14 +62,9 @@ test.describe("ensuring the publishing of documentunits works as expected", () =
   // RISDEV-2183
   test("publication page shows missing required fields of proceeding decisions with only missing fields in proceeding decisions", async ({
     page,
-    documentNumber,
+    prefilledDocumentUnit,
   }) => {
-    await navigateToCategories(page, documentNumber)
-
-    await fillAllRequiredCoreData(page)
-
-    await navigateToCategories(page, documentNumber)
-    await expect(page.getByText(documentNumber)).toBeVisible()
+    await navigateToCategories(page, prefilledDocumentUnit.documentNumber!)
 
     await waitForSaving(
       async () => {
@@ -88,7 +83,7 @@ test.describe("ensuring the publishing of documentunits works as expected", () =
       }),
     ).toBeVisible()
 
-    await navigateToPublication(page, documentNumber)
+    await navigateToPublication(page, prefilledDocumentUnit.documentNumber!)
 
     await expect(page.locator("li:has-text('Rechtszug')")).toBeVisible()
 
@@ -220,14 +215,9 @@ test.describe("ensuring the publishing of documentunits works as expected", () =
 
   test("publication possible when all required fields filled", async ({
     page,
-    documentNumber,
+    prefilledDocumentUnit,
   }) => {
-    await navigateToPublication(page, documentNumber)
-    await page.locator("[aria-label='Rubriken bearbeiten']").click()
-
-    await fillAllRequiredCoreData(page)
-
-    await navigateToPublication(page, documentNumber)
+    await navigateToPublication(page, prefilledDocumentUnit.documentNumber!)
 
     await expect(
       page.locator("text=Alle Pflichtfelder sind korrekt ausgefüllt"),
@@ -249,62 +239,4 @@ test.describe("ensuring the publishing of documentunits works as expected", () =
 
     await expect(page.locator("text=in Veröffentlichung")).toBeVisible()
   })
-
-  const fillAllRequiredCoreData = async (page: Page) => {
-    await waitForSaving(
-      async () => {
-        await page.locator("[aria-label='Aktenzeichen']").fill("abc")
-        await page.keyboard.press("Enter")
-        await expect(page.getByText("abc").first()).toBeVisible()
-      },
-      page,
-      { clickSaveButton: true },
-    )
-
-    await waitForSaving(
-      async () => {
-        await page
-          .locator("[aria-label='Entscheidungsdatum']")
-          .fill("03.02.2022")
-        await expect(
-          page.locator("[aria-label='Entscheidungsdatum']"),
-        ).toHaveValue("03.02.2022")
-
-        await page.keyboard.press("Tab")
-      },
-      page,
-      { clickSaveButton: true, reload: true },
-    )
-
-    await waitForSaving(
-      async () => {
-        await page.locator("[aria-label='Gericht']").fill("vgh mannheim")
-        await page.locator("text=VGH Mannheim").click()
-        await expect(page.locator("[aria-label='Gericht']")).toHaveValue(
-          "VGH Mannheim",
-        )
-      },
-      page,
-      { clickSaveButton: true, reload: true },
-    )
-
-    await waitForSaving(
-      async () => {
-        await page.locator("[aria-label='Dokumenttyp']").fill("AnU")
-        await page.locator("text=Anerkenntnisurteil").click()
-      },
-      page,
-      { clickSaveButton: true, reload: true },
-    )
-
-    await waitForSaving(
-      async () => {
-        await page
-          .getByRole("combobox", { name: "Rechtskraft" })
-          .selectOption("Ja")
-      },
-      page,
-      { clickSaveButton: true, reload: true },
-    )
-  }
 })
