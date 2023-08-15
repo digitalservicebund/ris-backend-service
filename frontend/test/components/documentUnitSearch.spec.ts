@@ -1,8 +1,13 @@
 import userEvent from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
+import { createPinia, setActivePinia } from "pinia"
 import DocumentUnitSearch from "@/components/DocumentUnitSearch.vue"
 
 describe("Documentunit Search", () => {
+  beforeEach(async () => {
+    setActivePinia(createPinia())
+  })
+
   test("renders correctly", async () => {
     render(DocumentUnitSearch)
     expect(
