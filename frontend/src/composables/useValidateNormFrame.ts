@@ -19,14 +19,14 @@ export function useValidateNormFrame(
     try {
       onBeforeValidation()
       const response = await validateCallback()
-      response.data && onValidationDone(response.data)
+      if (response.data) onValidationDone(response.data)
       lastValidateError.value = response.error
     } catch {
       lastValidateError.value = ERROR_MESSAGES.SERVER_ERROR
     } finally {
       setTimeout(() => {
         validateIsInProgress.value = false
-      })
+      }, 500)
     }
   }
 
