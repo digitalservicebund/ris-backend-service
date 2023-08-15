@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { storeToRefs } from "pinia"
+import { onUnmounted } from "vue"
 import { useValidateNormFrame } from "@/composables/useValidateNormFrame"
 import { validateNormFrame } from "@/services/norms"
 import TextButton from "@/shared/components/input/TextButton.vue"
@@ -17,6 +18,10 @@ const { loadedNorm } = storeToRefs(loadedNormStore)
 const { triggerSave, saveIsInProgress, lastSaveError, formattedLastSavedOn } =
   useSaveToRemote(loadedNormStore.update, 10000)
 
+onUnmounted(() => {
+  triggerSave()
+})
+
 /* -------------------------------------------------- *
  * Validating norms                                   *
  * -------------------------------------------------- */
@@ -33,6 +38,10 @@ const { triggerValidation, lastValidateError, validateIsInProgress } =
       validationErrorStore.add(...errors)
     },
   )
+
+onUnmounted(() => {
+  validationErrorStore.removeByScope("NORM")
+})
 </script>
 
 <template>
