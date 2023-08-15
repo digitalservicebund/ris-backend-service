@@ -129,7 +129,7 @@ export async function expectInputFieldGroupHasCorrectValues(
 
     if (value !== undefined) {
       if (field.type !== FieldType.EDITOR) {
-        const label = page.locator(`label:has-text("${field.label}")`).first()
+        const label = page.locator(`:not(.sr-only) > label[for='${field.id}']`)
         await expect(label).toBeVisible()
       }
 

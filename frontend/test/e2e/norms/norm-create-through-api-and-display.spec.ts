@@ -22,11 +22,9 @@ async function expectSectionAppearsAfterScroll(
     ).toBeInViewport()
   } else {
     await expect(
-      page
-        .locator(
-          `legend:text-is("${section.heading}"), h2:text-is("${section.heading}")`,
-        )
-        .first(),
+      page.locator(
+        `legend:text-is("${section.heading}"), h2:text-is("${section.heading}")`,
+      ),
     ).toBeInViewport()
   }
 }

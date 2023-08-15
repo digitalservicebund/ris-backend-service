@@ -25,7 +25,7 @@ testWithImportedNorm(
     }
 
     await saveNormFrame(page)
-    await expect(page.locator("text=Zuletzt").first()).toBeVisible()
+    await expect(page.locator("text=Zuletzt")).toBeVisible()
     await page.reload()
 
     for (const section of sections) {

@@ -61,11 +61,11 @@ const undefinedDateState = computed({
 
 <template>
   <div class="flex w-384 flex-col gap-8">
-    <InputField :id="id" :aria-label="label" :label="label">
+    <InputField :id="`${id}Dropdown`" :aria-label="label" :label="label">
       <DropdownInput
-        :id="id + 'Dropdown'"
+        :id="`${id}Dropdown`"
         v-model="undefinedDateState"
-        :aria-label="label + ' Dropdown'"
+        :aria-label="`${label} Dropdown`"
         :items="dropdownItems"
         placeholder="Bitte auswählen"
       />
