@@ -94,6 +94,7 @@ const myDocOfficeOnly = computed({
             id="documentNumber"
             v-model="searchEntry.documentNumberOrFileNumber"
             aria-label="Dokumentnummer oder Aktenzeichen Suche"
+            class="ds-input-small"
             placeholder="Dokumentnummeroder Aktenzeichen"
           ></TextInput>
         </InputField>
@@ -104,6 +105,7 @@ const myDocOfficeOnly = computed({
             id="courtType"
             v-model="courtType"
             aria-label="Gerichtstyp Suche"
+            class="ds-input-small"
             placeholder="Gerichtstyp"
           ></TextInput>
         </InputField>
@@ -113,6 +115,7 @@ const myDocOfficeOnly = computed({
             id="courtLocation"
             v-model="courtLocation"
             aria-label="Gerichtsort Suche"
+            class="ds-input-small"
             placeholder="Gerichtsort"
           ></TextInput>
         </InputField>
@@ -123,6 +126,7 @@ const myDocOfficeOnly = computed({
             id="decisionDate"
             v-model="searchEntry.decisionDate"
             aria-label="Entscheidungsdatum Suche"
+            class="ds-input-small"
           ></DateInput>
         </InputField>
       </div>
@@ -137,6 +141,7 @@ const myDocOfficeOnly = computed({
             id="status"
             v-model="publishingStateModel"
             aria-label="Status Suche"
+            class="ds-select-small"
             :items="dropdownItems"
             placeholder="Status"
           />
@@ -153,19 +158,21 @@ const myDocOfficeOnly = computed({
             :id="id"
             v-model="myDocOfficeOnly"
             aria-label="Nur meine Dokstelle Filter"
+            class="ds-checkbox-mini"
           />
         </InputField>
         <InputField
           v-if="myDocOfficeOnly"
           id="hasError"
           v-slot="{ id }"
-          label="Nur fehlerhafte Dokumentationseinheiten"
+          label="Nur Fehler"
           :label-position="LabelPosition.RIGHT"
         >
           <Checkbox
             :id="id"
             v-model="undefined"
             aria-label="Nur fehlerhafte Dokumentationseinheiten"
+            class="ds-checkbox-mini"
           />
         </InputField>
       </div>
