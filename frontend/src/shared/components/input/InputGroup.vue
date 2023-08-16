@@ -87,23 +87,20 @@ watch(
         v-for="field in group"
         :id="field.name"
         :key="field.name"
+        v-slot="{ id, hasError, updateValidationError }"
         :label="field.label"
         :label-position="field.inputAttributes.labelPosition"
         :required="field.required"
         :style="fieldStyle"
       >
         <InputElement
-          :id="field.name"
+          :id="id"
           v-model="inputValues[field.name]"
           :attributes="field.inputAttributes"
           class="w-full"
+          :has-error="hasError"
           :type="field.type"
-          :validation-error="
-            props.validationErrors &&
-            props.validationErrors.find(
-              (err) => err.instance.split('\.')[1] === field.name,
-            )
-          "
+          @update:validation-error="updateValidationError"
         />
       </InputFieldComponent>
     </div>
