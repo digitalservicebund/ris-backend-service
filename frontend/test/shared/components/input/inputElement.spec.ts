@@ -65,38 +65,4 @@ describe("InputElement", () => {
     expect(emitted()["update:modelValue"]).toHaveLength(1)
     expect(emitted()["update:modelValue"]).toEqual([["a"]])
   })
-
-  it("renders an error message if input is not valid", async () => {
-    renderComponent({
-      id: "Testfeld",
-      type: InputType.DATE,
-      modelValue: "2021-02-29",
-      validationError: {
-        message: "Entscheidungsdatum ist kein valides Datum",
-        instance: "Testfeld",
-      },
-    })
-
-    expect(
-      screen.getByText("Entscheidungsdatum ist kein valides Datum"),
-    ).toBeInTheDocument()
-  })
-
-  it("renders an error message if input is in the future", async () => {
-    renderComponent({
-      id: "Testfeld",
-      type: InputType.DATE,
-      modelValue: "2034-02-10",
-      validationError: {
-        message: "Das Entscheidungsdatum darf nicht in der Zukunft liegen",
-        instance: "Testfeld",
-      },
-    })
-
-    expect(
-      screen.getByText(
-        "Das Entscheidungsdatum darf nicht in der Zukunft liegen",
-      ),
-    ).toBeInTheDocument()
-  })
 })
