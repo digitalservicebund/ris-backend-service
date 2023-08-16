@@ -95,7 +95,7 @@ const myDocOfficeOnly = computed({
             v-model="searchEntry.documentNumberOrFileNumber"
             aria-label="Dokumentnummer oder Aktenzeichen Suche"
             class="ds-input-small"
-            placeholder="Dokumentnummeroder Aktenzeichen"
+            placeholder="Dokumentnummer/ Aktenzeichen"
           ></TextInput>
         </InputField>
       </div>
@@ -143,7 +143,7 @@ const myDocOfficeOnly = computed({
             aria-label="Status Suche"
             class="ds-select-small"
             :items="dropdownItems"
-            placeholder="Status"
+            placeholder="Auswählen"
           />
         </InputField>
       </div>
