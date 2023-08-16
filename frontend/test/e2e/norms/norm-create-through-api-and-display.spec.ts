@@ -100,8 +100,11 @@ testWithImportedNorm(
     const sections = getNormBySections(normData)
     const sectionsWithHeading = sections.filter((section) => !!section.heading)
 
+    // Manually add sections that are not part of the fixtures
+    sectionsWithHeading.push({ heading: "ELI" })
+
     for (const section of sectionsWithHeading) {
-      // TODO because of inconsistencies in design, having section name not listed in the menu
+      // Skip section names that are not listed as menu items in the sidebar
       if (
         section.heading === "Abweichendes Inkrafttretedatum" ||
         section.heading === "Abweichendes Außerkrafttretedatum" ||
@@ -113,6 +116,7 @@ testWithImportedNorm(
       ) {
         continue
       }
+
       await expectSectionAppearsAfterScroll(page, section)
     }
   },
