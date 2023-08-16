@@ -74,19 +74,6 @@ describe("Dropdown Input", () => {
     expect(input).not.toHaveAttribute("data-placeholder")
   })
 
-  it("does not contain a placeholder option if an item is selected", async () => {
-    const { rerender } = renderComponent({
-      placeholder: "test placeholder",
-      modelValue: "",
-    })
-
-    const placeholder = screen.getByRole("option", { name: "test placeholder" })
-    expect(placeholder).toBeInTheDocument()
-
-    await rerender({ modelValue: "t2", placeholder: "test placeholder" })
-    expect(placeholder).not.toBeInTheDocument()
-  })
-
   it("emits a model update", async () => {
     const user = userEvent.setup()
     const { emitted } = renderComponent({ modelValue: "t1" })

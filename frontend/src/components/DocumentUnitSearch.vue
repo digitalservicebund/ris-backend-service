@@ -22,7 +22,6 @@ async function search(page = 0, listEntry?: DocumentUnitSearchInput) {
     itemsPerPage,
     searchInput.value,
   )
-  console.log(listEntry, response)
   if (response.data) {
     documentUnitListEntries.value = response.data.content
     currentPage.value = response.data

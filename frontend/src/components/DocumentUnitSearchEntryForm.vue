@@ -27,9 +27,13 @@ const dropdownItems: DropdownItem[] = [
 const publishingStateModel = computed({
   get: () => searchEntry.value?.status?.publicationStatus,
   set: (data) => {
-    searchEntry.value.status = {
-      publicationStatus: data as PublicationState,
-      withError: false,
+    if (data?.length === 0) {
+      delete searchEntry.value.status
+    } else {
+      searchEntry.value.status = {
+        publicationStatus: data as PublicationState,
+        withError: false,
+      }
     }
   },
 })
@@ -143,7 +147,7 @@ const myDocOfficeOnly = computed({
             aria-label="Status Suche"
             class="ds-select-small"
             :items="dropdownItems"
-            placeholder="Auswählen"
+            placeholder="Alle"
           />
         </InputField>
       </div>
