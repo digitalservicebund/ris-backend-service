@@ -72,6 +72,10 @@ const myDocOfficeOnly = computed({
       : (searchEntry.value.myDocOfficeOnly = false)
   },
 })
+
+function resetSearchEntry() {
+  searchEntry.value = {}
+}
 </script>
 
 <template>
@@ -178,7 +182,13 @@ const myDocOfficeOnly = computed({
       </div>
     </div>
 
-    <div class="flex w-full flex-row justify-end pr-64">
+    <div class="flex w-full flex-row justify-end gap-20 pr-64">
+      <TextButton
+        aria-label="Suche zurücksetzen"
+        button-type="tertiary"
+        label="Suche zurücksetzen"
+        @click="resetSearchEntry"
+      />
       <TextButton
         aria-label="Nach Dokumentationseinheiten suchen"
         label="Ergebnisse anzeigen"
