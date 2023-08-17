@@ -4,35 +4,44 @@ on:
   # schedule:
   #   - cron: "0 0 * * *"
   workflow_dispatch:
+    inputs:
+      imageName:
+        description: "Name of the image to check for (e.g., nginx or redis)"
+        required: true
+      filePath:
+        description: "Path to the file where the image is located"
+        required: true
 
 jobs:
   update-digests:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
-      id-token: write # Enable OIDC for gitsign
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
-      - name: Pull latest images
-        run: |
-          docker pull cgr.dev/chainguard/nginx:latest
-          docker pull cgr.dev/chainguard/redis:latest
-      - name: Get newest digests
-        run: |
-          NGINX_DIGEST=$(docker inspect --format='{{index .RepoDigests 0}}' cgr.dev/chainguard/nginx:latest)
-          REDIS_DIGEST=$(docker inspect --format='{{index .RepoDigests 0}}' cgr.dev/chainguard/redis:latest)
-          echo "NGINX_DIGEST=$NGINX_DIGEST" >> $GITHUB_ENV
-          echo "REDIS_DIGEST=$REDIS_DIGEST" >> $GITHUB_ENV
+      - name: Construct full image name
+        run: echo "FULL_IMAGE_NAME=cgr.dev/chainguard/${{ github.event.inputs.imageName }}:latest" >> $GITHUB_ENV
+      - name: Pull latest image
+        run: docker pull $FULL_IMAGE_NAME
+      - name: Get newest digest
+        run: echo "IMAGE_DIGEST=$(docker inspect --format='{{index .RepoDigests 0}}' $FULL_IMAGE_NAME)" >> $GITHUB_ENV
       - name: Update digests in the repository
+        run: sed -i "s|${{ github.event.inputs.imageName }}@.*|$IMAGE_DIGEST|g" ${{ github.event.inputs.filePath }}
+      - name: Check for changes
+        id: check_changes
         run: |
-          sed -i "s|nginx@.*|$NGINX_DIGEST|g" frontend/Dockerfile.prod
-          sed -i "s|redis@.*|$REDIS_DIGEST|g" compose.yaml
-      - uses: chainguard-dev/actions/setup-gitsign@ac42db4c9c2e2bd9f66aadf3290c5995891d91a3
-      - name: Commit and push changes
+          git diff --exit-code || echo "files_changed=yes" >> $GITHUB_ENV
+      - name: Commit changes using GitHub REST API
+        if: env.files_changed == 'yes'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          git add frontend/Dockerfile.prod
-          git add compose.yaml
-          git diff-index --cached --quiet HEAD ||
-            git commit -S -m "Bump chainguard images" &&
-            git push origin main
+          export MESSAGE="Bump chainguard image for ${{ github.event.inputs.imageName }}"
+          export FILE_TO_COMMIT=${{ github.event.inputs.filePath }}
+          export SHA=$(git rev-parse HEAD:$FILE_TO_COMMIT)
+          export CONTENT=$(base64 -i $FILE_TO_COMMIT)
+          gh api --method PUT /repos/:owner/:repo/contents/$FILE_TO_COMMIT \
+            --field message="$MESSAGE" \
+            --field content="$CONTENT" \
+            --field encoding="base64" \
+            --field branch="main" \
+            --field sha="$SHA"
