@@ -1,0 +1,35 @@
+name: Bump chainguard digests
+
+on:
+  # schedule:
+  #   - cron: "0 0 * * *"
+  workflow_dispatch:
+
+jobs:
+  update-digests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+      - name: Pull latest images
+        run: |
+          docker pull cgr.dev/chainguard/nginx:latest
+          docker pull cgr.dev/chainguard/redis:latest
+      - name: Get newest digests
+        run: |
+          NGINX_DIGEST=$(docker inspect --format='{{index .RepoDigests 0}}' cgr.dev/chainguard/nginx:latest)
+          REDIS_DIGEST=$(docker inspect --format='{{index .RepoDigests 0}}' cgr.dev/chainguard/redis:latest)
+          echo "NGINX_DIGEST=$NGINX_DIGEST" >> $GITHUB_ENV
+          echo "REDIS_DIGEST=$REDIS_DIGEST" >> $GITHUB_ENV
+      - name: Update digests in the repository
+        run: |
+          sed -i "s|nginx@.*|$NGINX_DIGEST|g" frontend/Dockerfile.prod
+          sed -i "s|redis@.*|$REDIS_DIGEST|g" compose.yaml
+      - name: Commit and push changes
+        run: |
+          git add frontend/Dockerfile.prod
+          git add compose.yaml
+          git diff-index --cached --quiet HEAD ||
+            git commit -m "Bump chainguard images" &&
+            git push origin main
