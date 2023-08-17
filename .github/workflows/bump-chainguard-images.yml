@@ -26,9 +26,9 @@ jobs:
       - name: Pull latest image
         run: docker pull $FULL_IMAGE_NAME
       - name: Get newest digest
-        run: echo "IMAGE_DIGEST=$(docker inspect --format='{{index .RepoDigests 0}}' $FULL_IMAGE_NAME)" >> $GITHUB_ENV
+        run: echo "IMAGE_DIGEST=$(docker inspect --format='{{index .RepoDigests 0}}' $FULL_IMAGE_NAME | cut -d'@' -f2)" >> $GITHUB_ENV
       - name: Update digests in the repository
-        run: sed -i "s|(${{ github.event.inputs.imageName }}@)[^ ]*|\1$(echo $IMAGE_DIGEST | cut -d'@' -f2)|g" ${{ github.event.inputs.filePath }}
+        run: sed -i -E "s|(${{ github.event.inputs.imageName }}@)[^ ]*|\1$IMAGE_DIGEST|g" ${{ github.event.inputs.filePath }}
       - name: Check for changes
         id: check_changes
         run: |
