@@ -34,5 +34,5 @@ jobs:
           git add frontend/Dockerfile.prod
           git add compose.yaml
           git diff-index --cached --quiet HEAD ||
-            git commit -m "Bump chainguard images" &&
+            git commit -S -m "Bump chainguard images" &&
             git push origin main
