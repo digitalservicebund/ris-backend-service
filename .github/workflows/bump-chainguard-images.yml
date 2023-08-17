@@ -12,6 +12,9 @@ on:
         description: "Path to the file where the image is located"
         required: true
 
+permissions:
+  contents: write
+
 jobs:
   update-digests:
     runs-on: ubuntu-latest
@@ -25,7 +28,7 @@ jobs:
       - name: Get newest digest
         run: echo "IMAGE_DIGEST=$(docker inspect --format='{{index .RepoDigests 0}}' $FULL_IMAGE_NAME)" >> $GITHUB_ENV
       - name: Update digests in the repository
-        run: sed -i "s|${{ github.event.inputs.imageName }}@.*|$IMAGE_DIGEST|g" ${{ github.event.inputs.filePath }}
+        run: sed -i "s|(${{ github.event.inputs.imageName }}@)[^ ]*|\1$(echo $IMAGE_DIGEST | cut -d'@' -f2)|g" ${{ github.event.inputs.filePath }}
       - name: Check for changes
         id: check_changes
         run: |
