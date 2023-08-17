@@ -14,9 +14,11 @@ import { DropdownItem } from "@/shared/components/input/types"
 
 const emit = defineEmits<{
   search: [value: DocumentUnitSearchInput]
+  resetSearchResults: [void]
 }>()
 
 const searchEntry = ref<DocumentUnitSearchInput>({} as DocumentUnitSearchInput)
+const searchButtonClicked = ref(false)
 
 const dropdownItems: DropdownItem[] = [
   { label: "Veröffentlicht", value: PublicationState.PUBLISHED },
@@ -73,8 +75,14 @@ const myDocOfficeOnly = computed({
   },
 })
 
-function resetSearchEntry() {
+function resetSearch() {
   searchEntry.value = {}
+  emit("resetSearchResults")
+}
+
+function handleSearchButtonClicked() {
+  searchButtonClicked.value = true
+  emit("search", searchEntry.value)
 }
 </script>
 
@@ -180,20 +188,23 @@ function resetSearchEntry() {
           />
         </InputField>
       </div>
-    </div>
-
-    <div class="flex w-full flex-row justify-end gap-20 pr-64">
-      <TextButton
-        aria-label="Suche zurücksetzen"
-        button-type="tertiary"
-        label="Suche zurücksetzen"
-        @click="resetSearchEntry"
-      />
-      <TextButton
-        aria-label="Nach Dokumentationseinheiten suchen"
-        label="Ergebnisse anzeigen"
-        @click="emit('search', searchEntry)"
-      />
+      <div class="">
+        <TextButton
+          aria-label="Nach Dokumentationseinheiten suchen"
+          label="Ergebnisse anzeigen"
+          size="small"
+          @click="handleSearchButtonClicked"
+        />
+        <TextButton
+          v-if="searchButtonClicked"
+          aria-label="Suche zurücksetzen"
+          button-type="ghost"
+          class="ml-8"
+          label="Suche zurücksetzen"
+          size="small"
+          @click="resetSearch"
+        />
+      </div>
     </div>
   </div>
 </template>

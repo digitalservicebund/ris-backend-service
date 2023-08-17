@@ -2,14 +2,63 @@ import userEvent from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
 import { createPinia, setActivePinia } from "pinia"
 import DocumentUnitSearch from "@/components/DocumentUnitSearch.vue"
+import DocumentUnitListEntry from "@/domain/documentUnitListEntry"
+import documentUnitService from "@/services/documentUnitService"
+
+function renderComponent() {
+  const user = userEvent.setup()
+  return {
+    user,
+    ...render(DocumentUnitSearch, {
+      global: {
+        stubs: { routerLink: { template: "<a><slot/></a>" } },
+      },
+    }),
+  }
+}
 
 describe("Documentunit Search", () => {
   beforeEach(async () => {
     setActivePinia(createPinia())
   })
 
+  vi.spyOn(
+    documentUnitService,
+    "searchByDocumentUnitSearchInput",
+  ).mockImplementation(() =>
+    Promise.resolve({
+      status: 200,
+      data: {
+        content: [
+          new DocumentUnitListEntry({
+            uuid: "123",
+            court: {
+              type: "type",
+              location: "location",
+              label: "label",
+            },
+            decisionDate: "01.02.2022",
+            documentType: {
+              jurisShortcut: "documentTypeShortcut",
+              label: "documentType",
+            },
+            documentNumber: "test documentNumber",
+            fileNumber: "test fileNumber",
+          }),
+        ],
+        size: 0,
+        totalElements: 20,
+        totalPages: 2,
+        number: 0,
+        numberOfElements: 20,
+        first: true,
+        last: false,
+      },
+    }),
+  )
+
   test("renders correctly", async () => {
-    render(DocumentUnitSearch)
+    renderComponent()
     expect(
       screen.getByLabelText("Dokumentnummer oder Aktenzeichen Suche"),
     ).toBeVisible()
@@ -21,8 +70,7 @@ describe("Documentunit Search", () => {
   })
 
   test("click on 'Nur meine Dokstelle' renders 'Nur fehlerhafte Dokumentationseinheiten' checkbox", async () => {
-    const user = userEvent.setup()
-    render(DocumentUnitSearch)
+    const { user } = renderComponent()
     expect(
       screen.queryByLabelText("Nur fehlerhafte Dokumentationseinheiten"),
     ).not.toBeInTheDocument()
@@ -33,9 +81,17 @@ describe("Documentunit Search", () => {
     ).toBeVisible()
   })
 
-  test("click on 'Suche zurücksetzen' resets all input values", async () => {
-    const user = userEvent.setup()
-    render(DocumentUnitSearch)
+  test("click on 'Ergebnisse anzeigen' renders search results", async () => {
+    const { user } = renderComponent()
+
+    await user.click(
+      screen.getByLabelText("Nach Dokumentationseinheiten suchen"),
+    )
+    expect(screen.getAllByText(/test documentNumber/).length).toBe(1)
+  })
+
+  test("click on 'Suche zurücksetzen' resets all input values and search results", async () => {
+    const { user } = renderComponent()
 
     await user.click(screen.getByLabelText("Nur meine Dokstelle Filter"))
     await user.type(screen.getByLabelText("Gerichtstyp Suche"), "AG")
@@ -57,7 +113,14 @@ describe("Documentunit Search", () => {
       screen.getByLabelText("Nur fehlerhafte Dokumentationseinheiten"),
     ).toBeVisible()
 
+    await user.click(
+      screen.getByLabelText("Nach Dokumentationseinheiten suchen"),
+    )
+    expect(screen.getAllByText(/test documentNumber/).length).toBe(1)
+
     await user.click(screen.getByLabelText("Suche zurücksetzen"))
+    expect(screen.queryByText(/test documentNumber/)).not.toBeInTheDocument()
+
     expect(screen.getByLabelText("Gerichtstyp Suche")).toHaveValue("")
     expect(screen.getByLabelText("Gerichtsort Suche")).toHaveValue("")
     expect(screen.getByLabelText("Entscheidungsdatum Suche")).toHaveValue("")

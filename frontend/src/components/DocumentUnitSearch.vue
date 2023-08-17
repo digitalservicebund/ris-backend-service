@@ -22,7 +22,6 @@ async function search(page = 0, listEntry?: DocumentUnitSearchInput) {
     itemsPerPage,
     searchInput.value,
   )
-  console.log(listEntry, response)
   if (response.data) {
     documentUnitListEntries.value = response.data.content
     currentPage.value = response.data
@@ -47,11 +46,18 @@ async function handleDelete(documentUnitListEntry: DocumentUnitListEntry) {
 async function handleSearch(listEntry: DocumentUnitSearchInput) {
   await search(0, listEntry)
 }
+
+async function handleReset() {
+  documentUnitListEntries.value = []
+}
 </script>
 
 <template>
   <div>
-    <DocumentUnitSearchEntryForm @search="handleSearch" />
+    <DocumentUnitSearchEntryForm
+      @reset-search-results="handleReset"
+      @search="handleSearch"
+    />
     <Pagination
       v-if="currentPage"
       navigation-position="bottom"
