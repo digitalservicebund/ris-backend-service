@@ -8,7 +8,9 @@ on:
 jobs:
   update-digests:
     runs-on: ubuntu-latest
-
+    permissions:
+      contents: write
+      id-token: write # Enable OIDC for gitsign
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -26,6 +28,7 @@ jobs:
         run: |
           sed -i "s|nginx@.*|$NGINX_DIGEST|g" frontend/Dockerfile.prod
           sed -i "s|redis@.*|$REDIS_DIGEST|g" compose.yaml
+      - uses: chainguard-dev/actions/setup-gitsign@ac42db4c9c2e2bd9f66aadf3290c5995891d91a3
       - name: Commit and push changes
         run: |
           git add frontend/Dockerfile.prod
