@@ -193,27 +193,4 @@ describe("Documentunit Search", () => {
 
     expect(screen.getByText(/Keine Ergebnisse gefunden./)).toBeVisible()
   })
-
-  test("an error is displayed if something went wrong", async () => {
-    vi.spyOn(
-      documentUnitService,
-      "searchByDocumentUnitSearchInput",
-    ).mockResolvedValue({
-      status: 400,
-      error: { title: "error title", description: "error description" },
-    })
-
-    const { user } = renderComponent()
-
-    expect(
-      screen.getByText(/Starten Sie die Suche oder erstellen Sie eine/),
-    ).toBeVisible()
-
-    await user.click(
-      screen.getByLabelText("Nach Dokumentationseinheiten suchen"),
-    )
-
-    expect(screen.getByText(/error title/)).toBeVisible()
-    expect(screen.getByText(/error description/)).toBeVisible()
-  })
 })

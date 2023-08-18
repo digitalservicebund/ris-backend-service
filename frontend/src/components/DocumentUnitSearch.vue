@@ -13,8 +13,10 @@ const searchInput = ref<DocumentUnitListEntry | undefined>(undefined)
 
 const itemsPerPage = 30
 const searchResponseError = ref()
+const isLoading = ref(false)
 
 async function search(page = 0, listEntry?: DocumentUnitSearchInput) {
+  isLoading.value = true
   if (listEntry) {
     searchInput.value = listEntry
   }
@@ -27,10 +29,10 @@ async function search(page = 0, listEntry?: DocumentUnitSearchInput) {
     documentUnitListEntries.value = response.data.content
     currentPage.value = response.data
   }
-
   if (response.error) {
     searchResponseError.value = response.error
   }
+  isLoading.value = false
 }
 
 async function handleDelete(documentUnitListEntry: DocumentUnitListEntry) {
@@ -69,6 +71,7 @@ async function handleReset() {
       <DocumentUnitList
         class="grow"
         :document-unit-list-entries="documentUnitListEntries"
+        :is-loading="isLoading"
         :search-response-error="searchResponseError"
         @delete-document-unit="handleDelete"
       />

@@ -13,6 +13,7 @@ import PopupModal from "@/shared/components/PopupModal.vue"
 const props = defineProps<{
   documentUnitListEntries?: DocumentUnitListEntry[]
   searchResponseError?: ResponseError
+  isLoading?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -31,12 +32,15 @@ const listEntriesWithStatus = computed(() => {
 })
 
 const emptyStatus = computed(() => {
-  if (!props.documentUnitListEntries) {
-    return "Starten Sie die Suche oder erstellen Sie eine"
-  } else if (props.documentUnitListEntries.length === 0) {
-    return "Keine Ergebnisse gefunden."
+  if (props.isLoading) return "Dokumentationseinheiten werden geladen ..."
+  else {
+    if (!props.documentUnitListEntries) {
+      return "Starten Sie die Suche oder erstellen Sie eine"
+    } else if (props.documentUnitListEntries.length === 0) {
+      return "Keine Ergebnisse gefunden."
+    }
+    return undefined
   }
-  return undefined
 })
 
 const showModal = ref(false)
@@ -102,8 +106,8 @@ function onDelete() {
       </div>
 
       <div
-        v-for="listEntry in listEntriesWithStatus"
-        :key="listEntry.id"
+        v-for="(listEntry, id) in listEntriesWithStatus"
+        :key="id"
         class="ds-label-01-reg table-row border-b-2 border-b-gray-100 px-16 hover:bg-gray-100"
       >
         <div class="table-cell p-16">

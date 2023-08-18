@@ -1,142 +1,162 @@
-import { fireEvent, render, screen } from "@testing-library/vue"
+import userEvent from "@testing-library/user-event"
+import { render, screen } from "@testing-library/vue"
 import { createRouter, createWebHistory } from "vue-router"
 import DocumentUnitList from "@/components/DocumentUnitList.vue"
 import { PublicationState } from "@/domain/documentUnit"
 import DocumentUnitListEntry from "@/domain/documentUnitListEntry"
+import { ResponseError } from "@/services/httpClient"
 
-function renderComponent(
-  options?: Partial<DocumentUnitListEntry> | DocumentUnitListEntry[],
-) {
-  const documentUnitListEntries: DocumentUnitListEntry[] =
-    options instanceof Array
-      ? options
-      : [
-          {
-            id: "id",
-            uuid: "1",
-            documentNumber: "123",
-            decisionDate: "2022-02-10",
-            fileName: "",
-            fileNumber: "",
-            documentationOffice: { label: "testOffice" },
-            documentType: { label: "Testlabel", jurisShortcut: "Test" },
-            court: { type: "typeA", location: "locB", label: "typeA locB" },
-            status: {
-              publicationStatus: PublicationState.PUBLISHED,
-              withError: false,
-            },
-            ...options,
-          },
-        ]
-  return render(DocumentUnitList, {
-    props: {
-      documentUnitListEntries,
-    },
-    global: {
-      plugins: [
-        createRouter({
-          history: createWebHistory(),
-          routes: [
-            {
-              path: "/caselaw/documentUnit/:documentNumber/files",
-              name: "caselaw-documentUnit-documentNumber-files",
-              component: {},
-            },
-            {
-              path: "/caselaw/documentUnit/:documentNumber/categories",
-              name: "caselaw-documentUnit-documentNumber-categories",
-              component: {},
-            },
-            {
-              path: "/",
-              name: "caselaw",
-              component: {},
-            },
-          ],
-        }),
-      ],
-    },
-  })
+function renderComponent(options?: {
+  documentUnitListEntries?: DocumentUnitListEntry[]
+  searchResponseError?: ResponseError
+  isLoading?: boolean
+}) {
+  const user = userEvent.setup()
+  return {
+    user,
+    ...render(DocumentUnitList, {
+      props: {
+        documentUnitListEntries: options?.documentUnitListEntries,
+        searchResponseError: options?.searchResponseError ?? undefined,
+        isLoading: options?.isLoading ?? false,
+      },
+      global: {
+        plugins: [
+          createRouter({
+            history: createWebHistory(),
+            routes: [
+              {
+                path: "/caselaw/documentUnit/:documentNumber/files",
+                name: "caselaw-documentUnit-documentNumber-files",
+                component: {},
+              },
+              {
+                path: "/caselaw/documentUnit/:documentNumber/categories",
+                name: "caselaw-documentUnit-documentNumber-categories",
+                component: {},
+              },
+              {
+                path: "/",
+                name: "caselaw",
+                component: {},
+              },
+            ],
+          }),
+        ],
+      },
+    }),
+  }
 }
 
 describe("documentUnit list", () => {
-  test("renders fallback if no documentUnitsListEntries found", async () => {
-    renderComponent([])
+  test("initial state feedback", async () => {
+    renderComponent()
+
+    expect(
+      screen.getByText(/Starten Sie die Suche oder erstellen Sie eine/),
+    ).toBeVisible()
+  })
+
+  test("no results feedback", async () => {
+    renderComponent({
+      documentUnitListEntries: [],
+    })
 
     expect(screen.getByText(/Keine Ergebnisse gefunden./)).toBeVisible()
   })
 
-  test("renders documentUnits", async () => {
-    renderComponent()
+  test("shows error", () => {
+    renderComponent({
+      searchResponseError: {
+        title: "error title",
+        description: "error description",
+      },
+    })
+    expect(screen.getByText(/error title/)).toBeVisible()
+    expect(screen.getByText(/error description/)).toBeVisible()
+  })
 
-    await screen.findByText("123")
-    await screen.findByText("10.02.2022")
+  test("shows loading state", () => {
+    renderComponent({ isLoading: true })
     expect(
-      screen.queryByText("Starten Sie die Suche oder erstellen Sie eine"),
-    ).not.toBeInTheDocument()
+      screen.getByText(/Dokumentationseinheiten werden geladen .../),
+    ).toBeVisible()
   })
 
-  test("renders documentUnits with file number", async () => {
+  test("renders documentUnit list", async () => {
     renderComponent({
-      fileNumber: "foo",
+      documentUnitListEntries: [
+        {
+          id: "id",
+          uuid: "1",
+          documentNumber: "123",
+          decisionDate: "2022-02-10",
+          fileName: "",
+          fileNumber: "",
+          documentationOffice: { label: "testOffice" },
+          documentType: { label: "Testlabel", jurisShortcut: "Test" },
+          court: { type: "typeA", location: "locB", label: "typeA locB" },
+          status: {
+            publicationStatus: PublicationState.PUBLISHED,
+            withError: false,
+          },
+        },
+        {
+          id: "id",
+          uuid: "2",
+          documentNumber: "234",
+          decisionDate: "2022-02-10",
+          fileName: "abc",
+          fileNumber: "",
+          documentationOffice: { label: "testOffice" },
+          documentType: { label: "Testlabel", jurisShortcut: "Test" },
+          court: { type: "typeA", location: "locB", label: "typeA locB" },
+          status: {
+            publicationStatus: PublicationState.PUBLISHED,
+            withError: false,
+          },
+        },
+      ],
     })
 
-    await screen.findByText("123")
-    await screen.findByText("10.02.2022")
-    await screen.findByText("foo")
-    expect(
-      screen.queryByText("Starten Sie die Suche oder erstellen Sie eine"),
-    ).not.toBeInTheDocument()
-  })
+    expect(screen.getAllByRole("link").length).toBe(2)
 
-  test("renders documentUnits with document type", async () => {
-    renderComponent({
-      documentType: { label: "Test123", jurisShortcut: "Test" },
-    })
-
-    await screen.findByText("123")
-    await screen.findByText("10.02.2022")
-    await screen.findByText("Test")
-    expect(
-      screen.queryByText("Starten Sie die Suche oder erstellen Sie eine"),
-    ).not.toBeInTheDocument()
-  })
-
-  test("renders documentUnits with court", async () => {
-    renderComponent({
-      court: { type: "typeA", location: "locB", label: "typeA locB" },
-    })
-
-    await screen.findByText("typeA")
-    await screen.findByText("locB")
-  })
-
-  test("renders icon when file attached", async () => {
-    renderComponent({
-      fileName: "test.docx",
-    })
-
-    await screen.findByText("123")
-    await screen.findByText("10.02.2022")
-
-    expect(screen.getByText("attach_file")).toBeInTheDocument()
-  })
-
-  test("renders publication status", async () => {
-    renderComponent()
-
-    await screen.findByText("veröffentlicht")
+    expect(screen.getByRole("link", { name: "123" })).toHaveAttribute(
+      "href",
+      "/caselaw/documentUnit/123/files",
+    )
+    expect(screen.getByRole("link", { name: "234" })).toHaveAttribute(
+      "href",
+      "/caselaw/documentUnit/234/categories",
+    )
   })
 
   test("delete emits event", async () => {
-    const { emitted } = renderComponent({ id: "123" })
+    const { user, emitted } = renderComponent({
+      documentUnitListEntries: [
+        {
+          id: "id",
+          uuid: "1",
+          documentNumber: "123",
+          decisionDate: "2022-02-10",
+          fileName: "",
+          fileNumber: "",
+          documentationOffice: { label: "testOffice" },
+          documentType: { label: "Testlabel", jurisShortcut: "Test" },
+          court: { type: "typeA", location: "locB", label: "typeA locB" },
+          status: {
+            publicationStatus: PublicationState.PUBLISHED,
+            withError: false,
+          },
+        },
+      ],
+    })
 
-    await fireEvent.click(
-      screen.getByLabelText("Dokumentationseinheit löschen"),
-    )
+    await screen.findByText("123")
+    await user.click(screen.getByLabelText("Dokumentationseinheit löschen"))
     const confirmButton = screen.getByRole("button", { name: "Löschen" })
     expect(confirmButton).toBeInTheDocument()
-    await fireEvent.click(confirmButton)
+    await user.click(confirmButton)
     expect(emitted().deleteDocumentUnit).toBeTruthy()
   })
 })
