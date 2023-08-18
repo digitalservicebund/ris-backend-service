@@ -6,6 +6,9 @@ on:
   # Allow to run this workflow manually
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   bump-chainguard-images:
     uses: ./.github/workflows/_bump-chainguard-digest.yml
