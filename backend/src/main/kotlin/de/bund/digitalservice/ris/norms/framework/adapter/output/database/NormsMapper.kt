@@ -112,7 +112,7 @@ interface NormsMapper {
       }
     }
 
-    // TODO 2. if there are sections with no content at the end of the branch, add code for that
+    // CHECK 2. if there are sections with no content at the end of the branch, add code for that
 
     // 3. Now we put those initial article sections recursively into their corresponding parent
     // sections till there is now parent section left
@@ -322,18 +322,6 @@ interface NormsMapper {
           it.order,
           normGuid = normGuid,
           sectionGuid = sectionGuid)
-    }
-  }
-
-  fun paragraphsToDto(paragraphs: List<Paragraph>, articleGuid: UUID): List<ContentDto> {
-    return paragraphs.map {
-      ContentDto(
-          it.guid,
-          ContentElementType.PARAGRAPH,
-          it.marker,
-          it.text,
-          it.order,
-          sectionGuid = articleGuid)
     }
   }
 

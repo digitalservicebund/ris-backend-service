@@ -9,7 +9,5 @@ import reactor.core.publisher.Flux
 @Repository
 interface SectionsRepository : ReactiveCrudRepository<SectionDto, UUID> {
 
-  fun findBySectionGuid(sectionGuid: UUID): Flux<SectionDto>
-
   fun findByNormGuid(normGuid: UUID): Flux<SectionDto>
 }

@@ -12,7 +12,6 @@ import de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto.No
 import java.time.Duration
 import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
-import java.util.*
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Disabled

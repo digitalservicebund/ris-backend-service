@@ -148,7 +148,7 @@ class NormsServiceTest : PostgresTestcontainerIntegrationTest() {
   fun `the search norm result includes their ELI property`() {
     val page = Metadatum("1125", MetadatumType.PAGE)
     val gazette = Metadatum("bg-1", MetadatumType.ANNOUNCEMENT_GAZETTE)
-    val officialLongTitle = Metadatum("test title", MetadatumType.OFFICIAL_LONG_TITLE)
+    val officialLongTitle = Metadatum("test title", OFFICIAL_LONG_TITLE)
     val printAnnouncement =
         MetadataSection(MetadataSectionName.PRINT_ANNOUNCEMENT, listOf(page, gazette))
     val officialReference =
@@ -583,9 +583,9 @@ class NormsServiceTest : PostgresTestcontainerIntegrationTest() {
                         name = MetadataSectionName.NORM,
                         metadata =
                             listOf(
-                                Metadatum("document number", MetadatumType.DOCUMENT_NUMBER),
-                                Metadatum("complete citation", MetadatumType.COMPLETE_CITATION),
-                                Metadatum("celex number", MetadatumType.CELEX_NUMBER),
+                                Metadatum("document number", DOCUMENT_NUMBER),
+                                Metadatum("complete citation", COMPLETE_CITATION),
+                                Metadatum("celex number", CELEX_NUMBER),
                             ),
                     ),
                 ),
