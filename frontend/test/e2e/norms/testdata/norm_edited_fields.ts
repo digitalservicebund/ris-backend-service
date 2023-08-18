@@ -4,6 +4,7 @@ import { NormCategory, UndefinedDate } from "@/domain/norm"
 export const newNorm: NormData = {
   jurisZipFileName: "",
   sections: [],
+  contents: [],
   metadataSections: {
     NORM: [
       {

@@ -1,31 +1,25 @@
+export interface NormBase {
+  readonly guid: string
+  readonly files?: FileReference[]
+  sections: Section[]
+  contents: Content[]
+}
+
 export interface Norm extends NormBase, FlatMetadata {
   metadataSections?: MetadataSections
 }
 
-export interface NormBase {
-  readonly guid: string
-  sections: Section[]
-  readonly files?: FileReference[]
+/* -------------------------------------------------- *
+ * Flat metadata                                      *
+ * -------------------------------------------------- */
+
+export type FlatMetadata = {
+  eli?: string
 }
 
-export type Section = {
-  guid: string
-  header: string
-  designation: string
-  readonly paragraphs: Paragraph[]
-}
-
-export type Paragraph = {
-  guid: string
-  marker: string
-  text: string
-}
-
-export interface FileReference {
-  readonly name: string
-  readonly hash: string
-  readonly createdAt: string
-}
+/* -------------------------------------------------- *
+ * Metadata                                           *
+ * -------------------------------------------------- */
 
 export enum MetadatumType {
   KEYWORD = "KEYWORD",
@@ -100,13 +94,6 @@ export enum MetadatumType {
   TIME = "TIME",
 }
 
-export enum NormCategory {
-  AMENDMENT_NORM = "AMENDMENT_NORM",
-  BASE_NORM = "BASE_NORM",
-  TRANSITIONAL_NORM = "TRANSITIONAL_NORM",
-}
-
-// TODO: Establish typing that requires all `MetadatumType`s to be listed.
 export type MetadataValueType = {
   [MetadatumType.KEYWORD]: string
   [MetadatumType.UNOFFICIAL_LONG_TITLE]: string
@@ -180,9 +167,25 @@ export type MetadataValueType = {
   [MetadatumType.TIME]: string
 }
 
-export type Metadata = {
-  [Type in MetadatumType]?: MetadataValueType[Type][] | undefined
+export enum NormCategory {
+  AMENDMENT_NORM = "AMENDMENT_NORM",
+  BASE_NORM = "BASE_NORM",
+  TRANSITIONAL_NORM = "TRANSITIONAL_NORM",
 }
+
+export enum UndefinedDate {
+  UNDEFINED_UNKNOWN = "UNDEFINED_UNKNOWN",
+  UNDEFINED_FUTURE = "UNDEFINED_FUTURE",
+  UNDEFINED_NOT_PRESENT = "UNDEFINED_NOT_PRESENT",
+}
+
+export type Metadata = {
+  [Type in MetadatumType]?: MetadataValueType[Type][]
+}
+
+/* -------------------------------------------------- *
+ * Metadata sections                                  *
+ * -------------------------------------------------- */
 
 export enum MetadataSectionName {
   NORM = "NORM",
@@ -226,15 +229,41 @@ export enum MetadataSectionName {
 }
 
 export type MetadataSections = {
-  [Name in MetadataSectionName]?: (Metadata & MetadataSections)[] | undefined
+  [Name in MetadataSectionName]?: (Metadata & MetadataSections)[]
 }
 
-export type FlatMetadata = {
-  eli?: string
+/* -------------------------------------------------- *
+ * Section elements                                   *
+ * -------------------------------------------------- */
+
+export type Section = {
+  readonly guid: string
+  header: string
+  designation: string
+  sections: Section[]
+  paragraphs: Content[]
 }
 
-export enum UndefinedDate {
-  UNDEFINED_UNKNOWN = "UNDEFINED_UNKNOWN",
-  UNDEFINED_FUTURE = "UNDEFINED_FUTURE",
-  UNDEFINED_NOT_PRESENT = "UNDEFINED_NOT_PRESENT",
+// We may add more specific types for section elements here in the future
+
+/* -------------------------------------------------- *
+ * Content elements                                   *
+ * -------------------------------------------------- */
+
+export type Content = {
+  readonly guid: string
+  marker?: string
+  text: string
+}
+
+// We may add more specific types for content elements here in the future
+
+/* -------------------------------------------------- *
+ * Other norm contents                                *
+ * -------------------------------------------------- */
+
+export interface FileReference {
+  readonly name: string
+  readonly hash: string
+  readonly createdAt: string
 }

@@ -8,7 +8,7 @@ import {
   MetadatumType,
   Norm,
   NormCategory,
-  Paragraph,
+  Content,
   UndefinedDate,
 } from "@/domain/norm"
 import {
@@ -192,8 +192,8 @@ export function generateGuid(): string {
 }
 
 export function generateParagraph(
-  partialParagraph?: Partial<Paragraph>,
-): Paragraph {
+  partialParagraph?: Partial<Content>,
+): Content {
   return {
     guid: generateGuid(),
     marker: generateString({ prefix: "marker " }),
@@ -208,6 +208,7 @@ export function generateArticle(partialArticle?: Partial<Section>): Section {
     header: generateString({ prefix: "title " }),
     designation: generateString({ prefix: "marker " }),
     paragraphs: [generateParagraph()],
+    sections: [],
     ...partialArticle,
   }
 }
@@ -293,6 +294,7 @@ export function generateNorm(partialNorm?: Partial<Norm>): Norm {
   return {
     guid: generateGuid(),
     sections: [generateArticle()],
+    contents: [],
     metadataSections: generateMetadataSections(),
     ...generateFlatMetadata(),
     ...partialNorm,

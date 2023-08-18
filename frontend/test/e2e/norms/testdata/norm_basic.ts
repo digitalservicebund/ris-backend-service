@@ -14,6 +14,7 @@ export const normData: NormData = {
           text: "§ 2 der Verordnung über Stoffe mit pharmakologischer Wirkung in der Fassung der Bekanntmachung vom 8. Juli 2009 (BGBl. I S. 1768) wird wie folgt geändert:",
         },
       ],
+      sections: [],
     },
     {
       header: "Inkrafttreten, Außerkrafttreten",
@@ -28,8 +29,10 @@ export const normData: NormData = {
           text: "Gleichzeitig treten außer Kraft",
         },
       ],
+      sections: [],
     },
   ],
+  contents: [],
   metadataSections: {
     NORM: [
       {

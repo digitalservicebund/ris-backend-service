@@ -14,8 +14,14 @@ export const useLoadedNormStore = defineStore("loaded-norm", () => {
 
   async function update(): Promise<ServiceResponse<void>> {
     if (loadedNorm.value) {
-      const { guid, sections, files, metadataSections, ...flatMetadata } =
-        loadedNorm.value
+      const {
+        guid,
+        sections,
+        contents,
+        files,
+        metadataSections,
+        ...flatMetadata
+      } = loadedNorm.value
 
       return editNormFrame(
         loadedNorm.value.guid,
