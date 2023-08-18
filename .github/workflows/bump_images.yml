@@ -11,15 +11,16 @@ permissions:
 
 jobs:
   bump-chainguard-images:
-    uses: ./.github/workflows/_bump-chainguard-digest.yml
     strategy:
       fail-fast: false
+      max-parallel: 1
       matrix:
         include:
           - imageName: nginx
             filePath: frontend/Dockerfile.prod
           - imageName: redis
             filePath: compose.yaml
+    uses: ./.github/workflows/_bump-chainguard-digest.yml
     with:
-      imageName: ${{ matrix.imageName}}
+      imageName: ${{ matrix.imageName }}
       filePath: ${{ matrix.filePath }}

@@ -32,24 +32,27 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
       - name: Construct full image name
-        run: echo "FULL_IMAGE_NAME=cgr.dev/chainguard/${{ github.event.inputs.imageName }}:latest" >> $GITHUB_ENV
+        run: echo "FULL_IMAGE_NAME=cgr.dev/chainguard/${{ inputs.imageName }}:latest" >> $GITHUB_ENV
       - name: Pull latest image
         run: docker pull $FULL_IMAGE_NAME
       - name: Get newest digest
         run: echo "IMAGE_DIGEST=$(docker inspect --format='{{index .RepoDigests 0}}' $FULL_IMAGE_NAME | cut -d'@' -f2)" >> $GITHUB_ENV
       - name: Update digests in the repository
-        run: sed -i -E "s|(${{ github.event.inputs.imageName }}@)[^ ]*|\1$IMAGE_DIGEST|g" ${{ github.event.inputs.filePath }}
+        run: sed -i -E "s|(${{ inputs.imageName }}@)[^ ]*|\1$IMAGE_DIGEST|g" ${{ inputs.filePath }}
       - name: Check for changes
         id: check_changes
         run: |
           git diff --exit-code || echo "files_changed=yes" >> $GITHUB_ENV
+      - name: debug inputs
+        run: |
+          echo "Image name: ${{ inputs.imageName }}"
       - name: Commit changes using GitHub REST API
         if: env.files_changed == 'yes'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          export MESSAGE="Bump chainguard image for ${{ github.event.inputs.imageName }}"
-          export FILE_TO_COMMIT=${{ github.event.inputs.filePath }}
+          export MESSAGE="Bump chainguard image for ${{ inputs.imageName }}"
+          export FILE_TO_COMMIT=${{ inputs.filePath }}
           export SHA=$(git rev-parse HEAD:$FILE_TO_COMMIT)
           export CONTENT=$(base64 -i $FILE_TO_COMMIT)
           gh api --method PUT /repos/:owner/:repo/contents/$FILE_TO_COMMIT \
