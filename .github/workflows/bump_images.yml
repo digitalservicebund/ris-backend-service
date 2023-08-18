@@ -28,6 +28,9 @@ jobs:
   trigger-pipeline:
     needs: bump-chainguard-images
     runs-on: ubuntu-latest
+    permissions:
+      actions: write
+      contents: write
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
