@@ -97,85 +97,82 @@ function onDelete() {
         <div class="table-cell p-16">Status</div>
         <div class="table-cell p-16">Löschen</div>
       </div>
-      <div v-if="documentUnitListEntries">
-        <div
-          v-for="listEntry in listEntriesWithStatus"
-          :key="listEntry.id"
-          class="ds-label-01-reg table-row border-b-2 border-b-gray-100 px-16 hover:bg-gray-100"
-        >
-          <div class="table-cell p-16">
-            <router-link
-              class="underline"
-              :to="{
-                name: listEntry.fileName
-                  ? 'caselaw-documentUnit-documentNumber-categories'
-                  : 'caselaw-documentUnit-documentNumber-files',
-                params: { documentNumber: listEntry.documentNumber },
-              }"
-            >
-              {{ listEntry.documentNumber }}
-            </router-link>
-          </div>
-          <div class="table-cell p-16">
-            <span v-if="listEntry.fileName" class="material-icons">
-              attach_file
-            </span>
-            <span v-else>-</span>
-          </div>
-          <div class="table-cell p-16">
-            {{ listEntry.court?.type ? listEntry.court.type : "-" }}
-          </div>
-          <div class="table-cell p-16">
-            {{ listEntry.court?.location ? listEntry.court.location : "-" }}
-          </div>
-          <div class="table-cell p-16">
-            {{
-              listEntry.decisionDate
-                ? dayjs(listEntry.decisionDate).format("DD.MM.YYYY")
-                : "-"
-            }}
-          </div>
-          <div class="table-cell p-16">
-            {{ listEntry.fileNumber ? listEntry.fileNumber : "-" }}
-          </div>
-          <div class="table-cell p-16">
-            {{
-              listEntry.documentType
-                ? listEntry.documentType.jurisShortcut
-                : "-"
-            }}
-          </div>
-          <div class="table-cell p-16">
-            <IconBadge
-              v-if="listEntry.status"
-              :color="listEntry.status.color"
-              :icon="listEntry.status.icon"
-              :value="listEntry.status.value"
-            />
-          </div>
-          <div class="table-cell p-16">
-            <span
-              aria-label="Dokumentationseinheit löschen"
-              class="material-icons cursor-pointer"
-              tabindex="0"
-              @click="
-                setSelectedDocumentUnitListEntry(
-                  documentUnitListEntries.find(
-                    (entry) => entry.uuid == listEntry.uuid,
-                  ) as DocumentUnitListEntry,
-                )
-              "
-              @keyup.enter="
-                setSelectedDocumentUnitListEntry(
-                  documentUnitListEntries.find(
-                    (entry) => entry.uuid == listEntry.uuid,
-                  ) as DocumentUnitListEntry,
-                )
-              "
-            >
-              delete
-            </span>
-          </div>
+
+      <div
+        v-for="listEntry in listEntriesWithStatus"
+        :key="listEntry.id"
+        class="ds-label-01-reg table-row border-b-2 border-b-gray-100 px-16 hover:bg-gray-100"
+      >
+        <div class="table-cell p-16">
+          <router-link
+            class="underline"
+            :to="{
+              name: listEntry.fileName
+                ? 'caselaw-documentUnit-documentNumber-categories'
+                : 'caselaw-documentUnit-documentNumber-files',
+              params: { documentNumber: listEntry.documentNumber },
+            }"
+          >
+            {{ listEntry.documentNumber }}
+          </router-link>
+        </div>
+        <div class="table-cell p-16">
+          <span v-if="listEntry.fileName" class="material-icons">
+            attach_file
+          </span>
+          <span v-else>-</span>
+        </div>
+        <div class="table-cell p-16">
+          {{ listEntry.court?.type ? listEntry.court.type : "-" }}
+        </div>
+        <div class="table-cell p-16">
+          {{ listEntry.court?.location ? listEntry.court.location : "-" }}
+        </div>
+        <div class="table-cell p-16">
+          {{
+            listEntry.decisionDate
+              ? dayjs(listEntry.decisionDate).format("DD.MM.YYYY")
+              : "-"
+          }}
+        </div>
+        <div class="table-cell p-16">
+          {{ listEntry.fileNumber ? listEntry.fileNumber : "-" }}
+        </div>
+        <div class="table-cell p-16">
+          {{
+            listEntry.documentType ? listEntry.documentType.jurisShortcut : "-"
+          }}
+        </div>
+        <div class="table-cell p-16">
+          <IconBadge
+            v-if="listEntry.status"
+            :color="listEntry.status.color"
+            :icon="listEntry.status.icon"
+            :value="listEntry.status.value"
+          />
+        </div>
+        <div class="table-cell p-16">
+          <span
+            aria-label="Dokumentationseinheit löschen"
+            class="material-icons cursor-pointer"
+            tabindex="0"
+            @click="
+              setSelectedDocumentUnitListEntry(
+                documentUnitListEntries?.find(
+                  (entry) => entry.uuid == listEntry.uuid,
+                ) as DocumentUnitListEntry,
+              )
+            "
+            @keyup.enter="
+              setSelectedDocumentUnitListEntry(
+                documentUnitListEntries?.find(
+                  (entry) => entry.uuid == listEntry.uuid,
+                ) as DocumentUnitListEntry,
+              )
+            "
+          >
+            delete
+          </span>
         </div>
       </div>
     </div>
