@@ -6,30 +6,36 @@ import java.time.LocalDate
 import java.util.UUID
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
-import utils.createSimpleSections
+import utils.createSimpleMetadatasections
 import utils.factory.norm
 
 class NormTest {
 
   @Test
   fun `can create a norm with only mandatory fields`() {
-    val paragraph = Paragraph(UUID.randomUUID(), "marker", "text")
-    val article = Article(UUID.randomUUID(), "title", "marker", listOf(paragraph))
+    val paragraph = Paragraph(guid = UUID.randomUUID(), marker = "marker", text = "text", order = 1)
+    val article =
+        Article(
+            guid = UUID.randomUUID(),
+            header = "title",
+            designation = "marker",
+            order = 1,
+            paragraphs = listOf(paragraph))
     val guid = UUID.randomUUID()
-    val norm = Norm(guid = guid, articles = listOf(article))
+    val norm = Norm(guid = guid, sections = listOf(article))
 
     assertThat(norm.guid).isEqualTo(guid)
-    assertThat(norm.articles).isEqualTo(listOf(article))
+    assertThat(norm.sections).isEqualTo(listOf(article))
   }
 
   @Test
   fun `can create a norm with a list of metadata`() {
     val guid = UUID.randomUUID()
-    val sections = createSimpleSections()
+    val sections = createSimpleMetadatasections()
     val norm =
         Norm(
             guid = guid,
-            metadataSections = createSimpleSections(),
+            metadataSections = createSimpleMetadatasections(),
         )
 
     assertThat(norm.metadataSections.flatMap { it.metadata }).hasSize(2)
@@ -40,13 +46,19 @@ class NormTest {
 
   @Test
   fun `can create a norm with some optional string fields`() {
-    val paragraph = Paragraph(UUID.randomUUID(), "marker", "text")
-    val article = Article(UUID.randomUUID(), "title", "marker", listOf(paragraph))
+    val paragraph = Paragraph(guid = UUID.randomUUID(), marker = "marker", text = "text", order = 1)
+    val article =
+        Article(
+            guid = UUID.randomUUID(),
+            header = "title",
+            designation = "marker",
+            order = 1,
+            paragraphs = listOf(paragraph))
     val guid = UUID.randomUUID()
     val norm =
         Norm(
             guid = guid,
-            articles = listOf(article),
+            sections = listOf(article),
             metadataSections =
                 listOf(
                     MetadataSection(
@@ -62,7 +74,7 @@ class NormTest {
         )
 
     assertThat(norm.guid).isEqualTo(guid)
-    assertThat(norm.articles).isEqualTo(listOf(article))
+    assertThat(norm.sections).isEqualTo(listOf(article))
     assertThat(
             norm
                 .getFirstMetadatum(MetadataSectionName.NORM, MetadatumType.OFFICIAL_SHORT_TITLE)
@@ -85,8 +97,15 @@ class NormTest {
 
   @Test
   fun `can create a norm with optional date and boolean fields`() {
-    val paragraph = Paragraph(UUID.randomUUID(), "marker", "text")
-    val article = Article(UUID.randomUUID(), "title", "marker", listOf(paragraph))
+    val paragraph = Paragraph(guid = UUID.randomUUID(), marker = "marker", text = "text", order = 1)
+    val article =
+        Article(
+            guid = UUID.randomUUID(),
+            header = "title",
+            designation = "marker",
+            order = 1,
+            paragraphs = listOf(paragraph))
+
     val guid = UUID.randomUUID()
 
     val citationDate = Metadatum(LocalDate.of(2022, 11, 19), MetadatumType.DATE)
@@ -104,12 +123,12 @@ class NormTest {
     val norm =
         Norm(
             guid = guid,
-            articles = listOf(article),
+            sections = listOf(article),
             metadataSections = listOf(citationDateSection, normProviderSection, normSection),
         )
 
     assertThat(norm.guid).isEqualTo(guid)
-    assertThat(norm.articles).isEqualTo(listOf(article))
+    assertThat(norm.sections).isEqualTo(listOf(article))
     assertThat(norm.metadataSections.flatMap { it.metadata }).contains(citationDate)
     assertThat(norm.metadataSections.flatMap { it.metadata }).contains(resolutionMajority)
     assertThat(norm.metadataSections.flatMap { it.metadata }).contains(risAbbreviation)
@@ -209,7 +228,7 @@ class NormTest {
     val norm = norm {
       articles {
         article {
-          title = "Title"
+          header = "Title"
           paragraphs { paragraph { text = "Paragraph" } }
         }
       }
@@ -231,8 +250,10 @@ class NormTest {
       }
       files { file { name = "file.zip" } }
     }
-    assertThat(norm.articles.first().title).isEqualTo("Title")
-    assertThat(norm.articles.first().paragraphs.first().text).isEqualTo("Paragraph")
+    val article = norm.sections.filterIsInstance<Article>().first()
+    assertThat(article.header).isEqualTo("Title")
+    val paragraph = article.paragraphs.first() as Paragraph
+    assertThat(paragraph.text).isEqualTo("Paragraph")
     assertThat(norm.metadataSections.first().name).isEqualTo(MetadataSectionName.OFFICIAL_REFERENCE)
     assertThat(norm.metadataSections.first().metadata).isEmpty()
     assertThat(norm.metadataSections.first().sections?.first()?.metadata?.first()?.type)

@@ -7,22 +7,25 @@ import de.bund.digitalservice.ris.norms.application.port.output.SaveFileReferenc
 import de.bund.digitalservice.ris.norms.application.port.output.SaveNormOutputPort
 import de.bund.digitalservice.ris.norms.application.port.output.SearchNormsOutputPort
 import de.bund.digitalservice.ris.norms.domain.entity.Article
+import de.bund.digitalservice.ris.norms.domain.entity.ContentElement
 import de.bund.digitalservice.ris.norms.domain.entity.Metadatum
 import de.bund.digitalservice.ris.norms.domain.entity.Norm
+import de.bund.digitalservice.ris.norms.domain.entity.Paragraph
+import de.bund.digitalservice.ris.norms.domain.entity.SectionElement
 import de.bund.digitalservice.ris.norms.domain.value.Eli
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType
-import de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto.ArticleDto
+import de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto.ContentDto
 import de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto.FileReferenceDto
 import de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto.MetadataSectionDto
 import de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto.MetadatumDto
 import de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto.NormDto
-import de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto.ParagraphDto
-import de.bund.digitalservice.ris.norms.framework.adapter.output.database.repository.ArticlesRepository
+import de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto.SectionDto
+import de.bund.digitalservice.ris.norms.framework.adapter.output.database.repository.ContentsRepository
 import de.bund.digitalservice.ris.norms.framework.adapter.output.database.repository.FileReferenceRepository
 import de.bund.digitalservice.ris.norms.framework.adapter.output.database.repository.MetadataRepository
 import de.bund.digitalservice.ris.norms.framework.adapter.output.database.repository.MetadataSectionsRepository
 import de.bund.digitalservice.ris.norms.framework.adapter.output.database.repository.NormsRepository
-import de.bund.digitalservice.ris.norms.framework.adapter.output.database.repository.ParagraphsRepository
+import de.bund.digitalservice.ris.norms.framework.adapter.output.database.repository.SectionsRepository
 import java.util.*
 import org.springframework.context.annotation.Primary
 import org.springframework.stereotype.Component
@@ -34,11 +37,11 @@ import reactor.core.publisher.Mono
 @Primary
 class NormsService(
     val normsRepository: NormsRepository,
-    val articlesRepository: ArticlesRepository,
-    val paragraphsRepository: ParagraphsRepository,
     val fileReferenceRepository: FileReferenceRepository,
     val metadataRepository: MetadataRepository,
     val metadataSectionsRepository: MetadataSectionsRepository,
+    val sectionsRepository: SectionsRepository,
+    val contentsRepository: ContentsRepository
 ) :
     NormsMapper,
     GetNormByGuidOutputPort,
@@ -82,10 +85,11 @@ class NormsService(
 
   override fun getNormByGuid(query: GetNormByGuidOutputPort.Query): Mono<Norm> {
     val findNormRequest = normsRepository.findByGuid(query.guid).cache()
-    val buildArticlesRequest =
+
+    val contentElementsNormLevel =
         findNormRequest
-            .flatMapMany { articlesRepository.findByNormGuid(it.guid) }
-            .flatMap(::getArticleWithParagraphs)
+            .flatMapMany { contentsRepository.findByNormGuid(it.guid) }
+            .map(::contentElementToEntity)
             .collectList()
 
     val findFileReferencesRequest =
@@ -94,37 +98,52 @@ class NormsService(
             .map(::fileReferenceToEntity)
             .collectList()
 
-    val findSectionsRequest =
+    val findMetadatasectionsRequest =
         findNormRequest
             .flatMapMany { metadataSectionsRepository.findByNormGuid(it.guid) }
             .collectList()
 
     val findMetadataRequest =
-        findSectionsRequest
+        findMetadatasectionsRequest
             .flatMapMany {
               metadataRepository.findBySectionGuidIn(it.map { section -> section.guid })
             }
             .collectList()
 
+    val findAllSectionsRequest =
+        findNormRequest.flatMapMany { sectionsRepository.findByNormGuid(it.guid) }.collectList()
+
+    val findContentOfSectionsRequest =
+        findAllSectionsRequest
+            .flatMapMany {
+              contentsRepository.findBySectionGuidIn(it.map { section -> section.guid })
+            }
+            .collectList()
+
     return Mono.zip(
             findNormRequest,
-            buildArticlesRequest,
+            contentElementsNormLevel,
             findFileReferencesRequest,
-            findSectionsRequest,
+            findMetadatasectionsRequest,
             findMetadataRequest,
-        )
-        .map { normToEntity(it.t1, it.t2, it.t3, it.t4, it.t5) }
+            findAllSectionsRequest,
+            findContentOfSectionsRequest)
+        .map { normToEntity(it.t1, it.t2, it.t3, it.t4, it.t5, it.t6, it.t7) }
   }
 
   @Transactional(transactionManager = "connectionFactoryTransactionManager")
   override fun saveNorm(command: SaveNormOutputPort.Command): Mono<Boolean> {
     val saveNormRequest = normsRepository.save(normToDto(command.norm)).cache()
-    val saveArticlesRequest = saveNormRequest.flatMapMany { saveNormArticles(command.norm, it) }
+    val saveSections =
+        saveNormRequest.flatMapMany { saveNormSections(command.norm.sections, it.guid, null) }
+    val saveContents =
+        saveNormRequest.flatMapMany { saveNormContents(command.norm.contents, it.guid) }
     val saveFileReferencesRequest = saveNormRequest.flatMapMany { saveNormFiles(command.norm, it) }
-    val saveSectionsRequest =
+    val saveMetadatasectionsRequest =
         saveNormRequest.flatMapMany { saveNormSectionsWithMetadata(command.norm, it) }
 
-    return Mono.`when`(saveArticlesRequest, saveFileReferencesRequest, saveSectionsRequest)
+    return Mono.`when`(
+            saveSections, saveContents, saveFileReferencesRequest, saveMetadatasectionsRequest)
         .thenReturn(true)
   }
 
@@ -145,10 +164,42 @@ class NormsService(
         .map { true }
   }
 
-  private fun saveNormArticles(norm: Norm, normDto: NormDto): Flux<ParagraphDto> {
-    return articlesRepository
-        .saveAll(articlesToDto(articles = norm.articles, normGuid = normDto.guid))
-        .flatMap { article -> saveArticleParagraphs(norm, article) }
+  private fun saveNormContents(
+      contents: Collection<ContentElement>,
+      normGuid: UUID
+  ): Flux<ContentDto> {
+    return contentsRepository.saveAll(
+        contentsToDto(contents = contents, normGuid = normGuid, sectionGuid = null))
+  }
+
+  private fun saveNormSections(
+      sections: Collection<SectionElement>,
+      normGuid: UUID,
+      sectionGuid: UUID?
+  ): Flux<ContentDto> {
+    return if (sections.filterIsInstance<Article>().isNotEmpty()) {
+      sectionsRepository
+          .saveAll(
+              articlesToDto(
+                  articles = sections.filterIsInstance<Article>(),
+                  normGuid = normGuid,
+                  sectionGuid = sectionGuid))
+          .flatMap { article -> saveArticleParagraphs(sections, article) }
+    } else {
+      sectionsRepository
+          .saveAll(
+              sectionsToDto(
+                  sections = sections.filter { it !is Article },
+                  normGuid = normGuid,
+                  sectionGuid = sectionGuid))
+          .flatMap { section ->
+            val childSectionsToSave =
+                sections
+                    .filter { it.guid == section.guid }
+                    .flatMap { it.childSections ?: emptyList() }
+            saveNormSections(childSectionsToSave, normGuid, section.guid)
+          }
+    }
   }
 
   private fun saveNormSectionsWithMetadata(norm: Norm, normDto: NormDto): Flux<MetadataSectionDto> {
@@ -211,20 +262,22 @@ class NormsService(
     return metadataRepository.saveAll(metadataListToDto(metadata, metadataSectionDto.guid))
   }
 
-  private fun saveArticleParagraphs(norm: Norm, article: ArticleDto): Flux<ParagraphDto> {
-    return paragraphsRepository.saveAll(
-        paragraphsToDto(
-            paragraphs = norm.articles.find { it.guid == article.guid }?.paragraphs ?: listOf(),
-            articleGuid = article.guid,
+  private fun saveArticleParagraphs(
+      sections: Collection<SectionElement>,
+      article: SectionDto
+  ): Flux<ContentDto> {
+    return contentsRepository.saveAll(
+        contentsToDto(
+            contents =
+                sections
+                    .filterIsInstance<Article>()
+                    .find { it.guid == article.guid }
+                    ?.paragraphs
+                    ?.map { it as Paragraph }
+                    ?: listOf(),
+            normGuid = null,
+            sectionGuid = article.guid,
         ),
     )
-  }
-
-  private fun getArticleWithParagraphs(articleDto: ArticleDto): Mono<Article> {
-    return paragraphsRepository
-        .findByArticleGuid(articleDto.guid)
-        .map(::paragraphToEntity)
-        .collectList()
-        .map { paragraphs -> articleToEntity(articleDto, paragraphs) }
   }
 }

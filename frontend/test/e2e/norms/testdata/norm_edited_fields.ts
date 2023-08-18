@@ -1,9 +1,9 @@
-import { NormCategory, UndefinedDate } from "../../../../src/domain/Norm"
 import { NormData } from "../fixtures"
+import { NormCategory, UndefinedDate } from "@/domain/Norm"
 
 export const newNorm: NormData = {
   jurisZipFileName: "",
-  articles: [],
+  sections: [],
   metadataSections: {
     NORM: [
       {

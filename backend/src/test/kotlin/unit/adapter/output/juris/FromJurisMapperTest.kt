@@ -154,12 +154,15 @@ class FromJurisMapperTest {
     val domainNorm = mapDataToDomain(guid, extractedData)
 
     assertThat(domainNorm.guid).isEqualTo(guid)
-    assertThat(domainNorm.articles).hasSize(1)
-    assertThat(domainNorm.articles[0].title).isEqualTo("articleTitle")
-    assertThat(domainNorm.articles[0].marker).isEqualTo("articleMarker")
-    assertThat(domainNorm.articles[0].paragraphs).hasSize(1)
-    assertThat(domainNorm.articles[0].paragraphs[0].marker).isEqualTo("paragraphMarker")
-    assertThat(domainNorm.articles[0].paragraphs[0].text).isEqualTo("paragraphText")
+    assertThat(domainNorm.sections).hasSize(1)
+    val article = domainNorm.sections[0] as de.bund.digitalservice.ris.norms.domain.entity.Article
+    assertThat(article.header).isEqualTo("articleTitle")
+    assertThat(article.designation).isEqualTo("articleMarker")
+    assertThat(article.paragraphs).hasSize(1)
+    val paragraph =
+        article.paragraphs.first() as de.bund.digitalservice.ris.norms.domain.entity.Paragraph
+    assertThat(paragraph.marker).isEqualTo("paragraphMarker")
+    assertThat(paragraph.text).isEqualTo("paragraphText")
     val sections = domainNorm.metadataSections
     assertSectionsHasMetadata(
         sections, NORM, MetadatumType.OFFICIAL_LONG_TITLE, "officialLongTitle")

@@ -14,6 +14,7 @@ class MapParagraphToDto {
         Paragraph(
             guid = UUID.fromString("53d29ef7-377c-4d14-864b-eb3a85769359"),
             marker = "1",
+            order = 1,
             text = "test text",
         )
 
@@ -30,7 +31,7 @@ class MapParagraphToDto {
 
   @Test
   fun `it correctly parses the marker from the marker text`() {
-    val paragraph = Paragraph(guid = UUID.randomUUID(), marker = "§ 1a", text = "text")
+    val paragraph = Paragraph(guid = UUID.randomUUID(), marker = "§ 1a", text = "text", order = 1)
 
     val data = mapParagraphToDto(paragraph, "")
 
@@ -41,7 +42,7 @@ class MapParagraphToDto {
 
   @Test
   fun `it falls back to the orginal number if no marker could be parsed`() {
-    val paragraph = Paragraph(guid = UUID.randomUUID(), marker = "§", text = "text")
+    val paragraph = Paragraph(guid = UUID.randomUUID(), marker = "§", text = "text", order = 1)
 
     val data = mapParagraphToDto(paragraph, "", ordinalNumber = 2)
 
@@ -54,12 +55,13 @@ class MapParagraphToDto {
 class MapArticleToDto {
   @Test
   fun `it sets correctly all data properties`() {
-    val paragraph = Paragraph(UUID.randomUUID(), null, "text")
+    val paragraph = Paragraph(guid = UUID.randomUUID(), marker = "§", text = "text", order = 1)
     val article =
         Article(
             guid = UUID.fromString("761b5537-5aa5-4901-81f7-fbf7e040a7c8"),
-            title = "test title",
-            marker = "1",
+            header = "test title",
+            designation = "1",
+            order = 1,
             paragraphs = listOf(paragraph),
         )
 
@@ -74,7 +76,13 @@ class MapArticleToDto {
 
   @Test
   fun `it correctly parses the marker from the marker text`() {
-    val article = Article(guid = UUID.randomUUID(), title = "title", marker = "§ 1.1")
+    val article =
+        Article(
+            guid = UUID.randomUUID(),
+            header = "title",
+            designation = "§ 1.1",
+            order = 1,
+            paragraphs = listOf())
 
     val data = mapArticleToDto(article)
 
@@ -85,7 +93,13 @@ class MapArticleToDto {
 
   @Test
   fun `it falls back to the orginal number if no marker could be parsed`() {
-    val article = Article(guid = UUID.randomUUID(), title = "title", marker = "")
+    val article =
+        Article(
+            guid = UUID.randomUUID(),
+            header = "title",
+            designation = "",
+            order = 1,
+            paragraphs = listOf())
 
     val data = mapArticleToDto(article, ordinalNumber = 9)
 

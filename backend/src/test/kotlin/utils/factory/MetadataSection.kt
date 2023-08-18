@@ -15,7 +15,8 @@ class MetadataSectionBuilder {
 
   fun metadata(block: Metadata.() -> Unit) = metadata.addAll(Metadata().apply(block))
 
-  fun sections(block: Sections.() -> Unit) = sections.addAll(Sections().apply(block))
+  fun sections(block: Metadatasections.() -> Unit) =
+      sections.addAll(Metadatasections().apply(block))
 
   fun build(): MetadataSection = MetadataSection(name, metadata, order, sections)
 }
@@ -24,7 +25,7 @@ class Metadata : ArrayList<Metadatum<*>>() {
   fun metadatum(block: MetadatumBuilder.() -> Unit) = add(MetadatumBuilder().apply(block).build())
 }
 
-class Sections : ArrayList<MetadataSection>() {
+class Metadatasections : ArrayList<MetadataSection>() {
   fun section(block: MetadataSectionBuilder.() -> Unit) =
       add(MetadataSectionBuilder().apply(block).build())
 }

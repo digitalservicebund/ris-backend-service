@@ -4,14 +4,14 @@ export interface Norm extends NormBase, FlatMetadata {
 
 export interface NormBase {
   readonly guid: string
-  articles: Article[]
+  sections: Section[]
   readonly files?: FileReference[]
 }
 
-export type Article = {
+export type Section = {
   guid: string
-  title: string
-  marker: string
+  header: string
+  designation: string
   readonly paragraphs: Paragraph[]
 }
 

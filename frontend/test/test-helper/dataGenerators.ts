@@ -1,5 +1,5 @@
 import {
-  Article,
+  Section,
   FlatMetadata,
   Metadata,
   MetadataSectionName,
@@ -202,11 +202,11 @@ export function generateParagraph(
   }
 }
 
-export function generateArticle(partialArticle?: Partial<Article>): Article {
+export function generateArticle(partialArticle?: Partial<Section>): Section {
   return {
     guid: generateGuid(),
-    title: generateString({ prefix: "title " }),
-    marker: generateString({ prefix: "marker " }),
+    header: generateString({ prefix: "title " }),
+    designation: generateString({ prefix: "marker " }),
     paragraphs: [generateParagraph()],
     ...partialArticle,
   }
@@ -292,7 +292,7 @@ export function generateFlatMetadata(
 export function generateNorm(partialNorm?: Partial<Norm>): Norm {
   return {
     guid: generateGuid(),
-    articles: [generateArticle()],
+    sections: [generateArticle()],
     metadataSections: generateMetadataSections(),
     ...generateFlatMetadata(),
     ...partialNorm,

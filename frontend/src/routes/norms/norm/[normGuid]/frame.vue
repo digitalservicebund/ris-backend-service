@@ -123,7 +123,7 @@ const flatMetadata = ref<FlatMetadata>({} as FlatMetadata)
 watch(
   loadedNorm,
   () => {
-    const { guid, articles, files, metadataSections, ...data } =
+    const { guid, sections, files, metadataSections, ...data } =
       loadedNorm.value ?? {}
 
     flatMetadata.value = data as FlatMetadata

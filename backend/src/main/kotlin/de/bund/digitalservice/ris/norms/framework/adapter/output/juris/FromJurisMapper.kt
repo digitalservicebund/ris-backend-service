@@ -104,7 +104,7 @@ fun mapDataToDomain(guid: UUID, data: NormData): Norm {
 
   return Norm(
       guid = guid,
-      articles = mapArticlesToDomain(data.articles),
+      sections = mapArticlesToDomain(data.articles),
       metadataSections = sections.filterNotNull(),
   )
 }
@@ -530,20 +530,22 @@ private fun createMetadataForType(data: List<*>, type: MetadatumType): List<Meta
     data.filterNotNull().mapIndexed { index, value -> Metadatum(value, type, index + 1) }
 
 fun mapArticlesToDomain(articles: List<ArticleData>): List<Article> {
-  return articles.map { article ->
+  return articles.mapIndexed { index, article ->
     Article(
         guid = UUID.randomUUID(),
-        title = article.title,
-        marker = article.marker,
+        order = index,
+        header = article.title,
+        designation = article.marker,
         paragraphs = mapParagraphsToDomain(article.paragraphs),
     )
   }
 }
 
 fun mapParagraphsToDomain(paragraphs: List<ParagraphData>): List<Paragraph> {
-  return paragraphs.map { paragraph ->
+  return paragraphs.mapIndexed { index, paragraph ->
     Paragraph(
         guid = UUID.randomUUID(),
+        order = index,
         marker = paragraph.marker,
         text = paragraph.text,
     )

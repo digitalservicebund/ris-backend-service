@@ -3,10 +3,10 @@ import { NormCategory, UndefinedDate } from "@/domain/Norm"
 
 export const normData: NormData = {
   jurisZipFileName: "Tierarznei.3-0_multi.zip",
-  articles: [
+  sections: [
     {
-      marker: "Art 2",
-      title:
+      designation: "Art 2",
+      header:
         "Änderung der Verordnung über Stoffe mit pharmakologischer Wirkung",
       paragraphs: [
         {
@@ -16,8 +16,8 @@ export const normData: NormData = {
       ],
     },
     {
-      title: "Inkrafttreten, Außerkrafttreten",
-      marker: "Art 3",
+      header: "Inkrafttreten, Außerkrafttreten",
+      designation: "Art 3",
       paragraphs: [
         {
           marker: "(1)",
