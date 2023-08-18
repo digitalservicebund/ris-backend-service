@@ -14,12 +14,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: bump nginx image
-        uses: digitalservicebund/github-actions/bump-chainguard-digest@e5ebc86cf5e53360d2acb015cd7b11a38ad85172
+        uses: digitalservicebund/github-actions/bump-chainguard-digest@fa111f57d07a658c10ea3918cdc53447317024c8
         with:
           imageName: nginx
           filePath: frontend/Dockerfile.prod
       - name: bump redis image
-        uses: digitalservicebund/github-actions/bump-chainguard-digest@e5ebc86cf5e53360d2acb015cd7b11a38ad85172
+        uses: digitalservicebund/github-actions/bump-chainguard-digest@fa111f57d07a658c10ea3918cdc53447317024c8
         with:
           imageName: redis
           filePath: compose.yaml
