@@ -123,7 +123,7 @@ class NormsServiceTest : PostgresTestcontainerIntegrationTest() {
   @Test
   fun `save simple norm and verify it was saved with a search to get all norms`() {
     val saveCommand = SaveNormOutputPort.Command(NORM)
-    val getAllQuery = SearchNormsOutputPort.Query("")
+    val getAllQuery = SearchNormsOutputPort.Query("", eGesetzgebung = false)
 
     normsService
         .searchNorms(getAllQuery)
@@ -145,6 +145,56 @@ class NormsServiceTest : PostgresTestcontainerIntegrationTest() {
   }
 
   @Test
+  fun `retrieve norms for e-gesetzgebung`() {
+    val getAllEGesetzgebungNorms = SearchNormsOutputPort.Query("", eGesetzgebung = true)
+    val getAllNonEGesetzgebungNorms = SearchNormsOutputPort.Query("", eGesetzgebung = false)
+
+    normsService
+        .searchNorms(getAllEGesetzgebungNorms)
+        .`as`(StepVerifier::create)
+        .expectNextCount(0)
+        .verifyComplete()
+
+    normsService
+        .searchNorms(getAllNonEGesetzgebungNorms)
+        .`as`(StepVerifier::create)
+        .expectNextCount(0)
+        .verifyComplete()
+
+    val nonEGesetzgebungGUID = UUID.randomUUID()
+    val nonEGesetzgebungNorm = Norm(guid = nonEGesetzgebungGUID, eGesetzgebung = false)
+    val saveNonEGesetzgebungNorm = SaveNormOutputPort.Command(nonEGesetzgebungNorm)
+
+    normsService
+        .saveNorm(saveNonEGesetzgebungNorm)
+        .`as`(StepVerifier::create)
+        .expectNextCount(1)
+        .verifyComplete()
+
+    val eGesetzgebungGUID = UUID.randomUUID()
+    val eGesetzgebungNorm = Norm(guid = eGesetzgebungGUID, eGesetzgebung = true)
+    val saveEGesetzgebungNorm = SaveNormOutputPort.Command(eGesetzgebungNorm)
+
+    normsService
+        .saveNorm(saveEGesetzgebungNorm)
+        .`as`(StepVerifier::create)
+        .expectNextCount(1)
+        .verifyComplete()
+
+    normsService
+        .searchNorms(getAllEGesetzgebungNorms)
+        .`as`(StepVerifier::create)
+        .assertNext { assertThat(it.guid).isEqualTo(eGesetzgebungGUID) }
+        .verifyComplete()
+
+    normsService
+        .searchNorms(getAllNonEGesetzgebungNorms)
+        .`as`(StepVerifier::create)
+        .assertNext { assertThat(it.guid).isEqualTo(nonEGesetzgebungGUID) }
+        .verifyComplete()
+  }
+
+  @Test
   fun `the search norm result includes their ELI property`() {
     val page = Metadatum("1125", MetadatumType.PAGE)
     val gazette = Metadatum("bg-1", MetadatumType.ANNOUNCEMENT_GAZETTE)
@@ -161,7 +211,7 @@ class NormsServiceTest : PostgresTestcontainerIntegrationTest() {
                 listOf(officialReference, normSection, createAnnouncementSection("2022-02-02")),
         )
     val saveCommand = SaveNormOutputPort.Command(normWithEli)
-    val searchQuery = SearchNormsOutputPort.Query(officialLongTitle.value)
+    val searchQuery = SearchNormsOutputPort.Query(officialLongTitle.value, eGesetzgebung = false)
 
     assertThat(normWithEli.eli.toString()).isNotNull()
 

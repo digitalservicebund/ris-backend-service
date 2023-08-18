@@ -100,6 +100,7 @@ fun createRandomNorm(): Norm {
           .randomize(named("files")) { emptyList<FileReference>() }
           .randomize(named("sections")) { emptyList<SectionElement>() }
           .randomize(named("contents")) { emptyList<ContentElementTest>() }
+          .excludeField(named("eGesetzgebung"))
   return EasyRandom(parameters).nextObject(Norm::class.java)
 }
 

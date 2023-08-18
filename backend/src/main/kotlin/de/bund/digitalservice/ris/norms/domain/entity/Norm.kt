@@ -14,6 +14,7 @@ data class Norm(
     var files: List<FileReference> = listOf(),
     val sections: List<SectionElement> = emptyList(),
     val contents: List<ContentElement> = emptyList(),
+    var eGesetzgebung: Boolean = false
 ) {
   init {
     hasValidSections.evaluate(this).throwWhenUnsatisfied()

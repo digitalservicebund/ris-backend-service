@@ -15,7 +15,7 @@ export async function getAllNorms(): Promise<
 > {
   const { data, status, error } = await httpClient.get<{
     data: NormListResponseSchema
-  }>("norms")
+  }>("norms", { params: { eGesetzgebung: "false" } })
 
   if (status >= 300 || error) {
     return {

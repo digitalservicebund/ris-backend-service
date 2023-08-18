@@ -284,9 +284,7 @@ interface NormsMapper {
   }
 
   fun normToDto(norm: Norm): NormDto {
-    return NormDto(
-        norm.guid,
-    )
+    return NormDto(norm.guid, norm.eGesetzgebung)
   }
 
   fun sectionsToDto(

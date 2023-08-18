@@ -43,8 +43,18 @@ class ListNormsController(private val listNormsService: ListNormsUseCase) {
       )
       @RequestParam
       q: String?,
+      @Parameter(
+          name = "eGesetzgebung",
+          example = "true",
+          deprecated = true,
+          description =
+              "List only norms that are provided for E-Gesetzgebung.\n" +
+                  "\nDefaults to true, meaning only norms for E-Gesetzgebung are listed by default.",
+      )
+      @RequestParam
+      eGesetzgebung: Boolean?,
   ): Mono<ResponseEntity<PaginatedNormListResponseSchema>> {
-    val query = ListNormsUseCase.Query(searchTerm = q)
+    val query = ListNormsUseCase.Query(searchTerm = q, eGesetzgebung = eGesetzgebung ?: true)
 
     return listNormsService
         .listNorms(query)

@@ -61,9 +61,10 @@ class NormsService(
       query: SearchNormsOutputPort.Query,
   ): Flux<Norm> {
     if (query.searchTerm.isEmpty()) {
-      return normsRepository.findAll().flatMap {
-        getNormByGuid(GetNormByGuidOutputPort.Query(it.guid))
-      }
+      return normsRepository
+          .findAll()
+          .filter { it.eGesetzgebung == query.eGesetzgebung }
+          .flatMap { getNormByGuid(GetNormByGuidOutputPort.Query(it.guid)) }
     }
 
     return metadataRepository

@@ -6,5 +6,5 @@ import reactor.core.publisher.Flux
 fun interface SearchNormsOutputPort {
   fun searchNorms(query: Query): Flux<Norm>
 
-  data class Query(val searchTerm: String)
+  data class Query(val searchTerm: String, val eGesetzgebung: Boolean)
 }
