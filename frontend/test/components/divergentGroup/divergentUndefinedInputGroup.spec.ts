@@ -8,7 +8,7 @@ import {
   MetadatumType,
   NormCategory,
   UndefinedDate,
-} from "@/domain/Norm"
+} from "@/domain/norm"
 
 function renderComponent(options?: {
   modelValue?: Metadata

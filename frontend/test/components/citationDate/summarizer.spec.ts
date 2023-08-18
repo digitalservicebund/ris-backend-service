@@ -1,5 +1,5 @@
 import { describe, test } from "vitest"
-import { Metadata } from "@/domain/Norm"
+import { Metadata } from "@/domain/norm"
 import { dateYearSummarizer } from "@/helpers/dateYearSummarizer"
 
 describe("Citation Date Summarizer", () => {

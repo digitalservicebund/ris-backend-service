@@ -2,7 +2,7 @@ import {
   MetadatumType,
   MetadataSectionName,
   MetadataSections,
-} from "@/domain/Norm"
+} from "@/domain/norm"
 import {
   decodeMetadataSections,
   encodeMetadataSections,

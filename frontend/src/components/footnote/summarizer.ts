@@ -1,6 +1,6 @@
 import { createTextVNode, h, VNode } from "vue"
 import { Footnote, FOOTNOTE_LABELS } from "@/components/footnote/types"
-import { MetadatumType } from "@/domain/Norm"
+import { MetadatumType } from "@/domain/norm"
 
 export function summarizeFootnotePerLine(data?: Footnote): VNode {
   if (!data) return createTextVNode("")

@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { ref, watch } from "vue"
-import { Metadata, MetadataSectionName, NormCategory } from "@/domain/Norm"
+import { Metadata, MetadataSectionName, NormCategory } from "@/domain/norm"
 import CheckboxInput from "@/shared/components/input/CheckboxInput.vue"
 import InputField, {
   LabelPosition,

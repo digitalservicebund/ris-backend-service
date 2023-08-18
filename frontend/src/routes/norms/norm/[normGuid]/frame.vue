@@ -42,7 +42,7 @@ import SubjectAreaInputGroup from "@/components/subjectArea/SubjectAreaInputGrou
 import { subjectAreaSummarizer } from "@/components/subjectArea/summarizer"
 import { useLocator } from "@/composables/useLocator"
 import { useScrollToHash } from "@/composables/useScrollToHash"
-import { FlatMetadata, Metadata, MetadataSections } from "@/domain/Norm"
+import { FlatMetadata, Metadata, MetadataSections } from "@/domain/norm"
 import { dateYearSummarizer } from "@/helpers/dateYearSummarizer"
 import { generalSummarizer } from "@/helpers/generalSummarizer"
 import { withSummarizer } from "@/shared/components/DataSetSummary.vue"

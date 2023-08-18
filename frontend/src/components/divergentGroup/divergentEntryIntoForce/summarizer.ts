@@ -3,7 +3,7 @@ import {
   divergentDefinedSummary,
   divergentUndefinedSummary,
 } from "@/components/divergentGroup/divergentSummaryFunctions"
-import { MetadataSections } from "@/domain/Norm"
+import { MetadataSections } from "@/domain/norm"
 
 export function divergentEntryIntoForceSummarizer(
   data?: MetadataSections,

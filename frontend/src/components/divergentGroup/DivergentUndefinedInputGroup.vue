@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { computed, ref, watch } from "vue"
 import DivergentCategoryInputGroup from "@/components/divergentGroup/DivergentCategoryInputGroup.vue"
-import { Metadata, MetadataSectionName, UndefinedDate } from "@/domain/Norm"
+import { Metadata, MetadataSectionName, UndefinedDate } from "@/domain/norm"
 import DropdownInput from "@/shared/components/input/DropdownInput.vue"
 import InputField from "@/shared/components/input/InputField.vue"
 

@@ -4,7 +4,7 @@ import { computed, ref, watch } from "vue"
 import DocumentOtherInputGroup from "@/components/documentStatus/DocumentOtherInputGroup.vue"
 import DocumentStatusInputGroup from "@/components/documentStatus/DocumentStatusInputGroup.vue"
 import DocumentTextProofInputGroup from "@/components/documentStatus/DocumentTextProofInputGroup.vue"
-import { Metadata, MetadataSectionName, MetadataSections } from "@/domain/Norm"
+import { Metadata, MetadataSectionName, MetadataSections } from "@/domain/norm"
 import InputField, {
   LabelPosition,
 } from "@/shared/components/input/InputField.vue"

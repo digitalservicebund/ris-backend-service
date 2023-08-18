@@ -25,7 +25,7 @@ import {
   Norm,
   NormCategory,
   UndefinedDate,
-} from "@/domain/Norm"
+} from "@/domain/norm"
 
 function identity<T>(data: T): T {
   return data

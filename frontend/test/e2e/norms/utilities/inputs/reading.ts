@@ -7,7 +7,7 @@ import {
   MetadataInputSection,
 } from "./types"
 import { FOOTNOTE_LABELS } from "@/components/footnote/types"
-import { MetadatumType } from "@/domain/Norm"
+import { MetadatumType } from "@/domain/norm"
 import { expectSummaryToContainMetadata } from "~/e2e/norms/e2e-utils"
 
 type FieldExpecter<T> = (page: Page, id: string, value: T) => Promise<void>

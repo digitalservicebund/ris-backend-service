@@ -1,5 +1,5 @@
 import { createTextVNode, VNode } from "vue"
-import { Metadata, MetadataSections } from "@/domain/Norm"
+import { Metadata, MetadataSections } from "@/domain/norm"
 import {
   normsMetadataSummarizer,
   SummarizerDataSet,

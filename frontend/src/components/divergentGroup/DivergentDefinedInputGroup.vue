@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { computed, ref, watch } from "vue"
 import DivergentCategoryInputGroup from "@/components/divergentGroup/DivergentCategoryInputGroup.vue"
-import { Metadata, MetadataSectionName } from "@/domain/Norm"
+import { Metadata, MetadataSectionName } from "@/domain/norm"
 import DateInput from "@/shared/components/input/DateInput.vue"
 import InputField from "@/shared/components/input/InputField.vue"
 

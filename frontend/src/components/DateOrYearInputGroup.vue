@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { computed, ref, watch } from "vue"
-import { Metadata } from "@/domain/Norm"
+import { Metadata } from "@/domain/norm"
 import DateInput from "@/shared/components/input/DateInput.vue"
 import InputField, {
   LabelPosition,

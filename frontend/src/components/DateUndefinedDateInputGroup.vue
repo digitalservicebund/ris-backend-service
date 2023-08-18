@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { UndefinedDate } from "@/domain/Norm"
+import { UndefinedDate } from "@/domain/norm"
 import DateInput from "@/shared/components/input/DateInput.vue"
 import DropdownInput from "@/shared/components/input/DropdownInput.vue"
 import InputField from "@/shared/components/input/InputField.vue"

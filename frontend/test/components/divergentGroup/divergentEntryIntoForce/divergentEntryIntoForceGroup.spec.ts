@@ -7,7 +7,7 @@ import {
   MetadataSections,
   MetadatumType,
   UndefinedDate,
-} from "@/domain/Norm"
+} from "@/domain/norm"
 
 function renderComponent(options?: { modelValue?: MetadataSections }) {
   const props = {

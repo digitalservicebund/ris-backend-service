@@ -1,4 +1,4 @@
-import { MetadataSectionName, MetadatumType } from "@/domain/Norm"
+import { MetadataSectionName, MetadatumType } from "@/domain/norm"
 import httpClient from "@/services/httpClient"
 import {
   editNormFrame,

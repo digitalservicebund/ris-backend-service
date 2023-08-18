@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { computed, ref, watch } from "vue"
-import { Metadata, NormCategory } from "@/domain/Norm"
+import { Metadata, NormCategory } from "@/domain/norm"
 import CheckboxInput from "@/shared/components/input/CheckboxInput.vue"
 import ChipsInput from "@/shared/components/input/ChipsInput.vue"
 import InputField, {

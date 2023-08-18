@@ -3,7 +3,7 @@ import { importNormViaApi, loadJurisTestFile } from "./e2e-utils"
 import { normData } from "./testdata/norm_basic"
 import { FieldType, MetadataInputSection } from "./utilities"
 import { FOOTNOTE_LABELS } from "@/components/footnote/types"
-import { MetadataSectionName, Norm, NormCategory } from "@/domain/Norm"
+import { MetadataSectionName, Norm, NormCategory } from "@/domain/norm"
 
 type MyFixtures = {
   normData: NormData

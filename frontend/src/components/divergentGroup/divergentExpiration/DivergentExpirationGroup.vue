@@ -3,7 +3,7 @@ import { storeToRefs } from "pinia"
 import { computed, ref, watch } from "vue"
 import DivergentDefinedInputGroup from "@/components/divergentGroup/DivergentDefinedInputGroup.vue"
 import DivergentUndefinedInputGroup from "@/components/divergentGroup/DivergentUndefinedInputGroup.vue"
-import { Metadata, MetadataSectionName, MetadataSections } from "@/domain/Norm"
+import { Metadata, MetadataSectionName, MetadataSections } from "@/domain/norm"
 import InputField, {
   LabelPosition,
 } from "@/shared/components/input/InputField.vue"

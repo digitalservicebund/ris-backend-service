@@ -2,7 +2,7 @@ import userEvent from "@testing-library/user-event"
 import { render, screen, fireEvent } from "@testing-library/vue"
 import { createPinia, setActivePinia } from "pinia"
 import DateOrYearInputGroup from "@/components/DateOrYearInputGroup.vue"
-import { Metadata } from "@/domain/Norm"
+import { Metadata } from "@/domain/norm"
 
 function renderComponent(options?: {
   ariaLabel?: string

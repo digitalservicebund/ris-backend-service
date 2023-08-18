@@ -2,7 +2,7 @@
 import { computed, ref, watch } from "vue"
 import NoteStatusIndicationGroup from "@/components/statusIndication/NoteStatusIndicationGroup.vue"
 import UpdateStatusIndicationGroup from "@/components/statusIndication/UpdateStatusIndicationGroup.vue"
-import { Metadata, MetadataSectionName, MetadataSections } from "@/domain/Norm"
+import { Metadata, MetadataSectionName, MetadataSections } from "@/domain/norm"
 import InputField, {
   LabelPosition,
 } from "@/shared/components/input/InputField.vue"

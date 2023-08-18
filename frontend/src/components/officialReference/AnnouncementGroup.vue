@@ -4,7 +4,7 @@ import DigitalAnnouncementInputGroup from "@/components/officialReference/Digita
 import EuAnnouncementInputGroup from "@/components/officialReference/EuAnnouncementInputGroup.vue"
 import OtherOfficialAnnouncementInputGroup from "@/components/officialReference/OtherOfficialAnnouncementInputGroup.vue"
 import PrintAnnouncementInputGroup from "@/components/officialReference/PrintAnnouncementInputGroup.vue"
-import { Metadata, MetadataSectionName, MetadataSections } from "@/domain/Norm"
+import { Metadata, MetadataSectionName, MetadataSections } from "@/domain/norm"
 import InputField, {
   LabelPosition,
 } from "@/shared/components/input/InputField.vue"

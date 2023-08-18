@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { watch } from "vue"
 import DateOrYearInputGroup from "@/components/DateOrYearInputGroup.vue"
-import { Metadata } from "@/domain/Norm"
+import { Metadata } from "@/domain/norm"
 
 interface Props {
   modelValue: Metadata

@@ -7,7 +7,7 @@ import {
   MetadataInputSection,
 } from "./types"
 import { FOOTNOTE_LABELS } from "@/components/footnote/types"
-import { MetadatumType } from "@/domain/Norm"
+import { MetadatumType } from "@/domain/norm"
 
 type FieldFiller<T> = (page: Page, id: string, value: T) => Promise<void>
 

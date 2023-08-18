@@ -5,7 +5,7 @@ import {
   encodeFlatMetadata,
 } from "./conversions"
 import { NormListResponseSchema, NormResponseSchema } from "./schemas"
-import { FlatMetadata, MetadataSections, Norm } from "@/domain/Norm"
+import { FlatMetadata, MetadataSections, Norm } from "@/domain/norm"
 import httpClient, { ServiceResponse } from "@/services/httpClient"
 import { ValidationError } from "@/shared/components/input/types"
 import errorMessages from "@/shared/i18n/errors.json"

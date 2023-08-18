@@ -2,7 +2,7 @@ import userEvent from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
 import { createPinia, setActivePinia } from "pinia"
 import CategorizedReferenceInputGroup from "@/components/categorizedReference/CategorizedReferenceInputGroup.vue"
-import { Metadata } from "@/domain/Norm"
+import { Metadata } from "@/domain/norm"
 
 function renderComponent(options?: { modelValue?: Metadata }) {
   const props = {

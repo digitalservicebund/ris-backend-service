@@ -1,5 +1,5 @@
 import { createTextVNode, VNode } from "vue"
-import { Metadata } from "@/domain/Norm"
+import { Metadata } from "@/domain/norm"
 import { getLabel } from "@/helpers/generalSummarizer"
 import {
   normsMetadataSummarizer,

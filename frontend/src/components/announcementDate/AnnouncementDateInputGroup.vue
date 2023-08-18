@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { produce } from "immer"
 import { computed } from "vue"
-import { Metadata } from "@/domain/Norm"
+import { Metadata } from "@/domain/norm"
 import DateInput from "@/shared/components/input/DateInput.vue"
 import InputField, {
   LabelPosition,

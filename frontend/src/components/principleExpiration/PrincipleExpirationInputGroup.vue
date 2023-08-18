@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { computed, ref, watch } from "vue"
 import DateUndefinedDateInputGroup from "@/components/DateUndefinedDateInputGroup.vue"
-import { Metadata, UndefinedDate } from "@/domain/Norm"
+import { Metadata, UndefinedDate } from "@/domain/norm"
 import InputField, {
   LabelPosition,
 } from "@/shared/components/input/InputField.vue"

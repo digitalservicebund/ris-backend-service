@@ -2,7 +2,7 @@ import userEvent from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
 import { createPinia, setActivePinia } from "pinia"
 import DocumentTypeInputGroup from "@/components/documentType/DocumentTypeInputGroup.vue"
-import { Metadata, NormCategory } from "@/domain/Norm"
+import { Metadata, NormCategory } from "@/domain/norm"
 
 function renderComponent(options?: { modelValue?: Metadata }) {
   const props = {

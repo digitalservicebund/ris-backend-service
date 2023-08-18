@@ -10,7 +10,7 @@ import {
   NormCategory,
   Paragraph,
   UndefinedDate,
-} from "@/domain/Norm"
+} from "@/domain/norm"
 import {
   InputType,
   BaseInputAttributes,

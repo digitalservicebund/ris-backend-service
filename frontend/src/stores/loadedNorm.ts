@@ -1,6 +1,6 @@
 import { defineStore } from "pinia"
 import { ref } from "vue"
-import { Norm } from "@/domain/Norm"
+import { Norm } from "@/domain/norm"
 import { ServiceResponse } from "@/services/httpClient"
 import { editNormFrame, getNormByGuid } from "@/services/norms"
 

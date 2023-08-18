@@ -2,7 +2,7 @@ import userEvent from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
 import { createPinia, setActivePinia } from "pinia"
 import AnnouncementDateInputGroup from "@/components/announcementDate/AnnouncementDateInputGroup.vue"
-import { Metadata } from "@/domain/Norm"
+import { Metadata } from "@/domain/norm"
 
 type AnnouncementDateInputGroupProps = InstanceType<
   typeof AnnouncementDateInputGroup

@@ -1,5 +1,5 @@
 import dayjs from "dayjs"
-import { Metadata, UndefinedDate } from "@/domain/Norm"
+import { Metadata, UndefinedDate } from "@/domain/norm"
 
 export function getLabel(value: UndefinedDate): string {
   switch (value) {

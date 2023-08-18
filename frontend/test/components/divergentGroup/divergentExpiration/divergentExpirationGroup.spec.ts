@@ -8,7 +8,7 @@ import {
   MetadataSections,
   MetadatumType,
   UndefinedDate,
-} from "@/domain/Norm"
+} from "@/domain/norm"
 import { getNormByGuid } from "@/services/norms"
 import { useLoadedNormStore } from "@/stores/loadedNorm"
 import { generateNorm } from "~/test-helper/dataGenerators"

@@ -3,7 +3,7 @@ import { render, screen } from "@testing-library/vue"
 import { createPinia, setActivePinia } from "pinia"
 import { describe, test } from "vitest"
 import UpdateStatusIndicationGroup from "@/components/statusIndication/UpdateStatusIndicationGroup.vue"
-import { MetadataSectionName } from "@/domain/Norm"
+import { MetadataSectionName } from "@/domain/norm"
 
 type UpdateStatusIndicationGroupProps = InstanceType<
   typeof UpdateStatusIndicationGroup

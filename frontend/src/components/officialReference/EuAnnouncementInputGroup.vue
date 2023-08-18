@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { computed, ref, watch } from "vue"
-import { Metadata } from "@/domain/Norm"
+import { Metadata } from "@/domain/norm"
 import ChipsInput from "@/shared/components/input/ChipsInput.vue"
 import InputField from "@/shared/components/input/InputField.vue"
 import TextInput from "@/shared/components/input/TextInput.vue"

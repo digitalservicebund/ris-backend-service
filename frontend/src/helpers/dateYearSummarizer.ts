@@ -1,5 +1,5 @@
 import dayjs from "dayjs"
-import { Metadata } from "@/domain/Norm"
+import { Metadata } from "@/domain/norm"
 
 export function dateYearSummarizer(data: Metadata): string {
   if (!data) return ""

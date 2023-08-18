@@ -6,7 +6,7 @@ import {
   MetadataSectionName,
   MetadataSections,
   MetadatumType,
-} from "@/domain/Norm"
+} from "@/domain/norm"
 
 function renderComponent(options?: { modelValue?: MetadataSections }) {
   const props = {

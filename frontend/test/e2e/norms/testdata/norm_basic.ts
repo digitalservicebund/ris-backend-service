@@ -1,5 +1,5 @@
 import { NormData } from "../fixtures"
-import { NormCategory, UndefinedDate } from "@/domain/Norm"
+import { NormCategory, UndefinedDate } from "@/domain/norm"
 
 export const normData: NormData = {
   jurisZipFileName: "Tierarznei.3-0_multi.zip",

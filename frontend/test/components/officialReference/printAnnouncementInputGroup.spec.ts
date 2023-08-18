@@ -2,7 +2,7 @@ import userEvent from "@testing-library/user-event"
 import { render, screen, within } from "@testing-library/vue"
 import { createPinia, setActivePinia } from "pinia"
 import PrintAnnouncementInputGroup from "@/components/officialReference/PrintAnnouncementInputGroup.vue"
-import { Metadata } from "@/domain/Norm"
+import { Metadata } from "@/domain/norm"
 
 function renderComponent(options?: { modelValue?: Metadata }) {
   const props = {

@@ -1,4 +1,4 @@
-import { MetadatumType } from "@/domain/Norm"
+import { MetadatumType } from "@/domain/norm"
 
 export type FootnoteSection = {
   type?: MetadatumType

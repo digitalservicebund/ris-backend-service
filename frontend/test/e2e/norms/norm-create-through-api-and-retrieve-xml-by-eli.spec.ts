@@ -4,7 +4,7 @@ import { openNorm, saveNormFrame } from "./e2e-utils"
 import { testWithImportedNorm } from "./fixtures"
 import { normData as norm } from "./testdata/norm_basic"
 import { FieldType, fillInputField } from "./utilities"
-import { MetadataSectionName, MetadatumType } from "@/domain/Norm"
+import { MetadataSectionName, MetadatumType } from "@/domain/norm"
 
 testWithImportedNorm(
   "Check if XML can be retrieved by ELI and content is correct",

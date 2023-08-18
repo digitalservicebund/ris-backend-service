@@ -1,6 +1,6 @@
 import { createTextVNode, VNode } from "vue"
 import { NORM_CATEGORY_TRANSLATIONS } from "@/components/divergentGroup/divergentSummaryFunctions"
-import { Metadata } from "@/domain/Norm"
+import { Metadata } from "@/domain/norm"
 import {
   normsMetadataSummarizer,
   SummarizerDataSet,

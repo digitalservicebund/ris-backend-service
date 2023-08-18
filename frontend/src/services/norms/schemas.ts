@@ -3,7 +3,7 @@ import {
   MetadataSectionName,
   FlatMetadata,
   NormBase,
-} from "@/domain/Norm"
+} from "@/domain/norm"
 
 type NullableType<Type> = {
   [Property in keyof Type]: Type[Property] | null
