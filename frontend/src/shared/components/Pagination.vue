@@ -5,20 +5,20 @@ import { ServiceResponse } from "@/services/httpClient"
 
 const props = withDefaults(
   defineProps<{
-    page: Page<any> // eslint-disable-line @typescript-eslint/no-explicit-any
+    page?: Page<any> // eslint-disable-line @typescript-eslint/no-explicit-any
     navigationPosition?: "top" | "bottom"
   }>(),
-  { navigationPosition: "top" },
+  { page: undefined, navigationPosition: "top" },
 )
 
 const emits = defineEmits<(e: "updatePage", page: number) => void>()
 
 async function nextPage() {
-  !props.page.last && emits("updatePage", props.page.number + 1)
+  props.page && !props.page.last && emits("updatePage", props.page.number + 1)
 }
 
 async function previousPage() {
-  !props.page.first && emits("updatePage", props.page.number - 1)
+  props.page && !props.page?.first && emits("updatePage", props.page.number - 1)
 }
 </script>
 

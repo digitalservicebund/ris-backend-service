@@ -5,7 +5,9 @@ import { caselawTest } from "./fixtures"
 test.describe("create a doc unit and delete it again", () => {
   test("create and delete new doc unit", async ({ page }) => {
     await page.goto("/")
-    await page.locator("button >> text=Neue Dokumentationseinheit").click()
+    await page
+      .getByRole("button", { name: "Neue Dokumentationseinheit", exact: true })
+      .click()
     await page.waitForSelector("text=oder Datei auswählen")
     await expect(page).toHaveURL(
       /\/caselaw\/documentunit\/[A-Z0-9]{13}\/files$/,

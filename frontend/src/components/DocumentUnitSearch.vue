@@ -59,13 +59,11 @@ async function handleReset() {
       @search="handleSearch"
     />
     <Pagination
-      v-if="currentPage"
       navigation-position="bottom"
       :page="currentPage"
       @update-page="search"
     >
       <DocumentUnitList
-        v-if="documentUnitListEntries"
         class="grow"
         :document-unit-list-entries="documentUnitListEntries"
         @delete-document-unit="handleDelete"

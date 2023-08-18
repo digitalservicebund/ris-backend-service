@@ -15,7 +15,12 @@ test.describe("authentication", () => {
     documentNumber,
   }) => {
     await page.goto("/")
-    await expect(page.getByText("Neue Dokumentationseinheit")).toBeVisible()
+    await expect(
+      page.getByRole("button", {
+        name: "Neue Dokumentationseinheit",
+        exact: true,
+      }),
+    ).toBeVisible()
 
     await page.context().clearCookies()
 
@@ -29,7 +34,12 @@ test.describe("authentication", () => {
     documentNumber,
   }) => {
     await page.goto("/")
-    await expect(page.getByText("Neue Dokumentationseinheit")).toBeVisible()
+    await expect(
+      page.getByRole("button", {
+        name: "Neue Dokumentationseinheit",
+        exact: true,
+      }),
+    ).toBeVisible()
 
     await page.context().clearCookies()
 
@@ -38,12 +48,17 @@ test.describe("authentication", () => {
     await expect(page.getByLabel("E-Mailadresse")).toBeVisible()
   })
 
-  test("should should remember location after new login", async ({
+  test("should remember location after new login", async ({
     page,
     documentNumber,
   }) => {
     await page.goto("/")
-    await expect(page.getByText("Neue Dokumentationseinheit")).toBeVisible()
+    await expect(
+      page.getByRole("button", {
+        name: "Neue Dokumentationseinheit",
+        exact: true,
+      }),
+    ).toBeVisible()
     const validCookies = await page.context().cookies()
 
     await page.context().clearCookies()

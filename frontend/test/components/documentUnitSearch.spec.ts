@@ -1,18 +1,43 @@
 import userEvent from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
 import { createPinia, setActivePinia } from "pinia"
+import { createRouter, createWebHistory } from "vue-router"
 import DocumentUnitSearch from "@/components/DocumentUnitSearch.vue"
 import DocumentUnitListEntry from "@/domain/documentUnitListEntry"
 import documentUnitService from "@/services/documentUnitService"
 
 function renderComponent() {
   const user = userEvent.setup()
+
+  const router = createRouter({
+    history: createWebHistory(),
+    routes: [
+      {
+        path: "/caselaw/documentUnit/new",
+        name: "new",
+        component: {},
+      },
+      {
+        path: "/",
+        name: "home",
+        component: {},
+      },
+      {
+        path: "/caselaw/documentUnit/:documentNumber/categories",
+        name: "caselaw-documentUnit-documentNumber-categories",
+        component: {},
+      },
+      {
+        path: "/caselaw/documentUnit/:documentNumber/files",
+        name: "caselaw-documentUnit-documentNumber-files",
+        component: {},
+      },
+    ],
+  })
   return {
     user,
     ...render(DocumentUnitSearch, {
-      global: {
-        stubs: { routerLink: { template: "<a><slot/></a>" } },
-      },
+      global: { plugins: [router] },
     }),
   }
 }
@@ -42,8 +67,8 @@ describe("Documentunit Search", () => {
               jurisShortcut: "documentTypeShortcut",
               label: "documentType",
             },
-            documentNumber: "test documentNumber",
-            fileNumber: "test fileNumber",
+            documentNumber: "documentNumber",
+            fileNumber: "fileNumber",
           }),
         ],
         size: 0,
@@ -87,7 +112,7 @@ describe("Documentunit Search", () => {
     await user.click(
       screen.getByLabelText("Nach Dokumentationseinheiten suchen"),
     )
-    expect(screen.getAllByText(/test documentNumber/).length).toBe(1)
+    expect(screen.getAllByText(/documentNumber/).length).toBe(1)
   })
 
   test("click on 'Suche zurücksetzen' resets all input values and search results", async () => {
@@ -116,10 +141,10 @@ describe("Documentunit Search", () => {
     await user.click(
       screen.getByLabelText("Nach Dokumentationseinheiten suchen"),
     )
-    expect(screen.getAllByText(/test documentNumber/).length).toBe(1)
+    expect(screen.getAllByText(/documentNumber/).length).toBe(1)
 
     await user.click(screen.getByLabelText("Suche zurücksetzen"))
-    expect(screen.queryByText(/test documentNumber/)).not.toBeInTheDocument()
+    expect(screen.queryByText(/documentNumber/)).not.toBeInTheDocument()
 
     expect(screen.getByLabelText("Gerichtstyp Suche")).toHaveValue("")
     expect(screen.getByLabelText("Gerichtsort Suche")).toHaveValue("")
@@ -131,5 +156,41 @@ describe("Documentunit Search", () => {
     expect(
       screen.queryByLabelText("Nur fehlerhafte Dokumentationseinheiten"),
     ).not.toBeInTheDocument()
+  })
+
+  test("empty search result string is different on initial load and after search", async () => {
+    vi.spyOn(
+      documentUnitService,
+      "searchByDocumentUnitSearchInput",
+    ).mockImplementation(() =>
+      Promise.resolve({
+        status: 200,
+        data: {
+          content: [],
+          size: 0,
+          totalElements: 0,
+          totalPages: 0,
+          number: 0,
+          numberOfElements: 0,
+          first: true,
+          last: false,
+        },
+      }),
+    )
+
+    const { user } = renderComponent()
+
+    expect(
+      screen.getByText(/Starten Sie die Suche oder erstellen Sie eine/),
+    ).toBeVisible()
+
+    await user.click(screen.getByLabelText("Nur meine Dokstelle Filter"))
+    await user.type(screen.getByLabelText("Gerichtstyp Suche"), "ABCDEFG")
+
+    await user.click(
+      screen.getByLabelText("Nach Dokumentationseinheiten suchen"),
+    )
+
+    expect(screen.getByText(/Keine Ergebnisse gefunden./)).toBeVisible()
   })
 })

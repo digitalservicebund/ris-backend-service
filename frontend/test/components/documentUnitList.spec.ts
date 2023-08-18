@@ -63,7 +63,7 @@ describe("documentUnit list", () => {
   test("renders fallback if no documentUnitsListEntries found", async () => {
     renderComponent([])
 
-    await screen.findByText("Keine Dokumentationseinheiten gefunden")
+    expect(screen.getByText(/Keine Ergebnisse gefunden./)).toBeVisible()
   })
 
   test("renders documentUnits", async () => {
@@ -72,7 +72,7 @@ describe("documentUnit list", () => {
     await screen.findByText("123")
     await screen.findByText("10.02.2022")
     expect(
-      screen.queryByText("Keine Dokumentationseinheiten gefunden"),
+      screen.queryByText("Starten Sie die Suche oder erstellen Sie eine"),
     ).not.toBeInTheDocument()
   })
 
@@ -85,7 +85,7 @@ describe("documentUnit list", () => {
     await screen.findByText("10.02.2022")
     await screen.findByText("foo")
     expect(
-      screen.queryByText("Keine Dokumentationseinheiten gefunden"),
+      screen.queryByText("Starten Sie die Suche oder erstellen Sie eine"),
     ).not.toBeInTheDocument()
   })
 
@@ -98,7 +98,7 @@ describe("documentUnit list", () => {
     await screen.findByText("10.02.2022")
     await screen.findByText("Test")
     expect(
-      screen.queryByText("Keine Dokumentationseinheiten gefunden"),
+      screen.queryByText("Starten Sie die Suche oder erstellen Sie eine"),
     ).not.toBeInTheDocument()
   })
 
