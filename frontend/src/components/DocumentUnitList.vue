@@ -4,12 +4,15 @@ import { computed, ref } from "vue"
 import { useRouter } from "vue-router"
 import DocumentUnitListEntry from "../domain/documentUnitListEntry"
 import { useStatusBadge } from "@/composables/useStatusBadge"
+import { ResponseError } from "@/services/httpClient"
 import IconBadge from "@/shared/components/IconBadge.vue"
+import InfoModal from "@/shared/components/InfoModal.vue"
 import TextButton from "@/shared/components/input/TextButton.vue"
 import PopupModal from "@/shared/components/PopupModal.vue"
 
 const props = defineProps<{
-  documentUnitListEntries: DocumentUnitListEntry[] | undefined
+  documentUnitListEntries?: DocumentUnitListEntry[]
+  searchResponseError?: ResponseError
 }>()
 
 const emit = defineEmits<{
@@ -176,7 +179,16 @@ function onDelete() {
         </div>
       </div>
     </div>
-    <div v-if="emptyStatus" class="my-112 grid justify-items-center">
+    <div v-if="searchResponseError" class="mt-24">
+      <InfoModal
+        :description="searchResponseError.description"
+        :title="searchResponseError.title"
+      />
+    </div>
+    <div
+      v-if="emptyStatus && !searchResponseError"
+      class="my-112 grid justify-items-center"
+    >
       <span class="">{{ emptyStatus }}</span>
       <TextButton
         aria-label="Neue Dokumentationseinheit erstellen"

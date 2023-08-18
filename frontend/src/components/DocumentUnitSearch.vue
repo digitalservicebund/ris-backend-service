@@ -12,6 +12,7 @@ const currentPage = ref<Page<DocumentUnitListEntry>>()
 const searchInput = ref<DocumentUnitListEntry | undefined>(undefined)
 
 const itemsPerPage = 30
+const searchResponseError = ref()
 
 async function search(page = 0, listEntry?: DocumentUnitSearchInput) {
   if (listEntry) {
@@ -25,8 +26,10 @@ async function search(page = 0, listEntry?: DocumentUnitSearchInput) {
   if (response.data) {
     documentUnitListEntries.value = response.data.content
     currentPage.value = response.data
-  } else {
-    console.error("could not load list entries")
+  }
+
+  if (response.error) {
+    searchResponseError.value = response.error
   }
 }
 
@@ -66,6 +69,7 @@ async function handleReset() {
       <DocumentUnitList
         class="grow"
         :document-unit-list-entries="documentUnitListEntries"
+        :search-response-error="searchResponseError"
         @delete-document-unit="handleDelete"
       />
     </Pagination>

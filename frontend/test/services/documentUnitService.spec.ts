@@ -17,7 +17,10 @@ describe("documentUnitService", () => {
   it("appends correct error message if status 500", async () => {
     const result = await service.searchByDocumentUnitSearchInput(0, 20)
     expect(result.error?.title).toEqual(
-      "Die Suche nach passenden Dokumentationseinheit konnte nicht ausgeführt werden.",
+      "Die Suchergebnisse konnten nicht geladen werden.",
+    )
+    expect(result.error?.description).toEqual(
+      "Bitte versuchen Sie es später erneut.",
     )
   })
 })
