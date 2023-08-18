@@ -24,3 +24,9 @@ jobs:
     with:
       imageName: ${{ matrix.imageName }}
       filePath: ${{ matrix.filePath }}
+
+  trigger-pipeline:
+    needs: bump-chainguard-images
+    runs-on: ubuntu-latest
+    steps:
+      - run: gh workflow run pipeline.yml
