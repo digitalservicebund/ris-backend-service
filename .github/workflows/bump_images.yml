@@ -20,7 +20,7 @@ jobs:
             filePath: frontend/Dockerfile.prod
           - imageName: redis
             filePath: compose.yaml
-    uses: ./.github/workflows/_bump-chainguard-digest.yml
+    uses: digitalservicebund/github-actions/bump-chainguard-digest@08b70239e9646421ae060d7a61ebb49b32b2ae13
     with:
       imageName: ${{ matrix.imageName }}
       filePath: ${{ matrix.filePath }}
