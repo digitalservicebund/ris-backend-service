@@ -16,14 +16,14 @@ jobs:
       - name: bump nginx image
         uses: digitalservicebund/github-actions/bump-chainguard-digest@961e1cd525f8af56785a024bafc2b3b6a2f7449a
         with:
-          imageName: nginx
-          filePath: frontend/Dockerfile.prod
+          image_name: nginx
+          file_path: frontend/Dockerfile.prod
           github_token: ${{ github.token }}
       - name: bump redis image
         uses: digitalservicebund/github-actions/bump-chainguard-digest@961e1cd525f8af56785a024bafc2b3b6a2f7449a
         with:
-          imageName: redis
-          filePath: compose.yaml
+          image_name: redis
+          file_path: compose.yaml
           github_token: ${{ github.token }}
 
   trigger-pipeline:
