@@ -11,21 +11,16 @@ class MetadataSectionBuilder {
   var name: MetadataSectionName = MetadataSectionName.LEAD
   var order: Int = 1
   private val metadata = mutableListOf<Metadatum<*>>()
-  private val sections = mutableListOf<MetadataSection>()
+  private val metadataSections = mutableListOf<MetadataSection>()
 
   fun metadata(block: Metadata.() -> Unit) = metadata.addAll(Metadata().apply(block))
 
-  fun sections(block: Metadatasections.() -> Unit) =
-      sections.addAll(Metadatasections().apply(block))
+  fun metadataSections(block: MetadataSections.() -> Unit) =
+      metadataSections.addAll(MetadataSections().apply(block))
 
-  fun build(): MetadataSection = MetadataSection(name, metadata, order, sections)
+  fun build(): MetadataSection = MetadataSection(name, metadata, order, metadataSections)
 }
 
 class Metadata : ArrayList<Metadatum<*>>() {
   fun metadatum(block: MetadatumBuilder.() -> Unit) = add(MetadatumBuilder().apply(block).build())
-}
-
-class Metadatasections : ArrayList<MetadataSection>() {
-  fun section(block: MetadataSectionBuilder.() -> Unit) =
-      add(MetadataSectionBuilder().apply(block).build())
 }

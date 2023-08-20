@@ -39,7 +39,7 @@ interface NormsMapper {
       normDto: NormDto,
       contentsNormLevel: List<ContentElement>,
       fileReferences: List<FileReference>,
-      dtoMetadatasections: List<MetadataSectionDto>,
+      dtoMetadataSections: List<MetadataSectionDto>,
       dtoMetadata: List<MetadatumDto> = emptyList(),
       sectionsDto: List<SectionDto>,
       contentsNotNormLevel: List<ContentDto> = emptyList(),
@@ -48,11 +48,11 @@ interface NormsMapper {
 
     // 1. Objective: move children from parent level to their respective parents because otherwise
     // we can't instantite the parent MetadataSection
-    dtoMetadatasections
+    dtoMetadataSections
         .filter { dtoSectionToFilter -> dtoSectionToFilter.sectionGuid == null }
         .map { dtoCurrentParentSection ->
           val dtoChildrenOfCurrentParentSection =
-              dtoMetadatasections.filter { it2 -> it2.sectionGuid == dtoCurrentParentSection.guid }
+              dtoMetadataSections.filter { it2 -> it2.sectionGuid == dtoCurrentParentSection.guid }
           if (dtoChildrenOfCurrentParentSection.isEmpty()) {
             // Parent section without children, meaning with metadata
             val dtoMetadatumOfCurrentParentSection =

@@ -82,7 +82,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import utils.createRandomNorm
-import utils.createSimpleMetadatasections
+import utils.createSimpleMetadataSections
 
 class JurisConverterTest {
 
@@ -727,7 +727,7 @@ class JurisConverterTest {
 
     @Test
     fun `it correctly maps the norm metadata values including the order`() {
-      val normWithMetadata = norm.copy(metadataSections = createSimpleMetadatasections())
+      val normWithMetadata = norm.copy(metadataSections = createSimpleMetadataSections())
       val command =
           GenerateNormFileOutputPort.Command(normWithMetadata, generatedZipFile.readBytes())
       val converter = JurisConverter()

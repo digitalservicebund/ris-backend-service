@@ -52,7 +52,7 @@ import org.springframework.data.r2dbc.dialect.PostgresDialect
 import org.springframework.r2dbc.core.DatabaseClient
 import reactor.test.StepVerifier
 import utils.createRandomNorm
-import utils.createSimpleMetadatasections
+import utils.createSimpleMetadataSections
 import utils.factory.norm
 
 @DataR2dbcTest
@@ -459,7 +459,7 @@ class NormsServiceTest : PostgresTestcontainerIntegrationTest() {
 
   @Test
   fun `save norm with metadata and retrieve it by its GUID`() {
-    val norm = NORM.copy(metadataSections = createSimpleMetadatasections())
+    val norm = NORM.copy(metadataSections = createSimpleMetadataSections())
     val saveCommand = SaveNormOutputPort.Command(norm)
     val guidQuery = GetNormByGuidOutputPort.Query(norm.guid)
 
@@ -615,7 +615,7 @@ class NormsServiceTest : PostgresTestcontainerIntegrationTest() {
 
   @Test
   fun `it replaces the metadata when editing a norm`() {
-    val initialNorm = NORM.copy(metadataSections = createSimpleMetadatasections())
+    val initialNorm = NORM.copy(metadataSections = createSimpleMetadataSections())
     val saveCommand = SaveNormOutputPort.Command(initialNorm)
     val guidQuery = GetNormByGuidOutputPort.Query(initialNorm.guid)
 

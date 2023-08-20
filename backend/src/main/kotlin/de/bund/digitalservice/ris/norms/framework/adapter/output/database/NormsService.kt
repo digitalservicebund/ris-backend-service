@@ -98,13 +98,13 @@ class NormsService(
             .map(::fileReferenceToEntity)
             .collectList()
 
-    val findMetadatasectionsRequest =
+    val findMetadataSectionsRequest =
         findNormRequest
             .flatMapMany { metadataSectionsRepository.findByNormGuid(it.guid) }
             .collectList()
 
     val findMetadataRequest =
-        findMetadatasectionsRequest
+        findMetadataSectionsRequest
             .flatMapMany {
               metadataRepository.findBySectionGuidIn(it.map { section -> section.guid })
             }
@@ -124,7 +124,7 @@ class NormsService(
             findNormRequest,
             contentElementsNormLevel,
             findFileReferencesRequest,
-            findMetadatasectionsRequest,
+            findMetadataSectionsRequest,
             findMetadataRequest,
             findAllSectionsRequest,
             findContentOfSectionsRequest)
@@ -139,11 +139,11 @@ class NormsService(
     val saveContents =
         saveNormRequest.flatMapMany { saveNormContents(command.norm.contents, it.guid) }
     val saveFileReferencesRequest = saveNormRequest.flatMapMany { saveNormFiles(command.norm, it) }
-    val saveMetadatasectionsRequest =
+    val saveMetadataSectionsRequest =
         saveNormRequest.flatMapMany { saveNormSectionsWithMetadata(command.norm, it) }
 
     return Mono.`when`(
-            saveSections, saveContents, saveFileReferencesRequest, saveMetadatasectionsRequest)
+            saveSections, saveContents, saveFileReferencesRequest, saveMetadataSectionsRequest)
         .thenReturn(true)
   }
 

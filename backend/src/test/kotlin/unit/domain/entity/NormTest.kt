@@ -6,7 +6,7 @@ import java.time.LocalDate
 import java.util.UUID
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
-import utils.createSimpleMetadatasections
+import utils.createSimpleMetadataSections
 import utils.factory.norm
 
 class NormTest {
@@ -31,11 +31,11 @@ class NormTest {
   @Test
   fun `can create a norm with a list of metadata`() {
     val guid = UUID.randomUUID()
-    val sections = createSimpleMetadatasections()
+    val sections = createSimpleMetadataSections()
     val norm =
         Norm(
             guid = guid,
-            metadataSections = createSimpleMetadatasections(),
+            metadataSections = createSimpleMetadataSections(),
         )
 
     assertThat(norm.metadataSections.flatMap { it.metadata }).hasSize(2)
@@ -235,8 +235,8 @@ class NormTest {
       metadataSections {
         metadataSection {
           name = MetadataSectionName.OFFICIAL_REFERENCE
-          sections {
-            section {
+          metadataSections {
+            metadataSection {
               name = MetadataSectionName.PRINT_ANNOUNCEMENT
               metadata {
                 metadatum {

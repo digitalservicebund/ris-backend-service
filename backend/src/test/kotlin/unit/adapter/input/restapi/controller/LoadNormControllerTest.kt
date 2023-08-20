@@ -40,7 +40,7 @@ import reactor.core.publisher.Mono
 import utils.convertLoadNormResponseTestSchemaToJson
 import utils.createContentElements
 import utils.createRandomNorm
-import utils.createSimpleMetadatasections
+import utils.createSimpleMetadataSections
 import utils.createSimpleSections
 
 @ExtendWith(SpringExtension::class)
@@ -94,7 +94,7 @@ class LoadNormControllerTest {
     val norm =
         createRandomNorm()
             .copy(
-                metadataSections = createSimpleMetadatasections(),
+                metadataSections = createSimpleMetadataSections(),
                 sections = createSimpleSections(),
                 contents = createContentElements(),
             )

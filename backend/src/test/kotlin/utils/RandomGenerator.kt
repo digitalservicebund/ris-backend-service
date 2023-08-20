@@ -31,7 +31,7 @@ import org.jeasy.random.FieldPredicates.named
 
 fun createRandomNormFameProperties(): EditNormFrameUseCase.NormFrameProperties {
   val parameters: EasyRandomParameters =
-      EasyRandomParameters().randomize(named("metadataSections")) { createSimpleMetadatasections() }
+      EasyRandomParameters().randomize(named("metadataSections")) { createSimpleMetadataSections() }
   return EasyRandom(parameters).nextObject(EditNormFrameUseCase.NormFrameProperties::class.java)
 }
 
@@ -43,7 +43,7 @@ fun createRandomEditNormRequestTestSchema():
             // needed for string date fields
             createRandomLocalDateInString()
           }
-          .randomize(named("metadataSections")) { createSimpleMetadatasections() }
+          .randomize(named("metadataSections")) { createSimpleMetadataSections() }
           .randomize(named("documentNormCategory")) { NormCategory.values().random().name }
   return EasyRandom(parameters)
       .nextObject(EditNormFrameControllerTest.NormFramePropertiesTestRequestSchema::class.java)
@@ -146,7 +146,7 @@ private fun createRandomLocalDateInString(): String {
   return EasyRandom().nextObject(LocalDate::class.java).toString()
 }
 
-fun createSimpleMetadatasections(): List<MetadataSection> =
+fun createSimpleMetadataSections(): List<MetadataSection> =
     listOf(
         MetadataSection(
             MetadataSectionName.NORM,
