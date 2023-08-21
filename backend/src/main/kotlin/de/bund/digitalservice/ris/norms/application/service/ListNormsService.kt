@@ -19,7 +19,7 @@ class ListNormsService(private val searchNormsOutputAdapter: SearchNormsOutputPo
 
   override fun listNorms(query: ListNormsUseCase.Query): Flux<ListNormsUseCase.NormData> {
     return searchNormsOutputAdapter
-        .searchNorms(SearchNormsOutputPort.Query(query.searchTerm ?: ""))
+        .searchNorms(SearchNormsOutputPort.Query(query.searchTerm ?: "", query.eGesetzgebung))
         .map { mapToNormData(it) }
         .doOnError { exception ->
           logger.error("Error occurred while listing all norms:", exception)

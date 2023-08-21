@@ -1,0 +1,40 @@
+name: Bump images
+
+on:
+  schedule:
+    - cron: "0 0 * * *" # Every day at 8am
+  # Allow to run this workflow manually
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  bump-chainguard-images:
+    runs-on: ubuntu-latest
+    steps:
+      - name: bump nginx image
+        uses: digitalservicebund/github-actions/bump-chainguard-digest@961e1cd525f8af56785a024bafc2b3b6a2f7449a
+        with:
+          image_name: nginx
+          file_path: frontend/Dockerfile.prod
+          github_token: ${{ github.token }}
+      - name: bump redis image
+        uses: digitalservicebund/github-actions/bump-chainguard-digest@961e1cd525f8af56785a024bafc2b3b6a2f7449a
+        with:
+          image_name: redis
+          file_path: compose.yaml
+          github_token: ${{ github.token }}
+
+  trigger-pipeline:
+    needs: bump-chainguard-images
+    runs-on: ubuntu-latest
+    permissions:
+      actions: write
+      contents: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      - run: gh workflow run pipeline.yml
+        env:
+          GH_TOKEN: ${{ github.token }}

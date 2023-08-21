@@ -5,14 +5,24 @@ import { caselawTest as test } from "../../e2e/caselaw/fixtures"
 test.describe("a11y of start page (/caselaw)", () => {
   test("documentUnit list", async ({ page }) => {
     await page.goto("/")
-    await expect(page.locator("text=Neue Dokumentationseinheit")).toBeVisible()
+    await expect(
+      page.getByRole("button", {
+        name: "Neue Dokumentationseinheit",
+        exact: true,
+      }),
+    ).toBeVisible()
     const accessibilityScanResults = await new AxeBuilder({ page }).analyze()
     expect(accessibilityScanResults.violations).toEqual([])
   })
 
   test("delete documentUnit popup", async ({ page, documentNumber }) => {
     await page.goto("/")
-    await expect(page.locator("text=Neue Dokumentationseinheit")).toBeVisible()
+    await expect(
+      page.getByRole("button", {
+        name: "Neue Dokumentationseinheit",
+        exact: true,
+      }),
+    ).toBeVisible()
     await page
       .getByLabel("Dokumentnummer oder Aktenzeichen Suche")
       .fill(documentNumber)

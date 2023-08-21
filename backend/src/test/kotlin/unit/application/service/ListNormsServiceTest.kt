@@ -21,7 +21,7 @@ class ListNormsServiceTest {
   fun `if the search term is missing, it does an empty search for everything`() {
     val searchNormsAdapter = mockk<SearchNormsOutputPort>()
     val service = ListNormsService(searchNormsAdapter)
-    val query = ListNormsUseCase.Query(searchTerm = null)
+    val query = ListNormsUseCase.Query(searchTerm = null, eGesetzgebung = false)
 
     every { searchNormsAdapter.searchNorms(any()) } returns Flux.empty()
 
@@ -36,7 +36,7 @@ class ListNormsServiceTest {
   fun `if the search term is empty, it does an empty search for everything`() {
     val searchNormsAdapter = mockk<SearchNormsOutputPort>()
     val service = ListNormsService(searchNormsAdapter)
-    val query = ListNormsUseCase.Query(searchTerm = "")
+    val query = ListNormsUseCase.Query(searchTerm = "", eGesetzgebung = false)
 
     every { searchNormsAdapter.searchNorms(any()) } returns Flux.empty()
 
@@ -51,7 +51,7 @@ class ListNormsServiceTest {
   fun `if a search term is given, it calls the search adapter with a fuzzy search in all title fields`() {
     val searchNormsAdapter = mockk<SearchNormsOutputPort>()
     val service = ListNormsService(searchNormsAdapter)
-    val query = ListNormsUseCase.Query(searchTerm = "test")
+    val query = ListNormsUseCase.Query(searchTerm = "test", eGesetzgebung = false)
 
     every { searchNormsAdapter.searchNorms(any()) } returns Flux.empty()
 
@@ -68,7 +68,7 @@ class ListNormsServiceTest {
   fun `lists nothing if output adapter provides no norms`() {
     val searchNormsAdapter = mockk<SearchNormsOutputPort>()
     val service = ListNormsService(searchNormsAdapter)
-    val query = ListNormsUseCase.Query()
+    val query = ListNormsUseCase.Query(eGesetzgebung = false)
 
     every { searchNormsAdapter.searchNorms(any()) } returns Flux.empty()
 
@@ -83,7 +83,7 @@ class ListNormsServiceTest {
         Norm(
             UUID.fromString("761b5537-5aa5-4901-81f7-fbf7e040a7c8"),
         )
-    val query = ListNormsUseCase.Query()
+    val query = ListNormsUseCase.Query(eGesetzgebung = false)
 
     every { searchNormsAdapter.searchNorms(any()) } returns Flux.fromArray(arrayOf(norm))
 
@@ -94,6 +94,44 @@ class ListNormsServiceTest {
           it.guid == UUID.fromString("761b5537-5aa5-4901-81f7-fbf7e040a7c8") && it.eli == norm.eli
         }
         .verifyComplete()
+  }
+
+  @Test
+  fun `lists single E-Gesetzgebung norm if output adapter provides only one`() {
+    val searchNormsAdapter = mockk<SearchNormsOutputPort>()
+    val service = ListNormsService(searchNormsAdapter)
+    val norm =
+        Norm(
+            UUID.fromString("b61b5537-5aa5-4901-81f7-fbf7e040a7c8"),
+            eGesetzgebung = true,
+        )
+    val query = ListNormsUseCase.Query(eGesetzgebung = true)
+
+    every { searchNormsAdapter.searchNorms(any()) } returns Flux.fromArray(arrayOf(norm))
+
+    service
+        .listNorms(query)
+        .`as`(StepVerifier::create)
+        .expectNextMatches {
+          it.guid == UUID.fromString("b61b5537-5aa5-4901-81f7-fbf7e040a7c8") && it.eli == norm.eli
+        }
+        .verifyComplete()
+  }
+
+  @Test
+  fun `does not list E-Gesetzgebung norm when querying for non E-Gesetzgebung norms`() {
+    val searchNormsAdapter = mockk<SearchNormsOutputPort>()
+    val service = ListNormsService(searchNormsAdapter)
+    val norm =
+        Norm(
+            UUID.fromString("b61b5537-5aa5-4901-81f7-fbf7e040a7c8"),
+            eGesetzgebung = true,
+        )
+    val query = ListNormsUseCase.Query(eGesetzgebung = false)
+
+    every { searchNormsAdapter.searchNorms(any()) } returns Flux.empty()
+
+    service.listNorms(query).`as`(StepVerifier::create).expectNextCount(0).verifyComplete()
   }
 
   @Test
@@ -136,7 +174,7 @@ class ListNormsServiceTest {
                     ),
                 ),
         )
-    val query = ListNormsUseCase.Query()
+    val query = ListNormsUseCase.Query(eGesetzgebung = false)
 
     every { searchNormsAdapter.searchNorms(any()) } returns
         Flux.fromArray(arrayOf(normOne, normTwo, normThree))

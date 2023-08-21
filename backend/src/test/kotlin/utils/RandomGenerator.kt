@@ -2,11 +2,18 @@ package utils
 
 import de.bund.digitalservice.ris.norms.application.port.input.EditNormFrameUseCase
 import de.bund.digitalservice.ris.norms.domain.entity.Article
+import de.bund.digitalservice.ris.norms.domain.entity.Book
+import de.bund.digitalservice.ris.norms.domain.entity.Closing
+import de.bund.digitalservice.ris.norms.domain.entity.ContentElement
+import de.bund.digitalservice.ris.norms.domain.entity.ContentElementTest
 import de.bund.digitalservice.ris.norms.domain.entity.FileReference
 import de.bund.digitalservice.ris.norms.domain.entity.MetadataSection
 import de.bund.digitalservice.ris.norms.domain.entity.Metadatum
 import de.bund.digitalservice.ris.norms.domain.entity.Norm
 import de.bund.digitalservice.ris.norms.domain.entity.Paragraph
+import de.bund.digitalservice.ris.norms.domain.entity.Part
+import de.bund.digitalservice.ris.norms.domain.entity.Preamble
+import de.bund.digitalservice.ris.norms.domain.entity.SectionElement
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType
 import de.bund.digitalservice.ris.norms.domain.value.NormCategory
@@ -15,7 +22,7 @@ import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.controll
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.schema.MetadataSectionRequestSchema
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.schema.MetadatumRequestSchema
 import java.time.LocalDate
-import java.util.Random
+import java.util.*
 import org.apache.commons.lang3.RandomStringUtils
 import org.jeasy.random.EasyRandom
 import org.jeasy.random.EasyRandomParameters
@@ -24,7 +31,7 @@ import org.jeasy.random.FieldPredicates.named
 
 fun createRandomNormFameProperties(): EditNormFrameUseCase.NormFrameProperties {
   val parameters: EasyRandomParameters =
-      EasyRandomParameters().randomize(named("metadataSections")) { createSimpleSections() }
+      EasyRandomParameters().randomize(named("metadataSections")) { createSimpleMetadataSections() }
   return EasyRandom(parameters).nextObject(EditNormFrameUseCase.NormFrameProperties::class.java)
 }
 
@@ -36,7 +43,7 @@ fun createRandomEditNormRequestTestSchema():
             // needed for string date fields
             createRandomLocalDateInString()
           }
-          .randomize(named("metadataSections")) { createSimpleSections() }
+          .randomize(named("metadataSections")) { createSimpleMetadataSections() }
           .randomize(named("documentNormCategory")) { NormCategory.values().random().name }
   return EasyRandom(parameters)
       .nextObject(EditNormFrameControllerTest.NormFramePropertiesTestRequestSchema::class.java)
@@ -91,7 +98,9 @@ fun createRandomNorm(): Norm {
           }
           .randomize(named("metadataSections")) { emptyList<MetadataSection>() }
           .randomize(named("files")) { emptyList<FileReference>() }
-          .randomize(named("articles")) { emptyList<FileReference>() }
+          .randomize(named("sections")) { emptyList<SectionElement>() }
+          .randomize(named("contents")) { emptyList<ContentElementTest>() }
+          .excludeField(named("eGesetzgebung"))
   return EasyRandom(parameters).nextObject(Norm::class.java)
 }
 
@@ -104,7 +113,7 @@ fun createRandomNormWithCitationDateAndArticles(): Norm {
                       MetadataSectionName.CITATION_DATE,
                       listOf(Metadatum(LocalDate.parse("2002-02-02"), MetadatumType.DATE))),
               ),
-          articles =
+          sections =
               listOf(
                   createRandomArticle().copy(paragraphs = listOf(createRandomParagraph())),
                   createRandomArticle().copy(paragraphs = listOf(createRandomParagraph())),
@@ -118,9 +127,11 @@ fun createRandomFileReference(): FileReference {
 
 fun createRandomArticle(): Article {
   val parameters: EasyRandomParameters =
-      EasyRandomParameters().randomize(named("marker").and(inClass(Article::class.java))) {
-        "§ " + Random().nextInt(1, 50).toString()
-      }
+      EasyRandomParameters()
+          .randomize(named("designation").and(inClass(Article::class.java))) {
+            "§ " + Random().nextInt(1, 50).toString()
+          }
+          .randomize(named("paragraphs")) { emptyList<ContentElementTest>() }
   return EasyRandom(parameters).nextObject(Article::class.java)
 }
 
@@ -136,7 +147,7 @@ private fun createRandomLocalDateInString(): String {
   return EasyRandom().nextObject(LocalDate::class.java).toString()
 }
 
-fun createSimpleSections(): List<MetadataSection> =
+fun createSimpleMetadataSections(): List<MetadataSection> =
     listOf(
         MetadataSection(
             MetadataSectionName.NORM,
@@ -146,5 +157,47 @@ fun createSimpleSections(): List<MetadataSection> =
             ),
         ),
     )
+
+fun createSimpleSections(): List<SectionElement> =
+    listOf(
+        Book("Book 1", UUID.randomUUID(), "1", 1),
+        Book(
+            "Book 2",
+            UUID.randomUUID(),
+            "2",
+            2,
+            childSections =
+                listOf(
+                    Part(
+                        "Part 1",
+                        UUID.randomUUID(),
+                        "1",
+                        1,
+                        childSections =
+                            listOf(
+                                Article(
+                                    "Article 1",
+                                    UUID.randomUUID(),
+                                    "§ 1",
+                                    1,
+                                    paragraphs =
+                                        listOf(
+                                            Paragraph(
+                                                UUID.randomUUID(),
+                                                1,
+                                                "(1)",
+                                                "First paragraph text"),
+                                            Paragraph(
+                                                UUID.randomUUID(),
+                                                2,
+                                                "(2)",
+                                                "Second paragraph text"),
+                                        )))))),
+        Book("Book 3", UUID.randomUUID(), "3", 3))
+
+fun createContentElements(): List<ContentElement> =
+    listOf(
+        Preamble(UUID.randomUUID(), 1, text = "Preamble Text"),
+        Closing(UUID.randomUUID(), 2, text = "Closing Text"))
 
 fun randomString(length: Int = 10): String = RandomStringUtils.randomAlphabetic(length)

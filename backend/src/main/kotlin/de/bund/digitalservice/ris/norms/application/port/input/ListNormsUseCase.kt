@@ -7,7 +7,7 @@ import reactor.core.publisher.Flux
 fun interface ListNormsUseCase {
   fun listNorms(query: Query): Flux<NormData>
 
-  data class Query(val searchTerm: String? = null)
+  data class Query(val searchTerm: String? = null, val eGesetzgebung: Boolean)
 
   data class NormData(
       val guid: UUID,

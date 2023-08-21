@@ -60,6 +60,7 @@ test.describe("court", () => {
     page,
     documentNumber,
   }) => {
+    test.slow()
     await navigateToCategories(page, documentNumber)
 
     await waitForSaving(

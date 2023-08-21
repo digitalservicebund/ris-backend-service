@@ -90,32 +90,35 @@ fun mapNormToDto(norm: Norm): NormDto {
       printAnnouncementPage = norm.eli.printAnnouncementPage,
       eli = norm.eli.toString(),
       articles =
-          norm.articles
-              .filter { it.marker !in listOf("Eingangsformel", "Schlussformel") }
+          norm.sections
+              .filterIsInstance<Article>()
+              .filter { it.designation !in listOf("Eingangsformel", "Schlussformel") }
               .sortedBy {
-                if (it.marker.contains("§")) it.marker.substring(2).toInt()
-                else it.marker.substring(4).toInt()
+                if (it.designation.contains("§")) it.designation.substring(2).toInt()
+                else it.designation.substring(4).toInt()
               }
               .mapIndexed { index, article -> mapArticleToDto(article, index) },
   )
 }
 
 fun mapArticleToDto(article: Article, ordinalNumber: Int = 1): ArticleDto {
-  val marker = parseMarkerFromMarkerText(article.marker) ?: "$ordinalNumber"
+  val marker = parseMarkerFromMarkerText(article.designation) ?: "$ordinalNumber"
   var paragraphsToPass = article.paragraphs
-  if (article.paragraphs.none { it.marker == null }) {
+  if (article.paragraphs.none { (it as Paragraph).marker == null }) {
     paragraphsToPass =
-        article.paragraphs.sortedBy { it.marker!!.substring(1, it.marker!!.length.minus(1)) }
+        article.paragraphs.sortedBy {
+          (it as Paragraph).marker!!.substring(1, it.marker!!.length.minus(1))
+        }
   }
 
   return ArticleDto(
       guid = article.guid.toString(),
-      title = IdentifiedElement(article.title),
+      title = IdentifiedElement(article.header),
       marker = marker,
-      markerText = IdentifiedElement(article.marker),
+      markerText = IdentifiedElement(article.designation),
       paragraphs =
           paragraphsToPass.mapIndexed { index, paragraph ->
-            mapParagraphToDto(paragraph, marker, index)
+            mapParagraphToDto(paragraph as Paragraph, marker, index)
           },
   )
 }

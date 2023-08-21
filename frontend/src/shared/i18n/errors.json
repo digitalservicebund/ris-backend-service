@@ -60,8 +60,8 @@
     "description": ""
   },
   "DOCUMENT_UNIT_SEARCH_FAILED": {
-    "title": "Die Suche nach passenden Dokumentationseinheit konnte nicht ausgeführt werden.",
-    "description": ""
+    "title": "Die Suchergebnisse konnten nicht geladen werden.",
+    "description": "Bitte versuchen Sie es später erneut."
   },
   "DOCUMENT_UNIT_PUBLISH_FAILED": {
     "title": "Leider ist ein Fehler aufgetreten.",

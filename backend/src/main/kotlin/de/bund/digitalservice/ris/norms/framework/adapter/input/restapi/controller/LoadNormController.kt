@@ -4,11 +4,22 @@ import de.bund.digitalservice.ris.OpenApiConfiguration
 import de.bund.digitalservice.ris.exceptions.exception.NotFoundWithInstanceException
 import de.bund.digitalservice.ris.norms.application.port.input.LoadNormUseCase
 import de.bund.digitalservice.ris.norms.domain.entity.Article
+import de.bund.digitalservice.ris.norms.domain.entity.Book
+import de.bund.digitalservice.ris.norms.domain.entity.Chapter
+import de.bund.digitalservice.ris.norms.domain.entity.ContentElement
 import de.bund.digitalservice.ris.norms.domain.entity.FileReference
 import de.bund.digitalservice.ris.norms.domain.entity.MetadataSection
 import de.bund.digitalservice.ris.norms.domain.entity.Metadatum
 import de.bund.digitalservice.ris.norms.domain.entity.Norm
 import de.bund.digitalservice.ris.norms.domain.entity.Paragraph
+import de.bund.digitalservice.ris.norms.domain.entity.Part
+import de.bund.digitalservice.ris.norms.domain.entity.Section
+import de.bund.digitalservice.ris.norms.domain.entity.SectionElement
+import de.bund.digitalservice.ris.norms.domain.entity.Subchapter
+import de.bund.digitalservice.ris.norms.domain.entity.Subsection
+import de.bund.digitalservice.ris.norms.domain.entity.Subtitle
+import de.bund.digitalservice.ris.norms.domain.entity.Title
+import de.bund.digitalservice.ris.norms.domain.entity.Uncategorized
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.ApiConfiguration
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.encodeEli
@@ -46,7 +57,6 @@ class LoadNormController(private val loadNormService: LoadNormUseCase) {
       guid: String
   ): Mono<ResponseEntity<NormResponseSchema>> {
     val query = LoadNormUseCase.Query(UUID.fromString(guid))
-
     return loadNormService
         .loadNorm(query)
         .map { norm -> NormResponseSchema.fromUseCaseData(norm) }
@@ -55,52 +65,87 @@ class LoadNormController(private val loadNormService: LoadNormUseCase) {
   }
 
   data class NormResponseSchema
-  private constructor(
+  internal constructor(
       val guid: String,
-      val articles: List<ArticleResponseSchema>,
       val metadataSections: List<MetadataSectionResponseSchema>,
       var eli: String,
       var files: List<FileReferenceResponseSchema>,
+      val sections: List<SectionResponseSchema>,
+      val contents: List<ContentResponseSchema>,
   ) {
     companion object {
       fun fromUseCaseData(data: Norm): NormResponseSchema {
-        val articles = data.articles.map(ArticleResponseSchema::fromUseCaseData)
+        val sections =
+            data.sections.sortedBy { it.order }.map(SectionResponseSchema::fromUseCaseData)
+        val contents =
+            data.contents.sortedBy { it.order }.map(ContentResponseSchema::fromUseCaseData)
         val files = data.files.map(FileReferenceResponseSchema::fromUseCaseData)
         val metadataSections =
             data.metadataSections.map(MetadataSectionResponseSchema::fromUseCaseData)
         return NormResponseSchema(
             encodeGuid(data.guid),
-            articles,
             metadataSections,
             encodeEli(data.eli),
             files = files,
-        )
+            sections,
+            contents)
       }
     }
   }
 
-  data class ArticleResponseSchema
-  private constructor(
+  data class SectionResponseSchema
+  internal constructor(
       val guid: String,
-      var title: String? = null,
-      val marker: String,
-      val paragraphs: List<ParagraphResponseSchema>,
+      var header: String? = null,
+      val designation: String,
+      val sections: List<SectionResponseSchema>? = emptyList(),
+      val paragraphs: List<ParagraphResponseSchema>? = emptyList()
   ) {
     companion object {
-      fun fromUseCaseData(data: Article): ArticleResponseSchema {
-        val paragraphs = data.paragraphs.map { ParagraphResponseSchema.fromUseCaseData(it) }
-        return ArticleResponseSchema(
-            encodeGuid(data.guid),
-            data.title,
-            data.marker,
-            paragraphs,
-        )
+      fun fromUseCaseData(data: SectionElement): SectionResponseSchema {
+        return when (data) {
+          is Book,
+          is Chapter,
+          is Part,
+          is Section,
+          is Subchapter,
+          is Subsection,
+          is Subtitle,
+          is Title,
+          is Uncategorized ->
+              SectionResponseSchema(
+                  encodeGuid(data.guid),
+                  data.header,
+                  data.designation,
+                  sections = data.childSections?.map { fromUseCaseData(it) })
+          is Article -> {
+            val paragraphs =
+                data.paragraphs
+                    .sortedBy { it.order }
+                    .map { ParagraphResponseSchema.fromUseCaseData(it as Paragraph) }
+            SectionResponseSchema(
+                encodeGuid(data.guid), data.header, data.designation, paragraphs = paragraphs)
+          }
+        }
       }
+    }
+  }
+
+  data class ContentResponseSchema
+  internal constructor(
+      val guid: String,
+      var order: Int,
+      val marker: String? = null,
+      val text: String,
+  ) {
+    companion object {
+      fun fromUseCaseData(data: ContentElement): ContentResponseSchema =
+          ContentResponseSchema(encodeGuid(data.guid), data.order, data.marker, data.text)
     }
   }
 
   data class ParagraphResponseSchema
-  private constructor(val guid: String, val marker: String? = null, val text: String) {
+  internal constructor(val guid: String, val marker: String? = null, val text: String) {
     companion object {
       fun fromUseCaseData(data: Paragraph): ParagraphResponseSchema {
         return ParagraphResponseSchema(encodeGuid(data.guid), data.marker, data.text)
@@ -109,7 +154,12 @@ class LoadNormController(private val loadNormService: LoadNormUseCase) {
   }
 
   data class FileReferenceResponseSchema
-  private constructor(val guid: String, val name: String, val hash: String, val createdAt: String) {
+  internal constructor(
+      val guid: String,
+      val name: String,
+      val hash: String,
+      val createdAt: String
+  ) {
     companion object {
       fun fromUseCaseData(data: FileReference) =
           FileReferenceResponseSchema(
@@ -122,7 +172,7 @@ class LoadNormController(private val loadNormService: LoadNormUseCase) {
   }
 
   data class MetadataSectionResponseSchema
-  private constructor(
+  internal constructor(
       val guid: String,
       val name: MetadataSectionName,
       val order: Int,
@@ -144,7 +194,7 @@ class LoadNormController(private val loadNormService: LoadNormUseCase) {
   }
 
   data class MetadatumResponseSchema
-  private constructor(val guid: String, val value: String, val type: String, val order: Int) {
+  internal constructor(val guid: String, val value: String, val type: String, val order: Int) {
     companion object {
       fun fromUseCaseData(metadatum: Metadatum<*>): MetadatumResponseSchema {
         val value: String = metadatum.value.toString()

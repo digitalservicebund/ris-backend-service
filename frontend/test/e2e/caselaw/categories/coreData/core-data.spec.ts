@@ -234,7 +234,12 @@ test.describe("core data", () => {
   }) => {
     await test.step("create new docUnit with logged in user", async () => {
       page.goto("/caselaw")
-      await page.getByText("Neue Dokumentationseinheit").click()
+      await page
+        .getByRole("button", {
+          name: "Neue Dokumentationseinheit",
+          exact: true,
+        })
+        .click()
 
       await expect(
         page.getByText("Aktuell ist keine Datei hinterlegt"),
@@ -252,7 +257,12 @@ test.describe("core data", () => {
   }) => {
     await test.step("create new docUnit with logged in user", async () => {
       pageWithBghUser.goto("/caselaw")
-      await pageWithBghUser.getByText("Neue Dokumentationseinheit").click()
+      await pageWithBghUser
+        .getByRole("button", {
+          name: "Neue Dokumentationseinheit",
+          exact: true,
+        })
+        .click()
 
       await expect(
         pageWithBghUser.getByText("Aktuell ist keine Datei hinterlegt"),

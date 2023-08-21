@@ -7,9 +7,6 @@ on:
     branches: [main]
   # Allow to run this workflow manually
   workflow_dispatch:
-  schedule:
-    # 2pm UTC is 4pm in Berlin (with daylight saving)
-    - cron: "0 14 * * *"
 
 env:
   RUN_ID: ${{ github.run_id }}

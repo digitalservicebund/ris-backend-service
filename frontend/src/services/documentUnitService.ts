@@ -135,6 +135,7 @@ const service: DocumentUnitService = {
     if (response.status >= 300) {
       response.error = {
         title: errorMessages.DOCUMENT_UNIT_SEARCH_FAILED.title,
+        description: errorMessages.DOCUMENT_UNIT_SEARCH_FAILED.description,
       }
     }
     response.data = response.data as Page<LinkedDocumentUnit>
@@ -171,9 +172,11 @@ const service: DocumentUnitService = {
     if (response.status >= 300) {
       response.error = {
         title: errorMessages.DOCUMENT_UNIT_SEARCH_FAILED.title,
+        description: errorMessages.DOCUMENT_UNIT_SEARCH_FAILED.description,
       }
     }
     response.data = response.data as Page<DocumentUnitListEntry>
+
     return response
   },
 

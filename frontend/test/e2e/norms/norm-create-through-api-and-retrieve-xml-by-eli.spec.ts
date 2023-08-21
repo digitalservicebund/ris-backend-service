@@ -134,23 +134,23 @@ testWithImportedNorm(
       .querySelectorAll("akn\\:article")
       .forEach((article, articleIndex) => {
         expect(article.querySelector("akn\\:marker")?.textContent?.trim()).toBe(
-          norm.articles[articleIndex].marker,
+          norm.sections[articleIndex].designation,
         )
         expect(
           article.querySelector("akn\\:heading")?.textContent?.trim(),
-        ).toBe(norm.articles[articleIndex].title)
+        ).toBe(norm.sections[articleIndex].header)
 
         article
           .querySelectorAll("akn\\:paragraph")
           .forEach((paragraph, paragraphIndex) => {
             if (
-              norm.articles[articleIndex].paragraphs[paragraphIndex].marker !==
+              norm.sections[articleIndex].paragraphs[paragraphIndex].marker !==
               undefined
             ) {
               expect(
                 paragraph.querySelector("akn\\:marker")?.textContent?.trim(),
               ).toBe(
-                norm.articles[articleIndex].paragraphs[paragraphIndex].marker,
+                norm.sections[articleIndex].paragraphs[paragraphIndex].marker,
               )
             }
             expect(
@@ -158,7 +158,7 @@ testWithImportedNorm(
                 .querySelector("akn\\:p")
                 ?.textContent?.trim()
                 .replace(/\n/, ""),
-            ).toBe(norm.articles[articleIndex].paragraphs[paragraphIndex].text)
+            ).toBe(norm.sections[articleIndex].paragraphs[paragraphIndex].text)
           })
       })
   },

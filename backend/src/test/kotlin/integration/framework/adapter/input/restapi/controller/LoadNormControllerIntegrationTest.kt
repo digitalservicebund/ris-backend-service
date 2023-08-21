@@ -12,9 +12,9 @@ import de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto.No
 import java.time.Duration
 import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
-import java.util.*
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
@@ -44,8 +44,6 @@ class LoadNormControllerIntegrationTest : PostgresTestcontainerIntegrationTest()
   @Autowired private lateinit var client: DatabaseClient
 
   @Autowired lateinit var normsService: NormsService
-
-  @Autowired lateinit var loadNormFrameService: LoadNormService
 
   private lateinit var template: R2dbcEntityTemplate
 
@@ -161,8 +159,96 @@ class LoadNormControllerIntegrationTest : PostgresTestcontainerIntegrationTest()
             """
                 {
                   "guid":"${norm.guid}",
-                  "articles":[],
+                  "sections":[],
+                  "contents":[],
                   "metadataSections":[{"name":"CITATION_DATE","order":1,"metadata":[{"value":"${date.toLocalDate()}","type":"DATE","order":1}],"sections":null}, {"name":"DOCUMENT_TYPE","order":1,"metadata":[{"value":"BASE_NORM","type":"NORM_CATEGORY","order":1}, {"value":"documentTypeName","type":"TYPE_NAME","order":1}, {"value":"documentTemplateName","type":"TEMPLATE_NAME","order":1}],"sections":null}, {"name":"NORM","order":1,"metadata":[{"value":"officialLongTitle","type":"OFFICIAL_LONG_TITLE","order":1}, {"value":"risAbbreviation","type":"RIS_ABBREVIATION","order":1}, {"value":"documentNumber","type":"DOCUMENT_NUMBER","order":1}, {"value":"documentCategory","type":"DOCUMENT_CATEGORY","order":1}, {"value":"officialShortTitle","type":"OFFICIAL_SHORT_TITLE","order":1}, {"value":"officialAbbreviation","type":"OFFICIAL_ABBREVIATION","order":1}, {"value":"completeCitation","type":"COMPLETE_CITATION","order":1}, {"value":"celexNumber","type":"CELEX_NUMBER","order":1}, {"value":"text","type":"TEXT","order":1}],"sections":null}],
+                  "eli":"",
+                  "files":[{"name":"norm.zip","hash":"hash","createdAt":"$date"}]}
+                """
+                .trimIndent(),
+        )
+  }
+
+  @Test
+  @Disabled
+  fun `it correctly loads a norm with sections and contents via api`() {
+    val date = LocalDateTime.now().truncatedTo(ChronoUnit.MICROS)
+
+    val norm = norm {
+      files {
+        file {
+          name = "norm.zip"
+          hash = "hash"
+          createdAt = date
+        }
+      }
+      contents {
+        preamble {
+          text = "preamble text"
+          order = 1
+        }
+        closing {
+          text = "closing text"
+          order = 2
+        }
+      }
+      sections {
+        book {
+          header = "Book 1"
+          designation = "1"
+          order = 1
+          childSections {
+            part {
+              header = "Part 1"
+              designation = "1"
+              order = 1
+              childSections {
+                article {
+                  header = "Article 1"
+                  designation = "1"
+                  order = 1
+                  contents {
+                    paragraph {
+                      marker = "(1)"
+                      order = 1
+                      text = "Paragraph 1 text"
+                    }
+                    paragraph {
+                      marker = "(2)"
+                      order = 2
+                      text = "Paragraph 2 text"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+
+    val saveCommand = SaveNormOutputPort.Command(norm)
+    normsService
+        .saveNorm(saveCommand)
+        .`as`(StepVerifier::create)
+        .expectNextCount(1)
+        .verifyComplete()
+
+    webClient
+        .mutateWith(csrf())
+        .get()
+        .uri("/api/v1/norms/" + norm.guid.toString())
+        .exchange()
+        .expectStatus()
+        .isOk
+        .expectBody()
+        .json(
+            """
+                {
+                  "guid":"${norm.guid}",
+                  "sections":[],
+                  "contents":[{"text":  "peamble Text", "order": 1}, {"text":  "closing text", "order":  2}],
+                  "metadataSections":[],
                   "eli":"",
                   "files":[{"name":"norm.zip","hash":"hash","createdAt":"$date"}]}
                 """

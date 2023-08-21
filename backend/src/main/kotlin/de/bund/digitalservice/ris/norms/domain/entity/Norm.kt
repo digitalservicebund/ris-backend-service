@@ -1,5 +1,6 @@
 package de.bund.digitalservice.ris.norms.domain.entity
 
+import de.bund.digitalservice.ris.norms.domain.specification.norm.hasValidSectionElementsDepth
 import de.bund.digitalservice.ris.norms.domain.specification.norm.hasValidSections
 import de.bund.digitalservice.ris.norms.domain.value.Eli
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName
@@ -9,12 +10,15 @@ import java.util.UUID
 
 data class Norm(
     val guid: UUID,
-    val articles: List<Article> = emptyList(),
     val metadataSections: List<MetadataSection> = emptyList(),
     var files: List<FileReference> = listOf(),
+    val sections: List<SectionElement> = emptyList(),
+    val contents: List<ContentElement> = emptyList(),
+    var eGesetzgebung: Boolean = false
 ) {
   init {
     hasValidSections.evaluate(this).throwWhenUnsatisfied()
+    hasValidSectionElementsDepth.evaluate(this).throwWhenUnsatisfied()
   }
 
   val eli: Eli

@@ -9,13 +9,20 @@ fun article(block: ArticleBuilder.() -> Unit): Article = ArticleBuilder().apply(
 
 class ArticleBuilder {
   var guid: UUID = UUID.randomUUID()
-  var title: String = randomString(100)
-  var marker: String = randomString(1)
+  var header: String = randomString(100)
+  var designation: String = randomString(1)
+  var order: Int = 1
   private var paragraphs = mutableListOf<Paragraph>()
 
   fun paragraphs(block: Paragraphs.() -> Unit) = paragraphs.addAll(Paragraphs().apply(block))
 
-  fun build(): Article = Article(guid, title, marker, paragraphs)
+  fun build(): Article =
+      Article(
+          guid = guid,
+          header = header,
+          designation = designation,
+          order = order,
+          paragraphs = paragraphs)
 }
 
 class Paragraphs : ArrayList<Paragraph>() {

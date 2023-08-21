@@ -12,8 +12,11 @@ const currentPage = ref<Page<DocumentUnitListEntry>>()
 const searchInput = ref<DocumentUnitListEntry | undefined>(undefined)
 
 const itemsPerPage = 30
+const searchResponseError = ref()
+const isLoading = ref(false)
 
 async function search(page = 0, listEntry?: DocumentUnitSearchInput) {
+  isLoading.value = true
   if (listEntry) {
     searchInput.value = listEntry
   }
@@ -25,9 +28,11 @@ async function search(page = 0, listEntry?: DocumentUnitSearchInput) {
   if (response.data) {
     documentUnitListEntries.value = response.data.content
     currentPage.value = response.data
-  } else {
-    console.error("could not load list entries")
   }
+  if (response.error) {
+    searchResponseError.value = response.error
+  }
+  isLoading.value = false
 }
 
 async function handleDelete(documentUnitListEntry: DocumentUnitListEntry) {
@@ -46,21 +51,28 @@ async function handleDelete(documentUnitListEntry: DocumentUnitListEntry) {
 async function handleSearch(listEntry: DocumentUnitSearchInput) {
   await search(0, listEntry)
 }
+
+async function handleReset() {
+  documentUnitListEntries.value = []
+}
 </script>
 
 <template>
   <div>
-    <DocumentUnitSearchEntryForm @search="handleSearch" />
+    <DocumentUnitSearchEntryForm
+      @reset-search-results="handleReset"
+      @search="handleSearch"
+    />
     <Pagination
-      v-if="currentPage"
       navigation-position="bottom"
       :page="currentPage"
       @update-page="search"
     >
       <DocumentUnitList
-        v-if="documentUnitListEntries"
         class="grow"
         :document-unit-list-entries="documentUnitListEntries"
+        :is-loading="isLoading"
+        :search-response-error="searchResponseError"
         @delete-document-unit="handleDelete"
       />
     </Pagination>
