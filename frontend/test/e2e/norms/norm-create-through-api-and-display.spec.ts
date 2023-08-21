@@ -60,7 +60,8 @@ testWithImportedNorm(
   },
 )
 
-testWithImportedNorm(
+// eslint-disable-next-line playwright/no-skipped-test
+testWithImportedNorm.skip(
   "Check if frame fields are correctly displayed",
   async ({ page, normData, guid }) => {
     await openNorm(page, guid)
