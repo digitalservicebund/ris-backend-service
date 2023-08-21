@@ -64,12 +64,14 @@ testlogger { theme "mocha" }
 
 dependencies {
 
-  implementation "org.springframework.boot:spring-boot-starter-actuator"
-  implementation "org.springframework.boot:spring-boot-starter-security"
-  implementation "org.springframework.boot:spring-boot-starter-oauth2-client"
+  implementation "org.springframework.boot:spring-boot-starter-actuator:3.1.2"
+  implementation "org.springframework.boot:spring-boot-starter-security:3.1.2"
+  implementation "org.springframework.boot:spring-boot-starter-oauth2-client:3.1.2"
   // => CVE-2023-34035, CVE-2023-34034
   implementation "org.springframework.security:spring-security-web:6.1.2"
   implementation "org.springframework.security:spring-security-config:6.1.2"
+  // => CVE-2023-34034
+  implementation "org.springframework.security:spring-security-core:6.1.2"
   implementation "org.springframework.security:spring-security-oauth2-resource-server:6.1.2"
   implementation "org.springframework:spring-web:6.0.11"
   implementation "org.springframework:spring-webflux:6.0.11"
