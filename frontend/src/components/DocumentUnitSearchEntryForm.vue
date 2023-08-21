@@ -146,6 +146,7 @@ const myDocOfficeOnly = computed({
             v-model="publishingStateModel"
             aria-label="Status Suche"
             class="ds-select-small"
+            clearable
             :items="dropdownItems"
             placeholder="Alle"
           />
