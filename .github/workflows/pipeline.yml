@@ -582,11 +582,11 @@ jobs:
     outputs:
       version: ${{ steps.set-version.outputs.version }}
     steps:
-      # - uses: actions/cache@v3
-      #   with:
-      #     path: /tmp/images
-      #     key: docker-images-cache-${{ env.RUN_ID }}
-      #     restore-keys: docker-images-cache-${{ env.RUN_ID }}
+      - uses: actions/cache@v3
+        with:
+          path: /tmp/images
+          key: docker-images-cache-${{ env.RUN_ID }}
+          restore-keys: docker-images-cache-${{ env.RUN_ID }}
       - name: load image
         shell: bash
         run: docker load -i /tmp/images/backend-image.tar
