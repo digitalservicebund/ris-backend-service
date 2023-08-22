@@ -11,6 +11,8 @@ import de.bund.digitalservice.ris.caselaw.adapter.AuthService;
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentUnitController;
 import de.bund.digitalservice.ris.caselaw.adapter.DocxConverterService;
 import de.bund.digitalservice.ris.caselaw.adapter.KeycloakUserService;
+import de.bund.digitalservice.ris.caselaw.adapter.ProcedureController;
+import de.bund.digitalservice.ris.caselaw.adapter.ProcedureService;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPADocumentationOfficeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPADocumentationOfficeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPAProcedureDTO;
@@ -33,10 +35,13 @@ import de.bund.digitalservice.ris.caselaw.domain.Procedure;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationReportRepository;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.oauth2.client.registration.ReactiveClientRegistrationRepository;
@@ -58,9 +63,10 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
       PostgresJPAConfig.class,
       SecurityConfig.class,
       AuthService.class,
-      TestConfig.class
+      TestConfig.class,
+      ProcedureService.class
     },
-    controllers = {DocumentUnitController.class})
+    controllers = {DocumentUnitController.class, ProcedureController.class})
 class ProcedureIntegrationTest {
   @Container
   static PostgreSQLContainer<?> postgreSQLContainer = new PostgreSQLContainer<>("postgres:12");
@@ -103,8 +109,16 @@ class ProcedureIntegrationTest {
     repository.deleteAll();
   }
 
-  @Test
-  void testAddingNewProcedure() {
+  @ParameterizedTest
+  @ValueSource(
+      strings = {
+        "testProcedure",
+        "123456",
+        "asd 123",
+        "äÜö.123!",
+        "thisIsALongLongLongLongLongLongLongProcedureName"
+      })
+  void testAddingNewProcedure(String label) {
     DocumentUnitDTO dto =
         documentUnitRepository
             .save(
@@ -116,7 +130,7 @@ class ProcedureIntegrationTest {
                     .build())
             .block();
 
-    Procedure procedure = Procedure.builder().label("testProcedure").build();
+    Procedure procedure = Procedure.builder().label(label).build();
 
     DocumentUnit documentUnitFromFrontend =
         DocumentUnit.builder()
@@ -141,20 +155,14 @@ class ProcedureIntegrationTest {
                 assertThat(response.getResponseBody().coreData().procedure()).isEqualTo(procedure));
 
     assertThat(repository.findAll()).hasSize(1);
-    assertThat(repository.findAll().get(0).getLabel()).isEqualTo("testProcedure");
+    assertThat(repository.findAll().get(0).getLabel()).isEqualTo(label);
     assertThat(repository.findAll().get(0).getDocumentationOffice().getLabel())
         .isEqualTo(docOffice.label());
   }
 
   @Test
   void testAddSameProcedure() {
-    JPAProcedureDTO procedureDTO =
-        repository.save(
-            JPAProcedureDTO.builder()
-                .documentationOffice(documentationOfficeDTO)
-                .label("testProcedure")
-                .build());
-
+    JPAProcedureDTO procedureDTO = createProcedure("testProcedure", documentationOfficeDTO);
     assertThat(repository.findAll()).hasSize(1);
 
     DocumentUnitDTO dto =
@@ -200,14 +208,7 @@ class ProcedureIntegrationTest {
   @Test
   void testAddProcedureWithSameNameToDifferentOffice() {
     JPADocumentationOfficeDTO bghDocOfficeDTO = documentationOfficeRepository.findByLabel("BGH");
-
-    JPAProcedureDTO procedureDTO =
-        repository.save(
-            JPAProcedureDTO.builder()
-                .documentationOffice(bghDocOfficeDTO)
-                .label("testProcedure")
-                .build());
-
+    createProcedure("testProcedure", bghDocOfficeDTO);
     assertThat(repository.findAll()).hasSize(1);
 
     DocumentUnitDTO dto =
@@ -246,5 +247,99 @@ class ProcedureIntegrationTest {
                 assertThat(response.getResponseBody().coreData().procedure()).isEqualTo(procedure));
 
     assertThat(repository.findAll()).hasSize(2);
+  }
+
+  @Test
+  void testProcedureControllerReturnsList() {
+    createProcedures(
+        List.of("testProcedure1", "testProcedure2", "testProcedure3"), documentationOfficeDTO);
+    assertThat(repository.findAll()).hasSize(3);
+
+    risWebTestClient
+        .withDefaultLogin()
+        .get()
+        .uri("/api/v1/caselaw/procedure")
+        .exchange()
+        .expectStatus()
+        .is2xxSuccessful()
+        .expectBody(Procedure[].class)
+        .consumeWith(
+            response -> {
+              assertThat(response.getResponseBody()).hasSize(3);
+              assertThat(List.of(response.getResponseBody()).get(0).label())
+                  .isEqualTo("testProcedure1");
+            });
+  }
+
+  @Test
+  void testProcedureControllerReturnsFilteredList() {
+    createProcedures(List.of("aaabbb", "aaaccc", "dddfff"), documentationOfficeDTO);
+    assertThat(repository.findAll()).hasSize(3);
+
+    risWebTestClient
+        .withDefaultLogin()
+        .get()
+        .uri("/api/v1/caselaw/procedure?q=aaa")
+        .exchange()
+        .expectStatus()
+        .is2xxSuccessful()
+        .expectBody(Procedure[].class)
+        .consumeWith(
+            response -> {
+              assertThat(response.getResponseBody()).hasSize(2);
+              assertThat(List.of(response.getResponseBody()).get(0).label()).isEqualTo("aaabbb");
+            });
+
+    risWebTestClient
+        .withDefaultLogin()
+        .get()
+        .uri("/api/v1/caselaw/procedure?q=aaac")
+        .exchange()
+        .expectStatus()
+        .is2xxSuccessful()
+        .expectBody(Procedure[].class)
+        .consumeWith(
+            response -> {
+              assertThat(response.getResponseBody()).hasSize(1);
+              assertThat(List.of(response.getResponseBody()).get(0).label()).isEqualTo("aaaccc");
+            });
+  }
+
+  @Test
+  void testProcedureControllerReturnsPerDocOffice() {
+    JPADocumentationOfficeDTO bghDocOfficeDTO = documentationOfficeRepository.findByLabel("BGH");
+    createProcedures(List.of("procedure1", "procedure2", "procedure3"), bghDocOfficeDTO);
+    assertThat(repository.findAll()).hasSize(3);
+
+    risWebTestClient
+        .withDefaultLogin()
+        .get()
+        .uri("/api/v1/caselaw/procedure")
+        .exchange()
+        .expectStatus()
+        .is2xxSuccessful()
+        .expectBody(Procedure[].class)
+        .consumeWith(
+            response -> {
+              assertThat(response.getResponseBody()).hasSize(0);
+            });
+  }
+
+  private List<JPAProcedureDTO> createProcedures(
+      List<String> labels, JPADocumentationOfficeDTO documentationOffice) {
+    return labels.stream()
+        .map(
+            label ->
+                repository.save(
+                    JPAProcedureDTO.builder()
+                        .documentationOffice(documentationOffice)
+                        .label(label)
+                        .build()))
+        .toList();
+  }
+
+  private JPAProcedureDTO createProcedure(
+      String label, JPADocumentationOfficeDTO documentationOffice) {
+    return createProcedures(List.of(label), documentationOffice).get(0);
   }
 }
