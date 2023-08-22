@@ -25,7 +25,11 @@ describe("normsService", () => {
       await getAllNorms()
 
       expect(httpClientGet).toHaveBeenCalledOnce()
-      expect(httpClientGet).toHaveBeenLastCalledWith("norms")
+      expect(httpClientGet).toHaveBeenLastCalledWith("norms", {
+        params: {
+          eGesetzgebung: "false",
+        },
+      })
     })
 
     it("returns data entry of body if server connection was successful", async () => {
