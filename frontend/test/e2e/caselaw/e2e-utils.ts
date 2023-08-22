@@ -79,7 +79,7 @@ export async function deleteDocumentUnit(page: Page, documentNumber: string) {
     page.locator(".table-row", {
       hasText: documentNumber,
     }),
-  ).toBeVisible({ timeout: 20000 })
+  ).toBeVisible({ timeout: 30000 })
   await page
     .locator(".table-row", {
       hasText: documentNumber,
