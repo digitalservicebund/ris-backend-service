@@ -810,9 +810,9 @@ jobs:
     steps:
       - id: get-sha
         run: |
-          echo "latest_sha=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-              "https://api.github.com/repos/digitalservicebund/ris-backend-service/git/ref/heads/main" \
-              | jq -r '.object.sha') >> "$GITHUB_OUTPUT"
+          echo "latest_sha=$(curl -s -H 'Authorization: token ${{ secrets.GITHUB_TOKEN }}' \
+          'https://api.github.com/repos/digitalservicebund/ris-backend-service/git/ref/heads/main' \
+          | jq -r '.object.sha')" >> "$GITHUB_OUTPUT"
 
   deploy-production:
     runs-on: ubuntu-latest
