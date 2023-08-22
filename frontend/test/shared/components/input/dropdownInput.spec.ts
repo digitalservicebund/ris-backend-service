@@ -13,7 +13,8 @@ function renderComponent(
   const effectiveProps: DropdownInputProps = {
     modelValue,
     "onUpdate:modelValue":
-      props?.["onUpdate:modelValue"] ?? ((value) => (modelValue = value)),
+      props?.["onUpdate:modelValue"] ??
+      ((value: string | undefined) => (modelValue = value)),
     items: props?.items ?? [
       { label: "testItem1", value: "t1" },
       { label: "testItem2", value: "t2" },
@@ -74,9 +75,24 @@ describe("Dropdown Input", () => {
     expect(input).not.toHaveAttribute("data-placeholder")
   })
 
+  it("does not contain a placeholder option if an item is selected", async () => {
+    const { rerender } = renderComponent({
+      placeholder: "test placeholder",
+      modelValue: "",
+    })
+
+    const placeholder = screen.getByRole("option", { name: "test placeholder" })
+    expect(placeholder).toBeInTheDocument()
+
+    await rerender({ modelValue: "t2", placeholder: "test placeholder" })
+    expect(placeholder).not.toBeInTheDocument()
+  })
+
   it("placeholder is disabled when clearable prop not set", () => {
     renderComponent({ placeholder: "test placeholder" })
-    expect(screen.getByRole("option", { name: "" })).toBeDisabled()
+    expect(
+      screen.getByRole("option", { name: "test placeholder" }),
+    ).toBeDisabled()
   })
 
   it("placeholder is selectable when clearable prop set", async () => {

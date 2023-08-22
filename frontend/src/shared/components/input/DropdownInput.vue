@@ -5,18 +5,12 @@ import {
   DropdownItem,
 } from "@/shared/components/input/types"
 
-interface Props {
+const props = defineProps<{
   items: DropdownItem[]
   modelValue?: DropdownInputModelType
   placeholder?: string
   clearable?: boolean
-}
-
-const props = withDefaults(defineProps<Props>(), {
-  modelValue: "",
-  placeholder: "",
-  clearable: false,
-})
+}>()
 
 const emit = defineEmits<{
   "update:modelValue": [DropdownInputModelType | undefined]
@@ -47,8 +41,10 @@ const hasPlaceholder = computed(() =>
       v-if="!clearable && placeholder && !localModelValue"
       disabled
       value=""
-    ></option>
-    <option v-else-if="placeholder" value="">
+    >
+      {{ placeholder }}
+    </option>
+    <option v-if="clearable && placeholder" value="">
       {{ placeholder }}
     </option>
     <option v-for="item in items" :key="item.value" :value="item.value">
