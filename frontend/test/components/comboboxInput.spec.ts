@@ -15,6 +15,7 @@ function renderComponent(
     modelValue?: ComboboxItem
     itemService?: ComboboxAttributes["itemService"]
     ariaLabel?: string
+    manualEntry?: boolean
   } = {},
 ) {
   return render(ComboboxInput, {
@@ -22,6 +23,7 @@ function renderComponent(
       id: options.id ?? "combobox-test",
       modelValue: options.modelValue,
       ariaLabel: options.ariaLabel ?? "test label",
+      manualEntry: options.manualEntry ?? false,
       itemService:
         options.itemService ??
         service.filterItems([
@@ -423,5 +425,31 @@ describe("Combobox Element", () => {
       ],
       [undefined],
     ])
+  })
+
+  it("Adds entry if flag for manual entry is set", async () => {
+    const { emitted } = renderComponent({ manualEntry: true })
+
+    await user.type(screen.getByLabelText("test label"), "foo")
+    await user.click(screen.getByText("foo neu erstellen"))
+
+    expect(emitted()["update:modelValue"]).toEqual([
+      [
+        {
+          label: "foo",
+        },
+      ],
+    ])
+  })
+
+  it("Does not add entry if flag for manual entry is not set", async () => {
+    const { emitted } = renderComponent({ manualEntry: false })
+
+    await user.type(screen.getByLabelText("test label"), "foo")
+    expect(screen.queryByText("foo neu erstellen")).not.toBeInTheDocument()
+
+    user.tab()
+
+    expect(emitted()["update:modelValue"]).toBeUndefined()
   })
 })
