@@ -13,7 +13,8 @@ function renderComponent(
   const effectiveProps: DropdownInputProps = {
     modelValue,
     "onUpdate:modelValue":
-      props?.["onUpdate:modelValue"] ?? ((value) => (modelValue = value)),
+      props?.["onUpdate:modelValue"] ??
+      ((value: string | undefined) => (modelValue = value)),
     items: props?.items ?? [
       { label: "testItem1", value: "t1" },
       { label: "testItem2", value: "t2" },
@@ -85,6 +86,21 @@ describe("Dropdown Input", () => {
 
     await rerender({ modelValue: "t2", placeholder: "test placeholder" })
     expect(placeholder).not.toBeInTheDocument()
+  })
+
+  it("placeholder is disabled when clearable prop not set", () => {
+    renderComponent({ placeholder: "test placeholder" })
+    expect(
+      screen.getByRole("option", { name: "test placeholder" }),
+    ).toBeDisabled()
+  })
+
+  it("placeholder is selectable when clearable prop set", async () => {
+    const user = userEvent.setup()
+    renderComponent({ placeholder: "test placeholder", clearable: true })
+    const input = screen.getByRole("combobox")
+    await user.selectOptions(input, "")
+    expect(input).toHaveValue("")
   })
 
   it("emits a model update", async () => {
