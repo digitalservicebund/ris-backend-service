@@ -321,7 +321,7 @@ class ProcedureIntegrationTest {
         .expectBody(Procedure[].class)
         .consumeWith(
             response -> {
-              assertThat(response.getResponseBody()).hasSize(0);
+              assertThat(response.getResponseBody()).isEmpty();
             });
   }
 
