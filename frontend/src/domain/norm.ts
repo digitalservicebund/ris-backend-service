@@ -1,8 +1,8 @@
 export interface NormBase {
   readonly guid: string
   readonly files?: FileReference[]
-  sections: Section[]
-  contents: Content[]
+  sections: SectionElement[]
+  contents: ContentElement[]
 }
 
 export interface Norm extends NormBase, FlatMetadata {
@@ -236,12 +236,12 @@ export type MetadataSections = {
  * Section elements                                   *
  * -------------------------------------------------- */
 
-export type Section = {
+export type SectionElement = {
   readonly guid: string
   header: string
   designation: string
-  sections: Section[]
-  paragraphs: Content[]
+  sections: SectionElement[]
+  paragraphs: ContentElement[]
 }
 
 // We may add more specific types for section elements here in the future
@@ -250,7 +250,7 @@ export type Section = {
  * Content elements                                   *
  * -------------------------------------------------- */
 
-export type Content = {
+export type ContentElement = {
   readonly guid: string
   marker?: string
   text: string

@@ -1,5 +1,5 @@
 import {
-  Section,
+  SectionElement,
   FlatMetadata,
   Metadata,
   MetadataSectionName,
@@ -8,7 +8,7 @@ import {
   MetadatumType,
   Norm,
   NormCategory,
-  Content,
+  ContentElement,
   UndefinedDate,
 } from "@/domain/norm"
 import {
@@ -192,8 +192,8 @@ export function generateGuid(): string {
 }
 
 export function generateParagraph(
-  partialParagraph?: Partial<Content>,
-): Content {
+  partialParagraph?: Partial<ContentElement>,
+): ContentElement {
   return {
     guid: generateGuid(),
     marker: generateString({ prefix: "marker " }),
@@ -202,7 +202,9 @@ export function generateParagraph(
   }
 }
 
-export function generateArticle(partialArticle?: Partial<Section>): Section {
+export function generateArticle(
+  partialArticle?: Partial<SectionElement>,
+): SectionElement {
   return {
     guid: generateGuid(),
     header: generateString({ prefix: "title " }),
