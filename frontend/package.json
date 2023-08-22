@@ -95,7 +95,7 @@
     "eslint-plugin-playwright": "^0.15.3",
     "eslint-plugin-prettier": "^5.0.0-alpha.2",
     "eslint-plugin-testing-library": "^5.11.0",
-    "eslint-plugin-vue": "^9.15.0",
+    "eslint-plugin-vue": "^9.17.0",
     "eslint-plugin-vue-scoped-css": "^2.5.0",
     "eslint-plugin-vuejs-accessibility": "^2.0.0",
     "jest-fail-on-console": "^3.1.1",
