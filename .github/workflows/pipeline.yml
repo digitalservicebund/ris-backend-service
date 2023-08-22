@@ -800,15 +800,32 @@ jobs:
       mode: ${{ matrix.mode }}
     secrets: inherit
 
+  get-latest-commit-sha:
+    if: ${{ github.ref == 'refs/heads/main' }}
+    needs:
+      - e2e-tests
+    runs-on: ubuntu-latest
+    outputs:
+      latest_sha: ${{ steps.get-sha.outputs.latest_sha }}
+    steps:
+      - id: get-sha
+        run: |
+          echo "latest_sha=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+              "https://api.github.com/repos/digitalservicebund/ris-backend-service/git/ref/heads/main" \
+              | jq -r '.object.sha') >> "$GITHUB_OUTPUT"
+
   deploy-production:
     runs-on: ubuntu-latest
-    if: ${{ github.ref == 'refs/heads/main' }}
+    if: |
+      github.ref == 'refs/heads/main' &&
+      needs.get-latest-commit-sha.outputs.latest_sha == github.sha
     concurrency: deploy-production
     environment: production
     needs:
       - push-frontend-image-to-registry
       - push-backend-image-to-registry
       - e2e-tests
+      - get-latest-commit-sha
     permissions:
       id-token: write # Enable OIDC for gitsign
     steps:
