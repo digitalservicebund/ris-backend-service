@@ -69,32 +69,10 @@ export async function toggleFieldOfLawSection(page: Page): Promise<void> {
 }
 
 export async function deleteDocumentUnit(page: Page, documentNumber: string) {
-  await page.goto("/")
-  await page
-    .getByLabel("Dokumentnummer oder Aktenzeichen Suche")
-    .fill(documentNumber)
-  await page.getByLabel("Nach Dokumentationseinheiten suchen").click()
-  //TODO: remove the timeout when search performance get better
-  await expect(
-    page.locator(".table-row", {
-      hasText: documentNumber,
-    }),
-  ).toBeVisible({ timeout: 30000 })
-  await page
-    .locator(".table-row", {
-      hasText: documentNumber,
-    })
-    .isVisible()
-  await page
-    .locator(".table-row", {
-      hasText: documentNumber,
-    })
-    .locator("[aria-label='Dokumentationseinheit löschen']")
-    .click()
-  await page.locator('button:has-text("Löschen")').click()
-  await expect(
-    page.locator(`a[href*="/caselaw/documentunit/${documentNumber}/files"]`),
-  ).toBeHidden()
+  const response = await page.request.delete(
+    `/api/v1/caselaw/documentunits/${documentNumber}`,
+  )
+  expect(response.ok).toBeTruthy()
 }
 
 export async function documentUnitExists(
