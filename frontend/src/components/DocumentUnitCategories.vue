@@ -10,7 +10,7 @@ import DocumentUnitProceedingDecision from "@/components/proceedingDecisions/Pro
 import SaveButton from "@/components/SaveDocumentUnitButton.vue"
 import { useScrollToHash } from "@/composables/useScrollToHash"
 import { useToggleStateInRouteQuery } from "@/composables/useToggleStateInRouteQuery"
-import DocumentUnit, { Texts } from "@/domain/documentUnit"
+import DocumentUnit, { Texts, CoreData } from "@/domain/documentUnit"
 import ProceedingDecision from "@/domain/proceedingDecision"
 import documentUnitService from "@/services/documentUnitService"
 import fileService from "@/services/fileService"
@@ -93,7 +93,10 @@ const coreData = computed({
   set: (newValues) => {
     let triggerSaving = false
     if (
-      updatedDocumentUnit.value.coreData.court?.label !== newValues.court?.label
+      (["court", "procedure"] as (keyof CoreData)[]).some(
+        (property) =>
+          updatedDocumentUnit.value.coreData[property] !== newValues[property],
+      )
     ) {
       triggerSaving = true
     }
