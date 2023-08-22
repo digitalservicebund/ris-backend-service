@@ -115,7 +115,7 @@ function handleSearchButtonClicked() {
           ></TextInput>
         </InputField>
       </div>
-      <div class="flex flex-row gap-20 pr-32">
+      <div class="flex flex-row gap-24 pr-32">
         <InputField id="courtType" label="Gerichtstyp" visually-hide-label>
           <TextInput
             id="courtType"
@@ -125,7 +125,6 @@ function handleSearchButtonClicked() {
             placeholder="Gerichtstyp"
           ></TextInput>
         </InputField>
-
         <InputField id="courtLocation" label="Gerichtsort" visually-hide-label>
           <TextInput
             id="courtLocation"
@@ -136,13 +135,23 @@ function handleSearchButtonClicked() {
           ></TextInput>
         </InputField>
       </div>
-      <div class="flex flex-row gap-20 pr-32">
+      <div class="flex flex-row gap-10 pr-32">
         <InputField id="date" label="Entscheidungsdatum" visually-hide-label>
           <DateInput
             id="decisionDate"
             v-model="searchEntry.decisionDate"
             aria-label="Entscheidungsdatum Suche"
             class="ds-input-small"
+          ></DateInput>
+        </InputField>
+        <span>-</span>
+        <InputField id="date" label="Entscheidungsdatum " visually-hide-label>
+          <DateInput
+            id="decisionDateEnd"
+            v-model="searchEntry.decisionDateEnd"
+            aria-label="Entscheidungsdatum Suche Ende"
+            class="ds-input-small"
+            placeholder="TT.MM.JJJJ (optional)"
           ></DateInput>
         </InputField>
       </div>

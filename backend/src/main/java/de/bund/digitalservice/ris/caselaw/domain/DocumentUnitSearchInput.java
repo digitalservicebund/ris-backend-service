@@ -11,6 +11,7 @@ public record DocumentUnitSearchInput(
     String documentNumberOrFileNumber,
     Court court,
     Instant decisionDate,
+    Instant decisionDateEnd,
     DocumentationOffice documentationOffice,
     DocumentUnitStatus status,
     boolean myDocOfficeOnly) {}

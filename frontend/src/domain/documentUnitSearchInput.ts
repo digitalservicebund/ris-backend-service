@@ -7,6 +7,7 @@ export default class DocumentUnitSearchInput {
   documentNumberOrFileNumber?: string
   court?: Court
   decisionDate?: string
+  decisionDateEnd?: string
   status?: NonNullable<DocumentUnit["status"]>
   documentationOffice?: DocumentationOffice
   myDocOfficeOnly?: boolean = false
