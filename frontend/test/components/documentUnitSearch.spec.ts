@@ -57,16 +57,10 @@ describe("Documentunit Search", () => {
         content: [
           new DocumentUnitListEntry({
             uuid: "123",
-            court: {
-              type: "type",
-              location: "location",
-              label: "label",
-            },
+            courtType: "type",
+            courtLocation: "location",
             decisionDate: "01.02.2022",
-            documentType: {
-              jurisShortcut: "documentTypeShortcut",
-              label: "documentType",
-            },
+            documentType: "documentTypeShortcut",
             documentNumber: "documentNumber",
             fileNumber: "fileNumber",
           }),
