@@ -4,6 +4,7 @@
 classDiagram
   class Norm {
     +UUID guid
+    +Boolean eGesetzgebung
   }
 
   Norm *-- "*" MetadataSection : metadataSections
