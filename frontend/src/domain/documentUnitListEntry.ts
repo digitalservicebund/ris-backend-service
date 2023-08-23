@@ -1,6 +1,4 @@
-import DocumentationOffice from "./documentationOffice"
-import DocumentUnit, { Court } from "./documentUnit"
-import { DocumentType } from "@/domain/documentUnit"
+import DocumentUnit from "./documentUnit"
 
 export default class DocumentUnitListEntry {
   public id?: string
@@ -8,11 +6,11 @@ export default class DocumentUnitListEntry {
   documentNumber?: string
   decisionDate?: string
   status?: NonNullable<DocumentUnit["status"]>
-  fileName?: string
   fileNumber?: string
-  documentationOffice?: DocumentationOffice
-  documentType?: DocumentType
-  court?: Court
+  fileName?: string
+  documentType?: string
+  courtLocation?: string
+  courtType?: string
 
   constructor(data: Partial<DocumentUnitListEntry> = {}) {
     Object.assign(this, data)

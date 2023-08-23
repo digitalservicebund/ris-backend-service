@@ -1,6 +1,7 @@
 package de.bund.digitalservice.ris.caselaw.domain;
 
 import java.util.UUID;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.NoRepositoryBean;
 import reactor.core.publisher.Flux;
@@ -35,7 +36,7 @@ public interface DocumentUnitRepository {
   Mono<Long> countSearchByDocumentUnitSearchInput(
       DocumentationOffice documentationOffice, DocumentUnitSearchInput searchInput);
 
-  Flux<DocumentUnitListEntry> searchByDocumentUnitSearchInput(
+  Page<DocumentationUnitSearchEntry> searchByDocumentUnitSearchInput(
       Pageable pageable,
       DocumentationOffice documentationOffice,
       DocumentUnitSearchInput searchInput);

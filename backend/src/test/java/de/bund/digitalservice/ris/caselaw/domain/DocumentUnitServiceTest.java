@@ -30,6 +30,8 @@ import org.mockito.MockedStatic;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.test.context.TestPropertySource;
@@ -437,21 +439,21 @@ class DocumentUnitServiceTest {
   void testSearchByDocumentUnitListEntry() {
     DocumentationOffice documentationOffice = DocumentationOffice.builder().build();
     DocumentUnitSearchInput documentUnitSearchInput = DocumentUnitSearchInput.builder().build();
-    DocumentUnitListEntry documentUnitListEntry = DocumentUnitListEntry.builder().build();
+    DocumentationUnitSearchEntry documentationUnitSearchEntry =
+        DocumentationUnitSearchEntry.builder().build();
     PageRequest pageRequest = PageRequest.of(0, 10);
 
     when(repository.searchByDocumentUnitSearchInput(
             pageRequest, documentationOffice, documentUnitSearchInput))
-        .thenReturn(Flux.just(documentUnitListEntry));
+        .thenReturn(new PageImpl<>(List.of(documentationUnitSearchEntry)));
     when(repository.countSearchByDocumentUnitSearchInput(
             documentationOffice, documentUnitSearchInput))
         .thenReturn(Mono.just(1L));
 
-    StepVerifier.create(
-            service.searchByDocumentUnitSearchInput(
-                pageRequest, documentationOffice, documentUnitSearchInput))
-        .consumeNextWith(pd -> assertEquals(pd.getContent().get(0), documentUnitListEntry))
-        .verifyComplete();
+    Page<DocumentationUnitSearchEntry> documentationUnitSearchEntries =
+        service.searchByDocumentUnitSearchInput(
+            pageRequest, documentationOffice, documentUnitSearchInput);
+    assertThat(documentationUnitSearchEntries).contains(documentationUnitSearchEntry);
     verify(repository)
         .searchByDocumentUnitSearchInput(pageRequest, documentationOffice, documentUnitSearchInput);
   }

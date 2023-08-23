@@ -22,6 +22,11 @@ spring:
         provider:
           keycloak:
             issuer-uri: ${OAUTH2_CLIENT_ISSUER:}
+#  jpa:
+#    show-sql: true
+#    properties:
+#      hibernate:
+#        format_sql: true
 mail:
   exporter:
     response:
@@ -32,3 +37,13 @@ mail:
 #  level:
 #    io.r2dbc.postgresql.QUERY: DEBUG # for queries
 #    io.r2dbc.postgresql.PARAM: DEBUG # for parameters
+
+#logging:
+#  level:
+#    org:
+#      hibernate:
+#        SQL: DEBUG
+#        type:
+#          descriptor:
+#            sql:
+#              BasicBinder: TRACE

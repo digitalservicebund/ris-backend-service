@@ -19,6 +19,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumen
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentUnitRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentUnitStatusRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitStatusDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.FileNumberDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.FileNumberRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.PostgresDocumentUnitRepositoryImpl;
@@ -32,6 +33,7 @@ import de.bund.digitalservice.ris.caselaw.domain.DataSource;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitListEntry;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.EmailPublishService;
+import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import java.time.Instant;
 import java.util.Arrays;
@@ -122,7 +124,7 @@ class DocumentUnitListEntryIntegrationTest {
                     .dataSource(DataSource.MIGRATION)
                     .build())
             .block();
-    DocumentUnitDTO neurisDto =
+    DocumentUnitDTO oldNeurisDto =
         repository
             .save(
                 DocumentUnitDTO.builder()
@@ -133,15 +135,17 @@ class DocumentUnitListEntryIntegrationTest {
                     .documentationOfficeId(docOfficeDTO.getId())
                     .build())
             .block();
-
-    fileNumberRepository
-        .save(
-            FileNumberDTO.builder()
-                .documentUnitId(neurisDto.getId())
-                .fileNumber("AkteX")
-                .isDeviating(false)
-                .build())
-        .block();
+    DocumentUnitDTO newNeurisDto =
+        repository
+            .save(
+                DocumentUnitDTO.builder()
+                    .uuid(UUID.randomUUID())
+                    .creationtimestamp(Instant.now())
+                    .documentnumber("NEUR202300008")
+                    .dataSource(DataSource.NEURIS)
+                    .documentationOfficeId(docOfficeDTO.getId())
+                    .build())
+            .block();
 
     fileNumberRepository
         .save(
@@ -149,6 +153,50 @@ class DocumentUnitListEntryIntegrationTest {
                 .documentUnitId(migrationDto.getId())
                 .fileNumber("AkteM")
                 .isDeviating(false)
+                .build())
+        .block();
+    fileNumberRepository
+        .save(
+            FileNumberDTO.builder()
+                .documentUnitId(oldNeurisDto.getId())
+                .fileNumber("AkteX")
+                .isDeviating(false)
+                .build())
+        .block();
+    fileNumberRepository
+        .save(
+            FileNumberDTO.builder()
+                .documentUnitId(newNeurisDto.getId())
+                .fileNumber("AkteY")
+                .isDeviating(false)
+                .build())
+        .block();
+
+    statusRepository
+        .save(
+            DocumentUnitStatusDTO.builder()
+                .id(UUID.randomUUID())
+                .newEntry(true)
+                .documentUnitId(migrationDto.getUuid())
+                .publicationStatus(PublicationStatus.JURIS_PUBLISHED)
+                .build())
+        .block();
+    statusRepository
+        .save(
+            DocumentUnitStatusDTO.builder()
+                .id(UUID.randomUUID())
+                .newEntry(true)
+                .documentUnitId(oldNeurisDto.getUuid())
+                .publicationStatus(PublicationStatus.TEST_DOC_UNIT)
+                .build())
+        .block();
+    statusRepository
+        .save(
+            DocumentUnitStatusDTO.builder()
+                .id(UUID.randomUUID())
+                .newEntry(true)
+                .documentUnitId(newNeurisDto.getUuid())
+                .publicationStatus(PublicationStatus.PUBLISHED)
                 .build())
         .block();
 
@@ -164,17 +212,25 @@ class DocumentUnitListEntryIntegrationTest {
         .jsonPath("$.content")
         .isArray()
         .jsonPath("$.content[0].documentNumber")
+        .isEqualTo("NEUR202300008")
+        .jsonPath("$.content[1].documentNumber")
         .isEqualTo("NEUR202300007")
-        .jsonPath("$.content[0].uuid")
-        .isEqualTo(neurisDto.getUuid().toString())
+        .jsonPath("$.content[2].documentNumber")
+        .isEqualTo("MIGR202200012")
         .jsonPath("$.content[0].fileNumber")
+        .isEqualTo("AkteY")
+        .jsonPath("$.content[1].fileNumber")
         .isEqualTo("AkteX")
-        .jsonPath("$.content[0].documentationOffice.label")
-        .isEqualTo("DigitalService")
+        .jsonPath("$.content[2].fileNumber")
+        .isEqualTo("AkteM")
         .jsonPath("$.content[0].status.publicationStatus")
         .isEqualTo("PUBLISHED")
+        .jsonPath("$.content[1].status.publicationStatus")
+        .isEqualTo("PUBLISHED")
+        .jsonPath("$.content[2].status.publicationStatus")
+        .isEqualTo("PUBLISHED")
         .jsonPath("$.totalElements")
-        .isEqualTo(2);
+        .isEqualTo(3);
   }
 
   @Test

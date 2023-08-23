@@ -180,18 +180,14 @@ public class DocumentUnitService {
         .flatMap(Function.identity());
   }
 
-  public Mono<Page<DocumentUnitListEntry>> searchByDocumentUnitSearchInput(
+  public Page<DocumentationUnitSearchEntry> searchByDocumentUnitSearchInput(
       Pageable pageable,
       DocumentationOffice documentationOffice,
       DocumentUnitSearchInput searchInput) {
-    return repository
-        .searchByDocumentUnitSearchInput(
-            PageRequest.of(pageable.getPageNumber(), pageable.getPageSize()),
-            documentationOffice,
-            searchInput)
-        .collectList()
-        .zipWith(repository.countSearchByDocumentUnitSearchInput(documentationOffice, searchInput))
-        .map(tuple -> new PageImpl<>(tuple.getT1(), pageable, tuple.getT2()));
+    return repository.searchByDocumentUnitSearchInput(
+        PageRequest.of(pageable.getPageNumber(), pageable.getPageSize()),
+        documentationOffice,
+        searchInput);
   }
 
   public Mono<DocumentUnit> getByDocumentNumber(String documentNumber) {

@@ -27,7 +27,7 @@ import de.bund.digitalservice.ris.caselaw.config.PostgresConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
 import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
 import de.bund.digitalservice.ris.caselaw.domain.DataSource;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitListEntry;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitSearchInput;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatus;
 import de.bund.digitalservice.ris.caselaw.domain.EmailPublishService;
@@ -84,15 +84,6 @@ class DocumentUnitControllerAuthIntegrationTest {
     registry.add("database.port", () -> postgreSQLContainer.getFirstMappedPort());
     registry.add("database.database", () -> postgreSQLContainer.getDatabaseName());
   }
-
-  private static final UUID OFFICE1_UNPUBLISHED_UUID = UUID.randomUUID();
-  private static final UUID OFFICE2_PUBLISHED_UUID = UUID.randomUUID();
-  private static final UUID OFFICE2_PUBLISHING_UUID = UUID.randomUUID();
-  private static final UUID OFFICE2_UNPUBLISHED_UUID = UUID.randomUUID();
-  private static final UUID OFFICE2_LATER_PUBLISHED_UUID = UUID.randomUUID();
-  private static final UUID OFFICE2_NO_STATUS_UUID = UUID.randomUUID();
-  private static final UUID WITHOUT_OFFICE_UUID = UUID.randomUUID();
-  private static final UUID OFFICE2_LATER_UNPUBLISHED_UUID = UUID.randomUUID();
 
   @Autowired private RisWebTestClient risWebTestClient;
   @Autowired private DatabaseDocumentUnitRepository repository;
@@ -160,20 +151,29 @@ class DocumentUnitControllerAuthIntegrationTest {
             .withLogin(userOfficeId)
             .put()
             .uri("/api/v1/caselaw/documentunits/search?pg=0&sz=10")
-            .bodyValue(DocumentUnitListEntry.builder().build())
+            .bodyValue(DocumentUnitSearchInput.builder().build())
             .exchange()
             .expectStatus()
             .isOk()
             .expectBody(String.class)
             .returnResult();
 
+    assertThat(extractStatusByUuid(result.getResponseBody(), docUnit.getUuid()))
+        .isEqualTo(getResultStatus(publicationStatus).toString());
+  }
+
+  private PublicationStatus getResultStatus(List<PublicationStatus> publicationStatus) {
     if (publicationStatus.isEmpty()) {
-      assertThat(extractStatusByUuid(result.getResponseBody(), docUnit.getUuid()))
-          .isEqualTo(PUBLISHED.toString());
-    } else {
-      assertThat(extractStatusByUuid(result.getResponseBody(), docUnit.getUuid()))
-          .isEqualTo(publicationStatus.get(publicationStatus.size() - 1).toString());
+      return null;
     }
+
+    PublicationStatus lastStatus = publicationStatus.get(publicationStatus.size() - 1);
+    if (lastStatus == PublicationStatus.TEST_DOC_UNIT
+        || lastStatus == PublicationStatus.JURIS_PUBLISHED) {
+      return PUBLISHED;
+    }
+
+    return lastStatus;
   }
 
   @ParameterizedTest
@@ -208,7 +208,7 @@ class DocumentUnitControllerAuthIntegrationTest {
             .withLogin(userOfficeId)
             .put()
             .uri("/api/v1/caselaw/documentunits/search?pg=0&sz=10")
-            .bodyValue(DocumentUnitListEntry.builder().build())
+            .bodyValue(DocumentUnitSearchInput.builder().build())
             .exchange()
             .expectStatus()
             .isOk()
@@ -234,7 +234,8 @@ class DocumentUnitControllerAuthIntegrationTest {
         Arguments.of("NEURIS", "NEURIS", List.of(PUBLISHING)),
         Arguments.of("NEURIS", "NEURIS", List.of(UNPUBLISHED, PUBLISHING)),
         Arguments.of("NEURIS", "NEURIS", List.of(UNPUBLISHED, PUBLISHED, UNPUBLISHED)),
-        Arguments.of("NEURIS", "NEURIS", List.of()));
+        Arguments.of("NEURIS", "NEURIS", List.of(PublicationStatus.TEST_DOC_UNIT)),
+        Arguments.of("NEURIS", "NEURIS", List.of(PublicationStatus.JURIS_PUBLISHED)));
   }
 
   @Test
@@ -351,13 +352,5 @@ class DocumentUnitControllerAuthIntegrationTest {
 
   private String extractUuid(String responseBody) {
     return JsonPath.read(responseBody, "$.uuid");
-  }
-
-  public static String getDocOfficeFromGroup(String input) {
-    int lastSlashIndex = input.lastIndexOf("/");
-    if (lastSlashIndex != -1 && lastSlashIndex < input.length() - 1) {
-      return input.substring(lastSlashIndex + 1);
-    }
-    return ""; // Return an empty string if there is no slash or it's the last character.
   }
 }

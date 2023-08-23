@@ -38,6 +38,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.oauth2.client.registration.ReactiveClientRegistrationRepository;
@@ -433,7 +434,7 @@ class DocumentUnitControllerTest {
     PageRequest pageRequest = PageRequest.of(0, 10);
 
     when(service.searchByDocumentUnitSearchInput(pageRequest, docOffice, documentUnitSearchInput))
-        .thenReturn(Mono.empty());
+        .thenReturn(Page.empty());
 
     risWebClient
         .withDefaultLogin()

@@ -1,5 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc;
 
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitSearchEntryDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPADocumentationOfficeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPADocumentationOfficeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPAProcedureDTO;
@@ -17,16 +18,14 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.Sta
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.StateRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.ActiveCitationTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DeviatingDecisionDateTransformer;
-import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentTypeTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentUnitTransformer;
-import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationOfficeTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationUnitLinkTransformer;
+import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationUnitSearchEntryTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.IncorrectCourtTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.LinkedDocumentationUnitTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.ActiveCitation;
 import de.bund.digitalservice.ris.caselaw.domain.DataSource;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitListEntry;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitNorm;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitRepository;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitSearchInput;
@@ -35,6 +34,7 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitException;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitLink;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitLinkType;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitSearchEntry;
 import de.bund.digitalservice.ris.caselaw.domain.LegalEffect;
 import de.bund.digitalservice.ris.caselaw.domain.LinkedDocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.Procedure;
@@ -42,6 +42,11 @@ import de.bund.digitalservice.ris.caselaw.domain.ProceedingDecision;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.court.Court;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.util.ArrayList;
@@ -52,6 +57,9 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -81,6 +89,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
   private final DatabaseCitationStyleRepository citationStyleRepository;
 
   private final JPAProcedureRepository procedureRepository;
+  private final EntityManager entityManager;
 
   public PostgresDocumentUnitRepositoryImpl(
       DatabaseDocumentUnitRepository repository,
@@ -101,7 +110,8 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
       DatabaseDocumentationUnitLinkRepository documentationUnitLinkRepository,
       DatabaseCitationStyleRepository citationStyleRepository,
       JPADocumentationOfficeRepository documentationOfficeRepository,
-      JPAProcedureRepository procedureRepository) {
+      JPAProcedureRepository procedureRepository,
+      EntityManager entityManager) {
 
     this.repository = repository;
     this.metadataRepository = metadataRepository;
@@ -122,6 +132,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
     this.documentationUnitLinkRepository = documentationUnitLinkRepository;
     this.citationStyleRepository = citationStyleRepository;
     this.procedureRepository = procedureRepository;
+    this.entityManager = entityManager;
   }
 
   @Override
@@ -1094,7 +1105,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
         .flatMap(
             dto ->
                 databaseDocumentUnitStatusRepository
-                    .findFirstByDocumentUnitIdOrderByCreatedAtDesc(documentUnitDTO.uuid)
+                    .findFirstByDocumentUnitIdOrderByCreatedAtDesc(documentUnitDTO.getUuid())
                     .map(
                         statusDTO -> {
                           dto.setStatus(
@@ -1219,7 +1230,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
     return list.isEmpty() ? null : list.toArray(Long[]::new);
   }
 
-  public Flux<DocumentUnitListEntry> searchByDocumentUnitSearchInput(
+  public Page<DocumentationUnitSearchEntry> searchByDocumentUnitSearchInput(
       Pageable pageable,
       DocumentationOffice documentationOffice,
       DocumentUnitSearchInput searchInput) {
@@ -1227,49 +1238,105 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
       log.debug("Find by overview search: {}, {}", documentationOffice, searchInput);
     }
 
-    return Mono.just(documentationOfficeRepository.findByLabel(documentationOffice.label()))
-        .flatMapMany(
-            docOffice ->
-                metadataRepository.searchByDocumentUnitSearchInput(
-                    docOffice.getId(),
-                    pageable.getPageSize(),
-                    pageable.getOffset(),
-                    searchInput.documentNumberOrFileNumber(),
-                    searchInput.court() == null ? null : searchInput.court().type(),
-                    searchInput.court() == null ? null : searchInput.court().location(),
-                    searchInput.decisionDate(),
-                    searchInput.status() == null ? null : searchInput.status().publicationStatus(),
-                    searchInput.myDocOfficeOnly()))
-        .flatMapSequential(this::injectFileNumbers)
-        .flatMapSequential(this::injectDocumentType)
-        .flatMapSequential(this::injectDocumentationOffice)
-        .flatMapSequential(this::injectStatus)
-        .map(
-            documentUnitDTO ->
-                DocumentUnitListEntry.builder()
-                    .uuid(documentUnitDTO.getUuid())
-                    .documentNumber(documentUnitDTO.getDocumentnumber())
-                    .decisionDate(documentUnitDTO.getDecisionDate())
-                    .dataSource(documentUnitDTO.getDataSource())
-                    .fileName(documentUnitDTO.getFilename())
-                    .documentType(
-                        documentUnitDTO.getDocumentTypeDTO() == null
-                            ? null
-                            : DocumentTypeTransformer.transformDTO(
-                                documentUnitDTO.getDocumentTypeDTO()))
-                    .court(
-                        DocumentUnitTransformer.getCourtObject(
-                            documentUnitDTO.getCourtType(), documentUnitDTO.getCourtLocation()))
-                    .fileNumber(
-                        documentUnitDTO.getFileNumbers() == null
-                                || documentUnitDTO.getFileNumbers().isEmpty()
-                            ? null
-                            : documentUnitDTO.getFileNumbers().get(0).getFileNumber())
-                    .documentationOffice(
-                        DocumentationOfficeTransformer.transformDTO(
-                            documentUnitDTO.getDocumentationOffice()))
-                    .status(documentUnitDTO.getStatus())
-                    .build());
+    JPADocumentationOfficeDTO documentationOfficeDTO =
+        documentationOfficeRepository.findByLabel(documentationOffice.label());
+
+    CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+    CriteriaQuery<DocumentationUnitSearchEntryDTO> query =
+        builder.createQuery(DocumentationUnitSearchEntryDTO.class);
+    Root<DocumentationUnitSearchEntryDTO> root = query.from(DocumentationUnitSearchEntryDTO.class);
+
+    Predicate[] predicates = getPredicates(searchInput, documentationOfficeDTO, builder, root);
+    query.where(predicates);
+    query.orderBy(builder.desc(root.get("id")));
+
+    CriteriaQuery<Long> countQuery = builder.createQuery(Long.class);
+    Root<DocumentationUnitSearchEntryDTO> root1 =
+        countQuery.from(DocumentationUnitSearchEntryDTO.class);
+
+    predicates = getPredicates(searchInput, documentationOfficeDTO, builder, root1);
+    countQuery.select(builder.count(root1)).where(predicates);
+
+    List<DocumentationUnitSearchEntryDTO> resultList =
+        entityManager
+            .createQuery(query)
+            .setFirstResult(pageable.getPageNumber() * pageable.getPageSize())
+            .setMaxResults(pageable.getPageSize())
+            .getResultList();
+
+    Long count = entityManager.createQuery(countQuery).getSingleResult();
+
+    List<DocumentationUnitSearchEntry> searchEntries =
+        resultList.stream().map(DocumentationUnitSearchEntryTransformer::transferDTO).toList();
+    return new PageImpl<>(searchEntries, pageable, count);
+  }
+
+  @NotNull
+  private static Predicate[] getPredicates(
+      DocumentUnitSearchInput searchInput,
+      JPADocumentationOfficeDTO documentationOfficeDTO,
+      CriteriaBuilder builder,
+      Root<DocumentationUnitSearchEntryDTO> root) {
+    List<Predicate> restrictions = new ArrayList<>();
+
+    if (searchInput.documentNumberOrFileNumber() != null) {
+      String pattern = "%" + searchInput.documentNumberOrFileNumber().toLowerCase() + "%";
+      Predicate documentNumberLike =
+          builder.like(builder.lower(root.get("documentNumber")), pattern);
+      Predicate firstFileNumberLike =
+          builder.like(builder.lower(root.get("firstFileNumber")), pattern);
+      restrictions.add(builder.or(documentNumberLike, firstFileNumberLike));
+    }
+
+    if (searchInput.court() != null) {
+      if (searchInput.court().location() != null) {
+        restrictions.add(builder.equal(root.get("courtLocation"), searchInput.court().location()));
+      }
+
+      if (searchInput.court().type() != null) {
+        restrictions.add(builder.equal(root.get("courtType"), searchInput.court().type()));
+      }
+    }
+
+    if (searchInput.decisionDate() != null) {
+      restrictions.add(builder.equal(root.get("decisionDate"), searchInput.decisionDate()));
+    }
+
+    Predicate myDocOffice =
+        builder.equal(root.get("documentationOfficeId"), documentationOfficeDTO.getId());
+    if (searchInput.status() != null && searchInput.status().publicationStatus() != null) {
+      Predicate status =
+          builder.equal(root.get("publicationStatus"), searchInput.status().publicationStatus());
+      if (searchInput.status().publicationStatus() == PublicationStatus.PUBLISHED) {
+        status =
+            root.get("publicationStatus")
+                .in(
+                    PublicationStatus.PUBLISHED,
+                    PublicationStatus.TEST_DOC_UNIT,
+                    PublicationStatus.JURIS_PUBLISHED);
+      }
+      if (searchInput.myDocOfficeOnly()
+          || searchInput.status().publicationStatus() == PublicationStatus.UNPUBLISHED) {
+        restrictions.add(builder.and(myDocOffice, status));
+      } else {
+        restrictions.add(status);
+      }
+    } else {
+      Predicate status =
+          root.get("publicationStatus")
+              .in(
+                  PublicationStatus.PUBLISHED,
+                  PublicationStatus.PUBLISHING,
+                  PublicationStatus.TEST_DOC_UNIT,
+                  PublicationStatus.JURIS_PUBLISHED);
+      if (searchInput.myDocOfficeOnly()) {
+        restrictions.add(myDocOffice);
+      } else {
+        restrictions.add(builder.or(myDocOffice, status));
+      }
+    }
+
+    return restrictions.toArray(new Predicate[0]);
   }
 
   @Override
