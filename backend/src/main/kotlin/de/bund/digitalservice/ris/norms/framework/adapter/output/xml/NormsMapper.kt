@@ -5,13 +5,11 @@ import de.bund.digitalservice.ris.norms.domain.entity.Norm
 import de.bund.digitalservice.ris.norms.domain.entity.Paragraph
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType
-import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.encodeLocalDate
 import de.bund.digitalservice.ris.norms.framework.adapter.output.xml.dto.ArticleDto
 import de.bund.digitalservice.ris.norms.framework.adapter.output.xml.dto.ContentDto
 import de.bund.digitalservice.ris.norms.framework.adapter.output.xml.dto.IdentifiedElement
 import de.bund.digitalservice.ris.norms.framework.adapter.output.xml.dto.NormDto
 import de.bund.digitalservice.ris.norms.framework.adapter.output.xml.dto.ParagraphDto
-import java.time.LocalDate
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
@@ -20,7 +18,7 @@ import org.jsoup.nodes.TextNode
 fun mapNormToDto(norm: Norm): NormDto {
   val firstCitationDate =
       norm.getFirstMetadatum(MetadataSectionName.CITATION_DATE, MetadatumType.DATE)?.let {
-        encodeLocalDate(it.value as LocalDate)
+        it.value.toString()
       }
   val firstCitationYear =
       norm.getFirstMetadatum(MetadataSectionName.CITATION_DATE, MetadatumType.YEAR)?.let {
@@ -29,7 +27,7 @@ fun mapNormToDto(norm: Norm): NormDto {
 
   val firstAnnouncementDate =
       norm.getFirstMetadatum(MetadataSectionName.ANNOUNCEMENT_DATE, MetadatumType.DATE)?.let {
-        encodeLocalDate(it.value as LocalDate)
+        it.value.toString()
       }
   val firstAnnouncementYear =
       norm.getFirstMetadatum(MetadataSectionName.ANNOUNCEMENT_DATE, MetadatumType.YEAR)?.let {

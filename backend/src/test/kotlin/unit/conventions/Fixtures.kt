@@ -21,13 +21,11 @@ val sourceClasses =
     ClassFileImporter()
         .withImportOption(Predefined.DO_NOT_INCLUDE_TESTS)
         .importPackages("$BASE_PACKAGE_PATH..")
-        .that(are(not(aKotlinStaticClass())))
 
 val testClasses =
     ClassFileImporter()
         .withImportOption(Predefined.ONLY_INCLUDE_TESTS)
         .importPackages("$BASE_PACKAGE_PATH..")
-        .that(are(not(aKotlinStaticClass())))
 
 fun areFromTheDomain() = resideInAPackage("$BASE_PACKAGE_PATH.domain..")
 

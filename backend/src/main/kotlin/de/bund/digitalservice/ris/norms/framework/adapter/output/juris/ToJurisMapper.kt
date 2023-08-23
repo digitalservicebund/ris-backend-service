@@ -5,8 +5,6 @@ import de.bund.digitalservice.ris.norms.domain.entity.Norm
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName as Section
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType
 import de.bund.digitalservice.ris.norms.domain.value.NormCategory
-import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.encodeLocalDate
-import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.encodeLocalDateToGermanFormat
 import de.bund.digitalservice.ris.norms.juris.converter.model.CategorizedReference
 import de.bund.digitalservice.ris.norms.juris.converter.model.DigitalAnnouncement
 import de.bund.digitalservice.ris.norms.juris.converter.model.DivergentEntryIntoForce
@@ -102,7 +100,7 @@ private fun extractDocumentStatus(norm: Norm): List<DocumentStatus> =
           val date =
               section.metadata
                   .find { it.type == MetadatumType.DATE }
-                  ?.let { found -> encodeLocalDate(found.value as LocalDate) }
+                  ?.let { found -> found.value.toString() }
           val year =
               section.metadata.find { it.type == MetadatumType.YEAR }?.let { it.value.toString() }
           DocumentStatus(
@@ -161,7 +159,7 @@ private fun extractAnnouncementDate(norm: Norm): String? {
   val yearValue = year?.value?.toString()
 
   val date = section?.metadata?.firstOrNull { it.type == MetadatumType.DATE }
-  val dateValue = encodeLocalDate(date?.value as LocalDate?)
+  val dateValue = date?.value?.toString()
 
   val time = section?.metadata?.firstOrNull { it.type == MetadatumType.TIME }
   val timeValue = encodeLocalTime(time?.value as LocalTime?)
@@ -179,13 +177,7 @@ fun extractCitationDates(norm: Norm): List<String> =
         .filter { it.name == Section.CITATION_DATE }
         .sortedBy { it.order }
         .flatMap { it.metadata }
-        .map {
-          if (it.type == MetadatumType.DATE) {
-            encodeLocalDate(it.value as LocalDate)
-          } else {
-            it.value.toString()
-          }
-        }
+        .map { it.value.toString() }
         .filterNotNull()
 
 private fun extractSimpleStringValuesFromNormSection(
@@ -344,7 +336,7 @@ private fun extractDivergentEntryIntoForces(norm: Norm): List<DivergentEntryInto
           val date =
               it.metadata
                   .find { metadatum -> metadatum.type == MetadatumType.DATE }
-                  ?.let { found -> encodeLocalDate(found.value as LocalDate) }
+                  ?.let { found -> found.value.toString() }
           val state =
               it.metadata
                   .find { metadatum -> metadatum.type == MetadatumType.UNDEFINED_DATE }
@@ -367,7 +359,7 @@ private fun extractDivergentExpirations(norm: Norm): List<DivergentExpiration> =
           val date =
               it.metadata
                   .find { metadatum -> metadatum.type == MetadatumType.DATE }
-                  ?.let { found -> encodeLocalDate(found.value as LocalDate) }
+                  ?.let { found -> found.value.toString() }
           val state =
               it.metadata
                   .find { metadatum -> metadatum.type == MetadatumType.UNDEFINED_DATE }
@@ -444,7 +436,7 @@ private fun extractEntryIntoForceDate(norm: Norm): String? =
         ?.let {
           it.metadata
               .find { metadatum -> metadatum.type == MetadatumType.DATE }
-              ?.let { found -> encodeLocalDate(found.value as LocalDate) }
+              ?.let { found -> found.value.toString() }
         }
 
 private fun extractEntryIntoForceState(norm: Norm): String? =
@@ -462,7 +454,7 @@ private fun extractExpirationDate(norm: Norm): String? =
         ?.let {
           it.metadata
               .find { metadatum -> metadatum.type == MetadatumType.DATE }
-              ?.let { found -> encodeLocalDate(found.value as LocalDate) }
+              ?.let { found -> found.value.toString() }
         }
 
 private fun extractExpirationState(norm: Norm): String? =
@@ -483,3 +475,6 @@ private fun parseDomainNormToData(normCategory: NormCategory?): String? =
     }
 
 private fun encodeLocalTime(time: LocalTime?) = time?.format(DateTimeFormatter.ofPattern("HH:mm"))
+
+private fun encodeLocalDateToGermanFormat(date: LocalDate?): String? =
+    date?.format(DateTimeFormatter.ofPattern("d.M.yyyy"))

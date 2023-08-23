@@ -1,13 +1,16 @@
 package de.bund.digitalservice.ris.norms.conventions
 
+import com.tngtech.archunit.base.DescribedPredicate.not
 import com.tngtech.archunit.core.domain.JavaClass.Predicates.simpleNameEndingWith
 import com.tngtech.archunit.lang.conditions.ArchConditions.beAnnotatedWith
 import com.tngtech.archunit.lang.conditions.ArchConditions.beMemberClasses
 import com.tngtech.archunit.lang.conditions.ArchConditions.haveSimpleNameEndingWith
+import com.tngtech.archunit.lang.conditions.ArchPredicates.are
 import com.tngtech.archunit.lang.conditions.ArchPredicates.have
 import com.tngtech.archunit.lang.syntax.ArchRuleDefinition.classes
 import de.bund.digitalservice.ris.norms.conventions.condition.Conditions.haveAMethodWithNameLikeClassPrefix
 import de.bund.digitalservice.ris.norms.conventions.condition.Conditions.implementInterfaceWithSamePrefix
+import de.bund.digitalservice.ris.norms.conventions.predicate.Predicates.aKotlinStaticClass
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.springframework.stereotype.Service
@@ -20,6 +23,7 @@ class NamingConventionTest {
   fun `input ports are named as use-case but no other class`() {
     classes()
         .that(areFromTheInputPortPackage())
+        .and(are(not(aKotlinStaticClass())))
         .should(haveSimpleNameEndingWith("UseCase"))
         .orShould(beMemberClasses())
         .check(sourceClasses)
@@ -42,6 +46,7 @@ class NamingConventionTest {
   fun `output ports are named as output port but no other class`() {
     classes()
         .that(areFromTheOutputPortPackage())
+        .and(are(not(aKotlinStaticClass())))
         .should(haveSimpleNameEndingWith("OutputPort"))
         .orShould(beMemberClasses())
         .check(sourceClasses)
@@ -65,6 +70,7 @@ class NamingConventionTest {
   fun `application services are named as service`() {
     classes()
         .that(areFromTheServicePackage())
+        .and(are(not(aKotlinStaticClass())))
         .and()
         .areNotInnerClasses()
         .should(haveSimpleNameEndingWith("Service"))
@@ -93,6 +99,7 @@ class NamingConventionTest {
   fun `REST controllers are named as controller`() {
     classes()
         .that(areFromTheRestControllerPackage())
+        .and(are(not(aKotlinStaticClass())))
         .should(haveSimpleNameEndingWith("Controller"))
         .orShould(beMemberClasses())
         .check(sourceClasses)
