@@ -7,9 +7,53 @@ classDiagram
     +Boolean eGesetzgebung
   }
 
-  Norm *-- "*" MetadataSection : metadataSections
+  Norm *-- "0..1" Recitals : recitals
+  Norm *-- "*" Documentation : documentation
+  Norm *-- "0..1" Conclusion : conclusion
   Norm *-- "*" FileReference : files
-  Norm *-- "*" Article : articles
+  Norm *-- "*" MetadataSection : metadataSections
+
+  class Recitals {
+    +String? heading
+    +String? marker
+    +String text
+  }
+
+  class Conclusion {
+    +String text
+  }
+
+  class Documentation {
+    <<sealed class>>
+    +UUID guid
+    +Int order
+    +String? marker
+    +String? heading
+  }
+
+  Documentation <|-- DocumentSection
+  Documentation <|-- Article
+
+  class DocumentSection
+
+  DocumentSection *-- "*" Documentation : documentation
+  DocumentSection *-- "1" DocumentSectionType : type
+
+  class DocumentSectionType {
+    <<enumeration>>
+    BOOK
+    PART
+    CHAPTER
+    SUBCHAPTER
+    SECTION
+    SUBSECTION
+    TITLE
+    SUBTITLE
+  }
+
+  class Article{
+    +String text
+  }
 
   class FileReference {
     +String name
@@ -183,19 +227,5 @@ classDiagram
      <<enumeration>>
     TEXT_IN_PROGRESS
     TEXT_PROOFED_BUT_NOT_DONE
-  }
-
-  class Article {
-    +UUID guid
-    +String marker
-    +String title
-  }
-
-  Article *-- "*" Paragraph : paragraphs
-
-  class Paragraph {
-    +UUID guid
-    +String marker
-    +String text
   }
 ```
