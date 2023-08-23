@@ -85,7 +85,8 @@ class NormAbbreviationIntegrationTest {
   private static final UUID REGION_UUID_2 = UUID.fromString("E2E2E2E2-2222-3333-4444-555555555555");
 
   @Container
-  static PostgreSQLContainer<?> postgreSQLContainer = new PostgreSQLContainer<>("postgres:12");
+  static PostgreSQLContainer<?> postgreSQLContainer =
+      new PostgreSQLContainer<>("postgres:12").withInitScript("db/create_extension.sql");
 
   @DynamicPropertySource
   static void registerDynamicProperties(DynamicPropertyRegistry registry) {

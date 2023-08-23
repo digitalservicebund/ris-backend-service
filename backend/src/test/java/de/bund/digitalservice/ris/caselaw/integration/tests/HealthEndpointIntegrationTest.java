@@ -33,7 +33,8 @@ import org.testcontainers.utility.DockerImageName;
 class HealthEndpointIntegrationTest {
 
   @Container
-  static PostgreSQLContainer<?> postgreSQLContainer = new PostgreSQLContainer<>("postgres:12");
+  static PostgreSQLContainer<?> postgreSQLContainer =
+      new PostgreSQLContainer<>("postgres:12").withInitScript("db/create_extension.sql");
 
   @Container
   static GenericContainer<?> redis =

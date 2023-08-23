@@ -72,7 +72,8 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
     timeout = "10000000")
 class SaveNormIntegrationTest {
   @Container
-  static PostgreSQLContainer<?> postgreSQLContainer = new PostgreSQLContainer<>("postgres:12");
+  static PostgreSQLContainer<?> postgreSQLContainer =
+      new PostgreSQLContainer<>("postgres:12").withInitScript("db/create_extension.sql");
 
   @DynamicPropertySource
   static void registerDynamicProperties(DynamicPropertyRegistry registry) {

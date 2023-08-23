@@ -30,6 +30,7 @@ open class PostgresTestcontainerIntegrationTest {
           withDatabaseName("testdb")
           withUsername("user")
           withPassword("password")
+          withInitScript("db/create_extension.sql")
           start()
         }
 

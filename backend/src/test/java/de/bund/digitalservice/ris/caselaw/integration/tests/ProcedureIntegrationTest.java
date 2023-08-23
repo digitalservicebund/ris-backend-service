@@ -69,7 +69,8 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
     controllers = {DocumentUnitController.class, ProcedureController.class})
 class ProcedureIntegrationTest {
   @Container
-  static PostgreSQLContainer<?> postgreSQLContainer = new PostgreSQLContainer<>("postgres:12");
+  static PostgreSQLContainer<?> postgreSQLContainer =
+      new PostgreSQLContainer<>("postgres:12").withInitScript("db/create_extension.sql");
 
   @DynamicPropertySource
   static void registerDynamicProperties(DynamicPropertyRegistry registry) {
