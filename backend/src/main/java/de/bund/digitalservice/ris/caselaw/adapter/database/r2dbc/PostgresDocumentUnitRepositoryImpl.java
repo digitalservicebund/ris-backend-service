@@ -4,6 +4,8 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnit
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPADocumentationOfficeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPADocumentationOfficeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPAProcedureDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPAProcedureLinkDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPAProcedureLinkRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPAProcedureRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitDTO.DocumentUnitDTOBuilder;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.CourtDTO;
@@ -87,8 +89,8 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
   private final DatabaseNormAbbreviationRepository normAbbreviationRepository;
   private final DatabaseDocumentationUnitLinkRepository documentationUnitLinkRepository;
   private final DatabaseCitationStyleRepository citationStyleRepository;
-
   private final JPAProcedureRepository procedureRepository;
+  private final JPAProcedureLinkRepository procedureLinkRepository;
   private final EntityManager entityManager;
 
   public PostgresDocumentUnitRepositoryImpl(
@@ -111,6 +113,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
       DatabaseCitationStyleRepository citationStyleRepository,
       JPADocumentationOfficeRepository documentationOfficeRepository,
       JPAProcedureRepository procedureRepository,
+      JPAProcedureLinkRepository procedureLinkRepository,
       EntityManager entityManager) {
 
     this.repository = repository;
@@ -132,6 +135,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
     this.documentationUnitLinkRepository = documentationUnitLinkRepository;
     this.citationStyleRepository = citationStyleRepository;
     this.procedureRepository = procedureRepository;
+    this.procedureLinkRepository = procedureLinkRepository;
     this.entityManager = entityManager;
   }
 
@@ -735,8 +739,15 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
         .map(procedure -> findOrCreateProcedure(procedure, documentationOfficeLabel))
         .ifPresent(
             procedureDTO -> {
+              if (!areCurrentlyLinked(documentUnitDTO, procedureDTO)) {
+                procedureLinkRepository.save(
+                    JPAProcedureLinkDTO.builder()
+                        .procedureDTO(procedureDTO)
+                        .documentationUnitId(documentUnitDTO.uuid)
+                        .build());
+              }
+
               documentUnitDTO.setProcedure(procedureDTO);
-              documentUnitDTO.setProcedureId(procedureDTO.getId());
             });
 
     return Mono.just(documentUnitDTO);
@@ -757,6 +768,15 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
                         .label(procedure.label())
                         .documentationOffice(documentationOfficeDTO)
                         .build()));
+  }
+
+  private Boolean areCurrentlyLinked(
+      DocumentUnitDTO documentUnitDTO, JPAProcedureDTO procedureDTO) {
+    return Optional.ofNullable(
+            procedureLinkRepository.findFirstByDocumentationUnitIdOrderByCreatedAtDesc(
+                documentUnitDTO.uuid))
+        .map(linkDTO -> linkDTO.getProcedureDTO().equals(procedureDTO))
+        .orElse(false);
   }
 
   private Mono<DocumentUnit> unlinkLinkedDocumentationUnit(
@@ -1128,8 +1148,10 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
   }
 
   private <T extends DocumentUnitMetadataDTO> Mono<T> injectProcedure(T documentUnitDTO) {
-    Optional.ofNullable(documentUnitDTO.getProcedureId())
-        .flatMap(procedureRepository::findById)
+    Optional.ofNullable(
+            procedureLinkRepository.findFirstByDocumentationUnitIdOrderByCreatedAtDesc(
+                documentUnitDTO.uuid))
+        .map(JPAProcedureLinkDTO::getProcedureDTO)
         .ifPresent(documentUnitDTO::setProcedure);
 
     return Mono.just(documentUnitDTO);

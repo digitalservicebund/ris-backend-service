@@ -72,9 +72,6 @@ public class DocumentUnitMetadataDTO {
   @Column("documentation_office_id")
   private UUID documentationOfficeId;
 
-  @Column("procedure_id")
-  private UUID procedureId;
-
   @Transient private JPADocumentationOfficeDTO documentationOffice;
 
   @Transient private List<FileNumberDTO> fileNumbers;
@@ -82,4 +79,6 @@ public class DocumentUnitMetadataDTO {
   @Transient private DocumentUnitStatus status;
 
   @Transient private JPAProcedureDTO procedure;
+
+  @Transient private List<JPAProcedureDTO> previousProcedures;
 }

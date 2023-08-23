@@ -16,6 +16,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.ProcedureService;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPADocumentationOfficeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPADocumentationOfficeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPAProcedureDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPAProcedureLinkRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPAProcedureRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentUnitRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitDTO;
@@ -85,6 +86,7 @@ class ProcedureIntegrationTest {
   @Autowired private DatabaseDocumentUnitRepository documentUnitRepository;
   @Autowired private JPADocumentationOfficeRepository documentationOfficeRepository;
   @Autowired private JPAProcedureRepository repository;
+  @Autowired private JPAProcedureLinkRepository linkRepository;
 
   @MockBean private DocumentNumberService numberService;
   @MockBean private DocumentUnitStatusService statusService;
@@ -106,6 +108,7 @@ class ProcedureIntegrationTest {
 
   @AfterEach
   void cleanUp() {
+    linkRepository.deleteAll();
     documentUnitRepository.deleteAll().block();
     repository.deleteAll();
   }
@@ -202,8 +205,12 @@ class ProcedureIntegrationTest {
                 assertThat(response.getResponseBody().coreData().procedure()).isEqualTo(procedure));
 
     assertThat(repository.findAll()).hasSize(1);
-    assertThat(documentUnitRepository.findByUuid(dto.getUuid()).block().getProcedureId())
-        .isEqualTo(procedureDTO.getId());
+    assertThat(
+            linkRepository
+                .findFirstByDocumentationUnitIdOrderByCreatedAtDesc(documentUnitFromFrontend.uuid())
+                .getProcedureDTO())
+        .isEqualTo(procedureDTO);
+    assertThat(linkRepository.findAll()).hasSize(1);
   }
 
   @Test
