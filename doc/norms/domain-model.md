@@ -4,71 +4,25 @@
 classDiagram
   class Norm {
     +UUID guid
-    +List~MetadataSection~ metadataSections
-    +List~Article~ articles
-
-    List~FileReference~ files
   }
 
-  class Metadatum {
-      +String value
-      +MetadatumType type
-      +Integer order
+  Norm *-- "*" MetadataSection : metadataSections
+  Norm *-- "*" FileReference : files
+  Norm *-- "*" Article : articles
+
+  class FileReference {
+    +String name
+    +String hash
+    +Timestamp createdAt
   }
 
   class MetadataSection {
-      +MetadataSectionName name
       +Integer order
-      List~Metadatum~ metadata
-      List~MetadataSection~ sections
   }
 
-  class Article {
-    +UUID guid
-    +String marker
-    +String title
-    +List~Paragraph~ paragraphs
-  }
-
-  class Paragraph {
-    +UUID guid
-    +String marker
-    +String text
-  }
-
-
-  class UndefinedDate  {
-     <<enumeration>>
-    UNDEFINED_UNKNOWN
-    UNDEFINED_FUTURE
-    UNDEFINED_NOT_PRESENT
-  }
-
-  class NormCategory  {
-     <<enumeration>>
-    BASE_NORM
-    AMENDMENT_NORM
-    TRANSITIONAL_NORM
-  }
-
-  class ProofIndication  {
-     <<enumeration>>
-    NOT_YET_CONSIDERED
-    CONSIDERED
-  }
-
-  class ProofType  {
-     <<enumeration>>
-    TEXT_PROOF_FROM
-    TEXT_PROOF_VALIDITY_FROM
-  }
-
-  class OtherType  {
-     <<enumeration>>
-    TEXT_IN_PROGRESS
-    TEXT_PROOFED_BUT_NOT_DONE
-  }
-
+  MetadataSection *-- "1" MetadataSectionName
+  MetadataSection *-- "*" MetadataSection : sections
+  MetadataSection *-- "*" Metadatum : metadata
 
   class MetadataSectionName  {
      <<enumeration>>
@@ -110,6 +64,18 @@ classDiagram
      PUBLICATION_DATE
      ANNOUNCEMENT_DATE
   }
+
+  class Metadatum~T~ {
+      +T value
+      +Integer order
+  }
+
+  Metadatum *-- "1" MetadatumType : type
+  Metadatum --> UndefinedDate
+  Metadatum --> NormCategory
+  Metadatum --> ProofIndication
+  Metadatum --> ProofType
+  Metadatum --> OtherType
 
   class MetadatumType  {
       <<enumeration>>
@@ -186,16 +152,49 @@ classDiagram
     CELEX_NUMBER
   }
 
-  class FileReference {
-    +String name
-    +String hash
-    +Timestamp createdAt
+  class UndefinedDate  {
+     <<enumeration>>
+    UNDEFINED_UNKNOWN
+    UNDEFINED_FUTURE
+    UNDEFINED_NOT_PRESENT
   }
 
-  Norm "1" --> "*" MetadataSection
-  Norm "1" --> "*" Article
-  Norm "1" --> "*" FileReference
-  Article "1" --> "*" Paragraph
-  MetadataSection "1" --> "*" Metadatum
-  MetadataSection "1" --> "*" MetadataSection
+  class NormCategory  {
+     <<enumeration>>
+    BASE_NORM
+    AMENDMENT_NORM
+    TRANSITIONAL_NORM
+  }
+
+  class ProofIndication  {
+     <<enumeration>>
+    NOT_YET_CONSIDERED
+    CONSIDERED
+  }
+
+  class ProofType  {
+     <<enumeration>>
+    TEXT_PROOF_FROM
+    TEXT_PROOF_VALIDITY_FROM
+  }
+
+  class OtherType  {
+     <<enumeration>>
+    TEXT_IN_PROGRESS
+    TEXT_PROOFED_BUT_NOT_DONE
+  }
+
+  class Article {
+    +UUID guid
+    +String marker
+    +String title
+  }
+
+  Article *-- "*" Paragraph : paragraphs
+
+  class Paragraph {
+    +UUID guid
+    +String marker
+    +String text
+  }
 ```
