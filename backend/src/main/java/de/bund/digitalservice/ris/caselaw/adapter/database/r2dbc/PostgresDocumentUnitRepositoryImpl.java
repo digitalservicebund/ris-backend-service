@@ -1299,7 +1299,15 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
     }
 
     if (searchInput.decisionDate() != null) {
-      restrictions.add(builder.equal(root.get("decisionDate"), searchInput.decisionDate()));
+      if (searchInput.decisionDateEnd() != null) {
+        restrictions.add(
+            builder.between(
+                root.get("decisionDate"),
+                searchInput.decisionDate(),
+                searchInput.decisionDateEnd()));
+      } else {
+        restrictions.add(builder.equal(root.get("decisionDate"), searchInput.decisionDate()));
+      }
     }
 
     Predicate myDocOffice =

@@ -1029,6 +1029,14 @@ class DocumentUnitIntegrationTest {
     assertThat(extractDocumentNumbersFromSearchCall(searchInput))
         .containsExactly("MNOP202300099", "IJKL202101234", "EFGH202200123", "ABCD202300007");
 
+    // between to decision dates
+    Instant start = Instant.parse("2022-02-01T00:00:00.00Z");
+    Instant end = Instant.parse("2023-08-05T00:00:00.00Z");
+    searchInput =
+        DocumentUnitSearchInput.builder().decisionDate(start).decisionDateEnd(end).build();
+    assertThat(extractDocumentNumbersFromSearchCall(searchInput))
+        .containsExactly("MNOP202300099", "IJKL202101234", "EFGH202200123");
+
     // all combined
     searchInput =
         DocumentUnitSearchInput.builder()
