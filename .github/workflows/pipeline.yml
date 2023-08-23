@@ -941,7 +941,7 @@ jobs:
 
   generate-entity-relationship-diagram:
     runs-on: ubuntu-latest
-    if: ${{ github.ref == 'refs/heads/main' }}
+    if: ${{ false }}
     env:
       POSTGRES_DB: ris-erd
       POSTGRES_PASSWORD: postgres
@@ -1042,7 +1042,7 @@ jobs:
   push-reports:
     runs-on: ubuntu-latest
     needs:
-      - generate-entity-relationship-diagram
+#      - generate-entity-relationship-diagram
       - backend-build
       - audit-licenses-backend
       - audit-licenses-frontend
