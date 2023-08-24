@@ -78,9 +78,7 @@ describe("documentUnit list", () => {
 
   test("shows loading state", () => {
     renderComponent({ isLoading: true })
-    expect(
-      screen.getByText(/Dokumentationseinheiten werden geladen .../),
-    ).toBeVisible()
+    expect(screen.getByLabelText("Ladestatus")).toBeInTheDocument()
   })
 
   test("renders documentUnit list", async () => {

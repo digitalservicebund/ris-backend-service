@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import dayjs from "dayjs"
-import { computed, ref } from "vue"
+import { computed, nextTick, ref, watch, watchEffect } from "vue"
 import { useRouter } from "vue-router"
 import DocumentUnitListEntry from "../domain/documentUnitListEntry"
 import { useStatusBadge } from "@/composables/useStatusBadge"
@@ -31,16 +31,38 @@ const listEntriesWithStatus = computed(() => {
     : []
 })
 
+const documentUnitListRef = ref(null)
+const listheight = ref("auto")
+
+async function determineDocumentUnitListheight() {
+  if (!documentUnitListRef.value) return
+  // We first need to reset the height to auto, so that the scrollHeight
+  // is not limited by the current height. Then wait for the next tick
+  // so that the textarea has time to resize.
+  listheight.value = "auto"
+  await nextTick()
+  const { height } = getComputedStyle(documentUnitListRef.value as Element)
+
+  listheight.value = `${height}`
+}
+
+watchEffect(() => {
+  determineDocumentUnitListheight().catch(() => {
+    // left blank intentionally
+  })
+})
+
+watch(listEntriesWithStatus, async () => {
+  await determineDocumentUnitListheight()
+})
+
 const emptyStatus = computed(() => {
-  if (props.isLoading) return "Dokumentationseinheiten werden geladen ..."
-  else {
-    if (!props.documentUnitListEntries) {
-      return "Starten Sie die Suche oder erstellen Sie eine"
-    } else if (props.documentUnitListEntries.length === 0) {
-      return "Keine Ergebnisse gefunden."
-    }
-    return undefined
+  if (!props.documentUnitListEntries) {
+    return "Starten Sie die Suche oder erstellen Sie eine"
+  } else if (props.documentUnitListEntries.length === 0) {
+    return "Keine Ergebnisse gefunden."
   }
+  return undefined
 })
 
 const showModal = ref(false)
@@ -80,7 +102,7 @@ function onDelete() {
 </script>
 
 <template>
-  <div>
+  <div ref="documentUnitListRef">
     <PopupModal
       v-if="showModal"
       :aria-label="modalHeaderText"
@@ -92,7 +114,7 @@ function onDelete() {
       @close-modal="toggleModal"
       @confirm-action="onDelete"
     />
-    <div class="document-unit-list-table table w-full border-collapse">
+    <div class="document-unit-list-table relative table w-full border-collapse">
       <div class="ds-label-01-bold table-row bg-gray-400">
         <div class="table-cell p-16">Dokumentnummer</div>
         <div class="table-cell p-16"></div>
@@ -103,6 +125,19 @@ function onDelete() {
         <div class="table-cell p-16">Typ</div>
         <div class="table-cell p-16">Status</div>
         <div class="table-cell p-16">Löschen</div>
+      </div>
+      <div
+        v-if="isLoading"
+        aria-label="Ladestatus"
+        class="absolute flex w-full items-center justify-center bg-white bg-opacity-60"
+        :class="{
+          [$style.spinner]: true,
+        }"
+      >
+        <div
+          class="inline-block h-32 w-32 animate-spin rounded-full border-[3px] border-solid border-blue-900 border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]"
+          role="status"
+        ></div>
       </div>
 
       <div
@@ -204,3 +239,9 @@ function onDelete() {
     </div>
   </div>
 </template>
+
+<style module>
+.spinner {
+  height: v-bind(listheight);
+}
+</style>
