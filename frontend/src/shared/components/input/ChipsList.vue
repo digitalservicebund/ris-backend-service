@@ -117,8 +117,12 @@ function focusNext() {
       <li
         v-for="(chip, i) in modelValue"
         :key="i"
-        class="group ds-body-01-reg relative flex cursor-pointer items-center break-words rounded-10 bg-blue-500 pr-32 outline-none"
-        :class="{ 'cursor-default bg-gray-400 pr-0': readOnly }"
+        class="group ds-body-01-reg relative flex items-center break-words rounded-10 outline-none"
+        :class="[
+          readOnly
+            ? 'cursor-default bg-gray-400 pr-0'
+            : 'cursor-pointer bg-blue-500 pr-32',
+        ]"
         data-testid="chip"
         tabindex="0"
         @click.stop="localFocusedItem = i"
