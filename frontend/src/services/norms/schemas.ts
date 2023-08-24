@@ -2,7 +2,7 @@ import {
   MetadatumType,
   MetadataSectionName,
   FlatMetadata,
-  NormBase,
+  Norm,
 } from "@/domain/norm"
 
 type NullableType<Type> = {
@@ -14,8 +14,8 @@ export type NormListResponseSchema = {
   officialLongTitle: string
 }[]
 
-export interface NormResponseSchema extends NormBase, FlatMetadata {
-  metadataSections?: MetadataSectionSchema[]
+export interface NormResponseSchema extends Omit<Norm, "metadataSections"> {
+  metadataSections: MetadataSectionSchema[]
 }
 
 export interface MetadatumSchema {

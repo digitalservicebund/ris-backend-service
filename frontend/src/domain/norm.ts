@@ -1,12 +1,9 @@
-export interface NormBase {
+export interface Norm extends FlatMetadata {
   readonly guid: string
   readonly files?: FileReference[]
   recitals?: Recitals
   documentation?: (Article | DocumentSection)[]
   conclusion?: Conclusion
-}
-
-export interface Norm extends NormBase, FlatMetadata {
   metadataSections?: MetadataSections
 }
 
