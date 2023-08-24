@@ -147,7 +147,9 @@ function onDelete() {
           {{ listEntry.fileNumber ? listEntry.fileNumber : "-" }}
         </div>
         <div class="table-cell p-16">
-          {{ listEntry.documentType ? listEntry.documentType : "-" }}
+          {{
+            listEntry.documentType ? listEntry.documentType?.jurisShortcut : "-"
+          }}
         </div>
         <div class="table-cell p-16">
           <IconBadge
