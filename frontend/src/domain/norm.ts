@@ -1,8 +1,9 @@
 export interface NormBase {
   readonly guid: string
   readonly files?: FileReference[]
-  sections: SectionElement[]
-  contents: ContentElement[]
+  recitals?: Recitals
+  documentation?: (Article | DocumentSection)[]
+  conclusion?: Conclusion
 }
 
 export interface Norm extends NormBase, FlatMetadata {
@@ -233,30 +234,56 @@ export type MetadataSections = {
 }
 
 /* -------------------------------------------------- *
- * Section elements                                   *
+ * Regulation text contents                           *
  * -------------------------------------------------- */
 
-export type SectionElement = {
-  readonly guid: string
-  header: string
-  designation: string
-  sections: SectionElement[]
-  paragraphs: ContentElement[]
-}
-
-// We may add more specific types for section elements here in the future
-
-/* -------------------------------------------------- *
- * Content elements                                   *
- * -------------------------------------------------- */
-
-export type ContentElement = {
-  readonly guid: string
+export type Recitals = {
+  heading?: string
   marker?: string
   text: string
 }
 
-// We may add more specific types for content elements here in the future
+export type Documentation = {
+  readonly guid: string
+  heading?: string
+  marker?: string
+}
+
+export type Article = Documentation & {
+  text: string
+}
+
+export function isArticle(
+  documentation: Documentation,
+): documentation is Article {
+  return "text" in documentation
+}
+
+export type DocumentSection = Documentation & {
+  documentation?: (Article | DocumentSection)[]
+  type: DocumentSectionType
+}
+
+export function isDocumentSection(
+  documentation: Documentation,
+): documentation is DocumentSection {
+  return "type" in documentation
+}
+
+export enum DocumentSectionType {
+  BOOK = "BOOK",
+  PART = "PART",
+  CHAPTER = "CHAPTER",
+  SUBCHAPTER = "SUBCHAPTER",
+  SECTION = "SECTION",
+  SUBSECTION = "SUBSECTION",
+  TITLE = "TITLE",
+  SUBTITLE = "SUBTITLE",
+}
+
+export type Conclusion = {
+  text: string
+}
 
 /* -------------------------------------------------- *
  * Other norm contents                                *
