@@ -1,0 +1,6 @@
+ALTER TABLE IF EXISTS
+  doc_unit
+DROP
+  CONSTRAINT IF EXISTS fk_procedure,
+DROP COLUMN IF EXISTS
+  procedure_id;
