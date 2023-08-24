@@ -225,59 +225,7 @@ const buttons = computed(() => [
     isSecondRow: true,
     callback: () => editor.chain().focus().toggleMark("subscript").run(),
   },
-  {
-    type: "numbered-list",
-    icon: "format_list_numbered",
-    ariaLabel: "numbered-list",
-    group: "list",
-    isCollapsable: true,
-    isSecondRow: true,
-  },
-  {
-    type: "bullet-list",
-    icon: "format_list_bulleted",
-    ariaLabel: "bullet-list",
-    group: "list",
-    isCollapsable: true,
-    isSecondRow: true,
-  },
-  {
-    type: "vertical_split",
-    icon: "vertical_split",
-    ariaLabel: "vertical_split",
-    group: "split",
-    isCollapsable: true,
-    isSecondRow: true,
-  },
-  {
-    type: "vertical_split",
-    icon: "vertical_split",
-    ariaLabel: "vertical_split",
-    group: "split",
-    isCollapsable: true,
-    isSecondRow: true,
-  },
-  {
-    type: "table",
-    icon: "table_chart",
-    ariaLabel: "table",
-    isCollapsable: false,
-    isSecondRow: true,
-  },
 ])
-
-const fixButtons = [
-  {
-    type: "",
-    icon: "123",
-    ariaLabel: "margins",
-  },
-  {
-    type: "",
-    icon: "open_in_full",
-    ariaLabel: "fullview",
-  },
-]
 
 const editorButtons = computed(() =>
   buttons.value.map((button) => ({
@@ -288,7 +236,7 @@ const editorButtons = computed(() =>
         : editor.isActive(button.type),
   })),
 )
-const buttonSize = 48 //px
+const buttonSize = 48
 const containerWidth = ref()
 const maxButtonEntries = computed(() =>
   Math.floor((containerWidth.value - 100) / buttonSize),
@@ -347,14 +295,6 @@ const resizeObserver = new ResizeObserver((entries) => {
         <div class="flex flex-row">
           <TextEditorButton
             v-for="(button, index) in collapsedButtons"
-            :key="index"
-            v-bind="button"
-            @toggle="handleButtonClick"
-          />
-        </div>
-        <div class="flex flex-row">
-          <TextEditorButton
-            v-for="(button, index) in fixButtons"
             :key="index"
             v-bind="button"
             @toggle="handleButtonClick"
