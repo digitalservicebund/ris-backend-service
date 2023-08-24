@@ -16,6 +16,7 @@ function renderComponent(
     itemService?: ComboboxAttributes["itemService"]
     ariaLabel?: string
     manualEntry?: boolean
+    noClear?: boolean
   } = {},
 ) {
   return render(ComboboxInput, {
@@ -24,6 +25,7 @@ function renderComponent(
       modelValue: options.modelValue,
       ariaLabel: options.ariaLabel ?? "test label",
       manualEntry: options.manualEntry ?? false,
+      noClear: options.noClear ?? false,
       itemService:
         options.itemService ??
         service.filterItems([
@@ -451,5 +453,19 @@ describe("Combobox Element", () => {
     user.tab()
 
     expect(emitted()["update:modelValue"]).toBeUndefined()
+  })
+
+  it("does not render clear button if noClear flag is set", async () => {
+    renderComponent({ noClear: true })
+
+    await user.type(screen.getByLabelText("test label"), "test")
+    const dropdownItems = screen.getAllByLabelText("dropdown-option")
+    await user.click(dropdownItems[1])
+
+    expect(screen.queryByLabelText("dropdown-option")).not.toBeInTheDocument()
+
+    expect(
+      screen.queryByLabelText("Auswahl zurücksetzen"),
+    ).not.toBeInTheDocument()
   })
 })

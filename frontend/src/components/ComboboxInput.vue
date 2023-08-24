@@ -15,6 +15,7 @@ const props = defineProps<{
   placeholder?: string
   clearOnChoosingItem?: boolean
   manualEntry?: boolean
+  noClear?: boolean
   hasError?: boolean
 }>()
 
@@ -61,6 +62,8 @@ const toggleDropdown = async () => {
 }
 
 const clearSelection = async () => {
+  if (props.noClear) return
+
   emit("update:modelValue", undefined)
   filter.value = ""
   inputText.value = ""
@@ -243,7 +246,7 @@ export type InputModelProps =
           @keyup.down="keydown"
         />
         <button
-          v-if="inputText"
+          v-if="inputText && !noClear"
           class="input-close-icon flex items-center"
           tabindex="0"
           @click="clearSelection"

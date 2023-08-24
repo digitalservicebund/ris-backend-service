@@ -93,6 +93,7 @@ export function defineComboboxField(
   itemService: ComboboxAttributes["itemService"],
   placeholder?: string,
   manualEntry?: boolean,
+  noClear?: boolean,
   validationError?: ValidationError,
 ): InputField {
   return {
@@ -106,6 +107,7 @@ export function defineComboboxField(
       itemService,
       validationError,
       manualEntry,
+      noClear,
     },
   }
 }
@@ -235,6 +237,7 @@ export const coreDataFields: InputField[] = [
         "Vorgang",
         comboboxItemService.getProcedures,
         "Bitte auswählen",
+        true,
         true,
       ),
       child: defineChipsField(

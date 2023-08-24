@@ -147,6 +147,7 @@ export interface ComboboxAttributes extends BaseInputAttributes {
   }>
   placeholder?: string
   manualEntry?: boolean
+  noClear?: boolean
 }
 
 export interface ComboboxInputField extends BaseInputField {
