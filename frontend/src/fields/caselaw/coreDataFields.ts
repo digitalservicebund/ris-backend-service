@@ -242,8 +242,8 @@ export const coreDataFields: InputField[] = [
       ),
       child: defineChipsField(
         "previousProcedures",
-        "vorherige Vorgänge",
-        "vorherige Vorgänge",
+        "Vorgangshistorie",
+        "Vorgangshistorie",
         "",
         true,
       ),
