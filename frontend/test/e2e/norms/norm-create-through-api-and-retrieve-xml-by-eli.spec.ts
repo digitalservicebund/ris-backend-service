@@ -4,7 +4,12 @@ import { openNorm, saveNormFrame } from "./e2e-utils"
 import { testWithImportedNorm } from "./fixtures"
 import { normData as norm } from "./testdata/norm_basic"
 import { FieldType, fillInputField } from "./utilities"
-import { MetadataSectionName, MetadatumType } from "@/domain/norm"
+import {
+  Article,
+  DocumentSection,
+  MetadataSectionName,
+  MetadatumType,
+} from "@/domain/norm"
 
 testWithImportedNorm(
   "Check if XML can be retrieved by ELI and content is correct",
@@ -134,23 +139,24 @@ testWithImportedNorm(
       .querySelectorAll("akn\\:article")
       .forEach((article, articleIndex) => {
         expect(article.querySelector("akn\\:marker")?.textContent?.trim()).toBe(
-          norm.sections[articleIndex].designation,
+          norm.documentation?.[articleIndex]?.marker,
         )
         expect(
           article.querySelector("akn\\:heading")?.textContent?.trim(),
-        ).toBe(norm.sections[articleIndex].header)
+        ).toBe(norm.documentation?.[articleIndex].heading)
 
         article
           .querySelectorAll("akn\\:paragraph")
           .forEach((paragraph, paragraphIndex) => {
             if (
-              norm.sections[articleIndex].paragraphs[paragraphIndex].marker !==
-              undefined
+              (norm.documentation?.[articleIndex] as DocumentSection)
+                .documentation?.[paragraphIndex]?.marker !== undefined
             ) {
               expect(
                 paragraph.querySelector("akn\\:marker")?.textContent?.trim(),
               ).toBe(
-                norm.sections[articleIndex].paragraphs[paragraphIndex].marker,
+                (norm.documentation?.[articleIndex] as DocumentSection)
+                  .documentation?.[paragraphIndex]?.marker,
               )
             }
             expect(
@@ -158,7 +164,12 @@ testWithImportedNorm(
                 .querySelector("akn\\:p")
                 ?.textContent?.trim()
                 .replace(/\n/, ""),
-            ).toBe(norm.sections[articleIndex].paragraphs[paragraphIndex].text)
+            ).toBe(
+              (
+                (norm.documentation?.[articleIndex] as DocumentSection)
+                  .documentation?.[paragraphIndex] as Article
+              )?.text,
+            )
           })
       })
   },

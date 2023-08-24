@@ -122,11 +122,8 @@ const flatMetadata = ref<FlatMetadata>({} as FlatMetadata)
 
 watch(
   loadedNorm,
-  () => {
-    const { guid, sections, files, metadataSections, ...data } =
-      loadedNorm.value ?? {}
-
-    flatMetadata.value = data as FlatMetadata
+  (is) => {
+    flatMetadata.value = { eli: is?.eli }
   },
   { immediate: true, deep: true },
 )

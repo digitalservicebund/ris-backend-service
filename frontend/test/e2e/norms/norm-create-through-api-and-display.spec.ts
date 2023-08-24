@@ -6,6 +6,7 @@ import {
   MetadataInputSection,
   expectMetadataInputSectionToHaveCorrectDataOnDisplay,
 } from "./utilities"
+import { Article, isArticle, isDocumentSection } from "@/domain/norm"
 
 async function expectSectionAppearsAfterScroll(
   page: Page,
@@ -40,21 +41,37 @@ testWithImportedNorm(
       ),
     ).toBeVisible()
 
-    for (const section of Object.values(normData.sections)) {
+    expect(normData.documentation).toBeTruthy()
+    if (!normData.documentation) return
+
+    for (const documentation of Object.values(normData.documentation)) {
+      expect(documentation.marker).toBeTruthy()
+      if (!documentation.marker) return
       await expect(
-        page.getByText(section.designation, { exact: true }),
+        page.getByText(documentation.marker, { exact: true }),
       ).toBeVisible()
+
+      expect(documentation.heading).toBeTruthy()
+      if (!documentation.heading) return
       await expect(
-        page.getByText(section.header, { exact: true }),
+        page.getByText(documentation.heading, { exact: true }),
       ).toBeVisible()
-      for (const paragraph of Object.values(section.paragraphs)) {
-        if (paragraph.marker === undefined) {
-          await expect(page.getByText(paragraph.text)).toBeVisible()
-        } else {
-          await expect(
-            page.getByText(paragraph.marker + " " + paragraph.text),
-          ).toBeVisible()
-        }
+
+      // @ts-expect-error GUID is omitted for simplicity in the tests, which makes
+      // TS complain when calling the guard. Since we don't care about the GUID we
+      // accept that it is undefined here.
+      if (isDocumentSection(documentation) && documentation.documentation) {
+        documentation.documentation
+          .filter((doc): doc is Article => isArticle(doc))
+          .forEach(async (article) => {
+            if (article.marker === undefined) {
+              await expect(page.getByText(article.text)).toBeVisible()
+            } else {
+              await expect(
+                page.getByText(article.marker + " " + article.text),
+              ).toBeVisible()
+            }
+          })
       }
     }
   },

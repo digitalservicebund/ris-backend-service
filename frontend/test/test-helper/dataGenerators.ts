@@ -1,5 +1,7 @@
 import {
-  SectionElement,
+  Article,
+  DocumentSection,
+  DocumentSectionType,
   FlatMetadata,
   Metadata,
   MetadataSectionName,
@@ -8,7 +10,6 @@ import {
   MetadatumType,
   Norm,
   NormCategory,
-  ContentElement,
   UndefinedDate,
 } from "@/domain/norm"
 import {
@@ -191,27 +192,25 @@ export function generateGuid(): string {
   return `${first}-${second}-${third}-${fourth}-${fith}`
 }
 
-export function generateParagraph(
-  partialParagraph?: Partial<ContentElement>,
-): ContentElement {
+export function generateArticle(partialArticle?: Partial<Article>): Article {
   return {
     guid: generateGuid(),
     marker: generateString({ prefix: "marker " }),
     text: generateString({ prefix: "text", length: 40 }),
-    ...partialParagraph,
+    ...partialArticle,
   }
 }
 
-export function generateArticle(
-  partialArticle?: Partial<SectionElement>,
-): SectionElement {
+export function generateDocumentSection(
+  partialDocumentation?: Partial<DocumentSection>,
+): DocumentSection {
   return {
     guid: generateGuid(),
-    header: generateString({ prefix: "title " }),
-    designation: generateString({ prefix: "marker " }),
-    paragraphs: [generateParagraph()],
-    sections: [],
-    ...partialArticle,
+    type: DocumentSectionType.SECTION,
+    heading: generateString({ prefix: "title " }),
+    marker: generateString({ prefix: "marker " }),
+    documentation: [generateArticle()],
+    ...partialDocumentation,
   }
 }
 
@@ -295,8 +294,7 @@ export function generateFlatMetadata(
 export function generateNorm(partialNorm?: Partial<Norm>): Norm {
   return {
     guid: generateGuid(),
-    sections: [generateArticle()],
-    contents: [],
+    documentation: [generateDocumentSection()],
     metadataSections: generateMetadataSections(),
     ...generateFlatMetadata(),
     ...partialNorm,

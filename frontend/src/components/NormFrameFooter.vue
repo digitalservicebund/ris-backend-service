@@ -30,13 +30,9 @@ const validationErrorStore = useGlobalValidationErrorStore()
 
 const { triggerValidation, lastValidateError, validateIsInProgress } =
   useValidateNormFrame(
-    () => {
-      validationErrorStore.removeByScope("NORM")
-    },
+    () => validationErrorStore.removeByScope("NORM"),
     () => validateNormFrame(loadedNorm.value?.metadataSections),
-    (errors) => {
-      validationErrorStore.add(...errors)
-    },
+    (errors) => validationErrorStore.add(...errors),
   )
 
 onUnmounted(() => {

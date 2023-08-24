@@ -2,8 +2,7 @@ import { NormData } from "../fixtures"
 
 export const normEmptyMandatoryFields: NormData = {
   jurisZipFileName: "",
-  sections: [],
-  contents: [],
+  documentation: [],
   metadataSections: {
     NORM: [
       {

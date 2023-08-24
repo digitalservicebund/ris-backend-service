@@ -1,25 +1,26 @@
 import { NormData } from "../fixtures"
-import { NormCategory, UndefinedDate } from "@/domain/norm"
+import { DocumentSectionType, NormCategory, UndefinedDate } from "@/domain/norm"
 
 export const normData: NormData = {
   jurisZipFileName: "Tierarznei.3-0_multi.zip",
-  sections: [
+  documentation: [
     {
-      designation: "Art 2",
-      header:
+      type: DocumentSectionType.SECTION,
+      marker: "Art 2",
+      heading:
         "Änderung der Verordnung über Stoffe mit pharmakologischer Wirkung",
-      paragraphs: [
+      documentation: [
         {
           marker: "",
           text: "§ 2 der Verordnung über Stoffe mit pharmakologischer Wirkung in der Fassung der Bekanntmachung vom 8. Juli 2009 (BGBl. I S. 1768) wird wie folgt geändert:",
         },
       ],
-      sections: [],
     },
     {
-      header: "Inkrafttreten, Außerkrafttreten",
-      designation: "Art 3",
-      paragraphs: [
+      type: DocumentSectionType.SECTION,
+      marker: "Inkrafttreten, Außerkrafttreten",
+      heading: "Art 3",
+      documentation: [
         {
           marker: "(1)",
           text: "Diese Verordnung tritt am Tag nach der Verkündung in Kraft.",
@@ -29,10 +30,8 @@ export const normData: NormData = {
           text: "Gleichzeitig treten außer Kraft",
         },
       ],
-      sections: [],
     },
   ],
-  contents: [],
   metadataSections: {
     NORM: [
       {
