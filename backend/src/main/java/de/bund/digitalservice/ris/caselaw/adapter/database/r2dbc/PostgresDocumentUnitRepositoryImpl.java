@@ -1161,14 +1161,16 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
 
   private <T extends DocumentUnitMetadataDTO> Mono<T> injectPreviousProcedures(T documentUnitDTO) {
 
-    documentUnitDTO.setPreviousProcedures(
+    List<String> previousProcedures =
         procedureLinkRepository
             .findAllByDocumentationUnitIdOrderByCreatedAtDesc(documentUnitDTO.uuid)
             .stream()
             .skip(1)
             .map(JPAProcedureLinkDTO::getProcedureDTO)
             .map(JPAProcedureDTO::getLabel)
-            .toList());
+            .toList();
+
+    documentUnitDTO.setPreviousProcedures(previousProcedures.isEmpty() ? null : previousProcedures);
 
     return Mono.just(documentUnitDTO);
   }
