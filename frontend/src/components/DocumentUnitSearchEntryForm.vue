@@ -119,6 +119,7 @@ const myDocOfficeOnly = computed({
 })
 
 function resetSearch() {
+  validationStore.reset()
   searchEntry.value = {}
   emit("resetSearchResults")
 }
