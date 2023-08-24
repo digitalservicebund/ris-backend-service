@@ -119,7 +119,7 @@ describe("documentUnit list", () => {
       ],
     })
 
-    expect(screen.getAllByRole("link").length).toBe(2)
+    expect(screen.getAllByTestId("listEntry").length).toBe(2)
 
     expect(screen.getByRole("link", { name: "123" })).toHaveAttribute(
       "href",

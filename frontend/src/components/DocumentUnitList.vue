@@ -109,6 +109,7 @@ function onDelete() {
         v-for="(listEntry, id) in listEntriesWithStatus"
         :key="id"
         class="ds-label-01-reg table-row border-b-2 border-b-gray-100 px-16 hover:bg-gray-100"
+        data-testid="listEntry"
       >
         <div class="table-cell p-16">
           <router-link

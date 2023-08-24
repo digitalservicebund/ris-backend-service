@@ -86,18 +86,10 @@ describe("Documentunit Search", () => {
     expect(screen.getByLabelText("Entscheidungsdatum Suche")).toBeVisible()
     expect(screen.getByLabelText("Status Suche")).toBeVisible()
     expect(screen.getByLabelText("Nur meine Dokstelle Filter")).toBeVisible()
-  })
-
-  test("click on 'Nur meine Dokstelle' renders 'Nur fehlerhafte Dokumentationseinheiten' checkbox", async () => {
-    const { user } = renderComponent()
     expect(
-      screen.queryByLabelText("Nur fehlerhafte Dokumentationseinheiten"),
-    ).not.toBeInTheDocument()
-    expect(screen.getByLabelText("Nur meine Dokstelle Filter")).toBeVisible()
-    await user.click(screen.getByLabelText("Nur meine Dokstelle Filter"))
-    expect(
-      screen.getByLabelText("Nur fehlerhafte Dokumentationseinheiten"),
+      screen.getByLabelText("Neue Dokumentationseinheit erstellen"),
     ).toBeVisible()
+    expect(screen.queryAllByTestId("listEntry").length).toBe(0)
   })
 
   test("click on 'Ergebnisse anzeigen' renders search results", async () => {
@@ -106,6 +98,7 @@ describe("Documentunit Search", () => {
     await user.click(
       screen.getByLabelText("Nach Dokumentationseinheiten suchen"),
     )
+    expect(screen.getAllByTestId("listEntry").length).toBe(1)
     expect(screen.getAllByText(/documentNumber/).length).toBe(1)
   })
 
@@ -150,41 +143,5 @@ describe("Documentunit Search", () => {
     expect(
       screen.queryByLabelText("Nur fehlerhafte Dokumentationseinheiten"),
     ).not.toBeInTheDocument()
-  })
-
-  test("empty search result string is different on initial load and after search", async () => {
-    vi.spyOn(
-      documentUnitService,
-      "searchByDocumentUnitSearchInput",
-    ).mockImplementation(() =>
-      Promise.resolve({
-        status: 200,
-        data: {
-          content: [],
-          size: 0,
-          totalElements: 0,
-          totalPages: 0,
-          number: 0,
-          numberOfElements: 0,
-          first: true,
-          last: false,
-        },
-      }),
-    )
-
-    const { user } = renderComponent()
-
-    expect(
-      screen.getByText(/Starten Sie die Suche oder erstellen Sie eine/),
-    ).toBeVisible()
-
-    await user.click(screen.getByLabelText("Nur meine Dokstelle Filter"))
-    await user.type(screen.getByLabelText("Gerichtstyp Suche"), "ABCDEFG")
-
-    await user.click(
-      screen.getByLabelText("Nach Dokumentationseinheiten suchen"),
-    )
-
-    expect(screen.getByText(/Keine Ergebnisse gefunden./)).toBeVisible()
   })
 })

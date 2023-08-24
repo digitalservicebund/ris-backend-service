@@ -15,4 +15,13 @@ export default class DocumentUnitSearchInput {
   constructor(data: Partial<DocumentUnitSearchInput> = {}) {
     Object.assign(this, data)
   }
+
+  static fields = [
+    "documentNumberOrFileNumber",
+    "courtType",
+    "courtLocation",
+    "decisionDate",
+    "decisionDateEnd",
+    "status",
+  ] as const
 }
