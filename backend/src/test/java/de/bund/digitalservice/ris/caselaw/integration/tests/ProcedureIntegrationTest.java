@@ -252,7 +252,7 @@ class ProcedureIntegrationTest {
         .consumeWith(
             response -> {
               assertThat(response.getResponseBody().coreData().procedure()).isEqualTo(procedure1);
-              assertThat(response.getResponseBody().coreData().previousProcedures()).isEmpty();
+              assertThat(response.getResponseBody().coreData().previousProcedures()).isNull();
             });
 
     assertThat(repository.findAll()).hasSize(1);
