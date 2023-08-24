@@ -9,7 +9,6 @@ const props = defineProps<{
   items: DropdownItem[]
   modelValue?: DropdownInputModelType
   placeholder?: string
-  clearable?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -37,14 +36,7 @@ const hasPlaceholder = computed(() =>
     :data-placeholder="hasPlaceholder ? true : undefined"
     tabindex="0"
   >
-    <option
-      v-if="!clearable && placeholder && !localModelValue"
-      disabled
-      value=""
-    >
-      {{ placeholder }}
-    </option>
-    <option v-if="clearable && placeholder" value="">
+    <option v-if="placeholder && !localModelValue" disabled value="">
       {{ placeholder }}
     </option>
     <option v-for="item in items" :key="item.value" :value="item.value">

@@ -35,13 +35,14 @@ const searchEntryEmpty = computed(() => {
 })
 
 const dropdownItems: DropdownItem[] = [
+  { label: "Alle", value: "" },
   { label: "Veröffentlicht", value: PublicationState.PUBLISHED },
   { label: "Unveröffentlicht", value: PublicationState.UNPUBLISHED },
   { label: "In Veröffentlichung", value: PublicationState.PUBLISHING },
 ]
 
 const publishingStateModel = computed({
-  get: () => searchEntry.value?.status?.publicationStatus,
+  get: () => searchEntry.value?.status?.publicationStatus ?? "",
   set: (data) => {
     if (data?.length === 0) {
       delete searchEntry.value.status
@@ -257,9 +258,7 @@ onMounted(async () => {
             v-model="publishingStateModel"
             aria-label="Status Suche"
             class="ds-select-small"
-            clearable
             :items="dropdownItems"
-            placeholder="Alle"
           />
         </InputField>
       </div>

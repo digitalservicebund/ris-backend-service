@@ -88,19 +88,11 @@ describe("Dropdown Input", () => {
     expect(placeholder).not.toBeInTheDocument()
   })
 
-  it("placeholder is disabled when clearable prop not set", () => {
+  it("placeholder is disabled", () => {
     renderComponent({ placeholder: "test placeholder" })
     expect(
       screen.getByRole("option", { name: "test placeholder" }),
     ).toBeDisabled()
-  })
-
-  it("placeholder is selectable when clearable prop set", async () => {
-    const user = userEvent.setup()
-    renderComponent({ placeholder: "test placeholder", clearable: true })
-    const input = screen.getByRole("combobox")
-    await user.selectOptions(input, "")
-    expect(input).toHaveValue("")
   })
 
   it("emits a model update", async () => {
