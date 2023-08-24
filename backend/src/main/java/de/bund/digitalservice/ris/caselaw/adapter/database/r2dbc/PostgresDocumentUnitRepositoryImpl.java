@@ -219,6 +219,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
         .flatMap(this::injectStatus)
         .flatMap(this::injectKeywords)
         .flatMap(this::injectFieldsOfLaw)
+        .flatMap(this::injectPreviousProcedures)
         .flatMap(documentUnitDTO -> saveActiveCitations(documentUnitDTO, documentUnit))
         .flatMap(documentUnitDTO -> saveProceedingDecisions(documentUnitDTO, documentUnit))
         .map(DocumentUnitTransformer::transformDTO);
@@ -909,7 +910,8 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
         .flatMap(this::injectDocumentationOffice)
         .flatMap(this::injectStatus)
         .flatMap(this::injectActiveCitations)
-        .flatMap(this::injectProcedure);
+        .flatMap(this::injectProcedure)
+        .flatMap(this::injectPreviousProcedures);
   }
 
   private <T extends DocumentUnitMetadataDTO> Mono<T> injectMetadataInformation(
@@ -1153,6 +1155,20 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
                 documentUnitDTO.uuid))
         .map(JPAProcedureLinkDTO::getProcedureDTO)
         .ifPresent(documentUnitDTO::setProcedure);
+
+    return Mono.just(documentUnitDTO);
+  }
+
+  private <T extends DocumentUnitMetadataDTO> Mono<T> injectPreviousProcedures(T documentUnitDTO) {
+
+    documentUnitDTO.setPreviousProcedures(
+        procedureLinkRepository
+            .findAllByDocumentationUnitIdOrderByCreatedAtDesc(documentUnitDTO.uuid)
+            .stream()
+            .skip(1)
+            .map(JPAProcedureLinkDTO::getProcedureDTO)
+            .map(JPAProcedureDTO::getLabel)
+            .toList());
 
     return Mono.just(documentUnitDTO);
   }

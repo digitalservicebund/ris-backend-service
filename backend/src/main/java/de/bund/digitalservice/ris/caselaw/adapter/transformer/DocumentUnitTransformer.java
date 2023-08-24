@@ -322,6 +322,7 @@ public class DocumentUnitTransformer {
             .incorrectCourts(incorrectCourts)
             .documentType(documentType)
             .procedure(getProcedure(documentUnitDTO.getProcedure()))
+            .previousProcedures(documentUnitDTO.getPreviousProcedures())
             .ecli(documentUnitDTO.getEcli())
             .deviatingEclis(deviatingEclis)
             .appraisalBody(documentUnitDTO.getAppraisalBody())

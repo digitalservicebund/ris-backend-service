@@ -225,13 +225,26 @@ export const coreDataFields: InputField[] = [
       ),
     },
   ),
-  defineComboboxField(
-    "procedure",
-    "Vorgang",
-    "Vorgang",
-    comboboxItemService.getProcedures,
-    "Bitte auswählen",
-    true,
+  defineNestedInputField(
+    "Vorgänge",
+    "nestedInputOfProcedureAndPreviousProcedures",
+    {
+      parent: defineComboboxField(
+        "procedure",
+        "Vorgang",
+        "Vorgang",
+        comboboxItemService.getProcedures,
+        "Bitte auswählen",
+        true,
+      ),
+      child: defineChipsField(
+        "previousProcedures",
+        "vorherige Vorgänge",
+        "vorherige Vorgänge",
+        "",
+        true,
+      ),
+    },
   ),
   defineDropdownField(
     "legalEffect",

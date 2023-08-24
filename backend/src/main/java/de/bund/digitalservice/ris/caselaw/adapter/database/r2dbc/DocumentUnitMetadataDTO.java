@@ -80,5 +80,5 @@ public class DocumentUnitMetadataDTO {
 
   @Transient private JPAProcedureDTO procedure;
 
-  @Transient private List<JPAProcedureDTO> previousProcedures;
+  @Transient private List<String> previousProcedures;
 }

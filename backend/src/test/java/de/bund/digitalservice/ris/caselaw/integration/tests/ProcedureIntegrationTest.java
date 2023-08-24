@@ -214,6 +214,110 @@ class ProcedureIntegrationTest {
   }
 
   @Test
+  void testAddingProcedureToPreviousProcedures() {
+    DocumentUnitDTO dto =
+        documentUnitRepository
+            .save(
+                DocumentUnitDTO.builder()
+                    .uuid(UUID.randomUUID())
+                    .creationtimestamp(Instant.now())
+                    .documentnumber("1234567890123")
+                    .documentationOfficeId(documentationOfficeDTO.getId())
+                    .build())
+            .block();
+
+    Procedure procedure1 = Procedure.builder().label("foo").build();
+    Procedure procedure2 = Procedure.builder().label("bar").build();
+    Procedure procedure3 = Procedure.builder().label("baz").build();
+
+    // add first procedure
+    DocumentUnit documentUnitFromFrontend1 =
+        DocumentUnit.builder()
+            .uuid(dto.getUuid())
+            .creationtimestamp(dto.getCreationtimestamp())
+            .documentNumber(dto.getDocumentnumber())
+            .coreData(
+                CoreData.builder().procedure(procedure1).documentationOffice(docOffice).build())
+            .build();
+
+    risWebTestClient
+        .withDefaultLogin()
+        .put()
+        .uri("/api/v1/caselaw/documentunits/" + dto.getUuid())
+        .bodyValue(documentUnitFromFrontend1)
+        .exchange()
+        .expectStatus()
+        .is2xxSuccessful()
+        .expectBody(DocumentUnit.class)
+        .consumeWith(
+            response -> {
+              assertThat(response.getResponseBody().coreData().procedure()).isEqualTo(procedure1);
+              assertThat(response.getResponseBody().coreData().previousProcedures()).isEmpty();
+            });
+
+    assertThat(repository.findAll()).hasSize(1);
+    assertThat(repository.findAll().get(0).getLabel()).isEqualTo("foo");
+
+    // add second procedure
+    DocumentUnit documentUnitFromFrontend2 =
+        DocumentUnit.builder()
+            .uuid(dto.getUuid())
+            .creationtimestamp(dto.getCreationtimestamp())
+            .documentNumber(dto.getDocumentnumber())
+            .coreData(
+                CoreData.builder().procedure(procedure2).documentationOffice(docOffice).build())
+            .build();
+
+    risWebTestClient
+        .withDefaultLogin()
+        .put()
+        .uri("/api/v1/caselaw/documentunits/" + dto.getUuid())
+        .bodyValue(documentUnitFromFrontend2)
+        .exchange()
+        .expectStatus()
+        .is2xxSuccessful()
+        .expectBody(DocumentUnit.class)
+        .consumeWith(
+            response -> {
+              assertThat(response.getResponseBody().coreData().procedure()).isEqualTo(procedure2);
+              assertThat(response.getResponseBody().coreData().previousProcedures())
+                  .isEqualTo(List.of("foo"));
+            });
+
+    assertThat(repository.findAll()).hasSize(2);
+    assertThat(repository.findAll().get(1).getLabel()).isEqualTo("bar");
+
+    // add third procedure
+    DocumentUnit documentUnitFromFrontend3 =
+        DocumentUnit.builder()
+            .uuid(dto.getUuid())
+            .creationtimestamp(dto.getCreationtimestamp())
+            .documentNumber(dto.getDocumentnumber())
+            .coreData(
+                CoreData.builder().procedure(procedure3).documentationOffice(docOffice).build())
+            .build();
+
+    risWebTestClient
+        .withDefaultLogin()
+        .put()
+        .uri("/api/v1/caselaw/documentunits/" + dto.getUuid())
+        .bodyValue(documentUnitFromFrontend3)
+        .exchange()
+        .expectStatus()
+        .is2xxSuccessful()
+        .expectBody(DocumentUnit.class)
+        .consumeWith(
+            response -> {
+              assertThat(response.getResponseBody().coreData().procedure()).isEqualTo(procedure3);
+              assertThat(response.getResponseBody().coreData().previousProcedures())
+                  .isEqualTo(List.of("bar", "foo"));
+            });
+
+    assertThat(repository.findAll()).hasSize(3);
+    assertThat(repository.findAll().get(2).getLabel()).isEqualTo("baz");
+  }
+
+  @Test
   void testAddProcedureWithSameNameToDifferentOffice() {
     JPADocumentationOfficeDTO bghDocOfficeDTO = documentationOfficeRepository.findByLabel("BGH");
     createProcedure("testProcedure", bghDocOfficeDTO);
