@@ -154,11 +154,11 @@ watch(newChipText, async () => {
   <!-- eslint-disable vuejs-accessibility/click-events-have-key-events -->
   <div
     ref="wrapperEl"
-    class="flex min-h-[4rem] w-full cursor-text flex-wrap items-center overflow-hidden border-2 border-solid bg-white px-16 py-8 outline-2 -outline-offset-4 autofill:text-inherit autofill:shadow-white autofill:focus:text-inherit autofill:focus:shadow-white"
+    class="flex min-h-[4rem] w-full cursor-text flex-wrap items-center overflow-hidden bg-white px-16 py-8 outline-2 -outline-offset-4 autofill:text-inherit autofill:shadow-white autofill:focus:text-inherit autofill:focus:shadow-white"
     :class="[
       readOnly
         ? 'hover:outline-none'
-        : 'border-blue-800 outline-blue-800 hover:outline [&:has(:focus)]:outline',
+        : 'border-2 border-solid border-blue-800 outline-blue-800 hover:outline [&:has(:focus)]:outline',
     ]"
     :data-testid="`chips-input_${id}`"
     @click="focusInput"
