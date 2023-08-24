@@ -146,5 +146,10 @@ describe("Documentunit Search", () => {
     expect(
       screen.queryByLabelText("Nur fehlerhafte Dokumentationseinheiten"),
     ).not.toBeInTheDocument()
+
+    expect(
+      screen.getByText(/Starten Sie die Suche oder erstellen Sie eine/),
+    ).toBeVisible()
+    expect(screen.queryByText(/Total/)).not.toBeInTheDocument()
   })
 })

@@ -53,7 +53,8 @@ async function handleSearch(listEntry: DocumentUnitSearchInput) {
 }
 
 async function handleReset() {
-  documentUnitListEntries.value = []
+  documentUnitListEntries.value = undefined
+  currentPage.value = undefined
 }
 </script>
 
