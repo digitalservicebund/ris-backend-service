@@ -38,6 +38,7 @@ export function defineChipsField(
   label: string,
   ariaLabel: string,
   placeholder?: string,
+  readOnly?: boolean,
 ): InputField {
   return {
     name,
@@ -47,6 +48,7 @@ export function defineChipsField(
     inputAttributes: {
       ariaLabel,
       placeholder,
+      readOnly,
     },
   }
 }

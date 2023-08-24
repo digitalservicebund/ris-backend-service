@@ -14,6 +14,7 @@ interface Props {
   id: string
   modelValue?: string[]
   ariaLabel?: string
+  readOnly?: boolean
 }
 
 const props = defineProps<Props>()
@@ -31,6 +32,8 @@ const emit = defineEmits<{
 const newChipText = ref<string>("")
 
 function addChip() {
+  if (props.readOnly) return
+
   const chip = newChipText.value.trim()
   if (!chip) return
 
@@ -46,6 +49,8 @@ function addChip() {
 }
 
 function onDeleteChip(chip: string) {
+  if (props.readOnly) return
+
   focusInputIfEmpty()
   emit("chipDeleted", chip)
 }
@@ -150,18 +155,21 @@ watch(newChipText, async () => {
   <div
     ref="wrapperEl"
     class="flex min-h-[4rem] w-full cursor-text flex-wrap items-center overflow-hidden border-2 border-solid border-blue-800 bg-white px-16 py-8 outline-2 -outline-offset-4 outline-blue-800 autofill:text-inherit autofill:shadow-white hover:outline autofill:focus:text-inherit autofill:focus:shadow-white [&:has(:focus)]:outline"
+    :class="{ 'hover:outline-none': readOnly }"
     :data-testid="`chips-input_${id}`"
     @click="focusInput"
   >
     <ChipsList
       v-model:focused-item="focusedChip"
       :model-value="modelValue"
+      :read-only="readOnly"
       @chip-deleted="(_, value) => onDeleteChip(value)"
       @next-clicked-on-last="focusInput"
       @update:model-value="$emit('update:modelValue', $event)"
     />
 
     <span
+      v-if="!readOnly"
       class="flex max-w-full flex-auto items-center justify-start"
       :style="{ maxWidth: `${wrapperContentWidth}px` }"
     >

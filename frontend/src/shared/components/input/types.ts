@@ -58,6 +58,7 @@ export type ChipsInputModelType = string[]
 
 export interface ChipsInputAttributes extends BaseInputAttributes {
   placeholder?: string
+  readOnly?: boolean
 }
 
 export interface ChipsInputField extends BaseInputField {

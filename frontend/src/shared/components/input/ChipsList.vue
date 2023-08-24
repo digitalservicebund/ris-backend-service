@@ -5,6 +5,7 @@ import { ref, watch } from "vue"
 interface Props {
   modelValue: string[] | undefined
   focusedItem?: number
+  readOnly?: boolean
 }
 
 const props = defineProps<Props>()
@@ -22,6 +23,8 @@ const emit = defineEmits<{
  * -------------------------------------------------- */
 
 function deleteChip(index: number, value: string) {
+  if (props.readOnly) return
+
   if (!props.modelValue || index >= props.modelValue.length) return
   const next = produce(props.modelValue, (draft) => {
     draft.splice(index, 1)
@@ -115,6 +118,7 @@ function focusNext() {
         v-for="(chip, i) in modelValue"
         :key="i"
         class="group ds-body-01-reg relative flex cursor-pointer items-center break-words rounded-10 bg-blue-500 pr-32 outline-none"
+        :class="{ 'cursor-default bg-gray-400 pr-0': readOnly }"
         data-testid="chip"
         tabindex="0"
         @click.stop="localFocusedItem = i"
@@ -129,6 +133,7 @@ function focusNext() {
           >{{ chip }}
         </span>
         <button
+          v-if="!readOnly"
           aria-label="Löschen"
           class="iems-center absolute inset-y-0 right-0 flex h-full items-center rounded-r-10 p-4 group-focus:bg-blue-900 group-focus:text-white"
           tabindex="-1"

@@ -17,6 +17,7 @@ function renderComponent(props?: Partial<ChipsInputProps>) {
     ariaLabel: props?.ariaLabel ?? "aria-label",
     onChipAdded: props?.onChipAdded,
     onChipDeleted: props?.onChipDeleted,
+    readOnly: props?.readOnly,
   }
 
   return { user, ...render(ChipsInput, { props: effectiveProps }) }
@@ -103,6 +104,18 @@ describe("Chips Input", () => {
     const button = screen.getAllByRole("button")[0]
     await user.click(button)
     expect(onDeleted).toHaveBeenCalledWith("foo")
+  })
+
+  it("does not render delete button if readOnly", async () => {
+    renderComponent({ modelValue: ["foo", "bar"], readOnly: true })
+
+    expect(screen.queryByRole("button")).not.toBeInTheDocument()
+  })
+
+  it("does not render input if readOnly", async () => {
+    renderComponent({ modelValue: ["foo", "bar"], readOnly: true })
+
+    expect(screen.queryByRole("textbox")).not.toBeInTheDocument()
   })
 
   it("does not add a chip when input is empty", async () => {
