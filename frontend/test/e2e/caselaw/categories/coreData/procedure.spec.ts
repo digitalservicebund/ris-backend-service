@@ -31,6 +31,25 @@ test.describe("procedure", () => {
       await waitForInputValue(page, "[aria-label='Vorgang']", newProcedure)
     })
 
+    await test.step("fill previous procedures", async () => {
+      await expect(async () => {
+        const secondProcedure = generateString({ length: 10 })
+        await page.locator("[aria-label='Vorgang']").fill(secondProcedure)
+        await page.getByText(`${secondProcedure} neu erstellen`).click()
+      }).toPass()
+
+      await page.locator("[aria-label='Speichern Button']").click()
+      await expect(page.getByText(`Zuletzt`).first()).toBeVisible()
+
+      await page.getByLabel("Vorgänge anzeigen").click()
+      await expect(page.getByText("Vorgangshistorie")).toBeVisible()
+      await expect(
+        page
+          .getByTestId("chips-input_previousProcedures")
+          .getByText(newProcedure),
+      ).toBeVisible()
+    })
+
     await test.step("reuse created procedure", async () => {
       await page.goto("/caselaw")
       await page.getByText("Neue Dokumentationseinheit").first().click()
