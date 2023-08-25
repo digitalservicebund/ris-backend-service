@@ -8,6 +8,7 @@ classDiagram
   }
 
   Norm *-- "0..1" Recitals : recitals
+  Norm *-- "0..1" Formula : formula
   Norm *-- "*" Documentation : documentation
   Norm *-- "0..1" Conclusion : conclusion
   Norm *-- "*" FileReference : files
@@ -16,6 +17,10 @@ classDiagram
   class Recitals {
     +String? heading
     +String? marker
+    +String text
+  }
+
+  class Formula {
     +String text
   }
 
