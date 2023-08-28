@@ -43,6 +43,7 @@ export type Procedure = {
   label: string
   documentUnitCount?: number
   documentUnits: DocumentUnitListEntry[]
+  createdAt: string
 }
 
 export type Texts = {

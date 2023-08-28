@@ -43,6 +43,7 @@ public class ProcedureService {
                     .label(dto.getLabel())
                     .documentUnitCount(linkRepository.countByProcedureDTO(dto))
                     .documentUnits(getDocumentUnits(dto))
+                    .created_at(dto.getCreatedAt())
                     .build())
         .toList();
   }

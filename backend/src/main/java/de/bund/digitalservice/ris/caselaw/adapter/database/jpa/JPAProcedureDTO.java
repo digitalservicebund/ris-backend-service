@@ -6,6 +6,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import java.time.Instant;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -22,6 +23,9 @@ public class JPAProcedureDTO {
 
   @Column(name = "name")
   String label;
+
+  @Column(name = "created_at", updatable = false, insertable = false)
+  Instant createdAt;
 
   @ManyToOne()
   @JoinColumn(name = "documentation_office_id", referencedColumnName = "id")

@@ -21,7 +21,7 @@ function renderDocumentUnit(documentUnit: DocumentUnitListEntry): string {
 </script>
 
 <template>
-  <ul class="pt-12">
+  <ul class="py-24">
     <li
       v-for="documentUnit in procedure.documentUnits"
       :key="documentUnit.documentNumber"
@@ -42,4 +42,7 @@ function renderDocumentUnit(documentUnit: DocumentUnitListEntry): string {
       </router-link>
     </li>
   </ul>
+  <span class="ds-label-02-reg pt-28 italic text-gray-600"
+    >erstellt am {{ dayjs(procedure.createdAt).format("DD.MM.YYYY") }}</span
+  >
 </template>
