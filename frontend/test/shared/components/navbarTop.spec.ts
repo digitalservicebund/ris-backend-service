@@ -13,6 +13,11 @@ describe("navbar top", () => {
       },
       {
         path: "",
+        name: "caselaw-procedures",
+        component: {},
+      },
+      {
+        path: "",
         name: "norms",
         component: {},
       },
@@ -26,8 +31,8 @@ describe("navbar top", () => {
     })
 
     expect(screen.getByText("Rechtsinformationen")).toBeInTheDocument()
+    expect(screen.getByText("Vorgänge")).toBeInTheDocument()
     expect(screen.getByText("Normen")).toBeInTheDocument()
-    expect(screen.getByText("Rechtsinformationen")).toBeInTheDocument()
     expect(screen.getByText("des Bundes")).toBeInTheDocument()
   })
 })
