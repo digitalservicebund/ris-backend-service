@@ -306,7 +306,7 @@ onMounted(async () => {
           />
         </InputField>
       </div>
-      <div>
+      <div class="flex flex-row">
         <div class="flex flex-col gap-4">
           <TextButton
             aria-label="Nach Dokumentationseinheiten suchen"
@@ -329,7 +329,7 @@ onMounted(async () => {
           v-if="!searchEntryEmpty"
           aria-label="Suche zurücksetzen"
           button-type="ghost"
-          class="ml-8"
+          class="ml-8 self-start"
           label="Suche zurücksetzen"
           size="small"
           @click="resetSearch"
