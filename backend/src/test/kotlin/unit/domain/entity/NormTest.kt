@@ -1,5 +1,7 @@
 package de.bund.digitalservice.ris.norms.domain.entity
 
+import de.bund.digitalservice.ris.norms.domain.value.DocumentSectionType.BOOK
+import de.bund.digitalservice.ris.norms.domain.value.DocumentSectionType.CHAPTER
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType
 import java.time.LocalDate
@@ -13,19 +15,10 @@ class NormTest {
 
   @Test
   fun `can create a norm with only mandatory fields`() {
-    val paragraph = Paragraph(guid = UUID.randomUUID(), marker = "marker", text = "text", order = 1)
-    val article =
-        Article(
-            guid = UUID.randomUUID(),
-            header = "title",
-            designation = "marker",
-            order = 1,
-            paragraphs = listOf(paragraph))
     val guid = UUID.randomUUID()
-    val norm = Norm(guid = guid, sections = listOf(article))
+    val norm = Norm(guid = guid)
 
     assertThat(norm.guid).isEqualTo(guid)
-    assertThat(norm.sections).isEqualTo(listOf(article))
   }
 
   @Test
@@ -46,19 +39,10 @@ class NormTest {
 
   @Test
   fun `can create a norm with some optional string fields`() {
-    val paragraph = Paragraph(guid = UUID.randomUUID(), marker = "marker", text = "text", order = 1)
-    val article =
-        Article(
-            guid = UUID.randomUUID(),
-            header = "title",
-            designation = "marker",
-            order = 1,
-            paragraphs = listOf(paragraph))
     val guid = UUID.randomUUID()
     val norm =
         Norm(
             guid = guid,
-            sections = listOf(article),
             metadataSections =
                 listOf(
                     MetadataSection(
@@ -74,7 +58,6 @@ class NormTest {
         )
 
     assertThat(norm.guid).isEqualTo(guid)
-    assertThat(norm.sections).isEqualTo(listOf(article))
     assertThat(
             norm
                 .getFirstMetadatum(MetadataSectionName.NORM, MetadatumType.OFFICIAL_SHORT_TITLE)
@@ -97,15 +80,6 @@ class NormTest {
 
   @Test
   fun `can create a norm with optional date and boolean fields`() {
-    val paragraph = Paragraph(guid = UUID.randomUUID(), marker = "marker", text = "text", order = 1)
-    val article =
-        Article(
-            guid = UUID.randomUUID(),
-            header = "title",
-            designation = "marker",
-            order = 1,
-            paragraphs = listOf(paragraph))
-
     val guid = UUID.randomUUID()
 
     val citationDate = Metadatum(LocalDate.of(2022, 11, 19), MetadatumType.DATE)
@@ -123,16 +97,41 @@ class NormTest {
     val norm =
         Norm(
             guid = guid,
-            sections = listOf(article),
             metadataSections = listOf(citationDateSection, normProviderSection, normSection),
         )
 
     assertThat(norm.guid).isEqualTo(guid)
-    assertThat(norm.sections).isEqualTo(listOf(article))
     assertThat(norm.metadataSections.flatMap { it.metadata }).contains(citationDate)
     assertThat(norm.metadataSections.flatMap { it.metadata }).contains(resolutionMajority)
     assertThat(norm.metadataSections.flatMap { it.metadata }).contains(risAbbreviation)
     assertThat(norm.metadataSections.flatMap { it.metadata }).contains(text)
+  }
+
+  @Test
+  fun `it can create norm with only articles as documentation`() {
+    val paragraph = Paragraph(UUID.randomUUID(), "(1)", "text")
+    val article1 = Article(UUID.randomUUID(), 1, listOf(paragraph))
+    val article2 = Article(UUID.randomUUID(), 2)
+    val norm = Norm(UUID.randomUUID(), documentation = listOf(article1, article2))
+
+    assertThat(norm.documentation).containsOnly(article1, article2)
+  }
+
+  @Test
+  fun `it can create norm with nested documentation structure`() {
+    val paragraph1 = Paragraph(UUID.randomUUID(), "(1)", "text 1")
+    val article1 = Article(UUID.randomUUID(), 1, listOf(paragraph1))
+    val article2 = Article(UUID.randomUUID(), 2)
+    val chapter1 =
+        DocumentSection(UUID.randomUUID(), 1, CHAPTER, documentation = listOf(article1, article2))
+    val paragraph2 = Paragraph(UUID.randomUUID(), "(2)", "text 2")
+    val article3 = Article(UUID.randomUUID(), 3, listOf(paragraph2))
+    val chapter2 = DocumentSection(UUID.randomUUID(), 2, CHAPTER, documentation = listOf(article3))
+    val book =
+        DocumentSection(UUID.randomUUID(), 1, BOOK, documentation = listOf(chapter1, chapter2))
+    val norm = Norm(UUID.randomUUID(), documentation = listOf(book))
+
+    assertThat(norm.documentation).containsOnly(book)
   }
 
   @Test
@@ -226,10 +225,11 @@ class NormTest {
   @Test
   fun `can create a norm using type safe builders`() {
     val norm = norm {
-      articles {
-        article {
-          header = "Title"
-          paragraphs { paragraph { text = "Paragraph" } }
+      documentation {
+        documentSection {
+          order = 1
+          marker = "1"
+          heading = "book 1"
         }
       }
       metadataSections {
@@ -250,10 +250,9 @@ class NormTest {
       }
       files { file { name = "file.zip" } }
     }
-    val article = norm.sections.filterIsInstance<Article>().first()
-    assertThat(article.header).isEqualTo("Title")
-    val paragraph = article.paragraphs.first() as Paragraph
-    assertThat(paragraph.text).isEqualTo("Paragraph")
+    assertThat(norm.documentation.first().order).isEqualTo(1)
+    assertThat(norm.documentation.first().marker).isEqualTo("1")
+    assertThat(norm.documentation.first().heading).isEqualTo("book 1")
     assertThat(norm.metadataSections.first().name).isEqualTo(MetadataSectionName.OFFICIAL_REFERENCE)
     assertThat(norm.metadataSections.first().metadata).isEmpty()
     assertThat(norm.metadataSections.first().sections?.first()?.metadata?.first()?.type)

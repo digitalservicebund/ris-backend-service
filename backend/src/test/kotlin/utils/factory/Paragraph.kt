@@ -11,7 +11,6 @@ class ParagraphBuilder {
   var guid: UUID = UUID.randomUUID()
   var marker: String? = randomString(2)
   var text: String = randomString(100)
-  var order: Int = 1
 
-  fun build(): Paragraph = Paragraph(guid = guid, marker = marker, text = text, order = order)
+  fun build(): Paragraph = Paragraph(guid, marker, text)
 }

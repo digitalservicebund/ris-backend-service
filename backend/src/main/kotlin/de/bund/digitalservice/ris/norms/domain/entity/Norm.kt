@@ -11,9 +11,8 @@ import java.util.UUID
 data class Norm(
     val guid: UUID,
     val metadataSections: Collection<MetadataSection> = emptyList(),
-    var files: Collection<FileReference> = listOf(),
-    val sections: Collection<SectionElement> = emptyList(),
-    val contents: Collection<ContentElement> = emptyList(),
+    var files: Collection<FileReference> = emptyList(),
+    val documentation: Collection<Documentation> = emptyList(),
     var eGesetzgebung: Boolean = false
 ) {
   init {

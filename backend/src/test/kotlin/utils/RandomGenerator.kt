@@ -2,18 +2,15 @@ package utils
 
 import de.bund.digitalservice.ris.norms.application.port.input.EditNormFrameUseCase
 import de.bund.digitalservice.ris.norms.domain.entity.Article
-import de.bund.digitalservice.ris.norms.domain.entity.Book
-import de.bund.digitalservice.ris.norms.domain.entity.Closing
-import de.bund.digitalservice.ris.norms.domain.entity.ContentElement
-import de.bund.digitalservice.ris.norms.domain.entity.ContentElementTest
+import de.bund.digitalservice.ris.norms.domain.entity.DocumentSection
+import de.bund.digitalservice.ris.norms.domain.entity.Documentation
 import de.bund.digitalservice.ris.norms.domain.entity.FileReference
 import de.bund.digitalservice.ris.norms.domain.entity.MetadataSection
 import de.bund.digitalservice.ris.norms.domain.entity.Metadatum
 import de.bund.digitalservice.ris.norms.domain.entity.Norm
 import de.bund.digitalservice.ris.norms.domain.entity.Paragraph
-import de.bund.digitalservice.ris.norms.domain.entity.Part
-import de.bund.digitalservice.ris.norms.domain.entity.Preamble
-import de.bund.digitalservice.ris.norms.domain.entity.SectionElement
+import de.bund.digitalservice.ris.norms.domain.value.DocumentSectionType.BOOK
+import de.bund.digitalservice.ris.norms.domain.value.DocumentSectionType.PART
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType
 import de.bund.digitalservice.ris.norms.domain.value.NormCategory
@@ -22,7 +19,8 @@ import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.controll
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.schema.MetadataSectionRequestSchema
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.schema.MetadatumRequestSchema
 import java.time.LocalDate
-import java.util.*
+import java.util.Random
+import java.util.UUID
 import org.apache.commons.lang3.RandomStringUtils
 import org.jeasy.random.EasyRandom
 import org.jeasy.random.EasyRandomParameters
@@ -98,8 +96,7 @@ fun createRandomNorm(): Norm {
           }
           .randomize(named("metadataSections")) { emptyList<MetadataSection>() }
           .randomize(named("files")) { emptyList<FileReference>() }
-          .randomize(named("sections")) { emptyList<SectionElement>() }
-          .randomize(named("contents")) { emptyList<ContentElementTest>() }
+          .randomize(named("documentation")) { emptyList<Documentation>() }
           .excludeField(named("eGesetzgebung"))
   return EasyRandom(parameters).nextObject(Norm::class.java)
 }
@@ -113,7 +110,7 @@ fun createRandomNormWithCitationDateAndArticles(): Norm {
                       MetadataSectionName.CITATION_DATE,
                       listOf(Metadatum(LocalDate.parse("2002-02-02"), MetadatumType.DATE))),
               ),
-          sections =
+          documentation =
               listOf(
                   createRandomArticle().copy(paragraphs = listOf(createRandomParagraph())),
                   createRandomArticle().copy(paragraphs = listOf(createRandomParagraph())),
@@ -127,11 +124,9 @@ fun createRandomFileReference(): FileReference {
 
 fun createRandomArticle(): Article {
   val parameters: EasyRandomParameters =
-      EasyRandomParameters()
-          .randomize(named("designation").and(inClass(Article::class.java))) {
-            "§ " + Random().nextInt(1, 50).toString()
-          }
-          .randomize(named("paragraphs")) { emptyList<ContentElementTest>() }
+      EasyRandomParameters().randomize(named("marker").and(inClass(Article::class.java))) {
+        "§ " + Random().nextInt(1, 50).toString()
+      }
   return EasyRandom(parameters).nextObject(Article::class.java)
 }
 
@@ -158,46 +153,41 @@ fun createSimpleMetadataSections(): List<MetadataSection> =
         ),
     )
 
-fun createSimpleSections(): List<SectionElement> =
+fun createSimpleDocumentation(): List<Documentation> =
     listOf(
-        Book("Book 1", UUID.randomUUID(), "1", 1),
-        Book(
-            "Book 2",
-            UUID.randomUUID(),
-            "2",
-            2,
-            childSections =
+        DocumentSection(guid = UUID.randomUUID(), order = 1, type = BOOK),
+        DocumentSection(
+            guid = UUID.randomUUID(),
+            order = 2,
+            type = BOOK,
+            marker = "2",
+            heading = "Book 2",
+            documentation =
                 listOf(
-                    Part(
-                        "Part 1",
-                        UUID.randomUUID(),
-                        "1",
-                        1,
-                        childSections =
+                    DocumentSection(
+                        guid = UUID.randomUUID(),
+                        order = 1,
+                        type = PART,
+                        marker = "1",
+                        heading = "Part 1",
+                        documentation =
                             listOf(
                                 Article(
-                                    "Article 1",
-                                    UUID.randomUUID(),
-                                    "§ 1",
-                                    1,
+                                    guid = UUID.randomUUID(),
+                                    order = 1,
+                                    marker = "§ 1",
+                                    heading = "Article 1",
                                     paragraphs =
                                         listOf(
                                             Paragraph(
-                                                UUID.randomUUID(),
-                                                1,
-                                                "(1)",
-                                                "First paragraph text"),
-                                            Paragraph(
-                                                UUID.randomUUID(),
-                                                2,
-                                                "(2)",
-                                                "Second paragraph text"),
-                                        )))))),
-        Book("Book 3", UUID.randomUUID(), "3", 3))
-
-fun createContentElements(): List<ContentElement> =
-    listOf(
-        Preamble(UUID.randomUUID(), 1, text = "Preamble Text"),
-        Closing(UUID.randomUUID(), 2, text = "Closing Text"))
+                                                guid = UUID.randomUUID(),
+                                                marker = "(1)",
+                                                text = "text",
+                                            ),
+                                        )),
+                            )),
+                )),
+        DocumentSection(
+            guid = UUID.randomUUID(), order = 3, type = BOOK, marker = "3", heading = "Book 3"))
 
 fun randomString(length: Int = 10): String = RandomStringUtils.randomAlphabetic(length)
