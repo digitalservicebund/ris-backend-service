@@ -23,7 +23,7 @@ const emit = defineEmits<{
 const router = useRouter()
 
 const listEntriesWithStatus = computed(() => {
-  return props.documentUnitListEntries
+  return props.documentUnitListEntries && !props.isLoading
     ? props.documentUnitListEntries.map((entry) => ({
         ...entry,
         status: useStatusBadge(entry.status).value,
@@ -46,21 +46,13 @@ async function determineDocumentUnitListheight() {
   listheight.value = `${height}`
 }
 
-watchEffect(() => {
-  determineDocumentUnitListheight().catch(() => {
-    // left blank intentionally
-  })
-})
-
-watch(listEntriesWithStatus, async () => {
-  await determineDocumentUnitListheight()
-})
-
 const emptyStatus = computed(() => {
   if (!props.documentUnitListEntries) {
     return "Starten Sie die Suche oder erstellen Sie eine"
   } else if (props.documentUnitListEntries.length === 0) {
     return "Keine Ergebnisse gefunden."
+  } else if (props.isLoading) {
+    return "Dokumentationseinheiten werden geladen ..."
   }
   return undefined
 })
@@ -93,12 +85,23 @@ function setSelectedDocumentUnitListEntry(
   popupModalText.value = `Möchten Sie die Dokumentationseinheit ${selectedDocumentUnitListEntry.value.documentNumber} wirklich dauerhaft löschen?`
   toggleModal()
 }
+
 function onDelete() {
   if (selectedDocumentUnitListEntry.value) {
     emit("deleteDocumentUnit", selectedDocumentUnitListEntry.value)
     toggleModal()
   }
 }
+
+watchEffect(() => {
+  determineDocumentUnitListheight().catch(() => {
+    // left blank intentionally
+  })
+})
+
+watch(listEntriesWithStatus, async () => {
+  await determineDocumentUnitListheight()
+})
 </script>
 
 <template>
@@ -231,6 +234,7 @@ function onDelete() {
     >
       <span class="">{{ emptyStatus }}</span>
       <TextButton
+        v-if="!isLoading"
         aria-label="Neue Dokumentationseinheit erstellen"
         button-type="ghost"
         label="Neue Dokumentationseinheit"

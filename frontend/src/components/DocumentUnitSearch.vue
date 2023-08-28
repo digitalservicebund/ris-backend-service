@@ -61,6 +61,7 @@ async function handleReset() {
 <template>
   <div>
     <DocumentUnitSearchEntryForm
+      :is-loading="isLoading"
       @reset-search-results="handleReset"
       @search="handleSearch"
     />

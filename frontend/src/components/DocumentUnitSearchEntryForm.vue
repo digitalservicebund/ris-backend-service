@@ -15,6 +15,7 @@ import { DropdownItem } from "@/shared/components/input/types"
 
 const props = defineProps<{
   modelValue?: DocumentUnitSearchInput
+  isLoading?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -310,6 +311,7 @@ onMounted(async () => {
           <TextButton
             aria-label="Nach Dokumentationseinheiten suchen"
             class="self-start"
+            :disabled="isLoading"
             label="Ergebnisse anzeigen"
             size="small"
             @click="handleSearchButtonClicked"
