@@ -242,7 +242,7 @@ onMounted(async () => {
             :has-error="hasError"
             is-future-date
             placeholder="TT.MM.JJJJ (optional)"
-            @focus="validationStore.remove('decisionDate')"
+            @focus="validationStore.remove('decisionDateEnd')"
             @update:validation-error="updateValidationError"
           ></DateInput>
         </InputField>

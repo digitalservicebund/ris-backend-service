@@ -62,7 +62,6 @@ function validateInput() {
           message: "Das Datum darf nicht in der Zukunft liegen",
           instance: props.id,
         })
-      else emit("update:validationError", undefined)
     } else {
       emit("update:validationError", {
         message: "Kein valides Datum",
@@ -74,8 +73,6 @@ function validateInput() {
       message: "Unvollständiges Datum",
       instance: props.id,
     })
-  } else {
-    emit("update:validationError", undefined)
   }
 }
 
