@@ -30,9 +30,19 @@ onMounted(async () => {
 
       <router-link
         class="p-8 hover:bg-yellow-500 hover:underline"
-        :class="{ underline: route.path.includes('caselaw') }"
+        :class="{
+          underline:
+            route.path.includes('caselaw') &&
+            !route.path.includes('procedures'),
+        }"
         :to="{ name: 'caselaw' }"
         >Rechtsprechung</router-link
+      >
+      <router-link
+        class="p-8 hover:bg-yellow-500 hover:underline"
+        :class="{ underline: route.path.includes('procedures') }"
+        :to="{ name: 'caselaw-procedures' }"
+        >Vorgänge</router-link
       >
       <router-link
         class="p-8 hover:bg-yellow-500 hover:underline"
