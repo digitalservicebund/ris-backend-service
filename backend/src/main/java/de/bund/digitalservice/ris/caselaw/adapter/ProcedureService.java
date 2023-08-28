@@ -1,6 +1,7 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPADocumentationOfficeRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPAProcedureLinkRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPAProcedureRepository;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.Procedure;
@@ -11,12 +12,15 @@ import org.springframework.stereotype.Service;
 @Service
 public class ProcedureService {
   private final JPAProcedureRepository repository;
+  private final JPAProcedureLinkRepository linkRepository;
   private final JPADocumentationOfficeRepository documentationOfficeRepository;
 
   public ProcedureService(
       JPAProcedureRepository repository,
+      JPAProcedureLinkRepository linkRepository,
       JPADocumentationOfficeRepository documentationOfficeRepository) {
     this.repository = repository;
+    this.linkRepository = linkRepository;
     this.documentationOfficeRepository = documentationOfficeRepository;
   }
 
@@ -25,7 +29,12 @@ public class ProcedureService {
         .findByLabelContainingAndDocumentationOffice(
             query, documentationOfficeRepository.findByLabel(documentationOffice.label()))
         .stream()
-        .map(dto -> Procedure.builder().label(dto.getLabel()).build())
+        .map(
+            dto ->
+                Procedure.builder()
+                    .label(dto.getLabel())
+                    .documentUnitCount(linkRepository.countByProcedureDTO(dto))
+                    .build())
         .toList();
   }
 }

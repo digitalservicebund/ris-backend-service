@@ -158,5 +158,9 @@
   "MANDATORY_FIELD_MISSING": {
     "title": "Feld muss befüllt sein",
     "description": ""
+  },
+  "PROCEDURE_GET_ALL": {
+    "title": "Vorgänge konnten nicht geladen werden.",
+    "description": ""
   }
 }

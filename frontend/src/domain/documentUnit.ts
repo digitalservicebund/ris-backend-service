@@ -40,6 +40,7 @@ export type Court = {
 
 export type Procedure = {
   label: string
+  documentUnitCount?: number
 }
 
 export type Texts = {
