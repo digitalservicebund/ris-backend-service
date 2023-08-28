@@ -127,6 +127,15 @@ licenseReport {
     filters = arrayOf<DependencyFilter>(LicenseBundleNormalizer("$projectDir/license-normalizer-bundle.json", true))
 }
 
+sonar {
+    properties {
+        property("sonar.projectKey", "digitalservicebund_ris-backend-service",)
+        property("sonar.organization", "digitalservicebund",)
+        property("sonar.host.url", "https://sonarcloud.io",)
+        property("sonar.coverage.exclusions", "**/src/fields/**,**/config/**,**/S3AsyncMockClient.java,**/Application.java,**/NormsMemoryRepository.kt")
+    }
+}
+
 dependencies {
     val springBootStarterVersion = "3.1.2"
     val springSecurityVersion = "6.1.2"
@@ -273,18 +282,8 @@ tasks.named("bootBuildImage") {
     dependsOn("integrationTest")
 }
 
-tasks.named("sonar") {
+project.tasks.sonar {
     dependsOn("jacocoTestReport")
-    doFirst {
-        properties.plus(
-            mapOf(
-                "sonar.projectKey" to "digitalservicebund_ris-backend-service",
-                "sonar.organization" to "digitalservicebund",
-                "sonar.host.url" to "https://sonarcloud.io",
-                "sonar.coverage.exclusions" to "**/src/fields/**,**/config/**,**/S3AsyncMockClient.java,**/Application.java,**/NormsMemoryRepository.kt"
-            )
-        )
-    }
 }
 
 tasks {
@@ -374,6 +373,7 @@ tasks {
 
     val delombok by registering(DelombokTask::class) {
         dependsOn(compileJava)
+        mainClass.set("lombok.launch.Main")
         val outputDir by extra { file("$buildDir/delombok") }
         outputs.dir(outputDir)
         sourceSets["main"].java.srcDirs.forEach {
