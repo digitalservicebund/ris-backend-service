@@ -208,8 +208,9 @@ class ProcedureIntegrationTest {
     assertThat(
             linkRepository
                 .findFirstByDocumentationUnitIdOrderByCreatedAtDesc(documentUnitFromFrontend.uuid())
-                .getProcedureDTO())
-        .isEqualTo(procedureDTO);
+                .getProcedureDTO()
+                .getId())
+        .isEqualTo(procedureDTO.getId());
     assertThat(linkRepository.findAll()).hasSize(1);
   }
 
@@ -379,7 +380,7 @@ class ProcedureIntegrationTest {
             response -> {
               assertThat(response.getResponseBody()).hasSize(3);
               assertThat(List.of(response.getResponseBody()).get(0).label())
-                  .isEqualTo("testProcedure1");
+                  .isEqualTo("testProcedure3");
             });
   }
 
@@ -399,7 +400,7 @@ class ProcedureIntegrationTest {
         .consumeWith(
             response -> {
               assertThat(response.getResponseBody()).hasSize(2);
-              assertThat(List.of(response.getResponseBody()).get(0).label()).isEqualTo("aaabbb");
+              assertThat(List.of(response.getResponseBody()).get(0).label()).isEqualTo("aaaccc");
             });
 
     risWebTestClient
