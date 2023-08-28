@@ -339,22 +339,21 @@ class ToLegalDocMLConverterTest {
   }
 
   @Test
-  fun `it creates and article element with its paragraph and content`() {
+  fun `it creates an article element with its paragraph and content`() {
     val paragraph =
-        Paragraph(
-            guid = UUID.randomUUID(), marker = "§ 1.1", text = "test paragraph text", order = 1)
+        Paragraph(guid = UUID.randomUUID(), marker = "§ 1.1", text = "test paragraph text")
     val article =
         Article(
             guid = UUID.randomUUID(),
-            header = "test article title",
-            designation = "§ 9a",
             order = 1,
+            marker = "§ 9a",
+            heading = "test article title",
             paragraphs = listOf(paragraph),
         )
     val norm =
         createRandomNormWithCitationDateAndArticles()
             .copy(
-                sections = listOf(article),
+                documentation = listOf(article),
             )
     val document = convertNormToLegalDocML(norm)
 
@@ -396,7 +395,6 @@ class ToLegalDocMLConverterTest {
         Paragraph(
             guid = UUID.randomUUID(),
             marker = "(1)",
-            order = 1,
             text =
                 "test list intro text:\n" +
                     "                    <DL Type=\"arabic\">\n" +
@@ -416,15 +414,16 @@ class ToLegalDocMLConverterTest {
     val article =
         Article(
             guid = UUID.randomUUID(),
-            header = "test article title",
-            designation = "§ 1",
             order = 1,
+            marker = "§ 1",
+            heading = "test article title",
             paragraphs = listOf(paragraph),
         )
+
     val norm =
         createRandomNormWithCitationDateAndArticles()
             .copy(
-                sections = listOf(article),
+                documentation = listOf(article),
             )
     val document = convertNormToLegalDocML(norm)
 
@@ -456,12 +455,11 @@ class ToLegalDocMLConverterTest {
   }
 
   @Test
-  fun `it creates and article element with its paragraph and content containing a nested list`() {
+  fun `it creates an article element with its paragraph and content containing a nested list`() {
     val paragraph =
         Paragraph(
             guid = UUID.randomUUID(),
             marker = "(1)",
-            order = 1,
             text =
                 "test list intro text:\n" +
                     "                    <DL Font=\"normal\" Type=\"arabic\">\n" +
@@ -499,15 +497,15 @@ class ToLegalDocMLConverterTest {
     val article =
         Article(
             guid = UUID.randomUUID(),
-            header = "test article title",
-            designation = "§ 1",
             order = 1,
+            marker = "§ 1",
+            heading = "test article title",
             paragraphs = listOf(paragraph),
         )
     val norm =
         createRandomNormWithCitationDateAndArticles()
             .copy(
-                sections = listOf(article),
+                documentation = listOf(article),
             )
     val document = convertNormToLegalDocML(norm)
 
