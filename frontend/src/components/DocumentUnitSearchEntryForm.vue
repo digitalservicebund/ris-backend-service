@@ -26,7 +26,7 @@ const validationStore =
   useValidationStore<(typeof DocumentUnitSearchInput.fields)[number]>()
 
 const hasValidationErrors = ref(false)
-const submitButtonErrorMessage = ref(false)
+const submitButtonError = ref()
 
 const searchEntry = ref<DocumentUnitSearchInput>(props.modelValue ?? {})
 
@@ -124,6 +124,11 @@ function resetSearch() {
   emit("resetSearchResults")
 }
 
+function resetErrors(id?: (typeof DocumentUnitSearchInput.fields)[number]) {
+  if (id) validationStore.remove(id)
+  submitButtonError.value = undefined
+}
+
 async function validateSearchInput() {
   hasValidationErrors.value = false
   if (searchEntry.value?.decisionDateEnd && !searchEntry.value?.decisionDate) {
@@ -148,12 +153,11 @@ async function validateSearchInput() {
 function handleSearchButtonClicked() {
   validateSearchInput()
 
-  if (!hasValidationErrors.value) {
-    submitButtonErrorMessage.value = false
-    emit("search", searchEntry.value)
-  } else {
-    submitButtonErrorMessage.value = true
-  }
+  if (searchEntryEmpty.value) {
+    submitButtonError.value = "Geben Sie mindestens ein Suchkriterium ein"
+  } else if (hasValidationErrors.value) {
+    submitButtonError.value = "Fehler in Suchkriterien"
+  } else emit("search", searchEntry.value)
 }
 
 onMounted(async () => {
@@ -174,16 +178,17 @@ onMounted(async () => {
       <!-- Column 2 -->
       <div class="pr-32">
         <InputField
-          id="documentNumber"
+          id="documentNumberOrFileNumber"
           label="Dokumentnummer oder Aktenzeichen"
           visually-hide-label
         >
           <TextInput
-            id="documentNumber"
+            id="documentNumberOrFileNumber"
             v-model="searchEntry.documentNumberOrFileNumber"
             aria-label="Dokumentnummer oder Aktenzeichen Suche"
             class="ds-input-small"
             placeholder="Dokumentnummer/ Aktenzeichen"
+            @focus="resetErrors"
           ></TextInput>
         </InputField>
       </div>
@@ -195,6 +200,7 @@ onMounted(async () => {
             aria-label="Gerichtstyp Suche"
             class="ds-input-small"
             placeholder="Gerichtstyp"
+            @focus="resetErrors"
           ></TextInput>
         </InputField>
         <InputField id="courtLocation" label="Gerichtsort" visually-hide-label>
@@ -204,6 +210,7 @@ onMounted(async () => {
             aria-label="Gerichtsort Suche"
             class="ds-input-small"
             placeholder="Gerichtsort"
+            @focus="resetErrors"
           ></TextInput>
         </InputField>
       </div>
@@ -222,7 +229,9 @@ onMounted(async () => {
             class="ds-input-small"
             :has-error="hasError"
             is-future-date
-            @focus="validationStore.remove('decisionDate')"
+            @focus="
+              resetErrors(id as (typeof DocumentUnitSearchInput.fields)[number])
+            "
             @update:validation-error="updateValidationError"
           ></DateInput>
         </InputField>
@@ -242,7 +251,9 @@ onMounted(async () => {
             :has-error="hasError"
             is-future-date
             placeholder="TT.MM.JJJJ (optional)"
-            @focus="validationStore.remove('decisionDateEnd')"
+            @focus="
+              resetErrors(id as (typeof DocumentUnitSearchInput.fields)[number])
+            "
             @update:validation-error="updateValidationError"
           ></DateInput>
         </InputField>
@@ -260,6 +271,7 @@ onMounted(async () => {
             aria-label="Status Suche"
             class="ds-select-small"
             :items="dropdownItems"
+            @focus="resetErrors"
           />
         </InputField>
       </div>
@@ -275,6 +287,7 @@ onMounted(async () => {
             v-model="myDocOfficeOnly"
             aria-label="Nur meine Dokstelle Filter"
             class="ds-checkbox-mini"
+            @focus="resetErrors"
           />
         </InputField>
         <InputField
@@ -288,23 +301,25 @@ onMounted(async () => {
             :id="id"
             aria-label="Nur fehlerhafte Dokumentationseinheiten"
             class="ds-checkbox-mini"
+            @focus="resetErrors"
           />
         </InputField>
       </div>
       <div>
-        <div class="inline-grid gap-4">
+        <div class="flex flex-col gap-4">
           <TextButton
             aria-label="Nach Dokumentationseinheiten suchen"
+            class="self-start"
             label="Ergebnisse anzeigen"
             size="small"
             @click="handleSearchButtonClicked"
           />
 
           <span
-            v-if="submitButtonErrorMessage"
+            v-if="submitButtonError"
             class="ds-label-03-reg min-h-[1rem] text-red-800"
           >
-            Fehler in Suchkriterien
+            {{ submitButtonError }}
           </span>
         </div>
 

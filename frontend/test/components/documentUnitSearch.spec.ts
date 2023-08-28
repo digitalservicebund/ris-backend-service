@@ -95,14 +95,30 @@ describe("Documentunit Search", () => {
     expect(screen.queryAllByTestId("listEntry").length).toBe(0)
   })
 
-  test("click on 'Ergebnisse anzeigen' renders search results", async () => {
+  test("click on 'Ergebnisse anzeigen' with search input renders results", async () => {
+    const { user } = renderComponent()
+
+    await user.type(screen.getByLabelText("Gerichtstyp Suche"), "AG")
+    expect(screen.getByLabelText("Gerichtstyp Suche")).toHaveValue("AG")
+
+    await user.click(
+      screen.getByLabelText("Nach Dokumentationseinheiten suchen"),
+    )
+
+    expect(screen.getAllByTestId("listEntry").length).toBe(1)
+    expect(screen.getAllByText(/documentNumber/).length).toBe(1)
+  })
+
+  test("click on 'Ergebnisse anzeigen' without search input renders error message", async () => {
     const { user } = renderComponent()
 
     await user.click(
       screen.getByLabelText("Nach Dokumentationseinheiten suchen"),
     )
-    expect(screen.getAllByTestId("listEntry").length).toBe(1)
-    expect(screen.getAllByText(/documentNumber/).length).toBe(1)
+
+    expect(
+      screen.getByText(/Geben Sie mindestens ein Suchkriterium ein/),
+    ).toBeVisible()
   })
 
   test("click on 'Suche zurücksetzen' resets all input values and search results", async () => {
