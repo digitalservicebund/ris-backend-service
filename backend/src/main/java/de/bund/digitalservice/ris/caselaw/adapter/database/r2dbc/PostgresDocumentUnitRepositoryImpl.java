@@ -760,7 +760,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
         documentationOfficeRepository.findByLabel(documentationOfficeLabel);
 
     return Optional.ofNullable(
-            procedureRepository.findByLabelAndDocumentationOffice(
+            procedureRepository.findByLabelAndDocumentationOfficeOrderByCreatedAtDesc(
                 procedure.label(), documentationOfficeDTO))
         .orElseGet(
             () ->

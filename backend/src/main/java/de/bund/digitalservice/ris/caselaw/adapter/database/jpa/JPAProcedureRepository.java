@@ -11,11 +11,11 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface JPAProcedureRepository extends JpaRepository<JPAProcedureDTO, UUID> {
 
-  JPAProcedureDTO findByLabelAndDocumentationOffice(
+  JPAProcedureDTO findByLabelAndDocumentationOfficeOrderByCreatedAtDesc(
       String label, JPADocumentationOfficeDTO documentationOfficeDTO);
 
   @Query(
-      "SELECT p FROM procedure p WHERE (:label IS NULL OR p.label LIKE %:label%) AND p.documentationOffice = :documentationOffice")
+      "SELECT p FROM procedure p WHERE (:label IS NULL OR p.label LIKE %:label%) AND p.documentationOffice = :documentationOffice ORDER BY p.createdAt DESC")
   List<JPAProcedureDTO> findByLabelContainingAndDocumentationOffice(
       @Param("label") Optional<String> label,
       @Param("documentationOffice") JPADocumentationOfficeDTO documentationOfficeDTO);
