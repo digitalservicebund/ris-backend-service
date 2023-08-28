@@ -655,7 +655,7 @@ class JurisConverterTest {
 
       val norm = converter.parseJurisXml(query).block()
 
-      assertThat(norm?.sections).hasSize(1)
+      assertThat(norm?.documentation).hasSize(1)
     }
   }
 

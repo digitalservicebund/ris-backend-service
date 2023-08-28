@@ -104,7 +104,8 @@ fun mapDataToDomain(guid: UUID, data: NormData): Norm {
 
   return Norm(
       guid = guid,
-      sections = mapArticlesToDomain(data.articles),
+      documentation =
+          data.articles.mapIndexed { index, article -> mapArticleToDomain(article, index) },
       metadataSections = sections.filterNotNull(),
   )
 }
@@ -529,28 +530,21 @@ private fun createAnnoucementDateSection(announcementDate: String?): MetadataSec
 private fun createMetadataForType(data: List<*>, type: MetadatumType): List<Metadatum<*>> =
     data.filterNotNull().mapIndexed { index, value -> Metadatum(value, type, index + 1) }
 
-fun mapArticlesToDomain(articles: List<ArticleData>): List<Article> {
-  return articles.mapIndexed { index, article ->
+fun mapArticleToDomain(data: ArticleData, order: Int) =
     Article(
         guid = UUID.randomUUID(),
-        order = index,
-        header = article.title,
-        designation = article.marker,
-        paragraphs = mapParagraphsToDomain(article.paragraphs),
+        order = order,
+        paragraphs = data.paragraphs.map(::mapParagraphToDomain),
+        marker = data.marker,
+        heading = data.title,
     )
-  }
-}
 
-fun mapParagraphsToDomain(paragraphs: List<ParagraphData>): List<Paragraph> {
-  return paragraphs.mapIndexed { index, paragraph ->
+fun mapParagraphToDomain(data: ParagraphData) =
     Paragraph(
         guid = UUID.randomUUID(),
-        order = index,
-        marker = paragraph.marker,
-        text = paragraph.text,
+        marker = data.marker,
+        text = data.text,
     )
-  }
-}
 
 fun parseDateString(value: String): LocalDate? =
     try {

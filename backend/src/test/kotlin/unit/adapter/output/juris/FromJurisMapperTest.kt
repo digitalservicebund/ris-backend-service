@@ -1,5 +1,6 @@
 package unit.adapter.output.juris
 
+import de.bund.digitalservice.ris.norms.domain.entity.Article
 import de.bund.digitalservice.ris.norms.domain.entity.MetadataSection
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName.AGE_INDICATION
@@ -34,7 +35,7 @@ import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName.SUBJECT
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType
 import de.bund.digitalservice.ris.norms.domain.value.UndefinedDate
 import de.bund.digitalservice.ris.norms.framework.adapter.output.juris.mapDataToDomain
-import de.bund.digitalservice.ris.norms.juris.converter.model.Article
+import de.bund.digitalservice.ris.norms.juris.converter.model.Article as ArticleData
 import de.bund.digitalservice.ris.norms.juris.converter.model.CategorizedReference
 import de.bund.digitalservice.ris.norms.juris.converter.model.DigitalAnnouncement
 import de.bund.digitalservice.ris.norms.juris.converter.model.DivergentEntryIntoForce
@@ -64,7 +65,7 @@ class FromJurisMapperTest {
         NormData(
             articles =
                 listOf(
-                    Article(
+                    ArticleData(
                         "articleTitle",
                         "articleMarker",
                         listOf(Paragraph("paragraphMarker", "paragraphText")),
@@ -154,75 +155,86 @@ class FromJurisMapperTest {
     val domainNorm = mapDataToDomain(guid, extractedData)
 
     assertThat(domainNorm.guid).isEqualTo(guid)
-    assertThat(domainNorm.sections).hasSize(1)
-    val article = domainNorm.sections[0] as de.bund.digitalservice.ris.norms.domain.entity.Article
-    assertThat(article.header).isEqualTo("articleTitle")
-    assertThat(article.designation).isEqualTo("articleMarker")
+    assertThat(domainNorm.documentation).hasSize(1)
+
+    assertThat(domainNorm.documentation.first()).isInstanceOf(Article::class.java)
+    val article = domainNorm.documentation.first() as Article
+    assertThat(article.heading).isEqualTo("articleTitle")
+    assertThat(article.marker).isEqualTo("articleMarker")
+    assertThat(article.order).isEqualTo(0)
     assertThat(article.paragraphs).hasSize(1)
-    val paragraph =
-        article.paragraphs.first() as de.bund.digitalservice.ris.norms.domain.entity.Paragraph
+
+    val paragraph = article.paragraphs.first()
     assertThat(paragraph.marker).isEqualTo("paragraphMarker")
     assertThat(paragraph.text).isEqualTo("paragraphText")
-    val sections = domainNorm.metadataSections
+
+    val metadataSections = domainNorm.metadataSections
     assertSectionsHasMetadata(
-        sections, NORM, MetadatumType.OFFICIAL_LONG_TITLE, "officialLongTitle")
+        metadataSections, NORM, MetadatumType.OFFICIAL_LONG_TITLE, "officialLongTitle")
     assertSectionsHasMetadata(
-        sections, NORM, MetadatumType.OFFICIAL_SHORT_TITLE, "officialShortTitle")
+        metadataSections, NORM, MetadatumType.OFFICIAL_SHORT_TITLE, "officialShortTitle")
     assertSectionsHasMetadata(
-        sections, NORM, MetadatumType.OFFICIAL_ABBREVIATION, "officialAbbreviation")
-    assertSectionsHasMetadata(sections, NORM, MetadatumType.DOCUMENT_CATEGORY, "documentCategory")
-    assertSectionsHasMetadata(sections, NORM, MetadatumType.TEXT, "text")
-    assertSectionsHasMetadata(sections, NORM, MetadatumType.CELEX_NUMBER, "celexNumber")
-    assertSectionsHasMetadata(sections, NORM, MetadatumType.RIS_ABBREVIATION, "risAbbreviation")
-    assertSectionsHasMetadata(sections, NORM, MetadatumType.KEYWORD, "frameKeyword")
+        metadataSections, NORM, MetadatumType.OFFICIAL_ABBREVIATION, "officialAbbreviation")
     assertSectionsHasMetadata(
-        sections, NORM, MetadatumType.DIVERGENT_DOCUMENT_NUMBER, "divergentDocumentNumber")
+        metadataSections, NORM, MetadatumType.DOCUMENT_CATEGORY, "documentCategory")
+    assertSectionsHasMetadata(metadataSections, NORM, MetadatumType.TEXT, "text")
+    assertSectionsHasMetadata(metadataSections, NORM, MetadatumType.CELEX_NUMBER, "celexNumber")
     assertSectionsHasMetadata(
-        sections,
+        metadataSections, NORM, MetadatumType.RIS_ABBREVIATION, "risAbbreviation")
+    assertSectionsHasMetadata(metadataSections, NORM, MetadatumType.KEYWORD, "frameKeyword")
+    assertSectionsHasMetadata(
+        metadataSections, NORM, MetadatumType.DIVERGENT_DOCUMENT_NUMBER, "divergentDocumentNumber")
+    assertSectionsHasMetadata(
+        metadataSections,
         NORM,
         MetadatumType.RIS_ABBREVIATION_INTERNATIONAL_LAW,
         "risAbbreviationInternationalLaw")
     assertSectionsHasMetadata(
-        sections, NORM, MetadatumType.UNOFFICIAL_ABBREVIATION, "unofficialAbbreviation")
+        metadataSections, NORM, MetadatumType.UNOFFICIAL_ABBREVIATION, "unofficialAbbreviation")
     assertSectionsHasMetadata(
-        sections, NORM, MetadatumType.UNOFFICIAL_LONG_TITLE, "unofficialLongTitle")
+        metadataSections, NORM, MetadatumType.UNOFFICIAL_LONG_TITLE, "unofficialLongTitle")
     assertSectionsHasMetadata(
-        sections, NORM, MetadatumType.UNOFFICIAL_REFERENCE, "unofficialReference")
+        metadataSections, NORM, MetadatumType.UNOFFICIAL_REFERENCE, "unofficialReference")
     assertSectionsHasMetadata(
-        sections, NORM, MetadatumType.UNOFFICIAL_SHORT_TITLE, "unofficialShortTitle")
-    assertSectionsHasMetadata(sections, NORM, MetadatumType.VALIDITY_RULE, "validityRule")
-    assertSectionsHasMetadata(sections, NORM, MetadatumType.REFERENCE_NUMBER, "referenceNumber")
-    assertSectionsHasMetadata(sections, NORM, MetadatumType.DEFINITION, "definition")
+        metadataSections, NORM, MetadatumType.UNOFFICIAL_SHORT_TITLE, "unofficialShortTitle")
+    assertSectionsHasMetadata(metadataSections, NORM, MetadatumType.VALIDITY_RULE, "validityRule")
     assertSectionsHasMetadata(
-        sections, NORM, MetadatumType.AGE_OF_MAJORITY_INDICATION, "ageOfMajorityIndication")
+        metadataSections, NORM, MetadatumType.REFERENCE_NUMBER, "referenceNumber")
+    assertSectionsHasMetadata(metadataSections, NORM, MetadatumType.DEFINITION, "definition")
+    assertSectionsHasMetadata(
+        metadataSections, NORM, MetadatumType.AGE_OF_MAJORITY_INDICATION, "ageOfMajorityIndication")
     assertThat(
-            sections
+            metadataSections
                 .first { it.name == SUBJECT_AREA && it.order == 0 }
                 .metadata
                 .first { it.type == MetadatumType.SUBJECT_FNA }
                 .value)
         .isEqualTo("subjectFna")
     assertThat(
-            sections
+            metadataSections
                 .first { it.name == SUBJECT_AREA && it.order == 1 }
                 .metadata
                 .first { it.type == MetadatumType.SUBJECT_GESTA }
                 .value)
         .isEqualTo("subjectGesta")
-    assertSectionsHasMetadata(sections, LEAD, MetadatumType.LEAD_UNIT, "unit")
-    assertSectionsHasMetadata(sections, LEAD, MetadatumType.LEAD_JURISDICTION, "jurisdiction")
+    assertSectionsHasMetadata(metadataSections, LEAD, MetadatumType.LEAD_UNIT, "unit")
     assertSectionsHasMetadata(
-        sections, DOCUMENT_TYPE, MetadatumType.TEMPLATE_NAME, "documentTemplateName")
-    assertSectionsHasMetadata(sections, DOCUMENT_TYPE, MetadatumType.TYPE_NAME, "documentName")
+        metadataSections, LEAD, MetadatumType.LEAD_JURISDICTION, "jurisdiction")
     assertSectionsHasMetadata(
-        sections, PARTICIPATION, MetadatumType.PARTICIPATION_TYPE, "participationType")
+        metadataSections, DOCUMENT_TYPE, MetadatumType.TEMPLATE_NAME, "documentTemplateName")
     assertSectionsHasMetadata(
-        sections,
+        metadataSections, DOCUMENT_TYPE, MetadatumType.TYPE_NAME, "documentName")
+    assertSectionsHasMetadata(
+        metadataSections, PARTICIPATION, MetadatumType.PARTICIPATION_TYPE, "participationType")
+    assertSectionsHasMetadata(
+        metadataSections,
         PARTICIPATION,
         MetadatumType.PARTICIPATION_INSTITUTION,
         "participationInstitution")
     val officialReferenceSections =
-        sections.filter { it.name == OFFICIAL_REFERENCE }.flatMap { it.sections ?: emptyList() }
+        metadataSections
+            .filter { it.name == OFFICIAL_REFERENCE }
+            .flatMap { it.sections ?: emptyList() }
     assertSectionsHasMetadata(
         officialReferenceSections, PRINT_ANNOUNCEMENT, MetadatumType.ANNOUNCEMENT_GAZETTE, "bgbl")
     assertSectionsHasMetadata(
@@ -236,7 +248,7 @@ class FromJurisMapperTest {
     assertSectionsHasMetadata(
         officialReferenceSections, DIGITAL_ANNOUNCEMENT, MetadatumType.EDITION, "1")
     val divergentSections =
-        sections
+        metadataSections
             .filter { it.name in listOf(DIVERGENT_ENTRY_INTO_FORCE, DIVERGENT_EXPIRATION) }
             .flatMap { it.sections ?: emptyList() }
     assertSectionsHasMetadata(
@@ -250,17 +262,21 @@ class FromJurisMapperTest {
         MetadatumType.UNDEFINED_DATE,
         UndefinedDate.UNDEFINED_FUTURE)
     assertSectionsHasMetadata(
-        sections, CITATION_DATE, MetadatumType.DATE, LocalDate.of(2020, 10, 1))
+        metadataSections, CITATION_DATE, MetadatumType.DATE, LocalDate.of(2020, 10, 1))
     assertSectionsHasMetadata(
-        sections, AGE_INDICATION, MetadatumType.RANGE_START, "ageIndicationStart")
-    assertSectionsHasMetadata(sections, CATEGORIZED_REFERENCE, MetadatumType.TEXT, "category")
-    assertSectionsHasMetadata(sections, NORM_PROVIDER, MetadatumType.ENTITY, "providerEntity")
-    assertSectionsHasMetadata(sections, NORM_PROVIDER, MetadatumType.DECIDING_BODY, "providerBody")
-    assertSectionsHasMetadata(sections, NORM_PROVIDER, MetadatumType.RESOLUTION_MAJORITY, true)
+        metadataSections, AGE_INDICATION, MetadatumType.RANGE_START, "ageIndicationStart")
     assertSectionsHasMetadata(
-        sections, ENTRY_INTO_FORCE, MetadatumType.DATE, LocalDate.of(2023, 6, 15))
+        metadataSections, CATEGORIZED_REFERENCE, MetadatumType.TEXT, "category")
+    assertSectionsHasMetadata(
+        metadataSections, NORM_PROVIDER, MetadatumType.ENTITY, "providerEntity")
+    assertSectionsHasMetadata(
+        metadataSections, NORM_PROVIDER, MetadatumType.DECIDING_BODY, "providerBody")
+    assertSectionsHasMetadata(
+        metadataSections, NORM_PROVIDER, MetadatumType.RESOLUTION_MAJORITY, true)
+    assertSectionsHasMetadata(
+        metadataSections, ENTRY_INTO_FORCE, MetadatumType.DATE, LocalDate.of(2023, 6, 15))
     val documentStatusSections =
-        sections
+        metadataSections
             .filter { it.name == DOCUMENT_STATUS_SECTION }
             .flatMap { it.sections ?: emptyList() }
     assertSectionsHasMetadata(documentStatusSections, DOCUMENT_STATUS, MetadatumType.YEAR, "2021")
@@ -272,13 +288,19 @@ class FromJurisMapperTest {
         MetadatumType.DESCRIPTION,
         "documentStatusDescription")
     assertSectionsHasMetadata(
-        sections, PRINCIPLE_ENTRY_INTO_FORCE, MetadatumType.DATE, LocalDate.of(2024, 10, 10))
-    assertSectionHasNotMetadataType(sections, EXPIRATION, MetadatumType.DATE)
+        metadataSections,
+        PRINCIPLE_ENTRY_INTO_FORCE,
+        MetadatumType.DATE,
+        LocalDate.of(2024, 10, 10))
+    assertSectionHasNotMetadataType(metadataSections, EXPIRATION, MetadatumType.DATE)
     assertSectionsHasMetadata(
-        sections, PRINCIPLE_EXPIRATION, MetadatumType.DATE, LocalDate.of(2020, 10, 10))
-    assertSectionHasNotMetadataType(sections, PRINCIPLE_EXPIRATION, MetadatumType.UNDEFINED_DATE)
+        metadataSections, PRINCIPLE_EXPIRATION, MetadatumType.DATE, LocalDate.of(2020, 10, 10))
+    assertSectionHasNotMetadataType(
+        metadataSections, PRINCIPLE_EXPIRATION, MetadatumType.UNDEFINED_DATE)
     val statusIndicationSections =
-        sections.filter { it.name == STATUS_INDICATION }.flatMap { it.sections ?: emptyList() }
+        metadataSections
+            .filter { it.name == STATUS_INDICATION }
+            .flatMap { it.sections ?: emptyList() }
     assertSectionsHasMetadata(statusIndicationSections, STATUS, MetadatumType.NOTE, "statusNote")
     assertSectionsHasMetadata(
         statusIndicationSections, STATUS, MetadatumType.DESCRIPTION, "statusDescription")
@@ -298,7 +320,7 @@ class FromJurisMapperTest {
     assertSectionsHasMetadata(
         statusIndicationSections, OTHER_STATUS, MetadatumType.NOTE, "otherStatusNote")
 
-    val footnotesSections = sections.filter { it.name == FOOTNOTES }
+    val footnotesSections = metadataSections.filter { it.name == FOOTNOTES }
     assertThat(footnotesSections).hasSize(2)
     assertSectionHasMetadataWithCorrectOrder(
         footnotesSections[0], MetadatumType.FOOTNOTE_REFERENCE, "reference 1", 1)
@@ -333,36 +355,37 @@ class FromJurisMapperTest {
     assertSectionHasMetadataWithCorrectOrder(
         footnotesSections[1], MetadatumType.FOOTNOTE_CHANGE, "another footnoteChange B", 3)
 
-    assertThat(sections.filter { it.name == ANNOUNCEMENT_DATE }).hasSize(1)
+    assertThat(metadataSections.filter { it.name == ANNOUNCEMENT_DATE }).hasSize(1)
     assertSectionsHasMetadata(
-        sections, ANNOUNCEMENT_DATE, MetadatumType.DATE, LocalDate.parse("2020-10-10"))
+        metadataSections, ANNOUNCEMENT_DATE, MetadatumType.DATE, LocalDate.parse("2020-10-10"))
   }
 
   private fun assertSectionHasNotMetadataType(
-      sections: List<MetadataSection>,
+      metadataSections: Collection<MetadataSection>,
       name: MetadataSectionName,
       type: MetadatumType,
   ) {
-    assertThat(sections.first { it.name == name }.metadata.find { it.type == type }).isNull()
+    assertThat(metadataSections.first { it.name == name }.metadata.find { it.type == type })
+        .isNull()
   }
 
   private fun assertSectionsHasMetadata(
-      sections: List<MetadataSection>,
+      metadataSections: Collection<MetadataSection>,
       name: MetadataSectionName,
       type: MetadatumType,
       value: Any?
   ) {
-    assertThat(sections.first { it.name == name }.metadata.first { it.type == type }.value)
+    assertThat(metadataSections.first { it.name == name }.metadata.first { it.type == type }.value)
         .isEqualTo(value)
   }
 
   private fun assertSectionHasMetadataWithCorrectOrder(
-      sections: MetadataSection,
+      metadataSection: MetadataSection,
       type: MetadatumType,
       value: Any?,
       order: Int
   ) {
-    assertThat(sections.metadata.find { it.type == type && it.order == order }?.value)
+    assertThat(metadataSection.metadata.find { it.type == type && it.order == order }?.value)
         .isEqualTo(value)
   }
 }
