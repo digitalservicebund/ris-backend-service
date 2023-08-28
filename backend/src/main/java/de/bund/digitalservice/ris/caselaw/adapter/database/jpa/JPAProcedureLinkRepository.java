@@ -13,4 +13,6 @@ public interface JPAProcedureLinkRepository extends JpaRepository<JPAProcedureLi
       UUID documentationUnitId);
 
   Integer countByProcedureDTO(JPAProcedureDTO procedureDTO);
+
+  List<JPAProcedureLinkDTO> findAllByProcedureDTO(JPAProcedureDTO procedureDTO);
 }

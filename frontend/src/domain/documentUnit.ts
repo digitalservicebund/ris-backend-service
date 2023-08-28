@@ -1,5 +1,6 @@
 import ActiveCitation from "./activeCitation"
 import DocumentationOffice from "./documentationOffice"
+import DocumentUnitListEntry from "./documentUnitListEntry"
 import NormReference from "./normReference"
 import ProceedingDecision from "./proceedingDecision"
 
@@ -41,6 +42,7 @@ export type Court = {
 export type Procedure = {
   label: string
   documentUnitCount?: number
+  documentUnits: DocumentUnitListEntry[]
 }
 
 export type Texts = {
