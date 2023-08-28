@@ -7,26 +7,24 @@ import de.bund.digitalservice.ris.norms.application.port.output.SaveFileReferenc
 import de.bund.digitalservice.ris.norms.application.port.output.SaveNormOutputPort
 import de.bund.digitalservice.ris.norms.application.port.output.SearchNormsOutputPort
 import de.bund.digitalservice.ris.norms.domain.entity.Article
-import de.bund.digitalservice.ris.norms.domain.entity.ContentElement
+import de.bund.digitalservice.ris.norms.domain.entity.DocumentSection
+import de.bund.digitalservice.ris.norms.domain.entity.Documentation
 import de.bund.digitalservice.ris.norms.domain.entity.Metadatum
 import de.bund.digitalservice.ris.norms.domain.entity.Norm
-import de.bund.digitalservice.ris.norms.domain.entity.Paragraph
-import de.bund.digitalservice.ris.norms.domain.entity.SectionElement
 import de.bund.digitalservice.ris.norms.domain.value.Eli
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType
-import de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto.ContentDto
 import de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto.FileReferenceDto
 import de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto.MetadataSectionDto
 import de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto.MetadatumDto
 import de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto.NormDto
-import de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto.SectionDto
-import de.bund.digitalservice.ris.norms.framework.adapter.output.database.repository.ContentsRepository
+import de.bund.digitalservice.ris.norms.framework.adapter.output.database.repository.ArticleRepository
+import de.bund.digitalservice.ris.norms.framework.adapter.output.database.repository.DocumentSectionRepository
 import de.bund.digitalservice.ris.norms.framework.adapter.output.database.repository.FileReferenceRepository
 import de.bund.digitalservice.ris.norms.framework.adapter.output.database.repository.MetadataRepository
 import de.bund.digitalservice.ris.norms.framework.adapter.output.database.repository.MetadataSectionsRepository
 import de.bund.digitalservice.ris.norms.framework.adapter.output.database.repository.NormsRepository
-import de.bund.digitalservice.ris.norms.framework.adapter.output.database.repository.SectionsRepository
-import java.util.*
+import de.bund.digitalservice.ris.norms.framework.adapter.output.database.repository.ParagraphRepository
+import java.util.UUID
 import org.springframework.context.annotation.Primary
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
@@ -40,8 +38,9 @@ class NormsService(
     val fileReferenceRepository: FileReferenceRepository,
     val metadataRepository: MetadataRepository,
     val metadataSectionsRepository: MetadataSectionsRepository,
-    val sectionsRepository: SectionsRepository,
-    val contentsRepository: ContentsRepository
+    val documentSectionRepository: DocumentSectionRepository,
+    val articleRepository: ArticleRepository,
+    val paragraphRepository: ParagraphRepository,
 ) :
     NormsMapper,
     GetNormByGuidOutputPort,
@@ -87,12 +86,6 @@ class NormsService(
   override fun getNormByGuid(query: GetNormByGuidOutputPort.Query): Mono<Norm> {
     val findNormRequest = normsRepository.findByGuid(query.guid).cache()
 
-    val contentElementsNormLevel =
-        findNormRequest
-            .flatMapMany { contentsRepository.findByNormGuid(it.guid) }
-            .map(::contentElementToEntity)
-            .collectList()
-
     val findFileReferencesRequest =
         findNormRequest
             .flatMapMany { fileReferenceRepository.findByNormGuid(it.guid) }
@@ -111,40 +104,30 @@ class NormsService(
             }
             .collectList()
 
-    val findAllSectionsRequest =
-        findNormRequest.flatMapMany { sectionsRepository.findByNormGuid(it.guid) }.collectList()
-
-    val findContentOfSectionsRequest =
-        findAllSectionsRequest
-            .flatMapMany {
-              contentsRepository.findBySectionGuidIn(it.map { section -> section.guid })
-            }
-            .collectList()
+    val findDocumentationRequest =
+        findNormRequest.flatMapMany { findDocumentation(it.guid, null) }.collectList()
 
     return Mono.zip(
             findNormRequest,
-            contentElementsNormLevel,
             findFileReferencesRequest,
             findMetadataSectionsRequest,
             findMetadataRequest,
-            findAllSectionsRequest,
-            findContentOfSectionsRequest)
-        .map { normToEntity(it.t1, it.t2, it.t3, it.t4, it.t5, it.t6, it.t7) }
+            findDocumentationRequest,
+        )
+        .map { normToEntity(it.t1, it.t2, it.t3, it.t4, it.t5) }
   }
 
   @Transactional(transactionManager = "connectionFactoryTransactionManager")
   override fun saveNorm(command: SaveNormOutputPort.Command): Mono<Boolean> {
     val saveNormRequest = normsRepository.save(normToDto(command.norm)).cache()
-    val saveSections =
-        saveNormRequest.flatMapMany { saveNormSections(command.norm.sections, it.guid, null) }
-    val saveContents =
-        saveNormRequest.flatMapMany { saveNormContents(command.norm.contents, it.guid) }
+    val saveDocumentationRequest =
+        saveNormRequest.flatMapMany { saveDocumentation(command.norm.documentation, it.guid) }
     val saveFileReferencesRequest = saveNormRequest.flatMapMany { saveNormFiles(command.norm, it) }
     val saveMetadataSectionsRequest =
         saveNormRequest.flatMapMany { saveNormSectionsWithMetadata(command.norm, it) }
 
     return Mono.`when`(
-            saveSections, saveContents, saveFileReferencesRequest, saveMetadataSectionsRequest)
+            saveDocumentationRequest, saveFileReferencesRequest, saveMetadataSectionsRequest)
         .thenReturn(true)
   }
 
@@ -165,42 +148,42 @@ class NormsService(
         .map { true }
   }
 
-  private fun saveNormContents(
-      contents: Collection<ContentElement>,
-      normGuid: UUID
-  ): Flux<ContentDto> {
-    return contentsRepository.saveAll(
-        contentsToDto(contents = contents, normGuid = normGuid, sectionGuid = null))
+  // TODO: Maybe use `expand` and then save all?
+  private fun saveDocumentation(
+      documentation: Collection<Documentation>,
+      normGuid: UUID,
+      parentSectionGuid: UUID? = null,
+  ): Flux<Boolean> {
+    return Flux.fromIterable(documentation).flatMap {
+      when (it) {
+        is DocumentSection -> saveDocumentSection(it, normGuid, parentSectionGuid)
+        is Article -> saveArticle(it, normGuid, parentSectionGuid)
+      }
+    }
   }
 
-  private fun saveNormSections(
-      sections: Collection<SectionElement>,
+  private fun saveDocumentSection(
+      documentSection: DocumentSection,
       normGuid: UUID,
-      sectionGuid: UUID?
-  ): Flux<ContentDto> {
-    return if (sections.filterIsInstance<Article>().isNotEmpty()) {
-      sectionsRepository
-          .saveAll(
-              articlesToDto(
-                  articles = sections.filterIsInstance<Article>(),
-                  normGuid = normGuid,
-                  sectionGuid = sectionGuid))
-          .flatMap { article -> saveArticleParagraphs(sections, article) }
-    } else {
-      sectionsRepository
-          .saveAll(
-              sectionsToDto(
-                  sections = sections.filter { it !is Article },
-                  normGuid = normGuid,
-                  sectionGuid = sectionGuid))
-          .flatMap { section ->
-            val childSectionsToSave =
-                sections
-                    .filter { it.guid == section.guid }
-                    .flatMap { it.childSections ?: emptyList() }
-            saveNormSections(childSectionsToSave, normGuid, section.guid)
-          }
-    }
+      parentSectionGuid: UUID? = null
+  ): Flux<Boolean> {
+    return documentSectionRepository
+        .save(documentSectionToDto(documentSection, normGuid, parentSectionGuid))
+        .flatMapMany { saveDocumentation(documentSection.documentation, normGuid, it.guid) }
+  }
+
+  private fun saveArticle(
+      article: Article,
+      normGuid: UUID,
+      documentSectionGuid: UUID? = null
+  ): Flux<Boolean> {
+    return articleRepository
+        .save(articleToDto(article, normGuid, documentSectionGuid))
+        .flatMapMany { articleDto ->
+          paragraphRepository.saveAll(
+              article.paragraphs.map { paragraphToDto(it, articleDto.guid) })
+        }
+        .map { true }
   }
 
   private fun saveNormSectionsWithMetadata(norm: Norm, normDto: NormDto): Flux<MetadataSectionDto> {
@@ -263,22 +246,27 @@ class NormsService(
     return metadataRepository.saveAll(metadataListToDto(metadata, metadataSectionDto.guid))
   }
 
-  private fun saveArticleParagraphs(
-      sections: Collection<SectionElement>,
-      article: SectionDto
-  ): Flux<ContentDto> {
-    return contentsRepository.saveAll(
-        contentsToDto(
-            contents =
-                sections
-                    .filterIsInstance<Article>()
-                    .find { it.guid == article.guid }
-                    ?.paragraphs
-                    ?.map { it as Paragraph }
-                    ?: listOf(),
-            normGuid = null,
-            sectionGuid = article.guid,
-        ),
-    )
+  private fun findDocumentation(normGuid: UUID, parentSectionGuid: UUID?): Flux<Documentation> {
+    val articles =
+        articleRepository
+            .findByNormGuidAndDocumentSectionGuid(normGuid, parentSectionGuid)
+            .flatMap { articleDto ->
+              paragraphRepository
+                  .findByArticleGuid(articleDto.guid)
+                  .map(::paragraphToEntity)
+                  .collectList()
+                  .map { articleToEntity(articleDto, it) }
+            }
+
+    val documentSections =
+        documentSectionRepository
+            .findByNormGuidAndParentSectionGuid(normGuid, parentSectionGuid)
+            .flatMap { sectionDto ->
+              findDocumentation(normGuid, sectionDto.guid).collectList().map {
+                documentSectionToEntity(sectionDto, it)
+              }
+            }
+
+    return Flux.merge(articles, documentSections)
   }
 }

@@ -1,35 +1,23 @@
 package de.bund.digitalservice.ris.norms.framework.adapter.output.database
 
 import de.bund.digitalservice.ris.norms.domain.entity.Article
-import de.bund.digitalservice.ris.norms.domain.entity.Book
-import de.bund.digitalservice.ris.norms.domain.entity.Chapter
-import de.bund.digitalservice.ris.norms.domain.entity.Closing
-import de.bund.digitalservice.ris.norms.domain.entity.ContentElement
+import de.bund.digitalservice.ris.norms.domain.entity.DocumentSection
+import de.bund.digitalservice.ris.norms.domain.entity.Documentation
 import de.bund.digitalservice.ris.norms.domain.entity.FileReference
 import de.bund.digitalservice.ris.norms.domain.entity.MetadataSection
 import de.bund.digitalservice.ris.norms.domain.entity.Metadatum
 import de.bund.digitalservice.ris.norms.domain.entity.Norm
 import de.bund.digitalservice.ris.norms.domain.entity.Paragraph
-import de.bund.digitalservice.ris.norms.domain.entity.Part
-import de.bund.digitalservice.ris.norms.domain.entity.Preamble
-import de.bund.digitalservice.ris.norms.domain.entity.Section
-import de.bund.digitalservice.ris.norms.domain.entity.SectionElement
-import de.bund.digitalservice.ris.norms.domain.entity.Subchapter
-import de.bund.digitalservice.ris.norms.domain.entity.Subsection
-import de.bund.digitalservice.ris.norms.domain.entity.Subtitle
-import de.bund.digitalservice.ris.norms.domain.entity.Title
-import de.bund.digitalservice.ris.norms.domain.entity.Uncategorized
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType
 import de.bund.digitalservice.ris.norms.domain.value.NormCategory
 import de.bund.digitalservice.ris.norms.domain.value.UndefinedDate
-import de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto.ContentDto
-import de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto.ContentElementType
+import de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto.ArticleDto
+import de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto.DocumentSectionDto
 import de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto.FileReferenceDto
 import de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto.MetadataSectionDto
 import de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto.MetadatumDto
 import de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto.NormDto
-import de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto.SectionDto
-import de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto.SectionElementType
+import de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto.ParagraphDto
 import java.time.LocalDate
 import java.time.LocalTime
 import java.util.UUID
@@ -37,12 +25,10 @@ import java.util.UUID
 interface NormsMapper {
   fun normToEntity(
       normDto: NormDto,
-      contentsNormLevel: List<ContentElement>,
       fileReferences: List<FileReference>,
       dtoMetadataSections: List<MetadataSectionDto>,
-      dtoMetadata: List<MetadatumDto> = emptyList(),
-      sectionsDto: List<SectionDto>,
-      contentsNotNormLevel: List<ContentDto> = emptyList(),
+      dtoMetadata: Collection<MetadatumDto>,
+      documentation: Collection<Documentation>,
   ): Norm {
     val listDomainSections = mutableListOf<MetadataSection>()
 
@@ -89,75 +75,7 @@ interface NormsMapper {
           }
         }
 
-    // Move flat list SectionElement to nested structure and add ContentElement to SectionElements
-    // 1. We first take those sections, with child content elements --> Articles, since these don't
-    // have child sections, and we save them in a Pair list of the transformed SectionElement with
-    // the corresponding foreign key of the parent
-    val sections = mutableListOf<Pair<UUID?, MutableList<SectionElement>>>()
-    val contentsBySectionGuid: Map<UUID?, List<ContentDto>> =
-        contentsNotNormLevel.groupBy { it.sectionGuid }
-    contentsBySectionGuid.forEach { entry ->
-      val parentSectionDto = sectionsDto.find { sectionDto -> sectionDto.guid == entry.key }
-      if (parentSectionDto != null) {
-        val parentSection =
-            sectionElementToEntity(
-                parentSectionDto, null, entry.value.map { contentElementToEntity(it) })
-        val sectionWithSectionGuidAlreadyPresent =
-            sections.find { it.first == parentSectionDto.sectionGuid }
-        if (sectionWithSectionGuidAlreadyPresent != null) {
-          sectionWithSectionGuidAlreadyPresent.second.add(parentSection)
-        } else {
-          sections.add(Pair(parentSectionDto.sectionGuid, mutableListOf(parentSection)))
-        }
-      }
-    }
-
-    // CHECK 2. if there are sections with no content at the end of the branch, add code for that
-
-    // 3. Now we put those initial article sections recursively into their corresponding parent
-    // sections till there is now parent section left
-    var newSections: List<Pair<UUID?, MutableList<SectionElement>>> = sections
-    do {
-      newSections = findParentSections(newSections, sectionsDto)
-    } while (newSections.any { it.first != null })
-
-    return Norm(
-        normDto.guid,
-        listDomainSections,
-        fileReferences,
-        newSections.flatMap { it.second },
-        contentsNormLevel)
-  }
-
-  private fun findParentSections(
-      sections: List<Pair<UUID?, MutableList<SectionElement>>>,
-      sectionsDto: List<SectionDto>
-  ): List<Pair<UUID?, MutableList<SectionElement>>> {
-    val newSections = mutableListOf<Pair<UUID?, MutableList<SectionElement>>>()
-    sections.forEach { section ->
-      val parentSectionGuid = section.first
-      if (parentSectionGuid == null) {
-        newSections.add(section)
-        return@forEach
-      }
-      val childSectionElements = section.second
-      val parentSectionDto = sectionsDto.find { sectionDto -> sectionDto.guid == parentSectionGuid }
-      if (parentSectionDto != null) {
-        val parentSection =
-            sectionElementToEntity(
-                parentSectionDto, sectionElements = childSectionElements, contentElements = null)
-        val sectionWithSectionGuidAlreadyPresent =
-            newSections
-                .filter { it.first != null }
-                .find { it.first == parentSectionDto.sectionGuid }
-        if (sectionWithSectionGuidAlreadyPresent != null) {
-          sectionWithSectionGuidAlreadyPresent.second.add(parentSection)
-        } else {
-          newSections.add(Pair(parentSectionDto.sectionGuid, mutableListOf(parentSection)))
-        }
-      }
-    }
-    return newSections
+    return Norm(normDto.guid, listDomainSections, fileReferences, documentation)
   }
 
   fun metadataSectionToEntity(
@@ -179,95 +97,31 @@ interface NormsMapper {
         fileReferenceDto.guid)
   }
 
-  fun contentElementToEntity(contentDto: ContentDto): ContentElement {
-    return when (contentDto.type) {
-      ContentElementType.PREAMBLE ->
-          Preamble(contentDto.guid, contentDto.order, contentDto.marker, contentDto.text)
-      ContentElementType.PARAGRAPH ->
-          Paragraph(contentDto.guid, contentDto.order, contentDto.marker, contentDto.text)
-      ContentElementType.CLOSING ->
-          Closing(contentDto.guid, contentDto.order, contentDto.marker, contentDto.text)
-    }
-  }
+  fun articleToEntity(data: ArticleDto, paragraphs: Collection<Paragraph>) =
+      Article(
+          guid = data.guid,
+          order = data.order,
+          paragraphs = paragraphs,
+          marker = data.marker,
+          heading = data.heading,
+      )
 
-  fun sectionElementToEntity(
-      sectionDto: SectionDto,
-      sectionElements: List<SectionElement>?,
-      contentElements: List<ContentElement>?
-  ): SectionElement {
-    return when (sectionDto.type) {
-      SectionElementType.BOOK ->
-          Book(
-              sectionDto.header,
-              sectionDto.guid,
-              sectionDto.designation,
-              sectionDto.order,
-              childSections = sectionElements)
-      SectionElementType.PART ->
-          Part(
-              sectionDto.header,
-              sectionDto.guid,
-              sectionDto.designation,
-              sectionDto.order,
-              childSections = sectionElements)
-      SectionElementType.CHAPTER ->
-          Chapter(
-              sectionDto.header,
-              sectionDto.guid,
-              sectionDto.designation,
-              sectionDto.order,
-              childSections = sectionElements)
-      SectionElementType.SUBCHAPTER ->
-          Subchapter(
-              sectionDto.header,
-              sectionDto.guid,
-              sectionDto.designation,
-              sectionDto.order,
-              childSections = sectionElements)
-      SectionElementType.SECTION ->
-          Section(
-              sectionDto.header,
-              sectionDto.guid,
-              sectionDto.designation,
-              sectionDto.order,
-              childSections = sectionElements)
-      SectionElementType.ARTICLE ->
-          Article(
-              sectionDto.header,
-              sectionDto.guid,
-              sectionDto.designation,
-              sectionDto.order,
-              contentElements ?: listOf())
-      SectionElementType.SUBSECTION ->
-          Subsection(
-              sectionDto.header,
-              sectionDto.guid,
-              sectionDto.designation,
-              sectionDto.order,
-              childSections = sectionElements)
-      SectionElementType.TITLE ->
-          Title(
-              sectionDto.header,
-              sectionDto.guid,
-              sectionDto.designation,
-              sectionDto.order,
-              childSections = sectionElements)
-      SectionElementType.SUBTITLE ->
-          Subtitle(
-              sectionDto.header,
-              sectionDto.guid,
-              sectionDto.designation,
-              sectionDto.order,
-              childSections = sectionElements)
-      SectionElementType.UNCATEGORIZED ->
-          Uncategorized(
-              sectionDto.header,
-              sectionDto.guid,
-              sectionDto.designation,
-              sectionDto.order,
-              childSections = sectionElements)
-    }
-  }
+  fun documentSectionToEntity(data: DocumentSectionDto, documentation: Collection<Documentation>) =
+      DocumentSection(
+          guid = data.guid,
+          order = data.order,
+          type = data.type,
+          marker = data.marker,
+          heading = data.heading,
+          documentation = documentation,
+      )
+
+  fun paragraphToEntity(data: ParagraphDto) =
+      Paragraph(
+          guid = data.guid,
+          marker = data.marker,
+          text = data.text,
+      )
 
   fun metadatumToEntity(metadatumDto: MetadatumDto): Metadatum<*> {
     val value =
@@ -287,67 +141,37 @@ interface NormsMapper {
     return NormDto(norm.guid, norm.eGesetzgebung)
   }
 
-  fun sectionsToDto(
-      sections: List<SectionElement>,
-      normGuid: UUID,
-      sectionGuid: UUID?
-  ): List<SectionDto> {
-    return sections.map {
-      val type =
-          when (it) {
-            is Book -> SectionElementType.BOOK
-            is Article -> SectionElementType.ARTICLE
-            is Chapter -> SectionElementType.CHAPTER
-            is Part -> SectionElementType.PART
-            is Section -> SectionElementType.SECTION
-            is Subchapter -> SectionElementType.SUBCHAPTER
-            is Subsection -> SectionElementType.SUBSECTION
-            is Subtitle -> SectionElementType.SUBTITLE
-            is Title -> SectionElementType.TITLE
-            is Uncategorized -> SectionElementType.UNCATEGORIZED
-          }
-      SectionDto(it.guid, type, it.designation, it.header, it.order, sectionGuid, normGuid)
-    }
-  }
-
-  fun articlesToDto(articles: List<Article>, normGuid: UUID, sectionGuid: UUID?): List<SectionDto> {
-    return articles.map {
-      SectionDto(
-          it.guid,
-          SectionElementType.ARTICLE,
-          it.designation,
-          it.header,
-          it.order,
+  fun documentSectionToDto(data: DocumentSection, normGuid: UUID, parentSectionGuid: UUID?) =
+      DocumentSectionDto(
+          guid = data.guid,
+          order = data.order,
+          type = data.type,
+          marker = data.marker,
+          heading = data.heading,
+          parentSectionGuid = parentSectionGuid,
           normGuid = normGuid,
-          sectionGuid = sectionGuid)
-    }
-  }
+      )
 
-  fun contentsToDto(
-      contents: Collection<ContentElement>,
-      normGuid: UUID?,
-      sectionGuid: UUID?
-  ): List<ContentDto> {
-    return contents.map {
-      val type =
-          when (it) {
-            is Preamble -> ContentElementType.PREAMBLE
-            is Paragraph -> ContentElementType.PARAGRAPH
-            is Closing -> ContentElementType.CLOSING
-          }
-      ContentDto(
-          it.guid,
-          type,
-          it.marker,
-          it.text,
-          it.order,
+  fun articleToDto(data: Article, normGuid: UUID, documentSectionGuid: UUID?) =
+      ArticleDto(
+          guid = data.guid,
+          order = data.order,
+          marker = data.marker,
+          heading = data.heading,
           normGuid = normGuid,
-          sectionGuid = sectionGuid)
-    }
-  }
+          documentSectionGuid = documentSectionGuid,
+      )
+
+  fun paragraphToDto(data: Paragraph, articleGuid: UUID) =
+      ParagraphDto(
+          guid = data.guid,
+          marker = data.marker,
+          text = data.text,
+          articleGuid = articleGuid,
+      )
 
   fun fileReferencesToDto(
-      fileReferences: List<FileReference>,
+      fileReferences: Collection<FileReference>,
       normGuid: UUID
   ): List<FileReferenceDto> {
     return fileReferences.map { fileReferenceToDto(fileReference = it, normGuid = normGuid) }

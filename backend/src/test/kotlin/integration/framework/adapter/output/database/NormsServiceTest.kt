@@ -8,16 +8,15 @@ import de.bund.digitalservice.ris.norms.application.port.output.SaveFileReferenc
 import de.bund.digitalservice.ris.norms.application.port.output.SaveNormOutputPort
 import de.bund.digitalservice.ris.norms.application.port.output.SearchNormsOutputPort
 import de.bund.digitalservice.ris.norms.domain.entity.Article
-import de.bund.digitalservice.ris.norms.domain.entity.Book
-import de.bund.digitalservice.ris.norms.domain.entity.Chapter
-import de.bund.digitalservice.ris.norms.domain.entity.Closing
+import de.bund.digitalservice.ris.norms.domain.entity.DocumentSection
 import de.bund.digitalservice.ris.norms.domain.entity.FileReference
 import de.bund.digitalservice.ris.norms.domain.entity.MetadataSection
 import de.bund.digitalservice.ris.norms.domain.entity.Metadatum
 import de.bund.digitalservice.ris.norms.domain.entity.Norm
 import de.bund.digitalservice.ris.norms.domain.entity.Paragraph
-import de.bund.digitalservice.ris.norms.domain.entity.Part
-import de.bund.digitalservice.ris.norms.domain.entity.Preamble
+import de.bund.digitalservice.ris.norms.domain.value.DocumentSectionType.BOOK
+import de.bund.digitalservice.ris.norms.domain.value.DocumentSectionType.CHAPTER
+import de.bund.digitalservice.ris.norms.domain.value.DocumentSectionType.PART
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.CELEX_NUMBER
@@ -29,12 +28,13 @@ import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.OFFICIAL_LONG
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.PARTICIPATION_INSTITUTION
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.PARTICIPATION_TYPE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.YEAR
-import de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto.ContentDto
+import de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto.ArticleDto
+import de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto.DocumentSectionDto
 import de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto.FileReferenceDto
 import de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto.MetadataSectionDto
 import de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto.MetadatumDto
 import de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto.NormDto
-import de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto.SectionDto
+import de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto.ParagraphDto
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
@@ -62,14 +62,17 @@ class NormsServiceTest : PostgresTestcontainerIntegrationTest() {
 
   companion object {
     private val NORM: Norm = createRandomNorm()
-    private val ARTICLE1: Article = Article("Article1 title", UUID.randomUUID(), "§ 1", 0, listOf())
-    private val ARTICLE2: Article = Article("Article2 title", UUID.randomUUID(), "§ 2", 1, listOf())
-    private val ARTICLE3: Article = Article("Article3 title", UUID.randomUUID(), "§ 3", 1, listOf())
-    private val PARAGRAPH1: Paragraph = Paragraph(UUID.randomUUID(), 0, "(1)", "Text1")
-    private val PARAGRAPH2: Paragraph = Paragraph(UUID.randomUUID(), 1, "(2)", "Text2")
-    private val PARAGRAPH3: Paragraph = Paragraph(UUID.randomUUID(), 2, "(3)", "Text3")
-    private val PARAGRAPH4: Paragraph = Paragraph(UUID.randomUUID(), 3, "(4)", "Text4")
-    private val PARAGRAPH5: Paragraph = Paragraph(UUID.randomUUID(), 0, "(5)", "Text5")
+    private val ARTICLE1 =
+        Article(UUID.randomUUID(), 0, marker = "§ 1", heading = "article 1 heading")
+    private val ARTICLE2 =
+        Article(UUID.randomUUID(), 1, marker = "§ 2", heading = "article 2 heading")
+    private val ARTICLE3 =
+        Article(UUID.randomUUID(), 2, marker = "§ 3", heading = "article 3 heading")
+    private val PARAGRAPH1 = Paragraph(UUID.randomUUID(), "(1)", "Text1")
+    private val PARAGRAPH2 = Paragraph(UUID.randomUUID(), "(2)", "Text2")
+    private val PARAGRAPH3 = Paragraph(UUID.randomUUID(), "(3)", "Text3")
+    private val PARAGRAPH4 = Paragraph(UUID.randomUUID(), "(4)", "Text4")
+    private val PARAGRAPH5 = Paragraph(UUID.randomUUID(), "(5)", "Text5")
     private val FILE1: FileReference =
         FileReference("test.zip", "123456789", LocalDateTime.now(), UUID.randomUUID())
   }
@@ -91,8 +94,9 @@ class NormsServiceTest : PostgresTestcontainerIntegrationTest() {
     template.delete(FileReferenceDto::class.java).all().block()
     template.delete(MetadataSectionDto::class.java).all().block()
     template.delete(MetadatumDto::class.java).all().block()
-    template.delete(SectionDto::class.java).all().block()
-    template.delete(ContentDto::class.java).all().block()
+    template.delete(DocumentSectionDto::class.java).all().block()
+    template.delete(ArticleDto::class.java).all().block()
+    template.delete(ParagraphDto::class.java).all().block()
   }
 
   @Test
@@ -527,9 +531,8 @@ class NormsServiceTest : PostgresTestcontainerIntegrationTest() {
   }
 
   @Test
-  fun `save norm with 1 article and 2 paragraphs and retrieved by guid`() {
-    val article = ARTICLE1.copy(paragraphs = listOf(PARAGRAPH1, PARAGRAPH2))
-    val norm = NORM.copy(sections = listOf(article))
+  fun `save norm with one article and retrieved by guid`() {
+    val norm = NORM.copy(documentation = listOf(ARTICLE1))
     val saveCommand = SaveNormOutputPort.Command(norm)
     val guidQuery = GetNormByGuidOutputPort.Query(norm.guid)
 
@@ -547,10 +550,8 @@ class NormsServiceTest : PostgresTestcontainerIntegrationTest() {
   }
 
   @Test
-  fun `save norm with 2 article and 2 paragraphs each and retrieved by guid`() {
-    val article1 = ARTICLE1.copy(paragraphs = listOf(PARAGRAPH1, PARAGRAPH2))
-    val article2 = ARTICLE2.copy(paragraphs = listOf(PARAGRAPH3, PARAGRAPH4))
-    val norm = NORM.copy(sections = listOf(article1, article2))
+  fun `save norm with two articles`() {
+    val norm = NORM.copy(documentation = listOf(ARTICLE1, ARTICLE2))
     val saveCommand = SaveNormOutputPort.Command(norm)
     val guidQuery = GetNormByGuidOutputPort.Query(norm.guid)
 
@@ -737,8 +738,8 @@ class NormsServiceTest : PostgresTestcontainerIntegrationTest() {
         .`as`(StepVerifier::create)
         .assertNext {
           assertThat(it.files).hasSize(1)
-          assertThat(it.files[0].name).isEqualTo(FILE1.name)
-          assertThat(it.files[0].hash).isEqualTo(FILE1.hash)
+          assertThat(it.files.map { it.name }).containsOnly(FILE1.name)
+          assertThat(it.files.map { it.hash }).containsOnly(FILE1.hash)
         }
         .verifyComplete()
   }
@@ -958,52 +959,57 @@ class NormsServiceTest : PostgresTestcontainerIntegrationTest() {
   }
 
   @Test
-  fun `save norm with nested sections and content elements`() {
-
+  fun `save norm with nested documentation`() {
     val article1 = ARTICLE1.copy(paragraphs = listOf(PARAGRAPH1, PARAGRAPH2))
     val article2 = ARTICLE2.copy(paragraphs = listOf(PARAGRAPH3))
+    val article3 = ARTICLE3.copy(paragraphs = listOf(PARAGRAPH4))
+
     val chapter1 =
-        Chapter(
+        DocumentSection(
             guid = UUID.randomUUID(),
-            header = "Chapter 1",
-            designation = "1",
             order = 1,
-            childSections = listOf(article1, article2))
+            type = CHAPTER,
+            marker = "1",
+            heading = "Chapter 1",
+            documentation = listOf(article1, article2))
+
     val book1 =
-        Book(
+        DocumentSection(
             guid = UUID.randomUUID(),
-            header = "Book 1",
-            designation = "1",
             order = 1,
-            childSections = listOf(chapter1))
+            type = BOOK,
+            marker = "1",
+            heading = "Book 1",
+            documentation = listOf(chapter1))
 
-    val article3 = ARTICLE3.copy(paragraphs = listOf(PARAGRAPH4, PARAGRAPH5))
     val chapter2 =
-        Chapter(
+        DocumentSection(
             guid = UUID.randomUUID(),
-            header = "Chapter 2",
-            designation = "2",
             order = 1,
-            childSections = listOf(article3))
+            type = CHAPTER,
+            marker = "2",
+            heading = "Chapter 2",
+            documentation = listOf(article3))
+
     val part1 =
-        Part(
+        DocumentSection(
             guid = UUID.randomUUID(),
-            header = "Part 1",
-            designation = "1",
             order = 1,
-            childSections = listOf(chapter2))
+            type = PART,
+            marker = "1",
+            heading = "Part 1",
+            documentation = listOf(chapter2))
+
     val book2 =
-        Book(
+        DocumentSection(
             guid = UUID.randomUUID(),
-            header = "Book 2",
-            designation = "2",
             order = 2,
-            childSections = listOf(part1))
+            type = BOOK,
+            marker = "2",
+            heading = "Book 2",
+            documentation = listOf(part1))
 
-    val preamble = Preamble(guid = UUID.randomUUID(), order = 1, text = "Preamble text")
-    val closing = Closing(guid = UUID.randomUUID(), order = 2, text = "Closing text")
-
-    val norm = NORM.copy(sections = listOf(book1, book2), contents = listOf(preamble, closing))
+    val norm = NORM.copy(documentation = listOf(book1, book2))
     val saveCommand = SaveNormOutputPort.Command(norm)
     val guidQuery = GetNormByGuidOutputPort.Query(norm.guid)
 
