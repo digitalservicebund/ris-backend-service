@@ -42,6 +42,17 @@ const dropdownItems: DropdownItem[] = [
   { label: "In Veröffentlichung", value: PublicationState.PUBLISHING },
 ]
 
+const documentNumberOrFileNumber = computed({
+  get: () => searchEntry.value?.documentNumberOrFileNumber,
+  set: (data) => {
+    if (data?.length === 0) {
+      delete searchEntry.value.documentNumberOrFileNumber
+    } else {
+      searchEntry.value.documentNumberOrFileNumber = data
+    }
+  },
+})
+
 const publishingStateModel = computed({
   get: () => searchEntry.value?.status?.publicationStatus ?? "",
   set: (data) => {
@@ -59,14 +70,14 @@ const publishingStateModel = computed({
 const courtType = computed({
   get: () => searchEntry.value?.court?.type,
   set: (data) => {
-    if (data) {
+    if (data?.length === 0 && !searchEntry.value?.court?.location) {
+      delete searchEntry.value.court
+    } else {
       if (searchEntry.value.court) {
         searchEntry.value.court.type = data
       } else {
-        searchEntry.value.court = { type: data, label: data }
+        searchEntry.value.court = { type: data, label: data as string }
       }
-    } else {
-      searchEntry.value.court && delete searchEntry.value.court.type
     }
   },
 })
@@ -74,14 +85,14 @@ const courtType = computed({
 const courtLocation = computed({
   get: () => searchEntry.value?.court?.location,
   set: (data) => {
-    if (data) {
+    if (data?.length === 0 && !searchEntry.value?.court?.type) {
+      delete searchEntry.value.court
+    } else {
       if (searchEntry.value.court) {
         searchEntry.value.court.location = data
       } else {
-        searchEntry.value.court = { location: data, label: data }
+        searchEntry.value.court = { location: data, label: data as string }
       }
-    } else {
-      searchEntry.value.court && delete searchEntry.value.court.location
     }
   },
 })
@@ -89,11 +100,11 @@ const courtLocation = computed({
 const decisionDate = computed({
   get: () => searchEntry.value?.decisionDate,
   set: (data) => {
-    searchEntry.value.decisionDate = data
-    if (data) {
-      validateSearchInput()
-    } else {
+    if (data?.length === 0 || !data) {
       delete searchEntry.value.decisionDate
+    } else {
+      searchEntry.value.decisionDate = data
+      validateSearchInput()
     }
   },
 })
@@ -101,11 +112,11 @@ const decisionDate = computed({
 const decisionDateEnd = computed({
   get: () => searchEntry.value?.decisionDateEnd,
   set: (data) => {
-    searchEntry.value.decisionDateEnd = data
-    if (data) {
-      validateSearchInput()
-    } else {
+    if (data?.length === 0 || !data) {
       delete searchEntry.value.decisionDateEnd
+    } else {
+      searchEntry.value.decisionDateEnd = data
+      validateSearchInput()
     }
   },
 })
@@ -185,7 +196,7 @@ onMounted(async () => {
         >
           <TextInput
             id="documentNumberOrFileNumber"
-            v-model="searchEntry.documentNumberOrFileNumber"
+            v-model="documentNumberOrFileNumber"
             aria-label="Dokumentnummer oder Aktenzeichen Suche"
             class="ds-input-small"
             placeholder="Dokumentnummer/ Aktenzeichen"
