@@ -70,13 +70,15 @@ const publishingStateModel = computed({
 const courtType = computed({
   get: () => searchEntry.value?.court?.type,
   set: (data) => {
-    if (data?.length === 0 && !searchEntry.value?.court?.location) {
-      delete searchEntry.value.court
+    if (data?.length === 0) {
+      searchEntry.value?.court?.location
+        ? delete searchEntry.value.court.type
+        : delete searchEntry.value.court
     } else {
-      if (searchEntry.value.court) {
-        searchEntry.value.court.type = data
-      } else {
-        searchEntry.value.court = { type: data, label: data as string }
+      searchEntry.value.court = {
+        ...searchEntry.value.court,
+        type: data,
+        label: "",
       }
     }
   },
@@ -85,13 +87,15 @@ const courtType = computed({
 const courtLocation = computed({
   get: () => searchEntry.value?.court?.location,
   set: (data) => {
-    if (data?.length === 0 && !searchEntry.value?.court?.type) {
-      delete searchEntry.value.court
+    if (data?.length === 0) {
+      searchEntry.value?.court?.type
+        ? delete searchEntry.value.court.location
+        : delete searchEntry.value.court
     } else {
-      if (searchEntry.value.court) {
-        searchEntry.value.court.location = data
-      } else {
-        searchEntry.value.court = { location: data, label: data as string }
+      searchEntry.value.court = {
+        ...searchEntry.value.court,
+        location: data,
+        label: "",
       }
     }
   },
@@ -124,9 +128,7 @@ const decisionDateEnd = computed({
 const myDocOfficeOnly = computed({
   get: () => searchEntry.value?.myDocOfficeOnly,
   set: (data) => {
-    data
-      ? (searchEntry.value.myDocOfficeOnly = true)
-      : (searchEntry.value.myDocOfficeOnly = false)
+    searchEntry.value.myDocOfficeOnly = data ? true : false
   },
 })
 
