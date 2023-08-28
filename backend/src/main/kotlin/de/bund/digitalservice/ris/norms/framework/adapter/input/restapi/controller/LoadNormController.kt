@@ -4,22 +4,13 @@ import de.bund.digitalservice.ris.OpenApiConfiguration
 import de.bund.digitalservice.ris.exceptions.exception.NotFoundWithInstanceException
 import de.bund.digitalservice.ris.norms.application.port.input.LoadNormUseCase
 import de.bund.digitalservice.ris.norms.domain.entity.Article
-import de.bund.digitalservice.ris.norms.domain.entity.Book
-import de.bund.digitalservice.ris.norms.domain.entity.Chapter
-import de.bund.digitalservice.ris.norms.domain.entity.ContentElement
+import de.bund.digitalservice.ris.norms.domain.entity.DocumentSection
+import de.bund.digitalservice.ris.norms.domain.entity.Documentation
 import de.bund.digitalservice.ris.norms.domain.entity.FileReference
 import de.bund.digitalservice.ris.norms.domain.entity.MetadataSection
 import de.bund.digitalservice.ris.norms.domain.entity.Metadatum
 import de.bund.digitalservice.ris.norms.domain.entity.Norm
 import de.bund.digitalservice.ris.norms.domain.entity.Paragraph
-import de.bund.digitalservice.ris.norms.domain.entity.Part
-import de.bund.digitalservice.ris.norms.domain.entity.Section
-import de.bund.digitalservice.ris.norms.domain.entity.SectionElement
-import de.bund.digitalservice.ris.norms.domain.entity.Subchapter
-import de.bund.digitalservice.ris.norms.domain.entity.Subsection
-import de.bund.digitalservice.ris.norms.domain.entity.Subtitle
-import de.bund.digitalservice.ris.norms.domain.entity.Title
-import de.bund.digitalservice.ris.norms.domain.entity.Uncategorized
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.ApiConfiguration
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.encodeEli
@@ -67,85 +58,87 @@ class LoadNormController(private val loadNormService: LoadNormUseCase) {
   data class NormResponseSchema
   internal constructor(
       val guid: String,
-      val metadataSections: List<MetadataSectionResponseSchema>,
+      val metadataSections: Collection<MetadataSectionResponseSchema>,
       var eli: String,
-      var files: List<FileReferenceResponseSchema>,
-      val sections: List<SectionResponseSchema>,
-      val contents: List<ContentResponseSchema>,
+      var files: Collection<FileReferenceResponseSchema>,
+      val documentation: Collection<DocumentationResponseSchema>,
   ) {
     companion object {
       fun fromUseCaseData(data: Norm): NormResponseSchema {
-        val sections =
-            data.sections.sortedBy { it.order }.map(SectionResponseSchema::fromUseCaseData)
-        val contents =
-            data.contents.sortedBy { it.order }.map(ContentResponseSchema::fromUseCaseData)
+        val documentation = data.documentation.map(DocumentationResponseSchema::fromUseCaseData)
         val files = data.files.map(FileReferenceResponseSchema::fromUseCaseData)
         val metadataSections =
             data.metadataSections.map(MetadataSectionResponseSchema::fromUseCaseData)
+
         return NormResponseSchema(
-            encodeGuid(data.guid),
-            metadataSections,
-            encodeEli(data.eli),
+            guid = encodeGuid(data.guid),
+            metadataSections = metadataSections,
+            eli = encodeEli(data.eli),
             files = files,
-            sections,
-            contents)
+            documentation = documentation)
       }
     }
   }
 
-  data class SectionResponseSchema
-  internal constructor(
-      val guid: String,
-      var header: String? = null,
-      val designation: String,
-      val sections: List<SectionResponseSchema>? = emptyList(),
-      val paragraphs: List<ParagraphResponseSchema>? = emptyList()
-  ) {
+  abstract interface DocumentationResponseSchema {
+    val guid: String
+    val order: Int
+    val marker: String?
+    val heading: String?
+
     companion object {
-      fun fromUseCaseData(data: SectionElement): SectionResponseSchema {
+      fun fromUseCaseData(data: Documentation): DocumentationResponseSchema {
         return when (data) {
-          is Book,
-          is Chapter,
-          is Part,
-          is Section,
-          is Subchapter,
-          is Subsection,
-          is Subtitle,
-          is Title,
-          is Uncategorized ->
-              SectionResponseSchema(
-                  encodeGuid(data.guid),
-                  data.header,
-                  data.designation,
-                  sections = data.childSections?.map { fromUseCaseData(it) })
-          is Article -> {
-            val paragraphs =
-                data.paragraphs
-                    .sortedBy { it.order }
-                    .map { ParagraphResponseSchema.fromUseCaseData(it as Paragraph) }
-            SectionResponseSchema(
-                encodeGuid(data.guid), data.header, data.designation, paragraphs = paragraphs)
-          }
+          is DocumentSection -> DocumentSectionResponseSchema.fromUseCaseData(data)
+          is Article -> ArticleResponseSchema.fromUseCaseData(data)
         }
       }
     }
   }
 
-  data class ContentResponseSchema
+  data class DocumentSectionResponseSchema
   internal constructor(
-      val guid: String,
-      var order: Int,
-      val marker: String? = null,
-      val text: String,
-  ) {
+      override val guid: String,
+      override val order: Int,
+      val type: String,
+      override val marker: String?,
+      override val heading: String?,
+      val documentation: Collection<DocumentationResponseSchema>,
+  ) : DocumentationResponseSchema {
     companion object {
-      fun fromUseCaseData(data: ContentElement): ContentResponseSchema =
-          ContentResponseSchema(encodeGuid(data.guid), data.order, data.marker, data.text)
+      fun fromUseCaseData(data: DocumentSection) =
+          DocumentSectionResponseSchema(
+              guid = encodeGuid(data.guid),
+              order = data.order,
+              type = data.type.toString(),
+              marker = data.marker,
+              heading = data.heading,
+              documentation = data.documentation.map(DocumentationResponseSchema::fromUseCaseData))
+    }
+  }
+
+  data class ArticleResponseSchema
+  internal constructor(
+      override val guid: String,
+      override val order: Int,
+      val paragraphs: Collection<ParagraphResponseSchema>,
+      override val marker: String?,
+      override val heading: String?,
+  ) : DocumentationResponseSchema {
+    companion object {
+      fun fromUseCaseData(data: Article) =
+          ArticleResponseSchema(
+              guid = encodeGuid(data.guid),
+              order = data.order,
+              paragraphs = data.paragraphs.map(ParagraphResponseSchema::fromUseCaseData),
+              marker = data.marker,
+              heading = data.heading,
+          )
     }
   }
 
   data class ParagraphResponseSchema
-  internal constructor(val guid: String, val marker: String? = null, val text: String) {
+  private constructor(val guid: String, val marker: String? = null, val text: String) {
     companion object {
       fun fromUseCaseData(data: Paragraph): ParagraphResponseSchema {
         return ParagraphResponseSchema(encodeGuid(data.guid), data.marker, data.text)

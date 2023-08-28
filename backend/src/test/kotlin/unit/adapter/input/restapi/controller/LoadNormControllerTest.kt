@@ -3,22 +3,13 @@ package de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.control
 import com.ninjasquad.springmockk.MockkBean
 import de.bund.digitalservice.ris.norms.application.port.input.LoadNormUseCase
 import de.bund.digitalservice.ris.norms.domain.entity.Article
-import de.bund.digitalservice.ris.norms.domain.entity.Book
-import de.bund.digitalservice.ris.norms.domain.entity.Chapter
-import de.bund.digitalservice.ris.norms.domain.entity.ContentElement
+import de.bund.digitalservice.ris.norms.domain.entity.DocumentSection
+import de.bund.digitalservice.ris.norms.domain.entity.Documentation
 import de.bund.digitalservice.ris.norms.domain.entity.FileReference
 import de.bund.digitalservice.ris.norms.domain.entity.MetadataSection
 import de.bund.digitalservice.ris.norms.domain.entity.Metadatum
 import de.bund.digitalservice.ris.norms.domain.entity.Norm
 import de.bund.digitalservice.ris.norms.domain.entity.Paragraph
-import de.bund.digitalservice.ris.norms.domain.entity.Part
-import de.bund.digitalservice.ris.norms.domain.entity.Section
-import de.bund.digitalservice.ris.norms.domain.entity.SectionElement
-import de.bund.digitalservice.ris.norms.domain.entity.Subchapter
-import de.bund.digitalservice.ris.norms.domain.entity.Subsection
-import de.bund.digitalservice.ris.norms.domain.entity.Subtitle
-import de.bund.digitalservice.ris.norms.domain.entity.Title
-import de.bund.digitalservice.ris.norms.domain.entity.Uncategorized
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.encodeEli
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.encodeGuid
@@ -38,10 +29,9 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.springframework.test.web.reactive.server.WebTestClient
 import reactor.core.publisher.Mono
 import utils.convertLoadNormResponseTestSchemaToJson
-import utils.createContentElements
 import utils.createRandomNorm
+import utils.createSimpleDocumentation
 import utils.createSimpleMetadataSections
-import utils.createSimpleSections
 
 @ExtendWith(SpringExtension::class)
 @WebFluxTest(controllers = [LoadNormController::class])
@@ -95,8 +85,7 @@ class LoadNormControllerTest {
         createRandomNorm()
             .copy(
                 metadataSections = createSimpleMetadataSections(),
-                sections = createSimpleSections(),
-                contents = createContentElements(),
+                documentation = createSimpleDocumentation(),
             )
     val responseJson =
         convertLoadNormResponseTestSchemaToJson(NormResponseTestSchema.fromUseCaseData(norm))
@@ -156,88 +145,91 @@ class LoadNormControllerTest {
   data class NormResponseTestSchema
   internal constructor(
       val guid: String,
-      val metadataSections: List<MetadataSectionResponseTestSchema>,
+      val metadataSections: Collection<MetadataSectionResponseTestSchema>,
       var eli: String,
-      var files: List<FileReferenceResponseTestSchema>,
-      val sections: List<SectionResponseTestSchema>,
-      val contents: List<ContentResponseTestSchema>,
+      var files: Collection<FileReferenceResponseTestSchema>,
+      val documentation: Collection<DocumentationResponseTestSchema>,
   ) {
     companion object {
       fun fromUseCaseData(data: Norm): NormResponseTestSchema {
-        val sections =
-            data.sections.sortedBy { it.order }.map(SectionResponseTestSchema::fromUseCaseData)
-        val contents =
-            data.contents.sortedBy { it.order }.map(ContentResponseTestSchema::fromUseCaseData)
+        val documentation = data.documentation.map(DocumentationResponseTestSchema::fromUseCaseData)
         val files = data.files.map(FileReferenceResponseTestSchema::fromUseCaseData)
         val metadataSections =
             data.metadataSections.map(MetadataSectionResponseTestSchema::fromUseCaseData)
+
         return NormResponseTestSchema(
-            encodeGuid(data.guid),
-            metadataSections,
-            encodeEli(data.eli),
+            guid = encodeGuid(data.guid),
+            metadataSections = metadataSections,
+            eli = encodeEli(data.eli),
             files = files,
-            sections,
-            contents)
+            documentation = documentation)
       }
     }
   }
 
-  data class SectionResponseTestSchema
-  internal constructor(
-      val guid: String,
-      var header: String? = null,
-      val designation: String,
-      val sections: List<SectionResponseTestSchema>? = emptyList(),
-      val paragraphs: List<ParagraphResponseTestSchema>? = emptyList()
-  ) {
+  abstract interface DocumentationResponseTestSchema {
+    val guid: String
+    val order: Int
+    val marker: String?
+    val heading: String?
+
     companion object {
-      fun fromUseCaseData(data: SectionElement): SectionResponseTestSchema {
+      fun fromUseCaseData(data: Documentation): DocumentationResponseTestSchema {
         return when (data) {
-          is Book,
-          is Chapter,
-          is Part,
-          is Section,
-          is Subchapter,
-          is Subsection,
-          is Subtitle,
-          is Title,
-          is Uncategorized ->
-              SectionResponseTestSchema(
-                  encodeGuid(data.guid),
-                  data.header,
-                  data.designation,
-                  sections = data.childSections?.map { fromUseCaseData(it) })
-          is Article -> {
-            val paragraphs =
-                data.paragraphs
-                    .sortedBy { it.order }
-                    .map { ParagraphResponseTestSchema.fromUseCaseData(it as Paragraph) }
-            SectionResponseTestSchema(
-                encodeGuid(data.guid), data.header, data.designation, paragraphs = paragraphs)
-          }
+          is DocumentSection -> DocumentSectionResponseTestSchema.fromUseCaseData(data)
+          is Article -> ArticleResponseTestSchema.fromUseCaseData(data)
         }
       }
     }
   }
 
-  data class ContentResponseTestSchema
+  data class DocumentSectionResponseTestSchema
   internal constructor(
-      val guid: String,
-      var order: Int,
-      val marker: String? = null,
-      val text: String,
-  ) {
+      override val guid: String,
+      override val order: Int,
+      val type: String,
+      override val marker: String?,
+      override val heading: String?,
+      val documentation: Collection<DocumentationResponseTestSchema>,
+  ) : DocumentationResponseTestSchema {
     companion object {
-      fun fromUseCaseData(data: ContentElement): ContentResponseTestSchema =
-          ContentResponseTestSchema(encodeGuid(data.guid), data.order, data.marker, data.text)
+      fun fromUseCaseData(data: DocumentSection) =
+          DocumentSectionResponseTestSchema(
+              guid = encodeGuid(data.guid),
+              order = data.order,
+              type = data.type.toString(),
+              marker = data.marker,
+              heading = data.heading,
+              documentation =
+                  data.documentation.map(DocumentationResponseTestSchema::fromUseCaseData))
     }
   }
 
-  data class ParagraphResponseTestSchema
-  internal constructor(val guid: String, val marker: String? = null, val text: String) {
+  data class ArticleResponseTestSchema
+  internal constructor(
+      override val guid: String,
+      override val order: Int,
+      val paragraphs: Collection<ParagraphResponseSchema>,
+      override val marker: String?,
+      override val heading: String?,
+  ) : DocumentationResponseTestSchema {
     companion object {
-      fun fromUseCaseData(data: Paragraph): ParagraphResponseTestSchema {
-        return ParagraphResponseTestSchema(encodeGuid(data.guid), data.marker, data.text)
+      fun fromUseCaseData(data: Article) =
+          ArticleResponseTestSchema(
+              guid = encodeGuid(data.guid),
+              order = data.order,
+              paragraphs = data.paragraphs.map(ParagraphResponseSchema::fromUseCaseData),
+              marker = data.marker,
+              heading = data.heading,
+          )
+    }
+  }
+
+  data class ParagraphResponseSchema
+  private constructor(val guid: String, val marker: String? = null, val text: String) {
+    companion object {
+      fun fromUseCaseData(data: Paragraph): ParagraphResponseSchema {
+        return ParagraphResponseSchema(encodeGuid(data.guid), data.marker, data.text)
       }
     }
   }

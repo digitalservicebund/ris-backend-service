@@ -3,6 +3,8 @@ package de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.control
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig
 import de.bund.digitalservice.ris.norms.application.port.output.SaveNormOutputPort
 import de.bund.digitalservice.ris.norms.application.service.LoadNormService
+import de.bund.digitalservice.ris.norms.domain.value.DocumentSectionType.BOOK
+import de.bund.digitalservice.ris.norms.domain.value.DocumentSectionType.PART
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType
 import de.bund.digitalservice.ris.norms.domain.value.NormCategory
@@ -12,9 +14,9 @@ import de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto.No
 import java.time.Duration
 import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
+import java.util.UUID
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeAll
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
@@ -159,8 +161,7 @@ class LoadNormControllerIntegrationTest : PostgresTestcontainerIntegrationTest()
             """
                 {
                   "guid":"${norm.guid}",
-                  "sections":[],
-                  "contents":[],
+                  "documentation":[],
                   "metadataSections":[{"name":"CITATION_DATE","order":1,"metadata":[{"value":"${date.toLocalDate()}","type":"DATE","order":1}],"sections":null}, {"name":"DOCUMENT_TYPE","order":1,"metadata":[{"value":"BASE_NORM","type":"NORM_CATEGORY","order":1}, {"value":"documentTypeName","type":"TYPE_NAME","order":1}, {"value":"documentTemplateName","type":"TEMPLATE_NAME","order":1}],"sections":null}, {"name":"NORM","order":1,"metadata":[{"value":"officialLongTitle","type":"OFFICIAL_LONG_TITLE","order":1}, {"value":"risAbbreviation","type":"RIS_ABBREVIATION","order":1}, {"value":"documentNumber","type":"DOCUMENT_NUMBER","order":1}, {"value":"documentCategory","type":"DOCUMENT_CATEGORY","order":1}, {"value":"officialShortTitle","type":"OFFICIAL_SHORT_TITLE","order":1}, {"value":"officialAbbreviation","type":"OFFICIAL_ABBREVIATION","order":1}, {"value":"completeCitation","type":"COMPLETE_CITATION","order":1}, {"value":"celexNumber","type":"CELEX_NUMBER","order":1}, {"value":"text","type":"TEXT","order":1}],"sections":null}],
                   "eli":"",
                   "files":[{"name":"norm.zip","hash":"hash","createdAt":"$date"}]}
@@ -170,57 +171,63 @@ class LoadNormControllerIntegrationTest : PostgresTestcontainerIntegrationTest()
   }
 
   @Test
-  @Disabled
-  fun `it correctly loads a norm with sections and contents via api`() {
-    val date = LocalDateTime.now().truncatedTo(ChronoUnit.MICROS)
-
+  fun `it correctly loads a norm with documentation via api`() {
     val norm = norm {
-      files {
-        file {
-          name = "norm.zip"
-          hash = "hash"
-          createdAt = date
-        }
-      }
-      contents {
-        preamble {
-          text = "preamble text"
+      guid = UUID.fromString("160da595-25bb-4db1-9527-a949466886fc")
+      documentation {
+        documentSection {
+          guid = UUID.fromString("13760da1-17c2-4a2b-8236-351c85218260")
           order = 1
-        }
-        closing {
-          text = "closing text"
-          order = 2
-        }
-      }
-      sections {
-        book {
-          header = "Book 1"
-          designation = "1"
-          order = 1
-          childSections {
-            part {
-              header = "Part 1"
-              designation = "1"
+          type = BOOK
+          marker = "1"
+          heading = "Book 1"
+          documentation {
+            documentSection {
+              guid = UUID.fromString("07c8fe53-d16b-474c-a5bf-aa2b3aa165e4")
               order = 1
-              childSections {
+              type = PART
+              marker = "1"
+              heading = "Part 1"
+              documentation {
                 article {
-                  header = "Article 1"
-                  designation = "1"
+                  guid = UUID.fromString("36258e15-e72d-4ee7-8cab-3012a69c4ca7")
                   order = 1
-                  contents {
+                  marker = "§ 1"
+                  heading = "Article 1"
+                  paragraphs {
                     paragraph {
+                      guid = UUID.fromString("bbdbfbe9-8205-492f-836b-4545a5ec486b")
                       marker = "(1)"
-                      order = 1
-                      text = "Paragraph 1 text"
+                      text = "paragraph 1 text"
+                    }
+                  }
+                }
+                article {
+                  guid = UUID.fromString("f42bee15-8fed-495d-abf3-4af02a862b41")
+                  order = 2
+                  marker = "§ 2"
+                  heading = "Article 2"
+                  paragraphs {
+                    paragraph {
+                      guid = UUID.fromString("71e3ffe0-6d27-4473-b1b3-6c84f2d39a47")
+                      marker = "(1)"
+                      text = "paragraph 1 text"
                     }
                     paragraph {
+                      guid = UUID.fromString("e58ed763-928c-4155-bee9-fdbaaadc15f3")
                       marker = "(2)"
-                      order = 2
-                      text = "Paragraph 2 text"
+                      text = "paragraph 2 text"
                     }
                   }
                 }
               }
+            }
+            documentSection {
+              guid = UUID.fromString("b26e1ebd-50f9-4df9-a8b5-08cca0384959")
+              order = 2
+              type = PART
+              marker = "2"
+              heading = "Part 2"
             }
           }
         }
@@ -245,12 +252,70 @@ class LoadNormControllerIntegrationTest : PostgresTestcontainerIntegrationTest()
         .json(
             """
                 {
-                  "guid":"${norm.guid}",
-                  "sections":[],
-                  "contents":[{"text":  "peamble Text", "order": 1}, {"text":  "closing text", "order":  2}],
-                  "metadataSections":[],
-                  "eli":"",
-                  "files":[{"name":"norm.zip","hash":"hash","createdAt":"$date"}]}
+                  "guid": "160da595-25bb-4db1-9527-a949466886fc",
+                  "documentation": [
+                    {
+                      "guid": "13760da1-17c2-4a2b-8236-351c85218260",
+                      "order": 1,
+                      "type": "BOOK",
+                      "marker": "1",
+                      "heading": "Book 1",
+                      "documentation": [
+                        {
+                          "guid": "07c8fe53-d16b-474c-a5bf-aa2b3aa165e4",
+                          "order": 1,
+                          "type": "PART",
+                          "marker": "1",
+                          "heading": "Part 1",
+                          "documentation": [
+                            {
+                              "guid": "36258e15-e72d-4ee7-8cab-3012a69c4ca7",
+                              "order": 1,
+                              "marker": "§ 1",
+                              "heading": "Article 1",
+                              "paragraphs": [
+                                {
+                                  "guid": "bbdbfbe9-8205-492f-836b-4545a5ec486b",
+                                  "marker": "(1)",
+                                  "text": "paragraph 1 text"
+                                }
+                              ]
+                            },
+                            {
+                              "guid": "f42bee15-8fed-495d-abf3-4af02a862b41",
+                              "order": 2,
+                              "marker": "§ 2",
+                              "heading": "Article 2",
+                              "paragraphs": [
+                                {
+                                  "guid": "71e3ffe0-6d27-4473-b1b3-6c84f2d39a47",
+                                  "marker": "(1)",
+                                  "text": "paragraph 1 text"
+                                },
+                                {
+                                  "guid": "e58ed763-928c-4155-bee9-fdbaaadc15f3",
+                                  "marker": "(2)",
+                                  "text": "paragraph 2 text"
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "guid": "b26e1ebd-50f9-4df9-a8b5-08cca0384959",
+                          "order": 2,
+                          "type": "PART",
+                          "marker": "2",
+                          "heading": "Part 2",
+                          "documentation": []
+                        }
+                      ]
+                    }
+                  ],
+                  "metadataSections": [],
+                  "eli": "",
+                  "files": []
+                }
                 """
                 .trimIndent(),
         )
