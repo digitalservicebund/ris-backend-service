@@ -28,6 +28,5 @@ class EditNormFrameService(private val editNormOutputPort: EditNormOutputPort) :
 private fun getUpdatedNorm(guid: UUID, properties: EditNormFrameUseCase.NormFrameProperties) =
     Norm(
         guid = guid,
-        sections = listOf(),
         metadataSections = properties.metadataSections,
     )

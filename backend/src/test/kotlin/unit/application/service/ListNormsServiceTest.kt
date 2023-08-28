@@ -10,7 +10,7 @@ import de.bund.digitalservice.ris.norms.domain.value.MetadatumType
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
-import java.util.*
+import java.util.UUID
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import reactor.core.publisher.Flux
