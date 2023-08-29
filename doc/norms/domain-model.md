@@ -56,7 +56,13 @@ classDiagram
     SUBTITLE
   }
 
-  class Article{
+  class Article
+
+  Article *-- "*" Paragraph : paragraphs
+
+  class Paragraph {
+    +String guid
+    +String marker
     +String text
   }
 
