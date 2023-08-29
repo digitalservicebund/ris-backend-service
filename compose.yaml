@@ -103,7 +103,7 @@ services:
       - |
         set -e
         docker-entrypoint.sh postgres &
-        sleep 2
+        sleep 10
         psql -U $${POSTGRES_USER} -d $${POSTGRES_DB} -c 'CREATE EXTENSION IF NOT EXISTS "uuid-ossp";'
         wait
     healthcheck:
