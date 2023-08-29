@@ -1,6 +1,6 @@
 package de.bund.digitalservice.ris.norms.domain.entity
 
-import de.bund.digitalservice.ris.norms.domain.specification.norm.hasValidSectionElementsDepth
+import de.bund.digitalservice.ris.norms.domain.specification.norm.hasValidDocumentationDepth
 import de.bund.digitalservice.ris.norms.domain.specification.norm.hasValidSections
 import de.bund.digitalservice.ris.norms.domain.value.Eli
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName
@@ -17,7 +17,7 @@ data class Norm(
 ) {
   init {
     hasValidSections.evaluate(this).throwWhenUnsatisfied()
-    hasValidSectionElementsDepth.evaluate(this).throwWhenUnsatisfied()
+    hasValidDocumentationDepth.evaluate(this).throwWhenUnsatisfied()
   }
 
   val eli: Eli
