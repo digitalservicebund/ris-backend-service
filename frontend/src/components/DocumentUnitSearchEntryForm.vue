@@ -61,7 +61,7 @@ const publishingStateModel = computed({
     } else {
       searchEntry.value.status = {
         publicationStatus: data as PublicationState,
-        withError: false,
+        ...searchEntry.value.status,
       }
     }
   },
@@ -129,6 +129,16 @@ const myDocOfficeOnly = computed({
   get: () => searchEntry.value?.myDocOfficeOnly,
   set: (data) => {
     searchEntry.value.myDocOfficeOnly = data ? true : false
+  },
+})
+
+const withErrorsOnly = computed({
+  get: () => searchEntry.value?.status?.withError,
+  set: (data) => {
+    searchEntry.value.status = {
+      ...searchEntry.value.status,
+      withError: data ?? false,
+    }
   },
 })
 
@@ -306,13 +316,14 @@ onMounted(async () => {
         </InputField>
         <InputField
           v-if="myDocOfficeOnly"
-          id="hasError"
+          id="withErrorsOnly"
           v-slot="{ id }"
           label="Nur Fehler"
           :label-position="LabelPosition.RIGHT"
         >
           <Checkbox
             :id="id"
+            v-model="withErrorsOnly"
             aria-label="Nur fehlerhafte Dokumentationseinheiten"
             class="ds-checkbox-mini"
             @focus="resetErrors"

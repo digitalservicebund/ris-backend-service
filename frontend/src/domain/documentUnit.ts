@@ -64,8 +64,8 @@ export enum PublicationState {
 }
 
 export type PublicationStatus = {
-  publicationStatus: PublicationState
-  withError: boolean
+  publicationStatus?: PublicationState
+  withError?: boolean
 }
 
 export default class DocumentUnit {

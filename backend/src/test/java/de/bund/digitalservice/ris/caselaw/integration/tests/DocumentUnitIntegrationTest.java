@@ -958,6 +958,7 @@ class DocumentUnitIntegrationTest {
             Instant.parse("2023-08-10T00:00:00.00Z"));
     List<PublicationStatus> statuses =
         List.of(PUBLISHED, UNPUBLISHED, PUBLISHING, PUBLISHED, UNPUBLISHED);
+    List<Boolean> errorStatuses = List.of(false, true, true, false, true);
 
     for (int i = 0; i < 5; i++) {
       DocumentUnitDTO dto =
@@ -981,6 +982,7 @@ class DocumentUnitIntegrationTest {
                   .newEntry(true)
                   .documentUnitId(dto.getUuid())
                   .publicationStatus(statuses.get(i))
+                  .withError(errorStatuses.get(i))
                   .build())
           .block();
 
@@ -1023,6 +1025,15 @@ class DocumentUnitIntegrationTest {
             .status(DocumentUnitStatus.builder().publicationStatus(PUBLISHING).build())
             .build();
     assertThat(extractDocumentNumbersFromSearchCall(searchInput)).containsExactly("IJKL202101234");
+
+    // by error status
+    searchInput =
+        DocumentUnitSearchInput.builder()
+            .status(DocumentUnitStatus.builder().withError(true).build())
+            .build();
+    // the docunit with error from the other docoffice should not appear
+    assertThat(extractDocumentNumbersFromSearchCall(searchInput))
+        .containsExactly("IJKL202101234", "EFGH202200123");
 
     // by documentation office
     searchInput = DocumentUnitSearchInput.builder().myDocOfficeOnly(true).build();

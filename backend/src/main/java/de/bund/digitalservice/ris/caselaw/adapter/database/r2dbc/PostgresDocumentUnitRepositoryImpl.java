@@ -1352,6 +1352,13 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
 
     Predicate myDocOffice =
         builder.equal(root.get("documentationOfficeId"), documentationOfficeDTO.getId());
+
+    if (searchInput.status() != null && searchInput.status().withError() == true) {
+      Predicate statusWithError =
+          builder.equal(root.get("withError"), searchInput.status().withError());
+      restrictions.add(builder.and(myDocOffice, statusWithError));
+    }
+
     if (searchInput.status() != null && searchInput.status().publicationStatus() != null) {
       Predicate status =
           builder.equal(root.get("publicationStatus"), searchInput.status().publicationStatus());
