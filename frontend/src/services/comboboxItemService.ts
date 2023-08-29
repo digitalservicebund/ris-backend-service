@@ -76,10 +76,20 @@ function formatDropdownItems(
   }
 }
 
-async function fetchFromEndpoint(endpoint: Endpoint, filter?: string) {
+async function fetchFromEndpoint(
+  endpoint: Endpoint,
+  filter?: string,
+  size?: number,
+  page?: number,
+) {
+  const requestParams: { q?: string; sz?: string } = {
+    ...(filter ? { q: filter } : {}),
+    ...(size ? { sz: size.toString() } : {}),
+    ...(page != undefined ? { pg: page.toString() } : {}),
+  }
   const response = await httpClient.get<ComboboxInputModelType[]>(
     `caselaw/${endpoint}`,
-    filter ? { params: { q: filter } } : undefined,
+    { params: requestParams },
   )
   if (response.data) {
     return {
@@ -127,7 +137,7 @@ const service: ComboboxItemService = {
   getCitationStyles: async (filter?: string) =>
     await fetchFromEndpoint(Endpoint.citationStyles, filter),
   getProcedures: async (filter?: string) =>
-    await fetchFromEndpoint(Endpoint.procedures, filter),
+    await fetchFromEndpoint(Endpoint.procedures, filter, 10, 0),
 }
 
 export default service

@@ -12,6 +12,7 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitSearchEntry;
 import de.bund.digitalservice.ris.caselaw.domain.Procedure;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -32,10 +33,11 @@ public class ProcedureService {
     this.documentationOfficeRepository = documentationOfficeRepository;
   }
 
-  public List<Procedure> search(Optional<String> query, DocumentationOffice documentationOffice) {
+  public List<Procedure> search(
+      Optional<String> query, DocumentationOffice documentationOffice, Pageable pageable) {
     return repository
         .findByLabelContainingAndDocumentationOffice(
-            query, documentationOfficeRepository.findByLabel(documentationOffice.label()))
+            query, documentationOfficeRepository.findByLabel(documentationOffice.label()), pageable)
         .stream()
         .map(
             dto ->

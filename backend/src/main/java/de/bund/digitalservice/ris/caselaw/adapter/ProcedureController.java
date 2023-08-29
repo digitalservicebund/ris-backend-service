@@ -5,6 +5,8 @@ import de.bund.digitalservice.ris.caselaw.domain.Procedure;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.Optional;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
@@ -18,7 +20,6 @@ import reactor.core.publisher.Flux;
 @RequestMapping("api/v1/caselaw/procedure")
 @Tag(name = OpenApiConfiguration.CASELAW_TAG)
 public class ProcedureController {
-
   private final ProcedureService service;
   private final UserService userService;
 
@@ -31,8 +32,13 @@ public class ProcedureController {
   @PreAuthorize("isAuthenticated()")
   public Flux<Procedure> getAllProcedures(
       @AuthenticationPrincipal OidcUser oidcUser,
-      @RequestParam(value = "q") Optional<String> query) {
+      @RequestParam(value = "q") Optional<String> query,
+      @RequestParam(value = "sz") Integer size,
+      @RequestParam(value = "pg") Integer page) {
     return Flux.fromIterable(
-        service.search(query, userService.getDocumentationOffice(oidcUser).block()));
+        service.search(
+            query,
+            userService.getDocumentationOffice(oidcUser).block(),
+            PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"))));
   }
 }

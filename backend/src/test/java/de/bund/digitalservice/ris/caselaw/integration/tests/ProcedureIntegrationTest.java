@@ -371,7 +371,7 @@ class ProcedureIntegrationTest {
     risWebTestClient
         .withDefaultLogin()
         .get()
-        .uri("/api/v1/caselaw/procedure")
+        .uri("/api/v1/caselaw/procedure?sz=20&pg=0")
         .exchange()
         .expectStatus()
         .is2xxSuccessful()
@@ -392,7 +392,7 @@ class ProcedureIntegrationTest {
     risWebTestClient
         .withDefaultLogin()
         .get()
-        .uri("/api/v1/caselaw/procedure?q=aaa")
+        .uri("/api/v1/caselaw/procedure?q=aaa&sz=20&pg=0")
         .exchange()
         .expectStatus()
         .is2xxSuccessful()
@@ -406,7 +406,7 @@ class ProcedureIntegrationTest {
     risWebTestClient
         .withDefaultLogin()
         .get()
-        .uri("/api/v1/caselaw/procedure?q=aaac")
+        .uri("/api/v1/caselaw/procedure?q=aaac&pg=0&sz=10")
         .exchange()
         .expectStatus()
         .is2xxSuccessful()
@@ -427,7 +427,7 @@ class ProcedureIntegrationTest {
     risWebTestClient
         .withDefaultLogin()
         .get()
-        .uri("/api/v1/caselaw/procedure")
+        .uri("/api/v1/caselaw/procedure?sz=10&pg=0")
         .exchange()
         .expectStatus()
         .is2xxSuccessful()

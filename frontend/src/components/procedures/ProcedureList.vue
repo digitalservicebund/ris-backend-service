@@ -3,7 +3,7 @@ import ProcedureDetail from "./ProcedureDetail.vue"
 import ExpandableContent from "@/components/ExpandableContent.vue"
 import service from "@/services/procedureService"
 
-const { data: procedures, error } = await service.getAll()
+const { data: procedures, error } = await service.getAll(15, 0)
 </script>
 
 <template>
