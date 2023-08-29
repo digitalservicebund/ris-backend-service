@@ -167,8 +167,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
   public Mono<DocumentUnit> createNewDocumentUnit(
       String documentNumber, DocumentationOffice documentationOffice) {
 
-    return Mono.fromCallable(
-            () -> documentationOfficeRepository.findByLabel(documentationOffice.label()))
+    return Mono.just(documentationOfficeRepository.findByLabel(documentationOffice.label()))
         .flatMap(
             documentationOfficeDTO ->
                 metadataRepository.save(

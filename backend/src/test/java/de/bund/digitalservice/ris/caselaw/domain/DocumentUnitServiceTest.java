@@ -71,8 +71,6 @@ class DocumentUnitServiceTest {
 
   @MockBean private DatabaseDocumentUnitStatusService documentUnitStatusService;
 
-  @MockBean private ProcedureService procedureService;
-
   @MockBean private Validator validator;
 
   @Test

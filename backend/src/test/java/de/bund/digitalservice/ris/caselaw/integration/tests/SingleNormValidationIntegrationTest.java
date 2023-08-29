@@ -21,7 +21,6 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatusService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.EmailPublishService;
-import de.bund.digitalservice.ris.caselaw.domain.ProcedureService;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationReportRepository;
 import de.bund.digitalservice.ris.caselaw.domain.SingleNormValidationInfo;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
@@ -95,7 +94,6 @@ class SingleNormValidationIntegrationTest {
   @MockBean private DocumentNumberService numberService;
   @MockBean private DocumentUnitStatusService statusService;
   @MockBean private PublicationReportRepository reportRepository;
-  @MockBean private ProcedureService procedureService;
 
   private final DocumentationOffice docOffice = buildDefaultDocOffice();
   private UUID documentationOfficeUuid;

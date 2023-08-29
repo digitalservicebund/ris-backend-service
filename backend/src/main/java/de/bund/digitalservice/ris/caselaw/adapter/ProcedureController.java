@@ -2,7 +2,6 @@ package de.bund.digitalservice.ris.caselaw.adapter;
 
 import de.bund.digitalservice.ris.OpenApiConfiguration;
 import de.bund.digitalservice.ris.caselaw.domain.Procedure;
-import de.bund.digitalservice.ris.caselaw.domain.ProcedureService;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.Optional;
@@ -23,7 +22,7 @@ public class ProcedureController {
   private final ProcedureService service;
   private final UserService userService;
 
-  public ProcedureController(DatabaseProcedureService service, UserService userService) {
+  public ProcedureController(ProcedureService service, UserService userService) {
     this.service = service;
     this.userService = userService;
   }

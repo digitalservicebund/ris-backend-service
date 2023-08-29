@@ -31,7 +31,6 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitSearchInput;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatus;
 import de.bund.digitalservice.ris.caselaw.domain.EmailPublishService;
-import de.bund.digitalservice.ris.caselaw.domain.ProcedureService;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -98,7 +97,6 @@ class DocumentUnitControllerAuthIntegrationTest {
   @MockBean private EmailPublishService publishService;
   @MockBean DocxConverterService docxConverterService;
   @MockBean ReactiveClientRegistrationRepository clientRegistrationRepository;
-  @MockBean ProcedureService procedureService;
 
   private static final String docOffice1 = "CC-RIS";
   private static final String docOffice1Group = "/" + docOffice1;

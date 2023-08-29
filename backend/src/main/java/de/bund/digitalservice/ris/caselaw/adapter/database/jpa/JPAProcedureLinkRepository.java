@@ -30,7 +30,4 @@ public interface JPAProcedureLinkRepository extends JpaRepository<JPAProcedureLi
       nativeQuery = true)
   List<JPAProcedureLinkDTO> findLatestProcedureLinksByProcedure(
       @Param("procedureId") UUID procedureId);
-
-  JPAProcedureLinkDTO findTopByProcedureDTO_DocumentationOfficeOrderByCreatedAtDesc(
-      JPADocumentationOfficeDTO documentationOfficeDTO);
 }

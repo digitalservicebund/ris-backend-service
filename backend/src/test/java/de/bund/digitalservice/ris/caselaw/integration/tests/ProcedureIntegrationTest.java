@@ -8,11 +8,11 @@ import static org.mockito.Mockito.doReturn;
 import de.bund.digitalservice.ris.caselaw.RisWebTestClient;
 import de.bund.digitalservice.ris.caselaw.TestConfig;
 import de.bund.digitalservice.ris.caselaw.adapter.AuthService;
-import de.bund.digitalservice.ris.caselaw.adapter.DatabaseProcedureService;
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentUnitController;
 import de.bund.digitalservice.ris.caselaw.adapter.DocxConverterService;
 import de.bund.digitalservice.ris.caselaw.adapter.KeycloakUserService;
 import de.bund.digitalservice.ris.caselaw.adapter.ProcedureController;
+import de.bund.digitalservice.ris.caselaw.adapter.ProcedureService;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPADocumentationOfficeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPADocumentationOfficeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPAProcedureDTO;
@@ -65,7 +65,7 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
       SecurityConfig.class,
       AuthService.class,
       TestConfig.class,
-      DatabaseProcedureService.class
+      ProcedureService.class
     },
     controllers = {DocumentUnitController.class, ProcedureController.class})
 class ProcedureIntegrationTest {

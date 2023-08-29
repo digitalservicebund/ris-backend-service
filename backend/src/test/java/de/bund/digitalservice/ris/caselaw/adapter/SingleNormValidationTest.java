@@ -9,7 +9,6 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatusService;
 import de.bund.digitalservice.ris.caselaw.domain.EmailPublishService;
 import de.bund.digitalservice.ris.caselaw.domain.NormElement;
 import de.bund.digitalservice.ris.caselaw.domain.NormElementRepository;
-import de.bund.digitalservice.ris.caselaw.domain.ProcedureService;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationReportRepository;
 import de.bund.digitalservice.ris.caselaw.domain.SingleNormValidationInfo;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.NormCode;
@@ -42,7 +41,6 @@ class SingleNormValidationTest {
   @MockBean private EmailPublishService publishService;
   @MockBean private DocumentUnitStatusService statusService;
   @MockBean private PublicationReportRepository publicationReportRepository;
-  @MockBean private ProcedureService procedureService;
 
   @BeforeEach
   void setUp() {
