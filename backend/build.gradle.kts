@@ -278,10 +278,6 @@ dependencies {
     testImplementation("com.google.code.gson:gson:2.10.1")
 }
 
-tasks.named("bootBuildImage") {
-    dependsOn("integrationTest")
-}
-
 project.tasks.sonar {
     dependsOn("jacocoTestReport")
 }
