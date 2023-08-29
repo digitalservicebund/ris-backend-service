@@ -941,7 +941,8 @@ jobs:
 
   generate-entity-relationship-diagram:
     runs-on: ubuntu-latest
-    if: ${{ github.ref == 'refs/heads/main' }}
+#    if: ${{ github.ref == 'refs/heads/main' }}
+    if: ${{ false }}
     env:
       POSTGRES_DB: ris-erd
       POSTGRES_PASSWORD: postgres
@@ -960,8 +961,6 @@ jobs:
           --health-retries 5
         ports:
           - 5432:5432
-        volumes:
-          - backend/src/test/resources/db:/docker-entrypoint-initdb.d/
     steps:
       - uses: actions/checkout@v3
       - name: Get Gradle version
@@ -974,10 +973,6 @@ jobs:
           java-version: "17.0"
           distribution: "temurin"
           cache: gradle
-      - name: Install Postgres extension uuid-ossp
-        run: |
-          ls /docker-entrypoint-initdb.d/
-#          docker exec postgres psql -h localhost -U ${{ env.POSTGRES_USER }} -d ${{ env.POSTGRES_DB }} -c 'CREATE EXTENSION IF NOT EXISTS "uuid-ossp";'
       - uses: gradle/gradle-build-action@243af859f8ca30903d9d7f7936897ca0358ba691
         with:
           gradle-version: ${{ env.GRADLE_VERSION }}
@@ -1048,7 +1043,7 @@ jobs:
   push-reports:
     runs-on: ubuntu-latest
     needs:
-      - generate-entity-relationship-diagram
+#      - generate-entity-relationship-diagram
       - backend-build
       - audit-licenses-backend
       - audit-licenses-frontend
@@ -1067,16 +1062,16 @@ jobs:
           # This email identifies the commit as GitHub Actions - see https://github.com/orgs/community/discussions/26560
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
       # ER-diagram
-      - name: ER-diagram - Download artifact
-        uses: actions/download-artifact@v3
-        with:
-          name: erdiagram
-          path: tmp/erdiagram-reports/
-      - name: ER-diagram - git add report
-        uses: digitalservicebund/ris-reports/actions/git-add-report@da8cfce630414b940051870f02413c700320d510
-        with:
-          filePath: tmp/erdiagram-reports/latest.mmd
-          destinationDir: entity-relationship-diagrams/ris-backend-service
+#      - name: ER-diagram - Download artifact
+#        uses: actions/download-artifact@v3
+#        with:
+#          name: erdiagram
+#          path: tmp/erdiagram-reports/
+#      - name: ER-diagram - git add report
+#        uses: digitalservicebund/ris-reports/actions/git-add-report@da8cfce630414b940051870f02413c700320d510
+#        with:
+#          filePath: tmp/erdiagram-reports/latest.mmd
+#          destinationDir: entity-relationship-diagrams/ris-backend-service
       # Licence reports
       - name: Licence reports - Download
         uses: actions/download-artifact@v3
