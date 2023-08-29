@@ -41,7 +41,6 @@ export type Court = {
 
 export type Procedure = {
   label: string
-  documentUnitCount?: number
   documentUnits: DocumentUnitListEntry[]
   createdAt: string
 }

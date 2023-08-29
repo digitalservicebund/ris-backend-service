@@ -19,7 +19,10 @@ const { data: procedures, error } = await service.getAll()
             <div class="relative">
               <span class="font-bold">{{ procedure.label }}</span>
               <span class="absolute left-208 whitespace-nowrap"
-                >{{ procedure.documentUnitCount }} Dokumentationseinheiten</span
+                >{{
+                  procedure.documentUnits.length
+                }}
+                Dokumentationseinheiten</span
               >
             </div>
           </template>

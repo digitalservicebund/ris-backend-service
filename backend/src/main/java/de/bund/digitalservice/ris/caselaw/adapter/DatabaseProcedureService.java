@@ -43,7 +43,6 @@ public class DatabaseProcedureService implements ProcedureService {
             dto ->
                 Procedure.builder()
                     .label(dto.getLabel())
-                    .documentUnitCount(linkRepository.countByProcedureDTO(dto))
                     .documentUnits(getDocumentUnits(dto))
                     .created_at(dto.getCreatedAt())
                     .build())
@@ -65,7 +64,7 @@ public class DatabaseProcedureService implements ProcedureService {
   }
 
   private List<DocumentationUnitSearchEntry> getDocumentUnits(JPAProcedureDTO procedureDTO) {
-    return linkRepository.findAllByProcedureDTO(procedureDTO).stream()
+    return linkRepository.findLatestProcedureLinksByProcedure(procedureDTO.getId()).stream()
         .map(JPAProcedureLinkDTO::getDocumentationUnitId)
         .map(documentUnitRepository::findById)
         .filter(Optional::isPresent)

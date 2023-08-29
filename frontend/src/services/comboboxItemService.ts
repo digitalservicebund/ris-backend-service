@@ -70,7 +70,7 @@ function formatDropdownItems(
       return (responseData as Procedure[]).map((item) => ({
         label: item.label,
         value: item,
-        additionalInformation: `${item.documentUnitCount} Dokumentationseinheiten`,
+        additionalInformation: `${item.documentUnits.length} Dokumentationseinheiten`,
       }))
     }
   }

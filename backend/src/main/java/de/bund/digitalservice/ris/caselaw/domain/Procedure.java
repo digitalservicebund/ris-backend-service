@@ -6,7 +6,4 @@ import lombok.Builder;
 
 @Builder
 public record Procedure(
-    String label,
-    Integer documentUnitCount,
-    List<DocumentationUnitSearchEntry> documentUnits,
-    Instant created_at) {}
+    String label, List<DocumentationUnitSearchEntry> documentUnits, Instant created_at) {}
