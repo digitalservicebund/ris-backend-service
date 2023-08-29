@@ -55,7 +55,7 @@ public class DatabaseProcedureService implements ProcedureService {
             documentationOfficeRepository.findByLabel(
                 documentUnit.coreData().documentationOffice().label()))
         .map(linkRepository::findTopByProcedureDTO_DocumentationOfficeOrderByCreatedAtDesc)
-        .map(
+        .ifPresent(
             latestLink ->
                 linkRepository.save(
                     JPAProcedureLinkDTO.builder()
