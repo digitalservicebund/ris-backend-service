@@ -960,6 +960,8 @@ jobs:
           --health-retries 5
         ports:
           - 5432:5432
+        volumes:
+          - backend/src/test/resources/db:/docker-entrypoint-initdb.d/
     steps:
       - uses: actions/checkout@v3
       - name: Get Gradle version
@@ -974,7 +976,8 @@ jobs:
           cache: gradle
       - name: Install Postgres extension uuid-ossp
         run: |
-          docker exec postgres psql -h localhost -U ${{ env.POSTGRES_USER }} -d ${{ env.POSTGRES_DB }} -c 'CREATE EXTENSION IF NOT EXISTS "uuid-ossp";'
+          ls /docker-entrypoint-initdb.d/
+#          docker exec postgres psql -h localhost -U ${{ env.POSTGRES_USER }} -d ${{ env.POSTGRES_DB }} -c 'CREATE EXTENSION IF NOT EXISTS "uuid-ossp";'
       - uses: gradle/gradle-build-action@243af859f8ca30903d9d7f7936897ca0358ba691
         with:
           gradle-version: ${{ env.GRADLE_VERSION }}
