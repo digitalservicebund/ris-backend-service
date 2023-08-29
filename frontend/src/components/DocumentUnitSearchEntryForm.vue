@@ -253,6 +253,7 @@ onMounted(async () => {
             class="ds-input-small"
             :has-error="hasError"
             is-future-date
+            @blur="validateSearchInput"
             @focus="
               resetErrors(id as (typeof DocumentUnitSearchInput.fields)[number])
             "
@@ -275,6 +276,7 @@ onMounted(async () => {
             :has-error="hasError"
             is-future-date
             placeholder="TT.MM.JJJJ (optional)"
+            @blur="validateSearchInput"
             @focus="
               resetErrors(id as (typeof DocumentUnitSearchInput.fields)[number])
             "
