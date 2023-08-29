@@ -48,7 +48,7 @@ async function determineDocumentUnitListheight() {
 
 const emptyStatus = computed(() => {
   if (!props.documentUnitListEntries) {
-    return "Starten Sie die Suche oder erstellen Sie eine"
+    return "Starten Sie die Suche oder erstellen Sie eine neue Dokumentationseinheit."
   } else if (props.documentUnitListEntries.length === 0) {
     return "Keine Ergebnisse gefunden."
   } else if (props.isLoading) {
