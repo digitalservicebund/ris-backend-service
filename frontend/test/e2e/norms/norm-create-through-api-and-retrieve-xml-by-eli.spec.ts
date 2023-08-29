@@ -168,7 +168,7 @@ testWithImportedNorm(
               (
                 (norm.documentation?.[articleIndex] as DocumentSection)
                   .documentation?.[paragraphIndex] as Article
-              )?.text,
+              )?.paragraphs[0].text,
             )
           })
       })

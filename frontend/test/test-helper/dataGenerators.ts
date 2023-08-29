@@ -10,6 +10,7 @@ import {
   MetadatumType,
   Norm,
   NormCategory,
+  Paragraph,
   UndefinedDate,
 } from "@/domain/norm"
 import {
@@ -193,10 +194,16 @@ export function generateGuid(): string {
 }
 
 export function generateArticle(partialArticle?: Partial<Article>): Article {
+  const defaultParagraph: Paragraph = {
+    guid: generateGuid(),
+    marker: generateString({ prefix: "paragraph marker " }),
+    text: generateString({ prefix: "paragraph text", length: 20 }),
+  }
+
   return {
     guid: generateGuid(),
     marker: generateString({ prefix: "marker " }),
-    text: generateString({ prefix: "text", length: 40 }),
+    paragraphs: [defaultParagraph],
     ...partialArticle,
   }
 }

@@ -6,28 +6,75 @@ export const normData: NormData = {
   documentation: [
     {
       type: DocumentSectionType.SECTION,
+      marker: "Eingangsformel",
+      heading: "",
+      documentation: [
+        {
+          marker: "",
+          paragraphs: [
+            {
+              marker: "",
+              text: "Das Bundesministerium für Ernährung und Landwirtschaft verordnet auf Grund",
+            },
+          ],
+        },
+      ],
+    },
+    {
+      type: DocumentSectionType.SECTION,
       marker: "Art 2",
       heading:
         "Änderung der Verordnung über Stoffe mit pharmakologischer Wirkung",
       documentation: [
         {
           marker: "",
-          text: "§ 2 der Verordnung über Stoffe mit pharmakologischer Wirkung in der Fassung der Bekanntmachung vom 8. Juli 2009 (BGBl. I S. 1768) wird wie folgt geändert:",
+          paragraphs: [
+            {
+              marker: "",
+              text: "§ 2 der Verordnung über Stoffe mit pharmakologischer Wirkung in der Fassung der Bekanntmachung vom 8. Juli 2009 (BGBl. I S. 1768) wird wie folgt geändert:",
+            },
+          ],
         },
       ],
     },
     {
       type: DocumentSectionType.SECTION,
-      marker: "Inkrafttreten, Außerkrafttreten",
-      heading: "Art 3",
+      marker: "Art 3",
+      heading: "Inkrafttreten, Außerkrafttreten",
       documentation: [
         {
           marker: "(1)",
-          text: "Diese Verordnung tritt am Tag nach der Verkündung in Kraft.",
+          paragraphs: [
+            {
+              marker: "",
+              text: "Diese Verordnung tritt am Tag nach der Verkündung in Kraft.",
+            },
+          ],
         },
         {
           marker: "(2)",
-          text: "Gleichzeitig treten außer Kraft",
+          paragraphs: [
+            {
+              marker: "",
+              text: "Gleichzeitig treten außer Kraft",
+            },
+          ],
+        },
+      ],
+    },
+    {
+      type: DocumentSectionType.SECTION,
+      marker: "Schlussformel",
+      heading: "",
+      documentation: [
+        {
+          marker: "",
+          paragraphs: [
+            {
+              marker: "",
+              text: "Der Bundesrat hat zugestimmt.",
+            },
+          ],
         },
       ],
     },

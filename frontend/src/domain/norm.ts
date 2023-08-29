@@ -247,13 +247,19 @@ export type Documentation = {
 }
 
 export type Article = Documentation & {
+  paragraphs: Paragraph[]
+}
+
+export interface Paragraph {
+  guid: string
+  marker: string
   text: string
 }
 
 export function isArticle(
   documentation: Documentation,
 ): documentation is Article {
-  return "text" in documentation
+  return "paragraphs" in documentation
 }
 
 export type DocumentSection = Documentation & {

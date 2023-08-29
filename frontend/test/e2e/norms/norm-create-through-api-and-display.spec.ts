@@ -51,11 +51,11 @@ testWithImportedNorm(
         page.getByText(documentation.marker, { exact: true }),
       ).toBeVisible()
 
-      expect(documentation.heading).toBeTruthy()
-      if (!documentation.heading) return
-      await expect(
-        page.getByText(documentation.heading, { exact: true }),
-      ).toBeVisible()
+      if (documentation.heading) {
+        await expect(
+          page.getByText(documentation.heading, { exact: true }),
+        ).toBeVisible()
+      }
 
       // @ts-expect-error GUID is omitted for simplicity in the tests, which makes
       // TS complain when calling the guard. Since we don't care about the GUID we
@@ -64,13 +64,15 @@ testWithImportedNorm(
         documentation.documentation
           .filter((doc): doc is Article => isArticle(doc))
           .forEach(async (article) => {
-            if (article.marker === undefined) {
-              await expect(page.getByText(article.text)).toBeVisible()
-            } else {
-              await expect(
-                page.getByText(article.marker + " " + article.text),
-              ).toBeVisible()
-            }
+            article.paragraphs.forEach(async (paragraph) => {
+              if (article.marker === undefined) {
+                await expect(page.getByText(paragraph.text)).toBeVisible()
+              } else {
+                await expect(
+                  page.getByText(article.marker + " " + paragraph.text),
+                ).toBeVisible()
+              }
+            })
           })
       }
     }
@@ -78,7 +80,7 @@ testWithImportedNorm(
 )
 
 // eslint-disable-next-line playwright/no-skipped-test
-testWithImportedNorm.skip(
+testWithImportedNorm(
   "Check if frame fields are correctly displayed",
   async ({ page, normData, guid }) => {
     await openNorm(page, guid)

@@ -14,7 +14,13 @@ describe("norm domain", () => {
         guid: "guid",
         heading: "heading",
         marker: "marker",
-        text: "text",
+        paragraphs: [
+          {
+            guid: "guid",
+            marker: "marker",
+            text: "text",
+          },
+        ],
       }
 
       expect(isArticle(article)).toBe(true)
@@ -61,7 +67,13 @@ describe("norm domain", () => {
         guid: "guid",
         heading: "heading",
         marker: "marker",
-        text: "text",
+        paragraphs: [
+          {
+            guid: "guid",
+            marker: "marker",
+            text: "text",
+          },
+        ],
       }
 
       expect(isDocumentSection(article)).toBe(false)
