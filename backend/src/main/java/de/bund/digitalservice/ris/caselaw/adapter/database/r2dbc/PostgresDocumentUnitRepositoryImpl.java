@@ -772,7 +772,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
                         .build()));
   }
 
-  private Boolean areCurrentlyLinked(
+  private boolean areCurrentlyLinked(
       DocumentUnitDTO documentUnitDTO, JPAProcedureDTO procedureDTO) {
     return Optional.ofNullable(
             procedureLinkRepository.findFirstByDocumentationUnitIdOrderByCreatedAtDesc(
@@ -1354,7 +1354,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
     Predicate myDocOffice =
         builder.equal(root.get("documentationOfficeId"), documentationOfficeDTO.getId());
 
-    if (searchInput.status() != null && searchInput.status().withError() == true) {
+    if (searchInput.status() != null && searchInput.status().withError()) {
       Predicate statusWithError =
           builder.equal(root.get("withError"), searchInput.status().withError());
       restrictions.add(builder.and(myDocOffice, statusWithError));
