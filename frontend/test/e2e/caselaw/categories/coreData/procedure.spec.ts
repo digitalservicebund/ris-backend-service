@@ -8,6 +8,7 @@ import { caselawTest as test } from "~/e2e/caselaw/fixtures"
 import { generateString } from "~/test-helper/dataGenerators"
 
 test.describe("procedure", () => {
+  // eslint-disable-next-line playwright/no-skipped-test
   test.skip("add new procedure in coreData", async ({
     page,
     documentNumber,
