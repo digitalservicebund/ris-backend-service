@@ -36,6 +36,7 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatus;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitLinkType;
 import de.bund.digitalservice.ris.caselaw.domain.EmailPublishService;
+import de.bund.digitalservice.ris.caselaw.domain.ProcedureService;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.Texts;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
@@ -103,6 +104,7 @@ class ActiveCitationIntegrationTest {
   @MockBean private DocxConverterService docxConverterService;
   @MockBean private UserService userService;
   @MockBean ReactiveClientRegistrationRepository clientRegistrationRepository;
+  @MockBean ProcedureService procedureService;
 
   private static final String DOCUMENT_NUMBER_PREFIX = "XXRE20230000";
   private static final String UUID_PREFIX = "88888888-4444-4444-4444-11111111111";

@@ -50,6 +50,7 @@ public class DocumentUnitService {
   private final S3AsyncClient s3AsyncClient;
   private final EmailPublishService publicationService;
   private final DocumentUnitStatusService documentUnitStatusService;
+  private final ProcedureService procedureService;
   private final Validator validator;
 
   @Value("${otc.obs.bucket-name}")
@@ -65,6 +66,7 @@ public class DocumentUnitService {
       EmailPublishService publicationService,
       DocumentUnitStatusService documentUnitStatusService,
       PublicationReportRepository publicationReportRepository,
+      ProcedureService procedureService,
       Validator validator) {
 
     this.repository = repository;
@@ -73,6 +75,7 @@ public class DocumentUnitService {
     this.publicationService = publicationService;
     this.documentUnitStatusService = documentUnitStatusService;
     this.publicationReportRepository = publicationReportRepository;
+    this.procedureService = procedureService;
     this.validator = validator;
   }
 
@@ -81,8 +84,12 @@ public class DocumentUnitService {
         .flatMap(documentNumberService::generateNextDocumentNumber)
         .flatMap(
             documentNumber -> repository.createNewDocumentUnit(documentNumber, documentationOffice))
-        .flatMap(documentUnitStatusService::setInitialStatus)
         .retryWhen(Retry.backoff(5, Duration.ofSeconds(2)).jitter(0.75))
+        .flatMap(documentUnitStatusService::setInitialStatus)
+        .flatMap(
+            documentUnit ->
+                Mono.fromRunnable(() -> procedureService.setInitialProcedure(documentUnit))
+                    .thenReturn(documentUnit))
         .doOnError(ex -> log.error("Couldn't create empty doc unit", ex));
   }
 

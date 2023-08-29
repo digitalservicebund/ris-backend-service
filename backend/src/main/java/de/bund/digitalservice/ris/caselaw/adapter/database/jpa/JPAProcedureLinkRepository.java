@@ -15,4 +15,7 @@ public interface JPAProcedureLinkRepository extends JpaRepository<JPAProcedureLi
   Integer countByProcedureDTO(JPAProcedureDTO procedureDTO);
 
   List<JPAProcedureLinkDTO> findAllByProcedureDTO(JPAProcedureDTO procedureDTO);
+
+  JPAProcedureLinkDTO findTopByProcedureDTO_DocumentationOfficeOrderByCreatedAtDesc(
+      JPADocumentationOfficeDTO documentationOfficeDTO);
 }

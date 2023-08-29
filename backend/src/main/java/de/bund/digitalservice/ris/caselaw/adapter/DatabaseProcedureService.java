@@ -7,21 +7,23 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPAProcedureLinkD
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPAProcedureLinkRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPAProcedureRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationUnitSearchEntryTransformer;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitSearchEntry;
 import de.bund.digitalservice.ris.caselaw.domain.Procedure;
+import de.bund.digitalservice.ris.caselaw.domain.ProcedureService;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.stereotype.Service;
 
 @Service
-public class ProcedureService {
+public class DatabaseProcedureService implements ProcedureService {
   private final JPAProcedureRepository repository;
   private final JPAProcedureLinkRepository linkRepository;
   private final DatabaseDocumentationUnitSearchRepository documentUnitRepository;
   private final JPADocumentationOfficeRepository documentationOfficeRepository;
 
-  public ProcedureService(
+  public DatabaseProcedureService(
       JPAProcedureRepository repository,
       JPAProcedureLinkRepository linkRepository,
       DatabaseDocumentationUnitSearchRepository documentUnitRepository,
@@ -46,6 +48,20 @@ public class ProcedureService {
                     .created_at(dto.getCreatedAt())
                     .build())
         .toList();
+  }
+
+  public void setInitialProcedure(DocumentUnit documentUnit) {
+    Optional.ofNullable(
+            documentationOfficeRepository.findByLabel(
+                documentUnit.coreData().documentationOffice().label()))
+        .map(linkRepository::findTopByProcedureDTO_DocumentationOfficeOrderByCreatedAtDesc)
+        .map(
+            latestLink ->
+                linkRepository.save(
+                    JPAProcedureLinkDTO.builder()
+                        .procedureDTO(latestLink.getProcedureDTO())
+                        .documentationUnitId(documentUnit.uuid())
+                        .build()));
   }
 
   private List<DocumentationUnitSearchEntry> getDocumentUnits(JPAProcedureDTO procedureDTO) {

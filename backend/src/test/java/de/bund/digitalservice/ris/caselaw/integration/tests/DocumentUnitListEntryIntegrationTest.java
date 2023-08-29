@@ -33,6 +33,7 @@ import de.bund.digitalservice.ris.caselaw.domain.DataSource;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitListEntry;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.EmailPublishService;
+import de.bund.digitalservice.ris.caselaw.domain.ProcedureService;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import java.time.Instant;
@@ -97,6 +98,7 @@ class DocumentUnitListEntryIntegrationTest {
   @MockBean DocxConverterService docxConverterService;
   @MockBean UserService userService;
   @MockBean ReactiveClientRegistrationRepository clientRegistrationRepository;
+  @MockBean ProcedureService procedureService;
 
   private JPADocumentationOfficeDTO docOfficeDTO;
 
