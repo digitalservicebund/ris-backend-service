@@ -144,6 +144,7 @@ const withErrorsOnly = computed({
 
 function resetSearch() {
   validationStore.reset()
+  submitButtonError.value = undefined
   searchEntry.value = {}
   emit("resetSearchResults")
 }
