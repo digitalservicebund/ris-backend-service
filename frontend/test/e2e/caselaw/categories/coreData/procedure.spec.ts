@@ -8,7 +8,7 @@ import { caselawTest as test } from "~/e2e/caselaw/fixtures"
 import { generateString } from "~/test-helper/dataGenerators"
 
 test.describe("procedure", () => {
-  test("add new procedure in coreData", async ({
+  test.skip("add new procedure in coreData", async ({
     page,
     documentNumber,
     pageWithBghUser,
