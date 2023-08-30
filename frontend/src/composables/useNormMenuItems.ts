@@ -78,7 +78,7 @@ export function useNormMenuItems(
       label: "Bestand",
       route: {
         ...baseRoute,
-        name: "norms-norm-normGuid-frame",
+        name: "norms-norm-normGuid-content",
       },
     },
     {
