@@ -2,6 +2,7 @@ import { ref } from "vue"
 import { ValidationError } from "@/shared/components/input/types"
 
 type ValidationStore<T> = {
+  getAll: () => ValidationError[]
   getByField: (field: T) => ValidationError | undefined
   getByMessage: (message: string) => ValidationError[]
   add: (message: string, instance: T) => void
@@ -11,6 +12,10 @@ type ValidationStore<T> = {
 
 export function useValidationStore<T extends string>(): ValidationStore<T> {
   const validationErrors = ref<ValidationError[]>([])
+
+  function getAll() {
+    return validationErrors.value
+  }
 
   function add(message: string, instance: T) {
     remove(instance)
@@ -38,6 +43,7 @@ export function useValidationStore<T extends string>(): ValidationStore<T> {
   }
 
   return {
+    getAll,
     getByField,
     getByMessage,
     add,

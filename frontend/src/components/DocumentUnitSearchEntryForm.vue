@@ -11,7 +11,7 @@ import InputField, {
 } from "@/shared/components/input/InputField.vue"
 import TextButton from "@/shared/components/input/TextButton.vue"
 import TextInput from "@/shared/components/input/TextInput.vue"
-import { DropdownItem } from "@/shared/components/input/types"
+import { DropdownItem, ValidationError } from "@/shared/components/input/types"
 
 const props = defineProps<{
   modelValue?: DocumentUnitSearchInput
@@ -26,7 +26,6 @@ const emit = defineEmits<{
 const validationStore =
   useValidationStore<(typeof DocumentUnitSearchInput.fields)[number]>()
 
-const hasValidationErrors = ref(false)
 const submitButtonError = ref()
 
 const searchEntry = ref<DocumentUnitSearchInput>(props.modelValue ?? {})
@@ -108,8 +107,8 @@ const decisionDate = computed({
       delete searchEntry.value.decisionDate
     } else {
       searchEntry.value.decisionDate = data
-      validateSearchInput()
     }
+    validateSearchInput()
   },
 })
 
@@ -120,8 +119,8 @@ const decisionDateEnd = computed({
       delete searchEntry.value.decisionDateEnd
     } else {
       searchEntry.value.decisionDateEnd = data
-      validateSearchInput()
     }
+    validateSearchInput()
   },
 })
 
@@ -155,10 +154,8 @@ function resetErrors(id?: (typeof DocumentUnitSearchInput.fields)[number]) {
 }
 
 async function validateSearchInput() {
-  hasValidationErrors.value = false
   if (searchEntry.value?.decisionDateEnd && !searchEntry.value?.decisionDate) {
     validationStore.add("Startdatum fehlt", "decisionDate")
-    hasValidationErrors.value = true
   }
 
   if (
@@ -171,7 +168,6 @@ async function validateSearchInput() {
       "Enddatum darf nich vor Startdatum liegen",
       "decisionDateEnd",
     )
-    hasValidationErrors.value = true
   }
 }
 
@@ -180,9 +176,22 @@ function handleSearchButtonClicked() {
 
   if (searchEntryEmpty.value) {
     submitButtonError.value = "Geben Sie mindestens ein Suchkriterium ein"
-  } else if (hasValidationErrors.value) {
+  } else if (validationStore.getAll().length > 0) {
     submitButtonError.value = "Fehler in Suchkriterien"
   } else emit("search", searchEntry.value)
+}
+
+function handleLocalInputError(error: ValidationError | undefined, id: string) {
+  validateSearchInput()
+  if (error) {
+    validationStore.add(
+      error.message,
+      error.instance as (typeof DocumentUnitSearchInput.fields)[number],
+    )
+  } else
+    validationStore.remove(
+      id as (typeof DocumentUnitSearchInput.fields)[number],
+    )
 }
 
 onMounted(async () => {
@@ -242,7 +251,7 @@ onMounted(async () => {
       <div class="flex flex-row gap-10 pr-32">
         <InputField
           id="decisionDate"
-          v-slot="{ id, hasError, updateValidationError }"
+          v-slot="{ id, hasError }"
           label="Entscheidungsdatum"
           :validation-error="validationStore.getByField('decisionDate')"
           visually-hide-label
@@ -258,13 +267,15 @@ onMounted(async () => {
             @focus="
               resetErrors(id as (typeof DocumentUnitSearchInput.fields)[number])
             "
-            @update:validation-error="updateValidationError"
+            @update:validation-error="
+              (validationError) => handleLocalInputError(validationError, id)
+            "
           ></DateInput>
         </InputField>
         <span>-</span>
         <InputField
           id="decisionDateEnd"
-          v-slot="{ id, hasError, updateValidationError }"
+          v-slot="{ id, hasError }"
           label="Entscheidungsdatum Ende"
           :validation-error="validationStore.getByField('decisionDateEnd')"
           visually-hide-label
@@ -281,7 +292,9 @@ onMounted(async () => {
             @focus="
               resetErrors(id as (typeof DocumentUnitSearchInput.fields)[number])
             "
-            @update:validation-error="updateValidationError"
+            @update:validation-error="
+              (validationError) => handleLocalInputError(validationError, id)
+            "
           ></DateInput>
         </InputField>
       </div>
