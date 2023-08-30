@@ -7,8 +7,9 @@ const props = withDefaults(
   defineProps<{
     page?: Page<any> // eslint-disable-line @typescript-eslint/no-explicit-any
     navigationPosition?: "top" | "bottom"
+    isLoading?: boolean
   }>(),
-  { page: undefined, navigationPosition: "top" },
+  { page: undefined, navigationPosition: "top", isLoading: false },
 )
 
 const emits = defineEmits<(e: "updatePage", page: number) => void>()
@@ -43,7 +44,10 @@ export type PageableService<TResult, TQuery = TResult> = (
 
 <template>
   <slot v-if="props.navigationPosition == 'bottom'"></slot>
-  <div v-if="page?.content" class="my-32 flex flex-col items-center">
+  <div
+    v-if="page?.content && !isLoading"
+    class="my-32 flex flex-col items-center"
+  >
     <div class="flex items-center">
       <div class="relative flex flex-grow items-center justify-center">
         <PaginationButton

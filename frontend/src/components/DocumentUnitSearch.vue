@@ -66,6 +66,7 @@ async function handleReset() {
       @search="handleSearch"
     />
     <Pagination
+      :is-loading="isLoading"
       navigation-position="bottom"
       :page="currentPage"
       @update-page="search"

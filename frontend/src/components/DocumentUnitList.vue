@@ -129,19 +129,6 @@ watch(listEntriesWithStatus, async () => {
         <div class="table-cell p-16">Status</div>
         <div class="table-cell p-16">Löschen</div>
       </div>
-      <div
-        v-if="isLoading"
-        aria-label="Ladestatus"
-        class="absolute flex w-full items-center justify-center bg-white bg-opacity-60"
-        :class="{
-          [$style.spinner]: true,
-        }"
-      >
-        <div
-          class="inline-block h-32 w-32 animate-spin rounded-full border-[3px] border-solid border-blue-900 border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]"
-          role="status"
-        ></div>
-      </div>
 
       <div
         v-for="(listEntry, id) in listEntriesWithStatus"
@@ -222,14 +209,28 @@ watch(listEntriesWithStatus, async () => {
         </div>
       </div>
     </div>
+    <!-- Loading State -->
+    <div
+      v-if="isLoading"
+      aria-label="Ladestatus"
+      class="my-112 grid justify-items-center bg-white bg-opacity-60"
+    >
+      <div
+        class="inline-block h-32 w-32 animate-spin rounded-full border-[3px] border-solid border-blue-900 border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]"
+        role="status"
+      ></div>
+    </div>
+    <!-- Error State -->
     <div v-if="searchResponseError" class="mt-24">
       <InfoModal
         :description="searchResponseError.description"
         :title="searchResponseError.title"
       />
     </div>
+
+    <!-- Empty State -->
     <div
-      v-if="emptyStatus && !searchResponseError"
+      v-if="emptyStatus && !searchResponseError && !isLoading"
       class="my-112 grid justify-items-center"
     >
       <span class="">{{ emptyStatus }}</span>
@@ -243,9 +244,3 @@ watch(listEntriesWithStatus, async () => {
     </div>
   </div>
 </template>
-
-<style module>
-.spinner {
-  height: v-bind(listheight);
-}
-</style>
