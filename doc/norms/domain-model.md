@@ -32,14 +32,16 @@ classDiagram
     <<sealed class>>
     +UUID guid
     +Int order
-    +String? marker
+    +String marker
     +String? heading
   }
 
   Documentation <|-- DocumentSection
   Documentation <|-- Article
 
-  class DocumentSection
+  class DocumentSection {
+    +String heading
+  }
 
   DocumentSection *-- "*" Documentation : documentation
   DocumentSection *-- "1" DocumentSectionType : type
