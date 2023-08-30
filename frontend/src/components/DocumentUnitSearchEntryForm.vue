@@ -128,6 +128,12 @@ const myDocOfficeOnly = computed({
   get: () => searchEntry.value?.myDocOfficeOnly,
   set: (data) => {
     searchEntry.value.myDocOfficeOnly = data ? true : false
+    //should also reset with errors only filter
+    if (!data)
+      searchEntry.value.status = {
+        ...searchEntry.value.status,
+        withError: false,
+      }
   },
 })
 
@@ -169,7 +175,11 @@ async function validateSearchInput() {
       "decisionDateEnd",
     )
   } else {
-    validationStore.remove("decisionDateEnd")
+    if (
+      validationStore.getByMessage("Enddatum darf nich vor Startdatum liegen")
+        .length === 1
+    )
+      validationStore.remove("decisionDateEnd")
   }
 }
 
