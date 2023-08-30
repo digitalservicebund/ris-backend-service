@@ -12,8 +12,10 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitSearchEntry;
 import de.bund.digitalservice.ris.caselaw.domain.Procedure;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
 
 @Service
 public class ProcedureService {
@@ -33,20 +35,36 @@ public class ProcedureService {
     this.documentationOfficeRepository = documentationOfficeRepository;
   }
 
-  public List<Procedure> search(
+  public Flux<Procedure> search(
+      Optional<String> query, DocumentationOffice documentationOffice, Pageable pageable) {
+    return Flux.fromIterable(
+        repository
+            .findByLabelContainingAndDocumentationOffice(
+                query,
+                documentationOfficeRepository.findByLabel(documentationOffice.label()),
+                pageable)
+            .map(
+                dto ->
+                    Procedure.builder()
+                        .label(dto.getLabel())
+                        .documentUnitCount(
+                            linkRepository.countLatestProcedureLinksByProcedure(dto.getId()))
+                        .created_at(dto.getCreatedAt())
+                        .build()));
+  }
+
+  public Page<Procedure> searchWithDocumentUnits(
       Optional<String> query, DocumentationOffice documentationOffice, Pageable pageable) {
     return repository
         .findByLabelContainingAndDocumentationOffice(
             query, documentationOfficeRepository.findByLabel(documentationOffice.label()), pageable)
-        .stream()
         .map(
             dto ->
                 Procedure.builder()
                     .label(dto.getLabel())
                     .documentUnits(getDocumentUnits(dto))
                     .created_at(dto.getCreatedAt())
-                    .build())
-        .toList();
+                    .build());
   }
 
   private List<DocumentationUnitSearchEntry> getDocumentUnits(JPAProcedureDTO procedureDTO) {

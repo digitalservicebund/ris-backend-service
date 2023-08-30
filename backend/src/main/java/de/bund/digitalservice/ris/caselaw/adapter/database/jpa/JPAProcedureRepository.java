@@ -1,8 +1,8 @@
 package de.bund.digitalservice.ris.caselaw.adapter.database.jpa;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -17,7 +17,7 @@ public interface JPAProcedureRepository extends JpaRepository<JPAProcedureDTO, U
 
   @Query(
       "SELECT p FROM procedure p WHERE (:label IS NULL OR p.label LIKE %:label%) AND p.documentationOffice = :documentationOffice")
-  List<JPAProcedureDTO> findByLabelContainingAndDocumentationOffice(
+  Page<JPAProcedureDTO> findByLabelContainingAndDocumentationOffice(
       @Param("label") Optional<String> label,
       @Param("documentationOffice") JPADocumentationOfficeDTO documentationOfficeDTO,
       Pageable pageable);

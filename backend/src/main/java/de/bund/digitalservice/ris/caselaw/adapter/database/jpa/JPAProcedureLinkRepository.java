@@ -9,6 +9,16 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface JPAProcedureLinkRepository extends JpaRepository<JPAProcedureLinkDTO, UUID> {
+
+  String QUERY_ACTIVE_PROCEDURE_LINKS_BY_PROCEDURE =
+      "FROM procedure_link pl "
+          + "JOIN ( "
+          + "    SELECT documentation_unit_id, MAX(created_at) as latest_time "
+          + "    FROM procedure_link "
+          + "    GROUP BY documentation_unit_id "
+          + ") subq "
+          + "ON pl.documentation_unit_id = subq.documentation_unit_id AND pl.created_at = subq.latest_time";
+
   JPAProcedureLinkDTO findFirstByDocumentationUnitIdOrderByCreatedAtDesc(UUID documentationUnitId);
 
   List<JPAProcedureLinkDTO> findAllByDocumentationUnitIdOrderByCreatedAtDesc(
@@ -17,15 +27,17 @@ public interface JPAProcedureLinkRepository extends JpaRepository<JPAProcedureLi
   @Query(
       value =
           "SELECT pl.* "
-              + "FROM procedure_link pl "
-              + "JOIN ( "
-              + "    SELECT documentation_unit_id, MAX(created_at) as latest_time "
-              + "    FROM procedure_link "
-              + "    GROUP BY documentation_unit_id "
-              + ") subq "
-              + "ON pl.documentation_unit_id = subq.documentation_unit_id AND pl.created_at = subq.latest_time "
-              + "WHERE pl.procedure_id = :procedureId",
+              + QUERY_ACTIVE_PROCEDURE_LINKS_BY_PROCEDURE
+              + " WHERE pl.procedure_id = :procedureId",
       nativeQuery = true)
   List<JPAProcedureLinkDTO> findLatestProcedureLinksByProcedure(
       @Param("procedureId") UUID procedureId);
+
+  @Query(
+      value =
+          "SELECT COUNT(*) "
+              + QUERY_ACTIVE_PROCEDURE_LINKS_BY_PROCEDURE
+              + " WHERE pl.procedure_id = :procedureId",
+      nativeQuery = true)
+  Integer countLatestProcedureLinksByProcedure(@Param("procedureId") UUID procedureId);
 }

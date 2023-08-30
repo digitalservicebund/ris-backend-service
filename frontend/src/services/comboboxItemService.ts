@@ -70,7 +70,9 @@ function formatDropdownItems(
       return (responseData as Procedure[]).map((item) => ({
         label: item.label,
         value: item,
-        additionalInformation: `${item.documentUnits.length} Dokumentationseinheiten`,
+        additionalInformation: `${
+          item.documentUnitCount || 0
+        } Dokumentationseinheiten`,
       }))
     }
   }
@@ -80,12 +82,10 @@ async function fetchFromEndpoint(
   endpoint: Endpoint,
   filter?: string,
   size?: number,
-  page?: number,
 ) {
   const requestParams: { q?: string; sz?: string } = {
     ...(filter ? { q: filter } : {}),
-    ...(size ? { sz: size.toString() } : {}),
-    ...(page != undefined ? { pg: page.toString() } : {}),
+    ...(size != undefined ? { sz: size.toString() } : {}),
   }
   const response = await httpClient.get<ComboboxInputModelType[]>(
     `caselaw/${endpoint}`,
@@ -137,7 +137,7 @@ const service: ComboboxItemService = {
   getCitationStyles: async (filter?: string) =>
     await fetchFromEndpoint(Endpoint.citationStyles, filter),
   getProcedures: async (filter?: string) =>
-    await fetchFromEndpoint(Endpoint.procedures, filter, 10, 0),
+    await fetchFromEndpoint(Endpoint.procedures, filter, 10),
 }
 
 export default service
