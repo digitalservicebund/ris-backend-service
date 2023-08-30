@@ -168,6 +168,8 @@ async function validateSearchInput() {
       "Enddatum darf nich vor Startdatum liegen",
       "decisionDateEnd",
     )
+  } else {
+    validationStore.remove("decisionDateEnd")
   }
 }
 
@@ -182,7 +184,6 @@ function handleSearchButtonClicked() {
 }
 
 function handleLocalInputError(error: ValidationError | undefined, id: string) {
-  validateSearchInput()
   if (error) {
     validationStore.add(
       error.message,
@@ -192,6 +193,8 @@ function handleLocalInputError(error: ValidationError | undefined, id: string) {
     validationStore.remove(
       id as (typeof DocumentUnitSearchInput.fields)[number],
     )
+
+  validateSearchInput()
 }
 
 onMounted(async () => {
