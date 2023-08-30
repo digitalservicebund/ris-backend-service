@@ -135,27 +135,31 @@ testWithImportedNorm(
       ]?.[0],
     )
 
+    const onlyArticles = norm.documentation?.filter(
+      (doc) => !["Eingangsformel", "Schlussformel"].includes(doc.marker),
+    )
     xmlDOM.window.document
       .querySelectorAll("akn\\:article")
       .forEach((article, articleIndex) => {
         expect(article.querySelector("akn\\:marker")?.textContent?.trim()).toBe(
-          norm.documentation?.[articleIndex]?.marker,
+          onlyArticles?.[articleIndex]?.marker,
         )
         expect(
           article.querySelector("akn\\:heading")?.textContent?.trim(),
-        ).toBe(norm.documentation?.[articleIndex].heading)
+        ).toBe(onlyArticles?.[articleIndex].heading)
 
         article
           .querySelectorAll("akn\\:paragraph")
           .forEach((paragraph, paragraphIndex) => {
             if (
-              (norm.documentation?.[articleIndex] as DocumentSection)
-                .documentation?.[paragraphIndex]?.marker !== undefined
+              (onlyArticles?.[articleIndex] as DocumentSection).documentation?.[
+                paragraphIndex
+              ]?.marker !== undefined
             ) {
               expect(
                 paragraph.querySelector("akn\\:marker")?.textContent?.trim(),
               ).toBe(
-                (norm.documentation?.[articleIndex] as DocumentSection)
+                (onlyArticles?.[articleIndex] as DocumentSection)
                   .documentation?.[paragraphIndex]?.marker,
               )
             }
@@ -166,7 +170,7 @@ testWithImportedNorm(
                 .replace(/\n/, ""),
             ).toBe(
               (
-                (norm.documentation?.[articleIndex] as DocumentSection)
+                (onlyArticles?.[articleIndex] as DocumentSection)
                   .documentation?.[paragraphIndex] as Article
               )?.paragraphs[0].text,
             )

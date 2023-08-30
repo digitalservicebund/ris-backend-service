@@ -71,9 +71,14 @@ class LoadNormAsXmlController(private val loadNormAsXmlService: LoadNormAsXmlUse
             Mono.error(
                 NotFoundWithInstanceException(
                     URI(
-                        "gazette/$printAnnouncementGazette/year/$announcementYear/page/$printAnnouncementPage"),
+                        encodeUri(
+                            "gazette/${query.printAnnouncementGazette}/year/${query.announcementOrCitationYear}/page/${query.printAnnouncementPage}")),
                 ),
             ),
         )
+  }
+
+  private fun encodeUri(component: String): String {
+    return component.replace(" ", "%20").replace("(", "%28").replace(")", "%29")
   }
 }

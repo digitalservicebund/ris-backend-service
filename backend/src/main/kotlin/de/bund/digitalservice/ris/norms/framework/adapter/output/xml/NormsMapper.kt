@@ -10,6 +10,7 @@ import de.bund.digitalservice.ris.norms.framework.adapter.output.xml.dto.Content
 import de.bund.digitalservice.ris.norms.framework.adapter.output.xml.dto.IdentifiedElement
 import de.bund.digitalservice.ris.norms.framework.adapter.output.xml.dto.NormDto
 import de.bund.digitalservice.ris.norms.framework.adapter.output.xml.dto.ParagraphDto
+import org.apache.commons.lang3.StringUtils
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
@@ -82,15 +83,18 @@ fun mapNormToDto(norm: Norm): NormDto {
                   .getFirstMetadatum(
                       MetadataSectionName.PARTICIPATION, MetadatumType.PARTICIPATION_INSTITUTION)
                   ?.value
-                  .toString(),
-          ),
+                  .toString()),
       printAnnouncementGazette = norm.eli.gazetteOrMedium,
       printAnnouncementPage = norm.eli.printAnnouncementPage,
       eli = norm.eli.toString(),
       articles =
           norm.documentation
               .filterIsInstance<Article>()
-              .sortedBy { it.order }
+              .filter { """^(§|Art)\s\w+$""".toRegex().matches(it.marker) }
+              .sortedBy {
+                if (it.marker.contains("§")) it.marker.substring(2).toInt()
+                else it.marker.substring(4).toInt()
+              }
               .mapIndexed { index, article -> mapArticleToDto(article, index) },
   )
 }
@@ -98,7 +102,7 @@ fun mapNormToDto(norm: Norm): NormDto {
 fun mapArticleToDto(article: Article, ordinalNumber: Int = 1): ArticleDto {
   val marker = parseMarkerFromMarkerText(article.marker) ?: "$ordinalNumber"
   var paragraphsToPass = article.paragraphs
-  if (article.paragraphs.none { it.marker == null }) {
+  if (article.paragraphs.none { StringUtils.isEmpty((it as Paragraph).marker) }) {
     paragraphsToPass =
         article.paragraphs.sortedBy { it.marker!!.substring(1, it.marker!!.length.minus(1)) }
   }
@@ -138,6 +142,8 @@ fun mapParagraphToDto(
           .replace("</SUP>", "")
           .replace("<BR>", "")
           .replace("</BR>", "")
+          .replace("<noindex>", "")
+          .replace("</noindex>", "")
           .replace(
               Regex("<FnR[ ]ID=\\\".*\"\\/>"), "") // DIN EN 15940<FnR ID="F816768_02"/>, Ausgabe
           .replace(
