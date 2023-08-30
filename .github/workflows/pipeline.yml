@@ -814,6 +814,38 @@ jobs:
           'https://api.github.com/repos/digitalservicebund/ris-backend-service/git/ref/heads/main' \
           | jq -r '.object.sha')" >> "$GITHUB_OUTPUT"
 
+  check-latest-deploy-tag:
+    if: ${{ github.ref == 'refs/heads/main' }}
+    needs:
+      - e2e-tests
+    runs-on: ubuntu-latest
+    outputs:
+      latest_production_sha: ${{ steps.extract-current-sha.outputs.latest_production_sha }}
+    steps:
+      - name: Checkout infra repository
+        uses: actions/checkout@v3
+        with:
+          repository: digitalservicebund/neuris-infra
+          ssh-key: ${{ secrets.DEPLOY_KEY }}
+          path: infra
+      - name: Checkout main repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          path: main
+      - name: extract current image sha
+        id: extract-current-sha
+        run: |
+          set -x
+          current_tag=${{ env.CONTAINER_IMAGE_VERSION }}
+          latest_deploy_tag=$(yq '.images[0] | .newTag' infra/manifests/overlays/production/kustomization.yaml)
+          cd main
+          if git merge-base --is-ancestor $current_tag $latest_production_tag; then
+            echo "false"
+          else
+            echo "true"
+          fi
+
   deploy-production:
     runs-on: ubuntu-latest
     if: |
@@ -941,7 +973,7 @@ jobs:
 
   generate-entity-relationship-diagram:
     runs-on: ubuntu-latest
-#    if: ${{ github.ref == 'refs/heads/main' }}
+    #    if: ${{ github.ref == 'refs/heads/main' }}
     if: ${{ false }}
     env:
       POSTGRES_DB: ris-erd
@@ -1043,7 +1075,7 @@ jobs:
   push-reports:
     runs-on: ubuntu-latest
     needs:
-#      - generate-entity-relationship-diagram
+      #      - generate-entity-relationship-diagram
       - backend-build
       - audit-licenses-backend
       - audit-licenses-frontend
@@ -1062,16 +1094,16 @@ jobs:
           # This email identifies the commit as GitHub Actions - see https://github.com/orgs/community/discussions/26560
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
       # ER-diagram
-#      - name: ER-diagram - Download artifact
-#        uses: actions/download-artifact@v3
-#        with:
-#          name: erdiagram
-#          path: tmp/erdiagram-reports/
-#      - name: ER-diagram - git add report
-#        uses: digitalservicebund/ris-reports/actions/git-add-report@da8cfce630414b940051870f02413c700320d510
-#        with:
-#          filePath: tmp/erdiagram-reports/latest.mmd
-#          destinationDir: entity-relationship-diagrams/ris-backend-service
+      #      - name: ER-diagram - Download artifact
+      #        uses: actions/download-artifact@v3
+      #        with:
+      #          name: erdiagram
+      #          path: tmp/erdiagram-reports/
+      #      - name: ER-diagram - git add report
+      #        uses: digitalservicebund/ris-reports/actions/git-add-report@da8cfce630414b940051870f02413c700320d510
+      #        with:
+      #          filePath: tmp/erdiagram-reports/latest.mmd
+      #          destinationDir: entity-relationship-diagrams/ris-backend-service
       # Licence reports
       - name: Licence reports - Download
         uses: actions/download-artifact@v3
