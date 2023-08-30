@@ -36,6 +36,8 @@ onMounted(() => updateProcedures(0))
             v-for="(procedure, index) in procedures"
             :key="`procedure-${index}`"
             class="mb-24 bg-white p-14"
+            close-icon-name="expand_less"
+            open-icon-name="expand_more"
           >
             <template #header>
               <div class="relative">
