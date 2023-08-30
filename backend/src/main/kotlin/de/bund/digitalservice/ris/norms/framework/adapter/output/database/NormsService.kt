@@ -148,7 +148,6 @@ class NormsService(
         .map { true }
   }
 
-  // TODO: Maybe use `expand` and then save all?
   private fun saveDocumentation(
       documentation: Collection<Documentation>,
       normGuid: UUID,
