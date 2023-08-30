@@ -170,7 +170,7 @@ class LoadNormControllerTest {
   abstract interface DocumentationResponseTestSchema {
     val guid: String
     val order: Int
-    val marker: String?
+    val marker: String
     val heading: String?
 
     companion object {
@@ -187,9 +187,9 @@ class LoadNormControllerTest {
   internal constructor(
       override val guid: String,
       override val order: Int,
-      val type: String,
-      override val marker: String?,
+      override val marker: String,
       override val heading: String?,
+      val type: String,
       val documentation: Collection<DocumentationResponseTestSchema>,
   ) : DocumentationResponseTestSchema {
     companion object {
@@ -197,9 +197,9 @@ class LoadNormControllerTest {
           DocumentSectionResponseTestSchema(
               guid = encodeGuid(data.guid),
               order = data.order,
-              type = data.type.toString(),
               marker = data.marker,
               heading = data.heading,
+              type = data.type.toString(),
               documentation =
                   data.documentation.map(DocumentationResponseTestSchema::fromUseCaseData))
     }
@@ -209,18 +209,18 @@ class LoadNormControllerTest {
   internal constructor(
       override val guid: String,
       override val order: Int,
-      val paragraphs: Collection<ParagraphResponseSchema>,
-      override val marker: String?,
+      override val marker: String,
       override val heading: String?,
+      val paragraphs: Collection<ParagraphResponseSchema>,
   ) : DocumentationResponseTestSchema {
     companion object {
       fun fromUseCaseData(data: Article) =
           ArticleResponseTestSchema(
               guid = encodeGuid(data.guid),
               order = data.order,
-              paragraphs = data.paragraphs.map(ParagraphResponseSchema::fromUseCaseData),
               marker = data.marker,
               heading = data.heading,
+              paragraphs = data.paragraphs.map(ParagraphResponseSchema::fromUseCaseData),
           )
     }
   }

@@ -9,7 +9,7 @@ data class ArticleDto(
     val guid: UUID,
     @Column("order_number") // Because `order` is a reserved keyword in SQL.
     val order: Int,
-    var marker: String?,
+    var marker: String,
     val heading: String?,
     @Column("document_section_guid") val documentSectionGuid: UUID? = null,
     @Column("norm_guid") val normGuid: UUID? = null

@@ -83,7 +83,7 @@ class LoadNormController(private val loadNormService: LoadNormUseCase) {
   abstract interface DocumentationResponseSchema {
     val guid: String
     val order: Int
-    val marker: String?
+    val marker: String
     val heading: String?
 
     companion object {
@@ -100,9 +100,9 @@ class LoadNormController(private val loadNormService: LoadNormUseCase) {
   internal constructor(
       override val guid: String,
       override val order: Int,
+      override val marker: String,
+      override val heading: String,
       val type: String,
-      override val marker: String?,
-      override val heading: String?,
       val documentation: Collection<DocumentationResponseSchema>,
   ) : DocumentationResponseSchema {
     companion object {
@@ -110,9 +110,9 @@ class LoadNormController(private val loadNormService: LoadNormUseCase) {
           DocumentSectionResponseSchema(
               guid = encodeGuid(data.guid),
               order = data.order,
-              type = data.type.toString(),
               marker = data.marker,
               heading = data.heading,
+              type = data.type.toString(),
               documentation = data.documentation.map(DocumentationResponseSchema::fromUseCaseData))
     }
   }
@@ -121,18 +121,18 @@ class LoadNormController(private val loadNormService: LoadNormUseCase) {
   internal constructor(
       override val guid: String,
       override val order: Int,
-      val paragraphs: Collection<ParagraphResponseSchema>,
-      override val marker: String?,
+      override val marker: String,
       override val heading: String?,
+      val paragraphs: Collection<ParagraphResponseSchema>,
   ) : DocumentationResponseSchema {
     companion object {
       fun fromUseCaseData(data: Article) =
           ArticleResponseSchema(
               guid = encodeGuid(data.guid),
               order = data.order,
-              paragraphs = data.paragraphs.map(ParagraphResponseSchema::fromUseCaseData),
               marker = data.marker,
               heading = data.heading,
+              paragraphs = data.paragraphs.map(ParagraphResponseSchema::fromUseCaseData),
           )
     }
   }

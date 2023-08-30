@@ -961,7 +961,7 @@ class NormsServiceTest : PostgresTestcontainerIntegrationTest() {
   @Test
   fun `save norm with nested documentation`() {
     val article1 = ARTICLE1.copy(paragraphs = listOf(PARAGRAPH1, PARAGRAPH2))
-    val article2 = ARTICLE2.copy(paragraphs = listOf(PARAGRAPH3))
+    val article2 = ARTICLE2.copy(heading = null, paragraphs = listOf(PARAGRAPH3))
     val article3 = ARTICLE3.copy(paragraphs = listOf(PARAGRAPH4))
 
     val chapter1 =

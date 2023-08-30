@@ -11,8 +11,8 @@ data class DocumentSectionDto(
     @Column("order_number") // Because `order` is a reserved keyword in SQL.
     val order: Int,
     val type: DocumentSectionType,
-    var marker: String?,
-    val heading: String?,
+    var marker: String,
+    val heading: String,
     @Column("parent_section_guid") val parentSectionGuid: UUID? = null,
     @Column("norm_guid") val normGuid: UUID? = null
 )

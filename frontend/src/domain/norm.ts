@@ -243,7 +243,7 @@ export type Recitals = {
 export type Documentation = {
   readonly guid: string
   heading?: string
-  marker?: string
+  marker: string
 }
 
 export type Article = Documentation & {
@@ -263,6 +263,7 @@ export function isArticle(
 }
 
 export type DocumentSection = Documentation & {
+  heading: string
   documentation?: (Article | DocumentSection)[]
   type: DocumentSectionType
 }

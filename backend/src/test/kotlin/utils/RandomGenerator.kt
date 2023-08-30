@@ -155,7 +155,8 @@ fun createSimpleMetadataSections(): List<MetadataSection> =
 
 fun createSimpleDocumentation(): List<Documentation> =
     listOf(
-        DocumentSection(guid = UUID.randomUUID(), order = 1, type = BOOK),
+        DocumentSection(
+            guid = UUID.randomUUID(), order = 1, marker = "1", heading = "Book 1", type = BOOK),
         DocumentSection(
             guid = UUID.randomUUID(),
             order = 2,

@@ -110,8 +110,8 @@ class NormTest {
   @Test
   fun `it can create norm with only articles as documentation`() {
     val paragraph = Paragraph(UUID.randomUUID(), "(1)", "text")
-    val article1 = Article(UUID.randomUUID(), 1, listOf(paragraph))
-    val article2 = Article(UUID.randomUUID(), 2)
+    val article1 = Article(UUID.randomUUID(), 1, "§ 1", paragraphs = listOf(paragraph))
+    val article2 = Article(UUID.randomUUID(), 2, "§ 2")
     val norm = Norm(UUID.randomUUID(), documentation = listOf(article1, article2))
 
     assertThat(norm.documentation).containsOnly(article1, article2)
@@ -120,15 +120,17 @@ class NormTest {
   @Test
   fun `it can create norm with nested documentation structure`() {
     val paragraph1 = Paragraph(UUID.randomUUID(), "(1)", "text 1")
-    val article1 = Article(UUID.randomUUID(), 1, listOf(paragraph1))
-    val article2 = Article(UUID.randomUUID(), 2)
+    val article1 = Article(UUID.randomUUID(), 1, "§ 1", paragraphs = listOf(paragraph1))
+    val article2 = Article(UUID.randomUUID(), 2, "§ 2")
     val chapter1 =
-        DocumentSection(UUID.randomUUID(), 1, CHAPTER, documentation = listOf(article1, article2))
+        DocumentSection(UUID.randomUUID(), 1, "1", "Chapter 1", CHAPTER, listOf(article1, article2))
     val paragraph2 = Paragraph(UUID.randomUUID(), "(2)", "text 2")
-    val article3 = Article(UUID.randomUUID(), 3, listOf(paragraph2))
-    val chapter2 = DocumentSection(UUID.randomUUID(), 2, CHAPTER, documentation = listOf(article3))
+    val article3 = Article(UUID.randomUUID(), 3, "§ 3", paragraphs = listOf(paragraph2))
+    val chapter2 =
+        DocumentSection(UUID.randomUUID(), 2, "2", "Chapter 2", CHAPTER, listOf(article3))
     val book =
-        DocumentSection(UUID.randomUUID(), 1, BOOK, documentation = listOf(chapter1, chapter2))
+        DocumentSection(
+            UUID.randomUUID(), 1, "1", "Book 1", BOOK, documentation = listOf(chapter1, chapter2))
     val norm = Norm(UUID.randomUUID(), documentation = listOf(book))
 
     assertThat(norm.documentation).containsOnly(book)

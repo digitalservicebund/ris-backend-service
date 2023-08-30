@@ -101,18 +101,18 @@ interface NormsMapper {
       Article(
           guid = data.guid,
           order = data.order,
-          paragraphs = paragraphs,
           marker = data.marker,
           heading = data.heading,
+          paragraphs = paragraphs,
       )
 
   fun documentSectionToEntity(data: DocumentSectionDto, documentation: Collection<Documentation>) =
       DocumentSection(
           guid = data.guid,
           order = data.order,
-          type = data.type,
           marker = data.marker,
           heading = data.heading,
+          type = data.type,
           documentation = documentation,
       )
 

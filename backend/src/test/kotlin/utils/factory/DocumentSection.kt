@@ -17,7 +17,7 @@ class DocumentSectionBuilder : DocumentationBuilder() {
           order = order,
           type = type,
           marker = marker,
-          heading = heading,
+          heading = heading ?: "",
           documentation = documentation,
       )
 }
