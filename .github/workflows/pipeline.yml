@@ -15,7 +15,6 @@ env:
   CONTAINER_IMAGE_VERSION: ${{ github.event.pull_request.head.sha || github.sha }} # Use PR head SHA if available
   GH_PACKAGES_REPOSITORY_USER: ${{ secrets.GH_PACKAGES_REPOSITORY_USER }} # Secrets must not start with "GITHUB_"..
   GH_PACKAGES_REPOSITORY_TOKEN: ${{ secrets.GH_PACKAGES_REPOSITORY_TOKEN }}
-  INFRA_DEPLOY_KEY: ${{ secrets.DEPLOY_KEY }}
   SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
   SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
   REPORTS_REPOSITORY: digitalservicebund/ris-reports
@@ -822,10 +821,11 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       latest_production_sha: ${{ steps.extract-current-sha.outputs.latest_production_sha }}
+    environment: production
     steps:
       - name: Check Secret Availability
         run: |
-          if [[ -z "${{ env.INFRA_DEPLOY_KEY }}" ]]; then
+          if [[ -z "${{ secrets.DEPLOY_KEY }}" ]]; then
             echo "DEPLOY_KEY is not set."
           else
             echo "DEPLOY_KEY is set."
