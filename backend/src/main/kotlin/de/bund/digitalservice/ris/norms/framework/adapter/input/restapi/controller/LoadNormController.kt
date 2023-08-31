@@ -3,14 +3,7 @@ package de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.control
 import de.bund.digitalservice.ris.OpenApiConfiguration
 import de.bund.digitalservice.ris.exceptions.exception.NotFoundWithInstanceException
 import de.bund.digitalservice.ris.norms.application.port.input.LoadNormUseCase
-import de.bund.digitalservice.ris.norms.domain.entity.Article
-import de.bund.digitalservice.ris.norms.domain.entity.DocumentSection
-import de.bund.digitalservice.ris.norms.domain.entity.Documentation
-import de.bund.digitalservice.ris.norms.domain.entity.FileReference
-import de.bund.digitalservice.ris.norms.domain.entity.MetadataSection
-import de.bund.digitalservice.ris.norms.domain.entity.Metadatum
-import de.bund.digitalservice.ris.norms.domain.entity.Norm
-import de.bund.digitalservice.ris.norms.domain.entity.Paragraph
+import de.bund.digitalservice.ris.norms.domain.entity.*
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.ApiConfiguration
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.encodeEli
@@ -61,11 +54,17 @@ class LoadNormController(private val loadNormService: LoadNormUseCase) {
       val metadataSections: Collection<MetadataSectionResponseSchema>,
       var eli: String,
       var files: Collection<FileReferenceResponseSchema>,
+      val recitals: RecitalsResponseSchema?,
+      val formula: FormulaResponseSchema?,
       val documentation: Collection<DocumentationResponseSchema>,
+      val conclusion: ConclusionResponseSchema?,
   ) {
     companion object {
       fun fromUseCaseData(data: Norm): NormResponseSchema {
+        val recitals = data.recitals?.let(RecitalsResponseSchema::fromUseCaseData)
+        val formula = data.formula?.let(FormulaResponseSchema::fromUseCaseData)
         val documentation = data.documentation.map(DocumentationResponseSchema::fromUseCaseData)
+        val conclusion = data.conclusion?.let(ConclusionResponseSchema::fromUseCaseData)
         val files = data.files.map(FileReferenceResponseSchema::fromUseCaseData)
         val metadataSections =
             data.metadataSections.map(MetadataSectionResponseSchema::fromUseCaseData)
@@ -75,7 +74,11 @@ class LoadNormController(private val loadNormService: LoadNormUseCase) {
             metadataSections = metadataSections,
             eli = encodeEli(data.eli),
             files = files,
-            documentation = documentation)
+            recitals = recitals,
+            formula = formula,
+            documentation = documentation,
+            conclusion = conclusion,
+        )
       }
     }
   }
@@ -142,6 +145,36 @@ class LoadNormController(private val loadNormService: LoadNormUseCase) {
     companion object {
       fun fromUseCaseData(data: Paragraph): ParagraphResponseSchema {
         return ParagraphResponseSchema(encodeGuid(data.guid), data.marker, data.text)
+      }
+    }
+  }
+
+  data class RecitalsResponseSchema
+  private constructor(
+      val guid: String,
+      val marker: String?,
+      val heading: String?,
+      val text: String
+  ) {
+    companion object {
+      fun fromUseCaseData(data: Recitals): RecitalsResponseSchema {
+        return RecitalsResponseSchema(encodeGuid(data.guid), data.marker, data.heading, data.text)
+      }
+    }
+  }
+
+  data class FormulaResponseSchema private constructor(val guid: String, val text: String) {
+    companion object {
+      fun fromUseCaseData(data: Formula): FormulaResponseSchema {
+        return FormulaResponseSchema(encodeGuid(data.guid), data.text)
+      }
+    }
+  }
+
+  data class ConclusionResponseSchema private constructor(val guid: String, val text: String) {
+    companion object {
+      fun fromUseCaseData(data: Conclusion): ConclusionResponseSchema {
+        return ConclusionResponseSchema(encodeGuid(data.guid), data.text)
       }
     }
   }

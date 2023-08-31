@@ -1,30 +1,14 @@
 package de.bund.digitalservice.ris.norms.framework.adapter.output.database
 
-import de.bund.digitalservice.ris.norms.application.port.output.EditNormOutputPort
-import de.bund.digitalservice.ris.norms.application.port.output.GetNormByEliOutputPort
-import de.bund.digitalservice.ris.norms.application.port.output.GetNormByGuidOutputPort
-import de.bund.digitalservice.ris.norms.application.port.output.SaveFileReferenceOutputPort
-import de.bund.digitalservice.ris.norms.application.port.output.SaveNormOutputPort
-import de.bund.digitalservice.ris.norms.application.port.output.SearchNormsOutputPort
-import de.bund.digitalservice.ris.norms.domain.entity.Article
-import de.bund.digitalservice.ris.norms.domain.entity.DocumentSection
-import de.bund.digitalservice.ris.norms.domain.entity.Documentation
-import de.bund.digitalservice.ris.norms.domain.entity.Metadatum
-import de.bund.digitalservice.ris.norms.domain.entity.Norm
+import de.bund.digitalservice.ris.norms.application.port.output.*
+import de.bund.digitalservice.ris.norms.domain.entity.*
 import de.bund.digitalservice.ris.norms.domain.value.Eli
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType
-import de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto.FileReferenceDto
-import de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto.MetadataSectionDto
-import de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto.MetadatumDto
-import de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto.NormDto
-import de.bund.digitalservice.ris.norms.framework.adapter.output.database.repository.ArticleRepository
-import de.bund.digitalservice.ris.norms.framework.adapter.output.database.repository.DocumentSectionRepository
-import de.bund.digitalservice.ris.norms.framework.adapter.output.database.repository.FileReferenceRepository
-import de.bund.digitalservice.ris.norms.framework.adapter.output.database.repository.MetadataRepository
-import de.bund.digitalservice.ris.norms.framework.adapter.output.database.repository.MetadataSectionsRepository
-import de.bund.digitalservice.ris.norms.framework.adapter.output.database.repository.NormsRepository
-import de.bund.digitalservice.ris.norms.framework.adapter.output.database.repository.ParagraphRepository
-import java.util.UUID
+import de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto.*
+import de.bund.digitalservice.ris.norms.framework.adapter.output.database.repository.*
+import java.util.*
+import java.util.Optional.of
+import kotlin.jvm.optionals.getOrNull
 import org.springframework.context.annotation.Primary
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
@@ -38,9 +22,12 @@ class NormsService(
     val fileReferenceRepository: FileReferenceRepository,
     val metadataRepository: MetadataRepository,
     val metadataSectionsRepository: MetadataSectionsRepository,
+    val recitalsRepository: RecitalsRepository,
+    val formulaRepository: FormulaRepository,
     val documentSectionRepository: DocumentSectionRepository,
     val articleRepository: ArticleRepository,
     val paragraphRepository: ParagraphRepository,
+    val conclusionRepository: ConclusionRepository,
 ) :
     NormsMapper,
     GetNormByGuidOutputPort,
@@ -107,28 +94,92 @@ class NormsService(
     val findDocumentationRequest =
         findNormRequest.flatMapMany { findDocumentation(it.guid, null) }.collectList()
 
+    val findRecitalsRequest: Mono<Optional<RecitalsDto>> =
+        findNormRequest.flatMap { normDto ->
+          normDto.recitals?.let { recitalsRepository.findByGuid(it).map { Optional.of(it) } }
+              ?: Mono.just(Optional.empty())
+        }
+
+    val findFormulaRequest: Mono<Optional<FormulaDto>> =
+        findNormRequest.flatMap { normDto ->
+          normDto.formula?.let { formulaRepository.findByGuid(it).map { Optional.of(it) } }
+              ?: Mono.just(Optional.empty())
+        }
+
+    val findConclusionRequest: Mono<Optional<ConclusionDto>> =
+        findNormRequest.flatMap { normDto ->
+          normDto.conclusion?.let { conclusionRepository.findByGuid(it).map { Optional.of(it) } }
+              ?: Mono.just(Optional.empty())
+        }
+
     return Mono.zip(
             findNormRequest,
             findFileReferencesRequest,
             findMetadataSectionsRequest,
             findMetadataRequest,
+            findRecitalsRequest,
+            findFormulaRequest,
             findDocumentationRequest,
+            findConclusionRequest,
         )
-        .map { normToEntity(it.t1, it.t2, it.t3, it.t4, it.t5) }
+        .map {
+          normToEntity(
+              it.t1,
+              it.t2,
+              it.t3,
+              it.t4,
+              it.t5.getOrNull(),
+              it.t6.getOrNull(),
+              it.t7,
+              it.t8.getOrNull())
+        }
   }
 
   @Transactional(transactionManager = "connectionFactoryTransactionManager")
   override fun saveNorm(command: SaveNormOutputPort.Command): Mono<Boolean> {
-    val saveNormRequest = normsRepository.save(normToDto(command.norm)).cache()
-    val saveDocumentationRequest =
-        saveNormRequest.flatMapMany { saveDocumentation(command.norm.documentation, it.guid) }
-    val saveFileReferencesRequest = saveNormRequest.flatMapMany { saveNormFiles(command.norm, it) }
-    val saveMetadataSectionsRequest =
-        saveNormRequest.flatMapMany { saveNormSectionsWithMetadata(command.norm, it) }
 
-    return Mono.`when`(
-            saveDocumentationRequest, saveFileReferencesRequest, saveMetadataSectionsRequest)
-        .thenReturn(true)
+    val saveRecitalsRequest =
+        command.norm.recitals?.let { recitals ->
+          recitalsRepository.save(recitalsToDto(recitals)).map(::of)
+        }
+            ?: Mono.just(Optional.empty())
+
+    val saveFormulaRequest =
+        command.norm.formula?.let { formula ->
+          formulaRepository.save(formulaToDto(formula)).map(::of)
+        }
+            ?: Mono.just(Optional.empty())
+
+    val saveConclusionRequest =
+        command.norm.conclusion?.let { conclusion ->
+          conclusionRepository.save(conclusionToDto(conclusion)).map(::of)
+        }
+            ?: Mono.just(Optional.empty())
+
+    return Mono.zip(
+            saveRecitalsRequest,
+            saveFormulaRequest,
+            saveConclusionRequest,
+        )
+        .flatMap {
+          val normDto =
+              NormDto(
+                  guid = command.norm.guid,
+                  recitals = it.t1.getOrNull()?.guid,
+                  formula = it.t2.getOrNull()?.guid,
+                  conclusion = it.t3.getOrNull()?.guid,
+                  eGesetzgebung = command.norm.eGesetzgebung,
+              )
+          normsRepository.save(normDto)
+        }
+        .flatMap {
+          Mono.`when`(
+                  saveDocumentation(command.norm.documentation, it.guid),
+                  saveNormFiles(command.norm, it),
+                  saveNormSectionsWithMetadata(command.norm, it),
+              )
+              .thenReturn(true)
+        }
   }
 
   @Transactional(transactionManager = "connectionFactoryTransactionManager")

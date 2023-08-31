@@ -17,7 +17,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import reactor.core.publisher.Mono
 import reactor.test.StepVerifier
-import utils.createRandomNormFameProperties
+import utils.createRandomNormFrameProperties
 import utils.factory.metadataSection
 
 class EditNormFrameServiceTest {
@@ -86,7 +86,7 @@ class EditNormFrameServiceTest {
             },
         )
     val properties =
-        createRandomNormFameProperties()
+        createRandomNormFrameProperties()
             .copy(
                 metadataSections = metadataSections,
             )

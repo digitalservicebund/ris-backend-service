@@ -10,6 +10,9 @@ import org.springframework.data.relational.core.mapping.Table
 @Table(name = "norms")
 data class NormDto(
     @Id val guid: UUID,
+    @Column("recitals_guid") val recitals: UUID?,
+    @Column("formula_guid") val formula: UUID?,
+    @Column("conclusion_guid") val conclusion: UUID?,
     @Column("e_gesetzgebung") val eGesetzgebung: Boolean = false
 ) : Persistable<UUID> {
 

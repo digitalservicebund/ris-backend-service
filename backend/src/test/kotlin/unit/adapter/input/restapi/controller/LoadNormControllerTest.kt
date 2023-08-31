@@ -2,14 +2,7 @@ package de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.control
 
 import com.ninjasquad.springmockk.MockkBean
 import de.bund.digitalservice.ris.norms.application.port.input.LoadNormUseCase
-import de.bund.digitalservice.ris.norms.domain.entity.Article
-import de.bund.digitalservice.ris.norms.domain.entity.DocumentSection
-import de.bund.digitalservice.ris.norms.domain.entity.Documentation
-import de.bund.digitalservice.ris.norms.domain.entity.FileReference
-import de.bund.digitalservice.ris.norms.domain.entity.MetadataSection
-import de.bund.digitalservice.ris.norms.domain.entity.Metadatum
-import de.bund.digitalservice.ris.norms.domain.entity.Norm
-import de.bund.digitalservice.ris.norms.domain.entity.Paragraph
+import de.bund.digitalservice.ris.norms.domain.entity.*
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.encodeEli
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.encodeGuid
@@ -148,7 +141,10 @@ class LoadNormControllerTest {
       val metadataSections: Collection<MetadataSectionResponseTestSchema>,
       var eli: String,
       var files: Collection<FileReferenceResponseTestSchema>,
+      val recitals: RecitalsResponseTestSchema?,
+      val formula: FormulaResponseTestSchema?,
       val documentation: Collection<DocumentationResponseTestSchema>,
+      val conclusion: ConclusionResponseTestSchema?,
   ) {
     companion object {
       fun fromUseCaseData(data: Norm): NormResponseTestSchema {
@@ -162,7 +158,11 @@ class LoadNormControllerTest {
             metadataSections = metadataSections,
             eli = encodeEli(data.eli),
             files = files,
-            documentation = documentation)
+            recitals = data.recitals?.let(RecitalsResponseTestSchema::fromUseCaseData),
+            formula = data.formula?.let(FormulaResponseTestSchema::fromUseCaseData),
+            documentation = documentation,
+            conclusion = data.conclusion?.let(ConclusionResponseTestSchema::fromUseCaseData),
+        )
       }
     }
   }
@@ -230,6 +230,37 @@ class LoadNormControllerTest {
     companion object {
       fun fromUseCaseData(data: Paragraph): ParagraphResponseSchema {
         return ParagraphResponseSchema(encodeGuid(data.guid), data.marker, data.text)
+      }
+    }
+  }
+
+  data class RecitalsResponseTestSchema
+  private constructor(
+      val guid: String,
+      val marker: String?,
+      val heading: String?,
+      val text: String
+  ) {
+    companion object {
+      fun fromUseCaseData(data: Recitals): RecitalsResponseTestSchema {
+        return RecitalsResponseTestSchema(
+            encodeGuid(data.guid), data.marker, data.heading, data.text)
+      }
+    }
+  }
+
+  data class FormulaResponseTestSchema private constructor(val guid: String, val text: String) {
+    companion object {
+      fun fromUseCaseData(data: Formula): FormulaResponseTestSchema {
+        return FormulaResponseTestSchema(encodeGuid(data.guid), data.text)
+      }
+    }
+  }
+
+  data class ConclusionResponseTestSchema private constructor(val guid: String, val text: String) {
+    companion object {
+      fun fromUseCaseData(data: Conclusion): ConclusionResponseTestSchema {
+        return ConclusionResponseTestSchema(encodeGuid(data.guid), data.text)
       }
     }
   }

@@ -7,7 +7,7 @@ import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.KEYWORD
 import java.util.UUID
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
-import utils.createRandomNormFameProperties
+import utils.createRandomNormFrameProperties
 
 class EditNormFrameCommandTest {
 
@@ -26,7 +26,7 @@ class EditNormFrameCommandTest {
     val guid = UUID.randomUUID()
     val metadata = listOf(Metadatum("foo", KEYWORD, 0), Metadatum("bar", KEYWORD, 1))
     val metadataSections = listOf(MetadataSection(MetadataSectionName.NORM, metadata))
-    val properties = createRandomNormFameProperties().copy(metadataSections = metadataSections)
+    val properties = createRandomNormFrameProperties().copy(metadataSections = metadataSections)
     val command = EditNormFrameUseCase.Command(guid, properties)
 
     assertThat(command.guid).isEqualTo(guid)

@@ -1,14 +1,7 @@
 package utils
 
 import de.bund.digitalservice.ris.norms.application.port.input.EditNormFrameUseCase
-import de.bund.digitalservice.ris.norms.domain.entity.Article
-import de.bund.digitalservice.ris.norms.domain.entity.DocumentSection
-import de.bund.digitalservice.ris.norms.domain.entity.Documentation
-import de.bund.digitalservice.ris.norms.domain.entity.FileReference
-import de.bund.digitalservice.ris.norms.domain.entity.MetadataSection
-import de.bund.digitalservice.ris.norms.domain.entity.Metadatum
-import de.bund.digitalservice.ris.norms.domain.entity.Norm
-import de.bund.digitalservice.ris.norms.domain.entity.Paragraph
+import de.bund.digitalservice.ris.norms.domain.entity.*
 import de.bund.digitalservice.ris.norms.domain.value.DocumentSectionType.BOOK
 import de.bund.digitalservice.ris.norms.domain.value.DocumentSectionType.PART
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName
@@ -27,7 +20,7 @@ import org.jeasy.random.EasyRandomParameters
 import org.jeasy.random.FieldPredicates.inClass
 import org.jeasy.random.FieldPredicates.named
 
-fun createRandomNormFameProperties(): EditNormFrameUseCase.NormFrameProperties {
+fun createRandomNormFrameProperties(): EditNormFrameUseCase.NormFrameProperties {
   val parameters: EasyRandomParameters =
       EasyRandomParameters().randomize(named("metadataSections")) { createSimpleMetadataSections() }
   return EasyRandom(parameters).nextObject(EditNormFrameUseCase.NormFrameProperties::class.java)
@@ -88,18 +81,26 @@ fun createValidValidateNormFrameTestRequestSchema():
 }
 
 fun createRandomNorm(): Norm {
+  val random = EasyRandom(EasyRandomParameters().seed(Random().nextLong()))
   val parameters: EasyRandomParameters =
       EasyRandomParameters()
+          .seed(Random().nextLong())
           .randomize(named("citationYear")) {
-            EasyRandom(EasyRandomParameters().stringLengthRange(4, 4))
+            EasyRandom(EasyRandomParameters().seed(Random().nextLong()).stringLengthRange(4, 4))
                 .nextObject(String::class.java)
           }
           .randomize(named("metadataSections")) { emptyList<MetadataSection>() }
           .randomize(named("files")) { emptyList<FileReference>() }
           .randomize(named("documentation")) { emptyList<Documentation>() }
+          .randomize(named("recitals")) { random.nextOptionalObject<Recitals>() }
+          .randomize(named("formula")) { random.nextOptionalObject<Formula>() }
+          .randomize(named("conclusion")) { random.nextOptionalObject<Conclusion>() }
           .excludeField(named("eGesetzgebung"))
   return EasyRandom(parameters).nextObject(Norm::class.java)
 }
+
+inline fun <reified T> EasyRandom.nextOptionalObject(): T? =
+    nextObject(T::class.java).takeIf { nextBoolean() }
 
 fun createRandomNormWithCitationDateAndArticles(): Norm {
   return createRandomNorm()

@@ -7,13 +7,7 @@ import de.bund.digitalservice.ris.norms.application.port.output.GetNormByGuidOut
 import de.bund.digitalservice.ris.norms.application.port.output.SaveFileReferenceOutputPort
 import de.bund.digitalservice.ris.norms.application.port.output.SaveNormOutputPort
 import de.bund.digitalservice.ris.norms.application.port.output.SearchNormsOutputPort
-import de.bund.digitalservice.ris.norms.domain.entity.Article
-import de.bund.digitalservice.ris.norms.domain.entity.DocumentSection
-import de.bund.digitalservice.ris.norms.domain.entity.FileReference
-import de.bund.digitalservice.ris.norms.domain.entity.MetadataSection
-import de.bund.digitalservice.ris.norms.domain.entity.Metadatum
-import de.bund.digitalservice.ris.norms.domain.entity.Norm
-import de.bund.digitalservice.ris.norms.domain.entity.Paragraph
+import de.bund.digitalservice.ris.norms.domain.entity.*
 import de.bund.digitalservice.ris.norms.domain.value.DocumentSectionType.BOOK
 import de.bund.digitalservice.ris.norms.domain.value.DocumentSectionType.CHAPTER
 import de.bund.digitalservice.ris.norms.domain.value.DocumentSectionType.PART
@@ -28,13 +22,7 @@ import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.OFFICIAL_LONG
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.PARTICIPATION_INSTITUTION
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.PARTICIPATION_TYPE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.YEAR
-import de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto.ArticleDto
-import de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto.DocumentSectionDto
-import de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto.FileReferenceDto
-import de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto.MetadataSectionDto
-import de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto.MetadatumDto
-import de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto.NormDto
-import de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto.ParagraphDto
+import de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto.*
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
@@ -97,6 +85,9 @@ class NormsServiceTest : PostgresTestcontainerIntegrationTest() {
     template.delete(DocumentSectionDto::class.java).all().block()
     template.delete(ArticleDto::class.java).all().block()
     template.delete(ParagraphDto::class.java).all().block()
+    template.delete(RecitalsDto::class.java).all().block()
+    template.delete(FormulaDto::class.java).all().block()
+    template.delete(ConclusionDto::class.java).all().block()
   }
 
   @Test

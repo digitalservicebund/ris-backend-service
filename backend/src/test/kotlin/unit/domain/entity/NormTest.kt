@@ -227,6 +227,12 @@ class NormTest {
   @Test
   fun `can create a norm using type safe builders`() {
     val norm = norm {
+      recitals {
+        marker = "recitals"
+        heading = "Recitals"
+        text = "recitals text"
+      }
+      formula { text = "formula text" }
       documentation {
         documentSection {
           order = 1
@@ -234,6 +240,7 @@ class NormTest {
           heading = "book 1"
         }
       }
+      conclusion { text = "conclusion text" }
       metadataSections {
         metadataSection {
           name = MetadataSectionName.OFFICIAL_REFERENCE
@@ -262,6 +269,11 @@ class NormTest {
     assertThat(norm.metadataSections.first().sections?.first()?.metadata?.first()?.value)
         .isEqualTo("PrintAnnouncementGazette")
     assertThat(norm.files.first().name).isEqualTo("file.zip")
+    assertThat(norm.recitals?.marker).isEqualTo("recitals")
+    assertThat(norm.recitals?.heading).isEqualTo("Recitals")
+    assertThat(norm.recitals?.text).isEqualTo("recitals text")
+    assertThat(norm.formula?.text).isEqualTo("formula text")
+    assertThat(norm.conclusion?.text).isEqualTo("conclusion text")
   }
 
   @Test

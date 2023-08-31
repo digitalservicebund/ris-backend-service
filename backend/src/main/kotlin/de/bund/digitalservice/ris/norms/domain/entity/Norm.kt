@@ -12,8 +12,11 @@ data class Norm(
     val guid: UUID,
     val metadataSections: Collection<MetadataSection> = emptyList(),
     var files: Collection<FileReference> = emptyList(),
+    val recitals: Recitals? = null,
+    val formula: Formula? = null,
     val documentation: Collection<Documentation> = emptyList(),
-    var eGesetzgebung: Boolean = false
+    val conclusion: Conclusion? = null,
+    var eGesetzgebung: Boolean = false,
 ) {
   init {
     hasValidSections.evaluate(this).throwWhenUnsatisfied()

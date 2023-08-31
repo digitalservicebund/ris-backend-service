@@ -1,23 +1,10 @@
 package de.bund.digitalservice.ris.norms.framework.adapter.output.database
 
-import de.bund.digitalservice.ris.norms.domain.entity.Article
-import de.bund.digitalservice.ris.norms.domain.entity.DocumentSection
-import de.bund.digitalservice.ris.norms.domain.entity.Documentation
-import de.bund.digitalservice.ris.norms.domain.entity.FileReference
-import de.bund.digitalservice.ris.norms.domain.entity.MetadataSection
-import de.bund.digitalservice.ris.norms.domain.entity.Metadatum
-import de.bund.digitalservice.ris.norms.domain.entity.Norm
-import de.bund.digitalservice.ris.norms.domain.entity.Paragraph
+import de.bund.digitalservice.ris.norms.domain.entity.*
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType
 import de.bund.digitalservice.ris.norms.domain.value.NormCategory
 import de.bund.digitalservice.ris.norms.domain.value.UndefinedDate
-import de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto.ArticleDto
-import de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto.DocumentSectionDto
-import de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto.FileReferenceDto
-import de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto.MetadataSectionDto
-import de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto.MetadatumDto
-import de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto.NormDto
-import de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto.ParagraphDto
+import de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto.*
 import java.time.LocalDate
 import java.time.LocalTime
 import java.util.UUID
@@ -28,7 +15,10 @@ interface NormsMapper {
       fileReferences: List<FileReference>,
       dtoMetadataSections: List<MetadataSectionDto>,
       dtoMetadata: Collection<MetadatumDto>,
+      recitals: RecitalsDto?,
+      formula: FormulaDto?,
       documentation: Collection<Documentation>,
+      conclusion: ConclusionDto?,
   ): Norm {
     val listDomainSections = mutableListOf<MetadataSection>()
 
@@ -75,7 +65,15 @@ interface NormsMapper {
           }
         }
 
-    return Norm(normDto.guid, listDomainSections, fileReferences, documentation)
+    return Norm(
+        normDto.guid,
+        listDomainSections,
+        fileReferences,
+        recitals?.let { recitalsToEntity(it) },
+        formula?.let { formulaToEntity(it) },
+        documentation,
+        conclusion?.let { conclusionToEntity(it) },
+    )
   }
 
   fun metadataSectionToEntity(
@@ -123,6 +121,26 @@ interface NormsMapper {
           text = data.text,
       )
 
+  fun recitalsToEntity(data: RecitalsDto) =
+      Recitals(
+          guid = data.guid,
+          marker = data.marker,
+          heading = data.heading,
+          text = data.text,
+      )
+
+  fun formulaToEntity(data: FormulaDto) =
+      Formula(
+          guid = data.guid,
+          text = data.text,
+      )
+
+  fun conclusionToEntity(data: ConclusionDto) =
+      Conclusion(
+          guid = data.guid,
+          text = data.text,
+      )
+
   fun metadatumToEntity(metadatumDto: MetadatumDto): Metadatum<*> {
     val value =
         when (metadatumDto.type) {
@@ -138,8 +156,20 @@ interface NormsMapper {
   }
 
   fun normToDto(norm: Norm): NormDto {
-    return NormDto(norm.guid, norm.eGesetzgebung)
+    return NormDto(
+        norm.guid,
+        norm.recitals?.guid,
+        norm.formula?.guid,
+        norm.conclusion?.guid,
+        norm.eGesetzgebung,
+    )
   }
+
+  fun recitalsToDto(data: Recitals) = RecitalsDto(data.guid, data.marker, data.heading, data.text)
+
+  fun formulaToDto(data: Formula) = FormulaDto(data.guid, data.text)
+
+  fun conclusionToDto(data: Conclusion) = ConclusionDto(data.guid, data.text)
 
   fun documentSectionToDto(data: DocumentSection, normGuid: UUID, parentSectionGuid: UUID?) =
       DocumentSectionDto(
