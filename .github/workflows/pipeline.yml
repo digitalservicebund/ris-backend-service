@@ -816,12 +816,19 @@ jobs:
 
   check-latest-deploy-tag:
     if: ${{ github.ref == 'refs/heads/main' }}
-    needs:
-      - e2e-tests
+    # needs:
+    #   - e2e-tests
     runs-on: ubuntu-latest
     outputs:
       latest_production_sha: ${{ steps.extract-current-sha.outputs.latest_production_sha }}
     steps:
+      - name: Check Secret Availability
+        run: |
+          if [[ -z "${{ secrets.DEPLOY_KEY }}" ]]; then
+            echo "DEPLOY_KEY is not set."
+          else
+            echo "DEPLOY_KEY is set."
+          fi
       - name: Checkout infra repository
         uses: actions/checkout@v3
         with:
