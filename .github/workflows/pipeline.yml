@@ -800,36 +800,15 @@ jobs:
       mode: ${{ matrix.mode }}
     secrets: inherit
 
-  get-latest-commit-sha:
+  check-latest-deploy-tag:
     if: ${{ github.ref == 'refs/heads/main' }}
     needs:
       - e2e-tests
     runs-on: ubuntu-latest
     outputs:
-      latest_sha: ${{ steps.get-sha.outputs.latest_sha }}
-    steps:
-      - id: get-sha
-        run: |
-          echo "latest_sha=$(curl -s -H 'Authorization: token ${{ secrets.GITHUB_TOKEN }}' \
-          'https://api.github.com/repos/digitalservicebund/ris-backend-service/git/ref/heads/main' \
-          | jq -r '.object.sha')" >> "$GITHUB_OUTPUT"
-
-  check-latest-deploy-tag:
-    if: ${{ github.ref == 'refs/heads/main' }}
-    # needs:
-    #   - e2e-tests
-    runs-on: ubuntu-latest
-    outputs:
-      latest_production_sha: ${{ steps.extract-current-sha.outputs.latest_production_sha }}
+      should_deploy: ${{ steps.compare-tags.outputs.should_deploy }}
     environment: production
     steps:
-      - name: Check Secret Availability
-        run: |
-          if [[ -z "${{ secrets.DEPLOY_KEY }}" ]]; then
-            echo "DEPLOY_KEY is not set."
-          else
-            echo "DEPLOY_KEY is set."
-          fi
       - name: Checkout infra repository
         uses: actions/checkout@v3
         with:
@@ -841,31 +820,31 @@ jobs:
         with:
           fetch-depth: 0
           path: main
-      - name: extract current image sha
-        id: extract-current-sha
+      - name: compare image tags
+        id: compare-tags
         run: |
           set -x
-          current_tag=${{ env.CONTAINER_IMAGE_VERSION }}
-          latest_deploy_tag=$(yq '.images[0] | .newTag' infra/manifests/overlays/production/kustomization.yaml)
+          CURRENT_TAG=${{ env.CONTAINER_IMAGE_VERSION }}
+          DEPLOYED_TAG=$(yq '.images[0] | .newTag' infra/manifests/overlays/production/kustomization.yaml)
           cd main
-          if git merge-base --is-ancestor $current_tag $latest_production_tag; then
-            echo "false"
+          if git merge-base --is-ancestor $CURRENT_TAG $DEPLOYED_TAG; then
+            echo "should_deploy=false" >> "$GITHUB_OUTPUT"
           else
-            echo "true"
+            echo "should_deploy=true" >> "$GITHUB_OUTPUT"
           fi
 
   deploy-production:
     runs-on: ubuntu-latest
     if: |
       github.ref == 'refs/heads/main' &&
-      needs.get-latest-commit-sha.outputs.latest_sha == github.sha
+      needs.check-latest-deploy-tag.outputs.should_deploy == 'true'
     concurrency: deploy-production
     environment: production
     needs:
       - push-frontend-image-to-registry
       - push-backend-image-to-registry
       - e2e-tests
-      - get-latest-commit-sha
+      - check-latest-deploy-tag
     permissions:
       id-token: write # Enable OIDC for gitsign
     steps:
