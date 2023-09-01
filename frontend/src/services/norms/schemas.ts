@@ -1,13 +1,4 @@
-import {
-  MetadatumType,
-  MetadataSectionName,
-  FlatMetadata,
-  Norm,
-} from "@/domain/norm"
-
-type NullableType<Type> = {
-  [Property in keyof Type]: Type[Property] | null
-}
+import { MetadatumType, MetadataSectionName, Norm } from "@/domain/norm"
 
 export type NormListResponseSchema = {
   guid: string
@@ -30,5 +21,3 @@ export interface MetadataSectionSchema {
   metadata?: MetadatumSchema[] | null
   sections?: MetadataSectionSchema[] | null
 }
-
-export type FlatMetadataRequestSchema = NullableType<FlatMetadata>

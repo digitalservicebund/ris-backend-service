@@ -1,18 +1,11 @@
-export interface Norm extends FlatMetadata {
+export interface Norm {
   readonly guid: string
   readonly files?: FileReference[]
+  readonly eli?: string
   recitals?: Recitals
   documentation?: (Article | DocumentSection)[]
   conclusion?: Conclusion
   metadataSections?: MetadataSections
-}
-
-/* -------------------------------------------------- *
- * Flat metadata                                      *
- * -------------------------------------------------- */
-
-export type FlatMetadata = {
-  eli?: string
 }
 
 /* -------------------------------------------------- *

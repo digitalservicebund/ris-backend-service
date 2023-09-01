@@ -3,7 +3,6 @@ import { setActivePinia, createPinia } from "pinia"
 import { editNormFrame, getNormByGuid } from "@/services/norms"
 import { useLoadedNormStore } from "@/stores/loadedNorm"
 import {
-  generateFlatMetadata,
   generateMetadataSections,
   generateNorm,
 } from "~/test-helper/dataGenerators"
@@ -63,11 +62,9 @@ describe("loadedNorm", () => {
 
   it("calls the norms service on update with the frame data of the loaded norm", async () => {
     const metadataSections = generateMetadataSections()
-    const flatMetadata = generateFlatMetadata()
     const norm = generateNorm({
       guid: "guid",
       metadataSections,
-      ...flatMetadata,
     })
     const store = useLoadedNormStore()
     store.loadedNorm = norm
@@ -75,10 +72,6 @@ describe("loadedNorm", () => {
     await store.update()
 
     expect(editNormFrame).toHaveBeenCalledOnce()
-    expect(editNormFrame).toHaveBeenLastCalledWith(
-      "guid",
-      metadataSections,
-      flatMetadata,
-    )
+    expect(editNormFrame).toHaveBeenLastCalledWith("guid", metadataSections)
   })
 })

@@ -2,7 +2,6 @@ import {
   Article,
   DocumentSection,
   DocumentSectionType,
-  FlatMetadata,
   Metadata,
   MetadataSectionName,
   MetadataSections,
@@ -289,21 +288,11 @@ export function generateMetadataSections(
   return sections
 }
 
-export function generateFlatMetadata(
-  partialFlatMetadata?: Partial<FlatMetadata>,
-): FlatMetadata {
-  return {
-    eli: generateString(),
-    ...partialFlatMetadata,
-  }
-}
-
 export function generateNorm(partialNorm?: Partial<Norm>): Norm {
   return {
     guid: generateGuid(),
     documentation: [generateDocumentSection()],
     metadataSections: generateMetadataSections(),
-    ...generateFlatMetadata(),
     ...partialNorm,
   }
 }

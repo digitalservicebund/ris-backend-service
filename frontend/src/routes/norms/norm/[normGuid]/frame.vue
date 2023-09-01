@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { storeToRefs } from "pinia"
-import { computed, toRefs, ref, watch } from "vue"
+import { computed, toRefs } from "vue"
 import { useRoute } from "vue-router"
 import AgeIndicationInputGroup from "@/components/ageIndication/AgeIndicationInputGroup.vue"
 import { ageIndicationSummarizer } from "@/components/ageIndication/summarizer"
@@ -42,7 +42,7 @@ import SubjectAreaInputGroup from "@/components/subjectArea/SubjectAreaInputGrou
 import { subjectAreaSummarizer } from "@/components/subjectArea/summarizer"
 import { useLocator } from "@/composables/useLocator"
 import { useScrollToHash } from "@/composables/useScrollToHash"
-import { FlatMetadata, Metadata, MetadataSections } from "@/domain/norm"
+import { Metadata, MetadataSections } from "@/domain/norm"
 import { dateYearSummarizer } from "@/helpers/dateYearSummarizer"
 import { generalSummarizer } from "@/helpers/generalSummarizer"
 import { withSummarizer } from "@/shared/components/DataSetSummary.vue"
@@ -118,25 +118,7 @@ const documentCategory = computed({
   set: (category: string) => (normSection.value.DOCUMENT_CATEGORY = [category]),
 })
 
-const flatMetadata = ref<FlatMetadata>({} as FlatMetadata)
-
-watch(
-  loadedNorm,
-  (is) => {
-    flatMetadata.value = { eli: is?.eli }
-  },
-  { immediate: true, deep: true },
-)
-
-watch(
-  flatMetadata,
-  (data) => {
-    if (loadedNorm.value !== undefined && data !== undefined) {
-      loadedNorm.value.eli = data.eli as string
-    }
-  },
-  { deep: true },
-)
+const eli = computed(() => loadedNorm.value?.eli)
 
 const DateYearSummary = withSummarizer(dateYearSummarizer)
 const OfficialReferenceSummary = withSummarizer(officialReferenceSummarizer)
@@ -598,12 +580,7 @@ const AgeIndicationSummary = withSummarizer(ageIndicationSummarizer)
       :type="InputType.CHIPS"
     />
 
-    <SingleDataFieldSection
-      id="eli"
-      v-model="flatMetadata.eli"
-      label="ELI"
-      readonly
-    />
+    <SingleDataFieldSection id="eli" v-model="eli" label="ELI" readonly />
 
     <SingleDataFieldSection
       id="celexNumber"
