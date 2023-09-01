@@ -30,6 +30,7 @@ import reactor.core.publisher.Mono
 import utils.factory.article
 import utils.factory.documentSection
 import utils.factory.metadataSection
+import utils.factory.recitals
 
 @ExtendWith(SpringExtension::class)
 @WebFluxTest(controllers = [ImportTestDataController::class])
@@ -828,6 +829,44 @@ class ImportTestDataControllerTest {
   }
 
   @Test
+  fun `it correctly maps some an optional recitals`() {
+    every { importTestDataService.importTestData(any()) } returns Mono.just(true)
+
+    webClient
+        .mutateWith(csrf())
+        .post()
+        .uri("/api/v1/norms/test-data")
+        .contentType(APPLICATION_JSON)
+        .body(
+            BodyInserters.fromValue(
+                """
+                {
+                  "recitals": {
+                    "marker": "test marker",
+                    "heading": "Recitals",
+                    "text": "some text"
+                  }
+                }
+                """))
+        .exchange()
+        .expectStatus()
+        .is2xxSuccessful()
+
+    val command = slot<ImportTestDataUseCase.Command>()
+    verify(exactly = 1) { importTestDataService.importTestData(capture(command)) }
+
+    assertThat(command.captured.norm.recitals)
+        .usingRecursiveComparison()
+        .ignoringCollectionOrder()
+        .ignoringFieldsOfTypes(UUID::class.java)
+        .isEqualTo(
+            recitals {
+              marker = "test marker"
+              heading = "Recitals"
+              text = "some text"
+            })
+  }
+
   fun `it sends an internal error response if the import norm service throws an exception`() {
     every { importTestDataService.importTestData(any()) } throws Error()
 

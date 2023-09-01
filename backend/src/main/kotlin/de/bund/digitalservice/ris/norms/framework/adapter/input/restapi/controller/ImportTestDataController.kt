@@ -7,6 +7,7 @@ import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.ApiConfi
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.encodeGuid
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.schema.DocumentationRequestSchema
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.schema.MetadataSectionRequestSchema
+import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.schema.RecitalsRequestSchema
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.tags.Tag
@@ -48,6 +49,7 @@ class ImportTestDataController(private val importTestDataService: ImportTestData
 
   class RequestSchema {
     var metadataSections: Collection<MetadataSectionRequestSchema> = emptyList()
+    var recitals: RecitalsRequestSchema? = null
     var documentation: Collection<DocumentationRequestSchema> = emptyList()
 
     fun toUseCaseData() =
@@ -55,6 +57,7 @@ class ImportTestDataController(private val importTestDataService: ImportTestData
             guid = UUID.randomUUID(),
             eGesetzgebung = false,
             metadataSections = metadataSections.map(MetadataSectionRequestSchema::toUseCaseData),
+            recitals = recitals?.toUseCaseData(),
             documentation = documentation.map(DocumentationRequestSchema::toUseCaseData),
         )
   }

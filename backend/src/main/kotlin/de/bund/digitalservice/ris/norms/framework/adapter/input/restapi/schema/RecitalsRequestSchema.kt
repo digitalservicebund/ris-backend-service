@@ -1,19 +1,16 @@
-package utils.factory
+package de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.schema
 
 import de.bund.digitalservice.ris.norms.domain.entity.Recitals
 import java.util.UUID
 
-fun recitals(block: RecitalsBuilder.() -> Unit) = RecitalsBuilder().apply(block).build()
-
-class RecitalsBuilder {
-  var guid: UUID = UUID.randomUUID()
+class RecitalsRequestSchema {
   var marker: String? = null
   var heading: String? = null
-  var text: String = ""
+  lateinit var text: String
 
-  fun build() =
+  fun toUseCaseData() =
       Recitals(
-          guid = guid,
+          guid = UUID.randomUUID(),
           marker = marker,
           heading = heading,
           text = text,
