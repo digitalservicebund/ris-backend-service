@@ -7,12 +7,19 @@ function renderComponent(options?: {
   isExpanded?: boolean
   defaultSlot?: string
   headerSlot?: string
+  iconsOnLeft?: boolean
+  marginLeft?: number
 }) {
   const slots = {
     default: options?.defaultSlot ?? "",
     header: options?.headerSlot ?? "",
   }
-  const props = { header: options?.header, isExpanded: options?.isExpanded }
+  const props = {
+    header: options?.header,
+    isExpanded: options?.isExpanded,
+    iconsOnLeft: options?.iconsOnLeft,
+    marginLeft: options?.marginLeft,
+  }
   const utils = render(ExpandableContentnt, { slots, props })
   const user = userEvent.setup()
   return { user, ...utils }
@@ -87,5 +94,40 @@ describe("ExpandableContent", () => {
 
     expect(emitted()["update:isExpanded"]).toHaveLength(3)
     expect(emitted()["update:isExpanded"]).toEqual([[true], [false], [true]])
+  })
+
+  it("renders default 0 margin left", () => {
+    renderComponent()
+    const button = screen.getByRole("button")
+
+    expect(button).toHaveClass("ml-[0px]")
+  })
+
+  it("renders a non-default margin left for the button", () => {
+    renderComponent({ marginLeft: 40 })
+    const button = screen.getByRole("button")
+
+    expect(button).toHaveClass("ml-[40px]")
+  })
+
+  it("renders default icons on the right side", () => {
+    renderComponent()
+    const button = screen.getByRole("button")
+
+    // eslint-disable-next-line testing-library/no-node-access
+    const firstChild = button.firstElementChild
+
+    expect(firstChild?.classList.contains("icon")).not.toBe(true)
+  })
+
+  it("renders icons on the left side", () => {
+    renderComponent({ iconsOnLeft: true })
+
+    const button = screen.getByRole("button")
+
+    // eslint-disable-next-line testing-library/no-node-access
+    const firstChild = button.firstElementChild
+
+    expect(firstChild?.classList.contains("icon")).toBe(true)
   })
 })

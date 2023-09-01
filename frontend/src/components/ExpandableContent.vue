@@ -9,6 +9,7 @@ interface Props {
   closeIconName?: string
   headerId?: string
   iconsOnLeft?: boolean
+  marginLeft?: number
 }
 const props = withDefaults(defineProps<Props>(), {
   header: undefined,
@@ -18,6 +19,7 @@ const props = withDefaults(defineProps<Props>(), {
   headerId: "",
   headerClass: "",
   iconsOnLeft: false,
+  marginLeft: 0,
 })
 
 const emit = defineEmits<{
@@ -45,6 +47,18 @@ watch(
 )
 
 watch(localIsExpanded, () => emit("update:isExpanded", localIsExpanded.value))
+
+const sectionMargins: { [key: number]: string } = {
+  0: "ml-[0px]",
+  20: "ml-[20px]",
+  40: "ml-[40px]",
+  60: "ml-[60px]",
+  80: "ml-[80px]",
+  100: "ml-[100px]",
+  120: "ml-[120px]",
+  140: "ml-[140px]",
+  160: "ml-[160px]",
+}
 </script>
 
 <template>
@@ -52,6 +66,7 @@ watch(localIsExpanded, () => emit("update:isExpanded", localIsExpanded.value))
     <button
       :aria-labelledby="headerId"
       class="flex w-full justify-between focus:outline-none focus-visible:outline-blue-800"
+      :class="`${sectionMargins[marginLeft]}`"
       @click="toggleContentVisibility"
     >
       <span
