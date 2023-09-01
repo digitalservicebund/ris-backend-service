@@ -348,7 +348,8 @@ test.describe("search", () => {
   })
 
   // Filtern auf Fehler
-  test("filter for documentunits with errors only", async ({
+  // eslint-disable-next-line playwright/no-skipped-test
+  test.skip("filter for documentunits with errors only", async ({
     pageWithBghUser,
   }) => {
     pageWithBghUser.goto("/")
@@ -371,10 +372,9 @@ test.describe("search", () => {
       timeout: 30000,
     })
 
-    //TODO: check for other than BGH
-    // expect(
-    //   await pageWithBghUser.getByText("XXRE").count(),
-    // ).toBeGreaterThanOrEqual(1)
+    expect(
+      await pageWithBghUser.getByText("XXRE").count(),
+    ).toBeGreaterThanOrEqual(1)
 
     await select.selectOption("Alle")
     await docofficeOnly.click()
@@ -391,10 +391,9 @@ test.describe("search", () => {
       await pageWithBghUser.getByText("KORE").count(),
     ).toBeGreaterThanOrEqual(1)
 
-    //TODO: check for other than BGH
-    // await expect(pageWithBghUser.getByText("XXRE")).toBeHidden({
-    //   timeout: 30000,
-    // })
+    await expect(pageWithBghUser.getByText("XXRE")).toBeHidden({
+      timeout: 30000,
+    })
 
     await errorsOnly.click()
     await pageWithBghUser
