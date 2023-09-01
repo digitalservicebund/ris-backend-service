@@ -4,6 +4,9 @@ import de.bund.digitalservice.ris.norms.domain.entity.DocumentSection
 import de.bund.digitalservice.ris.norms.domain.entity.Documentation
 import de.bund.digitalservice.ris.norms.domain.value.DocumentSectionType
 
+fun documentSection(block: DocumentSectionBuilder.() -> Unit) =
+    DocumentSectionBuilder().apply(block).build()
+
 class DocumentSectionBuilder : DocumentationBuilder() {
   var type: DocumentSectionType = DocumentSectionType.BOOK
   private var documentation = mutableListOf<Documentation>()

@@ -244,7 +244,7 @@ class NormTest {
       metadataSections {
         metadataSection {
           name = MetadataSectionName.OFFICIAL_REFERENCE
-          metadataSections {
+          sections {
             metadataSection {
               name = MetadataSectionName.PRINT_ANNOUNCEMENT
               metadata {
