@@ -5,6 +5,7 @@ import de.bund.digitalservice.ris.norms.application.port.input.ImportTestDataUse
 import de.bund.digitalservice.ris.norms.domain.entity.Norm
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.ApiConfiguration
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.encodeGuid
+import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.schema.ConclusionRequestSchema
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.schema.DocumentationRequestSchema
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.schema.FormulaRequestSchema
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.schema.MetadataSectionRequestSchema
@@ -53,6 +54,7 @@ class ImportTestDataController(private val importTestDataService: ImportTestData
     var recitals: RecitalsRequestSchema? = null
     var formula: FormulaRequestSchema? = null
     var documentation: Collection<DocumentationRequestSchema> = emptyList()
+    var conclusion: ConclusionRequestSchema? = null
 
     fun toUseCaseData() =
         Norm(
@@ -62,6 +64,7 @@ class ImportTestDataController(private val importTestDataService: ImportTestData
             recitals = recitals?.toUseCaseData(),
             formula = formula?.toUseCaseData(),
             documentation = documentation.map(DocumentationRequestSchema::toUseCaseData),
+            conclusion = conclusion?.toUseCaseData(),
         )
   }
 

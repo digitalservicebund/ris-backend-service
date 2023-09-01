@@ -28,6 +28,7 @@ import org.springframework.test.web.reactive.server.WebTestClient
 import org.springframework.web.reactive.function.BodyInserters
 import reactor.core.publisher.Mono
 import utils.factory.article
+import utils.factory.conclusion
 import utils.factory.documentSection
 import utils.factory.formula
 import utils.factory.metadataSection
@@ -900,6 +901,39 @@ class ImportTestDataControllerTest {
         .isEqualTo(formula { text = "some text" })
   }
 
+  @Test
+  fun `it correctly maps some an optional conclusion`() {
+    every { importTestDataService.importTestData(any()) } returns Mono.just(true)
+
+    webClient
+        .mutateWith(csrf())
+        .post()
+        .uri("/api/v1/norms/test-data")
+        .contentType(APPLICATION_JSON)
+        .body(
+            BodyInserters.fromValue(
+                """
+                {
+                  "conclusion": {
+                    "text": "some text"
+                  }
+                }
+                """))
+        .exchange()
+        .expectStatus()
+        .is2xxSuccessful()
+
+    val command = slot<ImportTestDataUseCase.Command>()
+    verify(exactly = 1) { importTestDataService.importTestData(capture(command)) }
+
+    assertThat(command.captured.norm.conclusion)
+        .usingRecursiveComparison()
+        .ignoringCollectionOrder()
+        .ignoringFieldsOfTypes(UUID::class.java)
+        .isEqualTo(conclusion { text = "some text" })
+  }
+
+  @Test
   fun `it sends an internal error response if the import norm service throws an exception`() {
     every { importTestDataService.importTestData(any()) } throws Error()
 
