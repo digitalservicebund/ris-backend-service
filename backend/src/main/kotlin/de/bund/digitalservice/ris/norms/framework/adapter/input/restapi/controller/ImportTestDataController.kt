@@ -6,6 +6,7 @@ import de.bund.digitalservice.ris.norms.domain.entity.Norm
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.ApiConfiguration
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.encodeGuid
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.schema.DocumentationRequestSchema
+import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.schema.FormulaRequestSchema
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.schema.MetadataSectionRequestSchema
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.schema.RecitalsRequestSchema
 import io.swagger.v3.oas.annotations.Operation
@@ -50,6 +51,7 @@ class ImportTestDataController(private val importTestDataService: ImportTestData
   class RequestSchema {
     var metadataSections: Collection<MetadataSectionRequestSchema> = emptyList()
     var recitals: RecitalsRequestSchema? = null
+    var formula: FormulaRequestSchema? = null
     var documentation: Collection<DocumentationRequestSchema> = emptyList()
 
     fun toUseCaseData() =
@@ -58,6 +60,7 @@ class ImportTestDataController(private val importTestDataService: ImportTestData
             eGesetzgebung = false,
             metadataSections = metadataSections.map(MetadataSectionRequestSchema::toUseCaseData),
             recitals = recitals?.toUseCaseData(),
+            formula = formula?.toUseCaseData(),
             documentation = documentation.map(DocumentationRequestSchema::toUseCaseData),
         )
   }

@@ -29,6 +29,7 @@ import org.springframework.web.reactive.function.BodyInserters
 import reactor.core.publisher.Mono
 import utils.factory.article
 import utils.factory.documentSection
+import utils.factory.formula
 import utils.factory.metadataSection
 import utils.factory.recitals
 
@@ -865,6 +866,38 @@ class ImportTestDataControllerTest {
               heading = "Recitals"
               text = "some text"
             })
+  }
+
+  @Test
+  fun `it correctly maps some an optional formula`() {
+    every { importTestDataService.importTestData(any()) } returns Mono.just(true)
+
+    webClient
+        .mutateWith(csrf())
+        .post()
+        .uri("/api/v1/norms/test-data")
+        .contentType(APPLICATION_JSON)
+        .body(
+            BodyInserters.fromValue(
+                """
+                {
+                  "formula": {
+                    "text": "some text"
+                  }
+                }
+                """))
+        .exchange()
+        .expectStatus()
+        .is2xxSuccessful()
+
+    val command = slot<ImportTestDataUseCase.Command>()
+    verify(exactly = 1) { importTestDataService.importTestData(capture(command)) }
+
+    assertThat(command.captured.norm.formula)
+        .usingRecursiveComparison()
+        .ignoringCollectionOrder()
+        .ignoringFieldsOfTypes(UUID::class.java)
+        .isEqualTo(formula { text = "some text" })
   }
 
   fun `it sends an internal error response if the import norm service throws an exception`() {
