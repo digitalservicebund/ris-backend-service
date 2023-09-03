@@ -19,8 +19,7 @@ data class Norm(
     var eGesetzgebung: Boolean = false,
 ) {
   init {
-    hasValidSections.evaluate(this).throwWhenUnsatisfied()
-    hasValidDocumentationDepth.evaluate(this).throwWhenUnsatisfied()
+    hasValidSections.and(hasValidDocumentationDepth).evaluate(this).throwWhenUnsatisfied()
   }
 
   val eli: Eli

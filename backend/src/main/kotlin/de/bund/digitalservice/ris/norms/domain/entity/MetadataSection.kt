@@ -13,7 +13,6 @@ data class MetadataSection(
     val guid: UUID = UUID.randomUUID(),
 ) {
   init {
-    hasValidChildren.evaluate(this).throwWhenUnsatisfied()
-    hasValidMetadata.evaluate(this).throwWhenUnsatisfied()
+    hasValidChildren.and(hasValidMetadata).evaluate(this).throwWhenUnsatisfied()
   }
 }
