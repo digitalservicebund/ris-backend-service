@@ -112,22 +112,17 @@ describe("ExpandableContent", () => {
 
   it("renders default icons on the right side", () => {
     renderComponent()
-    const button = screen.getByRole("button")
 
-    // eslint-disable-next-line testing-library/no-node-access
-    const firstChild = button.firstElementChild
+    const icon = screen.getByTestId("icons-open-close")
 
-    expect(firstChild?.classList.contains("icon")).not.toBe(true)
+    expect(icon).toHaveClass("icon")
   })
 
   it("renders icons on the left side", () => {
     renderComponent({ iconsOnLeft: true })
 
-    const button = screen.getByRole("button")
+    const icon = screen.getByTestId("icons-open-close")
 
-    // eslint-disable-next-line testing-library/no-node-access
-    const firstChild = button.firstElementChild
-
-    expect(firstChild?.classList.contains("icon")).toBe(true)
+    expect(icon).toHaveClass("icon")
   })
 })

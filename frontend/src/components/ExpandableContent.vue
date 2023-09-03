@@ -73,6 +73,7 @@ const sectionMargins: { [key: number]: string } = {
         v-if="props.iconsOnLeft"
         :aria-label="ariaLabel"
         class="icon material-icons"
+        data-testid="icons-open-close"
       >
         {{ iconName }}
       </span>
@@ -85,6 +86,7 @@ const sectionMargins: { [key: number]: string } = {
         v-if="!props.iconsOnLeft"
         :aria-label="ariaLabel"
         class="icon material-icons"
+        data-testid="icons-open-close"
         >{{ iconName }}</span
       >
     </button>

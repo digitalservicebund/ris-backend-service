@@ -18,22 +18,27 @@ const articleMargins: { [key: number]: string } = {
   140: "ml-[128px]",
   160: "ml-[148px]",
 }
+const isLastItem = (index: number) =>
+  index === props.documentSections.length - 1
 </script>
 
 <template>
   <div
-    v-for="doc in props.documentSections"
+    v-for="(doc, index) in props.documentSections"
     :key="doc.guid"
     class="border-t border-gray-400"
+    :class="{ 'border-b border-gray-400': isLastItem(index) }"
+    data-testid="document-sections"
   >
     <ExpandableContent
       v-if="isDocumentSection(doc)"
       class="bg-blue-200 pt-4"
-      close-icon-name="expand_less"
+      close-icon-name="expand_more"
+      data-testid="document-sections"
       icons-on-left
       is-expanded
       :margin-left="marginLeft"
-      open-icon-name="expand_more"
+      open-icon-name="chevron_right"
     >
       <template #header>
         <h2 class="ds-label-02-bold ml-4 w-full text-left">

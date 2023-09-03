@@ -18,7 +18,7 @@ function formatTitle(title?: string): string {
         <router-link
           class="ds-heading-03-reg"
           :to="{
-            name: 'norms-norm-normGuid',
+            name: 'norms-norm-normGuid-content',
             params: { normGuid: norm.guid },
           }"
         >

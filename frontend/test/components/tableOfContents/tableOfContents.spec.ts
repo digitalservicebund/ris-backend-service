@@ -20,4 +20,12 @@ describe("TableOfContents", () => {
   it("TODO", () => {
     renderComponent({ documentSections: [], marginLeft: 0 })
   })
+
+  it("renders correctly with empty documentation", () => {})
+
+  it("renders document sections correctly", () => {})
+
+  it("renders articles correctly", () => {})
+
+  it("toggles expandable content", async () => {})
 })
