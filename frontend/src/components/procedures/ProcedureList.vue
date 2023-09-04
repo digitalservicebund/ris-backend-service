@@ -51,13 +51,11 @@ onMounted(() => updateProcedures(0))
             class="mb-24 bg-white p-14"
             close-icon-name="expand_less"
             open-icon-name="expand_more"
+            @click="loadDocumentUnits(procedure)"
+            @keydown.enter="loadDocumentUnits(procedure)"
           >
             <template #header>
-              <div
-                class="relative"
-                @click="loadDocumentUnits(procedure)"
-                @keydown.enter="loadDocumentUnits(procedure)"
-              >
+              <div class="relative w-auto">
                 <span class="font-bold">{{ procedure.label }}</span>
                 <span class="absolute left-208 whitespace-nowrap"
                   >{{
