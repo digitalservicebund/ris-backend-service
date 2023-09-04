@@ -3,7 +3,6 @@ import { ref, onMounted } from "vue"
 import ProcedureDetail from "./ProcedureDetail.vue"
 import ExpandableContent from "@/components/ExpandableContent.vue"
 import { Procedure } from "@/domain/documentUnit"
-import DocumentUnitListEntry from "@/domain/documentUnitListEntry"
 import service from "@/services/procedureService"
 import Pagination, { Page } from "@/shared/components/Pagination.vue"
 
@@ -12,11 +11,25 @@ const procedures = ref<Procedure[]>()
 const currentPage = ref<Page<Procedure>>()
 
 async function updateProcedures(page: number) {
-  const response = await service.getAllWithDocumentUnits(itemsPerPage, page)
+  const response = await service.getAll(itemsPerPage, page)
   if (response.data) {
     procedures.value = response.data.content
     currentPage.value = response.data
   }
+}
+
+async function loadDocumentUnits(loadingProcedure: Procedure) {
+  if (!procedures.value) return
+  if (loadingProcedure.documentUnitCount == 0) return
+  if (loadingProcedure.documentUnits) return
+
+  const response = await service.getDocumentUnits(loadingProcedure.label)
+
+  procedures.value = procedures.value.map((procedure) =>
+    procedure.label == loadingProcedure.label
+      ? { ...procedure, documentUnits: response.data }
+      : procedure,
+  )
 }
 
 onMounted(() => updateProcedures(0))
@@ -40,11 +53,15 @@ onMounted(() => updateProcedures(0))
             open-icon-name="expand_more"
           >
             <template #header>
-              <div class="relative">
+              <div
+                class="relative"
+                @click="loadDocumentUnits(procedure)"
+                @keydown.enter="loadDocumentUnits(procedure)"
+              >
                 <span class="font-bold">{{ procedure.label }}</span>
                 <span class="absolute left-208 whitespace-nowrap"
                   >{{
-                    (procedure.documentUnits as DocumentUnitListEntry[]).length
+                    procedure.documentUnitCount
                   }}
                   Dokumentationseinheiten</span
                 >

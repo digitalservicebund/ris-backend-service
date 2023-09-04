@@ -1,11 +1,16 @@
 <script lang="ts" setup>
 import dayjs from "dayjs"
+import { computed } from "vue"
 import { Procedure } from "@/domain/documentUnit"
 import DocumentUnitListEntry from "@/domain/documentUnitListEntry"
 
-defineProps<{
+const props = defineProps<{
   procedure: Procedure
 }>()
+
+const isLoading = computed(
+  () => !props.procedure.documentUnits && props.procedure.documentUnitCount > 0,
+)
 
 function renderDocumentUnit(documentUnit: DocumentUnitListEntry): string {
   return [
@@ -21,7 +26,17 @@ function renderDocumentUnit(documentUnit: DocumentUnitListEntry): string {
 </script>
 
 <template>
-  <ul class="py-24">
+  <div
+    v-if="isLoading"
+    aria-label="Ladestatus"
+    class="grid justify-items-center bg-white bg-opacity-60"
+  >
+    <div
+      class="inline-block h-32 w-32 animate-spin rounded-full border-[3px] border-solid border-blue-900 border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]"
+      role="status"
+    ></div>
+  </div>
+  <ul v-else class="py-24">
     <li
       v-for="documentUnit in procedure.documentUnits"
       :key="documentUnit.documentNumber"

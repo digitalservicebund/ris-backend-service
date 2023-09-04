@@ -2,7 +2,6 @@ package de.bund.digitalservice.ris.caselaw.adapter;
 
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitSearchRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPADocumentationOfficeRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPAProcedureDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPAProcedureLinkDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPAProcedureLinkRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPAProcedureRepository;
@@ -15,7 +14,6 @@ import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import reactor.core.publisher.Flux;
 
 @Service
 public class ProcedureService {
@@ -35,25 +33,7 @@ public class ProcedureService {
     this.documentationOfficeRepository = documentationOfficeRepository;
   }
 
-  public Flux<Procedure> search(
-      Optional<String> query, DocumentationOffice documentationOffice, Pageable pageable) {
-    return Flux.fromIterable(
-        repository
-            .findByLabelContainingAndDocumentationOffice(
-                query,
-                documentationOfficeRepository.findByLabel(documentationOffice.label()),
-                pageable)
-            .map(
-                dto ->
-                    Procedure.builder()
-                        .label(dto.getLabel())
-                        .documentUnitCount(
-                            linkRepository.countLatestProcedureLinksByProcedure(dto.getId()))
-                        .created_at(dto.getCreatedAt())
-                        .build()));
-  }
-
-  public Page<Procedure> searchWithDocumentUnits(
+  public Page<Procedure> search(
       Optional<String> query, DocumentationOffice documentationOffice, Pageable pageable) {
     return repository
         .findByLabelContainingAndDocumentationOffice(
@@ -62,13 +42,22 @@ public class ProcedureService {
             dto ->
                 Procedure.builder()
                     .label(dto.getLabel())
-                    .documentUnits(getDocumentUnits(dto))
+                    .documentUnitCount(
+                        linkRepository.countLatestProcedureLinksByProcedure(dto.getId()))
                     .created_at(dto.getCreatedAt())
                     .build());
   }
 
-  private List<DocumentationUnitSearchEntry> getDocumentUnits(JPAProcedureDTO procedureDTO) {
-    return linkRepository.findLatestProcedureLinksByProcedure(procedureDTO.getId()).stream()
+  public List<DocumentationUnitSearchEntry> getDocumentUnits(
+      String procedureLabel, DocumentationOffice documentationOffice) {
+    return linkRepository
+        .findLatestProcedureLinksByProcedure(
+            repository
+                .findByLabelAndDocumentationOfficeOrderByCreatedAtDesc(
+                    procedureLabel,
+                    documentationOfficeRepository.findByLabel(documentationOffice.label()))
+                .getId())
+        .stream()
         .map(JPAProcedureLinkDTO::getDocumentationUnitId)
         .map(documentUnitRepository::findById)
         .filter(Optional::isPresent)
