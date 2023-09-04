@@ -28,8 +28,11 @@ import org.springframework.test.web.reactive.server.WebTestClient
 import org.springframework.web.reactive.function.BodyInserters
 import reactor.core.publisher.Mono
 import utils.factory.article
+import utils.factory.conclusion
 import utils.factory.documentSection
+import utils.factory.formula
 import utils.factory.metadataSection
+import utils.factory.recitals
 
 @ExtendWith(SpringExtension::class)
 @WebFluxTest(controllers = [ImportTestDataController::class])
@@ -825,6 +828,109 @@ class ImportTestDataControllerTest {
                 },
             ),
         )
+  }
+
+  @Test
+  fun `it correctly maps some an optional recitals`() {
+    every { importTestDataService.importTestData(any()) } returns Mono.just(true)
+
+    webClient
+        .mutateWith(csrf())
+        .post()
+        .uri("/api/v1/norms/test-data")
+        .contentType(APPLICATION_JSON)
+        .body(
+            BodyInserters.fromValue(
+                """
+                {
+                  "recitals": {
+                    "marker": "test marker",
+                    "heading": "Recitals",
+                    "text": "some text"
+                  }
+                }
+                """))
+        .exchange()
+        .expectStatus()
+        .is2xxSuccessful()
+
+    val command = slot<ImportTestDataUseCase.Command>()
+    verify(exactly = 1) { importTestDataService.importTestData(capture(command)) }
+
+    assertThat(command.captured.norm.recitals)
+        .usingRecursiveComparison()
+        .ignoringCollectionOrder()
+        .ignoringFieldsOfTypes(UUID::class.java)
+        .isEqualTo(
+            recitals {
+              marker = "test marker"
+              heading = "Recitals"
+              text = "some text"
+            })
+  }
+
+  @Test
+  fun `it correctly maps some an optional formula`() {
+    every { importTestDataService.importTestData(any()) } returns Mono.just(true)
+
+    webClient
+        .mutateWith(csrf())
+        .post()
+        .uri("/api/v1/norms/test-data")
+        .contentType(APPLICATION_JSON)
+        .body(
+            BodyInserters.fromValue(
+                """
+                {
+                  "formula": {
+                    "text": "some text"
+                  }
+                }
+                """))
+        .exchange()
+        .expectStatus()
+        .is2xxSuccessful()
+
+    val command = slot<ImportTestDataUseCase.Command>()
+    verify(exactly = 1) { importTestDataService.importTestData(capture(command)) }
+
+    assertThat(command.captured.norm.formula)
+        .usingRecursiveComparison()
+        .ignoringCollectionOrder()
+        .ignoringFieldsOfTypes(UUID::class.java)
+        .isEqualTo(formula { text = "some text" })
+  }
+
+  @Test
+  fun `it correctly maps some an optional conclusion`() {
+    every { importTestDataService.importTestData(any()) } returns Mono.just(true)
+
+    webClient
+        .mutateWith(csrf())
+        .post()
+        .uri("/api/v1/norms/test-data")
+        .contentType(APPLICATION_JSON)
+        .body(
+            BodyInserters.fromValue(
+                """
+                {
+                  "conclusion": {
+                    "text": "some text"
+                  }
+                }
+                """))
+        .exchange()
+        .expectStatus()
+        .is2xxSuccessful()
+
+    val command = slot<ImportTestDataUseCase.Command>()
+    verify(exactly = 1) { importTestDataService.importTestData(capture(command)) }
+
+    assertThat(command.captured.norm.conclusion)
+        .usingRecursiveComparison()
+        .ignoringCollectionOrder()
+        .ignoringFieldsOfTypes(UUID::class.java)
+        .isEqualTo(conclusion { text = "some text" })
   }
 
   @Test

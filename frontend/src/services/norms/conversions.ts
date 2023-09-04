@@ -2,7 +2,6 @@ import dayjs from "dayjs"
 import timezone from "dayjs/plugin/timezone"
 import utc from "dayjs/plugin/utc"
 import {
-  FlatMetadataRequestSchema,
   MetadataSectionSchema,
   MetadatumSchema,
   NormResponseSchema,
@@ -16,7 +15,6 @@ import {
 } from "./utilities"
 
 import {
-  FlatMetadata,
   Metadata,
   MetadataSectionName,
   MetadataSections,
@@ -29,10 +27,6 @@ import {
 
 function identity<T>(data: T): T {
   return data
-}
-
-function encodeString(data?: string | null): string | null {
-  return data && data.length > 0 ? data : null
 }
 
 // Makes the assumption that we currently get a date string in the following
@@ -677,13 +671,5 @@ export function decodeNorm(norm: NormResponseSchema): Norm {
   return {
     metadataSections: decodeMetadataSections(metadataSections ?? []),
     ...stableData,
-  }
-}
-
-export function encodeFlatMetadata(
-  flatMetadata: FlatMetadata,
-): FlatMetadataRequestSchema {
-  return {
-    eli: encodeString(flatMetadata.eli),
   }
 }

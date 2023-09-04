@@ -5,8 +5,11 @@ import de.bund.digitalservice.ris.norms.application.port.input.ImportTestDataUse
 import de.bund.digitalservice.ris.norms.domain.entity.Norm
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.ApiConfiguration
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.encodeGuid
+import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.schema.ConclusionRequestSchema
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.schema.DocumentationRequestSchema
+import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.schema.FormulaRequestSchema
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.schema.MetadataSectionRequestSchema
+import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.schema.RecitalsRequestSchema
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.tags.Tag
@@ -48,14 +51,20 @@ class ImportTestDataController(private val importTestDataService: ImportTestData
 
   class RequestSchema {
     var metadataSections: Collection<MetadataSectionRequestSchema> = emptyList()
+    var recitals: RecitalsRequestSchema? = null
+    var formula: FormulaRequestSchema? = null
     var documentation: Collection<DocumentationRequestSchema> = emptyList()
+    var conclusion: ConclusionRequestSchema? = null
 
     fun toUseCaseData() =
         Norm(
             guid = UUID.randomUUID(),
             eGesetzgebung = false,
             metadataSections = metadataSections.map(MetadataSectionRequestSchema::toUseCaseData),
+            recitals = recitals?.toUseCaseData(),
+            formula = formula?.toUseCaseData(),
             documentation = documentation.map(DocumentationRequestSchema::toUseCaseData),
+            conclusion = conclusion?.toUseCaseData(),
         )
   }
 

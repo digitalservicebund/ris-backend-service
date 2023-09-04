@@ -11,6 +11,7 @@ dayjs.extend(utc)
 type MyFixtures = {
   documentNumber: string
   prefilledDocumentUnit: DocumentUnit
+  secondPrefilledDocumentUnit: DocumentUnit
   editorField: Locator
   pageWithBghUser: Page
 }
@@ -51,6 +52,35 @@ export const caselawTest = test.extend<MyFixtures>({
 
     await request.delete(
       `/api/v1/caselaw/documentunits/${prefilledDocumentUnit.uuid}`,
+    )
+  },
+
+  secondPrefilledDocumentUnit: async ({ request }, use) => {
+    const response = await request.get(`/api/v1/caselaw/documentunits/new`)
+    const secondPrefilledDocumentUnit = await response.json()
+    const updateResponse = await request.put(
+      `/api/v1/caselaw/documentunits/${secondPrefilledDocumentUnit.uuid}`,
+      {
+        data: {
+          ...secondPrefilledDocumentUnit,
+          coreData: {
+            ...secondPrefilledDocumentUnit.coreData,
+            court: {
+              type: "AG",
+              location: "Aachen",
+            },
+            fileNumbers: [generateString()],
+            documentType: { jurisShortcut: "AnU", label: "Anerkenntnisurteil" },
+            decisionDate: "2020-01-01T23:00:00Z",
+          },
+        },
+      },
+    )
+
+    await use(await updateResponse.json())
+
+    await request.delete(
+      `/api/v1/caselaw/documentunits/${secondPrefilledDocumentUnit.uuid}`,
     )
   },
 

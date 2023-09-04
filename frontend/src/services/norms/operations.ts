@@ -1,11 +1,7 @@
 import * as Sentry from "@sentry/vue"
-import {
-  decodeNorm,
-  encodeMetadataSections,
-  encodeFlatMetadata,
-} from "./conversions"
+import { decodeNorm, encodeMetadataSections } from "./conversions"
 import { NormListResponseSchema, NormResponseSchema } from "./schemas"
-import { FlatMetadata, MetadataSections, Norm } from "@/domain/norm"
+import { MetadataSections, Norm } from "@/domain/norm"
 import httpClient, { ServiceResponse } from "@/services/httpClient"
 import { ValidationError } from "@/shared/components/input/types"
 import errorMessages from "@/shared/i18n/errors.json"
@@ -54,7 +50,6 @@ export async function getNormByGuid(
 export async function editNormFrame(
   guid: string,
   metadataSections: MetadataSections,
-  flatMetadata: FlatMetadata,
 ): Promise<ServiceResponse<void>> {
   const headers = {
     Accept: "application/json",
@@ -62,7 +57,6 @@ export async function editNormFrame(
   }
 
   const body = {
-    ...encodeFlatMetadata(flatMetadata),
     metadataSections: encodeMetadataSections(metadataSections) ?? [],
   }
 

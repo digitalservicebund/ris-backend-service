@@ -19,7 +19,7 @@ fileignoreconfig:
 - filename: frontend/FRONTEND_STYLEGUIDE.md
   checksum: e6b8194eba2012f2a769c5a5d3577715a573b441a7b94e744c32b3149d0d3a93
 - filename: frontend/test/test-helper/dataGenerators.ts
-  checksum: a0170a09607d790e68ce0aef43c4d8f4f6dc17829b4dbefd75ad0c821344d9a2
+  checksum: a3d04d1168dcc221ba5fcd72e8d8bada60f48644c7586bde3a7602b748d0682c
 - filename: backend/src/test/kotlin/unit/adapter/input/restapi/controller/GetFileControllerTest.kt
   checksum: 527612bd680d9d2b7be5b55ad201bfbd94aea3b55d8dd97ae0ceedbee8cfe76d
 - filename: backend/src/test/kotlin/unit/application/service/GetFileServiceTest.kt
@@ -31,9 +31,9 @@ fileignoreconfig:
 - filename: backend/src/main/kotlin/de/bund/digitalservice/ris/norms/framework/adapter/input/restapi/controller/GetFileController.kt
   checksum: f989b3c9c176b1b985c2f78ca6ca13fa1403cbb69f367ae9b1cb8ea64d5f6747
 - filename: compose.yaml
-  checksum: 1a6807c6b63a78cf0194dce1986eece6ec1993e26c3aff58b97cb114c18693dc
+  checksum: 125c383f3e90422bac416c775da8e0bacadc657d94cddf488e0d4467e9ab9b17
 - filename: frontend/Dockerfile.prod
-  checksum: e446f285f0af84167c9b76cc882f196b5342a373b43d772f29aeb3f67d049fe1
+  checksum: 389da3cee358e45cb3a11bdb61b22edd78758f0c13b1cb31922784731d78b562
 scopeconfig:
 - scope: node
 allowed_patterns:

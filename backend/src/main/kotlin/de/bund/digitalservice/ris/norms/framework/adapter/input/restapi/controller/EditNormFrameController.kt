@@ -58,8 +58,6 @@ class EditNormFrameController(private val editNormFrameService: EditNormFrameUse
   class NormFramePropertiesRequestSchema {
     lateinit var metadataSections: List<MetadataSectionRequestSchema>
 
-    var eli: String? = null
-
     fun toUseCaseData(): EditNormFrameUseCase.NormFrameProperties =
         EditNormFrameUseCase.NormFrameProperties(
             this.metadataSections.map { it.toUseCaseData() },

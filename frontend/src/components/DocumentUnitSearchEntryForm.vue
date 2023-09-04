@@ -160,7 +160,11 @@ function resetErrors(id?: (typeof DocumentUnitSearchInput.fields)[number]) {
 }
 
 async function validateSearchInput() {
-  if (searchEntry.value?.decisionDateEnd && !searchEntry.value?.decisionDate) {
+  if (
+    searchEntry.value?.decisionDateEnd &&
+    !searchEntry.value?.decisionDate &&
+    !validationStore.getByField("decisionDate")
+  ) {
     validationStore.add("Startdatum fehlt", "decisionDate")
   }
 
@@ -170,15 +174,17 @@ async function validateSearchInput() {
     new Date(searchEntry.value.decisionDate) >
       new Date(searchEntry.value.decisionDateEnd)
   ) {
-    validationStore.add(
-      "Enddatum darf nich vor Startdatum liegen",
-      "decisionDateEnd",
-    )
+    !validationStore.getByField("decisionDateEnd") &&
+      validationStore.add(
+        "Enddatum darf nich vor Startdatum liegen",
+        "decisionDateEnd",
+      )
   } else if (
     validationStore.getByMessage("Enddatum darf nich vor Startdatum liegen")
       .length === 1
-  )
+  ) {
     validationStore.remove("decisionDateEnd")
+  }
 }
 
 function handleSearchButtonClicked() {
@@ -263,6 +269,7 @@ onMounted(async () => {
         <InputField
           id="decisionDate"
           v-slot="{ id, hasError }"
+          data-testid="decisionDateInput"
           label="Entscheidungsdatum"
           :validation-error="validationStore.getByField('decisionDate')"
           visually-hide-label
@@ -287,6 +294,7 @@ onMounted(async () => {
         <InputField
           id="decisionDateEnd"
           v-slot="{ id, hasError }"
+          data-testid="decisionDateEndInput"
           label="Entscheidungsdatum Ende"
           :validation-error="validationStore.getByField('decisionDateEnd')"
           visually-hide-label

@@ -129,35 +129,31 @@ describe("normsService", () => {
         .mocked(httpClient)
         .put.mockResolvedValueOnce({ status: 204, data: "" })
 
-      await editNormFrame(
-        "fake-guid",
-        {
-          [MetadataSectionName.LEAD]: [
-            {
-              [MetadatumType.LEAD_UNIT]: ["first", "second"],
-              [MetadatumType.LEAD_JURISDICTION]: ["text"],
-            },
-          ],
-          [MetadataSectionName.NORM_PROVIDER]: [
-            {
-              [MetadatumType.ENTITY]: ["new provider entity"],
-            },
-          ],
-          [MetadataSectionName.NORM]: [
-            {
-              [MetadatumType.OFFICIAL_LONG_TITLE]: ["new title"],
-              [MetadatumType.OFFICIAL_SHORT_TITLE]: ["short title"],
-              [MetadatumType.OFFICIAL_ABBREVIATION]: ["official abbreviation"],
-            },
-          ],
-          [MetadataSectionName.PUBLICATION_DATE]: [
-            {
-              [MetadatumType.DATE]: ["2022-11-14T23:00:00.000Z"],
-            },
-          ],
-        },
-        {},
-      )
+      await editNormFrame("fake-guid", {
+        [MetadataSectionName.LEAD]: [
+          {
+            [MetadatumType.LEAD_UNIT]: ["first", "second"],
+            [MetadatumType.LEAD_JURISDICTION]: ["text"],
+          },
+        ],
+        [MetadataSectionName.NORM_PROVIDER]: [
+          {
+            [MetadatumType.ENTITY]: ["new provider entity"],
+          },
+        ],
+        [MetadataSectionName.NORM]: [
+          {
+            [MetadatumType.OFFICIAL_LONG_TITLE]: ["new title"],
+            [MetadatumType.OFFICIAL_SHORT_TITLE]: ["short title"],
+            [MetadatumType.OFFICIAL_ABBREVIATION]: ["official abbreviation"],
+          },
+        ],
+        [MetadataSectionName.PUBLICATION_DATE]: [
+          {
+            [MetadatumType.DATE]: ["2022-11-14T23:00:00.000Z"],
+          },
+        ],
+      })
 
       expect(httpClientPut).toHaveBeenCalledOnce()
       expect(httpClientPut).toHaveBeenLastCalledWith(
@@ -239,7 +235,6 @@ describe("normsService", () => {
               ],
             },
           ],
-          eli: null,
         },
       )
     })
@@ -250,17 +245,13 @@ describe("normsService", () => {
         data: "",
       })
 
-      const response = await editNormFrame(
-        "fake-guid",
-        {
-          [MetadataSectionName.NORM]: [
-            {
-              [MetadatumType.OFFICIAL_LONG_TITLE]: ["new title"],
-            },
-          ],
-        },
-        {},
-      )
+      const response = await editNormFrame("fake-guid", {
+        [MetadataSectionName.NORM]: [
+          {
+            [MetadatumType.OFFICIAL_LONG_TITLE]: ["new title"],
+          },
+        ],
+      })
 
       expect(response.error?.title).toBe(
         "Dokumentationseinheit konnte nicht bearbeitet werden.",
@@ -273,17 +264,13 @@ describe("normsService", () => {
         error: { title: "error" },
       })
 
-      const response = await editNormFrame(
-        "fake-guid",
-        {
-          [MetadataSectionName.NORM]: [
-            {
-              [MetadatumType.OFFICIAL_LONG_TITLE]: ["new title"],
-            },
-          ],
-        },
-        {},
-      )
+      const response = await editNormFrame("fake-guid", {
+        [MetadataSectionName.NORM]: [
+          {
+            [MetadatumType.OFFICIAL_LONG_TITLE]: ["new title"],
+          },
+        ],
+      })
 
       expect(response.error?.title).toBe(
         "Dokumentationseinheit konnte nicht bearbeitet werden.",

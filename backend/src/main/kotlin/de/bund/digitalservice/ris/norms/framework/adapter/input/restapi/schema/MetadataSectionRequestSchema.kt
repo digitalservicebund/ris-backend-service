@@ -6,7 +6,7 @@ import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName
 class MetadataSectionRequestSchema {
   lateinit var name: MetadataSectionName
   var order: Int = 1
-  var metadata: List<MetadatumRequestSchema> = emptyList()
+  var metadata: List<MetadatumRequestSchema>? = null
   var sections: List<MetadataSectionRequestSchema>? = null
 
   fun toUseCaseData(): MetadataSection {
@@ -14,7 +14,7 @@ class MetadataSectionRequestSchema {
     return MetadataSection(
         name = this.name,
         order = order,
-        metadata = metadata.map(MetadatumRequestSchema::toUseCaseData),
+        metadata = metadata?.map(MetadatumRequestSchema::toUseCaseData) ?: emptyList(),
         sections = childSections,
     )
   }
