@@ -9,11 +9,12 @@ const { loadedNorm } = storeToRefs(loadedNormStore)
 
 <template>
   <div class="w-5/6 max-w-screen-lg">
-    <h2 class="ds-label-01-bold mb-32">Nichtamtliches Inhaltsverzeichnis</h2>
-    <TableOfContents
-      v-if="loadedNorm?.documentation"
-      :document-sections="loadedNorm?.documentation"
-      :margin-left="0"
-    />
+    <h1 class="ds-label-01-bold mb-32">Nichtamtliches Inhaltsverzeichnis</h1>
+    <div class="border-b border-gray-400">
+      <TableOfContents
+        v-if="loadedNorm?.documentation"
+        :document-sections="loadedNorm?.documentation"
+      />
+    </div>
   </div>
 </template>

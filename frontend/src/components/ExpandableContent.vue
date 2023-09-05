@@ -66,13 +66,13 @@ const sectionMargins: { [key: number]: string } = {
     <button
       :aria-labelledby="headerId"
       class="flex w-full justify-between focus:outline-none focus-visible:outline-blue-800"
-      :class="`${sectionMargins[marginLeft]}`"
       @click="toggleContentVisibility"
     >
       <span
         v-if="props.iconsOnLeft"
         :aria-label="ariaLabel"
         class="icon material-icons"
+        :class="`${sectionMargins[marginLeft]}`"
         data-testid="icons-open-close"
       >
         {{ iconName }}

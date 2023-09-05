@@ -111,18 +111,29 @@ describe("ExpandableContent", () => {
   })
 
   it("renders default icons on the right side", () => {
-    renderComponent()
+    renderComponent({
+      headerSlot: "<span>test header</span>",
+    })
+    const header = screen.getByText("test header")
 
     const icon = screen.getByTestId("icons-open-close")
 
-    expect(icon).toHaveClass("icon")
+    expect(icon.compareDocumentPosition(header)).toBe(
+      Node.DOCUMENT_POSITION_PRECEDING,
+    )
   })
 
   it("renders icons on the left side", () => {
-    renderComponent({ iconsOnLeft: true })
+    renderComponent({
+      headerSlot: "<span>test header</span>",
+      iconsOnLeft: true,
+    })
+    const header = screen.getByText("test header")
 
     const icon = screen.getByTestId("icons-open-close")
 
-    expect(icon).toHaveClass("icon")
+    expect(icon.compareDocumentPosition(header)).toBe(
+      Node.DOCUMENT_POSITION_FOLLOWING,
+    )
   })
 })
