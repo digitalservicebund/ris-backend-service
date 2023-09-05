@@ -7,12 +7,19 @@ function renderComponent(options?: {
   isExpanded?: boolean
   defaultSlot?: string
   headerSlot?: string
+  iconsOnLeft?: boolean
+  marginLeft?: number
 }) {
   const slots = {
     default: options?.defaultSlot ?? "",
     header: options?.headerSlot ?? "",
   }
-  const props = { header: options?.header, isExpanded: options?.isExpanded }
+  const props = {
+    header: options?.header,
+    isExpanded: options?.isExpanded,
+    iconsOnLeft: options?.iconsOnLeft,
+    marginLeft: options?.marginLeft,
+  }
   const utils = render(ExpandableContentnt, { slots, props })
   const user = userEvent.setup()
   return { user, ...utils }
@@ -87,5 +94,46 @@ describe("ExpandableContent", () => {
 
     expect(emitted()["update:isExpanded"]).toHaveLength(3)
     expect(emitted()["update:isExpanded"]).toEqual([[true], [false], [true]])
+  })
+
+  it("renders default 0 margin left", () => {
+    renderComponent()
+    const button = screen.getByRole("button")
+
+    expect(button).toHaveClass("ml-[0px]")
+  })
+
+  it("renders a non-default margin left for the button", () => {
+    renderComponent({ marginLeft: 40 })
+    const button = screen.getByRole("button")
+
+    expect(button).toHaveClass("ml-[40px]")
+  })
+
+  it("renders default icons on the right side", () => {
+    renderComponent({
+      headerSlot: "<span>test header</span>",
+    })
+    const header = screen.getByText("test header")
+
+    const icon = screen.getByTestId("icons-open-close")
+
+    expect(icon.compareDocumentPosition(header)).toBe(
+      Node.DOCUMENT_POSITION_PRECEDING,
+    )
+  })
+
+  it("renders icons on the left side", () => {
+    renderComponent({
+      headerSlot: "<span>test header</span>",
+      iconsOnLeft: true,
+    })
+    const header = screen.getByText("test header")
+
+    const icon = screen.getByTestId("icons-open-close")
+
+    expect(icon.compareDocumentPosition(header)).toBe(
+      Node.DOCUMENT_POSITION_FOLLOWING,
+    )
   })
 })

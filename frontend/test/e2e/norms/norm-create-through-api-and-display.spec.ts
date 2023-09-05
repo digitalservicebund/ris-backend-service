@@ -6,7 +6,6 @@ import {
   MetadataInputSection,
   expectMetadataInputSectionToHaveCorrectDataOnDisplay,
 } from "./utilities"
-import { Article, isArticle, isDocumentSection } from "@/domain/norm"
 
 async function expectSectionAppearsAfterScroll(
   page: Page,
@@ -30,55 +29,6 @@ async function expectSectionAppearsAfterScroll(
   }
 }
 
-testWithImportedNorm(
-  "Check display of norm complex",
-  async ({ page, normData, guid }) => {
-    await openNorm(page, guid)
-    await expect(page).toHaveURL(`/norms/norm/${guid}`)
-    await expect(
-      page.getByText(
-        normData.metadataSections?.NORM?.[0]?.OFFICIAL_LONG_TITLE?.[0] ?? "",
-      ),
-    ).toBeVisible()
-
-    expect(normData.documentation).toBeTruthy()
-    if (!normData.documentation) return
-
-    for (const documentation of Object.values(normData.documentation)) {
-      expect(documentation.marker).toBeTruthy()
-      if (!documentation.marker) return
-      await expect(
-        page.getByText(documentation.marker, { exact: true }),
-      ).toBeVisible()
-
-      if (documentation.heading) {
-        await expect(
-          page.getByText(documentation.heading, { exact: true }),
-        ).toBeVisible()
-      }
-
-      // @ts-expect-error GUID is omitted for simplicity in the tests, which makes
-      // TS complain when calling the guard. Since we don't care about the GUID we
-      // accept that it is undefined here.
-      if (isDocumentSection(documentation) && documentation.documentation) {
-        documentation.documentation
-          .filter((doc): doc is Article => isArticle(doc))
-          .forEach(async (article) => {
-            article.paragraphs.forEach(async (paragraph) => {
-              if (article.marker === undefined) {
-                await expect(page.getByText(paragraph.text)).toBeVisible()
-              } else {
-                await expect(
-                  page.getByText(article.marker + " " + paragraph.text),
-                ).toBeVisible()
-              }
-            })
-          })
-      }
-    }
-  },
-)
-
 // eslint-disable-next-line playwright/no-skipped-test
 testWithImportedNorm(
   "Check if frame fields are correctly displayed",
@@ -86,7 +36,6 @@ testWithImportedNorm(
     await openNorm(page, guid)
 
     // Outer menu
-    await expect(page.locator("a:has-text('Normenkomplex')")).toBeVisible()
     await expect(page.locator("a:has-text('Bestand')")).toBeVisible()
     await expect(page.locator("a:has-text('Export')")).toBeVisible()
     const locatorFrameButton = page.locator("a:has-text('Rahmen')")

@@ -3,7 +3,16 @@ import { importNormViaApi, loadJurisTestFile } from "./e2e-utils"
 import { normData } from "./testdata/norm_basic"
 import { FieldType, MetadataInputSection } from "./utilities"
 import { FOOTNOTE_LABELS } from "@/components/footnote/types"
-import { MetadataSectionName, Norm, NormCategory } from "@/domain/norm"
+import {
+  Article,
+  Conclusion,
+  DocumentSection,
+  MetadataSectionName,
+  MetadatumType,
+  Norm,
+  NormCategory,
+  Recitals,
+} from "@/domain/norm"
 
 type MyFixtures = {
   normData: NormData
@@ -57,6 +66,31 @@ type RecursiveOmit<Type, KeyToOmit extends PropertyKey> = Type extends {
 
 export type NormData = RecursiveOmit<Norm, "guid"> & {
   jurisZipFileName: string
+}
+
+export type TestNormNoGuid = RecursiveOmit<TestNorm, "guid">
+
+export type DocumentationNoGuid = RecursiveOmit<
+  Article | DocumentSection,
+  "guid"
+>
+
+export interface TestNorm {
+  recitals?: Recitals
+  documentation?: (Article | DocumentSection)[]
+  conclusion?: Conclusion
+  metadataSections?: TestMetadataSection[]
+}
+
+export type TestMetadataSection = {
+  name: string
+  sections?: TestMetadataSection[]
+  metadata?: TestMetadata[]
+}
+
+export type TestMetadata = {
+  type: MetadatumType
+  value: string
 }
 
 export const testWithImportedNorm = test.extend<MyFixtures>({

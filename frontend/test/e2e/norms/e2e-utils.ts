@@ -80,6 +80,21 @@ export async function importNormViaApi(
   return JSON.parse(body)
 }
 
+export async function importTestData(
+  request: APIRequestContext,
+  norm: object,
+): Promise<{ guid: string }> {
+  const response = await request.post(`/api/v1/norms/test-data`, {
+    headers: { "Content-Type": "application/json" },
+    data: norm,
+  })
+
+  expect(response.ok()).toBeTruthy()
+
+  const body = await response.text()
+  return JSON.parse(body)
+}
+
 export const openNorm = async (page: Page, guid: string) => {
   await page.goto(`/norms/norm/${guid}`)
 }

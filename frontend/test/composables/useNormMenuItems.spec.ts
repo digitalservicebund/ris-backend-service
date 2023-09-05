@@ -33,7 +33,6 @@ describe("useNormMenuItems", () => {
     )
 
     const topLebelNames = menuItems.value.map((item) => item.label)
-    expect(topLebelNames).toContain("Normenkomplex")
     expect(topLebelNames).toContain("Rahmen")
     expect(topLebelNames).toContain("Bestand")
     expect(topLebelNames).toContain("Export")
