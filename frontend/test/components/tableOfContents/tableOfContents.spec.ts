@@ -138,7 +138,7 @@ describe("TableOfContents", () => {
       marginLeft: 20,
     })
 
-    const iconSpan = screen.getByLabelText("Zuklappen")
+    const iconSpan = screen.getByTestId("icons-open-close")
 
     expect(iconSpan).toHaveClass("ml-[20px]")
   })

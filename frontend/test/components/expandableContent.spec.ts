@@ -97,17 +97,17 @@ describe("ExpandableContent", () => {
   })
 
   it("renders default 0 margin left", () => {
-    renderComponent()
-    const button = screen.getByRole("button")
+    renderComponent({ iconsOnLeft: true })
+    const iconSpan = screen.getByTestId("icons-open-close")
 
-    expect(button).toHaveClass("ml-[0px]")
+    expect(iconSpan).toHaveClass("ml-[0px]")
   })
 
   it("renders a non-default margin left for the button", () => {
-    renderComponent({ marginLeft: 40 })
-    const button = screen.getByRole("button")
+    renderComponent({ marginLeft: 40, iconsOnLeft: true })
+    const iconSpan = screen.getByTestId("icons-open-close")
 
-    expect(button).toHaveClass("ml-[40px]")
+    expect(iconSpan).toHaveClass("ml-[40px]")
   })
 
   it("renders default icons on the right side", () => {
