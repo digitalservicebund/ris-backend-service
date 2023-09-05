@@ -5,6 +5,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.JsonNode;
 import de.bund.digitalservice.ris.caselaw.RisWebTestClient;
 import de.bund.digitalservice.ris.caselaw.TestConfig;
 import de.bund.digitalservice.ris.caselaw.adapter.AuthService;
@@ -37,6 +40,7 @@ import de.bund.digitalservice.ris.caselaw.domain.PublicationReportRepository;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import java.time.Instant;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -45,6 +49,9 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.oauth2.client.registration.ReactiveClientRegistrationRepository;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.test.context.DynamicPropertyRegistry;
@@ -375,11 +382,11 @@ class ProcedureIntegrationTest {
         .exchange()
         .expectStatus()
         .is2xxSuccessful()
-        .expectBody(Procedure[].class)
+        .expectBody(new ParameterizedTypeReference<RestPageImpl<Procedure>>() {})
         .consumeWith(
             response -> {
               assertThat(response.getResponseBody()).hasSize(3);
-              assertThat(List.of(response.getResponseBody()).get(0).label())
+              assertThat(response.getResponseBody().getContent().get(0).label())
                   .isEqualTo("testProcedure3");
             });
   }
@@ -396,11 +403,12 @@ class ProcedureIntegrationTest {
         .exchange()
         .expectStatus()
         .is2xxSuccessful()
-        .expectBody(Procedure[].class)
+        .expectBody(new ParameterizedTypeReference<RestPageImpl<Procedure>>() {})
         .consumeWith(
             response -> {
               assertThat(response.getResponseBody()).hasSize(2);
-              assertThat(List.of(response.getResponseBody()).get(0).label()).isEqualTo("aaaccc");
+              assertThat(response.getResponseBody().getContent().get(0).label())
+                  .isEqualTo("aaaccc");
             });
 
     risWebTestClient
@@ -410,11 +418,12 @@ class ProcedureIntegrationTest {
         .exchange()
         .expectStatus()
         .is2xxSuccessful()
-        .expectBody(Procedure[].class)
+        .expectBody(new ParameterizedTypeReference<RestPageImpl<Procedure>>() {})
         .consumeWith(
             response -> {
               assertThat(response.getResponseBody()).hasSize(1);
-              assertThat(List.of(response.getResponseBody()).get(0).label()).isEqualTo("aaaccc");
+              assertThat(response.getResponseBody().getContent().get(0).label())
+                  .isEqualTo("aaaccc");
             });
   }
 
@@ -431,10 +440,10 @@ class ProcedureIntegrationTest {
         .exchange()
         .expectStatus()
         .is2xxSuccessful()
-        .expectBody(Procedure[].class)
+        .expectBody(new ParameterizedTypeReference<RestPageImpl<Procedure>>() {})
         .consumeWith(
             response -> {
-              assertThat(response.getResponseBody()).isEmpty();
+              assertThat(Objects.requireNonNull(response.getResponseBody()).getContent()).isEmpty();
             });
   }
 
@@ -454,5 +463,22 @@ class ProcedureIntegrationTest {
   private JPAProcedureDTO createProcedure(
       String label, JPADocumentationOfficeDTO documentationOffice) {
     return createProcedures(List.of(label), documentationOffice).get(0);
+  }
+
+  public static class RestPageImpl<T> extends PageImpl<T> {
+
+    @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
+    public RestPageImpl(
+        @JsonProperty("content") List<T> content,
+        @JsonProperty("totalElements") Long totalElements,
+        @JsonProperty("pageable") JsonNode pageable,
+        @JsonProperty("last") boolean last,
+        @JsonProperty("totalPages") int totalPages,
+        @JsonProperty("sort") JsonNode sort,
+        @JsonProperty("first") boolean first,
+        @JsonProperty("numberOfElements") int numberOfElements) {
+
+      super(content, Pageable.unpaged(), totalElements);
+    }
   }
 }

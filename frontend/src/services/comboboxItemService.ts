@@ -7,6 +7,7 @@ import {
   ComboboxInputModelType,
   ComboboxItem,
 } from "@/shared/components/input/types"
+import { Page } from "@/shared/components/Pagination.vue"
 import errorMessages from "@/shared/i18n/errors.json"
 
 enum Endpoint {
@@ -67,13 +68,15 @@ function formatDropdownItems(
       }))
     }
     case Endpoint.procedures: {
-      return (responseData as Procedure[]).map((item) => ({
-        label: item.label,
-        value: item,
-        additionalInformation: `${
-          item.documentUnitCount ?? 0
-        } Dokumentationseinheiten`,
-      }))
+      return (responseData as unknown as Page<Procedure>).content.map(
+        (item) => ({
+          label: item.label,
+          value: item,
+          additionalInformation: `${
+            item.documentUnitCount ?? 0
+          } Dokumentationseinheiten`,
+        }),
+      )
     }
   }
 }
