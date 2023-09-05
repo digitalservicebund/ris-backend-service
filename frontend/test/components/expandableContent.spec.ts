@@ -8,7 +8,7 @@ function renderComponent(options?: {
   defaultSlot?: string
   headerSlot?: string
   iconsOnLeft?: boolean
-  marginLeft?: number
+  marginLevel?: number
 }) {
   const slots = {
     default: options?.defaultSlot ?? "",
@@ -18,7 +18,7 @@ function renderComponent(options?: {
     header: options?.header,
     isExpanded: options?.isExpanded,
     iconsOnLeft: options?.iconsOnLeft,
-    marginLeft: options?.marginLeft,
+    marginLevel: options?.marginLevel,
   }
   const utils = render(ExpandableContentnt, { slots, props })
   const user = userEvent.setup()
@@ -103,11 +103,11 @@ describe("ExpandableContent", () => {
     expect(iconSpan).toHaveClass("ml-[0px]")
   })
 
-  it("renders a non-default margin left for the button", () => {
-    renderComponent({ marginLeft: 40, iconsOnLeft: true })
+  it("renders a non-default margin left for the icon span if icons on the left", () => {
+    renderComponent({ marginLevel: 2, iconsOnLeft: true })
     const iconSpan = screen.getByTestId("icons-open-close")
 
-    expect(iconSpan).toHaveClass("ml-[40px]")
+    expect(iconSpan).toHaveClass("ml-[44px]")
   })
 
   it("renders default icons on the right side", () => {

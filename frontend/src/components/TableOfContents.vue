@@ -4,19 +4,19 @@ import { Article, DocumentSection, isDocumentSection } from "@/domain/norm"
 
 const props = defineProps<{
   documentSections: (Article | DocumentSection)[]
-  marginLeft?: number
+  marginLevel?: number
 }>()
 
 const articleMargins: { [key: number]: string } = {
   0: "ml-[0px]",
-  20: "ml-[24px]",
-  40: "ml-[44px]",
-  60: "ml-[64px]",
-  80: "ml-[74px]",
-  100: "ml-[94px]",
-  120: "ml-[114px]",
-  140: "ml-[134px]",
-  160: "ml-[154px]",
+  1: "ml-[24px]",
+  2: "ml-[46px]",
+  3: "ml-[68px]",
+  4: "ml-[90px]",
+  5: "ml-[112px]",
+  6: "ml-[134px]",
+  7: "ml-[156px]",
+  8: "ml-[178px]",
 }
 </script>
 
@@ -33,7 +33,7 @@ const articleMargins: { [key: number]: string } = {
       close-icon-name="expand_more"
       icons-on-left
       is-expanded
-      :margin-left="marginLeft"
+      :margin-level="marginLevel"
       open-icon-name="chevron_right"
     >
       <template #header>
@@ -44,13 +44,13 @@ const articleMargins: { [key: number]: string } = {
       <TableOfContents
         v-if="doc.documentation"
         :document-sections="doc.documentation"
-        :margin-left="marginLeft ? marginLeft + 20 : 20"
+        :margin-level="marginLevel ? marginLevel + 1 : 1"
       />
     </ExpandableContent>
     <div v-else class="bg-gray-100 pb-4 pt-4">
       <p
         class="ds-label-02-reg pl-4 pr-4"
-        :class="`${articleMargins[marginLeft ? marginLeft : 0]}`"
+        :class="`${articleMargins[marginLevel ? marginLevel : 0]}`"
       >
         {{ doc.marker }} {{ doc.heading }}
       </p>

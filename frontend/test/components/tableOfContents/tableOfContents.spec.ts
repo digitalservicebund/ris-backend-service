@@ -5,11 +5,11 @@ import { Article, DocumentSection, DocumentSectionType } from "@/domain/norm"
 
 function renderComponent(options?: {
   documentSections: (Article | DocumentSection)[]
-  marginLeft?: number
+  marginLevel?: number
 }) {
   const props = {
     documentSections: options?.documentSections,
-    marginLeft: options?.marginLeft,
+    marginLevel: options?.marginLevel,
   }
   const utils = render(TableOfContents, { props })
   const user = userEvent.setup()
@@ -135,11 +135,11 @@ describe("TableOfContents", () => {
   it("it renders with some margin", async () => {
     renderComponent({
       documentSections: [firstPart],
-      marginLeft: 20,
+      marginLevel: 2,
     })
 
     const iconSpan = screen.getByTestId("icons-open-close")
 
-    expect(iconSpan).toHaveClass("ml-[20px]")
+    expect(iconSpan).toHaveClass("ml-[44px]")
   })
 })

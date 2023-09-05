@@ -9,7 +9,7 @@ interface Props {
   closeIconName?: string
   headerId?: string
   iconsOnLeft?: boolean
-  marginLeft?: number
+  marginLevel?: number
 }
 const props = withDefaults(defineProps<Props>(), {
   header: undefined,
@@ -19,7 +19,7 @@ const props = withDefaults(defineProps<Props>(), {
   headerId: "",
   headerClass: "",
   iconsOnLeft: false,
-  marginLeft: 0,
+  marginLevel: 0,
 })
 
 const emit = defineEmits<{
@@ -50,14 +50,14 @@ watch(localIsExpanded, () => emit("update:isExpanded", localIsExpanded.value))
 
 const sectionMargins: { [key: number]: string } = {
   0: "ml-[0px]",
-  20: "ml-[20px]",
-  40: "ml-[40px]",
-  60: "ml-[60px]",
-  80: "ml-[80px]",
-  100: "ml-[100px]",
-  120: "ml-[120px]",
-  140: "ml-[140px]",
-  160: "ml-[160px]",
+  1: "ml-[22px]",
+  2: "ml-[44px]",
+  3: "ml-[66px]",
+  4: "ml-[88px]",
+  5: "ml-[108px]",
+  6: "ml-[128px]",
+  7: "ml-[148px]",
+  8: "ml-[168px]",
 }
 </script>
 
@@ -72,7 +72,7 @@ const sectionMargins: { [key: number]: string } = {
         v-if="props.iconsOnLeft"
         :aria-label="ariaLabel"
         class="icon material-icons"
-        :class="`${sectionMargins[marginLeft]}`"
+        :class="`${sectionMargins[marginLevel]}`"
         data-testid="icons-open-close"
       >
         {{ iconName }}
