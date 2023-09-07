@@ -2,8 +2,10 @@ package de.bund.digitalservice.ris.caselaw.integration.tests;
 
 import static de.bund.digitalservice.ris.caselaw.AuthUtils.buildDefaultDocOffice;
 import static de.bund.digitalservice.ris.caselaw.AuthUtils.buildDocOffice;
+import static de.bund.digitalservice.ris.caselaw.domain.PublicationStatus.JURIS_PUBLISHED;
 import static de.bund.digitalservice.ris.caselaw.domain.PublicationStatus.PUBLISHED;
 import static de.bund.digitalservice.ris.caselaw.domain.PublicationStatus.PUBLISHING;
+import static de.bund.digitalservice.ris.caselaw.domain.PublicationStatus.TEST_DOC_UNIT;
 import static de.bund.digitalservice.ris.caselaw.domain.PublicationStatus.UNPUBLISHED;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.argThat;
@@ -63,6 +65,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Random;
 import java.util.UUID;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.AfterEach;
@@ -832,20 +835,30 @@ class DocumentUnitIntegrationTest {
 
   @Test
   void testSearchResultsAreDeterministic() {
-    Flux<DocumentUnitDTO> documentUnitDTOs =
-        Flux.range(0, 20)
-            .map(index -> UUID.randomUUID())
-            .map(
-                uuid ->
-                    DocumentUnitDTO.builder()
-                        .uuid(uuid)
-                        .creationtimestamp(Instant.now())
-                        .documentnumber(RandomStringUtils.random(10, true, true))
-                        .documentationOfficeId(documentationOfficeUuid)
-                        .build())
-            .flatMap(documentUnitDTO -> repository.save(documentUnitDTO));
-
-    documentUnitDTOs.blockLast();
+    PublicationStatus[] published =
+        new PublicationStatus[] {PUBLISHED, TEST_DOC_UNIT, PUBLISHING, JURIS_PUBLISHED};
+    Random random = new Random();
+    Flux.range(0, 20)
+        .map(index -> UUID.randomUUID())
+        .map(
+            uuid ->
+                DocumentUnitDTO.builder()
+                    .uuid(uuid)
+                    .creationtimestamp(Instant.now())
+                    .documentnumber(RandomStringUtils.random(10, true, true))
+                    .documentationOfficeId(documentationOfficeUuid)
+                    .build())
+        .flatMap(documentUnitDTO -> repository.save(documentUnitDTO))
+        .flatMap(
+            documentUnitDTO ->
+                documentUnitStatusRepository.save(
+                    DocumentUnitStatusDTO.builder()
+                        .newEntry(true)
+                        .id(UUID.randomUUID())
+                        .publicationStatus(published[random.nextInt(4)])
+                        .documentUnitId(documentUnitDTO.getUuid())
+                        .build()))
+        .blockLast();
     assertThat(repository.findAll().collectList().block()).hasSize(20);
 
     List<UUID> responseUUIDs = new ArrayList<>();

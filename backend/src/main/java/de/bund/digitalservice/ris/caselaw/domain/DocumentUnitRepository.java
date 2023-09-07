@@ -33,9 +33,6 @@ public interface DocumentUnitRepository {
 
   Mono<Long> countSearchByLinkedDocumentationUnit(LinkedDocumentationUnit linkedDocumentationUnit);
 
-  Mono<Long> countSearchByDocumentUnitSearchInput(
-      DocumentationOffice documentationOffice, DocumentUnitSearchInput searchInput);
-
   Page<DocumentationUnitSearchEntry> searchByDocumentUnitSearchInput(
       Pageable pageable,
       DocumentationOffice documentationOffice,

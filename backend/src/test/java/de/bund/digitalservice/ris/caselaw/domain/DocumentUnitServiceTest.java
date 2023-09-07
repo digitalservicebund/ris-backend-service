@@ -446,9 +446,6 @@ class DocumentUnitServiceTest {
     when(repository.searchByDocumentUnitSearchInput(
             pageRequest, documentationOffice, documentUnitSearchInput))
         .thenReturn(new PageImpl<>(List.of(documentationUnitSearchEntry)));
-    when(repository.countSearchByDocumentUnitSearchInput(
-            documentationOffice, documentUnitSearchInput))
-        .thenReturn(Mono.just(1L));
 
     Page<DocumentationUnitSearchEntry> documentationUnitSearchEntries =
         service.searchByDocumentUnitSearchInput(

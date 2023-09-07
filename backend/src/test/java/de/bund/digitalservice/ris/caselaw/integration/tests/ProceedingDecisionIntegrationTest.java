@@ -667,7 +667,15 @@ class ProceedingDecisionIntegrationTest {
             DocumentUnitStatus.builder().publicationStatus(PublicationStatus.PUBLISHED).build());
     var du3 =
         createDocumentUnit(
-            "Court3", "Berlin", date, List.of("AkteZ"), "EF", "DigitalService", null);
+            "Court3",
+            "Berlin",
+            date,
+            List.of("AkteZ"),
+            "EF",
+            "DigitalService",
+            DocumentUnitStatus.builder()
+                .publicationStatus(PublicationStatus.TEST_DOC_UNIT)
+                .build());
 
     var du4 =
         createDocumentUnit(
@@ -688,7 +696,17 @@ class ProceedingDecisionIntegrationTest {
             "EF",
             "CC-RIS",
             DocumentUnitStatus.builder().publicationStatus(PublicationStatus.PUBLISHED).build());
-    var du6 = createDocumentUnit("Court6", "Berlin", date, List.of("AkteZ"), "EF", "CC-RIS", null);
+    var du6 =
+        createDocumentUnit(
+            "Court6",
+            "Berlin",
+            date,
+            List.of("AkteZ"),
+            "EF",
+            "CC-RIS",
+            DocumentUnitStatus.builder()
+                .publicationStatus(PublicationStatus.JURIS_PUBLISHED)
+                .build());
 
     simulateAPICall(ProceedingDecision.builder().fileNumber("AkteZ").build())
         .jsonPath("$.content.length()")

@@ -1504,26 +1504,6 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
   }
 
   @Override
-  public Mono<Long> countSearchByDocumentUnitSearchInput(
-      DocumentationOffice documentationOffice, DocumentUnitSearchInput searchInput) {
-    if (log.isDebugEnabled()) {
-      log.debug("count for overview search: {}, {}", documentationOffice, searchInput);
-    }
-
-    return Mono.just(documentationOfficeRepository.findByLabel(documentationOffice.label()))
-        .flatMap(
-            docOffice ->
-                metadataRepository.countSearchByDocumentUnitSearchInput(
-                    docOffice.getId(),
-                    searchInput.documentNumberOrFileNumber(),
-                    searchInput.court() == null ? null : searchInput.court().type(),
-                    searchInput.court() == null ? null : searchInput.court().location(),
-                    searchInput.decisionDate(),
-                    searchInput.status() == null ? null : searchInput.status().publicationStatus(),
-                    searchInput.myDocOfficeOnly()));
-  }
-
-  @Override
   public Mono<Void> deleteIfOrphanedLinkedDocumentationUnit(UUID documentUnitUuid) {
     if (log.isDebugEnabled()) {
       log.debug("delete if orphaned linked documentation unit: {}", documentUnitUuid);
