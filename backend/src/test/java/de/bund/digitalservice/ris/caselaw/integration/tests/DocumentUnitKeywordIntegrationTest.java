@@ -11,8 +11,8 @@ import de.bund.digitalservice.ris.caselaw.adapter.AuthService;
 import de.bund.digitalservice.ris.caselaw.adapter.ContentRelatedIndexingController;
 import de.bund.digitalservice.ris.caselaw.adapter.FieldOfLawService;
 import de.bund.digitalservice.ris.caselaw.adapter.KeywordService;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPADocumentationOfficeDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPADocumentationOfficeRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationOfficeRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentUnitRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseKeywordRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitDTO;
@@ -75,14 +75,14 @@ class DocumentUnitKeywordIntegrationTest {
   @Autowired private RisWebTestClient risWebTestClient;
   @Autowired private DatabaseKeywordRepository keywordRepository;
   @Autowired private DatabaseDocumentUnitRepository documentUnitRepository;
-  @Autowired private JPADocumentationOfficeRepository documentationOfficeRepository;
+  @Autowired private DatabaseDocumentationOfficeRepository documentationOfficeRepository;
 
   @MockBean private DocumentUnitService documentUnitService;
   @MockBean private UserService userService;
   @MockBean ReactiveClientRegistrationRepository clientRegistrationRepository;
 
   private static final UUID TEST_UUID = UUID.fromString("88888888-4444-4444-4444-121212121212");
-  private JPADocumentationOfficeDTO docOfficeDTO;
+  private DocumentationOfficeDTO docOfficeDTO;
 
   @BeforeEach
   void setUp() {

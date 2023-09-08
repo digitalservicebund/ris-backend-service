@@ -19,7 +19,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentNumberService;
 import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentUnitStatusService;
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentUnitController;
 import de.bund.digitalservice.ris.caselaw.adapter.DocxConverterService;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPADocumentationOfficeRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationOfficeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDeviatingDecisionDateRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentUnitMetadataRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentUnitRepository;
@@ -124,7 +124,7 @@ class DocumentUnitIntegrationTest {
   @Autowired private DatabaseDocumentTypeRepository databaseDocumentTypeRepository;
   @Autowired private DatabaseIncorrectCourtRepository incorrectCourtRepository;
   @Autowired private DatabaseDocumentUnitStatusRepository documentUnitStatusRepository;
-  @Autowired private JPADocumentationOfficeRepository documentationOfficeRepository;
+  @Autowired private DatabaseDocumentationOfficeRepository documentationOfficeRepository;
 
   @Autowired private DatabasePublicationReportRepository databasePublishReportRepository;
 

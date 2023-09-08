@@ -18,7 +18,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity(name = "procedure_link")
-public class JPAProcedureLinkDTO {
+public class ProcedureLinkDTO {
   @Id @GeneratedValue private UUID id;
 
   @Column(name = "created_at", insertable = false, updatable = false)
@@ -29,5 +29,5 @@ public class JPAProcedureLinkDTO {
 
   @ManyToOne()
   @JoinColumn(name = "procedure_id", referencedColumnName = "id")
-  JPAProcedureDTO procedureDTO;
+  ProcedureDTO procedureDTO;
 }

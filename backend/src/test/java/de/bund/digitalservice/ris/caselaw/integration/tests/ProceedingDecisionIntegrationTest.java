@@ -14,8 +14,8 @@ import de.bund.digitalservice.ris.caselaw.adapter.DocumentUnitController;
 import de.bund.digitalservice.ris.caselaw.adapter.DocxConverterService;
 import de.bund.digitalservice.ris.caselaw.adapter.KeycloakUserService;
 import de.bund.digitalservice.ris.caselaw.adapter.ProceedingDecisionController;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPADocumentationOfficeDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPADocumentationOfficeRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationOfficeRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentUnitMetadataRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentUnitRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentUnitStatusRepository;
@@ -103,7 +103,7 @@ class ProceedingDecisionIntegrationTest {
   @Autowired private DatabaseDocumentationUnitLinkRepository linkRepository;
   @Autowired private FileNumberRepository fileNumberRepository;
   @Autowired private DatabaseDocumentTypeRepository databaseDocumentTypeRepository;
-  @Autowired private JPADocumentationOfficeRepository documentationOfficeRepository;
+  @Autowired private DatabaseDocumentationOfficeRepository documentationOfficeRepository;
   @Autowired private DatabaseDocumentUnitStatusRepository statusRepository;
 
   @Autowired private DatabasePublicationReportRepository databasePublishReportRepository;
@@ -794,7 +794,7 @@ class ProceedingDecisionIntegrationTest {
       documentTypeId = databaseDocumentTypeRepository.save(documentTypeDTO).block().getId();
     }
 
-    JPADocumentationOfficeDTO documentOffice =
+    DocumentationOfficeDTO documentOffice =
         documentationOfficeRepository.findByLabel(documentOfficeLabel);
     assertThat(documentOffice).isNotNull();
 

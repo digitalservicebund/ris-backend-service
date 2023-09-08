@@ -1,12 +1,12 @@
 package de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc;
 
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationOfficeRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseProcedureLinkRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseProcedureRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitSearchEntryDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPADocumentationOfficeDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPADocumentationOfficeRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPAProcedureDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPAProcedureLinkDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPAProcedureLinkRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPAProcedureRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ProcedureDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ProcedureLinkDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitDTO.DocumentUnitDTOBuilder;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.CourtDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DatabaseCitationStyleRepository;
@@ -84,13 +84,13 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
   private final DatabaseDocumentUnitFieldsOfLawRepository documentUnitFieldsOfLawRepository;
   private final DatabaseKeywordRepository keywordRepository;
   private final DatabaseDocumentUnitNormRepository documentUnitNormRepository;
-  private final JPADocumentationOfficeRepository documentationOfficeRepository;
+  private final DatabaseDocumentationOfficeRepository documentationOfficeRepository;
   private final DatabaseDocumentUnitStatusRepository databaseDocumentUnitStatusRepository;
   private final DatabaseNormAbbreviationRepository normAbbreviationRepository;
   private final DatabaseDocumentationUnitLinkRepository documentationUnitLinkRepository;
   private final DatabaseCitationStyleRepository citationStyleRepository;
-  private final JPAProcedureRepository procedureRepository;
-  private final JPAProcedureLinkRepository procedureLinkRepository;
+  private final DatabaseProcedureRepository procedureRepository;
+  private final DatabaseProcedureLinkRepository procedureLinkRepository;
   private final EntityManager entityManager;
 
   public PostgresDocumentUnitRepositoryImpl(
@@ -111,9 +111,9 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
       DatabaseNormAbbreviationRepository normAbbreviationRepository,
       DatabaseDocumentationUnitLinkRepository documentationUnitLinkRepository,
       DatabaseCitationStyleRepository citationStyleRepository,
-      JPADocumentationOfficeRepository documentationOfficeRepository,
-      JPAProcedureRepository procedureRepository,
-      JPAProcedureLinkRepository procedureLinkRepository,
+      DatabaseDocumentationOfficeRepository documentationOfficeRepository,
+      DatabaseProcedureRepository procedureRepository,
+      DatabaseProcedureLinkRepository procedureLinkRepository,
       EntityManager entityManager) {
 
     this.repository = repository;
@@ -742,7 +742,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
             procedureDTO -> {
               if (!areCurrentlyLinked(documentUnitDTO, procedureDTO)) {
                 procedureLinkRepository.save(
-                    JPAProcedureLinkDTO.builder()
+                    ProcedureLinkDTO.builder()
                         .procedureDTO(procedureDTO)
                         .documentationUnitId(documentUnitDTO.uuid)
                         .build());
@@ -754,9 +754,8 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
     return Mono.just(documentUnitDTO);
   }
 
-  private JPAProcedureDTO findOrCreateProcedure(
-      Procedure procedure, String documentationOfficeLabel) {
-    JPADocumentationOfficeDTO documentationOfficeDTO =
+  private ProcedureDTO findOrCreateProcedure(Procedure procedure, String documentationOfficeLabel) {
+    DocumentationOfficeDTO documentationOfficeDTO =
         documentationOfficeRepository.findByLabel(documentationOfficeLabel);
 
     return Optional.ofNullable(
@@ -765,14 +764,13 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
         .orElseGet(
             () ->
                 procedureRepository.save(
-                    JPAProcedureDTO.builder()
+                    ProcedureDTO.builder()
                         .label(procedure.label())
                         .documentationOffice(documentationOfficeDTO)
                         .build()));
   }
 
-  private boolean areCurrentlyLinked(
-      DocumentUnitDTO documentUnitDTO, JPAProcedureDTO procedureDTO) {
+  private boolean areCurrentlyLinked(DocumentUnitDTO documentUnitDTO, ProcedureDTO procedureDTO) {
     return Optional.ofNullable(
             procedureLinkRepository.findFirstByDocumentationUnitIdOrderByCreatedAtDesc(
                 documentUnitDTO.uuid))
@@ -1153,7 +1151,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
     Optional.ofNullable(
             procedureLinkRepository.findFirstByDocumentationUnitIdOrderByCreatedAtDesc(
                 documentUnitDTO.uuid))
-        .map(JPAProcedureLinkDTO::getProcedureDTO)
+        .map(ProcedureLinkDTO::getProcedureDTO)
         .ifPresent(documentUnitDTO::setProcedure);
 
     return Mono.just(documentUnitDTO);
@@ -1166,8 +1164,8 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
             .findAllByDocumentationUnitIdOrderByCreatedAtDesc(documentUnitDTO.uuid)
             .stream()
             .skip(1)
-            .map(JPAProcedureLinkDTO::getProcedureDTO)
-            .map(JPAProcedureDTO::getLabel)
+            .map(ProcedureLinkDTO::getProcedureDTO)
+            .map(ProcedureDTO::getLabel)
             .toList();
 
     documentUnitDTO.setPreviousProcedures(previousProcedures.isEmpty() ? null : previousProcedures);
@@ -1278,7 +1276,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
       log.debug("Find by overview search: {}, {}", documentationOffice, searchInput);
     }
 
-    JPADocumentationOfficeDTO documentationOfficeDTO =
+    DocumentationOfficeDTO documentationOfficeDTO =
         documentationOfficeRepository.findByLabel(documentationOffice.label());
 
     CriteriaBuilder builder = entityManager.getCriteriaBuilder();
@@ -1314,7 +1312,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
   @NotNull
   private static Predicate[] getPredicates(
       DocumentUnitSearchInput searchInput,
-      JPADocumentationOfficeDTO documentationOfficeDTO,
+      DocumentationOfficeDTO documentationOfficeDTO,
       CriteriaBuilder builder,
       Root<DocumentationUnitSearchEntryDTO> root) {
     List<Predicate> restrictions = new ArrayList<>();

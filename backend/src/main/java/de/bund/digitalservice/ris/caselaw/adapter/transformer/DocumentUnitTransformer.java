@@ -1,7 +1,7 @@
 package de.bund.digitalservice.ris.caselaw.adapter.transformer;
 
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPADocumentationOfficeDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPAProcedureDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ProcedureDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DeviatingDecisionDateDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DeviatingEcliDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitDTO;
@@ -141,14 +141,14 @@ public class DocumentUnitTransformer {
     return court;
   }
 
-  static Procedure getProcedure(JPAProcedureDTO procedureDTO) {
+  static Procedure getProcedure(ProcedureDTO procedureDTO) {
     return Optional.ofNullable(procedureDTO)
         .map(dto -> Procedure.builder().label(dto.getLabel()).build())
         .orElse(null);
   }
 
   private static DocumentationOffice getDocumentationOffice(
-      JPADocumentationOfficeDTO documentationOfficeDTO) {
+      DocumentationOfficeDTO documentationOfficeDTO) {
 
     if (documentationOfficeDTO == null) {
       return null;

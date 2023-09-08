@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity(name = "documentation_office")
-public class JPADocumentationOfficeDTO {
+public class DocumentationOfficeDTO {
   @Id private UUID id;
 
   @Column(name = "label")

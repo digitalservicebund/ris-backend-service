@@ -18,7 +18,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity(name = "procedure")
-public class JPAProcedureDTO {
+public class ProcedureDTO {
   @Id @GeneratedValue private UUID id;
 
   @Column(name = "name")
@@ -29,5 +29,5 @@ public class JPAProcedureDTO {
 
   @ManyToOne()
   @JoinColumn(name = "documentation_office_id", referencedColumnName = "id")
-  JPADocumentationOfficeDTO documentationOffice;
+  DocumentationOfficeDTO documentationOffice;
 }

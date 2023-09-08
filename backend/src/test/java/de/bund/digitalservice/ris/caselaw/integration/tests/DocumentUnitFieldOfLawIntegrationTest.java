@@ -11,8 +11,8 @@ import de.bund.digitalservice.ris.caselaw.adapter.AuthService;
 import de.bund.digitalservice.ris.caselaw.adapter.ContentRelatedIndexingController;
 import de.bund.digitalservice.ris.caselaw.adapter.FieldOfLawService;
 import de.bund.digitalservice.ris.caselaw.adapter.KeywordService;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPADocumentationOfficeDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPADocumentationOfficeRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationOfficeRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentUnitFieldsOfLawRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentUnitRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitDTO;
@@ -79,13 +79,13 @@ class DocumentUnitFieldOfLawIntegrationTest {
   @Autowired private DatabaseFieldOfLawRepository fieldOfLawRepository;
   @Autowired private DatabaseDocumentUnitRepository documentUnitRepository;
   @Autowired private DatabaseDocumentUnitFieldsOfLawRepository documentUnitFieldsOfLawRepository;
-  @Autowired private JPADocumentationOfficeRepository documentationOfficeRepository;
+  @Autowired private DatabaseDocumentationOfficeRepository documentationOfficeRepository;
 
   @MockBean private DocumentUnitService documentUnitService;
   @MockBean private UserService userService;
   @MockBean ReactiveClientRegistrationRepository clientRegistrationRepository;
 
-  private JPADocumentationOfficeDTO docOfficeDTO;
+  private DocumentationOfficeDTO docOfficeDTO;
 
   @BeforeEach
   void setUp() {

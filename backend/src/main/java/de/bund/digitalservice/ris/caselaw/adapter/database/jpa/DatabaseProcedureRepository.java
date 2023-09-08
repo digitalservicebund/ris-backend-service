@@ -10,15 +10,15 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface JPAProcedureRepository extends JpaRepository<JPAProcedureDTO, UUID> {
+public interface DatabaseProcedureRepository extends JpaRepository<ProcedureDTO, UUID> {
 
-  JPAProcedureDTO findByLabelAndDocumentationOfficeOrderByCreatedAtDesc(
-      String label, JPADocumentationOfficeDTO documentationOfficeDTO);
+  ProcedureDTO findByLabelAndDocumentationOfficeOrderByCreatedAtDesc(
+      String label, DocumentationOfficeDTO documentationOfficeDTO);
 
   @Query(
       "SELECT p FROM procedure p WHERE (:label IS NULL OR p.label LIKE %:label%) AND p.documentationOffice = :documentationOffice")
-  Page<JPAProcedureDTO> findByLabelContainingAndDocumentationOffice(
+  Page<ProcedureDTO> findByLabelContainingAndDocumentationOffice(
       @Param("label") Optional<String> label,
-      @Param("documentationOffice") JPADocumentationOfficeDTO documentationOfficeDTO,
+      @Param("documentationOffice") DocumentationOfficeDTO documentationOfficeDTO,
       Pageable pageable);
 }

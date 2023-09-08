@@ -16,11 +16,11 @@ import de.bund.digitalservice.ris.caselaw.adapter.DocxConverterService;
 import de.bund.digitalservice.ris.caselaw.adapter.KeycloakUserService;
 import de.bund.digitalservice.ris.caselaw.adapter.ProcedureController;
 import de.bund.digitalservice.ris.caselaw.adapter.ProcedureService;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPADocumentationOfficeDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPADocumentationOfficeRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPAProcedureDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPAProcedureLinkRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPAProcedureRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationOfficeRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseProcedureLinkRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseProcedureRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ProcedureDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentUnitRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.PostgresDocumentUnitRepositoryImpl;
@@ -91,9 +91,9 @@ class ProcedureIntegrationTest {
 
   @Autowired private RisWebTestClient risWebTestClient;
   @Autowired private DatabaseDocumentUnitRepository documentUnitRepository;
-  @Autowired private JPADocumentationOfficeRepository documentationOfficeRepository;
-  @Autowired private JPAProcedureRepository repository;
-  @Autowired private JPAProcedureLinkRepository linkRepository;
+  @Autowired private DatabaseDocumentationOfficeRepository documentationOfficeRepository;
+  @Autowired private DatabaseProcedureRepository repository;
+  @Autowired private DatabaseProcedureLinkRepository linkRepository;
 
   @MockBean private DocumentNumberService numberService;
   @MockBean private DocumentUnitStatusService statusService;
@@ -105,7 +105,7 @@ class ProcedureIntegrationTest {
   @MockBean private DocxConverterService docxConverterService;
 
   private final DocumentationOffice docOffice = buildDefaultDocOffice();
-  private JPADocumentationOfficeDTO documentationOfficeDTO;
+  private DocumentationOfficeDTO documentationOfficeDTO;
 
   @BeforeEach
   void setUp() {
@@ -173,7 +173,7 @@ class ProcedureIntegrationTest {
 
   @Test
   void testAddSameProcedure() {
-    JPAProcedureDTO procedureDTO = createProcedure("testProcedure", documentationOfficeDTO);
+    ProcedureDTO procedureDTO = createProcedure("testProcedure", documentationOfficeDTO);
     assertThat(repository.findAll()).hasSize(1);
 
     DocumentUnitDTO dto =
@@ -327,7 +327,7 @@ class ProcedureIntegrationTest {
 
   @Test
   void testAddProcedureWithSameNameToDifferentOffice() {
-    JPADocumentationOfficeDTO bghDocOfficeDTO = documentationOfficeRepository.findByLabel("BGH");
+    DocumentationOfficeDTO bghDocOfficeDTO = documentationOfficeRepository.findByLabel("BGH");
     createProcedure("testProcedure", bghDocOfficeDTO);
     assertThat(repository.findAll()).hasSize(1);
 
@@ -429,7 +429,7 @@ class ProcedureIntegrationTest {
 
   @Test
   void testProcedureControllerReturnsPerDocOffice() {
-    JPADocumentationOfficeDTO bghDocOfficeDTO = documentationOfficeRepository.findByLabel("BGH");
+    DocumentationOfficeDTO bghDocOfficeDTO = documentationOfficeRepository.findByLabel("BGH");
     createProcedures(List.of("procedure1", "procedure2", "procedure3"), bghDocOfficeDTO);
     assertThat(repository.findAll()).hasSize(3);
 
@@ -447,21 +447,20 @@ class ProcedureIntegrationTest {
             });
   }
 
-  private List<JPAProcedureDTO> createProcedures(
-      List<String> labels, JPADocumentationOfficeDTO documentationOffice) {
+  private List<ProcedureDTO> createProcedures(
+      List<String> labels, DocumentationOfficeDTO documentationOffice) {
     return labels.stream()
         .map(
             label ->
                 repository.save(
-                    JPAProcedureDTO.builder()
+                    ProcedureDTO.builder()
                         .documentationOffice(documentationOffice)
                         .label(label)
                         .build()))
         .toList();
   }
 
-  private JPAProcedureDTO createProcedure(
-      String label, JPADocumentationOfficeDTO documentationOffice) {
+  private ProcedureDTO createProcedure(String label, DocumentationOfficeDTO documentationOffice) {
     return createProcedures(List.of(label), documentationOffice).get(0);
   }
 

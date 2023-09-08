@@ -8,7 +8,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface JPAProcedureLinkRepository extends JpaRepository<JPAProcedureLinkDTO, UUID> {
+public interface DatabaseProcedureLinkRepository extends JpaRepository<ProcedureLinkDTO, UUID> {
 
   String QUERY_ACTIVE_PROCEDURE_LINKS_BY_PROCEDURE =
       "FROM procedure_link pl "
@@ -19,10 +19,9 @@ public interface JPAProcedureLinkRepository extends JpaRepository<JPAProcedureLi
           + ") subq "
           + "ON pl.documentation_unit_id = subq.documentation_unit_id AND pl.created_at = subq.latest_time";
 
-  JPAProcedureLinkDTO findFirstByDocumentationUnitIdOrderByCreatedAtDesc(UUID documentationUnitId);
+  ProcedureLinkDTO findFirstByDocumentationUnitIdOrderByCreatedAtDesc(UUID documentationUnitId);
 
-  List<JPAProcedureLinkDTO> findAllByDocumentationUnitIdOrderByCreatedAtDesc(
-      UUID documentationUnitId);
+  List<ProcedureLinkDTO> findAllByDocumentationUnitIdOrderByCreatedAtDesc(UUID documentationUnitId);
 
   @Query(
       value =
@@ -30,7 +29,7 @@ public interface JPAProcedureLinkRepository extends JpaRepository<JPAProcedureLi
               + QUERY_ACTIVE_PROCEDURE_LINKS_BY_PROCEDURE
               + " WHERE pl.procedure_id = :procedureId",
       nativeQuery = true)
-  List<JPAProcedureLinkDTO> findLatestProcedureLinksByProcedure(
+  List<ProcedureLinkDTO> findLatestProcedureLinksByProcedure(
       @Param("procedureId") UUID procedureId);
 
   @Query(

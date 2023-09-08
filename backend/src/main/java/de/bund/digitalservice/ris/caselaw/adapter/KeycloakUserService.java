@@ -1,6 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPADocumentationOfficeRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationOfficeRepository;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.User;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
@@ -14,7 +14,7 @@ import reactor.core.publisher.Mono;
 
 @Service
 public class KeycloakUserService implements UserService {
-  private final JPADocumentationOfficeRepository documentationOfficeRepository;
+  private final DatabaseDocumentationOfficeRepository documentationOfficeRepository;
 
   private static final Map<String, String> documentationCenterClaims =
       Map.ofEntries(
@@ -30,7 +30,7 @@ public class KeycloakUserService implements UserService {
           Map.entry("/DigitalService", "DigitalService"),
           Map.entry("/CC-RIS", "CC-RIS"));
 
-  public KeycloakUserService(JPADocumentationOfficeRepository documentationOfficeRepository) {
+  public KeycloakUserService(DatabaseDocumentationOfficeRepository documentationOfficeRepository) {
     this.documentationOfficeRepository = documentationOfficeRepository;
   }
 

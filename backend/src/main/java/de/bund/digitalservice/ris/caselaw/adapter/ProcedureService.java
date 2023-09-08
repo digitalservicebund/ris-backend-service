@@ -1,10 +1,10 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationOfficeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitSearchRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPADocumentationOfficeRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPAProcedureLinkDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPAProcedureLinkRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPAProcedureRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseProcedureLinkRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseProcedureRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ProcedureLinkDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationUnitSearchEntryTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitSearchEntry;
@@ -17,16 +17,16 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class ProcedureService {
-  private final JPAProcedureRepository repository;
-  private final JPAProcedureLinkRepository linkRepository;
+  private final DatabaseProcedureRepository repository;
+  private final DatabaseProcedureLinkRepository linkRepository;
   private final DatabaseDocumentationUnitSearchRepository documentUnitRepository;
-  private final JPADocumentationOfficeRepository documentationOfficeRepository;
+  private final DatabaseDocumentationOfficeRepository documentationOfficeRepository;
 
   public ProcedureService(
-      JPAProcedureRepository repository,
-      JPAProcedureLinkRepository linkRepository,
+      DatabaseProcedureRepository repository,
+      DatabaseProcedureLinkRepository linkRepository,
       DatabaseDocumentationUnitSearchRepository documentUnitRepository,
-      JPADocumentationOfficeRepository documentationOfficeRepository) {
+      DatabaseDocumentationOfficeRepository documentationOfficeRepository) {
     this.repository = repository;
     this.linkRepository = linkRepository;
     this.documentUnitRepository = documentUnitRepository;
@@ -58,7 +58,7 @@ public class ProcedureService {
                     documentationOfficeRepository.findByLabel(documentationOffice.label()))
                 .getId())
         .stream()
-        .map(JPAProcedureLinkDTO::getDocumentationUnitId)
+        .map(ProcedureLinkDTO::getDocumentationUnitId)
         .map(documentUnitRepository::findById)
         .filter(Optional::isPresent)
         .map(Optional::get)

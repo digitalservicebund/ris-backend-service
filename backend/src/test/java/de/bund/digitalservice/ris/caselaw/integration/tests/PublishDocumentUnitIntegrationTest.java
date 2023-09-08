@@ -13,7 +13,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.DocxConverterService;
 import de.bund.digitalservice.ris.caselaw.adapter.KeycloakUserService;
 import de.bund.digitalservice.ris.caselaw.adapter.MockXmlExporter;
 import de.bund.digitalservice.ris.caselaw.adapter.XmlEMailPublishService;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPADocumentationOfficeRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationOfficeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentUnitRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentUnitStatusRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabasePublicationReportRepository;
@@ -96,7 +96,7 @@ class PublishDocumentUnitIntegrationTest {
   @Autowired private DatabaseDocumentUnitRepository repository;
   @Autowired private DatabaseXmlPublicationRepository xmlPublicationRepository;
   @Autowired private DatabaseDocumentUnitStatusRepository documentUnitStatusRepository;
-  @Autowired private JPADocumentationOfficeRepository documentationOfficeRepository;
+  @Autowired private DatabaseDocumentationOfficeRepository documentationOfficeRepository;
   @Autowired private DatabasePublicationReportRepository databasePublishReportRepository;
 
   @MockBean ReactiveClientRegistrationRepository clientRegistrationRepository;

@@ -13,8 +13,8 @@ import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentUnitStatusServ
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentUnitController;
 import de.bund.digitalservice.ris.caselaw.adapter.DocxConverterService;
 import de.bund.digitalservice.ris.caselaw.adapter.KeycloakUserService;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPADocumentationOfficeDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPADocumentationOfficeRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationOfficeRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentUnitMetadataRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentUnitRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentUnitStatusRepository;
@@ -90,7 +90,7 @@ class DocumentUnitListEntryIntegrationTest {
   @Autowired private DatabaseDocumentUnitStatusRepository statusRepository;
   @Autowired private DatabaseDocumentUnitMetadataRepository listEntryRepository;
   @Autowired private FileNumberRepository fileNumberRepository;
-  @Autowired private JPADocumentationOfficeRepository documentationOfficeRepository;
+  @Autowired private DatabaseDocumentationOfficeRepository documentationOfficeRepository;
 
   @MockBean S3AsyncClient s3AsyncClient;
   @MockBean EmailPublishService publishService;
@@ -98,7 +98,7 @@ class DocumentUnitListEntryIntegrationTest {
   @MockBean UserService userService;
   @MockBean ReactiveClientRegistrationRepository clientRegistrationRepository;
 
-  private JPADocumentationOfficeDTO docOfficeDTO;
+  private DocumentationOfficeDTO docOfficeDTO;
 
   @BeforeEach
   void setUp() {

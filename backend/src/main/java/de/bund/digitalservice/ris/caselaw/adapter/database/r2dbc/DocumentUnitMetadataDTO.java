@@ -1,7 +1,7 @@
 package de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc;
 
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPADocumentationOfficeDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPAProcedureDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ProcedureDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DocumentTypeDTO;
 import de.bund.digitalservice.ris.caselaw.domain.DataSource;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatus;
@@ -72,13 +72,13 @@ public class DocumentUnitMetadataDTO {
   @Column("documentation_office_id")
   private UUID documentationOfficeId;
 
-  @Transient private JPADocumentationOfficeDTO documentationOffice;
+  @Transient private DocumentationOfficeDTO documentationOffice;
 
   @Transient private List<FileNumberDTO> fileNumbers;
 
   @Transient private DocumentUnitStatus status;
 
-  @Transient private JPAProcedureDTO procedure;
+  @Transient private ProcedureDTO procedure;
 
   @Transient private List<String> previousProcedures;
 }

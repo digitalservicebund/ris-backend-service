@@ -5,8 +5,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface JPADocumentationOfficeRepository
-    extends JpaRepository<JPADocumentationOfficeDTO, UUID> {
+public interface DatabaseDocumentationOfficeRepository
+    extends JpaRepository<DocumentationOfficeDTO, UUID> {
 
-  JPADocumentationOfficeDTO findByLabel(String label);
+  DocumentationOfficeDTO findByLabel(String label);
 }
