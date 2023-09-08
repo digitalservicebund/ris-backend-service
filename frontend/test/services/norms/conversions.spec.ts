@@ -2,12 +2,18 @@ import {
   MetadatumType,
   MetadataSectionName,
   MetadataSections,
+  DocumentSectionType,
 } from "@/domain/norm"
 import {
+  decodeDocumentation,
   decodeMetadataSections,
   encodeMetadataSections,
 } from "@/services/norms/conversions"
-import { MetadataSectionSchema } from "@/services/norms/schemas"
+import {
+  ArticleSchema,
+  DocumentSectionSchema,
+  MetadataSectionSchema,
+} from "@/services/norms/schemas"
 
 describe("conversions", () => {
   describe("decodeMetadataSections()", () => {
@@ -576,5 +582,245 @@ describe("conversions", () => {
     for (const name in MetadataSectionName) {
       expect(Object.values(MetadatumType)).not.includes(name)
     }
+  })
+
+  describe("decodeDocumentation()", () => {
+    it("sorts documentation", () => {
+      const encoded: (ArticleSchema | DocumentSectionSchema)[] = [
+        {
+          guid: "guid",
+          order: 1,
+          type: DocumentSectionType.PART,
+          marker: "Teil II",
+          heading: "Dies ist der zweiter Teil",
+          documentation: [
+            {
+              guid: "guid",
+              order: 1,
+              type: DocumentSectionType.SECTION,
+              marker: "Zweiter Abschnitt",
+              heading: "Dies ist der zweiter Abschnitt",
+              documentation: [
+                {
+                  guid: "guid",
+                  order: 1,
+                  marker: "§ 6",
+                  heading: "Artile 6 heading",
+                  paragraphs: [
+                    {
+                      guid: "guid",
+                      marker: "(6)",
+                      text: "Paragraph text 6",
+                    },
+                  ],
+                },
+                {
+                  guid: "guid",
+                  order: 0,
+                  marker: "§ 5",
+                  heading: "Artile 5 heading",
+                  paragraphs: [
+                    {
+                      guid: "guid",
+                      marker: "(5)",
+                      text: "Paragraph text 5",
+                    },
+                  ],
+                },
+              ],
+            },
+            {
+              guid: "guid",
+              order: 0,
+              type: DocumentSectionType.SECTION,
+              marker: "Erster Abschnitt",
+              heading: "Dies ist der erster Abschnitt",
+              documentation: [
+                {
+                  guid: "guid",
+                  order: 1,
+                  marker: "§ 4",
+                  heading: "Artile 4 heading",
+                  paragraphs: [
+                    {
+                      guid: "guid",
+                      marker: "(4)",
+                      text: "Paragraph text 4",
+                    },
+                  ],
+                },
+                {
+                  guid: "guid",
+                  order: 0,
+                  marker: "§ 3",
+                  heading: "Artile 3 heading",
+                  paragraphs: [
+                    {
+                      guid: "guid",
+                      marker: "(5)",
+                      text: "Paragraph text 5",
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+        {
+          guid: "guid",
+          order: 0,
+          type: DocumentSectionType.PART,
+          marker: "Teil I",
+          heading: "Dies ist der erster Teil",
+          documentation: [
+            {
+              guid: "guid",
+              order: 1,
+              marker: "§ 2",
+              heading: "Artile 2 heading",
+              paragraphs: [
+                {
+                  guid: "guid",
+                  marker: "(2)",
+                  text: "Paragraph text 2",
+                },
+              ],
+            },
+            {
+              guid: "guid",
+              order: 0,
+              marker: "§ 1",
+              heading: "Artile 1 heading",
+              paragraphs: [
+                {
+                  guid: "guid",
+                  marker: "(1)",
+                  text: "Paragraph text 1",
+                },
+              ],
+            },
+          ],
+        },
+      ]
+
+      const decoded = decodeDocumentation(encoded)
+
+      expect(decoded).toStrictEqual([
+        {
+          guid: "guid",
+          order: 0,
+          type: "PART",
+          marker: "Teil I",
+          heading: "Dies ist der erster Teil",
+          documentation: [
+            {
+              guid: "guid",
+              order: 0,
+              marker: "§ 1",
+              heading: "Artile 1 heading",
+              paragraphs: [
+                {
+                  guid: "guid",
+                  marker: "(1)",
+                  text: "Paragraph text 1",
+                },
+              ],
+            },
+            {
+              guid: "guid",
+              order: 1,
+              marker: "§ 2",
+              heading: "Artile 2 heading",
+              paragraphs: [
+                {
+                  guid: "guid",
+                  marker: "(2)",
+                  text: "Paragraph text 2",
+                },
+              ],
+            },
+          ],
+        },
+        {
+          guid: "guid",
+          order: 1,
+          type: "PART",
+          marker: "Teil II",
+          heading: "Dies ist der zweiter Teil",
+          documentation: [
+            {
+              guid: "guid",
+              order: 0,
+              type: "SECTION",
+              marker: "Erster Abschnitt",
+              heading: "Dies ist der erster Abschnitt",
+              documentation: [
+                {
+                  guid: "guid",
+                  order: 0,
+                  marker: "§ 3",
+                  heading: "Artile 3 heading",
+                  paragraphs: [
+                    {
+                      guid: "guid",
+                      marker: "(5)",
+                      text: "Paragraph text 5",
+                    },
+                  ],
+                },
+                {
+                  guid: "guid",
+                  order: 1,
+                  marker: "§ 4",
+                  heading: "Artile 4 heading",
+                  paragraphs: [
+                    {
+                      guid: "guid",
+                      marker: "(4)",
+                      text: "Paragraph text 4",
+                    },
+                  ],
+                },
+              ],
+            },
+            {
+              guid: "guid",
+              order: 1,
+              type: "SECTION",
+              marker: "Zweiter Abschnitt",
+              heading: "Dies ist der zweiter Abschnitt",
+              documentation: [
+                {
+                  guid: "guid",
+                  order: 0,
+                  marker: "§ 5",
+                  heading: "Artile 5 heading",
+                  paragraphs: [
+                    {
+                      guid: "guid",
+                      marker: "(5)",
+                      text: "Paragraph text 5",
+                    },
+                  ],
+                },
+                {
+                  guid: "guid",
+                  order: 1,
+                  marker: "§ 6",
+                  heading: "Artile 6 heading",
+                  paragraphs: [
+                    {
+                      guid: "guid",
+                      marker: "(6)",
+                      text: "Paragraph text 6",
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+      ])
+    })
   })
 })

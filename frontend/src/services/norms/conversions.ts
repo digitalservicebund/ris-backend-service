@@ -2,6 +2,8 @@ import dayjs from "dayjs"
 import timezone from "dayjs/plugin/timezone"
 import utc from "dayjs/plugin/utc"
 import {
+  ArticleSchema,
+  DocumentSectionSchema,
   MetadataSectionSchema,
   MetadatumSchema,
   NormResponseSchema,
@@ -15,6 +17,8 @@ import {
 } from "./utilities"
 
 import {
+  Article,
+  DocumentSection,
   Metadata,
   MetadataSectionName,
   MetadataSections,
@@ -666,10 +670,38 @@ export function decodeMetadataSections(
   })
 }
 
+export function decodeDocumentation(
+  documentation: (ArticleSchema | DocumentSectionSchema)[] | undefined,
+): (Article | DocumentSection)[] {
+  if (!documentation) {
+    return []
+  }
+  documentation.sort(compareOrder)
+  return documentation.map((item) => {
+    if ("paragraphs" in item) {
+      const { paragraphs, ...rest } = item
+      return {
+        ...rest,
+        paragraphs: paragraphs.map((paragraph) => {
+          const { marker, text, guid } = paragraph
+          return { guid, marker, text }
+        }),
+      }
+    } else {
+      const { documentation, ...rest } = item
+      return {
+        ...rest,
+        documentation: decodeDocumentation(documentation),
+      }
+    }
+  })
+}
+
 export function decodeNorm(norm: NormResponseSchema): Norm {
-  const { metadataSections, ...stableData } = norm
+  const { metadataSections, documentation, ...stableData } = norm
   return {
     metadataSections: decodeMetadataSections(metadataSections ?? []),
+    documentation: decodeDocumentation(documentation ?? []),
     ...stableData,
   }
 }

@@ -93,6 +93,7 @@ describe("normsService", () => {
       expect(response.data).toStrictEqual({
         officialLongTitle: "title",
         metadataSections: {},
+        documentation: [],
       })
     })
 
