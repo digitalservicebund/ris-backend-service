@@ -10,6 +10,7 @@ interface Props {
   headerId?: string
   iconsOnLeft?: boolean
   marginLevel?: number
+  preventExpandOnClick?: boolean
 }
 const props = withDefaults(defineProps<Props>(), {
   header: undefined,
@@ -36,8 +37,15 @@ const ariaLabel = computed(() =>
   localIsExpanded.value ? "Zuklappen" : "Aufklappen",
 )
 
-function toggleContentVisibility(): void {
-  localIsExpanded.value = !localIsExpanded.value
+function toggleContentVisibility(event: Event): void {
+  if (
+    !props.preventExpandOnClick ||
+    (event.target &&
+      (event.target as HTMLElement).classList.contains("material-icons"))
+  ) {
+    localIsExpanded.value = !localIsExpanded.value
+  }
+  event.stopPropagation()
 }
 
 watch(
@@ -62,34 +70,41 @@ const sectionMargins: { [key: number]: string } = {
 </script>
 
 <template>
+  <!-- Ignore requirement to have a keyboard listener as it's only a convenience
+  for mouse users, but keyboard users can already do the same thing by tabbing
+  just fine -->
+  <!-- eslint-disable vuejs-accessibility/click-events-have-key-events -->
   <div>
-    <button
+    <div
       :aria-labelledby="headerId"
       class="flex w-full justify-between focus:outline-none focus-visible:outline-blue-800"
       @click="toggleContentVisibility"
     >
-      <span
+      <button
         v-if="props.iconsOnLeft"
         :aria-label="ariaLabel"
         class="icon material-icons"
         :class="`${sectionMargins[marginLevel]}`"
         data-testid="icons-open-close"
+        @click="toggleContentVisibility"
       >
         {{ iconName }}
-      </span>
+      </button>
 
       <slot name="header">
         <span :class="headerClass">{{ header }}</span>
       </slot>
 
-      <span
+      <button
         v-if="!props.iconsOnLeft"
         :aria-label="ariaLabel"
         class="icon material-icons"
         data-testid="icons-open-close"
-        >{{ iconName }}</span
+        @click="toggleContentVisibility"
       >
-    </button>
+        {{ iconName }}
+      </button>
+    </div>
 
     <div v-if="localIsExpanded">
       <slot />

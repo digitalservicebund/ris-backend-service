@@ -1,19 +1,44 @@
 import userEvent from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
+import { createRouter, createWebHistory } from "vue-router"
 import TableOfContents from "@/components/TableOfContents.vue"
 import { Article, DocumentSection, DocumentSectionType } from "@/domain/norm"
 
 function renderComponent(options?: {
   documentSections: (Article | DocumentSection)[]
+  normGuid?: string
   marginLevel?: number
 }) {
   const props = {
     documentSections: options?.documentSections,
+    normGuid: options?.normGuid ?? "mockNormGuid",
     marginLevel: options?.marginLevel,
   }
-  const utils = render(TableOfContents, { props })
+  const utils = render(TableOfContents, {
+    props,
+    global: {
+      plugins: [
+        createRouter({
+          history: createWebHistory(),
+          routes: [
+            {
+              path: "/norms/norm/:normGuid/documentation/:documentationGuid",
+              name: "norms-norm-normGuid-documentation-documentationGuid",
+              component: {},
+            },
+            {
+              path: "/",
+              name: "root",
+              component: {},
+            },
+          ],
+        }),
+      ],
+    },
+  })
+
   const user = userEvent.setup()
-  return { user, ...utils }
+  return { ...utils, user }
 }
 
 const firstPart: DocumentSection = {
@@ -117,19 +142,12 @@ describe("TableOfContents", () => {
       documentSections: [firstPart, secondPart],
     })
 
-    const firstPartRendered = screen.getByText(
-      "Second Part Heading of second part",
-    )
-    await user.click(firstPartRendered)
+    const buttons = screen.getAllByLabelText("Zuklappen")
+    await user.click(buttons[1])
 
-    const section = screen.queryByText("Section Heading of section")
-    expect(section).not.toBeInTheDocument()
-
-    const subsection = screen.queryByText("Subsection Heading of subsection")
-    expect(subsection).not.toBeInTheDocument()
-
-    const article = screen.queryByText("§ 1 Article heading")
-    expect(article).not.toBeInTheDocument()
+    expect(
+      screen.queryByText("Section Heading of section"),
+    ).not.toBeInTheDocument()
   })
 
   it("it renders with some margin", async () => {
@@ -141,5 +159,23 @@ describe("TableOfContents", () => {
     const iconSpan = screen.getByTestId("icons-open-close")
 
     expect(iconSpan).toHaveClass("ml-[44px]")
+  })
+
+  it("generates correct links with parameters", async () => {
+    const mockNormGuid = "testNormGuid"
+
+    renderComponent({
+      documentSections: [firstPart, secondPart],
+      normGuid: mockNormGuid,
+    })
+
+    expect(
+      screen.getByRole("link", {
+        name: `${firstPart.marker} ${firstPart.heading}`,
+      }),
+    ).toHaveAttribute(
+      "href",
+      `/norms/norm/${mockNormGuid}/documentation/${firstPart.guid}`,
+    )
   })
 })

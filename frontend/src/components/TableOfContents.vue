@@ -4,6 +4,7 @@ import { Article, DocumentSection, isDocumentSection } from "@/domain/norm"
 
 const props = defineProps<{
   documentSections: (Article | DocumentSection)[]
+  normGuid?: string
   marginLevel?: number
 }>()
 
@@ -35,25 +36,43 @@ const articleMargins: { [key: number]: string } = {
       is-expanded
       :margin-level="marginLevel"
       open-icon-name="chevron_right"
+      prevent-expand-on-click
     >
       <template #header>
-        <h2 class="ds-label-02-bold ml-4 w-full text-left">
-          {{ doc.marker }} {{ doc.heading }}
-        </h2>
+        <router-link
+          class="ds-label-02-bold ml-4 w-full pb-4 text-left"
+          :to="{
+            name: 'norms-norm-normGuid-documentation-documentationGuid',
+            params: {
+              normGuid: props.normGuid,
+              documentationGuid: doc.guid,
+            },
+          }"
+        >
+          <h2>{{ doc.marker }} {{ doc.heading }}</h2>
+        </router-link>
       </template>
       <TableOfContents
         v-if="doc.documentation"
         :document-sections="doc.documentation"
         :margin-level="marginLevel ? marginLevel + 1 : 1"
+        :norm-guid="normGuid"
       />
     </ExpandableContent>
-    <div v-else class="bg-gray-100 pb-4 pt-4">
-      <p
-        class="ds-label-02-reg pl-4 pr-4"
+    <div v-else class="bg-gray-100">
+      <router-link
+        class="ds-label-02-reg"
         :class="`${articleMargins[marginLevel ? marginLevel : 0]}`"
+        :to="{
+          name: 'norms-norm-normGuid-documentation-documentationGuid',
+          params: {
+            normGuid: props.normGuid,
+            documentationGuid: doc.guid,
+          },
+        }"
       >
         {{ doc.marker }} {{ doc.heading }}
-      </p>
+      </router-link>
     </div>
   </div>
 </template>

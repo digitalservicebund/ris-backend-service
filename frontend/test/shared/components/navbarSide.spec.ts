@@ -175,6 +175,23 @@ describe("NavbarSide", () => {
         "bg-blue-200",
       )
     })
+
+    it("underlines the active level two menu item", async () => {
+      const menuItems = [
+        {
+          label: "level one",
+          route: "/route",
+          children: [
+            { label: "active level two", route: "/active-level-two" },
+            { label: "passive level two", route: "/passive-level-two" },
+          ],
+        },
+      ]
+
+      await renderComponent({ menuItems, activeRoute: "/active-level-two" })
+
+      expect(screen.getByLabelText("active level two")).toHaveClass("underline")
+    })
   })
 
   describe("expansion of level one items", () => {
@@ -256,6 +273,25 @@ describe("NavbarSide", () => {
       expect(screen.queryByText("second level two")).toBeVisible()
       expect(screen.queryByText("second level one")).toBeVisible()
       expect(screen.queryByText("third level two")).not.toBeVisible()
+    })
+
+    it("underlines the expanded level one item with children", async () => {
+      const menuItems = [
+        {
+          label: "underlined level one",
+          route: "/route",
+          children: [
+            { label: "child one", route: "/child-one" },
+            { label: "child two", route: "/child-two" },
+          ],
+        },
+      ]
+
+      await renderComponent({ menuItems, activeRoute: "/child-one" })
+
+      expect(screen.getByLabelText("underlined level one")).toHaveClass(
+        "underline",
+      )
     })
   })
 })

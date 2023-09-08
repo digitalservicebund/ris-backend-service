@@ -24,6 +24,7 @@ const enhancedActiveMenuItems = computed(() =>
         .map((levelTwoItem) => ({
           ...levelTwoItem,
           classes: getClassesForMenuItem(levelTwoItem),
+          isActive: checkIfMenuItemIsActive(levelTwoItem),
         })),
     })),
 )
@@ -33,9 +34,14 @@ function getClassesForMenuItem(
 ): Record<string, boolean> {
   const { isDisabled } = menuItem
   const isActive = checkIfMenuItemIsActive(menuItem)
+  const isParentActive =
+    "children" in menuItem &&
+    checkIfLevelOneItemIsExpanded(menuItem as LevelOneMenuItem)
+
   return {
     disabled: isDisabled ?? false,
     "bg-blue-200": isActive,
+    underline: isActive || isParentActive,
   }
 }
 
@@ -164,7 +170,10 @@ export interface LevelTwoMenuItem {
           :key="levelTwoItem.label"
           :aria-labelledby="`levelTwoSideMenuItem` + levelTwoIndex"
           class="ds-label-02-reg block py-[1rem] pl-[2rem] hover:bg-blue-200 hover:underline focus:bg-blue-200 focus:underline"
-          :class="levelTwoItem.classes"
+          :class="[
+            levelTwoItem.classes,
+            levelTwoItem.isActive ? 'underline' : '',
+          ]"
           :to="levelTwoItem.route"
         >
           <span :id="`levelTwoSideMenuItem` + levelTwoIndex">{{

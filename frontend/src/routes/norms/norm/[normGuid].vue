@@ -22,12 +22,12 @@ const navigationIsOpen = useToggleStateInRouteQuery(
   router.replace,
 )
 const store = useLoadedNormStore()
+const { findDocumentation } = useLoadedNormStore()
 const { loadedNorm } = storeToRefs(store)
 
 const normIsExportable = computed(
   () => (loadedNorm.value?.files ?? []).length > 0,
 )
-const menuItems = useNormMenuItems(normGuid, route, normIsExportable)
 
 const announcementInfo = computed(() => {
   const gazette =
@@ -88,6 +88,23 @@ const entryIntoForceInfo = computed(() => {
 
 watchEffect(() => store.load(props.normGuid))
 onUnmounted(() => (loadedNorm.value = undefined))
+
+const documentationRouteIsOpen = computed(
+  () => route.name == "norms-norm-normGuid-documentation-documentationGuid",
+)
+const openDocumentationGuid = computed(() =>
+  documentationRouteIsOpen.value
+    ? route.params.documentationGuid?.toString()
+    : undefined,
+)
+const openDocumentation = findDocumentation(openDocumentationGuid)
+
+const menuItems = useNormMenuItems(
+  normGuid,
+  route,
+  openDocumentation,
+  normIsExportable,
+)
 </script>
 
 <template>
