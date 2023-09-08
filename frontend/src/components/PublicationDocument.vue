@@ -46,9 +46,9 @@ function publishDocumentUnit() {
       description:
         "Die Dokumentationseinheit kann nicht veröffentlicht werden.",
     }
+  } else {
+    emits("publishADocument")
   }
-
-  emits("publishADocument")
 }
 
 //Required Core Data fields
