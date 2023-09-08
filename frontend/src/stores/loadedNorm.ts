@@ -1,8 +1,24 @@
 import { defineStore } from "pinia"
-import { ref } from "vue"
-import { Norm } from "@/domain/norm"
+import { ref, computed, MaybeRefOrGetter, toValue } from "vue"
+import { Documentation, isDocumentSection, Norm } from "@/domain/norm"
 import { ServiceResponse } from "@/services/httpClient"
 import { editNormFrame, getNormByGuid } from "@/services/norms"
+
+function findDocumentationRecursive(
+  documentation: Documentation[] | undefined,
+  guid: string | undefined,
+): Documentation | undefined {
+  if (!documentation || !guid) return undefined
+
+  for (const entry of documentation) {
+    if (entry.guid === guid) return entry
+    if (isDocumentSection(entry)) {
+      const nestedDoc = findDocumentationRecursive(entry.documentation, guid)
+      if (nestedDoc) return nestedDoc
+    }
+  }
+  return undefined
+}
 
 export const useLoadedNormStore = defineStore("loaded-norm", () => {
   const loadedNorm = ref<Norm | undefined>(undefined)
@@ -10,6 +26,17 @@ export const useLoadedNormStore = defineStore("loaded-norm", () => {
   async function load(guid: string): Promise<void> {
     const response = await getNormByGuid(guid)
     loadedNorm.value = response.data
+  }
+
+  function findDocumentation(
+    documentationGuid: MaybeRefOrGetter<string | undefined>,
+  ) {
+    return computed(() =>
+      findDocumentationRecursive(
+        loadedNorm.value?.documentation,
+        toValue(documentationGuid),
+      ),
+    )
   }
 
   async function update(): Promise<ServiceResponse<void>> {
@@ -21,5 +48,5 @@ export const useLoadedNormStore = defineStore("loaded-norm", () => {
     }
   }
 
-  return { loadedNorm, load, update }
+  return { loadedNorm, load, update, findDocumentation }
 })

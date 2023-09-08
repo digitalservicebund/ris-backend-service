@@ -57,6 +57,7 @@ describe("useNormMenuItems", () => {
     const menuItems = useNormMenuItems(
       ref(""),
       {} as unknown as RouteLocationNormalizedLoaded,
+      undefined,
       exportIsEnabled,
     )
 
@@ -66,5 +67,25 @@ describe("useNormMenuItems", () => {
 
     expect(exportMenuItem).toBeDefined()
     expect(exportMenuItem?.isDisabled).toBeFalsy()
+  })
+
+  it("lists expected children menu item for the bestand", () => {
+    const menuItems = useNormMenuItems(
+      ref("fake-guid"),
+      {} as unknown as RouteLocationNormalizedLoaded,
+      ref({
+        guid: "testGuid",
+        marker: "testMarker",
+      }),
+    )
+    const bestandMenuItem = menuItems.value.find(
+      (item) => item.label === "Bestand",
+    )
+    expect(bestandMenuItem).toBeDefined()
+
+    if (bestandMenuItem && bestandMenuItem.children) {
+      const childMarker = bestandMenuItem.children.map((child) => child.label)
+      expect(childMarker).toContain("testMarker")
+    }
   })
 })

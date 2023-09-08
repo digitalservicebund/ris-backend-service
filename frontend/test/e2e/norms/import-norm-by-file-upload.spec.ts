@@ -2,6 +2,7 @@ import { expect, test } from "@playwright/test"
 import { createDataTransfer } from "../shared/e2e-utils"
 import { loadJurisTestFile } from "./e2e-utils"
 import { normData } from "./testdata/norm_basic"
+import { MetadataSectionName, MetadatumType } from "@/domain/norm"
 
 test.describe("import a norm by uploading a file", () => {
   test.beforeEach(async ({ page }) => {
@@ -20,9 +21,12 @@ test.describe("import a norm by uploading a file", () => {
     await fileChooser.setFiles(filePath)
 
     await page.waitForURL("/norms/norm/*/content")
-    // TODO: add more advance expectation...
     await expect(
-      page.locator(`text=Nichtamtliches Inhaltsverzeichnis`),
+      page.locator(
+        `text=${normData.metadataSections?.[MetadataSectionName.NORM]?.[0]?.[
+          MetadatumType.OFFICIAL_LONG_TITLE
+        ]?.[0]}`,
+      ),
     ).toBeVisible()
   })
 
@@ -42,9 +46,12 @@ test.describe("import a norm by uploading a file", () => {
     await page.dispatchEvent(".upload-drop-area", "drop", { dataTransfer })
 
     await page.waitForURL("/norms/norm/*/content")
-    // TODO: add more advance expectation...
     await expect(
-      page.locator(`text=Nichtamtliches Inhaltsverzeichnis`),
+      page.locator(
+        `text=${normData.metadataSections?.[MetadataSectionName.NORM]?.[0]?.[
+          MetadatumType.OFFICIAL_LONG_TITLE
+        ]?.[0]}`,
+      ),
     ).toBeVisible()
   })
 })

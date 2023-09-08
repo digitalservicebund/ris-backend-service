@@ -1,5 +1,7 @@
 import { flushPromises } from "@vue/test-utils"
 import { setActivePinia, createPinia } from "pinia"
+import { ref } from "vue"
+import { DocumentSectionType } from "@/domain/norm"
 import { editNormFrame, getNormByGuid } from "@/services/norms"
 import { useLoadedNormStore } from "@/stores/loadedNorm"
 import {
@@ -73,5 +75,63 @@ describe("loadedNorm", () => {
 
     expect(editNormFrame).toHaveBeenCalledOnce()
     expect(editNormFrame).toHaveBeenLastCalledWith("guid", metadataSections)
+  })
+
+  describe("findDocumentation", () => {
+    beforeEach(() => {
+      setActivePinia(createPinia())
+    })
+
+    afterEach(() => {
+      flushPromises()
+    })
+
+    it("should return the correct documentation when GUID exists", async () => {
+      const norm = generateNorm({
+        guid: "normGuid",
+        documentation: [
+          {
+            guid: "documentationGuid1",
+            marker: "marker",
+            heading: "Your Heading Here",
+            type: DocumentSectionType.SECTION,
+          },
+        ],
+      })
+
+      const response = { status: 200, data: norm }
+      vi.mocked(getNormByGuid).mockResolvedValue(response)
+      const store = useLoadedNormStore()
+
+      await store.load("guid")
+      const documentationGuidRef = ref("documentationGuid1")
+
+      const foundDocumentation = store.findDocumentation(documentationGuidRef)
+      expect(foundDocumentation.value?.guid).toBe("documentationGuid1")
+    })
+
+    it("should return undefined when documentation with the GUID does not exist", async () => {
+      const norm = generateNorm({
+        guid: "normGuid",
+        documentation: [
+          {
+            guid: "documentationGuid1",
+            marker: "marker",
+            heading: "Your Heading Here",
+            type: DocumentSectionType.SECTION,
+          },
+        ],
+      })
+
+      const response = { status: 200, data: norm }
+      vi.mocked(getNormByGuid).mockResolvedValue(response)
+      const store = useLoadedNormStore()
+
+      await store.load("guid")
+      const documentationGuidRef = ref("nonExistentGuid")
+
+      const foundDocumentation = store.findDocumentation(documentationGuidRef)
+      expect(foundDocumentation.value).toBeUndefined()
+    })
   })
 })

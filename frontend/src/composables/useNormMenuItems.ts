@@ -1,10 +1,12 @@
 import { computed } from "vue"
 import type { Ref } from "vue"
 import type { RouteLocationNormalizedLoaded } from "vue-router"
+import { Documentation } from "@/domain/norm"
 
 export function useNormMenuItems(
   normGuid: Ref<string>,
   route: RouteLocationNormalizedLoaded,
+  openDocumentation?: Ref<Documentation | undefined>,
   exportIsEnabled?: Ref<boolean>,
 ) {
   const baseRoute = {
@@ -73,6 +75,22 @@ export function useNormMenuItems(
         ...baseRoute,
         name: "norms-norm-normGuid-content",
       },
+      ...(openDocumentation?.value
+        ? {
+            children: [
+              {
+                label: openDocumentation.value?.marker,
+                route: {
+                  name: "norms-norm-normGuid-documentation-documentationGuid",
+                  params: {
+                    normGuid: normGuid.value,
+                    documentationGuid: openDocumentation.value?.guid,
+                  },
+                },
+              },
+            ],
+          }
+        : {}),
     },
     {
       label: "Export",
