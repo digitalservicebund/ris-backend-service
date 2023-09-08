@@ -55,18 +55,6 @@ watch(
 )
 
 watch(localIsExpanded, () => emit("update:isExpanded", localIsExpanded.value))
-
-const sectionMargins: { [key: number]: string } = {
-  0: "ml-[0px]",
-  1: "ml-[22px]",
-  2: "ml-[44px]",
-  3: "ml-[66px]",
-  4: "ml-[88px]",
-  5: "ml-[108px]",
-  6: "ml-[128px]",
-  7: "ml-[148px]",
-  8: "ml-[168px]",
-}
 </script>
 
 <template>
@@ -77,15 +65,16 @@ const sectionMargins: { [key: number]: string } = {
   <div>
     <div
       :aria-labelledby="headerId"
-      class="flex w-full justify-between focus:outline-none focus-visible:outline-blue-800"
+      class="flex w-full items-center justify-between focus:outline-none focus-visible:outline-blue-800"
+      :class="{ 'cursor-pointer': !preventExpandOnClick }"
       @click="toggleContentVisibility"
     >
       <button
         v-if="props.iconsOnLeft"
         :aria-label="ariaLabel"
-        class="icon material-icons"
-        :class="`${sectionMargins[marginLevel]}`"
+        class="icon material-icons self-start"
         data-testid="icons-open-close"
+        :style="{ marginLeft: `${marginLevel * 24}px` }"
         @click="toggleContentVisibility"
       >
         {{ iconName }}
@@ -98,7 +87,7 @@ const sectionMargins: { [key: number]: string } = {
       <button
         v-if="!props.iconsOnLeft"
         :aria-label="ariaLabel"
-        class="icon material-icons"
+        class="icon material-icons self-start"
         data-testid="icons-open-close"
         @click="toggleContentVisibility"
       >

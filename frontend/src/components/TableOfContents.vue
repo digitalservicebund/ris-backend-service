@@ -2,23 +2,17 @@
 import ExpandableContent from "@/components/ExpandableContent.vue"
 import { Article, DocumentSection, isDocumentSection } from "@/domain/norm"
 
-const props = defineProps<{
-  documentSections: (Article | DocumentSection)[]
-  normGuid?: string
-  marginLevel?: number
-}>()
-
-const articleMargins: { [key: number]: string } = {
-  0: "ml-[0px]",
-  1: "ml-[24px]",
-  2: "ml-[46px]",
-  3: "ml-[68px]",
-  4: "ml-[90px]",
-  5: "ml-[112px]",
-  6: "ml-[134px]",
-  7: "ml-[156px]",
-  8: "ml-[178px]",
-}
+const props = withDefaults(
+  defineProps<{
+    documentSections: (Article | DocumentSection)[]
+    normGuid?: string
+    marginLevel?: number
+  }>(),
+  {
+    normGuid: undefined,
+    marginLevel: 0,
+  },
+)
 </script>
 
 <template>
@@ -26,6 +20,7 @@ const articleMargins: { [key: number]: string } = {
     v-for="doc in props.documentSections"
     :key="doc.guid"
     class="border-t border-gray-400"
+    :class="{ 'last:border-b': marginLevel === 0 }"
     data-testid="document-sections"
   >
     <ExpandableContent
@@ -40,7 +35,7 @@ const articleMargins: { [key: number]: string } = {
     >
       <template #header>
         <router-link
-          class="ds-label-02-bold ml-4 w-full pb-4 text-left"
+          class="ds-label-02-bold ml-4 w-full pb-4 text-left hover:underline active:underline"
           :to="{
             name: 'norms-norm-normGuid-documentation-documentationGuid',
             params: {
@@ -59,10 +54,13 @@ const articleMargins: { [key: number]: string } = {
         :norm-guid="normGuid"
       />
     </ExpandableContent>
-    <div v-else class="bg-gray-100">
+    <div
+      v-else
+      class="bg-gray-100 hover:bg-blue-300 hover:underline active:bg-blue-500 active:underline"
+    >
       <router-link
-        class="ds-label-02-reg"
-        :class="`${articleMargins[marginLevel ? marginLevel : 0]}`"
+        class="ds-label-02-reg block py-4"
+        :style="{ paddingLeft: `${marginLevel * 24 + 4}px` }"
         :to="{
           name: 'norms-norm-normGuid-documentation-documentationGuid',
           params: {

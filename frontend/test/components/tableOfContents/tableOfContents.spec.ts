@@ -158,7 +158,7 @@ describe("TableOfContents", () => {
 
     const iconSpan = screen.getByTestId("icons-open-close")
 
-    expect(iconSpan).toHaveClass("ml-[44px]")
+    expect(iconSpan).toHaveStyle("margin-left: 48px")
   })
 
   it("generates correct links with parameters", async () => {

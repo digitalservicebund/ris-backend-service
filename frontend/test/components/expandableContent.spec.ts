@@ -100,14 +100,14 @@ describe("ExpandableContent", () => {
     renderComponent({ iconsOnLeft: true })
     const iconSpan = screen.getByTestId("icons-open-close")
 
-    expect(iconSpan).toHaveClass("ml-[0px]")
+    expect(iconSpan).toHaveStyle("margin-left: 0px")
   })
 
   it("renders a non-default margin left for the icon span if icons on the left", () => {
     renderComponent({ marginLevel: 2, iconsOnLeft: true })
     const iconSpan = screen.getByTestId("icons-open-close")
 
-    expect(iconSpan).toHaveClass("ml-[44px]")
+    expect(iconSpan).toHaveStyle("margin-left: 48px")
   })
 
   it("renders default icons on the right side", () => {

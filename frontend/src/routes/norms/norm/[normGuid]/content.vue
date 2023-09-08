@@ -15,12 +15,10 @@ const { loadedNorm } = storeToRefs(loadedNormStore)
       }}
     </h1>
     <h1 class="ds-label-01-bold mb-32">Nichtamtliches Inhaltsverzeichnis</h1>
-    <div class="border-b border-gray-400">
-      <TableOfContents
-        v-if="loadedNorm?.documentation"
-        :document-sections="loadedNorm?.documentation"
-        :norm-guid="loadedNorm?.guid"
-      />
-    </div>
+    <TableOfContents
+      v-if="loadedNorm?.documentation"
+      :document-sections="loadedNorm?.documentation"
+      :norm-guid="loadedNorm?.guid"
+    />
   </div>
 </template>
