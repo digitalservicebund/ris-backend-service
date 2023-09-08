@@ -172,9 +172,7 @@ watch(listEntriesWithStatus, async () => {
           {{ listEntry.fileNumber ? listEntry.fileNumber : "-" }}
         </div>
         <div class="table-cell p-16">
-          {{
-            listEntry.documentType ? listEntry.documentType?.jurisShortcut : "-"
-          }}
+          {{ listEntry.documentType ? listEntry.documentType : "-" }}
         </div>
         <div class="table-cell p-16">
           <IconBadge

@@ -1,4 +1,4 @@
-import DocumentUnit, { DocumentType } from "./documentUnit"
+import DocumentUnit from "./documentUnit"
 
 export default class DocumentUnitListEntry {
   public id?: string
@@ -8,7 +8,7 @@ export default class DocumentUnitListEntry {
   status?: NonNullable<DocumentUnit["status"]>
   fileNumber?: string
   fileName?: string
-  documentType?: DocumentType
+  documentType?: string
   courtLocation?: string
   courtType?: string
 
