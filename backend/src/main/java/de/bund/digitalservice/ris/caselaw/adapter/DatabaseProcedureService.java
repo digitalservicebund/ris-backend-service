@@ -9,6 +9,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationUnitS
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitSearchEntry;
 import de.bund.digitalservice.ris.caselaw.domain.Procedure;
+import de.bund.digitalservice.ris.caselaw.domain.ProcedureService;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
@@ -16,13 +17,13 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @Service
-public class ProcedureService {
+public class DatabaseProcedureService implements ProcedureService {
   private final DatabaseProcedureRepository repository;
   private final DatabaseProcedureLinkRepository linkRepository;
   private final DatabaseDocumentationUnitSearchRepository documentUnitRepository;
   private final DatabaseDocumentationOfficeRepository documentationOfficeRepository;
 
-  public ProcedureService(
+  public DatabaseProcedureService(
       DatabaseProcedureRepository repository,
       DatabaseProcedureLinkRepository linkRepository,
       DatabaseDocumentationUnitSearchRepository documentUnitRepository,
@@ -33,6 +34,7 @@ public class ProcedureService {
     this.documentationOfficeRepository = documentationOfficeRepository;
   }
 
+  @Override
   public Page<Procedure> search(
       Optional<String> query, DocumentationOffice documentationOffice, Pageable pageable) {
     return repository
@@ -48,6 +50,7 @@ public class ProcedureService {
                     .build());
   }
 
+  @Override
   public List<DocumentationUnitSearchEntry> getDocumentUnits(
       String procedureLabel, DocumentationOffice documentationOffice) {
     return linkRepository
