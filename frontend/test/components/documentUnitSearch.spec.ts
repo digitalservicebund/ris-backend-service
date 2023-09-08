@@ -60,10 +60,7 @@ describe("Documentunit Search", () => {
             courtType: "type",
             courtLocation: "location",
             decisionDate: "01.02.2022",
-            documentType: {
-              label: "documentTypeShortcut",
-              jurisShortcut: "documentTypeShortcut",
-            },
+            documentType: "documentTypeShortcut",
             documentNumber: "documentNumber",
             fileNumber: "fileNumber",
           }),

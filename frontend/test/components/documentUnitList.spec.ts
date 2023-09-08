@@ -91,10 +91,7 @@ describe("documentUnit list", () => {
           decisionDate: "2022-02-10",
           fileName: "",
           fileNumber: "",
-          documentType: {
-            label: "Test",
-            jurisShortcut: "Test",
-          },
+          documentType: "Test",
           courtType: "typeA",
           courtLocation: "locB",
           status: {
@@ -109,10 +106,7 @@ describe("documentUnit list", () => {
           decisionDate: "2022-02-10",
           fileName: "abc",
           fileNumber: "",
-          documentType: {
-            label: "Test",
-            jurisShortcut: "Test",
-          },
+          documentType: "Test",
           courtType: "typeA",
           courtLocation: "locB",
           status: {
@@ -145,10 +139,7 @@ describe("documentUnit list", () => {
           decisionDate: "2022-02-10",
           fileName: "",
           fileNumber: "",
-          documentType: {
-            label: "Test",
-            jurisShortcut: "Test",
-          },
+          documentType: "Test",
           courtType: "typeA",
           courtLocation: "locB",
           status: {
