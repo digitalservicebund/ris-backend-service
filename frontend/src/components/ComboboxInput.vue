@@ -125,7 +125,7 @@ let timer: ReturnType<typeof setTimeout>
 const onTextChange = () => {
   focusedItemIndex.value = 0
   showDropdown.value = true
-  filter.value = inputText.value
+  filter.value = inputText.value ? inputText.value.trim() : inputText.value
   if (timer) clearTimeout(timer)
   if (props.throttleItemServiceThroughput) {
     timer = setTimeout(() => void updateCurrentItems(filter.value), 300)
@@ -147,9 +147,13 @@ const updateCurrentItems = async (searchStr?: string) => {
   }
 
   currentlyDisplayedItems.value = response.data
+
   if (
     !currentlyDisplayedItems.value ||
-    currentlyDisplayedItems.value.length === 0
+    currentlyDisplayedItems.value.length === 0 ||
+    (props.manualEntry &&
+      searchStr &&
+      !currentlyDisplayedItems.value.find((item) => item.label === searchStr))
   ) {
     handleNoSearchResults(searchStr)
   } else {
@@ -162,6 +166,7 @@ function handleNoSearchResults(searchStr?: string) {
   if (props.manualEntry && searchStr) {
     currentlyDisplayedItems.value = [
       { label: `${searchStr} neu erstellen`, value: { label: searchStr } },
+      ...(currentlyDisplayedItems.value ?? []),
     ]
     candidateForSelection.value = { label: searchStr }
   } else {

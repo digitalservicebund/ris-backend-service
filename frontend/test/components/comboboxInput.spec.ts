@@ -250,7 +250,7 @@ describe("Combobox Element", () => {
     expect(dropdownItemElements[0]).toHaveTextContent("BGH Karlsruhe")
   })
 
-  it("Dropdown uses endpoint to fetch Court items based on search string", async () => {
+  it("dropdown uses endpoint to fetch Court items based on search string", async () => {
     const court: Court = {
       type: "BGH",
       location: "Karlsruhe",
@@ -283,7 +283,7 @@ describe("Combobox Element", () => {
     expect(dropdownItemElements[0]).toHaveTextContent("BGH Karlsruhe")
   })
 
-  it("Court without location and with revoked string gets displayed correctly", async () => {
+  it("court without location and with revoked string gets displayed correctly", async () => {
     const court: Court = {
       type: "ABC",
       location: "",
@@ -323,7 +323,7 @@ describe("Combobox Element", () => {
     expect(additionalInfoElement[0]).toHaveTextContent("aufgehoben seit: 1973")
   })
 
-  it("Should revert to last saved state when leaving the input field via esc/tab", async () => {
+  it("should revert to last saved state when leaving the input field via esc/tab", async () => {
     const { emitted } = renderComponent()
 
     const input = screen.getByLabelText("test label")
@@ -358,7 +358,7 @@ describe("Combobox Element", () => {
     expect(emitted()["update:modelValue"]).toHaveLength(1)
   })
 
-  it("Top search result should get chosen upon enter", async () => {
+  it("top search result should get chosen upon enter", async () => {
     const { emitted } = renderComponent()
     const input = screen.getByLabelText("test label")
     await user.type(input, "test")
@@ -380,7 +380,7 @@ describe("Combobox Element", () => {
     ]) // value of testItem1
   })
 
-  it("First Enter should open dropdown, second should select top value", async () => {
+  it("first Enter should open dropdown, second should select top value", async () => {
     const { emitted } = renderComponent()
     const input = screen.getByLabelText("test label")
     input.focus()
@@ -402,7 +402,7 @@ describe("Combobox Element", () => {
     ])
   })
 
-  it("Clear-button should unset the currently set value", async () => {
+  it("clear-button should unset the currently set value", async () => {
     const { emitted } = renderComponent()
     const input = screen.getByLabelText("test label")
 
@@ -429,10 +429,15 @@ describe("Combobox Element", () => {
     ])
   })
 
-  it("Adds entry if flag for manual entry is set", async () => {
+  it("adds new entry option if manual entry flag set and no result found", async () => {
     const { emitted } = renderComponent({ manualEntry: true })
 
-    await user.type(screen.getByLabelText("test label"), "foo")
+    const input = screen.getByLabelText("test label")
+    await user.type(input, "foo")
+
+    const dropdownItems = screen.queryAllByLabelText("dropdown-option")
+    expect(dropdownItems).toHaveLength(1)
+    expect(dropdownItems[0]).toHaveTextContent("foo neu erstellen")
     await user.click(screen.getByText("foo neu erstellen"))
 
     expect(emitted()["update:modelValue"]).toEqual([
@@ -444,7 +449,52 @@ describe("Combobox Element", () => {
     ])
   })
 
-  it("Does not add entry if flag for manual entry is not set", async () => {
+  it("adds new entry option if manual entry flag set and no exact match found", async () => {
+    renderComponent({ manualEntry: true })
+
+    const input = screen.getByLabelText("test label")
+    await user.type(input, "testItem")
+
+    const dropdownItems = screen.queryAllByLabelText("dropdown-option")
+    expect(dropdownItems).toHaveLength(4)
+    expect(dropdownItems[0]).toHaveTextContent("testItem neu erstellen")
+    expect(dropdownItems[1]).toHaveTextContent("testItem1")
+  })
+
+  it("removes new entry option when exact match found", async () => {
+    renderComponent({ manualEntry: true })
+
+    const input = screen.getByLabelText("test label")
+    await user.type(input, "testItem")
+
+    const dropdownItems = screen.queryAllByLabelText("dropdown-option")
+    expect(dropdownItems).toHaveLength(4)
+    expect(dropdownItems[0]).toHaveTextContent("testItem neu erstellen")
+    expect(dropdownItems[1]).toHaveTextContent("testItem1")
+
+    await user.type(input, "testItem1")
+    expect(screen.queryAllByLabelText("dropdown-option")).toHaveLength(1)
+    expect(screen.queryAllByLabelText("dropdown-option")[0]).toHaveTextContent(
+      "testItem1",
+    )
+    expect(screen.queryByText("testItem neu erstellen")).not.toBeInTheDocument()
+  })
+
+  it("spaces should be ignored", async () => {
+    renderComponent({ manualEntry: true })
+
+    const input = screen.getByLabelText("test label")
+    await user.type(input, "testItem1 ")
+
+    const dropdownItems = screen.queryAllByLabelText("dropdown-option")
+    expect(dropdownItems).toHaveLength(1)
+    expect(dropdownItems[0]).toHaveTextContent("testItem1")
+    expect(
+      screen.queryByText("testItem1  neu erstellen"),
+    ).not.toBeInTheDocument()
+  })
+
+  it("does not add new entry option if flag for manual entry is not set", async () => {
     const { emitted } = renderComponent({ manualEntry: false })
 
     await user.type(screen.getByLabelText("test label"), "foo")
