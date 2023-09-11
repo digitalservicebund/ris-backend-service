@@ -165,6 +165,9 @@ public class JurisXmlExporterResponseProcessor {
           .thenReturn(messageWrapper);
     } catch (MessagingException | IOException e) {
       return Mono.error(new StatusImporterException("Could not update publicationStatus" + e));
+    } catch (NullPointerException ex) {
+      LOGGER.error("NPE with messageWrapper: {}", messageWrapper, ex);
+      return Mono.error(new StatusImporterException("Could not update publicationStatus" + ex));
     }
   }
 
@@ -195,6 +198,9 @@ public class JurisXmlExporterResponseProcessor {
                           documentNumber)))
           .thenReturn(messageWrapper);
     } catch (MessagingException | IOException e) {
+      return Mono.error(new StatusImporterException("Could not forward Message"));
+    } catch (NullPointerException ex) {
+      LOGGER.error("NPE with messageWrapper: {}", messageWrapper, ex);
       return Mono.error(new StatusImporterException("Could not forward Message"));
     }
   }
