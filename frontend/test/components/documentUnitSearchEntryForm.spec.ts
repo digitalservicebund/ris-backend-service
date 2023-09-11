@@ -179,6 +179,22 @@ describe("Documentunit Search", () => {
     expect(screen.getByText("Startdatum fehlt")).toBeVisible()
   })
 
+  test("removes startdate missing error if 2nd date is removed", async () => {
+    const user = userEvent.setup()
+    renderComponent({
+      modelValue: {
+        decisionDateEnd: "2023-01-31T23:00:00.000Z",
+      },
+    })
+
+    await nextTick()
+    expect(screen.getByText("Startdatum fehlt")).toBeVisible()
+
+    await user.clear(screen.getByLabelText("Entscheidungsdatum Suche Ende"))
+    await nextTick()
+    expect(screen.queryByText("Startdatum fehlt")).not.toBeInTheDocument()
+  })
+
   test("shows error when 2nd date before 1st date", async () => {
     const { user } = renderComponent({
       modelValue: {

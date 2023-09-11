@@ -117,6 +117,9 @@ const decisionDateEnd = computed({
   set: (data) => {
     if (data?.length === 0 || !data) {
       delete searchEntry.value.decisionDateEnd
+      if (validationStore.getByMessage("Startdatum fehlt").length === 1) {
+        validationStore.remove("decisionDate")
+      }
     } else {
       searchEntry.value.decisionDateEnd = data
     }
