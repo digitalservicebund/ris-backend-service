@@ -118,7 +118,7 @@ data class SpecificationViolation(
  * It is not possible to have a [SpecificationError] without any violations.
  */
 data class SpecificationError(val violations: List<SpecificationViolation>) :
-    Exception("specification is unsatisfied due to some violations") {
+    Exception("specification is unsatisfied due to:\n\n${violations.joinToString("\n\n")}") {
   init {
     require(violations.isNotEmpty()) { "A specification error must list some violations" }
   }
