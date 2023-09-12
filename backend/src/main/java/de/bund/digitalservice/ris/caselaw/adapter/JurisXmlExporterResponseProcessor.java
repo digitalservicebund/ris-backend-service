@@ -83,26 +83,13 @@ public class JurisXmlExporterResponseProcessor {
   }
 
   private MessageWrapper processMessage(MessageWrapper messageWrapper) {
-    forwardMessage(messageWrapper)
-        .doOnError(e -> LOGGER.error("Error: forward message", e))
+    return Mono.just(messageWrapper)
+        .flatMap(this::forwardMessage)
+        .flatMap(this::setPublicationStatus)
+        .flatMap(this::saveAttachments)
+        .doOnSuccess(result -> LOGGER.info("Message processed for: {}", messageWrapper))
+        .doOnError(e -> LOGGER.error("Error processing message: ", e))
         .block();
-    setPublicationStatus(messageWrapper)
-        .doOnError(e -> LOGGER.error("Error: set publication status", e))
-        .block();
-    saveAttachments(messageWrapper)
-        .doOnError(e -> LOGGER.error("Error: save attachments", e))
-        .block();
-    //    return Mono.just(messageWrapper)
-    //        .flatMap(this::forwardMessage)
-    //        .flatMap(this::setPublicationStatus)
-    //        .flatMap(this::saveAttachments)
-    //        .doOnSuccess(result -> LOGGER.info("Message processed for: {}", messageWrapper))
-    //        .doOnError(
-    //            e ->
-    //                LOGGER.error(
-    //                    "Error processing message: ", e))
-    //        .block();
-    return messageWrapper;
   }
 
   private Mono<MessageWrapper> saveAttachments(MessageWrapper messageWrapper) {

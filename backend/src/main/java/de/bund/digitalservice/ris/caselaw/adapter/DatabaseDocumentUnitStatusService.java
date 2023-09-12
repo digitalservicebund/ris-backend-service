@@ -104,9 +104,13 @@ public class DatabaseDocumentUnitStatusService implements DocumentUnitStatusServ
     return documentUnitRepository
         .findByDocumentNumber(documentNumber)
         .flatMap(
-            documentUnit ->
-                repository.findFirstByDocumentUnitIdAndPublicationStatusOrderByCreatedAtDesc(
-                    documentUnit.uuid(), PublicationStatus.PUBLISHING));
+            documentUnit -> {
+              if (documentUnit == null || documentUnit.uuid() == null) {
+                return Mono.empty();
+              }
+              return repository.findFirstByDocumentUnitIdAndPublicationStatusOrderByCreatedAtDesc(
+                  documentUnit.uuid(), PublicationStatus.PUBLISHING);
+            });
   }
 
   private Mono<DocumentUnitStatusDTO> getLatestPublishing(UUID documentUuid) {
