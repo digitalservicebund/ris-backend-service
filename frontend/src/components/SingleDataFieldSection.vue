@@ -64,7 +64,7 @@ const inputFieldId = getLocator(() => [props.id])
     <InputField
       :id="inputFieldId"
       v-slot="{ id: inputElementId, hasError, updateValidationError }"
-      class="!mb-0"
+      class="!mb-0 overflow-hidden"
       :label="label"
       visually-hide-label
     >

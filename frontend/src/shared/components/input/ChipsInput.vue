@@ -1,13 +1,6 @@
 <script lang="ts" setup>
 import { produce } from "immer"
-import {
-  nextTick,
-  onBeforeUnmount,
-  onMounted,
-  ref,
-  watch,
-  watchEffect,
-} from "vue"
+import { nextTick, ref, watch, watchEffect } from "vue"
 import ChipsList from "@/shared/components/input/ChipsList.vue"
 
 interface Props {
@@ -85,34 +78,6 @@ async function focusInputIfEmpty() {
 
 const wrapperEl = ref<HTMLElement | null>(null)
 
-// We're keeping the wrapper size to limit the width of the container of the
-// input field. Ideally we'd have CSS do this for us, but that can be tricky
-// with flexbox and we don't want that complexity to leak into the parent
-// component - better have it contained here.
-const wrapperContentWidth = ref<number | undefined>()
-
-function updateWrapperSize() {
-  if (!wrapperEl.value) return
-
-  const { paddingLeft, paddingRight } = getComputedStyle(wrapperEl.value)
-  const padding = parseInt(paddingLeft) + parseInt(paddingRight)
-  wrapperContentWidth.value = wrapperEl.value.clientWidth - padding
-}
-
-const wrapperResizeObserver = new ResizeObserver(() => {
-  updateWrapperSize()
-})
-
-onMounted(() => {
-  if (!wrapperEl.value) return
-  wrapperResizeObserver.observe(wrapperEl.value)
-  updateWrapperSize()
-})
-
-onBeforeUnmount(() => {
-  wrapperResizeObserver.disconnect()
-})
-
 const inputContentWidth = ref<string | undefined>("auto")
 
 async function determineInputWidth() {
@@ -131,9 +96,21 @@ async function determineInputWidth() {
   const borderLeft = parseInt(borderLeftWidth)
   const borderRight = parseInt(borderRightWidth)
 
-  inputContentWidth.value = `${
+  // Constrain the width to the wrapper width. This helps to prevent the component
+  // from growing in unexpected ways when the user types long words. (Technically
+  // this could also be solved by using hidden overflow and other layout
+  // constraints in the parent component, but we want to avoid bothering users
+  // of the component with this complexity.)
+  let maxWidth: number | undefined = undefined
+  if (wrapperEl.value) {
+    const { paddingLeft, paddingRight } = getComputedStyle(wrapperEl.value)
+    const padding = parseInt(paddingLeft) + parseInt(paddingRight)
+    maxWidth = wrapperEl.value.clientWidth - padding - 16 // 16px for the icon
+  }
+
+  inputContentWidth.value = `min(${maxWidth ?? "9999"}px, ${
     chipsInput.value.scrollWidth + borderLeft + borderRight
-  }px`
+  }px)`
 }
 
 watchEffect(() => {
@@ -175,7 +152,6 @@ watch(newChipText, async () => {
     <span
       v-if="!readOnly"
       class="flex max-w-full flex-auto items-center justify-start"
-      :style="{ maxWidth: `${wrapperContentWidth}px` }"
     >
       <span :id="`enter-note-for-${id}`" class="sr-only">
         Enter drücken, um die Eingabe zu bestätigen
