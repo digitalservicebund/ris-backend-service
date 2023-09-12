@@ -83,35 +83,26 @@ public class JurisXmlExporterResponseProcessor {
   }
 
   private MessageWrapper processMessage(MessageWrapper messageWrapper) {
-    return Mono.just(messageWrapper)
-        .flatMap(this::forwardMessage)
-        .flatMap(this::setPublicationStatus)
-        .flatMap(this::saveAttachments)
-        .doOnSuccess(result -> LOGGER.info("Message processed for: {}", messageWrapper))
-        .doOnError(
-            e ->
-                LOGGER.error(
-                    "Error processing message({}): ", generateInfoString(messageWrapper), e))
+    forwardMessage(messageWrapper)
+        .doOnError(e -> LOGGER.error("Error: forward message", e))
         .block();
-  }
-
-  private String generateInfoString(MessageWrapper messageWrapper) {
-    StringBuilder builder = new StringBuilder();
-    try {
-      builder.append("\nhasDocumentNumber: ").append(messageWrapper.getDocumentNumber() != null);
-      builder.append("\nisPublished: ").append(messageWrapper.isPublished());
-      builder.append("\nhasErrors: ").append(messageWrapper.hasErrors());
-      builder
-          .append("\nhasAttachments: ")
-          .append(
-              messageWrapper.getAttachments() != null
-                  && !messageWrapper.getAttachments().isEmpty());
-      builder.append("\nhasMessage: ").append(messageWrapper.getMessage() != null);
-      builder.append("\nhasReceivedDate: ").append(messageWrapper.getReceivedDate() != null);
-      builder.append("\nhasSubject: ").append(messageWrapper.getSubject() != null);
-    } catch (MessagingException | IOException ignored) {
-    }
-    return builder.toString();
+    setPublicationStatus(messageWrapper)
+        .doOnError(e -> LOGGER.error("Error: set publication status", e))
+        .block();
+    saveAttachments(messageWrapper)
+        .doOnError(e -> LOGGER.error("Error: save attachments", e))
+        .block();
+    //    return Mono.just(messageWrapper)
+    //        .flatMap(this::forwardMessage)
+    //        .flatMap(this::setPublicationStatus)
+    //        .flatMap(this::saveAttachments)
+    //        .doOnSuccess(result -> LOGGER.info("Message processed for: {}", messageWrapper))
+    //        .doOnError(
+    //            e ->
+    //                LOGGER.error(
+    //                    "Error processing message: ", e))
+    //        .block();
+    return messageWrapper;
   }
 
   private Mono<MessageWrapper> saveAttachments(MessageWrapper messageWrapper) {
