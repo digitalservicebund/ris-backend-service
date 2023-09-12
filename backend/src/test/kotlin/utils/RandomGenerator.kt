@@ -5,7 +5,6 @@ import de.bund.digitalservice.ris.norms.domain.entity.*
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType
 import de.bund.digitalservice.ris.norms.domain.value.NormCategory
-import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.controller.EditNormFrameControllerTest
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.controller.ValidateNormFrameControllerTest
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.schema.MetadataSectionRequestSchema
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.schema.MetadatumRequestSchema
@@ -21,20 +20,6 @@ fun createRandomNormFrameProperties(): EditNormFrameUseCase.NormFrameProperties 
   val parameters: EasyRandomParameters =
       EasyRandomParameters().randomize(named("metadataSections")) { createSimpleMetadataSections() }
   return EasyRandom(parameters).nextObject(EditNormFrameUseCase.NormFrameProperties::class.java)
-}
-
-fun createRandomEditNormRequestTestSchema():
-    EditNormFrameControllerTest.NormFramePropertiesTestRequestSchema {
-  val parameters: EasyRandomParameters =
-      EasyRandomParameters()
-          .randomize(named(".+Date\$")) {
-            // needed for string date fields
-            createRandomLocalDateInString()
-          }
-          .randomize(named("metadataSections")) { createSimpleMetadataSections() }
-          .randomize(named("documentNormCategory")) { NormCategory.values().random().name }
-  return EasyRandom(parameters)
-      .nextObject(EditNormFrameControllerTest.NormFramePropertiesTestRequestSchema::class.java)
 }
 
 fun createMetadatumRequestSchema(
