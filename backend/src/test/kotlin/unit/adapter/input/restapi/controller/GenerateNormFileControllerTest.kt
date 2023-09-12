@@ -2,7 +2,6 @@ package de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.control
 
 import com.ninjasquad.springmockk.MockkBean
 import de.bund.digitalservice.ris.norms.application.port.input.GenerateNormFileUseCase
-import de.bund.digitalservice.ris.norms.domain.entity.FileReference
 import io.mockk.every
 import io.mockk.slot
 import io.mockk.verify
@@ -18,8 +17,7 @@ import org.springframework.security.test.web.reactive.server.SecurityMockServerC
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.springframework.test.web.reactive.server.WebTestClient
 import reactor.core.publisher.Mono
-import utils.convertFileReferenceToJson
-import utils.createRandomFileReference
+import utils.factory.file
 
 @ExtendWith(SpringExtension::class)
 @WebFluxTest(controllers = [GenerateNormFileController::class])
@@ -31,13 +29,13 @@ class GenerateNormFileControllerTest {
 
   @Test
   fun `it calls the generate norm file service with the correct command`() {
-    val fileReference =
-        FileReference(
-            "norm.zip",
-            "1c47461aea72b7d4f36c075fe09ae283e78477d261e5b1141c510cb46c941d10",
-            LocalDateTime.now(),
-            UUID.randomUUID(),
-        )
+
+    val fileReference = file {
+      guid = UUID.randomUUID()
+      name = "norm.zip"
+      hash = "1c47461aea72b7d4f36c075fe09ae283e78477d261e5b1141c510cb46c941d10"
+      createdAt = LocalDateTime.now()
+    }
 
     every { generateNormFileService.generateNormFile(any()) } returns Mono.just(fileReference)
 
@@ -54,13 +52,13 @@ class GenerateNormFileControllerTest {
 
   @Test
   fun `it responds with ok status if the file reference was created successfully`() {
-    val fileReference =
-        FileReference(
-            "norm.zip",
-            "1c47461aea72b7d4f36c075fe09ae283e78477d261e5b1141c510cb46c941d10",
-            LocalDateTime.now(),
-            UUID.randomUUID(),
-        )
+
+    val fileReference = file {
+      guid = UUID.randomUUID()
+      name = "norm.zip"
+      hash = "1c47461aea72b7d4f36c075fe09ae283e78477d261e5b1141c510cb46c941d10"
+      createdAt = LocalDateTime.now()
+    }
 
     every { generateNormFileService.generateNormFile(any()) } returns Mono.just(fileReference)
 
@@ -75,8 +73,12 @@ class GenerateNormFileControllerTest {
 
   @Test
   fun `it maps the file reference entity to the expected response schema`() {
-    val fileReference = createRandomFileReference()
-    val responseJson = convertFileReferenceToJson(fileReference)
+    val fileReference = file {
+      name = "norm.zip"
+      hash = "1c47461aea72b7d4f36c075fe09ae283e78477d261e5b1141c510cb46c941d10"
+      createdAt = LocalDateTime.parse("2023-09-05T09:31:21.390936")
+      guid = UUID.randomUUID()
+    }
 
     every { generateNormFileService.generateNormFile(any()) } returns Mono.just(fileReference)
 
@@ -86,7 +88,15 @@ class GenerateNormFileControllerTest {
         .uri("/api/v1/norms/72631e54-78a4-11d0-bcf7-00aa00b7b32a/files")
         .exchange()
         .expectBody()
-        .json(responseJson, true)
+        .json(
+            """
+                {
+                    "name": "norm.zip",
+                    "hash": "1c47461aea72b7d4f36c075fe09ae283e78477d261e5b1141c510cb46c941d10",
+                    "createdAt": "2023-09-05T09:31:21.390936",
+                    "guid": "${fileReference.guid}"
+                }
+        """)
   }
 
   @Test

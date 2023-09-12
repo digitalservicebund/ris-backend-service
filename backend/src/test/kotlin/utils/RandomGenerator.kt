@@ -2,8 +2,6 @@ package utils
 
 import de.bund.digitalservice.ris.norms.application.port.input.EditNormFrameUseCase
 import de.bund.digitalservice.ris.norms.domain.entity.*
-import de.bund.digitalservice.ris.norms.domain.value.DocumentSectionType.BOOK
-import de.bund.digitalservice.ris.norms.domain.value.DocumentSectionType.PART
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType
 import de.bund.digitalservice.ris.norms.domain.value.NormCategory
@@ -13,7 +11,6 @@ import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.schema.M
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.schema.MetadatumRequestSchema
 import java.time.LocalDate
 import java.util.Random
-import java.util.UUID
 import org.apache.commons.lang3.RandomStringUtils
 import org.jeasy.random.EasyRandom
 import org.jeasy.random.EasyRandomParameters
@@ -153,43 +150,5 @@ fun createSimpleMetadataSections(): List<MetadataSection> =
             ),
         ),
     )
-
-fun createSimpleDocumentation(): List<Documentation> =
-    listOf(
-        DocumentSection(
-            guid = UUID.randomUUID(), order = 1, marker = "1", heading = "Book 1", type = BOOK),
-        DocumentSection(
-            guid = UUID.randomUUID(),
-            order = 2,
-            type = BOOK,
-            marker = "2",
-            heading = "Book 2",
-            documentation =
-                listOf(
-                    DocumentSection(
-                        guid = UUID.randomUUID(),
-                        order = 1,
-                        type = PART,
-                        marker = "1",
-                        heading = "Part 1",
-                        documentation =
-                            listOf(
-                                Article(
-                                    guid = UUID.randomUUID(),
-                                    order = 1,
-                                    marker = "§ 1",
-                                    heading = "Article 1",
-                                    paragraphs =
-                                        listOf(
-                                            Paragraph(
-                                                guid = UUID.randomUUID(),
-                                                marker = "(1)",
-                                                text = "text",
-                                            ),
-                                        )),
-                            )),
-                )),
-        DocumentSection(
-            guid = UUID.randomUUID(), order = 3, type = BOOK, marker = "3", heading = "Book 3"))
 
 fun randomString(length: Int = 10): String = RandomStringUtils.randomAlphabetic(length)
