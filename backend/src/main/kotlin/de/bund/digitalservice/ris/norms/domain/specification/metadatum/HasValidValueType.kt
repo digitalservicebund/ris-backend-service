@@ -156,7 +156,7 @@ val hasValidValueType =
             }
 
         return SpecificationResult.from(
-            instance, "INVLID_METADATUM_VALUE_TYPE", "metatum has not the correct value type") {
+            instance, "INVLID_METADATUM_VALUE_TYPE", "metadatum has not the correct value type") {
               typeIsCorreect
             }
       }

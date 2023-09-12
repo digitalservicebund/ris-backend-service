@@ -3,13 +3,13 @@ package de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.control
 import com.ninjasquad.springmockk.MockkBean
 import de.bund.digitalservice.ris.norms.application.port.input.LoadNormUseCase
 import de.bund.digitalservice.ris.norms.domain.entity.*
+import de.bund.digitalservice.ris.norms.domain.value.DocumentSectionType
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName
-import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.encodeEli
-import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.encodeGuid
-import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.encodeLocalDateTime
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType
 import io.mockk.every
 import io.mockk.slot
 import io.mockk.verify
+import java.time.LocalDateTime
 import java.util.*
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
@@ -21,10 +21,7 @@ import org.springframework.security.test.web.reactive.server.SecurityMockServerC
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.springframework.test.web.reactive.server.WebTestClient
 import reactor.core.publisher.Mono
-import utils.convertLoadNormResponseTestSchemaToJson
-import utils.createRandomNorm
-import utils.createSimpleDocumentation
-import utils.createSimpleMetadataSections
+import utils.factory.norm
 
 @ExtendWith(SpringExtension::class)
 @WebFluxTest(controllers = [LoadNormController::class])
@@ -36,11 +33,7 @@ class LoadNormControllerTest {
 
   @Test
   fun `it calls the load norm service with the correct query to get a norm by GUID`() {
-    val norm =
-        Norm(
-            UUID.fromString("761b5537-5aa5-4901-81f7-fbf7e040a7c8"),
-        )
-
+    val norm = norm { guid = UUID.fromString("761b5537-5aa5-4901-81f7-fbf7e040a7c8") }
     every { loadNormService.loadNorm(any()) } returns Mono.just(norm)
 
     webClient
@@ -56,11 +49,7 @@ class LoadNormControllerTest {
 
   @Test
   fun `it responds with ok status if the norm was loaded successfully`() {
-    val norm =
-        Norm(
-            UUID.fromString("761b5537-5aa5-4901-81f7-fbf7e040a7c8"),
-        )
-
+    val norm = norm { guid = UUID.fromString("761b5537-5aa5-4901-81f7-fbf7e040a7c8") }
     every { loadNormService.loadNorm(any()) } returns Mono.just(norm)
 
     webClient
@@ -73,25 +62,491 @@ class LoadNormControllerTest {
   }
 
   @Test
-  fun `it maps the norm entity to the expected data schema`() {
-    val norm =
-        createRandomNorm()
-            .copy(
-                metadataSections = createSimpleMetadataSections(),
-                documentation = createSimpleDocumentation(),
-            )
-    val responseJson =
-        convertLoadNormResponseTestSchemaToJson(NormResponseTestSchema.fromUseCaseData(norm))
+  fun `it correctly maps a norm with a file reference`() {
+    val norm = norm {
+      guid = UUID.randomUUID()
+      files {
+        file {
+          name = "norm.zip"
+          hash = "hash"
+          createdAt = LocalDateTime.parse("2023-09-05T09:31:21.390936")
+        }
+      }
+    }
 
     every { loadNormService.loadNorm(any()) } returns Mono.just(norm)
 
     webClient
         .mutateWith(csrf())
         .get()
-        .uri("/api/v1/norms/72631e54-78a4-11d0-bcf7-00aa00b7b32a")
+        .uri("/api/v1/norms/${norm.guid}")
         .exchange()
         .expectBody()
-        .json(responseJson, true)
+        .json(
+            """
+                {
+                    "guid": "${norm.guid}",
+                    "files": [
+                        {
+                            "name": "norm.zip",
+                            "hash": "hash",
+                            "createdAt": "2023-09-05T09:31:21.390936"
+                        }
+                    ]
+                }
+        """)
+  }
+
+  @Test
+  fun `it correctly maps a norm with a simple metadata section`() {
+    val norm = norm {
+      guid = UUID.randomUUID()
+      metadataSections {
+        metadataSection {
+          name = MetadataSectionName.NORM
+          metadata {
+            metadatum {
+              value = "official long title"
+              type = MetadatumType.OFFICIAL_LONG_TITLE
+            }
+            metadatum {
+              value = "RISABB"
+              type = MetadatumType.RIS_ABBREVIATION
+            }
+            metadatum {
+              value = "keyword1"
+              type = MetadatumType.KEYWORD
+              order = 1
+            }
+            metadatum {
+              value = "keyword2"
+              type = MetadatumType.KEYWORD
+              order = 2
+            }
+          }
+        }
+      }
+    }
+
+    every { loadNormService.loadNorm(any()) } returns Mono.just(norm)
+
+    webClient
+        .mutateWith(csrf())
+        .get()
+        .uri("/api/v1/norms/${norm.guid}")
+        .exchange()
+        .expectBody()
+        .json(
+            """
+                {
+                    "guid": "${norm.guid}",
+                    "metadataSections": [
+                        {
+                              "name": "NORM",
+                              "metadata": [
+                                  {
+                                      "value": "official long title",
+                                      "type": "OFFICIAL_LONG_TITLE"
+                                  },
+                                  {
+                                      "value": "RISABB",
+                                      "type": "RIS_ABBREVIATION"
+                                  },
+                                  {
+                                      "value": "keyword1",
+                                      "type": "KEYWORD"
+                                  },
+                                  {
+                                      "value": "keyword2",
+                                      "type": "KEYWORD"
+                                  }
+                              ]
+                          }
+                    ]
+                }
+        """,
+        )
+  }
+
+  @Test
+  fun `it correctly maps a norm with repeated sections`() {
+    val norm = norm {
+      guid = UUID.randomUUID()
+      metadataSections {
+        metadataSection {
+          name = MetadataSectionName.NORM_PROVIDER
+          order = 1
+          metadata {
+            metadatum {
+              value = "entity1"
+              type = MetadatumType.ENTITY
+            }
+            metadatum {
+              value = "body1"
+              type = MetadatumType.DECIDING_BODY
+            }
+          }
+        }
+        metadataSection {
+          name = MetadataSectionName.NORM_PROVIDER
+          order = 2
+          metadata {
+            metadatum {
+              value = "entity2"
+              type = MetadatumType.ENTITY
+            }
+            metadatum {
+              value = "body2"
+              type = MetadatumType.DECIDING_BODY
+            }
+          }
+        }
+      }
+    }
+
+    every { loadNormService.loadNorm(any()) } returns Mono.just(norm)
+
+    webClient
+        .mutateWith(csrf())
+        .get()
+        .uri("/api/v1/norms/fc513c68-1126-4797-955f-96492a1a7b3b")
+        .exchange()
+        .expectBody()
+        .json(
+            """
+                {
+                    "guid": "${norm.guid}",
+                    "metadataSections": [
+                          {
+                              "name": "NORM_PROVIDER",
+                              "order": 1,
+                              "metadata": [
+                                  {
+                                      "value": "entity1",
+                                      "type": "ENTITY"
+                                  },
+                                  {
+                                      "value": "body1",
+                                      "type": "DECIDING_BODY"
+                                  }
+                              ]
+                          },
+                                                    {
+                              "name": "NORM_PROVIDER",
+                              "order": 2,
+                              "metadata": [
+                                  {
+                                      "value": "entity2",
+                                      "type": "ENTITY"
+                                  },
+                                  {
+                                      "value": "body2",
+                                      "type": "DECIDING_BODY"
+                                  }
+                              ]
+                          }
+                    ]
+                }
+        """,
+        )
+  }
+
+  @Test
+  fun `it correctly maps a norm with nested sections and eli`() {
+    val norm = norm {
+      guid = UUID.randomUUID()
+      metadataSections {
+        metadataSection {
+          name = MetadataSectionName.ANNOUNCEMENT_DATE
+          metadata {
+            metadatum {
+              value = "2023"
+              type = MetadatumType.YEAR
+            }
+          }
+        }
+        metadataSection {
+          name = MetadataSectionName.OFFICIAL_REFERENCE
+          order = 1
+          sections {
+            metadataSection {
+              name = MetadataSectionName.PRINT_ANNOUNCEMENT
+              metadata {
+                metadatum {
+                  value = "BGBl I"
+                  type = MetadatumType.ANNOUNCEMENT_GAZETTE
+                }
+                metadatum {
+                  value = "34"
+                  type = MetadatumType.PAGE
+                }
+              }
+            }
+          }
+        }
+        metadataSection {
+          name = MetadataSectionName.OFFICIAL_REFERENCE
+          order = 2
+          sections {
+            metadataSection {
+              name = MetadataSectionName.DIGITAL_ANNOUNCEMENT
+              metadata {
+                metadatum {
+                  value = "medium"
+                  type = MetadatumType.ANNOUNCEMENT_MEDIUM
+                }
+                metadatum {
+                  value = "3"
+                  type = MetadatumType.EDITION
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+
+    every { loadNormService.loadNorm(any()) } returns Mono.just(norm)
+
+    webClient
+        .mutateWith(csrf())
+        .get()
+        .uri("/api/v1/norms/fc513c68-1126-4797-955f-96492a1a7b3b")
+        .exchange()
+        .expectBody()
+        .json(
+            """
+            {
+              "guid": "${norm.guid}",
+              "eli": "eli/bgbl-1/2023/s34",
+              "metadataSections": [
+                  {
+                      "name": "ANNOUNCEMENT_DATE",
+                      "order": 1,
+                      "metadata": [
+                          {
+                              "value": "2023",
+                              "type": "YEAR"
+                          }
+                      ]
+                  },
+                  {
+                      "name": "OFFICIAL_REFERENCE",
+                      "order": 1,
+                      "sections": [
+                          {
+                              "name": "PRINT_ANNOUNCEMENT",
+                              "metadata": [
+                                  {
+                                      "value": "BGBl I",
+                                      "type": "ANNOUNCEMENT_GAZETTE"
+                                  },
+                                  {
+                                      "value": "34",
+                                      "type": "PAGE"
+                                  }
+                              ]
+                          }
+                      ]
+                  },
+                  {
+                      "name": "OFFICIAL_REFERENCE",
+                      "order": 2,
+                      "sections": [
+                          {
+                              "name": "DIGITAL_ANNOUNCEMENT",
+                              "metadata": [
+                                  {
+                                      "value": "medium",
+                                      "type": "ANNOUNCEMENT_MEDIUM"
+                                  },
+                                  {
+                                      "value": "3",
+                                      "type": "EDITION"
+                                  }
+                              ]
+                          }
+                      ]
+                  }
+              ]
+          }
+        """,
+        )
+  }
+
+  @Test
+  fun `it correctly maps a norm with top level articles`() {
+    val norm = norm {
+      guid = UUID.randomUUID()
+      documentation {
+        article {
+          order = 1
+          marker = "§ 1"
+          heading = "article one"
+          paragraphs {
+            paragraph {
+              marker = "(1)"
+              text = "paragraph one"
+            }
+            paragraph {
+              marker = "(2)"
+              text = "paragraph two"
+            }
+          }
+        }
+        article {
+          order = 2
+          marker = "§ 2"
+          heading = "article two"
+          paragraphs {
+            paragraph {
+              marker = "(3)"
+              text = "paragraph three"
+            }
+            paragraph {
+              marker = "(4)"
+              text = "paragraph four"
+            }
+          }
+        }
+      }
+    }
+
+    every { loadNormService.loadNorm(any()) } returns Mono.just(norm)
+
+    webClient
+        .mutateWith(csrf())
+        .get()
+        .uri("/api/v1/norms/${norm.guid}")
+        .exchange()
+        .expectBody()
+        .json(
+            """
+                {
+                    "guid": "${norm.guid}",
+                    "documentation": [
+                        {
+                            "marker": "§ 1",
+                            "heading": "article one",
+                            "order": 1,
+                            "paragraphs": [
+                                {
+                                "marker": "(1)",
+                                "text": "paragraph one"
+                                },
+                                 {
+                                "marker": "(2)",
+                                "text": "paragraph two"
+                                }
+                            ]
+                        },
+                        {
+                            "marker": "§ 2",
+                            "heading": "article two",
+                            "order": 2,
+                            "paragraphs": [
+                                {
+                                "marker": "(3)",
+                                "text": "paragraph three"
+                                },
+                                 {
+                                "marker": "(4)",
+                                "text": "paragraph four"
+                                }
+                            ]
+                        }
+                    ]
+                }
+        """)
+  }
+
+  @Test
+  fun `it correctly maps a norm with nested sections and articles at the end`() {
+    val norm = norm {
+      guid = UUID.randomUUID()
+      documentation {
+        documentSection {
+          marker = "Teil I"
+          heading = "Das ist der erste Teil"
+          type = DocumentSectionType.PART
+          documentation {
+            documentSection {
+              marker = "Abschnitt 1"
+              heading = "Das ist der erste Abschnitt"
+              type = DocumentSectionType.SECTION
+              documentation {
+                documentSection {
+                  marker = "Unterabschnitt 1"
+                  heading = "Das ist der erste Unterabschnitt"
+                  type = DocumentSectionType.SUBSECTION
+                  documentation {
+                    article {
+                      order = 1
+                      marker = "§ 1"
+                      heading = "article one"
+                      paragraphs {
+                        paragraph {
+                          marker = "(1)"
+                          text = "paragraph one"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+
+    every { loadNormService.loadNorm(any()) } returns Mono.just(norm)
+
+    webClient
+        .mutateWith(csrf())
+        .get()
+        .uri("/api/v1/norms/${norm.guid}")
+        .exchange()
+        .expectBody()
+        .json(
+            """
+                {
+                    "guid": "${norm.guid}",
+                    "documentation": [
+                        {
+                            "type": "PART",
+                            "marker": "Teil I",
+                            "heading": "Das ist der erste Teil",
+                            "documentation": [
+                                {
+                                    "type": "SECTION",
+                                    "marker": "Abschnitt 1",
+                                    "heading": "Das ist der erste Abschnitt",
+                                    "documentation": [
+                                        {
+                                            "type": "SUBSECTION",
+                                            "marker": "Unterabschnitt 1",
+                                            "heading": "Das ist der erste Unterabschnitt",
+                                            "documentation": [
+                                                {
+                                                    "marker": "§ 1",
+                                                    "heading": "article one",
+                                                    "paragraphs": [
+                                                        {
+                                                            "marker": "(1)",
+                                                            "text": "paragraph one"
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+        """)
   }
 
   @Test
@@ -133,188 +588,5 @@ class LoadNormControllerTest {
         .exchange()
         .expectStatus()
         .is5xxServerError()
-  }
-
-  data class NormResponseTestSchema
-  internal constructor(
-      val guid: String,
-      val metadataSections: Collection<MetadataSectionResponseTestSchema>,
-      var eli: String,
-      var files: Collection<FileReferenceResponseTestSchema>,
-      val recitals: RecitalsResponseTestSchema?,
-      val formula: FormulaResponseTestSchema?,
-      val documentation: Collection<DocumentationResponseTestSchema>,
-      val conclusion: ConclusionResponseTestSchema?,
-  ) {
-    companion object {
-      fun fromUseCaseData(data: Norm): NormResponseTestSchema {
-        val documentation = data.documentation.map(DocumentationResponseTestSchema::fromUseCaseData)
-        val files = data.files.map(FileReferenceResponseTestSchema::fromUseCaseData)
-        val metadataSections =
-            data.metadataSections.map(MetadataSectionResponseTestSchema::fromUseCaseData)
-
-        return NormResponseTestSchema(
-            guid = encodeGuid(data.guid),
-            metadataSections = metadataSections,
-            eli = encodeEli(data.eli),
-            files = files,
-            recitals = data.recitals?.let(RecitalsResponseTestSchema::fromUseCaseData),
-            formula = data.formula?.let(FormulaResponseTestSchema::fromUseCaseData),
-            documentation = documentation,
-            conclusion = data.conclusion?.let(ConclusionResponseTestSchema::fromUseCaseData),
-        )
-      }
-    }
-  }
-
-  abstract interface DocumentationResponseTestSchema {
-    val guid: String
-    val order: Int
-    val marker: String
-    val heading: String?
-
-    companion object {
-      fun fromUseCaseData(data: Documentation): DocumentationResponseTestSchema {
-        return when (data) {
-          is DocumentSection -> DocumentSectionResponseTestSchema.fromUseCaseData(data)
-          is Article -> ArticleResponseTestSchema.fromUseCaseData(data)
-        }
-      }
-    }
-  }
-
-  data class DocumentSectionResponseTestSchema
-  internal constructor(
-      override val guid: String,
-      override val order: Int,
-      override val marker: String,
-      override val heading: String?,
-      val type: String,
-      val documentation: Collection<DocumentationResponseTestSchema>,
-  ) : DocumentationResponseTestSchema {
-    companion object {
-      fun fromUseCaseData(data: DocumentSection) =
-          DocumentSectionResponseTestSchema(
-              guid = encodeGuid(data.guid),
-              order = data.order,
-              marker = data.marker,
-              heading = data.heading,
-              type = data.type.toString(),
-              documentation =
-                  data.documentation.map(DocumentationResponseTestSchema::fromUseCaseData))
-    }
-  }
-
-  data class ArticleResponseTestSchema
-  internal constructor(
-      override val guid: String,
-      override val order: Int,
-      override val marker: String,
-      override val heading: String?,
-      val paragraphs: Collection<ParagraphResponseSchema>,
-  ) : DocumentationResponseTestSchema {
-    companion object {
-      fun fromUseCaseData(data: Article) =
-          ArticleResponseTestSchema(
-              guid = encodeGuid(data.guid),
-              order = data.order,
-              marker = data.marker,
-              heading = data.heading,
-              paragraphs = data.paragraphs.map(ParagraphResponseSchema::fromUseCaseData),
-          )
-    }
-  }
-
-  data class ParagraphResponseSchema
-  private constructor(val guid: String, val marker: String? = null, val text: String) {
-    companion object {
-      fun fromUseCaseData(data: Paragraph): ParagraphResponseSchema {
-        return ParagraphResponseSchema(encodeGuid(data.guid), data.marker, data.text)
-      }
-    }
-  }
-
-  data class RecitalsResponseTestSchema
-  private constructor(
-      val guid: String,
-      val marker: String?,
-      val heading: String?,
-      val text: String
-  ) {
-    companion object {
-      fun fromUseCaseData(data: Recitals): RecitalsResponseTestSchema {
-        return RecitalsResponseTestSchema(
-            encodeGuid(data.guid), data.marker, data.heading, data.text)
-      }
-    }
-  }
-
-  data class FormulaResponseTestSchema private constructor(val guid: String, val text: String) {
-    companion object {
-      fun fromUseCaseData(data: Formula): FormulaResponseTestSchema {
-        return FormulaResponseTestSchema(encodeGuid(data.guid), data.text)
-      }
-    }
-  }
-
-  data class ConclusionResponseTestSchema private constructor(val guid: String, val text: String) {
-    companion object {
-      fun fromUseCaseData(data: Conclusion): ConclusionResponseTestSchema {
-        return ConclusionResponseTestSchema(encodeGuid(data.guid), data.text)
-      }
-    }
-  }
-
-  data class FileReferenceResponseTestSchema
-  internal constructor(
-      val guid: String,
-      val name: String,
-      val hash: String,
-      val createdAt: String
-  ) {
-    companion object {
-      fun fromUseCaseData(data: FileReference) =
-          FileReferenceResponseTestSchema(
-              encodeGuid(data.guid),
-              data.name,
-              data.hash,
-              encodeLocalDateTime(data.createdAt),
-          )
-    }
-  }
-
-  data class MetadataSectionResponseTestSchema
-  internal constructor(
-      val guid: String,
-      val name: MetadataSectionName,
-      val order: Int,
-      val metadata: List<MetadatumResponseTestSchema>,
-      val sections: List<MetadataSectionResponseTestSchema>?
-  ) {
-    companion object {
-      fun fromUseCaseData(metadataSection: MetadataSection): MetadataSectionResponseTestSchema {
-        val metadata =
-            metadataSection.metadata.map { MetadatumResponseTestSchema.fromUseCaseData(it) }
-        val childSections = metadataSection.sections?.map { fromUseCaseData(it) }
-        return MetadataSectionResponseTestSchema(
-            guid = encodeGuid(metadataSection.guid),
-            name = metadataSection.name,
-            order = metadataSection.order,
-            metadata = metadata,
-            sections = childSections)
-      }
-    }
-  }
-
-  data class MetadatumResponseTestSchema
-  internal constructor(val guid: String, val value: String, val type: String, val order: Int) {
-    companion object {
-      fun fromUseCaseData(metadatum: Metadatum<*>): MetadatumResponseTestSchema {
-        val value: String = metadatum.value.toString()
-        val type = metadatum.type.name
-        return MetadatumResponseTestSchema(
-            guid = encodeGuid(metadatum.guid), value = value, type = type, order = metadatum.order)
-      }
-    }
   }
 }
