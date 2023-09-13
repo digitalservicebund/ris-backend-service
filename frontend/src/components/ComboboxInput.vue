@@ -231,7 +231,7 @@ export type InputModelProps =
 <template>
   <div
     ref="dropdownContainerRef"
-    class="relative w-full"
+    class="w-full"
     @keydown.esc="closeDropdownAndRevertToLastSavedValue"
   >
     <div

@@ -55,7 +55,7 @@ function toggleContentVisibility(): void {
 
 <template>
   <div class="relative">
-    <div class="absolute -right-10 top-48 z-10">
+    <div class="absolute -right-10 top-48">
       <button @click="toggleContentVisibility">
         <span
           :aria-label="
