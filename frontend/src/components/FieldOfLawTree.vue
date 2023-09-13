@@ -38,9 +38,8 @@ function handleLinkedFieldClicked(identifier: string) {
 const buildDirectPathTreeTo = async (clickedIdentifier: string) => {
   if (!clickedIdentifier) return
 
-  const response = await FieldOfLawService.getTreeForIdentifier(
-    clickedIdentifier,
-  )
+  const response =
+    await FieldOfLawService.getTreeForIdentifier(clickedIdentifier)
   if (!response.data) return
 
   root.value.children = [response.data]
