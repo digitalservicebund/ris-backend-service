@@ -4,13 +4,24 @@ import { useRoute } from "vue-router"
 import Logo from "@/assets/neuRIS-logo.svg"
 import { User } from "@/domain/user"
 import { getName } from "@/services/authService"
+import FeatureToggleService from "@/services/featureToggleService"
 
 const route = useRoute()
 const user = ref<User>()
+const fontColor = ref<string>()
 
 onMounted(async () => {
   const nameResponse = await getName()
   if (nameResponse.data) user.value = nameResponse.data
+
+  const featureToggle = (
+    await FeatureToggleService.isEnabled("neuris.environment-test")
+  ).data
+  if (featureToggle) {
+    fontColor.value = "green"
+  } else {
+    fontColor.value = "red"
+  }
 })
 </script>
 
@@ -22,7 +33,13 @@ onMounted(async () => {
       <div class="flex items-center">
         <img alt="Neuris Logo" :src="Logo" />
         <span class="px-[1rem] text-16 leading-20">
-          <span aria-hidden="true" class="font-bold"> Rechtsinformationen</span>
+          <span
+            aria-hidden="true"
+            class="font-bold"
+            :style="{ color: fontColor }"
+          >
+            Rechtsinformationen</span
+          >
           <br />
           <span aria-hidden="true">des Bundes</span>
         </span>

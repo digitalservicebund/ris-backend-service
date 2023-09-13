@@ -7,9 +7,11 @@ import reactor.core.publisher.Mono;
 
 public class UnleashService implements FeatureToggleService {
   private final Unleash unleash;
+  private final String environment;
 
-  public UnleashService(Unleash unleash) {
+  public UnleashService(Unleash unleash, String environment) {
     this.unleash = unleash;
+    this.environment = environment;
   }
 
   @Override
@@ -19,6 +21,7 @@ public class UnleashService implements FeatureToggleService {
 
   @Override
   public Mono<Boolean> isEnabled(String toggleName) {
-    return Mono.just(unleash.isEnabled(toggleName));
+    boolean enabled = unleash.isEnabled(toggleName + "." + environment);
+    return Mono.just(enabled);
   }
 }

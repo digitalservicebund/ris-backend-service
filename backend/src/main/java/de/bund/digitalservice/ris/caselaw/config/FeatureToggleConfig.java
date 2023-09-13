@@ -5,16 +5,21 @@ import de.bund.digitalservice.ris.caselaw.domain.FeatureToggleService;
 import io.getunleash.DefaultUnleash;
 import io.getunleash.Unleash;
 import io.getunleash.util.UnleashConfig;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
+import org.springframework.core.env.ConfigurableEnvironment;
 import reactor.core.publisher.Mono;
 
 @Configuration
 public class FeatureToggleConfig {
+  @Autowired private ConfigurableEnvironment environment;
+
   @Value("${unleash.appName:unleash-proxy}")
   private String appName;
 
@@ -34,7 +39,20 @@ public class FeatureToggleConfig {
   @Bean
   @Profile({"production", "staging"})
   public FeatureToggleService featureToggleService() {
-    return new UnleashService(unleash());
+    String env;
+    if (Arrays.stream(environment.getActiveProfiles()).anyMatch("production"::equals)) {
+      String sentryEnvironment =
+          (String) environment.getSystemEnvironment().get("SENTRY_ENVIRONMENT");
+      if (sentryEnvironment != null && sentryEnvironment.equals("uat")) {
+        env = "uat";
+      } else {
+        env = "prod";
+      }
+    } else {
+      env = "dev";
+    }
+
+    return new UnleashService(unleash(), env);
   }
 
   @Bean
