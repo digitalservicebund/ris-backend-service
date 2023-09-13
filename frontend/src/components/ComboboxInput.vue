@@ -231,7 +231,7 @@ export type InputModelProps =
 <template>
   <div
     ref="dropdownContainerRef"
-    class="w-full"
+    class="relative w-full"
     @keydown.esc="closeDropdownAndRevertToLastSavedValue"
   >
     <div
@@ -286,7 +286,7 @@ export type InputModelProps =
     <div
       v-if="showDropdown"
       ref="dropdownItemsRef"
-      class="absolute left-0 right-0 top-[100%] z-10 flex max-h-[300px] flex-col overflow-y-scroll bg-white drop-shadow-md"
+      class="absolute left-0 right-0 top-[100%] z-20 flex max-h-[300px] flex-col overflow-y-scroll bg-white drop-shadow-md"
       tabindex="-1"
     >
       <div

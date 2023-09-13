@@ -28,7 +28,7 @@ function isBadge(
 
 <template>
   <div
-    class="sticky top-0 z-10 flex flex-row items-center justify-between border-b border-solid border-gray-400 bg-blue-200 px-[2rem]"
+    class="sticky top-0 z-30 flex flex-row items-center justify-between border-b border-solid border-gray-400 bg-blue-200 px-[2rem]"
     :class="{ 'h-[8rem]': secondRow.length }"
   >
     <div class="-mt-1 flex h-80 flex-col justify-center gap-24">

@@ -62,7 +62,7 @@ watchEffect(() => {
 <template>
   <div class="flex w-screen grow">
     <div
-      class="sticky top-0 z-20 flex flex-col border-r-1 border-solid border-gray-400 bg-white"
+      class="sticky top-0 z-50 flex flex-col border-r-1 border-solid border-gray-400 bg-white"
     >
       <SideToggle
         v-model:is-expanded="navigationIsOpen"

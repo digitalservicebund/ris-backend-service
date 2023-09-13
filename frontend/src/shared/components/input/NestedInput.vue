@@ -55,7 +55,7 @@ function toggleContentVisibility(): void {
 
 <template>
   <div class="relative">
-    <div class="absolute -right-10 top-48">
+    <div class="absolute -right-10 top-48 z-10">
       <button @click="toggleContentVisibility">
         <span
           :aria-label="
@@ -72,7 +72,6 @@ function toggleContentVisibility(): void {
       :id="fields.parent.name"
       :key="fields.parent.name"
       v-slot="{ id, hasError, updateValidationError }"
-      class="input-group__row__field"
       :label="fields.parent.label"
       :required="fields.parent.required"
     >
@@ -92,7 +91,6 @@ function toggleContentVisibility(): void {
       :id="fields.child.name"
       :key="fields.child.name"
       v-slot="{ id, hasError, updateValidationError }"
-      class="input-group__row__field"
       :label="fields.child.label"
       :required="fields.child.required"
     >
