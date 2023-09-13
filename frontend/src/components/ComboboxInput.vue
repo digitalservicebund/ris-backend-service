@@ -29,6 +29,7 @@ const NO_MATCHING_ENTRY = "Kein passender Eintrag"
 const candidateForSelection = ref<ComboboxItem>() // <-- the top search result
 const inputText = ref<string>()
 const currentlyDisplayedItems = ref<ComboboxItem[]>()
+const noMatchingItem = ref<ComboboxItem>()
 const showDropdown = ref(false)
 const filter = ref<string>()
 const dropdownContainerRef = ref<HTMLElement>()
@@ -37,6 +38,11 @@ const inputFieldRef = ref<HTMLInputElement>()
 const focusedItemIndex = ref<number>(0)
 const ariaLabelDropdownIcon = computed(() =>
   showDropdown.value ? "Dropdown schließen" : "Dropdown öffnen",
+)
+const noCurrentlyDisplayeditems = computed(
+  () =>
+    !currentlyDisplayedItems.value ||
+    currentlyDisplayedItems.value.length === 0,
 )
 
 const conditionalClasses = computed(() =>
@@ -149,14 +155,15 @@ const updateCurrentItems = async (searchStr?: string) => {
   currentlyDisplayedItems.value = response.data
 
   if (
-    !currentlyDisplayedItems.value ||
-    currentlyDisplayedItems.value.length === 0 ||
+    noCurrentlyDisplayeditems.value ||
+    //no exact match found when add manual entry option set
     (props.manualEntry &&
       searchStr &&
       !currentlyDisplayedItems.value.find((item) => item.label === searchStr))
   ) {
     handleNoSearchResults(searchStr)
   } else {
+    noMatchingItem.value = undefined
     candidateForSelection.value = currentlyDisplayedItems.value[0]
     focusedItemIndex.value = 1
   }
@@ -164,10 +171,10 @@ const updateCurrentItems = async (searchStr?: string) => {
 
 function handleNoSearchResults(searchStr?: string) {
   if (props.manualEntry && searchStr) {
-    currentlyDisplayedItems.value = [
-      { label: `${searchStr} neu erstellen`, value: { label: searchStr } },
-      ...(currentlyDisplayedItems.value ?? []),
-    ]
+    noMatchingItem.value = {
+      label: `${searchStr} neu erstellen`,
+      value: { label: searchStr },
+    }
     candidateForSelection.value = { label: searchStr }
   } else {
     currentlyDisplayedItems.value = [{ label: NO_MATCHING_ENTRY }]
@@ -308,6 +315,25 @@ export type InputModelProps =
           >
             {{ item.additionalInformation }}
           </div>
+        </span>
+      </div>
+      <div
+        v-if="noMatchingItem"
+        key="noMatchingItem"
+        aria-label="dropdown-option"
+        class="cursor-pointer border-b-1 border-b-gray-400 px-[1.5rem] py-[1rem] last:border-b-0 hover:bg-gray-400 focus:bg-blue-200 focus:outline-none"
+        role="button"
+        tabindex="0"
+        @click="setChosenItem(noMatchingItem)"
+        @keydown.tab="closeDropdownAndRevertToLastSavedValue"
+        @keypress.enter="setChosenItem(noMatchingItem)"
+        @keyup.down="keydown"
+        @keyup.up="keyup"
+      >
+        <span>
+          <span class="ds-label-01-bold text-blue-800 underline">{{
+            noMatchingItem?.label
+          }}</span>
         </span>
       </div>
     </div>

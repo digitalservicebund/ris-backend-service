@@ -457,8 +457,8 @@ describe("Combobox Element", () => {
 
     const dropdownItems = screen.queryAllByLabelText("dropdown-option")
     expect(dropdownItems).toHaveLength(4)
-    expect(dropdownItems[0]).toHaveTextContent("testItem neu erstellen")
-    expect(dropdownItems[1]).toHaveTextContent("testItem1")
+    expect(dropdownItems[0]).toHaveTextContent("testItem1")
+    expect(dropdownItems[3]).toHaveTextContent("testItem neu erstellen")
   })
 
   it("removes new entry option when exact match found", async () => {
@@ -469,8 +469,8 @@ describe("Combobox Element", () => {
 
     const dropdownItems = screen.queryAllByLabelText("dropdown-option")
     expect(dropdownItems).toHaveLength(4)
-    expect(dropdownItems[0]).toHaveTextContent("testItem neu erstellen")
-    expect(dropdownItems[1]).toHaveTextContent("testItem1")
+    expect(dropdownItems[0]).toHaveTextContent("testItem1")
+    expect(dropdownItems[3]).toHaveTextContent("testItem neu erstellen")
 
     await user.type(input, "testItem1")
     expect(screen.queryAllByLabelText("dropdown-option")).toHaveLength(1)
