@@ -3,7 +3,7 @@ import { render, screen } from "@testing-library/vue"
 import { createPinia, setActivePinia } from "pinia"
 import { describe, test } from "vitest"
 import UpdateStatusIndicationGroup from "@/components/statusIndication/UpdateStatusIndicationGroup.vue"
-import { MetadataSectionName } from "@/domain/norm"
+import { Metadata, MetadataSectionName } from "@/domain/norm"
 
 type UpdateStatusIndicationGroupProps = InstanceType<
   typeof UpdateStatusIndicationGroup
@@ -22,6 +22,7 @@ describe("UpdateStatusIndicationGroup in status mode", () => {
   beforeEach(async () => {
     setActivePinia(createPinia())
   })
+
   test("should render", () => {
     renderComponent({ type: MetadataSectionName.STATUS })
   })
@@ -58,13 +59,21 @@ describe("UpdateStatusIndicationGroup in status mode", () => {
 
   test("should change the model value when updating the inputs", async () => {
     const user = userEvent.setup()
-    const modelValue = {
+    let modelValue: Metadata = {
       NOTE: ["foo"],
       DESCRIPTION: ["bar"],
       DATE: ["2023-06-29"],
       REFERENCE: ["baz", "qux"],
     }
-    renderComponent({ type: MetadataSectionName.STATUS, modelValue })
+    const updateModelValue = vi.fn().mockImplementation((value: Metadata) => {
+      modelValue = value
+    })
+
+    renderComponent({
+      type: MetadataSectionName.STATUS,
+      modelValue,
+      "onUpdate:modelValue": updateModelValue,
+    })
 
     const noteInput = screen.getByRole("textbox", { name: "Änderungshinweis" })
     expect(noteInput).toHaveValue("foo")
@@ -96,13 +105,21 @@ describe("UpdateStatusIndicationGroup in status mode", () => {
 
   test("should change the model value when clearing the inputs", async () => {
     const user = userEvent.setup()
-    const modelValue = {
+    let modelValue: Metadata = {
       NOTE: ["foo"],
       DESCRIPTION: ["bar"],
       DATE: ["2023-06-29"],
       REFERENCE: ["baz", "qux"],
     }
-    renderComponent({ type: MetadataSectionName.STATUS, modelValue })
+    const updateModelValue = vi.fn().mockImplementation((value: Metadata) => {
+      modelValue = value
+    })
+
+    const { rerender } = renderComponent({
+      type: MetadataSectionName.STATUS,
+      modelValue,
+      "onUpdate:modelValue": updateModelValue,
+    })
 
     const noteInput = screen.getByRole("textbox", { name: "Änderungshinweis" })
     expect(noteInput).toHaveValue("foo")
@@ -127,6 +144,7 @@ describe("UpdateStatusIndicationGroup in status mode", () => {
     expect(references.length).toBe(2)
     await user.click(references[0])
     await user.type(references[0], "{enter}")
+    await rerender({ modelValue })
     await user.click(references[0])
     await user.type(references[0], "{enter}")
     expect(modelValue.REFERENCE).toBeUndefined()
@@ -172,13 +190,21 @@ describe("UpdateStatusIndicationGroup in reissue mode", () => {
 
   test("should change the model value when updating the inputs", async () => {
     const user = userEvent.setup()
-    const modelValue = {
+    let modelValue: Metadata = {
       NOTE: ["foo"],
       ARTICLE: ["bar"],
       DATE: ["2023-06-29"],
       REFERENCE: ["baz", "qux"],
     }
-    renderComponent({ type: MetadataSectionName.REISSUE, modelValue })
+    const updateModelValue = vi.fn().mockImplementation((value: Metadata) => {
+      modelValue = value
+    })
+
+    renderComponent({
+      type: MetadataSectionName.REISSUE,
+      modelValue,
+      "onUpdate:modelValue": updateModelValue,
+    })
 
     const noteInput = screen.getByRole("textbox", {
       name: "Neufassungshinweis",
@@ -212,13 +238,21 @@ describe("UpdateStatusIndicationGroup in reissue mode", () => {
 
   test("should change the model value when clearing the inputs", async () => {
     const user = userEvent.setup()
-    const modelValue = {
+    let modelValue: Metadata = {
       NOTE: ["foo"],
       ARTICLE: ["bar"],
       DATE: ["2023-06-29"],
       REFERENCE: ["baz", "qux"],
     }
-    renderComponent({ type: MetadataSectionName.REISSUE, modelValue })
+    const updateModelValue = vi.fn().mockImplementation((value: Metadata) => {
+      modelValue = value
+    })
+
+    renderComponent({
+      type: MetadataSectionName.REISSUE,
+      modelValue,
+      "onUpdate:modelValue": updateModelValue,
+    })
 
     const noteInput = screen.getByRole("textbox", {
       name: "Neufassungshinweis",

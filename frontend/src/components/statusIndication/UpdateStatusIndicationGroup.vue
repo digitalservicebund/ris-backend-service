@@ -1,5 +1,6 @@
 <script lang="ts" setup>
-import { computed, ref, watch } from "vue"
+import { produce } from "immer"
+import { computed } from "vue"
 import { Metadata, MetadataSectionName } from "@/domain/norm"
 import ChipsInput from "@/shared/components/input/ChipsInput.vue"
 import DateInput from "@/shared/components/input/DateInput.vue"
@@ -20,58 +21,74 @@ const emit = defineEmits<{
   "update:modelValue": [value: Metadata]
 }>()
 
-const inputValue = ref(props.modelValue)
-
-watch(
-  () => props.modelValue,
-  (newValue) => {
-    if (newValue !== undefined) {
-      inputValue.value = newValue
-    }
-  },
-  { immediate: true },
-)
-
-watch(inputValue, () => emit("update:modelValue", inputValue.value), {
-  deep: true,
-})
-
 const note = computed({
-  get: () => inputValue.value.NOTE?.[0],
-  set: (data?: string) => (inputValue.value.NOTE = data ? [data] : undefined),
+  get: () => props.modelValue.NOTE?.[0],
+  set: (data?: string) => {
+    const next = produce(props.modelValue, (draft) => {
+      draft.NOTE = data ? [data] : undefined
+    })
+    emit("update:modelValue", next)
+  },
 })
 
 const description = computed({
-  get: () => inputValue.value.DESCRIPTION?.[0],
-  set: (data?: string) =>
-    (inputValue.value.DESCRIPTION = data ? [data] : undefined),
+  get: () => props.modelValue.DESCRIPTION?.[0],
+  set: (data?: string) => {
+    const next = produce(props.modelValue, (draft) => {
+      draft.DESCRIPTION = data ? [data] : undefined
+    })
+    emit("update:modelValue", next)
+  },
 })
 
 const article = computed({
-  get: () => inputValue.value.ARTICLE?.[0],
-  set: (data?: string) =>
-    (inputValue.value.ARTICLE = data ? [data] : undefined),
+  get: () => props.modelValue.ARTICLE?.[0],
+  set: (data?: string) => {
+    const next = produce(props.modelValue, (draft) => {
+      draft.ARTICLE = data ? [data] : undefined
+    })
+    emit("update:modelValue", next)
+  },
 })
 
 const date = computed({
-  get: () => inputValue.value.DATE?.[0],
-  set: (data?: string) => (inputValue.value.DATE = data ? [data] : undefined),
+  get: () => props.modelValue.DATE?.[0],
+  set: (data?: string) => {
+    const next = produce(props.modelValue, (draft) => {
+      draft.DATE = data ? [data] : undefined
+    })
+    emit("update:modelValue", next)
+  },
 })
 
 const year = computed({
-  get: () => inputValue.value.YEAR?.[0],
-  set: (data?: string) => (inputValue.value.YEAR = data ? [data] : undefined),
+  get: () => props.modelValue.YEAR?.[0],
+  set: (data?: string) => {
+    const next = produce(props.modelValue, (draft) => {
+      draft.YEAR = data ? [data] : undefined
+    })
+    emit("update:modelValue", next)
+  },
 })
 
 const singleReference = computed({
-  get: () => inputValue.value.REFERENCE?.[0],
-  set: (data?: string) =>
-    (inputValue.value.REFERENCE = data ? [data] : undefined),
+  get: () => props.modelValue.REFERENCE?.[0],
+  set: (data?: string) => {
+    const next = produce(props.modelValue, (draft) => {
+      draft.REFERENCE = data ? [data] : undefined
+    })
+    emit("update:modelValue", next)
+  },
 })
 
 const multipleReferences = computed({
-  get: () => inputValue.value.REFERENCE,
-  set: (data?: string[]) => (inputValue.value.REFERENCE = data ?? undefined),
+  get: () => props.modelValue.REFERENCE,
+  set: (data?: string[]) => {
+    const next = produce(props.modelValue, (draft) => {
+      draft.REFERENCE = data ?? undefined
+    })
+    emit("update:modelValue", next)
+  },
 })
 
 const inputFields = computed(() => {
@@ -161,8 +178,9 @@ const inputFields = computed(() => {
     referenceField,
   }
 })
-const dateEnabled = computed(() => !inputValue.value.YEAR?.[0])
-const yearEnabled = computed(() => !inputValue.value.DATE?.[0])
+
+const dateEnabled = computed(() => !props.modelValue.YEAR?.[0])
+const yearEnabled = computed(() => !props.modelValue.DATE?.[0])
 </script>
 
 <template>

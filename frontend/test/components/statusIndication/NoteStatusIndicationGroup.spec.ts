@@ -3,7 +3,7 @@ import { render, screen } from "@testing-library/vue"
 import { createPinia, setActivePinia } from "pinia"
 import { describe, test } from "vitest"
 import NoteStatusIndicationGroup from "@/components/statusIndication/NoteStatusIndicationGroup.vue"
-import { MetadataSectionName } from "@/domain/norm"
+import { Metadata, MetadataSectionName } from "@/domain/norm"
 
 type NoteStatusIndicationGroupProps = InstanceType<
   typeof NoteStatusIndicationGroup
@@ -22,6 +22,7 @@ describe("NoteStatusIndicationGroup in repeal mode", () => {
   beforeEach(async () => {
     setActivePinia(createPinia())
   })
+
   test("should render", () => {
     renderComponent({ type: MetadataSectionName.REPEAL })
   })
@@ -38,26 +39,44 @@ describe("NoteStatusIndicationGroup in repeal mode", () => {
 
   test("should change the model value when updating the inputs", async () => {
     const user = userEvent.setup()
-    const modelValue = { TEXT: ["foo"] }
-    renderComponent({ type: MetadataSectionName.REPEAL, modelValue })
+    let modelValue: Metadata = { TEXT: ["foo"] }
+    const updateModelValue = vi.fn().mockImplementation((value: Metadata) => {
+      modelValue = value
+    })
+
+    renderComponent({
+      type: MetadataSectionName.REPEAL,
+      modelValue,
+      "onUpdate:modelValue": updateModelValue,
+    })
 
     const input = screen.getByRole("textbox", { name: "Aufhebung" })
     expect(input).toHaveValue("foo")
 
     await user.clear(input)
     await user.type(input, "bar")
+    expect(updateModelValue).toHaveBeenCalled()
     expect(modelValue.TEXT).toEqual(["bar"])
   })
 
   test("should change the model value when clearing the inputs", async () => {
     const user = userEvent.setup()
-    const modelValue = { TEXT: ["foo"] }
-    renderComponent({ type: MetadataSectionName.REPEAL, modelValue })
+    let modelValue: Metadata = { TEXT: ["foo"] }
+    const updateModelValue = vi.fn().mockImplementation((value: Metadata) => {
+      modelValue = value
+    })
+
+    renderComponent({
+      type: MetadataSectionName.REPEAL,
+      modelValue,
+      "onUpdate:modelValue": updateModelValue,
+    })
 
     const input = screen.getByRole("textbox", { name: "Aufhebung" })
     expect(input).toHaveValue("foo")
 
     await user.clear(input)
+    expect(updateModelValue).toHaveBeenCalled()
     expect(modelValue.TEXT).toBeUndefined()
   })
 })
@@ -79,8 +98,16 @@ describe("NoteStatusIndicationGroup in other status mode", () => {
 
   test("should change the model value when updating the inputs", async () => {
     const user = userEvent.setup()
-    const modelValue = { NOTE: ["foo"] }
-    renderComponent({ type: MetadataSectionName.OTHER_STATUS, modelValue })
+    let modelValue: Metadata = { NOTE: ["foo"] }
+    const updateModelValue = vi.fn().mockImplementation((value: Metadata) => {
+      modelValue = value
+    })
+
+    renderComponent({
+      type: MetadataSectionName.OTHER_STATUS,
+      modelValue,
+      "onUpdate:modelValue": updateModelValue,
+    })
 
     const input = screen.getByRole("textbox", { name: "Sonstiger Hinweis" })
     expect(input).toHaveValue("foo")
@@ -91,8 +118,16 @@ describe("NoteStatusIndicationGroup in other status mode", () => {
 
   test("should change the model value when clearing the inputs", async () => {
     const user = userEvent.setup()
-    const modelValue = { NOTE: ["foo"] }
-    renderComponent({ type: MetadataSectionName.OTHER_STATUS, modelValue })
+    let modelValue: Metadata = { NOTE: ["foo"] }
+    const updateModelValue = vi.fn().mockImplementation((value: Metadata) => {
+      modelValue = value
+    })
+
+    renderComponent({
+      type: MetadataSectionName.OTHER_STATUS,
+      modelValue,
+      "onUpdate:modelValue": updateModelValue,
+    })
 
     const input = screen.getByRole("textbox", { name: "Sonstiger Hinweis" })
     expect(input).toHaveValue("foo")

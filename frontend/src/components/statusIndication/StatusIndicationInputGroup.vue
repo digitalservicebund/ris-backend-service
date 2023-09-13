@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, ref, watch } from "vue"
+import { computed } from "vue"
 import NoteStatusIndicationGroup from "@/components/statusIndication/NoteStatusIndicationGroup.vue"
 import UpdateStatusIndicationGroup from "@/components/statusIndication/UpdateStatusIndicationGroup.vue"
 import { Metadata, MetadataSectionName, MetadataSections } from "@/domain/norm"
@@ -8,76 +8,95 @@ import InputField, {
 } from "@/shared/components/input/InputField.vue"
 import RadioInput from "@/shared/components/input/RadioInput.vue"
 
-interface Props {
+const props = defineProps<{
   modelValue: MetadataSections
-}
-
-const props = defineProps<Props>()
+}>()
 
 const emit = defineEmits<{
   "update:modelValue": [value: MetadataSections]
 }>()
 
-type ChildSectionName =
+/* -------------------------------------------------- *
+ * Section type                                       *
+ * -------------------------------------------------- */
+
+const initialValue: MetadataSections = {
+  STATUS: props.modelValue.STATUS,
+  REISSUE: props.modelValue.REISSUE,
+  REPEAL: props.modelValue.REPEAL,
+  OTHER_STATUS: props.modelValue.OTHER_STATUS,
+}
+
+const selectedChildSection = computed<
   | MetadataSectionName.STATUS // Status + Reissue share the same component
   | MetadataSectionName.REISSUE
   | MetadataSectionName.REPEAL // Repeal + OtherStatus share the same component
   | MetadataSectionName.OTHER_STATUS
-
-const childSection = ref<Metadata>({})
-const selectedChildSectionName = ref<ChildSectionName>(
-  MetadataSectionName.STATUS,
-)
-
-watch(
-  childSection,
-  () =>
-    emit("update:modelValue", {
-      [selectedChildSectionName.value]: [childSection.value],
-    }),
-  {
-    deep: true,
-  },
-)
-
-watch(
-  () => props.modelValue,
-  (modelValue) => {
-    if (modelValue.STATUS) {
-      selectedChildSectionName.value = MetadataSectionName.STATUS
-      childSection.value = modelValue.STATUS[0]
-    } else if (modelValue.REISSUE) {
-      selectedChildSectionName.value = MetadataSectionName.REISSUE
-      childSection.value = modelValue.REISSUE[0]
-    } else if (modelValue.REPEAL) {
-      selectedChildSectionName.value = MetadataSectionName.REPEAL
-      childSection.value = modelValue.REPEAL[0]
-    } else if (modelValue.OTHER_STATUS) {
-      selectedChildSectionName.value = MetadataSectionName.OTHER_STATUS
-      childSection.value = modelValue.OTHER_STATUS[0]
+>({
+  get: () => {
+    if (props.modelValue.STATUS?.[0]) {
+      return MetadataSectionName.STATUS
+    } else if (props.modelValue.REISSUE?.[0]) {
+      return MetadataSectionName.REISSUE
+    } else if (props.modelValue.REPEAL?.[0]) {
+      return MetadataSectionName.REPEAL
+    } else if (props.modelValue.OTHER_STATUS?.[0]) {
+      return MetadataSectionName.OTHER_STATUS
+    } else {
+      return MetadataSectionName.STATUS
     }
   },
-  {
-    immediate: true,
-    deep: true,
+  set(value) {
+    emit("update:modelValue", { [value]: initialValue[value] ?? [{}] })
   },
-)
+})
 
-watch(selectedChildSectionName, () => (childSection.value = {}))
+/* -------------------------------------------------- *
+ * Section data                                       *
+ * -------------------------------------------------- */
 
-const component = computed(() => {
-  switch (selectedChildSectionName.value) {
-    case MetadataSectionName.STATUS:
-    case MetadataSectionName.REISSUE:
-      return UpdateStatusIndicationGroup
-    case MetadataSectionName.REPEAL:
-    case MetadataSectionName.OTHER_STATUS:
-      return NoteStatusIndicationGroup
-    default:
-      throw new Error(
-        `Unknown announcement child section: "${selectedChildSectionName.value}"`,
-      )
-  }
+const statusSection = computed({
+  get: () => props.modelValue.STATUS?.[0] ?? {},
+  set: (data?: Metadata) => {
+    const effectiveData = data ? [data] : undefined
+    initialValue.STATUS = effectiveData
+
+    const next: MetadataSections = { STATUS: effectiveData }
+    emit("update:modelValue", next)
+  },
+})
+
+const reissueSection = computed({
+  get: () => props.modelValue.REISSUE?.[0] ?? {},
+  set: (data?: Metadata) => {
+    const effectiveData = data ? [data] : undefined
+    initialValue.REISSUE = effectiveData
+
+    const next: MetadataSections = { REISSUE: effectiveData }
+    emit("update:modelValue", next)
+  },
+})
+
+const repealSection = computed({
+  get: () => props.modelValue.REPEAL?.[0] ?? {},
+  set: (data?: Metadata) => {
+    const effectiveData = data ? [data] : undefined
+    initialValue.REPEAL = effectiveData
+
+    const next: MetadataSections = { REPEAL: effectiveData }
+    emit("update:modelValue", next)
+  },
+})
+
+const otherStatusSection = computed({
+  get: () => props.modelValue.OTHER_STATUS?.[0] ?? {},
+  set: (data?: Metadata) => {
+    const effectiveData = data ? [data] : undefined
+    initialValue.OTHER_STATUS = effectiveData
+
+    const next: MetadataSections = { OTHER_STATUS: effectiveData }
+    emit("update:modelValue", next)
+  },
 })
 </script>
 
@@ -94,7 +113,7 @@ const component = computed(() => {
       >
         <RadioInput
           :id="id"
-          v-model="selectedChildSectionName"
+          v-model="selectedChildSection"
           name="statusIndication"
           size="medium"
           :value="MetadataSectionName.STATUS"
@@ -109,7 +128,7 @@ const component = computed(() => {
       >
         <RadioInput
           :id="id"
-          v-model="selectedChildSectionName"
+          v-model="selectedChildSection"
           name="statusIndication"
           size="medium"
           :value="MetadataSectionName.REPEAL"
@@ -124,7 +143,7 @@ const component = computed(() => {
       >
         <RadioInput
           :id="id"
-          v-model="selectedChildSectionName"
+          v-model="selectedChildSection"
           name="statusIndication"
           size="medium"
           :value="MetadataSectionName.REISSUE"
@@ -139,7 +158,7 @@ const component = computed(() => {
       >
         <RadioInput
           :id="id"
-          v-model="selectedChildSectionName"
+          v-model="selectedChildSection"
           name="statusIndication"
           size="medium"
           :value="MetadataSectionName.OTHER_STATUS"
@@ -147,10 +166,28 @@ const component = computed(() => {
       </InputField>
     </div>
 
-    <component
-      :is="component"
-      v-model="childSection"
-      :type="selectedChildSectionName"
+    <UpdateStatusIndicationGroup
+      v-if="selectedChildSection === MetadataSectionName.STATUS"
+      v-model="statusSection"
+      :type="MetadataSectionName.STATUS"
+    />
+
+    <UpdateStatusIndicationGroup
+      v-else-if="selectedChildSection === MetadataSectionName.REISSUE"
+      v-model="reissueSection"
+      :type="MetadataSectionName.REISSUE"
+    />
+
+    <NoteStatusIndicationGroup
+      v-if="selectedChildSection === MetadataSectionName.REPEAL"
+      v-model="repealSection"
+      :type="MetadataSectionName.REPEAL"
+    />
+
+    <NoteStatusIndicationGroup
+      v-else-if="selectedChildSection === MetadataSectionName.OTHER_STATUS"
+      v-model="otherStatusSection"
+      :type="MetadataSectionName.OTHER_STATUS"
     />
   </div>
 </template>

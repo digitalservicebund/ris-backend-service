@@ -1,5 +1,6 @@
 <script lang="ts" setup>
-import { computed, ref, watch } from "vue"
+import { produce } from "immer"
+import { computed } from "vue"
 import { Metadata, MetadataSectionName } from "@/domain/norm"
 import InputField from "@/shared/components/input/InputField.vue"
 import TextAreaInput from "@/shared/components/input/TextAreaInput.vue"
@@ -17,30 +18,24 @@ const emit = defineEmits<{
   "update:modelValue": [value: Metadata]
 }>()
 
-const inputValue = ref(props.modelValue)
-
-watch(
-  () => props.modelValue,
-  (newValue) => {
-    if (newValue !== undefined) {
-      inputValue.value = newValue
-    }
-  },
-  { immediate: true },
-)
-
-watch(inputValue, () => emit("update:modelValue", inputValue.value), {
-  deep: true,
-})
-
 const text = computed({
-  get: () => inputValue.value.TEXT?.[0],
-  set: (data?: string) => (inputValue.value.TEXT = data ? [data] : undefined),
+  get: () => props.modelValue.TEXT?.[0],
+  set: (data?: string) => {
+    const next = produce(props.modelValue, (draft) => {
+      draft.TEXT = data ? [data] : undefined
+    })
+    emit("update:modelValue", next)
+  },
 })
 
 const note = computed({
-  get: () => inputValue.value.NOTE?.[0],
-  set: (data?: string) => (inputValue.value.NOTE = data ? [data] : undefined),
+  get: () => props.modelValue.NOTE?.[0],
+  set: (data?: string) => {
+    const next = produce(props.modelValue, (draft) => {
+      draft.NOTE = data ? [data] : undefined
+    })
+    emit("update:modelValue", next)
+  },
 })
 
 const inputFields = computed(() => {
