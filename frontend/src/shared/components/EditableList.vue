@@ -40,28 +40,8 @@ const currentEditElement = computed(() =>
     : undefined,
 )
 
-function setEditIndex(newEditIndex?: number): void {
-  if (
-    editIndex.value !== undefined &&
-    entryIsEmpty(modelValueList.value[editIndex.value])
-  ) {
-    removeModelEntry(editIndex.value)
-
-    editIndex.value =
-      newEditIndex === undefined
-        ? undefined
-        : editIndex.value < newEditIndex
-        ? newEditIndex - 1
-        : newEditIndex
-  } else {
-    editIndex.value = newEditIndex
-  }
-}
-
-function entryIsEmpty(entry: unknown): boolean {
-  return typeof entry === "object"
-    ? Object.values(entry ?? {}).every(entryIsEmpty)
-    : !Boolean(entry)
+function setEditIndex(index: number | undefined) {
+  editIndex.value = index
 }
 
 function addNewModelEntry() {
@@ -69,7 +49,7 @@ function addNewModelEntry() {
   const newEntry =
     typeof defaultValue === "object" ? { ...defaultValue } : defaultValue
   modelValueList.value.push(newEntry)
-  setEditIndex(modelValueList.value.length - 1)
+  editIndex.value = modelValueList.value.length - 1
 }
 
 function removeModelEntry(index: number) {
