@@ -355,4 +355,69 @@ describe("EditableList", () => {
       screen.queryByRole("button", { name: "Weitere Angabe" }),
     ).not.toBeInTheDocument()
   })
+
+  it("does not extend the number of entries if adding only empty entries", async () => {
+    const user = userEvent.setup()
+    const modelValue = [""]
+    await renderComponent({
+      editComponent: SimpleTextEditComponent,
+      modelValue,
+    })
+
+    const addButton = screen.getByRole("button", { name: "Weitere Angabe" })
+    await user.click(addButton)
+    await user.click(addButton)
+    await user.click(addButton)
+
+    expect(modelValue).toEqual([""])
+  })
+
+  it("removes the current entry if it was cleared and the user adds a new one", async () => {
+    const user = userEvent.setup()
+    const modelValue = ["entry 1"]
+    await renderComponent({
+      editComponent: SimpleTextEditComponent,
+      modelValue,
+    })
+
+    const input = screen.getByRole("textbox") as HTMLInputElement
+    await user.clear(input)
+
+    const addButton = screen.getByRole("button", { name: "Weitere Angabe" })
+    await user.click(addButton)
+
+    expect(modelValue).toEqual([""])
+  })
+
+  it("removes the current entry if it was cleared and a different entry gets edited afterwards", async () => {
+    const user = userEvent.setup()
+    const modelValue = ["entry 1", "entry 2"]
+    await renderComponent({
+      editComponent: SimpleTextEditComponent,
+      modelValue,
+    })
+
+    await clickEditButtonOfEntry(1)
+    const input = screen.getByRole("textbox") as HTMLInputElement
+    await user.clear(input)
+    await clickEditButtonOfEntry(0)
+
+    expect(modelValue).toEqual(["entry 1"])
+  })
+
+  it("removes the current entry if it was cleared and the user finishes the entry", async () => {
+    const user = userEvent.setup()
+    const modelValue = ["entry 1", "entry 2"]
+    await renderComponent({
+      editComponent: SimpleTextEditComponent,
+      modelValue,
+    })
+
+    await clickEditButtonOfEntry(1)
+    const input = screen.getByRole("textbox") as HTMLInputElement
+    await user.clear(input)
+    await user.type(input, "{enter}")
+
+    expect(modelValue).toEqual(["entry 1"])
+  })
 })
