@@ -35,23 +35,9 @@ import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName.SUBJECT
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType
 import de.bund.digitalservice.ris.norms.domain.value.UndefinedDate
 import de.bund.digitalservice.ris.norms.framework.adapter.output.juris.mapDataToDomain
+import de.bund.digitalservice.ris.norms.juris.converter.model.*
 import de.bund.digitalservice.ris.norms.juris.converter.model.Article as ArticleData
-import de.bund.digitalservice.ris.norms.juris.converter.model.CategorizedReference
-import de.bund.digitalservice.ris.norms.juris.converter.model.DigitalAnnouncement
-import de.bund.digitalservice.ris.norms.juris.converter.model.DivergentEntryIntoForce
-import de.bund.digitalservice.ris.norms.juris.converter.model.DivergentExpiration
-import de.bund.digitalservice.ris.norms.juris.converter.model.DocumentStatus
-import de.bund.digitalservice.ris.norms.juris.converter.model.DocumentType
-import de.bund.digitalservice.ris.norms.juris.converter.model.Footnote
-import de.bund.digitalservice.ris.norms.juris.converter.model.Lead
 import de.bund.digitalservice.ris.norms.juris.converter.model.Norm as NormData
-import de.bund.digitalservice.ris.norms.juris.converter.model.NormProvider
-import de.bund.digitalservice.ris.norms.juris.converter.model.Paragraph
-import de.bund.digitalservice.ris.norms.juris.converter.model.Participation
-import de.bund.digitalservice.ris.norms.juris.converter.model.PrintAnnouncement
-import de.bund.digitalservice.ris.norms.juris.converter.model.Reissue
-import de.bund.digitalservice.ris.norms.juris.converter.model.Status
-import de.bund.digitalservice.ris.norms.juris.converter.model.SubjectArea
 import java.time.LocalDate
 import java.util.*
 import org.assertj.core.api.Assertions.assertThat
@@ -148,13 +134,19 @@ class FromJurisMapperTest {
                                 Pair(1, "another footnoteChange A"),
                                 Pair(2, "another footnoteChange B"))),
                 ),
-        )
+            formula = "Formula",
+            conclusion = "Conclusion",
+            recitals = Recitals("Recital heading", "Recital text"))
 
     val guid = UUID.randomUUID()
 
     val domainNorm = mapDataToDomain(guid, extractedData)
 
     assertThat(domainNorm.guid).isEqualTo(guid)
+    assertThat(domainNorm.formula?.text).isEqualTo("Formula")
+    assertThat(domainNorm.conclusion?.text).isEqualTo("Conclusion")
+    assertThat(domainNorm.recitals?.heading).isEqualTo("Recital heading")
+    assertThat(domainNorm.recitals?.text).isEqualTo("Recital text")
     assertThat(domainNorm.documentation).hasSize(1)
 
     assertThat(domainNorm.documentation.first()).isInstanceOf(Article::class.java)
@@ -358,6 +350,15 @@ class FromJurisMapperTest {
     assertThat(metadataSections.filter { it.name == ANNOUNCEMENT_DATE }).hasSize(1)
     assertSectionsHasMetadata(
         metadataSections, ANNOUNCEMENT_DATE, MetadatumType.DATE, LocalDate.parse("2020-10-10"))
+  }
+
+  @Test
+  fun `it maps null values for recitals conclusion and formula to domain`() {
+    val domainNorm = mapDataToDomain(UUID.randomUUID(), NormData())
+
+    assertThat(domainNorm.formula).isNull()
+    assertThat(domainNorm.conclusion).isNull()
+    assertThat(domainNorm.recitals).isNull()
   }
 
   private fun assertSectionHasNotMetadataType(

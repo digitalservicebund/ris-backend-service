@@ -1,10 +1,6 @@
 package de.bund.digitalservice.ris.norms.framework.adapter.output.juris
 
-import de.bund.digitalservice.ris.norms.domain.entity.Article
-import de.bund.digitalservice.ris.norms.domain.entity.MetadataSection
-import de.bund.digitalservice.ris.norms.domain.entity.Metadatum
-import de.bund.digitalservice.ris.norms.domain.entity.Norm
-import de.bund.digitalservice.ris.norms.domain.entity.Paragraph
+import de.bund.digitalservice.ris.norms.domain.entity.*
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName as Section
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType
@@ -101,12 +97,17 @@ fun mapDataToDomain(guid: UUID, data: NormData): Norm {
               data.statusList, data.reissueList, data.repealList, data.otherStatusList) +
           createFootnoteSections(data.footnotes) +
           listOfNotNull(createAnnoucementDateSection(data.announcementDate))
-
+  val recitals = data.recitals?.let { Recitals(UUID.randomUUID(), null, it.heading, it.text) }
+  val conclusion = data.conclusion?.let { Conclusion(UUID.randomUUID(), it) }
+  val formula = data.formula?.let { Formula(UUID.randomUUID(), it) }
   return Norm(
       guid = guid,
       documentation =
           data.articles.mapIndexed { index, article -> mapArticleToDomain(article, index) },
       metadataSections = sections.filterNotNull(),
+      recitals = recitals,
+      conclusion = conclusion,
+      formula = formula,
   )
 }
 
