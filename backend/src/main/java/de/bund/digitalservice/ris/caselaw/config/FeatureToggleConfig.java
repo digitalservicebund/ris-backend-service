@@ -8,7 +8,6 @@ import io.getunleash.util.UnleashConfig;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -18,8 +17,6 @@ import reactor.core.publisher.Mono;
 
 @Configuration
 public class FeatureToggleConfig {
-  @Autowired private ConfigurableEnvironment environment;
-
   @Value("${unleash.appName:unleash-proxy}")
   private String appName;
 
@@ -38,7 +35,7 @@ public class FeatureToggleConfig {
 
   @Bean
   @Profile({"production", "staging"})
-  public FeatureToggleService featureToggleService() {
+  public FeatureToggleService featureToggleService(ConfigurableEnvironment environment) {
     String env;
     if (Arrays.stream(environment.getActiveProfiles()).anyMatch("production"::equals)) {
       String sentryEnvironment =
