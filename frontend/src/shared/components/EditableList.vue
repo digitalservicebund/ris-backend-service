@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import type { Component } from "vue"
-import { computed, nextTick, onMounted, ref, watch } from "vue"
+import { computed, nextTick, ref, watch } from "vue"
 import DataSetSummary from "@/shared/components/DataSetSummary.vue"
 
 interface Props {
@@ -89,12 +89,6 @@ async function focusFirstFocusableElementOfCurrentEditElement() {
     firstFocusableElement.focus()
   }
 }
-
-function editFirstEntryIfOnlyOne(): void {
-  if (modelValueList.value?.length == 1) setEditIndex(0)
-}
-
-onMounted(editFirstEntryIfOnlyOne)
 
 watch(
   () => props.modelValue,

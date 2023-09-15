@@ -334,18 +334,6 @@ describe("EditableList", () => {
     expect(screen.queryByText('"entry 1"')).toBeVisible()
   })
 
-  it("puts the first entry into edit mode it is the only one", async () => {
-    await renderComponent({
-      editComponent: SimpleTextEditComponent,
-      modelValue: ["entry 1"],
-    })
-
-    const input = screen.queryByRole("textbox") as HTMLInputElement
-
-    expect(input).toBeInTheDocument()
-    expect(input).toHaveValue("entry 1")
-  })
-
   it("renders the component without the multi entry capability", async () => {
     await renderComponent({
       disableMultiEntry: true,
