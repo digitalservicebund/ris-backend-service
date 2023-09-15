@@ -283,10 +283,7 @@ export const newNorm: NormData = {
         OTHER_STATUS: [{ NOTE: ["Other status note"] }],
       },
     ],
-    ANNOUNCEMENT_DATE: [
-      { DATE: ["01.10.2021"], TIME: ["08:45"] },
-      { YEAR: ["2023"] },
-    ],
+    ANNOUNCEMENT_DATE: [{ DATE: ["01.10.2021"], TIME: ["08:45"] }],
   },
   eli: "europeanLegalIdentifier",
 }

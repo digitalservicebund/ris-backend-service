@@ -138,7 +138,7 @@ export async function expectInputFieldGroupHasCorrectValues(
   }
 }
 
-export async function expectRepeatedSectionListHasCorrectEntries(
+export async function expectExpandableSectionListHasCorrectEntries(
   page: Page,
   section: MetadataInputSection,
   numberOfEntries = 1,
@@ -165,15 +165,10 @@ export async function expectRepeatedSectionListHasCorrectEntries(
     await page.keyboard.down("Enter") // Stop editing / close inputs again.
   }
 
-  // Single entries are automatically in edit mode.
-  if (entryCount == 1) {
-    await expectEntry(0)
-  } else {
-    for (let index = 0; index < numberOfSectionRepetition; index++) {
-      const entry = listEntries.nth(index)
-      await entry.getByRole("button", { name: "Eintrag bearbeiten" }).click()
-      await expectEntry(index)
-    }
+  for (let index = 0; index < numberOfSectionRepetition; index++) {
+    const entry = listEntries.nth(index)
+    await entry.getByRole("button", { name: "Eintrag bearbeiten" }).click()
+    await expectEntry(index)
   }
 }
 
@@ -208,9 +203,9 @@ export async function expectMetadataInputSectionToHaveCorrectDataOnDisplay(
   page: Page,
   section: MetadataInputSection,
 ): Promise<void> {
-  if (section.isRepeatedSection) {
+  if (section.isRepeatedSection || section.isExpandableNotRepeatable) {
     await expectSummaryToContainMetadata(page, section)
-    await expectRepeatedSectionListHasCorrectEntries(page, section)
+    await expectExpandableSectionListHasCorrectEntries(page, section)
   } else {
     await expectMetadataInputSectionToHaveCorrectData(page, section)
   }
@@ -219,9 +214,9 @@ export async function expectMetadataInputSectionToHaveCorrectDataOnEdit(
   page: Page,
   section: MetadataInputSection,
 ): Promise<void> {
-  if (section.isRepeatedSection) {
+  if (section.isRepeatedSection || section.isExpandableNotRepeatable) {
     await expectSummaryToContainMetadata(page, section)
-    await expectRepeatedSectionListHasCorrectEntries(
+    await expectExpandableSectionListHasCorrectEntries(
       page,
       section,
       section.numberEditedSections ?? 1,

@@ -141,19 +141,13 @@ export async function clearRepeatedMetadataSectionList(
       .click()
   }
 
-  // Single entries are automatically in edit mode.
-  if (entryCount == 1) {
-    await page.keyboard.press("Enter") // Close edit mode first
-    await deleteEntry(0)
-  } else {
-    // Delete backwards to avoid conflicts.
-    for (let index = entryCount - 1; index >= 0; index--) {
-      await deleteEntry(index)
-    }
+  // Delete backwards to avoid conflicts.
+  for (let index = entryCount - 1; index >= 0; index--) {
+    await deleteEntry(index)
   }
 
-  const finishButton = expandable.getByRole("button", { name: "Fertig" })
-  await finishButton.click()
+  // const finishButton = expandable.getByRole("button", { name: "Fertig" })
+  // await finishButton.click()
 }
 
 export async function fillRepeatedMetadataSectionList(
@@ -196,7 +190,10 @@ export async function fillExpandableSectionNotRepeatable(
   }
 
   const expandable = page.locator(`#${section.id}`)
-  await expandable.click()
+
+  if (section.isNotImported) {
+    await expandable.click()
+  }
 
   await fillInputFieldGroup(page, section.fields ?? [], 0)
 
