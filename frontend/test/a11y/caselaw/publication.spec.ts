@@ -18,6 +18,7 @@ test.describe("a11y of publication page (/caselaw/documentunit/{documentNumber}/
     await expect(
       page.locator("text=Es sind noch nicht alle Pflichtfelder befüllt."),
     ).toBeVisible()
+    await expect(page.locator("text=Email versendet.")).toBeHidden()
 
     const accessibilityScanResults = await new AxeBuilder({ page }).analyze()
     expect(accessibilityScanResults.violations).toEqual([])
