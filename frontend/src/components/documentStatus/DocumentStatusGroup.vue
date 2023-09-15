@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { storeToRefs } from "pinia"
-import { computed, ref, watch } from "vue"
+import { computed } from "vue"
 import DocumentOtherInputGroup from "@/components/documentStatus/DocumentOtherInputGroup.vue"
 import DocumentStatusInputGroup from "@/components/documentStatus/DocumentStatusInputGroup.vue"
 import DocumentTextProofInputGroup from "@/components/documentStatus/DocumentTextProofInputGroup.vue"
@@ -11,80 +11,96 @@ import InputField, {
 import RadioInput from "@/shared/components/input/RadioInput.vue"
 import { useLoadedNormStore } from "@/stores/loadedNorm"
 
-const props = defineProps<Props>()
-const emit = defineEmits<Emits>()
+const props = defineProps<{
+  modelValue: MetadataSections
+}>()
+
+const emit = defineEmits<{
+  "update:modelValue": [value: MetadataSections]
+}>()
+
 const store = useLoadedNormStore()
+
 const { loadedNorm } = storeToRefs(store)
 
-const isDocumentTextProof = computed(() => {
-  return (
-    loadedNorm.value?.metadataSections?.DOCUMENT_STATUS_SECTION?.some(
-      (entry) => entry.DOCUMENT_TEXT_PROOF,
-    ) ?? false
-  )
-})
+/* -------------------------------------------------- *
+ * Section type                                       *
+ * -------------------------------------------------- */
 
-interface Props {
-  modelValue: MetadataSections
+const initialValue: MetadataSections = {
+  DOCUMENT_STATUS: props.modelValue.DOCUMENT_STATUS,
+  DOCUMENT_TEXT_PROOF: props.modelValue.DOCUMENT_TEXT_PROOF,
+  DOCUMENT_OTHER: props.modelValue.DOCUMENT_OTHER,
 }
-type Emits = (event: "update:modelValue", value: MetadataSections) => void
 
-type ChildSectionName =
+const selectedChildSection = computed<
   | MetadataSectionName.DOCUMENT_STATUS
   | MetadataSectionName.DOCUMENT_TEXT_PROOF
   | MetadataSectionName.DOCUMENT_OTHER
-
-const childSection = ref<Metadata>({})
-const selectedChildSectionName = ref<ChildSectionName>(
-  MetadataSectionName.DOCUMENT_STATUS,
-)
-
-watch(
-  childSection,
-  () =>
-    emit("update:modelValue", {
-      [selectedChildSectionName.value]: [childSection.value],
-    }),
-  {
-    deep: true,
-  },
-)
-
-watch(
-  () => props.modelValue,
-  (modelValue) => {
-    if (modelValue.DOCUMENT_STATUS) {
-      selectedChildSectionName.value = MetadataSectionName.DOCUMENT_STATUS
-      childSection.value = modelValue.DOCUMENT_STATUS[0]
-    } else if (modelValue.DOCUMENT_TEXT_PROOF) {
-      selectedChildSectionName.value = MetadataSectionName.DOCUMENT_TEXT_PROOF
-      childSection.value = modelValue.DOCUMENT_TEXT_PROOF[0]
-    } else if (modelValue.DOCUMENT_OTHER) {
-      selectedChildSectionName.value = MetadataSectionName.DOCUMENT_OTHER
-      childSection.value = modelValue.DOCUMENT_OTHER[0]
+>({
+  get: () => {
+    if (props.modelValue.DOCUMENT_STATUS?.[0]) {
+      return MetadataSectionName.DOCUMENT_STATUS
+    } else if (props.modelValue.DOCUMENT_TEXT_PROOF?.[0]) {
+      return MetadataSectionName.DOCUMENT_TEXT_PROOF
+    } else if (props.modelValue.DOCUMENT_OTHER?.[0]) {
+      return MetadataSectionName.DOCUMENT_OTHER
+    } else {
+      return MetadataSectionName.DOCUMENT_STATUS
     }
   },
-  {
-    immediate: true,
-    deep: true,
+  set(value) {
+    emit("update:modelValue", { [value]: initialValue[value] ?? [{}] })
   },
-)
+})
 
-watch(selectedChildSectionName, () => (childSection.value = {}))
+const disableDocumentTextProof = computed(() => {
+  const hasTextProof =
+    loadedNorm.value?.metadataSections?.DOCUMENT_STATUS_SECTION?.some(
+      (entry) => entry.DOCUMENT_TEXT_PROOF,
+    ) ?? false
 
-const component = computed(() => {
-  switch (selectedChildSectionName.value) {
-    case MetadataSectionName.DOCUMENT_STATUS:
-      return DocumentStatusInputGroup
-    case MetadataSectionName.DOCUMENT_TEXT_PROOF:
-      return DocumentTextProofInputGroup
-    case MetadataSectionName.DOCUMENT_OTHER:
-      return DocumentOtherInputGroup
-    default:
-      throw new Error(
-        `Unknown document status child section: "${selectedChildSectionName.value}"`,
-      )
-  }
+  return (
+    hasTextProof &&
+    selectedChildSection.value !== MetadataSectionName.DOCUMENT_TEXT_PROOF
+  )
+})
+
+/* -------------------------------------------------- *
+ * Section data                                       *
+ * -------------------------------------------------- */
+
+const documentStatusSection = computed({
+  get: () => props.modelValue.DOCUMENT_STATUS?.[0] ?? {},
+  set: (data?: Metadata) => {
+    const effectiveData = data ? [data] : undefined
+    initialValue.DOCUMENT_STATUS = effectiveData
+
+    const next: MetadataSections = { DOCUMENT_STATUS: effectiveData }
+    emit("update:modelValue", next)
+  },
+})
+
+const documentTextProofSection = computed({
+  get: () => props.modelValue.DOCUMENT_TEXT_PROOF?.[0] ?? {},
+  set: (data?: Metadata) => {
+    const effectiveData = data ? [data] : undefined
+    initialValue.DOCUMENT_TEXT_PROOF = effectiveData
+
+    const next: MetadataSections = { DOCUMENT_TEXT_PROOF: effectiveData }
+    emit("update:modelValue", next)
+  },
+})
+
+const documentOtherSection = computed({
+  get: () => props.modelValue.DOCUMENT_OTHER?.[0] ?? {},
+  set: (data?: Metadata) => {
+    const effectiveData = data ? [data] : undefined
+    initialValue.DOCUMENT_OTHER = effectiveData
+
+    const next: MetadataSections = { DOCUMENT_OTHER: effectiveData }
+    emit("update:modelValue", next)
+  },
 })
 </script>
 
@@ -100,7 +116,7 @@ const component = computed(() => {
         >
           <RadioInput
             :id="id"
-            v-model="selectedChildSectionName"
+            v-model="selectedChildSection"
             name="documentStatusSection"
             size="medium"
             :value="MetadataSectionName.DOCUMENT_STATUS"
@@ -117,14 +133,8 @@ const component = computed(() => {
         >
           <RadioInput
             :id="id"
-            v-model="selectedChildSectionName"
-            :disabled="
-              isDocumentTextProof &&
-              !(
-                selectedChildSectionName ===
-                MetadataSectionName.DOCUMENT_TEXT_PROOF
-              )
-            "
+            v-model="selectedChildSection"
+            :disabled="disableDocumentTextProof"
             name="documentStatusSection"
             size="medium"
             :value="MetadataSectionName.DOCUMENT_TEXT_PROOF"
@@ -141,7 +151,7 @@ const component = computed(() => {
         >
           <RadioInput
             :id="id"
-            v-model="selectedChildSectionName"
+            v-model="selectedChildSection"
             name="documentStatusSection"
             size="medium"
             :value="MetadataSectionName.DOCUMENT_OTHER"
@@ -150,6 +160,21 @@ const component = computed(() => {
       </div>
     </div>
 
-    <component :is="component" v-model="childSection" />
+    <DocumentStatusInputGroup
+      v-if="selectedChildSection === MetadataSectionName.DOCUMENT_STATUS"
+      v-model="documentStatusSection"
+    />
+
+    <DocumentTextProofInputGroup
+      v-else-if="
+        selectedChildSection === MetadataSectionName.DOCUMENT_TEXT_PROOF
+      "
+      v-model="documentTextProofSection"
+    />
+
+    <DocumentOtherInputGroup
+      v-else-if="selectedChildSection === MetadataSectionName.DOCUMENT_OTHER"
+      v-model="documentOtherSection"
+    />
   </div>
 </template>

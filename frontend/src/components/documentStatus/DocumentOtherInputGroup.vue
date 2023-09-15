@@ -1,39 +1,29 @@
 <script lang="ts" setup>
-import { computed, ref, watch } from "vue"
+import { produce } from "immer"
+import { computed } from "vue"
 import { Metadata } from "@/domain/norm"
 import InputField from "@/shared/components/input/InputField.vue"
 import TextInput from "@/shared/components/input/TextInput.vue"
 
-interface Props {
+const props = defineProps<{
   modelValue: Metadata
-}
+}>()
 
-type Emits = (event: "update:modelValue", value: Metadata) => void
-
-const props = defineProps<Props>()
-const emit = defineEmits<Emits>()
-
-const inputValue = ref(props.modelValue)
-
-watch(
-  () => props.modelValue,
-  (newValue) => {
-    if (newValue !== undefined) {
-      inputValue.value = newValue
-    }
-  },
-  { immediate: true },
-)
-
-watch(inputValue, () => emit("update:modelValue", inputValue.value), {
-  deep: true,
-})
+const emit = defineEmits<{
+  "update:modelValue": [value: Metadata]
+}>()
 
 const text = computed({
-  get: () => inputValue.value.TEXT?.[0],
-  set: (data?: string) => data && (inputValue.value.TEXT = [data]),
+  get: () => props.modelValue.TEXT?.[0],
+  set: (data?: string) => {
+    const next = produce(props.modelValue, (draft) => {
+      draft.TEXT = data ? [data] : undefined
+    })
+    emit("update:modelValue", next)
+  },
 })
 </script>
+
 <template>
   <InputField
     id="otherText"
