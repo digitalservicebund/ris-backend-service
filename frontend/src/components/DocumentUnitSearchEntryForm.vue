@@ -55,7 +55,6 @@ const documentNumberOrFileNumber = computed({
 const publishingStateModel = computed({
   get: () => searchEntry.value?.status?.publicationStatus ?? "",
   set: (data) => {
-    console.log(data)
     if (data?.length === 0) {
       delete searchEntry.value.status
     } else {
@@ -64,8 +63,6 @@ const publishingStateModel = computed({
         publicationStatus: data as PublicationState,
       }
     }
-
-    console.log(searchEntry.value)
   },
 })
 
