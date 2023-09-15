@@ -208,11 +208,11 @@ dependencies {
     implementation("org.freehep:freehep-graphicsio-emf:2.4")
 
     // package served by private repo, requires authentication:
-    implementation("de.bund.digitalservice:neuris-juris-xml-export:0.7.12") {
+    implementation("de.bund.digitalservice:neuris-juris-xml-export:0.7.13") {
         exclude(group = "org.slf4j", module = "slf4j-simple")
     }
     // for local development:
-    // implementation files("../../neuris-juris-xml-export/build/libs/neuris-juris-xml-export-0.7.12.jar")
+    // implementation files("../../neuris-juris-xml-export/build/libs/neuris-juris-xml-export-0.7.13.jar")
 
     implementation("com.icegreen:greenmail:2.0.0")
 
