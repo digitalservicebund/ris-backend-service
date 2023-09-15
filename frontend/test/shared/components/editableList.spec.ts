@@ -102,13 +102,14 @@ async function renderComponent(options?: {
 async function clickEditButtonOfEntry(
   entryIndex: number,
   user?: ReturnType<typeof userEvent.setup>,
-): Promise<void> {
+): Promise<HTMLInputElement> {
   user = user ?? userEvent.setup()
   const allEditButtons = screen.getAllByRole("button", {
     name: "Eintrag bearbeiten",
   })
 
   await user.click(allEditButtons[entryIndex])
+  return screen.getByRole("textbox") as HTMLInputElement
 }
 
 async function clickDeleteButtonOfEntry(
@@ -123,6 +124,14 @@ async function clickDeleteButtonOfEntry(
   await user.click(allDeleteButtons[entryIndex])
 }
 
+async function clickAddEntryButton(
+  user?: ReturnType<typeof userEvent.setup>,
+): Promise<void> {
+  user = user ?? userEvent.setup()
+  const addButton = screen.getByRole("button", { name: "Weitere Angabe" })
+  await user.click(addButton)
+}
+
 describe("EditableList", () => {
   it("renders a summary per model entry on initial render", async () => {
     await renderComponent({
@@ -135,7 +144,6 @@ describe("EditableList", () => {
   })
 
   it("shows edit component for default value when adding new new entry via button click", async () => {
-    const user = userEvent.setup()
     await renderComponent({
       editComponent: SimpleTextEditComponent,
       modelValue: ["entry 1", "entry 2"],
@@ -144,8 +152,7 @@ describe("EditableList", () => {
 
     expect(screen.queryByRole("textbox")).not.toBeInTheDocument()
 
-    const addButton = screen.getByRole("button", { name: "Weitere Angabe" })
-    await user.click(addButton)
+    await clickAddEntryButton()
     const input = screen.queryByRole("textbox") as HTMLInputElement
 
     expect(input).toBeInTheDocument()
@@ -311,8 +318,7 @@ describe("EditableList", () => {
       modelValue,
     })
 
-    await clickEditButtonOfEntry(0, user)
-    const input = screen.getByRole("textbox") as HTMLInputElement
+    const input = await clickEditButtonOfEntry(0, user)
     await user.type(input, "o")
 
     expect(modelValue).toEqual(["foo", "bar"])
@@ -326,8 +332,7 @@ describe("EditableList", () => {
       modelValue: ["entry 1", "entry 2"],
     })
 
-    await clickEditButtonOfEntry(0, user)
-    const input = screen.getByRole("textbox") as HTMLInputElement
+    const input = await clickEditButtonOfEntry(0, user)
     await user.type(input, "{enter}")
 
     expect(input).not.toBeInTheDocument()
@@ -342,5 +347,64 @@ describe("EditableList", () => {
     expect(
       screen.queryByRole("button", { name: "Weitere Angabe" }),
     ).not.toBeInTheDocument()
+  })
+
+  it("does not extend the number of entries if adding only empty entries", async () => {
+    const modelValue: string[] = []
+    await renderComponent({
+      editComponent: SimpleTextEditComponent,
+      modelValue,
+    })
+
+    await clickAddEntryButton()
+    await clickAddEntryButton()
+    await clickAddEntryButton()
+
+    expect(modelValue).toEqual([""])
+  })
+
+  it("removes the current entry if it was cleared and the user adds a new one", async () => {
+    const user = userEvent.setup()
+    const modelValue = ["entry 1"]
+    await renderComponent({
+      editComponent: SimpleTextEditComponent,
+      modelValue,
+    })
+
+    const input = await clickEditButtonOfEntry(0, user)
+    await user.clear(input)
+    await clickAddEntryButton(user)
+
+    expect(modelValue).toEqual([""])
+  })
+
+  it("removes the current entry if it was cleared and a different entry gets edited afterwards", async () => {
+    const user = userEvent.setup()
+    const modelValue = ["entry 1", "entry 2"]
+    await renderComponent({
+      editComponent: SimpleTextEditComponent,
+      modelValue,
+    })
+
+    const input = await clickEditButtonOfEntry(1)
+    await user.clear(input)
+    await clickEditButtonOfEntry(0)
+
+    expect(modelValue).toEqual(["entry 1"])
+  })
+
+  it("removes the current entry if it was cleared and the user finishes the entry", async () => {
+    const user = userEvent.setup()
+    const modelValue = ["entry 1", "entry 2"]
+    await renderComponent({
+      editComponent: SimpleTextEditComponent,
+      modelValue,
+    })
+
+    const input = await clickEditButtonOfEntry(1)
+    await user.clear(input)
+    await user.type(input, "{enter}")
+
+    expect(modelValue).toEqual(["entry 1"])
   })
 })
