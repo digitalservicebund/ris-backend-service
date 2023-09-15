@@ -47,12 +47,9 @@ function setEditIndex(newEditIndex?: number): void {
   ) {
     removeModelEntry(editIndex.value)
 
-    editIndex.value =
-      newEditIndex === undefined
-        ? undefined
-        : editIndex.value < newEditIndex
-        ? newEditIndex - 1
-        : newEditIndex
+    if (newEditIndex === undefined || newEditIndex < editIndex.value) {
+      editIndex.value = newEditIndex
+    } else editIndex.value = newEditIndex - 1
   } else {
     editIndex.value = newEditIndex
   }
@@ -61,7 +58,7 @@ function setEditIndex(newEditIndex?: number): void {
 function entryIsEmpty(entry: unknown): boolean {
   return typeof entry === "object"
     ? Object.values(entry ?? {}).every(entryIsEmpty)
-    : !Boolean(entry)
+    : !entry
 }
 
 function addNewModelEntry() {
