@@ -29,7 +29,7 @@ const NO_MATCHING_ENTRY = "Kein passender Eintrag"
 const candidateForSelection = ref<ComboboxItem>() // <-- the top search result
 const inputText = ref<string>()
 const currentlyDisplayedItems = ref<ComboboxItem[]>()
-const noMatchingItem = ref<ComboboxItem>()
+const createNewItem = ref<ComboboxItem>()
 const showDropdown = ref(false)
 const filter = ref<string>()
 const dropdownContainerRef = ref<HTMLElement>()
@@ -163,7 +163,7 @@ const updateCurrentItems = async (searchStr?: string) => {
   ) {
     handleNoSearchResults(searchStr)
   } else {
-    noMatchingItem.value = undefined
+    createNewItem.value = undefined
     candidateForSelection.value = currentlyDisplayedItems.value[0]
     focusedItemIndex.value = 1
   }
@@ -171,7 +171,7 @@ const updateCurrentItems = async (searchStr?: string) => {
 
 function handleNoSearchResults(searchStr?: string) {
   if (props.manualEntry && searchStr) {
-    noMatchingItem.value = {
+    createNewItem.value = {
       label: `${searchStr} neu erstellen`,
       value: { label: searchStr },
     }
@@ -318,21 +318,21 @@ export type InputModelProps =
         </span>
       </div>
       <div
-        v-if="noMatchingItem"
-        key="noMatchingItem"
+        v-if="createNewItem"
+        key="createNewItem"
         aria-label="dropdown-option"
         class="cursor-pointer border-b-1 border-b-gray-400 px-[1.5rem] py-[1rem] last:border-b-0 hover:bg-gray-400 focus:bg-blue-200 focus:outline-none"
         role="button"
         tabindex="0"
-        @click="setChosenItem(noMatchingItem)"
+        @click="setChosenItem(createNewItem)"
         @keydown.tab="closeDropdownAndRevertToLastSavedValue"
-        @keypress.enter="setChosenItem(noMatchingItem)"
+        @keypress.enter="setChosenItem(createNewItem)"
         @keyup.down="keydown"
         @keyup.up="keyup"
       >
         <span>
           <span class="ds-label-01-bold text-blue-800 underline">{{
-            noMatchingItem?.label
+            createNewItem?.label
           }}</span>
         </span>
       </div>
