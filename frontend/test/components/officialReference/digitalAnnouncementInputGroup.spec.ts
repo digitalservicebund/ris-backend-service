@@ -4,48 +4,54 @@ import { createPinia, setActivePinia } from "pinia"
 import DigitalAnnouncementInputGroup from "@/components/officialReference/DigitalAnnouncementInputGroup.vue"
 import { Metadata } from "@/domain/norm"
 
-function renderComponent(options?: { modelValue?: Metadata }) {
-  const props = {
-    modelValue: options?.modelValue ?? {},
+type DigitalAnnouncementInputGroupProps = InstanceType<
+  typeof DigitalAnnouncementInputGroup
+>["$props"]
+
+function renderComponent(props?: Partial<DigitalAnnouncementInputGroupProps>) {
+  const effectiveProps = {
+    modelValue: props?.modelValue ?? {},
+    "onUpdate:modelValue": props?.["onUpdate:modelValue"] ?? vi.fn(),
   }
-  return render(DigitalAnnouncementInputGroup, { props })
+
+  const utils = render(DigitalAnnouncementInputGroup, { props: effectiveProps })
+  // eslint-disable-next-line testing-library/await-async-events
+  const user = userEvent.setup()
+  return { user, ...utils }
 }
 
 function getControls() {
-  const announcementMediumInput = screen.queryByRole("textbox", {
+  const announcementMediumInput = screen.getByRole("textbox", {
     name: "Verkündungsmedium",
-  }) as HTMLInputElement
+  })
 
-  const dateInput = screen.queryByRole("textbox", {
+  const dateInput = screen.getByRole("textbox", {
     name: "Verkündungsdatum",
-  }) as HTMLInputElement
+  })
 
-  const editionInput = screen.queryByRole("textbox", {
+  const editionInput = screen.getByRole("textbox", {
     name: "Ausgabenummer",
-  }) as HTMLInputElement
+  })
 
-  const yearInput = screen.queryByRole("textbox", {
+  const yearInput = screen.getByRole("textbox", {
     name: "Jahr",
-  }) as HTMLInputElement
+  })
 
-  const pageInput = screen.queryByRole("textbox", {
+  const pageInput = screen.getByRole("textbox", {
     name: "Seitenzahl",
-  }) as HTMLInputElement
+  })
 
-  const areaOfPublicationInput = screen.queryByRole("textbox", {
+  const areaOfPublicationInput = screen.getByRole("textbox", {
     name: "Bereich der Veröffentlichung",
-  }) as HTMLInputElement
+  })
 
-  const numberOfPublicationInRespectiveAreaInput = screen.queryByRole(
-    "textbox",
-    {
-      name: "Nummer der Veröffentlichung im jeweiligen Bereich",
-    },
-  ) as HTMLInputElement
+  const numberOfPublicationInRespectiveAreaInput = screen.getByRole("textbox", {
+    name: "Nummer der Veröffentlichung im jeweiligen Bereich",
+  })
 
-  const additionalInfoInput = screen.queryByRole("textbox", {
+  const additionalInfoInput = screen.getByRole("textbox", {
     name: "Zusatzangaben",
-  }) as HTMLInputElement
+  })
 
   const additionalInfoChips = within(
     screen.getByTestId("chips-input_digitalAnnouncementInfo"),
@@ -55,9 +61,9 @@ function getControls() {
     screen.getByTestId("chips-input_digitalAnnouncementInfo"),
   ).queryAllByTestId("chip-value")
 
-  const explanationInput = screen.queryByRole("textbox", {
+  const explanationInput = screen.getByRole("textbox", {
     name: "Erläuterungen",
-  }) as HTMLInputElement
+  })
 
   const explanationChips = within(
     screen.getByTestId("chips-input_digitalAnnouncementExplanations"),
@@ -88,6 +94,7 @@ describe("DigitalAnnouncementInputGroup", () => {
   beforeEach(async () => {
     setActivePinia(createPinia())
   })
+
   it("renders all digital announcement inputs", () => {
     renderComponent({
       modelValue: {
@@ -198,9 +205,15 @@ describe("DigitalAnnouncementInputGroup", () => {
   })
 
   it("emits update model value event when input value changes", async () => {
-    const user = userEvent.setup()
-    const modelValue = {}
-    renderComponent({ modelValue })
+    let modelValue: Metadata = {}
+    const updateModelValue = vi.fn().mockImplementation((data: Metadata) => {
+      modelValue = data
+    })
+
+    const { user, rerender } = renderComponent({
+      modelValue,
+      "onUpdate:modelValue": updateModelValue,
+    })
 
     const {
       announcementMediumInput,
@@ -215,20 +228,27 @@ describe("DigitalAnnouncementInputGroup", () => {
     } = getControls()
 
     await user.type(announcementMediumInput, "foo")
+    await rerender({ modelValue })
     await user.type(dateInput, "05.04.2023")
+    await rerender({ modelValue })
     await user.type(editionInput, "1")
+    await rerender({ modelValue })
     await user.type(yearInput, "2023")
+    await rerender({ modelValue })
     await user.type(areaOfPublicationInput, "baz baz")
+    await rerender({ modelValue })
     await user.type(pageInput, "foo bar")
+    await rerender({ modelValue })
     await user.type(numberOfPublicationInRespectiveAreaInput, "bar foo")
-    await user.type(
-      additionalInfoInput,
-      "additional info 1{enter}additional info 2{enter}",
-    )
-    await user.type(
-      explanationInput,
-      "explanation 1{enter}explanation 2{enter}",
-    )
+    await rerender({ modelValue })
+    await user.type(additionalInfoInput, "additional info 1{enter}")
+    await rerender({ modelValue })
+    await user.type(additionalInfoInput, "additional info 2{enter}")
+    await rerender({ modelValue })
+    await user.type(explanationInput, "explanation 1{enter}")
+    await rerender({ modelValue })
+    await user.type(explanationInput, "explanation 2{enter}")
+    await rerender({ modelValue })
 
     expect(modelValue).toEqual({
       ANNOUNCEMENT_MEDIUM: ["foo"],
@@ -244,8 +264,7 @@ describe("DigitalAnnouncementInputGroup", () => {
   })
 
   it("emits update model value event when input value is cleared", async () => {
-    const user = userEvent.setup()
-    const modelValue: Metadata = {
+    let modelValue: Metadata = {
       ANNOUNCEMENT_MEDIUM: ["foo"],
       DATE: ["2023-04-05"],
       EDITION: ["1"],
@@ -256,8 +275,14 @@ describe("DigitalAnnouncementInputGroup", () => {
       ADDITIONAL_INFO: ["foo baz"],
       EXPLANATION: ["ban baz"],
     }
+    const updateModelValue = vi.fn().mockImplementation((data: Metadata) => {
+      modelValue = data
+    })
 
-    renderComponent({ modelValue })
+    const { user, rerender } = renderComponent({
+      modelValue,
+      "onUpdate:modelValue": updateModelValue,
+    })
 
     const {
       announcementMediumInput,
@@ -273,30 +298,37 @@ describe("DigitalAnnouncementInputGroup", () => {
 
     expect(announcementMediumInput).toHaveValue("foo")
     await user.clear(announcementMediumInput)
+    await rerender({ modelValue })
     expect(modelValue.ANNOUNCEMENT_MEDIUM).toBeUndefined()
 
     expect(dateInput).toHaveValue("05.04.2023")
     await userEvent.clear(dateInput)
+    await rerender({ modelValue })
     expect(modelValue.DATE).toBeUndefined()
 
     expect(editionInput).toHaveValue("1")
     await user.clear(editionInput)
+    await rerender({ modelValue })
     expect(modelValue.EDITION).toBeUndefined()
 
     expect(yearInput).toHaveValue("2023")
     await user.clear(yearInput)
+    await rerender({ modelValue })
     expect(modelValue.YEAR).toBeUndefined()
 
     expect(areaOfPublicationInput).toHaveValue("foo bar")
     await user.clear(areaOfPublicationInput)
+    await rerender({ modelValue })
     expect(modelValue.AREA_OF_PUBLICATION).toBeUndefined()
 
     expect(pageInput).toHaveValue("baz baz")
     await user.clear(pageInput)
+    await rerender({ modelValue })
     expect(modelValue.PAGE).toBeUndefined()
 
     expect(numberOfPublicationInRespectiveAreaInput).toHaveValue("bar foo")
     await user.clear(numberOfPublicationInRespectiveAreaInput)
+    await rerender({ modelValue })
     expect(modelValue.NUMBER_OF_THE_PUBLICATION_IN_THE_RESPECTIVE_AREA).toBe(
       undefined,
     )
@@ -304,12 +336,14 @@ describe("DigitalAnnouncementInputGroup", () => {
     for (const chip of additionalInfoChips) {
       const clearButton = within(chip).getByRole("button")
       await user.click(clearButton)
+      await rerender({ modelValue })
     }
     expect(modelValue.ADDITIONAL_INFO).toBeUndefined()
 
     for (const chip of explanationChips) {
       const clearButton = within(chip).getByRole("button")
       await user.click(clearButton)
+      await rerender({ modelValue })
     }
     expect(modelValue.EXPLANATION).toBeUndefined()
   })

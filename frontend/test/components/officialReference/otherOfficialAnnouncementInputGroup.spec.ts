@@ -4,17 +4,31 @@ import { createPinia, setActivePinia } from "pinia"
 import OtherOfficialAnnouncementInputGroup from "@/components/officialReference/OtherOfficialAnnouncementInputGroup.vue"
 import { Metadata, MetadatumType } from "@/domain/norm"
 
-function renderComponent(options?: { modelValue?: Metadata }) {
-  const props = {
-    modelValue: options?.modelValue ?? {},
+type OtherOfficialAnnouncementInputGroupProps = InstanceType<
+  typeof OtherOfficialAnnouncementInputGroup
+>["$props"]
+
+function renderComponent(
+  props?: Partial<OtherOfficialAnnouncementInputGroupProps>,
+) {
+  const effectiveProps = {
+    modelValue: props?.modelValue ?? {},
+    "onUpdate:modelValue": props?.["onUpdate:modelValue"] ?? vi.fn(),
   }
-  return render(OtherOfficialAnnouncementInputGroup, { props })
+
+  const utils = render(OtherOfficialAnnouncementInputGroup, {
+    props: effectiveProps,
+  })
+  // eslint-disable-next-line testing-library/await-async-events
+  const user = userEvent.setup()
+  return { user, ...utils }
 }
 
 describe("OtherOfficialReferenceInputGroup", () => {
   beforeEach(async () => {
     setActivePinia(createPinia())
   })
+
   it("renders all inputs", () => {
     renderComponent({
       modelValue: {
@@ -22,9 +36,9 @@ describe("OtherOfficialReferenceInputGroup", () => {
       },
     })
 
-    const otherOfficialReferenceInput = screen.queryByRole("textbox", {
+    const otherOfficialReferenceInput = screen.getByRole("textbox", {
       name: "Sonstige amtliche Fundstelle",
-    }) as HTMLInputElement
+    })
 
     expect(otherOfficialReferenceInput).toBeInTheDocument()
     expect(otherOfficialReferenceInput).toHaveValue("test value")
@@ -37,14 +51,20 @@ describe("OtherOfficialReferenceInputGroup", () => {
       },
     })
 
-    const otherOfficialReferenceInput = screen.queryByDisplayValue("foo")
+    const otherOfficialReferenceInput = screen.getByDisplayValue("foo")
     expect(otherOfficialReferenceInput).toBeInTheDocument()
   })
 
   it("emits update model value event when input value changes", async () => {
-    const user = userEvent.setup()
-    const modelValue = {}
-    renderComponent({ modelValue })
+    let modelValue: Metadata = {}
+    const updateModelValue = vi.fn().mockImplementation((data: Metadata) => {
+      modelValue = data
+    })
+
+    const { user } = renderComponent({
+      modelValue,
+      "onUpdate:modelValue": updateModelValue,
+    })
 
     const input = screen.getAllByRole("textbox")
     await user.type(input[0], "foo")
@@ -55,9 +75,15 @@ describe("OtherOfficialReferenceInputGroup", () => {
   })
 
   it("emits update model value event when input value is cleared", async () => {
-    const user = userEvent.setup()
-    const modelValue: Metadata = { OTHER_OFFICIAL_REFERENCE: ["test"] }
-    renderComponent({ modelValue })
+    let modelValue: Metadata = { OTHER_OFFICIAL_REFERENCE: ["test"] }
+    const updateModelValue = vi.fn().mockImplementation((data: Metadata) => {
+      modelValue = data
+    })
+
+    const { user } = renderComponent({
+      modelValue,
+      "onUpdate:modelValue": updateModelValue,
+    })
 
     const input = screen.getByRole("textbox")
     expect(input).toHaveValue("test")

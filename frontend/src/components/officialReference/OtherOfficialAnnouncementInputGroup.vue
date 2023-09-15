@@ -1,41 +1,29 @@
 <script lang="ts" setup>
-import { computed, ref, watch } from "vue"
+import { produce } from "immer"
+import { computed } from "vue"
 import { Metadata } from "@/domain/norm"
 import InputField from "@/shared/components/input/InputField.vue"
 import TextInput from "@/shared/components/input/TextInput.vue"
 
-interface Props {
+const props = defineProps<{
   modelValue: Metadata
-}
-
-const props = defineProps<Props>()
+}>()
 
 const emit = defineEmits<{
   "update:modelValue": [value: Metadata]
 }>()
 
-const inputValue = ref(props.modelValue)
-
-watch(
-  () => props.modelValue,
-  (newValue) => {
-    if (newValue !== undefined) {
-      inputValue.value = newValue
-    }
-  },
-  { immediate: true },
-)
-
-watch(inputValue, () => emit("update:modelValue", inputValue.value), {
-  deep: true,
-})
-
 const otherOfficialReference = computed({
-  get: () => inputValue.value.OTHER_OFFICIAL_REFERENCE?.[0],
-  set: (data?: string) =>
-    (inputValue.value.OTHER_OFFICIAL_REFERENCE = data ? [data] : undefined),
+  get: () => props.modelValue.OTHER_OFFICIAL_REFERENCE?.[0],
+  set: (data?: string) => {
+    const next = produce(props.modelValue, (draft) => {
+      draft.OTHER_OFFICIAL_REFERENCE = data ? [data] : undefined
+    })
+    emit("update:modelValue", next)
+  },
 })
 </script>
+
 <template>
   <InputField
     id="otherOfficialAnnouncement"

@@ -1,68 +1,81 @@
 <script lang="ts" setup>
-import { computed, ref, watch } from "vue"
+import { produce } from "immer"
+import { computed } from "vue"
 import { Metadata } from "@/domain/norm"
 import ChipsInput from "@/shared/components/input/ChipsInput.vue"
 import InputField from "@/shared/components/input/InputField.vue"
 import TextInput from "@/shared/components/input/TextInput.vue"
 import YearInput from "@/shared/components/input/YearInput.vue"
 
-interface Props {
+const props = defineProps<{
   modelValue: Metadata
-}
-
-const props = defineProps<Props>()
+}>()
 
 const emit = defineEmits<{
   "update:modelValue": [value: Metadata]
 }>()
 
-const inputValue = ref(props.modelValue)
-
-watch(
-  () => props.modelValue,
-  (newValue) => {
-    if (newValue !== undefined) {
-      inputValue.value = newValue
-    }
-  },
-  { immediate: true },
-)
-
-watch(inputValue, () => emit("update:modelValue", inputValue.value), {
-  deep: true,
-})
-
 const announcementGazette = computed({
-  get: () => inputValue.value.ANNOUNCEMENT_GAZETTE?.[0],
-  set: (data) =>
-    (inputValue.value.ANNOUNCEMENT_GAZETTE = data ? [data] : undefined),
+  get: () => props.modelValue.ANNOUNCEMENT_GAZETTE?.[0],
+  set: (data?: string) => {
+    const next = produce(props.modelValue, (draft) => {
+      draft.ANNOUNCEMENT_GAZETTE = data ? [data] : undefined
+    })
+    emit("update:modelValue", next)
+  },
 })
 
 const year = computed({
-  get: () => inputValue.value.YEAR?.[0],
-  set: (data) => (inputValue.value.YEAR = data ? [data] : undefined),
+  get: () => props.modelValue.YEAR?.[0],
+  set: (data?: string) => {
+    const next = produce(props.modelValue, (draft) => {
+      draft.YEAR = data ? [data] : undefined
+    })
+    emit("update:modelValue", next)
+  },
 })
 
 const number = computed({
-  get: () => inputValue.value.NUMBER?.[0],
-  set: (data) => (inputValue.value.NUMBER = data ? [data] : undefined),
+  get: () => props.modelValue.NUMBER?.[0],
+  set: (data?: string) => {
+    const next = produce(props.modelValue, (draft) => {
+      draft.NUMBER = data ? [data] : undefined
+    })
+    emit("update:modelValue", next)
+  },
 })
 
 const pageNumber = computed({
-  get: () => inputValue.value.PAGE?.[0],
-  set: (data) => (inputValue.value.PAGE = data ? [data] : undefined),
+  get: () => props.modelValue.PAGE?.[0],
+  set: (data?: string) => {
+    const next = produce(props.modelValue, (draft) => {
+      draft.PAGE = data ? [data] : undefined
+    })
+    emit("update:modelValue", next)
+  },
 })
 
 const additionalInfo = computed({
-  get: () => inputValue.value.ADDITIONAL_INFO,
-  set: (data) => (inputValue.value.ADDITIONAL_INFO = data),
+  get: () => props.modelValue.ADDITIONAL_INFO,
+  set: (data?: string[]) => {
+    const next = produce(props.modelValue, (draft) => {
+      draft.ADDITIONAL_INFO = data
+    })
+    emit("update:modelValue", next)
+  },
 })
 
 const explanation = computed({
-  get: () => inputValue.value.EXPLANATION,
-  set: (data) => (inputValue.value.EXPLANATION = data),
+  get: () => props.modelValue.EXPLANATION,
+  set: (data?: string[]) => {
+    const next = produce(props.modelValue, (draft) => {
+      draft.EXPLANATION = data
+    })
+    emit("update:modelValue", next)
+  },
 })
 </script>
+
 <template>
   <div class="ful-w flex justify-between gap-16">
     <InputField

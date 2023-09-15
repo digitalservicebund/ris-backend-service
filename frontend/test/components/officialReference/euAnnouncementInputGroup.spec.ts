@@ -4,40 +4,46 @@ import { createPinia, setActivePinia } from "pinia"
 import EuAnnouncementInputGroup from "@/components/officialReference/EuAnnouncementInputGroup.vue"
 import { Metadata } from "@/domain/norm"
 
-function renderComponent(options?: { modelValue?: Metadata }) {
-  const props = {
-    modelValue: options?.modelValue ?? {},
+type EuAnnouncementInputGroupProps = InstanceType<
+  typeof EuAnnouncementInputGroup
+>["$props"]
+
+function renderComponent(props?: Partial<EuAnnouncementInputGroupProps>) {
+  const effectiveProps = {
+    modelValue: props?.modelValue ?? {},
+    "onUpdate:modelValue": props?.["onUpdate:modelValue"] ?? vi.fn(),
   }
-  const utils = render(EuAnnouncementInputGroup, { props })
+
+  const utils = render(EuAnnouncementInputGroup, { props: effectiveProps })
   // eslint-disable-next-line testing-library/await-async-events
   const user = userEvent.setup()
   return { user, ...utils }
 }
 
 function getControls() {
-  const euGovernmentGazetteInput = screen.queryByRole("textbox", {
+  const euGovernmentGazetteInput = screen.getByRole("textbox", {
     name: "Amtsblatt der EU",
-  }) as HTMLInputElement
+  })
 
-  const yearInput = screen.queryByRole("textbox", {
+  const yearInput = screen.getByRole("textbox", {
     name: "Jahresangabe",
-  }) as HTMLInputElement
+  })
 
-  const seriesInput = screen.queryByRole("textbox", {
+  const seriesInput = screen.getByRole("textbox", {
     name: "Reihe",
-  }) as HTMLInputElement
+  })
 
-  const numberInput = screen.queryByRole("textbox", {
+  const numberInput = screen.getByRole("textbox", {
     name: "Nummer des Amtsblatts",
-  }) as HTMLInputElement
+  })
 
-  const pageInput = screen.queryByRole("textbox", {
+  const pageInput = screen.getByRole("textbox", {
     name: "Seitenzahl",
-  }) as HTMLInputElement
+  })
 
-  const additionalInfoInput = screen.queryByRole("textbox", {
+  const additionalInfoInput = screen.getByRole("textbox", {
     name: "Zusatzangaben",
-  }) as HTMLInputElement
+  })
 
   const additionalInfoChips = within(
     screen.getByTestId("chips-input_euAnnouncementInfo"),
@@ -47,9 +53,9 @@ function getControls() {
     screen.getByTestId("chips-input_euAnnouncementInfo"),
   ).queryAllByTestId("chip-value")
 
-  const explanationInput = screen.queryByRole("textbox", {
+  const explanationInput = screen.getByRole("textbox", {
     name: "Erläuterungen",
-  }) as HTMLInputElement
+  })
 
   const explanationChips = within(
     screen.getByTestId("chips-input_euAnnouncementExplanations"),
@@ -78,6 +84,7 @@ describe("EuGovernmentGazetteInputGroup", () => {
   beforeEach(async () => {
     setActivePinia(createPinia())
   })
+
   it("renders all inputs", () => {
     renderComponent({
       modelValue: {
@@ -162,9 +169,15 @@ describe("EuGovernmentGazetteInputGroup", () => {
   })
 
   it("emits update model value event when an input value changes", async () => {
-    const user = userEvent.setup()
-    const modelValue = {}
-    renderComponent({ modelValue })
+    let modelValue: Metadata = {}
+    const updateModelValue = vi.fn().mockImplementation((data: Metadata) => {
+      modelValue = data
+    })
+
+    const { user, rerender } = renderComponent({
+      modelValue,
+      "onUpdate:modelValue": updateModelValue,
+    })
 
     const {
       yearInput,
@@ -176,17 +189,20 @@ describe("EuGovernmentGazetteInputGroup", () => {
     } = getControls()
 
     await user.type(yearInput, "2023")
+    await rerender({ modelValue })
     await user.type(seriesInput, "0")
+    await rerender({ modelValue })
     await user.type(numberInput, "1")
+    await rerender({ modelValue })
     await user.type(pageInput, "2")
-    await user.type(
-      additionalInfoInput,
-      "additional info 1{enter}additional info 2{enter}",
-    )
-    await user.type(
-      explanationInput,
-      "explanation 1{enter}explanation 2{enter}",
-    )
+    await rerender({ modelValue })
+    await user.type(additionalInfoInput, "additional info 1{enter}")
+    await rerender({ modelValue })
+    await user.type(additionalInfoInput, "additional info 2{enter}")
+    await rerender({ modelValue })
+    await user.type(explanationInput, "explanation 1{enter}")
+    await rerender({ modelValue })
+    await user.type(explanationInput, "explanation 2{enter}")
 
     expect(modelValue).toEqual({
       YEAR: ["2023"],
@@ -199,8 +215,7 @@ describe("EuGovernmentGazetteInputGroup", () => {
   })
 
   it("emits update model value event when an input value is cleared", async () => {
-    const user = userEvent.setup()
-    const modelValue: Metadata = {
+    let modelValue: Metadata = {
       EU_GOVERNMENT_GAZETTE: ["Amtsblatt der EU"],
       YEAR: ["2023"],
       SERIES: ["0"],
@@ -209,7 +224,14 @@ describe("EuGovernmentGazetteInputGroup", () => {
       ADDITIONAL_INFO: ["foo bar"],
       EXPLANATION: ["bar foo"],
     }
-    renderComponent({ modelValue })
+    const updateModelValue = vi.fn().mockImplementation((data: Metadata) => {
+      modelValue = data
+    })
+
+    const { user, rerender } = renderComponent({
+      modelValue,
+      "onUpdate:modelValue": updateModelValue,
+    })
 
     const {
       yearInput,
@@ -222,29 +244,39 @@ describe("EuGovernmentGazetteInputGroup", () => {
 
     expect(yearInput).toHaveValue("2023")
     await user.clear(yearInput)
+    await rerender({ modelValue })
+
     expect(modelValue.YEAR).toBeUndefined()
 
     expect(seriesInput).toHaveValue("0")
     await user.clear(seriesInput)
+    await rerender({ modelValue })
+
     expect(modelValue.SERIES).toBeUndefined()
 
     expect(numberInput).toHaveValue("1")
     await user.clear(numberInput)
+    await rerender({ modelValue })
+
     expect(modelValue.NUMBER).toBeUndefined()
 
     expect(pageInput).toHaveValue("2")
     await user.clear(pageInput)
+    await rerender({ modelValue })
+
     expect(modelValue.PAGE).toBeUndefined()
 
     for (const chip of additionalInfoChips) {
       const clearButton = within(chip).getByRole("button")
       await user.click(clearButton)
+      await rerender({ modelValue })
     }
     expect(modelValue.ADDITIONAL_INFO).toBeUndefined()
 
     for (const chip of explanationChips) {
       const clearButton = within(chip).getByRole("button")
       await user.click(clearButton)
+      await rerender({ modelValue })
     }
     expect(modelValue.EXPLANATION).toBeUndefined()
   })

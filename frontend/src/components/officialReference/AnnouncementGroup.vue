@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, ref, watch } from "vue"
+import { computed } from "vue"
 import DigitalAnnouncementInputGroup from "@/components/officialReference/DigitalAnnouncementInputGroup.vue"
 import EuAnnouncementInputGroup from "@/components/officialReference/EuAnnouncementInputGroup.vue"
 import OtherOfficialAnnouncementInputGroup from "@/components/officialReference/OtherOfficialAnnouncementInputGroup.vue"
@@ -10,79 +10,97 @@ import InputField, {
 } from "@/shared/components/input/InputField.vue"
 import RadioInput from "@/shared/components/input/RadioInput.vue"
 
-interface Props {
+const props = defineProps<{
   modelValue: MetadataSections
-}
-
-const props = defineProps<Props>()
+}>()
 
 const emit = defineEmits<{
   "update:modelValue": [value: MetadataSections]
 }>()
 
-type ChildSectionName =
+/* -------------------------------------------------- *
+ * Section type                                       *
+ * -------------------------------------------------- */
+
+const initialValue: MetadataSections = {
+  PRINT_ANNOUNCEMENT: props.modelValue.PRINT_ANNOUNCEMENT,
+  DIGITAL_ANNOUNCEMENT: props.modelValue.DIGITAL_ANNOUNCEMENT,
+  EU_ANNOUNCEMENT: props.modelValue.EU_ANNOUNCEMENT,
+  OTHER_OFFICIAL_ANNOUNCEMENT: props.modelValue.OTHER_OFFICIAL_ANNOUNCEMENT,
+}
+
+const selectedChildSection = computed<
   | MetadataSectionName.PRINT_ANNOUNCEMENT
   | MetadataSectionName.DIGITAL_ANNOUNCEMENT
   | MetadataSectionName.EU_ANNOUNCEMENT
   | MetadataSectionName.OTHER_OFFICIAL_ANNOUNCEMENT
-
-const childSection = ref<Metadata>({})
-const selectedChildSectionName = ref<ChildSectionName>(
-  MetadataSectionName.PRINT_ANNOUNCEMENT,
-)
-
-watch(
-  childSection,
-  () =>
-    emit("update:modelValue", {
-      [selectedChildSectionName.value]: [childSection.value],
-    }),
-  {
-    deep: true,
-  },
-)
-
-watch(
-  () => props.modelValue,
-  (modelValue) => {
-    if (modelValue.PRINT_ANNOUNCEMENT) {
-      selectedChildSectionName.value = MetadataSectionName.PRINT_ANNOUNCEMENT
-      childSection.value = modelValue.PRINT_ANNOUNCEMENT[0]
-    } else if (modelValue.DIGITAL_ANNOUNCEMENT) {
-      selectedChildSectionName.value = MetadataSectionName.DIGITAL_ANNOUNCEMENT
-      childSection.value = modelValue.DIGITAL_ANNOUNCEMENT[0]
-    } else if (modelValue.EU_ANNOUNCEMENT) {
-      selectedChildSectionName.value = MetadataSectionName.EU_ANNOUNCEMENT
-      childSection.value = modelValue.EU_ANNOUNCEMENT[0]
-    } else if (modelValue.OTHER_OFFICIAL_ANNOUNCEMENT) {
-      selectedChildSectionName.value =
-        MetadataSectionName.OTHER_OFFICIAL_ANNOUNCEMENT
-      childSection.value = modelValue.OTHER_OFFICIAL_ANNOUNCEMENT[0]
+>({
+  get: () => {
+    if (props.modelValue.PRINT_ANNOUNCEMENT?.[0]) {
+      return MetadataSectionName.PRINT_ANNOUNCEMENT
+    } else if (props.modelValue.DIGITAL_ANNOUNCEMENT?.[0]) {
+      return MetadataSectionName.DIGITAL_ANNOUNCEMENT
+    } else if (props.modelValue.EU_ANNOUNCEMENT?.[0]) {
+      return MetadataSectionName.EU_ANNOUNCEMENT
+    } else if (props.modelValue.OTHER_OFFICIAL_ANNOUNCEMENT?.[0]) {
+      return MetadataSectionName.OTHER_OFFICIAL_ANNOUNCEMENT
+    } else {
+      return MetadataSectionName.PRINT_ANNOUNCEMENT
     }
   },
-  {
-    immediate: true,
-    deep: true,
+  set(value) {
+    emit("update:modelValue", { [value]: initialValue[value] ?? [{}] })
   },
-)
+})
 
-watch(selectedChildSectionName, () => (childSection.value = {}))
+/* -------------------------------------------------- *
+ * Section data                                       *
+ * -------------------------------------------------- */
 
-const component = computed(() => {
-  switch (selectedChildSectionName.value) {
-    case MetadataSectionName.PRINT_ANNOUNCEMENT:
-      return PrintAnnouncementInputGroup
-    case MetadataSectionName.DIGITAL_ANNOUNCEMENT:
-      return DigitalAnnouncementInputGroup
-    case MetadataSectionName.EU_ANNOUNCEMENT:
-      return EuAnnouncementInputGroup
-    case MetadataSectionName.OTHER_OFFICIAL_ANNOUNCEMENT:
-      return OtherOfficialAnnouncementInputGroup
-    default:
-      throw new Error(
-        `Unknown announcement child section: "${selectedChildSectionName.value}"`,
-      )
-  }
+const printAnnouncementSection = computed({
+  get: () => props.modelValue.PRINT_ANNOUNCEMENT?.[0] ?? {},
+  set: (data?: Metadata) => {
+    const effectiveData = data ? [data] : undefined
+    initialValue.PRINT_ANNOUNCEMENT = effectiveData
+
+    const next: MetadataSections = { PRINT_ANNOUNCEMENT: effectiveData }
+    emit("update:modelValue", next)
+  },
+})
+
+const digitalAnnouncementSection = computed({
+  get: () => props.modelValue.DIGITAL_ANNOUNCEMENT?.[0] ?? {},
+  set: (data?: Metadata) => {
+    const effectiveData = data ? [data] : undefined
+    initialValue.DIGITAL_ANNOUNCEMENT = effectiveData
+
+    const next: MetadataSections = { DIGITAL_ANNOUNCEMENT: effectiveData }
+    emit("update:modelValue", next)
+  },
+})
+
+const euAnnouncementSection = computed({
+  get: () => props.modelValue.EU_ANNOUNCEMENT?.[0] ?? {},
+  set: (data?: Metadata) => {
+    const effectiveData = data ? [data] : undefined
+    initialValue.EU_ANNOUNCEMENT = effectiveData
+
+    const next: MetadataSections = { EU_ANNOUNCEMENT: effectiveData }
+    emit("update:modelValue", next)
+  },
+})
+
+const otherOfficialAnnouncementSection = computed({
+  get: () => props.modelValue.OTHER_OFFICIAL_ANNOUNCEMENT?.[0] ?? {},
+  set: (data?: Metadata) => {
+    const effectiveData = data ? [data] : undefined
+    initialValue.OTHER_OFFICIAL_ANNOUNCEMENT = effectiveData
+
+    const next: MetadataSections = {
+      OTHER_OFFICIAL_ANNOUNCEMENT: effectiveData,
+    }
+    emit("update:modelValue", next)
+  },
 })
 </script>
 
@@ -99,7 +117,7 @@ const component = computed(() => {
       >
         <RadioInput
           :id="id"
-          v-model="selectedChildSectionName"
+          v-model="selectedChildSection"
           name="officialAnnouncement"
           size="medium"
           :value="MetadataSectionName.PRINT_ANNOUNCEMENT"
@@ -114,7 +132,7 @@ const component = computed(() => {
       >
         <RadioInput
           :id="id"
-          v-model="selectedChildSectionName"
+          v-model="selectedChildSection"
           name="officialAnnouncement"
           size="medium"
           :value="MetadataSectionName.DIGITAL_ANNOUNCEMENT"
@@ -129,7 +147,7 @@ const component = computed(() => {
       >
         <RadioInput
           :id="id"
-          v-model="selectedChildSectionName"
+          v-model="selectedChildSection"
           name="officialAnnouncement"
           size="medium"
           :value="MetadataSectionName.EU_ANNOUNCEMENT"
@@ -144,7 +162,7 @@ const component = computed(() => {
       >
         <RadioInput
           :id="id"
-          v-model="selectedChildSectionName"
+          v-model="selectedChildSection"
           name="officialAnnouncement"
           size="medium"
           :value="MetadataSectionName.OTHER_OFFICIAL_ANNOUNCEMENT"
@@ -152,6 +170,28 @@ const component = computed(() => {
       </InputField>
     </div>
 
-    <component :is="component" v-model="childSection" />
+    <DigitalAnnouncementInputGroup
+      v-if="selectedChildSection === MetadataSectionName.DIGITAL_ANNOUNCEMENT"
+      v-model="digitalAnnouncementSection"
+    />
+
+    <EuAnnouncementInputGroup
+      v-else-if="selectedChildSection === MetadataSectionName.EU_ANNOUNCEMENT"
+      v-model="euAnnouncementSection"
+    />
+
+    <OtherOfficialAnnouncementInputGroup
+      v-else-if="
+        selectedChildSection === MetadataSectionName.OTHER_OFFICIAL_ANNOUNCEMENT
+      "
+      v-model="otherOfficialAnnouncementSection"
+    />
+
+    <PrintAnnouncementInputGroup
+      v-else-if="
+        selectedChildSection === MetadataSectionName.PRINT_ANNOUNCEMENT
+      "
+      v-model="printAnnouncementSection"
+    />
   </div>
 </template>

@@ -1,5 +1,5 @@
 import userEvent from "@testing-library/user-event"
-import { render, screen, fireEvent } from "@testing-library/vue"
+import { fireEvent, render, screen } from "@testing-library/vue"
 import { createPinia, setActivePinia } from "pinia"
 import AnnouncementGroup from "@/components/officialReference/AnnouncementGroup.vue"
 import {
@@ -8,32 +8,31 @@ import {
   MetadatumType,
 } from "@/domain/norm"
 
-function renderComponent(options?: { modelValue?: MetadataSections }) {
-  const props = {
-    modelValue: options?.modelValue ?? {},
+type AnnouncementGroupProps = InstanceType<typeof AnnouncementGroup>["$props"]
+
+function renderComponent(props?: Partial<AnnouncementGroupProps>) {
+  const effectiveProps = {
+    modelValue: props?.modelValue ?? {},
+    "onUpdate:modelValue": props?.["onUpdate:modelValue"] ?? vi.fn(),
   }
 
-  return render(AnnouncementGroup, { props })
+  return render(AnnouncementGroup, { props: effectiveProps })
 }
 
 describe("AnnouncementInputGroup", () => {
   beforeEach(async () => {
     setActivePinia(createPinia())
   })
+
   it("should render the component with 4 radio buttons each for different sections ", () => {
     renderComponent()
-    const printRadio = screen.queryByLabelText(
-      "Papierverkündungsblatt",
-    ) as HTMLInputElement
-    const euRadio = screen.queryByLabelText(
-      "Amtsblatt der EU",
-    ) as HTMLInputElement
-    const digitalRadio = screen.queryByLabelText(
+
+    const printRadio = screen.getByLabelText("Papierverkündungsblatt")
+    const euRadio = screen.getByLabelText("Amtsblatt der EU")
+    const digitalRadio = screen.getByLabelText(
       "Elektronisches Verkündungsblatt",
-    ) as HTMLInputElement
-    const otherRadio = screen.queryByLabelText(
-      "Sonstige amtliche Fundstelle",
-    ) as HTMLInputElement
+    )
+    const otherRadio = screen.getByLabelText("Sonstige amtliche Fundstelle")
 
     expect(printRadio).toBeInTheDocument()
     expect(printRadio).toBeVisible()
@@ -49,99 +48,119 @@ describe("AnnouncementInputGroup", () => {
   })
 
   it("renders the correct child component when a radio button is selected ", async () => {
-    renderComponent()
+    const user = userEvent.setup()
 
-    const printRadio = screen.queryByLabelText(
-      "Papierverkündungsblatt",
-    ) as HTMLInputElement
-    const digitalRadio = screen.queryByLabelText(
+    let modelValue: MetadataSections = {}
+    const updateModelValue = vi
+      .fn()
+      .mockImplementation((data: MetadataSections) => {
+        modelValue = data
+      })
+    const { rerender } = renderComponent({
+      modelValue,
+      "onUpdate:modelValue": updateModelValue,
+    })
+
+    const printRadio = screen.getByLabelText("Papierverkündungsblatt")
+    const digitalRadio = screen.getByLabelText(
       "Elektronisches Verkündungsblatt",
-    ) as HTMLInputElement
-    const euRadio = screen.queryByLabelText(
-      "Amtsblatt der EU",
-    ) as HTMLInputElement
-    const otherRadio = screen.queryByLabelText(
-      "Sonstige amtliche Fundstelle",
-    ) as HTMLInputElement
+    )
+    const euRadio = screen.getByLabelText("Amtsblatt der EU")
+    const otherRadio = screen.getByLabelText("Sonstige amtliche Fundstelle")
 
     expect(printRadio).toBeChecked()
     expect(digitalRadio).not.toBeChecked()
     expect(euRadio).not.toBeChecked()
     expect(otherRadio).not.toBeChecked()
 
-    await fireEvent.click(digitalRadio)
+    await user.click(digitalRadio)
+    await rerender({ modelValue })
     expect(digitalRadio).toBeChecked()
     expect(printRadio).not.toBeChecked()
     expect(
-      screen.getByRole("textbox", {
-        name: "Verkündungsmedium",
-      }) as HTMLInputElement,
+      screen.getByRole("textbox", { name: "Verkündungsmedium" }),
     ).toBeInTheDocument()
 
-    await fireEvent.click(euRadio)
+    await user.click(euRadio)
+    await rerender({ modelValue })
     expect(euRadio).toBeChecked()
     expect(digitalRadio).not.toBeChecked()
     expect(
-      screen.getByRole("textbox", {
-        name: "Amtsblatt der EU",
-      }) as HTMLInputElement,
+      screen.getByRole("textbox", { name: "Amtsblatt der EU" }),
+    ).toBeInTheDocument()
+
+    await user.click(otherRadio)
+    await rerender({ modelValue })
+    expect(otherRadio).toBeChecked()
+    expect(digitalRadio).not.toBeChecked()
+    expect(
+      screen.getByRole("textbox", { name: "Sonstige amtliche Fundstelle" }),
     ).toBeInTheDocument()
   })
 
-  it("clears the child section data when a different radio button is selected ", async () => {
-    renderComponent()
+  it("restores the original data after switching types", async () => {
+    const user = userEvent.setup()
 
-    const printRadio = screen.queryByLabelText(
-      "Papierverkündungsblatt",
-    ) as HTMLInputElement
-    const digitalRadio = screen.queryByLabelText(
+    let modelValue: MetadataSections = {
+      PRINT_ANNOUNCEMENT: [
+        {
+          ANNOUNCEMENT_GAZETTE: ["foo"],
+          NUMBER: ["1"],
+          PAGE: ["2"],
+          ADDITIONAL_INFO: ["foo bar"],
+          EXPLANATION: ["baz ban"],
+        },
+      ],
+    }
+
+    const updateModelValue = vi
+      .fn()
+      .mockImplementation((data: MetadataSections) => {
+        modelValue = data
+      })
+
+    const { rerender, emitted } = renderComponent({
+      modelValue,
+      "onUpdate:modelValue": updateModelValue,
+    })
+
+    const printRadio = screen.getByLabelText("Papierverkündungsblatt")
+    const digitalRadio = screen.getByLabelText(
       "Elektronisches Verkündungsblatt",
-    ) as HTMLInputElement
+    )
 
-    const announcementGazetteInput = screen.queryByRole("textbox", {
-      name: "Verkündungsblatt",
-    }) as HTMLInputElement
+    await user.click(digitalRadio)
+    await rerender({ modelValue })
+    expect(emitted("update:modelValue")[0]).toEqual([
+      { DIGITAL_ANNOUNCEMENT: [{}] },
+    ])
 
-    await userEvent.type(announcementGazetteInput, "foo-bar")
-    await userEvent.tab()
-
-    expect(announcementGazetteInput).toHaveValue("foo-bar")
-
-    await fireEvent.click(digitalRadio)
-
-    const announcementMediumInput = screen.queryByRole("textbox", {
-      name: "Verkündungsmedium",
-    }) as HTMLInputElement
-
-    await userEvent.type(announcementMediumInput, "bar-foo")
-    await userEvent.tab()
-
-    expect(announcementMediumInput).toHaveValue("bar-foo")
-
-    await fireEvent.click(printRadio)
-
-    const announcementGazetteInputNew = screen.queryByRole("textbox", {
-      name: "Verkündungsblatt",
-    }) as HTMLInputElement
-
-    expect(announcementGazetteInputNew).not.toHaveValue()
+    await user.click(printRadio)
+    await rerender({ modelValue })
+    expect(emitted("update:modelValue")[1]).toEqual([
+      {
+        PRINT_ANNOUNCEMENT: [
+          {
+            ANNOUNCEMENT_GAZETTE: ["foo"],
+            NUMBER: ["1"],
+            PAGE: ["2"],
+            ADDITIONAL_INFO: ["foo bar"],
+            EXPLANATION: ["baz ban"],
+          },
+        ],
+      },
+    ])
   })
 
   it("only allows one radio button to be selected at a time", async () => {
     renderComponent()
 
-    const printRadio = screen.queryByLabelText(
-      "Papierverkündungsblatt",
-    ) as HTMLInputElement
-    const euRadio = screen.queryByLabelText(
-      "Amtsblatt der EU",
-    ) as HTMLInputElement
-    const digitalRadio = screen.queryByLabelText(
+    const printRadio = screen.getByLabelText("Papierverkündungsblatt")
+    const euRadio = screen.getByLabelText("Amtsblatt der EU")
+    const digitalRadio = screen.getByLabelText(
       "Elektronisches Verkündungsblatt",
-    ) as HTMLInputElement
-    const otherRadio = screen.queryByLabelText(
-      "Sonstige amtliche Fundstelle",
-    ) as HTMLInputElement
+    )
+    const otherRadio = screen.getByLabelText("Sonstige amtliche Fundstelle")
 
     expect(printRadio).toBeChecked()
     expect(euRadio).not.toBeChecked()
@@ -178,9 +197,9 @@ describe("AnnouncementInputGroup", () => {
   it("emits update:modelValue event when child section data is updated ", async () => {
     const { emitted } = renderComponent()
 
-    const announcementGazetteInput = screen.queryByRole("textbox", {
+    const announcementGazetteInput = screen.getByRole("textbox", {
       name: "Verkündungsblatt",
-    }) as HTMLInputElement
+    })
 
     await userEvent.type(announcementGazetteInput, "A")
 
@@ -207,14 +226,14 @@ describe("AnnouncementInputGroup", () => {
       },
     })
 
-    const digitalRadio = screen.queryByLabelText(
+    const digitalRadio = screen.getByLabelText(
       "Elektronisches Verkündungsblatt",
-    ) as HTMLInputElement
+    )
     expect(digitalRadio).toBeChecked()
 
-    const digitalMedium = screen.queryByRole("textbox", {
+    const digitalMedium = screen.getByRole("textbox", {
       name: "Verkündungsmedium",
-    }) as HTMLInputElement
+    })
     expect(digitalMedium).toBeVisible()
     expect(digitalMedium).toHaveValue("test value")
   })
@@ -222,14 +241,12 @@ describe("AnnouncementInputGroup", () => {
   it("should by default render the print announcement component if modelValue is empty", function () {
     renderComponent({ modelValue: {} })
 
-    const printRadio = screen.queryByLabelText(
-      "Papierverkündungsblatt",
-    ) as HTMLInputElement
+    const printRadio = screen.getByLabelText("Papierverkündungsblatt")
     expect(printRadio).toBeChecked()
 
-    const announcementGazetteInput = screen.queryByRole("textbox", {
+    const announcementGazetteInput = screen.getByRole("textbox", {
       name: "Verkündungsblatt",
-    }) as HTMLInputElement
+    })
     expect(announcementGazetteInput).toBeInTheDocument()
   })
 })
