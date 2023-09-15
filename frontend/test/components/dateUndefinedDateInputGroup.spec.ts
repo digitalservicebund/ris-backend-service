@@ -4,6 +4,7 @@ import { createPinia, setActivePinia } from "pinia"
 import DateUndefinedDateInputGroup from "@/components/DateUndefinedDateInputGroup.vue"
 
 function renderComponent(overrides = {}) {
+  // eslint-disable-next-line testing-library/await-async-events
   const user = userEvent.setup()
   const props = {
     dateId: "1",

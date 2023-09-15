@@ -63,6 +63,7 @@ watch(localIsExpanded, () => emit("update:isExpanded", localIsExpanded.value))
   just fine -->
   <!-- eslint-disable vuejs-accessibility/click-events-have-key-events -->
   <div>
+    <!-- eslint-disable-next-line vuejs-accessibility/no-static-element-interactions -->
     <div
       :aria-labelledby="headerId"
       class="flex w-full items-center justify-between focus:outline-none focus-visible:outline-blue-800"

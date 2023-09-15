@@ -44,7 +44,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div
+  <button
     :aria-label="ariaLabel"
     class="editor-button flex cursor-pointer flex-row-reverse items-center text-blue-900 hover:bg-blue-200"
     :class="{
@@ -64,7 +64,7 @@ onUnmounted(() => {
       v-if="showDropdown"
       class="pa-1 absolute z-50 mt-80 flex flex-row border-1 border-solid border-blue-800 bg-white"
     >
-      <div
+      <button
         v-for="(childButton, index) in childButtons"
         :key="index"
         :aria-label="childButton.ariaLabel"
@@ -77,9 +77,9 @@ onUnmounted(() => {
         <span class="material-icons px-2 leading-default">{{
           childButton.icon
         }}</span>
-      </div>
+      </button>
     </div>
-  </div>
+  </button>
 </template>
 
 <style lang="scss" scoped>

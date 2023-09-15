@@ -7,6 +7,7 @@ import { PublicationState } from "@/domain/documentUnit"
 import DocumentUnitSearchInput from "@/domain/documentUnitSearchInput"
 
 function renderComponent(options?: { modelValue?: DocumentUnitSearchInput }) {
+  // eslint-disable-next-line testing-library/await-async-events
   const user = userEvent.setup()
   const props = {
     modelValue: new DocumentUnitSearchInput({ ...options?.modelValue }),

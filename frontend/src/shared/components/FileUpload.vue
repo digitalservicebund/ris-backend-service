@@ -59,6 +59,7 @@ function onFileSelect(event: Event) {
 </script>
 
 <template>
+  <!-- eslint-disable-next-line vuejs-accessibility/no-static-element-interactions -->
   <div
     id="upload-drop-area"
     class="upload-drop-area flex w-full flex-col items-center rounded-lg border-3 border-dashed border-blue-300 bg-white p-[3.125rem] text-center hover:border-3"

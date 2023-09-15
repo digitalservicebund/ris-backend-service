@@ -11,6 +11,7 @@ function renderComponent(options?: {
   searchResponseError?: ResponseError
   isLoading?: boolean
 }) {
+  // eslint-disable-next-line testing-library/await-async-events
   const user = userEvent.setup()
   return {
     user,

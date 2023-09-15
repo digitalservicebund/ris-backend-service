@@ -183,10 +183,9 @@ watch(listEntriesWithStatus, async () => {
           />
         </div>
         <div class="table-cell p-16">
-          <span
+          <button
             aria-label="Dokumentationseinheit löschen"
             class="material-icons cursor-pointer"
-            tabindex="0"
             @click="
               setSelectedDocumentUnitListEntry(
                 documentUnitListEntries?.find(
@@ -203,7 +202,7 @@ watch(listEntriesWithStatus, async () => {
             "
           >
             delete
-          </span>
+          </button>
         </div>
       </div>
     </div>

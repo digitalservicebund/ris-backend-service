@@ -229,59 +229,53 @@ export type InputModelProps =
 </script>
 
 <template>
-  <div
-    ref="dropdownContainerRef"
-    class="relative w-full"
-    @keydown.esc="closeDropdownAndRevertToLastSavedValue"
-  >
+  <div ref="dropdownContainerRef" class="relative w-full">
     <div
-      @keydown.enter="onEnter"
-      @keydown.tab="closeDropdownAndRevertToLastSavedValue"
+      class="space-between flex h-64 flex-row whitespace-nowrap border-2 border-solid px-16 py-12 hover:shadow-hover focus:shadow-focus"
+      :class="conditionalClasses"
     >
-      <div
-        class="space-between flex h-64 flex-row whitespace-nowrap border-2 border-solid px-16 py-12 hover:shadow-hover focus:shadow-focus"
-        :class="conditionalClasses"
+      <input
+        :id="id"
+        ref="inputFieldRef"
+        v-model="inputText"
+        :aria-label="ariaLabel"
+        autocomplete="off"
+        class="w-full bg-transparent focus:outline-none"
+        :class="placeholderColor"
+        :placeholder="placeholder"
+        :readonly="false"
+        tabindex="0"
+        @click="selectAllText"
+        @input="onTextChange"
+        @keydown.enter="onEnter"
+        @keydown.esc="closeDropdownAndRevertToLastSavedValue"
+        @keydown.tab="closeDropdownAndRevertToLastSavedValue"
+        @keyup.down="keydown"
+      />
+      <button
+        v-if="inputText && !noClear"
+        class="input-close-icon flex items-center"
+        tabindex="0"
+        @click="clearSelection"
       >
-        <input
-          :id="id"
-          ref="inputFieldRef"
-          v-model="inputText"
-          :aria-label="ariaLabel"
-          autocomplete="off"
-          class="w-full bg-transparent focus:outline-none"
-          :class="placeholderColor"
-          :placeholder="placeholder"
-          :readonly="false"
-          tabindex="0"
-          @click="selectAllText"
-          @input="onTextChange"
-          @keyup.down="keydown"
-        />
-        <button
-          v-if="inputText && !noClear"
-          class="input-close-icon flex items-center"
-          tabindex="0"
-          @click="clearSelection"
+        <span
+          aria-label="Auswahl zurücksetzen"
+          class="icon material-icons pr-[1.5rem] text-blue-800"
         >
-          <span
-            aria-label="Auswahl zurücksetzen"
-            class="icon material-icons pr-[1.5rem] text-blue-800"
-          >
-            close
-          </span>
-        </button>
-        <button
-          :aria-label="ariaLabelDropdownIcon"
-          class="input-expand-icon flex items-center"
-          tabindex="-1"
-          @click="toggleDropdown"
-        >
-          <span v-if="!showDropdown" class="icon material-icons text-blue-800">
-            expand_more
-          </span>
-          <span v-else class="icon material-icons"> expand_less </span>
-        </button>
-      </div>
+          close
+        </span>
+      </button>
+      <button
+        :aria-label="ariaLabelDropdownIcon"
+        class="input-expand-icon flex items-center"
+        tabindex="-1"
+        @click="toggleDropdown"
+      >
+        <span v-if="!showDropdown" class="icon material-icons text-blue-800">
+          expand_more
+        </span>
+        <span v-else class="icon material-icons"> expand_less </span>
+      </button>
     </div>
     <div
       v-if="showDropdown"

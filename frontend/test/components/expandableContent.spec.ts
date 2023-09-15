@@ -21,6 +21,7 @@ function renderComponent(options?: {
     marginLevel: options?.marginLevel,
   }
   const utils = render(ExpandableContentnt, { slots, props })
+  // eslint-disable-next-line testing-library/await-async-events
   const user = userEvent.setup()
   return { user, ...utils }
 }

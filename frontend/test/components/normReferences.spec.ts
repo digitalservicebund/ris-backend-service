@@ -13,6 +13,7 @@ function renderComponent(options?: { modelValue?: NormReference[] }) {
     modelValue: options?.modelValue ? options?.modelValue : [],
   }
 
+  // eslint-disable-next-line testing-library/await-async-events
   const user = userEvent.setup()
   return {
     user,

@@ -36,6 +36,7 @@ function renderSearchResults(
       stubs: { routerLink: { template: "<a><slot/></a>" } },
     },
   })
+  // eslint-disable-next-line testing-library/await-async-events
   const user = userEvent.setup()
   return { user, ...utils }
 }

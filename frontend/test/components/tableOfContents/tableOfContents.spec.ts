@@ -37,6 +37,7 @@ function renderComponent(options?: {
     },
   })
 
+  // eslint-disable-next-line testing-library/await-async-events
   const user = userEvent.setup()
   return { ...utils, user }
 }

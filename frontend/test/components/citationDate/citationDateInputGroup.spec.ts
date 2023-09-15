@@ -8,6 +8,7 @@ function renderComponent(options?: {
   ariaLabel?: string
   modelValue?: Metadata
 }) {
+  // eslint-disable-next-line testing-library/await-async-events
   const user = userEvent.setup()
   const props = {
     ariaLabel: options?.ariaLabel ?? "aria-label",

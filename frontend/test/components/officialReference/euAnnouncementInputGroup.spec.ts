@@ -9,6 +9,7 @@ function renderComponent(options?: { modelValue?: Metadata }) {
     modelValue: options?.modelValue ?? {},
   }
   const utils = render(EuAnnouncementInputGroup, { props })
+  // eslint-disable-next-line testing-library/await-async-events
   const user = userEvent.setup()
   return { user, ...utils }
 }

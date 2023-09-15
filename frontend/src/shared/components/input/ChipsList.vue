@@ -114,6 +114,7 @@ function focusNext() {
     class="my-4 mr-8 flex flex-row flex-wrap items-center gap-8 empty:m-0"
   >
     <template v-if="modelValue">
+      <!-- eslint-disable-next-line vuejs-accessibility/no-static-element-interactions -->
       <li
         v-for="(chip, i) in modelValue"
         :key="i"

@@ -33,6 +33,8 @@ function handleTokenClick(tokenContent: string) {
               ' im Sachgebietsbaum anzeigen'
             "
             class="link mr-12 w-44 whitespace-nowrap"
+            role="button"
+            tabindex="0"
             @click="emit('node-clicked')"
             @keyup.enter="emit('node-clicked')"
           >

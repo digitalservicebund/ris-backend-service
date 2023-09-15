@@ -59,6 +59,7 @@ function renderComponent(
 }
 
 describe("Combobox Element", () => {
+  // eslint-disable-next-line testing-library/await-async-events
   const user = userEvent.setup()
 
   it("is closed", () => {

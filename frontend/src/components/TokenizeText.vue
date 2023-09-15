@@ -38,6 +38,8 @@ function handleTokenClick(token: Token) {
     v-for="(token, idx) in tokenizeText()"
     :key="idx"
     :class="token.isLink && 'linked-field'"
+    role="button"
+    tabindex="0"
     @click="handleTokenClick(token)"
     @keyup.enter="handleTokenClick(token)"
   >

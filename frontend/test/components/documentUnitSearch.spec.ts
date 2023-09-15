@@ -7,6 +7,7 @@ import DocumentUnitListEntry from "@/domain/documentUnitListEntry"
 import documentUnitService from "@/services/documentUnitService"
 
 function renderComponent() {
+  // eslint-disable-next-line testing-library/await-async-events
   const user = userEvent.setup()
 
   const router = createRouter({

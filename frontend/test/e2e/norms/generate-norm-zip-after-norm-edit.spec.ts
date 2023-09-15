@@ -36,9 +36,8 @@ testWithImportedNorm(
 
     const downloadFileContent = await getDownloadedFileContent(page, fileName)
 
-    const metadataFileDownloaded = await getMetaDataFileAsString(
-      downloadFileContent,
-    )
+    const metadataFileDownloaded =
+      await getMetaDataFileAsString(downloadFileContent)
 
     expect(metadataFileDownloaded.includes(newValue)).toBeTruthy()
   },
