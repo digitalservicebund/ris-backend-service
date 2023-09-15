@@ -206,7 +206,8 @@ watch(inputCompleted, () => {
 <template>
   <div class="input bg-white" :class="conditionalClasses">
     <div ref="containerRef" class="flex flex-row flex-wrap" tabindex="-1">
-      <button
+      <!-- eslint-disable-next-line vuejs-accessibility/no-static-element-interactions -->
+      <div
         v-for="(chip, i) in chips"
         :key="i"
         aria-label="chip"
@@ -221,17 +222,16 @@ watch(inputCompleted, () => {
         <div class="label-wrapper">{{ chip }}</div>
 
         <div class="icon-wrapper">
-          <button
+          <!-- eslint-disable-next-line vuejs-accessibility/no-static-element-interactions -->
+          <em
             aria-Label="Löschen"
             class="material-icons"
-            tabindex="-1"
             @click="deleteChip(i)"
             @keydown.enter="deleteChip(i)"
+            >clear</em
           >
-            clear
-          </button>
         </div>
-      </button>
+      </div>
     </div>
 
     <input
@@ -298,6 +298,10 @@ watch(inputCompleted, () => {
       display: flex;
       padding: 4px 3px;
       border-radius: 0 10px 10px 0;
+
+      em {
+        cursor: pointer;
+      }
     }
 
     .label-wrapper {
@@ -311,6 +315,10 @@ watch(inputCompleted, () => {
 
       .icon-wrapper {
         @apply bg-blue-900;
+
+        em {
+          color: white;
+        }
       }
     }
   }
