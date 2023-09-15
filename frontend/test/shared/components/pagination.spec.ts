@@ -35,7 +35,12 @@ describe("Pagination", () => {
   test("display navigation", async () => {
     renderComponent()
 
-    for (const element of ["zurück", "1 von 1", "vor", "Total 5 Items"]) {
+    for (const element of [
+      "zurück",
+      "1 von 1",
+      "vor",
+      "5 Ergebnisse gefunden.",
+    ]) {
       await screen.findByText(element)
     }
   })
@@ -61,7 +66,13 @@ describe("Pagination", () => {
   test("displays correct max Items", async () => {
     renderComponent({ getInitialData: true, totalElements: 1337 })
 
-    await screen.findByText("Total 1337 Items")
+    await screen.findByText("1337 Ergebnisse gefunden.")
+  })
+
+  test("updates string correctly for one result", async () => {
+    renderComponent({ getInitialData: true, totalElements: 1 })
+
+    await screen.findByText("1 Ergebnis gefunden.")
   })
 
   test("displays correct max Pages", async () => {

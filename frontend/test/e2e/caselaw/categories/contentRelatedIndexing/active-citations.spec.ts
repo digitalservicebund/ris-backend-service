@@ -239,7 +239,7 @@ test.describe("active citations", () => {
     const activeCitationContainer = page.getByLabel("Aktivzitierung")
     await activeCitationContainer.getByLabel("Nach Entscheidung suchen").click()
     await expect(
-      activeCitationContainer.getByText("Total 1 Items"),
+      activeCitationContainer.getByText("1 Ergebnis gefunden."),
     ).toBeVisible()
 
     //citation style ignored in search results
@@ -273,7 +273,7 @@ test.describe("active citations", () => {
     await activeCitationContainer.getByLabel("Nach Entscheidung suchen").click()
 
     await expect(
-      activeCitationContainer.getByText("Total 1 Items"),
+      activeCitationContainer.getByText("1 Ergebnis gefunden."),
     ).toBeVisible()
     await expect(
       activeCitationContainer.getByText("Bereits hinzugefügt"),

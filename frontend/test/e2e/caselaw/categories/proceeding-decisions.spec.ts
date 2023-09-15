@@ -227,7 +227,7 @@ test.describe("previous decisions", () => {
       .getByLabel("Nach Entscheidung suchen")
       .click()
 
-    await expect(page.getByText("Total 1 Items")).toBeVisible()
+    await expect(page.getByText("1 Ergebnis gefunden.")).toBeVisible()
 
     const result = page.getByText(
       `AG Aachen, 01.01.2020, ${prefilledDocumentUnit.coreData.fileNumbers?.[0]}, AnU, ${prefilledDocumentUnit.documentNumber}`,
@@ -259,7 +259,7 @@ test.describe("previous decisions", () => {
       .getByLabel("Nach Entscheidung suchen")
       .click()
 
-    await expect(page.getByText("Total 1 Items")).toBeVisible()
+    await expect(page.getByText("1 Ergebnis gefunden.")).toBeVisible()
     await expect(page.getByText("Bereits hinzugefügt")).toBeVisible()
 
     //can be deleted

@@ -73,8 +73,10 @@ export type PageableService<TResult, TQuery = TResult> = (
         </PaginationButton>
       </div>
     </div>
-    <div class="ds-label-02-reg -ml-144 mt-2 text-gray-900">
-      Total {{ page?.totalElements }} Items
+    <div class="ds-label-02-reg mt-2 text-center text-gray-900">
+      {{ page?.totalElements }}
+      {{ page?.totalElements === 1 ? "Ergebnis" : "Ergebnisse" }}
+      gefunden.
     </div>
   </div>
   <slot v-if="props.navigationPosition == 'top'"></slot>

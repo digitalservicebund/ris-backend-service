@@ -250,7 +250,7 @@ test.describe("field of law", () => {
 
     await page.locator("[aria-label='Sachgebiete Suche']").fill("xyz")
     await page.keyboard.press("Enter")
-    await expect(page.getByText("Total 0 Items")).toBeVisible()
+    await expect(page.getByText("0 Ergebnisse gefunden.")).toBeVisible()
   })
 
   test("Search with paginated results - test the pagination navigation", async ({
