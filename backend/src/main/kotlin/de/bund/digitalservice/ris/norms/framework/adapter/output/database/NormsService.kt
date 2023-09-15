@@ -9,6 +9,7 @@ import de.bund.digitalservice.ris.norms.framework.adapter.output.database.reposi
 import java.util.*
 import java.util.Optional.of
 import kotlin.jvm.optionals.getOrNull
+import org.slf4j.LoggerFactory
 import org.springframework.context.annotation.Primary
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
@@ -36,6 +37,10 @@ class NormsService(
     SearchNormsOutputPort,
     GetNormByEliOutputPort,
     SaveFileReferenceOutputPort {
+
+  companion object {
+    private val logger = LoggerFactory.getLogger(NormsService::class.java)
+  }
 
   override fun getNormByEli(query: GetNormByEliOutputPort.Query): Mono<Norm> {
     return normsRepository
@@ -132,6 +137,9 @@ class NormsService(
               it.t6.getOrNull(),
               it.t7,
               it.t8.getOrNull())
+        }
+        .doOnError { exception ->
+          logger.error("Could not map norm to entity with query ${query}:", exception)
         }
   }
 

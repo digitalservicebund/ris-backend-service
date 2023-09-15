@@ -22,7 +22,7 @@ class ListNormsService(private val searchNormsOutputAdapter: SearchNormsOutputPo
         .searchNorms(SearchNormsOutputPort.Query(query.searchTerm ?: "", query.eGesetzgebung))
         .map { mapToNormData(it) }
         .doOnError { exception ->
-          logger.error("Error occurred while listing all norms:", exception)
+          logger.error("Error occurred while listing all norms with query: $query:", exception)
         }
   }
 }
