@@ -20,7 +20,7 @@ onMounted(async () => {
   if (featureToggle) {
     fontColor.value = "green"
   } else {
-    fontColor.value = "red"
+    fontColor.value = "black"
   }
 })
 </script>
