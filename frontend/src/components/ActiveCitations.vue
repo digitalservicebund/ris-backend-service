@@ -2,9 +2,9 @@
 import { h, computed } from "vue"
 import { RouterLink } from "vue-router"
 import ActiveCitationInput from "@/components/ActiveCitationInput.vue"
+import EditableList from "@/components/EditableListCaselaw.vue"
 import ActiveCitation from "@/domain/activeCitation"
 import { withSummarizer } from "@/shared/components/DataSetSummary.vue"
-import EditableList from "@/shared/components/EditableListCaselaw.vue"
 
 const props = defineProps<{
   modelValue: ActiveCitation[] | undefined

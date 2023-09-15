@@ -1,9 +1,9 @@
 <script lang="ts" setup>
 import { computed, h } from "vue"
+import EditableList from "@/components/EditableListCaselaw.vue"
 import NormReferenceInput from "@/components/NormReferenceInput.vue"
 import NormReference from "@/domain/normReference"
 import { withSummarizer } from "@/shared/components/DataSetSummary.vue"
-import EditableList from "@/shared/components/EditableListCaselaw.vue"
 
 const props = defineProps<{
   modelValue: NormReference[] | undefined

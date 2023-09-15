@@ -2,9 +2,9 @@
 import { h, computed } from "vue"
 import { RouterLink } from "vue-router"
 import ProceedingDecisionInputGroup from "./ProceedingDecisionInputGroup.vue"
+import EditableList from "@/components/EditableListCaselaw.vue"
 import ProceedingDecision from "@/domain/proceedingDecision"
 import { withSummarizer } from "@/shared/components/DataSetSummary.vue"
-import EditableList from "@/shared/components/EditableListCaselaw.vue"
 
 const props = defineProps<{
   modelValue: ProceedingDecision[] | undefined
