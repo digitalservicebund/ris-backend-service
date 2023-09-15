@@ -347,6 +347,46 @@ test.describe("search", () => {
     await expect(secondDateInput.getByText("Kein valides Datum")).toBeVisible()
   })
 
+  test("search for status", async ({ pageWithBghUser }) => {
+    pageWithBghUser.goto("/")
+
+    const docofficeOnly = pageWithBghUser.getByLabel(
+      "Nur meine Dokstelle Filter",
+    )
+    await docofficeOnly.click()
+
+    await pageWithBghUser
+      .getByLabel("Nach Dokumentationseinheiten suchen")
+      .click()
+
+    //TODO: remove the timeout when search performance get better
+    await expect(pageWithBghUser.getByLabel("Ladestatus")).toBeHidden({
+      timeout: 30000,
+    })
+
+    expect(
+      await pageWithBghUser.getByText("unveröffentlicht").count(),
+    ).toBeGreaterThanOrEqual(1)
+
+    const select = pageWithBghUser.locator(`select[id="status"]`)
+    await select.selectOption("Veröffentlicht")
+
+    await pageWithBghUser
+      .getByLabel("Nach Dokumentationseinheiten suchen")
+      .click()
+
+    //TODO: remove the timeout when search performance get better
+    await expect(pageWithBghUser.getByLabel("Ladestatus")).toBeHidden({
+      timeout: 30000,
+    })
+
+    expect(
+      await pageWithBghUser.getByText("veröffentlicht").count(),
+    ).toBeGreaterThanOrEqual(1)
+
+    await expect(pageWithBghUser.getByText("unveröffentlicht")).toBeHidden()
+  })
+
   // Filtern auf Fehler
   // eslint-disable-next-line playwright/no-skipped-test
   test.skip("filter for documentunits with errors only", async ({
