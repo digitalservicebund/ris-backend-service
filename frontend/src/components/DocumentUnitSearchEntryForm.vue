@@ -283,7 +283,6 @@ onMounted(async () => {
             aria-label="Entscheidungsdatum Suche"
             class="ds-input-small"
             :has-error="hasError"
-            is-future-date
             @blur="validateSearchInput"
             @focus="
               resetErrors(id as (typeof DocumentUnitSearchInput.fields)[number])
@@ -308,7 +307,6 @@ onMounted(async () => {
             aria-label="Entscheidungsdatum Suche Ende"
             class="ds-input-small"
             :has-error="hasError"
-            is-future-date
             placeholder="TT.MM.JJJJ (optional)"
             @blur="validateSearchInput"
             @focus="
