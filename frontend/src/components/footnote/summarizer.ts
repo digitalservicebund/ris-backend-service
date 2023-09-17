@@ -25,7 +25,7 @@ export function summarizeFootnotePerLine(data?: Footnote): VNode {
       !Object.keys(footnote).includes(MetadatumType.FOOTNOTE_REFERENCE),
   )
 
-  if (footnotes.length > 0) {
+  if (footnotes && footnotes.length > 0) {
     footnotes?.forEach((footnote) => {
       const partType =
         MetadatumType[Object.keys(footnote)[0] as keyof typeof MetadatumType]
