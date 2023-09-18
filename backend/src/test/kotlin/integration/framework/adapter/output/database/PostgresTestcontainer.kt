@@ -13,7 +13,7 @@ class PostgresTestcontainer private constructor(dockerImageVersion: String) :
     val instance: PostgresTestcontainer?
       get() {
         if (container == null) {
-          container = PostgresTestcontainer("postgres:12-alpine")
+          container = PostgresTestcontainer("postgres:14-alpine")
         }
         return container
       }
