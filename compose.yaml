@@ -51,7 +51,7 @@ services:
     command: sh run.sh _start
     depends_on:
       - traefik
-      - db
+      - postgres14
       - redis
     ports:
       - 8080:8080
@@ -96,6 +96,38 @@ services:
       - POSTGRES_PASSWORD=test
       - POSTGRES_USER=test
     ports:
+      - 8432:5432
+    entrypoint:
+      - /bin/bash
+      - -c
+      - |
+        set -e
+        docker-entrypoint.sh postgres &
+        wait
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U test -d neuris"]
+      interval: 5s
+      retries: 3
+      start_period: 5s
+      timeout: 3s
+
+  postgres14:
+    image: postgres:14-alpine
+    extra_hosts:
+      - localhost:host-gateway
+    restart: always
+    container_name: postgres14
+    depends_on:
+      - db
+    volumes:
+      - postgres14-data:/var/lib/postgresql/data
+      - dump:/tmp
+    environment:
+      - POSTGRES_DB=neuris
+      - POSTGRES_PASSWORD=test
+      - POSTGRES_USER=test
+      - POSTGRES_INITDB_ARGS="--auth-local=md5"
+    ports:
       - 5432:5432
     entrypoint:
       - /bin/bash
@@ -104,7 +136,10 @@ services:
         set -e
         docker-entrypoint.sh postgres &
         sleep 10
-        psql -U $${POSTGRES_USER} -d $${POSTGRES_DB} -c 'CREATE EXTENSION IF NOT EXISTS "uuid-ossp";'
+        if [ ! -f /tmp/pg_dump.sql ]; then
+          PGPASSWORD=$${POSTGRES_PASSWORD} pg_dumpall -p 8432 -U $${POSTGRES_USER} -l $${POSTGRES_DB} -h localhost > /tmp/pg_dump.sql
+          PGPASSWORD=$${POSTGRES_PASSWORD} psql -p 5432 -U $${POSTGRES_USER} -h localhost -f /tmp/pg_dump.sql $${POSTGRES_DB}
+        fi
         wait
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U test -d neuris"]
@@ -152,3 +187,5 @@ services:
 volumes:
   db-data:
   gradle-cache:
+  postgres14-data:
+  dump:
