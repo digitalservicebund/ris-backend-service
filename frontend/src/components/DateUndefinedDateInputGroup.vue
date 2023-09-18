@@ -1,9 +1,8 @@
 <script lang="ts" setup>
-import { UndefinedDate } from "@/domain/norm"
+import { MetadatumType, UndefinedDate } from "@/domain/norm"
 import DateInput from "@/shared/components/input/DateInput.vue"
 import DropdownInput from "@/shared/components/input/DropdownInput.vue"
 import InputField from "@/shared/components/input/InputField.vue"
-import { InputType } from "@/shared/components/input/types"
 
 interface Props {
   dateId: string
@@ -14,7 +13,7 @@ interface Props {
   undefinedDateDropdownAriaLabel: string
   dateValue: string | undefined
   undefinedDateStateValue: UndefinedDate | undefined
-  selectedInputType: string
+  selectedInputType: MetadatumType.UNDEFINED_DATE | MetadatumType.DATE
 }
 
 defineProps<Props>()
@@ -46,7 +45,7 @@ interface DropdownItem {
 <template>
   <div class="w-320">
     <InputField
-      v-if="selectedInputType === InputType.DATE"
+      v-if="selectedInputType === MetadatumType.DATE"
       :id="dateId"
       v-slot="{ id, hasError, updateValidationError }"
       :aria-label="dateInputFieldLabel"
@@ -63,7 +62,7 @@ interface DropdownItem {
       />
     </InputField>
     <InputField
-      v-if="selectedInputType === InputType.UNDEFINED_DATE"
+      v-if="selectedInputType === MetadatumType.UNDEFINED_DATE"
       :id="undefinedDateId"
       v-slot="{ id }"
       :aria-label="undefinedDateInputFieldLabel"

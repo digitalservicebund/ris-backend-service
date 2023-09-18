@@ -1,70 +1,69 @@
 <script lang="ts" setup>
-import { computed, ref, watch } from "vue"
+import { computed } from "vue"
 import DateUndefinedDateInputGroup from "@/components/DateUndefinedDateInputGroup.vue"
-import { Metadata, UndefinedDate } from "@/domain/norm"
+import { Metadata, MetadatumType } from "@/domain/norm"
 import InputField, {
   LabelPosition,
 } from "@/shared/components/input/InputField.vue"
 import RadioInput from "@/shared/components/input/RadioInput.vue"
 
-interface Props {
+const props = defineProps<{
   modelValue: Metadata
-}
-
-const props = defineProps<Props>()
+}>()
 
 const emit = defineEmits<{
   "update:modelValue": [value: Metadata]
 }>()
 
-enum InputType {
-  DATE = "date",
-  UNDEFINED_DATE = "undefined_date",
+/* -------------------------------------------------- *
+ * Section type                                       *
+ * -------------------------------------------------- */
+
+const initialValue: Metadata = {
+  UNDEFINED_DATE: props.modelValue.UNDEFINED_DATE,
+  DATE: props.modelValue.DATE,
 }
 
-const inputValue = ref(props.modelValue)
-const selectedInputType = ref<InputType>(InputType.DATE)
-
-function detectSelectedInputType(): void {
-  if (
-    inputValue.value.UNDEFINED_DATE &&
-    inputValue.value.UNDEFINED_DATE.length > 0
-  ) {
-    selectedInputType.value = InputType.UNDEFINED_DATE
-  } else selectedInputType.value = InputType.DATE
-}
-
-watch(
-  () => props.modelValue,
-  (newValue) => {
-    if (newValue !== undefined) {
-      inputValue.value = newValue
+const selectedInputType = computed<
+  MetadatumType.UNDEFINED_DATE | MetadatumType.DATE
+>({
+  get() {
+    if (props.modelValue.UNDEFINED_DATE) {
+      return MetadatumType.UNDEFINED_DATE
+    } else if (props.modelValue.DATE) {
+      return MetadatumType.DATE
+    } else {
+      return MetadatumType.DATE
     }
   },
-  { immediate: true },
-)
-
-watch(inputValue, () => emit("update:modelValue", inputValue.value), {
-  deep: true,
-})
-
-watch(inputValue, detectSelectedInputType, { immediate: true, deep: true })
-
-const undefinedDateState = computed({
-  get: () => inputValue.value.UNDEFINED_DATE?.[0],
-  set: (data?: UndefinedDate) => {
-    if (data) {
-      inputValue.value.UNDEFINED_DATE = [data]
-    }
-    inputValue.value.DATE = undefined
+  set(value) {
+    emit("update:modelValue", { [value]: initialValue[value] ?? [] })
   },
 })
 
-const dateValue = computed({
-  get: () => inputValue.value.DATE?.[0],
-  set: (value) => {
-    inputValue.value.DATE = value ? [value] : undefined
-    inputValue.value.UNDEFINED_DATE = undefined
+/* -------------------------------------------------- *
+ * Section data                                       *
+ * -------------------------------------------------- */
+
+const undefinedDateSection = computed({
+  get: () => props.modelValue.UNDEFINED_DATE?.[0],
+  set: (data) => {
+    const effectiveData = data ? [data] : undefined
+    initialValue.UNDEFINED_DATE = effectiveData
+
+    const next: Metadata = { UNDEFINED_DATE: effectiveData }
+    emit("update:modelValue", next)
+  },
+})
+
+const dateSection = computed({
+  get: () => props.modelValue.DATE?.[0],
+  set: (data) => {
+    const effectiveData = data ? [data] : undefined
+    initialValue.DATE = effectiveData
+
+    const next: Metadata = { DATE: effectiveData }
+    emit("update:modelValue", next)
   },
 })
 </script>
@@ -83,7 +82,7 @@ const dateValue = computed({
           v-model="selectedInputType"
           name="entryIntoForce"
           size="medium"
-          :value="InputType.DATE"
+          :value="MetadatumType.DATE"
         />
       </InputField>
 
@@ -98,14 +97,14 @@ const dateValue = computed({
           v-model="selectedInputType"
           name="entryIntoForce"
           size="medium"
-          :value="InputType.UNDEFINED_DATE"
+          :value="MetadatumType.UNDEFINED_DATE"
         />
       </InputField>
     </div>
 
     <DateUndefinedDateInputGroup
-      v-model:date-value="dateValue"
-      v-model:undefined-date-state-value="undefinedDateState"
+      v-model:date-value="dateSection"
+      v-model:undefined-date-state-value="undefinedDateSection"
       date-id="entryIntoForceDate"
       date-input-aria-label="Bestimmtes Inkrafttretedatum Date Input"
       date-input-field-label="Bestimmtes Inkrafttretedatum"

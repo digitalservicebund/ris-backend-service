@@ -2,6 +2,7 @@ import userEvent from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
 import { createPinia, setActivePinia } from "pinia"
 import DateUndefinedDateInputGroup from "@/components/DateUndefinedDateInputGroup.vue"
+import { MetadatumType } from "@/domain/norm"
 
 function renderComponent(overrides = {}) {
   // eslint-disable-next-line testing-library/await-async-events
@@ -13,7 +14,7 @@ function renderComponent(overrides = {}) {
     undefinedDateId: "3",
     undefinedDateInputFieldLabel: "undefinedDateInputFieldLabel",
     undefinedDateDropdownAriaLabel: "undefinedDateDropdownAriaLabel",
-    selectedInputType: "date",
+    selectedInputType: MetadatumType.DATE,
     dateValue: "01.01.2022",
     undefinedDateStateValue: "undefinedDateStateValue",
     ...overrides,
@@ -26,6 +27,7 @@ describe("Date or UndefinedDate InputGroup Component", () => {
   beforeEach(async () => {
     setActivePinia(createPinia())
   })
+
   it('renders DateInput when selectedInputType is "date" and the other input is not in the document', async () => {
     renderComponent()
 
@@ -41,7 +43,7 @@ describe("Date or UndefinedDate InputGroup Component", () => {
 
   it('renders DropdownInput when selectedInputType is "undefined_date" and the other input is not in the document', () => {
     renderComponent({
-      selectedInputType: "undefined_date",
+      selectedInputType: MetadatumType.UNDEFINED_DATE,
     })
 
     const undefinedDateDropdown = screen.getByLabelText(
