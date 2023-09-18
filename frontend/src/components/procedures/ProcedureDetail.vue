@@ -36,28 +36,31 @@ function renderDocumentUnit(documentUnit: DocumentUnitListEntry): string {
       role="status"
     ></div>
   </div>
-  <ul v-else class="py-24">
-    <li
-      v-for="documentUnit in procedure.documentUnits"
-      :key="documentUnit.documentNumber"
-      class="ml-208 py-4"
-    >
-      <router-link
-        class="ds-link-01-bold underline"
-        tabindex="-1"
-        target="_blank"
-        :to="{
-          name: 'caselaw-documentUnit-documentNumber-categories',
-          params: { documentNumber: documentUnit.documentNumber },
-        }"
+  <div v-else class="grid grid-cols-[14em_auto] gap-x-24">
+    <div class="flex items-end">
+      <span class="bottom ds-label-02-reg pt-28 italic text-gray-600"
+        >erstellt am {{ dayjs(procedure.createdAt).format("DD.MM.YYYY") }}</span
       >
-        <button class="underline">
-          {{ renderDocumentUnit(documentUnit) }}
-        </button>
-      </router-link>
-    </li>
-  </ul>
-  <span class="ds-label-02-reg pt-28 italic text-gray-600"
-    >erstellt am {{ dayjs(procedure.createdAt).format("DD.MM.YYYY") }}</span
-  >
+    </div>
+    <ul class="py-24 text-left">
+      <li
+        v-for="documentUnit in procedure.documentUnits"
+        :key="documentUnit.documentNumber"
+      >
+        <router-link
+          class="ds-link-01-bold underline"
+          tabindex="-1"
+          target="_blank"
+          :to="{
+            name: 'caselaw-documentUnit-documentNumber-categories',
+            params: { documentNumber: documentUnit.documentNumber },
+          }"
+        >
+          <button class="text-left underline">
+            {{ renderDocumentUnit(documentUnit) }}
+          </button>
+        </router-link>
+      </li>
+    </ul>
+  </div>
 </template>

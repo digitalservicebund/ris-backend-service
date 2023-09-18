@@ -46,8 +46,8 @@ onMounted(() => updateProcedures(0))
           @update-page="updateProcedures"
         >
           <ExpandableContent
-            v-for="(procedure, index) in procedures"
-            :key="`procedure-${index}`"
+            v-for="procedure in procedures"
+            :key="procedure.label"
             class="mb-24 bg-white p-14"
             close-icon-name="expand_less"
             open-icon-name="expand_more"
@@ -56,9 +56,11 @@ onMounted(() => updateProcedures(0))
             "
           >
             <template #header>
-              <div class="relative w-auto">
-                <span class="font-bold">{{ procedure.label }}</span>
-                <span class="absolute left-208 whitespace-nowrap"
+              <div class="grid grid-cols-[14em,max-content] gap-x-24">
+                <span class="truncate font-bold" :title="procedure.label">{{
+                  procedure.label
+                }}</span>
+                <span class="mr-16"
                   >{{
                     procedure.documentUnitCount
                   }}
