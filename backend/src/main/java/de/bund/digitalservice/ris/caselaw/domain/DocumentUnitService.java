@@ -248,7 +248,7 @@ public class DocumentUnitService {
             })
         .onErrorResume(
             ex -> {
-              log.error("Couldn't delete the DocumentUnit");
+              log.error("Couldn't delete the DocumentUnit", ex);
               if (ex instanceof DataIntegrityViolationException) {
                 return Mono.error(
                     new DocumentUnitDeletionException(
