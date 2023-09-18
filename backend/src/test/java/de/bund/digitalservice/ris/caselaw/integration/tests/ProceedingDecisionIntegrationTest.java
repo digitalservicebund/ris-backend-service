@@ -787,7 +787,7 @@ class ProceedingDecisionIntegrationTest {
       DocumentTypeDTO documentTypeDTO =
           DocumentTypeDTO.builder()
               .changeIndicator('a')
-              .documentType('b')
+              .documentType('R')
               .label("ABC123")
               .jurisShortcut(documentTypeJurisShortcut)
               .build();

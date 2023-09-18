@@ -610,14 +610,30 @@ class DocumentUnitIntegrationTest {
 
   @Test
   void testDocumentTypeToSetIdFromLookuptable() {
-    DocumentTypeDTO documentTypeDTO =
+    DocumentTypeDTO documentTypeDTOA =
+        DocumentTypeDTO.builder()
+            .changeIndicator('c')
+            .jurisShortcut("ABC")
+            .documentType('A')
+            .label("ABC123")
+            .build();
+    DocumentTypeDTO documentTypeDTOR =
         DocumentTypeDTO.builder()
             .changeIndicator('c')
             .jurisShortcut("ABC")
             .documentType('R')
             .label("ABC123")
             .build();
-    databaseDocumentTypeRepository.save(documentTypeDTO).block();
+    DocumentTypeDTO documentTypeDTOC =
+        DocumentTypeDTO.builder()
+            .changeIndicator('c')
+            .jurisShortcut("ABC")
+            .documentType('C')
+            .label("ABC123")
+            .build();
+    databaseDocumentTypeRepository.save(documentTypeDTOA).block();
+    databaseDocumentTypeRepository.save(documentTypeDTOR).block();
+    databaseDocumentTypeRepository.save(documentTypeDTOC).block();
 
     DocumentUnitDTO dto =
         DocumentUnitDTO.builder()
@@ -637,8 +653,8 @@ class DocumentUnitIntegrationTest {
                 CoreData.builder()
                     .documentType(
                         DocumentType.builder()
-                            .jurisShortcut(documentTypeDTO.getJurisShortcut())
-                            .label(documentTypeDTO.getLabel())
+                            .jurisShortcut(documentTypeDTOR.getJurisShortcut())
+                            .label(documentTypeDTOR.getLabel())
                             .build())
                     .documentationOffice(docOffice)
                     .build())
@@ -657,14 +673,14 @@ class DocumentUnitIntegrationTest {
             response -> {
               assertThat(response.getResponseBody()).isNotNull();
               assertThat(response.getResponseBody().coreData().documentType().label())
-                  .isEqualTo(documentTypeDTO.getLabel());
+                  .isEqualTo(documentTypeDTOR.getLabel());
               assertThat(response.getResponseBody().coreData().documentType().jurisShortcut())
-                  .isEqualTo(documentTypeDTO.getJurisShortcut());
+                  .isEqualTo(documentTypeDTOR.getJurisShortcut());
             });
 
     List<DocumentUnitDTO> list = repository.findAll().collectList().block();
     assertThat(list).hasSize(1);
-    assertThat(list.get(0).getDocumentTypeId()).isEqualTo(1L);
+    assertThat(list.get(0).getDocumentTypeId()).isEqualTo(2L);
     assertThat(list.get(0).getDocumentTypeDTO()).isNull();
   }
 
