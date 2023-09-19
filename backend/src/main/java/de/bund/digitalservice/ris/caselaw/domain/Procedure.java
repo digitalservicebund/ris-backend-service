@@ -4,4 +4,4 @@ import java.time.Instant;
 import lombok.Builder;
 
 @Builder
-public record Procedure(String label, Integer documentUnitCount, Instant created_at) {}
+public record Procedure(String label, Integer documentUnitCount, Instant createdAt) {}

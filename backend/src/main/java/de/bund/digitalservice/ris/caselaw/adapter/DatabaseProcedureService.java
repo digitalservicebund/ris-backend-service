@@ -46,7 +46,7 @@ public class DatabaseProcedureService implements ProcedureService {
                     .label(dto.getLabel())
                     .documentUnitCount(
                         linkRepository.countLatestProcedureLinksByProcedure(dto.getId()))
-                    .created_at(dto.getCreatedAt())
+                    .createdAt(dto.getCreatedAt())
                     .build());
   }
 
