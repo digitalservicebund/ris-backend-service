@@ -1,64 +1,97 @@
 <script lang="ts" setup>
-import { produce } from "immer"
 import { computed } from "vue"
-import { Metadata } from "@/domain/norm"
+import { Metadata, MetadatumType } from "@/domain/norm"
 import DateInput from "@/shared/components/input/DateInput.vue"
 import InputField, {
   LabelPosition,
 } from "@/shared/components/input/InputField.vue"
 import RadioInput from "@/shared/components/input/RadioInput.vue"
 import TimeInput from "@/shared/components/input/TimeInput.vue"
-import { InputType } from "@/shared/components/input/types"
 import YearInput from "@/shared/components/input/YearInput.vue"
 
-interface Props {
+const props = defineProps<{
   modelValue: Metadata
-}
-
-const props = defineProps<Props>()
+}>()
 
 const emit = defineEmits<{
   "update:modelValue": [value: Metadata]
 }>()
 
-const selectedInputType = computed({
-  get: () => (props.modelValue.YEAR ? InputType.YEAR : InputType.DATE_TIME),
-  set: (value) => {
-    emit(
-      "update:modelValue",
-      value === InputType.DATE_TIME ? { DATE: [], TIME: [] } : { YEAR: [] },
-    )
+/* -------------------------------------------------- *
+ * Section type                                       *
+ * -------------------------------------------------- */
+
+const initialValue: Metadata = {
+  YEAR: props.modelValue.YEAR,
+  DATE: props.modelValue.DATE,
+  TIME: props.modelValue.TIME,
+}
+
+const selectedInputType = computed<MetadatumType.YEAR | MetadatumType.DATE>({
+  get() {
+    if (props.modelValue.DATE) {
+      return MetadatumType.DATE
+    } else if (props.modelValue.YEAR) {
+      return MetadatumType.YEAR
+    } else {
+      return MetadatumType.DATE
+    }
+  },
+  set(value) {
+    if (value === MetadatumType.DATE) {
+      emit("update:modelValue", {
+        ...initialValue,
+        DATE: initialValue.DATE ?? [],
+        YEAR: undefined,
+      })
+    } else if (value === MetadatumType.YEAR) {
+      emit("update:modelValue", {
+        YEAR: initialValue.YEAR ?? [],
+      })
+    }
   },
 })
 
-const dateValue = computed({
-  get: () => props.modelValue.DATE?.[0] ?? "",
-  set: (value) => {
-    const next = produce(props.modelValue, (draft) => {
-      draft.DATE = value ? [value] : undefined
-      draft.TIME = props.modelValue.TIME
-    })
+/* -------------------------------------------------- *
+ * Section data                                       *
+ * -------------------------------------------------- */
+
+const date = computed({
+  get: () => props.modelValue.DATE?.[0] || "",
+  set: (data) => {
+    const effectiveData = data ? [data] : undefined
+    initialValue.DATE = effectiveData
+
+    const next: Metadata = { DATE: effectiveData }
     emit("update:modelValue", next)
   },
 })
 
-const timeValue = computed({
-  get: () => props.modelValue.TIME?.[0] ?? "",
-  set: (value) => {
-    const next = produce(props.modelValue, (draft) => {
-      draft.TIME = value ? [value] : undefined
-      draft.DATE = props.modelValue.DATE
-    })
+const year = computed({
+  get: () => props.modelValue.YEAR?.[0] || "",
+  set: (data) => {
+    const effectiveData = data ? [data] : undefined
+    initialValue.YEAR = effectiveData
+
+    const next: Metadata = { YEAR: effectiveData }
     emit("update:modelValue", next)
   },
 })
 
-const yearValue = computed({
-  get: () => props.modelValue.YEAR?.[0] ?? "",
-  set: (value) => {
-    const next = produce(props.modelValue, (draft) => {
-      draft.YEAR = value ? [value] : []
-    })
+const time = computed({
+  get: () => props.modelValue.TIME?.[0] || "",
+  set: (data) => {
+    const effectiveData = props.modelValue.DATE
+      ? data
+        ? [data]
+        : undefined
+      : undefined
+    initialValue.TIME = effectiveData
+
+    const next: Metadata = {
+      ...props.modelValue,
+      TIME: effectiveData,
+    }
     emit("update:modelValue", next)
   },
 })
@@ -79,7 +112,7 @@ const yearValue = computed({
             v-model="selectedInputType"
             name="announcementDateSelection"
             size="medium"
-            :value="InputType.DATE_TIME"
+            :value="MetadatumType.DATE"
           />
         </InputField>
       </div>
@@ -96,13 +129,13 @@ const yearValue = computed({
             v-model="selectedInputType"
             name="announcementDateSelection"
             size="medium"
-            :value="InputType.YEAR"
+            :value="MetadatumType.YEAR"
           />
         </InputField>
       </div>
     </div>
 
-    <div v-if="selectedInputType === InputType.DATE_TIME" class="flex gap-24">
+    <div v-if="selectedInputType === MetadatumType.DATE" class="flex gap-24">
       <div class="w-288">
         <InputField
           id="announcementDateInput"
@@ -111,7 +144,7 @@ const yearValue = computed({
         >
           <DateInput
             :id="id"
-            v-model="dateValue"
+            v-model="date"
             aria-label="Datum"
             :has-error="hasError"
             is-future-date
@@ -122,12 +155,12 @@ const yearValue = computed({
 
       <div class="w-288">
         <InputField id="announcementDateTime" v-slot="{ id }" label="Uhrzeit">
-          <TimeInput :id="id" v-model="timeValue" aria-label="Uhrzeit" />
+          <TimeInput :id="id" v-model="time" aria-label="Uhrzeit" />
         </InputField>
       </div>
     </div>
 
-    <div v-if="selectedInputType === InputType.YEAR" class="w-112">
+    <div v-if="selectedInputType === MetadatumType.YEAR" class="w-112">
       <InputField
         id="announcementDateYearInput"
         v-slot="{ id, hasError, updateValidationError }"
@@ -135,7 +168,7 @@ const yearValue = computed({
       >
         <YearInput
           :id="id"
-          v-model="yearValue"
+          v-model="year"
           aria-label="Jahresangabe"
           :has-error="hasError"
           @update:validation-error="updateValidationError"

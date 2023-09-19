@@ -1,66 +1,27 @@
 <script lang="ts" setup>
-import { computed, ref, watch } from "vue"
-import { Metadata } from "@/domain/norm"
+import { MetadatumType } from "@/domain/norm"
 import DateInput from "@/shared/components/input/DateInput.vue"
 import InputField, {
   LabelPosition,
 } from "@/shared/components/input/InputField.vue"
 import RadioInput from "@/shared/components/input/RadioInput.vue"
-import { InputType } from "@/shared/components/input/types"
 import YearInput from "@/shared/components/input/YearInput.vue"
 
 interface Props {
-  modelValue: Metadata
   idPrefix: string
   label: string
+  dateValue: string | undefined
+  yearValue: string | undefined
+  selectedInputType: MetadatumType.YEAR | MetadatumType.DATE
 }
 
 const props = defineProps<Props>()
 
 const emit = defineEmits<{
-  "update:modelValue": [value: Metadata]
+  "update:dateValue": [value: string]
+  "update:yearValue": [value: string]
+  "update:selectedInputType": [value: MetadatumType.YEAR | MetadatumType.DATE]
 }>()
-
-const inputValue = ref(props.modelValue)
-const selectedInputType = ref<InputType>(InputType.DATE)
-
-function detectSelectedInputType(): void {
-  if (inputValue.value.YEAR) {
-    selectedInputType.value = InputType.YEAR
-  } else selectedInputType.value = InputType.DATE
-}
-
-watch(
-  () => props.modelValue,
-  (newValue) => {
-    if (newValue !== undefined) {
-      inputValue.value = newValue
-    }
-  },
-  { immediate: true },
-)
-
-watch(inputValue, () => emit("update:modelValue", inputValue.value), {
-  deep: true,
-})
-
-watch(inputValue, detectSelectedInputType, { immediate: true, deep: true })
-
-const dateValue = computed({
-  get: () => inputValue.value.DATE?.[0],
-  set: (value) => {
-    inputValue.value.DATE = value ? [value] : undefined
-    inputValue.value.YEAR = undefined
-  },
-})
-
-const yearValue = computed({
-  get: () => inputValue.value.YEAR?.[0],
-  set: (value) => {
-    inputValue.value.YEAR = value ? [value] : []
-    inputValue.value.DATE = undefined
-  },
-})
 </script>
 
 <template>
@@ -74,10 +35,11 @@ const yearValue = computed({
       >
         <RadioInput
           :id="id"
-          v-model="selectedInputType"
+          :model-value="selectedInputType"
           :name="`${idPrefix}InputType`"
           size="medium"
-          :value="InputType.DATE"
+          :value="MetadatumType.DATE"
+          @update:model-value="$emit('update:selectedInputType', $event)"
         />
       </InputField>
 
@@ -89,17 +51,18 @@ const yearValue = computed({
       >
         <RadioInput
           :id="id"
-          v-model="selectedInputType"
+          :model-value="selectedInputType"
           :name="`${idPrefix}InputType`"
           size="medium"
-          :value="InputType.YEAR"
+          :value="MetadatumType.YEAR"
+          @update:model-value="$emit('update:selectedInputType', $event)"
         />
       </InputField>
     </div>
 
     <InputField
       :id="
-        selectedInputType === InputType.DATE
+        selectedInputType === MetadatumType.DATE
           ? `${idPrefix}Date`
           : `${idPrefix}Year`
       "
@@ -109,20 +72,22 @@ const yearValue = computed({
       :label-position="LabelPosition.TOP"
     >
       <DateInput
-        v-if="selectedInputType === InputType.DATE"
+        v-if="selectedInputType === MetadatumType.DATE"
         :id="id"
-        v-model="dateValue"
         :aria-label="label"
         :has-error="hasError"
         is-future-date
+        :model-value="dateValue"
+        @update:model-value="$emit('update:dateValue', $event)"
         @update:validation-error="updateValidationError"
       />
       <YearInput
-        v-else-if="selectedInputType === InputType.YEAR"
+        v-else-if="selectedInputType === MetadatumType.YEAR"
         :id="id"
-        v-model="yearValue"
         :aria-label="`${label} Jahresangabe`"
         :has-error="hasError"
+        :model-value="yearValue"
+        @update:model-value="$emit('update:yearValue', $event)"
         @update:validation-error="updateValidationError"
       />
     </InputField>

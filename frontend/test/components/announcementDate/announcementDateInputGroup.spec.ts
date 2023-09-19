@@ -9,14 +9,10 @@ type AnnouncementDateInputGroupProps = InstanceType<
 >["$props"]
 
 function renderComponent(props?: Partial<AnnouncementDateInputGroupProps>) {
-  let modelValue: Metadata = props?.modelValue ?? {}
-
-  const effectiveProps: AnnouncementDateInputGroupProps = {
-    modelValue,
-    "onUpdate:modelValue": (val) => (modelValue = val),
-    ...props,
+  const effectiveProps = {
+    modelValue: props?.modelValue ?? {},
+    "onUpdate:modelValue": props?.["onUpdate:modelValue"],
   }
-
   return render(AnnouncementDateInputGroup, { props: effectiveProps })
 }
 
@@ -25,7 +21,7 @@ describe("Announcement date/time/year fields", () => {
     setActivePinia(createPinia())
   })
   it("defaults to the date selection", () => {
-    renderComponent({})
+    renderComponent()
 
     const dateRadio = screen.getByRole("radio", { name: "Datum" })
     expect(dateRadio).toBeChecked()
@@ -123,17 +119,24 @@ describe("Announcement date/time/year fields", () => {
     expect(modelValue).toEqual<Metadata>({ YEAR: [] })
   })
 
-  it("clears the year when the type is set to date", async () => {
+  it("does not clear the year when the type is set to date", async () => {
     const user = userEvent.setup()
-    let modelValue: Metadata = { YEAR: ["2020"] }
-    renderComponent({
+    let modelValue: Metadata = {
+      YEAR: ["2020"],
+    }
+    const onUpdateModelValue = vi.fn().mockImplementation((value) => {
+      modelValue = value
+    })
+
+    const { rerender } = renderComponent({
       modelValue,
-      "onUpdate:modelValue": (val) => (modelValue = val),
+      "onUpdate:modelValue": onUpdateModelValue,
     })
 
     const dateRadio = screen.getByRole("radio", { name: "Datum" })
     await user.click(dateRadio)
-    expect(modelValue).toEqual<Metadata>({ DATE: [], TIME: [] })
+    await rerender({ modelValue })
+    expect(modelValue.YEAR).toEqual<Metadata>({ YEAR: ["2020"] })
   })
 
   it("doesn't automatically switch back to date when the year is cleared", async () => {

@@ -1,21 +1,18 @@
-import { userEvent } from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
 import { createPinia, setActivePinia } from "pinia"
 import CitationDateInputGroup from "@/components/citationDate/CitationDateInputGroup.vue"
-import { Metadata } from "@/domain/norm"
 
-function renderComponent(options?: {
-  ariaLabel?: string
-  modelValue?: Metadata
-}) {
-  // eslint-disable-next-line testing-library/await-async-events
-  const user = userEvent.setup()
-  const props = {
-    ariaLabel: options?.ariaLabel ?? "aria-label",
-    modelValue: options?.modelValue ?? {},
+type CitationDateInputGroupProps = InstanceType<
+  typeof CitationDateInputGroup
+>["$props"]
+
+function renderComponent(props?: CitationDateInputGroupProps) {
+  const effectiveProps = {
+    ariaLabel: props?.ariaLabel ?? "aria-label",
+    modelValue: props?.modelValue ?? {},
+    "onUpdate:modelValue": props?.["onUpdate:modelValue"],
   }
-  const utils = render(CitationDateInputGroup, { props })
-  return { user, props, ...utils }
+  return render(CitationDateInputGroup, { props: effectiveProps })
 }
 
 describe("Citation date/year field", () => {
