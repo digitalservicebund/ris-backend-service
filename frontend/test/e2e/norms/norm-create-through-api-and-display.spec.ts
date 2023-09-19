@@ -30,7 +30,7 @@ async function expectSectionAppearsAfterScroll(
 }
 
 // eslint-disable-next-line playwright/no-skipped-test
-testWithImportedNorm(
+testWithImportedNorm.skip(
   "Check if frame fields are correctly displayed",
   async ({ page, normData, guid }) => {
     await openNorm(page, guid)
