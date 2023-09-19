@@ -348,7 +348,7 @@ test.describe("search", () => {
   })
 
   test("search for status", async ({ pageWithBghUser }) => {
-    pageWithBghUser.goto("/")
+    await pageWithBghUser.goto("/")
 
     const docofficeOnly = pageWithBghUser.getByLabel(
       "Nur meine Dokstelle Filter",
@@ -392,7 +392,7 @@ test.describe("search", () => {
   test.skip("filter for documentunits with errors only", async ({
     pageWithBghUser,
   }) => {
-    pageWithBghUser.goto("/")
+    await pageWithBghUser.goto("/")
 
     const docofficeOnly = pageWithBghUser.getByLabel(
       "Nur meine Dokstelle Filter",
@@ -472,7 +472,7 @@ test.describe("search", () => {
   // Suche zurücksetzen
   test("resetting the search", async ({ page }) => {
     // on input button is visible
-    page.goto("/")
+    await page.goto("/")
     const resetSearch = page.getByLabel("Suche zurücksetzen")
     const searchTerm = generateString()
     await expect(resetSearch).toBeHidden()

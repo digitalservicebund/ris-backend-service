@@ -501,7 +501,7 @@ describe("Combobox Element", () => {
     await user.type(screen.getByLabelText("test label"), "foo")
     expect(screen.queryByText("foo neu erstellen")).not.toBeInTheDocument()
 
-    user.tab()
+    await user.tab()
 
     expect(emitted()["update:modelValue"]).toBeUndefined()
   })

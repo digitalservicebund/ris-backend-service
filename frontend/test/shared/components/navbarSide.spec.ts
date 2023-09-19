@@ -313,7 +313,7 @@ async function renderComponent(options?: {
   const menuItems = options?.menuItems ?? []
   const activeRoute = options?.activeRoute ?? "/"
   const router = buildRouter(goBackRoute, menuItems)
-  router.replace(activeRoute)
+  await router.replace(activeRoute)
   await router.isReady()
   const global = { plugins: [router] }
   const props = {

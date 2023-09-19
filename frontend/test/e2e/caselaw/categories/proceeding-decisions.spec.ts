@@ -100,7 +100,7 @@ test.describe("previous decisions", () => {
     await expect(
       proceedingDecisionContainer.getByLabel("Listen Eintrag"),
     ).toHaveCount(1)
-    page.reload()
+    await page.reload()
     await expect(
       proceedingDecisionContainer.getByLabel("Listen Eintrag"),
     ).toHaveCount(1)
@@ -109,7 +109,7 @@ test.describe("previous decisions", () => {
     await page.getByLabel("Aktenzeichen Rechtszug").fill("two")
     await page.getByLabel("Vorgehende Entscheidung speichern").click()
     // "Vorgehende Entscheidung speichern" only saves state in frontend, no communication to backend yet
-    page.reload()
+    await page.reload()
     await expect(
       proceedingDecisionContainer.getByLabel("Listen Eintrag"),
     ).toHaveCount(1)
@@ -124,7 +124,7 @@ test.describe("previous decisions", () => {
       { clickSaveButton: true },
     )
 
-    page.reload()
+    await page.reload()
     await expect(
       proceedingDecisionContainer.getByLabel("Listen Eintrag"),
     ).toHaveCount(2)

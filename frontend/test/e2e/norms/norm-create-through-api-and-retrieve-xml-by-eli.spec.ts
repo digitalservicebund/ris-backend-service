@@ -23,7 +23,7 @@ testWithImportedNorm(
     await officialReferencesExpandable.click()
     const listEntries =
       officialReferencesExpandable.getByLabel("Listen Eintrag")
-    listEntries
+    await listEntries
       .nth(0)
       .getByRole("button", { name: "Eintrag bearbeiten" })
       .click()

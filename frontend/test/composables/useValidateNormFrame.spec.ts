@@ -115,13 +115,13 @@ describe("useValidateNormFrame", () => {
       afterCallback,
     )
 
-    triggerValidation()
+    await triggerValidation()
     vi.runAllTimers()
-    triggerValidation()
+    await triggerValidation()
     resolveCallback(undefined)
     await flushPromises()
     vi.runAllTimers()
-    triggerValidation()
+    await triggerValidation()
 
     expect(beforeCallback).toHaveBeenCalledTimes(2)
     expect(callback).toHaveBeenCalledTimes(2)
@@ -145,7 +145,7 @@ describe("useValidateNormFrame", () => {
 
     expect(validateIsInProgress.value).toBe(false)
 
-    triggerValidation()
+    await triggerValidation()
 
     expect(validateIsInProgress.value).toBe(true)
 

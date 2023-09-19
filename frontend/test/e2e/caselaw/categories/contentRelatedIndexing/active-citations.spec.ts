@@ -108,7 +108,7 @@ test.describe("active citations", () => {
     await expect(
       activeCitationContainer.getByLabel("Listen Eintrag"),
     ).toHaveCount(1)
-    page.reload()
+    await page.reload()
     await expect(
       activeCitationContainer.getByLabel("Listen Eintrag"),
     ).toHaveCount(1)
@@ -117,7 +117,7 @@ test.describe("active citations", () => {
     await page.getByLabel("Aktenzeichen der Aktivzitierung").fill("two")
     await page.getByLabel("Aktivzitierung speichern").click()
     // "Aktivzitierung speichern" only saves state in frontend, no communication to backend yet
-    page.reload()
+    await page.reload()
     await expect(
       activeCitationContainer.getByLabel("Listen Eintrag"),
     ).toHaveCount(1)
@@ -132,7 +132,7 @@ test.describe("active citations", () => {
       { clickSaveButton: true },
     )
 
-    page.reload()
+    await page.reload()
     await expect(
       activeCitationContainer.getByLabel("Listen Eintrag"),
     ).toHaveCount(2)

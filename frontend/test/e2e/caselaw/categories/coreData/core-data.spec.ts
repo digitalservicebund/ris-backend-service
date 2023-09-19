@@ -233,7 +233,7 @@ test.describe("core data", () => {
     page,
   }) => {
     await test.step("create new docUnit with logged in user", async () => {
-      page.goto("/caselaw")
+      await page.goto("/caselaw")
       await page
         .getByRole("button", {
           name: "Neue Dokumentationseinheit",
@@ -256,7 +256,7 @@ test.describe("core data", () => {
     pageWithBghUser,
   }) => {
     await test.step("create new docUnit with logged in user", async () => {
-      pageWithBghUser.goto("/caselaw")
+      await pageWithBghUser.goto("/caselaw")
       await pageWithBghUser
         .getByRole("button", {
           name: "Neue Dokumentationseinheit",

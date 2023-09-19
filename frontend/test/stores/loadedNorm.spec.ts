@@ -16,8 +16,8 @@ describe("loadedNorm", () => {
     setActivePinia(createPinia())
   })
 
-  afterEach(() => {
-    flushPromises()
+  afterEach(async () => {
+    await flushPromises()
   })
 
   it("calls the norms service to load a norm", async () => {
@@ -40,7 +40,7 @@ describe("loadedNorm", () => {
     const store = useLoadedNormStore()
     store.loadedNorm = generateNorm()
 
-    store.load("other-guid")
+    await store.load("other-guid")
   })
 
   it("keeps the loaded norm to be undefined if service fails", async () => {
@@ -82,8 +82,8 @@ describe("loadedNorm", () => {
       setActivePinia(createPinia())
     })
 
-    afterEach(() => {
-      flushPromises()
+    afterEach(async () => {
+      await flushPromises()
     })
 
     it("should return the correct documentation when GUID exists", async () => {

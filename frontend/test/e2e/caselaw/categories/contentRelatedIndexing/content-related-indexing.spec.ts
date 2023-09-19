@@ -23,7 +23,7 @@ test.describe("content related indexing", () => {
   }) => {
     await navigateToCategories(page, documentNumber)
 
-    page.getByRole("link", { name: "Inhaltliche Erschließung" }).click()
+    await page.getByRole("link", { name: "Inhaltliche Erschließung" }).click()
 
     await expect(page.locator("#contentRelatedIndexing > h2")).toBeInViewport()
   })

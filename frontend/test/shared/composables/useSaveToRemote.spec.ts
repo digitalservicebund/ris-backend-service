@@ -40,11 +40,11 @@ describe("useSaveToRemote", () => {
       )
     const { triggerSave } = useSaveToRemote(callback)
 
-    triggerSave()
-    triggerSave()
+    await triggerSave()
+    await triggerSave()
     resolveCallback(undefined)
     await flushPromises()
-    triggerSave()
+    await triggerSave()
 
     expect(callback).toHaveBeenCalledTimes(2)
   })
@@ -60,7 +60,7 @@ describe("useSaveToRemote", () => {
 
     expect(saveIsInProgress.value).toBe(false)
 
-    triggerSave()
+    await triggerSave()
 
     expect(saveIsInProgress.value).toBe(true)
 
