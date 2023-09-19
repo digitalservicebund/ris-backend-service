@@ -9,9 +9,8 @@ import reactor.core.publisher.Mono;
 @Repository
 public interface DatabaseDocumentTypeRepository extends R2dbcRepository<DocumentTypeDTO, Long> {
 
-  @Query(
-      "SELECT * FROM lookuptable_documenttype WHERE juris_shortcut = :jurisShortcut AND document_type = 'R' LIMIT 1")
-  Mono<DocumentTypeDTO> findByJurisShortcut(String jurisShortcut);
+  Mono<DocumentTypeDTO> findFirstByJurisShortcutAndDocumentType(
+      String jurisShortcut, char documentType);
 
   Flux<DocumentTypeDTO> findAllByDocumentTypeOrderByJurisShortcutAscLabelAsc(char documentType);
 

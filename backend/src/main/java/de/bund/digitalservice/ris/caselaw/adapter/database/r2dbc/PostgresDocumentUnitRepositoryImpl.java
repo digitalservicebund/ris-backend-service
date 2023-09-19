@@ -233,7 +233,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
     }
 
     return databaseDocumentTypeRepository
-        .findByJurisShortcut(documentType.jurisShortcut())
+        .findFirstByJurisShortcutAndDocumentType(documentType.jurisShortcut(), 'R')
         .map(
             documentTypeDTO -> {
               if (!documentTypeDTO.getLabel().equals(documentType.label())) {
@@ -1259,7 +1259,10 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
   private Mono<Long> extractDocumentTypeDTOId(LinkedDocumentationUnit linkedDocumentationUnit) {
     return Mono.justOrEmpty(linkedDocumentationUnit.getDocumentType())
         .map(DocumentType::jurisShortcut)
-        .flatMap(databaseDocumentTypeRepository::findByJurisShortcut)
+        .flatMap(
+            jurisShortcut ->
+                databaseDocumentTypeRepository.findFirstByJurisShortcutAndDocumentType(
+                    jurisShortcut, 'R'))
         .mapNotNull(DocumentTypeDTO::getId)
         .switchIfEmpty(Mono.just(-1L));
   }
