@@ -1,4 +1,4 @@
-import userEvent from "@testing-library/user-event"
+import { userEvent } from "@testing-library/user-event"
 import { fireEvent, render, screen } from "@testing-library/vue"
 import { createPinia, setActivePinia } from "pinia"
 import AnnouncementGroup from "@/components/officialReference/AnnouncementGroup.vue"

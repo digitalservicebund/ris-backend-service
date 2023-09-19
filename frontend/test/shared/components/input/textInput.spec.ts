@@ -1,4 +1,4 @@
-import userEvent from "@testing-library/user-event"
+import { userEvent } from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
 import { defineComponent } from "vue"
 import TextInput from "@/shared/components/input/TextInput.vue"

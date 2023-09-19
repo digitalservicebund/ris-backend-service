@@ -1,4 +1,4 @@
-import userEvent from "@testing-library/user-event"
+import { userEvent } from "@testing-library/user-event"
 import { render, fireEvent, screen } from "@testing-library/vue"
 import { mount } from "@vue/test-utils"
 import TextEditorButton from "@/shared/components/input/TextEditorButton.vue"

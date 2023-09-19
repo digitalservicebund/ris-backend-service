@@ -1,4 +1,4 @@
-import userEvent from "@testing-library/user-event"
+import { userEvent } from "@testing-library/user-event"
 import { within, render, screen } from "@testing-library/vue"
 import { createPinia, setActivePinia } from "pinia"
 import EuAnnouncementInputGroup from "@/components/officialReference/EuAnnouncementInputGroup.vue"

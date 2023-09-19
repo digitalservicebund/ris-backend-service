@@ -1,5 +1,5 @@
 /* eslint-disable jest-dom/prefer-in-document */
-import userEvent from "@testing-library/user-event"
+import { userEvent } from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
 import ComboboxInput from "@/components/ComboboxInput.vue"
 import { Court } from "@/domain/documentUnit"
