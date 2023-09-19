@@ -2,7 +2,7 @@ import { userEvent } from "@testing-library/user-event"
 import { render, screen, fireEvent } from "@testing-library/vue"
 import { createPinia, setActivePinia } from "pinia"
 import DateOrYearInputGroup from "@/components/DateOrYearInputGroup.vue"
-import { Metadata, MetadatumType } from "@/domain/norm"
+import { MetadatumType } from "@/domain/norm"
 
 //  ensures that the dateOrYearInputGroupProps type will always reflect the actual props of the DateOrYearInputGroup component. If you change the props of the component, this type will automatically update to match. This can help catch type errors early on and make the code more maintainable.
 type DateOrYearInputGroupProps = InstanceType<
@@ -50,12 +50,12 @@ describe("date/year field", () => {
     setActivePinia(createPinia())
   })
 
-  describe("Default date component", () => {
-    it("Shows 2 radio buttons with 1 selected by default and corresponding field displayed", () => {
+  describe("default date component", () => {
+    it("shows 2 radio buttons with 1 selected by default and corresponding field displayed", () => {
       renderComponent({ label: "test-label" })
       const dateRadioButton = screen.getByLabelText("Datum")
       const yearRadioButton = screen.getByLabelText("Jahresangabe")
-      const dateInputField = screen.getByLabelText("test-label")
+      const dateInputField = screen.getByPlaceholderText("TT.MM.JJJJ")
 
       expect(dateRadioButton).toBeInTheDocument()
       expect(dateRadioButton).toBeVisible()
@@ -69,34 +69,53 @@ describe("date/year field", () => {
       expect(dateInputField).toBeVisible()
     })
 
-    it("User can enter a date input", async () => {
-      renderComponent()
-      const dateInputField = screen.getByLabelText("test-label")
+    it("user can enter a date input", async () => {
+      const user = userEvent.setup()
+      let dateValue: string | undefined = undefined
+      const onUpdateDateValue = vi.fn().mockImplementation((value) => {
+        dateValue = value
+      })
+
+      const { rerender } = renderComponent({
+        dateValue,
+        "onUpdate:dateValue": onUpdateDateValue,
+      })
+
+      const dateInputField = screen.getByPlaceholderText("TT.MM.JJJJ")
 
       expect(dateInputField).toBeInTheDocument()
       expect(dateInputField).toBeVisible()
 
-      await userEvent.type(dateInputField, "12.05.2020")
-
+      await user.type(dateInputField, "12.05.2020")
+      await rerender({ dateValue })
       expect(dateInputField).toHaveValue("12.05.2020")
+      expect(dateValue).toBe("2020-05-12T00:00:00.000Z")
     })
 
-    it("User can delete the date input", async () => {
+    it("user can delete the date input", async () => {
       const user = userEvent.setup()
-      renderComponent({
-        dateValue: "2020-05-12",
+      let dateValue: string | undefined = "2020-05-12"
+      const onUpdateDateValue = vi.fn().mockImplementation((value) => {
+        dateValue = value
       })
 
-      const dateInputField = screen.getByLabelText("test-label")
+      const { rerender } = renderComponent({
+        dateValue,
+        "onUpdate:dateValue": onUpdateDateValue,
+      })
+
+      const dateInputField = screen.getByPlaceholderText("TT.MM.JJJJ")
 
       expect(dateInputField).toHaveValue("12.05.2020")
       await user.clear(dateInputField)
+      await rerender({ dateValue })
       expect(dateInputField).toHaveValue("")
+      expect(dateValue).toBeUndefined()
     })
   })
 
-  describe("Year input component", () => {
-    it("user clicks Year radio button and renders year input element", async () => {
+  describe("year input component", () => {
+    it("user clicks year radio button and renders year input element", async () => {
       let selectedInputType = MetadatumType.DATE
       const onUpdateSelectedInputType = vi.fn().mockImplementation((value) => {
         selectedInputType = value
@@ -175,8 +194,8 @@ describe("date/year field", () => {
     })
   })
 
-  describe("Behaviour when switching between date and year components", () => {
-    it("Date value is deleted after year value is entered", async () => {
+  describe("behaviour when switching between date and year components", () => {
+    it("date value is deleted after year value is entered", async () => {
       renderComponent()
 
       const dateInputField = screen.getByLabelText("test-label")
@@ -200,7 +219,7 @@ describe("date/year field", () => {
       expect(dateInputFieldNew).not.toHaveValue()
     })
 
-    it("Year value is deleted after date value is entered", async () => {
+    it("year value is deleted after date value is entered", async () => {
       renderComponent()
       await changeToYearInput()
       const yearInputField = screen.getByLabelText("test-label")
