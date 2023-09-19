@@ -43,7 +43,7 @@ async function downloadJurisTestFile(
     })
   }
 
-  expect(response.ok()).toBeTruthy()
+  await expect(response).toBeOK()
 
   const body = await response.body()
   await fs.promises.writeFile(localPath, body)
@@ -74,7 +74,7 @@ export async function importNormViaApi(
     data: fileContent,
   })
 
-  expect(response.ok()).toBeTruthy()
+  await expect(response).toBeOK()
 
   const body = await response.text()
   return JSON.parse(body)
@@ -89,7 +89,7 @@ export async function importTestData(
     data: norm,
   })
 
-  expect(response.ok()).toBeTruthy()
+  await expect(response).toBeOK()
 
   const body = await response.text()
   return JSON.parse(body)

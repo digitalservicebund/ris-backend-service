@@ -46,7 +46,7 @@ testWithImportedNorm(
     await page.goto(`/api/v1/norms/xml/${eliInputValue}`)
 
     const response = await request.get(`/api/v1/norms/xml/${eliInputValue}`)
-    expect(response.ok()).toBeTruthy()
+    await expect(response).toBeOK()
     expect(response.headers()["content-type"]).toBe("application/xml")
 
     const xmlAsString = await response.text()
