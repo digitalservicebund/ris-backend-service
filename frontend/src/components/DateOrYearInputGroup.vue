@@ -7,17 +7,15 @@ import InputField, {
 import RadioInput from "@/shared/components/input/RadioInput.vue"
 import YearInput from "@/shared/components/input/YearInput.vue"
 
-interface Props {
+defineProps<{
   idPrefix: string
   label: string
   dateValue: string | undefined
   yearValue: string | undefined
   selectedInputType: MetadatumType.YEAR | MetadatumType.DATE
-}
+}>()
 
-const props = defineProps<Props>()
-
-const emit = defineEmits<{
+defineEmits<{
   "update:dateValue": [value: string]
   "update:yearValue": [value: string]
   "update:selectedInputType": [value: MetadatumType.YEAR | MetadatumType.DATE]

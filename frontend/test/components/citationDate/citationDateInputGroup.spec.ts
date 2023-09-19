@@ -8,7 +8,6 @@ type CitationDateInputGroupProps = InstanceType<
 
 function renderComponent(props?: CitationDateInputGroupProps) {
   const effectiveProps = {
-    ariaLabel: props?.ariaLabel ?? "aria-label",
     modelValue: props?.modelValue ?? {},
     "onUpdate:modelValue": props?.["onUpdate:modelValue"],
   }

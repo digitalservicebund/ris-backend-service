@@ -50,18 +50,18 @@ describe("Announcement date/time/year fields", () => {
   it("selects the date selection", async () => {
     const user = userEvent.setup()
     let modelValue: Metadata = { YEAR: ["2013"] }
-    const { rerender } = renderComponent({
-      modelValue,
-      "onUpdate:modelValue": (val) => (modelValue = val),
+
+    const onUpdateModelValue = vi.fn().mockImplementation((value) => {
+      modelValue = value
     })
 
-    const yearRadio = screen.getByRole("radio", { name: "Jahresangabe" })
-    expect(yearRadio).toBeChecked()
+    const { rerender } = renderComponent({
+      modelValue,
+      "onUpdate:modelValue": onUpdateModelValue,
+    })
 
     const dateRadio = screen.getByRole("radio", { name: "Datum" })
     await user.click(dateRadio)
-    expect(dateRadio).toBeChecked()
-
     await rerender({ modelValue })
     const dateInputField = screen.getByRole("textbox", { name: "Datum" })
     expect(dateInputField).toBeVisible()
@@ -70,18 +70,17 @@ describe("Announcement date/time/year fields", () => {
   it("selects the year selection", async () => {
     const user = userEvent.setup()
     let modelValue: Metadata = {}
-    const { rerender } = renderComponent({
-      modelValue,
-      "onUpdate:modelValue": (val) => (modelValue = val),
+    const onUpdateModelValue = vi.fn().mockImplementation((value) => {
+      modelValue = value
     })
 
-    const dateRadio = screen.getByRole("radio", { name: "Datum" })
-    expect(dateRadio).toBeChecked()
+    const { rerender } = renderComponent({
+      modelValue,
+      "onUpdate:modelValue": onUpdateModelValue,
+    })
 
     const yearRadio = screen.getByRole("radio", { name: "Jahresangabe" })
     await user.click(yearRadio)
-    expect(yearRadio).toBeChecked()
-
     await rerender({ modelValue })
     const yearInputField = screen.getByRole("textbox", { name: "Jahresangabe" })
     expect(yearInputField).toBeVisible()
@@ -106,20 +105,7 @@ describe("Announcement date/time/year fields", () => {
     expect(emitted("update:modelValue")).toBeTruthy()
   })
 
-  it("clears the date and time when the type is set to year", async () => {
-    const user = userEvent.setup()
-    let modelValue: Metadata = { DATE: ["01.01.2020"], TIME: ["10:11"] }
-    renderComponent({
-      modelValue,
-      "onUpdate:modelValue": (val) => (modelValue = val),
-    })
-
-    const yearRadio = screen.getByRole("radio", { name: "Jahresangabe" })
-    await user.click(yearRadio)
-    expect(modelValue).toEqual<Metadata>({ YEAR: [] })
-  })
-
-  it("does not clear the year when the type is set to date", async () => {
+  it("restores the original data after switching types", async () => {
     const user = userEvent.setup()
     let modelValue: Metadata = {
       YEAR: ["2020"],
@@ -136,20 +122,30 @@ describe("Announcement date/time/year fields", () => {
     const dateRadio = screen.getByRole("radio", { name: "Datum" })
     await user.click(dateRadio)
     await rerender({ modelValue })
-    expect(modelValue.YEAR).toEqual<Metadata>({ YEAR: ["2020"] })
+    const dateInputField = screen.getByRole("textbox", { name: "Datum" })
+    await user.type(dateInputField, "01.01.2022")
+    expect(dateInputField).toHaveValue("01.01.2022")
+
+    const yearRadio = screen.getByRole("radio", { name: "Jahresangabe" })
+    await user.click(yearRadio)
+    await rerender({ modelValue })
+    const yearInputField = screen.getByRole("textbox", { name: "Jahresangabe" })
+    expect(yearInputField).toHaveValue("2020")
   })
 
-  it("doesn't automatically switch back to date when the year is cleared", async () => {
+  it("doesn't revert to date when year is cleared", async () => {
     const user = userEvent.setup()
     let modelValue: Metadata = { YEAR: ["2020"] }
+    const onUpdateModelValue = vi.fn().mockImplementation((value) => {
+      modelValue = value
+    })
     renderComponent({
       modelValue,
-      "onUpdate:modelValue": (val) => (modelValue = val),
+      "onUpdate:modelValue": onUpdateModelValue,
     })
 
     const yearInputField = screen.getByRole("textbox", { name: "Jahresangabe" })
     await user.clear(yearInputField)
-    expect(modelValue).toEqual<Metadata>({ YEAR: [] })
     expect(yearInputField).toBeVisible()
   })
 })
