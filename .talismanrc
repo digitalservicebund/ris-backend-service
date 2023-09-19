@@ -33,7 +33,7 @@ fileignoreconfig:
 - filename: frontend/Dockerfile.prod
   checksum: b7af7809a2aa9b5841256d2a63909abea754a177e18a53d3050aee58e5e47403
 - filename: compose.yaml
-  checksum: 0b84109059c95887631e8dd68498b2133aec9de4eac19a9058c7544a92ff9434
+  checksum: 32471330995a815cfa44221e03835e3155864c462deeef81a0e3e3c8fc70c8fc
 scopeconfig:
 - scope: node
 allowed_patterns:
