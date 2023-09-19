@@ -21,6 +21,9 @@ const error = reactive({ title: "", description: "" })
 
 const fileReference = computed(() => {
   const files = loadedNorm.value?.files ?? []
+  files.sort((lhs, rhs) => {
+    return lhs.createdAt.localeCompare(rhs.createdAt)
+  })
   return files.length > 0 ? files[files.length - 1] : undefined
 })
 
