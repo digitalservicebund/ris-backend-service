@@ -1,112 +1,122 @@
 import { userEvent } from "@testing-library/user-event"
-import { render, screen, fireEvent } from "@testing-library/vue"
+import { render, screen } from "@testing-library/vue"
 import { createPinia, setActivePinia } from "pinia"
 import DivergentEntryIntoForceGroup from "@/components/divergentGroup/divergentEntryIntoForce/DivergentEntryIntoForceGroup.vue"
 import {
   MetadataSectionName,
   MetadataSections,
   MetadatumType,
-  UndefinedDate,
+  NormCategory,
 } from "@/domain/norm"
 
-function renderComponent(options?: { modelValue?: MetadataSections }) {
-  const props = {
-    modelValue: options?.modelValue ?? {},
+type DivergentEntryIntoForceGroupProps = InstanceType<
+  typeof DivergentEntryIntoForceGroup
+>["$props"]
+
+function renderComponent(props?: Partial<DivergentEntryIntoForceGroupProps>) {
+  const effectiveProps: DivergentEntryIntoForceGroupProps = {
+    modelValue: props?.modelValue ?? {},
+    "onUpdate:modelValue": props?.["onUpdate:modelValue"],
   }
 
-  return render(DivergentEntryIntoForceGroup, { props })
+  return render(DivergentEntryIntoForceGroup, { props: effectiveProps })
 }
 
 describe("DivergentEntryIntoForceGroup", () => {
   beforeEach(async () => {
     setActivePinia(createPinia())
   })
+
   it("should render the component with 2 radio buttons each for different sections ", () => {
     renderComponent()
-    const divergentEntryIntoForceDefinedSelection = screen.queryByLabelText(
-      "bestimmt",
-    ) as HTMLInputElement
-    const divergentEntryIntoForceUndefinedSelection = screen.queryByLabelText(
-      "unbestimmt",
-    ) as HTMLInputElement
 
-    expect(divergentEntryIntoForceDefinedSelection).toBeInTheDocument()
-    expect(divergentEntryIntoForceDefinedSelection).toBeVisible()
+    const definedRadio = screen.getByLabelText("bestimmt")
+    expect(definedRadio).toBeInTheDocument()
+    expect(definedRadio).toBeVisible()
 
-    expect(divergentEntryIntoForceUndefinedSelection).toBeInTheDocument()
-    expect(divergentEntryIntoForceUndefinedSelection).toBeVisible()
+    const undefinedRadio = screen.getByLabelText("unbestimmt")
+    expect(undefinedRadio).toBeInTheDocument()
+    expect(undefinedRadio).toBeVisible()
   })
 
   it("renders the correct child component when a radio button is selected ", async () => {
-    renderComponent()
+    const user = userEvent.setup()
 
-    const divergentEntryIntoForceDefinedSelection = screen.queryByLabelText(
-      "bestimmt",
-    ) as HTMLInputElement
-    const divergentEntryIntoForceUndefinedSelection = screen.queryByLabelText(
-      "unbestimmt",
-    ) as HTMLInputElement
+    let modelValue = {}
+    const updateModelValue = vi.fn().mockImplementation((value) => {
+      modelValue = value
+    })
 
-    expect(divergentEntryIntoForceDefinedSelection).toBeChecked()
-    expect(divergentEntryIntoForceUndefinedSelection).not.toBeChecked()
+    const { rerender } = renderComponent({
+      modelValue,
+      "onUpdate:modelValue": updateModelValue,
+    })
 
-    await fireEvent.click(divergentEntryIntoForceUndefinedSelection)
-    expect(divergentEntryIntoForceUndefinedSelection).toBeChecked()
-    expect(divergentEntryIntoForceDefinedSelection).not.toBeChecked()
+    const definedRadio = screen.getByLabelText("bestimmt")
+    const undefinedRadio = screen.getByLabelText("unbestimmt")
+
+    expect(definedRadio).toBeChecked()
+    expect(undefinedRadio).not.toBeChecked()
+
+    await user.click(undefinedRadio)
+    await rerender({ modelValue })
+    expect(undefinedRadio).toBeChecked()
+    expect(definedRadio).not.toBeChecked()
 
     const dropDownInputField = screen.getByLabelText(
       "Unbestimmtes abweichendes Inkrafttretedatum Dropdown",
-    ) as HTMLInputElement
+    )
 
     expect(dropDownInputField).toBeInTheDocument()
     expect(dropDownInputField).toBeVisible()
   })
 
-  it("clears the child section data when a different radio button is selected ", async () => {
-    renderComponent()
+  it("restores the original data after switching types", async () => {
+    const user = userEvent.setup()
 
-    const divergentEntryIntoForceDefinedDate = screen.getByLabelText(
-      "Bestimmtes abweichendes Inkrafttretedatum Date Input",
-    ) as HTMLInputElement
+    let modelValue: MetadataSections = {
+      DIVERGENT_ENTRY_INTO_FORCE_DEFINED: [
+        {
+          DATE: ["2023-01-01"],
+          NORM_CATEGORY: [NormCategory.AMENDMENT_NORM],
+        },
+      ],
+    }
 
-    const divergentEntryIntoForceUndefinedSelection = screen.queryByLabelText(
-      "unbestimmt",
-    ) as HTMLInputElement
+    const updateModelValue = vi.fn().mockImplementation((value) => {
+      modelValue = value
+    })
 
-    expect(divergentEntryIntoForceDefinedDate).toBeInTheDocument()
-    expect(divergentEntryIntoForceDefinedDate).toBeVisible()
+    const { rerender, emitted } = renderComponent({
+      modelValue,
+      "onUpdate:modelValue": updateModelValue,
+    })
 
-    await userEvent.type(divergentEntryIntoForceDefinedDate, "12.05.2020")
-    await userEvent.tab()
+    const undefinedRadio = screen.getByLabelText("unbestimmt")
+    await user.click(undefinedRadio)
+    await rerender({ modelValue })
+    expect(emitted("update:modelValue")[0]).toEqual([
+      {
+        DIVERGENT_ENTRY_INTO_FORCE_UNDEFINED: [{}],
+      },
+    ])
 
-    expect(divergentEntryIntoForceDefinedDate).toHaveValue("12.05.2020")
-
-    await fireEvent.click(divergentEntryIntoForceUndefinedSelection)
-
-    const dropDownInputFieldNew = screen.getByLabelText(
-      "Unbestimmtes abweichendes Inkrafttretedatum Dropdown",
-    ) as HTMLInputElement
-
-    await userEvent.selectOptions(
-      dropDownInputFieldNew,
-      UndefinedDate.UNDEFINED_UNKNOWN,
-    )
-    expect(dropDownInputFieldNew).toHaveValue(UndefinedDate.UNDEFINED_UNKNOWN)
-
-    const divergentEntryIntoForceDefinedSelection = screen.queryByLabelText(
-      "bestimmt",
-    ) as HTMLInputElement
-
-    await fireEvent.click(divergentEntryIntoForceDefinedSelection)
-
-    const divergentEntryIntoForceDefinedDateNew = screen.getByLabelText(
-      "Bestimmtes abweichendes Inkrafttretedatum Date Input",
-    ) as HTMLInputElement
-
-    expect(divergentEntryIntoForceDefinedDateNew).not.toHaveValue()
+    const definedRadio = screen.getByLabelText("bestimmt")
+    await user.click(definedRadio)
+    await rerender({ modelValue })
+    expect(emitted("update:modelValue")[1]).toEqual([
+      {
+        DIVERGENT_ENTRY_INTO_FORCE_DEFINED: [
+          {
+            DATE: ["2023-01-01"],
+            NORM_CATEGORY: [NormCategory.AMENDMENT_NORM],
+          },
+        ],
+      },
+    ])
   })
 
-  it("initialises with the correct child section based on the modelvalue prop", function () {
+  it("initialises with the correct child section based on the modelvalue prop", () => {
     renderComponent({
       modelValue: {
         [MetadataSectionName.DIVERGENT_ENTRY_INTO_FORCE_DEFINED]: [
@@ -117,32 +127,28 @@ describe("DivergentEntryIntoForceGroup", () => {
       },
     })
 
-    const divergentEntryIntoForceDefinedSelection = screen.queryByLabelText(
-      "bestimmt",
-    ) as HTMLInputElement
-    expect(divergentEntryIntoForceDefinedSelection).toBeChecked()
+    const definedRadio = screen.getByLabelText("bestimmt")
+    expect(definedRadio).toBeChecked()
 
-    const divergentEntryIntoForceDefinedDate = screen.getByLabelText(
+    const definedDate = screen.getByLabelText(
       "Bestimmtes abweichendes Inkrafttretedatum Date Input",
-    ) as HTMLInputElement
-    expect(divergentEntryIntoForceDefinedDate).toBeVisible()
-    expect(divergentEntryIntoForceDefinedDate).toHaveValue("12.05.2020")
+    )
+    expect(definedDate).toBeVisible()
+    expect(definedDate).toHaveValue("12.05.2020")
   })
 
-  it("should by default render the  DivergentEntryIntoForceInputGroup if modelValue is empty", function () {
+  it("should by default render the  DivergentEntryIntoForceInputGroup if modelValue is empty", () => {
     renderComponent({ modelValue: {} })
 
-    const divergentEntryIntoForceDefinedSelection = screen.queryByLabelText(
-      "bestimmt",
-    ) as HTMLInputElement
+    const definedRadio = screen.getByLabelText("bestimmt")
 
-    expect(divergentEntryIntoForceDefinedSelection).toBeChecked()
+    expect(definedRadio).toBeChecked()
 
-    const divergentEntryIntoForceDefinedDate = screen.getByLabelText(
+    const definedDate = screen.getByLabelText(
       "Bestimmtes abweichendes Inkrafttretedatum Date Input",
-    ) as HTMLInputElement
+    )
 
-    expect(divergentEntryIntoForceDefinedDate).toBeInTheDocument()
-    expect(divergentEntryIntoForceDefinedDate).toBeVisible()
+    expect(definedDate).toBeInTheDocument()
+    expect(definedDate).toBeVisible()
   })
 })

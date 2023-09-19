@@ -1,43 +1,22 @@
 <script lang="ts" setup>
-import { computed, ref, watch } from "vue"
+import { produce } from "immer"
+import { computed } from "vue"
 import DivergentCategoryInputGroup from "@/components/divergentGroup/DivergentCategoryInputGroup.vue"
 import { Metadata, MetadataSectionName, UndefinedDate } from "@/domain/norm"
 import DropdownInput from "@/shared/components/input/DropdownInput.vue"
 import InputField from "@/shared/components/input/InputField.vue"
+import { DropdownItem } from "@/shared/components/input/types"
 
-interface Props {
+const props = defineProps<{
   modelValue: Metadata
   id: string
   label: string
   sectionName: MetadataSectionName
-}
-
-interface DropdownItem {
-  label: string
-  value: string
-}
-
-const props = defineProps<Props>()
+}>()
 
 const emit = defineEmits<{
   "update:modelValue": [value: Metadata]
 }>()
-
-const inputValue = ref(props.modelValue)
-
-watch(
-  () => props.modelValue,
-  (newValue) => {
-    if (newValue !== undefined) {
-      inputValue.value = newValue
-    }
-  },
-  { immediate: true },
-)
-
-watch(inputValue, () => emit("update:modelValue", inputValue.value), {
-  deep: true,
-})
 
 const ENTRY_INTO_FORCE_DATE_TRANSLATIONS: { [Value in UndefinedDate]: string } =
   {
@@ -52,10 +31,24 @@ const dropdownItems: DropdownItem[] = Object.entries(
   return { label, value }
 })
 
-const undefinedDateState = computed({
-  get: () => inputValue.value.UNDEFINED_DATE?.[0],
-  set: (data?: UndefinedDate) =>
-    data && (inputValue.value.UNDEFINED_DATE = [data]),
+const undefinedDate = computed({
+  get: () => props.modelValue.UNDEFINED_DATE?.[0],
+  set: (data) => {
+    const next = produce(props.modelValue, (draft) => {
+      draft.UNDEFINED_DATE = data ? [data] : undefined
+    })
+    emit("update:modelValue", next)
+  },
+})
+
+const normCategory = computed({
+  get: () => props.modelValue.NORM_CATEGORY ?? [],
+  set: (data) => {
+    const next = produce(props.modelValue, (draft) => {
+      draft.NORM_CATEGORY = data
+    })
+    emit("update:modelValue", next)
+  },
 })
 </script>
 
@@ -64,14 +57,15 @@ const undefinedDateState = computed({
     <InputField :id="`${id}Dropdown`" :aria-label="label" :label="label">
       <DropdownInput
         :id="`${id}Dropdown`"
-        v-model="undefinedDateState"
+        v-model="undefinedDate"
         :aria-label="`${label} Dropdown`"
         :items="dropdownItems"
         placeholder="Bitte auswählen"
       />
     </InputField>
+
     <DivergentCategoryInputGroup
-      :model-value="modelValue"
+      v-model="normCategory"
       :section-name="sectionName"
     />
   </div>

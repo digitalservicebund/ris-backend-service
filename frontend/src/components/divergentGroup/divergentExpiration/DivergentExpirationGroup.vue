@@ -1,76 +1,96 @@
 <script lang="ts" setup>
 import { storeToRefs } from "pinia"
-import { computed, ref, watch } from "vue"
+import { computed } from "vue"
 import DivergentDefinedInputGroup from "@/components/divergentGroup/DivergentDefinedInputGroup.vue"
 import DivergentUndefinedInputGroup from "@/components/divergentGroup/DivergentUndefinedInputGroup.vue"
-import { Metadata, MetadataSectionName, MetadataSections } from "@/domain/norm"
+import { MetadataSectionName, MetadataSections } from "@/domain/norm"
 import InputField, {
   LabelPosition,
 } from "@/shared/components/input/InputField.vue"
 import RadioInput from "@/shared/components/input/RadioInput.vue"
 import { useLoadedNormStore } from "@/stores/loadedNorm"
 
-const props = defineProps<Props>()
+const props = defineProps<{
+  modelValue: MetadataSections
+}>()
 
 const emit = defineEmits<{
   "update:modelValue": [value: MetadataSections]
 }>()
 
+/* -------------------------------------------------- *
+ * Section type                                       *
+ * -------------------------------------------------- */
+
+const initialValue: MetadataSections = {
+  DIVERGENT_EXPIRATION_DEFINED: props.modelValue.DIVERGENT_EXPIRATION_DEFINED,
+  DIVERGENT_EXPIRATION_UNDEFINED:
+    props.modelValue.DIVERGENT_EXPIRATION_UNDEFINED,
+}
+
+const selectedChildSection = computed<
+  | MetadataSectionName.DIVERGENT_EXPIRATION_DEFINED
+  | MetadataSectionName.DIVERGENT_EXPIRATION_UNDEFINED
+>({
+  get: () => {
+    if (props.modelValue.DIVERGENT_EXPIRATION_DEFINED?.[0]) {
+      return MetadataSectionName.DIVERGENT_EXPIRATION_DEFINED
+    } else if (props.modelValue.DIVERGENT_EXPIRATION_UNDEFINED?.[0]) {
+      return MetadataSectionName.DIVERGENT_EXPIRATION_UNDEFINED
+    } else {
+      return MetadataSectionName.DIVERGENT_EXPIRATION_DEFINED
+    }
+  },
+  set(value) {
+    emit("update:modelValue", { [value]: initialValue[value] ?? [{}] })
+  },
+})
+
 const store = useLoadedNormStore()
 const { loadedNorm } = storeToRefs(store)
 
 const isDivergentExpirationUndefined = computed(() => {
-  return (
+  const hasUndefinedEntry =
     loadedNorm.value?.metadataSections?.DIVERGENT_EXPIRATION?.some(
       (entry) => entry.DIVERGENT_EXPIRATION_UNDEFINED,
     ) ?? false
+
+  return (
+    hasUndefinedEntry &&
+    selectedChildSection.value !==
+      MetadataSectionName.DIVERGENT_EXPIRATION_UNDEFINED
   )
 })
 
-interface Props {
-  modelValue: MetadataSections
-}
+/* -------------------------------------------------- *
+ * Section data                                       *
+ * -------------------------------------------------- */
 
-type ChildSectionName =
-  | MetadataSectionName.DIVERGENT_EXPIRATION_DEFINED
-  | MetadataSectionName.DIVERGENT_EXPIRATION_UNDEFINED
+const definedDateSection = computed({
+  get: () => props.modelValue.DIVERGENT_EXPIRATION_DEFINED?.[0] ?? {},
+  set: (data) => {
+    const effectiveData = data ? [data] : undefined
+    initialValue.DIVERGENT_EXPIRATION_DEFINED = effectiveData
 
-const childSection = ref<Metadata>({})
-const selectedChildSectionName = ref<ChildSectionName>(
-  MetadataSectionName.DIVERGENT_EXPIRATION_DEFINED,
-)
-
-watch(
-  childSection,
-  () =>
-    emit("update:modelValue", {
-      [selectedChildSectionName.value]: [childSection.value],
-    }),
-  {
-    deep: true,
-  },
-)
-
-watch(
-  () => props.modelValue,
-  (modelValue) => {
-    if (modelValue.DIVERGENT_EXPIRATION_DEFINED) {
-      selectedChildSectionName.value =
-        MetadataSectionName.DIVERGENT_EXPIRATION_DEFINED
-      childSection.value = modelValue.DIVERGENT_EXPIRATION_DEFINED[0]
-    } else if (modelValue.DIVERGENT_EXPIRATION_UNDEFINED) {
-      selectedChildSectionName.value =
-        MetadataSectionName.DIVERGENT_EXPIRATION_UNDEFINED
-      childSection.value = modelValue.DIVERGENT_EXPIRATION_UNDEFINED[0]
+    const next: MetadataSections = {
+      DIVERGENT_EXPIRATION_DEFINED: effectiveData,
     }
+    emit("update:modelValue", next)
   },
-  {
-    immediate: true,
-    deep: true,
-  },
-)
+})
 
-watch(selectedChildSectionName, () => (childSection.value = {}))
+const undefinedDateSection = computed({
+  get: () => props.modelValue.DIVERGENT_EXPIRATION_UNDEFINED?.[0] ?? {},
+  set: (data) => {
+    const effectiveData = data ? [data] : undefined
+    initialValue.DIVERGENT_EXPIRATION_UNDEFINED = effectiveData
+
+    const next: MetadataSections = {
+      DIVERGENT_EXPIRATION_UNDEFINED: effectiveData,
+    }
+    emit("update:modelValue", next)
+  },
+})
 </script>
 
 <template>
@@ -84,7 +104,7 @@ watch(selectedChildSectionName, () => (childSection.value = {}))
       >
         <RadioInput
           :id="id"
-          v-model="selectedChildSectionName"
+          v-model="selectedChildSection"
           name="divergentExpiration"
           size="medium"
           :value="MetadataSectionName.DIVERGENT_EXPIRATION_DEFINED"
@@ -99,14 +119,8 @@ watch(selectedChildSectionName, () => (childSection.value = {}))
       >
         <RadioInput
           :id="id"
-          v-model="selectedChildSectionName"
-          :disabled="
-            isDivergentExpirationUndefined &&
-            !(
-              selectedChildSectionName ===
-              MetadataSectionName.DIVERGENT_EXPIRATION_UNDEFINED
-            )
-          "
+          v-model="selectedChildSection"
+          :disabled="isDivergentExpirationUndefined"
           name="divergentExpiration"
           size="medium"
           :value="MetadataSectionName.DIVERGENT_EXPIRATION_UNDEFINED"
@@ -116,22 +130,22 @@ watch(selectedChildSectionName, () => (childSection.value = {}))
 
     <DivergentDefinedInputGroup
       v-if="
-        selectedChildSectionName ===
+        selectedChildSection ===
         MetadataSectionName.DIVERGENT_EXPIRATION_DEFINED
       "
       id="divergentExpirationDefinedDate"
-      v-model="childSection"
+      v-model="definedDateSection"
       label="Bestimmtes abweichendes Außerkrafttretedatum"
       :section-name="MetadataSectionName.DIVERGENT_EXPIRATION_DEFINED"
     />
 
     <DivergentUndefinedInputGroup
       v-if="
-        selectedChildSectionName ===
+        selectedChildSection ===
         MetadataSectionName.DIVERGENT_EXPIRATION_UNDEFINED
       "
       id="divergentExpirationUndefinedDate"
-      v-model="childSection"
+      v-model="undefinedDateSection"
       label="Unbestimmtes abweichendes Außerkrafttretedatum"
       :section-name="MetadataSectionName.DIVERGENT_EXPIRATION_UNDEFINED"
     />

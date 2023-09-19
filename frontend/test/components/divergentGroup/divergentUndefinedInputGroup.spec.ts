@@ -3,32 +3,32 @@ import { render, screen } from "@testing-library/vue"
 import { createPinia, setActivePinia } from "pinia"
 import DivergentUndefinedInputGroup from "@/components/divergentGroup/DivergentUndefinedInputGroup.vue"
 import {
-  Metadata,
   MetadataSectionName,
   MetadatumType,
   NormCategory,
   UndefinedDate,
 } from "@/domain/norm"
 
-function renderComponent(options?: {
-  modelValue?: Metadata
-  id: string
-  label: string
-  sectionName: MetadataSectionName
-}) {
-  const props = {
-    modelValue: options?.modelValue ?? {},
-    id: options?.id,
-    label: options?.label,
-    sectionName: options?.sectionName,
+type DivergentUndefinedInputGroupProps = InstanceType<
+  typeof DivergentUndefinedInputGroup
+>["$props"]
+
+function renderComponent(props?: DivergentUndefinedInputGroupProps) {
+  const effectiveProps = {
+    modelValue: props?.modelValue ?? {},
+    "onUpdate:modelValue": props?.["onUpdate:modelValue"],
+    id: props?.id,
+    label: props?.label,
+    sectionName: props?.sectionName,
   }
-  return render(DivergentUndefinedInputGroup, { props })
+  return render(DivergentUndefinedInputGroup, { props: effectiveProps })
 }
 
 describe("DivergentEntryIntoForceUndefinedInputGroup", () => {
   beforeEach(async () => {
     setActivePinia(createPinia())
   })
+
   it("renders all inputs and correct model value entry", () => {
     renderComponent({
       modelValue: {
@@ -46,17 +46,17 @@ describe("DivergentEntryIntoForceUndefinedInputGroup", () => {
 
     const dropdown = screen.getByLabelText(
       "Unbestimmtes abweichendes Inkrafttretedatum Dropdown",
-    ) as HTMLInputElement
+    )
 
     const amendmentNormCheckBox = screen.getByRole("checkbox", {
       name: "Änderungsnorm",
-    }) as HTMLInputElement
+    })
     const baseNormCheckBox = screen.getByRole("checkbox", {
       name: "Stammnorm",
-    }) as HTMLInputElement
+    })
     const transitionalNormCheckBox = screen.getByRole("checkbox", {
       name: "Übergangsnorm",
-    }) as HTMLInputElement
+    })
 
     expect(dropdown).toBeInTheDocument()
     expect(dropdown).toHaveValue(UndefinedDate.UNDEFINED_NOT_PRESENT)
@@ -68,9 +68,14 @@ describe("DivergentEntryIntoForceUndefinedInputGroup", () => {
 
   it("should change the modelvalue when update the input", async () => {
     const user = userEvent.setup()
-    const modelValue = {}
-    renderComponent({
+    let modelValue = {}
+    const onUpdateModelValue = vi.fn().mockImplementation((value) => {
+      modelValue = value
+    })
+
+    const { rerender } = renderComponent({
       modelValue: modelValue,
+      "onUpdate:modelValue": onUpdateModelValue,
       id: "divergentEntryIntoForceUndefinedDate",
       label: "Unbestimmtes abweichendes Inkrafttretedatum",
       sectionName: MetadataSectionName.DIVERGENT_ENTRY_INTO_FORCE_UNDEFINED,
@@ -78,15 +83,19 @@ describe("DivergentEntryIntoForceUndefinedInputGroup", () => {
 
     const dropdown = screen.getByLabelText(
       "Unbestimmtes abweichendes Inkrafttretedatum Dropdown",
-    ) as HTMLInputElement
+    )
 
     await userEvent.selectOptions(dropdown, UndefinedDate.UNDEFINED_UNKNOWN)
+    await rerender({ modelValue })
     expect(dropdown).toHaveValue(UndefinedDate.UNDEFINED_UNKNOWN)
 
     const checkBoxInputs = screen.getAllByRole("checkbox")
     await user.click(checkBoxInputs[0])
+    await rerender({ modelValue })
     await user.click(checkBoxInputs[1])
+    await rerender({ modelValue })
     await user.click(checkBoxInputs[2])
+    await rerender({ modelValue })
 
     expect(modelValue).toEqual({
       [MetadatumType.UNDEFINED_DATE]: [UndefinedDate.UNDEFINED_UNKNOWN],

@@ -1,63 +1,79 @@
 <script lang="ts" setup>
-import { ref, watch } from "vue"
+import { computed } from "vue"
 import DivergentDefinedInputGroup from "@/components/divergentGroup/DivergentDefinedInputGroup.vue"
 import DivergentUndefinedInputGroup from "@/components/divergentGroup/DivergentUndefinedInputGroup.vue"
-import { Metadata, MetadataSectionName, MetadataSections } from "@/domain/norm"
+import { MetadataSectionName, MetadataSections } from "@/domain/norm"
 import InputField, {
   LabelPosition,
 } from "@/shared/components/input/InputField.vue"
 import RadioInput from "@/shared/components/input/RadioInput.vue"
 
-interface Props {
+const props = defineProps<{
   modelValue: MetadataSections
-}
-
-const props = defineProps<Props>()
+}>()
 
 const emit = defineEmits<{
   "update:modelValue": [value: MetadataSections]
 }>()
 
-type ChildSectionName =
+/* -------------------------------------------------- *
+ * Section type                                       *
+ * -------------------------------------------------- */
+
+const initialValue: MetadataSections = {
+  DIVERGENT_ENTRY_INTO_FORCE_DEFINED:
+    props.modelValue.DIVERGENT_ENTRY_INTO_FORCE_DEFINED,
+  DIVERGENT_ENTRY_INTO_FORCE_UNDEFINED:
+    props.modelValue.DIVERGENT_ENTRY_INTO_FORCE_UNDEFINED,
+}
+
+const selectedChildSection = computed<
   | MetadataSectionName.DIVERGENT_ENTRY_INTO_FORCE_DEFINED
   | MetadataSectionName.DIVERGENT_ENTRY_INTO_FORCE_UNDEFINED
-
-const childSection = ref<Metadata>({})
-const selectedChildSectionName = ref<ChildSectionName>(
-  MetadataSectionName.DIVERGENT_ENTRY_INTO_FORCE_DEFINED,
-)
-
-watch(
-  childSection,
-  () =>
-    emit("update:modelValue", {
-      [selectedChildSectionName.value]: [childSection.value],
-    }),
-  {
-    deep: true,
-  },
-)
-
-watch(
-  () => props.modelValue,
-  (modelValue) => {
-    if (modelValue.DIVERGENT_ENTRY_INTO_FORCE_DEFINED) {
-      selectedChildSectionName.value =
-        MetadataSectionName.DIVERGENT_ENTRY_INTO_FORCE_DEFINED
-      childSection.value = modelValue.DIVERGENT_ENTRY_INTO_FORCE_DEFINED[0]
-    } else if (modelValue.DIVERGENT_ENTRY_INTO_FORCE_UNDEFINED) {
-      selectedChildSectionName.value =
-        MetadataSectionName.DIVERGENT_ENTRY_INTO_FORCE_UNDEFINED
-      childSection.value = modelValue.DIVERGENT_ENTRY_INTO_FORCE_UNDEFINED[0]
+>({
+  get: () => {
+    if (props.modelValue.DIVERGENT_ENTRY_INTO_FORCE_DEFINED?.[0]) {
+      return MetadataSectionName.DIVERGENT_ENTRY_INTO_FORCE_DEFINED
+    } else if (props.modelValue.DIVERGENT_ENTRY_INTO_FORCE_UNDEFINED?.[0]) {
+      return MetadataSectionName.DIVERGENT_ENTRY_INTO_FORCE_UNDEFINED
+    } else {
+      return MetadataSectionName.DIVERGENT_ENTRY_INTO_FORCE_DEFINED
     }
   },
-  {
-    immediate: true,
-    deep: true,
+  set(value) {
+    emit("update:modelValue", { [value]: initialValue[value] ?? [{}] })
   },
-)
+})
 
-watch(selectedChildSectionName, () => (childSection.value = {}))
+/* -------------------------------------------------- *
+ * Section data                                       *
+ * -------------------------------------------------- */
+
+const definedDateSection = computed({
+  get: () => props.modelValue.DIVERGENT_ENTRY_INTO_FORCE_DEFINED?.[0] ?? {},
+  set: (data) => {
+    const effectiveData = data ? [data] : undefined
+    initialValue.DIVERGENT_ENTRY_INTO_FORCE_DEFINED = effectiveData
+
+    const next: MetadataSections = {
+      DIVERGENT_ENTRY_INTO_FORCE_DEFINED: effectiveData,
+    }
+    emit("update:modelValue", next)
+  },
+})
+
+const undefinedDateSection = computed({
+  get: () => props.modelValue.DIVERGENT_ENTRY_INTO_FORCE_UNDEFINED?.[0] ?? {},
+  set: (data) => {
+    const effectiveData = data ? [data] : undefined
+    initialValue.DIVERGENT_ENTRY_INTO_FORCE_UNDEFINED = effectiveData
+
+    const next: MetadataSections = {
+      DIVERGENT_ENTRY_INTO_FORCE_UNDEFINED: effectiveData,
+    }
+    emit("update:modelValue", next)
+  },
+})
 </script>
 
 <template>
@@ -71,7 +87,7 @@ watch(selectedChildSectionName, () => (childSection.value = {}))
       >
         <RadioInput
           :id="id"
-          v-model="selectedChildSectionName"
+          v-model="selectedChildSection"
           name="divergentEntryIntoForce"
           size="medium"
           :value="MetadataSectionName.DIVERGENT_ENTRY_INTO_FORCE_DEFINED"
@@ -86,7 +102,7 @@ watch(selectedChildSectionName, () => (childSection.value = {}))
       >
         <RadioInput
           :id="id"
-          v-model="selectedChildSectionName"
+          v-model="selectedChildSection"
           name="divergentEntryIntoForce"
           size="medium"
           :value="MetadataSectionName.DIVERGENT_ENTRY_INTO_FORCE_UNDEFINED"
@@ -96,22 +112,22 @@ watch(selectedChildSectionName, () => (childSection.value = {}))
 
     <DivergentDefinedInputGroup
       v-if="
-        selectedChildSectionName ===
+        selectedChildSection ===
         MetadataSectionName.DIVERGENT_ENTRY_INTO_FORCE_DEFINED
       "
       id="divergentEntryIntoForceDefinedDate"
-      v-model="childSection"
+      v-model="definedDateSection"
       label="Bestimmtes abweichendes Inkrafttretedatum"
       :section-name="MetadataSectionName.DIVERGENT_ENTRY_INTO_FORCE_DEFINED"
     />
 
     <DivergentUndefinedInputGroup
       v-if="
-        selectedChildSectionName ===
+        selectedChildSection ===
         MetadataSectionName.DIVERGENT_ENTRY_INTO_FORCE_UNDEFINED
       "
       id="divergentEntryIntoForceUndefinedDate"
-      v-model="childSection"
+      v-model="undefinedDateSection"
       label="Unbestimmtes abweichendes Inkrafttretedatum"
       :section-name="MetadataSectionName.DIVERGENT_ENTRY_INTO_FORCE_UNDEFINED"
     />

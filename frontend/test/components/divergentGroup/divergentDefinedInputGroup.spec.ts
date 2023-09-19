@@ -4,37 +4,37 @@ import { createPinia, setActivePinia } from "pinia"
 import DivergentDefinedInputGroup from "@/components/divergentGroup/DivergentDefinedInputGroup.vue"
 import { Metadata, MetadataSectionName, NormCategory } from "@/domain/norm"
 
-function renderComponent(options?: {
-  modelValue?: Metadata
-  id?: string
-  label?: string
-  sectionName: MetadataSectionName
-}) {
-  const props = {
-    modelValue: options?.modelValue ?? {},
-    id: options?.id,
-    label: options?.label,
-    sectionName: options?.sectionName,
+type DivergentDefinedInputGroupProps = InstanceType<
+  typeof DivergentDefinedInputGroup
+>["$props"]
+
+function renderComponent(props?: DivergentDefinedInputGroupProps) {
+  const effectiveProps = {
+    modelValue: props?.modelValue ?? {},
+    "onUpdate:modelValue": props?.["onUpdate:modelValue"],
+    id: props?.id,
+    label: props?.label,
+    sectionName: props?.sectionName,
   }
-  return render(DivergentDefinedInputGroup, { props })
+  return render(DivergentDefinedInputGroup, { props: effectiveProps })
 }
 
 function getControls() {
   const dateInput = screen.getByLabelText(
     "Bestimmtes abweichendes Außerkrafttretedatum Date Input",
-  ) as HTMLInputElement
+  )
 
   const amendmentNormCheckBox = screen.getByRole("checkbox", {
     name: "Änderungsnorm",
-  }) as HTMLInputElement
+  })
 
   const baseNormCheckBox = screen.getByRole("checkbox", {
     name: "Stammnorm",
-  }) as HTMLInputElement
+  })
 
   const transitionalNormCheckBox = screen.getByRole("checkbox", {
     name: "Übergangsnorm",
-  }) as HTMLInputElement
+  })
 
   return {
     dateInput,
@@ -48,6 +48,7 @@ describe("DivergentExpirationDefinedInputGroup", () => {
   beforeEach(async () => {
     setActivePinia(createPinia())
   })
+
   it("renders all inputs and correct model value entry", () => {
     renderComponent({
       id: "divergentExpirationDefinedInputGroup",
@@ -79,9 +80,14 @@ describe("DivergentExpirationDefinedInputGroup", () => {
 
   it("should change the modelvalue when update the input", async () => {
     const user = userEvent.setup()
-    const modelValue = {}
-    renderComponent({
+    let modelValue = {}
+    const onUpdateModelValue = vi.fn().mockImplementation((value) => {
+      modelValue = value
+    })
+
+    const { rerender } = renderComponent({
       modelValue: modelValue,
+      "onUpdate:modelValue": onUpdateModelValue,
       id: "divergentExpirationDefinedInputGroup",
       label: "Bestimmtes abweichendes Außerkrafttretedatum",
       sectionName: MetadataSectionName.DIVERGENT_EXPIRATION_DEFINED,
@@ -95,14 +101,19 @@ describe("DivergentExpirationDefinedInputGroup", () => {
     } = getControls()
 
     await userEvent.type(dateInput, "12.05.2020")
+    await rerender({ modelValue })
     await userEvent.tab()
 
     await userEvent.type(dateInput, "12.05.2020")
+    await rerender({ modelValue })
     await userEvent.tab()
 
     await user.click(amendmentNormCheckBox)
+    await rerender({ modelValue })
     await user.click(baseNormCheckBox)
+    await rerender({ modelValue })
     await user.click(transitionalNormCheckBox)
+    await rerender({ modelValue })
 
     expect(modelValue).toEqual({
       DATE: ["2020-05-12T00:00:00.000Z"],
@@ -116,7 +127,7 @@ describe("DivergentExpirationDefinedInputGroup", () => {
 
   it("should change the modelvalue when clearing the input", async () => {
     const user = userEvent.setup()
-    const modelValue: Metadata = {
+    let modelValue: Metadata = {
       DATE: ["2020-05-12T00:00:00.000Z"],
       NORM_CATEGORY: [
         NormCategory.AMENDMENT_NORM,
@@ -124,8 +135,13 @@ describe("DivergentExpirationDefinedInputGroup", () => {
         NormCategory.TRANSITIONAL_NORM,
       ],
     }
-    renderComponent({
-      modelValue: modelValue,
+    const onUpdateModelValue = vi.fn().mockImplementation((value) => {
+      modelValue = value
+    })
+
+    const { rerender } = renderComponent({
+      modelValue,
+      "onUpdate:modelValue": onUpdateModelValue,
       id: "divergentExpirationDefinedInputGroup",
       label: "Bestimmtes abweichendes Außerkrafttretedatum",
       sectionName: MetadataSectionName.DIVERGENT_EXPIRATION_DEFINED,
@@ -140,18 +156,22 @@ describe("DivergentExpirationDefinedInputGroup", () => {
 
     expect(dateInput).toHaveValue("12.05.2020")
     await userEvent.clear(dateInput)
+    await rerender({ modelValue })
     expect(modelValue.DATE).toBeUndefined()
 
     expect(amendmentNormCheckBox).toBeChecked()
     await user.click(amendmentNormCheckBox)
+    await rerender({ modelValue })
     expect(modelValue.NORM_CATEGORY).not.toContain(NormCategory.AMENDMENT_NORM)
 
     expect(baseNormCheckBox).toBeChecked()
     await user.click(baseNormCheckBox)
+    await rerender({ modelValue })
     expect(modelValue.NORM_CATEGORY).not.toContain(NormCategory.BASE_NORM)
 
     expect(transitionalNormCheckBox).toBeChecked()
     await user.click(transitionalNormCheckBox)
+    await rerender({ modelValue })
     expect(modelValue.NORM_CATEGORY).not.toContain(
       NormCategory.TRANSITIONAL_NORM,
     )

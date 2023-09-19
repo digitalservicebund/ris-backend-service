@@ -1,37 +1,20 @@
 <script lang="ts" setup>
-import { ref, watch } from "vue"
-import { Metadata, MetadataSectionName, NormCategory } from "@/domain/norm"
+import { produce } from "immer"
+import { computed } from "vue"
+import { MetadataSectionName, NormCategory } from "@/domain/norm"
 import CheckboxInput from "@/shared/components/input/CheckboxInput.vue"
 import InputField, {
   LabelPosition,
 } from "@/shared/components/input/InputField.vue"
 
-interface Props {
-  modelValue: Metadata
+const props = defineProps<{
+  modelValue: NormCategory[]
   sectionName: MetadataSectionName
-}
-
-const props = defineProps<Props>()
-
-const emit = defineEmits<{
-  "update:modelValue": [value: Metadata]
 }>()
 
-const inputValue = ref(props.modelValue)
-
-watch(
-  () => props.modelValue,
-  (newValue) => {
-    if (newValue !== undefined) {
-      inputValue.value = newValue
-    }
-  },
-  { immediate: true },
-)
-
-watch(inputValue, () => emit("update:modelValue", inputValue.value), {
-  deep: true,
-})
+const emit = defineEmits<{
+  "update:modelValue": [value: NormCategory[]]
+}>()
 
 const NORM_CATEGORY_NAMES = {
   [NormCategory.AMENDMENT_NORM]: "Änderungsnorm",
@@ -39,30 +22,24 @@ const NORM_CATEGORY_NAMES = {
   [NormCategory.TRANSITIONAL_NORM]: "Übergangsnorm",
 }
 
-const selectedNormCategories = ref<Record<NormCategory, boolean>>(
-  {} as Record<NormCategory, boolean>,
+const localModelValue = computed(() =>
+  props.modelValue.reduce<Partial<Record<NormCategory, true>>>(
+    (all, current) => {
+      all[current] = true
+      return all
+    },
+    {},
+  ),
 )
 
-watch(
-  selectedNormCategories,
-  () => {
-    inputValue.value.NORM_CATEGORY = (
-      Object.keys(selectedNormCategories.value) as NormCategory[]
-    ).filter((category) => selectedNormCategories.value[category])
-  },
-  { deep: true },
-)
+function toggleCategory(category: NormCategory, value?: boolean) {
+  const next = produce(localModelValue.value, (draft) => {
+    if (value) draft[category] = true
+    else delete draft[category]
+  })
 
-watch(
-  () => inputValue.value.NORM_CATEGORY,
-  (categories) => {
-    for (const category of Object.values(NormCategory)) {
-      selectedNormCategories.value[category] =
-        categories?.includes(category) ?? false
-    }
-  },
-  { immediate: true, deep: true },
-)
+  emit("update:modelValue", Object.keys(next) as NormCategory[])
+}
 </script>
 
 <template>
@@ -82,9 +59,10 @@ watch(
       >
         <CheckboxInput
           :id="[sectionName, category].join('-')"
-          v-model="selectedNormCategories[category]"
           :aria-label="NORM_CATEGORY_NAMES[category]"
+          :model-value="localModelValue[category] === true"
           size="small"
+          @update:model-value="toggleCategory(category, $event)"
         />
       </InputField>
     </div>

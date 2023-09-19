@@ -1,25 +1,31 @@
 import { userEvent } from "@testing-library/user-event"
-import { render, screen, fireEvent } from "@testing-library/vue"
-import { flushPromises } from "@vue/test-utils"
+import { render, screen } from "@testing-library/vue"
 import { setActivePinia, createPinia } from "pinia"
 import DivergentExpirationGroup from "@/components/divergentGroup/divergentExpiration/DivergentExpirationGroup.vue"
 import {
   MetadataSectionName,
-  MetadataSections,
   MetadatumType,
   UndefinedDate,
+  MetadataSections,
+  NormCategory,
 } from "@/domain/norm"
 import { getNormByGuid } from "@/services/norms"
 import { useLoadedNormStore } from "@/stores/loadedNorm"
 import { generateNorm } from "~/test-helper/dataGenerators"
 
 vi.mock("@/services/norms/operations")
-function renderComponent(options?: { modelValue?: MetadataSections }) {
-  const props = {
-    modelValue: options?.modelValue ?? {},
+
+type DivergentExpirationGroupProps = InstanceType<
+  typeof DivergentExpirationGroup
+>["$props"]
+
+function renderComponent(props?: Partial<DivergentExpirationGroupProps>) {
+  const effectiveProps: DivergentExpirationGroupProps = {
+    modelValue: props?.modelValue ?? {},
+    "onUpdate:modelValue": props?.["onUpdate:modelValue"],
   }
 
-  return render(DivergentExpirationGroup, { props })
+  return render(DivergentExpirationGroup, { props: effectiveProps })
 }
 
 describe("DivergentExpirationGroup", () => {
@@ -27,97 +33,96 @@ describe("DivergentExpirationGroup", () => {
     setActivePinia(createPinia())
   })
 
-  afterEach(() => {
-    flushPromises()
-  })
-
   it("should render the component with 2 radio buttons each for different sections ", async () => {
     renderComponent()
 
-    const divergentExpirationDefinedSelection = screen.queryByLabelText(
-      "bestimmt",
-    ) as HTMLInputElement
-    const divergentExpirationUndefinedSelection = screen.queryByLabelText(
-      "unbestimmt",
-    ) as HTMLInputElement
+    const definedRadio = screen.getByLabelText("bestimmt")
+    expect(definedRadio).toBeInTheDocument()
+    expect(definedRadio).toBeVisible()
 
-    expect(divergentExpirationDefinedSelection).toBeInTheDocument()
-    expect(divergentExpirationDefinedSelection).toBeVisible()
-
-    expect(divergentExpirationUndefinedSelection).toBeInTheDocument()
-    expect(divergentExpirationUndefinedSelection).toBeVisible()
+    const undefinedRadio = screen.getByLabelText("unbestimmt")
+    expect(undefinedRadio).toBeInTheDocument()
+    expect(undefinedRadio).toBeVisible()
   })
 
   it("renders the correct child component when a radio button is selected ", async () => {
-    renderComponent()
+    const user = userEvent.setup()
 
-    const divergentExpirationDefinedSelection = screen.queryByLabelText(
-      "bestimmt",
-    ) as HTMLInputElement
-    const divergentExpirationUndefinedSelection = screen.queryByLabelText(
-      "unbestimmt",
-    ) as HTMLInputElement
+    let modelValue = {}
+    const updateModelValue = vi.fn().mockImplementation((value) => {
+      modelValue = value
+    })
 
-    expect(divergentExpirationDefinedSelection).toBeChecked()
-    expect(divergentExpirationUndefinedSelection).not.toBeChecked()
+    const { rerender } = renderComponent({
+      modelValue,
+      "onUpdate:modelValue": updateModelValue,
+    })
 
-    await fireEvent.click(divergentExpirationUndefinedSelection)
-    expect(divergentExpirationUndefinedSelection).toBeChecked()
-    expect(divergentExpirationDefinedSelection).not.toBeChecked()
+    const definedRadio = screen.getByLabelText("bestimmt")
+    const undefinedRadio = screen.getByLabelText("unbestimmt")
+
+    expect(definedRadio).toBeChecked()
+    expect(undefinedRadio).not.toBeChecked()
+
+    await user.click(undefinedRadio)
+    await rerender({ modelValue })
+    expect(undefinedRadio).toBeChecked()
+    expect(definedRadio).not.toBeChecked()
 
     const dropDownInputField = screen.getByLabelText(
       "Unbestimmtes abweichendes Außerkrafttretedatum Dropdown",
-    ) as HTMLInputElement
+    )
 
     expect(dropDownInputField).toBeInTheDocument()
     expect(dropDownInputField).toBeVisible()
   })
 
-  it("clears the child section data when a different radio button is selected ", async () => {
-    renderComponent()
+  it("restores the original data after switching types", async () => {
+    const user = userEvent.setup()
 
-    const divergentExpirationUndefinedSelection = screen.queryByLabelText(
-      "unbestimmt",
-    ) as HTMLInputElement
+    let modelValue: MetadataSections = {
+      DIVERGENT_EXPIRATION_DEFINED: [
+        {
+          DATE: ["2023-01-01"],
+          NORM_CATEGORY: [NormCategory.AMENDMENT_NORM],
+        },
+      ],
+    }
 
-    const Date = screen.getByLabelText(
-      "Bestimmtes abweichendes Außerkrafttretedatum Date Input",
-    ) as HTMLInputElement
+    const updateModelValue = vi.fn().mockImplementation((value) => {
+      modelValue = value
+    })
 
-    expect(Date).toBeInTheDocument()
-    expect(Date).toBeVisible()
+    const { rerender, emitted } = renderComponent({
+      modelValue,
+      "onUpdate:modelValue": updateModelValue,
+    })
 
-    await userEvent.type(Date, "12.05.2020")
-    await userEvent.tab()
+    const undefinedRadio = screen.getByLabelText("unbestimmt")
+    await user.click(undefinedRadio)
+    await rerender({ modelValue })
+    expect(emitted("update:modelValue")[0]).toEqual([
+      {
+        DIVERGENT_EXPIRATION_UNDEFINED: [{}],
+      },
+    ])
 
-    expect(Date).toHaveValue("12.05.2020")
-
-    await fireEvent.click(divergentExpirationUndefinedSelection)
-
-    const dropDownInputField = screen.getByLabelText(
-      "Unbestimmtes abweichendes Außerkrafttretedatum Dropdown",
-    ) as HTMLInputElement
-
-    await userEvent.selectOptions(
-      dropDownInputField,
-      UndefinedDate.UNDEFINED_UNKNOWN,
-    )
-    expect(dropDownInputField).toHaveValue(UndefinedDate.UNDEFINED_UNKNOWN)
-
-    const divergentExpirationDefinedSelection = screen.queryByLabelText(
-      "bestimmt",
-    ) as HTMLInputElement
-
-    await fireEvent.click(divergentExpirationDefinedSelection)
-
-    const dateNew = screen.getByLabelText(
-      "Bestimmtes abweichendes Außerkrafttretedatum Date Input",
-    ) as HTMLInputElement
-
-    expect(dateNew).not.toHaveValue()
+    const definedRadio = screen.getByLabelText("bestimmt")
+    await user.click(definedRadio)
+    await rerender({ modelValue })
+    expect(emitted("update:modelValue")[1]).toEqual([
+      {
+        DIVERGENT_EXPIRATION_DEFINED: [
+          {
+            DATE: ["2023-01-01"],
+            NORM_CATEGORY: [NormCategory.AMENDMENT_NORM],
+          },
+        ],
+      },
+    ])
   })
 
-  it("initialises with the correct child section based on the modelvalue prop", function () {
+  it("initialises with the correct child section based on the modelvalue prop", () => {
     renderComponent({
       modelValue: {
         [MetadataSectionName.DIVERGENT_EXPIRATION_DEFINED]: [
@@ -128,34 +133,30 @@ describe("DivergentExpirationGroup", () => {
       },
     })
 
-    const divergentExpirationDefinedSelection = screen.queryByLabelText(
-      "bestimmt",
-    ) as HTMLInputElement
-    expect(divergentExpirationDefinedSelection).toBeChecked()
+    const definedRadio = screen.getByLabelText("bestimmt")
+    expect(definedRadio).toBeChecked()
 
-    const divergentExpirationDefinedDate = screen.getByLabelText(
+    const undefinedRadio = screen.getByLabelText(
       "Bestimmtes abweichendes Außerkrafttretedatum Date Input",
-    ) as HTMLInputElement
+    )
 
-    expect(divergentExpirationDefinedDate).toBeVisible()
-    expect(divergentExpirationDefinedDate).toHaveValue("12.05.2020")
+    expect(undefinedRadio).toBeVisible()
+    expect(undefinedRadio).toHaveValue("12.05.2020")
   })
 
-  it("should by default render the  DivergentExpirationDefinedInputGroup if modelValue is empty", function () {
+  it("should by default render the  DivergentExpirationDefinedInputGroup if modelValue is empty", () => {
     renderComponent({ modelValue: {} })
 
-    const divergentExpirationDefinedSelection = screen.queryByLabelText(
-      "bestimmt",
-    ) as HTMLInputElement
+    const definedRadio = screen.getByLabelText("bestimmt")
 
-    expect(divergentExpirationDefinedSelection).toBeChecked()
+    expect(definedRadio).toBeChecked()
 
-    const divergentExpirationDefinedDate = screen.getByLabelText(
+    const undefinedRadio = screen.getByLabelText(
       "Bestimmtes abweichendes Außerkrafttretedatum Date Input",
-    ) as HTMLInputElement
+    )
 
-    expect(divergentExpirationDefinedDate).toBeInTheDocument()
-    expect(divergentExpirationDefinedDate).toBeVisible()
+    expect(undefinedRadio).toBeInTheDocument()
+    expect(undefinedRadio).toBeVisible()
   })
 
   it("should disable the DivergentExpirationUndefined Radio Button if there is an UNDEFINED_DATE entry already ", async () => {
@@ -186,10 +187,8 @@ describe("DivergentExpirationGroup", () => {
     expect(getNormByGuid).toHaveBeenLastCalledWith("guid")
     expect(store.loadedNorm).toEqual(norm)
 
-    const divergentExpirationUndefinedSelection = screen.queryByLabelText(
-      "unbestimmt",
-    ) as HTMLInputElement
+    const undefinedRadio = screen.getByLabelText("unbestimmt")
 
-    await expect(divergentExpirationUndefinedSelection).toBeDisabled()
+    expect(undefinedRadio).toBeDisabled()
   })
 })
