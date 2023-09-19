@@ -34,11 +34,30 @@ module.exports = {
   parserOptions: {
     ecmaVersion: 2022,
   },
-  ignorePatterns: ["dist/", "Dockerfile.prod"],
+  ignorePatterns: ["dist/", "Dockerfile.prod", "playwright.config.ts"],
   overrides: [
     // Avoid linting JavaScript config files with TypeScript rules...
     {
-      files: ["**/*.{ts,vue}"],
+      files: ["**/*.ts"],
+      extends: [
+        "plugin:import/recommended",
+        "plugin:import/typescript",
+        "plugin:@typescript-eslint/recommended",
+      ],
+      rules: {
+        ...moduleImportRules,
+        "@typescript-eslint/no-floating-promises": ["error"],
+        "@typescript-eslint/no-unused-vars": [
+          "error",
+          { ignoreRestSiblings: true },
+        ],
+      },
+      parserOptions: {
+        project: ["./tsconfig.json"],
+      },
+    },
+    {
+      files: ["**/*.vue"],
       extends: [
         "plugin:import/recommended",
         "plugin:import/typescript",
