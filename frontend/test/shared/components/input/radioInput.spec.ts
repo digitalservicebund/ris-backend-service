@@ -1,4 +1,4 @@
-import userEvent from "@testing-library/user-event"
+import { userEvent } from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
 import { defineComponent } from "vue"
 import RadioInput from "@/shared/components/input/RadioInput.vue"

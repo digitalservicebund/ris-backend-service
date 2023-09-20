@@ -1,4 +1,4 @@
-import userEvent from "@testing-library/user-event"
+import { userEvent } from "@testing-library/user-event"
 import { fireEvent, render, screen } from "@testing-library/vue"
 import { nextTick } from "vue"
 import ChipsDateInput from "@/shared/components/input/ChipsDateInput.vue"

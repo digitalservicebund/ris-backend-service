@@ -1,4 +1,4 @@
-import userEvent from "@testing-library/user-event"
+import { userEvent } from "@testing-library/user-event"
 import { render, fireEvent, screen } from "@testing-library/vue"
 import { createRouter, createWebHistory } from "vue-router"
 import PublicationDocument from "@/components/PublicationDocument.vue"

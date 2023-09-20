@@ -1,4 +1,4 @@
-import userEvent from "@testing-library/user-event"
+import { userEvent } from "@testing-library/user-event"
 import { render, screen, fireEvent } from "@testing-library/vue"
 import { flushPromises } from "@vue/test-utils"
 import { setActivePinia, createPinia } from "pinia"
