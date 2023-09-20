@@ -1,14 +1,27 @@
 import { userEvent } from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
+import { createPinia } from "pinia"
 import { vi } from "vitest"
+import { createRouter, createWebHistory } from "vue-router"
 import ProcedureList from "@/components/procedures/ProcedureList.vue"
 import { Procedure } from "@/domain/documentUnit"
 import service from "@/services/procedureService"
 
 vi.mock("@/services/procedureService")
 
+const router = createRouter({
+  history: createWebHistory(process.env.BASE_URL),
+  routes: [
+    {
+      path: "",
+      name: "index",
+      component: {},
+    },
+  ],
+})
+
 async function renderComponent(options?: { procedures: Procedure[] }) {
-  const mockedGetAll = vi.mocked(service.getAll).mockResolvedValueOnce({
+  const mockedGetAll = vi.mocked(service.getAll).mockResolvedValue({
     status: 200,
     data: {
       content: options?.procedures || [
@@ -37,7 +50,10 @@ async function renderComponent(options?: { procedures: Procedure[] }) {
 
   return {
     ...render(ProcedureList, {
-      global: { stubs: { routerLink: { template: "<a><slot /></a>" } } },
+      global: {
+        stubs: { routerLink: { template: "<a><slot /></a>" } },
+        plugins: [router, createPinia()],
+      },
     }),
     // eslint-disable-next-line testing-library/await-async-events
     user: userEvent.setup(),

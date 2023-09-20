@@ -62,10 +62,9 @@ watch(
   queries,
   () => {
     updateProcedures(currentPage.value?.number || 0, queries.value.q)
-
     router.push(queries.value.q ? { query: queries.value } : {})
   },
-  { immediate: true, deep: true },
+  { deep: true },
 )
 
 onMounted(() => {
