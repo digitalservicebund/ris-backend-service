@@ -40,11 +40,14 @@ describe("useSaveToRemote", () => {
       )
     const { triggerSave } = useSaveToRemote(callback)
 
-    await triggerSave()
-    await triggerSave()
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
+    triggerSave()
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
+    triggerSave()
     resolveCallback(undefined)
     await flushPromises()
-    await triggerSave()
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
+    triggerSave()
 
     expect(callback).toHaveBeenCalledTimes(2)
   })
@@ -60,7 +63,8 @@ describe("useSaveToRemote", () => {
 
     expect(saveIsInProgress.value).toBe(false)
 
-    await triggerSave()
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
+    triggerSave()
 
     expect(saveIsInProgress.value).toBe(true)
 

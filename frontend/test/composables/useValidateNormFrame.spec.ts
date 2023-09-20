@@ -115,13 +115,16 @@ describe("useValidateNormFrame", () => {
       afterCallback,
     )
 
-    await triggerValidation()
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
+    triggerValidation()
     vi.runAllTimers()
-    await triggerValidation()
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
+    triggerValidation()
     resolveCallback(undefined)
     await flushPromises()
     vi.runAllTimers()
-    await triggerValidation()
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
+    triggerValidation()
 
     expect(beforeCallback).toHaveBeenCalledTimes(2)
     expect(callback).toHaveBeenCalledTimes(2)
@@ -145,7 +148,8 @@ describe("useValidateNormFrame", () => {
 
     expect(validateIsInProgress.value).toBe(false)
 
-    await triggerValidation()
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
+    triggerValidation()
 
     expect(validateIsInProgress.value).toBe(true)
 

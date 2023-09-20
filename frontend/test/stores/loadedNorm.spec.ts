@@ -40,7 +40,8 @@ describe("loadedNorm", () => {
     const store = useLoadedNormStore()
     store.loadedNorm = generateNorm()
 
-    await store.load("other-guid")
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
+    store.load("other-guid")
   })
 
   it("keeps the loaded norm to be undefined if service fails", async () => {
