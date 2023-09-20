@@ -103,6 +103,8 @@ services:
       - |
         set -e
         docker-entrypoint.sh postgres &
+        sleep 10
+        psql -U $${POSTGRES_USER} -d $${POSTGRES_DB} -c 'CREATE EXTENSION IF NOT EXISTS "uuid-ossp";'
         wait
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U test -d neuris"]
@@ -136,6 +138,7 @@ services:
         set -e
         docker-entrypoint.sh postgres &
         sleep 10
+        psql -U $${POSTGRES_USER} -d $${POSTGRES_DB} -c 'CREATE EXTENSION IF NOT EXISTS "uuid-ossp";'
         if [ ! -f /tmp/pg_dump.sql ]; then
           PGPASSWORD=$${POSTGRES_PASSWORD} pg_dumpall -p 8432 -U $${POSTGRES_USER} -l $${POSTGRES_DB} -h localhost > /tmp/pg_dump.sql
           PGPASSWORD=$${POSTGRES_PASSWORD} psql -p 5432 -U $${POSTGRES_USER} -h localhost -f /tmp/pg_dump.sql $${POSTGRES_DB}
