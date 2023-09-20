@@ -102,7 +102,7 @@ fun mapNormToDto(norm: Norm): NormDto {
 fun mapArticleToDto(article: Article, ordinalNumber: Int = 1): ArticleDto {
   val marker = parseMarkerFromMarkerText(article.marker) ?: "$ordinalNumber"
   var paragraphsToPass = article.paragraphs
-  if (article.paragraphs.none { StringUtils.isEmpty((it as Paragraph).marker) }) {
+  if (article.paragraphs.none { StringUtils.isEmpty(it.marker) }) {
     paragraphsToPass =
         article.paragraphs.sortedBy { it.marker!!.substring(1, it.marker!!.length.minus(1)) }
   }
