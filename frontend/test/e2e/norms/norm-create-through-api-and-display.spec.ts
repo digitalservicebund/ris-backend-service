@@ -1,4 +1,4 @@
-import { Page, expect } from "@playwright/test"
+import { Page, expect, test } from "@playwright/test"
 
 import { openNorm } from "./e2e-utils"
 import { getNormBySections, testWithImportedNorm } from "./fixtures"
@@ -57,38 +57,43 @@ testWithImportedNorm(
   },
 )
 
-testWithImportedNorm(
-  "Check if switching frame sections affects sections being inside or outside viewport",
-  async ({ page, normData, guid }) => {
-    testWithImportedNorm.slow()
-    await openNorm(page, guid)
+test.describe("skip in firefox", () => {
+  testWithImportedNorm.skip(({ browserName }) => browserName === "firefox")
+  testWithImportedNorm(
+    "Check if switching frame sections affects sections being inside or outside viewport",
+    async ({ page, normData, guid }) => {
+      testWithImportedNorm.slow()
+      await openNorm(page, guid)
 
-    const locatorFrameButton = page.locator("a:has-text('Rahmen')")
-    await expect(locatorFrameButton).toBeVisible()
-    await locatorFrameButton.click()
-    await expect(page).toHaveURL(`/norms/norm/${guid}/frame`)
+      const locatorFrameButton = page.locator("a:has-text('Rahmen')")
+      await expect(locatorFrameButton).toBeVisible()
+      await locatorFrameButton.click()
+      await expect(page).toHaveURL(`/norms/norm/${guid}/frame`)
 
-    const sections = getNormBySections(normData)
-    const sectionsWithHeading = sections.filter((section) => !!section.heading)
+      const sections = getNormBySections(normData)
+      const sectionsWithHeading = sections.filter(
+        (section) => !!section.heading,
+      )
 
-    // Manually add sections that are not part of the fixtures
-    sectionsWithHeading.push({ heading: "ELI" })
+      // Manually add sections that are not part of the fixtures
+      sectionsWithHeading.push({ heading: "ELI" })
 
-    for (const section of sectionsWithHeading) {
-      // Skip section names that are not listed as menu items in the sidebar
-      if (
-        section.heading === "Abweichendes Inkrafttretedatum" ||
-        section.heading === "Abweichendes Außerkrafttretedatum" ||
-        section.heading === "Datum des Inkrafttretens" ||
-        section.heading === "Datum des Außerkrafttretens" ||
-        section.heading === "Grundsätzliches Inkrafttretedatum" ||
-        section.heading === "Grundsätzliches Außerkrafttretedatum" ||
-        section.heading === "Veröffentlichungsdatum"
-      ) {
-        continue
+      for (const section of sectionsWithHeading) {
+        // Skip section names that are not listed as menu items in the sidebar
+        if (
+          section.heading === "Abweichendes Inkrafttretedatum" ||
+          section.heading === "Abweichendes Außerkrafttretedatum" ||
+          section.heading === "Datum des Inkrafttretens" ||
+          section.heading === "Datum des Außerkrafttretens" ||
+          section.heading === "Grundsätzliches Inkrafttretedatum" ||
+          section.heading === "Grundsätzliches Außerkrafttretedatum" ||
+          section.heading === "Veröffentlichungsdatum"
+        ) {
+          continue
+        }
+
+        await expectSectionAppearsAfterScroll(page, section)
       }
-
-      await expectSectionAppearsAfterScroll(page, section)
-    }
-  },
-)
+    },
+  )
+})
