@@ -57,7 +57,7 @@ const selectedInputType = computed<MetadatumType.YEAR | MetadatumType.DATE>({
  * -------------------------------------------------- */
 
 const date = computed({
-  get: () => props.modelValue.DATE?.[0] || "",
+  get: () => props.modelValue.DATE?.[0] ?? "",
   set: (data) => {
     const effectiveData = data ? [data] : undefined
     initialValue.DATE = effectiveData
@@ -68,7 +68,7 @@ const date = computed({
 })
 
 const year = computed({
-  get: () => props.modelValue.YEAR?.[0] || "",
+  get: () => props.modelValue.YEAR?.[0] ?? "",
   set: (data) => {
     const effectiveData = data ? [data] : undefined
     initialValue.YEAR = effectiveData
@@ -79,13 +79,15 @@ const year = computed({
 })
 
 const time = computed({
-  get: () => props.modelValue.TIME?.[0] || "",
+  get: () => props.modelValue.TIME?.[0] ?? "",
   set: (data) => {
-    const effectiveData = props.modelValue.DATE
-      ? data
-        ? [data]
-        : undefined
-      : undefined
+    let effectiveData
+
+    if (props.modelValue.DATE) {
+      effectiveData = data ? [data] : undefined
+    } else {
+      effectiveData = undefined
+    }
     initialValue.TIME = effectiveData
 
     const next: Metadata = {
