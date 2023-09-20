@@ -5,18 +5,26 @@ import { Page } from "@/shared/components/Pagination.vue"
 import errorMessages from "@/shared/i18n/errors.json"
 
 interface ProcedureService {
-  getAll(size: number, page: number): Promise<ServiceResponse<Page<Procedure>>>
+  getAll(
+    size: number,
+    page: number,
+    filter?: string,
+  ): Promise<ServiceResponse<Page<Procedure>>>
   getDocumentUnits(
     procedureLabel: string,
   ): Promise<ServiceResponse<DocumentUnitListEntry[]>>
 }
 
 const service: ProcedureService = {
-  async getAll(size: number, page: number) {
+  async getAll(size: number, page: number, filter?: string) {
     const response = await httpClient.get<Page<Procedure>>(
       `caselaw/procedure`,
       {
-        params: { sz: size.toString(), pg: page.toString() },
+        params: {
+          sz: size.toString(),
+          pg: page.toString(),
+          ...(filter ? { q: filter } : {}),
+        },
       },
     )
     if (response.status >= 300) {

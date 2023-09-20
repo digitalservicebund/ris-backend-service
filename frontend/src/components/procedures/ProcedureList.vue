@@ -1,19 +1,31 @@
 <script lang="ts" setup>
-import { ref, onMounted } from "vue"
+import { ref, onMounted, watch } from "vue"
+import { useRoute, useRouter } from "vue-router"
 import ProcedureDetail from "./ProcedureDetail.vue"
 import ExpandableContent from "@/components/ExpandableContent.vue"
 import { Procedure } from "@/domain/documentUnit"
 import service from "@/services/procedureService"
+import InputField from "@/shared/components/input/InputField.vue"
+import TextInput from "@/shared/components/input/TextInput.vue"
 import Pagination, { Page } from "@/shared/components/Pagination.vue"
 
 const itemsPerPage = 10
 const procedures = ref<Procedure[]>()
 const currentPage = ref<Page<Procedure>>()
 
-async function updateProcedures(page: number) {
-  const response = await service.getAll(itemsPerPage, page)
+const route = useRoute()
+const router = useRouter()
+
+const queries = ref<{ [key: string]: string }>({ q: "" })
+
+async function updateProcedures(page: number, filter?: string) {
+  const response = await service.getAll(itemsPerPage, page, filter)
   if (response.data) {
-    procedures.value = response.data.content
+    procedures.value = copyDocumentUnits(
+      response.data.content,
+      procedures.value,
+    )
+
     currentPage.value = response.data
   }
 }
@@ -32,13 +44,55 @@ async function loadDocumentUnits(loadingProcedure: Procedure) {
   )
 }
 
-onMounted(() => updateProcedures(0))
+function copyDocumentUnits(
+  newProcedures: Procedure[],
+  oldProcedures?: Procedure[],
+): Procedure[] {
+  return newProcedures.map((newProcedure) => {
+    const oldProcedure = oldProcedures?.find(
+      (oldProcedure) => oldProcedure.label == newProcedure.label,
+    )
+    return oldProcedure && oldProcedure.documentUnits
+      ? oldProcedure
+      : newProcedure
+  })
+}
+
+watch(
+  queries,
+  () => {
+    updateProcedures(currentPage.value?.number || 0, queries.value.q)
+
+    router.push(queries.value.q ? { query: queries.value } : {})
+  },
+  { immediate: true, deep: true },
+)
+
+onMounted(() => {
+  if (route.query.q) queries.value.q = route.query.q as string
+  updateProcedures(0, queries.value.q)
+})
 </script>
 
 <template>
-  <div aria-label="Vorgänge" class="bg-blue-200 p-16">
+  <div class="bg-white px-32 pb-16 pt-32">
+    <InputField
+      id="procedureFilter"
+      label="Dokumentnummer oder Aktenzeichen"
+      visually-hide-label
+    >
+      <TextInput
+        id="procedureFilter"
+        v-model="queries.q"
+        aria-label="Dokumentnummer oder Aktenzeichen Suche"
+        class="ds-input-medium"
+        placeholder="Nach Vorgängen suchen"
+      ></TextInput>
+    </InputField>
+  </div>
+  <div class="bg-blue-200 px-32 pt-24">
     <div class="flex flex-row">
-      <div v-if="procedures" class="flex-1 px-12 py-56">
+      <div v-if="procedures" class="flex-1 py-56">
         <Pagination
           v-if="currentPage"
           navigation-position="bottom"
@@ -48,7 +102,7 @@ onMounted(() => updateProcedures(0))
           <ExpandableContent
             v-for="procedure in procedures"
             :key="procedure.label"
-            class="mb-24 bg-white p-14"
+            class="mb-24 bg-white p-16"
             close-icon-name="expand_less"
             open-icon-name="expand_more"
             @update:is-expanded="
