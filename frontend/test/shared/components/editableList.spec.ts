@@ -95,8 +95,9 @@ async function renderComponent(options?: {
     disableMultiEntry: options?.disableMultiEntry ?? false,
   }
 
-  render(EditableList, { props })
+  const renderResult = render(EditableList, { props })
   await nextTick() // Wait for onMounted hook.
+  return renderResult
 }
 
 async function clickEditButtonOfEntry(
@@ -404,6 +405,21 @@ describe("EditableList", () => {
     const input = await clickEditButtonOfEntry(1)
     await user.clear(input)
     await user.type(input, "{enter}")
+
+    expect(modelValue).toEqual(["entry 1"])
+  })
+
+  it("removes the current entry if it was cleared and the component gets unmounted", async () => {
+    const user = userEvent.setup()
+    const modelValue = ["entry 1", "entry 2"]
+    const { unmount } = await renderComponent({
+      editComponent: SimpleTextEditComponent,
+      modelValue,
+    })
+
+    const input = await clickEditButtonOfEntry(1)
+    await user.clear(input)
+    unmount()
 
     expect(modelValue).toEqual(["entry 1"])
   })

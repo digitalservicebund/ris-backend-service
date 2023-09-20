@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import type { Component } from "vue"
-import { computed, nextTick, ref, watch } from "vue"
+import { computed, nextTick, ref, watch, onBeforeUnmount } from "vue"
 import DataSetSummary from "@/shared/components/DataSetSummary.vue"
 
 interface Props {
@@ -128,6 +128,8 @@ watch(modelValueList, () => emit("update:modelValue", modelValueList.value), {
 })
 
 watch(editIndex, focusFirstFocusableElementOfCurrentEditElement)
+
+onBeforeUnmount(() => setEditIndex(undefined))
 </script>
 
 <template>
