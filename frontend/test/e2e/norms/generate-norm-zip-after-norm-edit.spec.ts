@@ -28,17 +28,24 @@ testWithImportedNorm(
     await expect(locatorExportMenu).toBeVisible()
     await locatorExportMenu.click()
     await expect(page).toHaveURL(`/norms/norm/${guid}/export`)
+
+    const downloadButton = page.locator(`a[download='${fileName}']`)
+    const oldUrl = await downloadButton.getAttribute("href")
+    expect(oldUrl).not.toBeNull()
+
     const locatorNewGeneration = page.locator(
       "a:has-text('Neue Zip-Datei generieren')",
     )
     await expect(locatorNewGeneration).toBeVisible()
     await locatorNewGeneration.click()
 
+    await expect(downloadButton).not.toHaveAttribute("href", oldUrl!)
+
     const downloadFileContent = await getDownloadedFileContent(page, fileName)
 
     const metadataFileDownloaded =
       await getMetaDataFileAsString(downloadFileContent)
 
-    expect(metadataFileDownloaded.includes(newValue)).toBeTruthy()
+    expect(metadataFileDownloaded).toContain(newValue)
   },
 )
