@@ -52,9 +52,7 @@ function copyDocumentUnits(
     const oldProcedure = oldProcedures?.find(
       (oldProcedure) => oldProcedure.label == newProcedure.label,
     )
-    return oldProcedure && oldProcedure.documentUnits
-      ? oldProcedure
-      : newProcedure
+    return oldProcedure?.documentUnits ? oldProcedure : newProcedure
   })
 }
 
