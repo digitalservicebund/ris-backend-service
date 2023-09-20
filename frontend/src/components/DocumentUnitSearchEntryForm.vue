@@ -67,35 +67,23 @@ const publishingStateModel = computed({
 })
 
 const courtType = computed({
-  get: () => searchEntry.value?.court?.type,
+  get: () => searchEntry.value?.courtType,
   set: (data) => {
     if (data?.length === 0) {
-      searchEntry.value?.court?.location
-        ? delete searchEntry.value.court.type
-        : delete searchEntry.value.court
+      delete searchEntry.value.courtType
     } else {
-      searchEntry.value.court = {
-        ...searchEntry.value.court,
-        type: data,
-        label: "",
-      }
+      searchEntry.value.courtType = data
     }
   },
 })
 
 const courtLocation = computed({
-  get: () => searchEntry.value?.court?.location,
+  get: () => searchEntry.value?.courtLocation,
   set: (data) => {
     if (data?.length === 0) {
-      searchEntry.value?.court?.type
-        ? delete searchEntry.value.court.location
-        : delete searchEntry.value.court
+      delete searchEntry.value.courtLocation
     } else {
-      searchEntry.value.court = {
-        ...searchEntry.value.court,
-        location: data,
-        label: "",
-      }
+      searchEntry.value.courtLocation = data
     }
   },
 })

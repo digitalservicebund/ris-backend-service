@@ -3,7 +3,6 @@ package de.bund.digitalservice.ris.caselaw.adapter;
 import de.bund.digitalservice.ris.OpenApiConfiguration;
 import de.bund.digitalservice.ris.caselaw.domain.ConverterService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitSearchInput;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitSearchEntry;
 import de.bund.digitalservice.ris.caselaw.domain.LinkedDocumentationUnit;
@@ -15,6 +14,7 @@ import de.bund.digitalservice.ris.caselaw.domain.docx.Docx2Html;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.nio.ByteBuffer;
+import java.util.Optional;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -91,13 +91,21 @@ public class DocumentUnitController {
         .onErrorReturn(ResponseEntity.internalServerError().body(DocumentUnit.builder().build()));
   }
 
-  @PutMapping(value = "/search")
+  @GetMapping(value = "/search")
   @PreAuthorize("isAuthenticated()")
   // Access rights are being enforced through SQL filtering
   public Mono<Page<DocumentationUnitSearchEntry>> searchByDocumentUnitListEntry(
       @RequestParam("pg") int page,
       @RequestParam("sz") int size,
-      @RequestBody DocumentUnitSearchInput searchInput,
+      @RequestParam(value = "documentNumberOrFileNumber")
+          Optional<String> documentNumberOrFileNumber,
+      @RequestParam(value = "courtType") Optional<String> courtType,
+      @RequestParam(value = "courtLocation") Optional<String> courtLocation,
+      @RequestParam(value = "decisionDate") Optional<String> decisionDate,
+      @RequestParam(value = "decisionDateEnd") Optional<String> decisionDateEnd,
+      @RequestParam(value = "publicationStatus") Optional<String> publicationStatus,
+      @RequestParam(value = "withError") Optional<Boolean> withError,
+      @RequestParam(value = "myDocOfficeOnly") Optional<Boolean> myDocOfficeOnly,
       @AuthenticationPrincipal OidcUser oidcUser) {
 
     return userService
@@ -106,7 +114,16 @@ public class DocumentUnitController {
             documentationOffice ->
                 Mono.just(
                     service.searchByDocumentUnitSearchInput(
-                        PageRequest.of(page, size), documentationOffice, searchInput)));
+                        PageRequest.of(page, size),
+                        documentationOffice,
+                        documentNumberOrFileNumber,
+                        courtType,
+                        courtLocation,
+                        decisionDate,
+                        decisionDateEnd,
+                        publicationStatus,
+                        withError,
+                        myDocOfficeOnly)));
   }
 
   @GetMapping(value = "/{documentNumber}")

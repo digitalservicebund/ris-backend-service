@@ -53,11 +53,8 @@ describe("Documentunit Search", () => {
       modelValue: {
         myDocOfficeOnly: true,
         documentNumberOrFileNumber: "fileNumber",
-        court: {
-          label: "t",
-          type: "court type",
-          location: "court location",
-        },
+        courtType: "court type",
+        courtLocation: "court location",
         decisionDate: "2022-01-31T23:00:00.000Z",
         decisionDateEnd: "2023-01-31T23:00:00.000Z",
         status: {
@@ -78,11 +75,8 @@ describe("Documentunit Search", () => {
       modelValue: {
         myDocOfficeOnly: true,
         documentNumberOrFileNumber: "fileNumber",
-        court: {
-          label: "t",
-          type: "court type",
-          location: "court location",
-        },
+        courtType: "court type",
+        courtLocation: "court location",
         decisionDate: "2022-01-31T23:00:00.000Z",
         decisionDateEnd: "2023-01-31T23:00:00.000Z",
         status: {

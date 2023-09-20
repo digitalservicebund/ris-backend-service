@@ -254,9 +254,8 @@ class DocumentUnitListEntryIntegrationTest {
     EntityExchangeResult<String> result =
         risWebTestClient
             .withDefaultLogin()
-            .put()
+            .get()
             .uri("/api/v1/caselaw/documentunits/search?pg=0&sz=10")
-            .bodyValue(DocumentUnitListEntry.builder().build())
             .exchange()
             .expectStatus()
             .isOk()

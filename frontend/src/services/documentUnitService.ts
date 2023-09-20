@@ -21,7 +21,11 @@ interface DocumentUnitService {
     LinkedDocumentUnit,
     LinkedDocumentUnit
   >
-  searchByDocumentUnitSearchInput: PageableService<DocumentUnitSearchInput>
+  searchByDocumentUnitSearchInput(
+    page: number,
+    size: number,
+    query?: DocumentUnitSearchInput | undefined,
+  ): Promise<ServiceResponse<Page<DocumentUnitListEntry>>>
   validateSingleNorm(
     singleNormValidationInfo: SingleNormValidationInfo,
   ): Promise<ServiceResponse<unknown>>
@@ -156,19 +160,34 @@ const service: DocumentUnitService = {
     size: number,
     query = new DocumentUnitSearchInput(),
   ) {
-    const response = await httpClient.put<
-      DocumentUnitSearchInput,
-      Page<DocumentUnitListEntry>
-    >(
-      `caselaw/documentunits/search?pg=${page}&sz=${size}`,
+    const requestParams: { q?: string; pg?: string; sz?: string } = {
+      ...(page != undefined ? { pg: page.toString() } : {}),
+      ...(size != undefined ? { sz: size.toString() } : {}),
+      ...(query.documentNumberOrFileNumber
+        ? { documentNumberOrFileNumber: query.documentNumberOrFileNumber }
+        : {}),
+      ...(query.courtType ? { courtType: query.courtType } : {}),
+      ...(query.courtLocation ? { courtLocation: query.courtLocation } : {}),
+      ...(query.decisionDate ? { decisionDate: query.decisionDate } : {}),
+      ...(query.decisionDateEnd
+        ? { decisionDateEnd: query.decisionDateEnd }
+        : {}),
+      ...(query.status?.publicationStatus
+        ? { publicationStatus: query.status.publicationStatus }
+        : {}),
+      ...(query.status?.withError ? { withError: query.status.withError } : {}),
+      ...(query.myDocOfficeOnly
+        ? { myDocOfficeOnly: query.myDocOfficeOnly }
+        : {}),
+    }
+
+    const response = await httpClient.get<Page<DocumentUnitListEntry>>(
+      `caselaw/documentunits/search`,
       {
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-        },
+        params: requestParams,
       },
-      query,
     )
+
     if (response.status >= 300) {
       response.error = {
         title: errorMessages.DOCUMENT_UNIT_SEARCH_FAILED.title,

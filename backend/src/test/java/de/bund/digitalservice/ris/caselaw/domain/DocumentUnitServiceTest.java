@@ -21,6 +21,7 @@ import jakarta.validation.Validator;
 import java.nio.ByteBuffer;
 import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import org.junit.jupiter.api.Test;
@@ -449,7 +450,16 @@ class DocumentUnitServiceTest {
 
     Page<DocumentationUnitSearchEntry> documentationUnitSearchEntries =
         service.searchByDocumentUnitSearchInput(
-            pageRequest, documentationOffice, documentUnitSearchInput);
+            pageRequest,
+            documentationOffice,
+            Optional.empty(),
+            Optional.empty(),
+            Optional.empty(),
+            Optional.empty(),
+            Optional.empty(),
+            Optional.empty(),
+            Optional.empty(),
+            Optional.empty());
     assertThat(documentationUnitSearchEntries).contains(documentationUnitSearchEntry);
     verify(repository)
         .searchByDocumentUnitSearchInput(pageRequest, documentationOffice, documentUnitSearchInput);

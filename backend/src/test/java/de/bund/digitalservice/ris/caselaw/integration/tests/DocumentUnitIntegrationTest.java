@@ -78,6 +78,8 @@ import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.reactive.server.EntityExchangeResult;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import reactor.core.publisher.Flux;
@@ -1039,9 +1041,7 @@ class DocumentUnitIntegrationTest {
 
     // by court
     searchInput =
-        DocumentUnitSearchInput.builder()
-            .court(Court.builder().type("PQR").location("München").build())
-            .build();
+        DocumentUnitSearchInput.builder().courtType("PQR").courtLocation("München").build();
     assertThat(extractDocumentNumbersFromSearchCall(searchInput)).containsExactly("EFGH202200123");
 
     // by decisionDate
@@ -1081,7 +1081,8 @@ class DocumentUnitIntegrationTest {
     searchInput =
         DocumentUnitSearchInput.builder()
             .documentNumberOrFileNumber("abc")
-            .court(Court.builder().type("MNO").location("Hamburg").build())
+            .courtType("MNO")
+            .courtLocation("Hamburg")
             .decisionDate(decisionDates.get(0))
             .status(DocumentUnitStatus.builder().publicationStatus(PUBLISHED).build())
             .build();
@@ -1089,12 +1090,51 @@ class DocumentUnitIntegrationTest {
   }
 
   private List<String> extractDocumentNumbersFromSearchCall(DocumentUnitSearchInput searchInput) {
-    EntityExchangeResult<String> result =
+
+    MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<>();
+    queryParams.add("pg", "0");
+    queryParams.add("sz", "30");
+
+    if (searchInput.documentNumberOrFileNumber() != null) {
+      queryParams.add("documentNumberOrFileNumber", searchInput.documentNumberOrFileNumber());
+    }
+
+    if (searchInput.courtType() != null) {
+      queryParams.add("courtType", searchInput.courtType());
+    }
+
+    if (searchInput.courtLocation() != null) {
+      queryParams.add("courtLocation", searchInput.courtLocation());
+    }
+
+    if (searchInput.decisionDate() != null) {
+      queryParams.add("decisionDate", searchInput.decisionDate().toString());
+    }
+
+    if (searchInput.decisionDateEnd() != null) {
+      queryParams.add("decisionDateEnd", searchInput.decisionDateEnd().toString());
+    }
+
+    if (searchInput.status() != null) {
+      if (searchInput.status().publicationStatus() != null) {
+        queryParams.add("publicationStatus", searchInput.status().publicationStatus().toString());
+      }
+      queryParams.add("withError", String.valueOf(searchInput.status().withError()));
+    }
+
+    queryParams.add("myDocOfficeOnly", String.valueOf(searchInput.myDocOfficeOnly()));
+
+    EntityExchangeResult<String> result;
+    result =
         risWebTestClient
             .withDefaultLogin()
-            .put()
-            .uri("/api/v1/caselaw/documentunits/search?pg=0&sz=10")
-            .bodyValue(searchInput)
+            .get()
+            .uri(
+                uriBuilder ->
+                    uriBuilder
+                        .path("/api/v1/caselaw/documentunits/search")
+                        .queryParams(queryParams)
+                        .build())
             .exchange()
             .expectStatus()
             .isOk()

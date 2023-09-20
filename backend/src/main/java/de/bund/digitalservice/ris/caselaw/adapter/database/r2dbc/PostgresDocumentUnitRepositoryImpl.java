@@ -1329,14 +1329,12 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
       restrictions.add(builder.or(documentNumberLike, firstFileNumberLike));
     }
 
-    if (searchInput.court() != null) {
-      if (searchInput.court().location() != null) {
-        restrictions.add(builder.equal(root.get("courtLocation"), searchInput.court().location()));
-      }
+    if (searchInput.courtLocation() != null) {
+      restrictions.add(builder.equal(root.get("courtLocation"), searchInput.courtLocation()));
+    }
 
-      if (searchInput.court().type() != null) {
-        restrictions.add(builder.equal(root.get("courtType"), searchInput.court().type()));
-      }
+    if (searchInput.courtType() != null) {
+      restrictions.add(builder.equal(root.get("courtType"), searchInput.courtType()));
     }
 
     if (searchInput.decisionDate() != null) {

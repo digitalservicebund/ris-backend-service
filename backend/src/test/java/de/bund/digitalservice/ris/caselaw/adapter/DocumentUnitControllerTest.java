@@ -18,7 +18,6 @@ import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitPublishException;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitSearchInput;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.LinkedDocumentationUnit;
@@ -28,6 +27,7 @@ import java.nio.ByteBuffer;
 import java.time.Instant;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -430,24 +430,41 @@ class DocumentUnitControllerTest {
 
   @Test
   void testSearchByDocumentUnitListEntry() {
-    DocumentUnitSearchInput documentUnitSearchInput = DocumentUnitSearchInput.builder().build();
     PageRequest pageRequest = PageRequest.of(0, 10);
 
-    when(service.searchByDocumentUnitSearchInput(pageRequest, docOffice, documentUnitSearchInput))
+    when(service.searchByDocumentUnitSearchInput(
+            pageRequest,
+            docOffice,
+            Optional.empty(),
+            Optional.empty(),
+            Optional.empty(),
+            Optional.empty(),
+            Optional.empty(),
+            Optional.empty(),
+            Optional.empty(),
+            Optional.empty()))
         .thenReturn(Page.empty());
 
     risWebClient
         .withDefaultLogin()
         .put()
         .uri("/api/v1/caselaw/documentunits/search?pg=0&sz=10")
-        .header(HttpHeaders.CONTENT_TYPE, "application/json")
-        .bodyValue(documentUnitSearchInput)
         .exchange()
         .expectStatus()
         .isOk();
 
     verify(service)
-        .searchByDocumentUnitSearchInput(pageRequest, docOffice, documentUnitSearchInput);
+        .searchByDocumentUnitSearchInput(
+            pageRequest,
+            docOffice,
+            Optional.empty(),
+            Optional.empty(),
+            Optional.empty(),
+            Optional.empty(),
+            Optional.empty(),
+            Optional.empty(),
+            Optional.empty(),
+            Optional.empty());
   }
 
   @Test

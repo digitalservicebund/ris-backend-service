@@ -6,10 +6,12 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.time.Duration;
+import java.time.Instant;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -183,7 +185,33 @@ public class DocumentUnitService {
   public Page<DocumentationUnitSearchEntry> searchByDocumentUnitSearchInput(
       Pageable pageable,
       DocumentationOffice documentationOffice,
-      DocumentUnitSearchInput searchInput) {
+      Optional<String> documentNumberOrFileNumber,
+      Optional<String> courtType,
+      Optional<String> courtLocation,
+      Optional<String> decisionDate,
+      Optional<String> decisionDateEnd,
+      Optional<String> publicationStatus,
+      Optional<Boolean> withError,
+      Optional<Boolean> myDocOfficeOnly) {
+
+    DocumentUnitSearchInput searchInput =
+        DocumentUnitSearchInput.builder()
+            .documentNumberOrFileNumber(documentNumberOrFileNumber.orElse(null))
+            .courtType(courtType.orElse(null))
+            .courtLocation(courtLocation.orElse(null))
+            .decisionDate(decisionDate.map(Instant::parse).orElse(null))
+            .decisionDateEnd(decisionDateEnd.map(Instant::parse).orElse(null))
+            .status(
+                (publicationStatus.isPresent() || withError.isPresent())
+                    ? DocumentUnitStatus.builder()
+                        .publicationStatus(
+                            publicationStatus.map(PublicationStatus::valueOf).orElse(null))
+                        .withError(withError.orElse(false))
+                        .build()
+                    : null)
+            .myDocOfficeOnly(myDocOfficeOnly.orElse(false))
+            .build();
+
     return repository.searchByDocumentUnitSearchInput(
         PageRequest.of(pageable.getPageNumber(), pageable.getPageSize()),
         documentationOffice,

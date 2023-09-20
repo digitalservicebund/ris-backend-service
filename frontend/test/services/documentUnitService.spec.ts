@@ -9,7 +9,7 @@ describe("documentUnitService", () => {
     }
     return {
       default: {
-        put: vi.fn().mockReturnValue(testResponse),
+        get: vi.fn().mockReturnValue(testResponse),
       },
     }
   })

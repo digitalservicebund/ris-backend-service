@@ -51,8 +51,6 @@ onMounted(() => {
   <div
     :aria-label="ariaLabel"
     class="popup-modal-wrapper fixed left-0 top-0 z-50 flex h-full w-screen items-center justify-center bg-background"
-    role="dialog"
-    tabindex="0"
     @click.self="$emit('closeModal')"
     @keydown.esc="$emit('closeModal')"
   >

@@ -1,11 +1,12 @@
 import DocumentationOffice from "./documentationOffice"
-import DocumentUnit, { Court } from "./documentUnit"
+import DocumentUnit from "./documentUnit"
 
 export default class DocumentUnitSearchInput {
   public id?: string
   uuid?: string
   documentNumberOrFileNumber?: string
-  court?: Court
+  courtType?: string
+  courtLocation?: string
   decisionDate?: string
   decisionDateEnd?: string
   status?: NonNullable<DocumentUnit["status"]>
