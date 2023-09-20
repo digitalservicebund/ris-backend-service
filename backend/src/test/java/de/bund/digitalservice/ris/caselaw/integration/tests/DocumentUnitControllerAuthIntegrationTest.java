@@ -27,7 +27,6 @@ import de.bund.digitalservice.ris.caselaw.config.PostgresConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
 import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
 import de.bund.digitalservice.ris.caselaw.domain.DataSource;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitSearchInput;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatus;
 import de.bund.digitalservice.ris.caselaw.domain.EmailPublishService;
@@ -150,9 +149,8 @@ class DocumentUnitControllerAuthIntegrationTest {
     EntityExchangeResult<String> result =
         risWebTestClient
             .withLogin(userOfficeId)
-            .put()
+            .get()
             .uri("/api/v1/caselaw/documentunits/search?pg=0&sz=10")
-            .bodyValue(DocumentUnitSearchInput.builder().build())
             .exchange()
             .expectStatus()
             .isOk()
@@ -207,9 +205,8 @@ class DocumentUnitControllerAuthIntegrationTest {
     EntityExchangeResult<String> result =
         risWebTestClient
             .withLogin(userOfficeId)
-            .put()
+            .get()
             .uri("/api/v1/caselaw/documentunits/search?pg=0&sz=10")
-            .bodyValue(DocumentUnitSearchInput.builder().build())
             .exchange()
             .expectStatus()
             .isOk()

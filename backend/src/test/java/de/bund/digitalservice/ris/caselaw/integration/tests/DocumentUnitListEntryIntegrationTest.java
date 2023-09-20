@@ -30,7 +30,6 @@ import de.bund.digitalservice.ris.caselaw.config.PostgresConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
 import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
 import de.bund.digitalservice.ris.caselaw.domain.DataSource;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitListEntry;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.EmailPublishService;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
@@ -203,9 +202,8 @@ class DocumentUnitListEntryIntegrationTest {
 
     risWebTestClient
         .withDefaultLogin()
-        .put()
+        .get()
         .uri("/api/v1/caselaw/documentunits/search?pg=0&sz=3")
-        .bodyValue(DocumentUnitListEntry.builder().build())
         .exchange()
         .expectStatus()
         .isOk()
@@ -289,9 +287,8 @@ class DocumentUnitListEntryIntegrationTest {
     EntityExchangeResult<String> result =
         risWebTestClient
             .withDefaultLogin()
-            .put()
+            .get()
             .uri("/api/v1/caselaw/documentunits/search?pg=0&sz=1")
-            .bodyValue(DocumentUnitListEntry.builder().build())
             .exchange()
             .expectStatus()
             .isOk()
