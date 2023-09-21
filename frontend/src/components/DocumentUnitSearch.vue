@@ -1,5 +1,6 @@
 <script lang="ts" setup>
-import { ref } from "vue"
+import { onMounted, ref, watch } from "vue"
+import { useRoute, useRouter } from "vue-router"
 import DocumentUnitList from "@/components/DocumentUnitList.vue"
 import DocumentUnitSearchEntryForm from "@/components/DocumentUnitSearchEntryForm.vue"
 import DocumentUnitListEntry from "@/domain/documentUnitListEntry"
@@ -9,17 +10,57 @@ import Pagination, { Page } from "@/shared/components/Pagination.vue"
 
 const documentUnitListEntries = ref<DocumentUnitListEntry[]>()
 const currentPage = ref<Page<DocumentUnitListEntry>>()
-const searchInput = ref<DocumentUnitListEntry | undefined>(undefined)
+const searchInput = ref<DocumentUnitSearchInput | undefined>(undefined)
 
 const itemsPerPage = 30
 const searchResponseError = ref()
 const isLoading = ref(false)
+
+const route = useRoute()
+const router = useRouter()
+
+const queries = ref<{ [key: string]: string }>()
 
 async function search(page = 0, listEntry?: DocumentUnitSearchInput) {
   isLoading.value = true
   if (listEntry) {
     searchInput.value = listEntry
   }
+
+  const requestParams: { pg?: string; sz?: string; q?: string } = {
+    ...(page != undefined ? { pg: page.toString() } : {}),
+    ...(itemsPerPage != undefined ? { sz: itemsPerPage.toString() } : {}),
+    ...(searchInput.value?.documentNumberOrFileNumber
+      ? {
+          documentNumberOrFileNumber:
+            searchInput.value?.documentNumberOrFileNumber,
+        }
+      : {}),
+    ...(searchInput.value?.courtType
+      ? { courtType: searchInput.value?.courtType }
+      : {}),
+    ...(searchInput.value?.courtLocation
+      ? { courtLocation: searchInput.value?.courtLocation }
+      : {}),
+    ...(searchInput.value?.decisionDate
+      ? { decisionDate: searchInput.value?.decisionDate }
+      : {}),
+    ...(searchInput.value?.decisionDateEnd
+      ? { decisionDateEnd: searchInput.value?.decisionDateEnd }
+      : {}),
+    ...(searchInput.value?.status?.publicationStatus
+      ? { publicationStatus: searchInput.value?.status.publicationStatus }
+      : {}),
+    ...(searchInput.value?.status?.withError
+      ? { withError: searchInput.value?.status.withError }
+      : {}),
+    ...(searchInput.value?.myDocOfficeOnly
+      ? { myDocOfficeOnly: searchInput.value?.myDocOfficeOnly }
+      : {}),
+  }
+
+  queries.value = requestParams
+
   const response = await service.searchByDocumentUnitSearchInput(
     page,
     itemsPerPage,
@@ -56,6 +97,22 @@ async function handleReset() {
   documentUnitListEntries.value = undefined
   currentPage.value = undefined
 }
+
+watch(
+  queries,
+  () => {
+    router.push(queries.value ? { query: queries.value } : {})
+  },
+  { deep: true },
+)
+
+onMounted(async () => {
+  if (route.query) {
+    console.log
+    searchInput.value = route.query
+    await search(0, route.query)
+  }
+})
 </script>
 
 <template>
