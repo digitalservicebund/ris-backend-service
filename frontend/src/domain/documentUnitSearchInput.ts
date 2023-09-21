@@ -1,6 +1,3 @@
-import DocumentationOffice from "./documentationOffice"
-import DocumentUnit from "./documentUnit"
-
 export default class DocumentUnitSearchInput {
   public id?: string
   uuid?: string
@@ -9,9 +6,9 @@ export default class DocumentUnitSearchInput {
   courtLocation?: string
   decisionDate?: string
   decisionDateEnd?: string
-  status?: NonNullable<DocumentUnit["status"]>
-  documentationOffice?: DocumentationOffice
-  myDocOfficeOnly?: boolean = false
+  publicationStatus?: string
+  withError?: string
+  myDocOfficeOnly?: string
 
   constructor(data: Partial<DocumentUnitSearchInput> = {}) {
     Object.assign(this, data)

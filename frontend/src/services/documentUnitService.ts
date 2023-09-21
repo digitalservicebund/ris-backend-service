@@ -4,7 +4,6 @@ import httpClient, {
 } from "./httpClient"
 import DocumentUnit from "@/domain/documentUnit"
 import DocumentUnitListEntry from "@/domain/documentUnitListEntry"
-import DocumentUnitSearchInput from "@/domain/documentUnitSearchInput"
 import LinkedDocumentUnit from "@/domain/linkedDocumentUnit"
 import { SingleNormValidationInfo } from "@/domain/normReference"
 import { PageableService, Page } from "@/shared/components/Pagination.vue"
@@ -22,9 +21,7 @@ interface DocumentUnitService {
     LinkedDocumentUnit
   >
   searchByDocumentUnitSearchInput(
-    page: number,
-    size: number,
-    query?: DocumentUnitSearchInput | undefined,
+    requestParams?: { [key: string]: string } | undefined,
   ): Promise<ServiceResponse<Page<DocumentUnitListEntry>>>
   validateSingleNorm(
     singleNormValidationInfo: SingleNormValidationInfo,
@@ -155,32 +152,7 @@ const service: DocumentUnitService = {
     }
   },
 
-  async searchByDocumentUnitSearchInput(
-    page: number,
-    size: number,
-    query = new DocumentUnitSearchInput(),
-  ) {
-    const requestParams: { q?: string; pg?: string; sz?: string } = {
-      ...(page != undefined ? { pg: page.toString() } : {}),
-      ...(size != undefined ? { sz: size.toString() } : {}),
-      ...(query.documentNumberOrFileNumber
-        ? { documentNumberOrFileNumber: query.documentNumberOrFileNumber }
-        : {}),
-      ...(query.courtType ? { courtType: query.courtType } : {}),
-      ...(query.courtLocation ? { courtLocation: query.courtLocation } : {}),
-      ...(query.decisionDate ? { decisionDate: query.decisionDate } : {}),
-      ...(query.decisionDateEnd
-        ? { decisionDateEnd: query.decisionDateEnd }
-        : {}),
-      ...(query.status?.publicationStatus
-        ? { publicationStatus: query.status.publicationStatus }
-        : {}),
-      ...(query.status?.withError ? { withError: query.status.withError } : {}),
-      ...(query.myDocOfficeOnly
-        ? { myDocOfficeOnly: query.myDocOfficeOnly }
-        : {}),
-    }
-
+  async searchByDocumentUnitSearchInput(requestParams = {}) {
     const response = await httpClient.get<Page<DocumentUnitListEntry>>(
       `caselaw/documentunits/search`,
       {

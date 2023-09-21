@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, onMounted, ref } from "vue"
+import { computed, onMounted, ref, watch } from "vue"
 import { useValidationStore } from "@/composables/useValidationStore"
 import { PublicationState } from "@/domain/documentUnit"
 import DocumentUnitSearchInput from "@/domain/documentUnitSearchInput"
@@ -52,16 +52,13 @@ const documentNumberOrFileNumber = computed({
   },
 })
 
-const publishingStateModel = computed({
-  get: () => searchEntry.value?.status?.publicationStatus ?? "",
+const publicationStatus = computed({
+  get: () => searchEntry.value?.publicationStatus,
   set: (data) => {
     if (data?.length === 0) {
-      delete searchEntry.value.status
+      delete searchEntry.value.publicationStatus
     } else {
-      searchEntry.value.status = {
-        ...searchEntry.value.status,
-        publicationStatus: data as PublicationState,
-      }
+      searchEntry.value.publicationStatus = data
     }
   },
 })
@@ -116,25 +113,16 @@ const decisionDateEnd = computed({
 })
 
 const myDocOfficeOnly = computed({
-  get: () => searchEntry.value?.myDocOfficeOnly,
+  get: () => (searchEntry.value?.myDocOfficeOnly === "true" ? true : false),
   set: (data) => {
-    searchEntry.value.myDocOfficeOnly = data
-    //should also reset with errors only filter
-    if (!data)
-      searchEntry.value.status = {
-        ...searchEntry.value.status,
-        withError: false,
-      }
+    searchEntry.value.myDocOfficeOnly = data.toString()
   },
 })
 
-const withErrorsOnly = computed({
-  get: () => searchEntry.value?.status?.withError,
+const withErrors = computed({
+  get: () => (searchEntry.value?.withError === "true" ? true : false),
   set: (data) => {
-    searchEntry.value.status = {
-      ...searchEntry.value.status,
-      withError: data ?? false,
-    }
+    searchEntry.value.withError = data.toString()
   },
 })
 
@@ -201,6 +189,14 @@ function handleLocalInputError(error: ValidationError | undefined, id: string) {
 
   validateSearchInput()
 }
+
+watch(
+  () => props.modelValue,
+  () => {
+    searchEntry.value = props.modelValue ?? {}
+  },
+  { deep: true },
+)
 
 onMounted(async () => {
   searchEntry.value = props.modelValue ?? {}
@@ -315,7 +311,7 @@ onMounted(async () => {
         <InputField id="status" label="Status" visually-hide-label>
           <DropdownInput
             id="status"
-            v-model="publishingStateModel"
+            v-model="publicationStatus"
             aria-label="Status Suche"
             class="ds-select-small"
             :items="dropdownItems"
@@ -347,7 +343,7 @@ onMounted(async () => {
         >
           <Checkbox
             :id="id"
-            v-model="withErrorsOnly"
+            v-model="withErrors"
             aria-label="Nur fehlerhafte Dokumentationseinheiten"
             class="ds-checkbox-mini"
             @focus="resetErrors"

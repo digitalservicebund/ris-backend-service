@@ -15,7 +15,10 @@ describe("documentUnitService", () => {
   })
 
   it("appends correct error message if status 500", async () => {
-    const result = await service.searchByDocumentUnitSearchInput(0, 20)
+    const result = await service.searchByDocumentUnitSearchInput({
+      pg: "0",
+      sz: "20",
+    })
     expect(result.error?.title).toEqual(
       "Die Suchergebnisse konnten nicht geladen werden.",
     )

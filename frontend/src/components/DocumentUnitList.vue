@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import dayjs from "dayjs"
-import { computed, nextTick, ref, watch, watchEffect } from "vue"
+import { computed, ref } from "vue"
 import { useRouter } from "vue-router"
 import DocumentUnitListEntry from "../domain/documentUnitListEntry"
 import { useStatusBadge } from "@/composables/useStatusBadge"
@@ -30,21 +30,6 @@ const listEntriesWithStatus = computed(() => {
       }))
     : []
 })
-
-const documentUnitListRef = ref(null)
-const listheight = ref("auto")
-
-async function determineDocumentUnitListheight() {
-  if (!documentUnitListRef.value) return
-  // We first need to reset the height to auto, so that the scrollHeight
-  // is not limited by the current height. Then wait for the next tick
-  // so that the textarea has time to resize.
-  listheight.value = "auto"
-  await nextTick()
-  const { height } = getComputedStyle(documentUnitListRef.value as Element)
-
-  listheight.value = `${height}`
-}
 
 const emptyStatus = computed(() => {
   if (!props.documentUnitListEntries) {
@@ -92,20 +77,10 @@ function onDelete() {
     toggleModal()
   }
 }
-
-watchEffect(() => {
-  determineDocumentUnitListheight().catch(() => {
-    // left blank intentionally
-  })
-})
-
-watch(listEntriesWithStatus, async () => {
-  await determineDocumentUnitListheight()
-})
 </script>
 
 <template>
-  <div ref="documentUnitListRef">
+  <div>
     <PopupModal
       v-if="showModal"
       :aria-label="modalHeaderText"
