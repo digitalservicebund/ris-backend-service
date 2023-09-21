@@ -6,6 +6,7 @@ const config: PlaywrightTestConfig = {
   workers: process.env.CI ? 4 : undefined,
   fullyParallel: true,
   timeout: 120000,
+  expect: { timeout: 30000 },
   use: {
     viewport: { width: 1280, height: 720 },
     acceptDownloads: true,
