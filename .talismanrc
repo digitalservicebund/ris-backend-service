@@ -8,32 +8,32 @@ fileignoreconfig:
 - filename: _site/*
   ignore_detectors:
   - filecontent
-- filename: backend/src/test/java/de/bund/digitalservice/ris/caselaw/integration/tests/JurisXmlExporterWrapperIntegrationTest.java
-  checksum: f50e29a97b3766cd195dd27d291e2d8ed043299f1c3ef42dd35f1217782b19b9
-- filename: backend/src/test/kotlin/unit/adapter/input/restapi/controller/GenerateNormFileControllerTest.kt
-  checksum: 930c2643a15a900f328d1d83792e51b12af71cc20136ba43b13fffdffd601e8f
-- filename: doc/norms/backend-api.yaml
-  checksum: df4fa1f7e6d7023f9a7a98d1052c2b88c1785366962004b3165453edcd5bf4db
-- filename: doc/structurizr/workspace.json
-  checksum: 3e4a3d02bf05d6e0d930ddb6c965a2e512daded3b93127c9ad41feb875007153
-- filename: frontend/FRONTEND_STYLEGUIDE.md
-  checksum: e6b8194eba2012f2a769c5a5d3577715a573b441a7b94e744c32b3149d0d3a93
-- filename: frontend/test/test-helper/dataGenerators.ts
-  checksum: a3d04d1168dcc221ba5fcd72e8d8bada60f48644c7586bde3a7602b748d0682c
-- filename: backend/src/test/kotlin/unit/adapter/input/restapi/controller/GetFileControllerTest.kt
-  checksum: 527612bd680d9d2b7be5b55ad201bfbd94aea3b55d8dd97ae0ceedbee8cfe76d
-- filename: backend/src/test/kotlin/unit/application/service/GetFileServiceTest.kt
-  checksum: 8133265c6f388df84a3e0f61050428e8628853e0ba80b432e4723750a34b781e
-- filename: frontend/src/main.ts
-  checksum: 6da41131746ac5689a7b0a5b65d2967ba0285abe20a20e341ffc92a83218ed0b
 - filename: _site/prototype-footnotes/assets/index-086108b4.js
   checksum: 0bd435f734159482c18b1f78fbde74f6b3be56604f380ac59405dc240cf8a270
 - filename: backend/src/main/kotlin/de/bund/digitalservice/ris/norms/framework/adapter/input/restapi/controller/GetFileController.kt
   checksum: f989b3c9c176b1b985c2f78ca6ca13fa1403cbb69f367ae9b1cb8ea64d5f6747
+- filename: backend/src/test/java/de/bund/digitalservice/ris/caselaw/integration/tests/JurisXmlExporterWrapperIntegrationTest.java
+  checksum: f50e29a97b3766cd195dd27d291e2d8ed043299f1c3ef42dd35f1217782b19b9
+- filename: backend/src/test/kotlin/unit/adapter/input/restapi/controller/GenerateNormFileControllerTest.kt
+  checksum: 930c2643a15a900f328d1d83792e51b12af71cc20136ba43b13fffdffd601e8f
+- filename: backend/src/test/kotlin/unit/adapter/input/restapi/controller/GetFileControllerTest.kt
+  checksum: 527612bd680d9d2b7be5b55ad201bfbd94aea3b55d8dd97ae0ceedbee8cfe76d
+- filename: backend/src/test/kotlin/unit/application/service/GetFileServiceTest.kt
+  checksum: 8133265c6f388df84a3e0f61050428e8628853e0ba80b432e4723750a34b781e
 - filename: compose.yaml
-  checksum: 71acc9ceca2ea0aa0f748c6c971c257dd8ccb5807d0ee0a22293d4000975eccd
+  checksum: 32471330995a815cfa44221e03835e3155864c462deeef81a0e3e3c8fc70c8fc
+- filename: doc/norms/backend-api.yaml
+  checksum: df4fa1f7e6d7023f9a7a98d1052c2b88c1785366962004b3165453edcd5bf4db
+- filename: doc/structurizr/workspace.json
+  checksum: 2fbbbb947f0211e3a304f4ac7ea04c656d028e30b83da4a084dbac3036236056
 - filename: frontend/Dockerfile.prod
-  checksum: 51f662ced7d7ddb4eaea6c7aacf062a0c04a1ef86720d802fa853c2edba00e40
+  checksum: 7d2bf465ac9330fbe891d62a1e4a9ff50a7434c5b284d2197cfad33b72451f7b
+- filename: frontend/FRONTEND_STYLEGUIDE.md
+  checksum: e6b8194eba2012f2a769c5a5d3577715a573b441a7b94e744c32b3149d0d3a93
+- filename: frontend/src/main.ts
+  checksum: 6da41131746ac5689a7b0a5b65d2967ba0285abe20a20e341ffc92a83218ed0b
+- filename: frontend/test/test-helper/dataGenerators.ts
+  checksum: a3d04d1168dcc221ba5fcd72e8d8bada60f48644c7586bde3a7602b748d0682c
 scopeconfig:
 - scope: node
 allowed_patterns:
