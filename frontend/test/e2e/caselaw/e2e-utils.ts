@@ -6,7 +6,9 @@ export const navigateToCategories = async (
   documentNumber: string,
 ) => {
   await page.goto(`/caselaw/documentunit/${documentNumber}/categories`)
-  await expect(page.locator("text=Spruchkörper")).toBeVisible()
+  await expect(page.locator("text=Spruchkörper")).toBeVisible({
+    timeout: 15000, // for backend warm up
+  })
 }
 
 export const navigateToFiles = async (page: Page, documentNumber: string) => {
