@@ -113,14 +113,20 @@ const decisionDateEnd = computed({
 })
 
 const myDocOfficeOnly = computed({
-  get: () => (searchEntry.value?.myDocOfficeOnly === "true" ? true : false),
+  get: () =>
+    searchEntry.value?.myDocOfficeOnly
+      ? JSON.parse(searchEntry.value.myDocOfficeOnly)
+      : false,
   set: (data) => {
     searchEntry.value.myDocOfficeOnly = data.toString()
   },
 })
 
 const withErrors = computed({
-  get: () => (searchEntry.value?.withError === "true" ? true : false),
+  get: () =>
+    searchEntry.value?.withError
+      ? JSON.parse(searchEntry.value.withError)
+      : false,
   set: (data) => {
     searchEntry.value.withError = data.toString()
   },
