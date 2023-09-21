@@ -18,7 +18,7 @@ const isLoading = ref(false)
 const route = useRoute()
 const router = useRouter()
 
-const searchQuery = ref<{ [key: string]: string }>()
+const searchQuery = ref<DocumentUnitSearchInput>()
 
 async function search(page = 0, searchInput?: DocumentUnitSearchInput) {
   isLoading.value = true
@@ -40,12 +40,10 @@ async function search(page = 0, searchInput?: DocumentUnitSearchInput) {
     ...(searchInput?.decisionDateEnd
       ? { decisionDateEnd: searchInput?.decisionDateEnd }
       : {}),
-    ...(searchInput?.status?.publicationStatus
-      ? { publicationStatus: searchInput?.status.publicationStatus }
+    ...(searchInput?.publicationStatus
+      ? { publicationStatus: searchInput?.publicationStatus }
       : {}),
-    ...(searchInput?.status?.withError
-      ? { withError: searchInput?.status.withError }
-      : {}),
+    ...(searchInput?.withError ? { withError: searchInput?.withError } : {}),
     ...(searchInput?.myDocOfficeOnly
       ? { myDocOfficeOnly: searchInput?.myDocOfficeOnly }
       : {}),
@@ -56,7 +54,7 @@ async function search(page = 0, searchInput?: DocumentUnitSearchInput) {
   const response = await service.searchByDocumentUnitSearchInput({
     ...(page != undefined ? { pg: page.toString() } : {}),
     ...(itemsPerPage != undefined ? { sz: itemsPerPage.toString() } : {}),
-    ...searchQuery.value,
+    ...requestParams,
   })
   if (response.data) {
     documentUnitListEntries.value = response.data.content
@@ -88,20 +86,25 @@ async function handleSearch(searchInput: DocumentUnitSearchInput) {
 async function handleReset() {
   documentUnitListEntries.value = undefined
   currentPage.value = undefined
+  router.push({})
 }
 
 watch(
   searchQuery,
   () => {
-    router.push(searchQuery.value ? { query: searchQuery.value } : {})
+    router.push(
+      searchQuery.value
+        ? { query: searchQuery.value as { [key: string]: string } }
+        : {},
+    )
   },
   { deep: true },
 )
 
 onMounted(async () => {
-  if (route.query) {
+  if (Object.keys(route.query).length > 0) {
+    searchQuery.value = route.query as DocumentUnitSearchInput
     await search(0, route.query)
-    searchQuery.value = route.query as { [key: string]: string }
   }
 })
 </script>

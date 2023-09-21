@@ -51,16 +51,14 @@ describe("Documentunit Search", () => {
   it("renders search entry if given", () => {
     renderComponent({
       modelValue: {
-        myDocOfficeOnly: true,
+        myDocOfficeOnly: "true",
         documentNumberOrFileNumber: "fileNumber",
         courtType: "court type",
         courtLocation: "court location",
         decisionDate: "2022-01-31T23:00:00.000Z",
         decisionDateEnd: "2023-01-31T23:00:00.000Z",
-        status: {
-          publicationStatus: PublicationState.UNPUBLISHED,
-          withError: false,
-        },
+        publicationStatus: PublicationState.UNPUBLISHED,
+        withError: "false",
       },
     })
 
@@ -73,16 +71,14 @@ describe("Documentunit Search", () => {
   test("click on 'Suche zurücksetzen' resets all input values", async () => {
     const { user } = renderComponent({
       modelValue: {
-        myDocOfficeOnly: true,
+        myDocOfficeOnly: "true",
         documentNumberOrFileNumber: "fileNumber",
         courtType: "court type",
         courtLocation: "court location",
         decisionDate: "2022-01-31T23:00:00.000Z",
         decisionDateEnd: "2023-01-31T23:00:00.000Z",
-        status: {
-          publicationStatus: PublicationState.UNPUBLISHED,
-          withError: false,
-        },
+        publicationStatus: "UNPUBLISHED",
+        withError: "false",
       },
     })
 
