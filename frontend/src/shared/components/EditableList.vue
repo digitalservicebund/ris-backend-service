@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import type { Component } from "vue"
 import { computed, nextTick, ref, watch, onBeforeUnmount } from "vue"
+import { dataIsEmpty } from "@/helpers/dataIsEmpty"
 import DataSetSummary from "@/shared/components/DataSetSummary.vue"
 
 interface Props {
@@ -43,7 +44,7 @@ const currentEditElement = computed(() =>
 function setEditIndex(newEditIndex?: number): void {
   if (
     editIndex.value !== undefined &&
-    entryIsEmpty(modelValueList.value[editIndex.value])
+    dataIsEmpty(modelValueList.value[editIndex.value])
   ) {
     removeModelEntry(editIndex.value)
 
@@ -53,12 +54,6 @@ function setEditIndex(newEditIndex?: number): void {
   } else {
     editIndex.value = newEditIndex
   }
-}
-
-function entryIsEmpty(entry: unknown): boolean {
-  return typeof entry === "object"
-    ? Object.values(entry ?? {}).every(entryIsEmpty)
-    : !entry
 }
 
 function addNewModelEntry() {
