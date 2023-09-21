@@ -10,7 +10,6 @@ import Pagination, { Page } from "@/shared/components/Pagination.vue"
 
 const documentUnitListEntries = ref<DocumentUnitListEntry[]>()
 const currentPage = ref<Page<DocumentUnitListEntry>>()
-const searchInput = ref<DocumentUnitSearchInput | undefined>(undefined)
 
 const itemsPerPage = 30
 const searchResponseError = ref()
@@ -19,53 +18,46 @@ const isLoading = ref(false)
 const route = useRoute()
 const router = useRouter()
 
-const queries = ref<{ [key: string]: string }>()
+const searchQuery = ref<{ [key: string]: string }>()
 
-async function search(page = 0, listEntry?: DocumentUnitSearchInput) {
+async function search(page = 0, searchInput?: DocumentUnitSearchInput) {
   isLoading.value = true
-  if (listEntry) {
-    searchInput.value = listEntry
-  }
 
-  const requestParams: { pg?: string; sz?: string; q?: string } = {
-    ...(page != undefined ? { pg: page.toString() } : {}),
-    ...(itemsPerPage != undefined ? { sz: itemsPerPage.toString() } : {}),
-    ...(searchInput.value?.documentNumberOrFileNumber
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const requestParams: { [key: string]: any } = {
+    ...(searchInput?.documentNumberOrFileNumber
       ? {
-          documentNumberOrFileNumber:
-            searchInput.value?.documentNumberOrFileNumber,
+          documentNumberOrFileNumber: searchInput?.documentNumberOrFileNumber,
         }
       : {}),
-    ...(searchInput.value?.courtType
-      ? { courtType: searchInput.value?.courtType }
+    ...(searchInput?.courtType ? { courtType: searchInput?.courtType } : {}),
+    ...(searchInput?.courtLocation
+      ? { courtLocation: searchInput?.courtLocation }
       : {}),
-    ...(searchInput.value?.courtLocation
-      ? { courtLocation: searchInput.value?.courtLocation }
+    ...(searchInput?.decisionDate
+      ? { decisionDate: searchInput?.decisionDate }
       : {}),
-    ...(searchInput.value?.decisionDate
-      ? { decisionDate: searchInput.value?.decisionDate }
+    ...(searchInput?.decisionDateEnd
+      ? { decisionDateEnd: searchInput?.decisionDateEnd }
       : {}),
-    ...(searchInput.value?.decisionDateEnd
-      ? { decisionDateEnd: searchInput.value?.decisionDateEnd }
+    ...(searchInput?.status?.publicationStatus
+      ? { publicationStatus: searchInput?.status.publicationStatus }
       : {}),
-    ...(searchInput.value?.status?.publicationStatus
-      ? { publicationStatus: searchInput.value?.status.publicationStatus }
+    ...(searchInput?.status?.withError
+      ? { withError: searchInput?.status.withError }
       : {}),
-    ...(searchInput.value?.status?.withError
-      ? { withError: searchInput.value?.status.withError }
-      : {}),
-    ...(searchInput.value?.myDocOfficeOnly
-      ? { myDocOfficeOnly: searchInput.value?.myDocOfficeOnly }
+    ...(searchInput?.myDocOfficeOnly
+      ? { myDocOfficeOnly: searchInput?.myDocOfficeOnly }
       : {}),
   }
 
-  queries.value = requestParams
+  searchQuery.value = requestParams
 
-  const response = await service.searchByDocumentUnitSearchInput(
-    page,
-    itemsPerPage,
-    searchInput.value,
-  )
+  const response = await service.searchByDocumentUnitSearchInput({
+    ...(page != undefined ? { pg: page.toString() } : {}),
+    ...(itemsPerPage != undefined ? { sz: itemsPerPage.toString() } : {}),
+    ...searchQuery.value,
+  })
   if (response.data) {
     documentUnitListEntries.value = response.data.content
     currentPage.value = response.data
@@ -89,8 +81,8 @@ async function handleDelete(documentUnitListEntry: DocumentUnitListEntry) {
   }
 }
 
-async function handleSearch(listEntry: DocumentUnitSearchInput) {
-  await search(0, listEntry)
+async function handleSearch(searchInput: DocumentUnitSearchInput) {
+  await search(0, searchInput)
 }
 
 async function handleReset() {
@@ -99,18 +91,17 @@ async function handleReset() {
 }
 
 watch(
-  queries,
+  searchQuery,
   () => {
-    router.push(queries.value ? { query: queries.value } : {})
+    router.push(searchQuery.value ? { query: searchQuery.value } : {})
   },
   { deep: true },
 )
 
 onMounted(async () => {
   if (route.query) {
-    console.log
-    searchInput.value = route.query
     await search(0, route.query)
+    searchQuery.value = route.query as { [key: string]: string }
   }
 })
 </script>
@@ -119,6 +110,7 @@ onMounted(async () => {
   <div>
     <DocumentUnitSearchEntryForm
       :is-loading="isLoading"
+      :model-value="searchQuery"
       @reset-search-results="handleReset"
       @search="handleSearch"
     />

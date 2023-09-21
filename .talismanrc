@@ -30,10 +30,10 @@ fileignoreconfig:
   checksum: 0bd435f734159482c18b1f78fbde74f6b3be56604f380ac59405dc240cf8a270
 - filename: backend/src/main/kotlin/de/bund/digitalservice/ris/norms/framework/adapter/input/restapi/controller/GetFileController.kt
   checksum: f989b3c9c176b1b985c2f78ca6ca13fa1403cbb69f367ae9b1cb8ea64d5f6747
-- filename: frontend/Dockerfile.prod
-  checksum: 7d2bf465ac9330fbe891d62a1e4a9ff50a7434c5b284d2197cfad33b72451f7b
 - filename: compose.yaml
-  checksum: 32471330995a815cfa44221e03835e3155864c462deeef81a0e3e3c8fc70c8fc
+  checksum: 71acc9ceca2ea0aa0f748c6c971c257dd8ccb5807d0ee0a22293d4000975eccd
+- filename: frontend/Dockerfile.prod
+  checksum: 51f662ced7d7ddb4eaea6c7aacf062a0c04a1ef86720d802fa853c2edba00e40
 scopeconfig:
 - scope: node
 allowed_patterns:
