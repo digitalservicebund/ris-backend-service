@@ -13,7 +13,9 @@ export const navigateToCategories = async (
 
 export const navigateToFiles = async (page: Page, documentNumber: string) => {
   await page.goto(`/caselaw/documentunit/${documentNumber}/files`)
-  await expect(page.locator("h1:has-text('Dokumente')")).toBeVisible()
+  await expect(page.locator("h1:has-text('Dokumente')")).toBeVisible({
+    timeout: 15000, // for backend warm up
+  })
 }
 
 export const navigateToPublication = async (
@@ -21,7 +23,9 @@ export const navigateToPublication = async (
   documentNumber: string,
 ) => {
   await page.goto(`/caselaw/documentunit/${documentNumber}/publication`)
-  await expect(page.locator("h1:has-text('Veröffentlichen')")).toBeVisible()
+  await expect(page.locator("h1:has-text('Veröffentlichen')")).toBeVisible({
+    timeout: 15000, // for backend warm up
+  })
 }
 
 export const uploadTestfile = async (page: Page, filename: string) => {
