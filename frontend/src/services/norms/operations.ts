@@ -66,7 +66,12 @@ export async function editNormFrame(
     body,
   )
 
-  if (status >= 300 || error) {
+  if (status === 401) {
+    return {
+      status: status,
+      error: errorMessages.SESSION_TIMEOUT,
+    }
+  } else if (status >= 300 || error) {
     Sentry.captureException(error, {
       tags: {
         type: "save_failed",

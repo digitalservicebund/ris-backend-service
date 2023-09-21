@@ -162,5 +162,9 @@
   "PROCEDURE_GET_ALL": {
     "title": "Vorgänge konnten nicht geladen werden.",
     "description": ""
+  },
+  "SESSION_TIMEOUT": {
+    "title": "Fehler beim Speichern: Die Sitzung ist abgelaufen. Es kann helfen, die Seite neu zu laden.",
+    "description": ""
   }
 }
