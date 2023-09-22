@@ -21,3 +21,5 @@ lefthook-local.yml
 .env
 Brewfile.lock.json
 
+### structurizr c4 language server log ###
+c4-language-server.log
