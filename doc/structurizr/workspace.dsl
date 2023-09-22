@@ -141,6 +141,7 @@ workspace {
             exclude emailApiProvider
             exclude emailHoster
             exclude errorMonitoring
+            exclude jurisSftp
         }
 
         container ris "UsersAndContainers" {

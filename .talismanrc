@@ -25,7 +25,7 @@ fileignoreconfig:
 - filename: doc/norms/backend-api.yaml
   checksum: df4fa1f7e6d7023f9a7a98d1052c2b88c1785366962004b3165453edcd5bf4db
 - filename: doc/structurizr/workspace.json
-  checksum: 798c13df38de9ebcf9fa224ba073e2d13fb7b3f11d864d9a1d4aaa27ff0f98dc
+  checksum: 541780133a0bf013ac75f6a3bc402c77981a273654c5648eabeb32ccb271a834
 - filename: frontend/Dockerfile.prod
   checksum: 7d2bf465ac9330fbe891d62a1e4a9ff50a7434c5b284d2197cfad33b72451f7b
 - filename: frontend/FRONTEND_STYLEGUIDE.md
