@@ -5,8 +5,7 @@ workspace {
         normsDocumentary = person "Norms Documentary"
         systemAdministrator = person "System Administrator"
         user = person "User"
-        publicUser = person "Public User" "A public human user" "future"
-
+        publicUser = person "Public User" "A public human user" "portal"
 
         group "DigitalService" {
             ris = softwareSystem "RIS" {
@@ -20,9 +19,9 @@ workspace {
 
                 monitoring = container "Monitoring" "Stellt Systeminformationen grafisch da" "Grafana"
 
-                publicationStore = container "Publikationsspeicher" "Speichert die öffentlich verfügbaren Dokumente für das Portal" "S3(?), LegalDocML" "datastore,future"
-                portalBackend = container "Portal API-Anwendung" "Indiziert und stellt Suchfunktion" "Java(?)" "future"
-                portalFrontend = container "Portal Web-Anwendung" "Grafisches Nutzerinterface zur Recherche" "Typescript, Vue (?)" "future"
+                publicationStore = container "Publikationsspeicher" "Speichert die öffentlich verfügbaren Dokumente für das Portal" "S3(?), LegalDocML" "datastore,portal"
+                portalBackend = container "Portal API-Anwendung" "Indiziert und stellt Suchfunktion" "Java" "portal"
+                portalFrontend = container "Portal Web-Anwendung" "Grafisches Nutzerinterface zur Recherche" "Typescript, Vue (?)" "portal"
 
                 risMigration = container "Migration Tool" "Kommandozeilenwerkzeug zur Übernahme der jDV Daten" "Java" "migration"
             }
@@ -30,14 +29,16 @@ workspace {
         
         group "juris" {
             jurisDocumentationManagement = softwareSystem "jDV"
+            jurisSftp = softwareSystem "juris SFTP"
         }
         
-        group "Data consumers" {
+        group "Daten Konsumenten" {
             eLegislation = softwareSystem "E-Gesetzgebung"
         }
 
         group "Externe Anbieter" {
             openIdProvider = softwareSystem "IAM Anbieter" "Bare.ID (OpenID Connect)" "saas"
+            
             emailApiProvider = softwareSystem "E-Mail Anbieter (Versand)" "SendInBlue" "saas"
             emailHoster = softwareSystem "E-Mail Anbieter (Empfang)" "IONOS" "saas"
 
@@ -45,13 +46,9 @@ workspace {
         }
 
         # relationships between people and software systems
-        caselawDocumentary -> ris "documents verdicts"
-        normsDocumentary -> ris "documents norms"
-        normsDocumentary -> jurisDocumentationManagement "uploads norms"
-
-        ris -> jurisDocumentationManagement "push verdicts"
-
-        eLegislation -> ris "search norms"
+        caselawDocumentary -> ris "dokumentiert Rechtsprechung"
+        normsDocumentary -> ris "dokumentiert Normen"
+        normsDocumentary -> jurisDocumentationManagement "lädt Normen"
 
         user -> openIdProvider "authentifiziert sich" "HTTPS"
         normsDocumentary -> openIdProvider "authentifiziert sich" "HTTPS"
@@ -60,31 +57,48 @@ workspace {
 
         publicUser -> portalFrontend "nutzt" "HTTPS"
 
-        # relationships to/from containers
+        # relationships between systems
+        ris -> jurisDocumentationManagement "sendet Dokumentationseinheiten"
+        eLegislation -> ris "recherchiert Normen"
+
+        # relationships between systems and containers
+        jurisDocumentationManagement -> emailHoster "sendet Status-Mail zur Verarbeitung"
+
+        risBackend -> openIdProvider "prüft Nutzer" "HTTPS"
+        risBackend -> emailApiProvider "sendet E-Mails" "XML, HTTPS"
+        risBackend -> emailHoster "empfängt E-Mails" "XML, IMAP"
+        risBackend -> errorMonitoring "sendet Fehler" "JSON, HTTPS"
+        
+        risFrontend -> errorMonitoring "sendet Fehler" "JSON, HTTPS" 
+
+        risMigration -> jurisSftp "spiegelt Tages- und Monatsexporte" "ZIP, SFTP"
+
+        # relationships between people and containers
         user -> risFrontend "nutzt" "HTTPS"
         normsDocumentary -> risFrontend "nutzt" "HTTPS"
         caselawDocumentary -> risFrontend "nutzt" "HTTPS"
-        
         systemAdministrator -> monitoring "liest Systeminformationen" "HTTPS"
 
+        # relationships between containers
         risFrontend -> risBackend "nutzt" "JSON/HTTPS"
-        risFrontend -> errorMonitoring "sendet Fehler" "JSON, HTTPS" 
-
+        
         risBackend -> database "speichern & lesen" "R2DBC"
         risBackend -> sessionStore "speichern & lesen" "RESP"
         risBackend -> fileStore "speichern & lesen" "S3 Protocol"
-        risBackend -> openIdProvider "prüft Nutzer" "HTTPS"
-        risBackend -> emailApiProvider "sendet E-Mails" "XML, HTTPS"
         risBackend -> publicationStore "publiziert nach" "LegalDocML, HTTPS"
-        risBackend -> errorMonitoring "sendet Fehler" "JSON, HTTPS"
-
+        
         monitoring -> risBackend "holt Systeminformationen" "HTTPS"
         
         portalFrontend -> portalBackend "nutzt" "HTTPS"
         portalFrontend -> publicationStore "verweist auf" "HTTPS"
         portalBackend -> publicationStore "indiziert" "HTTPS(?)"
 
-        # relationships to/from components
+        risMigration -> database "speichert migrierte Daten" "JPA"
+        risMigration -> risBackend "sendet Normen" "JSON, HTTPS"
+        risMigration -> fileStore "speichert Tages- und Monatsexporte" "S3 Protocol"
+        risMigration -> monitoring "sendet Logs" "HTTPS"
+
+        # relationships to/from components # TODO generate in components.dsl from code
 
 
         deploymentEnvironment "Development" {
@@ -125,12 +139,60 @@ workspace {
             exclude user
             exclude openIdProvider
             exclude emailApiProvider
+            exclude emailHoster
+            exclude errorMonitoring
         }
 
-        container ris "ContainerView" {
+        container ris "UsersAndContainers" {
             include *
             exclude caselawDocumentary
             exclude normsDocumentary
+            exclude openIdProvider
+            exclude emailApiProvider
+            exclude emailHoster
+            exclude errorMonitoring
+            exclude jurisSftp
+        }
+
+        container ris "Migration" {
+            include risMigration
+            include jurisSftp
+            include database
+            include risBackend
+            include fileStore
+        }
+
+        container ris "Monitoring" {
+            include risBackend
+            include risFrontend
+            include risMigration
+            include monitoring
+            include errorMonitoring
+            
+            include systemAdministrator
+        }
+
+        container ris "IdentityAndAccessManagement" {
+            include risBackend
+            include risFrontend
+            
+            include openIdProvider
+            
+            include caselawDocumentary
+            include normsDocumentary
+            include systemAdministrator
+        }
+
+        container ris "ContainerAndExternals" {
+            include risBackend
+            include risFrontend
+            
+            include openIdProvider
+            include emailApiProvider
+            include emailHoster
+            include errorMonitoring
+
+            include user
         }
 
         systemlandscape "SystemLandscape" {
@@ -166,7 +228,7 @@ workspace {
             element "saas" {
                 background grey
             }
-            element "future" {
+            element "portal" {
                 background #DB005B
             }
             element "migration" {
