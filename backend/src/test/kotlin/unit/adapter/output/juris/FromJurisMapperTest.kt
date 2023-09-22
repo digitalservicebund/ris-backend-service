@@ -1,7 +1,12 @@
 package unit.adapter.output.juris
 
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.module.kotlin.KotlinFeature
+import com.fasterxml.jackson.module.kotlin.KotlinModule
 import de.bund.digitalservice.ris.norms.domain.entity.Article
+import de.bund.digitalservice.ris.norms.domain.entity.DocumentSection
 import de.bund.digitalservice.ris.norms.domain.entity.MetadataSection
+import de.bund.digitalservice.ris.norms.domain.value.DocumentSectionType
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName.AGE_INDICATION
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName.ANNOUNCEMENT_DATE
@@ -37,7 +42,9 @@ import de.bund.digitalservice.ris.norms.domain.value.UndefinedDate
 import de.bund.digitalservice.ris.norms.framework.adapter.output.juris.mapDataToDomain
 import de.bund.digitalservice.ris.norms.juris.converter.model.*
 import de.bund.digitalservice.ris.norms.juris.converter.model.Article as ArticleData
+import de.bund.digitalservice.ris.norms.juris.converter.model.DocumentSection as DocumentSectionData
 import de.bund.digitalservice.ris.norms.juris.converter.model.Norm as NormData
+import de.bund.digitalservice.ris.norms.juris.converter.model.value.DocumentSectionType as DocumentSectionTypeData
 import java.time.LocalDate
 import java.util.*
 import org.assertj.core.api.Assertions.assertThat
@@ -49,14 +56,34 @@ class FromJurisMapperTest {
   fun `it correctly maps the data to domain`() {
     val extractedData =
         NormData(
-            articles =
+            documentation =
                 listOf(
                     ArticleData(
+                        UUID.randomUUID(),
                         "articleTitle",
                         "articleMarker",
+                        1,
                         listOf(Paragraph("paragraphMarker", "paragraphText")),
                     ),
-                ),
+                    DocumentSectionData(
+                        UUID.randomUUID(),
+                        "sectionTitle",
+                        "sectionMarker",
+                        2,
+                        DocumentSectionTypeData.SECTION,
+                        mutableListOf(
+                            ArticleData(
+                                UUID.randomUUID(),
+                                "articleTitle2",
+                                "articleMarker2",
+                                1,
+                                listOf(Paragraph("paragraphMarker2", "paragraphText2")),
+                            ),
+                        ),
+                        1,
+                        null,
+                        "articleMarker2",
+                        -1)),
             ageIndicationStartList = listOf("ageIndicationStart"),
             ageOfMajorityIndicationList = listOf("ageOfMajorityIndication"),
             announcementDate = "2020-10-10",
@@ -147,18 +174,26 @@ class FromJurisMapperTest {
     assertThat(domainNorm.conclusion?.text).isEqualTo("Conclusion")
     assertThat(domainNorm.recitals?.heading).isEqualTo("Recital heading")
     assertThat(domainNorm.recitals?.text).isEqualTo("Recital text")
-    assertThat(domainNorm.documentation).hasSize(1)
+    assertThat(domainNorm.documentation).hasSize(2)
 
-    assertThat(domainNorm.documentation.first()).isInstanceOf(Article::class.java)
-    val article = domainNorm.documentation.first() as Article
+    assertThat(domainNorm.documentation.first { it.order == 1 }).isInstanceOf(Article::class.java)
+    val article = domainNorm.documentation.first { it.order == 1 } as Article
     assertThat(article.heading).isEqualTo("articleTitle")
     assertThat(article.marker).isEqualTo("articleMarker")
-    assertThat(article.order).isEqualTo(0)
+    assertThat(article.order).isEqualTo(1)
     assertThat(article.paragraphs).hasSize(1)
 
     val paragraph = article.paragraphs.first()
     assertThat(paragraph.marker).isEqualTo("paragraphMarker")
     assertThat(paragraph.text).isEqualTo("paragraphText")
+
+    assertThat(domainNorm.documentation.first { it.order == 2 })
+        .isInstanceOf(DocumentSection::class.java)
+    val documentationSection = domainNorm.documentation.first { it.order == 2 } as DocumentSection
+    assertThat(documentationSection.type).isEqualTo(DocumentSectionType.SECTION)
+    assertThat(documentationSection.heading).isEqualTo("sectionTitle")
+    assertThat(documentationSection.marker).isEqualTo("sectionMarker")
+    assertThat(documentationSection.documentation.size).isEqualTo(1)
 
     val metadataSections = domainNorm.metadataSections
     assertSectionsHasMetadata(
@@ -359,6 +394,65 @@ class FromJurisMapperTest {
     assertThat(domainNorm.formula).isNull()
     assertThat(domainNorm.conclusion).isNull()
     assertThat(domainNorm.recitals).isNull()
+  }
+
+  @Test
+  fun `it can resolve norm json properly from the converter`() {
+    val kotlinModule: KotlinModule =
+        KotlinModule.Builder().configure(KotlinFeature.StrictNullChecks, true).build()
+    val mapper = ObjectMapper().registerModule(kotlinModule)
+
+    val testDocumentation =
+        """
+        {
+            "guid": "${UUID.randomUUID()}",
+            "title": "I",
+            "marker": "Abschnitt",
+            "order": 2,
+            "type": "${DocumentSectionTypeData.SECTION}",
+            "level": 1,
+            "parentOrder": null,
+            "closestArticle": "§ 2",
+            "closestArticlePosition": -2,
+            "documentation": [
+                {
+                    "guid": "${UUID.randomUUID()}",
+                    "title": "I",
+                    "marker": "Unterabschnitt",
+                    "order": 1,
+                    "type": "${DocumentSectionTypeData.SUBSECTION}",
+                    "level": 2,
+                    "parentOrder": 1,
+                    "closestArticle": "§ 2",
+                    "closestArticlePosition": -1,
+                    "documentation": [
+                        {
+                            "guid": "${UUID.randomUUID()}",
+                            "order": 1,
+                            "title": null,
+                            "marker": "§ 2",
+                            "paragraphs": [
+                                {
+                                    "text": "Dieses Gesetz tritt mit Ablauf des 2. Dezember 2009 außer Kraft.<Rec></Rec>",
+                                    "marker": ""
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+      """
+            .trimIndent()
+
+    val documentation =
+        mapper.readValue(testDocumentation, Documentation::class.java) as DocumentSectionData
+    assertThat(documentation).isNotNull
+    assertThat(documentation.marker).isEqualTo("Abschnitt")
+    val subheader = documentation.documentation.first().let { it as DocumentSectionData }
+    val article = subheader.documentation.first().let { it as ArticleData }
+    assertThat(article.paragraphs.first().text)
+        .isEqualTo("Dieses Gesetz tritt mit Ablauf des 2. Dezember 2009 außer Kraft.<Rec></Rec>")
   }
 
   private fun assertSectionHasNotMetadataType(

@@ -1,17 +1,17 @@
 package de.bund.digitalservice.ris.norms.framework.adapter.output.juris
 
 import de.bund.digitalservice.ris.norms.domain.entity.*
+import de.bund.digitalservice.ris.norms.domain.value.*
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName as Section
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName
-import de.bund.digitalservice.ris.norms.domain.value.MetadatumType
-import de.bund.digitalservice.ris.norms.domain.value.NormCategory
-import de.bund.digitalservice.ris.norms.domain.value.UndefinedDate
 import de.bund.digitalservice.ris.norms.juris.converter.model.Article as ArticleData
 import de.bund.digitalservice.ris.norms.juris.converter.model.DigitalAnnouncement
 import de.bund.digitalservice.ris.norms.juris.converter.model.DivergentEntryIntoForce
 import de.bund.digitalservice.ris.norms.juris.converter.model.DivergentExpiration
+import de.bund.digitalservice.ris.norms.juris.converter.model.DocumentSection as DocumentSectionData
 import de.bund.digitalservice.ris.norms.juris.converter.model.DocumentStatus
 import de.bund.digitalservice.ris.norms.juris.converter.model.DocumentType
+import de.bund.digitalservice.ris.norms.juris.converter.model.Documentation as DocumentationData
 import de.bund.digitalservice.ris.norms.juris.converter.model.Footnote
 import de.bund.digitalservice.ris.norms.juris.converter.model.Norm as NormData
 import de.bund.digitalservice.ris.norms.juris.converter.model.NormProvider
@@ -102,8 +102,7 @@ fun mapDataToDomain(guid: UUID, data: NormData): Norm {
   val formula = data.formula?.let { Formula(UUID.randomUUID(), it) }
   return Norm(
       guid = guid,
-      documentation =
-          data.articles.mapIndexed { index, article -> mapArticleToDomain(article, index) },
+      documentation = mapDocumentationToDomain(data.documentation),
       metadataSections = sections.filterNotNull(),
       recitals = recitals,
       conclusion = conclusion,
@@ -531,10 +530,29 @@ private fun createAnnoucementDateSection(announcementDate: String?): MetadataSec
 private fun createMetadataForType(data: List<*>, type: MetadatumType): List<Metadatum<*>> =
     data.filterNotNull().mapIndexed { index, value -> Metadatum(value, type, index + 1) }
 
-fun mapArticleToDomain(data: ArticleData, order: Int) =
+fun mapDocumentationToDomain(documentation: List<DocumentationData>): List<Documentation> {
+  return documentation.map {
+    when (it) {
+      is ArticleData -> mapArticleToDomain(it)
+      is DocumentSectionData -> mapDocumentSectionToDomain(it)
+    }
+  }
+}
+
+fun mapDocumentSectionToDomain(data: DocumentSectionData) =
+    DocumentSection(
+        guid = data.guid,
+        order = data.order,
+        marker = data.marker,
+        heading = data.title,
+        type = DocumentSectionType.valueOf(data.type.name),
+        documentation = mapDocumentationToDomain(data.documentation),
+    )
+
+fun mapArticleToDomain(data: ArticleData) =
     Article(
-        guid = UUID.randomUUID(),
-        order = order,
+        guid = data.guid,
+        order = data.order,
         paragraphs = data.paragraphs.map(::mapParagraphToDomain),
         marker = data.marker,
         heading = data.title,

@@ -648,8 +648,8 @@ class JurisConverterTest {
       val converter = JurisConverter()
       val guid = UUID.randomUUID()
       val query = ParseJurisXmlOutputPort.Query(guid, anyZipFile.readBytes(), anyZipFile.name)
-      val articleData = ArticleData("title", "marker")
-      val data = NormData().apply { articles = listOf(articleData) }
+      val articleData = ArticleData(UUID.randomUUID(), "title", "marker", 1)
+      val data = NormData().apply { documentation = listOf(articleData) }
 
       every { extractData(any()) } returns data
 
