@@ -7,6 +7,7 @@ import {
   Article,
   Conclusion,
   DocumentSection,
+  Formula,
   MetadataSectionName,
   MetadatumType,
   Norm,
@@ -79,6 +80,7 @@ export interface TestNorm {
   recitals?: Recitals
   documentation?: (Article | DocumentSection)[]
   conclusion?: Conclusion
+  formula?: Formula
   metadataSections?: TestMetadataSection[]
 }
 

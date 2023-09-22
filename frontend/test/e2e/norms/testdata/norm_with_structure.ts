@@ -13,6 +13,15 @@ export const norm_with_structure: TestNormNoGuid = {
       ],
     },
   ],
+  conclusion: {
+    text: "Test conclusion",
+  },
+  formula: {
+    text: "Test formula",
+  },
+  recitals: {
+    text: "Test recitals",
+  },
   documentation: [
     {
       marker: "Erster Teil",

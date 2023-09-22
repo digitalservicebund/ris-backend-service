@@ -1,6 +1,7 @@
 import { expect, Page, test } from "@playwright/test"
 import { importTestData } from "./e2e-utils"
 import { norm_with_structure } from "./testdata/norm_with_structure"
+import { Conclusion, Formula, Recitals } from "@/domain/norm"
 import { DocumentationNoGuid } from "~/e2e/norms/fixtures"
 
 test.describe("display table of contents and navigate to documentation view page", () => {
@@ -16,6 +17,9 @@ test.describe("display table of contents and navigate to documentation view page
     ).toBeVisible()
 
     await checkIfDocumentationPresent(page, norm_with_structure.documentation)
+    await checkIfFormulaPresent(page, norm_with_structure.formula)
+    await checkIfRecitalsPresent(page, norm_with_structure.recitals)
+    await checkIfConclusionPresent(page, norm_with_structure.conclusion)
   })
 })
 
@@ -23,9 +27,7 @@ async function checkIfDocumentationPresent(
   page: Page,
   documentation?: DocumentationNoGuid[],
 ) {
-  for (const documentationElement of documentation
-    ? Object.values(documentation)
-    : []) {
+  for (const documentationElement of documentation ?? []) {
     const linkLocator = page.getByText(
       [documentationElement.marker, documentationElement.heading].join(" "),
       {
@@ -53,4 +55,43 @@ async function checkIfDocumentationPresent(
       )
     }
   }
+}
+
+async function checkIfFormulaPresent(page: Page, formula?: Formula) {
+  const linkLocator = page.getByText("Eingangsformel", { exact: true })
+  await expect(linkLocator).toBeVisible()
+  await linkLocator.click()
+  await page.waitForSelector("input")
+
+  const nameInputLocator = page.getByRole("textbox", { name: "Text" })
+  const nameInputValue = await nameInputLocator.inputValue()
+  expect(nameInputValue).toBe(formula?.text)
+
+  await page.goBack()
+}
+
+async function checkIfRecitalsPresent(page: Page, recitals?: Recitals) {
+  const linkLocator = page.getByText("Präambel", { exact: true })
+  await expect(linkLocator).toBeVisible()
+  await linkLocator.click()
+  await page.waitForSelector("input")
+
+  const nameInputLocator = page.getByRole("textbox", { name: "Text" })
+  const nameInputValue = await nameInputLocator.inputValue()
+  expect(nameInputValue).toBe(recitals?.text)
+
+  await page.goBack()
+}
+
+async function checkIfConclusionPresent(page: Page, conclusion?: Conclusion) {
+  const linkLocator = page.getByText("Schlussformel", { exact: true })
+  await expect(linkLocator).toBeVisible()
+  await linkLocator.click()
+  await page.waitForSelector("input")
+
+  const nameInputLocator = page.getByRole("textbox", { name: "Text" })
+  const nameInputValue = await nameInputLocator.inputValue()
+  expect(nameInputValue).toBe(conclusion?.text)
+
+  await page.goBack()
 }

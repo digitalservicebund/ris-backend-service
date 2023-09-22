@@ -1,18 +1,29 @@
 import { userEvent } from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
 import { createRouter, createWebHistory } from "vue-router"
-import TableOfContents from "@/components/TableOfContents.vue"
-import { Article, DocumentSection, DocumentSectionType } from "@/domain/norm"
+import TableOfContents from "@/components/tableOfContents/TableOfContents.vue"
+import {
+  Article,
+  DocumentSection,
+  DocumentSectionType,
+  Recitals,
+} from "@/domain/norm"
 
 function renderComponent(options?: {
   documentSections: (Article | DocumentSection)[]
   normGuid?: string
   marginLevel?: number
+  hasFormula?: boolean
+  recitals?: Recitals
+  hasConclusion?: boolean
 }) {
   const props = {
     documentSections: options?.documentSections,
     normGuid: options?.normGuid ?? "mockNormGuid",
     marginLevel: options?.marginLevel,
+    hasFormula: options?.hasFormula,
+    recitals: options?.recitals,
+    hasConclusion: options?.hasConclusion,
   }
   const utils = render(TableOfContents, {
     props,
@@ -24,6 +35,21 @@ function renderComponent(options?: {
             {
               path: "/norms/norm/:normGuid/documentation/:documentationGuid",
               name: "norms-norm-normGuid-documentation-documentationGuid",
+              component: {},
+            },
+            {
+              path: "/norms/norm/:normGuid/documentation/conclusion",
+              name: "norms-norm-normGuid-documentation-conclusion",
+              component: {},
+            },
+            {
+              path: "/norms/norm/:normGuid/documentation/formula",
+              name: "norms-norm-normGuid-documentation-formula",
+              component: {},
+            },
+            {
+              path: "/norms/norm/:normGuid/documentation/recitals",
+              name: "norms-norm-normGuid-documentation-recitals",
               component: {},
             },
             {
@@ -178,5 +204,109 @@ describe("TableOfContents", () => {
       "href",
       `/norms/norm/${mockNormGuid}/documentation/${firstPart.guid}`,
     )
+  })
+
+  it("shows a link to the formula if the prop is set", () => {
+    const mockNormGuid = "testNormGuid"
+
+    renderComponent({
+      documentSections: [firstPart, secondPart],
+      normGuid: mockNormGuid,
+      hasFormula: true,
+    })
+
+    expect(
+      screen.getByRole("link", { name: "Eingangsformel" }),
+    ).toHaveAttribute(
+      "href",
+      `/norms/norm/${mockNormGuid}/documentation/formula`,
+    )
+  })
+
+  it("does not show a link to the formula if the prop is not set", () => {
+    const mockNormGuid = "testNormGuid"
+
+    renderComponent({
+      documentSections: [firstPart, secondPart],
+      normGuid: mockNormGuid,
+      hasFormula: false,
+    })
+
+    expect(
+      screen.queryByRole("link", { name: "Eingangsformel" }),
+    ).not.toBeInTheDocument()
+  })
+
+  it("shows a link to the recitals with a default label if the prop is set without marker and heading", () => {
+    const mockNormGuid = "testNormGuid"
+
+    renderComponent({
+      documentSections: [firstPart, secondPart],
+      normGuid: mockNormGuid,
+      recitals: { text: "foo" },
+    })
+
+    expect(screen.getByRole("link", { name: "Präambel" })).toHaveAttribute(
+      "href",
+      `/norms/norm/${mockNormGuid}/documentation/recitals`,
+    )
+  })
+
+  it("shows a link to the recitals with a default label if marker and heading", () => {
+    const mockNormGuid = "testNormGuid"
+
+    renderComponent({
+      documentSections: [firstPart, secondPart],
+      normGuid: mockNormGuid,
+      recitals: { text: "foo", marker: "bar", heading: "baz" },
+    })
+
+    expect(screen.getByRole("link", { name: "bar baz" })).toHaveAttribute(
+      "href",
+      `/norms/norm/${mockNormGuid}/documentation/recitals`,
+    )
+  })
+
+  it("does not show a link to the recitals if the prop is not set", () => {
+    const mockNormGuid = "testNormGuid"
+
+    renderComponent({
+      documentSections: [firstPart, secondPart],
+      normGuid: mockNormGuid,
+      recitals: undefined,
+    })
+
+    expect(
+      screen.queryByRole("link", { name: "Präambel" }),
+    ).not.toBeInTheDocument()
+  })
+
+  it("shows a link to the conclusion if the prop is set", () => {
+    const mockNormGuid = "testNormGuid"
+
+    renderComponent({
+      documentSections: [firstPart, secondPart],
+      normGuid: mockNormGuid,
+      hasConclusion: true,
+    })
+
+    expect(screen.getByRole("link", { name: "Schlussformel" })).toHaveAttribute(
+      "href",
+      `/norms/norm/${mockNormGuid}/documentation/conclusion`,
+    )
+  })
+
+  it("does not show a link to the conclusion if the prop is not set", () => {
+    const mockNormGuid = "testNormGuid"
+
+    renderComponent({
+      documentSections: [firstPart, secondPart],
+      normGuid: mockNormGuid,
+      hasConclusion: false,
+    })
+
+    expect(
+      screen.queryByRole("link", { name: "Eingangsformel" }),
+    ).not.toBeInTheDocument()
   })
 })

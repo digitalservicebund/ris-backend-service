@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { storeToRefs } from "pinia"
-import TableOfContents from "@/components/TableOfContents.vue"
+import TableOfContents from "@/components/tableOfContents/TableOfContents.vue"
 import { useLoadedNormStore } from "@/stores/loadedNorm"
 
 const loadedNormStore = useLoadedNormStore()
@@ -15,10 +15,14 @@ const { loadedNorm } = storeToRefs(loadedNormStore)
       }}
     </h1>
     <h1 class="ds-label-01-bold mb-32">Nichtamtliches Inhaltsverzeichnis</h1>
+
     <TableOfContents
       v-if="loadedNorm?.documentation"
       :document-sections="loadedNorm?.documentation"
+      :has-conclusion="!!loadedNorm?.conclusion"
+      :has-formula="!!loadedNorm?.formula"
       :norm-guid="loadedNorm?.guid"
+      :recitals="loadedNorm?.recitals"
     />
   </div>
 </template>

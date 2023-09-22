@@ -2,6 +2,7 @@ export interface Norm {
   readonly guid: string
   readonly files?: FileReference[]
   readonly eli?: string
+  formula?: Formula
   recitals?: Recitals
   documentation?: (Article | DocumentSection)[]
   conclusion?: Conclusion
@@ -279,6 +280,10 @@ export enum DocumentSectionType {
 }
 
 export type Conclusion = {
+  text: string
+}
+
+export type Formula = {
   text: string
 }
 
