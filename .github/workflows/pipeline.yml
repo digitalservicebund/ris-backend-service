@@ -883,15 +883,32 @@ jobs:
           url: ${{ secrets.SLACK_WEBHOOK_URL }}
           token: ${{ secrets.GITHUB_TOKEN }}
 
+  deployment-time-check:
+    runs-on: ubuntu-latest
+    outputs:
+      between-8-and-16: ${{ steps.check-time.outputs.between-8-and-16 }}
+    steps:
+      - id: check-time
+        run: |
+          current_hour=$(TZ="Europe/Berlin" date +'%H')
+          if [ "$current_hour" -ge 8 ] && [ "$current_hour" -lt 16 ]; then
+            echo "between-8-and-16=true" >> "$GITHUB_ENV"
+          else
+            echo "between-8-and-16=false" >> "$GITHUB_ENV"
+          fi
+
   deploy-uat:
     runs-on: ubuntu-latest
-    if: ${{ github.ref == 'refs/heads/main' }}
+    if: |
+      github.ref == 'refs/heads/main' &&
+      needs.deployment-time-check.outputs.between-8-and-16 == 'false'
     concurrency: deploy-uat
     environment: uat
     needs:
       - push-frontend-image-to-registry
       - push-backend-image-to-registry
       - e2e-tests
+      - deployment-time-check
       - deploy-production
     permissions:
       id-token: write # Enable OIDC for gitsign
