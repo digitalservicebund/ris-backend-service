@@ -72,24 +72,22 @@ test.describe("search", () => {
       .getByLabel("Dokumentnummer oder Aktenzeichen Suche")
       .fill(documentNumber)
     await page.getByLabel("Nach Dokumentationseinheiten suchen").click()
-    //TODO: remove the timeout when search performance get better
     await expect(
       page.locator(".table-row", {
         hasText: documentNumber,
       }),
-    ).toBeVisible({ timeout: 30000 })
+    ).toBeVisible({ timeout: 30000 }) // RISDEV-2269
 
     //no results
     await page
       .getByLabel("Dokumentnummer oder Aktenzeichen Suche")
       .fill("wrong document number")
     await page.getByLabel("Nach Dokumentationseinheiten suchen").click()
-    //TODO: remove the timeout when search performance get better
     await expect(
       page.locator(".table-row", {
         hasText: documentNumber,
       }),
-    ).toBeHidden({ timeout: 30000 })
+    ).toBeHidden({ timeout: 30000 }) // RISDEV-2269
 
     //error
     await page.getByLabel("Nur meine Dokstelle Filter").click()
@@ -98,7 +96,7 @@ test.describe("search", () => {
     })
     await page.getByLabel("Nach Dokumentationseinheiten suchen").click()
 
-    await expect(page.getByLabel("Infomodal")).toBeVisible()
+    await expect(page.getByLabel("Infomodal")).toBeVisible({ timeout: 30000 }) // RISDEV-2269
     await expect(
       page.getByText("Die Suchergebnisse konnten nicht geladen werden."),
     ).toBeVisible()
@@ -143,7 +141,7 @@ test.describe("search", () => {
       )
     await page.getByLabel("Nach Dokumentationseinheiten suchen").click()
 
-    await expect(page.getByLabel("Ladestatus")).toBeHidden({ timeout: 30000 })
+    await expect(page.getByLabel("Ladestatus")).toBeHidden({ timeout: 30000 }) // RISDEV-2269
     expect(
       await page
         .locator(".table-row", {
@@ -172,7 +170,7 @@ test.describe("search", () => {
         ),
       )
     await page.getByLabel("Nach Dokumentationseinheiten suchen").click()
-    await expect(page.getByLabel("Ladestatus")).toBeHidden({ timeout: 30000 })
+    await expect(page.getByLabel("Ladestatus")).toBeHidden({ timeout: 30000 }) // RISDEV-2269
 
     expect(
       await page
@@ -217,7 +215,7 @@ test.describe("search", () => {
         ),
       )
     await page.getByLabel("Nach Dokumentationseinheiten suchen").click()
-    await expect(page.getByLabel("Ladestatus")).toBeHidden({ timeout: 30000 })
+    await expect(page.getByLabel("Ladestatus")).toBeHidden({ timeout: 30000 }) // RISDEV-2269
 
     //TODO: add this line again when sorting by asc desc date in possible
     // expect(
@@ -247,7 +245,7 @@ test.describe("search", () => {
       )
 
     await page.getByLabel("Nach Dokumentationseinheiten suchen").click()
-    await expect(page.getByLabel("Ladestatus")).toBeHidden({ timeout: 30000 })
+    await expect(page.getByLabel("Ladestatus")).toBeHidden({ timeout: 30000 }) // RISDEV-2269
 
     expect(
       await page
@@ -359,10 +357,9 @@ test.describe("search", () => {
       .getByLabel("Nach Dokumentationseinheiten suchen")
       .click()
 
-    //TODO: remove the timeout when search performance get better
     await expect(pageWithBghUser.getByLabel("Ladestatus")).toBeHidden({
       timeout: 30000,
-    })
+    }) // RISDEV-2269
 
     expect(
       await pageWithBghUser.getByText("unveröffentlicht").count(),
@@ -375,10 +372,9 @@ test.describe("search", () => {
       .getByLabel("Nach Dokumentationseinheiten suchen")
       .click()
 
-    //TODO: remove the timeout when search performance get better
     await expect(pageWithBghUser.getByLabel("Ladestatus")).toBeHidden({
       timeout: 30000,
-    })
+    }) // RISDEV-2269
 
     expect(
       await pageWithBghUser.getByText("veröffentlicht").count(),
@@ -407,10 +403,9 @@ test.describe("search", () => {
       .getByLabel("Nach Dokumentationseinheiten suchen")
       .click()
 
-    //TODO: remove the timeout when search performance get better
     await expect(pageWithBghUser.getByLabel("Ladestatus")).toBeHidden({
       timeout: 30000,
-    })
+    }) // RISDEV-2269
 
     expect(
       await pageWithBghUser.getByText("XXRE").count(),
@@ -423,27 +418,25 @@ test.describe("search", () => {
       .getByLabel("Nach Dokumentationseinheiten suchen")
       .click()
 
-    //TODO: remove the timeout when search performance get better
     await expect(pageWithBghUser.getByLabel("Ladestatus")).toBeHidden({
       timeout: 30000,
-    })
+    }) // RISDEV-2269
     expect(
       await pageWithBghUser.getByText("KORE").count(),
     ).toBeGreaterThanOrEqual(1)
 
     await expect(pageWithBghUser.getByText("XXRE")).toBeHidden({
       timeout: 30000,
-    })
+    }) // RISDEV-2269
 
     await errorsOnly.click()
     await pageWithBghUser
       .getByLabel("Nach Dokumentationseinheiten suchen")
       .click()
 
-    //TODO: remove the timeout when search performance get better
     await expect(pageWithBghUser.getByLabel("Ladestatus")).toBeHidden({
       timeout: 30000,
-    })
+    }) // RISDEV-2269
     expect(
       await pageWithBghUser.getByText("Nicht veröffentlicht (Fehler)").count(),
     ).toBeGreaterThanOrEqual(1)
@@ -455,10 +448,9 @@ test.describe("search", () => {
       .getByLabel("Nach Dokumentationseinheiten suchen")
       .click()
 
-    //TODO: remove the timeout when search performance get better
     await expect(pageWithBghUser.getByLabel("Ladestatus")).toBeHidden({
       timeout: 30000,
-    })
+    }) // RISDEV-2269
 
     expect(
       await pageWithBghUser.getByText("unveröffentlicht").count(),
@@ -482,10 +474,9 @@ test.describe("search", () => {
     await expect(resetSearch).toBeVisible()
     await page.getByLabel("Nach Dokumentationseinheiten suchen").click()
 
-    //TODO: remove the timeout when search performance get better
     await expect(page.getByLabel("Ladestatus")).toBeHidden({
       timeout: 30000,
-    })
+    }) // RISDEV-2269
     await expect(page.getByText("Keine Ergebnisse")).toBeVisible()
     await resetSearch.click()
     await expect(page.getByText("123")).toBeHidden()
