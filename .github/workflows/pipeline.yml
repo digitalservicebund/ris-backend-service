@@ -892,16 +892,15 @@ jobs:
         run: |
           current_hour=$(TZ="Europe/Berlin" date +'%H')
           if [ "$current_hour" -ge 8 ] && [ "$current_hour" -lt 16 ]; then
-            echo "between-8-and-16=true" >> "$GITHUB_ENV"
+            echo "between-8-and-16=true" >> "$GITHUB_OUTPUT"
           else
-            echo "between-8-and-16=false" >> "$GITHUB_ENV"
+            echo "between-8-and-16=false" >> "$GITHUB_OUTPUT"
           fi
 
   deploy-uat:
     runs-on: ubuntu-latest
     if: |
-      github.ref == 'refs/heads/main' &&
-      needs.deployment-time-check.outputs.between-8-and-16 == 'false'
+      github.ref == 'refs/heads/main'
     concurrency: deploy-uat
     environment: uat
     needs:
