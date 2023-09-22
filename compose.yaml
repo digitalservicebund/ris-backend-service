@@ -129,6 +129,7 @@ services:
       - POSTGRES_PASSWORD=test
       - POSTGRES_USER=test
       - POSTGRES_INITDB_ARGS="--auth-local=md5"
+      - PGPASSWORD=test
     ports:
       - 5432:5432
     entrypoint:
@@ -140,8 +141,8 @@ services:
         sleep 10
         psql -U $${POSTGRES_USER} -d $${POSTGRES_DB} -c 'CREATE EXTENSION IF NOT EXISTS "uuid-ossp";'
         if [ ! -f /tmp/pg_dump.sql ]; then
-          PGPASSWORD=$${POSTGRES_PASSWORD} pg_dumpall -p 8432 -U $${POSTGRES_USER} -l $${POSTGRES_DB} -h localhost > /tmp/pg_dump.sql
-          PGPASSWORD=$${POSTGRES_PASSWORD} psql -p 5432 -U $${POSTGRES_USER} -h localhost -f /tmp/pg_dump.sql $${POSTGRES_DB}
+          pg_dumpall -p 8432 -U $${POSTGRES_USER} -l $${POSTGRES_DB} -h localhost > /tmp/pg_dump.sql
+          psql -p 5432 -U $${POSTGRES_USER} -h localhost -f /tmp/pg_dump.sql $${POSTGRES_DB}
         fi
         wait
     healthcheck:
