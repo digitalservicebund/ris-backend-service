@@ -74,8 +74,8 @@ describe("useNormMenuItems", () => {
       ref("fake-guid"),
       {} as unknown as RouteLocationNormalizedLoaded,
       ref({
-        guid: "testGuid",
-        marker: "testMarker",
+        title: "testMarker",
+        to: "#",
       }),
     )
     const bestandMenuItem = menuItems.value.find(
@@ -83,7 +83,7 @@ describe("useNormMenuItems", () => {
     )
     expect(bestandMenuItem).toBeDefined()
 
-    if (bestandMenuItem && bestandMenuItem.children) {
+    if (bestandMenuItem?.children) {
       const childMarker = bestandMenuItem.children.map((child) => child.label)
       expect(childMarker).toContain("testMarker")
     }

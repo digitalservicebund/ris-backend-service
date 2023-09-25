@@ -2,7 +2,7 @@
 import dayjs from "dayjs"
 import { storeToRefs } from "pinia"
 import { toRefs, watchEffect, onUnmounted, computed } from "vue"
-import { RouterView, useRoute, useRouter } from "vue-router"
+import { RouteLocationRaw, RouterView, useRoute, useRouter } from "vue-router"
 import NormUnitInfoPanel from "@/components/NormUnitInfoPanel.vue"
 import { useNormMenuItems } from "@/composables/useNormMenuItems"
 import { useToggleStateInRouteQuery } from "@/composables/useToggleStateInRouteQuery"
@@ -89,20 +89,52 @@ const entryIntoForceInfo = computed(() => {
 watchEffect(() => store.load(props.normGuid))
 onUnmounted(() => (loadedNorm.value = undefined))
 
-const documentationRouteIsOpen = computed(
-  () => route.name == "norms-norm-normGuid-documentation-documentationGuid",
-)
-const openDocumentationGuid = computed(() =>
-  documentationRouteIsOpen.value
-    ? route.params.documentationGuid?.toString()
-    : undefined,
-)
-const openDocumentation = findDocumentation(openDocumentationGuid)
+const documentationItem = computed<
+  { title: string; to: RouteLocationRaw } | undefined
+>(() => {
+  if (route.name === "norms-norm-normGuid-documentation-documentationGuid") {
+    const currentId = route.params.documentationGuid?.toString()
+    const documentation = findDocumentation(currentId)
+    return documentation
+      ? {
+          title: documentation.value?.marker ?? "",
+          to: {
+            name: "norms-norm-normGuid-documentation-documentationGuid",
+            to: { normGuid: props.normGuid, documentationGuid: currentId },
+          },
+        }
+      : undefined
+  } else if (route.name === "norms-norm-normGuid-documentation-formula") {
+    return {
+      title: "Eingangsformel",
+      to: {
+        name: "norms-norm-normGuid-documentation-formula",
+        params: { normGuid: props.normGuid },
+      },
+    }
+  } else if (route.name === "norms-norm-normGuid-documentation-recitals") {
+    return {
+      title: "Präambel",
+      to: {
+        name: "norms-norm-normGuid-documentation-recitals",
+        params: { normGuid: props.normGuid },
+      },
+    }
+  } else if (route.name === "norms-norm-normGuid-documentation-conclusion") {
+    return {
+      title: "Schlussformel",
+      to: {
+        name: "norms-norm-normGuid-documentation-conclusion",
+        params: { normGuid: props.normGuid },
+      },
+    }
+  } else return undefined
+})
 
 const menuItems = useNormMenuItems(
   normGuid,
   route,
-  openDocumentation,
+  documentationItem,
   normIsExportable,
 )
 </script>

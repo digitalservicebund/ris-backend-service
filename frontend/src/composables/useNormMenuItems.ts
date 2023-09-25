@@ -1,12 +1,16 @@
-import { computed } from "vue"
-import type { Ref } from "vue"
-import type { RouteLocationNormalizedLoaded } from "vue-router"
-import { Documentation } from "@/domain/norm"
+import { computed, toValue } from "vue"
+import type { MaybeRefOrGetter, Ref } from "vue"
+import type {
+  RouteLocationNormalizedLoaded,
+  RouteLocationRaw,
+} from "vue-router"
 
 export function useNormMenuItems(
   normGuid: Ref<string>,
   route: RouteLocationNormalizedLoaded,
-  openDocumentation?: Ref<Documentation | undefined>,
+  documentationItem?: MaybeRefOrGetter<
+    { title: string; to: RouteLocationRaw } | undefined
+  >,
   exportIsEnabled?: Ref<boolean>,
 ) {
   const baseRoute = {
@@ -21,6 +25,11 @@ export function useNormMenuItems(
       name: "norms-norm-normGuid-frame",
       hash: `#${id}`,
     },
+  })
+
+  const documentationNavigationItem = computed(() => {
+    const val = toValue(documentationItem)
+    return val ? { label: val.title, route: val.to } : undefined
   })
 
   return computed(() => [
@@ -75,21 +84,8 @@ export function useNormMenuItems(
         ...baseRoute,
         name: "norms-norm-normGuid-content",
       },
-      ...(openDocumentation?.value
-        ? {
-            children: [
-              {
-                label: openDocumentation.value?.marker,
-                route: {
-                  name: "norms-norm-normGuid-documentation-documentationGuid",
-                  params: {
-                    normGuid: normGuid.value,
-                    documentationGuid: openDocumentation.value?.guid,
-                  },
-                },
-              },
-            ],
-          }
+      ...(documentationNavigationItem.value
+        ? { children: [documentationNavigationItem.value] }
         : {}),
     },
     {
