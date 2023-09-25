@@ -21,6 +21,8 @@ export const norm_with_structure: TestNormNoGuid = {
   },
   recitals: {
     text: "Test recitals",
+    heading: "Präambel",
+    marker: "§ 0",
   },
   documentation: [
     {

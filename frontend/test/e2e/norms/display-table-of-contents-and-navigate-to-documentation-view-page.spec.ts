@@ -71,14 +71,22 @@ async function checkIfFormulaPresent(page: Page, formula?: Formula) {
 }
 
 async function checkIfRecitalsPresent(page: Page, recitals?: Recitals) {
-  const linkLocator = page.getByText("Präambel", { exact: true })
+  const linkLocator = page.getByText("§ 0 Präambel", { exact: true })
   await expect(linkLocator).toBeVisible()
   await linkLocator.click()
   await page.waitForSelector("input")
 
-  const nameInputLocator = page.getByRole("textbox", { name: "Text" })
+  const nameInputLocator = page.getByLabel("Bezeichnung des Elements")
   const nameInputValue = await nameInputLocator.inputValue()
-  expect(nameInputValue).toBe(recitals?.text)
+  expect(nameInputValue).toBe(recitals?.marker)
+
+  const headingInputLocator = page.getByLabel("Überschrift des Elements")
+  const headingInputValue = await headingInputLocator.inputValue()
+  expect(headingInputValue).toBe(recitals?.heading)
+
+  const textInputLocator = page.getByRole("textbox", { name: "Text" })
+  const textInputValue = await textInputLocator.inputValue()
+  expect(textInputValue).toBe(recitals?.text)
 
   await page.goBack()
 }
