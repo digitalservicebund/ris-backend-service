@@ -212,7 +212,7 @@ class NormsService(
       normGuid: UUID,
       parentSectionGuid: UUID? = null,
   ): Flux<Boolean> {
-    return Flux.fromIterable(documentation).flatMap {
+    return Flux.fromIterable(documentation).concatMap {
       when (it) {
         is DocumentSection -> saveDocumentSection(it, normGuid, parentSectionGuid)
         is Article -> saveArticle(it, normGuid, parentSectionGuid)
