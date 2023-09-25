@@ -227,7 +227,7 @@ class NormsService(
   ): Flux<Boolean> {
     return documentSectionRepository
         .save(documentSectionToDto(documentSection, normGuid, parentSectionGuid))
-        .flatMapMany { saveDocumentation(documentSection.documentation, normGuid, it.guid) }
+        .thenMany(saveDocumentation(documentSection.documentation, normGuid, documentSection.guid))
   }
 
   private fun saveArticle(
