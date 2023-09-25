@@ -21,13 +21,13 @@ fileignoreconfig:
 - filename: backend/src/test/kotlin/unit/application/service/GetFileServiceTest.kt
   checksum: 8133265c6f388df84a3e0f61050428e8628853e0ba80b432e4723750a34b781e
 - filename: compose.yaml
-  checksum: 445f6bb33680e9f00f2dbd7a91730e80d942b9a7e38e1ba048be161a10dd3f5e
+  checksum: 2afad63606bdac9044fd5dcabe22d9d9e1123c12e0226716804d9350084a4ee8
 - filename: doc/norms/backend-api.yaml
   checksum: df4fa1f7e6d7023f9a7a98d1052c2b88c1785366962004b3165453edcd5bf4db
 - filename: doc/structurizr/workspace.json
   checksum: 541780133a0bf013ac75f6a3bc402c77981a273654c5648eabeb32ccb271a834
 - filename: frontend/Dockerfile.prod
-  checksum: 7d2bf465ac9330fbe891d62a1e4a9ff50a7434c5b284d2197cfad33b72451f7b
+  checksum: 3307752ddc7656606048f085ec2158b8a671844970944178fda705f64789d97a
 - filename: frontend/FRONTEND_STYLEGUIDE.md
   checksum: e6b8194eba2012f2a769c5a5d3577715a573b441a7b94e744c32b3149d0d3a93
 - filename: frontend/src/main.ts
