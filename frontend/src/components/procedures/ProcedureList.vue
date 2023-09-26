@@ -1,8 +1,8 @@
 <script lang="ts" setup>
-import { ref, onMounted, watch } from "vue"
-import { useRoute, useRouter } from "vue-router"
+import { ref, onMounted } from "vue"
 import ProcedureDetail from "./ProcedureDetail.vue"
 import ExpandableContent from "@/components/ExpandableContent.vue"
+import useQueries, { Query } from "@/composables/useQueryFromRoute"
 import { Procedure } from "@/domain/documentUnit"
 import service from "@/services/procedureService"
 import InputField from "@/shared/components/input/InputField.vue"
@@ -13,13 +13,8 @@ const itemsPerPage = 10
 const procedures = ref<Procedure[]>()
 const currentPage = ref<Page<Procedure>>()
 
-const route = useRoute()
-const router = useRouter()
-
-const queries = ref<{ [key: string]: string }>({ q: "" })
-
-async function updateProcedures(page: number, filter?: string) {
-  const response = await service.getAll(itemsPerPage, page, filter)
+async function updateProcedures(page: number, queries?: Query<string>) {
+  const response = await service.getAll(itemsPerPage, page, queries?.q)
   if (response.data) {
     procedures.value = copyDocumentUnits(
       response.data.content,
@@ -29,6 +24,8 @@ async function updateProcedures(page: number, filter?: string) {
     currentPage.value = response.data
   }
 }
+
+const queries = useQueries<"q">(updateProcedures)
 
 async function loadDocumentUnits(loadingProcedure: Procedure) {
   if (!procedures.value) return
@@ -56,18 +53,8 @@ function copyDocumentUnits(
   })
 }
 
-watch(
-  queries,
-  () => {
-    updateProcedures(currentPage.value?.number || 0, queries.value.q)
-    router.push(queries.value.q ? { query: queries.value } : {})
-  },
-  { deep: true },
-)
-
 onMounted(() => {
-  if (route.query.q) queries.value.q = route.query.q as string
-  updateProcedures(0, queries.value.q)
+  updateProcedures(0, queries.value)
 })
 </script>
 
