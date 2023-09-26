@@ -29,7 +29,7 @@ export default function useQueries<T extends string>(
 
       timeoutId = window.setTimeout(
         () =>
-          router.push(
+          void router.push(
             Object.values(currentQuerry).some((value) => value != "")
               ? { query: currentQuerry }
               : {},
