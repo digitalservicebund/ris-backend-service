@@ -4,7 +4,7 @@ import { useRouter, useRoute } from "vue-router"
 export type Query<T extends string> = { [key in T]?: string }
 
 export default function useQueries<T extends string>(
-  searchCallback: (page: number, query: Query<T>) => void,
+  searchCallback: (page: number, query: Query<T>) => Promise<void>,
 ) {
   const route = useRoute()
   const router = useRouter()
@@ -25,7 +25,7 @@ export default function useQueries<T extends string>(
   watch(
     query,
     async () => {
-      searchCallback(0, query.value as Query<T>)
+      await searchCallback(0, query.value as Query<T>)
       await router.push(query.value ? { query: query.value } : {})
     },
     { deep: true },
