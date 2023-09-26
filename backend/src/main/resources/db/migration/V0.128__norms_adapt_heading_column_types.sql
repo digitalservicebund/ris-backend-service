@@ -1,0 +1,13 @@
+ALTER TABLE IF EXISTS
+  articles
+ALTER COLUMN
+  heading
+TYPE
+  TEXT;
+
+ALTER TABLE IF EXISTS
+  document_section
+ALTER COLUMN
+  heading
+TYPE
+  TEXT;
