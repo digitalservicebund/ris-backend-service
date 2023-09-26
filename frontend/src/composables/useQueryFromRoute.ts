@@ -13,8 +13,7 @@ export default function useQueries<T extends string>(
     const query: Partial<Query<T>> = {}
 
     for (const parameter in route.query) {
-      if (parameter in route.query)
-        query[parameter as T] = route.query[parameter] as string
+      query[parameter as T] = route.query[parameter] as string
     }
 
     return query
@@ -22,11 +21,29 @@ export default function useQueries<T extends string>(
 
   const query = ref<Query<T>>(getQueriesFromRoute())
 
+  const debouncedRouterPush = (() => {
+    let timeoutId: number | null = null
+
+    return (currentQuerry: Query<T>) => {
+      if (timeoutId !== null) window.clearTimeout(timeoutId)
+
+      timeoutId = window.setTimeout(
+        async () =>
+          await router.push(
+            Object.values(currentQuerry).some((value) => value != "")
+              ? { query: currentQuerry }
+              : {},
+          ),
+        300,
+      )
+    }
+  })()
+
   watch(
     query,
     async () => {
       await searchCallback(0, query.value as Query<T>)
-      await router.push(query.value ? { query: query.value } : {})
+      debouncedRouterPush(query.value as Query<T>)
     },
     { deep: true },
   )
