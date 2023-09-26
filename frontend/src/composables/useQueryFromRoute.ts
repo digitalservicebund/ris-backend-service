@@ -28,8 +28,8 @@ export default function useQueries<T extends string>(
       if (timeoutId !== null) window.clearTimeout(timeoutId)
 
       timeoutId = window.setTimeout(
-        async () =>
-          await router.push(
+        () =>
+          router.push(
             Object.values(currentQuerry).some((value) => value != "")
               ? { query: currentQuerry }
               : {},
