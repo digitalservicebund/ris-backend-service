@@ -29,7 +29,7 @@
   },
   "dependencies": {
     "@braintree/sanitize-url": "^6.0.4",
-    "@sentry/vue": "^7.70.0",
+    "@sentry/vue": "^7.71.0",
     "@tiptap/extension-bold": "^2.1.9",
     "@tiptap/extension-bullet-list": "^2.1.9",
     "@tiptap/extension-color": "^2.1.9",
