@@ -253,6 +253,12 @@ public class DocumentUnitService {
                       ? Flux.empty()
                       : Flux.fromIterable(documentUnit.proceedingDecisions());
 
+              Flux<ActiveCitation> activeCitations =
+                  documentUnit.contentRelatedIndexing() == null
+                          || documentUnit.contentRelatedIndexing().activeCitations() == null
+                      ? Flux.empty()
+                      : Flux.fromIterable(documentUnit.contentRelatedIndexing().activeCitations());
+
               String logMsg =
                   "Dokumentationseinheit gelöscht: "
                       + documentUnitUuid
@@ -261,7 +267,14 @@ public class DocumentUnitService {
                           ? ""
                           : ", zudem die Verknüpfungen mit "
                               + documentUnit.proceedingDecisions().size()
-                              + " vorgehenden Entscheidungen");
+                              + " vorgehenden Entscheidungen")
+                      + (documentUnit.contentRelatedIndexing() == null
+                              || documentUnit.contentRelatedIndexing().activeCitations() == null
+                              || documentUnit.contentRelatedIndexing().activeCitations().isEmpty()
+                          ? ""
+                          : ", zudem die Verknüpfungen mit "
+                              + documentUnit.contentRelatedIndexing().activeCitations().size()
+                              + " Aktivzitierungen");
 
               return deleteAttachedFile
                   .thenMany(
@@ -271,6 +284,13 @@ public class DocumentUnitService {
                                   documentUnitUuid,
                                   proceedingDecision.getUuid(),
                                   DocumentationUnitLinkType.PREVIOUS_DECISION)))
+                  .thenMany(
+                      activeCitations.flatMap(
+                          activeCitation ->
+                              removeLinkedDocumentationUnit(
+                                  documentUnitUuid,
+                                  activeCitation.getUuid(),
+                                  DocumentationUnitLinkType.ACTIVE_CITATION)))
                   .then(repository.delete(documentUnit))
                   .thenReturn(logMsg);
             })
@@ -281,7 +301,7 @@ public class DocumentUnitService {
                 return Mono.error(
                     new DocumentUnitDeletionException(
                         "die Dokumentationseinheit konnte nicht gelöscht werden, "
-                            + "da sie eine vorgehende Entscheidung für "
+                            + "da sie eine vorgehende Entscheidung oder Aktivzitierung für "
                             + documentUnitsThisOneIsAChildOf.get()
                             + " andere Dokumentationseinheiten darstellt"));
               }

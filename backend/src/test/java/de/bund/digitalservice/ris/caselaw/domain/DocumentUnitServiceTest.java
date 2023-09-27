@@ -227,6 +227,108 @@ class DocumentUnitServiceTest {
   }
 
   @Test
+  void testDeleteByUuid_withProceedingDecisions() {
+    var pdUuid = UUID.randomUUID();
+    DocumentUnit documentUnit =
+        DocumentUnit.builder()
+            .uuid(TEST_UUID)
+            .proceedingDecisions(
+                List.of(
+                    ProceedingDecision.builder()
+                        .uuid(pdUuid)
+                        .dataSource(DataSource.PROCEEDING_DECISION)
+                        .build()))
+            .build();
+    when(repository.countLinksByChildDocumentUnitUuid(TEST_UUID)).thenReturn(Mono.just(1L));
+    when(repository.findByUuid(TEST_UUID)).thenReturn(Mono.just(documentUnit));
+    when(repository.deleteIfOrphanedLinkedDocumentationUnit(pdUuid)).thenReturn(Mono.empty());
+    when(repository.unlinkDocumentUnit(
+            TEST_UUID, pdUuid, DocumentationUnitLinkType.PREVIOUS_DECISION))
+        .thenReturn(Mono.empty());
+
+    when(repository.findAllLinkedDocumentUnitsByParentDocumentUnitUuidAndType(
+            TEST_UUID, DocumentationUnitLinkType.ACTIVE_CITATION))
+        .thenReturn(Flux.empty());
+    when(repository.findAllLinkedDocumentUnitsByParentDocumentUnitUuidAndType(
+            TEST_UUID, DocumentationUnitLinkType.PREVIOUS_DECISION))
+        .thenReturn(
+            Flux.just(
+                LinkedDocumentationUnit.builder()
+                    .uuid(pdUuid)
+                    .dataSource(DataSource.PROCEEDING_DECISION)
+                    .build()));
+    when(repository.delete(any(DocumentUnit.class))).thenReturn(Mono.just(mock(Void.class)));
+
+    StepVerifier.create(service.deleteByUuid(TEST_UUID))
+        .consumeNextWith(
+            string -> {
+              assertNotNull(string);
+              assertEquals(
+                  "Dokumentationseinheit gelöscht: "
+                      + TEST_UUID
+                      + ", zudem die Verknüpfungen mit 1 vorgehenden Entscheidungen",
+                  string);
+            })
+        .verifyComplete();
+
+    verify(repository)
+        .unlinkDocumentUnit(TEST_UUID, pdUuid, DocumentationUnitLinkType.PREVIOUS_DECISION);
+    verify(repository).deleteIfOrphanedLinkedDocumentationUnit(pdUuid);
+  }
+
+  @Test
+  void testDeleteByUuid_withActiveCitations() {
+    var acUuid = UUID.randomUUID();
+    DocumentUnit documentUnit =
+        DocumentUnit.builder()
+            .uuid(TEST_UUID)
+            .contentRelatedIndexing(
+                ContentRelatedIndexing.builder()
+                    .activeCitations(
+                        List.of(
+                            ActiveCitation.builder()
+                                .uuid(acUuid)
+                                .dataSource(DataSource.ACTIVE_CITATION)
+                                .build()))
+                    .build())
+            .build();
+    when(repository.countLinksByChildDocumentUnitUuid(TEST_UUID)).thenReturn(Mono.just(1L));
+    when(repository.findByUuid(TEST_UUID)).thenReturn(Mono.just(documentUnit));
+    when(repository.deleteIfOrphanedLinkedDocumentationUnit(acUuid)).thenReturn(Mono.empty());
+    when(repository.unlinkDocumentUnit(
+            TEST_UUID, acUuid, DocumentationUnitLinkType.ACTIVE_CITATION))
+        .thenReturn(Mono.empty());
+    when(repository.findAllLinkedDocumentUnitsByParentDocumentUnitUuidAndType(
+            TEST_UUID, DocumentationUnitLinkType.PREVIOUS_DECISION))
+        .thenReturn(Flux.empty());
+    when(repository.findAllLinkedDocumentUnitsByParentDocumentUnitUuidAndType(
+            TEST_UUID, DocumentationUnitLinkType.ACTIVE_CITATION))
+        .thenReturn(
+            Flux.just(
+                LinkedDocumentationUnit.builder()
+                    .uuid(acUuid)
+                    .dataSource(DataSource.ACTIVE_CITATION)
+                    .build()));
+    when(repository.delete(any(DocumentUnit.class))).thenReturn(Mono.just(mock(Void.class)));
+
+    StepVerifier.create(service.deleteByUuid(TEST_UUID))
+        .consumeNextWith(
+            string -> {
+              assertNotNull(string);
+              assertEquals(
+                  "Dokumentationseinheit gelöscht: "
+                      + TEST_UUID
+                      + ", zudem die Verknüpfungen mit 1 Aktivzitierungen",
+                  string);
+            })
+        .verifyComplete();
+
+    verify(repository)
+        .unlinkDocumentUnit(TEST_UUID, acUuid, DocumentationUnitLinkType.ACTIVE_CITATION);
+    verify(repository).deleteIfOrphanedLinkedDocumentationUnit(acUuid);
+  }
+
+  @Test
   void testDeleteByUuid_withFileAttached() {
     DocumentUnit documentUnit =
         DocumentUnit.builder().uuid(TEST_UUID).s3path(TEST_UUID.toString()).build();
