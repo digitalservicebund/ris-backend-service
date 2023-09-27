@@ -4,7 +4,6 @@ import de.bund.digitalservice.ris.caselaw.adapter.S3AsyncMockClient
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig
 import de.bund.digitalservice.ris.norms.application.port.output.GetNormByGuidOutputPort
 import de.bund.digitalservice.ris.norms.application.service.ImportNormService
-import de.bund.digitalservice.ris.norms.domain.entity.Article
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType
 import de.bund.digitalservice.ris.norms.framework.adapter.output.database.NormsService
@@ -145,17 +144,27 @@ class ImportNormControllerIntegrationTest : PostgresTestcontainerIntegrationTest
     val guid = UUID.fromString(guidString)
 
     val norm = normsService.getNormByGuid(GetNormByGuidOutputPort.Query(guid)).block()
-    assertThat(norm.guid).isEqualTo(guid)
-    val article = norm?.documentation?.first { it.order == 1 }
+    assertThat(norm?.guid).isEqualTo(guid)
 
-    assertThat(article?.heading)
-        .isEqualTo("Änderung der Verordnung über Stoffe mit pharmakologischer Wirkung")
-    assertThat(article?.marker).isEqualTo("Art 2")
-
-    val header = norm?.documentation?.first { it.order == 2 } as Article
-
-    assertThat(header.marker).isEqualTo("Art 3")
-    assertThat(header.heading).isEqualTo("Inkrafttreten, Außerkrafttreten")
+    assertThat(
+            norm?.documentation?.any { article ->
+              article.marker == "Art 1" &&
+                  article.heading ==
+                      "Verordnung über die Verwendung antibiotisch wirksamer Arzneimittel"
+            })
+        .isTrue()
+    assertThat(
+            norm?.documentation?.any { article ->
+              article.marker == "Art 2" &&
+                  article.heading ==
+                      "Änderung der Verordnung über Stoffe mit pharmakologischer Wirkung"
+            })
+        .isTrue()
+    assertThat(
+            norm?.documentation?.any { article ->
+              article.marker == "Art 3" && article.heading == "Inkrafttreten, Außerkrafttreten"
+            })
+        .isTrue()
 
     assertThat(
             norm
