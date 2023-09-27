@@ -216,9 +216,10 @@ dependencies {
 
     implementation("com.icegreen:greenmail:2.0.0")
 
-    implementation("de.bund.digitalservice:ris-norms-juris-converter:0.18.3")
+    implementation("de.bund.digitalservice:ris-norms-juris-converter:0.18.5")
     // for local development:
-    // implementation(files("ris-norms-juris-converter-0.18.0.jar"))
+    // implementation(files("ris-norms-juris-converter-0.18.5.jar"))
+    // implementation("org.apache.commons:commons-text:1.10.0")
 
     implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.15.2")
 

@@ -4,12 +4,7 @@ import { openNorm, saveNormFrame } from "./e2e-utils"
 import { testWithImportedNorm } from "./fixtures"
 import { normData as norm } from "./testdata/norm_basic"
 import { FieldType, fillInputField } from "./utilities"
-import {
-  Article,
-  DocumentSection,
-  MetadataSectionName,
-  MetadatumType,
-} from "@/domain/norm"
+import { Article, MetadataSectionName, MetadatumType } from "@/domain/norm"
 
 testWithImportedNorm(
   "Check if XML can be retrieved by ELI and content is correct",
@@ -152,15 +147,16 @@ testWithImportedNorm(
           .querySelectorAll("akn\\:paragraph")
           .forEach((paragraph, paragraphIndex) => {
             if (
-              (onlyArticles?.[articleIndex] as DocumentSection).documentation?.[
+              (onlyArticles?.[articleIndex] as Article).paragraphs?.[
                 paragraphIndex
               ]?.marker !== undefined
             ) {
               expect(
                 paragraph.querySelector("akn\\:marker")?.textContent?.trim(),
               ).toBe(
-                (onlyArticles?.[articleIndex] as DocumentSection)
-                  .documentation?.[paragraphIndex]?.marker,
+                (onlyArticles?.[articleIndex] as Article).paragraphs?.[
+                  paragraphIndex
+                ]?.marker,
               )
             }
             expect(
@@ -169,10 +165,9 @@ testWithImportedNorm(
                 ?.textContent?.trim()
                 .replace(/\n/, ""),
             ).toBe(
-              (
-                (onlyArticles?.[articleIndex] as DocumentSection)
-                  .documentation?.[paragraphIndex] as Article
-              )?.paragraphs[0].text,
+              (onlyArticles?.[articleIndex] as Article).paragraphs?.[
+                paragraphIndex
+              ].text,
             )
           })
       })

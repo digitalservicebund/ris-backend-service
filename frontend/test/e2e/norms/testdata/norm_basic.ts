@@ -1,80 +1,55 @@
 import { NormData } from "../fixtures"
-import { DocumentSectionType, NormCategory, UndefinedDate } from "@/domain/norm"
+import { NormCategory, UndefinedDate } from "@/domain/norm"
 
 export const normData: NormData = {
   jurisZipFileName: "Tierarznei.3-0_multi.zip",
   documentation: [
     {
-      type: DocumentSectionType.SECTION,
       marker: "Eingangsformel",
-      heading: "",
-      documentation: [
+      paragraphs: [
         {
           marker: "",
-          paragraphs: [
-            {
-              marker: "",
-              text: "Das Bundesministerium für Ernährung und Landwirtschaft verordnet auf Grund",
-            },
-          ],
+          text: "Das Bundesministerium für Ernährung und Landwirtschaft verordnet auf Grund",
         },
       ],
     },
     {
-      type: DocumentSectionType.SECTION,
+      marker: "Art 1",
+      heading:
+        "Verordnung über die Verwendung antibiotisch wirksamer Arzneimittel",
+      paragraphs: [],
+    },
+    {
       marker: "Art 2",
       heading:
         "Änderung der Verordnung über Stoffe mit pharmakologischer Wirkung",
-      documentation: [
+      paragraphs: [
         {
           marker: "",
-          paragraphs: [
-            {
-              marker: "",
-              text: "§ 2 der Verordnung über Stoffe mit pharmakologischer Wirkung in der Fassung der Bekanntmachung vom 8. Juli 2009 (BGBl. I S. 1768) wird wie folgt geändert:",
-            },
-          ],
+          text: "§ 2 der Verordnung über Stoffe mit pharmakologischer Wirkung in der Fassung der Bekanntmachung vom 8. Juli 2009 (BGBl. I S. 1768) wird wie folgt geändert:",
         },
       ],
     },
     {
-      type: DocumentSectionType.SECTION,
       marker: "Art 3",
       heading: "Inkrafttreten, Außerkrafttreten",
-      documentation: [
+      paragraphs: [
         {
           marker: "(1)",
-          paragraphs: [
-            {
-              marker: "",
-              text: "Diese Verordnung tritt am Tag nach der Verkündung in Kraft.",
-            },
-          ],
+          text: "Diese Verordnung tritt am Tag nach der Verkündung in Kraft.",
         },
         {
           marker: "(2)",
-          paragraphs: [
-            {
-              marker: "",
-              text: "Gleichzeitig treten außer Kraft",
-            },
-          ],
+          text: "Gleichzeitig treten außer Kraft",
         },
       ],
     },
     {
-      type: DocumentSectionType.SECTION,
       marker: "Schlussformel",
-      heading: "",
-      documentation: [
+      paragraphs: [
         {
           marker: "",
-          paragraphs: [
-            {
-              marker: "",
-              text: "Der Bundesrat hat zugestimmt.",
-            },
-          ],
+          text: "Der Bundesrat hat zugestimmt.",
         },
       ],
     },

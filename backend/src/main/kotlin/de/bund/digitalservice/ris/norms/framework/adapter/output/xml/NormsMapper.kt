@@ -1,6 +1,8 @@
 package de.bund.digitalservice.ris.norms.framework.adapter.output.xml
 
 import de.bund.digitalservice.ris.norms.domain.entity.Article
+import de.bund.digitalservice.ris.norms.domain.entity.DocumentSection
+import de.bund.digitalservice.ris.norms.domain.entity.Documentation
 import de.bund.digitalservice.ris.norms.domain.entity.Norm
 import de.bund.digitalservice.ris.norms.domain.entity.Paragraph
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName
@@ -88,15 +90,23 @@ fun mapNormToDto(norm: Norm): NormDto {
       printAnnouncementPage = norm.eli.printAnnouncementPage,
       eli = norm.eli.toString(),
       articles =
-          norm.documentation
-              .filterIsInstance<Article>()
+          getAllArticles(norm.documentation.sortedBy { it.order })
               .filter { """^(§|Art)\s\w+$""".toRegex().matches(it.marker) }
-              .sortedBy {
-                if (it.marker.contains("§")) it.marker.substring(2).toInt()
-                else it.marker.substring(4).toInt()
-              }
               .mapIndexed { index, article -> mapArticleToDto(article, index) },
   )
+}
+
+private fun getAllArticles(documentationList: List<Documentation>): List<Article> {
+  val articleList = mutableListOf<Article>()
+  for (doc in documentationList) {
+    if (doc is Article) {
+      articleList.add(doc)
+    } else if (doc is DocumentSection) {
+      val nestedArticles = getAllArticles(doc.documentation.sortedBy { it.order }.toList())
+      articleList.addAll(nestedArticles)
+    }
+  }
+  return articleList
 }
 
 fun mapArticleToDto(article: Article, ordinalNumber: Int = 1): ArticleDto {
