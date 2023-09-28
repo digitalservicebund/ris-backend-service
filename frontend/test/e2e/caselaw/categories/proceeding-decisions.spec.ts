@@ -101,9 +101,10 @@ test.describe("previous decisions", () => {
       proceedingDecisionContainer.getByLabel("Listen Eintrag"),
     ).toHaveCount(1)
     await page.reload()
+
     await expect(
       proceedingDecisionContainer.getByLabel("Listen Eintrag"),
-    ).toHaveCount(1)
+    ).toHaveCount(1, { timeout: 10000 }) // reloading can be slow if too many parallel tests
 
     await page.getByLabel("Weitere Angabe").click()
     await page.getByLabel("Aktenzeichen Rechtszug").fill("two")
@@ -112,7 +113,7 @@ test.describe("previous decisions", () => {
     await page.reload()
     await expect(
       proceedingDecisionContainer.getByLabel("Listen Eintrag"),
-    ).toHaveCount(1)
+    ).toHaveCount(1, { timeout: 10000 }) // reloading can be slow if too many parallel tests
 
     await page.getByLabel("Weitere Angabe").click()
     await waitForSaving(
@@ -127,7 +128,7 @@ test.describe("previous decisions", () => {
     await page.reload()
     await expect(
       proceedingDecisionContainer.getByLabel("Listen Eintrag"),
-    ).toHaveCount(2)
+    ).toHaveCount(2, { timeout: 10000 }) // reloading can be slow if too many parallel tests
   })
 
   test("manually added proceeding decision can be edited", async ({
