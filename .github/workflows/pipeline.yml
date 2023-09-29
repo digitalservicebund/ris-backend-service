@@ -900,10 +900,8 @@ jobs:
   deploy-uat:
     runs-on: ubuntu-latest
     if: |
-      github.ref == 'refs/heads/main'
-#    if: |
-#      github.ref == 'refs/heads/main' &&
-#      needs.deployment-time-check.outputs.between-8-and-16 == 'false'
+      github.ref == 'refs/heads/main' &&
+      needs.deployment-time-check.outputs.between-8-and-16 == 'false'
     concurrency: deploy-uat
     environment: uat
     needs:
