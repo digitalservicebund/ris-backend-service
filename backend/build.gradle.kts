@@ -138,7 +138,7 @@ dependencies {
     val logbackVersion = "1.4.5"
     val r2dbcVersion = "1.0.0.RELEASE"
     val jacksonModuleVersion = "2.15.2"
-    val testContainersVersion = "1.18.3"
+    val testContainersVersion = "1.19.0"
 
     implementation("org.springframework.boot:spring-boot-starter-actuator:$springBootStarterVersion")
     implementation("org.springframework.boot:spring-boot-starter-security:$springBootStarterVersion")
