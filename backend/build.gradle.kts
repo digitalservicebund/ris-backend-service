@@ -173,7 +173,7 @@ dependencies {
         because("CVE-2021-43797, not using Tomcat")
     }
     implementation("io.projectreactor.netty:reactor-netty-core:1.1.8")
-    implementation("org.yaml:snakeyaml:2.0")
+    implementation("org.yaml:snakeyaml:2.2")
     implementation("ch.qos.logback:logback-classic:$logbackVersion")
     implementation("ch.qos.logback:logback-core:$logbackVersion")
     implementation("org.postgresql:r2dbc-postgresql:1.0.1.RELEASE")
