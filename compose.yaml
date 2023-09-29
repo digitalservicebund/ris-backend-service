@@ -83,53 +83,23 @@ services:
       start_period: 10s
       timeout: 3s
 
-  db:
-    image: postgres:12-alpine
-    extra_hosts:
-      - localhost:host-gateway
-    restart: always
-    container_name: db
-    volumes:
-      - db-data:/var/lib/postgresql/data
-    environment:
-      - POSTGRES_DB=neuris
-      - POSTGRES_PASSWORD=test
-      - POSTGRES_USER=test
-    ports:
-      - 8432:5432
-    entrypoint:
-      - /bin/bash
-      - -c
-      - |
-        set -e
-        docker-entrypoint.sh postgres &
-        sleep 10
-        psql -U $${POSTGRES_USER} -d $${POSTGRES_DB} -c 'CREATE EXTENSION IF NOT EXISTS "uuid-ossp";'
-        wait
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U test -d neuris"]
-      interval: 5s
-      retries: 3
-      start_period: 5s
-      timeout: 3s
-
   postgres14:
     image: postgres:14-alpine
     extra_hosts:
       - localhost:host-gateway
     restart: always
     container_name: postgres14
-    depends_on:
-      - db
     volumes:
       - postgres14-data:/var/lib/postgresql/data
-      - dump:/tmp
     environment:
       - POSTGRES_DB=neuris
       - POSTGRES_PASSWORD=test
       - POSTGRES_USER=test
       - POSTGRES_INITDB_ARGS="--auth-local=md5"
       - PGPASSWORD=test
+      - PGUSER=test
+      - MIGRATION_USER_NAME=migration
+      - MIGRATION_USER_PASSWORD=migration
     ports:
       - 5432:5432
     entrypoint:
@@ -138,12 +108,19 @@ services:
       - |
         set -e
         docker-entrypoint.sh postgres &
-        sleep 10
+        sleep 5
+        # Create migration role (unless it exists)
+        [ "$(psql -U test postgres -Atc "select 1 from pg_roles where rolname = '$${MIGRATION_USER_NAME}';")" = "1" ] || psql -e -U test postgres -c "CREATE ROLE $${MIGRATION_USER_NAME} LOGIN PASSWORD '$${MIGRATION_USER_PASSWORD}';"
+
+        # access for migration user
+        psql -e -U test "$${POSTGRES_DB}" -c "CREATE SCHEMA IF NOT EXISTS incremental_migration;"
+        psql -e -U test "$${POSTGRES_DB}" -c "GRANT ALL ON schema incremental_migration TO $${MIGRATION_USER_NAME}, $${POSTGRES_USER};"
+        psql -e -U test "$${POSTGRES_DB}" -c "GRANT ALL ON ALL TABLES IN schema incremental_migration TO $${MIGRATION_USER_NAME}, $${POSTGRES_USER};"
+        psql -e -U test "$${POSTGRES_DB}" -c "GRANT ALL ON ALL SEQUENCES IN schema incremental_migration TO $${MIGRATION_USER_NAME}, $${POSTGRES_USER};"
+        psql -e -U test "$${POSTGRES_DB}" -c "GRANT ALL ON ALL FUNCTIONS IN schema incremental_migration TO $${MIGRATION_USER_NAME}, $${POSTGRES_USER};"
+        psql -e -U test "$${POSTGRES_DB}" -c "ALTER DEFAULT PRIVILEGES IN SCHEMA incremental_migration GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO $${MIGRATION_USER_NAME}, $${POSTGRES_USER};"
+
         psql -U $${POSTGRES_USER} -d $${POSTGRES_DB} -c 'CREATE EXTENSION IF NOT EXISTS "uuid-ossp";'
-        if [ ! -f /tmp/pg_dump.sql ]; then
-          pg_dumpall -p 8432 -U $${POSTGRES_USER} -l $${POSTGRES_DB} -h localhost > /tmp/pg_dump.sql
-          psql -p 5432 -U $${POSTGRES_USER} -h localhost -f /tmp/pg_dump.sql $${POSTGRES_DB}
-        fi
         wait
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U test -d neuris"]
@@ -189,7 +166,5 @@ services:
       - "58080:8080"
 
 volumes:
-  db-data:
   gradle-cache:
   postgres14-data:
-  dump:
