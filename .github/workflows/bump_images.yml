@@ -2,7 +2,7 @@ name: Bump images
 
 on:
   schedule:
-    - cron: "0 0 * * *" # Every day at 8am
+    - cron: "0 6 * * *"
   # Allow to run this workflow manually
   workflow_dispatch:
 
