@@ -2,7 +2,7 @@
 import { ref, onMounted } from "vue"
 import ProcedureDetail from "./ProcedureDetail.vue"
 import ExpandableContent from "@/components/ExpandableContent.vue"
-import useQueries, { Query } from "@/composables/useQueryFromRoute"
+import useQuery, { Query } from "@/composables/useQueryFromRoute"
 import { Procedure } from "@/domain/documentUnit"
 import service from "@/services/procedureService"
 import InputField from "@/shared/components/input/InputField.vue"
@@ -25,7 +25,7 @@ async function updateProcedures(page: number, queries?: Query<string>) {
   }
 }
 
-const queries = useQueries<"q">(updateProcedures)
+const queries = useQuery<"q">(updateProcedures)
 
 async function loadDocumentUnits(loadingProcedure: Procedure) {
   if (!procedures.value) return
@@ -81,7 +81,7 @@ onMounted(() => {
           v-if="currentPage"
           navigation-position="bottom"
           :page="currentPage"
-          @update-page="updateProcedures"
+          @update-page="(page) => updateProcedures(page, queries)"
         >
           <ExpandableContent
             v-for="procedure in procedures"
