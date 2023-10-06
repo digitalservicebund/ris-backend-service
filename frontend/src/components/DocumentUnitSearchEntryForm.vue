@@ -1,8 +1,8 @@
 <script lang="ts" setup>
-import { computed, onMounted, ref, watch } from "vue"
+import { Ref, computed, onMounted, ref, watch } from "vue"
+import useQuery, { Query } from "@/composables/useQueryFromRoute"
 import { useValidationStore } from "@/composables/useValidationStore"
 import { PublicationState } from "@/domain/documentUnit"
-import DocumentUnitSearchInput from "@/domain/documentUnitSearchInput"
 import Checkbox from "@/shared/components/input/CheckboxInput.vue"
 import DateInput from "@/shared/components/input/DateInput.vue"
 import DropdownInput from "@/shared/components/input/DropdownInput.vue"
@@ -13,26 +13,25 @@ import TextButton from "@/shared/components/input/TextButton.vue"
 import TextInput from "@/shared/components/input/TextInput.vue"
 import { DropdownItem, ValidationError } from "@/shared/components/input/types"
 
-const props = defineProps<{
-  modelValue?: DocumentUnitSearchInput
+defineProps<{
   isLoading?: boolean
 }>()
 
 const emit = defineEmits<{
-  search: [value: DocumentUnitSearchInput]
+  search: [value: Query<DocumentUnitSearchParameter>]
   resetSearchResults: [void]
 }>()
 
-const validationStore =
-  useValidationStore<(typeof DocumentUnitSearchInput.fields)[number]>()
-
-const submitButtonError = ref()
-
-const searchEntry = ref<DocumentUnitSearchInput>(props.modelValue ?? {})
-
+const validationStore = useValidationStore<DocumentUnitSearchParameter>()
+const { route, getQueriesFromRoute, pushQueriesToRoute } =
+  useQuery<DocumentUnitSearchParameter>()
+const query = ref(getQueriesFromRoute()) as Ref<
+  Query<DocumentUnitSearchParameter>
+>
 const searchEntryEmpty = computed(() => {
-  return Object.keys(searchEntry.value).length === 0
+  return Object.keys(query.value).length === 0
 })
+const submitButtonError = ref()
 
 const dropdownItems: DropdownItem[] = [
   { label: "Alle", value: "" },
@@ -41,123 +40,66 @@ const dropdownItems: DropdownItem[] = [
   { label: "In Veröffentlichung", value: PublicationState.PUBLISHING },
 ]
 
-const documentNumberOrFileNumber = computed({
-  get: () => searchEntry.value?.documentNumberOrFileNumber,
-  set: (data) => {
-    if (data?.length === 0) {
-      delete searchEntry.value.documentNumberOrFileNumber
-    } else {
-      searchEntry.value.documentNumberOrFileNumber = data
-    }
-  },
-})
-
-const publicationStatus = computed({
-  get: () => searchEntry.value?.publicationStatus,
-  set: (data) => {
-    if (data?.length === 0) {
-      delete searchEntry.value.publicationStatus
-    } else {
-      searchEntry.value.publicationStatus = data
-    }
-  },
-})
-
-const courtType = computed({
-  get: () => searchEntry.value?.courtType,
-  set: (data) => {
-    if (data?.length === 0) {
-      delete searchEntry.value.courtType
-    } else {
-      searchEntry.value.courtType = data
-    }
-  },
-})
-
-const courtLocation = computed({
-  get: () => searchEntry.value?.courtLocation,
-  set: (data) => {
-    if (data?.length === 0) {
-      delete searchEntry.value.courtLocation
-    } else {
-      searchEntry.value.courtLocation = data
-    }
-  },
-})
-
-const decisionDate = computed({
-  get: () => searchEntry.value?.decisionDate,
-  set: (data) => {
-    if (data?.length === 0 || !data) {
-      delete searchEntry.value.decisionDate
-    } else {
-      searchEntry.value.decisionDate = data
-    }
-    validateSearchInput()
-  },
-})
-
-const decisionDateEnd = computed({
-  get: () => searchEntry.value?.decisionDateEnd,
-  set: (data) => {
-    if (data?.length === 0 || !data) {
-      delete searchEntry.value.decisionDateEnd
-      if (validationStore.getByMessage("Startdatum fehlt").length === 1) {
-        validationStore.remove("decisionDate")
-      }
-    } else {
-      searchEntry.value.decisionDateEnd = data
-    }
-    validateSearchInput()
-  },
-})
-
 const myDocOfficeOnly = computed({
   get: () =>
-    searchEntry.value?.myDocOfficeOnly
-      ? JSON.parse(searchEntry.value.myDocOfficeOnly)
+    query.value?.myDocOfficeOnly
+      ? JSON.parse(query.value.myDocOfficeOnly)
       : false,
   set: (data) => {
-    searchEntry.value.myDocOfficeOnly = data.toString()
+    if (!data) {
+      delete query.value.withError
+      delete query.value.myDocOfficeOnly
+    } else {
+      query.value.myDocOfficeOnly = "true"
+    }
   },
 })
 
-const withErrors = computed({
+const withError = computed({
   get: () =>
-    searchEntry.value?.withError
-      ? JSON.parse(searchEntry.value.withError)
-      : false,
+    query.value?.withError ? JSON.parse(query.value.withError) : false,
   set: (data) => {
-    searchEntry.value.withError = data.toString()
+    if (!data) {
+      delete query.value.withError
+    } else {
+      query.value.withError = "true"
+    }
   },
 })
 
 function resetSearch() {
   validationStore.reset()
   submitButtonError.value = undefined
-  searchEntry.value = {}
+  query.value = {}
+  pushQueriesToRoute(query.value)
   emit("resetSearchResults")
 }
 
-function resetErrors(id?: (typeof DocumentUnitSearchInput.fields)[number]) {
+function resetErrors(id?: DocumentUnitSearchParameter) {
   if (id) validationStore.remove(id)
   submitButtonError.value = undefined
 }
 
 async function validateSearchInput() {
+  //Startdatum fehlt
   if (
-    searchEntry.value?.decisionDateEnd &&
-    !searchEntry.value?.decisionDate &&
+    query.value?.decisionDateEnd &&
+    !query.value?.decisionDate &&
     !validationStore.getByField("decisionDate")
   ) {
     validationStore.add("Startdatum fehlt", "decisionDate")
+  } else if (
+    !query.value.decisionDateEnd &&
+    validationStore.getByMessage("Startdatum fehlt").length === 1
+  ) {
+    validationStore.remove("decisionDate")
   }
 
+  //Enddatum darf nich vor Startdatum liegen
   if (
-    searchEntry.value?.decisionDateEnd &&
-    searchEntry.value?.decisionDate &&
-    new Date(searchEntry.value.decisionDate) >
-      new Date(searchEntry.value.decisionDateEnd)
+    query.value?.decisionDateEnd &&
+    query.value?.decisionDate &&
+    new Date(query.value.decisionDate) > new Date(query.value.decisionDateEnd)
   ) {
     !validationStore.getByField("decisionDateEnd") &&
       validationStore.add(
@@ -172,42 +114,59 @@ async function validateSearchInput() {
   }
 }
 
-function handleSearchButtonClicked() {
-  validateSearchInput()
-
-  if (searchEntryEmpty.value) {
-    submitButtonError.value = "Geben Sie mindestens ein Suchkriterium ein"
-  } else if (validationStore.getAll().length > 0) {
-    submitButtonError.value = "Fehler in Suchkriterien"
-  } else emit("search", searchEntry.value)
-}
-
 function handleLocalInputError(error: ValidationError | undefined, id: string) {
   if (error) {
     validationStore.add(
       error.message,
-      error.instance as (typeof DocumentUnitSearchInput.fields)[number],
+      error.instance as DocumentUnitSearchParameter,
     )
-  } else
-    validationStore.remove(
-      id as (typeof DocumentUnitSearchInput.fields)[number],
-    )
-
+  } else validationStore.remove(id as DocumentUnitSearchParameter)
   validateSearchInput()
 }
 
+function handleSearchButtonClicked() {
+  validateSearchInput()
+  if (searchEntryEmpty.value) {
+    submitButtonError.value = "Geben Sie mindestens ein Suchkriterium ein"
+  } else if (validationStore.getAll().length > 0) {
+    submitButtonError.value = "Fehler in Suchkriterien"
+  } else {
+    pushQueriesToRoute(query.value)
+  }
+}
+
 watch(
-  () => props.modelValue,
+  route,
   () => {
-    searchEntry.value = props.modelValue ?? {}
+    query.value = getQueriesFromRoute()
+    emit("search", getQueriesFromRoute())
+  },
+  { deep: true },
+)
+
+watch(
+  query,
+  () => {
+    validateSearchInput()
   },
   { deep: true },
 )
 
 onMounted(async () => {
-  searchEntry.value = props.modelValue ?? {}
-  validateSearchInput()
+  if (!searchEntryEmpty.value) emit("search", getQueriesFromRoute())
 })
+</script>
+
+<script lang="ts">
+export type DocumentUnitSearchParameter =
+  | "documentNumberOrFileNumber"
+  | "publicationStatus"
+  | "courtType"
+  | "courtLocation"
+  | "decisionDate"
+  | "decisionDateEnd"
+  | "withError"
+  | "myDocOfficeOnly"
 </script>
 
 <template>
@@ -228,7 +187,7 @@ onMounted(async () => {
         >
           <TextInput
             id="documentNumberOrFileNumber"
-            v-model="documentNumberOrFileNumber"
+            v-model="query.documentNumberOrFileNumber"
             aria-label="Dokumentnummer oder Aktenzeichen Suche"
             class="ds-input-small"
             placeholder="Dokumentnummer/ Aktenzeichen"
@@ -240,7 +199,7 @@ onMounted(async () => {
         <InputField id="courtType" label="Gerichtstyp" visually-hide-label>
           <TextInput
             id="courtType"
-            v-model="courtType"
+            v-model="query.courtType"
             aria-label="Gerichtstyp Suche"
             class="ds-input-small"
             placeholder="Gerichtstyp"
@@ -250,7 +209,7 @@ onMounted(async () => {
         <InputField id="courtLocation" label="Gerichtsort" visually-hide-label>
           <TextInput
             id="courtLocation"
-            v-model="courtLocation"
+            v-model="query.courtLocation"
             aria-label="Gerichtsort Suche"
             class="ds-input-small"
             placeholder="Gerichtsort"
@@ -269,14 +228,12 @@ onMounted(async () => {
         >
           <DateInput
             :id="id"
-            v-model="decisionDate"
+            v-model="query.decisionDate"
             aria-label="Entscheidungsdatum Suche"
             class="ds-input-small"
             :has-error="hasError"
             @blur="validateSearchInput"
-            @focus="
-              resetErrors(id as (typeof DocumentUnitSearchInput.fields)[number])
-            "
+            @focus="resetErrors(id as DocumentUnitSearchParameter)"
             @update:validation-error="
               (validationError) => handleLocalInputError(validationError, id)
             "
@@ -293,15 +250,13 @@ onMounted(async () => {
         >
           <DateInput
             :id="id"
-            v-model="decisionDateEnd"
+            v-model="query.decisionDateEnd"
             aria-label="Entscheidungsdatum Suche Ende"
             class="ds-input-small"
             :has-error="hasError"
             placeholder="TT.MM.JJJJ (optional)"
             @blur="validateSearchInput"
-            @focus="
-              resetErrors(id as (typeof DocumentUnitSearchInput.fields)[number])
-            "
+            @focus="resetErrors(id as DocumentUnitSearchParameter)"
             @update:validation-error="
               (validationError) => handleLocalInputError(validationError, id)
             "
@@ -317,7 +272,7 @@ onMounted(async () => {
         <InputField id="status" label="Status" visually-hide-label>
           <DropdownInput
             id="status"
-            v-model="publicationStatus"
+            v-model="query.publicationStatus"
             aria-label="Status Suche"
             class="ds-select-small"
             :items="dropdownItems"
@@ -349,7 +304,7 @@ onMounted(async () => {
         >
           <Checkbox
             :id="id"
-            v-model="withErrors"
+            v-model="withError"
             aria-label="Nur fehlerhafte Dokumentationseinheiten"
             class="ds-checkbox-mini"
             @focus="resetErrors"

@@ -1,11 +1,17 @@
-import { Ref, ref, watch } from "vue"
 import { useRouter, useRoute } from "vue-router"
+
+function truncateQuery(query: Query<string>): Query<string> {
+  const truncatedQuery: Query<string> = {}
+
+  for (const key in query) {
+    if (query[key] != "") truncatedQuery[key] = query[key]
+  }
+  return truncatedQuery
+}
 
 export type Query<T extends string> = { [key in T]?: string }
 
-export default function useQuery<T extends string>(
-  searchCallback: (page: number, query: Query<T>) => Promise<void>,
-) {
+export default function useQuery<T extends string>() {
   const route = useRoute()
   const router = useRouter()
 
@@ -19,36 +25,8 @@ export default function useQuery<T extends string>(
     return query
   }
 
-  const query = ref(getQueriesFromRoute()) as Ref<Query<T>>
+  const pushQueriesToRoute = (currentQuerry: Query<T>) =>
+    void router.push({ query: truncateQuery(currentQuerry) })
 
-  const debouncedRouterPush = (() => {
-    let timeoutId: number | null = null
-
-    return (currentQuerry: Query<T>) => {
-      if (timeoutId !== null) window.clearTimeout(timeoutId)
-
-      timeoutId = window.setTimeout(
-        () =>
-          void router.push(
-            Object.values(currentQuerry).some((value) => value != "")
-              ? { query: currentQuerry }
-              : {},
-          ),
-        300,
-      )
-    }
-  })()
-
-  watch(
-    query,
-    async () => {
-      await searchCallback(0, query.value)
-      debouncedRouterPush(query.value)
-    },
-    { deep: true },
-  )
-
-  watch(route, () => (query.value = getQueriesFromRoute()))
-
-  return query
+  return { getQueriesFromRoute, pushQueriesToRoute, route }
 }

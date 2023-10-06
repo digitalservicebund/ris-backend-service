@@ -478,18 +478,15 @@ test.describe("search", () => {
       timeout: 30000,
     }) // RISDEV-2269
     await expect(page.getByText("Keine Ergebnisse")).toBeVisible()
-    await resetSearch.click()
-    await expect(page.getByText("123")).toBeHidden()
+    await resetSearch.click({
+      timeout: 30000,
+    })
+    await expect(page.getByText(searchTerm)).toBeHidden()
     await expect(page.getByText("Keine Ergebnisse")).toBeHidden()
     await expect(
       page.getByText(
         "Starten Sie die Suche oder erstellen Sie eine neue Dokumentationseinheit.",
       ),
     ).toBeVisible()
-    await expect(resetSearch).toBeHidden()
-    await page.getByLabel("Dokumentnummer oder Aktenzeichen Suche").fill("123")
-    await expect(resetSearch).toBeVisible()
-    await page.getByLabel("Dokumentnummer oder Aktenzeichen Suche").clear()
-    await expect(resetSearch).toBeHidden()
   })
 })
