@@ -39,17 +39,7 @@ const dropdownItems: DropdownItem[] = [
   { label: "In Veröffentlichung", value: PublicationState.PUBLISHING },
 ]
 
-watch(
-  query,
-  (newQuery, oldQuery) => {
-    if (
-      newQuery.decisionDate != oldQuery.decisionDate ||
-      newQuery.decisionDateEnd != oldQuery.decisionDateEnd
-    )
-      validateSearchInput()
-  },
-  { deep: true },
-)
+watch(query, () => validateSearchInput(), { deep: true })
 
 const myDocOfficeOnly = computed({
   get: () =>
@@ -98,7 +88,7 @@ async function validateSearchInput() {
   ) {
     validationStore.add("Startdatum fehlt", "decisionDate")
   } else if (
-    query.value.decisionDateEnd?.length === 0 &&
+    !query.value.decisionDateEnd &&
     validationStore.getByMessage("Startdatum fehlt").length === 1
   ) {
     validationStore.remove("decisionDate")

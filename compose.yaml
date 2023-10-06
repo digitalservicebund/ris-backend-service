@@ -110,7 +110,7 @@ services:
         docker-entrypoint.sh postgres &
         sleep 5
         # Create migration role (unless it exists)
-        [ "$(psql -U test postgres -Atc "select 1 from pg_roles where rolname = '$${MIGRATION_USER_NAME}';")" = "1" ] || psql -e -U test postgres -c "CREATE ROLE $${MIGRATION_USER_NAME} LOGIN PASSWORD '$${MIGRATION_USER_PASSWORD}';"
+        [ "$$(psql -U test postgres -Atc "select 1 from pg_roles where rolname = '$${MIGRATION_USER_NAME}';")" = "1" ] || psql -e -U test postgres -c "CREATE ROLE $${MIGRATION_USER_NAME} LOGIN PASSWORD '$${MIGRATION_USER_PASSWORD}';"
 
         # access for migration user
         psql -e -U test "$${POSTGRES_DB}" -c "CREATE SCHEMA IF NOT EXISTS incremental_migration;"

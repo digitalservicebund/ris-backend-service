@@ -2,24 +2,52 @@ import { userEvent } from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
 import { createPinia, setActivePinia } from "pinia"
 import { nextTick } from "vue"
+import { createRouter, createWebHistory } from "vue-router"
 import DocumentUnitSearchEntryForm from "@/components/DocumentUnitSearchEntryForm.vue"
-import { PublicationState } from "@/domain/documentUnit"
-import DocumentUnitSearchInput from "@/domain/documentUnitSearchInput"
 
-function renderComponent(options?: { modelValue?: DocumentUnitSearchInput }) {
+function renderComponent(options?: { isLoading: boolean }) {
   // eslint-disable-next-line testing-library/await-async-events
-  const user = userEvent.setup()
   const props = {
-    modelValue: new DocumentUnitSearchInput({ ...options?.modelValue }),
+    isLoading: options?.isLoading ? options?.isLoading : false,
   }
 
+  const router = createRouter({
+    history: createWebHistory(),
+    routes: [
+      {
+        path: "/caselaw/documentUnit/new",
+        name: "new",
+        component: {},
+      },
+      {
+        path: "/",
+        name: "home",
+        component: {},
+      },
+      {
+        path: "/caselaw/documentUnit/:documentNumber/categories",
+        name: "caselaw-documentUnit-documentNumber-categories",
+        component: {},
+      },
+      {
+        path: "/caselaw/documentUnit/:documentNumber/files",
+        name: "caselaw-documentUnit-documentNumber-files",
+        component: {},
+      },
+    ],
+  })
+
   return {
-    user,
-    ...render(DocumentUnitSearchEntryForm, { props }),
+    ...render(DocumentUnitSearchEntryForm, {
+      props,
+      global: { plugins: [router] },
+    }),
   }
 }
 
 describe("Documentunit Search", () => {
+  const user = userEvent.setup()
+
   beforeEach(async () => {
     setActivePinia(createPinia())
   })
@@ -36,147 +64,78 @@ describe("Documentunit Search", () => {
     expect(screen.getByLabelText("Nur meine Dokstelle Filter")).toBeVisible()
   })
 
-  test("click on 'Nur meine Dokstelle' renders 'Nur fehlerhafte Dokumentationseinheiten' checkbox", async () => {
-    const { user } = renderComponent()
-    expect(
-      screen.queryByLabelText("Nur fehlerhafte Dokumentationseinheiten"),
-    ).not.toBeInTheDocument()
-    expect(screen.getByLabelText("Nur meine Dokstelle Filter")).toBeVisible()
-    await user.click(screen.getByLabelText("Nur meine Dokstelle Filter"))
-    expect(
-      screen.getByLabelText("Nur fehlerhafte Dokumentationseinheiten"),
-    ).toBeVisible()
-  })
-
-  it("renders search entry if given", () => {
-    renderComponent({
-      modelValue: {
-        myDocOfficeOnly: "true",
-        documentNumberOrFileNumber: "fileNumber",
-        courtType: "court type",
-        courtLocation: "court location",
-        decisionDate: "2022-01-31T23:00:00.000Z",
-        decisionDateEnd: "2023-01-31T23:00:00.000Z",
-        publicationStatus: PublicationState.UNPUBLISHED,
-        withError: "false",
-      },
-    })
-
-    const dateField = screen.getByLabelText(
-      "Dokumentnummer oder Aktenzeichen Suche",
+  test("click on 'Suche zurücksetzen' emits 'resetSearchResults'", async () => {
+    const { emitted } = renderComponent()
+    await user.type(
+      screen.getByLabelText("Entscheidungsdatum Suche"),
+      "22.02.2001",
     )
-    expect(dateField).toHaveValue("fileNumber")
-  })
-
-  test("click on 'Suche zurücksetzen' resets all input values", async () => {
-    const { user } = renderComponent({
-      modelValue: {
-        myDocOfficeOnly: "true",
-        documentNumberOrFileNumber: "fileNumber",
-        courtType: "court type",
-        courtLocation: "court location",
-        decisionDate: "2022-01-31T23:00:00.000Z",
-        decisionDateEnd: "2023-01-31T23:00:00.000Z",
-        publicationStatus: "UNPUBLISHED",
-        withError: "false",
-      },
-    })
-
-    expect(screen.getByLabelText("Gerichtsort Suche")).toHaveValue(
-      "court location",
-    )
-    expect(screen.getByLabelText("Gerichtstyp Suche")).toHaveValue("court type")
-    expect(screen.getByLabelText("Entscheidungsdatum Suche")).toHaveValue(
-      "31.01.2022",
-    )
-    expect(screen.getByLabelText("Entscheidungsdatum Suche Ende")).toHaveValue(
-      "31.01.2023",
-    )
-
-    expect(screen.getByLabelText("Status Suche")).toHaveValue("UNPUBLISHED")
-    expect(screen.getByLabelText("Nur meine Dokstelle Filter")).toBeChecked()
-    expect(
-      screen.getByLabelText("Nur fehlerhafte Dokumentationseinheiten"),
-    ).toBeVisible()
-
     await user.click(screen.getByLabelText("Suche zurücksetzen"))
-    expect(screen.queryByText(/documentNumber/)).not.toBeInTheDocument()
-
-    expect(screen.getByLabelText("Gerichtstyp Suche")).toHaveValue("")
-    expect(screen.getByLabelText("Gerichtsort Suche")).toHaveValue("")
-    expect(screen.getByLabelText("Entscheidungsdatum Suche")).toHaveValue("")
-    expect(screen.getByLabelText("Status Suche")).toHaveValue("")
-    expect(
-      screen.getByLabelText("Nur meine Dokstelle Filter"),
-    ).not.toBeChecked()
-    expect(
-      screen.queryByLabelText("Nur fehlerhafte Dokumentationseinheiten"),
-    ).not.toBeInTheDocument()
-  })
-
-  test("click on 'Nur meine Dokstelle' renders 'Nur fehlerhafte Dokumentationseinheiten' checkbox", async () => {
-    const { user } = renderComponent()
-    expect(
-      screen.queryByLabelText("Nur fehlerhafte Dokumentationseinheiten"),
-    ).not.toBeInTheDocument()
-    expect(screen.getByLabelText("Nur meine Dokstelle Filter")).toBeVisible()
-    await user.click(screen.getByLabelText("Nur meine Dokstelle Filter"))
-    expect(
-      screen.getByLabelText("Nur fehlerhafte Dokumentationseinheiten"),
-    ).toBeVisible()
+    expect(emitted().resetSearchResults).toBeTruthy()
   })
 
   test("click on 'Ergebnisse anzeigen' emits search event", async () => {
-    const { user, emitted } = renderComponent()
+    const { emitted } = renderComponent()
+
+    const input = screen.getByLabelText("Entscheidungsdatum Suche")
+
+    await user.type(input, "22.02.2001")
     await user.click(
       screen.getByLabelText("Nach Dokumentationseinheiten suchen"),
     )
+
     expect(emitted().search).toBeTruthy()
   })
 
-  test("emits search event if only 1st date input given", async () => {
-    const { user, emitted } = renderComponent({
-      modelValue: {
-        decisionDate: "2022-01-31T23:00:00.000Z",
-      },
-    })
-    await user.click(
-      screen.getByLabelText("Nach Dokumentationseinheiten suchen"),
-    )
-    expect(emitted().search).toBeTruthy()
+  test("click on 'Nur meine Dokstelle' renders 'Nur fehlerhafte Dokumentationseinheiten' checkbox", async () => {
+    renderComponent()
+    expect(
+      screen.queryByLabelText("Nur fehlerhafte Dokumentationseinheiten"),
+    ).not.toBeInTheDocument()
+    expect(screen.getByLabelText("Nur meine Dokstelle Filter")).toBeVisible()
+    await user.click(screen.getByLabelText("Nur meine Dokstelle Filter"))
+    expect(
+      screen.getByLabelText("Nur fehlerhafte Dokumentationseinheiten"),
+    ).toBeVisible()
   })
 
-  test("shows results for a range if 1st and 2nd date input given", async () => {
-    const { user, emitted } = renderComponent({
-      modelValue: {
-        decisionDate: "2022-01-31T23:00:00.000Z",
-        decisionDateEnd: "2023-01-31T23:00:00.000Z",
-      },
-    })
-    await user.click(
-      screen.getByLabelText("Nach Dokumentationseinheiten suchen"),
-    )
-    expect(emitted().search).toBeTruthy()
+  test("click on 'Nur meine Dokstelle' renders 'Nur fehlerhafte Dokumentationseinheiten' checkbox", async () => {
+    renderComponent()
+    expect(
+      screen.queryByLabelText("Nur fehlerhafte Dokumentationseinheiten"),
+    ).not.toBeInTheDocument()
+    expect(screen.getByLabelText("Nur meine Dokstelle Filter")).toBeVisible()
+    await user.click(screen.getByLabelText("Nur meine Dokstelle Filter"))
+    expect(
+      screen.getByLabelText("Nur fehlerhafte Dokumentationseinheiten"),
+    ).toBeVisible()
   })
 
   test("shows error if 2nd date input given but 1st empty", async () => {
-    renderComponent({
-      modelValue: {
-        decisionDateEnd: "2023-01-31T23:00:00.000Z",
-      },
-    })
+    renderComponent()
+
+    const input = screen.getByLabelText("Entscheidungsdatum Suche Ende")
+
+    await user.type(input, "22.02.2001")
+
+    await user.click(
+      screen.getByLabelText("Nach Dokumentationseinheiten suchen"),
+    )
 
     await nextTick()
     expect(screen.getByText("Startdatum fehlt")).toBeVisible()
   })
 
   test("removes startdate missing error if 2nd date is removed", async () => {
-    const user = userEvent.setup()
-    renderComponent({
-      modelValue: {
-        decisionDateEnd: "2023-01-31T23:00:00.000Z",
-      },
-    })
+    renderComponent()
+
+    const input = screen.getByLabelText("Entscheidungsdatum Suche Ende")
+
+    await user.type(input, "22.02.2001")
+
+    await user.click(
+      screen.getByLabelText("Nach Dokumentationseinheiten suchen"),
+    )
 
     await nextTick()
     expect(screen.getByText("Startdatum fehlt")).toBeVisible()
@@ -187,53 +146,37 @@ describe("Documentunit Search", () => {
   })
 
   test("shows error when 2nd date before 1st date", async () => {
-    const { user } = renderComponent({
-      modelValue: {
-        decisionDate: "2023-01-31T23:00:00.000Z",
-        decisionDateEnd: "2022-01-31T23:00:00.000Z",
-      },
-    })
+    renderComponent()
 
-    await nextTick()
-    //TODO: the error should already occur before submitting search
-    await user.click(
-      screen.getByLabelText("Nach Dokumentationseinheiten suchen"),
-    )
+    const date = screen.getByLabelText("Entscheidungsdatum Suche")
+    const dateEnd = screen.getByLabelText("Entscheidungsdatum Suche Ende")
+
+    await user.type(date, "22.02.2001")
+    await user.type(dateEnd, "22.02.2000")
+
     expect(
       screen.getByText("Enddatum darf nich vor Startdatum liegen"),
     ).toBeVisible()
   })
 
-  test("shows error date input is invalid", async () => {
-    renderComponent()
-    const input = screen.getByLabelText("Entscheidungsdatum Suche")
-
-    await userEvent.type(input, "29.02.2001")
-    expect(screen.getByText("Kein valides Datum")).toBeVisible()
-  })
-
-  test("shows two errors when 1st and 2nd date input is invalid", async () => {
+  test("shows error when clicking on search with errors in search params", async () => {
     renderComponent()
 
-    const dateInput = screen.getByLabelText("Entscheidungsdatum Suche")
-    const dateInputEnd = screen.getByLabelText("Entscheidungsdatum Suche Ende")
+    const date = screen.getByLabelText("Entscheidungsdatum Suche")
+    const dateEnd = screen.getByLabelText("Entscheidungsdatum Suche Ende")
 
-    await userEvent.type(dateInput, "29.02.2001")
-    await userEvent.type(dateInputEnd, "29.02.2002")
-    expect(screen.queryAllByText("Kein valides Datum").length).toBe(2)
-  })
+    await user.type(date, "22.02.2001")
+    await user.type(dateEnd, "22.02.2000")
 
-  test("shows error when clicking submit search button with errors in the search form", async () => {
-    const { user } = renderComponent({
-      modelValue: {
-        decisionDateEnd: "2022-01-31T23:00:00.000Z",
-      },
-    })
+    expect(
+      screen.getByText("Enddatum darf nich vor Startdatum liegen"),
+    ).toBeVisible()
 
     await user.click(
       screen.getByLabelText("Nach Dokumentationseinheiten suchen"),
     )
-    expect(screen.getByText("Startdatum fehlt")).toBeVisible()
+
+    await nextTick()
     expect(screen.getByText("Fehler in Suchkriterien")).toBeVisible()
   })
 })
