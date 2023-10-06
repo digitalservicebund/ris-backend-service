@@ -139,7 +139,8 @@ watch(
   route,
   () => {
     query.value = getQueriesFromRoute()
-    emit("search", getQueriesFromRoute())
+    if (!searchEntryEmpty.value) emit("search", getQueriesFromRoute())
+    else resetSearch()
   },
   { deep: true },
 )
