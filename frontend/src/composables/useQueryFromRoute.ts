@@ -25,18 +25,8 @@ export default function useQuery<T extends string>() {
     return query
   }
 
-  const pushQueriesToRoute = (() => {
-    let timeoutId: number | null = null
-
-    return (currentQuerry: Query<T>) => {
-      if (timeoutId !== null) window.clearTimeout(timeoutId)
-
-      timeoutId = window.setTimeout(
-        () => void router.push({ query: truncateQuery(currentQuerry) }),
-        300,
-      )
-    }
-  })()
+  const pushQueriesToRoute = (currentQuerry: Query<T>) =>
+    void router.push({ query: truncateQuery(currentQuerry) })
 
   return { getQueriesFromRoute, pushQueriesToRoute, route }
 }

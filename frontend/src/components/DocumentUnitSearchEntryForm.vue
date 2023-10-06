@@ -23,10 +23,7 @@ const emit = defineEmits<{
 }>()
 
 const validationStore = useValidationStore<DocumentUnitSearchParameter>()
-
-const submitButtonError = ref()
-
-const { getQueriesFromRoute, pushQueriesToRoute, route } =
+const { route, getQueriesFromRoute, pushQueriesToRoute } =
   useQuery<DocumentUnitSearchParameter>()
 const query = ref(getQueriesFromRoute()) as Ref<
   Query<DocumentUnitSearchParameter>
@@ -34,6 +31,7 @@ const query = ref(getQueriesFromRoute()) as Ref<
 const searchEntryEmpty = computed(() => {
   return Object.keys(query.value).length === 0
 })
+const submitButtonError = ref()
 
 const dropdownItems: DropdownItem[] = [
   { label: "Alle", value: "" },
@@ -41,8 +39,6 @@ const dropdownItems: DropdownItem[] = [
   { label: "Unveröffentlicht", value: PublicationState.UNPUBLISHED },
   { label: "In Veröffentlichung", value: PublicationState.PUBLISHING },
 ]
-
-watch(query, () => validateSearchInput(), { deep: true })
 
 const myDocOfficeOnly = computed({
   get: () =>
@@ -75,6 +71,7 @@ function resetSearch() {
   validationStore.reset()
   submitButtonError.value = undefined
   query.value = {}
+  pushQueriesToRoute(query.value)
   emit("resetSearchResults")
 }
 
@@ -84,6 +81,7 @@ function resetErrors(id?: DocumentUnitSearchParameter) {
 }
 
 async function validateSearchInput() {
+  //Startdatum fehlt
   if (
     query.value?.decisionDateEnd &&
     !query.value?.decisionDate &&
@@ -97,6 +95,7 @@ async function validateSearchInput() {
     validationStore.remove("decisionDate")
   }
 
+  //Enddatum darf nich vor Startdatum liegen
   if (
     query.value?.decisionDateEnd &&
     query.value?.decisionDate &&
@@ -115,17 +114,6 @@ async function validateSearchInput() {
   }
 }
 
-function handleSearchButtonClicked() {
-  validateSearchInput()
-
-  if (searchEntryEmpty.value) {
-    submitButtonError.value = "Geben Sie mindestens ein Suchkriterium ein"
-  } else if (validationStore.getAll().length > 0) {
-    submitButtonError.value = "Fehler in Suchkriterien"
-  } else emit("search", query.value)
-  pushQueriesToRoute(query.value)
-}
-
 function handleLocalInputError(error: ValidationError | undefined, id: string) {
   if (error) {
     validationStore.add(
@@ -133,25 +121,39 @@ function handleLocalInputError(error: ValidationError | undefined, id: string) {
       error.instance as DocumentUnitSearchParameter,
     )
   } else validationStore.remove(id as DocumentUnitSearchParameter)
-
   validateSearchInput()
+}
+
+function handleSearchButtonClicked() {
+  validateSearchInput()
+  if (searchEntryEmpty.value) {
+    submitButtonError.value = "Geben Sie mindestens ein Suchkriterium ein"
+  } else if (validationStore.getAll().length > 0) {
+    submitButtonError.value = "Fehler in Suchkriterien"
+  } else {
+    pushQueriesToRoute(query.value)
+  }
 }
 
 watch(
   route,
   () => {
-    emit("search", query.value)
+    query.value = getQueriesFromRoute()
+    emit("search", getQueriesFromRoute())
+  },
+  { deep: true },
+)
+
+watch(
+  query,
+  () => {
+    validateSearchInput()
   },
   { deep: true },
 )
 
 onMounted(async () => {
-  validateSearchInput()
-
-  if (Object.keys(query.value).length > 0) {
-    // searchQuery.value = route.query as DocumentUnitSearchInput
-    emit("search", query.value)
-  }
+  if (!searchEntryEmpty.value) emit("search", getQueriesFromRoute())
 })
 </script>
 
