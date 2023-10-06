@@ -234,28 +234,13 @@ test.describe("court", () => {
   }) => {
     await navigateToCategories(page, documentNumber)
     await waitForInputValue(page, "select#legalEffect", "Keine Angabe")
-
-    await waitForSaving(
-      async () => {
-        await page.locator("[aria-label='Gericht']").fill("bgh")
-        await page.locator("text=BGH").click()
-        await waitForInputValue(page, "[aria-label='Gericht']", "BGH")
-        await waitForInputValue(page, "select#legalEffect", "Ja")
-      },
-      page,
-      { clickSaveButton: true, reload: true },
-    )
-
-    await waitForSaving(
-      async () => {
-        await page
-          .getByRole("combobox", { name: "Rechtskraft" })
-          .selectOption("Nein")
-      },
-      page,
-      { clickSaveButton: true, reload: true },
-    )
-
+    await page.locator("[aria-label='Gericht']").fill("bgh")
+    await page.locator("text=BGH").click()
+    await waitForInputValue(page, "[aria-label='Gericht']", "BGH")
+    await waitForInputValue(page, "select#legalEffect", "Ja")
+    await page
+      .getByRole("combobox", { name: "Rechtskraft" })
+      .selectOption("Nein")
     await waitForInputValue(page, "select#legalEffect", "Nein")
     await expect(page.getByLabel("Rechtskraft")).toHaveValue("Nein")
   })
