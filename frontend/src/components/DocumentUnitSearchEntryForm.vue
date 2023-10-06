@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, onMounted, ref, watch } from "vue"
+import { Ref, computed, onMounted, ref, watch } from "vue"
 import useQuery, { Query } from "@/composables/useQueryFromRoute"
 import { useValidationStore } from "@/composables/useValidationStore"
 import { PublicationState } from "@/domain/documentUnit"
@@ -26,8 +26,11 @@ const validationStore = useValidationStore<DocumentUnitSearchParameter>()
 
 const submitButtonError = ref()
 
-const query = useQuery<DocumentUnitSearchParameter>()
-
+const { getQueriesFromRoute, pushQueriesToRoute, route } =
+  useQuery<DocumentUnitSearchParameter>()
+const query = ref(getQueriesFromRoute()) as Ref<
+  Query<DocumentUnitSearchParameter>
+>
 const searchEntryEmpty = computed(() => {
   return Object.keys(query.value).length === 0
 })
@@ -120,6 +123,7 @@ function handleSearchButtonClicked() {
   } else if (validationStore.getAll().length > 0) {
     submitButtonError.value = "Fehler in Suchkriterien"
   } else emit("search", query.value)
+  pushQueriesToRoute(query.value)
 }
 
 function handleLocalInputError(error: ValidationError | undefined, id: string) {
@@ -132,6 +136,14 @@ function handleLocalInputError(error: ValidationError | undefined, id: string) {
 
   validateSearchInput()
 }
+
+watch(
+  route,
+  () => {
+    emit("search", query.value)
+  },
+  { deep: true },
+)
 
 onMounted(async () => {
   validateSearchInput()

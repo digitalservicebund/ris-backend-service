@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref, onMounted } from "vue"
+import { Ref, ref, onMounted, watch } from "vue"
 import ProcedureDetail from "./ProcedureDetail.vue"
 import ExpandableContent from "@/components/ExpandableContent.vue"
 import useQuery, { Query } from "@/composables/useQueryFromRoute"
@@ -25,7 +25,20 @@ async function updateProcedures(page: number, queries?: Query<string>) {
   }
 }
 
-const queries = useQuery<"q">(updateProcedures)
+const { getQueriesFromRoute, pushQueriesToRoute, route } = useQuery<"q">()
+
+const query = ref(getQueriesFromRoute()) as Ref<Query<"q">>
+
+watch(route, () => (query.value = getQueriesFromRoute()))
+
+watch(
+  query,
+  async () => {
+    await updateProcedures(0, query.value)
+    pushQueriesToRoute(query.value)
+  },
+  { deep: true },
+)
 
 async function loadDocumentUnits(loadingProcedure: Procedure) {
   if (!procedures.value) return
@@ -54,7 +67,7 @@ function copyDocumentUnits(
 }
 
 onMounted(() => {
-  updateProcedures(0, queries.value)
+  updateProcedures(0, query.value)
 })
 </script>
 
@@ -67,7 +80,7 @@ onMounted(() => {
     >
       <TextInput
         id="procedureFilter"
-        v-model="queries.q"
+        v-model="query.q"
         aria-label="Dokumentnummer oder Aktenzeichen Suche"
         class="ds-input-medium"
         placeholder="Nach Vorgängen suchen"
@@ -81,7 +94,7 @@ onMounted(() => {
           v-if="currentPage"
           navigation-position="bottom"
           :page="currentPage"
-          @update-page="(page) => updateProcedures(page, queries)"
+          @update-page="(page) => updateProcedures(page, query)"
         >
           <ExpandableContent
             v-for="procedure in procedures"
