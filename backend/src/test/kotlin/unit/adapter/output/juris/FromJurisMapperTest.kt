@@ -64,6 +64,7 @@ class FromJurisMapperTest {
                         "articleMarker",
                         1,
                         listOf(Paragraph("paragraphMarker", "paragraphText")),
+                        "articleMarker",
                     ),
                     DocumentSectionData(
                         UUID.randomUUID(),
@@ -78,10 +79,10 @@ class FromJurisMapperTest {
                                 "articleMarker2",
                                 1,
                                 listOf(Paragraph("paragraphMarker2", "paragraphText2")),
+                                "articleMarker",
                             ),
                         ),
-                        1,
-                        null,
+                        "010",
                         "articleMarker2",
                         -1)),
             ageIndicationStartList = listOf("ageIndicationStart"),
@@ -161,19 +162,13 @@ class FromJurisMapperTest {
                                 Pair(1, "another footnoteChange A"),
                                 Pair(2, "another footnoteChange B"))),
                 ),
-            formula = "Formula",
-            conclusion = "Conclusion",
-            recitals = Recitals("Recital heading", "Recital text"))
+        )
 
     val guid = UUID.randomUUID()
 
     val domainNorm = mapDataToDomain(guid, extractedData)
 
     assertThat(domainNorm.guid).isEqualTo(guid)
-    assertThat(domainNorm.formula?.text).isEqualTo("Formula")
-    assertThat(domainNorm.conclusion?.text).isEqualTo("Conclusion")
-    assertThat(domainNorm.recitals?.heading).isEqualTo("Recital heading")
-    assertThat(domainNorm.recitals?.text).isEqualTo("Recital text")
     assertThat(domainNorm.documentation).hasSize(2)
 
     assertThat(domainNorm.documentation.first { it.order == 1 }).isInstanceOf(Article::class.java)
@@ -410,8 +405,7 @@ class FromJurisMapperTest {
             "marker": "Abschnitt",
             "order": 2,
             "type": "${DocumentSectionTypeData.SECTION}",
-            "level": 1,
-            "parentOrder": null,
+            "treeOrder": "010",
             "closestArticle": "§ 2",
             "closestArticlePosition": -2,
             "documentation": [
@@ -421,8 +415,7 @@ class FromJurisMapperTest {
                     "marker": "Unterabschnitt",
                     "order": 1,
                     "type": "${DocumentSectionTypeData.SUBSECTION}",
-                    "level": 2,
-                    "parentOrder": 1,
+                    "treeOrder": "010010",
                     "closestArticle": "§ 2",
                     "closestArticlePosition": -1,
                     "documentation": [
@@ -436,7 +429,9 @@ class FromJurisMapperTest {
                                     "text": "Dieses Gesetz tritt mit Ablauf des 2. Dezember 2009 außer Kraft.<Rec></Rec>",
                                     "marker": ""
                                 }
-                            ]
+                            ],
+                            "closestArticle": "§ 2",
+                            "closestArticlePosition": 0
                         }
                     ]
                 }

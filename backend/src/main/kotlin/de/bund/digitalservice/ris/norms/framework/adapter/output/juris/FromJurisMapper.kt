@@ -97,16 +97,10 @@ fun mapDataToDomain(guid: UUID, data: NormData): Norm {
               data.statusList, data.reissueList, data.repealList, data.otherStatusList) +
           createFootnoteSections(data.footnotes) +
           listOfNotNull(createAnnoucementDateSection(data.announcementDate))
-  val recitals = data.recitals?.let { Recitals(UUID.randomUUID(), null, it.heading, it.text) }
-  val conclusion = data.conclusion?.let { Conclusion(UUID.randomUUID(), it) }
-  val formula = data.formula?.let { Formula(UUID.randomUUID(), it) }
   return Norm(
       guid = guid,
       documentation = mapDocumentationToDomain(data.documentation),
       metadataSections = sections.filterNotNull(),
-      recitals = recitals,
-      conclusion = conclusion,
-      formula = formula,
   )
 }
 

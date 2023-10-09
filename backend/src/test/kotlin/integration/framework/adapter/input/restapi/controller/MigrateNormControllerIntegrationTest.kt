@@ -91,7 +91,9 @@ class MigrateNormControllerIntegrationTest : PostgresTestcontainerIntegrationTes
                                     "text": "Auf den Schienenpersonenverkehr der öffentlichen Eisenbahnen sind die Vorschriften der Verordnung (EG) Nr. 1371/2007 des Europäischen Parlaments und des Rates vom 23. Oktober 2007 über die Rechte und Pflichten der Fahrgäste im Eisenbahnverkehr (ABl. EU Nr. L 315 S. 14) anzuwenden.<Rec></Rec> Das gilt nach Maßgabe des Artikels 2 Abs. 5 der Verordnung (EG) Nr. 1371/2007 nicht, soweit auf Grund des § 26 Abs. 1 Satz 1 Nr. 1a des Allgemeinen Eisenbahngesetzes vom 27. Dezember 1993 (BGBl. I S. 2378, 2396; 1994 I S. 2439), das zuletzt durch Artikel 2 des Gesetzes vom 26. Mai 2009 (BGBl. I S. 1146) geändert worden ist, für die Beförderung im Schienenpersonennahverkehr etwas anderes bestimmt ist oder soweit es sich um Verkehrsdienste des Schienenpersonennahverkehrs handelt, die hauptsächlich aus Gründen historischen Interesses oder zu touristischen Zwecken betrieben werden.<Rec></Rec>",
                                     "marker": ""
                                 }
-                            ]
+                            ],
+                            "closestArticle" : "§ 1",
+                            "closestArticlePosition" : 0
                         },
                         {
                             "guid": "${UUID.randomUUID()}",
@@ -99,8 +101,7 @@ class MigrateNormControllerIntegrationTest : PostgresTestcontainerIntegrationTes
                             "marker": "Abschnitt",
                             "order": 2,
                             "type": "${DocumentSectionType.SECTION}",
-                            "level": 1,
-                            "parentOrder": null,
+                            "treeOrder": "010",
                             "closestArticle": "§ 2",
                             "closestArticlePosition": -2,
                             "documentation": [
@@ -110,8 +111,7 @@ class MigrateNormControllerIntegrationTest : PostgresTestcontainerIntegrationTes
                                     "marker": "Unterabschnitt",
                                     "order": 1,
                                     "type": "${DocumentSectionType.SUBSECTION}",
-                                    "level": 2,
-                                    "parentOrder": 1,
+                                    "treeOrder": "010010",
                                     "closestArticle": "§ 2",
                                     "closestArticlePosition": -1,
                                     "documentation": [
@@ -125,7 +125,9 @@ class MigrateNormControllerIntegrationTest : PostgresTestcontainerIntegrationTes
                                                     "text": "Dieses Gesetz tritt mit Ablauf des 2. Dezember 2009 außer Kraft.<Rec></Rec>",
                                                     "marker": ""
                                                 }
-                                            ]
+                                            ],
+                                            "closestArticle": "§ 2",
+                                            "closestArticlePosition": 0
                                         }
                                     ]
                                 }

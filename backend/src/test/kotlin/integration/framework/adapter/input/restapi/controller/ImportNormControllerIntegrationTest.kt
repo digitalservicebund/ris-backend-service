@@ -166,24 +166,28 @@ class ImportNormControllerIntegrationTest : PostgresTestcontainerIntegrationTest
             })
         .isTrue()
 
-    assertThat(
-            norm
-                .getFirstMetadatum(MetadataSectionName.NORM, MetadatumType.OFFICIAL_LONG_TITLE)
-                ?.value)
-        .isEqualTo("Verordnung zur Anpassung von Rechtsverordnungen an das Tierarzneimittelrecht")
-    assertThat(
-            norm.getFirstMetadatum(MetadataSectionName.NORM_PROVIDER, MetadatumType.ENTITY)?.value)
-        .isEqualTo("DEU")
-    assertThat(
-            norm
-                .getFirstMetadatum(MetadataSectionName.NORM_PROVIDER, MetadatumType.DECIDING_BODY)
-                ?.value)
-        .isEqualTo("BT")
-    assertThat(
-            norm
-                .getFirstMetadatum(
-                    MetadataSectionName.NORM_PROVIDER, MetadatumType.RESOLUTION_MAJORITY)
-                ?.value)
-        .isEqualTo(true)
+    if (norm != null) {
+      assertThat(
+              norm
+                  .getFirstMetadatum(MetadataSectionName.NORM, MetadatumType.OFFICIAL_LONG_TITLE)
+                  ?.value)
+          .isEqualTo("Verordnung zur Anpassung von Rechtsverordnungen an das Tierarzneimittelrecht")
+      assertThat(
+              norm
+                  .getFirstMetadatum(MetadataSectionName.NORM_PROVIDER, MetadatumType.ENTITY)
+                  ?.value)
+          .isEqualTo("DEU")
+      assertThat(
+              norm
+                  .getFirstMetadatum(MetadataSectionName.NORM_PROVIDER, MetadatumType.DECIDING_BODY)
+                  ?.value)
+          .isEqualTo("BT")
+      assertThat(
+              norm
+                  .getFirstMetadatum(
+                      MetadataSectionName.NORM_PROVIDER, MetadatumType.RESOLUTION_MAJORITY)
+                  ?.value)
+          .isEqualTo(true)
+    }
   }
 }
