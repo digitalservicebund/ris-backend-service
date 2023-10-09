@@ -15,14 +15,18 @@ const currentPage = ref<Page<DocumentUnitListEntry>>()
 const itemsPerPage = 30
 const searchResponseError = ref()
 const isLoading = ref(false)
+const searchQuery = ref<Query<DocumentUnitSearchParameter>>()
+const pageNumber = ref<number>(0)
 
-async function search(page = 0, query?: Query<string>) {
+async function search() {
   isLoading.value = true
 
   const response = await service.searchByDocumentUnitSearchInput({
-    ...(page != undefined ? { pg: page.toString() } : {}),
+    ...(pageNumber.value != undefined
+      ? { pg: pageNumber.value.toString() }
+      : {}),
     ...(itemsPerPage != undefined ? { sz: itemsPerPage.toString() } : {}),
-    ...query,
+    ...searchQuery.value,
   })
   if (response.data) {
     documentUnitListEntries.value = response.data.content
@@ -47,8 +51,15 @@ async function handleDelete(documentUnitListEntry: DocumentUnitListEntry) {
   }
 }
 
-async function handleSearch(value: Query<DocumentUnitSearchParameter>) {
-  await search(0, value)
+async function updatePage(page: number) {
+  pageNumber.value = page
+  search()
+}
+
+async function updateQuery(value: Query<DocumentUnitSearchParameter>) {
+  searchQuery.value = value
+  pageNumber.value = 0
+  search()
 }
 
 async function handleReset() {
@@ -62,13 +73,13 @@ async function handleReset() {
     <DocumentUnitSearchEntryForm
       :is-loading="isLoading"
       @reset-search-results="handleReset"
-      @search="handleSearch"
+      @search="updateQuery"
     />
     <Pagination
       :is-loading="isLoading"
       navigation-position="bottom"
       :page="currentPage"
-      @update-page="search"
+      @update-page="updatePage"
     >
       <DocumentUnitList
         class="grow"
