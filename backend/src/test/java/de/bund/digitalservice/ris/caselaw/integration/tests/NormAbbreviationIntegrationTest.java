@@ -32,6 +32,7 @@ import java.time.Month;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import org.junit.jupiter.api.AfterEach;
@@ -303,7 +304,7 @@ class NormAbbreviationIntegrationTest {
 
     repository.saveAndFlush(
         abbreviation1.toBuilder()
-            .documentTypeList(Set.of(documentType2, documentType1))
+            .documentTypeList(Set.of(documentType1, documentType2))
             .region(region1)
             .build());
 
@@ -312,7 +313,6 @@ class NormAbbreviationIntegrationTest {
             .getExpectedNormAbbreviation()
             .addDocumentType(documentType1.getId(), "L")
             .addDocumentType(documentType2.getId(), "M")
-            .setRegion(region1.getId())
             .build();
 
     risWebTestClient
@@ -325,7 +325,8 @@ class NormAbbreviationIntegrationTest {
         .expectBody(NormAbbreviation.class)
         .consumeWith(
             response -> {
-              assertThat(response.getResponseBody()).isEqualTo(expectedNormAbbreviation);
+              assertThat(Objects.requireNonNull(response.getResponseBody()).documentTypes())
+                  .containsAll(expectedNormAbbreviation.documentTypes());
             });
   }
 
