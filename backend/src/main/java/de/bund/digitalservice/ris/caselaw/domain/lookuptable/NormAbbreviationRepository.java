@@ -8,11 +8,11 @@ import reactor.core.publisher.Mono;
 
 @NoRepositoryBean
 public interface NormAbbreviationRepository {
-  public Mono<NormAbbreviation> findById(UUID id);
+  public NormAbbreviation findById(UUID id);
 
   Flux<NormAbbreviation> findBySearchQuery(String query, Integer size, Integer page);
 
-  Mono<List<NormAbbreviation>> findByAwesomeSearchQuery(String query, Integer size, Integer page);
+  Mono<List<NormAbbreviation>> findByAwesomeSearchQuery(String query, Integer size);
 
   Mono<Void> refreshMaterializedViews();
 }

@@ -16,30 +16,18 @@ public class NormAbbreviationService {
     this.repository = repository;
   }
 
-  public Mono<NormAbbreviation> getNormAbbreviationById(UUID uuid) {
+  public NormAbbreviation getNormAbbreviationById(UUID uuid) {
     return repository.findById(uuid);
   }
 
   public Flux<NormAbbreviation> getNormAbbreviationBySearchQuery(
       String query, Integer size, Integer page) {
-
-    Integer pageOffset = null;
-    if (page != null && size != null) {
-      pageOffset = page * size;
-    }
-
-    return repository.findBySearchQuery(query, size, pageOffset);
+    return repository.findBySearchQuery(query, size, page);
   }
 
   public Mono<List<NormAbbreviation>> getNormAbbreviationByAwesomeSearchQuery(
       String query, Integer size, Integer page) {
-
-    Integer pageOffset = null;
-    if (page != null && size != null) {
-      pageOffset = page * size;
-    }
-
-    return repository.findByAwesomeSearchQuery(query, size, pageOffset);
+    return repository.findByAwesomeSearchQuery(query, size);
   }
 
   public Mono<Void> refreshMaterializedViews() {

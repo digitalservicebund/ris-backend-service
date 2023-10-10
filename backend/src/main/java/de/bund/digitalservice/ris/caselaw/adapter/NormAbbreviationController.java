@@ -31,15 +31,14 @@ public class NormAbbreviationController {
   public Flux<NormAbbreviation> getAllNormAbbreviationsBySearchQuery(
       @RequestParam(value = "q", required = false, defaultValue = "") String query,
       @RequestParam(value = "sz", required = false) Integer size,
-      @RequestParam(value = "pg", required = false) Integer page) {
-
+      @RequestParam(value = "pg", required = false, defaultValue = "0") Integer page) {
     return service.getNormAbbreviationBySearchQuery(query, size, page);
   }
 
   @GetMapping("/{uuid}")
   @PreAuthorize("isAuthenticated()")
   public Mono<NormAbbreviation> getNormAbbreviationController(@PathVariable("uuid") UUID uuid) {
-    return service.getNormAbbreviationById(uuid);
+    return Mono.just(service.getNormAbbreviationById(uuid));
   }
 
   @GetMapping("/search")
@@ -48,7 +47,6 @@ public class NormAbbreviationController {
       @RequestParam(value = "q", required = false, defaultValue = "") String query,
       @RequestParam(value = "sz", required = false) Integer size,
       @RequestParam(value = "pg", required = false) Integer page) {
-
     return service.getNormAbbreviationByAwesomeSearchQuery(query, size, page);
   }
 
@@ -58,6 +56,7 @@ public class NormAbbreviationController {
     return service
         .refreshMaterializedViews()
         .thenReturn(
-            ResponseEntity.ok("Refreshed the materialized view 'norm_abbreviation_search'"));
+            ResponseEntity.ok(
+                "Refreshed the materialized view 'norm_abbreviation_search_migration'"));
   }
 }

@@ -1,10 +1,12 @@
 package de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc;
 
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationOfficeRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseNormAbbreviationRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseProcedureLinkRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseProcedureRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitSearchEntryDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.NormAbbreviationDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ProcedureDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ProcedureLinkDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitDTO.DocumentUnitDTOBuilder;
@@ -13,9 +15,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.Dat
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DatabaseCourtRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DatabaseDocumentTypeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DatabaseFieldOfLawRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DatabaseNormAbbreviationRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DocumentTypeDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.NormAbbreviationDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.StateDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.StateRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.ActiveCitationTransformer;
@@ -1100,14 +1100,12 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
       return Mono.just(documentUnitNormDTO);
     }
 
-    return normAbbreviationRepository
-        .findById(documentUnitNormDTO.getNormAbbreviationUuid())
-        .defaultIfEmpty(NormAbbreviationDTO.builder().build())
-        .map(
-            normAbbreviationDTO -> {
-              documentUnitNormDTO.setNormAbbreviation(normAbbreviationDTO);
-              return documentUnitNormDTO;
-            });
+    var normAbbreviation =
+        normAbbreviationRepository
+            .findById(documentUnitNormDTO.getNormAbbreviationUuid())
+            .orElse(NormAbbreviationDTO.builder().build());
+    documentUnitNormDTO.setNormAbbreviation(normAbbreviation);
+    return Mono.just(documentUnitNormDTO);
   }
 
   private <T extends DocumentUnitMetadataDTO> Mono<T> injectDocumentationOffice(

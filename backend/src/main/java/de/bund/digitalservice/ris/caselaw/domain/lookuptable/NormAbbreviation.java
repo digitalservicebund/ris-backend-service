@@ -10,11 +10,11 @@ public record NormAbbreviation(
     UUID id,
     String abbreviation,
     Instant decisionDate,
-    Integer documentId,
+    Long documentId,
     String documentNumber,
     String officialLetterAbbreviation,
     String officialLongTitle,
     String officialShortTitle,
-    Character source,
+    String source,
     List<DocumentTypeNew> documentTypes,
-    List<Region> regions) {}
+    Region region) {}

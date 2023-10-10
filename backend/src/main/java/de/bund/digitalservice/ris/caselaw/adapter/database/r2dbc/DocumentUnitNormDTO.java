@@ -1,6 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc;
 
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.NormAbbreviationDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.NormAbbreviationDTO;
 import java.time.Instant;
 import java.util.UUID;
 import lombok.AllArgsConstructor;

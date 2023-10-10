@@ -9,4 +9,4 @@ public record DocumentTypeNew(
     boolean multiple,
     String superLabel1,
     String superLabel2,
-    Character categoryLabel) {}
+    String categoryLabel) {}
