@@ -886,22 +886,22 @@ jobs:
   deployment-time-check:
     runs-on: ubuntu-latest
     outputs:
-      between-8-and-16: ${{ steps.check-time.outputs.between-8-and-16 }}
+      between-8-and-20: ${{ steps.check-time.outputs.between-8-and-20 }}
     steps:
       - id: check-time
         run: |
           current_hour=$(TZ="Europe/Berlin" date +'%H')
-          if [ "$current_hour" -ge 8 ] && [ "$current_hour" -lt 16 ]; then
-            echo "between-8-and-16=true" >> "$GITHUB_OUTPUT"
+          if [ "$current_hour" -ge 8 ] && [ "$current_hour" -lt 20 ]; then
+            echo "between-8-and-20=true" >> "$GITHUB_OUTPUT"
           else
-            echo "between-8-and-16=false" >> "$GITHUB_OUTPUT"
+            echo "between-8-and-20=false" >> "$GITHUB_OUTPUT"
           fi
 
   deploy-uat:
     runs-on: ubuntu-latest
     if: |
       github.ref == 'refs/heads/main' &&
-      needs.deployment-time-check.outputs.between-8-and-16 == 'false'
+      needs.deployment-time-check.outputs.between-8-and-20 == 'false'
     concurrency: deploy-uat
     environment: uat
     needs:
