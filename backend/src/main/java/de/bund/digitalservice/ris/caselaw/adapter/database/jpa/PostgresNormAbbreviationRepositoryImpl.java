@@ -7,8 +7,6 @@ import java.util.List;
 import java.util.UUID;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Repository;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
 @Repository
 public class PostgresNormAbbreviationRepositoryImpl implements NormAbbreviationRepository {
@@ -25,16 +23,16 @@ public class PostgresNormAbbreviationRepositoryImpl implements NormAbbreviationR
   }
 
   @Override
-  public Flux<NormAbbreviation> getNormAbbreviationsStartingWithExact(
+  public List<NormAbbreviation> getNormAbbreviationsStartingWithExact(
       String query, Integer size, Integer page) {
     var list =
         repository.findByAbbreviationStartsWithOrderByAbbreviation(
             query, PageRequest.of(page, size));
-    return Flux.fromIterable(list.stream().map(NormAbbreviationTransformer::transformDTO).toList());
+    return list.stream().map(NormAbbreviationTransformer::transformDTO).toList();
   }
 
   @Override
-  public Mono<List<NormAbbreviation>> findAllContainingOrderByAccuracy(
+  public List<NormAbbreviation> findAllContainingOrderByAccuracy(
       String query, Integer size, Integer page) {
 
     String cleanedQuery =
@@ -100,12 +98,11 @@ public class PostgresNormAbbreviationRepositoryImpl implements NormAbbreviationR
           .forEach(results::add);
     }
 
-    return Mono.just(results.stream().map(NormAbbreviationTransformer::transformDTO).toList());
+    return results.stream().map(NormAbbreviationTransformer::transformDTO).toList();
   }
 
   @Override
-  public Mono<Void> refreshMaterializedViews() {
+  public void refreshMaterializedViews() {
     repository.refreshMaterializedViews();
-    return Mono.empty();
   }
 }

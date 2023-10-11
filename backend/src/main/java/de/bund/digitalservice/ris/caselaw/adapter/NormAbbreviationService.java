@@ -5,8 +5,6 @@ import de.bund.digitalservice.ris.caselaw.domain.lookuptable.NormAbbreviationRep
 import java.util.List;
 import java.util.UUID;
 import org.springframework.stereotype.Service;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
 @Service
 public class NormAbbreviationService {
@@ -20,17 +18,17 @@ public class NormAbbreviationService {
     return repository.findById(uuid);
   }
 
-  public Flux<NormAbbreviation> getNormAbbreviationsStartingWithExact(
+  public List<NormAbbreviation> getNormAbbreviationsStartingWithExact(
       String query, Integer size, Integer page) {
     return repository.getNormAbbreviationsStartingWithExact(query, size, page);
   }
 
-  public Mono<List<NormAbbreviation>> findAllNormAbbreviationsContaining(
+  public List<NormAbbreviation> findAllNormAbbreviationsContaining(
       String query, Integer size, Integer page) {
     return repository.findAllContainingOrderByAccuracy(query, size, page);
   }
 
-  public Mono<Void> refreshMaterializedViews() {
-    return repository.refreshMaterializedViews();
+  public void refreshMaterializedViews() {
+    repository.refreshMaterializedViews();
   }
 }
