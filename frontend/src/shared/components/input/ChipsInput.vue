@@ -2,6 +2,7 @@
 import { produce } from "immer"
 import { nextTick, ref, watch, watchEffect } from "vue"
 import ChipsList from "@/shared/components/input/ChipsList.vue"
+import IconSubdirectoryArrowLeft from "~icons/ic/baseline-subdirectory-arrow-left"
 
 interface Props {
   id: string
@@ -170,10 +171,8 @@ watch(newChipText, async () => {
         @keydown.enter.stop.prevent="addChip"
         @keydown.left="maybeFocusPrevious"
       />
-      <span
-        class="material-icons flex-none text-16 text-transparent peer-focus:text-gray-900"
-      >
-        subdirectory_arrow_left
+      <span class="flex-none text-transparent peer-focus:text-gray-900">
+        <IconSubdirectoryArrowLeft height="16px" width="16px" />
       </span>
     </span>
   </div>

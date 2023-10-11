@@ -1,5 +1,7 @@
 <script lang="ts" setup>
 import { computed, ref, watch } from "vue"
+import IconChevronLeft from "~icons/ic/baseline-chevron-left"
+import IconChevronRight from "~icons/ic/baseline-chevron-right"
 
 interface Props {
   isExpanded?: boolean
@@ -76,9 +78,11 @@ export enum OpeningDirection {
       @click="toggleContentVisibility"
     >
       <span
-        class="material-icons w-icon rounded-full border-1 border-solid border-gray-400 bg-white text-22 text-gray-900"
-        >{{ iconName }}</span
+        class="w-icon rounded-full border-1 border-solid border-gray-400 bg-white text-16 text-gray-900"
       >
+        <IconChevronLeft v-if="iconName === 'chevron_left'" />
+        <IconChevronRight v-else-if="iconName === 'chevron_right'" />
+      </span>
     </button>
     <div v-show="localIsExpanded" class="-mr-[1.25rem]">
       <slot />

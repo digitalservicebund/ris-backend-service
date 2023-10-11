@@ -2,6 +2,7 @@
 import { computed } from "vue"
 import type { RouteLocationRaw, RouteRecordName } from "vue-router"
 import { useRoute } from "vue-router"
+import IconArrowBack from "~icons/ic/baseline-arrow-back"
 
 interface Props {
   menuItems: LevelOneMenuItem[]
@@ -144,7 +145,7 @@ export interface LevelTwoMenuItem {
       class="ds-link-01-bold flex h-80 items-center gap-12 border-b-1 border-gray-400 px-14 text-blue-800"
       :to="goBackRoute"
     >
-      <span class="material-icons">arrow_back</span>
+      <IconArrowBack class="text-18" />
       <span id="toOverviewButton">{{ goBackLabel }}</span>
     </router-link>
 

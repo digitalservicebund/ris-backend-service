@@ -5,6 +5,7 @@ import Logo from "@/assets/neuRIS-logo.svg"
 import { User } from "@/domain/user"
 import { getName } from "@/services/authService"
 import FeatureToggleService from "@/services/featureToggleService"
+import IconPermIdentity from "~icons/ic/baseline-perm-identity"
 
 const route = useRoute()
 const user = ref<User>()
@@ -70,7 +71,7 @@ onMounted(async () => {
     </div>
 
     <div v-if="user" class="grid grid-cols-[auto,1fr] gap-10">
-      <span aria-hidden="true" class="material-icons"> perm_identity </span>
+      <IconPermIdentity />
       <div>
         <div class="ds-label-01-bold">
           {{ user.name }}

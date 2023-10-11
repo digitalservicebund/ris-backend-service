@@ -4,6 +4,8 @@ import { ref } from "vue"
 import ExpandableContent from "@/components/ExpandableContent.vue"
 import DataSetSummary from "@/shared/components/DataSetSummary.vue"
 import TextButton from "@/shared/components/input/TextButton.vue"
+import IconExpandLess from "~icons/ic/baseline-expand-less"
+import IconExpandMore from "~icons/ic/baseline-expand-more"
 
 interface Props {
   title: string
@@ -39,6 +41,14 @@ function collapse(): void {
     close-icon-name="expand_less"
     open-icon-name="expand_more"
   >
+    <template #open-icon>
+      <IconExpandMore />
+    </template>
+
+    <template #close-icon>
+      <IconExpandLess />
+    </template>
+
     <template #header>
       <div class="flex w-full gap-8" :class="{ 'flex-col': asColumn }">
         <h2

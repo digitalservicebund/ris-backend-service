@@ -8,6 +8,8 @@ import service from "@/services/procedureService"
 import InputField from "@/shared/components/input/InputField.vue"
 import TextInput from "@/shared/components/input/TextInput.vue"
 import Pagination, { Page } from "@/shared/components/Pagination.vue"
+import IconExpandLess from "~icons/ic/baseline-expand-less"
+import IconExpandMore from "~icons/ic/baseline-expand-more"
 
 const itemsPerPage = 10
 const procedures = ref<Procedure[]>()
@@ -100,12 +102,18 @@ onMounted(() => {
             v-for="procedure in procedures"
             :key="procedure.label"
             class="mb-24 bg-white p-16"
-            close-icon-name="expand_less"
-            open-icon-name="expand_more"
             @update:is-expanded="
               (isExpanded) => isExpanded && loadDocumentUnits(procedure)
             "
           >
+            <template #open-icon>
+              <IconExpandMore />
+            </template>
+
+            <template #close-icon>
+              <IconExpandLess />
+            </template>
+
             <template #header>
               <div class="grid grid-cols-[14em,max-content] gap-x-24">
                 <span class="truncate font-bold" :title="procedure.label">{{

@@ -15,6 +15,8 @@ import { ResponseError } from "@/services/httpClient"
 import { InfoStatus } from "@/shared/components/enumInfoStatus"
 import InfoModal from "@/shared/components/InfoModal.vue"
 import TextButton from "@/shared/components/input/TextButton.vue"
+import IconKeyboardArrowDown from "~icons/ic/baseline-keyboard-arrow-down"
+import IconKeyboardArrowUp from "~icons/ic/baseline-keyboard-arrow-up"
 
 const props = defineProps<{
   documentUnit: DocumentUnit
@@ -281,7 +283,6 @@ const fieldsMissing = computed(() => {
           <ExpandableContent
             as-column
             class="border-b-1 border-r-1 border-gray-400 bg-white p-10"
-            close-icon-name="keyboard_arrow_up"
             :data-set="item"
             :header="
               item.type == PublicationHistoryRecordType.PUBLICATION_REPORT
@@ -290,9 +291,16 @@ const fieldsMissing = computed(() => {
             "
             header-class="font-bold"
             :is-expanded="index == 0"
-            open-icon-name="keyboard_arrow_down"
             :title="item.type"
           >
+            <template #open-icon>
+              <IconKeyboardArrowDown />
+            </template>
+
+            <template #close-icon>
+              <IconKeyboardArrowUp />
+            </template>
+
             <!-- eslint-disable vue/no-v-html -->
             <div
               v-if="
