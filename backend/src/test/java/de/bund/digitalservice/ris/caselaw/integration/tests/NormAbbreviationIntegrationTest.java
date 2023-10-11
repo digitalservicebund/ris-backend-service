@@ -351,6 +351,21 @@ class NormAbbreviationIntegrationTest {
   }
 
   @Test
+  void testGetNormAbbreviationBySearchQueryOnlySearchesStartWith() {
+    generateLookupValues();
+
+    risWebTestClient
+        .withDefaultLogin()
+        .get()
+        .uri("/api/v1/caselaw/normabbreviation?q=beginning")
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody()
+        .json("[]", true);
+  }
+
+  @Test
   void testGetNormAbbreviationBySearchQuery_returnInTheRightOrder() {
     generateLookupValues();
 

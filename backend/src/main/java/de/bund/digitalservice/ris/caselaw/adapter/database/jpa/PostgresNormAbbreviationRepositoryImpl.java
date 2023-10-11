@@ -27,7 +27,7 @@ public class PostgresNormAbbreviationRepositoryImpl implements NormAbbreviationR
   @Override
   public Flux<NormAbbreviation> findBySearchQuery(String query, Integer size, Integer pageOffset) {
     var list =
-        repository.findByAbbreviationContainsOrderByAbbreviation(
+        repository.findByAbbreviationStartsWithOrderByAbbreviation(
             query, PageRequest.of(pageOffset, size == null ? 30 : size));
     return Flux.fromIterable(list.stream().map(NormAbbreviationTransformer::transformDTO).toList());
   }
