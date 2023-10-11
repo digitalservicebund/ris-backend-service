@@ -7,7 +7,6 @@ import de.bund.digitalservice.ris.caselaw.TestConfig;
 import de.bund.digitalservice.ris.caselaw.adapter.AuthService;
 import de.bund.digitalservice.ris.caselaw.adapter.LookupTableImporterController;
 import de.bund.digitalservice.ris.caselaw.adapter.LookupTableImporterService;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPADocumentTypeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.CitationStyleDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.CourtDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DatabaseCitationStyleRepository;
@@ -71,7 +70,6 @@ class LookupTableImporterIntegrationTest {
   }
 
   @Autowired private RisWebTestClient risWebTestClient;
-  @Autowired private JPADocumentTypeRepository JPADocumentTypeRepository;
   @Autowired private DatabaseCourtRepository databaseCourtRepository;
   @Autowired private DatabaseCitationStyleRepository databaseCitationStyleRepository;
   @Autowired private StateRepository stateRepository;
@@ -89,7 +87,6 @@ class LookupTableImporterIntegrationTest {
 
   @AfterEach
   void cleanUp() {
-    JPADocumentTypeRepository.deleteAll();
     databaseCourtRepository.deleteAll().block();
     databaseCitationStyleRepository.deleteAll().block();
     stateRepository.deleteAll().block();

@@ -12,13 +12,14 @@ import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentNumberService;
 import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentUnitStatusService;
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentUnitController;
 import de.bund.digitalservice.ris.caselaw.adapter.DocxConverterService;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentUnitNormRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationOfficeRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitSearchRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseNormAbbreviationRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.NormAbbreviationDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentUnitNormRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.NormReferenceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentUnitRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitNormDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.PostgresDocumentUnitRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.PostgresPublicationReportRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
@@ -33,7 +34,6 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.EmailPublishService;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
-import de.bund.digitalservice.ris.caselaw.domain.lookuptable.NormAbbreviation;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -100,6 +100,9 @@ class SaveNormIntegrationTest {
   private final DocumentationOffice docOffice = buildDefaultDocOffice();
   private UUID documentationOfficeUuid;
 
+  @Autowired
+  private DatabaseDocumentationUnitSearchRepository databaseDocumentationUnitSearchRepository;
+
   @BeforeEach
   void setUp() {
     documentationOfficeUuid = documentationOfficeRepository.findByLabel(docOffice.label()).getId();
@@ -117,7 +120,7 @@ class SaveNormIntegrationTest {
   @AfterEach
   void cleanUp() {
     normAbbreviationRepository.deleteAll();
-    normRepository.deleteAll().block();
+    normRepository.deleteAll();
     repository.deleteAll().block();
   }
 
@@ -176,7 +179,7 @@ class SaveNormIntegrationTest {
             .documentationOfficeId(documentationOfficeUuid)
             .build();
     DocumentUnitDTO savedDTO = repository.save(dto).block();
-    var norm = addNormToDB(1, savedDTO.getId());
+    var norm = addNormToDB(1, savedDTO);
 
     DocumentUnit documentUnitFromFrontend = generateDocumentationUnit(uuid, creationTimestamp);
     documentUnitFromFrontend =
@@ -217,8 +220,8 @@ class SaveNormIntegrationTest {
             .documentationOfficeId(documentationOfficeUuid)
             .build();
     DocumentUnitDTO savedDTO = repository.save(dto).block();
-    var dbnorm1 = addNormToDB(1, savedDTO.getId());
-    var dbnorm2 = addNormToDB(2, savedDTO.getId());
+    var dbnorm1 = addNormToDB(1, savedDTO);
+    var dbnorm2 = addNormToDB(2, savedDTO);
 
     DocumentUnit documentUnitFromFrontend = generateDocumentationUnit(uuid, creationTimestamp);
     documentUnitFromFrontend =
@@ -268,7 +271,7 @@ class SaveNormIntegrationTest {
         .build();
   }
 
-  private NormAbbreviationDTO addNormToDB(int index, Long parentId) {
+  private NormAbbreviationDTO addNormToDB(int index, DocumentUnitDTO parent) {
     NormAbbreviationDTO normAbbreviationDTO =
         NormAbbreviationDTO.builder()
             .abbreviation("norm abbreviation " + index)
@@ -276,12 +279,12 @@ class SaveNormIntegrationTest {
             .build();
     normAbbreviationDTO = normAbbreviationRepository.save(normAbbreviationDTO);
 
-    DocumentUnitNormDTO normDTO =
-        DocumentUnitNormDTO.builder()
-            .documentUnitId(parentId)
-            .normAbbreviationUuid(normAbbreviationDTO.getId())
+    NormReferenceDTO normDTO =
+        NormReferenceDTO.builder()
+            .documentUnitId(parent.getUuid())
+            .normAbbreviation(normAbbreviationDTO.getAbbreviation())
             .build();
-    normRepository.save(normDTO).block();
+    normRepository.save(normDTO);
     return normAbbreviationDTO;
   }
 
@@ -304,14 +307,6 @@ class SaveNormIntegrationTest {
   }
 
   private DocumentUnitNorm generateDocumentationUnitNorm(UUID id, int index) {
-    return DocumentUnitNorm.builder()
-        .normAbbreviation(
-            NormAbbreviation.builder()
-                .id(id)
-                .abbreviation("norm abbreviation " + index)
-                .documentId((long) index)
-                .documentTypes(List.of())
-                .build())
-        .build();
+    return DocumentUnitNorm.builder().normAbbreviation("norm abbreviation " + index).build();
   }
 }
