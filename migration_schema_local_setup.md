@@ -20,23 +20,23 @@ This document will help Developers in NeuRIS to setup the new schema with data i
    # or use your favourite startup command, e.g. ./run.sh dev --no-backend
    ```
 
-2. Make sure the new schema `incremental_migration` has been added
+1. Make sure the new schema `incremental_migration` has been added
 
-3. Clone [ris-data-migration](https://github.com/digitalservicebund/ris-data-migration) repository
+1. Clone [ris-data-migration](https://github.com/digitalservicebund/ris-data-migration) repository
 
    ```bash
    git clone git@github.com:digitalservicebund/ris-data-migration.git
    cd ris-data-migration
    ```
 
-4. Create a directory where you will store the xml files to import into the database
+1. Create a directory where you will store the xml files to import into the database
    ```
-   mkdir juris-xml-data 
+   mkdir juris-xml-data
    ```
 
-5. Follow the steps here to get access to OTC buckets via command line. You can use the `AWS_` environemnt variables that you use for `neuris-infra`: https://platform-docs.prod.ds4g.net/user-docs/how-to-guides/access-obs-via-aws-sdk/ 
+1. Follow the steps here to get access to OTC buckets via command line. You can use the `AWS_` environemnt variables that you use for `neuris-infra`: https://platform-docs.prod.ds4g.net/user-docs/how-to-guides/access-obs-via-aws-sdk/
 
-6. Check if you can access the right bucket with
+1. Check if you can access the right bucket with
    ```bash
    aws s3 ls --profile otc --endpoint-url https://obs.eu-de.otc.t-systems.com s3://neuris-migration-juris-data
    # output should look like this:
@@ -44,25 +44,26 @@ This document will help Developers in NeuRIS to setup the new schema with data i
    #                           PRE monthly/
    ```
 
-7. Download the lookup tables
+1. Download the lookup tables
 
    ```bash
    aws s3 cp --profile otc --endpoint-url https://obs.eu-de.otc.t-systems.com --recursive s3://neuris-migration-juris-data/monthly/2023/09/Tabellen ./juris-xml-data/Tabellen
    ```
 
-4. Download BGH DocumentationUnits
+1. Download BGH DocumentationUnits
 
    ```bash
    aws s3 cp --profile otc --endpoint-url https://obs.eu-de.otc.t-systems.com --recursive s3://neuris-migration-juris-data/monthly/2023/09/BGH-juris/RSP/ ./juris-xml-data/BGH-juris/RSP/2022/
    ```
 
-5. Setup your local .env file with this command as described in [Set up local env](https://github.com/digitalservicebund/ris-data-migration#set-up-local-env)
+1. Setup your local .env file with this command as described in [Set up local env](https://github.com/digitalservicebund/ris-data-migration#set-up-local-env)
 
-6. Change the following variables in the .env file:
+1. Change the following variables in the .env file:
    ```bash
    RIS_MIGRATION_TABLES_LOCATION=juris-xml-data
    RIS_MIGRATION_INCLUDE_NORM_ABBREVIATIONS=true
-   
+   RIS_MIGRATION_CLI_MODE=true
+
    # database config
    RIS_MIGRATION_DB_HOST=localhost
    RIS_MIGRATION_DB_PORT=5432
@@ -72,27 +73,31 @@ This document will help Developers in NeuRIS to setup the new schema with data i
    RIS_MIGRATION_DB_SCHEMA=incremental_migration
    ```
 
-7. Build the ris-data-migration application into a jar
+1. For console logging
+   ```bash
+   export SPRING_PROFILES_ACTIVE=dev
+   ```
+
+1. Build the ris-data-migration application into a jar
 
    ```bash
    ./gradlew bootJar
    ```
 
-8. Import the static lookup tables into your new schema (see Confluence "Wertetabellen" to find out what is static and dynamic)
+1. Import the static lookup tables into your new schema (see Confluence "Wertetabellen" to find out what is static and dynamic)
    ```bash
-   java -jar build/libs/ris-data-migration.jar refdata seed 
+   java -jar build/libs/ris-data-migration.jar refdata seed
    ```
 
-9. Import the dynamic lookup tables
+1. Import the dynamic lookup tables
 
    ```bash
    java -jar build/libs/ris-data-migration.jar juris-table seed
    ```
 
-10. Import the BGH DocumentationUnits
+1. Import the BGH DocumentationUnits
 
     ```bash
     java -jar build/libs/ris-data-migration.jar juris-r migrate -p juris-xml-data/
     ```
 
-    
