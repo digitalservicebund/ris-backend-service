@@ -28,26 +28,26 @@ public class NormAbbreviationController {
 
   @GetMapping
   @PreAuthorize("isAuthenticated()")
-  public Flux<NormAbbreviation> getAllNormAbbreviationsBySearchQuery(
-      @RequestParam(value = "q", required = false, defaultValue = "") String query,
-      @RequestParam(value = "sz", required = false) Integer size,
+  public Flux<NormAbbreviation> getAllNormAbbreviationsStartingWithExact(
+      @RequestParam(value = "q", required = false, defaultValue = "") String normAbbreviation,
+      @RequestParam(value = "sz", required = false, defaultValue = "30") Integer size,
       @RequestParam(value = "pg", required = false, defaultValue = "0") Integer page) {
-    return service.getNormAbbreviationBySearchQuery(query, size, page);
+    return service.getNormAbbreviationsStartingWithExact(normAbbreviation, size, page);
   }
 
   @GetMapping("/{uuid}")
   @PreAuthorize("isAuthenticated()")
-  public Mono<NormAbbreviation> getNormAbbreviationController(@PathVariable("uuid") UUID uuid) {
+  public Mono<NormAbbreviation> getNormAbbreviationById(@PathVariable("uuid") UUID uuid) {
     return Mono.just(service.getNormAbbreviationById(uuid));
   }
 
   @GetMapping("/search")
   @PreAuthorize("isAuthenticated()")
-  public Mono<List<NormAbbreviation>> getAllNormAbbreviationsByAwesomeSearchQuery(
+  public Mono<List<NormAbbreviation>> getAllNormAbbreviationsContaining(
       @RequestParam(value = "q", required = false, defaultValue = "") String query,
-      @RequestParam(value = "sz", required = false) Integer size,
-      @RequestParam(value = "pg", required = false) Integer page) {
-    return service.getNormAbbreviationByAwesomeSearchQuery(query, size, page);
+      @RequestParam(value = "sz", required = false, defaultValue = "30") Integer size,
+      @RequestParam(value = "pg", required = false, defaultValue = "0") Integer page) {
+    return service.findAllNormAbbreviationsContaining(query, size, page);
   }
 
   @PutMapping("/refreshMaterializedViews")

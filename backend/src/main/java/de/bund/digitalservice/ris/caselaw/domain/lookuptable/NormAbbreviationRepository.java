@@ -10,9 +10,11 @@ import reactor.core.publisher.Mono;
 public interface NormAbbreviationRepository {
   public NormAbbreviation findById(UUID id);
 
-  Flux<NormAbbreviation> findBySearchQuery(String query, Integer size, Integer page);
+  Flux<NormAbbreviation> getNormAbbreviationsStartingWithExact(
+      String query, Integer size, Integer page);
 
-  Mono<List<NormAbbreviation>> findByAwesomeSearchQuery(String query, Integer size);
+  Mono<List<NormAbbreviation>> findAllContainingOrderByAccuracy(
+      String query, Integer size, Integer page);
 
   Mono<Void> refreshMaterializedViews();
 }

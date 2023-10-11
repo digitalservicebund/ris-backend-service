@@ -25,15 +25,17 @@ public class PostgresNormAbbreviationRepositoryImpl implements NormAbbreviationR
   }
 
   @Override
-  public Flux<NormAbbreviation> findBySearchQuery(String query, Integer size, Integer pageOffset) {
+  public Flux<NormAbbreviation> getNormAbbreviationsStartingWithExact(
+      String query, Integer size, Integer page) {
     var list =
         repository.findByAbbreviationStartsWithOrderByAbbreviation(
-            query, PageRequest.of(pageOffset, size == null ? 30 : size));
+            query, PageRequest.of(page, size));
     return Flux.fromIterable(list.stream().map(NormAbbreviationTransformer::transformDTO).toList());
   }
 
   @Override
-  public Mono<List<NormAbbreviation>> findByAwesomeSearchQuery(String query, Integer size) {
+  public Mono<List<NormAbbreviation>> findAllContainingOrderByAccuracy(
+      String query, Integer size, Integer page) {
 
     String cleanedQuery =
         query
@@ -61,37 +63,41 @@ public class PostgresNormAbbreviationRepositoryImpl implements NormAbbreviationR
     }
 
     List<NormAbbreviationDTO> results =
-        repository.findByAbbreviationIgnoreCase(directInput, PageRequest.of(0, size));
+        repository.findByAbbreviationIgnoreCase(directInput, PageRequest.of(page, size));
 
     if (results.size() < size) {
       var officialLetterAbbreviationExact =
           repository.findByOfficialLetterAbbreviationIgnoreCase(
-              directInput, PageRequest.of(0, size - results.size()));
+              directInput, PageRequest.of(page, size));
       officialLetterAbbreviationExact.stream()
-          .filter(e -> !results.contains(e))
+          .filter(e -> results.size() < size && !results.contains(e))
           .forEach(results::add);
     }
 
     if (results.size() < size) {
       var abbreviationStartingWith =
           repository.findByAbbreviationStartsWithIgnoreCase(
-              directInput, PageRequest.of(0, size - results.size()));
-      abbreviationStartingWith.stream().filter(e -> !results.contains(e)).forEach(results::add);
+              directInput, PageRequest.of(page, size));
+      abbreviationStartingWith.stream()
+          .filter(e -> results.size() < size && !results.contains(e))
+          .forEach(results::add);
     }
 
     if (results.size() < size) {
       var officialLetterAbbreviationStartingWith =
           repository.findByOfficialLetterAbbreviationStartsWithIgnoreCase(
-              directInput, PageRequest.of(0, size - results.size()));
+              directInput, PageRequest.of(page, size));
       officialLetterAbbreviationStartingWith.stream()
-          .filter(e -> !results.contains(e))
+          .filter(e -> results.size() < size && !results.contains(e))
           .forEach(results::add);
     }
 
     if (results.size() < size) {
       var rankWeightedVector =
-          repository.findByRankWeightedVector(tsQuery.toString(), size - results.size());
-      rankWeightedVector.stream().filter(e -> !results.contains(e)).forEach(results::add);
+          repository.findByRankWeightedVector(tsQuery.toString(), size, page * size);
+      rankWeightedVector.stream()
+          .filter(e -> results.size() < size && !results.contains(e))
+          .forEach(results::add);
     }
 
     return Mono.just(results.stream().map(NormAbbreviationTransformer::transformDTO).toList());

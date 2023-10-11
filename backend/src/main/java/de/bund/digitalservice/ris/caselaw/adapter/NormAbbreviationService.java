@@ -20,14 +20,14 @@ public class NormAbbreviationService {
     return repository.findById(uuid);
   }
 
-  public Flux<NormAbbreviation> getNormAbbreviationBySearchQuery(
+  public Flux<NormAbbreviation> getNormAbbreviationsStartingWithExact(
       String query, Integer size, Integer page) {
-    return repository.findBySearchQuery(query, size, page);
+    return repository.getNormAbbreviationsStartingWithExact(query, size, page);
   }
 
-  public Mono<List<NormAbbreviation>> getNormAbbreviationByAwesomeSearchQuery(
+  public Mono<List<NormAbbreviation>> findAllNormAbbreviationsContaining(
       String query, Integer size, Integer page) {
-    return repository.findByAwesomeSearchQuery(query, size);
+    return repository.findAllContainingOrderByAccuracy(query, size, page);
   }
 
   public Mono<Void> refreshMaterializedViews() {

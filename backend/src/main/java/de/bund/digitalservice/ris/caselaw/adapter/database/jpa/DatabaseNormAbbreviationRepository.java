@@ -46,9 +46,10 @@ public interface DatabaseNormAbbreviationRepository
               + " from norm_abbreviation_search_migration"
               + " where weighted_vector @@ to_tsquery('german', '' || :tsQuery || '')"
               + " order by rank desc"
-              + " limit :size",
+              + " limit :size"
+              + " offset :offset",
       nativeQuery = true)
-  List<NormAbbreviationDTO> findByRankWeightedVector(String tsQuery, Integer size);
+  List<NormAbbreviationDTO> findByRankWeightedVector(String tsQuery, Integer size, Integer offset);
 
   @Transactional
   @Modifying
