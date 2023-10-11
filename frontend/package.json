@@ -71,7 +71,7 @@
     "@digitalservice4germany/angie": "^1.1.0",
     "@digitalservice4germany/style-dictionary": "^2.0.0",
     "@namics/stylelint-bem": "^9.0.0",
-    "@playwright/test": "^1.38.0",
+    "@playwright/test": "^1.39.0",
     "@sentry/vite-plugin": "^2.8.0",
     "@testing-library/dom": "^9.3.1",
     "@testing-library/jest-dom": "^6.1.3",
