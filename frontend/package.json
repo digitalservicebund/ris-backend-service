@@ -67,7 +67,7 @@
     "vue-router": "4.2.4"
   },
   "devDependencies": {
-    "@axe-core/playwright": "^4.7.3",
+    "@axe-core/playwright": "^4.8.0",
     "@digitalservice4germany/angie": "^1.1.0",
     "@digitalservice4germany/style-dictionary": "^2.0.0",
     "@namics/stylelint-bem": "^9.0.0",
