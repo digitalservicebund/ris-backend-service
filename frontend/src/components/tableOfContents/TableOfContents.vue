@@ -8,6 +8,8 @@ import {
   Recitals,
   isDocumentSection,
 } from "@/domain/norm"
+import IconChevronRight from "~icons/ic/baseline-chevron-right"
+import IconExpandMore from "~icons/ic/baseline-expand-more"
 
 const props = withDefaults(
   defineProps<{
@@ -72,13 +74,19 @@ const effectiveRecitals = computed(() => {
     <ExpandableContent
       v-if="isDocumentSection(doc)"
       class="bg-blue-200 pt-4"
-      close-icon-name="expand_more"
       icons-on-left
       is-expanded
       :margin-level="marginLevel"
-      open-icon-name="chevron_right"
       prevent-expand-on-click
     >
+      <template #open-icon>
+        <IconChevronRight />
+      </template>
+
+      <template #close-icon>
+        <IconExpandMore />
+      </template>
+
       <template #header>
         <router-link
           class="ds-label-02-bold ml-4 w-full pb-4 text-left hover:underline active:underline"
