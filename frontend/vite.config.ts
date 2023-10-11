@@ -2,6 +2,7 @@ import path from "path"
 import * as process from "process"
 import { sentryVitePlugin } from "@sentry/vite-plugin"
 import vue from "@vitejs/plugin-vue"
+import Icons from "unplugin-icons/vite"
 import { defineConfig } from "vite"
 import EnvironmentPlugin from "vite-plugin-environment"
 import Pages from "vite-plugin-pages"
@@ -27,6 +28,9 @@ export default defineConfig({
       org: "digitalservice",
       project: "ris-frontend",
       telemetry: process.env.VITEST !== "true",
+    }),
+    Icons({
+      scale: 1.3333, // ~24px at the current default font size of 18px
     }),
   ],
   test: {
