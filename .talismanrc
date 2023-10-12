@@ -27,7 +27,7 @@ fileignoreconfig:
 - filename: doc/structurizr/workspace.json
   checksum: 541780133a0bf013ac75f6a3bc402c77981a273654c5648eabeb32ccb271a834
 - filename: frontend/Dockerfile.prod
-  checksum: c4ce959b84195482a9017a4b540821686700a5c0a6ed2180987aee50f119aea9
+  checksum: 3307752ddc7656606048f085ec2158b8a671844970944178fda705f64789d97a
 - filename: frontend/FRONTEND_STYLEGUIDE.md
   checksum: e6b8194eba2012f2a769c5a5d3577715a573b441a7b94e744c32b3149d0d3a93
 - filename: frontend/src/main.ts
