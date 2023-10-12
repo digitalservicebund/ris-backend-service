@@ -166,7 +166,7 @@ dependencies {
     // => CVE-2023-1370
     implementation("net.minidev:json-smart:2.5.0")
     // CVE-2022-3171
-    implementation("com.google.protobuf:protobuf-java:3.23.3")
+    implementation("com.google.protobuf:protobuf-java:3.24.4")
     // => CVE-2021-37136, CVE-2021-37137, CVE-2021-43797
     implementation("io.netty:netty-all:4.1.94.Final") {
         exclude(group = "io.netty", module = "netty-tcnative-classes")
