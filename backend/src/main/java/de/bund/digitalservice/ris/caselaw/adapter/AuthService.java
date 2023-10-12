@@ -1,11 +1,10 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
-import static de.bund.digitalservice.ris.caselaw.domain.PublicationStatus.PUBLISHED;
-import static de.bund.digitalservice.ris.caselaw.domain.PublicationStatus.PUBLISHING;
-
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
+import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
+import java.util.List;
 import java.util.UUID;
 import java.util.function.Function;
 import lombok.extern.slf4j.Slf4j;
@@ -64,9 +63,14 @@ public class AuthService {
   }
 
   private Mono<Boolean> userHasReadAccess(DocumentUnit documentUnit) {
+    List<PublicationStatus> published =
+        List.of(
+            PublicationStatus.TEST_DOC_UNIT,
+            PublicationStatus.PUBLISHED,
+            PublicationStatus.PUBLISHING,
+            PublicationStatus.JURIS_PUBLISHED);
     return (documentUnit.status() != null // legacy documents are published
-                && (documentUnit.status().publicationStatus() == PUBLISHED
-                    || documentUnit.status().publicationStatus() == PUBLISHING)
+                && published.contains(documentUnit.status().publicationStatus())
             ? Mono.just(true)
             : userHasSameDocOfficeAsDocument(documentUnit))
         .defaultIfEmpty(false)
