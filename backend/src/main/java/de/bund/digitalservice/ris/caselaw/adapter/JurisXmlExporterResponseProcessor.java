@@ -157,11 +157,8 @@ public class JurisXmlExporterResponseProcessor {
                   .build())
           .thenReturn(messageWrapper)
           .block();
-    } catch (MessagingException | IOException e) {
+    } catch (MessagingException | IOException | NullPointerException e) {
       throw new StatusImporterException("Could not update publicationStatus" + e);
-    } catch (NullPointerException ex) {
-      LOGGER.error("NPE with messageWrapper: {}", messageWrapper, ex);
-      throw new StatusImporterException("Could not update publicationStatus" + ex);
     }
   }
 
