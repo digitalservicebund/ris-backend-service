@@ -19,6 +19,7 @@ import IconCheck from "~icons/ic/baseline-check"
 import IconErrorOutline from "~icons/ic/baseline-error-outline"
 import IconKeyboardArrowDown from "~icons/ic/baseline-keyboard-arrow-down"
 import IconKeyboardArrowUp from "~icons/ic/baseline-keyboard-arrow-up"
+import IconPublish from "~icons/ic/outline-campaign"
 
 const props = defineProps<{
   documentUnit: DocumentUnit
@@ -270,7 +271,7 @@ const fieldsMissing = computed(() => {
       aria-label="Dokumentationseinheit veröffentlichen"
       button-type="secondary"
       class="w-fit"
-      icon="campaign"
+      :icon="IconPublish"
       label="Dokumentationseinheit veröffentlichen"
       @click="publishDocumentUnit"
     />
