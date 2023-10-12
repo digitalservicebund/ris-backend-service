@@ -1,7 +1,7 @@
 package de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc;
 
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentUnitNormRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationOfficeRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseNormReferenceRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseProcedureLinkRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseProcedureRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
@@ -83,7 +83,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
   private final DatabaseFieldOfLawRepository fieldOfLawRepository;
   private final DatabaseDocumentUnitFieldsOfLawRepository documentUnitFieldsOfLawRepository;
   private final DatabaseKeywordRepository keywordRepository;
-  private final DatabaseDocumentUnitNormRepository documentUnitNormRepository;
+  private final DatabaseNormReferenceRepository documentUnitNormRepository;
   private final DatabaseDocumentationOfficeRepository documentationOfficeRepository;
   private final DatabaseDocumentUnitStatusRepository databaseDocumentUnitStatusRepository;
   private final DatabaseDocumentationUnitLinkRepository documentationUnitLinkRepository;
@@ -105,7 +105,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
       DatabaseFieldOfLawRepository fieldOfLawRepository,
       DatabaseDocumentUnitFieldsOfLawRepository documentUnitFieldsOfLawRepository,
       DatabaseKeywordRepository keywordRepository,
-      DatabaseDocumentUnitNormRepository documentUnitNormRepository,
+      DatabaseNormReferenceRepository documentUnitNormRepository,
       DatabaseDocumentUnitStatusRepository databaseDocumentUnitStatusRepository,
       DatabaseDocumentationUnitLinkRepository documentationUnitLinkRepository,
       DatabaseCitationStyleRepository citationStyleRepository,
@@ -372,6 +372,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
                       documentUnitNormDTO.setSingleNorm(currentNorm.singleNorm());
                       documentUnitNormDTO.setDateOfVersion(currentNorm.dateOfVersion());
                       documentUnitNormDTO.setDateOfRelevance(currentNorm.dateOfRelevance());
+                      documentUnitNormDTO.setNormAbbreviation(currentNorm.normAbbreviation());
                       toSave.add(documentUnitNormDTO);
                     } else {
                       toDelete.add(documentUnitNormDTO);

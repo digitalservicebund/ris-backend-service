@@ -6,6 +6,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface DatabaseDocumentUnitNormRepository extends JpaRepository<NormReferenceDTO, UUID> {
+public interface DatabaseNormReferenceRepository extends JpaRepository<NormReferenceDTO, UUID> {
   List<NormReferenceDTO> findAllByDocumentUnitIdOrderById(UUID documentationUnitId);
 }

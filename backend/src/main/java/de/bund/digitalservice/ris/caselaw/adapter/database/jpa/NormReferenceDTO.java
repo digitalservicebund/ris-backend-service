@@ -4,7 +4,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
-import jakarta.validation.constraints.NotBlank;
+import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.util.UUID;
@@ -13,7 +13,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.data.relational.core.mapping.Table;
 
 @Getter
 @Setter
@@ -21,20 +20,26 @@ import org.springframework.data.relational.core.mapping.Table;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(value = "norm_reference", schema = "incremental_migration")
+@Table(name = "norm_reference", schema = "incremental_migration")
 public class NormReferenceDTO {
 
   @Id @GeneratedValue UUID id;
 
-  @NotBlank @Column String normAbbreviation;
+  @Column(name = "norm_abbreviation")
+  String normAbbreviation;
 
-  @Column String singleNorm;
+  @Column(name = "single_norm")
+  String singleNorm;
 
-  @Column LocalDate dateOfVersion;
+  @Column(name = "date_of_version")
+  LocalDate dateOfVersion;
 
-  @Column String dateOfRelevance;
+  @Column(name = "date_of_relevance")
+  String dateOfRelevance;
 
-  @NotNull UUID documentUnitId;
+  @Column(name = "documentation_unit_id")
+  @NotNull
+  UUID documentUnitId;
 
   // @ManyToOne @NotNull DocumentUnitDTO documentUnit;
 }
