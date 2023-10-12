@@ -94,7 +94,6 @@ const SelectedFieldsOfLawSummary = withSummarizer(selectedFieldsOfLawSummarizer)
       <div class="flex flex-row">
         <div class="flex flex-1 flex-col bg-white p-20">
           <FieldOfLawSearch
-            :show-norms="showNorms"
             @do-show-norms="showNorms = true"
             @node-clicked="handleNodeClicked"
           />

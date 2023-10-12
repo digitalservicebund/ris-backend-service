@@ -44,7 +44,8 @@ const sanitizedUrl = computed(() => sanitizeUrl(props.href))
 
 const renderIcon = () =>
   props.icon
-    ? h("span", { class: "material-icons ds-button-icon" }, props.icon)
+    ? //TODO: render dynamic vue icon component based on props
+      h("span", { class: "material-icons ds-button-icon" }, props.icon)
     : undefined
 
 const renderLabel = () =>

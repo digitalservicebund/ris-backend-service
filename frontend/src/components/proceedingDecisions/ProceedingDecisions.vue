@@ -5,6 +5,7 @@ import ProceedingDecisionInputGroup from "./ProceedingDecisionInputGroup.vue"
 import EditableList from "@/components/EditableListCaselaw.vue"
 import ProceedingDecision from "@/domain/proceedingDecision"
 import { withSummarizer } from "@/shared/components/DataSetSummary.vue"
+import IconErrorOutline from "~icons/ic/baseline-error-outline"
 
 const props = defineProps<{
   modelValue: ProceedingDecision[] | undefined
@@ -42,12 +43,10 @@ function decisionSummarizer(dataEntry: ProceedingDecision) {
   } else if (dataEntry.hasMissingRequiredFields) {
     return h("div", { class: ["flex flex-row items-center"] }, [
       h(
-        "span",
-        {
+        h(h(IconErrorOutline), {
           "aria-label": "Fehlerhafte Eingabe",
-          class: ["material-icons pr-8 text-red-800"],
-        },
-        "error_outline",
+          class: ["mr-8 text-red-800"],
+        }),
       ),
       h(
         "div",

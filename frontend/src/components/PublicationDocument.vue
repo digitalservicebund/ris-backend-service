@@ -15,6 +15,8 @@ import { ResponseError } from "@/services/httpClient"
 import { InfoStatus } from "@/shared/components/enumInfoStatus"
 import InfoModal from "@/shared/components/InfoModal.vue"
 import TextButton from "@/shared/components/input/TextButton.vue"
+import IconCheck from "~icons/ic/baseline-check"
+import IconErrorOutline from "~icons/ic/baseline-error-outline"
 import IconKeyboardArrowDown from "~icons/ic/baseline-keyboard-arrow-down"
 import IconKeyboardArrowUp from "~icons/ic/baseline-keyboard-arrow-up"
 
@@ -148,9 +150,7 @@ const fieldsMissing = computed(() => {
       </div>
       <div v-if="fieldsMissing" class="flex flex-row gap-8">
         <div>
-          <span class="material-icons rounded-full bg-red-800 text-white">
-            error
-          </span>
+          <IconErrorOutline class="text-red-800" />
         </div>
         <div class="flex flex-col gap-32">
           <div>
@@ -247,7 +247,8 @@ const fieldsMissing = computed(() => {
         </div>
       </div>
       <div v-else class="flex flex-row gap-8">
-        <span class="material-icons text-green-700"> check </span>
+        <IconCheck class="text-green-700" />
+
         <p class="ds-body-01-reg">Alle Pflichtfelder sind korrekt ausgefüllt</p>
       </div>
     </div>

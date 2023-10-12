@@ -8,6 +8,8 @@ import {
   NestedInputModelType,
 } from "@/shared/components/input/types"
 import { useInputModel } from "@/shared/composables/useInputModel"
+import IconAdd from "~icons/ic/baseline-add"
+import IconHorizontalRule from "~icons/ic/baseline-horizontal-rule"
 
 interface Props {
   ariaLabel: string
@@ -25,9 +27,6 @@ interface Emits {
 const props = defineProps<Props>()
 const emits = defineEmits<Emits>()
 const localIsExpanded = ref(false)
-const iconName = computed(() =>
-  localIsExpanded.value ? "horizontal_rule" : "add",
-)
 
 const { inputValue } = useInputModel<NestedInputModelType, Props, Emits>(
   props,
@@ -56,14 +55,21 @@ function toggleContentVisibility(): void {
 <template>
   <div class="relative">
     <div class="absolute -right-10 top-48 z-10">
-      <button @click="toggleContentVisibility">
-        <span
-          :aria-label="
-            localIsExpanded ? ariaLabel + ' schließen' : ariaLabel + ' anzeigen'
-          "
-          class="material-icons w-icon rounded-full bg-blue-800 text-white"
-          >{{ iconName }}</span
+      <button
+        class="w-icon rounded-full bg-blue-800 text-white"
+        @click="toggleContentVisibility"
+      >
+        <slot
+          v-if="localIsExpanded"
+          :aria-label="ariaLabel + ' schließen'"
+          class="w-icon rounded-full bg-blue-800 text-white"
+          name="close-icon"
         >
+          <IconHorizontalRule />
+        </slot>
+        <slot v-else :aria-label="ariaLabel + ' anzeigen'" name="open-icon">
+          <IconAdd />
+        </slot>
       </button>
     </div>
 

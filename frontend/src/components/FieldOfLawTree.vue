@@ -3,6 +3,10 @@ import { computed, watch, ref } from "vue"
 import FieldOfLawNodeComponent from "./FieldOfLawNodeComponent.vue"
 import { buildRoot, getDescendants, FieldOfLawNode } from "@/domain/fieldOfLaw"
 import FieldOfLawService from "@/services/fieldOfLawService"
+import CheckboxInput from "@/shared/components/input/CheckboxInput.vue"
+import InputField, {
+  LabelPosition,
+} from "@/shared/components/input/InputField.vue"
 
 const props = defineProps<{
   selectedNodes: FieldOfLawNode[]
@@ -50,27 +54,28 @@ const buildDirectPathTreeTo = async (clickedIdentifier: string) => {
 
   emit("reset-clicked-node")
 }
+
+const showNormsModelValue = computed({
+  get: () => props.showNorms,
+  set: () => emit("toggle-show-norms"),
+})
 </script>
 
 <template>
-  <div class="flex items-center justify-between pb-10">
-    <h1 class="ds-heading-03-reg">Sachgebietsbaum</h1>
-    <div class="flex items-center">
-      <button
-        aria-label="Normen anzeigen"
-        class="h-24 w-24 appearance-none rounded-sm border-2 align-top text-blue-800 outline-none outline-0 outline-offset-[-4px] outline-blue-800 hover:outline-2 focus:outline-2"
-        @click="emit('toggle-show-norms')"
-      >
-        <span
-          v-if="showNorms"
-          aria-label="Sachgebiet entfernen"
-          class="material-icons selected-icon"
-        >
-          done
-        </span>
-      </button>
-      <span class="pl-8">Normen anzeigen</span>
-    </div>
+  <div class="flex flex-col justify-between">
+    <h1 class="ds-heading-03-reg pb-10">Sachgebietsbaum</h1>
+    <InputField
+      id="showNorms"
+      aria-label="Beschlussfassung mit qualifizierter Mehrheit"
+      label="Normen anzeigen"
+      :label-position="LabelPosition.RIGHT"
+    >
+      <CheckboxInput
+        id="showNorms"
+        v-model="showNormsModelValue"
+        size="small"
+      />
+    </InputField>
   </div>
   <FieldOfLawNodeComponent
     :key="root.identifier"
@@ -87,9 +92,3 @@ const buildDirectPathTreeTo = async (clickedIdentifier: string) => {
     @node:unselect="handleUnselect"
   />
 </template>
-
-<style lang="scss" scoped>
-.selected-icon {
-  font-size: 20px;
-}
-</style>

@@ -5,6 +5,7 @@ import { ResponseError } from "@/services/httpClient"
 import ChipsList from "@/shared/components/input/ChipsList.vue"
 import TextInput from "@/shared/components/input/TextInput.vue"
 import { ValidationError } from "@/shared/components/input/types"
+import IconErrorOutline from "~icons/ic/baseline-error-outline"
 
 interface Props {
   id: string
@@ -103,9 +104,7 @@ const focusInput = () => {
     />
 
     <div v-if="errorMessage" class="flex flex-row items-center">
-      <span class="material-icons leading-default text-gray-900"
-        >error_outline</span
-      >
+      <IconErrorOutline class="leading-default text-gray-900" />
       <p class="ds-label-02-reg m-4 text-gray-900">{{ errorMessage?.title }}</p>
     </div>
 

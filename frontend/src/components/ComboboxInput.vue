@@ -5,6 +5,9 @@ import {
   ComboboxInputModelType,
   ComboboxItem,
 } from "@/shared/components/input/types"
+import IconClear from "~icons/ic/baseline-clear"
+import IconKeyboardArrowDown from "~icons/ic/baseline-keyboard-arrow-down"
+import IconKeyboardArrowUp from "~icons/ic/baseline-keyboard-arrow-up"
 
 const props = defineProps<{
   id: string
@@ -254,27 +257,21 @@ export type InputModelProps =
       />
       <button
         v-if="inputText && !noClear"
-        class="input-close-icon flex items-center"
+        class="input-close-icon flex items-center text-blue-800"
         tabindex="0"
         @click="clearSelection"
       >
-        <span
-          aria-label="Auswahl zurücksetzen"
-          class="icon material-icons pr-[1.5rem] text-blue-800"
-        >
-          close
-        </span>
+        <IconClear />
       </button>
+
       <button
         :aria-label="ariaLabelDropdownIcon"
-        class="input-expand-icon flex items-center"
+        class="input-expand-icon flex items-center text-blue-800"
         tabindex="-1"
         @click="toggleDropdown"
       >
-        <span v-if="!showDropdown" class="icon material-icons text-blue-800">
-          expand_more
-        </span>
-        <span v-else class="icon material-icons"> expand_less </span>
+        <IconKeyboardArrowDown v-if="!showDropdown" />
+        <IconKeyboardArrowUp v-else />
       </button>
     </div>
     <div

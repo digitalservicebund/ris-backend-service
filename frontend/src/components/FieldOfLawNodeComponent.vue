@@ -3,6 +3,9 @@ import { computed, toRaw } from "vue"
 import TokenizeText from "@/components/TokenizeText.vue"
 import { ROOT_ID, FieldOfLawNode } from "@/domain/fieldOfLaw"
 import FieldOfLawService from "@/services/fieldOfLawService"
+import IconAdd from "~icons/ic/baseline-add"
+import IconDone from "~icons/ic/baseline-done"
+import IconHorizontalRule from "~icons/ic/baseline-horizontal-rule"
 
 interface Props {
   selectedNodes: FieldOfLawNode[]
@@ -20,6 +23,10 @@ const emit = defineEmits<{
 }>()
 
 const node = computed(() => props.node)
+
+const isExpandable = computed(() => {
+  return canLoadMoreChildren() || !props.node.isExpanded
+})
 
 function handleTokenClick(tokenContent: string) {
   emit("linkedField:clicked", tokenContent)
@@ -69,12 +76,15 @@ async function handleToggle() {
       <div v-else>
         <button
           :aria-label="node.identifier + ' ' + node.text + ' aufklappen'"
-          class="material-icons w-icon rounded-full bg-blue-200 text-blue-800"
+          class="w-icon rounded-full bg-blue-200 text-blue-800"
           @click="handleToggle"
         >
-          {{
-            canLoadMoreChildren() || !props.node.isExpanded ? "add" : "remove"
-          }}
+          <slot v-if="!isExpandable" name="close-icon">
+            <IconHorizontalRule />
+          </slot>
+          <slot v-else name="open-icon">
+            <IconAdd />
+          </slot>
         </button>
       </div>
       <div v-if="node.identifier !== ROOT_ID">
@@ -92,13 +102,12 @@ async function handleToggle() {
               : emit('node:select', node)
           "
         >
-          <span
+          <!-- TODO: replace by checkmark component -->
+          <IconDone
             v-if="selected"
             aria-label="Sachgebiet entfernen"
-            class="material-icons selected-icon"
-          >
-            done
-          </span>
+            class="text-14"
+          />
         </button>
       </div>
       <div>
@@ -156,10 +165,6 @@ async function handleToggle() {
 // TODO use tailwind instead
 .font-size-14px {
   font-size: 14px;
-}
-
-.selected-icon {
-  font-size: 20px;
 }
 
 // will be integrated into the styleguide

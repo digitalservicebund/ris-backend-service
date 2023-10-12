@@ -9,6 +9,8 @@ import IconBadge from "@/shared/components/IconBadge.vue"
 import InfoModal from "@/shared/components/InfoModal.vue"
 import TextButton from "@/shared/components/input/TextButton.vue"
 import PopupModal from "@/shared/components/PopupModal.vue"
+import IconAttachedFile from "~icons/ic/baseline-attach-file"
+import IconDelete from "~icons/ic/baseline-delete"
 
 const props = defineProps<{
   documentUnitListEntries?: DocumentUnitListEntry[]
@@ -125,8 +127,8 @@ function onDelete() {
           </router-link>
         </div>
         <div class="table-cell p-16">
-          <span v-if="listEntry.fileName" class="material-icons">
-            attach_file
+          <span v-if="listEntry.fileName">
+            <IconAttachedFile />
           </span>
           <span v-else>-</span>
         </div>
@@ -160,7 +162,7 @@ function onDelete() {
         <div class="table-cell p-16">
           <button
             aria-label="Dokumentationseinheit löschen"
-            class="material-icons cursor-pointer"
+            class="cursor-pointer"
             @click="
               setSelectedDocumentUnitListEntry(
                 documentUnitListEntries?.find(
@@ -176,7 +178,7 @@ function onDelete() {
               )
             "
           >
-            delete
+            <IconDelete />
           </button>
         </div>
       </div>

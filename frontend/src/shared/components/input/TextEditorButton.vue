@@ -55,6 +55,7 @@ onUnmounted(() => {
     @keydown.m="onClickToggle(props)"
     @mousedown.prevent=""
   >
+    <!-- TODO: render dynamic vue icon component based on props -->
     <span
       class="px-[0.5rem] leading-default"
       :class="{ dropdown: type == 'menu', 'material-icons': icon }"

@@ -2,6 +2,8 @@
 import { computed, ref, watch } from "vue"
 import { useRoute } from "vue-router"
 import TextEditor from "@/shared/components/input/TextEditor.vue"
+import IconArrowForward from "~icons/ic/baseline-arrow-forward"
+import IconCloudUpload from "~icons/ic/baseline-cloud-upload"
 
 const props = defineProps<{
   open?: boolean
@@ -44,7 +46,7 @@ const uploadFileRoute = computed(() =>
       </div>
 
       <div v-if="!hasFile" class="flex flex-col gap-24">
-        <span class="material-icons odoc-upload-icon">cloud_upload</span>
+        <IconCloudUpload class="text-48 text-blue-800" />
 
         Es wurde noch kein Originaldokument hochgeladen.
 
@@ -53,7 +55,7 @@ const uploadFileRoute = computed(() =>
           class="ds-link-01-bold flex items-center gap-2"
           :to="uploadFileRoute"
         >
-          <span class="material-icons">arrow_forward</span>
+          <IconArrowForward />
           <span>Zum Upload</span>
         </router-link>
       </div>
@@ -97,10 +99,5 @@ const uploadFileRoute = computed(() =>
 .odoc-open-icon {
   margin-top: 8px;
   margin-right: 9px;
-}
-
-.odoc-upload-icon {
-  font-size: 50px;
-  @apply text-blue-800;
 }
 </style>
