@@ -19,7 +19,11 @@ import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentNumberService;
 import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentUnitStatusService;
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentUnitController;
 import de.bund.digitalservice.ris.caselaw.adapter.DocxConverterService;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentCategoryRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentTypeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationOfficeRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentCategoryDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentTypeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDeviatingDecisionDateRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentUnitMetadataRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentUnitRepository;
@@ -38,8 +42,6 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.PostgresDocumen
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.PostgresPublicationReportRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.CourtDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DatabaseCourtRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DatabaseDocumentTypeRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DocumentTypeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.StateDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.StateRepository;
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
@@ -139,6 +141,7 @@ class DocumentUnitIntegrationTest {
 
   private final DocumentationOffice docOffice = buildDefaultDocOffice();
   private UUID documentationOfficeUuid;
+  @Autowired private DatabaseDocumentCategoryRepository databaseDocumentCategoryRepository;
 
   @BeforeEach
   void setUp() {
@@ -164,7 +167,7 @@ class DocumentUnitIntegrationTest {
     deviatingDecisionDateRepository.deleteAll().block();
     incorrectCourtRepository.deleteAll().block();
     repository.deleteAll().block();
-    databaseDocumentTypeRepository.deleteAll().block();
+    databaseDocumentTypeRepository.deleteAll();
     documentUnitStatusRepository.deleteAll().block();
     databasePublishReportRepository.deleteAll().block();
   }
@@ -613,30 +616,39 @@ class DocumentUnitIntegrationTest {
 
   @Test
   void testDocumentTypeToSetIdFromLookuptable() {
+    var categoryA =
+        databaseDocumentCategoryRepository.saveAndFlush(
+            DocumentCategoryDTO.builder().label("A").build());
+    var categoryR =
+        databaseDocumentCategoryRepository.saveAndFlush(
+            DocumentCategoryDTO.builder().label("R").build());
+    var categoryC =
+        databaseDocumentCategoryRepository.saveAndFlush(
+            DocumentCategoryDTO.builder().label("C").build());
+
     DocumentTypeDTO documentTypeDTOA =
         DocumentTypeDTO.builder()
-            .changeIndicator('c')
-            .jurisShortcut("ABC")
-            .documentType('A')
+            .abbreviation("ABC")
+            .category(categoryA)
             .label("ABC123")
+            .multiple(true)
             .build();
     DocumentTypeDTO documentTypeDTOR =
         DocumentTypeDTO.builder()
-            .changeIndicator('c')
-            .jurisShortcut("ABC")
-            .documentType('R')
+            .abbreviation("ABC")
+            .category(categoryR)
             .label("ABC123")
+            .multiple(true)
             .build();
     DocumentTypeDTO documentTypeDTOC =
         DocumentTypeDTO.builder()
-            .changeIndicator('c')
-            .jurisShortcut("ABC")
-            .documentType('C')
+            .abbreviation("ABC")
+            .category(categoryC)
             .label("ABC123")
+            .multiple(true)
             .build();
-    databaseDocumentTypeRepository.save(documentTypeDTOA).block();
-    databaseDocumentTypeRepository.save(documentTypeDTOR).block();
-    databaseDocumentTypeRepository.save(documentTypeDTOC).block();
+    databaseDocumentTypeRepository.saveAllAndFlush(
+        List.of(documentTypeDTOA, documentTypeDTOR, documentTypeDTOC));
 
     DocumentUnitDTO dto =
         DocumentUnitDTO.builder()
@@ -656,7 +668,7 @@ class DocumentUnitIntegrationTest {
                 CoreData.builder()
                     .documentType(
                         DocumentType.builder()
-                            .jurisShortcut(documentTypeDTOR.getJurisShortcut())
+                            .jurisShortcut(documentTypeDTOR.getAbbreviation())
                             .label(documentTypeDTOR.getLabel())
                             .build())
                     .documentationOffice(docOffice)
@@ -678,7 +690,7 @@ class DocumentUnitIntegrationTest {
               assertThat(response.getResponseBody().coreData().documentType().label())
                   .isEqualTo(documentTypeDTOR.getLabel());
               assertThat(response.getResponseBody().coreData().documentType().jurisShortcut())
-                  .isEqualTo(documentTypeDTOR.getJurisShortcut());
+                  .isEqualTo(documentTypeDTOR.getAbbreviation());
             });
 
     List<DocumentUnitDTO> list = repository.findAll().collectList().block();
@@ -689,12 +701,16 @@ class DocumentUnitIntegrationTest {
 
   @Test
   void testUndoSettingDocumentType() {
+    var docType =
+        databaseDocumentTypeRepository.saveAndFlush(
+            DocumentTypeDTO.builder().abbreviation("test").multiple(true).build());
+
     DocumentUnitDTO dto =
         DocumentUnitDTO.builder()
             .uuid(UUID.randomUUID())
             .creationtimestamp(Instant.now())
             .documentnumber("1234567890123")
-            .documentTypeId(123L)
+            .documentTypeId(docType.getId())
             .documentationOfficeId(documentationOfficeUuid)
             .build();
     repository.save(dto).block();

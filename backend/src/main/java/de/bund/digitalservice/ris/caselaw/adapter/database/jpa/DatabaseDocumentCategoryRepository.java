@@ -6,4 +6,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface DatabaseDocumentCategoryRepository
-    extends JpaRepository<DocumentCategoryDTO, UUID> {}
+    extends JpaRepository<DocumentCategoryDTO, UUID> {
+
+  DocumentCategoryDTO findFirstByLabel(String label);
+}

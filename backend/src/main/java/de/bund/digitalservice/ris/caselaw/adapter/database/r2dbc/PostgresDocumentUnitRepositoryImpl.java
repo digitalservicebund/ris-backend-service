@@ -1,9 +1,12 @@
 package de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc;
 
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentCategoryRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentTypeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationOfficeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseNormReferenceRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseProcedureLinkRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseProcedureRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentTypeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitSearchEntryDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.NormReferenceDTO;
@@ -13,9 +16,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitDTO
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.CourtDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DatabaseCitationStyleRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DatabaseCourtRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DatabaseDocumentTypeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DatabaseFieldOfLawRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DocumentTypeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.StateDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.StateRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.ActiveCitationTransformer;
@@ -80,6 +81,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
   private final DatabaseCourtRepository databaseCourtRepository;
   private final StateRepository stateRepository;
   private final DatabaseDocumentTypeRepository databaseDocumentTypeRepository;
+  private final DatabaseDocumentCategoryRepository databaseDocumentCategoryRepository;
   private final DatabaseFieldOfLawRepository fieldOfLawRepository;
   private final DatabaseDocumentUnitFieldsOfLawRepository documentUnitFieldsOfLawRepository;
   private final DatabaseKeywordRepository keywordRepository;
@@ -102,6 +104,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
       DatabaseCourtRepository databaseCourtRepository,
       StateRepository stateRepository,
       DatabaseDocumentTypeRepository databaseDocumentTypeRepository,
+      DatabaseDocumentCategoryRepository databaseDocumentCategoryRepository,
       DatabaseFieldOfLawRepository fieldOfLawRepository,
       DatabaseDocumentUnitFieldsOfLawRepository documentUnitFieldsOfLawRepository,
       DatabaseKeywordRepository keywordRepository,
@@ -123,6 +126,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
     this.databaseCourtRepository = databaseCourtRepository;
     this.stateRepository = stateRepository;
     this.databaseDocumentTypeRepository = databaseDocumentTypeRepository;
+    this.databaseDocumentCategoryRepository = databaseDocumentCategoryRepository;
     this.fieldOfLawRepository = fieldOfLawRepository;
     this.documentUnitFieldsOfLawRepository = documentUnitFieldsOfLawRepository;
     this.keywordRepository = keywordRepository;
@@ -229,8 +233,10 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
       return Mono.just(documentUnitDTO);
     }
 
-    return databaseDocumentTypeRepository
-        .findFirstByJurisShortcutAndDocumentType(documentType.jurisShortcut(), 'R')
+    return Mono.just(
+            databaseDocumentTypeRepository.findFirstByAbbreviationAndCategory(
+                documentType.jurisShortcut(),
+                databaseDocumentCategoryRepository.findFirstByLabel("R")))
         .map(
             documentTypeDTO -> {
               if (!documentTypeDTO.getLabel().equals(documentType.label())) {
@@ -1028,9 +1034,10 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
     if (documentUnitMetadataDTO.getDocumentTypeId() == null) {
       return Mono.just(documentUnitMetadataDTO);
     }
-    return databaseDocumentTypeRepository
-        .findById(documentUnitMetadataDTO.getDocumentTypeId())
-        .defaultIfEmpty(DocumentTypeDTO.builder().build())
+    return Mono.just(
+            databaseDocumentTypeRepository
+                .findById(documentUnitMetadataDTO.getDocumentTypeId())
+                .orElse(DocumentTypeDTO.builder().build()))
         .map(
             documentTypeDTO -> {
               documentUnitMetadataDTO.setDocumentTypeDTO(documentTypeDTO);
@@ -1163,7 +1170,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
               if (documentUnitDTOIdsViaFileNumber == null
                   && linkedDocumentationUnit.getFileNumber() != null) return Flux.empty();
 
-              Long documentTypeDTOId = tuple.getT2() == -1L ? null : tuple.getT2();
+              UUID documentTypeDTOId = tuple.getT2() == UUID.fromString("0") ? null : tuple.getT2();
               if (documentTypeDTOId == null && linkedDocumentationUnit.getDocumentType() != null)
                 return Flux.empty();
 
@@ -1196,7 +1203,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
               if (documentUnitDTOIdsViaFileNumber == null
                   && linkedDocumentationUnit.getFileNumber() != null) return Mono.just(0L);
 
-              Long documentTypeDTOId = tuple.getT2() == -1L ? null : tuple.getT2();
+              UUID documentTypeDTOId = tuple.getT2() == UUID.fromString("0") ? null : tuple.getT2();
               if (documentTypeDTOId == null && linkedDocumentationUnit.getDocumentType() != null)
                 return Mono.just(0L);
 
@@ -1232,15 +1239,17 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
         .map(FileNumberDTO::getDocumentUnitId);
   }
 
-  private Mono<Long> extractDocumentTypeDTOId(LinkedDocumentationUnit linkedDocumentationUnit) {
+  private Mono<UUID> extractDocumentTypeDTOId(LinkedDocumentationUnit linkedDocumentationUnit) {
     return Mono.justOrEmpty(linkedDocumentationUnit.getDocumentType())
         .map(DocumentType::jurisShortcut)
         .flatMap(
             jurisShortcut ->
-                databaseDocumentTypeRepository.findFirstByJurisShortcutAndDocumentType(
-                    jurisShortcut, 'R'))
-        .mapNotNull(DocumentTypeDTO::getId)
-        .switchIfEmpty(Mono.just(-1L));
+                Mono.justOrEmpty(
+                        databaseDocumentTypeRepository.findFirstByAbbreviationAndCategory(
+                            jurisShortcut,
+                            databaseDocumentCategoryRepository.findFirstByLabel("R")))
+                    .mapNotNull(DocumentTypeDTO::getId)
+                    .switchIfEmpty(Mono.just(UUID.fromString("0"))));
   }
 
   private Long[] convertListToArrayOrReturnNull(List<Long> list) {

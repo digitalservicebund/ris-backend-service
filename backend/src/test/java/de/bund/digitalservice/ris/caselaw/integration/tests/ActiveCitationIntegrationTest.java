@@ -12,7 +12,11 @@ import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentNumberService;
 import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentUnitStatusService;
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentUnitController;
 import de.bund.digitalservice.ris.caselaw.adapter.DocxConverterService;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentCategoryRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentTypeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationOfficeRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentCategoryDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentTypeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentUnitRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentationUnitLinkRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitDTO;
@@ -21,8 +25,6 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.FileNumberDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.FileNumberRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.PostgresDocumentUnitRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.PostgresPublicationReportRepositoryImpl;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DatabaseDocumentTypeRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DocumentTypeDTO;
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
@@ -107,10 +109,12 @@ class ActiveCitationIntegrationTest {
 
   private static final String DOCUMENT_NUMBER_PREFIX = "XXRE20230000";
   private static final String UUID_PREFIX = "88888888-4444-4444-4444-11111111111";
-  private static final Long DOCUMENT_TYPE_ID_OFFSET = 111111L;
   private static final Instant TIMESTAMP = Instant.parse("2000-02-01T20:13:36.00Z");
   private static final Instant DECISION_DATE = Instant.parse("1983-09-15T08:21:17.00Z");
   private UUID docOfficeUuid;
+
+  private DocumentCategoryDTO category;
+  @Autowired private DatabaseDocumentCategoryRepository databaseDocumentCategoryRepository;
 
   @BeforeEach
   void setUp() {
@@ -118,13 +122,20 @@ class ActiveCitationIntegrationTest {
         .thenReturn(Mono.just(AuthUtils.buildDocOffice("DigitalService", "XX")));
 
     docOfficeUuid = documentationOfficeRepository.findByLabel("DigitalService").getId();
+
+    category = databaseDocumentCategoryRepository.findFirstByLabel("R");
+    if (category == null) {
+      category =
+          databaseDocumentCategoryRepository.saveAndFlush(
+              DocumentCategoryDTO.builder().label("R").build());
+    }
   }
 
   @AfterEach
   void cleanUp() {
     linkRepository.deleteAll().block();
-    documentTypeRepository.deleteAll().block();
     repository.deleteAll().block();
+    documentTypeRepository.deleteAll();
   }
 
   @Test
@@ -152,7 +163,7 @@ class ActiveCitationIntegrationTest {
   @Test
   void testUpdateDocumentationUnit_withNewActiveCitation() {
     prepareTestData(1, 0);
-    addDocumentTypeToDB(2);
+    var type = addDocumentTypeToDB(2);
 
     ActiveCitation activeCitation = generateActiveCitation(1, false);
     ActiveCitation newActiveCitationRequest =
@@ -709,7 +720,7 @@ class ActiveCitationIntegrationTest {
   }
 
   private void prepareTestData(int realActiveCitationCount, int editableActiveCitationCount) {
-    addDocumentTypeToDB(0);
+    var type = addDocumentTypeToDB(0);
 
     DocumentUnitDTO parentDTO =
         DocumentUnitDTO.builder()
@@ -718,7 +729,7 @@ class ActiveCitationIntegrationTest {
             .documentnumber(DOCUMENT_NUMBER_PREFIX + "0")
             .creationtimestamp(TIMESTAMP.plus(0, ChronoUnit.MINUTES))
             .decisionDate(DECISION_DATE)
-            .documentTypeId(DOCUMENT_TYPE_ID_OFFSET)
+            .documentTypeId(type.getId())
             .build();
 
     DocumentUnitDTO savedParentDTO = repository.save(parentDTO).block();
@@ -742,7 +753,7 @@ class ActiveCitationIntegrationTest {
   }
 
   private void addActiveCitationToDB(int offset, boolean editable) {
-    addDocumentTypeToDB(offset);
+    var type = addDocumentTypeToDB(offset);
 
     DocumentUnitDTO activeCitationDTO =
         DocumentUnitDTO.builder()
@@ -753,7 +764,7 @@ class ActiveCitationIntegrationTest {
             .decisionDate(DECISION_DATE.plus(offset * 10L, ChronoUnit.MINUTES))
             .courtType("TestCourt #" + offset)
             .courtLocation("Berlin #" + offset)
-            .documentTypeId(DOCUMENT_TYPE_ID_OFFSET + offset)
+            .documentTypeId(type.getId())
             .dateKnown(true)
             .dataSource(editable ? DataSource.ACTIVE_CITATION : DataSource.NEURIS)
             .build();
@@ -791,18 +802,16 @@ class ActiveCitationIntegrationTest {
     linkRepository.delete(linkDTO).block();
   }
 
-  private void addDocumentTypeToDB(int number) {
+  private DocumentTypeDTO addDocumentTypeToDB(int number) {
     DocumentTypeDTO documentTypeDTO =
         DocumentTypeDTO.builder()
-            .id(DOCUMENT_TYPE_ID_OFFSET + number)
-            .newEntry(true)
-            .jurisShortcut("D" + number)
-            .label("document type of DigitalService #" + number)
-            .documentType('R')
-            .changeIndicator('N')
+            .abbreviation("abbreviation" + number)
+            .label("R")
+            .category(category)
+            .multiple(true)
             .build();
 
-    documentTypeRepository.save(documentTypeDTO).block();
+    return documentTypeRepository.saveAndFlush(documentTypeDTO);
   }
 
   private ActiveCitation generateActiveCitation(int number, boolean editable) {
@@ -819,10 +828,7 @@ class ActiveCitationIntegrationTest {
         .decisionDate(DECISION_DATE.plus(number * 10L, ChronoUnit.MINUTES))
         .documentNumber(DOCUMENT_NUMBER_PREFIX + number)
         .documentType(
-            DocumentType.builder()
-                .jurisShortcut("D" + number)
-                .label("document type of DigitalService #" + number)
-                .build())
+            DocumentType.builder().jurisShortcut("abbreviation" + number).label("R").build())
         .fileNumber("file number #" + number)
         .build();
   }
@@ -847,10 +853,7 @@ class ActiveCitationIntegrationTest {
                 .deviatingFileNumbers(Collections.emptyList())
                 .fileNumbers(List.of("file number #0"))
                 .documentType(
-                    DocumentType.builder()
-                        .jurisShortcut("D0")
-                        .label("document type of DigitalService #0")
-                        .build())
+                    DocumentType.builder().jurisShortcut("abbreviation0").label("R").build())
                 .decisionDate(DECISION_DATE)
                 .incorrectCourts(Collections.emptyList())
                 .documentationOffice(AuthUtils.buildDefaultDocOffice())

@@ -5,8 +5,6 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -24,8 +22,5 @@ import lombok.Setter;
 public class DocumentCategoryDTO {
   @Id @GeneratedValue private UUID id;
 
-  @Column
-  @NotBlank
-  @Size(max = 1)
-  private String label;
+  @Column private String label;
 }

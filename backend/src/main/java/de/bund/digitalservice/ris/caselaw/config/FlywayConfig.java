@@ -34,6 +34,7 @@ public class FlywayConfig {
         .dataSource(url, user, password)
         .baselineOnMigrate(true)
         .baselineVersion("0.0")
+        .ignoreMigrationPatterns("*:ignored")
         .load();
   }
 

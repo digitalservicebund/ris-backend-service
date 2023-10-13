@@ -47,8 +47,7 @@ class LookupTableImporterServiceTest {
   @SpyBean private LookupTableImporterService service;
 
   @MockBean
-  private de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable
-          .DatabaseDocumentTypeRepository
+  private de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentTypeRepository
       databaseDocumentTypeRepository;
 
   @MockBean private DatabaseCourtRepository databaseCourtRepository;

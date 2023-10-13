@@ -8,11 +8,11 @@ import de.bund.digitalservice.ris.caselaw.adapter.AuthService;
 import de.bund.digitalservice.ris.caselaw.adapter.NormAbbreviationController;
 import de.bund.digitalservice.ris.caselaw.adapter.NormAbbreviationService;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentCategoryRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentTypeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseNormAbbreviationRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseRegionRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentCategoryDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentTypeDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPADatabaseDocumentTypeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.NormAbbreviationDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresNormAbbreviationRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.RegionDTO;
@@ -149,7 +149,6 @@ class NormAbbreviationIntegrationTest {
           .multiple(false)
           .superLabel1("super label 11")
           .superLabel2("super label 21")
-          .jurisID("jurisId1")
           .build();
   private DocumentTypeDTO documentType2 =
       DocumentTypeDTO.builder()
@@ -158,7 +157,6 @@ class NormAbbreviationIntegrationTest {
           .multiple(false)
           .superLabel1("super label 12")
           .superLabel2("super label 22")
-          .jurisID("jurisId 2")
           .build();
   private RegionDTO region1 = RegionDTO.builder().code("region code 1").build();
   private RegionDTO region2 = RegionDTO.builder().code("region code 2").build();
@@ -179,7 +177,7 @@ class NormAbbreviationIntegrationTest {
 
   @Autowired private RisWebTestClient risWebTestClient;
   @Autowired private DatabaseNormAbbreviationRepository repository;
-  @Autowired private JPADatabaseDocumentTypeRepository documentTypeRepository;
+  @Autowired private DatabaseDocumentTypeRepository documentTypeRepository;
   @Autowired private DatabaseDocumentCategoryRepository documentCategoryRepository;
   @Autowired private DatabaseRegionRepository regionRepository;
 
