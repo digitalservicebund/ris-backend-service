@@ -65,7 +65,6 @@ public class AuthService {
   private Mono<Boolean> userHasReadAccess(DocumentUnit documentUnit) {
     List<PublicationStatus> published =
         List.of(
-            PublicationStatus.TEST_DOC_UNIT,
             PublicationStatus.PUBLISHED,
             PublicationStatus.PUBLISHING,
             PublicationStatus.JURIS_PUBLISHED);

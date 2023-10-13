@@ -29,10 +29,7 @@ public class DocumentationUnitSearchEntryTransformer {
   private static DocumentUnitStatus getPublicStatus(
       PublicationStatus publicationStatus, Boolean withError) {
     List<PublicationStatus> published =
-        List.of(
-            PublicationStatus.TEST_DOC_UNIT,
-            PublicationStatus.PUBLISHED,
-            PublicationStatus.JURIS_PUBLISHED);
+        List.of(PublicationStatus.PUBLISHED, PublicationStatus.JURIS_PUBLISHED);
 
     DocumentUnitStatusBuilder builder = DocumentUnitStatus.builder();
     if (publicationStatus != null && published.contains(publicationStatus)) {
