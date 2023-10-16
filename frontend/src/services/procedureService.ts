@@ -5,7 +5,7 @@ import { Page } from "@/shared/components/Pagination.vue"
 import errorMessages from "@/shared/i18n/errors.json"
 
 interface ProcedureService {
-  getAll(
+  get(
     size: number,
     page: number,
     filter?: string,
@@ -16,7 +16,7 @@ interface ProcedureService {
 }
 
 const service: ProcedureService = {
-  async getAll(size: number, page: number, filter?: string) {
+  async get(size: number, page: number, filter?: string) {
     const response = await httpClient.get<Page<Procedure>>(
       `caselaw/procedure`,
       {

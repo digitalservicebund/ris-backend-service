@@ -16,7 +16,7 @@ const procedures = ref<Procedure[]>()
 const currentPage = ref<Page<Procedure>>()
 
 async function updateProcedures(page: number, queries?: Query<string>) {
-  const response = await service.getAll(itemsPerPage, page, queries?.q)
+  const response = await service.get(itemsPerPage, page, queries?.q)
   if (response.data) {
     procedures.value = copyDocumentUnits(
       response.data.content,
@@ -60,7 +60,11 @@ onMounted(() => {
   updateProcedures(0, query.value)
 })
 
-watch(route, () => (query.value = getQueryFromRoute()))
+watch(route, () => {
+  const currentQuery = getQueryFromRoute()
+  if (JSON.stringify(query.value) != JSON.stringify(currentQuery))
+    query.value = currentQuery
+})
 
 watch(
   query,
@@ -74,15 +78,11 @@ watch(
 
 <template>
   <div class="bg-white px-32 pb-16 pt-32">
-    <InputField
-      id="procedureFilter"
-      label="Dokumentnummer oder Aktenzeichen"
-      visually-hide-label
-    >
+    <InputField id="procedureFilter" label="Vorgang" visually-hide-label>
       <TextInput
         id="procedureFilter"
         v-model="query.q"
-        aria-label="Dokumentnummer oder Aktenzeichen Suche"
+        aria-label="Nach Vorgängen suchen"
         class="ds-input-medium"
         placeholder="Nach Vorgängen suchen"
       ></TextInput>
