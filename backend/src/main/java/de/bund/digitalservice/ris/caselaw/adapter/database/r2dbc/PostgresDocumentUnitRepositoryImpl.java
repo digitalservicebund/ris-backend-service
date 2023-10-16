@@ -1170,7 +1170,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
               if (documentUnitDTOIdsViaFileNumber == null
                   && linkedDocumentationUnit.getFileNumber() != null) return Flux.empty();
 
-              UUID documentTypeDTOId = tuple.getT2() == UUID.fromString("0") ? null : tuple.getT2();
+              UUID documentTypeDTOId = tuple.getT2().equals(new UUID(0, 0)) ? null : tuple.getT2();
               if (documentTypeDTOId == null && linkedDocumentationUnit.getDocumentType() != null)
                 return Flux.empty();
 
@@ -1203,7 +1203,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
               if (documentUnitDTOIdsViaFileNumber == null
                   && linkedDocumentationUnit.getFileNumber() != null) return Mono.just(0L);
 
-              UUID documentTypeDTOId = tuple.getT2() == UUID.fromString("0") ? null : tuple.getT2();
+              UUID documentTypeDTOId = tuple.getT2().equals(new UUID(0, 0)) ? null : tuple.getT2();
               if (documentTypeDTOId == null && linkedDocumentationUnit.getDocumentType() != null)
                 return Mono.just(0L);
 
@@ -1245,11 +1245,10 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
         .flatMap(
             jurisShortcut ->
                 Mono.justOrEmpty(
-                        databaseDocumentTypeRepository.findFirstByAbbreviationAndCategory(
-                            jurisShortcut,
-                            databaseDocumentCategoryRepository.findFirstByLabel("R")))
-                    .mapNotNull(DocumentTypeDTO::getId)
-                    .switchIfEmpty(Mono.just(UUID.fromString("0"))));
+                    databaseDocumentTypeRepository.findFirstByAbbreviationAndCategory(
+                        jurisShortcut, databaseDocumentCategoryRepository.findFirstByLabel("R"))))
+        .mapNotNull(DocumentTypeDTO::getId)
+        .switchIfEmpty(Mono.just(new UUID(0, 0)));
   }
 
   private Long[] convertListToArrayOrReturnNull(List<Long> list) {

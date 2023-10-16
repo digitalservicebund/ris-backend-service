@@ -799,14 +799,22 @@ class ProceedingDecisionIntegrationTest {
     UUID documentTypeId = null;
     if (documentTypeJurisShortcut != null) {
 
-      DocumentTypeDTO documentTypeDTO =
-          DocumentTypeDTO.builder()
-              .category(category)
-              .label("ABC123")
-              .multiple(true)
-              .abbreviation(documentTypeJurisShortcut)
-              .build();
-      documentTypeId = databaseDocumentTypeRepository.saveAndFlush(documentTypeDTO).getId();
+      var documentType =
+          databaseDocumentTypeRepository.findFirstByAbbreviationAndCategory(
+              documentTypeJurisShortcut, category);
+
+      if (documentType == null) {
+        DocumentTypeDTO documentTypeDTO =
+            DocumentTypeDTO.builder()
+                .category(category)
+                .label("ABC123")
+                .multiple(true)
+                .abbreviation(documentTypeJurisShortcut)
+                .build();
+        documentTypeId = databaseDocumentTypeRepository.saveAndFlush(documentTypeDTO).getId();
+      } else {
+        documentTypeId = documentType.getId();
+      }
     }
 
     DocumentationOfficeDTO documentOffice =

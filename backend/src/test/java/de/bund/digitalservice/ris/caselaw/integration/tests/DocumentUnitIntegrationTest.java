@@ -633,13 +633,6 @@ class DocumentUnitIntegrationTest {
             .label("ABC123")
             .multiple(true)
             .build();
-    DocumentTypeDTO documentTypeDTOR =
-        DocumentTypeDTO.builder()
-            .abbreviation("ABC")
-            .category(categoryR)
-            .label("ABC123")
-            .multiple(true)
-            .build();
     DocumentTypeDTO documentTypeDTOC =
         DocumentTypeDTO.builder()
             .abbreviation("ABC")
@@ -647,8 +640,17 @@ class DocumentUnitIntegrationTest {
             .label("ABC123")
             .multiple(true)
             .build();
-    databaseDocumentTypeRepository.saveAllAndFlush(
-        List.of(documentTypeDTOA, documentTypeDTOR, documentTypeDTOC));
+
+    databaseDocumentTypeRepository.saveAllAndFlush(List.of(documentTypeDTOA, documentTypeDTOC));
+
+    var documentTypeDTOR =
+        databaseDocumentTypeRepository.saveAndFlush(
+            DocumentTypeDTO.builder()
+                .abbreviation("ABC")
+                .category(categoryR)
+                .label("ABC123")
+                .multiple(true)
+                .build());
 
     DocumentUnitDTO dto =
         DocumentUnitDTO.builder()
@@ -695,7 +697,7 @@ class DocumentUnitIntegrationTest {
 
     List<DocumentUnitDTO> list = repository.findAll().collectList().block();
     assertThat(list).hasSize(1);
-    assertThat(list.get(0).getDocumentTypeId()).isEqualTo(2L);
+    assertThat(list.get(0).getDocumentTypeId()).isEqualTo(documentTypeDTOR.getId());
     assertThat(list.get(0).getDocumentTypeDTO()).isNull();
   }
 
