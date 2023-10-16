@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { Ref, ref, onMounted, watch } from "vue"
+import { ref, onMounted, watch } from "vue"
 import ProcedureDetail from "./ProcedureDetail.vue"
 import ExpandableContent from "@/components/ExpandableContent.vue"
 import useQuery, { Query } from "@/composables/useQueryFromRoute"
@@ -27,20 +27,8 @@ async function updateProcedures(page: number, queries?: Query<string>) {
   }
 }
 
-const { getQueriesFromRoute, pushQueriesToRoute, route } = useQuery<"q">()
-
-const query = ref(getQueriesFromRoute()) as Ref<Query<"q">>
-
-watch(route, () => (query.value = getQueriesFromRoute()))
-
-watch(
-  query,
-  async () => {
-    await updateProcedures(0, query.value)
-    pushQueriesToRoute(query.value)
-  },
-  { deep: true },
-)
+const { getQueryFromRoute, pushQueryToRoute, route } = useQuery<"q">()
+const query = ref(getQueryFromRoute())
 
 async function loadDocumentUnits(loadingProcedure: Procedure) {
   if (!procedures.value) return
@@ -71,6 +59,17 @@ function copyDocumentUnits(
 onMounted(() => {
   updateProcedures(0, query.value)
 })
+
+watch(route, () => (query.value = getQueryFromRoute()))
+
+watch(
+  query,
+  async () => {
+    await updateProcedures(0, query.value)
+    pushQueryToRoute(query.value)
+  },
+  { deep: true },
+)
 </script>
 
 <template>
