@@ -5,6 +5,8 @@ on:
     branches: [main]
   pull_request:
     branches: [main]
+  schedule:
+    - cron: "0 18 * * *" # Every day at 8pm
   # Allow to run this workflow manually
   workflow_dispatch:
 
@@ -900,8 +902,9 @@ jobs:
   deploy-uat:
     runs-on: ubuntu-latest
     if: |
-      github.ref == 'refs/heads/main' &&
-      needs.deployment-time-check.outputs.between-8-and-20 == 'false'
+      github.ref == 'refs/heads/main' 
+    # &&
+    # needs.deployment-time-check.outputs.between-8-and-20 == 'false'
     concurrency: deploy-uat
     environment: uat
     needs:
