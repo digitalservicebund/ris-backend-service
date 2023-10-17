@@ -62,10 +62,7 @@ const debouncedPushQueryToRoute = (() => {
   return (currentQuerry: Query<string>) => {
     if (timeoutId != null) window.clearTimeout(timeoutId)
 
-    timeoutId = window.setTimeout(
-      () => void pushQueryToRoute(currentQuerry),
-      500,
-    )
+    timeoutId = window.setTimeout(() => pushQueryToRoute(currentQuerry), 500)
   }
 })()
 
