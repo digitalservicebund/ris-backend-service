@@ -56,6 +56,19 @@ function copyDocumentUnits(
   })
 }
 
+const debouncedPushQueryToRoute = (() => {
+  let timeoutId: number | null = null
+
+  return (currentQuerry: Query<string>) => {
+    if (timeoutId != null) window.clearTimeout(timeoutId)
+
+    timeoutId = window.setTimeout(
+      () => void pushQueryToRoute(currentQuerry),
+      500,
+    )
+  }
+})()
+
 onMounted(() => {
   updateProcedures(0, query.value)
 })
@@ -70,7 +83,7 @@ watch(
   query,
   async () => {
     await updateProcedures(0, query.value)
-    pushQueryToRoute(query.value)
+    debouncedPushQueryToRoute(query.value)
   },
   { deep: true },
 )

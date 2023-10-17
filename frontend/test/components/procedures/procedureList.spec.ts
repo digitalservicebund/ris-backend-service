@@ -163,6 +163,20 @@ describe("ProcedureList", () => {
 
     await user.type(await screen.findByLabelText("Nach Vorgängen suchen"), "b")
     expect(mockedGetProcedures).toHaveBeenCalledWith(10, 0, "b")
+
+    expect(mocks.mockedPushQuery).not.toHaveBeenCalled()
+  })
+
+  it("debounces route updates on search", async () => {
+    const { user } = await renderComponent()
+    await user.type(await screen.findByLabelText("Nach Vorgängen suchen"), "b")
+
+    expect(mocks.mockedPushQuery).not.toHaveBeenCalled()
+
+    await new Promise((resolve) => {
+      setTimeout(resolve, 500)
+    })
+
     expect(mocks.mockedPushQuery).toHaveBeenCalledWith({ q: "b" })
   })
 
