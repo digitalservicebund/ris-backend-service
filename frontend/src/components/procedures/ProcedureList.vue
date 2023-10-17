@@ -87,18 +87,21 @@ watch(
 </script>
 
 <template>
-  <div class="bg-white px-32 pb-16 pt-32">
-    <InputField id="procedureFilter" label="Vorgang" visually-hide-label>
-      <TextInput
-        id="procedureFilter"
-        v-model="query.q"
-        aria-label="Nach Vorgängen suchen"
-        class="ds-input-medium"
-        placeholder="Nach Vorgängen suchen"
-      ></TextInput>
-    </InputField>
-  </div>
-  <div class="bg-blue-200 px-32 pt-24">
+  <header class="bg-white px-32 py-16">
+    <h1 class="ds-heading-02-reg">Vorgänge</h1>
+    <div class="mt-32" role="search">
+      <InputField id="procedureFilter" label="Vorgang" visually-hide-label>
+        <TextInput
+          id="procedureFilter"
+          v-model="query.q"
+          aria-label="Nach Vorgängen suchen"
+          class="ds-input-medium"
+          placeholder="Nach Vorgängen suchen"
+        ></TextInput>
+      </InputField>
+    </div>
+  </header>
+  <div class="bg-blue-200 px-32 pt-24" role="main">
     <div class="flex flex-row">
       <div v-if="procedures" class="flex-1 py-56">
         <Pagination
