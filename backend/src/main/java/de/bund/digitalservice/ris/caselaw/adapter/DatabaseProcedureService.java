@@ -15,6 +15,7 @@ import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class DatabaseProcedureService implements ProcedureService {
@@ -56,7 +57,7 @@ public class DatabaseProcedureService implements ProcedureService {
     return linkRepository
         .findLatestProcedureLinksByProcedure(
             repository
-                .findByLabelAndDocumentationOfficeOrderByCreatedAtDesc(
+                .findByLabelAndDocumentationOffice(
                     procedureLabel,
                     documentationOfficeRepository.findByLabel(documentationOffice.label()))
                 .getId())
@@ -67,5 +68,12 @@ public class DatabaseProcedureService implements ProcedureService {
         .map(Optional::get)
         .map(DocumentationUnitSearchEntryTransformer::transferDTO)
         .toList();
+  }
+
+  @Override
+  @Transactional(transactionManager = "jpaTransactionManager")
+  public void delete(String procedureLabel, DocumentationOffice documentationOffice) {
+    repository.deleteByLabelAndDocumentationOffice(
+        procedureLabel, documentationOfficeRepository.findByLabel(documentationOffice.label()));
   }
 }

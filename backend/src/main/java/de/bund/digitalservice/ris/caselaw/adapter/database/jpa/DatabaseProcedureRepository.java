@@ -12,7 +12,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface DatabaseProcedureRepository extends JpaRepository<ProcedureDTO, UUID> {
 
-  ProcedureDTO findByLabelAndDocumentationOfficeOrderByCreatedAtDesc(
+  ProcedureDTO findByLabelAndDocumentationOffice(
       String label, DocumentationOfficeDTO documentationOfficeDTO);
 
   @Query(
@@ -21,4 +21,7 @@ public interface DatabaseProcedureRepository extends JpaRepository<ProcedureDTO,
       @Param("label") Optional<String> label,
       @Param("documentationOffice") DocumentationOfficeDTO documentationOfficeDTO,
       Pageable pageable);
+
+  void deleteByLabelAndDocumentationOffice(
+      String label, DocumentationOfficeDTO documentationOfficeDTO);
 }

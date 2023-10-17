@@ -11,4 +11,6 @@ public interface ProcedureService {
 
   List<DocumentationUnitSearchEntry> getDocumentUnits(
       String procedureLabel, DocumentationOffice documentationOffice);
+
+  void delete(String procedureLabel, DocumentationOffice documentationOffice);
 }
