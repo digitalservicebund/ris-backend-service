@@ -4,7 +4,6 @@ import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentTypeTransf
 import de.bund.digitalservice.ris.caselaw.domain.DocumentTypeRepository;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
 import java.util.List;
-import java.util.stream.Collectors;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -26,7 +25,7 @@ public class PostgresDocumentTypeRepositoryImpl implements DocumentTypeRepositor
             searchString, categoryRepository.findFirstByLabel("R").getId())
         .stream()
         .map(DocumentTypeTransformer::transformDTO)
-        .collect(Collectors.toList());
+        .toList();
   }
 
   @Override

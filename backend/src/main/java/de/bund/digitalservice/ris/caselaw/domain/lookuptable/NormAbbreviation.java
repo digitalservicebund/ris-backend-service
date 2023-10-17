@@ -1,5 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.domain.lookuptable;
 
+import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
@@ -16,5 +17,5 @@ public record NormAbbreviation(
     String officialLongTitle,
     String officialShortTitle,
     String source,
-    List<DocumentTypeNew> documentTypes,
+    List<DocumentType> documentTypes,
     Region region) {}

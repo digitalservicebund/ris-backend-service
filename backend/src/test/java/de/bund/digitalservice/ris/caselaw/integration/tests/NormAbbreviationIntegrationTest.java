@@ -23,10 +23,10 @@ import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.EmailPublishService;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
-import de.bund.digitalservice.ris.caselaw.domain.lookuptable.DocumentTypeNew;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.NormAbbreviation;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.NormAbbreviation.NormAbbreviationBuilder;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.Region;
+import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
 import java.time.LocalDate;
 import java.time.Month;
 import java.time.ZoneId;
@@ -456,7 +456,7 @@ class NormAbbreviationIntegrationTest {
 
     private final NormAbbreviationBuilder builder;
     private Region region;
-    private final List<DocumentTypeNew> documentTypes;
+    private final List<DocumentType> documentTypes;
 
     private NormAbbreviationTestBuilder() {
       this.builder = NormAbbreviation.builder();
@@ -501,13 +501,9 @@ class NormAbbreviationIntegrationTest {
       }
 
       documentTypes.add(
-          DocumentTypeNew.builder()
-              .abbreviation(documentTypeNewDTO.getAbbreviation())
+          DocumentType.builder()
+              .jurisShortcut(documentTypeNewDTO.getAbbreviation())
               .label(documentTypeNewDTO.getLabel())
-              .multiple(documentTypeNewDTO.getMultiple())
-              .superLabel1(documentTypeNewDTO.getSuperLabel1())
-              .superLabel2(documentTypeNewDTO.getSuperLabel2())
-              .categoryLabel(categoryLabel)
               .build());
       return this;
     }

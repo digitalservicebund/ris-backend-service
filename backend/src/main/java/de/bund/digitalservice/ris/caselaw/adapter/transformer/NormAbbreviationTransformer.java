@@ -1,9 +1,9 @@
 package de.bund.digitalservice.ris.caselaw.adapter.transformer;
 
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.NormAbbreviationDTO;
-import de.bund.digitalservice.ris.caselaw.domain.lookuptable.DocumentTypeNew;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.NormAbbreviation;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.Region;
+import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
 import java.time.ZoneId;
 import java.util.List;
 
@@ -15,11 +15,11 @@ public class NormAbbreviationTransformer {
       return null;
     }
 
-    List<DocumentTypeNew> documentTypes = null;
+    List<DocumentType> documentTypes = null;
     if (normAbbreviationDTO.getDocumentTypeList() != null) {
       documentTypes =
           normAbbreviationDTO.getDocumentTypeList().stream()
-              .map(DocumentTypeNewTransformer::transformDTO)
+              .map(DocumentTypeTransformer::transformDTO)
               .toList();
     }
     Region region = null;
