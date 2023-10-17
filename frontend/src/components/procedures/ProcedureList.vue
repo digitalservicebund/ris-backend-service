@@ -87,7 +87,7 @@ watch(
 </script>
 
 <template>
-  <header class="bg-white px-32 py-16">
+  <header class="bg-white px-16 py-16">
     <h1 class="ds-heading-02-reg">Vorgänge</h1>
     <div class="mt-32" role="search">
       <InputField id="procedureFilter" label="Vorgang" visually-hide-label>
@@ -101,7 +101,7 @@ watch(
       </InputField>
     </div>
   </header>
-  <div class="bg-blue-200 px-32 pt-24" role="main">
+  <div class="bg-blue-200 px-16 pt-24" role="main">
     <div class="flex flex-row">
       <div v-if="procedures" class="flex-1 py-56">
         <Pagination
