@@ -230,7 +230,11 @@ class SaveNormIntegrationTest {
             .id(dbnorm1.getId())
             .normAbbreviation("norm abbreviation 1")
             .build();
-    DocumentUnitNorm norm2 = DocumentUnitNorm.builder().id(dbnorm2.getId()).build();
+    DocumentUnitNorm norm2 =
+        DocumentUnitNorm.builder()
+            .normAbbreviation("norm abbreviation 2")
+            .id(dbnorm2.getId())
+            .build();
     documentUnitFromFrontend.contentRelatedIndexing().norms().addAll(List.of(norm1, norm2));
 
     List<DocumentUnitNorm> expectedNormList = List.of(norm1, norm2);

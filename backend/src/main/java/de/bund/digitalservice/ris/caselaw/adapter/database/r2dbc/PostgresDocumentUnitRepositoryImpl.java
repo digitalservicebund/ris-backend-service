@@ -374,12 +374,17 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
                     int index = normIndex.getAndIncrement();
                     if (index < documentUnitNorms.size()) {
                       DocumentUnitNorm currentNorm = documentUnitNorms.get(index);
-                      documentUnitNormDTO.setId(currentNorm.id());
-                      documentUnitNormDTO.setSingleNorm(currentNorm.singleNorm());
-                      documentUnitNormDTO.setDateOfVersion(currentNorm.dateOfVersion());
-                      documentUnitNormDTO.setDateOfRelevance(currentNorm.dateOfRelevance());
-                      documentUnitNormDTO.setNormAbbreviation(currentNorm.normAbbreviation());
-                      toSave.add(documentUnitNormDTO);
+                      if (!isEmptyNorm(currentNorm)) {
+                        documentUnitNormDTO.setId(currentNorm.id());
+                        documentUnitNormDTO.setSingleNorm(currentNorm.singleNorm());
+                        documentUnitNormDTO.setDateOfVersion(currentNorm.dateOfVersion());
+                        documentUnitNormDTO.setDateOfRelevance(currentNorm.dateOfRelevance());
+                        documentUnitNormDTO.setNormAbbreviation(currentNorm.normAbbreviation());
+                        documentUnitNormDTO.setLegacyDocUnitId(documentUnitDTO.uuid);
+                        toSave.add(documentUnitNormDTO);
+                      } else {
+                        toDelete.add(documentUnitNormDTO);
+                      }
                     } else {
                       toDelete.add(documentUnitNormDTO);
                     }
@@ -403,7 +408,6 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
               }
 
               documentUnitNormRepository.deleteAll(toDelete);
-              documentUnitNormRepository.flush();
 
               return Flux.fromIterable(documentUnitNormRepository.saveAll(toSave))
                   .flatMapSequential(this::injectNormAbbreviation)
