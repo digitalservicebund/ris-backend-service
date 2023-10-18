@@ -460,7 +460,7 @@ class ProcedureIntegrationTest {
         .expectStatus()
         .is2xxSuccessful();
 
-    assertThat(repository.findAll()).hasSize(0);
+    assertThat(repository.findAll()).isEmpty();
   }
 
   @Test
