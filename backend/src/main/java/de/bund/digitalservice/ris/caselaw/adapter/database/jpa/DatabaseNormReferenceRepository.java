@@ -7,5 +7,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface DatabaseNormReferenceRepository extends JpaRepository<NormReferenceDTO, UUID> {
-  List<NormReferenceDTO> findAllByDocumentUnitIdOrderById(UUID documentationUnitId);
+  List<NormReferenceDTO> findAllByLegacyDocUnitIdOrderById(UUID documentationUnitId);
 }

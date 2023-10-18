@@ -354,7 +354,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
       DocumentUnitDTO documentUnitDTO, DocumentUnit documentUnit) {
 
     return Flux.fromIterable(
-            documentUnitNormRepository.findAllByDocumentUnitIdOrderById(documentUnitDTO.getUuid()))
+            documentUnitNormRepository.findAllByLegacyDocUnitIdOrderById(documentUnitDTO.getUuid()))
         .collectList()
         .flatMap(
             documentUnitNormDTOs -> {
@@ -397,12 +397,13 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
                         .singleNorm(currentNorm.singleNorm())
                         .dateOfVersion(currentNorm.dateOfVersion())
                         .dateOfRelevance(currentNorm.dateOfRelevance())
-                        .documentUnitId(documentUnitDTO.getUuid())
+                        .legacyDocUnitId(documentUnitDTO.getUuid())
                         .build();
                 toSave.add(normReferenceDTO);
               }
 
               documentUnitNormRepository.deleteAll(toDelete);
+              documentUnitNormRepository.flush();
 
               return Flux.fromIterable(documentUnitNormRepository.saveAll(toSave))
                   .flatMapSequential(this::injectNormAbbreviation)
@@ -1079,7 +1080,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
 
   private Mono<DocumentUnitDTO> injectNorms(DocumentUnitDTO documentUnitDTO) {
     return Flux.fromIterable(
-            documentUnitNormRepository.findAllByDocumentUnitIdOrderById(documentUnitDTO.getUuid()))
+            documentUnitNormRepository.findAllByLegacyDocUnitIdOrderById(documentUnitDTO.getUuid()))
         .flatMapSequential(this::injectNormAbbreviation)
         .collectList()
         .map(

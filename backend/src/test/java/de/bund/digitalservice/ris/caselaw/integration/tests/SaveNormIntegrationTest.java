@@ -273,7 +273,7 @@ class SaveNormIntegrationTest {
 
     NormReferenceDTO normDTO =
         NormReferenceDTO.builder()
-            .documentUnitId(parent.getUuid())
+            .legacyDocUnitId(parent.getUuid())
             .normAbbreviation(normAbbreviationDTO.getAbbreviation())
             .build();
     normDTO = normRepository.save(normDTO);
