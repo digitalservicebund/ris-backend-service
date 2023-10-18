@@ -10,7 +10,7 @@ In NeuRIS databases, the name of the "old" schema is `public` and the new is `in
 
 This document will help Developers in NeuRIS to setup the new schema with data in their local environments.
 
- ### Steps
+ ### Initialize the Schema
 
 1. In ris-backend-service restart the database to add the user and the scheme:
    ``` bash
@@ -40,7 +40,7 @@ This document will help Developers in NeuRIS to setup the new schema with data i
    mkdir juris-xml-data 
    ```
 
-6. Follow the steps here to get access to OTC buckets via command line. You can use the `AWS_` environemnt variables that you use for `neuris-infra`: https://platform-docs.prod.ds4g.net/user-docs/how-to-guides/access-obs-via-aws-sdk/ 
+6. Follow the steps here to get access to OTC buckets via command line. You can use the `AWS_` environment variables that you use for `neuris-infra`: https://platform-docs.prod.ds4g.net/user-docs/how-to-guides/access-obs-via-aws-sdk/ 
 
 7. Check if you can access the right bucket with
    ```bash
@@ -102,3 +102,17 @@ This document will help Developers in NeuRIS to setup the new schema with data i
     ```
 
     
+
+### Upgrade the Schema
+
+1. Optional: Drop the schema (manually) and restart the db
+
+2. Optional: download the new lookup tables and Document Units (see step 8 & 9 above)
+
+3. Checkout the ris-data-migration repo on the new commit used by staging (commit id to be found [here](https://github.com/digitalservicebund/neuris-migration-infra/blob/e0e2b368da31aab5b0257d904a24a0b85f6222cd/manifests/overlays/staging/kustomization.yaml#L29C11-L29C51)):
+
+   ```
+   git checkout <commit-hash>
+   ```
+
+4. Continue with steps 12 - 15 above
