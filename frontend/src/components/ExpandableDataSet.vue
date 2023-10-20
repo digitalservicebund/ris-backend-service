@@ -38,8 +38,6 @@ function collapse(): void {
       'hover:border-blue-500 hover:bg-blue-200': !isExpanded,
       'border-b': borderBottom,
     }"
-    close-icon-name="expand_less"
-    open-icon-name="expand_more"
   >
     <template #open-icon>
       <IconExpandMore />

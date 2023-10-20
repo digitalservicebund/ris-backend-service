@@ -2,7 +2,7 @@ import { expect } from "@playwright/test"
 import jsdom from "jsdom"
 import { openNorm, saveNormFrame } from "./e2e-utils"
 import { testWithImportedNorm } from "./fixtures"
-import { normData as norm } from "./testdata/norm_basic"
+import { normData as norm } from "./testdata/norm_basic_exported"
 import { FieldType, fillInputField } from "./utilities"
 import { Article, MetadataSectionName, MetadatumType } from "@/domain/norm"
 

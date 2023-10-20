@@ -21,19 +21,21 @@ fileignoreconfig:
 - filename: backend/src/test/kotlin/unit/application/service/GetFileServiceTest.kt
   checksum: 8133265c6f388df84a3e0f61050428e8628853e0ba80b432e4723750a34b781e
 - filename: compose.yaml
-  checksum: 0cf11aa3c7711e07ad50cc83cad9b4c5a2081e7400d949aa84a43b1c5354058e
+  checksum: a90052cdb65eb87dd6b0549f3a80860632555b7e3f7f013c30f193596a1fa456
 - filename: doc/norms/backend-api.yaml
   checksum: df4fa1f7e6d7023f9a7a98d1052c2b88c1785366962004b3165453edcd5bf4db
 - filename: doc/structurizr/workspace.json
   checksum: 541780133a0bf013ac75f6a3bc402c77981a273654c5648eabeb32ccb271a834
 - filename: frontend/Dockerfile.prod
-  checksum: 3307752ddc7656606048f085ec2158b8a671844970944178fda705f64789d97a
+  checksum: 28a020072dc1992104413530b3138c5376e4e49f407f1438b4021135b0fc30e5
 - filename: frontend/FRONTEND_STYLEGUIDE.md
   checksum: e6b8194eba2012f2a769c5a5d3577715a573b441a7b94e744c32b3149d0d3a93
 - filename: frontend/src/main.ts
   checksum: 6da41131746ac5689a7b0a5b65d2967ba0285abe20a20e341ffc92a83218ed0b
 - filename: frontend/test/test-helper/dataGenerators.ts
   checksum: a3d04d1168dcc221ba5fcd72e8d8bada60f48644c7586bde3a7602b748d0682c
+- filename: migration_schema_local_setup.md
+  checksum: a6c8afb7dba5ecc5973368e5f6a6b55ca9a474b7b526e7a0fa793659993151c0
 scopeconfig:
 - scope: node
 allowed_patterns:

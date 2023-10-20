@@ -4,10 +4,31 @@ import { createPinia } from "pinia"
 import { vi } from "vitest"
 import { createRouter, createWebHistory } from "vue-router"
 import ProcedureList from "@/components/procedures/ProcedureList.vue"
+import useQuery from "@/composables/useQueryFromRoute"
 import { Procedure } from "@/domain/documentUnit"
 import service from "@/services/procedureService"
 
 vi.mock("@/services/procedureService")
+
+const mocks = vi.hoisted(() => ({
+  mockedPushQuery: vi.fn(),
+}))
+
+vi.mock("@/composables/useQueryFromRoute", async () => {
+  const actual = (
+    await vi.importActual<{ default: typeof useQuery }>(
+      "@/composables/useQueryFromRoute",
+    )
+  ).default
+  return {
+    default: () => {
+      return {
+        ...actual(),
+        pushQueryToRoute: mocks.mockedPushQuery,
+      }
+    },
+  }
+})
 
 const router = createRouter({
   history: createWebHistory(process.env.BASE_URL),
@@ -20,26 +41,47 @@ const router = createRouter({
   ],
 })
 
-async function renderComponent(options?: { procedures: Procedure[] }) {
-  const mockedGetAll = vi.mocked(service.getAll).mockResolvedValue({
-    status: 200,
-    data: {
-      content: options?.procedures || [
-        {
-          label: "testProcedure",
-          documentUnitCount: 2,
-          createdAt: "foo",
-        },
-      ],
-      size: 1,
-      totalElements: 10,
-      totalPages: 10,
-      number: 1,
-      numberOfElements: 200,
-      first: true,
-      last: false,
-    },
-  })
+async function renderComponent(options?: { procedures: Procedure[][] }) {
+  const mockedGetProcedures = vi
+    .mocked(service.get)
+    .mockResolvedValueOnce({
+      status: 200,
+      data: {
+        content: options?.procedures[0] ?? [
+          {
+            label: "testProcedure",
+            documentUnitCount: 2,
+            createdAt: "foo",
+          },
+        ],
+        size: 1,
+        totalElements: 10,
+        totalPages: 10,
+        number: 1,
+        numberOfElements: 200,
+        first: true,
+        last: false,
+      },
+    })
+    .mockResolvedValueOnce({
+      status: 200,
+      data: {
+        content: options?.procedures[1] ?? [
+          {
+            label: "testProcedure",
+            documentUnitCount: 2,
+            createdAt: "foo",
+          },
+        ],
+        size: 1,
+        totalElements: 10,
+        totalPages: 10,
+        number: 1,
+        numberOfElements: 200,
+        first: true,
+        last: false,
+      },
+    })
 
   const mockedGetDocumentUnits = vi
     .mocked(service.getDocumentUnits)
@@ -57,7 +99,7 @@ async function renderComponent(options?: { procedures: Procedure[] }) {
     }),
     // eslint-disable-next-line testing-library/await-async-events
     user: userEvent.setup(),
-    mockedGetAll,
+    mockedGetProcedures,
     mockedGetDocumentUnits,
   }
 }
@@ -68,9 +110,9 @@ describe("ProcedureList", () => {
   })
 
   it("fetches docUnits once from BE if expanded", async () => {
-    const { mockedGetAll, mockedGetDocumentUnits, user } =
+    const { mockedGetProcedures, mockedGetDocumentUnits, user } =
       await renderComponent()
-    expect(mockedGetAll).toHaveBeenCalledOnce()
+    expect(mockedGetProcedures).toHaveBeenCalledOnce()
     expect(mockedGetDocumentUnits).not.toHaveBeenCalled()
 
     await user.click(await screen.findByTestId("icons-open-close"))
@@ -84,11 +126,13 @@ describe("ProcedureList", () => {
   it("does not fetches docUnits if unecessary", async () => {
     const { mockedGetDocumentUnits, user } = await renderComponent({
       procedures: [
-        {
-          label: "foo",
-          documentUnitCount: 0,
-          createdAt: "2023-09-18T19:57:01.826083Z",
-        },
+        [
+          {
+            label: "foo",
+            documentUnitCount: 0,
+            createdAt: "2023-09-18T19:57:01.826083Z",
+          },
+        ],
       ],
     })
 
@@ -97,5 +141,75 @@ describe("ProcedureList", () => {
     await user.click(await screen.findByText(/foo/))
     await user.click(await screen.findByTestId("icons-open-close"))
     expect(mockedGetDocumentUnits).not.toHaveBeenCalledOnce()
+  })
+
+  it("searches on entry", async () => {
+    const { user, mockedGetProcedures } = await renderComponent({
+      procedures: [
+        [
+          {
+            label: "foo",
+            documentUnitCount: 0,
+            createdAt: "2023-09-18T19:57:01.826083Z",
+          },
+          {
+            label: "bar",
+            documentUnitCount: 0,
+            createdAt: "2023-09-18T19:57:01.826083Z",
+          },
+        ],
+      ],
+    })
+
+    await user.type(await screen.findByLabelText("Nach Vorgängen suchen"), "b")
+    expect(mockedGetProcedures).toHaveBeenCalledWith(10, 0, "b")
+
+    expect(mocks.mockedPushQuery).not.toHaveBeenCalled()
+  })
+
+  it("debounces route updates on search", async () => {
+    const { user } = await renderComponent()
+    await user.type(await screen.findByLabelText("Nach Vorgängen suchen"), "b")
+
+    expect(mocks.mockedPushQuery).not.toHaveBeenCalled()
+
+    await new Promise((resolve) => {
+      setTimeout(resolve, 500)
+    })
+
+    expect(mocks.mockedPushQuery).toHaveBeenCalledWith({ q: "b" })
+  })
+
+  it("keeps toggled procedure open on search (copies loaded documentUnits)", async () => {
+    const { user } = await renderComponent({
+      procedures: [
+        [
+          {
+            label: "foo",
+            documentUnitCount: 0,
+            createdAt: "2023-09-18T19:57:01.826083Z",
+          },
+          {
+            label: "bar",
+            documentUnitCount: 0,
+            createdAt: "2023-09-18T19:57:01.826083Z",
+          },
+        ],
+        [
+          {
+            label: "bar",
+            documentUnitCount: 0,
+            createdAt: "2023-09-18T19:57:01.826083Z",
+          },
+        ],
+      ],
+    })
+
+    await user.click(await screen.findByText("bar"))
+    expect(await screen.findByText("erstellt am 18.09.2023")).toBeVisible()
+
+    await user.type(await screen.findByLabelText("Nach Vorgängen suchen"), "b")
+    expect(screen.queryByText("foo")).not.toBeInTheDocument()
+    expect(await screen.findByText("erstellt am 18.09.2023")).toBeVisible()
   })
 })

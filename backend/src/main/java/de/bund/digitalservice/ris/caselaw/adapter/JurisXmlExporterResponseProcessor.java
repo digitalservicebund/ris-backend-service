@@ -28,7 +28,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-import reactor.core.publisher.Mono;
 
 @Component
 public class JurisXmlExporterResponseProcessor {
@@ -74,7 +73,10 @@ public class JurisXmlExporterResponseProcessor {
               .flatMap(Optional::stream)
               .sorted(
                   Comparator.comparing(wrapper -> wrapper instanceof ImportMessageWrapper ? 0 : 1))
-              .map(this::processMessage)
+              .map(this::forwardMessage)
+              .flatMap(Optional::stream)
+              .map(this::setPublicationStatus)
+              .map(this::saveAttachments)
               .toList();
       moveMessages(processedMessages, inbox, store.getFolder("processed"));
     } catch (MessagingException e) {
@@ -82,17 +84,7 @@ public class JurisXmlExporterResponseProcessor {
     }
   }
 
-  private MessageWrapper processMessage(MessageWrapper messageWrapper) {
-    return Mono.just(messageWrapper)
-        .flatMap(this::forwardMessage)
-        .flatMap(this::setPublicationStatus)
-        .flatMap(this::saveAttachments)
-        .doOnSuccess(result -> LOGGER.info("Message processed for: {}", messageWrapper))
-        .doOnError(e -> LOGGER.error("Error processing message: ", e))
-        .block();
-  }
-
-  private Mono<MessageWrapper> saveAttachments(MessageWrapper messageWrapper) {
+  private MessageWrapper saveAttachments(MessageWrapper messageWrapper) {
     PolicyFactory policy =
         new HtmlPolicyBuilder()
             .allowElements(
@@ -127,9 +119,10 @@ public class JurisXmlExporterResponseProcessor {
                               .build())
                   .toList())
           .collectList()
-          .thenReturn(messageWrapper);
+          .thenReturn(messageWrapper)
+          .block();
     } catch (MessagingException | IOException e) {
-      return Mono.error(new StatusImporterException("Error saving attachments"));
+      throw new StatusImporterException("Error saving attachments");
     }
   }
 
@@ -153,7 +146,7 @@ public class JurisXmlExporterResponseProcessor {
         .toList();
   }
 
-  private Mono<MessageWrapper> setPublicationStatus(MessageWrapper messageWrapper) {
+  private MessageWrapper setPublicationStatus(MessageWrapper messageWrapper) {
     try {
       return statusService
           .update(
@@ -162,46 +155,37 @@ public class JurisXmlExporterResponseProcessor {
                   .publicationStatus(getPublicationStatus(messageWrapper.isPublished()))
                   .withError(messageWrapper.hasErrors())
                   .build())
-          .thenReturn(messageWrapper);
-    } catch (MessagingException | IOException e) {
-      return Mono.error(new StatusImporterException("Could not update publicationStatus" + e));
-    } catch (NullPointerException ex) {
-      LOGGER.error("NPE with messageWrapper: {}", messageWrapper, ex);
-      return Mono.error(new StatusImporterException("Could not update publicationStatus" + ex));
+          .thenReturn(messageWrapper)
+          .block();
+    } catch (MessagingException | IOException | NullPointerException e) {
+      throw new StatusImporterException("Could not update publicationStatus" + e);
     }
   }
 
-  private Mono<MessageWrapper> forwardMessage(MessageWrapper messageWrapper) {
+  private Optional<MessageWrapper> forwardMessage(MessageWrapper messageWrapper) {
     try {
       String documentNumber = messageWrapper.getDocumentNumber();
       String subject = messageWrapper.getSubject();
       List<Attachment> attachments = collectAttachments(messageWrapper);
 
-      return statusService
-          .getLatestIssuerAddress(documentNumber)
-          .flatMap(
-              issuerAddress ->
-                  Mono.fromRunnable(
-                      () ->
-                          mailSender.sendMail(
-                              storeFactory.getUsername(),
-                              issuerAddress,
-                              "FWD: " + subject,
-                              "Anbei weitergeleitet von der jDV:",
-                              attachments,
-                              "report-" + documentNumber)))
-          .switchIfEmpty(
-              Mono.fromRunnable(
-                  () ->
-                      LOGGER.info(
-                          "Could not forward JurisResponse (DocumentUnit not found): {}",
-                          documentNumber)))
-          .thenReturn(messageWrapper);
+      return Optional.ofNullable(statusService.getLatestIssuerAddress(documentNumber).block())
+          .map(
+              issuerAddress -> {
+                mailSender.sendMail(
+                    storeFactory.getUsername(),
+                    issuerAddress,
+                    "FWD: " + subject,
+                    "Anbei weitergeleitet von der jDV:",
+                    attachments,
+                    "report-" + documentNumber);
+                return messageWrapper;
+              });
+
     } catch (MessagingException | IOException e) {
-      return Mono.error(new StatusImporterException("Could not forward Message"));
+      throw new StatusImporterException("Could not forward Message");
     } catch (NullPointerException ex) {
       LOGGER.error("NPE with messageWrapper: {}", messageWrapper, ex);
-      return Mono.error(new StatusImporterException("Could not forward Message"));
+      throw new StatusImporterException("Could not forward Message");
     }
   }
 

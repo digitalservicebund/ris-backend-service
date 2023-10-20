@@ -10,7 +10,7 @@ In NeuRIS databases, the name of the "old" schema is `public` and the new is `in
 
 This document will help Developers in NeuRIS to setup the new schema with data in their local environments.
 
- ### Steps
+ ### Initialize the Schema
 
 1. In ris-backend-service restart the database to add the user and the scheme:
    ``` bash
@@ -29,14 +29,20 @@ This document will help Developers in NeuRIS to setup the new schema with data i
    cd ris-data-migration
    ```
 
-4. Create a directory where you will store the xml files to import into the database
+4. Checkout the repo on the commit used by staging (commit id to be found [here](https://github.com/digitalservicebund/neuris-migration-infra/blob/e0e2b368da31aab5b0257d904a24a0b85f6222cd/manifests/overlays/staging/kustomization.yaml#L29C11-L29C51)):
+   ```
+   git checkout <commit-hash>
+   ```
+
+5. Create a directory where you will store the xml files to import into the database
+
    ```
    mkdir juris-xml-data 
    ```
 
-5. Follow the steps here to get access to OTC buckets via command line. You can use the `AWS_` environemnt variables that you use for `neuris-infra`: https://platform-docs.prod.ds4g.net/user-docs/how-to-guides/access-obs-via-aws-sdk/ 
+6. Follow the steps here to get access to OTC buckets via command line. You can use the `AWS_` environment variables that you use for `neuris-infra`: https://platform-docs.prod.ds4g.net/user-docs/how-to-guides/access-obs-via-aws-sdk/ 
 
-6. Check if you can access the right bucket with
+7. Check if you can access the right bucket with
    ```bash
    aws s3 ls --profile otc --endpoint-url https://obs.eu-de.otc.t-systems.com s3://neuris-migration-juris-data
    # output should look like this:
@@ -44,55 +50,69 @@ This document will help Developers in NeuRIS to setup the new schema with data i
    #                           PRE monthly/
    ```
 
-7. Download the lookup tables
+8. Download the lookup tables
 
    ```bash
    aws s3 cp --profile otc --endpoint-url https://obs.eu-de.otc.t-systems.com --recursive s3://neuris-migration-juris-data/monthly/2023/09/Tabellen ./juris-xml-data/Tabellen
    ```
 
-4. Download BGH DocumentationUnits
+9. Download BGH DocumentationUnits
 
    ```bash
    aws s3 cp --profile otc --endpoint-url https://obs.eu-de.otc.t-systems.com --recursive s3://neuris-migration-juris-data/monthly/2023/09/BGH-juris/RSP/ ./juris-xml-data/BGH-juris/RSP/2022/
    ```
 
-5. Setup your local .env file with this command as described in [Set up local env](https://github.com/digitalservicebund/ris-data-migration#set-up-local-env)
+10. Setup your local .env file with this command as described in [Set up local env](https://github.com/digitalservicebund/ris-data-migration#set-up-local-env)
 
-6. Change the following variables in the .env file:
-   ```bash
-   RIS_MIGRATION_TABLES_LOCATION=juris-xml-data
-   RIS_MIGRATION_INCLUDE_NORM_ABBREVIATIONS=true
-   
-   # database config
-   RIS_MIGRATION_DB_HOST=localhost
-   RIS_MIGRATION_DB_PORT=5432
-   RIS_MIGRATION_DB_NAME=neuris
-   RIS_MIGRATION_DB_USER=migration
-   RIS_MIGRATION_DB_PASSWORD=migration
-   RIS_MIGRATION_DB_SCHEMA=incremental_migration
-   ```
+11. Change the following variables in the .env file:
+    ```bash
+    RIS_MIGRATION_TABLES_LOCATION=juris-xml-data
+    RIS_MIGRATION_INCLUDE_NORM_ABBREVIATIONS=true
+    
+    # database config
+    RIS_MIGRATION_DB_HOST=localhost
+    RIS_MIGRATION_DB_PORT=5432
+    RIS_MIGRATION_DB_NAME=neuris
+    RIS_MIGRATION_DB_USER=migration
+    RIS_MIGRATION_DB_PASSWORD=migration
+    RIS_MIGRATION_DB_SCHEMA=incremental_migration
+    ```
 
-7. Build the ris-data-migration application into a jar
+12. Build the ris-data-migration application into a jar
 
-   ```bash
-   ./gradlew bootJar
-   ```
+    ```bash
+    ./gradlew bootJar
+    ```
 
-8. Import the static lookup tables into your new schema (see Confluence "Wertetabellen" to find out what is static and dynamic)
-   ```bash
-   java -jar build/libs/ris-data-migration.jar refdata seed 
-   ```
+13. Import the static lookup tables into your new schema (see Confluence "Wertetabellen" to find out what is static and dynamic)
+    ```bash
+    java -jar build/libs/ris-data-migration.jar refdata seed 
+    ```
 
-9. Import the dynamic lookup tables
+14. Import the dynamic lookup tables
 
-   ```bash
-   java -jar build/libs/ris-data-migration.jar juris-table seed
-   ```
+    ```bash
+    java -jar build/libs/ris-data-migration.jar juris-table seed
+    ```
 
-10. Import the BGH DocumentationUnits
+15. Import the BGH DocumentationUnits
 
     ```bash
     java -jar build/libs/ris-data-migration.jar juris-r migrate -p juris-xml-data/
     ```
 
     
+
+### Upgrade the Schema
+
+1. Optional: Drop the schema (manually) and restart the db
+
+2. Optional: download the new lookup tables and Document Units (see step 8 & 9 above)
+
+3. Checkout the ris-data-migration repo on the new commit used by staging (commit id to be found [here](https://github.com/digitalservicebund/neuris-migration-infra/blob/e0e2b368da31aab5b0257d904a24a0b85f6222cd/manifests/overlays/staging/kustomization.yaml#L29C11-L29C51)):
+
+   ```
+   git checkout <commit-hash>
+   ```
+
+4. Continue with steps 12 - 15 above

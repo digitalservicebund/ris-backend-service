@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { Ref, computed, onMounted, ref, watch } from "vue"
+import { computed, onMounted, ref, watch } from "vue"
 import useQuery, { Query } from "@/composables/useQueryFromRoute"
 import { useValidationStore } from "@/composables/useValidationStore"
 import { PublicationState } from "@/domain/documentUnit"
@@ -23,11 +23,10 @@ const emit = defineEmits<{
 }>()
 
 const validationStore = useValidationStore<DocumentUnitSearchParameter>()
-const { route, getQueriesFromRoute, pushQueriesToRoute } =
+const { route, getQueryFromRoute, pushQueryToRoute } =
   useQuery<DocumentUnitSearchParameter>()
-const query = ref(getQueriesFromRoute()) as Ref<
-  Query<DocumentUnitSearchParameter>
->
+const query = ref(getQueryFromRoute())
+
 const searchEntryEmpty = computed(() => {
   return Object.keys(query.value).length === 0
 })
@@ -71,7 +70,7 @@ function resetSearch() {
   validationStore.reset()
   submitButtonError.value = undefined
   query.value = {}
-  pushQueriesToRoute(query.value)
+  pushQueryToRoute(query.value)
   emit("resetSearchResults")
 }
 
@@ -131,15 +130,15 @@ function handleSearchButtonClicked() {
   } else if (validationStore.getAll().length > 0) {
     submitButtonError.value = "Fehler in Suchkriterien"
   } else {
-    pushQueriesToRoute(query.value)
+    pushQueryToRoute(query.value)
   }
 }
 
 watch(
   route,
   () => {
-    query.value = getQueriesFromRoute()
-    if (!searchEntryEmpty.value) emit("search", getQueriesFromRoute())
+    query.value = getQueryFromRoute()
+    if (!searchEntryEmpty.value) emit("search", getQueryFromRoute())
     else resetSearch()
   },
   { deep: true },
@@ -154,7 +153,7 @@ watch(
 )
 
 onMounted(async () => {
-  if (!searchEntryEmpty.value) emit("search", getQueriesFromRoute())
+  if (!searchEntryEmpty.value) emit("search", getQueryFromRoute())
 })
 </script>
 

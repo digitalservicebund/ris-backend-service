@@ -173,7 +173,7 @@ dependencies {
         because("CVE-2021-43797, not using Tomcat")
     }
     implementation("io.projectreactor.netty:reactor-netty-core:1.1.8")
-    implementation("org.yaml:snakeyaml:2.0")
+    implementation("org.yaml:snakeyaml:2.2")
     implementation("ch.qos.logback:logback-classic:$logbackVersion")
     implementation("ch.qos.logback:logback-core:$logbackVersion")
     implementation("org.postgresql:r2dbc-postgresql:1.0.1.RELEASE")
@@ -217,9 +217,9 @@ dependencies {
 
     implementation("com.icegreen:greenmail:2.0.0")
 
-    implementation("de.bund.digitalservice:ris-norms-juris-converter:0.19.1")
+    implementation("de.bund.digitalservice:ris-norms-juris-converter:0.19.2")
     // for local development:
-    // implementation(files("ris-norms-juris-converter-0.19.1.jar"))
+    // implementation(files("ris-norms-juris-converter-0.19.2.jar"))
     // implementation("org.apache.commons:commons-text:1.10.0")
 
     implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.15.2")
@@ -244,7 +244,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-autoconfigure")
     implementation("com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer:20211018.2")
     // => CVE-2023-2976
-    implementation("com.google.guava:guava:32.0.1-jre")
+    implementation("com.google.guava:guava:32.1.3-jre")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
         exclude(group = "org.mockito", module = "mockito-core")
@@ -263,7 +263,7 @@ dependencies {
     // 1.0.23 as that is affected by CVE-2022-31684
     implementation("io.projectreactor.netty:reactor-netty-http:1.1.8")
 
-    var flywayCore = "org.flywaydb:flyway-core:9.21.1"
+    var flywayCore = "org.flywaydb:flyway-core:9.22.2"
     implementation(flywayCore)
     "migrationImplementation"(flywayCore)
 

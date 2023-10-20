@@ -447,6 +447,39 @@ class ProcedureIntegrationTest {
             });
   }
 
+  @Test
+  void testDeleteProcedure() {
+    createProcedures(List.of("fooProcedure"), documentationOfficeDTO);
+    assertThat(repository.findAll()).hasSize(1);
+
+    risWebTestClient
+        .withDefaultLogin()
+        .delete()
+        .uri("/api/v1/caselaw/procedure/fooProcedure")
+        .exchange()
+        .expectStatus()
+        .is2xxSuccessful();
+
+    assertThat(repository.findAll()).isEmpty();
+  }
+
+  @Test
+  void testDontDeleteProcedureOfForeignOffice() {
+    DocumentationOfficeDTO bghDocOfficeDTO = documentationOfficeRepository.findByLabel("BGH");
+    createProcedures(List.of("fooProcedure"), bghDocOfficeDTO);
+    assertThat(repository.findAll()).hasSize(1);
+
+    risWebTestClient
+        .withDefaultLogin()
+        .delete()
+        .uri("/api/v1/caselaw/procedure/fooProcedure")
+        .exchange()
+        .expectStatus()
+        .is2xxSuccessful();
+
+    assertThat(repository.findAll()).hasSize(1);
+  }
+
   private List<ProcedureDTO> createProcedures(
       List<String> labels, DocumentationOfficeDTO documentationOffice) {
     return labels.stream()

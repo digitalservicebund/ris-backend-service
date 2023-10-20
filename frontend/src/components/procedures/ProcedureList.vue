@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { Ref, ref, onMounted, watch } from "vue"
+import { ref, onMounted, watch } from "vue"
 import ProcedureDetail from "./ProcedureDetail.vue"
 import ExpandableContent from "@/components/ExpandableContent.vue"
 import useQuery, { Query } from "@/composables/useQueryFromRoute"
@@ -16,7 +16,7 @@ const procedures = ref<Procedure[]>()
 const currentPage = ref<Page<Procedure>>()
 
 async function updateProcedures(page: number, queries?: Query<string>) {
-  const response = await service.getAll(itemsPerPage, page, queries?.q)
+  const response = await service.get(itemsPerPage, page, queries?.q)
   if (response.data) {
     procedures.value = copyDocumentUnits(
       response.data.content,
@@ -27,20 +27,8 @@ async function updateProcedures(page: number, queries?: Query<string>) {
   }
 }
 
-const { getQueriesFromRoute, pushQueriesToRoute, route } = useQuery<"q">()
-
-const query = ref(getQueriesFromRoute()) as Ref<Query<"q">>
-
-watch(route, () => (query.value = getQueriesFromRoute()))
-
-watch(
-  query,
-  async () => {
-    await updateProcedures(0, query.value)
-    pushQueriesToRoute(query.value)
-  },
-  { deep: true },
-)
+const { getQueryFromRoute, pushQueryToRoute, route } = useQuery<"q">()
+const query = ref(getQueryFromRoute())
 
 async function loadDocumentUnits(loadingProcedure: Procedure) {
   if (!procedures.value) return
@@ -68,28 +56,52 @@ function copyDocumentUnits(
   })
 }
 
+const debouncedPushQueryToRoute = (() => {
+  let timeoutId: number | null = null
+
+  return (currentQuerry: Query<string>) => {
+    if (timeoutId != null) window.clearTimeout(timeoutId)
+
+    timeoutId = window.setTimeout(() => pushQueryToRoute(currentQuerry), 500)
+  }
+})()
+
 onMounted(() => {
   updateProcedures(0, query.value)
 })
+
+watch(route, () => {
+  const currentQuery = getQueryFromRoute()
+  if (JSON.stringify(query.value) != JSON.stringify(currentQuery))
+    query.value = currentQuery
+})
+
+watch(
+  query,
+  async () => {
+    await updateProcedures(0, query.value)
+    debouncedPushQueryToRoute(query.value)
+  },
+  { deep: true },
+)
 </script>
 
 <template>
-  <div class="bg-white px-32 pb-16 pt-32">
-    <InputField
-      id="procedureFilter"
-      label="Dokumentnummer oder Aktenzeichen"
-      visually-hide-label
-    >
-      <TextInput
-        id="procedureFilter"
-        v-model="query.q"
-        aria-label="Dokumentnummer oder Aktenzeichen Suche"
-        class="ds-input-medium"
-        placeholder="Nach Vorgängen suchen"
-      ></TextInput>
-    </InputField>
-  </div>
-  <div class="bg-blue-200 px-32 pt-24">
+  <header class="bg-white px-16 py-16">
+    <h1 class="ds-heading-02-reg">Vorgänge</h1>
+    <div class="mt-32" role="search">
+      <InputField id="procedureFilter" label="Vorgang" visually-hide-label>
+        <TextInput
+          id="procedureFilter"
+          v-model="query.q"
+          aria-label="Nach Vorgängen suchen"
+          class="ds-input-medium"
+          placeholder="Nach Vorgängen suchen"
+        ></TextInput>
+      </InputField>
+    </div>
+  </header>
+  <div class="bg-blue-200 px-16 pt-24" role="main">
     <div class="flex flex-row">
       <div v-if="procedures" class="flex-1 py-56">
         <Pagination

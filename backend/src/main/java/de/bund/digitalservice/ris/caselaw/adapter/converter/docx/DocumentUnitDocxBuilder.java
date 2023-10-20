@@ -341,10 +341,14 @@ public class DocumentUnitDocxBuilder extends DocxBuilder {
         .forEach(
             child -> {
               if (child instanceof JAXBElement<?> jaxbElement) {
-                LOGGER.error(
-                    "unknown jaxb child '{}' in pict element: {}",
-                    jaxbElement.getName(),
-                    jaxbElement.getValue());
+                if (jaxbElement.getDeclaredType() == CTShape.class) {
+                  parseCTShape(parent, (CTShape) jaxbElement.getValue());
+                } else {
+                  LOGGER.error(
+                      "unknown jaxb child '{}' in pict element: {}",
+                      jaxbElement.getName(),
+                      jaxbElement.getValue());
+                }
               } else if (child instanceof CTShape shape) {
                 parseCTShape(parent, shape);
               } else {

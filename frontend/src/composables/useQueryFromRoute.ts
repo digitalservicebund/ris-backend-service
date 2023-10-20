@@ -15,7 +15,7 @@ export default function useQuery<T extends string>() {
   const route = useRoute()
   const router = useRouter()
 
-  function getQueriesFromRoute(): Query<T> {
+  function getQueryFromRoute(): Query<T> {
     const query: Query<T> = {}
 
     for (const parameter in route.query) {
@@ -25,8 +25,9 @@ export default function useQuery<T extends string>() {
     return query
   }
 
-  const pushQueriesToRoute = (currentQuerry: Query<T>) =>
+  function pushQueryToRoute(currentQuerry: Query<T>) {
     void router.push({ query: truncateQuery(currentQuerry) })
+  }
 
-  return { getQueriesFromRoute, pushQueriesToRoute, route }
+  return { getQueryFromRoute, pushQueryToRoute, route }
 }

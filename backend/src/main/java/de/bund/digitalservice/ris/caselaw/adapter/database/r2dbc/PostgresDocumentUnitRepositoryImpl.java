@@ -759,7 +759,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
         documentationOfficeRepository.findByLabel(documentationOfficeLabel);
 
     return Optional.ofNullable(
-            procedureRepository.findByLabelAndDocumentationOfficeOrderByCreatedAtDesc(
+            procedureRepository.findByLabelAndDocumentationOffice(
                 procedure.label(), documentationOfficeDTO))
         .orElseGet(
             () ->
@@ -1364,10 +1364,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
       if (searchInput.status().publicationStatus() == PublicationStatus.PUBLISHED) {
         status =
             root.get("publicationStatus")
-                .in(
-                    PublicationStatus.PUBLISHED,
-                    PublicationStatus.TEST_DOC_UNIT,
-                    PublicationStatus.JURIS_PUBLISHED);
+                .in(PublicationStatus.PUBLISHED, PublicationStatus.JURIS_PUBLISHED);
       }
       if (searchInput.myDocOfficeOnly()
           || searchInput.status().publicationStatus() == PublicationStatus.UNPUBLISHED) {
@@ -1381,7 +1378,6 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
               .in(
                   PublicationStatus.PUBLISHED,
                   PublicationStatus.PUBLISHING,
-                  PublicationStatus.TEST_DOC_UNIT,
                   PublicationStatus.JURIS_PUBLISHED);
       if (searchInput.myDocOfficeOnly()) {
         restrictions.add(myDocOffice);

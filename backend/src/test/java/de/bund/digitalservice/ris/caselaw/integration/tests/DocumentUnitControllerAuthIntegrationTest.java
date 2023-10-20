@@ -1,5 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.integration.tests;
 
+import static de.bund.digitalservice.ris.caselaw.domain.PublicationStatus.JURIS_PUBLISHED;
 import static de.bund.digitalservice.ris.caselaw.domain.PublicationStatus.PUBLISHED;
 import static de.bund.digitalservice.ris.caselaw.domain.PublicationStatus.PUBLISHING;
 import static de.bund.digitalservice.ris.caselaw.domain.PublicationStatus.UNPUBLISHED;
@@ -33,7 +34,9 @@ import de.bund.digitalservice.ris.caselaw.domain.EmailPublishService;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -97,19 +100,43 @@ class DocumentUnitControllerAuthIntegrationTest {
   @MockBean DocxConverterService docxConverterService;
   @MockBean ReactiveClientRegistrationRepository clientRegistrationRepository;
 
-  private static final String docOffice1 = "CC-RIS";
-  private static final String docOffice1Group = "/" + docOffice1;
+  static Stream<Arguments> getUnauthorizedCases() {
+    return Stream.of(
+        Arguments.of("CC-RIS", "BGH", List.of(UNPUBLISHED)),
+        Arguments.of("BGH", "CC-RIS", List.of(UNPUBLISHED)));
+  }
 
-  private static final String docOffice2 = "BGH";
-  private static final String docOffice2Group = "/caselaw/" + docOffice2;
-  private UUID docOffice1Id;
-  private UUID docOffice2Id;
+  static Stream<Arguments> getAuthorizedCases() {
+    return Stream.of(
+        Arguments.of("CC-RIS", "BGH", List.of(PUBLISHED)),
+        Arguments.of("CC-RIS", "BGH", List.of(PUBLISHING)),
+        Arguments.of("CC-RIS", "BGH", List.of(JURIS_PUBLISHED)),
+        Arguments.of("BGH", "BGH", List.of(UNPUBLISHED)),
+        Arguments.of("BGH", "BGH", List.of(PUBLISHED)),
+        Arguments.of("BGH", "BGH", List.of(UNPUBLISHED, PUBLISHED)),
+        Arguments.of("BGH", "BGH", List.of(PUBLISHING)),
+        Arguments.of("BGH", "BGH", List.of(UNPUBLISHED, PUBLISHING)),
+        Arguments.of("BGH", "BGH", List.of(UNPUBLISHED, PUBLISHED, UNPUBLISHED)));
+  }
+
+  private static final Map<String, String> officeGroupMap =
+      new HashMap<>() {
+        {
+          put("CC-RIS", "/CC-RIS");
+          put("BGH", "/caselaw/BGH");
+        }
+      };
+
+  private static final Map<String, UUID> officeIdMap = new HashMap<>();
 
   @BeforeEach
   void setUp() {
     // created via db migration V0_79__caselaw_insert_default_documentation_offices
-    docOffice1Id = documentationOfficeRepository.findByLabel(docOffice1).getId();
-    docOffice2Id = documentationOfficeRepository.findByLabel(docOffice2).getId();
+    UUID docOffice1Id = documentationOfficeRepository.findByLabel("CC-RIS").getId();
+    UUID docOffice2Id = documentationOfficeRepository.findByLabel("BGH").getId();
+
+    officeIdMap.put("CC-RIS", docOffice1Id);
+    officeIdMap.put("BGH", docOffice2Id);
   }
 
   @AfterEach
@@ -124,19 +151,8 @@ class DocumentUnitControllerAuthIntegrationTest {
   void testGetAll_shouldBeAccessible(
       String docUnitOffice, String userDocOffice, List<PublicationStatus> publicationStatus) {
 
-    UUID docUnitOfficeId = null;
-    if (docUnitOffice.equals(userDocOffice)) {
-      docUnitOfficeId = docOffice1Id;
-    } else if (docUnitOffice.equals(docOffice2)) {
-      docUnitOfficeId = docOffice2Id;
-    }
-
-    String userOfficeId = null;
-    if (userDocOffice.equals(userDocOffice)) {
-      userOfficeId = docOffice1Group;
-    } else if (userDocOffice.equals(docOffice2)) {
-      userOfficeId = docOffice2Group;
-    }
+    String userOfficeId = officeGroupMap.get(userDocOffice);
+    UUID docUnitOfficeId = officeIdMap.get(docUnitOffice);
 
     DocumentUnitDTO docUnit = createNewDocumentUnitDTO(UUID.randomUUID(), docUnitOfficeId);
     for (int i = 0; i < publicationStatus.size(); i++) {
@@ -159,20 +175,17 @@ class DocumentUnitControllerAuthIntegrationTest {
 
     assertThat(extractStatusByUuid(result.getResponseBody(), docUnit.getUuid()))
         .isEqualTo(getResultStatus(publicationStatus).toString());
-  }
 
-  private PublicationStatus getResultStatus(List<PublicationStatus> publicationStatus) {
-    if (publicationStatus.isEmpty()) {
-      return null;
-    }
-
-    PublicationStatus lastStatus = publicationStatus.get(publicationStatus.size() - 1);
-    if (lastStatus == PublicationStatus.TEST_DOC_UNIT
-        || lastStatus == PublicationStatus.JURIS_PUBLISHED) {
-      return PUBLISHED;
-    }
-
-    return lastStatus;
+    EntityExchangeResult<String> resultForSingleAccess =
+        risWebTestClient
+            .withLogin(userOfficeId)
+            .get()
+            .uri("/api/v1/caselaw/documentunits/" + docUnit.getDocumentnumber())
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectBody(String.class)
+            .returnResult();
   }
 
   @ParameterizedTest
@@ -180,19 +193,8 @@ class DocumentUnitControllerAuthIntegrationTest {
   void testGetAll_shouldNotBeAccessible(
       String docUnitOffice, String userDocOffice, List<PublicationStatus> publicationStatus) {
 
-    UUID docUnitOfficeId = null;
-    if (docUnitOffice.equals(userDocOffice)) {
-      docUnitOfficeId = docOffice1Id;
-    } else if (docUnitOffice.equals(docOffice2)) {
-      docUnitOfficeId = docOffice2Id;
-    }
-
-    String userOfficeId = null;
-    if (userDocOffice.equals(userDocOffice)) {
-      userOfficeId = docOffice1Group;
-    } else if (userDocOffice.equals(docOffice2)) {
-      userOfficeId = docOffice2Group;
-    }
+    String userOfficeId = officeGroupMap.get(userDocOffice);
+    UUID docUnitOfficeId = officeIdMap.get(docUnitOffice);
 
     DocumentUnitDTO docUnit = createNewDocumentUnitDTO(UUID.randomUUID(), docUnitOfficeId);
     for (int i = 0; i < publicationStatus.size(); i++) {
@@ -214,31 +216,20 @@ class DocumentUnitControllerAuthIntegrationTest {
             .returnResult();
 
     assertThat(extractDocUnitsByUuid(result.getResponseBody(), docUnit.getUuid())).isEmpty();
-  }
 
-  static Stream<Arguments> getUnauthorizedCases() {
-    return Stream.of(
-        Arguments.of("CC_RIS", "NEURIS", List.of(UNPUBLISHED)),
-        Arguments.of("NEURIS", "CC_RIS", List.of(UNPUBLISHED)));
-  }
-
-  static Stream<Arguments> getAuthorizedCases() {
-    return Stream.of(
-        Arguments.of("CC_RIS", "NEURIS", List.of(PUBLISHED)),
-        Arguments.of("CC_RIS", "NEURIS", List.of(PUBLISHING)),
-        Arguments.of("NEURIS", "NEURIS", List.of(UNPUBLISHED)),
-        Arguments.of("NEURIS", "NEURIS", List.of(PUBLISHED)),
-        Arguments.of("NEURIS", "NEURIS", List.of(UNPUBLISHED, PUBLISHED)),
-        Arguments.of("NEURIS", "NEURIS", List.of(PUBLISHING)),
-        Arguments.of("NEURIS", "NEURIS", List.of(UNPUBLISHED, PUBLISHING)),
-        Arguments.of("NEURIS", "NEURIS", List.of(UNPUBLISHED, PUBLISHED, UNPUBLISHED)),
-        Arguments.of("NEURIS", "NEURIS", List.of(PublicationStatus.TEST_DOC_UNIT)),
-        Arguments.of("NEURIS", "NEURIS", List.of(PublicationStatus.JURIS_PUBLISHED)));
+    risWebTestClient
+        .withLogin(userOfficeId)
+        .get()
+        .uri("/api/v1/caselaw/documentunits/" + docUnit.getDocumentnumber())
+        .exchange()
+        .expectStatus()
+        .isForbidden();
   }
 
   @Test
   void testUnpublishedDocumentUnitIsForbiddenFOrOtherOffice() {
-    DocumentUnitDTO docUnit1 = createNewDocumentUnitDTO(UUID.randomUUID(), docOffice1Id);
+    DocumentUnitDTO docUnit1 =
+        createNewDocumentUnitDTO(UUID.randomUUID(), officeIdMap.get("CC-RIS"));
     saveToStatusRepository(
         docUnit1,
         docUnit1.getCreationtimestamp(),
@@ -247,7 +238,7 @@ class DocumentUnitControllerAuthIntegrationTest {
     // Documentation Office 1
     EntityExchangeResult<String> result =
         risWebTestClient
-            .withLogin(docOffice1Group)
+            .withLogin(officeGroupMap.get("CC-RIS"))
             .get()
             .uri("/api/v1/caselaw/documentunits/" + docUnit1.getDocumentnumber())
             .exchange()
@@ -260,7 +251,7 @@ class DocumentUnitControllerAuthIntegrationTest {
 
     // Documentation Office 2
     risWebTestClient
-        .withLogin(docOffice2Group)
+        .withLogin(officeGroupMap.get("BGH"))
         .get()
         .uri("/api/v1/caselaw/documentunits/" + docUnit1.getDocumentnumber())
         .exchange()
@@ -274,7 +265,7 @@ class DocumentUnitControllerAuthIntegrationTest {
 
     result =
         risWebTestClient
-            .withLogin(docOffice2Group)
+            .withLogin(officeGroupMap.get("BGH"))
             .get()
             .uri("/api/v1/caselaw/documentunits/" + docUnit1.getDocumentnumber())
             .exchange()
@@ -292,7 +283,7 @@ class DocumentUnitControllerAuthIntegrationTest {
 
     result =
         risWebTestClient
-            .withLogin(docOffice2Group)
+            .withLogin(officeGroupMap.get("BGH"))
             .get()
             .uri("/api/v1/caselaw/documentunits/" + docUnit1.getDocumentnumber())
             .exchange()
@@ -302,6 +293,19 @@ class DocumentUnitControllerAuthIntegrationTest {
             .returnResult();
 
     assertThat(extractUuid(result.getResponseBody())).hasToString(docUnit1.getUuid().toString());
+  }
+
+  private PublicationStatus getResultStatus(List<PublicationStatus> publicationStatus) {
+    if (publicationStatus.isEmpty()) {
+      return null;
+    }
+
+    PublicationStatus lastStatus = publicationStatus.get(publicationStatus.size() - 1);
+    if (lastStatus == PublicationStatus.JURIS_PUBLISHED) {
+      return PUBLISHED;
+    }
+
+    return lastStatus;
   }
 
   private DocumentUnitDTO createNewDocumentUnitDTO(
