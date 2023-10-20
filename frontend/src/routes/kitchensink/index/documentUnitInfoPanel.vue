@@ -1,12 +1,13 @@
 <script lang="ts" setup>
 import DocumentUnitInfoPanel from "@/components/DocumentUnitInfoPanel.vue"
 import KitchensinkPage from "@/kitchensink/components/KitchensinkPage.vue"
+import IconPublished from "~icons/ic/outline-campaign"
 
 const firstRowInfos = [
   {
     label: "status",
     value: "veröffentlicht",
-    icon: "campaign",
+    icon: IconPublished,
     color: "black",
   },
   {

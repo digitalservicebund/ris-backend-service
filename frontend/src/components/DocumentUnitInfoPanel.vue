@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import { toRaw } from "vue"
 import IconBadge, { IconBadgeProps } from "@/shared/components/IconBadge.vue"
 import PropertyInfo from "@/shared/components/PropertyInfo.vue"
 
@@ -41,7 +42,7 @@ function isBadge(
           <IconBadge
             v-if="isBadge(entry)"
             :color="entry.color"
-            :icon="entry.icon"
+            :icon="toRaw(entry.icon)"
             :value="entry.value"
           />
           <PropertyInfo
