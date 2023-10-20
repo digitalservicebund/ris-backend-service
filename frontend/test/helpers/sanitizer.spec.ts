@@ -41,6 +41,30 @@ describe("sanitizer", () => {
       )
       expect(result).toBe("Heading of section")
     })
+
+    it("removes <b/> tags", () => {
+      const result = sanitizeTableOfContentEntry("Heading <b/>of section")
+      expect(result).toBe("Heading of section")
+    })
+
+    it("removes <B/> tags", () => {
+      const result = sanitizeTableOfContentEntry("Heading <B/>of section")
+      expect(result).toBe("Heading of section")
+    })
+
+    it("removes <sup>...</sup> tags", () => {
+      const result = sanitizeTableOfContentEntry(
+        "Heading <sup>of section</sup>",
+      )
+      expect(result).toBe("Heading")
+    })
+
+    it("removes <SUP>...</SUP> tags", () => {
+      const result = sanitizeTableOfContentEntry(
+        "Heading <SUP>of section</SUP>",
+      )
+      expect(result).toBe("Heading")
+    })
   })
 
   describe("sanitize norm title", () => {
@@ -62,6 +86,41 @@ describe("sanitizer", () => {
     it("collapses surrounding whitespace", () => {
       const result = sanitizeNormTitle("Heading <br/>  of section")
       expect(result).toBe("Heading\nof section")
+    })
+
+    it("removes <kw/> tags", () => {
+      const result = sanitizeNormTitle("Heading <kw/>of section")
+      expect(result).toBe("Heading of section")
+    })
+
+    it("removes <KW/> tags", () => {
+      const result = sanitizeNormTitle("Heading <KW/>of section")
+      expect(result).toBe("Heading of section")
+    })
+
+    it('removes <FnR ID="..."/> tags', () => {
+      const result = sanitizeNormTitle('Heading <FnR ID="123"/>of section')
+      expect(result).toBe("Heading of section")
+    })
+
+    it("removes <b/> tags", () => {
+      const result = sanitizeNormTitle("Heading <b/>of section")
+      expect(result).toBe("Heading of section")
+    })
+
+    it("removes <B/> tags", () => {
+      const result = sanitizeNormTitle("Heading <B/>of section")
+      expect(result).toBe("Heading of section")
+    })
+
+    it("removes <sup>...</sup> tags", () => {
+      const result = sanitizeNormTitle("Heading <sup>of section</sup>")
+      expect(result).toBe("Heading")
+    })
+
+    it("removes <SUP>...</SUP> tags", () => {
+      const result = sanitizeNormTitle("Heading <SUP>of section</SUP>")
+      expect(result).toBe("Heading")
     })
   })
 })
