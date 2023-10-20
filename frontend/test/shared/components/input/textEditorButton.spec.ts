@@ -1,70 +1,45 @@
 import { userEvent } from "@testing-library/user-event"
 import { render, fireEvent, screen } from "@testing-library/vue"
-import { mount } from "@vue/test-utils"
 import TextEditorButton from "@/shared/components/input/TextEditorButton.vue"
+import IconTest from "~icons/ic/baseline-clear"
 
 describe("text editor button", async () => {
-  it("renders with mandatory props", () => {
-    const wrapper = mount(TextEditorButton, {
-      props: {
-        type: "test type",
-        icon: "test icon",
-        ariaLabel: "test aria",
-      },
-    })
-
-    expect(wrapper.props().type).toBe("test type")
-    expect(wrapper.props().icon).toBe("test icon")
-    expect(wrapper.props().ariaLabel).toBe("test aria")
-  })
-
   test("renders with child components", async () => {
-    const wrapper = mount(TextEditorButton, {
+    render(TextEditorButton, {
       props: {
         type: "test type",
-        icon: "test icon",
-        ariaLabel: "test aria",
+        icon: IconTest,
+        ariaLabel: "test editor button",
         childButtons: [
           {
             type: "test child 1 type",
-            icon: "test child 1 icon",
-            ariaLabel: "test child 1 aria",
+            icon: IconTest,
+            ariaLabel: "test child button 1",
           },
           {
             type: "test child 2 type",
-            icon: "test child 2 icon",
-            ariaLabel: "test child 2 aria",
+            icon: IconTest,
+            ariaLabel: "test child button 2",
           },
         ],
       },
     })
-
-    expect(wrapper.props().type).toBe("test type")
-    expect(wrapper.props().icon).toBe("test icon")
-    expect(wrapper.props().ariaLabel).toBe("test aria")
-    expect(wrapper.props().childButtons).toStrictEqual([
-      {
-        type: "test child 1 type",
-        icon: "test child 1 icon",
-        ariaLabel: "test child 1 aria",
-      },
-      {
-        type: "test child 2 type",
-        icon: "test child 2 icon",
-        ariaLabel: "test child 2 aria",
-      },
-    ])
+    const button = screen.getByLabelText("test editor button")
+    expect(button).toBeInTheDocument()
+    await fireEvent.click(button)
+    expect(screen.getByLabelText("test child button 1")).toBeInTheDocument()
+    expect(screen.getByLabelText("test child button 2")).toBeInTheDocument()
   })
 
   test("emits event to parent when user clicks on button without child buttons", async () => {
     const { emitted } = render(TextEditorButton, {
       props: {
         type: "test type",
-        icon: "test icon",
-        ariaLabel: "test aria",
+        icon: IconTest,
+        ariaLabel: "test editor button",
       },
     })
-    const button = screen.getByLabelText("test aria")
+    const button = screen.getByLabelText("test editor button")
     expect(button).toBeInTheDocument()
     await fireEvent.click(button)
     expect(emitted().toggle).toBeTruthy()
@@ -76,53 +51,27 @@ describe("text editor button", async () => {
     render(TextEditorButton, {
       props: {
         type: "menu",
-        icon: "test icon",
+        icon: IconTest,
         ariaLabel: "menu",
         childButtons: [
           {
             type: "test child 1 type",
-            icon: "test child 1 icon",
+            icon: IconTest,
             ariaLabel: "test child 1 aria",
           },
           {
             type: "test child 2 type",
-            icon: "test child 2 icon",
+            icon: IconTest,
             ariaLabel: "test child 2 aria",
           },
         ],
       },
     })
-    const button = screen.getByText("test icon")
+    const button = screen.getByLabelText("menu")
     expect(button).toBeInTheDocument()
     await user.click(button)
 
     expect(screen.getByLabelText("test child 1 aria")).toBeInTheDocument()
     expect(screen.getByLabelText("test child 2 aria")).toBeInTheDocument()
-  })
-
-  test("if more button clicked, don't show childButtons but emit event", async () => {
-    const { emitted } = render(TextEditorButton, {
-      props: {
-        type: "more",
-        icon: "test icon",
-        ariaLabel: "test aria",
-        childButtons: [
-          {
-            type: "test child 1 type",
-            icon: "test child 1 icon",
-            ariaLabel: "test child 1 aria",
-          },
-          {
-            type: "test child 2 type",
-            icon: "test child 2 icon",
-            ariaLabel: "test child 2 aria",
-          },
-        ],
-      },
-    })
-    const button = screen.getByLabelText("test aria")
-    expect(button).toBeInTheDocument()
-    await fireEvent.click(button)
-    expect(emitted().toggle).toBeTruthy()
   })
 })

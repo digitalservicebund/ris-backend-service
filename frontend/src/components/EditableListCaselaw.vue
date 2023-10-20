@@ -146,6 +146,7 @@ onMounted(() => {
 
         <div class="flex gap-8">
           <button
+            v-if="!entry.isReadOnly"
             aria-label="Eintrag bearbeiten"
             class="p-2 text-blue-800 outline-none outline-offset-2 hover:bg-blue-200 focus:outline-2 focus:outline-blue-800 active:bg-blue-500 active:outline-none"
             @click="setEditIndex(index)"

@@ -280,7 +280,7 @@ const resizeObserver = new ResizeObserver((entries) => {
   <div class="editor bg-white" fluid>
     <div v-if="showButtons()">
       <div
-        :aria-label="ariaLabel + 'Button Leiste'"
+        :aria-label="ariaLabel + ' Button Leiste'"
         class="pa-1 flex flex-row flex-wrap justify-between"
       >
         <div class="flex flex-row">

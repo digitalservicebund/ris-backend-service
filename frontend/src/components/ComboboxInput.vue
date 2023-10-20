@@ -257,6 +257,7 @@ export type InputModelProps =
       />
       <button
         v-if="inputText && !noClear"
+        aria-label="Auswahl zurücksetzen"
         class="input-close-icon flex items-center text-blue-800"
         tabindex="0"
         @click="clearSelection"

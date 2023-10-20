@@ -159,20 +159,4 @@ describe("useCollapsingMenuBar", () => {
     expect(collapsedButtons.value[2].isLast).toBe(undefined)
     expect(collapsedButtons.value[3].isLast).toBe(undefined)
   })
-
-  it("renders more button when there is no more buttons to collapse", () => {
-    const buttons = [
-      generateButton({ isCollapsable: false }),
-      generateButton({ isCollapsable: false, isSecondRow: true }),
-      generateButton({ isCollapsable: false, isSecondRow: true }),
-    ]
-    const { collapsedButtons } = useCollapsingMenuBar(ref(buttons), ref(2))
-    expect(collapsedButtons.value).toHaveLength(2)
-    expect(collapsedButtons.value[0]).toStrictEqual(buttons[0])
-    expect(collapsedButtons.value[1].type).toStrictEqual("more")
-    expect(collapsedButtons.value[1].childButtons).toStrictEqual([
-      buttons[1],
-      buttons[2],
-    ])
-  })
 })

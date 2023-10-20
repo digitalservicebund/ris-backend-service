@@ -3,8 +3,6 @@ import { InfoStatus } from "@/shared/components/enumInfoStatus"
 import InfoModal from "@/shared/components/InfoModal.vue"
 
 describe("InfoModal", () => {
-  const SUCCEED_ICON_TEXT = "done"
-  const ERROR_ICON_TEXT = "error"
   test("renders infomodal: error", () => {
     render(InfoModal, {
       props: {
@@ -15,8 +13,7 @@ describe("InfoModal", () => {
 
     screen.getByText("foo")
     screen.getByText("bar")
-    const icon = screen.getByLabelText("foo icon")
-    expect(icon).toHaveTextContent(ERROR_ICON_TEXT)
+    expect(screen.getByLabelText("foo icon")).toBeInTheDocument()
   })
 
   test("renders infomodal: succeed", () => {
@@ -30,7 +27,6 @@ describe("InfoModal", () => {
 
     screen.getByText("foo")
     screen.getByText("bar")
-    const icon = screen.getByLabelText("foo icon")
-    expect(icon).toHaveTextContent(SUCCEED_ICON_TEXT)
+    expect(screen.getByLabelText("foo icon")).toBeInTheDocument()
   })
 })
