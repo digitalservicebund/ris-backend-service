@@ -17,7 +17,6 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumenta
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseNormAbbreviationRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseNormReferenceRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.NormAbbreviationDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.NormReferenceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentUnitRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.PostgresDocumentUnitRepositoryImpl;
@@ -34,6 +33,7 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.EmailPublishService;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
+import de.bund.digitalservice.ris.caselaw.domain.lookuptable.NormAbbreviation;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -118,9 +118,9 @@ class SaveNormIntegrationTest {
 
   @AfterEach
   void cleanUp() {
-    normAbbreviationRepository.deleteAll();
     normRepository.deleteAll();
     repository.deleteAll().block();
+    normAbbreviationRepository.deleteAll();
   }
 
   // TODO: write a test for add a document type with a wrong shortcut
@@ -140,13 +140,7 @@ class SaveNormIntegrationTest {
 
     repository.save(dto).block();
 
-    DocumentUnit documentUnitFromFrontend =
-        DocumentUnit.builder()
-            .uuid(uuid)
-            .creationtimestamp(creationTimestamp)
-            .documentNumber("1234567890123")
-            .coreData(CoreData.builder().documentationOffice(docOffice).build())
-            .build();
+    DocumentUnit documentUnitFromFrontend = generateDocumentationUnit(uuid, creationTimestamp);
 
     risWebTestClient
         .withDefaultLogin()
@@ -161,7 +155,7 @@ class SaveNormIntegrationTest {
             response -> {
               assertThat(response.getResponseBody()).isNotNull();
               assertThat(response.getResponseBody().contentRelatedIndexing()).isNotNull();
-              assertThat(response.getResponseBody().contentRelatedIndexing().norms()).isNull();
+              assertThat(response.getResponseBody().contentRelatedIndexing().norms()).isEmpty();
             });
   }
 
@@ -170,23 +164,27 @@ class SaveNormIntegrationTest {
     UUID uuid = UUID.randomUUID();
     Instant creationTimestamp = Instant.now();
 
-    DocumentUnitDTO dto =
-        DocumentUnitDTO.builder()
-            .uuid(uuid)
-            .creationtimestamp(creationTimestamp)
-            .documentnumber("1234567890123")
-            .documentationOfficeId(documentationOfficeUuid)
-            .build();
-    DocumentUnitDTO savedDTO = repository.save(dto).block();
-    NormReferenceDTO norm = addNormToDB(1, savedDTO);
-
-    DocumentUnitNorm norm1 =
-        DocumentUnitNorm.builder().normAbbreviation("norm abbreviation 1").id(norm.getId()).build();
+    repository
+        .save(
+            DocumentUnitDTO.builder()
+                .uuid(uuid)
+                .norms(new ArrayList<>())
+                .creationtimestamp(creationTimestamp)
+                .documentnumber("1234567890124")
+                .documentationOfficeId(documentationOfficeUuid)
+                .build())
+        .block();
+    NormAbbreviationDTO normAbbreviation = addNormToDB(2352);
 
     DocumentUnit documentUnitFromFrontend = generateDocumentationUnit(uuid, creationTimestamp);
-    documentUnitFromFrontend.contentRelatedIndexing().norms().add(norm1);
 
-    List<DocumentUnitNorm> expectedNormList = List.of(norm1);
+    documentUnitFromFrontend
+        .contentRelatedIndexing()
+        .norms()
+        .add(
+            DocumentUnitNorm.builder()
+                .normAbbreviation(NormAbbreviation.builder().id(normAbbreviation.getId()).build())
+                .build());
 
     risWebTestClient
         .withDefaultLogin()
@@ -201,8 +199,16 @@ class SaveNormIntegrationTest {
             response -> {
               assertThat(response.getResponseBody()).isNotNull();
               assertThat(response.getResponseBody().contentRelatedIndexing()).isNotNull();
-              assertThat(response.getResponseBody().contentRelatedIndexing().norms())
-                  .containsExactlyElementsOf(expectedNormList);
+              assertThat(response.getResponseBody().contentRelatedIndexing().norms()).hasSize(1);
+              assertThat(
+                      response
+                          .getResponseBody()
+                          .contentRelatedIndexing()
+                          .norms()
+                          .get(0)
+                          .normAbbreviation()
+                          .id())
+                  .isEqualTo(normAbbreviation.getId());
             });
   }
 
@@ -212,32 +218,29 @@ class SaveNormIntegrationTest {
     UUID uuid = UUID.randomUUID();
     Instant creationTimestamp = Instant.now();
 
-    DocumentUnitDTO dto =
-        DocumentUnitDTO.builder()
-            .uuid(uuid)
-            .creationtimestamp(creationTimestamp)
-            .documentnumber("1234567890123")
-            .documentationOfficeId(documentationOfficeUuid)
-            .build();
-    DocumentUnitDTO savedDTO = repository.save(dto).block();
-    var dbnorm1 = addNormToDB(1, savedDTO);
-    var dbnorm2 = addNormToDB(2, savedDTO);
+    repository
+        .save(
+            DocumentUnitDTO.builder()
+                .uuid(uuid)
+                .creationtimestamp(creationTimestamp)
+                .documentnumber("1234567890123")
+                .documentationOfficeId(documentationOfficeUuid)
+                .build())
+        .block();
+    var dbNormAbbreviation1 = addNormToDB(1);
+    var dbNormAbbreviation2 = addNormToDB(2);
 
     DocumentUnit documentUnitFromFrontend = generateDocumentationUnit(uuid, creationTimestamp);
 
     DocumentUnitNorm norm1 =
         DocumentUnitNorm.builder()
-            .id(dbnorm1.getId())
-            .normAbbreviation("norm abbreviation 1")
+            .normAbbreviation(NormAbbreviation.builder().id(dbNormAbbreviation1.getId()).build())
             .build();
     DocumentUnitNorm norm2 =
         DocumentUnitNorm.builder()
-            .normAbbreviation("norm abbreviation 2")
-            .id(dbnorm2.getId())
+            .normAbbreviation(NormAbbreviation.builder().id(dbNormAbbreviation2.getId()).build())
             .build();
     documentUnitFromFrontend.contentRelatedIndexing().norms().addAll(List.of(norm1, norm2));
-
-    List<DocumentUnitNorm> expectedNormList = List.of(norm1, norm2);
 
     risWebTestClient
         .withDefaultLogin()
@@ -252,8 +255,24 @@ class SaveNormIntegrationTest {
             response -> {
               assertThat(response.getResponseBody()).isNotNull();
               assertThat(response.getResponseBody().contentRelatedIndexing()).isNotNull();
-              assertThat(response.getResponseBody().contentRelatedIndexing().norms())
-                  .containsExactlyElementsOf(expectedNormList);
+              assertThat(
+                      response
+                          .getResponseBody()
+                          .contentRelatedIndexing()
+                          .norms()
+                          .get(0)
+                          .normAbbreviation()
+                          .id())
+                  .isEqualTo(dbNormAbbreviation1.getId());
+              assertThat(
+                      response
+                          .getResponseBody()
+                          .contentRelatedIndexing()
+                          .norms()
+                          .get(1)
+                          .normAbbreviation()
+                          .id())
+                  .isEqualTo(dbNormAbbreviation2.getId());
             });
   }
 
@@ -267,20 +286,12 @@ class SaveNormIntegrationTest {
         .build();
   }
 
-  private NormReferenceDTO addNormToDB(int index, DocumentUnitDTO parent) {
+  private NormAbbreviationDTO addNormToDB(int index) {
     NormAbbreviationDTO normAbbreviationDTO =
         NormAbbreviationDTO.builder()
             .abbreviation("norm abbreviation " + index)
             .documentId((long) index)
             .build();
-    normAbbreviationDTO = normAbbreviationRepository.save(normAbbreviationDTO);
-
-    NormReferenceDTO normDTO =
-        NormReferenceDTO.builder()
-            .legacyDocUnitId(parent.getUuid())
-            .normAbbreviation(normAbbreviationDTO.getAbbreviation())
-            .build();
-    normDTO = normRepository.save(normDTO);
-    return normDTO;
+    return normAbbreviationRepository.saveAndFlush(normAbbreviationDTO);
   }
 }

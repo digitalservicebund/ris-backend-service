@@ -113,14 +113,12 @@ CREATE INDEX
 CREATE TABLE IF NOT EXISTS
   incremental_migration.norm_reference (
     id uuid NOT NULL,
-    norm_abbreviation character varying(1000) COLLATE pg_catalog."default",
+    norm_abbreviation_raw_value character varying(1000) COLLATE pg_catalog."default",
     single_norm character varying(255) COLLATE pg_catalog."default",
     date_of_version date,
     date_of_relevance character varying(255) COLLATE pg_catalog."default",
     documentation_unit_id uuid,
-    CONSTRAINT norm_reference_pkey PRIMARY KEY (id)
-    ---     CONSTRAINT fk_documentation_unit FOREIGN KEY (documentation_unit_id)
-    ---        REFERENCES incremental_migration.documentation_unit (id) MATCH SIMPLE
-    ---        ON UPDATE NO ACTION
-    ---        ON DELETE NO ACTION
-  );
+    norm_abbreviation_id uuid,
+    date_of_version_raw_value character varying(255) COLLATE pg_catalog."default",
+    legacy_doc_unit_id uuid
+  )

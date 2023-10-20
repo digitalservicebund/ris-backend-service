@@ -9,7 +9,7 @@ public class DocumentUnitNormTransformer {
   public static DocumentUnitNorm transformToDomain(NormReferenceDTO normDTO) {
     return DocumentUnitNorm.builder()
         .id(normDTO.getId())
-        .normAbbreviation(normDTO.getNormAbbreviation())
+        .normAbbreviation(NormAbbreviationTransformer.transformDTO(normDTO.getNormAbbreviation()))
         .singleNorm(normDTO.getSingleNorm())
         .dateOfVersion(normDTO.getDateOfVersion())
         .dateOfRelevance(normDTO.getDateOfRelevance())

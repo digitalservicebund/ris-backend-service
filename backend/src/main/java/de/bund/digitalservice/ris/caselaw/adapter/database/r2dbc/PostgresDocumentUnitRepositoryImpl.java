@@ -3,6 +3,7 @@ package de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentCategoryRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentTypeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationOfficeRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseNormAbbreviationRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseNormReferenceRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseProcedureLinkRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseProcedureRepository;
@@ -89,6 +90,8 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
   private final DatabaseDocumentationOfficeRepository documentationOfficeRepository;
   private final DatabaseDocumentUnitStatusRepository databaseDocumentUnitStatusRepository;
   private final DatabaseDocumentationUnitLinkRepository documentationUnitLinkRepository;
+
+  private final DatabaseNormAbbreviationRepository normAbbreviationRepository;
   private final DatabaseCitationStyleRepository citationStyleRepository;
   private final DatabaseProcedureRepository procedureRepository;
   private final DatabaseProcedureLinkRepository procedureLinkRepository;
@@ -111,6 +114,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
       DatabaseNormReferenceRepository documentUnitNormRepository,
       DatabaseDocumentUnitStatusRepository databaseDocumentUnitStatusRepository,
       DatabaseDocumentationUnitLinkRepository documentationUnitLinkRepository,
+      DatabaseNormAbbreviationRepository normAbbreviationRepository,
       DatabaseCitationStyleRepository citationStyleRepository,
       DatabaseDocumentationOfficeRepository documentationOfficeRepository,
       DatabaseProcedureRepository procedureRepository,
@@ -134,6 +138,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
     this.documentationOfficeRepository = documentationOfficeRepository;
     this.databaseDocumentUnitStatusRepository = databaseDocumentUnitStatusRepository;
     this.documentationUnitLinkRepository = documentationUnitLinkRepository;
+    this.normAbbreviationRepository = normAbbreviationRepository;
     this.citationStyleRepository = citationStyleRepository;
     this.procedureRepository = procedureRepository;
     this.procedureLinkRepository = procedureLinkRepository;
@@ -379,7 +384,10 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
                         documentUnitNormDTO.setSingleNorm(currentNorm.singleNorm());
                         documentUnitNormDTO.setDateOfVersion(currentNorm.dateOfVersion());
                         documentUnitNormDTO.setDateOfRelevance(currentNorm.dateOfRelevance());
-                        documentUnitNormDTO.setNormAbbreviation(currentNorm.normAbbreviation());
+                        documentUnitNormDTO.setNormAbbreviation(
+                            normAbbreviationRepository
+                                .findById(currentNorm.normAbbreviation().id())
+                                .orElse(null));
                         documentUnitNormDTO.setLegacyDocUnitId(documentUnitDTO.uuid);
                         toSave.add(documentUnitNormDTO);
                       } else {
@@ -402,6 +410,10 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
                         .singleNorm(currentNorm.singleNorm())
                         .dateOfVersion(currentNorm.dateOfVersion())
                         .dateOfRelevance(currentNorm.dateOfRelevance())
+                        .normAbbreviation(
+                            normAbbreviationRepository
+                                .findById(currentNorm.normAbbreviation().id())
+                                .orElse(null))
                         .legacyDocUnitId(documentUnitDTO.getUuid())
                         .build();
                 toSave.add(normReferenceDTO);
