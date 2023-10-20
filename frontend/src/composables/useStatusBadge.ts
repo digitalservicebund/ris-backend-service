@@ -1,12 +1,19 @@
-import { computed } from "vue"
+import { FunctionalComponent, SVGAttributes, computed } from "vue"
 import DocumentUnit from "@/domain/documentUnit"
 import IconErrorOutline from "~icons/ic/baseline-error-outline"
 import IconInPublishing from "~icons/ic/outline-access-time"
 import IconPublished from "~icons/ic/outline-campaign"
 import IconUnpublished from "~icons/ic/outline-disabled-visible"
 
+export interface Badge {
+  label: string
+  value: string
+  icon?: FunctionalComponent<SVGAttributes>
+  color: string
+}
+
 export function useStatusBadge(status: DocumentUnit["status"]) {
-  const badge = {
+  const badge: Badge = {
     label: "status",
     value: "",
     icon: undefined,

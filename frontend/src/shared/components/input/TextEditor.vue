@@ -29,26 +29,28 @@ import { CustomParagraph } from "../../editor/paragraph"
 import { CustomSuperscript, CustomSubscript } from "../../editor/scriptText"
 import { TableStyle } from "../../editor/tableStyle"
 import { FieldSize } from "@/shared/components/input/FieldSize"
-import TextEditorButton from "@/shared/components/input/TextEditorButton.vue"
+import TextEditorButton, {
+  EditorButton,
+} from "@/shared/components/input/TextEditorButton.vue"
 import { useCollapsingMenuBar } from "@/shared/composables/useCollapsingMenuBar"
+import IconAlignJustify from "~icons/ic/baseline-format-align-justify"
+import IconAlignRight from "~icons/ic/baseline-format-align-right"
+import IconBold from "~icons/ic/baseline-format-bold"
+import IconItalic from "~icons/ic/baseline-format-italic"
+import IconStrikethrough from "~icons/ic/baseline-format-strikethrough"
+import IconUnderline from "~icons/ic/baseline-format-underlined"
+import IconRedo from "~icons/ic/baseline-redo"
+import IconSubscript from "~icons/ic/baseline-subscript"
+import IconSuperscript from "~icons/ic/baseline-superscript"
+import IconUndo from "~icons/ic/baseline-undo"
+import IconAlignCenter from "~icons/ic/outline-format-align-center"
+import IconAlignLeft from "~icons/ic/outline-format-align-left"
 
 interface Props {
   value?: string
   fieldSize?: FieldSize
   editable?: boolean
   ariaLabel?: string
-}
-
-interface MenuButton {
-  type: string
-  icon: string
-  ariaLabel: string
-  childButtons?: MenuButton[]
-  isLast?: boolean
-  isActive?: boolean
-  isSecondRow?: boolean
-  isCollapsable?: boolean
-  callback?: () => void
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -125,7 +127,7 @@ const editor = new Editor({
 const buttons = computed(() => [
   {
     type: "undo",
-    icon: "undo",
+    icon: IconUndo,
     ariaLabel: "undo",
     group: "arrow",
     isCollapsable: false,
@@ -133,7 +135,7 @@ const buttons = computed(() => [
   },
   {
     type: "redo",
-    icon: "redo",
+    icon: IconRedo,
     ariaLabel: "redo",
     group: "arrow",
     isCollapsable: false,
@@ -141,7 +143,7 @@ const buttons = computed(() => [
   },
   {
     type: "bold",
-    icon: "format_bold",
+    icon: IconBold,
     ariaLabel: "bold",
     group: "format",
     isCollapsable: false,
@@ -149,7 +151,7 @@ const buttons = computed(() => [
   },
   {
     type: "italic",
-    icon: "format_italic",
+    icon: IconItalic,
     ariaLabel: "italic",
     group: "format",
     isCollapsable: false,
@@ -157,7 +159,7 @@ const buttons = computed(() => [
   },
   {
     type: "underline",
-    icon: "format_underlined",
+    icon: IconUnderline,
     ariaLabel: "underline",
     group: "format",
     isCollapsable: false,
@@ -165,7 +167,7 @@ const buttons = computed(() => [
   },
   {
     type: "strike",
-    icon: "strikethrough_s",
+    icon: IconStrikethrough,
     ariaLabel: "strike",
     group: "format",
     isCollapsable: false,
@@ -173,56 +175,50 @@ const buttons = computed(() => [
   },
   {
     type: "left",
-    icon: "format_align_left",
+    icon: IconAlignLeft,
     ariaLabel: "left",
     group: "alignment",
     isCollapsable: true,
-    isSecondRow: true,
     callback: () => editor.chain().focus().setTextAlign("left").run(),
   },
   {
     type: "center",
-    icon: "format_align_center",
+    icon: IconAlignCenter,
     ariaLabel: "center",
     group: "alignment",
     isCollapsable: true,
-    isSecondRow: true,
     callback: () => editor.chain().focus().setTextAlign("center").run(),
   },
   {
     type: "right",
-    icon: "format_align_right",
+    icon: IconAlignRight,
     ariaLabel: "right",
     group: "alignment",
     isCollapsable: true,
-    isSecondRow: true,
     callback: () => editor.chain().focus().setTextAlign("right").run(),
   },
   {
     type: "justify",
-    icon: "format_align_justify",
+    icon: IconAlignJustify,
     ariaLabel: "justify",
     group: "alignment",
     isCollapsable: true,
-    isSecondRow: true,
     callback: () => editor.chain().focus().setTextAlign("justify").run(),
   },
   {
     type: "superscript",
-    icon: "superscript",
+    icon: IconSuperscript,
     ariaLabel: "superscript",
     group: "vertical-alignment",
     isCollapsable: false,
-    isSecondRow: true,
     callback: () => editor.chain().focus().toggleMark("superscript").run(),
   },
   {
     type: "subscript",
-    icon: "subscript",
+    icon: IconSubscript,
     ariaLabel: "subscript",
     group: "vertical-alignment",
     isCollapsable: false,
-    isSecondRow: true,
     callback: () => editor.chain().focus().toggleMark("subscript").run(),
   },
 ])
@@ -245,12 +241,8 @@ const { collapsedButtons } = useCollapsingMenuBar(
   editorButtons,
   maxButtonEntries,
 )
-const showSecondRow = ref(false)
 
-const container = ref()
-
-function handleButtonClick(button: MenuButton) {
-  if (button.type == "more") showSecondRow.value = !showSecondRow.value
+function handleButtonClick(button: EditorButton) {
   if (button.callback) button.callback()
 }
 
@@ -278,7 +270,6 @@ onMounted(() => {
 })
 
 const resizeObserver = new ResizeObserver((entries) => {
-  showSecondRow.value = false
   for (const entry of entries) {
     containerWidth.value = entry.contentRect.width
   }
@@ -286,10 +277,10 @@ const resizeObserver = new ResizeObserver((entries) => {
 </script>
 
 <template>
-  <div ref="container" class="editor bg-white" fluid>
+  <div class="editor bg-white" fluid>
     <div v-if="showButtons()">
       <div
-        :aria-label="props.ariaLabel + ' Button Leiste'"
+        :aria-label="ariaLabel + 'Button Leiste'"
         class="pa-1 flex flex-row flex-wrap justify-between"
       >
         <div class="flex flex-row">
@@ -301,46 +292,18 @@ const resizeObserver = new ResizeObserver((entries) => {
           />
         </div>
       </div>
-      <hr class="border-t-black" />
-    </div>
-    <div v-if="showButtons() && showSecondRow">
-      <div
-        :aria-label="ariaLabel + ' Editor Button Leiste'"
-        class="pa-1 flex flex-row flex-wrap"
-      >
-        <TextEditorButton
-          v-for="(button, index) in collapsedButtons[
-            collapsedButtons.length - 1
-          ].childButtons"
-          :key="index"
-          v-bind="button"
-          @toggle="handleButtonClick"
-        />
-      </div>
       <hr />
     </div>
     <div>
       <EditorContent
-        :class="'editor-content editor-content--' + fieldSize"
+        :class="{
+          'h-64': fieldSize === 'small',
+          'h-128': fieldSize === 'medium',
+          'h-320': fieldSize === 'large',
+        }"
         :data-testid="ariaLabel"
         :editor="editor"
       />
     </div>
   </div>
 </template>
-
-<style lang="scss" scoped>
-.editor-content {
-  &--small {
-    height: 60px;
-  }
-
-  &--medium {
-    height: 120px;
-  }
-
-  &--large {
-    height: 320px;
-  }
-}
-</style>
