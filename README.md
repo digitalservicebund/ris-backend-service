@@ -188,3 +188,7 @@ To access the api documentation, start the application and navigate to `/api/doc
 
 Opt in to CI posting notifications for failing jobs to a particular Slack channel by setting a repository secret
 with the name `SLACK_WEBHOOK_URL`, containing a url for [Incoming Webhooks](https://api.slack.com/messaging/webhooks).
+
+## Reports
+
+All reports will be published here https://digitalservicebund.github.io/ris-reports/

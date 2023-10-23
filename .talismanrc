@@ -5,11 +5,6 @@ fileignoreconfig:
 - filename: '*README.md'
   ignore_detectors:
   - filecontent
-- filename: _site/*
-  ignore_detectors:
-  - filecontent
-- filename: _site/prototype-footnotes/assets/index-086108b4.js
-  checksum: 0bd435f734159482c18b1f78fbde74f6b3be56604f380ac59405dc240cf8a270
 - filename: backend/src/main/kotlin/de/bund/digitalservice/ris/norms/framework/adapter/input/restapi/controller/GetFileController.kt
   checksum: f989b3c9c176b1b985c2f78ca6ca13fa1403cbb69f367ae9b1cb8ea64d5f6747
 - filename: backend/src/test/java/de/bund/digitalservice/ris/caselaw/integration/tests/JurisXmlExporterWrapperIntegrationTest.java
