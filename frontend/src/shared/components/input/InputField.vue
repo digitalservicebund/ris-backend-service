@@ -4,6 +4,7 @@ import { ValidationError } from "@/shared/components/input/types"
 import errors from "@/shared/i18n/errors.json"
 import { isErrorCode } from "@/shared/i18n/utils"
 import { useGlobalValidationErrorStore } from "@/stores/globalValidationErrorStore"
+import IconErrorOutline from "~icons/ic/baseline-error-outline"
 
 interface Props {
   id: string
@@ -109,12 +110,10 @@ export enum LabelPosition {
       }"
       data-testid="label-wrapper"
     >
-      <span
+      <IconErrorOutline
         v-if="localValidationError"
-        class="material-icons pr-4 text-red-800"
-      >
-        error_outline
-      </span>
+        class="pr-4 text-20 text-red-800"
+      />
 
       <label
         class="ds-label-02-reg grid items-center"

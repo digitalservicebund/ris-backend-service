@@ -1,12 +1,12 @@
 <script lang="ts" setup>
 import { computed, ref, watch } from "vue"
+import IconAdd from "~icons/ic/baseline-add"
+import IconHorizontalRule from "~icons/ic/baseline-horizontal-rule"
 
 interface Props {
   header?: string
   headerClass?: string
   isExpanded?: boolean
-  openIconName?: string
-  closeIconName?: string
   headerId?: string
   iconsOnLeft?: boolean
   marginLevel?: number
@@ -15,8 +15,6 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
   header: undefined,
   isExpanded: false,
-  openIconName: "add",
-  closeIconName: "horizontal_rule",
   headerId: "",
   headerClass: "",
   iconsOnLeft: false,
@@ -29,22 +27,17 @@ const emit = defineEmits<{
 
 const localIsExpanded = ref(false)
 
-const iconName = computed(() =>
-  localIsExpanded.value ? props.closeIconName : props.openIconName,
-)
-
 const ariaLabel = computed(() =>
   localIsExpanded.value ? "Zuklappen" : "Aufklappen",
 )
 
-function toggleContentVisibility(event: Event): void {
-  if (
-    !props.preventExpandOnClick ||
-    (event.target &&
-      (event.target as HTMLElement).classList.contains("material-icons"))
-  ) {
-    localIsExpanded.value = !localIsExpanded.value
-  }
+function toggleContentVisibility(): void {
+  if (props.preventExpandOnClick) return
+  localIsExpanded.value = !localIsExpanded.value
+}
+
+function toggleContentVisibilityOnButton(event: Event): void {
+  localIsExpanded.value = !localIsExpanded.value
   event.stopPropagation()
 }
 
@@ -68,17 +61,22 @@ watch(localIsExpanded, () => emit("update:isExpanded", localIsExpanded.value))
       :aria-labelledby="headerId"
       class="flex w-full items-center justify-between focus:outline-none focus-visible:outline-blue-800"
       :class="{ 'cursor-pointer': !preventExpandOnClick }"
-      @click="toggleContentVisibility"
+      @click.stop="toggleContentVisibility"
     >
       <button
         v-if="props.iconsOnLeft"
         :aria-label="ariaLabel"
-        class="icon material-icons self-start"
+        class="icon self-start"
         data-testid="icons-open-close"
         :style="{ marginLeft: `${marginLevel * 24}px` }"
-        @click="toggleContentVisibility"
+        @click.stop="toggleContentVisibilityOnButton"
       >
-        {{ iconName }}
+        <slot v-if="localIsExpanded" name="close-icon">
+          <IconHorizontalRule />
+        </slot>
+        <slot v-else name="open-icon">
+          <IconAdd />
+        </slot>
       </button>
 
       <slot name="header">
@@ -88,11 +86,16 @@ watch(localIsExpanded, () => emit("update:isExpanded", localIsExpanded.value))
       <button
         v-if="!props.iconsOnLeft"
         :aria-label="ariaLabel"
-        class="icon material-icons self-start"
+        class="icon self-start"
         data-testid="icons-open-close"
-        @click="toggleContentVisibility"
+        @click.stop="toggleContentVisibilityOnButton"
       >
-        {{ iconName }}
+        <slot v-if="localIsExpanded" name="close-icon">
+          <IconHorizontalRule />
+        </slot>
+        <slot v-else name="open-icon">
+          <IconAdd />
+        </slot>
       </button>
     </div>
 

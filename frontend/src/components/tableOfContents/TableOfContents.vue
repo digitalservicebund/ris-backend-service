@@ -8,6 +8,9 @@ import {
   Recitals,
   isDocumentSection,
 } from "@/domain/norm"
+import { sanitizeTableOfContentEntry } from "@/helpers/sanitizer"
+import IconChevronRight from "~icons/ic/baseline-chevron-right"
+import IconExpandMore from "~icons/ic/baseline-expand-more"
 
 const props = withDefaults(
   defineProps<{
@@ -31,11 +34,20 @@ const effectiveRecitals = computed(() => {
   } else if (!props.recitals.marker && !props.recitals.heading) {
     return "Präambel"
   } else {
-    return `${props.recitals.marker ?? ""} ${
-      props.recitals.heading ?? ""
-    }`.trim()
+    return sanitizeTableOfContentEntry(
+      `${props.recitals.marker ?? ""} ${props.recitals.heading ?? ""}`.trim(),
+    )
   }
 })
+
+const effectiveDocumentSections = computed(() =>
+  props.documentSections.map((i) => {
+    return {
+      ...i,
+      heading: sanitizeTableOfContentEntry(i.heading ?? ""),
+    }
+  }),
+)
 </script>
 
 <template>
@@ -46,7 +58,7 @@ const effectiveRecitals = computed(() => {
     title="Eingangsformel"
     :to="{
       name: 'norms-norm-normGuid-documentation-formula',
-      params: { normGuid: props.normGuid },
+      params: { normGuid },
     }"
   />
 
@@ -57,13 +69,13 @@ const effectiveRecitals = computed(() => {
     :title="effectiveRecitals"
     :to="{
       name: 'norms-norm-normGuid-documentation-recitals',
-      params: { normGuid: props.normGuid },
+      params: { normGuid },
     }"
   />
 
   <!-- Sections & articles -->
   <div
-    v-for="doc in props.documentSections"
+    v-for="doc in effectiveDocumentSections"
     :key="doc.guid"
     class="border-t border-gray-400"
     :class="{ 'last:border-b': marginLevel === 0 }"
@@ -72,20 +84,26 @@ const effectiveRecitals = computed(() => {
     <ExpandableContent
       v-if="isDocumentSection(doc)"
       class="bg-blue-200 pt-4"
-      close-icon-name="expand_more"
       icons-on-left
       is-expanded
       :margin-level="marginLevel"
-      open-icon-name="chevron_right"
       prevent-expand-on-click
     >
+      <template #open-icon>
+        <IconChevronRight />
+      </template>
+
+      <template #close-icon>
+        <IconExpandMore />
+      </template>
+
       <template #header>
         <router-link
           class="ds-label-02-bold ml-4 w-full pb-4 text-left hover:underline active:underline"
           :to="{
             name: 'norms-norm-normGuid-documentation-documentationGuid',
             params: {
-              normGuid: props.normGuid,
+              normGuid,
               documentationGuid: doc.guid,
             },
           }"
@@ -107,7 +125,7 @@ const effectiveRecitals = computed(() => {
       :title="`${doc.marker ?? ''} ${doc.heading ?? ''}`"
       :to="{
         name: 'norms-norm-normGuid-documentation-documentationGuid',
-        params: { normGuid: props.normGuid, documentationGuid: doc.guid },
+        params: { normGuid, documentationGuid: doc.guid },
       }"
     />
   </div>
@@ -119,7 +137,7 @@ const effectiveRecitals = computed(() => {
     title="Schlussformel"
     :to="{
       name: 'norms-norm-normGuid-documentation-conclusion',
-      params: { normGuid: props.normGuid },
+      params: { normGuid },
     }"
   />
 </template>

@@ -171,7 +171,8 @@ class ImportNormControllerIntegrationTest : PostgresTestcontainerIntegrationTest
               norm
                   .getFirstMetadatum(MetadataSectionName.NORM, MetadatumType.OFFICIAL_LONG_TITLE)
                   ?.value)
-          .isEqualTo("Verordnung zur Anpassung von Rechtsverordnungen an das Tierarzneimittelrecht")
+          .isEqualTo(
+              "Verordnung<BR/> zur Anpassung von Rechtsverordnungen an das Tierarzneimittelrecht")
       assertThat(
               norm
                   .getFirstMetadatum(MetadataSectionName.NORM_PROVIDER, MetadatumType.ENTITY)

@@ -1,6 +1,6 @@
 import dayjs from "dayjs"
 import { createTextVNode, h, VNode } from "vue"
-import CheckMark from "@/assets/icons/ckeckbox_regular.svg"
+import IconCheck from "~icons/ic/baseline-check"
 
 function processDateValue(value: string, format: string | undefined): VNode {
   const formattedValue = dayjs(value).format(format)
@@ -16,11 +16,7 @@ function processStringValue(
 }
 
 function processCheckmarkValue(value: string): VNode {
-  const checkmarkNode = h("img", {
-    src: CheckMark,
-    alt: "Schwarzes Haken",
-    width: "16",
-  })
+  const checkmarkNode = h(IconCheck)
   const valueNode = h("span", value)
   return h("div", { class: ["flex", "gap-4"] }, [checkmarkNode, valueNode])
 }

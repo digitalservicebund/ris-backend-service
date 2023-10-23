@@ -10,10 +10,12 @@ import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.ResponseEntity;
 import org.springframework.lang.NonNull;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -55,5 +57,14 @@ public class ProcedureController {
     return Flux.fromIterable(
         service.getDocumentUnits(
             procedureLabel, userService.getDocumentationOffice(oidcUser).block()));
+  }
+
+  @DeleteMapping(value = "{procedureLabel}")
+  @PreAuthorize("isAuthenticated()")
+  public Mono<ResponseEntity<Void>> delete(
+      @AuthenticationPrincipal OidcUser oidcUser, @NonNull @PathVariable String procedureLabel) {
+
+    service.delete(procedureLabel, userService.getDocumentationOffice(oidcUser).block());
+    return Mono.just(ResponseEntity.ok().build());
   }
 }

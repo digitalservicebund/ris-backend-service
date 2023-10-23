@@ -78,13 +78,13 @@ const firstPart: DocumentSection = {
 const secondPart: DocumentSection = {
   guid: "guid",
   marker: "Second Part",
-  heading: "Heading of second part",
+  heading: "Heading<BR/> of second part",
   type: DocumentSectionType.PART,
   documentation: [
     {
       guid: "guid",
       marker: "Section",
-      heading: "Heading of section",
+      heading: "Heading<BR/> of section",
       type: DocumentSectionType.SECTION,
       documentation: [
         {

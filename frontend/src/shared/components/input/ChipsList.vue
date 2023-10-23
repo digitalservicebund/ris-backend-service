@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { produce } from "immer"
 import { ref, watch } from "vue"
+import IconClear from "~icons/ic/baseline-clear"
 
 interface Props {
   modelValue: string[] | undefined
@@ -140,12 +141,12 @@ function focusNext() {
         <button
           v-if="!readOnly"
           aria-label="Löschen"
-          class="iems-center absolute inset-y-0 right-0 flex h-full items-center rounded-r-10 p-4 group-focus:bg-blue-900 group-focus:text-white"
+          class="absolute inset-y-0 right-0 flex h-full items-center rounded-r-10 p-4 text-18 group-focus:bg-blue-900 group-focus:text-white"
           tabindex="-1"
           type="button"
           @click="deleteChip(i, chip)"
         >
-          <em class="material-icons text-center">clear</em>
+          <IconClear />
         </button>
       </li>
     </template>

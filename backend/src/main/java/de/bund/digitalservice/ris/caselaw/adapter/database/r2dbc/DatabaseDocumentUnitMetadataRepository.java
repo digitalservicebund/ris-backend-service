@@ -25,7 +25,7 @@ public interface DatabaseDocumentUnitMetadataRepository
           + "(:decisionDate IS NULL OR decision_date = :decisionDate) AND"
           + "(:docUnitIds IS NULL OR id = ANY(:docUnitIds)) AND "
           + "(:docTypeId IS NULL OR document_type_id = :docTypeId) AND "
-          + "status.publication_status IN ('PUBLISHED', 'PUBLISHING', 'JURIS_PUBLISHED', 'TEST_DOC_UNIT') AND "
+          + "status.publication_status IN ('PUBLISHED', 'PUBLISHING', 'JURIS_PUBLISHED') AND "
           + "data_source in ('NEURIS', 'MIGRATION') ";
 
   Mono<DocumentUnitMetadataDTO> findByUuid(UUID documentUnitUuid);

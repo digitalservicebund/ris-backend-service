@@ -1,4 +1,6 @@
 <script lang="ts" setup>
+import { sanitizeTableOfContentEntry } from "@/helpers/sanitizer"
+
 interface Norm {
   officialLongTitle: string
   guid: string
@@ -8,7 +10,7 @@ defineProps<{ norms: Norm[] }>()
 
 function formatTitle(title?: string): string {
   const titleIsMissing = title === undefined || title.length <= 0
-  return titleIsMissing ? "Kein Titel" : title
+  return titleIsMissing ? "Kein Titel" : sanitizeTableOfContentEntry(title)
 }
 </script>
 <template>

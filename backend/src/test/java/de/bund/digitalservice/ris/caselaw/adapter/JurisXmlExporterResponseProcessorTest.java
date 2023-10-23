@@ -124,7 +124,19 @@ class JurisXmlExporterResponseProcessorTest {
         });
 
     verifyNoInteractions(mailSender);
-    verify(inbox, never()).getFolder("processed");
+    verify(inbox, never()).copyMessages(any(), any());
+    verify(importMessage, never()).setFlag(Flag.DELETED, true);
+  }
+
+  @Test
+  void testMessageGetsNotMovedIfDocumentNumberNotFound() throws MessagingException {
+    when(inbox.getMessages()).thenReturn(new Message[] {importMessage});
+    when(statusService.getLatestIssuerAddress(DOCUMENT_NUMBER)).thenReturn(Mono.empty());
+
+    responseProcessor.readEmails();
+
+    verifyNoInteractions(mailSender);
+    verify(inbox, never()).copyMessages(new Message[] {importMessage}, processed);
     verify(importMessage, never()).setFlag(Flag.DELETED, true);
   }
 

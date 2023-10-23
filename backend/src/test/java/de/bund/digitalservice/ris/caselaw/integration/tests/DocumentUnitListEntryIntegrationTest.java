@@ -125,17 +125,6 @@ class DocumentUnitListEntryIntegrationTest {
                     .dataSource(DataSource.MIGRATION)
                     .build())
             .block();
-    DocumentUnitDTO oldNeurisDto =
-        repository
-            .save(
-                DocumentUnitDTO.builder()
-                    .uuid(UUID.randomUUID())
-                    .creationtimestamp(Instant.now())
-                    .documentnumber("NEUR202300007")
-                    .dataSource(DataSource.NEURIS)
-                    .documentationOfficeId(docOfficeDTO.getId())
-                    .build())
-            .block();
     DocumentUnitDTO newNeurisDto =
         repository
             .save(
@@ -153,14 +142,6 @@ class DocumentUnitListEntryIntegrationTest {
             FileNumberDTO.builder()
                 .documentUnitId(migrationDto.getId())
                 .fileNumber("AkteM")
-                .isDeviating(false)
-                .build())
-        .block();
-    fileNumberRepository
-        .save(
-            FileNumberDTO.builder()
-                .documentUnitId(oldNeurisDto.getId())
-                .fileNumber("AkteX")
                 .isDeviating(false)
                 .build())
         .block();
@@ -187,15 +168,6 @@ class DocumentUnitListEntryIntegrationTest {
             DocumentUnitStatusDTO.builder()
                 .id(UUID.randomUUID())
                 .newEntry(true)
-                .documentUnitId(oldNeurisDto.getUuid())
-                .publicationStatus(PublicationStatus.TEST_DOC_UNIT)
-                .build())
-        .block();
-    statusRepository
-        .save(
-            DocumentUnitStatusDTO.builder()
-                .id(UUID.randomUUID())
-                .newEntry(true)
                 .documentUnitId(newNeurisDto.getUuid())
                 .publicationStatus(PublicationStatus.PUBLISHED)
                 .build())
@@ -214,23 +186,17 @@ class DocumentUnitListEntryIntegrationTest {
         .jsonPath("$.content[0].documentNumber")
         .isEqualTo("NEUR202300008")
         .jsonPath("$.content[1].documentNumber")
-        .isEqualTo("NEUR202300007")
-        .jsonPath("$.content[2].documentNumber")
         .isEqualTo("MIGR202200012")
         .jsonPath("$.content[0].fileNumber")
         .isEqualTo("AkteY")
         .jsonPath("$.content[1].fileNumber")
-        .isEqualTo("AkteX")
-        .jsonPath("$.content[2].fileNumber")
         .isEqualTo("AkteM")
         .jsonPath("$.content[0].status.publicationStatus")
         .isEqualTo("PUBLISHED")
         .jsonPath("$.content[1].status.publicationStatus")
         .isEqualTo("PUBLISHED")
-        .jsonPath("$.content[2].status.publicationStatus")
-        .isEqualTo("PUBLISHED")
         .jsonPath("$.totalElements")
-        .isEqualTo(3);
+        .isEqualTo(2);
   }
 
   @Test

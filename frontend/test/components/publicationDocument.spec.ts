@@ -194,7 +194,7 @@ describe("PublicationDocument:", () => {
       expect(
         screen.getByLabelText("Letzte Veröffentlichungen"),
       ).toHaveTextContent(
-        `Letzte VeröffentlichungenXml Email Abgabe - 01.02.2000keyboard_arrow_upÜBERE-Mail an: receiver address Betreff: mail subjectALSXML1<?xml version="1.0"?>2<!DOCTYPE juris-r SYSTEM "juris-r.dtd">3<xml>content</xml>`,
+        `Letzte VeröffentlichungenXml Email Abgabe - 01.02.2000ÜBERE-Mail an: receiver address Betreff: mail subjectALSXML1<?xml version="1.0"?>2<!DOCTYPE juris-r SYSTEM "juris-r.dtd">3<xml>content</xml>`,
       )
     })
 
@@ -253,7 +253,7 @@ describe("PublicationDocument:", () => {
     })
 
     expect(container).toHaveTextContent(
-      `VeröffentlichenPlausibilitätsprüfung check Alle Pflichtfelder sind korrekt ausgefülltcampaignDokumentationseinheit veröffentlichenLetzte VeröffentlichungenXml Email Abgabe - 01.02.2000keyboard_arrow_upÜBERE-Mail an: receiver address Betreff: mail subjectALS`,
+      `VeröffentlichenPlausibilitätsprüfung check Alle Pflichtfelder sind korrekt ausgefülltcampaignDokumentationseinheit veröffentlichenLetzte VeröffentlichungenXml Email Abgabe - 01.02.2000ÜBERE-Mail an: receiver address Betreff: mail subjectALS`,
     )
 
     const codeSnippet = screen.queryByTestId("code-snippet")

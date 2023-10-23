@@ -7,6 +7,8 @@ import TextButton from "@/shared/components/input/TextButton.vue"
 import { useSaveToRemote } from "@/shared/composables/useSaveToRemote"
 import { useGlobalValidationErrorStore } from "@/stores/globalValidationErrorStore"
 import { useLoadedNormStore } from "@/stores/loadedNorm"
+import IconCloudUpload from "~icons/ic/baseline-cloud-upload"
+import IconErrorOutline from "~icons/ic/baseline-error-outline"
 
 /* -------------------------------------------------- *
  * Saving norms                                       *
@@ -51,12 +53,12 @@ onUnmounted(() => {
       />
 
       <div v-if="saveIsInProgress" class="text-sm flex items-center gap-4">
-        <span class="material-icons">cloud_upload</span>
+        <IconCloudUpload />
         wird gespeichert
       </div>
 
       <div v-if="lastSaveError !== undefined" class="flex items-center gap-4">
-        <span class="material-icons text-red-900">error_outline</span>
+        <IconErrorOutline class="text-red-900" />
         {{ lastSaveError?.title }}
       </div>
 
@@ -77,12 +79,12 @@ onUnmounted(() => {
       />
 
       <div v-if="validateIsInProgress" class="text-sm flex items-center gap-4">
-        <span class="material-icons">cloud_upload</span>
+        <IconCloudUpload />
         Validierung läuft
       </div>
 
       <div v-if="lastValidateError" class="flex items-center gap-4">
-        <span class="material-icons text-red-900">error_outline</span>
+        <IconErrorOutline class="text-red-900" />
         {{ lastValidateError?.title }}
       </div>
     </div>

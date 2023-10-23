@@ -5,7 +5,6 @@ import static de.bund.digitalservice.ris.caselaw.AuthUtils.buildDocOffice;
 import static de.bund.digitalservice.ris.caselaw.domain.PublicationStatus.JURIS_PUBLISHED;
 import static de.bund.digitalservice.ris.caselaw.domain.PublicationStatus.PUBLISHED;
 import static de.bund.digitalservice.ris.caselaw.domain.PublicationStatus.PUBLISHING;
-import static de.bund.digitalservice.ris.caselaw.domain.PublicationStatus.TEST_DOC_UNIT;
 import static de.bund.digitalservice.ris.caselaw.domain.PublicationStatus.UNPUBLISHED;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.argThat;
@@ -873,7 +872,7 @@ class DocumentUnitIntegrationTest {
   @Test
   void testSearchResultsAreDeterministic() {
     PublicationStatus[] published =
-        new PublicationStatus[] {PUBLISHED, TEST_DOC_UNIT, PUBLISHING, JURIS_PUBLISHED};
+        new PublicationStatus[] {PUBLISHED, PUBLISHING, JURIS_PUBLISHED};
     Random random = new Random();
     Flux.range(0, 20)
         .map(index -> UUID.randomUUID())
@@ -892,7 +891,7 @@ class DocumentUnitIntegrationTest {
                     DocumentUnitStatusDTO.builder()
                         .newEntry(true)
                         .id(UUID.randomUUID())
-                        .publicationStatus(published[random.nextInt(4)])
+                        .publicationStatus(published[random.nextInt(3)])
                         .documentUnitId(documentUnitDTO.getUuid())
                         .build()))
         .blockLast();
