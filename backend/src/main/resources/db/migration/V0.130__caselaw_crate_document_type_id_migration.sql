@@ -1,7 +1,6 @@
-drop view
-  if exists search_documentation_unit;
+DROP VIEW
+  IF EXISTS search_documentation_unit;
 
---- TODO decide if it's ok to destroy all current document type links
 ALTER TABLE
   doc_unit
 DROP COLUMN IF EXISTS

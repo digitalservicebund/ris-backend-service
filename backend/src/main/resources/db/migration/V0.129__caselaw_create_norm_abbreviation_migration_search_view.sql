@@ -12,12 +12,12 @@ CREATE INDEX
     )
   );
 
-create materialized view if not exists
-  norm_abbreviation_search_migration as
-select
+CREATE materialized VIEW IF NOT EXISTS
+  norm_abbreviation_search_migration AS
+SELECT
   na.*,
   r.code,
-  r.id as region_id,
+  r.id AS region_id,
   setweight(to_tsvector('german', na.abbreviation), 'A') || setweight(
     to_tsvector(
       'german',
@@ -31,10 +31,10 @@ select
     to_tsvector('german', coalesce(na.official_long_title, '')),
     'B'
   ) || setweight(to_tsvector('german', coalesce(r.code, '')), 'B') weighted_vector
-from
+FROM
   incremental_migration.norm_abbreviation na
-  left join incremental_migration.norm_abbreviation_region nar on na.id = nar.norm_abbreviation_id
-  left join incremental_migration.region r on nar.region_id = r.id;
+  LEFT JOIN incremental_migration.norm_abbreviation_region nar ON na.id = nar.norm_abbreviation_id
+  LEFT JOIN incremental_migration.region r ON nar.region_id = r.id;
 
 CREATE INDEX
   IF NOT EXISTS norm_abbreviation_search_migration_idx ON norm_abbreviation_search_migration USING GIN (weighted_vector);
