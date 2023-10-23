@@ -35,7 +35,7 @@ fileignoreconfig:
 - filename: frontend/test/test-helper/dataGenerators.ts
   checksum: a3d04d1168dcc221ba5fcd72e8d8bada60f48644c7586bde3a7602b748d0682c
 - filename: migration_schema_local_setup.md
-  checksum: de2cc2837b063aee4360a27c3f4bdb87f3e2b8f9d1abbb187c2d6230e267c7ca
+  checksum: f8957e52c0131c38da9d0805e924b395869d9326c959ad69c7e78cd192bf008d
 scopeconfig:
 - scope: node
 allowed_patterns:
