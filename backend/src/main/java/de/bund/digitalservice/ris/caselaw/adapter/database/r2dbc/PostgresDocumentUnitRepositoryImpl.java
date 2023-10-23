@@ -19,11 +19,11 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.Nor
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.StateDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.StateRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.ActiveCitationTransformer;
+import de.bund.digitalservice.ris.caselaw.adapter.transformer.DeviatingCourtTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DeviatingDecisionDateTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentUnitTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationUnitLinkTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationUnitSearchEntryTransformer;
-import de.bund.digitalservice.ris.caselaw.adapter.transformer.IncorrectCourtTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.LinkedDocumentationUnitTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.ActiveCitation;
 import de.bund.digitalservice.ris.caselaw.domain.DataSource;
@@ -601,7 +601,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
                   incorrectCourtDTO -> {
                     if (incorrectCourtIndex.get() < incorrectCourts.size()) {
                       incorrectCourtDTO =
-                          IncorrectCourtTransformer.enrichDTO(
+                          DeviatingCourtTransformer.enrichDTO(
                               incorrectCourtDTO,
                               incorrectCourts.get(incorrectCourtIndex.getAndIncrement()));
                       toSave.add(incorrectCourtDTO);

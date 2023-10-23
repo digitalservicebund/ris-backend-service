@@ -4,4 +4,4 @@ import java.util.UUID;
 import lombok.Builder;
 
 @Builder
-public record DeviatingEcli(UUID id, String ecli) {}
+public record DeviatingDecisionDate(UUID id, String deviatingDecisionDate) {}
