@@ -1,8 +1,8 @@
 package de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc;
 
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentTypeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ProcedureDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DocumentTypeDTO;
 import de.bund.digitalservice.ris.caselaw.domain.DataSource;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatus;
 import java.time.Instant;
@@ -41,7 +41,7 @@ public class DocumentUnitMetadataDTO {
   private String courtType;
 
   @Column("document_type_id")
-  private UUID documentTypeId;
+  private Long documentTypeId;
 
   @Transient private DocumentTypeDTO documentTypeDTO;
 

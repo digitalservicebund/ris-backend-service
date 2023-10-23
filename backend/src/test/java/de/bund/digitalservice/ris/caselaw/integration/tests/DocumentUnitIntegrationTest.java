@@ -18,11 +18,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentNumberService;
 import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentUnitStatusService;
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentUnitController;
 import de.bund.digitalservice.ris.caselaw.adapter.DocxConverterService;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentCategoryRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentTypeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationOfficeRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentCategoryDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentTypeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDeviatingDecisionDateRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentUnitMetadataRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentUnitRepository;
@@ -41,6 +37,8 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.PostgresDocumen
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.PostgresPublicationReportRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.CourtDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DatabaseCourtRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DatabaseDocumentTypeRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DocumentTypeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.StateDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.StateRepository;
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
@@ -105,8 +103,7 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
 class DocumentUnitIntegrationTest {
   @Container
   static PostgreSQLContainer<?> postgreSQLContainer =
-      new PostgreSQLContainer<>("postgres:14")
-          .withInitScript("db/create_migration_scheme_and_extensions.sql");
+      new PostgreSQLContainer<>("postgres:14").withInitScript("db/create_extension.sql");
 
   @DynamicPropertySource
   static void registerDynamicProperties(DynamicPropertyRegistry registry) {
@@ -140,7 +137,6 @@ class DocumentUnitIntegrationTest {
 
   private final DocumentationOffice docOffice = buildDefaultDocOffice();
   private UUID documentationOfficeUuid;
-  @Autowired private DatabaseDocumentCategoryRepository databaseDocumentCategoryRepository;
 
   @BeforeEach
   void setUp() {
@@ -166,7 +162,7 @@ class DocumentUnitIntegrationTest {
     deviatingDecisionDateRepository.deleteAll().block();
     incorrectCourtRepository.deleteAll().block();
     repository.deleteAll().block();
-    databaseDocumentTypeRepository.deleteAll();
+    databaseDocumentTypeRepository.deleteAll().block();
     documentUnitStatusRepository.deleteAll().block();
     databasePublishReportRepository.deleteAll().block();
   }
@@ -615,41 +611,30 @@ class DocumentUnitIntegrationTest {
 
   @Test
   void testDocumentTypeToSetIdFromLookuptable() {
-    var categoryA =
-        databaseDocumentCategoryRepository.saveAndFlush(
-            DocumentCategoryDTO.builder().label("A").build());
-    var categoryR =
-        databaseDocumentCategoryRepository.saveAndFlush(
-            DocumentCategoryDTO.builder().label("R").build());
-    var categoryC =
-        databaseDocumentCategoryRepository.saveAndFlush(
-            DocumentCategoryDTO.builder().label("C").build());
-
     DocumentTypeDTO documentTypeDTOA =
         DocumentTypeDTO.builder()
-            .abbreviation("ABC")
-            .category(categoryA)
+            .changeIndicator('c')
+            .jurisShortcut("ABC")
+            .documentType('A')
             .label("ABC123")
-            .multiple(true)
+            .build();
+    DocumentTypeDTO documentTypeDTOR =
+        DocumentTypeDTO.builder()
+            .changeIndicator('c')
+            .jurisShortcut("ABC")
+            .documentType('R')
+            .label("ABC123")
             .build();
     DocumentTypeDTO documentTypeDTOC =
         DocumentTypeDTO.builder()
-            .abbreviation("ABC")
-            .category(categoryC)
+            .changeIndicator('c')
+            .jurisShortcut("ABC")
+            .documentType('C')
             .label("ABC123")
-            .multiple(true)
             .build();
-
-    databaseDocumentTypeRepository.saveAllAndFlush(List.of(documentTypeDTOA, documentTypeDTOC));
-
-    var documentTypeDTOR =
-        databaseDocumentTypeRepository.saveAndFlush(
-            DocumentTypeDTO.builder()
-                .abbreviation("ABC")
-                .category(categoryR)
-                .label("ABC123")
-                .multiple(true)
-                .build());
+    databaseDocumentTypeRepository.save(documentTypeDTOA).block();
+    databaseDocumentTypeRepository.save(documentTypeDTOR).block();
+    databaseDocumentTypeRepository.save(documentTypeDTOC).block();
 
     DocumentUnitDTO dto =
         DocumentUnitDTO.builder()
@@ -669,7 +654,7 @@ class DocumentUnitIntegrationTest {
                 CoreData.builder()
                     .documentType(
                         DocumentType.builder()
-                            .jurisShortcut(documentTypeDTOR.getAbbreviation())
+                            .jurisShortcut(documentTypeDTOR.getJurisShortcut())
                             .label(documentTypeDTOR.getLabel())
                             .build())
                     .documentationOffice(docOffice)
@@ -691,27 +676,23 @@ class DocumentUnitIntegrationTest {
               assertThat(response.getResponseBody().coreData().documentType().label())
                   .isEqualTo(documentTypeDTOR.getLabel());
               assertThat(response.getResponseBody().coreData().documentType().jurisShortcut())
-                  .isEqualTo(documentTypeDTOR.getAbbreviation());
+                  .isEqualTo(documentTypeDTOR.getJurisShortcut());
             });
 
     List<DocumentUnitDTO> list = repository.findAll().collectList().block();
     assertThat(list).hasSize(1);
-    assertThat(list.get(0).getDocumentTypeId()).isEqualTo(documentTypeDTOR.getId());
+    assertThat(list.get(0).getDocumentTypeId()).isEqualTo(2L);
     assertThat(list.get(0).getDocumentTypeDTO()).isNull();
   }
 
   @Test
   void testUndoSettingDocumentType() {
-    var docType =
-        databaseDocumentTypeRepository.saveAndFlush(
-            DocumentTypeDTO.builder().abbreviation("test").multiple(true).build());
-
     DocumentUnitDTO dto =
         DocumentUnitDTO.builder()
             .uuid(UUID.randomUUID())
             .creationtimestamp(Instant.now())
             .documentnumber("1234567890123")
-            .documentTypeId(docType.getId())
+            .documentTypeId(123L)
             .documentationOfficeId(documentationOfficeUuid)
             .build();
     repository.save(dto).block();

@@ -40,7 +40,7 @@ public interface DatabaseDocumentUnitMetadataRepository
       String courtLocation,
       Instant decisionDate,
       Long[] docUnitIds,
-      UUID docTypeId,
+      Long docTypeId,
       Integer pageSize,
       Long offset);
 
@@ -50,5 +50,5 @@ public interface DatabaseDocumentUnitMetadataRepository
       String courtLocation,
       Instant decisionDate,
       Long[] docUnitIds,
-      UUID docTypeId);
+      Long docTypeId);
 }

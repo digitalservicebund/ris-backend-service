@@ -1,25 +1,21 @@
 package de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc;
 
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentCategoryRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentTypeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationOfficeRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseNormAbbreviationRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseNormReferenceRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseProcedureLinkRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseProcedureRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentTypeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitSearchEntryDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.NormAbbreviationDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.NormReferenceDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.NormReferenceDTO.NormReferenceDTOBuilder;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ProcedureDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ProcedureLinkDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitDTO.DocumentUnitDTOBuilder;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.CourtDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DatabaseCitationStyleRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DatabaseCourtRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DatabaseDocumentTypeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DatabaseFieldOfLawRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DatabaseNormAbbreviationRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DocumentTypeDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.NormAbbreviationDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.StateDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.StateRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.ActiveCitationTransformer;
@@ -84,16 +80,14 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
   private final DatabaseCourtRepository databaseCourtRepository;
   private final StateRepository stateRepository;
   private final DatabaseDocumentTypeRepository databaseDocumentTypeRepository;
-  private final DatabaseDocumentCategoryRepository databaseDocumentCategoryRepository;
   private final DatabaseFieldOfLawRepository fieldOfLawRepository;
   private final DatabaseDocumentUnitFieldsOfLawRepository documentUnitFieldsOfLawRepository;
   private final DatabaseKeywordRepository keywordRepository;
-  private final DatabaseNormReferenceRepository documentUnitNormRepository;
+  private final DatabaseDocumentUnitNormRepository documentUnitNormRepository;
   private final DatabaseDocumentationOfficeRepository documentationOfficeRepository;
   private final DatabaseDocumentUnitStatusRepository databaseDocumentUnitStatusRepository;
-  private final DatabaseDocumentationUnitLinkRepository documentationUnitLinkRepository;
-
   private final DatabaseNormAbbreviationRepository normAbbreviationRepository;
+  private final DatabaseDocumentationUnitLinkRepository documentationUnitLinkRepository;
   private final DatabaseCitationStyleRepository citationStyleRepository;
   private final DatabaseProcedureRepository procedureRepository;
   private final DatabaseProcedureLinkRepository procedureLinkRepository;
@@ -109,14 +103,13 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
       DatabaseCourtRepository databaseCourtRepository,
       StateRepository stateRepository,
       DatabaseDocumentTypeRepository databaseDocumentTypeRepository,
-      DatabaseDocumentCategoryRepository databaseDocumentCategoryRepository,
       DatabaseFieldOfLawRepository fieldOfLawRepository,
       DatabaseDocumentUnitFieldsOfLawRepository documentUnitFieldsOfLawRepository,
       DatabaseKeywordRepository keywordRepository,
-      DatabaseNormReferenceRepository documentUnitNormRepository,
+      DatabaseDocumentUnitNormRepository documentUnitNormRepository,
       DatabaseDocumentUnitStatusRepository databaseDocumentUnitStatusRepository,
-      DatabaseDocumentationUnitLinkRepository documentationUnitLinkRepository,
       DatabaseNormAbbreviationRepository normAbbreviationRepository,
+      DatabaseDocumentationUnitLinkRepository documentationUnitLinkRepository,
       DatabaseCitationStyleRepository citationStyleRepository,
       DatabaseDocumentationOfficeRepository documentationOfficeRepository,
       DatabaseProcedureRepository procedureRepository,
@@ -132,15 +125,14 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
     this.databaseCourtRepository = databaseCourtRepository;
     this.stateRepository = stateRepository;
     this.databaseDocumentTypeRepository = databaseDocumentTypeRepository;
-    this.databaseDocumentCategoryRepository = databaseDocumentCategoryRepository;
     this.fieldOfLawRepository = fieldOfLawRepository;
     this.documentUnitFieldsOfLawRepository = documentUnitFieldsOfLawRepository;
     this.keywordRepository = keywordRepository;
     this.documentUnitNormRepository = documentUnitNormRepository;
     this.documentationOfficeRepository = documentationOfficeRepository;
     this.databaseDocumentUnitStatusRepository = databaseDocumentUnitStatusRepository;
-    this.documentationUnitLinkRepository = documentationUnitLinkRepository;
     this.normAbbreviationRepository = normAbbreviationRepository;
+    this.documentationUnitLinkRepository = documentationUnitLinkRepository;
     this.citationStyleRepository = citationStyleRepository;
     this.procedureRepository = procedureRepository;
     this.procedureLinkRepository = procedureLinkRepository;
@@ -240,10 +232,8 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
       return Mono.just(documentUnitDTO);
     }
 
-    return Mono.just(
-            databaseDocumentTypeRepository.findFirstByAbbreviationAndCategory(
-                documentType.jurisShortcut(),
-                databaseDocumentCategoryRepository.findFirstByLabel("R")))
+    return databaseDocumentTypeRepository
+        .findFirstByJurisShortcutAndDocumentType(documentType.jurisShortcut(), 'R')
         .map(
             documentTypeDTO -> {
               if (!documentTypeDTO.getLabel().equals(documentType.label())) {
@@ -360,41 +350,36 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
   public Mono<DocumentUnitDTO> saveNorms(
       DocumentUnitDTO documentUnitDTO, DocumentUnit documentUnit) {
 
-    return Flux.fromIterable(
-            documentUnitNormRepository.findAllByLegacyDocUnitIdOrderById(documentUnitDTO.getUuid()))
+    return documentUnitNormRepository
+        .findAllByDocumentUnitIdOrderById(documentUnitDTO.getId())
         .collectList()
         .flatMap(
             documentUnitNormDTOs -> {
+              List<DocumentUnitNorm> documentUnitNorms = new ArrayList<>();
               if (documentUnit.contentRelatedIndexing() == null
                   || documentUnit.contentRelatedIndexing().norms() == null)
                 return Mono.just(documentUnitDTO);
 
-              List<DocumentUnitNorm> documentUnitNorms =
-                  new ArrayList<>(documentUnit.contentRelatedIndexing().norms());
+              documentUnitNorms.addAll(documentUnit.contentRelatedIndexing().norms());
 
               AtomicInteger normIndex = new AtomicInteger(0);
-              List<NormReferenceDTO> toSave = new ArrayList<>();
-              List<NormReferenceDTO> toDelete = new ArrayList<>();
+              List<DocumentUnitNormDTO> toSave = new ArrayList<>();
+              List<DocumentUnitNormDTO> toDelete = new ArrayList<>();
 
               documentUnitNormDTOs.forEach(
                   documentUnitNormDTO -> {
                     int index = normIndex.getAndIncrement();
+                    UUID normAbbreviationId = null;
                     if (index < documentUnitNorms.size()) {
                       DocumentUnitNorm currentNorm = documentUnitNorms.get(index);
-                      if (!isEmptyNorm(currentNorm)) {
-                        documentUnitNormDTO.setId(currentNorm.id());
-                        documentUnitNormDTO.setSingleNorm(currentNorm.singleNorm());
-                        documentUnitNormDTO.setDateOfVersion(currentNorm.dateOfVersion());
-                        documentUnitNormDTO.setDateOfRelevance(currentNorm.dateOfRelevance());
-                        documentUnitNormDTO.setNormAbbreviation(
-                            normAbbreviationRepository
-                                .findById(currentNorm.normAbbreviation().id())
-                                .orElse(null));
-                        documentUnitNormDTO.setLegacyDocUnitId(documentUnitDTO.uuid);
-                        toSave.add(documentUnitNormDTO);
-                      } else {
-                        toDelete.add(documentUnitNormDTO);
+                      if (currentNorm.normAbbreviation() != null) {
+                        normAbbreviationId = currentNorm.normAbbreviation().id();
                       }
+                      documentUnitNormDTO.normAbbreviationUuid = normAbbreviationId;
+                      documentUnitNormDTO.singleNorm = currentNorm.singleNorm();
+                      documentUnitNormDTO.dateOfVersion = currentNorm.dateOfVersion();
+                      documentUnitNormDTO.dateOfRelevance = currentNorm.dateOfRelevance();
+                      toSave.add(documentUnitNormDTO);
                     } else {
                       toDelete.add(documentUnitNormDTO);
                     }
@@ -406,31 +391,28 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
                 if (isEmptyNorm(currentNorm)) {
                   continue;
                 }
-
-                NormReferenceDTOBuilder builder =
-                    NormReferenceDTO.builder()
-                        .id(currentNorm.id())
+                UUID normAbbreviationId = null;
+                if (currentNorm.normAbbreviation() != null) {
+                  normAbbreviationId = currentNorm.normAbbreviation().id();
+                }
+                DocumentUnitNormDTO documentUnitNormDTO =
+                    DocumentUnitNormDTO.builder()
+                        .normAbbreviationUuid(normAbbreviationId)
                         .singleNorm(currentNorm.singleNorm())
                         .dateOfVersion(currentNorm.dateOfVersion())
                         .dateOfRelevance(currentNorm.dateOfRelevance())
-                        .legacyDocUnitId(documentUnitDTO.getUuid());
-
-                if (currentNorm.normAbbreviation() != null
-                    && currentNorm.normAbbreviation().id() != null) {
-                  Optional<NormAbbreviationDTO> normAbbreviationDTO =
-                      normAbbreviationRepository.findById(currentNorm.normAbbreviation().id());
-
-                  normAbbreviationDTO.ifPresent(builder::normAbbreviation);
-                }
-
-                toSave.add(builder.build());
+                        .documentUnitId(documentUnitDTO.getId())
+                        .build();
+                toSave.add(documentUnitNormDTO);
               }
 
-              documentUnitNormRepository.deleteAll(toDelete);
-
-              return Flux.fromIterable(documentUnitNormRepository.saveAll(toSave))
-                  .flatMapSequential(this::injectNormAbbreviation)
-                  .collectList()
+              return documentUnitNormRepository
+                  .deleteAll(toDelete)
+                  .then(
+                      documentUnitNormRepository
+                          .saveAll(toSave)
+                          .flatMapSequential(this::injectNormAbbreviation)
+                          .collectList())
                   .map(
                       savedNormList -> {
                         documentUnitDTO.setNorms(savedNormList);
@@ -1058,10 +1040,9 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
     if (documentUnitMetadataDTO.getDocumentTypeId() == null) {
       return Mono.just(documentUnitMetadataDTO);
     }
-    return Mono.just(
-            databaseDocumentTypeRepository
-                .findById(documentUnitMetadataDTO.getDocumentTypeId())
-                .orElse(DocumentTypeDTO.builder().build()))
+    return databaseDocumentTypeRepository
+        .findById(documentUnitMetadataDTO.getDocumentTypeId())
+        .defaultIfEmpty(DocumentTypeDTO.builder().build())
         .map(
             documentTypeDTO -> {
               documentUnitMetadataDTO.setDocumentTypeDTO(documentTypeDTO);
@@ -1102,8 +1083,8 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
   }
 
   private Mono<DocumentUnitDTO> injectNorms(DocumentUnitDTO documentUnitDTO) {
-    return Flux.fromIterable(
-            documentUnitNormRepository.findAllByLegacyDocUnitIdOrderById(documentUnitDTO.getUuid()))
+    return documentUnitNormRepository
+        .findAllByDocumentUnitIdOrderById(documentUnitDTO.getId())
         .flatMapSequential(this::injectNormAbbreviation)
         .collectList()
         .map(
@@ -1113,8 +1094,20 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
             });
   }
 
-  private Mono<NormReferenceDTO> injectNormAbbreviation(NormReferenceDTO normReferenceDTO) {
-    return Mono.just(normReferenceDTO);
+  private Mono<DocumentUnitNormDTO> injectNormAbbreviation(
+      DocumentUnitNormDTO documentUnitNormDTO) {
+    if (documentUnitNormDTO.getNormAbbreviationUuid() == null) {
+      return Mono.just(documentUnitNormDTO);
+    }
+
+    return normAbbreviationRepository
+        .findById(documentUnitNormDTO.getNormAbbreviationUuid())
+        .defaultIfEmpty(NormAbbreviationDTO.builder().build())
+        .map(
+            normAbbreviationDTO -> {
+              documentUnitNormDTO.setNormAbbreviation(normAbbreviationDTO);
+              return documentUnitNormDTO;
+            });
   }
 
   private <T extends DocumentUnitMetadataDTO> Mono<T> injectDocumentationOffice(
@@ -1194,7 +1187,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
               if (documentUnitDTOIdsViaFileNumber == null
                   && linkedDocumentationUnit.getFileNumber() != null) return Flux.empty();
 
-              UUID documentTypeDTOId = tuple.getT2().equals(new UUID(0, 0)) ? null : tuple.getT2();
+              Long documentTypeDTOId = tuple.getT2() == -1L ? null : tuple.getT2();
               if (documentTypeDTOId == null && linkedDocumentationUnit.getDocumentType() != null)
                 return Flux.empty();
 
@@ -1227,7 +1220,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
               if (documentUnitDTOIdsViaFileNumber == null
                   && linkedDocumentationUnit.getFileNumber() != null) return Mono.just(0L);
 
-              UUID documentTypeDTOId = tuple.getT2().equals(new UUID(0, 0)) ? null : tuple.getT2();
+              Long documentTypeDTOId = tuple.getT2() == -1L ? null : tuple.getT2();
               if (documentTypeDTOId == null && linkedDocumentationUnit.getDocumentType() != null)
                 return Mono.just(0L);
 
@@ -1263,16 +1256,15 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
         .map(FileNumberDTO::getDocumentUnitId);
   }
 
-  private Mono<UUID> extractDocumentTypeDTOId(LinkedDocumentationUnit linkedDocumentationUnit) {
+  private Mono<Long> extractDocumentTypeDTOId(LinkedDocumentationUnit linkedDocumentationUnit) {
     return Mono.justOrEmpty(linkedDocumentationUnit.getDocumentType())
         .map(DocumentType::jurisShortcut)
         .flatMap(
             jurisShortcut ->
-                Mono.justOrEmpty(
-                    databaseDocumentTypeRepository.findFirstByAbbreviationAndCategory(
-                        jurisShortcut, databaseDocumentCategoryRepository.findFirstByLabel("R"))))
+                databaseDocumentTypeRepository.findFirstByJurisShortcutAndDocumentType(
+                    jurisShortcut, 'R'))
         .mapNotNull(DocumentTypeDTO::getId)
-        .switchIfEmpty(Mono.just(new UUID(0, 0)));
+        .switchIfEmpty(Mono.just(-1L));
   }
 
   private Long[] convertListToArrayOrReturnNull(List<Long> list) {
@@ -1361,7 +1353,8 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
         builder.equal(root.get("documentationOfficeId"), documentationOfficeDTO.getId());
 
     if (searchInput.status() != null && searchInput.status().withError()) {
-      Predicate statusWithError = builder.equal(root.get("withError"), true);
+      Predicate statusWithError =
+          builder.equal(root.get("withError"), searchInput.status().withError());
       restrictions.add(builder.and(myDocOffice, statusWithError));
     }
 

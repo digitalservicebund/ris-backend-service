@@ -1,9 +1,9 @@
 package de.bund.digitalservice.ris.caselaw.adapter.transformer;
 
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentTypeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitException;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitMetadataDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentationUnitLinkDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DocumentTypeDTO;
 import de.bund.digitalservice.ris.caselaw.domain.ActiveCitation;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.DataSource;
@@ -63,13 +63,13 @@ public class LinkedDocumentationUnitTransformer {
 
   static DocumentType getDocumentTypeByDTO(DocumentTypeDTO documentTypeDTO) {
     if (documentTypeDTO == null
-        || (documentTypeDTO.getLabel() == null && documentTypeDTO.getAbbreviation() == null)) {
+        || (documentTypeDTO.getLabel() == null && documentTypeDTO.getJurisShortcut() == null)) {
       return null;
     }
 
     return DocumentType.builder()
         .label(documentTypeDTO.getLabel())
-        .jurisShortcut(documentTypeDTO.getAbbreviation())
+        .jurisShortcut(documentTypeDTO.getJurisShortcut())
         .build();
   }
 

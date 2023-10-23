@@ -5,6 +5,8 @@ import de.bund.digitalservice.ris.caselaw.domain.lookuptable.NormAbbreviationRep
 import java.util.List;
 import java.util.UUID;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 @Service
 public class NormAbbreviationService {
@@ -14,21 +16,33 @@ public class NormAbbreviationService {
     this.repository = repository;
   }
 
-  public NormAbbreviation getNormAbbreviationById(UUID uuid) {
+  public Mono<NormAbbreviation> getNormAbbreviationById(UUID uuid) {
     return repository.findById(uuid);
   }
 
-  public List<NormAbbreviation> getNormAbbreviationsStartingWithExact(
+  public Flux<NormAbbreviation> getNormAbbreviationBySearchQuery(
       String query, Integer size, Integer page) {
-    return repository.getNormAbbreviationsStartingWithExact(query, size, page);
+
+    Integer pageOffset = null;
+    if (page != null && size != null) {
+      pageOffset = page * size;
+    }
+
+    return repository.findBySearchQuery(query, size, pageOffset);
   }
 
-  public List<NormAbbreviation> findAllNormAbbreviationsContaining(
+  public Mono<List<NormAbbreviation>> getNormAbbreviationByAwesomeSearchQuery(
       String query, Integer size, Integer page) {
-    return repository.findAllContainingOrderByAccuracy(query, size, page);
+
+    Integer pageOffset = null;
+    if (page != null && size != null) {
+      pageOffset = page * size;
+    }
+
+    return repository.findByAwesomeSearchQuery(query, size, pageOffset);
   }
 
-  public void refreshMaterializedViews() {
-    repository.refreshMaterializedViews();
+  public Mono<Void> refreshMaterializedViews() {
+    return repository.refreshMaterializedViews();
   }
 }

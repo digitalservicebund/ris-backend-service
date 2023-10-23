@@ -1,6 +1,5 @@
 package de.bund.digitalservice.ris.caselaw.adapter.transformer;
 
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentTypeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ProcedureDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DeviatingDecisionDateDTO;
@@ -10,6 +9,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitMet
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.FileNumberDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.IncorrectCourtDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.KeywordDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DocumentTypeDTO;
 import de.bund.digitalservice.ris.caselaw.domain.ActiveCitation;
 import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
@@ -174,7 +174,7 @@ public class DocumentUnitTransformer {
     DocumentTypeDTO documentTypeDTO = documentUnitMetadataDTO.getDocumentTypeDTO();
     if (documentTypeDTO != null) {
       documentType =
-          new DocumentType(documentTypeDTO.getAbbreviation(), documentTypeDTO.getLabel());
+          new DocumentType(documentTypeDTO.getJurisShortcut(), documentTypeDTO.getLabel());
     }
 
     List<String> fileNumbers = null;
@@ -237,7 +237,7 @@ public class DocumentUnitTransformer {
     DocumentTypeDTO documentTypeDTO = documentUnitDTO.getDocumentTypeDTO();
     if (documentTypeDTO != null) {
       documentType =
-          new DocumentType(documentTypeDTO.getAbbreviation(), documentTypeDTO.getLabel());
+          new DocumentType(documentTypeDTO.getJurisShortcut(), documentTypeDTO.getLabel());
     }
 
     List<ProceedingDecision> proceedingDecisions = null;
