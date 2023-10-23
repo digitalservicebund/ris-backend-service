@@ -10,7 +10,9 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseProcedure
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentTypeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitSearchEntryDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.NormAbbreviationDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.NormReferenceDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.NormReferenceDTO.NormReferenceDTOBuilder;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ProcedureDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ProcedureLinkDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitDTO.DocumentUnitDTOBuilder;
@@ -404,19 +406,24 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
                 if (isEmptyNorm(currentNorm)) {
                   continue;
                 }
-                NormReferenceDTO normReferenceDTO =
+
+                NormReferenceDTOBuilder builder =
                     NormReferenceDTO.builder()
                         .id(currentNorm.id())
                         .singleNorm(currentNorm.singleNorm())
                         .dateOfVersion(currentNorm.dateOfVersion())
                         .dateOfRelevance(currentNorm.dateOfRelevance())
-                        .normAbbreviation(
-                            normAbbreviationRepository
-                                .findById(currentNorm.normAbbreviation().id())
-                                .orElse(null))
-                        .legacyDocUnitId(documentUnitDTO.getUuid())
-                        .build();
-                toSave.add(normReferenceDTO);
+                        .legacyDocUnitId(documentUnitDTO.getUuid());
+
+                if (currentNorm.normAbbreviation() != null
+                    && currentNorm.normAbbreviation().id() != null) {
+                  Optional<NormAbbreviationDTO> normAbbreviationDTO =
+                      normAbbreviationRepository.findById(currentNorm.normAbbreviation().id());
+
+                  normAbbreviationDTO.ifPresent(builder::normAbbreviation);
+                }
+
+                toSave.add(builder.build());
               }
 
               documentUnitNormRepository.deleteAll(toDelete);
