@@ -1,5 +1,6 @@
 import { userEvent } from "@testing-library/user-event"
-import { render, fireEvent, screen } from "@testing-library/vue"
+import { render, screen } from "@testing-library/vue"
+import { markRaw } from "vue"
 import TextEditorButton from "@/shared/components/input/TextEditorButton.vue"
 import IconTest from "~icons/ic/baseline-clear"
 
@@ -7,18 +8,18 @@ describe("text editor button", async () => {
   test("renders with child components", async () => {
     render(TextEditorButton, {
       props: {
-        type: "test type",
-        icon: IconTest,
+        type: "menu",
+        icon: markRaw(IconTest),
         ariaLabel: "test editor button",
         childButtons: [
           {
             type: "test child 1 type",
-            icon: IconTest,
+            icon: markRaw(IconTest),
             ariaLabel: "test child button 1",
           },
           {
             type: "test child 2 type",
-            icon: IconTest,
+            icon: markRaw(IconTest),
             ariaLabel: "test child button 2",
           },
         ],
@@ -26,7 +27,7 @@ describe("text editor button", async () => {
     })
     const button = screen.getByLabelText("test editor button")
     expect(button).toBeInTheDocument()
-    await fireEvent.click(button)
+    await userEvent.click(button)
     expect(screen.getByLabelText("test child button 1")).toBeInTheDocument()
     expect(screen.getByLabelText("test child button 2")).toBeInTheDocument()
   })
@@ -41,7 +42,7 @@ describe("text editor button", async () => {
     })
     const button = screen.getByLabelText("test editor button")
     expect(button).toBeInTheDocument()
-    await fireEvent.click(button)
+    await userEvent.click(button)
     expect(emitted().toggle).toBeTruthy()
   })
 
