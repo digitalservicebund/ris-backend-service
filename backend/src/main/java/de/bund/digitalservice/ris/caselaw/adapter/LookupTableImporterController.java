@@ -25,21 +25,6 @@ public class LookupTableImporterController {
     this.service = service;
   }
 
-  // In Postman go to "Body", select "raw" and "XML" and paste the XML-contents.
-  // Can we use @RequestBody @Valid DocumentTypesXML directly instead of ByteBuffer?
-
-  @PutMapping(value = "doktyp")
-  @PreAuthorize("isAuthenticated()")
-  public Mono<ResponseEntity<String>> importDocumentTypeLookupTable(
-      @RequestBody ByteBuffer byteBuffer) {
-    return service
-        .importDocumentTypeLookupTable(byteBuffer)
-        .map(resultString -> ResponseEntity.status(HttpStatus.OK).body(resultString))
-        .onErrorReturn(
-            ResponseEntity.internalServerError()
-                .body("Could not import the document type lookup table"));
-  }
-
   @PutMapping(value = "gerichtdata")
   @PreAuthorize("isAuthenticated()")
   public Mono<ResponseEntity<String>> importCourtLookupTable(@RequestBody ByteBuffer byteBuffer) {

@@ -7,8 +7,6 @@ import de.bund.digitalservice.ris.caselaw.TestConfig;
 import de.bund.digitalservice.ris.caselaw.adapter.AuthService;
 import de.bund.digitalservice.ris.caselaw.adapter.LookupTableImporterController;
 import de.bund.digitalservice.ris.caselaw.adapter.LookupTableImporterService;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPADocumentTypeDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPADocumentTypeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.CitationStyleDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.CourtDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DatabaseCitationStyleRepository;
@@ -59,7 +57,8 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
 class LookupTableImporterIntegrationTest {
   @Container
   static PostgreSQLContainer<?> postgreSQLContainer =
-      new PostgreSQLContainer<>("postgres:14").withInitScript("db/create_extension.sql");
+      new PostgreSQLContainer<>("postgres:14")
+          .withInitScript("db/create_migration_scheme_and_extensions.sql");
 
   @DynamicPropertySource
   static void registerDynamicProperties(DynamicPropertyRegistry registry) {
@@ -71,7 +70,6 @@ class LookupTableImporterIntegrationTest {
   }
 
   @Autowired private RisWebTestClient risWebTestClient;
-  @Autowired private JPADocumentTypeRepository jpaDocumentTypeRepository;
   @Autowired private DatabaseCourtRepository databaseCourtRepository;
   @Autowired private DatabaseCitationStyleRepository databaseCitationStyleRepository;
   @Autowired private StateRepository stateRepository;
@@ -89,49 +87,10 @@ class LookupTableImporterIntegrationTest {
 
   @AfterEach
   void cleanUp() {
-    jpaDocumentTypeRepository.deleteAll();
     databaseCourtRepository.deleteAll().block();
     databaseCitationStyleRepository.deleteAll().block();
     stateRepository.deleteAll().block();
     fieldOfLawRepository.deleteAll().block(); // will cascade delete the other 3 repo-contents
-  }
-
-  @Test
-  void shouldImportDocumentTypeLookupTableCorrectly() {
-    String doktypXml =
-        """
-        <?xml version="1.0" encoding="utf-8"?>
-        <juris-table>
-          <juris-doktyp id="7" aendkz="N" version="1.0">
-            <jurisabk>ÄN</jurisabk>
-            <dokumentart>N</dokumentart>
-            <mehrfach>Ja</mehrfach>
-            <bezeichnung>Änderungsnorm</bezeichnung>
-          </juris-doktyp>
-        </juris-table>""";
-
-    risWebTestClient
-        .withDefaultLogin()
-        .put()
-        .uri("/api/v1/caselaw/lookuptableimporter/doktyp")
-        .bodyValue(doktypXml)
-        .exchange()
-        .expectStatus()
-        .isOk()
-        .expectBody(String.class)
-        .consumeWith(
-            response ->
-                assertThat(response.getResponseBody())
-                    .isEqualTo("Successfully imported the document type lookup table"));
-
-    List<JPADocumentTypeDTO> list = jpaDocumentTypeRepository.findAll();
-    assertThat(list).hasSize(1);
-    JPADocumentTypeDTO documentTypeDTO = list.get(0);
-    assertThat(documentTypeDTO.getId()).isEqualTo(7L);
-    assertThat(documentTypeDTO.getJurisShortcut()).isEqualTo("ÄN");
-    assertThat(documentTypeDTO.getDocumentType()).isEqualTo('N');
-    assertThat(documentTypeDTO.getMultiple()).isEqualTo("Ja");
-    assertThat(documentTypeDTO.getLabel()).isEqualTo("Änderungsnorm");
   }
 
   @Test

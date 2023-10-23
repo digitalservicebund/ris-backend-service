@@ -1,9 +1,9 @@
 package de.bund.digitalservice.ris.caselaw.adapter.transformer;
 
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.NormAbbreviationDTO;
-import de.bund.digitalservice.ris.caselaw.domain.lookuptable.DocumentTypeNew;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.NormAbbreviationDTO;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.NormAbbreviation;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.Region;
+import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
 import java.time.ZoneId;
 import java.util.List;
 
@@ -15,17 +15,16 @@ public class NormAbbreviationTransformer {
       return null;
     }
 
-    List<DocumentTypeNew> documentTypes = null;
-    if (normAbbreviationDTO.getDocumentTypes() != null) {
+    List<DocumentType> documentTypes = null;
+    if (normAbbreviationDTO.getDocumentTypeList() != null) {
       documentTypes =
-          normAbbreviationDTO.getDocumentTypes().stream()
-              .map(DocumentTypeNewTransformer::transformDTO)
+          normAbbreviationDTO.getDocumentTypeList().stream()
+              .map(DocumentTypeTransformer::transformDTO)
               .toList();
     }
-    List<Region> regions = null;
-    if (normAbbreviationDTO.getRegions() != null) {
-      regions =
-          normAbbreviationDTO.getRegions().stream().map(RegionTransformer::transformDTO).toList();
+    Region region = null;
+    if (normAbbreviationDTO.getRegion() != null) {
+      region = RegionTransformer.transformDTO(normAbbreviationDTO.getRegion());
     }
 
     return NormAbbreviation.builder()
@@ -46,7 +45,7 @@ public class NormAbbreviationTransformer {
         .officialShortTitle(normAbbreviationDTO.getOfficialShortTitle())
         .source(normAbbreviationDTO.getSource())
         .documentTypes(documentTypes)
-        .regions(regions)
+        .region(region)
         .build();
   }
 }

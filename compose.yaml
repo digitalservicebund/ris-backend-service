@@ -121,6 +121,7 @@ services:
         psql -e -U test "$${POSTGRES_DB}" -c "ALTER DEFAULT PRIVILEGES IN SCHEMA incremental_migration GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO $${MIGRATION_USER_NAME}, $${POSTGRES_USER};"
 
         psql -U $${POSTGRES_USER} -d $${POSTGRES_DB} -c 'CREATE EXTENSION IF NOT EXISTS "uuid-ossp";'
+        psql -U $${POSTGRES_USER} -d $${POSTGRES_DB} -c 'CREATE EXTENSION IF NOT EXISTS pg_trgm;'
         wait
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U test -d neuris"]
