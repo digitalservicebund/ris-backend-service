@@ -1,5 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc;
 
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseCourtRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentCategoryRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentTypeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationOfficeRepository;
@@ -18,7 +19,8 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ProcedureLinkDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitDTO.DocumentUnitDTOBuilder;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.CourtDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DatabaseCitationStyleRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DatabaseCourtRepository;
+// import
+// de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DatabaseCourtRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DatabaseFieldOfLawRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.StateDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.StateRepository;
@@ -303,16 +305,19 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
   }
 
   private Mono<CourtDTO> getCourt(DocumentUnit documentUnit) {
-    if (documentUnit == null
-        || documentUnit.coreData() == null
-        || documentUnit.coreData().court() == null) {
-      return Mono.just(CourtDTO.builder().build());
-    }
+    return Mono.just(CourtDTO.builder().build());
 
-    return databaseCourtRepository
-        .findByCourttypeAndCourtlocation(
-            documentUnit.coreData().court().type(), documentUnit.coreData().court().location())
-        .defaultIfEmpty(CourtDTO.builder().build());
+    //    if (documentUnit == null
+    //        || documentUnit.coreData() == null
+    //        || documentUnit.coreData().court() == null) {
+    //      return Mono.just(CourtDTO.builder().build());
+    //    }
+    //
+    //    return databaseCourtRepository
+    //        .findByCourttypeAndCourtlocation(
+    //            documentUnit.coreData().court().type(),
+    // documentUnit.coreData().court().location())
+    //        .defaultIfEmpty(CourtDTO.builder().build());
   }
 
   public Mono<DocumentUnitDTO> saveFileNumbers(

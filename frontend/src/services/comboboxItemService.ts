@@ -12,7 +12,7 @@ import errorMessages from "@/shared/i18n/errors.json"
 
 enum Endpoint {
   documentTypes = "lookuptable/documentTypes",
-  courts = "lookuptable/courts",
+  courts = "courts",
   citationStyles = "lookuptable/zitart",
   fieldOfLawSearchByIdentifier = "fieldsoflaw/search-by-identifier",
   risAbbreviations = `normabbreviation?pg=0&sz=30`,

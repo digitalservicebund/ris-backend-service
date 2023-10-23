@@ -9,11 +9,8 @@ import de.bund.digitalservice.ris.caselaw.adapter.LookupTableController;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentTypeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentTypeRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.CitationStyleDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.CourtDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DatabaseCitationStyleRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DatabaseCourtRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.PostgresCitationStyleRepositoryImpl;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.PostgresCourtRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
@@ -25,8 +22,6 @@ import de.bund.digitalservice.ris.caselaw.domain.LookupTableService;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.citation.CitationStyle;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.court.Court;
-import java.util.Arrays;
-import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
@@ -46,7 +41,6 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
       PostgresConfig.class,
       PostgresJPAConfig.class,
       PostgresDocumentTypeRepositoryImpl.class,
-      PostgresCourtRepositoryImpl.class,
       PostgresCitationStyleRepositoryImpl.class,
       SecurityConfig.class,
       AuthService.class,
@@ -69,7 +63,6 @@ class LookupTableIntegrationTest {
   }
 
   @Autowired private RisWebTestClient risWebTestClient;
-  @Autowired private DatabaseCourtRepository databaseCourtRepository;
   @Autowired private DatabaseDocumentTypeRepository databaseDocumentTypeRepository;
   @Autowired private DatabaseCitationStyleRepository databaseCitationStyleRepository;
 
@@ -82,84 +75,8 @@ class LookupTableIntegrationTest {
 
   @AfterEach
   void cleanUp() {
-    databaseCourtRepository.deleteAll().block();
     databaseCitationStyleRepository.deleteAll().block();
     databaseDocumentTypeRepository.deleteAll();
-  }
-
-  @Test
-  void testGetAllCourts() {
-    CourtDTO courtDTO = CourtDTO.builder().courttype("AB").courtlocation("Berlin").build();
-    databaseCourtRepository.save(courtDTO).block();
-    courtDTO =
-        CourtDTO.builder()
-            .courttype("BGH")
-            .courtlocation("Karlsruhe")
-            .superiorcourt("ja")
-            .foreigncountry("nein")
-            .build();
-    databaseCourtRepository.save(courtDTO).block();
-
-    risWebTestClient
-        .withDefaultLogin()
-        .get()
-        .uri("/api/v1/caselaw/lookuptable/courts")
-        .exchange()
-        .expectStatus()
-        .isOk()
-        .expectBody(Court[].class)
-        .consumeWith(
-            response -> {
-              assertThat(response.getResponseBody()).hasSize(2);
-              assertThat(response.getResponseBody()[0].label()).isEqualTo("AB Berlin");
-              assertThat(response.getResponseBody()[1].label()).isEqualTo("BGH");
-            });
-  }
-
-  @Test
-  void testGetCourtsBySearchString() {
-    String[][] courtData = {
-      {"Kammer für Baulandsachen", "Ulm"},
-      {"Gericht", "Potsdam"}, // not expected to be in results
-      {"Landsitzungskammer", "Hamburg"},
-      {"Verwaltungsgericht der Landeskirche", "Frankfurt"},
-      {"England", "Court"},
-      {"Landgericht", "Amberg"},
-      {"Jugendgericht des Haupt-Landes", "München"},
-    };
-
-    for (String[] court : courtData) {
-      databaseCourtRepository
-          .save(CourtDTO.builder().courttype(court[0]).courtlocation(court[1]).build())
-          .block();
-    }
-
-    // expected order: alphabetically within 3 priority classes:
-    List<String> expectedOrder =
-        Arrays.asList(
-            "Landgericht Amberg", // [1]
-            "Landsitzungskammer Hamburg", // [1]
-            "Jugendgericht des Haupt-Landes München", // [2]
-            "Verwaltungsgericht der Landeskirche Frankfurt", // [2]
-            "England Court", // [3]
-            "Kammer für Baulandsachen Ulm" // [3]
-            );
-
-    risWebTestClient
-        .withDefaultLogin()
-        .get()
-        .uri("/api/v1/caselaw/lookuptable/courts?q=land")
-        .exchange()
-        .expectStatus()
-        .isOk()
-        .expectBody(CitationStyle[].class)
-        .consumeWith(
-            response -> {
-              assertThat(response.getResponseBody()).hasSize(6);
-              for (int i = 0; i < expectedOrder.size(); i++) {
-                assertThat(response.getResponseBody()[i].label()).isEqualTo(expectedOrder.get(i));
-              }
-            });
   }
 
   @Test

@@ -22,7 +22,6 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitNorm;
 import de.bund.digitalservice.ris.caselaw.domain.LegalEffect;
 import de.bund.digitalservice.ris.caselaw.domain.Texts;
-import de.bund.digitalservice.ris.caselaw.domain.lookuptable.court.Court;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
 import java.time.LocalDate;
 import java.util.List;
@@ -228,20 +227,6 @@ public class DocumentationUnitTransformer {
     ;
   }
 
-  public static Court getCourtObject(String courtType, String courtLocation) {
-    if (log.isDebugEnabled()) {
-      log.debug("get court object from '{}' and '{}", courtType, courtLocation);
-    }
-
-    Court court = null;
-    if (courtType != null) {
-      String label = Court.generateLabel(courtType, courtLocation);
-      court = new Court(courtType, courtLocation, label, null);
-    }
-
-    return court;
-  }
-
   public static DocumentUnit transformToMetadataToDomain(
       DocumentationUnitMetadataDTO documentUnitMetadataDTO) {
 
@@ -315,7 +300,7 @@ public class DocumentationUnitTransformer {
 
     CoreDataBuilder coreDataBuilder =
         CoreData.builder()
-            // .court(getCourtObject(documentationUnitDTO.getCourtType(),
+            .court(CourtTransformer.transformDTO((documentationUnitDTO.getCourt())))
             // documentationUnitDTO.getCourtLocation()))
             // .procedure(getProcedure(documentationUnitDTO.getProcedure()))
             // .previousProcedures(documentationUnitDTO.getPreviousProcedures())

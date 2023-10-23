@@ -26,6 +26,7 @@ import de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw.FieldOfL
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -138,7 +139,7 @@ public class DocumentUnitTransformer {
     Court court = null;
     if (courtType != null) {
       String label = Court.generateLabel(courtType, courtLocation);
-      court = new Court(courtType, courtLocation, label, null);
+      court = new Court(UUID.randomUUID(), courtType, courtLocation, label, null);
     }
 
     return court;

@@ -3,7 +3,6 @@ package de.bund.digitalservice.ris.caselaw.adapter;
 import de.bund.digitalservice.ris.OpenApiConfiguration;
 import de.bund.digitalservice.ris.caselaw.domain.LookupTableService;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.citation.CitationStyle;
-import de.bund.digitalservice.ris.caselaw.domain.lookuptable.court.Court;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.Optional;
@@ -32,12 +31,6 @@ public class LookupTableController {
   public Flux<DocumentType> getCaselawDocumentTypes(
       @RequestParam(value = "q") Optional<String> searchStr) {
     return service.getCaselawDocumentTypes(searchStr);
-  }
-
-  @GetMapping(value = "courts")
-  @PreAuthorize("isAuthenticated()")
-  public Flux<Court> getCourts(@RequestParam(value = "q") Optional<String> searchStr) {
-    return service.getCourts(searchStr);
   }
 
   @GetMapping(value = "zitart")

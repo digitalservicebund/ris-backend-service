@@ -1,6 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.adapter.transformer;
 
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.CourtDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CourtDTO;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.court.Court;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -11,20 +11,18 @@ public class CourtTransformer {
   private CourtTransformer() {}
 
   public static Court transformDTO(CourtDTO courtDTO) {
-    String revoked = extractRevoked(courtDTO.getAdditional());
+    String revoked = extractRevoked(courtDTO.getAdditionalInformation());
 
-    if (courtDTO.getSuperiorcourt() != null
-        && courtDTO.getForeigncountry() != null
-        && courtDTO.getSuperiorcourt().equalsIgnoreCase("ja")
-        && courtDTO.getForeigncountry().equalsIgnoreCase("nein")) {
+    if (courtDTO.isSuperiorCourt() && !courtDTO.isForeignCourt()) {
 
-      return new Court(courtDTO.getCourttype(), null, courtDTO.getCourttype(), revoked);
+      return new Court(courtDTO.getId(), courtDTO.getType(), null, courtDTO.getType(), revoked);
     }
 
     return new Court(
-        courtDTO.getCourttype(),
-        courtDTO.getCourtlocation(),
-        courtDTO.getCourttype() + " " + courtDTO.getCourtlocation(),
+        courtDTO.getId(),
+        courtDTO.getType(),
+        courtDTO.getLocation(),
+        courtDTO.getType() + " " + courtDTO.getLocation(),
         revoked);
   }
 

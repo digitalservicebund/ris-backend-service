@@ -1,13 +1,14 @@
-package de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable;
+package de.bund.digitalservice.ris.caselaw.adapter.database.jpa;
 
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.CourtTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.court.Court;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.court.CourtRepository;
+import java.util.List;
 import org.springframework.stereotype.Repository;
-import reactor.core.publisher.Flux;
 
 @Repository
 public class PostgresCourtRepositoryImpl implements CourtRepository {
+
   private final DatabaseCourtRepository repository;
 
   public PostgresCourtRepositoryImpl(DatabaseCourtRepository repository) {
@@ -15,14 +16,16 @@ public class PostgresCourtRepositoryImpl implements CourtRepository {
   }
 
   @Override
-  public Flux<Court> findBySearchStr(String searchString) {
-    return repository.findBySearchStr(searchString).map(CourtTransformer::transformDTO);
+  public List<Court> findBySearchStr(String searchString) {
+    return repository.findBySearchStr(searchString).stream()
+        .map(CourtTransformer::transformDTO)
+        .toList();
   }
 
   @Override
-  public Flux<Court> findAllByOrderByCourttypeAscCourtlocationAsc() {
-    return repository
-        .findAllByOrderByCourttypeAscCourtlocationAsc()
-        .map(CourtTransformer::transformDTO);
+  public List<Court> findAllByOrderByTypeAscLocationAsc() {
+    return repository.findAllByOrderByTypeAscLocationAsc().stream()
+        .map(CourtTransformer::transformDTO)
+        .toList();
   }
 }

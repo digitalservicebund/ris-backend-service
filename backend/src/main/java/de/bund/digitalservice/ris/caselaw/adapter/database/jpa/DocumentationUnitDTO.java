@@ -144,7 +144,9 @@ public class DocumentationUnitDTO {
   // Other NeuRIS Categories:
 
   // Gericht
-  // @ManyToOne private Court court;
+  @ManyToOne
+  @JoinColumn(name = "court_id", referencedColumnName = "id")
+  private CourtDTO court;
 
   // Aktivzitierung
   //  @OneToMany(

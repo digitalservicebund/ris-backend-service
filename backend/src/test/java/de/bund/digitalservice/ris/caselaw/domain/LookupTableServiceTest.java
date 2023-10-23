@@ -10,15 +10,11 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentCategoryD
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentTypeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentTypeRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.CitationStyleDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.CourtDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DatabaseCitationStyleRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DatabaseCourtRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.FieldOfLawKeywordRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.NormRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.PostgresCitationStyleRepositoryImpl;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.PostgresCourtRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.citation.CitationStyle;
-import de.bund.digitalservice.ris.caselaw.domain.lookuptable.court.Court;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
 import java.util.List;
 import java.util.Optional;
@@ -36,7 +32,6 @@ import reactor.test.StepVerifier;
 @Import({
   LookupTableService.class,
   PostgresDocumentTypeRepositoryImpl.class,
-  PostgresCourtRepositoryImpl.class,
   PostgresCitationStyleRepositoryImpl.class
 })
 class LookupTableServiceTest {
@@ -45,7 +40,6 @@ class LookupTableServiceTest {
 
   @MockBean private DatabaseDocumentTypeRepository databaseDocumentTypeRepository;
   @MockBean private DatabaseDocumentCategoryRepository databaseDocumentCategoryRepository;
-  @MockBean private DatabaseCourtRepository databaseCourtRepository;
   @MockBean private DatabaseCitationStyleRepository databaseCitationStyleRepository;
   @MockBean private FieldOfLawRepository fieldOfLawRepository;
   @MockBean private NormRepository normRepository;
@@ -73,33 +67,6 @@ class LookupTableServiceTest {
 
     verify(databaseDocumentTypeRepository)
         .findAllByCategoryOrderByAbbreviationAscLabelAsc(category);
-  }
-
-  @Test
-  void testGetTwoDifferentCourts() {
-    // court where the location will be intentionally dropped
-    CourtDTO courtA = new CourtDTO();
-    courtA.setCourttype("ABC");
-    courtA.setCourtlocation("Berlin");
-    courtA.setSuperiorcourt("Ja");
-    courtA.setForeigncountry("Nein");
-
-    // court where the location will be kept
-    CourtDTO courtB = new CourtDTO();
-    courtB.setCourttype("XYZ");
-    courtB.setCourtlocation("Hamburg");
-    courtB.setSuperiorcourt("Nein");
-    courtB.setForeigncountry("Nein");
-
-    when(databaseCourtRepository.findAllByOrderByCourttypeAscCourtlocationAsc())
-        .thenReturn(Flux.fromIterable(List.of(courtA, courtB)));
-
-    StepVerifier.create(service.getCourts(Optional.empty()))
-        .expectNext(new Court("ABC", null, "ABC", null))
-        .expectNext(new Court("XYZ", "Hamburg", "XYZ Hamburg", null))
-        .verifyComplete();
-
-    verify(databaseCourtRepository).findAllByOrderByCourttypeAscCourtlocationAsc();
   }
 
   @Test

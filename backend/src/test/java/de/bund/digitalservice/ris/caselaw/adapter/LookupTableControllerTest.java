@@ -44,21 +44,6 @@ class LookupTableControllerTest {
   }
 
   @Test
-  void testGetCourts() {
-    when(service.getCourts(Optional.empty())).thenReturn(Flux.empty());
-
-    risWebTestClient
-        .withDefaultLogin()
-        .get()
-        .uri("/api/v1/caselaw/lookuptable/courts")
-        .exchange()
-        .expectStatus()
-        .isOk();
-
-    verify(service, times(1)).getCourts(Optional.empty());
-  }
-
-  @Test
   void testGetCitationStyles() {
     when(service.getCitationStyles(Optional.empty())).thenReturn(Flux.empty());
 
