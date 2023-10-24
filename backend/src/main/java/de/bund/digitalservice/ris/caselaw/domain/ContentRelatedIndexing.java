@@ -6,7 +6,7 @@ import lombok.Builder;
 
 @Builder(toBuilder = true)
 public record ContentRelatedIndexing(
-    List<String> keywords,
+    List<Keyword> keywords,
     List<FieldOfLaw> fieldsOfLaw,
     List<DocumentUnitNorm> norms,
     List<ActiveCitation> activeCitations) {}
