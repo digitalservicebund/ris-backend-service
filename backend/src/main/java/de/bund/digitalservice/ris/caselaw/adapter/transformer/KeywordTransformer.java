@@ -2,9 +2,7 @@ package de.bund.digitalservice.ris.caselaw.adapter.transformer;
 
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.KeywordDTO;
 import de.bund.digitalservice.ris.caselaw.domain.Keyword;
-import lombok.experimental.UtilityClass;
 
-@UtilityClass
 public class KeywordTransformer {
 
   public static KeywordDTO transformToDTO(Keyword keyword, Long rank) {
