@@ -16,7 +16,7 @@ fileignoreconfig:
 - filename: backend/src/test/kotlin/unit/application/service/GetFileServiceTest.kt
   checksum: 8133265c6f388df84a3e0f61050428e8628853e0ba80b432e4723750a34b781e
 - filename: compose.yaml
-  checksum: 49cedb7c9f983605198b3a6efd8acfa48c48e39a5af310b94846a33ebeb60881
+  checksum: a9899cbf98e5d6402d4a8f1844445b36d0426dc189b5a323bdac3d1eec25d37a
 - filename: doc/norms/backend-api.yaml
   checksum: df4fa1f7e6d7023f9a7a98d1052c2b88c1785366962004b3165453edcd5bf4db
 - filename: doc/structurizr/workspace.json

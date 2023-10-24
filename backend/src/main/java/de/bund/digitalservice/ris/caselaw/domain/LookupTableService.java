@@ -30,10 +30,12 @@ public class LookupTableService {
 
   public Flux<DocumentType> getCaselawDocumentTypes(Optional<String> searchStr) {
     if (searchStr.isPresent() && !searchStr.get().isBlank()) {
-      return documentTypeRepository.findCaselawBySearchStr(searchStr.get().trim());
+      return Flux.fromIterable(
+          documentTypeRepository.findCaselawBySearchStr(searchStr.get().trim()));
     }
 
-    return documentTypeRepository.findAllByDocumentTypeOrderByJurisShortcutAscLabelAsc('R');
+    return Flux.fromIterable(
+        documentTypeRepository.findAllByDocumentTypeOrderByAbbreviationAscLabelAsc('R'));
   }
 
   public Flux<Court> getCourts(Optional<String> searchStr) {

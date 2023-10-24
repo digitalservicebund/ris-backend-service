@@ -11,8 +11,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import de.bund.digitalservice.ris.caselaw.adapter.LookupTableImporterService;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPADocumentTypeDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPADocumentTypeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPAFieldOfLawDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPAFieldOfLawLinkRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPAFieldOfLawRepository;
@@ -22,7 +20,6 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.Cit
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.CourtDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DatabaseCitationStyleRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DatabaseCourtRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DatabaseDocumentTypeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DatabaseFieldOfLawRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.StateDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.StateRepository;
@@ -49,9 +46,9 @@ class LookupTableImporterServiceTest {
 
   @SpyBean private LookupTableImporterService service;
 
-  @MockBean private DatabaseDocumentTypeRepository databaseDocumentTypeRepository;
-
-  @MockBean private JPADocumentTypeRepository jpaDocumentTypeRepository;
+  @MockBean
+  private de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentTypeRepository
+      databaseDocumentTypeRepository;
 
   @MockBean private DatabaseCourtRepository databaseCourtRepository;
 
@@ -64,47 +61,6 @@ class LookupTableImporterServiceTest {
   @MockBean private JPAFieldOfLawRepository jpaFieldOfLawRepository;
 
   @MockBean private JPAFieldOfLawLinkRepository jpaFieldOfLawLinkRepository;
-
-  @Test
-  void testImportDocumentTypeLookupTable() {
-    when(databaseDocumentTypeRepository.deleteAll()).thenReturn(Mono.empty());
-
-    String doctypesXml =
-        """
-        <?xml version="1.0" encoding="utf-8"?>
-        <juris-table>
-          <juris-doktyp id="1" aendkz="N" version="1.0">
-            <jurisabk>ÄN</jurisabk>
-            <dokumentart>N</dokumentart>
-            <mehrfach>Ja</mehrfach>
-            <bezeichnung>Änderungsnorm</bezeichnung>
-          </juris-doktyp>
-        </juris-table>""";
-    ByteBuffer byteBuffer = ByteBuffer.wrap(doctypesXml.getBytes());
-    List<JPADocumentTypeDTO> documentTypeDTOs =
-        List.of(
-            JPADocumentTypeDTO.builder()
-                .id(1L)
-                .changeIndicator('N')
-                .version("1.0")
-                .jurisShortcut("ÄN")
-                .documentType('N')
-                .multiple("Ja")
-                .label("Änderungsnorm")
-                .build());
-
-    StepVerifier.create(service.importDocumentTypeLookupTable(byteBuffer))
-        .consumeNextWith(
-            documentTypeDTO ->
-                assertEquals(
-                    "Successfully imported the document type lookup table", documentTypeDTO))
-        .verifyComplete();
-
-    verify(databaseDocumentTypeRepository, never()).deleteAll();
-    verify(databaseDocumentTypeRepository, never()).saveAll(anyCollection());
-    verify(jpaDocumentTypeRepository, atMostOnce()).deleteAll();
-    verify(jpaDocumentTypeRepository, atMostOnce()).saveAll(documentTypeDTOs);
-  }
 
   @Captor private ArgumentCaptor<List<CourtDTO>> courtDTOlistCaptor;
 
