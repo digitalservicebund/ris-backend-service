@@ -110,7 +110,7 @@ describe("DocumentStatusInputGroup", () => {
     await user.clear(dateInput)
     await rerender({ modelValue })
     await user.type(dateInput, "02.02.2021")
-    expect(modelValue.DATE).toEqual(["2021-02-02T00:00:00.000Z"])
+    expect(modelValue.DATE).toEqual(["2021-02-02"])
 
     const referenceInput = screen.getByRole("textbox", {
       name: "Fundstelle der Änderungsvorschrift",

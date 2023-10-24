@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.court.Court;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
 import java.beans.Transient;
-import java.time.Instant;
+import java.time.LocalDate;
 import java.util.UUID;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -22,7 +22,7 @@ public class LinkedDocumentationUnit {
   protected UUID uuid;
   protected String documentNumber;
   protected Court court;
-  protected Instant decisionDate;
+  protected LocalDate decisionDate;
   protected String fileNumber;
   protected DocumentType documentType;
   protected DataSource dataSource;

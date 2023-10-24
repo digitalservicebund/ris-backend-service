@@ -4,7 +4,7 @@ import de.bund.digitalservice.ris.caselaw.domain.lookuptable.court.Court;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
 import de.bund.digitalservice.ris.caselaw.domain.validator.LookupTableConstraint;
 import jakarta.validation.constraints.PastOrPresent;
-import java.time.Instant;
+import java.time.LocalDate;
 import java.util.List;
 import lombok.Builder;
 
@@ -20,9 +20,9 @@ public record CoreData(
     String ecli,
     List<String> deviatingEclis,
     String appraisalBody,
-    @PastOrPresent Instant decisionDate,
+    @PastOrPresent LocalDate decisionDate,
     boolean dateKnown,
-    List<Instant> deviatingDecisionDates,
+    List<LocalDate> deviatingDecisionDates,
     @LookupTableConstraint(lookupTableName = "legalEffect") String legalEffect,
     String inputType,
     DocumentationOffice documentationOffice,

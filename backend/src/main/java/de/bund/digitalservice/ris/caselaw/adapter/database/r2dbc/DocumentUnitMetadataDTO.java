@@ -6,6 +6,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ProcedureDTO;
 import de.bund.digitalservice.ris.caselaw.domain.DataSource;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatus;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
@@ -52,7 +53,7 @@ public class DocumentUnitMetadataDTO {
   private String appraisalBody;
 
   @Column("decision_date")
-  private Instant decisionDate;
+  private LocalDate decisionDate;
 
   @Column("date_known")
   private boolean dateKnown;

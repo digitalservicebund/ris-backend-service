@@ -6,7 +6,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.time.Duration;
-import java.time.Instant;
+import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -188,8 +188,8 @@ public class DocumentUnitService {
       Optional<String> documentNumberOrFileNumber,
       Optional<String> courtType,
       Optional<String> courtLocation,
-      Optional<String> decisionDate,
-      Optional<String> decisionDateEnd,
+      Optional<LocalDate> decisionDate,
+      Optional<LocalDate> decisionDateEnd,
       Optional<String> publicationStatus,
       Optional<Boolean> withError,
       Optional<Boolean> myDocOfficeOnly) {
@@ -199,8 +199,8 @@ public class DocumentUnitService {
             .documentNumberOrFileNumber(documentNumberOrFileNumber.orElse(null))
             .courtType(courtType.orElse(null))
             .courtLocation(courtLocation.orElse(null))
-            .decisionDate(decisionDate.map(Instant::parse).orElse(null))
-            .decisionDateEnd(decisionDateEnd.map(Instant::parse).orElse(null))
+            .decisionDate(decisionDate.orElse(null))
+            .decisionDateEnd(decisionDateEnd.orElse(null))
             .status(
                 (publicationStatus.isPresent() || withError.isPresent())
                     ? DocumentUnitStatus.builder()

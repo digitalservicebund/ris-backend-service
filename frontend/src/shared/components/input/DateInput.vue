@@ -91,7 +91,9 @@ function onBlur() {
 watch(
   () => props.modelValue,
   (is) => {
-    inputValue.value = is ? dayjs(is).format("DD.MM.YYYY") : undefined
+    inputValue.value = is
+      ? dayjs(is, "YYYY-MM-DD", true).format("DD.MM.YYYY")
+      : undefined
   },
 )
 
@@ -99,7 +101,10 @@ watch(inputValue, (is) => {
   if (is === "") emit("update:modelValue", undefined)
   isValidDate.value &&
     isInPast.value &&
-    emit("update:modelValue", dayjs(is, "DD.MM.YYYY").toISOString())
+    emit(
+      "update:modelValue",
+      dayjs(is, "DD.MM.YYYY", true).format("YYYY-MM-DD"),
+    )
 })
 
 watch(inputCompleted, (is) => {

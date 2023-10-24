@@ -54,7 +54,7 @@ import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import java.time.Instant;
-import java.time.ZoneId;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -552,7 +552,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
         .collectList()
         .flatMap(
             deviatingDecisionDateDTOs -> {
-              List<Instant> deviatingDecisionDates = new ArrayList<>();
+              List<LocalDate> deviatingDecisionDates = new ArrayList<>();
               if (documentUnit.coreData() != null
                   && documentUnit.coreData().deviatingDecisionDates() != null) {
                 deviatingDecisionDates.addAll(documentUnit.coreData().deviatingDecisionDates());
@@ -1201,7 +1201,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
               return metadataRepository.searchByLinkedDocumentationUnit(
                   extractCourtType(linkedDocumentationUnit),
                   extractCourtLocation(linkedDocumentationUnit),
-                  extractDecisionDate(linkedDocumentationUnit),
+                  linkedDocumentationUnit.getDecisionDate(),
                   documentUnitDTOIdsViaFileNumber,
                   documentTypeDTOId,
                   pageable.getPageSize(),
@@ -1234,7 +1234,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
               return metadataRepository.countSearchByLinkedDocumentationUnit(
                   extractCourtType(linkedDocumentationUnit),
                   extractCourtLocation(linkedDocumentationUnit),
-                  extractDecisionDate(linkedDocumentationUnit),
+                  linkedDocumentationUnit.getDecisionDate(),
                   documentUnitDTOIdsViaFileNumber,
                   documentTypeDTOId);
             });
@@ -1247,12 +1247,6 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
   private String extractCourtLocation(LinkedDocumentationUnit linkedDocumentationUnit) {
     return Optional.ofNullable(linkedDocumentationUnit.getCourt())
         .map(Court::location)
-        .orElse(null);
-  }
-
-  private Instant extractDecisionDate(LinkedDocumentationUnit linkedDocumentationUnit) {
-    return Optional.ofNullable(linkedDocumentationUnit.getDecisionDate())
-        .map(date -> date.atZone(ZoneId.of("UTC")).toInstant())
         .orElse(null);
   }
 

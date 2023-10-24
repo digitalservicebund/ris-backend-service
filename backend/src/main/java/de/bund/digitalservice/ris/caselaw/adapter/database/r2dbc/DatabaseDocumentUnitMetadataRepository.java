@@ -1,6 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc;
 
-import java.time.Instant;
+import java.time.LocalDate;
 import java.util.UUID;
 import org.springframework.data.r2dbc.repository.Query;
 import org.springframework.data.r2dbc.repository.R2dbcRepository;
@@ -38,7 +38,7 @@ public interface DatabaseDocumentUnitMetadataRepository
   Flux<DocumentUnitMetadataDTO> searchByLinkedDocumentationUnit(
       String courtType,
       String courtLocation,
-      Instant decisionDate,
+      LocalDate decisionDate,
       Long[] docUnitIds,
       UUID docTypeId,
       Integer pageSize,
@@ -48,7 +48,7 @@ public interface DatabaseDocumentUnitMetadataRepository
   Mono<Long> countSearchByLinkedDocumentationUnit(
       String courtType,
       String courtLocation,
-      Instant decisionDate,
+      LocalDate decisionDate,
       Long[] docUnitIds,
       UUID docTypeId);
 }

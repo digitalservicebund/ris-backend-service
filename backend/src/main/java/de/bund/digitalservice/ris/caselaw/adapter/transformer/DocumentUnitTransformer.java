@@ -23,7 +23,7 @@ import de.bund.digitalservice.ris.caselaw.domain.Texts;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.court.Court;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw.FieldOfLaw;
-import java.time.Instant;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
@@ -273,7 +273,7 @@ public class DocumentUnitTransformer {
           documentUnitDTO.getDeviatingEclis().stream().map(DeviatingEcliDTO::getEcli).toList();
     }
 
-    List<Instant> deviatingDecisionDates = null;
+    List<LocalDate> deviatingDecisionDates = null;
     if (documentUnitDTO.getDeviatingDecisionDates() != null) {
       deviatingDecisionDates =
           documentUnitDTO.getDeviatingDecisionDates().stream()

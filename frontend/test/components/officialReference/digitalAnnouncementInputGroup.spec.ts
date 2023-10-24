@@ -252,7 +252,7 @@ describe("DigitalAnnouncementInputGroup", () => {
 
     expect(modelValue).toEqual({
       ANNOUNCEMENT_MEDIUM: ["foo"],
-      DATE: ["2023-04-05T00:00:00.000Z"],
+      DATE: ["2023-04-05"],
       EDITION: ["1"],
       YEAR: ["2023"],
       AREA_OF_PUBLICATION: ["baz baz"],
