@@ -184,7 +184,7 @@ dependencies {
     // CVE-2022-4244
     implementation("org.codehaus.plexus:plexus-utils:3.0.24")
 
-    implementation(platform("software.amazon.awssdk:bom:2.20.12"))
+    implementation(platform("software.amazon.awssdk:bom:2.21.7"))
     implementation("software.amazon.awssdk:netty-nio-client")
     implementation("software.amazon.awssdk:s3")
 
