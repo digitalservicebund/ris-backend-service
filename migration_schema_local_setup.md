@@ -29,7 +29,7 @@ This document will help Developers in NeuRIS to setup the new schema with data i
    cd ris-data-migration
    ```
 
-4. Checkout the repo on the commit used by staging (commit id to be found [here](https://github.com/digitalservicebund/neuris-migration-infra/blob/79eb1ea624a99ca96614246065761fbfab9803bc/manifests/shared/kustomization.yaml#L13)):
+4. Checkout the repo on the commit used by staging (commit id to be found [here](https://github.com/digitalservicebund/neuris-migration-infra/blob/main/manifests/shared/kustomization.yaml#L13)):
    ```
    git checkout <commit-hash>
    ```
