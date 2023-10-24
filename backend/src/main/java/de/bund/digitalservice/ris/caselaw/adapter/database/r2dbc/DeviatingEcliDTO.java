@@ -16,6 +16,7 @@ import org.springframework.data.relational.core.mapping.Table;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table("deviating_ecli")
+@Deprecated
 public class DeviatingEcliDTO {
   @Id Long id;
   Long documentUnitId;

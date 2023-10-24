@@ -7,4 +7,5 @@ import org.springframework.data.relational.core.mapping.Table;
 
 @Builder(toBuilder = true)
 @Table("deviating_decision_date")
+@Deprecated
 public record DeviatingDecisionDateDTO(@Id Long id, Long documentUnitId, Instant decisionDate) {}

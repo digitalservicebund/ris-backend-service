@@ -279,7 +279,6 @@ class SaveNormIntegrationTest {
   private DocumentUnit generateDocumentationUnit(UUID uuid, Instant creationTimestamp) {
     return DocumentUnit.builder()
         .uuid(uuid)
-        .creationtimestamp(creationTimestamp)
         .documentNumber("1234567890123")
         .coreData(CoreData.builder().documentationOffice(docOffice).build())
         .contentRelatedIndexing(ContentRelatedIndexing.builder().norms(new ArrayList<>()).build())

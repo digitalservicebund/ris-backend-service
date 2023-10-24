@@ -12,6 +12,7 @@ import org.springframework.data.relational.core.mapping.Table;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table("file_number")
+@Deprecated
 public class FileNumberDTO {
   @Id Long id;
   Long documentUnitId;

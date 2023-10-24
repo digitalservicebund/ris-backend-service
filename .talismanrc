@@ -5,15 +5,10 @@ fileignoreconfig:
 - filename: '*README.md'
   ignore_detectors:
   - filecontent
-- filename: _site/*
-  ignore_detectors:
-  - filecontent
-- filename: _site/prototype-footnotes/assets/index-086108b4.js
-  checksum: 0bd435f734159482c18b1f78fbde74f6b3be56604f380ac59405dc240cf8a270
 - filename: backend/src/main/kotlin/de/bund/digitalservice/ris/norms/framework/adapter/input/restapi/controller/GetFileController.kt
   checksum: f989b3c9c176b1b985c2f78ca6ca13fa1403cbb69f367ae9b1cb8ea64d5f6747
 - filename: backend/src/test/java/de/bund/digitalservice/ris/caselaw/integration/tests/JurisXmlExporterWrapperIntegrationTest.java
-  checksum: f50e29a97b3766cd195dd27d291e2d8ed043299f1c3ef42dd35f1217782b19b9
+  checksum: 08f921af78c41b983b8a01c1c77beb3d16ed3350f9014a106471f31bff3db478
 - filename: backend/src/test/kotlin/unit/adapter/input/restapi/controller/GenerateNormFileControllerTest.kt
   checksum: 930c2643a15a900f328d1d83792e51b12af71cc20136ba43b13fffdffd601e8f
 - filename: backend/src/test/kotlin/unit/adapter/input/restapi/controller/GetFileControllerTest.kt
@@ -35,7 +30,7 @@ fileignoreconfig:
 - filename: frontend/test/test-helper/dataGenerators.ts
   checksum: a3d04d1168dcc221ba5fcd72e8d8bada60f48644c7586bde3a7602b748d0682c
 - filename: migration_schema_local_setup.md
-  checksum: a6c8afb7dba5ecc5973368e5f6a6b55ca9a474b7b526e7a0fa793659993151c0
+  checksum: 0e3fc84949750036f1e433f23f3091abcc7866192673580fa69c0fa15782022a
 scopeconfig:
 - scope: node
 allowed_patterns:

@@ -859,7 +859,6 @@ class ActiveCitationIntegrationTest {
                 .documentationOffice(AuthUtils.buildDefaultDocOffice())
                 .build())
         .texts(Texts.builder().build())
-        .creationtimestamp(TIMESTAMP)
         .contentRelatedIndexing(contentRelatedIndexing)
         .status(DocumentUnitStatus.builder().publicationStatus(PublicationStatus.PUBLISHED).build())
         .proceedingDecisions(Collections.emptyList())

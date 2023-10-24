@@ -14,6 +14,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity(name = "documentation_office")
+@Deprecated
 public class DocumentationOfficeDTO {
   @Id private UUID id;
 

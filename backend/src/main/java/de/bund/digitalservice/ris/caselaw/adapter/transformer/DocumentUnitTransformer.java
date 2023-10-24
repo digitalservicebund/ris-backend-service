@@ -29,6 +29,7 @@ import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
+@Deprecated
 public class DocumentUnitTransformer {
   private DocumentUnitTransformer() {}
 
@@ -48,7 +49,6 @@ public class DocumentUnitTransformer {
         documentUnitDTO.toBuilder()
             .uuid(documentUnit.uuid())
             .documentnumber(documentUnit.documentNumber())
-            .creationtimestamp(documentUnit.creationtimestamp())
             .fileuploadtimestamp(documentUnit.fileuploadtimestamp())
             .dataSource(dataSource)
             .s3path(documentUnit.s3path())
@@ -213,7 +213,6 @@ public class DocumentUnitTransformer {
         .uuid(documentUnitMetadataDTO.getUuid())
         .coreData(coreData)
         .documentNumber(documentUnitMetadataDTO.getDocumentnumber())
-        .creationtimestamp(documentUnitMetadataDTO.getCreationtimestamp())
         .fileuploadtimestamp(documentUnitMetadataDTO.getFileuploadtimestamp())
         .dataSource(dataSource)
         .s3path(documentUnitMetadataDTO.getS3path())
@@ -349,7 +348,6 @@ public class DocumentUnitTransformer {
     return DocumentUnit.builder()
         .uuid(documentUnitDTO.getUuid())
         .documentNumber(documentUnitDTO.getDocumentnumber())
-        .creationtimestamp(documentUnitDTO.getCreationtimestamp())
         .fileuploadtimestamp(documentUnitDTO.getFileuploadtimestamp())
         .dataSource(dataSource)
         .s3path(documentUnitDTO.getS3path())

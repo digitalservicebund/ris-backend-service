@@ -6,4 +6,5 @@ import org.springframework.data.relational.core.mapping.Table;
 
 @Builder
 @Table("keyword")
+@Deprecated
 public record KeywordDTO(@Id Long id, Long documentUnitId, String keyword) {}

@@ -121,4 +121,57 @@ CREATE TABLE IF NOT EXISTS
     norm_abbreviation_id uuid,
     date_of_version_raw_value character varying(255) COLLATE pg_catalog."default",
     legacy_doc_unit_id uuid
-  )
+  );
+
+CREATE TABLE IF NOT EXISTS
+  incremental_migration.documentation_unit (
+    id uuid NOT NULL,
+    case_facts text COLLATE pg_catalog."default",
+    court_id uuid,
+    decision_date date,
+    decision_grounds text COLLATE pg_catalog."default",
+    dissenting_opinion text COLLATE pg_catalog."default",
+    document_number character varying(255) COLLATE pg_catalog."default" NOT NULL,
+    document_type_id uuid,
+    documentation_office_id uuid,
+    ecli character varying(255) COLLATE pg_catalog."default",
+    grounds text COLLATE pg_catalog."default",
+    guiding_principle text COLLATE pg_catalog."default",
+    headline text COLLATE pg_catalog."default",
+    headnote text COLLATE pg_catalog."default",
+    input_type character varying(255) COLLATE pg_catalog."default",
+    judicial_body character varying(255) COLLATE pg_catalog."default",
+    jurisdiction_type_id uuid,
+    other_headnote text COLLATE pg_catalog."default",
+    other_long_text text COLLATE pg_catalog."default",
+    procedure character varying(255) COLLATE pg_catalog."default",
+    source character varying(1000) COLLATE pg_catalog."default",
+    tenor text COLLATE pg_catalog."default",
+    outline text COLLATE pg_catalog."default",
+    year_of_dispute character varying(32) COLLATE pg_catalog."default",
+    duplicate_check boolean,
+    CONSTRAINT documentation_unit_pkey PRIMARY KEY (id)
+  );
+
+CREATE TABLE IF NOT EXISTS
+  incremental_migration.file_number (
+    id uuid NOT NULL,
+    value character varying(1000) COLLATE pg_catalog."default" NOT NULL,
+    documentation_unit_id uuid NOT NULL,
+    CONSTRAINT file_number_pkey PRIMARY KEY (id)
+  );
+
+CREATE TABLE IF NOT EXISTS
+  incremental_migration.decision_name (
+    id uuid NOT NULL,
+    value character varying(1000) COLLATE pg_catalog."default" NOT NULL,
+    documentation_unit_id uuid NOT NULL,
+    CONSTRAINT decision_name_pkey PRIMARY KEY (id)
+  );
+
+CREATE TABLE IF NOT EXISTS
+  incremental_migration.documentation_unit_region (
+    documentation_unit_id uuid NOT NULL,
+    region_id uuid NOT NULL,
+    CONSTRAINT documentation_unit_region_pkey PRIMARY KEY (documentation_unit_id, region_id)
+  );

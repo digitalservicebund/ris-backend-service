@@ -21,6 +21,7 @@ import org.springframework.data.relational.core.mapping.Table;
 @Table("doc_unit")
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
+@Deprecated
 public class DocumentUnitDTO extends DocumentUnitMetadataDTO {
 
   // RUBRIKEN

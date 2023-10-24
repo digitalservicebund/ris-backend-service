@@ -147,7 +147,6 @@ class ProcedureIntegrationTest {
     DocumentUnit documentUnitFromFrontend =
         DocumentUnit.builder()
             .uuid(dto.getUuid())
-            .creationtimestamp(dto.getCreationtimestamp())
             .documentNumber(dto.getDocumentnumber())
             .coreData(
                 CoreData.builder().procedure(procedure).documentationOffice(docOffice).build())
@@ -193,7 +192,6 @@ class ProcedureIntegrationTest {
     DocumentUnit documentUnitFromFrontend =
         DocumentUnit.builder()
             .uuid(dto.getUuid())
-            .creationtimestamp(dto.getCreationtimestamp())
             .documentNumber(dto.getDocumentnumber())
             .coreData(
                 CoreData.builder().procedure(procedure).documentationOffice(docOffice).build())
@@ -243,7 +241,6 @@ class ProcedureIntegrationTest {
     DocumentUnit documentUnitFromFrontend1 =
         DocumentUnit.builder()
             .uuid(dto.getUuid())
-            .creationtimestamp(dto.getCreationtimestamp())
             .documentNumber(dto.getDocumentnumber())
             .coreData(
                 CoreData.builder().procedure(procedure1).documentationOffice(docOffice).build())
@@ -271,7 +268,6 @@ class ProcedureIntegrationTest {
     DocumentUnit documentUnitFromFrontend2 =
         DocumentUnit.builder()
             .uuid(dto.getUuid())
-            .creationtimestamp(dto.getCreationtimestamp())
             .documentNumber(dto.getDocumentnumber())
             .coreData(
                 CoreData.builder().procedure(procedure2).documentationOffice(docOffice).build())
@@ -300,7 +296,6 @@ class ProcedureIntegrationTest {
     DocumentUnit documentUnitFromFrontend3 =
         DocumentUnit.builder()
             .uuid(dto.getUuid())
-            .creationtimestamp(dto.getCreationtimestamp())
             .documentNumber(dto.getDocumentnumber())
             .coreData(
                 CoreData.builder().procedure(procedure3).documentationOffice(docOffice).build())
@@ -348,7 +343,6 @@ class ProcedureIntegrationTest {
     DocumentUnit documentUnitFromFrontend =
         DocumentUnit.builder()
             .uuid(dto.getUuid())
-            .creationtimestamp(dto.getCreationtimestamp())
             .documentNumber(dto.getDocumentnumber())
             .coreData(
                 CoreData.builder().procedure(procedure).documentationOffice(docOffice).build())

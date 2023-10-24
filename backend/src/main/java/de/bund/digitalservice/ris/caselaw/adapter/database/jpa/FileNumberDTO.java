@@ -2,13 +2,13 @@ package de.bund.digitalservice.ris.caselaw.adapter.database.jpa;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import java.time.LocalDate;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -22,28 +22,21 @@ import lombok.Setter;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(name = "norm_reference", schema = "incremental_migration")
-public class NormReferenceDTO {
+@Table(name = "file_number", schema = "incremental_migration")
+public class FileNumberDTO {
 
-  @Id @GeneratedValue UUID id;
+  @Id @GeneratedValue private UUID id;
 
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "norm_abbreviation_id")
-  private NormAbbreviationDTO normAbbreviation;
-
-  @Column(name = "single_norm")
-  String singleNorm;
-
-  @Column(name = "date_of_version")
-  LocalDate dateOfVersion;
-
-  @Column(name = "date_of_relevance")
-  String dateOfRelevance;
-
-  @Column(name = "legacy_doc_unit_id")
-  UUID legacyDocUnitId;
+  @Column(nullable = false)
+  @NotBlank
+  private String value;
 
   @JoinColumn(name = "documentation_unit_id")
   @ManyToOne
-  DocumentationUnitDTO documentationUnit;
+  @NotNull
+  private DocumentationUnitDTO documentationUnit;
+
+  public FileNumberDTO(String value) {
+    this.value = value;
+  }
 }

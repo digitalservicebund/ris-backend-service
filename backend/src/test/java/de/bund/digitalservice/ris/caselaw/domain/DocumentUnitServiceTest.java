@@ -379,7 +379,6 @@ class DocumentUnitServiceTest {
         DocumentUnit.builder()
             .uuid(UUID.randomUUID())
             .documentNumber("ABCDE20220001")
-            .creationtimestamp(Instant.now())
             .fileuploadtimestamp(Instant.now())
             .proceedingDecisions(null)
             .build();

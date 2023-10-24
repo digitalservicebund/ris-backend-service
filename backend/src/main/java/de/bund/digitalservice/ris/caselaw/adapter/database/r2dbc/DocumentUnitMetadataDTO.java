@@ -22,6 +22,7 @@ import org.springframework.data.relational.core.mapping.Table;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table("doc_unit")
+@Deprecated
 public class DocumentUnitMetadataDTO {
 
   @Id private Long id;

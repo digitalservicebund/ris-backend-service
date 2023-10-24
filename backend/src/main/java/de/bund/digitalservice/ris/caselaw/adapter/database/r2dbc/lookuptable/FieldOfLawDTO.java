@@ -15,6 +15,7 @@ import org.springframework.data.relational.core.mapping.Table;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table("lookuptable_field_of_law")
+@Deprecated
 public class FieldOfLawDTO implements Persistable<Long> {
   @Id Long id;
   Integer childrenCount;

@@ -35,7 +35,7 @@ public class DatabaseDocumentUnitStatusService implements DocumentUnitStatusServ
             DocumentUnitStatusDTO.builder()
                 .newEntry(true)
                 .id(UUID.randomUUID())
-                .createdAt(documentUnit.creationtimestamp())
+                .createdAt(Instant.now())
                 .documentUnitId(documentUnit.uuid())
                 .publicationStatus(PublicationStatus.UNPUBLISHED)
                 .withError(false)

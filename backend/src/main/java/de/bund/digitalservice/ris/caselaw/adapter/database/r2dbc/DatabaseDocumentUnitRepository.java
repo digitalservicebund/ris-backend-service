@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Mono;
 
 @Repository
+@Deprecated
 public interface DatabaseDocumentUnitRepository extends R2dbcRepository<DocumentUnitDTO, Long> {
   @Query("SELECT * FROM doc_unit WHERE documentnumber = $1")
   Mono<DocumentUnitDTO> findByDocumentnumber(String documentnumber);

@@ -222,7 +222,6 @@ class DocumentUnitIntegrationTest {
     DocumentUnit documentUnitFromFrontend =
         DocumentUnit.builder()
             .uuid(dto.getUuid())
-            .creationtimestamp(dto.getCreationtimestamp())
             .documentNumber(dto.getDocumentnumber())
             .coreData(
                 CoreData.builder()
@@ -276,7 +275,6 @@ class DocumentUnitIntegrationTest {
     DocumentUnit documentUnitFromFrontend =
         DocumentUnit.builder()
             .uuid(dto.getUuid())
-            .creationtimestamp(dto.getCreationtimestamp())
             .documentNumber(dto.getDocumentnumber())
             .coreData(
                 CoreData.builder()
@@ -338,7 +336,6 @@ class DocumentUnitIntegrationTest {
     DocumentUnit documentUnitFromFrontend =
         DocumentUnit.builder()
             .uuid(dto.getUuid())
-            .creationtimestamp(dto.getCreationtimestamp())
             .documentNumber(dto.getDocumentnumber())
             .coreData(
                 CoreData.builder()
@@ -415,7 +412,6 @@ class DocumentUnitIntegrationTest {
     DocumentUnit documentUnitFromFrontend =
         DocumentUnit.builder()
             .uuid(dto.getUuid())
-            .creationtimestamp(dto.getCreationtimestamp())
             .documentNumber(dto.getDocumentnumber())
             .coreData(
                 CoreData.builder()
@@ -606,7 +602,6 @@ class DocumentUnitIntegrationTest {
 
     return DocumentUnit.builder()
         .uuid(dto.getUuid())
-        .creationtimestamp(dto.getCreationtimestamp())
         .documentNumber(dto.getDocumentnumber())
         .coreData(CoreData.builder().court(court).documentationOffice(docOffice).build())
         .texts(Texts.builder().decisionName("decisionName").build())
@@ -663,7 +658,6 @@ class DocumentUnitIntegrationTest {
     DocumentUnit documentUnitFromFrontend =
         DocumentUnit.builder()
             .uuid(dto.getUuid())
-            .creationtimestamp(dto.getCreationtimestamp())
             .documentNumber(dto.getDocumentnumber())
             .coreData(
                 CoreData.builder()
@@ -719,7 +713,6 @@ class DocumentUnitIntegrationTest {
     DocumentUnit documentUnitFromFrontend =
         DocumentUnit.builder()
             .uuid(dto.getUuid())
-            .creationtimestamp(dto.getCreationtimestamp())
             .documentNumber(dto.getDocumentnumber())
             .coreData(CoreData.builder().documentationOffice(docOffice).build())
             .build();
@@ -835,7 +828,6 @@ class DocumentUnitIntegrationTest {
     }
     return DocumentUnit.builder()
         .uuid(dto.getUuid())
-        .creationtimestamp(dto.getCreationtimestamp())
         .documentNumber(dto.getDocumentnumber())
         .coreData(coreData)
         .build();
