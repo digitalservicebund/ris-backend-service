@@ -7,18 +7,16 @@ import lombok.experimental.UtilityClass;
 @UtilityClass
 public class DeviatingFileNumberTransformer {
 
-  public static DeviatingFileNumberDTO transformToDTO(DeviatingFileNumber deviatingFileNumber) {
+  public static DeviatingFileNumberDTO transformToDTO(
+      DeviatingFileNumber deviatingFileNumber, Long rank) {
     return DeviatingFileNumberDTO.builder()
-        .id(deviatingFileNumber.id())
         .value(deviatingFileNumber.fileNumber())
+        .rank(rank)
         .build();
   }
 
   public static DeviatingFileNumber transformToDomain(
       DeviatingFileNumberDTO DeviatingFileNumberDTO) {
-    return DeviatingFileNumber.builder()
-        .id(DeviatingFileNumberDTO.getId())
-        .fileNumber(DeviatingFileNumberDTO.getValue())
-        .build();
+    return DeviatingFileNumber.builder().fileNumber(DeviatingFileNumberDTO.getValue()).build();
   }
 }

@@ -13,17 +13,11 @@ public class DeviatingCourtTransformer {
     return incorrectCourtDTO.toBuilder().court(incorrectCourt).build();
   }
 
-  public static DeviatingCourtDTO transformToDTO(DeviatingCourt deviatingCourt) {
-    return DeviatingCourtDTO.builder()
-        .id(deviatingCourt.id())
-        .value(deviatingCourt.court())
-        .build();
+  public static DeviatingCourtDTO transformToDTO(DeviatingCourt deviatingCourt, Long rank) {
+    return DeviatingCourtDTO.builder().value(deviatingCourt.court()).rank(rank).build();
   }
 
   public static DeviatingCourt transformToDomain(DeviatingCourtDTO deviatingCourtDTO) {
-    return DeviatingCourt.builder()
-        .id(deviatingCourtDTO.getId())
-        .court(deviatingCourtDTO.getValue())
-        .build();
+    return DeviatingCourt.builder().court(deviatingCourtDTO.getValue()).build();
   }
 }

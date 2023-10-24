@@ -15,16 +15,16 @@ public class DeviatingDecisionDateTransformer {
     return deviatingDecisionDateDTO.toBuilder().decisionDate(deviationDecisionDate).build();
   }
 
-  public static DeviatingDateDTO transformToDTO(DeviatingDecisionDate deviatingDecisionDate) {
+  public static DeviatingDateDTO transformToDTO(
+      DeviatingDecisionDate deviatingDecisionDate, Long rank) {
     return DeviatingDateDTO.builder()
-        .id(deviatingDecisionDate.id())
         .value(LocalDate.parse(deviatingDecisionDate.deviatingDecisionDate()))
+        .rank(rank)
         .build();
   }
 
   public static DeviatingDecisionDate transformToDomain(DeviatingDateDTO deviatingDecisionDateDTO) {
     return DeviatingDecisionDate.builder()
-        .id(deviatingDecisionDateDTO.getId())
         .deviatingDecisionDate(deviatingDecisionDateDTO.getValue().toString())
         .build();
   }

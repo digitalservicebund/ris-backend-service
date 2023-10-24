@@ -1,7 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.domain;
 
-import java.util.UUID;
 import lombok.Builder;
 
 @Builder
-public record DeviatingDecisionDate(UUID id, String deviatingDecisionDate) {}
+public record DeviatingDecisionDate(String deviatingDecisionDate) {}
