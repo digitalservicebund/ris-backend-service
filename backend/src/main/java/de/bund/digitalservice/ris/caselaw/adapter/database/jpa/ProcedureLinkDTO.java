@@ -6,7 +6,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import java.time.Instant;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -21,11 +20,11 @@ import lombok.NoArgsConstructor;
 public class ProcedureLinkDTO {
   @Id @GeneratedValue private UUID id;
 
-  @Column(name = "created_at", insertable = false, updatable = false)
-  private Instant createdAt;
-
   @Column(name = "documentation_unit_id")
   UUID documentationUnitId;
+
+  @Column(name = "rank")
+  Integer rank;
 
   @ManyToOne()
   @JoinColumn(name = "procedure_id", referencedColumnName = "id")

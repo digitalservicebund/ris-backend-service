@@ -763,6 +763,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
                     ProcedureLinkDTO.builder()
                         .procedureDTO(procedureDTO)
                         .documentationUnitId(documentUnitDTO.uuid)
+                        .rank(getNextProcedureLinkRank(documentUnitDTO))
                         .build());
               }
 
@@ -790,10 +791,18 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
 
   private boolean areCurrentlyLinked(DocumentUnitDTO documentUnitDTO, ProcedureDTO procedureDTO) {
     return Optional.ofNullable(
-            procedureLinkRepository.findFirstByDocumentationUnitIdOrderByCreatedAtDesc(
+            procedureLinkRepository.findFirstByDocumentationUnitIdOrderByRankDesc(
                 documentUnitDTO.uuid))
         .map(linkDTO -> linkDTO.getProcedureDTO().equals(procedureDTO))
         .orElse(false);
+  }
+
+  private int getNextProcedureLinkRank(DocumentUnitDTO documentUnitDTO) {
+    return Optional.ofNullable(
+            procedureLinkRepository.findFirstByDocumentationUnitIdOrderByRankDesc(
+                documentUnitDTO.getUuid()))
+        .map(procedureLinkDTO -> procedureLinkDTO.getRank() + 1)
+        .orElse(1);
   }
 
   private Mono<DocumentUnit> unlinkLinkedDocumentationUnit(
@@ -1156,7 +1165,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
 
   private <T extends DocumentUnitMetadataDTO> Mono<T> injectProcedure(T documentUnitDTO) {
     Optional.ofNullable(
-            procedureLinkRepository.findFirstByDocumentationUnitIdOrderByCreatedAtDesc(
+            procedureLinkRepository.findFirstByDocumentationUnitIdOrderByRankDesc(
                 documentUnitDTO.uuid))
         .map(ProcedureLinkDTO::getProcedureDTO)
         .ifPresent(documentUnitDTO::setProcedure);
@@ -1168,7 +1177,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
 
     List<String> previousProcedures =
         procedureLinkRepository
-            .findAllByDocumentationUnitIdOrderByCreatedAtDesc(documentUnitDTO.uuid)
+            .findAllByDocumentationUnitIdOrderByRankDesc(documentUnitDTO.uuid)
             .stream()
             .skip(1)
             .map(ProcedureLinkDTO::getProcedureDTO)

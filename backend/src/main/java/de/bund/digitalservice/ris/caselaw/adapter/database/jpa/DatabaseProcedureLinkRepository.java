@@ -13,15 +13,15 @@ public interface DatabaseProcedureLinkRepository extends JpaRepository<Procedure
   String QUERY_ACTIVE_PROCEDURE_LINKS_BY_PROCEDURE =
       "FROM procedure_link pl "
           + "JOIN ( "
-          + "    SELECT documentation_unit_id, MAX(created_at) as latest_time "
+          + "    SELECT documentation_unit_id, MAX(rank) as highest_rank "
           + "    FROM procedure_link "
           + "    GROUP BY documentation_unit_id "
           + ") subq "
-          + "ON pl.documentation_unit_id = subq.documentation_unit_id AND pl.created_at = subq.latest_time";
+          + "ON pl.documentation_unit_id = subq.documentation_unit_id AND pl.rank = subq.highest_rank";
 
-  ProcedureLinkDTO findFirstByDocumentationUnitIdOrderByCreatedAtDesc(UUID documentationUnitId);
+  ProcedureLinkDTO findFirstByDocumentationUnitIdOrderByRankDesc(UUID documentationUnitId);
 
-  List<ProcedureLinkDTO> findAllByDocumentationUnitIdOrderByCreatedAtDesc(UUID documentationUnitId);
+  List<ProcedureLinkDTO> findAllByDocumentationUnitIdOrderByRankDesc(UUID documentationUnitId);
 
   @Query(
       value =
