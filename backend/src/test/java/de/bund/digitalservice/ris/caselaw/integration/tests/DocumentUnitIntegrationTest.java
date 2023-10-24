@@ -63,6 +63,7 @@ import de.bund.digitalservice.ris.caselaw.domain.lookuptable.court.Court;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -345,8 +346,8 @@ class DocumentUnitIntegrationTest {
                 CoreData.builder()
                     .deviatingDecisionDates(
                         (List.of(
-                            Instant.parse("2022-01-31T23:00:00Z"),
-                            Instant.parse("2022-01-31T23:00:00Z"))))
+                            LocalDate.parse("2022-01-31T23:00:00Z"),
+                            LocalDate.parse("2022-01-31T23:00:00Z"))))
                     .documentationOffice(docOffice)
                     .build())
             .texts(Texts.builder().decisionName("decisionName").build()) // TODO why is this needed?
@@ -994,13 +995,13 @@ class DocumentUnitIntegrationTest {
     List<String> fileNumbers = List.of("jkl", "ghi", "def", "abc", "mno");
     List<String> courtTypes = List.of("MNO", "PQR", "STU", "VWX", "YZA");
     List<String> courtLocations = List.of("Hamburg", "München", "Berlin", "Frankfurt", "Köln");
-    List<Instant> decisionDates =
+    List<LocalDate> decisionDates =
         List.of(
-            Instant.parse("2021-01-02T00:00:00.00Z"),
-            Instant.parse("2022-02-03T00:00:00.00Z"),
-            Instant.parse("2023-03-04T00:00:00.00Z"),
-            Instant.parse("2023-08-01T00:00:00.00Z"),
-            Instant.parse("2023-08-10T00:00:00.00Z"));
+            LocalDate.parse("2021-01-02T00:00:00.00Z"),
+            LocalDate.parse("2022-02-03T00:00:00.00Z"),
+            LocalDate.parse("2023-03-04T00:00:00.00Z"),
+            LocalDate.parse("2023-08-01T00:00:00.00Z"),
+            LocalDate.parse("2023-08-10T00:00:00.00Z"));
     List<PublicationStatus> statuses =
         List.of(PUBLISHED, UNPUBLISHED, PUBLISHING, PUBLISHED, UNPUBLISHED);
     List<Boolean> errorStatuses = List.of(false, true, true, false, true);
@@ -1084,8 +1085,8 @@ class DocumentUnitIntegrationTest {
         .containsExactly("MNOP202300099", "IJKL202101234", "EFGH202200123", "ABCD202300007");
 
     // between to decision dates
-    Instant start = Instant.parse("2022-02-01T00:00:00.00Z");
-    Instant end = Instant.parse("2023-08-05T00:00:00.00Z");
+    LocalDate start = LocalDate.parse("2022-02-01T00:00:00.00Z");
+    LocalDate end = LocalDate.parse("2023-08-05T00:00:00.00Z");
     searchInput =
         DocumentUnitSearchInput.builder().decisionDate(start).decisionDateEnd(end).build();
     assertThat(extractDocumentNumbersFromSearchCall(searchInput))

@@ -1,6 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.domain;
 
-import java.time.Instant;
+import java.time.LocalDate;
 import java.util.UUID;
 import lombok.Builder;
 
@@ -10,8 +10,8 @@ public record DocumentUnitSearchInput(
     String documentNumberOrFileNumber,
     String courtType,
     String courtLocation,
-    Instant decisionDate,
-    Instant decisionDateEnd,
+    LocalDate decisionDate,
+    LocalDate decisionDateEnd,
     DocumentationOffice documentationOffice,
     DocumentUnitStatus status,
     boolean myDocOfficeOnly) {}

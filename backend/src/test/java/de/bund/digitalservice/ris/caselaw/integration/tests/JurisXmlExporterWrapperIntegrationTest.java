@@ -23,6 +23,7 @@ import de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw.FieldOfL
 import de.bund.digitalservice.ris.domain.export.juris.JurisXmlExporter;
 import java.lang.reflect.Field;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
@@ -59,10 +60,11 @@ class JurisXmlExporterWrapperIntegrationTest {
             .documentType(
                 DocumentType.builder().jurisShortcut("category").label("category123").build())
             .ecli("ecli")
-            .decisionDate(Instant.parse("2021-01-01T00:00:00Z"))
+            .decisionDate(LocalDate.parse("2021-01-01T00:00:00Z"))
             .deviatingDecisionDates(
                 List.of(
-                    Instant.parse("2021-01-01T00:00:00Z"), Instant.parse("2021-01-02T00:00:00Z")))
+                    LocalDate.parse("2021-01-01T00:00:00Z"),
+                    LocalDate.parse("2021-01-02T00:00:00Z")))
             .build();
 
     Texts texts = Texts.builder().decisionName("decisionName").build();
@@ -72,7 +74,7 @@ class JurisXmlExporterWrapperIntegrationTest {
             ProceedingDecision.builder()
                 .uuid(UUID.randomUUID())
                 .court(new Court("courtType", "courtPlace", "courtLabel", null))
-                .decisionDate(Instant.parse("2020-05-06T00:00:00Z"))
+                .decisionDate(LocalDate.parse("2020-05-06T00:00:00Z"))
                 .dateKnown(true)
                 .fileNumber("fileNumber")
                 .documentType(
@@ -133,7 +135,7 @@ class JurisXmlExporterWrapperIntegrationTest {
             .ecli("ecli")
             .deviatingEclis(List.of("dev-ecli-1", "dev-ecli-2"))
             .appraisalBody("appraisalBody")
-            .decisionDate(Instant.parse("2021-01-01T00:00:00Z"))
+            .decisionDate(LocalDate.parse("2021-01-01T00:00:00Z"))
             .legalEffect("legalEffect")
             .inputType("inputType")
             .documentationOffice(
@@ -159,7 +161,7 @@ class JurisXmlExporterWrapperIntegrationTest {
                 .documentNumber("documentNumber")
                 .dataSource(DataSource.NEURIS)
                 .court(new Court("courtType", "courtPlace", "courtLabel", null))
-                .decisionDate(Instant.parse("2020-04-05T00:00:00Z"))
+                .decisionDate(LocalDate.parse("2020-04-05T00:00:00Z"))
                 .dateKnown(true)
                 .fileNumber("fileNumber")
                 .documentType(

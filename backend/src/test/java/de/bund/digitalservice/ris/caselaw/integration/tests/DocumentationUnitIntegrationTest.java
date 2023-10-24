@@ -46,9 +46,7 @@ import de.bund.digitalservice.ris.caselaw.domain.Texts;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
 import java.nio.charset.StandardCharsets;
-import java.time.Instant;
 import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -525,10 +523,7 @@ class DocumentationUnitIntegrationTest {
     assertThat(extractDocumentNumbersFromSearchCall(searchInput)).containsExactly("EFGH202200123");
 
     // by decisionDate
-    searchInput =
-        DocumentUnitSearchInput.builder()
-            .decisionDate(decisionDates.get(2).atStartOfDay(ZoneId.of("Europe/Berlin")).toInstant())
-            .build();
+    searchInput = DocumentUnitSearchInput.builder().decisionDate(decisionDates.get(2)).build();
 
     assertThat(extractDocumentNumbersFromSearchCall(searchInput)).containsExactly("IJKL202101234");
 
@@ -555,8 +550,8 @@ class DocumentationUnitIntegrationTest {
         .containsExactly("MNOP202300099", "IJKL202101234", "EFGH202200123", "ABCD202300007");
 
     // between to decision dates
-    Instant start = Instant.parse("2022-02-01T00:00:00.00Z");
-    Instant end = Instant.parse("2023-08-05T00:00:00.00Z");
+    LocalDate start = LocalDate.parse("2022-02-01T00:00:00.00Z");
+    LocalDate end = LocalDate.parse("2023-08-05T00:00:00.00Z");
     searchInput =
         DocumentUnitSearchInput.builder().decisionDate(start).decisionDateEnd(end).build();
     assertThat(extractDocumentNumbersFromSearchCall(searchInput))
@@ -568,7 +563,7 @@ class DocumentationUnitIntegrationTest {
             .documentNumberOrFileNumber("abc")
             .courtType("MNO")
             .courtLocation("Hamburg")
-            .decisionDate(decisionDates.get(0).atStartOfDay(ZoneId.of("Europe/Berlin")).toInstant())
+            .decisionDate(decisionDates.get(0))
             .status(DocumentUnitStatus.builder().publicationStatus(PUBLISHED).build())
             .build();
 

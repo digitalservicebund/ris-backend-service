@@ -16,8 +16,6 @@ import de.bund.digitalservice.ris.caselaw.domain.LegalEffect;
 import de.bund.digitalservice.ris.caselaw.domain.Texts;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.court.Court;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
-import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -91,7 +89,7 @@ public class DocumentationUnitTransformer {
       builder
           .ecli(coreData.ecli())
           .judicialBody(coreData.appraisalBody())
-          .decisionDate(LocalDate.ofInstant(coreData.decisionDate(), ZoneId.of("Europe/Berlin")))
+          .decisionDate(coreData.decisionDate())
           .inputType(coreData.inputType());
       // TODO documentationOffice
       // TODO court
@@ -204,10 +202,7 @@ public class DocumentationUnitTransformer {
             .decisionDate(
                 documentUnitMetadataDTO.getDecisionDate() == null
                     ? null
-                    : documentUnitMetadataDTO
-                        .getDecisionDate()
-                        .atStartOfDay(ZoneId.of("Europe/Berlin"))
-                        .toInstant())
+                    : documentUnitMetadataDTO.getDecisionDate())
             // .legalEffect(documentUnitMetadataDTO.getLegalEffect())
             .inputType(documentUnitMetadataDTO.getInputType())
             //            .documentationOffice(
@@ -334,10 +329,7 @@ public class DocumentationUnitTransformer {
             .decisionDate(
                 documentationUnitDTO.getDecisionDate() == null
                     ? null
-                    : documentationUnitDTO
-                        .getDecisionDate()
-                        .atStartOfDay(ZoneId.of("Europe/Berlin"))
-                        .toInstant())
+                    : documentationUnitDTO.getDecisionDate())
             // .deviatingDecisionDates(deviatingDecisionDates)
             // .legalEffect(documentationUnitDTO.getLegalEffect())
             .inputType(documentationUnitDTO.getInputType())

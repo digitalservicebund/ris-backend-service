@@ -116,7 +116,7 @@ describe("DivergentExpirationDefinedInputGroup", () => {
     await rerender({ modelValue })
 
     expect(modelValue).toEqual({
-      DATE: ["2020-05-12T00:00:00.000Z"],
+      DATE: ["2020-05-12"],
       NORM_CATEGORY: [
         NormCategory.AMENDMENT_NORM,
         NormCategory.BASE_NORM,
@@ -128,7 +128,7 @@ describe("DivergentExpirationDefinedInputGroup", () => {
   it("should change the modelvalue when clearing the input", async () => {
     const user = userEvent.setup()
     let modelValue: Metadata = {
-      DATE: ["2020-05-12T00:00:00.000Z"],
+      DATE: ["2020-05-12"],
       NORM_CATEGORY: [
         NormCategory.AMENDMENT_NORM,
         NormCategory.BASE_NORM,

@@ -129,7 +129,7 @@ class PublishDocumentUnitIntegrationTest {
             .documentationOfficeId(docOfficeUuid)
             .documentnumber("docnr12345678")
             .creationtimestamp(Instant.now())
-            .decisionDate(Instant.now())
+            .decisionDate(LocalDate.now())
             .build();
     DocumentUnitDTO savedDocumentUnitDTO = repository.save(documentUnitDTO).block();
 

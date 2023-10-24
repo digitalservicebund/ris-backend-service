@@ -14,6 +14,7 @@ import de.bund.digitalservice.ris.caselaw.domain.docx.Docx2Html;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.nio.ByteBuffer;
+import java.time.LocalDate;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
@@ -101,8 +102,8 @@ public class DocumentUnitController {
           Optional<String> documentNumberOrFileNumber,
       @RequestParam(value = "courtType") Optional<String> courtType,
       @RequestParam(value = "courtLocation") Optional<String> courtLocation,
-      @RequestParam(value = "decisionDate") Optional<String> decisionDate,
-      @RequestParam(value = "decisionDateEnd") Optional<String> decisionDateEnd,
+      @RequestParam(value = "decisionDate") Optional<LocalDate> decisionDate,
+      @RequestParam(value = "decisionDateEnd") Optional<LocalDate> decisionDateEnd,
       @RequestParam(value = "publicationStatus") Optional<String> publicationStatus,
       @RequestParam(value = "withError") Optional<Boolean> withError,
       @RequestParam(value = "myDocOfficeOnly") Optional<Boolean> myDocOfficeOnly,
