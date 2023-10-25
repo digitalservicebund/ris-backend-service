@@ -90,7 +90,7 @@ public class FieldOfLawDTO {
   @Builder.Default
   private Set<FieldOfLawDTO> fieldOfLawTextReferences = new HashSet<>();
 
-  @Column(nullable = false, updatable = false)
+  @Column(nullable = false, updatable = false, name = "juris_id")
   @ToString.Include
   @NotNull
   private Integer jurisId;
