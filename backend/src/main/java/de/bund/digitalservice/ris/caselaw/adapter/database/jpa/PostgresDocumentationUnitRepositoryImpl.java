@@ -123,6 +123,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
       return null;
     }
 
+    // TODO cache category at application start
     DocumentTypeDTO docTypeDTO =
         databaseDocumentTypeRepository.findFirstByAbbreviationAndCategory(
             documentType.jurisShortcut(), databaseDocumentCategoryRepository.findFirstByLabel("R"));

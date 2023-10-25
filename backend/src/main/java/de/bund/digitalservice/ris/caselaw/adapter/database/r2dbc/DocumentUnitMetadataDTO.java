@@ -17,6 +17,10 @@ import org.springframework.data.annotation.Transient;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
+/**
+ * @deprecated use {@link
+ *     de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitMetadataDTO} instead
+ */
 @Data
 @SuperBuilder(toBuilder = true)
 @NoArgsConstructor

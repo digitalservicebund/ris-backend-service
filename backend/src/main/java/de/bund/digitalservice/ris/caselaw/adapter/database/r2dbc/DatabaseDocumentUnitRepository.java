@@ -6,6 +6,11 @@ import org.springframework.data.r2dbc.repository.R2dbcRepository;
 import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Mono;
 
+/**
+ * @deprecated use {@link
+ *     de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository}
+ *     instead
+ */
 @Repository
 @Deprecated
 public interface DatabaseDocumentUnitRepository extends R2dbcRepository<DocumentUnitDTO, Long> {

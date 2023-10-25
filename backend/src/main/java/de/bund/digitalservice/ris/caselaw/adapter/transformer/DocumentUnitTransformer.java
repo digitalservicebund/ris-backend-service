@@ -28,6 +28,9 @@ import java.util.List;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * @deprecated use {@link DocumentationUnitTransformer} instead
+ */
 @Slf4j
 @Deprecated
 public class DocumentUnitTransformer {

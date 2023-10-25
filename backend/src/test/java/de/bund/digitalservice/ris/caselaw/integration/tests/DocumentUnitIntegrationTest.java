@@ -87,6 +87,9 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import software.amazon.awssdk.services.s3.S3AsyncClient;
 
+/**
+ * @deprecated use {@link DocumentationUnitIntegrationTest} instead
+ */
 @RISIntegrationTest(
     imports = {
       DocumentUnitService.class,
@@ -102,6 +105,7 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
       TestConfig.class
     },
     controllers = {DocumentUnitController.class})
+@Deprecated
 class DocumentUnitIntegrationTest {
   @Container
   static PostgreSQLContainer<?> postgreSQLContainer =

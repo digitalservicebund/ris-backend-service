@@ -54,7 +54,7 @@ public class DocumentationUnitTransformer {
                             FileNumberDTO.builder()
                                 // TODO do we have to use the fileNumber repo instead?
                                 .value(fileNumber)
-                                .documentationUnit(currentDto) // TODO reference needed?
+                                .documentationUnit(currentDto)
                                 .build())
                     .collect(Collectors.toSet()))
             .normReferences(

@@ -18,7 +18,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity(name = "procedure")
-@Deprecated
 public class ProcedureDTO {
   @Id @GeneratedValue private UUID id;
 

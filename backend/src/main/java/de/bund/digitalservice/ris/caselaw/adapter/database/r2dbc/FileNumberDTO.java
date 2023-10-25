@@ -7,6 +7,10 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Table;
 
+/**
+ * @deprecated use {@link de.bund.digitalservice.ris.caselaw.adapter.database.jpa.FileNumberDTO}
+ *     instead
+ */
 @Data
 @Builder
 @NoArgsConstructor
