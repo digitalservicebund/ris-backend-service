@@ -418,7 +418,7 @@ class DocumentUnitIntegrationTest {
             .documentNumber(dto.getDocumentnumber())
             .coreData(
                 CoreData.builder()
-                    .incorrectCourts(
+                    .deviatingCourts(
                         List.of("incorrectCourt1", "incorrectCourt3", "incorrectCourt4"))
                     .documentationOffice(docOffice)
                     .build())
@@ -439,8 +439,8 @@ class DocumentUnitIntegrationTest {
               assertThat(response.getResponseBody()).isNotNull();
               assertThat(response.getResponseBody().documentNumber()).isEqualTo("1234567890123");
               assertThat(response.getResponseBody().coreData()).isNotNull();
-              assertThat(response.getResponseBody().coreData().incorrectCourts()).hasSize(3);
-              assertThat(response.getResponseBody().coreData().incorrectCourts())
+              assertThat(response.getResponseBody().coreData().deviatingCourts()).hasSize(3);
+              assertThat(response.getResponseBody().coreData().deviatingCourts())
                   .containsExactly("incorrectCourt1", "incorrectCourt3", "incorrectCourt4");
             });
 

@@ -862,7 +862,7 @@ class ActiveCitationIntegrationTest {
                 .documentType(
                     DocumentType.builder().jurisShortcut("abbreviation0").label("R").build())
                 .decisionDate(LocalDate.ofInstant(DECISION_DATE, ZoneId.of("Europe/Berlin")))
-                .incorrectCourts(Collections.emptyList())
+                .deviatingCourts(Collections.emptyList())
                 .documentationOffice(AuthUtils.buildDefaultDocOffice())
                 .build())
         .texts(Texts.builder().build())

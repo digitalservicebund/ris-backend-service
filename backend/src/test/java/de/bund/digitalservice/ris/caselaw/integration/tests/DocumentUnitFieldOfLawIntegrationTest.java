@@ -10,7 +10,6 @@ import de.bund.digitalservice.ris.caselaw.TestConfig;
 import de.bund.digitalservice.ris.caselaw.adapter.AuthService;
 import de.bund.digitalservice.ris.caselaw.adapter.ContentRelatedIndexingController;
 import de.bund.digitalservice.ris.caselaw.adapter.FieldOfLawService;
-import de.bund.digitalservice.ris.caselaw.adapter.KeywordService;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationOfficeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentUnitFieldsOfLawRepository;
@@ -19,7 +18,6 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitDTO
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitFieldsOfLawDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.PostgresDocumentUnitRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.PostgresFieldOfLawRepositoryImpl;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.PostgresKeywordRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DatabaseFieldOfLawRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.FieldOfLawDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentUnitTransformer;
@@ -48,13 +46,11 @@ import reactor.test.StepVerifier;
 
 @RISIntegrationTest(
     imports = {
-      KeywordService.class,
       FieldOfLawService.class,
       FlywayConfig.class,
       PostgresConfig.class,
       PostgresJPAConfig.class,
       PostgresDocumentUnitRepositoryImpl.class,
-      PostgresKeywordRepositoryImpl.class,
       PostgresFieldOfLawRepositoryImpl.class,
       SecurityConfig.class,
       AuthService.class,

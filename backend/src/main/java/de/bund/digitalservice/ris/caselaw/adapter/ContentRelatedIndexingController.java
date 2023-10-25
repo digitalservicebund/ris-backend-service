@@ -19,12 +19,9 @@ import reactor.core.publisher.Mono;
 @Tag(name = OpenApiConfiguration.CASELAW_TAG)
 public class ContentRelatedIndexingController {
   private final FieldOfLawService fieldOfLawService;
-  private final KeywordService keywordService;
 
-  public ContentRelatedIndexingController(
-      FieldOfLawService fieldOfLawService, KeywordService keywordService) {
+  public ContentRelatedIndexingController(FieldOfLawService fieldOfLawService) {
     this.fieldOfLawService = fieldOfLawService;
-    this.keywordService = keywordService;
   }
 
   @GetMapping("fieldsoflaw")
@@ -47,27 +44,5 @@ public class ContentRelatedIndexingController {
       @PathVariable("uuid") UUID documentUnitUuid, @PathVariable("identifier") String identifier) {
 
     return fieldOfLawService.removeFieldOfLawToDocumentUnit(documentUnitUuid, identifier);
-  }
-
-  @GetMapping("keywords")
-  @PreAuthorize("@userHasReadAccessByDocumentUnitUuid.apply(#documentUnitUuid)")
-  public Mono<List<String>> getKeywords(@PathVariable("uuid") UUID documentUnitUuid) {
-    return keywordService.getKeywordsForDocumentUnit(documentUnitUuid);
-  }
-
-  @PutMapping("keywords/{keyword}")
-  @PreAuthorize("@userHasWriteAccessByDocumentUnitUuid.apply(#documentUnitUuid)")
-  public Mono<List<String>> addKeyword(
-      @PathVariable("uuid") UUID documentUnitUuid, @PathVariable("keyword") String keyword) {
-
-    return keywordService.addKeywordToDocumentUnit(documentUnitUuid, keyword);
-  }
-
-  @DeleteMapping("keywords/{keyword}")
-  @PreAuthorize("@userHasWriteAccessByDocumentUnitUuid.apply(#documentUnitUuid)")
-  public Mono<List<String>> deleteKeyword(
-      @PathVariable("uuid") UUID documentUnitUuid, @PathVariable("keyword") String keyword) {
-
-    return keywordService.deleteKeywordFromDocumentUnit(documentUnitUuid, keyword);
   }
 }

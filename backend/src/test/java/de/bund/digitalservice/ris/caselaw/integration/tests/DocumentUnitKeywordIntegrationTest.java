@@ -10,16 +10,14 @@ import de.bund.digitalservice.ris.caselaw.TestConfig;
 import de.bund.digitalservice.ris.caselaw.adapter.AuthService;
 import de.bund.digitalservice.ris.caselaw.adapter.ContentRelatedIndexingController;
 import de.bund.digitalservice.ris.caselaw.adapter.FieldOfLawService;
-import de.bund.digitalservice.ris.caselaw.adapter.KeywordService;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationOfficeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentationUnitRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentUnitRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseKeywordRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.KeywordDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.PostgresDocumentUnitRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.PostgresFieldOfLawRepositoryImpl;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.PostgresKeywordRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentUnitTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationOfficeTransformer;
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
@@ -45,13 +43,11 @@ import reactor.core.publisher.Mono;
 
 @RISIntegrationTest(
     imports = {
-      KeywordService.class,
       FieldOfLawService.class,
       FlywayConfig.class,
       PostgresConfig.class,
       PostgresJPAConfig.class,
-      PostgresDocumentUnitRepositoryImpl.class,
-      PostgresKeywordRepositoryImpl.class,
+      PostgresDocumentationUnitRepositoryImpl.class,
       PostgresFieldOfLawRepositoryImpl.class,
       SecurityConfig.class,
       AuthService.class,
@@ -119,7 +115,7 @@ class DocumentUnitKeywordIntegrationTest {
     risWebTestClient
         .withDefaultLogin()
         .get()
-        .uri("/api/v1/caselaw/documentunits/" + TEST_UUID + "/contentrelatedindexing/keywords")
+        .uri("/api/v1/caselaw/documentunits/" + TEST_UUID)
         .exchange()
         .expectStatus()
         .isOk()

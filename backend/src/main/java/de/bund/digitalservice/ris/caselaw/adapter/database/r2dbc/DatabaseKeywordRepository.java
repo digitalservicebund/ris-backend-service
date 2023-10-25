@@ -6,6 +6,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Repository
+@Deprecated
 public interface DatabaseKeywordRepository extends R2dbcRepository<KeywordDTO, Long> {
   Flux<KeywordDTO> findAllByDocumentUnitIdOrderById(Long documentUnitId);
 
