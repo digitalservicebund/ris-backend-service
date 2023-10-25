@@ -46,7 +46,7 @@ public class SecurityConfig {
                 headers.contentSecurityPolicy(
                     customizer ->
                         customizer.policyDirectives(
-                            "default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'")))
+                            "default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; object-src 'none'")))
         .oauth2ResourceServer(jwtCustomizer -> jwtCustomizer.jwt(Customizer.withDefaults()))
         .build();
   }
