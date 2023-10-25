@@ -175,7 +175,8 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
   public Mono<DocumentUnit> createNewDocumentUnit(
       String documentNumber, DocumentationOffice documentationOffice) {
 
-    return Mono.just(documentationOfficeRepository.findByLabel(documentationOffice.label()))
+    return Mono.just(
+            documentationOfficeRepository.findByAbbreviation(documentationOffice.abbreviation()))
         .flatMap(
             documentationOfficeDTO ->
                 metadataRepository.save(
@@ -753,7 +754,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
   private Mono<DocumentUnitDTO> saveProcedure(
       DocumentUnitDTO documentUnitDTO, DocumentUnit documentUnit) {
 
-    String documentationOfficeLabel = documentUnit.coreData().documentationOffice().label();
+    String documentationOfficeLabel = documentUnit.coreData().documentationOffice().abbreviation();
     Optional.ofNullable(documentUnit.coreData().procedure())
         .map(procedure -> findOrCreateProcedure(procedure, documentationOfficeLabel))
         .ifPresent(
@@ -775,7 +776,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
 
   private ProcedureDTO findOrCreateProcedure(Procedure procedure, String documentationOfficeLabel) {
     DocumentationOfficeDTO documentationOfficeDTO =
-        documentationOfficeRepository.findByLabel(documentationOfficeLabel);
+        documentationOfficeRepository.findByAbbreviation(documentationOfficeLabel);
 
     return Optional.ofNullable(
             procedureRepository.findByLabelAndDocumentationOffice(
@@ -1291,7 +1292,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
     }
 
     DocumentationOfficeDTO documentationOfficeDTO =
-        documentationOfficeRepository.findByLabel(documentationOffice.label());
+        documentationOfficeRepository.findByAbbreviation(documentationOffice.abbreviation());
 
     CriteriaBuilder builder = entityManager.getCriteriaBuilder();
     CriteriaQuery<DocumentationUnitSearchEntryDTO> query =

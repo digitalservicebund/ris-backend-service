@@ -138,8 +138,7 @@ class JurisXmlExporterWrapperIntegrationTest {
             .decisionDate(LocalDate.parse("2021-01-01T00:00:00Z"))
             .legalEffect("legalEffect")
             .inputType("inputType")
-            .documentationOffice(
-                DocumentationOffice.builder().label("fooOffice").label("FO").build())
+            .documentationOffice(DocumentationOffice.builder().abbreviation("fooOffice").build())
             .region("region")
             .build();
     Texts texts =

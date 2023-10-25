@@ -17,6 +17,7 @@ import jakarta.persistence.OneToOne;
 import jakarta.persistence.PrimaryKeyJoinColumn;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
@@ -127,6 +128,11 @@ public class DocumentationUnitDTO {
   @Column(name = "legal_effect")
   @Enumerated(EnumType.STRING)
   private LegalEffectDTO legalEffect;
+
+  @ManyToOne(optional = false)
+  @NotNull
+  @JoinColumn(name = "documentation_office_id", referencedColumnName = "id")
+  private DocumentationOfficeDTO documentationOffice;
 
   public void setOriginalFileDocument(OriginalFileDocumentDTO originalFileDocument) {
     if (originalFileDocument != null) {

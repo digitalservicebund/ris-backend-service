@@ -65,11 +65,11 @@ public class KeycloakUserService implements UserService {
             .map(documentationCenterClaims::get)
             .orElse(null);
 
-    return Optional.ofNullable(documentationOfficeRepository.findByLabel(documentationOfficeKey))
+    return Optional.ofNullable(
+            documentationOfficeRepository.findByAbbreviation(documentationOfficeKey))
         .map(
             documentationOfficeDTO ->
                 DocumentationOffice.builder()
-                    .label(documentationOfficeDTO.getLabel())
                     .abbreviation(documentationOfficeDTO.getAbbreviation())
                     .build())
         .map(Mono::just)

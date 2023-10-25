@@ -83,7 +83,7 @@ public class DocumentUnitService {
         .flatMap(documentNumberService::generateNextDocumentNumber)
         .flatMap(
             documentNumber -> repository.createNewDocumentUnit(documentNumber, documentationOffice))
-        .flatMap(documentUnitStatusService::setInitialStatus)
+        // .flatMap(documentUnitStatusService::setInitialStatus)
         .retryWhen(Retry.backoff(5, Duration.ofSeconds(2)).jitter(0.75))
         .doOnError(ex -> log.error("Couldn't create empty doc unit", ex));
   }

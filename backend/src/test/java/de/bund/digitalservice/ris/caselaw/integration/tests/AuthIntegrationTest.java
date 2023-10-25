@@ -65,7 +65,7 @@ class AuthIntegrationTest {
         .consumeWith(
             response -> {
               assertThat(response.getResponseBody().name()).isEqualTo("testUser");
-              assertThat(response.getResponseBody().documentationOffice().label())
+              assertThat(response.getResponseBody().documentationOffice().abbreviation())
                   .isEqualTo("DigitalService");
             });
   }
@@ -84,7 +84,7 @@ class AuthIntegrationTest {
             response -> {
               assertThat(response.getResponseBody()).isNotNull();
               assertThat(response.getResponseBody().name()).isEqualTo("testUser");
-              assertThat(response.getResponseBody().documentationOffice().label())
+              assertThat(response.getResponseBody().documentationOffice().abbreviation())
                   .isEqualTo("CC-RIS");
             });
   }

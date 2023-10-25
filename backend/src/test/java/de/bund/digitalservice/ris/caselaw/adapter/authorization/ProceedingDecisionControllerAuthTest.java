@@ -44,8 +44,8 @@ class ProceedingDecisionControllerAuthTest {
   private static final UUID CHILD_UUID = UUID.fromString("99999999-5555-5555-5555-232323232323");
   private final String docOffice1Group = "/CC-RIS";
   private final String docOffice2Group = "/caselaw/BGH";
-  private final DocumentationOffice docOffice1 = buildDocOffice("CC-RIS", "XX");
-  private final DocumentationOffice docOffice2 = buildDocOffice("BGH", "CO");
+  private final DocumentationOffice docOffice1 = buildDocOffice("CC-RIS");
+  private final DocumentationOffice docOffice2 = buildDocOffice("BGH");
 
   @BeforeEach
   void setUp() {

@@ -80,7 +80,8 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
   public Mono<DocumentUnit> createNewDocumentUnit(
       String documentNumber, DocumentationOffice documentationOffice) {
 
-    return Mono.just(documentationOfficeRepository.findByLabel(documentationOffice.label()))
+    return Mono.just(
+            documentationOfficeRepository.findByAbbreviation(documentationOffice.abbreviation()))
         .flatMap(
             documentationOfficeDTO ->
                 Mono.just(
@@ -88,8 +89,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
                         DocumentationUnitDTO.builder()
                             .id(UUID.randomUUID())
                             .documentNumber(documentNumber)
-                            // .documentationOfficeId(documentationOfficeDTO.getId())
-                            // .documentationOffice(documentationOfficeDTO)
+                            .documentationOffice(documentationOfficeDTO)
                             // TODO is decisionDate = null the same as dateKnown? .dateKnown(true)
                             .legalEffect(LegalEffectDTO.KEINE_ANGABE)
                             .build())))

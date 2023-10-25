@@ -104,7 +104,8 @@ class SaveNormIntegrationTest {
 
   @BeforeEach
   void setUp() {
-    documentationOfficeUuid = documentationOfficeRepository.findByLabel(docOffice.label()).getId();
+    documentationOfficeUuid =
+        documentationOfficeRepository.findByAbbreviation(docOffice.abbreviation()).getId();
 
     doReturn(Mono.just(docOffice))
         .when(userService)

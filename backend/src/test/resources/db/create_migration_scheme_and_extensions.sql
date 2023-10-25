@@ -176,3 +176,18 @@ CREATE TABLE IF NOT EXISTS
     region_id uuid NOT NULL,
     CONSTRAINT documentation_unit_region_pkey PRIMARY KEY (documentation_unit_id, region_id)
   );
+
+CREATE TABLE IF NOT EXISTS
+  incremental_migration.documentation_office (
+    id UUID PRIMARY KEY,
+    abbreviation VARCHAR(20) CONSTRAINT uc_documentation_office_abbreviation UNIQUE
+  );
+
+INSERT INTO
+  incremental_migration.documentation_office (id, abbreviation)
+VALUES
+  ('41e62dbc-e5b6-414f-91e2-0cfe559447d1', 'BGH'),
+  (
+    'ba90a851-3c54-4858-b4fa-7742ffbe8f05',
+    'DigitalService'
+  );

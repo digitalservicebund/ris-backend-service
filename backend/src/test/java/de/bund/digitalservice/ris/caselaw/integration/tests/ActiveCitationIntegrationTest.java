@@ -121,9 +121,9 @@ class ActiveCitationIntegrationTest {
   @BeforeEach
   void setUp() {
     when(userService.getDocumentationOffice(any(OidcUser.class)))
-        .thenReturn(Mono.just(AuthUtils.buildDocOffice("DigitalService", "XX")));
+        .thenReturn(Mono.just(AuthUtils.buildDocOffice("DigitalService")));
 
-    docOfficeUuid = documentationOfficeRepository.findByLabel("DigitalService").getId();
+    docOfficeUuid = documentationOfficeRepository.findByAbbreviation("DigitalService").getId();
 
     category = databaseDocumentCategoryRepository.findFirstByLabel("R");
     if (category == null) {

@@ -126,7 +126,8 @@ class ProceedingDecisionIntegrationTest {
 
   @BeforeEach
   void setUp() {
-    documentationOfficeUuid = documentationOfficeRepository.findByLabel(docOffice.label()).getId();
+    documentationOfficeUuid =
+        documentationOfficeRepository.findByAbbreviation(docOffice.abbreviation()).getId();
     doReturn(Mono.just(docOffice)).when(userService).getDocumentationOffice(any(OidcUser.class));
     category =
         databaseDocumentCategoryRepository.saveAndFlush(
@@ -806,7 +807,7 @@ class ProceedingDecisionIntegrationTest {
     }
 
     DocumentationOfficeDTO documentOffice =
-        documentationOfficeRepository.findByLabel(documentOfficeLabel);
+        documentationOfficeRepository.findByAbbreviation(documentOfficeLabel);
     assertThat(documentOffice).isNotNull();
 
     DocumentUnitMetadataDTO documentUnitMetadataDTO =

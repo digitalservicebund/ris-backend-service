@@ -3,4 +3,4 @@ package de.bund.digitalservice.ris.caselaw.domain;
 import lombok.Builder;
 
 @Builder
-public record DocumentationOffice(String label, String abbreviation) {}
+public record DocumentationOffice(String abbreviation) {}

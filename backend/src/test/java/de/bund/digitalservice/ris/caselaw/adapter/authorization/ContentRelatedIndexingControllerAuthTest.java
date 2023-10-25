@@ -46,8 +46,8 @@ class ContentRelatedIndexingControllerAuthTest {
   private static final UUID TEST_UUID = UUID.fromString("88888888-4444-4444-4444-121212121212");
   private final String docOffice1Group = "/CC-RIS";
   private final String docOffice2Group = "/caselaw/BGH";
-  private final DocumentationOffice docOffice1 = buildDocOffice("CC-RIS", "XX");
-  private final DocumentationOffice docOffice2 = buildDocOffice("BGH", "CO");
+  private final DocumentationOffice docOffice1 = buildDocOffice("CC-RIS");
+  private final DocumentationOffice docOffice2 = buildDocOffice("BGH");
 
   @BeforeEach
   void setUp() {

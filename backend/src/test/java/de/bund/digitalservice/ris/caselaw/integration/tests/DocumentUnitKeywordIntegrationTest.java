@@ -87,7 +87,7 @@ class DocumentUnitKeywordIntegrationTest {
 
   @BeforeEach
   void setUp() {
-    docOfficeDTO = documentationOfficeRepository.findByLabel("DigitalService");
+    docOfficeDTO = documentationOfficeRepository.findByAbbreviation("DigitalService");
 
     doReturn(Mono.just(DocumentationOfficeTransformer.transformDTO(docOfficeDTO)))
         .when(userService)

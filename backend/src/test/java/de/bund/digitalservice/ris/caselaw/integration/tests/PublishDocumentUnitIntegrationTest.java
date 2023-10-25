@@ -109,7 +109,7 @@ class PublishDocumentUnitIntegrationTest {
 
   @BeforeEach
   void setUp() {
-    docOfficeUuid = documentationOfficeRepository.findByLabel("DigitalService").getId();
+    docOfficeUuid = documentationOfficeRepository.findByAbbreviation("DigitalService").getId();
   }
 
   @AfterEach

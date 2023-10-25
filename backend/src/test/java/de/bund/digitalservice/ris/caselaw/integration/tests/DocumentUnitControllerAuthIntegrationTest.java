@@ -133,8 +133,8 @@ class DocumentUnitControllerAuthIntegrationTest {
   @BeforeEach
   void setUp() {
     // created via db migration V0_79__caselaw_insert_default_documentation_offices
-    UUID docOffice1Id = documentationOfficeRepository.findByLabel("CC-RIS").getId();
-    UUID docOffice2Id = documentationOfficeRepository.findByLabel("BGH").getId();
+    UUID docOffice1Id = documentationOfficeRepository.findByAbbreviation("CC-RIS").getId();
+    UUID docOffice2Id = documentationOfficeRepository.findByAbbreviation("BGH").getId();
 
     officeIdMap.put("CC-RIS", docOffice1Id);
     officeIdMap.put("BGH", docOffice2Id);

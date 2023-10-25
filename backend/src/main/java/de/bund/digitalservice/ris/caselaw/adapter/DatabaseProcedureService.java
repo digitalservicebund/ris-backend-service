@@ -40,7 +40,9 @@ public class DatabaseProcedureService implements ProcedureService {
       Optional<String> query, DocumentationOffice documentationOffice, Pageable pageable) {
     return repository
         .findByLabelContainingAndDocumentationOffice(
-            query, documentationOfficeRepository.findByLabel(documentationOffice.label()), pageable)
+            query,
+            documentationOfficeRepository.findByAbbreviation(documentationOffice.abbreviation()),
+            pageable)
         .map(
             dto ->
                 Procedure.builder()
@@ -59,7 +61,8 @@ public class DatabaseProcedureService implements ProcedureService {
             repository
                 .findByLabelAndDocumentationOffice(
                     procedureLabel,
-                    documentationOfficeRepository.findByLabel(documentationOffice.label()))
+                    documentationOfficeRepository.findByAbbreviation(
+                        documentationOffice.abbreviation()))
                 .getId())
         .stream()
         .map(ProcedureLinkDTO::getDocumentationUnitId)
@@ -74,6 +77,7 @@ public class DatabaseProcedureService implements ProcedureService {
   @Transactional(transactionManager = "jpaTransactionManager")
   public void delete(String procedureLabel, DocumentationOffice documentationOffice) {
     repository.deleteByLabelAndDocumentationOffice(
-        procedureLabel, documentationOfficeRepository.findByLabel(documentationOffice.label()));
+        procedureLabel,
+        documentationOfficeRepository.findByAbbreviation(documentationOffice.abbreviation()));
   }
 }

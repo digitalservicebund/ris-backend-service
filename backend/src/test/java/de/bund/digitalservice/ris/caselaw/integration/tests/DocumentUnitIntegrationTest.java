@@ -149,7 +149,8 @@ class DocumentUnitIntegrationTest {
 
   @BeforeEach
   void setUp() {
-    documentationOfficeUuid = documentationOfficeRepository.findByLabel(docOffice.label()).getId();
+    documentationOfficeUuid =
+        documentationOfficeRepository.findByAbbreviation(docOffice.abbreviation()).getId();
 
     doReturn(Mono.just(docOffice))
         .when(userService)
@@ -284,10 +285,7 @@ class DocumentUnitIntegrationTest {
             .coreData(
                 CoreData.builder()
                     .documentationOffice(
-                        DocumentationOffice.builder()
-                            .label("DigitalService")
-                            .abbreviation("XX")
-                            .build())
+                        DocumentationOffice.builder().abbreviation("DigitalService").build())
                     .deviatingEclis(List.of("ecli123", "ecli456"))
                     .build())
             .texts(Texts.builder().decisionName("decisionName").build()) // TODO why is this needed?
@@ -978,9 +976,9 @@ class DocumentUnitIntegrationTest {
 
   @Test
   void testSearchByDocumentUnitSearchInput() {
-    DocumentationOffice otherDocOffice = buildDocOffice("BGH", "CO");
+    DocumentationOffice otherDocOffice = buildDocOffice("BGH");
     UUID otherDocOfficeUuid =
-        documentationOfficeRepository.findByLabel(otherDocOffice.label()).getId();
+        documentationOfficeRepository.findByAbbreviation(otherDocOffice.abbreviation()).getId();
 
     List<UUID> docOfficeIds =
         List.of(
