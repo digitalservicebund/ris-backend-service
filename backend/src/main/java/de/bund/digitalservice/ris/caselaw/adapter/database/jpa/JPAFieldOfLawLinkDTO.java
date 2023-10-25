@@ -15,6 +15,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity(name = "lookuptable_field_of_law_link")
+@Deprecated
 public class JPAFieldOfLawLinkDTO {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)

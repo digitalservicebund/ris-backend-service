@@ -16,6 +16,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity(name = "lookuptable_field_of_law_keyword")
+@Deprecated
 public class JPAKeywordDTO {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)

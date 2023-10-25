@@ -18,6 +18,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity(name = "lookuptable_field_of_law")
+@Deprecated
 public class JPAFieldOfLawDTO {
 
   @Id Long id;

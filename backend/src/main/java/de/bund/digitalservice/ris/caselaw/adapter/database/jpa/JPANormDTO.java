@@ -17,6 +17,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity(name = "lookuptable_field_of_law_norm")
+@Deprecated
 public class JPANormDTO {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
