@@ -14,7 +14,6 @@ import lombok.experimental.SuperBuilder;
 @Getter
 @NoArgsConstructor
 @DateKnownConstraint
-@Deprecated
 public class ActiveCitation extends LinkedDocumentationUnit {
   private CitationStyle citationStyle;
 

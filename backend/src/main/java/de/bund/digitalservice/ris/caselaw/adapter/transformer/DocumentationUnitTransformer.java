@@ -2,93 +2,117 @@ package de.bund.digitalservice.ris.caselaw.adapter.transformer;
 
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DecisionNameDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentTypeDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitMetadataDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.FileNumberDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LegalEffectDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.NormAbbreviationDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.NormReferenceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.OriginalFileDocumentDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ProcedureDTO;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitNorm;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
-import de.bund.digitalservice.ris.caselaw.domain.Procedure;
+import de.bund.digitalservice.ris.caselaw.domain.LegalEffect;
 import de.bund.digitalservice.ris.caselaw.domain.Texts;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.court.Court;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class DocumentationUnitTransformer {
   private DocumentationUnitTransformer() {}
 
-  public static DocumentationUnitDTO enrichDTO(
-      DocumentationUnitDTO documentUnitDTO, DocumentUnit documentUnit) {
+  public static DocumentationUnitDTO domainToDTO(
+      DocumentationUnitDTO currentDto, DocumentUnit updatedDomainObject) {
 
     if (log.isDebugEnabled()) {
-      log.debug("enrich database documentation unit '{}'", documentUnitDTO.getId());
+      log.debug("enrich database documentation unit '{}'", currentDto.getId());
     }
 
     OriginalFileDocumentDTO originalFileDocument =
         OriginalFileDocumentDTO.builder()
-            .extension(documentUnit.filetype())
-            .filename(documentUnit.filename())
-            .s3ObjectPath(documentUnit.s3path())
-            .uploadTimestamp(documentUnit.fileuploadtimestamp())
+            .extension(updatedDomainObject.filetype())
+            .filename(updatedDomainObject.filename())
+            .s3ObjectPath(updatedDomainObject.s3path())
+            .uploadTimestamp(updatedDomainObject.fileuploadtimestamp())
             .build();
 
     DocumentationUnitDTO.DocumentationUnitDTOBuilder builder =
-        documentUnitDTO.toBuilder()
-            .id(documentUnit.uuid())
-            .documentNumber(documentUnit.documentNumber())
-            .originalFileDocument(originalFileDocument);
+        currentDto.toBuilder()
+            .id(updatedDomainObject.uuid())
+            .documentNumber(updatedDomainObject.documentNumber())
+            .originalFileDocument(originalFileDocument)
+            .fileNumbers(
+                updatedDomainObject.coreData().fileNumbers().stream()
+                    .map(
+                        fileNumber ->
+                            FileNumberDTO.builder()
+                                // TODO do we have to use the fileNumber repo instead?
+                                .value(fileNumber)
+                                .documentationUnit(currentDto) // TODO reference needed?
+                                .build())
+                    .collect(Collectors.toSet()))
+            .normReferences(
+                updatedDomainObject.contentRelatedIndexing().norms().stream()
+                    .map(
+                        norm ->
+                            NormReferenceDTO.builder()
+                                // TODO do we have to use the normAbbreviation repo instead?
+                                .normAbbreviation(
+                                    NormAbbreviationDTO.builder()
+                                        .id(norm.normAbbreviation().id())
+                                        .build())
+                                .singleNorm(norm.singleNorm())
+                                .dateOfVersion(norm.dateOfVersion())
+                                .dateOfRelevance(norm.dateOfRelevance())
+                                .build())
+                    .collect(Collectors.toSet()));
+    var legalEffect =
+        LegalEffect.deriveLegalEffectFrom(
+            updatedDomainObject, hasCourtChanged(currentDto, updatedDomainObject));
 
-    if (documentUnit.coreData() != null) {
-      CoreData coreData = documentUnit.coreData();
+    LegalEffectDTO legalEffectDTO;
+    switch (legalEffect) {
+      case NO -> legalEffectDTO = LegalEffectDTO.NEIN;
+      case YES -> legalEffectDTO = LegalEffectDTO.JA;
+      case NOT_SPECIFIED -> legalEffectDTO = LegalEffectDTO.KEINE_ANGABE;
+      default -> legalEffectDTO = LegalEffectDTO.FALSCHE_ANGABE;
+    }
+    builder.legalEffect(legalEffectDTO);
+
+    if (updatedDomainObject.coreData() != null) {
+      CoreData coreData = updatedDomainObject.coreData();
 
       builder
           .ecli(coreData.ecli())
           .judicialBody(coreData.appraisalBody())
           .decisionDate(LocalDate.ofInstant(coreData.decisionDate(), ZoneId.of("Europe/Berlin")))
           .inputType(coreData.inputType());
-
-      //      if (coreData.documentationOffice() != null) {
-      //        builder.documentationOffice(
-      //            DocumentationOfficeTransformer.transform(coreData.documentationOffice()));
-      //      }
-
-      //      if (coreData.court() != null) {
-      //        builder
-      //            .courtType(documentUnit.coreData().court().type())
-      //            .courtLocation(coreData.court().location());
-      //      } else {
-      //        builder.courtType(null);
-      //        builder.courtLocation(null);
-      //      }
+      // TODO documentationOffice
+      // TODO court
     } else {
       builder.procedure(null).ecli(null).judicialBody(null).decisionDate(null).inputType(null)
-      // .documentationOffice(null)
-      // .courtType(null)
-      // .courtLocation(null)
+      // TODO documentationOffice
+      // TODO court
       ;
     }
 
-    if (documentUnitDTO.getId() == null
-        && documentUnit.proceedingDecisions() != null
-        && !documentUnit.proceedingDecisions().isEmpty()) {
+    if (currentDto.getId() == null
+        && updatedDomainObject.proceedingDecisions() != null
+        && !updatedDomainObject.proceedingDecisions().isEmpty()) {
 
       throw new DocumentUnitTransformerException(
           "Transformation of a document unit with previous decisions only allowed by update. "
               + "Document unit must have a database id!");
     }
 
-    if (documentUnit.texts() != null) {
-      Texts texts = documentUnit.texts();
+    if (updatedDomainObject.texts() != null) {
+      Texts texts = updatedDomainObject.texts();
 
       builder
           .decisionNames(Set.of(DecisionNameDTO.builder().value(texts.decisionName()).build()))
@@ -114,6 +138,19 @@ public class DocumentationUnitTransformer {
     return builder.build();
   }
 
+  private static boolean hasCourtChanged(
+      DocumentationUnitDTO documentUnitDTO, DocumentUnit documentUnit) {
+    return documentUnit == null
+        || documentUnit.coreData() == null
+        || documentUnit.coreData().court() == null
+    // TODO court
+    //        || !Objects.equals(documentUnitDTO.getCourtType(),
+    // documentUnit.coreData().court().type())
+    //        || !Objects.equals(
+    //            documentUnitDTO.getCourtLocation(), documentUnit.coreData().court().location()
+    ;
+  }
+
   public static Court getCourtObject(String courtType, String courtLocation) {
     if (log.isDebugEnabled()) {
       log.debug("get court object from '{}' and '{}", courtType, courtLocation);
@@ -126,22 +163,6 @@ public class DocumentationUnitTransformer {
     }
 
     return court;
-  }
-
-  static Procedure getProcedure(ProcedureDTO procedureDTO) {
-    return Optional.ofNullable(procedureDTO)
-        .map(dto -> Procedure.builder().label(dto.getLabel()).build())
-        .orElse(null);
-  }
-
-  private static DocumentationOffice getDocumentationOffice(
-      DocumentationOfficeDTO documentationOfficeDTO) {
-
-    if (documentationOfficeDTO == null) {
-      return null;
-    }
-
-    return DocumentationOfficeTransformer.transformDTO(documentationOfficeDTO);
   }
 
   public static DocumentUnit transformMetadataToDomain(

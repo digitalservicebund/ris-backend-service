@@ -2,8 +2,8 @@ package de.bund.digitalservice.ris.caselaw.adapter;
 
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentUnitStatusRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitStatusDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.PostgresDocumentUnitRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitRepository;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatus;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatusService;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
@@ -19,11 +19,11 @@ import reactor.core.publisher.Mono;
 public class DatabaseDocumentUnitStatusService implements DocumentUnitStatusService {
 
   private final DatabaseDocumentUnitStatusRepository repository;
-  private final PostgresDocumentUnitRepositoryImpl documentUnitRepository;
+  private final DocumentUnitRepository documentUnitRepository;
 
   public DatabaseDocumentUnitStatusService(
       DatabaseDocumentUnitStatusRepository repository,
-      PostgresDocumentUnitRepositoryImpl documentUnitRepository) {
+      DocumentUnitRepository documentUnitRepository) {
     this.repository = repository;
     this.documentUnitRepository = documentUnitRepository;
   }

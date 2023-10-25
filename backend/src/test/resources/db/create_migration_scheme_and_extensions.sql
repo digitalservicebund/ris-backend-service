@@ -150,6 +150,7 @@ CREATE TABLE IF NOT EXISTS
     outline text COLLATE pg_catalog."default",
     year_of_dispute character varying(32) COLLATE pg_catalog."default",
     duplicate_check boolean,
+    legal_effect character varying(255),
     CONSTRAINT documentation_unit_pkey PRIMARY KEY (id)
   );
 
