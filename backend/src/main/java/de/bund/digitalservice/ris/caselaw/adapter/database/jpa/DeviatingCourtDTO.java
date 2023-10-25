@@ -21,7 +21,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(schema = "incremental_migration")
+@Table(schema = "incremental_migration", name = "deviating_court")
 @IdClass(DeviatingCourtId.class)
 public class DeviatingCourtDTO {
 
@@ -30,7 +30,6 @@ public class DeviatingCourtDTO {
   @Id
   private String value;
 
-  // @ManyToOne @NotNull private DocumentationUnit documentationUnit;
   @Column(name = "documentation_unit_id")
   @Id
   private UUID documentationUnitId;

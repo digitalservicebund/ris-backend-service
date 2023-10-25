@@ -608,8 +608,8 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
             incorrectCourtDTOs -> {
               List<String> incorrectCourts = new ArrayList<>();
               if (documentUnit.coreData() != null
-                  && documentUnit.coreData().incorrectCourts() != null) {
-                incorrectCourts.addAll(documentUnit.coreData().incorrectCourts());
+                  && documentUnit.coreData().deviatingCourts() != null) {
+                incorrectCourts.addAll(documentUnit.coreData().deviatingCourts());
               }
 
               AtomicInteger incorrectCourtIndex = new AtomicInteger(0);

@@ -63,7 +63,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
     }
 
     return Mono.just(
-        DocumentationUnitTransformer.transformDTO(
+        DocumentationUnitTransformer.transformToDomain(
             repository.findByDocumentNumber(documentNumber).orElse(null)));
   }
 
@@ -73,7 +73,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
       log.debug("find by uuid: {}", uuid);
     }
     return Mono.just(
-        DocumentationUnitTransformer.transformDTO(repository.findById(uuid).orElse(null)));
+        DocumentationUnitTransformer.transformToDomain(repository.findById(uuid).orElse(null)));
   }
 
   @Override
@@ -93,7 +93,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
                             // TODO is decisionDate = null the same as dateKnown? .dateKnown(true)
                             .legalEffect(LegalEffectDTO.KEINE_ANGABE)
                             .build())))
-        .map(DocumentationUnitTransformer::transformDTO);
+        .map(DocumentationUnitTransformer::transformToDomain);
   }
 
   @Override
@@ -112,10 +112,10 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
     }
 
     documentationUnitDTO =
-        DocumentationUnitTransformer.domainToDTO(documentationUnitDTO, documentUnit);
+        DocumentationUnitTransformer.transformToDTO(documentationUnitDTO, documentUnit);
     documentationUnitDTO = repository.save(documentationUnitDTO);
 
-    return Mono.just(DocumentationUnitTransformer.transformDTO(documentationUnitDTO));
+    return Mono.just(DocumentationUnitTransformer.transformToDomain(documentationUnitDTO));
   }
 
   private DocumentTypeDTO getDbDocType(DocumentType documentType) {
@@ -147,7 +147,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
             .uploadTimestamp(Instant.now())
             .build());
     docUnitDto = repository.save(docUnitDto);
-    return Mono.just(DocumentationUnitTransformer.transformDTO(docUnitDto));
+    return Mono.just(DocumentationUnitTransformer.transformToDomain(docUnitDto));
   }
 
   @Override
@@ -155,7 +155,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
     var docUnitDto = repository.findById(documentUnitId).orElseThrow();
     docUnitDto.setOriginalFileDocument(null);
     docUnitDto = repository.save(docUnitDto);
-    return Mono.just(DocumentationUnitTransformer.transformDTO(docUnitDto));
+    return Mono.just(DocumentationUnitTransformer.transformToDomain(docUnitDto));
   }
 
   @Override

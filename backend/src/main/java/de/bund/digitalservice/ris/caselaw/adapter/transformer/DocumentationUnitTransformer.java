@@ -1,21 +1,30 @@
 package de.bund.digitalservice.ris.caselaw.adapter.transformer;
 
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DecisionNameDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DeviatingCourtDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DeviatingDateDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DeviatingEcliDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DeviatingFileNumberDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentTypeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitMetadataDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.FileNumberDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.KeywordDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LegalEffectDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.NormAbbreviationDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.NormReferenceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.OriginalFileDocumentDTO;
+import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
+import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing.ContentRelatedIndexingBuilder;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
+import de.bund.digitalservice.ris.caselaw.domain.CoreData.CoreDataBuilder;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitNorm;
 import de.bund.digitalservice.ris.caselaw.domain.LegalEffect;
 import de.bund.digitalservice.ris.caselaw.domain.Texts;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.court.Court;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -25,7 +34,7 @@ import lombok.extern.slf4j.Slf4j;
 public class DocumentationUnitTransformer {
   private DocumentationUnitTransformer() {}
 
-  public static DocumentationUnitDTO domainToDTO(
+  public static DocumentationUnitDTO transformToDTO(
       DocumentationUnitDTO currentDto, DocumentUnit updatedDomainObject) {
 
     if (log.isDebugEnabled()) {
@@ -85,12 +94,67 @@ public class DocumentationUnitTransformer {
 
     if (updatedDomainObject.coreData() != null) {
       CoreData coreData = updatedDomainObject.coreData();
-
       builder
           .ecli(coreData.ecli())
           .judicialBody(coreData.appraisalBody())
           .decisionDate(coreData.decisionDate())
           .inputType(coreData.inputType());
+
+      Set<DeviatingCourtDTO> deviatingCourtDTOs = null;
+      if (coreData.deviatingCourts() != null) {
+        List<String> deviatingCourts = coreData.deviatingCourts();
+        for (int i = 0; i < deviatingCourts.size(); i++) {
+          // Todo beginning the rank with 0 or 1?
+          deviatingCourtDTOs.add(
+              DeviatingCourtDTO.builder()
+                  .value(deviatingCourts.get(i))
+                  .rank(Long.valueOf(i))
+                  .build());
+        }
+        builder.deviatingCourts(deviatingCourtDTOs);
+      }
+
+      Set<DeviatingDateDTO> deviatingDateDTOs = null;
+      if (coreData.deviatingDecisionDates() != null) {
+        List<LocalDate> deviatingDecisionDates = coreData.deviatingDecisionDates();
+        for (int i = 0; i < deviatingDecisionDates.size(); i++) {
+          // Todo beginning the rank with 0 or 1?
+          deviatingDateDTOs.add(
+              DeviatingDateDTO.builder()
+                  .value(deviatingDecisionDates.get(i))
+                  .rank(Long.valueOf(i))
+                  .build());
+        }
+        builder.deviatingDates(deviatingDateDTOs);
+      }
+
+      Set<DeviatingFileNumberDTO> deviatingFileNumberDTOs = null;
+      if (coreData.deviatingFileNumbers() != null) {
+        List<String> deviatingFileNumbers = coreData.deviatingFileNumbers();
+        for (int i = 0; i < deviatingFileNumbers.size(); i++) {
+          // Todo beginning the rank with 0 or 1?
+          deviatingFileNumberDTOs.add(
+              DeviatingFileNumberDTO.builder()
+                  .value(deviatingFileNumbers.get(i))
+                  .rank(Long.valueOf(i))
+                  .build());
+        }
+        builder.deviatingFileNumbers(deviatingFileNumberDTOs);
+      }
+
+      Set<DeviatingEcliDTO> deviatingEcliDTOs = null;
+      if (coreData.deviatingEclis() != null) {
+        List<String> deviatingEclis = coreData.deviatingEclis();
+        for (int i = 0; i < deviatingEclis.size(); i++) {
+          // Todo beginning the rank with 0 or 1?
+          deviatingEcliDTOs.add(
+              DeviatingEcliDTO.builder()
+                  .value(deviatingEclis.get(i))
+                  .rank(Long.valueOf(i))
+                  .build());
+        }
+        builder.deviatingEclis(deviatingEcliDTOs);
+      }
       // TODO documentationOffice
       // TODO court
     } else {
@@ -98,6 +162,21 @@ public class DocumentationUnitTransformer {
       // TODO documentationOffice
       // TODO court
       ;
+    }
+
+    if (updatedDomainObject.contentRelatedIndexing() != null) {
+      ContentRelatedIndexing contentRelatedIndexing = updatedDomainObject.contentRelatedIndexing();
+
+      Set<KeywordDTO> keywordDTOs = null;
+      if (contentRelatedIndexing.keywords() != null) {
+        List<String> deviatingCourts = contentRelatedIndexing.keywords();
+        for (int i = 0; i < deviatingCourts.size(); i++) {
+          // Todo beginning the rank with 0 or 1?
+          keywordDTOs.add(
+              KeywordDTO.builder().value(deviatingCourts.get(i)).rank(Long.valueOf(i)).build());
+        }
+        builder.keywords(keywordDTOs);
+      }
     }
 
     if (currentDto.getId() == null
@@ -163,7 +242,7 @@ public class DocumentationUnitTransformer {
     return court;
   }
 
-  public static DocumentUnit transformMetadataToDomain(
+  public static DocumentUnit transformToMetadataToDomain(
       DocumentationUnitMetadataDTO documentUnitMetadataDTO) {
 
     if (log.isDebugEnabled()) {
@@ -223,7 +302,7 @@ public class DocumentationUnitTransformer {
         .build();
   }
 
-  public static DocumentUnit transformDTO(DocumentationUnitDTO documentationUnitDTO) {
+  public static DocumentUnit transformToDomain(DocumentationUnitDTO documentationUnitDTO) {
     if (log.isDebugEnabled()) {
       log.debug(
           "transfer database documentation unit '{}' to domain object",
@@ -234,11 +313,69 @@ public class DocumentationUnitTransformer {
       return DocumentUnit.builder().build();
     }
 
+    CoreDataBuilder coreDataBuilder =
+        CoreData.builder()
+            // .court(getCourtObject(documentationUnitDTO.getCourtType(),
+            // documentationUnitDTO.getCourtLocation()))
+            // .procedure(getProcedure(documentationUnitDTO.getProcedure()))
+            // .previousProcedures(documentationUnitDTO.getPreviousProcedures())
+            // .documentationOffice(getDocumentationOffice(documentationUnitDTO.getDocumentationOffice()))
+            // TODO multiple regions .region(documentationUnitDTO.getRegions())
+            .ecli(documentationUnitDTO.getEcli())
+            .decisionDate(documentationUnitDTO.getDecisionDate())
+            .appraisalBody(documentationUnitDTO.getJudicialBody())
+            .legalEffect(documentationUnitDTO.getLegalEffect().toString())
+            .inputType(documentationUnitDTO.getInputType());
+
+    List<String> fileNumbers = null;
+    if (documentationUnitDTO.getFileNumbers() != null) {
+      fileNumbers =
+          documentationUnitDTO.getFileNumbers().stream().map(FileNumberDTO::getValue).toList();
+      coreDataBuilder.fileNumbers(fileNumbers);
+    }
+
+    List<String> deviatingFileNumbers = null;
+    if (documentationUnitDTO.getDeviatingFileNumbers() != null) {
+      deviatingFileNumbers =
+          documentationUnitDTO.getDeviatingFileNumbers().stream()
+              .map(DeviatingFileNumberDTO::getValue)
+              .toList();
+      coreDataBuilder.deviatingFileNumbers(deviatingFileNumbers);
+    }
+
+    List<String> deviatingCourts = null;
+    if (documentationUnitDTO.getDeviatingCourts() != null) {
+      deviatingCourts =
+          documentationUnitDTO.getDeviatingCourts().stream()
+              .map(DeviatingCourtDTO::getValue)
+              .toList();
+      coreDataBuilder.deviatingCourts(deviatingCourts);
+    }
+
     DocumentType documentType = null;
     DocumentTypeDTO documentTypeDTO = documentationUnitDTO.getDocumentType();
     if (documentTypeDTO != null) {
       documentType =
           new DocumentType(documentTypeDTO.getAbbreviation(), documentTypeDTO.getLabel());
+      coreDataBuilder.documentType(documentType);
+    }
+
+    List<String> deviatingEclis = null;
+    if (documentationUnitDTO.getDeviatingEclis() != null) {
+      deviatingEclis =
+          documentationUnitDTO.getDeviatingEclis().stream()
+              .map(DeviatingEcliDTO::getValue)
+              .toList();
+      coreDataBuilder.deviatingEclis(deviatingEclis);
+    }
+
+    List<LocalDate> deviatingDecisionDates = null;
+    if (documentationUnitDTO.getDeviatingDates() != null) {
+      deviatingDecisionDates =
+          documentationUnitDTO.getDeviatingDates().stream()
+              .map(DeviatingDateDTO::getValue)
+              .toList();
+      coreDataBuilder.deviatingDecisionDates(deviatingDecisionDates);
     }
 
     //    List<ProceedingDecision> proceedingDecisions = null;
@@ -248,48 +385,17 @@ public class DocumentationUnitTransformer {
     //              .map(ProceedingDecisionTransformer::transformToDomain)
     //              .toList();
     //    }
-    //
-    //    List<ActiveCitation> activeCitations = null;
-    //    if (documentationUnitDTO.getActiveCitations() != null) {
-    //      activeCitations = documentationUnitDTO.getActiveCitations();
-    //    }
 
-    List<String> fileNumbers = null;
-    if (documentationUnitDTO.getFileNumbers() != null) {
-      fileNumbers =
-          documentationUnitDTO.getFileNumbers().stream().map(FileNumberDTO::getValue).toList();
+    CoreData coreData = coreDataBuilder.build();
+
+    ContentRelatedIndexingBuilder contentRelatedIndexingBuilder = ContentRelatedIndexing.builder();
+
+    List<String> keywords = null;
+    if (documentationUnitDTO.getKeywords() != null) {
+      keywords = documentationUnitDTO.getKeywords().stream().map(KeywordDTO::getValue).toList();
+      contentRelatedIndexingBuilder.keywords(keywords);
     }
 
-    //    List<String> deviatingFileNumbers = null;
-    //    if (documentationUnitDTO.getDeviatingFileNumbers() != null) {
-    //      deviatingFileNumbers =
-    //          documentationUnitDTO.getDeviatingFileNumbers().stream()
-    //              .map(FileNumberDTO::getFileNumber)
-    //              .toList();
-    //    }
-    //
-    //    List<String> deviatingEclis = null;
-    //    if (documentationUnitDTO.getDeviatingEclis() != null) {
-    //      deviatingEclis =
-    //
-    // documentationUnitDTO.getDeviatingEclis().stream().map(DeviatingEcliDTO::getEcli).toList();
-    //    }
-    //
-    //    List<Instant> deviatingDecisionDates = null;
-    //    if (documentationUnitDTO.getDeviatingDecisionDates() != null) {
-    //      deviatingDecisionDates =
-    //          documentationUnitDTO.getDeviatingDecisionDates().stream()
-    //              .map(DeviatingDecisionDateDTO::decisionDate)
-    //              .toList();
-    //    }
-    //
-    //    List<String> incorrectCourts = null;
-    //    if (documentationUnitDTO.getIncorrectCourts() != null) {
-    //      incorrectCourts =
-    //
-    // documentationUnitDTO.getIncorrectCourts().stream().map(IncorrectCourtDTO::court).toList();
-    //    }
-    //
     //    List<FieldOfLaw> fieldsOfLaw = null;
     //    if (documentationUnitDTO.getFieldsOfLaw() != null) {
     //      fieldsOfLaw =
@@ -304,38 +410,17 @@ public class DocumentationUnitTransformer {
           documentationUnitDTO.getNormReferences().stream()
               .map(DocumentUnitNormTransformer::transformToDomain)
               .toList();
+
+      contentRelatedIndexingBuilder.norms(norms);
     }
 
-    //    List<String> keywords = null;
-    //    if (documentationUnitDTO.getKeywords() != null) {
-    //      keywords =
-    // documentationUnitDTO.getKeywords().stream().map(KeywordDTO::keyword).toList();
+    //    List<ActiveCitation> activeCitations = null;
+    //    if (documentationUnitDTO.getActiveCitations() != null) {
+    //      activeCitations = documentationUnitDTO.getActiveCitations();
     //    }
 
-    CoreData coreData =
-        CoreData.builder()
-            .fileNumbers(fileNumbers)
-            //            .deviatingFileNumbers(deviatingFileNumbers)
-            //            .court(
-            //                getCourtObject(documentationUnitDTO.getCourtType(),
-            // documentationUnitDTO.getCourtLocation()))
-            //            .incorrectCourts(incorrectCourts)
-            .documentType(documentType)
-            // .procedure(getProcedure(documentationUnitDTO.getProcedure()))
-            //            .previousProcedures(documentationUnitDTO.getPreviousProcedures())
-            .ecli(documentationUnitDTO.getEcli())
-            //            .deviatingEclis(deviatingEclis)
-            .appraisalBody(documentationUnitDTO.getJudicialBody())
-            .decisionDate(
-                documentationUnitDTO.getDecisionDate() == null
-                    ? null
-                    : documentationUnitDTO.getDecisionDate())
-            // .deviatingDecisionDates(deviatingDecisionDates)
-            // .legalEffect(documentationUnitDTO.getLegalEffect())
-            .inputType(documentationUnitDTO.getInputType())
-            // .documentationOffice(getDocumentationOffice(documentationUnitDTO.getDocumentationOffice()))
-            // TODO multiple regions .region(documentationUnitDTO.getRegions())
-            .build();
+    ContentRelatedIndexing contentRelatedIndexing = contentRelatedIndexingBuilder.build();
+
     Texts texts =
         Texts.builder()
             // TODO multiple decisionNames
@@ -366,13 +451,8 @@ public class DocumentationUnitTransformer {
         // .proceedingDecisions(proceedingDecisions)
         .texts(texts)
         // .status(documentUnitDTO.getStatus())
-        //        .contentRelatedIndexing(
-        //            ContentRelatedIndexing.builder()
-        //                .keywords(keywords)
-        //                .fieldsOfLaw(fieldsOfLaw)
-        //                .norms(norms)
-        //                .activeCitations(activeCitations)
-        //                .build())
+        //        .contentRelatedIndexing(contentRelatedIndexing)
+        //
         .build();
   }
 }

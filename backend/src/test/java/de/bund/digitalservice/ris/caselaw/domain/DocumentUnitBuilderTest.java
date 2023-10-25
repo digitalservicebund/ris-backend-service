@@ -33,7 +33,7 @@ class DocumentUnitBuilderTest {
     documentUnitDTO.setOriginalFileDocument(
         OriginalFileDocumentDTO.builder().filename("doc.docx").build());
     documentUnitDTO.setGrounds("reasons123");
-    DocumentUnit documentUnit = DocumentationUnitTransformer.transformDTO(documentUnitDTO);
+    DocumentUnit documentUnit = DocumentationUnitTransformer.transformToDomain(documentUnitDTO);
 
     assertThat(documentUnit.filename()).isEqualTo("doc.docx");
     assertThat(documentUnit.texts().reasons()).isEqualTo("reasons123");

@@ -22,7 +22,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(schema = "incremental_migration")
+@Table(schema = "incremental_migration", name = "deviating_date")
 @IdClass(DeviatingDateId.class)
 public class DeviatingDateDTO {
 
@@ -31,7 +31,6 @@ public class DeviatingDateDTO {
   @Id
   private LocalDate value;
 
-  // @ManyToOne @NotNull private DocumentationUnit documentationUnit;
   @Column(name = "documentation_unit_id")
   @Id
   private UUID documentationUnitId;

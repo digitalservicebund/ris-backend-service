@@ -321,7 +321,7 @@ public class DocumentUnitTransformer {
             .deviatingFileNumbers(deviatingFileNumbers)
             .court(
                 getCourtObject(documentUnitDTO.getCourtType(), documentUnitDTO.getCourtLocation()))
-            .incorrectCourts(incorrectCourts)
+            .deviatingCourts(incorrectCourts)
             .documentType(documentType)
             .procedure(getProcedure(documentUnitDTO.getProcedure()))
             .previousProcedures(documentUnitDTO.getPreviousProcedures())

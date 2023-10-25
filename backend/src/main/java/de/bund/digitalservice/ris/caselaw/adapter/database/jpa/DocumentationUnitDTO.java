@@ -155,13 +155,11 @@ public class DocumentationUnitDTO {
   // @Builder.Default
   // private Set<CaselawActiveCitation> caselawActiveCitations = new HashSet<>();
 
-  //  @OneToMany(
-  //      mappedBy = "documentationUnit",
-  //      cascade = CascadeType.ALL,
-  //      fetch = FetchType.EAGER,
-  //      orphanRemoval = true)
-  //  @Builder.Default
-  //  private Set<DeviatingDate> deviatingDates = new HashSet<>();
+  @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+  @JoinColumn(name = "documentation_unit_id")
+  @Builder.Default
+  private Set<DeviatingDateDTO> deviatingDates = new HashSet<>();
+
   //
   //  @OneToMany(
   //      mappedBy = "documentationUnit",
@@ -171,29 +169,21 @@ public class DocumentationUnitDTO {
   //  @Builder.Default
   //  private Set<DeviatingDocumentNumber> deviatingDocumentNumbers = new HashSet<>();
   //
-  //  @OneToMany(
-  //      mappedBy = "documentationUnit",
-  //      cascade = CascadeType.ALL,
-  //      fetch = FetchType.EAGER,
-  //      orphanRemoval = true)
-  //  @Builder.Default
-  //  private Set<DeviatingEcli> deviatingEclis = new HashSet<>();
-  //
-  //  @OneToMany(
-  //      mappedBy = "documentationUnit",
-  //      cascade = CascadeType.ALL,
-  //      fetch = FetchType.EAGER,
-  //      orphanRemoval = true)
-  //  @Builder.Default
-  //  private Set<DeviatingFileNumber> deviatingFileNumbers = new HashSet<>();
-  //
-  //    @OneToMany(
-  //        mappedBy = "documentationUnit",
-  //        cascade = CascadeType.ALL,
-  //        fetch = FetchType.EAGER,
-  //        orphanRemoval = true)
-  //    @Builder.Default
-  //    private Set<DeviatingCourt> deviatingCourts = new HashSet<>();
+  @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+  @JoinColumn(name = "documentation_unit_id")
+  @Builder.Default
+  private Set<DeviatingEcliDTO> deviatingEclis = new HashSet<>();
+
+  @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+  @JoinColumn(name = "documentation_unit_id")
+  @Builder.Default
+  private Set<DeviatingFileNumberDTO> deviatingFileNumbers = new HashSet<>();
+
+  @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+  @JoinColumn(name = "documentation_unit_id")
+  @Builder.Default
+  private Set<DeviatingCourtDTO> deviatingCourts = new HashSet<>();
+
   //
   //    @ManyToOne(optional = false)
   //    @NotNull
@@ -208,13 +198,13 @@ public class DocumentationUnitDTO {
   //  @Builder.Default
   //  private Set<EnsuingDecision> ensuingDecisions = new HashSet<>();
 
-  //  @ManyToMany(cascade = {CascadeType.MERGE})
-  //  @JoinTable(
-  //      name = "documentation_unit_keyword",
-  //      joinColumns = @JoinColumn(name = "documentation_unit_id"),
-  //      inverseJoinColumns = @JoinColumn(name = "keyword_id"))
-  //  @Builder.Default
-  //  private Set<Keyword> keywords = new HashSet<>();
+  @ManyToMany(cascade = {CascadeType.MERGE})
+  @JoinTable(
+      name = "documentation_unit_keyword",
+      joinColumns = @JoinColumn(name = "documentation_unit_id"),
+      inverseJoinColumns = @JoinColumn(name = "keyword_id"))
+  @Builder.Default
+  private Set<KeywordDTO> keywords = new HashSet<>();
 
   // Nachgehende Entscheidungen mit Prädikat anhängig
   //  @OneToMany(

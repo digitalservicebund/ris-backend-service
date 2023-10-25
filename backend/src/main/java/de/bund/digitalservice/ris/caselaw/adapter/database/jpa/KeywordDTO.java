@@ -21,7 +21,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(schema = "incremental_migration")
+@Table(schema = "incremental_migration", name = "keyword")
 @IdClass(KeywordId.class)
 public class KeywordDTO {
 
@@ -30,7 +30,6 @@ public class KeywordDTO {
   @Id
   private String value;
 
-  // @ManyToOne @NotNull private DocumentationUnit documentationUnit;
   @Column(name = "documentation_unit_id")
   @Id
   private UUID documentationUnitId;

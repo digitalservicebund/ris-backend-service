@@ -13,7 +13,7 @@ public record CoreData(
     List<String> fileNumbers,
     List<String> deviatingFileNumbers,
     Court court,
-    List<String> incorrectCourts,
+    List<String> deviatingCourts,
     DocumentType documentType,
     Procedure procedure,
     List<String> previousProcedures,
