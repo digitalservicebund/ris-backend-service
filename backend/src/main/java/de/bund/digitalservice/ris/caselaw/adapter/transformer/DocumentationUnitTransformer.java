@@ -48,58 +48,34 @@ public class DocumentationUnitTransformer {
     DocumentationUnitDTO.DocumentationUnitDTOBuilder builder =
         currentDto.toBuilder()
             .id(updatedDomainObject.uuid())
-            .documentNumber(updatedDomainObject.documentNumber())
-            // .originalFileDocument(originalFileDocument)
-            .fileNumbers(
-                updatedDomainObject.coreData().fileNumbers().stream()
-                    .map(
-                        fileNumber ->
-                            FileNumberDTO.builder()
-                                // TODO do we have to use the fileNumber repo instead?
-                                .value(fileNumber)
-                                .documentationUnit(currentDto)
-                                .build())
-                    .collect(Collectors.toSet()));
-    //            .normReferences(
-    //                updatedDomainObject.contentRelatedIndexing().norms().stream()
-    //                    .map(
-    //                        norm ->
-    //                            NormReferenceDTO.builder()
-    //                                // TODO do we have to use the normAbbreviation repo instead?
-    //                                .normAbbreviation(
-    //                                    NormAbbreviationDTO.builder()
-    //                                        .id(norm.normAbbreviation().id())
-    //                                        .build())
-    //                                .singleNorm(norm.singleNorm())
-    //                                .dateOfVersion(norm.dateOfVersion())
-    //                                .dateOfRelevance(norm.dateOfRelevance())
-    //                                .build())
-    //                    .collect(Collectors.toSet()));
-
-    //    TODO nullchecks
-    //    var legalEffect =
-    //        LegalEffect.deriveLegalEffectFrom(
-    //            updatedDomainObject, hasCourtChanged(currentDto, updatedDomainObject));
-
-    //    LegalEffectDTO legalEffectDTO;
-    //    switch (legalEffect) {
-    //      case NO -> legalEffectDTO = LegalEffectDTO.NEIN;
-    //      case YES -> legalEffectDTO = LegalEffectDTO.JA;
-    //      case NOT_SPECIFIED -> legalEffectDTO = LegalEffectDTO.KEINE_ANGABE;
-    //      default -> legalEffectDTO = LegalEffectDTO.FALSCHE_ANGABE;
-    //    }
-    //    builder.legalEffect(legalEffectDTO);
+            .documentNumber(updatedDomainObject.documentNumber());
+    // .originalFileDocument(originalFileDocument)
 
     if (updatedDomainObject.coreData() != null) {
-      CoreData coreData = updatedDomainObject.coreData();
+      var coreData = updatedDomainObject.coreData();
+
+      var fileNumbers = coreData.fileNumbers();
+      if (fileNumbers != null && !fileNumbers.isEmpty()) {
+        builder.fileNumbers(
+            fileNumbers.stream()
+                .map(
+                    fileNumber ->
+                        FileNumberDTO.builder()
+                            // TODO do we have to use the fileNumber repo instead?
+                            .value(fileNumber)
+                            .documentationUnit(currentDto)
+                            .build())
+                .collect(Collectors.toSet()));
+      }
+
       builder
           .ecli(coreData.ecli())
           .judicialBody(coreData.appraisalBody())
           .decisionDate(coreData.decisionDate())
           .inputType(coreData.inputType());
 
-      Set<DeviatingCourtDTO> deviatingCourtDTOs = null;
       if (coreData.deviatingCourts() != null) {
+        Set<DeviatingCourtDTO> deviatingCourtDTOs = null;
         List<String> deviatingCourts = coreData.deviatingCourts();
         for (int i = 0; i < deviatingCourts.size(); i++) {
           // Todo beginning the rank with 0 or 1?
@@ -112,8 +88,8 @@ public class DocumentationUnitTransformer {
         builder.deviatingCourts(deviatingCourtDTOs);
       }
 
-      Set<DeviatingDateDTO> deviatingDateDTOs = null;
       if (coreData.deviatingDecisionDates() != null) {
+        Set<DeviatingDateDTO> deviatingDateDTOs = null;
         List<LocalDate> deviatingDecisionDates = coreData.deviatingDecisionDates();
         for (int i = 0; i < deviatingDecisionDates.size(); i++) {
           // Todo beginning the rank with 0 or 1?
@@ -140,8 +116,8 @@ public class DocumentationUnitTransformer {
         builder.deviatingFileNumbers(deviatingFileNumberDTOs);
       }
 
-      Set<DeviatingEcliDTO> deviatingEcliDTOs = null;
       if (coreData.deviatingEclis() != null) {
+        Set<DeviatingEcliDTO> deviatingEcliDTOs = null;
         List<String> deviatingEclis = coreData.deviatingEclis();
         for (int i = 0; i < deviatingEclis.size(); i++) {
           // Todo beginning the rank with 0 or 1?
@@ -155,6 +131,37 @@ public class DocumentationUnitTransformer {
       }
       // TODO documentationOffice
       // TODO court
+
+      //            .normReferences(
+      //                updatedDomainObject.contentRelatedIndexing().norms().stream()
+      //                    .map(
+      //                        norm ->
+      //                            NormReferenceDTO.builder()
+      //                                // TODO do we have to use the normAbbreviation repo instead?
+      //                                .normAbbreviation(
+      //                                    NormAbbreviationDTO.builder()
+      //                                        .id(norm.normAbbreviation().id())
+      //                                        .build())
+      //                                .singleNorm(norm.singleNorm())
+      //                                .dateOfVersion(norm.dateOfVersion())
+      //                                .dateOfRelevance(norm.dateOfRelevance())
+      //                                .build())
+      //                    .collect(Collectors.toSet()));
+
+      //    TODO nullchecks
+      //    var legalEffect =
+      //        LegalEffect.deriveLegalEffectFrom(
+      //            updatedDomainObject, hasCourtChanged(currentDto, updatedDomainObject));
+
+      //    LegalEffectDTO legalEffectDTO;
+      //    switch (legalEffect) {
+      //      case NO -> legalEffectDTO = LegalEffectDTO.NEIN;
+      //      case YES -> legalEffectDTO = LegalEffectDTO.JA;
+      //      case NOT_SPECIFIED -> legalEffectDTO = LegalEffectDTO.KEINE_ANGABE;
+      //      default -> legalEffectDTO = LegalEffectDTO.FALSCHE_ANGABE;
+      //    }
+      //    builder.legalEffect(legalEffectDTO);
+
     } else {
       builder.procedure(null).ecli(null).judicialBody(null).decisionDate(null).inputType(null)
       // TODO documentationOffice
@@ -201,7 +208,7 @@ public class DocumentationUnitTransformer {
           .decisionGrounds(texts.decisionReasons());
     } else {
       builder
-          .decisionNames(null)
+          // .decisionNames(null)
           .headline(null)
           .guidingPrinciple(null)
           .headnote(null)

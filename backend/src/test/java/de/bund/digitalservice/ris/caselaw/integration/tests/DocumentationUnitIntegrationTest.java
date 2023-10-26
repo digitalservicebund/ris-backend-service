@@ -51,7 +51,6 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Random;
 import java.util.UUID;
 import org.junit.jupiter.api.AfterEach;
@@ -194,18 +193,12 @@ class DocumentationUnitIntegrationTest {
   void testForFileNumbersDbEntryAfterUpdateByUuid() {
 
     DocumentationUnitDTO dto =
-        DocumentationUnitDTO.builder()
-            .documentNumber("1234567890123")
-            .documentationOffice(documentationOfficeRepository.findByAbbreviation("DigitalService"))
-            .build();
-
-    DocumentationUnitDTO savedDto = repository.save(dto);
-    UUID uuid = savedDto.getId();
-
-    assertThat(repository.findAll().get(0).getId()).isEqualTo(uuid);
-
-    assertThat(repository.getReferenceById(uuid).getId()).isEqualTo(uuid);
-    assertThat(repository.findById(uuid)).isNotEqualTo(Optional.empty());
+        repository.save(
+            DocumentationUnitDTO.builder()
+                .documentNumber("1234567890123")
+                .documentationOffice(
+                    documentationOfficeRepository.findByAbbreviation("DigitalService"))
+                .build());
 
     DocumentUnit documentUnitFromFrontend =
         DocumentUnit.builder()
@@ -223,7 +216,7 @@ class DocumentationUnitIntegrationTest {
     risWebTestClient
         .withDefaultLogin()
         .put()
-        .uri("/api/v1/caselaw/documentunits/" + uuid)
+        .uri("/api/v1/caselaw/documentunits/" + dto.getId())
         .bodyValue(documentUnitFromFrontend)
         .exchange()
         .expectStatus()
@@ -248,7 +241,6 @@ class DocumentationUnitIntegrationTest {
   }
 
   @Test
-  @Disabled
   void testDocumentTypeToSetIdFromLookuptable() {
     var categoryA =
         databaseDocumentCategoryRepository.saveAndFlush(
@@ -286,18 +278,19 @@ class DocumentationUnitIntegrationTest {
                 .multiple(true)
                 .build());
 
-    DocumentationUnitDTO dto =
-        DocumentationUnitDTO.builder()
-            .id(UUID.randomUUID())
-            .documentNumber("1234567890123")
-            //            .documentationOfficeId(documentationOfficeUuid)
-            .build();
-    repository.save(dto);
+    DocumentationUnitDTO documentationUnitDto =
+        repository.save(
+            DocumentationUnitDTO.builder()
+                .id(UUID.randomUUID())
+                .documentNumber("1234567890123")
+                .documentationOffice(
+                    documentationOfficeRepository.findByAbbreviation("DigitalService"))
+                .build());
 
     DocumentUnit documentUnitFromFrontend =
         DocumentUnit.builder()
-            .uuid(dto.getId())
-            .documentNumber(dto.getDocumentNumber())
+            .uuid(documentationUnitDto.getId())
+            .documentNumber(documentationUnitDto.getDocumentNumber())
             .coreData(
                 CoreData.builder()
                     .documentType(
@@ -329,8 +322,8 @@ class DocumentationUnitIntegrationTest {
 
     List<DocumentationUnitDTO> list = repository.findAll();
     assertThat(list).hasSize(1);
-    assertThat(list.get(0).getDocumentType()).isEqualTo(documentTypeDTOR);
-    assertThat(list.get(0).getDocumentType()).isNull();
+    assertThat(list.get(0).getDocumentType().getId()).isEqualTo(documentTypeDTOR.getId());
+    assertThat(list.get(0).getDocumentType()).isNotNull();
   }
 
   @Test
