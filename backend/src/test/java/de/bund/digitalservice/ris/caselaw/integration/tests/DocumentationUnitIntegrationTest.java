@@ -51,6 +51,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Random;
 import java.util.UUID;
 import org.junit.jupiter.api.AfterEach;
@@ -281,7 +282,6 @@ class DocumentationUnitIntegrationTest {
     DocumentationUnitDTO documentationUnitDto =
         repository.save(
             DocumentationUnitDTO.builder()
-                .id(UUID.randomUUID())
                 .documentNumber("1234567890123")
                 .documentationOffice(
                     documentationOfficeRepository.findByAbbreviation("DigitalService"))
@@ -327,20 +327,22 @@ class DocumentationUnitIntegrationTest {
   }
 
   @Test
-  @Disabled
   void testUndoSettingDocumentType() {
     var docType =
         databaseDocumentTypeRepository.saveAndFlush(
             DocumentTypeDTO.builder().abbreviation("test").multiple(true).build());
 
     DocumentationUnitDTO dto =
-        DocumentationUnitDTO.builder()
-            .id(UUID.randomUUID())
-            .documentNumber("1234567890123")
-            .documentType(docType)
-            //            .documentationOfficeId(documentationOfficeUuid)
-            .build();
-    repository.save(dto);
+        repository.save(
+            DocumentationUnitDTO.builder()
+                .documentNumber("1234567890123")
+                .documentType(docType)
+                .documentationOffice(
+                    documentationOfficeRepository.findByAbbreviation("DigitalService"))
+                .build());
+
+    assertThat(repository.findAll().size()).isEqualTo(1);
+    assertThat(repository.findById(dto.getId())).isNotEqualTo(Optional.empty());
 
     DocumentUnit documentUnitFromFrontend =
         DocumentUnit.builder()
@@ -366,7 +368,6 @@ class DocumentationUnitIntegrationTest {
 
     List<DocumentationUnitDTO> list = repository.findAll();
     assertThat(list).hasSize(1);
-    assertThat(list.get(0).getDocumentType().getId()).isNull();
     assertThat(list.get(0).getDocumentType()).isNull();
   }
 

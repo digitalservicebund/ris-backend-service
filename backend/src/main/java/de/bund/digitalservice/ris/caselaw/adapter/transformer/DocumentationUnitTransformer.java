@@ -74,6 +74,20 @@ public class DocumentationUnitTransformer {
           .decisionDate(coreData.decisionDate())
           .inputType(coreData.inputType());
 
+      DocumentTypeDTO documentType = null;
+      if (coreData.documentType() != null) {
+        if (coreData.documentType().label().equals(currentDto.getDocumentType().getLabel())) {
+          documentType = currentDto.getDocumentType();
+        } else {
+          documentType =
+              DocumentTypeDTO.builder()
+                  .abbreviation(coreData.documentType().jurisShortcut())
+                  .label(coreData.documentType().label())
+                  .build();
+        }
+      }
+      builder.documentType(documentType);
+
       if (coreData.deviatingCourts() != null) {
         Set<DeviatingCourtDTO> deviatingCourtDTOs = null;
         List<String> deviatingCourts = coreData.deviatingCourts();
@@ -129,6 +143,7 @@ public class DocumentationUnitTransformer {
         }
         builder.deviatingEclis(deviatingEcliDTOs);
       }
+
       // TODO documentationOffice
       // TODO court
 
