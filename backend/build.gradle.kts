@@ -217,7 +217,7 @@ dependencies {
 
     implementation("com.icegreen:greenmail:2.0.0")
 
-    implementation("de.bund.digitalservice:ris-norms-juris-converter:0.19.2")
+    implementation("de.bund.digitalservice:ris-norms-juris-converter:0.19.4")
     // for local development:
     // implementation(files("ris-norms-juris-converter-0.19.2.jar"))
     // implementation("org.apache.commons:commons-text:1.10.0")
