@@ -102,9 +102,7 @@ class DocumentUnitControllerAuthIntegrationTest {
 
   static Stream<Arguments> getUnauthorizedCases() {
     return Stream.of(
-        Arguments.of("CC-RIS", "BGH", null),
         Arguments.of("CC-RIS", "BGH", List.of(UNPUBLISHED)),
-        Arguments.of("BGH", "CC-RIS", null),
         Arguments.of("BGH", "CC-RIS", List.of(UNPUBLISHED)));
   }
 
@@ -199,13 +197,11 @@ class DocumentUnitControllerAuthIntegrationTest {
     UUID docUnitOfficeId = officeIdMap.get(docUnitOffice);
 
     DocumentUnitDTO docUnit = createNewDocumentUnitDTO(UUID.randomUUID(), docUnitOfficeId);
-    if (publicationStatus != null) {
-      for (int i = 0; i < publicationStatus.size(); i++) {
-        saveToStatusRepository(
-            docUnit,
-            docUnit.getCreationtimestamp().plusSeconds(60 + i),
-            DocumentUnitStatus.builder().publicationStatus(publicationStatus.get(i)).build());
-      }
+    for (int i = 0; i < publicationStatus.size(); i++) {
+      saveToStatusRepository(
+          docUnit,
+          docUnit.getCreationtimestamp().plusSeconds(60 + i),
+          DocumentUnitStatus.builder().publicationStatus(publicationStatus.get(i)).build());
     }
 
     EntityExchangeResult<String> result =

@@ -69,14 +69,13 @@ public class AuthService {
             PublicationStatus.PUBLISHING,
             PublicationStatus.JURIS_PUBLISHED);
     // legacy documents are published
-    if (documentUnit.status() == null || documentUnit.status().publicationStatus() == null) {
-      return Mono.just(false);
-    }
-    if (published.contains(documentUnit.status().publicationStatus())) {
-      return Mono.just(true);
-    }
-
-    return userHasSameDocOfficeAsDocument(documentUnit).defaultIfEmpty(false).onErrorReturn(false);
+    return (documentUnit.status() == null
+                || (documentUnit.status().publicationStatus() != null
+                    && published.contains(documentUnit.status().publicationStatus()))
+            ? Mono.just(true)
+            : userHasSameDocOfficeAsDocument(documentUnit))
+        .defaultIfEmpty(false)
+        .onErrorReturn(false);
   }
 
   private Mono<Boolean> userHasSameDocOfficeAsDocument(DocumentUnit documentUnit) {
