@@ -32,6 +32,22 @@ class LookupTableImporterControllerTest {
   @MockBean private JdbcTemplate jdbcTemplate;
 
   @Test
+  void testImportDocumentTypeLookupTable() {
+    when(service.importDocumentTypeLookupTable(any(ByteBuffer.class))).thenReturn(Mono.empty());
+
+    risWebTestClient
+        .withDefaultLogin()
+        .put()
+        .uri("/api/v1/caselaw/lookuptableimporter/doktyp")
+        .bodyValue(BodyInserters.fromValue(new byte[] {}))
+        .exchange()
+        .expectStatus()
+        .isOk();
+
+    verify(service, times(1)).importDocumentTypeLookupTable(any(ByteBuffer.class));
+  }
+
+  @Test
   void testImportCourtLookupTable() {
     when(service.importCourtLookupTable(any(ByteBuffer.class))).thenReturn(Mono.empty());
 

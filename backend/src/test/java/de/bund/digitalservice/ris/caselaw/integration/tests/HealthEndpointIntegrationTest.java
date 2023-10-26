@@ -34,8 +34,7 @@ class HealthEndpointIntegrationTest {
 
   @Container
   static PostgreSQLContainer<?> postgreSQLContainer =
-      new PostgreSQLContainer<>("postgres:14")
-          .withInitScript("db/create_migration_scheme_and_extensions.sql");
+      new PostgreSQLContainer<>("postgres:14").withInitScript("db/create_extension.sql");
 
   @Container
   static GenericContainer<?> redis =

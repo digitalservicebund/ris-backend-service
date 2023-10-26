@@ -6,11 +6,12 @@ import java.util.List;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class PostgresNormElementRepositoryImpl implements NormElementRepository {
+public class JPAPostgresNormElementRepositoryImpl implements NormElementRepository {
 
-  private final DatabaseNormElementRepository normElementRepository;
+  private final JPADatabaseNormElementRepository normElementRepository;
 
-  public PostgresNormElementRepositoryImpl(DatabaseNormElementRepository normElementRepository) {
+  public JPAPostgresNormElementRepositoryImpl(
+      JPADatabaseNormElementRepository normElementRepository) {
     this.normElementRepository = normElementRepository;
   }
 

@@ -4,19 +4,17 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentCategoryRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentTypeRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentCategoryDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentTypeDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentTypeRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.CitationStyleDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.CourtDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DatabaseCitationStyleRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DatabaseCourtRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DatabaseDocumentTypeRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DocumentTypeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.FieldOfLawKeywordRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.NormRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.PostgresCitationStyleRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.PostgresCourtRepositoryImpl;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.PostgresDocumentTypeRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.citation.CitationStyle;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.court.Court;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
@@ -44,7 +42,6 @@ class LookupTableServiceTest {
   @SpyBean private LookupTableService service;
 
   @MockBean private DatabaseDocumentTypeRepository databaseDocumentTypeRepository;
-  @MockBean private DatabaseDocumentCategoryRepository databaseDocumentCategoryRepository;
   @MockBean private DatabaseCourtRepository databaseCourtRepository;
   @MockBean private DatabaseCitationStyleRepository databaseCitationStyleRepository;
   @MockBean private FieldOfLawRepository fieldOfLawRepository;
@@ -53,14 +50,11 @@ class LookupTableServiceTest {
 
   @Test
   void testGetDocumentTypes() {
-    var category = DocumentCategoryDTO.builder().id(UUID.randomUUID()).label("R").build();
-    when(databaseDocumentCategoryRepository.findFirstByLabel("R")).thenReturn(category);
-
     DocumentTypeDTO documentTypeDTO = DocumentTypeDTO.builder().build();
-    documentTypeDTO.setAbbreviation("ABC");
+    documentTypeDTO.setJurisShortcut("ABC");
     documentTypeDTO.setLabel("LabelABC");
-    when(databaseDocumentTypeRepository.findAllByCategoryOrderByAbbreviationAscLabelAsc(category))
-        .thenReturn(List.of(documentTypeDTO));
+    when(databaseDocumentTypeRepository.findAllByDocumentTypeOrderByJurisShortcutAscLabelAsc('R'))
+        .thenReturn(Flux.just(documentTypeDTO));
 
     StepVerifier.create(service.getCaselawDocumentTypes(Optional.empty()))
         .consumeNextWith(
@@ -72,7 +66,7 @@ class LookupTableServiceTest {
         .verifyComplete();
 
     verify(databaseDocumentTypeRepository)
-        .findAllByCategoryOrderByAbbreviationAscLabelAsc(category);
+        .findAllByDocumentTypeOrderByJurisShortcutAscLabelAsc('R');
   }
 
   @Test

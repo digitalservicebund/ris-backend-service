@@ -14,11 +14,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.DocumentUnitController;
 import de.bund.digitalservice.ris.caselaw.adapter.DocxConverterService;
 import de.bund.digitalservice.ris.caselaw.adapter.KeycloakUserService;
 import de.bund.digitalservice.ris.caselaw.adapter.ProceedingDecisionController;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentCategoryRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentTypeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationOfficeRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentCategoryDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentTypeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentUnitMetadataRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentUnitRepository;
@@ -33,6 +29,8 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.FileNumberDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.FileNumberRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.PostgresDocumentUnitRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.PostgresPublicationReportRepositoryImpl;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DatabaseDocumentTypeRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DocumentTypeDTO;
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
@@ -88,10 +86,7 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
 class ProceedingDecisionIntegrationTest {
   @Container
   static PostgreSQLContainer<?> postgreSQLContainer =
-      new PostgreSQLContainer<>("postgres:14")
-          .withInitScript("db/create_migration_scheme_and_extensions.sql");
-
-  private DocumentCategoryDTO category;
+      new PostgreSQLContainer<>("postgres:14").withInitScript("db/create_extension.sql");
 
   @DynamicPropertySource
   static void registerDynamicProperties(DynamicPropertyRegistry registry) {
@@ -121,15 +116,11 @@ class ProceedingDecisionIntegrationTest {
 
   private final DocumentationOffice docOffice = buildDefaultDocOffice();
   private UUID documentationOfficeUuid;
-  @Autowired private DatabaseDocumentCategoryRepository databaseDocumentCategoryRepository;
 
   @BeforeEach
   void setUp() {
     documentationOfficeUuid = documentationOfficeRepository.findByLabel(docOffice.label()).getId();
     doReturn(Mono.just(docOffice)).when(userService).getDocumentationOffice(any(OidcUser.class));
-    category =
-        databaseDocumentCategoryRepository.saveAndFlush(
-            DocumentCategoryDTO.builder().label("R").build());
   }
 
   @AfterEach
@@ -139,10 +130,9 @@ class ProceedingDecisionIntegrationTest {
     repository.deleteAll().block();
     metadataRepository.deleteAll().block();
     fileNumberRepository.deleteAll().block();
-    databaseDocumentTypeRepository.deleteAll();
+    databaseDocumentTypeRepository.deleteAll().block();
     statusRepository.deleteAll().block();
     databasePublishReportRepository.deleteAll().block();
-    databaseDocumentCategoryRepository.delete(category);
   }
 
   // This test is flaky if executed locally, but reliable in the pipeline
@@ -603,10 +593,6 @@ class ProceedingDecisionIntegrationTest {
     prepareDocumentUnitMetadataDTOs();
     simulateAPICall(
             ProceedingDecision.builder().court(Court.builder().type("SomeCourt").build()).build())
-        .consumeWith(
-            result -> {
-              System.out.println("result = " + result.toString());
-            })
         .jsonPath("$.content")
         .isNotEmpty()
         .jsonPath("$.content.length()")
@@ -783,25 +769,16 @@ class ProceedingDecisionIntegrationTest {
       String documentOfficeLabel,
       DocumentUnitStatus status) {
 
-    UUID documentTypeId = null;
+    Long documentTypeId = null;
     if (documentTypeJurisShortcut != null) {
-
-      var documentType =
-          databaseDocumentTypeRepository.findFirstByAbbreviationAndCategory(
-              documentTypeJurisShortcut, category);
-
-      if (documentType == null) {
-        DocumentTypeDTO documentTypeDTO =
-            DocumentTypeDTO.builder()
-                .category(category)
-                .label("ABC123")
-                .multiple(true)
-                .abbreviation(documentTypeJurisShortcut)
-                .build();
-        documentTypeId = databaseDocumentTypeRepository.saveAndFlush(documentTypeDTO).getId();
-      } else {
-        documentTypeId = documentType.getId();
-      }
+      DocumentTypeDTO documentTypeDTO =
+          DocumentTypeDTO.builder()
+              .changeIndicator('a')
+              .documentType('R')
+              .label("ABC123")
+              .jurisShortcut(documentTypeJurisShortcut)
+              .build();
+      documentTypeId = databaseDocumentTypeRepository.save(documentTypeDTO).block().getId();
     }
 
     DocumentationOfficeDTO documentOffice =
