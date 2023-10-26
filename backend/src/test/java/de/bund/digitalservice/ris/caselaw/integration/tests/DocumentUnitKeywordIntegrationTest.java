@@ -12,11 +12,11 @@ import de.bund.digitalservice.ris.caselaw.adapter.ContentRelatedIndexingControll
 import de.bund.digitalservice.ris.caselaw.adapter.FieldOfLawService;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationOfficeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPADatabaseKeywordRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.KeywordDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentationUnitRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentUnitRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseKeywordRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.KeywordDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.PostgresFieldOfLawRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentUnitTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationOfficeTransformer;
@@ -70,7 +70,7 @@ class DocumentUnitKeywordIntegrationTest {
   }
 
   @Autowired private RisWebTestClient risWebTestClient;
-  @Autowired private DatabaseKeywordRepository keywordRepository;
+  @Autowired private JPADatabaseKeywordRepository keywordRepository;
   @Autowired private DatabaseDocumentUnitRepository documentUnitRepository;
   @Autowired private DatabaseDocumentationOfficeRepository documentationOfficeRepository;
 
@@ -92,7 +92,7 @@ class DocumentUnitKeywordIntegrationTest {
 
   @AfterEach
   void cleanUp() {
-    keywordRepository.deleteAll().block();
+    keywordRepository.deleteAll();
     documentUnitRepository.deleteAll().block();
   }
 
@@ -139,13 +139,11 @@ class DocumentUnitKeywordIntegrationTest {
     when(documentUnitService.getByUuid(TEST_UUID))
         .thenReturn(Mono.just(DocumentUnitTransformer.transformDTO(documentUnitDTO)));
 
-    KeywordDTO keywordDTO01 =
-        KeywordDTO.builder().documentUnitId(documentUnitDTO.getId()).keyword("keyword01").build();
-    keywordRepository.save(keywordDTO01).block();
+    KeywordDTO keywordDTO01 = KeywordDTO.builder().value("keyword01").build();
+    keywordRepository.save(keywordDTO01);
 
-    KeywordDTO keywordDTO02 =
-        KeywordDTO.builder().documentUnitId(documentUnitDTO.getId()).keyword("keyword02").build();
-    keywordRepository.save(keywordDTO02).block();
+    KeywordDTO keywordDTO02 = KeywordDTO.builder().value("keyword02").build();
+    keywordRepository.save(keywordDTO02);
 
     risWebTestClient
         .withDefaultLogin()
@@ -237,9 +235,8 @@ class DocumentUnitKeywordIntegrationTest {
     when(documentUnitService.getByUuid(TEST_UUID))
         .thenReturn(Mono.just(DocumentUnitTransformer.transformDTO(documentUnitDTO)));
 
-    KeywordDTO keywordDTO01 =
-        KeywordDTO.builder().documentUnitId(documentUnitDTO.getId()).keyword("keyword01").build();
-    keywordRepository.save(keywordDTO01).block();
+    KeywordDTO keywordDTO01 = KeywordDTO.builder().value("keyword01").build();
+    keywordRepository.save(keywordDTO01);
 
     risWebTestClient
         .withDefaultLogin()
@@ -272,9 +269,8 @@ class DocumentUnitKeywordIntegrationTest {
     when(documentUnitService.getByUuid(TEST_UUID))
         .thenReturn(Mono.just(DocumentUnitTransformer.transformDTO(documentUnitDTO)));
 
-    KeywordDTO keywordDTO01 =
-        KeywordDTO.builder().documentUnitId(documentUnitDTO.getId()).keyword("keyword01").build();
-    keywordRepository.save(keywordDTO01).block();
+    KeywordDTO keywordDTO01 = KeywordDTO.builder().value("keyword01").build();
+    keywordRepository.save(keywordDTO01);
 
     risWebTestClient
         .withDefaultLogin()
@@ -306,9 +302,8 @@ class DocumentUnitKeywordIntegrationTest {
     when(documentUnitService.getByUuid(TEST_UUID))
         .thenReturn(Mono.just(DocumentUnitTransformer.transformDTO(documentUnitDTO)));
 
-    KeywordDTO keywordDTO01 =
-        KeywordDTO.builder().documentUnitId(documentUnitDTO.getId()).keyword("keyword01").build();
-    keywordRepository.save(keywordDTO01).block();
+    KeywordDTO keywordDTO01 = KeywordDTO.builder().value("keyword01").build();
+    keywordRepository.save(keywordDTO01);
 
     risWebTestClient
         .withDefaultLogin()

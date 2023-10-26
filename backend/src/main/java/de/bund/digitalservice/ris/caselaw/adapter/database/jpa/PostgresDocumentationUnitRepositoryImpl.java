@@ -1,6 +1,7 @@
 package de.bund.digitalservice.ris.caselaw.adapter.database.jpa;
 
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationUnitTransformer;
+import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitRepository;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitSearchInput;
@@ -13,6 +14,8 @@ import de.bund.digitalservice.ris.caselaw.domain.LinkedDocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
 import jakarta.persistence.EntityManager;
 import java.time.Instant;
+import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Primary;
@@ -33,6 +36,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
   private final DatabaseDocumentCategoryRepository databaseDocumentCategoryRepository;
   private final DatabaseNormReferenceRepository documentUnitNormRepository;
   private final DatabaseDocumentationOfficeRepository documentationOfficeRepository;
+  private final JPADatabaseKeywordRepository keywordRepository;
   private final DatabaseNormAbbreviationRepository normAbbreviationRepository;
   private final EntityManager entityManager;
 
@@ -44,6 +48,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
       DatabaseNormReferenceRepository documentUnitNormRepository,
       DatabaseNormAbbreviationRepository normAbbreviationRepository,
       DatabaseDocumentationOfficeRepository documentationOfficeRepository,
+      JPADatabaseKeywordRepository keywordRepository,
       EntityManager entityManager) {
 
     this.repository = repository;
@@ -53,6 +58,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
     this.documentUnitNormRepository = documentUnitNormRepository;
     this.documentationOfficeRepository = documentationOfficeRepository;
     this.normAbbreviationRepository = normAbbreviationRepository;
+    this.keywordRepository = keywordRepository;
     this.entityManager = entityManager;
   }
 
@@ -111,11 +117,35 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
       documentationUnitDTO.setDocumentType(getDbDocType(documentUnit.coreData().documentType()));
     }
 
+    documentationUnitDTO = saveKeywords(documentationUnitDTO, documentUnit);
+
     documentationUnitDTO =
         DocumentationUnitTransformer.transformToDTO(documentationUnitDTO, documentUnit);
     documentationUnitDTO = repository.save(documentationUnitDTO);
 
     return Mono.just(DocumentationUnitTransformer.transformToDomain(documentationUnitDTO));
+  }
+
+  private DocumentationUnitDTO saveKeywords(
+      DocumentationUnitDTO documentationUnitDTO, DocumentUnit documentUnit) {
+    if (documentUnit.contentRelatedIndexing() != null) {
+      ContentRelatedIndexing contentRelatedIndexing = documentUnit.contentRelatedIndexing();
+
+      Set<KeywordDTO> keywordDTOs = null;
+      if (contentRelatedIndexing.keywords() != null) {
+        List<String> keywords = contentRelatedIndexing.keywords();
+        for (int i = 1; i < keywords.size(); i++) {
+          String value = keywords.get(i);
+          keywordRepository
+              .findByValue(value)
+              .ifPresentOrElse(
+                  keywordDTO -> keywordDTOs.add(keywordDTO),
+                  () -> keywordDTOs.add(KeywordDTO.builder().value(value).build()));
+        }
+        documentationUnitDTO.setKeywords(keywordDTOs);
+      }
+    }
+    return documentationUnitDTO;
   }
 
   private DocumentTypeDTO getDbDocType(DocumentType documentType) {

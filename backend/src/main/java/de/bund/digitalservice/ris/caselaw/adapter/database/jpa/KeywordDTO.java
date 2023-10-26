@@ -21,13 +21,15 @@ import lombok.Setter;
 @Entity
 @Table(schema = "incremental_migration", name = "keyword")
 public class KeywordDTO {
-  @Id private UUID id;
+  @Id
+  private UUID id;
 
   @Column(nullable = false)
   @NotBlank
   private String value;
 
-  @Transient private Long rank;
+  @Transient
+  private Long rank;
 
   public KeywordDTO(String value) {
     this.value = value;

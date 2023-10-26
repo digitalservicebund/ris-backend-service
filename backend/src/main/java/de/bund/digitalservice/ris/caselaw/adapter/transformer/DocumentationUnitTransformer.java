@@ -184,21 +184,6 @@ public class DocumentationUnitTransformer {
       ;
     }
 
-    if (updatedDomainObject.contentRelatedIndexing() != null) {
-      ContentRelatedIndexing contentRelatedIndexing = updatedDomainObject.contentRelatedIndexing();
-
-      Set<KeywordDTO> keywordDTOs = null;
-      if (contentRelatedIndexing.keywords() != null) {
-        List<String> deviatingCourts = contentRelatedIndexing.keywords();
-        for (int i = 0; i < deviatingCourts.size(); i++) {
-          // Todo beginning the rank with 0 or 1?
-          keywordDTOs.add(
-              KeywordDTO.builder().value(deviatingCourts.get(i)).rank(Long.valueOf(i)).build());
-        }
-        builder.keywords(keywordDTOs);
-      }
-    }
-
     if (currentDto.getId() == null
         && updatedDomainObject.proceedingDecisions() != null
         && !updatedDomainObject.proceedingDecisions().isEmpty()) {
