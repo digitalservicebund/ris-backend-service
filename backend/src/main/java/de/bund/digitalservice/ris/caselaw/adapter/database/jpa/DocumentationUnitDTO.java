@@ -20,6 +20,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
@@ -60,7 +61,7 @@ public class DocumentationUnitDTO {
   @NotBlank
   private String documentNumber;
 
-  @ManyToOne(optional = false)
+  @ManyToOne(optional = true) // todo
   @JoinColumn(name = "document_type_id")
   // TODO  @NotNull
   private DocumentTypeDTO documentType;
@@ -134,6 +135,13 @@ public class DocumentationUnitDTO {
   @JoinColumn(name = "documentation_office_id", referencedColumnName = "id")
   private DocumentationOfficeDTO documentationOffice;
 
+  @OneToMany(
+      mappedBy = "documentationUnitDTO",
+      cascade = CascadeType.ALL,
+      orphanRemoval = true,
+      fetch = FetchType.EAGER)
+  private List<StatusDTO> status;
+
   public void setOriginalFileDocument(OriginalFileDocumentDTO originalFileDocument) {
     if (originalFileDocument != null) {
       originalFileDocument.setDocumentationUnit(this);
@@ -200,9 +208,12 @@ public class DocumentationUnitDTO {
   //  @Builder.Default
   //  private Set<EnsuingDecision> ensuingDecisions = new HashSet<>();
 
-  @ManyToMany(cascade = {CascadeType.MERGE})
+  @ManyToMany(
+      cascade = {CascadeType.MERGE},
+      fetch = FetchType.EAGER)
   @JoinTable(
       name = "documentation_unit_keyword",
+      schema = "incremental_migration",
       joinColumns = @JoinColumn(name = "documentation_unit_id"),
       inverseJoinColumns = @JoinColumn(name = "keyword_id"))
   @Builder.Default

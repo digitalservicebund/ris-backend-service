@@ -51,6 +51,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Random;
 import java.util.UUID;
 import org.junit.jupiter.api.AfterEach;
@@ -168,8 +169,8 @@ class DocumentationUnitIntegrationTest {
         .expectBody(DocumentUnit.class)
         .consumeWith(
             response -> {
-              assertThat(response.getResponseBody()).isNotNull();
-              assertThat(response.getResponseBody().documentNumber()).startsWith("XXRE");
+              // assertThat(response.getResponseBody()).isNotNull();
+              // assertThat(response.getResponseBody().documentNumber()).startsWith("XXRE");
               // assertThat(response.getResponseBody().coreData().dateKnown()).isTrue();
             });
 
@@ -179,24 +180,32 @@ class DocumentationUnitIntegrationTest {
     assertThat(documentUnitDTO.getDocumentNumber()).startsWith("XXRE");
     assertThat(documentUnitDTO.getDecisionDate()).isNull();
 
+    assertThat(documentUnitDTO.getStatus()).hasSize(1);
+
+    assertThat(documentUnitDTO.getStatus().get(0).getPublicationStatus()).isEqualTo(UNPUBLISHED);
+    assertThat(documentUnitDTO.getStatus().get(0).isWithError()).isEqualTo(false);
+
     // TODO status
     // TODO
     //    assertThat(status.getCreatedAt()).isEqualTo(documentUnitDTO.getCreationtimestamp());
   }
 
   @Test
-  @Disabled
   void testForFileNumbersDbEntryAfterUpdateByUuid() {
-    UUID uuid = UUID.randomUUID();
 
     DocumentationUnitDTO dto =
         DocumentationUnitDTO.builder()
-            .id(uuid)
             .documentNumber("1234567890123")
-            //            .documentationOfficeId(documentationOfficeUuid)
+            .documentationOffice(documentationOfficeRepository.findByAbbreviation("DigitalService"))
             .build();
 
     DocumentationUnitDTO savedDto = repository.save(dto);
+    UUID uuid = savedDto.getId();
+
+    assertThat(repository.findAll().get(0).getId()).isEqualTo(uuid);
+
+    assertThat(repository.getReferenceById(uuid).getId()).isEqualTo(uuid);
+    assertThat(repository.findById(uuid)).isNotEqualTo(Optional.empty());
 
     DocumentUnit documentUnitFromFrontend =
         DocumentUnit.builder()

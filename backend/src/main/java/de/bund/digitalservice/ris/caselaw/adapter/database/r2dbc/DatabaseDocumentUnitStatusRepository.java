@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Mono;
 
 @Repository
+@Deprecated
 public interface DatabaseDocumentUnitStatusRepository
     extends R2dbcRepository<DocumentUnitStatusDTO, UUID> {
 

@@ -1,4 +1,4 @@
-CREATE TABLE
+CREATE TABLE IF NOT EXISTS
   original_file_document (
     id UUID NOT NULL PRIMARY KEY,
     upload_timestamp TIMESTAMP WITHOUT TIME ZONE NOT NULL,

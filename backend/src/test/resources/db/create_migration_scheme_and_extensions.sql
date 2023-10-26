@@ -191,3 +191,121 @@ VALUES
     'ba90a851-3c54-4858-b4fa-7742ffbe8f05',
     'DigitalService'
   );
+
+CREATE TABLE IF NOT EXISTS
+  incremental_migration.deviating_court (
+    id UUID PRIMARY KEY,
+    value VARCHAR(225) NOT NULL,
+    rank int,
+    documentation_unit_id UUID NOT NULL CONSTRAINT fk_documentation_unit REFERENCES incremental_migration.documentation_unit
+  );
+
+CREATE TABLE IF NOT EXISTS
+  incremental_migration.deviating_date (
+    id UUID PRIMARY KEY,
+    value DATE NOT NULL,
+    rank int,
+    documentation_unit_id UUID NOT NULL CONSTRAINT fk_documentation_unit REFERENCES incremental_migration.documentation_unit
+  );
+
+CREATE TABLE IF NOT EXISTS
+  incremental_migration.deviating_ecli (
+    id UUID PRIMARY KEY,
+    value VARCHAR(255) NOT NULL,
+    rank int,
+    documentation_unit_id UUID NOT NULL CONSTRAINT fk_documentation_unit REFERENCES incremental_migration.documentation_unit
+  );
+
+CREATE TABLE IF NOT EXISTS
+  incremental_migration.deviating_file_number (
+    id UUID PRIMARY KEY,
+    value VARCHAR(255) NOT NULL,
+    rank int,
+    documentation_unit_id UUID NOT NULL CONSTRAINT fk_documentation_unit REFERENCES incremental_migration.documentation_unit
+  );
+
+create table if not exists
+  incremental_migration.keyword (
+    id uuid not null primary key,
+    value varchar(1000) not null constraint uc_keyword_value unique
+  );
+
+create table if not exists
+  incremental_migration.documentation_unit_keyword (
+    documentation_unit_id uuid not null constraint fk_documentation_unit references incremental_migration.documentation_unit,
+    keyword_id uuid not null constraint fk_keyword references incremental_migration.keyword,
+    primary key (documentation_unit_id, keyword_id)
+  );
+
+create table if not exists
+  incremental_migration.address (
+    id uuid not null primary key,
+    city varchar(255),
+    email varchar(255),
+    fax_number varchar(255),
+    phone_number varchar(255),
+    post_office_box varchar(255),
+    post_office_box_location varchar(255),
+    post_office_box_postal_code varchar(255),
+    postal_code varchar(255),
+    street varchar(255),
+    url varchar(255)
+  );
+
+create table if not exists
+  incremental_migration.court (
+    id uuid not null primary key,
+    additional_information varchar(1000),
+    belongs_to varchar(255),
+    belongs_to_branch varchar(255),
+    can_deliver_lrs boolean,
+    current_branch varchar(255),
+    deprecated_branch varchar(255),
+    deprecated_since date,
+    early_name varchar(255),
+    exists_since date,
+    field varchar(255),
+    is_foreign_court boolean default false not null,
+    is_superior_court boolean default false not null,
+    juris_id integer not null constraint uc_court_juris_id unique,
+    late_name varchar(255),
+    location varchar(255),
+    official_name varchar(255),
+    remark varchar(255),
+    traditional_name varchar(255),
+    type
+      varchar(255),
+      address_id uuid constraint fk_address references incremental_migration.address
+  );
+
+create table if not exists
+  incremental_migration.court_region (
+    court_id uuid not null constraint fk_court references incremental_migration.court,
+    region_id uuid not null constraint fk_region references incremental_migration.region,
+    primary key (court_id, region_id)
+  );
+
+create table if not exists
+  incremental_migration.judicial_body (
+    id uuid not null primary key,
+    name varchar(255) not null,
+    court_id uuid not null constraint fk_court references incremental_migration.court
+  );
+
+create table if not exists
+  incremental_migration.numeric_figure (
+    judicial_body_id uuid unique constraint fk_judicial_body references incremental_migration.judicial_body,
+    from_value varchar(255) not null,
+    to_value varchar(255) not null,
+    type
+      varchar(255) not null
+  );
+
+create table if not exists
+  incremental_migration.court_synonym (
+    id uuid not null primary key,
+    label varchar(255) not null,
+    type
+      varchar(255) not null,
+      court_id uuid not null constraint fk_court references incremental_migration.court
+  );

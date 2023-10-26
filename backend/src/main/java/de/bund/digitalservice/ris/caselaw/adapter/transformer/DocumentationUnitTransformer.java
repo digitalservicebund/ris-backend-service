@@ -1,6 +1,5 @@
 package de.bund.digitalservice.ris.caselaw.adapter.transformer;
 
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DecisionNameDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DeviatingCourtDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DeviatingDateDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DeviatingEcliDTO;
@@ -10,9 +9,6 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnit
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitMetadataDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.FileNumberDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.KeywordDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LegalEffectDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.NormAbbreviationDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.NormReferenceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.OriginalFileDocumentDTO;
 import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
 import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing.ContentRelatedIndexingBuilder;
@@ -20,7 +16,7 @@ import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData.CoreDataBuilder;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitNorm;
-import de.bund.digitalservice.ris.caselaw.domain.LegalEffect;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.Texts;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
 import java.time.LocalDate;
@@ -40,19 +36,20 @@ public class DocumentationUnitTransformer {
       log.debug("enrich database documentation unit '{}'", currentDto.getId());
     }
 
-    OriginalFileDocumentDTO originalFileDocument =
-        OriginalFileDocumentDTO.builder()
-            .extension(updatedDomainObject.filetype())
-            .filename(updatedDomainObject.filename())
-            .s3ObjectPath(updatedDomainObject.s3path())
-            .uploadTimestamp(updatedDomainObject.fileuploadtimestamp())
-            .build();
+    //    TODO needs null-checking
+    //    OriginalFileDocumentDTO originalFileDocument =
+    //        OriginalFileDocumentDTO.builder()
+    //            .extension(updatedDomainObject.filetype())
+    //            .filename(updatedDomainObject.filename())
+    //            .s3ObjectPath(updatedDomainObject.s3path())
+    //            .uploadTimestamp(updatedDomainObject.fileuploadtimestamp())
+    //            .build();
 
     DocumentationUnitDTO.DocumentationUnitDTOBuilder builder =
         currentDto.toBuilder()
             .id(updatedDomainObject.uuid())
             .documentNumber(updatedDomainObject.documentNumber())
-            .originalFileDocument(originalFileDocument)
+            // .originalFileDocument(originalFileDocument)
             .fileNumbers(
                 updatedDomainObject.coreData().fileNumbers().stream()
                     .map(
@@ -62,34 +59,36 @@ public class DocumentationUnitTransformer {
                                 .value(fileNumber)
                                 .documentationUnit(currentDto)
                                 .build())
-                    .collect(Collectors.toSet()))
-            .normReferences(
-                updatedDomainObject.contentRelatedIndexing().norms().stream()
-                    .map(
-                        norm ->
-                            NormReferenceDTO.builder()
-                                // TODO do we have to use the normAbbreviation repo instead?
-                                .normAbbreviation(
-                                    NormAbbreviationDTO.builder()
-                                        .id(norm.normAbbreviation().id())
-                                        .build())
-                                .singleNorm(norm.singleNorm())
-                                .dateOfVersion(norm.dateOfVersion())
-                                .dateOfRelevance(norm.dateOfRelevance())
-                                .build())
                     .collect(Collectors.toSet()));
-    var legalEffect =
-        LegalEffect.deriveLegalEffectFrom(
-            updatedDomainObject, hasCourtChanged(currentDto, updatedDomainObject));
+    //            .normReferences(
+    //                updatedDomainObject.contentRelatedIndexing().norms().stream()
+    //                    .map(
+    //                        norm ->
+    //                            NormReferenceDTO.builder()
+    //                                // TODO do we have to use the normAbbreviation repo instead?
+    //                                .normAbbreviation(
+    //                                    NormAbbreviationDTO.builder()
+    //                                        .id(norm.normAbbreviation().id())
+    //                                        .build())
+    //                                .singleNorm(norm.singleNorm())
+    //                                .dateOfVersion(norm.dateOfVersion())
+    //                                .dateOfRelevance(norm.dateOfRelevance())
+    //                                .build())
+    //                    .collect(Collectors.toSet()));
 
-    LegalEffectDTO legalEffectDTO;
-    switch (legalEffect) {
-      case NO -> legalEffectDTO = LegalEffectDTO.NEIN;
-      case YES -> legalEffectDTO = LegalEffectDTO.JA;
-      case NOT_SPECIFIED -> legalEffectDTO = LegalEffectDTO.KEINE_ANGABE;
-      default -> legalEffectDTO = LegalEffectDTO.FALSCHE_ANGABE;
-    }
-    builder.legalEffect(legalEffectDTO);
+    //    TODO nullchecks
+    //    var legalEffect =
+    //        LegalEffect.deriveLegalEffectFrom(
+    //            updatedDomainObject, hasCourtChanged(currentDto, updatedDomainObject));
+
+    //    LegalEffectDTO legalEffectDTO;
+    //    switch (legalEffect) {
+    //      case NO -> legalEffectDTO = LegalEffectDTO.NEIN;
+    //      case YES -> legalEffectDTO = LegalEffectDTO.JA;
+    //      case NOT_SPECIFIED -> legalEffectDTO = LegalEffectDTO.KEINE_ANGABE;
+    //      default -> legalEffectDTO = LegalEffectDTO.FALSCHE_ANGABE;
+    //    }
+    //    builder.legalEffect(legalEffectDTO);
 
     if (updatedDomainObject.coreData() != null) {
       CoreData coreData = updatedDomainObject.coreData();
@@ -191,7 +190,8 @@ public class DocumentationUnitTransformer {
       Texts texts = updatedDomainObject.texts();
 
       builder
-          .decisionNames(Set.of(DecisionNameDTO.builder().value(texts.decisionName()).build()))
+          // TODO null check, only set if exists
+          // .decisionNames(Set.of(DecisionNameDTO.builder().value(texts.decisionName()).build()))
           .headline(texts.headline())
           .guidingPrinciple(texts.guidingPrinciple())
           .headnote(texts.headnote())
@@ -304,12 +304,15 @@ public class DocumentationUnitTransformer {
             // documentationUnitDTO.getCourtLocation()))
             // .procedure(getProcedure(documentationUnitDTO.getProcedure()))
             // .previousProcedures(documentationUnitDTO.getPreviousProcedures())
-            // .documentationOffice(getDocumentationOffice(documentationUnitDTO.getDocumentationOffice()))
+            .documentationOffice(
+                DocumentationOffice.builder()
+                    .abbreviation(documentationUnitDTO.getDocumentationOffice().getAbbreviation())
+                    .build())
             // TODO multiple regions .region(documentationUnitDTO.getRegions())
             .ecli(documentationUnitDTO.getEcli())
             .decisionDate(documentationUnitDTO.getDecisionDate())
             .appraisalBody(documentationUnitDTO.getJudicialBody())
-            .legalEffect(documentationUnitDTO.getLegalEffect().toString())
+            // .legalEffect(documentationUnitDTO.getLegalEffect().toString())
             .inputType(documentationUnitDTO.getInputType());
 
     List<String> fileNumbers = null;

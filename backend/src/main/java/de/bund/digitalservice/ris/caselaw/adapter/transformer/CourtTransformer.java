@@ -11,6 +11,8 @@ public class CourtTransformer {
   private CourtTransformer() {}
 
   public static Court transformDTO(CourtDTO courtDTO) {
+    if (courtDTO == null) return null;
+
     String revoked = extractRevoked(courtDTO.getAdditionalInformation());
 
     if (courtDTO.isSuperiorCourt() && !courtDTO.isForeignCourt()) {

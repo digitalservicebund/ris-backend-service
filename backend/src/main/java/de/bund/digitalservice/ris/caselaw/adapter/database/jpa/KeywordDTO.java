@@ -4,6 +4,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import jakarta.validation.constraints.NotBlank;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
@@ -26,7 +27,7 @@ public class KeywordDTO {
   @NotBlank
   private String value;
 
-  private Long rank;
+  @Transient private Long rank;
 
   public KeywordDTO(String value) {
     this.value = value;
