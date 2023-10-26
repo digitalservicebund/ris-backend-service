@@ -1135,16 +1135,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
                                   .build());
                           return dto;
                         })
-                    .switchIfEmpty(
-                        Mono.defer(
-                            () -> {
-                              dto.setStatus(
-                                  DocumentUnitStatus.builder()
-                                      .publicationStatus(PublicationStatus.PUBLISHED)
-                                      .withError(false)
-                                      .build());
-                              return Mono.just(dto);
-                            })));
+                    .switchIfEmpty(Mono.defer(Mono::empty)));
   }
 
   private <T extends DocumentUnitMetadataDTO> Mono<T> injectProcedure(T documentUnitDTO) {
