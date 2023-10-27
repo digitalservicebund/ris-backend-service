@@ -11,7 +11,7 @@ import de.bund.digitalservice.ris.caselaw.domain.XmlExporter;
 import de.bund.digitalservice.ris.caselaw.domain.XmlPublication;
 import de.bund.digitalservice.ris.caselaw.domain.XmlPublicationRepository;
 import de.bund.digitalservice.ris.caselaw.domain.XmlResultObject;
-import de.bund.digitalservice.ris.caselaw.domain.lookuptable.court.Court;
+import de.bund.digitalservice.ris.caselaw.domain.court.Court;
 import java.time.Clock;
 import java.time.LocalDate;
 import java.time.ZoneId;

@@ -1,7 +1,7 @@
 package de.bund.digitalservice.ris.caselaw.adapter.transformer;
 
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CourtDTO;
-import de.bund.digitalservice.ris.caselaw.domain.lookuptable.court.Court;
+import de.bund.digitalservice.ris.caselaw.domain.court.Court;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -10,7 +10,7 @@ public class CourtTransformer {
 
   private CourtTransformer() {}
 
-  public static Court transformDTO(CourtDTO courtDTO) {
+  public static Court transformToDomain(CourtDTO courtDTO) {
     if (courtDTO == null) return null;
 
     String revoked = extractRevoked(courtDTO.getAdditionalInformation());

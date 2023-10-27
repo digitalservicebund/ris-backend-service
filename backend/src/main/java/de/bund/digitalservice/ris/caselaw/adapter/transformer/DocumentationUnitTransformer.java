@@ -127,7 +127,6 @@ public class DocumentationUnitTransformer {
       }
 
       // TODO documentationOffice
-      // TODO court
 
       // .normReferences(
       // updatedDomainObject.contentRelatedIndexing().norms().stream()
@@ -160,10 +159,14 @@ public class DocumentationUnitTransformer {
       // builder.legalEffect(legalEffectDTO);
 
     } else {
-      builder.procedure(null).ecli(null).judicialBody(null).decisionDate(null).inputType(null)
-      // TODO documentationOffice
-      // TODO court
-      ;
+      builder
+          .procedure(null)
+          .ecli(null)
+          .judicialBody(null)
+          .decisionDate(null)
+          .inputType(null)
+          .court(null)
+          .documentationOffice(null);
     }
 
     if (currentDto.getId() == null
@@ -250,10 +253,7 @@ public class DocumentationUnitTransformer {
     CoreData coreData =
         CoreData.builder()
             .fileNumbers(fileNumbers)
-            // .court(
-            // getCourtObject(
-            // documentUnitMetadataDTO.getCourtType(),
-            // documentUnitMetadataDTO.getCourtLocation()))
+            .court(CourtTransformer.transformToDomain(documentUnitMetadataDTO.getCourt()))
             .documentType(documentType)
             .ecli(documentUnitMetadataDTO.getEcli())
             .appraisalBody(documentUnitMetadataDTO.getJudicialBody())
@@ -294,8 +294,7 @@ public class DocumentationUnitTransformer {
 
     CoreDataBuilder coreDataBuilder =
         CoreData.builder()
-            .court(CourtTransformer.transformDTO((documentationUnitDTO.getCourt())))
-            // documentationUnitDTO.getCourtLocation()))
+            .court(CourtTransformer.transformToDomain((documentationUnitDTO.getCourt())))
             // .procedure(getProcedure(documentationUnitDTO.getProcedure()))
             // .previousProcedures(documentationUnitDTO.getPreviousProcedures())
             .documentationOffice(

@@ -35,6 +35,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
   private final DatabaseFileNumberRepository fileNumberRepository;
   private final DatabaseDocumentTypeRepository databaseDocumentTypeRepository;
   private final DatabaseDocumentCategoryRepository databaseDocumentCategoryRepository;
+  private final DatabaseCourtRepository databaseCourtRepository;
   private final DatabaseNormReferenceRepository documentUnitNormRepository;
   private final DatabaseDocumentationOfficeRepository documentationOfficeRepository;
   private final JPADatabaseKeywordRepository keywordRepository;
@@ -46,6 +47,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
       DatabaseFileNumberRepository fileNumberRepository,
       DatabaseDocumentTypeRepository databaseDocumentTypeRepository,
       DatabaseDocumentCategoryRepository databaseDocumentCategoryRepository,
+      DatabaseCourtRepository databaseCourtRepository,
       DatabaseNormReferenceRepository documentUnitNormRepository,
       DatabaseNormAbbreviationRepository normAbbreviationRepository,
       DatabaseDocumentationOfficeRepository documentationOfficeRepository,
@@ -55,6 +57,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
     this.repository = repository;
     this.fileNumberRepository = fileNumberRepository;
     this.databaseDocumentTypeRepository = databaseDocumentTypeRepository;
+    this.databaseCourtRepository = databaseCourtRepository;
     this.databaseDocumentCategoryRepository = databaseDocumentCategoryRepository;
     this.documentUnitNormRepository = documentUnitNormRepository;
     this.documentationOfficeRepository = documentationOfficeRepository;
@@ -114,12 +117,30 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
       return Mono.empty();
     }
 
-    if (documentUnit.coreData() != null) {
+    // ---
+    // Doing database-related (pre) transformation
+    if (documentUnit.coreData() != null && documentUnit.coreData().documentType() != null) {
       documentationUnitDTO.setDocumentType(getDbDocType(documentUnit.coreData().documentType()));
     }
 
     documentationUnitDTO = saveKeywords(documentationUnitDTO, documentUnit);
 
+    if (documentUnit.coreData() != null && documentUnit.coreData().court() != null) {
+      var court =
+          databaseCourtRepository
+              .findByTypeAndLocation(
+                  documentUnit.coreData().court().type(),
+                  documentUnit.coreData().court().location())
+              .stream()
+              .findFirst();
+      if (court.isEmpty()) {
+        throw new DocumentationUnitException("no court found.");
+      }
+      documentationUnitDTO.setCourt(court.get());
+    }
+    // ---
+
+    // Transform non-database-related properties
     documentationUnitDTO =
         DocumentationUnitTransformer.transformToDTO(documentationUnitDTO, documentUnit);
     documentationUnitDTO = repository.save(documentationUnitDTO);
@@ -152,10 +173,6 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
   }
 
   private DocumentTypeDTO getDbDocType(DocumentType documentType) {
-    if (documentType == null) {
-      return null;
-    }
-
     // TODO cache category at application start
     DocumentTypeDTO docTypeDTO =
         databaseDocumentTypeRepository.findFirstByAbbreviationAndCategory(

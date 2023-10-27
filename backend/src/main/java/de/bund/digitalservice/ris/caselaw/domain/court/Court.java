@@ -1,4 +1,4 @@
-package de.bund.digitalservice.ris.caselaw.domain.lookuptable.court;
+package de.bund.digitalservice.ris.caselaw.domain.court;
 
 import java.util.UUID;
 import lombok.Builder;
