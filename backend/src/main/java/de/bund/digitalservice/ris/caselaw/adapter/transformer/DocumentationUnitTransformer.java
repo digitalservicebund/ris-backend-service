@@ -21,8 +21,8 @@ import de.bund.digitalservice.ris.caselaw.domain.Texts;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
-import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -71,7 +71,7 @@ public class DocumentationUnitTransformer {
                             .value(fileNumber)
                             .documentationUnit(currentDto)
                             .build())
-                .collect(Collectors.toSet()));
+                .toList());
       }
 
       if (coreData.deviatingCourts() != null) {
@@ -215,13 +215,10 @@ public class DocumentationUnitTransformer {
     return documentUnit == null
         || documentUnit.coreData() == null
         || documentUnit.coreData().court() == null
-    // TODO court
-    // || !Objects.equals(documentUnitDTO.getCourtType(),
-    // documentUnit.coreData().court().type())
-    // || !Objects.equals(
-    // documentUnitDTO.getCourtLocation(),
-    // documentUnit.coreData().court().location()
-    ;
+        || !Objects.equals(
+            documentUnitDTO.getCourt().getType(), documentUnit.coreData().court().type())
+        || !Objects.equals(
+            documentUnitDTO.getCourt().getLocation(), documentUnit.coreData().court().location());
   }
 
   public static DocumentUnit transformToMetadataToDomain(

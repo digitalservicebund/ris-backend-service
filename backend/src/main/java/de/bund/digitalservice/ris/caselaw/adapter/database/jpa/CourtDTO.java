@@ -41,4 +41,9 @@ public class CourtDTO {
 
   @Column(name = "additional_information")
   private String additionalInformation;
+
+  // TODO This property has only been added to allow tests to create courts in the database, beacuse
+  // this column is not nullable. We might have to ask the migration team to remove the contraint
+  @Column(name = "juris_id")
+  private int jurisId;
 }

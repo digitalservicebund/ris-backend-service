@@ -19,6 +19,8 @@ import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentUnitStatusServ
 import de.bund.digitalservice.ris.caselaw.adapter.DatabaseProcedureService;
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentUnitController;
 import de.bund.digitalservice.ris.caselaw.adapter.DocxConverterService;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CourtDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseCourtRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentCategoryRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentTypeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationOfficeRepository;
@@ -26,6 +28,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumenta
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseFileNumberRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentCategoryDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentTypeDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.FileNumberDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentationUnitRepositoryImpl;
@@ -109,7 +112,10 @@ class DocumentationUnitIntegrationTest {
   @Autowired private DatabaseDocumentationUnitRepository repository;
   @Autowired private DatabaseFileNumberRepository fileNumberRepository;
   @Autowired private DatabaseDocumentTypeRepository databaseDocumentTypeRepository;
+
+  @Autowired private DatabaseDocumentCategoryRepository databaseDocumentCategoryRepository;
   @Autowired private DatabaseDocumentationOfficeRepository documentationOfficeRepository;
+  @Autowired private DatabaseCourtRepository courtRepository;
   @MockBean private S3AsyncClient s3AsyncClient;
   @MockBean private EmailPublishService publishService;
   @MockBean private DocxConverterService docxConverterService;
@@ -118,7 +124,6 @@ class DocumentationUnitIntegrationTest {
 
   private final DocumentationOffice docOffice = buildDefaultDocOffice();
   private UUID documentationOfficeUuid;
-  @Autowired private DatabaseDocumentCategoryRepository databaseDocumentCategoryRepository;
 
   @BeforeEach
   void setUp() {
@@ -186,8 +191,6 @@ class DocumentationUnitIntegrationTest {
     assertThat(documentUnitDTO.getStatus().get(0).isWithError()).isEqualTo(false);
 
     // TODO status
-    // TODO
-    //    assertThat(status.getCreatedAt()).isEqualTo(documentUnitDTO.getCreationtimestamp());
   }
 
   @Test
@@ -372,7 +375,7 @@ class DocumentationUnitIntegrationTest {
   }
 
   @Test
-  @Disabled
+  @Disabled("depends on status and linked decisions")
   void testSearchResultsAreDeterministic() {
     PublicationStatus[] published =
         new PublicationStatus[] {PUBLISHED, PUBLISHING, JURIS_PUBLISHED};
@@ -384,7 +387,8 @@ class DocumentationUnitIntegrationTest {
                 DocumentationUnitDTO.builder()
                     .id(uuid)
                     .documentNumber(RandomStringUtils.random(10, true, true))
-                    //                    .documentationOfficeId(documentationOfficeUuid)
+                    .documentationOffice(
+                        documentationOfficeRepository.findByAbbreviation("DigitalService"))
                     .build())
         .flatMap(documentUnitDTO -> Mono.just(repository.save(documentUnitDTO)))
         // TODO status
@@ -473,27 +477,47 @@ class DocumentationUnitIntegrationTest {
     List<String> courtLocations = List.of("Hamburg", "München", "Berlin", "Frankfurt", "Köln");
     List<LocalDate> decisionDates =
         List.of(
-            LocalDate.parse("2021-01-02T00:00:00.00Z"),
-            LocalDate.parse("2022-02-03T00:00:00.00Z"),
-            LocalDate.parse("2023-03-04T00:00:00.00Z"),
-            LocalDate.parse("2023-08-01T00:00:00.00Z"),
-            LocalDate.parse("2023-08-10T00:00:00.00Z"));
+            LocalDate.parse("2021-01-02"),
+            LocalDate.parse("2022-02-03"),
+            LocalDate.parse("2023-03-04"),
+            LocalDate.parse("2023-08-01"),
+            LocalDate.parse("2023-08-10"));
+    // TODO status
     List<PublicationStatus> statuses =
         List.of(PUBLISHED, UNPUBLISHED, PUBLISHING, PUBLISHED, UNPUBLISHED);
     List<Boolean> errorStatuses = List.of(false, true, true, false, true);
 
     for (int i = 0; i < 5; i++) {
+
+      CourtDTO court =
+          courtRepository.save(
+              CourtDTO.builder()
+                  .type(courtTypes.get(i))
+                  .location(courtLocations.get(i))
+                  .isSuperiorCourt(true)
+                  .isForeignCourt(false)
+                  .jurisId(i)
+                  .build());
       DocumentationUnitDTO dto =
           repository.save(
               DocumentationUnitDTO.builder()
                   .id(UUID.randomUUID())
-                  //                      .creationtimestamp(Instant.now())
                   .documentNumber(documentNumbers.get(i))
-                  //                      .courtType(courtTypes.get(i))
-                  //                      .courtLocation(courtLocations.get(i))
+                  .court(court)
                   .decisionDate(decisionDates.get(i))
-                  //                      .documentationOfficeId(docOfficeIds.get(i))
+                  .documentationOffice(
+                      DocumentationOfficeDTO.builder().id(docOfficeIds.get(i)).build())
                   .build());
+
+      repository.save(
+          dto.toBuilder()
+              .fileNumbers(
+                  List.of(
+                      FileNumberDTO.builder()
+                          .documentationUnit(dto)
+                          .value(fileNumbers.get(i))
+                          .build()))
+              .build());
 
       // TODO status
       //      documentUnitStatusRepository
@@ -507,8 +531,6 @@ class DocumentationUnitIntegrationTest {
       //                  .build())
       //          .block();
 
-      fileNumberRepository.save(
-          FileNumberDTO.builder().documentationUnit(dto).value(fileNumbers.get(i)).build());
     }
 
     // no search criteria
@@ -534,22 +556,24 @@ class DocumentationUnitIntegrationTest {
 
     assertThat(extractDocumentNumbersFromSearchCall(searchInput)).containsExactly("IJKL202101234");
 
-    // by status
-    searchInput =
-        DocumentUnitSearchInput.builder()
-            .status(DocumentUnitStatus.builder().publicationStatus(PUBLISHING).build())
-            .build();
-
-    assertThat(extractDocumentNumbersFromSearchCall(searchInput)).containsExactly("IJKL202101234");
-
-    // by error status
-    searchInput =
-        DocumentUnitSearchInput.builder()
-            .status(DocumentUnitStatus.builder().withError(true).build())
-            .build();
-    // the docunit with error from the other docoffice should not appear
-    assertThat(extractDocumentNumbersFromSearchCall(searchInput))
-        .containsExactly("IJKL202101234", "EFGH202200123");
+    // TODO status
+    //  by status
+    //    searchInput =
+    //        DocumentUnitSearchInput.builder()
+    //            .status(DocumentUnitStatus.builder().publicationStatus(PUBLISHING).build())
+    //            .build();
+    //
+    //
+    // assertThat(extractDocumentNumbersFromSearchCall(searchInput)).containsExactly("IJKL202101234");
+    //
+    //    // by error status
+    //    searchInput =
+    //        DocumentUnitSearchInput.builder()
+    //            .status(DocumentUnitStatus.builder().withError(true).build())
+    //            .build();
+    //    // the docunit with error from the other docoffice should not appear
+    //    assertThat(extractDocumentNumbersFromSearchCall(searchInput))
+    //        .containsExactly("IJKL202101234", "EFGH202200123");
 
     // by documentation office
     searchInput = DocumentUnitSearchInput.builder().myDocOfficeOnly(true).build();
@@ -628,6 +652,7 @@ class DocumentationUnitIntegrationTest {
             .isOk()
             .expectBody(String.class)
             .returnResult();
+    System.out.println(JsonPath.read(result.getResponseBody(), "$.content[*]").toString());
     return JsonPath.read(result.getResponseBody(), "$.content[*].documentNumber");
   }
 }

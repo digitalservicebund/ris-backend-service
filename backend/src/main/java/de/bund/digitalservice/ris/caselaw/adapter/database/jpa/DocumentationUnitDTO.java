@@ -19,6 +19,7 @@ import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -55,15 +56,14 @@ public class DocumentationUnitDTO {
       fetch = FetchType.EAGER,
       orphanRemoval = true)
   @Builder.Default
-  private Set<DecisionNameDTO> decisionNames = new HashSet<>();
+  private List<DecisionNameDTO> decisionNames = new ArrayList<>();
 
   @Column(nullable = false, unique = true, updatable = false, name = "document_number")
   @NotBlank
   private String documentNumber;
 
-  @ManyToOne(optional = true) // todo
+  @ManyToOne
   @JoinColumn(name = "document_type_id")
-  // TODO  @NotNull
   private DocumentTypeDTO documentType;
 
   @Column private String ecli;
@@ -74,7 +74,7 @@ public class DocumentationUnitDTO {
       fetch = FetchType.EAGER,
       orphanRemoval = true)
   @Builder.Default
-  private Set<FileNumberDTO> fileNumbers = new HashSet<>();
+  private List<FileNumberDTO> fileNumbers = new ArrayList<>();
 
   @Column private String grounds;
 
@@ -97,7 +97,7 @@ public class DocumentationUnitDTO {
       fetch = FetchType.EAGER,
       orphanRemoval = true)
   @Builder.Default
-  private Set<NormReferenceDTO> normReferences = new HashSet<>();
+  private List<NormReferenceDTO> normReferences = new ArrayList<>();
 
   @OneToOne(mappedBy = "documentationUnit", cascade = CascadeType.ALL, orphanRemoval = true)
   @PrimaryKeyJoinColumn
@@ -120,7 +120,7 @@ public class DocumentationUnitDTO {
       joinColumns = @JoinColumn(name = "documentation_unit_id"),
       inverseJoinColumns = @JoinColumn(name = "region_id"))
   @Builder.Default
-  private Set<RegionDTO> regions = new HashSet<>();
+  private List<RegionDTO> regions = new ArrayList<>();
 
   @Column private String source;
 
@@ -148,8 +148,6 @@ public class DocumentationUnitDTO {
     }
     this.originalFileDocument = originalFileDocument;
   }
-
-  // Other NeuRIS Categories:
 
   // Gericht
   @ManyToOne
@@ -194,20 +192,6 @@ public class DocumentationUnitDTO {
   @Builder.Default
   private Set<DeviatingCourtDTO> deviatingCourts = new HashSet<>();
 
-  //
-  //    @ManyToOne(optional = false)
-  //    @NotNull
-  //    private DocumentationOffice documentationOffice;
-
-  // Nachgehende Entscheidungen
-  //  @OneToMany(
-  //      mappedBy = "documentationUnit",
-  //      cascade = CascadeType.ALL,
-  //      fetch = FetchType.EAGER,
-  //      orphanRemoval = true)
-  //  @Builder.Default
-  //  private Set<EnsuingDecision> ensuingDecisions = new HashSet<>();
-
   @ManyToMany(
       cascade = {CascadeType.MERGE},
       fetch = FetchType.EAGER)
@@ -218,6 +202,15 @@ public class DocumentationUnitDTO {
       inverseJoinColumns = @JoinColumn(name = "keyword_id"))
   @Builder.Default
   private Set<KeywordDTO> keywords = new HashSet<>();
+
+  // Nachgehende Entscheidungen
+  //  @OneToMany(
+  //      mappedBy = "documentationUnit",
+  //      cascade = CascadeType.ALL,
+  //      fetch = FetchType.EAGER,
+  //      orphanRemoval = true)
+  //  @Builder.Default
+  //  private Set<EnsuingDecision> ensuingDecisions = new HashSet<>();
 
   // Nachgehende Entscheidungen mit Prädikat anhängig
   //  @OneToMany(

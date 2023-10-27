@@ -8,8 +8,6 @@ public interface DocumentationUnitMetadataDTO {
 
   UUID getId();
 
-  String getCaseFacts();
-
   LocalDate getDecisionDate();
 
   String getDocumentNumber();
@@ -25,4 +23,10 @@ public interface DocumentationUnitMetadataDTO {
   String getInputType();
 
   CourtDTO getCourt();
+
+  OriginalFileDocumentDTO getOriginalFileDocument();
+
+  DocumentationOfficeDTO getDocumentationOffice();
+
+  List<StatusDTO> getStatus();
 }

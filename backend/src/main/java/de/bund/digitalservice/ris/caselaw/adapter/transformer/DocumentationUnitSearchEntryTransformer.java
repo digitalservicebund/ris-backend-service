@@ -5,6 +5,8 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatus;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatus.DocumentUnitStatusBuilder;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitSearchEntry;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.List;
 
 public class DocumentationUnitSearchEntryTransformer {
@@ -19,7 +21,8 @@ public class DocumentationUnitSearchEntryTransformer {
         .courtLocation(searchEntryDTO.getCourtLocation())
         .fileNumber(searchEntryDTO.getFirstFileNumber())
         .fileName(searchEntryDTO.getFileName())
-        .decisionDate(searchEntryDTO.getDecisionDate())
+        .decisionDate(
+            LocalDate.ofInstant(searchEntryDTO.getDecisionDate(), ZoneId.of("Europe/Berlin")))
         .documentType(searchEntryDTO.getDocumentType())
         .status(
             getPublicStatus(searchEntryDTO.getPublicationStatus(), searchEntryDTO.getWithError()))
