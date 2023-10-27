@@ -14,6 +14,7 @@ import de.bund.digitalservice.ris.caselaw.domain.LinkedDocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
 import jakarta.persistence.EntityManager;
 import java.time.Instant;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -128,19 +129,21 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
 
   private DocumentationUnitDTO saveKeywords(
       DocumentationUnitDTO documentationUnitDTO, DocumentUnit documentUnit) {
-    if (documentUnit.contentRelatedIndexing() != null) {
+    if (documentUnit != null && documentUnit.contentRelatedIndexing() != null) {
       ContentRelatedIndexing contentRelatedIndexing = documentUnit.contentRelatedIndexing();
 
-      Set<KeywordDTO> keywordDTOs = null;
       if (contentRelatedIndexing.keywords() != null) {
+        Set<KeywordDTO> keywordDTOs = new HashSet<>();
         List<String> keywords = contentRelatedIndexing.keywords();
-        for (int i = 1; i < keywords.size(); i++) {
+        for (int i = 0; i < keywords.size(); i++) {
           String value = keywords.get(i);
           keywordRepository
               .findByValue(value)
               .ifPresentOrElse(
                   keywordDTO -> keywordDTOs.add(keywordDTO),
-                  () -> keywordDTOs.add(KeywordDTO.builder().value(value).build()));
+                  () ->
+                      keywordDTOs.add(
+                          KeywordDTO.builder().id(UUID.randomUUID()).value(value).build()));
         }
         documentationUnitDTO.setKeywords(keywordDTOs);
       }
