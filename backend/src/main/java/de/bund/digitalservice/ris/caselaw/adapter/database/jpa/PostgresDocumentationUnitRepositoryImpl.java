@@ -114,7 +114,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
       return Mono.empty();
     }
 
-    if (documentUnit.coreData() != null && documentUnit.coreData().documentType() != null) {
+    if (documentUnit.coreData() != null) {
       documentationUnitDTO.setDocumentType(getDbDocType(documentUnit.coreData().documentType()));
     }
 
