@@ -173,6 +173,9 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
   }
 
   private DocumentTypeDTO getDbDocType(DocumentType documentType) {
+    if (documentType == null) {
+      return null;
+    }
     // TODO cache category at application start
     DocumentTypeDTO docTypeDTO =
         databaseDocumentTypeRepository.findFirstByAbbreviationAndCategory(
