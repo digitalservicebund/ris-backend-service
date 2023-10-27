@@ -16,6 +16,7 @@ import org.springframework.data.relational.core.mapping.Table;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table("documentation_unit_link")
+@Deprecated
 public class DocumentationUnitLinkDTO {
   @Id private Long id;
   private UUID parentDocumentationUnitUuid;
