@@ -20,15 +20,20 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.Procedure;
 import de.bund.digitalservice.ris.caselaw.domain.ProceedingDecision;
 import de.bund.digitalservice.ris.caselaw.domain.Texts;
-import de.bund.digitalservice.ris.caselaw.domain.lookuptable.court.Court;
+import de.bund.digitalservice.ris.caselaw.domain.court.Court;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw.FieldOfLaw;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * @deprecated use {@link DocumentationUnitTransformer} instead
+ */
 @Slf4j
+@Deprecated
 public class DocumentUnitTransformer {
   private DocumentUnitTransformer() {}
 
@@ -48,7 +53,6 @@ public class DocumentUnitTransformer {
         documentUnitDTO.toBuilder()
             .uuid(documentUnit.uuid())
             .documentnumber(documentUnit.documentNumber())
-            .creationtimestamp(documentUnit.creationtimestamp())
             .fileuploadtimestamp(documentUnit.fileuploadtimestamp())
             .dataSource(dataSource)
             .s3path(documentUnit.s3path())
@@ -135,7 +139,7 @@ public class DocumentUnitTransformer {
     Court court = null;
     if (courtType != null) {
       String label = Court.generateLabel(courtType, courtLocation);
-      court = new Court(courtType, courtLocation, label, null);
+      court = new Court(UUID.randomUUID(), courtType, courtLocation, label, null);
     }
 
     return court;
@@ -213,7 +217,6 @@ public class DocumentUnitTransformer {
         .uuid(documentUnitMetadataDTO.getUuid())
         .coreData(coreData)
         .documentNumber(documentUnitMetadataDTO.getDocumentnumber())
-        .creationtimestamp(documentUnitMetadataDTO.getCreationtimestamp())
         .fileuploadtimestamp(documentUnitMetadataDTO.getFileuploadtimestamp())
         .dataSource(dataSource)
         .s3path(documentUnitMetadataDTO.getS3path())
@@ -319,7 +322,7 @@ public class DocumentUnitTransformer {
             .deviatingFileNumbers(deviatingFileNumbers)
             .court(
                 getCourtObject(documentUnitDTO.getCourtType(), documentUnitDTO.getCourtLocation()))
-            .incorrectCourts(incorrectCourts)
+            .deviatingCourts(incorrectCourts)
             .documentType(documentType)
             .procedure(getProcedure(documentUnitDTO.getProcedure()))
             .previousProcedures(documentUnitDTO.getPreviousProcedures())
@@ -349,7 +352,6 @@ public class DocumentUnitTransformer {
     return DocumentUnit.builder()
         .uuid(documentUnitDTO.getUuid())
         .documentNumber(documentUnitDTO.getDocumentnumber())
-        .creationtimestamp(documentUnitDTO.getCreationtimestamp())
         .fileuploadtimestamp(documentUnitDTO.getFileuploadtimestamp())
         .dataSource(dataSource)
         .s3path(documentUnitDTO.getS3path())

@@ -8,7 +8,7 @@ fileignoreconfig:
 - filename: backend/src/main/kotlin/de/bund/digitalservice/ris/norms/framework/adapter/input/restapi/controller/GetFileController.kt
   checksum: f989b3c9c176b1b985c2f78ca6ca13fa1403cbb69f367ae9b1cb8ea64d5f6747
 - filename: backend/src/test/java/de/bund/digitalservice/ris/caselaw/integration/tests/JurisXmlExporterWrapperIntegrationTest.java
-  checksum: f50e29a97b3766cd195dd27d291e2d8ed043299f1c3ef42dd35f1217782b19b9
+  checksum: ce72ef60a67a168690b1ca5aa7b916e2a9c2a4ae2acd36c7611a6e4cd1443e47
 - filename: backend/src/test/kotlin/unit/adapter/input/restapi/controller/GenerateNormFileControllerTest.kt
   checksum: 930c2643a15a900f328d1d83792e51b12af71cc20136ba43b13fffdffd601e8f
 - filename: backend/src/test/kotlin/unit/adapter/input/restapi/controller/GetFileControllerTest.kt
@@ -22,7 +22,7 @@ fileignoreconfig:
 - filename: doc/structurizr/workspace.json
   checksum: 541780133a0bf013ac75f6a3bc402c77981a273654c5648eabeb32ccb271a834
 - filename: frontend/Dockerfile.prod
-  checksum: c4ce959b84195482a9017a4b540821686700a5c0a6ed2180987aee50f119aea9
+  checksum: 98615dbec84eb0504d5f17c488c5b8d408bf2d032b924a9fb37c758d10846e5f
 - filename: frontend/FRONTEND_STYLEGUIDE.md
   checksum: e6b8194eba2012f2a769c5a5d3577715a573b441a7b94e744c32b3149d0d3a93
 - filename: frontend/src/main.ts

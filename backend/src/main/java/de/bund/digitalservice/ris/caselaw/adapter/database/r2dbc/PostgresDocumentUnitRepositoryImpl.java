@@ -1,5 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc;
 
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseCourtRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentCategoryRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentTypeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationOfficeRepository;
@@ -18,16 +19,17 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ProcedureLinkDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitDTO.DocumentUnitDTOBuilder;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.CourtDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DatabaseCitationStyleRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DatabaseCourtRepository;
+// import
+// de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DatabaseCourtRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DatabaseFieldOfLawRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.StateDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.StateRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.ActiveCitationTransformer;
+import de.bund.digitalservice.ris.caselaw.adapter.transformer.DeviatingCourtTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DeviatingDecisionDateTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentUnitTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationUnitLinkTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationUnitSearchEntryTransformer;
-import de.bund.digitalservice.ris.caselaw.adapter.transformer.IncorrectCourtTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.LinkedDocumentationUnitTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.ActiveCitation;
 import de.bund.digitalservice.ris.caselaw.domain.DataSource;
@@ -46,7 +48,7 @@ import de.bund.digitalservice.ris.caselaw.domain.LinkedDocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.Procedure;
 import de.bund.digitalservice.ris.caselaw.domain.ProceedingDecision;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
-import de.bund.digitalservice.ris.caselaw.domain.lookuptable.court.Court;
+import de.bund.digitalservice.ris.caselaw.domain.court.Court;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.criteria.CriteriaBuilder;
@@ -175,7 +177,8 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
   public Mono<DocumentUnit> createNewDocumentUnit(
       String documentNumber, DocumentationOffice documentationOffice) {
 
-    return Mono.just(documentationOfficeRepository.findByLabel(documentationOffice.label()))
+    return Mono.just(
+            documentationOfficeRepository.findByAbbreviation(documentationOffice.abbreviation()))
         .flatMap(
             documentationOfficeDTO ->
                 metadataRepository.save(
@@ -302,16 +305,19 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
   }
 
   private Mono<CourtDTO> getCourt(DocumentUnit documentUnit) {
-    if (documentUnit == null
-        || documentUnit.coreData() == null
-        || documentUnit.coreData().court() == null) {
-      return Mono.just(CourtDTO.builder().build());
-    }
+    return Mono.just(CourtDTO.builder().build());
 
-    return databaseCourtRepository
-        .findByCourttypeAndCourtlocation(
-            documentUnit.coreData().court().type(), documentUnit.coreData().court().location())
-        .defaultIfEmpty(CourtDTO.builder().build());
+    //    if (documentUnit == null
+    //        || documentUnit.coreData() == null
+    //        || documentUnit.coreData().court() == null) {
+    //      return Mono.just(CourtDTO.builder().build());
+    //    }
+    //
+    //    return databaseCourtRepository
+    //        .findByCourttypeAndCourtlocation(
+    //            documentUnit.coreData().court().type(),
+    // documentUnit.coreData().court().location())
+    //        .defaultIfEmpty(CourtDTO.builder().build());
   }
 
   public Mono<DocumentUnitDTO> saveFileNumbers(
@@ -607,8 +613,8 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
             incorrectCourtDTOs -> {
               List<String> incorrectCourts = new ArrayList<>();
               if (documentUnit.coreData() != null
-                  && documentUnit.coreData().incorrectCourts() != null) {
-                incorrectCourts.addAll(documentUnit.coreData().incorrectCourts());
+                  && documentUnit.coreData().deviatingCourts() != null) {
+                incorrectCourts.addAll(documentUnit.coreData().deviatingCourts());
               }
 
               AtomicInteger incorrectCourtIndex = new AtomicInteger(0);
@@ -619,7 +625,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
                   incorrectCourtDTO -> {
                     if (incorrectCourtIndex.get() < incorrectCourts.size()) {
                       incorrectCourtDTO =
-                          IncorrectCourtTransformer.enrichDTO(
+                          DeviatingCourtTransformer.enrichDTO(
                               incorrectCourtDTO,
                               incorrectCourts.get(incorrectCourtIndex.getAndIncrement()));
                       toSave.add(incorrectCourtDTO);
@@ -753,7 +759,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
   private Mono<DocumentUnitDTO> saveProcedure(
       DocumentUnitDTO documentUnitDTO, DocumentUnit documentUnit) {
 
-    String documentationOfficeLabel = documentUnit.coreData().documentationOffice().label();
+    String documentationOfficeLabel = documentUnit.coreData().documentationOffice().abbreviation();
     Optional.ofNullable(documentUnit.coreData().procedure())
         .map(procedure -> findOrCreateProcedure(procedure, documentationOfficeLabel))
         .ifPresent(
@@ -763,6 +769,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
                     ProcedureLinkDTO.builder()
                         .procedureDTO(procedureDTO)
                         .documentationUnitId(documentUnitDTO.uuid)
+                        .rank(getNextProcedureLinkRank(documentUnitDTO))
                         .build());
               }
 
@@ -774,7 +781,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
 
   private ProcedureDTO findOrCreateProcedure(Procedure procedure, String documentationOfficeLabel) {
     DocumentationOfficeDTO documentationOfficeDTO =
-        documentationOfficeRepository.findByLabel(documentationOfficeLabel);
+        documentationOfficeRepository.findByAbbreviation(documentationOfficeLabel);
 
     return Optional.ofNullable(
             procedureRepository.findByLabelAndDocumentationOffice(
@@ -790,10 +797,18 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
 
   private boolean areCurrentlyLinked(DocumentUnitDTO documentUnitDTO, ProcedureDTO procedureDTO) {
     return Optional.ofNullable(
-            procedureLinkRepository.findFirstByDocumentationUnitIdOrderByCreatedAtDesc(
+            procedureLinkRepository.findFirstByDocumentationUnitIdOrderByRankDesc(
                 documentUnitDTO.uuid))
         .map(linkDTO -> linkDTO.getProcedureDTO().equals(procedureDTO))
         .orElse(false);
+  }
+
+  private int getNextProcedureLinkRank(DocumentUnitDTO documentUnitDTO) {
+    return Optional.ofNullable(
+            procedureLinkRepository.findFirstByDocumentationUnitIdOrderByRankDesc(
+                documentUnitDTO.getUuid()))
+        .map(procedureLinkDTO -> procedureLinkDTO.getRank() + 1)
+        .orElse(1);
   }
 
   private Mono<DocumentUnit> unlinkLinkedDocumentationUnit(
@@ -1156,7 +1171,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
 
   private <T extends DocumentUnitMetadataDTO> Mono<T> injectProcedure(T documentUnitDTO) {
     Optional.ofNullable(
-            procedureLinkRepository.findFirstByDocumentationUnitIdOrderByCreatedAtDesc(
+            procedureLinkRepository.findFirstByDocumentationUnitIdOrderByRankDesc(
                 documentUnitDTO.uuid))
         .map(ProcedureLinkDTO::getProcedureDTO)
         .ifPresent(documentUnitDTO::setProcedure);
@@ -1168,7 +1183,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
 
     List<String> previousProcedures =
         procedureLinkRepository
-            .findAllByDocumentationUnitIdOrderByCreatedAtDesc(documentUnitDTO.uuid)
+            .findAllByDocumentationUnitIdOrderByRankDesc(documentUnitDTO.uuid)
             .stream()
             .skip(1)
             .map(ProcedureLinkDTO::getProcedureDTO)
@@ -1282,7 +1297,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
     }
 
     DocumentationOfficeDTO documentationOfficeDTO =
-        documentationOfficeRepository.findByLabel(documentationOffice.label());
+        documentationOfficeRepository.findByAbbreviation(documentationOffice.abbreviation());
 
     CriteriaBuilder builder = entityManager.getCriteriaBuilder();
     CriteriaQuery<DocumentationUnitSearchEntryDTO> query =

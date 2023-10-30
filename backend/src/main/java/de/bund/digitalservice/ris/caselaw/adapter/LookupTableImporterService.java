@@ -6,15 +6,12 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPAFieldOfLawLink
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPAFieldOfLawLinkRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPAFieldOfLawRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.CitationStyleDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.CourtDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DatabaseCitationStyleRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DatabaseCourtRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.StateDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.StateRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.FieldOfLawTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.ServiceUtils;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.citation.CitationsStyleXML;
-import de.bund.digitalservice.ris.caselaw.domain.lookuptable.court.CourtsXML;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw.FieldOfLawXml;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw.FieldsOfLawXml;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.state.StatesXML;
@@ -41,7 +38,6 @@ import reactor.core.publisher.Mono;
 @Service
 @Slf4j
 public class LookupTableImporterService {
-  private final DatabaseCourtRepository databaseCourtRepository;
   private final StateRepository stateRepository;
   private final DatabaseCitationStyleRepository databaseCitationStyleRepository;
   private final JPAFieldOfLawRepository jpaFieldOfLawRepository;
@@ -50,78 +46,14 @@ public class LookupTableImporterService {
       Pattern.compile("\\p{Lu}{2}(-\\d{2})+(?![\\p{L}\\d-])");
 
   public LookupTableImporterService(
-      DatabaseCourtRepository databaseCourtRepository,
       StateRepository stateRepository,
       DatabaseCitationStyleRepository databaseCitationStyleRepository,
       JPAFieldOfLawRepository jpaFieldOfLawRepository,
       JPAFieldOfLawLinkRepository jpaFieldOfLawLinkRepository) {
-    this.databaseCourtRepository = databaseCourtRepository;
     this.stateRepository = stateRepository;
     this.databaseCitationStyleRepository = databaseCitationStyleRepository;
     this.jpaFieldOfLawRepository = jpaFieldOfLawRepository;
     this.jpaFieldOfLawLinkRepository = jpaFieldOfLawLinkRepository;
-  }
-
-  public Mono<String> importCourtLookupTable(ByteBuffer byteBuffer) {
-    XmlMapper mapper = new XmlMapper();
-    CourtsXML courtsXML;
-    try {
-      courtsXML = mapper.readValue(ServiceUtils.byteBufferToArray(byteBuffer), CourtsXML.class);
-    } catch (IOException e) {
-      throw new ResponseStatusException(
-          HttpStatus.NOT_ACCEPTABLE, "Could not map ByteBuffer-content to CourtsXML", e);
-    }
-
-    List<CourtDTO> courtsDTO =
-        courtsXML.getList().stream()
-            .map(
-                courtXML ->
-                    CourtDTO.builder()
-                        .id(courtXML.getId())
-                        .newEntry(true)
-                        .changedatemail(courtXML.getChangeDateMail())
-                        .changedateclient(courtXML.getChangeDateClient())
-                        .changeindicator(courtXML.getChangeIndicator())
-                        .version(courtXML.getVersion())
-                        .courttype(courtXML.getCourtType())
-                        .courtlocation(courtXML.getCourtLocation())
-                        .field(courtXML.getField())
-                        .superiorcourt(courtXML.getSuperiorcourt())
-                        .foreigncountry(courtXML.getForeignCountry())
-                        .region(courtXML.getRegion())
-                        .federalstate(courtXML.getFederalState())
-                        .belongsto(courtXML.getBelongsto())
-                        .street(courtXML.getStreet())
-                        .zipcode(courtXML.getZipcode())
-                        .maillocation(courtXML.getMaillocation())
-                        .phone(courtXML.getPhone())
-                        .fax(courtXML.getFax())
-                        .postofficebox(courtXML.getPostofficebox())
-                        .postofficeboxzipcode(courtXML.getPostofficeboxzipcode())
-                        .postofficeboxlocation(courtXML.getPostofficeboxlocation())
-                        .email(courtXML.getEmail())
-                        .internet(courtXML.getInternet())
-                        .isbranchofficeto(courtXML.getIsbranchofficeto())
-                        .earlycourtname(courtXML.getEarlycourtname())
-                        .latecourtname(courtXML.getLatecourtname())
-                        .currentofficialcourtname(courtXML.getCurrentofficialcourtname())
-                        .traditionalcourtname(courtXML.getTraditionalcourtname())
-                        .existingbranchoffice(courtXML.getExistingbranchoffice())
-                        .abandonedbranchoffice(courtXML.getAbandonedbranchoffice())
-                        .contactperson(courtXML.getContactperson())
-                        .deliverslrs(courtXML.getDeliverslrs())
-                        .remark(courtXML.getRemark())
-                        .additional(courtXML.getAdditional())
-                        .existencedate(courtXML.getExistencedate())
-                        .cancellationdate(courtXML.getCancellationdate())
-                        .build())
-            .toList();
-
-    return databaseCourtRepository
-        .deleteAll()
-        .thenMany(databaseCourtRepository.saveAll(courtsDTO))
-        .collectList()
-        .map(list -> "Successfully imported the court lookup table");
   }
 
   public Mono<String> importStateLookupTable(ByteBuffer byteBuffer) {

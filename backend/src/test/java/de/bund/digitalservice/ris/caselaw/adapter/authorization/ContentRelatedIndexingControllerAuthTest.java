@@ -11,7 +11,6 @@ import de.bund.digitalservice.ris.caselaw.adapter.AuthService;
 import de.bund.digitalservice.ris.caselaw.adapter.ContentRelatedIndexingController;
 import de.bund.digitalservice.ris.caselaw.adapter.FieldOfLawService;
 import de.bund.digitalservice.ris.caselaw.adapter.KeycloakUserService;
-import de.bund.digitalservice.ris.caselaw.adapter.KeywordService;
 import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
@@ -40,14 +39,13 @@ class ContentRelatedIndexingControllerAuthTest {
   @MockBean private DocumentUnitService documentUnitService;
   @MockBean private FieldOfLawService fieldOfLawService;
   @MockBean private KeycloakUserService userService;
-  @MockBean private KeywordService keywordService;
   @MockBean ReactiveClientRegistrationRepository clientRegistrationRepository;
 
   private static final UUID TEST_UUID = UUID.fromString("88888888-4444-4444-4444-121212121212");
   private final String docOffice1Group = "/CC-RIS";
   private final String docOffice2Group = "/caselaw/BGH";
-  private final DocumentationOffice docOffice1 = buildDocOffice("CC-RIS", "XX");
-  private final DocumentationOffice docOffice2 = buildDocOffice("BGH", "CO");
+  private final DocumentationOffice docOffice1 = buildDocOffice("CC-RIS");
+  private final DocumentationOffice docOffice2 = buildDocOffice("BGH");
 
   @BeforeEach
   void setUp() {
@@ -130,80 +128,6 @@ class ContentRelatedIndexingControllerAuthTest {
         .exchange()
         .expectStatus()
         .isForbidden();
-  }
-
-  @Test
-  void testGetKeywords() {
-    when(keywordService.getKeywordsForDocumentUnit(TEST_UUID)).thenReturn(Mono.empty());
-    mockDocumentUnit(docOffice2, PUBLISHED);
-
-    String uri = "/api/v1/caselaw/documentunits/" + TEST_UUID + "/contentrelatedindexing/keywords";
-
-    risWebTestClient
-        .withLogin(docOffice1Group)
-        .get()
-        .uri(uri)
-        .exchange()
-        .expectStatus()
-        .isOk(); // because publicationStatus is PUBLISHED
-
-    risWebTestClient.withLogin(docOffice2Group).get().uri(uri).exchange().expectStatus().isOk();
-
-    mockDocumentUnit(docOffice2, null);
-
-    risWebTestClient
-        .withLogin(docOffice1Group)
-        .get()
-        .uri(uri)
-        .exchange()
-        .expectStatus()
-        .isForbidden();
-  }
-
-  @Test
-  void testAddKeyword() {
-    String keyword = "XYZ";
-    when(keywordService.addKeywordToDocumentUnit(TEST_UUID, keyword)).thenReturn(Mono.empty());
-    mockDocumentUnit(docOffice1, null);
-
-    String uri =
-        "/api/v1/caselaw/documentunits/"
-            + TEST_UUID
-            + "/contentrelatedindexing/keywords/"
-            + keyword;
-
-    risWebTestClient.withLogin(docOffice1Group).put().uri(uri).exchange().expectStatus().isOk();
-
-    risWebTestClient
-        .withLogin(docOffice2Group)
-        .put()
-        .uri(uri)
-        .exchange()
-        .expectStatus()
-        .isForbidden();
-  }
-
-  @Test
-  void testDeleteKeyword() {
-    String keyword = "XZY";
-    when(keywordService.deleteKeywordFromDocumentUnit(TEST_UUID, keyword)).thenReturn(Mono.empty());
-    mockDocumentUnit(docOffice2, null);
-
-    String uri =
-        "/api/v1/caselaw/documentunits/"
-            + TEST_UUID
-            + "/contentrelatedindexing/keywords/"
-            + keyword;
-
-    risWebTestClient
-        .withLogin(docOffice1Group)
-        .delete()
-        .uri(uri)
-        .exchange()
-        .expectStatus()
-        .isForbidden();
-
-    risWebTestClient.withLogin(docOffice2Group).delete().uri(uri).exchange().expectStatus().isOk();
   }
 
   private void mockDocumentUnit(DocumentationOffice docOffice, PublicationStatus status) {

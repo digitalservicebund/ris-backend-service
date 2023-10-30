@@ -104,7 +104,8 @@ class SaveNormIntegrationTest {
 
   @BeforeEach
   void setUp() {
-    documentationOfficeUuid = documentationOfficeRepository.findByLabel(docOffice.label()).getId();
+    documentationOfficeUuid =
+        documentationOfficeRepository.findByAbbreviation(docOffice.abbreviation()).getId();
 
     doReturn(Mono.just(docOffice))
         .when(userService)
@@ -279,7 +280,6 @@ class SaveNormIntegrationTest {
   private DocumentUnit generateDocumentationUnit(UUID uuid, Instant creationTimestamp) {
     return DocumentUnit.builder()
         .uuid(uuid)
-        .creationtimestamp(creationTimestamp)
         .documentNumber("1234567890123")
         .coreData(CoreData.builder().documentationOffice(docOffice).build())
         .contentRelatedIndexing(ContentRelatedIndexing.builder().norms(new ArrayList<>()).build())

@@ -33,4 +33,9 @@ public enum LegalEffect {
     }
     return documentUnit.coreData().legalEffect();
   }
+
+  public static LegalEffect deriveLegalEffectFrom(
+      DocumentUnit documentUnit, boolean courtHasChanged) {
+    return LegalEffect.valueOf(deriveFrom(documentUnit, courtHasChanged));
+  }
 }

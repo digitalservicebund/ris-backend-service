@@ -1,7 +1,7 @@
 package de.bund.digitalservice.ris.caselaw.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import de.bund.digitalservice.ris.caselaw.domain.lookuptable.court.Court;
+import de.bund.digitalservice.ris.caselaw.domain.court.Court;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
 import java.beans.Transient;
 import java.time.LocalDate;

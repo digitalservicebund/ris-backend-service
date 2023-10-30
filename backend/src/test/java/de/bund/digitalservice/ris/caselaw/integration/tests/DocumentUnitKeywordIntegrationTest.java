@@ -3,34 +3,36 @@ package de.bund.digitalservice.ris.caselaw.integration.tests;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.when;
+import static org.springframework.test.context.jdbc.Sql.ExecutionPhase.AFTER_TEST_METHOD;
 
 import de.bund.digitalservice.ris.caselaw.RisWebTestClient;
 import de.bund.digitalservice.ris.caselaw.TestConfig;
 import de.bund.digitalservice.ris.caselaw.adapter.AuthService;
-import de.bund.digitalservice.ris.caselaw.adapter.ContentRelatedIndexingController;
+import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentNumberService;
+import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentUnitStatusService;
+import de.bund.digitalservice.ris.caselaw.adapter.DatabaseProcedureService;
+import de.bund.digitalservice.ris.caselaw.adapter.DocumentUnitController;
+import de.bund.digitalservice.ris.caselaw.adapter.DocxConverterService;
 import de.bund.digitalservice.ris.caselaw.adapter.FieldOfLawService;
-import de.bund.digitalservice.ris.caselaw.adapter.KeywordService;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationOfficeRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentUnitRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseKeywordRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.KeywordDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.PostgresDocumentUnitRepositoryImpl;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPADatabaseKeywordRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentationUnitRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.PostgresFieldOfLawRepositoryImpl;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.PostgresKeywordRepositoryImpl;
-import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentUnitTransformer;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.PostgresPublicationReportRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationOfficeTransformer;
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
 import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
+import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
+import de.bund.digitalservice.ris.caselaw.domain.EmailPublishService;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
-import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,25 +41,34 @@ import org.springframework.security.oauth2.client.registration.ReactiveClientReg
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.test.context.jdbc.Sql;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import reactor.core.publisher.Mono;
+import software.amazon.awssdk.services.s3.S3AsyncClient;
 
 @RISIntegrationTest(
     imports = {
-      KeywordService.class,
+      DatabaseDocumentNumberService.class,
       FieldOfLawService.class,
       FlywayConfig.class,
       PostgresConfig.class,
       PostgresJPAConfig.class,
-      PostgresDocumentUnitRepositoryImpl.class,
-      PostgresKeywordRepositoryImpl.class,
+      PostgresDocumentationUnitRepositoryImpl.class,
       PostgresFieldOfLawRepositoryImpl.class,
       SecurityConfig.class,
       AuthService.class,
       TestConfig.class,
+      DocumentUnitService.class,
+      DatabaseDocumentUnitStatusService.class,
+      PostgresPublicationReportRepositoryImpl.class,
+      DatabaseProcedureService.class,
     },
-    controllers = {ContentRelatedIndexingController.class})
+    controllers = {DocumentUnitController.class})
+@Sql(scripts = {"classpath:keyword_init.sql"})
+@Sql(
+    scripts = {"classpath:keyword_cleanup.sql"},
+    executionPhase = AFTER_TEST_METHOD)
 class DocumentUnitKeywordIntegrationTest {
   @Container
   static PostgreSQLContainer<?> postgreSQLContainer =
@@ -74,258 +85,182 @@ class DocumentUnitKeywordIntegrationTest {
   }
 
   @Autowired private RisWebTestClient risWebTestClient;
-  @Autowired private DatabaseKeywordRepository keywordRepository;
-  @Autowired private DatabaseDocumentUnitRepository documentUnitRepository;
+  @Autowired private JPADatabaseKeywordRepository keywordRepository;
+  @Autowired private DatabaseDocumentationUnitRepository documentUnitRepository;
   @Autowired private DatabaseDocumentationOfficeRepository documentationOfficeRepository;
-
-  @MockBean private DocumentUnitService documentUnitService;
+  @Autowired private DocumentUnitService documentUnitService;
   @MockBean private UserService userService;
   @MockBean ReactiveClientRegistrationRepository clientRegistrationRepository;
+  @MockBean private DocxConverterService docxConverterService;
+  @MockBean private S3AsyncClient s3AsyncClient;
+  @MockBean private EmailPublishService publishService;
 
   private static final UUID TEST_UUID = UUID.fromString("88888888-4444-4444-4444-121212121212");
   private DocumentationOfficeDTO docOfficeDTO;
 
   @BeforeEach
   void setUp() {
-    docOfficeDTO = documentationOfficeRepository.findByLabel("DigitalService");
+    docOfficeDTO = documentationOfficeRepository.findByAbbreviation("DigitalService");
 
     doReturn(Mono.just(DocumentationOfficeTransformer.transformDTO(docOfficeDTO)))
         .when(userService)
         .getDocumentationOffice(any(OidcUser.class));
   }
 
-  @AfterEach
-  void cleanUp() {
-    keywordRepository.deleteAll().block();
-    documentUnitRepository.deleteAll().block();
-  }
-
   @Test
   void testGetAllKeywordsForDocumentUnit_withoutKeywords_shouldReturnEmptyList() {
-    DocumentUnitDTO documentUnitDTO =
-        documentUnitRepository
-            .save(
-                DocumentUnitDTO.builder()
-                    .uuid(TEST_UUID)
-                    .documentationOffice(docOfficeDTO)
-                    .documentnumber("docnr12345678")
-                    .creationtimestamp(Instant.now())
-                    .build())
-            .block();
-
-    when(documentUnitService.getByUuid(TEST_UUID))
-        .thenReturn(Mono.just(DocumentUnitTransformer.transformDTO(documentUnitDTO)));
-
     risWebTestClient
         .withDefaultLogin()
         .get()
-        .uri("/api/v1/caselaw/documentunits/" + TEST_UUID + "/contentrelatedindexing/keywords")
+        .uri("/api/v1/caselaw/documentunits/documentnr003")
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(String[].class)
-        .consumeWith(response -> assertThat(response.getResponseBody()).isEmpty());
+        .expectBody(DocumentUnit.class)
+        .consumeWith(
+            response -> {
+              assertThat(response.getResponseBody().contentRelatedIndexing().keywords()).isEmpty();
+            });
   }
 
   @Test
   void testGetAllKeywordsForDocumentUnit_withKeywords_shouldReturnList() {
-    DocumentUnitDTO documentUnitDTO =
-        documentUnitRepository
-            .save(
-                DocumentUnitDTO.builder()
-                    .uuid(TEST_UUID)
-                    .documentationOffice(docOfficeDTO)
-                    .documentnumber("docnr12345678")
-                    .creationtimestamp(Instant.now())
-                    .build())
-            .block();
-
-    when(documentUnitService.getByUuid(TEST_UUID))
-        .thenReturn(Mono.just(DocumentUnitTransformer.transformDTO(documentUnitDTO)));
-
-    KeywordDTO keywordDTO01 =
-        KeywordDTO.builder().documentUnitId(documentUnitDTO.getId()).keyword("keyword01").build();
-    keywordRepository.save(keywordDTO01).block();
-
-    KeywordDTO keywordDTO02 =
-        KeywordDTO.builder().documentUnitId(documentUnitDTO.getId()).keyword("keyword02").build();
-    keywordRepository.save(keywordDTO02).block();
-
     risWebTestClient
         .withDefaultLogin()
         .get()
-        .uri("/api/v1/caselaw/documentunits/" + TEST_UUID + "/contentrelatedindexing/keywords")
+        .uri("/api/v1/caselaw/documentunits/documentnr001")
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(String[].class)
+        .expectBody(DocumentUnit.class)
+        // Todo replace InAnyOrder when ordered by rank
         .consumeWith(
             response ->
-                assertThat(response.getResponseBody()).containsExactly("keyword01", "keyword02"));
-  }
-
-  @Test
-  void testGetAllKeywordsForDocumentUnit_forNonExistingDocumentUnit_shouldReturnForbidden() {
-    when(documentUnitService.getByUuid(TEST_UUID)).thenReturn(Mono.empty());
-
-    risWebTestClient
-        .withDefaultLogin()
-        .get()
-        .uri("/api/v1/caselaw/documentunits/" + TEST_UUID + "/contentrelatedindexing/keywords")
-        .exchange()
-        .expectStatus()
-        .isForbidden();
+                assertThat(response.getResponseBody().contentRelatedIndexing().keywords())
+                    .containsExactlyInAnyOrder("keyword1", "keyword2"));
   }
 
   @Test
   void testAddKeywordForDocumentUnit_shouldReturnListWithAllKeywords() {
-    DocumentUnitDTO documentUnitDTO =
-        documentUnitRepository
-            .save(
-                DocumentUnitDTO.builder()
-                    .uuid(TEST_UUID)
-                    .documentationOffice(docOfficeDTO)
-                    .documentnumber("docnr12345678")
-                    .creationtimestamp(Instant.now())
-                    .build())
-            .block();
+    UUID uuid = UUID.fromString("46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3");
 
-    when(documentUnitService.getByUuid(TEST_UUID))
-        .thenReturn(Mono.just(DocumentUnitTransformer.transformDTO(documentUnitDTO)));
+    DocumentUnit documentUnitFromFrontend =
+        DocumentUnit.builder()
+            .uuid(uuid)
+            .documentNumber("documentnr001")
+            .contentRelatedIndexing(
+                ContentRelatedIndexing.builder()
+                    .keywords(List.of("keyword1", "keyword2", "keyword3"))
+                    .build())
+            .build();
+
+    assertThat(keywordRepository.findAll().size()).isEqualTo(2);
 
     risWebTestClient
         .withDefaultLogin()
         .put()
-        .uri(
-            "/api/v1/caselaw/documentunits/"
-                + TEST_UUID
-                + "/contentrelatedindexing/keywords/keyword01")
+        .uri("/api/v1/caselaw/documentunits/" + uuid)
+        .bodyValue(documentUnitFromFrontend)
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(String[].class)
+        .expectBody(DocumentUnit.class)
         .consumeWith(
-            response -> assertThat(response.getResponseBody()).containsExactly("keyword01"));
-  }
-
-  @Test
-  void testAddKeywordForNonExistingDocumentUnit_shouldReturnForbidden() {
-    when(documentUnitService.getByUuid(TEST_UUID)).thenReturn(Mono.empty());
+            response ->
+                assertThat(response.getResponseBody().contentRelatedIndexing().keywords())
+                    .containsExactlyInAnyOrder("keyword1", "keyword2", "keyword3"));
 
     risWebTestClient
         .withDefaultLogin()
-        .put()
-        .uri(
-            "/api/v1/caselaw/documentunits/"
-                + TEST_UUID
-                + "/contentrelatedindexing/keywords/keyword01")
+        .get()
+        .uri("/api/v1/caselaw/documentunits/documentnr002")
         .exchange()
         .expectStatus()
-        .isForbidden();
+        .isOk()
+        .expectBody(DocumentUnit.class)
+        // Todo replace InAnyOrder when ordered by rank
+        .consumeWith(
+            response ->
+                assertThat(response.getResponseBody().contentRelatedIndexing().keywords())
+                    .containsExactlyInAnyOrder("keyword1"));
+
+    assertThat(keywordRepository.findAll().size()).isEqualTo(3);
   }
 
   @Test
   void
       testAddExistingKeywordForDocumentUnit_shouldNotAddDuplicateKeywordAndReturnListWithAllKeywords() {
-    DocumentUnitDTO documentUnitDTO =
-        documentUnitRepository
-            .save(
-                DocumentUnitDTO.builder()
-                    .uuid(TEST_UUID)
-                    .documentationOffice(docOfficeDTO)
-                    .documentnumber("docnr12345678")
-                    .creationtimestamp(Instant.now())
-                    .build())
-            .block();
+    UUID uuid = UUID.fromString("46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3");
 
-    when(documentUnitService.getByUuid(TEST_UUID))
-        .thenReturn(Mono.just(DocumentUnitTransformer.transformDTO(documentUnitDTO)));
+    risWebTestClient
+        .withDefaultLogin()
+        .get()
+        .uri("/api/v1/caselaw/documentunits/documentnr001")
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody(DocumentUnit.class)
+        // Todo replace InAnyOrder when ordered by rank
+        .consumeWith(
+            response ->
+                assertThat(response.getResponseBody().contentRelatedIndexing().keywords())
+                    .containsExactlyInAnyOrder("keyword1", "keyword2"));
 
-    KeywordDTO keywordDTO01 =
-        KeywordDTO.builder().documentUnitId(documentUnitDTO.getId()).keyword("keyword01").build();
-    keywordRepository.save(keywordDTO01).block();
+    DocumentUnit documentUnitFromFrontend =
+        DocumentUnit.builder()
+            .uuid(uuid)
+            .documentNumber("documentnr001")
+            .contentRelatedIndexing(
+                ContentRelatedIndexing.builder().keywords(List.of("keyword1", "keyword2")).build())
+            .build();
+
+    assertThat(keywordRepository.findAll().size()).isEqualTo(2);
 
     risWebTestClient
         .withDefaultLogin()
         .put()
-        .uri(
-            "/api/v1/caselaw/documentunits/"
-                + TEST_UUID
-                + "/contentrelatedindexing/keywords/keyword01")
+        .uri("/api/v1/caselaw/documentunits/" + uuid)
+        .bodyValue(documentUnitFromFrontend)
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(String[].class)
+        .expectBody(DocumentUnit.class)
         .consumeWith(
-            response -> assertThat(response.getResponseBody()).containsExactly("keyword01"));
+            response ->
+                assertThat(response.getResponseBody().contentRelatedIndexing().keywords())
+                    .containsExactlyInAnyOrder("keyword1", "keyword2"));
+
+    assertThat(keywordRepository.findAll().size()).isEqualTo(2);
   }
 
   @Test
-  void testDeleteKeywordForDocumentUnit_shouldReturnListWithAllKeywords() {
-    DocumentUnitDTO documentUnitDTO =
-        documentUnitRepository
-            .save(
-                DocumentUnitDTO.builder()
-                    .uuid(TEST_UUID)
-                    .documentationOffice(docOfficeDTO)
-                    .documentnumber("docnr12345678")
-                    .creationtimestamp(Instant.now())
-                    .build())
-            .block();
+  void testDeleteKeywordFromDocumentUnit_shouldReturnListWithAllRemainingKeywords() {
+    UUID uuid = UUID.fromString("46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3");
 
-    when(documentUnitService.getByUuid(TEST_UUID))
-        .thenReturn(Mono.just(DocumentUnitTransformer.transformDTO(documentUnitDTO)));
+    DocumentUnit documentUnitFromFrontend =
+        DocumentUnit.builder()
+            .uuid(uuid)
+            .documentNumber("documentnr001")
+            .contentRelatedIndexing(
+                ContentRelatedIndexing.builder().keywords(List.of("keyword1")).build())
+            .build();
 
-    KeywordDTO keywordDTO01 =
-        KeywordDTO.builder().documentUnitId(documentUnitDTO.getId()).keyword("keyword01").build();
-    keywordRepository.save(keywordDTO01).block();
+    assertThat(keywordRepository.findAll().size()).isEqualTo(2);
 
     risWebTestClient
         .withDefaultLogin()
-        .delete()
-        .uri(
-            "/api/v1/caselaw/documentunits/"
-                + TEST_UUID
-                + "/contentrelatedindexing/keywords/keyword01")
+        .put()
+        .uri("/api/v1/caselaw/documentunits/" + uuid)
+        .bodyValue(documentUnitFromFrontend)
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(String[].class)
-        .consumeWith(response -> assertThat(response.getResponseBody()).isEmpty());
-  }
-
-  @Test
-  void testDeleteNonExistingKeywordForDocumentUnit_shouldReturnListWithAllKeywords() {
-    DocumentUnitDTO documentUnitDTO =
-        documentUnitRepository
-            .save(
-                DocumentUnitDTO.builder()
-                    .uuid(TEST_UUID)
-                    .documentationOffice(docOfficeDTO)
-                    .documentnumber("docnr12345678")
-                    .creationtimestamp(Instant.now())
-                    .build())
-            .block();
-
-    when(documentUnitService.getByUuid(TEST_UUID))
-        .thenReturn(Mono.just(DocumentUnitTransformer.transformDTO(documentUnitDTO)));
-
-    KeywordDTO keywordDTO01 =
-        KeywordDTO.builder().documentUnitId(documentUnitDTO.getId()).keyword("keyword01").build();
-    keywordRepository.save(keywordDTO01).block();
-
-    risWebTestClient
-        .withDefaultLogin()
-        .delete()
-        .uri(
-            "/api/v1/caselaw/documentunits/"
-                + TEST_UUID
-                + "/contentrelatedindexing/keywords/keyword02")
-        .exchange()
-        .expectStatus()
-        .isOk()
-        .expectBody(String[].class)
+        .expectBody(DocumentUnit.class)
         .consumeWith(
-            response -> assertThat(response.getResponseBody()).containsExactly("keyword01"));
+            response ->
+                assertThat(response.getResponseBody().contentRelatedIndexing().keywords())
+                    .containsExactlyInAnyOrder("keyword1"));
+
+    // Todo delete keywords, when no reference to any documentationunitId?
   }
 }

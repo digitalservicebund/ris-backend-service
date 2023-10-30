@@ -41,9 +41,11 @@ import de.bund.digitalservice.ris.caselaw.domain.EmailPublishService;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.Texts;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
-import de.bund.digitalservice.ris.caselaw.domain.lookuptable.court.Court;
+import de.bund.digitalservice.ris.caselaw.domain.court.Court;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.Collections;
 import java.util.List;
@@ -119,9 +121,9 @@ class ActiveCitationIntegrationTest {
   @BeforeEach
   void setUp() {
     when(userService.getDocumentationOffice(any(OidcUser.class)))
-        .thenReturn(Mono.just(AuthUtils.buildDocOffice("DigitalService", "XX")));
+        .thenReturn(Mono.just(AuthUtils.buildDocOffice("DigitalService")));
 
-    docOfficeUuid = documentationOfficeRepository.findByLabel("DigitalService").getId();
+    docOfficeUuid = documentationOfficeRepository.findByAbbreviation("DigitalService").getId();
 
     category = databaseDocumentCategoryRepository.findFirstByLabel("R");
     if (category == null) {
@@ -728,7 +730,7 @@ class ActiveCitationIntegrationTest {
             .documentationOfficeId(docOfficeUuid)
             .documentnumber(DOCUMENT_NUMBER_PREFIX + "0")
             .creationtimestamp(TIMESTAMP.plus(0, ChronoUnit.MINUTES))
-            .decisionDate(DECISION_DATE)
+            .decisionDate(LocalDate.ofInstant(DECISION_DATE, ZoneId.of("Europe/Berlin")))
             .documentTypeId(type.getId())
             .build();
 
@@ -761,7 +763,10 @@ class ActiveCitationIntegrationTest {
             .documentationOfficeId(docOfficeUuid)
             .documentnumber(DOCUMENT_NUMBER_PREFIX + offset)
             .creationtimestamp(TIMESTAMP.plus(offset * 10L, ChronoUnit.MINUTES))
-            .decisionDate(DECISION_DATE.plus(offset * 10L, ChronoUnit.MINUTES))
+            .decisionDate(
+                LocalDate.ofInstant(
+                    DECISION_DATE.plus(offset * 10L, ChronoUnit.MINUTES),
+                    ZoneId.of("Europe/Berlin")))
             .courtType("TestCourt #" + offset)
             .courtLocation("Berlin #" + offset)
             .documentTypeId(type.getId())
@@ -825,7 +830,9 @@ class ActiveCitationIntegrationTest {
                 .label("TestCourt #" + number + " Berlin #" + number)
                 .build())
         .dateKnown(true)
-        .decisionDate(DECISION_DATE.plus(number * 10L, ChronoUnit.MINUTES))
+        .decisionDate(
+            LocalDate.ofInstant(
+                DECISION_DATE.plus(number * 10L, ChronoUnit.MINUTES), ZoneId.of("Europe/Berlin")))
         .documentNumber(DOCUMENT_NUMBER_PREFIX + number)
         .documentType(
             DocumentType.builder().jurisShortcut("abbreviation" + number).label("R").build())
@@ -854,12 +861,11 @@ class ActiveCitationIntegrationTest {
                 .fileNumbers(List.of("file number #0"))
                 .documentType(
                     DocumentType.builder().jurisShortcut("abbreviation0").label("R").build())
-                .decisionDate(DECISION_DATE)
-                .incorrectCourts(Collections.emptyList())
+                .decisionDate(LocalDate.ofInstant(DECISION_DATE, ZoneId.of("Europe/Berlin")))
+                .deviatingCourts(Collections.emptyList())
                 .documentationOffice(AuthUtils.buildDefaultDocOffice())
                 .build())
         .texts(Texts.builder().build())
-        .creationtimestamp(TIMESTAMP)
         .contentRelatedIndexing(contentRelatedIndexing)
         .status(DocumentUnitStatus.builder().publicationStatus(PublicationStatus.PUBLISHED).build())
         .proceedingDecisions(Collections.emptyList())

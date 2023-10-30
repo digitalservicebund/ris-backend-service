@@ -47,9 +47,10 @@ import de.bund.digitalservice.ris.caselaw.domain.EmailPublishService;
 import de.bund.digitalservice.ris.caselaw.domain.ProceedingDecision;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
-import de.bund.digitalservice.ris.caselaw.domain.lookuptable.court.Court;
+import de.bund.digitalservice.ris.caselaw.domain.court.Court;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -125,7 +126,8 @@ class ProceedingDecisionIntegrationTest {
 
   @BeforeEach
   void setUp() {
-    documentationOfficeUuid = documentationOfficeRepository.findByLabel(docOffice.label()).getId();
+    documentationOfficeUuid =
+        documentationOfficeRepository.findByAbbreviation(docOffice.abbreviation()).getId();
     doReturn(Mono.just(docOffice)).when(userService).getDocumentationOffice(any(OidcUser.class));
     category =
         databaseDocumentCategoryRepository.saveAndFlush(
@@ -588,7 +590,7 @@ class ProceedingDecisionIntegrationTest {
 
   @Test
   void testSearchForDocumentUnitsByProceedingDecisionInput_onlyDate_shouldMatchOne() {
-    Instant date1 = prepareDocumentUnitMetadataDTOs();
+    LocalDate date1 = prepareDocumentUnitMetadataDTOs();
     simulateAPICall(ProceedingDecision.builder().decisionDate(date1).build())
         .jsonPath("$.content")
         .isNotEmpty()
@@ -645,7 +647,7 @@ class ProceedingDecisionIntegrationTest {
   @Test
   void
       testSearchForDocumentUnitsByProceedingDecisionInput_threeMatchingOneDoesNot_shouldMatchNothing() {
-    Instant date1 = prepareDocumentUnitMetadataDTOs();
+    LocalDate date1 = prepareDocumentUnitMetadataDTOs();
     simulateAPICall(
             ProceedingDecision.builder()
                 .decisionDate(date1)
@@ -659,7 +661,7 @@ class ProceedingDecisionIntegrationTest {
 
   @Test
   void testSearchForDocumentUnitsByProceedingDecisionInput_shouldOnlyFindPublished() {
-    Instant date = Instant.parse("2023-02-02T00:00:00.00Z");
+    LocalDate date = LocalDate.parse("2023-02-02T00:00:00.00Z");
 
     var du1 =
         createDocumentUnit(
@@ -726,8 +728,8 @@ class ProceedingDecisionIntegrationTest {
         .isArray();
   }
 
-  private Instant prepareDocumentUnitMetadataDTOs() {
-    Instant date1 = Instant.parse("2023-01-02T00:00:00.00Z");
+  private LocalDate prepareDocumentUnitMetadataDTOs() {
+    LocalDate date1 = LocalDate.parse("2023-01-02T00:00:00.00Z");
     DocumentUnitMetadataDTO documentUnit1 =
         createDocumentUnit(
             "SomeCourt",
@@ -738,7 +740,7 @@ class ProceedingDecisionIntegrationTest {
             "DigitalService",
             DocumentUnitStatus.builder().publicationStatus(PublicationStatus.PUBLISHED).build());
 
-    Instant date2 = Instant.parse("2023-02-03T00:00:00.00Z");
+    LocalDate date2 = LocalDate.parse("2023-02-03T00:00:00.00Z");
     DocumentUnitMetadataDTO documentUnit2 =
         createDocumentUnit(
             "AnotherCourt",
@@ -749,7 +751,7 @@ class ProceedingDecisionIntegrationTest {
             "DigitalService",
             DocumentUnitStatus.builder().publicationStatus(PublicationStatus.PUBLISHED).build());
 
-    Instant date3 = Instant.parse("2023-03-04T00:00:00.00Z");
+    LocalDate date3 = LocalDate.parse("2023-03-04T00:00:00.00Z");
     DocumentUnitMetadataDTO documentUnit3 =
         createDocumentUnit(
             "YetAnotherCourt",
@@ -777,7 +779,7 @@ class ProceedingDecisionIntegrationTest {
   private DocumentUnitMetadataDTO createDocumentUnit(
       String courtType,
       String courtLocation,
-      Instant decisionDate,
+      LocalDate decisionDate,
       List<String> fileNumbers,
       String documentTypeJurisShortcut,
       String documentOfficeLabel,
@@ -805,7 +807,7 @@ class ProceedingDecisionIntegrationTest {
     }
 
     DocumentationOfficeDTO documentOffice =
-        documentationOfficeRepository.findByLabel(documentOfficeLabel);
+        documentationOfficeRepository.findByAbbreviation(documentOfficeLabel);
     assertThat(documentOffice).isNotNull();
 
     DocumentUnitMetadataDTO documentUnitMetadataDTO =

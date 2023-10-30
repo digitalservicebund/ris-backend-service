@@ -14,6 +14,10 @@ import org.springframework.data.annotation.Transient;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
+/**
+ * @deprecated use {@link
+ *     de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO} instead
+ */
 @Data
 @SuperBuilder(toBuilder = true)
 @NoArgsConstructor
@@ -21,6 +25,7 @@ import org.springframework.data.relational.core.mapping.Table;
 @Table("doc_unit")
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
+@Deprecated
 public class DocumentUnitDTO extends DocumentUnitMetadataDTO {
 
   // RUBRIKEN

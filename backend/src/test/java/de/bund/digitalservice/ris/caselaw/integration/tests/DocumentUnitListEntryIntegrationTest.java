@@ -106,7 +106,7 @@ class DocumentUnitListEntryIntegrationTest {
     fileNumberRepository.deleteAll().block();
     statusRepository.deleteAll().block();
 
-    docOfficeDTO = documentationOfficeRepository.findByLabel("DigitalService");
+    docOfficeDTO = documentationOfficeRepository.findByAbbreviation("DigitalService");
 
     doReturn(Mono.just(DocumentationOfficeTransformer.transformDTO(docOfficeDTO)))
         .when(userService)

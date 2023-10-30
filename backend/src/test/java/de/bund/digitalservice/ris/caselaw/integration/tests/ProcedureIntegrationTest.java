@@ -110,7 +110,8 @@ class ProcedureIntegrationTest {
 
   @BeforeEach
   void setUp() {
-    documentationOfficeDTO = documentationOfficeRepository.findByLabel(docOffice.label());
+    documentationOfficeDTO =
+        documentationOfficeRepository.findByAbbreviation(docOffice.abbreviation());
     doReturn(Mono.just(docOffice)).when(userService).getDocumentationOffice(any(OidcUser.class));
   }
 
@@ -147,7 +148,6 @@ class ProcedureIntegrationTest {
     DocumentUnit documentUnitFromFrontend =
         DocumentUnit.builder()
             .uuid(dto.getUuid())
-            .creationtimestamp(dto.getCreationtimestamp())
             .documentNumber(dto.getDocumentnumber())
             .coreData(
                 CoreData.builder().procedure(procedure).documentationOffice(docOffice).build())
@@ -168,8 +168,8 @@ class ProcedureIntegrationTest {
 
     assertThat(repository.findAll()).hasSize(1);
     assertThat(repository.findAll().get(0).getLabel()).isEqualTo(label);
-    assertThat(repository.findAll().get(0).getDocumentationOffice().getLabel())
-        .isEqualTo(docOffice.label());
+    assertThat(repository.findAll().get(0).getDocumentationOffice().getAbbreviation())
+        .isEqualTo(docOffice.abbreviation());
   }
 
   @Test
@@ -193,7 +193,6 @@ class ProcedureIntegrationTest {
     DocumentUnit documentUnitFromFrontend =
         DocumentUnit.builder()
             .uuid(dto.getUuid())
-            .creationtimestamp(dto.getCreationtimestamp())
             .documentNumber(dto.getDocumentnumber())
             .coreData(
                 CoreData.builder().procedure(procedure).documentationOffice(docOffice).build())
@@ -215,7 +214,7 @@ class ProcedureIntegrationTest {
     assertThat(repository.findAll()).hasSize(1);
     assertThat(
             linkRepository
-                .findFirstByDocumentationUnitIdOrderByCreatedAtDesc(documentUnitFromFrontend.uuid())
+                .findFirstByDocumentationUnitIdOrderByRankDesc(documentUnitFromFrontend.uuid())
                 .getProcedureDTO()
                 .getId())
         .isEqualTo(procedureDTO.getId());
@@ -243,7 +242,6 @@ class ProcedureIntegrationTest {
     DocumentUnit documentUnitFromFrontend1 =
         DocumentUnit.builder()
             .uuid(dto.getUuid())
-            .creationtimestamp(dto.getCreationtimestamp())
             .documentNumber(dto.getDocumentnumber())
             .coreData(
                 CoreData.builder().procedure(procedure1).documentationOffice(docOffice).build())
@@ -271,7 +269,6 @@ class ProcedureIntegrationTest {
     DocumentUnit documentUnitFromFrontend2 =
         DocumentUnit.builder()
             .uuid(dto.getUuid())
-            .creationtimestamp(dto.getCreationtimestamp())
             .documentNumber(dto.getDocumentnumber())
             .coreData(
                 CoreData.builder().procedure(procedure2).documentationOffice(docOffice).build())
@@ -300,7 +297,6 @@ class ProcedureIntegrationTest {
     DocumentUnit documentUnitFromFrontend3 =
         DocumentUnit.builder()
             .uuid(dto.getUuid())
-            .creationtimestamp(dto.getCreationtimestamp())
             .documentNumber(dto.getDocumentnumber())
             .coreData(
                 CoreData.builder().procedure(procedure3).documentationOffice(docOffice).build())
@@ -328,7 +324,8 @@ class ProcedureIntegrationTest {
 
   @Test
   void testAddProcedureWithSameNameToDifferentOffice() {
-    DocumentationOfficeDTO bghDocOfficeDTO = documentationOfficeRepository.findByLabel("BGH");
+    DocumentationOfficeDTO bghDocOfficeDTO =
+        documentationOfficeRepository.findByAbbreviation("BGH");
     createProcedure("testProcedure", bghDocOfficeDTO);
     assertThat(repository.findAll()).hasSize(1);
 
@@ -348,7 +345,6 @@ class ProcedureIntegrationTest {
     DocumentUnit documentUnitFromFrontend =
         DocumentUnit.builder()
             .uuid(dto.getUuid())
-            .creationtimestamp(dto.getCreationtimestamp())
             .documentNumber(dto.getDocumentnumber())
             .coreData(
                 CoreData.builder().procedure(procedure).documentationOffice(docOffice).build())
@@ -430,7 +426,8 @@ class ProcedureIntegrationTest {
 
   @Test
   void testProcedureControllerReturnsPerDocOffice() {
-    DocumentationOfficeDTO bghDocOfficeDTO = documentationOfficeRepository.findByLabel("BGH");
+    DocumentationOfficeDTO bghDocOfficeDTO =
+        documentationOfficeRepository.findByAbbreviation("BGH");
     createProcedures(List.of("procedure1", "procedure2", "procedure3"), bghDocOfficeDTO);
     assertThat(repository.findAll()).hasSize(3);
 
@@ -466,7 +463,8 @@ class ProcedureIntegrationTest {
 
   @Test
   void testDontDeleteProcedureOfForeignOffice() {
-    DocumentationOfficeDTO bghDocOfficeDTO = documentationOfficeRepository.findByLabel("BGH");
+    DocumentationOfficeDTO bghDocOfficeDTO =
+        documentationOfficeRepository.findByAbbreviation("BGH");
     createProcedures(List.of("fooProcedure"), bghDocOfficeDTO);
     assertThat(repository.findAll()).hasSize(1);
 

@@ -17,12 +17,13 @@ import de.bund.digitalservice.ris.caselaw.domain.Procedure;
 import de.bund.digitalservice.ris.caselaw.domain.ProceedingDecision;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.Texts;
-import de.bund.digitalservice.ris.caselaw.domain.lookuptable.court.Court;
+import de.bund.digitalservice.ris.caselaw.domain.court.Court;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw.FieldOfLaw;
 import de.bund.digitalservice.ris.domain.export.juris.JurisXmlExporter;
 import java.lang.reflect.Field;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
@@ -53,16 +54,17 @@ class JurisXmlExporterWrapperIntegrationTest {
         CoreData.builder()
             .fileNumbers(List.of("fileNumber1", "fileNumber2"))
             .deviatingFileNumbers(List.of("deviatingFileNumber1", "deviatingFileNumber2"))
-            .court(new Court("courtType", null, null, null))
+            .court(new Court(UUID.randomUUID(), "courtType", null, null, null))
             .ecli("ecli")
             .deviatingEclis(List.of("dev-ecli-1", "dev-ecli-2"))
             .documentType(
                 DocumentType.builder().jurisShortcut("category").label("category123").build())
             .ecli("ecli")
-            .decisionDate(Instant.parse("2021-01-01T00:00:00Z"))
+            .decisionDate(LocalDate.parse("2021-01-01T00:00:00Z"))
             .deviatingDecisionDates(
                 List.of(
-                    Instant.parse("2021-01-01T00:00:00Z"), Instant.parse("2021-01-02T00:00:00Z")))
+                    LocalDate.parse("2021-01-01T00:00:00Z"),
+                    LocalDate.parse("2021-01-02T00:00:00Z")))
             .build();
 
     Texts texts = Texts.builder().decisionName("decisionName").build();
@@ -71,8 +73,8 @@ class JurisXmlExporterWrapperIntegrationTest {
         List.of(
             ProceedingDecision.builder()
                 .uuid(UUID.randomUUID())
-                .court(new Court("courtType", "courtPlace", "courtLabel", null))
-                .decisionDate(Instant.parse("2020-05-06T00:00:00Z"))
+                .court(new Court(UUID.randomUUID(), "courtType", "courtPlace", "courtLabel", null))
+                .decisionDate(LocalDate.parse("2020-05-06T00:00:00Z"))
                 .dateKnown(true)
                 .fileNumber("fileNumber")
                 .documentType(
@@ -103,7 +105,6 @@ class JurisXmlExporterWrapperIntegrationTest {
         DocumentUnit.builder()
             .uuid(TEST_UUID)
             .documentNumber(documentNr)
-            .creationtimestamp(Instant.parse("2021-01-01T00:00:00Z"))
             .fileuploadtimestamp(Instant.parse("2021-01-01T00:00:00Z"))
             .s3path("s3path")
             .filetype("filetype")
@@ -134,11 +135,10 @@ class JurisXmlExporterWrapperIntegrationTest {
             .ecli("ecli")
             .deviatingEclis(List.of("dev-ecli-1", "dev-ecli-2"))
             .appraisalBody("appraisalBody")
-            .decisionDate(Instant.parse("2021-01-01T00:00:00Z"))
+            .decisionDate(LocalDate.parse("2021-01-01T00:00:00Z"))
             .legalEffect("legalEffect")
             .inputType("inputType")
-            .documentationOffice(
-                DocumentationOffice.builder().label("fooOffice").label("FO").build())
+            .documentationOffice(DocumentationOffice.builder().abbreviation("fooOffice").build())
             .region("region")
             .build();
     Texts texts =
@@ -159,8 +159,8 @@ class JurisXmlExporterWrapperIntegrationTest {
                 .uuid(UUID.randomUUID())
                 .documentNumber("documentNumber")
                 .dataSource(DataSource.NEURIS)
-                .court(new Court("courtType", "courtPlace", "courtLabel", null))
-                .decisionDate(Instant.parse("2020-04-05T00:00:00Z"))
+                .court(new Court(UUID.randomUUID(), "courtType", "courtPlace", "courtLabel", null))
+                .decisionDate(LocalDate.parse("2020-04-05T00:00:00Z"))
                 .dateKnown(true)
                 .fileNumber("fileNumber")
                 .documentType(
@@ -184,7 +184,6 @@ class JurisXmlExporterWrapperIntegrationTest {
         DocumentUnit.builder()
             .uuid(TEST_UUID)
             .documentNumber(documentNr)
-            .creationtimestamp(Instant.parse("2021-01-01T00:00:00Z"))
             .fileuploadtimestamp(Instant.parse("2021-01-01T00:00:00Z"))
             .dataSource(DataSource.NEURIS)
             .s3path("s3path")

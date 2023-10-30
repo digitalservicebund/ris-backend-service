@@ -1,0 +1,43 @@
+package de.bund.digitalservice.ris.caselaw.adapter.database.jpa;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.MapsId;
+import jakarta.persistence.OneToOne;
+import java.time.Instant;
+import java.util.UUID;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder(toBuilder = true)
+@Entity(name = "original_file_document")
+public class OriginalFileDocumentDTO {
+
+  @Column(name = "documentation_unit_id")
+  @Id
+  private UUID documentationUnitId;
+
+  @Column(name = "upload_timestamp")
+  private Instant uploadTimestamp;
+
+  @Column private String extension;
+
+  @Column private String filename;
+
+  @Column(name = "s3_object_path")
+  private String s3ObjectPath;
+
+  @OneToOne
+  @MapsId
+  @JoinColumn(name = "documentation_unit_id")
+  private DocumentationUnitDTO documentationUnit;
+}

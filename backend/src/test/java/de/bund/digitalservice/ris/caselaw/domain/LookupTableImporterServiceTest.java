@@ -1,7 +1,5 @@
 package de.bund.digitalservice.ris.caselaw.domain;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.tuple;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.anyCollection;
 import static org.mockito.Mockito.atMostOnce;
@@ -19,7 +17,6 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPANormDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.CitationStyleDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.CourtDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DatabaseCitationStyleRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DatabaseCourtRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DatabaseFieldOfLawRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.StateDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.StateRepository;
@@ -50,8 +47,6 @@ class LookupTableImporterServiceTest {
   private de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentTypeRepository
       databaseDocumentTypeRepository;
 
-  @MockBean private DatabaseCourtRepository databaseCourtRepository;
-
   @MockBean private StateRepository stateRepository;
 
   @MockBean private DatabaseCitationStyleRepository databaseCitationStyleRepository;
@@ -63,50 +58,6 @@ class LookupTableImporterServiceTest {
   @MockBean private JPAFieldOfLawLinkRepository jpaFieldOfLawLinkRepository;
 
   @Captor private ArgumentCaptor<List<CourtDTO>> courtDTOlistCaptor;
-
-  @Test
-  void testImportCourtLookupTable() {
-    List<CourtDTO> courtsDTO =
-        List.of(
-            CourtDTO.builder()
-                .id(9L)
-                .version("1.0")
-                .courttype("type123")
-                .courtlocation("location123")
-                .newEntry(true)
-                .build());
-
-    when(databaseCourtRepository.deleteAll()).thenReturn(Mono.empty());
-    when(databaseCourtRepository.saveAll(courtsDTO)).thenReturn(Flux.fromIterable(courtsDTO));
-
-    String courtsXml =
-        """
-            <?xml version="1.0"?>
-            <juris-table>
-                <juris-gericht id="9" version="1.0">
-                    <gertyp>type123</gertyp>
-                    <gerort>location123</gerort>
-                    <spruchkoerper>
-                        <name>Staatsanwaltschaft</name>
-                    </spruchkoerper>
-                </juris-gericht>
-            </juris-table>
-            """;
-    ByteBuffer byteBuffer = ByteBuffer.wrap(courtsXml.getBytes());
-
-    StepVerifier.create(service.importCourtLookupTable(byteBuffer))
-        .consumeNextWith(
-            courtDTO -> assertEquals("Successfully imported the court lookup table", courtDTO))
-        .verifyComplete();
-
-    verify(databaseCourtRepository).deleteAll();
-    // this was already tested by using when(courtRepository.saveAll(courtsDTO)), but we leave it
-    // here as an example how to use captors
-    verify(databaseCourtRepository).saveAll(courtDTOlistCaptor.capture());
-    assertThat(courtDTOlistCaptor.getValue())
-        .extracting("courttype", "courtlocation")
-        .containsExactly(tuple("type123", "location123"));
-  }
 
   @Test
   void testImportStateLookupTable() {

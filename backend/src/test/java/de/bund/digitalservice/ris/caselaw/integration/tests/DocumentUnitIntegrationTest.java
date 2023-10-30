@@ -39,9 +39,6 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.FileNumberRepos
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.IncorrectCourtDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.PostgresDocumentUnitRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.PostgresPublicationReportRepositoryImpl;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.CourtDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DatabaseCourtRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.StateDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.StateRepository;
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresConfig;
@@ -59,10 +56,11 @@ import de.bund.digitalservice.ris.caselaw.domain.ProceedingDecision;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.Texts;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
-import de.bund.digitalservice.ris.caselaw.domain.lookuptable.court.Court;
+import de.bund.digitalservice.ris.caselaw.domain.court.Court;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -87,6 +85,9 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import software.amazon.awssdk.services.s3.S3AsyncClient;
 
+/**
+ * @deprecated use {@link DocumentationUnitIntegrationTest} instead
+ */
 @RISIntegrationTest(
     imports = {
       DocumentUnitService.class,
@@ -102,6 +103,7 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
       TestConfig.class
     },
     controllers = {DocumentUnitController.class})
+@Deprecated
 class DocumentUnitIntegrationTest {
   @Container
   static PostgreSQLContainer<?> postgreSQLContainer =
@@ -122,7 +124,6 @@ class DocumentUnitIntegrationTest {
   @Autowired private DatabaseDocumentUnitMetadataRepository previousDecisionRepository;
   @Autowired private FileNumberRepository fileNumberRepository;
   @Autowired private DeviatingEcliRepository deviatingEcliRepository;
-  @Autowired private DatabaseCourtRepository databaseCourtRepository;
   @Autowired private StateRepository stateRepository;
   @Autowired private DatabaseDeviatingDecisionDateRepository deviatingDecisionDateRepository;
   @Autowired private DatabaseDocumentTypeRepository databaseDocumentTypeRepository;
@@ -144,7 +145,8 @@ class DocumentUnitIntegrationTest {
 
   @BeforeEach
   void setUp() {
-    documentationOfficeUuid = documentationOfficeRepository.findByLabel(docOffice.label()).getId();
+    documentationOfficeUuid =
+        documentationOfficeRepository.findByAbbreviation(docOffice.abbreviation()).getId();
 
     doReturn(Mono.just(docOffice))
         .when(userService)
@@ -161,7 +163,6 @@ class DocumentUnitIntegrationTest {
     fileNumberRepository.deleteAll().block();
     deviatingEcliRepository.deleteAll().block();
     previousDecisionRepository.deleteAll().block();
-    databaseCourtRepository.deleteAll().block();
     stateRepository.deleteAll().block();
     deviatingDecisionDateRepository.deleteAll().block();
     incorrectCourtRepository.deleteAll().block();
@@ -222,7 +223,6 @@ class DocumentUnitIntegrationTest {
     DocumentUnit documentUnitFromFrontend =
         DocumentUnit.builder()
             .uuid(dto.getUuid())
-            .creationtimestamp(dto.getCreationtimestamp())
             .documentNumber(dto.getDocumentnumber())
             .coreData(
                 CoreData.builder()
@@ -276,15 +276,11 @@ class DocumentUnitIntegrationTest {
     DocumentUnit documentUnitFromFrontend =
         DocumentUnit.builder()
             .uuid(dto.getUuid())
-            .creationtimestamp(dto.getCreationtimestamp())
             .documentNumber(dto.getDocumentnumber())
             .coreData(
                 CoreData.builder()
                     .documentationOffice(
-                        DocumentationOffice.builder()
-                            .label("DigitalService")
-                            .abbreviation("XX")
-                            .build())
+                        DocumentationOffice.builder().abbreviation("DigitalService").build())
                     .deviatingEclis(List.of("ecli123", "ecli456"))
                     .build())
             .texts(Texts.builder().decisionName("decisionName").build()) // TODO why is this needed?
@@ -338,14 +334,13 @@ class DocumentUnitIntegrationTest {
     DocumentUnit documentUnitFromFrontend =
         DocumentUnit.builder()
             .uuid(dto.getUuid())
-            .creationtimestamp(dto.getCreationtimestamp())
             .documentNumber(dto.getDocumentnumber())
             .coreData(
                 CoreData.builder()
                     .deviatingDecisionDates(
                         (List.of(
-                            Instant.parse("2022-01-31T23:00:00Z"),
-                            Instant.parse("2022-01-31T23:00:00Z"))))
+                            LocalDate.parse("2022-01-31T23:00:00Z"),
+                            LocalDate.parse("2022-01-31T23:00:00Z"))))
                     .documentationOffice(docOffice)
                     .build())
             .texts(Texts.builder().decisionName("decisionName").build()) // TODO why is this needed?
@@ -415,11 +410,10 @@ class DocumentUnitIntegrationTest {
     DocumentUnit documentUnitFromFrontend =
         DocumentUnit.builder()
             .uuid(dto.getUuid())
-            .creationtimestamp(dto.getCreationtimestamp())
             .documentNumber(dto.getDocumentnumber())
             .coreData(
                 CoreData.builder()
-                    .incorrectCourts(
+                    .deviatingCourts(
                         List.of("incorrectCourt1", "incorrectCourt3", "incorrectCourt4"))
                     .documentationOffice(docOffice)
                     .build())
@@ -440,8 +434,8 @@ class DocumentUnitIntegrationTest {
               assertThat(response.getResponseBody()).isNotNull();
               assertThat(response.getResponseBody().documentNumber()).isEqualTo("1234567890123");
               assertThat(response.getResponseBody().coreData()).isNotNull();
-              assertThat(response.getResponseBody().coreData().incorrectCourts()).hasSize(3);
-              assertThat(response.getResponseBody().coreData().incorrectCourts())
+              assertThat(response.getResponseBody().coreData().deviatingCourts()).hasSize(3);
+              assertThat(response.getResponseBody().coreData().deviatingCourts())
                   .containsExactly("incorrectCourt1", "incorrectCourt3", "incorrectCourt4");
             });
 
@@ -456,161 +450,6 @@ class DocumentUnitIntegrationTest {
     assertThat(incorrectCourtDTOs)
         .extracting("court")
         .containsExactly("incorrectCourt1", "incorrectCourt3", "incorrectCourt4");
-  }
-
-  @Test
-  void testRegionFilledBasedOnCourt_courtHasStateShortcut_shouldUseStateName() {
-    DocumentUnit documentUnitFromFrontend =
-        testRegionFilledBasedOnCourt("BE", "Berlin", "region123", false);
-
-    risWebTestClient
-        .withDefaultLogin()
-        .put()
-        .uri("/api/v1/caselaw/documentunits/" + documentUnitFromFrontend.uuid())
-        .bodyValue(documentUnitFromFrontend)
-        .exchange()
-        .expectStatus()
-        .isOk()
-        .expectBody(DocumentUnit.class)
-        .consumeWith(
-            response -> {
-              assertThat(response.getResponseBody()).isNotNull();
-              assertThat(response.getResponseBody().coreData().court().label())
-                  .isEqualTo(documentUnitFromFrontend.coreData().court().label());
-              assertThat(response.getResponseBody().coreData().region()).isEqualTo("Berlin");
-            });
-  }
-
-  @Test
-  void testRegionFilledBasedOnCourt_courtHasNoStateShortcut_shouldUseCourtRegion() {
-    DocumentUnit documentUnitFromFrontend =
-        testRegionFilledBasedOnCourt(null, null, "region123", false);
-
-    risWebTestClient
-        .withDefaultLogin()
-        .put()
-        .uri("/api/v1/caselaw/documentunits/" + documentUnitFromFrontend.uuid())
-        .bodyValue(documentUnitFromFrontend)
-        .exchange()
-        .expectStatus()
-        .isOk()
-        .expectBody(DocumentUnit.class)
-        .consumeWith(
-            response -> {
-              assertThat(response.getResponseBody()).isNotNull();
-              assertThat(response.getResponseBody().coreData().court().label())
-                  .isEqualTo(documentUnitFromFrontend.coreData().court().label());
-              assertThat(response.getResponseBody().coreData().region()).isEqualTo("region123");
-            });
-  }
-
-  @Test
-  void testRegionFilledBasedOnCourt_courtHasNoStateShortcutAndNoRegion_shouldLeaveEmpty() {
-    DocumentUnit documentUnitFromFrontend = testRegionFilledBasedOnCourt(null, null, null, false);
-
-    risWebTestClient
-        .withDefaultLogin()
-        .put()
-        .uri("/api/v1/caselaw/documentunits/" + documentUnitFromFrontend.uuid())
-        .bodyValue(documentUnitFromFrontend)
-        .exchange()
-        .expectStatus()
-        .isOk()
-        .expectBody(DocumentUnit.class)
-        .consumeWith(
-            response -> {
-              assertThat(response.getResponseBody()).isNotNull();
-              assertThat(response.getResponseBody().coreData().court().label())
-                  .isEqualTo(documentUnitFromFrontend.coreData().court().label());
-              assertThat(response.getResponseBody().coreData().region()).isNull();
-            });
-  }
-
-  @Test
-  void testDontSetRegionIfCourtHasNotChanged() {
-    DocumentUnit documentUnitFromFrontend =
-        testRegionFilledBasedOnCourt("BY", "Bayern", "region123", true);
-
-    risWebTestClient
-        .withDefaultLogin()
-        .put()
-        .uri("/api/v1/caselaw/documentunits/" + documentUnitFromFrontend.uuid())
-        .bodyValue(documentUnitFromFrontend)
-        .exchange()
-        .expectStatus()
-        .isOk()
-        .expectBody(DocumentUnit.class)
-        .consumeWith(
-            response -> {
-              assertThat(response.getResponseBody()).isNotNull();
-              assertThat(response.getResponseBody().coreData().court().label())
-                  .isEqualTo(documentUnitFromFrontend.coreData().court().label());
-              assertThat(response.getResponseBody().coreData().region()).isNull();
-            });
-  }
-
-  private DocumentUnit testRegionFilledBasedOnCourt(
-      String stateShortcutInCourtAndState,
-      String stateNameInState,
-      String regionInCourt,
-      boolean sameCourt) {
-
-    CourtDTO courtDTO =
-        CourtDTO.builder()
-            .courttype("ABC")
-            .courtlocation("location123")
-            .federalstate(stateShortcutInCourtAndState)
-            .region(regionInCourt)
-            .build();
-    databaseCourtRepository.save(courtDTO).block();
-    stateRepository
-        .save(
-            StateDTO.builder()
-                .jurisshortcut(stateShortcutInCourtAndState)
-                .label(stateNameInState)
-                .build())
-        .block();
-
-    DocumentUnitDTO.DocumentUnitDTOBuilder builder =
-        DocumentUnitDTO.builder()
-            .uuid(UUID.randomUUID())
-            .creationtimestamp(Instant.now())
-            .documentnumber("1234567890123")
-            .documentationOfficeId(documentationOfficeUuid);
-    if (sameCourt) {
-      builder.courtType(courtDTO.getCourttype()).courtLocation(courtDTO.getCourtlocation());
-    } else {
-      builder.courtType("courttype").courtLocation("courtlocation");
-    }
-    DocumentUnitDTO dto = builder.build();
-
-    DocumentUnitDTO savedDto = repository.save(dto).block();
-    assert savedDto != null;
-
-    Court court = null;
-    if (sameCourt) {
-      court =
-          new Court(
-              savedDto.getCourtType(),
-              savedDto.getCourtLocation(),
-              savedDto.getCourtType() + " " + savedDto.getCourtLocation(),
-              "");
-    } else {
-      court =
-          new Court(
-              courtDTO.getCourttype(),
-              courtDTO.getCourtlocation(),
-              courtDTO.getCourttype() + " " + courtDTO.getCourtlocation(),
-              "");
-    }
-
-    return DocumentUnit.builder()
-        .uuid(dto.getUuid())
-        .creationtimestamp(dto.getCreationtimestamp())
-        .documentNumber(dto.getDocumentnumber())
-        .coreData(CoreData.builder().court(court).documentationOffice(docOffice).build())
-        .texts(Texts.builder().decisionName("decisionName").build())
-        .build();
   }
 
   @Test
@@ -663,7 +502,6 @@ class DocumentUnitIntegrationTest {
     DocumentUnit documentUnitFromFrontend =
         DocumentUnit.builder()
             .uuid(dto.getUuid())
-            .creationtimestamp(dto.getCreationtimestamp())
             .documentNumber(dto.getDocumentnumber())
             .coreData(
                 CoreData.builder()
@@ -719,7 +557,6 @@ class DocumentUnitIntegrationTest {
     DocumentUnit documentUnitFromFrontend =
         DocumentUnit.builder()
             .uuid(dto.getUuid())
-            .creationtimestamp(dto.getCreationtimestamp())
             .documentNumber(dto.getDocumentnumber())
             .coreData(CoreData.builder().documentationOffice(docOffice).build())
             .build();
@@ -835,7 +672,6 @@ class DocumentUnitIntegrationTest {
     }
     return DocumentUnit.builder()
         .uuid(dto.getUuid())
-        .creationtimestamp(dto.getCreationtimestamp())
         .documentNumber(dto.getDocumentnumber())
         .coreData(coreData)
         .build();
@@ -981,9 +817,9 @@ class DocumentUnitIntegrationTest {
 
   @Test
   void testSearchByDocumentUnitSearchInput() {
-    DocumentationOffice otherDocOffice = buildDocOffice("BGH", "CO");
+    DocumentationOffice otherDocOffice = buildDocOffice("BGH");
     UUID otherDocOfficeUuid =
-        documentationOfficeRepository.findByLabel(otherDocOffice.label()).getId();
+        documentationOfficeRepository.findByAbbreviation(otherDocOffice.abbreviation()).getId();
 
     List<UUID> docOfficeIds =
         List.of(
@@ -998,13 +834,13 @@ class DocumentUnitIntegrationTest {
     List<String> fileNumbers = List.of("jkl", "ghi", "def", "abc", "mno");
     List<String> courtTypes = List.of("MNO", "PQR", "STU", "VWX", "YZA");
     List<String> courtLocations = List.of("Hamburg", "München", "Berlin", "Frankfurt", "Köln");
-    List<Instant> decisionDates =
+    List<LocalDate> decisionDates =
         List.of(
-            Instant.parse("2021-01-02T00:00:00.00Z"),
-            Instant.parse("2022-02-03T00:00:00.00Z"),
-            Instant.parse("2023-03-04T00:00:00.00Z"),
-            Instant.parse("2023-08-01T00:00:00.00Z"),
-            Instant.parse("2023-08-10T00:00:00.00Z"));
+            LocalDate.parse("2021-01-02T00:00:00.00Z"),
+            LocalDate.parse("2022-02-03T00:00:00.00Z"),
+            LocalDate.parse("2023-03-04T00:00:00.00Z"),
+            LocalDate.parse("2023-08-01T00:00:00.00Z"),
+            LocalDate.parse("2023-08-10T00:00:00.00Z"));
     List<PublicationStatus> statuses =
         List.of(PUBLISHED, UNPUBLISHED, PUBLISHING, PUBLISHED, UNPUBLISHED);
     List<Boolean> errorStatuses = List.of(false, true, true, false, true);
@@ -1088,8 +924,8 @@ class DocumentUnitIntegrationTest {
         .containsExactly("MNOP202300099", "IJKL202101234", "EFGH202200123", "ABCD202300007");
 
     // between to decision dates
-    Instant start = Instant.parse("2022-02-01T00:00:00.00Z");
-    Instant end = Instant.parse("2023-08-05T00:00:00.00Z");
+    LocalDate start = LocalDate.parse("2022-02-01T00:00:00.00Z");
+    LocalDate end = LocalDate.parse("2023-08-05T00:00:00.00Z");
     searchInput =
         DocumentUnitSearchInput.builder().decisionDate(start).decisionDateEnd(end).build();
     assertThat(extractDocumentNumbersFromSearchCall(searchInput))
