@@ -115,7 +115,7 @@ This document will help Developers in NeuRIS to setup the new schema with data i
 
 2. Optional: download the new lookup tables and Document Units (see step 8 & 9 above)
 
-3. Checkout the ris-data-migration repo on the new commit used by staging (commit id to be found [here](https://github.com/digitalservicebund/neuris-migration-infra/blob/e0e2b368da31aab5b0257d904a24a0b85f6222cd/manifests/overlays/staging/kustomization.yaml#L29C11-L29C51)):
+3. Checkout the ris-data-migration repo on the new commit used by staging (commit id to be found [here](https://github.com/digitalservicebund/neuris-migration-infra/blob/main/manifests/shared/kustomization.yaml#L13)):
 
    ```
    git checkout <commit-hash>
