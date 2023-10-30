@@ -152,7 +152,7 @@ class DocumentUnitIntegrationTest {
             argThat(
                 (OidcUser user) -> {
                   List<String> groups = user.getAttribute("groups");
-                  return Objects.requireNonNull(groups).get(0).equals("/DigitalService");
+                  return Objects.requireNonNull(groups).get(0).equals("/DS");
                 }));
   }
 
