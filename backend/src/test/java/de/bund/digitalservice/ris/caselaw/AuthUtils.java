@@ -16,7 +16,7 @@ import reactor.core.publisher.Mono;
 public class AuthUtils {
 
   public static OidcLoginMutator getMockLogin() {
-    return getMockLoginWithDocOffice("/DigitalService");
+    return getMockLoginWithDocOffice("/DS");
   }
 
   public static OidcLoginMutator getMockLoginWithDocOffice(String docOfficeGroup) {
