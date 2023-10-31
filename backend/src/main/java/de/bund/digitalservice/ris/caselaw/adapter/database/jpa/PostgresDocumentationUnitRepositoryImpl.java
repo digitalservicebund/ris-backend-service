@@ -156,20 +156,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
       }
 
       if (documentUnit.coreData().procedure() != null) {
-        DocumentationOfficeDTO documentationOfficeDTO =
-            documentationUnitDTO.getDocumentationOffice();
-
-        Stream<String> procedureLabels = Stream.of(documentUnit.coreData().procedure().label());
-        if (documentUnit.coreData().previousProcedures() != null)
-          procedureLabels =
-              Stream.concat(procedureLabels, documentUnit.coreData().previousProcedures().stream());
-
-        documentationUnitDTO.setProcedures(
-            procedureLabels
-                .map(
-                    procedureLabel ->
-                        findOrCreateProcedureDTO(procedureLabel, documentationOfficeDTO))
-                .toList());
+        documentationUnitDTO.setProcedures(getDbProcedures(documentUnit, documentationUnitDTO));
       }
     }
 
@@ -181,20 +168,6 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
     documentationUnitDTO = repository.save(documentationUnitDTO);
 
     return Mono.just(DocumentationUnitTransformer.transformToDomain(documentationUnitDTO));
-  }
-
-  private ProcedureDTO findOrCreateProcedureDTO(
-      String procedureLabel, DocumentationOfficeDTO documentationOfficeDTO) {
-    return Optional.ofNullable(
-            databaseProcedureRepository.findByLabelAndDocumentationOffice(
-                procedureLabel, documentationOfficeDTO))
-        .orElseGet(
-            () ->
-                databaseProcedureRepository.save(
-                    ProcedureDTO.builder()
-                        .label(procedureLabel)
-                        .documentationOffice(documentationOfficeDTO)
-                        .build()));
   }
 
   private DocumentationUnitDTO saveKeywords(
@@ -235,6 +208,31 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
           "no document type for the shortcut '" + documentType.jurisShortcut() + "' found.");
     }
     return docTypeDTO;
+  }
+
+  private List<ProcedureDTO> getDbProcedures(
+      DocumentUnit documentUnit, DocumentationUnitDTO documentationUnitDTO) {
+    Stream<String> procedureLabels = Stream.of(documentUnit.coreData().procedure().label());
+    if (documentUnit.coreData().previousProcedures() != null)
+      procedureLabels =
+          Stream.concat(procedureLabels, documentUnit.coreData().previousProcedures().stream());
+
+    return procedureLabels
+        .map(procedureLabel -> findOrCreateProcedureDTO(procedureLabel, documentationUnitDTO))
+        .toList();
+  }
+
+  private ProcedureDTO findOrCreateProcedureDTO(
+      String procedureLabel, DocumentationUnitDTO documentationUnitDTO) {
+    return Optional.ofNullable(
+            databaseProcedureRepository.findByLabelAndDocumentationOffice(
+                procedureLabel, documentationUnitDTO.getDocumentationOffice()))
+        .orElse(
+            ProcedureDTO.builder()
+                .label(procedureLabel)
+                .documentationOffice(documentationUnitDTO.getDocumentationOffice())
+                .documentationUnits(List.of(documentationUnitDTO))
+                .build());
   }
 
   @Override

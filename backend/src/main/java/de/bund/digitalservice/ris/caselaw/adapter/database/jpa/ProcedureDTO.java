@@ -17,6 +17,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
 
 @Data
 @Builder
@@ -31,6 +32,7 @@ public class ProcedureDTO {
   String label;
 
   @Column(name = "created_at", updatable = false, insertable = false)
+  @CreationTimestamp
   Instant createdAt;
 
   @ManyToOne()
@@ -42,6 +44,7 @@ public class ProcedureDTO {
   @JoinTable(
       name = "procedure_link",
       schema = "public",
-      joinColumns = @JoinColumn(name = "procedure_id"))
+      joinColumns = @JoinColumn(name = "procedure_id"),
+      inverseJoinColumns = @JoinColumn(name = "documentation_unit_id"))
   List<DocumentationUnitDTO> documentationUnits;
 }

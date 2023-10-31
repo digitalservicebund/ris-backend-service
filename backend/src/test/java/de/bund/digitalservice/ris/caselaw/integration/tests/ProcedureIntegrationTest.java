@@ -157,9 +157,13 @@ class ProcedureIntegrationTest {
         .is2xxSuccessful()
         .expectBody(DocumentUnit.class)
         .consumeWith(
-            response ->
-                // todo Count should not be null
-                assertThat(response.getResponseBody().coreData().procedure()).isEqualTo(procedure));
+            response -> {
+              assertThat(response.getResponseBody().coreData().procedure().label())
+                  .isEqualTo(procedure.label());
+              assertThat(response.getResponseBody().coreData().procedure().createdAt()).isNotNull();
+              assertThat(response.getResponseBody().coreData().procedure().documentUnitCount())
+                  .isEqualTo(1);
+            });
 
     assertThat(repository.findAll()).hasSize(1);
     assertThat(repository.findAll().get(0).getLabel()).isEqualTo(label);
@@ -176,7 +180,6 @@ class ProcedureIntegrationTest {
     DocumentationUnitDTO dto =
         documentUnitRepository.save(
             DocumentationUnitDTO.builder()
-                // .creationtimestamp(Instant.now())
                 .documentNumber("1234567890123")
                 .documentationOffice(documentationOfficeDTO)
                 .build());
