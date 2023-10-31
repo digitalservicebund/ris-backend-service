@@ -290,6 +290,8 @@ public class DocumentationUnitTransformer {
       return DocumentUnit.builder().build();
     }
 
+    DocumentUnit.DocumentUnitBuilder builder = DocumentUnit.builder();
+
     CoreDataBuilder coreDataBuilder =
         CoreData.builder()
             .court(CourtTransformer.transformToDomain((documentationUnitDTO.getCourt())))
@@ -418,16 +420,20 @@ public class DocumentationUnitTransformer {
             .decisionReasons(documentationUnitDTO.getDecisionGrounds())
             .build();
 
-    OriginalFileDocumentDTO originalFileDocumentDTO =
-        documentationUnitDTO.getOriginalFileDocument();
+    if (documentationUnitDTO.getOriginalFileDocument() != null) {
+      OriginalFileDocumentDTO originalFileDocumentDTO =
+          documentationUnitDTO.getOriginalFileDocument();
 
-    return DocumentUnit.builder()
+      builder
+          .fileuploadtimestamp(originalFileDocumentDTO.getUploadTimestamp())
+          .s3path(originalFileDocumentDTO.getS3ObjectPath())
+          .filetype(originalFileDocumentDTO.getExtension())
+          .filename(originalFileDocumentDTO.getFilename());
+    }
+
+    return builder
         .uuid(documentationUnitDTO.getId())
         .documentNumber(documentationUnitDTO.getDocumentNumber())
-        .fileuploadtimestamp(originalFileDocumentDTO.getUploadTimestamp())
-        .s3path(originalFileDocumentDTO.getS3ObjectPath())
-        .filetype(originalFileDocumentDTO.getExtension())
-        .filename(originalFileDocumentDTO.getFilename())
         .coreData(coreData)
         // .proceedingDecisions(proceedingDecisions)
         .texts(texts)
