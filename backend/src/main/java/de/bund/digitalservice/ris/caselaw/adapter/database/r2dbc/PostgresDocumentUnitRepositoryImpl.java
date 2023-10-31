@@ -305,18 +305,6 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
 
   private Mono<CourtDTO> getCourt(DocumentUnit documentUnit) {
     return Mono.just(CourtDTO.builder().build());
-
-    //    if (documentUnit == null
-    //        || documentUnit.coreData() == null
-    //        || documentUnit.coreData().court() == null) {
-    //      return Mono.just(CourtDTO.builder().build());
-    //    }
-    //
-    //    return databaseCourtRepository
-    //        .findByCourttypeAndCourtlocation(
-    //            documentUnit.coreData().court().type(),
-    // documentUnit.coreData().court().location())
-    //        .defaultIfEmpty(CourtDTO.builder().build());
   }
 
   public Mono<DocumentUnitDTO> saveFileNumbers(
