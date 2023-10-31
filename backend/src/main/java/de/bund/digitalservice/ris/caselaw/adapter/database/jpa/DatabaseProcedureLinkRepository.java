@@ -19,9 +19,11 @@ public interface DatabaseProcedureLinkRepository extends JpaRepository<Procedure
           + ") subq "
           + "ON pl.documentation_unit_id = subq.documentation_unit_id AND pl.rank = subq.highest_rank";
 
-  ProcedureLinkDTO findFirstByDocumentationUnitIdOrderByRankDesc(UUID documentationUnitId);
+  ProcedureLinkDTO findFirstByDocumentationUnitDTOOrderByRankDesc(
+      DocumentationUnitDTO documentationUnitDTO);
 
-  List<ProcedureLinkDTO> findAllByDocumentationUnitIdOrderByRankDesc(UUID documentationUnitId);
+  List<ProcedureLinkDTO> findAllByDocumentationUnitDTOOrderByRankDesc(
+      DocumentationUnitDTO documentationUnitDTO);
 
   @Query(
       value =

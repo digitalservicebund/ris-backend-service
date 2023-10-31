@@ -16,7 +16,7 @@ public interface DatabaseProcedureRepository extends JpaRepository<ProcedureDTO,
       String label, DocumentationOfficeDTO documentationOfficeDTO);
 
   @Query(
-      "SELECT p FROM procedure p WHERE (:label IS NULL OR p.label LIKE %:label%) AND p.documentationOffice = :documentationOffice")
+      "SELECT p FROM ProcedureDTO p WHERE (:label IS NULL OR p.label LIKE %:label%) AND p.documentationOffice = :documentationOffice")
   Page<ProcedureDTO> findByLabelContainingAndDocumentationOffice(
       @Param("label") Optional<String> label,
       @Param("documentationOffice") DocumentationOfficeDTO documentationOfficeDTO,

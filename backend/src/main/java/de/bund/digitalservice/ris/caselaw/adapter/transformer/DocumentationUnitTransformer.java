@@ -161,7 +161,7 @@ public class DocumentationUnitTransformer {
 
     } else {
       builder
-          .procedure(null)
+          .procedures(new ArrayList<>())
           .ecli(null)
           .judicialBody(null)
           .decisionDate(null)
@@ -293,7 +293,7 @@ public class DocumentationUnitTransformer {
     CoreDataBuilder coreDataBuilder =
         CoreData.builder()
             .court(CourtTransformer.transformToDomain((documentationUnitDTO.getCourt())))
-            // .procedure(getProcedure(documentationUnitDTO.getProcedure()))
+            .procedure(ProcedureTransformer.transformToDomain(documentationUnitDTO.getProcedures()))
             // .previousProcedures(documentationUnitDTO.getPreviousProcedures())
             .documentationOffice(
                 DocumentationOffice.builder()

@@ -109,7 +109,13 @@ public class DocumentationUnitDTO {
   @Column(name = "other_headnote")
   String otherHeadnote;
 
-  @Column private String procedure;
+  @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+  @JoinTable(
+      name = "procedure_link",
+      schema = "public",
+      joinColumns = @JoinColumn(name = "documentation_unit_id"),
+      inverseJoinColumns = @JoinColumn(name = "procedure_id"))
+  private List<ProcedureDTO> procedures;
 
   @ManyToMany(
       cascade = {CascadeType.MERGE},

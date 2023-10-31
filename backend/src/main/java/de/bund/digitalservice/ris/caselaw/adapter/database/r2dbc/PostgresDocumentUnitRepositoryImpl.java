@@ -15,7 +15,6 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.NormAbbreviationD
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.NormReferenceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.NormReferenceDTO.NormReferenceDTOBuilder;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ProcedureDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ProcedureLinkDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitDTO.DocumentUnitDTOBuilder;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.CourtDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DatabaseCitationStyleRepository;
@@ -211,7 +210,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
         .flatMap(documentUnitDTO -> enrichLegalEffect(documentUnitDTO, documentUnit))
         .flatMap(documentUnitDTO -> enrichRegion(documentUnitDTO, documentUnit))
         .map(documentUnitDTO -> DocumentUnitTransformer.enrichDTO(documentUnitDTO, documentUnit))
-        .flatMap(documentUnitDTO -> saveProcedure(documentUnitDTO, documentUnit))
+        // .flatMap(documentUnitDTO -> saveProcedure(documentUnitDTO, documentUnit))
         .flatMap(repository::save)
         .flatMap(
             documentUnitDTO -> {
@@ -230,7 +229,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
         .flatMap(this::injectStatus)
         .flatMap(this::injectKeywords)
         .flatMap(this::injectFieldsOfLaw)
-        .flatMap(this::injectPreviousProcedures)
+        // .flatMap(this::injectPreviousProcedures)
         .flatMap(documentUnitDTO -> saveActiveCitations(documentUnitDTO, documentUnit))
         .flatMap(documentUnitDTO -> saveProceedingDecisions(documentUnitDTO, documentUnit))
         .map(DocumentUnitTransformer::transformDTO);
@@ -756,28 +755,29 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
         .then(injectProceedingDecisions(documentUnitDTO));
   }
 
-  private Mono<DocumentUnitDTO> saveProcedure(
-      DocumentUnitDTO documentUnitDTO, DocumentUnit documentUnit) {
-
-    String documentationOfficeLabel = documentUnit.coreData().documentationOffice().abbreviation();
-    Optional.ofNullable(documentUnit.coreData().procedure())
-        .map(procedure -> findOrCreateProcedure(procedure, documentationOfficeLabel))
-        .ifPresent(
-            procedureDTO -> {
-              if (!areCurrentlyLinked(documentUnitDTO, procedureDTO)) {
-                procedureLinkRepository.save(
-                    ProcedureLinkDTO.builder()
-                        .procedureDTO(procedureDTO)
-                        .documentationUnitId(documentUnitDTO.uuid)
-                        .rank(getNextProcedureLinkRank(documentUnitDTO))
-                        .build());
-              }
-
-              documentUnitDTO.setProcedure(procedureDTO);
-            });
-
-    return Mono.just(documentUnitDTO);
-  }
+  //  private Mono<DocumentUnitDTO> saveProcedure(
+  //      DocumentUnitDTO documentUnitDTO, DocumentUnit documentUnit) {
+  //
+  //    String documentationOfficeLabel =
+  // documentUnit.coreData().documentationOffice().abbreviation();
+  //    Optional.ofNullable(documentUnit.coreData().procedure())
+  //        .map(procedure -> findOrCreateProcedure(procedure, documentationOfficeLabel))
+  //        .ifPresent(
+  //            procedureDTO -> {
+  //              if (!areCurrentlyLinked(documentUnitDTO, procedureDTO)) {
+  //                procedureLinkRepository.save(
+  //                    ProcedureLinkDTO.builder()
+  //                        .procedureDTO(procedureDTO)
+  //                        // .documentationUnitId(documentUnitDTO.uuid)
+  //                        .rank(getNextProcedureLinkRank(documentUnitDTO))
+  //                        .build());
+  //              }
+  //
+  //              documentUnitDTO.setProcedure(procedureDTO);
+  //            });
+  //
+  //    return Mono.just(documentUnitDTO);
+  //  }
 
   private ProcedureDTO findOrCreateProcedure(Procedure procedure, String documentationOfficeLabel) {
     DocumentationOfficeDTO documentationOfficeDTO =
@@ -795,21 +795,22 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
                         .build()));
   }
 
-  private boolean areCurrentlyLinked(DocumentUnitDTO documentUnitDTO, ProcedureDTO procedureDTO) {
-    return Optional.ofNullable(
-            procedureLinkRepository.findFirstByDocumentationUnitIdOrderByRankDesc(
-                documentUnitDTO.uuid))
-        .map(linkDTO -> linkDTO.getProcedureDTO().equals(procedureDTO))
-        .orElse(false);
-  }
-
-  private int getNextProcedureLinkRank(DocumentUnitDTO documentUnitDTO) {
-    return Optional.ofNullable(
-            procedureLinkRepository.findFirstByDocumentationUnitIdOrderByRankDesc(
-                documentUnitDTO.getUuid()))
-        .map(procedureLinkDTO -> procedureLinkDTO.getRank() + 1)
-        .orElse(1);
-  }
+  //  private boolean areCurrentlyLinked(DocumentUnitDTO documentUnitDTO, ProcedureDTO procedureDTO)
+  // {
+  //    return Optional.ofNullable(
+  //            procedureLinkRepository.findFirstByDocumentationUnitDTOOrderByRankDesc(
+  //                documentUnitDTO.uuid))
+  //        .map(linkDTO -> linkDTO.getProcedureDTO().equals(procedureDTO))
+  //        .orElse(false);
+  //  }
+  //
+  //  private Long getNextProcedureLinkRank(DocumentUnitDTO documentUnitDTO) {
+  //    return Optional.ofNullable(
+  //            procedureLinkRepository.findFirstByDocumentationUnitIdOrderByRankDesc(
+  //                documentUnitDTO.getUuid()))
+  //        .map(procedureLinkDTO -> procedureLinkDTO.getRank() + 1)
+  //        .orElse(1L);
+  //  }
 
   private Mono<DocumentUnit> unlinkLinkedDocumentationUnit(
       DocumentUnit documentUnit, DocumentationUnitLinkType type) {
@@ -940,9 +941,9 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
         .flatMap(this::injectFieldsOfLaw)
         .flatMap(this::injectDocumentationOffice)
         .flatMap(this::injectStatus)
-        .flatMap(this::injectActiveCitations)
-        .flatMap(this::injectProcedure)
-        .flatMap(this::injectPreviousProcedures);
+        .flatMap(this::injectActiveCitations);
+    // .flatMap(this::injectProcedure)
+    // .flatMap(this::injectPreviousProcedures);
   }
 
   private <T extends DocumentUnitMetadataDTO> Mono<T> injectMetadataInformation(
@@ -1169,31 +1170,33 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
                             })));
   }
 
-  private <T extends DocumentUnitMetadataDTO> Mono<T> injectProcedure(T documentUnitDTO) {
-    Optional.ofNullable(
-            procedureLinkRepository.findFirstByDocumentationUnitIdOrderByRankDesc(
-                documentUnitDTO.uuid))
-        .map(ProcedureLinkDTO::getProcedureDTO)
-        .ifPresent(documentUnitDTO::setProcedure);
-
-    return Mono.just(documentUnitDTO);
-  }
-
-  private <T extends DocumentUnitMetadataDTO> Mono<T> injectPreviousProcedures(T documentUnitDTO) {
-
-    List<String> previousProcedures =
-        procedureLinkRepository
-            .findAllByDocumentationUnitIdOrderByRankDesc(documentUnitDTO.uuid)
-            .stream()
-            .skip(1)
-            .map(ProcedureLinkDTO::getProcedureDTO)
-            .map(ProcedureDTO::getLabel)
-            .toList();
-
-    documentUnitDTO.setPreviousProcedures(previousProcedures.isEmpty() ? null : previousProcedures);
-
-    return Mono.just(documentUnitDTO);
-  }
+  //  private <T extends DocumentUnitMetadataDTO> Mono<T> injectProcedure(T documentUnitDTO) {
+  //    Optional.ofNullable(
+  //            procedureLinkRepository.findFirstByDocumentationUnitIdOrderByRankDesc(
+  //                documentUnitDTO.uuid))
+  //        .map(ProcedureLinkDTO::getProcedureDTO)
+  //        .ifPresent(documentUnitDTO::setProcedure);
+  //
+  //    return Mono.just(documentUnitDTO);
+  //  }
+  //
+  //  private <T extends DocumentUnitMetadataDTO> Mono<T> injectPreviousProcedures(T
+  // documentUnitDTO) {
+  //
+  //    List<String> previousProcedures =
+  //        procedureLinkRepository
+  //            .findAllByDocumentationUnitIdOrderByRankDesc(documentUnitDTO.uuid)
+  //            .stream()
+  //            .skip(1)
+  //            .map(ProcedureLinkDTO::getProcedureDTO)
+  //            .map(ProcedureDTO::getLabel)
+  //            .toList();
+  //
+  //    documentUnitDTO.setPreviousProcedures(previousProcedures.isEmpty() ? null :
+  // previousProcedures);
+  //
+  //    return Mono.just(documentUnitDTO);
+  //  }
 
   @Override
   public Flux<LinkedDocumentationUnit> searchByLinkedDocumentationUnit(

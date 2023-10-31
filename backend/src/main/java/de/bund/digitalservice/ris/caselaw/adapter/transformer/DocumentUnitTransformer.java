@@ -2,7 +2,6 @@ package de.bund.digitalservice.ris.caselaw.adapter.transformer;
 
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentTypeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ProcedureDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DeviatingDecisionDateDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DeviatingEcliDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitDTO;
@@ -17,7 +16,6 @@ import de.bund.digitalservice.ris.caselaw.domain.DataSource;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitNorm;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
-import de.bund.digitalservice.ris.caselaw.domain.Procedure;
 import de.bund.digitalservice.ris.caselaw.domain.ProceedingDecision;
 import de.bund.digitalservice.ris.caselaw.domain.Texts;
 import de.bund.digitalservice.ris.caselaw.domain.court.Court;
@@ -25,7 +23,6 @@ import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.Docume
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw.FieldOfLaw;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 
@@ -143,12 +140,6 @@ public class DocumentUnitTransformer {
     }
 
     return court;
-  }
-
-  static Procedure getProcedure(ProcedureDTO procedureDTO) {
-    return Optional.ofNullable(procedureDTO)
-        .map(dto -> Procedure.builder().label(dto.getLabel()).build())
-        .orElse(null);
   }
 
   private static DocumentationOffice getDocumentationOffice(
@@ -324,7 +315,7 @@ public class DocumentUnitTransformer {
                 getCourtObject(documentUnitDTO.getCourtType(), documentUnitDTO.getCourtLocation()))
             .deviatingCourts(incorrectCourts)
             .documentType(documentType)
-            .procedure(getProcedure(documentUnitDTO.getProcedure()))
+            //            .procedure(getProcedure(documentUnitDTO.getProcedure()))
             .previousProcedures(documentUnitDTO.getPreviousProcedures())
             .ecli(documentUnitDTO.getEcli())
             .deviatingEclis(deviatingEclis)

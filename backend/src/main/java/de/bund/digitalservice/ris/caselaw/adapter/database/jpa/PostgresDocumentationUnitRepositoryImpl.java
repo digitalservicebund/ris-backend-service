@@ -23,8 +23,10 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.context.annotation.Primary;
@@ -45,6 +47,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
   private final DatabaseDocumentTypeRepository databaseDocumentTypeRepository;
   private final DatabaseDocumentCategoryRepository databaseDocumentCategoryRepository;
   private final DatabaseCourtRepository databaseCourtRepository;
+  private final DatabaseProcedureRepository databaseProcedureRepository;
   private final DatabaseNormReferenceRepository documentUnitNormRepository;
   private final DatabaseDocumentationOfficeRepository documentationOfficeRepository;
   private final JPADatabaseKeywordRepository keywordRepository;
@@ -57,6 +60,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
       DatabaseDocumentTypeRepository databaseDocumentTypeRepository,
       DatabaseDocumentCategoryRepository databaseDocumentCategoryRepository,
       DatabaseCourtRepository databaseCourtRepository,
+      DatabaseProcedureRepository databaseProcedureRepository,
       DatabaseNormReferenceRepository documentUnitNormRepository,
       DatabaseNormAbbreviationRepository normAbbreviationRepository,
       DatabaseDocumentationOfficeRepository documentationOfficeRepository,
@@ -68,6 +72,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
     this.databaseDocumentTypeRepository = databaseDocumentTypeRepository;
     this.databaseCourtRepository = databaseCourtRepository;
     this.databaseDocumentCategoryRepository = databaseDocumentCategoryRepository;
+    this.databaseProcedureRepository = databaseProcedureRepository;
     this.documentUnitNormRepository = documentUnitNormRepository;
     this.documentationOfficeRepository = documentationOfficeRepository;
     this.normAbbreviationRepository = normAbbreviationRepository;
@@ -128,25 +133,46 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
 
     // ---
     // Doing database-related (pre) transformation
-    if (documentUnit.coreData() != null && documentUnit.coreData().documentType() != null) {
-      documentationUnitDTO.setDocumentType(getDbDocType(documentUnit.coreData().documentType()));
-    }
+    if (documentUnit.coreData() != null) {
 
-    documentationUnitDTO = saveKeywords(documentationUnitDTO, documentUnit);
-
-    if (documentUnit.coreData() != null && documentUnit.coreData().court() != null) {
-      var court =
-          databaseCourtRepository
-              .findByTypeAndLocation(
-                  documentUnit.coreData().court().type(),
-                  documentUnit.coreData().court().location())
-              .stream()
-              .findFirst();
-      if (court.isEmpty()) {
-        throw new DocumentationUnitException("no court found.");
+      if (documentUnit.coreData().documentType() != null) {
+        documentationUnitDTO.setDocumentType(getDbDocType(documentUnit.coreData().documentType()));
       }
-      documentationUnitDTO.setCourt(court.get());
+
+      documentationUnitDTO = saveKeywords(documentationUnitDTO, documentUnit);
+
+      if (documentUnit.coreData().court() != null) {
+        var court =
+            databaseCourtRepository
+                .findByTypeAndLocation(
+                    documentUnit.coreData().court().type(),
+                    documentUnit.coreData().court().location())
+                .stream()
+                .findFirst();
+        if (court.isEmpty()) {
+          throw new DocumentationUnitException("no court found.");
+        }
+        documentationUnitDTO.setCourt(court.get());
+      }
+
+      if (documentUnit.coreData().procedure() != null) {
+        DocumentationOfficeDTO documentationOfficeDTO =
+            documentationUnitDTO.getDocumentationOffice();
+
+        Stream<String> procedureLabels = Stream.of(documentUnit.coreData().procedure().label());
+        if (documentUnit.coreData().previousProcedures() != null)
+          procedureLabels =
+              Stream.concat(procedureLabels, documentUnit.coreData().previousProcedures().stream());
+
+        documentationUnitDTO.setProcedures(
+            procedureLabels
+                .map(
+                    procedureLabel ->
+                        findOrCreateProcedureDTO(procedureLabel, documentationOfficeDTO))
+                .toList());
+      }
     }
+
     // ---
 
     // Transform non-database-related properties
@@ -155,6 +181,20 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
     documentationUnitDTO = repository.save(documentationUnitDTO);
 
     return Mono.just(DocumentationUnitTransformer.transformToDomain(documentationUnitDTO));
+  }
+
+  private ProcedureDTO findOrCreateProcedureDTO(
+      String procedureLabel, DocumentationOfficeDTO documentationOfficeDTO) {
+    return Optional.ofNullable(
+            databaseProcedureRepository.findByLabelAndDocumentationOffice(
+                procedureLabel, documentationOfficeDTO))
+        .orElseGet(
+            () ->
+                databaseProcedureRepository.save(
+                    ProcedureDTO.builder()
+                        .label(procedureLabel)
+                        .documentationOffice(documentationOfficeDTO)
+                        .build()));
   }
 
   private DocumentationUnitDTO saveKeywords(

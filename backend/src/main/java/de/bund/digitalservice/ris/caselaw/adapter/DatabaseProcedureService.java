@@ -5,9 +5,9 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumenta
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseProcedureLinkRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseProcedureRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ProcedureLinkDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationUnitSearchEntryTransformer;
+import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationUnitTransformer;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitSearchEntry;
 import de.bund.digitalservice.ris.caselaw.domain.Procedure;
 import de.bund.digitalservice.ris.caselaw.domain.ProcedureService;
 import java.util.List;
@@ -54,7 +54,7 @@ public class DatabaseProcedureService implements ProcedureService {
   }
 
   @Override
-  public List<DocumentationUnitSearchEntry> getDocumentUnits(
+  public List<DocumentUnit> getDocumentUnits(
       String procedureLabel, DocumentationOffice documentationOffice) {
     return linkRepository
         .findLatestProcedureLinksByProcedure(
@@ -65,11 +65,8 @@ public class DatabaseProcedureService implements ProcedureService {
                         documentationOffice.abbreviation()))
                 .getId())
         .stream()
-        .map(ProcedureLinkDTO::getDocumentationUnitId)
-        .map(documentUnitRepository::findById)
-        .filter(Optional::isPresent)
-        .map(Optional::get)
-        .map(DocumentationUnitSearchEntryTransformer::transferDTO)
+        .map(ProcedureLinkDTO::getDocumentationUnitDTO)
+        .map(DocumentationUnitTransformer::transformToDomain)
         .toList();
   }
 

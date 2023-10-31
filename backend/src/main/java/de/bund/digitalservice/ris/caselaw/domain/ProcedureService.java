@@ -9,7 +9,7 @@ public interface ProcedureService {
   Page<Procedure> search(
       Optional<String> query, DocumentationOffice documentationOffice, Pageable pageable);
 
-  List<DocumentationUnitSearchEntry> getDocumentUnits(
+  List<DocumentUnit> getDocumentUnits(
       String procedureLabel, DocumentationOffice documentationOffice);
 
   void delete(String procedureLabel, DocumentationOffice documentationOffice);
