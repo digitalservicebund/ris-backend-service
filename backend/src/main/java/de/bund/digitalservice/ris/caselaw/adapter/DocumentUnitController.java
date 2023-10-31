@@ -66,6 +66,7 @@ public class DocumentUnitController {
         .getDocumentationOffice(oidcUser)
         .flatMap(service::generateNewDocumentUnit)
         .map(documentUnit -> ResponseEntity.status(HttpStatus.CREATED).body(documentUnit))
+        .doOnError(ex -> log.error("error in generate new documentation unit", ex))
         .onErrorReturn(ResponseEntity.internalServerError().body(DocumentUnit.builder().build()));
   }
 

@@ -2,9 +2,10 @@ package de.bund.digitalservice.ris.caselaw.adapter.database.jpa;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
-import jakarta.persistence.IdClass;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import jakarta.validation.constraints.NotBlank;
 import java.io.Serializable;
 import java.util.UUID;
@@ -22,23 +23,17 @@ import lombok.Setter;
 @Builder
 @Entity
 @Table(schema = "incremental_migration", name = "deviating_ecli")
-@IdClass(DeviatingEcliId.class)
 public class DeviatingEcliDTO {
+  @Id @GeneratedValue private UUID id;
 
   @Column(nullable = false)
   @NotBlank
-  @Id
   private String value;
 
-  @Column(name = "documentation_unit_id")
-  @Id
-  private UUID documentationUnitId;
+  //  @Column(name = "documentation_unit_id")
+  //  private UUID documentationUnitId;
 
-  private Long rank;
-
-  public DeviatingEcliDTO(String value) {
-    this.value = value;
-  }
+  @Transient private Long rank;
 }
 
 @AllArgsConstructor

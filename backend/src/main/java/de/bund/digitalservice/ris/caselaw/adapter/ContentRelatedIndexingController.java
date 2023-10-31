@@ -3,6 +3,7 @@ package de.bund.digitalservice.ris.caselaw.adapter;
 import de.bund.digitalservice.ris.OpenApiConfiguration;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw.FieldOfLaw;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -28,6 +29,13 @@ public class ContentRelatedIndexingController {
   @PreAuthorize("@userHasReadAccessByDocumentUnitUuid.apply(#documentUnitUuid)")
   public Mono<List<FieldOfLaw>> getFieldsOfLaw(@PathVariable("uuid") UUID documentUnitUuid) {
     return fieldOfLawService.getFieldsOfLawForDocumentUnit(documentUnitUuid);
+  }
+
+  @GetMapping("keywords")
+  @PreAuthorize("@userHasReadAccessByDocumentUnitUuid.apply(#documentUnitUuid)")
+  @Deprecated
+  public Mono<List<String>> getKeywords(@PathVariable("uuid") UUID documentUnitUuid) {
+    return Mono.just(Collections.emptyList());
   }
 
   @PutMapping("fieldsoflaw/{identifier}")

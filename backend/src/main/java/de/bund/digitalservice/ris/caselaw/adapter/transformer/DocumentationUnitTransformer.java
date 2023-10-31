@@ -20,9 +20,10 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.Texts;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -75,7 +76,7 @@ public class DocumentationUnitTransformer {
       }
 
       if (coreData.deviatingCourts() != null) {
-        Set<DeviatingCourtDTO> deviatingCourtDTOs = null;
+        List<DeviatingCourtDTO> deviatingCourtDTOs = new ArrayList<>();
         List<String> deviatingCourts = coreData.deviatingCourts();
         for (int i = 0; i < deviatingCourts.size(); i++) {
           deviatingCourtDTOs.add(
@@ -88,7 +89,7 @@ public class DocumentationUnitTransformer {
       }
 
       if (coreData.deviatingDecisionDates() != null) {
-        Set<DeviatingDateDTO> deviatingDateDTOs = null;
+        List<DeviatingDateDTO> deviatingDateDTOs = new ArrayList<>();
         List<LocalDate> deviatingDecisionDates = coreData.deviatingDecisionDates();
         for (int i = 0; i < deviatingDecisionDates.size(); i++) {
           deviatingDateDTOs.add(
@@ -101,7 +102,7 @@ public class DocumentationUnitTransformer {
       }
 
       if (coreData.deviatingFileNumbers() != null) {
-        Set<DeviatingFileNumberDTO> deviatingFileNumberDTOs = null;
+        List<DeviatingFileNumberDTO> deviatingFileNumberDTOs = new ArrayList<>();
         List<String> deviatingFileNumbers = coreData.deviatingFileNumbers();
         for (int i = 0; i < deviatingFileNumbers.size(); i++) {
           deviatingFileNumberDTOs.add(
@@ -114,7 +115,7 @@ public class DocumentationUnitTransformer {
       }
 
       if (coreData.deviatingEclis() != null) {
-        Set<DeviatingEcliDTO> deviatingEcliDTOs = null;
+        List<DeviatingEcliDTO> deviatingEcliDTOs = new ArrayList<>();
         List<String> deviatingEclis = coreData.deviatingEclis();
         for (int i = 0; i < deviatingEclis.size(); i++) {
           deviatingEcliDTOs.add(
@@ -396,6 +397,7 @@ public class DocumentationUnitTransformer {
     // if (documentationUnitDTO.getActiveCitations() != null) {
     // activeCitations = documentationUnitDTO.getActiveCitations();
     // }
+    contentRelatedIndexingBuilder.activeCitations(Collections.emptyList());
 
     ContentRelatedIndexing contentRelatedIndexing = contentRelatedIndexingBuilder.build();
 

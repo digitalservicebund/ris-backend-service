@@ -7,22 +7,23 @@ import jakarta.validation.constraints.PastOrPresent;
 import java.time.LocalDate;
 import java.util.List;
 import lombok.Builder;
+import org.hibernate.validator.constraints.UniqueElements;
 
 @Builder(toBuilder = true)
 public record CoreData(
-    List<String> fileNumbers,
-    List<String> deviatingFileNumbers,
+    @UniqueElements List<String> fileNumbers,
+    @UniqueElements List<String> deviatingFileNumbers,
     Court court,
-    List<String> deviatingCourts,
+    @UniqueElements List<String> deviatingCourts,
     DocumentType documentType,
     Procedure procedure,
     List<String> previousProcedures,
     String ecli,
-    List<String> deviatingEclis,
+    @UniqueElements List<String> deviatingEclis,
     String appraisalBody,
     @PastOrPresent LocalDate decisionDate,
     boolean dateKnown,
-    List<LocalDate> deviatingDecisionDates,
+    @UniqueElements List<LocalDate> deviatingDecisionDates,
     @LookupTableConstraint(lookupTableName = "legalEffect") String legalEffect,
     String inputType,
     DocumentationOffice documentationOffice,

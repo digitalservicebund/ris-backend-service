@@ -135,11 +135,7 @@ public class DocumentationUnitDTO {
   @JoinColumn(name = "documentation_office_id", referencedColumnName = "id")
   private DocumentationOfficeDTO documentationOffice;
 
-  @OneToMany(
-      mappedBy = "documentationUnitDTO",
-      cascade = CascadeType.ALL,
-      orphanRemoval = true,
-      fetch = FetchType.EAGER)
+  @OneToMany(mappedBy = "documentationUnitDTO", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
   private List<StatusDTO> status;
 
   public void setOriginalFileDocument(OriginalFileDocumentDTO originalFileDocument) {
@@ -164,9 +160,9 @@ public class DocumentationUnitDTO {
   // private Set<CaselawActiveCitation> caselawActiveCitations = new HashSet<>();
 
   @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
-  @JoinColumn(name = "documentation_unit_id")
+  @JoinColumn(name = "documentation_unit_id", nullable = false)
   @Builder.Default
-  private Set<DeviatingDateDTO> deviatingDates = new HashSet<>();
+  private List<DeviatingDateDTO> deviatingDates = new ArrayList<>();
 
   //
   //  @OneToMany(
@@ -178,19 +174,19 @@ public class DocumentationUnitDTO {
   //  private Set<DeviatingDocumentNumber> deviatingDocumentNumbers = new HashSet<>();
   //
   @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
-  @JoinColumn(name = "documentation_unit_id")
+  @JoinColumn(name = "documentation_unit_id", nullable = false)
   @Builder.Default
-  private Set<DeviatingEcliDTO> deviatingEclis = new HashSet<>();
+  private List<DeviatingEcliDTO> deviatingEclis = new ArrayList<>();
 
   @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
-  @JoinColumn(name = "documentation_unit_id")
+  @JoinColumn(name = "documentation_unit_id", nullable = false)
   @Builder.Default
-  private Set<DeviatingFileNumberDTO> deviatingFileNumbers = new HashSet<>();
+  private List<DeviatingFileNumberDTO> deviatingFileNumbers = new ArrayList<>();
 
   @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
-  @JoinColumn(name = "documentation_unit_id")
+  @JoinColumn(name = "documentation_unit_id", nullable = false)
   @Builder.Default
-  private Set<DeviatingCourtDTO> deviatingCourts = new HashSet<>();
+  private List<DeviatingCourtDTO> deviatingCourts = new ArrayList<>();
 
   @ManyToMany(
       cascade = {CascadeType.MERGE},

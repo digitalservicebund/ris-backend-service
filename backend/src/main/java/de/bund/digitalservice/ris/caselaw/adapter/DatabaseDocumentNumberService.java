@@ -24,7 +24,7 @@ public class DatabaseDocumentNumberService implements DocumentNumberService {
           Map.entry("BVerwG", "LE"),
           Map.entry("OVG_NRW", "MW"),
           Map.entry("BZSt", "FM"),
-          Map.entry("DigitalService", "XX"),
+          Map.entry("DS", "XX"),
           Map.entry("CC-RIS", "XX"));
 
   public DatabaseDocumentNumberService(DatabaseDocumentNumberCounterRepository repository) {
