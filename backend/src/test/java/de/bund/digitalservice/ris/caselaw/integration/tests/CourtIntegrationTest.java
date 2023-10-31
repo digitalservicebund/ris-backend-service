@@ -19,7 +19,6 @@ import de.bund.digitalservice.ris.caselaw.domain.CourtService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import de.bund.digitalservice.ris.caselaw.domain.court.Court;
-import de.bund.digitalservice.ris.caselaw.domain.lookuptable.citation.CitationStyle;
 import java.util.Arrays;
 import java.util.List;
 import org.junit.jupiter.api.AfterEach;
@@ -152,7 +151,7 @@ class CourtIntegrationTest {
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(CitationStyle[].class)
+        .expectBody(Court[].class)
         .consumeWith(
             response -> {
               assertThat(response.getResponseBody()).hasSize(6);

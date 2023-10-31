@@ -4,7 +4,9 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.util.UUID;
@@ -20,7 +22,7 @@ import lombok.ToString;
 @Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
-// TODO @Table ?
+@Table(schema = "incremental_migration", name = "citation_type")
 @Entity
 public class CitationTypeDTO {
   @Id @GeneratedValue private UUID id;
@@ -29,11 +31,17 @@ public class CitationTypeDTO {
 
   @Column @NotBlank private String label;
 
-  @ManyToOne @NotNull private DocumentCategoryDTO documentationUnitDocumentCategory;
+  @ManyToOne
+  @JoinColumn(name = "documentation_unit_document_category_id")
+  @NotNull
+  private DocumentCategoryDTO documentationUnitDocumentCategory;
 
-  @ManyToOne @NotNull private DocumentCategoryDTO citationDocumentCategory;
+  @ManyToOne
+  @JoinColumn(name = "citation_document_category_id")
+  @NotNull
+  private DocumentCategoryDTO citationDocumentCategory;
 
-  @Column(nullable = false, unique = true, updatable = false)
+  @Column(name = "juris_id", nullable = false, unique = true, updatable = false)
   @ToString.Include
   @NotNull
   private Integer jurisId;

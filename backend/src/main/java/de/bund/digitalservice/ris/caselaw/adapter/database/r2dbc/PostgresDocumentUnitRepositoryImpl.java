@@ -1,5 +1,8 @@
 package de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc;
 
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseCitationTypeRepository;
+// import
+// de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DatabaseCourtRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseCourtRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentCategoryRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentTypeRepository;
@@ -17,20 +20,14 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.NormReferenceDTO.
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ProcedureDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitDTO.DocumentUnitDTOBuilder;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.CourtDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DatabaseCitationStyleRepository;
-// import
-// de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DatabaseCourtRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DatabaseFieldOfLawRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.StateDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.StateRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.transformer.ActiveCitationTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DeviatingCourtTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DeviatingDecisionDateTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentUnitTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationUnitLinkTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationUnitSearchEntryTransformer;
-import de.bund.digitalservice.ris.caselaw.adapter.transformer.LinkedDocumentationUnitTransformer;
-import de.bund.digitalservice.ris.caselaw.domain.ActiveCitation;
 import de.bund.digitalservice.ris.caselaw.domain.DataSource;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitNorm;
@@ -45,7 +42,6 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitSearchEntry;
 import de.bund.digitalservice.ris.caselaw.domain.LegalEffect;
 import de.bund.digitalservice.ris.caselaw.domain.LinkedDocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.Procedure;
-import de.bund.digitalservice.ris.caselaw.domain.ProceedingDecision;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.court.Court;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
@@ -95,7 +91,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
   private final DatabaseDocumentationUnitLinkRepository documentationUnitLinkRepository;
 
   private final DatabaseNormAbbreviationRepository normAbbreviationRepository;
-  private final DatabaseCitationStyleRepository citationStyleRepository;
+  private final DatabaseCitationTypeRepository citationStyleRepository;
   private final DatabaseProcedureRepository procedureRepository;
   private final DatabaseProcedureLinkRepository procedureLinkRepository;
   private final EntityManager entityManager;
@@ -118,7 +114,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
       DatabaseDocumentUnitStatusRepository databaseDocumentUnitStatusRepository,
       DatabaseDocumentationUnitLinkRepository documentationUnitLinkRepository,
       DatabaseNormAbbreviationRepository normAbbreviationRepository,
-      DatabaseCitationStyleRepository citationStyleRepository,
+      DatabaseCitationTypeRepository citationStyleRepository,
       DatabaseDocumentationOfficeRepository documentationOfficeRepository,
       DatabaseProcedureRepository procedureRepository,
       DatabaseProcedureLinkRepository procedureLinkRepository,
@@ -230,8 +226,10 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
         .flatMap(this::injectKeywords)
         .flatMap(this::injectFieldsOfLaw)
         // .flatMap(this::injectPreviousProcedures)
-        .flatMap(documentUnitDTO -> saveActiveCitations(documentUnitDTO, documentUnit))
-        .flatMap(documentUnitDTO -> saveProceedingDecisions(documentUnitDTO, documentUnit))
+        // .flatMap(documentUnitDTO -> saveActiveCitations(documentUnitDTO,
+        // documentUnit))
+        // .flatMap(documentUnitDTO -> saveProceedingDecisions(documentUnitDTO,
+        // documentUnit))
         .map(DocumentUnitTransformer::transformDTO);
   }
 
@@ -641,131 +639,135 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
             });
   }
 
-  private Mono<DocumentUnitDTO> saveActiveCitations(
-      DocumentUnitDTO documentUnitDTO, DocumentUnit documentUnit) {
-    if (log.isDebugEnabled()) {
-      log.debug("save active citations: {}", documentUnit.uuid());
-    }
-
-    List<ActiveCitation> activeCitations = Collections.emptyList();
-    if (documentUnit.contentRelatedIndexing() != null
-        && documentUnit.contentRelatedIndexing().activeCitations() != null) {
-      activeCitations = documentUnit.contentRelatedIndexing().activeCitations();
-    }
-
-    return Flux.fromIterable(activeCitations)
-        .filter(activeCitation -> activeCitation.getUuid() != null)
-        .flatMap(
-            activeCitation -> {
-              if (activeCitation.hasNoValues()) {
-                return unlinkDocumentUnit(
-                    documentUnitDTO.getUuid(),
-                    activeCitation.getUuid(),
-                    DocumentationUnitLinkType.ACTIVE_CITATION);
-              } else {
-                return repository
-                    .findByUuid(activeCitation.getUuid())
-                    .filter(
-                        activeCitationDocumentationUnitDTO ->
-                            activeCitationDocumentationUnitDTO.getDataSource()
-                                == DataSource.ACTIVE_CITATION)
-                    .flatMap(
-                        activeCitationDocumentationUnitDTO ->
-                            updateLinkedDocumentationUnit(
-                                activeCitationDocumentationUnitDTO, activeCitation))
-                    .then(
-                        documentationUnitLinkRepository
-                            .findByParentDocumentationUnitUuidAndChildDocumentationUnitUuidAndType(
-                                documentUnitDTO.getUuid(),
-                                activeCitation.getUuid(),
-                                DocumentationUnitLinkType.ACTIVE_CITATION)
-                            .flatMap(
-                                documentationUnitLinkDTO -> {
-                                  UUID citationStyleUuid = null;
-
-                                  if (activeCitation.getCitationStyle() != null) {
-                                    citationStyleUuid = activeCitation.getCitationStyle().uuid();
-                                  }
-
-                                  return documentationUnitLinkRepository.save(
-                                      documentationUnitLinkDTO.toBuilder()
-                                          .citationStyleUuid(citationStyleUuid)
-                                          .build());
-                                }));
-              }
-            })
-        .then(
-            unlinkLinkedDocumentationUnit(documentUnit, DocumentationUnitLinkType.ACTIVE_CITATION))
-        .then(injectActiveCitations(documentUnitDTO));
-  }
-
-  private Mono<DocumentUnitDTO> saveProceedingDecisions(
-      DocumentUnitDTO documentUnitDTO, DocumentUnit documentUnit) {
-    if (log.isDebugEnabled()) {
-      log.debug("save precious decisions: {}", documentUnit.uuid());
-    }
-
-    List<ProceedingDecision> proceedingDecisions = Collections.emptyList();
-    if (documentUnit.proceedingDecisions() != null) {
-      proceedingDecisions = documentUnit.proceedingDecisions();
-    }
-
-    return Flux.fromIterable(proceedingDecisions)
-        .filter(proceedingDecision -> proceedingDecision.getUuid() != null)
-        .flatMap(
-            proceedingDecision -> {
-              if (proceedingDecision.hasNoValues()) {
-                return unlinkDocumentUnit(
-                    documentUnitDTO.getUuid(),
-                    proceedingDecision.getUuid(),
-                    DocumentationUnitLinkType.PREVIOUS_DECISION);
-              } else {
-                return repository
-                    .findByUuid(proceedingDecision.getUuid())
-                    .filter(
-                        proceedingDecisionDTO ->
-                            proceedingDecisionDTO.getDataSource() == DataSource.PROCEEDING_DECISION)
-                    .flatMap(
-                        proceedingDecisionDTO ->
-                            updateLinkedDocumentationUnit(
-                                proceedingDecisionDTO, proceedingDecision))
-                    .then(
-                        documentationUnitLinkRepository
-                            .findByParentDocumentationUnitUuidAndChildDocumentationUnitUuidAndType(
-                                documentUnitDTO.getUuid(),
-                                proceedingDecision.getUuid(),
-                                DocumentationUnitLinkType.PREVIOUS_DECISION));
-              }
-            })
-        .then(
-            unlinkLinkedDocumentationUnit(
-                documentUnit, DocumentationUnitLinkType.PREVIOUS_DECISION))
-        .then(injectProceedingDecisions(documentUnitDTO));
-  }
-
-  //  private Mono<DocumentUnitDTO> saveProcedure(
-  //      DocumentUnitDTO documentUnitDTO, DocumentUnit documentUnit) {
+  // private Mono<DocumentUnitDTO> saveActiveCitations(
+  // DocumentUnitDTO documentUnitDTO, DocumentUnit documentUnit) {
+  // if (log.isDebugEnabled()) {
+  // log.debug("save active citations: {}", documentUnit.uuid());
+  // }
   //
-  //    String documentationOfficeLabel =
+  // List<ActiveCitation> activeCitations = Collections.emptyList();
+  // if (documentUnit.contentRelatedIndexing() != null
+  // && documentUnit.contentRelatedIndexing().activeCitations() != null) {
+  // activeCitations = documentUnit.contentRelatedIndexing().activeCitations();
+  // }
+  //
+  // return Flux.fromIterable(activeCitations)
+  // .filter(activeCitation -> activeCitation.getUuid() != null)
+  // .flatMap(
+  // activeCitation -> {
+  // if (activeCitation.hasNoValues()) {
+  // return unlinkDocumentUnit(
+  // documentUnitDTO.getUuid(),
+  // activeCitation.getUuid(),
+  // DocumentationUnitLinkType.ACTIVE_CITATION);
+  // } else {
+  // return repository
+  // .findByUuid(activeCitation.getUuid())
+  // .filter(
+  // activeCitationDocumentationUnitDTO ->
+  // activeCitationDocumentationUnitDTO.getDataSource()
+  // == DataSource.ACTIVE_CITATION)
+  // .flatMap(
+  // activeCitationDocumentationUnitDTO ->
+  // updateLinkedDocumentationUnit(
+  // activeCitationDocumentationUnitDTO, activeCitation))
+  // .then(
+  // documentationUnitLinkRepository
+  //
+  // .findByParentDocumentationUnitUuidAndChildDocumentationUnitUuidAndType(
+  // documentUnitDTO.getUuid(),
+  // activeCitation.getUuid(),
+  // DocumentationUnitLinkType.ACTIVE_CITATION)
+  // .flatMap(
+  // documentationUnitLinkDTO -> {
+  // UUID citationStyleUuid = null;
+  //
+  // if (activeCitation.getCitationType() != null) {
+  // citationStyleUuid = activeCitation.getCitationType().uuid();
+  // }
+  //
+  // return documentationUnitLinkRepository.save(
+  // documentationUnitLinkDTO.toBuilder()
+  // .citationStyleUuid(citationStyleUuid)
+  // .build());
+  // }));
+  // }
+  // })
+  // .then(
+  // unlinkLinkedDocumentationUnit(documentUnit,
+  // DocumentationUnitLinkType.ACTIVE_CITATION))
+  // .then(injectActiveCitations(documentUnitDTO));
+  // }
+
+  // private Mono<DocumentUnitDTO> saveProceedingDecisions(
+  // DocumentUnitDTO documentUnitDTO, DocumentUnit documentUnit) {
+  // if (log.isDebugEnabled()) {
+  // log.debug("save precious decisions: {}", documentUnit.uuid());
+  // }
+  //
+  // List<ProceedingDecision> proceedingDecisions = Collections.emptyList();
+  // if (documentUnit.proceedingDecisions() != null) {
+  // proceedingDecisions = documentUnit.proceedingDecisions();
+  // }
+  //
+  // return Flux.fromIterable(proceedingDecisions)
+  // .filter(proceedingDecision -> proceedingDecision.getUuid() != null)
+  // .flatMap(
+  // proceedingDecision -> {
+  // if (proceedingDecision.hasNoValues()) {
+  // return unlinkDocumentUnit(
+  // documentUnitDTO.getUuid(),
+  // proceedingDecision.getUuid(),
+  // DocumentationUnitLinkType.PREVIOUS_DECISION);
+  // } else {
+  // return repository
+  // .findByUuid(proceedingDecision.getUuid())
+  // .filter(
+  // proceedingDecisionDTO ->
+  // proceedingDecisionDTO.getDataSource() ==
+  // DataSource.PROCEEDING_DECISION)
+  // .flatMap(
+  // proceedingDecisionDTO ->
+  // updateLinkedDocumentationUnit(
+  // proceedingDecisionDTO, proceedingDecision))
+  // .then(
+  // documentationUnitLinkRepository
+  //
+  // .findByParentDocumentationUnitUuidAndChildDocumentationUnitUuidAndType(
+  // documentUnitDTO.getUuid(),
+  // proceedingDecision.getUuid(),
+  // DocumentationUnitLinkType.PREVIOUS_DECISION));
+  // }
+  // })
+  // .then(
+  // unlinkLinkedDocumentationUnit(
+  // documentUnit, DocumentationUnitLinkType.PREVIOUS_DECISION))
+  // .then(injectProceedingDecisions(documentUnitDTO));
+  // }
+
+  // private Mono<DocumentUnitDTO> saveProcedure(
+  // DocumentUnitDTO documentUnitDTO, DocumentUnit documentUnit) {
+  //
+  // String documentationOfficeLabel =
   // documentUnit.coreData().documentationOffice().abbreviation();
-  //    Optional.ofNullable(documentUnit.coreData().procedure())
-  //        .map(procedure -> findOrCreateProcedure(procedure, documentationOfficeLabel))
-  //        .ifPresent(
-  //            procedureDTO -> {
-  //              if (!areCurrentlyLinked(documentUnitDTO, procedureDTO)) {
-  //                procedureLinkRepository.save(
-  //                    ProcedureLinkDTO.builder()
-  //                        .procedureDTO(procedureDTO)
-  //                        // .documentationUnitId(documentUnitDTO.uuid)
-  //                        .rank(getNextProcedureLinkRank(documentUnitDTO))
-  //                        .build());
-  //              }
+  // Optional.ofNullable(documentUnit.coreData().procedure())
+  // .map(procedure -> findOrCreateProcedure(procedure, documentationOfficeLabel))
+  // .ifPresent(
+  // procedureDTO -> {
+  // if (!areCurrentlyLinked(documentUnitDTO, procedureDTO)) {
+  // procedureLinkRepository.save(
+  // ProcedureLinkDTO.builder()
+  // .procedureDTO(procedureDTO)
+  // // .documentationUnitId(documentUnitDTO.uuid)
+  // .rank(getNextProcedureLinkRank(documentUnitDTO))
+  // .build());
+  // }
   //
-  //              documentUnitDTO.setProcedure(procedureDTO);
-  //            });
+  // documentUnitDTO.setProcedure(procedureDTO);
+  // });
   //
-  //    return Mono.just(documentUnitDTO);
-  //  }
+  // return Mono.just(documentUnitDTO);
+  // }
 
   private ProcedureDTO findOrCreateProcedure(Procedure procedure, String documentationOfficeLabel) {
     DocumentationOfficeDTO documentationOfficeDTO =
@@ -783,22 +785,23 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
                         .build()));
   }
 
-  //  private boolean areCurrentlyLinked(DocumentUnitDTO documentUnitDTO, ProcedureDTO procedureDTO)
+  // private boolean areCurrentlyLinked(DocumentUnitDTO documentUnitDTO,
+  // ProcedureDTO procedureDTO)
   // {
-  //    return Optional.ofNullable(
-  //            procedureLinkRepository.findFirstByDocumentationUnitDTOOrderByRankDesc(
-  //                documentUnitDTO.uuid))
-  //        .map(linkDTO -> linkDTO.getProcedureDTO().equals(procedureDTO))
-  //        .orElse(false);
-  //  }
+  // return Optional.ofNullable(
+  // procedureLinkRepository.findFirstByDocumentationUnitDTOOrderByRankDesc(
+  // documentUnitDTO.uuid))
+  // .map(linkDTO -> linkDTO.getProcedureDTO().equals(procedureDTO))
+  // .orElse(false);
+  // }
   //
-  //  private Long getNextProcedureLinkRank(DocumentUnitDTO documentUnitDTO) {
-  //    return Optional.ofNullable(
-  //            procedureLinkRepository.findFirstByDocumentationUnitIdOrderByRankDesc(
-  //                documentUnitDTO.getUuid()))
-  //        .map(procedureLinkDTO -> procedureLinkDTO.getRank() + 1)
-  //        .orElse(1L);
-  //  }
+  // private Long getNextProcedureLinkRank(DocumentUnitDTO documentUnitDTO) {
+  // return Optional.ofNullable(
+  // procedureLinkRepository.findFirstByDocumentationUnitIdOrderByRankDesc(
+  // documentUnitDTO.getUuid()))
+  // .map(procedureLinkDTO -> procedureLinkDTO.getRank() + 1)
+  // .orElse(1L);
+  // }
 
   private Mono<DocumentUnit> unlinkLinkedDocumentationUnit(
       DocumentUnit documentUnit, DocumentationUnitLinkType type) {
@@ -807,9 +810,9 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
     }
 
     return findAllLinkedDocumentUnitsByParentDocumentUnitUuidAndType(documentUnit.uuid(), type)
-        .filter(
-            linkedDocumentationUnit ->
-                filterUnlinkedDocumentUnit(documentUnit, linkedDocumentationUnit, type))
+        // .filter(
+        // linkedDocumentationUnit ->
+        // filterUnlinkedDocumentUnit(documentUnit, linkedDocumentationUnit, type))
         .flatMap(
             linkedDocumentationUnit ->
                 unlinkDocumentUnit(documentUnit.uuid(), linkedDocumentationUnit.getUuid(), type)
@@ -819,27 +822,31 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
         .thenReturn(documentUnit);
   }
 
-  private boolean filterUnlinkedDocumentUnit(
-      DocumentUnit documentUnit,
-      LinkedDocumentationUnit linkedDocumentationUnit,
-      DocumentationUnitLinkType type) {
-    if (type == DocumentationUnitLinkType.ACTIVE_CITATION) {
-      return documentUnit.contentRelatedIndexing() == null
-          || documentUnit.contentRelatedIndexing().activeCitations() == null
-          || documentUnit.contentRelatedIndexing().activeCitations().isEmpty()
-          || documentUnit.contentRelatedIndexing().activeCitations().stream()
-              .map(LinkedDocumentationUnit::getUuid)
-              .noneMatch(linkedUuid -> linkedDocumentationUnit.getUuid().equals(linkedUuid));
-    } else if (type == DocumentationUnitLinkType.PREVIOUS_DECISION) {
-      return documentUnit.proceedingDecisions() == null
-          || documentUnit.proceedingDecisions().isEmpty()
-          || documentUnit.proceedingDecisions().stream()
-              .map(LinkedDocumentationUnit::getUuid)
-              .noneMatch(linkedUuid -> linkedDocumentationUnit.getUuid().equals(linkedUuid));
-    } else {
-      throw new DocumentationUnitException("Couldn't filter for unknown link type '" + type + "'");
-    }
-  }
+  // private boolean filterUnlinkedDocumentUnit(
+  // DocumentUnit documentUnit,
+  // LinkedDocumentationUnit linkedDocumentationUnit,
+  // DocumentationUnitLinkType type) {
+  // if (type == DocumentationUnitLinkType.ACTIVE_CITATION) {
+  //// return documentUnit.contentRelatedIndexing() == null
+  //// || documentUnit.contentRelatedIndexing().activeCitations() == null
+  //// || documentUnit.contentRelatedIndexing().activeCitations().isEmpty()
+  //// || documentUnit.contentRelatedIndexing().activeCitations().stream()
+  //// .map(LinkedDocumentationUnit::getUuid)
+  //// .noneMatch(linkedUuid ->
+  // linkedDocumentationUnit.getUuid().equals(linkedUuid));
+  // } else if (type == DocumentationUnitLinkType.PREVIOUS_DECISION) {
+  //// return documentUnit.proceedingDecisions() == null
+  //// || documentUnit.proceedingDecisions().isEmpty()
+  //// || documentUnit.proceedingDecisions().stream()
+  //// .map(LinkedDocumentationUnit::getUuid)
+  //// .noneMatch(linkedUuid ->
+  // linkedDocumentationUnit.getUuid().equals(linkedUuid));
+  // } else {
+  // throw new DocumentationUnitException("Couldn't filter for unknown link type
+  // '" + type +
+  // "'");
+  // }
+  // }
 
   private Mono<DocumentUnitMetadataDTO> updateLinkedDocumentationUnit(
       DocumentUnitDTO linkedDocumentationUnitDTO, LinkedDocumentationUnit linkedDocumentationUnit) {
@@ -920,7 +927,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
 
     return injectMetadataInformation(documentUnitDTO)
         .flatMap(this::injectDeviatingFileNumbers)
-        .flatMap(this::injectProceedingDecisions)
+        // .flatMap(this::injectProceedingDecisions)
         .flatMap(this::injectDeviatingEclis)
         .flatMap(this::injectDeviatingDecisionDates)
         .flatMap(this::injectIncorrectCourt)
@@ -928,8 +935,8 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
         .flatMap(this::injectNorms)
         .flatMap(this::injectFieldsOfLaw)
         .flatMap(this::injectDocumentationOffice)
-        .flatMap(this::injectStatus)
-        .flatMap(this::injectActiveCitations);
+        .flatMap(this::injectStatus);
+    // .flatMap(this::injectActiveCitations)
     // .flatMap(this::injectProcedure)
     // .flatMap(this::injectPreviousProcedures);
   }
@@ -944,70 +951,73 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
     return injectFileNumbers(documentUnitMetadataDTO).flatMap(this::injectDocumentType);
   }
 
-  private Mono<DocumentUnitDTO> injectProceedingDecisions(DocumentUnitDTO documentUnitDTO) {
-    return documentationUnitLinkRepository
-        .findAllByParentDocumentationUnitUuidAndTypeOrderByIdAsc(
-            documentUnitDTO.getUuid(), DocumentationUnitLinkType.PREVIOUS_DECISION)
-        .map(DocumentationUnitLinkDTO::getChildDocumentationUnitUuid)
-        .flatMap(metadataRepository::findByUuid)
-        .flatMap(this::injectMetadataInformation)
-        .collectList()
-        .map(
-            proceedingDecisionDTOs -> {
-              documentUnitDTO.setProceedingDecisions(proceedingDecisionDTOs);
-              return documentUnitDTO;
-            });
-  }
+  // private Mono<DocumentUnitDTO> injectProceedingDecisions(DocumentUnitDTO
+  // documentUnitDTO) {
+  // return documentationUnitLinkRepository
+  // .findAllByParentDocumentationUnitUuidAndTypeOrderByIdAsc(
+  // documentUnitDTO.getUuid(), DocumentationUnitLinkType.PREVIOUS_DECISION)
+  // .map(DocumentationUnitLinkDTO::getChildDocumentationUnitUuid)
+  // .flatMap(metadataRepository::findByUuid)
+  // .flatMap(this::injectMetadataInformation)
+  // .collectList()
+  // .map(
+  // proceedingDecisionDTOs -> {
+  // documentUnitDTO.setProceedingDecisions(proceedingDecisionDTOs);
+  // return documentUnitDTO;
+  // });
+  // }
 
-  private Mono<DocumentUnitDTO> injectActiveCitations(DocumentUnitDTO parentDTO) {
-    if (log.isDebugEnabled()) {
-      log.debug("inject active citations: {}", parentDTO.getUuid());
-    }
+  // private Mono<DocumentUnitDTO> injectActiveCitations(DocumentUnitDTO
+  // parentDTO) {
+  // if (log.isDebugEnabled()) {
+  // log.debug("inject active citations: {}", parentDTO.getUuid());
+  // }
+  //
+  // return documentationUnitLinkRepository
+  // .findAllByParentDocumentationUnitUuidAndTypeOrderByIdAsc(
+  // parentDTO.getUuid(), DocumentationUnitLinkType.ACTIVE_CITATION)
+  // .map(DocumentationUnitLinkDTO::getChildDocumentationUnitUuid)
+  // .flatMapSequential(metadataRepository::findByUuid)
+  // .flatMapSequential(this::injectMetadataInformation)
+  //// .flatMapSequential(childDTO -> injectCitationStyle(parentDTO.getUuid(),
+  // childDTO))
+  // .collectList()
+  // .map(
+  // activeCitations -> {
+  // parentDTO.setActiveCitations(activeCitations);
+  // return parentDTO;
+  // });
+  // }
 
-    return documentationUnitLinkRepository
-        .findAllByParentDocumentationUnitUuidAndTypeOrderByIdAsc(
-            parentDTO.getUuid(), DocumentationUnitLinkType.ACTIVE_CITATION)
-        .map(DocumentationUnitLinkDTO::getChildDocumentationUnitUuid)
-        .flatMapSequential(metadataRepository::findByUuid)
-        .flatMapSequential(this::injectMetadataInformation)
-        .flatMapSequential(childDTO -> injectCitationStyle(parentDTO.getUuid(), childDTO))
-        .collectList()
-        .map(
-            activeCitations -> {
-              parentDTO.setActiveCitations(activeCitations);
-              return parentDTO;
-            });
-  }
-
-  private Mono<ActiveCitation> injectCitationStyle(
-      UUID parentUUID, DocumentUnitMetadataDTO documentUnitMetadataDTO) {
-    if (log.isDebugEnabled()) {
-      log.debug(
-          "inject citation style in child '{}' for parent '{}'",
-          documentUnitMetadataDTO.getUuid(),
-          parentUUID);
-    }
-
-    return documentationUnitLinkRepository
-        .findByParentDocumentationUnitUuidAndChildDocumentationUnitUuidAndType(
-            parentUUID,
-            documentUnitMetadataDTO.getUuid(),
-            DocumentationUnitLinkType.ACTIVE_CITATION)
-        .flatMap(
-            documentationUnitLinkDTO ->
-                citationStyleRepository
-                    .findByUuid(documentationUnitLinkDTO.getCitationStyleUuid())
-                    .map(
-                        citationStyleDTO ->
-                            documentationUnitLinkDTO.toBuilder()
-                                .citationStyleDTO(citationStyleDTO)
-                                .build())
-                    .defaultIfEmpty(documentationUnitLinkDTO))
-        .map(
-            documentationUnitLinkDTO ->
-                ActiveCitationTransformer.transformToDomain(
-                    documentUnitMetadataDTO, documentationUnitLinkDTO));
-  }
+  // private Mono<ActiveCitation> injectCitationStyle(
+  // UUID parentUUID, DocumentUnitMetadataDTO documentUnitMetadataDTO) {
+  // if (log.isDebugEnabled()) {
+  // log.debug(
+  // "inject citation style in child '{}' for parent '{}'",
+  // documentUnitMetadataDTO.getUuid(),
+  // parentUUID);
+  // }
+  //
+  // return documentationUnitLinkRepository
+  // .findByParentDocumentationUnitUuidAndChildDocumentationUnitUuidAndType(
+  // parentUUID,
+  // documentUnitMetadataDTO.getUuid(),
+  // DocumentationUnitLinkType.ACTIVE_CITATION)
+  // .flatMap(
+  // documentationUnitLinkDTO ->
+  // citationStyleRepository
+  // .findByUuid(documentationUnitLinkDTO.getCitationStyleUuid())
+  // .map(
+  // citationStyleDTO ->
+  // documentationUnitLinkDTO.toBuilder()
+  // .citationStyleDTO(citationStyleDTO)
+  // .build())
+  // .defaultIfEmpty(documentationUnitLinkDTO))
+  // .map(
+  // documentationUnitLinkDTO ->
+  // ActiveCitationTransformer.transformToDomain(
+  // documentUnitMetadataDTO, documentationUnitLinkDTO));
+  // }
 
   private <T extends DocumentUnitMetadataDTO> Mono<T> injectFileNumbers(T documentUnitMetadataDTO) {
     return fileNumberRepository
@@ -1158,33 +1168,35 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
                             })));
   }
 
-  //  private <T extends DocumentUnitMetadataDTO> Mono<T> injectProcedure(T documentUnitDTO) {
-  //    Optional.ofNullable(
-  //            procedureLinkRepository.findFirstByDocumentationUnitIdOrderByRankDesc(
-  //                documentUnitDTO.uuid))
-  //        .map(ProcedureLinkDTO::getProcedureDTO)
-  //        .ifPresent(documentUnitDTO::setProcedure);
+  // private <T extends DocumentUnitMetadataDTO> Mono<T> injectProcedure(T
+  // documentUnitDTO) {
+  // Optional.ofNullable(
+  // procedureLinkRepository.findFirstByDocumentationUnitIdOrderByRankDesc(
+  // documentUnitDTO.uuid))
+  // .map(ProcedureLinkDTO::getProcedureDTO)
+  // .ifPresent(documentUnitDTO::setProcedure);
   //
-  //    return Mono.just(documentUnitDTO);
-  //  }
+  // return Mono.just(documentUnitDTO);
+  // }
   //
-  //  private <T extends DocumentUnitMetadataDTO> Mono<T> injectPreviousProcedures(T
+  // private <T extends DocumentUnitMetadataDTO> Mono<T>
+  // injectPreviousProcedures(T
   // documentUnitDTO) {
   //
-  //    List<String> previousProcedures =
-  //        procedureLinkRepository
-  //            .findAllByDocumentationUnitIdOrderByRankDesc(documentUnitDTO.uuid)
-  //            .stream()
-  //            .skip(1)
-  //            .map(ProcedureLinkDTO::getProcedureDTO)
-  //            .map(ProcedureDTO::getLabel)
-  //            .toList();
+  // List<String> previousProcedures =
+  // procedureLinkRepository
+  // .findAllByDocumentationUnitIdOrderByRankDesc(documentUnitDTO.uuid)
+  // .stream()
+  // .skip(1)
+  // .map(ProcedureLinkDTO::getProcedureDTO)
+  // .map(ProcedureDTO::getLabel)
+  // .toList();
   //
-  //    documentUnitDTO.setPreviousProcedures(previousProcedures.isEmpty() ? null :
+  // documentUnitDTO.setPreviousProcedures(previousProcedures.isEmpty() ? null :
   // previousProcedures);
   //
-  //    return Mono.just(documentUnitDTO);
-  //  }
+  // return Mono.just(documentUnitDTO);
+  // }
 
   @Override
   public Flux<LinkedDocumentationUnit> searchByLinkedDocumentationUnit(
@@ -1214,10 +1226,12 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
                   pageable.getOffset());
             })
         .flatMapSequential(this::injectAdditionalInformation)
-        .map(
-            documentUnitMetadataDTO ->
-                LinkedDocumentationUnitTransformer.transformToDomain(
-                    documentUnitMetadataDTO, null));
+        // .map(
+        // documentUnitMetadataDTO ->
+        // LinkedDocumentationUnitTransformer.transformToDomain(
+        // documentUnitMetadataDTO, null));
+        .map(documentUnitMetadataDTO -> LinkedDocumentationUnit.builder().build());
+    // Todo: workaround to let the app compile
   }
 
   @Override
@@ -1416,7 +1430,10 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
                     .zipWith(Mono.just(linkDTO)))
         .map(
             tuple ->
-                LinkedDocumentationUnitTransformer.transformToDomain(tuple.getT1(), tuple.getT2()));
+                // LinkedDocumentationUnitTransformer.transformToDomain(tuple.getT1(),
+                // tuple.getT2()));
+                // Todo: workaround to let the app compile
+                LinkedDocumentationUnit.builder().build());
   }
 
   private Mono<DocumentUnitDTO> filterUnlinkedDocumentUnit(DocumentUnitDTO documentUnitDTO) {

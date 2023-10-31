@@ -1,30 +1,26 @@
 package de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable;
 
-import de.bund.digitalservice.ris.caselaw.adapter.transformer.CitationStyleTransformer;
-import de.bund.digitalservice.ris.caselaw.domain.lookuptable.citation.CitationStyle;
-import de.bund.digitalservice.ris.caselaw.domain.lookuptable.citation.CitationStyleRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseCitationTypeRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.transformer.CitationTypeTransformer;
+import de.bund.digitalservice.ris.caselaw.domain.lookuptable.citation.CitationType;
+import de.bund.digitalservice.ris.caselaw.domain.lookuptable.citation.CitationTypeRepository;
 import org.springframework.stereotype.Repository;
-import reactor.core.publisher.Flux;
 
 @Repository
-public class PostgresCitationStyleRepositoryImpl implements CitationStyleRepository {
-  private final DatabaseCitationStyleRepository repository;
+public class PostgresCitationStyleRepositoryImpl implements CitationTypeRepository {
+  private final DatabaseCitationTypeRepository repository;
 
-  public PostgresCitationStyleRepositoryImpl(DatabaseCitationStyleRepository repository) {
+  public PostgresCitationStyleRepositoryImpl(DatabaseCitationTypeRepository repository) {
     this.repository = repository;
   }
 
   @Override
-  public Flux<CitationStyle> findBySearchStr(String searchString) {
-    return repository
-        .findBySearchStr(searchString)
-        .map(CitationStyleTransformer::transformToDomain);
+  public CitationType findBySearchStr(String searchString) {
+    return CitationTypeTransformer.transformToDomain(repository.findBySearchStr(searchString));
   }
 
   @Override
-  public Flux<CitationStyle> findAllByOrderByCitationDocumentTypeAsc() {
-    return repository
-        .findAllByDocumentTypeAndCitationDocumentTypeOrderByLabelAsc('R', 'R')
-        .map(CitationStyleTransformer::transformToDomain);
+  public CitationType findAllByOrderByCitationDocumentTypeAsc() {
+    return CitationTypeTransformer.transformToDomain(repository.findAllByDocumentTypes('R', 'R'));
   }
 }

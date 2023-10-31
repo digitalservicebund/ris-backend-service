@@ -16,6 +16,7 @@ import org.springframework.data.relational.core.mapping.Table;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table("citation_style")
+@Deprecated
 public class CitationStyleDTO implements Persistable<UUID> {
   @Id UUID uuid;
   Long jurisId;

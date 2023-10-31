@@ -1,43 +1,58 @@
 package de.bund.digitalservice.ris.caselaw.adapter.transformer;
 
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitMetadataDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentationUnitLinkDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ActiveCitationDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CitationTypeDTO;
 import de.bund.digitalservice.ris.caselaw.domain.ActiveCitation;
-import de.bund.digitalservice.ris.caselaw.domain.lookuptable.citation.CitationStyle;
+import de.bund.digitalservice.ris.caselaw.domain.lookuptable.citation.CitationType;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class ActiveCitationTransformer extends LinkedDocumentationUnitTransformer {
-  public static ActiveCitation transformToDomain(
-      DocumentUnitMetadataDTO documentUnitMetadataDTO, DocumentationUnitLinkDTO linkDTO) {
+public class ActiveCitationTransformer extends RelatedDocumentationUnitTransformer {
+  public static ActiveCitation transformToDomain(ActiveCitationDTO activeCitationDTO) {
 
-    if (log.isDebugEnabled()) {
-      log.debug(
-          "transform '{}' to active citation domain object", documentUnitMetadataDTO.getUuid());
-    }
-
-    CitationStyle citationStyle = null;
-    if (linkDTO != null && linkDTO.getCitationStyleDTO() != null) {
-      citationStyle =
-          CitationStyle.builder()
-              .uuid(linkDTO.getCitationStyleDTO().getUuid())
-              .jurisShortcut(linkDTO.getCitationStyleDTO().getJurisShortcut())
-              .citationDocumentType(linkDTO.getCitationStyleDTO().getCitationDocumentType())
-              .label(linkDTO.getCitationStyleDTO().getLabel())
-              .documentType(linkDTO.getCitationStyleDTO().getDocumentType())
+    CitationTypeDTO citationTypeDTO = activeCitationDTO.getCitationType();
+    CitationType citationType = null;
+    if (citationTypeDTO != null) {
+      citationType =
+          CitationType.builder()
+              .uuid(citationTypeDTO.getId())
+              .documentType(citationTypeDTO.getDocumentationUnitDocumentCategory().getLabel())
+              .citationDocumentType(citationTypeDTO.getCitationDocumentCategory().getLabel())
+              .jurisShortcut(citationTypeDTO.getAbbreviation())
+              .label(citationTypeDTO.getLabel())
               .build();
     }
 
     return ActiveCitation.builder()
-        .uuid(documentUnitMetadataDTO.getUuid())
-        .documentNumber(documentUnitMetadataDTO.getDocumentnumber())
-        .dataSource(documentUnitMetadataDTO.getDataSource())
-        .court(getCourt(documentUnitMetadataDTO))
-        .fileNumber(getFileNumber(documentUnitMetadataDTO))
-        .documentType(getDocumentTypeByDTO(documentUnitMetadataDTO.getDocumentTypeDTO()))
-        .decisionDate(documentUnitMetadataDTO.getDecisionDate())
-        .dateKnown(documentUnitMetadataDTO.isDateKnown())
-        .citationStyle(citationStyle)
+        .uuid(activeCitationDTO.getId())
+        .documentNumber(activeCitationDTO.getDocumentNumber())
+        .court(getCourtFromDTO(activeCitationDTO.getCourt()))
+        .fileNumber(getFileNumber(activeCitationDTO.getFileNumber()))
+        .documentType(getDocumentTypeFromDTO(activeCitationDTO.getDocumentType()))
+        .decisionDate(activeCitationDTO.getDate())
+        .citationType(citationType)
         .build();
+  }
+
+  public static ActiveCitationDTO transformToDTO(ActiveCitation activeCitation) {
+
+    ActiveCitationDTO.ActiveCitationDTOBuilder activeCitationDTOBuilder =
+        ActiveCitationDTO.builder()
+            .court(getCourtFromDomain(activeCitation.getCourt()))
+            .date(activeCitation.getDecisionDate())
+            .documentNumber(activeCitation.getDocumentNumber())
+            .documentType(getDocumentTypeFromDomain(activeCitation.getDocumentType()))
+            .fileNumber(getFileNumber(activeCitation.getFileNumber()));
+
+    CitationType citationType = activeCitation.getCitationType();
+
+    if (citationType != null) {
+      CitationTypeDTO.CitationTypeDTOBuilder citationTypeDTOBuilder =
+          CitationTypeDTO.builder().id(citationType.uuid());
+
+      activeCitationDTOBuilder.citationType(citationTypeDTOBuilder.build());
+    }
+
+    return activeCitationDTOBuilder.build();
   }
 }

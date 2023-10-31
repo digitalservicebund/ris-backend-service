@@ -309,3 +309,30 @@ create table if not exists
       varchar(255) not null,
       court_id uuid not null constraint fk_court references incremental_migration.court
   );
+
+create table
+  incremental_migration.citation_type (
+    id uuid not null primary key,
+    abbreviation varchar(255) not null,
+    label varchar(255),
+    documentation_unit_document_category_id uuid constraint fk_documentation_unit_document_category references incremental_migration.document_category,
+    citation_document_category_id uuid constraint fk_citation_document_category references incremental_migration.document_category,
+    juris_id integer not null constraint uc_citation_type_juris_id unique
+  );
+
+create table
+  incremental_migration.related_documentation (
+    id uuid not null primary key,
+    court_location varchar(255),
+    court_type varchar(255),
+    court_id uuid constraint fk_court references incremental_migration.court,
+    date date,
+    document_number varchar(255),
+    document_type_id uuid constraint fk_document_type references incremental_migration.document_type,
+    file_number varchar(255),
+    citation_type_id uuid constraint fk_citation_type references incremental_migration.citation_type,
+    note text,
+    dtype varchar(31) not null,
+    documentation_unit_id uuid constraint fk_documentation_unit references incremental_migration.documentation_unit,
+    document_type_raw_value varchar(255)
+  );

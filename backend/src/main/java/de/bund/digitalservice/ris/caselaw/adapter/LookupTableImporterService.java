@@ -1,29 +1,25 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseCitationTypeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPAFieldOfLawDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPAFieldOfLawLinkDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPAFieldOfLawLinkRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPAFieldOfLawRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.CitationStyleDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DatabaseCitationStyleRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.StateDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.StateRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.FieldOfLawTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.ServiceUtils;
-import de.bund.digitalservice.ris.caselaw.domain.lookuptable.citation.CitationsStyleXML;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw.FieldOfLawXml;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw.FieldsOfLawXml;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.state.StatesXML;
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -39,7 +35,7 @@ import reactor.core.publisher.Mono;
 @Slf4j
 public class LookupTableImporterService {
   private final StateRepository stateRepository;
-  private final DatabaseCitationStyleRepository databaseCitationStyleRepository;
+  private final DatabaseCitationTypeRepository databaseCitationTypeRepository;
   private final JPAFieldOfLawRepository jpaFieldOfLawRepository;
   private final JPAFieldOfLawLinkRepository jpaFieldOfLawLinkRepository;
   private static final Pattern FIELD_OF_LAW_NUMBER_PATTERN =
@@ -47,11 +43,11 @@ public class LookupTableImporterService {
 
   public LookupTableImporterService(
       StateRepository stateRepository,
-      DatabaseCitationStyleRepository databaseCitationStyleRepository,
+      DatabaseCitationTypeRepository databaseCitationTypeRepository,
       JPAFieldOfLawRepository jpaFieldOfLawRepository,
       JPAFieldOfLawLinkRepository jpaFieldOfLawLinkRepository) {
     this.stateRepository = stateRepository;
-    this.databaseCitationStyleRepository = databaseCitationStyleRepository;
+    this.databaseCitationTypeRepository = databaseCitationTypeRepository;
     this.jpaFieldOfLawRepository = jpaFieldOfLawRepository;
     this.jpaFieldOfLawLinkRepository = jpaFieldOfLawLinkRepository;
   }
@@ -85,44 +81,6 @@ public class LookupTableImporterService {
         .thenMany(stateRepository.saveAll(statesDTO))
         .collectList()
         .map(list -> "Successfully imported the state lookup table");
-  }
-
-  public Mono<String> importCitationStyleLookupTable(ByteBuffer byteBuffer) {
-    XmlMapper mapper = new XmlMapper();
-    CitationsStyleXML citationsStyleXML;
-    try {
-      citationsStyleXML =
-          mapper.readValue(ServiceUtils.byteBufferToArray(byteBuffer), CitationsStyleXML.class);
-    } catch (IOException e) {
-      throw new ResponseStatusException(
-          HttpStatus.NOT_ACCEPTABLE, "Could not map ByteBuffer-content to CitationsXML", e);
-    }
-
-    List<CitationStyleDTO> citationsDTO =
-        citationsStyleXML.getList().stream()
-            .map(
-                citationXML ->
-                    CitationStyleDTO.builder()
-                        .jurisId(citationXML.getId())
-                        .newEntry(true)
-                        .uuid(UUID.randomUUID())
-                        .changeIndicator(citationXML.getChangeIndicator())
-                        .changeDateMail(
-                            citationXML.getChangeDateMail() != null
-                                ? LocalDate.parse(citationXML.getChangeDateMail())
-                                : null)
-                        .version(citationXML.getVersion())
-                        .documentType(citationXML.getDocumentType())
-                        .citationDocumentType(citationXML.getCitationDocumentType())
-                        .jurisShortcut(citationXML.getJurisShortcut())
-                        .label(citationXML.getLabel())
-                        .build())
-            .toList();
-
-    return databaseCitationStyleRepository
-        .deleteAll()
-        .thenMany(databaseCitationStyleRepository.saveAll(citationsDTO))
-        .then(Mono.just("Successfully imported the citation lookup table"));
   }
 
   @Transactional(transactionManager = "jpaTransactionManager")

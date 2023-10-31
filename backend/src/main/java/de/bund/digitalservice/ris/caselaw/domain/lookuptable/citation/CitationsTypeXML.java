@@ -8,8 +8,8 @@ import lombok.Data;
 
 @Data
 @JacksonXmlRootElement(localName = "juris-table")
-public class CitationsStyleXML {
+public class CitationsTypeXML {
   @JacksonXmlElementWrapper(useWrapping = false)
   @JsonProperty(value = "juris-zitart")
-  List<CitationStyleXML> list;
+  List<CitationTypeXML> list;
 }

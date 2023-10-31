@@ -2,7 +2,7 @@ package de.bund.digitalservice.ris.caselaw.adapter;
 
 import de.bund.digitalservice.ris.OpenApiConfiguration;
 import de.bund.digitalservice.ris.caselaw.domain.LookupTableService;
-import de.bund.digitalservice.ris.caselaw.domain.lookuptable.citation.CitationStyle;
+import de.bund.digitalservice.ris.caselaw.domain.lookuptable.citation.CitationType;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.Optional;
@@ -35,8 +35,8 @@ public class LookupTableController {
 
   @GetMapping(value = "zitart")
   @PreAuthorize("isAuthenticated()")
-  public Flux<CitationStyle> getCitationStyles(
+  public Flux<CitationType> getCitationStyles(
       @RequestParam(value = "q") Optional<String> searchStr) {
-    return service.getCitationStyles(searchStr);
+    return Flux.empty();
   }
 }

@@ -232,12 +232,12 @@ class DocumentUnitServiceTest {
     DocumentUnit documentUnit =
         DocumentUnit.builder()
             .uuid(TEST_UUID)
-            .proceedingDecisions(
-                List.of(
-                    ProceedingDecision.builder()
-                        .uuid(pdUuid)
-                        .dataSource(DataSource.PROCEEDING_DECISION)
-                        .build()))
+            //            .proceedingDecisions(
+            //                List.of(
+            //                    ProceedingDecision.builder()
+            //                        .uuid(pdUuid)
+            //                        .dataSource(DataSource.PROCEEDING_DECISION)
+            //                        .build()))
             .build();
     when(repository.countLinksByChildDocumentUnitUuid(TEST_UUID)).thenReturn(Mono.just(1L));
     when(repository.findByUuid(TEST_UUID)).thenReturn(Mono.just(documentUnit));
@@ -288,7 +288,8 @@ class DocumentUnitServiceTest {
                         List.of(
                             ActiveCitation.builder()
                                 .uuid(acUuid)
-                                .dataSource(DataSource.ACTIVE_CITATION)
+                                //
+                                // .dataSource(DataSource.ACTIVE_CITATION)
                                 .build()))
                     .build())
             .build();
@@ -380,7 +381,7 @@ class DocumentUnitServiceTest {
             .uuid(UUID.randomUUID())
             .documentNumber("ABCDE20220001")
             .fileuploadtimestamp(Instant.now())
-            .proceedingDecisions(null)
+            //            .proceedingDecisions(null)
             .build();
     DocumentationOffice documentationOffice = mock(DocumentationOffice.class);
     when(repository.save(documentUnit)).thenReturn(Mono.just(documentUnit));

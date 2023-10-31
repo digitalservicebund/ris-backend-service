@@ -16,7 +16,6 @@ import de.bund.digitalservice.ris.caselaw.domain.DataSource;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitNorm;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
-import de.bund.digitalservice.ris.caselaw.domain.ProceedingDecision;
 import de.bund.digitalservice.ris.caselaw.domain.Texts;
 import de.bund.digitalservice.ris.caselaw.domain.court.Court;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
@@ -92,14 +91,15 @@ public class DocumentUnitTransformer {
           .courtLocation(null);
     }
 
-    if (documentUnitDTO.getId() == null
-        && documentUnit.proceedingDecisions() != null
-        && !documentUnit.proceedingDecisions().isEmpty()) {
-
-      throw new DocumentUnitTransformerException(
-          "Transformation of a document unit with previous decisions only allowed by update. "
-              + "Document unit must have a database id!");
-    }
+    // if (documentUnitDTO.getId() == null
+    // && documentUnit.proceedingDecisions() != null
+    // && !documentUnit.proceedingDecisions().isEmpty()) {
+    //
+    // throw new DocumentUnitTransformerException(
+    // "Transformation of a document unit with previous decisions only allowed by
+    // update. "
+    // + "Document unit must have a database id!");
+    // }
 
     if (documentUnit.texts() != null) {
       Texts texts = documentUnit.texts();
@@ -234,13 +234,13 @@ public class DocumentUnitTransformer {
           new DocumentType(documentTypeDTO.getAbbreviation(), documentTypeDTO.getLabel());
     }
 
-    List<ProceedingDecision> proceedingDecisions = null;
-    if (documentUnitDTO.getProceedingDecisions() != null) {
-      proceedingDecisions =
-          documentUnitDTO.getProceedingDecisions().stream()
-              .map(ProceedingDecisionTransformer::transformToDomain)
-              .toList();
-    }
+    // List<ProceedingDecision> proceedingDecisions = null;
+    // if (documentUnitDTO.getProceedingDecisions() != null) {
+    // proceedingDecisions =
+    // documentUnitDTO.getProceedingDecisions().stream()
+    // .map(ProceedingDecisionTransformer::transformToDomain)
+    // .toList();
+    // }
 
     List<ActiveCitation> activeCitations = null;
     if (documentUnitDTO.getActiveCitations() != null) {
@@ -315,7 +315,7 @@ public class DocumentUnitTransformer {
                 getCourtObject(documentUnitDTO.getCourtType(), documentUnitDTO.getCourtLocation()))
             .deviatingCourts(incorrectCourts)
             .documentType(documentType)
-            //            .procedure(getProcedure(documentUnitDTO.getProcedure()))
+            // .procedure(getProcedure(documentUnitDTO.getProcedure()))
             .previousProcedures(documentUnitDTO.getPreviousProcedures())
             .ecli(documentUnitDTO.getEcli())
             .deviatingEclis(deviatingEclis)
@@ -349,7 +349,7 @@ public class DocumentUnitTransformer {
         .filetype(documentUnitDTO.getFiletype())
         .filename(documentUnitDTO.getFilename())
         .coreData(coreData)
-        .proceedingDecisions(proceedingDecisions)
+        // .proceedingDecisions(proceedingDecisions)
         .texts(texts)
         .status(documentUnitDTO.getStatus())
         .contentRelatedIndexing(

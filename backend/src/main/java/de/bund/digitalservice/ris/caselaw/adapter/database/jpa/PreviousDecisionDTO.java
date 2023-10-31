@@ -9,4 +9,7 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @Entity
 @DiscriminatorValue("previous_decision")
-public class PreviousDecisionDTO extends RelatedDocumentationDTO {}
+public class PreviousDecisionDTO extends RelatedDocumentationDTO {
+  // Todo column missing
+  //    private boolean dateKnown;
+}

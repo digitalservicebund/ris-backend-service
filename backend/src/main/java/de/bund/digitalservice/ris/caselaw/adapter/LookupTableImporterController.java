@@ -46,16 +46,4 @@ public class LookupTableImporterController {
             ResponseEntity.internalServerError()
                 .body("Could not import the fieldOfLaw lookup table"));
   }
-
-  @PutMapping(value = "zitart")
-  @PreAuthorize("isAuthenticated()")
-  public Mono<ResponseEntity<String>> importCitationStyleLookupTable(
-      @RequestBody ByteBuffer byteBuffer) {
-    return service
-        .importCitationStyleLookupTable(byteBuffer)
-        .map(resultString -> ResponseEntity.status(HttpStatus.OK).body(resultString))
-        .onErrorReturn(
-            ResponseEntity.internalServerError()
-                .body("Could not import the citation lookup table"));
-  }
 }

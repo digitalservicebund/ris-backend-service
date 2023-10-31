@@ -1,30 +1,27 @@
 package de.bund.digitalservice.ris.caselaw.adapter.transformer;
 
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentTypeDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitException;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitMetadataDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentationUnitLinkDTO;
-import de.bund.digitalservice.ris.caselaw.domain.ActiveCitation;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
-import de.bund.digitalservice.ris.caselaw.domain.DataSource;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.LinkedDocumentationUnit;
-import de.bund.digitalservice.ris.caselaw.domain.ProceedingDecision;
 import de.bund.digitalservice.ris.caselaw.domain.court.Court;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
 import java.util.List;
 
+@Deprecated
 public class LinkedDocumentationUnitTransformer {
   LinkedDocumentationUnitTransformer() {}
 
   public static LinkedDocumentationUnit transformToDomain(
       DocumentUnitMetadataDTO documentUnitMetadataDTO, DocumentationUnitLinkDTO linkDTO) {
 
-    if (documentUnitMetadataDTO.getDataSource() == DataSource.ACTIVE_CITATION) {
-      return ActiveCitationTransformer.transformToDomain(documentUnitMetadataDTO, linkDTO);
-    } else if (documentUnitMetadataDTO.getDataSource() == DataSource.PROCEEDING_DECISION) {
-      return ProceedingDecisionTransformer.transformToDomain(documentUnitMetadataDTO);
-    }
+    //    if (documentUnitMetadataDTO.getDataSource() == DataSource.ACTIVE_CITATION) {
+    //      return ActiveCitationTransformer.transformToDomain(documentUnitMetadataDTO, linkDTO);
+    //    } else if (documentUnitMetadataDTO.getDataSource() == DataSource.PROCEEDING_DECISION) {
+    //      return ProceedingDecisionTransformer.transformToDomain(documentUnitMetadataDTO);
+    //    }
 
     return LinkedDocumentationUnit.builder()
         .uuid(documentUnitMetadataDTO.getUuid())
@@ -89,19 +86,19 @@ public class LinkedDocumentationUnitTransformer {
         .uuid(linkedDocumentationUnit.getUuid())
         .documentNumber(linkedDocumentationUnit.getDocumentNumber())
         .coreData(coreData)
-        .dataSource(getDatasource(linkedDocumentationUnit))
+        //        .dataSource(getDatasource(linkedDocumentationUnit))
         .build();
   }
 
-  public static <T extends LinkedDocumentationUnit> DataSource getDatasource(
-      T linkedDocumentationUnit) {
-    if (linkedDocumentationUnit instanceof ActiveCitation) {
-      return DataSource.ACTIVE_CITATION;
-    } else if (linkedDocumentationUnit instanceof ProceedingDecision) {
-      return DataSource.PROCEEDING_DECISION;
-    } else {
-      throw new DocumentUnitException(
-          "Couldn't find data source for " + linkedDocumentationUnit.getClass());
-    }
-  }
+  //  public static <T extends LinkedDocumentationUnit> DataSource getDatasource(
+  //      T linkedDocumentationUnit) {
+  //    if (linkedDocumentationUnit instanceof ActiveCitation) {
+  //      return DataSource.ACTIVE_CITATION;
+  //    } else if (linkedDocumentationUnit instanceof ProceedingDecision) {
+  //      return DataSource.PROCEEDING_DECISION;
+  //    } else {
+  //      throw new DocumentUnitException(
+  //          "Couldn't find data source for " + linkedDocumentationUnit.getClass());
+  //    }
+  //  }
 }

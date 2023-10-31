@@ -19,7 +19,7 @@ public record DocumentUnit(
     String filetype,
     String filename,
     @Valid CoreData coreData,
-    List<ProceedingDecision> proceedingDecisions,
+    List<PreviousDecision> previousDecisions,
     Texts texts,
     DocumentUnitStatus status,
     ContentRelatedIndexing contentRelatedIndexing) {}

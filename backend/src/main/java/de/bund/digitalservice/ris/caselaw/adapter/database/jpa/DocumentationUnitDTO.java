@@ -157,13 +157,10 @@ public class DocumentationUnitDTO {
   private CourtDTO court;
 
   // Aktivzitierung
-  //  @OneToMany(
-  //      mappedBy = "documentationUnit",
-  //      cascade = CascadeType.ALL,
-  //      fetch = FetchType.EAGER,
-  //      orphanRemoval = true)
-  // @Builder.Default
-  // private Set<CaselawActiveCitation> caselawActiveCitations = new HashSet<>();
+  @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+  @JoinColumn(name = "documentation_unit_id")
+  @Builder.Default
+  private List<ActiveCitationDTO> activeCitations = new ArrayList<>();
 
   @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
   @JoinColumn(name = "documentation_unit_id", nullable = false)
@@ -223,13 +220,9 @@ public class DocumentationUnitDTO {
   //  @Builder.Default
   //  private Set<PendingDecision> pendingDecisions = new HashSet<>();
 
-  // Nachgehende Entscheidungen
-  //  @OneToMany(
-  //      mappedBy = "documentationUnit",
-  //      cascade = CascadeType.ALL,
-  //      fetch = FetchType.EAGER,
-  //      orphanRemoval = true)
-  //  @Builder.Default
-  //  private Set<PreviousDecision> previousDecisions = new HashSet<>();
-
+  // Vorgehende Entscheidungen
+  @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+  @JoinColumn(name = "documentation_unit_id")
+  @Builder.Default
+  private List<PreviousDecisionDTO> previousDecisions = new ArrayList<>();
 }

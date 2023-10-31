@@ -1,7 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.domain;
 
-import de.bund.digitalservice.ris.caselaw.domain.lookuptable.citation.CitationStyle;
-import de.bund.digitalservice.ris.caselaw.domain.lookuptable.citation.CitationStyleRepository;
+import de.bund.digitalservice.ris.caselaw.domain.lookuptable.citation.CitationTypeRepository;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
@@ -10,17 +9,18 @@ import reactor.core.publisher.Flux;
 
 @Service
 @Slf4j
+@Deprecated
 public class LookupTableService {
-  private final CitationStyleRepository citationStyleRepository;
+  private final CitationTypeRepository citationTypeRepository;
 
   private final DocumentTypeRepository documentTypeRepository;
 
   public LookupTableService(
       DocumentTypeRepository documentTypeRepository,
-      CitationStyleRepository citationStyleRepository) {
+      CitationTypeRepository citationTypeRepository) {
 
     this.documentTypeRepository = documentTypeRepository;
-    this.citationStyleRepository = citationStyleRepository;
+    this.citationTypeRepository = citationTypeRepository;
   }
 
   public Flux<DocumentType> getCaselawDocumentTypes(Optional<String> searchStr) {
@@ -31,13 +31,5 @@ public class LookupTableService {
 
     return Flux.fromIterable(
         documentTypeRepository.findAllByDocumentTypeOrderByAbbreviationAscLabelAsc('R'));
-  }
-
-  public Flux<CitationStyle> getCitationStyles(Optional<String> searchStr) {
-    if (searchStr.isPresent() && !searchStr.get().isBlank()) {
-      return citationStyleRepository.findBySearchStr(searchStr.get().trim());
-    }
-
-    return citationStyleRepository.findAllByOrderByCitationDocumentTypeAsc();
   }
 }

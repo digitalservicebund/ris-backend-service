@@ -2,11 +2,11 @@ package de.bund.digitalservice.ris.caselaw.adapter.database.jpa;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.Inheritance;
 import jakarta.persistence.InheritanceType;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.time.LocalDate;
@@ -29,22 +29,29 @@ public abstract class RelatedDocumentationDTO {
 
   @Id @GeneratedValue private UUID id;
 
-  @Column private String courtLocation;
+  @Column(name = "court_location", insertable = false, updatable = false)
+  private String courtLocation;
 
-  @Column private String courtType;
+  @Column(name = "court_type", insertable = false, updatable = false)
+  private String courtType;
 
-  @ManyToOne(fetch = FetchType.LAZY)
-  private CourtDTO court;
+  @ManyToOne private CourtDTO court;
 
-  @Column private LocalDate date;
+  @Column(name = "date")
+  private LocalDate date;
 
-  @Column private String documentNumber;
+  @Column(name = "document_number", insertable = false, updatable = false)
+  private String documentNumber;
 
-  @ManyToOne private DocumentTypeDTO documentType;
+  @ManyToOne
+  @JoinColumn(name = "document_type_id")
+  private DocumentTypeDTO documentType;
 
-  @Column private String documentTypeRawValue;
+  @Column(name = "document_type_raw_value", insertable = false, updatable = false)
+  private String documentTypeRawValue;
 
-  @Column private String fileNumber;
+  @Column(name = "file_number")
+  private String fileNumber;
 
-  @ManyToOne private DocumentationUnitDTO documentationUnit;
+  //  @Transient private DocumentationUnitDTO referencedDocumentationUnit;
 }

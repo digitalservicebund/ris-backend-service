@@ -248,49 +248,52 @@ public class DocumentUnitService {
                               d -> log.debug("Deleted file {} in bucket", documentUnit.s3path()))
                           .flatMap(d -> Mono.empty());
 
-              Flux<ProceedingDecision> proceedingDecisions =
-                  documentUnit.proceedingDecisions() == null
-                      ? Flux.empty()
-                      : Flux.fromIterable(documentUnit.proceedingDecisions());
+              //              Flux<ProceedingDecision> proceedingDecisions =
+              //                  documentUnit.proceedingDecisions() == null
+              //                      ? Flux.empty()
+              //                      : Flux.fromIterable(documentUnit.proceedingDecisions());
 
-              Flux<ActiveCitation> activeCitations =
-                  documentUnit.contentRelatedIndexing() == null
-                          || documentUnit.contentRelatedIndexing().activeCitations() == null
-                      ? Flux.empty()
-                      : Flux.fromIterable(documentUnit.contentRelatedIndexing().activeCitations());
+              //              Flux<ActiveCitation> activeCitations =
+              //                  documentUnit.contentRelatedIndexing() == null
+              //                          || documentUnit.contentRelatedIndexing().activeCitations()
+              // == null
+              //                      ? Flux.empty()
+              //                      :
+              // Flux.fromIterable(documentUnit.contentRelatedIndexing().activeCitations());
 
-              String logMsg =
-                  "Dokumentationseinheit gelöscht: "
-                      + documentUnitUuid
-                      + (documentUnit.proceedingDecisions() == null
-                              || documentUnit.proceedingDecisions().isEmpty()
-                          ? ""
-                          : ", zudem die Verknüpfungen mit "
-                              + documentUnit.proceedingDecisions().size()
-                              + " vorgehenden Entscheidungen")
-                      + (documentUnit.contentRelatedIndexing() == null
-                              || documentUnit.contentRelatedIndexing().activeCitations() == null
-                              || documentUnit.contentRelatedIndexing().activeCitations().isEmpty()
-                          ? ""
-                          : ", zudem die Verknüpfungen mit "
-                              + documentUnit.contentRelatedIndexing().activeCitations().size()
-                              + " Aktivzitierungen");
+              String logMsg = "Dokumentationseinheit gelöscht: " + documentUnitUuid;
+              //                      + (documentUnit.proceedingDecisions() == null
+              //                              || documentUnit.proceedingDecisions().isEmpty()
+              //                          ? ""
+              //                          : ", zudem die Verknüpfungen mit "
+              //                              + documentUnit.proceedingDecisions().size()
+              //                              + " vorgehenden Entscheidungen")
+              //                      + (documentUnit.contentRelatedIndexing() == null
+              //                              ||
+              // documentUnit.contentRelatedIndexing().activeCitations() == null
+              //                              ||
+              // documentUnit.contentRelatedIndexing().activeCitations().isEmpty()
+              //                          ? ""
+              //                          : ", zudem die Verknüpfungen mit "
+              //                              +
+              // documentUnit.contentRelatedIndexing().activeCitations().size()
+              //                              + " Aktivzitierungen");
 
               return deleteAttachedFile
-                  .thenMany(
-                      proceedingDecisions.flatMap(
-                          proceedingDecision ->
-                              removeLinkedDocumentationUnit(
-                                  documentUnitUuid,
-                                  proceedingDecision.getUuid(),
-                                  DocumentationUnitLinkType.PREVIOUS_DECISION)))
-                  .thenMany(
-                      activeCitations.flatMap(
-                          activeCitation ->
-                              removeLinkedDocumentationUnit(
-                                  documentUnitUuid,
-                                  activeCitation.getUuid(),
-                                  DocumentationUnitLinkType.ACTIVE_CITATION)))
+                  //                  .thenMany(
+                  //                      proceedingDecisions.flatMap(
+                  //                          proceedingDecision ->
+                  //                              removeLinkedDocumentationUnit(
+                  //                                  documentUnitUuid,
+                  //                                  proceedingDecision.getUuid(),
+                  //                                  DocumentationUnitLinkType.PREVIOUS_DECISION)))
+                  //                  .thenMany(
+                  //                      activeCitations.flatMap(
+                  //                          activeCitation ->
+                  //                              removeLinkedDocumentationUnit(
+                  //                                  documentUnitUuid,
+                  //                                  activeCitation.getUuid(),
+                  //                                  DocumentationUnitLinkType.ACTIVE_CITATION)))
                   .then(repository.delete(documentUnit))
                   .thenReturn(logMsg);
             })
@@ -315,77 +318,83 @@ public class DocumentUnitService {
     Mono<DocumentUnit> documentUnitMono = Mono.just(documentUnit);
 
     return documentUnitMono
-        .flatMap(
-            documentUnit1 -> {
-              if (documentUnit1.proceedingDecisions() == null) return Mono.just(documentUnit1);
-              return Flux.fromIterable(documentUnit1.proceedingDecisions())
-                  .flatMap(
-                      proceedingDecision -> {
-                        if (proceedingDecision.getUuid() == null && !proceedingDecision.isEmpty()) {
-                          return createLinkedDocumentationUnit(
-                                  documentUnit1.uuid(),
-                                  proceedingDecision,
-                                  documentationOffice,
-                                  DocumentationUnitLinkType.PREVIOUS_DECISION)
-                              .map(
-                                  documentationUnitLink ->
-                                      proceedingDecision.toBuilder()
-                                          .uuid(documentationUnitLink.childDocumentationUnitUuid())
-                                          .build());
-                        } else {
-                          return linkLinkedDocumentationUnit(
-                                  documentUnit1.uuid(),
-                                  proceedingDecision.getUuid(),
-                                  DocumentationUnitLinkType.PREVIOUS_DECISION)
-                              .thenReturn(proceedingDecision);
-                        }
-                      })
-                  .collectList()
-                  .map(
-                      proceedingDecisions ->
-                          documentUnit1.toBuilder()
-                              .proceedingDecisions(proceedingDecisions)
-                              .build());
-            })
-        .flatMap(
-            documentUnit1 -> {
-              if (documentUnit1.contentRelatedIndexing() == null
-                  || documentUnit1.contentRelatedIndexing().activeCitations() == null)
-                return Mono.just(documentUnit1);
-              return Flux.fromIterable(documentUnit1.contentRelatedIndexing().activeCitations())
-                  .flatMap(
-                      activeCitation -> {
-                        if (activeCitation.getUuid() == null && !activeCitation.isEmpty()) {
-                          return createLinkedDocumentationUnit(
-                                  documentUnit1.uuid(),
-                                  activeCitation,
-                                  documentationOffice,
-                                  DocumentationUnitLinkType.ACTIVE_CITATION)
-                              .map(
-                                  documentationUnitLink ->
-                                      activeCitation.toBuilder()
-                                          .uuid(documentationUnitLink.childDocumentationUnitUuid())
-                                          .build());
-                        } else {
-                          return linkLinkedDocumentationUnit(
-                                  documentUnit1.uuid(),
-                                  activeCitation.getUuid(),
-                                  DocumentationUnitLinkType.ACTIVE_CITATION)
-                              .thenReturn(activeCitation);
-                        }
-                      })
-                  .collectList()
-                  .map(
-                      activeCitations -> {
-                        ContentRelatedIndexing contentRelatedIndexing =
-                            documentUnit1.contentRelatedIndexing().toBuilder()
-                                .activeCitations(activeCitations)
-                                .build();
-                        return documentUnit1.toBuilder()
-                            .contentRelatedIndexing(contentRelatedIndexing)
-                            .build();
-                      });
-            })
+        //        .flatMap(
+        //            documentUnit1 -> {
+        //              if (documentUnit1.proceedingDecisions() == null) return
+        // Mono.just(documentUnit1);
+        //              return Flux.fromIterable(documentUnit1.proceedingDecisions())
+        //                  .flatMap(
+        //                      proceedingDecision -> {
+        //                        if (proceedingDecision.getUuid() == null &&
+        // !proceedingDecision.isEmpty()) {
+        //                          return createLinkedDocumentationUnit(
+        //                                  documentUnit1.uuid(),
+        //                                  proceedingDecision,
+        //                                  documentationOffice,
+        //                                  DocumentationUnitLinkType.PREVIOUS_DECISION)
+        //                              .map(
+        //                                  documentationUnitLink ->
+        //                                      proceedingDecision.toBuilder()
+        //
+        // .uuid(documentationUnitLink.childDocumentationUnitUuid())
+        //                                          .build());
+        //                        } else {
+        //                          return linkLinkedDocumentationUnit(
+        //                                  documentUnit1.uuid(),
+        //                                  proceedingDecision.getUuid(),
+        //                                  DocumentationUnitLinkType.PREVIOUS_DECISION)
+        //                              .thenReturn(proceedingDecision);
+        //                        }
+        //                      })
+        //                  .collectList()
+        //                  .map(
+        //                      proceedingDecisions ->
+        //                          documentUnit1.toBuilder()
+        //                              .proceedingDecisions(proceedingDecisions)
+        //                              .build());
+        //            })
+        //        .flatMap(
+        //            documentUnit1 -> {
+        //              if (documentUnit1.contentRelatedIndexing() == null
+        //                  || documentUnit1.contentRelatedIndexing().activeCitations() == null)
+        //                return Mono.just(documentUnit1);
+        //              return
+        // Flux.fromIterable(documentUnit1.contentRelatedIndexing().activeCitations())
+        //                  .flatMap(
+        //                      activeCitation -> {
+        //                        if (activeCitation.getUuid() == null && !activeCitation.isEmpty())
+        // {
+        //                          return createLinkedDocumentationUnit(
+        //                                  documentUnit1.uuid(),
+        //                                  activeCitation,
+        //                                  documentationOffice,
+        //                                  DocumentationUnitLinkType.ACTIVE_CITATION)
+        //                              .map(
+        //                                  documentationUnitLink ->
+        //                                      activeCitation.toBuilder()
+        //
+        // .uuid(documentationUnitLink.childDocumentationUnitUuid())
+        //                                          .build());
+        //                        } else {
+        //                          return linkLinkedDocumentationUnit(
+        //                                  documentUnit1.uuid(),
+        //                                  activeCitation.getUuid(),
+        //                                  DocumentationUnitLinkType.ACTIVE_CITATION)
+        //                              .thenReturn(activeCitation);
+        //                        }
+        //                      })
+        //                  .collectList()
+        //                  .map(
+        //                      activeCitations -> {
+        //                        ContentRelatedIndexing contentRelatedIndexing =
+        //                            documentUnit1.contentRelatedIndexing().toBuilder()
+        //                                .activeCitations(activeCitations)
+        //                                .build();
+        //                        return documentUnit1.toBuilder()
+        //                            .contentRelatedIndexing(contentRelatedIndexing)
+        //                            .build();
+        //                      });
+        //            })
         .flatMap(repository::save)
         .doOnError(ex -> log.error("Couldn't update the DocumentUnit", ex));
   }
@@ -482,7 +491,7 @@ public class DocumentUnitService {
             .build();
 
     return documentUnit.toBuilder()
-        .dataSource(getDatasource(linkedDocumentationUnit))
+        //        .dataSource(getDatasource(linkedDocumentationUnit))
         .coreData(coreData)
         .build();
   }
@@ -491,17 +500,17 @@ public class DocumentUnitService {
     return repository.deleteIfOrphanedLinkedDocumentationUnit(documentUnitUuid);
   }
 
-  private static <T extends LinkedDocumentationUnit> DataSource getDatasource(
-      T linkedDocumentationUnit) {
-    if (linkedDocumentationUnit instanceof ActiveCitation) {
-      return DataSource.ACTIVE_CITATION;
-    } else if (linkedDocumentationUnit instanceof ProceedingDecision) {
-      return DataSource.PROCEEDING_DECISION;
-    } else {
-      throw new DocumentationUnitException(
-          "Couldn't find data source for " + linkedDocumentationUnit.getClass());
-    }
-  }
+  //  private static <T extends LinkedDocumentationUnit> DataSource getDatasource(
+  //      T linkedDocumentationUnit) {
+  //    if (linkedDocumentationUnit instanceof ActiveCitation) {
+  //      return DataSource.ACTIVE_CITATION;
+  //    } else if (linkedDocumentationUnit instanceof ProceedingDecision) {
+  //      return DataSource.PROCEEDING_DECISION;
+  //    } else {
+  //      throw new DocumentationUnitException(
+  //          "Couldn't find data source for " + linkedDocumentationUnit.getClass());
+  //    }
+  //  }
 
   public <T extends LinkedDocumentationUnit>
       Flux<T> findAllLinkedDocumentUnitsByParentDocumentUnitUuidAndType(

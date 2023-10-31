@@ -4,9 +4,9 @@ import java.util.UUID;
 import lombok.Builder;
 
 @Builder
-public record CitationStyle(
+public record CitationType(
     UUID uuid,
-    Character documentType,
-    Character citationDocumentType,
+    String documentType,
+    String citationDocumentType,
     String jurisShortcut,
     String label) {}

@@ -86,7 +86,7 @@ class JurisXmlExporterWrapperIntegrationTest {
             .uuid(TEST_UUID)
             .documentNumber(documentNr)
             .coreData(coreData)
-            .proceedingDecisions(proceedingDecisions)
+            //            .proceedingDecisions(proceedingDecisions)
             .texts(texts)
             .build();
 
@@ -190,7 +190,7 @@ class JurisXmlExporterWrapperIntegrationTest {
             .filetype("filetype")
             .filename("filename")
             .coreData(coreData)
-            .proceedingDecisions(proceedingDecisions)
+            //            .proceedingDecisions(proceedingDecisions)
             .texts(texts)
             .contentRelatedIndexing(indexing)
             .status(

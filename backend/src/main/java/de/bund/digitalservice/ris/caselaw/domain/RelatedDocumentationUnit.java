@@ -12,26 +12,21 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
-/**
- * @deprecated use {@link de.bund.digitalservice.ris.caselaw.domain.RelatedDocumentationUnit}
- *     instead
- */
 @SuperBuilder(toBuilder = true)
 @Getter
 @NoArgsConstructor
 @EqualsAndHashCode
 @ToString
 @JsonIgnoreProperties(ignoreUnknown = true)
-@Deprecated
-public class LinkedDocumentationUnit {
+public class RelatedDocumentationUnit {
   protected UUID uuid;
   protected String documentNumber;
   protected Court court;
   protected LocalDate decisionDate;
   protected String fileNumber;
   protected DocumentType documentType;
-  protected DataSource dataSource;
-  protected boolean dateKnown;
+
+  // Todo referencedDocumentationUnit?
 
   @Transient
   public boolean isEmpty() {
@@ -40,8 +35,6 @@ public class LinkedDocumentationUnit {
         && court == null
         && decisionDate == null
         && fileNumber == null
-        && documentType == null
-        && dataSource == null
-        && !dateKnown;
+        && documentType == null;
   }
 }
