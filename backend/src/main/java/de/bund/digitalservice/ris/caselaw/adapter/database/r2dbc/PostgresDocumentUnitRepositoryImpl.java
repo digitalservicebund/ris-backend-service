@@ -71,6 +71,7 @@ import reactor.core.publisher.Mono;
 
 @Repository
 @Slf4j
+@Deprecated
 public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepository {
   private final DatabaseDocumentUnitRepository repository;
   private final DatabaseDocumentUnitMetadataRepository metadataRepository;

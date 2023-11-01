@@ -9,12 +9,14 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnit
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.FileNumberDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.KeywordDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.OriginalFileDocumentDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.StatusDTO;
 import de.bund.digitalservice.ris.caselaw.domain.ActiveCitation;
 import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData.CoreDataBuilder;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitNorm;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatus;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.PreviousDecision;
 import de.bund.digitalservice.ris.caselaw.domain.Texts;
@@ -156,7 +158,7 @@ public class DocumentationUnitTransformer {
       // case NOT_SPECIFIED -> legalEffectDTO = LegalEffectDTO.KEINE_ANGABE;
       // default -> legalEffectDTO = LegalEffectDTO.FALSCHE_ANGABE;
       // }
-      // builder.legalEffect(legalEffectDTO);
+      // builder.legalEffect(legalEffectDTO);ich hoffe nicht.
 
     } else {
       builder
@@ -387,13 +389,22 @@ public class DocumentationUnitTransformer {
       builder.previousDecisions(previousDecisions);
     }
 
-    return builder
+    builder
         .uuid(documentationUnitDTO.getId())
         .documentNumber(documentationUnitDTO.getDocumentNumber())
         .coreData(coreData)
         .texts(texts)
-        // .status(documentUnitDTO.getStatus())
-        .contentRelatedIndexing(contentRelatedIndexing)
-        .build();
+        .contentRelatedIndexing(contentRelatedIndexing);
+
+    if (documentationUnitDTO.getStatus() != null && !documentationUnitDTO.getStatus().isEmpty()) {
+      StatusDTO statusDTO = documentationUnitDTO.getStatus().get(0);
+      builder.status(
+          DocumentUnitStatus.builder()
+              .publicationStatus(statusDTO.getPublicationStatus())
+              .withError(statusDTO.isWithError())
+              .build());
+    }
+
+    return builder.build();
   }
 }

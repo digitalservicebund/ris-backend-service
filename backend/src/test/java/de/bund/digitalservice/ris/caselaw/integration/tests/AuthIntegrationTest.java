@@ -66,7 +66,7 @@ class AuthIntegrationTest {
             response -> {
               assertThat(response.getResponseBody().name()).isEqualTo("testUser");
               assertThat(response.getResponseBody().documentationOffice().abbreviation())
-                  .isEqualTo("DigitalService");
+                  .isEqualTo("DS");
             });
   }
 

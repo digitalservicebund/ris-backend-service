@@ -14,6 +14,7 @@ import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
+import jakarta.persistence.OrderBy;
 import jakarta.persistence.PrimaryKeyJoinColumn;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
@@ -142,6 +143,7 @@ public class DocumentationUnitDTO {
   private DocumentationOfficeDTO documentationOffice;
 
   @OneToMany(mappedBy = "documentationUnitDTO", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+  @OrderBy("createdAt desc")
   private List<StatusDTO> status;
 
   public void setOriginalFileDocument(OriginalFileDocumentDTO originalFileDocument) {
