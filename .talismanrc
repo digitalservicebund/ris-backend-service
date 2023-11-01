@@ -37,7 +37,7 @@ allowed_patterns:
 - key
 - uses:\ ([A-z0-9\-]+\/)*[A-z0-9\-]+@[a-fA-F0-9]{40}
 - https://github.com/jk1/Gradle-License-Report/blob/7cf695c38126b63ef9e907345adab84dfa92ea0e/src/main/resources/default-license-normalizer-bundle.json
-- paketobuildpacks/builder@sha256:1a59354925fcb7ba54744b8017630c97c2b035e1a9e19309330557b9c66bfc2c
+- paketobuildpacks/builder-jammy-tiny@sha256:61b59d061af9dbb117952dbc916dc2e0af87fd2e8b5ee24ff1573a1e3fffe0aa
 - KEYWORD
 threshold: medium
 version: "1.0"
