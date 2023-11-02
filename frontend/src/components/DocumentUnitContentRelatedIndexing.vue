@@ -28,7 +28,7 @@ const contentRelatedIndexing = computed({
 <template>
   <div class="mb-32 flex flex-col gap-32">
     <h2 class="ds-heading-02-reg mb-[1rem]">Inhaltliche Erschließung</h2>
-    <KeyWords :document-unit-uuid="props.documentUnitUuid" />
+    <KeyWords v-model="contentRelatedIndexing.keywords" />
     <FieldOfLawMain :document-unit-uuid="props.documentUnitUuid" />
     <Norms v-model="contentRelatedIndexing.norms" />
     <ActiveCitations v-model="contentRelatedIndexing.activeCitations" />

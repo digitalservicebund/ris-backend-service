@@ -13,12 +13,9 @@ function renderComponent(props?: Partial<KeywordsChipsInputProps>) {
     id: props?.id ?? "identifier",
     modelValue,
     "onUpdate:modelValue":
-      props?.["onUpdate:modelValue"] ?? ((val) => (modelValue = val)),
+      props?.["onUpdate:modelValue"] ??
+      ((val: string[] | undefined) => (modelValue = val)),
     ariaLabel: props?.ariaLabel ?? "aria-label",
-    validationError: props?.validationError,
-    onChipAdded: props?.onChipAdded,
-    onChipDeleted: props?.onChipDeleted,
-    error: props?.error,
   }
 
   return { user, ...render(KeywordsChipsInput, { props: effectiveProps }) }
@@ -52,15 +49,6 @@ describe("Keywords Chips Input", () => {
     const input = screen.getByRole("textbox")
     await user.type(input, "foo{enter}")
     expect(onUpdate).toHaveBeenCalledWith(["foo"])
-  })
-
-  it("emits an event when a chip is added", async () => {
-    const onAdded = vi.fn()
-    const { user } = renderComponent({ onChipAdded: onAdded })
-
-    const input = screen.getByRole("textbox")
-    await user.type(input, "foo{enter}")
-    expect(onAdded).toHaveBeenCalledWith("foo")
   })
 
   it("removes whitespace from chips when added", async () => {
@@ -115,18 +103,6 @@ describe("Keywords Chips Input", () => {
     const button = screen.getAllByRole("button")[0]
     await user.click(button)
     expect(onUpdate).toHaveBeenCalledWith(["bar"])
-  })
-
-  it("emits an event when a chip is removed", async () => {
-    const onDeleted = vi.fn()
-    const { user } = renderComponent({
-      modelValue: ["foo", "bar"],
-      onChipDeleted: onDeleted,
-    })
-
-    const button = screen.getAllByRole("button")[0]
-    await user.click(button)
-    expect(onDeleted).toHaveBeenCalledWith("foo")
   })
 
   it("focuses the input when pressing arrow on the first chip", async () => {
@@ -200,31 +176,6 @@ describe("Keywords Chips Input", () => {
     expect(onUpdate).toHaveBeenCalledWith(["foo"])
   })
 
-  it("shows an error message", () => {
-    renderComponent({ error: { title: "foo" } })
-    expect(screen.getByText("foo")).toBeInTheDocument()
-  })
-
-  it("clears the error message on blur", async () => {
-    const { user } = renderComponent({ error: { title: "foo" } })
-    expect(screen.getByText("foo")).toBeInTheDocument()
-
-    const input = screen.getByRole("textbox")
-    await user.click(input)
-    await user.tab()
-    expect(screen.queryByText("foo")).not.toBeInTheDocument()
-  })
-
-  it("clears the error message on input", async () => {
-    const { user } = renderComponent({ error: { title: "foo" } })
-    expect(screen.getByText("foo")).toBeInTheDocument()
-
-    const input = screen.getByRole("textbox")
-    await user.click(input)
-    await user.type(input, "o")
-    expect(screen.queryByText("foo")).not.toBeInTheDocument()
-  })
-
   it("shows an error message when adding a chip that already exists", async () => {
     const onUpdate = vi.fn()
     const { user } = renderComponent({
@@ -236,5 +187,37 @@ describe("Keywords Chips Input", () => {
     await user.type(input, "one{enter}")
     expect(screen.getByText("Schlagwort bereits vergeben.")).toBeInTheDocument()
     expect(onUpdate).not.toHaveBeenCalled()
+  })
+
+  it("clears the error message on blur", async () => {
+    const onUpdate = vi.fn()
+    const { user } = renderComponent({
+      modelValue: ["one"],
+      "onUpdate:modelValue": onUpdate,
+    })
+
+    const input = screen.getByRole<HTMLInputElement>("textbox")
+    await user.type(input, "one{enter}")
+    expect(screen.getByText("Schlagwort bereits vergeben.")).toBeInTheDocument()
+    await user.tab()
+    expect(
+      screen.queryByText("Schlagwort bereits vergeben."),
+    ).not.toBeInTheDocument()
+  })
+
+  it("clears the error message on input", async () => {
+    const onUpdate = vi.fn()
+    const { user } = renderComponent({
+      modelValue: ["one"],
+      "onUpdate:modelValue": onUpdate,
+    })
+
+    const input = screen.getByRole<HTMLInputElement>("textbox")
+    await user.type(input, "one{enter}")
+    expect(screen.getByText("Schlagwort bereits vergeben.")).toBeInTheDocument()
+    await user.type(input, "two")
+    expect(
+      screen.queryByText("Schlagwort bereits vergeben."),
+    ).not.toBeInTheDocument()
   })
 })

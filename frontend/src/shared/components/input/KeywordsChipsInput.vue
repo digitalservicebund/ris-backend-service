@@ -1,25 +1,19 @@
 <script lang="ts" setup>
 import { produce } from "immer"
 import { ref, watch } from "vue"
-import { ResponseError } from "@/services/httpClient"
 import ChipsList from "@/shared/components/input/ChipsList.vue"
 import TextInput from "@/shared/components/input/TextInput.vue"
-import { ValidationError } from "@/shared/components/input/types"
 
 interface Props {
   id: string
   modelValue?: string[]
   ariaLabel?: string
-  error?: ResponseError
-  validationError?: ValidationError
 }
 
 const props = defineProps<Props>()
 
 const emit = defineEmits<{
   "update:modelValue": [value?: string[]]
-  chipAdded: [value: string]
-  chipDeleted: [value: string]
 }>()
 
 /* -------------------------------------------------- *
@@ -28,22 +22,7 @@ const emit = defineEmits<{
 
 const newChipText = ref<string>("")
 
-const errorMessage = ref<ResponseError | undefined>(props.error)
-
-watch(
-  () => props.error,
-  (error) => {
-    errorMessage.value = error
-  },
-)
-
-const handleOnBlur = () => {
-  errorMessage.value = undefined
-}
-
-watch(newChipText, (is) => {
-  if (errorMessage.value && is !== "") errorMessage.value = undefined
-})
+const errorMessage = ref()
 
 function addChip() {
   const chip = newChipText.value.trim()
@@ -57,14 +36,16 @@ function addChip() {
 
   const next = props.modelValue
     ? produce(props.modelValue, (draft) => {
-        draft?.push(chip)
+        draft.push(chip)
       })
     : [chip]
 
-  emit("chipAdded", chip)
   emit("update:modelValue", next)
-
   newChipText.value = ""
+}
+
+function onDeleteChip() {
+  focusInputIfEmpty()
 }
 
 /* -------------------------------------------------- *
@@ -87,6 +68,18 @@ const focusInput = () => {
   focusedChip.value = undefined
   chipsInput.value?.focusInput()
 }
+
+async function focusInputIfEmpty() {
+  if (props.modelValue?.length === 1) focusInput()
+}
+
+const handleOnBlur = () => {
+  errorMessage.value = undefined
+}
+
+watch(newChipText, (is) => {
+  if (errorMessage.value && is !== "") errorMessage.value = undefined
+})
 </script>
 
 <template>
@@ -112,7 +105,7 @@ const focusInput = () => {
     <ChipsList
       v-model:focused-item="focusedChip"
       :model-value="modelValue"
-      @chip-deleted="(_, keyword) => $emit('chipDeleted', keyword)"
+      @chip-deleted="onDeleteChip"
       @previous-clicked-on-first="focusInput"
       @update:model-value="$emit('update:modelValue', $event)"
     />

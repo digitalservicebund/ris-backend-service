@@ -23,6 +23,7 @@ export type CoreData = {
 }
 
 export type ContentRelatedIndexing = {
+  keywords?: string[]
   norms?: NormReference[]
   activeCitations?: ActiveCitation[]
 }
