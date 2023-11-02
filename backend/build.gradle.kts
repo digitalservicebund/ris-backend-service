@@ -157,7 +157,7 @@ dependencies {
         exclude(group = "io.netty", module = "netty-tcnative-classes")
         because("CVE-2021-43797, not using Tomcat")
     }
-    implementation("org.springframework.cloud:spring-cloud-starter-kubernetes-client-config:3.0.4")
+    implementation("org.springframework.cloud:spring-cloud-starter-kubernetes-client-config:2.1.3")
     // CVE-2023-31582
     implementation("org.bitbucket.b_c:jose4j:0.9.3")
     implementation("org.springframework.boot:spring-boot-starter-data-redis")
@@ -359,7 +359,7 @@ tasks {
         val containerImageVersion = System.getenv("CONTAINER_IMAGE_VERSION") ?: "latest"
 
         imageName.set("${containerRegistry}/${containerImageName}:${containerImageVersion}")
-        builder.set("paketobuildpacks/builder-jammy-base")
+        builder.set("paketobuildpacks/builder-jammy-tiny@sha256:61b59d061af9dbb117952dbc916dc2e0af87fd2e8b5ee24ff1573a1e3fffe0aa")
         publish.set(false)
         docker {
             publishRegistry {
