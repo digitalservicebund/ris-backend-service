@@ -1,14 +1,13 @@
-import { ref } from "vue"
-import {
-  MenuButton,
-  useCollapsingMenuBar,
-} from "@/shared/composables/useCollapsingMenuBar"
+import { ref, markRaw } from "vue"
+import { EditorButton } from "@/shared/components/input/TextEditorButton.vue"
+import { useCollapsingMenuBar } from "@/shared/composables/useCollapsingMenuBar"
 import { generateString } from "~/test-helper/dataGenerators"
+import IconTest from "~icons/ic/baseline-clear"
 
-function generateButton(partialButton?: Partial<MenuButton>) {
+function generateButton(partialButton?: Partial<EditorButton>) {
   return {
     type: generateString({ prefix: "group-1" }),
-    icon: generateString({ prefix: "icon-1" }),
+    icon: markRaw(IconTest),
     ariaLabel: generateString({ prefix: "aria-1" }),
     isCollapsable: true,
     ...partialButton,
