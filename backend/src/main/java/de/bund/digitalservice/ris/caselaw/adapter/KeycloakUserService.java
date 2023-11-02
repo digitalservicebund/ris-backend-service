@@ -27,7 +27,7 @@ public class KeycloakUserService implements UserService {
           Map.entry("/caselaw/BVerwG", "BVerwG"),
           Map.entry("/caselaw/OVG_NRW", "OVG NRW"),
           Map.entry("/caselaw/BZSt", "BZSt"),
-          Map.entry("/DigitalService", "DigitalService"),
+          Map.entry("/DS", "DigitalService"),
           Map.entry("/CC-RIS", "CC-RIS"));
 
   public KeycloakUserService(DatabaseDocumentationOfficeRepository documentationOfficeRepository) {

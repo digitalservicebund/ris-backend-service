@@ -5,11 +5,6 @@ fileignoreconfig:
 - filename: '*README.md'
   ignore_detectors:
   - filecontent
-- filename: _site/*
-  ignore_detectors:
-  - filecontent
-- filename: _site/prototype-footnotes/assets/index-086108b4.js
-  checksum: 0bd435f734159482c18b1f78fbde74f6b3be56604f380ac59405dc240cf8a270
 - filename: backend/src/main/kotlin/de/bund/digitalservice/ris/norms/framework/adapter/input/restapi/controller/GetFileController.kt
   checksum: f989b3c9c176b1b985c2f78ca6ca13fa1403cbb69f367ae9b1cb8ea64d5f6747
 - filename: backend/src/test/java/de/bund/digitalservice/ris/caselaw/integration/tests/JurisXmlExporterWrapperIntegrationTest.java
@@ -21,13 +16,13 @@ fileignoreconfig:
 - filename: backend/src/test/kotlin/unit/application/service/GetFileServiceTest.kt
   checksum: 8133265c6f388df84a3e0f61050428e8628853e0ba80b432e4723750a34b781e
 - filename: compose.yaml
-  checksum: a90052cdb65eb87dd6b0549f3a80860632555b7e3f7f013c30f193596a1fa456
+  checksum: 33ed6a756c7eb9ecde0a8067af28764d31b1d835146fad24bbd9b7c7602af9dc
 - filename: doc/norms/backend-api.yaml
   checksum: df4fa1f7e6d7023f9a7a98d1052c2b88c1785366962004b3165453edcd5bf4db
 - filename: doc/structurizr/workspace.json
   checksum: 541780133a0bf013ac75f6a3bc402c77981a273654c5648eabeb32ccb271a834
 - filename: frontend/Dockerfile.prod
-  checksum: 28a020072dc1992104413530b3138c5376e4e49f407f1438b4021135b0fc30e5
+  checksum: 7eddf58956c7e4f812b1381175df3a420a681937aaccd0001572939a484158ff
 - filename: frontend/FRONTEND_STYLEGUIDE.md
   checksum: e6b8194eba2012f2a769c5a5d3577715a573b441a7b94e744c32b3149d0d3a93
 - filename: frontend/src/main.ts
@@ -35,14 +30,14 @@ fileignoreconfig:
 - filename: frontend/test/test-helper/dataGenerators.ts
   checksum: a3d04d1168dcc221ba5fcd72e8d8bada60f48644c7586bde3a7602b748d0682c
 - filename: migration_schema_local_setup.md
-  checksum: a6c8afb7dba5ecc5973368e5f6a6b55ca9a474b7b526e7a0fa793659993151c0
+  checksum: 69432ee1eea4b8c7c72e1bb049e9ad5ec3423ea2305bec1ae19badc0e202f0c3
 scopeconfig:
 - scope: node
 allowed_patterns:
 - key
 - uses:\ ([A-z0-9\-]+\/)*[A-z0-9\-]+@[a-fA-F0-9]{40}
 - https://github.com/jk1/Gradle-License-Report/blob/7cf695c38126b63ef9e907345adab84dfa92ea0e/src/main/resources/default-license-normalizer-bundle.json
-- paketobuildpacks/builder@sha256:367c3da5ae0a3caeb12e7e5bc317cb0b21e700c7f7bbb29204f70151cb5d8e66
+- paketobuildpacks/builder-jammy-tiny@sha256:61b59d061af9dbb117952dbc916dc2e0af87fd2e8b5ee24ff1573a1e3fffe0aa
 - KEYWORD
 threshold: medium
 version: "1.0"

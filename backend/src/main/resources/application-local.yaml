@@ -27,6 +27,8 @@ spring:
 #    properties:
 #      hibernate:
 #        format_sql: true
+#        jdbc:
+#          fetch_size: 10000
 mail:
   exporter:
     response:

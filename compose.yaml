@@ -121,6 +121,7 @@ services:
         psql -e -U test "$${POSTGRES_DB}" -c "ALTER DEFAULT PRIVILEGES IN SCHEMA incremental_migration GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO $${MIGRATION_USER_NAME}, $${POSTGRES_USER};"
 
         psql -U $${POSTGRES_USER} -d $${POSTGRES_DB} -c 'CREATE EXTENSION IF NOT EXISTS "uuid-ossp";'
+        psql -U $${POSTGRES_USER} -d $${POSTGRES_DB} -c 'CREATE EXTENSION IF NOT EXISTS pg_trgm;'
         wait
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U test -d neuris"]
@@ -130,7 +131,7 @@ services:
       timeout: 3s
 
   redis:
-    image: cgr.dev/chainguard/redis@sha256:8969ecdfa82ed7d0d10596163ba9b7063879e0b1ccb57d054d10aa9d99bd1ce5
+    image: cgr.dev/chainguard/redis@sha256:0101f37fde3ca4aa56e802058389752bd48c9a375dbe2a94ffa3089336fff518
     extra_hosts:
       - localhost:host-gateway
     container_name: redis

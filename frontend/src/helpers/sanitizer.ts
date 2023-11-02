@@ -15,18 +15,28 @@ function sanitize(input: string, rules: SanitizeRule[]): string {
     output = output.replace(rule.pattern, rule.replacement ?? "")
   })
 
-  return output
+  return output.trim()
 }
 
 /** Removes tags that indicate "Kuppelwörter" */
 const kwReplacement: SanitizeRule = {
-  pattern: /<(kw|KW)\/>/g,
+  pattern: /<kw\/>/gi,
   replacement: null,
 }
 
 /** Removes FNR tags */
 const fnrReplacement: SanitizeRule = {
   pattern: /<FnR ID="[^"]*"\/>/g,
+  replacement: null,
+}
+
+const bReplacement: SanitizeRule = {
+  pattern: /<b\/>/gi,
+  replacement: null,
+}
+
+const supReplacement: SanitizeRule = {
+  pattern: /<sup>.*<\/sup>/gi,
   replacement: null,
 }
 
@@ -38,6 +48,8 @@ export function sanitizeTableOfContentEntry(input: string): string {
   return sanitize(input, [
     kwReplacement,
     fnrReplacement,
+    bReplacement,
+    supReplacement,
     { pattern: /\s*<(br|BR)\/>\s*/g, replacement: " " },
   ])
 }
@@ -46,6 +58,8 @@ export function sanitizeNormTitle(input: string): string {
   return sanitize(input, [
     kwReplacement,
     fnrReplacement,
+    bReplacement,
+    supReplacement,
     { pattern: /\s*<(br|BR)\/>\s*/g, replacement: "\n" },
   ])
 }

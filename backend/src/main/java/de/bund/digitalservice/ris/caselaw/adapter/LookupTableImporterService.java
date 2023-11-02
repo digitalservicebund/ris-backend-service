@@ -1,8 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPADocumentTypeDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPADocumentTypeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPAFieldOfLawDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPAFieldOfLawLinkDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPAFieldOfLawLinkRepository;
@@ -17,7 +15,6 @@ import de.bund.digitalservice.ris.caselaw.adapter.transformer.FieldOfLawTransfor
 import de.bund.digitalservice.ris.caselaw.domain.ServiceUtils;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.citation.CitationsStyleXML;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.court.CourtsXML;
-import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentTypesXML;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw.FieldOfLawXml;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw.FieldsOfLawXml;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.state.StatesXML;
@@ -44,8 +41,6 @@ import reactor.core.publisher.Mono;
 @Service
 @Slf4j
 public class LookupTableImporterService {
-
-  private final JPADocumentTypeRepository jpaDocumentTypeRepository;
   private final DatabaseCourtRepository databaseCourtRepository;
   private final StateRepository stateRepository;
   private final DatabaseCitationStyleRepository databaseCitationStyleRepository;
@@ -55,57 +50,16 @@ public class LookupTableImporterService {
       Pattern.compile("\\p{Lu}{2}(-\\d{2})+(?![\\p{L}\\d-])");
 
   public LookupTableImporterService(
-      JPADocumentTypeRepository jpaDocumentTypeRepository,
       DatabaseCourtRepository databaseCourtRepository,
       StateRepository stateRepository,
       DatabaseCitationStyleRepository databaseCitationStyleRepository,
       JPAFieldOfLawRepository jpaFieldOfLawRepository,
       JPAFieldOfLawLinkRepository jpaFieldOfLawLinkRepository) {
-    this.jpaDocumentTypeRepository = jpaDocumentTypeRepository;
     this.databaseCourtRepository = databaseCourtRepository;
     this.stateRepository = stateRepository;
     this.databaseCitationStyleRepository = databaseCitationStyleRepository;
     this.jpaFieldOfLawRepository = jpaFieldOfLawRepository;
     this.jpaFieldOfLawLinkRepository = jpaFieldOfLawLinkRepository;
-  }
-
-  @Transactional(transactionManager = "jpaTransactionManager")
-  public Mono<String> importDocumentTypeLookupTable(ByteBuffer byteBuffer) {
-    XmlMapper mapper = new XmlMapper();
-    DocumentTypesXML documentTypesXML;
-    try {
-      documentTypesXML =
-          mapper.readValue(ServiceUtils.byteBufferToArray(byteBuffer), DocumentTypesXML.class);
-    } catch (IOException e) {
-      throw new ResponseStatusException(
-          HttpStatus.NOT_ACCEPTABLE, "Could not map ByteBuffer-content to DocumentTypesXML", e);
-    }
-
-    importDocumentTypeJPA(documentTypesXML);
-
-    return Mono.just("Successfully imported the document type lookup table");
-  }
-
-  public void importDocumentTypeJPA(DocumentTypesXML documentTypesXML) {
-    List<JPADocumentTypeDTO> documentTypeDTOS =
-        documentTypesXML.getList().stream()
-            .map(
-                documentTypeXML ->
-                    JPADocumentTypeDTO.builder()
-                        .id(documentTypeXML.getId())
-                        .changeDateClient(documentTypeXML.getChangeDateClient())
-                        .changeIndicator(documentTypeXML.getChangeIndicator())
-                        .version(documentTypeXML.getVersion())
-                        .jurisShortcut(documentTypeXML.getJurisShortcut())
-                        .documentType(documentTypeXML.getDocumentType())
-                        .multiple(documentTypeXML.getMultiple())
-                        .label(documentTypeXML.getLabel())
-                        .superlabel1(documentTypeXML.getSuperlabel1())
-                        .superlabel2(documentTypeXML.getSuperlabel2())
-                        .build())
-            .toList();
-
-    jpaDocumentTypeRepository.saveAll(documentTypeDTOS);
   }
 
   public Mono<String> importCourtLookupTable(ByteBuffer byteBuffer) {

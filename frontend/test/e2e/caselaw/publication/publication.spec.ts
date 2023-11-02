@@ -176,11 +176,11 @@ test.describe("ensuring the publishing of documentunits works as expected", () =
 
     await waitForSaving(
       async () => {
-        await page.locator("[aria-label='Aktenzeichen']").fill("abc")
-        await page.keyboard.press("Enter")
-
         await page.locator("[aria-label='Gericht']").fill("aalen")
         await page.locator("text=AG Aalen").click()
+
+        await page.locator("[aria-label='Aktenzeichen']").fill("abc")
+        await page.keyboard.press("Enter")
       },
       page,
       { clickSaveButton: true },
