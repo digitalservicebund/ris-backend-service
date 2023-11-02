@@ -51,7 +51,6 @@ public class RelatedDocumentationUnitTransformer {
 
     return DocumentType.builder()
         .label(documentTypeDTO.getLabel())
-        // Todo is this the correct mapping?
         .jurisShortcut(documentTypeDTO.getAbbreviation())
         .build();
   }
