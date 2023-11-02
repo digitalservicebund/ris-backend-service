@@ -183,7 +183,10 @@ public class DocumentationUnitTransformer {
       List<ActiveCitation> activeCitations = contentRelatedIndexing.activeCitations();
       if (activeCitations != null && !activeCitations.isEmpty()) {
         builder.activeCitations(
-            activeCitations.stream().map(ActiveCitationTransformer::transformToDTO).toList());
+            activeCitations.stream()
+                .map(ActiveCitationTransformer::transformToDTO)
+                .filter(Objects::nonNull)
+                .toList());
       }
     }
 

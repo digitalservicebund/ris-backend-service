@@ -9,7 +9,6 @@ public class RelatedDocumentationUnitTransformer {
   RelatedDocumentationUnitTransformer() {}
 
   static String getFileNumber(String fileNumber) {
-    // Todo multiple fileNumbers possible!
     if (fileNumber == null) {
       return null;
     }
@@ -23,6 +22,7 @@ public class RelatedDocumentationUnitTransformer {
     }
 
     return Court.builder()
+        .id(courtDTO.getId())
         .type(courtDTO.getType())
         .location(courtDTO.getLocation())
         .label(Court.generateLabel(courtDTO.getType(), courtDTO.getLocation()))
@@ -35,6 +35,7 @@ public class RelatedDocumentationUnitTransformer {
     }
 
     return CourtDTO.builder()
+        .id(court.id())
         .type(court.type())
         .location(court.location())
         // Todo isSuperiorCourt, isForeignCourt, additionalInformation, jurisId?
@@ -64,7 +65,7 @@ public class RelatedDocumentationUnitTransformer {
     return DocumentTypeDTO.builder()
         .label(documentType.label())
         .abbreviation(documentType.jurisShortcut())
-        // Todo superLabel1, superLabel2, multiple?
+        // Todo do we need superLabel1, superLabel2, multiple from DTO?
         .build();
   }
 }

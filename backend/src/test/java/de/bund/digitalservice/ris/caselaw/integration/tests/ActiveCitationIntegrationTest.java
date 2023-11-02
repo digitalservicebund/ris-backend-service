@@ -3,6 +3,7 @@ package de.bund.digitalservice.ris.caselaw.integration.tests;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
+import static org.springframework.test.context.jdbc.Sql.ExecutionPhase.AFTER_TEST_METHOD;
 
 import de.bund.digitalservice.ris.caselaw.RisWebTestClient;
 import de.bund.digitalservice.ris.caselaw.TestConfig;
@@ -19,7 +20,6 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentCategoryD
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentationUnitRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentationUnitLinkRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.FileNumberRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.PostgresPublicationReportRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationOfficeTransformer;
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
@@ -33,6 +33,7 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.EmailPublishService;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
+import de.bund.digitalservice.ris.caselaw.domain.court.Court;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.citation.CitationType;
 import java.time.Instant;
 import java.util.List;
@@ -68,6 +69,10 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
     },
     controllers = {DocumentUnitController.class},
     timeout = "PT5M")
+@Sql(scripts = {"classpath:active_citation_init.sql"})
+@Sql(
+    scripts = {"classpath:active_citation_cleanup.sql"},
+    executionPhase = AFTER_TEST_METHOD)
 class ActiveCitationIntegrationTest {
   @Container
   static PostgreSQLContainer<?> postgreSQLContainer =
@@ -86,15 +91,14 @@ class ActiveCitationIntegrationTest {
   @Autowired private RisWebTestClient risWebTestClient;
   @Autowired private DatabaseDocumentationUnitRepository repository;
   @Autowired private DatabaseDocumentationUnitLinkRepository linkRepository;
-  @Autowired private FileNumberRepository fileNumberRepository;
   @Autowired private DatabaseDocumentTypeRepository documentTypeRepository;
   @Autowired private DatabaseDocumentationOfficeRepository documentationOfficeRepository;
 
+  @MockBean private UserService userService;
+  @MockBean ReactiveClientRegistrationRepository clientRegistrationRepository;
   @MockBean private S3AsyncClient s3AsyncClient;
   @MockBean private EmailPublishService publishService;
   @MockBean private DocxConverterService docxConverterService;
-  @MockBean private UserService userService;
-  @MockBean ReactiveClientRegistrationRepository clientRegistrationRepository;
 
   private static final String DOCUMENT_NUMBER_PREFIX = "XXRE20230000";
   private static final String UUID_PREFIX = "88888888-4444-4444-4444-11111111111";
@@ -109,7 +113,7 @@ class ActiveCitationIntegrationTest {
 
   @BeforeEach
   void setUp() {
-    docOfficeDTO = documentationOfficeRepository.findByAbbreviation("DigitalService");
+    docOfficeDTO = documentationOfficeRepository.findByAbbreviation("DS");
 
     doReturn(Mono.just(DocumentationOfficeTransformer.transformDTO(docOfficeDTO)))
         .when(userService)
@@ -118,77 +122,992 @@ class ActiveCitationIntegrationTest {
 
   @AfterEach
   void cleanUp() {
-    linkRepository.deleteAll().block();
     repository.deleteAll();
     documentTypeRepository.deleteAll();
   }
 
-  //
-  //  @Test
-  //  void testFindDocumentationUnit_withActiveCitation() {
-  //    prepareTestData(1, 0);
-  //
-  //    ActiveCitation activeCitation = generateActiveCitation(1, false);
-  //
-  //    DocumentUnit documentUnit = generateDocumentUnit(List.of(activeCitation));
-  //
-  //    risWebTestClient
-  //        .withDefaultLogin()
-  //        .get()
-  //        .uri("/api/v1/caselaw/documentunits/" + DOCUMENT_NUMBER_PREFIX + "0")
-  //        .exchange()
-  //        .expectStatus()
-  //        .isOk()
-  //        .expectBody(DocumentUnit.class)
-  //        .consumeWith(
-  //            response -> {
-  //              assertThat(response.getResponseBody()).isEqualTo(documentUnit);
-  //            });
-  //  }
-  //
-  //  @Test
-  //  void testUpdateDocumentationUnit_withNewActiveCitation() {
-  //    prepareTestData(1, 0);
-  //    var type = addDocumentTypeToDB(2);
-  //
-  //    ActiveCitation activeCitation = generateActiveCitation(1, false);
-  //    ActiveCitation newActiveCitationRequest =
-  //        generateActiveCitation(2, true).toBuilder().dataSource(null).uuid(null).build();
-  //    ActiveCitation newActiveCitationResponse = generateActiveCitation(2,
-  // true).toBuilder().build();
-  //
-  //    DocumentUnit documentUnitRequest =
-  //        generateDocumentUnit(List.of(activeCitation, newActiveCitationRequest));
-  //    DocumentUnit documentUnitResponse =
-  //        generateDocumentUnit(List.of(activeCitation, newActiveCitationResponse));
-  //
-  //    risWebTestClient
-  //        .withDefaultLogin()
-  //        .put()
-  //        .uri("/api/v1/caselaw/documentunits/" + UUID_PREFIX + "0")
-  //        .bodyValue(documentUnitRequest)
-  //        .exchange()
-  //        .expectStatus()
-  //        .isOk()
-  //        .expectBody(DocumentUnit.class)
-  //        .consumeWith(
-  //            response -> {
-  //              assertThat(response.getResponseBody()).isNotNull();
-  //              assertThat(response.getResponseBody())
-  //                  .usingRecursiveComparison()
-  //                  .ignoringFields("contentRelatedIndexing.activeCitations")
-  //                  .isEqualTo(documentUnitResponse);
-  //              List<ActiveCitation> activeCitations =
-  //                  response.getResponseBody().contentRelatedIndexing().activeCitations();
-  //              assertThat(activeCitations).hasSize(2);
-  //              assertThat(activeCitations.get(0)).isEqualTo(activeCitation);
-  //              assertThat(activeCitations.get(1))
-  //                  .usingRecursiveComparison()
-  //                  .ignoringFields("uuid")
-  //                  .isEqualTo(newActiveCitationResponse);
-  //            });
-  //  }
-  //
+  @Test
+  void testGetDocumentUnit_withoutActiveCitation_shouldReturnEmptyList() {
+    risWebTestClient
+        .withDefaultLogin()
+        .get()
+        .uri("/api/v1/caselaw/documentunits/documentnr002")
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody(DocumentUnit.class)
+        .consumeWith(
+            response ->
+                assertThat(response.getResponseBody().contentRelatedIndexing().activeCitations())
+                    .isEmpty());
+  }
+
+  @Test
+  void testGetDocumentUnit_withActiveCitation_shouldReturnList() {
+    risWebTestClient
+        .withDefaultLogin()
+        .get()
+        .uri("/api/v1/caselaw/documentunits/documentnr001")
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody(DocumentUnit.class)
+        .consumeWith(
+            response -> {
+              assertThat(
+                      response.getResponseBody().contentRelatedIndexing().activeCitations().size())
+                  .isEqualTo(2);
+              assertThat(
+                      response
+                          .getResponseBody()
+                          .contentRelatedIndexing()
+                          .activeCitations()
+                          .get(0)
+                          .getCitationType())
+                  .extracting("label")
+                  .isEqualTo("Anwendung");
+              assertThat(
+                      response
+                          .getResponseBody()
+                          .contentRelatedIndexing()
+                          .activeCitations()
+                          .get(1)
+                          .getCitationType())
+                  .extracting("label")
+                  .isEqualTo("Nichtanwendung");
+            });
+  }
+
+  @Test
+  void testUpdateDocumentUnit_addNewActiveCitation() {
+    risWebTestClient
+        .withDefaultLogin()
+        .get()
+        .uri("/api/v1/caselaw/documentunits/documentnr001")
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody(DocumentUnit.class)
+        .consumeWith(
+            response ->
+                assertThat(
+                        response
+                            .getResponseBody()
+                            .contentRelatedIndexing()
+                            .activeCitations()
+                            .size())
+                    .isEqualTo(2));
+
+    DocumentUnit documentUnitFromFrontend =
+        DocumentUnit.builder()
+            .uuid(UUID.fromString("46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3"))
+            .documentNumber("documentnr001")
+            .coreData(CoreData.builder().build())
+            .contentRelatedIndexing(
+                ContentRelatedIndexing.builder()
+                    .activeCitations(
+                        List.of(
+                            ActiveCitation.builder()
+                                .uuid(UUID.fromString("f0232240-7416-11ee-b962-0242ac120002"))
+                                .citationType(
+                                    CitationType.builder()
+                                        .uuid(
+                                            UUID.fromString("4e768071-1a19-43a1-8ab9-c185adec94bf"))
+                                        .build())
+                                .build(),
+                            ActiveCitation.builder()
+                                .uuid(UUID.fromString("7da39a1e-78a9-11ee-b962-0242ac120002"))
+                                .citationType(
+                                    CitationType.builder()
+                                        .uuid(
+                                            UUID.fromString("6b4bd747-fce9-4e49-8af4-3fb4f1d3663c"))
+                                        .build())
+                                .build(),
+                            ActiveCitation.builder()
+                                .uuid(UUID.fromString("7da39a1e-78a9-11ee-b962-0242ac120002"))
+                                .citationType(
+                                    CitationType.builder()
+                                        .uuid(
+                                            UUID.fromString("6b4bd747-fce9-4e49-8af4-3fb4f1d3663c"))
+                                        .build())
+                                .build()))
+                    .build())
+            .build();
+
+    risWebTestClient
+        .withDefaultLogin()
+        .put()
+        .uri("/api/v1/caselaw/documentunits/46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3")
+        .bodyValue(documentUnitFromFrontend)
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody(DocumentUnit.class)
+        .consumeWith(
+            response -> {
+              assertThat(
+                      response.getResponseBody().contentRelatedIndexing().activeCitations().size())
+                  .isEqualTo(3);
+              assertThat(
+                      response
+                          .getResponseBody()
+                          .contentRelatedIndexing()
+                          .activeCitations()
+                          .get(2)
+                          .getCitationType())
+                  .extracting("label")
+                  .isEqualTo("Nichtanwendung");
+            });
+  }
+
+  @Test
+  void testUpdateDocumentationUnit_updateExistingActiveCitation() {
+    UUID uuid = UUID.fromString("46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3");
+    UUID activeCitationUUID1 = UUID.fromString("f0232240-7416-11ee-b962-0242ac120002");
+    UUID activeCitationUUID2 = UUID.fromString("f0232240-7416-11ee-b962-0242ac120003");
+    risWebTestClient
+        .withDefaultLogin()
+        .get()
+        .uri("/api/v1/caselaw/documentunits/documentnr001")
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody(DocumentUnit.class)
+        .consumeWith(
+            response -> {
+              assertThat(
+                      response.getResponseBody().contentRelatedIndexing().activeCitations().size())
+                  .isEqualTo(2);
+              assertThat(
+                      response
+                          .getResponseBody()
+                          .contentRelatedIndexing()
+                          .activeCitations()
+                          .get(0)
+                          .getCitationType())
+                  .extracting("label")
+                  .isEqualTo("Anwendung");
+              assertThat(
+                      response
+                          .getResponseBody()
+                          .contentRelatedIndexing()
+                          .activeCitations()
+                          .get(0)
+                          .getFileNumber())
+                  .isEqualTo("abc");
+              assertThat(
+                      response
+                          .getResponseBody()
+                          .contentRelatedIndexing()
+                          .activeCitations()
+                          .get(0)
+                          .getUuid())
+                  .isEqualTo(activeCitationUUID1);
+            });
+
+    DocumentUnit documentUnitFromFrontend =
+        DocumentUnit.builder()
+            .uuid(uuid)
+            .documentNumber("documentnr001")
+            .coreData(CoreData.builder().build())
+            .contentRelatedIndexing(
+                ContentRelatedIndexing.builder()
+                    .activeCitations(
+                        List.of(
+                            ActiveCitation.builder()
+                                .uuid(activeCitationUUID1)
+                                .citationType(
+                                    CitationType.builder()
+                                        .uuid(
+                                            UUID.fromString("6b4bd747-fce9-4e49-8af4-3fb4f1d3663c"))
+                                        .build())
+                                .fileNumber("cba")
+                                .build(),
+                            ActiveCitation.builder()
+                                .uuid(activeCitationUUID2)
+                                .citationType(
+                                    CitationType.builder()
+                                        .uuid(
+                                            UUID.fromString("6b4bd747-fce9-4e49-8af4-3fb4f1d3663c"))
+                                        .build())
+                                .build()))
+                    .build())
+            .build();
+
+    risWebTestClient
+        .withDefaultLogin()
+        .put()
+        .uri("/api/v1/caselaw/documentunits/46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3")
+        .bodyValue(documentUnitFromFrontend)
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody(DocumentUnit.class)
+        .consumeWith(
+            response -> {
+              assertThat(
+                      response.getResponseBody().contentRelatedIndexing().activeCitations().size())
+                  .isEqualTo(2);
+              assertThat(
+                      response
+                          .getResponseBody()
+                          .contentRelatedIndexing()
+                          .activeCitations()
+                          .get(0)
+                          .getCitationType())
+                  .extracting("label")
+                  .isEqualTo("Nichtanwendung");
+              assertThat(
+                      response
+                          .getResponseBody()
+                          .contentRelatedIndexing()
+                          .activeCitations()
+                          .get(0)
+                          .getFileNumber())
+                  .isEqualTo("cba");
+              assertThat(
+                      response
+                          .getResponseBody()
+                          .contentRelatedIndexing()
+                          .activeCitations()
+                          .get(0)
+                          .getUuid())
+                  .isEqualTo(activeCitationUUID1);
+            });
+  }
+
+  @Test
+  void testUpdateDocumentationUnit_tryToAddAEmptyActiveCitation_shouldNotSucceed() {
+    UUID activeCitationUUID1 = UUID.fromString("f0232240-7416-11ee-b962-0242ac120002");
+    UUID activeCitationUUID2 = UUID.fromString("f0232240-7416-11ee-b962-0242ac120003");
+    risWebTestClient
+        .withDefaultLogin()
+        .get()
+        .uri("/api/v1/caselaw/documentunits/documentnr001")
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody(DocumentUnit.class)
+        .consumeWith(
+            response ->
+                assertThat(
+                        response
+                            .getResponseBody()
+                            .contentRelatedIndexing()
+                            .activeCitations()
+                            .size())
+                    .isEqualTo(2));
+
+    DocumentUnit documentUnitFromFrontend =
+        DocumentUnit.builder()
+            .uuid(UUID.fromString("46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3"))
+            .documentNumber("documentnr001")
+            .coreData(CoreData.builder().build())
+            .contentRelatedIndexing(
+                ContentRelatedIndexing.builder()
+                    .activeCitations(
+                        List.of(
+                            ActiveCitation.builder()
+                                .uuid(activeCitationUUID1)
+                                .citationType(
+                                    CitationType.builder()
+                                        .uuid(
+                                            UUID.fromString("6b4bd747-fce9-4e49-8af4-3fb4f1d3663c"))
+                                        .build())
+                                .fileNumber("abc")
+                                .build(),
+                            ActiveCitation.builder()
+                                .uuid(activeCitationUUID2)
+                                .citationType(
+                                    CitationType.builder()
+                                        .uuid(
+                                            UUID.fromString("6b4bd747-fce9-4e49-8af4-3fb4f1d3663c"))
+                                        .build())
+                                .build(),
+                            ActiveCitation.builder().build()))
+                    .build())
+            .build();
+
+    risWebTestClient
+        .withDefaultLogin()
+        .put()
+        .uri("/api/v1/caselaw/documentunits/46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3")
+        .bodyValue(documentUnitFromFrontend)
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody(DocumentUnit.class)
+        .consumeWith(
+            response -> {
+              assertThat(
+                      response.getResponseBody().contentRelatedIndexing().activeCitations().size())
+                  .isEqualTo(2);
+            });
+  }
+
+  @Test
+  void testUpdateDocumentUnit_removeValuesDeletesActiveCitation() {
+    risWebTestClient
+        .withDefaultLogin()
+        .get()
+        .uri("/api/v1/caselaw/documentunits/documentnr001")
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody(DocumentUnit.class)
+        .consumeWith(
+            response ->
+                assertThat(
+                        response
+                            .getResponseBody()
+                            .contentRelatedIndexing()
+                            .activeCitations()
+                            .size())
+                    .isEqualTo(2));
+
+    DocumentUnit documentUnitFromFrontend =
+        DocumentUnit.builder()
+            .uuid(UUID.fromString("46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3"))
+            .documentNumber("documentnr001")
+            .coreData(CoreData.builder().build())
+            .contentRelatedIndexing(
+                ContentRelatedIndexing.builder()
+                    .activeCitations(
+                        List.of(
+                            ActiveCitation.builder()
+                                .uuid(UUID.fromString("f0232240-7416-11ee-b962-0242ac120002"))
+                                .citationType(
+                                    CitationType.builder()
+                                        .uuid(
+                                            UUID.fromString("4e768071-1a19-43a1-8ab9-c185adec94bf"))
+                                        .build())
+                                .build(),
+                            ActiveCitation.builder()
+                                .uuid(UUID.fromString("7da39a1e-78a9-11ee-b962-0242ac120002"))
+                                .build()))
+                    .build())
+            .build();
+
+    risWebTestClient
+        .withDefaultLogin()
+        .put()
+        .uri("/api/v1/caselaw/documentunits/46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3")
+        .bodyValue(documentUnitFromFrontend)
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody(DocumentUnit.class)
+        .consumeWith(
+            response -> {
+              assertThat(
+                      response.getResponseBody().contentRelatedIndexing().activeCitations().size())
+                  .isEqualTo(1);
+            });
+  }
+
+  @Test
+  void testUpdateDocumentUnit_removeActiveCitation() {
+    risWebTestClient
+        .withDefaultLogin()
+        .get()
+        .uri("/api/v1/caselaw/documentunits/documentnr001")
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody(DocumentUnit.class)
+        .consumeWith(
+            response ->
+                assertThat(
+                        response
+                            .getResponseBody()
+                            .contentRelatedIndexing()
+                            .activeCitations()
+                            .size())
+                    .isEqualTo(2));
+
+    DocumentUnit documentUnitFromFrontend =
+        DocumentUnit.builder()
+            .uuid(UUID.fromString("46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3"))
+            .documentNumber("documentnr001")
+            .coreData(CoreData.builder().build())
+            .contentRelatedIndexing(
+                ContentRelatedIndexing.builder()
+                    .activeCitations(
+                        List.of(
+                            ActiveCitation.builder()
+                                .uuid(UUID.fromString("f0232240-7416-11ee-b962-0242ac120002"))
+                                .citationType(
+                                    CitationType.builder()
+                                        .uuid(
+                                            UUID.fromString("4e768071-1a19-43a1-8ab9-c185adec94bf"))
+                                        .build())
+                                .build()))
+                    .build())
+            .build();
+
+    risWebTestClient
+        .withDefaultLogin()
+        .put()
+        .uri("/api/v1/caselaw/documentunits/46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3")
+        .bodyValue(documentUnitFromFrontend)
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody(DocumentUnit.class)
+        .consumeWith(
+            response -> {
+              assertThat(
+                      response.getResponseBody().contentRelatedIndexing().activeCitations().size())
+                  .isEqualTo(1);
+            });
+  }
+
+  @Test
+  void testUpdateDocumentUnit_removeAllActiveCitation() {
+    risWebTestClient
+        .withDefaultLogin()
+        .get()
+        .uri("/api/v1/caselaw/documentunits/documentnr001")
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody(DocumentUnit.class)
+        .consumeWith(
+            response ->
+                assertThat(
+                        response
+                            .getResponseBody()
+                            .contentRelatedIndexing()
+                            .activeCitations()
+                            .size())
+                    .isEqualTo(2));
+
+    DocumentUnit documentUnitFromFrontend =
+        DocumentUnit.builder()
+            .uuid(UUID.fromString("46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3"))
+            .documentNumber("documentnr001")
+            .coreData(CoreData.builder().build())
+            .contentRelatedIndexing(
+                // Todo is this a realistic scenario to delete all active citations?
+                ContentRelatedIndexing.builder()
+                    .activeCitations(List.of(ActiveCitation.builder().build()))
+                    .build())
+            .build();
+
+    risWebTestClient
+        .withDefaultLogin()
+        .put()
+        .uri("/api/v1/caselaw/documentunits/46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3")
+        .bodyValue(documentUnitFromFrontend)
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody(DocumentUnit.class)
+        .consumeWith(
+            response -> {
+              assertThat(
+                      response.getResponseBody().contentRelatedIndexing().activeCitations().size())
+                  .isEqualTo(0);
+            });
+  }
+
+  @Test
+  void testUpdateDocumentationUnit_withListOfMixedVariations() {
+    risWebTestClient
+        .withDefaultLogin()
+        .get()
+        .uri("/api/v1/caselaw/documentunits/documentnr001")
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody(DocumentUnit.class)
+        .consumeWith(
+            response ->
+                assertThat(
+                        response
+                            .getResponseBody()
+                            .contentRelatedIndexing()
+                            .activeCitations()
+                            .size())
+                    .isEqualTo(2));
+
+    UUID uuid = UUID.fromString("f0232240-7416-11ee-b962-0242ac120002");
+
+    DocumentUnit documentUnitFromFrontend =
+        DocumentUnit.builder()
+            .uuid(UUID.fromString("46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3"))
+            .documentNumber("documentnr001")
+            .coreData(CoreData.builder().build())
+            .contentRelatedIndexing(
+                ContentRelatedIndexing.builder()
+                    .activeCitations(
+                        List.of(
+                            ActiveCitation.builder()
+                                .uuid(uuid)
+                                .citationType(
+                                    CitationType.builder()
+                                        .uuid(
+                                            UUID.fromString("6b4bd747-fce9-4e49-8af4-3fb4f1d3663c"))
+                                        .build())
+                                .fileNumber("abc")
+                                .build(),
+                            ActiveCitation.builder()
+                                .uuid(UUID.fromString("f0232240-7416-11ee-b962-0242ac120003"))
+                                .build(),
+                            ActiveCitation.builder()
+                                .citationType(
+                                    CitationType.builder()
+                                        .uuid(
+                                            UUID.fromString("4e768071-1a19-43a1-8ab9-c185adec94bf"))
+                                        .build())
+                                .build(),
+                            ActiveCitation.builder().build()))
+                    .build())
+            .build();
+
+    risWebTestClient
+        .withDefaultLogin()
+        .put()
+        .uri("/api/v1/caselaw/documentunits/46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3")
+        .bodyValue(documentUnitFromFrontend)
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody(DocumentUnit.class)
+        .consumeWith(
+            response -> {
+              assertThat(
+                      response.getResponseBody().contentRelatedIndexing().activeCitations().size())
+                  .isEqualTo(2);
+              assertThat(
+                      response
+                          .getResponseBody()
+                          .contentRelatedIndexing()
+                          .activeCitations()
+                          .get(0)
+                          .getCitationType())
+                  .extracting("label")
+                  .isEqualTo("Nichtanwendung");
+              assertThat(
+                      response
+                          .getResponseBody()
+                          .contentRelatedIndexing()
+                          .activeCitations()
+                          .get(0)
+                          .getUuid())
+                  .isEqualTo(uuid);
+              assertThat(
+                      response
+                          .getResponseBody()
+                          .contentRelatedIndexing()
+                          .activeCitations()
+                          .get(1)
+                          .getCitationType())
+                  .extracting("label")
+                  .isEqualTo("Anwendung");
+            });
+  }
+
+  @Test
+  void testUpdateDocumentationUnit_removeCourtInActiveCitation() {
+    UUID activeCitationUUID1 = UUID.fromString("f0232240-7416-11ee-b962-0242ac120002");
+    UUID activeCitationUUID2 = UUID.fromString("f0232240-7416-11ee-b962-0242ac120003");
+    UUID uuid = UUID.fromString("46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3");
+    risWebTestClient
+        .withDefaultLogin()
+        .get()
+        .uri("/api/v1/caselaw/documentunits/documentnr001")
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody(DocumentUnit.class)
+        .consumeWith(
+            response -> {
+              assertThat(
+                      response.getResponseBody().contentRelatedIndexing().activeCitations().size())
+                  .isEqualTo(2);
+              assertThat(
+                      response
+                          .getResponseBody()
+                          .contentRelatedIndexing()
+                          .activeCitations()
+                          .get(0)
+                          .getCourt())
+                  .isNotNull();
+              assertThat(
+                      response
+                          .getResponseBody()
+                          .contentRelatedIndexing()
+                          .activeCitations()
+                          .get(0)
+                          .getCourt())
+                  .extracting("id")
+                  .isEqualTo(UUID.fromString("96301f85-9bd2-4690-a67f-f9fdfe725de3"));
+            });
+
+    DocumentUnit documentUnitFromFrontend =
+        DocumentUnit.builder()
+            .uuid(uuid)
+            .documentNumber("documentnr001")
+            .coreData(CoreData.builder().build())
+            .contentRelatedIndexing(
+                ContentRelatedIndexing.builder()
+                    .activeCitations(
+                        List.of(
+                            ActiveCitation.builder()
+                                .uuid(activeCitationUUID1)
+                                .citationType(
+                                    CitationType.builder()
+                                        .uuid(
+                                            UUID.fromString("6b4bd747-fce9-4e49-8af4-3fb4f1d3663c"))
+                                        .build())
+                                .build(),
+                            ActiveCitation.builder()
+                                .uuid(activeCitationUUID2)
+                                .citationType(
+                                    CitationType.builder()
+                                        .uuid(
+                                            UUID.fromString("6b4bd747-fce9-4e49-8af4-3fb4f1d3663c"))
+                                        .build())
+                                .build()))
+                    .build())
+            .build();
+
+    risWebTestClient
+        .withDefaultLogin()
+        .put()
+        .uri("/api/v1/caselaw/documentunits/46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3")
+        .bodyValue(documentUnitFromFrontend)
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody(DocumentUnit.class)
+        .consumeWith(
+            response -> {
+              assertThat(
+                      response.getResponseBody().contentRelatedIndexing().activeCitations().size())
+                  .isEqualTo(2);
+              assertThat(
+                      response
+                          .getResponseBody()
+                          .contentRelatedIndexing()
+                          .activeCitations()
+                          .get(0)
+                          .getCourt())
+                  .isNull();
+            });
+  }
+
+  @Test
+  void testUpdateDocumentationUnit_removeCitationStyleInActiveCitation() {
+    UUID activeCitationUUID1 = UUID.fromString("f0232240-7416-11ee-b962-0242ac120002");
+    UUID activeCitationUUID2 = UUID.fromString("f0232240-7416-11ee-b962-0242ac120003");
+    UUID uuid = UUID.fromString("46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3");
+    risWebTestClient
+        .withDefaultLogin()
+        .get()
+        .uri("/api/v1/caselaw/documentunits/documentnr001")
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody(DocumentUnit.class)
+        .consumeWith(
+            response -> {
+              assertThat(
+                      response.getResponseBody().contentRelatedIndexing().activeCitations().size())
+                  .isEqualTo(2);
+              assertThat(
+                      response
+                          .getResponseBody()
+                          .contentRelatedIndexing()
+                          .activeCitations()
+                          .get(0)
+                          .getCitationType())
+                  .extracting("label")
+                  .isEqualTo("Anwendung");
+              assertThat(
+                      response
+                          .getResponseBody()
+                          .contentRelatedIndexing()
+                          .activeCitations()
+                          .get(1)
+                          .getCitationType())
+                  .extracting("label")
+                  .isEqualTo("Nichtanwendung");
+            });
+
+    DocumentUnit documentUnitFromFrontend =
+        DocumentUnit.builder()
+            .uuid(uuid)
+            .documentNumber("documentnr001")
+            .coreData(CoreData.builder().build())
+            .contentRelatedIndexing(
+                ContentRelatedIndexing.builder()
+                    .activeCitations(
+                        List.of(
+                            ActiveCitation.builder()
+                                .uuid(activeCitationUUID1)
+                                .court(
+                                    Court.builder()
+                                        .id(UUID.fromString("96301f85-9bd2-4690-a67f-f9fdfe725de3"))
+                                        .location("Karlsruhe")
+                                        .type("BGH")
+                                        .build())
+                                .build(),
+                            ActiveCitation.builder().uuid(activeCitationUUID2).build()))
+                    .build())
+            .build();
+
+    risWebTestClient
+        .withDefaultLogin()
+        .put()
+        .uri("/api/v1/caselaw/documentunits/46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3")
+        .bodyValue(documentUnitFromFrontend)
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody(DocumentUnit.class)
+        .consumeWith(
+            response -> {
+              assertThat(
+                      response.getResponseBody().contentRelatedIndexing().activeCitations().size())
+                  .isEqualTo(1);
+              assertThat(
+                      response
+                          .getResponseBody()
+                          .contentRelatedIndexing()
+                          .activeCitations()
+                          .get(0)
+                          .getCitationType())
+                  .isNull();
+            });
+  }
+
+  @Test
+  void testUpdateDocumentationUnit_removeDocumentTypeInActiveCitation() {
+    UUID activeCitationUUID1 = UUID.fromString("f0232240-7416-11ee-b962-0242ac120002");
+    UUID activeCitationUUID2 = UUID.fromString("f0232240-7416-11ee-b962-0242ac120003");
+    UUID uuid = UUID.fromString("46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3");
+    risWebTestClient
+        .withDefaultLogin()
+        .get()
+        .uri("/api/v1/caselaw/documentunits/documentnr001")
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody(DocumentUnit.class)
+        .consumeWith(
+            response -> {
+              assertThat(
+                      response.getResponseBody().contentRelatedIndexing().activeCitations().size())
+                  .isEqualTo(2);
+              assertThat(
+                      response
+                          .getResponseBody()
+                          .contentRelatedIndexing()
+                          .activeCitations()
+                          .get(0)
+                          .getDocumentType())
+                  .extracting("label")
+                  .isEqualTo("Beschluss");
+            });
+
+    DocumentUnit documentUnitFromFrontend =
+        DocumentUnit.builder()
+            .uuid(uuid)
+            .documentNumber("documentnr001")
+            .coreData(CoreData.builder().build())
+            .contentRelatedIndexing(
+                ContentRelatedIndexing.builder()
+                    .activeCitations(
+                        List.of(
+                            ActiveCitation.builder()
+                                .uuid(activeCitationUUID1)
+                                .court(
+                                    Court.builder()
+                                        .id(UUID.fromString("96301f85-9bd2-4690-a67f-f9fdfe725de3"))
+                                        .location("Karlsruhe")
+                                        .type("BGH")
+                                        .build())
+                                .build(),
+                            ActiveCitation.builder().uuid(activeCitationUUID2).build()))
+                    .build())
+            .build();
+
+    risWebTestClient
+        .withDefaultLogin()
+        .put()
+        .uri("/api/v1/caselaw/documentunits/46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3")
+        .bodyValue(documentUnitFromFrontend)
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody(DocumentUnit.class)
+        .consumeWith(
+            response -> {
+              assertThat(
+                      response.getResponseBody().contentRelatedIndexing().activeCitations().size())
+                  .isEqualTo(1);
+              assertThat(
+                      response
+                          .getResponseBody()
+                          .contentRelatedIndexing()
+                          .activeCitations()
+                          .get(0)
+                          .getDocumentType())
+                  .isNull();
+            });
+  }
+
+  @Test
+  void testUpdateDocumentationUnit_removeFileNumberInActiveCitation() {
+    UUID activeCitationUUID1 = UUID.fromString("f0232240-7416-11ee-b962-0242ac120002");
+    UUID activeCitationUUID2 = UUID.fromString("f0232240-7416-11ee-b962-0242ac120003");
+    UUID uuid = UUID.fromString("46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3");
+    risWebTestClient
+        .withDefaultLogin()
+        .get()
+        .uri("/api/v1/caselaw/documentunits/documentnr001")
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody(DocumentUnit.class)
+        .consumeWith(
+            response -> {
+              assertThat(
+                      response.getResponseBody().contentRelatedIndexing().activeCitations().size())
+                  .isEqualTo(2);
+              assertThat(
+                      response
+                          .getResponseBody()
+                          .contentRelatedIndexing()
+                          .activeCitations()
+                          .get(0)
+                          .getFileNumber())
+                  .isEqualTo("abc");
+            });
+
+    DocumentUnit documentUnitFromFrontend =
+        DocumentUnit.builder()
+            .uuid(uuid)
+            .documentNumber("documentnr001")
+            .coreData(CoreData.builder().build())
+            .contentRelatedIndexing(
+                ContentRelatedIndexing.builder()
+                    .activeCitations(
+                        List.of(
+                            ActiveCitation.builder()
+                                .uuid(activeCitationUUID1)
+                                .court(
+                                    Court.builder()
+                                        .id(UUID.fromString("96301f85-9bd2-4690-a67f-f9fdfe725de3"))
+                                        .location("Karlsruhe")
+                                        .type("BGH")
+                                        .build())
+                                .build(),
+                            ActiveCitation.builder().uuid(activeCitationUUID2).build()))
+                    .build())
+            .build();
+
+    risWebTestClient
+        .withDefaultLogin()
+        .put()
+        .uri("/api/v1/caselaw/documentunits/46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3")
+        .bodyValue(documentUnitFromFrontend)
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody(DocumentUnit.class)
+        .consumeWith(
+            response -> {
+              assertThat(
+                      response.getResponseBody().contentRelatedIndexing().activeCitations().size())
+                  .isEqualTo(1);
+              assertThat(
+                      response
+                          .getResponseBody()
+                          .contentRelatedIndexing()
+                          .activeCitations()
+                          .get(0)
+                          .getFileNumber())
+                  .isNull();
+            });
+  }
+
+  @Test
+  void testUpdateDocumentationUnit_removeDecisionDateInActiveCitation() {
+    UUID activeCitationUUID1 = UUID.fromString("f0232240-7416-11ee-b962-0242ac120002");
+    UUID activeCitationUUID2 = UUID.fromString("f0232240-7416-11ee-b962-0242ac120003");
+    UUID uuid = UUID.fromString("46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3");
+    risWebTestClient
+        .withDefaultLogin()
+        .get()
+        .uri("/api/v1/caselaw/documentunits/documentnr001")
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody(DocumentUnit.class)
+        .consumeWith(
+            response -> {
+              assertThat(
+                      response.getResponseBody().contentRelatedIndexing().activeCitations().size())
+                  .isEqualTo(2);
+              assertThat(
+                      response
+                          .getResponseBody()
+                          .contentRelatedIndexing()
+                          .activeCitations()
+                          .get(0)
+                          .getDecisionDate())
+                  .isEqualTo("2011-01-21");
+            });
+
+    DocumentUnit documentUnitFromFrontend =
+        DocumentUnit.builder()
+            .uuid(uuid)
+            .documentNumber("documentnr001")
+            .coreData(CoreData.builder().build())
+            .contentRelatedIndexing(
+                ContentRelatedIndexing.builder()
+                    .activeCitations(
+                        List.of(
+                            ActiveCitation.builder()
+                                .uuid(activeCitationUUID1)
+                                .court(
+                                    Court.builder()
+                                        .id(UUID.fromString("96301f85-9bd2-4690-a67f-f9fdfe725de3"))
+                                        .location("Karlsruhe")
+                                        .type("BGH")
+                                        .build())
+                                .build(),
+                            ActiveCitation.builder().uuid(activeCitationUUID2).build()))
+                    .build())
+            .build();
+
+    risWebTestClient
+        .withDefaultLogin()
+        .put()
+        .uri("/api/v1/caselaw/documentunits/46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3")
+        .bodyValue(documentUnitFromFrontend)
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody(DocumentUnit.class)
+        .consumeWith(
+            response -> {
+              assertThat(
+                      response.getResponseBody().contentRelatedIndexing().activeCitations().size())
+                  .isEqualTo(1);
+              assertThat(
+                      response
+                          .getResponseBody()
+                          .contentRelatedIndexing()
+                          .activeCitations()
+                          .get(0)
+                          .getDecisionDate())
+                  .isNull();
+            });
+  }
   //  @Test
   //  void testUpdateDocumentationUnit_addLinkToExistingDocumentationUnit() {
   //    prepareTestData(2, 0);
@@ -215,7 +1134,7 @@ class ActiveCitationIntegrationTest {
   //              assertThat(response.getResponseBody()).isEqualTo(documentUnit);
   //            });
   //  }
-  //
+
   //  @Test
   //  void testUpdateDocumentationUnit_addLinkToExistingDocumentationUnitWhichIsLinkedAlready() {
   //    prepareTestData(2, 0);
@@ -244,74 +1163,10 @@ class ActiveCitationIntegrationTest {
   //              assertThat(response.getResponseBody()).isEqualTo(documentUnitResponse);
   //            });
   //  }
+
   //
   //  @Test
-  //  void testUpdateDocumentationUnit_tryToAddAEmptyActiveCitation() {
-  //    prepareTestData(1, 0);
-  //
-  //    ActiveCitation activeCitation = generateActiveCitation(1, false);
-  //    ActiveCitation newActiveCitationRequest = ActiveCitation.builder().build();
-  //
-  //    DocumentUnit documentUnitRequest =
-  //        generateDocumentUnit(List.of(activeCitation, newActiveCitationRequest));
-  //    DocumentUnit documentUnitResponse = generateDocumentUnit(List.of(activeCitation));
-  //
-  //    risWebTestClient
-  //        .withDefaultLogin()
-  //        .put()
-  //        .uri("/api/v1/caselaw/documentunits/" + UUID_PREFIX + "0")
-  //        .bodyValue(documentUnitRequest)
-  //        .exchange()
-  //        .expectStatus()
-  //        .isOk()
-  //        .expectBody(DocumentUnit.class)
-  //        .consumeWith(
-  //            response -> {
-  //              assertThat(response.getResponseBody()).isNotNull();
-  //              assertThat(response.getResponseBody()).isEqualTo(documentUnitResponse);
-  //            });
-  //
-  //    StepVerifier.create(repository.findAll()).expectNextCount(2).verifyComplete();
-  //    StepVerifier.create(linkRepository.findAll()).expectNextCount(1).verifyComplete();
-  //  }
-  //
-  //  @Test
-  //  void testUpdateDocumentationUnit_removeEditableActiveCitation() {
-  //    prepareTestData(1, 1);
-  //
-  //    ActiveCitation activeCitation = generateActiveCitation(1, false);
-  //
-  //    DocumentUnit documentUnitRequest = generateDocumentUnit(List.of(activeCitation));
-  //    DocumentUnit documentUnitResponse = generateDocumentUnit(List.of(activeCitation));
-  //
-  //    risWebTestClient
-  //        .withDefaultLogin()
-  //        .put()
-  //        .uri("/api/v1/caselaw/documentunits/" + UUID_PREFIX + "0")
-  //        .bodyValue(documentUnitRequest)
-  //        .exchange()
-  //        .expectStatus()
-  //        .isOk()
-  //        .expectBody(DocumentUnit.class)
-  //        .consumeWith(
-  //            response -> {
-  //              assertThat(response.getResponseBody()).isNotNull();
-  //              assertThat(response.getResponseBody()).isEqualTo(documentUnitResponse);
-  //            });
-  //
-  //    StepVerifier.create(repository.findByUuid(UUID.fromString(UUID_PREFIX +
-  // "2"))).verifyComplete();
-  //    StepVerifier.create(
-  //
-  // linkRepository.findByParentDocumentationUnitUuidAndChildDocumentationUnitUuidAndType(
-  //                UUID.fromString(UUID_PREFIX + "0"),
-  //                UUID.fromString(UUID_PREFIX + "2"),
-  //                DocumentationUnitLinkType.ACTIVE_CITATION))
-  //        .verifyComplete();
-  //  }
-  //
-  //  @Test
-  //  void testUpdateDocumentationUnit_removeRealActiveCitation() {
+  //  void testUpdateDocumentationUnit_removeLinkedActiveCitation() {
   //    prepareTestData(1, 1);
   //
   //    ActiveCitation editableActiveCitation = generateActiveCitation(2, true);
@@ -346,64 +1201,7 @@ class ActiveCitationIntegrationTest {
   //        .verifyComplete();
   //  }
   //
-  //  @Test
-  //  void testUpdateDocumentationUnit_removeAllActiveCitation() {
-  //    prepareTestData(1, 1);
-  //
-  //    DocumentUnit documentUnitRequest = generateDocumentUnit(Collections.emptyList());
-  //    DocumentUnit documentUnitResponse = generateDocumentUnit(Collections.emptyList());
-  //
-  //    risWebTestClient
-  //        .withDefaultLogin()
-  //        .put()
-  //        .uri("/api/v1/caselaw/documentunits/" + UUID_PREFIX + "0")
-  //        .bodyValue(documentUnitRequest)
-  //        .exchange()
-  //        .expectStatus()
-  //        .isOk()
-  //        .expectBody(DocumentUnit.class)
-  //        .consumeWith(
-  //            response -> {
-  //              assertThat(response.getResponseBody()).isNotNull();
-  //              assertThat(response.getResponseBody()).isEqualTo(documentUnitResponse);
-  //            });
-  //
-  //    StepVerifier.create(repository.findByUuid(UUID.fromString(UUID_PREFIX +
-  // "2"))).verifyComplete();
-  //    StepVerifier.create(linkRepository.findAll()).verifyComplete();
-  //  }
-  //
-  //  @Test
-  //  void testUpdateDocumentationUnit_removeCourtInEditableActiveCitation() {
-  //    prepareTestData(1, 1);
-  //
-  //    ActiveCitation realActiveCitation = generateActiveCitation(1, false);
-  //    ActiveCitation editableActiveCitationRequest =
-  //        generateActiveCitation(2, true).toBuilder().court(null).build();
-  //    ActiveCitation editableActiveCitationResponse =
-  //        editableActiveCitationRequest.toBuilder().build();
-  //
-  //    DocumentUnit documentUnitRequest =
-  //        generateDocumentUnit(List.of(realActiveCitation, editableActiveCitationRequest));
-  //    DocumentUnit documentUnitResponse =
-  //        generateDocumentUnit(List.of(realActiveCitation, editableActiveCitationResponse));
-  //
-  //    risWebTestClient
-  //        .withDefaultLogin()
-  //        .put()
-  //        .uri("/api/v1/caselaw/documentunits/" + UUID_PREFIX + "0")
-  //        .bodyValue(documentUnitRequest)
-  //        .exchange()
-  //        .expectStatus()
-  //        .isOk()
-  //        .expectBody(DocumentUnit.class)
-  //        .consumeWith(
-  //            response -> {
-  //              assertThat(response.getResponseBody()).isNotNull();
-  //              assertThat(response.getResponseBody()).isEqualTo(documentUnitResponse);
-  //            });
-  //  }
-  //
+
   //  @Test
   //  void testUpdateDocumentationUnit_removeCourtInRealActiveCitation() {
   //    prepareTestData(1, 1);
@@ -434,36 +1232,6 @@ class ActiveCitationIntegrationTest {
   //            });
   //  }
   //
-  //  @Test
-  //  void testUpdateDocumentationUnit_removeCitationStyleInEditableActiveCitation() {
-  //    prepareTestData(1, 1);
-  //
-  //    ActiveCitation realActiveCitation = generateActiveCitation(1, false);
-  //    ActiveCitation editableActiveCitationRequest =
-  //        generateActiveCitation(2, true).toBuilder().citationType(null).build();
-  //    ActiveCitation editableActiveCitationResponse =
-  //        editableActiveCitationRequest.toBuilder().build();
-  //
-  //    DocumentUnit documentUnitRequest =
-  //        generateDocumentUnit(List.of(realActiveCitation, editableActiveCitationRequest));
-  //    DocumentUnit documentUnitResponse =
-  //        generateDocumentUnit(List.of(realActiveCitation, editableActiveCitationResponse));
-  //
-  //    risWebTestClient
-  //        .withDefaultLogin()
-  //        .put()
-  //        .uri("/api/v1/caselaw/documentunits/" + UUID_PREFIX + "0")
-  //        .bodyValue(documentUnitRequest)
-  //        .exchange()
-  //        .expectStatus()
-  //        .isOk()
-  //        .expectBody(DocumentUnit.class)
-  //        .consumeWith(
-  //            response -> {
-  //              assertThat(response.getResponseBody()).isNotNull();
-  //              assertThat(response.getResponseBody()).isEqualTo(documentUnitResponse);
-  //            });
-  //  }
   //
   //  @Test
   //  void testUpdateDocumentationUnit_removeCitationStyleInRealActiveCitation() {
@@ -495,36 +1263,6 @@ class ActiveCitationIntegrationTest {
   //            });
   //  }
   //
-  //  @Test
-  //  void testUpdateDocumentationUnit_removeDocumentTypeInEditableActiveCitation() {
-  //    prepareTestData(1, 1);
-  //
-  //    ActiveCitation realActiveCitation = generateActiveCitation(1, false);
-  //    ActiveCitation editableActiveCitationRequest =
-  //        generateActiveCitation(2, true).toBuilder().documentType(null).build();
-  //    ActiveCitation editableActiveCitationResponse =
-  //        editableActiveCitationRequest.toBuilder().build();
-  //
-  //    DocumentUnit documentUnitRequest =
-  //        generateDocumentUnit(List.of(realActiveCitation, editableActiveCitationRequest));
-  //    DocumentUnit documentUnitResponse =
-  //        generateDocumentUnit(List.of(realActiveCitation, editableActiveCitationResponse));
-  //
-  //    risWebTestClient
-  //        .withDefaultLogin()
-  //        .put()
-  //        .uri("/api/v1/caselaw/documentunits/" + UUID_PREFIX + "0")
-  //        .bodyValue(documentUnitRequest)
-  //        .exchange()
-  //        .expectStatus()
-  //        .isOk()
-  //        .expectBody(DocumentUnit.class)
-  //        .consumeWith(
-  //            response -> {
-  //              assertThat(response.getResponseBody()).isNotNull();
-  //              assertThat(response.getResponseBody()).isEqualTo(documentUnitResponse);
-  //            });
-  //  }
   //
   //  @Test
   //  void testUpdateDocumentationUnit_removeDocumentTypeInRealActiveCitation() {
@@ -555,37 +1293,7 @@ class ActiveCitationIntegrationTest {
   //              assertThat(response.getResponseBody()).isEqualTo(documentUnitResponse);
   //            });
   //  }
-  //
-  //  @Test
-  //  void testUpdateDocumentationUnit_removeFileNumberInEditableActiveCitation() {
-  //    prepareTestData(1, 1);
-  //
-  //    ActiveCitation realActiveCitation = generateActiveCitation(1, false);
-  //    ActiveCitation editableActiveCitationRequest =
-  //        generateActiveCitation(2, true).toBuilder().fileNumber(null).build();
-  //    ActiveCitation editableActiveCitationResponse =
-  //        editableActiveCitationRequest.toBuilder().build();
-  //
-  //    DocumentUnit documentUnitRequest =
-  //        generateDocumentUnit(List.of(realActiveCitation, editableActiveCitationRequest));
-  //    DocumentUnit documentUnitResponse =
-  //        generateDocumentUnit(List.of(realActiveCitation, editableActiveCitationResponse));
-  //
-  //    risWebTestClient
-  //        .withDefaultLogin()
-  //        .put()
-  //        .uri("/api/v1/caselaw/documentunits/" + UUID_PREFIX + "0")
-  //        .bodyValue(documentUnitRequest)
-  //        .exchange()
-  //        .expectStatus()
-  //        .isOk()
-  //        .expectBody(DocumentUnit.class)
-  //        .consumeWith(
-  //            response -> {
-  //              assertThat(response.getResponseBody()).isNotNull();
-  //              assertThat(response.getResponseBody()).isEqualTo(documentUnitResponse);
-  //            });
-  //  }
+
   //
   //  @Test
   //  void testUpdateDocumentationUnit_removeFileNumberInRealActiveCitation() {
@@ -617,37 +1325,7 @@ class ActiveCitationIntegrationTest {
   //            });
   //  }
   //
-  //  @Test
-  //  void testUpdateDocumentationUnit_removeDecisionDateInEditableActiveCitation() {
-  //    prepareTestData(1, 1);
-  //
-  //    ActiveCitation realActiveCitation = generateActiveCitation(1, false);
-  //    ActiveCitation editableActiveCitationRequest =
-  //        generateActiveCitation(2, true).toBuilder().decisionDate(null).build();
-  //    ActiveCitation editableActiveCitationResponse =
-  //        editableActiveCitationRequest.toBuilder().build();
-  //
-  //    DocumentUnit documentUnitRequest =
-  //        generateDocumentUnit(List.of(realActiveCitation, editableActiveCitationRequest));
-  //    DocumentUnit documentUnitResponse =
-  //        generateDocumentUnit(List.of(realActiveCitation, editableActiveCitationResponse));
-  //
-  //    risWebTestClient
-  //        .withDefaultLogin()
-  //        .put()
-  //        .uri("/api/v1/caselaw/documentunits/" + UUID_PREFIX + "0")
-  //        .bodyValue(documentUnitRequest)
-  //        .exchange()
-  //        .expectStatus()
-  //        .isOk()
-  //        .expectBody(DocumentUnit.class)
-  //        .consumeWith(
-  //            response -> {
-  //              assertThat(response.getResponseBody()).isNotNull();
-  //              assertThat(response.getResponseBody()).isEqualTo(documentUnitResponse);
-  //            });
-  //  }
-  //
+
   //  @Test
   //  void testUpdateDocumentationUnit_removeDecisionDateInRealActiveCitation() {
   //    prepareTestData(1, 1);
@@ -677,271 +1355,4 @@ class ActiveCitationIntegrationTest {
   //              assertThat(response.getResponseBody()).isEqualTo(documentUnitResponse);
   //            });
   //  }
-  //
-  //  @Test
-  //  void testUpdateDocumentationUnit_removeAllValuesInEditableActiveCitation() {
-  //    prepareTestData(1, 1);
-  //
-  //    ActiveCitation activeCitation = generateActiveCitation(1, false);
-  //    ActiveCitation activeCitationRequest =
-  //        generateActiveCitation(2, true).toBuilder()
-  //            .court(null)
-  //            .fileNumber(null)
-  //            .citationType(null)
-  //            .decisionDate(null)
-  //            .documentType(null)
-  //            .build();
-  //
-  //    DocumentUnit documentUnitRequest =
-  //        generateDocumentUnit(List.of(activeCitation, activeCitationRequest));
-  //    DocumentUnit documentUnitResponse = generateDocumentUnit(List.of(activeCitation));
-  //
-  //    risWebTestClient
-  //        .withDefaultLogin()
-  //        .put()
-  //        .uri("/api/v1/caselaw/documentunits/" + UUID_PREFIX + "0")
-  //        .bodyValue(documentUnitRequest)
-  //        .exchange()
-  //        .expectStatus()
-  //        .isOk()
-  //        .expectBody(DocumentUnit.class)
-  //        .consumeWith(
-  //            response -> {
-  //              assertThat(response.getResponseBody()).isNotNull();
-  //              assertThat(response.getResponseBody()).isEqualTo(documentUnitResponse);
-  //            });
-  //  }
-  //
-  //  private void prepareTestData(int realActiveCitationCount, int editableActiveCitationCount) {
-  //    var type = addDocumentTypeToDB(0);
-  //
-  //    DocumentUnitDTO parentDTO =
-  //        DocumentUnitDTO.builder()
-  //            .uuid(UUID.fromString(UUID_PREFIX + "0"))
-  //            .documentationOfficeId(docOfficeUuid)
-  //            .documentnumber(DOCUMENT_NUMBER_PREFIX + "0")
-  //            .creationtimestamp(TIMESTAMP.plus(0, ChronoUnit.MINUTES))
-  //            .decisionDate(LocalDate.ofInstant(DECISION_DATE, ZoneId.of("Europe/Berlin")))
-  //            .documentTypeId(type.getId())
-  //            .build();
-  //
-  //    DocumentUnitDTO savedParentDTO = repository.save(parentDTO).block();
-  //
-  //    FileNumberDTO fileNumberDTO =
-  //        FileNumberDTO.builder()
-  //            .fileNumber("file number #0")
-  //            .documentUnitId(savedParentDTO.getId())
-  //            .isDeviating(false)
-  //            .build();
-  //
-  //    fileNumberRepository.save(fileNumberDTO).block();
-  //
-  //    for (int i = 0; i < realActiveCitationCount; i++) {
-  //      addActiveCitationToDB(i + 1, false);
-  //    }
-  //
-  //    for (int i = 0; i < editableActiveCitationCount; i++) {
-  //      addActiveCitationToDB(i + realActiveCitationCount + 1, true);
-  //    }
-  //  }
-  //
-  //  private void addActiveCitationToDB(int offset, boolean editable) {
-  //    var type = addDocumentTypeToDB(offset);
-  //
-  //    DocumentUnitDTO activeCitationDTO =
-  //        DocumentUnitDTO.builder()
-  //            .uuid(UUID.fromString(UUID_PREFIX + offset))
-  //            .documentationOfficeId(docOfficeUuid)
-  //            .documentnumber(DOCUMENT_NUMBER_PREFIX + offset)
-  //            .creationtimestamp(TIMESTAMP.plus(offset * 10L, ChronoUnit.MINUTES))
-  //            .decisionDate(
-  //                LocalDate.ofInstant(
-  //                    DECISION_DATE.plus(offset * 10L, ChronoUnit.MINUTES),
-  //                    ZoneId.of("Europe/Berlin")))
-  //            .courtType("TestCourt #" + offset)
-  //            .courtLocation("Berlin #" + offset)
-  //            .documentTypeId(type.getId())
-  //            .dateKnown(true)
-  //            .dataSource(editable ? DataSource.ACTIVE_CITATION : DataSource.NEURIS)
-  //            .build();
-  //
-  //    DocumentUnitDTO savedActiveCitationDTO = repository.save(activeCitationDTO).block();
-  //
-  //    FileNumberDTO fileNumberDTO =
-  //        FileNumberDTO.builder()
-  //            .fileNumber("file number #" + offset)
-  //            .documentUnitId(savedActiveCitationDTO.getId())
-  //            .isDeviating(false)
-  //            .build();
-  //
-  //    fileNumberRepository.save(fileNumberDTO).block();
-  //
-  //    DocumentationUnitLinkDTO linkDTO =
-  //        DocumentationUnitLinkDTO.builder()
-  //            .parentDocumentationUnitUuid(UUID.fromString(UUID_PREFIX + "0"))
-  //            .childDocumentationUnitUuid(UUID.fromString(UUID_PREFIX + offset))
-  //            .type(DocumentationUnitLinkType.ACTIVE_CITATION)
-  //            .build();
-  //
-  //    linkRepository.save(linkDTO).block();
-  //  }
-  //
-  //  private void removeLink(int number) {
-  //    DocumentationUnitLinkDTO linkDTO =
-  //        linkRepository
-  //            .findByParentDocumentationUnitUuidAndChildDocumentationUnitUuidAndType(
-  //                UUID.fromString(UUID_PREFIX + "0"),
-  //                UUID.fromString(UUID_PREFIX + number),
-  //                DocumentationUnitLinkType.ACTIVE_CITATION)
-  //            .block();
-  //
-  //    linkRepository.delete(linkDTO).block();
-  //  }
-  //
-  //  private DocumentTypeDTO addDocumentTypeToDB(int number) {
-  //    DocumentTypeDTO documentTypeDTO =
-  //        DocumentTypeDTO.builder()
-  //            .abbreviation("abbreviation" + number)
-  //            .label("R")
-  //            .category(category)
-  //            .multiple(true)
-  //            .build();
-  //
-  //    return documentTypeRepository.saveAndFlush(documentTypeDTO);
-  //  }
-  //
-  //  private ActiveCitation generateActiveCitation(int number, boolean editable) {
-  //    return ActiveCitation.builder()
-  //        .dataSource(editable ? DataSource.ACTIVE_CITATION : DataSource.NEURIS)
-  //        .uuid(UUID.fromString(UUID_PREFIX + number))
-  //        .court(
-  //            Court.builder()
-  //                .type("TestCourt #" + number)
-  //                .location("Berlin #" + number)
-  //                .label("TestCourt #" + number + " Berlin #" + number)
-  //                .build())
-  //        .dateKnown(true)
-  //        .decisionDate(
-  //            LocalDate.ofInstant(
-  //                DECISION_DATE.plus(number * 10L, ChronoUnit.MINUTES),
-  // ZoneId.of("Europe/Berlin")))
-  //        .documentNumber(DOCUMENT_NUMBER_PREFIX + number)
-  //        .documentType(
-  //            DocumentType.builder().jurisShortcut("abbreviation" + number).label("R").build())
-  //        .fileNumber("file number #" + number)
-  //        .build();
-  //  }
-  //
-  //  private DocumentUnit generateDocumentUnit(List<ActiveCitation> activeCitations) {
-  //    ContentRelatedIndexing contentRelatedIndexing =
-  //        ContentRelatedIndexing.builder()
-  //            .activeCitations(activeCitations)
-  //            .keywords(Collections.emptyList())
-  //            .norms(Collections.emptyList())
-  //            .fieldsOfLaw(Collections.emptyList())
-  //            .build();
-  //
-  //    return DocumentUnit.builder()
-  //        .uuid(UUID.fromString(UUID_PREFIX + "0"))
-  //        .documentNumber(DOCUMENT_NUMBER_PREFIX + "0")
-  //        .dataSource(DataSource.NEURIS)
-  //        .coreData(
-  //            CoreData.builder()
-  //                .deviatingEclis(Collections.emptyList())
-  //                .deviatingDecisionDates(Collections.emptyList())
-  //                .deviatingFileNumbers(Collections.emptyList())
-  //                .fileNumbers(List.of("file number #0"))
-  //                .documentType(
-  //                    DocumentType.builder().jurisShortcut("abbreviation0").label("R").build())
-  //                .decisionDate(LocalDate.ofInstant(DECISION_DATE, ZoneId.of("Europe/Berlin")))
-  //                .deviatingCourts(Collections.emptyList())
-  //                .documentationOffice(AuthUtils.buildDefaultDocOffice())
-  //                .build())
-  //        .texts(Texts.builder().build())
-  //        .contentRelatedIndexing(contentRelatedIndexing)
-  //
-  // .status(DocumentUnitStatus.builder().publicationStatus(PublicationStatus.PUBLISHED).build())
-  //        .proceedingDecisions(Collections.emptyList())
-  //        .build();
-  //  }
-
-  @Test
-  @Sql(scripts = {"classpath:active_citation_init.sql"})
-  void testUpdateDocumentationUnit() {
-    //        prepareTestData(1, 1);
-
-    //        ActiveCitation realActiveCitationRequest =
-    //                generateActiveCitation(1, false).toBuilder().decisionDate(null).build();
-    //        ActiveCitation realActiveCitationResponse = generateActiveCitation(1, false);
-    //        ActiveCitation editableActiveCitation = generateActiveCitation(2, true);
-    //
-    //        DocumentUnit documentUnitRequest =
-    //                generateDocumentUnit(List.of(realActiveCitationRequest,
-    // editableActiveCitation));
-    //        DocumentUnit documentUnitResponse =
-    //                generateDocumentUnit(List.of(realActiveCitationResponse,
-    // editableActiveCitation));
-
-    risWebTestClient
-        .withDefaultLogin()
-        .get()
-        .uri("/api/v1/caselaw/documentunits/documentnr001")
-        .exchange()
-        .expectStatus()
-        .isOk()
-        .expectBody(DocumentUnit.class)
-        .consumeWith(
-            response ->
-                assertThat(
-                        response
-                            .getResponseBody()
-                            .contentRelatedIndexing()
-                            .activeCitations()
-                            .get(0)
-                            .getCitationType())
-                    .extracting("label")
-                    .isEqualTo("Anwendung"));
-
-    UUID uuid = UUID.fromString("46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3");
-
-    DocumentUnit documentUnitFromFrontend =
-        DocumentUnit.builder()
-            .uuid(uuid)
-            .documentNumber("documentnr001")
-            .coreData(CoreData.builder().build())
-            .contentRelatedIndexing(
-                ContentRelatedIndexing.builder()
-                    .activeCitations(
-                        List.of(
-                            ActiveCitation.builder()
-                                .citationType(
-                                    CitationType.builder()
-                                        .uuid(
-                                            UUID.fromString("6b4bd747-fce9-4e49-8af4-3fb4f1d3663c"))
-                                        .build())
-                                .build()))
-                    .build())
-            .build();
-
-    risWebTestClient
-        .withDefaultLogin()
-        .put()
-        .uri("/api/v1/caselaw/documentunits/46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3")
-        .bodyValue(documentUnitFromFrontend)
-        .exchange()
-        .expectStatus()
-        .isOk()
-        .expectBody(DocumentUnit.class)
-        .consumeWith(
-            response ->
-                assertThat(
-                        response
-                            .getResponseBody()
-                            .contentRelatedIndexing()
-                            .activeCitations()
-                            .get(0)
-                            .getCitationType())
-                    .extracting("label")
-                    .isEqualTo("Nichtanwendung"));
-  }
 }

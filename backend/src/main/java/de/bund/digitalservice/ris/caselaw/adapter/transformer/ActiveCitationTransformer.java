@@ -35,9 +35,13 @@ public class ActiveCitationTransformer extends RelatedDocumentationUnitTransform
   }
 
   public static ActiveCitationDTO transformToDTO(ActiveCitation activeCitation) {
+    if (activeCitation.hasNoValues()) {
+      return null;
+    }
 
     ActiveCitationDTO.ActiveCitationDTOBuilder activeCitationDTOBuilder =
         ActiveCitationDTO.builder()
+            .id(activeCitation.getUuid())
             .court(getCourtFromDomain(activeCitation.getCourt()))
             .date(activeCitation.getDecisionDate())
             .documentNumber(activeCitation.getDocumentNumber())
