@@ -4,7 +4,7 @@ import de.bund.digitalservice.ris.OpenApiConfiguration;
 import de.bund.digitalservice.ris.caselaw.domain.ConverterService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitSearchEntry;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitSearchResult;
 import de.bund.digitalservice.ris.caselaw.domain.Publication;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationHistoryRecord;
 import de.bund.digitalservice.ris.caselaw.domain.RelatedDocumentationUnit;
@@ -96,7 +96,7 @@ public class DocumentUnitController {
   @GetMapping(value = "/search")
   @PreAuthorize("isAuthenticated()")
   // Access rights are being enforced through SQL filtering
-  public Mono<Page<DocumentationUnitSearchEntry>> searchByDocumentUnitListEntry(
+  public Mono<Page<DocumentationUnitSearchResult>> searchByDocumentUnitListEntry(
       @RequestParam("pg") int page,
       @RequestParam("sz") int size,
       @RequestParam(value = "documentNumberOrFileNumber")
@@ -115,7 +115,7 @@ public class DocumentUnitController {
         .flatMap(
             documentationOffice ->
                 Mono.just(
-                    service.searchByDocumentUnitSearchInput(
+                    service.searchByDocumentationUnitSearchInput(
                         PageRequest.of(page, size),
                         documentationOffice,
                         documentNumberOrFileNumber,
@@ -186,13 +186,14 @@ public class DocumentUnitController {
 
   @PutMapping(value = "/search-by-linked-documentation-unit")
   @PreAuthorize("isAuthenticated()")
-  public Mono<Page<RelatedDocumentationUnit>> searchByLinkedDocumentationUnit(
+  public Mono<Page<DocumentationUnitSearchResult>> searchByLinkedDocumentationUnit(
       @RequestParam("pg") int page,
       @RequestParam("sz") int size,
       @RequestBody RelatedDocumentationUnit relatedDocumentationUnit) {
 
-    return service.searchByLinkedDocumentationUnit(
-        relatedDocumentationUnit, PageRequest.of(page, size));
+    return Mono.just(
+        service.searchByLinkedDocumentationUnit(
+            relatedDocumentationUnit, PageRequest.of(page, size)));
   }
 
   @GetMapping(value = "/{uuid}/docx", produces = MediaType.APPLICATION_JSON_VALUE)

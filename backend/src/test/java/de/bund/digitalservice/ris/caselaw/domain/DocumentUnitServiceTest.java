@@ -462,33 +462,20 @@ class DocumentUnitServiceTest {
   }
 
   @Test
-  void testSearchByPreviousDecision() {
-    PreviousDecision previousDecision = PreviousDecision.builder().build();
-    PageRequest pageRequest = PageRequest.of(0, 10);
-
-    when(repository.searchByRelatedDocumentationUnit(previousDecision, pageRequest))
-        .thenReturn(new PageImpl<>(List.of(previousDecision)));
-
-    StepVerifier.create(service.searchByLinkedDocumentationUnit(previousDecision, pageRequest))
-        .consumeNextWith(pd -> assertEquals(pd.getContent().get(0), previousDecision))
-        .verifyComplete();
-    verify(repository).searchByRelatedDocumentationUnit(previousDecision, pageRequest);
-  }
-
-  @Test
   void testSearchByDocumentUnitListEntry() {
     DocumentationOffice documentationOffice = DocumentationOffice.builder().build();
-    DocumentUnitSearchInput documentUnitSearchInput = DocumentUnitSearchInput.builder().build();
-    DocumentationUnitSearchEntry documentationUnitSearchEntry =
-        DocumentationUnitSearchEntry.builder().build();
+    DocumentationUnitSearchInput documentationUnitSearchInput =
+        DocumentationUnitSearchInput.builder().build();
+    DocumentationUnitSearchResult documentationUnitSearchResult =
+        DocumentationUnitSearchResult.builder().build();
     PageRequest pageRequest = PageRequest.of(0, 10);
 
-    when(repository.searchByDocumentUnitSearchInput(
-            pageRequest, documentationOffice, documentUnitSearchInput))
-        .thenReturn(new PageImpl<>(List.of(documentationUnitSearchEntry)));
+    when(repository.searchByDocumentationUnitSearchInput(
+            pageRequest, documentationOffice, documentationUnitSearchInput))
+        .thenReturn(new PageImpl<>(List.of(documentationUnitSearchResult)));
 
-    Page<DocumentationUnitSearchEntry> documentationUnitSearchEntries =
-        service.searchByDocumentUnitSearchInput(
+    Page<DocumentationUnitSearchResult> documentationUnitSearchEntries =
+        service.searchByDocumentationUnitSearchInput(
             pageRequest,
             documentationOffice,
             Optional.empty(),
@@ -499,9 +486,10 @@ class DocumentUnitServiceTest {
             Optional.empty(),
             Optional.empty(),
             Optional.empty());
-    assertThat(documentationUnitSearchEntries).contains(documentationUnitSearchEntry);
+    assertThat(documentationUnitSearchEntries).contains(documentationUnitSearchResult);
     verify(repository)
-        .searchByDocumentUnitSearchInput(pageRequest, documentationOffice, documentUnitSearchInput);
+        .searchByDocumentationUnitSearchInput(
+            pageRequest, documentationOffice, documentationUnitSearchInput);
   }
 
   private CompletableFuture<DeleteObjectResponse> buildEmptyDeleteObjectResponse() {

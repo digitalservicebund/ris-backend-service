@@ -17,50 +17,73 @@ public interface DatabaseDocumentationUnitRepository
   @Query(
       value =
           """
-           SELECT du.id as id, du.document_number as documentNumber, du.decision_date as decisionDate
-           FROM incremental_migration.documentation_unit AS du
-           LEFT JOIN incremental_migration.court AS court ON du.court_id = court.id
-           WHERE (
-               (:documentNumberOrFileNumber IS NULL
-                 OR ( du.document_number = :documentNumberOrFileNumber
-                    OR EXISTS (
-                       SELECT 1
-                       FROM incremental_migration.file_number AS fn
-                       WHERE fn.documentation_unit_id = du.id
-                       AND fn.value = :documentNumberOrFileNumber
-                    )
-                    OR EXISTS (
-                       SELECT 1
-                       FROM incremental_migration.deviating_file_number AS dfn
-                       WHERE dfn.documentation_unit_id = du.id
-                       AND dfn.value = :documentNumberOrFileNumber
-                    )))
-               AND (:courtType IS NULL OR court.type = :courtType)
-               AND (:courtLocation IS NULL OR court.location = :courtLocation)
-               AND (:decisionDate IS NULL OR du.decision_date = :decisionDate)
-               AND (:myDocOfficeOnly = FALSE OR (:myDocOfficeOnly = TRUE AND du.documentation_office_id = :documentationOfficeId))
-           );
+        SELECT documentationUnit FROM DocumentationUnitDTO documentationUnit
+        WHERE (
+            (:courtType IS NULL OR documentationUnit.court.type = :courtType)
+        AND (:courtLocation IS NULL OR documentationUnit.court.location = :courtLocation)
+        AND (:fileNumber is NULL OR EXISTS (
+            SELECT 1
+            FROM FileNumberDTO fileNumber
+            WHERE fileNumber.documentationUnit.id = documentationUnit.id
+            AND fileNumber.value = :fileNumber
+            )
+         )
+        AND (cast(:decisionDate as date) IS NULL OR documentationUnit.decisionDate = :decisionDate)
+        )
+        ORDER BY documentationUnit.decisionDate DESC, documentationUnit.id DESC
+        """)
+  Page<DocumentationUnitSearchResultDTO> searchByDocumentUnitSearchInput(
+      String courtType,
+      String courtLocation,
+      String fileNumber,
+      LocalDate decisionDate,
+      Pageable pageable);
 
-             """,
-      //             AND (
-      //                 (documentation_office_id = :documentationOfficeId) OR
-      //                 (
-      //                     NOT EXISTS (
-      //                         SELECT 1
-      //                         FROM public.status
-      //                         WHERE document_unit_id = documentation_unit.id
-      //                         AND status = :status
-      //                     ) OR
-      //                     :status IS NULL
-      //                 )
-      nativeQuery = true)
-  Page<DocumentationUnitMetadataDTO> searchByDocumentUnitSearchInput(
+  @Query(
+      value =
+          """
+    SELECT documentationUnit FROM DocumentationUnitDTO documentationUnit
+    WHERE (
+       (:documentNumberOrFileNumber IS NULL
+         OR ( lower(documentationUnit.documentNumber) like lower(concat('%', :documentNumberOrFileNumber,'%'))
+            OR EXISTS (
+               SELECT 1
+               FROM FileNumberDTO fileNumber
+               WHERE fileNumber.documentationUnit.id = documentationUnit.id
+               AND fileNumber.value = :documentNumberOrFileNumber
+            )
+            OR EXISTS (
+               SELECT 1
+               FROM DeviatingFileNumberDTO deviatingFileNumber
+               WHERE deviatingFileNumber.documentationUnit.id = documentationUnit.id
+               AND deviatingFileNumber.value = :documentNumberOrFileNumber
+            )))
+       AND (:courtType IS NULL OR documentationUnit.court.type = :courtType)
+       AND (:courtLocation IS NULL OR documentationUnit.court.location = :courtLocation)
+       AND (cast(:decisionDate as date) IS NULL
+           OR (cast(:decisionDateEnd as date) IS NULL AND documentationUnit.decisionDate = :decisionDate)
+           OR (cast(:decisionDateEnd as date) IS NOT NULL AND documentationUnit.decisionDate BETWEEN :decisionDate AND :decisionDateEnd))
+       AND (:myDocOfficeOnly = FALSE OR (:myDocOfficeOnly = TRUE AND
+    documentationUnit.documentationOffice.id = :documentationOfficeId))
+       AND
+         (
+            (:status IS NULL AND ((documentationUnit.documentationOffice.id = :documentationOfficeId OR EXISTS (SELECT 1 FROM StatusDTO status WHERE status.documentationUnitDTO.id = documentationUnit.id AND status.publicationStatus IN (cast(de.bund.digitalservice.ris.caselaw.domain.PublicationStatus.PUBLISHED as string), cast(de.bund.digitalservice.ris.caselaw.domain.PublicationStatus.JURIS_PUBLISHED as string), cast(de.bund.digitalservice.ris.caselaw.domain.PublicationStatus.PUBLISHING as string))))))
+         OR
+            (:status IS NOT NULL AND EXISTS (SELECT 1 FROM StatusDTO status WHERE status.documentationUnitDTO.id = documentationUnit.id AND ((cast(status.publicationStatus as string) = :status) OR status.publicationStatus = cast(de.bund.digitalservice.ris.caselaw.domain.PublicationStatus.JURIS_PUBLISHED as string) AND :status = '1')))
+         )
+       AND (:withErrorOnly = FALSE OR documentationUnit.documentationOffice.id = :documentationOfficeId AND EXISTS (SELECT 1 FROM StatusDTO status WHERE status.documentationUnitDTO.id = documentationUnit.id AND status.withError = TRUE))
+    )
+    ORDER BY documentationUnit.documentNumber
+""")
+  Page<DocumentationUnitSearchResultDTO> searchByDocumentUnitSearchInput(
       UUID documentationOfficeId,
       String documentNumberOrFileNumber,
       String courtType,
       String courtLocation,
       LocalDate decisionDate,
-      //      PublicationStatus status,
+      LocalDate decisionDateEnd,
+      String status,
+      Boolean withErrorOnly,
       Boolean myDocOfficeOnly,
       Pageable pageable);
 }

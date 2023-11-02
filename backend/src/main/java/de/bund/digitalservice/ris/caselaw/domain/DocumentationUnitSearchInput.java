@@ -5,13 +5,13 @@ import java.util.UUID;
 import lombok.Builder;
 
 @Builder
-public record DocumentationUnitSearchEntry(
+public record DocumentationUnitSearchInput(
     UUID uuid,
-    String documentNumber,
+    String documentNumberOrFileNumber,
     String courtType,
     String courtLocation,
-    String fileNumber,
-    String fileName,
     LocalDate decisionDate,
-    String documentType,
-    Status status) {}
+    LocalDate decisionDateEnd,
+    DocumentationOffice documentationOffice,
+    Status status,
+    boolean myDocOfficeOnly) {}

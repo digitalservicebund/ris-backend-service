@@ -140,6 +140,7 @@ public class DocumentationUnitTransformer {
               DeviatingFileNumberDTO.builder()
                   .value(deviatingFileNumbers.get(i))
                   .rank((long) (i + 1))
+                  .documentationUnit(currentDto)
                   .build());
         }
         builder.deviatingFileNumbers(deviatingFileNumberDTOs);

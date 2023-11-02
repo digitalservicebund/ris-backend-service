@@ -1,16 +1,17 @@
 package de.bund.digitalservice.ris.caselaw.adapter.database.jpa;
 
-import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentTypeTransformer;
+import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationUnitSearchResultTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationUnitTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitRepository;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitSearchInput;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitSearchEntry;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitSearchInput;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitSearchResult;
 import de.bund.digitalservice.ris.caselaw.domain.RelatedDocumentationType;
 import de.bund.digitalservice.ris.caselaw.domain.RelatedDocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.Status;
+import de.bund.digitalservice.ris.caselaw.domain.court.Court;
 import jakarta.persistence.EntityManager;
 import java.time.Instant;
 import java.util.Collections;
@@ -261,15 +262,33 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
   }
 
   @Override
-  public Page<RelatedDocumentationUnit> searchByRelatedDocumentationUnit(
+  public Page<DocumentationUnitSearchResult> searchByRelatedDocumentationUnit(
       RelatedDocumentationUnit relatedDocumentationUnit, Pageable pageable) {
-    throw new UnsupportedOperationException("not implemented yet");
+    String courtType =
+        Optional.ofNullable(relatedDocumentationUnit.getCourt()).map(Court::type).orElse(null);
+    String courtLocation =
+        Optional.ofNullable(relatedDocumentationUnit.getCourt()).map(Court::location).orElse(null);
+
+    Page<DocumentationUnitSearchResultDTO> documentationUnitSearchResultDTOPage =
+        repository.searchByDocumentUnitSearchInput(
+            courtType,
+            courtLocation,
+            relatedDocumentationUnit.getFileNumber(),
+            relatedDocumentationUnit.getDecisionDate(),
+            pageable);
+
+    List<DocumentationUnitSearchResult> list =
+        documentationUnitSearchResultDTOPage.stream()
+            .map(DocumentationUnitSearchResultTransformer::transformToDomain)
+            .toList();
+
+    return new PageImpl<>(list, pageable, documentationUnitSearchResultDTOPage.getTotalElements());
   }
 
-  public Page<DocumentationUnitSearchEntry> searchByDocumentUnitSearchInput(
+  public Page<DocumentationUnitSearchResult> searchByDocumentationUnitSearchInput(
       Pageable pageable,
       DocumentationOffice documentationOffice,
-      DocumentUnitSearchInput searchInput) {
+      DocumentationUnitSearchInput searchInput) {
     if (log.isDebugEnabled()) {
       log.debug("Find by overview search: {}, {}", documentationOffice, searchInput);
     }
@@ -277,68 +296,38 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
     DocumentationOfficeDTO documentationOfficeDTO =
         documentationOfficeRepository.findByAbbreviation(documentationOffice.abbreviation());
 
-    Page<DocumentationUnitMetadataDTO> documentUnitDTOList =
+    String publicationStatus =
+        Optional.ofNullable(searchInput.status())
+            .flatMap(
+                status ->
+                    Optional.ofNullable(status.publicationStatus())
+                        .map(
+                            notNullPublicationStatus ->
+                                String.valueOf(notNullPublicationStatus.ordinal())))
+            .orElse(null);
+
+    Boolean withError =
+        Optional.ofNullable(searchInput.status()).map(Status::withError).orElse(false);
+
+    Page<DocumentationUnitSearchResultDTO> documentationUnitSearchResultDTOPage =
         repository.searchByDocumentUnitSearchInput(
             documentationOfficeDTO.getId(),
             searchInput.documentNumberOrFileNumber(),
             searchInput.courtType(),
             searchInput.courtLocation(),
             searchInput.decisionDate(),
-            //            searchInput.status() == null ? null :
-            // searchInput.status().publicationStatus(),
+            searchInput.decisionDateEnd(),
+            publicationStatus,
+            withError,
             searchInput.myDocOfficeOnly(),
             pageable);
 
-    List<DocumentationUnitSearchEntry> list =
-        documentUnitDTOList.stream()
-            .map(
-                metadataDTO ->
-                    // TODO move to transformer
-                    DocumentationUnitSearchEntry.builder()
-                        .uuid(metadataDTO.getId())
-                        .documentNumber(metadataDTO.getDocumentNumber())
-                        .decisionDate(metadataDTO.getDecisionDate())
-                        .fileName(
-                            metadataDTO.getOriginalFileDocument() == null
-                                ? null
-                                : metadataDTO.getOriginalFileDocument().getFilename())
-                        .documentType(
-                            metadataDTO.getDocumentType() == null
-                                ? null
-                                : DocumentTypeTransformer.transformToDomain(
-                                        metadataDTO.getDocumentType())
-                                    .jurisShortcut())
-                        .courtLocation(
-                            metadataDTO.getCourt() == null
-                                ? null
-                                : metadataDTO.getCourt().getLocation())
-                        .courtType(
-                            metadataDTO.getCourt() == null
-                                ? null
-                                : metadataDTO.getCourt().getType())
-                        .fileNumber(
-                            metadataDTO.getFileNumbers() == null
-                                    || metadataDTO.getFileNumbers().isEmpty()
-                                ? null
-                                : metadataDTO.getFileNumbers().get(0).getValue())
-                        .status(
-                            metadataDTO.getStatus() == null || metadataDTO.getStatus().isEmpty()
-                                ? null
-                                : Status.builder()
-                                    // TODO is the first status the most recent?
-                                    .publicationStatus(
-                                        metadataDTO.getStatus().get(0) == null
-                                            ? null
-                                            : metadataDTO.getStatus().get(0).getPublicationStatus())
-                                    .withError(
-                                        metadataDTO.getStatus().get(0) == null
-                                            || metadataDTO.getStatus().get(0).isWithError())
-                                    .build())
-                        .build())
+    List<DocumentationUnitSearchResult> list =
+        documentationUnitSearchResultDTOPage.stream()
+            .map(DocumentationUnitSearchResultTransformer::transformToDomain)
             .toList();
 
-    // TODO fix count
-    return new PageImpl<>(list, pageable, 100);
+    return new PageImpl<>(list, pageable, documentationUnitSearchResultDTOPage.getTotalElements());
   }
 
   @Override

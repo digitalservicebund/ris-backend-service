@@ -1,7 +1,7 @@
 package de.bund.digitalservice.ris.caselaw.adapter.transformer;
 
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitSearchEntryDTO;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitSearchEntry;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitSearchResult;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.Status;
 import de.bund.digitalservice.ris.caselaw.domain.Status.StatusBuilder;
@@ -13,9 +13,9 @@ import java.util.Objects;
 public class DocumentationUnitSearchEntryTransformer {
   private DocumentationUnitSearchEntryTransformer() {}
 
-  public static DocumentationUnitSearchEntry transferDTO(
+  public static DocumentationUnitSearchResult transferDTO(
       DocumentationUnitSearchEntryDTO searchEntryDTO) {
-    return DocumentationUnitSearchEntry.builder()
+    return DocumentationUnitSearchResult.builder()
         .uuid(searchEntryDTO.getUuid())
         .documentNumber(searchEntryDTO.getDocumentNumber())
         .courtType(searchEntryDTO.getCourtType())

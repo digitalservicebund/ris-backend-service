@@ -177,7 +177,7 @@ public class DocumentUnitService {
         .flatMap(Function.identity());
   }
 
-  public Page<DocumentationUnitSearchEntry> searchByDocumentUnitSearchInput(
+  public Page<DocumentationUnitSearchResult> searchByDocumentationUnitSearchInput(
       Pageable pageable,
       DocumentationOffice documentationOffice,
       Optional<String> documentNumberOrFileNumber,
@@ -189,8 +189,8 @@ public class DocumentUnitService {
       Optional<Boolean> withError,
       Optional<Boolean> myDocOfficeOnly) {
 
-    DocumentUnitSearchInput searchInput =
-        DocumentUnitSearchInput.builder()
+    DocumentationUnitSearchInput searchInput =
+        DocumentationUnitSearchInput.builder()
             .documentNumberOrFileNumber(documentNumberOrFileNumber.orElse(null))
             .courtType(courtType.orElse(null))
             .courtLocation(courtLocation.orElse(null))
@@ -207,7 +207,7 @@ public class DocumentUnitService {
             .myDocOfficeOnly(myDocOfficeOnly.orElse(false))
             .build();
 
-    return repository.searchByDocumentUnitSearchInput(
+    return repository.searchByDocumentationUnitSearchInput(
         PageRequest.of(pageable.getPageNumber(), pageable.getPageSize()),
         documentationOffice,
         searchInput);
@@ -295,11 +295,10 @@ public class DocumentUnitService {
         .sort(Comparator.comparing(PublicationHistoryRecord::getDate).reversed());
   }
 
-  public <T extends RelatedDocumentationUnit> Mono<Page<T>> searchByLinkedDocumentationUnit(
-      T linkedDocumentationUnit, Pageable pageable) {
+  public Page<DocumentationUnitSearchResult> searchByLinkedDocumentationUnit(
+      RelatedDocumentationUnit relatedDocumentationUnit, Pageable pageable) {
 
-    return Mono.just(
-        repository.searchByRelatedDocumentationUnit(linkedDocumentationUnit, pageable));
+    return repository.searchByRelatedDocumentationUnit(relatedDocumentationUnit, pageable);
   }
 
   public Mono<String> validateSingleNorm(SingleNormValidationInfo singleNormValidationInfo) {

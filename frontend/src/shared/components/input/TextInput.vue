@@ -31,7 +31,10 @@ const inputRef = ref<HTMLInputElement | null>()
 
 const localModelValue = computed({
   get: () => props.modelValue,
-  set: (value) => emit("update:modelValue", value),
+  set: (value) =>
+    value === ""
+      ? emit("update:modelValue", undefined)
+      : emit("update:modelValue", value),
 })
 
 const conditionalClasses = computed(() => ({

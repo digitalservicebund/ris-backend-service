@@ -37,7 +37,8 @@ import lombok.Setter;
 @Builder(toBuilder = true)
 @Entity
 @Table(name = "documentation_unit", schema = "incremental_migration")
-public class DocumentationUnitDTO implements DocumentationUnitMetadataDTO {
+public class DocumentationUnitDTO
+    implements DocumentationUnitSearchResultDTO, DocumentationUnitMetadataDTO {
 
   @Id @GeneratedValue private UUID id;
 

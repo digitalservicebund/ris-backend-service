@@ -26,13 +26,13 @@ public interface DocumentUnitRepository {
 
   void delete(DocumentUnit documentUnit);
 
-  <T extends RelatedDocumentationUnit> Page<T> searchByRelatedDocumentationUnit(
-      T linkedDocumentationUnit, Pageable pageable);
+  Page<DocumentationUnitSearchResult> searchByRelatedDocumentationUnit(
+      RelatedDocumentationUnit relatedDocumentationUnit, Pageable pageable);
 
-  Page<DocumentationUnitSearchEntry> searchByDocumentUnitSearchInput(
+  Page<DocumentationUnitSearchResult> searchByDocumentationUnitSearchInput(
       Pageable pageable,
       DocumentationOffice documentationOffice,
-      DocumentUnitSearchInput searchInput);
+      DocumentationUnitSearchInput searchInput);
 
   Map<RelatedDocumentationType, Long> getAllDocumentationUnitWhichLink(UUID documentUnitUuid);
 }

@@ -26,6 +26,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentT
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationOfficeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseFileNumberRepository;
+// import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseStatusRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentCategoryDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentTypeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
@@ -33,15 +34,16 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnit
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.FileNumberDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentationUnitRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresPublicationReportRepositoryImpl;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.StatusDTO;
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
 import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitSearchInput;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitSearchInput;
 import de.bund.digitalservice.ris.caselaw.domain.EmailPublishService;
 import de.bund.digitalservice.ris.caselaw.domain.PreviousDecision;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
@@ -58,7 +60,6 @@ import java.util.Random;
 import java.util.UUID;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -72,7 +73,6 @@ import org.springframework.util.MultiValueMap;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.shaded.org.apache.commons.lang3.RandomStringUtils;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import software.amazon.awssdk.services.s3.S3AsyncClient;
 
@@ -84,6 +84,7 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
       DatabaseProcedureService.class,
       PostgresPublicationReportRepositoryImpl.class,
       PostgresDocumentationUnitRepositoryImpl.class,
+      //      DatabaseStatusRepository.class,
       FlywayConfig.class,
       PostgresConfig.class,
       PostgresJPAConfig.class,
@@ -111,6 +112,7 @@ class DocumentationUnitIntegrationTest {
   @Autowired private DatabaseDocumentationUnitRepository repository;
   @Autowired private DatabaseFileNumberRepository fileNumberRepository;
   @Autowired private DatabaseDocumentTypeRepository databaseDocumentTypeRepository;
+  //  @Autowired private DatabaseStatusRepository databaseStatusRepository;
 
   @Autowired private DatabaseDocumentCategoryRepository databaseDocumentCategoryRepository;
   @Autowired private DatabaseDocumentationOfficeRepository documentationOfficeRepository;
@@ -370,32 +372,38 @@ class DocumentationUnitIntegrationTest {
   }
 
   @Test
-  @Disabled("depends on status and linked decisions")
   void testSearchResultsAreDeterministic() {
-    PublicationStatus[] published =
-        new PublicationStatus[] {PUBLISHED, PUBLISHING, JURIS_PUBLISHED};
-    Random random = new Random();
-    Flux.range(0, 20)
-        .map(index -> UUID.randomUUID())
-        .map(
-            uuid ->
-                DocumentationUnitDTO.builder()
-                    .id(uuid)
-                    .documentNumber(RandomStringUtils.random(10, true, true))
-                    .documentationOffice(documentationOfficeRepository.findByAbbreviation("DS"))
-                    .build())
-        .flatMap(documentUnitDTO -> Mono.just(repository.save(documentUnitDTO)))
-        // TODO status
-        //        .flatMap(
-        //            documentUnitDTO ->
-        //                documentUnitStatusRepository.save(
-        //                    DocumentUnitStatusDTO.builder()
-        //                        .newEntry(true)
-        //                        .id(UUID.randomUUID())
-        //                        .publicationStatus(published[random.nextInt(3)])
-        //                        .documentUnitId(documentUnitDTO.getId())
-        //                        .build()))
-        .blockLast();
+    for (int i = 0; i < 20; i++) {
+      CourtDTO court =
+          courtRepository.save(
+              CourtDTO.builder()
+                  .type("LG")
+                  .location("Kassel")
+                  .isSuperiorCourt(true)
+                  .isForeignCourt(false)
+                  .jurisId(i)
+                  .build());
+
+      DocumentationUnitDTO dto =
+          repository.save(
+              DocumentationUnitDTO.builder()
+                  .id(UUID.randomUUID())
+                  .documentNumber(RandomStringUtils.random(10, true, true))
+                  .court(court)
+                  .documentationOffice(documentationOfficeRepository.findByAbbreviation("DS"))
+                  .build());
+
+      repository.save(
+          dto.toBuilder()
+              .status(
+                  List.of(
+                      StatusDTO.builder()
+                          .documentationUnitDTO(dto)
+                          .publicationStatus(PUBLISHED)
+                          .build()))
+              .build());
+    }
+
     assertThat(repository.findAll()).hasSize(20);
 
     List<UUID> responseUUIDs = new ArrayList<>();
@@ -450,7 +458,6 @@ class DocumentationUnitIntegrationTest {
   }
 
   @Test
-  @Disabled
   void testSearchByDocumentUnitSearchInput() {
     DocumentationOffice otherDocOffice = buildDocOffice("BGH");
     UUID otherDocOfficeUuid =
@@ -462,26 +469,33 @@ class DocumentationUnitIntegrationTest {
             documentationOfficeUuid,
             documentationOfficeUuid,
             documentationOfficeUuid,
+            otherDocOfficeUuid,
             otherDocOfficeUuid);
     List<String> documentNumbers =
         List.of(
-            "ABCD202300007", "EFGH202200123", "IJKL202101234", "MNOP202300099", "QRST202200102");
-    List<String> fileNumbers = List.of("jkl", "ghi", "def", "abc", "mno");
-    List<String> courtTypes = List.of("MNO", "PQR", "STU", "VWX", "YZA");
-    List<String> courtLocations = List.of("Hamburg", "München", "Berlin", "Frankfurt", "Köln");
+            "ABCD202300007",
+            "EFGH202200123",
+            "IJKL202101234",
+            "MNOP202300099",
+            "QRST202200102",
+            "UVWX202311090");
+    List<String> fileNumbers = List.of("jkl", "ghi", "def", "abc", "mno", "pqr");
+    List<String> courtTypes = List.of("MNO", "PQR", "STU", "VWX", "YZA", "BCD");
+    List<String> courtLocations =
+        List.of("Hamburg", "München", "Berlin", "Frankfurt", "Köln", "Leipzig");
     List<LocalDate> decisionDates =
         List.of(
             LocalDate.parse("2021-01-02"),
             LocalDate.parse("2022-02-03"),
             LocalDate.parse("2023-03-04"),
             LocalDate.parse("2023-08-01"),
-            LocalDate.parse("2023-08-10"));
-    // TODO status
+            LocalDate.parse("2023-08-10"),
+            LocalDate.parse("2023-09-10"));
     List<PublicationStatus> statuses =
-        List.of(PUBLISHED, UNPUBLISHED, PUBLISHING, PUBLISHED, UNPUBLISHED);
-    List<Boolean> errorStatuses = List.of(false, true, true, false, true);
+        List.of(PUBLISHED, UNPUBLISHED, PUBLISHING, JURIS_PUBLISHED, UNPUBLISHED, PUBLISHED);
+    List<Boolean> errorStatuses = List.of(false, true, true, false, true, true);
 
-    for (int i = 0; i < 5; i++) {
+    for (int i = 0; i < 6; i++) {
 
       CourtDTO court =
           courtRepository.save(
@@ -490,7 +504,7 @@ class DocumentationUnitIntegrationTest {
                   .location(courtLocations.get(i))
                   .isSuperiorCourt(true)
                   .isForeignCourt(false)
-                  .jurisId(i)
+                  .jurisId(new Random().nextInt())
                   .build());
       DocumentationUnitDTO dto =
           repository.save(
@@ -510,81 +524,87 @@ class DocumentationUnitIntegrationTest {
                       FileNumberDTO.builder()
                           .documentationUnit(dto)
                           .value(fileNumbers.get(i))
+                          .rank((long) i)
                           .build()))
               .build());
 
-      // TODO status
-      //      documentUnitStatusRepository
-      //          .save(
-      //              DocumentUnitStatusDTO.builder()
-      //                  .id(UUID.randomUUID())
-      //                  .newEntry(true)
-      //                  .documentUnitId(dto.getId())
-      //                  .publicationStatus(statuses.get(i))
-      //                  .withError(errorStatuses.get(i))
-      //                  .build())
-      //          .block();
-
+      repository.save(
+          dto.toBuilder()
+              .status(
+                  List.of(
+                      StatusDTO.builder()
+                          .documentationUnitDTO(dto)
+                          .publicationStatus(statuses.get(i))
+                          .withError(errorStatuses.get(i))
+                          .build()))
+              .build());
     }
 
     // no search criteria
-    DocumentUnitSearchInput searchInput = DocumentUnitSearchInput.builder().build();
+    DocumentationUnitSearchInput searchInput = DocumentationUnitSearchInput.builder().build();
     // the unpublished one from the other docoffice is not in it, the others are ordered
     // by documentNumber
     assertThat(extractDocumentNumbersFromSearchCall(searchInput))
-        .containsExactly("MNOP202300099", "IJKL202101234", "EFGH202200123", "ABCD202300007");
+        .containsExactly(
+            "ABCD202300007", "EFGH202200123", "IJKL202101234", "MNOP202300099", "UVWX202311090");
 
     // by documentNumber / fileNumber
-    searchInput = DocumentUnitSearchInput.builder().documentNumberOrFileNumber("abc").build();
+    searchInput = DocumentationUnitSearchInput.builder().documentNumberOrFileNumber("abc").build();
     assertThat(extractDocumentNumbersFromSearchCall(searchInput))
-        .containsExactly("MNOP202300099", "ABCD202300007");
+        .containsExactly("ABCD202300007", "MNOP202300099");
 
     // by court
     searchInput =
-        DocumentUnitSearchInput.builder().courtType("PQR").courtLocation("München").build();
+        DocumentationUnitSearchInput.builder().courtType("PQR").courtLocation("München").build();
 
     assertThat(extractDocumentNumbersFromSearchCall(searchInput)).containsExactly("EFGH202200123");
 
     // by decisionDate
-    searchInput = DocumentUnitSearchInput.builder().decisionDate(decisionDates.get(2)).build();
+    searchInput = DocumentationUnitSearchInput.builder().decisionDate(decisionDates.get(2)).build();
 
     assertThat(extractDocumentNumbersFromSearchCall(searchInput)).containsExactly("IJKL202101234");
 
-    // TODO status
-    //  by status
-    //    searchInput =
-    //        DocumentUnitSearchInput.builder()
-    //            .status(DocumentUnitStatus.builder().publicationStatus(PUBLISHING).build())
-    //            .build();
-    //
-    //
-    // assertThat(extractDocumentNumbersFromSearchCall(searchInput)).containsExactly("IJKL202101234");
-    //
-    //    // by error status
-    //    searchInput =
-    //        DocumentUnitSearchInput.builder()
-    //            .status(DocumentUnitStatus.builder().withError(true).build())
-    //            .build();
-    //    // the docunit with error from the other docoffice should not appear
-    //    assertThat(extractDocumentNumbersFromSearchCall(searchInput))
-    //        .containsExactly("IJKL202101234", "EFGH202200123");
+    // by status
+    searchInput =
+        DocumentationUnitSearchInput.builder()
+            .status(Status.builder().publicationStatus(PUBLISHING).build())
+            .build();
+
+    assertThat(extractDocumentNumbersFromSearchCall(searchInput)).containsExactly("IJKL202101234");
+
+    searchInput =
+        DocumentationUnitSearchInput.builder()
+            .status(Status.builder().publicationStatus(PUBLISHED).build())
+            .build();
+
+    assertThat(extractDocumentNumbersFromSearchCall(searchInput))
+        .containsExactly("ABCD202300007", "MNOP202300099", "UVWX202311090");
+
+    // by error status
+    searchInput =
+        DocumentationUnitSearchInput.builder()
+            .status(Status.builder().withError(true).build())
+            .build();
+    // the docunit with error from the other docoffice should not appear
+    assertThat(extractDocumentNumbersFromSearchCall(searchInput))
+        .containsExactly("EFGH202200123", "IJKL202101234");
 
     // by documentation office
-    searchInput = DocumentUnitSearchInput.builder().myDocOfficeOnly(true).build();
+    searchInput = DocumentationUnitSearchInput.builder().myDocOfficeOnly(true).build();
     assertThat(extractDocumentNumbersFromSearchCall(searchInput))
-        .containsExactly("MNOP202300099", "IJKL202101234", "EFGH202200123", "ABCD202300007");
+        .containsExactly("ABCD202300007", "EFGH202200123", "IJKL202101234", "MNOP202300099");
 
-    // between to decision dates
-    LocalDate start = LocalDate.parse("2022-02-01T00:00:00.00Z");
-    LocalDate end = LocalDate.parse("2023-08-05T00:00:00.00Z");
+    // between two decision dates
+    LocalDate start = LocalDate.parse("2022-02-01");
+    LocalDate end = LocalDate.parse("2023-08-05");
     searchInput =
-        DocumentUnitSearchInput.builder().decisionDate(start).decisionDateEnd(end).build();
+        DocumentationUnitSearchInput.builder().decisionDate(start).decisionDateEnd(end).build();
     assertThat(extractDocumentNumbersFromSearchCall(searchInput))
-        .containsExactly("MNOP202300099", "IJKL202101234", "EFGH202200123");
+        .containsExactly("EFGH202200123", "IJKL202101234", "MNOP202300099");
 
     // all combined
     searchInput =
-        DocumentUnitSearchInput.builder()
+        DocumentationUnitSearchInput.builder()
             .documentNumberOrFileNumber("abc")
             .courtType("MNO")
             .courtLocation("Hamburg")
@@ -595,7 +615,8 @@ class DocumentationUnitIntegrationTest {
     assertThat(extractDocumentNumbersFromSearchCall(searchInput)).containsExactly("ABCD202300007");
   }
 
-  private List<String> extractDocumentNumbersFromSearchCall(DocumentUnitSearchInput searchInput) {
+  private List<String> extractDocumentNumbersFromSearchCall(
+      DocumentationUnitSearchInput searchInput) {
 
     MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<>();
     queryParams.add("pg", "0");

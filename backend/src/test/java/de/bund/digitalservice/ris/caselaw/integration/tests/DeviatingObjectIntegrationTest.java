@@ -110,6 +110,24 @@ class DeviatingObjectIntegrationTest {
                 }));
   }
 
+  private DocumentationUnitDTO prepareDocumentationUnitDTOWithDeviatingFileNumbers() {
+    DocumentationUnitDTO dto =
+        repository.save(
+            DocumentationUnitDTO.builder()
+                .documentNumber("1234567890123")
+                .documentationOffice(
+                    documentationOfficeRepository.findByAbbreviation(docOffice.abbreviation()))
+                .build());
+
+    return repository.save(
+        dto.toBuilder()
+            .deviatingFileNumbers(
+                List.of(
+                    DeviatingFileNumberDTO.builder().documentationUnit(dto).value("dfn1").build(),
+                    DeviatingFileNumberDTO.builder().documentationUnit(dto).value("dfn2").build()))
+            .build());
+  }
+
   @AfterEach
   void cleanUp() {
     repository.deleteAll();
@@ -118,18 +136,7 @@ class DeviatingObjectIntegrationTest {
   // Deviating File Number
   @Test
   void testReadOfDeviatingFileNumbers() {
-    DocumentationUnitDTO dto =
-        DocumentationUnitDTO.builder()
-            .documentNumber("1234567890123")
-            .documentationOffice(
-                documentationOfficeRepository.findByAbbreviation(docOffice.abbreviation()))
-            .deviatingFileNumbers(
-                List.of(
-                    DeviatingFileNumberDTO.builder().value("dfn1").build(),
-                    DeviatingFileNumberDTO.builder().value("dfn2").build()))
-            .build();
-
-    DocumentationUnitDTO savedDTO = repository.save(dto);
+    prepareDocumentationUnitDTOWithDeviatingFileNumbers();
 
     risWebTestClient
         .withDefaultLogin()
@@ -151,18 +158,7 @@ class DeviatingObjectIntegrationTest {
 
   @Test
   void testAddANewDeviatingFileNumberToAnExistingList() {
-    DocumentationUnitDTO dto =
-        DocumentationUnitDTO.builder()
-            .documentNumber("1234567890123")
-            .documentationOffice(
-                documentationOfficeRepository.findByAbbreviation(docOffice.abbreviation()))
-            .deviatingFileNumbers(
-                List.of(
-                    DeviatingFileNumberDTO.builder().value("dfn1").build(),
-                    DeviatingFileNumberDTO.builder().value("dfn2").build()))
-            .build();
-
-    DocumentationUnitDTO savedDTO = repository.save(dto);
+    DocumentationUnitDTO savedDTO = prepareDocumentationUnitDTOWithDeviatingFileNumbers();
 
     UUID dfn1Id = savedDTO.getDeviatingFileNumbers().get(0).getId();
     UUID dfn12d = savedDTO.getDeviatingFileNumbers().get(1).getId();
@@ -205,18 +201,7 @@ class DeviatingObjectIntegrationTest {
 
   @Test
   void testAddADeviatingFileNumberTwiceToAnExistingList() {
-    DocumentationUnitDTO dto =
-        DocumentationUnitDTO.builder()
-            .documentNumber("1234567890123")
-            .documentationOffice(
-                documentationOfficeRepository.findByAbbreviation(docOffice.abbreviation()))
-            .deviatingFileNumbers(
-                List.of(
-                    DeviatingFileNumberDTO.builder().value("dfn1").build(),
-                    DeviatingFileNumberDTO.builder().value("dfn2").build()))
-            .build();
-
-    DocumentationUnitDTO savedDTO = repository.save(dto);
+    DocumentationUnitDTO savedDTO = prepareDocumentationUnitDTOWithDeviatingFileNumbers();
 
     DocumentUnit documentUnit =
         DocumentUnit.builder()
@@ -242,18 +227,7 @@ class DeviatingObjectIntegrationTest {
 
   @Test
   void testRemoveOneDeviatingFileNumberFromExistingList() {
-    DocumentationUnitDTO dto =
-        DocumentationUnitDTO.builder()
-            .documentNumber("1234567890123")
-            .documentationOffice(
-                documentationOfficeRepository.findByAbbreviation(docOffice.abbreviation()))
-            .deviatingFileNumbers(
-                List.of(
-                    DeviatingFileNumberDTO.builder().value("dfn1").build(),
-                    DeviatingFileNumberDTO.builder().value("dfn2").build()))
-            .build();
-
-    DocumentationUnitDTO savedDTO = repository.save(dto);
+    DocumentationUnitDTO savedDTO = prepareDocumentationUnitDTOWithDeviatingFileNumbers();
 
     DocumentUnit documentUnit =
         DocumentUnit.builder()
@@ -287,18 +261,7 @@ class DeviatingObjectIntegrationTest {
 
   @Test
   void testRemoveAllDeviatingFileNumberWithAEmplyListFromExistingList() {
-    DocumentationUnitDTO dto =
-        DocumentationUnitDTO.builder()
-            .documentNumber("1234567890123")
-            .documentationOffice(
-                documentationOfficeRepository.findByAbbreviation(docOffice.abbreviation()))
-            .deviatingFileNumbers(
-                List.of(
-                    DeviatingFileNumberDTO.builder().value("dfn1").build(),
-                    DeviatingFileNumberDTO.builder().value("dfn2").build()))
-            .build();
-
-    DocumentationUnitDTO savedDTO = repository.save(dto);
+    DocumentationUnitDTO savedDTO = prepareDocumentationUnitDTOWithDeviatingFileNumbers();
 
     DocumentUnit documentUnit =
         DocumentUnit.builder()
@@ -331,18 +294,7 @@ class DeviatingObjectIntegrationTest {
 
   @Test
   void testWithNullDontChangeTheExistingDeviatingFileNumbers() {
-    DocumentationUnitDTO dto =
-        DocumentationUnitDTO.builder()
-            .documentNumber("1234567890123")
-            .documentationOffice(
-                documentationOfficeRepository.findByAbbreviation(docOffice.abbreviation()))
-            .deviatingFileNumbers(
-                List.of(
-                    DeviatingFileNumberDTO.builder().value("dfn1").build(),
-                    DeviatingFileNumberDTO.builder().value("dfn2").build()))
-            .build();
-
-    DocumentationUnitDTO savedDTO = repository.save(dto);
+    DocumentationUnitDTO savedDTO = prepareDocumentationUnitDTOWithDeviatingFileNumbers();
 
     DocumentUnit documentUnit =
         DocumentUnit.builder()
