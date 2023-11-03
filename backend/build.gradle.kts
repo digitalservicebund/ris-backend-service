@@ -184,7 +184,7 @@ dependencies {
     implementation("org.postgresql:postgresql:42.6.0")
     implementation("com.sendinblue:sib-api-v3-sdk:7.0.0")
     // CVE-2022-4244
-    implementation("org.codehaus.plexus:plexus-utils:3.0.24")
+    implementation("org.codehaus.plexus:plexus-utils:4.0.0")
 
     implementation(platform("software.amazon.awssdk:bom:2.20.12"))
     implementation("software.amazon.awssdk:netty-nio-client")
