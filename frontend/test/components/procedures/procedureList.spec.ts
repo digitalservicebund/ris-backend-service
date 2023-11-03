@@ -1,7 +1,6 @@
 import { userEvent } from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
 import { createPinia } from "pinia"
-import { vi } from "vitest"
 import { createRouter, createWebHistory } from "vue-router"
 import ProcedureList from "@/components/procedures/ProcedureList.vue"
 import useQuery from "@/composables/useQueryFromRoute"

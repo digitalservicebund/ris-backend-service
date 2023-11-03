@@ -1,6 +1,5 @@
 import { fireEvent, render, screen } from "@testing-library/vue"
 import { flushPromises } from "@vue/test-utils"
-import { describe, test } from "vitest"
 import FileUpload from "@/shared/components/FileUpload.vue"
 
 describe("FileUpload", () => {

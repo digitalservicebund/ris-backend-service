@@ -1,5 +1,4 @@
 import { render, screen } from "@testing-library/vue"
-import { describe, test } from "vitest"
 import { Router, createRouter, createWebHistory } from "vue-router"
 import OriginalFileSidePanel from "@/components/OriginalFileSidePanel.vue"
 

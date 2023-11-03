@@ -35,7 +35,7 @@ jobs:
         with:
           java-version: "17.0"
           distribution: "temurin"
-      - uses: gradle/gradle-build-action@62cce3c597efd445cd71ee868887b8b1117703a7
+      - uses: gradle/gradle-build-action@0bfe00a136db5e61ba3416b372542a65863a9fee
         with:
           gradle-version: ${{ env.GRADLE_VERSION }}
           arguments: build --profile -x integrationTest -x test
@@ -74,7 +74,7 @@ jobs:
         with:
           java-version: "17.0"
           distribution: "temurin"
-      - uses: gradle/gradle-build-action@62cce3c597efd445cd71ee868887b8b1117703a7
+      - uses: gradle/gradle-build-action@0bfe00a136db5e61ba3416b372542a65863a9fee
         with:
           gradle-version: ${{ env.GRADLE_VERSION}}
           arguments: test -x integrationTest
@@ -108,7 +108,7 @@ jobs:
         with:
           java-version: "17.0"
           distribution: "temurin"
-      - uses: gradle/gradle-build-action@62cce3c597efd445cd71ee868887b8b1117703a7
+      - uses: gradle/gradle-build-action@0bfe00a136db5e61ba3416b372542a65863a9fee
         with:
           gradle-version: ${{ env.GRADLE_VERSION }}
           arguments: integrationTest -x test
@@ -147,7 +147,7 @@ jobs:
         with:
           java-version: "17.0"
           distribution: "temurin"
-      - uses: gradle/gradle-build-action@62cce3c597efd445cd71ee868887b8b1117703a7
+      - uses: gradle/gradle-build-action@0bfe00a136db5e61ba3416b372542a65863a9fee
         with:
           gradle-version: ${{ env.GRADLE_VERSION }}
           arguments: bootBuildImage
@@ -155,7 +155,7 @@ jobs:
       - name: Run Trivy vulnerability scanner
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
-        uses: aquasecurity/trivy-action@69cbbc0cbbf6a2b0bab8dcf0e9f2d7ead08e87e4
+        uses: aquasecurity/trivy-action@f78e9ecf42a1271402d4f484518b9313235990e1
         with:
           image-ref: ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}:${{ env.CONTAINER_IMAGE_VERSION }}
           format: "sarif"
@@ -179,7 +179,7 @@ jobs:
       - name: Generate cosign vulnerability scan record
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
-        uses: aquasecurity/trivy-action@69cbbc0cbbf6a2b0bab8dcf0e9f2d7ead08e87e4
+        uses: aquasecurity/trivy-action@f78e9ecf42a1271402d4f484518b9313235990e1
         with:
           image-ref: ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}:${{ env.CONTAINER_IMAGE_VERSION }}
           format: "cosign-vuln"
@@ -386,7 +386,7 @@ jobs:
       - name: Run Trivy vulnerability image scanner
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
-        uses: aquasecurity/trivy-action@69cbbc0cbbf6a2b0bab8dcf0e9f2d7ead08e87e4
+        uses: aquasecurity/trivy-action@f78e9ecf42a1271402d4f484518b9313235990e1
         with:
           image-ref: ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}/frontend:${{ env.CONTAINER_IMAGE_VERSION }}
           format: "sarif"
@@ -411,7 +411,7 @@ jobs:
       - name: Run Trivy vulnerability file scanner
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
-        uses: aquasecurity/trivy-action@69cbbc0cbbf6a2b0bab8dcf0e9f2d7ead08e87e4
+        uses: aquasecurity/trivy-action@f78e9ecf42a1271402d4f484518b9313235990e1
         with:
           scan-type: "fs"
           scan-ref: "./frontend"
@@ -438,7 +438,7 @@ jobs:
       - name: Generate cosign vulnerability scan record
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
-        uses: aquasecurity/trivy-action@69cbbc0cbbf6a2b0bab8dcf0e9f2d7ead08e87e4
+        uses: aquasecurity/trivy-action@f78e9ecf42a1271402d4f484518b9313235990e1
         with:
           image-ref: ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}/frontend:${{ env.CONTAINER_IMAGE_VERSION }}
           format: "cosign-vuln"
@@ -494,7 +494,7 @@ jobs:
           path: ~/.sonar/cache
           key: ${{ runner.os }}-sonar
       - name: Scan with SonarQube
-        uses: gradle/gradle-build-action@62cce3c597efd445cd71ee868887b8b1117703a7
+        uses: gradle/gradle-build-action@0bfe00a136db5e61ba3416b372542a65863a9fee
         with:
           gradle-version: ${{ env.GRADLE_VERSION }}
           arguments: sonar --info
@@ -605,7 +605,7 @@ jobs:
       - name: Install cosign
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
-        uses: sigstore/cosign-installer@9c520b997e685cb69e1ac226f7dce8114e8f36df
+        uses: sigstore/cosign-installer@4b014e3cf19eef7b0be66ede0b1eafe5534db38d
         with:
           cosign-release: "v1.13.1"
       - name: Sign the published Docker image
@@ -676,7 +676,7 @@ jobs:
       - name: Install cosign
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
-        uses: sigstore/cosign-installer@9c520b997e685cb69e1ac226f7dce8114e8f36df
+        uses: sigstore/cosign-installer@4b014e3cf19eef7b0be66ede0b1eafe5534db38d
         with:
           cosign-release: "v1.13.1"
       - name: Sign the published Docker image
@@ -902,8 +902,9 @@ jobs:
   deploy-uat:
     runs-on: ubuntu-latest
     if: |
-      github.ref == 'refs/heads/main' &&
-      needs.deployment-time-check.outputs.between-8-and-20 == 'false'
+      github.ref == 'refs/heads/main'
+    # &&
+    # needs.deployment-time-check.outputs.between-8-and-20 == 'false'
     concurrency: deploy-uat
     environment: uat
     needs:
@@ -979,7 +980,7 @@ jobs:
           java-version: "17.0"
           distribution: "temurin"
           cache: gradle
-      - uses: gradle/gradle-build-action@62cce3c597efd445cd71ee868887b8b1117703a7
+      - uses: gradle/gradle-build-action@0bfe00a136db5e61ba3416b372542a65863a9fee
         with:
           gradle-version: ${{ env.GRADLE_VERSION }}
           arguments: migrateDatabaseForERD

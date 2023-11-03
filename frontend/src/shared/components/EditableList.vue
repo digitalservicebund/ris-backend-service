@@ -44,7 +44,7 @@ const currentEditElement = computed(() =>
     : undefined,
 )
 
-function setEditIndex(newEditIndex?: number): void {
+function setEditIndex(newEditIndex: number | undefined): void {
   if (
     editIndex.value !== undefined &&
     dataIsEmpty(modelValueList.value[editIndex.value])

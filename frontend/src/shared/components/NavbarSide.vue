@@ -36,8 +36,7 @@ function getClassesForMenuItem(
   const { isDisabled } = menuItem
   const isActive = checkIfMenuItemIsActive(menuItem)
   const isParentActive =
-    "children" in menuItem &&
-    checkIfLevelOneItemIsExpanded(menuItem as LevelOneMenuItem)
+    "children" in menuItem && checkIfLevelOneItemIsExpanded(menuItem)
 
   return {
     disabled: isDisabled ?? false,
