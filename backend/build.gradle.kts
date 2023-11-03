@@ -244,7 +244,7 @@ dependencies {
     developmentOnly("org.springframework.boot:spring-boot-devtools")
     // => CVE-2023-20883
     implementation("org.springframework.boot:spring-boot-autoconfigure")
-    implementation("com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer:20211018.2")
+    implementation("com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer:20220608.1")
     // => CVE-2023-2976
     implementation("com.google.guava:guava:32.1.3-jre")
 
