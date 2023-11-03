@@ -137,18 +137,14 @@ test.describe("field of law", () => {
       ),
     ).toBeVisible()
     await expect(
-      page
-        .getByRole("button", {
-          name: "SR-07 Ordnungswidrigkeitenrecht entfernen",
-        })
-        .filter({ hasText: "delete_outline" }),
+      page.getByRole("button", {
+        name: "SR-07 Ordnungswidrigkeitenrecht aus Liste entfernen",
+      }),
     ).toBeVisible()
     await expect(
-      page
-        .getByRole("button", {
-          name: "SR-07 Ordnungswidrigkeitenrecht entfernen",
-        })
-        .filter({ hasText: "done" }),
+      page.getByRole("button", {
+        name: "SR-07 Ordnungswidrigkeitenrecht entfernen",
+      }),
     ).toBeVisible()
   })
 
@@ -178,18 +174,15 @@ test.describe("field of law", () => {
       .click()
 
     await expect(
-      page
-        .getByRole("button", {
-          name: "SR-07 Ordnungswidrigkeitenrecht entfernen",
-        })
-        .filter({ hasText: "done" }),
+      page.getByRole("button", {
+        name: "SR-07 Ordnungswidrigkeitenrecht entfernen",
+      }),
     ).toBeVisible()
 
     await page
       .getByRole("button", {
         name: "SR-07 Ordnungswidrigkeitenrecht entfernen",
       })
-      .filter({ hasText: "done" })
       .click()
 
     await expect(page.getByText("Die Liste ist aktuell leer")).toBeVisible()
@@ -229,9 +222,8 @@ test.describe("field of law", () => {
 
     await page
       .getByRole("button", {
-        name: "SR-07 Ordnungswidrigkeitenrecht entfernen",
+        name: "SR-07 Ordnungswidrigkeitenrecht aus Liste entfernen",
       })
-      .filter({ hasText: "delete_outline" })
       .click()
 
     await expect(page.getByText("Die Liste ist aktuell leer")).toBeVisible()
