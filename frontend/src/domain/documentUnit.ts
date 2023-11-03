@@ -1,8 +1,9 @@
 import ActiveCitation from "./activeCitation"
 import DocumentationOffice from "./documentationOffice"
 import DocumentUnitListEntry from "./documentUnitListEntry"
+import EnsuingDecision from "./ensuingDecision"
 import NormReference from "./normReference"
-import ProceedingDecision from "./proceedingDecision"
+import PreviousDecision from "./previousDecision"
 
 export type CoreData = {
   fileNumbers?: string[]
@@ -83,7 +84,8 @@ export default class DocumentUnit {
 
   public coreData: CoreData = {}
   public texts: Texts = {}
-  public proceedingDecisions?: ProceedingDecision[]
+  public previousDecisions?: PreviousDecision[]
+  public ensuingDecisions?: EnsuingDecision[]
   public contentRelatedIndexing: ContentRelatedIndexing = {}
 
   static requiredFields = [
@@ -112,9 +114,9 @@ export default class DocumentUnit {
         delete data.texts[textsField]
     }
 
-    if (data.proceedingDecisions)
-      data.proceedingDecisions = data.proceedingDecisions.map(
-        (decision) => new ProceedingDecision({ ...decision }),
+    if (data.previousDecisions)
+      data.previousDecisions = data.previousDecisions.map(
+        (decision) => new PreviousDecision({ ...decision }),
       )
 
     if (data.contentRelatedIndexing?.norms)

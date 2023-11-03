@@ -1,17 +1,17 @@
 <script lang="ts" setup>
 import { h, computed } from "vue"
 import { RouterLink } from "vue-router"
-import ProceedingDecisionInputGroup from "./ProceedingDecisionInputGroup.vue"
+import PreviousDecisionInputGroup from "./PreviousDecisionInputGroup.vue"
 import EditableList from "@/components/EditableListCaselaw.vue"
-import ProceedingDecision from "@/domain/proceedingDecision"
+import PreviousDecision from "@/domain/previousDecision"
 import { withSummarizer } from "@/shared/components/DataSetSummary.vue"
 
 const props = defineProps<{
-  modelValue: ProceedingDecision[] | undefined
+  modelValue: PreviousDecision[] | undefined
 }>()
 
 const emit = defineEmits<{
-  "update:modelValue": [value?: ProceedingDecision[]]
+  "update:modelValue": [value?: PreviousDecision[]]
 }>()
 
 const proceedingDecisions = computed({
@@ -22,9 +22,9 @@ const proceedingDecisions = computed({
     if (value) emit("update:modelValue", value)
   },
 })
-const defaultValue = new ProceedingDecision()
+const defaultValue = new PreviousDecision()
 
-function decisionSummarizer(dataEntry: ProceedingDecision) {
+function decisionSummarizer(dataEntry: PreviousDecision) {
   if (dataEntry.isReadOnly) {
     return h(
       RouterLink,
@@ -74,7 +74,7 @@ const DecisionSummary = withSummarizer(decisionSummarizer)
         <EditableList
           v-model="proceedingDecisions"
           :default-value="defaultValue"
-          :edit-component="ProceedingDecisionInputGroup"
+          :edit-component="PreviousDecisionInputGroup"
           :summary-component="DecisionSummary"
         />
       </div>

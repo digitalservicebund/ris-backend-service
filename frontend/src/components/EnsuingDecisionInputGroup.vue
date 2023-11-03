@@ -4,8 +4,8 @@ import SearchResultList, { SearchResults } from "./SearchResultList.vue"
 import ComboboxInput from "@/components/ComboboxInput.vue"
 import { useValidationStore } from "@/composables/useValidationStore"
 import values from "@/data/values.json"
+import EnsuingDecision from "@/domain/ensuingDecision"
 import LinkedDocumentUnit from "@/domain/linkedDocumentUnit"
-import ProceedingDecision from "@/domain/proceedingDecision"
 import ComboboxItemService from "@/services/comboboxItemService"
 import documentUnitService from "@/services/documentUnitService"
 import CheckboxInput from "@/shared/components/input/CheckboxInput.vue"
@@ -16,42 +16,42 @@ import TextInput from "@/shared/components/input/TextInput.vue"
 import Pagination, { Page } from "@/shared/components/Pagination.vue"
 
 const props = defineProps<{
-  modelValue?: ProceedingDecision
-  modelValueList?: ProceedingDecision[]
+  modelValue?: EnsuingDecision
+  modelValueList?: EnsuingDecision[]
 }>()
 
 const emit = defineEmits<{
-  "update:modelValue": [value: ProceedingDecision]
+  "update:modelValue": [value: EnsuingDecision]
   addEntry: [void]
 }>()
 
-const proceedingDecision = ref(new ProceedingDecision({ ...props.modelValue }))
+const ensuingDecision = ref(new EnsuingDecision({ ...props.modelValue }))
 const validationStore =
-  useValidationStore<(typeof ProceedingDecision.fields)[number]>()
+  useValidationStore<(typeof EnsuingDecision.fields)[number]>()
 const searchRunning = ref(false)
-const searchResultsCurrentPage = ref<Page<ProceedingDecision>>()
-const searchResults = ref<SearchResults<ProceedingDecision>>()
+const searchResultsCurrentPage = ref<Page<EnsuingDecision>>()
+const searchResults = ref<SearchResults<EnsuingDecision>>()
 
 async function search(page = 0) {
-  const proceedingDecisionRef = new ProceedingDecision({
-    ...proceedingDecision.value,
+  const ensuingDecisionRef = new EnsuingDecision({
+    ...ensuingDecision.value,
   })
 
   const response = await documentUnitService.searchByLinkedDocumentUnit(
     page,
     30,
-    proceedingDecisionRef,
+    ensuingDecisionRef,
   )
   if (response.data) {
     searchResultsCurrentPage.value = {
       ...response.data,
       content: response.data.content.map(
-        (decision) => new ProceedingDecision({ ...decision }),
+        (decision) => new EnsuingDecision({ ...decision }),
       ),
     }
     searchResults.value = response.data.content.map((searchResult) => {
       return {
-        decision: new ProceedingDecision({ ...searchResult }),
+        decision: new EnsuingDecision({ ...searchResult }),
         isLinked: searchResult.isLinkedWith(props.modelValueList),
       }
     })
@@ -66,27 +66,27 @@ function handleSearch() {
 
 async function validateRequiredInput() {
   validationStore.reset()
-  if (proceedingDecision.value.missingRequiredFields?.length) {
-    proceedingDecision.value.missingRequiredFields.forEach((missingField) => {
+  if (ensuingDecision.value.missingRequiredFields?.length) {
+    ensuingDecision.value.missingRequiredFields.forEach((missingField) => {
       validationStore.add("Pflichtfeld nicht befüllt", missingField)
     })
   }
 }
 
-async function addProceedingDecision() {
+async function addEnsuingDecision() {
   validateRequiredInput()
-  emit("update:modelValue", proceedingDecision.value as ProceedingDecision)
+  emit("update:modelValue", ensuingDecision.value as EnsuingDecision)
   emit("addEntry")
 }
 
-async function addProceedingDecisionFromSearch(decision: LinkedDocumentUnit) {
-  emit("update:modelValue", decision as ProceedingDecision)
+async function addEnsuingDecisionFromSearch(decision: LinkedDocumentUnit) {
+  emit("update:modelValue", decision as EnsuingDecision)
   emit("addEntry")
   scrollToTop()
 }
 
 function scrollToTop() {
-  const element = document.getElementById("proceedingDecisions")
+  const element = document.getElementById("ensuingDecisions")
   if (element) {
     const headerOffset = values.headerOffset
     const elementPosition = element?.getBoundingClientRect().top
@@ -102,18 +102,25 @@ function scrollToTop() {
 onMounted(() => {
   // On first mount, we don't need to validate. When the props.modelValue do not
   // have the isEmpty getter, we can be sure that it has not been initialized as
-  // ProceedingDecision and is therefore the inital load. As soons as we are using
+  // EnsuingDecision and is therefore the inital load. As soons as we are using
   // uuids, the check should be 'props.modelValue?.uuid !== undefined'
 
   if (props.modelValue?.isEmpty !== undefined) {
     validateRequiredInput()
   }
-  proceedingDecision.value = new ProceedingDecision({ ...props.modelValue })
+  ensuingDecision.value = new EnsuingDecision({ ...props.modelValue })
 })
 </script>
 
 <template>
   <div>
+    <InputField id="regularCheckbox" v-slot="{ id }" label="Prädikat">
+      <CheckboxInput
+        :id="id"
+        v-model="ensuingDecision.isPending"
+        aria-label="Prädikat"
+      />
+    </InputField>
     <div class="flex justify-between gap-24">
       <InputField
         id="court"
@@ -123,7 +130,7 @@ onMounted(() => {
       >
         <ComboboxInput
           id="court"
-          v-model="proceedingDecision.court"
+          v-model="ensuingDecision.court"
           aria-label="Gericht Rechtszug"
           clear-on-choosing-item
           :has-error="slotProps.hasError"
@@ -141,24 +148,13 @@ onMounted(() => {
         >
           <DateInput
             id="decisionDate"
-            v-model="proceedingDecision.decisionDate"
+            v-model="ensuingDecision.decisionDate"
             aria-label="Entscheidungsdatum Rechtszug"
-            :disabled="proceedingDecision.dateUnknown"
+            :disabled="ensuingDecision.isPending"
             :has-error="slotProps.hasError"
             @focus="validationStore.remove('decisionDate')"
             @update:validation-error="slotProps.updateValidationError"
           ></DateInput>
-        </InputField>
-        <InputField
-          id="regularCheckbox"
-          v-slot="{ id }"
-          label="Datum unbekannt"
-        >
-          <CheckboxInput
-            :id="id"
-            v-model="proceedingDecision.dateUnknown"
-            aria-label="Datum Unbekannt Rechtszug"
-          />
         </InputField>
       </div>
     </div>
@@ -173,7 +169,7 @@ onMounted(() => {
       >
         <TextInput
           id="fileNumber"
-          v-model="proceedingDecision.fileNumber"
+          v-model="ensuingDecision.fileNumber"
           aria-label="Aktenzeichen Rechtszug"
           :has-error="slotProps.hasError"
           placeholder="Aktenzeichen"
@@ -188,13 +184,30 @@ onMounted(() => {
       >
         <ComboboxInput
           id="documentType"
-          v-model="proceedingDecision.documentType"
+          v-model="ensuingDecision.documentType"
           aria-label="Dokumenttyp Rechtszug"
           :item-service="ComboboxItemService.getDocumentTypes"
           placeholder="Bitte auswählen"
         ></ComboboxInput>
       </InputField>
     </div>
+
+    <InputField
+      id="note"
+      v-slot="{ id, hasError }"
+      class="fake-input-group__row__field flex-col"
+      label="Vermerk"
+      :validation-error="validationStore.getByField('note')"
+    >
+      <TextInput
+        :id="id"
+        v-model="ensuingDecision.note"
+        aria-label="Vermerk"
+        :has-error="hasError"
+        placeholder="Vermerk"
+        @input="validationStore.remove('note')"
+      ></TextInput>
+    </InputField>
 
     <div>
       <TextButton
@@ -207,9 +220,9 @@ onMounted(() => {
       <TextButton
         aria-label="Vorgehende Entscheidung speichern"
         class="mr-28"
-        :disabled="proceedingDecision.isEmpty"
+        :disabled="ensuingDecision.isEmpty"
         label="Übernehmen"
-        @click="addProceedingDecision"
+        @click="addEnsuingDecision"
       />
     </div>
 
@@ -221,7 +234,7 @@ onMounted(() => {
       >
         <SearchResultList
           :search-results="searchResults"
-          @link-decision="addProceedingDecisionFromSearch"
+          @link-decision="addEnsuingDecisionFromSearch"
         />
       </Pagination>
     </div>

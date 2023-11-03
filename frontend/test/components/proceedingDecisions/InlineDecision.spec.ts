@@ -1,9 +1,9 @@
 import { render, screen } from "@testing-library/vue"
 import { createRouter, createWebHistory } from "vue-router"
-import InlineDecision from "@/components/proceedingDecisions/InlineDecision.vue"
+import InlineDecision from "@/components/InlineDecision.vue"
 import { Court, DocumentType } from "@/domain/documentUnit"
 import LinkedDocumentUnit from "@/domain/linkedDocumentUnit"
-import ProceedingDecision from "@/domain/proceedingDecision"
+import PreviousDecision from "@/domain/previousDecision"
 
 function renderComponent(options?: {
   court?: Court
@@ -12,8 +12,8 @@ function renderComponent(options?: {
   dataSource?: LinkedDocumentUnit["dataSource"]
   documentNumber?: string
 }) {
-  const props: { decision: ProceedingDecision } = {
-    decision: new ProceedingDecision({
+  const props: { decision: PreviousDecision } = {
+    decision: new PreviousDecision({
       ...{
         court: options?.court ?? {
           type: "testCourtType",

@@ -2,21 +2,24 @@ import dayjs from "dayjs"
 import EditableListItem from "./editableListItem"
 import LinkedDocumentUnit from "./linkedDocumentUnit"
 
-export default class ProceedingDecision
+export default class EnsuingDecision
   extends LinkedDocumentUnit
   implements EditableListItem
 {
-  public dateKnown = true
+  public isPending = false
+  public note: string | undefined
 
   static requiredFields = ["fileNumber", "court", "decisionDate"] as const
   static fields = [
+    "isPending",
     "fileNumber",
     "court",
     "decisionDate",
     "documentType",
+    "note",
   ] as const
 
-  constructor(data: Partial<ProceedingDecision> = {}) {
+  constructor(data: Partial<EnsuingDecision> = {}) {
     super()
     Object.assign(this, data)
   }
@@ -27,20 +30,13 @@ export default class ProceedingDecision
       ...(this.decisionDate
         ? [dayjs(this.decisionDate).format("DD.MM.YYYY")]
         : []),
-      ...(this.dateUnknown === true ? ["unbekanntes Entscheidungsdatum"] : []),
+      ...(this.isPending === true ? ["anhängig"] : []),
       ...(this.fileNumber ? [this.fileNumber] : []),
       ...(this.documentType ? [this.documentType?.jurisShortcut] : []),
       ...(this.documentNumber && this.hasForeignSource
         ? [this.documentNumber]
         : []),
     ].join(", ")
-  }
-
-  get dateUnknown(): boolean {
-    return !this.dateKnown
-  }
-  set dateUnknown(dateUnknown: boolean) {
-    this.dateKnown = !dateUnknown
   }
 
   get hasMissingRequiredFields(): boolean {
@@ -52,7 +48,7 @@ export default class ProceedingDecision
   }
 
   get missingRequiredFields() {
-    return ProceedingDecision.requiredFields.filter((field) =>
+    return EnsuingDecision.requiredFields.filter((field) =>
       this.fieldIsEmpty(field, this[field]),
     )
   }
@@ -60,7 +56,7 @@ export default class ProceedingDecision
   get isEmpty(): boolean {
     let isEmpty = true
 
-    ProceedingDecision.fields.map((field) => {
+    EnsuingDecision.fields.map((field) => {
       if (!this.fieldIsEmpty(field, this[field])) {
         isEmpty = false
       }
@@ -69,8 +65,8 @@ export default class ProceedingDecision
   }
 
   private fieldIsEmpty(
-    fieldName: keyof ProceedingDecision,
-    value: ProceedingDecision[(typeof ProceedingDecision.fields)[number]],
+    fieldName: keyof EnsuingDecision,
+    value: EnsuingDecision[(typeof EnsuingDecision.fields)[number]],
   ) {
     if (fieldName === "decisionDate" && !value && !this.dateKnown) {
       return false
@@ -88,7 +84,7 @@ export default class ProceedingDecision
   }
 }
 
-export const proceedingDecisionFieldLabels: { [name: string]: string } = {
+export const ensuingDecisionFieldLabels: { [name: string]: string } = {
   court: "Gericht",
   decisionDate: "Entscheidungsdatum",
   fileNumber: "Aktenzeichen",

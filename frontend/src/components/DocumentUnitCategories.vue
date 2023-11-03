@@ -5,13 +5,15 @@ import DocumentUnitContentRelatedIndexing from "@/components/DocumentUnitContent
 import DocumentUnitCoreData from "@/components/DocumentUnitCoreData.vue"
 import DocumentUnitTexts from "@/components/DocumentUnitTexts.vue"
 import DocumentUnitWrapper from "@/components/DocumentUnitWrapper.vue"
+import EnsuingDecisions from "@/components/EnsuingDecisions.vue"
 import OriginalFileSidePanel from "@/components/OriginalFileSidePanel.vue"
-import DocumentUnitProceedingDecision from "@/components/proceedingDecisions/ProceedingDecisions.vue"
+import PreviousDecisions from "@/components/PreviousDecisions.vue"
 import SaveButton from "@/components/SaveDocumentUnitButton.vue"
 import { useScrollToHash } from "@/composables/useScrollToHash"
 import { useToggleStateInRouteQuery } from "@/composables/useToggleStateInRouteQuery"
 import DocumentUnit, { Texts, CoreData } from "@/domain/documentUnit"
-import ProceedingDecision from "@/domain/proceedingDecision"
+import EnsuingDecision from "@/domain/ensuingDecision"
+import PreviousDecision from "@/domain/previousDecision"
 import documentUnitService from "@/services/documentUnitService"
 import fileService from "@/services/fileService"
 import { ServiceResponse } from "@/services/httpClient"
@@ -110,11 +112,17 @@ const coreData = computed({
   },
 })
 
-const proceedingDecisions = computed({
-  get: () =>
-    updatedDocumentUnit.value.proceedingDecisions as ProceedingDecision[],
+const previousDecisions = computed({
+  get: () => updatedDocumentUnit.value.previousDecisions as PreviousDecision[],
   set: (newValues) => {
-    updatedDocumentUnit.value.proceedingDecisions = newValues
+    updatedDocumentUnit.value.previousDecisions = newValues
+  },
+})
+
+const ensuingDecisions = computed({
+  get: () => updatedDocumentUnit.value.ensuingDecisions as EnsuingDecision[],
+  set: (newValues) => {
+    updatedDocumentUnit.value.ensuingDecisions = newValues
   },
 })
 
@@ -167,7 +175,8 @@ onMounted(async () => {
             "
           />
 
-          <DocumentUnitProceedingDecision v-model="proceedingDecisions" />
+          <PreviousDecisions v-model="previousDecisions" />
+          <EnsuingDecisions v-model="ensuingDecisions" />
 
           <DocumentUnitContentRelatedIndexing
             id="contentRelatedIndexing"

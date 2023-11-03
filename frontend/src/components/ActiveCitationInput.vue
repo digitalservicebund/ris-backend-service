@@ -1,8 +1,6 @@
 <script lang="ts" setup>
 import { computed, onMounted, ref, watch } from "vue"
-import SearchResultList, {
-  SearchResults,
-} from "./proceedingDecisions/SearchResultList.vue"
+import SearchResultList, { SearchResults } from "./SearchResultList.vue"
 import ComboboxInput from "@/components/ComboboxInput.vue"
 import { useValidationStore } from "@/composables/useValidationStore"
 import values from "@/data/values.json"

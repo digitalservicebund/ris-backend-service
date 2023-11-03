@@ -1,4 +1,4 @@
-import ProceedingDecision from "@/domain/proceedingDecision"
+import ProceedingDecision from "@/domain/previousDecision"
 import { ServiceResponse } from "@/services/httpClient"
 import service from "@/services/proceedingDecisionService"
 

@@ -2,9 +2,9 @@ import { userEvent } from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
 import SearchResultList, {
   SearchResults,
-} from "@/components/proceedingDecisions/SearchResultList.vue"
+} from "@/components/SearchResultList.vue"
 import ActiveCitation from "@/domain/activeCitation"
-import ProceedingDecision from "@/domain/proceedingDecision"
+import ProceedingDecision from "@/domain/previousDecision"
 
 function renderSearchResults(
   searchResults?: SearchResults<ProceedingDecision | ActiveCitation>,

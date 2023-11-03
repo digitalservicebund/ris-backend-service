@@ -1,6 +1,6 @@
 import httpClient, { ServiceResponse } from "./httpClient"
 import DocumentUnit from "@/domain/documentUnit"
-import ProceedingDecision from "@/domain/proceedingDecision"
+import ProceedingDecision from "@/domain/previousDecision"
 import errorMessages from "@/shared/i18n/errors.json"
 
 interface ProceedingDecisionService {
