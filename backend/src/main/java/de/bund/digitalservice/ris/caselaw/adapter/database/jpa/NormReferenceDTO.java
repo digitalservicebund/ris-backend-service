@@ -42,6 +42,4 @@ public class NormReferenceDTO {
 
   @Column(name = "legacy_doc_unit_id")
   UUID legacyDocUnitId;
-
-  // @ManyToOne @NotNull DocumentUnitDTO documentUnit;
 }

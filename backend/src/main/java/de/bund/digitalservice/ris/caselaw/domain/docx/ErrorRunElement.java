@@ -3,7 +3,7 @@ package de.bund.digitalservice.ris.caselaw.domain.docx;
 import org.springframework.beans.factory.annotation.Value;
 
 public class ErrorRunElement extends ErrorElement implements RunElement {
-  @Value("error.nodes.active")
+  @Value("${error.nodes.active}")
   private boolean active;
 
   public ErrorRunElement(String name) {
