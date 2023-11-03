@@ -27,9 +27,9 @@ const keywords = computed({
       <div class="flex-1">
         <KeywordsChipsInput
           id="keywords"
+          v-model="keywords"
           aria-label="Schlagwörter"
           :error="errorMessage"
-          :model-value="keywords"
         ></KeywordsChipsInput>
       </div>
     </div>
