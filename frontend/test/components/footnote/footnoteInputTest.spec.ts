@@ -1,6 +1,5 @@
 import { render, screen } from "@testing-library/vue"
 import { flushPromises } from "@vue/test-utils"
-import { describe, test } from "vitest"
 import FootnoteInput from "@/components/footnote/FootnoteInput.vue"
 import { Footnote } from "@/components/footnote/types"
 
