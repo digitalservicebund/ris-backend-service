@@ -60,8 +60,7 @@ public class SecurityConfig {
                             referrerPolicySpec.policy(
                                 ReferrerPolicyServerHttpHeadersWriter.ReferrerPolicy
                                     .STRICT_ORIGIN_WHEN_CROSS_ORIGIN))
-                    .permissionsPolicy(
-                        permissionsPolicySpec -> permissionsPolicySpec.policy("* 'none'")))
+                    .permissionsPolicy(permissionsPolicySpec -> permissionsPolicySpec.policy("*")))
         .oauth2ResourceServer(jwtCustomizer -> jwtCustomizer.jwt(Customizer.withDefaults()))
         .build();
   }
