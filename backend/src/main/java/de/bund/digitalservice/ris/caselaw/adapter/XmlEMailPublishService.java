@@ -24,7 +24,9 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -42,6 +44,8 @@ public class XmlEMailPublishService implements EmailPublishService {
 
   @Value("${mail.exporter.senderAddress:export.test@neuris}")
   private String senderAddress;
+
+  @Autowired private Environment env;
 
   public XmlEMailPublishService(
       XmlExporter xmlExporter, HttpMailSender mailSender, XmlPublicationRepository repository) {
@@ -83,11 +87,15 @@ public class XmlEMailPublishService implements EmailPublishService {
         LocalDate.now(Clock.system(ZoneId.of("Europe/Berlin"))).format(DATE_FORMATTER);
 
     String subject = "id=juris";
-    subject += " name=NeuRIS";
+    if (env.matchesProfiles("production")) {
+      subject += " name=NeuRIS";
+    } else {
+      subject += " name=neuris-test";
+      subject += " mod=T";
+    }
     subject += " da=R";
     subject += " df=X";
     subject += " dt=N";
-    subject += " mod=T";
     subject += " ld=" + deliveryDate;
     subject += " vg=";
     subject += documentUnit.documentNumber();
@@ -151,6 +159,9 @@ public class XmlEMailPublishService implements EmailPublishService {
   }
 
   private DocumentUnit getTestDocumentUnit(DocumentUnit documentUnit) {
+    if (env.matchesProfiles("production")) {
+      return documentUnit;
+    }
     return documentUnit.toBuilder()
         .coreData(
             Optional.ofNullable(documentUnit.coreData())
