@@ -22,7 +22,7 @@ plugins {
     id("com.gorylenko.gradle-git-properties") version "2.4.1"
     id("com.adarshr.test-logger") version "3.2.0"
     id("com.github.ben-manes.versions") version "0.47.0"
-    id("org.jetbrains.dokka") version "1.8.20"
+    id("org.jetbrains.dokka") version "1.9.10"
     id("io.franzbecker.gradle-lombok") version "5.0.0"
     id("org.flywaydb.flyway") version "9.21.1"
 }
