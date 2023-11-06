@@ -20,6 +20,7 @@ public record DocumentUnit(
     String filename,
     @Valid CoreData coreData,
     List<PreviousDecision> previousDecisions,
+    List<EnsuingDecision> ensuingDecisions,
     Texts texts,
     DocumentUnitStatus status,
     ContentRelatedIndexing contentRelatedIndexing) {}
