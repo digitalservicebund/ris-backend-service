@@ -245,7 +245,7 @@ dependencies {
     testImplementation("io.projectreactor:reactor-test:3.5.3")
     // => CVE-2023-34034
     testImplementation("org.springframework.security:spring-security-test:6.1.2")
-    testImplementation("com.tngtech.archunit:archunit-junit5:1.0.1")
+    testImplementation("com.tngtech.archunit:archunit-junit5:1.2.0")
     testImplementation("org.mockito:mockito-junit-jupiter:5.7.0")
     testImplementation("org.testcontainers:testcontainers:$testContainersVersion")
     testImplementation("org.testcontainers:junit-jupiter:$testContainersVersion")
