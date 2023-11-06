@@ -12,9 +12,6 @@ import org.springframework.security.oauth2.jwt.ReactiveJwtDecoder;
 import org.springframework.security.oauth2.jwt.ReactiveJwtDecoders;
 import org.springframework.security.web.server.SecurityWebFilterChain;
 import org.springframework.security.web.server.authentication.HttpStatusServerEntryPoint;
-import org.springframework.security.web.server.header.ReferrerPolicyServerHttpHeadersWriter;
-import org.springframework.security.web.server.header.XContentTypeOptionsServerHttpHeadersWriter;
-import org.springframework.security.web.server.header.XFrameOptionsServerHttpHeadersWriter;
 
 @Configuration
 @EnableWebFluxSecurity
@@ -46,21 +43,23 @@ public class SecurityConfig {
         .csrf(ServerHttpSecurity.CsrfSpec::disable)
         .headers(
             headers ->
-                headers
-                    .contentSecurityPolicy(
-                        customizer ->
-                            customizer.policyDirectives(
-                                "default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'"))
-                    .writer(new XContentTypeOptionsServerHttpHeadersWriter())
-                    .frameOptions(
-                        frameOptions ->
-                            frameOptions.mode(XFrameOptionsServerHttpHeadersWriter.Mode.SAMEORIGIN))
-                    .referrerPolicy(
-                        referrerPolicySpec ->
-                            referrerPolicySpec.policy(
-                                ReferrerPolicyServerHttpHeadersWriter.ReferrerPolicy
-                                    .STRICT_ORIGIN_WHEN_CROSS_ORIGIN))
-                    .permissionsPolicy(permissionsPolicySpec -> permissionsPolicySpec.policy("*")))
+                headers.contentSecurityPolicy(
+                    customizer ->
+                        customizer.policyDirectives(
+                            "default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'"))
+            //                    .writer(new XContentTypeOptionsServerHttpHeadersWriter())
+            //                    .frameOptions(
+            //                        frameOptions ->
+            //
+            // frameOptions.mode(XFrameOptionsServerHttpHeadersWriter.Mode.SAMEORIGIN))
+            //                    .referrerPolicy(
+            //                        referrerPolicySpec ->
+            //                            referrerPolicySpec.policy(
+            //                                ReferrerPolicyServerHttpHeadersWriter.ReferrerPolicy
+            //                                    .STRICT_ORIGIN_WHEN_CROSS_ORIGIN))
+            //                    .permissionsPolicy(permissionsPolicySpec ->
+            // permissionsPolicySpec.policy("*"))
+            )
         .oauth2ResourceServer(jwtCustomizer -> jwtCustomizer.jwt(Customizer.withDefaults()))
         .build();
   }
