@@ -11,6 +11,7 @@ import static org.mockito.Mockito.when;
 
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.domain.Attachment;
+import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitPublishException;
 import de.bund.digitalservice.ris.caselaw.domain.HttpMailSender;
@@ -18,6 +19,7 @@ import de.bund.digitalservice.ris.caselaw.domain.XmlExporter;
 import de.bund.digitalservice.ris.caselaw.domain.XmlPublication;
 import de.bund.digitalservice.ris.caselaw.domain.XmlPublicationRepository;
 import de.bund.digitalservice.ris.caselaw.domain.XmlResultObject;
+import de.bund.digitalservice.ris.caselaw.domain.court.Court;
 import java.time.Clock;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -53,6 +55,7 @@ class XmlEMailPublishServiceTest {
       "id=juris name=neuris-test mod=T da=R df=X dt=N ld="
           + DELIVER_DATE
           + " vg=test-document-number";
+
   private static final UUID TEST_UUID = UUID.fromString("88888888-4444-4444-4444-121212121212");
   private static final XmlPublication EXPECTED_BEFORE_SAVE =
       XmlPublication.builder()
@@ -65,6 +68,7 @@ class XmlEMailPublishServiceTest {
           .fileName("test.xml")
           .publishDate(PUBLISH_DATE)
           .build();
+
   private static final XmlPublication SAVED_XML_MAIL =
       XmlPublication.builder()
           .documentUnitUuid(TEST_UUID)
@@ -76,6 +80,7 @@ class XmlEMailPublishServiceTest {
           .fileName("test.xml")
           .publishDate(PUBLISH_DATE)
           .build();
+
   private static final XmlPublication EXPECTED_RESPONSE = SAVED_XML_MAIL;
   private static final XmlResultObject FORMATTED_XML =
       new XmlResultObject("xml", "200", List.of("succeed"), "test.xml", PUBLISH_DATE);
@@ -102,13 +107,27 @@ class XmlEMailPublishServiceTest {
   }
 
   @Test
-  void testPublish() {
+  void testPublish() throws ParserConfigurationException, TransformerException {
     StepVerifier.create(service.publish(documentUnit, RECEIVER_ADDRESS))
         .consumeNextWith(
             response ->
                 assertThat(response).usingRecursiveComparison().isEqualTo(EXPECTED_RESPONSE))
         .verifyComplete();
 
+    verify(xmlExporter)
+        .generateXml(
+            documentUnit.toBuilder()
+                .coreData(
+                    CoreData.builder()
+                        .court(
+                            Court.builder()
+                                .label("VGH Mannheim")
+                                .location("Mannheim")
+                                .type("VGH")
+                                .build())
+                        .fileNumbers(List.of("TEST"))
+                        .build())
+                .build());
     verify(repository).save(EXPECTED_BEFORE_SAVE);
     verify(mailSender)
         .sendMail(
