@@ -1,5 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.adapter.transformer;
 
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ActiveCitationDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DeviatingCourtDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DeviatingDateDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DeviatingEcliDTO;
@@ -216,11 +217,12 @@ public class DocumentationUnitTransformer {
 
       List<ActiveCitation> activeCitations = contentRelatedIndexing.activeCitations();
       if (activeCitations != null && !activeCitations.isEmpty()) {
-        builder.activeCitations(
-            activeCitations.stream()
-                .map(ActiveCitationTransformer::transformToDTO)
-                .filter(Objects::nonNull)
-                .toList());
+        List<ActiveCitationDTO> activeCitationsDTOs = new ArrayList<>();
+        for (int i = 0; i < activeCitations.size(); i++) {
+          activeCitationsDTOs.add(
+              ActiveCitationTransformer.transformToDTO(activeCitations.get(i), i + 1));
+        }
+        builder.activeCitations(activeCitationsDTOs.stream().filter(Objects::nonNull).toList());
       }
     }
 
@@ -376,15 +378,15 @@ public class DocumentationUnitTransformer {
       contentRelatedIndexingBuilder.norms(norms);
     }
 
-    if (documentationUnitDTO.getActiveCitations() != null) {
-      List<ActiveCitation> activeCitations = null;
-
-      activeCitations =
-          documentationUnitDTO.getActiveCitations().stream()
-              .map(ActiveCitationTransformer::transformToDomain)
-              .toList();
-
-      contentRelatedIndexingBuilder.activeCitations(activeCitations);
+    List<ActiveCitationDTO> activeCitationDTOS = documentationUnitDTO.getActiveCitations();
+    if (activeCitationDTOS != null) {
+      ActiveCitation[] activeCitations = new ActiveCitation[activeCitationDTOS.size()];
+      for (int i = 0; i < activeCitationDTOS.size(); i++) {
+        ActiveCitationDTO currentDTO = activeCitationDTOS.get(i);
+        activeCitations[currentDTO.getRank() - 1] =
+            ActiveCitationTransformer.transformToDomain(currentDTO);
+      }
+      contentRelatedIndexingBuilder.activeCitations(Arrays.stream(activeCitations).toList());
     }
 
     ContentRelatedIndexing contentRelatedIndexing = contentRelatedIndexingBuilder.build();
@@ -419,13 +421,13 @@ public class DocumentationUnitTransformer {
 
     List<PreviousDecisionDTO> previousDecisionDTOS = documentationUnitDTO.getPreviousDecisions();
     if (previousDecisionDTOS != null) {
-      List<PreviousDecision> previousDecisions = new ArrayList<>();
+      PreviousDecision[] previousDecisions = new PreviousDecision[previousDecisionDTOS.size()];
       for (int i = 0; i < previousDecisionDTOS.size(); i++) {
         PreviousDecisionDTO currentDTO = previousDecisionDTOS.get(i);
-        previousDecisions.add(
-            currentDTO.getRank(), PreviousDecisionTransformer.transformToDomain(currentDTO));
+        previousDecisions[currentDTO.getRank() - 1] =
+            PreviousDecisionTransformer.transformToDomain(currentDTO);
       }
-      builder.previousDecisions(previousDecisions);
+      builder.previousDecisions(Arrays.stream(previousDecisions).toList());
     }
 
     List<EnsuingDecisionDTO> ensuingDecisionDTOs = documentationUnitDTO.getEnsuingDecisions();
@@ -444,7 +446,7 @@ public class DocumentationUnitTransformer {
       if (pendingDecisionDTOs != null) {
         for (int i = 0; i < pendingDecisionDTOs.size(); i++) {
           PendingDecisionDTO currentDTO = pendingDecisionDTOs.get(i);
-          ensuingDecisions[currentDTO.getRank()] =
+          ensuingDecisions[currentDTO.getRank() - 1] =
               PendingDecisionTransformer.transformToDomain(currentDTO);
         }
       }

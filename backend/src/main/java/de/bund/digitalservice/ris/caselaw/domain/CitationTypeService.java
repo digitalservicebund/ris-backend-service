@@ -2,10 +2,10 @@ package de.bund.digitalservice.ris.caselaw.domain;
 
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.citation.CitationType;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.citation.CitationTypeRepository;
+import java.util.List;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import reactor.core.publisher.Flux;
 
 @Service
 @Slf4j
@@ -17,11 +17,11 @@ public class CitationTypeService {
     this.citationTypeRepository = citationTypeRepository;
   }
 
-  public Flux<CitationType> getCitationStyles(Optional<String> searchStr) {
+  public List<CitationType> getCitationStyles(Optional<String> searchStr) {
     if (searchStr.isPresent() && !searchStr.get().isBlank()) {
-      return Flux.just(citationTypeRepository.findBySearchStr(searchStr.get().trim()));
+      return citationTypeRepository.findBySearchStr(searchStr.get().trim());
     }
 
-    return Flux.just(citationTypeRepository.findAllByOrderByCitationDocumentTypeAsc());
+    return citationTypeRepository.findAllByOrderByCitationDocumentTypeAsc();
   }
 }

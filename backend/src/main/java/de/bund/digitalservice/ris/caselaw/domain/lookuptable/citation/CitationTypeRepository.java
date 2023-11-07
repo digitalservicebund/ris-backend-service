@@ -1,10 +1,11 @@
 package de.bund.digitalservice.ris.caselaw.domain.lookuptable.citation;
 
+import java.util.List;
 import org.springframework.data.repository.NoRepositoryBean;
 
 @NoRepositoryBean
 public interface CitationTypeRepository {
-  CitationType findBySearchStr(String searchString);
+  List<CitationType> findBySearchStr(String searchString);
 
-  CitationType findAllByOrderByCitationDocumentTypeAsc();
+  List<CitationType> findAllByOrderByCitationDocumentTypeAsc();
 }

@@ -3,7 +3,7 @@ import { render, screen } from "@testing-library/vue"
 import { createPinia, setActivePinia } from "pinia"
 import ActiveCitations from "@/components/ActiveCitations.vue"
 import ActiveCitation from "@/domain/activeCitation"
-import { CitationStyle } from "@/domain/citationStyle"
+import { CitationType } from "@/domain/citationType"
 import { Court, DocumentType } from "@/domain/documentUnit"
 import comboboxItemService from "@/services/comboboxItemService"
 import documentUnitService from "@/services/documentUnitService"
@@ -34,7 +34,7 @@ function generateActiveCitation(options?: {
   decisionDate?: string
   fileNumber?: string
   documentType?: DocumentType
-  citationStyle?: CitationStyle
+  citationStyle?: CitationType
 }) {
   const activeCitation = new ActiveCitation({
     uuid: options?.uuid ?? "123",
@@ -50,7 +50,7 @@ function generateActiveCitation(options?: {
       jurisShortcut: "documentTypeShortcut1",
       label: "documentType1",
     },
-    citationStyle: options?.citationStyle ?? {
+    citationType: options?.citationStyle ?? {
       uuid: "123",
       jurisShortcut: "Änderungen",
       label: "Änderungen",
@@ -112,7 +112,7 @@ describe("Active Citations", () => {
     label: "EuGH-Vorlage",
   }
 
-  const citationStyle: CitationStyle = {
+  const citationStyle: CitationType = {
     uuid: "123",
     jurisShortcut: "Änderungen",
     label: "Änderungen",
@@ -149,7 +149,7 @@ describe("Active Citations", () => {
     Promise.resolve({ status: 200, data: dropdownDocumentTypesItems }),
   )
 
-  vi.spyOn(comboboxItemService, "getCitationStyles").mockImplementation(() =>
+  vi.spyOn(comboboxItemService, "getCitationTypes").mockImplementation(() =>
     Promise.resolve({ status: 200, data: dropdownCitationStyleItems }),
   )
 

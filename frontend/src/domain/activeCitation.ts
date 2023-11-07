@@ -1,5 +1,5 @@
 import dayjs from "dayjs"
-import { CitationStyle } from "./citationStyle"
+import { CitationType } from "./citationType"
 import EditableListItem from "./editableListItem"
 import RelatedDocumentation from "./relatedDocumentation"
 
@@ -7,17 +7,17 @@ export default class ActiveCitation
   extends RelatedDocumentation
   implements EditableListItem
 {
-  public citationStyle?: CitationStyle
+  public citationType?: CitationType
 
   static requiredFields = [
-    "citationStyle",
+    "citationType",
     "fileNumber",
     "court",
     "decisionDate",
   ] as const
 
   static fields = [
-    "citationStyle",
+    "citationType",
     "fileNumber",
     "court",
     "decisionDate",
@@ -31,7 +31,7 @@ export default class ActiveCitation
 
   get renderDecision(): string {
     return [
-      ...(this.citationStyle?.label ? [this.citationStyle.label] : []),
+      ...(this.citationType?.label ? [this.citationType.label] : []),
       ...(this.court?.label ? [`${this.court?.label}`] : []),
       ...(this.decisionDate
         ? [dayjs(this.decisionDate).format("DD.MM.YYYY")]
@@ -64,8 +64,8 @@ export default class ActiveCitation
     return false
   }
 
-  get citationStyleIsSet(): boolean {
-    return !!this.citationStyle?.uuid
+  get citationTypeIsSet(): boolean {
+    return !!this.citationType?.uuid
   }
 
   private fieldIsEmpty(
@@ -76,7 +76,7 @@ export default class ActiveCitation
 }
 
 export const activeCitationLabels: { [name: string]: string } = {
-  citationStyle: "Art der Zitierung",
+  citationType: "Art der Zitierung",
   fileNumber: "Aktenzeichen",
   court: "Gericht",
   decisionDate: "Entscheidungsdatum",

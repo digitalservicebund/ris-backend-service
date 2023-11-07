@@ -34,7 +34,7 @@ public class ActiveCitationTransformer extends RelatedDocumentationUnitTransform
         .build();
   }
 
-  public static ActiveCitationDTO transformToDTO(ActiveCitation activeCitation) {
+  public static ActiveCitationDTO transformToDTO(ActiveCitation activeCitation, Integer rank) {
     if (activeCitation.hasNoValues()) {
       return null;
     }
@@ -46,7 +46,8 @@ public class ActiveCitationTransformer extends RelatedDocumentationUnitTransform
             .date(activeCitation.getDecisionDate())
             .documentNumber(activeCitation.getDocumentNumber())
             .documentType(getDocumentTypeFromDomain(activeCitation.getDocumentType()))
-            .fileNumber(getFileNumber(activeCitation.getFileNumber()));
+            .fileNumber(getFileNumber(activeCitation.getFileNumber()))
+            .rank(rank);
 
     CitationType citationType = activeCitation.getCitationType();
 

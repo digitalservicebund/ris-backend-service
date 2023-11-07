@@ -1,5 +1,5 @@
 import httpClient, { ServiceResponse } from "./httpClient"
-import { CitationStyle } from "@/domain/citationStyle"
+import { CitationType } from "@/domain/citationType"
 import { Court, Procedure } from "@/domain/documentUnit"
 import { FieldOfLawNode } from "@/domain/fieldOfLaw"
 import { NormAbbreviation } from "@/domain/normAbbreviation"
@@ -13,7 +13,7 @@ import errorMessages from "@/shared/i18n/errors.json"
 enum Endpoint {
   documentTypes = "lookuptable/documentTypes",
   courts = "courts",
-  citationStyles = "lookuptable/zitart",
+  citationTypes = "citationtypes",
   fieldOfLawSearchByIdentifier = "fieldsoflaw/search-by-identifier",
   risAbbreviations = `normabbreviation?pg=0&sz=30`,
   risAbbreviationsAwesome = `normabbreviation/search?pg=0&sz=30`,
@@ -60,8 +60,8 @@ function formatDropdownItems(
         additionalInformation: item.officialLongTitle,
       }))
     }
-    case Endpoint.citationStyles: {
-      return (responseData as CitationStyle[]).map((item) => ({
+    case Endpoint.citationTypes: {
+      return (responseData as CitationType[]).map((item) => ({
         label: item.label,
         value: item,
         additionalInformation: item.jurisShortcut,
@@ -137,8 +137,8 @@ const service: ComboboxItemService = {
     await fetchFromEndpoint(Endpoint.risAbbreviations, filter),
   getRisAbbreviationsAwesome: async (filter?: string) =>
     await fetchFromEndpoint(Endpoint.risAbbreviationsAwesome, filter),
-  getCitationStyles: async (filter?: string) =>
-    await fetchFromEndpoint(Endpoint.citationStyles, filter),
+  getCitationTypes: async (filter?: string) =>
+    await fetchFromEndpoint(Endpoint.citationTypes, filter),
   getProcedures: async (filter?: string) =>
     await fetchFromEndpoint(Endpoint.procedures, filter, 10),
 }

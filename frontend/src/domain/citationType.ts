@@ -1,4 +1,4 @@
-export type CitationStyle = {
+export type CitationType = {
   label: string
   uuid?: string
   jurisShortcut?: string
