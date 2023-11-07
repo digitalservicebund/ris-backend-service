@@ -14,7 +14,7 @@ plugins {
     jacoco
     kotlin("jvm") version "1.9.0"
     kotlin("plugin.spring") version "1.8.22"
-    id("org.springframework.boot") version "3.1.1"
+    id("org.springframework.boot") version "3.1.5"
     id("io.spring.dependency-management") version "1.1.0"
     id("com.diffplug.spotless") version "6.22.0"
     id("org.sonarqube") version "4.4.1.3373"
@@ -168,7 +168,7 @@ dependencies {
     // CVE-2022-3171
     implementation("com.google.protobuf:protobuf-java:3.25.0")
     // => CVE-2021-37136, CVE-2021-37137, CVE-2021-43797
-    implementation("io.netty:netty-all:4.1.94.Final") {
+    implementation("io.netty:netty-all:4.1.100.Final") {
         exclude(group = "io.netty", module = "netty-tcnative-classes")
         because("CVE-2021-43797, not using Tomcat")
     }
