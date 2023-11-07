@@ -1,14 +1,13 @@
 import { userEvent } from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
 import { createPinia, setActivePinia } from "pinia"
-import ProceedingDecisions from "@/components/proceedingDecisions/ProceedingDecisions.vue"
 import { Court, DocumentType } from "@/domain/documentUnit"
-import ProceedingDecision from "@/domain/previousDecision"
+import PreviousDecision from "@/domain/previousDecision"
 import comboboxItemService from "@/services/comboboxItemService"
 import documentUnitService from "@/services/documentUnitService"
 import { ComboboxItem } from "@/shared/components/input/types"
 
-function renderComponent(options?: { modelValue?: ProceedingDecision[] }) {
+function renderComponent(options?: { modelValue?: PreviousDecision[] }) {
   const props = {
     modelValue: options?.modelValue ? options?.modelValue : [],
   }
@@ -17,7 +16,7 @@ function renderComponent(options?: { modelValue?: ProceedingDecision[] }) {
   const user = userEvent.setup()
   return {
     user,
-    ...render(ProceedingDecisions, {
+    ...render(PreviousDecision, {
       props,
       global: {
         stubs: { routerLink: { template: "<a><slot/></a>" } },
@@ -26,21 +25,16 @@ function renderComponent(options?: { modelValue?: ProceedingDecision[] }) {
   }
 }
 
-function generateProceedingDecision(options?: {
+function generatePreviousDecision(options?: {
   uuid?: string
   documentNumber?: string
   court?: Court
   decisionDate?: string
   fileNumber?: string
   documentType?: DocumentType
-  dataSource?:
-    | "NEURIS"
-    | "MIGRATION"
-    | "PROCEEDING_DECISION"
-    | "ACTIVE_CITATION"
   dateKnown?: boolean
 }) {
-  const activeCitation = new ProceedingDecision({
+  const activeCitation = new PreviousDecision({
     uuid: options?.uuid ?? "123",
     documentNumber: "ABC",
     court: options?.court ?? {
@@ -54,26 +48,25 @@ function generateProceedingDecision(options?: {
       jurisShortcut: "documentTypeShortcut1",
       label: "documentType1",
     },
-    dataSource: options?.dataSource ?? "NEURIS",
     dateKnown: options?.dateKnown ?? true,
   })
   return activeCitation
 }
 
-describe("ProceedingDecisions", () => {
+describe("PreviousDecisions", () => {
   beforeEach(async () => {
     setActivePinia(createPinia())
   })
 
   vi.spyOn(
     documentUnitService,
-    "searchByLinkedDocumentUnit",
+    "searchByRelatedDocumentation",
   ).mockImplementation(() =>
     Promise.resolve({
       status: 200,
       data: {
         content: [
-          new ProceedingDecision({
+          new PreviousDecision({
             uuid: "123",
             court: {
               type: "type1",
@@ -152,9 +145,9 @@ describe("ProceedingDecisions", () => {
   })
 
   it("renders proceedingDecisions as list entries", () => {
-    const modelValue: ProceedingDecision[] = [
-      generateProceedingDecision({ fileNumber: "123" }),
-      generateProceedingDecision({ fileNumber: "345" }),
+    const modelValue: PreviousDecision[] = [
+      generatePreviousDecision({ fileNumber: "123" }),
+      generatePreviousDecision({ fileNumber: "345" }),
     ]
     renderComponent({ modelValue })
 
@@ -178,9 +171,8 @@ describe("ProceedingDecisions", () => {
   it("click on edit icon, opens the list entry in edit mode", async () => {
     const { user } = renderComponent({
       modelValue: [
-        generateProceedingDecision({
+        generatePreviousDecision({
           fileNumber: "123",
-          dataSource: "PROCEEDING_DECISION",
         }),
       ],
     })
@@ -198,22 +190,14 @@ describe("ProceedingDecisions", () => {
 
   it("renders manually added decision as editable list item", async () => {
     renderComponent({
-      modelValue: [
-        generateProceedingDecision({
-          dataSource: "PROCEEDING_DECISION",
-        }),
-      ],
+      modelValue: [generatePreviousDecision()],
     })
     expect(screen.getByLabelText("Eintrag bearbeiten")).toBeInTheDocument()
   })
 
   it("correctly updates value court input", async () => {
     const { user } = renderComponent({
-      modelValue: [
-        generateProceedingDecision({
-          dataSource: "PROCEEDING_DECISION",
-        }),
-      ],
+      modelValue: [generatePreviousDecision()],
     })
 
     expect(screen.queryByText(/AG Test/)).not.toBeInTheDocument()
@@ -233,11 +217,7 @@ describe("ProceedingDecisions", () => {
 
   it("correctly updates value of fileNumber input", async () => {
     const { user } = renderComponent({
-      modelValue: [
-        generateProceedingDecision({
-          dataSource: "PROCEEDING_DECISION",
-        }),
-      ],
+      modelValue: [generatePreviousDecision()],
     })
 
     expect(screen.queryByText(/new fileNumber/)).not.toBeInTheDocument()
@@ -258,11 +238,7 @@ describe("ProceedingDecisions", () => {
 
   it("correctly updates value of decision date input", async () => {
     const { user } = renderComponent({
-      modelValue: [
-        generateProceedingDecision({
-          dataSource: "PROCEEDING_DECISION",
-        }),
-      ],
+      modelValue: [generatePreviousDecision()],
     })
 
     expect(screen.queryByText(/02.02.2022/)).not.toBeInTheDocument()
@@ -283,14 +259,7 @@ describe("ProceedingDecisions", () => {
 
   it("correctly deletes manually added active citations", async () => {
     const { user } = renderComponent({
-      modelValue: [
-        generateProceedingDecision({
-          dataSource: "PROCEEDING_DECISION",
-        }),
-        generateProceedingDecision({
-          dataSource: "PROCEEDING_DECISION",
-        }),
-      ],
+      modelValue: [generatePreviousDecision(), generatePreviousDecision()],
     })
     const proceedingDecisions = screen.getAllByLabelText("Listen Eintrag")
     expect(proceedingDecisions.length).toBe(2)
@@ -300,9 +269,9 @@ describe("ProceedingDecisions", () => {
   })
 
   it("correctly deletes active citations added by search", async () => {
-    const modelValue: ProceedingDecision[] = [
-      generateProceedingDecision(),
-      generateProceedingDecision(),
+    const modelValue: PreviousDecision[] = [
+      generatePreviousDecision(),
+      generatePreviousDecision(),
     ]
     const { user } = renderComponent({ modelValue })
     const proceedingDecisions = screen.getAllByLabelText("Listen Eintrag")
@@ -314,11 +283,7 @@ describe("ProceedingDecisions", () => {
 
   it("correctly updates deleted values in active citations", async () => {
     const { user } = renderComponent({
-      modelValue: [
-        generateProceedingDecision({
-          dataSource: "PROCEEDING_DECISION",
-        }),
-      ],
+      modelValue: [generatePreviousDecision()],
     })
 
     expect(
@@ -346,7 +311,7 @@ describe("ProceedingDecisions", () => {
 
   it("renders from search added active citations as non-editable list item", async () => {
     renderComponent({
-      modelValue: [generateProceedingDecision()],
+      modelValue: [generatePreviousDecision()],
     })
     expect(
       screen.queryByLabelText("Eintrag bearbeiten"),
@@ -371,8 +336,8 @@ describe("ProceedingDecisions", () => {
   })
 
   it("indicates that search result already added to active citations", async () => {
-    const modelValue: ProceedingDecision[] = [
-      generateProceedingDecision({ uuid: "123" }),
+    const modelValue: PreviousDecision[] = [
+      generatePreviousDecision({ uuid: "123" }),
     ]
     const { user } = renderComponent({ modelValue })
     await user.click(screen.getByText(/Weitere Angabe/))
@@ -381,9 +346,7 @@ describe("ProceedingDecisions", () => {
   })
 
   it("displays error in list and edit component when fields missing", async () => {
-    const modelValue: ProceedingDecision[] = [
-      generateProceedingDecision({ dataSource: "PROCEEDING_DECISION" }),
-    ]
+    const modelValue: PreviousDecision[] = [generatePreviousDecision()]
     const { user } = renderComponent({ modelValue })
     const editButton = screen.getByLabelText("Eintrag bearbeiten")
     await user.click(editButton)

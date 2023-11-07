@@ -22,7 +22,6 @@ function renderSearchResults(
               label: "fooLabel",
             },
             documentNumber: "fooDocumentNumber",
-            dataSource: "NEURIS",
           },
         }),
         isLinked: false,

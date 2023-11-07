@@ -1,9 +1,9 @@
 import dayjs from "dayjs"
 import EditableListItem from "./editableListItem"
-import LinkedDocumentUnit from "./linkedDocumentUnit"
+import RelatedDocumentation from "./relatedDocumentation"
 
 export default class EnsuingDecision
-  extends LinkedDocumentUnit
+  extends RelatedDocumentation
   implements EditableListItem
 {
   public isPending = false
@@ -26,16 +26,16 @@ export default class EnsuingDecision
 
   get renderDecision(): string {
     return [
+      ...(this.isPending === true ? ["anhängig"] : []),
       ...(this.court ? [`${this.court.label}`] : []),
       ...(this.decisionDate
         ? [dayjs(this.decisionDate).format("DD.MM.YYYY")]
         : []),
-      ...(this.isPending === true ? ["anhängig"] : []),
       ...(this.fileNumber ? [this.fileNumber] : []),
       ...(this.documentType ? [this.documentType?.jurisShortcut] : []),
-      ...(this.documentNumber && this.hasForeignSource
-        ? [this.documentNumber]
-        : []),
+      // ...(this.documentNumber && this.hasForeignSource
+      //   ? [this.documentNumber]
+      //   : []),
     ].join(", ")
   }
 
@@ -43,14 +43,14 @@ export default class EnsuingDecision
     return this.missingRequiredFields.length > 0
   }
 
-  get isReadOnly(): boolean {
-    return this.hasForeignSource
-  }
-
   get missingRequiredFields() {
     return EnsuingDecision.requiredFields.filter((field) =>
       this.fieldIsEmpty(field, this[field]),
     )
+  }
+
+  get isReadOnly(): boolean {
+    return false
   }
 
   get isEmpty(): boolean {
@@ -68,7 +68,7 @@ export default class EnsuingDecision
     fieldName: keyof EnsuingDecision,
     value: EnsuingDecision[(typeof EnsuingDecision.fields)[number]],
   ) {
-    if (fieldName === "decisionDate" && !value && !this.dateKnown) {
+    if (fieldName === "decisionDate" && !value) {
       return false
     }
     if (value === undefined || !value || value === null) {

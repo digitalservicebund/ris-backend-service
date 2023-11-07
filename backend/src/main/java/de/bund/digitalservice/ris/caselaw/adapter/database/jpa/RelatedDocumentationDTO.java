@@ -9,6 +9,7 @@ import jakarta.persistence.InheritanceType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
@@ -52,6 +53,10 @@ public abstract class RelatedDocumentationDTO {
 
   @Column(name = "file_number")
   private String fileNumber;
+
+  @Column @NotNull private Integer rank;
+
+  //  @ManyToOne private DocumentationUnitDTO documentationUnit;
 
   //  @Transient private DocumentationUnitDTO referencedDocumentationUnit;
 }

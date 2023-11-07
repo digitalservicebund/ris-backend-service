@@ -1,24 +1,19 @@
 import dayjs from "dayjs"
 import { Court, DocumentType } from "./documentUnit"
 
-export default class LinkedDocumentUnit {
+export default class RelatedDocumentation {
   public uuid?: string
   public documentNumber?: string
   public court?: Court
   public decisionDate?: string
   public fileNumber?: string
   public documentType?: DocumentType
-  public dataSource?:
-    | "NEURIS"
-    | "MIGRATION"
-    | "PROCEEDING_DECISION"
-    | "ACTIVE_CITATION"
 
-  constructor(data: Partial<LinkedDocumentUnit> = {}) {
+  constructor(data: Partial<RelatedDocumentation> = {}) {
     Object.assign(this, data)
   }
 
-  public isLinkedWith<Type extends LinkedDocumentUnit>(
+  public isLinkedWith<Type extends RelatedDocumentation>(
     localDecisions: Type[] | undefined,
   ): boolean {
     if (!localDecisions) return false
@@ -26,10 +21,6 @@ export default class LinkedDocumentUnit {
     return localDecisions.some(
       (localDecision) => localDecision.uuid == this.uuid,
     )
-  }
-
-  get hasForeignSource(): boolean {
-    return this.dataSource === "NEURIS" || this.dataSource === "MIGRATION"
   }
 
   get renderDecision(): string {
@@ -40,9 +31,9 @@ export default class LinkedDocumentUnit {
         : []),
       ...(this.documentType ? [this.documentType.label] : []),
       ...(this.fileNumber ? [this.fileNumber] : []),
-      ...(this.documentNumber && this.hasForeignSource
-        ? [this.documentNumber]
-        : []),
+      // ...(this.documentNumber && this.hasForeignSource
+      //   ? [this.documentNumber]
+      //   : []),
     ].join(", ")
   }
 }

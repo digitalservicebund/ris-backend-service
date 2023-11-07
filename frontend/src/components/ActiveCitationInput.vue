@@ -6,7 +6,7 @@ import { useValidationStore } from "@/composables/useValidationStore"
 import values from "@/data/values.json"
 import ActiveCitation from "@/domain/activeCitation"
 import { CitationStyle } from "@/domain/citationStyle"
-import LinkedDocumentUnit from "@/domain/linkedDocumentUnit"
+import RelatedDocumentation from "@/domain/relatedDocumentation"
 import ComboboxItemService from "@/services/comboboxItemService"
 import documentUnitService from "@/services/documentUnitService"
 import DateInput from "@/shared/components/input/DateInput.vue"
@@ -62,7 +62,7 @@ async function search(page = 0) {
   if (activeCitationRef.citationStyle) {
     delete activeCitationRef["citationStyle"]
   }
-  const response = await documentUnitService.searchByLinkedDocumentUnit(
+  const response = await documentUnitService.searchByRelatedDocumentation(
     page,
     30,
     activeCitationRef,
@@ -103,7 +103,7 @@ async function addActiveCitation() {
   emit("addEntry")
 }
 
-async function addActiveCitationFromSearch(decision: LinkedDocumentUnit) {
+async function addActiveCitationFromSearch(decision: RelatedDocumentation) {
   const newActiveCitationStyle = {
     ...activeCitationStyle.value?.value,
   } as CitationStyle
@@ -155,12 +155,13 @@ watch(
 
 <template>
   <div>
-    <div
+    <!-- Todo implement linked logic  -->
+    <!-- <div
       v-if="activeCitation.hasForeignSource"
       class="ds-link-01-bold mb-24 underline"
     >
       {{ activeCitation.renderDecision }}
-    </div>
+    </div> -->
     <InputField
       id="activeCitationPredicate"
       v-slot="slotProps"
@@ -178,7 +179,9 @@ watch(
         placeholder="Bitte auswählen"
       ></ComboboxInput>
     </InputField>
-    <div v-if="!activeCitation.hasForeignSource">
+    <!-- Todo implement linked logic  -->
+    <!-- <div v-if="!activeCitation.hasForeignSource"> -->
+    <div>
       <div class="flex justify-between gap-24">
         <InputField
           id="activeCitationCourt"
@@ -239,8 +242,9 @@ watch(
       </div>
     </div>
     <div>
+      <!-- Todo implement linked logic  -->
+      <!-- v-if="!activeCitation.hasForeignSource" -->
       <TextButton
-        v-if="!activeCitation.hasForeignSource"
         aria-label="Nach Entscheidung suchen"
         button-type="secondary"
         class="mr-28"

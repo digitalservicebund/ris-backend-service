@@ -205,22 +205,16 @@ public class DocumentationUnitDTO {
   private Set<KeywordDTO> keywords = new HashSet<>();
 
   // Nachgehende Entscheidungen
-  //  @OneToMany(
-  //      mappedBy = "documentationUnit",
-  //      cascade = CascadeType.ALL,
-  //      fetch = FetchType.EAGER,
-  //      orphanRemoval = true)
-  //  @Builder.Default
-  //  private Set<EnsuingDecision> ensuingDecisions = new HashSet<>();
+  @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+  @JoinColumn(name = "documentation_unit_id")
+  @Builder.Default
+  private List<EnsuingDecisionDTO> ensuingDecisions = new ArrayList<>();
 
   // Nachgehende Entscheidungen mit Prädikat anhängig
-  //  @OneToMany(
-  //      mappedBy = "documentationUnit",
-  //      cascade = CascadeType.ALL,
-  //      fetch = FetchType.EAGER,
-  //      orphanRemoval = true)
-  //  @Builder.Default
-  //  private Set<PendingDecision> pendingDecisions = new HashSet<>();
+  @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+  @JoinColumn(name = "documentation_unit_id")
+  @Builder.Default
+  private List<PendingDecisionDTO> pendingDecisions = new ArrayList<>();
 
   // Vorgehende Entscheidungen
   @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)

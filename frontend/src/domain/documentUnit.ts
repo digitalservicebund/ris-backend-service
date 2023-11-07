@@ -119,6 +119,11 @@ export default class DocumentUnit {
         (decision) => new PreviousDecision({ ...decision }),
       )
 
+    if (data.ensuingDecisions)
+      data.ensuingDecisions = data.ensuingDecisions.map(
+        (decision) => new EnsuingDecision({ ...decision }),
+      )
+
     if (data.contentRelatedIndexing?.norms)
       data.contentRelatedIndexing.norms = data.contentRelatedIndexing.norms.map(
         (norm) => new NormReference({ ...norm }),

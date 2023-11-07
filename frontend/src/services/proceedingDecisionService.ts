@@ -76,7 +76,7 @@ const service: ProceedingDecisionService = {
         status: 200,
         data: (
           (response.data as DocumentUnit)
-            .proceedingDecisions as ProceedingDecision[]
+            .previousDecisions as ProceedingDecision[]
         ).map((decision) => new ProceedingDecision({ ...decision })),
       }
     }

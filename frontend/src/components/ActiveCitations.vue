@@ -1,6 +1,5 @@
 <script lang="ts" setup>
 import { h, computed } from "vue"
-import { RouterLink } from "vue-router"
 import ActiveCitationInput from "@/components/ActiveCitationInput.vue"
 import EditableList from "@/components/EditableListCaselaw.vue"
 import ActiveCitation from "@/domain/activeCitation"
@@ -24,29 +23,31 @@ const activeCitations = computed({
 const defaultValue = new ActiveCitation()
 
 function decisionSummarizer(activeCitation: ActiveCitation) {
-  if (activeCitation.hasForeignSource) {
-    return h("div", { class: ["flex flex-row items-center"] }, [
-      !activeCitation.citationStyleIsSet &&
-        renderValidationAlert("Art der Zitierung"),
-      h(
-        RouterLink,
-        {
-          class: [
-            "ds-link-01-bold",
-            "underline",
-            !activeCitation.citationStyleIsSet && "pl-32",
-          ],
-          target: "_blank",
-          tabindex: -1,
-          to: {
-            name: "caselaw-documentUnit-documentNumber-categories",
-            params: { documentNumber: activeCitation.documentNumber },
-          },
-        },
-        () => activeCitation.renderDecision,
-      ),
-    ])
-  } else if (activeCitation.hasMissingRequiredFields) {
+  // Todo implement linked logic
+  // if (activeCitation.hasForeignSource) {
+  //   return h("div", { class: ["flex flex-row items-center"] }, [
+  //     !activeCitation.citationStyleIsSet &&
+  //       renderValidationAlert("Art der Zitierung"),
+  //     h(
+  //       RouterLink,
+  //       {
+  //         class: [
+  //           "ds-link-01-bold",
+  //           "underline",
+  //           !activeCitation.citationStyleIsSet && "pl-32",
+  //         ],
+  //         target: "_blank",
+  //         tabindex: -1,
+  //         to: {
+  //           name: "caselaw-documentUnit-documentNumber-categories",
+  //           params: { documentNumber: activeCitation.documentNumber },
+  //         },
+  //       },
+  //       () => activeCitation.renderDecision,
+  //     ),
+  //   ])
+  // } else
+  if (activeCitation.hasMissingRequiredFields) {
     return h("div", { class: ["flex flex-row items-center"] }, [
       renderValidationAlert(),
       h(

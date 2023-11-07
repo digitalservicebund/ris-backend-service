@@ -1,18 +1,18 @@
 <script setup lang="ts">
 import InlineDecision from "./InlineDecision.vue"
-import LinkedDocumentUnit from "@/domain/linkedDocumentUnit"
+import RelatedDocumentation from "@/domain/relatedDocumentation"
 import TextButton from "@/shared/components/input/TextButton.vue"
 
 defineProps<{
-  searchResults?: SearchResults<LinkedDocumentUnit>
+  searchResults?: SearchResults<RelatedDocumentation>
 }>()
 
 const emits =
-  defineEmits<(event: "linkDecision", decision: LinkedDocumentUnit) => void>()
+  defineEmits<(event: "linkDecision", decision: RelatedDocumentation) => void>()
 </script>
 
 <script lang="ts">
-export type SearchResults<Type extends LinkedDocumentUnit> = {
+export type SearchResults<Type extends RelatedDocumentation> = {
   decision: Type
   isLinked: boolean
 }[]

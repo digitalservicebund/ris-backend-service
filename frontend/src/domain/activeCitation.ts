@@ -1,10 +1,10 @@
 import dayjs from "dayjs"
 import { CitationStyle } from "./citationStyle"
 import EditableListItem from "./editableListItem"
-import LinkedDocumentUnit from "./linkedDocumentUnit"
+import RelatedDocumentation from "./relatedDocumentation"
 
 export default class ActiveCitation
-  extends LinkedDocumentUnit
+  extends RelatedDocumentation
   implements EditableListItem
 {
   public citationStyle?: CitationStyle
@@ -38,9 +38,9 @@ export default class ActiveCitation
         : []),
       ...(this.fileNumber ? [this.fileNumber] : []),
       ...(this.documentType ? [this.documentType.label] : []),
-      ...(this.documentNumber && this.hasForeignSource
-        ? [this.documentNumber]
-        : []),
+      // ...(this.documentNumber && this.hasForeignSource
+      //   ? [this.documentNumber]
+      //   : []),
     ].join(", ")
   }
 

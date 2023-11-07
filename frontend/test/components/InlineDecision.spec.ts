@@ -2,14 +2,12 @@ import { render, screen } from "@testing-library/vue"
 import { createRouter, createWebHistory } from "vue-router"
 import InlineDecision from "@/components/InlineDecision.vue"
 import { Court, DocumentType } from "@/domain/documentUnit"
-import LinkedDocumentUnit from "@/domain/linkedDocumentUnit"
 import PreviousDecision from "@/domain/previousDecision"
 
 function renderComponent(options?: {
   court?: Court
   documentType?: DocumentType
   decisionDate?: string
-  dataSource?: LinkedDocumentUnit["dataSource"]
   documentNumber?: string
 }) {
   const props: { decision: PreviousDecision } = {
@@ -26,7 +24,6 @@ function renderComponent(options?: {
         },
         decisionDate:
           options?.decisionDate ?? "2004-12-02 12:00:00.000000 +00:00",
-        dataSource: options?.dataSource ?? "PROCEEDING_DECISION",
         documentNumber: options?.documentNumber ?? "testDocumentNumber",
       },
     }),
@@ -79,7 +76,6 @@ describe("Decision ListItem", () => {
 
   it("renders with link if source is not proceedingDecisions", async () => {
     renderComponent({
-      dataSource: "MIGRATION",
       documentNumber: "fooDocumentNumber",
     })
     expect(screen.getByRole("link")).toHaveAttribute(

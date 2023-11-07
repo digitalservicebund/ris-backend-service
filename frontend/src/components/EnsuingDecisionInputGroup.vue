@@ -5,7 +5,7 @@ import ComboboxInput from "@/components/ComboboxInput.vue"
 import { useValidationStore } from "@/composables/useValidationStore"
 import values from "@/data/values.json"
 import EnsuingDecision from "@/domain/ensuingDecision"
-import LinkedDocumentUnit from "@/domain/linkedDocumentUnit"
+import RelatedDocumentation from "@/domain/relatedDocumentation"
 import ComboboxItemService from "@/services/comboboxItemService"
 import documentUnitService from "@/services/documentUnitService"
 import CheckboxInput from "@/shared/components/input/CheckboxInput.vue"
@@ -37,7 +37,7 @@ async function search(page = 0) {
     ...ensuingDecision.value,
   })
 
-  const response = await documentUnitService.searchByLinkedDocumentUnit(
+  const response = await documentUnitService.searchByRelatedDocumentation(
     page,
     30,
     ensuingDecisionRef,
@@ -79,7 +79,7 @@ async function addEnsuingDecision() {
   emit("addEntry")
 }
 
-async function addEnsuingDecisionFromSearch(decision: LinkedDocumentUnit) {
+async function addEnsuingDecisionFromSearch(decision: RelatedDocumentation) {
   emit("update:modelValue", decision as EnsuingDecision)
   emit("addEntry")
   scrollToTop()

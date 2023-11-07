@@ -6,9 +6,12 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DeviatingEcliDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DeviatingFileNumberDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentTypeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.EnsuingDecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.FileNumberDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.KeywordDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.OriginalFileDocumentDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PendingDecisionDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PreviousDecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.StatusDTO;
 import de.bund.digitalservice.ris.caselaw.domain.ActiveCitation;
 import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
@@ -18,11 +21,13 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitNorm;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatus;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
+import de.bund.digitalservice.ris.caselaw.domain.EnsuingDecision;
 import de.bund.digitalservice.ris.caselaw.domain.PreviousDecision;
 import de.bund.digitalservice.ris.caselaw.domain.Texts;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
@@ -173,8 +178,37 @@ public class DocumentationUnitTransformer {
 
     List<PreviousDecision> previousDecisions = updatedDomainObject.previousDecisions();
     if (previousDecisions != null && !previousDecisions.isEmpty()) {
-      builder.previousDecisions(
-          previousDecisions.stream().map(PreviousDecisionTransformer::transformToDTO).toList());
+      List<PreviousDecisionDTO> previousDecisionDTOs = new ArrayList<>();
+      for (int i = 0; i < previousDecisions.size(); i++) {
+        previousDecisionDTOs.add(
+            PreviousDecisionTransformer.transformToDTO(previousDecisions.get(i), i + 1));
+      }
+      builder.previousDecisions(previousDecisionDTOs.stream().filter(Objects::nonNull).toList());
+    }
+
+    List<EnsuingDecision> ensuingDecisions = updatedDomainObject.ensuingDecisions();
+    if (ensuingDecisions != null && !ensuingDecisions.isEmpty()) {
+
+      List<EnsuingDecisionDTO> ensuingDecisionDTOs = new ArrayList<>();
+      List<PendingDecisionDTO> pendingDecisionDTOs = new ArrayList<>();
+
+      for (int i = 0; i < ensuingDecisions.size(); i++) {
+        if (ensuingDecisions.get(i).isPending) {
+          pendingDecisionDTOs.add(
+              PendingDecisionTransformer.transformToDTO(ensuingDecisions.get(i), i + 1));
+        } else {
+          ensuingDecisionDTOs.add(
+              EnsuingDecisionTransformer.transformToDTO(ensuingDecisions.get(i), i + 1));
+        }
+      }
+
+      if (!ensuingDecisionDTOs.isEmpty()) {
+        builder.ensuingDecisions(ensuingDecisionDTOs.stream().filter(Objects::nonNull).toList());
+      }
+
+      if (!pendingDecisionDTOs.isEmpty()) {
+        builder.pendingDecisions(pendingDecisionDTOs.stream().filter(Objects::nonNull).toList());
+      }
     }
 
     if (updatedDomainObject.contentRelatedIndexing() != null) {
@@ -383,13 +417,39 @@ public class DocumentationUnitTransformer {
           .filename(originalFileDocumentDTO.getFilename());
     }
 
-    List<PreviousDecision> previousDecisions = null;
-    if (documentationUnitDTO.getPreviousDecisions() != null) {
-      previousDecisions =
-          documentationUnitDTO.getPreviousDecisions().stream()
-              .map(PreviousDecisionTransformer::transformToDomain)
-              .toList();
+    List<PreviousDecisionDTO> previousDecisionDTOS = documentationUnitDTO.getPreviousDecisions();
+    if (previousDecisionDTOS != null) {
+      List<PreviousDecision> previousDecisions = new ArrayList<>();
+      for (int i = 0; i < previousDecisionDTOS.size(); i++) {
+        PreviousDecisionDTO currentDTO = previousDecisionDTOS.get(i);
+        previousDecisions.add(
+            currentDTO.getRank(), PreviousDecisionTransformer.transformToDomain(currentDTO));
+      }
       builder.previousDecisions(previousDecisions);
+    }
+
+    List<EnsuingDecisionDTO> ensuingDecisionDTOs = documentationUnitDTO.getEnsuingDecisions();
+    List<PendingDecisionDTO> pendingDecisionDTOs = documentationUnitDTO.getPendingDecisions();
+
+    if (pendingDecisionDTOs != null || ensuingDecisionDTOs != null) {
+      EnsuingDecision[] ensuingDecisions = new EnsuingDecision[ensuingDecisionDTOs.size()];
+      if (ensuingDecisionDTOs != null) {
+        for (int i = 0; i < ensuingDecisionDTOs.size(); i++) {
+          EnsuingDecisionDTO currentDTO = ensuingDecisionDTOs.get(i);
+          ensuingDecisions[currentDTO.getRank() - 1] =
+              EnsuingDecisionTransformer.transformToDomain(currentDTO);
+        }
+      }
+
+      if (pendingDecisionDTOs != null) {
+        for (int i = 0; i < pendingDecisionDTOs.size(); i++) {
+          PendingDecisionDTO currentDTO = pendingDecisionDTOs.get(i);
+          ensuingDecisions[currentDTO.getRank()] =
+              PendingDecisionTransformer.transformToDomain(currentDTO);
+        }
+      }
+
+      builder.ensuingDecisions(Arrays.stream(ensuingDecisions).toList());
     }
 
     builder

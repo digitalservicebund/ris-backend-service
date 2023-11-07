@@ -1,15 +1,18 @@
 package de.bund.digitalservice.ris.caselaw.adapter.database.jpa;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
 @NoArgsConstructor
 @SuperBuilder
+@Getter
 @Entity
-@DiscriminatorValue("previous_decision")
-public class PreviousDecisionDTO extends RelatedDocumentationDTO {
-  // Todo column missing
-  // private boolean dateKnown;
+@DiscriminatorValue("pending_decision")
+public class PendingDecisionDTO extends RelatedDocumentationDTO {
+
+  @Column private String note;
 }

@@ -34,11 +34,6 @@ function generateActiveCitation(options?: {
   decisionDate?: string
   fileNumber?: string
   documentType?: DocumentType
-  dataSource?:
-    | "NEURIS"
-    | "MIGRATION"
-    | "PROCEEDING_DECISION"
-    | "ACTIVE_CITATION"
   citationStyle?: CitationStyle
 }) {
   const activeCitation = new ActiveCitation({
@@ -55,7 +50,6 @@ function generateActiveCitation(options?: {
       jurisShortcut: "documentTypeShortcut1",
       label: "documentType1",
     },
-    dataSource: options?.dataSource ?? "NEURIS",
     citationStyle: options?.citationStyle ?? {
       uuid: "123",
       jurisShortcut: "Änderungen",
@@ -73,7 +67,7 @@ describe("Active Citations", () => {
 
   vi.spyOn(
     documentUnitService,
-    "searchByLinkedDocumentUnit",
+    "searchByRelatedDocumentation",
   ).mockImplementation(() =>
     Promise.resolve({
       status: 200,
@@ -203,7 +197,6 @@ describe("Active Citations", () => {
       modelValue: [
         generateActiveCitation({
           fileNumber: "123",
-          dataSource: "ACTIVE_CITATION",
         }),
       ],
     })
@@ -227,11 +220,7 @@ describe("Active Citations", () => {
 
   it("renders manually added active citations as editable list item", async () => {
     renderComponent({
-      modelValue: [
-        generateActiveCitation({
-          dataSource: "ACTIVE_CITATION",
-        }),
-      ],
+      modelValue: [generateActiveCitation()],
     })
     expect(screen.getByLabelText("Eintrag bearbeiten")).toBeInTheDocument()
   })
@@ -245,7 +234,6 @@ describe("Active Citations", () => {
             jurisShortcut: "ABC",
             label: "ABC",
           },
-          dataSource: "ACTIVE_CITATION",
         }),
       ],
     })
@@ -270,11 +258,7 @@ describe("Active Citations", () => {
 
   it("correctly updates value document type input", async () => {
     const { user } = renderComponent({
-      modelValue: [
-        generateActiveCitation({
-          dataSource: "ACTIVE_CITATION",
-        }),
-      ],
+      modelValue: [generateActiveCitation()],
     })
 
     expect(screen.queryByText(/EuGH-Vorlage/)).not.toBeInTheDocument()
@@ -297,11 +281,7 @@ describe("Active Citations", () => {
 
   it("correctly updates value court input", async () => {
     const { user } = renderComponent({
-      modelValue: [
-        generateActiveCitation({
-          dataSource: "ACTIVE_CITATION",
-        }),
-      ],
+      modelValue: [generateActiveCitation()],
     })
 
     expect(screen.queryByText(/AG Test/)).not.toBeInTheDocument()
@@ -324,11 +304,7 @@ describe("Active Citations", () => {
 
   it("correctly updates value of fileNumber input", async () => {
     const { user } = renderComponent({
-      modelValue: [
-        generateActiveCitation({
-          dataSource: "ACTIVE_CITATION",
-        }),
-      ],
+      modelValue: [generateActiveCitation()],
     })
 
     expect(screen.queryByText(/new fileNumber/)).not.toBeInTheDocument()
@@ -349,11 +325,7 @@ describe("Active Citations", () => {
 
   it("correctly updates value of decision date input", async () => {
     const { user } = renderComponent({
-      modelValue: [
-        generateActiveCitation({
-          dataSource: "ACTIVE_CITATION",
-        }),
-      ],
+      modelValue: [generateActiveCitation()],
     })
 
     expect(screen.queryByText(/02.02.2022/)).not.toBeInTheDocument()
@@ -374,14 +346,7 @@ describe("Active Citations", () => {
 
   it("correctly deletes manually added active citations", async () => {
     const { user } = renderComponent({
-      modelValue: [
-        generateActiveCitation({
-          dataSource: "ACTIVE_CITATION",
-        }),
-        generateActiveCitation({
-          dataSource: "ACTIVE_CITATION",
-        }),
-      ],
+      modelValue: [generateActiveCitation(), generateActiveCitation()],
     })
     const activeCitations = screen.getAllByLabelText("Listen Eintrag")
     expect(activeCitations.length).toBe(2)
@@ -405,11 +370,7 @@ describe("Active Citations", () => {
 
   it("correctly updates deleted values in active citations", async () => {
     const { user } = renderComponent({
-      modelValue: [
-        generateActiveCitation({
-          dataSource: "ACTIVE_CITATION",
-        }),
-      ],
+      modelValue: [generateActiveCitation()],
     })
 
     expect(
@@ -484,9 +445,7 @@ describe("Active Citations", () => {
   })
 
   it("displays error in list and edit component when fields missing", async () => {
-    const modelValue: ActiveCitation[] = [
-      generateActiveCitation({ dataSource: "ACTIVE_CITATION" }),
-    ]
+    const modelValue: ActiveCitation[] = [generateActiveCitation()]
     const { user } = renderComponent({ modelValue })
     const editButton = screen.getByLabelText("Eintrag bearbeiten")
     await user.click(editButton)

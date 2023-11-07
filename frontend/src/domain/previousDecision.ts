@@ -1,9 +1,9 @@
 import dayjs from "dayjs"
 import EditableListItem from "./editableListItem"
-import LinkedDocumentUnit from "./linkedDocumentUnit"
+import RelatedDocumentation from "./relatedDocumentation"
 
 export default class PreviousDecision
-  extends LinkedDocumentUnit
+  extends RelatedDocumentation
   implements EditableListItem
 {
   public dateKnown = true
@@ -30,9 +30,9 @@ export default class PreviousDecision
       ...(this.dateUnknown === true ? ["unbekanntes Entscheidungsdatum"] : []),
       ...(this.fileNumber ? [this.fileNumber] : []),
       ...(this.documentType ? [this.documentType?.jurisShortcut] : []),
-      ...(this.documentNumber && this.hasForeignSource
-        ? [this.documentNumber]
-        : []),
+      // ...(this.documentNumber && this.hasForeignSource
+      //   ? [this.documentNumber]
+      //   : []),
     ].join(", ")
   }
 
@@ -48,7 +48,9 @@ export default class PreviousDecision
   }
 
   get isReadOnly(): boolean {
-    return this.hasForeignSource
+    // Todo implement linked logic
+    // return this.hasForeignSource
+    return false
   }
 
   get missingRequiredFields() {

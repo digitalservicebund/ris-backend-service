@@ -12,17 +12,23 @@ public class PreviousDecisionTransformer extends RelatedDocumentationUnitTransfo
         .fileNumber(getFileNumber(previousDecisionDTO.getFileNumber()))
         .documentType(getDocumentTypeFromDTO(previousDecisionDTO.getDocumentType()))
         .decisionDate(previousDecisionDTO.getDate())
-        // Todo dateKown?
+        // Todo dateKnown?
         .build();
   }
 
-  public static PreviousDecisionDTO transformToDTO(PreviousDecision previousDecision) {
+  public static PreviousDecisionDTO transformToDTO(
+      PreviousDecision previousDecision, Integer rank) {
+    if (previousDecision.hasNoValues()) {
+      return null;
+    }
+
     return PreviousDecisionDTO.builder()
         .court(getCourtFromDomain(previousDecision.getCourt()))
         .date(previousDecision.getDecisionDate())
         .documentNumber(previousDecision.getDocumentNumber())
         .documentType(getDocumentTypeFromDomain(previousDecision.getDocumentType()))
         .fileNumber(getFileNumber(previousDecision.getFileNumber()))
+        .rank(rank)
         .build();
   }
 }
