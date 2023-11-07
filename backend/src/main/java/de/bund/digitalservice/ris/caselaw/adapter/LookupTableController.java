@@ -1,7 +1,8 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
 import de.bund.digitalservice.ris.OpenApiConfiguration;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentTypeService;
+import de.bund.digitalservice.ris.caselaw.domain.LookupTableService;
+import de.bund.digitalservice.ris.caselaw.domain.lookuptable.citation.CitationType;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.Optional;
@@ -14,20 +15,28 @@ import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Flux;
 
 @RestController
-@RequestMapping("api/v1/caselaw/documenttypes")
+@RequestMapping("api/v1/caselaw/lookuptable")
 @Slf4j
 @Tag(name = OpenApiConfiguration.CASELAW_TAG)
-public class DocumentTypeController {
-  private final DocumentTypeService service;
+public class LookupTableController {
 
-  public DocumentTypeController(DocumentTypeService service) {
+  private final LookupTableService service;
+
+  public LookupTableController(LookupTableService service) {
     this.service = service;
   }
 
-  @GetMapping
+  @GetMapping(value = "documentTypes")
   @PreAuthorize("isAuthenticated()")
-  public Flux<DocumentType> getDocumentTypes(
+  public Flux<DocumentType> getCaselawDocumentTypes(
       @RequestParam(value = "q") Optional<String> searchStr) {
-    return Flux.fromIterable(service.getDocumentTypes(searchStr));
+    return service.getCaselawDocumentTypes(searchStr);
+  }
+
+  @GetMapping(value = "zitart")
+  @PreAuthorize("isAuthenticated()")
+  public Flux<CitationType> getCitationStyles(
+      @RequestParam(value = "q") Optional<String> searchStr) {
+    return Flux.empty();
   }
 }

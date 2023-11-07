@@ -11,7 +11,7 @@ import { Page } from "@/shared/components/Pagination.vue"
 import errorMessages from "@/shared/i18n/errors.json"
 
 enum Endpoint {
-  documentTypes = "documenttypes",
+  documentTypes = "lookuptable/documentTypes",
   courts = "courts",
   citationTypes = "citationtypes",
   fieldOfLawSearchByIdentifier = "fieldsoflaw/search-by-identifier",
