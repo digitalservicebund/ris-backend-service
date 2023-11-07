@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { onMounted, ref } from "vue"
+import { computed, onMounted, ref } from "vue"
 import SearchResultList, { SearchResults } from "./SearchResultList.vue"
 import ComboboxInput from "@/components/ComboboxInput.vue"
 import { useValidationStore } from "@/composables/useValidationStore"
@@ -31,6 +31,14 @@ const validationStore =
 const searchRunning = ref(false)
 const searchResultsCurrentPage = ref<Page<EnsuingDecision>>()
 const searchResults = ref<SearchResults<EnsuingDecision>>()
+
+const isPending = computed({
+  get: () => ensuingDecision.value.isPending,
+  set: (value) => {
+    if (value) ensuingDecision.value.decisionDate = undefined
+    ensuingDecision.value.isPending = value
+  },
+})
 
 async function search(page = 0) {
   const ensuingDecisionRef = new EnsuingDecision({
@@ -114,11 +122,15 @@ onMounted(() => {
 
 <template>
   <div>
-    <InputField id="regularCheckbox" v-slot="{ id }" label="Prädikat">
+    <InputField
+      id="regularCheckbox"
+      v-slot="{ id }"
+      label="Anhängige Entscheidung"
+    >
       <CheckboxInput
         :id="id"
-        v-model="ensuingDecision.isPending"
-        aria-label="Prädikat"
+        v-model="isPending"
+        aria-label="Anhängige Entscheidung"
       />
     </InputField>
     <div class="flex justify-between gap-24">
@@ -139,7 +151,7 @@ onMounted(() => {
           @click="validationStore.remove('court')"
         ></ComboboxInput>
       </InputField>
-      <div class="flex w-full justify-between gap-24">
+      <div v-if="!isPending" class="flex w-full justify-between gap-24">
         <InputField
           id="date"
           v-slot="slotProps"
@@ -150,7 +162,6 @@ onMounted(() => {
             id="decisionDate"
             v-model="ensuingDecision.decisionDate"
             aria-label="Entscheidungsdatum Rechtszug"
-            :disabled="ensuingDecision.isPending"
             :has-error="slotProps.hasError"
             @focus="validationStore.remove('decisionDate')"
             @update:validation-error="slotProps.updateValidationError"
