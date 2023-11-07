@@ -89,8 +89,8 @@ public class XmlEMailPublishService implements EmailPublishService {
       subject += " name=NeuRIS";
     } else {
       subject += " name=neuris-test";
-      subject += " mod=T";
     }
+    subject += " mod=T";
     subject += " da=R";
     subject += " df=X";
     subject += " dt=N";
