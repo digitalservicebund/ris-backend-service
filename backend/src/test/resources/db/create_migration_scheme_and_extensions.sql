@@ -84,7 +84,7 @@ CREATE TABLE IF NOT EXISTS
   );
 
 create materialized view
-  norm_abbreviation_search_migration as
+  incremental_migration.norm_abbreviation_search_migration as
 select
   na.*,
   r.code,
@@ -108,7 +108,7 @@ from
   left join incremental_migration.region r on nar.region_id = r.id;
 
 CREATE INDEX
-  norm_abbreviation_search_migration_idx ON norm_abbreviation_search_migration USING GIN (weighted_vector);
+  norm_abbreviation_search_migration_idx ON incremental_migration.norm_abbreviation_search_migration USING GIN (weighted_vector);
 
 CREATE TABLE IF NOT EXISTS
   incremental_migration.norm_reference (

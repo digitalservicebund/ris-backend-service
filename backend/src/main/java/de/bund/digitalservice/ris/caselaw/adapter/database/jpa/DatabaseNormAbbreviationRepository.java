@@ -43,7 +43,7 @@ public interface DatabaseNormAbbreviationRepository
               + " source,"
               + " region_id,"
               + " ts_rank_cd(weighted_vector, to_tsquery('german', '' || :tsQuery || '')) rank"
-              + " from norm_abbreviation_search_migration"
+              + " from incremental_migration.norm_abbreviation_search_migration"
               + " where weighted_vector @@ to_tsquery('german', '' || :tsQuery || '')"
               + " order by rank desc"
               + " limit :size"
@@ -53,6 +53,8 @@ public interface DatabaseNormAbbreviationRepository
 
   @Transactional
   @Modifying
-  @Query(value = "REFRESH MATERIALIZED VIEW norm_abbreviation_search_migration", nativeQuery = true)
+  @Query(
+      value = "REFRESH MATERIALIZED VIEW incremental_migration.norm_abbreviation_search_migration",
+      nativeQuery = true)
   void refreshMaterializedViews();
 }

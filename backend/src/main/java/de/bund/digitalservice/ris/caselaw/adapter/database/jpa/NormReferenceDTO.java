@@ -27,7 +27,7 @@ public class NormReferenceDTO {
 
   @Id @GeneratedValue UUID id;
 
-  @ManyToOne(fetch = FetchType.LAZY)
+  @ManyToOne(fetch = FetchType.EAGER)
   @JoinColumn(name = "norm_abbreviation_id")
   private NormAbbreviationDTO normAbbreviation;
 
