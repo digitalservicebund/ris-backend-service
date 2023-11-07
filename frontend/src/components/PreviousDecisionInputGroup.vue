@@ -198,6 +198,7 @@ onMounted(() => {
         button-type="secondary"
         class="mr-28"
         label="Suchen"
+        size="small"
         @click="handleSearch"
       />
       <TextButton
@@ -205,6 +206,7 @@ onMounted(() => {
         class="mr-28"
         :disabled="previousDecision.isEmpty"
         label="Übernehmen"
+        size="small"
         @click="addPreviousDecision"
       />
     </div>

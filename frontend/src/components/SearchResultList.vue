@@ -38,6 +38,7 @@ export type SearchResults<Type extends RelatedDocumentation> = {
             class="ml-24"
             :disabled="searchResult.isLinked"
             label="Übernehmen"
+            size="small"
             @click="emits('linkDecision', searchResult.decision)"
           />
         </div>

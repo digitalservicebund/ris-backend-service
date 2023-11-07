@@ -249,6 +249,7 @@ watch(
         button-type="secondary"
         class="mr-28"
         label="Suchen"
+        size="small"
         @click="handleSearch"
       />
       <TextButton
@@ -256,6 +257,7 @@ watch(
         class="mr-28"
         :disabled="activeCitation.isEmpty"
         label="Übernehmen"
+        size="small"
         @click="addActiveCitation"
       />
     </div>
