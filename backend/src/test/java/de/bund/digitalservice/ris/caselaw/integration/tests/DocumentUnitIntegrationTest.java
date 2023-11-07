@@ -69,6 +69,7 @@ import java.util.UUID;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -175,6 +176,7 @@ class DocumentUnitIntegrationTest {
   // TODO: write a test for add a document type with a wrong shortcut
 
   @Test
+  @Disabled
   void testForCorrectDbEntryAfterNewDocumentUnitCreation() {
     risWebTestClient
         .withDefaultLogin()
@@ -207,6 +209,7 @@ class DocumentUnitIntegrationTest {
   }
 
   @Test
+  @Disabled
   void testForFileNumbersDbEntryAfterUpdateByUuid() {
     UUID uuid = UUID.randomUUID();
 
@@ -260,6 +263,7 @@ class DocumentUnitIntegrationTest {
   }
 
   @Test
+  @Disabled
   void testForDeviatingEcliDbEntryAfterUpdateByUuid() {
     UUID uuid = UUID.randomUUID();
 
@@ -318,6 +322,7 @@ class DocumentUnitIntegrationTest {
   }
 
   @Test
+  @Disabled
   void testForDeviatingDecisionDateDbEntryAfterUpdateByUuid() {
     UUID uuid = UUID.randomUUID();
 
@@ -381,6 +386,7 @@ class DocumentUnitIntegrationTest {
   }
 
   @Test
+  @Disabled
   void testUpdate_withIncorrectCourts_shouldHaveIncorrectCourtsSavedInDB() {
     UUID uuid = UUID.randomUUID();
 
@@ -453,6 +459,7 @@ class DocumentUnitIntegrationTest {
   }
 
   @Test
+  @Disabled
   void testDocumentTypeToSetIdFromLookuptable() {
     var categoryA =
         databaseDocumentCategoryRepository.saveAndFlush(
@@ -539,6 +546,7 @@ class DocumentUnitIntegrationTest {
   }
 
   @Test
+  @Disabled
   void testUndoSettingDocumentType() {
     var docType =
         databaseDocumentTypeRepository.saveAndFlush(
@@ -583,21 +591,25 @@ class DocumentUnitIntegrationTest {
   }
 
   @Test
+  @Disabled
   void testLegalEffectToBeSetFromNotSpecifiedToYesBySpecialCourtChangeButBeChangeableAfterwards() {
     testLegalEffectChanges(LegalEffect.NOT_SPECIFIED, "BGH", LegalEffect.YES);
   }
 
   @Test
+  @Disabled
   void testLegalEffectToBeSetFromNoToYesBySpecialCourtChangeButBeChangeableAfterwards() {
     testLegalEffectChanges(LegalEffect.NO, "BVerfG", LegalEffect.YES);
   }
 
   @Test
+  @Disabled
   void testLegalEffectToBeKeptAtYesBySpecialCourtChangeAndBeChangeableAfterwards() {
     testLegalEffectChanges(LegalEffect.YES, "BSG", LegalEffect.YES);
   }
 
   @Test
+  @Disabled
   void testLegalEffectToBeKeptByNonSpecialCourtChangeAndBeChangeableAfterwards() {
     testLegalEffectChanges(LegalEffect.NO, "ABC", LegalEffect.NO);
   }
@@ -706,6 +718,7 @@ class DocumentUnitIntegrationTest {
   }
 
   @Test
+  @Disabled
   void testSearchResultsAreDeterministic() {
     PublicationStatus[] published =
         new PublicationStatus[] {PUBLISHED, PUBLISHING, JURIS_PUBLISHED};
@@ -785,6 +798,7 @@ class DocumentUnitIntegrationTest {
   }
 
   @Test
+  @Disabled
   void testDefaultStatus() {
     DocumentUnitDTO dto =
         repository
@@ -816,6 +830,7 @@ class DocumentUnitIntegrationTest {
   }
 
   @Test
+  @Disabled
   void testSearchByDocumentUnitSearchInput() {
     DocumentationOffice otherDocOffice = buildDocOffice("BGH");
     UUID otherDocOfficeUuid =

@@ -136,7 +136,7 @@ class DocumentationUnitIntegrationTest {
             argThat(
                 (OidcUser user) -> {
                   List<String> groups = user.getAttribute("groups");
-                  return Objects.requireNonNull(groups).get(0).equals("/DigitalService");
+                  return Objects.requireNonNull(groups).get(0).equals("/DS");
                 }));
   }
 
@@ -154,8 +154,7 @@ class DocumentationUnitIntegrationTest {
             DocumentationUnitDTO.builder()
                 .caseFacts("abc")
                 .documentNumber("1234567890123")
-                .documentationOffice(
-                    documentationOfficeRepository.findByAbbreviation("DigitalService"))
+                .documentationOffice(documentationOfficeRepository.findByAbbreviation("DS"))
                 .build());
 
     assertThat(repository.findAll()).hasSize(1);
@@ -200,14 +199,12 @@ class DocumentationUnitIntegrationTest {
         repository.save(
             DocumentationUnitDTO.builder()
                 .documentNumber("1234567890123")
-                .documentationOffice(
-                    documentationOfficeRepository.findByAbbreviation("DigitalService"))
+                .documentationOffice(documentationOfficeRepository.findByAbbreviation("DS"))
                 .build());
 
     DocumentUnit documentUnitFromFrontend =
         DocumentUnit.builder()
             .uuid(dto.getId())
-            //            .creationtimestamp(dto.getCreationtimestamp())
             .documentNumber(dto.getDocumentNumber())
             .coreData(
                 CoreData.builder()
@@ -286,8 +283,7 @@ class DocumentationUnitIntegrationTest {
         repository.save(
             DocumentationUnitDTO.builder()
                 .documentNumber("1234567890123")
-                .documentationOffice(
-                    documentationOfficeRepository.findByAbbreviation("DigitalService"))
+                .documentationOffice(documentationOfficeRepository.findByAbbreviation("DS"))
                 .build());
 
     DocumentUnit documentUnitFromFrontend =
@@ -340,8 +336,7 @@ class DocumentationUnitIntegrationTest {
             DocumentationUnitDTO.builder()
                 .documentNumber("1234567890123")
                 .documentType(docType)
-                .documentationOffice(
-                    documentationOfficeRepository.findByAbbreviation("DigitalService"))
+                .documentationOffice(documentationOfficeRepository.findByAbbreviation("DS"))
                 .build());
 
     assertThat(repository.findAll().size()).isEqualTo(1);
@@ -351,7 +346,7 @@ class DocumentationUnitIntegrationTest {
         DocumentUnit.builder()
             .uuid(dto.getId())
             .documentNumber(dto.getDocumentNumber())
-            .coreData(CoreData.builder().documentationOffice(docOffice).build())
+            .coreData(CoreData.builder().documentationOffice(docOffice).documentType(null).build())
             .build();
 
     risWebTestClient
@@ -387,8 +382,7 @@ class DocumentationUnitIntegrationTest {
                 DocumentationUnitDTO.builder()
                     .id(uuid)
                     .documentNumber(RandomStringUtils.random(10, true, true))
-                    .documentationOffice(
-                        documentationOfficeRepository.findByAbbreviation("DigitalService"))
+                    .documentationOffice(documentationOfficeRepository.findByAbbreviation("DS"))
                     .build())
         .flatMap(documentUnitDTO -> Mono.just(repository.save(documentUnitDTO)))
         // TODO status

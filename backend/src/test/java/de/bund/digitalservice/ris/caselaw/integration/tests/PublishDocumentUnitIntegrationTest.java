@@ -14,17 +14,18 @@ import de.bund.digitalservice.ris.caselaw.adapter.KeycloakUserService;
 import de.bund.digitalservice.ris.caselaw.adapter.MockXmlExporter;
 import de.bund.digitalservice.ris.caselaw.adapter.XmlEMailPublishService;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationOfficeRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentUnitRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseXmlPublicationRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentationUnitRepositoryImpl;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresXmlPublicationRepositoryImpl;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.XmlPublicationDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentUnitStatusRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabasePublicationReportRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseXmlPublicationRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitStatusDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.PostgresDocumentUnitRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.PostgresPublicationReportRepositoryImpl;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.PostgresXmlPublicationRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.PublicationReportDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.XmlPublicationDTO;
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
@@ -60,7 +61,7 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
       DocumentUnitService.class,
       KeycloakUserService.class,
       DatabaseDocumentNumberService.class,
-      PostgresDocumentUnitRepositoryImpl.class,
+      PostgresDocumentationUnitRepositoryImpl.class,
       PostgresXmlPublicationRepositoryImpl.class,
       PostgresPublicationReportRepositoryImpl.class,
       XmlEMailPublishService.class,
@@ -94,7 +95,7 @@ class PublishDocumentUnitIntegrationTest {
       LocalDate.now(Clock.system(ZoneId.of("Europe/Berlin"))).format(DATE_FORMATTER);
 
   @Autowired private RisWebTestClient risWebTestClient;
-  @Autowired private DatabaseDocumentUnitRepository repository;
+  @Autowired private DatabaseDocumentationUnitRepository repository;
   @Autowired private DatabaseXmlPublicationRepository xmlPublicationRepository;
   @Autowired private DatabaseDocumentUnitStatusRepository documentUnitStatusRepository;
   @Autowired private DatabaseDocumentationOfficeRepository documentationOfficeRepository;
@@ -105,17 +106,17 @@ class PublishDocumentUnitIntegrationTest {
   @MockBean private HttpMailSender mailSender;
   @MockBean DocxConverterService docxConverterService;
 
-  private UUID docOfficeUuid;
+  private DocumentationOfficeDTO docOffice;
 
   @BeforeEach
   void setUp() {
-    docOfficeUuid = documentationOfficeRepository.findByAbbreviation("DigitalService").getId();
+    docOffice = documentationOfficeRepository.findByAbbreviation("DS");
   }
 
   @AfterEach
   void cleanUp() {
-    xmlPublicationRepository.deleteAll().block();
-    repository.deleteAll().block();
+    xmlPublicationRepository.deleteAll();
+    repository.deleteAll();
     documentUnitStatusRepository.deleteAll().block();
     databasePublishReportRepository.deleteAll().block();
   }
@@ -123,17 +124,16 @@ class PublishDocumentUnitIntegrationTest {
   @Test
   void testPublishDocumentUnit() {
     UUID documentUnitUuid1 = UUID.randomUUID();
-    DocumentUnitDTO documentUnitDTO =
-        DocumentUnitDTO.builder()
-            .uuid(documentUnitUuid1)
-            .documentationOfficeId(docOfficeUuid)
-            .documentnumber("docnr12345678")
-            .creationtimestamp(Instant.now())
+    DocumentationUnitDTO documentUnitDTO =
+        DocumentationUnitDTO.builder()
+            .id(documentUnitUuid1)
+            .documentationOffice(docOffice)
+            .documentNumber("docnr12345678")
             .decisionDate(LocalDate.now())
             .build();
-    DocumentUnitDTO savedDocumentUnitDTO = repository.save(documentUnitDTO).block();
+    DocumentationUnitDTO savedDocumentUnitDTO = repository.save(documentUnitDTO);
 
-    assertThat(repository.findAll().collectList().block()).hasSize(1);
+    assertThat(repository.findAll()).hasSize(1);
 
     XmlPublicationDTO expectedXmlPublicationDTO =
         new XmlPublicationDTO(
@@ -143,7 +143,7 @@ class PublishDocumentUnitIntegrationTest {
             "id=juris name=NeuRIS da=R df=X dt=N mod=T ld="
                 + DELIVER_DATE
                 + " vg="
-                + savedDocumentUnitDTO.getDocumentnumber(),
+                + savedDocumentUnitDTO.getDocumentNumber(),
             "xml",
             "200",
             "message 1|message 2",
@@ -157,7 +157,7 @@ class PublishDocumentUnitIntegrationTest {
                 "id=juris name=NeuRIS da=R df=X dt=N mod=T ld="
                     + DELIVER_DATE
                     + " vg="
-                    + savedDocumentUnitDTO.getDocumentnumber())
+                    + savedDocumentUnitDTO.getDocumentNumber())
             .xml("xml")
             .statusCode("200")
             .statusMessages(List.of("message 1", "message 2"))
@@ -178,8 +178,7 @@ class PublishDocumentUnitIntegrationTest {
                     .ignoringFields("publishDate")
                     .isEqualTo(expectedXmlResultObject));
 
-    List<XmlPublicationDTO> xmlPublicationList =
-        xmlPublicationRepository.findAll().collectList().block();
+    List<XmlPublicationDTO> xmlPublicationList = xmlPublicationRepository.findAll();
     assertThat(xmlPublicationList).hasSize(1);
     XmlPublicationDTO xmlPublicationDTO = xmlPublicationList.get(0);
     assertThat(xmlPublicationDTO)
@@ -191,30 +190,29 @@ class PublishDocumentUnitIntegrationTest {
         documentUnitStatusRepository.findAll().collectList().block();
     DocumentUnitStatusDTO status = statusList.get(statusList.size() - 1);
     assertThat(status.getPublicationStatus()).isEqualTo(PUBLISHING);
-    assertThat(status.getDocumentUnitId()).isEqualTo(documentUnitDTO.getUuid());
-    assertThat(status.getCreatedAt()).isEqualTo(xmlPublicationDTO.publishDate());
+    assertThat(status.getDocumentUnitId()).isEqualTo(documentUnitDTO.getId());
+    assertThat(status.getCreatedAt()).isEqualTo(xmlPublicationDTO.getPublishDate());
     assertThat(status.getIssuerAddress()).isEqualTo("test@test.com");
   }
 
   @Test
   void testPublishDocumentUnitWithNotAllMandatoryFieldsFilled_shouldNotUpdateStatus() {
     UUID documentUnitUuid = UUID.randomUUID();
-    DocumentUnitDTO documentUnitDTO =
-        DocumentUnitDTO.builder()
-            .uuid(documentUnitUuid)
-            .documentationOfficeId(docOfficeUuid)
-            .documentnumber("docnr12345678")
-            .creationtimestamp(Instant.now())
+    DocumentationUnitDTO documentUnitDTO =
+        DocumentationUnitDTO.builder()
+            .id(documentUnitUuid)
+            .documentationOffice(docOffice)
+            .documentNumber("docnr12345678")
             .build();
-    DocumentUnitDTO savedDocumentUnitDTO = repository.save(documentUnitDTO).block();
-    assertThat(repository.findAll().collectList().block()).hasSize(1);
+    DocumentationUnitDTO savedDocumentUnitDTO = repository.save(documentUnitDTO);
+    assertThat(repository.findAll()).hasSize(1);
 
     documentUnitStatusRepository
         .save(
             DocumentUnitStatusDTO.builder()
                 .newEntry(true)
                 .id(UUID.randomUUID())
-                .documentUnitId(savedDocumentUnitDTO.getUuid())
+                .documentUnitId(savedDocumentUnitDTO.getId())
                 .issuerAddress("test1@test.com")
                 .publicationStatus(PublicationStatus.UNPUBLISHED)
                 .build())
@@ -243,8 +241,7 @@ class PublishDocumentUnitIntegrationTest {
                     .ignoringFields("publishDate")
                     .isEqualTo(xmlPublication));
 
-    List<XmlPublicationDTO> xmlPublicationList =
-        xmlPublicationRepository.findAll().collectList().block();
+    List<XmlPublicationDTO> xmlPublicationList = xmlPublicationRepository.findAll();
     assertThat(xmlPublicationList).isEmpty();
 
     List<DocumentUnitStatusDTO> statusList =
@@ -256,14 +253,13 @@ class PublishDocumentUnitIntegrationTest {
   @Test
   void testGetLastPublishedXml() {
     UUID documentUnitUuid1 = UUID.randomUUID();
-    DocumentUnitDTO documentUnitDTO =
-        DocumentUnitDTO.builder()
-            .uuid(documentUnitUuid1)
-            .documentationOfficeId(docOfficeUuid)
-            .documentnumber("docnr12345678")
-            .creationtimestamp(Instant.now())
+    DocumentationUnitDTO documentUnitDTO =
+        DocumentationUnitDTO.builder()
+            .id(documentUnitUuid1)
+            .documentationOffice(docOffice)
+            .documentNumber("docnr12345678")
             .build();
-    DocumentUnitDTO savedDocumentUnitDTO = repository.save(documentUnitDTO).block();
+    DocumentationUnitDTO savedDocumentUnitDTO = repository.save(documentUnitDTO);
 
     XmlPublicationDTO xmlPublicationDTO =
         new XmlPublicationDTO(
@@ -276,7 +272,7 @@ class PublishDocumentUnitIntegrationTest {
             "message 1|message 2",
             "test.xml",
             Instant.now());
-    xmlPublicationRepository.save(xmlPublicationDTO).block();
+    xmlPublicationRepository.save(xmlPublicationDTO);
 
     XmlPublication expectedXmlPublication =
         XmlPublication.builder()
@@ -309,36 +305,33 @@ class PublishDocumentUnitIntegrationTest {
   @Test
   void testPublicationHistoryWithXmlAndReport() {
     UUID documentUnitUuid1 = UUID.randomUUID();
-    DocumentUnitDTO documentUnitDTO =
-        DocumentUnitDTO.builder()
-            .uuid(documentUnitUuid1)
-            .documentationOfficeId(docOfficeUuid)
-            .documentnumber("docnr12345678")
-            .creationtimestamp(Instant.now())
+    DocumentationUnitDTO documentUnitDTO =
+        DocumentationUnitDTO.builder()
+            .id(documentUnitUuid1)
+            .documentationOffice(docOffice)
+            .documentNumber("docnr12345678")
             .build();
-    DocumentUnitDTO savedDocumentUnitDTO = repository.save(documentUnitDTO).block();
+    DocumentationUnitDTO savedDocumentUnitDTO = repository.save(documentUnitDTO);
 
     Instant publishDate = Instant.now();
-    xmlPublicationRepository
-        .save(
-            new XmlPublicationDTO(
-                null,
-                savedDocumentUnitDTO.getId(),
-                "exporter@neuris.de",
-                "mailSubject",
-                "xml",
-                "200",
-                "message 1|message 2",
-                "test.xml",
-                publishDate))
-        .block();
+    xmlPublicationRepository.save(
+        new XmlPublicationDTO(
+            null,
+            savedDocumentUnitDTO.getId(),
+            "exporter@neuris.de",
+            "mailSubject",
+            "xml",
+            "200",
+            "message 1|message 2",
+            "test.xml",
+            publishDate));
 
     Instant receivedDate = publishDate.plus(1, ChronoUnit.HOURS);
     databasePublishReportRepository
         .save(
             new PublicationReportDTO(
                 UUID.randomUUID(),
-                savedDocumentUnitDTO.getUuid(),
+                savedDocumentUnitDTO.getId(),
                 "<HTML>success!</HTML>",
                 receivedDate,
                 true))

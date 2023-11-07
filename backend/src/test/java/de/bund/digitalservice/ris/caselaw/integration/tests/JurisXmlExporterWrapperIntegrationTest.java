@@ -60,11 +60,9 @@ class JurisXmlExporterWrapperIntegrationTest {
             .documentType(
                 DocumentType.builder().jurisShortcut("category").label("category123").build())
             .ecli("ecli")
-            .decisionDate(LocalDate.parse("2021-01-01T00:00:00Z"))
+            .decisionDate(LocalDate.parse("2021-01-01"))
             .deviatingDecisionDates(
-                List.of(
-                    LocalDate.parse("2021-01-01T00:00:00Z"),
-                    LocalDate.parse("2021-01-02T00:00:00Z")))
+                List.of(LocalDate.parse("2021-01-01"), LocalDate.parse("2021-01-02")))
             .build();
 
     Texts texts = Texts.builder().decisionName("decisionName").build();
@@ -74,7 +72,7 @@ class JurisXmlExporterWrapperIntegrationTest {
             ProceedingDecision.builder()
                 .uuid(UUID.randomUUID())
                 .court(new Court(UUID.randomUUID(), "courtType", "courtPlace", "courtLabel", null))
-                .decisionDate(LocalDate.parse("2020-05-06T00:00:00Z"))
+                .decisionDate(LocalDate.parse("2020-05-06"))
                 .dateKnown(true)
                 .fileNumber("fileNumber")
                 .documentType(
@@ -135,7 +133,7 @@ class JurisXmlExporterWrapperIntegrationTest {
             .ecli("ecli")
             .deviatingEclis(List.of("dev-ecli-1", "dev-ecli-2"))
             .appraisalBody("appraisalBody")
-            .decisionDate(LocalDate.parse("2021-01-01T00:00:00Z"))
+            .decisionDate(LocalDate.parse("2021-01-01"))
             .legalEffect("legalEffect")
             .inputType("inputType")
             .documentationOffice(DocumentationOffice.builder().abbreviation("fooOffice").build())
@@ -160,7 +158,7 @@ class JurisXmlExporterWrapperIntegrationTest {
                 .documentNumber("documentNumber")
                 .dataSource(DataSource.NEURIS)
                 .court(new Court(UUID.randomUUID(), "courtType", "courtPlace", "courtLabel", null))
-                .decisionDate(LocalDate.parse("2020-04-05T00:00:00Z"))
+                .decisionDate(LocalDate.parse("2020-04-05"))
                 .dateKnown(true)
                 .fileNumber("fileNumber")
                 .documentType(

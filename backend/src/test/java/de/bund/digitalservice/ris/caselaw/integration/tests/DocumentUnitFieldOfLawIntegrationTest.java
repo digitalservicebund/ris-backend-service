@@ -87,9 +87,9 @@ class DocumentUnitFieldOfLawIntegrationTest {
   @BeforeEach
   void setUp() {
     when(userService.getDocumentationOffice(any(OidcUser.class)))
-        .thenReturn(Mono.just(AuthUtils.buildDocOffice("DigitalService")));
+        .thenReturn(Mono.just(AuthUtils.buildDocOffice("DS")));
 
-    docOfficeDTO = documentationOfficeRepository.findByAbbreviation("DigitalService");
+    docOfficeDTO = documentationOfficeRepository.findByAbbreviation("DS");
   }
 
   @AfterEach
