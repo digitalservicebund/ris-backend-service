@@ -206,7 +206,7 @@ dependencies {
     }
     implementation("org.freehep:freehep-graphicsio-emf:2.4")
     // package served by private repo, requires authentication:
-    implementation("de.bund.digitalservice:neuris-juris-xml-export:0.7.14") {
+    implementation("de.bund.digitalservice:neuris-juris-xml-export:0.7.15") {
         exclude(group = "org.slf4j", module = "slf4j-simple")
     }
     // for local development:
