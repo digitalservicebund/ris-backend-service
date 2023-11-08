@@ -51,6 +51,6 @@ class SecurityIntegrationTest {
         .expectHeader()
         .valueEquals(
             "Content-Security-Policy",
-            "default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'");
+            "default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-eval'; connect-src 'self' *.sentry.io data:");
   }
 }
