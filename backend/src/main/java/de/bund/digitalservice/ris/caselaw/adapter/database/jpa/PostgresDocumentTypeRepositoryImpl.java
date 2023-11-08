@@ -4,6 +4,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentTypeTransf
 import de.bund.digitalservice.ris.caselaw.domain.DocumentTypeRepository;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
 import java.util.List;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -29,7 +30,8 @@ public class PostgresDocumentTypeRepositoryImpl implements DocumentTypeRepositor
   }
 
   @Override
-  public List<DocumentType> findAllByDocumentTypeOrderByAbbreviationAscLabelAsc(char shortcut) {
+  public List<DocumentType> findAllByDocumentTypeOrderByAbbreviationAscLabelAsc(
+      @Param("shortcut") char shortcut) {
     return repository
         .findAllByCategoryOrderByAbbreviationAscLabelAsc(categoryRepository.findFirstByLabel("R"))
         .stream()
