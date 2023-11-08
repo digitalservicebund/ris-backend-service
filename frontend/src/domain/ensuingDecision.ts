@@ -26,7 +26,7 @@ export default class EnsuingDecision
 
   get renderDecision(): string {
     return [
-      ...(this.isPending === true ? ["anhängig"] : []),
+      ...(this.isPending === true ? ["anhängig"] : ["nachgehend"]),
       ...(this.court ? [`${this.court.label}`] : []),
       ...(this.decisionDate
         ? [dayjs(this.decisionDate).format("DD.MM.YYYY")]
@@ -34,6 +34,7 @@ export default class EnsuingDecision
       ...(this.isPending ? ["Datum unbekannt"] : []),
       ...(this.fileNumber ? [this.fileNumber] : []),
       ...(this.documentType ? [this.documentType?.jurisShortcut] : []),
+      ...(this.note ? [this.note] : []),
       // ...(this.documentNumber && this.hasForeignSource
       //   ? [this.documentNumber]
       //   : []),

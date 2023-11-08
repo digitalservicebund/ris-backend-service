@@ -24,7 +24,14 @@ const ensuingDecisions = computed({
 const defaultValue = new EnsuingDecision()
 
 function decisionSummarizer(dataEntry: EnsuingDecision) {
-  if (dataEntry.hasMissingRequiredFields) {
+  if (
+    !dataEntry.hasMissingRequiredFields ||
+    (dataEntry.missingRequiredFields.length === 1 &&
+      dataEntry.missingRequiredFields[0] === "decisionDate" &&
+      dataEntry.isPending)
+  ) {
+    return h("div", { class: ["link-02-reg"] }, dataEntry.renderDecision)
+  } else {
     return h("div", { class: ["flex flex-row items-center"] }, [
       h(
         "span",
@@ -40,8 +47,6 @@ function decisionSummarizer(dataEntry: EnsuingDecision) {
         dataEntry.renderDecision,
       ),
     ])
-  } else {
-    return h("div", { class: ["link-02-reg"] }, dataEntry.renderDecision)
   }
 }
 

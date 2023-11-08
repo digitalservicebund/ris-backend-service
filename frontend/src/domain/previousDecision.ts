@@ -27,7 +27,7 @@ export default class PreviousDecision
       ...(this.decisionDate
         ? [dayjs(this.decisionDate).format("DD.MM.YYYY")]
         : []),
-      ...(this.dateUnknown === true ? ["unbekanntes Entscheidungsdatum"] : []),
+      ...(this.dateUnknown === true ? ["Datum unbekannt"] : []),
       ...(this.fileNumber ? [this.fileNumber] : []),
       ...(this.documentType ? [this.documentType?.jurisShortcut] : []),
       // ...(this.documentNumber && this.hasForeignSource
