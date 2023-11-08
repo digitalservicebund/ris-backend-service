@@ -7,10 +7,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
@@ -28,7 +26,7 @@ public class ContentRelatedIndexingController {
   @GetMapping("fieldsoflaw")
   @PreAuthorize("@userHasReadAccessByDocumentUnitUuid.apply(#documentUnitUuid)")
   public Mono<List<FieldOfLaw>> getFieldsOfLaw(@PathVariable("uuid") UUID documentUnitUuid) {
-    return fieldOfLawService.getFieldsOfLawForDocumentUnit(documentUnitUuid);
+    return Mono.just(Collections.emptyList());
   }
 
   @GetMapping("keywords")
@@ -36,21 +34,5 @@ public class ContentRelatedIndexingController {
   @Deprecated
   public Mono<List<String>> getKeywords(@PathVariable("uuid") UUID documentUnitUuid) {
     return Mono.just(Collections.emptyList());
-  }
-
-  @PutMapping("fieldsoflaw/{identifier}")
-  @PreAuthorize("@userHasWriteAccessByDocumentUnitUuid.apply(#documentUnitUuid)")
-  public Mono<List<FieldOfLaw>> addFieldOfLaw(
-      @PathVariable("uuid") UUID documentUnitUuid, @PathVariable("identifier") String identifier) {
-
-    return fieldOfLawService.addFieldOfLawToDocumentUnit(documentUnitUuid, identifier);
-  }
-
-  @DeleteMapping("fieldsoflaw/{identifier}")
-  @PreAuthorize("@userHasWriteAccessByDocumentUnitUuid.apply(#documentUnitUuid)")
-  public Mono<List<FieldOfLaw>> removeFieldOfLaw(
-      @PathVariable("uuid") UUID documentUnitUuid, @PathVariable("identifier") String identifier) {
-
-    return fieldOfLawService.removeFieldOfLawToDocumentUnit(documentUnitUuid, identifier);
   }
 }

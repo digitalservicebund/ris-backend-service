@@ -171,7 +171,7 @@ class JurisXmlExporterWrapperIntegrationTest {
             .fieldsOfLaw(
                 List.of(
                     FieldOfLaw.builder()
-                        .id(1L)
+                        .id(UUID.randomUUID())
                         .identifier("SF-01")
                         .text("field of law text")
                         .build()))

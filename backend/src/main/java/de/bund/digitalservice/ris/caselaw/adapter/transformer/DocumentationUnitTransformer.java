@@ -7,6 +7,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DeviatingEcliDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DeviatingFileNumberDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentTypeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.FieldOfLawDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.EnsuingDecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.FileNumberDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.KeywordDTO;
@@ -26,6 +27,7 @@ import de.bund.digitalservice.ris.caselaw.domain.EnsuingDecision;
 import de.bund.digitalservice.ris.caselaw.domain.PreviousDecision;
 import de.bund.digitalservice.ris.caselaw.domain.Texts;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
+import de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw.FieldOfLaw;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -224,6 +226,19 @@ public class DocumentationUnitTransformer {
         }
         builder.activeCitations(activeCitationsDTOs.stream().filter(Objects::nonNull).toList());
       }
+
+      List<FieldOfLaw> fieldOfLaws = contentRelatedIndexing.fieldsOfLaw();
+      if (fieldOfLaws != null) {
+        builder.fieldsOfLaw(
+            fieldOfLaws.stream()
+                .map(
+                    fieldOfLaw ->
+                        FieldOfLawDTO.builder()
+                            .id(fieldOfLaw.id())
+                            .identifier(fieldOfLaw.identifier())
+                            .build())
+                .toList());
+      }
     }
 
     if (updatedDomainObject.texts() != null) {
@@ -256,17 +271,6 @@ public class DocumentationUnitTransformer {
     }
 
     return builder.build();
-  }
-
-  private static boolean hasCourtChanged(
-      DocumentationUnitDTO documentUnitDTO, DocumentUnit documentUnit) {
-    return documentUnit == null
-        || documentUnit.coreData() == null
-        || documentUnit.coreData().court() == null
-        || !Objects.equals(
-            documentUnitDTO.getCourt().getType(), documentUnit.coreData().court().type())
-        || !Objects.equals(
-            documentUnitDTO.getCourt().getLocation(), documentUnit.coreData().court().location());
   }
 
   public static DocumentUnit transformToDomain(DocumentationUnitDTO documentationUnitDTO) {
@@ -360,17 +364,8 @@ public class DocumentationUnitTransformer {
       contentRelatedIndexingBuilder.keywords(keywords);
     }
 
-    // List<FieldOfLaw> fieldsOfLaw = null;
-    // if (documentationUnitDTO.getFieldsOfLaw() != null) {
-    // fieldsOfLaw =
-    // documentationUnitDTO.getFieldsOfLaw().stream()
-    // .map(FieldOfLawTransformer::transformToDomain)
-    // .toList();
-    // }
-
     if (documentationUnitDTO.getNormReferences() != null) {
-      List<DocumentUnitNorm> norms = null;
-      norms =
+      List<DocumentUnitNorm> norms =
           documentationUnitDTO.getNormReferences().stream()
               .map(DocumentUnitNormTransformer::transformToDomain)
               .toList();
@@ -387,6 +382,15 @@ public class DocumentationUnitTransformer {
             ActiveCitationTransformer.transformToDomain(currentDTO);
       }
       contentRelatedIndexingBuilder.activeCitations(Arrays.stream(activeCitations).toList());
+    }
+
+    if (documentationUnitDTO.getFieldsOfLaw() != null) {
+      List<FieldOfLaw> fieldOfLaws =
+          documentationUnitDTO.getFieldsOfLaw().stream()
+              .map(FieldOfLawTransformer::transformToDomain)
+              .toList();
+
+      contentRelatedIndexingBuilder.fieldsOfLaw(fieldOfLaws);
     }
 
     ContentRelatedIndexing contentRelatedIndexing = contentRelatedIndexingBuilder.build();

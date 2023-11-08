@@ -51,12 +51,15 @@ const handleUpdateValueDocumentUnitTexts = async (
 }
 
 function haveDataChanged(): boolean {
-  return (
-    JSON.stringify(updatedDocumentUnit.value)
-      .replaceAll('"norms":[{"validationError":false}]', '"norms":[]')
-      .replaceAll('"activeCitations":[{}]', '"activeCitations":[]') !==
-    JSON.stringify(lastUpdatedDocumentUnit.value)
-  )
+  const newValue = JSON.stringify(updatedDocumentUnit.value)
+    .replaceAll('"norms":[{"validationError":false}]', '"norms":[]')
+    .replaceAll('"activeCitations":[{}]', '"activeCitations":[]')
+  const oldValue = JSON.stringify(lastUpdatedDocumentUnit.value)
+
+  // console.log("newValue:", newValue)
+  // console.log("oldValue:", oldValue)
+
+  return newValue !== oldValue
 }
 
 async function handleUpdateDocumentUnit(): Promise<ServiceResponse<void>> {
@@ -181,7 +184,6 @@ onMounted(async () => {
           <DocumentUnitContentRelatedIndexing
             id="contentRelatedIndexing"
             v-model="contentRelatedIndexing"
-            :document-unit-uuid="updatedDocumentUnit.uuid"
           />
 
           <DocumentUnitTexts

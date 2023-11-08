@@ -35,7 +35,7 @@ public interface DatabaseDocumentUnitMetadataRepository
           + LINKEDDOC_QUERY
           + "ORDER BY decision_date DESC, id DESC "
           + "LIMIT :pageSize OFFSET :offset")
-  Flux<DocumentUnitMetadataDTO> searchByLinkedDocumentationUnit(
+  Flux<DocumentUnitDTO> searchByLinkedDocumentationUnit(
       String courtType,
       String courtLocation,
       LocalDate decisionDate,

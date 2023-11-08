@@ -7,7 +7,6 @@ import Norms from "@/components/NormReferences.vue"
 import { ContentRelatedIndexing } from "@/domain/documentUnit"
 
 const props = defineProps<{
-  documentUnitUuid: string
   modelValue: ContentRelatedIndexing
 }>()
 
@@ -29,7 +28,7 @@ const contentRelatedIndexing = computed({
   <div class="mb-32 flex flex-col gap-32">
     <h2 class="ds-heading-02-reg mb-[1rem]">Inhaltliche Erschließung</h2>
     <KeyWords v-model="contentRelatedIndexing.keywords" />
-    <FieldOfLawMain :document-unit-uuid="props.documentUnitUuid" />
+    <FieldOfLawMain v-model="contentRelatedIndexing.fieldsOfLaw" />
     <Norms v-model="contentRelatedIndexing.norms" />
     <ActiveCitations v-model="contentRelatedIndexing.activeCitations" />
   </div>

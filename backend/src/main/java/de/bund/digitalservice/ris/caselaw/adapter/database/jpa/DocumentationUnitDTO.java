@@ -38,7 +38,7 @@ import lombok.Setter;
 @Builder(toBuilder = true)
 @Entity
 @Table(name = "documentation_unit", schema = "incremental_migration")
-public class DocumentationUnitDTO {
+public class DocumentationUnitDTO implements DocumentationUnitMetadataDTO {
 
   @Id @GeneratedValue private UUID id;
 
@@ -128,6 +128,15 @@ public class DocumentationUnitDTO {
       inverseJoinColumns = @JoinColumn(name = "region_id"))
   @Builder.Default
   private List<RegionDTO> regions = new ArrayList<>();
+
+  @ManyToMany(fetch = FetchType.EAGER)
+  @JoinTable(
+      name = "documentation_unit_field_of_law",
+      schema = "incremental_migration",
+      joinColumns = @JoinColumn(name = "documentation_unit_id"),
+      inverseJoinColumns = @JoinColumn(name = "field_of_law_id"))
+  @Builder.Default
+  private List<FieldOfLawDTO> fieldsOfLaw = new ArrayList<>();
 
   @Column private String source;
 

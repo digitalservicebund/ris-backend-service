@@ -81,6 +81,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
   }
 
   @Override
+  @Transactional(transactionManager = "jpaTransactionManager")
   public Mono<DocumentUnit> findByDocumentNumber(String documentNumber) {
     if (log.isDebugEnabled()) {
       log.debug("find by document number: {}", documentNumber);
@@ -92,10 +93,12 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
   }
 
   @Override
+  @Transactional(transactionManager = "jpaTransactionManager")
   public Mono<DocumentUnit> findByUuid(UUID uuid) {
     if (log.isDebugEnabled()) {
       log.debug("find by uuid: {}", uuid);
     }
+
     return Mono.just(
         DocumentationUnitTransformer.transformToDomain(repository.findById(uuid).orElse(null)));
   }
@@ -121,7 +124,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
   }
 
   @Override
-  @Transactional(transactionManager = "connectionFactoryTransactionManager")
+  @Transactional(transactionManager = "jpaTransactionManager")
   public Mono<DocumentUnit> save(DocumentUnit documentUnit) {
 
     DocumentationUnitDTO documentationUnitDTO =

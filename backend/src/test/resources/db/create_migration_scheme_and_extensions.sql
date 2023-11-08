@@ -334,3 +334,88 @@ create table
     documentation_unit_id uuid constraint fk_documentation_unit references incremental_migration.documentation_unit,
     document_type_raw_value varchar(255)
   );
+
+create type
+  incremental_migration.notation as enum('OLD', 'NEW');
+
+create table
+  incremental_migration.field_of_law (
+    id uuid not null primary key,
+    identifier varchar(255) not null constraint uc_field_of_law_identifier unique,
+    text varchar(1023) not null,
+    juris_id integer not null,
+    notation incremental_migration.notation not null,
+    constraint uc_field_of_law_juris_id_notation unique (juris_id, notation)
+  );
+
+create table
+  incremental_migration.field_of_law_keyword (
+    id uuid not null primary key,
+    value varchar(255) not null constraint uc_field_of_law_keyword unique
+  );
+
+create table
+  incremental_migration.field_of_law_navigation_term (
+    id uuid not null primary key,
+    value varchar(1023) not null constraint uc_field_of_law_navigation_term unique
+  );
+
+create table
+  incremental_migration.field_of_law_norm (
+    id uuid not null primary key,
+    abbreviation varchar(255) not null,
+    single_norm_description varchar(255),
+    field_of_law_id uuid not null constraint fk_field_of_law references incremental_migration.field_of_law
+  );
+
+create index
+  field_of_law_norm_field_of_law_id_idx on incremental_migration.field_of_law_norm (field_of_law_id);
+
+create table
+  incremental_migration.field_of_law_field_of_law_keyword (
+    field_of_law_id uuid not null constraint fk_field_of_law references incremental_migration.field_of_law,
+    field_of_law_keyword_id uuid not null constraint fk_field_of_law_keyword references incremental_migration.field_of_law_keyword,
+    primary key (field_of_law_id, field_of_law_keyword_id)
+  );
+
+create index
+  field_of_law_keyword_id_idx on incremental_migration.field_of_law_field_of_law_keyword (field_of_law_keyword_id);
+
+create table
+  incremental_migration.field_of_law_field_of_law_navigation_term (
+    field_of_law_id uuid not null constraint fk_field_of_law references incremental_migration.field_of_law,
+    field_of_law_navigation_term_id uuid not null constraint fk_field_of_law_navigation_term references incremental_migration.field_of_law_navigation_term,
+    primary key (field_of_law_id, field_of_law_navigation_term_id)
+  );
+
+create index
+  field_of_law_navigation_term_id_idx on incremental_migration.field_of_law_field_of_law_navigation_term (field_of_law_navigation_term_id);
+
+create table
+  incremental_migration.field_of_law_field_of_law_parent (
+    field_of_law_id uuid not null primary key constraint fk_field_of_law references incremental_migration.field_of_law,
+    field_of_law_parent_id uuid not null constraint fk_field_of_law_parent references incremental_migration.field_of_law
+  );
+
+create index
+  field_of_law_parent_id_idx on incremental_migration.field_of_law_field_of_law_parent (field_of_law_parent_id);
+
+create table
+  incremental_migration.field_of_law_field_of_law_text_reference (
+    field_of_law_id uuid not null constraint fk_field_of_law references incremental_migration.field_of_law,
+    field_of_law_text_reference_id uuid not null constraint field_of_law_reference references incremental_migration.field_of_law,
+    primary key (field_of_law_id, field_of_law_text_reference_id)
+  );
+
+create index
+  field_of_law_text_reference_id_idx on incremental_migration.field_of_law_field_of_law_text_reference (field_of_law_text_reference_id);
+
+create table
+  incremental_migration.documentation_unit_field_of_law (
+    documentation_unit_id uuid not null constraint fk_documentation_unit references incremental_migration.documentation_unit,
+    field_of_law_id uuid not null constraint fk_field_of_law references incremental_migration.field_of_law,
+    primary key (documentation_unit_id, field_of_law_id)
+  );
+
+create index
+  documentation_unit_field_of_law_field_of_law_id_idx on incremental_migration.documentation_unit_field_of_law (field_of_law_id);

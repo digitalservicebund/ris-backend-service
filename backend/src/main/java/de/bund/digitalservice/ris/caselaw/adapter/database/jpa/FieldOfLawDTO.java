@@ -13,11 +13,10 @@ import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OrderBy;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
@@ -41,16 +40,15 @@ import lombok.ToString;
 public class FieldOfLawDTO {
   @Id @GeneratedValue private UUID id;
 
-  @Column(nullable = false, unique = true)
-  @NotBlank
+  @Column(unique = true, updatable = false, insertable = false)
   private String identifier;
 
-  @Column(nullable = false)
-  @NotBlank
+  @Column(updatable = false, insertable = false)
   private String text;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinTable(
+      schema = "incremental_migration",
       name = "field_of_law_field_of_law_navigation_term",
       joinColumns = @JoinColumn(name = "field_of_law_id"),
       inverseJoinColumns = @JoinColumn(name = "field_of_law_navigation_term_id"))
@@ -59,6 +57,7 @@ public class FieldOfLawDTO {
 
   @ManyToMany(fetch = FetchType.LAZY)
   @JoinTable(
+      schema = "incremental_migration",
       name = "field_of_law_field_of_law_keyword",
       joinColumns = @JoinColumn(name = "field_of_law_id"),
       inverseJoinColumns = @JoinColumn(name = "field_of_law_keyword_id"))
@@ -75,41 +74,33 @@ public class FieldOfLawDTO {
   @Valid
   private Set<FieldOfLawNormDTO> norms = new HashSet<>();
 
-  @ManyToOne(fetch = FetchType.LAZY)
+  @ManyToOne
   @JoinTable(
+      schema = "incremental_migration",
       name = "field_of_law_field_of_law_parent",
       joinColumns = @JoinColumn(name = "field_of_law_id"),
       inverseJoinColumns = @JoinColumn(name = "field_of_law_parent_id"))
   private FieldOfLawDTO parent;
 
+  @OneToMany(fetch = FetchType.LAZY, mappedBy = "parent")
+  @OrderBy("identifier")
+  private Set<FieldOfLawDTO> children = new HashSet<>();
+
   @ManyToMany(fetch = FetchType.LAZY)
   @JoinTable(
+      schema = "incremental_migration",
       name = "field_of_law_field_of_law_text_reference",
       joinColumns = @JoinColumn(name = "field_of_law_id"),
       inverseJoinColumns = @JoinColumn(name = "field_of_law_text_reference_id"))
   @Builder.Default
   private Set<FieldOfLawDTO> fieldOfLawTextReferences = new HashSet<>();
 
-  @Column(nullable = false, updatable = false, name = "juris_id")
+  @Column(updatable = false, name = "juris_id")
   @ToString.Include
-  @NotNull
   private Integer jurisId;
 
-  @Column(nullable = false, updatable = false)
-  @NotNull
+  @Column(updatable = false)
   @Enumerated(EnumType.STRING)
   @ToString.Include
   private Notation notation;
-
-  public void setNorms(Set<FieldOfLawNormDTO> entities) {
-    entities.forEach(e -> e.setFieldOfLaw(this));
-    this.norms = new HashSet<>();
-    this.norms.addAll(entities);
-  }
-
-  public UniqueIdentifier getUniqueIdentifier() {
-    return new UniqueIdentifier(jurisId, notation);
-  }
-
-  public record UniqueIdentifier(Integer jurisId, Notation notation) {}
 }

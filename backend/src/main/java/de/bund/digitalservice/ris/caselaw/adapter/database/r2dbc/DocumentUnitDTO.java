@@ -1,7 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc;
 
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.NormReferenceDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.FieldOfLawDTO;
 import de.bund.digitalservice.ris.caselaw.domain.ActiveCitation;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -61,6 +60,6 @@ public class DocumentUnitDTO extends DocumentUnitMetadataDTO {
   @Transient List<DeviatingEcliDTO> deviatingEclis;
   @Transient List<DeviatingDecisionDateDTO> deviatingDecisionDates;
   @Transient List<KeywordDTO> keywords;
-  @Transient List<FieldOfLawDTO> fieldsOfLaw;
+  //  @Transient List<FieldOfLawDTO> fieldsOfLaw;
   @Transient List<NormReferenceDTO> norms;
 }

@@ -1,49 +1,42 @@
 <script lang="ts" setup>
-import { h, ref } from "vue"
+import { h, ref, watch } from "vue"
 import FieldOfLawSelectionList from "./FieldOfLawSelectionList.vue"
 import FieldOfLawTree from "./FieldOfLawTree.vue"
 import ExpandableDataSet from "@/components/ExpandableDataSet.vue"
 import FieldOfLawDirectInputSearch from "@/components/FieldOfLawDirectInputSearch.vue"
 import FieldOfLawSearch from "@/components/FieldOfLawSearch.vue"
 import { FieldOfLawNode } from "@/domain/fieldOfLaw"
-import FieldOfLawService from "@/services/fieldOfLawService"
 import { withSummarizer } from "@/shared/components/DataSetSummary.vue"
 
 const props = defineProps<{
-  documentUnitUuid: string
+  modelValue: FieldOfLawNode[] | undefined
 }>()
 
-const selectedFieldsOfLaw = ref<FieldOfLawNode[]>([])
+const emit = defineEmits<{ "update:modelValue": [value?: FieldOfLawNode[]] }>()
+
 const clickedIdentifier = ref("")
 const showNorms = ref(false)
+const localModelValue = ref<FieldOfLawNode[]>(props.modelValue ?? [])
 
-const response = await FieldOfLawService.getSelectedFieldsOfLaw(
-  props.documentUnitUuid,
+watch(
+  props,
+  () => {
+    localModelValue.value = props.modelValue ?? []
+  },
+  { immediate: true },
 )
 
-if (response.data) {
-  selectedFieldsOfLaw.value = response.data
-}
+watch(localModelValue, () => {
+  emit("update:modelValue", localModelValue.value)
+})
 
-const handleAdd = async (identifier: string) => {
-  const response = await FieldOfLawService.addFieldOfLaw(
-    props.documentUnitUuid,
-    identifier,
-  )
-
-  if (response.data) {
-    selectedFieldsOfLaw.value = response.data
-  }
-}
-
-const handleRemoveByIdentifier = async (identifier: string) => {
-  const response = await FieldOfLawService.removeFieldOfLaw(
-    props.documentUnitUuid,
-    identifier,
-  )
-
-  if (response.data) {
-    selectedFieldsOfLaw.value = response.data
+const handleAdd = async (fieldOfLaw: FieldOfLawNode) => {
+  if (
+    !localModelValue.value?.find(
+      (entry) => entry.identifier === fieldOfLaw.identifier,
+    )
+  ) {
+    localModelValue.value?.push(fieldOfLaw)
   }
 }
 
@@ -86,7 +79,7 @@ const SelectedFieldsOfLawSummary = withSummarizer(selectedFieldsOfLawSummarizer)
 <template>
   <ExpandableDataSet
     as-column
-    :data-set="selectedFieldsOfLaw"
+    :data-set="localModelValue"
     :summary-component="SelectedFieldsOfLawSummary"
     title="Sachgebiete"
   >
@@ -101,12 +94,10 @@ const SelectedFieldsOfLawSummary = withSummarizer(selectedFieldsOfLawSummarizer)
         </div>
         <div class="flex-1 bg-white p-20">
           <FieldOfLawTree
+            v-model="localModelValue"
             :clicked-identifier="clickedIdentifier"
-            :selected-nodes="selectedFieldsOfLaw"
             :show-norms="showNorms"
-            @add-to-list="handleAdd"
             @linked-field:clicked="handleLinkedFieldClicked"
-            @remove-from-list="handleRemoveByIdentifier"
             @reset-clicked-node="handleResetClickedNode"
             @toggle-show-norms="showNorms = !showNorms"
           ></FieldOfLawTree>
@@ -117,10 +108,9 @@ const SelectedFieldsOfLawSummary = withSummarizer(selectedFieldsOfLawSummarizer)
         <h1 class="ds-heading-03-reg pb-8">Ausgewählte Sachgebiete</h1>
         <FieldOfLawDirectInputSearch @add-to-list="handleAdd" />
         <FieldOfLawSelectionList
-          :selected-fields-of-law="selectedFieldsOfLaw"
+          v-model="localModelValue"
           @linked-field:clicked="handleLinkedFieldClicked"
           @node-clicked="handleNodeClicked"
-          @remove-from-list="handleRemoveByIdentifier"
         ></FieldOfLawSelectionList>
       </div>
     </div>

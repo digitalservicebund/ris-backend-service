@@ -19,7 +19,6 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.Texts;
 import de.bund.digitalservice.ris.caselaw.domain.court.Court;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
-import de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw.FieldOfLaw;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
@@ -281,14 +280,6 @@ public class DocumentUnitTransformer {
           documentUnitDTO.getIncorrectCourts().stream().map(IncorrectCourtDTO::court).toList();
     }
 
-    List<FieldOfLaw> fieldsOfLaw = null;
-    if (documentUnitDTO.getFieldsOfLaw() != null) {
-      fieldsOfLaw =
-          documentUnitDTO.getFieldsOfLaw().stream()
-              .map(FieldOfLawTransformer::transformToDomain)
-              .toList();
-    }
-
     List<DocumentUnitNorm> norms = null;
     if (documentUnitDTO.getNorms() != null) {
       norms =
@@ -355,7 +346,6 @@ public class DocumentUnitTransformer {
         .contentRelatedIndexing(
             ContentRelatedIndexing.builder()
                 .keywords(keywords)
-                .fieldsOfLaw(fieldsOfLaw)
                 .norms(norms)
                 .activeCitations(activeCitations)
                 .build())

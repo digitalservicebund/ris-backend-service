@@ -396,6 +396,7 @@ public class DocumentUnitService {
         //                      });
         //            })
         .flatMap(repository::save)
+        .flatMap(du -> repository.findByUuid(du.uuid()))
         .doOnError(ex -> log.error("Couldn't update the DocumentUnit", ex));
   }
 

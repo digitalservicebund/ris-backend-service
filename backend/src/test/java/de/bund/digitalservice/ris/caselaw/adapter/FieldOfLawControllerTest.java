@@ -18,7 +18,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.oauth2.client.registration.ReactiveClientRegistrationRepository;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @ExtendWith(SpringExtension.class)
@@ -65,7 +64,7 @@ class FieldOfLawControllerTest {
 
   @Test
   void testGetChildrenOfFieldOfLaw() {
-    when(service.getChildrenOfFieldOfLaw("root")).thenReturn(Flux.empty());
+    when(service.getChildrenOfFieldOfLaw("root")).thenReturn(Mono.empty());
 
     risWebTestClient
         .withDefaultLogin()

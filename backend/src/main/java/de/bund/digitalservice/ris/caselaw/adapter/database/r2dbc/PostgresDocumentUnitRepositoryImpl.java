@@ -20,7 +20,6 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.NormReferenceDTO.
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ProcedureDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitDTO.DocumentUnitDTOBuilder;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.CourtDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DatabaseFieldOfLawRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.StateDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.StateRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DeviatingCourtTransformer;
@@ -83,7 +82,6 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
   private final StateRepository stateRepository;
   private final DatabaseDocumentTypeRepository databaseDocumentTypeRepository;
   private final DatabaseDocumentCategoryRepository databaseDocumentCategoryRepository;
-  private final DatabaseFieldOfLawRepository fieldOfLawRepository;
   private final DatabaseDocumentUnitFieldsOfLawRepository documentUnitFieldsOfLawRepository;
   private final DatabaseKeywordRepository keywordRepository;
   private final DatabaseNormReferenceRepository documentUnitNormRepository;
@@ -108,7 +106,6 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
       StateRepository stateRepository,
       DatabaseDocumentTypeRepository databaseDocumentTypeRepository,
       DatabaseDocumentCategoryRepository databaseDocumentCategoryRepository,
-      DatabaseFieldOfLawRepository fieldOfLawRepository,
       DatabaseDocumentUnitFieldsOfLawRepository documentUnitFieldsOfLawRepository,
       DatabaseKeywordRepository keywordRepository,
       DatabaseNormReferenceRepository documentUnitNormRepository,
@@ -131,7 +128,6 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
     this.stateRepository = stateRepository;
     this.databaseDocumentTypeRepository = databaseDocumentTypeRepository;
     this.databaseDocumentCategoryRepository = databaseDocumentCategoryRepository;
-    this.fieldOfLawRepository = fieldOfLawRepository;
     this.documentUnitFieldsOfLawRepository = documentUnitFieldsOfLawRepository;
     this.keywordRepository = keywordRepository;
     this.documentUnitNormRepository = documentUnitNormRepository;
@@ -1096,13 +1092,14 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
   }
 
   private Mono<DocumentUnitDTO> injectFieldsOfLaw(DocumentUnitDTO documentUnitDTO) {
-    return documentUnitFieldsOfLawRepository
-        .findAllByDocumentUnitId(documentUnitDTO.getId())
-        .map(DocumentUnitFieldsOfLawDTO::fieldOfLawId)
-        .collectList()
-        .flatMapMany(fieldOfLawRepository::findAllById)
-        .collectList()
-        .map(fieldsOfLaw -> documentUnitDTO.toBuilder().fieldsOfLaw(fieldsOfLaw).build());
+    return Mono.just(documentUnitDTO);
+    //    return documentUnitFieldsOfLawRepository
+    //        .findAllByDocumentUnitId(documentUnitDTO.getId())
+    //        .map(DocumentUnitFieldsOfLawDTO::fieldOfLawId)
+    //        .collectList()
+    //        .flatMapMany(fieldOfLawRepository::findAllById)
+    //        .collectList()
+    //        .map(fieldsOfLaw -> documentUnitDTO.toBuilder().fieldsOfLaw(fieldsOfLaw).build());
   }
 
   private Mono<DocumentUnitDTO> injectKeywords(DocumentUnitDTO documentUnitDTO) {
