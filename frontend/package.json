@@ -55,7 +55,7 @@
     "@tiptap/suggestion": "^2.1.9",
     "@tiptap/vue-3": "^2.1.9",
     "@unleash/proxy-client-vue": "^0.0.8",
-    "axios": "^1.5.0",
+    "axios": "^1.6.0",
     "dayjs": "^1.11.9",
     "immer": "^10.0.2",
     "maska": "^2.1.10",
