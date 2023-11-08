@@ -57,7 +57,7 @@ class XmlEMailPublishServiceTest {
   private static final String MAIL_SUBJECT =
       "id=juris name="
           + JURIS_USERNAME
-          + " mod=T da=R df=X dt=N ld="
+          + " da=R df=X dt=N mod=T ld="
           + DELIVER_DATE
           + " vg=test-document-number";
 

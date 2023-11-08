@@ -146,7 +146,7 @@ class PublishDocumentUnitIntegrationTest {
             1L,
             savedDocumentUnitDTO.getId(),
             "neuris@example.com",
-            "id=juris name=test-user mod=T da=R df=X dt=N ld="
+            "id=juris name=test-user da=R df=X dt=N mod=T ld="
                 + DELIVER_DATE
                 + " vg="
                 + savedDocumentUnitDTO.getDocumentnumber(),
@@ -160,7 +160,7 @@ class PublishDocumentUnitIntegrationTest {
             .documentUnitUuid(documentUnitUuid1)
             .receiverAddress("neuris@example.com")
             .mailSubject(
-                "id=juris name=test-user mod=T da=R df=X dt=N ld="
+                "id=juris name=test-user da=R df=X dt=N mod=T ld="
                     + DELIVER_DATE
                     + " vg="
                     + savedDocumentUnitDTO.getDocumentnumber())

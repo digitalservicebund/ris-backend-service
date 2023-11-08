@@ -87,10 +87,10 @@ public class XmlEMailPublishService implements EmailPublishService {
 
     String subject = "id=juris";
     subject += " name=" + jurisUsername;
-    subject += " mod=T";
     subject += " da=R";
     subject += " df=X";
     subject += " dt=N";
+    subject += " mod=T";
     subject += " ld=" + deliveryDate;
     subject += " vg=";
     subject += documentUnit.documentNumber();
