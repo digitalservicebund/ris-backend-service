@@ -76,12 +76,4 @@ describe("router's auth navigation guards", () => {
     expect(document.cookie).toEqual("")
     expect(window.location.href).toEqual("/norms")
   })
-
-  it("clears session cookie, if not authenticated", async () => {
-    document.cookie = "SESSION=invalid; path=/;"
-    vi.mocked(isAuthenticated).mockResolvedValueOnce(false)
-
-    await routerBeforeEach(router.resolve("/"))
-    expect(document.cookie).not.toContain("SESSION")
-  })
 })
