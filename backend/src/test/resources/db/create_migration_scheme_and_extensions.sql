@@ -332,7 +332,8 @@ create table
     note text,
     dtype varchar(31) not null,
     documentation_unit_id uuid constraint fk_documentation_unit references incremental_migration.documentation_unit,
-    document_type_raw_value varchar(255)
+    document_type_raw_value varchar(255),
+    rank integer default '-1'::integer not null
   );
 
 create type
