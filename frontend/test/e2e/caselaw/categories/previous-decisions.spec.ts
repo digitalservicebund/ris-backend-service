@@ -1,7 +1,7 @@
 import { expect } from "@playwright/test"
 import { generateString } from "../../../test-helper/dataGenerators"
 import {
-  fillProceedingDecisionInputs,
+  fillPreviousDecisionInputs,
   navigateToCategories,
   navigateToPublication,
   waitForSaving,
@@ -40,7 +40,7 @@ test.describe("previous decisions", () => {
     await navigateToCategories(page, documentNumber)
     await expect(page.getByText(documentNumber)).toBeVisible()
 
-    await fillProceedingDecisionInputs(page, {
+    await fillPreviousDecisionInputs(page, {
       court: prefilledDocumentUnit.coreData.court?.label,
       fileNumber: prefilledDocumentUnit.coreData.fileNumbers?.[0],
       documentType: prefilledDocumentUnit.coreData.documentType?.jurisShortcut,
@@ -60,7 +60,7 @@ test.describe("previous decisions", () => {
     await expect(page.getByLabel("Eintrag bearbeiten")).toHaveCount(1)
 
     await page.getByLabel("Weitere Angabe").click()
-    await fillProceedingDecisionInputs(page, {
+    await fillPreviousDecisionInputs(page, {
       court: prefilledDocumentUnit.coreData.court?.label,
       fileNumber: prefilledDocumentUnit.coreData.fileNumbers?.[0],
       documentType: prefilledDocumentUnit.coreData.documentType?.jurisShortcut,
@@ -93,7 +93,7 @@ test.describe("previous decisions", () => {
 
     await waitForSaving(
       async () => {
-        await fillProceedingDecisionInputs(page, {
+        await fillPreviousDecisionInputs(page, {
           court: prefilledDocumentUnit.coreData.court?.label,
           fileNumber: prefilledDocumentUnit.coreData.fileNumbers?.[0],
           documentType:
@@ -241,7 +241,7 @@ test.describe("previous decisions", () => {
     await navigateToCategories(page, documentNumber)
     await expect(page.getByText(documentNumber)).toBeVisible()
 
-    await fillProceedingDecisionInputs(page, {
+    await fillPreviousDecisionInputs(page, {
       court: prefilledDocumentUnit.coreData.court?.label,
       fileNumber: prefilledDocumentUnit.coreData.fileNumbers?.[0],
       documentType: prefilledDocumentUnit.coreData.documentType?.jurisShortcut,
@@ -273,7 +273,7 @@ test.describe("previous decisions", () => {
 
     // search for same parameters gives same result, indication that decision is already added
     await page.getByLabel("Weitere Angabe").click()
-    await fillProceedingDecisionInputs(page, {
+    await fillPreviousDecisionInputs(page, {
       court: prefilledDocumentUnit.coreData.court?.label,
       fileNumber: prefilledDocumentUnit.coreData.fileNumbers?.[0],
       documentType: prefilledDocumentUnit.coreData.documentType?.jurisShortcut,
@@ -303,7 +303,7 @@ test.describe("previous decisions", () => {
     await navigateToCategories(page, documentNumber)
     await expect(page.getByText(documentNumber)).toBeVisible()
 
-    await fillProceedingDecisionInputs(page, {
+    await fillPreviousDecisionInputs(page, {
       fileNumber: "abc",
     })
     await page.getByLabel("Vorgehende Entscheidung speichern").click()
@@ -314,7 +314,7 @@ test.describe("previous decisions", () => {
       page.getByLabel("Rechtszug").getByText("Pflichtfeld nicht befüllt"),
     ).toHaveCount(2)
 
-    await fillProceedingDecisionInputs(page, {
+    await fillPreviousDecisionInputs(page, {
       court: prefilledDocumentUnit.coreData.court?.label,
       fileNumber: prefilledDocumentUnit.coreData.fileNumbers?.[0],
       documentType: prefilledDocumentUnit.coreData.documentType?.jurisShortcut,

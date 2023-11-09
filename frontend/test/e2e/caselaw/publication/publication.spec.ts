@@ -2,7 +2,7 @@ import { expect } from "@playwright/test"
 import {
   fillActiveCitationInputs,
   fillNormInputs,
-  fillProceedingDecisionInputs,
+  fillPreviousDecisionInputs,
   navigateToCategories,
   navigateToPublication,
   waitForSaving,
@@ -33,7 +33,7 @@ test.describe("ensuring the publishing of documentunits works as expected", () =
 
     await waitForSaving(
       async () => {
-        await fillProceedingDecisionInputs(page, {
+        await fillPreviousDecisionInputs(page, {
           court: "AG Aalen",
         })
         await page.getByLabel("Vorgehende Entscheidung speichern").click()
@@ -68,7 +68,7 @@ test.describe("ensuring the publishing of documentunits works as expected", () =
 
     await waitForSaving(
       async () => {
-        await fillProceedingDecisionInputs(page, {
+        await fillPreviousDecisionInputs(page, {
           court: "AG Aalen",
         })
         await page.getByLabel("Vorgehende Entscheidung speichern").click()

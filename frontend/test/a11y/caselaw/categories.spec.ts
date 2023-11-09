@@ -3,7 +3,7 @@ import { expect } from "@playwright/test"
 import {
   navigateToCategories,
   waitForSaving,
-  fillProceedingDecisionInputs,
+  fillPreviousDecisionInputs,
 } from "../../e2e/caselaw/e2e-utils"
 import { caselawTest as test } from "../../e2e/caselaw/fixtures"
 
@@ -139,7 +139,7 @@ test.describe("a11y of categories page (/caselaw/documentunit/{documentNumber}/c
 
     await waitForSaving(
       async () => {
-        await fillProceedingDecisionInputs(page, {
+        await fillPreviousDecisionInputs(page, {
           court: "AG Aalen",
           decisionDate: "03.12.2004",
           fileNumber: "1a2b3c",
@@ -149,7 +149,7 @@ test.describe("a11y of categories page (/caselaw/documentunit/{documentNumber}/c
       { clickSaveButton: true },
     )
     await page.reload()
-    await fillProceedingDecisionInputs(page, {
+    await fillPreviousDecisionInputs(page, {
       decisionDate: "03.12.2004",
     })
 
