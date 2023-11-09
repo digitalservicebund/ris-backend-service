@@ -39,7 +39,6 @@ export async function beforeEach(to: RouteLocationNormalized) {
     return true
   } else {
     setLocationCookie(to.path)
-    deleteCookie("SESSION")
     redirectToLogin()
     return false
   }
