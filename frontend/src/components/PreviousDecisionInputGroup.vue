@@ -118,7 +118,7 @@ onMounted(() => {
       <CheckboxInput
         :id="id"
         v-model="previousDecision.dateUnknown"
-        aria-label="Datum Unbekannt Rechtszug"
+        aria-label="Datum Unbekannt Vorgehende Entscheidung"
       />
     </InputField>
     <div class="flex justify-between gap-24">
@@ -131,7 +131,7 @@ onMounted(() => {
         <ComboboxInput
           id="court"
           v-model="previousDecision.court"
-          aria-label="Gericht Rechtszug"
+          aria-label="Gericht Vorgehende Entscheidung"
           clear-on-choosing-item
           :has-error="slotProps.hasError"
           :item-service="ComboboxItemService.getCourts"
@@ -149,7 +149,7 @@ onMounted(() => {
           <DateInput
             id="decisionDate"
             v-model="previousDecision.decisionDate"
-            aria-label="Entscheidungsdatum Rechtszug"
+            aria-label="Entscheidungsdatum Vorgehende Entscheidung"
             :disabled="previousDecision.dateUnknown"
             :has-error="slotProps.hasError"
             @focus="validationStore.remove('decisionDate')"
@@ -170,7 +170,7 @@ onMounted(() => {
         <TextInput
           id="fileNumber"
           v-model="previousDecision.fileNumber"
-          aria-label="Aktenzeichen Rechtszug"
+          aria-label="Aktenzeichen Vorgehende Entscheidung"
           :has-error="slotProps.hasError"
           placeholder="Aktenzeichen"
           @input="validationStore.remove('fileNumber')"
@@ -185,7 +185,7 @@ onMounted(() => {
         <ComboboxInput
           id="documentType"
           v-model="previousDecision.documentType"
-          aria-label="Dokumenttyp Rechtszug"
+          aria-label="Dokumenttyp Vorgehende Entscheidung"
           :item-service="ComboboxItemService.getDocumentTypes"
           placeholder="Bitte auswählen"
         ></ComboboxInput>

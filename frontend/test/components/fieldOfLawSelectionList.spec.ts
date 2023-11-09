@@ -2,11 +2,9 @@ import { fireEvent, render, RenderResult, screen } from "@testing-library/vue"
 import FieldOfLawSelectionList from "@/components/FieldOfLawSelectionList.vue"
 import { FieldOfLawNode } from "@/domain/fieldOfLaw"
 
-function renderComponent(
-  selectedFieldsOfLaw: Partial<FieldOfLawNode>[],
-): RenderResult {
+function renderComponent(modelValue: Partial<FieldOfLawNode>[]): RenderResult {
   const props = {
-    selectedFieldsOfLaw,
+    modelValue,
   }
 
   return render(FieldOfLawSelectionList, { props })
@@ -54,7 +52,7 @@ describe("FieldOfLawSelectionList", () => {
       screen.getByLabelText("ST-01-02-03 Steuerrecht 1-2-3 entfernen"),
     )
 
-    expect(emitted()["remove-from-list"]).toBeTruthy()
+    expect(emitted()["update:modelValue"]).toBeTruthy()
   })
 
   it("click on 'Auswahl im Sachgebietsbaum' emit 'select-node", async () => {

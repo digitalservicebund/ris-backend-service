@@ -74,13 +74,14 @@ describe("Decision ListItem", () => {
     expect(await screen.findByText(/27.03.2022/)).toBeVisible()
   })
 
-  it("renders with link if source is not proceedingDecisions", async () => {
-    renderComponent({
-      documentNumber: "fooDocumentNumber",
-    })
-    expect(screen.getByRole("link")).toHaveAttribute(
-      "href",
-      expect.stringMatching(/fooDocumentNumber/),
-    )
-  })
+  // Todo: enable again when linking possible
+  // it("renders with link if linked to docunit", async () => {
+  //   renderComponent({
+  //     documentNumber: "fooDocumentNumber",
+  //   })
+  //   expect(screen.getByRole("link")).toHaveAttribute(
+  //     "href",
+  //     expect.stringMatching(/fooDocumentNumber/),
+  //   )
+  // })
 })

@@ -146,7 +146,7 @@ onMounted(() => {
         <ComboboxInput
           id="court"
           v-model="ensuingDecision.court"
-          aria-label="Gericht Rechtszug"
+          aria-label="Gericht Nachgehende Entschiedung"
           clear-on-choosing-item
           :has-error="slotProps.hasError"
           :item-service="ComboboxItemService.getCourts"
@@ -164,7 +164,7 @@ onMounted(() => {
           <DateInput
             id="decisionDate"
             v-model="ensuingDecision.decisionDate"
-            aria-label="Entscheidungsdatum Rechtszug"
+            aria-label="Entscheidungsdatum Nachgehende Entschiedung"
             :has-error="slotProps.hasError"
             @focus="validationStore.remove('decisionDate')"
             @update:validation-error="slotProps.updateValidationError"
@@ -184,7 +184,7 @@ onMounted(() => {
         <TextInput
           id="fileNumber"
           v-model="ensuingDecision.fileNumber"
-          aria-label="Aktenzeichen Rechtszug"
+          aria-label="Aktenzeichen Nachgehende Entschiedung"
           :has-error="slotProps.hasError"
           placeholder="Aktenzeichen"
           @input="validationStore.remove('fileNumber')"
@@ -199,7 +199,7 @@ onMounted(() => {
         <ComboboxInput
           id="documentType"
           v-model="ensuingDecision.documentType"
-          aria-label="Dokumenttyp Rechtszug"
+          aria-label="Dokumenttyp Nachgehende Entschiedung"
           :item-service="ComboboxItemService.getDocumentTypes"
           placeholder="Bitte auswählen"
         ></ComboboxInput>
@@ -233,7 +233,7 @@ onMounted(() => {
         @click="handleSearch"
       />
       <TextButton
-        aria-label="Vorgehende Entscheidung speichern"
+        aria-label="Nachgehende Entscheidung speichern"
         class="mr-28"
         :disabled="ensuingDecision.isEmpty"
         label="Übernehmen"

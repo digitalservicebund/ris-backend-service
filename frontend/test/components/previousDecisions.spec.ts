@@ -1,6 +1,7 @@
 import { userEvent } from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
 import { createPinia, setActivePinia } from "pinia"
+import PreviousDecisions from "@/components/PreviousDecisions.vue"
 import { Court, DocumentType } from "@/domain/documentUnit"
 import PreviousDecision from "@/domain/previousDecision"
 import comboboxItemService from "@/services/comboboxItemService"
@@ -16,7 +17,7 @@ function renderComponent(options?: { modelValue?: PreviousDecision[] }) {
   const user = userEvent.setup()
   return {
     user,
-    ...render(PreviousDecision, {
+    ...render(PreviousDecisions, {
       props,
       global: {
         stubs: { routerLink: { template: "<a><slot/></a>" } },
@@ -34,7 +35,7 @@ function generatePreviousDecision(options?: {
   documentType?: DocumentType
   dateKnown?: boolean
 }) {
-  const activeCitation = new PreviousDecision({
+  const previousDecision = new PreviousDecision({
     uuid: options?.uuid ?? "123",
     documentNumber: "ABC",
     court: options?.court ?? {
@@ -50,7 +51,7 @@ function generatePreviousDecision(options?: {
     },
     dateKnown: options?.dateKnown ?? true,
   })
-  return activeCitation
+  return previousDecision
 }
 
 describe("PreviousDecisions", () => {
@@ -129,16 +130,23 @@ describe("PreviousDecisions", () => {
     Promise.resolve({ status: 200, data: dropdownDocumentTypesItems }),
   )
 
-  it("renders empty proceeding decision in edit mode, when no proceedingDecisions in list", async () => {
+  it("renders empty previous decision in edit mode, when no previousDecisions in list", async () => {
     renderComponent()
-    expect(screen.getAllByLabelText("Listen Eintrag").length).toBe(1)
-    expect(screen.getByLabelText("Gericht Rechtszug")).toBeVisible()
-    expect(screen.getByLabelText("Entscheidungsdatum Rechtszug")).toBeVisible()
     expect(
-      screen.getByLabelText("Datum Unbekannt Rechtszug"),
+      screen.getByLabelText("Gericht Vorgehende Entscheidung"),
+    ).toBeVisible()
+    expect(
+      screen.getByLabelText("Entscheidungsdatum Vorgehende Entscheidung"),
+    ).toBeVisible()
+    expect(
+      screen.getByLabelText("Datum Unbekannt Vorgehende Entscheidung"),
     ).toBeInTheDocument()
-    expect(screen.getByLabelText("Aktenzeichen Rechtszug")).toBeInTheDocument()
-    expect(screen.getByLabelText("Dokumenttyp Rechtszug")).toBeInTheDocument()
+    expect(
+      screen.getByLabelText("Aktenzeichen Vorgehende Entscheidung"),
+    ).toBeInTheDocument()
+    expect(
+      screen.getByLabelText("Dokumenttyp Vorgehende Entscheidung"),
+    ).toBeInTheDocument()
     expect(
       screen.getByLabelText("Vorgehende Entscheidung speichern"),
     ).toBeDisabled()
@@ -160,7 +168,7 @@ describe("PreviousDecisions", () => {
 
   it("creates new proceeding desision manually", async () => {
     const { user } = renderComponent()
-    const input = screen.getByLabelText("Aktenzeichen Rechtszug")
+    const input = screen.getByLabelText("Aktenzeichen Vorgehende Entscheidung")
     await user.type(input, "123")
     const button = screen.getByLabelText("Vorgehende Entscheidung speichern")
     await user.click(button)
@@ -179,13 +187,21 @@ describe("PreviousDecisions", () => {
     const button = screen.getByLabelText("Eintrag bearbeiten")
     await user.click(button)
 
-    expect(screen.getByLabelText("Gericht Rechtszug")).toBeVisible()
-    expect(screen.getByLabelText("Entscheidungsdatum Rechtszug")).toBeVisible()
     expect(
-      screen.getByLabelText("Datum Unbekannt Rechtszug"),
+      screen.getByLabelText("Gericht Vorgehende Entscheidung"),
+    ).toBeVisible()
+    expect(
+      screen.getByLabelText("Entscheidungsdatum Vorgehende Entscheidung"),
+    ).toBeVisible()
+    expect(
+      screen.getByLabelText("Datum Unbekannt Vorgehende Entscheidung"),
     ).toBeInTheDocument()
-    expect(screen.getByLabelText("Aktenzeichen Rechtszug")).toBeInTheDocument()
-    expect(screen.getByLabelText("Dokumenttyp Rechtszug")).toBeInTheDocument()
+    expect(
+      screen.getByLabelText("Aktenzeichen Vorgehende Entscheidung"),
+    ).toBeInTheDocument()
+    expect(
+      screen.getByLabelText("Dokumenttyp Vorgehende Entscheidung"),
+    ).toBeInTheDocument()
   })
 
   it("renders manually added decision as editable list item", async () => {
@@ -205,7 +221,10 @@ describe("PreviousDecisions", () => {
     const editButton = screen.getByLabelText("Eintrag bearbeiten")
     await user.click(editButton)
 
-    await user.type(await screen.findByLabelText("Gericht Rechtszug"), "AG")
+    await user.type(
+      await screen.findByLabelText("Gericht Vorgehende Entscheidung"),
+      "AG",
+    )
     const dropdownItems = screen.getAllByLabelText("dropdown-option")
     expect(dropdownItems[0]).toHaveTextContent("AG Test")
     await user.click(dropdownItems[0])
@@ -225,7 +244,7 @@ describe("PreviousDecisions", () => {
     await user.click(editButton)
 
     const fileNumberInput = await screen.findByLabelText(
-      "Aktenzeichen Rechtszug",
+      "Aktenzeichen Vorgehende Entscheidung",
     )
 
     await user.clear(fileNumberInput)
@@ -246,7 +265,7 @@ describe("PreviousDecisions", () => {
     await user.click(editButton)
 
     const fileNumberInput = await screen.findByLabelText(
-      "Entscheidungsdatum Rechtszug",
+      "Entscheidungsdatum Vorgehende Entscheidung",
     )
 
     await user.clear(fileNumberInput)
@@ -288,16 +307,18 @@ describe("PreviousDecisions", () => {
 
     expect(
       screen.getByText(
-        "label1, 01.02.2022, test fileNumber, documentTypeShortcut1",
+        "label1, 01.02.2022, test fileNumber, documentTypeShortcut1, ABC",
       ),
     ).toBeInTheDocument()
     const editButton = screen.getByLabelText("Eintrag bearbeiten")
     await user.click(editButton)
 
     const fileNumberInput = await screen.findByLabelText(
-      "Aktenzeichen Rechtszug",
+      "Aktenzeichen Vorgehende Entscheidung",
     )
-    const courtInput = await screen.findByLabelText("Gericht Rechtszug")
+    const courtInput = await screen.findByLabelText(
+      "Gericht Vorgehende Entscheidung",
+    )
 
     await user.clear(fileNumberInput)
     await user.clear(courtInput)
@@ -309,14 +330,15 @@ describe("PreviousDecisions", () => {
     ).toBeInTheDocument()
   })
 
-  it("renders from search added active citations as non-editable list item", async () => {
-    renderComponent({
-      modelValue: [generatePreviousDecision()],
-    })
-    expect(
-      screen.queryByLabelText("Eintrag bearbeiten"),
-    ).not.toBeInTheDocument()
-  })
+  // Todo: enable again when linking possible
+  // it("renders from search added active citations as non-editable list item", async () => {
+  //   renderComponent({
+  //     modelValue: [generatePreviousDecision()],
+  //   })
+  //   expect(
+  //     screen.queryByLabelText("Eintrag bearbeiten"),
+  //   ).not.toBeInTheDocument()
+  // })
 
   it("lists search results", async () => {
     const { user } = renderComponent()
@@ -351,7 +373,9 @@ describe("PreviousDecisions", () => {
     const editButton = screen.getByLabelText("Eintrag bearbeiten")
     await user.click(editButton)
 
-    const fileInput = await screen.findByLabelText("Aktenzeichen Rechtszug")
+    const fileInput = await screen.findByLabelText(
+      "Aktenzeichen Vorgehende Entscheidung",
+    )
     await user.clear(fileInput)
     await user.click(screen.getByLabelText("Vorgehende Entscheidung speichern"))
     expect(screen.getByLabelText(/Fehlerhafte Eingabe/)).toBeInTheDocument()

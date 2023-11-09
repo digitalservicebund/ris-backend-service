@@ -17,10 +17,18 @@ test.describe("previous decisions", () => {
     await expect(
       page.getByRole("heading", { name: "Vorgehende Entscheidung " }),
     ).toBeVisible()
-    await expect(page.getByLabel("Gericht Rechtszug")).toBeVisible()
-    await expect(page.getByLabel("Entscheidungsdatum Rechtszug")).toBeVisible()
-    await expect(page.getByLabel("Aktenzeichen Rechtszug")).toBeVisible()
-    await expect(page.getByLabel("Dokumenttyp Rechtszug")).toBeVisible()
+    await expect(
+      page.getByLabel("Gericht Vorgehende Entscheidung"),
+    ).toBeVisible()
+    await expect(
+      page.getByLabel("Entscheidungsdatum Vorgehende Entscheidung"),
+    ).toBeVisible()
+    await expect(
+      page.getByLabel("Aktenzeichen Vorgehende Entscheidung"),
+    ).toBeVisible()
+    await expect(
+      page.getByLabel("Dokumenttyp Vorgehende Entscheidung"),
+    ).toBeVisible()
     await expect(page.getByLabel("Datum unbekannt")).toBeVisible()
   })
 
@@ -61,7 +69,9 @@ test.describe("previous decisions", () => {
 
     await page.getByLabel("Vorgehende Entscheidung speichern").click()
 
-    const proceedingDecisionContainer = page.getByLabel("Rechtszug")
+    const proceedingDecisionContainer = page.getByLabel(
+      "Vorgehende Entscheidung",
+    )
     await expect(
       proceedingDecisionContainer.getByLabel("Listen Eintrag"),
     ).toHaveCount(2)
@@ -96,7 +106,9 @@ test.describe("previous decisions", () => {
       { clickSaveButton: true },
     )
 
-    const proceedingDecisionContainer = page.getByLabel("Rechtszug")
+    const proceedingDecisionContainer = page.getByLabel(
+      "Vorgehende Entscheidung",
+    )
     await expect(
       proceedingDecisionContainer.getByLabel("Listen Eintrag"),
     ).toHaveCount(1)
@@ -107,7 +119,7 @@ test.describe("previous decisions", () => {
     ).toHaveCount(1, { timeout: 10000 }) // reloading can be slow if too many parallel tests
 
     await page.getByLabel("Weitere Angabe").click()
-    await page.getByLabel("Aktenzeichen Rechtszug").fill("two")
+    await page.getByLabel("Aktenzeichen Vorgehende Entscheidung").fill("two")
     await page.getByLabel("Vorgehende Entscheidung speichern").click()
     // "Vorgehende Entscheidung speichern" only saves state in frontend, no communication to backend yet
     await page.reload()
@@ -118,7 +130,9 @@ test.describe("previous decisions", () => {
     await page.getByLabel("Weitere Angabe").click()
     await waitForSaving(
       async () => {
-        await page.getByLabel("Aktenzeichen Rechtszug").fill("two")
+        await page
+          .getByLabel("Aktenzeichen Vorgehende Entscheidung")
+          .fill("two")
         await page.getByLabel("Vorgehende Entscheidung speichern").click()
       },
       page,
@@ -141,7 +155,9 @@ test.describe("previous decisions", () => {
 
     await waitForSaving(
       async () => {
-        await page.getByLabel("Aktenzeichen Rechtszug").fill(fileNumber1)
+        await page
+          .getByLabel("Aktenzeichen Vorgehende Entscheidung")
+          .fill(fileNumber1)
       },
       page,
       { clickSaveButton: true },
@@ -152,7 +168,9 @@ test.describe("previous decisions", () => {
     await page.getByLabel("Eintrag bearbeiten").click()
     await waitForSaving(
       async () => {
-        await page.getByLabel("Aktenzeichen Rechtszug").fill(fileNumber2)
+        await page
+          .getByLabel("Aktenzeichen Vorgehende Entscheidung")
+          .fill(fileNumber2)
       },
       page,
       { clickSaveButton: true },
@@ -170,7 +188,9 @@ test.describe("previous decisions", () => {
 
     await waitForSaving(
       async () => {
-        await page.getByLabel("Aktenzeichen Rechtszug").fill("one")
+        await page
+          .getByLabel("Aktenzeichen Vorgehende Entscheidung")
+          .fill("one")
       },
       page,
       { clickSaveButton: true },
@@ -180,12 +200,16 @@ test.describe("previous decisions", () => {
     await page.getByLabel("Weitere Angabe").click()
     await waitForSaving(
       async () => {
-        await page.getByLabel("Aktenzeichen Rechtszug").fill("two")
+        await page
+          .getByLabel("Aktenzeichen Vorgehende Entscheidung")
+          .fill("two")
       },
       page,
       { clickSaveButton: true },
     )
-    const proceedingDecisionContainer = page.getByLabel("Rechtszug")
+    const proceedingDecisionContainer = page.getByLabel(
+      "Vorgehende Entscheidung",
+    )
     await page.getByLabel("Vorgehende Entscheidung speichern").click()
     await expect(
       proceedingDecisionContainer.getByLabel("Listen Eintrag"),

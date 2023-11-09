@@ -398,24 +398,25 @@ describe("Active Citations", () => {
     ).not.toBeInTheDocument()
   })
 
-  it("renders limited edit view if linked document unit", async () => {
-    const { user } = renderComponent({
-      modelValue: [generateActiveCitation()],
-    })
+  // Todo: enable again when linking possible
+  // it("renders limited edit view if linked document unit", async () => {
+  //   const { user } = renderComponent({
+  //     modelValue: [generateActiveCitation()],
+  //   })
 
-    await user.click(screen.getByLabelText("Eintrag bearbeiten"))
+  //   await user.click(screen.getByLabelText("Eintrag bearbeiten"))
 
-    expect(screen.getByLabelText("Art der Zitierung")).toBeVisible()
-    ;[
-      "Gericht der Aktivzitierung",
-      "Entscheidungsdatum der Aktivzitierung",
-      "Aktenzeichen der Aktivzitierung",
-      "Dokumenttyp der Aktivzitierung",
-      "Nach Entscheidung suchen",
-    ].forEach((label) =>
-      expect(screen.queryByLabelText(label)).not.toBeInTheDocument(),
-    )
-  })
+  //   expect(screen.getByLabelText("Art der Zitierung")).toBeVisible()
+  //   ;[
+  //     "Gericht der Aktivzitierung",
+  //     "Entscheidungsdatum der Aktivzitierung",
+  //     "Aktenzeichen der Aktivzitierung",
+  //     "Dokumenttyp der Aktivzitierung",
+  //     "Nach Entscheidung suchen",
+  //   ].forEach((label) =>
+  //     expect(screen.queryByLabelText(label)).not.toBeInTheDocument(),
+  //   )
+  // })
 
   it("lists search results", async () => {
     const { user } = renderComponent()
@@ -476,19 +477,20 @@ describe("Active Citations", () => {
     expect(getStyleValidation()).toBeVisible()
   })
 
-  it("shows missing citationStyle validation for linked decision", async () => {
-    renderComponent({
-      modelValue: [
-        generateActiveCitation({
-          citationStyle: {
-            uuid: undefined,
-            jurisShortcut: undefined,
-            label: "invalid",
-          },
-        }),
-      ],
-    })
+  // Todo: enable again when linking possible
+  // it("shows missing citationStyle validation for linked decision", async () => {
+  //   renderComponent({
+  //     modelValue: [
+  //       generateActiveCitation({
+  //         citationStyle: {
+  //           uuid: undefined,
+  //           jurisShortcut: undefined,
+  //           label: "invalid",
+  //         },
+  //       }),
+  //     ],
+  //   })
 
-    expect(screen.getByText("Art der Zitierung")).toBeVisible()
-  })
+  //   expect(screen.getByText("Art der Zitierung")).toBeVisible()
+  // })
 })
