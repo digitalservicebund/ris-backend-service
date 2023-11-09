@@ -23,6 +23,7 @@ public class PreviousDecisionTransformer extends RelatedDocumentationUnitTransfo
     }
 
     return PreviousDecisionDTO.builder()
+        .id(previousDecision.getUuid())
         .court(getCourtFromDomain(previousDecision.getCourt()))
         .date(previousDecision.getDecisionDate())
         .documentNumber(previousDecision.getDocumentNumber())

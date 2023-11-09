@@ -50,10 +50,8 @@ const handleUpdateValueDocumentUnitTexts = async (
     hasInnerText || hasImgElem || hasTable ? updatedValue[1] : ""
 }
 
-function haveDataChanged(): boolean {
+function hasDataChange(): boolean {
   const newValue = JSON.stringify(updatedDocumentUnit.value)
-    .replaceAll('"norms":[{"validationError":false}]', '"norms":[]')
-    .replaceAll('"activeCitations":[{}]', '"activeCitations":[]')
   const oldValue = JSON.stringify(lastUpdatedDocumentUnit.value)
 
   // console.log("newValue:", newValue)
@@ -63,7 +61,7 @@ function haveDataChanged(): boolean {
 }
 
 async function handleUpdateDocumentUnit(): Promise<ServiceResponse<void>> {
-  if (haveDataChanged()) {
+  if (hasDataChange()) {
     lastUpdatedDocumentUnit.value = JSON.parse(
       JSON.stringify(updatedDocumentUnit.value),
     )
@@ -77,7 +75,7 @@ async function handleUpdateDocumentUnit(): Promise<ServiceResponse<void>> {
       validationErrors.value = []
     }
 
-    if (!haveDataChanged() && response.data) {
+    if (!hasDataChange() && response.data) {
       updatedDocumentUnit.value = response.data as DocumentUnit
     }
 
