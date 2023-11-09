@@ -37,6 +37,7 @@ server:
     session:
       cookie:
         max-age: 43200 # 12*60*60
+        http-only: false
 #logging:
 #  level:
 #    org.springframework: DEBUG
