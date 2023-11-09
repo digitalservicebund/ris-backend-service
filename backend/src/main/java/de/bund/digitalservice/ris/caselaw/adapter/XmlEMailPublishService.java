@@ -47,6 +47,9 @@ public class XmlEMailPublishService implements EmailPublishService {
 
   @Autowired private Environment env;
 
+  @Value("${mail.exporter.jurisUsername:invalid-user}")
+  private String jurisUsername;
+
   public XmlEMailPublishService(
       XmlExporter xmlExporter, HttpMailSender mailSender, XmlPublicationRepository repository) {
     this.xmlExporter = xmlExporter;
@@ -85,15 +88,11 @@ public class XmlEMailPublishService implements EmailPublishService {
         LocalDate.now(Clock.system(ZoneId.of("Europe/Berlin"))).format(DATE_FORMATTER);
 
     String subject = "id=juris";
-    if (env.matchesProfiles("production")) {
-      subject += " name=NeuRIS";
-    } else {
-      subject += " name=neuris-test";
-    }
-    subject += " mod=T";
+    subject += " name=" + jurisUsername;
     subject += " da=R";
     subject += " df=X";
     subject += " dt=N";
+    subject += " mod=T";
     subject += " ld=" + deliveryDate;
     subject += " vg=";
     subject += documentUnit.documentNumber();

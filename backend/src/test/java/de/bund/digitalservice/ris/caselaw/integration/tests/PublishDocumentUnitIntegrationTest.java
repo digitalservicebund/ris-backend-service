@@ -51,6 +51,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.oauth2.client.registration.ReactiveClientRegistrationRepository;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.test.context.TestPropertySource;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.shaded.org.hamcrest.Matchers;
@@ -75,6 +76,11 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
       TestConfig.class
     },
     controllers = {DocumentUnitController.class})
+@TestPropertySource(
+    properties = {
+      "mail.exporter.jurisUsername=test-user",
+      "mail.exporter.recipientAddress=neuris@example.com"
+    })
 class PublishDocumentUnitIntegrationTest {
   @Container
   static PostgreSQLContainer<?> postgreSQLContainer =
@@ -140,7 +146,7 @@ class PublishDocumentUnitIntegrationTest {
             1L,
             savedDocumentUnitDTO.getId(),
             "neuris@example.com",
-            "id=juris name=NeuRIS da=R df=X dt=N mod=T ld="
+            "id=juris name=test-user da=R df=X dt=N mod=T ld="
                 + DELIVER_DATE
                 + " vg="
                 + savedDocumentUnitDTO.getDocumentNumber(),
@@ -154,7 +160,7 @@ class PublishDocumentUnitIntegrationTest {
             .documentUnitUuid(documentUnitUuid1)
             .receiverAddress("neuris@example.com")
             .mailSubject(
-                "id=juris name=NeuRIS da=R df=X dt=N mod=T ld="
+                "id=juris name=test-user da=R df=X dt=N mod=T ld="
                     + DELIVER_DATE
                     + " vg="
                     + savedDocumentUnitDTO.getDocumentNumber())
@@ -336,8 +342,6 @@ class PublishDocumentUnitIntegrationTest {
                 receivedDate,
                 true))
         .block();
-
-    System.out.println(receivedDate.truncatedTo(ChronoUnit.MICROS).toString());
 
     risWebTestClient
         .withDefaultLogin()

@@ -48,7 +48,7 @@ class XmlEMailPublishServiceProdTest {
   private static final String DELIVER_DATE =
       LocalDate.now(Clock.system(ZoneId.of("Europe/Berlin"))).format(DATE_FORMATTER);
   private static final String PROD_MAIL_SUBJECT =
-      "id=juris name=NeuRIS mod=T da=R df=X dt=N ld=" + DELIVER_DATE + " vg=test-document-number";
+      "id=juris name=NeuRIS da=R df=X dt=N mod=T ld=" + DELIVER_DATE + " vg=test-document-number";
   private static final UUID TEST_UUID = UUID.fromString("88888888-4444-4444-4444-121212121212");
   private static final XmlPublication EXPECTED_BEFORE_SAVE_PROD =
       XmlPublication.builder()

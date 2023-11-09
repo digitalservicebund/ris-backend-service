@@ -124,10 +124,13 @@ licenseReport {
 
 sonar {
     properties {
-        property("sonar.projectKey", "digitalservicebund_ris-backend-service",)
-        property("sonar.organization", "digitalservicebund",)
-        property("sonar.host.url", "https://sonarcloud.io",)
-        property("sonar.coverage.exclusions", "**/src/fields/**,**/config/**,**/S3AsyncMockClient.java,**/Application.java,**/NormsMemoryRepository.kt")
+        property("sonar.projectKey", "digitalservicebund_ris-backend-service")
+        property("sonar.organization", "digitalservicebund")
+        property("sonar.host.url", "https://sonarcloud.io")
+        property(
+            "sonar.coverage.exclusions",
+            "**/src/fields/**,**/config/**,**/S3AsyncMockClient.java,**/Application.java,**/NormsMemoryRepository.kt"
+        )
     }
 }
 
@@ -209,7 +212,7 @@ dependencies {
     implementation("org.freehep:freehep-graphicsio-emf:2.4")
 
     // package served by private repo, requires authentication:
-     implementation("de.bund.digitalservice:neuris-juris-xml-export:0.7.13") {
+    implementation("de.bund.digitalservice:neuris-juris-xml-export:0.8.2") {
         exclude(group = "org.slf4j", module = "slf4j-simple")
     }
     // for local development:

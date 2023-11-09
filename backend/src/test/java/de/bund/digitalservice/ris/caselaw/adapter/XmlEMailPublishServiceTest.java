@@ -43,16 +43,23 @@ import reactor.test.StepVerifier;
 
 @ExtendWith(SpringExtension.class)
 @Import({XmlEMailPublishService.class})
-@TestPropertySource(properties = "mail.exporter.senderAddress=export@neuris")
+@TestPropertySource(
+    properties = {
+      "mail.exporter.jurisUsername=test-user",
+      "mail.exporter.senderAddress=export@neuris"
+    })
 class XmlEMailPublishServiceTest {
   private static final String RECEIVER_ADDRESS = "test-to@mail.com";
   private static final String SENDER_ADDRESS = "export@neuris";
+  private static final String JURIS_USERNAME = "test-user";
   private static final Instant PUBLISH_DATE = Instant.parse("2020-05-05T10:21:35.00Z");
   private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
   private static final String DELIVER_DATE =
       LocalDate.now(Clock.system(ZoneId.of("Europe/Berlin"))).format(DATE_FORMATTER);
   private static final String MAIL_SUBJECT =
-      "id=juris name=neuris-test mod=T da=R df=X dt=N ld="
+      "id=juris name="
+          + JURIS_USERNAME
+          + " da=R df=X dt=N mod=T ld="
           + DELIVER_DATE
           + " vg=test-document-number";
 
