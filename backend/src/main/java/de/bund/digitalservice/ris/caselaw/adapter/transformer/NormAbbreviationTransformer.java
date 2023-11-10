@@ -19,7 +19,7 @@ public class NormAbbreviationTransformer {
     if (normAbbreviationDTO.getDocumentTypeList() != null) {
       documentTypes =
           normAbbreviationDTO.getDocumentTypeList().stream()
-              .map(DocumentTypeTransformer::transformDTO)
+              .map(DocumentTypeTransformer::transformToDomain)
               .toList();
     }
     Region region = null;

@@ -92,7 +92,7 @@ public class DocumentationUnitDTO implements DocumentationUnitMetadataDTO {
   @Column(name = "judicial_body")
   private String judicialBody;
 
-  @OneToMany(fetch = FetchType.EAGER, orphanRemoval = true)
+  @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
   @JoinColumn(name = "documentation_unit_id")
   @Builder.Default
   private List<NormReferenceDTO> normReferences = new ArrayList<>();
@@ -107,7 +107,9 @@ public class DocumentationUnitDTO implements DocumentationUnitMetadataDTO {
   @Column(name = "other_headnote")
   String otherHeadnote;
 
-  @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+  @ManyToMany(
+      cascade = {CascadeType.MERGE, CascadeType.PERSIST}, // TODO more?
+      fetch = FetchType.EAGER)
   @JoinTable(
       name = "procedure_link",
       schema = "public",

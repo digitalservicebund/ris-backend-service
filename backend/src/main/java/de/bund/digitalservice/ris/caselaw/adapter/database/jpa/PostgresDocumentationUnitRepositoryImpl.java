@@ -305,7 +305,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
                         .documentType(
                             metadataDTO.getDocumentType() == null
                                 ? null
-                                : DocumentTypeTransformer.transformDTO(
+                                : DocumentTypeTransformer.transformToDomain(
                                         metadataDTO.getDocumentType())
                                     .jurisShortcut())
                         .courtLocation(

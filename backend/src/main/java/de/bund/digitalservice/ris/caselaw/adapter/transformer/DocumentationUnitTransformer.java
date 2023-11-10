@@ -11,8 +11,6 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.EnsuingDecisionDT
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.FieldOfLawDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.FileNumberDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.KeywordDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.NormAbbreviationDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.NormReferenceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.OriginalFileDocumentDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PendingDecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PreviousDecisionDTO;
@@ -237,20 +235,7 @@ public class DocumentationUnitTransformer {
       List<NormReference> norms = contentRelatedIndexing.norms();
       if (norms != null) {
         builder.normReferences(
-            norms.stream()
-                .map(
-                    normReference ->
-                        NormReferenceDTO.builder()
-                            .id(normReference.id())
-                            .normAbbreviation(
-                                NormAbbreviationDTO.builder()
-                                    .id(normReference.normAbbreviation().id())
-                                    .build())
-                            .singleNorm(normReference.singleNorm())
-                            .dateOfVersion(normReference.dateOfVersion())
-                            .dateOfRelevance(normReference.dateOfRelevance())
-                            .build())
-                .toList());
+            norms.stream().map(NormReferenceTransformer::transformToDTO).toList());
       }
     }
 
@@ -312,7 +297,7 @@ public class DocumentationUnitTransformer {
             .ecli(documentationUnitDTO.getEcli())
             .decisionDate(documentationUnitDTO.getDecisionDate())
             .appraisalBody(documentationUnitDTO.getJudicialBody())
-            // .legalEffect(documentationUnitDTO.getLegalEffect().toString())
+            .legalEffect(documentationUnitDTO.getLegalEffect().toString())
             .inputType(documentationUnitDTO.getInputType());
 
     List<String> fileNumbers = null;
@@ -380,7 +365,7 @@ public class DocumentationUnitTransformer {
     if (documentationUnitDTO.getNormReferences() != null) {
       List<NormReference> norms =
           documentationUnitDTO.getNormReferences().stream()
-              .map(DocumentUnitNormTransformer::transformToDomain)
+              .map(NormReferenceTransformer::transformToDomain)
               .toList();
 
       contentRelatedIndexingBuilder.norms(norms);

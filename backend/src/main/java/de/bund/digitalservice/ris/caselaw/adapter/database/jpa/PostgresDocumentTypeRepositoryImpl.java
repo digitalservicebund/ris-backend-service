@@ -25,7 +25,7 @@ public class PostgresDocumentTypeRepositoryImpl implements DocumentTypeRepositor
         .findCaselawBySearchStrAndCategory(
             searchString, categoryRepository.findFirstByLabel("R").getId())
         .stream()
-        .map(DocumentTypeTransformer::transformDTO)
+        .map(DocumentTypeTransformer::transformToDomain)
         .toList();
   }
 
@@ -35,7 +35,7 @@ public class PostgresDocumentTypeRepositoryImpl implements DocumentTypeRepositor
     return repository
         .findAllByCategoryOrderByAbbreviationAscLabelAsc(categoryRepository.findFirstByLabel("R"))
         .stream()
-        .map(DocumentTypeTransformer::transformDTO)
+        .map(DocumentTypeTransformer::transformToDomain)
         .toList();
   }
 }
