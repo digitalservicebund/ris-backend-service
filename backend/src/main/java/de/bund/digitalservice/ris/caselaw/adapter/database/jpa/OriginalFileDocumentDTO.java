@@ -2,6 +2,7 @@ package de.bund.digitalservice.ris.caselaw.adapter.database.jpa;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.MapsId;
@@ -22,9 +23,7 @@ import lombok.Setter;
 @Entity(name = "original_file_document")
 public class OriginalFileDocumentDTO {
 
-  @Column(name = "documentation_unit_id")
-  @Id
-  private UUID documentationUnitId;
+  @Id @GeneratedValue private UUID id;
 
   @Column(name = "upload_timestamp")
   private Instant uploadTimestamp;

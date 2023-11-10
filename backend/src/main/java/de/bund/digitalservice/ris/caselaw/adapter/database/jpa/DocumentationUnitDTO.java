@@ -15,7 +15,6 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.OrderBy;
-import jakarta.persistence.PrimaryKeyJoinColumn;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -98,7 +97,6 @@ public class DocumentationUnitDTO implements DocumentationUnitMetadataDTO {
   private List<NormReferenceDTO> normReferences = new ArrayList<>();
 
   @OneToOne(mappedBy = "documentationUnit", cascade = CascadeType.ALL, orphanRemoval = true)
-  @PrimaryKeyJoinColumn
   private OriginalFileDocumentDTO originalFileDocument;
 
   @Column(name = "other_long_text")

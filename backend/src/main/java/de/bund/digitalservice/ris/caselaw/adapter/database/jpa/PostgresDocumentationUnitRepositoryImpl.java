@@ -134,20 +134,6 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
 
       documentationUnitDTO = saveKeywords(documentationUnitDTO, documentUnit);
 
-      if (documentUnit.coreData().court() != null) {
-        var court =
-            databaseCourtRepository
-                .findByTypeAndLocation(
-                    documentUnit.coreData().court().type(),
-                    documentUnit.coreData().court().location())
-                .stream()
-                .findFirst();
-        if (court.isEmpty()) {
-          throw new DocumentationUnitException("no court found.");
-        }
-        documentationUnitDTO.setCourt(court.get());
-      }
-
       if (documentUnit.coreData().procedure() != null) {
         documentationUnitDTO.setProcedures(getDbProcedures(documentUnit, documentationUnitDTO));
       }

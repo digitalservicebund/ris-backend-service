@@ -1,6 +1,8 @@
 package de.bund.digitalservice.ris.caselaw.adapter.transformer;
 
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ActiveCitationDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CourtDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DecisionNameDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DeviatingCourtDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DeviatingDateDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DeviatingEcliDTO;
@@ -11,6 +13,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.EnsuingDecisionDT
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.FieldOfLawDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.FileNumberDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.KeywordDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LegalEffectDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.OriginalFileDocumentDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PendingDecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PreviousDecisionDTO;
@@ -23,6 +26,7 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatus;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.EnsuingDecision;
+import de.bund.digitalservice.ris.caselaw.domain.LegalEffect;
 import de.bund.digitalservice.ris.caselaw.domain.NormReference;
 import de.bund.digitalservice.ris.caselaw.domain.PreviousDecision;
 import de.bund.digitalservice.ris.caselaw.domain.Texts;
@@ -44,23 +48,29 @@ public class DocumentationUnitTransformer {
       DocumentationUnitDTO currentDto, DocumentUnit updatedDomainObject) {
 
     if (log.isDebugEnabled()) {
-      log.debug("enrich database documentation unit '{}'", currentDto.getId());
+      log.debug("transform database documentation unit '{}'", currentDto.getId());
     }
-
-    // TODO needs null-checking
-    // OriginalFileDocumentDTO originalFileDocument =
-    // OriginalFileDocumentDTO.builder()
-    // .extension(updatedDomainObject.filetype())
-    // .filename(updatedDomainObject.filename())
-    // .s3ObjectPath(updatedDomainObject.s3path())
-    // .uploadTimestamp(updatedDomainObject.fileuploadtimestamp())
-    // .build();
 
     DocumentationUnitDTO.DocumentationUnitDTOBuilder builder =
         currentDto.toBuilder()
             .id(updatedDomainObject.uuid())
             .documentNumber(updatedDomainObject.documentNumber());
-    // .originalFileDocument(originalFileDocument)
+
+    // TODO Should we create an originalFileDocument if it doesn't exist since the upload happens
+    // somewhere else?
+    //    if (updatedDomainObject.filetype() != null
+    //        && updatedDomainObject.filename() != null
+    //        && updatedDomainObject.s3path() != null
+    //        && updatedDomainObject.fileuploadtimestamp() != null) {
+    //      builder.originalFileDocument(
+    //          OriginalFileDocumentDTO.builder()
+    //              .documentationUnitId(updatedDomainObject.uuid())
+    //              .extension(updatedDomainObject.filetype())
+    //              .filename(updatedDomainObject.filename())
+    //              .s3ObjectPath(updatedDomainObject.s3path())
+    //              .uploadTimestamp(updatedDomainObject.fileuploadtimestamp())
+    //              .build());
+    //    }
 
     if (updatedDomainObject.coreData() != null) {
       var coreData = updatedDomainObject.coreData();
@@ -69,7 +79,11 @@ public class DocumentationUnitTransformer {
           .ecli(coreData.ecli())
           .judicialBody(coreData.appraisalBody())
           .decisionDate(coreData.decisionDate())
-          .inputType(coreData.inputType());
+          .inputType(coreData.inputType())
+          .court(
+              updatedDomainObject.coreData().court() != null
+                  ? CourtDTO.builder().id(updatedDomainObject.coreData().court().id()).build()
+                  : null);
 
       var fileNumbers = coreData.fileNumbers();
       if (fileNumbers != null && !fileNumbers.isEmpty()) {
@@ -92,7 +106,7 @@ public class DocumentationUnitTransformer {
           deviatingCourtDTOs.add(
               DeviatingCourtDTO.builder()
                   .value(deviatingCourts.get(i))
-                  .rank(Long.valueOf(i + 1))
+                  .rank((long) (i + 1))
                   .build());
         }
         builder.deviatingCourts(deviatingCourtDTOs);
@@ -105,7 +119,7 @@ public class DocumentationUnitTransformer {
           deviatingDateDTOs.add(
               DeviatingDateDTO.builder()
                   .value(deviatingDecisionDates.get(i))
-                  .rank(Long.valueOf(i + 1))
+                  .rank((long) (i + 1))
                   .build());
         }
         builder.deviatingDates(deviatingDateDTOs);
@@ -118,7 +132,7 @@ public class DocumentationUnitTransformer {
           deviatingFileNumberDTOs.add(
               DeviatingFileNumberDTO.builder()
                   .value(deviatingFileNumbers.get(i))
-                  .rank(Long.valueOf(i + 1))
+                  .rank((long) (i + 1))
                   .build());
         }
         builder.deviatingFileNumbers(deviatingFileNumberDTOs);
@@ -137,21 +151,33 @@ public class DocumentationUnitTransformer {
         builder.deviatingEclis(deviatingEcliDTOs);
       }
 
-      // TODO documentationOffice
+      boolean courtWasAdded =
+          currentDto.getCourt() == null
+              && updatedDomainObject.coreData() != null
+              && updatedDomainObject.coreData().court() != null;
+      boolean courtWasDeleted =
+          currentDto.getCourt() != null
+              && (updatedDomainObject.coreData() == null
+                  || updatedDomainObject.coreData().court() == null);
+      boolean courtHasChanged =
+          currentDto.getCourt() != null
+              && updatedDomainObject.coreData() != null
+              && updatedDomainObject.coreData().court() != null
+              && updatedDomainObject.coreData().court().id() != currentDto.getCourt().getId();
 
-      // TODO nullchecks
-      // var legalEffect =
-      // LegalEffect.deriveLegalEffectFrom(
-      // updatedDomainObject, hasCourtChanged(currentDto, updatedDomainObject));
+      LegalEffectDTO legalEffectDTO;
+      var legalEffect =
+          LegalEffect.deriveLegalEffectFrom(
+              updatedDomainObject, courtWasAdded || courtWasDeleted || courtHasChanged);
 
-      // LegalEffectDTO legalEffectDTO;
-      // switch (legalEffect) {
-      // case NO -> legalEffectDTO = LegalEffectDTO.NEIN;
-      // case YES -> legalEffectDTO = LegalEffectDTO.JA;
-      // case NOT_SPECIFIED -> legalEffectDTO = LegalEffectDTO.KEINE_ANGABE;
-      // default -> legalEffectDTO = LegalEffectDTO.FALSCHE_ANGABE;
-      // }
-      // builder.legalEffect(legalEffectDTO);ich hoffe nicht.
+      switch (legalEffect) {
+        case NO -> legalEffectDTO = LegalEffectDTO.NEIN;
+        case YES -> legalEffectDTO = LegalEffectDTO.JA;
+        case NOT_SPECIFIED -> legalEffectDTO = LegalEffectDTO.KEINE_ANGABE;
+        default -> legalEffectDTO = LegalEffectDTO.FALSCHE_ANGABE;
+      }
+
+      builder.legalEffect(legalEffectDTO);
 
     } else {
       builder
@@ -253,12 +279,12 @@ public class DocumentationUnitTransformer {
 
       if (texts.decisionName() != null) {
         // Todo multiple decision names?
-        //
-        // builder.decisionNames(Set.of(DecisionNameDTO.builder().value(texts.decisionName()).build()));
+        builder.decisionNames(
+            List.of(DecisionNameDTO.builder().value(texts.decisionName()).build()));
       }
     } else {
       builder
-          // .decisionNames(null)
+          .decisionNames(null)
           .headline(null)
           .guidingPrinciple(null)
           .headnote(null)
@@ -282,8 +308,14 @@ public class DocumentationUnitTransformer {
       return DocumentUnit.builder().build();
     }
 
-    DocumentUnit.DocumentUnitBuilder builder = DocumentUnit.builder();
+    LegalEffect legalEffect;
+    switch (documentationUnitDTO.getLegalEffect()) {
+      case NEIN -> legalEffect = LegalEffect.NO;
+      case JA -> legalEffect = LegalEffect.YES;
+      default -> legalEffect = LegalEffect.NOT_SPECIFIED;
+    }
 
+    DocumentUnit.DocumentUnitBuilder builder = DocumentUnit.builder();
     CoreDataBuilder coreDataBuilder =
         CoreData.builder()
             .court(CourtTransformer.transformToDomain((documentationUnitDTO.getCourt())))
@@ -293,11 +325,17 @@ public class DocumentationUnitTransformer {
                 DocumentationOffice.builder()
                     .abbreviation(documentationUnitDTO.getDocumentationOffice().getAbbreviation())
                     .build())
-            // TODO multiple regions .region(documentationUnitDTO.getRegions())
+            // TODO multiple regions
+            .region(
+                documentationUnitDTO.getRegions() == null
+                        || documentationUnitDTO.getRegions().isEmpty()
+                        || documentationUnitDTO.getRegions().get(0) == null
+                    ? null
+                    : documentationUnitDTO.getRegions().get(0).getCode())
             .ecli(documentationUnitDTO.getEcli())
             .decisionDate(documentationUnitDTO.getDecisionDate())
             .appraisalBody(documentationUnitDTO.getJudicialBody())
-            .legalEffect(documentationUnitDTO.getLegalEffect().toString())
+            .legalEffect(legalEffect.getLabel())
             .inputType(documentationUnitDTO.getInputType());
 
     List<String> fileNumbers = null;
@@ -396,11 +434,10 @@ public class DocumentationUnitTransformer {
     Texts texts =
         Texts.builder()
             // TODO multiple decisionNames
-            // .decisionName(
-            // documentationUnitDTO.getDecisionNames().isEmpty()
-            // ? null
-            // :
-            // documentationUnitDTO.getDecisionNames().stream().findFirst().get().getValue())
+            .decisionName(
+                documentationUnitDTO.getDecisionNames().isEmpty()
+                    ? null
+                    : documentationUnitDTO.getDecisionNames().stream().findFirst().get().getValue())
             .headline(documentationUnitDTO.getHeadline())
             .guidingPrinciple(documentationUnitDTO.getGuidingPrinciple())
             .headnote(documentationUnitDTO.getHeadnote())
@@ -437,17 +474,13 @@ public class DocumentationUnitTransformer {
 
     if (pendingDecisionDTOs != null || ensuingDecisionDTOs != null) {
       EnsuingDecision[] ensuingDecisions = new EnsuingDecision[ensuingDecisionDTOs.size()];
-      if (ensuingDecisionDTOs != null) {
-        for (int i = 0; i < ensuingDecisionDTOs.size(); i++) {
-          EnsuingDecisionDTO currentDTO = ensuingDecisionDTOs.get(i);
-          ensuingDecisions[currentDTO.getRank() - 1] =
-              EnsuingDecisionTransformer.transformToDomain(currentDTO);
-        }
+      for (EnsuingDecisionDTO currentDTO : ensuingDecisionDTOs) {
+        ensuingDecisions[currentDTO.getRank() - 1] =
+            EnsuingDecisionTransformer.transformToDomain(currentDTO);
       }
 
       if (pendingDecisionDTOs != null) {
-        for (int i = 0; i < pendingDecisionDTOs.size(); i++) {
-          PendingDecisionDTO currentDTO = pendingDecisionDTOs.get(i);
+        for (PendingDecisionDTO currentDTO : pendingDecisionDTOs) {
           ensuingDecisions[currentDTO.getRank() - 1] =
               PendingDecisionTransformer.transformToDomain(currentDTO);
         }
