@@ -238,7 +238,7 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.jsoup:jsoup:1.16.1")
     implementation("com.github.loki4j:loki-logback-appender:1.4.0")
-    implementation("io.getunleash:unleash-client-java:8.2.0")
+    implementation("io.getunleash:unleash-client-java:9.1.0")
 
     testImplementation("com.ninja-squad:springmockk:4.0.0")
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
