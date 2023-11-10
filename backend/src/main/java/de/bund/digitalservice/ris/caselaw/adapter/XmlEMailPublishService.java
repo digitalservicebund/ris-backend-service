@@ -24,7 +24,9 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -45,6 +47,8 @@ public class XmlEMailPublishService implements EmailPublishService {
 
   @Value("${mail.exporter.jurisUsername:invalid-user}")
   private String jurisUsername;
+
+  @Autowired private Environment env;
 
   public XmlEMailPublishService(
       XmlExporter xmlExporter, HttpMailSender mailSender, XmlPublicationRepository repository) {
@@ -154,6 +158,9 @@ public class XmlEMailPublishService implements EmailPublishService {
   }
 
   private DocumentUnit getTestDocumentUnit(DocumentUnit documentUnit) {
+    if (env.matchesProfiles("production")) {
+      return documentUnit;
+    }
     return documentUnit.toBuilder()
         .coreData(
             Optional.ofNullable(documentUnit.coreData())
