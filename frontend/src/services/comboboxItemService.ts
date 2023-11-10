@@ -26,7 +26,6 @@ function formatDropdownItems(
 ): ComboboxItem[] {
   switch (endpoint) {
     case Endpoint.documentTypes: {
-      console.log("hi", responseData)
       return (responseData as DocumentType[]).map((item) => ({
         label: item.label,
         value: item,
