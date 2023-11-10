@@ -226,6 +226,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
     var docUnitDto = repository.findById(documentUnitUuid).orElseThrow();
     docUnitDto.setOriginalFileDocument(
         OriginalFileDocumentDTO.builder()
+            .id(UUID.randomUUID())
             .s3ObjectPath(fileUuid)
             .filename(fileName)
             .extension(type)

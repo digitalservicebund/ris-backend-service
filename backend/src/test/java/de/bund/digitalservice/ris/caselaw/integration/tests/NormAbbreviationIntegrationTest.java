@@ -33,7 +33,6 @@ import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 import java.util.UUID;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
@@ -200,7 +199,7 @@ class NormAbbreviationIntegrationTest {
     generateLookupValues();
 
     repository.save(
-        abbreviation1.toBuilder().documentTypeList(Set.of(documentType1)).region(region2).build());
+        abbreviation1.toBuilder().documentTypeList(List.of(documentType1)).region(region2).build());
 
     NormAbbreviation expectedNormAbbreviation =
         new NormAbbreviationTestBuilder()
@@ -253,7 +252,7 @@ class NormAbbreviationIntegrationTest {
   void testGetNormAbbreviationById_withoutLinkedRegion() {
     generateLookupValues();
 
-    repository.save(abbreviation1.toBuilder().documentTypeList(Set.of(documentType1)).build());
+    repository.save(abbreviation1.toBuilder().documentTypeList(List.of(documentType1)).build());
 
     NormAbbreviation expectedNormAbbreviation =
         new NormAbbreviationTestBuilder()
@@ -302,7 +301,7 @@ class NormAbbreviationIntegrationTest {
 
     repository.saveAndFlush(
         abbreviation1.toBuilder()
-            .documentTypeList(Set.of(documentType1, documentType2))
+            .documentTypeList(List.of(documentType1, documentType2))
             .region(region1)
             .build());
 

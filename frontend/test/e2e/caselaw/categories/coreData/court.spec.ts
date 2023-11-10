@@ -126,7 +126,7 @@ test.describe("court", () => {
     // type search string: 2 results for "bayern"
     await page.locator("[aria-label='Gericht']").fill("bayern")
     await waitForInputValue(page, "[aria-label='Gericht']", "bayern")
-    await expect(page.locator("[aria-label='dropdown-option']")).toHaveCount(2)
+    await expect(page.locator("[aria-label='dropdown-option']")).toHaveCount(3)
 
     // use the clear icon
     await page.locator("[aria-label='Auswahl zurücksetzen']").click()

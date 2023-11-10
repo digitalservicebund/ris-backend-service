@@ -5,8 +5,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.MapsId;
 import jakarta.persistence.OneToOne;
+import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
@@ -23,7 +23,7 @@ import lombok.Setter;
 @Entity(name = "original_file_document")
 public class OriginalFileDocumentDTO {
 
-  @Id @GeneratedValue private UUID id;
+  @Id @GeneratedValue @NotNull private UUID id;
 
   @Column(name = "upload_timestamp")
   private Instant uploadTimestamp;
@@ -36,7 +36,6 @@ public class OriginalFileDocumentDTO {
   private String s3ObjectPath;
 
   @OneToOne
-  @MapsId
   @JoinColumn(name = "documentation_unit_id")
   private DocumentationUnitDTO documentationUnit;
 }

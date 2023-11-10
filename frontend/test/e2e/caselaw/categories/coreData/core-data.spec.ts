@@ -246,9 +246,7 @@ test.describe("core data", () => {
       ).toBeVisible()
 
       await page.getByText("Rubriken").click()
-      await expect(
-        page.getByText("DOKUMENTATIONSSTELLEDigitalService"),
-      ).toBeVisible()
+      await expect(page.getByText("DOKUMENTATIONSSTELLEDS")).toBeVisible()
     })
   })
 
