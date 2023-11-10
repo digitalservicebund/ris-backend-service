@@ -1,5 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.adapter.database.jpa;
 
+import de.bund.digitalservice.ris.caselaw.domain.RelatedDocumentationType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -54,9 +55,10 @@ public abstract class RelatedDocumentationDTO {
   @Column(name = "file_number")
   private String fileNumber;
 
-  @Column @NotNull private Integer rank;
+  @Column(name = "dtype", updatable = false, insertable = false)
+  private RelatedDocumentationType type;
 
-  //  @ManyToOne private DocumentationUnitDTO documentationUnit;
+  @Column @NotNull private Integer rank;
 
   //  @Transient private DocumentationUnitDTO referencedDocumentationUnit;
 }

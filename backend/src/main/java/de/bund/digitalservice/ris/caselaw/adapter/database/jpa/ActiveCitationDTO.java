@@ -1,5 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.adapter.database.jpa;
 
+import de.bund.digitalservice.ris.caselaw.domain.RelatedDocumentationType.Values;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
@@ -12,7 +13,7 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @Getter
 @Entity
-@DiscriminatorValue("caselaw_active_citation")
+@DiscriminatorValue(Values.ACTIVE_CITATION)
 public class ActiveCitationDTO extends RelatedDocumentationDTO {
 
   @ManyToOne

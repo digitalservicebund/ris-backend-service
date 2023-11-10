@@ -1,5 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.adapter.database.jpa;
 
+import de.bund.digitalservice.ris.caselaw.domain.RelatedDocumentationType.Values;
 import jakarta.persistence.Column;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
@@ -11,7 +12,7 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @Getter
 @Entity
-@DiscriminatorValue("ensuing_decision")
+@DiscriminatorValue(Values.ENSUING_DECISION)
 public class EnsuingDecisionDTO extends RelatedDocumentationDTO {
 
   @Column private String note;

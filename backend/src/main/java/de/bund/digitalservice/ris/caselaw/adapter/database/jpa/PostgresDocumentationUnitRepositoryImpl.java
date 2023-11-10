@@ -10,12 +10,15 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatus;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitException;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitSearchEntry;
+import de.bund.digitalservice.ris.caselaw.domain.RelatedDocumentationType;
 import de.bund.digitalservice.ris.caselaw.domain.RelatedDocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
 import jakarta.persistence.EntityManager;
 import java.time.Instant;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -42,6 +45,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
   private final DatabaseNormReferenceRepository documentUnitNormRepository;
   private final DatabaseDocumentationOfficeRepository documentationOfficeRepository;
   private final JPADatabaseKeywordRepository keywordRepository;
+  private final DatabaseRelatedDocumentationRepository relatedDocumentationRepository;
   private final DatabaseNormAbbreviationRepository normAbbreviationRepository;
   private final EntityManager entityManager;
 
@@ -56,6 +60,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
       DatabaseNormAbbreviationRepository normAbbreviationRepository,
       DatabaseDocumentationOfficeRepository documentationOfficeRepository,
       JPADatabaseKeywordRepository keywordRepository,
+      DatabaseRelatedDocumentationRepository relatedDocumentationRepository,
       EntityManager entityManager) {
 
     this.repository = repository;
@@ -68,6 +73,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
     this.documentationOfficeRepository = documentationOfficeRepository;
     this.normAbbreviationRepository = normAbbreviationRepository;
     this.keywordRepository = keywordRepository;
+    this.relatedDocumentationRepository = relatedDocumentationRepository;
     this.entityManager = entityManager;
   }
 
@@ -241,9 +247,8 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
   }
 
   @Override
-  public Mono<Void> delete(DocumentUnit documentUnit) {
+  public void delete(DocumentUnit documentUnit) {
     repository.deleteById(documentUnit.uuid());
-    return Mono.empty();
   }
 
   @Override
@@ -328,88 +333,16 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
   }
 
   @Override
-  // TODO how to delete orphaned without dataSource
-  public Mono<Void> deleteIfOrphanedLinkedDocumentationUnit(UUID documentUnitUuid) {
-    if (log.isDebugEnabled()) {
-      log.debug("delete if orphaned linked documentation unit: {}", documentUnitUuid);
-    }
-
-    throw new UnsupportedOperationException("not implemented yet");
+  public Map<RelatedDocumentationType, Long> getAllDocumentationUnitWhichLink(
+      UUID documentationUnitId) {
+    // TODO: activate after referenced documentation unit id in related documentation
+    return Collections.emptyMap();
+    //    return
+    // relatedDocumentationRepository.findAllByReferencedDocumentUnitId(documentationUnitId).stream()
+    //            .collect(Collectors.groupingBy(
+    //              RelatedDocumentationDTO::getType,
+    //              Collectors.counting()
+    //            )
+    //    );
   }
-  //  @NotNull
-  //  private static Predicate[] getPredicates(
-  //      DocumentUnitSearchInput searchInput,
-  //      DocumentationOfficeDTO documentationOfficeDTO,
-  //      CriteriaBuilder builder,
-  //      Root<DocumentationUnitSearchEntryDTO> root) {
-  //    List<Predicate> restrictions = new ArrayList<>();
-  //
-  //    if (searchInput.documentNumberOrFileNumber() != null) {
-  //      String pattern = "%" + searchInput.documentNumberOrFileNumber().toLowerCase() + "%";
-  //      Predicate documentNumberLike =
-  //          builder.like(builder.lower(root.get("documentNumber")), pattern);
-  //      Predicate firstFileNumberLike =
-  //          builder.like(builder.lower(root.get("firstFileNumber")), pattern);
-  //      restrictions.add(builder.or(documentNumberLike, firstFileNumberLike));
-  //    }
-  //
-  //    if (searchInput.courtLocation() != null) {
-  //      restrictions.add(builder.equal(root.get("courtLocation"), searchInput.courtLocation()));
-  //    }
-  //
-  //    if (searchInput.courtType() != null) {
-  //      restrictions.add(builder.equal(root.get("courtType"), searchInput.courtType()));
-  //    }
-  //
-  //    if (searchInput.decisionDate() != null) {
-  //      if (searchInput.decisionDateEnd() != null) {
-  //        restrictions.add(
-  //            builder.between(
-  //                root.get("decisionDate"),
-  //                searchInput.decisionDate(),
-  //                searchInput.decisionDateEnd()));
-  //      } else {
-  //        restrictions.add(builder.equal(root.get("decisionDate"), searchInput.decisionDate()));
-  //      }
-  //    }
-  //
-  //    Predicate myDocOffice =
-  //        builder.equal(root.get("documentationOfficeId"), documentationOfficeDTO.getId());
-  //
-  //    if (searchInput.status() != null && searchInput.status().withError()) {
-  //      Predicate statusWithError = builder.equal(root.get("withError"), true);
-  //      restrictions.add(builder.and(myDocOffice, statusWithError));
-  //    }
-  //
-  //    if (searchInput.status() != null && searchInput.status().publicationStatus() != null) {
-  //      Predicate status =
-  //          builder.equal(root.get("publicationStatus"),
-  // searchInput.status().publicationStatus());
-  //      if (searchInput.status().publicationStatus() == PublicationStatus.PUBLISHED) {
-  //        status =
-  //            root.get("publicationStatus")
-  //                .in(PublicationStatus.PUBLISHED, PublicationStatus.JURIS_PUBLISHED);
-  //      }
-  //      if (searchInput.myDocOfficeOnly()
-  //          || searchInput.status().publicationStatus() == PublicationStatus.UNPUBLISHED) {
-  //        restrictions.add(builder.and(myDocOffice, status));
-  //      } else {
-  //        restrictions.add(status);
-  //      }
-  //    } else {
-  //      Predicate status =
-  //          root.get("publicationStatus")
-  //              .in(
-  //                  PublicationStatus.PUBLISHED,
-  //                  PublicationStatus.PUBLISHING,
-  //                  PublicationStatus.JURIS_PUBLISHED);
-  //      if (searchInput.myDocOfficeOnly()) {
-  //        restrictions.add(myDocOffice);
-  //      } else {
-  //        restrictions.add(builder.or(myDocOffice, status));
-  //      }
-  //    }
-  //
-  //    return restrictions.toArray(new Predicate[0]);
-  //  }
 }

@@ -1,5 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.domain;
 
+import java.util.Map;
 import java.util.UUID;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -23,7 +24,7 @@ public interface DocumentUnitRepository {
 
   DocumentUnit removeFile(UUID documentUnitId);
 
-  Mono<Void> delete(DocumentUnit documentUnit);
+  void delete(DocumentUnit documentUnit);
 
   <T extends RelatedDocumentationUnit> Page<T> searchByRelatedDocumentationUnit(
       T linkedDocumentationUnit, Pageable pageable);
@@ -33,5 +34,5 @@ public interface DocumentUnitRepository {
       DocumentationOffice documentationOffice,
       DocumentUnitSearchInput searchInput);
 
-  Mono<Void> deleteIfOrphanedLinkedDocumentationUnit(UUID documentUnitUuid);
+  Map<RelatedDocumentationType, Long> getAllDocumentationUnitWhichLink(UUID documentUnitUuid);
 }
