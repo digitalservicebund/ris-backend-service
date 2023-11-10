@@ -32,7 +32,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOffi
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.FileNumberDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentationUnitRepositoryImpl;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.PostgresPublicationReportRepositoryImpl;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresPublicationReportRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
@@ -44,7 +44,7 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatus;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.EmailPublishService;
-import de.bund.digitalservice.ris.caselaw.domain.ProceedingDecision;
+import de.bund.digitalservice.ris.caselaw.domain.PreviousDecision;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.Texts;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
@@ -54,7 +54,6 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Random;
 import java.util.UUID;
 import org.junit.jupiter.api.AfterEach;
@@ -339,8 +338,8 @@ class DocumentationUnitIntegrationTest {
                 .documentationOffice(documentationOfficeRepository.findByAbbreviation("DS"))
                 .build());
 
-    assertThat(repository.findAll().size()).isEqualTo(1);
-    assertThat(repository.findById(dto.getId())).isNotEqualTo(Optional.empty());
+    assertThat(repository.findAll()).hasSize(1);
+    assertThat(repository.findById(dto.getId())).isPresent();
 
     DocumentUnit documentUnitFromFrontend =
         DocumentUnit.builder()
@@ -400,7 +399,7 @@ class DocumentationUnitIntegrationTest {
 
     List<UUID> responseUUIDs = new ArrayList<>();
 
-    ProceedingDecision proceedingDecision = ProceedingDecision.builder().build();
+    PreviousDecision proceedingDecision = PreviousDecision.builder().build();
     risWebTestClient
         .withDefaultLogin()
         .put()

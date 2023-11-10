@@ -6,84 +6,84 @@ values
     'FL',
     'fl',
     1,
-    'OLD'
+    'NEW'
   ),
   (
     '71defe05-cd4d-43e5-a07e-06c611b81a26',
     'FL-01',
     'fl-01',
     2,
-    'OLD'
+    'NEW'
   ),
   (
     'ce5bab9c-8852-49a3-8ed8-08b67399abde',
     'FL-01-01',
     'fl-01-01',
     3,
-    'OLD'
+    'NEW'
   ),
   (
     'dfc6c738-7e81-40bd-8aa4-c5426605e9b0',
     'FO',
     'fo',
     4,
-    'OLD'
+    'NEW'
   ),
   (
     '93393410-0ab0-48ab-a61d-5056e440174a',
     'FL-02',
     'fl-02',
     5,
-    'OLD'
+    'NEW'
   ),
   (
     '64df49b7-1efe-4b18-96b3-46efef1ce21d',
     'FL-03',
     'fl-03',
     6,
-    'OLD'
+    'NEW'
   ),
   (
     'cb6cb7f4-4ad3-43ec-ae5e-a32d6eaab09f',
     'FL-04',
     'fl-04',
     7,
-    'OLD'
+    'NEW'
   ),
   (
     '6959af10-7355-4e22-858d-29a485189957',
     'AB-01',
     'Some text here',
     8,
-    'OLD'
+    'NEW'
   ),
   (
     '155da15c-f419-4c3c-a8f7-344d8ef10eea',
     'AB-01-01',
     'More text also here',
     9,
-    'OLD'
+    'NEW'
   ),
   (
     'ba67f3bd-ee06-4c04-8b14-72c615e23393',
     'CD',
     'Other text without more',
     10,
-    'OLD'
+    'NEW'
   ),
   (
     'b4f9ee05-38ed-49c3-89d6-50141f031017',
     'CD-01',
     'Text means writing here',
     11,
-    'OLD'
+    'NEW'
   ),
   (
     '64202894-ea0b-46d3-bc02-e8cf21248644',
     'CD-02',
     'Aber a word starting with ab and text + here',
     12,
-    'OLD'
+    'NEW'
   );
 
 insert into

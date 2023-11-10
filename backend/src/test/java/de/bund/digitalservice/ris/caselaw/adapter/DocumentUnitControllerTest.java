@@ -12,16 +12,17 @@ import static org.mockito.Mockito.when;
 
 import de.bund.digitalservice.ris.caselaw.RisWebTestClient;
 import de.bund.digitalservice.ris.caselaw.TestConfig;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentUnitTransformer;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationUnitTransformer;
 import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitPublishException;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
-import de.bund.digitalservice.ris.caselaw.domain.LinkedDocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationReport;
+import de.bund.digitalservice.ris.caselaw.domain.RelatedDocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.XmlPublication;
 import java.nio.ByteBuffer;
 import java.time.Instant;
@@ -223,13 +224,14 @@ class DocumentUnitControllerTest {
 
   @Test
   void testUpdateByUuid() {
-    DocumentUnitDTO documentUnitDTO = new DocumentUnitDTO();
-    documentUnitDTO.setDocumentnumber("ABCD202200001");
-    documentUnitDTO.setUuid(TEST_UUID);
-    DocumentUnit documentUnit = DocumentUnitTransformer.transformDTO(documentUnitDTO);
+    DocumentationUnitDTO documentUnitDTO =
+        DocumentationUnitDTO.builder()
+            .documentNumber("ABCD202200001")
+            .documentationOffice(DocumentationOfficeDTO.builder().abbreviation("DS").build())
+            .build();
+    DocumentUnit documentUnit = DocumentationUnitTransformer.transformToDomain(documentUnitDTO);
 
-    when(service.updateDocumentUnit(eq(documentUnit), any(DocumentationOffice.class)))
-        .thenReturn(Mono.empty());
+    when(service.updateDocumentUnit(documentUnit)).thenReturn(Mono.empty());
 
     risWebClient
         .withDefaultLogin()
@@ -241,13 +243,13 @@ class DocumentUnitControllerTest {
         .expectStatus()
         .isOk();
 
-    verify(service).updateDocumentUnit(eq(documentUnit), any(DocumentationOffice.class));
+    verify(service).updateDocumentUnit(documentUnit);
   }
 
   @Test
   void testUpdateByUuid_withInvalidUuid() {
-    DocumentUnitDTO documentUnitDTO = new DocumentUnitDTO();
-    documentUnitDTO.setUuid(TEST_UUID);
+    DocumentUnit documentUnitDTO = DocumentUnit.builder().uuid(TEST_UUID).build();
+
     risWebClient
         .withDefaultLogin()
         .put()
@@ -409,7 +411,7 @@ class DocumentUnitControllerTest {
 
   @Test
   void testSearchByLinkedDocumentationUnit() {
-    LinkedDocumentationUnit linkedDocumentationUnit = LinkedDocumentationUnit.builder().build();
+    RelatedDocumentationUnit linkedDocumentationUnit = RelatedDocumentationUnit.builder().build();
     PageRequest pageRequest = PageRequest.of(0, 10);
 
     when(service.searchByLinkedDocumentationUnit(linkedDocumentationUnit, pageRequest))

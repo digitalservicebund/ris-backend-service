@@ -1,15 +1,16 @@
 package de.bund.digitalservice.ris.caselaw.adapter.database.jpa;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import java.time.Instant;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.data.relational.core.mapping.Column;
-import org.springframework.data.relational.core.mapping.Table;
 
 @Builder(toBuilder = true)
 @AllArgsConstructor
@@ -18,28 +19,28 @@ import org.springframework.data.relational.core.mapping.Table;
 @Table(name = "xml_publication")
 @Entity
 public class XmlPublicationDTO {
-  @Id Long id;
+  @Id @GeneratedValue UUID id;
 
-  @Column("document_unit_id")
+  @Column(name = "documentation_unit_id")
   UUID documentUnitId;
 
-  @Column("receiver_address")
+  @Column(name = "receiver_address")
   String receiverAddress;
 
-  @Column("mail_subject")
+  @Column(name = "mail_subject")
   String mailSubject;
 
   String xml;
 
-  @Column("status_code")
+  @Column(name = "status_code")
   String statusCode;
 
-  @Column("status_messages")
+  @Column(name = "status_messages")
   String statusMessages;
 
-  @Column("file_name")
+  @Column(name = "file_name")
   String fileName;
 
-  @Column("publish_date")
+  @Column(name = "publish_date")
   Instant publishDate;
 }

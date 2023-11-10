@@ -17,7 +17,7 @@ public class PendingDecisionTransformer extends RelatedDocumentationUnitTransfor
         .build();
   }
 
-  public static PendingDecisionDTO transformToDTO(EnsuingDecision ensuingDecision, Integer rank) {
+  public static PendingDecisionDTO transformToDTO(EnsuingDecision ensuingDecision) {
     if (ensuingDecision.hasNoValues()) {
       return null;
     }
@@ -30,7 +30,6 @@ public class PendingDecisionTransformer extends RelatedDocumentationUnitTransfor
         .documentType(getDocumentTypeFromDomain(ensuingDecision.getDocumentType()))
         .fileNumber(getFileNumber(ensuingDecision.getFileNumber()))
         .note(ensuingDecision.getNote())
-        .rank(rank)
         .build();
   }
 }

@@ -1,8 +1,8 @@
 delete from
-  incremental_migration.documentation_unit;
+  incremental_migration.related_documentation;
 
 delete from
-  incremental_migration.related_documentation;
+  incremental_migration.documentation_unit;
 
 delete from
   incremental_migration.document_type;

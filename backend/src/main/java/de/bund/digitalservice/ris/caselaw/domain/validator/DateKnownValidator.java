@@ -1,11 +1,11 @@
 package de.bund.digitalservice.ris.caselaw.domain.validator;
 
-import de.bund.digitalservice.ris.caselaw.domain.ProceedingDecision;
+import de.bund.digitalservice.ris.caselaw.domain.PreviousDecision;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 
 public class DateKnownValidator
-    implements ConstraintValidator<DateKnownConstraint, ProceedingDecision> {
+    implements ConstraintValidator<DateKnownConstraint, PreviousDecision> {
 
   @Override
   public void initialize(DateKnownConstraint constraintAnnotation) {
@@ -14,8 +14,7 @@ public class DateKnownValidator
 
   @Override
   public boolean isValid(
-      ProceedingDecision proceedingDecision,
-      ConstraintValidatorContext constraintValidatorContext) {
-    return proceedingDecision.isDateKnown() || proceedingDecision.getDecisionDate() == null;
+      PreviousDecision previousDecision, ConstraintValidatorContext constraintValidatorContext) {
+    return previousDecision.getDateKnown() || previousDecision.getDecisionDate() == null;
   }
 }

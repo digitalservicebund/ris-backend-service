@@ -19,8 +19,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumenta
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentCategoryDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentationUnitRepositoryImpl;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentationUnitLinkRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.PostgresPublicationReportRepositoryImpl;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresPublicationReportRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationOfficeTransformer;
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresConfig;
@@ -38,8 +37,8 @@ import de.bund.digitalservice.ris.caselaw.domain.lookuptable.citation.CitationTy
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -90,7 +89,6 @@ class ActiveCitationIntegrationTest {
 
   @Autowired private RisWebTestClient risWebTestClient;
   @Autowired private DatabaseDocumentationUnitRepository repository;
-  @Autowired private DatabaseDocumentationUnitLinkRepository linkRepository;
   @Autowired private DatabaseDocumentTypeRepository documentTypeRepository;
   @Autowired private DatabaseDocumentationOfficeRepository documentationOfficeRepository;
 
@@ -118,12 +116,6 @@ class ActiveCitationIntegrationTest {
     doReturn(Mono.just(DocumentationOfficeTransformer.transformDTO(docOfficeDTO)))
         .when(userService)
         .getDocumentationOffice(any(OidcUser.class));
-  }
-
-  @AfterEach
-  void cleanUp() {
-    repository.deleteAll();
-    documentTypeRepository.deleteAll();
   }
 
   @Test
@@ -1126,251 +1118,256 @@ class ActiveCitationIntegrationTest {
                   .isNull();
             });
   }
-  //  @Test
-  //  void testUpdateDocumentationUnit_addLinkToExistingDocumentationUnit() {
-  //    prepareTestData(2, 0);
-  //    removeLink(2);
-  //
-  //    ActiveCitation activeCitation = generateActiveCitation(1, false);
-  //    ActiveCitation linkedActiveCitation = generateActiveCitation(2, false);
-  //
-  //    DocumentUnit documentUnit = generateDocumentUnit(List.of(activeCitation,
-  // linkedActiveCitation));
-  //
-  //    risWebTestClient
-  //        .withDefaultLogin()
-  //        .put()
-  //        .uri("/api/v1/caselaw/documentunits/" + UUID_PREFIX + "0")
-  //        .bodyValue(documentUnit)
-  //        .exchange()
-  //        .expectStatus()
-  //        .isOk()
-  //        .expectBody(DocumentUnit.class)
-  //        .consumeWith(
-  //            response -> {
-  //              assertThat(response.getResponseBody()).isNotNull();
-  //              assertThat(response.getResponseBody()).isEqualTo(documentUnit);
-  //            });
-  //  }
 
-  //  @Test
-  //  void testUpdateDocumentationUnit_addLinkToExistingDocumentationUnitWhichIsLinkedAlready() {
-  //    prepareTestData(2, 0);
-  //
-  //    ActiveCitation activeCitation = generateActiveCitation(1, false);
-  //    ActiveCitation linkedActiveCitation = generateActiveCitation(2, false);
-  //
-  //    DocumentUnit documentUnitRequest =
-  //        generateDocumentUnit(List.of(activeCitation, linkedActiveCitation,
-  // linkedActiveCitation));
-  //    DocumentUnit documentUnitResponse =
-  //        generateDocumentUnit(List.of(activeCitation, linkedActiveCitation));
-  //
-  //    risWebTestClient
-  //        .withDefaultLogin()
-  //        .put()
-  //        .uri("/api/v1/caselaw/documentunits/" + UUID_PREFIX + "0")
-  //        .bodyValue(documentUnitRequest)
-  //        .exchange()
-  //        .expectStatus()
-  //        .isOk()
-  //        .expectBody(DocumentUnit.class)
-  //        .consumeWith(
-  //            response -> {
-  //              assertThat(response.getResponseBody()).isNotNull();
-  //              assertThat(response.getResponseBody()).isEqualTo(documentUnitResponse);
-  //            });
-  //  }
+  @Test
+  @Disabled
+  void testUpdateDocumentationUnit_addLinkToExistingDocumentationUnit() {
+    //    prepareTestData(2, 0);
+    //    removeLink(2);
+    //
+    //    ActiveCitation activeCitation = generateActiveCitation(1, false);
+    //    ActiveCitation linkedActiveCitation = generateActiveCitation(2, false);
+    //
+    //    DocumentUnit documentUnit = generateDocumentUnit(List.of(activeCitation,
+    //        linkedActiveCitation));
+    //
+    //    risWebTestClient
+    //        .withDefaultLogin()
+    //        .put()
+    //        .uri("/api/v1/caselaw/documentunits/" + UUID_PREFIX + "0")
+    //        .bodyValue(documentUnit)
+    //        .exchange()
+    //        .expectStatus()
+    //        .isOk()
+    //        .expectBody(DocumentUnit.class)
+    //        .consumeWith(
+    //            response -> {
+    //              assertThat(response.getResponseBody()).isNotNull();
+    //              assertThat(response.getResponseBody()).isEqualTo(documentUnit);
+    //            });
+  }
 
-  //
-  //  @Test
-  //  void testUpdateDocumentationUnit_removeLinkedActiveCitation() {
-  //    prepareTestData(1, 1);
-  //
-  //    ActiveCitation editableActiveCitation = generateActiveCitation(2, true);
-  //
-  //    DocumentUnit documentUnitRequest = generateDocumentUnit(List.of(editableActiveCitation));
-  //    DocumentUnit documentUnitResponse = generateDocumentUnit(List.of(editableActiveCitation));
-  //
-  //    risWebTestClient
-  //        .withDefaultLogin()
-  //        .put()
-  //        .uri("/api/v1/caselaw/documentunits/" + UUID_PREFIX + "0")
-  //        .bodyValue(documentUnitRequest)
-  //        .exchange()
-  //        .expectStatus()
-  //        .isOk()
-  //        .expectBody(DocumentUnit.class)
-  //        .consumeWith(
-  //            response -> {
-  //              assertThat(response.getResponseBody()).isNotNull();
-  //              assertThat(response.getResponseBody()).isEqualTo(documentUnitResponse);
-  //            });
-  //
-  //    StepVerifier.create(repository.findByUuid(UUID.fromString(UUID_PREFIX + "1")))
-  //        .expectNextCount(1)
-  //        .verifyComplete();
-  //    StepVerifier.create(
-  //
-  // linkRepository.findByParentDocumentationUnitUuidAndChildDocumentationUnitUuidAndType(
-  //                UUID.fromString(UUID_PREFIX + "0"),
-  //                UUID.fromString(UUID_PREFIX + "1"),
-  //                DocumentationUnitLinkType.ACTIVE_CITATION))
-  //        .verifyComplete();
-  //  }
-  //
+  @Test
+  @Disabled
+  void testUpdateDocumentationUnit_addLinkToExistingDocumentationUnitWhichIsLinkedAlready() {
+    //      prepareTestData(2, 0);
+    //
+    //      ActiveCitation activeCitation = generateActiveCitation(1, false);
+    //      ActiveCitation linkedActiveCitation = generateActiveCitation(2, false);
+    //
+    //      DocumentUnit documentUnitRequest =
+    //          generateDocumentUnit(List.of(activeCitation, linkedActiveCitation,
+    //   linkedActiveCitation));
+    //      DocumentUnit documentUnitResponse =
+    //          generateDocumentUnit(List.of(activeCitation, linkedActiveCitation));
+    //
+    //      risWebTestClient
+    //          .withDefaultLogin()
+    //          .put()
+    //          .uri("/api/v1/caselaw/documentunits/" + UUID_PREFIX + "0")
+    //          .bodyValue(documentUnitRequest)
+    //          .exchange()
+    //          .expectStatus()
+    //          .isOk()
+    //          .expectBody(DocumentUnit.class)
+    //          .consumeWith(
+    //              response -> {
+    //                assertThat(response.getResponseBody()).isNotNull();
+    //                assertThat(response.getResponseBody()).isEqualTo(documentUnitResponse);
+    //              });
+  }
 
-  //  @Test
-  //  void testUpdateDocumentationUnit_removeCourtInRealActiveCitation() {
-  //    prepareTestData(1, 1);
-  //
-  //    ActiveCitation realActiveCitationResponse = generateActiveCitation(1, false);
-  //    ActiveCitation realActiveCitationRequest =
-  //        realActiveCitationResponse.toBuilder().court(null).build();
-  //    ActiveCitation editableActiveCitation = generateActiveCitation(2, true);
-  //
-  //    DocumentUnit documentUnitRequest =
-  //        generateDocumentUnit(List.of(realActiveCitationRequest, editableActiveCitation));
-  //    DocumentUnit documentUnitResponse =
-  //        generateDocumentUnit(List.of(realActiveCitationResponse, editableActiveCitation));
-  //
-  //    risWebTestClient
-  //        .withDefaultLogin()
-  //        .put()
-  //        .uri("/api/v1/caselaw/documentunits/" + UUID_PREFIX + "0")
-  //        .bodyValue(documentUnitRequest)
-  //        .exchange()
-  //        .expectStatus()
-  //        .isOk()
-  //        .expectBody(DocumentUnit.class)
-  //        .consumeWith(
-  //            response -> {
-  //              assertThat(response.getResponseBody()).isNotNull();
-  //              assertThat(response.getResponseBody()).isEqualTo(documentUnitResponse);
-  //            });
-  //  }
-  //
-  //
-  //  @Test
-  //  void testUpdateDocumentationUnit_removeCitationStyleInRealActiveCitation() {
-  //    prepareTestData(1, 1);
-  //
-  //    ActiveCitation realActiveCitationRequest =
-  //        generateActiveCitation(1, false).toBuilder().citationType(null).build();
-  //    ActiveCitation realActiveCitationResponse = generateActiveCitation(1, false);
-  //    ActiveCitation editableActiveCitation = generateActiveCitation(2, true);
-  //
-  //    DocumentUnit documentUnitRequest =
-  //        generateDocumentUnit(List.of(realActiveCitationRequest, editableActiveCitation));
-  //    DocumentUnit documentUnitResponse =
-  //        generateDocumentUnit(List.of(realActiveCitationResponse, editableActiveCitation));
-  //
-  //    risWebTestClient
-  //        .withDefaultLogin()
-  //        .put()
-  //        .uri("/api/v1/caselaw/documentunits/" + UUID_PREFIX + "0")
-  //        .bodyValue(documentUnitRequest)
-  //        .exchange()
-  //        .expectStatus()
-  //        .isOk()
-  //        .expectBody(DocumentUnit.class)
-  //        .consumeWith(
-  //            response -> {
-  //              assertThat(response.getResponseBody()).isNotNull();
-  //              assertThat(response.getResponseBody()).isEqualTo(documentUnitResponse);
-  //            });
-  //  }
-  //
-  //
-  //  @Test
-  //  void testUpdateDocumentationUnit_removeDocumentTypeInRealActiveCitation() {
-  //    prepareTestData(1, 1);
-  //
-  //    ActiveCitation realActiveCitationRequest =
-  //        generateActiveCitation(1, false).toBuilder().documentType(null).build();
-  //    ActiveCitation realActiveCitationResponse = generateActiveCitation(1, false);
-  //    ActiveCitation editableActiveCitation = generateActiveCitation(2, true);
-  //
-  //    DocumentUnit documentUnitRequest =
-  //        generateDocumentUnit(List.of(realActiveCitationRequest, editableActiveCitation));
-  //    DocumentUnit documentUnitResponse =
-  //        generateDocumentUnit(List.of(realActiveCitationResponse, editableActiveCitation));
-  //
-  //    risWebTestClient
-  //        .withDefaultLogin()
-  //        .put()
-  //        .uri("/api/v1/caselaw/documentunits/" + UUID_PREFIX + "0")
-  //        .bodyValue(documentUnitRequest)
-  //        .exchange()
-  //        .expectStatus()
-  //        .isOk()
-  //        .expectBody(DocumentUnit.class)
-  //        .consumeWith(
-  //            response -> {
-  //              assertThat(response.getResponseBody()).isNotNull();
-  //              assertThat(response.getResponseBody()).isEqualTo(documentUnitResponse);
-  //            });
-  //  }
+  @Test
+  @Disabled
+  void testUpdateDocumentationUnit_removeLinkedActiveCitation() {
+    //      prepareTestData(1, 1);
+    //
+    //      ActiveCitation editableActiveCitation = generateActiveCitation(2, true);
+    //
+    //      DocumentUnit documentUnitRequest =
+    // generateDocumentUnit(List.of(editableActiveCitation));
+    //      DocumentUnit documentUnitResponse =
+    // generateDocumentUnit(List.of(editableActiveCitation));
+    //
+    //      risWebTestClient
+    //          .withDefaultLogin()
+    //          .put()
+    //          .uri("/api/v1/caselaw/documentunits/" + UUID_PREFIX + "0")
+    //          .bodyValue(documentUnitRequest)
+    //          .exchange()
+    //          .expectStatus()
+    //          .isOk()
+    //          .expectBody(DocumentUnit.class)
+    //          .consumeWith(
+    //              response -> {
+    //                assertThat(response.getResponseBody()).isNotNull();
+    //                assertThat(response.getResponseBody()).isEqualTo(documentUnitResponse);
+    //              });
+    //
+    //      StepVerifier.create(repository.findByUuid(UUID.fromString(UUID_PREFIX + "1")))
+    //          .expectNextCount(1)
+    //          .verifyComplete();
+    //      StepVerifier.create(
+    //
+    //   linkRepository.findByParentDocumentationUnitUuidAndChildDocumentationUnitUuidAndType(
+    //                  UUID.fromString(UUID_PREFIX + "0"),
+    //                  UUID.fromString(UUID_PREFIX + "1"),
+    //                  DocumentationUnitLinkType.ACTIVE_CITATION))
+    //          .verifyComplete();
+  }
 
-  //
-  //  @Test
-  //  void testUpdateDocumentationUnit_removeFileNumberInRealActiveCitation() {
-  //    prepareTestData(1, 1);
-  //
-  //    ActiveCitation realActiveCitationRequest =
-  //        generateActiveCitation(1, false).toBuilder().fileNumber(null).build();
-  //    ActiveCitation realActiveCitationResponse = generateActiveCitation(1, false);
-  //    ActiveCitation editableActiveCitation = generateActiveCitation(2, true);
-  //
-  //    DocumentUnit documentUnitRequest =
-  //        generateDocumentUnit(List.of(realActiveCitationRequest, editableActiveCitation));
-  //    DocumentUnit documentUnitResponse =
-  //        generateDocumentUnit(List.of(realActiveCitationResponse, editableActiveCitation));
-  //
-  //    risWebTestClient
-  //        .withDefaultLogin()
-  //        .put()
-  //        .uri("/api/v1/caselaw/documentunits/" + UUID_PREFIX + "0")
-  //        .bodyValue(documentUnitRequest)
-  //        .exchange()
-  //        .expectStatus()
-  //        .isOk()
-  //        .expectBody(DocumentUnit.class)
-  //        .consumeWith(
-  //            response -> {
-  //              assertThat(response.getResponseBody()).isNotNull();
-  //              assertThat(response.getResponseBody()).isEqualTo(documentUnitResponse);
-  //            });
-  //  }
-  //
+  @Test
+  @Disabled
+  void testUpdateDocumentationUnit_removeCourtInRealActiveCitation() {
+    //      prepareTestData(1, 1);
+    //
+    //      ActiveCitation realActiveCitationResponse = generateActiveCitation(1, false);
+    //      ActiveCitation realActiveCitationRequest =
+    //          realActiveCitationResponse.toBuilder().court(null).build();
+    //      ActiveCitation editableActiveCitation = generateActiveCitation(2, true);
+    //
+    //      DocumentUnit documentUnitRequest =
+    //          generateDocumentUnit(List.of(realActiveCitationRequest, editableActiveCitation));
+    //      DocumentUnit documentUnitResponse =
+    //          generateDocumentUnit(List.of(realActiveCitationResponse, editableActiveCitation));
+    //
+    //      risWebTestClient
+    //          .withDefaultLogin()
+    //          .put()
+    //          .uri("/api/v1/caselaw/documentunits/" + UUID_PREFIX + "0")
+    //          .bodyValue(documentUnitRequest)
+    //          .exchange()
+    //          .expectStatus()
+    //          .isOk()
+    //          .expectBody(DocumentUnit.class)
+    //          .consumeWith(
+    //              response -> {
+    //                assertThat(response.getResponseBody()).isNotNull();
+    //                assertThat(response.getResponseBody()).isEqualTo(documentUnitResponse);
+    //              });
+  }
 
-  //  @Test
-  //  void testUpdateDocumentationUnit_removeDecisionDateInRealActiveCitation() {
-  //    prepareTestData(1, 1);
-  //
-  //    ActiveCitation realActiveCitationRequest =
-  //        generateActiveCitation(1, false).toBuilder().decisionDate(null).build();
-  //    ActiveCitation realActiveCitationResponse = generateActiveCitation(1, false);
-  //    ActiveCitation editableActiveCitation = generateActiveCitation(2, true);
-  //
-  //    DocumentUnit documentUnitRequest =
-  //        generateDocumentUnit(List.of(realActiveCitationRequest, editableActiveCitation));
-  //    DocumentUnit documentUnitResponse =
-  //        generateDocumentUnit(List.of(realActiveCitationResponse, editableActiveCitation));
-  //
-  //    risWebTestClient
-  //        .withDefaultLogin()
-  //        .put()
-  //        .uri("/api/v1/caselaw/documentunits/" + UUID_PREFIX + "0")
-  //        .bodyValue(documentUnitRequest)
-  //        .exchange()
-  //        .expectStatus()
-  //        .isOk()
-  //        .expectBody(DocumentUnit.class)
-  //        .consumeWith(
-  //            response -> {
-  //              assertThat(response.getResponseBody()).isNotNull();
-  //              assertThat(response.getResponseBody()).isEqualTo(documentUnitResponse);
-  //            });
-  //  }
+  @Test
+  @Disabled
+  void testUpdateDocumentationUnit_removeCitationStyleInRealActiveCitation() {
+    //      prepareTestData(1, 1);
+    //
+    //      ActiveCitation realActiveCitationRequest =
+    //          generateActiveCitation(1, false).toBuilder().citationType(null).build();
+    //      ActiveCitation realActiveCitationResponse = generateActiveCitation(1, false);
+    //      ActiveCitation editableActiveCitation = generateActiveCitation(2, true);
+    //
+    //      DocumentUnit documentUnitRequest =
+    //          generateDocumentUnit(List.of(realActiveCitationRequest, editableActiveCitation));
+    //      DocumentUnit documentUnitResponse =
+    //          generateDocumentUnit(List.of(realActiveCitationResponse, editableActiveCitation));
+    //
+    //      risWebTestClient
+    //          .withDefaultLogin()
+    //          .put()
+    //          .uri("/api/v1/caselaw/documentunits/" + UUID_PREFIX + "0")
+    //          .bodyValue(documentUnitRequest)
+    //          .exchange()
+    //          .expectStatus()
+    //          .isOk()
+    //          .expectBody(DocumentUnit.class)
+    //          .consumeWith(
+    //              response -> {
+    //                assertThat(response.getResponseBody()).isNotNull();
+    //                assertThat(response.getResponseBody()).isEqualTo(documentUnitResponse);
+    //              });
+  }
+
+  @Test
+  @Disabled
+  void testUpdateDocumentationUnit_removeDocumentTypeInRealActiveCitation() {
+    //      prepareTestData(1, 1);
+    //
+    //      ActiveCitation realActiveCitationRequest =
+    //          generateActiveCitation(1, false).toBuilder().documentType(null).build();
+    //      ActiveCitation realActiveCitationResponse = generateActiveCitation(1, false);
+    //      ActiveCitation editableActiveCitation = generateActiveCitation(2, true);
+    //
+    //      DocumentUnit documentUnitRequest =
+    //          generateDocumentUnit(List.of(realActiveCitationRequest, editableActiveCitation));
+    //      DocumentUnit documentUnitResponse =
+    //          generateDocumentUnit(List.of(realActiveCitationResponse, editableActiveCitation));
+    //
+    //      risWebTestClient
+    //          .withDefaultLogin()
+    //          .put()
+    //          .uri("/api/v1/caselaw/documentunits/" + UUID_PREFIX + "0")
+    //          .bodyValue(documentUnitRequest)
+    //          .exchange()
+    //          .expectStatus()
+    //          .isOk()
+    //          .expectBody(DocumentUnit.class)
+    //          .consumeWith(
+    //              response -> {
+    //                assertThat(response.getResponseBody()).isNotNull();
+    //                assertThat(response.getResponseBody()).isEqualTo(documentUnitResponse);
+    //              });
+  }
+
+  @Test
+  @Disabled
+  void testUpdateDocumentationUnit_removeFileNumberInRealActiveCitation() {
+    //      prepareTestData(1, 1);
+    //
+    //      ActiveCitation realActiveCitationRequest =
+    //          generateActiveCitation(1, false).toBuilder().fileNumber(null).build();
+    //      ActiveCitation realActiveCitationResponse = generateActiveCitation(1, false);
+    //      ActiveCitation editableActiveCitation = generateActiveCitation(2, true);
+    //
+    //      DocumentUnit documentUnitRequest =
+    //          generateDocumentUnit(List.of(realActiveCitationRequest, editableActiveCitation));
+    //      DocumentUnit documentUnitResponse =
+    //          generateDocumentUnit(List.of(realActiveCitationResponse, editableActiveCitation));
+    //
+    //      risWebTestClient
+    //          .withDefaultLogin()
+    //          .put()
+    //          .uri("/api/v1/caselaw/documentunits/" + UUID_PREFIX + "0")
+    //          .bodyValue(documentUnitRequest)
+    //          .exchange()
+    //          .expectStatus()
+    //          .isOk()
+    //          .expectBody(DocumentUnit.class)
+    //          .consumeWith(
+    //              response -> {
+    //                assertThat(response.getResponseBody()).isNotNull();
+    //                assertThat(response.getResponseBody()).isEqualTo(documentUnitResponse);
+    //              });
+  }
+
+  @Test
+  @Disabled
+  void testUpdateDocumentationUnit_removeDecisionDateInRealActiveCitation() {
+    //      prepareTestData(1, 1);
+    //
+    //      ActiveCitation realActiveCitationRequest =
+    //          generateActiveCitation(1, false).toBuilder().decisionDate(null).build();
+    //      ActiveCitation realActiveCitationResponse = generateActiveCitation(1, false);
+    //      ActiveCitation editableActiveCitation = generateActiveCitation(2, true);
+    //
+    //      DocumentUnit documentUnitRequest =
+    //          generateDocumentUnit(List.of(realActiveCitationRequest, editableActiveCitation));
+    //      DocumentUnit documentUnitResponse =
+    //          generateDocumentUnit(List.of(realActiveCitationResponse, editableActiveCitation));
+    //
+    //      risWebTestClient
+    //          .withDefaultLogin()
+    //          .put()
+    //          .uri("/api/v1/caselaw/documentunits/" + UUID_PREFIX + "0")
+    //          .bodyValue(documentUnitRequest)
+    //          .exchange()
+    //          .expectStatus()
+    //          .isOk()
+    //          .expectBody(DocumentUnit.class)
+    //          .consumeWith(
+    //              response -> {
+    //                assertThat(response.getResponseBody()).isNotNull();
+    //                assertThat(response.getResponseBody()).isEqualTo(documentUnitResponse);
+    //              });
+  }
 }

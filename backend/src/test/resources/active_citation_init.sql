@@ -80,7 +80,8 @@ insert into
     file_number,
     citation_type_id,
     dtype,
-    documentation_unit_id
+    documentation_unit_id,
+    rank
   )
 values
   (
@@ -93,7 +94,8 @@ values
     'abc',
     '4e768071-1a19-43a1-8ab9-c185adec94bf',
     'caselaw_active_citation',
-    '46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3'
+    '46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3',
+    1
   ),
   (
     'f0232240-7416-11ee-b962-0242ac120003',
@@ -105,5 +107,6 @@ values
     null,
     '6b4bd747-fce9-4e49-8af4-3fb4f1d3663c',
     'caselaw_active_citation',
-    '46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3'
+    '46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3',
+    2
   );

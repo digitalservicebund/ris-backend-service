@@ -10,11 +10,11 @@ import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.DataSource;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitNorm;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatus;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
+import de.bund.digitalservice.ris.caselaw.domain.NormReference;
+import de.bund.digitalservice.ris.caselaw.domain.PreviousDecision;
 import de.bund.digitalservice.ris.caselaw.domain.Procedure;
-import de.bund.digitalservice.ris.caselaw.domain.ProceedingDecision;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.Texts;
 import de.bund.digitalservice.ris.caselaw.domain.court.Court;
@@ -67,9 +67,9 @@ class JurisXmlExporterWrapperIntegrationTest {
 
     Texts texts = Texts.builder().decisionName("decisionName").build();
 
-    List<ProceedingDecision> proceedingDecisions =
+    List<PreviousDecision> previousDecisions =
         List.of(
-            ProceedingDecision.builder()
+            PreviousDecision.builder()
                 .uuid(UUID.randomUUID())
                 .court(new Court(UUID.randomUUID(), "courtType", "courtPlace", "courtLabel", null))
                 .decisionDate(LocalDate.parse("2020-05-06"))
@@ -151,12 +151,11 @@ class JurisXmlExporterWrapperIntegrationTest {
             .decisionReasons("decisionReasons")
             .build();
 
-    List<ProceedingDecision> proceedingDecisions =
+    List<PreviousDecision> previousDecisions =
         List.of(
-            ProceedingDecision.builder()
+            PreviousDecision.builder()
                 .uuid(UUID.randomUUID())
                 .documentNumber("documentNumber")
-                .dataSource(DataSource.NEURIS)
                 .court(new Court(UUID.randomUUID(), "courtType", "courtPlace", "courtLabel", null))
                 .decisionDate(LocalDate.parse("2020-04-05"))
                 .dateKnown(true)
@@ -175,7 +174,7 @@ class JurisXmlExporterWrapperIntegrationTest {
                         .identifier("SF-01")
                         .text("field of law text")
                         .build()))
-            .norms(List.of(DocumentUnitNorm.builder().singleNorm("01").build()))
+            .norms(List.of(NormReference.builder().singleNorm("01").build()))
             .build();
 
     DocumentUnit documentUnit =
@@ -204,10 +203,10 @@ class JurisXmlExporterWrapperIntegrationTest {
         assertThat(field).hasNoNullFieldsOrProperties();
       if (field.getType().equals(List.class)) {
         field.setAccessible(true);
-        List<ProceedingDecision> previousDecisionsList =
-            (List<ProceedingDecision>) field.get(documentUnit);
-        for (ProceedingDecision proceedingDecision : previousDecisionsList) {
-          assertThat(proceedingDecision).hasNoNullFieldsOrProperties();
+        List<PreviousDecision> previousDecisionsList =
+            (List<PreviousDecision>) field.get(documentUnit);
+        for (PreviousDecision previousDecision : previousDecisionsList) {
+          assertThat(previousDecision).hasNoNullFieldsOrProperties();
         }
       }
     }

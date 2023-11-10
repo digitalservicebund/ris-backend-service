@@ -9,28 +9,22 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -100,7 +94,7 @@ public class DocumentUnitService {
 
     return putObjectIntoBucket(fileUuid, byteBuffer, httpHeaders)
         .doOnNext(putObjectResponse -> log.debug("generate doc unit for {}", fileUuid))
-        .flatMap(putObjectResponse -> repository.findByUuid(documentUnitUuid))
+        .map(putObjectResponse -> repository.findByUuid(documentUnitUuid))
         .doOnNext(
             documentUnit ->
                 log.debug(
@@ -113,17 +107,14 @@ public class DocumentUnitService {
   }
 
   public Mono<DocumentUnit> removeFileFromDocumentUnit(UUID documentUnitId) {
-    return repository
-        .findByUuid(documentUnitId)
-        .flatMap(
-            documentUnit -> {
-              var fileUuid = documentUnit.s3path();
-              return deleteObjectFromBucket(fileUuid)
-                  .doOnNext(
-                      deleteObjectResponse -> log.debug("deleted file {} in bucket", fileUuid));
+    DocumentUnit documentUnit = repository.findByUuid(documentUnitId);
+
+    return deleteObjectFromBucket(documentUnit.s3path())
+        .map(
+            response -> {
+              log.debug("deleted file {} in bucket", documentUnit.s3path());
+              return repository.removeFile(documentUnitId);
             })
-        .doOnNext(response -> log.debug("removed file from DocumentUnitDTO {}", documentUnitId))
-        .flatMap(response -> repository.removeFile(documentUnitId))
         .doOnError(ex -> log.error("Couldn't remove the file from the DocumentUnit", ex));
   }
 
@@ -223,301 +214,86 @@ public class DocumentUnitService {
   }
 
   public Mono<DocumentUnit> getByUuid(UUID documentUnitUuid) {
-    return repository.findByUuid(documentUnitUuid);
+    return Mono.just(repository.findByUuid(documentUnitUuid));
   }
 
   public Mono<String> deleteByUuid(UUID documentUnitUuid) {
-    AtomicInteger documentUnitsThisOneIsAChildOf = new AtomicInteger();
 
-    return repository
-        .countLinksByChildDocumentUnitUuid(documentUnitUuid)
-        .flatMap(
-            count -> {
-              documentUnitsThisOneIsAChildOf.set(count.intValue());
-              return repository.findByUuid(documentUnitUuid);
-            })
-        .flatMap(
-            documentUnit -> {
-              log.debug("Deleting DocumentUnitDTO " + documentUnitUuid);
+    // TODO: check and fix related documentation has links to real documentation units
+    //    return repository
+    //        .countLinksByChildDocumentUnitUuid(documentUnitUuid)
+    //        .flatMap(
+    //            count -> {
+    //              documentUnitsThisOneIsAChildOf.set(count.intValue());
+    //              return repository.findByUuid(documentUnitUuid);
+    //            })
 
-              Mono<Void> deleteAttachedFile =
-                  documentUnit.s3path() == null
-                      ? Mono.empty()
-                      : deleteObjectFromBucket(documentUnit.s3path())
-                          .doOnNext(
-                              d -> log.debug("Deleted file {} in bucket", documentUnit.s3path()))
-                          .flatMap(d -> Mono.empty());
+    DocumentUnit documentUnit = repository.findByUuid(documentUnitUuid);
 
-              //              Flux<ProceedingDecision> proceedingDecisions =
-              //                  documentUnit.proceedingDecisions() == null
-              //                      ? Flux.empty()
-              //                      : Flux.fromIterable(documentUnit.proceedingDecisions());
+    log.debug("Deleting DocumentUnitDTO " + documentUnitUuid);
 
-              //              Flux<ActiveCitation> activeCitations =
-              //                  documentUnit.contentRelatedIndexing() == null
-              //                          || documentUnit.contentRelatedIndexing().activeCitations()
-              // == null
-              //                      ? Flux.empty()
-              //                      :
-              // Flux.fromIterable(documentUnit.contentRelatedIndexing().activeCitations());
-
+    return deleteObjectFromBucket(documentUnit.s3path())
+        .map(
+            deleteObjectResponse -> {
+              log.debug("Deleted file {} in bucket", documentUnit.s3path());
               String logMsg = "Dokumentationseinheit gelöscht: " + documentUnitUuid;
-              //                      + (documentUnit.proceedingDecisions() == null
-              //                              || documentUnit.proceedingDecisions().isEmpty()
-              //                          ? ""
-              //                          : ", zudem die Verknüpfungen mit "
-              //                              + documentUnit.proceedingDecisions().size()
-              //                              + " vorgehenden Entscheidungen")
-              //                      + (documentUnit.contentRelatedIndexing() == null
-              //                              ||
-              // documentUnit.contentRelatedIndexing().activeCitations() == null
-              //                              ||
-              // documentUnit.contentRelatedIndexing().activeCitations().isEmpty()
-              //                          ? ""
-              //                          : ", zudem die Verknüpfungen mit "
-              //                              +
-              // documentUnit.contentRelatedIndexing().activeCitations().size()
-              //                              + " Aktivzitierungen");
-
-              return deleteAttachedFile
-                  //                  .thenMany(
-                  //                      proceedingDecisions.flatMap(
-                  //                          proceedingDecision ->
-                  //                              removeLinkedDocumentationUnit(
-                  //                                  documentUnitUuid,
-                  //                                  proceedingDecision.getUuid(),
-                  //                                  DocumentationUnitLinkType.PREVIOUS_DECISION)))
-                  //                  .thenMany(
-                  //                      activeCitations.flatMap(
-                  //                          activeCitation ->
-                  //                              removeLinkedDocumentationUnit(
-                  //                                  documentUnitUuid,
-                  //                                  activeCitation.getUuid(),
-                  //                                  DocumentationUnitLinkType.ACTIVE_CITATION)))
-                  .then(repository.delete(documentUnit))
-                  .thenReturn(logMsg);
-            })
-        .onErrorResume(
-            ex -> {
-              log.error("Couldn't delete the DocumentUnit", ex);
-              if (ex instanceof DataIntegrityViolationException) {
-                return Mono.error(
-                    new DocumentUnitDeletionException(
-                        "die Dokumentationseinheit konnte nicht gelöscht werden, "
-                            + "da sie eine vorgehende Entscheidung oder Aktivzitierung für "
-                            + documentUnitsThisOneIsAChildOf.get()
-                            + " andere Dokumentationseinheiten darstellt"));
-              }
-              return Mono.error(
-                  new DocumentUnitDeletionException("Couldn't delete the DocumentUnit"));
+              repository.delete(documentUnit);
+              return logMsg;
             });
+
+    //        .onErrorResume(
+    //            ex -> {
+    //              log.error("Couldn't delete the DocumentUnit", ex);
+    //              if (ex instanceof DataIntegrityViolationException) {
+    //                return Mono.error(
+    //                    new DocumentUnitDeletionException(
+    //                        "die Dokumentationseinheit konnte nicht gelöscht werden, "
+    //                            + "da sie eine vorgehende Entscheidung oder Aktivzitierung für "
+    //                            + documentUnitsThisOneIsAChildOf.get()
+    //                            + " andere Dokumentationseinheiten darstellt"));
+    //              }
+    //              return Mono.error(
+    //                  new DocumentUnitDeletionException("Couldn't delete the DocumentUnit"));
+    //            });
   }
 
-  public Mono<DocumentUnit> updateDocumentUnit(
-      DocumentUnit documentUnit, DocumentationOffice documentationOffice) {
-    Mono<DocumentUnit> documentUnitMono = Mono.just(documentUnit);
-
-    return documentUnitMono
-        //        .flatMap(
-        //            documentUnit1 -> {
-        //              if (documentUnit1.proceedingDecisions() == null) return
-        // Mono.just(documentUnit1);
-        //              return Flux.fromIterable(documentUnit1.proceedingDecisions())
-        //                  .flatMap(
-        //                      proceedingDecision -> {
-        //                        if (proceedingDecision.getUuid() == null &&
-        // !proceedingDecision.isEmpty()) {
-        //                          return createLinkedDocumentationUnit(
-        //                                  documentUnit1.uuid(),
-        //                                  proceedingDecision,
-        //                                  documentationOffice,
-        //                                  DocumentationUnitLinkType.PREVIOUS_DECISION)
-        //                              .map(
-        //                                  documentationUnitLink ->
-        //                                      proceedingDecision.toBuilder()
-        //
-        // .uuid(documentationUnitLink.childDocumentationUnitUuid())
-        //                                          .build());
-        //                        } else {
-        //                          return linkLinkedDocumentationUnit(
-        //                                  documentUnit1.uuid(),
-        //                                  proceedingDecision.getUuid(),
-        //                                  DocumentationUnitLinkType.PREVIOUS_DECISION)
-        //                              .thenReturn(proceedingDecision);
-        //                        }
-        //                      })
-        //                  .collectList()
-        //                  .map(
-        //                      proceedingDecisions ->
-        //                          documentUnit1.toBuilder()
-        //                              .proceedingDecisions(proceedingDecisions)
-        //                              .build());
-        //            })
-        //        .flatMap(
-        //            documentUnit1 -> {
-        //              if (documentUnit1.contentRelatedIndexing() == null
-        //                  || documentUnit1.contentRelatedIndexing().activeCitations() == null)
-        //                return Mono.just(documentUnit1);
-        //              return
-        // Flux.fromIterable(documentUnit1.contentRelatedIndexing().activeCitations())
-        //                  .flatMap(
-        //                      activeCitation -> {
-        //                        if (activeCitation.getUuid() == null && !activeCitation.isEmpty())
-        // {
-        //                          return createLinkedDocumentationUnit(
-        //                                  documentUnit1.uuid(),
-        //                                  activeCitation,
-        //                                  documentationOffice,
-        //                                  DocumentationUnitLinkType.ACTIVE_CITATION)
-        //                              .map(
-        //                                  documentationUnitLink ->
-        //                                      activeCitation.toBuilder()
-        //
-        // .uuid(documentationUnitLink.childDocumentationUnitUuid())
-        //                                          .build());
-        //                        } else {
-        //                          return linkLinkedDocumentationUnit(
-        //                                  documentUnit1.uuid(),
-        //                                  activeCitation.getUuid(),
-        //                                  DocumentationUnitLinkType.ACTIVE_CITATION)
-        //                              .thenReturn(activeCitation);
-        //                        }
-        //                      })
-        //                  .collectList()
-        //                  .map(
-        //                      activeCitations -> {
-        //                        ContentRelatedIndexing contentRelatedIndexing =
-        //                            documentUnit1.contentRelatedIndexing().toBuilder()
-        //                                .activeCitations(activeCitations)
-        //                                .build();
-        //                        return documentUnit1.toBuilder()
-        //                            .contentRelatedIndexing(contentRelatedIndexing)
-        //                            .build();
-        //                      });
-        //            })
-        .flatMap(repository::save)
-        .flatMap(du -> repository.findByUuid(du.uuid()))
-        .doOnError(ex -> log.error("Couldn't update the DocumentUnit", ex));
+  public Mono<DocumentUnit> updateDocumentUnit(DocumentUnit documentUnit) {
+    return repository.save(documentUnit);
   }
 
   public Mono<Publication> publishAsEmail(UUID documentUnitUuid, String issuerAddress) {
-    return repository
-        .findByUuid(documentUnitUuid)
+    DocumentUnit documentUnit = repository.findByUuid(documentUnitUuid);
+
+    if (documentUnit == null) {
+      return Mono.empty();
+    }
+
+    return publicationService
+        .publish(documentUnit, recipientAddress)
         .flatMap(
-            documentUnit ->
-                publicationService
-                    .publish(documentUnit, recipientAddress)
-                    .flatMap(
-                        mailResponse -> {
-                          if (mailResponse
-                              .getStatusCode()
-                              .equals(String.valueOf(HttpStatus.OK.value()))) {
-                            return documentUnitStatusService
-                                .setToPublishing(
-                                    documentUnit, mailResponse.getPublishDate(), issuerAddress)
-                                .thenReturn(mailResponse);
-                          } else {
-                            return Mono.just(mailResponse);
-                          }
-                        }));
+            mailResponse -> {
+              if (mailResponse.getStatusCode().equals(String.valueOf(HttpStatus.OK.value()))) {
+                return documentUnitStatusService
+                    .setToPublishing(documentUnit, mailResponse.getPublishDate(), issuerAddress)
+                    .thenReturn(mailResponse);
+              } else {
+                return Mono.just(mailResponse);
+              }
+            });
   }
 
   public Flux<PublicationHistoryRecord> getPublicationHistory(UUID documentUuid) {
     return Flux.concat(
             publicationService.getPublications(documentUuid),
-            publicationReportRepository.getAllByDocumentUnitUuid(documentUuid))
+            Flux.fromIterable(publicationReportRepository.getAllByDocumentUnitUuid(documentUuid)))
         .sort(Comparator.comparing(PublicationHistoryRecord::getDate).reversed());
   }
 
-  public <T extends LinkedDocumentationUnit> Mono<Page<T>> searchByLinkedDocumentationUnit(
+  public <T extends RelatedDocumentationUnit> Mono<Page<T>> searchByLinkedDocumentationUnit(
       T linkedDocumentationUnit, Pageable pageable) {
 
-    return repository
-        .searchByLinkedDocumentationUnit(linkedDocumentationUnit, pageable)
-        .collectList()
-        .zipWith(repository.countSearchByLinkedDocumentationUnit(linkedDocumentationUnit))
-        .map(tuple -> new PageImpl<>(tuple.getT1(), pageable, tuple.getT2()));
-  }
-
-  @Transactional(transactionManager = "connectionFactoryTransactionManager")
-  public <T extends LinkedDocumentationUnit>
-      Mono<DocumentationUnitLink> createLinkedDocumentationUnit(
-          UUID parentDocumentUnitUuid,
-          T linkedDocumentationUnit,
-          DocumentationOffice documentationOffice,
-          DocumentationUnitLinkType type) {
-
-    return generateNewDocumentUnit(documentationOffice)
-        .flatMap(
-            childDocumentUnit ->
-                updateDocumentUnit(
-                    enrichNewDocumentUnitWithData(childDocumentUnit, linkedDocumentationUnit),
-                    documentationOffice))
-        .flatMap(
-            childDocumentUnit ->
-                repository.linkDocumentUnits(
-                    parentDocumentUnitUuid, childDocumentUnit.uuid(), type));
-  }
-
-  public Mono<DocumentUnit> linkLinkedDocumentationUnit(
-      UUID parentUuid, UUID childUuid, DocumentationUnitLinkType type) {
-    return repository
-        .linkDocumentUnits(parentUuid, childUuid, type)
-        .flatMap(documentationUnitLink -> repository.findByUuid(parentUuid));
-  }
-
-  public Mono<String> removeLinkedDocumentationUnit(
-      UUID parentUuid, UUID childUuid, DocumentationUnitLinkType type) {
-    return repository
-        .unlinkDocumentUnit(parentUuid, childUuid, type)
-        .doOnError(ex -> log.error("Couldn't unlink the documentation unit", ex))
-        .then(deleteIfOrphanedLinkedDocumentationUnit(childUuid))
-        .thenReturn("done");
-  }
-
-  private DocumentUnit enrichNewDocumentUnitWithData(
-      DocumentUnit documentUnit, LinkedDocumentationUnit linkedDocumentationUnit) {
-    List<String> fileNumbers = null;
-    if (!StringUtils.isBlank(linkedDocumentationUnit.getFileNumber())) {
-      fileNumbers = List.of(linkedDocumentationUnit.getFileNumber());
-    }
-
-    CoreData coreData =
-        documentUnit.coreData().toBuilder()
-            .fileNumbers(fileNumbers)
-            .documentType(linkedDocumentationUnit.getDocumentType())
-            .decisionDate(linkedDocumentationUnit.getDecisionDate())
-            .court(linkedDocumentationUnit.getCourt())
-            .dateKnown(linkedDocumentationUnit.isDateKnown())
-            .build();
-
-    return documentUnit.toBuilder()
-        //        .dataSource(getDatasource(linkedDocumentationUnit))
-        .coreData(coreData)
-        .build();
-  }
-
-  private Mono<Void> deleteIfOrphanedLinkedDocumentationUnit(UUID documentUnitUuid) {
-    return repository.deleteIfOrphanedLinkedDocumentationUnit(documentUnitUuid);
-  }
-
-  //  private static <T extends LinkedDocumentationUnit> DataSource getDatasource(
-  //      T linkedDocumentationUnit) {
-  //    if (linkedDocumentationUnit instanceof ActiveCitation) {
-  //      return DataSource.ACTIVE_CITATION;
-  //    } else if (linkedDocumentationUnit instanceof ProceedingDecision) {
-  //      return DataSource.PROCEEDING_DECISION;
-  //    } else {
-  //      throw new DocumentationUnitException(
-  //          "Couldn't find data source for " + linkedDocumentationUnit.getClass());
-  //    }
-  //  }
-
-  public <T extends LinkedDocumentationUnit>
-      Flux<T> findAllLinkedDocumentUnitsByParentDocumentUnitUuidAndType(
-          UUID parentDocumentUnitUuid, DocumentationUnitLinkType type) {
-    return repository.findAllLinkedDocumentUnitsByParentDocumentUnitUuidAndType(
-        parentDocumentUnitUuid, type);
+    return Mono.just(
+        repository.searchByRelatedDocumentationUnit(linkedDocumentationUnit, pageable));
   }
 
   public Mono<String> validateSingleNorm(SingleNormValidationInfo singleNormValidationInfo) {

@@ -5,9 +5,9 @@ import de.bund.digitalservice.ris.caselaw.domain.ConverterService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitSearchEntry;
-import de.bund.digitalservice.ris.caselaw.domain.LinkedDocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.Publication;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationHistoryRecord;
+import de.bund.digitalservice.ris.caselaw.domain.RelatedDocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.SingleNormValidationInfo;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import de.bund.digitalservice.ris.caselaw.domain.docx.Docx2Html;
@@ -161,10 +161,8 @@ public class DocumentUnitController {
       return Mono.just(ResponseEntity.unprocessableEntity().body(DocumentUnit.builder().build()));
     }
 
-    return userService
-        .getDocumentationOffice(oidcUser)
-        .flatMap(
-            documentationOffice -> service.updateDocumentUnit(documentUnit, documentationOffice))
+    return service
+        .updateDocumentUnit(documentUnit)
         .map(du -> ResponseEntity.status(HttpStatus.OK).body(du))
         .onErrorReturn(ResponseEntity.internalServerError().body(DocumentUnit.builder().build()));
   }
@@ -188,13 +186,13 @@ public class DocumentUnitController {
 
   @PutMapping(value = "/search-by-linked-documentation-unit")
   @PreAuthorize("isAuthenticated()")
-  public Mono<Page<LinkedDocumentationUnit>> searchByLinkedDocumentationUnit(
+  public Mono<Page<RelatedDocumentationUnit>> searchByLinkedDocumentationUnit(
       @RequestParam("pg") int page,
       @RequestParam("sz") int size,
-      @RequestBody LinkedDocumentationUnit linkedDocumentationUnit) {
+      @RequestBody RelatedDocumentationUnit relatedDocumentationUnit) {
 
     return service.searchByLinkedDocumentationUnit(
-        linkedDocumentationUnit, PageRequest.of(page, size));
+        relatedDocumentationUnit, PageRequest.of(page, size));
   }
 
   @GetMapping(value = "/{uuid}/docx", produces = MediaType.APPLICATION_JSON_VALUE)

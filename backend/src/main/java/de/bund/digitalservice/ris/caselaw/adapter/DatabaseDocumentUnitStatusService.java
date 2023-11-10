@@ -44,7 +44,7 @@ public class DatabaseDocumentUnitStatusService implements DocumentUnitStatusServ
                     .publicationStatus(PublicationStatus.UNPUBLISHED)
                     .withError(false)
                     .build()))
-        .then(documentUnitRepository.findByUuid(documentUnit.uuid()));
+        .then(Mono.just(documentUnitRepository.findByUuid(documentUnit.uuid())));
   }
 
   @Override
@@ -60,7 +60,7 @@ public class DatabaseDocumentUnitStatusService implements DocumentUnitStatusServ
                     .withError(false)
                     .issuerAddress(issuerAddress)
                     .build()))
-        .then(documentUnitRepository.findByUuid(documentUnit.uuid()));
+        .then(Mono.just(documentUnitRepository.findByUuid(documentUnit.uuid())));
   }
 
   @Override

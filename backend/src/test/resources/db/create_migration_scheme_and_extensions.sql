@@ -336,6 +336,18 @@ create table
     rank integer default '-1'::integer not null
   );
 
+create index
+  related_documentation_citation_type_id_idx on incremental_migration.related_documentation (citation_type_id);
+
+create index
+  related_documentation_court_id_idx on incremental_migration.related_documentation (court_id);
+
+create index
+  related_documentation_document_type_id_idx on incremental_migration.related_documentation (document_type_id);
+
+create index
+  related_documentation_documentation_unit_id_idx on incremental_migration.related_documentation (documentation_unit_id);
+
 create type
   incremental_migration.notation as enum('OLD', 'NEW');
 

@@ -165,6 +165,7 @@ class ArchitectureFitnessTest {
   }
 
   @Test
+  @Disabled("no r2dbc classes")
   void repositoryInR2DBCAdapterPackageAreInterfacesWhichExtendReactiveCrudRepository() {
     ArchRule rule =
         ArchRuleDefinition.classes()

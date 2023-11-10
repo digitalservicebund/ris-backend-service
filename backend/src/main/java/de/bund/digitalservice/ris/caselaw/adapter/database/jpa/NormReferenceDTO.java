@@ -42,8 +42,4 @@ public class NormReferenceDTO {
 
   @Column(name = "legacy_doc_unit_id")
   UUID legacyDocUnitId;
-
-  @JoinColumn(name = "documentation_unit_id")
-  @ManyToOne
-  DocumentationUnitDTO documentationUnit;
 }

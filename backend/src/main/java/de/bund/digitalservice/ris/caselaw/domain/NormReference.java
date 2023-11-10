@@ -9,7 +9,7 @@ import lombok.Builder;
 @Builder(toBuilder = true)
 // to ignore the validationErrors that the frontend might be sending along
 @JsonIgnoreProperties(ignoreUnknown = true)
-public record DocumentUnitNorm(
+public record NormReference(
     UUID id,
     NormAbbreviation normAbbreviation,
     String singleNorm,

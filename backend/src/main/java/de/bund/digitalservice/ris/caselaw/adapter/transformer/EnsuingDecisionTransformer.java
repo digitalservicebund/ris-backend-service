@@ -17,7 +17,7 @@ public class EnsuingDecisionTransformer extends RelatedDocumentationUnitTransfor
         .build();
   }
 
-  public static EnsuingDecisionDTO transformToDTO(EnsuingDecision ensuingDecision, Integer rank) {
+  public static EnsuingDecisionDTO transformToDTO(EnsuingDecision ensuingDecision) {
     if (ensuingDecision.hasNoValues()) {
       return null;
     }
@@ -29,7 +29,6 @@ public class EnsuingDecisionTransformer extends RelatedDocumentationUnitTransfor
         .documentType(getDocumentTypeFromDomain(ensuingDecision.getDocumentType()))
         .fileNumber(getFileNumber(ensuingDecision.getFileNumber()))
         .note(ensuingDecision.getNote())
-        .rank(rank)
         .build();
   }
 }

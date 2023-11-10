@@ -9,18 +9,11 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitSearchInput;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatus;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitException;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitLink;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitLinkType;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitSearchEntry;
-import de.bund.digitalservice.ris.caselaw.domain.LinkedDocumentationUnit;
-import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
+import de.bund.digitalservice.ris.caselaw.domain.RelatedDocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.criteria.CriteriaBuilder;
-import jakarta.persistence.criteria.Predicate;
-import jakarta.persistence.criteria.Root;
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -28,14 +21,12 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Repository
@@ -94,13 +85,12 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
 
   @Override
   @Transactional(transactionManager = "jpaTransactionManager")
-  public Mono<DocumentUnit> findByUuid(UUID uuid) {
+  public DocumentUnit findByUuid(UUID uuid) {
     if (log.isDebugEnabled()) {
       log.debug("find by uuid: {}", uuid);
     }
 
-    return Mono.just(
-        DocumentationUnitTransformer.transformToDomain(repository.findById(uuid).orElse(null)));
+    return DocumentationUnitTransformer.transformToDomain(repository.findById(uuid).orElse(null));
   }
 
   @Override
@@ -254,11 +244,14 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
   }
 
   @Override
-  public Mono<DocumentUnit> removeFile(UUID documentUnitId) {
+  public DocumentUnit removeFile(UUID documentUnitId) {
     var docUnitDto = repository.findById(documentUnitId).orElseThrow();
+
     docUnitDto.setOriginalFileDocument(null);
+
     docUnitDto = repository.save(docUnitDto);
-    return Mono.just(DocumentationUnitTransformer.transformToDomain(docUnitDto));
+
+    return DocumentationUnitTransformer.transformToDomain(docUnitDto);
   }
 
   @Override
@@ -268,13 +261,8 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
   }
 
   @Override
-  public Mono<Long> count() {
-    return Mono.just(repository.count());
-  }
-
-  @Override
-  public Flux<LinkedDocumentationUnit> searchByLinkedDocumentationUnit(
-      LinkedDocumentationUnit linkedDocumentationUnit, Pageable pageable) {
+  public Page<RelatedDocumentationUnit> searchByRelatedDocumentationUnit(
+      RelatedDocumentationUnit relatedDocumentationUnit, Pageable pageable) {
     throw new UnsupportedOperationException("not implemented yet");
   }
 
@@ -354,46 +342,6 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
   }
 
   @Override
-  public Flux<LinkedDocumentationUnit> findAllLinkedDocumentUnitsByParentDocumentUnitUuidAndType(
-      UUID parentDocumentUnitUuid, DocumentationUnitLinkType type) {
-    throw new UnsupportedOperationException("not implemented yet");
-  }
-
-  @Override
-  public Mono<DocumentationUnitLink> linkDocumentUnits(
-      UUID parentDocumentUnitUuid, UUID childDocumentUnitUuid, DocumentationUnitLinkType type) {
-    if (log.isDebugEnabled()) {
-      log.debug(
-          "link documentation unitst: {}, {}, {}",
-          parentDocumentUnitUuid,
-          childDocumentUnitUuid,
-          type);
-    }
-
-    if (parentDocumentUnitUuid == null || childDocumentUnitUuid == null || type == null) {
-      return Mono.empty();
-    }
-
-    throw new UnsupportedOperationException("not implemented yet");
-  }
-
-  @Override
-  public Mono<Void> unlinkDocumentUnit(
-      UUID parentDocumentationUnitUuid,
-      UUID childDocumentationUnitUuid,
-      DocumentationUnitLinkType type) {
-    throw new UnsupportedOperationException("not implemented yet");
-  }
-
-  @Override
-  public Mono<Long> countLinksByChildDocumentUnitUuid(UUID childDocumentUnitUuid) {
-    if (log.isDebugEnabled()) {
-      log.debug("count links by child documentation unit uuid: {}", childDocumentUnitUuid);
-    }
-    throw new UnsupportedOperationException("not implemented yet");
-  }
-
-  @Override
   // TODO how to delete orphaned without dataSource
   public Mono<Void> deleteIfOrphanedLinkedDocumentationUnit(UUID documentUnitUuid) {
     if (log.isDebugEnabled()) {
@@ -402,87 +350,80 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
 
     throw new UnsupportedOperationException("not implemented yet");
   }
-
-  @Override
-  public Mono<Long> countSearchByLinkedDocumentationUnit(
-      LinkedDocumentationUnit linkedDocumentationUnit) {
-
-    throw new UnsupportedOperationException("not implemented yet");
-  }
-
-  @NotNull
-  private static Predicate[] getPredicates(
-      DocumentUnitSearchInput searchInput,
-      DocumentationOfficeDTO documentationOfficeDTO,
-      CriteriaBuilder builder,
-      Root<DocumentationUnitSearchEntryDTO> root) {
-    List<Predicate> restrictions = new ArrayList<>();
-
-    if (searchInput.documentNumberOrFileNumber() != null) {
-      String pattern = "%" + searchInput.documentNumberOrFileNumber().toLowerCase() + "%";
-      Predicate documentNumberLike =
-          builder.like(builder.lower(root.get("documentNumber")), pattern);
-      Predicate firstFileNumberLike =
-          builder.like(builder.lower(root.get("firstFileNumber")), pattern);
-      restrictions.add(builder.or(documentNumberLike, firstFileNumberLike));
-    }
-
-    if (searchInput.courtLocation() != null) {
-      restrictions.add(builder.equal(root.get("courtLocation"), searchInput.courtLocation()));
-    }
-
-    if (searchInput.courtType() != null) {
-      restrictions.add(builder.equal(root.get("courtType"), searchInput.courtType()));
-    }
-
-    if (searchInput.decisionDate() != null) {
-      if (searchInput.decisionDateEnd() != null) {
-        restrictions.add(
-            builder.between(
-                root.get("decisionDate"),
-                searchInput.decisionDate(),
-                searchInput.decisionDateEnd()));
-      } else {
-        restrictions.add(builder.equal(root.get("decisionDate"), searchInput.decisionDate()));
-      }
-    }
-
-    Predicate myDocOffice =
-        builder.equal(root.get("documentationOfficeId"), documentationOfficeDTO.getId());
-
-    if (searchInput.status() != null && searchInput.status().withError()) {
-      Predicate statusWithError = builder.equal(root.get("withError"), true);
-      restrictions.add(builder.and(myDocOffice, statusWithError));
-    }
-
-    if (searchInput.status() != null && searchInput.status().publicationStatus() != null) {
-      Predicate status =
-          builder.equal(root.get("publicationStatus"), searchInput.status().publicationStatus());
-      if (searchInput.status().publicationStatus() == PublicationStatus.PUBLISHED) {
-        status =
-            root.get("publicationStatus")
-                .in(PublicationStatus.PUBLISHED, PublicationStatus.JURIS_PUBLISHED);
-      }
-      if (searchInput.myDocOfficeOnly()
-          || searchInput.status().publicationStatus() == PublicationStatus.UNPUBLISHED) {
-        restrictions.add(builder.and(myDocOffice, status));
-      } else {
-        restrictions.add(status);
-      }
-    } else {
-      Predicate status =
-          root.get("publicationStatus")
-              .in(
-                  PublicationStatus.PUBLISHED,
-                  PublicationStatus.PUBLISHING,
-                  PublicationStatus.JURIS_PUBLISHED);
-      if (searchInput.myDocOfficeOnly()) {
-        restrictions.add(myDocOffice);
-      } else {
-        restrictions.add(builder.or(myDocOffice, status));
-      }
-    }
-
-    return restrictions.toArray(new Predicate[0]);
-  }
+  //  @NotNull
+  //  private static Predicate[] getPredicates(
+  //      DocumentUnitSearchInput searchInput,
+  //      DocumentationOfficeDTO documentationOfficeDTO,
+  //      CriteriaBuilder builder,
+  //      Root<DocumentationUnitSearchEntryDTO> root) {
+  //    List<Predicate> restrictions = new ArrayList<>();
+  //
+  //    if (searchInput.documentNumberOrFileNumber() != null) {
+  //      String pattern = "%" + searchInput.documentNumberOrFileNumber().toLowerCase() + "%";
+  //      Predicate documentNumberLike =
+  //          builder.like(builder.lower(root.get("documentNumber")), pattern);
+  //      Predicate firstFileNumberLike =
+  //          builder.like(builder.lower(root.get("firstFileNumber")), pattern);
+  //      restrictions.add(builder.or(documentNumberLike, firstFileNumberLike));
+  //    }
+  //
+  //    if (searchInput.courtLocation() != null) {
+  //      restrictions.add(builder.equal(root.get("courtLocation"), searchInput.courtLocation()));
+  //    }
+  //
+  //    if (searchInput.courtType() != null) {
+  //      restrictions.add(builder.equal(root.get("courtType"), searchInput.courtType()));
+  //    }
+  //
+  //    if (searchInput.decisionDate() != null) {
+  //      if (searchInput.decisionDateEnd() != null) {
+  //        restrictions.add(
+  //            builder.between(
+  //                root.get("decisionDate"),
+  //                searchInput.decisionDate(),
+  //                searchInput.decisionDateEnd()));
+  //      } else {
+  //        restrictions.add(builder.equal(root.get("decisionDate"), searchInput.decisionDate()));
+  //      }
+  //    }
+  //
+  //    Predicate myDocOffice =
+  //        builder.equal(root.get("documentationOfficeId"), documentationOfficeDTO.getId());
+  //
+  //    if (searchInput.status() != null && searchInput.status().withError()) {
+  //      Predicate statusWithError = builder.equal(root.get("withError"), true);
+  //      restrictions.add(builder.and(myDocOffice, statusWithError));
+  //    }
+  //
+  //    if (searchInput.status() != null && searchInput.status().publicationStatus() != null) {
+  //      Predicate status =
+  //          builder.equal(root.get("publicationStatus"),
+  // searchInput.status().publicationStatus());
+  //      if (searchInput.status().publicationStatus() == PublicationStatus.PUBLISHED) {
+  //        status =
+  //            root.get("publicationStatus")
+  //                .in(PublicationStatus.PUBLISHED, PublicationStatus.JURIS_PUBLISHED);
+  //      }
+  //      if (searchInput.myDocOfficeOnly()
+  //          || searchInput.status().publicationStatus() == PublicationStatus.UNPUBLISHED) {
+  //        restrictions.add(builder.and(myDocOffice, status));
+  //      } else {
+  //        restrictions.add(status);
+  //      }
+  //    } else {
+  //      Predicate status =
+  //          root.get("publicationStatus")
+  //              .in(
+  //                  PublicationStatus.PUBLISHED,
+  //                  PublicationStatus.PUBLISHING,
+  //                  PublicationStatus.JURIS_PUBLISHED);
+  //      if (searchInput.myDocOfficeOnly()) {
+  //        restrictions.add(myDocOffice);
+  //      } else {
+  //        restrictions.add(builder.or(myDocOffice, status));
+  //      }
+  //    }
+  //
+  //    return restrictions.toArray(new Predicate[0]);
+  //  }
 }

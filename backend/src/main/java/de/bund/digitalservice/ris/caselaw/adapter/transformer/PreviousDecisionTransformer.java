@@ -16,8 +16,7 @@ public class PreviousDecisionTransformer extends RelatedDocumentationUnitTransfo
         .build();
   }
 
-  public static PreviousDecisionDTO transformToDTO(
-      PreviousDecision previousDecision, Integer rank) {
+  public static PreviousDecisionDTO transformToDTO(PreviousDecision previousDecision) {
     if (previousDecision.hasNoValues()) {
       return null;
     }
@@ -29,7 +28,6 @@ public class PreviousDecisionTransformer extends RelatedDocumentationUnitTransfo
         .documentNumber(previousDecision.getDocumentNumber())
         .documentType(getDocumentTypeFromDomain(previousDecision.getDocumentType()))
         .fileNumber(getFileNumber(previousDecision.getFileNumber()))
-        .rank(rank)
         .build();
   }
 }

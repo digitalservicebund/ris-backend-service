@@ -103,24 +103,21 @@ public class JurisXmlExporterResponseProcessor {
       List<Attachment> attachments = collectAttachments(messageWrapper);
       String documentNumber = messageWrapper.getDocumentNumber();
       Instant receivedDate = messageWrapper.getReceivedDate();
-      return reportRepository
-          .saveAll(
-              attachments.stream()
-                  .map(
-                      attachment ->
-                          PublicationReport.builder()
-                              .documentNumber(documentNumber)
-                              .receivedDate(receivedDate)
-                              .content(
-                                  policy.sanitize(
-                                      attachment.fileName().endsWith(".html")
-                                          ? attachment.fileContent()
-                                          : stringToHTML(attachment.fileContent())))
-                              .build())
-                  .toList())
-          .collectList()
-          .thenReturn(messageWrapper)
-          .block();
+      reportRepository.saveAll(
+          attachments.stream()
+              .map(
+                  attachment ->
+                      PublicationReport.builder()
+                          .documentNumber(documentNumber)
+                          .receivedDate(receivedDate)
+                          .content(
+                              policy.sanitize(
+                                  attachment.fileName().endsWith(".html")
+                                      ? attachment.fileContent()
+                                      : stringToHTML(attachment.fileContent())))
+                          .build())
+              .toList());
+      return messageWrapper;
     } catch (MessagingException | IOException e) {
       throw new StatusImporterException("Error saving attachments");
     }

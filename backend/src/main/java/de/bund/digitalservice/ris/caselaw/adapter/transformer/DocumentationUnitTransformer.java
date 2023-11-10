@@ -11,6 +11,8 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.EnsuingDecisionDT
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.FieldOfLawDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.FileNumberDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.KeywordDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.NormAbbreviationDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.NormReferenceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.OriginalFileDocumentDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PendingDecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PreviousDecisionDTO;
@@ -20,10 +22,10 @@ import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData.CoreDataBuilder;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitNorm;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatus;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.EnsuingDecision;
+import de.bund.digitalservice.ris.caselaw.domain.NormReference;
 import de.bund.digitalservice.ris.caselaw.domain.PreviousDecision;
 import de.bund.digitalservice.ris.caselaw.domain.Texts;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
@@ -33,6 +35,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicInteger;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -138,22 +141,6 @@ public class DocumentationUnitTransformer {
 
       // TODO documentationOffice
 
-      // .normReferences(
-      // updatedDomainObject.contentRelatedIndexing().norms().stream()
-      // .map(
-      // norm ->
-      // NormReferenceDTO.builder()
-      // // TODO do we have to use the normAbbreviation repo instead?
-      // .normAbbreviation(
-      // NormAbbreviationDTO.builder()
-      // .id(norm.normAbbreviation().id())
-      // .build())
-      // .singleNorm(norm.singleNorm())
-      // .dateOfVersion(norm.dateOfVersion())
-      // .dateOfRelevance(norm.dateOfRelevance())
-      // .build())
-      // .collect(Collectors.toSet()));
-
       // TODO nullchecks
       // var legalEffect =
       // LegalEffect.deriveLegalEffectFrom(
@@ -176,55 +163,62 @@ public class DocumentationUnitTransformer {
           .decisionDate(null)
           .inputType(null)
           .court(null)
+          .documentType(null)
           .documentationOffice(null);
     }
 
     List<PreviousDecision> previousDecisions = updatedDomainObject.previousDecisions();
-    if (previousDecisions != null && !previousDecisions.isEmpty()) {
-      List<PreviousDecisionDTO> previousDecisionDTOs = new ArrayList<>();
-      for (int i = 0; i < previousDecisions.size(); i++) {
-        previousDecisionDTOs.add(
-            PreviousDecisionTransformer.transformToDTO(previousDecisions.get(i), i + 1));
-      }
-      builder.previousDecisions(previousDecisionDTOs.stream().filter(Objects::nonNull).toList());
+    if (previousDecisions != null) {
+      AtomicInteger i = new AtomicInteger(1);
+      builder.previousDecisions(
+          previousDecisions.stream()
+              .map(PreviousDecisionTransformer::transformToDTO)
+              .filter(Objects::nonNull)
+              .peek(previousDecisionDTO -> previousDecisionDTO.setRank(i.getAndIncrement()))
+              .toList());
     }
 
     List<EnsuingDecision> ensuingDecisions = updatedDomainObject.ensuingDecisions();
-    if (ensuingDecisions != null && !ensuingDecisions.isEmpty()) {
+    if (ensuingDecisions != null) {
 
       List<EnsuingDecisionDTO> ensuingDecisionDTOs = new ArrayList<>();
       List<PendingDecisionDTO> pendingDecisionDTOs = new ArrayList<>();
 
-      for (int i = 0; i < ensuingDecisions.size(); i++) {
-        if (ensuingDecisions.get(i).isPending) {
-          pendingDecisionDTOs.add(
-              PendingDecisionTransformer.transformToDTO(ensuingDecisions.get(i), i + 1));
+      AtomicInteger i = new AtomicInteger(1);
+      for (EnsuingDecision ensuingDecision : ensuingDecisions) {
+        if (ensuingDecision.isPending()) {
+          PendingDecisionDTO pendingDecisionDTO =
+              PendingDecisionTransformer.transformToDTO(ensuingDecision);
+          if (pendingDecisionDTO != null) {
+            pendingDecisionDTO.setRank(i.getAndIncrement());
+            pendingDecisionDTOs.add(pendingDecisionDTO);
+          }
         } else {
-          ensuingDecisionDTOs.add(
-              EnsuingDecisionTransformer.transformToDTO(ensuingDecisions.get(i), i + 1));
+          EnsuingDecisionDTO ensuingDecisionDTO =
+              EnsuingDecisionTransformer.transformToDTO(ensuingDecision);
+          if (ensuingDecisionDTO != null) {
+            ensuingDecisionDTO.setRank(i.getAndIncrement());
+            ensuingDecisionDTOs.add(ensuingDecisionDTO);
+          }
         }
       }
 
-      if (!ensuingDecisionDTOs.isEmpty()) {
-        builder.ensuingDecisions(ensuingDecisionDTOs.stream().filter(Objects::nonNull).toList());
-      }
-
-      if (!pendingDecisionDTOs.isEmpty()) {
-        builder.pendingDecisions(pendingDecisionDTOs.stream().filter(Objects::nonNull).toList());
-      }
+      builder.ensuingDecisions(ensuingDecisionDTOs);
+      builder.pendingDecisions(pendingDecisionDTOs);
     }
 
     if (updatedDomainObject.contentRelatedIndexing() != null) {
       ContentRelatedIndexing contentRelatedIndexing = updatedDomainObject.contentRelatedIndexing();
 
       List<ActiveCitation> activeCitations = contentRelatedIndexing.activeCitations();
-      if (activeCitations != null && !activeCitations.isEmpty()) {
-        List<ActiveCitationDTO> activeCitationsDTOs = new ArrayList<>();
-        for (int i = 0; i < activeCitations.size(); i++) {
-          activeCitationsDTOs.add(
-              ActiveCitationTransformer.transformToDTO(activeCitations.get(i), i + 1));
-        }
-        builder.activeCitations(activeCitationsDTOs.stream().filter(Objects::nonNull).toList());
+      if (activeCitations != null) {
+        AtomicInteger i = new AtomicInteger(1);
+        builder.activeCitations(
+            activeCitations.stream()
+                .map(ActiveCitationTransformer::transformToDTO)
+                .filter(Objects::nonNull)
+                .peek(activeCitationDTO -> activeCitationDTO.setRank(i.getAndIncrement()))
+                .toList());
       }
 
       List<FieldOfLaw> fieldOfLaws = contentRelatedIndexing.fieldsOfLaw();
@@ -236,6 +230,25 @@ public class DocumentationUnitTransformer {
                         FieldOfLawDTO.builder()
                             .id(fieldOfLaw.id())
                             .identifier(fieldOfLaw.identifier())
+                            .build())
+                .toList());
+      }
+
+      List<NormReference> norms = contentRelatedIndexing.norms();
+      if (norms != null) {
+        builder.normReferences(
+            norms.stream()
+                .map(
+                    normReference ->
+                        NormReferenceDTO.builder()
+                            .id(normReference.id())
+                            .normAbbreviation(
+                                NormAbbreviationDTO.builder()
+                                    .id(normReference.normAbbreviation().id())
+                                    .build())
+                            .singleNorm(normReference.singleNorm())
+                            .dateOfVersion(normReference.dateOfVersion())
+                            .dateOfRelevance(normReference.dateOfRelevance())
                             .build())
                 .toList());
       }
@@ -365,7 +378,7 @@ public class DocumentationUnitTransformer {
     }
 
     if (documentationUnitDTO.getNormReferences() != null) {
-      List<DocumentUnitNorm> norms =
+      List<NormReference> norms =
           documentationUnitDTO.getNormReferences().stream()
               .map(DocumentUnitNormTransformer::transformToDomain)
               .toList();

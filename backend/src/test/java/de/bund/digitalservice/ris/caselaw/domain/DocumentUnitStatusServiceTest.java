@@ -16,7 +16,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 @ExtendWith(SpringExtension.class)
@@ -39,7 +38,7 @@ class DocumentUnitStatusServiceTest {
     StatusDTO documentUnitStatusDTO = StatusDTO.builder().build();
 
     when(repository.save(any(StatusDTO.class))).thenReturn(documentUnitStatusDTO);
-    when(documentUnitRepo.findByUuid(documentUnitDTO.getId())).thenReturn(Mono.just(documentUnit));
+    when(documentUnitRepo.findByUuid(documentUnitDTO.getId())).thenReturn(documentUnit);
 
     StepVerifier.create(service.setInitialStatus(documentUnit)).expectNextCount(1).verifyComplete();
 

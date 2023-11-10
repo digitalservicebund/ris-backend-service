@@ -92,11 +92,8 @@ public class DocumentationUnitDTO implements DocumentationUnitMetadataDTO {
   @Column(name = "judicial_body")
   private String judicialBody;
 
-  @OneToMany(
-      mappedBy = "documentationUnit",
-      cascade = CascadeType.ALL,
-      fetch = FetchType.EAGER,
-      orphanRemoval = true)
+  @OneToMany(fetch = FetchType.EAGER, orphanRemoval = true)
+  @JoinColumn(name = "documentation_unit_id")
   @Builder.Default
   private List<NormReferenceDTO> normReferences = new ArrayList<>();
 
