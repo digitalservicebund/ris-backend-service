@@ -1,6 +1,6 @@
 import httpClient, { ServiceResponse } from "./httpClient"
 import { CitationType } from "@/domain/citationType"
-import { Court, Procedure } from "@/domain/documentUnit"
+import { Court, Procedure, DocumentType } from "@/domain/documentUnit"
 import { FieldOfLawNode } from "@/domain/fieldOfLaw"
 import { NormAbbreviation } from "@/domain/normAbbreviation"
 import {
@@ -20,18 +20,13 @@ enum Endpoint {
   procedures = `procedure`,
 }
 
-type DocumentType = {
-  id: number
-  jurisShortcut: string
-  label: string
-}
-
 function formatDropdownItems(
   responseData: ComboboxInputModelType[],
   endpoint: Endpoint,
 ): ComboboxItem[] {
   switch (endpoint) {
     case Endpoint.documentTypes: {
+      console.log("hi", responseData)
       return (responseData as DocumentType[]).map((item) => ({
         label: item.label,
         value: item,

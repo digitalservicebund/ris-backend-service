@@ -21,12 +21,7 @@ public class RelatedDocumentationUnitTransformer {
       return null;
     }
 
-    return Court.builder()
-        .id(courtDTO.getId())
-        .type(courtDTO.getType())
-        .location(courtDTO.getLocation())
-        .label(Court.generateLabel(courtDTO.getType(), courtDTO.getLocation()))
-        .build();
+    return CourtTransformer.transformToDomain(courtDTO);
   }
 
   static CourtDTO getCourtFromDomain(Court court) {
@@ -34,37 +29,22 @@ public class RelatedDocumentationUnitTransformer {
       return null;
     }
 
-    return CourtDTO.builder()
-        .id(court.id())
-        .type(court.type())
-        .location(court.location())
-        // Todo isSuperiorCourt, isForeignCourt, additionalInformation, jurisId?
-        .build();
+    return CourtTransformer.transformToDTO(court);
   }
 
   static DocumentType getDocumentTypeFromDTO(DocumentTypeDTO documentTypeDTO) {
-
-    if (documentTypeDTO == null
-        || (documentTypeDTO.getLabel() == null && documentTypeDTO.getAbbreviation() == null)) {
+    if (documentTypeDTO == null) {
       return null;
     }
 
-    return DocumentType.builder()
-        .label(documentTypeDTO.getLabel())
-        .jurisShortcut(documentTypeDTO.getAbbreviation())
-        .build();
+    return DocumentTypeTransformer.transformToDomain(documentTypeDTO);
   }
 
   static DocumentTypeDTO getDocumentTypeFromDomain(DocumentType documentType) {
-    if (documentType == null
-        || (documentType.label() == null && documentType.jurisShortcut() == null)) {
+    if (documentType == null) {
       return null;
     }
 
-    return DocumentTypeDTO.builder()
-        .label(documentType.label())
-        .abbreviation(documentType.jurisShortcut())
-        // Todo do we need superLabel1, superLabel2, multiple from DTO?
-        .build();
+    return DocumentTypeTransformer.transformToDTO(documentType);
   }
 }

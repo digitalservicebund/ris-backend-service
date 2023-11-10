@@ -8,8 +8,13 @@ public class DocumentTypeTransformer {
 
   public static DocumentType transformToDomain(DocumentTypeDTO documentTypeDTO) {
     return DocumentType.builder()
+        .uuid(documentTypeDTO.getId())
         .jurisShortcut(documentTypeDTO.getAbbreviation())
         .label(documentTypeDTO.getLabel())
         .build();
+  }
+
+  public static DocumentTypeDTO transformToDTO(DocumentType documentType) {
+    return DocumentTypeDTO.builder().id(documentType.uuid()).build();
   }
 }

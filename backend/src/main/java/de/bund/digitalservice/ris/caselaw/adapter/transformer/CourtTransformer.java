@@ -20,12 +20,24 @@ public class CourtTransformer {
       return new Court(courtDTO.getId(), courtDTO.getType(), null, courtDTO.getType(), revoked);
     }
 
-    return new Court(
-        courtDTO.getId(),
-        courtDTO.getType(),
-        courtDTO.getLocation(),
-        courtDTO.getType() + " " + courtDTO.getLocation(),
-        revoked);
+    return Court.builder()
+        .id(courtDTO.getId())
+        .type(courtDTO.getType())
+        .location(courtDTO.getLocation())
+        .label(courtDTO.getType() + " " + courtDTO.getLocation())
+        .revoked(revoked)
+        .build();
+  }
+
+  public static CourtDTO transformToDTO(Court court) {
+    if (court == null) return null;
+
+    return CourtDTO.builder()
+        .id(court.id())
+        .type(court.type())
+        .location(court.location())
+        // Todo isSuperiorCourt, isForeignCourt, additionalInformation, jurisId?
+        .build();
   }
 
   private static String extractRevoked(String additional) {

@@ -30,7 +30,6 @@ import de.bund.digitalservice.ris.caselaw.domain.LegalEffect;
 import de.bund.digitalservice.ris.caselaw.domain.NormReference;
 import de.bund.digitalservice.ris.caselaw.domain.PreviousDecision;
 import de.bund.digitalservice.ris.caselaw.domain.Texts;
-import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw.FieldOfLaw;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -365,10 +364,7 @@ public class DocumentationUnitTransformer {
 
     DocumentTypeDTO documentTypeDTO = documentationUnitDTO.getDocumentType();
     if (documentTypeDTO != null) {
-      DocumentType documentType = null;
-      documentType =
-          new DocumentType(documentTypeDTO.getAbbreviation(), documentTypeDTO.getLabel());
-      coreDataBuilder.documentType(documentType);
+      coreDataBuilder.documentType(DocumentTypeTransformer.transformToDomain(documentTypeDTO));
     }
 
     if (documentationUnitDTO.getDeviatingEclis() != null) {

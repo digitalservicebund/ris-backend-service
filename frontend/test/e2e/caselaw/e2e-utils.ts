@@ -202,7 +202,7 @@ export async function fillNormInputs(
 export async function fillActiveCitationInputs(
   page: Page,
   values?: {
-    citationStyle?: string
+    citationType?: string
     court?: string
     decisionDate?: string
     fileNumber?: string
@@ -215,13 +215,13 @@ export async function fillActiveCitationInputs(
     await waitForInputValue(page, `[aria-label='${ariaLabel}']`, value)
   }
 
-  if (values?.citationStyle) {
-    await fillInput("Art der Zitierung", values?.citationStyle)
+  if (values?.citationType) {
+    await fillInput("Art der Zitierung", values?.citationType)
     await page.getByRole("button", { name: "dropdown-option" }).click()
     await waitForInputValue(
       page,
       "[aria-label='Art der Zitierung']",
-      values.citationStyle,
+      values.citationType,
     )
   }
 
