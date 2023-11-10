@@ -42,21 +42,18 @@ public enum LegalEffect {
     return label;
   }
 
-  public static String deriveFrom(DocumentUnit documentUnit, boolean courtHasChanged) {
-    if (documentUnit == null || documentUnit.coreData() == null) {
+  public static LegalEffect deriveFrom(DocumentUnit documentUnit, boolean courtHasChanged) {
+    if (documentUnit == null
+        || documentUnit.coreData() == null
+        || documentUnit.coreData().legalEffect() == null) {
       return null;
     }
     if (courtHasChanged
         && documentUnit.coreData().court() != null
         && documentUnit.coreData().court().type() != null
         && autoYesCourtTypes.contains(documentUnit.coreData().court().type())) {
-      return YES.getLabel();
+      return YES;
     }
-    return documentUnit.coreData().legalEffect();
-  }
-
-  public static LegalEffect deriveLegalEffectFrom(
-      DocumentUnit documentUnit, boolean courtHasChanged) {
-    return LegalEffect.of(deriveFrom(documentUnit, courtHasChanged));
+    return of(documentUnit.coreData().legalEffect());
   }
 }

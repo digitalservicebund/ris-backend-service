@@ -50,11 +50,8 @@ public class DocumentationUnitDTO implements DocumentationUnitMetadataDTO {
   @Column(name = "decision_grounds")
   private String decisionGrounds;
 
-  @OneToMany(
-      mappedBy = "documentationUnit",
-      cascade = CascadeType.ALL,
-      fetch = FetchType.EAGER,
-      orphanRemoval = true)
+  @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+  @JoinColumn(name = "documentation_unit_id", nullable = false)
   @Builder.Default
   private List<DecisionNameDTO> decisionNames = new ArrayList<>();
 

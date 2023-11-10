@@ -34,6 +34,7 @@ import de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw.FieldOfL
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -164,16 +165,17 @@ public class DocumentationUnitTransformer {
               && updatedDomainObject.coreData().court() != null
               && updatedDomainObject.coreData().court().id() != currentDto.getCourt().getId();
 
-      LegalEffectDTO legalEffectDTO;
+      LegalEffectDTO legalEffectDTO = LegalEffectDTO.FALSCHE_ANGABE;
       var legalEffect =
-          LegalEffect.deriveLegalEffectFrom(
+          LegalEffect.deriveFrom(
               updatedDomainObject, courtWasAdded || courtWasDeleted || courtHasChanged);
 
-      switch (legalEffect) {
-        case NO -> legalEffectDTO = LegalEffectDTO.NEIN;
-        case YES -> legalEffectDTO = LegalEffectDTO.JA;
-        case NOT_SPECIFIED -> legalEffectDTO = LegalEffectDTO.KEINE_ANGABE;
-        default -> legalEffectDTO = LegalEffectDTO.FALSCHE_ANGABE;
+      if (legalEffect != null) {
+        switch (legalEffect) {
+          case NO -> legalEffectDTO = LegalEffectDTO.NEIN;
+          case YES -> legalEffectDTO = LegalEffectDTO.JA;
+          case NOT_SPECIFIED -> legalEffectDTO = LegalEffectDTO.KEINE_ANGABE;
+        }
       }
 
       builder.legalEffect(legalEffectDTO);
@@ -280,10 +282,12 @@ public class DocumentationUnitTransformer {
         // Todo multiple decision names?
         builder.decisionNames(
             List.of(DecisionNameDTO.builder().value(texts.decisionName()).build()));
+      } else {
+        builder.decisionNames(Collections.emptyList());
       }
     } else {
       builder
-          .decisionNames(null)
+          .decisionNames(Collections.emptyList())
           .headline(null)
           .guidingPrinciple(null)
           .headnote(null)
@@ -307,11 +311,12 @@ public class DocumentationUnitTransformer {
       return DocumentUnit.builder().build();
     }
 
-    LegalEffect legalEffect;
-    switch (documentationUnitDTO.getLegalEffect()) {
-      case NEIN -> legalEffect = LegalEffect.NO;
-      case JA -> legalEffect = LegalEffect.YES;
-      default -> legalEffect = LegalEffect.NOT_SPECIFIED;
+    LegalEffect legalEffect = LegalEffect.NOT_SPECIFIED;
+    if (documentationUnitDTO.getLegalEffect() != null) {
+      switch (documentationUnitDTO.getLegalEffect()) {
+        case NEIN -> legalEffect = LegalEffect.NO;
+        case JA -> legalEffect = LegalEffect.YES;
+      }
     }
 
     DocumentUnit.DocumentUnitBuilder builder = DocumentUnit.builder();
@@ -431,7 +436,8 @@ public class DocumentationUnitTransformer {
         Texts.builder()
             // TODO multiple decisionNames
             .decisionName(
-                documentationUnitDTO.getDecisionNames().isEmpty()
+                (documentationUnitDTO.getDecisionNames() == null
+                        || documentationUnitDTO.getDecisionNames().isEmpty())
                     ? null
                     : documentationUnitDTO.getDecisionNames().stream().findFirst().get().getValue())
             .headline(documentationUnitDTO.getHeadline())
