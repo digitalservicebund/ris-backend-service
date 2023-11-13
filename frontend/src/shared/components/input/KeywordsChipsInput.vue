@@ -3,6 +3,7 @@ import { produce } from "immer"
 import { ref, watch } from "vue"
 import ChipsList from "@/shared/components/input/ChipsList.vue"
 import TextInput from "@/shared/components/input/TextInput.vue"
+import IconErrorOutline from "~icons/ic/baseline-error-outline"
 
 interface Props {
   id: string
