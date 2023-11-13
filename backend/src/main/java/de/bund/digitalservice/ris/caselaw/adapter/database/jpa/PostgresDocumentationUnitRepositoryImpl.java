@@ -143,8 +143,16 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
       if (documentUnit.coreData().procedure() != null) {
         documentationUnitDTO.setProcedures(getDbProcedures(documentUnit, documentationUnitDTO));
       }
-    }
 
+      documentationUnitDTO.getRegions().clear();
+      if (documentUnit.coreData().court() != null) {
+        Optional<CourtDTO> court =
+            databaseCourtRepository.findById(documentUnit.coreData().court().id());
+        if (court.isPresent() && court.get().getRegion() != null) {
+          documentationUnitDTO.getRegions().add(court.get().getRegion());
+        }
+      }
+    }
     // ---
 
     // Transform non-database-related properties

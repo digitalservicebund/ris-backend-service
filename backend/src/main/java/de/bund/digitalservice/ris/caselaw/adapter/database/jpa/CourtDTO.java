@@ -4,6 +4,9 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -46,4 +49,12 @@ public class CourtDTO {
   // this column is not nullable. We might have to ask the migration team to remove the contraint
   @Column(name = "juris_id")
   private int jurisId;
+
+  @ManyToOne
+  @JoinTable(
+      name = "court_region",
+      schema = "incremental_migration",
+      joinColumns = @JoinColumn(name = "court_id"),
+      inverseJoinColumns = @JoinColumn(name = "region_id"))
+  private RegionDTO region;
 }

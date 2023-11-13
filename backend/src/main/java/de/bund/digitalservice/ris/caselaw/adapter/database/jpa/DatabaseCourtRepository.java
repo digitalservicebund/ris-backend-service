@@ -39,7 +39,11 @@ public interface DatabaseCourtRepository extends JpaRepository<CourtDTO, UUID> {
               + "           WHEN label LIKE UPPER('%-'||:searchStr||'%') THEN 2 "
               + "           ELSE 3 "
               + "           END AS weight "
-              + "FROM label_added "
+              + "FROM label_added as court "
+              // FIXME: this inner join has been added to fill the region field in court. This
+              // should be solved in other ways with better performance (e.g. change query or use a
+              // Interface instead of the full CourtDTO
+              + "INNER JOIN incremental_migration.court_region as region on court.id = region.court_id "
               + "WHERE label LIKE UPPER('%'||:searchStr||'%') "
               + "ORDER BY weight, label")
   List<CourtDTO> findBySearchStr(@Param("searchStr") String searchStr);

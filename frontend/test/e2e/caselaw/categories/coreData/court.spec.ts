@@ -210,7 +210,7 @@ test.describe("court", () => {
     await expect(page.locator("text=Region")).toBeVisible()
 
     // region was set by the backend based on state database table
-    await waitForInputValue(page, "[aria-label='Region']", "Baden-Württemberg")
+    await waitForInputValue(page, "[aria-label='Region']", "BW")
 
     await waitForSaving(
       async () => {
