@@ -210,12 +210,8 @@ class ProcedureIntegrationTest {
     assertThat(repository.findAll()).hasSize(1);
     assertThat(
             linkRepository
-                .findFirstByDocumentationUnitDTOOrderByRankDesc(
-                    documentUnitRepository
-                        .findByDocumentNumber(documentUnitFromFrontend.documentNumber())
-                        .orElseThrow())
-                .getProcedureDTO()
-                .getId())
+                .findFirstByDocumentationUnitIdOrderByRankDesc(dto.getId())
+                .getProcedureId())
         .isEqualTo(procedureDTO.getId());
     assertThat(linkRepository.findAll()).hasSize(1);
   }

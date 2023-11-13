@@ -102,9 +102,7 @@ public class DocumentationUnitDTO implements DocumentationUnitMetadataDTO {
   @Column(name = "other_headnote")
   String otherHeadnote;
 
-  @ManyToMany(
-      cascade = {CascadeType.MERGE, CascadeType.PERSIST}, // TODO more?
-      fetch = FetchType.EAGER)
+  @ManyToMany(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
   @JoinTable(
       name = "procedure_link",
       schema = "public",

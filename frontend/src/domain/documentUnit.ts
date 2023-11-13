@@ -45,6 +45,7 @@ export type Court = {
 }
 
 export type Procedure = {
+  id?: string
   label: string
   documentUnitCount: number
   createdAt: string

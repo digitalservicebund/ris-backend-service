@@ -7,6 +7,7 @@ import de.bund.digitalservice.ris.caselaw.domain.ProcedureService;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.Optional;
+import java.util.UUID;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -50,21 +51,19 @@ public class ProcedureController {
             PageRequest.of(page.orElse(0), size, Sort.by(Sort.Direction.DESC, "createdAt"))));
   }
 
-  @GetMapping(value = "/{procedureLabel}/documentunits")
+  @GetMapping(value = "/{procedureUUID}/documentunits")
   @PreAuthorize("isAuthenticated()")
   public Flux<DocumentUnit> getDocumentUnits(
-      @AuthenticationPrincipal OidcUser oidcUser, @NonNull @PathVariable String procedureLabel) {
-    return Flux.fromIterable(
-        service.getDocumentUnits(
-            procedureLabel, userService.getDocumentationOffice(oidcUser).block()));
+      @AuthenticationPrincipal OidcUser oidcUser, @NonNull @PathVariable UUID procedureUUID) {
+    return Flux.fromIterable(service.getDocumentUnits(procedureUUID));
   }
 
-  @DeleteMapping(value = "{procedureLabel}")
+  @DeleteMapping(value = "{procedureUUID}")
   @PreAuthorize("isAuthenticated()")
   public Mono<ResponseEntity<Void>> delete(
-      @AuthenticationPrincipal OidcUser oidcUser, @NonNull @PathVariable String procedureLabel) {
+      @AuthenticationPrincipal OidcUser oidcUser, @NonNull @PathVariable UUID procedureUUID) {
 
-    service.delete(procedureLabel, userService.getDocumentationOffice(oidcUser).block());
+    service.delete(procedureUUID);
     return Mono.just(ResponseEntity.ok().build());
   }
 }

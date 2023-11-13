@@ -8,6 +8,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DeviatingEcliDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DeviatingFileNumberDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentTypeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO.DocumentationUnitDTOBuilder;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.EnsuingDecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.FieldOfLawDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.FileNumberDTO;
@@ -16,6 +17,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LegalEffectDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.OriginalFileDocumentDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PendingDecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PreviousDecisionDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ProcedureDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.StatusDTO;
 import de.bund.digitalservice.ris.caselaw.domain.ActiveCitation;
 import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
@@ -30,6 +32,7 @@ import de.bund.digitalservice.ris.caselaw.domain.NormReference;
 import de.bund.digitalservice.ris.caselaw.domain.PreviousDecision;
 import de.bund.digitalservice.ris.caselaw.domain.Texts;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw.FieldOfLaw;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -85,6 +88,8 @@ public class DocumentationUnitTransformer {
                   ? DocumentTypeTransformer.transformToDTO(coreData.documentType())
                   : null)
           .court(CourtTransformer.transformToDTO(coreData.court()));
+
+      addProcedures(currentDto, builder, coreData);
 
       var fileNumbers = coreData.fileNumbers();
       if (fileNumbers != null && !fileNumbers.isEmpty()) {
@@ -301,6 +306,40 @@ public class DocumentationUnitTransformer {
     return builder.build();
   }
 
+  private static void addProcedures(
+      DocumentationUnitDTO currentDto, DocumentationUnitDTOBuilder builder, CoreData coreData) {
+
+    List<ProcedureDTO> procedureDTOs = currentDto.getProcedures();
+    if ((procedureDTOs == null || procedureDTOs.isEmpty()) && coreData.procedure() != null) {
+      if (coreData.procedure().id() == null) {
+        builder.procedures(
+            List.of(
+                ProcedureDTO.builder()
+                    .label(coreData.procedure().label())
+                    .createdAt(Instant.now())
+                    .documentationOffice(currentDto.getDocumentationOffice())
+                    .build()));
+      } else {
+        builder.procedures(List.of(ProcedureDTO.builder().id(coreData.procedure().id()).build()));
+      }
+    } else if (procedureDTOs != null && !procedureDTOs.isEmpty()) {
+      if (coreData.procedure().id() == null) {
+        procedureDTOs.add(
+            0,
+            ProcedureDTO.builder()
+                .label(coreData.procedure().label())
+                .createdAt(Instant.now())
+                .documentationOffice(currentDto.getDocumentationOffice())
+                .build());
+      } else {
+        if (!coreData.procedure().id().equals(procedureDTOs.get(0).getId())) {
+          procedureDTOs.add(0, ProcedureDTO.builder().id(coreData.procedure().id()).build());
+        }
+      }
+      builder.procedures(procedureDTOs);
+    }
+  }
+
   public static DocumentUnit transformToDomain(DocumentationUnitDTO documentationUnitDTO) {
     if (log.isDebugEnabled()) {
       log.debug(
@@ -324,8 +363,11 @@ public class DocumentationUnitTransformer {
     CoreDataBuilder coreDataBuilder =
         CoreData.builder()
             .court(CourtTransformer.transformToDomain((documentationUnitDTO.getCourt())))
-            .procedure(ProcedureTransformer.transformToDomain(documentationUnitDTO.getProcedures()))
-            // .previousProcedures(documentationUnitDTO.getPreviousProcedures())
+            .procedure(
+                ProcedureTransformer.transformFirstToDomain(documentationUnitDTO.getProcedures()))
+            .previousProcedures(
+                ProcedureTransformer.transformPreviousProceduresToLabel(
+                    documentationUnitDTO.getProcedures()))
             .documentationOffice(
                 DocumentationOffice.builder()
                     .abbreviation(documentationUnitDTO.getDocumentationOffice().getAbbreviation())

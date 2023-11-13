@@ -8,11 +8,9 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitRepository;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitSearchInput;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatus;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitException;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitSearchEntry;
 import de.bund.digitalservice.ris.caselaw.domain.RelatedDocumentationType;
 import de.bund.digitalservice.ris.caselaw.domain.RelatedDocumentationUnit;
-import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
 import jakarta.persistence.EntityManager;
 import java.time.Instant;
 import java.util.Collections;
@@ -22,7 +20,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.domain.Page;
@@ -120,7 +117,6 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
   }
 
   @Override
-  @Transactional(transactionManager = "jpaTransactionManager")
   public Mono<DocumentUnit> save(DocumentUnit documentUnit) {
 
     DocumentationUnitDTO documentationUnitDTO =
@@ -132,18 +128,20 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
 
     // ---
     // Doing database-related (pre) transformation
+
+      //      if (documentUnit.coreData().documentType() != null) {
+      //
+      // documentationUnitDTO.setDocumentType(getDbDocType(documentUnit.coreData().documentType()));
+      //      }
+
+      //      if (documentUnit.coreData().procedure() != null) {
+      //        documentationUnitDTO.setProcedures(getDbProcedures(documentUnit,
+      // documentationUnitDTO));
+      //      }
+
+    documentationUnitDTO = saveKeywords(documentationUnitDTO, documentUnit);
+
     if (documentUnit.coreData() != null) {
-
-      if (documentUnit.coreData().documentType() != null) {
-        documentationUnitDTO.setDocumentType(getDbDocType(documentUnit.coreData().documentType()));
-      }
-
-      documentationUnitDTO = saveKeywords(documentationUnitDTO, documentUnit);
-
-      if (documentUnit.coreData().procedure() != null) {
-        documentationUnitDTO.setProcedures(getDbProcedures(documentUnit, documentationUnitDTO));
-      }
-
       documentationUnitDTO.getRegions().clear();
       if (documentUnit.coreData().court() != null) {
         Optional<CourtDTO> court =
@@ -159,6 +157,8 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
     documentationUnitDTO =
         DocumentationUnitTransformer.transformToDTO(documentationUnitDTO, documentUnit);
     documentationUnitDTO = repository.save(documentationUnitDTO);
+
+    documentationUnitDTO = repository.findById(documentationUnitDTO.getId()).get();
 
     return Mono.just(DocumentationUnitTransformer.transformToDomain(documentationUnitDTO));
   }
@@ -187,46 +187,47 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
     return documentationUnitDTO;
   }
 
-  private DocumentTypeDTO getDbDocType(DocumentType documentType) {
-    if (documentType == null) {
-      return null;
-    }
-    // TODO cache category at application start
-    DocumentTypeDTO docTypeDTO =
-        databaseDocumentTypeRepository.findFirstByAbbreviationAndCategory(
-            documentType.jurisShortcut(), databaseDocumentCategoryRepository.findFirstByLabel("R"));
-
-    if (docTypeDTO == null) {
-      throw new DocumentationUnitException(
-          "no document type for the shortcut '" + documentType.jurisShortcut() + "' found.");
-    }
-    return docTypeDTO;
-  }
-
-  private List<ProcedureDTO> getDbProcedures(
-      DocumentUnit documentUnit, DocumentationUnitDTO documentationUnitDTO) {
-    Stream<String> procedureLabels = Stream.of(documentUnit.coreData().procedure().label());
-    if (documentUnit.coreData().previousProcedures() != null)
-      procedureLabels =
-          Stream.concat(procedureLabels, documentUnit.coreData().previousProcedures().stream());
-
-    return procedureLabels
-        .map(procedureLabel -> findOrCreateProcedureDTO(procedureLabel, documentationUnitDTO))
-        .toList();
-  }
-
-  private ProcedureDTO findOrCreateProcedureDTO(
-      String procedureLabel, DocumentationUnitDTO documentationUnitDTO) {
-    return Optional.ofNullable(
-            databaseProcedureRepository.findByLabelAndDocumentationOffice(
-                procedureLabel, documentationUnitDTO.getDocumentationOffice()))
-        .orElse(
-            ProcedureDTO.builder()
-                .label(procedureLabel)
-                .documentationOffice(documentationUnitDTO.getDocumentationOffice())
-                .documentationUnits(List.of(documentationUnitDTO))
-                .build());
-  }
+  //  private DocumentTypeDTO getDbDocType(DocumentType documentType) {
+  //    if (documentType == null) {
+  //      return null;
+  //    }
+  //    // TODO cache category at application start
+  //    DocumentTypeDTO docTypeDTO =
+  //        databaseDocumentTypeRepository.findFirstByAbbreviationAndCategory(
+  //            documentType.jurisShortcut(),
+  // databaseDocumentCategoryRepository.findFirstByLabel("R"));
+  //
+  //    if (docTypeDTO == null) {
+  //      throw new DocumentationUnitException(
+  //          "no document type for the shortcut '" + documentType.jurisShortcut() + "' found.");
+  //    }
+  //    return docTypeDTO;
+  //  }
+  //
+  //  private List<ProcedureDTO> getDbProcedures(
+  //      DocumentUnit documentUnit, DocumentationUnitDTO documentationUnitDTO) {
+  //    Stream<String> procedureLabels = Stream.of(documentUnit.coreData().procedure().label());
+  //    if (documentUnit.coreData().previousProcedures() != null)
+  //      procedureLabels =
+  //          Stream.concat(procedureLabels, documentUnit.coreData().previousProcedures().stream());
+  //
+  //    return procedureLabels
+  //        .map(procedureLabel -> findOrCreateProcedureDTO(procedureLabel, documentationUnitDTO))
+  //        .toList();
+  //  }
+  //
+  //  private ProcedureDTO findOrCreateProcedureDTO(
+  //      String procedureLabel, DocumentationUnitDTO documentationUnitDTO) {
+  //    return Optional.ofNullable(
+  //            databaseProcedureRepository.findByLabelAndDocumentationOffice(
+  //                procedureLabel, documentationUnitDTO.getDocumentationOffice()))
+  //        .orElse(
+  //            ProcedureDTO.builder()
+  //                .label(procedureLabel)
+  //                .documentationOffice(documentationUnitDTO.getDocumentationOffice())
+  //                .documentationUnits(List.of(documentationUnitDTO))
+  //                .build());
+  //  }
 
   @Override
   public Mono<DocumentUnit> attachFile(

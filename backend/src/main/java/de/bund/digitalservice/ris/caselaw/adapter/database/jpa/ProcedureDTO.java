@@ -2,6 +2,7 @@ package de.bund.digitalservice.ris.caselaw.adapter.database.jpa;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
@@ -40,11 +41,11 @@ public class ProcedureDTO {
   @NotNull
   DocumentationOfficeDTO documentationOffice;
 
-  @ManyToMany()
+  @ManyToMany(fetch = FetchType.EAGER)
   @JoinTable(
       name = "procedure_link",
       schema = "public",
-      joinColumns = @JoinColumn(name = "procedure_id"),
-      inverseJoinColumns = @JoinColumn(name = "documentation_unit_id"))
+      inverseJoinColumns = @JoinColumn(name = "documentation_unit_id"),
+      joinColumns = @JoinColumn(name = "procedure_id"))
   List<DocumentationUnitDTO> documentationUnits;
 }

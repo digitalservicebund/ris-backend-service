@@ -4,10 +4,9 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.IdClass;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.validation.constraints.NotNull;
 import java.io.Serializable;
+import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -22,17 +21,14 @@ import lombok.NoArgsConstructor;
 @IdClass(ProcedureLinkId.class)
 public class ProcedureLinkDTO {
   @Id
-  @ManyToOne()
-  @JoinColumn(name = "procedure_id", referencedColumnName = "id")
+  @Column(name = "procedure_id")
   @NotNull
-  ProcedureDTO procedureDTO;
+  UUID procedureId;
 
   @Id
-  @ManyToOne()
-  @JoinColumn(name = "documentation_unit_id", referencedColumnName = "id")
+  @Column(name = "documentation_unit_id")
   @NotNull
-  DocumentationUnitDTO
-      documentationUnitDTO; // TODO should this be a jpa projection to a minimal docUnit?
+  UUID documentationUnitId;
 
   @Id
   @Column(name = "rank")
@@ -42,7 +38,7 @@ public class ProcedureLinkDTO {
 @AllArgsConstructor
 @EqualsAndHashCode
 class ProcedureLinkId implements Serializable {
-  private ProcedureDTO procedureDTO;
-  private DocumentationUnitDTO documentationUnitDTO;
+  private UUID procedureId;
+  private UUID documentationUnitId;
   private Long rank;
 }
