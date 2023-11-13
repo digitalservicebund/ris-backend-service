@@ -4,6 +4,7 @@ import customParseFormat from "dayjs/plugin/customParseFormat"
 import { vMaska, MaskaDetail } from "maska"
 import { ref, watch, computed } from "vue"
 import { ValidationError } from "@/shared/components/input/types"
+import IconClear from "~icons/ic/baseline-clear"
 
 const props = defineProps<Props>()
 const emit = defineEmits<{
@@ -230,16 +231,14 @@ watch(inputCompleted, () => {
       >
         <div class="label-wrapper">{{ chip }}</div>
 
-        <div class="icon-wrapper">
-          <!-- eslint-disable-next-line vuejs-accessibility/no-static-element-interactions -->
-          <em
-            aria-Label="Löschen"
-            class="material-icons"
-            @click="deleteChip(i)"
-            @keydown.enter="deleteChip(i)"
-            >clear</em
-          >
-        </div>
+        <button
+          aria-Label="Löschen"
+          class="icon-wrapper"
+          @click="deleteChip(i)"
+          @keydown.enter="deleteChip(i)"
+        >
+          <IconClear />
+        </button>
       </div>
     </div>
 
@@ -307,10 +306,6 @@ watch(inputCompleted, () => {
       display: flex;
       padding: 4px 3px;
       border-radius: 0 10px 10px 0;
-
-      em {
-        cursor: pointer;
-      }
     }
 
     .label-wrapper {
@@ -325,9 +320,7 @@ watch(inputCompleted, () => {
       .icon-wrapper {
         @apply bg-blue-900;
 
-        em {
-          color: white;
-        }
+        color: white;
       }
     }
   }

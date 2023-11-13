@@ -4,6 +4,7 @@ import ActiveCitationInput from "@/components/ActiveCitationInput.vue"
 import EditableList from "@/components/EditableListCaselaw.vue"
 import ActiveCitation from "@/domain/activeCitation"
 import { withSummarizer } from "@/shared/components/DataSetSummary.vue"
+import IconErrorOutline from "~icons/ic/baseline-error-outline"
 
 const props = defineProps<{
   modelValue: ActiveCitation[] | undefined
@@ -63,14 +64,10 @@ function decisionSummarizer(activeCitation: ActiveCitation) {
 
 function renderValidationAlert(message?: string) {
   return [
-    h(
-      "span",
-      {
-        "aria-label": "Fehlerhafte Eingabe",
-        class: ["material-icons pr-8 text-red-800"],
-      },
-      "error_outline",
-    ),
+    h(h(IconErrorOutline), {
+      "aria-label": "Fehlerhafte Eingabe",
+      class: ["mr-8 text-red-800"],
+    }),
     message,
   ]
 }

@@ -4,6 +4,7 @@ import EditableList from "@/components/EditableListCaselaw.vue"
 import NormReferenceInput from "@/components/NormReferenceInput.vue"
 import NormReference from "@/domain/normReference"
 import { withSummarizer } from "@/shared/components/DataSetSummary.vue"
+import IconErrorOutline from "~icons/ic/baseline-error-outline"
 
 const props = defineProps<{
   modelValue: NormReference[] | undefined
@@ -28,14 +29,10 @@ function decisionSummarizer(normEntry: NormReference) {
   return h("div", [
     normEntry.hasMissingRequiredFields
       ? h("div", { class: ["flex flex-row items-center"] }, [
-          h(
-            "span",
-            {
-              "aria-label": "Fehlerhafte Eingabe",
-              class: ["material-icons pr-8 text-red-800"],
-            },
-            "error_outline",
-          ),
+          h(h(IconErrorOutline), {
+            "aria-label": "Fehlerhafte Eingabe",
+            class: ["mr-8 text-red-800"],
+          }),
           h(
             "div",
             { class: ["ds-label-02-bold text-red-800"] },

@@ -23,7 +23,7 @@ test.describe("court", () => {
         await page.keyboard.press("Enter")
       },
       page,
-      { clickSaveButton: true },
+      { reload: true, clickSaveButton: true },
     )
 
     await page.reload()

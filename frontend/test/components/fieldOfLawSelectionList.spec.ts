@@ -36,7 +36,9 @@ describe("FieldOfLawSelectionList", () => {
       ),
     ).toBeInTheDocument()
     expect(
-      screen.getByLabelText("ST-01-02-03 Steuerrecht 1-2-3 entfernen"),
+      screen.getByLabelText(
+        "ST-01-02-03 Steuerrecht 1-2-3 aus Liste entfernen",
+      ),
     ).toBeInTheDocument()
   })
 
@@ -49,7 +51,9 @@ describe("FieldOfLawSelectionList", () => {
     ])
 
     await fireEvent.click(
-      screen.getByLabelText("ST-01-02-03 Steuerrecht 1-2-3 entfernen"),
+      screen.getByLabelText(
+        "ST-01-02-03 Steuerrecht 1-2-3 aus Liste entfernen",
+      ),
     )
 
     expect(emitted()["update:modelValue"]).toBeTruthy()

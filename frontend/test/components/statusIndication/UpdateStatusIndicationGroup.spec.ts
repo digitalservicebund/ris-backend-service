@@ -1,7 +1,6 @@
 import { userEvent } from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
 import { createPinia, setActivePinia } from "pinia"
-import { describe, test } from "vitest"
 import UpdateStatusIndicationGroup from "@/components/statusIndication/UpdateStatusIndicationGroup.vue"
 import { Metadata, MetadataSectionName } from "@/domain/norm"
 

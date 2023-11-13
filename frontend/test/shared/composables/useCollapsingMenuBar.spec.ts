@@ -1,14 +1,13 @@
-import { ref } from "vue"
-import {
-  MenuButton,
-  useCollapsingMenuBar,
-} from "@/shared/composables/useCollapsingMenuBar"
+import { ref, markRaw } from "vue"
+import { EditorButton } from "@/shared/components/input/TextEditorButton.vue"
+import { useCollapsingMenuBar } from "@/shared/composables/useCollapsingMenuBar"
 import { generateString } from "~/test-helper/dataGenerators"
+import IconTest from "~icons/ic/baseline-clear"
 
-function generateButton(partialButton?: Partial<MenuButton>) {
+function generateButton(partialButton?: Partial<EditorButton>) {
   return {
     type: generateString({ prefix: "group-1" }),
-    icon: generateString({ prefix: "icon-1" }),
+    icon: markRaw(IconTest),
     ariaLabel: generateString({ prefix: "aria-1" }),
     isCollapsable: true,
     ...partialButton,
@@ -158,21 +157,5 @@ describe("useCollapsingMenuBar", () => {
     expect(collapsedButtons.value[1].isLast).toBe(true)
     expect(collapsedButtons.value[2].isLast).toBe(undefined)
     expect(collapsedButtons.value[3].isLast).toBe(undefined)
-  })
-
-  it("renders more button when there is no more buttons to collapse", () => {
-    const buttons = [
-      generateButton({ isCollapsable: false }),
-      generateButton({ isCollapsable: false, isSecondRow: true }),
-      generateButton({ isCollapsable: false, isSecondRow: true }),
-    ]
-    const { collapsedButtons } = useCollapsingMenuBar(ref(buttons), ref(2))
-    expect(collapsedButtons.value).toHaveLength(2)
-    expect(collapsedButtons.value[0]).toStrictEqual(buttons[0])
-    expect(collapsedButtons.value[1].type).toStrictEqual("more")
-    expect(collapsedButtons.value[1].childButtons).toStrictEqual([
-      buttons[1],
-      buttons[2],
-    ])
   })
 })

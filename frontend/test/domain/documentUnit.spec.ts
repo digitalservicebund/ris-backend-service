@@ -1,4 +1,3 @@
-import { describe, it, expect } from "vitest"
 import DocumentUnit, { CoreData, Texts } from "../../src/domain/documentUnit"
 
 describe("DocumentUnit", () => {

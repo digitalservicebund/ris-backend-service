@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import TokenizeText from "@/components/TokenizeText.vue"
 import { FieldOfLawNode } from "@/domain/fieldOfLaw"
+import IconDelete from "~icons/ic/outline-delete"
 
 interface Props {
   fieldOfLaw: FieldOfLawNode
@@ -53,12 +54,12 @@ function handleTokenClick(tokenContent: string) {
     <div v-if="props.showBin">
       <button
         :aria-label="
-          fieldOfLaw.identifier + ' ' + fieldOfLaw.text + ' entfernen'
+          fieldOfLaw.identifier + ' ' + fieldOfLaw.text + ' aus Liste entfernen'
         "
-        class="material-icons text-blue-800"
+        class="text-blue-800"
         @click="emit('remove-from-list')"
       >
-        delete_outline
+        <IconDelete />
       </button>
     </div>
   </div>

@@ -9,6 +9,7 @@ import { getFileUrl, triggerFileGeneration } from "@/services/norms"
 import InfoModal from "@/shared/components/InfoModal.vue"
 import TextButton from "@/shared/components/input/TextButton.vue"
 import { useLoadedNormStore } from "@/stores/loadedNorm"
+import IconRefresh from "~icons/ic/baseline-refresh"
 
 dayjs.extend(utc)
 dayjs.extend(timezone)
@@ -96,12 +97,10 @@ async function getFileLink() {
           href="#"
           @click.prevent="getFileLink"
           >Neue Zip-Datei generieren
-          <span
+          <IconRefresh
             v-if="isLoading"
-            class="material-icons ml-[0.5rem] align-middle text-20 text-blue-800"
-          >
-            refresh
-          </span>
+            class="ml-[0.5rem] align-middle text-20 text-blue-800"
+          />
         </a>
       </div>
     </div>

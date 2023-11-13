@@ -159,7 +159,7 @@ describe("PublicationDocument:", () => {
       ).not.toBeInTheDocument()
       expect(
         screen.getByLabelText("Fehler bei Veröffentlichung"),
-      ).toHaveTextContent(`errorerror message titleerror message description`)
+      ).toHaveTextContent(`error message titleerror message description`)
     })
 
     it("renders error modal from frontend", async () => {
@@ -183,7 +183,7 @@ describe("PublicationDocument:", () => {
       expect(
         screen.getByLabelText("Fehler bei Veröffentlichung"),
       ).toHaveTextContent(
-        `errorEs sind noch nicht alle Pflichtfelder befüllt.Die Dokumentationseinheit kann nicht veröffentlicht werden.`,
+        `Es sind noch nicht alle Pflichtfelder befüllt.Die Dokumentationseinheit kann nicht veröffentlicht werden.`,
       )
     })
   })
@@ -253,7 +253,7 @@ describe("PublicationDocument:", () => {
     })
 
     expect(container).toHaveTextContent(
-      `VeröffentlichenPlausibilitätsprüfung check Alle Pflichtfelder sind korrekt ausgefülltcampaignDokumentationseinheit veröffentlichenLetzte VeröffentlichungenXml Email Abgabe - 01.02.2000ÜBERE-Mail an: receiver address Betreff: mail subjectALS`,
+      `VeröffentlichenPlausibilitätsprüfungAlle Pflichtfelder sind korrekt ausgefülltDokumentationseinheit veröffentlichenLetzte VeröffentlichungenXml Email Abgabe - 01.02.2000ÜBERE-Mail an: receiver address Betreff: mail subjectALS`,
     )
 
     const codeSnippet = screen.queryByTestId("code-snippet")

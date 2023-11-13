@@ -14,15 +14,15 @@ plugins {
     jacoco
     kotlin("jvm") version "1.9.0"
     kotlin("plugin.spring") version "1.8.22"
-    id("org.springframework.boot") version "3.1.1"
+    id("org.springframework.boot") version "3.1.5"
     id("io.spring.dependency-management") version "1.1.0"
     id("com.diffplug.spotless") version "6.22.0"
-    id("org.sonarqube") version "4.2.0.3129"
+    id("org.sonarqube") version "4.4.1.3373"
     id("com.github.jk1.dependency-license-report") version "2.5"
     id("com.gorylenko.gradle-git-properties") version "2.4.1"
-    id("com.adarshr.test-logger") version "3.2.0"
-    id("com.github.ben-manes.versions") version "0.47.0"
-    id("org.jetbrains.dokka") version "1.8.20"
+    id("com.adarshr.test-logger") version "4.0.0"
+    id("com.github.ben-manes.versions") version "0.49.0"
+    id("org.jetbrains.dokka") version "1.9.10"
     id("io.franzbecker.gradle-lombok") version "5.0.0"
     id("org.flywaydb.flyway") version "9.21.1"
 }
@@ -154,24 +154,24 @@ dependencies {
     implementation("org.springframework.security:spring-security-oauth2-resource-server:$springSecurityVersion")
     implementation("org.springframework:spring-web:$springWebVersion")
     implementation("org.springframework:spring-webflux:$springWebVersion")
-    implementation("org.springdoc:springdoc-openapi-starter-webflux-ui:2.1.0")
-
+    implementation("org.springdoc:springdoc-openapi-starter-webflux-ui:2.2.0")
     implementation("org.springframework.boot:spring-boot-starter-webflux") {
         exclude(group = "io.netty", module = "netty-tcnative-classes")
         because("CVE-2021-43797, not using Tomcat")
     }
     implementation("org.springframework.cloud:spring-cloud-starter-kubernetes-client-config:2.1.3")
+    // CVE-2023-31582
+    implementation("org.bitbucket.b_c:jose4j:0.9.3")
     implementation("org.springframework.boot:spring-boot-starter-data-redis")
     implementation("org.springframework.session:spring-session-data-redis")
     implementation("org.springframework.boot:spring-boot-starter-data-r2dbc")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
-
     // => CVE-2023-1370
     implementation("net.minidev:json-smart:2.5.0")
     // CVE-2022-3171
-    implementation("com.google.protobuf:protobuf-java:3.23.3")
+    implementation("com.google.protobuf:protobuf-java:3.25.0")
     // => CVE-2021-37136, CVE-2021-37137, CVE-2021-43797
-    implementation("io.netty:netty-all:4.1.94.Final") {
+    implementation("io.netty:netty-all:4.1.100.Final") {
         exclude(group = "io.netty", module = "netty-tcnative-classes")
         because("CVE-2021-43797, not using Tomcat")
     }
@@ -185,22 +185,17 @@ dependencies {
     implementation("org.postgresql:postgresql:42.6.0")
     implementation("com.sendinblue:sib-api-v3-sdk:7.0.0")
     // CVE-2022-4244
-    implementation("org.codehaus.plexus:plexus-utils:3.0.24")
-
-    implementation(platform("software.amazon.awssdk:bom:2.20.12"))
+    implementation("org.codehaus.plexus:plexus-utils:4.0.0")
+    implementation(platform("software.amazon.awssdk:bom:2.21.14"))
     implementation("software.amazon.awssdk:netty-nio-client")
     implementation("software.amazon.awssdk:s3")
-
     // CVE-2022-42004, CVE-2022-42003
     implementation("com.fasterxml.jackson:jackson-bom:$jacksonModuleVersion")
     implementation("com.fasterxml.jackson.core:jackson-databind:2.14.2")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:$jacksonModuleVersion")
-
     implementation("com.github.spullara.mustache.java:compiler:0.9.10")
-
     // CVE-2022-40153
     implementation("com.fasterxml.woodstox:woodstox-core:6.5.0")
-
     implementation("org.docx4j:docx4j-JAXB-MOXy:11.4.9")
     implementation("jakarta.mail:jakarta.mail-api:2.0.1")
     implementation("com.sun.activation:jakarta.activation:2.0.1")
@@ -210,45 +205,42 @@ dependencies {
         }
     }
     implementation("org.freehep:freehep-graphicsio-emf:2.4")
-
     // package served by private repo, requires authentication:
     implementation("de.bund.digitalservice:neuris-juris-xml-export:0.8.2") {
         exclude(group = "org.slf4j", module = "slf4j-simple")
     }
     // for local development:
     // implementation(files("../../neuris-juris-xml-export/build/libs/neuris-juris-xml-export-0.7.13.jar"))
-
     implementation("com.icegreen:greenmail:2.0.0")
-
     implementation("de.bund.digitalservice:ris-norms-juris-converter:0.19.2")
     // for local development:
     // implementation(files("ris-norms-juris-converter-0.19.2.jar"))
     // implementation("org.apache.commons:commons-text:1.10.0")
-
     implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.15.2")
-
     implementation("io.micrometer:micrometer-registry-prometheus:1.11.2")
     implementation("io.micrometer:micrometer-core:1.11.4")
-
-    implementation(platform("io.sentry:sentry-bom:6.25.1"))
+    implementation(platform("io.sentry:sentry-bom:6.33.1"))
     implementation("io.sentry:sentry-spring-boot-starter-jakarta")
     implementation("io.sentry:sentry-logback")
-
     implementation("org.springframework.boot:spring-boot-starter-validation")
-
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
-    testImplementation("com.ninja-squad:springmockk:4.0.0")
-
-    compileOnly("org.projectlombok:lombok")
-    annotationProcessor("org.projectlombok:lombok")
-
-    developmentOnly("org.springframework.boot:spring-boot-devtools")
     // => CVE-2023-20883
     implementation("org.springframework.boot:spring-boot-autoconfigure")
-    implementation("com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer:20211018.2")
+    implementation("com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer:20220608.1")
     // => CVE-2023-2976
     implementation("com.google.guava:guava:32.1.3-jre")
+    // this is to force transitive dependencies to use 1.0.24 instead of
+    // 1.0.23 as that is affected by CVE-2022-31684
+    implementation("io.projectreactor.netty:reactor-netty-http:1.1.8")
+    var flywayCore = "org.flywaydb:flyway-core:9.22.2"
+    implementation(flywayCore)
+    "migrationImplementation"(flywayCore)
+    implementation("org.jetbrains.kotlin:kotlin-reflect")
+    implementation("org.jsoup:jsoup:1.16.1")
+    implementation("com.github.loki4j:loki-logback-appender:1.4.0")
+    implementation("io.getunleash:unleash-client-java:9.1.0")
 
+    testImplementation("com.ninja-squad:springmockk:4.0.0")
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
         exclude(group = "org.mockito", module = "mockito-core")
     }
@@ -256,30 +248,18 @@ dependencies {
     testImplementation("io.projectreactor:reactor-test:3.5.3")
     // => CVE-2023-34034
     testImplementation("org.springframework.security:spring-security-test:6.1.2")
-    testImplementation("com.tngtech.archunit:archunit-junit5:1.0.1")
-    testImplementation("org.mockito:mockito-junit-jupiter:5.4.0")
+    testImplementation("com.tngtech.archunit:archunit-junit5:1.2.0")
+    testImplementation("org.mockito:mockito-junit-jupiter:5.7.0")
     testImplementation("org.testcontainers:testcontainers:$testContainersVersion")
     testImplementation("org.testcontainers:junit-jupiter:$testContainersVersion")
     testImplementation("org.testcontainers:postgresql:$testContainersVersion")
-
-    // this is to force transitive dependencies to use 1.0.24 instead of
-    // 1.0.23 as that is affected by CVE-2022-31684
-    implementation("io.projectreactor.netty:reactor-netty-http:1.1.8")
-
-    var flywayCore = "org.flywaydb:flyway-core:9.22.2"
-    implementation(flywayCore)
-    "migrationImplementation"(flywayCore)
-
-    implementation("org.jetbrains.kotlin:kotlin-reflect")
-
-    implementation("org.jsoup:jsoup:1.16.1")
-
-    implementation("com.github.loki4j:loki-logback-appender:1.4.0")
-
-    implementation("io.getunleash:unleash-client-java:8.2.0")
-
     testImplementation("org.jeasy:easy-random-core:5.0.0")
     testImplementation("com.google.code.gson:gson:2.10.1")
+
+    compileOnly("org.projectlombok:lombok")
+    annotationProcessor("org.projectlombok:lombok")
+
+    developmentOnly("org.springframework.boot:spring-boot-devtools")
 }
 
 project.tasks.sonar {
@@ -360,7 +340,7 @@ tasks {
         val containerImageVersion = System.getenv("CONTAINER_IMAGE_VERSION") ?: "latest"
 
         imageName.set("${containerRegistry}/${containerImageName}:${containerImageVersion}")
-        builder.set("paketobuildpacks/builder@sha256:367c3da5ae0a3caeb12e7e5bc317cb0b21e700c7f7bbb29204f70151cb5d8e66")
+        builder.set("paketobuildpacks/builder-jammy-tiny@sha256:61b59d061af9dbb117952dbc916dc2e0af87fd2e8b5ee24ff1573a1e3fffe0aa")
         publish.set(false)
         docker {
             publishRegistry {

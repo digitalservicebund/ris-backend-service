@@ -96,9 +96,7 @@ watch(newChipText, (is) => {
     />
 
     <div v-if="errorMessage" class="flex flex-row items-center">
-      <span class="material-icons leading-default text-gray-900"
-        >error_outline</span
-      >
+      <IconErrorOutline class="leading-default text-gray-900" />
       <p class="ds-label-02-reg m-4 text-gray-900">{{ errorMessage?.title }}</p>
     </div>
 

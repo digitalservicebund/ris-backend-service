@@ -3,6 +3,9 @@ import type { Component, Ref } from "vue"
 import { ref, watch, onMounted, nextTick } from "vue"
 import ListItem from "@/domain/editableListItem"
 import DataSetSummary from "@/shared/components/DataSetSummary.vue"
+import IconAdd from "~icons/ic/baseline-add"
+import IconEditNote from "~icons/ic/baseline-edit-note"
+import IconDelete from "~icons/ic/outline-delete"
 
 interface Props {
   editComponent: Component
@@ -142,18 +145,18 @@ onMounted(() => {
           <button
             v-if="!entry.isReadOnly"
             aria-label="Eintrag bearbeiten"
-            class="material-icons p-2 text-blue-800 outline-none outline-offset-2 hover:bg-blue-200 focus:outline-2 focus:outline-blue-800 active:bg-blue-500 active:outline-none"
+            class="p-2 text-blue-800 outline-none outline-offset-2 hover:bg-blue-200 focus:outline-2 focus:outline-blue-800 active:bg-blue-500 active:outline-none"
             @click="setEditIndex(index)"
           >
-            edit_note
+            <IconEditNote />
           </button>
 
           <button
             aria-label="Eintrag löschen"
-            class="material-icons p-2 text-blue-800 outline-none outline-offset-2 hover:bg-blue-200 focus:outline-2 focus:outline-blue-800 active:bg-blue-500 active:outline-none"
+            class="p-2 text-blue-800 outline-none outline-offset-2 hover:bg-blue-200 focus:outline-2 focus:outline-blue-800 active:bg-blue-500 active:outline-none"
             @click="removeListEntry(index)"
           >
-            delete_outline
+            <IconDelete />
           </button>
         </div>
       </div>
@@ -174,7 +177,7 @@ onMounted(() => {
       class="add-button gap-0.5 mt-16 flex items-center whitespace-nowrap bg-blue-300 px-8 py-2 text-14 font-bold leading-18 text-blue-800 outline-none outline-0 outline-offset-4 outline-blue-800 hover:bg-blue-800 hover:text-white focus:outline-4"
       @click="addNewListEntry"
     >
-      <span class="material-icons text-14">add</span>
+      <IconAdd class="mr-4" />
       Weitere Angabe
     </button>
   </div>

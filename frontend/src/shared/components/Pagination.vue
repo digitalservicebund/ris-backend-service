@@ -2,6 +2,8 @@
 <script setup lang="ts">
 import PaginationButton from "./PaginationButton.vue"
 import { ServiceResponse } from "@/services/httpClient"
+import IconArrowBack from "~icons/ic/baseline-arrow-back"
+import IconArrowForward from "~icons/ic/baseline-arrow-forward"
 
 const props = withDefaults(
   defineProps<{
@@ -56,8 +58,8 @@ export type PageableService<TResult, TQuery = TResult> = (
           @click="previousPage"
           @keydown.enter="previousPage"
         >
-          <span class="material-icons no-">arrow_back</span
-          ><span class="underline">zurück</span>
+          <IconArrowBack />
+          <span class="underline">zurück</span>
         </PaginationButton>
         <span v-if="page">
           {{ page.number + 1 }} von {{ page.totalPages }}
@@ -68,8 +70,8 @@ export type PageableService<TResult, TQuery = TResult> = (
           @click="nextPage"
           @keydown.enter="nextPage"
         >
-          <span class="underline">vor</span
-          ><span class="material-icons">arrow_forward</span>
+          <span class="underline">vor</span>
+          <IconArrowForward />
         </PaginationButton>
       </div>
     </div>

@@ -1,4 +1,3 @@
-import { describe, test } from "vitest"
 import { VNode, VNodeArrayChildren } from "vue"
 import { summarizeFootnotePerLine } from "@/components/footnote/summarizer"
 import { Footnote } from "@/components/footnote/types"

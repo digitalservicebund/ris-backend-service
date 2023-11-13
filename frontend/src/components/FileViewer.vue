@@ -6,6 +6,7 @@ import TextButton from "@/shared/components/input/TextButton.vue"
 import TextEditor from "@/shared/components/input/TextEditor.vue"
 import PopupModal from "@/shared/components/PopupModal.vue"
 import PropertyInfo from "@/shared/components/PropertyInfo.vue"
+import IconDelete from "~icons/ic/outline-delete"
 
 const props = defineProps<{
   uuid: string
@@ -59,6 +60,7 @@ const toggleModal = () => {
 }
 
 const fileAsHtml = ref("Dokument wird geladen.")
+
 onMounted(async () => {
   const fileResponse = await fileService.getDocxFileAsHtml(props.uuid)
   if (fileResponse.error) {
@@ -82,7 +84,11 @@ onMounted(async () => {
         </div>
       </div>
 
-      <TextButton icon="delete" label="Datei löschen" @click="toggleModal" />
+      <TextButton
+        :icon="IconDelete"
+        label="Datei löschen"
+        @click="toggleModal"
+      />
     </div>
 
     <TextEditor class="grow bg-white" field-size="max" :value="fileAsHtml" />

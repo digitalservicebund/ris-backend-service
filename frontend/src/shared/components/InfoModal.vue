@@ -1,6 +1,9 @@
 <script lang="ts" setup>
-import { computed } from "vue"
+import { computed, h } from "vue"
 import { InfoStatus } from "@/shared/components/enumInfoStatus"
+import IconDone from "~icons/ic/baseline-done"
+import IconErrorOutline from "~icons/ic/baseline-error-outline"
+import IconInfo from "~icons/ic/baseline-info"
 
 const props = withDefaults(
   defineProps<{
@@ -18,34 +21,40 @@ const props = withDefaults(
 type ModalAttribute = {
   borderClass: string
   backgroundColorClass: string
-  textColorClass: string
-  icon: string
 }
 const staticContainerClass =
   "border-l-[0.125rem] flex gap-[0.625rem] px-[1.25rem] py-[1.125rem] w-full"
-const staticIconClass = "material-icons pt-1"
 const modalAttribute = computed((): ModalAttribute => {
   if (props.status === InfoStatus.SUCCEED) {
     return {
       borderClass: "border-l-green-700",
       backgroundColorClass: "bg-white",
-      textColorClass: "text-green-700",
-      icon: "done",
     }
   } else if (props.status === InfoStatus.INFO) {
     return {
       borderClass: "border-l-blue-800",
       backgroundColorClass: "bg-white",
-      textColorClass: "text-blue-800",
-      icon: "info",
     }
   }
   return {
     borderClass: "border-l-red-800",
     backgroundColorClass: "bg-red-200",
-    textColorClass: "text-red-800",
-    icon: "error",
   }
+})
+
+const ModalIcon = computed(() => {
+  if (props.status === InfoStatus.SUCCEED) {
+    return h(h(IconDone), {
+      class: ["text-green-700"],
+    })
+  } else if (props.status === InfoStatus.INFO) {
+    return h(h(IconInfo), {
+      class: ["text-blue-800"],
+    })
+  }
+  return h(h(IconErrorOutline), {
+    class: ["text-red-800"],
+  })
 })
 
 const ariaLabelIcon = props.title + " icon"
@@ -60,11 +69,7 @@ const ariaLabelIcon = props.title + " icon"
       modalAttribute.backgroundColorClass,
     ]"
   >
-    <span
-      :aria-label="ariaLabelIcon"
-      :class="[staticIconClass, modalAttribute.textColorClass]"
-      >{{ modalAttribute.icon }}</span
-    >
+    <ModalIcon :aria-label="ariaLabelIcon" />
 
     <div class="flex flex-col">
       <span class="ds-label-02-bold">{{ title }}</span>

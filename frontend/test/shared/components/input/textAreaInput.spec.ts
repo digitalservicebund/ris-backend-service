@@ -1,6 +1,5 @@
 import { userEvent } from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
-import { vi } from "vitest"
 import { defineComponent } from "vue"
 import TextAreaInput from "@/shared/components/input/TextAreaInput.vue"
 

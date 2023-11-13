@@ -34,7 +34,7 @@ fun interface MigrateNormUseCase {
       val norms =
           mapper
               .readerForListOf(ConverterNorm::class.java)
-              .readValue<List<ConverterNorm>>(schema.get("norms").toString())
+              .readValue<List<ConverterNorm>>(schema["norms"].toString())
       return ConverterNorms(norms)
     }
   }
