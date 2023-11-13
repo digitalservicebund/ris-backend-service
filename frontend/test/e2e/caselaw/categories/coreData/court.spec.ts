@@ -41,9 +41,13 @@ test.describe("court", () => {
         await page
           .locator("[aria-label='Fehlerhaftes Gericht anzeigen']")
           .click()
-        await page
-          .locator("[aria-label='Fehlerhaftes Gericht']")
-          .fill("incorrectCourt1")
+
+        await page.locator("[aria-label='Fehlerhaftes Gericht']").type("abc")
+
+        await expect(
+          page.locator("[aria-label='Fehlerhaftes Gericht']"),
+        ).toHaveValue("abc")
+
         await page.keyboard.press("Enter")
       },
       page,
@@ -53,7 +57,7 @@ test.describe("court", () => {
     await page.reload()
 
     await page.locator("[aria-label='Fehlerhaftes Gericht anzeigen']").click()
-    await expect(page.locator("text=IncorrectCourt1").first()).toBeVisible()
+    await expect(page.locator("text=abc").first()).toBeVisible()
   })
 
   test("open incorrect court field, input two, save, reload, remove first, save and reload", async ({
@@ -70,11 +74,11 @@ test.describe("court", () => {
           .click()
         await page
           .locator("[aria-label='Fehlerhaftes Gericht']")
-          .fill("incorrectCourt1")
+          .type("incorrectCourt1")
         await page.keyboard.press("Enter")
         await page
           .locator("[aria-label='Fehlerhaftes Gericht']")
-          .fill("incorrectCourt2")
+          .type("incorrectCourt2")
         await page.keyboard.press("Enter")
       },
       page,
