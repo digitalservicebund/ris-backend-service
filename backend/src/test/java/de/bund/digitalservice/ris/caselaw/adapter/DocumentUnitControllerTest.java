@@ -226,6 +226,7 @@ class DocumentUnitControllerTest {
   void testUpdateByUuid() {
     DocumentationUnitDTO documentUnitDTO =
         DocumentationUnitDTO.builder()
+            .id(TEST_UUID)
             .documentNumber("ABCD202200001")
             .documentationOffice(DocumentationOfficeDTO.builder().abbreviation("DS").build())
             .build();

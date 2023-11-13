@@ -38,7 +38,11 @@ import reactor.test.StepVerifier;
 
 @ExtendWith(SpringExtension.class)
 @Import({XmlEMailPublishService.class})
-@TestPropertySource(properties = "mail.exporter.senderAddress=export@neuris")
+@TestPropertySource(
+    properties = {
+      "mail.exporter.senderAddress=export@neuris",
+      "mail.exporter.jurisUsername=NeuRIS"
+    })
 @ActiveProfiles(profiles = {"production"})
 class XmlEMailPublishServiceProdTest {
   private static final String RECEIVER_ADDRESS = "test-to@mail.com";
