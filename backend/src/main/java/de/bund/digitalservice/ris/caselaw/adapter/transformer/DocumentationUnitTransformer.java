@@ -80,9 +80,13 @@ public class DocumentationUnitTransformer {
           .judicialBody(coreData.appraisalBody())
           .decisionDate(coreData.decisionDate())
           .inputType(coreData.inputType())
+          .documentType(
+              coreData.documentType() != null
+                  ? DocumentTypeTransformer.transformToDTO(coreData.documentType())
+                  : null)
           .court(
-              updatedDomainObject.coreData().court() != null
-                  ? CourtDTO.builder().id(updatedDomainObject.coreData().court().id()).build()
+              coreData.court() != null
+                  ? CourtDTO.builder().id(coreData.court().id()).build()
                   : null);
 
       var fileNumbers = coreData.fileNumbers();

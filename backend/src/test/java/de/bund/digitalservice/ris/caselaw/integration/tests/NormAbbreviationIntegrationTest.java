@@ -143,6 +143,7 @@ class NormAbbreviationIntegrationTest {
       DocumentCategoryDTO.builder().label("M").build();
   private DocumentTypeDTO documentType1 =
       DocumentTypeDTO.builder()
+          .id(UUID.randomUUID())
           .abbreviation("document type abbreviation 1")
           .label("document type label 1")
           .multiple(false)
@@ -151,6 +152,7 @@ class NormAbbreviationIntegrationTest {
           .build();
   private DocumentTypeDTO documentType2 =
       DocumentTypeDTO.builder()
+          .id(UUID.randomUUID())
           .abbreviation("document type abbreviation 2")
           .label("document type label 2")
           .multiple(false)
@@ -429,17 +431,14 @@ class NormAbbreviationIntegrationTest {
 
     documentCategoryDTO1 = documentCategoryRepository.save(documentCategoryDTO1);
     documentCategoryDTO2 = documentCategoryRepository.save(documentCategoryDTO2);
-    documentCategoryRepository.flush();
 
     documentType1.setCategory(documentCategoryDTO1);
-    documentType1 = documentTypeRepository.saveAndFlush(documentType1);
+    documentType1 = documentTypeRepository.save(documentType1);
     documentType2.setCategory(documentCategoryDTO2);
-    documentType2 = documentTypeRepository.saveAndFlush(documentType2);
-    documentTypeRepository.flush();
+    documentType2 = documentTypeRepository.save(documentType2);
 
     region1 = regionRepository.save(region1);
     region2 = regionRepository.save(region2);
-    regionRepository.flush();
 
     abbreviation1 = repository.save(abbreviation1);
     abbreviation2 = repository.save(abbreviation2);
@@ -448,7 +447,6 @@ class NormAbbreviationIntegrationTest {
     abbreviation5 = repository.save(abbreviation5);
     abbreviation6 = repository.save(abbreviation6);
     abbreviation7 = repository.save(abbreviation7);
-    repository.flush();
   }
 
   private class NormAbbreviationTestBuilder {
@@ -501,6 +499,7 @@ class NormAbbreviationIntegrationTest {
 
       documentTypes.add(
           DocumentType.builder()
+              .uuid(documentTypeNewDTO.getId())
               .jurisShortcut(documentTypeNewDTO.getAbbreviation())
               .label(documentTypeNewDTO.getLabel())
               .build());

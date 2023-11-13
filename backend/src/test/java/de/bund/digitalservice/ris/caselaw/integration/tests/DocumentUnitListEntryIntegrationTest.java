@@ -114,6 +114,7 @@ class DocumentUnitListEntryIntegrationTest {
             DocumentationUnitDTO.builder()
                 .id(UUID.randomUUID())
                 .documentNumber("MIGR202200012")
+                .documentationOffice(docOfficeDTO)
                 .build());
     DocumentationUnitDTO newNeurisDto =
         repository.save(

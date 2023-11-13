@@ -253,24 +253,24 @@ class DocumentationUnitIntegrationTest {
             DocumentCategoryDTO.builder().label("C").build());
 
     DocumentTypeDTO documentTypeDTOA =
-        DocumentTypeDTO.builder()
-            .abbreviation("ABC")
-            .category(categoryA)
-            .label("ABC123")
-            .multiple(true)
-            .build();
+        databaseDocumentTypeRepository.save(
+            DocumentTypeDTO.builder()
+                .abbreviation("ABC")
+                .category(categoryA)
+                .label("ABC123")
+                .multiple(true)
+                .build());
     DocumentTypeDTO documentTypeDTOC =
-        DocumentTypeDTO.builder()
-            .abbreviation("ABC")
-            .category(categoryC)
-            .label("ABC123")
-            .multiple(true)
-            .build();
-
-    databaseDocumentTypeRepository.saveAllAndFlush(List.of(documentTypeDTOA, documentTypeDTOC));
+        databaseDocumentTypeRepository.save(
+            DocumentTypeDTO.builder()
+                .abbreviation("ABC")
+                .category(categoryC)
+                .label("ABC123")
+                .multiple(true)
+                .build());
 
     var documentTypeDTOR =
-        databaseDocumentTypeRepository.saveAndFlush(
+        databaseDocumentTypeRepository.save(
             DocumentTypeDTO.builder()
                 .abbreviation("ABC")
                 .category(categoryR)
@@ -293,6 +293,7 @@ class DocumentationUnitIntegrationTest {
                 CoreData.builder()
                     .documentType(
                         DocumentType.builder()
+                            .uuid(documentTypeDTOR.getId())
                             .jurisShortcut(documentTypeDTOR.getAbbreviation())
                             .label(documentTypeDTOR.getLabel())
                             .build())

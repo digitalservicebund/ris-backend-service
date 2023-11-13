@@ -26,11 +26,13 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresXmlPublic
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PublicationReportDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.StatusDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.XmlPublicationDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationUnitTransformer;
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
 import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatus;
 import de.bund.digitalservice.ris.caselaw.domain.HttpMailSender;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationHistoryRecordType;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
@@ -143,7 +145,7 @@ class PublishDocumentUnitIntegrationTest {
             .documentUnitId(savedDocumentUnitDTO.getId())
             .receiverAddress("neuris@example.com")
             .mailSubject(
-                "id=juris name=NeuRIS da=R df=X dt=N mod=T ld="
+                "id=juris name=test-user da=R df=X dt=N mod=T ld="
                     + DELIVER_DATE
                     + " vg="
                     + savedDocumentUnitDTO.getDocumentNumber())
@@ -158,7 +160,7 @@ class PublishDocumentUnitIntegrationTest {
             .documentUnitUuid(savedDocumentUnitDTO.getId())
             .receiverAddress("neuris@example.com")
             .mailSubject(
-                "id=juris name=NeuRIS da=R df=X dt=N mod=T ld="
+                "id=juris name=test-user da=R df=X dt=N mod=T ld="
                     + DELIVER_DATE
                     + " vg="
                     + savedDocumentUnitDTO.getDocumentNumber())
@@ -194,7 +196,15 @@ class PublishDocumentUnitIntegrationTest {
     StatusDTO status = statusList.get(statusList.size() - 1);
 
     assertThat(status.getPublicationStatus()).isEqualTo(PUBLISHING);
-    assertThat(status.getDocumentationUnitDTO()).isEqualTo(documentUnitDTO);
+    assertThat(DocumentationUnitTransformer.transformToDomain(status.getDocumentationUnitDTO()))
+        .isEqualTo(
+            DocumentationUnitTransformer.transformToDomain(documentUnitDTO).toBuilder()
+                .status(
+                    DocumentUnitStatus.builder()
+                        .publicationStatus(PUBLISHING)
+                        .withError(false)
+                        .build())
+                .build());
     assertThat(status.getCreatedAt()).isEqualTo(xmlPublicationDTO.getPublishDate());
     assertThat(status.getIssuerAddress()).isEqualTo("test@test.com");
   }
