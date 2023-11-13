@@ -10,7 +10,7 @@ export type CoreData = {
   fileNumbers?: string[]
   deviatingFileNumbers?: string[]
   court?: Court
-  incorrectCourts?: string[]
+  deviatingCourts?: string[]
   documentType?: DocumentType
   procedure?: Procedure
   ecli?: string

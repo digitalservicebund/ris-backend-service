@@ -1,7 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.adapter.transformer;
 
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ActiveCitationDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CourtDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DecisionNameDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DeviatingCourtDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DeviatingDateDTO;
@@ -56,21 +55,22 @@ public class DocumentationUnitTransformer {
             .id(updatedDomainObject.uuid())
             .documentNumber(updatedDomainObject.documentNumber());
 
-    // TODO Should we create an originalFileDocument if it doesn't exist since the upload happens
+    // TODO Should we create an originalFileDocument if it doesn't exist since the
+    // upload happens
     // somewhere else?
-    //    if (updatedDomainObject.filetype() != null
-    //        && updatedDomainObject.filename() != null
-    //        && updatedDomainObject.s3path() != null
-    //        && updatedDomainObject.fileuploadtimestamp() != null) {
-    //      builder.originalFileDocument(
-    //          OriginalFileDocumentDTO.builder()
-    //              .documentationUnitId(updatedDomainObject.uuid())
-    //              .extension(updatedDomainObject.filetype())
-    //              .filename(updatedDomainObject.filename())
-    //              .s3ObjectPath(updatedDomainObject.s3path())
-    //              .uploadTimestamp(updatedDomainObject.fileuploadtimestamp())
-    //              .build());
-    //    }
+    // if (updatedDomainObject.filetype() != null
+    // && updatedDomainObject.filename() != null
+    // && updatedDomainObject.s3path() != null
+    // && updatedDomainObject.fileuploadtimestamp() != null) {
+    // builder.originalFileDocument(
+    // OriginalFileDocumentDTO.builder()
+    // .documentationUnitId(updatedDomainObject.uuid())
+    // .extension(updatedDomainObject.filetype())
+    // .filename(updatedDomainObject.filename())
+    // .s3ObjectPath(updatedDomainObject.s3path())
+    // .uploadTimestamp(updatedDomainObject.fileuploadtimestamp())
+    // .build());
+    // }
 
     if (updatedDomainObject.coreData() != null) {
       var coreData = updatedDomainObject.coreData();
@@ -84,10 +84,7 @@ public class DocumentationUnitTransformer {
               coreData.documentType() != null
                   ? DocumentTypeTransformer.transformToDTO(coreData.documentType())
                   : null)
-          .court(
-              coreData.court() != null
-                  ? CourtDTO.builder().id(coreData.court().id()).build()
-                  : null);
+          .court(CourtTransformer.transformToDTO(coreData.court()));
 
       var fileNumbers = coreData.fileNumbers();
       if (fileNumbers != null && !fileNumbers.isEmpty()) {

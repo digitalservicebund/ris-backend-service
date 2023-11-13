@@ -43,7 +43,7 @@ test.describe("court", () => {
           .click()
         await page
           .locator("[aria-label='Fehlerhaftes Gericht']")
-          .type("incorrectCourt1")
+          .fill("incorrectCourt1")
         await page.keyboard.press("Enter")
       },
       page,
@@ -70,11 +70,11 @@ test.describe("court", () => {
           .click()
         await page
           .locator("[aria-label='Fehlerhaftes Gericht']")
-          .type("incorrectCourt1")
+          .fill("incorrectCourt1")
         await page.keyboard.press("Enter")
         await page
           .locator("[aria-label='Fehlerhaftes Gericht']")
-          .type("incorrectCourt2")
+          .fill("incorrectCourt2")
         await page.keyboard.press("Enter")
       },
       page,
@@ -91,7 +91,7 @@ test.describe("court", () => {
         await expect(page.locator("text=IncorrectCourt2")).toBeVisible()
 
         await page
-          .locator(":text('IncorrectCourt1') + button[aria-label='Löschen']")
+          .locator(":text('incorrectCourt1') + button[aria-label='Löschen']")
           .click()
       },
       page,
@@ -144,7 +144,7 @@ test.describe("court", () => {
 
     // open dropdown again by typing a search string
     await page.locator("[aria-label='Gericht']").fill("bayern")
-    await expect(page.locator("[aria-label='dropdown-option']")).toHaveCount(2)
+    await expect(page.locator("[aria-label='dropdown-option']")).toHaveCount(3)
     // first search result displays a revoked string
     await expect(page.locator("text=aufgehoben seit: 1973")).toBeVisible()
 

@@ -18,7 +18,12 @@ public class CourtTransformer {
     if (Boolean.TRUE.equals(courtDTO.isSuperiorCourt())
         && Boolean.TRUE.equals(!courtDTO.isForeignCourt())) {
 
-      return new Court(courtDTO.getId(), courtDTO.getType(), null, courtDTO.getType(), revoked);
+      return Court.builder()
+          .id(courtDTO.getId())
+          .type(courtDTO.getType())
+          .label(courtDTO.getType())
+          .revoked(revoked)
+          .build();
     }
 
     return Court.builder()
