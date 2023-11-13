@@ -18,6 +18,7 @@ import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import jakarta.validation.Valid;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
@@ -55,15 +56,13 @@ public class FieldOfLawDTO {
   @Valid
   private NavigationTermDTO navigationTerm;
 
-  @ManyToMany(fetch = FetchType.LAZY)
+  @ManyToMany(fetch = FetchType.EAGER)
   @JoinTable(
       schema = "incremental_migration",
       name = "field_of_law_field_of_law_keyword",
       joinColumns = @JoinColumn(name = "field_of_law_id"),
       inverseJoinColumns = @JoinColumn(name = "field_of_law_keyword_id"))
-  @Builder.Default
-  @Valid
-  private Set<FieldOfLawKeywordDTO> keywords = new HashSet<>();
+  private List<FieldOfLawKeywordDTO> keywords;
 
   @OneToMany(
       mappedBy = "fieldOfLaw",

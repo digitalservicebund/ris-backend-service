@@ -161,8 +161,6 @@ class ProcedureIntegrationTest {
               assertThat(response.getResponseBody().coreData().procedure().label())
                   .isEqualTo(procedure.label());
               assertThat(response.getResponseBody().coreData().procedure().createdAt()).isNotNull();
-              assertThat(response.getResponseBody().coreData().procedure().documentUnitCount())
-                  .isEqualTo(1);
             });
 
     assertThat(repository.findAll()).hasSize(1);

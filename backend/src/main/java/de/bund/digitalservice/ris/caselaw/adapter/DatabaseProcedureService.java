@@ -7,7 +7,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseProcedure
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationUnitTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.ProcedureTransformer;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitListEntry;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.Procedure;
 import de.bund.digitalservice.ris.caselaw.domain.ProcedureService;
@@ -17,6 +17,7 @@ import java.util.UUID;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class DatabaseProcedureService implements ProcedureService {
@@ -37,6 +38,7 @@ public class DatabaseProcedureService implements ProcedureService {
   }
 
   @Override
+  @Transactional(transactionManager = "jpaTransactionManager")
   public Page<Procedure> search(
       Optional<String> query, DocumentationOffice documentationOffice, Pageable pageable) {
 
@@ -60,13 +62,13 @@ public class DatabaseProcedureService implements ProcedureService {
   }
 
   @Override
-  public List<DocumentUnit> getDocumentUnits(UUID procedureId) {
+  public List<DocumentUnitListEntry> getDocumentUnits(UUID procedureId) {
     return repository
         .findById(procedureId)
         .map(
             procedureDTO ->
                 procedureDTO.getDocumentationUnits().stream()
-                    .map(DocumentationUnitTransformer::transformToDomain)
+                    .map(DocumentationUnitTransformer::transformToMetaDomain)
                     .toList())
         .orElse(null);
     //    return linkRepository

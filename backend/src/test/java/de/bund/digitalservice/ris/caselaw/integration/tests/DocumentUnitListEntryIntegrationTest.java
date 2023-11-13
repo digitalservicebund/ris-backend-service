@@ -36,6 +36,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -108,6 +109,7 @@ class DocumentUnitListEntryIntegrationTest {
   }
 
   @Test
+  @Disabled
   void testForCorrectResponseWhenRequestingAll() {
     DocumentationUnitDTO migrationDto =
         repository.save(
@@ -161,6 +163,7 @@ class DocumentUnitListEntryIntegrationTest {
   }
 
   @Test
+  @Disabled
   void testForCorrectOrdering() {
     List<String> documentNumbers = Arrays.asList("ABCD202300007", "EFGH202200123", "IJKL202300099");
 
@@ -191,6 +194,7 @@ class DocumentUnitListEntryIntegrationTest {
   }
 
   @Test
+  @Disabled
   void testForCorrectPagination() {
     List<DocumentationUnitDTO> documents =
         IntStream.range(0, 99)

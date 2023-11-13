@@ -35,7 +35,7 @@ async function loadDocumentUnits(loadingProcedure: Procedure) {
   if (loadingProcedure.documentUnitCount == 0) return
   if (loadingProcedure.documentUnits) return
 
-  const response = await service.getDocumentUnits(loadingProcedure.label)
+  const response = await service.getDocumentUnits(loadingProcedure.id)
 
   procedures.value = procedures.value.map((procedure) =>
     procedure.label == loadingProcedure.label

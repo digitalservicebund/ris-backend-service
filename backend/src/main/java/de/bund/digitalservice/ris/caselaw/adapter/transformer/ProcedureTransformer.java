@@ -32,6 +32,7 @@ public class ProcedureTransformer {
     }
 
     return Procedure.builder()
+        .id(procedureDTO.getId())
         .label(procedureDTO.getLabel())
         .createdAt(procedureDTO.getCreatedAt())
         .documentUnitCount(getDocumentationUnitCount(procedureDTO))

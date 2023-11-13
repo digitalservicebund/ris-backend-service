@@ -117,6 +117,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
   }
 
   @Override
+  @Transactional(transactionManager = "jpaTransactionManager")
   public Mono<DocumentUnit> save(DocumentUnit documentUnit) {
 
     DocumentationUnitDTO documentationUnitDTO =
@@ -158,9 +159,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
         DocumentationUnitTransformer.transformToDTO(documentationUnitDTO, documentUnit);
     documentationUnitDTO = repository.save(documentationUnitDTO);
 
-    documentationUnitDTO = repository.findById(documentationUnitDTO.getId()).get();
-
-    return Mono.just(DocumentationUnitTransformer.transformToDomain(documentationUnitDTO));
+    return Mono.just(findByUuid(documentationUnitDTO.getId()));
   }
 
   private DocumentationUnitDTO saveKeywords(

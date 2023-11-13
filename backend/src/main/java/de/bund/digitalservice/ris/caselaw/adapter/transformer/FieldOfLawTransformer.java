@@ -1,6 +1,7 @@
 package de.bund.digitalservice.ris.caselaw.adapter.transformer;
 
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.FieldOfLawDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.FieldOfLawKeywordDTO;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw.FieldOfLaw;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw.FieldOfLaw.FieldOfLawBuilder;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw.Keyword;
@@ -22,18 +23,17 @@ public class FieldOfLawTransformer {
             .identifier(fieldOfLawDTO.getIdentifier())
             .text(fieldOfLawDTO.getText());
 
-    List<Keyword> keywords = null;
     if (fieldOfLawDTO.getKeywords() != null) {
-      keywords =
+      List<FieldOfLawKeywordDTO> keywordDTOs = fieldOfLawDTO.getKeywords();
+      List<Keyword> keywords =
           fieldOfLawDTO.getKeywords().stream()
               .map(keywordDTO -> Keyword.builder().value(keywordDTO.getValue()).build())
               .toList();
       builder.keywords(keywords);
     }
 
-    List<Norm> norms = null;
     if (fieldOfLawDTO.getNorms() != null) {
-      norms =
+      List<Norm> norms =
           fieldOfLawDTO.getNorms().stream()
               .map(
                   normDTO ->
@@ -45,9 +45,8 @@ public class FieldOfLawTransformer {
       builder.norms(norms);
     }
 
-    List<String> linkedFields = null;
     if (fieldOfLawDTO.getFieldOfLawTextReferences() != null) {
-      linkedFields =
+      List<String> linkedFields =
           fieldOfLawDTO.getFieldOfLawTextReferences().stream()
               .map(FieldOfLawDTO::getIdentifier)
               .toList();

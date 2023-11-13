@@ -24,6 +24,7 @@ import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData.CoreDataBuilder;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitListEntry;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatus;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.EnsuingDecision;
@@ -551,5 +552,18 @@ public class DocumentationUnitTransformer {
     }
 
     return builder.build();
+  }
+
+  public static DocumentUnitListEntry transformToMetaDomain(
+      DocumentationUnitDTO documentationUnitDTO) {
+    return DocumentUnitListEntry.builder()
+        .documentNumber(documentationUnitDTO.getDocumentNumber())
+        .fileName(
+            (documentationUnitDTO.getFileNumbers() != null
+                    && !documentationUnitDTO.getFileNumbers().isEmpty())
+                ? documentationUnitDTO.getFileNumbers().get(0).getValue()
+                : null)
+        .decisionDate(documentationUnitDTO.getDecisionDate())
+        .build();
   }
 }

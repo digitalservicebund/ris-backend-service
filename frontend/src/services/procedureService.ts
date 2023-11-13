@@ -11,7 +11,7 @@ interface ProcedureService {
     filter?: string,
   ): Promise<ServiceResponse<Page<Procedure>>>
   getDocumentUnits(
-    procedureLabel: string,
+    procedureId: string | undefined,
   ): Promise<ServiceResponse<DocumentUnitListEntry[]>>
 }
 
@@ -34,9 +34,9 @@ const service: ProcedureService = {
     }
     return response
   },
-  async getDocumentUnits(procedureLabel: string) {
+  async getDocumentUnits(procedureId: string | undefined) {
     const response = await httpClient.get<DocumentUnitListEntry[]>(
-      `caselaw/procedure/${procedureLabel}/documentunits`,
+      `caselaw/procedure/${procedureId}/documentunits`,
     )
     if (response.status >= 300) {
       response.error = {
