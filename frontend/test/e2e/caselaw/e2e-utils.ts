@@ -154,9 +154,61 @@ export async function fillPreviousDecisionInputs(
     if (!(await dateUnknownCheckbox.isChecked())) {
       await dateUnknownCheckbox.click()
       await expect(dateUnknownCheckbox).toBeChecked()
+    }
+  }
+}
+
+export async function fillEnsuingDecisionInputs(
+  page: Page,
+  values?: {
+    pending?: boolean
+    court?: string
+    decisionDate?: string
+    fileNumber?: string
+    documentType?: string
+    note?: string
+  },
+  decisionIndex = 0,
+): Promise<void> {
+  const fillInput = async (ariaLabel: string, value = generateString()) => {
+    const input = page.locator(`[aria-label='${ariaLabel}']`).nth(decisionIndex)
+    await input.fill(value ?? ariaLabel)
+    await waitForInputValue(page, `[aria-label='${ariaLabel}']`, value)
+  }
+
+  if (values?.court) {
+    await fillInput("Gericht Nachgehende Entscheidung", values?.court)
+    await page.getByText(values.court, { exact: true }).click()
+    await waitForInputValue(
+      page,
+      "[aria-label='Gericht Nachgehende Entscheidung']",
+      values.court,
+    )
+  }
+  if (values?.decisionDate) {
+    await fillInput(
+      "Entscheidungsdatum Nachgehende Entscheidung",
+      values?.decisionDate,
+    )
+  }
+  if (values?.fileNumber) {
+    await fillInput("Aktenzeichen Nachgehende Entscheidung", values?.fileNumber)
+  }
+  if (values?.documentType) {
+    await fillInput(
+      "Dokumenttyp Nachgehende Entscheidung",
+      values?.documentType,
+    )
+    await page.locator("[aria-label='dropdown-option']").first().click()
+  }
+  if (values?.pending) {
+    const pendingCheckbox = page.getByLabel("Anhängige Entscheidung")
+    if (!(await pendingCheckbox.isChecked())) {
+      await pendingCheckbox.click()
+      await expect(pendingCheckbox).toBeChecked()
       await waitForInputValue(
         page,
-        "[aria-label='Entscheidungsdatum Vorgehende Entscheidung']",
+        "[aria-label='Entscheidungsdatum Nachgehende Entscheidung']",
         "",
       )
     }

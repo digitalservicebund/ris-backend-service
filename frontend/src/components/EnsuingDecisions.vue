@@ -19,7 +19,7 @@ const ensuingDecisions = computed({
     return props.modelValue
   },
   set: (value) => {
-    if (value) emit("update:modelValue", value)
+    emit("update:modelValue", value)
   },
 })
 const defaultValue = new EnsuingDecision()
@@ -29,7 +29,7 @@ function decisionSummarizer(dataEntry: EnsuingDecision) {
     !dataEntry.hasMissingRequiredFields ||
     (dataEntry.missingRequiredFields.length === 1 &&
       dataEntry.missingRequiredFields[0] === "decisionDate" &&
-      dataEntry.isPending)
+      dataEntry.pending)
   ) {
     return h("div", { class: ["link-02-reg"] }, dataEntry.renderDecision)
   } else {

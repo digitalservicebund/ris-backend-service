@@ -13,7 +13,7 @@ public class EnsuingDecisionTransformer extends RelatedDocumentationUnitTransfor
         .documentType(getDocumentTypeFromDTO(ensuingDecisionDTO.getDocumentType()))
         .decisionDate(ensuingDecisionDTO.getDate())
         .note(ensuingDecisionDTO.getNote())
-        .isPending(false)
+        .pending(false)
         .build();
   }
 

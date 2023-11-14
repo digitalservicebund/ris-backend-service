@@ -1,38 +1,38 @@
 import { expect } from "@playwright/test"
 import { generateString } from "../../../test-helper/dataGenerators"
 import {
-  fillPreviousDecisionInputs,
+  fillEnsuingDecisionInputs,
   navigateToCategories,
   navigateToPublication,
   waitForSaving,
 } from "~/e2e/caselaw/e2e-utils"
 import { caselawTest as test } from "~/e2e/caselaw/fixtures"
 
-test.describe("previous decisions", () => {
-  test("renders empty previous decision in edit mode, when none in list", async ({
+test.describe("ensuing decisions", () => {
+  test("renders empty ensuing decision in edit mode, when none in list", async ({
     page,
     documentNumber,
   }) => {
     await navigateToCategories(page, documentNumber)
     await expect(
-      page.getByRole("heading", { name: "Vorgehende Entscheidung " }),
+      page.getByRole("heading", { name: "Nachgehende Entscheidung " }),
     ).toBeVisible()
     await expect(
-      page.getByLabel("Gericht Vorgehende Entscheidung"),
+      page.getByLabel("Gericht Nachgehende Entscheidung"),
     ).toBeVisible()
     await expect(
-      page.getByLabel("Entscheidungsdatum Vorgehende Entscheidung"),
+      page.getByLabel("Entscheidungsdatum Nachgehende Entscheidung"),
     ).toBeVisible()
     await expect(
-      page.getByLabel("Aktenzeichen Vorgehende Entscheidung"),
+      page.getByLabel("Aktenzeichen Nachgehende Entscheidung"),
     ).toBeVisible()
     await expect(
-      page.getByLabel("Dokumenttyp Vorgehende Entscheidung"),
+      page.getByLabel("Dokumenttyp Nachgehende Entscheidung"),
     ).toBeVisible()
     await expect(page.getByLabel("Datum unbekannt")).toBeVisible()
   })
 
-  test("create and renders new previous decision in list", async ({
+  test("create and renders new ensuing decision in list", async ({
     page,
     documentNumber,
     prefilledDocumentUnit,
@@ -40,45 +40,110 @@ test.describe("previous decisions", () => {
     await navigateToCategories(page, documentNumber)
     await expect(page.getByText(documentNumber)).toBeVisible()
 
-    await fillPreviousDecisionInputs(page, {
+    await fillEnsuingDecisionInputs(page, {
+      pending: false,
       court: prefilledDocumentUnit.coreData.court?.label,
       fileNumber: prefilledDocumentUnit.coreData.fileNumbers?.[0],
       documentType: prefilledDocumentUnit.coreData.documentType?.jurisShortcut,
       decisionDate: "01.01.2020",
+      note: "abc",
     })
 
-    await page.getByLabel("Vorgehende Entscheidung speichern").click()
+    await page.getByLabel("Nachgehende Entscheidung speichern").click()
     await expect(
       page.getByText(
-        `AG Aachen, 01.01.2020, ${prefilledDocumentUnit.coreData.fileNumbers?.[0]}, AnU`,
+        `nachgehend, AG Aachen, 01.01.2020, ${prefilledDocumentUnit.coreData.fileNumbers?.[0]}, AnU`,
         {
           exact: true,
         },
       ),
     ).toBeVisible()
 
-    const previousDecisionContainer = page.getByLabel("Vorgehende Entscheidung")
+    const ensuingDecisionContainer = page.getByLabel("Nachgehende Entscheidung")
 
     await expect(
-      previousDecisionContainer.getByLabel("Listen Eintrag"),
+      ensuingDecisionContainer.getByLabel("Listen Eintrag"),
     ).toHaveCount(1)
 
     await page.getByLabel("Weitere Angabe").click()
-    await fillPreviousDecisionInputs(page, {
+    await fillEnsuingDecisionInputs(page, {
       court: prefilledDocumentUnit.coreData.court?.label,
       fileNumber: prefilledDocumentUnit.coreData.fileNumbers?.[0],
       documentType: prefilledDocumentUnit.coreData.documentType?.jurisShortcut,
       decisionDate: "01.01.2020",
     })
 
-    await page.getByLabel("Vorgehende Entscheidung speichern").click()
+    await page.getByLabel("Nachgehende Entscheidung speichern").click()
 
     await expect(
-      previousDecisionContainer.getByLabel("Listen Eintrag"),
+      ensuingDecisionContainer.getByLabel("Listen Eintrag"),
     ).toHaveCount(2)
   })
 
-  test("saving behaviour of previous decision", async ({
+  test("change to 'anhaengig' removes date with value and vice versa", async ({
+    page,
+    documentNumber,
+    prefilledDocumentUnit,
+  }) => {
+    await navigateToCategories(page, documentNumber)
+    await expect(page.getByText(documentNumber)).toBeVisible()
+
+    await fillEnsuingDecisionInputs(page, {
+      court: prefilledDocumentUnit.coreData.court?.label,
+      fileNumber: prefilledDocumentUnit.coreData.fileNumbers?.[0],
+      documentType: prefilledDocumentUnit.coreData.documentType?.jurisShortcut,
+      decisionDate: "01.01.2020",
+    })
+
+    await page.getByLabel("Nachgehende Entscheidung speichern").click()
+    await expect(
+      page.getByText(
+        `nachgehend, AG Aachen, 01.01.2020, ${prefilledDocumentUnit.coreData.fileNumbers?.[0]}, AnU`,
+        {
+          exact: true,
+        },
+      ),
+    ).toBeVisible()
+
+    const ensuingDecisionContainer = page.getByLabel("Nachgehende Entscheidung")
+
+    await expect(
+      ensuingDecisionContainer.getByLabel("Listen Eintrag"),
+    ).toHaveCount(1)
+
+    await page.getByLabel("Weitere Angabe").click()
+    await fillEnsuingDecisionInputs(page, {
+      court: prefilledDocumentUnit.coreData.court?.label,
+      fileNumber: prefilledDocumentUnit.coreData.fileNumbers?.[0],
+      documentType: prefilledDocumentUnit.coreData.documentType?.jurisShortcut,
+      decisionDate: "01.01.2020",
+    })
+
+    const pendingCheckbox = page.getByLabel("Anhängige Entscheidung")
+
+    await pendingCheckbox.click()
+    await expect(pendingCheckbox).toBeChecked()
+
+    await expect(
+      page.getByLabel("Entscheidungsdatum Nachgehende Entscheidung"),
+    ).toBeHidden()
+
+    await page.getByLabel("Nachgehende Entscheidung speichern").click()
+    await expect(
+      page.getByText(
+        `anhängig, AG Aachen, Datum unbekannt, ${prefilledDocumentUnit.coreData.fileNumbers?.[0]}, AnU`,
+        {
+          exact: true,
+        },
+      ),
+    ).toBeVisible()
+
+    await expect(
+      ensuingDecisionContainer.getByLabel("Listen Eintrag"),
+    ).toHaveCount(2)
+  })
+
+  test("saving behaviour of ensuing decision", async ({
     page,
     documentNumber,
     prefilledDocumentUnit,
@@ -88,7 +153,7 @@ test.describe("previous decisions", () => {
 
     await waitForSaving(
       async () => {
-        await fillPreviousDecisionInputs(page, {
+        await fillEnsuingDecisionInputs(page, {
           court: prefilledDocumentUnit.coreData.court?.label,
           fileNumber: prefilledDocumentUnit.coreData.fileNumbers?.[0],
           documentType:
@@ -96,10 +161,10 @@ test.describe("previous decisions", () => {
           decisionDate: "01.01.2020",
         })
 
-        await page.getByLabel("Vorgehende Entscheidung speichern").click()
+        await page.getByLabel("Nachgehende Entscheidung speichern").click()
         await expect(
           page.getByText(
-            `AG Aachen, 01.01.2020, ${prefilledDocumentUnit.coreData.fileNumbers?.[0]}, AnU`,
+            `nachgehend, AG Aachen, 01.01.2020, ${prefilledDocumentUnit.coreData.fileNumbers?.[0]}, AnU`,
             {
               exact: true,
             },
@@ -110,39 +175,39 @@ test.describe("previous decisions", () => {
       { clickSaveButton: true },
     )
 
-    const previousDecisionContainer = page.getByLabel("Vorgehende Entscheidung")
+    const ensuingDecisionContainer = page.getByLabel("Nachgehende Entscheidung")
 
     await expect(
-      previousDecisionContainer.getByLabel("Listen Eintrag"),
+      ensuingDecisionContainer.getByLabel("Listen Eintrag"),
     ).toHaveCount(1)
 
     await page.reload()
 
     await expect(
-      previousDecisionContainer.getByLabel("Listen Eintrag"),
+      ensuingDecisionContainer.getByLabel("Listen Eintrag"),
     ).toHaveCount(1, { timeout: 10000 }) // reloading can be slow if too many parallel tests
 
     await page.getByLabel("Weitere Angabe").click()
-    await page.getByLabel("Aktenzeichen Vorgehende Entscheidung").fill("two")
-    await page.getByLabel("Vorgehende Entscheidung speichern").click()
+    await page.getByLabel("Aktenzeichen Nachgehende Entscheidung").fill("two")
+    await page.getByLabel("Nachgehende Entscheidung speichern").click()
     await expect(
-      page.getByText(`two`, {
+      page.getByText(`nachgehend, two`, {
         exact: true,
       }),
     ).toBeVisible()
-    // "Vorgehende Entscheidung speichern" only saves state in frontend, no communication to backend yet
+    // "Nachgehende Entscheidung speichern" only saves state in frontend, no communication to backend yet
     await page.reload()
     await expect(
-      previousDecisionContainer.getByLabel("Listen Eintrag"),
+      ensuingDecisionContainer.getByLabel("Listen Eintrag"),
     ).toHaveCount(1, { timeout: 10000 }) // reloading can be slow if too many parallel tests
 
     await page.getByLabel("Weitere Angabe").click()
     await waitForSaving(
       async () => {
         await page
-          .getByLabel("Aktenzeichen Vorgehende Entscheidung")
+          .getByLabel("Aktenzeichen Nachgehende Entscheidung")
           .fill("two")
-        await page.getByLabel("Vorgehende Entscheidung speichern").click()
+        await page.getByLabel("Nachgehende Entscheidung speichern").click()
       },
       page,
       { clickSaveButton: true },
@@ -150,11 +215,11 @@ test.describe("previous decisions", () => {
 
     await page.reload()
     await expect(
-      previousDecisionContainer.getByLabel("Listen Eintrag"),
+      ensuingDecisionContainer.getByLabel("Listen Eintrag"),
     ).toHaveCount(2, { timeout: 20000 })
   })
 
-  test("manually added previous decision can be edited", async ({
+  test("manually added ensuing decision can be edited", async ({
     page,
     documentNumber,
   }) => {
@@ -165,31 +230,31 @@ test.describe("previous decisions", () => {
     await waitForSaving(
       async () => {
         await page
-          .getByLabel("Aktenzeichen Vorgehende Entscheidung")
+          .getByLabel("Aktenzeichen Nachgehende Entscheidung")
           .fill(fileNumber1)
       },
       page,
       { clickSaveButton: true },
     )
-    await page.getByLabel("Vorgehende Entscheidung speichern").click()
+    await page.getByLabel("Nachgehende Entscheidung speichern").click()
     await expect(page.getByText(fileNumber1)).toBeVisible()
 
     await page.getByLabel("Eintrag bearbeiten").click()
     await waitForSaving(
       async () => {
         await page
-          .getByLabel("Aktenzeichen Vorgehende Entscheidung")
+          .getByLabel("Aktenzeichen Nachgehende Entscheidung")
           .fill(fileNumber2)
       },
       page,
       { clickSaveButton: true },
     )
-    await page.getByLabel("Vorgehende Entscheidung speichern").click()
+    await page.getByLabel("Nachgehende Entscheidung speichern").click()
     await expect(page.getByText(fileNumber1)).toBeHidden()
     await expect(page.getByText(fileNumber2)).toBeVisible()
   })
 
-  test("manually added previous decision can be deleted", async ({
+  test("manually added ensuing decision can be deleted", async ({
     page,
     documentNumber,
   }) => {
@@ -198,38 +263,38 @@ test.describe("previous decisions", () => {
     await waitForSaving(
       async () => {
         await page
-          .getByLabel("Aktenzeichen Vorgehende Entscheidung")
+          .getByLabel("Aktenzeichen Nachgehende Entscheidung")
           .fill("one")
       },
       page,
       { clickSaveButton: true },
     )
 
-    await page.getByLabel("Vorgehende Entscheidung speichern").click()
+    await page.getByLabel("Nachgehende Entscheidung speichern").click()
     await page.getByLabel("Weitere Angabe").click()
     await waitForSaving(
       async () => {
         await page
-          .getByLabel("Aktenzeichen Vorgehende Entscheidung")
+          .getByLabel("Aktenzeichen Nachgehende Entscheidung")
           .fill("two")
       },
       page,
       { clickSaveButton: true },
     )
-    const previousDecisionContainer = page.getByLabel("Vorgehende Entscheidung")
-    await page.getByLabel("Vorgehende Entscheidung speichern").click()
+    const ensuingDecisionContainer = page.getByLabel("Nachgehende Entscheidung")
+    await page.getByLabel("Nachgehende Entscheidung speichern").click()
     await expect(
-      previousDecisionContainer.getByLabel("Listen Eintrag"),
+      ensuingDecisionContainer.getByLabel("Listen Eintrag"),
     ).toHaveCount(2)
     await page.getByLabel("Eintrag löschen").first().click()
     await expect(
-      previousDecisionContainer.getByLabel("Listen Eintrag"),
+      ensuingDecisionContainer.getByLabel("Listen Eintrag"),
     ).toHaveCount(1)
   })
 
   //Todo enable again when linking possible
   // eslint-disable-next-line playwright/no-skipped-test
-  test.skip("search for documentunits and link as previous decision", async ({
+  test.skip("search for documentunits and link as ensuing decision", async ({
     page,
     documentNumber,
     prefilledDocumentUnit,
@@ -250,14 +315,14 @@ test.describe("previous decisions", () => {
     await navigateToCategories(page, documentNumber)
     await expect(page.getByText(documentNumber)).toBeVisible()
 
-    await fillPreviousDecisionInputs(page, {
+    await fillEnsuingDecisionInputs(page, {
       court: prefilledDocumentUnit.coreData.court?.label,
       fileNumber: prefilledDocumentUnit.coreData.fileNumbers?.[0],
       documentType: prefilledDocumentUnit.coreData.documentType?.jurisShortcut,
       decisionDate: "01.01.2020",
     })
-    const previousDecisionContainer = page.getByLabel("Vorgehende Entscheidung")
-    await previousDecisionContainer
+    const ensuingDecisionContainer = page.getByLabel("Nachgehende Entscheidung")
+    await ensuingDecisionContainer
       .getByLabel("Nach Entscheidung suchen")
       .click()
 
@@ -282,14 +347,14 @@ test.describe("previous decisions", () => {
 
     // search for same parameters gives same result, indication that decision is already added
     await page.getByLabel("Weitere Angabe").click()
-    await fillPreviousDecisionInputs(page, {
+    await fillEnsuingDecisionInputs(page, {
       court: prefilledDocumentUnit.coreData.court?.label,
       fileNumber: prefilledDocumentUnit.coreData.fileNumbers?.[0],
       documentType: prefilledDocumentUnit.coreData.documentType?.jurisShortcut,
       decisionDate: "01.01.2020",
     })
 
-    await previousDecisionContainer
+    await ensuingDecisionContainer
       .getByLabel("Nach Entscheidung suchen")
       .click()
 
@@ -299,7 +364,7 @@ test.describe("previous decisions", () => {
     //can be deleted
     await page.getByLabel("Eintrag löschen").first().click()
     await expect(
-      previousDecisionContainer.getByLabel("Listen Eintrag"),
+      ensuingDecisionContainer.getByLabel("Listen Eintrag"),
     ).toHaveCount(1)
     await expect(listItem).toBeHidden()
   })
@@ -312,38 +377,38 @@ test.describe("previous decisions", () => {
     await navigateToCategories(page, documentNumber)
     await expect(page.getByText(documentNumber)).toBeVisible()
 
-    await fillPreviousDecisionInputs(page, {
+    await fillEnsuingDecisionInputs(page, {
       fileNumber: "abc",
     })
-    await page.getByLabel("Vorgehende Entscheidung speichern").click()
+    await page.getByLabel("Nachgehende Entscheidung speichern").click()
 
     await expect(page.getByLabel("Fehlerhafte Eingabe")).toBeVisible()
     await page.getByLabel("Eintrag bearbeiten").click()
     await expect(
       page
-        .getByLabel("Vorgehende Entscheidung")
+        .getByLabel("Nachgehende Entscheidung")
         .getByText("Pflichtfeld nicht befüllt"),
     ).toHaveCount(2)
 
-    await fillPreviousDecisionInputs(page, {
+    await fillEnsuingDecisionInputs(page, {
       court: prefilledDocumentUnit.coreData.court?.label,
       fileNumber: prefilledDocumentUnit.coreData.fileNumbers?.[0],
       documentType: prefilledDocumentUnit.coreData.documentType?.jurisShortcut,
       decisionDate: "01.01.2020",
     })
-    await page.getByLabel("Vorgehende Entscheidung speichern").click()
+    await page.getByLabel("Nachgehende Entscheidung speichern").click()
 
     await expect(page.getByLabel("Fehlerhafte Eingabe")).toBeHidden()
   })
 
-  test("adding empty previous decision not possible", async ({
+  test("adding empty ensuing decision not possible", async ({
     page,
     documentNumber,
   }) => {
     await navigateToCategories(page, documentNumber)
     await expect(page.getByText(documentNumber)).toBeVisible()
 
-    await page.getByLabel("Vorgehende Entscheidung speichern").isDisabled()
+    await page.getByLabel("Nachgehende Entscheidung speichern").isDisabled()
   })
 
   test("incomplete date input shows error message and does not persist", async ({
@@ -354,13 +419,15 @@ test.describe("previous decisions", () => {
     await expect(page.getByText(documentNumber)).toBeVisible()
 
     await page
-      .locator("[aria-label='Entscheidungsdatum Vorgehende Entscheidung']")
+      .locator("[aria-label='Entscheidungsdatum Nachgehende Entscheidung']")
       .fill("03")
 
     await page.keyboard.press("Tab")
 
     await expect(
-      page.locator("[aria-label='Entscheidungsdatum Vorgehende Entscheidung']"),
+      page.locator(
+        "[aria-label='Entscheidungsdatum Nachgehende Entscheidung']",
+      ),
     ).toHaveValue("03")
 
     await expect(page.locator("text=Unvollständiges Datum")).toBeVisible()
@@ -368,7 +435,9 @@ test.describe("previous decisions", () => {
     await page.reload()
 
     await expect(
-      page.locator("[aria-label='Entscheidungsdatum Vorgehende Entscheidung']"),
+      page.locator(
+        "[aria-label='Entscheidungsdatum Nachgehende Entscheidung']",
+      ),
     ).toHaveValue("")
   })
 })

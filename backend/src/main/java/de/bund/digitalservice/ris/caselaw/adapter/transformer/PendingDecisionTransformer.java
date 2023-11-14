@@ -13,7 +13,7 @@ public class PendingDecisionTransformer extends RelatedDocumentationUnitTransfor
         .documentType(getDocumentTypeFromDTO(pendingDecisionDTO.getDocumentType()))
         .decisionDate(pendingDecisionDTO.getDate())
         .note(pendingDecisionDTO.getNote())
-        .isPending(true)
+        .pending(true)
         .build();
   }
 

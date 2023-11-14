@@ -6,12 +6,12 @@ export default class EnsuingDecision
   extends RelatedDocumentation
   implements EditableListItem
 {
-  public isPending = false
+  public pending: boolean | undefined
   public note: string | undefined
 
   static requiredFields = ["fileNumber", "court", "decisionDate"] as const
   static fields = [
-    "isPending",
+    "pending",
     "fileNumber",
     "court",
     "decisionDate",
@@ -26,12 +26,12 @@ export default class EnsuingDecision
 
   get renderDecision(): string {
     return [
-      ...(this.isPending === true ? ["anhängig"] : ["nachgehend"]),
+      ...(this.pending === true ? ["anhängig"] : ["nachgehend"]),
       ...(this.court ? [`${this.court.label}`] : []),
       ...(this.decisionDate
         ? [dayjs(this.decisionDate).format("DD.MM.YYYY")]
         : []),
-      ...(this.isPending ? ["Datum unbekannt"] : []),
+      ...(this.pending ? ["Datum unbekannt"] : []),
       ...(this.fileNumber ? [this.fileNumber] : []),
       ...(this.documentType ? [this.documentType?.jurisShortcut] : []),
       ...(this.note ? [this.note] : []),
@@ -70,7 +70,7 @@ export default class EnsuingDecision
     fieldName: keyof EnsuingDecision,
     value: EnsuingDecision[(typeof EnsuingDecision.fields)[number]],
   ) {
-    if (fieldName === "isPending" && value === true) {
+    if (fieldName === "pending" && value === true) {
       return false
     }
     if (value === undefined || !value || value === null) {

@@ -35,10 +35,10 @@ const searchResultsCurrentPage = ref<Page<EnsuingDecision>>()
 const searchResults = ref<SearchResults<EnsuingDecision>>()
 
 const isPending = computed({
-  get: () => ensuingDecision.value.isPending,
+  get: () => ensuingDecision.value.pending,
   set: (value) => {
     if (value) ensuingDecision.value.decisionDate = undefined
-    ensuingDecision.value.isPending = value
+    ensuingDecision.value.pending = value
   },
 })
 
@@ -146,7 +146,7 @@ onMounted(() => {
         <ComboboxInput
           id="court"
           v-model="ensuingDecision.court"
-          aria-label="Gericht Nachgehende Entschiedung"
+          aria-label="Gericht Nachgehende Entscheidung"
           clear-on-choosing-item
           :has-error="slotProps.hasError"
           :item-service="ComboboxItemService.getCourts"
@@ -164,7 +164,7 @@ onMounted(() => {
           <DateInput
             id="decisionDate"
             v-model="ensuingDecision.decisionDate"
-            aria-label="Entscheidungsdatum Nachgehende Entschiedung"
+            aria-label="Entscheidungsdatum Nachgehende Entscheidung"
             :has-error="slotProps.hasError"
             @focus="validationStore.remove('decisionDate')"
             @update:validation-error="slotProps.updateValidationError"
@@ -184,7 +184,7 @@ onMounted(() => {
         <TextInput
           id="fileNumber"
           v-model="ensuingDecision.fileNumber"
-          aria-label="Aktenzeichen Nachgehende Entschiedung"
+          aria-label="Aktenzeichen Nachgehende Entscheidung"
           :has-error="slotProps.hasError"
           placeholder="Aktenzeichen"
           @input="validationStore.remove('fileNumber')"
@@ -199,7 +199,7 @@ onMounted(() => {
         <ComboboxInput
           id="documentType"
           v-model="ensuingDecision.documentType"
-          aria-label="Dokumenttyp Nachgehende Entschiedung"
+          aria-label="Dokumenttyp Nachgehende Entscheidung"
           :item-service="ComboboxItemService.getDocumentTypes"
           placeholder="Bitte auswählen"
         ></ComboboxInput>

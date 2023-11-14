@@ -14,7 +14,7 @@ import lombok.experimental.SuperBuilder;
 @DateKnownConstraint
 @Data
 public class EnsuingDecision extends RelatedDocumentationUnit {
-  private boolean isPending;
+  private boolean pending;
   private String note;
 
   public boolean hasNoValues() {

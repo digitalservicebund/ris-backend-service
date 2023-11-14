@@ -520,10 +520,13 @@ public class DocumentationUnitTransformer {
     List<PendingDecisionDTO> pendingDecisionDTOs = documentationUnitDTO.getPendingDecisions();
 
     if (pendingDecisionDTOs != null || ensuingDecisionDTOs != null) {
-      EnsuingDecision[] ensuingDecisions = new EnsuingDecision[ensuingDecisionDTOs.size()];
-      for (EnsuingDecisionDTO currentDTO : ensuingDecisionDTOs) {
-        ensuingDecisions[currentDTO.getRank() - 1] =
-            EnsuingDecisionTransformer.transformToDomain(currentDTO);
+      EnsuingDecision[] ensuingDecisions =
+          new EnsuingDecision[ensuingDecisionDTOs.size() + pendingDecisionDTOs.size()];
+      if (ensuingDecisionDTOs != null) {
+        for (EnsuingDecisionDTO currentDTO : ensuingDecisionDTOs) {
+          ensuingDecisions[currentDTO.getRank() - 1] =
+              EnsuingDecisionTransformer.transformToDomain(currentDTO);
+        }
       }
 
       if (pendingDecisionDTOs != null) {
