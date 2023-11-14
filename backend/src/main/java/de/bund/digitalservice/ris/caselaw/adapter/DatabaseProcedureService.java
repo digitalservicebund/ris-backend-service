@@ -4,14 +4,16 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumenta
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitSearchRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseProcedureLinkRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseProcedureRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ProcedureLinkDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationUnitSearchEntryTransformer;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationUnitTransformer;
+import de.bund.digitalservice.ris.caselaw.adapter.transformer.ProcedureTransformer;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitListEntry;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitSearchEntry;
 import de.bund.digitalservice.ris.caselaw.domain.Procedure;
 import de.bund.digitalservice.ris.caselaw.domain.ProcedureService;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -36,44 +38,55 @@ public class DatabaseProcedureService implements ProcedureService {
   }
 
   @Override
+  @Transactional(transactionManager = "jpaTransactionManager")
   public Page<Procedure> search(
       Optional<String> query, DocumentationOffice documentationOffice, Pageable pageable) {
-    return repository
-        .findByLabelContainingAndDocumentationOffice(
-            query, documentationOfficeRepository.findByLabel(documentationOffice.label()), pageable)
+
+    DocumentationOfficeDTO documentationOfficeDTO =
+        documentationOfficeRepository.findByAbbreviation(documentationOffice.abbreviation());
+
+    return query
         .map(
-            dto ->
-                Procedure.builder()
-                    .label(dto.getLabel())
-                    .documentUnitCount(
-                        linkRepository.countLatestProcedureLinksByProcedure(dto.getId()))
-                    .createdAt(dto.getCreatedAt())
-                    .build());
+            queryString ->
+                repository.findAllByLabelContainingAndDocumentationOffice(
+                    queryString, documentationOfficeDTO, pageable))
+        .orElse(repository.findAllByDocumentationOffice(documentationOfficeDTO, pageable))
+        .map(ProcedureTransformer::transformToDomain);
+
+    //    return repository
+    //        .findByLabelContainingAndDocumentationOffice(
+    //            query,
+    //
+    // documentationOfficeRepository.findByAbbreviation(documentationOffice.abbreviation()),
+    //            pageable);
   }
 
   @Override
-  public List<DocumentationUnitSearchEntry> getDocumentUnits(
-      String procedureLabel, DocumentationOffice documentationOffice) {
-    return linkRepository
-        .findLatestProcedureLinksByProcedure(
-            repository
-                .findByLabelAndDocumentationOffice(
-                    procedureLabel,
-                    documentationOfficeRepository.findByLabel(documentationOffice.label()))
-                .getId())
-        .stream()
-        .map(ProcedureLinkDTO::getDocumentationUnitId)
-        .map(documentUnitRepository::findById)
-        .filter(Optional::isPresent)
-        .map(Optional::get)
-        .map(DocumentationUnitSearchEntryTransformer::transferDTO)
-        .toList();
+  public List<DocumentUnitListEntry> getDocumentUnits(UUID procedureId) {
+    return repository
+        .findById(procedureId)
+        .map(
+            procedureDTO ->
+                procedureDTO.getDocumentationUnits().stream()
+                    .map(DocumentationUnitTransformer::transformToMetaDomain)
+                    .toList())
+        .orElse(null);
+    //    return linkRepository
+    //        .findLatestProcedureLinksByProcedure(
+    //            repository
+    //                .findByLabelAndDocumentationOffice(
+    //                    procedureLabel,
+    //                    documentationOfficeRepository.findByAbbreviation(
+    //                        documentationOffice.abbreviation()))
+    //                .getId())
+    //        .stream()
+    //        .map(ProcedureLinkDTO::getDocumentationUnitDTO)
+    //        .map(DocumentationUnitTransformer::transformToDomain)
+    //        .toList();
   }
 
   @Override
-  @Transactional(transactionManager = "jpaTransactionManager")
-  public void delete(String procedureLabel, DocumentationOffice documentationOffice) {
-    repository.deleteByLabelAndDocumentationOffice(
-        procedureLabel, documentationOfficeRepository.findByLabel(documentationOffice.label()));
+  public void delete(UUID procedureId) {
+    repository.deleteById(procedureId);
   }
 }

@@ -41,9 +41,13 @@ test.describe("court", () => {
         await page
           .locator("[aria-label='Fehlerhaftes Gericht anzeigen']")
           .click()
-        await page
-          .locator("[aria-label='Fehlerhaftes Gericht']")
-          .type("incorrectCourt1")
+
+        await page.locator("[aria-label='Fehlerhaftes Gericht']").type("abc")
+
+        await expect(
+          page.locator("[aria-label='Fehlerhaftes Gericht']"),
+        ).toHaveValue("abc")
+
         await page.keyboard.press("Enter")
       },
       page,
@@ -53,7 +57,7 @@ test.describe("court", () => {
     await page.reload()
 
     await page.locator("[aria-label='Fehlerhaftes Gericht anzeigen']").click()
-    await expect(page.locator("text=IncorrectCourt1").first()).toBeVisible()
+    await expect(page.locator("text=abc").first()).toBeVisible()
   })
 
   test("open incorrect court field, input two, save, reload, remove first, save and reload", async ({
@@ -91,7 +95,7 @@ test.describe("court", () => {
         await expect(page.locator("text=IncorrectCourt2")).toBeVisible()
 
         await page
-          .locator(":text('IncorrectCourt1') + button[aria-label='Löschen']")
+          .locator(":text('incorrectCourt1') + button[aria-label='Löschen']")
           .click()
       },
       page,
@@ -106,7 +110,7 @@ test.describe("court", () => {
 
   test("test court dropdown", async ({ page, documentNumber }) => {
     await navigateToCategories(page, documentNumber)
-    const totalCourts = 3925
+    const totalCourts = 4053
 
     // on start: closed dropdown, no input text
     await waitForInputValue(page, "[aria-label='Gericht']", "")
@@ -126,7 +130,7 @@ test.describe("court", () => {
     // type search string: 2 results for "bayern"
     await page.locator("[aria-label='Gericht']").fill("bayern")
     await waitForInputValue(page, "[aria-label='Gericht']", "bayern")
-    await expect(page.locator("[aria-label='dropdown-option']")).toHaveCount(2)
+    await expect(page.locator("[aria-label='dropdown-option']")).toHaveCount(3)
 
     // use the clear icon
     await page.locator("[aria-label='Auswahl zurücksetzen']").click()
@@ -144,7 +148,7 @@ test.describe("court", () => {
 
     // open dropdown again by typing a search string
     await page.locator("[aria-label='Gericht']").fill("bayern")
-    await expect(page.locator("[aria-label='dropdown-option']")).toHaveCount(2)
+    await expect(page.locator("[aria-label='dropdown-option']")).toHaveCount(3)
     // first search result displays a revoked string
     await expect(page.locator("text=aufgehoben seit: 1973")).toBeVisible()
 
@@ -206,7 +210,7 @@ test.describe("court", () => {
     await expect(page.locator("text=Region")).toBeVisible()
 
     // region was set by the backend based on state database table
-    await waitForInputValue(page, "[aria-label='Region']", "Baden-Württemberg")
+    await waitForInputValue(page, "[aria-label='Region']", "BW")
 
     await waitForSaving(
       async () => {

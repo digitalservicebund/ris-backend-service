@@ -10,19 +10,21 @@ import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.DataSource;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitNorm;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatus;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
+import de.bund.digitalservice.ris.caselaw.domain.NormReference;
+import de.bund.digitalservice.ris.caselaw.domain.PreviousDecision;
 import de.bund.digitalservice.ris.caselaw.domain.Procedure;
-import de.bund.digitalservice.ris.caselaw.domain.ProceedingDecision;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.Texts;
-import de.bund.digitalservice.ris.caselaw.domain.lookuptable.court.Court;
+import de.bund.digitalservice.ris.caselaw.domain.court.Court;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw.FieldOfLaw;
 import de.bund.digitalservice.ris.domain.export.juris.JurisXmlExporter;
 import java.lang.reflect.Field;
 import java.time.Instant;
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
@@ -53,26 +55,25 @@ class JurisXmlExporterWrapperIntegrationTest {
         CoreData.builder()
             .fileNumbers(List.of("fileNumber1", "fileNumber2"))
             .deviatingFileNumbers(List.of("deviatingFileNumber1", "deviatingFileNumber2"))
-            .court(new Court("courtType", null, null, null))
+            .court(new Court(UUID.randomUUID(), "courtType", null, null, null))
             .ecli("ecli")
             .deviatingEclis(List.of("dev-ecli-1", "dev-ecli-2"))
             .documentType(
                 DocumentType.builder().jurisShortcut("category").label("category123").build())
             .ecli("ecli")
-            .decisionDate(Instant.parse("2021-01-01T00:00:00Z"))
+            .decisionDate(LocalDate.parse("2021-01-01"))
             .deviatingDecisionDates(
-                List.of(
-                    Instant.parse("2021-01-01T00:00:00Z"), Instant.parse("2021-01-02T00:00:00Z")))
+                List.of(LocalDate.parse("2021-01-01"), LocalDate.parse("2021-01-02")))
             .build();
 
     Texts texts = Texts.builder().decisionName("decisionName").build();
 
-    List<ProceedingDecision> proceedingDecisions =
+    List<PreviousDecision> previousDecisions =
         List.of(
-            ProceedingDecision.builder()
+            PreviousDecision.builder()
                 .uuid(UUID.randomUUID())
-                .court(new Court("courtType", "courtPlace", "courtLabel", null))
-                .decisionDate(Instant.parse("2020-05-06T00:00:00Z"))
+                .court(new Court(UUID.randomUUID(), "courtType", "courtPlace", "courtLabel", null))
+                .decisionDate(LocalDate.parse("2020-05-06"))
                 .dateKnown(true)
                 .fileNumber("fileNumber")
                 .documentType(
@@ -84,14 +85,14 @@ class JurisXmlExporterWrapperIntegrationTest {
             .uuid(TEST_UUID)
             .documentNumber(documentNr)
             .coreData(coreData)
-            .proceedingDecisions(proceedingDecisions)
+            //            .proceedingDecisions(proceedingDecisions)
             .texts(texts)
             .build();
 
     encryptedXml = jurisXmlExporter.generateEncryptedXMLString(documentUnit);
 
     assertEquals(
-        "hoj9Xi74aXi9dPWMdaJm3noJt/m8BEO8DAYMRnMGQvpxxtnuRDwB+x8bVG6O0BTpTokyk+hWClr6pwQ5Bm5Xj7n5CUPU7L1LxgQOake4IDv3U9KN0Ucqu3G1lFcZMlZcU6HuBHlFojDNxw/GOxqumrLLqoTKsMI/c5vHmQuwQt36ss7raPKw2wf6dM7GfHGeheclptyuXQgfSBrMwXVJv7kwfY5dWJ1+FJxBQsl4gDDdoXkCil9wJeZeOTKXFI0zOQUC2m19Q5+ro8jE3RKMi5LbLncOv1UJaG/F4S5I1WxRvswpWXDkj6jXPg61okdtggCQ/t1a0So3OAru/xVM8WItbYH16u5uN41/E34zQC1A7z0eVEI9N1QOyur30k7blYFtdNYhFsVQrJgOKUWhNgzt4gbqJq+wxh38kQd3/DDuJnMM6KFUI0nTsurW3FMWLGty9o/hMR+CWOgDG0ZoD6o4SW9jp8iDNvSpBeHPBRy66IbGlz/tDdmbBHn0IyW3Yw/v8tF9bYOCDFnRgybLo2ZB5rgyvgEceBfBdCknDr4mpfW1AM+nP46BIYg9uU47o/35ZPwHfjL+jY7fR3uhaa0gaDQAFCEjmV7VRB9OQ/3Aqb832kdiRNs4iQ52nGo929PwwMM27D+XFIL5BPjEuLWnkn2WoMrbf9x1GCKFK59qIjEUsHYYblzeij0BRMwm8KMVQ+FqBNLaoDBpLoU7S/BEvD1KYgDgNS7mZ9jQMtabAAXUIgtopMJlm0vNXkGOEb/PmnumHRM6SP1DIRMRafj8gtBupPi+gOTh5k2GBNPqCAVIgipLVTt3a9winZcYC5D5qz4C44zxmwGaymelXql6qQWaYwuY66Arc30vmyMU6LQSMain0I9li5DlRLGBhMk2eD+S9o2YPk7o0hrj3n+9HlQTiILLDseX6iWSn2nFtuU3NzEkwPNmeV4WTQdO+kUP6l4UTGpJcBi3JP3qbbuwQqrkq9oFcMPQi4i0yLWdDQ07NlbQn4/t8XygvwCeyeCFbQuZYplSYen7j1NGQRK273ZE8uQ5gs45exV/P3K308LnwBOShIpveWhIzF2AzXI7YRiFshcdW2H1q4FOby9A4obIvuMsOiTtrw5hzXAfnxceJ98yDLYKnTfgc8E6myWl4Ub+gB8OP2HmKiUvmiuE+SKfxMBoWNk8132Ttgcy3nYeqdQGdgHVrLAfVwfDZ+JSPyMlDvVaFGA9QdEbBMnE5ux3mEzIHaz8zKkbqWNzJw/TV1MUsRO7ylOSE4qdgBLxOn81hyY00T8uHAKxxxEgDU2LWps+gwceqsWEgb1z0wv2NK3EUaVRerRJXhJJp8c4OVaoXOj7jcCrvECft3mWYDrSsYS5px8IpJAcU4xslSaxf3DJ6CTQdWiSkHD1+hQ4P3S702NRnsMkl55PatJNzLtVmMDFW2h512X5K2R24Ne0a93FQuYIwEhB8Ws2lFMEJ94OEzlYVCRauXEL6JQcskLNBfyZQcjk8oiIYtiiQt4B8E8P472QomK8/J+C88sCwLUzVh9D5RqPxSWC5nxiTn3cleBEEzuBWNUqYYGZ49C+Chtfd7vG/gXepm0EDIuK8IFIFotar5REt4y03IrTRYsYZPMVVI4y67KFQP7D/y/3L3hY2xLguY3U46PRnsNwAVSeUakkfuAGXxbzYDr5BTg+S32IbRSfMYBH/rPL2+z6/tMzZglAdwNSr9ttlRdLA10VDqieldQ+aS7f3HmWYDrSsYS5px8IpJAcU4yEb+qjRozQJZH2UvBQpSZ1IKpS1ohRVCYdUv+tZK3t1EEDo4twezrxcvbV+MBHOOVgXm1WkYfKlZYhZL1b/s/aQ2bD0FL2WavWOOE1evnzHsE6vj9iP7D2qQc4SljY00WZ49C+Chtfd7vG/gXepm0Eu37CpBVg7tfBzbwevHOO/h4RHaJzXDnxpuLpGF//Lp1nq0lA6Pl+yCv5vQxXBATD1hks1/QLDIU7AHh/nAF9XJDodAefzH0ijNInVJZ3XjpD8/e1mw6uSxzVzMuZIi6Z0nccJNnufHx1qmIVzc0tq8ShYwsMCieqM6KNwz+1agGDsn4sr0FU7DB6FIgqi4kjlKbN2N5aPnTqtaKYznrxHw+fsmm3KmiHZPzLsmXh18uYm4NTLEK4IXiYWMwbMPK3L0Dihsi+4yw6JO2vDmHNcNScekmBxgaVz3oXODNog6m63MbhS/0ky7mw/MxWwJlcFEee8vL4ahiAaCoo4PU98XjMSYkS1ab2d9S0w/R87b7KKJq/4r54gtfgnPdma+Nn",
+        "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",
         encryptedXml);
   }
 
@@ -103,7 +104,6 @@ class JurisXmlExporterWrapperIntegrationTest {
         DocumentUnit.builder()
             .uuid(TEST_UUID)
             .documentNumber(documentNr)
-            .creationtimestamp(Instant.parse("2021-01-01T00:00:00Z"))
             .fileuploadtimestamp(Instant.parse("2021-01-01T00:00:00Z"))
             .s3path("s3path")
             .filetype("filetype")
@@ -134,11 +134,10 @@ class JurisXmlExporterWrapperIntegrationTest {
             .ecli("ecli")
             .deviatingEclis(List.of("dev-ecli-1", "dev-ecli-2"))
             .appraisalBody("appraisalBody")
-            .decisionDate(Instant.parse("2021-01-01T00:00:00Z"))
+            .decisionDate(LocalDate.parse("2021-01-01"))
             .legalEffect("legalEffect")
             .inputType("inputType")
-            .documentationOffice(
-                DocumentationOffice.builder().label("fooOffice").label("FO").build())
+            .documentationOffice(DocumentationOffice.builder().abbreviation("fooOffice").build())
             .region("region")
             .build();
     Texts texts =
@@ -153,14 +152,13 @@ class JurisXmlExporterWrapperIntegrationTest {
             .decisionReasons("decisionReasons")
             .build();
 
-    List<ProceedingDecision> proceedingDecisions =
+    List<PreviousDecision> previousDecisions =
         List.of(
-            ProceedingDecision.builder()
+            PreviousDecision.builder()
                 .uuid(UUID.randomUUID())
                 .documentNumber("documentNumber")
-                .dataSource(DataSource.NEURIS)
-                .court(new Court("courtType", "courtPlace", "courtLabel", null))
-                .decisionDate(Instant.parse("2020-04-05T00:00:00Z"))
+                .court(new Court(UUID.randomUUID(), "courtType", "courtPlace", "courtLabel", null))
+                .decisionDate(LocalDate.parse("2020-04-05"))
                 .dateKnown(true)
                 .fileNumber("fileNumber")
                 .documentType(
@@ -173,25 +171,25 @@ class JurisXmlExporterWrapperIntegrationTest {
             .fieldsOfLaw(
                 List.of(
                     FieldOfLaw.builder()
-                        .id(1L)
+                        .id(UUID.randomUUID())
                         .identifier("SF-01")
                         .text("field of law text")
                         .build()))
-            .norms(List.of(DocumentUnitNorm.builder().singleNorm("01").build()))
+            .norms(List.of(NormReference.builder().singleNorm("01").build()))
             .build();
 
     DocumentUnit documentUnit =
         DocumentUnit.builder()
             .uuid(TEST_UUID)
             .documentNumber(documentNr)
-            .creationtimestamp(Instant.parse("2021-01-01T00:00:00Z"))
             .fileuploadtimestamp(Instant.parse("2021-01-01T00:00:00Z"))
             .dataSource(DataSource.NEURIS)
             .s3path("s3path")
             .filetype("filetype")
             .filename("filename")
             .coreData(coreData)
-            .proceedingDecisions(proceedingDecisions)
+            .previousDecisions(previousDecisions)
+            .ensuingDecisions(new ArrayList<>())
             .texts(texts)
             .contentRelatedIndexing(indexing)
             .status(
@@ -207,10 +205,10 @@ class JurisXmlExporterWrapperIntegrationTest {
         assertThat(field).hasNoNullFieldsOrProperties();
       if (field.getType().equals(List.class)) {
         field.setAccessible(true);
-        List<ProceedingDecision> previousDecisionsList =
-            (List<ProceedingDecision>) field.get(documentUnit);
-        for (ProceedingDecision proceedingDecision : previousDecisionsList) {
-          assertThat(proceedingDecision).hasNoNullFieldsOrProperties();
+        List<PreviousDecision> previousDecisionsList =
+            (List<PreviousDecision>) field.get(documentUnit);
+        for (PreviousDecision previousDecision : previousDecisionsList) {
+          assertThat(previousDecision).hasNoNullFieldsOrProperties();
         }
       }
     }

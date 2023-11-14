@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 /** */
@@ -34,5 +35,6 @@ public interface DatabaseDocumentTypeRepository extends JpaRepository<DocumentTy
               + "FROM label_added "
               + "WHERE concat LIKE UPPER('%'||:searchStr||'%') AND document_category_id = :category "
               + "ORDER BY weight, concat")
-  List<DocumentTypeDTO> findCaselawBySearchStrAndCategory(String searchStr, UUID category);
+  List<DocumentTypeDTO> findCaselawBySearchStrAndCategory(
+      @Param("searchStr") String searchStr, @Param("category") UUID category);
 }

@@ -49,7 +49,6 @@ import org.mockito.Mockito;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @ExtendWith(SpringExtension.class)
@@ -88,7 +87,7 @@ class JurisXmlExporterResponseProcessorTest {
     when(wrapperFactory.getResponsibleWrapper(processMessage))
         .thenReturn(Optional.of(processMessageWrapper));
 
-    when(reportRepository.saveAll(any())).thenReturn(Flux.empty());
+    when(reportRepository.saveAll(any())).thenReturn(Collections.emptyList());
     when(statusService.update(anyString(), any(DocumentUnitStatus.class))).thenReturn(Mono.empty());
     when(statusService.getLatestIssuerAddress(DOCUMENT_NUMBER))
         .thenReturn(Mono.just("test@digitalservice.bund.de"));

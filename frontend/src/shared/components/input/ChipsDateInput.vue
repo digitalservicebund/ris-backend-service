@@ -40,13 +40,22 @@ watch(
   },
 )
 
+watch(
+  () => props.modelValue,
+  (is) => {
+    chips.value = is
+      ? is.map((value) => dayjs(value, "YYYY-MM-DD", true).format("DD.MM.YYYY"))
+      : []
+  },
+)
+
 function updateModelValue() {
   emit(
     "update:modelValue",
     chips.value.length === 0
       ? undefined
       : chips.value.map((value) =>
-          dayjs(value, "DD.MM.YYYY", true).toISOString(),
+          dayjs(value, "DD.MM.YYYY", true).format("YYYY-MM-DD"),
         ),
   )
 }

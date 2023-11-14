@@ -11,7 +11,7 @@ import de.bund.digitalservice.ris.caselaw.domain.XmlExporter;
 import de.bund.digitalservice.ris.caselaw.domain.XmlPublication;
 import de.bund.digitalservice.ris.caselaw.domain.XmlPublicationRepository;
 import de.bund.digitalservice.ris.caselaw.domain.XmlResultObject;
-import de.bund.digitalservice.ris.caselaw.domain.lookuptable.court.Court;
+import de.bund.digitalservice.ris.caselaw.domain.court.Court;
 import java.time.Clock;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -45,10 +45,10 @@ public class XmlEMailPublishService implements EmailPublishService {
   @Value("${mail.exporter.senderAddress:export.test@neuris}")
   private String senderAddress;
 
+  @Autowired private Environment env;
+
   @Value("${mail.exporter.jurisUsername:invalid-user}")
   private String jurisUsername;
-
-  @Autowired private Environment env;
 
   public XmlEMailPublishService(
       XmlExporter xmlExporter, HttpMailSender mailSender, XmlPublicationRepository repository) {
@@ -66,24 +66,22 @@ public class XmlEMailPublishService implements EmailPublishService {
       return Mono.error(new DocumentUnitPublishException("Couldn't generate xml.", ex));
     }
 
-    return generateMailSubject(documentUnit)
-        .map(
-            mailSubject ->
-                generateXmlPublication(documentUnit.uuid(), receiverAddress, mailSubject, xml))
-        .doOnNext(this::generateAndSendMail)
-        .flatMap(this::savePublishInformation)
-        .doOnError(ex -> LOGGER.error("Error by generation of mail message", ex));
+    String mailSubject = generateMailSubject(documentUnit);
+
+    XmlPublication xmlPublication =
+        generateXmlPublication(documentUnit.uuid(), receiverAddress, mailSubject, xml);
+    generateAndSendMail(xmlPublication);
+    return Mono.just(savePublishInformation(xmlPublication));
   }
 
   @Override
   public Flux<Publication> getPublications(UUID documentUnitUuid) {
-    return repository.getPublicationsByDocumentUnitUuid(documentUnitUuid);
+    return Flux.fromIterable(repository.getPublicationsByDocumentUnitUuid(documentUnitUuid));
   }
 
-  private Mono<String> generateMailSubject(DocumentUnit documentUnit) {
+  private String generateMailSubject(DocumentUnit documentUnit) {
     if (documentUnit.documentNumber() == null) {
-      return Mono.error(
-          new DocumentUnitPublishException("No document number has set in the document unit."));
+      throw new DocumentUnitPublishException("No document number has set in the document unit.");
     }
 
     String deliveryDate =
@@ -99,7 +97,7 @@ public class XmlEMailPublishService implements EmailPublishService {
     subject += " vg=";
     subject += documentUnit.documentNumber();
 
-    return Mono.just(subject);
+    return subject;
   }
 
   private void generateAndSendMail(XmlPublication xmlPublication)
@@ -150,16 +148,20 @@ public class XmlEMailPublishService implements EmailPublishService {
         .build();
   }
 
-  private Mono<XmlPublication> savePublishInformation(XmlPublication xmlPublication) {
+  private XmlPublication savePublishInformation(XmlPublication xmlPublication) {
     if (xmlPublication.getStatusCode().equals("400")) {
-      return Mono.just(xmlPublication);
+      return xmlPublication;
     }
     return repository.save(xmlPublication);
   }
 
   private DocumentUnit getTestDocumentUnit(DocumentUnit documentUnit) {
     if (env.matchesProfiles("production")) {
-      return documentUnit;
+      return documentUnit.toBuilder()
+          .coreData(
+              Optional.ofNullable(documentUnit.coreData())
+                  .orElseGet(() -> CoreData.builder().build()))
+          .build();
     }
     return documentUnit.toBuilder()
         .coreData(

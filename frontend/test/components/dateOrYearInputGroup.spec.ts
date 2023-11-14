@@ -78,7 +78,7 @@ describe("date/year field", () => {
       await user.type(dateInputField, "12.05.2020")
       await rerender({ dateValue })
       expect(dateInputField).toHaveValue("12.05.2020")
-      expect(dateValue).toBe("2020-05-12T00:00:00.000Z")
+      expect(dateValue).toBe("2020-05-12")
     })
 
     it("user can delete the date input", async () => {

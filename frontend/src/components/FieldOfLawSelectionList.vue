@@ -1,33 +1,51 @@
 <script lang="ts" setup>
+import { ref, watch } from "vue"
 import FieldOfLawListEntry from "./FieldOfLawListEntry.vue"
 import { FieldOfLawNode } from "@/domain/fieldOfLaw"
 
 const props = defineProps<{
-  selectedFieldsOfLaw: FieldOfLawNode[]
+  modelValue: FieldOfLawNode[]
 }>()
 
 const emit = defineEmits<{
-  "remove-from-list": [identifier: string]
   "node-clicked": [identifier: string]
   "linkedField:clicked": [identifier: string]
+  "update:modelValue": [value: FieldOfLawNode[]]
 }>()
+
+const localModelValue = ref<FieldOfLawNode[]>(props.modelValue)
+
+watch(
+  props,
+  () => {
+    localModelValue.value = props.modelValue
+  },
+  { immediate: true },
+)
+
+function handleRemove(item: FieldOfLawNode) {
+  localModelValue.value = localModelValue.value?.filter(
+    (entry) => entry.identifier !== item.identifier,
+  )
+  emit("update:modelValue", localModelValue.value)
+}
 </script>
 
 <template>
   <div class="pt-20">
-    <div v-if="!props.selectedFieldsOfLaw.length">
-      Die Liste ist aktuell leer
-    </div>
+    <div v-if="!modelValue.length">Die Liste ist aktuell leer</div>
     <div v-else>
       <hr class="mt-20 w-full border-blue-500" />
       <FieldOfLawListEntry
-        v-for="fieldOfLaw in props.selectedFieldsOfLaw"
+        v-for="fieldOfLaw in localModelValue"
         :key="fieldOfLaw.identifier"
         :field-of-law="fieldOfLaw"
         show-bin
-        @linked-field:clicked="(identifier) => emit('node-clicked', identifier)"
+        @linked-field:clicked="
+          (identifier) => emit('linkedField:clicked', identifier)
+        "
         @node-clicked="emit('node-clicked', fieldOfLaw.identifier)"
-        @remove-from-list="emit('remove-from-list', fieldOfLaw.identifier)"
+        @remove-from-list="handleRemove(fieldOfLaw)"
       />
     </div>
   </div>

@@ -178,6 +178,7 @@ watch(props, () => {
       class="mr-28"
       :disabled="norm.isEmpty"
       label="Übernehmen"
+      size="small"
       @click="addNormReference"
     />
   </div>

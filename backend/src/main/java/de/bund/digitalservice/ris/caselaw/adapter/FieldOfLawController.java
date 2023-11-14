@@ -3,6 +3,7 @@ package de.bund.digitalservice.ris.caselaw.adapter;
 import de.bund.digitalservice.ris.OpenApiConfiguration;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw.FieldOfLaw;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -12,7 +13,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @RestController
@@ -36,14 +36,14 @@ public class FieldOfLawController {
 
   @GetMapping(value = "/search-by-identifier")
   @PreAuthorize("isAuthenticated()")
-  public Flux<FieldOfLaw> getFieldsOfLawByIdentifierSearch(
+  public Mono<List<FieldOfLaw>> getFieldsOfLawByIdentifierSearch(
       @RequestParam("q") Optional<String> searchStr) {
     return service.getFieldsOfLawByIdentifierSearch(searchStr);
   }
 
   @GetMapping(value = "{identifier}/children")
   @PreAuthorize("isAuthenticated()")
-  public Flux<FieldOfLaw> getChildrenOfFieldOfLaw(@PathVariable String identifier) {
+  public Mono<List<FieldOfLaw>> getChildrenOfFieldOfLaw(@PathVariable String identifier) {
     return service.getChildrenOfFieldOfLaw(identifier);
   }
 

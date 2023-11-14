@@ -3,16 +3,17 @@ import { ref } from "vue"
 import ComboboxInput from "@/components/ComboboxInput.vue"
 import { FieldOfLawNode } from "@/domain/fieldOfLaw"
 import ComboboxItemService from "@/services/comboboxItemService"
+import { ComboboxInputModelType } from "@/shared/components/input/types"
 
 const emit = defineEmits<{
-  "add-to-list": [identifier: string]
+  "add-to-list": [item: FieldOfLawNode]
 }>()
 const fieldOfLawNode = ref()
 
-function handleUpdateModelValue(item: FieldOfLawNode) {
+function handleUpdateModelValue(item: ComboboxInputModelType | undefined) {
   if (!item) return
   fieldOfLawNode.value = item
-  emit("add-to-list", item.identifier)
+  emit("add-to-list", item as FieldOfLawNode)
 }
 </script>
 
