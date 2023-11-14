@@ -35,6 +35,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.core.publisher.Flux;
@@ -48,6 +49,7 @@ import reactor.test.StepVerifier;
       "mail.exporter.jurisUsername=test-user",
       "mail.exporter.senderAddress=export@neuris"
     })
+@ActiveProfiles(profiles = {"uat"})
 class XmlEMailPublishServiceTest {
   private static final String RECEIVER_ADDRESS = "test-to@mail.com";
   private static final String SENDER_ADDRESS = "export@neuris";

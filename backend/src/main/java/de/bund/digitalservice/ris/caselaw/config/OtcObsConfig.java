@@ -27,7 +27,7 @@ public class OtcObsConfig {
   private String secretAccessKey;
 
   @Bean
-  @Profile({"production", "staging"})
+  @Profile({"staging", "production", "uat"})
   public S3AsyncClient amazonS3Async() throws URISyntaxException {
     SdkAsyncHttpClient httpClient =
         NettyNioAsyncHttpClient.builder().writeTimeout(Duration.ZERO).maxConcurrency(64).build();
@@ -43,7 +43,7 @@ public class OtcObsConfig {
   }
 
   @Bean
-  @Profile({"!production & !staging"})
+  @Profile({"!production & !staging & !uat"})
   public S3AsyncClient amazonS3AsyncMock() {
     return new S3AsyncMockClient();
   }

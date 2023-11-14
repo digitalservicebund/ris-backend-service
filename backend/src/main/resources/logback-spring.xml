@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
-    <springProfile name="!(staging | production)">
-        <include resource="org/springframework/boot/logging/logback/base.xml" />
+    <springProfile name="!(staging | production | uat)">
+        <include resource="org/springframework/boot/logging/logback/base.xml"/>
     </springProfile>
-    <springProfile name="staging,production">
-        <include resource="org/springframework/boot/logging/logback/base.xml" />
+    <springProfile name="staging,production,uat">
+        <include resource="org/springframework/boot/logging/logback/base.xml"/>
         <!--
         <springProperty name="lokiUrl" source="neuris.loki.url"/>
         <appender name="LOKI" class="com.github.loki4j.logback.Loki4jAppender">
@@ -31,7 +31,7 @@
 
         <root level="INFO">
             <!-- <appender-ref ref="LOKI" /> -->
-            <appender-ref ref="SENTRY" />
+            <appender-ref ref="SENTRY"/>
         </root>
     </springProfile>
 </configuration>

@@ -34,17 +34,13 @@ public class FeatureToggleConfig {
   }
 
   @Bean
-  @Profile({"production", "staging"})
+  @Profile({"production", "uat", "staging"})
   public FeatureToggleService featureToggleService(ConfigurableEnvironment environment) {
     String env;
-    if (Arrays.stream(environment.getActiveProfiles()).anyMatch("production"::equals)) {
-      String sentryEnvironment =
-          (String) environment.getSystemEnvironment().get("SENTRY_ENVIRONMENT");
-      if (sentryEnvironment != null && sentryEnvironment.equals("uat")) {
-        env = "uat";
-      } else {
-        env = "prod";
-      }
+    if (Arrays.asList(environment.getActiveProfiles()).contains("production")) {
+      env = "prod";
+    } else if (Arrays.asList(environment.getActiveProfiles()).contains("uat")) {
+      env = "uat";
     } else {
       env = "dev";
     }
@@ -53,7 +49,7 @@ public class FeatureToggleConfig {
   }
 
   @Bean
-  @Profile({"!production & !staging"})
+  @Profile({"!production & !staging & !uat"})
   public FeatureToggleService featureToggleServiceMock() {
     return new FeatureToggleService() {
       @Override

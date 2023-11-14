@@ -25,20 +25,20 @@ public class JurisConfig {
   private String apiKey;
 
   @Bean
-  @Profile({"production"})
+  @Profile({"production", "uat"})
   public HttpMailSender httpMailSender() {
     return new SendInBlueHttpMailSender(apiKey);
   }
 
   @Bean
-  @Profile({"production"})
+  @Profile({"production", "uat"})
   public MailStoreFactory mailStoreFactory() {
     return new ImapStoreFactory();
   }
 
   @Bean
   @Primary
-  @Profile({"!production"})
+  @Profile({"!production", "uat"})
   public JurisStub jurisStub() {
     return new JurisStub(mailboxUsername, mailboxPassword);
   }
