@@ -10,7 +10,9 @@ import ComboboxItemService from "@/services/comboboxItemService"
 import documentUnitService from "@/services/documentUnitService"
 import CheckboxInput from "@/shared/components/input/CheckboxInput.vue"
 import DateInput from "@/shared/components/input/DateInput.vue"
-import InputField from "@/shared/components/input/InputField.vue"
+import InputField, {
+  LabelPosition,
+} from "@/shared/components/input/InputField.vue"
 import TextButton from "@/shared/components/input/TextButton.vue"
 import TextInput from "@/shared/components/input/TextInput.vue"
 import Pagination, { Page } from "@/shared/components/Pagination.vue"
@@ -114,7 +116,12 @@ onMounted(() => {
 
 <template>
   <div>
-    <InputField id="regularCheckbox" v-slot="{ id }" label="Datum unbekannt">
+    <InputField
+      id="regularCheckbox"
+      v-slot="{ id }"
+      label="Datum unbekannt"
+      :label-position="LabelPosition.RIGHT"
+    >
       <CheckboxInput
         :id="id"
         v-model="previousDecision.dateUnknown"

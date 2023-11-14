@@ -5,6 +5,9 @@ import ExpandableContent from "./ExpandableContent.vue"
 import CodeSnippet from "@/components/CodeSnippet.vue"
 import ActiveCitation, { activeCitationLabels } from "@/domain/activeCitation"
 import DocumentUnit from "@/domain/documentUnit"
+import EnsuingDecision, {
+  ensuingDecisionFieldLabels,
+} from "@/domain/ensuingDecision"
 import NormReference, { normFieldLabels } from "@/domain/normReference"
 import PreviousDecision, {
   previousDecisionFieldLabels,
@@ -61,8 +64,8 @@ const missingCoreDataFields = ref(
   props.documentUnit.missingRequiredFields.map((field) => fieldLabels[field]),
 )
 
-//Required Proceeding Decision fields
-const missingProceedingDecisionFields = ref(
+//Required Previous Decision fields
+const missingPreviousDecisionFields = ref(
   props.documentUnit.previousDecisions
     ?.filter((previousDecision) => {
       return getMissingPreviousDecisionFields(previousDecision).length > 0
@@ -78,6 +81,26 @@ const missingProceedingDecisionFields = ref(
 function getMissingPreviousDecisionFields(previousDecision: PreviousDecision) {
   return previousDecision.missingRequiredFields.map(
     (field) => previousDecisionFieldLabels[field],
+  )
+}
+
+//Required Ensuing Decision fields
+const missingEnsuingDecisionFields = ref(
+  props.documentUnit.ensuingDecisions
+    ?.filter((ensuingDecision) => {
+      return getMissingEnsuingDecisionFields(ensuingDecision).length > 0
+    })
+    .map((ensuingDecision) => {
+      return {
+        identifier: ensuingDecision.renderDecision,
+        missingFields: getMissingEnsuingDecisionFields(ensuingDecision),
+      }
+    }),
+)
+
+function getMissingEnsuingDecisionFields(ensuingDecision: EnsuingDecision) {
+  return ensuingDecision.missingRequiredFields.map(
+    (field) => ensuingDecisionFieldLabels[field],
   )
 }
 
@@ -133,7 +156,8 @@ function getActiveCitationsFields(activeCitation: ActiveCitation) {
 const fieldsMissing = computed(() => {
   return (
     !!missingCoreDataFields.value.length ||
-    !!missingProceedingDecisionFields.value?.length ||
+    !!missingPreviousDecisionFields.value?.length ||
+    !!missingEnsuingDecisionFields.value?.length ||
     !!missingNormsFields.value?.length ||
     !!missingActiveCitationFields.value?.length
   )
@@ -166,16 +190,40 @@ const fieldsMissing = computed(() => {
               </li>
               <li
                 v-if="
-                  missingProceedingDecisionFields &&
-                  missingProceedingDecisionFields.length > 0
+                  missingPreviousDecisionFields &&
+                  missingPreviousDecisionFields.length > 0
                 "
                 class="ds-body-01-reg ml-[1rem] list-item"
               >
-                Rechtszug
+                Vorgehende Entscheidungen
                 <ul>
                   <li
-                    v-for="fields in missingProceedingDecisionFields"
-                    :key="missingProceedingDecisionFields.indexOf(fields)"
+                    v-for="fields in missingPreviousDecisionFields"
+                    :key="missingPreviousDecisionFields.indexOf(fields)"
+                    class="ds-body-01-reg ml-[1rem] list-item"
+                  >
+                    <div v-if="fields && fields.missingFields.length > 0">
+                      <span>{{ fields.identifier }}</span>
+                      -
+                      <span class="ds-label-02-bold">{{
+                        fields.missingFields.join(", ")
+                      }}</span>
+                    </div>
+                  </li>
+                </ul>
+              </li>
+              <li
+                v-if="
+                  missingEnsuingDecisionFields &&
+                  missingEnsuingDecisionFields.length > 0
+                "
+                class="ds-body-01-reg ml-[1rem] list-item"
+              >
+                Nachgehende Entscheidungen
+                <ul>
+                  <li
+                    v-for="fields in missingEnsuingDecisionFields"
+                    :key="missingEnsuingDecisionFields.indexOf(fields)"
                     class="ds-body-01-reg ml-[1rem] list-item"
                   >
                     <div v-if="fields && fields.missingFields.length > 0">
