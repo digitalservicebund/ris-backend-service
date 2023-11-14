@@ -1,17 +1,3 @@
-CREATE INDEX
-  IF NOT EXISTS norm_abbreviation_official_letter_gin_idx ON incremental_migration.norm_abbreviation USING gin (upper(official_letter_abbreviation) gin_trgm_ops);
-
-CREATE INDEX
-  IF NOT EXISTS norm_abbreviation_gin_idx ON incremental_migration.norm_abbreviation USING gin (upper(abbreviation) gin_trgm_ops);
-
-CREATE INDEX
-  IF NOT EXISTS norm_abbreviation_fs_idx ON incremental_migration.norm_abbreviation USING GIN (
-    to_tsvector(
-      'german',
-      coalesce(abbreviation, '') || ' ' || coalesce(official_long_title, '') || ' ' || coalesce(official_short_title, '') || ' ' || coalesce(official_letter_abbreviation, '')
-    )
-  );
-
 CREATE materialized VIEW IF NOT EXISTS
   norm_abbreviation_search_migration AS
 SELECT
