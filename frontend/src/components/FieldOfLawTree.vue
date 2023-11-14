@@ -9,30 +9,50 @@ import InputField, {
 } from "@/shared/components/input/InputField.vue"
 
 const props = defineProps<{
-  selectedNodes: FieldOfLawNode[]
+  modelValue: FieldOfLawNode[]
   clickedIdentifier: string
   showNorms: boolean
 }>()
 
 const emit = defineEmits<{
-  "add-to-list": [identifier: string]
-  "remove-from-list": [identifier: string]
+  "update:modelValue": [value: FieldOfLawNode[]]
   "reset-clicked-node": []
   "toggle-show-norms": []
   "linkedField:clicked": [identifier: string]
 }>()
 
+const localModelValue = ref<FieldOfLawNode[]>(props.modelValue)
 const root = ref(buildRoot())
 
 const clicked = computed(() => props.clickedIdentifier)
 watch(clicked, () => buildDirectPathTreeTo(clicked.value))
+watch(
+  props,
+  () => {
+    localModelValue.value = props.modelValue
+  },
+  { immediate: true },
+)
+
+watch(localModelValue, () => {
+  emit("update:modelValue", localModelValue.value)
+})
 
 function handleSelect(node: FieldOfLawNode) {
-  emit("add-to-list", node.identifier)
+  if (
+    !localModelValue.value?.find(
+      (entry) => entry.identifier === node.identifier,
+    )
+  ) {
+    localModelValue.value?.push(node)
+  }
 }
 
-function handleUnselect(identifier: string) {
-  emit("remove-from-list", identifier)
+function handleUnselect(node: FieldOfLawNode) {
+  localModelValue.value = localModelValue.value?.filter(
+    (entry) => entry.identifier !== node.identifier,
+  )
+  emit("update:modelValue", localModelValue.value)
 }
 
 function handleLinkedFieldClicked(identifier: string) {
@@ -81,11 +101,9 @@ const showNormsModelValue = computed({
     :key="root.identifier"
     :node="root"
     :selected="
-      props.selectedNodes.some(
-        ({ identifier }) => identifier === root.identifier,
-      )
+      localModelValue.some(({ identifier }) => identifier === root.identifier)
     "
-    :selected-nodes="selectedNodes"
+    :selected-nodes="localModelValue"
     :show-norms="showNorms"
     @linked-field:clicked="handleLinkedFieldClicked"
     @node:select="handleSelect"

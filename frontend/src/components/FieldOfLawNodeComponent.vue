@@ -16,9 +16,8 @@ interface Props {
 
 const props = defineProps<Props>()
 const emit = defineEmits<{
-  "node:toggle": [node: FieldOfLawNode]
   "node:select": [node: FieldOfLawNode]
-  "node:unselect": [identifier: string]
+  "node:unselect": [node: FieldOfLawNode]
   "linkedField:clicked": [identifier: string]
 }>()
 
@@ -33,7 +32,7 @@ function handleTokenClick(tokenContent: string) {
 }
 
 function canLoadMoreChildren() {
-  return node.value.childrenCount > node.value.children.length
+  return node.value.childrenCount > node.value.children?.length
 }
 
 async function handleToggle() {
@@ -97,9 +96,7 @@ async function handleToggle() {
           "
           class="ml-12 h-24 w-24 appearance-none rounded-sm border-2 align-top text-blue-800 outline-none outline-0 outline-offset-[-4px] outline-blue-800 hover:outline-2 focus:outline-2"
           @click="
-            selected
-              ? emit('node:unselect', node.identifier)
-              : emit('node:select', node)
+            selected ? emit('node:unselect', node) : emit('node:select', node)
           "
         >
           <!-- TODO: replace by checkmark component -->
@@ -136,7 +133,7 @@ async function handleToggle() {
         </div>
       </div>
     </div>
-    <div v-if="node.isExpanded && node.children.length">
+    <div v-if="node.isExpanded && node.children?.length">
       <FieldOfLawNodeComponent
         v-for="child in node.children"
         :key="child.identifier"

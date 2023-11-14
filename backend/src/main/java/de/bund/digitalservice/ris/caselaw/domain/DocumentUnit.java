@@ -13,14 +13,14 @@ public record DocumentUnit(
     UUID uuid,
     @Size(min = 13, max = 14, message = "documentNumber has to be 13 or 14 characters long")
         String documentNumber,
-    @PastOrPresent Instant creationtimestamp,
     @PastOrPresent Instant fileuploadtimestamp,
     DataSource dataSource,
     String s3path,
     String filetype,
     String filename,
     @Valid CoreData coreData,
-    List<ProceedingDecision> proceedingDecisions,
+    List<PreviousDecision> previousDecisions,
+    List<EnsuingDecision> ensuingDecisions,
     Texts texts,
     DocumentUnitStatus status,
     ContentRelatedIndexing contentRelatedIndexing) {}

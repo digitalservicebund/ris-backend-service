@@ -1,7 +1,7 @@
 package de.bund.digitalservice.ris.caselaw.adapter.transformer;
 
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.CourtDTO;
-import de.bund.digitalservice.ris.caselaw.domain.lookuptable.court.Court;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CourtDTO;
+import de.bund.digitalservice.ris.caselaw.domain.court.Court;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -10,22 +10,40 @@ public class CourtTransformer {
 
   private CourtTransformer() {}
 
-  public static Court transformDTO(CourtDTO courtDTO) {
-    String revoked = extractRevoked(courtDTO.getAdditional());
+  public static Court transformToDomain(CourtDTO courtDTO) {
+    if (courtDTO == null) return null;
 
-    if (courtDTO.getSuperiorcourt() != null
-        && courtDTO.getForeigncountry() != null
-        && courtDTO.getSuperiorcourt().equalsIgnoreCase("ja")
-        && courtDTO.getForeigncountry().equalsIgnoreCase("nein")) {
+    String revoked = extractRevoked(courtDTO.getAdditionalInformation());
 
-      return new Court(courtDTO.getCourttype(), null, courtDTO.getCourttype(), revoked);
+    if (Boolean.TRUE.equals(courtDTO.isSuperiorCourt())
+        && Boolean.TRUE.equals(!courtDTO.isForeignCourt())) {
+
+      return Court.builder()
+          .id(courtDTO.getId())
+          .type(courtDTO.getType())
+          .label(courtDTO.getType())
+          .revoked(revoked)
+          .build();
     }
 
-    return new Court(
-        courtDTO.getCourttype(),
-        courtDTO.getCourtlocation(),
-        courtDTO.getCourttype() + " " + courtDTO.getCourtlocation(),
-        revoked);
+    return Court.builder()
+        .id(courtDTO.getId())
+        .type(courtDTO.getType())
+        .location(courtDTO.getLocation())
+        .label(courtDTO.getType() + " " + courtDTO.getLocation())
+        .revoked(revoked)
+        .build();
+  }
+
+  public static CourtDTO transformToDTO(Court court) {
+    if (court == null) return null;
+
+    return CourtDTO.builder()
+        .id(court.id())
+        .type(court.type())
+        .location(court.location())
+        // Todo isSuperiorCourt, isForeignCourt, additionalInformation, jurisId?
+        .build();
   }
 
   private static String extractRevoked(String additional) {

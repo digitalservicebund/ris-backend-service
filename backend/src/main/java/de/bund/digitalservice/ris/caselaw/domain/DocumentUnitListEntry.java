@@ -1,8 +1,8 @@
 package de.bund.digitalservice.ris.caselaw.domain;
 
-import de.bund.digitalservice.ris.caselaw.domain.lookuptable.court.Court;
+import de.bund.digitalservice.ris.caselaw.domain.court.Court;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
-import java.time.Instant;
+import java.time.LocalDate;
 import java.util.UUID;
 import lombok.Builder;
 
@@ -10,8 +10,7 @@ import lombok.Builder;
 public record DocumentUnitListEntry(
     UUID uuid,
     String documentNumber,
-    Instant decisionDate,
-    DataSource dataSource,
+    LocalDate decisionDate,
     String fileName,
     String fileNumber,
     DocumentType documentType,

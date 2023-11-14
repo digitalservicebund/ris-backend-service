@@ -55,7 +55,7 @@ describe("NormReferenceEntry", () => {
       modelValue: {
         normAbbreviation: { id: "123", abbreviation: "ABC" },
         singleNorm: "12",
-        dateOfVersion: "2022-01-31T23:00:00Z",
+        dateOfVersion: "2022-01-31",
         dateOfRelevance: "2023",
       } as NormReference,
     })

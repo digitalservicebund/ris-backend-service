@@ -1,14 +1,12 @@
 <script lang="ts" setup>
 import { computed, onMounted, ref, watch } from "vue"
-import SearchResultList, {
-  SearchResults,
-} from "./proceedingDecisions/SearchResultList.vue"
+import SearchResultList, { SearchResults } from "./SearchResultList.vue"
 import ComboboxInput from "@/components/ComboboxInput.vue"
 import { useValidationStore } from "@/composables/useValidationStore"
 import values from "@/data/values.json"
 import ActiveCitation from "@/domain/activeCitation"
-import { CitationStyle } from "@/domain/citationStyle"
-import LinkedDocumentUnit from "@/domain/linkedDocumentUnit"
+import { CitationType } from "@/domain/citationType"
+import RelatedDocumentation from "@/domain/relatedDocumentation"
 import ComboboxItemService from "@/services/comboboxItemService"
 import documentUnitService from "@/services/documentUnitService"
 import DateInput from "@/shared/components/input/DateInput.vue"
@@ -34,21 +32,23 @@ const validationStore =
 
 const searchRunning = ref(false)
 
-const activeCitationStyle = computed({
+const activeCitationType = computed({
   get: () =>
-    activeCitation?.value?.citationStyle
+    activeCitation?.value?.citationType
       ? {
-          label: activeCitation.value.citationStyle.label,
-          value: activeCitation.value.citationStyle,
+          label: activeCitation.value.citationType.label,
+          value: activeCitation.value.citationType,
           additionalInformation:
-            activeCitation.value.citationStyle.jurisShortcut,
+            activeCitation.value.citationType.jurisShortcut,
         }
       : undefined,
   set: (newValue) => {
+    if (!newValue)
+      validationStore.add("Pflichtfeld nicht befüllt", "citationType")
     if (newValue?.label) {
-      activeCitation.value.citationStyle = { ...newValue }
+      activeCitation.value.citationType = { ...newValue }
     } else {
-      activeCitation.value.citationStyle = undefined
+      activeCitation.value.citationType = undefined
     }
   },
 })
@@ -61,10 +61,10 @@ async function search(page = 0) {
     ...activeCitation.value,
   })
 
-  if (activeCitationRef.citationStyle) {
-    delete activeCitationRef["citationStyle"]
+  if (activeCitationRef.citationType) {
+    delete activeCitationRef["citationType"]
   }
-  const response = await documentUnitService.searchByLinkedDocumentUnit(
+  const response = await documentUnitService.searchByRelatedDocumentation(
     page,
     30,
     activeCitationRef,
@@ -105,15 +105,15 @@ async function addActiveCitation() {
   emit("addEntry")
 }
 
-async function addActiveCitationFromSearch(decision: LinkedDocumentUnit) {
-  const newActiveCitationStyle = {
-    ...activeCitationStyle.value?.value,
-  } as CitationStyle
-  const decisionWithCitationStyle = new ActiveCitation({
+async function addActiveCitationFromSearch(decision: RelatedDocumentation) {
+  const newActiveCitationType = {
+    ...activeCitationType.value?.value,
+  } as CitationType
+  const decisionWithCitationType = new ActiveCitation({
     ...decision,
-    citationStyle: newActiveCitationStyle,
+    citationType: newActiveCitationType,
   })
-  emit("update:modelValue", decisionWithCitationStyle)
+  emit("update:modelValue", decisionWithCitationType)
   emit("addEntry")
   scrollToTop()
 }
@@ -143,12 +143,12 @@ watch(
   activeCitation,
   () => {
     if (
-      !activeCitation.value.citationStyleIsSet &&
+      !activeCitation.value.citationTypeIsSet &&
       !activeCitation.value.isEmpty
     ) {
-      validationStore.add("Pflichtfeld nicht befüllt", "citationStyle")
-    } else if (activeCitation.value.citationStyleIsSet) {
-      validationStore.remove("citationStyle")
+      validationStore.add("Pflichtfeld nicht befüllt", "citationType")
+    } else if (activeCitation.value.citationTypeIsSet) {
+      validationStore.remove("citationType")
     }
   },
   { deep: true },
@@ -157,30 +157,33 @@ watch(
 
 <template>
   <div>
-    <div
+    <!-- Todo implement linked logic  -->
+    <!-- <div
       v-if="activeCitation.hasForeignSource"
       class="ds-link-01-bold mb-24 underline"
     >
       {{ activeCitation.renderDecision }}
-    </div>
+    </div> -->
     <InputField
       id="activeCitationPredicate"
       v-slot="slotProps"
       class="mb-16 border-b-1 border-gray-400"
       label="Art der Zitierung *"
-      :validation-error="validationStore.getByField('citationStyle')"
+      :validation-error="validationStore.getByField('citationType')"
     >
       <ComboboxInput
         id="activeCitationPredicate"
-        v-model="activeCitationStyle"
+        v-model="activeCitationType"
         aria-label="Art der Zitierung"
         clear-on-choosing-item
         :has-error="slotProps.hasError"
-        :item-service="ComboboxItemService.getCitationStyles"
+        :item-service="ComboboxItemService.getCitationTypes"
         placeholder="Bitte auswählen"
       ></ComboboxInput>
     </InputField>
-    <div v-if="!activeCitation.hasForeignSource">
+    <!-- Todo implement linked logic  -->
+    <!-- <div v-if="!activeCitation.hasForeignSource"> -->
+    <div>
       <div class="flex justify-between gap-24">
         <InputField
           id="activeCitationCourt"
@@ -241,12 +244,14 @@ watch(
       </div>
     </div>
     <div>
+      <!-- Todo implement linked logic  -->
+      <!-- v-if="!activeCitation.hasForeignSource" -->
       <TextButton
-        v-if="!activeCitation.hasForeignSource"
         aria-label="Nach Entscheidung suchen"
         button-type="secondary"
         class="mr-28"
         label="Suchen"
+        size="small"
         @click="handleSearch"
       />
       <TextButton
@@ -254,6 +259,7 @@ watch(
         class="mr-28"
         :disabled="activeCitation.isEmpty"
         label="Übernehmen"
+        size="small"
         @click="addActiveCitation"
       />
     </div>

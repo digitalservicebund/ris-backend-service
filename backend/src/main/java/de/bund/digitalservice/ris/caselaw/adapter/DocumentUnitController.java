@@ -5,15 +5,16 @@ import de.bund.digitalservice.ris.caselaw.domain.ConverterService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitSearchEntry;
-import de.bund.digitalservice.ris.caselaw.domain.LinkedDocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.Publication;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationHistoryRecord;
+import de.bund.digitalservice.ris.caselaw.domain.RelatedDocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.SingleNormValidationInfo;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import de.bund.digitalservice.ris.caselaw.domain.docx.Docx2Html;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.nio.ByteBuffer;
+import java.time.LocalDate;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
@@ -65,6 +66,7 @@ public class DocumentUnitController {
         .getDocumentationOffice(oidcUser)
         .flatMap(service::generateNewDocumentUnit)
         .map(documentUnit -> ResponseEntity.status(HttpStatus.CREATED).body(documentUnit))
+        .doOnError(ex -> log.error("error in generate new documentation unit", ex))
         .onErrorReturn(ResponseEntity.internalServerError().body(DocumentUnit.builder().build()));
   }
 
@@ -101,8 +103,8 @@ public class DocumentUnitController {
           Optional<String> documentNumberOrFileNumber,
       @RequestParam(value = "courtType") Optional<String> courtType,
       @RequestParam(value = "courtLocation") Optional<String> courtLocation,
-      @RequestParam(value = "decisionDate") Optional<String> decisionDate,
-      @RequestParam(value = "decisionDateEnd") Optional<String> decisionDateEnd,
+      @RequestParam(value = "decisionDate") Optional<LocalDate> decisionDate,
+      @RequestParam(value = "decisionDateEnd") Optional<LocalDate> decisionDateEnd,
       @RequestParam(value = "publicationStatus") Optional<String> publicationStatus,
       @RequestParam(value = "withError") Optional<Boolean> withError,
       @RequestParam(value = "myDocOfficeOnly") Optional<Boolean> myDocOfficeOnly,
@@ -159,10 +161,8 @@ public class DocumentUnitController {
       return Mono.just(ResponseEntity.unprocessableEntity().body(DocumentUnit.builder().build()));
     }
 
-    return userService
-        .getDocumentationOffice(oidcUser)
-        .flatMap(
-            documentationOffice -> service.updateDocumentUnit(documentUnit, documentationOffice))
+    return service
+        .updateDocumentUnit(documentUnit)
         .map(du -> ResponseEntity.status(HttpStatus.OK).body(du))
         .onErrorReturn(ResponseEntity.internalServerError().body(DocumentUnit.builder().build()));
   }
@@ -186,13 +186,13 @@ public class DocumentUnitController {
 
   @PutMapping(value = "/search-by-linked-documentation-unit")
   @PreAuthorize("isAuthenticated()")
-  public Mono<Page<LinkedDocumentationUnit>> searchByLinkedDocumentationUnit(
+  public Mono<Page<RelatedDocumentationUnit>> searchByLinkedDocumentationUnit(
       @RequestParam("pg") int page,
       @RequestParam("sz") int size,
-      @RequestBody LinkedDocumentationUnit linkedDocumentationUnit) {
+      @RequestBody RelatedDocumentationUnit relatedDocumentationUnit) {
 
     return service.searchByLinkedDocumentationUnit(
-        linkedDocumentationUnit, PageRequest.of(page, size));
+        relatedDocumentationUnit, PageRequest.of(page, size));
   }
 
   @GetMapping(value = "/{uuid}/docx", produces = MediaType.APPLICATION_JSON_VALUE)

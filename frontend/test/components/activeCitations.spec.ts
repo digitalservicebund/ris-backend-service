@@ -3,7 +3,7 @@ import { render, screen } from "@testing-library/vue"
 import { createPinia, setActivePinia } from "pinia"
 import ActiveCitations from "@/components/ActiveCitations.vue"
 import ActiveCitation from "@/domain/activeCitation"
-import { CitationStyle } from "@/domain/citationStyle"
+import { CitationType } from "@/domain/citationType"
 import { Court, DocumentType } from "@/domain/documentUnit"
 import comboboxItemService from "@/services/comboboxItemService"
 import documentUnitService from "@/services/documentUnitService"
@@ -34,12 +34,7 @@ function generateActiveCitation(options?: {
   decisionDate?: string
   fileNumber?: string
   documentType?: DocumentType
-  dataSource?:
-    | "NEURIS"
-    | "MIGRATION"
-    | "PROCEEDING_DECISION"
-    | "ACTIVE_CITATION"
-  citationStyle?: CitationStyle
+  citationStyle?: CitationType
 }) {
   const activeCitation = new ActiveCitation({
     uuid: options?.uuid ?? "123",
@@ -55,8 +50,7 @@ function generateActiveCitation(options?: {
       jurisShortcut: "documentTypeShortcut1",
       label: "documentType1",
     },
-    dataSource: options?.dataSource ?? "NEURIS",
-    citationStyle: options?.citationStyle ?? {
+    citationType: options?.citationStyle ?? {
       uuid: "123",
       jurisShortcut: "Änderungen",
       label: "Änderungen",
@@ -73,7 +67,7 @@ describe("Active Citations", () => {
 
   vi.spyOn(
     documentUnitService,
-    "searchByLinkedDocumentUnit",
+    "searchByRelatedDocumentation",
   ).mockImplementation(() =>
     Promise.resolve({
       status: 200,
@@ -118,7 +112,7 @@ describe("Active Citations", () => {
     label: "EuGH-Vorlage",
   }
 
-  const citationStyle: CitationStyle = {
+  const citationStyle: CitationType = {
     uuid: "123",
     jurisShortcut: "Änderungen",
     label: "Änderungen",
@@ -155,7 +149,7 @@ describe("Active Citations", () => {
     Promise.resolve({ status: 200, data: dropdownDocumentTypesItems }),
   )
 
-  vi.spyOn(comboboxItemService, "getCitationStyles").mockImplementation(() =>
+  vi.spyOn(comboboxItemService, "getCitationTypes").mockImplementation(() =>
     Promise.resolve({ status: 200, data: dropdownCitationStyleItems }),
   )
 
@@ -203,7 +197,6 @@ describe("Active Citations", () => {
       modelValue: [
         generateActiveCitation({
           fileNumber: "123",
-          dataSource: "ACTIVE_CITATION",
         }),
       ],
     })
@@ -227,11 +220,7 @@ describe("Active Citations", () => {
 
   it("renders manually added active citations as editable list item", async () => {
     renderComponent({
-      modelValue: [
-        generateActiveCitation({
-          dataSource: "ACTIVE_CITATION",
-        }),
-      ],
+      modelValue: [generateActiveCitation()],
     })
     expect(screen.getByLabelText("Eintrag bearbeiten")).toBeInTheDocument()
   })
@@ -245,7 +234,6 @@ describe("Active Citations", () => {
             jurisShortcut: "ABC",
             label: "ABC",
           },
-          dataSource: "ACTIVE_CITATION",
         }),
       ],
     })
@@ -270,11 +258,7 @@ describe("Active Citations", () => {
 
   it("correctly updates value document type input", async () => {
     const { user } = renderComponent({
-      modelValue: [
-        generateActiveCitation({
-          dataSource: "ACTIVE_CITATION",
-        }),
-      ],
+      modelValue: [generateActiveCitation()],
     })
 
     expect(screen.queryByText(/EuGH-Vorlage/)).not.toBeInTheDocument()
@@ -297,11 +281,7 @@ describe("Active Citations", () => {
 
   it("correctly updates value court input", async () => {
     const { user } = renderComponent({
-      modelValue: [
-        generateActiveCitation({
-          dataSource: "ACTIVE_CITATION",
-        }),
-      ],
+      modelValue: [generateActiveCitation()],
     })
 
     expect(screen.queryByText(/AG Test/)).not.toBeInTheDocument()
@@ -324,11 +304,7 @@ describe("Active Citations", () => {
 
   it("correctly updates value of fileNumber input", async () => {
     const { user } = renderComponent({
-      modelValue: [
-        generateActiveCitation({
-          dataSource: "ACTIVE_CITATION",
-        }),
-      ],
+      modelValue: [generateActiveCitation()],
     })
 
     expect(screen.queryByText(/new fileNumber/)).not.toBeInTheDocument()
@@ -349,11 +325,7 @@ describe("Active Citations", () => {
 
   it("correctly updates value of decision date input", async () => {
     const { user } = renderComponent({
-      modelValue: [
-        generateActiveCitation({
-          dataSource: "ACTIVE_CITATION",
-        }),
-      ],
+      modelValue: [generateActiveCitation()],
     })
 
     expect(screen.queryByText(/02.02.2022/)).not.toBeInTheDocument()
@@ -374,14 +346,7 @@ describe("Active Citations", () => {
 
   it("correctly deletes manually added active citations", async () => {
     const { user } = renderComponent({
-      modelValue: [
-        generateActiveCitation({
-          dataSource: "ACTIVE_CITATION",
-        }),
-        generateActiveCitation({
-          dataSource: "ACTIVE_CITATION",
-        }),
-      ],
+      modelValue: [generateActiveCitation(), generateActiveCitation()],
     })
     const activeCitations = screen.getAllByLabelText("Listen Eintrag")
     expect(activeCitations.length).toBe(2)
@@ -405,11 +370,7 @@ describe("Active Citations", () => {
 
   it("correctly updates deleted values in active citations", async () => {
     const { user } = renderComponent({
-      modelValue: [
-        generateActiveCitation({
-          dataSource: "ACTIVE_CITATION",
-        }),
-      ],
+      modelValue: [generateActiveCitation()],
     })
 
     expect(
@@ -437,24 +398,25 @@ describe("Active Citations", () => {
     ).not.toBeInTheDocument()
   })
 
-  it("renders limited edit view if linked document unit", async () => {
-    const { user } = renderComponent({
-      modelValue: [generateActiveCitation()],
-    })
+  // Todo: enable again when linking possible
+  // it("renders limited edit view if linked document unit", async () => {
+  //   const { user } = renderComponent({
+  //     modelValue: [generateActiveCitation()],
+  //   })
 
-    await user.click(screen.getByLabelText("Eintrag bearbeiten"))
+  //   await user.click(screen.getByLabelText("Eintrag bearbeiten"))
 
-    expect(screen.getByLabelText("Art der Zitierung")).toBeVisible()
-    ;[
-      "Gericht der Aktivzitierung",
-      "Entscheidungsdatum der Aktivzitierung",
-      "Aktenzeichen der Aktivzitierung",
-      "Dokumenttyp der Aktivzitierung",
-      "Nach Entscheidung suchen",
-    ].forEach((label) =>
-      expect(screen.queryByLabelText(label)).not.toBeInTheDocument(),
-    )
-  })
+  //   expect(screen.getByLabelText("Art der Zitierung")).toBeVisible()
+  //   ;[
+  //     "Gericht der Aktivzitierung",
+  //     "Entscheidungsdatum der Aktivzitierung",
+  //     "Aktenzeichen der Aktivzitierung",
+  //     "Dokumenttyp der Aktivzitierung",
+  //     "Nach Entscheidung suchen",
+  //   ].forEach((label) =>
+  //     expect(screen.queryByLabelText(label)).not.toBeInTheDocument(),
+  //   )
+  // })
 
   it("lists search results", async () => {
     const { user } = renderComponent()
@@ -484,9 +446,7 @@ describe("Active Citations", () => {
   })
 
   it("displays error in list and edit component when fields missing", async () => {
-    const modelValue: ActiveCitation[] = [
-      generateActiveCitation({ dataSource: "ACTIVE_CITATION" }),
-    ]
+    const modelValue: ActiveCitation[] = [generateActiveCitation()]
     const { user } = renderComponent({ modelValue })
     const editButton = screen.getByLabelText("Eintrag bearbeiten")
     await user.click(editButton)
@@ -517,19 +477,20 @@ describe("Active Citations", () => {
     expect(getStyleValidation()).toBeVisible()
   })
 
-  it("shows missing citationStyle validation for linked decision", async () => {
-    renderComponent({
-      modelValue: [
-        generateActiveCitation({
-          citationStyle: {
-            uuid: undefined,
-            jurisShortcut: undefined,
-            label: "invalid",
-          },
-        }),
-      ],
-    })
+  // Todo: enable again when linking possible
+  // it("shows missing citationStyle validation for linked decision", async () => {
+  //   renderComponent({
+  //     modelValue: [
+  //       generateActiveCitation({
+  //         citationStyle: {
+  //           uuid: undefined,
+  //           jurisShortcut: undefined,
+  //           label: "invalid",
+  //         },
+  //       }),
+  //     ],
+  //   })
 
-    expect(screen.getByText("Art der Zitierung")).toBeVisible()
-  })
+  //   expect(screen.getByText("Art der Zitierung")).toBeVisible()
+  // })
 })

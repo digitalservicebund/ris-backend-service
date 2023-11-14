@@ -54,7 +54,7 @@ describe("DateInput", () => {
   })
 
   it("displays modelValue in correct format", async () => {
-    renderComponent({ modelValue: "2022-05-13T18:08:14.036Z" })
+    renderComponent({ modelValue: "2022-05-13" })
     const input = screen.queryByLabelText("aria-label") as HTMLInputElement
 
     expect(input).toHaveValue("13.05.2022")
@@ -76,13 +76,13 @@ describe("DateInput", () => {
 
     expect(emitted()["update:modelValue"]).toEqual([
       [undefined],
-      ["2022-05-14T00:00:00.000Z"],
+      ["2022-05-14"],
     ])
   })
 
   it("removes validation errors on backspace delete", async () => {
     const { emitted } = renderComponent({
-      modelValue: "2022-05-13T18:08:14.036Z",
+      modelValue: "2022-05-13",
     })
     const input: HTMLInputElement = screen.queryByLabelText(
       "aria-label",

@@ -5,11 +5,10 @@ import de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw.FieldOfL
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw.Norm;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
-import java.util.UUID;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import lombok.extern.slf4j.Slf4j;
@@ -17,7 +16,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Service
@@ -34,75 +32,90 @@ public class FieldOfLawService {
 
   public Mono<Page<FieldOfLaw>> getFieldsOfLawBySearchQuery(
       Optional<String> optionalSearchStr, Pageable pageable) {
+
     if (optionalSearchStr.isEmpty() || optionalSearchStr.get().isBlank()) {
-      return repository
-          .findAllByOrderByIdentifierAsc(pageable)
-          .collectList()
-          .zipWith(repository.count())
-          .map(t -> new PageImpl<>(t.getT1(), pageable, t.getT2()));
+      return Mono.just(repository.findAllByOrderByIdentifierAsc(pageable));
     }
-    return searchAndOrderByScore(optionalSearchStr.get().trim(), pageable);
+
+    return Mono.just(searchAndOrderByScore(optionalSearchStr.get().trim(), pageable));
   }
 
   private String[] splitSearchTerms(String searchStr) {
     return Arrays.stream(searchStr.split("\\s+")).map(String::trim).toArray(String[]::new);
   }
 
-  public Mono<Page<FieldOfLaw>> searchAndOrderByScore(String searchStr, Pageable pageable) {
+  Page<FieldOfLaw> searchAndOrderByScore(String searchStr, Pageable pageable) {
     Matcher matcher = NORMS_PATTERN.matcher(searchStr);
-    AtomicInteger totalElements = new AtomicInteger();
     String[] searchTerms;
     String normStr;
 
-    Mono<List<FieldOfLaw>> unorderedList;
+    List<FieldOfLaw> unorderedList;
     if (matcher.find()) {
       normStr = matcher.group(1).trim().replaceAll("§(\\d+)", "§ $1");
       String afterNormSearchStr = matcher.group(2).trim();
       if (afterNormSearchStr.isEmpty()) {
         searchTerms = null;
-        unorderedList = repository.findByNormStr(normStr).collectList();
+        unorderedList = repository.findByNormStr(normStr);
       } else {
         searchTerms = splitSearchTerms(afterNormSearchStr);
-        unorderedList = repository.findByNormStrAndSearchTerms(normStr, searchTerms).collectList();
+        unorderedList = repository.findByNormStrAndSearchTerms(normStr, searchTerms);
       }
     } else {
       normStr = null;
       searchTerms = splitSearchTerms(searchStr);
-      unorderedList = repository.findBySearchTerms(searchTerms).collectList();
+      unorderedList = repository.findBySearchTerms(searchTerms);
     }
 
-    return unorderedList
-        .map(
-            (Function<List<FieldOfLaw>, List<FieldOfLaw>>)
-                list -> {
-                  totalElements.set(list.size());
-                  list =
-                      list.stream()
-                          .map(fieldOfLaw -> calculateScore(searchTerms, normStr, fieldOfLaw))
-                          .sorted((f1, f2) -> f2.score().compareTo(f1.score()))
-                          .toList();
-                  int fromIdx = (int) pageable.getOffset();
-                  int toIdx =
-                      (int) Math.min(pageable.getOffset() + pageable.getPageSize(), list.size());
-                  if (fromIdx > toIdx) {
-                    return new ArrayList<>();
-                  }
-                  return list.subList(fromIdx, toIdx);
-                })
-        .map(list -> new PageImpl<>(list, pageable, totalElements.get()));
+    if (unorderedList == null || unorderedList.isEmpty()) {
+      return Page.empty();
+    }
+
+    Map<FieldOfLaw, Integer> scores = calculateScore(searchTerms, normStr, unorderedList);
+
+    List<FieldOfLaw> orderedList =
+        unorderedList.stream()
+            .sorted((f1, f2) -> scores.get(f2).compareTo(scores.get(f1)))
+            .toList();
+
+    int fromIdx = (int) pageable.getOffset();
+    int toIdx = (int) Math.min(pageable.getOffset() + pageable.getPageSize(), orderedList.size());
+
+    List<FieldOfLaw> pageContent = new ArrayList<>();
+    if (fromIdx < toIdx) {
+      pageContent = orderedList.subList(fromIdx, toIdx);
+    }
+
+    int totalElements = orderedList.size();
+
+    return new PageImpl<>(pageContent, pageable, totalElements);
   }
 
-  private FieldOfLaw calculateScore(String[] searchTerms, String normStr, FieldOfLaw fieldOfLaw) {
-    int score = 0;
-    if (searchTerms != null) {
-      for (String searchTerm : searchTerms) {
-        score += getScoreContributionFromSearchTerm(fieldOfLaw, searchTerm);
-      }
+  private Map<FieldOfLaw, Integer> calculateScore(
+      String[] searchTerms, String normStr, List<FieldOfLaw> fieldOfLaws) {
+    Map<FieldOfLaw, Integer> scores = new HashMap<>();
+
+    if (fieldOfLaws == null || fieldOfLaws.isEmpty()) {
+      return scores;
     }
-    if (normStr != null) {
-      score += getScoreContributionFromNormStr(fieldOfLaw, normStr);
-    }
-    return fieldOfLaw.toBuilder().score(score).build();
+
+    fieldOfLaws.forEach(
+        fieldOfLaw -> {
+          int score = 0;
+
+          if (searchTerms != null) {
+            for (String searchTerm : searchTerms) {
+              score += getScoreContributionFromSearchTerm(fieldOfLaw, searchTerm);
+            }
+          }
+
+          if (normStr != null) {
+            score += getScoreContributionFromNormStr(fieldOfLaw, normStr);
+          }
+
+          scores.put(fieldOfLaw, score);
+        });
+
+    return scores;
   }
 
   private int getScoreContributionFromSearchTerm(FieldOfLaw fieldOfLaw, String searchTerm) {
@@ -141,52 +154,29 @@ public class FieldOfLawService {
     return score;
   }
 
-  public Flux<FieldOfLaw> getFieldsOfLawByIdentifierSearch(Optional<String> optionalSearchStr) {
+  public Mono<List<FieldOfLaw>> getFieldsOfLawByIdentifierSearch(
+      Optional<String> optionalSearchStr) {
     if (optionalSearchStr.isEmpty() || optionalSearchStr.get().isBlank()) {
-      return repository.getAllLimitedOrderByIdentifierLength();
+      return Mono.just(repository.getFirst30OrderByIdentifier());
     }
-    return repository.findByIdentifierSearch(optionalSearchStr.get().trim());
+    return Mono.just(repository.findByIdentifierSearch(optionalSearchStr.get().trim()));
   }
 
-  public Flux<FieldOfLaw> getChildrenOfFieldOfLaw(String identifier) {
+  public Mono<List<FieldOfLaw>> getChildrenOfFieldOfLaw(String identifier) {
     if (identifier.equalsIgnoreCase(ROOT_ID)) {
-      return repository.getTopLevelNodes();
+      return Mono.just(repository.getTopLevelNodes());
     }
 
-    return repository.findAllByParentIdentifierOrderByIdentifierAsc(identifier);
+    return Mono.just(repository.findAllByParentIdentifierOrderByIdentifierAsc(identifier));
   }
 
   public Mono<FieldOfLaw> getTreeForFieldOfLaw(String identifier) {
-    return repository.findByIdentifier(identifier).flatMap(this::findParent);
-  }
+    FieldOfLaw fieldOfLaw = repository.findTreeByIdentifier(identifier);
 
-  private Mono<FieldOfLaw> findParent(FieldOfLaw child) {
+    if (fieldOfLaw == null) {
+      return Mono.empty();
+    }
 
-    return repository
-        .findParentByChild(child)
-        .flatMap(
-            parent -> {
-              if (child.identifier().equals(parent.identifier())) {
-                return Mono.just(child);
-              }
-
-              parent.children().add(child);
-
-              return findParent(parent);
-            });
-  }
-
-  public Mono<List<FieldOfLaw>> getFieldsOfLawForDocumentUnit(UUID documentUnitUuid) {
-    return repository.findAllForDocumentUnit(documentUnitUuid);
-  }
-
-  public Mono<List<FieldOfLaw>> addFieldOfLawToDocumentUnit(
-      UUID documentUnitUuid, String identifier) {
-    return repository.addFieldOfLawToDocumentUnit(documentUnitUuid, identifier);
-  }
-
-  public Mono<List<FieldOfLaw>> removeFieldOfLawToDocumentUnit(
-      UUID documentUnitUuid, String identifier) {
-    return repository.removeFieldOfLawToDocumentUnit(documentUnitUuid, identifier);
+    return Mono.just(fieldOfLaw);
   }
 }

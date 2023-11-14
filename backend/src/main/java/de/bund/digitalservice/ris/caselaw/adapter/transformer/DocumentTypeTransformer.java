@@ -6,10 +6,15 @@ import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.Docume
 public class DocumentTypeTransformer {
   private DocumentTypeTransformer() {}
 
-  public static DocumentType transformDTO(DocumentTypeDTO documentTypeDTO) {
+  public static DocumentType transformToDomain(DocumentTypeDTO documentTypeDTO) {
     return DocumentType.builder()
+        .uuid(documentTypeDTO.getId())
         .jurisShortcut(documentTypeDTO.getAbbreviation())
         .label(documentTypeDTO.getLabel())
         .build();
+  }
+
+  public static DocumentTypeDTO transformToDTO(DocumentType documentType) {
+    return DocumentTypeDTO.builder().id(documentType.uuid()).build();
   }
 }

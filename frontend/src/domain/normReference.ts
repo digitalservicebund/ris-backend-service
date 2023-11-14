@@ -24,10 +24,6 @@ export default class NormReference implements EditableListItem {
     return false
   }
 
-  get hasForeignSource(): boolean {
-    return true
-  }
-
   get renderDecision(): string {
     return [
       ...(this.normAbbreviation?.abbreviation

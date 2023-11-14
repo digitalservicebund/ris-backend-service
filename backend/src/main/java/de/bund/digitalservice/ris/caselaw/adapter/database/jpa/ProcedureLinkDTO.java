@@ -2,15 +2,15 @@ package de.bund.digitalservice.ris.caselaw.adapter.database.jpa;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import java.time.Instant;
+import jakarta.persistence.IdClass;
+import jakarta.validation.constraints.NotNull;
+import java.io.Serializable;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 @Data
@@ -18,16 +18,27 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity(name = "procedure_link")
+@IdClass(ProcedureLinkId.class)
 public class ProcedureLinkDTO {
-  @Id @GeneratedValue private UUID id;
+  @Id
+  @Column(name = "procedure_id")
+  @NotNull
+  UUID procedureId;
 
-  @Column(name = "created_at", insertable = false, updatable = false)
-  private Instant createdAt;
-
+  @Id
   @Column(name = "documentation_unit_id")
+  @NotNull
   UUID documentationUnitId;
 
-  @ManyToOne()
-  @JoinColumn(name = "procedure_id", referencedColumnName = "id")
-  ProcedureDTO procedureDTO;
+  @Id
+  @Column(name = "rank")
+  Long rank;
+}
+
+@AllArgsConstructor
+@EqualsAndHashCode
+class ProcedureLinkId implements Serializable {
+  private UUID procedureId;
+  private UUID documentationUnitId;
+  private Long rank;
 }

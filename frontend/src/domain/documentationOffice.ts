@@ -1,5 +1,4 @@
 type DocumentationOffice = {
-  label: string
   abbreviation?: string
 }
 
