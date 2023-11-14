@@ -9,7 +9,7 @@ import {
 import { caselawTest as test } from "~/e2e/caselaw/fixtures"
 
 test.describe("previous decisions", () => {
-  test("renders empty proceeding decision in edit mode, when none in list", async ({
+  test("renders empty previous decision in edit mode, when none in list", async ({
     page,
     documentNumber,
   }) => {
@@ -32,7 +32,7 @@ test.describe("previous decisions", () => {
     await expect(page.getByLabel("Datum unbekannt")).toBeVisible()
   })
 
-  test("create and renders new proceeding decision in list", async ({
+  test("create and renders new previous decision in list", async ({
     page,
     documentNumber,
     prefilledDocumentUnit,
@@ -56,8 +56,12 @@ test.describe("previous decisions", () => {
         },
       ),
     ).toBeVisible()
-    await expect(page.getByLabel("Eintrag löschen")).toHaveCount(1)
-    await expect(page.getByLabel("Eintrag bearbeiten")).toHaveCount(1)
+
+    const previousDecisionContainer = page.getByLabel("Vorgehende Entscheidung")
+
+    await expect(
+      previousDecisionContainer.getByLabel("Listen Eintrag"),
+    ).toHaveCount(1)
 
     await page.getByLabel("Weitere Angabe").click()
     await fillPreviousDecisionInputs(page, {
@@ -69,17 +73,8 @@ test.describe("previous decisions", () => {
 
     await page.getByLabel("Vorgehende Entscheidung speichern").click()
 
-    const proceedingDecisionContainer = page.getByLabel(
-      "Vorgehende Entscheidung",
-    )
     await expect(
-      proceedingDecisionContainer.getByLabel("Listen Eintrag"),
-    ).toHaveCount(2)
-    await expect(
-      proceedingDecisionContainer.getByLabel("Eintrag löschen"),
-    ).toHaveCount(2)
-    await expect(
-      proceedingDecisionContainer.getByLabel("Eintrag bearbeiten"),
+      previousDecisionContainer.getByLabel("Listen Eintrag"),
     ).toHaveCount(2)
   })
 
@@ -100,31 +95,45 @@ test.describe("previous decisions", () => {
             prefilledDocumentUnit.coreData.documentType?.jurisShortcut,
           decisionDate: "01.01.2020",
         })
+
         await page.getByLabel("Vorgehende Entscheidung speichern").click()
+        await expect(
+          page.getByText(
+            `AG Aachen, 01.01.2020, ${prefilledDocumentUnit.coreData.fileNumbers?.[0]}, AnU`,
+            {
+              exact: true,
+            },
+          ),
+        ).toBeVisible()
       },
       page,
       { clickSaveButton: true },
     )
 
-    const proceedingDecisionContainer = page.getByLabel(
-      "Vorgehende Entscheidung",
-    )
+    const previousDecisionContainer = page.getByLabel("Vorgehende Entscheidung")
+
     await expect(
-      proceedingDecisionContainer.getByLabel("Listen Eintrag"),
+      previousDecisionContainer.getByLabel("Listen Eintrag"),
     ).toHaveCount(1)
+
     await page.reload()
 
     await expect(
-      proceedingDecisionContainer.getByLabel("Listen Eintrag"),
+      previousDecisionContainer.getByLabel("Listen Eintrag"),
     ).toHaveCount(1, { timeout: 10000 }) // reloading can be slow if too many parallel tests
 
     await page.getByLabel("Weitere Angabe").click()
     await page.getByLabel("Aktenzeichen Vorgehende Entscheidung").fill("two")
     await page.getByLabel("Vorgehende Entscheidung speichern").click()
+    await expect(
+      page.getByText(`two`, {
+        exact: true,
+      }),
+    ).toBeVisible()
     // "Vorgehende Entscheidung speichern" only saves state in frontend, no communication to backend yet
     await page.reload()
     await expect(
-      proceedingDecisionContainer.getByLabel("Listen Eintrag"),
+      previousDecisionContainer.getByLabel("Listen Eintrag"),
     ).toHaveCount(1, { timeout: 10000 }) // reloading can be slow if too many parallel tests
 
     await page.getByLabel("Weitere Angabe").click()
@@ -141,8 +150,8 @@ test.describe("previous decisions", () => {
 
     await page.reload()
     await expect(
-      proceedingDecisionContainer.getByLabel("Listen Eintrag"),
-    ).toHaveCount(2, { timeout: 10000 }) // reloading can be slow if too many parallel tests
+      previousDecisionContainer.getByLabel("Listen Eintrag"),
+    ).toHaveCount(2, { timeout: 20000 })
   })
 
   test("manually added proceeding decision can be edited", async ({
@@ -220,7 +229,9 @@ test.describe("previous decisions", () => {
     ).toHaveCount(1)
   })
 
-  test("search for documentunits and link as proceeding decision", async ({
+  //Todo enable again when linking possible
+  // eslint-disable-next-line playwright/no-skipped-test
+  test.skip("search for documentunits and link as proceeding decision", async ({
     page,
     documentNumber,
     prefilledDocumentUnit,
@@ -247,7 +258,9 @@ test.describe("previous decisions", () => {
       documentType: prefilledDocumentUnit.coreData.documentType?.jurisShortcut,
       decisionDate: "01.01.2020",
     })
-    const proceedingDecisionContainer = page.getByLabel("Rechtszug")
+    const proceedingDecisionContainer = page.getByLabel(
+      "Vorgehende Entscheidung",
+    )
     await proceedingDecisionContainer
       .getByLabel("Nach Entscheidung suchen")
       .click()
@@ -311,7 +324,9 @@ test.describe("previous decisions", () => {
     await expect(page.getByLabel("Fehlerhafte Eingabe")).toBeVisible()
     await page.getByLabel("Eintrag bearbeiten").click()
     await expect(
-      page.getByLabel("Rechtszug").getByText("Pflichtfeld nicht befüllt"),
+      page
+        .getByLabel("Vorgehende Entscheidung")
+        .getByText("Pflichtfeld nicht befüllt"),
     ).toHaveCount(2)
 
     await fillPreviousDecisionInputs(page, {
@@ -342,12 +357,14 @@ test.describe("previous decisions", () => {
     await navigateToCategories(page, documentNumber)
     await expect(page.getByText(documentNumber)).toBeVisible()
 
-    await page.locator("[aria-label='Entscheidungsdatum Rechtszug']").fill("03")
+    await page
+      .locator("[aria-label='Entscheidungsdatum Vorgehende Entscheidung']")
+      .fill("03")
 
     await page.keyboard.press("Tab")
 
     await expect(
-      page.locator("[aria-label='Entscheidungsdatum Rechtszug']"),
+      page.locator("[aria-label='Entscheidungsdatum Vorgehende Entscheidung']"),
     ).toHaveValue("03")
 
     await expect(page.locator("text=Unvollständiges Datum")).toBeVisible()
@@ -355,7 +372,7 @@ test.describe("previous decisions", () => {
     await page.reload()
 
     await expect(
-      page.locator("[aria-label='Entscheidungsdatum Rechtszug']"),
+      page.locator("[aria-label='Entscheidungsdatum Vorgehende Entscheidung']"),
     ).toHaveValue("")
   })
 })

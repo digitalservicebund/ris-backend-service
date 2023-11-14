@@ -66,7 +66,7 @@ const DecisionSummary = withSummarizer(decisionSummarizer)
   <h2 id="proceedingDecisions" class="ds-heading-02-reg mb-[1rem]">
     Rechtszug
   </h2>
-  <div aria-label="Rechtszug" class="mb-32 bg-white p-16">
+  <div aria-label="Vorgehende Entscheidung" class="mb-32 bg-white p-16">
     <h2 class="ds-label-02-bold mb-[1rem]">Vorgehende Entscheidung</h2>
     <div class="flex flex-row">
       <div class="flex-1">

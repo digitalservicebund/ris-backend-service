@@ -29,6 +29,15 @@ export const caselawTest = test.extend<MyFixtures>({
   prefilledDocumentUnit: async ({ request }, use) => {
     const response = await request.get(`/api/v1/caselaw/documentunits/new`)
     const prefilledDocumentUnit = await response.json()
+
+    const courtResponse = await request.get(`api/v1/caselaw/courts?q=AG+Aachen`)
+    const court = await courtResponse.json()
+
+    const documentTypeResponse = await request.get(
+      `api/v1/caselaw/documenttypes?q=Anerkenntnisurteil`,
+    )
+    const documentType = await documentTypeResponse.json()
+
     const updateResponse = await request.put(
       `/api/v1/caselaw/documentunits/${prefilledDocumentUnit.uuid}`,
       {
@@ -36,6 +45,8 @@ export const caselawTest = test.extend<MyFixtures>({
           ...prefilledDocumentUnit,
           coreData: {
             ...prefilledDocumentUnit.coreData,
+            court: court?.[0],
+            documentType: documentType?.[0],
             fileNumbers: [generateString()],
             decisionDate: "2019-12-31T23:00:00Z",
           },
