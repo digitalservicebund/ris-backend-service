@@ -8,9 +8,7 @@ fileignoreconfig:
 - filename: backend/src/main/kotlin/de/bund/digitalservice/ris/norms/framework/adapter/input/restapi/controller/GetFileController.kt
   checksum: f989b3c9c176b1b985c2f78ca6ca13fa1403cbb69f367ae9b1cb8ea64d5f6747
 - filename: backend/src/test/java/de/bund/digitalservice/ris/caselaw/integration/tests/JurisXmlExporterWrapperIntegrationTest.java
-  checksum: bb03d7e0a8cf3586988c216bbd8f35c6e6c238a8dee23e1bc8999c2265e85e9a
-- filename: backend/src/test/java/de/bund/digitalservice/ris/caselaw/integration/tests/DeviatingObjectIntegrationTest.java
-  checksum: b37eafa0587a05ef879dea00a8b35db09d2d92b884ae450d16c017eda13f5378
+  checksum: 3e0efd6314605a39710a3a6c89f265b096f74f7895319a7b0fdaa04b8ab96ad4
 - filename: backend/src/test/kotlin/unit/adapter/input/restapi/controller/GenerateNormFileControllerTest.kt
   checksum: 930c2643a15a900f328d1d83792e51b12af71cc20136ba43b13fffdffd601e8f
 - filename: backend/src/test/kotlin/unit/adapter/input/restapi/controller/GetFileControllerTest.kt
@@ -18,13 +16,13 @@ fileignoreconfig:
 - filename: backend/src/test/kotlin/unit/application/service/GetFileServiceTest.kt
   checksum: 8133265c6f388df84a3e0f61050428e8628853e0ba80b432e4723750a34b781e
 - filename: compose.yaml
-  checksum: 986e520e19749f8a93e74a5e740ac5d4da64bca3d767dc2d4ff867b02101de60
+  checksum: 33ed6a756c7eb9ecde0a8067af28764d31b1d835146fad24bbd9b7c7602af9dc
 - filename: doc/norms/backend-api.yaml
   checksum: df4fa1f7e6d7023f9a7a98d1052c2b88c1785366962004b3165453edcd5bf4db
 - filename: doc/structurizr/workspace.json
   checksum: 541780133a0bf013ac75f6a3bc402c77981a273654c5648eabeb32ccb271a834
 - filename: frontend/Dockerfile.prod
-  checksum: 876b34909d37b05b2dfa53dca708fbad212b79a6f9ddb2c1eba337589db8c150
+  checksum: 82ac3e6cd84d2b628f49aaba85c9815e4093a672daa0923f55e2ecc9367b6219
 - filename: frontend/FRONTEND_STYLEGUIDE.md
   checksum: e6b8194eba2012f2a769c5a5d3577715a573b441a7b94e744c32b3149d0d3a93
 - filename: frontend/src/main.ts
@@ -32,7 +30,7 @@ fileignoreconfig:
 - filename: frontend/test/test-helper/dataGenerators.ts
   checksum: a3d04d1168dcc221ba5fcd72e8d8bada60f48644c7586bde3a7602b748d0682c
 - filename: migration_schema_local_setup.md
-  checksum: 0e3fc84949750036f1e433f23f3091abcc7866192673580fa69c0fa15782022a
+  checksum: 69432ee1eea4b8c7c72e1bb049e9ad5ec3423ea2305bec1ae19badc0e202f0c3
 scopeconfig:
 - scope: node
 allowed_patterns:

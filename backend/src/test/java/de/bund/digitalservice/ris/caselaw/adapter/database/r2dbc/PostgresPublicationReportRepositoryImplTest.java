@@ -1,32 +1,27 @@
 package de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabasePublicationReportRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresPublicationReportRepositoryImpl;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PublicationReportDTO;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationReport;
 import java.time.Instant;
 import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mockito;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+import reactor.test.StepVerifier;
 
 @ExtendWith(SpringExtension.class)
 class PostgresPublicationReportRepositoryImplTest {
 
   PostgresPublicationReportRepositoryImpl reportRepository;
   @MockBean private DatabasePublicationReportRepository publicationReportRepository;
-  @MockBean private DatabaseDocumentationUnitRepository documentUnitRepository;
+  @MockBean private DatabaseDocumentUnitRepository documentUnitRepository;
 
   @BeforeEach
   public void setup() {
@@ -37,19 +32,21 @@ class PostgresPublicationReportRepositoryImplTest {
 
   @Test
   void saveAll() {
-    var docUnit = DocumentationUnitDTO.builder().build();
+    var docUnit = DocumentUnitDTO.builder().uuid(UUID.randomUUID()).build();
     Instant received = Instant.now();
 
-    when(documentUnitRepository.findByDocumentNumber("ABC126543712683"))
-        .thenReturn(Optional.of(docUnit));
+    Mockito.when(documentUnitRepository.findByDocumentnumber("ABC126543712683"))
+        .thenReturn(Mono.just(docUnit));
 
-    when(publicationReportRepository.saveAll(any(Iterable.class)))
+    Mockito.when(publicationReportRepository.saveAll(Mockito.any(Iterable.class)))
         .thenReturn(
-            List.of(
+            Flux.just(
                 PublicationReportDTO.builder()
                     .content("report content")
+                    .newEntry(true)
                     .receivedDate(received)
-                    .documentUnitId(docUnit.getId())
+                    .documentUnitId(docUnit.getUuid())
+                    .id(UUID.randomUUID())
                     .build()));
 
     PublicationReport report =
@@ -59,21 +56,23 @@ class PostgresPublicationReportRepositoryImplTest {
             .receivedDate(received)
             .build();
 
-    List<PublicationReport> savedReportList =
-        reportRepository.saveAll(Collections.singletonList(report));
+    StepVerifier.create(reportRepository.saveAll(Collections.singletonList(report)))
+        .consumeNextWith(
+            publicationReport -> {
+              assertEquals("report content", publicationReport.content());
+              assertEquals(received, publicationReport.receivedDate());
+            })
+        .verifyComplete();
 
-    assertThat(savedReportList).hasSize(1);
-    assertThat(savedReportList.get(0).content()).isEqualTo("report content");
-    assertThat(savedReportList.get(0).receivedDate()).isEqualTo(received);
-
-    verify(publicationReportRepository)
+    Mockito.verify(publicationReportRepository)
         .saveAll(
             Collections.singletonList(
                 PublicationReportDTO.builder()
                     .content("report content")
+                    .newEntry(true)
                     .receivedDate(received)
-                    .documentUnitId(docUnit.getId())
-                    .id(any())
+                    .documentUnitId(docUnit.getUuid())
+                    .id(Mockito.any())
                     .build()));
   }
 }

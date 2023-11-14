@@ -2,25 +2,22 @@ package de.bund.digitalservice.ris.caselaw.domain;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.OriginalFileDocumentDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationUnitTransformer;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentUnitTransformer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith(SpringExtension.class)
 class DocumentUnitBuilderTest {
+
   @Test
-  void shouldConvertDocumentationUnitCorrectly() {
-    DocumentationUnitDTO documentationUnitDTO = new DocumentationUnitDTO();
-    documentationUnitDTO.setOriginalFileDocument(
-        OriginalFileDocumentDTO.builder().filename("doc.docx").build());
-    documentationUnitDTO.setGrounds("reasons123");
-    documentationUnitDTO.setDocumentationOffice(DocumentationOfficeDTO.builder().build());
-    DocumentUnit documentUnit =
-        DocumentationUnitTransformer.transformToDomain(documentationUnitDTO);
+  void shouldConvertCorrectly() {
+    // TODO: check not all fields?
+    DocumentUnitDTO documentUnitDTO = new DocumentUnitDTO();
+    documentUnitDTO.setFilename("doc.docx");
+    documentUnitDTO.setReasons("reasons123");
+    DocumentUnit documentUnit = DocumentUnitTransformer.transformDTO(documentUnitDTO);
 
     assertThat(documentUnit.filename()).isEqualTo("doc.docx");
     assertThat(documentUnit.texts().reasons()).isEqualTo("reasons123");

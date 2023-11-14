@@ -1,10 +1,10 @@
 package de.bund.digitalservice.ris.caselaw.domain;
 
-import java.util.Map;
 import java.util.UUID;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.NoRepositoryBean;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @NoRepositoryBean
@@ -12,7 +12,7 @@ public interface DocumentUnitRepository {
 
   Mono<DocumentUnit> findByDocumentNumber(String documentNumber);
 
-  DocumentUnit findByUuid(UUID uuid);
+  Mono<DocumentUnit> findByUuid(UUID uuid);
 
   Mono<DocumentUnit> createNewDocumentUnit(
       String documentNumber, DocumentationOffice documentationOffice);
@@ -22,17 +22,33 @@ public interface DocumentUnitRepository {
   Mono<DocumentUnit> attachFile(
       UUID documentUnitUuid, String fileUuid, String type, String fileName);
 
-  DocumentUnit removeFile(UUID documentUnitId);
+  Mono<DocumentUnit> removeFile(UUID documentUnitId);
 
-  void delete(DocumentUnit documentUnit);
+  Mono<Void> delete(DocumentUnit documentUnit);
 
-  <T extends RelatedDocumentationUnit> Page<T> searchByRelatedDocumentationUnit(
+  <T extends LinkedDocumentationUnit> Flux<T> searchByLinkedDocumentationUnit(
       T linkedDocumentationUnit, Pageable pageable);
+
+  Mono<Long> count();
+
+  Mono<Long> countSearchByLinkedDocumentationUnit(LinkedDocumentationUnit linkedDocumentationUnit);
 
   Page<DocumentationUnitSearchEntry> searchByDocumentUnitSearchInput(
       Pageable pageable,
       DocumentationOffice documentationOffice,
       DocumentUnitSearchInput searchInput);
 
-  Map<RelatedDocumentationType, Long> getAllDocumentationUnitWhichLink(UUID documentUnitUuid);
+  <T extends LinkedDocumentationUnit>
+      Flux<T> findAllLinkedDocumentUnitsByParentDocumentUnitUuidAndType(
+          UUID parentDocumentUnitUuid, DocumentationUnitLinkType type);
+
+  Mono<DocumentationUnitLink> linkDocumentUnits(
+      UUID parentDocumentUnitUuid, UUID childDocumentUnitUuid, DocumentationUnitLinkType type);
+
+  Mono<Void> unlinkDocumentUnit(
+      UUID parentDocumentUnitUuid, UUID childDocumentUnitUuid, DocumentationUnitLinkType type);
+
+  Mono<Long> countLinksByChildDocumentUnitUuid(UUID childDocumentUnitUuid);
+
+  Mono<Void> deleteIfOrphanedLinkedDocumentationUnit(UUID documentUnitUuid);
 }

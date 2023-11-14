@@ -131,13 +131,16 @@ onMounted(() => {
         class="group flex cursor-pointer items-center justify-between gap-8 border-b-1 border-gray-400 py-8 group-first:pt-0"
         :class="{ '!border-none': noHorizontalSeparators }"
       >
-        <!-- Todo implement linked logic -->
-        <!-- @click="entry.hasForeignSource ? (e: Event) => e.preventDefault() : setEditIndex(index)" -->
         <component
           :is="summaryComponent"
           class="focus:outline-none focus-visible:outline-blue-800"
           :data="entry"
           tabindex="0"
+          @click="
+            entry.hasForeignSource
+              ? (e: Event) => e.preventDefault()
+              : setEditIndex(index)
+          "
           @keypress.enter="setEditIndex(index)"
         />
 

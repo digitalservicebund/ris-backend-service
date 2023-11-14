@@ -15,6 +15,8 @@ const props = defineProps<Props>()
 
 const emit = defineEmits<{
   "update:modelValue": [value?: string[]]
+  chipAdded: [value: string]
+  chipDeleted: [value: string]
 }>()
 
 /* -------------------------------------------------- *
@@ -35,14 +37,16 @@ function addChip() {
       })
     : [chip]
 
+  emit("chipAdded", chip)
   emit("update:modelValue", next)
   newChipText.value = ""
 }
 
-function onDeleteChip() {
+function onDeleteChip(chip: string) {
   if (props.readOnly) return
 
   focusInputIfEmpty()
+  emit("chipDeleted", chip)
 }
 
 /* -------------------------------------------------- *
@@ -142,7 +146,7 @@ watch(newChipText, async () => {
       v-model:focused-item="focusedChip"
       :model-value="modelValue"
       :read-only="readOnly"
-      @chip-deleted="onDeleteChip"
+      @chip-deleted="(_, value) => onDeleteChip(value)"
       @next-clicked-on-last="focusInput"
       @update:model-value="$emit('update:modelValue', $event)"
     />

@@ -2,29 +2,39 @@ package de.bund.digitalservice.ris.caselaw.domain;
 
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw.FieldOfLaw;
 import java.util.List;
-import org.springframework.data.domain.Page;
+import java.util.UUID;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.NoRepositoryBean;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 @NoRepositoryBean
 public interface FieldOfLawRepository {
-  List<FieldOfLaw> getTopLevelNodes();
+  Flux<FieldOfLaw> getTopLevelNodes();
 
-  List<FieldOfLaw> findAllByParentIdentifierOrderByIdentifierAsc(String identifier);
+  Flux<FieldOfLaw> findAllByParentIdentifierOrderByIdentifierAsc(String identifier);
 
-  FieldOfLaw findTreeByIdentifier(String identifier);
+  Mono<FieldOfLaw> findByIdentifier(String identifier);
 
-  FieldOfLaw findParentByChild(FieldOfLaw child);
+  Mono<FieldOfLaw> findParentByChild(FieldOfLaw child);
 
-  Page<FieldOfLaw> findAllByOrderByIdentifierAsc(Pageable pageable);
+  Flux<FieldOfLaw> findAllByOrderByIdentifierAsc(Pageable pageable);
 
-  List<FieldOfLaw> findBySearchTerms(String[] searchTerms);
+  Mono<List<FieldOfLaw>> findAllForDocumentUnit(UUID documentUnitUuid);
 
-  List<FieldOfLaw> findByNormStr(String normStr);
+  Mono<List<FieldOfLaw>> addFieldOfLawToDocumentUnit(UUID documentUnitUuid, String identifier);
 
-  List<FieldOfLaw> findByNormStrAndSearchTerms(String normStr, String[] searchTerms);
+  Mono<List<FieldOfLaw>> removeFieldOfLawToDocumentUnit(UUID documentUnitUuid, String identifier);
 
-  List<FieldOfLaw> getFirst30OrderByIdentifier();
+  Mono<Long> count();
 
-  List<FieldOfLaw> findByIdentifierSearch(String searchStr);
+  Flux<FieldOfLaw> findBySearchTerms(String[] searchTerms);
+
+  Flux<FieldOfLaw> findByNormStr(String normStr);
+
+  Flux<FieldOfLaw> findByNormStrAndSearchTerms(String normStr, String[] searchTerms);
+
+  Flux<FieldOfLaw> getAllLimitedOrderByIdentifierLength();
+
+  Flux<FieldOfLaw> findByIdentifierSearch(String searchStr);
 }

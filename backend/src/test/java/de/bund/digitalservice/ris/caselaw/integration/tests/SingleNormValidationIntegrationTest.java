@@ -120,8 +120,7 @@ class SingleNormValidationIntegrationTest {
 
   @BeforeEach
   void setUp() {
-    documentationOfficeUuid =
-        documentationOfficeRepository.findByAbbreviation(docOffice.abbreviation()).getId();
+    documentationOfficeUuid = documentationOfficeRepository.findByLabel(docOffice.label()).getId();
 
     doReturn(Mono.just(docOffice))
         .when(userService)
@@ -129,7 +128,7 @@ class SingleNormValidationIntegrationTest {
             argThat(
                 (OidcUser user) -> {
                   List<String> groups = user.getAttribute("groups");
-                  return Objects.requireNonNull(groups).get(0).equals("/DS");
+                  return Objects.requireNonNull(groups).get(0).equals("/DigitalService");
                 }));
   }
 

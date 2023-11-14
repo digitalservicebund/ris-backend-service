@@ -33,7 +33,7 @@ const decisionDateInfo = computed(() =>
 )
 
 const documentationOffice = computed(
-  () => props.documentUnit.coreData.documentationOffice?.abbreviation,
+  () => props.documentUnit.coreData.documentationOffice?.label,
 )
 
 const courtInfo = computed(() => props.documentUnit.coreData.court?.label)

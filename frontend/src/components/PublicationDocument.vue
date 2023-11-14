@@ -6,9 +6,9 @@ import CodeSnippet from "@/components/CodeSnippet.vue"
 import ActiveCitation, { activeCitationLabels } from "@/domain/activeCitation"
 import DocumentUnit from "@/domain/documentUnit"
 import NormReference, { normFieldLabels } from "@/domain/normReference"
-import PreviousDecision, {
-  previousDecisionFieldLabels,
-} from "@/domain/previousDecision"
+import ProceedingDecision, {
+  proceedingDecisionFieldLabels,
+} from "@/domain/proceedingDecision"
 import XmlMail, { PublicationHistoryRecordType } from "@/domain/xmlMail"
 import { fieldLabels } from "@/fields/caselaw"
 import { ResponseError } from "@/services/httpClient"
@@ -63,21 +63,23 @@ const missingCoreDataFields = ref(
 
 //Required Proceeding Decision fields
 const missingProceedingDecisionFields = ref(
-  props.documentUnit.previousDecisions
-    ?.filter((previousDecision) => {
-      return getMissingPreviousDecisionFields(previousDecision).length > 0
+  props.documentUnit.proceedingDecisions
+    ?.filter((proceedingDecision) => {
+      return getMissingProceedingDecisionFields(proceedingDecision).length > 0
     })
-    .map((previousDecision) => {
+    .map((proceedingDecision) => {
       return {
-        identifier: previousDecision.renderDecision,
-        missingFields: getMissingPreviousDecisionFields(previousDecision),
+        identifier: proceedingDecision.renderDecision,
+        missingFields: getMissingProceedingDecisionFields(proceedingDecision),
       }
     }),
 )
 
-function getMissingPreviousDecisionFields(previousDecision: PreviousDecision) {
-  return previousDecision.missingRequiredFields.map(
-    (field) => previousDecisionFieldLabels[field],
+function getMissingProceedingDecisionFields(
+  proceedingDecision: ProceedingDecision,
+) {
+  return proceedingDecision.missingRequiredFields.map(
+    (field) => proceedingDecisionFieldLabels[field],
   )
 }
 

@@ -1,15 +1,13 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseStatusRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.StatusDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentUnitStatusRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitStatusDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.PostgresDocumentUnitRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitRepository;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatus;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatusService;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import java.time.Instant;
-import java.util.Objects;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
@@ -20,47 +18,46 @@ import reactor.core.publisher.Mono;
 @Slf4j
 public class DatabaseDocumentUnitStatusService implements DocumentUnitStatusService {
 
-  private final DatabaseStatusRepository repository;
-  private final DocumentUnitRepository documentUnitRepository;
-  private final DatabaseDocumentationUnitRepository databaseDocumentationUnitRepository;
+  private final DatabaseDocumentUnitStatusRepository repository;
+  private final PostgresDocumentUnitRepositoryImpl documentUnitRepository;
 
   public DatabaseDocumentUnitStatusService(
-      DatabaseStatusRepository repository,
-      DatabaseDocumentationUnitRepository databaseDocumentationUnitRepository,
-      DocumentUnitRepository documentUnitRepository) {
+      DatabaseDocumentUnitStatusRepository repository,
+      PostgresDocumentUnitRepositoryImpl documentUnitRepository) {
     this.repository = repository;
     this.documentUnitRepository = documentUnitRepository;
-    this.databaseDocumentationUnitRepository = databaseDocumentationUnitRepository;
   }
 
   @Override
   public Mono<DocumentUnit> setInitialStatus(DocumentUnit documentUnit) {
-    return Mono.just(
-            repository.save(
-                StatusDTO.builder()
-                    .createdAt(Instant.now())
-                    .documentationUnitDTO(
-                        databaseDocumentationUnitRepository.getReferenceById(documentUnit.uuid()))
-                    .publicationStatus(PublicationStatus.UNPUBLISHED)
-                    .withError(false)
-                    .build()))
-        .then(Mono.just(documentUnitRepository.findByUuid(documentUnit.uuid())));
+    return repository
+        .save(
+            DocumentUnitStatusDTO.builder()
+                .newEntry(true)
+                .id(UUID.randomUUID())
+                .createdAt(documentUnit.creationtimestamp())
+                .documentUnitId(documentUnit.uuid())
+                .publicationStatus(PublicationStatus.UNPUBLISHED)
+                .withError(false)
+                .build())
+        .then(documentUnitRepository.findByUuid(documentUnit.uuid()));
   }
 
   @Override
   public Mono<DocumentUnit> setToPublishing(
       DocumentUnit documentUnit, Instant publishDate, String issuerAddress) {
-    return Mono.just(
-            repository.save(
-                StatusDTO.builder()
-                    .createdAt(publishDate)
-                    .documentationUnitDTO(
-                        databaseDocumentationUnitRepository.getReferenceById(documentUnit.uuid()))
-                    .publicationStatus(PublicationStatus.PUBLISHING)
-                    .withError(false)
-                    .issuerAddress(issuerAddress)
-                    .build()))
-        .then(Mono.just(documentUnitRepository.findByUuid(documentUnit.uuid())));
+    return repository
+        .save(
+            DocumentUnitStatusDTO.builder()
+                .newEntry(true)
+                .id(UUID.randomUUID())
+                .createdAt(publishDate)
+                .documentUnitId(documentUnit.uuid())
+                .publicationStatus(PublicationStatus.PUBLISHING)
+                .withError(false)
+                .issuerAddress(issuerAddress)
+                .build())
+        .then(documentUnitRepository.findByUuid(documentUnit.uuid()));
   }
 
   @Override
@@ -78,32 +75,32 @@ public class DatabaseDocumentUnitStatusService implements DocumentUnitStatusServ
   }
 
   @NotNull
-  private Mono<StatusDTO> saveStatus(DocumentUnitStatus status, StatusDTO previousStatusDTO) {
-
-    return Mono.just(
-        repository.save(
-            StatusDTO.builder()
-                .createdAt(Instant.now())
-                .documentationUnitDTO(previousStatusDTO.getDocumentationUnitDTO())
-                .issuerAddress(previousStatusDTO.getIssuerAddress())
-                .publicationStatus(status.publicationStatus())
-                .withError(status.withError())
-                .build()));
+  private Mono<DocumentUnitStatusDTO> saveStatus(
+      DocumentUnitStatus status, DocumentUnitStatusDTO previousStatusDTO) {
+    return repository.save(
+        DocumentUnitStatusDTO.builder()
+            .newEntry(true)
+            .id(UUID.randomUUID())
+            .createdAt(Instant.now())
+            .documentUnitId(previousStatusDTO.getDocumentUnitId())
+            .issuerAddress(previousStatusDTO.getIssuerAddress())
+            .publicationStatus(status.publicationStatus())
+            .withError(status.withError())
+            .build());
   }
 
   public Mono<String> getLatestIssuerAddress(String documentNumber) {
-    return getLatestPublishing(documentNumber).map(StatusDTO::getIssuerAddress);
+    return getLatestPublishing(documentNumber).map(DocumentUnitStatusDTO::getIssuerAddress);
   }
 
   @Override
   public Mono<PublicationStatus> getLatestStatus(UUID documentUuid) {
-    return Mono.just(
-            repository.findFirstByDocumentationUnitDTOOrderByCreatedAtDesc(
-                databaseDocumentationUnitRepository.getReferenceById(documentUuid)))
-        .map(StatusDTO::getPublicationStatus);
+    return repository
+        .findFirstByDocumentUnitIdOrderByCreatedAtDesc(documentUuid)
+        .map(DocumentUnitStatusDTO::getPublicationStatus);
   }
 
-  private Mono<StatusDTO> getLatestPublishing(String documentNumber) {
+  private Mono<DocumentUnitStatusDTO> getLatestPublishing(String documentNumber) {
     return documentUnitRepository
         .findByDocumentNumber(documentNumber)
         .flatMap(
@@ -111,23 +108,13 @@ public class DatabaseDocumentUnitStatusService implements DocumentUnitStatusServ
               if (documentUnit == null || documentUnit.uuid() == null) {
                 return Mono.empty();
               }
-              return Mono.just(
-                  Objects.requireNonNull(
-                      databaseDocumentationUnitRepository
-                          .findByDocumentNumber(documentNumber)
-                          .map(
-                              documentationUnitDTO ->
-                                  repository
-                                      .findFirstByDocumentationUnitDTOAndPublicationStatusOrderByCreatedAtDesc(
-                                          documentationUnitDTO, PublicationStatus.PUBLISHING))
-                          .orElse(null)));
+              return repository.findFirstByDocumentUnitIdAndPublicationStatusOrderByCreatedAtDesc(
+                  documentUnit.uuid(), PublicationStatus.PUBLISHING);
             });
   }
 
-  private Mono<StatusDTO> getLatestPublishing(UUID documentUuid) {
-    return Mono.just(
-        repository.findFirstByDocumentationUnitDTOAndPublicationStatusOrderByCreatedAtDesc(
-            databaseDocumentationUnitRepository.getReferenceById(documentUuid),
-            PublicationStatus.PUBLISHING));
+  private Mono<DocumentUnitStatusDTO> getLatestPublishing(UUID documentUuid) {
+    return repository.findFirstByDocumentUnitIdAndPublicationStatusOrderByCreatedAtDesc(
+        documentUuid, PublicationStatus.PUBLISHING);
   }
 }

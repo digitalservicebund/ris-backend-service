@@ -27,7 +27,7 @@ public class KeycloakUserService implements UserService {
           Map.entry("/caselaw/BVerwG", "BVerwG"),
           Map.entry("/caselaw/OVG_NRW", "OVG NRW"),
           Map.entry("/caselaw/BZSt", "BZSt"),
-          Map.entry("/DS", "DS"),
+          Map.entry("/DS", "DigitalService"),
           Map.entry("/CC-RIS", "CC-RIS"));
 
   public KeycloakUserService(DatabaseDocumentationOfficeRepository documentationOfficeRepository) {
@@ -65,11 +65,11 @@ public class KeycloakUserService implements UserService {
             .map(documentationCenterClaims::get)
             .orElse(null);
 
-    return Optional.ofNullable(
-            documentationOfficeRepository.findByAbbreviation(documentationOfficeKey))
+    return Optional.ofNullable(documentationOfficeRepository.findByLabel(documentationOfficeKey))
         .map(
             documentationOfficeDTO ->
                 DocumentationOffice.builder()
+                    .label(documentationOfficeDTO.getLabel())
                     .abbreviation(documentationOfficeDTO.getAbbreviation())
                     .build())
         .map(Mono::just)

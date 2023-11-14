@@ -28,9 +28,9 @@ function handleTokenClick(tokenContent: string) {
         <div class="ds-label-02-reg flex pt-8 text-blue-800">
           <span
             :aria-label="
-              fieldOfLaw.identifier +
+              props.fieldOfLaw.identifier +
               ' ' +
-              fieldOfLaw.text +
+              props.fieldOfLaw.text +
               ' im Sachgebietsbaum anzeigen'
             "
             class="link mr-12 w-44 whitespace-nowrap"
@@ -39,12 +39,12 @@ function handleTokenClick(tokenContent: string) {
             @click="emit('node-clicked')"
             @keyup.enter="emit('node-clicked')"
           >
-            {{ fieldOfLaw.identifier }}
+            {{ props.fieldOfLaw.identifier }}
           </span>
           <span class="ml-112 text-black">
             <TokenizeText
-              :keywords="fieldOfLaw.linkedFields ?? []"
-              :text="fieldOfLaw.text"
+              :keywords="props.fieldOfLaw.linkedFields ?? []"
+              :text="props.fieldOfLaw.text"
               @link-token:clicked="handleTokenClick"
             />
           </span>

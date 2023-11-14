@@ -8,5 +8,5 @@ import lombok.Builder;
 public record ContentRelatedIndexing(
     List<String> keywords,
     List<FieldOfLaw> fieldsOfLaw,
-    List<NormReference> norms,
+    List<DocumentUnitNorm> norms,
     List<ActiveCitation> activeCitations) {}

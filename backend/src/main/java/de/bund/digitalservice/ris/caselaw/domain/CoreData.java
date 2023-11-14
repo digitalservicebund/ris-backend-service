@@ -1,29 +1,29 @@
 package de.bund.digitalservice.ris.caselaw.domain;
 
-import de.bund.digitalservice.ris.caselaw.domain.court.Court;
+import de.bund.digitalservice.ris.caselaw.domain.lookuptable.court.Court;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
+import de.bund.digitalservice.ris.caselaw.domain.validator.LookupTableConstraint;
 import jakarta.validation.constraints.PastOrPresent;
-import java.time.LocalDate;
+import java.time.Instant;
 import java.util.List;
 import lombok.Builder;
-import org.hibernate.validator.constraints.UniqueElements;
 
 @Builder(toBuilder = true)
 public record CoreData(
-    @UniqueElements List<String> fileNumbers,
-    @UniqueElements List<String> deviatingFileNumbers,
+    List<String> fileNumbers,
+    List<String> deviatingFileNumbers,
     Court court,
-    @UniqueElements List<String> deviatingCourts,
+    List<String> incorrectCourts,
     DocumentType documentType,
     Procedure procedure,
     List<String> previousProcedures,
     String ecli,
-    @UniqueElements List<String> deviatingEclis,
+    List<String> deviatingEclis,
     String appraisalBody,
-    @PastOrPresent LocalDate decisionDate,
+    @PastOrPresent Instant decisionDate,
     boolean dateKnown,
-    @UniqueElements List<LocalDate> deviatingDecisionDates,
-    String legalEffect,
+    List<Instant> deviatingDecisionDates,
+    @LookupTableConstraint(lookupTableName = "legalEffect") String legalEffect,
     String inputType,
     DocumentationOffice documentationOffice,
     String region) {}

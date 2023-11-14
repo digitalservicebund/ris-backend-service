@@ -110,7 +110,7 @@ export async function toggleNormsSection(page: Page): Promise<void> {
   await page.getByRole("button", { name: "Normen Aufklappen" }).click()
 }
 
-export async function fillPreviousDecisionInputs(
+export async function fillProceedingDecisionInputs(
   page: Page,
   values?: {
     court?: string
@@ -128,25 +128,22 @@ export async function fillPreviousDecisionInputs(
   }
 
   if (values?.court) {
-    await fillInput("Gericht Vorgehende Entscheidung", values?.court)
+    await fillInput("Gericht Rechtszug", values?.court)
     await page.getByText(values.court, { exact: true }).click()
     await waitForInputValue(
       page,
-      "[aria-label='Gericht Vorgehende Entscheidung']",
+      "[aria-label='Gericht Rechtszug']",
       values.court,
     )
   }
   if (values?.decisionDate) {
-    await fillInput(
-      "Entscheidungsdatum Vorgehende Entscheidung",
-      values?.decisionDate,
-    )
+    await fillInput("Entscheidungsdatum Rechtszug", values?.decisionDate)
   }
   if (values?.fileNumber) {
-    await fillInput("Aktenzeichen Vorgehende Entscheidung", values?.fileNumber)
+    await fillInput("Aktenzeichen Rechtszug", values?.fileNumber)
   }
   if (values?.documentType) {
-    await fillInput("Dokumenttyp Vorgehende Entscheidung", values?.documentType)
+    await fillInput("Dokumenttyp Rechtszug", values?.documentType)
     await page.locator("[aria-label='dropdown-option']").first().click()
   }
   if (values?.dateUnknown) {
@@ -156,7 +153,7 @@ export async function fillPreviousDecisionInputs(
       await expect(dateUnknownCheckbox).toBeChecked()
       await waitForInputValue(
         page,
-        "[aria-label='Entscheidungsdatum Vorgehende Entscheidung']",
+        "[aria-label='Entscheidungsdatum Rechtszug']",
         "",
       )
     }
@@ -202,7 +199,7 @@ export async function fillNormInputs(
 export async function fillActiveCitationInputs(
   page: Page,
   values?: {
-    citationType?: string
+    citationStyle?: string
     court?: string
     decisionDate?: string
     fileNumber?: string
@@ -215,13 +212,13 @@ export async function fillActiveCitationInputs(
     await waitForInputValue(page, `[aria-label='${ariaLabel}']`, value)
   }
 
-  if (values?.citationType) {
-    await fillInput("Art der Zitierung", values?.citationType)
+  if (values?.citationStyle) {
+    await fillInput("Art der Zitierung", values?.citationStyle)
     await page.getByRole("button", { name: "dropdown-option" }).click()
     await waitForInputValue(
       page,
       "[aria-label='Art der Zitierung']",
-      values.citationType,
+      values.citationStyle,
     )
   }
 
@@ -249,12 +246,12 @@ export async function fillActiveCitationInputs(
   }
 }
 
-export async function checkIfPreviousDecisionCleared(page: Page) {
+export async function checkIfProceedingDecisionCleared(page: Page) {
   ;[
-    "Gericht Vorgehende Entscheidung",
-    "Entscheidungsdatum Vorgehende Entscheidung",
-    "Aktenzeichen Vorgehende Entscheidung",
-    "Dokumenttyp Vorgehende Entscheidung",
+    "Gericht Rechtszug",
+    "Entscheidungsdatum Rechtszug",
+    "Aktenzeichen Rechtszug",
+    "Dokumenttyp Rechtszug",
   ].forEach((ariaLabel) =>
     waitForInputValue(page, `[aria-label='${ariaLabel}']`, ""),
   )

@@ -12,31 +12,35 @@ import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentNumberService;
 import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentUnitStatusService;
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentUnitController;
 import de.bund.digitalservice.ris.caselaw.adapter.DocxConverterService;
+import de.bund.digitalservice.ris.caselaw.adapter.KeycloakUserService;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationOfficeRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseStatusRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentationUnitRepositoryImpl;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresPublicationReportRepositoryImpl;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.StatusDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentUnitMetadataRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentUnitRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentUnitStatusRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitStatusDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.FileNumberDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.FileNumberRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.PostgresDocumentUnitRepositoryImpl;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.PostgresPublicationReportRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationOfficeTransformer;
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
 import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
+import de.bund.digitalservice.ris.caselaw.domain.DataSource;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.EmailPublishService;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
+import java.time.Instant;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -53,9 +57,10 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
 @RISIntegrationTest(
     imports = {
       DocumentUnitService.class,
+      KeycloakUserService.class,
       DatabaseDocumentUnitStatusService.class,
       DatabaseDocumentNumberService.class,
-      PostgresDocumentationUnitRepositoryImpl.class,
+      PostgresDocumentUnitRepositoryImpl.class,
       PostgresPublicationReportRepositoryImpl.class,
       FlywayConfig.class,
       PostgresConfig.class,
@@ -81,10 +86,11 @@ class DocumentUnitListEntryIntegrationTest {
   }
 
   @Autowired private RisWebTestClient risWebTestClient;
-  @Autowired private DatabaseDocumentationUnitRepository repository;
+  @Autowired private DatabaseDocumentUnitRepository repository;
+  @Autowired private DatabaseDocumentUnitStatusRepository statusRepository;
+  @Autowired private DatabaseDocumentUnitMetadataRepository listEntryRepository;
+  @Autowired private FileNumberRepository fileNumberRepository;
   @Autowired private DatabaseDocumentationOfficeRepository documentationOfficeRepository;
-
-  @Autowired private DatabaseStatusRepository statusRepository;
 
   @MockBean S3AsyncClient s3AsyncClient;
   @MockBean EmailPublishService publishService;
@@ -96,45 +102,76 @@ class DocumentUnitListEntryIntegrationTest {
 
   @BeforeEach
   void setUp() {
-    docOfficeDTO = documentationOfficeRepository.findByAbbreviation("DS");
+    repository.deleteAll().block();
+    fileNumberRepository.deleteAll().block();
+    statusRepository.deleteAll().block();
+
+    docOfficeDTO = documentationOfficeRepository.findByLabel("DigitalService");
 
     doReturn(Mono.just(DocumentationOfficeTransformer.transformDTO(docOfficeDTO)))
         .when(userService)
         .getDocumentationOffice(any(OidcUser.class));
   }
 
-  @AfterEach
-  void cleanUp() {
-    repository.deleteAll();
-  }
-
   @Test
-  @Disabled
   void testForCorrectResponseWhenRequestingAll() {
-    DocumentationUnitDTO migrationDto =
-        repository.save(
-            DocumentationUnitDTO.builder()
-                .id(UUID.randomUUID())
-                .documentNumber("MIGR202200012")
-                .documentationOffice(docOfficeDTO)
-                .build());
-    DocumentationUnitDTO newNeurisDto =
-        repository.save(
-            DocumentationUnitDTO.builder()
-                .documentNumber("NEUR202300008")
-                .documentationOffice(docOfficeDTO)
-                .build());
+    DocumentUnitDTO migrationDto =
+        repository
+            .save(
+                DocumentUnitDTO.builder()
+                    .uuid(UUID.randomUUID())
+                    .creationtimestamp(Instant.now())
+                    .documentnumber("MIGR202200012")
+                    .dataSource(DataSource.MIGRATION)
+                    .build())
+            .block();
+    DocumentUnitDTO newNeurisDto =
+        repository
+            .save(
+                DocumentUnitDTO.builder()
+                    .uuid(UUID.randomUUID())
+                    .creationtimestamp(Instant.now())
+                    .documentnumber("NEUR202300008")
+                    .dataSource(DataSource.NEURIS)
+                    .documentationOfficeId(docOfficeDTO.getId())
+                    .build())
+            .block();
 
-    statusRepository.save(
-        StatusDTO.builder()
-            .documentationUnitDTO(migrationDto)
-            .publicationStatus(PublicationStatus.JURIS_PUBLISHED)
-            .build());
-    statusRepository.save(
-        StatusDTO.builder()
-            .documentationUnitDTO(newNeurisDto)
-            .publicationStatus(PublicationStatus.PUBLISHED)
-            .build());
+    fileNumberRepository
+        .save(
+            FileNumberDTO.builder()
+                .documentUnitId(migrationDto.getId())
+                .fileNumber("AkteM")
+                .isDeviating(false)
+                .build())
+        .block();
+    fileNumberRepository
+        .save(
+            FileNumberDTO.builder()
+                .documentUnitId(newNeurisDto.getId())
+                .fileNumber("AkteY")
+                .isDeviating(false)
+                .build())
+        .block();
+
+    statusRepository
+        .save(
+            DocumentUnitStatusDTO.builder()
+                .id(UUID.randomUUID())
+                .newEntry(true)
+                .documentUnitId(migrationDto.getUuid())
+                .publicationStatus(PublicationStatus.JURIS_PUBLISHED)
+                .build())
+        .block();
+    statusRepository
+        .save(
+            DocumentUnitStatusDTO.builder()
+                .id(UUID.randomUUID())
+                .newEntry(true)
+                .documentUnitId(newNeurisDto.getUuid())
+                .publicationStatus(PublicationStatus.PUBLISHED)
+                .build())
+        .block();
 
     risWebTestClient
         .withDefaultLogin()
@@ -163,16 +200,20 @@ class DocumentUnitListEntryIntegrationTest {
   }
 
   @Test
-  @Disabled
   void testForCorrectOrdering() {
     List<String> documentNumbers = Arrays.asList("ABCD202300007", "EFGH202200123", "IJKL202300099");
 
     for (String documentNumber : documentNumbers) {
-      repository.save(
-          DocumentationUnitDTO.builder()
-              .documentNumber(documentNumber)
-              .documentationOffice(docOfficeDTO)
-              .build());
+      repository
+          .save(
+              DocumentUnitDTO.builder()
+                  .uuid(UUID.randomUUID())
+                  .creationtimestamp(Instant.now())
+                  .documentnumber(documentNumber)
+                  .dataSource(DataSource.NEURIS)
+                  .documentationOfficeId(docOfficeDTO.getId())
+                  .build())
+          .block();
     }
 
     EntityExchangeResult<String> result =
@@ -194,19 +235,21 @@ class DocumentUnitListEntryIntegrationTest {
   }
 
   @Test
-  @Disabled
   void testForCorrectPagination() {
-    List<DocumentationUnitDTO> documents =
+    List<DocumentUnitDTO> documents =
         IntStream.range(0, 99)
             .mapToObj(
                 i ->
-                    DocumentationUnitDTO.builder()
-                        .documentNumber("123456780" + i)
-                        .documentationOffice(docOfficeDTO)
+                    DocumentUnitDTO.builder()
+                        .uuid(UUID.randomUUID())
+                        .creationtimestamp(Instant.now())
+                        .documentnumber("123456780" + i)
+                        .dataSource(DataSource.NEURIS)
+                        .documentationOfficeId(docOfficeDTO.getId())
                         .build())
             .collect(Collectors.toList());
 
-    repository.saveAll(documents);
+    repository.saveAll(documents).blockLast();
 
     EntityExchangeResult<String> result =
         risWebTestClient

@@ -36,7 +36,12 @@ export const caselawTest = test.extend<MyFixtures>({
           ...prefilledDocumentUnit,
           coreData: {
             ...prefilledDocumentUnit.coreData,
+            court: {
+              type: "AG",
+              location: "Aachen",
+            },
             fileNumbers: [generateString()],
+            documentType: { jurisShortcut: "AnU", label: "Anerkenntnisurteil" },
             decisionDate: "2019-12-31T23:00:00Z",
           },
         },

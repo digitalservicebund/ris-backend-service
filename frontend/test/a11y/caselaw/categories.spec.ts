@@ -3,7 +3,7 @@ import { expect } from "@playwright/test"
 import {
   navigateToCategories,
   waitForSaving,
-  fillPreviousDecisionInputs,
+  fillProceedingDecisionInputs,
 } from "../../e2e/caselaw/e2e-utils"
 import { caselawTest as test } from "../../e2e/caselaw/fixtures"
 
@@ -22,7 +22,7 @@ test.describe("a11y of categories page (/caselaw/documentunit/{documentNumber}/c
       .locator("[aria-label='Gericht'] + button.input-expand-icon")
       .click()
     await expect(page.locator("[aria-label='dropdown-option']")).toHaveCount(
-      4053,
+      3925,
     )
 
     await expect(page.locator("text=AG Aachen")).toBeVisible()
@@ -139,7 +139,7 @@ test.describe("a11y of categories page (/caselaw/documentunit/{documentNumber}/c
 
     await waitForSaving(
       async () => {
-        await fillPreviousDecisionInputs(page, {
+        await fillProceedingDecisionInputs(page, {
           court: "AG Aalen",
           decisionDate: "03.12.2004",
           fileNumber: "1a2b3c",
@@ -149,7 +149,7 @@ test.describe("a11y of categories page (/caselaw/documentunit/{documentNumber}/c
       { clickSaveButton: true },
     )
     await page.reload()
-    await fillPreviousDecisionInputs(page, {
+    await fillProceedingDecisionInputs(page, {
       decisionDate: "03.12.2004",
     })
 

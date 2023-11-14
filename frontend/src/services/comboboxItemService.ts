@@ -1,6 +1,6 @@
 import httpClient, { ServiceResponse } from "./httpClient"
-import { CitationType } from "@/domain/citationType"
-import { Court, Procedure, DocumentType } from "@/domain/documentUnit"
+import { CitationStyle } from "@/domain/citationStyle"
+import { Court, Procedure } from "@/domain/documentUnit"
 import { FieldOfLawNode } from "@/domain/fieldOfLaw"
 import { NormAbbreviation } from "@/domain/normAbbreviation"
 import {
@@ -11,13 +11,19 @@ import { Page } from "@/shared/components/Pagination.vue"
 import errorMessages from "@/shared/i18n/errors.json"
 
 enum Endpoint {
-  documentTypes = "documenttypes",
-  courts = "courts",
-  citationTypes = "citationtypes",
+  documentTypes = "lookuptable/documentTypes",
+  courts = "lookuptable/courts",
+  citationStyles = "lookuptable/zitart",
   fieldOfLawSearchByIdentifier = "fieldsoflaw/search-by-identifier",
   risAbbreviations = `normabbreviation?pg=0&sz=30`,
   risAbbreviationsAwesome = `normabbreviation/search?pg=0&sz=30`,
   procedures = `procedure`,
+}
+
+type DocumentType = {
+  id: number
+  jurisShortcut: string
+  label: string
 }
 
 function formatDropdownItems(
@@ -54,8 +60,8 @@ function formatDropdownItems(
         additionalInformation: item.officialLongTitle,
       }))
     }
-    case Endpoint.citationTypes: {
-      return (responseData as CitationType[]).map((item) => ({
+    case Endpoint.citationStyles: {
+      return (responseData as CitationStyle[]).map((item) => ({
         label: item.label,
         value: item,
         additionalInformation: item.jurisShortcut,
@@ -131,8 +137,8 @@ const service: ComboboxItemService = {
     await fetchFromEndpoint(Endpoint.risAbbreviations, filter),
   getRisAbbreviationsAwesome: async (filter?: string) =>
     await fetchFromEndpoint(Endpoint.risAbbreviationsAwesome, filter),
-  getCitationTypes: async (filter?: string) =>
-    await fetchFromEndpoint(Endpoint.citationTypes, filter),
+  getCitationStyles: async (filter?: string) =>
+    await fetchFromEndpoint(Endpoint.citationStyles, filter),
   getProcedures: async (filter?: string) =>
     await fetchFromEndpoint(Endpoint.procedures, filter, 10),
 }

@@ -5,7 +5,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentUnitRepository;
 import de.bund.digitalservice.ris.caselaw.domain.Attachment;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
@@ -14,7 +14,7 @@ import de.bund.digitalservice.ris.caselaw.domain.XmlExporter;
 import de.bund.digitalservice.ris.caselaw.domain.XmlPublication;
 import de.bund.digitalservice.ris.caselaw.domain.XmlPublicationRepository;
 import de.bund.digitalservice.ris.caselaw.domain.XmlResultObject;
-import de.bund.digitalservice.ris.caselaw.domain.court.Court;
+import de.bund.digitalservice.ris.caselaw.domain.lookuptable.court.Court;
 import java.time.Clock;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -34,6 +34,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 @ExtendWith(SpringExtension.class)
@@ -88,7 +89,7 @@ class XmlEMailPublishServiceProdTest {
 
   @MockBean private XmlPublicationRepository repository;
 
-  @MockBean private DatabaseDocumentationUnitRepository documentationUnitRepository;
+  @MockBean private DatabaseDocumentUnitRepository documentationUnitRepository;
 
   @MockBean private HttpMailSender mailSender;
 
@@ -106,7 +107,7 @@ class XmlEMailPublishServiceProdTest {
             .build();
     when(xmlExporter.generateXml(any(DocumentUnit.class))).thenReturn(FORMATTED_XML);
 
-    when(repository.save(EXPECTED_BEFORE_SAVE_PROD)).thenReturn(SAVED_XML_MAIL_PROD);
+    when(repository.save(EXPECTED_BEFORE_SAVE_PROD)).thenReturn(Mono.just(SAVED_XML_MAIL_PROD));
   }
 
   @Test

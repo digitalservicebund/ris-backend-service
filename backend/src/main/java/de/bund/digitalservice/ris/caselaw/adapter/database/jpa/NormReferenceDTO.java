@@ -39,4 +39,7 @@ public class NormReferenceDTO {
 
   @Column(name = "date_of_relevance")
   String dateOfRelevance;
+
+  @Column(name = "legacy_doc_unit_id")
+  UUID legacyDocUnitId;
 }

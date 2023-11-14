@@ -9,7 +9,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.domain.Attachment;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
@@ -19,7 +18,7 @@ import de.bund.digitalservice.ris.caselaw.domain.XmlExporter;
 import de.bund.digitalservice.ris.caselaw.domain.XmlPublication;
 import de.bund.digitalservice.ris.caselaw.domain.XmlPublicationRepository;
 import de.bund.digitalservice.ris.caselaw.domain.XmlResultObject;
-import de.bund.digitalservice.ris.caselaw.domain.court.Court;
+import de.bund.digitalservice.ris.caselaw.domain.lookuptable.court.Court;
 import java.time.Clock;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -30,7 +29,6 @@ import java.util.List;
 import java.util.UUID;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
-import org.junit.Assert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -39,6 +37,8 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 @ExtendWith(SpringExtension.class)
@@ -100,8 +100,6 @@ class XmlEMailPublishServiceTest {
 
   @MockBean private XmlPublicationRepository repository;
 
-  @MockBean private DatabaseDocumentationUnitRepository documentationUnitRepository;
-
   @MockBean private HttpMailSender mailSender;
 
   @BeforeEach
@@ -110,7 +108,7 @@ class XmlEMailPublishServiceTest {
         DocumentUnit.builder().uuid(TEST_UUID).documentNumber("test-document-number").build();
     when(xmlExporter.generateXml(any(DocumentUnit.class))).thenReturn(FORMATTED_XML);
 
-    when(repository.save(EXPECTED_BEFORE_SAVE)).thenReturn(SAVED_XML_MAIL);
+    when(repository.save(EXPECTED_BEFORE_SAVE)).thenReturn(Mono.just(SAVED_XML_MAIL));
   }
 
   @Test
@@ -195,16 +193,13 @@ class XmlEMailPublishServiceTest {
   void testPublish_withoutDocumentNumber() {
     documentUnit = documentUnit.toBuilder().documentNumber(null).build();
 
-    // Call the method and check for the exception
-    Throwable throwable =
-        Assert.assertThrows(
-            DocumentUnitPublishException.class,
-            () -> service.publish(documentUnit, RECEIVER_ADDRESS));
+    StepVerifier.create(service.publish(documentUnit, RECEIVER_ADDRESS))
+        .expectErrorMatches(
+            ex ->
+                ex instanceof DocumentUnitPublishException
+                    && ex.getMessage().equals("No document number has set in the document unit."))
+        .verify();
 
-    assertThat(throwable.getMessage())
-        .isEqualTo("No document number has set in the document unit.");
-
-    // Verify that repository.save and mailSender.sendMail were not called
     verify(repository, times(0)).save(any(XmlPublication.class));
     verify(mailSender, times(0))
         .sendMail(anyString(), anyString(), anyString(), anyString(), any(List.class), anyString());
@@ -214,8 +209,9 @@ class XmlEMailPublishServiceTest {
   void testPublish_withExceptionBySaving() {
     when(repository.save(EXPECTED_BEFORE_SAVE)).thenThrow(IllegalArgumentException.class);
 
-    Assert.assertThrows(
-        IllegalArgumentException.class, () -> service.publish(documentUnit, RECEIVER_ADDRESS));
+    StepVerifier.create(service.publish(documentUnit, RECEIVER_ADDRESS))
+        .expectErrorMatches(ex -> ex instanceof IllegalArgumentException)
+        .verify();
 
     verify(repository).save(any(XmlPublication.class));
     verify(mailSender)
@@ -224,11 +220,13 @@ class XmlEMailPublishServiceTest {
 
   @Test
   void testPublish_withoutToReceiverAddressSet() {
-    Throwable throwable =
-        Assert.assertThrows(
-            DocumentUnitPublishException.class, () -> service.publish(documentUnit, null));
 
-    assertThat(throwable.getMessage()).isEqualTo("No receiver mail address is set");
+    StepVerifier.create(service.publish(documentUnit, null))
+        .expectErrorMatches(
+            ex ->
+                ex instanceof DocumentUnitPublishException
+                    && ex.getMessage().equals("No receiver mail address is set"))
+        .verify();
 
     verify(repository, times(0)).save(any(XmlPublication.class));
     verify(mailSender, times(0))
@@ -248,8 +246,9 @@ class XmlEMailPublishServiceTest {
                 Attachment.builder().fileName("test.xml").fileContent("xml").build()),
             TEST_UUID.toString());
 
-    Assert.assertThrows(
-        DocumentUnitPublishException.class, () -> service.publish(documentUnit, RECEIVER_ADDRESS));
+    StepVerifier.create(service.publish(documentUnit, RECEIVER_ADDRESS))
+        .expectErrorMatches(DocumentUnitPublishException.class::isInstance)
+        .verify();
 
     verify(repository, times(0)).save(any(XmlPublication.class));
     verify(mailSender)
@@ -265,8 +264,8 @@ class XmlEMailPublishServiceTest {
 
   @Test
   void testGetLastPublishedXml() {
-    List<XmlPublication> list = List.of(SAVED_XML_MAIL);
-    when(repository.getPublicationsByDocumentUnitUuid(TEST_UUID)).thenReturn((List) list);
+    when(repository.getPublicationsByDocumentUnitUuid(TEST_UUID))
+        .thenReturn(Flux.just(SAVED_XML_MAIL));
 
     StepVerifier.create(service.getPublications(TEST_UUID))
         .consumeNextWith(

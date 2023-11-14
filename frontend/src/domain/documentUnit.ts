@@ -1,16 +1,14 @@
 import ActiveCitation from "./activeCitation"
 import DocumentationOffice from "./documentationOffice"
 import DocumentUnitListEntry from "./documentUnitListEntry"
-import EnsuingDecision from "./ensuingDecision"
-import { FieldOfLawNode } from "./fieldOfLaw"
 import NormReference from "./normReference"
-import PreviousDecision from "./previousDecision"
+import ProceedingDecision from "./proceedingDecision"
 
 export type CoreData = {
   fileNumbers?: string[]
   deviatingFileNumbers?: string[]
   court?: Court
-  deviatingCourts?: string[]
+  incorrectCourts?: string[]
   documentType?: DocumentType
   procedure?: Procedure
   ecli?: string
@@ -25,14 +23,11 @@ export type CoreData = {
 }
 
 export type ContentRelatedIndexing = {
-  keywords?: string[]
   norms?: NormReference[]
   activeCitations?: ActiveCitation[]
-  fieldsOfLaw?: FieldOfLawNode[]
 }
 
 export type DocumentType = {
-  uuid?: string
   jurisShortcut: string
   label: string
 }
@@ -45,7 +40,6 @@ export type Court = {
 }
 
 export type Procedure = {
-  id?: string
   label: string
   documentUnitCount: number
   createdAt: string
@@ -88,8 +82,7 @@ export default class DocumentUnit {
 
   public coreData: CoreData = {}
   public texts: Texts = {}
-  public previousDecisions?: PreviousDecision[]
-  public ensuingDecisions?: EnsuingDecision[]
+  public proceedingDecisions?: ProceedingDecision[]
   public contentRelatedIndexing: ContentRelatedIndexing = {}
 
   static requiredFields = [
@@ -118,14 +111,9 @@ export default class DocumentUnit {
         delete data.texts[textsField]
     }
 
-    if (data.previousDecisions)
-      data.previousDecisions = data.previousDecisions.map(
-        (decision) => new PreviousDecision({ ...decision }),
-      )
-
-    if (data.ensuingDecisions)
-      data.ensuingDecisions = data.ensuingDecisions.map(
-        (decision) => new EnsuingDecision({ ...decision }),
+    if (data.proceedingDecisions)
+      data.proceedingDecisions = data.proceedingDecisions.map(
+        (decision) => new ProceedingDecision({ ...decision }),
       )
 
     if (data.contentRelatedIndexing?.norms)

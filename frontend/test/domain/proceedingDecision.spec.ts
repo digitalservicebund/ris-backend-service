@@ -1,5 +1,4 @@
-import { describe, it, expect } from "vitest"
-import ProceedingDecision from "@/domain/previousDecision"
+import ProceedingDecision from "@/domain/proceedingDecision"
 
 describe("ProceedingDecision", () => {
   it("instantiates a proceeding decision", () => {
@@ -28,16 +27,19 @@ describe("ProceedingDecision", () => {
     expect(proceedingDecision.dateKnown).toBeTruthy()
   })
 
-  // Todo
-  // it("returns false if not linked to other docunit", () => {
-  //   const proceedingDecision = new ProceedingDecision()
-  //   expect(previousDecisions.isReadOnly).toBeFalsy()
-  // })
+  it("returns false if not linked to other docunit", () => {
+    const proceedingDecision = new ProceedingDecision({
+      dataSource: "PROCEEDING_DECISION",
+    })
+    expect(proceedingDecision.isReadOnly).toBeFalsy()
+  })
 
-  // it("returns true if linked to other docunit", () => {
-  //   const proceedingDecision = new ProceedingDecision()
-  //   expect(previousDecisions.isReadOnly).toBeTruthy()
-  // })
+  it("returns true if linked to other docunit", () => {
+    const proceedingDecision = new ProceedingDecision({
+      dataSource: "NEURIS",
+    })
+    expect(proceedingDecision.isReadOnly).toBeTruthy()
+  })
 
   it("returns a string representation of a proceeding decision", () => {
     const proceedingDecision = new ProceedingDecision({

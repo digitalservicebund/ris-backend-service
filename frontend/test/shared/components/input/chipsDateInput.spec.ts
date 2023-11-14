@@ -107,7 +107,9 @@ describe("ChipsInput", () => {
     await user.type(input, "{enter}")
     await userEvent.tab()
 
-    expect(emitted()["update:modelValue"]).toEqual([[["2022-02-03"]]])
+    expect(emitted()["update:modelValue"]).toEqual([
+      [["2022-02-03T00:00:00.000Z"]],
+    ])
   })
 
   it("resets date input on backspace delete", async () => {

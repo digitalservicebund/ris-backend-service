@@ -39,7 +39,7 @@ test.describe("active citations", () => {
     await expect(page.getByText(documentNumber)).toBeVisible()
 
     await fillActiveCitationInputs(page, {
-      citationType: "Änderung",
+      citationStyle: "Änderung",
       court: prefilledDocumentUnit.coreData.court?.label,
       fileNumber: prefilledDocumentUnit.coreData.fileNumbers?.[0],
       documentType: prefilledDocumentUnit.coreData.documentType?.jurisShortcut,
@@ -60,7 +60,7 @@ test.describe("active citations", () => {
 
     await page.getByLabel("Weitere Angabe").click()
     await fillActiveCitationInputs(page, {
-      citationType: "Änderung",
+      citationStyle: "Änderung",
       court: prefilledDocumentUnit.coreData.court?.label,
       fileNumber: prefilledDocumentUnit.coreData.fileNumbers?.[0],
       documentType: prefilledDocumentUnit.coreData.documentType?.jurisShortcut,
@@ -91,7 +91,7 @@ test.describe("active citations", () => {
     await waitForSaving(
       async () => {
         await fillActiveCitationInputs(page, {
-          citationType: "Änderung",
+          citationStyle: "Änderung",
           court: prefilledDocumentUnit.coreData.court?.label,
           fileNumber: prefilledDocumentUnit.coreData.fileNumbers?.[0],
           documentType:
@@ -207,9 +207,7 @@ test.describe("active citations", () => {
     ).toHaveCount(1)
   })
 
-  // Todo enable again when linking possible
-  // eslint-disable-next-line playwright/no-skipped-test
-  test.skip("search for documentunits and link as active citation", async ({
+  test("search for documentunits and link as active citation", async ({
     page,
     documentNumber,
     prefilledDocumentUnit,
@@ -231,7 +229,7 @@ test.describe("active citations", () => {
     await expect(page.getByText(documentNumber)).toBeVisible()
 
     await fillActiveCitationInputs(page, {
-      citationType: "Änderung",
+      citationStyle: "Änderung",
       court: prefilledDocumentUnit.coreData.court?.label,
       fileNumber: prefilledDocumentUnit.coreData.fileNumbers?.[0],
       documentType: prefilledDocumentUnit.coreData.documentType?.jurisShortcut,
@@ -265,7 +263,7 @@ test.describe("active citations", () => {
     // search for same parameters gives same result, indication that decision is already added
     await activeCitationContainer.getByLabel("Weitere Angabe").click()
     await fillActiveCitationInputs(page, {
-      citationType: "Änderung",
+      citationStyle: "Änderung",
       court: prefilledDocumentUnit.coreData.court?.label,
       fileNumber: prefilledDocumentUnit.coreData.fileNumbers?.[0],
       documentType: prefilledDocumentUnit.coreData.documentType?.jurisShortcut,
@@ -309,7 +307,7 @@ test.describe("active citations", () => {
     ).toHaveCount(3)
 
     await fillActiveCitationInputs(page, {
-      citationType: "Änderung",
+      citationStyle: "Änderung",
       court: prefilledDocumentUnit.coreData.court?.label,
       fileNumber: prefilledDocumentUnit.coreData.fileNumbers?.[0],
       documentType: prefilledDocumentUnit.coreData.documentType?.jurisShortcut,

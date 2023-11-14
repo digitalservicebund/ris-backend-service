@@ -1,6 +1,6 @@
 import httpClient, { ServiceResponse } from "./httpClient"
 import DocumentUnit from "@/domain/documentUnit"
-import ProceedingDecision from "@/domain/previousDecision"
+import ProceedingDecision from "@/domain/proceedingDecision"
 import errorMessages from "@/shared/i18n/errors.json"
 
 interface ProceedingDecisionService {
@@ -76,7 +76,7 @@ const service: ProceedingDecisionService = {
         status: 200,
         data: (
           (response.data as DocumentUnit)
-            .previousDecisions as ProceedingDecision[]
+            .proceedingDecisions as ProceedingDecision[]
         ).map((decision) => new ProceedingDecision({ ...decision })),
       }
     }

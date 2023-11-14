@@ -92,7 +92,7 @@ describe("UpdateStatusIndicationGroup in status mode", () => {
     expect(dateInput).toHaveValue("29.06.2023")
     await userEvent.clear(dateInput)
     await user.type(dateInput, "30.05.2022")
-    expect(modelValue.DATE).toEqual(["2022-05-30"])
+    expect(modelValue.DATE).toEqual(["2022-05-30T00:00:00.000Z"])
 
     const referencesInput = screen.getByRole("textbox", {
       name: "Fundstellen der Änderungsvorschrift",
@@ -225,7 +225,7 @@ describe("UpdateStatusIndicationGroup in reissue mode", () => {
     expect(dateInput).toHaveValue("29.06.2023")
     await userEvent.clear(dateInput)
     await user.type(dateInput, "30.05.2022")
-    expect(modelValue.DATE).toEqual(["2022-05-30"])
+    expect(modelValue.DATE).toEqual(["2022-05-30T00:00:00.000Z"])
 
     const referencesInput = screen.getByRole("textbox", {
       name: "Fundstelle der Bekanntmachung",

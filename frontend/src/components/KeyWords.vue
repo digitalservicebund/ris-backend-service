@@ -1,23 +1,64 @@
 <script lang="ts" setup>
-import { ref, computed } from "vue"
+import { ref, watch } from "vue"
 import { ResponseError } from "@/services/httpClient"
+import KeywordsService from "@/services/keywordsService"
 import KeywordsChipsInput from "@/shared/components/input/KeywordsChipsInput.vue"
 
 const props = defineProps<{
-  modelValue: string[] | undefined
+  documentUnitUuid: string
 }>()
 
-const emit = defineEmits<{ "update:modelValue": [value?: string[]] }>()
+const keywords = ref<string[]>([])
 const errorMessage = ref<ResponseError>()
 
-const keywords = computed({
-  get: () => {
-    return props.modelValue
+const addKeyword = async (keyword: string | undefined) => {
+  if (keyword !== undefined) {
+    const response = await KeywordsService.addKeyword(
+      props.documentUnitUuid,
+      keyword,
+    )
+    if (response.error) {
+      errorMessage.value = response.error
+      return
+    }
+    if (response.data) {
+      keywords.value = response.data
+    }
+  }
+}
+
+const deleteKeyword = async (keyword: string | undefined) => {
+  if (keyword !== undefined) {
+    const response = await KeywordsService.deleteKeyword(
+      props.documentUnitUuid,
+      keyword,
+    )
+    if (response.error) {
+      errorMessage.value = response.error
+      return
+    }
+    if (response.data) {
+      keywords.value = response.data
+    }
+  }
+}
+
+watch(
+  props,
+  async () => {
+    const response = await KeywordsService.getKeywords(props.documentUnitUuid)
+    if (response.error) {
+      errorMessage.value = response.error
+      return
+    }
+    if (response.data) {
+      keywords.value = response.data
+    }
   },
-  set: (value) => {
-    if (value) emit("update:modelValue", value)
+  {
+    immediate: true,
   },
-})
+)
 </script>
 
 <template>
@@ -27,9 +68,11 @@ const keywords = computed({
       <div class="flex-1">
         <KeywordsChipsInput
           id="keywords"
-          v-model="keywords"
           aria-label="Schlagwörter"
           :error="errorMessage"
+          :model-value="keywords"
+          @chip-added="addKeyword"
+          @chip-deleted="deleteKeyword"
         ></KeywordsChipsInput>
       </div>
     </div>

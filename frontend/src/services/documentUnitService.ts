@@ -4,8 +4,8 @@ import httpClient, {
 } from "./httpClient"
 import DocumentUnit from "@/domain/documentUnit"
 import DocumentUnitListEntry from "@/domain/documentUnitListEntry"
+import LinkedDocumentUnit from "@/domain/linkedDocumentUnit"
 import { SingleNormValidationInfo } from "@/domain/normReference"
-import RelatedDocumentation from "@/domain/relatedDocumentation"
 import { PageableService, Page } from "@/shared/components/Pagination.vue"
 import errorMessages from "@/shared/i18n/errors.json"
 
@@ -16,9 +16,9 @@ interface DocumentUnitService {
   createNew(): Promise<ServiceResponse<DocumentUnit>>
   update(documentUnit: DocumentUnit): Promise<ServiceResponse<unknown>>
   delete(documentUnitUuid: string): Promise<ServiceResponse<unknown>>
-  searchByRelatedDocumentation: PageableService<
-    RelatedDocumentation,
-    RelatedDocumentation
+  searchByLinkedDocumentUnit: PageableService<
+    LinkedDocumentUnit,
+    LinkedDocumentUnit
   >
   searchByDocumentUnitSearchInput(
     requestParams?: { [key: string]: string } | undefined,
@@ -115,14 +115,14 @@ const service: DocumentUnitService = {
     return response
   },
 
-  async searchByRelatedDocumentation(
+  async searchByLinkedDocumentUnit(
     page: number,
     size: number,
-    query = new RelatedDocumentation(),
+    query = new LinkedDocumentUnit(),
   ) {
     const response = await httpClient.put<
-      RelatedDocumentation,
-      Page<RelatedDocumentation>
+      LinkedDocumentUnit,
+      Page<LinkedDocumentUnit>
     >(
       `caselaw/documentunits/search-by-linked-documentation-unit?pg=${page}&sz=${size}`,
       {
@@ -139,14 +139,14 @@ const service: DocumentUnitService = {
         description: errorMessages.DOCUMENT_UNIT_SEARCH_FAILED.description,
       }
     }
-    response.data = response.data as Page<RelatedDocumentation>
+    response.data = response.data as Page<LinkedDocumentUnit>
     return {
       status: response.status,
       data: {
         ...response.data,
         content: response.data.content.map(
-          (decision: Partial<RelatedDocumentation> | undefined) =>
-            new RelatedDocumentation({ ...decision }),
+          (decision: Partial<LinkedDocumentUnit> | undefined) =>
+            new LinkedDocumentUnit({ ...decision }),
         ),
       },
     }

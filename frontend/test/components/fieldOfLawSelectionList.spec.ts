@@ -2,9 +2,11 @@ import { fireEvent, render, RenderResult, screen } from "@testing-library/vue"
 import FieldOfLawSelectionList from "@/components/FieldOfLawSelectionList.vue"
 import { FieldOfLawNode } from "@/domain/fieldOfLaw"
 
-function renderComponent(modelValue: Partial<FieldOfLawNode>[]): RenderResult {
+function renderComponent(
+  selectedFieldsOfLaw: Partial<FieldOfLawNode>[],
+): RenderResult {
   const props = {
-    modelValue,
+    selectedFieldsOfLaw,
   }
 
   return render(FieldOfLawSelectionList, { props })
@@ -56,7 +58,7 @@ describe("FieldOfLawSelectionList", () => {
       ),
     )
 
-    expect(emitted()["update:modelValue"]).toBeTruthy()
+    expect(emitted()["remove-from-list"]).toBeTruthy()
   })
 
   it("click on 'Auswahl im Sachgebietsbaum' emit 'select-node", async () => {

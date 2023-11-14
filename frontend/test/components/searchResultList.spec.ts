@@ -2,9 +2,9 @@ import { userEvent } from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
 import SearchResultList, {
   SearchResults,
-} from "@/components/SearchResultList.vue"
+} from "@/components/proceedingDecisions/SearchResultList.vue"
 import ActiveCitation from "@/domain/activeCitation"
-import ProceedingDecision from "@/domain/previousDecision"
+import ProceedingDecision from "@/domain/proceedingDecision"
 
 function renderSearchResults(
   searchResults?: SearchResults<ProceedingDecision | ActiveCitation>,
@@ -22,6 +22,7 @@ function renderSearchResults(
               label: "fooLabel",
             },
             documentNumber: "fooDocumentNumber",
+            dataSource: "NEURIS",
           },
         }),
         isLinked: false,

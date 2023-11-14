@@ -51,8 +51,8 @@ class DocumentUnitControllerAuthTest {
   private static final UUID TEST_UUID = UUID.fromString("88888888-4444-4444-4444-121212121212");
   private final String docOffice1Group = "/CC-RIS";
   private final String docOffice2Group = "/caselaw/BGH";
-  private final DocumentationOffice docOffice1 = buildDocOffice("CC-RIS");
-  private final DocumentationOffice docOffice2 = buildDocOffice("BGH");
+  private final DocumentationOffice docOffice1 = buildDocOffice("CC-RIS", "XX");
+  private final DocumentationOffice docOffice2 = buildDocOffice("BGH", "CO");
 
   @BeforeEach
   void setUp() {
@@ -149,7 +149,8 @@ class DocumentUnitControllerAuthTest {
   @Test
   void testUpdateByUuid() {
     DocumentUnit docUnit = mockDocumentUnit(docOffice2, null, null);
-    when(service.updateDocumentUnit(eq(docUnit))).thenReturn(Mono.empty());
+    when(service.updateDocumentUnit(eq(docUnit), any(DocumentationOffice.class)))
+        .thenReturn(Mono.empty());
     when(service.getByUuid(TEST_UUID)).thenReturn(Mono.just(docUnit));
 
     String uri = "/api/v1/caselaw/documentunits/" + TEST_UUID;

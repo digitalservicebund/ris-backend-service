@@ -9,7 +9,12 @@ public class DocumentationOfficeTransformer {
 
   public static DocumentationOffice transformDTO(DocumentationOfficeDTO documentationOfficeDTO) {
     return Optional.ofNullable(documentationOfficeDTO)
-        .map(dto -> DocumentationOffice.builder().abbreviation(dto.getAbbreviation()).build())
+        .map(
+            dto ->
+                DocumentationOffice.builder()
+                    .label(dto.getLabel())
+                    .abbreviation(dto.getAbbreviation())
+                    .build())
         .orElse(null);
   }
 
@@ -17,7 +22,10 @@ public class DocumentationOfficeTransformer {
     return Optional.ofNullable(documentationOffice)
         .map(
             domainObject ->
-                DocumentationOfficeDTO.builder().abbreviation(domainObject.abbreviation()).build())
+                DocumentationOfficeDTO.builder()
+                    .label(domainObject.label())
+                    .abbreviation(domainObject.abbreviation())
+                    .build())
         .orElse(null);
   }
 }

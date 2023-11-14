@@ -2,10 +2,11 @@ package de.bund.digitalservice.ris.caselaw.domain;
 
 import java.util.List;
 import java.util.UUID;
+import reactor.core.publisher.Flux;
 
 public interface PublicationReportRepository {
 
-  List<PublicationReport> saveAll(List<PublicationReport> reports);
+  Flux<PublicationReport> saveAll(List<PublicationReport> reports);
 
-  List<PublicationReport> getAllByDocumentUnitUuid(UUID documentUnitUuid);
+  Flux<PublicationReport> getAllByDocumentUnitUuid(UUID documentUnitUuid);
 }

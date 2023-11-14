@@ -8,11 +8,13 @@ import de.bund.digitalservice.ris.caselaw.TestConfig;
 import de.bund.digitalservice.ris.caselaw.adapter.AuthService;
 import de.bund.digitalservice.ris.caselaw.adapter.FieldOfLawController;
 import de.bund.digitalservice.ris.caselaw.adapter.FieldOfLawService;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseFieldOfLawRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresFieldOfLawRepositoryImpl;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.PostgresFieldOfLawRepositoryImpl;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DatabaseFieldOfLawRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.FieldOfLawDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.NormDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.NormRepository;
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresConfig;
-import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
 import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
@@ -20,8 +22,6 @@ import de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw.FieldOfL
 import java.util.Arrays;
 import java.util.List;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -30,8 +30,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.oauth2.client.registration.ReactiveClientRegistrationRepository;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
-import org.springframework.test.context.jdbc.Sql;
-import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
 import org.springframework.test.web.reactive.server.EntityExchangeResult;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
@@ -41,20 +39,12 @@ import org.testcontainers.junit.jupiter.Container;
       FieldOfLawService.class,
       FlywayConfig.class,
       PostgresConfig.class,
-      PostgresJPAConfig.class,
       PostgresFieldOfLawRepositoryImpl.class,
       SecurityConfig.class,
       AuthService.class,
       TestConfig.class
     },
-    controllers = {FieldOfLawController.class},
-    timeout = "PT5M")
-@Sql(
-    scripts = {"classpath:fields_of_law_init.sql"},
-    executionPhase = ExecutionPhase.BEFORE_TEST_METHOD)
-@Sql(
-    scripts = {"classpath:fields_of_law_cleanup.sql"},
-    executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
+    controllers = {FieldOfLawController.class})
 class FieldOfLawIntegrationTest {
   @Container
   static PostgreSQLContainer<?> postgreSQLContainer =
@@ -72,24 +62,27 @@ class FieldOfLawIntegrationTest {
 
   @Autowired private RisWebTestClient risWebTestClient;
   @Autowired private DatabaseFieldOfLawRepository repository;
+  @Autowired private NormRepository normRepository;
 
   @MockBean private UserService userService;
   @MockBean ReactiveClientRegistrationRepository clientRegistrationRepository;
   @MockBean private DocumentUnitService service;
 
-  @BeforeEach()
-  void init() {}
-
   @AfterEach
-  void cleanUp() {}
+  void cleanUp() {
+    repository.deleteAll().block();
+    normRepository.deleteAll().block();
+  }
 
   @Test
   void testGetAllFieldsOfLaw() {
+    prepareDatabase();
+
     EntityExchangeResult<String> result =
         risWebTestClient
             .withDefaultLogin()
             .get()
-            .uri("/api/v1/caselaw/fieldsoflaw?pg=0&sz=20")
+            .uri("/api/v1/caselaw/fieldsoflaw?pg=0&sz=10")
             .exchange()
             .expectStatus()
             .isOk()
@@ -98,23 +91,13 @@ class FieldOfLawIntegrationTest {
 
     List<String> identifiers = JsonPath.read(result.getResponseBody(), "$.content[*].identifier");
     assertThat(identifiers)
-        .containsExactly(
-            "AB-01",
-            "AB-01-01",
-            "CD",
-            "CD-01",
-            "CD-02",
-            "FL",
-            "FL-01",
-            "FL-01-01",
-            "FL-02",
-            "FL-03",
-            "FL-04",
-            "FO");
+        .containsExactly("FL", "FL-01", "FL-01-01", "FL-02", "FL-03", "FL-04", "FO");
   }
 
   @Test
   void testGetFieldsOfLawBySearchQuery() {
+    prepareDatabase();
+
     EntityExchangeResult<String> result =
         risWebTestClient
             .withDefaultLogin()
@@ -131,13 +114,14 @@ class FieldOfLawIntegrationTest {
   }
 
   @Test
-  @Disabled("enable it after order by rank")
   void testPaginationInGetFieldsOfLawBySearchQuery() {
+    prepareDatabase();
+
     EntityExchangeResult<String> result =
         risWebTestClient
             .withDefaultLogin()
             .get()
-            .uri("/api/v1/caselaw/fieldsoflaw?q=FL-&pg=0&sz=10")
+            .uri("/api/v1/caselaw/fieldsoflaw?q=FL-&pg=0&sz=3")
             .exchange()
             .expectStatus()
             .isOk()
@@ -153,8 +137,7 @@ class FieldOfLawIntegrationTest {
     assertThat((Boolean) JsonPath.read(str, "$.first")).isTrue();
     assertThat((Boolean) JsonPath.read(str, "$.last")).isFalse();
     List<String> identifiers = JsonPath.read(str, "$.content[*].identifier");
-    // TODO: order by rank
-    assertThat(identifiers).containsExactlyInAnyOrder("FL-01-01", "FL-04", "FL-02");
+    assertThat(identifiers).containsExactly("FL-01-01", "FL-04", "FL-02");
 
     result =
         risWebTestClient
@@ -200,51 +183,16 @@ class FieldOfLawIntegrationTest {
   @ValueSource(
       strings = {
         "§ 123", // paragraph
-        "§123", // paragraph without whitespace
-      })
-  void testGetFieldsOfLawByNormsQuery_OnlyParagraph(String query) {
-    EntityExchangeResult<String> result =
-        risWebTestClient
-            .withDefaultLogin()
-            .get()
-            .uri("/api/v1/caselaw/fieldsoflaw?q=norm:\"" + query + "\"&pg=0&sz=3")
-            .exchange()
-            .expectStatus()
-            .isOk()
-            .expectBody(String.class)
-            .returnResult();
-
-    List<String> identifiers = JsonPath.read(result.getResponseBody(), "$.content[*].identifier");
-    // TODO: ordered by rank
-    assertThat(identifiers).containsExactlyInAnyOrder("FL", "AB-01", "AB-01-01");
-  }
-
-  @Test
-  void testGetFieldsOfLawByNormsQuery_OnlyNormText() {
-    EntityExchangeResult<String> result =
-        risWebTestClient
-            .withDefaultLogin()
-            .get()
-            .uri("/api/v1/caselaw/fieldsoflaw?q=norm:\"abc\"&pg=0&sz=3")
-            .exchange()
-            .expectStatus()
-            .isOk()
-            .expectBody(String.class)
-            .returnResult();
-
-    List<String> identifiers = JsonPath.read(result.getResponseBody(), "$.content[*].identifier");
-    assertThat(identifiers).containsExactlyInAnyOrder("FL", "AB-01");
-  }
-
-  @ParameterizedTest
-  @ValueSource(
-      strings = {
         "§ 123 abc", // paragraph followed by norm
+        "§123", // paragraph without whitespace
+        "abc", // norm
         "abc § 123", // norm followed by paragraph
         "abc §123", // norm followed by paragraph without whitespace
         "abc § 12", // norm followed by incomplete paragraph
       })
   void testGetFieldsOfLawByNormsQuery(String query) {
+    prepareDatabase();
+
     EntityExchangeResult<String> result =
         risWebTestClient
             .withDefaultLogin()
@@ -257,16 +205,18 @@ class FieldOfLawIntegrationTest {
             .returnResult();
 
     List<String> identifiers = JsonPath.read(result.getResponseBody(), "$.content[*].identifier");
-    assertThat(identifiers).isEmpty();
+    assertThat(identifiers).containsExactly("FL");
   }
 
   @Test
   void testGetFieldsOfLawByNormsAndSearchQuery() {
+    prepareDatabase();
+
     EntityExchangeResult<String> result =
         risWebTestClient
             .withDefaultLogin()
             .get()
-            .uri("/api/v1/caselaw/fieldsoflaw?q=norm:\"def\" fl-01&pg=0&sz=3")
+            .uri("/api/v1/caselaw/fieldsoflaw?q=norm:\"def\" some here&pg=0&sz=3")
             .exchange()
             .expectStatus()
             .isOk()
@@ -279,6 +229,8 @@ class FieldOfLawIntegrationTest {
 
   @Test
   void testGetFieldsOfLawByIdentifierSearch() {
+    prepareDatabase();
+
     EntityExchangeResult<String> result =
         risWebTestClient
             .withDefaultLogin()
@@ -296,7 +248,8 @@ class FieldOfLawIntegrationTest {
 
   @Test
   void testGetChildrenForFieldOfLawNumber() {
-    // TODO: order by rank
+    prepareDatabase();
+
     risWebTestClient
         .withDefaultLogin()
         .get()
@@ -309,11 +262,13 @@ class FieldOfLawIntegrationTest {
             response ->
                 assertThat(response.getResponseBody())
                     .extracting("identifier")
-                    .containsExactlyInAnyOrder("FL-01", "FL-02", "FL-03", "FL-04"));
+                    .containsExactly("FL-01", "FL-02", "FL-03", "FL-04"));
   }
 
   @Test
   void testGetParentForFieldOfLaw() {
+    prepareDatabase();
+
     risWebTestClient
         .withDefaultLogin()
         .get()
@@ -337,14 +292,124 @@ class FieldOfLawIntegrationTest {
             });
   }
 
+  private void prepareDatabase() {
+    // first root child
+    FieldOfLawDTO fieldOfLawDTO =
+        FieldOfLawDTO.builder().id(1L).identifier("FL").isNew(true).changeIndicator('N').build();
+    repository.save(fieldOfLawDTO).block();
+
+    NormDTO normDTO =
+        NormDTO.builder()
+            .id(1L)
+            .fieldOfLawId(1L)
+            .abbreviation("ABC")
+            .singleNormDescription("§ 123")
+            .build();
+    normRepository.save(normDTO).block();
+
+    // child of the first root child
+    fieldOfLawDTO =
+        FieldOfLawDTO.builder()
+            .id(2L)
+            .isNew(true)
+            .identifier("FL-01")
+            .text("some text here")
+            .parentId(1L)
+            .changeIndicator('N')
+            .build();
+    repository.save(fieldOfLawDTO).block();
+
+    normDTO =
+        NormDTO.builder()
+            .id(2L)
+            .fieldOfLawId(2L)
+            .abbreviation("DEF")
+            .singleNormDescription("§ 456")
+            .build();
+    normRepository.save(normDTO).block();
+
+    // sub child of the child of the first root child
+    fieldOfLawDTO =
+        FieldOfLawDTO.builder()
+            .id(3L)
+            .isNew(true)
+            .identifier("FL-01-01")
+            .parentId(2L)
+            .changeIndicator('N')
+            .build();
+    repository.save(fieldOfLawDTO).block();
+
+    // second root child
+    fieldOfLawDTO =
+        FieldOfLawDTO.builder().id(4L).isNew(true).identifier("FO").changeIndicator('N').build();
+    repository.save(fieldOfLawDTO).block();
+
+    // second child of the first root child
+    fieldOfLawDTO =
+        FieldOfLawDTO.builder()
+            .id(5L)
+            .isNew(true)
+            .identifier("FL-02")
+            .parentId(1L)
+            .changeIndicator('N')
+            .build();
+    repository.save(fieldOfLawDTO).block();
+
+    // third child of the first root child
+    fieldOfLawDTO =
+        FieldOfLawDTO.builder()
+            .id(6L)
+            .isNew(true)
+            .identifier("FL-03")
+            .parentId(1L)
+            .changeIndicator('N')
+            .build();
+    repository.save(fieldOfLawDTO).block();
+
+    // fourth child of the first root child
+    fieldOfLawDTO =
+        FieldOfLawDTO.builder()
+            .id(7L)
+            .isNew(true)
+            .identifier("FL-04")
+            .parentId(1L)
+            .changeIndicator('N')
+            .build();
+    repository.save(fieldOfLawDTO).block();
+  }
+
   @Test
-  @Disabled(
-      "wrong test, syntax incorrect, logic replaced in refactoring, have to redesign in a later iteration")
   void testOrderingOfGetFieldsOfLawByNormsAndSearchQuery() {
+    String[][] fieldOfLawData = {
+      {"AB-01", "Some text here", "§ 123", "abcd"},
+      {"AB-01-01", "More text also here", "§ 123", "abxyz"},
+      {"CD", "Other text without more", null, null},
+      {"CD-01", "Text means writing here", "§ 012", "dab"},
+      {"CD-02", "Aber a word starting with ab and text + here", "§ 123", "aber hallo"}
+    };
+
     String searchStr = "norm:\"§ 123 ab\" AB here text";
 
     List<String> expectedIdentifiers = Arrays.asList("CD-02", "AB-01", "AB-01-01");
     List<Integer> expectedScores = Arrays.asList(38, 28, 28);
+
+    int normCount = 0;
+    for (int i = 0; i < fieldOfLawData.length; i++) {
+      String[] fol = fieldOfLawData[i];
+      long folId = (long) i + 1;
+      FieldOfLawDTO fieldOfLawDTO =
+          FieldOfLawDTO.builder().id(folId).isNew(true).identifier(fol[0]).text(fol[1]).build();
+      repository.save(fieldOfLawDTO).block();
+      if (fol[2] == null) continue;
+      NormDTO normDTO =
+          NormDTO.builder()
+              .id((long) normCount++)
+              .fieldOfLawId(folId)
+              .singleNormDescription(fol[2])
+              .abbreviation(fol[3])
+              .build();
+      normRepository.save(normDTO).block();
+    }
 
     EntityExchangeResult<String> result =
         risWebTestClient
@@ -367,11 +432,23 @@ class FieldOfLawIntegrationTest {
 
   @Test
   void testOrderingOfGetFieldsOfLawByIdentifierSearch() {
+    String[] identifier = {"AB-01", "AB-01-01", "CD", "CD-01", "CD-02"};
+
+    String searchStr = "01";
+
+    List<String> expectedIdentifiers = Arrays.asList("AB-01", "CD-01", "AB-01-01");
+
+    for (int i = 0; i < identifier.length; i++) {
+      FieldOfLawDTO fieldOfLawDTO =
+          FieldOfLawDTO.builder().id((long) i + 1).isNew(true).identifier(identifier[i]).build();
+      repository.save(fieldOfLawDTO).block();
+    }
+
     EntityExchangeResult<String> result =
         risWebTestClient
             .withDefaultLogin()
             .get()
-            .uri("/api/v1/caselaw/fieldsoflaw/search-by-identifier?q=01")
+            .uri("/api/v1/caselaw/fieldsoflaw/search-by-identifier?q=" + searchStr)
             .exchange()
             .expectStatus()
             .isOk()
@@ -379,8 +456,6 @@ class FieldOfLawIntegrationTest {
             .returnResult();
 
     List<String> actualIdentifiers = JsonPath.read(result.getResponseBody(), "$[*].identifier");
-    // TODO: order by rank
-    assertThat(actualIdentifiers)
-        .containsExactlyInAnyOrder("AB-01", "CD-01", "AB-01-01", "FL-01", "FL-01-01");
+    assertThat(actualIdentifiers).isEqualTo(expectedIdentifiers);
   }
 }

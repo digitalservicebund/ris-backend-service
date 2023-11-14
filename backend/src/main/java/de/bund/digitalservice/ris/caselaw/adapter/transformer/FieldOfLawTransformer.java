@@ -1,39 +1,35 @@
 package de.bund.digitalservice.ris.caselaw.adapter.transformer;
 
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.FieldOfLawDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.FieldOfLawKeywordDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPAFieldOfLawDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPAKeywordDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPANormDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.FieldOfLawDTO;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw.FieldOfLaw;
-import de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw.FieldOfLaw.FieldOfLawBuilder;
+import de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw.FieldOfLawXml;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw.Keyword;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw.Norm;
+import de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw.NormXml;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class FieldOfLawTransformer {
   private FieldOfLawTransformer() {}
 
   public static FieldOfLaw transformToDomain(FieldOfLawDTO fieldOfLawDTO) {
-    return transformToDomain(fieldOfLawDTO, true);
-  }
-
-  public static FieldOfLaw transformToDomain(FieldOfLawDTO fieldOfLawDTO, boolean withChildren) {
-    FieldOfLawBuilder builder =
-        FieldOfLaw.builder()
-            .id(fieldOfLawDTO.getId())
-            .identifier(fieldOfLawDTO.getIdentifier())
-            .text(fieldOfLawDTO.getText());
-
+    List<Keyword> keywords = null;
     if (fieldOfLawDTO.getKeywords() != null) {
-      List<FieldOfLawKeywordDTO> keywordDTOs = fieldOfLawDTO.getKeywords();
-      List<Keyword> keywords =
+      keywords =
           fieldOfLawDTO.getKeywords().stream()
               .map(keywordDTO -> Keyword.builder().value(keywordDTO.getValue()).build())
               .toList();
-      builder.keywords(keywords);
     }
 
+    List<Norm> norms = null;
     if (fieldOfLawDTO.getNorms() != null) {
-      List<Norm> norms =
+      norms =
           fieldOfLawDTO.getNorms().stream()
               .map(
                   normDTO ->
@@ -42,33 +38,65 @@ public class FieldOfLawTransformer {
                           .singleNormDescription(normDTO.getSingleNormDescription())
                           .build())
               .toList();
-      builder.norms(norms);
     }
 
-    if (fieldOfLawDTO.getFieldOfLawTextReferences() != null) {
-      List<String> linkedFields =
-          fieldOfLawDTO.getFieldOfLawTextReferences().stream()
-              .map(FieldOfLawDTO::getIdentifier)
-              .toList();
-      builder.linkedFields(linkedFields);
+    List<String> linkedFields = null;
+    if (fieldOfLawDTO.getLinkedFieldsOfLaw() != null) {
+      linkedFields =
+          fieldOfLawDTO.getLinkedFieldsOfLaw().stream().map(FieldOfLawDTO::getIdentifier).toList();
     }
 
-    if (withChildren && fieldOfLawDTO.getChildren() != null) {
-      List<FieldOfLaw> children =
-          fieldOfLawDTO.getChildren().stream()
-              .map(FieldOfLawTransformer::transformToDomain)
-              .toList();
-      if (!children.isEmpty()) {
-        builder.children(children);
-        builder.childrenCount(children.size());
-      }
-    } else {
-      builder.children(Collections.emptyList());
-      if (fieldOfLawDTO.getChildren() != null) {
-        builder.childrenCount(fieldOfLawDTO.getChildren().size());
-      }
+    return FieldOfLaw.builder()
+        .id(fieldOfLawDTO.getId())
+        .childrenCount(fieldOfLawDTO.getChildrenCount())
+        .identifier(fieldOfLawDTO.getIdentifier())
+        .text(fieldOfLawDTO.getText())
+        .linkedFields(linkedFields)
+        .keywords(keywords)
+        .norms(norms)
+        .children(new ArrayList<>())
+        .build();
+  }
+
+  public static JPAFieldOfLawDTO transformToJPADTO(FieldOfLawXml fieldOfLawXml) {
+    return JPAFieldOfLawDTO.builder()
+        .id(fieldOfLawXml.getId())
+        .changeDateMail(fieldOfLawXml.getChangeDateMail())
+        .changeDateClient(fieldOfLawXml.getChangeDateClient())
+        .changeIndicator(fieldOfLawXml.getChangeIndicator())
+        .version(fieldOfLawXml.getVersion())
+        .identifier(fieldOfLawXml.getIdentifier())
+        .text(fieldOfLawXml.getText())
+        .navigationTerm(fieldOfLawXml.getNavigationTerm())
+        .keywords(transformKeywordsToJPADTOs(fieldOfLawXml.getKeywords()))
+        .norms(transformNormsToJPADTOs(fieldOfLawXml.getNorms()))
+        .build();
+  }
+
+  private static Set<JPAKeywordDTO> transformKeywordsToJPADTOs(Set<String> keywordXmls) {
+    if (keywordXmls == null) {
+      return Collections.emptySet();
     }
 
-    return builder.build();
+    Set<JPAKeywordDTO> jpaKeywordDTOs = new HashSet<>();
+    keywordXmls.forEach(
+        keyword -> jpaKeywordDTOs.add(JPAKeywordDTO.builder().value(keyword).build()));
+    return jpaKeywordDTOs;
+  }
+
+  private static Set<JPANormDTO> transformNormsToJPADTOs(Set<NormXml> normXmls) {
+    if (normXmls == null) {
+      return Collections.emptySet();
+    }
+
+    Set<JPANormDTO> jpaNormDTOs = new HashSet<>();
+    normXmls.forEach(
+        normXml ->
+            jpaNormDTOs.add(
+                JPANormDTO.builder()
+                    .abbreviation(normXml.getAbbreviation())
+                    .singleNormDescription(normXml.getSingleNormDescription())
+                    .build()));
+    return jpaNormDTOs;
   }
 }

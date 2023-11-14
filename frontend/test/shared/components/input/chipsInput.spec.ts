@@ -13,9 +13,10 @@ function renderComponent(props?: Partial<ChipsInputProps>) {
     id: props?.id ?? "identifier",
     modelValue,
     "onUpdate:modelValue":
-      props?.["onUpdate:modelValue"] ??
-      ((val: string[] | undefined) => (modelValue = val)),
+      props?.["onUpdate:modelValue"] ?? ((val) => (modelValue = val)),
     ariaLabel: props?.ariaLabel ?? "aria-label",
+    onChipAdded: props?.onChipAdded,
+    onChipDeleted: props?.onChipDeleted,
     readOnly: props?.readOnly,
   }
 
@@ -52,6 +53,15 @@ describe("Chips Input", () => {
     expect(onUpdate).toHaveBeenCalledWith(["foo"])
   })
 
+  it("emits an event when a chip is added", async () => {
+    const onAdded = vi.fn()
+    const { user } = renderComponent({ onChipAdded: onAdded })
+
+    const input = screen.getByRole("textbox")
+    await user.type(input, "foo{enter}")
+    expect(onAdded).toHaveBeenCalledWith("foo")
+  })
+
   it("removes whitespace from chips when added", async () => {
     const onUpdate = vi.fn()
     const { user } = renderComponent({
@@ -82,6 +92,18 @@ describe("Chips Input", () => {
     const button = screen.getAllByRole("button")[0]
     await user.click(button)
     expect(onUpdate).toHaveBeenCalledWith(["bar"])
+  })
+
+  it("emits an event when a chip is removed", async () => {
+    const onDeleted = vi.fn()
+    const { user } = renderComponent({
+      modelValue: ["foo", "bar"],
+      onChipDeleted: onDeleted,
+    })
+
+    const button = screen.getAllByRole("button")[0]
+    await user.click(button)
+    expect(onDeleted).toHaveBeenCalledWith("foo")
   })
 
   it("does not render delete button if readOnly", async () => {

@@ -1,23 +1,23 @@
 import dayjs from "dayjs"
-import { CitationType } from "./citationType"
+import { CitationStyle } from "./citationStyle"
 import EditableListItem from "./editableListItem"
-import RelatedDocumentation from "./relatedDocumentation"
+import LinkedDocumentUnit from "./linkedDocumentUnit"
 
 export default class ActiveCitation
-  extends RelatedDocumentation
+  extends LinkedDocumentUnit
   implements EditableListItem
 {
-  public citationType?: CitationType
+  public citationStyle?: CitationStyle
 
   static requiredFields = [
-    "citationType",
+    "citationStyle",
     "fileNumber",
     "court",
     "decisionDate",
   ] as const
 
   static fields = [
-    "citationType",
+    "citationStyle",
     "fileNumber",
     "court",
     "decisionDate",
@@ -31,16 +31,16 @@ export default class ActiveCitation
 
   get renderDecision(): string {
     return [
-      ...(this.citationType?.label ? [this.citationType.label] : []),
+      ...(this.citationStyle?.label ? [this.citationStyle.label] : []),
       ...(this.court?.label ? [`${this.court?.label}`] : []),
       ...(this.decisionDate
         ? [dayjs(this.decisionDate).format("DD.MM.YYYY")]
         : []),
       ...(this.fileNumber ? [this.fileNumber] : []),
       ...(this.documentType ? [this.documentType.label] : []),
-      // ...(this.documentNumber && this.hasForeignSource
-      //   ? [this.documentNumber]
-      //   : []),
+      ...(this.documentNumber && this.hasForeignSource
+        ? [this.documentNumber]
+        : []),
     ].join(", ")
   }
 
@@ -64,8 +64,8 @@ export default class ActiveCitation
     return false
   }
 
-  get citationTypeIsSet(): boolean {
-    return !!this.citationType?.uuid
+  get citationStyleIsSet(): boolean {
+    return !!this.citationStyle?.uuid
   }
 
   private fieldIsEmpty(
@@ -76,7 +76,7 @@ export default class ActiveCitation
 }
 
 export const activeCitationLabels: { [name: string]: string } = {
-  citationType: "Art der Zitierung",
+  citationStyle: "Art der Zitierung",
   fileNumber: "Aktenzeichen",
   court: "Gericht",
   decisionDate: "Entscheidungsdatum",

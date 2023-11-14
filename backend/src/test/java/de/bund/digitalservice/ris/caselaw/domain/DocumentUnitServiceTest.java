@@ -8,6 +8,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -19,12 +20,10 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumenta
 import jakarta.validation.Validator;
 import java.nio.ByteBuffer;
 import java.time.Instant;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -116,7 +115,7 @@ class DocumentUnitServiceTest {
             .build();
     when(repository.attachFile(TEST_UUID, TEST_UUID.toString(), "docx", "testfile.docx"))
         .thenReturn(Mono.just(savedDocumentUnit));
-    when(repository.findByUuid(TEST_UUID)).thenReturn(savedDocumentUnit);
+    when(repository.findByUuid(TEST_UUID)).thenReturn(Mono.just(savedDocumentUnit));
 
     doNothing().when(service).checkDocx(any(ByteBuffer.class));
     when(s3AsyncClient.putObject(any(PutObjectRequest.class), any(AsyncRequestBody.class)))
@@ -160,9 +159,9 @@ class DocumentUnitServiceTest {
 
     var documentUnitAfter = DocumentUnit.builder().uuid(TEST_UUID).build();
 
-    when(repository.findByUuid(TEST_UUID)).thenReturn(documentUnitBefore);
+    when(repository.findByUuid(TEST_UUID)).thenReturn(Mono.just(documentUnitBefore));
     // is the thenReturn ok? Or am I bypassing the actual functionality-test?
-    when(repository.removeFile(TEST_UUID)).thenReturn(documentUnitAfter);
+    when(repository.removeFile(TEST_UUID)).thenReturn(Mono.just(documentUnitAfter));
     when(s3AsyncClient.deleteObject(any(DeleteObjectRequest.class)))
         .thenReturn(buildEmptyDeleteObjectResponse());
 
@@ -212,7 +211,9 @@ class DocumentUnitServiceTest {
     // something flaky with the repository mock? Investigate this later
     DocumentUnit documentUnit = DocumentUnit.builder().uuid(TEST_UUID).build();
     // can we also test that the fileUuid from the DocumentUnit is used? with a captor somehow?
-    when(repository.findByUuid(TEST_UUID)).thenReturn(documentUnit);
+    when(repository.countLinksByChildDocumentUnitUuid(TEST_UUID)).thenReturn(Mono.just(0L));
+    when(repository.findByUuid(TEST_UUID)).thenReturn(Mono.just(documentUnit));
+    when(repository.delete(any(DocumentUnit.class))).thenReturn(Mono.just(mock(Void.class)));
 
     StepVerifier.create(service.deleteByUuid(TEST_UUID))
         .consumeNextWith(
@@ -226,14 +227,37 @@ class DocumentUnitServiceTest {
   }
 
   @Test
-  @Disabled("done by JPA can be checked later")
   void testDeleteByUuid_withProceedingDecisions() {
+    var pdUuid = UUID.randomUUID();
     DocumentUnit documentUnit =
         DocumentUnit.builder()
             .uuid(TEST_UUID)
-            .previousDecisions(List.of(PreviousDecision.builder().build()))
+            .proceedingDecisions(
+                List.of(
+                    ProceedingDecision.builder()
+                        .uuid(pdUuid)
+                        .dataSource(DataSource.PROCEEDING_DECISION)
+                        .build()))
             .build();
-    when(repository.findByUuid(TEST_UUID)).thenReturn(documentUnit);
+    when(repository.countLinksByChildDocumentUnitUuid(TEST_UUID)).thenReturn(Mono.just(1L));
+    when(repository.findByUuid(TEST_UUID)).thenReturn(Mono.just(documentUnit));
+    when(repository.deleteIfOrphanedLinkedDocumentationUnit(pdUuid)).thenReturn(Mono.empty());
+    when(repository.unlinkDocumentUnit(
+            TEST_UUID, pdUuid, DocumentationUnitLinkType.PREVIOUS_DECISION))
+        .thenReturn(Mono.empty());
+
+    when(repository.findAllLinkedDocumentUnitsByParentDocumentUnitUuidAndType(
+            TEST_UUID, DocumentationUnitLinkType.ACTIVE_CITATION))
+        .thenReturn(Flux.empty());
+    when(repository.findAllLinkedDocumentUnitsByParentDocumentUnitUuidAndType(
+            TEST_UUID, DocumentationUnitLinkType.PREVIOUS_DECISION))
+        .thenReturn(
+            Flux.just(
+                LinkedDocumentationUnit.builder()
+                    .uuid(pdUuid)
+                    .dataSource(DataSource.PROCEEDING_DECISION)
+                    .build()));
+    when(repository.delete(any(DocumentUnit.class))).thenReturn(Mono.just(mock(Void.class)));
 
     StepVerifier.create(service.deleteByUuid(TEST_UUID))
         .consumeNextWith(
@@ -246,20 +270,46 @@ class DocumentUnitServiceTest {
                   string);
             })
         .verifyComplete();
+
+    verify(repository)
+        .unlinkDocumentUnit(TEST_UUID, pdUuid, DocumentationUnitLinkType.PREVIOUS_DECISION);
+    verify(repository).deleteIfOrphanedLinkedDocumentationUnit(pdUuid);
   }
 
   @Test
-  @Disabled("done by JPA can be checked later")
   void testDeleteByUuid_withActiveCitations() {
+    var acUuid = UUID.randomUUID();
     DocumentUnit documentUnit =
         DocumentUnit.builder()
             .uuid(TEST_UUID)
             .contentRelatedIndexing(
                 ContentRelatedIndexing.builder()
-                    .activeCitations(List.of(ActiveCitation.builder().build()))
+                    .activeCitations(
+                        List.of(
+                            ActiveCitation.builder()
+                                .uuid(acUuid)
+                                .dataSource(DataSource.ACTIVE_CITATION)
+                                .build()))
                     .build())
             .build();
-    when(repository.findByUuid(TEST_UUID)).thenReturn(documentUnit);
+    when(repository.countLinksByChildDocumentUnitUuid(TEST_UUID)).thenReturn(Mono.just(1L));
+    when(repository.findByUuid(TEST_UUID)).thenReturn(Mono.just(documentUnit));
+    when(repository.deleteIfOrphanedLinkedDocumentationUnit(acUuid)).thenReturn(Mono.empty());
+    when(repository.unlinkDocumentUnit(
+            TEST_UUID, acUuid, DocumentationUnitLinkType.ACTIVE_CITATION))
+        .thenReturn(Mono.empty());
+    when(repository.findAllLinkedDocumentUnitsByParentDocumentUnitUuidAndType(
+            TEST_UUID, DocumentationUnitLinkType.PREVIOUS_DECISION))
+        .thenReturn(Flux.empty());
+    when(repository.findAllLinkedDocumentUnitsByParentDocumentUnitUuidAndType(
+            TEST_UUID, DocumentationUnitLinkType.ACTIVE_CITATION))
+        .thenReturn(
+            Flux.just(
+                LinkedDocumentationUnit.builder()
+                    .uuid(acUuid)
+                    .dataSource(DataSource.ACTIVE_CITATION)
+                    .build()));
+    when(repository.delete(any(DocumentUnit.class))).thenReturn(Mono.just(mock(Void.class)));
 
     StepVerifier.create(service.deleteByUuid(TEST_UUID))
         .consumeNextWith(
@@ -272,6 +322,10 @@ class DocumentUnitServiceTest {
                   string);
             })
         .verifyComplete();
+
+    verify(repository)
+        .unlinkDocumentUnit(TEST_UUID, acUuid, DocumentationUnitLinkType.ACTIVE_CITATION);
+    verify(repository).deleteIfOrphanedLinkedDocumentationUnit(acUuid);
   }
 
   @Test
@@ -279,7 +333,9 @@ class DocumentUnitServiceTest {
     DocumentUnit documentUnit =
         DocumentUnit.builder().uuid(TEST_UUID).s3path(TEST_UUID.toString()).build();
 
-    when(repository.findByUuid(TEST_UUID)).thenReturn(documentUnit);
+    when(repository.countLinksByChildDocumentUnitUuid(TEST_UUID)).thenReturn(Mono.just(0L));
+    when(repository.findByUuid(TEST_UUID)).thenReturn(Mono.just(documentUnit));
+    when(repository.delete(any(DocumentUnit.class))).thenReturn(Mono.just(mock(Void.class)));
     when(s3AsyncClient.deleteObject(any(DeleteObjectRequest.class)))
         .thenReturn(buildEmptyDeleteObjectResponse());
 
@@ -296,8 +352,8 @@ class DocumentUnitServiceTest {
 
   @Test
   void testDeleteByUuid_withoutFileAttached_withExceptionFromBucket() {
-    when(repository.findByUuid(TEST_UUID))
-        .thenReturn(DocumentUnit.builder().s3path("test.file").build());
+    when(repository.countLinksByChildDocumentUnitUuid(TEST_UUID)).thenReturn(Mono.just(0L));
+    when(repository.findByUuid(TEST_UUID)).thenReturn(Mono.just(DocumentUnit.builder().build()));
     when(s3AsyncClient.deleteObject(any(DeleteObjectRequest.class)))
         .thenThrow(SdkException.create("exception", null));
 
@@ -308,7 +364,8 @@ class DocumentUnitServiceTest {
 
   @Test
   void testDeleteByUuid_withoutFileAttached_withExceptionFromRepository() {
-    when(repository.findByUuid(TEST_UUID)).thenReturn(DocumentUnit.builder().build());
+    when(repository.countLinksByChildDocumentUnitUuid(TEST_UUID)).thenReturn(Mono.just(0L));
+    when(repository.findByUuid(TEST_UUID)).thenReturn(Mono.just(DocumentUnit.builder().build()));
     doThrow(new IllegalArgumentException()).when(repository).delete(DocumentUnit.builder().build());
 
     StepVerifier.create(service.deleteByUuid(TEST_UUID)).expectError().verify();
@@ -322,12 +379,17 @@ class DocumentUnitServiceTest {
         DocumentUnit.builder()
             .uuid(UUID.randomUUID())
             .documentNumber("ABCDE20220001")
+            .creationtimestamp(Instant.now())
             .fileuploadtimestamp(Instant.now())
-            //            .proceedingDecisions(null)
+            .proceedingDecisions(null)
             .build();
+    DocumentationOffice documentationOffice = mock(DocumentationOffice.class);
     when(repository.save(documentUnit)).thenReturn(Mono.just(documentUnit));
+    when(repository.findAllLinkedDocumentUnitsByParentDocumentUnitUuidAndType(
+            any(UUID.class), eq(DocumentationUnitLinkType.ACTIVE_CITATION)))
+        .thenReturn(Flux.empty());
 
-    StepVerifier.create(service.updateDocumentUnit(documentUnit))
+    StepVerifier.create(service.updateDocumentUnit(documentUnit, documentationOffice))
         .consumeNextWith(du -> assertEquals(du, documentUnit))
         .verifyComplete();
 
@@ -336,7 +398,7 @@ class DocumentUnitServiceTest {
 
   @Test
   void testPublishByEmail() {
-    when(repository.findByUuid(TEST_UUID)).thenReturn(DocumentUnit.builder().build());
+    when(repository.findByUuid(TEST_UUID)).thenReturn(Mono.just(DocumentUnit.builder().build()));
     XmlPublication xmlPublication =
         XmlPublication.builder()
             .documentUnitUuid(TEST_UUID)
@@ -366,7 +428,7 @@ class DocumentUnitServiceTest {
 
   @Test
   void testPublishByEmail_withoutDocumentUnitForUuid() {
-    when(repository.findByUuid(TEST_UUID)).thenReturn(null);
+    when(repository.findByUuid(TEST_UUID)).thenReturn(Mono.empty());
 
     StepVerifier.create(service.publishAsEmail(TEST_UUID, ISSUER_ADDRESS)).verifyComplete();
     verify(repository).findByUuid(TEST_UUID);
@@ -386,8 +448,7 @@ class DocumentUnitServiceTest {
             .fileName("filename")
             .build();
     when(publishService.getPublications(TEST_UUID)).thenReturn(Flux.just(xmlPublication));
-    when(publicationReportRepository.getAllByDocumentUnitUuid(TEST_UUID))
-        .thenReturn(Collections.emptyList());
+    when(publicationReportRepository.getAllByDocumentUnitUuid(TEST_UUID)).thenReturn(Flux.empty());
 
     StepVerifier.create(service.getPublicationHistory(TEST_UUID))
         .consumeNextWith(
@@ -401,7 +462,7 @@ class DocumentUnitServiceTest {
     PublicationReport report =
         new PublicationReport("documentNumber", "<html></html>", Instant.now());
     when(publicationReportRepository.getAllByDocumentUnitUuid(TEST_UUID))
-        .thenReturn(List.of(report));
+        .thenReturn(Flux.just(report));
     when(publishService.getPublications(TEST_UUID)).thenReturn(Flux.empty());
 
     StepVerifier.create(service.getPublicationHistory(TEST_UUID))
@@ -448,7 +509,7 @@ class DocumentUnitServiceTest {
             .build();
 
     when(publicationReportRepository.getAllByDocumentUnitUuid(TEST_UUID))
-        .thenReturn(List.of(report2, report1));
+        .thenReturn(Flux.fromIterable(List.of(report2, report1)));
     when(publishService.getPublications(TEST_UUID))
         .thenReturn(Flux.fromIterable(List.of(xml2, xml1)));
 
@@ -462,17 +523,19 @@ class DocumentUnitServiceTest {
   }
 
   @Test
-  void testSearchByPreviousDecision() {
-    PreviousDecision previousDecision = PreviousDecision.builder().build();
+  void testSearchByProceedingDecision() {
+    ProceedingDecision proceedingDecision = ProceedingDecision.builder().build();
     PageRequest pageRequest = PageRequest.of(0, 10);
 
-    when(repository.searchByRelatedDocumentationUnit(previousDecision, pageRequest))
-        .thenReturn(new PageImpl<>(List.of(previousDecision)));
+    when(repository.searchByLinkedDocumentationUnit(proceedingDecision, pageRequest))
+        .thenReturn(Flux.just(proceedingDecision));
+    when(repository.countSearchByLinkedDocumentationUnit(proceedingDecision))
+        .thenReturn(Mono.just(1L));
 
-    StepVerifier.create(service.searchByLinkedDocumentationUnit(previousDecision, pageRequest))
-        .consumeNextWith(pd -> assertEquals(pd.getContent().get(0), previousDecision))
+    StepVerifier.create(service.searchByLinkedDocumentationUnit(proceedingDecision, pageRequest))
+        .consumeNextWith(pd -> assertEquals(pd.getContent().get(0), proceedingDecision))
         .verifyComplete();
-    verify(repository).searchByRelatedDocumentationUnit(previousDecision, pageRequest);
+    verify(repository).searchByLinkedDocumentationUnit(proceedingDecision, pageRequest);
   }
 
   @Test

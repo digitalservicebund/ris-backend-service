@@ -5,15 +5,13 @@ import DocumentUnitContentRelatedIndexing from "@/components/DocumentUnitContent
 import DocumentUnitCoreData from "@/components/DocumentUnitCoreData.vue"
 import DocumentUnitTexts from "@/components/DocumentUnitTexts.vue"
 import DocumentUnitWrapper from "@/components/DocumentUnitWrapper.vue"
-import EnsuingDecisions from "@/components/EnsuingDecisions.vue"
 import OriginalFileSidePanel from "@/components/OriginalFileSidePanel.vue"
-import PreviousDecisions from "@/components/PreviousDecisions.vue"
+import DocumentUnitProceedingDecision from "@/components/proceedingDecisions/ProceedingDecisions.vue"
 import SaveButton from "@/components/SaveDocumentUnitButton.vue"
 import { useScrollToHash } from "@/composables/useScrollToHash"
 import { useToggleStateInRouteQuery } from "@/composables/useToggleStateInRouteQuery"
 import DocumentUnit, { Texts, CoreData } from "@/domain/documentUnit"
-import EnsuingDecision from "@/domain/ensuingDecision"
-import PreviousDecision from "@/domain/previousDecision"
+import ProceedingDecision from "@/domain/proceedingDecision"
 import documentUnitService from "@/services/documentUnitService"
 import fileService from "@/services/fileService"
 import { ServiceResponse } from "@/services/httpClient"
@@ -50,18 +48,17 @@ const handleUpdateValueDocumentUnitTexts = async (
     hasInnerText || hasImgElem || hasTable ? updatedValue[1] : ""
 }
 
-function hasDataChange(): boolean {
-  const newValue = JSON.stringify(updatedDocumentUnit.value)
-  const oldValue = JSON.stringify(lastUpdatedDocumentUnit.value)
-
-  // console.log("newValue:", newValue)
-  // console.log("oldValue:", oldValue)
-
-  return newValue !== oldValue
+function haveDataChanged(): boolean {
+  return (
+    JSON.stringify(updatedDocumentUnit.value)
+      .replaceAll('"norms":[{"validationError":false}]', '"norms":[]')
+      .replaceAll('"activeCitations":[{}]', '"activeCitations":[]') !==
+    JSON.stringify(lastUpdatedDocumentUnit.value)
+  )
 }
 
 async function handleUpdateDocumentUnit(): Promise<ServiceResponse<void>> {
-  if (hasDataChange()) {
+  if (haveDataChanged()) {
     lastUpdatedDocumentUnit.value = JSON.parse(
       JSON.stringify(updatedDocumentUnit.value),
     )
@@ -75,7 +72,7 @@ async function handleUpdateDocumentUnit(): Promise<ServiceResponse<void>> {
       validationErrors.value = []
     }
 
-    if (!hasDataChange() && response.data) {
+    if (!haveDataChanged() && response.data) {
       updatedDocumentUnit.value = response.data as DocumentUnit
     }
 
@@ -113,17 +110,11 @@ const coreData = computed({
   },
 })
 
-const previousDecisions = computed({
-  get: () => updatedDocumentUnit.value.previousDecisions as PreviousDecision[],
+const proceedingDecisions = computed({
+  get: () =>
+    updatedDocumentUnit.value.proceedingDecisions as ProceedingDecision[],
   set: (newValues) => {
-    updatedDocumentUnit.value.previousDecisions = newValues
-  },
-})
-
-const ensuingDecisions = computed({
-  get: () => updatedDocumentUnit.value.ensuingDecisions as EnsuingDecision[],
-  set: (newValues) => {
-    updatedDocumentUnit.value.ensuingDecisions = newValues
+    updatedDocumentUnit.value.proceedingDecisions = newValues
   },
 })
 
@@ -176,12 +167,12 @@ onMounted(async () => {
             "
           />
 
-          <PreviousDecisions v-model="previousDecisions" />
-          <EnsuingDecisions v-model="ensuingDecisions" />
+          <DocumentUnitProceedingDecision v-model="proceedingDecisions" />
 
           <DocumentUnitContentRelatedIndexing
             id="contentRelatedIndexing"
             v-model="contentRelatedIndexing"
+            :document-unit-uuid="updatedDocumentUnit.uuid"
           />
 
           <DocumentUnitTexts

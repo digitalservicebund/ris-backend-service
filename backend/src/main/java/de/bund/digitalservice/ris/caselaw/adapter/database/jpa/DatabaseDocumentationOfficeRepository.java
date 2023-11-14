@@ -8,5 +8,5 @@ import org.springframework.stereotype.Repository;
 public interface DatabaseDocumentationOfficeRepository
     extends JpaRepository<DocumentationOfficeDTO, UUID> {
 
-  DocumentationOfficeDTO findByAbbreviation(String abbreviation);
+  DocumentationOfficeDTO findByLabel(String label);
 }

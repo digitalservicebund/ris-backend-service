@@ -153,7 +153,7 @@ export function defineNestedInputField(
 export const courtFields: InputField[] = [
   defineNestedInputField(
     "Fehlerhaftes Gericht",
-    "nestedInputOfCourtAndDeviatingCourts",
+    "nestedInputOfCourtAndIncorrectCourts",
     {
       parent: defineComboboxField(
         "court",
@@ -163,7 +163,7 @@ export const courtFields: InputField[] = [
         "Gerichtstyp Gerichtsort",
       ),
       child: defineChipsField(
-        "deviatingCourts",
+        "incorrectCourts",
         "Fehlerhaftes Gericht",
         "Fehlerhaftes Gericht",
         "",

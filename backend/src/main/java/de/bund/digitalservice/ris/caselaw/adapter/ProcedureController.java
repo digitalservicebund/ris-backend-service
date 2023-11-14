@@ -1,13 +1,12 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
 import de.bund.digitalservice.ris.OpenApiConfiguration;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitListEntry;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitSearchEntry;
 import de.bund.digitalservice.ris.caselaw.domain.Procedure;
 import de.bund.digitalservice.ris.caselaw.domain.ProcedureService;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.Optional;
-import java.util.UUID;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -51,19 +50,21 @@ public class ProcedureController {
             PageRequest.of(page.orElse(0), size, Sort.by(Sort.Direction.DESC, "createdAt"))));
   }
 
-  @GetMapping(value = "/{procedureUUID}/documentunits")
+  @GetMapping(value = "/{procedureLabel}/documentunits")
   @PreAuthorize("isAuthenticated()")
-  public Flux<DocumentUnitListEntry> getDocumentUnits(
-      @AuthenticationPrincipal OidcUser oidcUser, @NonNull @PathVariable UUID procedureUUID) {
-    return Flux.fromIterable(service.getDocumentUnits(procedureUUID));
+  public Flux<DocumentationUnitSearchEntry> getDocumentUnits(
+      @AuthenticationPrincipal OidcUser oidcUser, @NonNull @PathVariable String procedureLabel) {
+    return Flux.fromIterable(
+        service.getDocumentUnits(
+            procedureLabel, userService.getDocumentationOffice(oidcUser).block()));
   }
 
-  @DeleteMapping(value = "{procedureUUID}")
+  @DeleteMapping(value = "{procedureLabel}")
   @PreAuthorize("isAuthenticated()")
   public Mono<ResponseEntity<Void>> delete(
-      @AuthenticationPrincipal OidcUser oidcUser, @NonNull @PathVariable UUID procedureUUID) {
+      @AuthenticationPrincipal OidcUser oidcUser, @NonNull @PathVariable String procedureLabel) {
 
-    service.delete(procedureUUID);
+    service.delete(procedureLabel, userService.getDocumentationOffice(oidcUser).block());
     return Mono.just(ResponseEntity.ok().build());
   }
 }
