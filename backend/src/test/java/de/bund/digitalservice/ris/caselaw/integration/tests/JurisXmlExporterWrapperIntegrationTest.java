@@ -10,12 +10,12 @@ import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.DataSource;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatus;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.NormReference;
 import de.bund.digitalservice.ris.caselaw.domain.PreviousDecision;
 import de.bund.digitalservice.ris.caselaw.domain.Procedure;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
+import de.bund.digitalservice.ris.caselaw.domain.Status;
 import de.bund.digitalservice.ris.caselaw.domain.Texts;
 import de.bund.digitalservice.ris.caselaw.domain.court.Court;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
@@ -192,10 +192,7 @@ class JurisXmlExporterWrapperIntegrationTest {
             .ensuingDecisions(new ArrayList<>())
             .texts(texts)
             .contentRelatedIndexing(indexing)
-            .status(
-                DocumentUnitStatus.builder()
-                    .publicationStatus(PublicationStatus.UNPUBLISHED)
-                    .build())
+            .status(Status.builder().publicationStatus(PublicationStatus.UNPUBLISHED).build())
             .build();
 
     assertThat(documentUnit).hasNoNullFieldsOrProperties();

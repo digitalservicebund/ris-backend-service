@@ -13,5 +13,5 @@ public record DocumentUnitSearchInput(
     LocalDate decisionDate,
     LocalDate decisionDateEnd,
     DocumentationOffice documentationOffice,
-    DocumentUnitStatus status,
+    Status status,
     boolean myDocOfficeOnly) {}

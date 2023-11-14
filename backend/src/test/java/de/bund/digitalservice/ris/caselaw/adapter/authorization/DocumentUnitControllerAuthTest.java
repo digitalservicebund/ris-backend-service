@@ -18,8 +18,8 @@ import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatus;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
+import de.bund.digitalservice.ris.caselaw.domain.Status;
 import java.nio.ByteBuffer;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
@@ -201,8 +201,7 @@ class DocumentUnitControllerAuthTest {
 
   @Test
   void testHtml() {
-    mockDocumentUnit(
-        docOffice1, "123", DocumentUnitStatus.builder().publicationStatus(PUBLISHED).build());
+    mockDocumentUnit(docOffice1, "123", Status.builder().publicationStatus(PUBLISHED).build());
     when(docxConverterService.getConvertedObject("123")).thenReturn(Mono.empty());
 
     String uri = "/api/v1/caselaw/documentunits/" + TEST_UUID + "/docx";
@@ -211,8 +210,7 @@ class DocumentUnitControllerAuthTest {
 
     risWebTestClient.withLogin(docOffice2Group).get().uri(uri).exchange().expectStatus().isOk();
 
-    mockDocumentUnit(
-        docOffice1, "123", DocumentUnitStatus.builder().publicationStatus(UNPUBLISHED).build());
+    mockDocumentUnit(docOffice1, "123", Status.builder().publicationStatus(UNPUBLISHED).build());
 
     risWebTestClient
         .withLogin(docOffice2Group)
@@ -244,8 +242,7 @@ class DocumentUnitControllerAuthTest {
 
   @Test
   void testGetPublishedMails() {
-    mockDocumentUnit(
-        docOffice1, null, DocumentUnitStatus.builder().publicationStatus(PUBLISHED).build());
+    mockDocumentUnit(docOffice1, null, Status.builder().publicationStatus(PUBLISHED).build());
     when(service.getPublicationHistory(TEST_UUID)).thenReturn(Flux.empty());
 
     String uri = "/api/v1/caselaw/documentunits/" + TEST_UUID + "/publish";
@@ -254,8 +251,7 @@ class DocumentUnitControllerAuthTest {
 
     risWebTestClient.withLogin(docOffice2Group).get().uri(uri).exchange().expectStatus().isOk();
 
-    mockDocumentUnit(
-        docOffice1, null, DocumentUnitStatus.builder().publicationStatus(UNPUBLISHED).build());
+    mockDocumentUnit(docOffice1, null, Status.builder().publicationStatus(UNPUBLISHED).build());
 
     risWebTestClient
         .withLogin(docOffice2Group)
@@ -267,7 +263,7 @@ class DocumentUnitControllerAuthTest {
   }
 
   private DocumentUnit mockDocumentUnit(
-      DocumentationOffice docOffice, String s3path, DocumentUnitStatus status) {
+      DocumentationOffice docOffice, String s3path, Status status) {
     DocumentUnit docUnit =
         DocumentUnit.builder()
             .uuid(TEST_UUID)

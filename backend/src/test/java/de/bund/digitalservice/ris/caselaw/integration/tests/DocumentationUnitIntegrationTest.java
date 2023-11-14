@@ -41,11 +41,11 @@ import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitSearchInput;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatus;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.EmailPublishService;
 import de.bund.digitalservice.ris.caselaw.domain.PreviousDecision;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
+import de.bund.digitalservice.ris.caselaw.domain.Status;
 import de.bund.digitalservice.ris.caselaw.domain.Texts;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
@@ -589,7 +589,7 @@ class DocumentationUnitIntegrationTest {
             .courtType("MNO")
             .courtLocation("Hamburg")
             .decisionDate(decisionDates.get(0))
-            .status(DocumentUnitStatus.builder().publicationStatus(PUBLISHED).build())
+            .status(Status.builder().publicationStatus(PUBLISHED).build())
             .build();
 
     assertThat(extractDocumentNumbersFromSearchCall(searchInput)).containsExactly("ABCD202300007");

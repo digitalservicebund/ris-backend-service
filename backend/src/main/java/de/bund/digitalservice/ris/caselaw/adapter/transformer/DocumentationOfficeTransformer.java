@@ -7,13 +7,14 @@ import java.util.Optional;
 public class DocumentationOfficeTransformer {
   private DocumentationOfficeTransformer() {}
 
-  public static DocumentationOffice transformDTO(DocumentationOfficeDTO documentationOfficeDTO) {
+  public static DocumentationOffice transformToDomain(
+      DocumentationOfficeDTO documentationOfficeDTO) {
     return Optional.ofNullable(documentationOfficeDTO)
         .map(dto -> DocumentationOffice.builder().abbreviation(dto.getAbbreviation()).build())
         .orElse(null);
   }
 
-  public static DocumentationOfficeDTO transform(DocumentationOffice documentationOffice) {
+  public static DocumentationOfficeDTO transformToDTO(DocumentationOffice documentationOffice) {
     return Optional.ofNullable(documentationOffice)
         .map(
             domainObject ->

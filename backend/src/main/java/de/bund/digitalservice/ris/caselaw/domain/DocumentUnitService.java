@@ -198,7 +198,7 @@ public class DocumentUnitService {
             .decisionDateEnd(decisionDateEnd.orElse(null))
             .status(
                 (publicationStatus.isPresent() || withError.isPresent())
-                    ? DocumentUnitStatus.builder()
+                    ? Status.builder()
                         .publicationStatus(
                             publicationStatus.map(PublicationStatus::valueOf).orElse(null))
                         .withError(withError.orElse(false))

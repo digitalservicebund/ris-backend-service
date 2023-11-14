@@ -72,7 +72,7 @@ public class SendInBlueMailTrackingService implements MailTrackingService {
             documentUnitStatusDTO ->
                 statusService.update(
                     documentUnitUuid,
-                    DocumentUnitStatus.builder()
+                    Status.builder()
                         .publicationStatus(documentUnitStatusDTO)
                         .withError(state == EmailPublishState.ERROR)
                         .build()))

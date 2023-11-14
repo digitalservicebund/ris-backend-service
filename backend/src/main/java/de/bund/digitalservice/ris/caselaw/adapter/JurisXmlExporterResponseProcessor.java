@@ -1,13 +1,13 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
 import de.bund.digitalservice.ris.caselaw.domain.Attachment;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatus;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatusService;
 import de.bund.digitalservice.ris.caselaw.domain.HttpMailSender;
 import de.bund.digitalservice.ris.caselaw.domain.MailStoreFactory;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationReport;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationReportRepository;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
+import de.bund.digitalservice.ris.caselaw.domain.Status;
 import de.bund.digitalservice.ris.domain.export.juris.response.ImportMessageWrapper;
 import de.bund.digitalservice.ris.domain.export.juris.response.MessageWrapper;
 import de.bund.digitalservice.ris.domain.export.juris.response.StatusImporterException;
@@ -148,7 +148,7 @@ public class JurisXmlExporterResponseProcessor {
       return statusService
           .update(
               messageWrapper.getDocumentNumber(),
-              DocumentUnitStatus.builder()
+              Status.builder()
                   .publicationStatus(getPublicationStatus(messageWrapper.isPublished()))
                   .withError(messageWrapper.hasErrors())
                   .build())

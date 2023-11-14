@@ -6,11 +6,11 @@ import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitRepository;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitSearchInput;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatus;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitSearchEntry;
 import de.bund.digitalservice.ris.caselaw.domain.RelatedDocumentationType;
 import de.bund.digitalservice.ris.caselaw.domain.RelatedDocumentationUnit;
+import de.bund.digitalservice.ris.caselaw.domain.Status;
 import jakarta.persistence.EntityManager;
 import java.time.Instant;
 import java.util.Collections;
@@ -324,7 +324,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
                         .status(
                             metadataDTO.getStatus() == null || metadataDTO.getStatus().isEmpty()
                                 ? null
-                                : DocumentUnitStatus.builder()
+                                : Status.builder()
                                     // TODO is the first status the most recent?
                                     .publicationStatus(
                                         metadataDTO.getStatus().get(0) == null

@@ -22,5 +22,5 @@ public record DocumentUnit(
     List<PreviousDecision> previousDecisions,
     List<EnsuingDecision> ensuingDecisions,
     Texts texts,
-    DocumentUnitStatus status,
+    Status status,
     ContentRelatedIndexing contentRelatedIndexing) {}

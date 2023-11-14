@@ -16,4 +16,4 @@ public record DocumentUnitListEntry(
     DocumentType documentType,
     Court court,
     DocumentationOffice documentationOffice,
-    DocumentUnitStatus status) {}
+    Status status) {}

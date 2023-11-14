@@ -14,4 +14,4 @@ public record DocumentationUnitSearchEntry(
     String fileName,
     LocalDate decisionDate,
     String documentType,
-    DocumentUnitStatus status) {}
+    Status status) {}

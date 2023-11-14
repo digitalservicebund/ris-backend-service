@@ -28,9 +28,9 @@ import de.bund.digitalservice.ris.caselaw.config.PostgresConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
 import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatus;
 import de.bund.digitalservice.ris.caselaw.domain.EmailPublishService;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
+import de.bund.digitalservice.ris.caselaw.domain.Status;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
@@ -163,7 +163,7 @@ class DocumentUnitControllerAuthIntegrationTest {
       saveToStatusRepository(
           documentationUnitDTO,
           Instant.now().plusSeconds(60 + i),
-          DocumentUnitStatus.builder().publicationStatus(publicationStatus.get(i)).build());
+          Status.builder().publicationStatus(publicationStatus.get(i)).build());
     }
 
     EntityExchangeResult<String> result =
@@ -209,7 +209,7 @@ class DocumentUnitControllerAuthIntegrationTest {
       saveToStatusRepository(
           documentationUnitDTO,
           Instant.now().plusSeconds(60 + i),
-          DocumentUnitStatus.builder().publicationStatus(publicationStatus.get(i)).build());
+          Status.builder().publicationStatus(publicationStatus.get(i)).build());
     }
 
     EntityExchangeResult<String> result =
@@ -242,7 +242,7 @@ class DocumentUnitControllerAuthIntegrationTest {
     saveToStatusRepository(
         documentationUnitDTO,
         Instant.now(),
-        DocumentUnitStatus.builder().publicationStatus(UNPUBLISHED).build());
+        Status.builder().publicationStatus(UNPUBLISHED).build());
 
     // Documentation Office 1
     EntityExchangeResult<String> result =
@@ -271,7 +271,7 @@ class DocumentUnitControllerAuthIntegrationTest {
     saveToStatusRepository(
         documentationUnitDTO,
         Instant.now().plus(1, ChronoUnit.DAYS),
-        DocumentUnitStatus.builder().publicationStatus(PUBLISHING).build());
+        Status.builder().publicationStatus(PUBLISHING).build());
 
     result =
         risWebTestClient
@@ -290,7 +290,7 @@ class DocumentUnitControllerAuthIntegrationTest {
     saveToStatusRepository(
         documentationUnitDTO,
         Instant.now().plus(2, ChronoUnit.DAYS),
-        DocumentUnitStatus.builder().publicationStatus(PUBLISHED).build());
+        Status.builder().publicationStatus(PUBLISHED).build());
 
     result =
         risWebTestClient
@@ -333,7 +333,7 @@ class DocumentUnitControllerAuthIntegrationTest {
   }
 
   private void saveToStatusRepository(
-      DocumentationUnitDTO documentationUnitDTO, Instant createdAt, DocumentUnitStatus status) {
+      DocumentationUnitDTO documentationUnitDTO, Instant createdAt, Status status) {
     statusRepository.save(
         StatusDTO.builder()
             .documentationUnitDTO(documentationUnitDTO)

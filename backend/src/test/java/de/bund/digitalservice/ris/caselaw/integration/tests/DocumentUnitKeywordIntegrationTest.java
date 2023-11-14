@@ -100,7 +100,7 @@ class DocumentUnitKeywordIntegrationTest {
     DocumentationOfficeDTO docOfficeDTO = documentationOfficeRepository.findByAbbreviation("DS");
 
     when(userService.getDocumentationOffice(any()))
-        .thenReturn(Mono.just(DocumentationOfficeTransformer.transformDTO(docOfficeDTO)));
+        .thenReturn(Mono.just(DocumentationOfficeTransformer.transformToDomain(docOfficeDTO)));
   }
 
   @Test

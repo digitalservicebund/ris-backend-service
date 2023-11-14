@@ -113,7 +113,7 @@ class ActiveCitationIntegrationTest {
   void setUp() {
     docOfficeDTO = documentationOfficeRepository.findByAbbreviation("DS");
 
-    doReturn(Mono.just(DocumentationOfficeTransformer.transformDTO(docOfficeDTO)))
+    doReturn(Mono.just(DocumentationOfficeTransformer.transformToDomain(docOfficeDTO)))
         .when(userService)
         .getDocumentationOffice(any(OidcUser.class));
   }

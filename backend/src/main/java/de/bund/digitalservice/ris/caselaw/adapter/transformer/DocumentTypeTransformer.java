@@ -7,6 +7,10 @@ public class DocumentTypeTransformer {
   private DocumentTypeTransformer() {}
 
   public static DocumentType transformToDomain(DocumentTypeDTO documentTypeDTO) {
+    if (documentTypeDTO == null) {
+      return null;
+    }
+
     return DocumentType.builder()
         .uuid(documentTypeDTO.getId())
         .jurisShortcut(documentTypeDTO.getAbbreviation())

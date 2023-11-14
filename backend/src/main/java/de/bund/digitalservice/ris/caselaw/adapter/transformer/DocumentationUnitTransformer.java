@@ -25,12 +25,13 @@ import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData.CoreDataBuilder;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitListEntry;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatus;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitListEntry.DocumentUnitListEntryBuilder;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.EnsuingDecision;
 import de.bund.digitalservice.ris.caselaw.domain.LegalEffect;
 import de.bund.digitalservice.ris.caselaw.domain.NormReference;
 import de.bund.digitalservice.ris.caselaw.domain.PreviousDecision;
+import de.bund.digitalservice.ris.caselaw.domain.Status;
 import de.bund.digitalservice.ris.caselaw.domain.Texts;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw.FieldOfLaw;
 import java.time.Instant;
@@ -545,7 +546,7 @@ public class DocumentationUnitTransformer {
     if (documentationUnitDTO.getStatus() != null && !documentationUnitDTO.getStatus().isEmpty()) {
       StatusDTO statusDTO = documentationUnitDTO.getStatus().get(0);
       builder.status(
-          DocumentUnitStatus.builder()
+          Status.builder()
               .publicationStatus(statusDTO.getPublicationStatus())
               .withError(statusDTO.isWithError())
               .build());
@@ -556,14 +557,26 @@ public class DocumentationUnitTransformer {
 
   public static DocumentUnitListEntry transformToMetaDomain(
       DocumentationUnitDTO documentationUnitDTO) {
-    return DocumentUnitListEntry.builder()
-        .documentNumber(documentationUnitDTO.getDocumentNumber())
-        .fileName(
-            (documentationUnitDTO.getFileNumbers() != null
-                    && !documentationUnitDTO.getFileNumbers().isEmpty())
-                ? documentationUnitDTO.getFileNumbers().get(0).getValue()
-                : null)
-        .decisionDate(documentationUnitDTO.getDecisionDate())
-        .build();
+    DocumentUnitListEntryBuilder builder =
+        DocumentUnitListEntry.builder()
+            .documentNumber(documentationUnitDTO.getDocumentNumber())
+            // .fileName(documentationUnitDTO.get) TODO
+            .documentationOffice(
+                DocumentationOfficeTransformer.transformToDomain(
+                    documentationUnitDTO.getDocumentationOffice()))
+            .documentType(
+                DocumentTypeTransformer.transformToDomain(documentationUnitDTO.getDocumentType()))
+            .decisionDate(documentationUnitDTO.getDecisionDate());
+
+    if (documentationUnitDTO.getFileNumbers() != null
+        && !documentationUnitDTO.getFileNumbers().isEmpty()) {
+      builder.fileNumber(documentationUnitDTO.getFileNumbers().get(0).getValue());
+    }
+
+    if (documentationUnitDTO.getStatus() != null && !documentationUnitDTO.getStatus().isEmpty()) {
+      builder.status(StatusTransformer.transformToDomain(documentationUnitDTO.getStatus().get(0)));
+    }
+
+    return builder.build();
   }
 }

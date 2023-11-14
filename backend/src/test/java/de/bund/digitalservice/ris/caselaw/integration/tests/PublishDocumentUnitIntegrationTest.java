@@ -32,10 +32,10 @@ import de.bund.digitalservice.ris.caselaw.config.PostgresConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
 import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatus;
 import de.bund.digitalservice.ris.caselaw.domain.HttpMailSender;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationHistoryRecordType;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
+import de.bund.digitalservice.ris.caselaw.domain.Status;
 import de.bund.digitalservice.ris.caselaw.domain.XmlPublication;
 import java.time.Clock;
 import java.time.Instant;
@@ -199,11 +199,7 @@ class PublishDocumentUnitIntegrationTest {
     assertThat(DocumentationUnitTransformer.transformToDomain(status.getDocumentationUnitDTO()))
         .isEqualTo(
             DocumentationUnitTransformer.transformToDomain(documentUnitDTO).toBuilder()
-                .status(
-                    DocumentUnitStatus.builder()
-                        .publicationStatus(PUBLISHING)
-                        .withError(false)
-                        .build())
+                .status(Status.builder().publicationStatus(PUBLISHING).withError(false).build())
                 .build());
     assertThat(status.getCreatedAt()).isEqualTo(xmlPublicationDTO.getPublishDate());
     assertThat(status.getIssuerAddress()).isEqualTo("test@test.com");

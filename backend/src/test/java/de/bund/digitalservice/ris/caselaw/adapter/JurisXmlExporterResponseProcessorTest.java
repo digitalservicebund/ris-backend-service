@@ -13,12 +13,12 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import de.bund.digitalservice.ris.caselaw.domain.Attachment;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatus;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatusService;
 import de.bund.digitalservice.ris.caselaw.domain.HttpMailSender;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationReport;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationReportRepository;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
+import de.bund.digitalservice.ris.caselaw.domain.Status;
 import de.bund.digitalservice.ris.domain.export.juris.response.ImportMessageWrapper;
 import de.bund.digitalservice.ris.domain.export.juris.response.MessageAttachment;
 import de.bund.digitalservice.ris.domain.export.juris.response.ProcessMessageWrapper;
@@ -88,7 +88,7 @@ class JurisXmlExporterResponseProcessorTest {
         .thenReturn(Optional.of(processMessageWrapper));
 
     when(reportRepository.saveAll(any())).thenReturn(Collections.emptyList());
-    when(statusService.update(anyString(), any(DocumentUnitStatus.class))).thenReturn(Mono.empty());
+    when(statusService.update(anyString(), any(Status.class))).thenReturn(Mono.empty());
     when(statusService.getLatestIssuerAddress(DOCUMENT_NUMBER))
         .thenReturn(Mono.just("test@digitalservice.bund.de"));
 
@@ -308,7 +308,7 @@ class JurisXmlExporterResponseProcessorTest {
         .update(
             anyString(),
             eq(
-                DocumentUnitStatus.builder()
+                Status.builder()
                     .publicationStatus(PublicationStatus.PUBLISHING)
                     .withError(false)
                     .build()));
@@ -327,7 +327,7 @@ class JurisXmlExporterResponseProcessorTest {
         .update(
             anyString(),
             eq(
-                DocumentUnitStatus.builder()
+                Status.builder()
                     .publicationStatus(PublicationStatus.UNPUBLISHED)
                     .withError(true)
                     .build()));
@@ -346,7 +346,7 @@ class JurisXmlExporterResponseProcessorTest {
         .update(
             anyString(),
             eq(
-                DocumentUnitStatus.builder()
+                Status.builder()
                     .publicationStatus(PublicationStatus.PUBLISHED)
                     .withError(false)
                     .build()));
@@ -365,7 +365,7 @@ class JurisXmlExporterResponseProcessorTest {
         .update(
             anyString(),
             eq(
-                DocumentUnitStatus.builder()
+                Status.builder()
                     .publicationStatus(PublicationStatus.PUBLISHED)
                     .withError(true)
                     .build()));
@@ -384,7 +384,7 @@ class JurisXmlExporterResponseProcessorTest {
         .update(
             anyString(),
             eq(
-                DocumentUnitStatus.builder()
+                Status.builder()
                     .publicationStatus(PublicationStatus.UNPUBLISHED)
                     .withError(true)
                     .build()));
@@ -409,7 +409,7 @@ class JurisXmlExporterResponseProcessorTest {
         .update(
             anyString(),
             eq(
-                DocumentUnitStatus.builder()
+                Status.builder()
                     .publicationStatus(PublicationStatus.PUBLISHING)
                     .withError(false)
                     .build()));
@@ -419,7 +419,7 @@ class JurisXmlExporterResponseProcessorTest {
         .update(
             anyString(),
             eq(
-                DocumentUnitStatus.builder()
+                Status.builder()
                     .publicationStatus(PublicationStatus.PUBLISHED)
                     .withError(false)
                     .build()));

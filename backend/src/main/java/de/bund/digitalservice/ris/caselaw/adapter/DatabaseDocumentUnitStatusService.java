@@ -5,9 +5,9 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseStatusRep
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.StatusDTO;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitRepository;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatus;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatusService;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
+import de.bund.digitalservice.ris.caselaw.domain.Status;
 import java.time.Instant;
 import java.util.Objects;
 import java.util.UUID;
@@ -64,21 +64,21 @@ public class DatabaseDocumentUnitStatusService implements DocumentUnitStatusServ
   }
 
   @Override
-  public Mono<Void> update(String documentNumber, DocumentUnitStatus status) {
+  public Mono<Void> update(String documentNumber, Status status) {
     return getLatestPublishing(documentNumber)
         .flatMap(previousStatusDTO -> saveStatus(status, previousStatusDTO))
         .then();
   }
 
   @Override
-  public Mono<Void> update(UUID documentUuid, DocumentUnitStatus status) {
+  public Mono<Void> update(UUID documentUuid, Status status) {
     return getLatestPublishing(documentUuid)
         .flatMap(previousStatusDTO -> saveStatus(status, previousStatusDTO))
         .then();
   }
 
   @NotNull
-  private Mono<StatusDTO> saveStatus(DocumentUnitStatus status, StatusDTO previousStatusDTO) {
+  private Mono<StatusDTO> saveStatus(Status status, StatusDTO previousStatusDTO) {
 
     return Mono.just(
         repository.save(
