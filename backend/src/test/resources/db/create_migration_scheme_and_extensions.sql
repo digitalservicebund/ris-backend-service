@@ -159,6 +159,7 @@ CREATE TABLE IF NOT EXISTS
     id uuid NOT NULL,
     value character varying(1000) COLLATE pg_catalog."default" NOT NULL,
     documentation_unit_id uuid NOT NULL,
+    rank INTEGER DEFAULT '-1'::INTEGER NOT NULL,
     CONSTRAINT file_number_pkey PRIMARY KEY (id)
   );
 
