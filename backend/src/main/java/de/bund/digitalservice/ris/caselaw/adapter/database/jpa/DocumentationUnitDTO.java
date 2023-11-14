@@ -71,6 +71,7 @@ public class DocumentationUnitDTO implements DocumentationUnitMetadataDTO {
       fetch = FetchType.EAGER,
       orphanRemoval = true)
   @Builder.Default
+  @OrderBy("rank")
   private List<FileNumberDTO> fileNumbers = new ArrayList<>();
 
   @Column private String grounds;
@@ -182,16 +183,19 @@ public class DocumentationUnitDTO implements DocumentationUnitMetadataDTO {
   @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
   @JoinColumn(name = "documentation_unit_id", nullable = false)
   @Builder.Default
+  @OrderBy("rank")
   private List<DeviatingEcliDTO> deviatingEclis = new ArrayList<>();
 
   @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
   @JoinColumn(name = "documentation_unit_id", nullable = false)
   @Builder.Default
+  @OrderBy("rank")
   private List<DeviatingFileNumberDTO> deviatingFileNumbers = new ArrayList<>();
 
   @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
   @JoinColumn(name = "documentation_unit_id", nullable = false)
   @Builder.Default
+  @OrderBy("rank")
   private List<DeviatingCourtDTO> deviatingCourts = new ArrayList<>();
 
   @ManyToMany(

@@ -23,29 +23,14 @@ import lombok.Setter;
 @Builder
 @Entity
 @Table(schema = "incremental_migration", name = "deviating_file_number")
-// @IdClass(DeviatingFileNumberId.class)
 public class DeviatingFileNumberDTO {
   @Id @GeneratedValue private UUID id;
 
   @Column(nullable = false)
   @NotBlank
-  //  @Id
   private String value;
 
-  //  @Column(name = "documentation_unit_id")
-  //  @Id
-  //  private UUID documentationUnitId;
-
-  //  @ManyToOne
-  //  @Column(name = "documentation_unit")
-  //  @NotNull
-  //  private DocumentationUnitDTO documentationUnit;
-
   @Transient private Long rank;
-
-  public DeviatingFileNumberDTO(String value) {
-    this.value = value;
-  }
 }
 
 @AllArgsConstructor

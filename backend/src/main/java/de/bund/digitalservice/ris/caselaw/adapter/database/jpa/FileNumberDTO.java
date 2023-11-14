@@ -36,7 +36,5 @@ public class FileNumberDTO {
   @NotNull
   private DocumentationUnitDTO documentationUnit;
 
-  public FileNumberDTO(String value) {
-    this.value = value;
-  }
+  private Long rank;
 }

@@ -93,18 +93,18 @@ public class DocumentationUnitTransformer {
 
       addProcedures(currentDto, builder, coreData);
 
-      var fileNumbers = coreData.fileNumbers();
-      if (fileNumbers != null && !fileNumbers.isEmpty()) {
-        builder.fileNumbers(
-            fileNumbers.stream()
-                .map(
-                    fileNumber ->
-                        FileNumberDTO.builder()
-                            // TODO do we have to use the fileNumber repo instead?
-                            .value(fileNumber)
-                            .documentationUnit(currentDto)
-                            .build())
-                .toList());
+      if (coreData.fileNumbers() != null) {
+        List<FileNumberDTO> fileNumberDTOs = new ArrayList<>();
+        List<String> fileNumbers = coreData.fileNumbers();
+        for (int i = 0; i < fileNumbers.size(); i++) {
+          fileNumberDTOs.add(
+              FileNumberDTO.builder()
+                  .value(fileNumbers.get(i))
+                  .rank((long) (i + 1))
+                  .documentationUnit(currentDto)
+                  .build());
+        }
+        builder.fileNumbers(fileNumberDTOs);
       }
 
       if (coreData.deviatingCourts() != null) {
