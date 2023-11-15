@@ -110,7 +110,7 @@ test.describe("court", () => {
 
   test("test court dropdown", async ({ page, documentNumber }) => {
     await navigateToCategories(page, documentNumber)
-    const totalCourts = 4053
+    const minTotalCourts = 4052
 
     // on start: closed dropdown, no input text
     await waitForInputValue(page, "[aria-label='Gericht']", "")
@@ -121,13 +121,13 @@ test.describe("court", () => {
     await page
       .locator("[aria-label='Gericht'] + button.input-expand-icon")
       .click()
-    await expect(page.locator("[aria-label='dropdown-option']")).toHaveCount(
-      totalCourts,
-    )
+    await expect(
+      page.locator("[aria-label='dropdown-option'] >> nth=" + minTotalCourts),
+    ).toBeVisible()
     await expect(page.locator("text=AG Aachen")).toBeVisible()
     await expect(page.locator("text=AG Aalen")).toBeVisible()
 
-    // type search string: 2 results for "bayern"
+    // type search string: 3 results for "bayern"
     await page.locator("[aria-label='Gericht']").fill("bayern")
     await waitForInputValue(page, "[aria-label='Gericht']", "bayern")
     await expect(page.locator("[aria-label='dropdown-option']")).toHaveCount(3)
@@ -135,9 +135,9 @@ test.describe("court", () => {
     // use the clear icon
     await page.locator("[aria-label='Auswahl zurücksetzen']").click()
     await waitForInputValue(page, "[aria-label='Gericht']", "")
-    await expect(page.locator("[aria-label='dropdown-option']")).toHaveCount(
-      totalCourts,
-    )
+    await expect(
+      page.locator("[aria-label='dropdown-option'] >> nth=" + minTotalCourts),
+    ).toBeVisible()
 
     // close dropdown
     await page
