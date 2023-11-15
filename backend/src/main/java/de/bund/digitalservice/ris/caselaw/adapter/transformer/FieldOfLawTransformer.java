@@ -1,7 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.adapter.transformer;
 
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.FieldOfLawDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.FieldOfLawKeywordDTO;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw.FieldOfLaw;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw.FieldOfLaw.FieldOfLawBuilder;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw.Keyword;
@@ -24,7 +23,6 @@ public class FieldOfLawTransformer {
             .text(fieldOfLawDTO.getText());
 
     if (fieldOfLawDTO.getKeywords() != null) {
-      List<FieldOfLawKeywordDTO> keywordDTOs = fieldOfLawDTO.getKeywords();
       List<Keyword> keywords =
           fieldOfLawDTO.getKeywords().stream()
               .map(keywordDTO -> Keyword.builder().value(keywordDTO.getValue()).build())
@@ -64,9 +62,10 @@ public class FieldOfLawTransformer {
       }
     } else {
       builder.children(Collections.emptyList());
-      if (fieldOfLawDTO.getChildren() != null) {
-        builder.childrenCount(fieldOfLawDTO.getChildren().size());
-      }
+      // TODO
+      //      if (fieldOfLawDTO.getChildren() != null) {
+      //        builder.childrenCount(fieldOfLawDTO.getChildren().size());
+      //      }
     }
 
     return builder.build();

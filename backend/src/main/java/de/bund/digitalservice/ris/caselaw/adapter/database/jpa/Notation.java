@@ -13,4 +13,9 @@ public enum Notation {
   Notation(Pattern pattern) {
     this.pattern = pattern;
   }
+
+  @Override
+  public String toString() {
+    return name();
+  }
 }

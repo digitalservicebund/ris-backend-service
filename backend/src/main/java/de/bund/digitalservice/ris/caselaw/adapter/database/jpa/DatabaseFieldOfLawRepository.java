@@ -20,11 +20,13 @@ public interface DatabaseFieldOfLawRepository extends JpaRepository<FieldOfLawDT
   Page<FieldOfLawDTO> findAllByOrderByIdentifierAsc(Pageable pageable);
 
   @Query(
-      "select fol from FieldOfLawDTO fol where  fol.notation = 'NEW' and fol.identifier ilike concat('%', :searchStr, '%') order by fol.identifier")
+      "select fol from FieldOfLawDTO fol where  fol.notation = 'NEW' and fol.identifier like upper(concat('%', :searchStr, '%')) order by fol.identifier")
   List<FieldOfLawDTO> findAllByIdentifierContainingIgnoreCaseOrderByIdentifier(String searchStr);
 
   @Query(
-      "select fol from FieldOfLawDTO fol where  fol.notation = 'NEW' and (fol.identifier ilike concat('%', :searchTerm, '%') or fol.text ilike concat('%', :searchTerm, '%'))")
-  List<FieldOfLawDTO> findAllByIdentifierContainingIgnoreCaseOrTextContainingIgnoreCase(
+      "SELECT f FROM FieldOfLawDTO f WHERE f.notation = 'NEW' AND "
+          + "(UPPER(f.identifier) LIKE UPPER(CONCAT('%', :searchTerm, '%')) OR "
+          + "UPPER(f.text) LIKE UPPER(CONCAT('%', :searchTerm, '%')))")
+  List<FieldOfLawDTO> findAllByNotationAndIdentifierContainingIgnoreCaseOrTextContainingIgnoreCase(
       String searchTerm);
 }

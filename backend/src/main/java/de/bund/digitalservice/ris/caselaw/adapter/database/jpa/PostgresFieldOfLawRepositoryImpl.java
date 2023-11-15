@@ -65,7 +65,9 @@ public class PostgresFieldOfLawRepositoryImpl implements FieldOfLawRepository {
   @Transactional(transactionManager = "jpaTransactionManager")
   public FieldOfLaw findParentByChild(FieldOfLaw child) {
     Optional<FieldOfLawDTO> childDTO = repository.findById(child.id());
-    return childDTO.map(FieldOfLawTransformer::transformToDomain).orElse(null);
+    return childDTO
+        .map(fieldOfLawDTO -> FieldOfLawTransformer.transformToDomain(fieldOfLawDTO, false))
+        .orElse(null);
   }
 
   @Override
@@ -73,7 +75,7 @@ public class PostgresFieldOfLawRepositoryImpl implements FieldOfLawRepository {
   public Page<FieldOfLaw> findAllByOrderByIdentifierAsc(Pageable pageable) {
     return repository
         .findAllByOrderByIdentifierAsc(pageable)
-        .map(FieldOfLawTransformer::transformToDomain);
+        .map(item -> FieldOfLawTransformer.transformToDomain(item, false));
   }
 
   @Override
@@ -84,12 +86,12 @@ public class PostgresFieldOfLawRepositoryImpl implements FieldOfLawRepository {
     }
 
     List<FieldOfLawDTO> listWithFirstSearchTerm =
-        repository.findAllByIdentifierContainingIgnoreCaseOrTextContainingIgnoreCase(
+        repository.findAllByNotationAndIdentifierContainingIgnoreCaseOrTextContainingIgnoreCase(
             searchTerms[0]);
 
     if (searchTerms.length == 1) {
       return listWithFirstSearchTerm.stream()
-          .map(FieldOfLawTransformer::transformToDomain)
+          .map(item -> FieldOfLawTransformer.transformToDomain(item, false))
           .toList();
     }
 
@@ -116,7 +118,7 @@ public class PostgresFieldOfLawRepositoryImpl implements FieldOfLawRepository {
   public List<FieldOfLaw> findByNormStr(String normStr) {
     return getNormDTOs(normStr).stream()
         .map(FieldOfLawNormDTO::getFieldOfLaw)
-        .map(FieldOfLawTransformer::transformToDomain)
+        .map(item -> FieldOfLawTransformer.transformToDomain(item, false))
         .toList();
   }
 
@@ -157,14 +159,14 @@ public class PostgresFieldOfLawRepositoryImpl implements FieldOfLawRepository {
               return false;
             })
         .map(FieldOfLawNormDTO::getFieldOfLaw)
-        .map(FieldOfLawTransformer::transformToDomain)
+        .map(item -> FieldOfLawTransformer.transformToDomain(item, false))
         .toList();
   }
 
   @Override
   public List<FieldOfLaw> getFirst30OrderByIdentifier() {
     return repository.findAllByOrderByIdentifierAsc(PageRequest.of(0, 30)).stream()
-        .map(FieldOfLawTransformer::transformToDomain)
+        .map(item -> FieldOfLawTransformer.transformToDomain(item, false))
         .toList();
   }
 
@@ -172,7 +174,7 @@ public class PostgresFieldOfLawRepositoryImpl implements FieldOfLawRepository {
   @Transactional(transactionManager = "jpaTransactionManager")
   public List<FieldOfLaw> findByIdentifierSearch(String searchStr) {
     return repository.findAllByIdentifierContainingIgnoreCaseOrderByIdentifier(searchStr).stream()
-        .map(FieldOfLawTransformer::transformToDomain)
+        .map(item -> FieldOfLawTransformer.transformToDomain(item, false))
         .toList();
   }
 }

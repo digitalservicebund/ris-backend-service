@@ -56,7 +56,7 @@ public class FieldOfLawDTO {
   @Valid
   private NavigationTermDTO navigationTerm;
 
-  @ManyToMany(fetch = FetchType.EAGER)
+  @ManyToMany(fetch = FetchType.LAZY)
   @JoinTable(
       schema = "incremental_migration",
       name = "field_of_law_field_of_law_keyword",
@@ -73,7 +73,7 @@ public class FieldOfLawDTO {
   @Valid
   private Set<FieldOfLawNormDTO> norms = new HashSet<>();
 
-  @ManyToOne
+  @ManyToOne(fetch = FetchType.LAZY)
   @JoinTable(
       schema = "incremental_migration",
       name = "field_of_law_field_of_law_parent",
