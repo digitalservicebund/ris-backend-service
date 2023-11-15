@@ -538,9 +538,18 @@ public class DocumentationUnitTransformer {
       return;
     }
 
+    int size = 0;
+    if (ensuingDecisionDTOs != null) {
+      size += ensuingDecisionDTOs.size();
+    }
+
+    if (pendingDecisionDTOs != null) {
+      size += pendingDecisionDTOs.size();
+    }
+
     List<EnsuingDecision> withoutRank = new ArrayList<>();
-    EnsuingDecision[] ensuingDecisions =
-        new EnsuingDecision[ensuingDecisionDTOs.size() + pendingDecisionDTOs.size()];
+    EnsuingDecision[] ensuingDecisions = new EnsuingDecision[size];
+
     if (ensuingDecisionDTOs != null) {
       for (EnsuingDecisionDTO currentDTO : ensuingDecisionDTOs) {
         if (currentDTO.getRank() > 0) {
