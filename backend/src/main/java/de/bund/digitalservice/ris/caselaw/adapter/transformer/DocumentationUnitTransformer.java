@@ -1,6 +1,5 @@
 package de.bund.digitalservice.ris.caselaw.adapter.transformer;
 
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ActiveCitationDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DecisionNameDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DeviatingCourtDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DeviatingDateDTO;
@@ -16,7 +15,6 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.KeywordDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LegalEffectDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.OriginalFileDocumentDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PendingDecisionDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PreviousDecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ProcedureDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.StatusDTO;
 import de.bund.digitalservice.ris.caselaw.domain.ActiveCitation;
@@ -24,6 +22,7 @@ import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData.CoreDataBuilder;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit.DocumentUnitBuilder;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitListEntry;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitListEntry.DocumentUnitListEntryBuilder;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
@@ -455,15 +454,11 @@ public class DocumentationUnitTransformer {
       contentRelatedIndexingBuilder.norms(norms);
     }
 
-    List<ActiveCitationDTO> activeCitationDTOS = documentationUnitDTO.getActiveCitations();
-    if (activeCitationDTOS != null) {
-      ActiveCitation[] activeCitations = new ActiveCitation[activeCitationDTOS.size()];
-      for (int i = 0; i < activeCitationDTOS.size(); i++) {
-        ActiveCitationDTO currentDTO = activeCitationDTOS.get(i);
-        activeCitations[currentDTO.getRank() - 1] =
-            ActiveCitationTransformer.transformToDomain(currentDTO);
-      }
-      contentRelatedIndexingBuilder.activeCitations(Arrays.stream(activeCitations).toList());
+    if (documentationUnitDTO.getActiveCitations() != null) {
+      contentRelatedIndexingBuilder.activeCitations(
+          documentationUnitDTO.getActiveCitations().stream()
+              .map(ActiveCitationTransformer::transformToDomain)
+              .toList());
     }
 
     if (documentationUnitDTO.getFieldsOfLaw() != null) {
@@ -505,39 +500,14 @@ public class DocumentationUnitTransformer {
           .filename(originalFileDocumentDTO.getFilename());
     }
 
-    List<PreviousDecisionDTO> previousDecisionDTOS = documentationUnitDTO.getPreviousDecisions();
-    if (previousDecisionDTOS != null) {
-      PreviousDecision[] previousDecisions = new PreviousDecision[previousDecisionDTOS.size()];
-      for (int i = 0; i < previousDecisionDTOS.size(); i++) {
-        PreviousDecisionDTO currentDTO = previousDecisionDTOS.get(i);
-        previousDecisions[currentDTO.getRank() - 1] =
-            PreviousDecisionTransformer.transformToDomain(currentDTO);
-      }
-      builder.previousDecisions(Arrays.stream(previousDecisions).toList());
+    if (documentationUnitDTO.getPreviousDecisions() != null) {
+      builder.previousDecisions(
+          documentationUnitDTO.getPreviousDecisions().stream()
+              .map(PreviousDecisionTransformer::transformToDomain)
+              .toList());
     }
 
-    List<EnsuingDecisionDTO> ensuingDecisionDTOs = documentationUnitDTO.getEnsuingDecisions();
-    List<PendingDecisionDTO> pendingDecisionDTOs = documentationUnitDTO.getPendingDecisions();
-
-    if (pendingDecisionDTOs != null || ensuingDecisionDTOs != null) {
-      EnsuingDecision[] ensuingDecisions =
-          new EnsuingDecision[ensuingDecisionDTOs.size() + pendingDecisionDTOs.size()];
-      if (ensuingDecisionDTOs != null) {
-        for (EnsuingDecisionDTO currentDTO : ensuingDecisionDTOs) {
-          ensuingDecisions[currentDTO.getRank() - 1] =
-              EnsuingDecisionTransformer.transformToDomain(currentDTO);
-        }
-      }
-
-      if (pendingDecisionDTOs != null) {
-        for (PendingDecisionDTO currentDTO : pendingDecisionDTOs) {
-          ensuingDecisions[currentDTO.getRank() - 1] =
-              PendingDecisionTransformer.transformToDomain(currentDTO);
-        }
-      }
-
-      builder.ensuingDecisions(Arrays.stream(ensuingDecisions).toList());
-    }
+    addEnsuingDecisionsToDomain(documentationUnitDTO, builder);
 
     builder
         .uuid(documentationUnitDTO.getId())
@@ -556,6 +526,57 @@ public class DocumentationUnitTransformer {
     }
 
     return builder.build();
+  }
+
+  private static void addEnsuingDecisionsToDomain(
+      DocumentationUnitDTO documentationUnitDTO, DocumentUnitBuilder builder) {
+
+    List<EnsuingDecisionDTO> ensuingDecisionDTOs = documentationUnitDTO.getEnsuingDecisions();
+    List<PendingDecisionDTO> pendingDecisionDTOs = documentationUnitDTO.getPendingDecisions();
+
+    if (pendingDecisionDTOs == null && ensuingDecisionDTOs == null) {
+      return;
+    }
+
+    List<EnsuingDecision> withoutRank = new ArrayList<>();
+    EnsuingDecision[] ensuingDecisions = new EnsuingDecision[ensuingDecisionDTOs.size() + pendingDecisionDTOs.size()];
+    if (ensuingDecisionDTOs != null) {
+      for (EnsuingDecisionDTO currentDTO : ensuingDecisionDTOs) {
+        if (currentDTO.getRank() > 0) {
+          ensuingDecisions[currentDTO.getRank() - 1] =
+              EnsuingDecisionTransformer.transformToDomain(currentDTO);
+        } else {
+          withoutRank.add(EnsuingDecisionTransformer.transformToDomain(currentDTO));
+        }
+      }
+    }
+
+    if (pendingDecisionDTOs != null) {
+      for (PendingDecisionDTO currentDTO : pendingDecisionDTOs) {
+        if (currentDTO.getRank() > 0) {
+          ensuingDecisions[currentDTO.getRank() - 1] =
+              PendingDecisionTransformer.transformToDomain(currentDTO);
+        } else {
+          withoutRank.add(PendingDecisionTransformer.transformToDomain(currentDTO));
+        }
+      }
+    }
+
+    if (!withoutRank.isEmpty()) {
+      int j = 0;
+      for (int i = 0; i < ensuingDecisions.length; i++) {
+        if (ensuingDecisions[i] == null) {
+          ensuingDecisions[i] = withoutRank.get(j++);
+        }
+      }
+
+      if (j < withoutRank.size()) {
+        log.error(
+            "ensuing decision - adding ensuing decisions without rank has more elements than expected.");
+      }
+    }
+
+    builder.ensuingDecisions(Arrays.stream(ensuingDecisions).toList());
   }
 
   public static DocumentUnitListEntry transformToMetaDomain(

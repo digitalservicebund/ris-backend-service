@@ -71,7 +71,7 @@ public class DocumentationUnitDTO implements DocumentationUnitMetadataDTO {
       fetch = FetchType.EAGER,
       orphanRemoval = true)
   @Builder.Default
-  //  @OrderBy("rank")
+  @OrderBy("rank")
   private List<FileNumberDTO> fileNumbers = new ArrayList<>();
 
   @Column private String grounds;
