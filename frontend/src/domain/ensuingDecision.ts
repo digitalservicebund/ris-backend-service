@@ -73,6 +73,10 @@ export default class EnsuingDecision
     if (fieldName === "pending" && value === true) {
       return false
     }
+
+    if (fieldName === "decisionDate" && this.pending === true) {
+      return false
+    }
     if (value === undefined || !value || value === null) {
       return true
     }
