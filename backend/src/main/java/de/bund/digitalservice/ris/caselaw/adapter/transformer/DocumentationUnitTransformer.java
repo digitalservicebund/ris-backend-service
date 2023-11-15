@@ -539,7 +539,8 @@ public class DocumentationUnitTransformer {
     }
 
     List<EnsuingDecision> withoutRank = new ArrayList<>();
-    EnsuingDecision[] ensuingDecisions = new EnsuingDecision[ensuingDecisionDTOs.size() + pendingDecisionDTOs.size()];
+    EnsuingDecision[] ensuingDecisions =
+        new EnsuingDecision[ensuingDecisionDTOs.size() + pendingDecisionDTOs.size()];
     if (ensuingDecisionDTOs != null) {
       for (EnsuingDecisionDTO currentDTO : ensuingDecisionDTOs) {
         if (currentDTO.getRank() > 0) {
