@@ -68,9 +68,9 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
     },
     controllers = {DocumentUnitController.class},
     timeout = "PT5M")
-@Sql(scripts = {"classpath:active_citation_init.sql"})
+@Sql(scripts = {"classpath:active_citations_init.sql"})
 @Sql(
-    scripts = {"classpath:active_citation_cleanup.sql"},
+    scripts = {"classpath:active_citations_cleanup.sql"},
     executionPhase = AFTER_TEST_METHOD)
 class ActiveCitationIntegrationTest {
   @Container
