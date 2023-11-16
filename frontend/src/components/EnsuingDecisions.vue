@@ -54,7 +54,7 @@ const DecisionSummary = withSummarizer(decisionSummarizer)
 
 <template>
   <div aria-label="Nachgehende Entscheidung" class="mb-32 bg-white p-16">
-    <h2 class="ds-label-02-bold mb-[1rem]">Nachgehende Entscheidung</h2>
+    <h2 class="ds-label-02-bold mb-[1rem]">Nachgehende Entscheidungen</h2>
     <div class="flex flex-row">
       <div class="flex-1">
         <EditableList

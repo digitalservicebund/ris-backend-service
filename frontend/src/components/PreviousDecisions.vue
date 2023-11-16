@@ -67,7 +67,7 @@ const DecisionSummary = withSummarizer(decisionSummarizer)
     Rechtszug
   </h2>
   <div aria-label="Vorgehende Entscheidung" class="mb-32 bg-white p-16">
-    <h2 class="ds-label-02-bold mb-[1rem]">Vorgehende Entscheidung</h2>
+    <h2 class="ds-label-02-bold mb-[1rem]">Vorgehende Entscheidungen</h2>
     <div class="flex flex-row">
       <div class="flex-1">
         <EditableList

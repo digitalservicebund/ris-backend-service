@@ -127,7 +127,7 @@ onMounted(() => {
     <InputField
       id="regularCheckbox"
       v-slot="{ id }"
-      label="Anhängige Entscheidung"
+      label="anhängig"
       :label-position="LabelPosition.RIGHT"
     >
       <CheckboxInput
