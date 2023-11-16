@@ -38,7 +38,7 @@ public class JurisConfig {
 
   @Bean
   @Primary
-  @Profile({"!production", "uat"})
+  @Profile({"!production & !uat"})
   public JurisStub jurisStub() {
     return new JurisStub(mailboxUsername, mailboxPassword);
   }
