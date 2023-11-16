@@ -229,9 +229,8 @@ dependencies {
     implementation("com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer:20220608.1")
     // => CVE-2023-2976
     implementation("com.google.guava:guava:32.1.3-jre")
-    // this is to force transitive dependencies to use 1.0.24 instead of
-    // 1.0.23 as that is affected by CVE-2022-31684
-    implementation("io.projectreactor.netty:reactor-netty-http:1.1.8")
+    // Manually updating to 1.1.13 because parents already latest version (CVE-2023-34062)
+    implementation("io.projectreactor.netty:reactor-netty-http:1.1.13")
     var flywayCore = "org.flywaydb:flyway-core:9.22.2"
     implementation(flywayCore)
     "migrationImplementation"(flywayCore)
