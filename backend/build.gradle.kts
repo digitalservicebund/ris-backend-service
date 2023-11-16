@@ -191,7 +191,7 @@ dependencies {
     implementation("software.amazon.awssdk:s3")
     // CVE-2022-42004, CVE-2022-42003
     implementation("com.fasterxml.jackson:jackson-bom:$jacksonModuleVersion")
-    implementation("com.fasterxml.jackson.core:jackson-databind:2.14.2")
+    implementation("com.fasterxml.jackson.core:jackson-databind:2.16.0")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:$jacksonModuleVersion")
     implementation("com.github.spullara.mustache.java:compiler:0.9.10")
     // CVE-2022-40153
