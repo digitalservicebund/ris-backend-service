@@ -329,6 +329,7 @@ jobs:
     needs:
       - push-frontend-image-to-registry
       - push-backend-image-to-registry
+      - deploy-uat
     permissions:
       id-token: write # Enable OIDC for gitsign
     steps:
