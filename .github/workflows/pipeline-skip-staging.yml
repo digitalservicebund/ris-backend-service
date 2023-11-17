@@ -312,7 +312,7 @@ jobs:
       - push-frontend-image-to-registry
       - push-backend-image-to-registry
     steps:
-      - id: deploy prod instructions
+      - id: deploy-prod-instructions
         run: echo "To deploy prod, commit image tag $CONTAINER_IMAGE_VERSION manually in infra repo manifests/overlays/production/kustomization.yaml"
 
   deploy-uat:
