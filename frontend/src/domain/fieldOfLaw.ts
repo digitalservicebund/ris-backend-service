@@ -26,7 +26,7 @@ export function buildRoot(): FieldOfLawNode {
     identifier: ROOT_ID,
     text: "Alle Sachgebiete anzeigen",
     children: [],
-    childrenCount: 17,
+    childrenCount: -1,
     norms: [],
     isExpanded: false,
   }

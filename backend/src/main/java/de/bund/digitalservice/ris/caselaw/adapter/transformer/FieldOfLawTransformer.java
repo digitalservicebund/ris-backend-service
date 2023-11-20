@@ -62,6 +62,7 @@ public class FieldOfLawTransformer {
       }
     } else {
       builder.children(Collections.emptyList());
+      builder.childrenCount(-1);
       // TODO
       //      if (fieldOfLawDTO.getChildren() != null) {
       //        builder.childrenCount(fieldOfLawDTO.getChildren().size());

@@ -32,7 +32,7 @@ function handleTokenClick(tokenContent: string) {
 }
 
 function canLoadMoreChildren() {
-  return node.value.childrenCount > node.value.children?.length
+  return node.value.childrenCount <= 0
 }
 
 async function handleToggle() {
@@ -46,6 +46,7 @@ async function handleToggle() {
       (response) => {
         if (!response.data) return
         node.value.children = response.data
+        node.value.childrenCount = node.value.children.length
         if (!childToReattach) return
         const parentToReattachTo = node.value.children.find(
           (node) => node.identifier === childToReattach.identifier,

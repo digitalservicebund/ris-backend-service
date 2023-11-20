@@ -301,7 +301,7 @@ test.describe("field of law", () => {
     // if these two are visible, it must mean that the tree opened automatically with the first result
     await expect(page.getByText("Bürgerliches Recht")).toBeVisible()
     await expect(
-      page.getByText("Fallgruppen der Leistungskondiktion"),
+      page.getByText("Person, Sache, Willenserklärung, Vertrag, IPR"),
     ).toBeVisible()
   })
 

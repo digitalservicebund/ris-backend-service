@@ -196,29 +196,6 @@ class FieldOfLawIntegrationTest {
     assertThat(identifiers).isEmpty();
   }
 
-  @ParameterizedTest
-  @ValueSource(
-      strings = {
-        "§ 123", // paragraph
-        "§123", // paragraph without whitespace
-      })
-  void testGetFieldsOfLawByNormsQuery_OnlyParagraph(String query) {
-    EntityExchangeResult<String> result =
-        risWebTestClient
-            .withDefaultLogin()
-            .get()
-            .uri("/api/v1/caselaw/fieldsoflaw?q=norm:\"" + query + "\"&pg=0&sz=3")
-            .exchange()
-            .expectStatus()
-            .isOk()
-            .expectBody(String.class)
-            .returnResult();
-
-    List<String> identifiers = JsonPath.read(result.getResponseBody(), "$.content[*].identifier");
-    // TODO: ordered by rank
-    assertThat(identifiers).containsExactlyInAnyOrder("FL", "AB-01", "AB-01-01");
-  }
-
   @Test
   void testGetFieldsOfLawByNormsQuery_OnlyNormText() {
     EntityExchangeResult<String> result =
@@ -239,12 +216,10 @@ class FieldOfLawIntegrationTest {
   @ParameterizedTest
   @ValueSource(
       strings = {
-        "§ 123 abc", // paragraph followed by norm
-        "abc § 123", // norm followed by paragraph
-        "abc §123", // norm followed by paragraph without whitespace
-        "abc § 12", // norm followed by incomplete paragraph
+        "§ 123", // paragraph
+        "§123", // paragraph without whitespace
       })
-  void testGetFieldsOfLawByNormsQuery(String query) {
+  void testGetFieldsOfLawByNormsQuery_withoutAbbreviation(String query) {
     EntityExchangeResult<String> result =
         risWebTestClient
             .withDefaultLogin()
@@ -257,7 +232,52 @@ class FieldOfLawIntegrationTest {
             .returnResult();
 
     List<String> identifiers = JsonPath.read(result.getResponseBody(), "$.content[*].identifier");
-    assertThat(identifiers).isEmpty();
+    assertThat(identifiers).containsExactly("AB-01", "AB-01-01", "CD-02");
+  }
+
+  @ParameterizedTest
+  @ValueSource(
+      strings = {
+        "§ 123 abc", // paragraph followed by norm
+        "abc", // norm
+      })
+  void testGetFieldsOfLawByNormsQuery_withAbbreviation(String query) {
+    EntityExchangeResult<String> result =
+        risWebTestClient
+            .withDefaultLogin()
+            .get()
+            .uri("/api/v1/caselaw/fieldsoflaw?q=norm:\"" + query + "\"&pg=0&sz=3")
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectBody(String.class)
+            .returnResult();
+
+    List<String> identifiers = JsonPath.read(result.getResponseBody(), "$.content[*].identifier");
+    assertThat(identifiers).containsExactly("AB-01", "FL");
+  }
+
+  @ParameterizedTest
+  @ValueSource(
+      strings = {
+        "abc § 123", // norm followed by paragraph
+        "abc §123", // norm followed by paragraph without whitespace
+        "abc § 12", // norm followed by incomplete paragraph
+      })
+  void testGetFieldsOfLawByNormsQuery_withStartingAbbreviation(String query) {
+    EntityExchangeResult<String> result =
+        risWebTestClient
+            .withDefaultLogin()
+            .get()
+            .uri("/api/v1/caselaw/fieldsoflaw?q=norm:\"" + query + "\"&pg=0&sz=3")
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectBody(String.class)
+            .returnResult();
+
+    List<String> identifiers = JsonPath.read(result.getResponseBody(), "$.content[*].identifier");
+    assertThat(identifiers).containsExactly("FL");
   }
 
   @Test
@@ -371,7 +391,7 @@ class FieldOfLawIntegrationTest {
         risWebTestClient
             .withDefaultLogin()
             .get()
-            .uri("/api/v1/caselaw/fieldsoflaw/search-by-identifier?q=01")
+            .uri("/api/v1/caselaw/fieldsoflaw/search-by-identifier?q=fl")
             .exchange()
             .expectStatus()
             .isOk()
@@ -381,6 +401,6 @@ class FieldOfLawIntegrationTest {
     List<String> actualIdentifiers = JsonPath.read(result.getResponseBody(), "$[*].identifier");
     // TODO: order by rank
     assertThat(actualIdentifiers)
-        .containsExactlyInAnyOrder("AB-01", "CD-01", "AB-01-01", "FL-01", "FL-01-01");
+        .containsExactlyInAnyOrder("FL", "FL-01", "FL-01-01", "FL-02", "FL-03", "FL-04");
   }
 }

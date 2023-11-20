@@ -74,7 +74,16 @@ public class FieldOfLawService {
 
     List<FieldOfLaw> orderedList =
         unorderedList.stream()
-            .sorted((f1, f2) -> scores.get(f2).compareTo(scores.get(f1)))
+            .sorted(
+                (f1, f2) -> {
+                  int compare = scores.get(f2).compareTo(scores.get(f1));
+
+                  if (compare == 0) {
+                    compare = f1.identifier().compareTo(f2.identifier());
+                  }
+
+                  return compare;
+                })
             .toList();
 
     int fromIdx = (int) pageable.getOffset();

@@ -116,8 +116,10 @@ public class PostgresFieldOfLawRepositoryImpl implements FieldOfLawRepository {
   @Override
   @Transactional(transactionManager = "jpaTransactionManager")
   public List<FieldOfLaw> findByNormStr(String normStr) {
-    return getNormDTOs(normStr).stream()
+    List<FieldOfLawNormDTO> list = getNormDTOs(normStr);
+    return list.stream()
         .map(FieldOfLawNormDTO::getFieldOfLaw)
+        .distinct()
         .map(item -> FieldOfLawTransformer.transformToDomain(item, false))
         .toList();
   }
@@ -125,9 +127,8 @@ public class PostgresFieldOfLawRepositoryImpl implements FieldOfLawRepository {
   private List<FieldOfLawNormDTO> getNormDTOs(String normStr) {
     String correctedNormStr = getNormQueryStrings(normStr);
 
-    return normRepository
-        .findByAbbreviationContainingIgnoreCaseOrSingleNormDescriptionContainingIgnoreCase(
-            correctedNormStr, correctedNormStr);
+    return normRepository.findByAbbreviationAndSingleNormDescriptionContainingIgnoreCase(
+        correctedNormStr);
   }
 
   private String getNormQueryStrings(String normString) {
@@ -159,11 +160,13 @@ public class PostgresFieldOfLawRepositoryImpl implements FieldOfLawRepository {
               return false;
             })
         .map(FieldOfLawNormDTO::getFieldOfLaw)
+        .distinct()
         .map(item -> FieldOfLawTransformer.transformToDomain(item, false))
         .toList();
   }
 
   @Override
+  @Transactional(transactionManager = "jpaTransactionManager")
   public List<FieldOfLaw> getFirst30OrderByIdentifier() {
     return repository.findAllByOrderByIdentifierAsc(PageRequest.of(0, 30)).stream()
         .map(item -> FieldOfLawTransformer.transformToDomain(item, false))
@@ -173,7 +176,9 @@ public class PostgresFieldOfLawRepositoryImpl implements FieldOfLawRepository {
   @Override
   @Transactional(transactionManager = "jpaTransactionManager")
   public List<FieldOfLaw> findByIdentifierSearch(String searchStr) {
-    return repository.findAllByIdentifierContainingIgnoreCaseOrderByIdentifier(searchStr).stream()
+    return repository
+        .findAllByIdentifierStartsWithIgnoreCaseOrderByIdentifier(searchStr, PageRequest.of(0, 30))
+        .stream()
         .map(item -> FieldOfLawTransformer.transformToDomain(item, false))
         .toList();
   }

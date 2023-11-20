@@ -17,11 +17,19 @@ public interface DatabaseFieldOfLawRepository extends JpaRepository<FieldOfLawDT
       "select fol from FieldOfLawDTO fol where fol.parent is null and fol.notation = 'NEW' order by fol.identifier")
   List<FieldOfLawDTO> findAllByParentIsNullAndNotationOrderByIdentifier();
 
+  @Query(
+      "SELECT fol FROM FieldOfLawDTO fol "
+          + "WHERE  fol.notation = 'NEW' "
+          + "ORDER BY fol.identifier")
   Page<FieldOfLawDTO> findAllByOrderByIdentifierAsc(Pageable pageable);
 
   @Query(
-      "select fol from FieldOfLawDTO fol where  fol.notation = 'NEW' and fol.identifier like upper(concat('%', :searchStr, '%')) order by fol.identifier")
-  List<FieldOfLawDTO> findAllByIdentifierContainingIgnoreCaseOrderByIdentifier(String searchStr);
+      "SELECT fol FROM FieldOfLawDTO fol "
+          + "WHERE  fol.notation = 'NEW' AND fol.identifier "
+          + "LIKE upper(concat(:searchStr, '%')) "
+          + "ORDER BY fol.identifier")
+  Page<FieldOfLawDTO> findAllByIdentifierStartsWithIgnoreCaseOrderByIdentifier(
+      String searchStr, Pageable pageable);
 
   @Query(
       "SELECT f FROM FieldOfLawDTO f WHERE f.notation = 'NEW' AND "

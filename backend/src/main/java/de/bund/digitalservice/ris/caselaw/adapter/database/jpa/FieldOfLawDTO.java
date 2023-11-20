@@ -71,6 +71,7 @@ public class FieldOfLawDTO {
       orphanRemoval = true)
   @Builder.Default
   @Valid
+  @OrderBy("abbreviation")
   private Set<FieldOfLawNormDTO> norms = new HashSet<>();
 
   @ManyToOne(fetch = FetchType.LAZY)
