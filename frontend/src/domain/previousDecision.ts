@@ -78,8 +78,8 @@ export default class PreviousDecision
     fieldName: keyof PreviousDecision,
     value: PreviousDecision[(typeof PreviousDecision.fields)[number]],
   ) {
-    if (fieldName === "decisionDate" && !this.dateKnown && !value) {
-      return true
+    if (fieldName === "decisionDate" && this.dateKnown === false && !value) {
+      return false
     }
     if (value === undefined || !value || value === null) {
       return true

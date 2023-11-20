@@ -87,7 +87,9 @@ describe("ProceedingDecision", () => {
     expect(decisionWithoutDateKnown.missingRequiredFields).toStrictEqual([
       "decisionDate",
     ])
+  })
 
+  it("missing date with dateKnown false should be invalid", () => {
     const decisionWithDateKnown = new ProceedingDecision({
       court: {
         type: "testCourtType",
