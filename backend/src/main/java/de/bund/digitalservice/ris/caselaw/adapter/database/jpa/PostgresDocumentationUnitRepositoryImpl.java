@@ -145,7 +145,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
 
     if (documentUnit.coreData() != null) {
       documentationUnitDTO.getRegions().clear();
-      if (documentUnit.coreData().court() != null) {
+      if (documentUnit.coreData().court() != null && documentUnit.coreData().court().id() != null) {
         Optional<CourtDTO> court =
             databaseCourtRepository.findById(documentUnit.coreData().court().id());
         if (court.isPresent() && court.get().getRegion() != null) {
