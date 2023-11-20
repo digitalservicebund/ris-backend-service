@@ -47,6 +47,28 @@ test.describe("saving behaviour", () => {
     )
   })
 
+  test("test input not lost on page unload (autosave not triggered yet)", async ({
+    page,
+    documentNumber,
+  }) => {
+    await navigateToCategories(page, documentNumber)
+
+    await page.locator("[aria-label='Spruchkörper']").fill("VG-001")
+    await waitForInputValue(page, "[aria-label='Spruchkörper']", "VG-001")
+
+    await expect(page.getByText(/Zuletzt .* Uhr/)).toBeHidden()
+    await page.locator("a:has-text('Veröffentlichen')").click()
+    await expect(page.locator("h1:has-text('Veröffentlichen')")).toBeVisible({
+      timeout: 15000,
+    })
+    await navigateToCategories(page, documentNumber)
+
+    await expect(page.locator("[aria-label='Spruchkörper']")).toHaveValue(
+      "VG-001",
+      { timeout: 500 },
+    )
+  })
+
   test("change Spruchkörper two times, saving after each change", async ({
     page,
     documentNumber,

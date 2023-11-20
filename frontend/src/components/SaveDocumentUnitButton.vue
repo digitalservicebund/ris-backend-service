@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { toRaw } from "vue"
+import { onBeforeUnmount, toRaw } from "vue"
 import { ServiceResponse } from "@/services/httpClient"
 import TextButton from "@/shared/components/input/TextButton.vue"
 import { useSaveToRemote } from "@/shared/composables/useSaveToRemote"
@@ -24,6 +24,9 @@ const getErrorDetails = () => {
   }
   return ""
 }
+
+onBeforeUnmount(triggerSave)
+window.onbeforeunload = triggerSave
 </script>
 
 <template>
