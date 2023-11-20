@@ -49,13 +49,19 @@ test.describe("ensuring the publishing of documentunits works as expected", () =
     ).toBeVisible()
     await navigateToPublication(page, documentNumber)
 
-    await expect(page.locator("li:has-text('Rechtszug')")).toBeVisible()
+    await expect(
+      page.locator("li:has-text('Vorgehende Entscheidungen')"),
+    ).toBeVisible()
 
     await expect(
-      page.locator("li:has-text('Rechtszug')").getByText("Entscheidungsdatum"),
+      page
+        .locator("li:has-text('Vorgehende Entscheidungen')")
+        .getByText("Entscheidungsdatum"),
     ).toBeVisible()
     await expect(
-      page.locator("li:has-text('Rechtszug')").getByText("Aktenzeichen"),
+      page
+        .locator("li:has-text('Vorgehende Entscheidungen')")
+        .getByText("Aktenzeichen"),
     ).toBeVisible()
   })
 
@@ -85,13 +91,19 @@ test.describe("ensuring the publishing of documentunits works as expected", () =
 
     await navigateToPublication(page, prefilledDocumentUnit.documentNumber!)
 
-    await expect(page.locator("li:has-text('Rechtszug')")).toBeVisible()
+    await expect(
+      page.locator("li:has-text('Vorgehende Entscheidungen')"),
+    ).toBeVisible()
 
     await expect(
-      page.locator("li:has-text('Rechtszug')").getByText("Entscheidungsdatum"),
+      page
+        .locator("li:has-text('Vorgehende Entscheidungen')")
+        .getByText("Entscheidungsdatum"),
     ).toBeVisible()
     await expect(
-      page.locator("li:has-text('Rechtszug')").getByText("Aktenzeichen"),
+      page
+        .locator("li:has-text('Vorgehende Entscheidungen')")
+        .getByText("Aktenzeichen"),
     ).toBeVisible()
   })
 

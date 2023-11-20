@@ -43,6 +43,7 @@ public interface DatabaseDocumentationUnitRepository
       value =
           """
     SELECT documentationUnit FROM DocumentationUnitDTO documentationUnit
+    LEFT JOIN documentationUnit.court court
     WHERE (
        (:documentNumberOrFileNumber IS NULL
          OR ( lower(documentationUnit.documentNumber) like lower(concat('%', :documentNumberOrFileNumber,'%'))
@@ -58,8 +59,8 @@ public interface DatabaseDocumentationUnitRepository
                WHERE deviatingFileNumber.documentationUnit.id = documentationUnit.id
                AND deviatingFileNumber.value = :documentNumberOrFileNumber
             )))
-       AND (:courtType IS NULL OR documentationUnit.court.type = :courtType)
-       AND (:courtLocation IS NULL OR documentationUnit.court.location = :courtLocation)
+       AND (:courtType IS NULL OR court.type = :courtType)
+       AND (:courtLocation IS NULL OR court.location = :courtLocation)
        AND (cast(:decisionDate as date) IS NULL
            OR (cast(:decisionDateEnd as date) IS NULL AND documentationUnit.decisionDate = :decisionDate)
            OR (cast(:decisionDateEnd as date) IS NOT NULL AND documentationUnit.decisionDate BETWEEN :decisionDate AND :decisionDateEnd))

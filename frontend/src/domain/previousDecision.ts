@@ -6,7 +6,7 @@ export default class PreviousDecision
   extends RelatedDocumentation
   implements EditableListItem
 {
-  public dateKnown = true
+  public dateKnown: boolean | undefined = true
 
   static requiredFields = ["fileNumber", "court", "decisionDate"] as const
   static fields = [
@@ -18,6 +18,9 @@ export default class PreviousDecision
 
   constructor(data: Partial<PreviousDecision> = {}) {
     super()
+    if (data.dateKnown === undefined) {
+      this.dateKnown = true
+    }
     Object.assign(this, data)
   }
 
@@ -27,7 +30,7 @@ export default class PreviousDecision
       ...(this.decisionDate
         ? [dayjs(this.decisionDate).format("DD.MM.YYYY")]
         : []),
-      ...(this.dateUnknown === true ? ["Datum unbekannt"] : []),
+      ...(this.dateKnown === false ? ["Datum unbekannt"] : []),
       ...(this.fileNumber ? [this.fileNumber] : []),
       ...(this.documentType ? [this.documentType?.jurisShortcut] : []),
       ...(this.documentNumber ? [this.documentNumber] : []),
@@ -38,7 +41,7 @@ export default class PreviousDecision
   }
 
   get dateUnknown(): boolean {
-    return !this.dateKnown
+    return this.dateKnown !== true
   }
   set dateUnknown(dateUnknown: boolean) {
     this.dateKnown = !dateUnknown
@@ -75,8 +78,8 @@ export default class PreviousDecision
     fieldName: keyof PreviousDecision,
     value: PreviousDecision[(typeof PreviousDecision.fields)[number]],
   ) {
-    if (fieldName === "decisionDate" && !value && !this.dateKnown) {
-      return false
+    if (fieldName === "decisionDate" && !this.dateKnown && !value) {
+      return true
     }
     if (value === undefined || !value || value === null) {
       return true

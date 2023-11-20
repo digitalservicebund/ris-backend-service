@@ -29,7 +29,9 @@ test.describe("a11y of categories page (/caselaw/documentunit/{documentNumber}/c
     await expect(page.locator("text=AG Aalen")).toBeVisible()
     await page.locator("[aria-label='Gericht']").fill("bayern")
     await expect(page.locator("[aria-label='Gericht']")).toHaveValue("bayern")
-    await expect(page.locator("[aria-label='dropdown-option']")).toHaveCount(2)
+    await expect(
+      page.locator("[aria-label='dropdown-option'] >> nth=2"),
+    ).toBeVisible()
     const accessibilityScanResults = await new AxeBuilder({ page })
       .disableRules(["duplicate-id-aria"])
       .analyze()

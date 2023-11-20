@@ -67,20 +67,21 @@ describe("ProceedingDecision", () => {
         location: "testCourtLocation",
         label: "label1",
       },
-      decisionDate: "2019-12-31T23:00:00Z",
+      decisionDate: "2019-12-31",
     })
     expect(proceedingDecision.missingRequiredFields).toStrictEqual([
       "fileNumber",
     ])
   })
 
-  it("missing date with dateKnown false should be valid", () => {
+  it("missing date with dateKnown true should be invalid", () => {
     const decisionWithoutDateKnown = new ProceedingDecision({
       court: {
         type: "testCourtType",
         location: "testCourtLocation",
         label: "label1",
       },
+      dateKnown: true,
       fileNumber: "bar",
     })
     expect(decisionWithoutDateKnown.missingRequiredFields).toStrictEqual([

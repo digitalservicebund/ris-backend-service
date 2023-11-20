@@ -117,7 +117,7 @@ export async function fillPreviousDecisionInputs(
     decisionDate?: string
     fileNumber?: string
     documentType?: string
-    dateUnknown?: boolean
+    dateKnown?: boolean
   },
   decisionIndex = 0,
 ): Promise<void> {
@@ -149,7 +149,7 @@ export async function fillPreviousDecisionInputs(
     await fillInput("Dokumenttyp Vorgehende Entscheidung", values?.documentType)
     await page.locator("[aria-label='dropdown-option']").first().click()
   }
-  if (values?.dateUnknown) {
+  if (values?.dateKnown === false) {
     const dateUnknownCheckbox = page.getByLabel("Datum unbekannt")
     if (!(await dateUnknownCheckbox.isChecked())) {
       await dateUnknownCheckbox.click()
