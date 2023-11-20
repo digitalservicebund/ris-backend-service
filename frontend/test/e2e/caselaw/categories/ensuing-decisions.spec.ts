@@ -187,19 +187,20 @@ test.describe("ensuing decisions", () => {
       ensuingDecisionContainer.getByLabel("Listen Eintrag"),
     ).toHaveCount(1, { timeout: 10000 }) // reloading can be slow if too many parallel tests
 
-    await page.getByLabel("Weitere Angabe").click()
-    await page.getByLabel("Aktenzeichen Nachgehende Entscheidung").fill("two")
-    await page.getByLabel("Nachgehende Entscheidung speichern").click()
-    await expect(
-      page.getByText(`nachgehend, two`, {
-        exact: true,
-      }),
-    ).toBeVisible()
-    // "Nachgehende Entscheidung speichern" only saves state in frontend, no communication to backend yet
-    await page.reload()
-    await expect(
-      ensuingDecisionContainer.getByLabel("Listen Eintrag"),
-    ).toHaveCount(1, { timeout: 10000 }) // reloading can be slow if too many parallel tests
+    // Change with commit reload by saving
+    // await page.getByLabel("Weitere Angabe").click()
+    // await page.getByLabel("Aktenzeichen Nachgehende Entscheidung").fill("two")
+    // await page.getByLabel("Nachgehende Entscheidung speichern").click()
+    // await expect(
+    //   page.getByText(`nachgehend, two`, {
+    //     exact: true,
+    //   }),
+    // ).toBeVisible()
+    // // "Nachgehende Entscheidung speichern" only saves state in frontend, no communication to backend yet
+    // await page.reload()
+    // await expect(
+    //   ensuingDecisionContainer.getByLabel("Listen Eintrag"),
+    // ).toHaveCount(1, { timeout: 10000 }) // reloading can be slow if too many parallel tests
 
     await page.getByLabel("Weitere Angabe").click()
     await waitForSaving(

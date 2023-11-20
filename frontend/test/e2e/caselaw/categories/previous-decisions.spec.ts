@@ -122,19 +122,20 @@ test.describe("previous decisions", () => {
       previousDecisionContainer.getByLabel("Listen Eintrag"),
     ).toHaveCount(1, { timeout: 10000 }) // reloading can be slow if too many parallel tests
 
-    await page.getByLabel("Weitere Angabe").click()
-    await page.getByLabel("Aktenzeichen Vorgehende Entscheidung").fill("two")
-    await page.getByLabel("Vorgehende Entscheidung speichern").click()
-    await expect(
-      page.getByText(`two`, {
-        exact: true,
-      }),
-    ).toBeVisible()
-    // "Vorgehende Entscheidung speichern" only saves state in frontend, no communication to backend yet
-    await page.reload()
-    await expect(
-      previousDecisionContainer.getByLabel("Listen Eintrag"),
-    ).toHaveCount(1, { timeout: 10000 }) // reloading can be slow if too many parallel tests
+    // Change with commit reload by saving
+    // await page.getByLabel("Weitere Angabe").click()
+    // await page.getByLabel("Aktenzeichen Vorgehende Entscheidung").fill("two")
+    // await page.getByLabel("Vorgehende Entscheidung speichern").click()
+    // await expect(
+    //   page.getByText(`two`, {
+    //     exact: true,
+    //   }),
+    // ).toBeVisible()
+    // // "Vorgehende Entscheidung speichern" only saves state in frontend, no communication to backend yet
+    // await page.reload()
+    // await expect(
+    //   previousDecisionContainer.getByLabel("Listen Eintrag"),
+    // ).toHaveCount(1, { timeout: 10000 }) // reloading can be slow if too many parallel tests
 
     await page.getByLabel("Weitere Angabe").click()
     await waitForSaving(
