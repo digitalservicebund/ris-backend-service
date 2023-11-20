@@ -48,7 +48,7 @@ jobs:
       - name: Send status to Slack
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
-        uses: digitalservicebund/github-actions/notify-on-failure@2d30386af9bbeb448023f598818ef96b6225c24b # v1.0.0
+        uses: digitalservicebund/notify-on-failure-gha@2d30386af9bbeb448023f598818ef96b6225c24b # v1.0.0
         if: ${{ failure() && github.ref == 'refs/heads/main' && env.SLACK_WEBHOOK_URL }}
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
@@ -82,7 +82,7 @@ jobs:
       - name: Send status to Slack
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
-        uses: digitalservicebund/github-actions/notify-on-failure@2d30386af9bbeb448023f598818ef96b6225c24b # v1.0.0
+        uses: digitalservicebund/notify-on-failure-gha@2d30386af9bbeb448023f598818ef96b6225c24b # v1.0.0
         if: ${{ failure() && github.ref == 'refs/heads/main' && env.SLACK_WEBHOOK_URL }}
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
@@ -116,7 +116,7 @@ jobs:
       - name: Send status to Slack
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
-        uses: digitalservicebund/github-actions/notify-on-failure@2d30386af9bbeb448023f598818ef96b6225c24b # v1.0.0
+        uses: digitalservicebund/notify-on-failure-gha@2d30386af9bbeb448023f598818ef96b6225c24b # v1.0.0
         if: ${{ failure() && github.ref == 'refs/heads/main' && env.SLACK_WEBHOOK_URL }}
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
@@ -200,7 +200,7 @@ jobs:
       - name: Send status to Slack
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
-        uses: digitalservicebund/github-actions/notify-on-failure@2d30386af9bbeb448023f598818ef96b6225c24b # v1.0.0
+        uses: digitalservicebund/notify-on-failure-gha@2d30386af9bbeb448023f598818ef96b6225c24b # v1.0.0
         if: ${{ failure() && github.ref == 'refs/heads/main' && env.SLACK_WEBHOOK_URL }}
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
@@ -242,7 +242,7 @@ jobs:
       - name: Send status to Slack
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
-        uses: digitalservicebund/github-actions/notify-on-failure@2d30386af9bbeb448023f598818ef96b6225c24b # v1.0.0
+        uses: digitalservicebund/notify-on-failure-gha@2d30386af9bbeb448023f598818ef96b6225c24b # v1.0.0
         if: ${{ failure() && github.ref == 'refs/heads/main' && env.SLACK_WEBHOOK_URL }}
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
@@ -283,7 +283,7 @@ jobs:
       - name: Send status to Slack
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
-        uses: digitalservicebund/github-actions/notify-on-failure@2d30386af9bbeb448023f598818ef96b6225c24b # v1.0.0
+        uses: digitalservicebund/notify-on-failure-gha@2d30386af9bbeb448023f598818ef96b6225c24b # v1.0.0
         if: ${{ failure() && github.ref == 'refs/heads/main' && env.SLACK_WEBHOOK_URL }}
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
@@ -321,7 +321,7 @@ jobs:
       - name: Send status to Slack
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
-        uses: digitalservicebund/github-actions/notify-on-failure@2d30386af9bbeb448023f598818ef96b6225c24b # v1.0.0
+        uses: digitalservicebund/notify-on-failure-gha@2d30386af9bbeb448023f598818ef96b6225c24b # v1.0.0
         if: ${{ failure() && github.ref == 'refs/heads/main' && env.SLACK_WEBHOOK_URL }}
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
@@ -359,7 +359,7 @@ jobs:
       - name: Send status to Slack
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
-        uses: digitalservicebund/github-actions/notify-on-failure@2d30386af9bbeb448023f598818ef96b6225c24b # v1.0.0
+        uses: digitalservicebund/notify-on-failure-gha@2d30386af9bbeb448023f598818ef96b6225c24b # v1.0.0
         if: ${{ failure() && github.ref == 'refs/heads/main' && env.SLACK_WEBHOOK_URL }}
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
@@ -455,7 +455,7 @@ jobs:
       - name: Send status to Slack
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
-        uses: digitalservicebund/github-actions/notify-on-failure@2d30386af9bbeb448023f598818ef96b6225c24b # v1.0.0
+        uses: digitalservicebund/notify-on-failure-gha@2d30386af9bbeb448023f598818ef96b6225c24b # v1.0.0
         if: ${{ failure() && github.ref == 'refs/heads/main' && env.SLACK_WEBHOOK_URL }}
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
@@ -508,7 +508,7 @@ jobs:
       - name: Send status to Slack
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
-        uses: digitalservicebund/github-actions/notify-on-failure@2d30386af9bbeb448023f598818ef96b6225c24b # v1.0.0
+        uses: digitalservicebund/notify-on-failure-gha@2d30386af9bbeb448023f598818ef96b6225c24b # v1.0.0
         if: ${{ failure() && env.SLACK_WEBHOOK_URL }}
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
@@ -549,7 +549,7 @@ jobs:
       - name: Send status to Slack
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
-        uses: digitalservicebund/github-actions/notify-on-failure@2d30386af9bbeb448023f598818ef96b6225c24b # v1.0.0
+        uses: digitalservicebund/notify-on-failure-gha@2d30386af9bbeb448023f598818ef96b6225c24b # v1.0.0
         if: ${{ failure() && env.SLACK_WEBHOOK_URL }}
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
@@ -621,7 +621,7 @@ jobs:
       - name: Send status to Slack
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
-        uses: digitalservicebund/github-actions/notify-on-failure@2d30386af9bbeb448023f598818ef96b6225c24b # v1.0.0
+        uses: digitalservicebund/notify-on-failure-gha@2d30386af9bbeb448023f598818ef96b6225c24b # v1.0.0
         if: ${{ failure() && env.SLACK_WEBHOOK_URL }}
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
@@ -692,7 +692,7 @@ jobs:
       - name: Send status to Slack
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
-        uses: digitalservicebund/github-actions/notify-on-failure@2d30386af9bbeb448023f598818ef96b6225c24b # v1.0.0
+        uses: digitalservicebund/notify-on-failure-gha@2d30386af9bbeb448023f598818ef96b6225c24b # v1.0.0
         if: ${{ failure() && env.SLACK_WEBHOOK_URL }}
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
@@ -738,7 +738,7 @@ jobs:
       - name: Send status to Slack
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
-        uses: digitalservicebund/github-actions/notify-on-failure@2d30386af9bbeb448023f598818ef96b6225c24b # v1.0.0
+        uses: digitalservicebund/notify-on-failure-gha@2d30386af9bbeb448023f598818ef96b6225c24b # v1.0.0
         if: ${{ failure() && env.SLACK_WEBHOOK_URL }}
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
@@ -866,7 +866,7 @@ jobs:
       - name: Send status to Slack
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
-        uses: digitalservicebund/github-actions/notify-on-failure@2d30386af9bbeb448023f598818ef96b6225c24b # v1.0.0
+        uses: digitalservicebund/notify-on-failure-gha@2d30386af9bbeb448023f598818ef96b6225c24b # v1.0.0
         if: ${{ failure() && env.SLACK_WEBHOOK_URL }}
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
@@ -925,7 +925,7 @@ jobs:
       - name: Send status to Slack
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
-        uses: digitalservicebund/github-actions/notify-on-failure@2d30386af9bbeb448023f598818ef96b6225c24b # v1.0.0
+        uses: digitalservicebund/notify-on-failure-gha@2d30386af9bbeb448023f598818ef96b6225c24b # v1.0.0
         if: ${{ failure() && env.SLACK_WEBHOOK_URL }}
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
@@ -1028,7 +1028,7 @@ jobs:
       - name: Send status to Slack
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
-        uses: digitalservicebund/github-actions/notify-on-failure@2d30386af9bbeb448023f598818ef96b6225c24b # v1.0.0
+        uses: digitalservicebund/notify-on-failure-gha@2d30386af9bbeb448023f598818ef96b6225c24b # v1.0.0
         if: ${{ failure() && github.ref == 'refs/heads/main' && env.SLACK_WEBHOOK_URL }}
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
