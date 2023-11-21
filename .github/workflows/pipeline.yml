@@ -833,7 +833,7 @@ jobs:
         ports:
           - 5432:5432
         volumes:
-        - ./backend/src/test/resources/db:/docker-entrypoint-initdb.d 
+        - ./backend/src/test/resources/db:/db-script 
     steps:
       - name: Chown user
         run: |
@@ -842,8 +842,7 @@ jobs:
       - name: Install uuid-ossp extension
         run: docker exec postgres psql -d ${{ env.POSTGRES_DB }}  -U ${{ env.POSTGRES_USER }} -c 'CREATE EXTENSION IF NOT EXISTS "uuid-ossp";'
       - name: Apply migration scheme and extensions
-        run: docker exec postgres psql -d ${{ env.POSTGRES_DB }} -U ${{ env.POSTGRES_USER }} -f /docker-entrypoint-initdb.d/create_migration_scheme_and_extensions.sql
-        working-directory: ./backend/src/test/resources/db
+        run: docker exec postgres psql -d ${{ env.POSTGRES_DB }} -U ${{ env.POSTGRES_USER }} -f /db-script/create_migration_scheme_and_extensions.sql
       - name: Get Gradle version
         working-directory: ./backend
         run: |
