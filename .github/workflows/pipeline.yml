@@ -962,6 +962,8 @@ jobs:
           --name postgres
         ports:
           - 5432:5432
+        volumes:
+        - ./backend/src/test/resources/db:/docker-entrypoint-initdb.d 
     steps:
       - uses: actions/checkout@v4
       - name: Install uuid-ossp extension
