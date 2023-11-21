@@ -433,3 +433,18 @@ create table
 
 create index
   documentation_unit_field_of_law_field_of_law_id_idx on incremental_migration.documentation_unit_field_of_law (field_of_law_id);
+
+create table
+  incremental_migration.status (
+    id uuid not null primary key,
+    created_at timestamp with time zone,
+    publication_status varchar(255) not null,
+    with_error boolean,
+    zustand_raw_value varchar(255),
+    verarbzustand_raw_value varchar(255),
+    issuer_address varchar(255),
+    documentation_unit_id uuid not null constraint fk_documentation_unit references incremental_migration.documentation_unit
+  );
+
+create index
+  status_documentation_unit_id_idx on incremental_migration.status (documentation_unit_id);

@@ -1,6 +1,5 @@
 package de.bund.digitalservice.ris.caselaw.integration.tests;
 
-import static de.bund.digitalservice.ris.caselaw.domain.PublicationStatus.JURIS_PUBLISHED;
 import static de.bund.digitalservice.ris.caselaw.domain.PublicationStatus.PUBLISHED;
 import static de.bund.digitalservice.ris.caselaw.domain.PublicationStatus.PUBLISHING;
 import static de.bund.digitalservice.ris.caselaw.domain.PublicationStatus.UNPUBLISHED;
@@ -111,7 +110,6 @@ class DocumentUnitControllerAuthIntegrationTest {
     return Stream.of(
         Arguments.of("CC-RIS", "BGH", List.of(PUBLISHED)),
         Arguments.of("CC-RIS", "BGH", List.of(PUBLISHING)),
-        Arguments.of("CC-RIS", "BGH", List.of(JURIS_PUBLISHED)),
         Arguments.of("BGH", "BGH", List.of(UNPUBLISHED)),
         Arguments.of("BGH", "BGH", List.of(PUBLISHED)),
         Arguments.of("BGH", "BGH", List.of(UNPUBLISHED, PUBLISHED)),
@@ -312,12 +310,7 @@ class DocumentUnitControllerAuthIntegrationTest {
       return null;
     }
 
-    PublicationStatus lastStatus = publicationStatus.get(publicationStatus.size() - 1);
-    if (lastStatus == PublicationStatus.JURIS_PUBLISHED) {
-      return PUBLISHED;
-    }
-
-    return lastStatus;
+    return publicationStatus.get(publicationStatus.size() - 1);
   }
 
   private DocumentationUnitDTO createNewDocumentUnitDTO(

@@ -128,7 +128,7 @@ class DocumentUnitListEntryIntegrationTest {
     statusRepository.save(
         StatusDTO.builder()
             .documentationUnitDTO(migrationDto)
-            .publicationStatus(PublicationStatus.JURIS_PUBLISHED)
+            .publicationStatus(PublicationStatus.PUBLISHED)
             .build());
     statusRepository.save(
         StatusDTO.builder()

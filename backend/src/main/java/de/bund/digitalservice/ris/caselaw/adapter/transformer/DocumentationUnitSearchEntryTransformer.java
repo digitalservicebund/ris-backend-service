@@ -7,7 +7,6 @@ import de.bund.digitalservice.ris.caselaw.domain.Status;
 import de.bund.digitalservice.ris.caselaw.domain.Status.StatusBuilder;
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.util.List;
 import java.util.Objects;
 
 public class DocumentationUnitSearchEntryTransformer {
@@ -31,18 +30,9 @@ public class DocumentationUnitSearchEntryTransformer {
   }
 
   private static Status getPublicStatus(PublicationStatus publicationStatus, Boolean withError) {
-    List<PublicationStatus> published =
-        List.of(PublicationStatus.PUBLISHED, PublicationStatus.JURIS_PUBLISHED);
-
     StatusBuilder builder = Status.builder();
-    if (publicationStatus != null && published.contains(publicationStatus)) {
-      builder.publicationStatus(PublicationStatus.PUBLISHED);
-    } else {
-      builder.publicationStatus(publicationStatus);
-    }
-
+    builder.publicationStatus(publicationStatus);
     builder.withError(Objects.requireNonNullElse(withError, false));
-
     return builder.build();
   }
 }

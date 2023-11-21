@@ -2,7 +2,6 @@ package de.bund.digitalservice.ris.caselaw.integration.tests;
 
 import static de.bund.digitalservice.ris.caselaw.AuthUtils.buildDefaultDocOffice;
 import static de.bund.digitalservice.ris.caselaw.AuthUtils.buildDocOffice;
-import static de.bund.digitalservice.ris.caselaw.domain.PublicationStatus.JURIS_PUBLISHED;
 import static de.bund.digitalservice.ris.caselaw.domain.PublicationStatus.PUBLISHED;
 import static de.bund.digitalservice.ris.caselaw.domain.PublicationStatus.PUBLISHING;
 import static de.bund.digitalservice.ris.caselaw.domain.PublicationStatus.UNPUBLISHED;
@@ -492,7 +491,7 @@ class DocumentationUnitIntegrationTest {
             LocalDate.parse("2023-08-10"),
             LocalDate.parse("2023-09-10"));
     List<PublicationStatus> statuses =
-        List.of(PUBLISHED, UNPUBLISHED, PUBLISHING, JURIS_PUBLISHED, UNPUBLISHED, PUBLISHED);
+        List.of(PUBLISHED, UNPUBLISHED, PUBLISHING, PUBLISHED, UNPUBLISHED, PUBLISHED);
     List<Boolean> errorStatuses = List.of(false, true, true, false, true, true);
 
     for (int i = 0; i < 6; i++) {

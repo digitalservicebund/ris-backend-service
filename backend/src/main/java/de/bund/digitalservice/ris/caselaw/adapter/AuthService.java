@@ -64,10 +64,7 @@ public class AuthService {
 
   private Mono<Boolean> userHasReadAccess(DocumentUnit documentUnit) {
     List<PublicationStatus> published =
-        List.of(
-            PublicationStatus.PUBLISHED,
-            PublicationStatus.PUBLISHING,
-            PublicationStatus.JURIS_PUBLISHED);
+        List.of(PublicationStatus.PUBLISHED, PublicationStatus.PUBLISHING);
     // legacy documents are published
     return (documentUnit.status() == null
                 || (documentUnit.status().publicationStatus() != null

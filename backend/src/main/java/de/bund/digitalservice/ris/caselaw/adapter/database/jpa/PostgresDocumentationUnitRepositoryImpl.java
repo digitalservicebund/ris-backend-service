@@ -296,15 +296,15 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
     DocumentationOfficeDTO documentationOfficeDTO =
         documentationOfficeRepository.findByAbbreviation(documentationOffice.abbreviation());
 
-    String publicationStatus =
-        Optional.ofNullable(searchInput.status())
-            .flatMap(
-                status ->
-                    Optional.ofNullable(status.publicationStatus())
-                        .map(
-                            notNullPublicationStatus ->
-                                String.valueOf(notNullPublicationStatus.ordinal())))
-            .orElse(null);
+    //    String publicationStatus =
+    //        Optional.ofNullable(searchInput.status())
+    //            .flatMap(
+    //                status ->
+    //                    Optional.ofNullable(status.publicationStatus())
+    //                        .map(
+    //                            notNullPublicationStatus ->
+    //                                String.valueOf(notNullPublicationStatus.ordinal())))
+    //            .orElse(null);
 
     Boolean withError =
         Optional.ofNullable(searchInput.status()).map(Status::withError).orElse(false);
@@ -317,7 +317,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
             searchInput.courtLocation(),
             searchInput.decisionDate(),
             searchInput.decisionDateEnd(),
-            publicationStatus,
+            searchInput.status() != null ? searchInput.status().publicationStatus() : null,
             withError,
             searchInput.myDocOfficeOnly(),
             pageable);

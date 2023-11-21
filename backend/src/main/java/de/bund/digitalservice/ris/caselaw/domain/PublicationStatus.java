@@ -4,5 +4,8 @@ public enum PublicationStatus {
   UNPUBLISHED,
   PUBLISHED,
   PUBLISHING,
-  JURIS_PUBLISHED,
+  DELETING,
+  LOCKED,
+  DUPLICATED,
+  UNKNOWN
 }

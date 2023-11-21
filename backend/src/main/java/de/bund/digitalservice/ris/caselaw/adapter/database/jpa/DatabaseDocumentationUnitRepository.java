@@ -1,5 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.adapter.database.jpa;
 
+import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import java.time.LocalDate;
 import java.util.Optional;
 import java.util.UUID;
@@ -68,9 +69,9 @@ public interface DatabaseDocumentationUnitRepository
     documentationUnit.documentationOffice.id = :documentationOfficeId))
        AND
          (
-            (:status IS NULL AND ((documentationUnit.documentationOffice.id = :documentationOfficeId OR EXISTS (SELECT 1 FROM StatusDTO status WHERE status.documentationUnitDTO.id = documentationUnit.id AND status.publicationStatus IN (cast(de.bund.digitalservice.ris.caselaw.domain.PublicationStatus.PUBLISHED as string), cast(de.bund.digitalservice.ris.caselaw.domain.PublicationStatus.JURIS_PUBLISHED as string), cast(de.bund.digitalservice.ris.caselaw.domain.PublicationStatus.PUBLISHING as string))))))
+            (:status IS NULL AND ((documentationUnit.documentationOffice.id = :documentationOfficeId OR EXISTS (SELECT 1 FROM StatusDTO status WHERE status.documentationUnitDTO.id = documentationUnit.id AND status.publicationStatus IN (de.bund.digitalservice.ris.caselaw.domain.PublicationStatus.PUBLISHED, de.bund.digitalservice.ris.caselaw.domain.PublicationStatus.PUBLISHING)))))
          OR
-            (:status IS NOT NULL AND EXISTS (SELECT 1 FROM StatusDTO status WHERE status.documentationUnitDTO.id = documentationUnit.id AND ((cast(status.publicationStatus as string) = :status) OR status.publicationStatus = cast(de.bund.digitalservice.ris.caselaw.domain.PublicationStatus.JURIS_PUBLISHED as string) AND :status = '1')))
+            (:status IS NOT NULL AND EXISTS (SELECT 1 FROM StatusDTO status WHERE status.documentationUnitDTO.id = documentationUnit.id AND status.publicationStatus = :status AND :status IN ('PUBLISHED', 'PUBLISHING')))
          )
        AND (:withErrorOnly = FALSE OR documentationUnit.documentationOffice.id = :documentationOfficeId AND EXISTS (SELECT 1 FROM StatusDTO status WHERE status.documentationUnitDTO.id = documentationUnit.id AND status.withError = TRUE))
     )
@@ -83,7 +84,7 @@ public interface DatabaseDocumentationUnitRepository
       String courtLocation,
       LocalDate decisionDate,
       LocalDate decisionDateEnd,
-      String status,
+      PublicationStatus status,
       Boolean withErrorOnly,
       Boolean myDocOfficeOnly,
       Pageable pageable);
