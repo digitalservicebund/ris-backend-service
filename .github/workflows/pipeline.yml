@@ -967,7 +967,7 @@ jobs:
       - name: Install uuid-ossp extension
         run: docker exec postgres psql -d ${{ env.POSTGRES_DB }}  -U ${{ env.POSTGRES_USER }} -c 'CREATE EXTENSION IF NOT EXISTS "uuid-ossp";'
       - name: Apply migration scheme and extensions
-        run: docker exec postgres psql -d ${{ env.POSTGRES_DB }} -U ${{ env.POSTGRES_USER }} -f backend/src/test/resources/db/create_migration_scheme_and_extensions.sql
+        run: docker exec postgres psql -d ${{ env.POSTGRES_DB }} -U ${{ env.POSTGRES_USER }} -f ./backend/src/test/resources/db/create_migration_scheme_and_extensions.sql
       - name: Get Gradle version
         working-directory: ./backend
         run: |
