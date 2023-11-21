@@ -69,6 +69,51 @@ test.describe("saving behaviour", () => {
     )
   })
 
+  test("test removing last chip element not possible", async ({
+    page,
+    documentNumber,
+  }) => {
+    await navigateToCategories(page, documentNumber)
+
+    await waitForSaving(
+      async () => {
+        await page.locator("[aria-label='Aktenzeichen']").type(generateString())
+        await page.keyboard.press("Enter")
+
+        const labels = [
+          "Abweichendes Aktenzeichen",
+          "Abweichendes Entscheidungsdatum",
+          "Abweichender ECLI",
+          "Fehlerhaftes Gericht",
+        ]
+
+        for (const label of labels) {
+          await page.locator(`[aria-label='${label} anzeigen']`).click()
+          await page.locator(`[aria-label='${label}']`).type("22.11.2023")
+          await page.keyboard.press("Enter")
+        }
+      },
+      page,
+      { clickSaveButton: true },
+    )
+
+    await waitForSaving(
+      async () => {
+        while (
+          (await page.locator("[data-testid='chip'] > button").count()) > 0
+        ) {
+          await page.locator("[data-testid='chip'] > button").first().click()
+        }
+      },
+      page,
+      { clickSaveButton: true },
+    )
+
+    await page.waitForTimeout(500) // eslint-disable-line playwright/no-wait-for-timeout
+
+    await expect(page.locator("[data-testid='chip']")).toHaveCount(0)
+  })
+
   test("change Spruchkörper two times, saving after each change", async ({
     page,
     documentNumber,

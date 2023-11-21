@@ -106,6 +106,17 @@ const coreData = computed({
     ) {
       triggerSaving = true
     }
+
+    // --- TRANSFORMATION OF DATA
+
+    newValues.fileNumbers = newValues.fileNumbers ?? []
+    newValues.deviatingFileNumbers = newValues.deviatingFileNumbers ?? []
+    newValues.deviatingCourts = newValues.deviatingCourts ?? []
+    newValues.deviatingEclis = newValues.deviatingEclis ?? []
+    newValues.deviatingDecisionDates = newValues.deviatingDecisionDates ?? []
+
+    // ---
+
     Object.assign(updatedDocumentUnit.value.coreData, newValues)
     if (triggerSaving) {
       handleUpdateDocumentUnit()

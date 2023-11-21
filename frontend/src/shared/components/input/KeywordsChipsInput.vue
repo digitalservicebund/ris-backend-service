@@ -47,6 +47,7 @@ function addChip() {
 
 function onDeleteChip() {
   focusInputIfEmpty()
+  if (props.modelValue?.length === 1) emit("update:modelValue", [])
 }
 
 /* -------------------------------------------------- *
