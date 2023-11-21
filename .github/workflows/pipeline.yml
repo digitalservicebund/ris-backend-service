@@ -964,7 +964,7 @@ jobs:
         with:
           repository: 'digitalservicebund/ris-data-migration'
           token: ${{ secrets.GITHUB_TOKEN }}
-          defaultBranch: main
+          ref: main
       - name: Install uuid-ossp extension
         run: docker exec postgres psql -p ${{ env.POSTGRES_PORT }} -d ${{ env.POSTGRES_DB }}  -U ${{ env.POSTGRES_USER }} -c 'CREATE EXTENSION IF NOT EXISTS "uuid-ossp"; CREATE EXTENSION IF NOT EXISTS "pg_trgm";'
       - name: Get Gradle version
