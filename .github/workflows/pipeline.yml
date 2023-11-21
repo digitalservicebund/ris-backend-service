@@ -957,13 +957,16 @@ jobs:
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
-          --name postgres
         ports:
           - 5432:5432
     steps:
       - uses: actions/checkout@v4
+        with:
+          repository: 'digitalservicebund/ris-data-migration'
+          token: ${{ secrets.GITHUB_TOKEN }}
+          defaultBranch: main
       - name: Install uuid-ossp extension
-        run: docker exec postgres psql -d ${{ env.POSTGRES_DB }}  -U ${{ env.POSTGRES_USER }} -c 'CREATE EXTENSION IF NOT EXISTS "uuid-ossp";'
+        run: docker exec postgres psql -p ${{ env.POSTGRES_PORT }} -d ${{ env.POSTGRES_DB }}  -U ${{ env.POSTGRES_USER }} -c 'CREATE EXTENSION IF NOT EXISTS "uuid-ossp"; CREATE EXTENSION IF NOT EXISTS "pg_trgm";'
       - name: Get Gradle version
         working-directory: ./backend
         run: |
@@ -977,12 +980,14 @@ jobs:
       - uses: gradle/gradle-build-action@9bca466e2722baf9e77b4f929bbe0af18848791f
         with:
           gradle-version: ${{ env.GRADLE_VERSION }}
-          arguments: migrateDatabaseForERD
-          build-root-directory: ./backend
+          arguments: migrateDatabase
         env:
-          DB_URL: jdbc:postgresql://localhost:5432/${{ env.POSTGRES_DB }}
-          DB_USER: ${{ env.POSTGRES_USER }}
-          DB_PASSWORD: ${{ env.POSTGRES_PASSWORD }}
+          RIS_MIGRATION_DB_HOST: localhost
+          RIS_MIGRATION_DB_NAME: ${{ env.POSTGRES_DB }}
+          RIS_MIGRATION_DB_USER: ${{ env.POSTGRES_USER }}
+          RIS_MIGRATION_DB_PASSWORD: ${{ env.POSTGRES_PASSWORD }}
+          RIS_MIGRATION_DB_PORT: 5432
+          RIS_MIGRATION_DB_SCHEMA: incremental_migration
       - name: Generate mermaid ER-diagram
         uses: digitalservicebund/github-actions/entity-relationship-diagram@b0e67dbb3637296eeb2ae0c9110cd42d4d8de6fb
         with:
