@@ -832,7 +832,6 @@ jobs:
   deploy-production:
     runs-on: ubuntu-latest
     if: |
-      false &&
       github.ref == 'refs/heads/main' &&
       needs.check-latest-deploy-tag.outputs.should_deploy == 'true'
     concurrency: deploy-production
@@ -897,7 +896,6 @@ jobs:
   deploy-uat:
     runs-on: ubuntu-latest
     if: |
-      false &&
       github.ref == 'refs/heads/main'
     # &&
     # needs.deployment-time-check.outputs.between-8-and-20 == 'false'
