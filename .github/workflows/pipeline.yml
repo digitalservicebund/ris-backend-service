@@ -835,6 +835,9 @@ jobs:
         volumes:
         - ./backend/src/test/resources/db:/docker-entrypoint-initdb.d 
     steps:
+      - name: Chown user
+        run: |
+          sudo chown -R $USER:$USER $GITHUB_WORKSPACE
       - uses: actions/checkout@v4
       - name: Install uuid-ossp extension
         run: docker exec postgres psql -d ${{ env.POSTGRES_DB }}  -U ${{ env.POSTGRES_USER }} -c 'CREATE EXTENSION IF NOT EXISTS "uuid-ossp";'
