@@ -326,6 +326,7 @@ create table
     court_type varchar(255),
     court_id uuid constraint fk_court references incremental_migration.court,
     date date,
+    date_known boolean,
     document_number varchar(255),
     document_type_id uuid constraint fk_document_type references incremental_migration.document_type,
     file_number varchar(255),
