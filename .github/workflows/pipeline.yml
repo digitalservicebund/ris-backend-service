@@ -833,7 +833,7 @@ jobs:
         ports:
           - 5432:5432
         volumes:
-        - ./backend/src/test/resources/db:/db-script 
+        - ./ris-backend-service/backend/src/test/resources/db:/db-script 
     steps:
       - name: Chown user
         run: |
