@@ -51,7 +51,7 @@ public class DocumentationUnitDTO
   @Column(name = "decision_grounds")
   private String decisionGrounds;
 
-  @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+  @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
   @JoinColumn(name = "documentation_unit_id", nullable = false)
   @Builder.Default
   private List<DecisionNameDTO> decisionNames = new ArrayList<>();
@@ -69,7 +69,7 @@ public class DocumentationUnitDTO
   @OneToMany(
       mappedBy = "documentationUnit",
       cascade = CascadeType.ALL,
-      fetch = FetchType.EAGER,
+      fetch = FetchType.LAZY,
       orphanRemoval = true)
   @Builder.Default
   @OrderBy("rank")
@@ -90,7 +90,7 @@ public class DocumentationUnitDTO
   @Column(name = "judicial_body")
   private String judicialBody;
 
-  @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
+  @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
   @JoinColumn(name = "documentation_unit_id")
   @Builder.Default
   private List<NormReferenceDTO> normReferences = new ArrayList<>();
@@ -104,7 +104,7 @@ public class DocumentationUnitDTO
   @Column(name = "other_headnote")
   String otherHeadnote;
 
-  @ManyToMany(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
+  @ManyToMany(cascade = CascadeType.MERGE, fetch = FetchType.LAZY)
   @JoinTable(
       name = "procedure_link",
       schema = "public",
@@ -114,7 +114,7 @@ public class DocumentationUnitDTO
 
   @ManyToMany(
       cascade = {CascadeType.MERGE},
-      fetch = FetchType.EAGER)
+      fetch = FetchType.LAZY)
   @JoinTable(
       name = "documentation_unit_region",
       schema = "incremental_migration",
@@ -123,7 +123,7 @@ public class DocumentationUnitDTO
   @Builder.Default
   private List<RegionDTO> regions = new ArrayList<>();
 
-  @ManyToMany(fetch = FetchType.EAGER)
+  @ManyToMany(fetch = FetchType.LAZY)
   @JoinTable(
       name = "documentation_unit_field_of_law",
       schema = "incremental_migration",
@@ -145,7 +145,7 @@ public class DocumentationUnitDTO
   @JoinColumn(name = "documentation_office_id", referencedColumnName = "id")
   private DocumentationOfficeDTO documentationOffice;
 
-  @OneToMany(mappedBy = "documentationUnitDTO", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+  @OneToMany(mappedBy = "documentationUnitDTO", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
   @OrderBy("createdAt desc")
   private List<StatusDTO> status;
 
@@ -162,13 +162,13 @@ public class DocumentationUnitDTO
   private CourtDTO court;
 
   // Aktivzitierung
-  @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+  @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
   @JoinColumn(name = "documentation_unit_id")
   @Builder.Default
   @OrderBy("rank")
   private List<ActiveCitationDTO> activeCitations = new ArrayList<>();
 
-  @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+  @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
   @JoinColumn(name = "documentation_unit_id", nullable = false)
   @Builder.Default
   @OrderBy("rank")
@@ -183,19 +183,19 @@ public class DocumentationUnitDTO
   //  @Builder.Default
   //  private Set<DeviatingDocumentNumber> deviatingDocumentNumbers = new HashSet<>();
   //
-  @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+  @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
   @JoinColumn(name = "documentation_unit_id", nullable = false)
   @Builder.Default
   @OrderBy("rank")
   private List<DeviatingEcliDTO> deviatingEclis = new ArrayList<>();
 
-  @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+  @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
   @JoinColumn(name = "documentation_unit_id", nullable = false)
   @Builder.Default
   @OrderBy("rank")
   private List<DeviatingFileNumberDTO> deviatingFileNumbers = new ArrayList<>();
 
-  @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+  @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
   @JoinColumn(name = "documentation_unit_id", nullable = false)
   @Builder.Default
   @OrderBy("rank")
@@ -203,7 +203,7 @@ public class DocumentationUnitDTO
 
   @ManyToMany(
       cascade = {CascadeType.MERGE},
-      fetch = FetchType.EAGER)
+      fetch = FetchType.LAZY)
   @JoinTable(
       name = "documentation_unit_keyword",
       schema = "incremental_migration",
@@ -213,20 +213,20 @@ public class DocumentationUnitDTO
   private Set<KeywordDTO> keywords = new HashSet<>();
 
   // Nachgehende Entscheidungen
-  @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+  @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
   @JoinColumn(name = "documentation_unit_id")
   @Builder.Default
   private List<EnsuingDecisionDTO> ensuingDecisions = new ArrayList<>();
 
   // Nachgehende Entscheidungen mit Prädikat anhängig
-  @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+  @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
   @JoinColumn(name = "documentation_unit_id")
   @Builder.Default
   @OrderBy("rank")
   private List<PendingDecisionDTO> pendingDecisions = new ArrayList<>();
 
   // Vorgehende Entscheidungen
-  @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+  @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
   @JoinColumn(name = "documentation_unit_id")
   @Builder.Default
   @OrderBy("rank")

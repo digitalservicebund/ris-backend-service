@@ -15,6 +15,6 @@ public class DateKnownValidator
   @Override
   public boolean isValid(
       PreviousDecision previousDecision, ConstraintValidatorContext constraintValidatorContext) {
-    return previousDecision.getDateKnown() || previousDecision.getDecisionDate() == null;
+    return previousDecision.isDateKnown() || previousDecision.getDecisionDate() == null;
   }
 }

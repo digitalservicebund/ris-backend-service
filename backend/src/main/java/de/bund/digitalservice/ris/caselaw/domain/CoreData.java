@@ -21,7 +21,6 @@ public record CoreData(
     @UniqueElements List<String> deviatingEclis,
     String appraisalBody,
     @PastOrPresent LocalDate decisionDate,
-    boolean dateKnown,
     @UniqueElements List<LocalDate> deviatingDecisionDates,
     String legalEffect,
     String inputType,

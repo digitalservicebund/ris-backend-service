@@ -59,23 +59,6 @@ public class DocumentationUnitTransformer {
             .id(updatedDomainObject.uuid())
             .documentNumber(updatedDomainObject.documentNumber());
 
-    // TODO Should we create an originalFileDocument if it doesn't exist since the
-    // upload happens
-    // somewhere else?
-    // if (updatedDomainObject.filetype() != null
-    // && updatedDomainObject.filename() != null
-    // && updatedDomainObject.s3path() != null
-    // && updatedDomainObject.fileuploadtimestamp() != null) {
-    // builder.originalFileDocument(
-    // OriginalFileDocumentDTO.builder()
-    // .documentationUnitId(updatedDomainObject.uuid())
-    // .extension(updatedDomainObject.filetype())
-    // .filename(updatedDomainObject.filename())
-    // .s3ObjectPath(updatedDomainObject.s3path())
-    // .uploadTimestamp(updatedDomainObject.fileuploadtimestamp())
-    // .build());
-    // }
-
     if (updatedDomainObject.coreData() != null) {
       var coreData = updatedDomainObject.coreData();
 
@@ -97,6 +80,7 @@ public class DocumentationUnitTransformer {
       addDeviatingFileNumbers(currentDto, builder, coreData);
       addDeviatingEclis(builder, coreData);
       addLegalEffect(currentDto, updatedDomainObject, builder);
+
     } else {
       builder
           .procedures(Collections.emptyList())
@@ -736,7 +720,6 @@ public class DocumentationUnitTransformer {
     DocumentUnitListEntryBuilder builder =
         DocumentUnitListEntry.builder()
             .documentNumber(documentationUnitDTO.getDocumentNumber())
-            // .fileName(documentationUnitDTO.get) TODO
             .documentationOffice(
                 DocumentationOfficeTransformer.transformToDomain(
                     documentationUnitDTO.getDocumentationOffice()))

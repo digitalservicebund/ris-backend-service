@@ -12,7 +12,7 @@ public class PreviousDecisionTransformer extends RelatedDocumentationUnitTransfo
         .fileNumber(getFileNumber(previousDecisionDTO.getFileNumber()))
         .documentType(getDocumentTypeFromDTO(previousDecisionDTO.getDocumentType()))
         .decisionDate(previousDecisionDTO.getDate())
-        // Todo dateKnown?
+        .dateKnown(previousDecisionDTO.isDateKnown())
         .build();
   }
 
@@ -28,6 +28,7 @@ public class PreviousDecisionTransformer extends RelatedDocumentationUnitTransfo
         .documentNumber(previousDecision.getDocumentNumber())
         .documentType(getDocumentTypeFromDomain(previousDecision.getDocumentType()))
         .fileNumber(getFileNumber(previousDecision.getFileNumber()))
+        .dateKnown(previousDecision.isDateKnown())
         .build();
   }
 }

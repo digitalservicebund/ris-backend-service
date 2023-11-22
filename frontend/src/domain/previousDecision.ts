@@ -6,7 +6,7 @@ export default class PreviousDecision
   extends RelatedDocumentation
   implements EditableListItem
 {
-  public dateKnown: boolean | undefined = true
+  public dateKnown: boolean = true
 
   static requiredFields = ["fileNumber", "court", "decisionDate"] as const
   static fields = [
@@ -18,9 +18,6 @@ export default class PreviousDecision
 
   constructor(data: Partial<PreviousDecision> = {}) {
     super()
-    if (data.dateKnown === undefined) {
-      this.dateKnown = true
-    }
     Object.assign(this, data)
   }
 
@@ -41,7 +38,7 @@ export default class PreviousDecision
   }
 
   get dateUnknown(): boolean {
-    return this.dateKnown !== true
+    return this.dateKnown === false
   }
   set dateUnknown(dateUnknown: boolean) {
     this.dateKnown = !dateUnknown

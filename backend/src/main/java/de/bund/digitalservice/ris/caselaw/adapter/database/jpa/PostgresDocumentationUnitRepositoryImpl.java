@@ -86,7 +86,6 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
                             .id(UUID.randomUUID())
                             .documentNumber(documentNumber)
                             .documentationOffice(documentationOfficeDTO)
-                            // TODO is decisionDate = null the same as dateKnown? .dateKnown(true)
                             .legalEffect(LegalEffectDTO.KEINE_ANGABE)
                             .build())))
         .map(DocumentationUnitTransformer::transformToDomain);
@@ -205,6 +204,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
   //  }
 
   @Override
+  @Transactional(transactionManager = "jpaTransactionManager")
   public Mono<DocumentUnit> attachFile(
       UUID documentUnitUuid, String fileUuid, String type, String fileName) {
     var docUnitDto = repository.findById(documentUnitUuid).orElseThrow();
@@ -221,6 +221,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
   }
 
   @Override
+  @Transactional(transactionManager = "jpaTransactionManager")
   public DocumentUnit removeFile(UUID documentUnitId) {
     var docUnitDto = repository.findById(documentUnitId).orElseThrow();
 
@@ -237,6 +238,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
   }
 
   @Override
+  @Transactional(transactionManager = "jpaTransactionManager")
   public Page<DocumentationUnitSearchResult> searchByRelatedDocumentationUnit(
       RelatedDocumentationUnit relatedDocumentationUnit, Pageable pageable) {
     String courtType =
@@ -260,6 +262,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
     return new PageImpl<>(list, pageable, documentationUnitSearchResultDTOPage.getTotalElements());
   }
 
+  @Transactional(transactionManager = "jpaTransactionManager")
   public Page<DocumentationUnitSearchResult> searchByDocumentationUnitSearchInput(
       Pageable pageable,
       DocumentationOffice documentationOffice,

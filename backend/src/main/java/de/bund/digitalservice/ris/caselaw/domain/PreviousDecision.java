@@ -14,7 +14,7 @@ import lombok.experimental.SuperBuilder;
 @DateKnownConstraint
 @Data
 public class PreviousDecision extends RelatedDocumentationUnit {
-  private Boolean dateKnown;
+  private boolean dateKnown = true;
 
   public boolean hasNoValues() {
     return court == null && decisionDate == null && fileNumber == null && documentType == null;

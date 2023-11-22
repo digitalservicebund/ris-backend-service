@@ -173,9 +173,8 @@ class DocumentationUnitIntegrationTest {
         .expectBody(DocumentUnit.class)
         .consumeWith(
             response -> {
-              // assertThat(response.getResponseBody()).isNotNull();
-              // assertThat(response.getResponseBody().documentNumber()).startsWith("XXRE");
-              // assertThat(response.getResponseBody().coreData().dateKnown()).isTrue();
+              assertThat(response.getResponseBody()).isNotNull();
+              assertThat(response.getResponseBody().documentNumber()).startsWith("XXRE");
             });
 
     List<DocumentationUnitDTO> list = repository.findAll();
@@ -188,8 +187,6 @@ class DocumentationUnitIntegrationTest {
 
     assertThat(documentUnitDTO.getStatus().get(0).getPublicationStatus()).isEqualTo(UNPUBLISHED);
     assertThat(documentUnitDTO.getStatus().get(0).isWithError()).isEqualTo(false);
-
-    // TODO status
   }
 
   @Test

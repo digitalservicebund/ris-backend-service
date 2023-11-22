@@ -23,6 +23,7 @@ describe("documentUnitService", () => {
             documentType: undefined,
             date: undefined,
             fileNumber: undefined,
+            dateKnown: true,
           },
         }),
       ],

@@ -11,7 +11,6 @@ public record DocumentUnitListEntry(
     UUID uuid,
     String documentNumber,
     LocalDate decisionDate,
-    String fileName,
     String fileNumber,
     DocumentType documentType,
     Court court,
