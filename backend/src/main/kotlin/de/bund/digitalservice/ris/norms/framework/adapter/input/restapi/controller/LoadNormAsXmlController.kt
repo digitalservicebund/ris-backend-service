@@ -79,6 +79,11 @@ class LoadNormAsXmlController(private val loadNormAsXmlService: LoadNormAsXmlUse
   }
 
   private fun encodeUri(component: String): String {
-    return component.replace(" ", "%20").replace("(", "%28").replace(")", "%29")
+    return component
+        .replace(" ", "%20")
+        .replace("(", "%28")
+        .replace(")", "%29")
+        .replace("[", "%5B")
+        .replace("]", "%5D")
   }
 }

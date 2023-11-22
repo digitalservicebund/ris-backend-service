@@ -71,7 +71,7 @@ class LoadNormAsXmlControllerTest {
     webClient
         .mutateWith(csrf())
         .get()
-        .uri("/api/v1/norms/xml/eli/bg-1/2022/s1125")
+        .uri("/api/v1/norms/xml/eli/bg-1/2022/s1125 (Test1) [Test2]")
         .exchange()
         .expectStatus()
         .isNotFound()
@@ -80,7 +80,7 @@ class LoadNormAsXmlControllerTest {
             """
                 {
                   "errors" : [
-                      {"code":"NOT_FOUND","instance":"gazette/bg-1/year/2022/page/1125","message":""}
+                      {"code":"NOT_FOUND","instance":"gazette/bg-1/year/2022/page/1125%20%28Test1%29%20%5BTest2%5D","message":""}
                   ]
                 }
                 """
