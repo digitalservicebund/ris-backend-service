@@ -12,7 +12,6 @@ import de.bund.digitalservice.ris.caselaw.domain.RelatedDocumentationType;
 import de.bund.digitalservice.ris.caselaw.domain.RelatedDocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.Status;
 import de.bund.digitalservice.ris.caselaw.domain.court.Court;
-import jakarta.persistence.EntityManager;
 import java.time.Instant;
 import java.util.Collections;
 import java.util.HashSet;
@@ -35,44 +34,20 @@ import reactor.core.publisher.Mono;
 @Primary
 public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepository {
   private final DatabaseDocumentationUnitRepository repository;
-  private final DatabaseFileNumberRepository fileNumberRepository;
-  private final DatabaseDocumentTypeRepository databaseDocumentTypeRepository;
-  private final DatabaseDocumentCategoryRepository databaseDocumentCategoryRepository;
   private final DatabaseCourtRepository databaseCourtRepository;
-  private final DatabaseProcedureRepository databaseProcedureRepository;
-  private final DatabaseNormReferenceRepository documentUnitNormRepository;
   private final DatabaseDocumentationOfficeRepository documentationOfficeRepository;
   private final JPADatabaseKeywordRepository keywordRepository;
-  private final DatabaseRelatedDocumentationRepository relatedDocumentationRepository;
-  private final DatabaseNormAbbreviationRepository normAbbreviationRepository;
-  private final EntityManager entityManager;
 
   public PostgresDocumentationUnitRepositoryImpl(
       DatabaseDocumentationUnitRepository repository,
-      DatabaseFileNumberRepository fileNumberRepository,
-      DatabaseDocumentTypeRepository databaseDocumentTypeRepository,
-      DatabaseDocumentCategoryRepository databaseDocumentCategoryRepository,
       DatabaseCourtRepository databaseCourtRepository,
-      DatabaseProcedureRepository databaseProcedureRepository,
-      DatabaseNormReferenceRepository documentUnitNormRepository,
-      DatabaseNormAbbreviationRepository normAbbreviationRepository,
       DatabaseDocumentationOfficeRepository documentationOfficeRepository,
-      JPADatabaseKeywordRepository keywordRepository,
-      DatabaseRelatedDocumentationRepository relatedDocumentationRepository,
-      EntityManager entityManager) {
+      JPADatabaseKeywordRepository keywordRepository) {
 
     this.repository = repository;
-    this.fileNumberRepository = fileNumberRepository;
-    this.databaseDocumentTypeRepository = databaseDocumentTypeRepository;
     this.databaseCourtRepository = databaseCourtRepository;
-    this.databaseDocumentCategoryRepository = databaseDocumentCategoryRepository;
-    this.databaseProcedureRepository = databaseProcedureRepository;
-    this.documentUnitNormRepository = documentUnitNormRepository;
     this.documentationOfficeRepository = documentationOfficeRepository;
-    this.normAbbreviationRepository = normAbbreviationRepository;
     this.keywordRepository = keywordRepository;
-    this.relatedDocumentationRepository = relatedDocumentationRepository;
-    this.entityManager = entityManager;
   }
 
   @Override
@@ -176,7 +151,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
           keywordRepository
               .findByValue(value)
               .ifPresentOrElse(
-                  keywordDTO -> keywordDTOs.add(keywordDTO),
+                  keywordDTOs::add,
                   () ->
                       keywordDTOs.add(
                           KeywordDTO.builder().id(UUID.randomUUID()).value(value).build()));

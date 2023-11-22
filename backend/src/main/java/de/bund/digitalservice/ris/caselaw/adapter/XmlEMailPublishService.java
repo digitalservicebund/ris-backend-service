@@ -22,8 +22,6 @@ import java.util.UUID;
 import java.util.stream.Stream;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
@@ -33,7 +31,6 @@ import reactor.core.publisher.Mono;
 
 @Service
 public class XmlEMailPublishService implements EmailPublishService {
-  private static final Logger LOGGER = LoggerFactory.getLogger(XmlEMailPublishService.class);
   private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
   private final XmlExporter xmlExporter;

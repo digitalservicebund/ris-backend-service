@@ -32,5 +32,7 @@ public enum RelatedDocumentationType {
     public static final String ENSUING_DECISION = "ensuing_decision";
     public static final String PENDING_DECISION = "pending_decision";
     public static final String PREVIOUS_DECISION = "previous_decision";
+
+    private Values() {}
   }
 }

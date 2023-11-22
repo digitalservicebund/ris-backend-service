@@ -7,6 +7,8 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class DocumentationUnitSearchResultTransformer {
+  private DocumentationUnitSearchResultTransformer() {}
+
   public static DocumentationUnitSearchResult transformToDomain(
       DocumentationUnitSearchResultDTO documentationUnitSearchResultDTO) {
     if (log.isDebugEnabled()) {

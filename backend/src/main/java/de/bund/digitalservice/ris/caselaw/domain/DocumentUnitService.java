@@ -236,9 +236,9 @@ public class DocumentUnitService {
           .doOnNext(
               deleteObjectResponse -> log.debug("Deleted file {} in bucket", documentUnit.s3path()))
           .doOnError(
-              exception -> {
-                log.error("Error by deleting file {} in bucket", documentUnit.s3path(), exception);
-              })
+              exception ->
+                  log.error(
+                      "Error by deleting file {} in bucket", documentUnit.s3path(), exception))
           .defaultIfEmpty(DeleteObjectResponse.builder().build())
           .map(
               deleteObjectResponse -> {

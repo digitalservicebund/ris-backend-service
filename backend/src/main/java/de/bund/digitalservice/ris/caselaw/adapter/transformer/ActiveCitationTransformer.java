@@ -1,6 +1,7 @@
 package de.bund.digitalservice.ris.caselaw.adapter.transformer;
 
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ActiveCitationDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ActiveCitationDTO.ActiveCitationDTOBuilder;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CitationTypeDTO;
 import de.bund.digitalservice.ris.caselaw.domain.ActiveCitation;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.citation.CitationType;
@@ -39,7 +40,7 @@ public class ActiveCitationTransformer extends RelatedDocumentationUnitTransform
       return null;
     }
 
-    ActiveCitationDTO.ActiveCitationDTOBuilder activeCitationDTOBuilder =
+    ActiveCitationDTOBuilder<?, ?> activeCitationDTOBuilder =
         ActiveCitationDTO.builder()
             .id(activeCitation.getUuid())
             .court(getCourtFromDomain(activeCitation.getCourt()))

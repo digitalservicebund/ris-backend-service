@@ -2,6 +2,7 @@ package de.bund.digitalservice.ris.caselaw.adapter.transformer;
 
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ProcedureDTO;
 import de.bund.digitalservice.ris.caselaw.domain.Procedure;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import lombok.experimental.UtilityClass;
@@ -15,7 +16,9 @@ public class ProcedureTransformer {
   }
 
   public static List<String> transformPreviousProceduresToLabel(List<ProcedureDTO> procedureDTOs) {
-    if (procedureDTOs == null || procedureDTOs.size() < 2) return null;
+    if (procedureDTOs == null || procedureDTOs.size() < 2) {
+      return Collections.emptyList();
+    }
 
     return procedureDTOs.subList(1, procedureDTOs.size()).stream()
         .map(ProcedureDTO::getLabel)

@@ -1,8 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationOfficeRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitSearchRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseProcedureLinkRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseProcedureRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationUnitTransformer;
@@ -22,18 +20,12 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class DatabaseProcedureService implements ProcedureService {
   private final DatabaseProcedureRepository repository;
-  private final DatabaseProcedureLinkRepository linkRepository;
-  private final DatabaseDocumentationUnitSearchRepository documentUnitRepository;
   private final DatabaseDocumentationOfficeRepository documentationOfficeRepository;
 
   public DatabaseProcedureService(
       DatabaseProcedureRepository repository,
-      DatabaseProcedureLinkRepository linkRepository,
-      DatabaseDocumentationUnitSearchRepository documentUnitRepository,
       DatabaseDocumentationOfficeRepository documentationOfficeRepository) {
     this.repository = repository;
-    this.linkRepository = linkRepository;
-    this.documentUnitRepository = documentUnitRepository;
     this.documentationOfficeRepository = documentationOfficeRepository;
   }
 
