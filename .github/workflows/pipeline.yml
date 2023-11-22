@@ -832,17 +832,12 @@ jobs:
           --name postgres
         ports:
           - 5432:5432
-        volumes:
-        - ./ris-backend-service/backend/src/test/resources/db:/db-script 
     steps:
-      - name: Chown user
-        run: |
-          sudo chown -R $USER:$USER $GITHUB_WORKSPACE
       - uses: actions/checkout@v4
       - name: Install uuid-ossp extension
         run: docker exec postgres psql -d ${{ env.POSTGRES_DB }}  -U ${{ env.POSTGRES_USER }} -c 'CREATE EXTENSION IF NOT EXISTS "uuid-ossp";'
-      - name: Apply migration scheme and extensions
-        run: docker exec postgres psql -d ${{ env.POSTGRES_DB }} -U ${{ env.POSTGRES_USER }} -f /db-script/create_migration_scheme_and_extensions.sql
+      - name: Apply incremental migration structure
+        run: docker exec -i postgres psql -d ${{ env.POSTGRES_DB }} -U ${{ env.POSTGRES_USER }} < ./backend/src/test/resources/db/create_migration_scheme_and_extensions.sql
       - name: Get Gradle version
         working-directory: ./backend
         run: |
