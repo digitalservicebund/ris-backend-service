@@ -237,7 +237,7 @@ jobs:
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
         uses: digitalservicebund/notify-on-failure-gha@d050613c380ee805de056e6ba37eb6676a98ce4f # v1.1.0
-        if: ${{ failure() && env.SLACK_WEBHOOK_URL }}
+        if: ${{ failure() }}
         with:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
 
@@ -299,7 +299,7 @@ jobs:
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
         uses: digitalservicebund/notify-on-failure-gha@d050613c380ee805de056e6ba37eb6676a98ce4f # v1.1.0
-        if: ${{ failure() && env.SLACK_WEBHOOK_URL }}
+        if: ${{ failure() }}
         with:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
 
@@ -340,7 +340,7 @@ jobs:
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
         uses: digitalservicebund/notify-on-failure-gha@d050613c380ee805de056e6ba37eb6676a98ce4f # v1.1.0
-        if: ${{ failure() && env.SLACK_WEBHOOK_URL }}
+        if: ${{ failure() }}
         with:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
 
@@ -372,6 +372,6 @@ jobs:
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
         uses: digitalservicebund/notify-on-failure-gha@d050613c380ee805de056e6ba37eb6676a98ce4f # v1.1.0
-        if: ${{ failure() && env.SLACK_WEBHOOK_URL }}
+        if: ${{ failure() }}
         with:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
