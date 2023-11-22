@@ -3,6 +3,7 @@ package de.bund.digitalservice.ris.caselaw.adapter.transformer;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitSearchResultDTO;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitSearchResult;
 import de.bund.digitalservice.ris.caselaw.domain.Status;
+import de.bund.digitalservice.ris.caselaw.domain.court.Court;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -36,16 +37,14 @@ public class DocumentationUnitSearchResultTransformer {
             documentationUnitSearchResultDTO.getDocumentType() == null
                 ? null
                 : DocumentTypeTransformer.transformToDomain(
-                        documentationUnitSearchResultDTO.getDocumentType())
-                    .jurisShortcut())
-        .courtLocation(
+                    documentationUnitSearchResultDTO.getDocumentType()))
+        .court(
             documentationUnitSearchResultDTO.getCourt() == null
                 ? null
-                : documentationUnitSearchResultDTO.getCourt().getLocation())
-        .courtType(
-            documentationUnitSearchResultDTO.getCourt() == null
-                ? null
-                : documentationUnitSearchResultDTO.getCourt().getType())
+                : Court.builder()
+                    .location(documentationUnitSearchResultDTO.getCourt().getLocation())
+                    .type(documentationUnitSearchResultDTO.getCourt().getType())
+                    .build())
         .fileNumber(
             documentationUnitSearchResultDTO.getFileNumbers() == null
                     || documentationUnitSearchResultDTO.getFileNumbers().isEmpty()

@@ -107,11 +107,9 @@ class ActiveCitationIntegrationTest {
   private DocumentCategoryDTO category;
   @Autowired private DatabaseDocumentCategoryRepository databaseDocumentCategoryRepository;
 
-  private DocumentationOfficeDTO docOfficeDTO;
-
   @BeforeEach
   void setUp() {
-    docOfficeDTO = documentationOfficeRepository.findByAbbreviation("DS");
+    DocumentationOfficeDTO docOfficeDTO = documentationOfficeRepository.findByAbbreviation("DS");
 
     doReturn(Mono.just(DocumentationOfficeTransformer.transformToDomain(docOfficeDTO)))
         .when(userService)

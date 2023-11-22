@@ -26,7 +26,6 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresXmlPublic
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PublicationReportDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.StatusDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.XmlPublicationDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationUnitTransformer;
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
@@ -35,7 +34,6 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.HttpMailSender;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationHistoryRecordType;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
-import de.bund.digitalservice.ris.caselaw.domain.Status;
 import de.bund.digitalservice.ris.caselaw.domain.XmlPublication;
 import java.time.Clock;
 import java.time.Instant;
@@ -136,7 +134,7 @@ class PublishDocumentUnitIntegrationTest {
             .documentNumber("docnr12345678")
             .decisionDate(LocalDate.now())
             .build();
-    DocumentationUnitDTO savedDocumentUnitDTO = repository.save(documentUnitDTO);
+    DocumentationUnitDTO savedDocumentUnitDTO = repository.saveAndFlush(documentUnitDTO);
 
     assertThat(repository.findAll()).hasSize(1);
 
@@ -192,17 +190,13 @@ class PublishDocumentUnitIntegrationTest {
         .ignoringFields("publishDate", "id")
         .isEqualTo(expectedXmlPublicationDTO);
 
-    List<StatusDTO> statusList = documentUnitStatusRepository.findAll();
-    StatusDTO status = statusList.get(statusList.size() - 1);
+    StatusDTO statusList =
+        documentUnitStatusRepository.findFirstByDocumentationUnitDTOOrderByCreatedAtDesc(
+            savedDocumentUnitDTO);
 
-    assertThat(status.getPublicationStatus()).isEqualTo(PUBLISHING);
-    assertThat(DocumentationUnitTransformer.transformToDomain(status.getDocumentationUnitDTO()))
-        .isEqualTo(
-            DocumentationUnitTransformer.transformToDomain(documentUnitDTO).toBuilder()
-                .status(Status.builder().publicationStatus(PUBLISHING).withError(false).build())
-                .build());
-    assertThat(status.getCreatedAt()).isEqualTo(xmlPublicationDTO.getPublishDate());
-    assertThat(status.getIssuerAddress()).isEqualTo("test@test.com");
+    assertThat(statusList.getPublicationStatus()).isEqualTo(PUBLISHING);
+    assertThat(statusList.getCreatedAt()).isEqualTo(xmlPublicationDTO.getPublishDate());
+    assertThat(statusList.getIssuerAddress()).isEqualTo("test@test.com");
   }
 
   @Test

@@ -67,6 +67,7 @@ import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.reactive.server.EntityExchangeResult;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.testcontainers.containers.PostgreSQLContainer;
@@ -162,6 +163,7 @@ class DocumentationUnitIntegrationTest {
   }
 
   @Test
+  @Transactional(transactionManager = "jpaTransactionManager")
   void testForCorrectDbEntryAfterNewDocumentUnitCreation() {
     risWebTestClient
         .withDefaultLogin()
@@ -276,6 +278,8 @@ class DocumentationUnitIntegrationTest {
                 .multiple(true)
                 .build());
 
+    // TODO find out why this is necessary when the whole test class is executed
+    repository.deleteAll();
     DocumentationUnitDTO documentationUnitDto =
         repository.save(
             DocumentationUnitDTO.builder()

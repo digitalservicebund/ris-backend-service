@@ -5,6 +5,8 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitSearchResult;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.Status;
 import de.bund.digitalservice.ris.caselaw.domain.Status.StatusBuilder;
+import de.bund.digitalservice.ris.caselaw.domain.court.Court;
+import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Objects;
@@ -17,13 +19,16 @@ public class DocumentationUnitSearchEntryTransformer {
     return DocumentationUnitSearchResult.builder()
         .uuid(searchEntryDTO.getUuid())
         .documentNumber(searchEntryDTO.getDocumentNumber())
-        .courtType(searchEntryDTO.getCourtType())
-        .courtLocation(searchEntryDTO.getCourtLocation())
+        .court(
+            Court.builder()
+                .type(searchEntryDTO.getCourtType())
+                .location(searchEntryDTO.getCourtLocation())
+                .build())
         .fileNumber(searchEntryDTO.getFirstFileNumber())
         .fileName(searchEntryDTO.getFileName())
         .decisionDate(
             LocalDate.ofInstant(searchEntryDTO.getDecisionDate(), ZoneId.of("Europe/Berlin")))
-        .documentType(searchEntryDTO.getDocumentType())
+        .documentType(DocumentType.builder().label(searchEntryDTO.getDocumentType()).build())
         .status(
             getPublicStatus(searchEntryDTO.getPublicationStatus(), searchEntryDTO.getWithError()))
         .build();
