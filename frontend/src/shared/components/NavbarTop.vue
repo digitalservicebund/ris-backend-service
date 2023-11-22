@@ -77,7 +77,7 @@ onMounted(async () => {
           {{ user.name }}
         </div>
         <div v-if="user.documentationOffice" class="ds-label-03-reg">
-          {{ user.documentationOffice.label }}
+          {{ user.documentationOffice.abbreviation }}
         </div>
       </div>
     </div>
