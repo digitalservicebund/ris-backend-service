@@ -38,7 +38,7 @@ function generateActiveCitation(options?: {
 }) {
   const activeCitation = new ActiveCitation({
     uuid: options?.uuid ?? "123",
-    documentNumber: "ABC",
+    // documentNumber: "ABC",
     court: options?.court ?? {
       type: "type1",
       location: "location1",

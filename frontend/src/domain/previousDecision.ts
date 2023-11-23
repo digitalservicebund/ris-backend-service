@@ -31,9 +31,6 @@ export default class PreviousDecision
       ...(this.fileNumber ? [this.fileNumber] : []),
       ...(this.documentType ? [this.documentType?.jurisShortcut] : []),
       ...(this.documentNumber ? [this.documentNumber] : []),
-      // ...(this.documentNumber && this.hasForeignSource
-      //   ? [this.documentNumber]
-      //   : []),
     ].join(", ")
   }
 

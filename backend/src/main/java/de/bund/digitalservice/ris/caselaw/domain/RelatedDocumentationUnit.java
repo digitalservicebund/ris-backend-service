@@ -26,8 +26,6 @@ public class RelatedDocumentationUnit {
   protected String fileNumber;
   protected DocumentType documentType;
 
-  // Todo referencedDocumentationUnit?
-
   @Transient
   public boolean isEmpty() {
     return uuid == null

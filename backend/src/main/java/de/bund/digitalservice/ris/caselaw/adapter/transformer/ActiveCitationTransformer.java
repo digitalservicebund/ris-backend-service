@@ -13,7 +13,7 @@ public class ActiveCitationTransformer extends RelatedDocumentationUnitTransform
 
     CitationTypeDTO citationTypeDTO = activeCitationDTO.getCitationType();
     CitationType citationType = null;
-    if (citationTypeDTO != null) {
+    if (citationTypeDTO != null && citationTypeDTO.getId() != null) {
       citationType =
           CitationType.builder()
               .uuid(citationTypeDTO.getId())
@@ -51,7 +51,7 @@ public class ActiveCitationTransformer extends RelatedDocumentationUnitTransform
 
     CitationType citationType = activeCitation.getCitationType();
 
-    if (citationType != null) {
+    if (citationType != null && citationType.uuid() != null) {
       CitationTypeDTO.CitationTypeDTOBuilder citationTypeDTOBuilder =
           CitationTypeDTO.builder().id(citationType.uuid());
 

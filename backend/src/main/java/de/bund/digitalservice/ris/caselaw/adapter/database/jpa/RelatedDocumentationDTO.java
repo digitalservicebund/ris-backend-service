@@ -10,6 +10,7 @@ import jakarta.persistence.InheritanceType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.util.UUID;
@@ -60,5 +61,5 @@ public abstract class RelatedDocumentationDTO {
 
   @Column @NotNull private Integer rank;
 
-  //  @Transient private DocumentationUnitDTO referencedDocumentationUnit;
+  @Transient private DocumentationUnitDTO referencedDocumentationUnit;
 }
