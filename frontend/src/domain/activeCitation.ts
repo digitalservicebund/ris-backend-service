@@ -9,6 +9,8 @@ export default class ActiveCitation
 {
   public citationType?: CitationType
 
+  public hasForeignSource: boolean = this.documentNumber !== undefined
+
   static requiredFields = [
     "citationType",
     "fileNumber",

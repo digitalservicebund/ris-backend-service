@@ -21,6 +21,7 @@ import lombok.experimental.SuperBuilder;
 public class RelatedDocumentationUnit {
   protected UUID uuid;
   protected String documentNumber;
+  protected UUID documentationUnitId;
   protected Court court;
   protected LocalDate decisionDate;
   protected String fileNumber;
@@ -33,6 +34,7 @@ public class RelatedDocumentationUnit {
         && court == null
         && decisionDate == null
         && fileNumber == null
-        && documentType == null;
+        && documentType == null
+        && documentationUnitId == null;
   }
 }

@@ -3,6 +3,7 @@ package de.bund.digitalservice.ris.caselaw.adapter.transformer;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ActiveCitationDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ActiveCitationDTO.ActiveCitationDTOBuilder;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CitationTypeDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
 import de.bund.digitalservice.ris.caselaw.domain.ActiveCitation;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.citation.CitationType;
 import lombok.extern.slf4j.Slf4j;
@@ -27,6 +28,7 @@ public class ActiveCitationTransformer extends RelatedDocumentationUnitTransform
     return ActiveCitation.builder()
         .uuid(activeCitationDTO.getId())
         .documentNumber(activeCitationDTO.getDocumentNumber())
+        .documentationUnitId(activeCitationDTO.getReferencedDocumentationUnit().getId())
         .court(getCourtFromDTO(activeCitationDTO.getCourt()))
         .fileNumber(getFileNumber(activeCitationDTO.getFileNumber()))
         .documentType(getDocumentTypeFromDTO(activeCitationDTO.getDocumentType()))
@@ -46,6 +48,8 @@ public class ActiveCitationTransformer extends RelatedDocumentationUnitTransform
             .court(getCourtFromDomain(activeCitation.getCourt()))
             .date(activeCitation.getDecisionDate())
             .documentNumber(activeCitation.getDocumentNumber())
+            .referencedDocumentationUnit(
+                DocumentationUnitDTO.builder().id(activeCitation.getDocumentationUnitId()).build())
             .documentType(getDocumentTypeFromDomain(activeCitation.getDocumentType()))
             .fileNumber(getFileNumber(activeCitation.getFileNumber()));
 

@@ -157,13 +157,12 @@ watch(
 
 <template>
   <div>
-    <!-- Todo implement linked logic  -->
-    <!-- <div
+    <div
       v-if="activeCitation.hasForeignSource"
       class="ds-link-01-bold mb-24 underline"
     >
       {{ activeCitation.renderDecision }}
-    </div> -->
+    </div>
     <InputField
       id="activeCitationPredicate"
       v-slot="slotProps"
@@ -181,9 +180,7 @@ watch(
         placeholder="Bitte auswählen"
       ></ComboboxInput>
     </InputField>
-    <!-- Todo implement linked logic  -->
-    <!-- <div v-if="!activeCitation.hasForeignSource"> -->
-    <div>
+    <div v-if="!activeCitation.hasForeignSource">
       <div class="flex justify-between gap-24">
         <InputField
           id="activeCitationCourt"
@@ -243,9 +240,7 @@ watch(
         </InputField>
       </div>
     </div>
-    <div>
-      <!-- Todo implement linked logic  -->
-      <!-- v-if="!activeCitation.hasForeignSource" -->
+    <div v-if="!activeCitation.hasForeignSource">
       <TextButton
         aria-label="Nach Entscheidung suchen"
         button-type="secondary"

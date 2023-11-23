@@ -47,8 +47,7 @@ export default class PreviousDecision
 
   get isReadOnly(): boolean {
     // Todo implement linked logic
-    // return this.hasForeignSource
-    return false
+    return this.hasForeignSource
   }
 
   get missingRequiredFields() {

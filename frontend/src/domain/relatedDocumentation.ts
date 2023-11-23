@@ -19,7 +19,7 @@ export default class RelatedDocumentation {
     if (!localDecisions) return false
 
     return localDecisions.some(
-      (localDecision) => localDecision.uuid == this.uuid,
+      (localDecision) => localDecision.documentNumber == this.documentNumber,
     )
   }
 

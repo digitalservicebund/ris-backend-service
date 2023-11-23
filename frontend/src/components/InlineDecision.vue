@@ -9,7 +9,7 @@ defineProps<{
 <template>
   <div>
     <!-- Todo implement linked logic -->
-    <!--  
+
     <router-link
       v-if="decision.hasForeignSource"
       class="ds-link-01-bold underline"
@@ -24,7 +24,7 @@ defineProps<{
         {{ decision.renderDecision }}
       </button>
     </router-link>
-    -->
+
     <span class="ds-label-02-reg">{{ decision.renderDecision }}</span>
   </div>
 </template>
