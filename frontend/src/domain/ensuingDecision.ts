@@ -27,7 +27,7 @@ export default class EnsuingDecision
   get renderDecision(): string {
     return [
       ...(this.pending === true ? ["anhängig"] : ["nachgehend"]),
-      ...(this.court ? [`${this.court.label}`] : []),
+      ...(this.court ? [`${this.court?.label}`] : []),
       ...(this.decisionDate
         ? [dayjs(this.decisionDate).format("DD.MM.YYYY")]
         : []),

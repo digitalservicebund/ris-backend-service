@@ -40,7 +40,7 @@ export type DocumentType = {
 export type Court = {
   type?: string
   location?: string
-  label: string
+  label?: string // TODO why not sent from backend for related documentation?
   revoked?: string
 }
 

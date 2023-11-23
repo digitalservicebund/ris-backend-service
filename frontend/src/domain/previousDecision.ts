@@ -23,7 +23,7 @@ export default class PreviousDecision
 
   get renderDecision(): string {
     return [
-      ...(this.court ? [`${this.court.label}`] : []),
+      ...(this.court ? [`${this.court?.label}`] : []),
       ...(this.decisionDate
         ? [dayjs(this.decisionDate).format("DD.MM.YYYY")]
         : []),

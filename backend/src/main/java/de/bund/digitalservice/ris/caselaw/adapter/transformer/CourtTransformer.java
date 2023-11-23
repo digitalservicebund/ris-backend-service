@@ -30,7 +30,7 @@ public class CourtTransformer {
         .id(courtDTO.getId())
         .type(courtDTO.getType())
         .location(courtDTO.getLocation())
-        .label(courtDTO.getType() + " " + courtDTO.getLocation())
+        .label(Court.generateLabel(courtDTO.getType(), courtDTO.getLocation()))
         .revoked(revoked)
         .build();
   }
@@ -38,12 +38,7 @@ public class CourtTransformer {
   public static CourtDTO transformToDTO(Court court) {
     if (court == null) return null;
 
-    return CourtDTO.builder()
-        .id(court.id())
-        .type(court.type())
-        .location(court.location())
-        // Todo isSuperiorCourt, isForeignCourt, additionalInformation, jurisId?
-        .build();
+    return CourtDTO.builder().id(court.id()).type(court.type()).location(court.location()).build();
   }
 
   private static String extractRevoked(String additional) {

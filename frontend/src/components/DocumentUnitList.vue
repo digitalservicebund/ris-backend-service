@@ -133,10 +133,10 @@ function onDelete() {
           <span v-else>-</span>
         </div>
         <div class="table-cell p-16">
-          {{ listEntry.courtType ? listEntry.courtType : "-" }}
+          {{ listEntry.court ? listEntry.court.type : "-" }}
         </div>
         <div class="table-cell p-16">
-          {{ listEntry.courtLocation ? listEntry.courtLocation : "-" }}
+          {{ listEntry.court ? listEntry.court.location : "-" }}
         </div>
         <div class="table-cell p-16">
           {{
@@ -149,7 +149,7 @@ function onDelete() {
           {{ listEntry.fileNumber ? listEntry.fileNumber : "-" }}
         </div>
         <div class="table-cell p-16">
-          {{ listEntry.documentType ? listEntry.documentType : "-" }}
+          {{ listEntry.documentType ? listEntry.documentType.label : "-" }}
         </div>
         <div class="table-cell p-16">
           <IconBadge

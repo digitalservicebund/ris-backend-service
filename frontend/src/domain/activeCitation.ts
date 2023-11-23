@@ -32,7 +32,7 @@ export default class ActiveCitation
   get renderDecision(): string {
     return [
       ...(this.citationType?.label ? [this.citationType.label] : []),
-      ...(this.court?.label ? [`${this.court?.label}`] : []),
+      ...(this.court ? [`${this.court?.label}`] : []),
       ...(this.decisionDate
         ? [dayjs(this.decisionDate).format("DD.MM.YYYY")]
         : []),

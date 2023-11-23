@@ -25,7 +25,7 @@ export default class RelatedDocumentation {
 
   get renderDecision(): string {
     return [
-      ...(this.court?.label ? [`${this.court?.label}`] : []),
+      ...(this.court ? [`${this.court?.label}`] : []),
       ...(this.decisionDate
         ? [dayjs(this.decisionDate).format("DD.MM.YYYY")]
         : []),
