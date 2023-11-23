@@ -13,13 +13,13 @@ import de.bund.digitalservice.ris.caselaw.domain.RelatedDocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.Status;
 import de.bund.digitalservice.ris.caselaw.domain.court.Court;
 import java.time.Instant;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.domain.Page;
@@ -38,16 +38,20 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
   private final DatabaseDocumentationOfficeRepository documentationOfficeRepository;
   private final JPADatabaseKeywordRepository keywordRepository;
 
+  private final DatabaseRelatedDocumentationRepository relatedDocumentationRepository;
+
   public PostgresDocumentationUnitRepositoryImpl(
       DatabaseDocumentationUnitRepository repository,
       DatabaseCourtRepository databaseCourtRepository,
       DatabaseDocumentationOfficeRepository documentationOfficeRepository,
-      JPADatabaseKeywordRepository keywordRepository) {
+      JPADatabaseKeywordRepository keywordRepository,
+      DatabaseRelatedDocumentationRepository relatedDocumentationRepository) {
 
     this.repository = repository;
     this.databaseCourtRepository = databaseCourtRepository;
     this.documentationOfficeRepository = documentationOfficeRepository;
     this.keywordRepository = keywordRepository;
+    this.relatedDocumentationRepository = relatedDocumentationRepository;
   }
 
   @Override
@@ -311,14 +315,9 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
   @Override
   public Map<RelatedDocumentationType, Long> getAllDocumentationUnitWhichLink(
       UUID documentationUnitId) {
-    // TODO: activate after referenced documentation unit id in related documentation
-    return Collections.emptyMap();
-    //    return
-    // relatedDocumentationRepository.findAllByReferencedDocumentUnitId(documentationUnitId).stream()
-    //            .collect(Collectors.groupingBy(
-    //              RelatedDocumentationDTO::getType,
-    //              Collectors.counting()
-    //            )
-    //    );
+    return relatedDocumentationRepository
+        .findAllByReferencedDocumentationUnitId(documentationUnitId)
+        .stream()
+        .collect(Collectors.groupingBy(RelatedDocumentationDTO::getType, Collectors.counting()));
   }
 }

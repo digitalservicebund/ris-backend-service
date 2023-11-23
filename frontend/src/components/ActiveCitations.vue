@@ -25,7 +25,6 @@ const activeCitations = computed({
 const defaultValue = new ActiveCitation()
 
 function decisionSummarizer(activeCitation: ActiveCitation) {
-  // Todo implement linked logic
   if (activeCitation.hasForeignSource) {
     return h("div", { class: ["flex flex-row items-center"] }, [
       !activeCitation.citationType &&

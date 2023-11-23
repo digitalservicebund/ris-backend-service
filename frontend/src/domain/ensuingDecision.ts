@@ -35,7 +35,9 @@ export default class EnsuingDecision
       ...(this.fileNumber ? [this.fileNumber] : []),
       ...(this.documentType ? [this.documentType?.jurisShortcut] : []),
       ...(this.note ? [this.note] : []),
-      ...(this.documentNumber ? [this.documentNumber] : []),
+      ...(this.documentNumber && this.hasForeignSource
+        ? [this.documentNumber]
+        : []),
     ].join(", ")
   }
 

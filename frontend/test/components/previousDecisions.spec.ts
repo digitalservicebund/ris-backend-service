@@ -37,7 +37,7 @@ function generatePreviousDecision(options?: {
 }) {
   const previousDecision = new PreviousDecision({
     uuid: options?.uuid ?? "123",
-    documentNumber: "ABC",
+    documentNumber: options?.documentNumber ?? undefined,
     court: options?.court ?? {
       type: "type1",
       location: "location1",
@@ -307,7 +307,7 @@ describe("PreviousDecisions", () => {
 
     expect(
       screen.getByText(
-        "label1, 01.02.2022, test fileNumber, documentTypeShortcut1, ABC",
+        "label1, 01.02.2022, test fileNumber, documentTypeShortcut1",
       ),
     ).toBeInTheDocument()
     const editButton = screen.getByLabelText("Eintrag bearbeiten")
@@ -330,15 +330,14 @@ describe("PreviousDecisions", () => {
     ).toBeInTheDocument()
   })
 
-  // Todo: enable again when linking possible
-  // it("renders from search added active citations as non-editable list item", async () => {
-  //   renderComponent({
-  //     modelValue: [generatePreviousDecision()],
-  //   })
-  //   expect(
-  //     screen.queryByLabelText("Eintrag bearbeiten"),
-  //   ).not.toBeInTheDocument()
-  // })
+  it("renders from search added active citations as non-editable list item", async () => {
+    renderComponent({
+      modelValue: [generatePreviousDecision({ documentNumber: "ABC" })],
+    })
+    expect(
+      screen.queryByLabelText("Eintrag bearbeiten"),
+    ).not.toBeInTheDocument()
+  })
 
   it("lists search results", async () => {
     const { user } = renderComponent()

@@ -30,7 +30,9 @@ export default class PreviousDecision
       ...(this.dateKnown === false ? ["Datum unbekannt"] : []),
       ...(this.fileNumber ? [this.fileNumber] : []),
       ...(this.documentType ? [this.documentType?.jurisShortcut] : []),
-      ...(this.documentNumber ? [this.documentNumber] : []),
+      ...(this.documentNumber && this.hasForeignSource
+        ? [this.documentNumber]
+        : []),
     ].join(", ")
   }
 
@@ -46,7 +48,6 @@ export default class PreviousDecision
   }
 
   get isReadOnly(): boolean {
-    // Todo implement linked logic
     return this.hasForeignSource
   }
 

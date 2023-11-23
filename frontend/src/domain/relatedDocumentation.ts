@@ -9,6 +9,10 @@ export default class RelatedDocumentation {
   public fileNumber?: string
   public documentType?: DocumentType
 
+  get hasForeignSource(): boolean {
+    return this.documentNumber != null
+  }
+
   constructor(data: Partial<RelatedDocumentation> = {}) {
     Object.assign(this, data)
   }
@@ -31,7 +35,9 @@ export default class RelatedDocumentation {
         : []),
       ...(this.documentType ? [this.documentType.label] : []),
       ...(this.fileNumber ? [this.fileNumber] : []),
-      ...(this.documentNumber ? [this.documentNumber] : []),
+      ...(this.documentNumber && this.hasForeignSource
+        ? [this.documentNumber]
+        : []),
     ].join(", ")
   }
 }
