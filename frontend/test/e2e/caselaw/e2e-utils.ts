@@ -1,6 +1,5 @@
 import { expect, Page } from "@playwright/test"
 import { generateString } from "../../test-helper/dataGenerators"
-import { Court } from "@/domain/documentUnit"
 
 export const navigateToCategories = async (
   page: Page,
@@ -114,7 +113,7 @@ export async function toggleNormsSection(page: Page): Promise<void> {
 export async function fillPreviousDecisionInputs(
   page: Page,
   values?: {
-    court?: Court
+    court?: string
     decisionDate?: string
     fileNumber?: string
     documentType?: string
@@ -163,10 +162,10 @@ export async function fillEnsuingDecisionInputs(
   page: Page,
   values?: {
     pending?: boolean
-    court?: Court
+    court?: string
     decisionDate?: string
     fileNumber?: string
-    documentType?: DocumentType
+    documentType?: string
     note?: string
   },
   decisionIndex = 0,
@@ -256,7 +255,7 @@ export async function fillActiveCitationInputs(
   page: Page,
   values?: {
     citationType?: string
-    court?: Court
+    court?: string
     decisionDate?: string
     fileNumber?: string
     documentType?: string

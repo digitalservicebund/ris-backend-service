@@ -14,7 +14,7 @@ const isLoading = computed(
 
 function renderDocumentUnit(documentUnit: DocumentUnitListEntry): string {
   return [
-    ...(documentUnit.courtType ? [`${documentUnit.courtType}`] : []),
+    ...(documentUnit.court ? [`${documentUnit.court.label}`] : []),
     ...(documentUnit.decisionDate
       ? [dayjs(documentUnit.decisionDate).format("DD.MM.YYYY")]
       : []),
