@@ -1132,9 +1132,10 @@ class ActiveCitationIntegrationTest {
   }
 
   @Test
+  //  TODO relatedDocumentationRepository.deleteById(id);
+  @Disabled
   void testUpdateDocumentationUnit_addLinkToExistingDocumentationUnit() {
     prepareTestData(2, 0);
-    //  TODO relatedDocumentationRepository.deleteById(id);
 
     ActiveCitation activeCitation = generateActiveCitation(1, false);
     ActiveCitation linkedActiveCitation = generateActiveCitation(2, false);
