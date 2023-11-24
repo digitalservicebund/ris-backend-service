@@ -52,7 +52,7 @@ export default class EnsuingDecision
   }
 
   get isReadOnly(): boolean {
-    return false
+    return this.hasForeignSource
   }
 
   get isEmpty(): boolean {

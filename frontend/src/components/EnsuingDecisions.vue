@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { h, computed } from "vue"
+import { RouterLink } from "vue-router"
 import EnsuingDecisionInputGroup from "./EnsuingDecisionInputGroup.vue"
 import EditableList from "@/components/EditableListCaselaw.vue"
 import EnsuingDecision from "@/domain/ensuingDecision"
@@ -25,7 +26,21 @@ const ensuingDecisions = computed({
 const defaultValue = new EnsuingDecision()
 
 function decisionSummarizer(dataEntry: EnsuingDecision) {
-  if (
+  if (dataEntry.isReadOnly) {
+    return h(
+      RouterLink,
+      {
+        class: ["ds-link-01-bold", "underline"],
+        target: "_blank",
+        tabindex: -1,
+        to: {
+          name: "caselaw-documentUnit-documentNumber-categories",
+          params: { documentNumber: dataEntry.documentNumber },
+        },
+      },
+      () => dataEntry.renderDecision,
+    )
+  } else if (
     !dataEntry.hasMissingRequiredFields ||
     (dataEntry.missingRequiredFields.length === 1 &&
       dataEntry.missingRequiredFields[0] === "decisionDate" &&

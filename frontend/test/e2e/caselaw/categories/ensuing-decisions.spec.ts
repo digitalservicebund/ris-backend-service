@@ -318,7 +318,7 @@ test.describe("ensuing decisions", () => {
       court: prefilledDocumentUnit.coreData.court?.label,
       fileNumber: prefilledDocumentUnit.coreData.fileNumbers?.[0],
       documentType: prefilledDocumentUnit.coreData.documentType?.jurisShortcut,
-      decisionDate: "01.01.2020",
+      decisionDate: "31.12.2019",
     })
     const ensuingDecisionContainer = page.getByLabel("Nachgehende Entscheidung")
     await ensuingDecisionContainer
@@ -328,7 +328,7 @@ test.describe("ensuing decisions", () => {
     await expect(page.getByText("1 Ergebnis gefunden.")).toBeVisible()
 
     const result = page.getByText(
-      `AG Aachen, 01.01.2020, ${prefilledDocumentUnit.coreData.fileNumbers?.[0]}, AnU, ${prefilledDocumentUnit.documentNumber}`,
+      `nachgehend, AG Aachen, 31.12.2019, ${prefilledDocumentUnit.coreData.fileNumbers?.[0]}, AnU, ${prefilledDocumentUnit.documentNumber}`,
     )
 
     await expect(result).toBeVisible()
@@ -336,7 +336,7 @@ test.describe("ensuing decisions", () => {
 
     //make sure to have citation style in list
     const listItem = page.getByText(
-      `AG Aachen, 01.01.2020, ${prefilledDocumentUnit.coreData.fileNumbers?.[0]}, AnU, ${prefilledDocumentUnit.documentNumber}`,
+      `nachgehend, AG Aachen, 31.12.2019, ${prefilledDocumentUnit.coreData.fileNumbers?.[0]}, AnU, ${prefilledDocumentUnit.documentNumber}`,
     )
     await expect(listItem).toBeVisible()
     await expect(page.getByLabel("Eintrag löschen")).toBeVisible()
@@ -350,7 +350,7 @@ test.describe("ensuing decisions", () => {
       court: prefilledDocumentUnit.coreData.court?.label,
       fileNumber: prefilledDocumentUnit.coreData.fileNumbers?.[0],
       documentType: prefilledDocumentUnit.coreData.documentType?.jurisShortcut,
-      decisionDate: "01.01.2020",
+      decisionDate: "31.12.2019",
     })
 
     await ensuingDecisionContainer

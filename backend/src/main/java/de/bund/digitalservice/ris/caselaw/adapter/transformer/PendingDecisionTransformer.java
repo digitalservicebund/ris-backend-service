@@ -1,5 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.adapter.transformer;
 
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PendingDecisionDTO;
 import de.bund.digitalservice.ris.caselaw.domain.EnsuingDecision;
 
@@ -8,6 +9,10 @@ public class PendingDecisionTransformer extends RelatedDocumentationUnitTransfor
     return EnsuingDecision.builder()
         .uuid(pendingDecisionDTO.getId())
         .documentNumber(pendingDecisionDTO.getDocumentNumber())
+        .referencedDocumentationUnitId(
+            pendingDecisionDTO.getReferencedDocumentationUnit() == null
+                ? null
+                : pendingDecisionDTO.getReferencedDocumentationUnit().getId())
         .court(getCourtFromDTO(pendingDecisionDTO.getCourt()))
         .fileNumber(getFileNumber(pendingDecisionDTO.getFileNumber()))
         .documentType(getDocumentTypeFromDTO(pendingDecisionDTO.getDocumentType()))
@@ -27,6 +32,12 @@ public class PendingDecisionTransformer extends RelatedDocumentationUnitTransfor
         .court(getCourtFromDomain(ensuingDecision.getCourt()))
         .date(ensuingDecision.getDecisionDate())
         .documentNumber(ensuingDecision.getDocumentNumber())
+        .referencedDocumentationUnit(
+            ensuingDecision.getReferencedDocumentationUnitId() == null
+                ? null
+                : DocumentationUnitDTO.builder()
+                    .id(ensuingDecision.getReferencedDocumentationUnitId())
+                    .build())
         .documentType(getDocumentTypeFromDomain(ensuingDecision.getDocumentType()))
         .fileNumber(getFileNumber(ensuingDecision.getFileNumber()))
         .note(ensuingDecision.getNote())

@@ -10,9 +10,9 @@ public class EnsuingDecisionTransformer extends RelatedDocumentationUnitTransfor
         .uuid(ensuingDecisionDTO.getId())
         .documentNumber(ensuingDecisionDTO.getDocumentNumber())
         .referencedDocumentationUnitId(
-            ensuingDecisionDTO.getReferencedDocumentationUnitId() == null
+            ensuingDecisionDTO.getReferencedDocumentationUnit() == null
                 ? null
-                : ensuingDecisionDTO.getReferencedDocumentationUnitId())
+                : ensuingDecisionDTO.getReferencedDocumentationUnit().getId())
         .court(getCourtFromDTO(ensuingDecisionDTO.getCourt()))
         .fileNumber(getFileNumber(ensuingDecisionDTO.getFileNumber()))
         .documentType(getDocumentTypeFromDTO(ensuingDecisionDTO.getDocumentType()))

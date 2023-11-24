@@ -234,7 +234,7 @@ test.describe("active citations", () => {
       court: prefilledDocumentUnit.coreData.court?.label,
       fileNumber: prefilledDocumentUnit.coreData.fileNumbers?.[0],
       documentType: prefilledDocumentUnit.coreData.documentType?.jurisShortcut,
-      decisionDate: "01.01.2020",
+      decisionDate: "31.12.2019",
     })
 
     const activeCitationContainer = page.getByLabel("Aktivzitierung")
@@ -245,7 +245,7 @@ test.describe("active citations", () => {
 
     //citation style ignored in search results
     const result = page.getByText(
-      `AG Aachen, 01.01.2020, ${prefilledDocumentUnit.coreData.fileNumbers?.[0]}, Anerkenntnisurteil, ${prefilledDocumentUnit.documentNumber}`,
+      `AG Aachen, 31.12.2019, ${prefilledDocumentUnit.coreData.fileNumbers?.[0]}, Anerkenntnisurteil, ${prefilledDocumentUnit.documentNumber}`,
     )
 
     await expect(result).toBeVisible()
@@ -253,7 +253,7 @@ test.describe("active citations", () => {
 
     //make sure to have citation style in list
     const listItem = page.getByText(
-      `Änderung, AG Aachen, 01.01.2020, ${prefilledDocumentUnit.coreData.fileNumbers?.[0]}, Anerkenntnisurteil, ${prefilledDocumentUnit.documentNumber}`,
+      `Änderung, AG Aachen, 31.12.2019, ${prefilledDocumentUnit.coreData.fileNumbers?.[0]}, Anerkenntnisurteil, ${prefilledDocumentUnit.documentNumber}`,
     )
     await expect(listItem).toBeVisible()
     await expect(page.getByLabel("Eintrag löschen")).toBeVisible()
@@ -268,7 +268,7 @@ test.describe("active citations", () => {
       court: prefilledDocumentUnit.coreData.court?.label,
       fileNumber: prefilledDocumentUnit.coreData.fileNumbers?.[0],
       documentType: prefilledDocumentUnit.coreData.documentType?.jurisShortcut,
-      decisionDate: "01.01.2020",
+      decisionDate: "31.12.2019",
     })
 
     await activeCitationContainer.getByLabel("Nach Entscheidung suchen").click()
@@ -312,7 +312,7 @@ test.describe("active citations", () => {
       court: prefilledDocumentUnit.coreData.court?.label,
       fileNumber: prefilledDocumentUnit.coreData.fileNumbers?.[0],
       documentType: prefilledDocumentUnit.coreData.documentType?.jurisShortcut,
-      decisionDate: "01.01.2020",
+      decisionDate: "31.12.2019",
     })
     await page.getByLabel("Aktivzitierung speichern").click()
 
