@@ -1,5 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.adapter.transformer;
 
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PreviousDecisionDTO;
 import de.bund.digitalservice.ris.caselaw.domain.PreviousDecision;
 
@@ -8,6 +9,10 @@ public class PreviousDecisionTransformer extends RelatedDocumentationUnitTransfo
     return PreviousDecision.builder()
         .uuid(previousDecisionDTO.getId())
         .documentNumber(previousDecisionDTO.getDocumentNumber())
+        .referencedDocumentationUnitId(
+            previousDecisionDTO.getReferencedDocumentationUnit() == null
+                ? null
+                : previousDecisionDTO.getReferencedDocumentationUnit().getId())
         .court(getCourtFromDTO(previousDecisionDTO.getCourt()))
         .fileNumber(getFileNumber(previousDecisionDTO.getFileNumber()))
         .documentType(getDocumentTypeFromDTO(previousDecisionDTO.getDocumentType()))
@@ -26,6 +31,12 @@ public class PreviousDecisionTransformer extends RelatedDocumentationUnitTransfo
         .court(getCourtFromDomain(previousDecision.getCourt()))
         .date(previousDecision.getDecisionDate())
         .documentNumber(previousDecision.getDocumentNumber())
+        .referencedDocumentationUnit(
+            previousDecision.getReferencedDocumentationUnitId() == null
+                ? null
+                : DocumentationUnitDTO.builder()
+                    .id(previousDecision.getReferencedDocumentationUnitId())
+                    .build())
         .documentType(getDocumentTypeFromDomain(previousDecision.getDocumentType()))
         .fileNumber(getFileNumber(previousDecision.getFileNumber()))
         .dateKnown(previousDecision.isDateKnown())

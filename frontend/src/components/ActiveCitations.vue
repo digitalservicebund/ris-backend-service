@@ -27,7 +27,7 @@ const defaultValue = new ActiveCitation()
 function decisionSummarizer(activeCitation: ActiveCitation) {
   if (activeCitation.hasForeignSource) {
     return h("div", { class: ["flex flex-row items-center"] }, [
-      !activeCitation.citationType &&
+      !activeCitation.citationTypeIsSet &&
         renderValidationAlert("Art der Zitierung"),
       h(
         RouterLink,

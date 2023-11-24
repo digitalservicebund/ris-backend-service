@@ -24,20 +24,23 @@ describe("ProceedingDecision", () => {
 
   it("instantiates with default unkownData", () => {
     const proceedingDecision = new ProceedingDecision()
-
     expect(proceedingDecision.dateKnown).toBeTruthy()
   })
 
-  // Todo
-  // it("returns false if not linked to other docunit", () => {
-  //   const proceedingDecision = new ProceedingDecision()
-  //   expect(previousDecisions.isReadOnly).toBeFalsy()
-  // })
+  it("returns false if not linked to other docunit", () => {
+    const proceedingDecision = new ProceedingDecision({
+      documentNumber: undefined,
+    })
+    expect(proceedingDecision.isReadOnly).toBeFalsy()
+  })
 
-  // it("returns true if linked to other docunit", () => {
-  //   const proceedingDecision = new ProceedingDecision()
-  //   expect(previousDecisions.isReadOnly).toBeTruthy()
-  // })
+  it("returns true if linked to other docunit", () => {
+    const proceedingDecision = new ProceedingDecision({
+      documentNumber: "ABC",
+      referencedDocumentationUnitId: "abc",
+    })
+    expect(proceedingDecision.isReadOnly).toBeTruthy()
+  })
 
   it("returns a string representation of a proceeding decision", () => {
     const proceedingDecision = new ProceedingDecision({

@@ -55,8 +55,7 @@ describe("DocumentUnit", () => {
     ])
   })
 
-  //TODO naming
-  it("returns all missing required fields but one", () => {
+  it("identify missing fields correctly if one field is set", () => {
     const documentUnit = new DocumentUnit("foo", {
       s3path: "foo-path",
       coreData: { legalEffect: "foo" },
@@ -69,8 +68,7 @@ describe("DocumentUnit", () => {
     ])
   })
 
-  //TODO naming
-  it("returns all missing required with empty array", () => {
+  it("indentify empty fileNumbers as missing", () => {
     const documentUnit = new DocumentUnit("foo", {
       s3path: "foo-path",
       coreData: { fileNumbers: [] },
@@ -84,8 +82,7 @@ describe("DocumentUnit", () => {
     ])
   })
 
-  //TODO naming
-  it("returns all missing required fields with empty string", () => {
+  it("indentify empty decisionDate as missing", () => {
     const documentUnit = new DocumentUnit("foo", {
       s3path: "foo-path",
       coreData: { decisionDate: "" },
@@ -99,8 +96,7 @@ describe("DocumentUnit", () => {
     ])
   })
 
-  //TODO naming
-  it("returns all missing required fields", () => {
+  it("indentify all missing required fields", () => {
     const documentUnit = new DocumentUnit("foo", {
       s3path: "foo-path",
       coreData: { legalEffect: "foo" },

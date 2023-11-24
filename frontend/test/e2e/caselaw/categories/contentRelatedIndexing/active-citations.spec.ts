@@ -208,9 +208,7 @@ test.describe("active citations", () => {
     ).toHaveCount(1)
   })
 
-  // Todo enable again when linking possible
-  // eslint-disable-next-line playwright/no-skipped-test
-  test.skip("search for documentunits and link as active citation", async ({
+  test("search for documentunits and link as active citation", async ({
     page,
     documentNumber,
     prefilledDocumentUnit,

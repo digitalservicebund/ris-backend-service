@@ -12,17 +12,23 @@ import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentNumberService;
 import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentUnitStatusService;
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentUnitController;
 import de.bund.digitalservice.ris.caselaw.adapter.DocxConverterService;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CourtDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseCourtRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentCategoryRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentTypeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationOfficeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabasePublicationReportRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentCategoryDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentTypeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitMetadataDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.FileNumberDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentationUnitRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresPublicationReportRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PreviousDecisionDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.StatusDTO;
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
@@ -33,9 +39,15 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.EmailPublishService;
 import de.bund.digitalservice.ris.caselaw.domain.PreviousDecision;
+import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
+import de.bund.digitalservice.ris.caselaw.domain.Status;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
+import de.bund.digitalservice.ris.caselaw.domain.court.Court;
+import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
+import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
+import java.util.Random;
 import java.util.UUID;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -47,8 +59,10 @@ import org.springframework.security.oauth2.client.registration.ReactiveClientReg
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.test.web.reactive.server.WebTestClient;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.shaded.org.apache.commons.lang3.RandomStringUtils;
 import reactor.core.publisher.Mono;
 import software.amazon.awssdk.services.s3.S3AsyncClient;
 
@@ -87,6 +101,7 @@ class PreviousDecisionIntegrationTest {
   @Autowired private RisWebTestClient risWebTestClient;
   @Autowired private DatabaseDocumentationUnitRepository repository;
   @Autowired private DatabaseDocumentTypeRepository databaseDocumentTypeRepository;
+  @Autowired private DatabaseCourtRepository courtRepository;
   @Autowired private DatabaseDocumentationOfficeRepository documentationOfficeRepository;
   @Autowired private DatabasePublicationReportRepository databasePublishReportRepository;
 
@@ -117,6 +132,7 @@ class PreviousDecisionIntegrationTest {
     repository.deleteAll();
     databaseDocumentTypeRepository.deleteAll();
     databasePublishReportRepository.deleteAll();
+    courtRepository.deleteAll();
     databaseDocumentCategoryRepository.delete(category);
   }
 
@@ -184,8 +200,7 @@ class PreviousDecisionIntegrationTest {
   }
 
   @Test
-  @Disabled("fix after documentation unit id in related documentation")
-  void testLinkExistingProceedingDecision() {
+  void testLinkExistingPreviousDecision() {
     DocumentationUnitDTO parentDocumentUnitDTO =
         DocumentationUnitDTO.builder()
             .documentationOffice(documentationOfficeDTO)
@@ -194,7 +209,11 @@ class PreviousDecisionIntegrationTest {
     parentDocumentUnitDTO = repository.save(parentDocumentUnitDTO);
 
     DocumentationUnitDTO childDocumentUnitDTO =
-        DocumentationUnitDTO.builder().documentNumber("abcdefghjikl").build();
+        DocumentationUnitDTO.builder()
+            .documentNumber("abcdefghjikl")
+            .decisionDate(LocalDate.parse("2021-01-01"))
+            .documentationOffice(documentationOfficeDTO)
+            .build();
     childDocumentUnitDTO = repository.save(childDocumentUnitDTO);
     final UUID childDocumentationUnitUuid = childDocumentUnitDTO.getId();
 
@@ -202,7 +221,12 @@ class PreviousDecisionIntegrationTest {
         DocumentUnit.builder()
             .uuid(parentDocumentUnitDTO.getId())
             .documentNumber("docnr12345678")
-            .previousDecisions(List.of(PreviousDecision.builder() /*documentationUnitId*/.build()))
+            .previousDecisions(
+                List.of(
+                    PreviousDecision.builder()
+                        .referencedDocumentationUnitId(childDocumentationUnitUuid)
+                        .documentNumber(childDocumentUnitDTO.getDocumentNumber())
+                        .build()))
             .coreData(CoreData.builder().documentationOffice(docOffice).build())
             .build();
 
@@ -218,7 +242,7 @@ class PreviousDecisionIntegrationTest {
         .consumeWith(
             response -> {
               assertThat(response.getResponseBody().previousDecisions())
-                  .extracting("documentationUnitId")
+                  .extracting("referencedDocumentationUnitId")
                   .containsExactly(childDocumentationUnitUuid);
             });
   }
@@ -259,7 +283,7 @@ class PreviousDecisionIntegrationTest {
 
   @Test
   @Disabled("should be done by jpa cascades")
-  void testRemoveProceedingDecisionLinkAndDeleteOrphanedDocumentUnit() {
+  void testRemovePreviousDecisionLinkAndDeleteOrphanedDocumentUnit() {
     DocumentationUnitDTO parentDocumentUnitDTO =
         DocumentationUnitDTO.builder()
             .documentationOffice(documentationOfficeDTO)
@@ -287,8 +311,17 @@ class PreviousDecisionIntegrationTest {
   }
 
   @Test
-  @Disabled("relevant if linking is migrated")
+  // TODO fix this test by checking for duplicates when adding a previous decision
+  @Disabled("should be fixed")
   void testLinkTheSameDocumentUnitsTwice() {
+    DocumentationUnitDTO childDocumentUnitDTO =
+        DocumentationUnitDTO.builder()
+            .documentNumber("xxx")
+            .documentationOffice(documentationOfficeDTO)
+            .build();
+    childDocumentUnitDTO = repository.save(childDocumentUnitDTO);
+    final UUID childDocumentationUnitUuid = childDocumentUnitDTO.getId();
+
     DocumentationUnitDTO parentDocumentUnitDTO =
         DocumentationUnitDTO.builder()
             .documentationOffice(documentationOfficeDTO)
@@ -302,8 +335,14 @@ class PreviousDecisionIntegrationTest {
             .documentNumber("docnr12345678")
             .previousDecisions(
                 List.of(
-                    PreviousDecision.builder() /*documentationUnitId*/.build(),
-                    PreviousDecision.builder() /*same documentationUnitId*/.build()))
+                    PreviousDecision.builder()
+                        .documentNumber("xxx")
+                        .referencedDocumentationUnitId(childDocumentationUnitUuid)
+                        .build(),
+                    PreviousDecision.builder()
+                        .documentNumber("xxx")
+                        .referencedDocumentationUnitId(childDocumentationUnitUuid)
+                        .build()))
             .coreData(CoreData.builder().documentationOffice(docOffice).build())
             .build();
 
@@ -319,293 +358,292 @@ class PreviousDecisionIntegrationTest {
         .consumeWith(
             response -> {
               assertThat(response.getResponseBody().previousDecisions())
-                  .extracting("documentationUnitId")
+                  .extracting("documentNumber")
                   .containsExactly("xxx");
             });
   }
 
-  // TODO: tests for search
-  //  @Test
-  //  void testSearchForDocumentUnitsByProceedingDecisionInput_noSearchCriteria_shouldMatchAll() {
-  //    prepareDocumentUnitMetadataDTOs();
-  //    simulateAPICall(ProceedingDecision.builder().build())
-  //        .jsonPath("$.content")
-  //        .isNotEmpty()
-  //        .jsonPath("$.content.length()")
-  //        .isEqualTo(3);
-  //  }
-  //
-  //  @Test
-  //  void testSearchForDocumentUnitsByProceedingDecisionInput_onlyDate_shouldMatchOne() {
-  //    LocalDate date1 = prepareDocumentUnitMetadataDTOs();
-  //    simulateAPICall(ProceedingDecision.builder().decisionDate(date1).build())
-  //        .jsonPath("$.content")
-  //        .isNotEmpty()
-  //        .jsonPath("$.content.length()")
-  //        .isEqualTo(1)
-  //        .jsonPath("$.content[0].decisionDate")
-  //        .isEqualTo(date1.toString());
-  //  }
-  //
-  //  @Test
-  //  void testSearchForDocumentUnitsByProceedingDecisionInput_onlyCourt_shouldMatchOne() {
-  //    prepareDocumentUnitMetadataDTOs();
-  //    simulateAPICall(
-  //
-  // ProceedingDecision.builder().court(Court.builder().type("SomeCourt").build()).build())
-  //        .consumeWith(
-  //            result -> {
-  //              System.out.println("result = " + result.toString());
-  //            })
-  //        .jsonPath("$.content")
-  //        .isNotEmpty()
-  //        .jsonPath("$.content.length()")
-  //        .isEqualTo(1)
-  //        .jsonPath("$.content[0].court.type")
-  //        .isEqualTo("SomeCourt");
-  //  }
-  //
-  //  @Test
-  //  void testSearchForDocumentUnitsByProceedingDecisionInput_onlyFileNumber_shouldMatchTwo() {
-  //    prepareDocumentUnitMetadataDTOs();
-  //    simulateAPICall(ProceedingDecision.builder().fileNumber("AkteX").build())
-  //        .jsonPath("$.content")
-  //        .isNotEmpty()
-  //        .jsonPath("$.content.length()")
-  //        .isEqualTo(2)
-  //        .jsonPath("$.content[0].fileNumber")
-  //        .isEqualTo("AkteX");
-  //  }
-  //
-  //  @Test
-  //  void testSearchForDocumentUnitsByProceedingDecisionInput_onlyDocumentType_shouldMatchOne() {
-  //    prepareDocumentUnitMetadataDTOs();
-  //    simulateAPICall(
-  //            ProceedingDecision.builder()
-  //                .documentType(DocumentType.builder().jurisShortcut("GH").build())
-  //                .build())
-  //        .jsonPath("$.content")
-  //        .isArray()
-  //        .jsonPath("$.content.length()")
-  //        .isEqualTo(1)
-  //        .jsonPath("$.content[0].documentType.jurisShortcut")
-  //        .isEqualTo("GH");
-  //  }
-  //
-  //  @Test
-  //  void
-  //
-  // testSearchForDocumentUnitsByProceedingDecisionInput_threeMatchingOneDoesNot_shouldMatchNothing() {
-  //    LocalDate date1 = prepareDocumentUnitMetadataDTOs();
-  //    simulateAPICall(
-  //            ProceedingDecision.builder()
-  //                .decisionDate(date1)
-  //                .court(Court.builder().type("SomeCourt").build())
-  //                .fileNumber("AkteX")
-  //                .documentType(DocumentType.builder().jurisShortcut("XY").build())
-  //                .build())
-  //        .jsonPath("$.content.length()")
-  //        .isEqualTo(0);
-  //  }
-  //
-  //  @Test
-  //  void testSearchForDocumentUnitsByProceedingDecisionInput_shouldOnlyFindPublished() {
-  //    LocalDate date = LocalDate.parse("2023-02-02T00:00:00.00Z");
-  //
-  //    var du1 =
-  //        createDocumentUnit(
-  //            "Court1",
-  //            "Berlin",
-  //            date,
-  //            List.of("AkteZ"),
-  //            "EF",
-  //            "DigitalService",
-  //
-  // DocumentUnitStatus.builder().publicationStatus(PublicationStatus.UNPUBLISHED).build());
-  //    var du2 =
-  //        createDocumentUnit(
-  //            "Court2",
-  //            "Berlin",
-  //            date,
-  //            List.of("AkteZ"),
-  //            "EF",
-  //            "DigitalService",
-  //
-  // DocumentUnitStatus.builder().publicationStatus(PublicationStatus.PUBLISHED).build());
-  //
-  //    var du4 =
-  //        createDocumentUnit(
-  //            "Court4",
-  //            "Berlin",
-  //            date,
-  //            List.of("AkteZ"),
-  //            "EF",
-  //            "CC-RIS",
-  //
-  // DocumentUnitStatus.builder().publicationStatus(PublicationStatus.UNPUBLISHED).build());
-  //
-  //    var du5 =
-  //        createDocumentUnit(
-  //            "Court5",
-  //            "Berlin",
-  //            date,
-  //            List.of("AkteZ"),
-  //            "EF",
-  //            "CC-RIS",
-  //
-  // DocumentUnitStatus.builder().publicationStatus(PublicationStatus.PUBLISHED).build());
-  //    var du6 =
-  //        createDocumentUnit(
-  //            "Court6",
-  //            "Berlin",
-  //            date,
-  //            List.of("AkteZ"),
-  //            "EF",
-  //            "CC-RIS",
-  //            DocumentUnitStatus.builder()
-  //                .publicationStatus(PublicationStatus.JURIS_PUBLISHED)
-  //                .build());
-  //
-  //    simulateAPICall(ProceedingDecision.builder().fileNumber("AkteZ").build())
-  //        .jsonPath("$.content.length()")
-  //        .isEqualTo(3)
-  //        .jsonPath("$.content[?(@.uuid=='" + du1.getUuid() + "')]")
-  //        .isEmpty()
-  //        .jsonPath("$.content[?(@.uuid=='" + du2.getUuid() + "')]")
-  //        .isArray()
-  //        .jsonPath("$.content[?(@.uuid=='" + du4.getUuid() + "')]")
-  //        .isEmpty()
-  //        .jsonPath("$.content[?(@.uuid=='" + du5.getUuid() + "')]")
-  //        .isArray()
-  //        .jsonPath("$.content[?(@.uuid=='" + du6.getUuid() + "')]")
-  //        .isArray();
-  //  }
-  //
-  //  private LocalDate prepareDocumentUnitMetadataDTOs() {
-  //    LocalDate date1 = LocalDate.parse("2023-01-02T00:00:00.00Z");
-  //    DocumentUnitMetadataDTO documentUnit1 =
-  //        createDocumentUnit(
-  //            "SomeCourt",
-  //            "Berlin",
-  //            date1,
-  //            List.of("AkteX", "AkteY"),
-  //            "CD",
-  //            "DigitalService",
-  //
-  // DocumentUnitStatus.builder().publicationStatus(PublicationStatus.PUBLISHED).build());
-  //
-  //    LocalDate date2 = LocalDate.parse("2023-02-03T00:00:00.00Z");
-  //    DocumentUnitMetadataDTO documentUnit2 =
-  //        createDocumentUnit(
-  //            "AnotherCourt",
-  //            "Hamburg",
-  //            date2,
-  //            null,
-  //            "EF",
-  //            "DigitalService",
-  //
-  // DocumentUnitStatus.builder().publicationStatus(PublicationStatus.PUBLISHED).build());
-  //
-  //    LocalDate date3 = LocalDate.parse("2023-03-04T00:00:00.00Z");
-  //    DocumentUnitMetadataDTO documentUnit3 =
-  //        createDocumentUnit(
-  //            "YetAnotherCourt",
-  //            "Munich",
-  //            date3,
-  //            List.of("AkteX"),
-  //            "GH",
-  //            "DigitalService",
-  //
-  // DocumentUnitStatus.builder().publicationStatus(PublicationStatus.PUBLISHED).build());
-  //    return date1;
-  //  }
-  //
-  //  private BodyContentSpec simulateAPICall(ProceedingDecision proceedingDecisionSearchInput) {
-  //    return risWebTestClient
-  //        .withDefaultLogin()
-  //        .put()
-  //        .uri("/api/v1/caselaw/documentunits/search-by-linked-documentation-unit?pg=0&sz=30")
-  //        .bodyValue(proceedingDecisionSearchInput)
-  //        .exchange()
-  //        .expectStatus()
-  //        .isOk()
-  //        .expectBody();
-  //  }
-  //
-  //  private DocumentUnitMetadataDTO createDocumentUnit(
-  //      String courtType,
-  //      String courtLocation,
-  //      LocalDate decisionDate,
-  //      List<String> fileNumbers,
-  //      String documentTypeJurisShortcut,
-  //      String documentOfficeLabel,
-  //      DocumentUnitStatus status) {
-  //
-  //    UUID documentTypeId = null;
-  //    if (documentTypeJurisShortcut != null) {
-  //
-  //      var documentType =
-  //          databaseDocumentTypeRepository.findFirstByAbbreviationAndCategory(
-  //              documentTypeJurisShortcut, category);
-  //
-  //      if (documentType == null) {
-  //        DocumentTypeDTO documentTypeDTO =
-  //            DocumentTypeDTO.builder()
-  //                .category(category)
-  //                .label("ABC123")
-  //                .multiple(true)
-  //                .abbreviation(documentTypeJurisShortcut)
-  //                .build();
-  //        documentTypeId = databaseDocumentTypeRepository.saveAndFlush(documentTypeDTO).getId();
-  //      } else {
-  //        documentTypeId = documentType.getId();
-  //      }
-  //    }
-  //
-  //    DocumentationOfficeDTO documentOffice =
-  //        documentationOfficeRepository.findByAbbreviation(documentOfficeLabel);
-  //    assertThat(documentOffice).isNotNull();
-  //
-  //    DocumentUnitMetadataDTO documentUnitMetadataDTO =
-  //        DocumentUnitMetadataDTO.builder()
-  //            .uuid(UUID.randomUUID())
-  //            .documentationOfficeId(documentOffice.getId())
-  //            .documentnumber(RandomStringUtils.randomAlphanumeric(13))
-  //            .creationtimestamp(Instant.now())
-  //            .courtType(courtType)
-  //            .courtLocation(courtLocation)
-  //            .decisionDate(decisionDate)
-  //            .documentTypeId(documentTypeId)
-  //            .dataSource(DataSource.NEURIS)
-  //            .documentationOfficeId(documentOffice.getId())
-  //            .build();
-  //    Long id = metadataRepository.save(documentUnitMetadataDTO).block().getId();
-  //
-  //    List<FileNumberDTO> fileNumberDTOs;
-  //    if (fileNumbers != null) {
-  //      fileNumberDTOs =
-  //          fileNumbers.stream()
-  //              .map(fn -> FileNumberDTO.builder().fileNumber(fn).documentUnitId(id).build())
-  //              .collect(Collectors.toList());
-  //      fileNumberRepository.saveAll(fileNumberDTOs).collectList().block();
-  //    }
-  //
-  //    if (status == null) {
-  //      return documentUnitMetadataDTO;
-  //    }
-  //
-  //    assertThat(
-  //            statusRepository
-  //                .save(
-  //                    DocumentUnitStatusDTO.builder()
-  //                        .id(UUID.randomUUID())
-  //                        .documentUnitId(documentUnitMetadataDTO.getUuid())
-  //                        .publicationStatus(status.publicationStatus())
-  //                        .withError(status.withError())
-  //                        .newEntry(true)
-  //                        .build())
-  //                .block())
-  //        .isNotNull();
-  //    return documentUnitMetadataDTO;
-  //  }
+  @Test
+  void testSearchForDocumentUnitsByPreviousDecisionInput_noSearchCriteria_shouldMatchAll() {
+    prepareDocumentUnitMetadataDTOs();
+    simulateAPICall(PreviousDecision.builder().build())
+        .jsonPath("$.content")
+        .isNotEmpty()
+        .jsonPath("$.content.length()")
+        .isEqualTo(3);
+  }
+
+  @Test
+  void testSearchForDocumentUnitsByPreviousDecisionInput_onlyDate_shouldMatchOne() {
+    LocalDate date1 = prepareDocumentUnitMetadataDTOs();
+    simulateAPICall(PreviousDecision.builder().decisionDate(date1).build())
+        .jsonPath("$.content")
+        .isNotEmpty()
+        .jsonPath("$.content.length()")
+        .isEqualTo(1)
+        .jsonPath("$.content[0].decisionDate")
+        .isEqualTo(date1.toString());
+  }
+
+  @Test
+  void testSearchForDocumentUnitsByPreviousDecisionInput_onlyCourt_shouldMatchOne() {
+    prepareDocumentUnitMetadataDTOs();
+    simulateAPICall(
+            PreviousDecision.builder().court(Court.builder().type("SomeCourt").build()).build())
+        .consumeWith(
+            result -> {
+              System.out.println("result = " + result.toString());
+            })
+        .jsonPath("$.content")
+        .isNotEmpty()
+        .jsonPath("$.content.length()")
+        .isEqualTo(1)
+        .jsonPath("$.content[0].court.type")
+        .isEqualTo("SomeCourt");
+  }
+
+  @Test
+  void testSearchForDocumentUnitsByPreviousDecisionInput_onlyFileNumber_shouldMatchTwo() {
+    prepareDocumentUnitMetadataDTOs();
+    simulateAPICall(PreviousDecision.builder().fileNumber("AkteX").build())
+        .jsonPath("$.content")
+        .isNotEmpty()
+        .jsonPath("$.content.length()")
+        .isEqualTo(2)
+        .jsonPath("$.content[0].fileNumber")
+        .isEqualTo("AkteX");
+  }
+
+  @Test
+  @Disabled
+  // TODO fix this test by making sure the DocumentType is properly searched for
+  void testSearchForDocumentUnitsByPreviousDecisionInput_onlyDocumentType_shouldMatchOne() {
+    prepareDocumentUnitMetadataDTOs();
+    simulateAPICall(
+            PreviousDecision.builder()
+                .documentType(DocumentType.builder().jurisShortcut("GH").label("ABC123").build())
+                .build())
+        .jsonPath("$.content")
+        .isArray()
+        .jsonPath("$.content.length()")
+        .isEqualTo(1)
+        .jsonPath("$.content[0].documentType.jurisShortcut")
+        .isEqualTo("GH");
+  }
+
+  @Test
+  @Disabled
+  // TODO fix this test by making sure the DocumentType is properly searched for
+  void
+      testSearchForDocumentUnitsByPreviousDecisionInput_threeMatchingOneDoesNot_shouldMatchNothing() {
+    LocalDate date1 = prepareDocumentUnitMetadataDTOs();
+    simulateAPICall(
+            PreviousDecision.builder()
+                .decisionDate(date1)
+                .court(Court.builder().type("SomeCourt").build())
+                .fileNumber("AkteX")
+                .documentType(DocumentType.builder().jurisShortcut("XY").build())
+                .build())
+        .jsonPath("$.content.length()")
+        .isEqualTo(0);
+  }
+
+  @Test
+  @Disabled("should be fixed")
+  // TODO fix this test by making sure only published DocumentUnits are found
+  void testSearchForDocumentUnitsByPreviousDecisionInput_shouldOnlyFindPublished() {
+    LocalDate date = LocalDate.parse("2023-02-02");
+
+    var du1 =
+        createDocumentUnit(
+            CourtDTO.builder().type("Court1").location("Berlin").build(),
+            date,
+            List.of("AkteZ"),
+            "EF",
+            "DS",
+            Status.builder().publicationStatus(PublicationStatus.UNPUBLISHED).build());
+    var du2 =
+        createDocumentUnit(
+            CourtDTO.builder().type("Court2").location("Berlin").build(),
+            date,
+            List.of("AkteZ"),
+            "EF",
+            "DS",
+            Status.builder().publicationStatus(PublicationStatus.PUBLISHED).build());
+
+    var du4 =
+        createDocumentUnit(
+            CourtDTO.builder().type("Court4").location("Berlin").build(),
+            date,
+            List.of("AkteZ"),
+            "EF",
+            "CC-RIS",
+            Status.builder().publicationStatus(PublicationStatus.UNPUBLISHED).build());
+
+    var du5 =
+        createDocumentUnit(
+            CourtDTO.builder().type("Court5").location("Berlin").build(),
+            date,
+            List.of("AkteZ"),
+            "EF",
+            "CC-RIS",
+            Status.builder().publicationStatus(PublicationStatus.PUBLISHED).build());
+
+    simulateAPICall(PreviousDecision.builder().fileNumber("AkteZ").build())
+        .jsonPath("$.content.length()")
+        .isEqualTo(2)
+        .jsonPath("$.content[?(@.uuid=='" + du1.getId() + "')]")
+        .isEmpty()
+        .jsonPath("$.content[?(@.uuid=='" + du2.getId() + "')]")
+        .isArray()
+        .jsonPath("$.content[?(@.uuid=='" + du4.getId() + "')]")
+        .isEmpty()
+        .jsonPath("$.content[?(@.uuid=='" + du5.getId() + "')]")
+        .isArray();
+  }
+
+  private LocalDate prepareDocumentUnitMetadataDTOs() {
+    LocalDate date1 = LocalDate.parse("2023-01-02");
+    DocumentationUnitMetadataDTO documentUnit1 =
+        createDocumentUnit(
+            CourtDTO.builder().type("SomeCourt").location("Berlin").build(),
+            date1,
+            List.of("AkteX", "AkteY"),
+            "CD",
+            "DS",
+            Status.builder().publicationStatus(PublicationStatus.PUBLISHED).build());
+
+    LocalDate date2 = LocalDate.parse("2023-02-03");
+    DocumentationUnitMetadataDTO documentUnit2 =
+        createDocumentUnit(
+            CourtDTO.builder().type("AnotherCourt").location("Hamburg").build(),
+            date2,
+            null,
+            "EF",
+            "DS",
+            Status.builder().publicationStatus(PublicationStatus.PUBLISHED).build());
+
+    LocalDate date3 = LocalDate.parse("2023-03-04");
+    DocumentationUnitMetadataDTO documentUnit3 =
+        createDocumentUnit(
+            CourtDTO.builder().type("YetAnotherCourt").location("Munich").build(),
+            date3,
+            List.of("AkteX"),
+            "GH",
+            "DS",
+            Status.builder().publicationStatus(PublicationStatus.PUBLISHED).build());
+    return date1;
+  }
+
+  private WebTestClient.BodyContentSpec simulateAPICall(
+      PreviousDecision PreviousDecisionSearchInput) {
+    return risWebTestClient
+        .withDefaultLogin()
+        .put()
+        .uri("/api/v1/caselaw/documentunits/search-by-linked-documentation-unit?pg=0&sz=30")
+        .bodyValue(PreviousDecisionSearchInput)
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody();
+  }
+
+  private DocumentationUnitDTO createDocumentUnit(
+      CourtDTO court,
+      LocalDate decisionDate,
+      List<String> fileNumbers,
+      String documentTypeJurisShortcut,
+      String documentOfficeLabel,
+      Status status) {
+
+    DocumentTypeDTO documentTypeDTO = null;
+    if (documentTypeJurisShortcut != null) {
+
+      var documentType =
+          databaseDocumentTypeRepository.findFirstByAbbreviationAndCategory(
+              documentTypeJurisShortcut, category);
+
+      if (documentType == null) {
+        documentTypeDTO =
+            DocumentTypeDTO.builder()
+                .category(category)
+                .label("ABC123")
+                .multiple(true)
+                .abbreviation(documentTypeJurisShortcut)
+                .build();
+        documentTypeDTO = databaseDocumentTypeRepository.saveAndFlush(documentTypeDTO);
+      }
+    }
+
+    if (court != null) {
+
+      var existingcourt =
+          courtRepository.findByTypeAndLocation(court.getType(), court.getLocation());
+
+      if (existingcourt.isEmpty()) {
+        court =
+            courtRepository.saveAndFlush(
+                court.toBuilder()
+                    .jurisId(new Random().nextInt(100))
+                    .isForeignCourt(false)
+                    .isSuperiorCourt(false)
+                    .id(UUID.randomUUID())
+                    .build());
+      } else {
+        court = existingcourt.get(0);
+      }
+    }
+
+    DocumentationOfficeDTO documentOffice =
+        documentationOfficeRepository.findByAbbreviation(documentOfficeLabel);
+    assertThat(documentOffice).isNotNull();
+
+    DocumentationUnitDTO documentationUnitDTO =
+        DocumentationUnitDTO.builder()
+            .id(UUID.randomUUID())
+            .documentationOffice(documentOffice)
+            .documentNumber(RandomStringUtils.randomAlphanumeric(13))
+            .court(court)
+            .decisionDate(decisionDate)
+            .documentType(documentTypeDTO)
+            .documentationOffice(documentOffice)
+            .build();
+    documentationUnitDTO = repository.save(documentationUnitDTO);
+
+    UUID docUnitId = documentationUnitDTO.getId();
+
+    documentationUnitDTO =
+        documentationUnitDTO.toBuilder()
+            .status(
+                status == null
+                    ? null
+                    : List.of(
+                        StatusDTO.builder()
+                            .id(UUID.randomUUID())
+                            .publicationStatus(status.publicationStatus())
+                            .withError(status.withError())
+                            .documentationUnitDTO(documentationUnitDTO)
+                            .build()))
+            .build();
+
+    if (fileNumbers != null) {
+      documentationUnitDTO
+          .getFileNumbers()
+          .addAll(
+              fileNumbers.stream()
+                  .map(
+                      fn ->
+                          FileNumberDTO.builder()
+                              .value(fn)
+                              .rank(1L)
+                              .documentationUnit(
+                                  DocumentationUnitDTO.builder().id(docUnitId).build())
+                              .build())
+                  .toList());
+    }
+
+    documentationUnitDTO = repository.save(documentationUnitDTO);
+
+    return documentationUnitDTO;
+  }
 }

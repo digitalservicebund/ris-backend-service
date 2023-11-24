@@ -30,6 +30,7 @@ function renderComponent(options?: { modelValue?: ActiveCitation[] }) {
 function generateActiveCitation(options?: {
   uuid?: string
   documentNumber?: string
+  referencedDocumentationUnitId?: string
   court?: Court
   decisionDate?: string
   fileNumber?: string
@@ -38,7 +39,9 @@ function generateActiveCitation(options?: {
 }) {
   const activeCitation = new ActiveCitation({
     uuid: options?.uuid ?? "123",
-    // documentNumber: "ABC",
+    documentNumber: options?.documentNumber ?? undefined,
+    referencedDocumentationUnitId:
+      options?.referencedDocumentationUnitId ?? undefined,
     court: options?.court ?? {
       type: "type1",
       location: "location1",
@@ -398,25 +401,29 @@ describe("Active Citations", () => {
     ).not.toBeInTheDocument()
   })
 
-  // Todo: enable again when linking possible
-  // it("renders limited edit view if linked document unit", async () => {
-  //   const { user } = renderComponent({
-  //     modelValue: [generateActiveCitation()],
-  //   })
+  it("renders limited edit view if linked document unit", async () => {
+    const { user } = renderComponent({
+      modelValue: [
+        generateActiveCitation({
+          documentNumber: "ABC",
+          referencedDocumentationUnitId: "abc",
+        }),
+      ],
+    })
 
-  //   await user.click(screen.getByLabelText("Eintrag bearbeiten"))
+    await user.click(screen.getByLabelText("Eintrag bearbeiten"))
 
-  //   expect(screen.getByLabelText("Art der Zitierung")).toBeVisible()
-  //   ;[
-  //     "Gericht der Aktivzitierung",
-  //     "Entscheidungsdatum der Aktivzitierung",
-  //     "Aktenzeichen der Aktivzitierung",
-  //     "Dokumenttyp der Aktivzitierung",
-  //     "Nach Entscheidung suchen",
-  //   ].forEach((label) =>
-  //     expect(screen.queryByLabelText(label)).not.toBeInTheDocument(),
-  //   )
-  // })
+    expect(screen.getByLabelText("Art der Zitierung")).toBeVisible()
+    ;[
+      "Gericht der Aktivzitierung",
+      "Entscheidungsdatum der Aktivzitierung",
+      "Aktenzeichen der Aktivzitierung",
+      "Dokumenttyp der Aktivzitierung",
+      "Nach Entscheidung suchen",
+    ].forEach((label) =>
+      expect(screen.queryByLabelText(label)).not.toBeInTheDocument(),
+    )
+  })
 
   it("lists search results", async () => {
     const { user } = renderComponent()
@@ -477,20 +484,19 @@ describe("Active Citations", () => {
     expect(getStyleValidation()).toBeVisible()
   })
 
-  // Todo: enable again when linking possible
-  // it("shows missing citationStyle validation for linked decision", async () => {
-  //   renderComponent({
-  //     modelValue: [
-  //       generateActiveCitation({
-  //         citationStyle: {
-  //           uuid: undefined,
-  //           jurisShortcut: undefined,
-  //           label: "invalid",
-  //         },
-  //       }),
-  //     ],
-  //   })
+  it("shows missing citationStyle validation for linked decision", async () => {
+    renderComponent({
+      modelValue: [
+        generateActiveCitation({
+          documentNumber: "123",
+          referencedDocumentationUnitId: "123",
+          citationStyle: {
+            label: "invalid",
+          },
+        }),
+      ],
+    })
 
-  //   expect(screen.getByText("Art der Zitierung")).toBeVisible()
-  // })
+    expect(screen.getByText("Art der Zitierung")).toBeVisible()
+  })
 })

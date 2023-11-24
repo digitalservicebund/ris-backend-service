@@ -17,6 +17,11 @@ public class PreviousDecision extends RelatedDocumentationUnit {
   private boolean dateKnown = true;
 
   public boolean hasNoValues() {
-    return court == null && decisionDate == null && fileNumber == null && documentType == null;
+    return court == null
+        && decisionDate == null
+        && fileNumber == null
+        && documentType == null
+        && documentNumber == null
+        && referencedDocumentationUnitId == null;
   }
 }

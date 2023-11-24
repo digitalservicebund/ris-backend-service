@@ -150,6 +150,7 @@ describe("NormReferenceEntry", () => {
             abbreviation: "1000g-BefV",
           },
           singleNorm: undefined,
+          hasForeignSource: false,
         },
       ],
     ])

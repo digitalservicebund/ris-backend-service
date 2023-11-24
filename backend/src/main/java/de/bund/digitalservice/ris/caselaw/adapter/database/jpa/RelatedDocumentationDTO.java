@@ -61,9 +61,9 @@ public abstract class RelatedDocumentationDTO {
   @Column @NotNull private Integer rank;
 
   @ManyToOne
-  @JoinColumn(name = "documentation_unit_id", referencedColumnName = "id")
+  @JoinColumn(name = "referenced_documentation_unit_id", referencedColumnName = "id")
   private DocumentationUnitDTO referencedDocumentationUnit;
 
-  @Column(name = "documentation_unit_id", insertable = false, updatable = false)
+  @Column(name = "referenced_documentation_unit_id", insertable = false, updatable = false)
   private UUID referencedDocumentationUnitId;
 }

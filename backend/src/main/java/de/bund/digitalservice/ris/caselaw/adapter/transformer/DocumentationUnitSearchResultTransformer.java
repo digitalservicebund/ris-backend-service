@@ -27,6 +27,7 @@ public class DocumentationUnitSearchResultTransformer {
     builder
         .uuid(documentationUnitSearchResultDTO.getId())
         .documentNumber(documentationUnitSearchResultDTO.getDocumentNumber())
+        .referencedDocumentationUnitId(documentationUnitSearchResultDTO.getId())
         .decisionDate(documentationUnitSearchResultDTO.getDecisionDate())
         .fileName(
             documentationUnitSearchResultDTO.getOriginalFileDocument() == null

@@ -21,11 +21,11 @@ import lombok.experimental.SuperBuilder;
 public class RelatedDocumentationUnit {
   protected UUID uuid;
   protected String documentNumber;
-  protected UUID documentationUnitId;
   protected Court court;
   protected LocalDate decisionDate;
   protected String fileNumber;
   protected DocumentType documentType;
+  protected UUID referencedDocumentationUnitId;
 
   @Transient
   public boolean isEmpty() {
@@ -35,6 +35,6 @@ public class RelatedDocumentationUnit {
         && decisionDate == null
         && fileNumber == null
         && documentType == null
-        && documentationUnitId == null;
+        && referencedDocumentationUnitId == null;
   }
 }

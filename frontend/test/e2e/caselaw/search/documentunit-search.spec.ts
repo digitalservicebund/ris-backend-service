@@ -66,7 +66,7 @@ test.describe("search", () => {
     await page.getByLabel("Nur meine Dokstelle Filter").click()
     await page.getByLabel("Nach Dokumentationseinheiten suchen").click()
     // TODO: investigate on why this is no longer visible
-    // await expect(page.getByLabel("Ladestatus")).toBeVisible()
+    await expect(page.getByLabel("Ladestatus")).toBeVisible()
 
     //results
     await page
@@ -98,10 +98,10 @@ test.describe("search", () => {
     await page.getByLabel("Nach Dokumentationseinheiten suchen").click()
 
     // TODO: investigate on why this is no longer visible
-    // await expect(page.getByLabel("Infomodal")).toBeVisible({ timeout: 30000 }) // RISDEV-2269
-    // await expect(
-    //   page.getByText("Die Suchergebnisse konnten nicht geladen werden."),
-    // ).toBeVisible()
+    await expect(page.getByLabel("Infomodal")).toBeVisible({ timeout: 30000 }) // RISDEV-2269
+    await expect(
+      page.getByText("Die Suchergebnisse konnten nicht geladen werden."),
+    ).toBeVisible()
   })
 
   test("starting search with all kinds of errors or no search parameters not possible", async ({
@@ -125,7 +125,7 @@ test.describe("search", () => {
     await page.getByLabel("Nach Dokumentationseinheiten suchen").click()
     await expect(page.getByText("Fehler in Suchkriterien")).toBeHidden()
     // TODO: investigate on why this is no longer visible
-    // await expect(page.getByLabel("Ladestatus")).toBeVisible()
+    await expect(page.getByLabel("Ladestatus")).toBeVisible()
   })
 
   // Datumskomponente Zeitraum

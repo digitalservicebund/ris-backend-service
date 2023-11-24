@@ -293,9 +293,7 @@ test.describe("ensuing decisions", () => {
     ).toHaveCount(1)
   })
 
-  //Todo enable again when linking possible
-  // eslint-disable-next-line playwright/no-skipped-test
-  test.skip("search for documentunits and link as ensuing decision", async ({
+  test("search for documentunits and link as ensuing decision", async ({
     page,
     documentNumber,
     prefilledDocumentUnit,

@@ -9,6 +9,7 @@ function renderComponent(options?: {
   documentType?: DocumentType
   decisionDate?: string
   documentNumber?: string
+  referencedDocumentationUnitId?: string
 }) {
   const props: { decision: PreviousDecision } = {
     decision: new PreviousDecision({
@@ -24,7 +25,9 @@ function renderComponent(options?: {
         },
         decisionDate:
           options?.decisionDate ?? "2004-12-02 12:00:00.000000 +00:00",
-        documentNumber: options?.documentNumber ?? "testDocumentNumber",
+        documentNumber: options?.documentNumber ?? undefined,
+        referencedDocumentationUnitId:
+          options?.referencedDocumentationUnitId ?? undefined,
       },
     }),
   }
@@ -74,14 +77,14 @@ describe("Decision ListItem", () => {
     expect(await screen.findByText(/27.03.2022/)).toBeVisible()
   })
 
-  // Todo: enable again when linking possible
-  // it("renders with link if linked to docunit", async () => {
-  //   renderComponent({
-  //     documentNumber: "fooDocumentNumber",
-  //   })
-  //   expect(screen.getByRole("link")).toHaveAttribute(
-  //     "href",
-  //     expect.stringMatching(/fooDocumentNumber/),
-  //   )
-  // })
+  it("renders with link if linked to docunit", async () => {
+    renderComponent({
+      documentNumber: "fooDocumentNumber",
+      referencedDocumentationUnitId: "abc",
+    })
+    expect(screen.getByRole("link")).toHaveAttribute(
+      "href",
+      expect.stringMatching(/fooDocumentNumber/),
+    )
+  })
 })

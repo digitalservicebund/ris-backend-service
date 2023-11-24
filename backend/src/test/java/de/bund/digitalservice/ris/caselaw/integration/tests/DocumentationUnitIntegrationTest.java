@@ -427,7 +427,7 @@ class DocumentationUnitIntegrationTest {
               String responseBody = new String(response.getResponseBody(), StandardCharsets.UTF_8);
               assertThat(responseBody).isNotNull();
 
-              List<String> uuids = JsonPath.read(responseBody, "$.content[*].documentationUnitId");
+              List<String> uuids = JsonPath.read(responseBody, "$.content[*].uuid");
               assertThat(uuids).hasSize(20);
               responseUUIDs.addAll(uuids.stream().map(UUID::fromString).toList());
             });
@@ -450,7 +450,7 @@ class DocumentationUnitIntegrationTest {
               String responseBody = new String(response.getResponseBody(), StandardCharsets.UTF_8);
               assertThat(responseBody).isNotNull();
 
-              List<String> uuids = JsonPath.read(responseBody, "$.content[*].documentationUnitId");
+              List<String> uuids = JsonPath.read(responseBody, "$.content[*].uuid");
               List<UUID> responseUUIDs2 = uuids.stream().map(UUID::fromString).toList();
 
               assertThat(responseUUIDs2).isEqualTo(responseUUIDs);
