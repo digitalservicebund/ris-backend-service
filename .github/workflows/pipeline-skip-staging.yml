@@ -28,7 +28,7 @@ jobs:
         with:
           java-version: "17.0"
           distribution: "temurin"
-      - uses: gradle/gradle-build-action@9bca466e2722baf9e77b4f929bbe0af18848791f
+      - uses: gradle/gradle-build-action@87a9a15658c426a54dd469d4fc7dc1a73ca9d4a6
         with:
           gradle-version: ${{ env.GRADLE_VERSION }}
           arguments: build --profile -x integrationTest -x test
@@ -48,7 +48,7 @@ jobs:
         with:
           java-version: "17.0"
           distribution: "temurin"
-      - uses: gradle/gradle-build-action@9bca466e2722baf9e77b4f929bbe0af18848791f
+      - uses: gradle/gradle-build-action@87a9a15658c426a54dd469d4fc7dc1a73ca9d4a6
         with:
           gradle-version: ${{ env.GRADLE_VERSION}}
           arguments: test -x integrationTest
@@ -67,7 +67,7 @@ jobs:
         with:
           java-version: "17.0"
           distribution: "temurin"
-      - uses: gradle/gradle-build-action@9bca466e2722baf9e77b4f929bbe0af18848791f
+      - uses: gradle/gradle-build-action@87a9a15658c426a54dd469d4fc7dc1a73ca9d4a6
         with:
           gradle-version: ${{ env.GRADLE_VERSION }}
           arguments: integrationTest -x test
@@ -91,7 +91,7 @@ jobs:
         with:
           java-version: "17.0"
           distribution: "temurin"
-      - uses: gradle/gradle-build-action@9bca466e2722baf9e77b4f929bbe0af18848791f
+      - uses: gradle/gradle-build-action@87a9a15658c426a54dd469d4fc7dc1a73ca9d4a6
         with:
           gradle-version: ${{ env.GRADLE_VERSION }}
           arguments: bootBuildImage
