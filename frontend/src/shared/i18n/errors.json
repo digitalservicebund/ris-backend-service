@@ -13,7 +13,7 @@
   },
   "SERVER_ERROR_DROPDOWN": {
     "title": "Serverfehler.",
-    "description": "Dropdown Items konnten nicht geladen werden."
+    "description": "Dropdown-Items konnten nicht geladen werden."
   },
   "FEATURE_TOGGLE_COULD_NOT_BE_LOADED": {
     "title": "Feature toggle konnten nicht geladen werden.",
@@ -44,7 +44,7 @@
     "description": ""
   },
   "DOCUMENT_UNIT_NOT_ALLOWED": {
-    "title": "Diese Dokumentationseinheit existiert nicht oder sie haben keine Berechtigung",
+    "title": "Diese Dokumentationseinheit existiert nicht oder Sie haben keine Berechtigung.",
     "description": ""
   },
   "DOCUMENT_UNIT_CREATION_FAILED": {
@@ -88,11 +88,11 @@
     "description": ""
   },
   "DOCUMENT_UNIT_FIELDS_OF_LAW_COULD_NOT_BE_ADDED": {
-    "title": "Sachgebiet ${identifier} konnte nicht zu\n Dokumentationseinheit ${uuid} hinzugefügt werden",
+    "title": "Sachgebiet ${identifier} konnte nicht zu\n Dokumentationseinheit ${uuid} hinzugefügt werden.",
     "description": ""
   },
   "DOCUMENT_UNIT_FIELDS_OF_LAW_COULD_NOT_BE_DELETED": {
-    "title": "Sachgebiet ${identifier} konnte nicht von der\n Dokumentationseinheit ${uuid} entfernt werden",
+    "title": "Sachgebiet ${identifier} konnte nicht von der\n Dokumentationseinheit ${uuid} entfernt werden.",
     "description": ""
   },
   "FIELDS_OF_LAW_COULD_NOT_BE_LOADED": {
@@ -108,11 +108,11 @@
     "description": ""
   },
   "KEYWORD_COULD_NOT_BE_ADDED": {
-    "title": "Schlagwort ${keyword} konnte nicht hinzugefügt werden",
+    "title": "Schlagwort ${keyword} konnte nicht hinzugefügt werden.",
     "description": ""
   },
   "KEYWORD_COULD_NOT_BE_DELETED": {
-    "title": "Schlagwort ${keyword} konnte nicht entfernt werden",
+    "title": "Schlagwort ${keyword} konnte nicht entfernt werden.",
     "description": ""
   },
   "KEYWORDS_COULD_NOT_BE_LOADED": {
@@ -128,7 +128,7 @@
     "description": ""
   },
   "DOCUMENT_UNIT_PROCEEDING_DECISION_COULD_NOT_BE_DELETED": {
-    "title": "Vorgehende Entscheidung ${childUuid} für die Dokumentationseinheit ${parentUuid} konnten nicht entfernt werden.",
+    "title": "Vorgehende Entscheidung ${childUuid} für die Dokumentationseinheit ${parentUuid} konnte nicht entfernt werden.",
     "description": ""
   },
   "FILE_TOO_BIG": {
