@@ -117,7 +117,7 @@ onMounted(() => {
 <template>
   <div>
     <InputField
-      id="regularCheckbox"
+      id="dateKnown"
       v-slot="{ id }"
       label="Datum unbekannt"
       :label-position="LabelPosition.RIGHT"

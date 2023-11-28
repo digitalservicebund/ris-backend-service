@@ -125,7 +125,7 @@ onMounted(() => {
 <template>
   <div>
     <InputField
-      id="regularCheckbox"
+      id="isPending"
       v-slot="{ id }"
       label="anhängig"
       :label-position="LabelPosition.RIGHT"
