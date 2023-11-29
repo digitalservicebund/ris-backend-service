@@ -77,6 +77,9 @@ public interface DatabaseDocumentationUnitRepository
     )
     ORDER BY documentationUnit.documentNumber
 """)
+  @SuppressWarnings(
+      "java:S107") // We use JPA repository interface magic, so reducing parameter count is not
+  // possible.
   Page<DocumentationUnitSearchResultDTO> searchByDocumentUnitSearchInput(
       UUID documentationOfficeId,
       String documentNumberOrFileNumber,

@@ -37,6 +37,9 @@ import lombok.Setter;
 @Builder(toBuilder = true)
 @Entity
 @Table(name = "documentation_unit", schema = "incremental_migration")
+@SuppressWarnings(
+    "java:S6539") // This class depends on many classes, because it's the key part and merging
+// everything.
 public class DocumentationUnitDTO
     implements DocumentationUnitSearchResultDTO, DocumentationUnitMetadataDTO {
 

@@ -139,11 +139,10 @@ class EnsuingDecisionsIntegrationTest {
         .expectBody(DocumentUnit.class)
         .consumeWith(
             response -> {
-              assertThat(response.getResponseBody().ensuingDecisions().size()).isEqualTo(2);
+              assertThat(response.getResponseBody().ensuingDecisions()).hasSize(2);
               assertThat(response.getResponseBody().ensuingDecisions().get(0).isPending())
-                  .isEqualTo(false);
-              assertThat(response.getResponseBody().ensuingDecisions().get(1).isPending())
-                  .isEqualTo(true);
+                  .isFalse();
+              assertThat(response.getResponseBody().ensuingDecisions().get(1).isPending()).isTrue();
             });
   }
 
@@ -158,8 +157,7 @@ class EnsuingDecisionsIntegrationTest {
         .isOk()
         .expectBody(DocumentUnit.class)
         .consumeWith(
-            response ->
-                assertThat(response.getResponseBody().ensuingDecisions().size()).isEqualTo(2));
+            response -> assertThat(response.getResponseBody().ensuingDecisions()).hasSize(2));
 
     DocumentUnit documentUnitFromFrontend =
         DocumentUnit.builder()
@@ -194,7 +192,7 @@ class EnsuingDecisionsIntegrationTest {
             response -> {
               assertThat(response.getResponseBody().ensuingDecisions()).hasSize(3);
               assertThat(response.getResponseBody().ensuingDecisions().get(2).isPending())
-                  .isEqualTo(false);
+                  .isFalse();
             });
   }
 

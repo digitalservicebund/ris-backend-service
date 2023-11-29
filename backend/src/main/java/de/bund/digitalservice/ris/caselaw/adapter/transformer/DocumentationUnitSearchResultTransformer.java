@@ -54,7 +54,9 @@ public class DocumentationUnitSearchResultTransformer {
                 : Status.builder()
                     // TODO is the first status the most recent?
                     .publicationStatus(
-                        documentationUnitSearchResultDTO.getStatus().get(0) == null
+                        documentationUnitSearchResultDTO.getStatus().get(0)
+                                == null // NOSONAR this is readable bc of indent and still has a
+                            // "todo" above
                             ? null
                             : documentationUnitSearchResultDTO
                                 .getStatus()

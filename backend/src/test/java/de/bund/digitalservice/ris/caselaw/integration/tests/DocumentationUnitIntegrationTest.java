@@ -188,7 +188,7 @@ class DocumentationUnitIntegrationTest {
     assertThat(documentUnitDTO.getStatus()).hasSize(1);
 
     assertThat(documentUnitDTO.getStatus().get(0).getPublicationStatus()).isEqualTo(UNPUBLISHED);
-    assertThat(documentUnitDTO.getStatus().get(0).isWithError()).isEqualTo(false);
+    assertThat(documentUnitDTO.getStatus().get(0).isWithError()).isFalse();
   }
 
   @Test

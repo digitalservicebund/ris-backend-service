@@ -158,9 +158,8 @@ class ActiveCitationIntegrationTest {
         .expectBody(DocumentUnit.class)
         .consumeWith(
             response -> {
-              assertThat(
-                      response.getResponseBody().contentRelatedIndexing().activeCitations().size())
-                  .isEqualTo(2);
+              assertThat(response.getResponseBody().contentRelatedIndexing().activeCitations())
+                  .hasSize(2);
               assertThat(
                       response
                           .getResponseBody()
@@ -194,13 +193,8 @@ class ActiveCitationIntegrationTest {
         .expectBody(DocumentUnit.class)
         .consumeWith(
             response ->
-                assertThat(
-                        response
-                            .getResponseBody()
-                            .contentRelatedIndexing()
-                            .activeCitations()
-                            .size())
-                    .isEqualTo(2));
+                assertThat(response.getResponseBody().contentRelatedIndexing().activeCitations())
+                    .hasSize(2));
 
     DocumentUnit documentUnitFromFrontend =
         DocumentUnit.builder()
@@ -249,9 +243,8 @@ class ActiveCitationIntegrationTest {
         .expectBody(DocumentUnit.class)
         .consumeWith(
             response -> {
-              assertThat(
-                      response.getResponseBody().contentRelatedIndexing().activeCitations().size())
-                  .isEqualTo(3);
+              assertThat(response.getResponseBody().contentRelatedIndexing().activeCitations())
+                  .hasSize(3);
               assertThat(
                       response
                           .getResponseBody()
@@ -279,9 +272,8 @@ class ActiveCitationIntegrationTest {
         .expectBody(DocumentUnit.class)
         .consumeWith(
             response -> {
-              assertThat(
-                      response.getResponseBody().contentRelatedIndexing().activeCitations().size())
-                  .isEqualTo(2);
+              assertThat(response.getResponseBody().contentRelatedIndexing().activeCitations())
+                  .hasSize(2);
               assertThat(
                       response
                           .getResponseBody()
@@ -349,9 +341,8 @@ class ActiveCitationIntegrationTest {
         .expectBody(DocumentUnit.class)
         .consumeWith(
             response -> {
-              assertThat(
-                      response.getResponseBody().contentRelatedIndexing().activeCitations().size())
-                  .isEqualTo(2);
+              assertThat(response.getResponseBody().contentRelatedIndexing().activeCitations())
+                  .hasSize(2);
               assertThat(
                       response
                           .getResponseBody()
@@ -394,13 +385,8 @@ class ActiveCitationIntegrationTest {
         .expectBody(DocumentUnit.class)
         .consumeWith(
             response ->
-                assertThat(
-                        response
-                            .getResponseBody()
-                            .contentRelatedIndexing()
-                            .activeCitations()
-                            .size())
-                    .isEqualTo(2));
+                assertThat(response.getResponseBody().contentRelatedIndexing().activeCitations())
+                    .hasSize(2));
 
     DocumentUnit documentUnitFromFrontend =
         DocumentUnit.builder()
@@ -443,9 +429,8 @@ class ActiveCitationIntegrationTest {
         .expectBody(DocumentUnit.class)
         .consumeWith(
             response -> {
-              assertThat(
-                      response.getResponseBody().contentRelatedIndexing().activeCitations().size())
-                  .isEqualTo(2);
+              assertThat(response.getResponseBody().contentRelatedIndexing().activeCitations())
+                  .hasSize(2);
             });
   }
 
@@ -461,13 +446,8 @@ class ActiveCitationIntegrationTest {
         .expectBody(DocumentUnit.class)
         .consumeWith(
             response ->
-                assertThat(
-                        response
-                            .getResponseBody()
-                            .contentRelatedIndexing()
-                            .activeCitations()
-                            .size())
-                    .isEqualTo(2));
+                assertThat(response.getResponseBody().contentRelatedIndexing().activeCitations())
+                    .hasSize(2));
 
     DocumentUnit documentUnitFromFrontend =
         DocumentUnit.builder()
@@ -503,9 +483,8 @@ class ActiveCitationIntegrationTest {
         .expectBody(DocumentUnit.class)
         .consumeWith(
             response -> {
-              assertThat(
-                      response.getResponseBody().contentRelatedIndexing().activeCitations().size())
-                  .isEqualTo(1);
+              assertThat(response.getResponseBody().contentRelatedIndexing().activeCitations())
+                  .hasSize(1);
             });
   }
 
@@ -521,13 +500,8 @@ class ActiveCitationIntegrationTest {
         .expectBody(DocumentUnit.class)
         .consumeWith(
             response ->
-                assertThat(
-                        response
-                            .getResponseBody()
-                            .contentRelatedIndexing()
-                            .activeCitations()
-                            .size())
-                    .isEqualTo(2));
+                assertThat(response.getResponseBody().contentRelatedIndexing().activeCitations())
+                    .hasSize(2));
 
     DocumentUnit documentUnitFromFrontend =
         DocumentUnit.builder()
@@ -560,9 +534,8 @@ class ActiveCitationIntegrationTest {
         .expectBody(DocumentUnit.class)
         .consumeWith(
             response -> {
-              assertThat(
-                      response.getResponseBody().contentRelatedIndexing().activeCitations().size())
-                  .isEqualTo(1);
+              assertThat(response.getResponseBody().contentRelatedIndexing().activeCitations())
+                  .hasSize(1);
             });
   }
 
@@ -578,13 +551,8 @@ class ActiveCitationIntegrationTest {
         .expectBody(DocumentUnit.class)
         .consumeWith(
             response ->
-                assertThat(
-                        response
-                            .getResponseBody()
-                            .contentRelatedIndexing()
-                            .activeCitations()
-                            .size())
-                    .isEqualTo(2));
+                assertThat(response.getResponseBody().contentRelatedIndexing().activeCitations())
+                    .hasSize(2));
 
     DocumentUnit documentUnitFromFrontend =
         DocumentUnit.builder()
@@ -609,9 +577,8 @@ class ActiveCitationIntegrationTest {
         .expectBody(DocumentUnit.class)
         .consumeWith(
             response -> {
-              assertThat(
-                      response.getResponseBody().contentRelatedIndexing().activeCitations().size())
-                  .isEqualTo(0);
+              assertThat(response.getResponseBody().contentRelatedIndexing().activeCitations())
+                  .isEmpty();
             });
   }
 
@@ -627,13 +594,8 @@ class ActiveCitationIntegrationTest {
         .expectBody(DocumentUnit.class)
         .consumeWith(
             response ->
-                assertThat(
-                        response
-                            .getResponseBody()
-                            .contentRelatedIndexing()
-                            .activeCitations()
-                            .size())
-                    .isEqualTo(2));
+                assertThat(response.getResponseBody().contentRelatedIndexing().activeCitations())
+                    .hasSize(2));
 
     UUID uuid = UUID.fromString("f0232240-7416-11ee-b962-0242ac120002");
 
@@ -680,9 +642,8 @@ class ActiveCitationIntegrationTest {
         .expectBody(DocumentUnit.class)
         .consumeWith(
             response -> {
-              assertThat(
-                      response.getResponseBody().contentRelatedIndexing().activeCitations().size())
-                  .isEqualTo(2);
+              assertThat(response.getResponseBody().contentRelatedIndexing().activeCitations())
+                  .hasSize(2);
               assertThat(
                       response
                           .getResponseBody()
@@ -727,9 +688,8 @@ class ActiveCitationIntegrationTest {
         .expectBody(DocumentUnit.class)
         .consumeWith(
             response -> {
-              assertThat(
-                      response.getResponseBody().contentRelatedIndexing().activeCitations().size())
-                  .isEqualTo(2);
+              assertThat(response.getResponseBody().contentRelatedIndexing().activeCitations())
+                  .hasSize(2);
               assertThat(
                       response
                           .getResponseBody()
@@ -788,9 +748,8 @@ class ActiveCitationIntegrationTest {
         .expectBody(DocumentUnit.class)
         .consumeWith(
             response -> {
-              assertThat(
-                      response.getResponseBody().contentRelatedIndexing().activeCitations().size())
-                  .isEqualTo(2);
+              assertThat(response.getResponseBody().contentRelatedIndexing().activeCitations())
+                  .hasSize(2);
               assertThat(
                       response
                           .getResponseBody()
@@ -817,9 +776,8 @@ class ActiveCitationIntegrationTest {
         .expectBody(DocumentUnit.class)
         .consumeWith(
             response -> {
-              assertThat(
-                      response.getResponseBody().contentRelatedIndexing().activeCitations().size())
-                  .isEqualTo(2);
+              assertThat(response.getResponseBody().contentRelatedIndexing().activeCitations())
+                  .hasSize(2);
               assertThat(
                       response
                           .getResponseBody()
@@ -891,9 +849,8 @@ class ActiveCitationIntegrationTest {
         .expectBody(DocumentUnit.class)
         .consumeWith(
             response -> {
-              assertThat(
-                      response.getResponseBody().contentRelatedIndexing().activeCitations().size())
-                  .isEqualTo(1);
+              assertThat(response.getResponseBody().contentRelatedIndexing().activeCitations())
+                  .hasSize(1);
               assertThat(
                       response
                           .getResponseBody()
@@ -920,9 +877,8 @@ class ActiveCitationIntegrationTest {
         .expectBody(DocumentUnit.class)
         .consumeWith(
             response -> {
-              assertThat(
-                      response.getResponseBody().contentRelatedIndexing().activeCitations().size())
-                  .isEqualTo(2);
+              assertThat(response.getResponseBody().contentRelatedIndexing().activeCitations())
+                  .hasSize(2);
               assertThat(
                       response
                           .getResponseBody()
@@ -967,9 +923,8 @@ class ActiveCitationIntegrationTest {
         .expectBody(DocumentUnit.class)
         .consumeWith(
             response -> {
-              assertThat(
-                      response.getResponseBody().contentRelatedIndexing().activeCitations().size())
-                  .isEqualTo(1);
+              assertThat(response.getResponseBody().contentRelatedIndexing().activeCitations())
+                  .hasSize(1);
               assertThat(
                       response
                           .getResponseBody()
@@ -996,9 +951,8 @@ class ActiveCitationIntegrationTest {
         .expectBody(DocumentUnit.class)
         .consumeWith(
             response -> {
-              assertThat(
-                      response.getResponseBody().contentRelatedIndexing().activeCitations().size())
-                  .isEqualTo(2);
+              assertThat(response.getResponseBody().contentRelatedIndexing().activeCitations())
+                  .hasSize(2);
               assertThat(
                       response
                           .getResponseBody()
@@ -1042,9 +996,8 @@ class ActiveCitationIntegrationTest {
         .expectBody(DocumentUnit.class)
         .consumeWith(
             response -> {
-              assertThat(
-                      response.getResponseBody().contentRelatedIndexing().activeCitations().size())
-                  .isEqualTo(1);
+              assertThat(response.getResponseBody().contentRelatedIndexing().activeCitations())
+                  .hasSize(1);
               assertThat(
                       response
                           .getResponseBody()
@@ -1071,9 +1024,8 @@ class ActiveCitationIntegrationTest {
         .expectBody(DocumentUnit.class)
         .consumeWith(
             response -> {
-              assertThat(
-                      response.getResponseBody().contentRelatedIndexing().activeCitations().size())
-                  .isEqualTo(2);
+              assertThat(response.getResponseBody().contentRelatedIndexing().activeCitations())
+                  .hasSize(2);
               assertThat(
                       response
                           .getResponseBody()
@@ -1117,9 +1069,8 @@ class ActiveCitationIntegrationTest {
         .expectBody(DocumentUnit.class)
         .consumeWith(
             response -> {
-              assertThat(
-                      response.getResponseBody().contentRelatedIndexing().activeCitations().size())
-                  .isEqualTo(1);
+              assertThat(response.getResponseBody().contentRelatedIndexing().activeCitations())
+                  .hasSize(1);
               assertThat(
                       response
                           .getResponseBody()
