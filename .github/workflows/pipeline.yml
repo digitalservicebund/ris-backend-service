@@ -812,9 +812,7 @@ jobs:
 
   generate-entity-relationship-diagram:
     runs-on: ubuntu-latest
-    if: |
-      false && 
-      ${{ github.ref == 'refs/heads/main' }}
+    if: ${{ false && github.ref == 'refs/heads/main' }}
     env:
       POSTGRES_DB: ris-erd
       POSTGRES_PASSWORD: postgres
