@@ -54,9 +54,9 @@ public class DocumentationUnitSearchResultTransformer {
                 : Status.builder()
                     // TODO is the first status the most recent?
                     .publicationStatus(
-                        documentationUnitSearchResultDTO.getStatus().get(0)
-                                == null // NOSONAR this is readable bc of indent and still has a
-                            // "todo" above
+                        documentationUnitSearchResultDTO.getStatus().get(0) == null // NOSONAR
+                            // reason for NOSONAR: it's still readable and there is still a todo, so
+                            // still object to change
                             ? null
                             : documentationUnitSearchResultDTO
                                 .getStatus()

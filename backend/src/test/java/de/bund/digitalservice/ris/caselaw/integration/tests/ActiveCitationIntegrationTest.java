@@ -1084,7 +1084,7 @@ class ActiveCitationIntegrationTest {
 
   @Test
   //  TODO relatedDocumentationRepository.deleteById(id);
-  @Disabled
+  @Disabled("waiting for Datenschemamigration to be finished")
   void testUpdateDocumentationUnit_addLinkToExistingDocumentationUnit() {
     prepareTestData(2, 0);
 
@@ -1110,7 +1110,7 @@ class ActiveCitationIntegrationTest {
   }
 
   @Test
-  @Disabled
+  @Disabled("waiting for Datenschemamigration to be finished")
   void testUpdateDocumentationUnit_addLinkToExistingDocumentationUnitWhichIsLinkedAlready() {
     prepareTestData(2, 0);
 
@@ -1139,7 +1139,7 @@ class ActiveCitationIntegrationTest {
   }
 
   @Test
-  @Disabled
+  @Disabled("waiting for Datenschemamigration to be finished")
   void testUpdateDocumentationUnit_removeLinkedActiveCitation() {
     prepareTestData(1, 1);
 
@@ -1174,7 +1174,7 @@ class ActiveCitationIntegrationTest {
   }
 
   @Test
-  @Disabled
+  @Disabled("waiting for Datenschemamigration to be finished")
   void testUpdateDocumentationUnit_removeCourtInRealActiveCitation() {
     prepareTestData(1, 1);
 
@@ -1205,7 +1205,7 @@ class ActiveCitationIntegrationTest {
   }
 
   @Test
-  @Disabled
+  @Disabled("waiting for Datenschemamigration to be finished")
   void testUpdateDocumentationUnit_removeCitationStyleInRealActiveCitation() {
     prepareTestData(1, 1);
 
@@ -1236,7 +1236,7 @@ class ActiveCitationIntegrationTest {
   }
 
   @Test
-  @Disabled
+  @Disabled("waiting for Datenschemamigration to be finished")
   void testUpdateDocumentationUnit_removeDocumentTypeInRealActiveCitation() {
     prepareTestData(1, 1);
 
@@ -1267,7 +1267,7 @@ class ActiveCitationIntegrationTest {
   }
 
   @Test
-  @Disabled
+  @Disabled("waiting for Datenschemamigration to be finished")
   void testUpdateDocumentationUnit_removeFileNumberInRealActiveCitation() {
     prepareTestData(1, 1);
 
@@ -1298,7 +1298,7 @@ class ActiveCitationIntegrationTest {
   }
 
   @Test
-  @Disabled
+  @Disabled("waiting for Datenschemamigration to be finished")
   void testUpdateDocumentationUnit_removeDecisionDateInRealActiveCitation() {
     prepareTestData(1, 1);
 

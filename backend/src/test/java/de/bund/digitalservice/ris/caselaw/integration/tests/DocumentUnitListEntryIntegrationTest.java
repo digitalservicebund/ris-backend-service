@@ -109,7 +109,7 @@ class DocumentUnitListEntryIntegrationTest {
   }
 
   @Test
-  @Disabled
+  @Disabled("waiting for Datenschemamigration to be finished")
   void testForCorrectResponseWhenRequestingAll() {
     DocumentationUnitDTO migrationDto =
         repository.save(
@@ -163,7 +163,7 @@ class DocumentUnitListEntryIntegrationTest {
   }
 
   @Test
-  @Disabled
+  @Disabled("waiting for Datenschemamigration to be finished")
   void testForCorrectOrdering() {
     List<String> documentNumbers = Arrays.asList("ABCD202300007", "EFGH202200123", "IJKL202300099");
 
@@ -194,7 +194,7 @@ class DocumentUnitListEntryIntegrationTest {
   }
 
   @Test
-  @Disabled
+  @Disabled("waiting for Datenschemamigration to be finished")
   void testForCorrectPagination() {
     List<DocumentationUnitDTO> documents =
         IntStream.range(0, 99)

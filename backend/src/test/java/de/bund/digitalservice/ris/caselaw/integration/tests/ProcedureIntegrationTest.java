@@ -170,7 +170,7 @@ class ProcedureIntegrationTest {
   }
 
   @Test
-  @Disabled
+  @Disabled("waiting for Datenschemamigration to be finished")
   void testAddSameProcedure() {
     ProcedureDTO procedureDTO = createProcedure("testProcedure", documentationOfficeDTO);
     assertThat(repository.findAll()).hasSize(1);
@@ -215,7 +215,7 @@ class ProcedureIntegrationTest {
   }
 
   @Test
-  @Disabled
+  @Disabled("waiting for Datenschemamigration to be finished")
   void testAddingProcedureToPreviousProcedures() {
     DocumentationUnitDTO dto =
         documentUnitRepository.save(
@@ -314,7 +314,7 @@ class ProcedureIntegrationTest {
   }
 
   @Test
-  @Disabled
+  @Disabled("waiting for Datenschemamigration to be finished")
   void testAddProcedureWithSameNameToDifferentOffice() {
     DocumentationOfficeDTO bghDocOfficeDTO =
         documentationOfficeRepository.findByAbbreviation("BGH");
@@ -356,7 +356,7 @@ class ProcedureIntegrationTest {
   }
 
   @Test
-  @Disabled
+  @Disabled("waiting for Datenschemamigration to be finished")
   void testProcedureControllerReturnsList() {
     createProcedures(
         List.of("testProcedure1", "testProcedure2", "testProcedure3"), documentationOfficeDTO);
@@ -379,7 +379,7 @@ class ProcedureIntegrationTest {
   }
 
   @Test
-  @Disabled
+  @Disabled("waiting for Datenschemamigration to be finished")
   void testProcedureControllerReturnsFilteredList() {
     createProcedures(List.of("aaabbb", "aaaccc", "dddfff"), documentationOfficeDTO);
     assertThat(repository.findAll()).hasSize(3);
@@ -416,7 +416,7 @@ class ProcedureIntegrationTest {
   }
 
   @Test
-  @Disabled
+  @Disabled("waiting for Datenschemamigration to be finished")
   void testProcedureControllerReturnsPerDocOffice() {
     DocumentationOfficeDTO bghDocOfficeDTO =
         documentationOfficeRepository.findByAbbreviation("BGH");
@@ -438,7 +438,7 @@ class ProcedureIntegrationTest {
   }
 
   @Test
-  @Disabled
+  @Disabled("waiting for Datenschemamigration to be finished")
   void testDeleteProcedure() {
     createProcedures(List.of("fooProcedure"), documentationOfficeDTO);
     assertThat(repository.findAll()).hasSize(1);
@@ -455,7 +455,7 @@ class ProcedureIntegrationTest {
   }
 
   @Test
-  @Disabled
+  @Disabled("waiting for Datenschemamigration to be finished")
   void testDontDeleteProcedureOfForeignOffice() {
     DocumentationOfficeDTO bghDocOfficeDTO =
         documentationOfficeRepository.findByAbbreviation("BGH");

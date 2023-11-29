@@ -182,7 +182,11 @@ public class DocumentationUnitTransformer {
         contentRelatedIndexing.activeCitations().stream()
             .map(ActiveCitationTransformer::transformToDTO)
             .filter(Objects::nonNull)
-            .peek(activeCitationDTO -> activeCitationDTO.setRank(i.getAndIncrement()))
+            .map(
+                activeCitationDTO -> {
+                  activeCitationDTO.setRank(i.getAndIncrement());
+                  return activeCitationDTO;
+                })
             .toList());
   }
 
@@ -227,7 +231,11 @@ public class DocumentationUnitTransformer {
           previousDecisions.stream()
               .map(PreviousDecisionTransformer::transformToDTO)
               .filter(Objects::nonNull)
-              .peek(previousDecisionDTO -> previousDecisionDTO.setRank(i.getAndIncrement()))
+              .map(
+                  previousDecisionDTO -> {
+                    previousDecisionDTO.setRank(i.getAndIncrement());
+                    return previousDecisionDTO;
+                  })
               .toList());
     }
   }

@@ -415,7 +415,7 @@ class PreviousDecisionIntegrationTest {
   }
 
   @Test
-  @Disabled
+  @Disabled("waiting for Datenschemamigration to be finished")
   // TODO fix this test by making sure the DocumentType is properly searched for
   void testSearchForDocumentUnitsByPreviousDecisionInput_onlyDocumentType_shouldMatchOne() {
     prepareDocumentUnitMetadataDTOs();
@@ -432,7 +432,7 @@ class PreviousDecisionIntegrationTest {
   }
 
   @Test
-  @Disabled
+  @Disabled("waiting for Datenschemamigration to be finished")
   // TODO fix this test by making sure the DocumentType is properly searched for
   void
       testSearchForDocumentUnitsByPreviousDecisionInput_threeMatchingOneDoesNot_shouldMatchNothing() {

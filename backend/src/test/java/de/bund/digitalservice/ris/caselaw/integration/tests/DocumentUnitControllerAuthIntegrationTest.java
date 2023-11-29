@@ -145,7 +145,7 @@ class DocumentUnitControllerAuthIntegrationTest {
   }
 
   @ParameterizedTest
-  @Disabled
+  @Disabled("waiting for Datenschemamigration to be finished")
   @MethodSource("getAuthorizedCases")
   void testGetAll_shouldBeAccessible(
       String docUnitOfficeAbbreviation,
@@ -191,7 +191,7 @@ class DocumentUnitControllerAuthIntegrationTest {
   }
 
   @ParameterizedTest
-  @Disabled
+  @Disabled("waiting for Datenschemamigration to be finished")
   @MethodSource("getUnauthorizedCases")
   void testGetAll_shouldNotBeAccessible(
       String docUnitOfficeAbbreviation,
