@@ -138,7 +138,7 @@ dependencies {
     val springBootStarterVersion = "3.1.2"
     val springSecurityVersion = "6.1.2"
     val springWebVersion = "6.0.11"
-    val logbackVersion = "1.4.5"
+    val logbackVersion = "1.4.13"
     val r2dbcVersion = "1.0.0.RELEASE"
     val jacksonModuleVersion = "2.15.2"
     val testContainersVersion = "1.19.0"
