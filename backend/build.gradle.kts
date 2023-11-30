@@ -135,7 +135,6 @@ sonar {
 }
 
 dependencies {
-    val springBootStarterVersion = "3.1.2"
     val springSecurityVersion = "6.1.2"
     val springWebVersion = "6.0.11"
     val logbackVersion = "1.4.13"
@@ -143,9 +142,9 @@ dependencies {
     val jacksonModuleVersion = "2.15.2"
     val testContainersVersion = "1.19.0"
 
-    implementation("org.springframework.boot:spring-boot-starter-actuator:$springBootStarterVersion")
-    implementation("org.springframework.boot:spring-boot-starter-security:$springBootStarterVersion")
-    implementation("org.springframework.boot:spring-boot-starter-oauth2-client:$springBootStarterVersion")
+    implementation("org.springframework.boot:spring-boot-starter-actuator")
+    implementation("org.springframework.boot:spring-boot-starter-security")
+    implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
     // => CVE-2023-34035, CVE-2023-34034
     implementation("org.springframework.security:spring-security-web:$springSecurityVersion")
     implementation("org.springframework.security:spring-security-config:$springSecurityVersion")
