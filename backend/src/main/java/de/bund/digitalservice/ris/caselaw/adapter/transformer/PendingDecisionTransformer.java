@@ -31,6 +31,7 @@ public class PendingDecisionTransformer extends RelatedDocumentationUnitTransfor
             ensuingDecision.getDocumentNumber() == null
                 ? null
                 : DocumentationUnitDTO.builder()
+                    .id(ensuingDecision.getUuid())
                     .documentNumber(ensuingDecision.getDocumentNumber())
                     .build())
         .documentType(getDocumentTypeFromDomain(ensuingDecision.getDocumentType()))

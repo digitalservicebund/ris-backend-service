@@ -50,6 +50,7 @@ public class ActiveCitationTransformer extends RelatedDocumentationUnitTransform
                 activeCitation.getDocumentNumber() == null
                     ? null
                     : DocumentationUnitDTO.builder()
+                        .id(activeCitation.getUuid())
                         .documentNumber(activeCitation.getDocumentNumber())
                         .build())
             .documentType(getDocumentTypeFromDomain(activeCitation.getDocumentType()))

@@ -30,6 +30,7 @@ public class PreviousDecisionTransformer extends RelatedDocumentationUnitTransfo
             previousDecision.getDocumentNumber() == null
                 ? null
                 : DocumentationUnitDTO.builder()
+                    .id(previousDecision.getUuid())
                     .documentNumber(previousDecision.getDocumentNumber())
                     .build())
         .documentType(getDocumentTypeFromDomain(previousDecision.getDocumentType()))

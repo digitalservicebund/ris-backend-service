@@ -8,6 +8,7 @@ export default class RelatedDocumentation {
   public decisionDate?: string
   public fileNumber?: string
   public documentType?: DocumentType
+  public referencedDocumentationUnitId?: string
 
   get hasForeignSource(): boolean {
     return this.documentNumber != null

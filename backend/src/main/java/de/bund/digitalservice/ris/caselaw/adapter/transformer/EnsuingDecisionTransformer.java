@@ -8,7 +8,10 @@ public class EnsuingDecisionTransformer extends RelatedDocumentationUnitTransfor
   public static EnsuingDecision transformToDomain(EnsuingDecisionDTO ensuingDecisionDTO) {
     return EnsuingDecision.builder()
         .uuid(ensuingDecisionDTO.getId())
-        .documentNumber(ensuingDecisionDTO.getReferencedDocumentationUnit().getDocumentNumber())
+        .documentNumber(
+            ensuingDecisionDTO.getReferencedDocumentationUnit() != null
+                ? ensuingDecisionDTO.getReferencedDocumentationUnit().getDocumentNumber()
+                : null)
         //        .referencedDocumentationUnit(
         //            ensuingDecisionDTO.getReferencedDocumentationUnit() == null
         //                ? null
@@ -30,11 +33,11 @@ public class EnsuingDecisionTransformer extends RelatedDocumentationUnitTransfor
         .id(ensuingDecision.getUuid())
         .court(getCourtFromDomain(ensuingDecision.getCourt()))
         .date(ensuingDecision.getDecisionDate())
-        //        .documentNumber(ensuingDecision.getDocumentNumber())
         .referencedDocumentationUnit(
             ensuingDecision.getDocumentNumber() == null
                 ? null
                 : DocumentationUnitDTO.builder()
+                    .id(ensuingDecision.getUuid())
                     .documentNumber(ensuingDecision.getDocumentNumber())
                     .build())
         .documentType(getDocumentTypeFromDomain(ensuingDecision.getDocumentType()))

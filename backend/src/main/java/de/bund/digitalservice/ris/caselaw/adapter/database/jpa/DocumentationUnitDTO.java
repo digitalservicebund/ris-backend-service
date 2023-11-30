@@ -234,21 +234,4 @@ public class DocumentationUnitDTO
   @Builder.Default
   @OrderBy("rank")
   private List<PreviousDecisionDTO> previousDecisions = new ArrayList<>();
-
-  @Override
-  public int hashCode() {
-    return java.util.Objects.hashCode(documentNumber);
-  }
-
-  @Override
-  public boolean equals(Object obj) {
-    if (this == obj) {
-      return true;
-    }
-    if (obj == null) {
-      return false;
-    }
-    return (obj instanceof DocumentationUnitDTO documentationUnitDTO
-        && documentationUnitDTO.getDocumentNumber().equals(getDocumentNumber()));
-  }
 }
