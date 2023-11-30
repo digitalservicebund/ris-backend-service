@@ -29,6 +29,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumenta
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresPublicationReportRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PreviousDecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.StatusDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentTypeTransformer;
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
@@ -415,14 +416,12 @@ class PreviousDecisionIntegrationTest {
   }
 
   @Test
-  @Disabled("waiting for Datenschemamigration to be finished")
-  // TODO fix this test by making sure the DocumentType is properly searched for
   void testSearchForDocumentUnitsByPreviousDecisionInput_onlyDocumentType_shouldMatchOne() {
     prepareDocumentUnitMetadataDTOs();
-    simulateAPICall(
-            PreviousDecision.builder()
-                .documentType(DocumentType.builder().jurisShortcut("GH").label("ABC123").build())
-                .build())
+    DocumentType documentType =
+        DocumentTypeTransformer.transformToDomain(
+            databaseDocumentTypeRepository.findFirstByAbbreviationAndCategory("GH", category));
+    simulateAPICall(PreviousDecision.builder().documentType(documentType).build())
         .jsonPath("$.content")
         .isArray()
         .jsonPath("$.content.length()")
@@ -432,8 +431,16 @@ class PreviousDecisionIntegrationTest {
   }
 
   @Test
-  @Disabled("waiting for Datenschemamigration to be finished")
-  // TODO fix this test by making sure the DocumentType is properly searched for
+  void testSearchForDocumentUnitsByPreviousDecisionInput_nullDocumentType_shouldAll() {
+    prepareDocumentUnitMetadataDTOs();
+    simulateAPICall(PreviousDecision.builder().documentType(null).build())
+        .jsonPath("$.content")
+        .isArray()
+        .jsonPath("$.content.length()")
+        .isEqualTo(3);
+  }
+
+  @Test
   void
       testSearchForDocumentUnitsByPreviousDecisionInput_threeMatchingOneDoesNot_shouldMatchNothing() {
     LocalDate date1 = prepareDocumentUnitMetadataDTOs();
@@ -442,7 +449,8 @@ class PreviousDecisionIntegrationTest {
                 .decisionDate(date1)
                 .court(Court.builder().type("SomeCourt").build())
                 .fileNumber("AkteX")
-                .documentType(DocumentType.builder().jurisShortcut("XY").build())
+                .documentType(
+                    DocumentType.builder().uuid(UUID.randomUUID()).jurisShortcut("XY").build())
                 .build())
         .jsonPath("$.content.length()")
         .isEqualTo(0);

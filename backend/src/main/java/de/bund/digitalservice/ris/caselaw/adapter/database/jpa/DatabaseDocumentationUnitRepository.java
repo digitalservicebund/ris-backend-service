@@ -30,6 +30,7 @@ public interface DatabaseDocumentationUnitRepository
             )
          )
         AND (cast(:decisionDate as date) IS NULL OR documentationUnit.decisionDate = :decisionDate)
+        AND (cast(:documentType as uuid) IS NULL OR documentationUnit.documentType = :documentType)
         )
         ORDER BY documentationUnit.decisionDate DESC, documentationUnit.id DESC
         """)
@@ -38,6 +39,7 @@ public interface DatabaseDocumentationUnitRepository
       String courtLocation,
       String fileNumber,
       LocalDate decisionDate,
+      DocumentTypeDTO documentType,
       Pageable pageable);
 
   @Query(

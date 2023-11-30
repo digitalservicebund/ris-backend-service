@@ -1,5 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.adapter.database.jpa;
 
+import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentTypeTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationUnitSearchResultTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationUnitTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
@@ -256,6 +257,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
             courtLocation,
             relatedDocumentationUnit.getFileNumber(),
             relatedDocumentationUnit.getDecisionDate(),
+            DocumentTypeTransformer.transformToDTO(relatedDocumentationUnit.getDocumentType()),
             pageable);
 
     List<DocumentationUnitSearchResult> list =
