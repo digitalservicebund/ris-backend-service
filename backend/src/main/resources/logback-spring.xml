@@ -5,23 +5,6 @@
     </springProfile>
     <springProfile name="staging,production,uat">
         <include resource="org/springframework/boot/logging/logback/base.xml"/>
-        <!--
-        <springProperty name="lokiUrl" source="neuris.loki.url"/>
-        <appender name="LOKI" class="com.github.loki4j.logback.Loki4jAppender">
-            <http>
-                <url>${lokiUrl}</url>
-            </http>
-            <format>
-                <label>
-                    <pattern>app=ris-backend,level=%level</pattern>
-                </label>
-                <message>
-                    <pattern>l=%level c=%logger{20} t=%thread | %msg</pattern>
-                </message>
-                <sortByTime>true</sortByTime>
-            </format>
-        </appender>
-        -->
         <appender name="SENTRY" class="io.sentry.logback.SentryAppender">
             <options>
                 <dsn>${SENTRY_DSN}</dsn>
