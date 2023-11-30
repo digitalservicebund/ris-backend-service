@@ -8,11 +8,11 @@ public class EnsuingDecisionTransformer extends RelatedDocumentationUnitTransfor
   public static EnsuingDecision transformToDomain(EnsuingDecisionDTO ensuingDecisionDTO) {
     return EnsuingDecision.builder()
         .uuid(ensuingDecisionDTO.getId())
-        .documentNumber(ensuingDecisionDTO.getDocumentNumber())
-        .referencedDocumentationUnitId(
-            ensuingDecisionDTO.getReferencedDocumentationUnit() == null
-                ? null
-                : ensuingDecisionDTO.getReferencedDocumentationUnit().getId())
+        .documentNumber(ensuingDecisionDTO.getReferencedDocumentationUnit().getDocumentNumber())
+        //        .referencedDocumentationUnit(
+        //            ensuingDecisionDTO.getReferencedDocumentationUnit() == null
+        //                ? null
+        //                : ensuingDecisionDTO.getReferencedDocumentationUnit().getId())
         .court(getCourtFromDTO(ensuingDecisionDTO.getCourt()))
         .fileNumber(getFileNumber(ensuingDecisionDTO.getFileNumber()))
         .documentType(getDocumentTypeFromDTO(ensuingDecisionDTO.getDocumentType()))
@@ -30,12 +30,12 @@ public class EnsuingDecisionTransformer extends RelatedDocumentationUnitTransfor
         .id(ensuingDecision.getUuid())
         .court(getCourtFromDomain(ensuingDecision.getCourt()))
         .date(ensuingDecision.getDecisionDate())
-        .documentNumber(ensuingDecision.getDocumentNumber())
+        //        .documentNumber(ensuingDecision.getDocumentNumber())
         .referencedDocumentationUnit(
-            ensuingDecision.getReferencedDocumentationUnitId() == null
+            ensuingDecision.getDocumentNumber() == null
                 ? null
                 : DocumentationUnitDTO.builder()
-                    .id(ensuingDecision.getReferencedDocumentationUnitId())
+                    .documentNumber(ensuingDecision.getDocumentNumber())
                     .build())
         .documentType(getDocumentTypeFromDomain(ensuingDecision.getDocumentType()))
         .fileNumber(getFileNumber(ensuingDecision.getFileNumber()))

@@ -42,9 +42,6 @@ public abstract class RelatedDocumentationDTO {
   @Column(name = "date")
   private LocalDate date;
 
-  @Column(name = "document_number")
-  private String documentNumber;
-
   @ManyToOne
   @JoinColumn(name = "document_type_id")
   private DocumentTypeDTO documentType;
@@ -61,9 +58,6 @@ public abstract class RelatedDocumentationDTO {
   @Column @NotNull private Integer rank;
 
   @ManyToOne
-  @JoinColumn(name = "referenced_documentation_unit_id", referencedColumnName = "id")
+  @JoinColumn(name = "document_number", referencedColumnName = "document_number")
   private DocumentationUnitDTO referencedDocumentationUnit;
-
-  @Column(name = "referenced_documentation_unit_id", insertable = false, updatable = false)
-  private UUID referencedDocumentationUnitId;
 }

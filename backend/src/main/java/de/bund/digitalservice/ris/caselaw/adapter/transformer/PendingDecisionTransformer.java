@@ -8,11 +8,7 @@ public class PendingDecisionTransformer extends RelatedDocumentationUnitTransfor
   public static EnsuingDecision transformToDomain(PendingDecisionDTO pendingDecisionDTO) {
     return EnsuingDecision.builder()
         .uuid(pendingDecisionDTO.getId())
-        .documentNumber(pendingDecisionDTO.getDocumentNumber())
-        .referencedDocumentationUnitId(
-            pendingDecisionDTO.getReferencedDocumentationUnit() == null
-                ? null
-                : pendingDecisionDTO.getReferencedDocumentationUnit().getId())
+        .documentNumber(pendingDecisionDTO.getReferencedDocumentationUnit().getDocumentNumber())
         .court(getCourtFromDTO(pendingDecisionDTO.getCourt()))
         .fileNumber(getFileNumber(pendingDecisionDTO.getFileNumber()))
         .documentType(getDocumentTypeFromDTO(pendingDecisionDTO.getDocumentType()))
@@ -31,12 +27,11 @@ public class PendingDecisionTransformer extends RelatedDocumentationUnitTransfor
         .id(ensuingDecision.getUuid())
         .court(getCourtFromDomain(ensuingDecision.getCourt()))
         .date(ensuingDecision.getDecisionDate())
-        .documentNumber(ensuingDecision.getDocumentNumber())
         .referencedDocumentationUnit(
-            ensuingDecision.getReferencedDocumentationUnitId() == null
+            ensuingDecision.getDocumentNumber() == null
                 ? null
                 : DocumentationUnitDTO.builder()
-                    .id(ensuingDecision.getReferencedDocumentationUnitId())
+                    .documentNumber(ensuingDecision.getDocumentNumber())
                     .build())
         .documentType(getDocumentTypeFromDomain(ensuingDecision.getDocumentType()))
         .fileNumber(getFileNumber(ensuingDecision.getFileNumber()))

@@ -25,7 +25,6 @@ public class RelatedDocumentationUnit {
   protected LocalDate decisionDate;
   protected String fileNumber;
   protected DocumentType documentType;
-  protected UUID referencedDocumentationUnitId;
 
   @Transient
   public boolean isEmpty() {
@@ -34,7 +33,6 @@ public class RelatedDocumentationUnit {
         && court == null
         && decisionDate == null
         && fileNumber == null
-        && documentType == null
-        && referencedDocumentationUnitId == null;
+        && documentType == null;
   }
 }
