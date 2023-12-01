@@ -73,15 +73,14 @@ public interface DatabaseDocumentationUnitRepository
          (
             (:status IS NULL AND ((documentationUnit.documentationOffice.id = :documentationOfficeId OR EXISTS (SELECT 1 FROM StatusDTO status WHERE status.documentationUnitDTO.id = documentationUnit.id AND status.publicationStatus IN (de.bund.digitalservice.ris.caselaw.domain.PublicationStatus.PUBLISHED, de.bund.digitalservice.ris.caselaw.domain.PublicationStatus.PUBLISHING)))))
          OR
-            (:status IS NOT NULL AND EXISTS (SELECT 1 FROM StatusDTO status WHERE status.documentationUnitDTO.id = documentationUnit.id AND status.publicationStatus = :status AND :status IN ('PUBLISHED', 'PUBLISHING')))
+            (:status IS NOT NULL AND EXISTS (SELECT 1 FROM StatusDTO status WHERE status.documentationUnitDTO.id = documentationUnit.id AND status.publicationStatus = :status AND (:status IN ('PUBLISHED', 'PUBLISHING') OR documentationUnit.documentationOffice.id = :documentationOfficeId)))
          )
        AND (:withErrorOnly = FALSE OR documentationUnit.documentationOffice.id = :documentationOfficeId AND EXISTS (SELECT 1 FROM StatusDTO status WHERE status.documentationUnitDTO.id = documentationUnit.id AND status.withError = TRUE))
     )
     ORDER BY documentationUnit.documentNumber
 """)
-  @SuppressWarnings(
-      "java:S107") // We use JPA repository interface magic, so reducing parameter count is not
-  // possible.
+  @SuppressWarnings("java:S107")
+  // We use JPA repository interface magic, so reducing parameter count is not possible.
   Page<DocumentationUnitSearchResultDTO> searchByDocumentUnitSearchInput(
       UUID documentationOfficeId,
       String documentNumberOrFileNumber,

@@ -567,10 +567,10 @@ class DocumentationUnitIntegrationTest {
     // by status
     searchInput =
         DocumentationUnitSearchInput.builder()
-            .status(Status.builder().publicationStatus(PUBLISHING).build())
+            .status(Status.builder().publicationStatus(UNPUBLISHED).build())
             .build();
 
-    assertThat(extractDocumentNumbersFromSearchCall(searchInput)).containsExactly("IJKL202101234");
+    assertThat(extractDocumentNumbersFromSearchCall(searchInput)).containsExactly("EFGH202200123");
 
     searchInput =
         DocumentationUnitSearchInput.builder()
