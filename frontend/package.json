@@ -102,7 +102,7 @@
     "jsdom": "^22.1.0",
     "jszip": "^3.10.1",
     "license-checker": "^25.0.1",
-    "playwright": "^1.38.0",
+    "playwright": "^1.40.1",
     "postcss": "^8.4.29",
     "postcss-import": "^15.1.0",
     "postcss-scrollbar": "^0.5.1",
