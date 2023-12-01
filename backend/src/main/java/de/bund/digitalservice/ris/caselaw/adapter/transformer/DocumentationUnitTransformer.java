@@ -187,6 +187,7 @@ public class DocumentationUnitTransformer {
                   activeCitationDTO.setRank(i.getAndIncrement());
                   return activeCitationDTO;
                 })
+            .distinct()
             .toList());
   }
 

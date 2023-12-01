@@ -24,6 +24,8 @@ public class ActiveCitation extends RelatedDocumentationUnit {
         && decisionDate == null
         && fileNumber == null
         && documentType == null
-        && citationType == null;
+        && citationType == null
+        && documentNumber == null
+        && referencedDocumentationUnitId == null;
   }
 }
