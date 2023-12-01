@@ -32,12 +32,6 @@ public abstract class RelatedDocumentationDTO {
 
   @Id @GeneratedValue private UUID id;
 
-  @Column(name = "court_location", insertable = false, updatable = false)
-  private String courtLocation;
-
-  @Column(name = "court_type", insertable = false, updatable = false)
-  private String courtType;
-
   @ManyToOne private CourtDTO court;
 
   @Column(name = "date")
