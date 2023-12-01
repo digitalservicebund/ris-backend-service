@@ -26,7 +26,6 @@ import de.bund.digitalservice.ris.caselaw.domain.RelatedDocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.XmlPublication;
 import java.nio.ByteBuffer;
 import java.time.Instant;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -41,7 +40,6 @@ import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.oauth2.client.registration.ReactiveClientRegistrationRepository;
@@ -417,8 +415,8 @@ class DocumentUnitControllerTest {
     RelatedDocumentationUnit linkedDocumentationUnit = RelatedDocumentationUnit.builder().build();
     PageRequest pageRequest = PageRequest.of(0, 10);
 
-    when(service.searchByLinkedDocumentationUnit(linkedDocumentationUnit, pageRequest))
-        .thenReturn(new PageImpl<>(Collections.emptyList()));
+    when(service.searchByLinkedDocumentationUnit(linkedDocumentationUnit, docOffice, pageRequest))
+        .thenReturn(Page.empty());
 
     risWebClient
         .withDefaultLogin()
@@ -430,7 +428,8 @@ class DocumentUnitControllerTest {
         .expectStatus()
         .isOk();
 
-    verify(service).searchByLinkedDocumentationUnit(linkedDocumentationUnit, pageRequest);
+    verify(service)
+        .searchByLinkedDocumentationUnit(linkedDocumentationUnit, docOffice, pageRequest);
   }
 
   @Test

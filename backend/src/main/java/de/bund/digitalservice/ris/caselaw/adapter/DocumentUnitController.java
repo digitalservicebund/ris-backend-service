@@ -189,11 +189,18 @@ public class DocumentUnitController {
   public Mono<Page<DocumentationUnitSearchResult>> searchByLinkedDocumentationUnit(
       @RequestParam("pg") int page,
       @RequestParam("sz") int size,
-      @RequestBody RelatedDocumentationUnit relatedDocumentationUnit) {
+      @RequestBody RelatedDocumentationUnit relatedDocumentationUnit,
+      @AuthenticationPrincipal OidcUser oidcUser) {
 
-    return Mono.just(
-        service.searchByLinkedDocumentationUnit(
-            relatedDocumentationUnit, PageRequest.of(page, size)));
+    return userService
+        .getDocumentationOffice(oidcUser)
+        .flatMap(
+            documentationOffice ->
+                Mono.just(
+                    service.searchByLinkedDocumentationUnit(
+                        relatedDocumentationUnit,
+                        documentationOffice,
+                        PageRequest.of(page, size))));
   }
 
   @GetMapping(value = "/{uuid}/docx", produces = MediaType.APPLICATION_JSON_VALUE)

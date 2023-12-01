@@ -302,9 +302,12 @@ public class DocumentUnitService {
   }
 
   public Page<DocumentationUnitSearchResult> searchByLinkedDocumentationUnit(
-      RelatedDocumentationUnit relatedDocumentationUnit, Pageable pageable) {
+      RelatedDocumentationUnit relatedDocumentationUnit,
+      DocumentationOffice documentationOffice,
+      Pageable pageable) {
 
-    return repository.searchByRelatedDocumentationUnit(relatedDocumentationUnit, pageable);
+    return repository.searchByRelatedDocumentationUnit(
+        relatedDocumentationUnit, documentationOffice, pageable);
   }
 
   public Mono<String> validateSingleNorm(SingleNormValidationInfo singleNormValidationInfo) {

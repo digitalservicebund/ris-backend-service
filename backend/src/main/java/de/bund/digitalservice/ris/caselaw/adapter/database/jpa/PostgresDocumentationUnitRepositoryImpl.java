@@ -398,18 +398,28 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
   @Override
   @Transactional(transactionManager = "jpaTransactionManager")
   public Page<DocumentationUnitSearchResult> searchByRelatedDocumentationUnit(
-      RelatedDocumentationUnit relatedDocumentationUnit, Pageable pageable) {
+      RelatedDocumentationUnit relatedDocumentationUnit,
+      DocumentationOffice documentationOffice,
+      Pageable pageable) {
     String courtType =
         Optional.ofNullable(relatedDocumentationUnit.getCourt()).map(Court::type).orElse(null);
     String courtLocation =
         Optional.ofNullable(relatedDocumentationUnit.getCourt()).map(Court::location).orElse(null);
 
+    DocumentationOfficeDTO documentationOfficeDTO =
+        documentationOfficeRepository.findByAbbreviation(documentationOffice.abbreviation());
+
     Page<DocumentationUnitSearchResultDTO> documentationUnitSearchResultDTOPage =
         repository.searchByDocumentUnitSearchInput(
+            documentationOfficeDTO.getId(),
+            relatedDocumentationUnit.getFileNumber(),
             courtType,
             courtLocation,
-            relatedDocumentationUnit.getFileNumber(),
             relatedDocumentationUnit.getDecisionDate(),
+            null,
+            null,
+            false,
+            false,
             DocumentTypeTransformer.transformToDTO(relatedDocumentationUnit.getDocumentType()),
             pageable);
 
@@ -457,6 +467,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
             searchInput.status() != null ? searchInput.status().publicationStatus() : null,
             withError,
             searchInput.myDocOfficeOnly(),
+            null,
             pageable);
 
     List<DocumentationUnitSearchResult> list =

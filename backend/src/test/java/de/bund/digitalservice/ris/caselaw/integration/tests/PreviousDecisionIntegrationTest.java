@@ -463,7 +463,7 @@ class PreviousDecisionIntegrationTest {
   }
 
   @Test
-  void testSearchForDocumentUnitsByPreviousDecisionInput_shouldOnlyFindPublished() {
+  void testSearchForDocumentUnitsByPreviousDecisionInput_shouldOnlyFindPublishedOrMine() {
     LocalDate date = LocalDate.parse("2023-02-02");
 
     var du1 =
@@ -503,9 +503,9 @@ class PreviousDecisionIntegrationTest {
 
     simulateAPICall(PreviousDecision.builder().fileNumber("AkteZ").build())
         .jsonPath("$.content.length()")
-        .isEqualTo(2)
+        .isEqualTo(3)
         .jsonPath("$.content[?(@.uuid=='" + du1.getId() + "')]")
-        .isEmpty()
+        .isArray()
         .jsonPath("$.content[?(@.uuid=='" + du2.getId() + "')]")
         .isArray()
         .jsonPath("$.content[?(@.uuid=='" + du4.getId() + "')]")

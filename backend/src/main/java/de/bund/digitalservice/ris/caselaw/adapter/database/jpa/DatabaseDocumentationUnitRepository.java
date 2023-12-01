@@ -15,44 +15,6 @@ public interface DatabaseDocumentationUnitRepository
 
   Optional<DocumentationUnitMetadataDTO> findMetadataById(UUID documentUnitUuid);
 
-  @Query(
-      value =
-          """
-        SELECT documentationUnit FROM DocumentationUnitDTO documentationUnit
-        WHERE (
-            (:courtType IS NULL OR documentationUnit.court.type = :courtType)
-        AND (:courtLocation IS NULL OR documentationUnit.court.location = :courtLocation)
-        AND (:fileNumber is NULL OR EXISTS (
-            SELECT 1
-            FROM FileNumberDTO fileNumber
-            WHERE fileNumber.documentationUnit.id = documentationUnit.id
-            AND fileNumber.value = :fileNumber
-            )
-         )
-        AND (cast(:decisionDate as date) IS NULL OR documentationUnit.decisionDate = :decisionDate)
-        AND (cast(:documentType as uuid) IS NULL OR documentationUnit.documentType = :documentType)
-        AND EXISTS (
-          SELECT 1
-          FROM StatusDTO status
-          WHERE status.documentationUnitDTO.id = documentationUnit.id
-          AND status.createdAt = (
-              SELECT MAX(subStatus.createdAt)
-              FROM StatusDTO subStatus
-              WHERE subStatus.documentationUnitDTO.id = documentationUnit.id
-          )
-          AND (status.publicationStatus IN ('PUBLISHED', 'PUBLISHING'))
-          )
-        )
-        ORDER BY documentationUnit.decisionDate DESC, documentationUnit.id DESC
-        """)
-  Page<DocumentationUnitSearchResultDTO> searchByDocumentUnitSearchInput(
-      String courtType,
-      String courtLocation,
-      String fileNumber,
-      LocalDate decisionDate,
-      DocumentTypeDTO documentType,
-      Pageable pageable);
-
   // TODO fix deviatingFileNumber case sensitivity - the query breaks as soon as we activate it
   // TODO should we query fileNumbers for contains()?
   @Query(
@@ -82,6 +44,7 @@ public interface DatabaseDocumentationUnitRepository
            OR (cast(:decisionDateEnd as date) IS NOT NULL AND documentationUnit.decisionDate BETWEEN :decisionDate AND :decisionDateEnd))
        AND (:myDocOfficeOnly = FALSE OR (:myDocOfficeOnly = TRUE AND
     documentationUnit.documentationOffice.id = :documentationOfficeId))
+       AND (cast(:documentType as uuid) IS NULL OR documentationUnit.documentType = :documentType)
        AND
          (
             (:status IS NULL AND ((documentationUnit.documentationOffice.id = :documentationOfficeId OR EXISTS (SELECT 1 FROM StatusDTO status WHERE status.documentationUnitDTO.id = documentationUnit.id AND status.publicationStatus IN (de.bund.digitalservice.ris.caselaw.domain.PublicationStatus.PUBLISHED, de.bund.digitalservice.ris.caselaw.domain.PublicationStatus.PUBLISHING)))))
@@ -104,5 +67,6 @@ public interface DatabaseDocumentationUnitRepository
       PublicationStatus status,
       Boolean withErrorOnly,
       Boolean myDocOfficeOnly,
+      DocumentTypeDTO documentType,
       Pageable pageable);
 }

@@ -33,7 +33,9 @@ public interface DocumentUnitRepository {
   void delete(DocumentUnit documentUnit);
 
   Page<DocumentationUnitSearchResult> searchByRelatedDocumentationUnit(
-      RelatedDocumentationUnit relatedDocumentationUnit, Pageable pageable);
+      RelatedDocumentationUnit relatedDocumentationUnit,
+      DocumentationOffice documentationOffice,
+      Pageable pageable);
 
   Page<DocumentationUnitSearchResult> searchByDocumentationUnitSearchInput(
       Pageable pageable,
