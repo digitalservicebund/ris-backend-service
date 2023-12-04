@@ -485,7 +485,7 @@ describe("Active Citations", () => {
   })
 
   it("shows missing citationStyle validation for linked decision", async () => {
-    renderComponent({
+    const { user } = renderComponent({
       modelValue: [
         generateActiveCitation({
           documentNumber: "123",
@@ -496,7 +496,10 @@ describe("Active Citations", () => {
         }),
       ],
     })
+    const editButton = screen.getByLabelText("Eintrag bearbeiten")
+    await user.click(editButton)
 
-    expect(screen.getByText("Art der Zitierung")).toBeVisible()
+    expect(screen.getByText("Art der Zitierung *")).toBeVisible()
+    expect(screen.getAllByText(/Pflichtfeld nicht befüllt/).length).toBe(1)
   })
 })
