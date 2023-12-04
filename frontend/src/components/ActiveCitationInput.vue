@@ -240,8 +240,9 @@ watch(
         </InputField>
       </div>
     </div>
-    <div v-if="!activeCitation.hasForeignSource">
+    <div>
       <TextButton
+        v-if="!activeCitation.hasForeignSource"
         aria-label="Nach Entscheidung suchen"
         button-type="secondary"
         class="mr-28"

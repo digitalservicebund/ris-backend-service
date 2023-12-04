@@ -288,6 +288,68 @@ test.describe("active citations", () => {
     await expect(listItem).toBeHidden()
   })
 
+  test("citation style can be edited in linked decisions", async ({
+    page,
+    documentNumber,
+    prefilledDocumentUnit,
+  }) => {
+    await navigateToPublication(
+      page,
+      prefilledDocumentUnit.documentNumber || "",
+    )
+
+    await page
+      .locator("[aria-label='Dokumentationseinheit veröffentlichen']")
+      .click()
+    await expect(page.locator("text=Email wurde versendet")).toBeVisible()
+
+    await expect(page.locator("text=Xml Email Abgabe -")).toBeVisible()
+    await expect(page.locator("text=in Veröffentlichung")).toBeVisible()
+
+    await navigateToCategories(page, documentNumber)
+    await expect(page.getByText(documentNumber)).toBeVisible()
+
+    await fillActiveCitationInputs(page, {
+      court: prefilledDocumentUnit.coreData.court?.label,
+      fileNumber: prefilledDocumentUnit.coreData.fileNumbers?.[0],
+      documentType: prefilledDocumentUnit.coreData.documentType?.jurisShortcut,
+      decisionDate: "31.12.2019",
+    })
+
+    const activeCitationContainer = page.getByLabel("Aktivzitierung")
+    await activeCitationContainer.getByLabel("Nach Entscheidung suchen").click()
+    await expect(
+      activeCitationContainer.getByText("1 Ergebnis gefunden."),
+    ).toBeVisible()
+
+    const result = page.getByText(
+      `AG Aachen, 31.12.2019, ${prefilledDocumentUnit.coreData.fileNumbers?.[0]}, Anerkenntnisurteil, ${prefilledDocumentUnit.documentNumber}`,
+    )
+
+    await expect(result).toBeVisible()
+    await page.getByLabel("Treffer übernehmen").click()
+
+    await expect(
+      page.getByText(
+        `AG Aachen, 31.12.2019, ${prefilledDocumentUnit.coreData.fileNumbers?.[0]}, Anerkenntnisurteil, ${prefilledDocumentUnit.documentNumber}`,
+      ),
+    ).toBeVisible()
+    await expect(page.getByLabel("Eintrag löschen")).toBeVisible()
+
+    //can be edited
+    await expect(page.getByLabel("Eintrag bearbeiten")).toBeVisible()
+    await page.getByLabel("Eintrag bearbeiten").click()
+    await fillActiveCitationInputs(page, {
+      citationType: "Änderung",
+    })
+    await page.getByLabel("Aktivzitierung speichern").click()
+    await expect(
+      page.getByText(
+        `Änderung, AG Aachen, 31.12.2019, ${prefilledDocumentUnit.coreData.fileNumbers?.[0]}, Anerkenntnisurteil, ${prefilledDocumentUnit.documentNumber}`,
+      ),
+    ).toBeVisible()
+  })
+
   test("validates against required fields", async ({
     page,
     documentNumber,
