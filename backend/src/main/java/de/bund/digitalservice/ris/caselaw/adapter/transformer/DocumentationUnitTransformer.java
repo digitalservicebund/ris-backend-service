@@ -202,8 +202,8 @@ public class DocumentationUnitTransformer {
         }
       }
 
-      builder.ensuingDecisions(ensuingDecisionDTOs);
-      builder.pendingDecisions(pendingDecisionDTOs);
+      builder.ensuingDecisions(ensuingDecisionDTOs.stream().distinct().toList());
+      builder.pendingDecisions(pendingDecisionDTOs.stream().distinct().toList());
     }
   }
 

@@ -1,7 +1,8 @@
 INSERT INTO
   incremental_migration.document_category (id, label)
 VALUES
-  ('dd315130-1fda-46d5-bccd-d587cf51c664', 'R');
+  ('dd315130-1fda-46d5-bccd-d587cf51c664', 'R'),
+  ('4eea678f-39a9-4c56-aba1-b29423415209', 'N');
 
 insert into
   incremental_migration.court (
@@ -16,6 +17,12 @@ values
     '1357',
     'Karlsruhe',
     'BGH'
+  ),
+  (
+    'f99a0003-bfa3-4baa-904c-be07e274c741',
+    '1362',
+    'Karlsruhe',
+    'BVerfG'
   );
 
 insert into
@@ -26,6 +33,12 @@ values
     'Bes',
     'Beschluss',
     'dd315130-1fda-46d5-bccd-d587cf51c664'
+  ),
+  (
+    '0c64fc8f-806c-4c43-a80f-dc54500b2a5a',
+    'AO',
+    'Anordnung',
+    '4eea678f-39a9-4c56-aba1-b29423415209'
   );
 
 insert into
@@ -55,7 +68,8 @@ insert into
     note,
     dtype,
     documentation_unit_id,
-    rank
+    rank,
+    referenced_documentation_unit_id
   )
 values
   (
@@ -70,7 +84,8 @@ values
     'note1',
     'ensuing_decision',
     '46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3',
-    1
+    1,
+    null
   ),
   (
     'f0232240-7416-11ee-b962-0242ac120003',
@@ -78,11 +93,12 @@ values
     'BGH',
     '96301f85-9bd2-4690-a67f-f9fdfe725de3',
     '2011-01-21',
-    null,
-    'b57e016e-665d-486c-902e-c191f5a7acf6',
+    'documentnr002',
+    '0c64fc8f-806c-4c43-a80f-dc54500b2a5a',
     'cba',
     'note2',
     'pending_decision',
     '46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3',
-    2
+    2,
+    'f13e7fe2-78a5-11ee-b962-0242ac120002'
   );

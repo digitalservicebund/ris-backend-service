@@ -67,7 +67,7 @@ public abstract class RelatedDocumentationDTO {
   public boolean equals(Object o) {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass() || documentNumber == null) return false;
-    ActiveCitationDTO that = (ActiveCitationDTO) o;
+    RelatedDocumentationDTO that = (RelatedDocumentationDTO) o;
     return Objects.equals(documentNumber, that.getDocumentNumber());
   }
 

@@ -34,6 +34,9 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.EmailPublishService;
 import de.bund.digitalservice.ris.caselaw.domain.EnsuingDecision;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
+import de.bund.digitalservice.ris.caselaw.domain.court.Court;
+import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
@@ -362,7 +365,7 @@ class EnsuingDecisionsIntegrationTest {
   }
 
   @Test
-  void testUpdateDocumentUnit_removeActiveCitation() {
+  void testUpdateDocumentUnit_removeEnsuingDecision() {
     risWebTestClient
         .withDefaultLogin()
         .get()
@@ -404,6 +407,597 @@ class EnsuingDecisionsIntegrationTest {
             });
   }
 
-  // Todo: add linking ensuing decisions tests
+  @Test
+  void testUpdateDocumentUnit_removeAllEnsuingDecisions() {
+    risWebTestClient
+        .withDefaultLogin()
+        .get()
+        .uri("/api/v1/caselaw/documentunits/documentnr001")
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody(DocumentUnit.class)
+        .consumeWith(
+            response -> assertThat(response.getResponseBody().ensuingDecisions()).hasSize(2));
 
+    DocumentUnit documentUnitFromFrontend =
+        DocumentUnit.builder()
+            .uuid(UUID.fromString("46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3"))
+            .documentNumber("documentnr001")
+            .coreData(CoreData.builder().build())
+            .ensuingDecisions(List.of(EnsuingDecision.builder().build()))
+            .build();
+
+    risWebTestClient
+        .withDefaultLogin()
+        .put()
+        .uri("/api/v1/caselaw/documentunits/46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3")
+        .bodyValue(documentUnitFromFrontend)
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody(DocumentUnit.class)
+        .consumeWith(
+            response -> {
+              assertThat(response.getResponseBody().ensuingDecisions()).isEmpty();
+            });
+  }
+
+  @Test
+  void testUpdateDocumentationUnit_updateToPendingDecision() {
+    UUID uuid = UUID.fromString("46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3");
+    UUID ensuingDecisionUUID1 = UUID.fromString("f0232240-7416-11ee-b962-0242ac120002");
+    UUID ensuingDecisionUUID2 = UUID.fromString("f0232240-7416-11ee-b962-0242ac120003");
+    risWebTestClient
+        .withDefaultLogin()
+        .get()
+        .uri("/api/v1/caselaw/documentunits/documentnr001")
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody(DocumentUnit.class)
+        .consumeWith(
+            response -> {
+              assertThat(response.getResponseBody().ensuingDecisions()).hasSize(2);
+              assertThat(response.getResponseBody().ensuingDecisions().get(0).isPending())
+                  .isEqualTo(false);
+              assertThat(response.getResponseBody().ensuingDecisions().get(1).isPending())
+                  .isEqualTo(true);
+            });
+
+    DocumentUnit documentUnitFromFrontend =
+        DocumentUnit.builder()
+            .uuid(uuid)
+            .documentNumber("documentnr001")
+            .coreData(CoreData.builder().build())
+            .ensuingDecisions(
+                List.of(
+                    EnsuingDecision.builder()
+                        .uuid(ensuingDecisionUUID1)
+                        .pending(true)
+                        .note("note1")
+                        .build(),
+                    EnsuingDecision.builder()
+                        .uuid(ensuingDecisionUUID2)
+                        .pending(true)
+                        .note("note2")
+                        .build()))
+            .build();
+
+    risWebTestClient
+        .withDefaultLogin()
+        .put()
+        .uri("/api/v1/caselaw/documentunits/46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3")
+        .bodyValue(documentUnitFromFrontend)
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody(DocumentUnit.class)
+        .consumeWith(
+            response -> {
+              assertThat(response.getResponseBody().ensuingDecisions()).hasSize(2);
+              assertThat(response.getResponseBody().ensuingDecisions().get(0).isPending())
+                  .isEqualTo(true);
+              assertThat(response.getResponseBody().ensuingDecisions().get(1).isPending())
+                  .isEqualTo(true);
+            });
+  }
+
+  @Test
+  void testUpdateDocumentationUnit_deletePendingDecision() {
+    UUID uuid = UUID.fromString("46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3");
+    UUID ensuingDecisionUUID1 = UUID.fromString("f0232240-7416-11ee-b962-0242ac120002");
+    UUID ensuingDecisionUUID2 = UUID.fromString("f0232240-7416-11ee-b962-0242ac120003");
+    risWebTestClient
+        .withDefaultLogin()
+        .get()
+        .uri("/api/v1/caselaw/documentunits/documentnr001")
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody(DocumentUnit.class)
+        .consumeWith(
+            response -> {
+              assertThat(response.getResponseBody().ensuingDecisions()).hasSize(2);
+              assertThat(response.getResponseBody().ensuingDecisions().get(0).isPending())
+                  .isEqualTo(false);
+            });
+
+    DocumentUnit documentUnitFromFrontend =
+        DocumentUnit.builder()
+            .uuid(uuid)
+            .documentNumber("documentnr001")
+            .coreData(CoreData.builder().build())
+            .ensuingDecisions(
+                List.of(
+                    EnsuingDecision.builder()
+                        .uuid(ensuingDecisionUUID1)
+                        .pending(false)
+                        .note("note1")
+                        .build()))
+            .build();
+
+    risWebTestClient
+        .withDefaultLogin()
+        .put()
+        .uri("/api/v1/caselaw/documentunits/46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3")
+        .bodyValue(documentUnitFromFrontend)
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody(DocumentUnit.class)
+        .consumeWith(
+            response -> {
+              assertThat(response.getResponseBody().ensuingDecisions()).hasSize(1);
+              assertThat(response.getResponseBody().ensuingDecisions().get(0).isPending())
+                  .isEqualTo(false);
+            });
+  }
+
+  @Test
+  void testUpdateDocumentationUnit_updateCourtInEnsuingDecision() {
+    UUID uuid = UUID.fromString("46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3");
+    UUID ensuingDecisionUUID1 = UUID.fromString("f0232240-7416-11ee-b962-0242ac120002");
+    UUID ensuingDecisionUUID2 = UUID.fromString("f0232240-7416-11ee-b962-0242ac120003");
+    risWebTestClient
+        .withDefaultLogin()
+        .get()
+        .uri("/api/v1/caselaw/documentunits/documentnr001")
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody(DocumentUnit.class)
+        .consumeWith(
+            response -> {
+              assertThat(response.getResponseBody().ensuingDecisions()).hasSize(2);
+              assertThat(response.getResponseBody().ensuingDecisions().get(0).getCourt())
+                  .extracting("id")
+                  .isEqualTo(UUID.fromString("96301f85-9bd2-4690-a67f-f9fdfe725de3"));
+              assertThat(response.getResponseBody().ensuingDecisions().get(1).getCourt())
+                  .extracting("id")
+                  .isEqualTo(UUID.fromString("96301f85-9bd2-4690-a67f-f9fdfe725de3"));
+            });
+
+    DocumentUnit documentUnitFromFrontend =
+        DocumentUnit.builder()
+            .uuid(uuid)
+            .documentNumber("documentnr001")
+            .coreData(CoreData.builder().build())
+            .ensuingDecisions(
+                List.of(
+                    EnsuingDecision.builder()
+                        .uuid(ensuingDecisionUUID1)
+                        .pending(false)
+                        .court(
+                            Court.builder()
+                                .id(UUID.fromString("f99a0003-bfa3-4baa-904c-be07e274c741"))
+                                .location("Karlsruhe")
+                                .type("BVerfG")
+                                .build())
+                        .fileNumber("abc")
+                        .note("note1")
+                        .build(),
+                    EnsuingDecision.builder()
+                        .uuid(ensuingDecisionUUID2)
+                        .pending(true)
+                        .fileNumber("cba")
+                        .note("note2")
+                        .build()))
+            .build();
+
+    risWebTestClient
+        .withDefaultLogin()
+        .put()
+        .uri("/api/v1/caselaw/documentunits/46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3")
+        .bodyValue(documentUnitFromFrontend)
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody(DocumentUnit.class)
+        .consumeWith(
+            response -> {
+              assertThat(response.getResponseBody().ensuingDecisions()).hasSize(2);
+              assertThat(response.getResponseBody().ensuingDecisions().get(0).getCourt())
+                  .extracting("id")
+                  .isEqualTo(UUID.fromString("f99a0003-bfa3-4baa-904c-be07e274c741"));
+              assertThat(response.getResponseBody().ensuingDecisions().get(1).getCourt()).isNull();
+            });
+  }
+
+  @Test
+  void testUpdateDocumentationUnit_updateDecisionDateInEnsuingDecision() {
+    UUID uuid = UUID.fromString("46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3");
+    UUID ensuingDecisionUUID1 = UUID.fromString("f0232240-7416-11ee-b962-0242ac120002");
+    UUID ensuingDecisionUUID2 = UUID.fromString("f0232240-7416-11ee-b962-0242ac120003");
+    risWebTestClient
+        .withDefaultLogin()
+        .get()
+        .uri("/api/v1/caselaw/documentunits/documentnr001")
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody(DocumentUnit.class)
+        .consumeWith(
+            response -> {
+              assertThat(response.getResponseBody().ensuingDecisions()).hasSize(2);
+              assertThat(response.getResponseBody().ensuingDecisions().get(0).getDecisionDate())
+                  .isEqualTo("2011-01-21");
+              assertThat(response.getResponseBody().ensuingDecisions().get(1).getDecisionDate())
+                  .isEqualTo("2011-01-21");
+            });
+
+    DocumentUnit documentUnitFromFrontend =
+        DocumentUnit.builder()
+            .uuid(uuid)
+            .documentNumber("documentnr001")
+            .coreData(CoreData.builder().build())
+            .ensuingDecisions(
+                List.of(
+                    EnsuingDecision.builder()
+                        .uuid(ensuingDecisionUUID1)
+                        .pending(false)
+                        .decisionDate(LocalDate.parse("2000-01-21"))
+                        .fileNumber("abc")
+                        .note("note1")
+                        .build(),
+                    EnsuingDecision.builder()
+                        .uuid(ensuingDecisionUUID2)
+                        .pending(true)
+                        .fileNumber("cba")
+                        .note("note2")
+                        .build()))
+            .build();
+
+    risWebTestClient
+        .withDefaultLogin()
+        .put()
+        .uri("/api/v1/caselaw/documentunits/46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3")
+        .bodyValue(documentUnitFromFrontend)
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody(DocumentUnit.class)
+        .consumeWith(
+            response -> {
+              assertThat(response.getResponseBody().ensuingDecisions()).hasSize(2);
+              assertThat(response.getResponseBody().ensuingDecisions().get(0).getDecisionDate())
+                  .isEqualTo("2000-01-21");
+              assertThat(response.getResponseBody().ensuingDecisions().get(1).getCourt()).isNull();
+            });
+  }
+
+  @Test
+  void testUpdateDocumentationUnit_updateFileNumberInEnsuingDecision() {
+    UUID uuid = UUID.fromString("46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3");
+    UUID ensuingDecisionUUID1 = UUID.fromString("f0232240-7416-11ee-b962-0242ac120002");
+    UUID ensuingDecisionUUID2 = UUID.fromString("f0232240-7416-11ee-b962-0242ac120003");
+    risWebTestClient
+        .withDefaultLogin()
+        .get()
+        .uri("/api/v1/caselaw/documentunits/documentnr001")
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody(DocumentUnit.class)
+        .consumeWith(
+            response -> {
+              assertThat(response.getResponseBody().ensuingDecisions()).hasSize(2);
+              assertThat(response.getResponseBody().ensuingDecisions().get(0).getFileNumber())
+                  .isEqualTo("abc");
+              assertThat(response.getResponseBody().ensuingDecisions().get(1).getFileNumber())
+                  .isEqualTo("cba");
+            });
+
+    DocumentUnit documentUnitFromFrontend =
+        DocumentUnit.builder()
+            .uuid(uuid)
+            .documentNumber("documentnr001")
+            .coreData(CoreData.builder().build())
+            .ensuingDecisions(
+                List.of(
+                    EnsuingDecision.builder()
+                        .uuid(ensuingDecisionUUID1)
+                        .fileNumber("cba")
+                        .note("note1")
+                        .build(),
+                    EnsuingDecision.builder().uuid(ensuingDecisionUUID2).note("note2").build()))
+            .build();
+
+    risWebTestClient
+        .withDefaultLogin()
+        .put()
+        .uri("/api/v1/caselaw/documentunits/46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3")
+        .bodyValue(documentUnitFromFrontend)
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody(DocumentUnit.class)
+        .consumeWith(
+            response -> {
+              assertThat(response.getResponseBody().ensuingDecisions()).hasSize(2);
+              assertThat(response.getResponseBody().ensuingDecisions().get(0).getFileNumber())
+                  .isEqualTo("cba");
+              assertThat(response.getResponseBody().ensuingDecisions().get(1).getFileNumber())
+                  .isNull();
+            });
+  }
+
+  @Test
+  void testUpdateDocumentationUnit_updateDocumentTypeInEnsuingDecision() {
+    UUID uuid = UUID.fromString("46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3");
+    UUID ensuingDecisionUUID1 = UUID.fromString("f0232240-7416-11ee-b962-0242ac120002");
+    UUID ensuingDecisionUUID2 = UUID.fromString("f0232240-7416-11ee-b962-0242ac120003");
+    risWebTestClient
+        .withDefaultLogin()
+        .get()
+        .uri("/api/v1/caselaw/documentunits/documentnr001")
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody(DocumentUnit.class)
+        .consumeWith(
+            response -> {
+              assertThat(response.getResponseBody().ensuingDecisions()).hasSize(2);
+              assertThat(response.getResponseBody().ensuingDecisions().get(0).getDocumentType())
+                  .extracting("label")
+                  .isEqualTo("Beschluss");
+              assertThat(response.getResponseBody().ensuingDecisions().get(1).getDocumentType())
+                  .extracting("label")
+                  .isEqualTo("Anordnung");
+            });
+
+    DocumentUnit documentUnitFromFrontend =
+        DocumentUnit.builder()
+            .uuid(uuid)
+            .documentNumber("documentnr001")
+            .coreData(CoreData.builder().build())
+            .ensuingDecisions(
+                List.of(
+                    EnsuingDecision.builder()
+                        .uuid(ensuingDecisionUUID1)
+                        .documentType(
+                            DocumentType.builder()
+                                .uuid(UUID.fromString("0c64fc8f-806c-4c43-a80f-dc54500b2a5a"))
+                                .jurisShortcut("AO")
+                                .label("Anordnung")
+                                .build())
+                        .note("note1")
+                        .build(),
+                    EnsuingDecision.builder().uuid(ensuingDecisionUUID2).note("note2").build()))
+            .build();
+
+    risWebTestClient
+        .withDefaultLogin()
+        .put()
+        .uri("/api/v1/caselaw/documentunits/46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3")
+        .bodyValue(documentUnitFromFrontend)
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody(DocumentUnit.class)
+        .consumeWith(
+            response -> {
+              assertThat(response.getResponseBody().ensuingDecisions()).hasSize(2);
+              assertThat(response.getResponseBody().ensuingDecisions().get(0).getDocumentType())
+                  .extracting("label")
+                  .isEqualTo("Anordnung");
+              assertThat(response.getResponseBody().ensuingDecisions().get(1).getDocumentType())
+                  .isNull();
+            });
+  }
+
+  @Test
+  void testUpdateDocumentationUnit_updateNoteInEnsuingDecision() {
+    UUID uuid = UUID.fromString("46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3");
+    UUID ensuingDecisionUUID1 = UUID.fromString("f0232240-7416-11ee-b962-0242ac120002");
+    UUID ensuingDecisionUUID2 = UUID.fromString("f0232240-7416-11ee-b962-0242ac120003");
+    risWebTestClient
+        .withDefaultLogin()
+        .get()
+        .uri("/api/v1/caselaw/documentunits/documentnr001")
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody(DocumentUnit.class)
+        .consumeWith(
+            response -> {
+              assertThat(response.getResponseBody().ensuingDecisions()).hasSize(2);
+              assertThat(response.getResponseBody().ensuingDecisions().get(0).getNote())
+                  .isEqualTo("note1");
+              assertThat(response.getResponseBody().ensuingDecisions().get(1).getNote())
+                  .isEqualTo("note2");
+            });
+
+    DocumentUnit documentUnitFromFrontend =
+        DocumentUnit.builder()
+            .uuid(uuid)
+            .documentNumber("documentnr001")
+            .coreData(CoreData.builder().build())
+            .ensuingDecisions(
+                List.of(
+                    EnsuingDecision.builder()
+                        .uuid(ensuingDecisionUUID1)
+                        .fileNumber("abc")
+                        .note("note2")
+                        .build(),
+                    EnsuingDecision.builder().uuid(ensuingDecisionUUID2).fileNumber("cba").build()))
+            .build();
+
+    risWebTestClient
+        .withDefaultLogin()
+        .put()
+        .uri("/api/v1/caselaw/documentunits/46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3")
+        .bodyValue(documentUnitFromFrontend)
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody(DocumentUnit.class)
+        .consumeWith(
+            response -> {
+              assertThat(response.getResponseBody().ensuingDecisions()).hasSize(2);
+              assertThat(response.getResponseBody().ensuingDecisions().get(0).getNote())
+                  .isEqualTo("note2");
+              assertThat(response.getResponseBody().ensuingDecisions().get(1).getNote()).isNull();
+            });
+  }
+
+  @Test
+  void testGetDocumentUnit_withEnsuingDecisions_shouldReturnListWithLinkedAndNotLinkedDecisions() {
+    risWebTestClient
+        .withDefaultLogin()
+        .get()
+        .uri("/api/v1/caselaw/documentunits/documentnr001")
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody(DocumentUnit.class)
+        .consumeWith(
+            response -> {
+              assertThat(response.getResponseBody().ensuingDecisions()).hasSize(2);
+              assertThat(response.getResponseBody().ensuingDecisions().get(0).getDocumentNumber())
+                  .isNull();
+              assertThat(response.getResponseBody().ensuingDecisions().get(1).getDocumentNumber())
+                  .isEqualTo("documentnr002");
+            });
+  }
+
+  @Test
+  void testUpdateDocumentationUnit_addLinkedEnsuingDecision() {
+    DocumentUnit documentUnitFromFrontend =
+        DocumentUnit.builder()
+            .uuid(UUID.fromString("46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3"))
+            .documentNumber("documentnr001")
+            .coreData(CoreData.builder().build())
+            .ensuingDecisions(
+                List.of(
+                    EnsuingDecision.builder()
+                        .uuid(UUID.randomUUID())
+                        .documentNumber("documentnr002")
+                        .referencedDocumentationUnitId(
+                            UUID.fromString("f13e7fe2-78a5-11ee-b962-0242ac120002"))
+                        .build()))
+            .build();
+
+    risWebTestClient
+        .withDefaultLogin()
+        .put()
+        .uri("/api/v1/caselaw/documentunits/46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3")
+        .bodyValue(documentUnitFromFrontend)
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody(DocumentUnit.class)
+        .consumeWith(
+            response -> {
+              assertThat(response.getResponseBody().ensuingDecisions()).hasSize(1);
+              assertThat(response.getResponseBody().ensuingDecisions().get(0).getDocumentNumber())
+                  .isEqualTo("documentnr002");
+            });
+  }
+
+  @Test
+  void testUpdateDocumentationUnit_shouldNotAddSameLinkedDecisionTwice() {
+    DocumentUnit documentUnitFromFrontend =
+        DocumentUnit.builder()
+            .uuid(UUID.fromString("46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3"))
+            .documentNumber("documentnr001")
+            .coreData(CoreData.builder().build())
+            .ensuingDecisions(
+                List.of(
+                    EnsuingDecision.builder()
+                        .uuid(UUID.fromString("f0232240-7416-11ee-b962-0242ac120002"))
+                        .documentNumber("documentnr002")
+                        .referencedDocumentationUnitId(
+                            UUID.fromString("f13e7fe2-78a5-11ee-b962-0242ac120002"))
+                        .build(),
+                    EnsuingDecision.builder()
+                        .uuid(UUID.fromString("f0232240-7416-11ee-b962-0242ac120002"))
+                        .documentNumber("documentnr002")
+                        .referencedDocumentationUnitId(
+                            UUID.fromString("f13e7fe2-78a5-11ee-b962-0242ac120002"))
+                        .build()))
+            .build();
+
+    risWebTestClient
+        .withDefaultLogin()
+        .put()
+        .uri("/api/v1/caselaw/documentunits/46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3")
+        .bodyValue(documentUnitFromFrontend)
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody(DocumentUnit.class)
+        .consumeWith(
+            response -> {
+              assertThat(response.getResponseBody().ensuingDecisions()).hasSize(1);
+              assertThat(response.getResponseBody().ensuingDecisions().get(0).getDocumentNumber())
+                  .isEqualTo("documentnr002");
+            });
+  }
+
+  @Test
+  void testUpdateDocumentUnit_removeLinkedEnsuingDecision() {
+    UUID uuid = UUID.fromString("46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3");
+    UUID ensuingDecisionUUID1 = UUID.fromString("f0232240-7416-11ee-b962-0242ac120002");
+    risWebTestClient
+        .withDefaultLogin()
+        .get()
+        .uri("/api/v1/caselaw/documentunits/documentnr001")
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody(DocumentUnit.class)
+        .consumeWith(
+            response -> assertThat(response.getResponseBody().ensuingDecisions()).hasSize(2));
+
+    DocumentUnit documentUnitFromFrontend =
+        DocumentUnit.builder()
+            .uuid(uuid)
+            .documentNumber("documentnr001")
+            .coreData(CoreData.builder().build())
+            .ensuingDecisions(
+                List.of(
+                    EnsuingDecision.builder()
+                        .uuid(ensuingDecisionUUID1)
+                        .fileNumber("abc")
+                        .note("note2")
+                        .build()))
+            .build();
+
+    risWebTestClient
+        .withDefaultLogin()
+        .put()
+        .uri("/api/v1/caselaw/documentunits/46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3")
+        .bodyValue(documentUnitFromFrontend)
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody(DocumentUnit.class)
+        .consumeWith(
+            response -> {
+              assertThat(response.getResponseBody().ensuingDecisions()).hasSize(1);
+              assertThat(response.getResponseBody().ensuingDecisions().get(0).getDocumentNumber())
+                  .isNull();
+            });
+  }
 }

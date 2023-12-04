@@ -1259,6 +1259,4 @@ class ActiveCitationIntegrationTest {
                   .hasSize(1);
             });
   }
-
-  // Todo missing test cases?
 }

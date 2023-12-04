@@ -24,6 +24,7 @@ public class EnsuingDecision extends RelatedDocumentationUnit {
         && decisionDate == null
         && fileNumber == null
         && documentType == null
-        && note == null;
+        && note == null
+        && documentNumber == null;
   }
 }
