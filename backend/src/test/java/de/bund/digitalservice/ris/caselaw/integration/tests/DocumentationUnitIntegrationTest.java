@@ -51,6 +51,7 @@ import de.bund.digitalservice.ris.caselaw.domain.Texts;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
 import java.nio.charset.StandardCharsets;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -402,6 +403,7 @@ class DocumentationUnitIntegrationTest {
                       StatusDTO.builder()
                           .documentationUnitDTO(dto)
                           .publicationStatus(PUBLISHED)
+                          .createdAt(Instant.now())
                           .build()))
               .build());
     }
