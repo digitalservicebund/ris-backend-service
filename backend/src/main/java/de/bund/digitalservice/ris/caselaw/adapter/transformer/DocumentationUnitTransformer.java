@@ -221,6 +221,7 @@ public class DocumentationUnitTransformer {
                     previousDecisionDTO.setRank(i.getAndIncrement());
                     return previousDecisionDTO;
                   })
+              .distinct()
               .toList());
     }
   }

@@ -286,6 +286,7 @@ class PreviousDecisionIntegrationTest {
 
   @Test
   @Disabled("should be done by jpa cascades")
+  // Todo what does this test?
   void testRemovePreviousDecisionLinkAndDeleteOrphanedDocumentUnit() {
     DocumentationUnitDTO parentDocumentUnitDTO =
         DocumentationUnitDTO.builder()
@@ -314,8 +315,6 @@ class PreviousDecisionIntegrationTest {
   }
 
   @Test
-  // TODO fix this test by checking for duplicates when adding a previous decision
-  @Disabled("should be fixed")
   void testLinkTheSameDocumentUnitsTwice() {
     DocumentationUnitDTO childDocumentUnitDTO =
         DocumentationUnitDTO.builder()
@@ -360,9 +359,13 @@ class PreviousDecisionIntegrationTest {
         .expectBody(DocumentUnit.class)
         .consumeWith(
             response -> {
-              assertThat(response.getResponseBody().previousDecisions())
+              assertThat(response.getResponseBody().previousDecisions()).hasSize(1);
+              assertThat(response.getResponseBody().previousDecisions().get(0))
                   .extracting("documentNumber")
-                  .containsExactly("xxx");
+                  .isEqualTo("xxx");
+              assertThat(response.getResponseBody().previousDecisions().get(0))
+                  .extracting("referencedDocumentationUnitId")
+                  .isEqualTo(childDocumentationUnitUuid);
             });
   }
 
