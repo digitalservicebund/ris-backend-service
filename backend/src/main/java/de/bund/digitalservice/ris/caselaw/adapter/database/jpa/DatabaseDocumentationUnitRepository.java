@@ -31,6 +31,17 @@ public interface DatabaseDocumentationUnitRepository
          )
         AND (cast(:decisionDate as date) IS NULL OR documentationUnit.decisionDate = :decisionDate)
         AND (cast(:documentType as uuid) IS NULL OR documentationUnit.documentType = :documentType)
+        AND EXISTS (
+          SELECT 1
+          FROM StatusDTO status
+          WHERE status.documentationUnitDTO.id = documentationUnit.id
+          AND status.createdAt = (
+              SELECT MAX(subStatus.createdAt)
+              FROM StatusDTO subStatus
+              WHERE subStatus.documentationUnitDTO.id = documentationUnit.id
+          )
+          AND (status.publicationStatus IN ('PUBLISHED', 'PUBLISHING'))
+          )
         )
         ORDER BY documentationUnit.decisionDate DESC, documentationUnit.id DESC
         """)
@@ -42,6 +53,8 @@ public interface DatabaseDocumentationUnitRepository
       DocumentTypeDTO documentType,
       Pageable pageable);
 
+  // TODO fix deviatingFileNumber case sensitivity - the query breaks as soon as we activate it
+  // TODO should we query fileNumbers for contains()?
   @Query(
       value =
           """
@@ -49,12 +62,12 @@ public interface DatabaseDocumentationUnitRepository
     LEFT JOIN documentationUnit.court court
     WHERE (
        (:documentNumberOrFileNumber IS NULL
-         OR ( lower(documentationUnit.documentNumber) like lower(concat('%', :documentNumberOrFileNumber,'%'))
+         OR (upper(documentationUnit.documentNumber) like upper(concat('%', :documentNumberOrFileNumber,'%'))
             OR EXISTS (
                SELECT 1
                FROM FileNumberDTO fileNumber
                WHERE fileNumber.documentationUnit.id = documentationUnit.id
-               AND fileNumber.value = :documentNumberOrFileNumber
+               AND upper(fileNumber.value) like upper(:documentNumberOrFileNumber)
             )
             OR EXISTS (
                SELECT 1

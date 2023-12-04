@@ -481,7 +481,7 @@ class DocumentationUnitIntegrationTest {
             "MNOP202300099",
             "QRST202200102",
             "UVWX202311090");
-    List<String> fileNumbers = List.of("jkl", "ghi", "def", "abc", "mno", "pqr");
+    List<String> fileNumbers = List.of("jkl", "ghi", "def", "ABC", "mno", "pqr");
     List<String> courtTypes = List.of("MNO", "PQR", "STU", "VWX", "YZA", "BCD");
     List<String> courtLocations =
         List.of("Hamburg", "München", "Berlin", "Frankfurt", "Köln", "Leipzig");

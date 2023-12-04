@@ -45,6 +45,7 @@ import de.bund.digitalservice.ris.caselaw.domain.Status;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import de.bund.digitalservice.ris.caselaw.domain.court.Court;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
@@ -462,8 +463,6 @@ class PreviousDecisionIntegrationTest {
   }
 
   @Test
-  @Disabled("should be fixed")
-  // TODO fix this test by making sure only published DocumentUnits are found
   void testSearchForDocumentUnitsByPreviousDecisionInput_shouldOnlyFindPublished() {
     LocalDate date = LocalDate.parse("2023-02-02");
 
@@ -638,6 +637,7 @@ class PreviousDecisionIntegrationTest {
                             .publicationStatus(status.publicationStatus())
                             .withError(status.withError())
                             .documentationUnitDTO(documentationUnitDTO)
+                            .createdAt(Instant.now())
                             .build()))
             .build();
 
