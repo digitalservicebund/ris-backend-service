@@ -65,8 +65,7 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
       AuthService.class,
       TestConfig.class
     },
-    controllers = {DocumentUnitController.class},
-    timeout = "PT5M")
+    controllers = {DocumentUnitController.class})
 @Sql(
     scripts = {"classpath:fields_of_law_init.sql"},
     executionPhase = ExecutionPhase.BEFORE_TEST_METHOD)

@@ -73,8 +73,7 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
       TestConfig.class,
       DatabaseProcedureService.class
     },
-    controllers = {DocumentUnitController.class, ProcedureController.class},
-    timeout = "PT5M")
+    controllers = {DocumentUnitController.class, ProcedureController.class})
 class ProcedureIntegrationTest {
   @Container
   static PostgreSQLContainer<?> postgreSQLContainer =

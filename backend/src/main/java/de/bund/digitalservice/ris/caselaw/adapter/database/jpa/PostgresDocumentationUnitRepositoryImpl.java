@@ -142,8 +142,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
     // Transform non-database-related properties
     documentationUnitDTO =
         DocumentationUnitTransformer.transformToDTO(documentationUnitDTO, documentUnit);
-    DocumentationUnitDTO dto = repository.save(documentationUnitDTO);
-    log.info("test");
+    repository.save(documentationUnitDTO);
   }
 
   @Override

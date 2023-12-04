@@ -68,8 +68,7 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
       AuthService.class,
       TestConfig.class
     },
-    controllers = {DocumentUnitController.class},
-    timeout = "10000000")
+    controllers = {DocumentUnitController.class})
 class SaveNormIntegrationTest {
   @Container
   static PostgreSQLContainer<?> postgreSQLContainer =

@@ -62,8 +62,7 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
       AuthService.class,
       TestConfig.class
     },
-    controllers = {DocumentUnitController.class},
-    timeout = "PT5M")
+    controllers = {DocumentUnitController.class})
 @Sql(scripts = {"classpath:keyword_init.sql"})
 @Sql(
     scripts = {"classpath:keyword_cleanup.sql"},

@@ -47,8 +47,7 @@ import org.testcontainers.junit.jupiter.Container;
       AuthService.class,
       TestConfig.class
     },
-    controllers = {FieldOfLawController.class},
-    timeout = "PT5M")
+    controllers = {FieldOfLawController.class})
 @Sql(
     scripts = {"classpath:fields_of_law_init.sql"},
     executionPhase = ExecutionPhase.BEFORE_TEST_METHOD)

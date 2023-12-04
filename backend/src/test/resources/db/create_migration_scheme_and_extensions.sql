@@ -107,9 +107,6 @@ from
   left join incremental_migration.norm_abbreviation_region nar on na.id = nar.norm_abbreviation_id
   left join incremental_migration.region r on nar.region_id = r.id;
 
-CREATE INDEX
-  norm_abbreviation_search_migration_idx ON incremental_migration.norm_abbreviation_search_migration USING GIN (weighted_vector);
-
 CREATE TABLE IF NOT EXISTS
   incremental_migration.norm_reference (
     id uuid NOT NULL,
@@ -341,18 +338,6 @@ create table
     rank integer default '-1'::integer not null
   );
 
-create index
-  related_documentation_citation_type_id_idx on incremental_migration.related_documentation (citation_type_id);
-
-create index
-  related_documentation_court_id_idx on incremental_migration.related_documentation (court_id);
-
-create index
-  related_documentation_document_type_id_idx on incremental_migration.related_documentation (document_type_id);
-
-create index
-  related_documentation_documentation_unit_id_idx on incremental_migration.related_documentation (documentation_unit_id);
-
 create type
   incremental_migration.notation as enum('OLD', 'NEW');
 
@@ -386,18 +371,12 @@ create table
     field_of_law_id uuid not null constraint fk_field_of_law references incremental_migration.field_of_law
   );
 
-create index
-  field_of_law_norm_field_of_law_id_idx on incremental_migration.field_of_law_norm (field_of_law_id);
-
 create table
   incremental_migration.field_of_law_field_of_law_keyword (
     field_of_law_id uuid not null constraint fk_field_of_law references incremental_migration.field_of_law,
     field_of_law_keyword_id uuid not null constraint fk_field_of_law_keyword references incremental_migration.field_of_law_keyword,
     primary key (field_of_law_id, field_of_law_keyword_id)
   );
-
-create index
-  field_of_law_keyword_id_idx on incremental_migration.field_of_law_field_of_law_keyword (field_of_law_keyword_id);
 
 create table
   incremental_migration.field_of_law_field_of_law_navigation_term (
@@ -406,17 +385,11 @@ create table
     primary key (field_of_law_id, field_of_law_navigation_term_id)
   );
 
-create index
-  field_of_law_navigation_term_id_idx on incremental_migration.field_of_law_field_of_law_navigation_term (field_of_law_navigation_term_id);
-
 create table
   incremental_migration.field_of_law_field_of_law_parent (
     field_of_law_id uuid not null primary key constraint fk_field_of_law references incremental_migration.field_of_law,
     field_of_law_parent_id uuid not null constraint fk_field_of_law_parent references incremental_migration.field_of_law
   );
-
-create index
-  field_of_law_parent_id_idx on incremental_migration.field_of_law_field_of_law_parent (field_of_law_parent_id);
 
 create table
   incremental_migration.field_of_law_field_of_law_text_reference (
@@ -425,9 +398,6 @@ create table
     primary key (field_of_law_id, field_of_law_text_reference_id)
   );
 
-create index
-  field_of_law_text_reference_id_idx on incremental_migration.field_of_law_field_of_law_text_reference (field_of_law_text_reference_id);
-
 create table
   incremental_migration.documentation_unit_field_of_law (
     documentation_unit_id uuid not null constraint fk_documentation_unit references incremental_migration.documentation_unit,
@@ -435,9 +405,6 @@ create table
     rank int default -1,
     primary key (documentation_unit_id, field_of_law_id)
   );
-
-create index
-  documentation_unit_field_of_law_field_of_law_id_idx on incremental_migration.documentation_unit_field_of_law (field_of_law_id);
 
 create table
   incremental_migration.status (
@@ -450,9 +417,6 @@ create table
     issuer_address varchar(255),
     documentation_unit_id uuid not null constraint fk_documentation_unit references incremental_migration.documentation_unit
   );
-
-create index
-  status_documentation_unit_id_idx on incremental_migration.status (documentation_unit_id);
 
 create table
   incremental_migration.procedure (
@@ -471,5 +435,169 @@ create table
     constraint uc_documentation_unit_id_procedure_id_rank unique (documentation_unit_id, procedure_id, rank)
   );
 
-create index
-  documentation_unit_procedure_procedure_id_idx on incremental_migration.documentation_unit_procedure (procedure_id);
+CREATE INDEX
+  citation_type_citation_document_category_id_idx ON incremental_migration.citation_type USING btree (citation_document_category_id);
+
+CREATE INDEX
+  citation_type_documentation_unit_document_category_id_idx ON incremental_migration.citation_type USING btree (documentation_unit_document_category_id);
+
+CREATE UNIQUE INDEX uc_citation_type ON incremental_migration.citation_type USING btree (
+  abbreviation,
+  documentation_unit_document_category_id,
+  citation_document_category_id
+);
+
+CREATE INDEX
+  court_address_id_idx ON incremental_migration.court USING btree (address_id);
+
+CREATE INDEX
+  court_region_id_idx ON incremental_migration.court_region USING btree (region_id);
+
+CREATE INDEX
+  court_synonym_court_id_idx ON incremental_migration.court_synonym USING btree (court_id);
+
+CREATE INDEX
+  decision_name_documentation_unit_id_idx ON incremental_migration.decision_name USING btree (documentation_unit_id);
+
+CREATE INDEX
+  deviating_court_documentation_unit_id_idx ON incremental_migration.deviating_court USING btree (documentation_unit_id);
+
+CREATE INDEX
+  deviating_date_documentation_unit_id_idx ON incremental_migration.deviating_date USING btree (documentation_unit_id);
+
+CREATE INDEX
+  deviating_ecli_documentation_unit_id_idx ON incremental_migration.deviating_ecli USING btree (documentation_unit_id);
+
+CREATE INDEX
+  deviating_file_number_documentation_unit_id_idx ON incremental_migration.deviating_file_number USING btree (documentation_unit_id);
+
+CREATE INDEX
+  document_type_document_category_id_idx ON incremental_migration.document_type USING btree (document_category_id);
+
+CREATE INDEX
+  documentation_unit_court_id_idx ON incremental_migration.documentation_unit USING btree (court_id);
+
+CREATE INDEX
+  documentation_unit_decision_date_idx ON incremental_migration.documentation_unit USING btree (decision_date);
+
+CREATE INDEX
+  documentation_unit_document_type_id_idx ON incremental_migration.documentation_unit USING btree (document_type_id);
+
+CREATE INDEX
+  documentation_unit_documentation_office_id_idx ON incremental_migration.documentation_unit USING btree (documentation_office_id);
+
+CREATE INDEX
+  documentation_unit_jurisdiction_type_id_idx ON incremental_migration.documentation_unit USING btree (jurisdiction_type_id);
+
+CREATE UNIQUE INDEX uc_document_number ON incremental_migration.documentation_unit USING btree (document_number);
+
+CREATE INDEX
+  documentation_unit_field_of_law_field_of_law_id_idx ON incremental_migration.documentation_unit_field_of_law USING btree (field_of_law_id);
+
+CREATE INDEX
+  documentation_unit_keyword_keyword_id_idx ON incremental_migration.documentation_unit_keyword USING btree (keyword_id);
+
+CREATE INDEX
+  documentation_unit_procedure_procedure_id_idx ON incremental_migration.documentation_unit_procedure USING btree (procedure_id);
+
+CREATE INDEX
+  documentation_unit_region_region_id_idx ON incremental_migration.documentation_unit_region USING btree (region_id);
+
+CREATE INDEX
+  field_of_law_keyword_id_idx ON incremental_migration.field_of_law_field_of_law_keyword USING btree (field_of_law_keyword_id);
+
+CREATE INDEX
+  field_of_law_navigation_term_id_idx ON incremental_migration.field_of_law_field_of_law_navigation_term USING btree (field_of_law_navigation_term_id);
+
+CREATE INDEX
+  field_of_law_parent_id_idx ON incremental_migration.field_of_law_field_of_law_parent USING btree (field_of_law_parent_id);
+
+CREATE INDEX
+  field_of_law_text_reference_id_idx ON incremental_migration.field_of_law_field_of_law_text_reference USING btree (field_of_law_text_reference_id);
+
+CREATE INDEX
+  field_of_law_norm_field_of_law_id_idx ON incremental_migration.field_of_law_norm USING btree (field_of_law_id);
+
+CREATE INDEX
+  file_number_documentation_unit_id_idx ON incremental_migration.file_number USING btree (documentation_unit_id);
+
+CREATE INDEX
+  judicial_body_court_id_idx ON incremental_migration.judicial_body USING btree (court_id);
+
+CREATE INDEX
+  norm_abbreviation_abbreviation_idx ON incremental_migration.norm_abbreviation USING btree (abbreviation);
+
+CREATE INDEX
+  norm_abbreviation_fs_idx ON incremental_migration.norm_abbreviation USING gin (
+    to_tsvector(
+      'german'::regconfig,
+      (
+        (
+          (
+            (
+              (
+                (
+                  (COALESCE(abbreviation, ''::character varying))::text || ' '::text
+                ) || COALESCE(official_long_title, ''::text)
+              ) || ' '::text
+            ) || COALESCE(official_short_title, ''::text)
+          ) || ' '::text
+        ) || (
+          COALESCE(
+            official_letter_abbreviation,
+            ''::character varying
+          )
+        )::text
+      )
+    )
+  );
+
+CREATE INDEX
+  norm_abbreviation_gin_idx ON incremental_migration.norm_abbreviation USING gin (upper((abbreviation)::text) gin_trgm_ops);
+
+CREATE INDEX
+  norm_abbreviation_official_letter_gin_idx ON incremental_migration.norm_abbreviation USING gin (
+    upper((official_letter_abbreviation)::text) gin_trgm_ops
+  );
+
+CREATE INDEX
+  norm_abbreviation_document_type_document_type_id_idx ON incremental_migration.norm_abbreviation_document_type USING btree (document_type_id);
+
+CREATE INDEX
+  norm_abbreviation_document_type_norm_abbreviation_id_idx ON incremental_migration.norm_abbreviation_document_type USING btree (norm_abbreviation_id);
+
+CREATE INDEX
+  norm_abbreviation_region_norm_abbreviation_id_idx ON incremental_migration.norm_abbreviation_region USING btree (norm_abbreviation_id);
+
+CREATE INDEX
+  norm_abbreviation_region_region_id_idx ON incremental_migration.norm_abbreviation_region USING btree (region_id);
+
+CREATE INDEX
+  norm_abbreviation_search_migration_idx ON incremental_migration.norm_abbreviation_search_migration USING gin (weighted_vector);
+
+CREATE INDEX
+  norm_element_document_category_id_idx ON incremental_migration.norm_element USING btree (document_category_id);
+
+CREATE INDEX
+  norm_reference_documentation_unit_id_idx ON incremental_migration.norm_reference USING btree (documentation_unit_id);
+
+CREATE INDEX
+  norm_reference_legacy_doc_unit_id_idx ON incremental_migration.norm_reference USING btree (legacy_doc_unit_id);
+
+CREATE INDEX
+  norm_reference_norm_abbreviation_id_idx ON incremental_migration.norm_reference USING btree (norm_abbreviation_id);
+
+CREATE INDEX
+  related_documentation_citation_type_id_idx ON incremental_migration.related_documentation USING btree (citation_type_id);
+
+CREATE INDEX
+  related_documentation_court_id_idx ON incremental_migration.related_documentation USING btree (court_id);
+
+CREATE INDEX
+  related_documentation_document_type_id_idx ON incremental_migration.related_documentation USING btree (document_type_id);
+
+CREATE INDEX
+  related_documentation_documentation_unit_id_idx ON incremental_migration.related_documentation USING btree (documentation_unit_id);
+
+CREATE INDEX
+  status_documentation_unit_id_idx ON incremental_migration.status USING btree (documentation_unit_id);

@@ -19,7 +19,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 @Tag("integration")
 @Testcontainers(disabledWithoutDocker = true)
 @AutoConfigureDataR2dbc
-@AutoConfigureWebTestClient(timeout = "100000000000")
+@AutoConfigureWebTestClient(timeout = "PT10S")
 public @interface RISIntegrationTest {
   @AliasFor(annotation = Import.class, attribute = "value")
   Class<?>[] imports();
@@ -28,5 +28,5 @@ public @interface RISIntegrationTest {
   Class<?>[] controllers() default {};
 
   @AliasFor(annotation = AutoConfigureWebTestClient.class, attribute = "timeout")
-  String timeout() default "";
+  String timeout() default "PT10S";
 }
