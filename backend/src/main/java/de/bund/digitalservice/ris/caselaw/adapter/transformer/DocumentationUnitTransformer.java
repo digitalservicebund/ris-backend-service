@@ -9,13 +9,11 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentTypeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO.DocumentationUnitDTOBuilder;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.EnsuingDecisionDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.FieldOfLawDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.FileNumberDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.KeywordDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LegalEffectDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.NormReferenceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.OriginalFileDocumentDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PendingDecisionDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ProcedureDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.StatusDTO;
 import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
@@ -32,7 +30,6 @@ import de.bund.digitalservice.ris.caselaw.domain.PreviousDecision;
 import de.bund.digitalservice.ris.caselaw.domain.Status;
 import de.bund.digitalservice.ris.caselaw.domain.Texts;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw.FieldOfLaw;
-import java.time.Instant;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -73,7 +70,6 @@ public class DocumentationUnitTransformer {
                   : null)
           .court(CourtTransformer.transformToDTO(coreData.court()));
 
-      addProcedures(currentDto, builder, coreData);
       addFileNumbers(currentDto, builder, coreData);
       addDeviationCourts(builder, coreData);
       addDeviatingDecisionDates(builder, coreData);
@@ -100,7 +96,6 @@ public class DocumentationUnitTransformer {
       ContentRelatedIndexing contentRelatedIndexing = updatedDomainObject.contentRelatedIndexing();
 
       addActiveCitations(builder, contentRelatedIndexing);
-      addFieldsOfLaw(builder, contentRelatedIndexing);
       addNormReferences(builder, contentRelatedIndexing);
     }
 
@@ -148,26 +143,15 @@ public class DocumentationUnitTransformer {
       return;
     }
 
+    AtomicInteger i = new AtomicInteger(1);
     builder.normReferences(
         contentRelatedIndexing.norms().stream()
-            .map(NormReferenceTransformer::transformToDTO)
-            .toList());
-  }
-
-  private static void addFieldsOfLaw(
-      DocumentationUnitDTOBuilder builder, ContentRelatedIndexing contentRelatedIndexing) {
-    if (contentRelatedIndexing.fieldsOfLaw() == null) {
-      return;
-    }
-
-    builder.fieldsOfLaw(
-        contentRelatedIndexing.fieldsOfLaw().stream()
             .map(
-                fieldOfLaw ->
-                    FieldOfLawDTO.builder()
-                        .id(fieldOfLaw.id())
-                        .identifier(fieldOfLaw.identifier())
-                        .build())
+                norm -> {
+                  NormReferenceDTO normReferenceDTO = NormReferenceTransformer.transformToDTO(norm);
+                  normReferenceDTO.setRank(i.getAndIncrement());
+                  return normReferenceDTO;
+                })
             .toList());
   }
 
@@ -366,40 +350,6 @@ public class DocumentationUnitTransformer {
     builder.fileNumbers(fileNumberDTOs);
   }
 
-  private static void addProcedures(
-      DocumentationUnitDTO currentDto, DocumentationUnitDTOBuilder builder, CoreData coreData) {
-
-    List<ProcedureDTO> procedureDTOs = currentDto.getProcedures();
-    if ((procedureDTOs == null || procedureDTOs.isEmpty()) && coreData.procedure() != null) {
-      if (coreData.procedure().id() == null) {
-        builder.procedures(
-            List.of(
-                ProcedureDTO.builder()
-                    .label(coreData.procedure().label())
-                    .createdAt(Instant.now())
-                    .documentationOffice(currentDto.getDocumentationOffice())
-                    .build()));
-      } else {
-        builder.procedures(List.of(ProcedureDTO.builder().id(coreData.procedure().id()).build()));
-      }
-    } else if (procedureDTOs != null && !procedureDTOs.isEmpty()) {
-      if (coreData.procedure().id() == null) {
-        procedureDTOs.add(
-            0,
-            ProcedureDTO.builder()
-                .label(coreData.procedure().label())
-                .createdAt(Instant.now())
-                .documentationOffice(currentDto.getDocumentationOffice())
-                .build());
-      } else {
-        if (!coreData.procedure().id().equals(procedureDTOs.get(0).getId())) {
-          procedureDTOs.add(0, ProcedureDTO.builder().id(coreData.procedure().id()).build());
-        }
-      }
-      builder.procedures(procedureDTOs);
-    }
-  }
-
   public static DocumentUnit transformToDomain(DocumentationUnitDTO documentationUnitDTO) {
     if (log.isDebugEnabled()) {
       log.debug(
@@ -455,9 +405,13 @@ public class DocumentationUnitTransformer {
     ContentRelatedIndexing.ContentRelatedIndexingBuilder contentRelatedIndexingBuilder =
         ContentRelatedIndexing.builder();
 
-    if (documentationUnitDTO.getKeywords() != null) {
+    if (documentationUnitDTO.getDocumentationUnitKeywordDTOs() != null) {
       List<String> keywords =
-          documentationUnitDTO.getKeywords().stream().map(KeywordDTO::getValue).toList();
+          documentationUnitDTO.getDocumentationUnitKeywordDTOs().stream()
+              .map(
+                  documentationUnitKeywordDTO ->
+                      documentationUnitKeywordDTO.getKeyword().getValue())
+              .toList();
       contentRelatedIndexingBuilder.keywords(keywords);
     }
 
@@ -477,10 +431,13 @@ public class DocumentationUnitTransformer {
               .toList());
     }
 
-    if (documentationUnitDTO.getFieldsOfLaw() != null) {
+    if (documentationUnitDTO.getDocumentationUnitFieldsOfLaw() != null) {
       List<FieldOfLaw> fieldOfLaws =
-          documentationUnitDTO.getFieldsOfLaw().stream()
-              .map(FieldOfLawTransformer::transformToDomain)
+          documentationUnitDTO.getDocumentationUnitFieldsOfLaw().stream()
+              .map(
+                  documentationUnitFieldOfLawDTO ->
+                      FieldOfLawTransformer.transformToDomain(
+                          documentationUnitFieldOfLawDTO.getFieldOfLaw()))
               .toList();
 
       contentRelatedIndexingBuilder.fieldsOfLaw(fieldOfLaws);

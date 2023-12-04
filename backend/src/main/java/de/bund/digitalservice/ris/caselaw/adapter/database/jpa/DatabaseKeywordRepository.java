@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface JPADatabaseKeywordRepository extends JpaRepository<KeywordDTO, UUID> {
+public interface DatabaseKeywordRepository extends JpaRepository<KeywordDTO, UUID> {
 
   Optional<KeywordDTO> findByValue(String value);
 }

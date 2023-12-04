@@ -393,6 +393,8 @@ class DocumentationUnitIntegrationTest {
                   .documentationOffice(documentationOfficeRepository.findByAbbreviation("DS"))
                   .build());
 
+      dto = repository.findById(dto.getId()).get();
+
       repository.save(
           dto.toBuilder()
               .status(
@@ -517,6 +519,8 @@ class DocumentationUnitIntegrationTest {
                       DocumentationOfficeDTO.builder().id(docOfficeIds.get(i)).build())
                   .build());
 
+      dto = repository.findById(dto.getId()).get();
+
       repository.save(
           dto.toBuilder()
               .fileNumbers(
@@ -527,6 +531,8 @@ class DocumentationUnitIntegrationTest {
                           .rank((long) i)
                           .build()))
               .build());
+
+      dto = repository.findById(dto.getId()).get();
 
       repository.save(
           dto.toBuilder()

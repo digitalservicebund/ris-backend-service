@@ -7,18 +7,20 @@ import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitRepository;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitException;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitSearchInput;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitSearchResult;
+import de.bund.digitalservice.ris.caselaw.domain.Procedure;
 import de.bund.digitalservice.ris.caselaw.domain.RelatedDocumentationType;
 import de.bund.digitalservice.ris.caselaw.domain.RelatedDocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.Status;
 import de.bund.digitalservice.ris.caselaw.domain.court.Court;
+import de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw.FieldOfLaw;
 import java.time.Instant;
-import java.util.HashSet;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
@@ -37,22 +39,27 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
   private final DatabaseDocumentationUnitRepository repository;
   private final DatabaseCourtRepository databaseCourtRepository;
   private final DatabaseDocumentationOfficeRepository documentationOfficeRepository;
-  private final JPADatabaseKeywordRepository keywordRepository;
-
+  private final DatabaseKeywordRepository keywordRepository;
+  private final DatabaseFieldOfLawRepository fieldOfLawRepository;
+  private final DatabaseProcedureRepository procedureRepository;
   private final DatabaseRelatedDocumentationRepository relatedDocumentationRepository;
 
   public PostgresDocumentationUnitRepositoryImpl(
       DatabaseDocumentationUnitRepository repository,
       DatabaseCourtRepository databaseCourtRepository,
       DatabaseDocumentationOfficeRepository documentationOfficeRepository,
-      JPADatabaseKeywordRepository keywordRepository,
-      DatabaseRelatedDocumentationRepository relatedDocumentationRepository) {
+      DatabaseRelatedDocumentationRepository relatedDocumentationRepository,
+      DatabaseKeywordRepository keywordRepository,
+      DatabaseProcedureRepository procedureRepository,
+      DatabaseFieldOfLawRepository fieldOfLawRepository) {
 
     this.repository = repository;
     this.databaseCourtRepository = databaseCourtRepository;
     this.documentationOfficeRepository = documentationOfficeRepository;
     this.keywordRepository = keywordRepository;
     this.relatedDocumentationRepository = relatedDocumentationRepository;
+    this.fieldOfLawRepository = fieldOfLawRepository;
+    this.procedureRepository = procedureRepository;
   }
 
   @Override
@@ -96,15 +103,15 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
         .map(DocumentationUnitTransformer::transformToDomain);
   }
 
-  @Override
   @Transactional(transactionManager = "jpaTransactionManager")
-  public Mono<DocumentUnit> save(DocumentUnit documentUnit) {
+  @Override
+  public void save(DocumentUnit documentUnit) {
 
     DocumentationUnitDTO documentationUnitDTO =
         repository.findById(documentUnit.uuid()).orElse(null);
     if (documentationUnitDTO == null) {
       log.info("Can't save non-existing docUnit with id = " + documentUnit.uuid());
-      return Mono.empty();
+      return;
     }
 
     // ---
@@ -119,8 +126,6 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
     //        documentationUnitDTO.setProcedures(getDbProcedures(documentUnit,
     // documentationUnitDTO));
     //      }
-
-    documentationUnitDTO = saveKeywords(documentationUnitDTO, documentUnit);
 
     if (documentUnit.coreData() != null) {
       documentationUnitDTO.getRegions().clear();
@@ -137,33 +142,182 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
     // Transform non-database-related properties
     documentationUnitDTO =
         DocumentationUnitTransformer.transformToDTO(documentationUnitDTO, documentUnit);
-    documentationUnitDTO = repository.save(documentationUnitDTO);
-
-    return Mono.just(findByUuid(documentationUnitDTO.getId()));
+    DocumentationUnitDTO dto = repository.save(documentationUnitDTO);
+    log.info("test");
   }
 
-  private DocumentationUnitDTO saveKeywords(
-      DocumentationUnitDTO documentationUnitDTO, DocumentUnit documentUnit) {
-    if (documentUnit != null && documentUnit.contentRelatedIndexing() != null) {
-      ContentRelatedIndexing contentRelatedIndexing = documentUnit.contentRelatedIndexing();
-
-      if (contentRelatedIndexing.keywords() != null) {
-        Set<KeywordDTO> keywordDTOs = new HashSet<>();
-        List<String> keywords = contentRelatedIndexing.keywords();
-        for (int i = 0; i < keywords.size(); i++) {
-          String value = keywords.get(i);
-          keywordRepository
-              .findByValue(value)
-              .ifPresentOrElse(
-                  keywordDTOs::add,
-                  () ->
-                      keywordDTOs.add(
-                          KeywordDTO.builder().id(UUID.randomUUID()).value(value).build()));
-        }
-        documentationUnitDTO.setKeywords(keywordDTOs);
-      }
+  @Override
+  public void saveKeywords(DocumentUnit documentUnit) {
+    if (documentUnit == null || documentUnit.contentRelatedIndexing() == null) {
+      return;
     }
-    return documentationUnitDTO;
+
+    repository
+        .findById(documentUnit.uuid())
+        .ifPresent(
+            documentationUnitDTO -> {
+              ContentRelatedIndexing contentRelatedIndexing = documentUnit.contentRelatedIndexing();
+
+              if (contentRelatedIndexing.keywords() != null) {
+                List<DocumentationUnitKeywordDTO> documentationUnitKeywordDTOs = new ArrayList<>();
+
+                List<String> keywords = contentRelatedIndexing.keywords();
+                for (int i = 0; i < keywords.size(); i++) {
+                  String value = keywords.get(i);
+
+                  KeywordDTO keywordDTO =
+                      keywordRepository
+                          .findByValue(value)
+                          .orElseGet(
+                              () ->
+                                  keywordRepository.save(
+                                      KeywordDTO.builder().value(value).build()));
+
+                  DocumentationUnitKeywordDTO documentationUnitKeywordDTO =
+                      DocumentationUnitKeywordDTO.builder()
+                          .primaryKey(
+                              new DocumentationUnitKeywordId(
+                                  documentationUnitDTO.getId(), keywordDTO.getId()))
+                          .documentationUnit(documentationUnitDTO)
+                          .keyword(keywordDTO)
+                          .rank(i + 1)
+                          .build();
+
+                  documentationUnitKeywordDTOs.add(documentationUnitKeywordDTO);
+                }
+
+                documentationUnitDTO.setDocumentationUnitKeywordDTOs(documentationUnitKeywordDTOs);
+
+                repository.save(documentationUnitDTO);
+              }
+            });
+  }
+
+  @Override
+  public void saveFieldsOfLaw(DocumentUnit documentUnit) {
+    if (documentUnit == null || documentUnit.contentRelatedIndexing() == null) {
+      return;
+    }
+
+    repository
+        .findById(documentUnit.uuid())
+        .ifPresent(
+            documentationUnitDTO -> {
+              ContentRelatedIndexing contentRelatedIndexing = documentUnit.contentRelatedIndexing();
+
+              if (contentRelatedIndexing.fieldsOfLaw() != null) {
+                List<DocumentationUnitFieldOfLawDTO> documentationUnitFieldOfLawDTOs =
+                    new ArrayList<>();
+
+                List<FieldOfLaw> fieldsOfLaw = contentRelatedIndexing.fieldsOfLaw();
+                for (int i = 0; i < fieldsOfLaw.size(); i++) {
+                  FieldOfLaw fieldOfLaw = fieldsOfLaw.get(i);
+
+                  Optional<FieldOfLawDTO> fieldOfLawDTOOptional =
+                      fieldOfLawRepository.findById(fieldOfLaw.id());
+
+                  if (fieldOfLawDTOOptional.isPresent()) {
+                    DocumentationUnitFieldOfLawDTO documentationUnitFieldOfLawDTO =
+                        DocumentationUnitFieldOfLawDTO.builder()
+                            .primaryKey(
+                                new DocumentationUnitFieldOfLawId(
+                                    documentationUnitDTO.getId(),
+                                    fieldOfLawDTOOptional.get().getId()))
+                            .rank(i + 1)
+                            .build();
+                    documentationUnitFieldOfLawDTO.setDocumentationUnit(documentationUnitDTO);
+                    documentationUnitFieldOfLawDTO.setFieldOfLaw(fieldOfLawDTOOptional.get());
+
+                    documentationUnitFieldOfLawDTOs.add(documentationUnitFieldOfLawDTO);
+                  } else {
+                    throw new DocumentationUnitException(
+                        "field of law with id: '" + fieldOfLaw.id() + "' not found.");
+                  }
+                }
+
+                documentationUnitDTO.setDocumentationUnitFieldsOfLaw(
+                    documentationUnitFieldOfLawDTOs);
+
+                repository.save(documentationUnitDTO);
+              }
+            });
+  }
+
+  @Override
+  @Transactional(transactionManager = "jpaTransactionManager")
+  public void saveProcedures(DocumentUnit documentUnit) {
+    if (documentUnit == null
+        || documentUnit.coreData() == null
+        || documentUnit.coreData().procedure() == null) {
+      return;
+    }
+
+    repository
+        .findById(documentUnit.uuid())
+        .ifPresent(
+            documentationUnitDTO -> {
+              Procedure procedure = documentUnit.coreData().procedure();
+
+              List<DocumentationUnitProcedureDTO> documentationUnitProcedureDTOs =
+                  documentationUnitDTO.getProcedures();
+
+              if (procedure.id() == null) {
+                ProcedureDTO procedureDTO =
+                    ProcedureDTO.builder()
+                        .label(procedure.label())
+                        .createdAt(Instant.now())
+                        .documentationOffice(documentationUnitDTO.getDocumentationOffice())
+                        .build();
+
+                procedureDTO = procedureRepository.save(procedureDTO);
+
+                DocumentationUnitProcedureDTO documentationUnitProcedureDTO =
+                    DocumentationUnitProcedureDTO.builder()
+                        .primaryKey(
+                            new DocumentationUnitProcedureId(
+                                documentationUnitDTO.getId(), procedureDTO.getId()))
+                        .documentationUnit(documentationUnitDTO)
+                        .procedure(procedureDTO)
+                        .build();
+                documentationUnitProcedureDTOs.add(0, documentationUnitProcedureDTO);
+
+                updateProcedureRank(documentationUnitProcedureDTOs);
+              } else {
+                procedureRepository
+                    .findById(procedure.id())
+                    .ifPresent(
+                        procedureDTO -> {
+                          DocumentationUnitProcedureDTO documentationUnitProcedureDTO =
+                              DocumentationUnitProcedureDTO.builder()
+                                  .primaryKey(
+                                      new DocumentationUnitProcedureId(
+                                          documentationUnitDTO.getId(), procedureDTO.getId()))
+                                  .documentationUnit(documentationUnitDTO)
+                                  .procedure(procedureDTO)
+                                  .build();
+
+                          if (documentationUnitProcedureDTOs.isEmpty()
+                              || !documentationUnitProcedureDTOs
+                                  .get(0)
+                                  .equals(documentationUnitProcedureDTO)) {
+                            documentationUnitProcedureDTOs.add(0, documentationUnitProcedureDTO);
+
+                            updateProcedureRank(documentationUnitProcedureDTOs);
+                          }
+                        });
+              }
+
+              repository.save(documentationUnitDTO);
+            });
+  }
+
+  private void updateProcedureRank(
+      List<DocumentationUnitProcedureDTO> documentationUnitProcedureDTOs) {
+    for (int i = 0; i < documentationUnitProcedureDTOs.size(); i++) {
+      DocumentationUnitProcedureDTO documentationUnitProcedureDTO =
+          documentationUnitProcedureDTOs.get(i);
+      documentationUnitProcedureDTO.setRank(i + 1);
+    }
   }
 
   //  private DocumentTypeDTO getDbDocType(DocumentType documentType) {

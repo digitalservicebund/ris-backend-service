@@ -17,7 +17,13 @@ public interface DocumentUnitRepository {
   Mono<DocumentUnit> createNewDocumentUnit(
       String documentNumber, DocumentationOffice documentationOffice);
 
-  Mono<DocumentUnit> save(DocumentUnit documentUnit);
+  void save(DocumentUnit documentUnit);
+
+  void saveKeywords(DocumentUnit documentUnit);
+
+  void saveFieldsOfLaw(DocumentUnit documentUnit);
+
+  void saveProcedures(DocumentUnit documentUnit);
 
   Mono<DocumentUnit> attachFile(
       UUID documentUnitUuid, String fileUuid, String type, String fileName);

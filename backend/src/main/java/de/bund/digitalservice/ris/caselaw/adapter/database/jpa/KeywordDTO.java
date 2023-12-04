@@ -2,13 +2,14 @@ package de.bund.digitalservice.ris.caselaw.adapter.database.jpa;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import jakarta.persistence.Transient;
 import jakarta.validation.constraints.NotBlank;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -18,18 +19,13 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@EqualsAndHashCode
 @Entity
 @Table(schema = "incremental_migration", name = "keyword")
 public class KeywordDTO {
-  @Id private UUID id;
+  @Id @GeneratedValue private UUID id;
 
   @Column(nullable = false)
   @NotBlank
   private String value;
-
-  @Transient private Long rank;
-
-  public KeywordDTO(String value) {
-    this.value = value;
-  }
 }

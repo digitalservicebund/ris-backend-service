@@ -325,7 +325,7 @@ class DocumentUnitServiceTest {
             .fileuploadtimestamp(Instant.now())
             //            .proceedingDecisions(null)
             .build();
-    when(repository.save(documentUnit)).thenReturn(Mono.just(documentUnit));
+    when(repository.findByUuid(documentUnit.uuid())).thenReturn(documentUnit);
 
     StepVerifier.create(service.updateDocumentUnit(documentUnit))
         .consumeNextWith(du -> assertEquals(du, documentUnit))

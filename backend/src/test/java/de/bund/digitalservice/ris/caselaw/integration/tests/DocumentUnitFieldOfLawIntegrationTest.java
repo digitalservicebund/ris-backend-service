@@ -17,6 +17,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumenta
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitFieldOfLawDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.FieldOfLawDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentationUnitRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresPublicationReportRepositoryImpl;
@@ -35,7 +36,6 @@ import de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw.FieldOfL
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -65,7 +65,8 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
       AuthService.class,
       TestConfig.class
     },
-    controllers = {DocumentUnitController.class})
+    controllers = {DocumentUnitController.class},
+    timeout = "PT5M")
 @Sql(
     scripts = {"classpath:fields_of_law_init.sql"},
     executionPhase = ExecutionPhase.BEFORE_TEST_METHOD)
@@ -108,11 +109,6 @@ class DocumentUnitFieldOfLawIntegrationTest {
     when(userService.getDocumentationOffice(any())).thenReturn(Mono.just(docOffice));
   }
 
-  @AfterEach
-  void cleanUp() {
-    documentUnitRepository.deleteAll();
-  }
-
   @Test
   void testGetAllFieldsOfLawForDocumentUnit_withoutFieldOfLawLinked_shouldReturnEmptyList() {
     UUID documentUnitUuid = UUID.randomUUID();
@@ -140,21 +136,26 @@ class DocumentUnitFieldOfLawIntegrationTest {
   @Test
   void
       testGetAllFieldsOfLawForDocumentUnit_withFirstFieldOfLawLinked_shouldReturnListWithLinkedFieldOfLaw() {
-    UUID documentUnitUuid = UUID.randomUUID();
     DocumentationUnitDTO documentUnitDTO =
         documentUnitRepository.save(
             DocumentationUnitDTO.builder()
-                .id(documentUnitUuid)
                 .documentationOffice(documentationOfficeDTO)
                 .documentNumber("docnr12345678")
-                .fieldsOfLaw(
-                    List.of(
-                        FieldOfLawDTO.builder()
-                            .id(UUID.fromString("71defe05-cd4d-43e5-a07e-06c611b81a26"))
-                            .build()))
                 .build());
 
-    assertThat(documentUnitDTO).isNotNull();
+    documentUnitDTO = documentUnitRepository.findById(documentUnitDTO.getId()).get();
+
+    DocumentationUnitFieldOfLawDTO documentationUnitFieldOfLawDTO =
+        new DocumentationUnitFieldOfLawDTO();
+    documentationUnitFieldOfLawDTO.setFieldOfLaw(
+        FieldOfLawDTO.builder()
+            .id(UUID.fromString("71defe05-cd4d-43e5-a07e-06c611b81a26"))
+            .build());
+    documentationUnitFieldOfLawDTO.setDocumentationUnit(documentUnitDTO);
+    documentationUnitFieldOfLawDTO.setRank(1);
+    documentUnitDTO.setDocumentationUnitFieldsOfLaw(List.of(documentationUnitFieldOfLawDTO));
+
+    documentUnitRepository.save(documentUnitDTO);
 
     risWebTestClient
         .withDefaultLogin()
@@ -173,31 +174,55 @@ class DocumentUnitFieldOfLawIntegrationTest {
 
   @Test
   void testGetAllFieldsOfLawForDocumentUnit_shouldReturnSortedList() {
-    // TODO: have to refactor after rank exist
-    UUID documentUnitUuid = UUID.randomUUID();
     DocumentationUnitDTO documentUnitDTO =
         documentUnitRepository.save(
             DocumentationUnitDTO.builder()
-                .id(documentUnitUuid)
                 .documentationOffice(documentationOfficeDTO)
                 .documentNumber("docnr12345678")
-                .fieldsOfLaw(
-                    List.of(
-                        FieldOfLawDTO.builder()
-                            .id(UUID.fromString("71defe05-cd4d-43e5-a07e-06c611b81a26"))
-                            .build(),
-                        FieldOfLawDTO.builder()
-                            .id(UUID.fromString("6959af10-7355-4e22-858d-29a485189957"))
-                            .build(),
-                        FieldOfLawDTO.builder()
-                            .id(UUID.fromString("93393410-0ab0-48ab-a61d-5056e440174a"))
-                            .build(),
-                        FieldOfLawDTO.builder()
-                            .id(UUID.fromString("b4f9ee05-38ed-49c3-89d6-50141f031017"))
-                            .build()))
                 .build());
 
-    assertThat(documentUnitDTO).isNotNull();
+    documentUnitDTO = documentUnitRepository.findById(documentUnitDTO.getId()).get();
+
+    DocumentationUnitFieldOfLawDTO documentationUnitFieldOfLawDTO1 =
+        new DocumentationUnitFieldOfLawDTO();
+    documentationUnitFieldOfLawDTO1.setFieldOfLaw(
+        FieldOfLawDTO.builder()
+            .id(UUID.fromString("71defe05-cd4d-43e5-a07e-06c611b81a26"))
+            .build());
+    documentationUnitFieldOfLawDTO1.setDocumentationUnit(documentUnitDTO);
+    documentationUnitFieldOfLawDTO1.setRank(1);
+    DocumentationUnitFieldOfLawDTO documentationUnitFieldOfLawDTO2 =
+        new DocumentationUnitFieldOfLawDTO();
+    documentationUnitFieldOfLawDTO2.setFieldOfLaw(
+        FieldOfLawDTO.builder()
+            .id(UUID.fromString("6959af10-7355-4e22-858d-29a485189957"))
+            .build());
+    documentationUnitFieldOfLawDTO2.setDocumentationUnit(documentUnitDTO);
+    documentationUnitFieldOfLawDTO2.setRank(2);
+    DocumentationUnitFieldOfLawDTO documentationUnitFieldOfLawDTO3 =
+        new DocumentationUnitFieldOfLawDTO();
+    documentationUnitFieldOfLawDTO3.setFieldOfLaw(
+        FieldOfLawDTO.builder()
+            .id(UUID.fromString("93393410-0ab0-48ab-a61d-5056e440174a"))
+            .build());
+    documentationUnitFieldOfLawDTO3.setDocumentationUnit(documentUnitDTO);
+    documentationUnitFieldOfLawDTO3.setRank(3);
+    DocumentationUnitFieldOfLawDTO documentationUnitFieldOfLawDTO4 =
+        new DocumentationUnitFieldOfLawDTO();
+    documentationUnitFieldOfLawDTO4.setFieldOfLaw(
+        FieldOfLawDTO.builder()
+            .id(UUID.fromString("b4f9ee05-38ed-49c3-89d6-50141f031017"))
+            .build());
+    documentationUnitFieldOfLawDTO4.setDocumentationUnit(documentUnitDTO);
+    documentationUnitFieldOfLawDTO4.setRank(4);
+    documentUnitDTO.setDocumentationUnitFieldsOfLaw(
+        List.of(
+            documentationUnitFieldOfLawDTO1,
+            documentationUnitFieldOfLawDTO2,
+            documentationUnitFieldOfLawDTO3,
+            documentationUnitFieldOfLawDTO4));
+
+    documentUnitRepository.save(documentUnitDTO);
 
     risWebTestClient
         .withDefaultLogin()
@@ -211,7 +236,7 @@ class DocumentUnitFieldOfLawIntegrationTest {
             response ->
                 assertThat(response.getResponseBody().contentRelatedIndexing().fieldsOfLaw())
                     .extracting("identifier")
-                    .containsExactlyInAnyOrder("AB-01", "CD-01", "FL-01", "FL-02"));
+                    .containsExactly("FL-01", "AB-01", "FL-02", "CD-01"));
   }
 
   @Test
@@ -254,10 +279,9 @@ class DocumentUnitFieldOfLawIntegrationTest {
         .expectBody(DocumentUnit.class)
         .consumeWith(
             response ->
-                // TODO: right order after use of rank
                 assertThat(response.getResponseBody().contentRelatedIndexing().fieldsOfLaw())
                     .extracting("identifier")
-                    .containsExactlyInAnyOrder("FL-01", "FL-02"));
+                    .containsExactly("FL-01", "FL-02"));
   }
 
   @Test
@@ -304,12 +328,21 @@ class DocumentUnitFieldOfLawIntegrationTest {
             DocumentationUnitDTO.builder()
                 .documentationOffice(documentationOfficeDTO)
                 .documentNumber("docnr12345678")
-                .fieldsOfLaw(
-                    List.of(
-                        FieldOfLawDTO.builder()
-                            .id(UUID.fromString("71defe05-cd4d-43e5-a07e-06c611b81a26"))
-                            .build()))
                 .build());
+
+    documentUnitDTO = documentUnitRepository.findById(documentUnitDTO.getId()).get();
+
+    DocumentationUnitFieldOfLawDTO documentationUnitFieldOfLawDTO =
+        new DocumentationUnitFieldOfLawDTO();
+    documentationUnitFieldOfLawDTO.setFieldOfLaw(
+        FieldOfLawDTO.builder()
+            .id(UUID.fromString("71defe05-cd4d-43e5-a07e-06c611b81a26"))
+            .build());
+    documentationUnitFieldOfLawDTO.setDocumentationUnit(documentUnitDTO);
+    documentationUnitFieldOfLawDTO.setRank(1);
+    documentUnitDTO.setDocumentationUnitFieldsOfLaw(List.of(documentationUnitFieldOfLawDTO));
+
+    documentUnitRepository.save(documentUnitDTO);
 
     DocumentUnit documentUnit =
         DocumentUnit.builder()

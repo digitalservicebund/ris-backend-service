@@ -54,6 +54,7 @@ public class DatabaseProcedureService implements ProcedureService {
   }
 
   @Override
+  @Transactional(transactionManager = "jpaTransactionManager")
   public List<DocumentUnitListEntry> getDocumentUnits(UUID procedureId) {
     return repository
         .findById(procedureId)

@@ -25,14 +25,14 @@ import org.hibernate.annotations.CreationTimestamp;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity()
-@Table(name = "procedure", schema = "public")
+@Table(name = "procedure", schema = "incremental_migration")
 public class ProcedureDTO {
   @Id @GeneratedValue private UUID id;
 
   @Column(name = "name")
   String label;
 
-  @Column(name = "created_at", updatable = false, insertable = false)
+  @Column(name = "created_at", updatable = false)
   @CreationTimestamp
   Instant createdAt;
 
@@ -43,8 +43,8 @@ public class ProcedureDTO {
 
   @ManyToMany(fetch = FetchType.EAGER)
   @JoinTable(
-      name = "procedure_link",
-      schema = "public",
+      name = "documentation_unit_procedure",
+      schema = "incremental_migration",
       inverseJoinColumns = @JoinColumn(name = "documentation_unit_id"),
       joinColumns = @JoinColumn(name = "procedure_id"))
   List<DocumentationUnitDTO> documentationUnits;

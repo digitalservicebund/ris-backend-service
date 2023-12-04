@@ -17,8 +17,8 @@ import de.bund.digitalservice.ris.caselaw.adapter.DocxConverterService;
 import de.bund.digitalservice.ris.caselaw.adapter.KeycloakUserService;
 import de.bund.digitalservice.ris.caselaw.adapter.ProcedureController;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationOfficeRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitProcedureRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseProcedureLinkRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseProcedureRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
@@ -73,7 +73,8 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
       TestConfig.class,
       DatabaseProcedureService.class
     },
-    controllers = {DocumentUnitController.class, ProcedureController.class})
+    controllers = {DocumentUnitController.class, ProcedureController.class},
+    timeout = "PT5M")
 class ProcedureIntegrationTest {
   @Container
   static PostgreSQLContainer<?> postgreSQLContainer =
@@ -93,7 +94,7 @@ class ProcedureIntegrationTest {
   @Autowired private DatabaseDocumentationUnitRepository documentUnitRepository;
   @Autowired private DatabaseDocumentationOfficeRepository documentationOfficeRepository;
   @Autowired private DatabaseProcedureRepository repository;
-  @Autowired private DatabaseProcedureLinkRepository linkRepository;
+  @Autowired private DatabaseDocumentationUnitProcedureRepository linkRepository;
 
   @MockBean private DocumentNumberService numberService;
   @MockBean private DocumentUnitStatusService statusService;
@@ -170,7 +171,6 @@ class ProcedureIntegrationTest {
   }
 
   @Test
-  @Disabled("waiting for Datenschemamigration to be finished")
   void testAddSameProcedure() {
     ProcedureDTO procedureDTO = createProcedure("testProcedure", documentationOfficeDTO);
     assertThat(repository.findAll()).hasSize(1);
@@ -182,7 +182,8 @@ class ProcedureIntegrationTest {
                 .documentationOffice(documentationOfficeDTO)
                 .build());
 
-    Procedure procedure = Procedure.builder().label("testProcedure").build();
+    Procedure procedure =
+        Procedure.builder().id(procedureDTO.getId()).label("testProcedure").build();
 
     DocumentUnit documentUnitFromFrontend =
         DocumentUnit.builder()
@@ -203,19 +204,24 @@ class ProcedureIntegrationTest {
         .expectBody(DocumentUnit.class)
         .consumeWith(
             response ->
-                assertThat(response.getResponseBody().coreData().procedure()).isEqualTo(procedure));
+                assertThat(response.getResponseBody().coreData().procedure())
+                    .extracting("id", "label")
+                    .containsExactly(procedure.id(), procedure.label()));
 
     assertThat(repository.findAll()).hasSize(1);
-    assertThat(
-            linkRepository
-                .findFirstByDocumentationUnitIdOrderByRankDesc(dto.getId())
-                .getProcedureId())
-        .isEqualTo(procedureDTO.getId());
+    ProcedureDTO firstProcedure =
+        linkRepository.findFirstByDocumentationUnitOrderByRankDesc(dto).getProcedure();
+    assertThat(firstProcedure)
+        .extracting("id", "label")
+        .containsExactly(procedureDTO.getId(), procedureDTO.getLabel());
+    assertThat(firstProcedure.getDocumentationUnits()).hasSize(1);
+    assertThat(firstProcedure.getDocumentationUnits().get(0))
+        .extracting("id", "documentNumber")
+        .containsExactly(dto.getId(), dto.getDocumentNumber());
     assertThat(linkRepository.findAll()).hasSize(1);
   }
 
   @Test
-  @Disabled("waiting for Datenschemamigration to be finished")
   void testAddingProcedureToPreviousProcedures() {
     DocumentationUnitDTO dto =
         documentUnitRepository.save(
@@ -249,8 +255,9 @@ class ProcedureIntegrationTest {
         .expectBody(DocumentUnit.class)
         .consumeWith(
             response -> {
-              assertThat(response.getResponseBody().coreData().procedure()).isEqualTo(procedure1);
-              assertThat(response.getResponseBody().coreData().previousProcedures()).isNull();
+              assertThat(response.getResponseBody().coreData().procedure().label())
+                  .isEqualTo(procedure1.label());
+              assertThat(response.getResponseBody().coreData().previousProcedures()).isEmpty();
             });
 
     assertThat(repository.findAll()).hasSize(1);
@@ -276,7 +283,8 @@ class ProcedureIntegrationTest {
         .expectBody(DocumentUnit.class)
         .consumeWith(
             response -> {
-              assertThat(response.getResponseBody().coreData().procedure()).isEqualTo(procedure2);
+              assertThat(response.getResponseBody().coreData().procedure().label())
+                  .isEqualTo(procedure2.label());
               assertThat(response.getResponseBody().coreData().previousProcedures())
                   .isEqualTo(List.of("foo"));
             });
@@ -304,9 +312,10 @@ class ProcedureIntegrationTest {
         .expectBody(DocumentUnit.class)
         .consumeWith(
             response -> {
-              assertThat(response.getResponseBody().coreData().procedure()).isEqualTo(procedure3);
+              assertThat(response.getResponseBody().coreData().procedure().label())
+                  .isEqualTo(procedure3.label());
               assertThat(response.getResponseBody().coreData().previousProcedures())
-                  .isEqualTo(List.of("bar", "foo"));
+                  .containsExactly("bar", "foo");
             });
 
     assertThat(repository.findAll()).hasSize(3);
@@ -314,7 +323,6 @@ class ProcedureIntegrationTest {
   }
 
   @Test
-  @Disabled("waiting for Datenschemamigration to be finished")
   void testAddProcedureWithSameNameToDifferentOffice() {
     DocumentationOfficeDTO bghDocOfficeDTO =
         documentationOfficeRepository.findByAbbreviation("BGH");
@@ -350,13 +358,13 @@ class ProcedureIntegrationTest {
         .expectBody(DocumentUnit.class)
         .consumeWith(
             response ->
-                assertThat(response.getResponseBody().coreData().procedure()).isEqualTo(procedure));
+                assertThat(response.getResponseBody().coreData().procedure().label())
+                    .isEqualTo(procedure.label()));
 
     assertThat(repository.findAll()).hasSize(2);
   }
 
   @Test
-  @Disabled("waiting for Datenschemamigration to be finished")
   void testProcedureControllerReturnsList() {
     createProcedures(
         List.of("testProcedure1", "testProcedure2", "testProcedure3"), documentationOfficeDTO);
@@ -379,7 +387,6 @@ class ProcedureIntegrationTest {
   }
 
   @Test
-  @Disabled("waiting for Datenschemamigration to be finished")
   void testProcedureControllerReturnsFilteredList() {
     createProcedures(List.of("aaabbb", "aaaccc", "dddfff"), documentationOfficeDTO);
     assertThat(repository.findAll()).hasSize(3);
@@ -416,7 +423,6 @@ class ProcedureIntegrationTest {
   }
 
   @Test
-  @Disabled("waiting for Datenschemamigration to be finished")
   void testProcedureControllerReturnsPerDocOffice() {
     DocumentationOfficeDTO bghDocOfficeDTO =
         documentationOfficeRepository.findByAbbreviation("BGH");
@@ -438,7 +444,8 @@ class ProcedureIntegrationTest {
   }
 
   @Test
-  @Disabled("waiting for Datenschemamigration to be finished")
+  @Disabled(
+      "only for e2e test needed. remove controller endpoint. check how to handle cleanup after e2e tests.")
   void testDeleteProcedure() {
     createProcedures(List.of("fooProcedure"), documentationOfficeDTO);
     assertThat(repository.findAll()).hasSize(1);
@@ -455,7 +462,8 @@ class ProcedureIntegrationTest {
   }
 
   @Test
-  @Disabled("waiting for Datenschemamigration to be finished")
+  @Disabled(
+      "only for e2e test needed. remove controller endpoint. check how to handle cleanup after e2e tests.")
   void testDontDeleteProcedureOfForeignOffice() {
     DocumentationOfficeDTO bghDocOfficeDTO =
         documentationOfficeRepository.findByAbbreviation("BGH");

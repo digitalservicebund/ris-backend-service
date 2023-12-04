@@ -5,9 +5,11 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface DatabaseProcedureLinkRepository extends JpaRepository<ProcedureLinkDTO, UUID> {
+public interface DatabaseDocumentationUnitProcedureRepository
+    extends JpaRepository<DocumentationUnitProcedureDTO, UUID> {
 
-  ProcedureLinkDTO findFirstByDocumentationUnitIdOrderByRankDesc(UUID documentationUnitId);
+  DocumentationUnitProcedureDTO findFirstByDocumentationUnitOrderByRankDesc(
+      DocumentationUnitDTO documentationUnitDTO);
 
   //  String QUERY_ACTIVE_PROCEDURE_LINKS_BY_PROCEDURE =
   //      "FROM procedure_link pl "

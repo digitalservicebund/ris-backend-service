@@ -264,7 +264,13 @@ public class DocumentUnitService {
   }
 
   public Mono<DocumentUnit> updateDocumentUnit(DocumentUnit documentUnit) {
-    return repository.save(documentUnit);
+    repository.saveKeywords(documentUnit);
+    repository.saveFieldsOfLaw(documentUnit);
+    repository.saveProcedures(documentUnit);
+
+    repository.save(documentUnit);
+
+    return Mono.just(repository.findByUuid(documentUnit.uuid()));
   }
 
   public Mono<Publication> publishAsEmail(UUID documentUnitUuid, String issuerAddress) {

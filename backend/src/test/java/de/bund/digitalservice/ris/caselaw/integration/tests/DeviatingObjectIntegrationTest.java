@@ -119,6 +119,8 @@ class DeviatingObjectIntegrationTest {
                     documentationOfficeRepository.findByAbbreviation(docOffice.abbreviation()))
                 .build());
 
+    dto = repository.findById(dto.getId()).get();
+
     return repository.save(
         dto.toBuilder()
             .deviatingFileNumbers(

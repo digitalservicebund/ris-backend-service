@@ -120,7 +120,8 @@ CREATE TABLE IF NOT EXISTS
     documentation_unit_id uuid,
     norm_abbreviation_id uuid,
     date_of_version_raw_value character varying(255) COLLATE pg_catalog."default",
-    legacy_doc_unit_id uuid
+    legacy_doc_unit_id uuid,
+    rank int default -1
   );
 
 CREATE TABLE IF NOT EXISTS
@@ -233,6 +234,7 @@ create table if not exists
   incremental_migration.documentation_unit_keyword (
     documentation_unit_id uuid not null constraint fk_documentation_unit references incremental_migration.documentation_unit,
     keyword_id uuid not null constraint fk_keyword references incremental_migration.keyword,
+    rank int default -1,
     primary key (documentation_unit_id, keyword_id)
   );
 
@@ -430,6 +432,7 @@ create table
   incremental_migration.documentation_unit_field_of_law (
     documentation_unit_id uuid not null constraint fk_documentation_unit references incremental_migration.documentation_unit,
     field_of_law_id uuid not null constraint fk_field_of_law references incremental_migration.field_of_law,
+    rank int default -1,
     primary key (documentation_unit_id, field_of_law_id)
   );
 
@@ -450,3 +453,23 @@ create table
 
 create index
   status_documentation_unit_id_idx on incremental_migration.status (documentation_unit_id);
+
+create table
+  incremental_migration.procedure (
+    id uuid not null primary key,
+    name varchar(255) not null,
+    created_at timestamp with time zone,
+    documentation_office_id uuid not null constraint fk_documentation_office references incremental_migration.documentation_office,
+    constraint uc_procedure_name_documentation_office_id unique (name, documentation_office_id)
+  );
+
+create table
+  incremental_migration.documentation_unit_procedure (
+    documentation_unit_id uuid not null constraint fk_documentation_unit references incremental_migration.documentation_unit,
+    procedure_id uuid not null constraint fk_procedure references incremental_migration.procedure,
+    rank integer default '-1'::integer not null,
+    constraint uc_documentation_unit_id_procedure_id_rank unique (documentation_unit_id, procedure_id, rank)
+  );
+
+create index
+  documentation_unit_procedure_procedure_id_idx on incremental_migration.documentation_unit_procedure (procedure_id);

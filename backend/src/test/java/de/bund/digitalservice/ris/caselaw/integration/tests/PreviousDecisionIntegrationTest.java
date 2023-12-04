@@ -48,8 +48,8 @@ import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.Docume
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
-import java.util.Random;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
@@ -115,6 +115,8 @@ class PreviousDecisionIntegrationTest {
   private final DocumentationOffice docOffice = buildDefaultDocOffice();
   private DocumentationOfficeDTO documentationOfficeDTO;
   @Autowired private DatabaseDocumentCategoryRepository databaseDocumentCategoryRepository;
+
+  private AtomicInteger courtJurisId = new AtomicInteger(100);
 
   @BeforeEach
   void setUp() {
@@ -592,7 +594,7 @@ class PreviousDecisionIntegrationTest {
         court =
             courtRepository.saveAndFlush(
                 court.toBuilder()
-                    .jurisId(new Random().nextInt(100))
+                    .jurisId(courtJurisId.getAndIncrement())
                     .isForeignCourt(false)
                     .isSuperiorCourt(false)
                     .id(UUID.randomUUID())
@@ -620,6 +622,8 @@ class PreviousDecisionIntegrationTest {
 
     UUID docUnitId = documentationUnitDTO.getId();
 
+    documentationUnitDTO = repository.findById(docUnitId).get();
+
     documentationUnitDTO =
         documentationUnitDTO.toBuilder()
             .status(
@@ -635,19 +639,16 @@ class PreviousDecisionIntegrationTest {
             .build();
 
     if (fileNumbers != null) {
-      documentationUnitDTO
-          .getFileNumbers()
-          .addAll(
-              fileNumbers.stream()
-                  .map(
-                      fn ->
-                          FileNumberDTO.builder()
-                              .value(fn)
-                              .rank(1L)
-                              .documentationUnit(
-                                  DocumentationUnitDTO.builder().id(docUnitId).build())
-                              .build())
-                  .toList());
+      documentationUnitDTO.setFileNumbers(
+          fileNumbers.stream()
+              .map(
+                  fn ->
+                      FileNumberDTO.builder()
+                          .value(fn)
+                          .rank(1L)
+                          .documentationUnit(DocumentationUnitDTO.builder().id(docUnitId).build())
+                          .build())
+              .toList());
     }
 
     documentationUnitDTO = repository.save(documentationUnitDTO);
