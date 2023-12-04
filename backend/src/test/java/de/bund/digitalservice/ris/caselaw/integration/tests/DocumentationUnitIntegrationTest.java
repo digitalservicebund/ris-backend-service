@@ -563,7 +563,7 @@ class DocumentationUnitIntegrationTest {
 
     // by court
     searchInput =
-        DocumentationUnitSearchInput.builder().courtType("PQR").courtLocation("München").build();
+        DocumentationUnitSearchInput.builder().courtType("pqr").courtLocation("münchen").build();
 
     assertThat(extractDocumentNumbersFromSearchCall(searchInput)).containsExactly("EFGH202200123");
 

@@ -75,8 +75,8 @@ public interface DatabaseDocumentationUnitRepository
                WHERE deviatingFileNumber.documentationUnit.id = documentationUnit.id
                AND deviatingFileNumber.value = :documentNumberOrFileNumber
             )))
-       AND (:courtType IS NULL OR court.type = :courtType)
-       AND (:courtLocation IS NULL OR court.location = :courtLocation)
+       AND (:courtType IS NULL OR upper(court.type) like upper(cast(:courtType as text)))
+       AND (:courtLocation IS NULL OR upper(court.location) like upper(cast(:courtLocation as text)))
        AND (cast(:decisionDate as date) IS NULL
            OR (cast(:decisionDateEnd as date) IS NULL AND documentationUnit.decisionDate = :decisionDate)
            OR (cast(:decisionDateEnd as date) IS NOT NULL AND documentationUnit.decisionDate BETWEEN :decisionDate AND :decisionDateEnd))
