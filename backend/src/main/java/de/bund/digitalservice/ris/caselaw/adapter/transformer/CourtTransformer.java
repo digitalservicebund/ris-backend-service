@@ -15,9 +15,7 @@ public class CourtTransformer {
 
     String revoked = extractRevoked(courtDTO.getAdditionalInformation());
 
-    if (Boolean.TRUE.equals(courtDTO.isSuperiorCourt())
-        && Boolean.TRUE.equals(!courtDTO.isForeignCourt())) {
-
+    if (Boolean.TRUE.equals(courtDTO.isSuperiorCourt())) {
       return Court.builder()
           .id(courtDTO.getId())
           .type(courtDTO.getType())
