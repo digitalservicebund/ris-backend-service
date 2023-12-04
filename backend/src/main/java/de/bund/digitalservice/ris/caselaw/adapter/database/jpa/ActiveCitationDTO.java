@@ -5,6 +5,7 @@ import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import java.util.Objects;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
@@ -23,5 +24,10 @@ public class ActiveCitationDTO extends RelatedDocumentationDTO {
   @Override
   public boolean equals(Object other) {
     return super.equals(other);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(super.getDocumentNumber());
   }
 }
