@@ -18,4 +18,9 @@ import lombok.experimental.SuperBuilder;
 public class PreviousDecisionDTO extends RelatedDocumentationDTO {
   @Column(name = "date_known")
   private boolean dateKnown;
+
+  @Override
+  public boolean equals(Object other) {
+    return super.equals(other);
+  }
 }

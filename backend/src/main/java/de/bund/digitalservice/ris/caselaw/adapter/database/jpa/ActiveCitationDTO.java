@@ -19,4 +19,9 @@ public class ActiveCitationDTO extends RelatedDocumentationDTO {
   @ManyToOne
   @JoinColumn(name = "citation_type_id")
   private CitationTypeDTO citationType;
+
+  @Override
+  public boolean equals(Object other) {
+    return super.equals(other);
+  }
 }

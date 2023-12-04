@@ -16,4 +16,9 @@ import lombok.experimental.SuperBuilder;
 public class PendingDecisionDTO extends RelatedDocumentationDTO {
 
   @Column private String note;
+
+  @Override
+  public boolean equals(Object other) {
+    return super.equals(other);
+  }
 }

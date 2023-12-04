@@ -460,9 +460,8 @@ class EnsuingDecisionsIntegrationTest {
             response -> {
               assertThat(response.getResponseBody().ensuingDecisions()).hasSize(2);
               assertThat(response.getResponseBody().ensuingDecisions().get(0).isPending())
-                  .isEqualTo(false);
-              assertThat(response.getResponseBody().ensuingDecisions().get(1).isPending())
-                  .isEqualTo(true);
+                  .isFalse();
+              assertThat(response.getResponseBody().ensuingDecisions().get(1).isPending()).isTrue();
             });
 
     DocumentUnit documentUnitFromFrontend =
@@ -496,10 +495,8 @@ class EnsuingDecisionsIntegrationTest {
         .consumeWith(
             response -> {
               assertThat(response.getResponseBody().ensuingDecisions()).hasSize(2);
-              assertThat(response.getResponseBody().ensuingDecisions().get(0).isPending())
-                  .isEqualTo(true);
-              assertThat(response.getResponseBody().ensuingDecisions().get(1).isPending())
-                  .isEqualTo(true);
+              assertThat(response.getResponseBody().ensuingDecisions().get(0).isPending()).isTrue();
+              assertThat(response.getResponseBody().ensuingDecisions().get(1).isPending()).isTrue();
             });
   }
 
@@ -520,7 +517,7 @@ class EnsuingDecisionsIntegrationTest {
             response -> {
               assertThat(response.getResponseBody().ensuingDecisions()).hasSize(2);
               assertThat(response.getResponseBody().ensuingDecisions().get(0).isPending())
-                  .isEqualTo(false);
+                  .isFalse();
             });
 
     DocumentUnit documentUnitFromFrontend =
@@ -550,7 +547,7 @@ class EnsuingDecisionsIntegrationTest {
             response -> {
               assertThat(response.getResponseBody().ensuingDecisions()).hasSize(1);
               assertThat(response.getResponseBody().ensuingDecisions().get(0).isPending())
-                  .isEqualTo(false);
+                  .isFalse();
             });
   }
 
