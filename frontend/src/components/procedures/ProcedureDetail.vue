@@ -18,7 +18,7 @@ function renderDocumentUnit(documentUnit: DocumentUnitListEntry): string {
     ...(documentUnit.decisionDate
       ? [dayjs(documentUnit.decisionDate).format("DD.MM.YYYY")]
       : []),
-    ...(documentUnit.documentType ? [documentUnit.documentType] : []),
+    ...(documentUnit.documentType ? [documentUnit.documentType.label] : []),
     ...(documentUnit.fileNumber ? [documentUnit.fileNumber] : []),
     ...(documentUnit.documentNumber ? [documentUnit.documentNumber] : []),
   ].join(", ")
