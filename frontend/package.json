@@ -28,7 +28,7 @@
     "audit:licences": "license-checker --production --excludePrivatePackages --onlyAllow \"$(. ./parseAllowedLicences.sh)\" --csv --out ./frontend-licence-report.csv"
   },
   "dependencies": {
-    "@braintree/sanitize-url": "^6.0.4",
+    "@braintree/sanitize-url": "^7.0.0",
     "@sentry/vue": "^7.80.0",
     "@tiptap/extension-bold": "^2.1.9",
     "@tiptap/extension-bullet-list": "^2.1.9",
