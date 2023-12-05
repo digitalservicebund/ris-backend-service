@@ -15,8 +15,9 @@ public interface DatabaseDocumentationUnitRepository
 
   Optional<DocumentationUnitMetadataDTO> findMetadataById(UUID documentUnitUuid);
 
-  // TODO fix deviatingFileNumber case sensitivity - the query breaks as soon as we activate it
-  // TODO should we query fileNumbers for contains()?
+  String SELECT_STATUS_WHERE_LATEST =
+      "SELECT 1 FROM StatusDTO status WHERE status.documentationUnitDTO.id = documentationUnit.id AND status.createdAt = (SELECT MAX(s.createdAt) FROM StatusDTO s WHERE s.documentationUnitDTO.id = documentationUnit.id)";
+
   @Query(
       value =
           """
@@ -24,19 +25,20 @@ public interface DatabaseDocumentationUnitRepository
     LEFT JOIN documentationUnit.court court
     WHERE (
        (:documentNumberOrFileNumber IS NULL
-         OR (upper(documentationUnit.documentNumber) like upper(concat('%', :documentNumberOrFileNumber,'%'))
+         OR upper(documentationUnit.documentNumber) like upper(concat('%', :documentNumberOrFileNumber,'%'))
             OR EXISTS (
                SELECT 1
                FROM FileNumberDTO fileNumber
                WHERE fileNumber.documentationUnit.id = documentationUnit.id
-               AND upper(fileNumber.value) like upper(:documentNumberOrFileNumber)
+               AND upper(fileNumber.value) like upper(concat('%', :documentNumberOrFileNumber, '%'))
             )
             OR EXISTS (
                SELECT 1
                FROM DeviatingFileNumberDTO deviatingFileNumber
                WHERE deviatingFileNumber.documentationUnit.id = documentationUnit.id
-               AND deviatingFileNumber.value = :documentNumberOrFileNumber
-            )))
+               AND upper(deviatingFileNumber.value) like upper(concat('%', :documentNumberOrFileNumber, '%'))
+            )
+       )
        AND (:courtType IS NULL OR upper(court.type) like upper(cast(:courtType as text)))
        AND (:courtLocation IS NULL OR upper(court.location) like upper(cast(:courtLocation as text)))
        AND (cast(:decisionDate as date) IS NULL
@@ -47,11 +49,23 @@ public interface DatabaseDocumentationUnitRepository
        AND (cast(:documentType as uuid) IS NULL OR documentationUnit.documentType = :documentType)
        AND
          (
-            (:status IS NULL AND ((documentationUnit.documentationOffice.id = :documentationOfficeId OR EXISTS (SELECT 1 FROM StatusDTO status WHERE status.documentationUnitDTO.id = documentationUnit.id AND status.publicationStatus IN (de.bund.digitalservice.ris.caselaw.domain.PublicationStatus.PUBLISHED, de.bund.digitalservice.ris.caselaw.domain.PublicationStatus.PUBLISHING)))))
+            (:status IS NULL AND ((documentationUnit.documentationOffice.id = :documentationOfficeId OR EXISTS (
+            """
+              + SELECT_STATUS_WHERE_LATEST
+              + """
+         AND status.publicationStatus IN (de.bund.digitalservice.ris.caselaw.domain.PublicationStatus.PUBLISHED, de.bund.digitalservice.ris.caselaw.domain.PublicationStatus.PUBLISHING)))))
          OR
-            (:status IS NOT NULL AND EXISTS (SELECT 1 FROM StatusDTO status WHERE status.documentationUnitDTO.id = documentationUnit.id AND status.publicationStatus = :status AND (:status IN ('PUBLISHED', 'PUBLISHING') OR documentationUnit.documentationOffice.id = :documentationOfficeId)))
+            (:status IS NOT NULL AND EXISTS (
+            """
+              + SELECT_STATUS_WHERE_LATEST
+              + """
+         AND status.publicationStatus = :status AND (:status IN ('PUBLISHED', 'PUBLISHING') OR documentationUnit.documentationOffice.id = :documentationOfficeId)))
          )
-       AND (:withErrorOnly = FALSE OR documentationUnit.documentationOffice.id = :documentationOfficeId AND EXISTS (SELECT 1 FROM StatusDTO status WHERE status.documentationUnitDTO.id = documentationUnit.id AND status.withError = TRUE))
+       AND (:withErrorOnly = FALSE OR documentationUnit.documentationOffice.id = :documentationOfficeId AND EXISTS (
+       """
+              + SELECT_STATUS_WHERE_LATEST
+              + """
+     AND status.withError = TRUE))
     )
     ORDER BY documentationUnit.documentNumber
 """)
