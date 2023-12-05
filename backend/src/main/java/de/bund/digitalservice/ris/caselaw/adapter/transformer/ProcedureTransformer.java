@@ -5,7 +5,6 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ProcedureDTO;
 import de.bund.digitalservice.ris.caselaw.domain.Procedure;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import lombok.experimental.UtilityClass;
 
 @UtilityClass
@@ -29,8 +28,17 @@ public class ProcedureTransformer {
         .toList();
   }
 
-  private static Integer getDocumentationUnitCount(ProcedureDTO procedureDTO) {
-    return Optional.ofNullable(procedureDTO.getDocumentationUnits()).map(List::size).orElse(null);
+  private static Long getDocumentationUnitCount(ProcedureDTO procedureDTO) {
+    if (procedureDTO.getDocumentationUnits() == null
+        || procedureDTO.getDocumentationUnits().isEmpty()) {
+      return 0L;
+    }
+
+    return procedureDTO.getDocumentationUnits().stream()
+        .filter(
+            documentationUnitDTO ->
+                documentationUnitDTO.getProcedures().get(0).getProcedure().equals(procedureDTO))
+        .count();
   }
 
   public static Procedure transformToDomain(ProcedureDTO procedureDTO) {

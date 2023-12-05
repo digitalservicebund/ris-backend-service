@@ -3,6 +3,7 @@ package de.bund.digitalservice.ris.caselaw.adapter;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationOfficeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseProcedureRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitProcedureDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationUnitTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.ProcedureTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitListEntry;
@@ -61,6 +62,13 @@ public class DatabaseProcedureService implements ProcedureService {
         .map(
             procedureDTO ->
                 procedureDTO.getDocumentationUnits().stream()
+                    .filter(
+                        documentationUnitDTO -> {
+                          List<DocumentationUnitProcedureDTO> procedures =
+                              documentationUnitDTO.getProcedures();
+
+                          return procedures.get(0).getProcedure().equals(procedureDTO);
+                        })
                     .map(DocumentationUnitTransformer::transformToMetaDomain)
                     .toList())
         .orElse(null);

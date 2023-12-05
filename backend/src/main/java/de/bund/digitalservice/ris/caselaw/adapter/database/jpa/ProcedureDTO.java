@@ -17,6 +17,8 @@ import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.EqualsAndHashCode.Include;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 
@@ -24,11 +26,13 @@ import org.hibernate.annotations.CreationTimestamp;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity()
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@Entity
 @Table(name = "procedure", schema = "incremental_migration")
 public class ProcedureDTO {
   @Id @GeneratedValue private UUID id;
 
+  @Include
   @Column(name = "name")
   String label;
 
@@ -36,6 +40,7 @@ public class ProcedureDTO {
   @CreationTimestamp
   Instant createdAt;
 
+  @Include
   @ManyToOne()
   @JoinColumn(name = "documentation_office_id")
   @NotNull
