@@ -153,7 +153,7 @@ dependencies {
     implementation("org.springframework.security:spring-security-oauth2-resource-server:$springSecurityVersion")
     implementation("org.springframework:spring-web:$springWebVersion")
     implementation("org.springframework:spring-webflux:$springWebVersion")
-    implementation("org.springdoc:springdoc-openapi-starter-webflux-ui:2.2.0")
+    implementation("org.springdoc:springdoc-openapi-starter-webflux-ui:2.3.0")
     implementation("org.springframework.boot:spring-boot-starter-webflux") {
         exclude(group = "io.netty", module = "netty-tcnative-classes")
         because("CVE-2021-43797, not using Tomcat")
