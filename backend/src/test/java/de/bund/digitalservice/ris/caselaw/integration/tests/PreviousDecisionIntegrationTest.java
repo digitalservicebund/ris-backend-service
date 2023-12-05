@@ -53,7 +53,6 @@ import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -283,36 +282,6 @@ class PreviousDecisionIntegrationTest {
             response -> {
               assertThat(response.getResponseBody().previousDecisions()).isEmpty();
             });
-  }
-
-  @Test
-  @Disabled("should be done by jpa cascades")
-  // Todo what does this test?
-  void testRemovePreviousDecisionLinkAndDeleteOrphanedDocumentUnit() {
-    DocumentationUnitDTO parentDocumentUnitDTO =
-        DocumentationUnitDTO.builder()
-            .documentationOffice(documentationOfficeDTO)
-            .documentNumber("1234567890123")
-            .previousDecisions(List.of(PreviousDecisionDTO.builder().fileNumber("test").build()))
-            .build();
-    parentDocumentUnitDTO = repository.save(parentDocumentUnitDTO);
-
-    DocumentUnit documentUnit =
-        DocumentUnit.builder()
-            .uuid(parentDocumentUnitDTO.getId())
-            .documentNumber("docnr12345678")
-            .previousDecisions(Collections.emptyList())
-            .coreData(CoreData.builder().documentationOffice(docOffice).build())
-            .build();
-
-    risWebTestClient
-        .withDefaultLogin()
-        .put()
-        .uri("/api/v1/caselaw/documentunits/" + parentDocumentUnitDTO.getId())
-        .bodyValue(documentUnit)
-        .exchange()
-        .expectStatus()
-        .isOk();
   }
 
   @Test
