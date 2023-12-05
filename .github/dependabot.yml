@@ -10,6 +10,7 @@ updates:
     ignore:
       - dependency-name: "*"
         update-types: ["version-update:semver-patch"]
+    open-pull-requests-limit: 9999
 
   - package-ecosystem: "npm"
     directory: "/frontend"
@@ -19,6 +20,7 @@ updates:
     ignore:
       - dependency-name: "*"
         update-types: ["version-update:semver-patch"]
+    open-pull-requests-limit: 9999
 
   - package-ecosystem: "github-actions"
     directory: "/"
@@ -28,6 +30,7 @@ updates:
     ignore:
       - dependency-name: "*"
         update-types: ["version-update:semver-patch"]
+    open-pull-requests-limit: 9999
 
   - package-ecosystem: "docker"
     directory: "/frontend"
@@ -37,3 +40,4 @@ updates:
     ignore:
       - dependency-name: "*"
         update-types: ["version-update:semver-patch"]
+    open-pull-requests-limit: 9999
