@@ -703,6 +703,10 @@ public class DocumentationUnitTransformer {
       builder.status(StatusTransformer.transformToDomain(documentationUnitDTO.getStatus().get(0)));
     }
 
+    if (documentationUnitDTO.getCourt() != null) {
+      builder.court(CourtTransformer.transformToDomain(documentationUnitDTO.getCourt()));
+    }
+
     return builder.build();
   }
 }
