@@ -217,7 +217,7 @@ dependencies {
     // implementation("org.apache.commons:commons-text:1.10.0")
     implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.15.2")
     implementation("io.micrometer:micrometer-registry-prometheus:1.11.2")
-    implementation("io.micrometer:micrometer-core:1.11.4")
+    implementation("io.micrometer:micrometer-core:1.12.0")
     implementation(platform("io.sentry:sentry-bom:6.33.1"))
     implementation("io.sentry:sentry-spring-boot-starter-jakarta")
     implementation("io.sentry:sentry-logback")
