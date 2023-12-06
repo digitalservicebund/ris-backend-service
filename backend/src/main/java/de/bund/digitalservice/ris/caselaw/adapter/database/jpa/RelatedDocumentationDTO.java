@@ -60,4 +60,7 @@ public abstract class RelatedDocumentationDTO {
   @ManyToOne
   @JoinColumn(name = "document_number", referencedColumnName = "document_number")
   private DocumentationUnitDTO referencedDocumentationUnit;
+
+  @Column(name = "document_number", insertable = false, updatable = false)
+  private String documentNumber;
 }

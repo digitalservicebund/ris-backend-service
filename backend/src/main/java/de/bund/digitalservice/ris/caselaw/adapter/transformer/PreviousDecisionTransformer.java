@@ -8,12 +8,13 @@ public class PreviousDecisionTransformer extends RelatedDocumentationUnitTransfo
   public static PreviousDecision transformToDomain(PreviousDecisionDTO previousDecisionDTO) {
     return PreviousDecision.builder()
         .uuid(previousDecisionDTO.getId())
-        .documentNumber(previousDecisionDTO.getReferencedDocumentationUnit().getDocumentNumber())
+        .documentNumber(previousDecisionDTO.getDocumentNumber())
         .court(getCourtFromDTO(previousDecisionDTO.getCourt()))
         .fileNumber(getFileNumber(previousDecisionDTO.getFileNumber()))
         .documentType(getDocumentTypeFromDTO(previousDecisionDTO.getDocumentType()))
         .decisionDate(previousDecisionDTO.getDate())
         .dateKnown(previousDecisionDTO.isDateKnown())
+        .referenceFound(previousDecisionDTO.getReferencedDocumentationUnit() != null)
         .build();
   }
 
