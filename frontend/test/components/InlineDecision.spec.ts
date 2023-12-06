@@ -26,8 +26,7 @@ function renderComponent(options?: {
         decisionDate:
           options?.decisionDate ?? "2004-12-02 12:00:00.000000 +00:00",
         documentNumber: options?.documentNumber ?? undefined,
-        referencedDocumentationUnitId:
-          options?.referencedDocumentationUnitId ?? undefined,
+        referenceFound: true,
       },
     }),
   }
@@ -80,7 +79,6 @@ describe("Decision ListItem", () => {
   it("renders with link if linked to docunit", async () => {
     renderComponent({
       documentNumber: "fooDocumentNumber",
-      referencedDocumentationUnitId: "abc",
     })
     expect(screen.getByRole("link")).toHaveAttribute(
       "href",

@@ -227,7 +227,7 @@ class PreviousDecisionIntegrationTest {
             .previousDecisions(
                 List.of(
                     PreviousDecision.builder()
-                        .referencedDocumentationUnitId(childDocumentationUnitUuid)
+                        .uuid(childDocumentationUnitUuid)
                         .documentNumber(childDocumentUnitDTO.getDocumentNumber())
                         .build()))
             .coreData(CoreData.builder().documentationOffice(docOffice).build())
@@ -245,8 +245,8 @@ class PreviousDecisionIntegrationTest {
         .consumeWith(
             response -> {
               assertThat(response.getResponseBody().previousDecisions())
-                  .extracting("referencedDocumentationUnitId")
-                  .containsExactly(childDocumentationUnitUuid);
+                  .extracting("documentNumber")
+                  .containsExactly("abcdefghjikl");
             });
   }
 
@@ -308,12 +308,12 @@ class PreviousDecisionIntegrationTest {
             .previousDecisions(
                 List.of(
                     PreviousDecision.builder()
+                        .uuid(childDocumentationUnitUuid)
                         .documentNumber("xxx")
-                        .referencedDocumentationUnitId(childDocumentationUnitUuid)
                         .build(),
                     PreviousDecision.builder()
+                        .uuid(childDocumentationUnitUuid)
                         .documentNumber("xxx")
-                        .referencedDocumentationUnitId(childDocumentationUnitUuid)
                         .build()))
             .coreData(CoreData.builder().documentationOffice(docOffice).build())
             .build();
@@ -333,9 +333,6 @@ class PreviousDecisionIntegrationTest {
               assertThat(response.getResponseBody().previousDecisions().get(0))
                   .extracting("documentNumber")
                   .isEqualTo("xxx");
-              assertThat(response.getResponseBody().previousDecisions().get(0))
-                  .extracting("referencedDocumentationUnitId")
-                  .isEqualTo(childDocumentationUnitUuid);
             });
   }
 

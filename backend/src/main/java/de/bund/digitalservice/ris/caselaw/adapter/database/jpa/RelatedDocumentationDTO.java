@@ -14,6 +14,8 @@ import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.EqualsAndHashCode.Include;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -25,11 +27,12 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 @SuperBuilder
 @Entity
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Table(schema = "incremental_migration", name = "related_documentation")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 public abstract class RelatedDocumentationDTO {
 
-  @Id @GeneratedValue private UUID id;
+  @Include @Id @GeneratedValue private UUID id;
 
   @ManyToOne private CourtDTO court;
 
@@ -55,6 +58,7 @@ public abstract class RelatedDocumentationDTO {
   @JoinColumn(name = "document_number", referencedColumnName = "document_number")
   private DocumentationUnitDTO referencedDocumentationUnit;
 
+  @Include
   @Column(name = "document_number", insertable = false, updatable = false)
   private String documentNumber;
 }

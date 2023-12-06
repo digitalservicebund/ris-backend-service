@@ -200,7 +200,7 @@ class ActiveCitationIntegrationTest {
                                         .build())
                                 .build(),
                             ActiveCitation.builder()
-                                .uuid(UUID.fromString("7da39a1e-78a9-11ee-b962-0242ac120002"))
+                                .uuid(UUID.fromString("7da39a1e-78a9-11ee-b962-0242ac120003"))
                                 .citationType(
                                     CitationType.builder()
                                         .uuid(
@@ -1117,8 +1117,6 @@ class ActiveCitationIntegrationTest {
                             ActiveCitation.builder()
                                 .uuid(UUID.randomUUID())
                                 .documentNumber("documentnr002")
-                                .referencedDocumentationUnitId(
-                                    UUID.fromString("f13e7fe2-78a5-11ee-b962-0242ac120002"))
                                 .build()))
                     .build())
             .build();
@@ -1172,14 +1170,10 @@ class ActiveCitationIntegrationTest {
                             ActiveCitation.builder()
                                 .uuid(activeCitationUUID2)
                                 .documentNumber("documentnr002")
-                                .referencedDocumentationUnitId(
-                                    UUID.fromString("f13e7fe2-78a5-11ee-b962-0242ac120002"))
                                 .build(),
                             ActiveCitation.builder()
                                 .uuid(activeCitationUUID2)
                                 .documentNumber("documentnr002")
-                                .referencedDocumentationUnitId(
-                                    UUID.fromString("f13e7fe2-78a5-11ee-b962-0242ac120002"))
                                 .build()))
                     .build())
             .build();

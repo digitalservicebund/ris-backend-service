@@ -30,7 +30,7 @@ function renderComponent(options?: { modelValue?: ActiveCitation[] }) {
 function generateActiveCitation(options?: {
   uuid?: string
   documentNumber?: string
-  referencedDocumentationUnitId?: string
+  referenceFound?: boolean
   court?: Court
   decisionDate?: string
   fileNumber?: string
@@ -40,8 +40,6 @@ function generateActiveCitation(options?: {
   const activeCitation = new ActiveCitation({
     uuid: options?.uuid ?? "123",
     documentNumber: options?.documentNumber ?? undefined,
-    referencedDocumentationUnitId:
-      options?.referencedDocumentationUnitId ?? undefined,
     court: options?.court ?? {
       type: "type1",
       location: "location1",
@@ -58,6 +56,7 @@ function generateActiveCitation(options?: {
       jurisShortcut: "Änderungen",
       label: "Änderungen",
     },
+    referenceFound: options?.referenceFound ?? false,
   })
   return activeCitation
 }
@@ -406,7 +405,7 @@ describe("Active Citations", () => {
       modelValue: [
         generateActiveCitation({
           documentNumber: "ABC",
-          referencedDocumentationUnitId: "abc",
+          referenceFound: true,
         }),
       ],
     })
@@ -489,7 +488,7 @@ describe("Active Citations", () => {
       modelValue: [
         generateActiveCitation({
           documentNumber: "123",
-          referencedDocumentationUnitId: "123",
+          referenceFound: true,
           citationStyle: {
             label: "invalid",
           },

@@ -34,13 +34,12 @@ function generatePreviousDecision(options?: {
   fileNumber?: string
   documentType?: DocumentType
   dateKnown?: boolean
-  referencedDocumentationUnitId?: string
+  referenceFound?: boolean
 }) {
   const previousDecision = new PreviousDecision({
     uuid: options?.uuid ?? "123",
     documentNumber: options?.documentNumber ?? undefined,
-    referencedDocumentationUnitId:
-      options?.referencedDocumentationUnitId ?? undefined,
+    referenceFound: options?.referenceFound ?? false,
     court: options?.court ?? {
       type: "type1",
       location: "location1",
@@ -356,7 +355,7 @@ describe("PreviousDecisions", () => {
       modelValue: [
         generatePreviousDecision({
           documentNumber: "ABC",
-          referencedDocumentationUnitId: "abc",
+          referenceFound: true,
         }),
       ],
     })

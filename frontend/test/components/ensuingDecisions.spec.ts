@@ -33,7 +33,7 @@ function generateEnsuingDecision(options?: {
   decisionDate?: string
   fileNumber?: string
   documentType?: DocumentType
-  referencedDocumentationUnitId?: string
+  referenceFound?: boolean
   pending?: boolean
   note?: string
 }) {
@@ -51,8 +51,7 @@ function generateEnsuingDecision(options?: {
       jurisShortcut: "documentTypeShortcut1",
       label: "documentType1",
     },
-    referencedDocumentationUnitId:
-      options?.referencedDocumentationUnitId ?? undefined,
+    referenceFound: options?.referenceFound ?? false,
     pending: options?.pending ?? false,
     note: options?.note ?? undefined,
   })
@@ -298,7 +297,7 @@ describe("EnsuingDecisions", () => {
       modelValue: [
         generateEnsuingDecision({
           documentNumber: "ABC",
-          referencedDocumentationUnitId: "abc",
+          referenceFound: true,
         }),
       ],
     })

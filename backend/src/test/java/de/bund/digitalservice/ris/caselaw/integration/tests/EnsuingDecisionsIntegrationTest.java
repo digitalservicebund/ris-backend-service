@@ -890,8 +890,6 @@ class EnsuingDecisionsIntegrationTest {
                     EnsuingDecision.builder()
                         .uuid(UUID.randomUUID())
                         .documentNumber("documentnr002")
-                        .referencedDocumentationUnitId(
-                            UUID.fromString("f13e7fe2-78a5-11ee-b962-0242ac120002"))
                         .build()))
             .build();
 
@@ -924,14 +922,10 @@ class EnsuingDecisionsIntegrationTest {
                     EnsuingDecision.builder()
                         .uuid(UUID.fromString("f0232240-7416-11ee-b962-0242ac120002"))
                         .documentNumber("documentnr002")
-                        .referencedDocumentationUnitId(
-                            UUID.fromString("f13e7fe2-78a5-11ee-b962-0242ac120002"))
                         .build(),
                     EnsuingDecision.builder()
                         .uuid(UUID.fromString("f0232240-7416-11ee-b962-0242ac120002"))
                         .documentNumber("documentnr002")
-                        .referencedDocumentationUnitId(
-                            UUID.fromString("f13e7fe2-78a5-11ee-b962-0242ac120002"))
                         .build()))
             .build();
 
