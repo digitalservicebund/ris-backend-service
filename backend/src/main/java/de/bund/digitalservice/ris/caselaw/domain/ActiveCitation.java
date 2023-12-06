@@ -25,7 +25,6 @@ public class ActiveCitation extends RelatedDocumentationUnit {
         && fileNumber == null
         && documentType == null
         && citationType == null
-        && documentNumber == null
-        && referencedDocumentationUnitId == null;
+        && documentNumber == null;
   }
 }

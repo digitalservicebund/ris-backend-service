@@ -30,9 +30,7 @@ export default class PreviousDecision
       ...(this.dateKnown === false ? ["Datum unbekannt"] : []),
       ...(this.fileNumber ? [this.fileNumber] : []),
       ...(this.documentType ? [this.documentType?.jurisShortcut] : []),
-      ...(this.documentNumber && this.hasForeignSource
-        ? [this.documentNumber]
-        : []),
+      ...(this.documentNumber ? [this.documentNumber] : []),
     ].join(", ")
   }
 
@@ -48,7 +46,7 @@ export default class PreviousDecision
   }
 
   get isReadOnly(): boolean {
-    return this.hasForeignSource
+    return this.documentNumber != null
   }
 
   get missingRequiredFields() {

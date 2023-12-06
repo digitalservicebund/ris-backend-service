@@ -12,7 +12,6 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
-import java.util.Objects;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -37,9 +36,6 @@ public abstract class RelatedDocumentationDTO {
   @Column(name = "date")
   private LocalDate date;
 
-  @Column(name = "document_number")
-  private String documentNumber;
-
   @ManyToOne
   @JoinColumn(name = "document_type_id")
   private DocumentTypeDTO documentType;
@@ -56,23 +52,9 @@ public abstract class RelatedDocumentationDTO {
   @Column @NotNull private Integer rank;
 
   @ManyToOne
-  @JoinColumn(name = "referenced_documentation_unit_id", referencedColumnName = "id")
+  @JoinColumn(name = "document_number", referencedColumnName = "document_number")
   private DocumentationUnitDTO referencedDocumentationUnit;
 
-  @Column(name = "referenced_documentation_unit_id", insertable = false, updatable = false)
-  private UUID referencedDocumentationUnitId;
-
-  // Todo overriding equals() to filter distinct documentNumbers -> is there a better approach?
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass() || documentNumber == null) return false;
-    RelatedDocumentationDTO that = (RelatedDocumentationDTO) o;
-    return Objects.equals(documentNumber, that.getDocumentNumber());
-  }
-
-  @Override
-  public int hashCode() {
-    return Objects.hash(documentNumber);
-  }
+  @Column(name = "document_number", insertable = false, updatable = false)
+  private String documentNumber;
 }

@@ -8,12 +8,10 @@ export default class RelatedDocumentation {
   public decisionDate?: string
   public fileNumber?: string
   public documentType?: DocumentType
-  public referencedDocumentationUnitId?: string
+  public referenceFound?: boolean
 
   get hasForeignSource(): boolean {
-    return (
-      this.documentNumber != null && this.referencedDocumentationUnitId != null
-    )
+    return this.documentNumber != null && !!this.referenceFound
   }
 
   constructor(data: Partial<RelatedDocumentation> = {}) {

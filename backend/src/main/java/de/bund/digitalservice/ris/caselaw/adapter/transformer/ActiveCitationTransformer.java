@@ -28,15 +28,12 @@ public class ActiveCitationTransformer extends RelatedDocumentationUnitTransform
     return ActiveCitation.builder()
         .uuid(activeCitationDTO.getId())
         .documentNumber(activeCitationDTO.getDocumentNumber())
-        .referencedDocumentationUnitId(
-            activeCitationDTO.getReferencedDocumentationUnit() == null
-                ? null
-                : activeCitationDTO.getReferencedDocumentationUnit().getId())
         .court(getCourtFromDTO(activeCitationDTO.getCourt()))
         .fileNumber(getFileNumber(activeCitationDTO.getFileNumber()))
         .documentType(getDocumentTypeFromDTO(activeCitationDTO.getDocumentType()))
         .decisionDate(activeCitationDTO.getDate())
         .citationType(citationType)
+        .referenceFound(activeCitationDTO.getReferencedDocumentationUnit() != null)
         .build();
   }
 
@@ -50,12 +47,12 @@ public class ActiveCitationTransformer extends RelatedDocumentationUnitTransform
             .id(activeCitation.getUuid())
             .court(getCourtFromDomain(activeCitation.getCourt()))
             .date(activeCitation.getDecisionDate())
-            .documentNumber(activeCitation.getDocumentNumber())
             .referencedDocumentationUnit(
-                activeCitation.getReferencedDocumentationUnitId() == null
+                activeCitation.getDocumentNumber() == null
                     ? null
                     : DocumentationUnitDTO.builder()
-                        .id(activeCitation.getReferencedDocumentationUnitId())
+                        .id(activeCitation.getUuid())
+                        .documentNumber(activeCitation.getDocumentNumber())
                         .build())
             .documentType(getDocumentTypeFromDomain(activeCitation.getDocumentType()))
             .fileNumber(getFileNumber(activeCitation.getFileNumber()));

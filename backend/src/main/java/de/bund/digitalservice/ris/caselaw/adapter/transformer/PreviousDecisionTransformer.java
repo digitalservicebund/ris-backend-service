@@ -9,15 +9,12 @@ public class PreviousDecisionTransformer extends RelatedDocumentationUnitTransfo
     return PreviousDecision.builder()
         .uuid(previousDecisionDTO.getId())
         .documentNumber(previousDecisionDTO.getDocumentNumber())
-        .referencedDocumentationUnitId(
-            previousDecisionDTO.getReferencedDocumentationUnit() == null
-                ? null
-                : previousDecisionDTO.getReferencedDocumentationUnit().getId())
         .court(getCourtFromDTO(previousDecisionDTO.getCourt()))
         .fileNumber(getFileNumber(previousDecisionDTO.getFileNumber()))
         .documentType(getDocumentTypeFromDTO(previousDecisionDTO.getDocumentType()))
         .decisionDate(previousDecisionDTO.getDate())
         .dateKnown(previousDecisionDTO.isDateKnown())
+        .referenceFound(previousDecisionDTO.getReferencedDocumentationUnit() != null)
         .build();
   }
 
@@ -30,12 +27,12 @@ public class PreviousDecisionTransformer extends RelatedDocumentationUnitTransfo
         .id(previousDecision.getUuid())
         .court(getCourtFromDomain(previousDecision.getCourt()))
         .date(previousDecision.getDecisionDate())
-        .documentNumber(previousDecision.getDocumentNumber())
         .referencedDocumentationUnit(
-            previousDecision.getReferencedDocumentationUnitId() == null
+            previousDecision.getDocumentNumber() == null
                 ? null
                 : DocumentationUnitDTO.builder()
-                    .id(previousDecision.getReferencedDocumentationUnitId())
+                    .id(previousDecision.getUuid())
+                    .documentNumber(previousDecision.getDocumentNumber())
                     .build())
         .documentType(getDocumentTypeFromDomain(previousDecision.getDocumentType()))
         .fileNumber(getFileNumber(previousDecision.getFileNumber()))

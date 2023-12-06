@@ -21,7 +21,6 @@ public class PreviousDecision extends RelatedDocumentationUnit {
         && decisionDate == null
         && fileNumber == null
         && documentType == null
-        && documentNumber == null
-        && referencedDocumentationUnitId == null;
+        && documentNumber == null;
   }
 }
