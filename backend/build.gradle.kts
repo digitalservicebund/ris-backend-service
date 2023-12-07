@@ -181,7 +181,7 @@ dependencies {
     implementation("org.postgresql:r2dbc-postgresql:1.0.1.RELEASE")
     implementation("io.r2dbc:r2dbc-spi:$r2dbcVersion")
     implementation("io.r2dbc:r2dbc-pool:$r2dbcVersion")
-    implementation("org.postgresql:postgresql:42.6.0")
+    implementation("org.postgresql:postgresql:42.7.1")
     implementation("com.sendinblue:sib-api-v3-sdk:7.0.0")
     // CVE-2022-4244
     implementation("org.codehaus.plexus:plexus-utils:4.0.0")
