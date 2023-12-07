@@ -26,6 +26,7 @@ import IconPublish from "~icons/ic/outline-campaign"
 
 const props = defineProps<{
   documentUnit: DocumentUnit
+  preview?: XmlMail
   publishResult?: XmlMail
   publicationLog?: XmlMail[]
   errorMessage?: ResponseError
@@ -295,11 +296,17 @@ const fieldsMissing = computed(() => {
       </div>
       <div v-else class="flex flex-row gap-8">
         <IconCheck class="text-green-700" />
-
         <p class="ds-body-01-reg">Alle Pflichtfelder sind korrekt ausgefüllt</p>
       </div>
     </div>
     <div class="border-b-1 border-b-gray-400"></div>
+
+    <CodeSnippet
+      v-if="!!preview?.xml && !fieldsMissing"
+      title="XML Vorschau"
+      :xml="preview.xml"
+    />
+
     <InfoModal
       v-if="errorMessage"
       aria-label="Fehler bei Veröffentlichung"

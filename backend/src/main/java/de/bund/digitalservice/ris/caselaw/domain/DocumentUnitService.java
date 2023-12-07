@@ -294,6 +294,11 @@ public class DocumentUnitService {
             });
   }
 
+  public Mono<XmlResultObject> previewPublication(UUID documentUuid) {
+    DocumentUnit documentUnit = repository.findByUuid(documentUuid);
+    return publicationService.getPublicationPreview(documentUnit);
+  }
+
   public Flux<PublicationHistoryRecord> getPublicationHistory(UUID documentUuid) {
     return Flux.concat(
             publicationService.getPublications(documentUuid),

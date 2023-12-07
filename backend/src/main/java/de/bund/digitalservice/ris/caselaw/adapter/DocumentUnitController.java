@@ -10,6 +10,7 @@ import de.bund.digitalservice.ris.caselaw.domain.PublicationHistoryRecord;
 import de.bund.digitalservice.ris.caselaw.domain.RelatedDocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.SingleNormValidationInfo;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
+import de.bund.digitalservice.ris.caselaw.domain.XmlResultObject;
 import de.bund.digitalservice.ris.caselaw.domain.docx.Docx2Html;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -182,6 +183,14 @@ public class DocumentUnitController {
   @PreAuthorize("@userHasReadAccessByDocumentUnitUuid.apply(#uuid)")
   public Flux<PublicationHistoryRecord> getPublicationHistory(@PathVariable UUID uuid) {
     return service.getPublicationHistory(uuid);
+  }
+
+  @GetMapping(
+      value = "/{uuid}/preview-publication-xml",
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  @PreAuthorize("@userHasReadAccessByDocumentUnitUuid.apply(#uuid)")
+  public Mono<XmlResultObject> getPublicationPreview(@PathVariable UUID uuid) {
+    return service.previewPublication(uuid);
   }
 
   @PutMapping(value = "/search-by-linked-documentation-unit")

@@ -76,6 +76,15 @@ public class XmlEMailPublishService implements EmailPublishService {
     return Flux.fromIterable(repository.getPublicationsByDocumentUnitUuid(documentUnitUuid));
   }
 
+  @Override
+  public Mono<XmlResultObject> getPublicationPreview(DocumentUnit documentUnit) {
+    try {
+      return Mono.just(xmlExporter.generateXml(documentUnit));
+    } catch (ParserConfigurationException | TransformerException ex) {
+      return Mono.error(new DocumentUnitPublishException("Couldn't generate xml.", ex));
+    }
+  }
+
   private String generateMailSubject(DocumentUnit documentUnit) {
     if (documentUnit.documentNumber() == null) {
       throw new DocumentUnitPublishException("No document number has set in the document unit.");

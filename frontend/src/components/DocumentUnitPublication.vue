@@ -17,6 +17,7 @@ const emits = defineEmits<{
 
 const loadDone = ref(false)
 const publicationLog = ref<XmlMail[]>()
+const preview = ref<XmlMail>()
 const publishResult = ref<XmlMail>()
 const errorMessage = ref<ResponseError>()
 const succeedMessage = ref<{ title: string; description: string }>()
@@ -60,6 +61,13 @@ function formatDate(date?: string): string {
 }
 
 onMounted(async () => {
+  const previewResponse = await publishService.getPreview(
+    props.documentUnit.uuid,
+  )
+  if (previewResponse.data && previewResponse.data.xml) {
+    preview.value = previewResponse.data
+  }
+
   const response = await publishService.getPublicationLog(
     props.documentUnit.uuid,
   )
@@ -88,6 +96,7 @@ onMounted(async () => {
           v-if="loadDone"
           :document-unit="documentUnit"
           :error-message="errorMessage"
+          :preview="preview"
           :publication-log="publicationLog"
           :publish-result="publishResult"
           :succeed-message="succeedMessage"
