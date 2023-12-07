@@ -36,9 +36,7 @@ export default class RelatedDocumentation {
         : []),
       ...(this.documentType ? [this.documentType.label] : []),
       ...(this.fileNumber ? [this.fileNumber] : []),
-      ...(this.documentNumber && this.hasForeignSource
-        ? [this.documentNumber]
-        : []),
+      ...(this.documentNumber ? [this.documentNumber] : []),
     ].join(", ")
   }
 }

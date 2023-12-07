@@ -26,7 +26,7 @@ const proceedingDecisions = computed({
 const defaultValue = new PreviousDecision()
 
 function decisionSummarizer(dataEntry: PreviousDecision) {
-  if (dataEntry.isReadOnly) {
+  if (dataEntry.hasForeignSource) {
     return h(
       RouterLink,
       {

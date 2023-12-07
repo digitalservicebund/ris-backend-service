@@ -90,6 +90,7 @@ async function addEnsuingDecision() {
 }
 
 async function addEnsuingDecisionFromSearch(decision: RelatedDocumentation) {
+  decision.referenceFound = true
   emit("update:modelValue", decision as EnsuingDecision)
   emit("addEntry")
   scrollToTop()

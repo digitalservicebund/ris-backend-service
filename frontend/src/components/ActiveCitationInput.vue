@@ -111,6 +111,7 @@ async function addActiveCitationFromSearch(decision: RelatedDocumentation) {
   } as CitationType
   const decisionWithCitationType = new ActiveCitation({
     ...decision,
+    referenceFound: true,
     citationType: newActiveCitationType,
   })
   emit("update:modelValue", decisionWithCitationType)

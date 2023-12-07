@@ -82,6 +82,7 @@ async function addPreviousDecision() {
 }
 
 async function addPreviousDecisionFromSearch(decision: RelatedDocumentation) {
+  decision.referenceFound = true
   emit("update:modelValue", decision as PreviousDecision)
   emit("addEntry")
   scrollToTop()
