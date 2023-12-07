@@ -10,7 +10,6 @@ import static org.mockito.Mockito.when;
 
 import de.bund.digitalservice.ris.caselaw.domain.FieldOfLawRepository;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw.FieldOfLaw;
-import de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw.Keyword;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw.Norm;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -171,7 +170,6 @@ class FieldOfLawServiceTest {
             .identifier("TS-01-01")
             .text("stext 2")
             .linkedFields(Collections.emptyList())
-            .keywords(List.of(new Keyword("keyword")))
             .norms(List.of(new Norm("abbr1", "description")))
             .children(Collections.emptyList())
             .build();
@@ -197,7 +195,6 @@ class FieldOfLawServiceTest {
             .identifier("TS-01-01")
             .text("stext 2")
             .linkedFields(Collections.emptyList())
-            .keywords(List.of(new Keyword("keyword")))
             .norms(List.of(new Norm("abbr1", "description")))
             .children(new ArrayList<>())
             .build();

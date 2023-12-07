@@ -438,7 +438,7 @@ public class DocumentationUnitTransformer {
               .map(
                   documentationUnitFieldOfLawDTO ->
                       FieldOfLawTransformer.transformToDomain(
-                          documentationUnitFieldOfLawDTO.getFieldOfLaw()))
+                          documentationUnitFieldOfLawDTO.getFieldOfLaw(), false, false))
               .toList();
 
       contentRelatedIndexingBuilder.fieldsOfLaw(fieldOfLaws);

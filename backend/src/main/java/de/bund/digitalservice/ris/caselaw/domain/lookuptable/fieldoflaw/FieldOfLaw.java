@@ -11,6 +11,6 @@ public record FieldOfLaw(
     String identifier,
     String text,
     List<String> linkedFields,
-    List<Keyword> keywords,
+    //    List<Keyword> keywords,
     List<Norm> norms,
     List<FieldOfLaw> children) {}

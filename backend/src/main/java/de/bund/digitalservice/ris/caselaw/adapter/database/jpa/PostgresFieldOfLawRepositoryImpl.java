@@ -29,7 +29,7 @@ public class PostgresFieldOfLawRepositoryImpl implements FieldOfLawRepository {
   @Transactional(transactionManager = "jpaTransactionManager")
   public List<FieldOfLaw> getTopLevelNodes() {
     return repository.findAllByParentIsNullAndNotationOrderByIdentifier().stream()
-        .map(fieldOfLawDTO -> FieldOfLawTransformer.transformToDomain(fieldOfLawDTO, false))
+        .map(fieldOfLawDTO -> FieldOfLawTransformer.transformToDomain(fieldOfLawDTO, false, true))
         .toList();
   }
 
@@ -37,7 +37,7 @@ public class PostgresFieldOfLawRepositoryImpl implements FieldOfLawRepository {
   @Transactional(transactionManager = "jpaTransactionManager")
   public List<FieldOfLaw> findAllByParentIdentifierOrderByIdentifierAsc(String identifier) {
     return repository.findByIdentifier(identifier).getChildren().stream()
-        .map(fieldOfLawDTO -> FieldOfLawTransformer.transformToDomain(fieldOfLawDTO, false))
+        .map(fieldOfLawDTO -> FieldOfLawTransformer.transformToDomain(fieldOfLawDTO, false, true))
         .toList();
   }
 
@@ -45,13 +45,13 @@ public class PostgresFieldOfLawRepositoryImpl implements FieldOfLawRepository {
   @Transactional(transactionManager = "jpaTransactionManager")
   public FieldOfLaw findTreeByIdentifier(String identifier) {
     FieldOfLawDTO childDTO = repository.findByIdentifier(identifier);
-    FieldOfLaw child = FieldOfLawTransformer.transformToDomain(childDTO, false);
+    FieldOfLaw child = FieldOfLawTransformer.transformToDomain(childDTO, false, true);
 
     FieldOfLawDTO parentDTO;
     FieldOfLaw parent = child;
     while (childDTO.getParent() != null) {
       parentDTO = childDTO.getParent();
-      parent = FieldOfLawTransformer.transformToDomain(parentDTO, false);
+      parent = FieldOfLawTransformer.transformToDomain(parentDTO, false, true);
       parent = parent.toBuilder().children(List.of(child)).build();
 
       childDTO = parentDTO;
@@ -66,7 +66,7 @@ public class PostgresFieldOfLawRepositoryImpl implements FieldOfLawRepository {
   public FieldOfLaw findParentByChild(FieldOfLaw child) {
     Optional<FieldOfLawDTO> childDTO = repository.findById(child.id());
     return childDTO
-        .map(fieldOfLawDTO -> FieldOfLawTransformer.transformToDomain(fieldOfLawDTO, false))
+        .map(fieldOfLawDTO -> FieldOfLawTransformer.transformToDomain(fieldOfLawDTO, false, true))
         .orElse(null);
   }
 
@@ -75,7 +75,7 @@ public class PostgresFieldOfLawRepositoryImpl implements FieldOfLawRepository {
   public Page<FieldOfLaw> findAllByOrderByIdentifierAsc(Pageable pageable) {
     return repository
         .findAllByOrderByIdentifierAsc(pageable)
-        .map(item -> FieldOfLawTransformer.transformToDomain(item, false));
+        .map(item -> FieldOfLawTransformer.transformToDomain(item, false, true));
   }
 
   @Override
@@ -91,7 +91,7 @@ public class PostgresFieldOfLawRepositoryImpl implements FieldOfLawRepository {
 
     if (searchTerms.length == 1) {
       return listWithFirstSearchTerm.stream()
-          .map(item -> FieldOfLawTransformer.transformToDomain(item, false))
+          .map(item -> FieldOfLawTransformer.transformToDomain(item, false, true))
           .toList();
     }
 
@@ -109,7 +109,7 @@ public class PostgresFieldOfLawRepositoryImpl implements FieldOfLawRepository {
               }
               return false;
             })
-        .map(FieldOfLawTransformer::transformToDomain)
+        .map(fol -> FieldOfLawTransformer.transformToDomain(fol, false, true))
         .toList();
   }
 
@@ -120,7 +120,7 @@ public class PostgresFieldOfLawRepositoryImpl implements FieldOfLawRepository {
     return list.stream()
         .map(FieldOfLawNormDTO::getFieldOfLaw)
         .distinct()
-        .map(item -> FieldOfLawTransformer.transformToDomain(item, false))
+        .map(item -> FieldOfLawTransformer.transformToDomain(item, false, true))
         .toList();
   }
 
@@ -161,7 +161,7 @@ public class PostgresFieldOfLawRepositoryImpl implements FieldOfLawRepository {
             })
         .map(FieldOfLawNormDTO::getFieldOfLaw)
         .distinct()
-        .map(item -> FieldOfLawTransformer.transformToDomain(item, false))
+        .map(item -> FieldOfLawTransformer.transformToDomain(item, false, true))
         .toList();
   }
 
@@ -169,7 +169,7 @@ public class PostgresFieldOfLawRepositoryImpl implements FieldOfLawRepository {
   @Transactional(transactionManager = "jpaTransactionManager")
   public List<FieldOfLaw> getFirst30OrderByIdentifier() {
     return repository.findAllByOrderByIdentifierAsc(PageRequest.of(0, 30)).stream()
-        .map(item -> FieldOfLawTransformer.transformToDomain(item, false))
+        .map(item -> FieldOfLawTransformer.transformToDomain(item, false, true))
         .toList();
   }
 
@@ -179,7 +179,7 @@ public class PostgresFieldOfLawRepositoryImpl implements FieldOfLawRepository {
     return repository
         .findAllByIdentifierStartsWithIgnoreCaseOrderByIdentifier(searchStr, PageRequest.of(0, 30))
         .stream()
-        .map(item -> FieldOfLawTransformer.transformToDomain(item, false))
+        .map(item -> FieldOfLawTransformer.transformToDomain(item, false, true))
         .toList();
   }
 }

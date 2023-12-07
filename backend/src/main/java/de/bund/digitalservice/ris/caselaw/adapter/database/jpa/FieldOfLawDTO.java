@@ -47,6 +47,7 @@ public class FieldOfLawDTO {
   @Column(updatable = false, insertable = false)
   private String text;
 
+  // Not used yet
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinTable(
       schema = "incremental_migration",
@@ -56,6 +57,7 @@ public class FieldOfLawDTO {
   @Valid
   private NavigationTermDTO navigationTerm;
 
+  // Not used yet
   @ManyToMany(fetch = FetchType.LAZY)
   @JoinTable(
       schema = "incremental_migration",
