@@ -31,9 +31,11 @@ public enum LegalEffect {
 
   public static LegalEffect of(String name) {
     LegalEffect result = map.get(name);
+
     if (result == null) {
       throw new IllegalArgumentException("Invalid category name: " + name);
     }
+
     return result;
   }
 
@@ -48,12 +50,14 @@ public enum LegalEffect {
         || documentUnit.coreData().legalEffect() == null) {
       return null;
     }
+
     if (courtHasChanged
         && documentUnit.coreData().court() != null
         && documentUnit.coreData().court().type() != null
         && autoYesCourtTypes.contains(documentUnit.coreData().court().type())) {
       return YES;
     }
+
     return of(documentUnit.coreData().legalEffect());
   }
 }

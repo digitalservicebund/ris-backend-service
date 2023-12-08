@@ -230,6 +230,7 @@ public class DocumentationUnitTransformer {
       DocumentationUnitDTO currentDto,
       DocumentUnit updatedDomainObject,
       DocumentationUnitDTOBuilder builder) {
+
     boolean courtWasAdded =
         currentDto.getCourt() == null
             && updatedDomainObject.coreData() != null
@@ -242,13 +243,13 @@ public class DocumentationUnitTransformer {
         currentDto.getCourt() != null
             && updatedDomainObject.coreData() != null
             && updatedDomainObject.coreData().court() != null
-            && updatedDomainObject.coreData().court().id() != currentDto.getCourt().getId();
+            && !updatedDomainObject.coreData().court().id().equals(currentDto.getCourt().getId());
 
-    LegalEffectDTO legalEffectDTO = LegalEffectDTO.FALSCHE_ANGABE;
     var legalEffect =
         LegalEffect.deriveFrom(
             updatedDomainObject, courtWasAdded || courtWasDeleted || courtHasChanged);
 
+    LegalEffectDTO legalEffectDTO = LegalEffectDTO.FALSCHE_ANGABE;
     if (legalEffect != null) {
       switch (legalEffect) {
         case NO -> legalEffectDTO = LegalEffectDTO.NEIN;
