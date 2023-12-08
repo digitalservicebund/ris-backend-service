@@ -58,6 +58,7 @@ function formatDropdownItems(
       return (responseData as CitationType[]).map((item) => ({
         label: item.label,
         value: item,
+        additionalInformation: item.jurisShortcut,
       }))
     }
     case Endpoint.procedures: {

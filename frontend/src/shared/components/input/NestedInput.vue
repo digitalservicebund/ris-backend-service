@@ -54,6 +54,23 @@ function toggleContentVisibility(): void {
 
 <template>
   <div class="relative">
+    <div class="absolute -right-10 top-48 z-10">
+      <button
+        :aria-label="`${ariaLabel} ${
+          localIsExpanded ? 'schließen' : 'anzeigen'
+        }`"
+        class="w-icon rounded-full bg-blue-800 text-white"
+        @click="toggleContentVisibility"
+      >
+        <slot v-if="localIsExpanded" name="close-icon">
+          <IconHorizontalRule />
+        </slot>
+        <slot v-else name="open-icon">
+          <IconAdd />
+        </slot>
+      </button>
+    </div>
+
     <!-- Parent Element -->
     <InputFieldComponent
       :id="fields.parent.name"
@@ -71,23 +88,6 @@ function toggleContentVisibility(): void {
         @update:validation-error="updateValidationError"
       ></InputElement>
     </InputFieldComponent>
-
-    <div class="absolute -right-10 top-48 z-10">
-      <button
-        :aria-label="`${ariaLabel} ${
-          localIsExpanded ? 'schließen' : 'anzeigen'
-        }`"
-        class="w-icon rounded-full bg-blue-800 text-white"
-        @click="toggleContentVisibility"
-      >
-        <slot v-if="localIsExpanded" name="close-icon">
-          <IconHorizontalRule />
-        </slot>
-        <slot v-else name="open-icon">
-          <IconAdd />
-        </slot>
-      </button>
-    </div>
 
     <!-- Child Element -->
     <InputFieldComponent
