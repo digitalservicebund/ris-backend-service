@@ -85,8 +85,11 @@ const service: PublishService = {
     response.error =
       response.status >= 300
         ? {
-            title: "Can't load publication preview",
-            description: "TODO error",
+            title:
+              errorMessages.DOCUMENT_UNIT_LOADING_PUBLICATION_PREVIEW.title,
+            description:
+              errorMessages.DOCUMENT_UNIT_LOADING_PUBLICATION_PREVIEW
+                .description,
           }
         : undefined
 
