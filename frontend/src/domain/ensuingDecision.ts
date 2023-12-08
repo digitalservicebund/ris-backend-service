@@ -50,7 +50,7 @@ export default class EnsuingDecision
   }
 
   get isReadOnly(): boolean {
-    return this.documentNumber != null
+    return false
   }
 
   get isEmpty(): boolean {

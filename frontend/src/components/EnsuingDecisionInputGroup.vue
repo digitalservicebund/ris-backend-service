@@ -90,8 +90,12 @@ async function addEnsuingDecision() {
 }
 
 async function addEnsuingDecisionFromSearch(decision: RelatedDocumentation) {
-  decision.referenceFound = true
-  emit("update:modelValue", decision as EnsuingDecision)
+  const decisionWithNote = new EnsuingDecision({
+    ...decision,
+    referenceFound: true,
+    note: ensuingDecision.value?.note,
+  })
+  emit("update:modelValue", decisionWithNote)
   emit("addEntry")
   scrollToTop()
 }
@@ -125,88 +129,89 @@ onMounted(() => {
 
 <template>
   <div>
-    <InputField
-      id="isPending"
-      v-slot="{ id }"
-      label="anhängig"
-      :label-position="LabelPosition.RIGHT"
-    >
-      <CheckboxInput
-        :id="id"
-        v-model="isPending"
-        aria-label="Anhängige Entscheidung"
-      />
-    </InputField>
-    <div class="flex justify-between gap-24">
+    <div v-if="!ensuingDecision.hasForeignSource">
       <InputField
-        id="court"
-        v-slot="slotProps"
-        label="Gericht *"
-        :validation-error="validationStore.getByField('court')"
+        id="isPending"
+        v-slot="{ id }"
+        label="anhängig"
+        :label-position="LabelPosition.RIGHT"
       >
-        <ComboboxInput
-          id="court"
-          v-model="ensuingDecision.court"
-          aria-label="Gericht Nachgehende Entscheidung"
-          clear-on-choosing-item
-          :has-error="slotProps.hasError"
-          :item-service="ComboboxItemService.getCourts"
-          placeholder="Gerichtstyp Gerichtsort"
-          @click="validationStore.remove('court')"
-        ></ComboboxInput>
+        <CheckboxInput
+          :id="id"
+          v-model="isPending"
+          aria-label="Anhängige Entscheidung"
+        />
       </InputField>
-      <div v-if="!isPending" class="flex w-full justify-between gap-24">
+      <div class="flex justify-between gap-24">
         <InputField
-          id="date"
+          id="court"
           v-slot="slotProps"
-          label="Entscheidungsdatum *"
-          :validation-error="validationStore.getByField('decisionDate')"
+          label="Gericht *"
+          :validation-error="validationStore.getByField('court')"
         >
-          <DateInput
-            id="decisionDate"
-            v-model="ensuingDecision.decisionDate"
-            aria-label="Entscheidungsdatum Nachgehende Entscheidung"
+          <ComboboxInput
+            id="court"
+            v-model="ensuingDecision.court"
+            aria-label="Gericht Nachgehende Entscheidung"
+            clear-on-choosing-item
             :has-error="slotProps.hasError"
-            @focus="validationStore.remove('decisionDate')"
-            @update:validation-error="slotProps.updateValidationError"
-          ></DateInput>
+            :item-service="ComboboxItemService.getCourts"
+            placeholder="Gerichtstyp Gerichtsort"
+            @click="validationStore.remove('court')"
+          ></ComboboxInput>
+        </InputField>
+        <div v-if="!isPending" class="flex w-full justify-between gap-24">
+          <InputField
+            id="date"
+            v-slot="slotProps"
+            label="Entscheidungsdatum *"
+            :validation-error="validationStore.getByField('decisionDate')"
+          >
+            <DateInput
+              id="decisionDate"
+              v-model="ensuingDecision.decisionDate"
+              aria-label="Entscheidungsdatum Nachgehende Entscheidung"
+              :has-error="slotProps.hasError"
+              @focus="validationStore.remove('decisionDate')"
+              @update:validation-error="slotProps.updateValidationError"
+            ></DateInput>
+          </InputField>
+        </div>
+      </div>
+
+      <div class="flex justify-between gap-24">
+        <InputField
+          id="fileNumber"
+          v-slot="slotProps"
+          class="fake-input-group__row__field flex-col"
+          label="Aktenzeichen *"
+          :validation-error="validationStore.getByField('fileNumber')"
+        >
+          <TextInput
+            id="fileNumber"
+            v-model="ensuingDecision.fileNumber"
+            aria-label="Aktenzeichen Nachgehende Entscheidung"
+            :has-error="slotProps.hasError"
+            placeholder="Aktenzeichen"
+            @input="validationStore.remove('fileNumber')"
+          ></TextInput>
+        </InputField>
+
+        <InputField
+          id="documentType"
+          class="fake-input-group__row__field flex-col"
+          label="Dokumenttyp"
+        >
+          <ComboboxInput
+            id="documentType"
+            v-model="ensuingDecision.documentType"
+            aria-label="Dokumenttyp Nachgehende Entscheidung"
+            :item-service="ComboboxItemService.getDocumentTypes"
+            placeholder="Bitte auswählen"
+          ></ComboboxInput>
         </InputField>
       </div>
     </div>
-
-    <div class="flex justify-between gap-24">
-      <InputField
-        id="fileNumber"
-        v-slot="slotProps"
-        class="fake-input-group__row__field flex-col"
-        label="Aktenzeichen *"
-        :validation-error="validationStore.getByField('fileNumber')"
-      >
-        <TextInput
-          id="fileNumber"
-          v-model="ensuingDecision.fileNumber"
-          aria-label="Aktenzeichen Nachgehende Entscheidung"
-          :has-error="slotProps.hasError"
-          placeholder="Aktenzeichen"
-          @input="validationStore.remove('fileNumber')"
-        ></TextInput>
-      </InputField>
-
-      <InputField
-        id="documentType"
-        class="fake-input-group__row__field flex-col"
-        label="Dokumenttyp"
-      >
-        <ComboboxInput
-          id="documentType"
-          v-model="ensuingDecision.documentType"
-          aria-label="Dokumenttyp Nachgehende Entscheidung"
-          :item-service="ComboboxItemService.getDocumentTypes"
-          placeholder="Bitte auswählen"
-        ></ComboboxInput>
-      </InputField>
-    </div>
-
     <InputField
       id="note"
       v-slot="{ id, hasError }"

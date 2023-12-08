@@ -292,8 +292,8 @@ describe("EnsuingDecisions", () => {
     expect(screen.getAllByLabelText("Listen Eintrag").length).toBe(1)
   })
 
-  it("renders from search added ensuing decisions as non-editable list item", async () => {
-    renderComponent({
+  it("renders from search added ensuing decisions as editable list item, only note is editable", async () => {
+    const { user } = renderComponent({
       modelValue: [
         generateEnsuingDecision({
           documentNumber: "ABC",
@@ -301,9 +301,41 @@ describe("EnsuingDecisions", () => {
         }),
       ],
     })
+    expect(screen.getByLabelText("Eintrag bearbeiten")).toBeInTheDocument()
+
+    const editButton = screen.getByLabelText("Eintrag bearbeiten")
+    await user.click(editButton)
+
     expect(
-      screen.queryByLabelText("Eintrag bearbeiten"),
+      screen.queryByLabelText("Anhängige Entscheidung"),
     ).not.toBeInTheDocument()
+    expect(
+      screen.queryByLabelText("Gericht Nachgehende Entscheidung"),
+    ).not.toBeInTheDocument()
+    expect(
+      screen.queryByLabelText("Entscheidungsdatum Nachgehende Entscheidung"),
+    ).not.toBeInTheDocument()
+    expect(
+      screen.queryByLabelText("Aktenzeichen Nachgehende Entscheidung"),
+    ).not.toBeInTheDocument()
+    expect(
+      screen.queryByLabelText("Dokumenttyp Nachgehende Entscheidung"),
+    ).not.toBeInTheDocument()
+    expect(screen.getByLabelText("Vermerk")).toBeInTheDocument()
+    const saveButton = screen.getByLabelText(
+      "Nachgehende Entscheidung speichern",
+    )
+    expect(saveButton).toBeEnabled()
+
+    const input = screen.getByLabelText("Vermerk")
+    await user.type(input, "Vermerk")
+
+    await user.click(saveButton)
+    expect(
+      screen.getByText(
+        /nachgehend, label1, 01.02.2022, test fileNumber, documentTypeShortcut1, Vermerk, ABC/,
+      ),
+    ).toBeInTheDocument()
   })
 
   it("lists search results", async () => {

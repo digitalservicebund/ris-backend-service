@@ -5,6 +5,7 @@ import {
   navigateToCategories,
   navigateToPublication,
   waitForSaving,
+  waitForInputValue,
 } from "~/e2e/caselaw/e2e-utils"
 import { caselawTest as test } from "~/e2e/caselaw/fixtures"
 
@@ -29,6 +30,7 @@ test.describe("ensuing decisions", () => {
     await expect(
       page.getByLabel("Dokumenttyp Nachgehende Entscheidung"),
     ).toBeVisible()
+    await expect(page.getByLabel("Vermerk")).toBeVisible()
     await expect(page.getByLabel("Datum unbekannt")).toBeVisible()
   })
 
@@ -341,9 +343,6 @@ test.describe("ensuing decisions", () => {
     await expect(listItem).toBeVisible()
     await expect(page.getByLabel("Eintrag löschen")).toBeVisible()
 
-    //can not be edited
-    await expect(page.getByLabel("Eintrag bearbeiten")).toBeHidden()
-
     // search for same parameters gives same result, indication that decision is already added
     await page.getByLabel("Weitere Angabe").click()
     await fillEnsuingDecisionInputs(page, {
@@ -366,6 +365,83 @@ test.describe("ensuing decisions", () => {
       ensuingDecisionContainer.getByLabel("Listen Eintrag"),
     ).toHaveCount(1)
     await expect(listItem).toBeHidden()
+  })
+
+  test("only note of linked ensuing decision is editable", async ({
+    page,
+    documentNumber,
+    prefilledDocumentUnit,
+  }) => {
+    await navigateToPublication(
+      page,
+      prefilledDocumentUnit.documentNumber || "",
+    )
+
+    await page
+      .locator("[aria-label='Dokumentationseinheit veröffentlichen']")
+      .click()
+    await expect(page.locator("text=Email wurde versendet")).toBeVisible()
+
+    await expect(page.locator("text=Xml Email Abgabe -")).toBeVisible()
+    await expect(page.locator("text=in Veröffentlichung")).toBeVisible()
+
+    await navigateToCategories(page, documentNumber)
+    await expect(page.getByText(documentNumber)).toBeVisible()
+
+    await fillEnsuingDecisionInputs(page, {
+      court: prefilledDocumentUnit.coreData.court?.label,
+      fileNumber: prefilledDocumentUnit.coreData.fileNumbers?.[0],
+      documentType: prefilledDocumentUnit.coreData.documentType?.jurisShortcut,
+      decisionDate: "31.12.2019",
+    })
+    const ensuingDecisionContainer = page.getByLabel("Nachgehende Entscheidung")
+    await ensuingDecisionContainer
+      .getByLabel("Nach Entscheidung suchen")
+      .click()
+
+    await expect(page.getByText("1 Ergebnis gefunden.")).toBeVisible()
+
+    const result = page.getByText(
+      `nachgehend, AG Aachen, 31.12.2019, ${prefilledDocumentUnit.coreData.fileNumbers?.[0]}, AnU, ${prefilledDocumentUnit.documentNumber}`,
+    )
+
+    await expect(result).toBeVisible()
+    await page.getByLabel("Treffer übernehmen").click()
+
+    //make sure to have citation style in list
+    await expect(
+      page.getByText(
+        `nachgehend, AG Aachen, 31.12.2019, ${prefilledDocumentUnit.coreData.fileNumbers?.[0]}, AnU, ${prefilledDocumentUnit.documentNumber}`,
+      ),
+    ).toBeVisible()
+    await expect(page.getByLabel("Eintrag löschen")).toBeVisible()
+
+    //can not be edited
+    await expect(page.getByLabel("Eintrag bearbeiten")).toBeVisible()
+
+    await page.getByLabel("Eintrag bearbeiten").click()
+    await expect(
+      page.getByLabel("Gericht Nachgehende Entscheidung"),
+    ).toBeHidden()
+    await expect(
+      page.getByLabel("Entscheidungsdatum Nachgehende Entscheidung"),
+    ).toBeHidden()
+    await expect(
+      page.getByLabel("Aktenzeichen Nachgehende Entscheidung"),
+    ).toBeHidden()
+    await expect(
+      page.getByLabel("Dokumenttyp Nachgehende Entscheidung"),
+    ).toBeHidden()
+    await expect(page.getByLabel("Vermerk")).toBeVisible()
+
+    await page.getByLabel("Vermerk").fill("Vermerk")
+    await waitForInputValue(page, `[aria-label='Vermerk']`, "Vermerk")
+    await page.getByLabel("Nachgehende Entscheidung speichern").click()
+    await expect(
+      page.getByText(
+        `nachgehend, AG Aachen, 31.12.2019, ${prefilledDocumentUnit.coreData.fileNumbers?.[0]}, AnU, Vermerk, ${prefilledDocumentUnit.documentNumber}`,
+      ),
+    ).toBeVisible()
   })
 
   test("validates against required fields", async ({
