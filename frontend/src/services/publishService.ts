@@ -9,6 +9,9 @@ interface PublishService {
   getPublicationLog(
     documentUnitUuid: string,
   ): Promise<ServiceResponse<PublicationHistoryRecord[]>>
+  getPreview(
+    documentUnitUuid: string,
+  ): Promise<ServiceResponse<PublicationHistoryRecord>>
 }
 
 const service: PublishService = {
@@ -67,6 +70,25 @@ const service: PublishService = {
             title: errorMessages.DOCUMENT_UNIT_LOADING_PUBLICATION_FAILED.title,
             description:
               errorMessages.DOCUMENT_UNIT_LOADING_PUBLICATION_FAILED
+                .description,
+          }
+        : undefined
+
+    return response
+  },
+
+  async getPreview(documentUnitUuid: string) {
+    const response = await httpClient.get<PublicationHistoryRecord>(
+      `caselaw/documentunits/${documentUnitUuid}/preview-publication-xml`,
+    )
+
+    response.error =
+      response.status >= 300
+        ? {
+            title:
+              errorMessages.DOCUMENT_UNIT_LOADING_PUBLICATION_PREVIEW.title,
+            description:
+              errorMessages.DOCUMENT_UNIT_LOADING_PUBLICATION_PREVIEW
                 .description,
           }
         : undefined

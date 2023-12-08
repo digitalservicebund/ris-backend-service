@@ -24,6 +24,7 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationReport;
 import de.bund.digitalservice.ris.caselaw.domain.RelatedDocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.XmlPublication;
+import de.bund.digitalservice.ris.caselaw.domain.XmlResultObject;
 import java.nio.ByteBuffer;
 import java.time.Instant;
 import java.util.List;
@@ -408,6 +409,41 @@ class DocumentUnitControllerTest {
 
     verify(service).getByUuid(TEST_UUID);
     verify(service).getPublicationHistory(TEST_UUID);
+  }
+
+  @Test
+  void testGetPublicationXmlPreview() {
+    when(userService.getEmail(any(OidcUser.class))).thenReturn(ISSUER_ADDRESS);
+    when(service.previewPublication(TEST_UUID))
+        .thenReturn(
+            Mono.just(
+                new XmlResultObject(
+                    "xml",
+                    "200",
+                    List.of("status-messages"),
+                    "test.xml",
+                    Instant.parse("2020-01-01T01:01:01.00Z"))));
+
+    risWebClient
+        .withDefaultLogin()
+        .get()
+        .uri("/api/v1/caselaw/documentunits/" + TEST_UUID + "/preview-publication-xml")
+        .exchange()
+        .expectHeader()
+        .valueEquals("Content-Type", "application/json")
+        .expectStatus()
+        .isOk()
+        .expectBody()
+        .jsonPath("xml")
+        .isEqualTo("xml")
+        .jsonPath("statusCode")
+        .isEqualTo("200")
+        .jsonPath("statusMessages")
+        .isEqualTo("status-messages")
+        .jsonPath("publishDate")
+        .isEqualTo("2020-01-01T01:01:01Z");
+
+    verify(service).previewPublication(TEST_UUID);
   }
 
   @Test

@@ -56,6 +56,7 @@ const setupWithAllRequiredFields = () =>
           },
         },
       }),
+      preview: { xml: "<xml>all good</xml>", statusCode: "200" },
     },
     global: {
       plugins: [router],
@@ -75,6 +76,9 @@ describe("PublicationDocument:", () => {
           "Die folgenden Rubriken-Pflichtfelder sind nicht befüllt:",
         ),
       ).not.toBeInTheDocument()
+      expect(
+        await screen.findByText("XML Vorschau der Veröffentlichung"),
+      ).toBeInTheDocument()
     })
 
     it("with required fields missing", async () => {
@@ -83,6 +87,7 @@ describe("PublicationDocument:", () => {
           documentUnit: new DocumentUnit("123", {
             documentNumber: "foo",
           }),
+          preview: undefined,
         },
         global: {
           plugins: [router],
@@ -99,6 +104,10 @@ describe("PublicationDocument:", () => {
       expect(screen.getByText("Entscheidungsdatum")).toBeInTheDocument()
       expect(screen.getByText("Rechtskraft")).toBeInTheDocument()
       expect(screen.getByText("Dokumenttyp")).toBeInTheDocument()
+
+      expect(
+        screen.queryByText("XML Vorschau der Veröffentlichung"),
+      ).not.toBeInTheDocument()
     })
 
     it("'Rubriken bearbeiten' button links back to categories", async () => {

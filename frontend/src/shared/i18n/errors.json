@@ -71,6 +71,10 @@
     "title": "Fehler beim Laden der letzten Veröffentlichung",
     "description": "Die Daten der letzten Veröffentlichung konnten nicht geladen werden."
   },
+  "DOCUMENT_UNIT_LOADING_PUBLICATION_PREVIEW": {
+    "title": "Fehler beim Laden der Veröffentlichungs-Vorschau",
+    "description": "Die Vorschau konnte nicht geladen werden."
+  },
   "NORM_COULD_NOT_BE_VALIDATED": {
     "title": "Einzelnorm konnte nicht validiert werden.",
     "description": ""
