@@ -301,11 +301,18 @@ const fieldsMissing = computed(() => {
     </div>
     <div class="border-b-1 border-b-gray-400"></div>
 
-    <CodeSnippet
-      v-if="!!preview?.xml && !fieldsMissing"
-      title="XML Vorschau"
-      :xml="preview.xml"
-    />
+    <ExpandableContent
+      v-if="!fieldsMissing && preview?.statusCode === '200' && !!preview?.xml"
+      as-column
+      class="border-b-1 border-r-1 border-gray-400 bg-white p-10"
+      :data-set="preview"
+      header="XML Vorschau der Veröffentlichung"
+      header-class="font-bold"
+      :is-expanded="false"
+      title="XML Vorschau der Veröffentlichung"
+    >
+      <CodeSnippet title="" :xml="preview.xml" />
+    </ExpandableContent>
 
     <InfoModal
       v-if="errorMessage"

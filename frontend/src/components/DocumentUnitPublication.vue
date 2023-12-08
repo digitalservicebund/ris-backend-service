@@ -27,6 +27,7 @@ async function publishADocument() {
   publishResult.value = response.data
   if (!publicationLog.value) publicationLog.value = []
   if (response.data && Number(response.data?.statusCode) < 300) {
+    preview.value = undefined
     const publication = response.data
     publication.date = formatDate(publication.date)
     publication.xml = publication.xml
