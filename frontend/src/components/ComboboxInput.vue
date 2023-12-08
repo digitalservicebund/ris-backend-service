@@ -66,7 +66,6 @@ const toggleDropdown = async () => {
       filter.value = inputText.value
     }
     await updateCurrentItems(filter.value)
-    inputFieldRef.value?.focus()
   }
 }
 
@@ -80,7 +79,6 @@ const clearSelection = async () => {
   if (showDropdown.value) {
     await updateCurrentItems("")
   }
-  inputFieldRef.value?.focus()
 }
 
 const setChosenItem = (item: ComboboxItem) => {
@@ -102,6 +100,10 @@ const onEnter = async () => {
     return
   }
   await toggleDropdown()
+}
+
+const onFocus = async () => {
+  if (!showDropdown.value) await toggleDropdown()
 }
 
 const keyup = () => {
@@ -249,6 +251,7 @@ export type InputModelProps =
         :readonly="false"
         tabindex="0"
         @click="selectAllText"
+        @focus="onFocus"
         @input="onTextChange"
         @keydown.enter="onEnter"
         @keydown.esc="closeDropdownAndRevertToLastSavedValue"

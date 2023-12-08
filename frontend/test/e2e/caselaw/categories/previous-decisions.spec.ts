@@ -43,7 +43,7 @@ test.describe("previous decisions", () => {
     await fillPreviousDecisionInputs(page, {
       court: prefilledDocumentUnit.coreData.court?.label,
       fileNumber: prefilledDocumentUnit.coreData.fileNumbers?.[0],
-      documentType: prefilledDocumentUnit.coreData.documentType?.jurisShortcut,
+      documentType: prefilledDocumentUnit.coreData.documentType?.label,
       decisionDate: "01.01.2020",
     })
 
@@ -67,7 +67,7 @@ test.describe("previous decisions", () => {
     await fillPreviousDecisionInputs(page, {
       court: prefilledDocumentUnit.coreData.court?.label,
       fileNumber: prefilledDocumentUnit.coreData.fileNumbers?.[0],
-      documentType: prefilledDocumentUnit.coreData.documentType?.jurisShortcut,
+      documentType: prefilledDocumentUnit.coreData.documentType?.label,
       decisionDate: "01.01.2020",
     })
 
@@ -91,8 +91,7 @@ test.describe("previous decisions", () => {
         await fillPreviousDecisionInputs(page, {
           court: prefilledDocumentUnit.coreData.court?.label,
           fileNumber: prefilledDocumentUnit.coreData.fileNumbers?.[0],
-          documentType:
-            prefilledDocumentUnit.coreData.documentType?.jurisShortcut,
+          documentType: prefilledDocumentUnit.coreData.documentType?.label,
           decisionDate: "01.01.2020",
         })
 
@@ -252,7 +251,7 @@ test.describe("previous decisions", () => {
     await fillPreviousDecisionInputs(page, {
       court: prefilledDocumentUnit.coreData.court?.label,
       fileNumber: prefilledDocumentUnit.coreData.fileNumbers?.[0],
-      documentType: prefilledDocumentUnit.coreData.documentType?.jurisShortcut,
+      documentType: prefilledDocumentUnit.coreData.documentType?.label,
       decisionDate: "31.12.2019",
     })
     const previousDecisionContainer = page.getByLabel("Vorgehende Entscheidung")
@@ -284,7 +283,7 @@ test.describe("previous decisions", () => {
     await fillPreviousDecisionInputs(page, {
       court: prefilledDocumentUnit.coreData.court?.label,
       fileNumber: prefilledDocumentUnit.coreData.fileNumbers?.[0],
-      documentType: prefilledDocumentUnit.coreData.documentType?.jurisShortcut,
+      documentType: prefilledDocumentUnit.coreData.documentType?.label,
       decisionDate: "31.12.2019",
     })
 
@@ -327,7 +326,7 @@ test.describe("previous decisions", () => {
     await fillPreviousDecisionInputs(page, {
       court: prefilledDocumentUnit.coreData.court?.label,
       fileNumber: prefilledDocumentUnit.coreData.fileNumbers?.[0],
-      documentType: prefilledDocumentUnit.coreData.documentType?.jurisShortcut,
+      documentType: prefilledDocumentUnit.coreData.documentType?.label,
       decisionDate: "01.01.2020",
     })
     await page.getByLabel("Vorgehende Entscheidung speichern").click()

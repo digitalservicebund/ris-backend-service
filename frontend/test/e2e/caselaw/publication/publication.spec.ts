@@ -6,6 +6,7 @@ import {
   navigateToCategories,
   navigateToPublication,
   waitForSaving,
+  waitForInputValue,
 } from "../e2e-utils"
 import { caselawTest as test } from "../fixtures"
 
@@ -195,10 +196,18 @@ test.describe("ensuring the publishing of documentunits works as expected", () =
       { clickSaveButton: true },
     )
 
-    await page.locator("[aria-label='Gericht']").fill("aalen")
-    await page.locator("text=AG Aalen").click()
-
-    await expect(page.locator("[aria-label='Gericht']")).toHaveValue("AG Aalen")
+    await waitForSaving(
+      async () => {
+        await page.locator("[aria-label='Gericht']").fill("Aalen")
+        await page.getByText("AG Aalen", { exact: true }).click()
+        await waitForInputValue(page, "[aria-label='Gericht']", "AG Aalen")
+        await expect(page.locator("[aria-label='Gericht']")).toHaveValue(
+          "AG Aalen",
+        )
+      },
+      page,
+      { clickSaveButton: true, reload: true },
+    )
 
     await navigateToPublication(page, documentNumber)
     await expect(page.locator("li:has-text('Aktenzeichen')")).toBeHidden()

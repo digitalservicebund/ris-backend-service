@@ -44,7 +44,7 @@ test.describe("ensuing decisions", () => {
       pending: false,
       court: prefilledDocumentUnit.coreData.court?.label,
       fileNumber: prefilledDocumentUnit.coreData.fileNumbers?.[0],
-      documentType: prefilledDocumentUnit.coreData.documentType?.jurisShortcut,
+      documentType: prefilledDocumentUnit.coreData.documentType?.label,
       decisionDate: "01.01.2020",
       note: "abc",
     })
@@ -69,7 +69,7 @@ test.describe("ensuing decisions", () => {
     await fillEnsuingDecisionInputs(page, {
       court: prefilledDocumentUnit.coreData.court?.label,
       fileNumber: prefilledDocumentUnit.coreData.fileNumbers?.[0],
-      documentType: prefilledDocumentUnit.coreData.documentType?.jurisShortcut,
+      documentType: prefilledDocumentUnit.coreData.documentType?.label,
       decisionDate: "01.01.2020",
     })
 
@@ -91,7 +91,7 @@ test.describe("ensuing decisions", () => {
     await fillEnsuingDecisionInputs(page, {
       court: prefilledDocumentUnit.coreData.court?.label,
       fileNumber: prefilledDocumentUnit.coreData.fileNumbers?.[0],
-      documentType: prefilledDocumentUnit.coreData.documentType?.jurisShortcut,
+      documentType: prefilledDocumentUnit.coreData.documentType?.label,
       decisionDate: "01.01.2020",
     })
 
@@ -115,7 +115,7 @@ test.describe("ensuing decisions", () => {
     await fillEnsuingDecisionInputs(page, {
       court: prefilledDocumentUnit.coreData.court?.label,
       fileNumber: prefilledDocumentUnit.coreData.fileNumbers?.[0],
-      documentType: prefilledDocumentUnit.coreData.documentType?.jurisShortcut,
+      documentType: prefilledDocumentUnit.coreData.documentType?.label,
       decisionDate: "01.01.2020",
     })
 
@@ -156,8 +156,7 @@ test.describe("ensuing decisions", () => {
         await fillEnsuingDecisionInputs(page, {
           court: prefilledDocumentUnit.coreData.court?.label,
           fileNumber: prefilledDocumentUnit.coreData.fileNumbers?.[0],
-          documentType:
-            prefilledDocumentUnit.coreData.documentType?.jurisShortcut,
+          documentType: prefilledDocumentUnit.coreData.documentType?.label,
           decisionDate: "01.01.2020",
         })
 
@@ -317,7 +316,7 @@ test.describe("ensuing decisions", () => {
     await fillEnsuingDecisionInputs(page, {
       court: prefilledDocumentUnit.coreData.court?.label,
       fileNumber: prefilledDocumentUnit.coreData.fileNumbers?.[0],
-      documentType: prefilledDocumentUnit.coreData.documentType?.jurisShortcut,
+      documentType: prefilledDocumentUnit.coreData.documentType?.label,
       decisionDate: "31.12.2019",
     })
     const ensuingDecisionContainer = page.getByLabel("Nachgehende Entscheidung")
@@ -349,7 +348,7 @@ test.describe("ensuing decisions", () => {
     await fillEnsuingDecisionInputs(page, {
       court: prefilledDocumentUnit.coreData.court?.label,
       fileNumber: prefilledDocumentUnit.coreData.fileNumbers?.[0],
-      documentType: prefilledDocumentUnit.coreData.documentType?.jurisShortcut,
+      documentType: prefilledDocumentUnit.coreData.documentType?.label,
       decisionDate: "31.12.2019",
     })
 
@@ -392,7 +391,7 @@ test.describe("ensuing decisions", () => {
     await fillEnsuingDecisionInputs(page, {
       court: prefilledDocumentUnit.coreData.court?.label,
       fileNumber: prefilledDocumentUnit.coreData.fileNumbers?.[0],
-      documentType: prefilledDocumentUnit.coreData.documentType?.jurisShortcut,
+      documentType: prefilledDocumentUnit.coreData.documentType?.label,
       decisionDate: "01.01.2020",
     })
     await page.getByLabel("Nachgehende Entscheidung speichern").click()

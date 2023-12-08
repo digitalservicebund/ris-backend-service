@@ -1,6 +1,6 @@
 /* eslint-disable jest-dom/prefer-in-document */
 import { userEvent } from "@testing-library/user-event"
-import { render, screen } from "@testing-library/vue"
+import { render, screen, fireEvent } from "@testing-library/vue"
 import ComboboxInput from "@/components/ComboboxInput.vue"
 import { Court } from "@/domain/documentUnit"
 import service from "@/services/comboboxItemService"
@@ -76,8 +76,61 @@ describe("Combobox Element", () => {
     const openComboboxContainer = screen.getByLabelText("Dropdown öffnen")
     await user.click(openComboboxContainer)
     expect(screen.getAllByLabelText("dropdown-option")).toHaveLength(3)
-    await user.keyboard("{escape}")
+  })
+
+  it("focus should open dropdown", async () => {
+    renderComponent()
+    const input = screen.getByLabelText("test label")
+    await fireEvent.focus(input)
+
+    expect(screen.getAllByLabelText("dropdown-option")).toHaveLength(3)
+  })
+
+  it("enter should select top value", async () => {
+    const { emitted } = renderComponent()
+    const input = screen.getByLabelText("test label")
+    await fireEvent.focus(input)
+    expect(screen.getAllByLabelText("dropdown-option")).toHaveLength(3)
+
+    input.focus()
+    await user.keyboard("{enter}")
+
+    expect(emitted()["update:modelValue"]).toEqual([
+      [
+        {
+          label: "courtlabel1",
+          location: "courtlocation1",
+          type: "courttype1",
+        },
+      ],
+    ])
+  })
+
+  it("clear-button should unset the currently set value", async () => {
+    const { emitted } = renderComponent()
+    const input = screen.getByLabelText("test label")
+
+    await user.type(input, "test")
+    const dropdownItems = screen.getAllByLabelText("dropdown-option")
+    await user.click(dropdownItems[1])
+
     expect(screen.queryByLabelText("dropdown-option")).not.toBeInTheDocument()
+
+    const resetButton = screen.getByLabelText("Auswahl zurücksetzen")
+    await user.click(resetButton)
+
+    expect(screen.queryByLabelText("dropdown-option")).not.toBeInTheDocument()
+    expect(input).toHaveValue("")
+    expect(emitted()["update:modelValue"]).toEqual([
+      [
+        {
+          label: "courtlabel2",
+          location: "courtlocation2",
+          type: "courttype2",
+        },
+      ],
+      [undefined],
+    ])
   })
 
   it("items should be filtered", async () => {
@@ -278,7 +331,7 @@ describe("Combobox Element", () => {
 
     const dropdownItemElements = screen.getAllByLabelText("dropdown-option")
 
-    expect(fetchSpy).toHaveBeenCalledTimes(3)
+    expect(fetchSpy).toHaveBeenCalledTimes(4)
     // TODO checking for "b", "bg", "bgh" as the three arguments does not work though
     expect(dropdownItemElements).toHaveLength(1)
     expect(dropdownItemElements[0]).toHaveTextContent("BGH Karlsruhe")
@@ -379,55 +432,6 @@ describe("Combobox Element", () => {
         },
       ],
     ]) // value of testItem1
-  })
-
-  it("first Enter should open dropdown, second should select top value", async () => {
-    const { emitted } = renderComponent()
-    const input = screen.getByLabelText("test label")
-    input.focus()
-
-    await user.keyboard("{enter}")
-
-    expect(screen.getAllByLabelText("dropdown-option")).toHaveLength(3)
-
-    await user.keyboard("{enter}")
-
-    expect(emitted()["update:modelValue"]).toEqual([
-      [
-        {
-          label: "courtlabel1",
-          location: "courtlocation1",
-          type: "courttype1",
-        },
-      ],
-    ])
-  })
-
-  it("clear-button should unset the currently set value", async () => {
-    const { emitted } = renderComponent()
-    const input = screen.getByLabelText("test label")
-
-    await user.type(input, "test")
-    const dropdownItems = screen.getAllByLabelText("dropdown-option")
-    await user.click(dropdownItems[1])
-
-    expect(screen.queryByLabelText("dropdown-option")).not.toBeInTheDocument()
-
-    const resetButton = screen.getByLabelText("Auswahl zurücksetzen")
-    await user.click(resetButton)
-
-    expect(screen.queryByLabelText("dropdown-option")).not.toBeInTheDocument()
-    expect(input).toHaveValue("")
-    expect(emitted()["update:modelValue"]).toEqual([
-      [
-        {
-          label: "courtlabel2",
-          location: "courtlocation2",
-          type: "courttype2",
-        },
-      ],
-      [undefined],
-    ])
   })
 
   it("adds new entry option if manual entry flag set and no result found", async () => {

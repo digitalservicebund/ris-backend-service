@@ -58,6 +58,13 @@ describe("Norm references", () => {
     Promise.resolve({ status: 200, data: dropdownAbbreviationItems }),
   )
 
+  vi.spyOn(
+    comboboxItemService,
+    "getRisAbbreviationsAwesome",
+  ).mockImplementation(() =>
+    Promise.resolve({ status: 200, data: dropdownAbbreviationItems }),
+  )
+
   it("renders empty norm reference in edit mode, when no norm references in list", () => {
     renderComponent()
     expect(screen.getAllByLabelText("Listen Eintrag").length).toBe(1)

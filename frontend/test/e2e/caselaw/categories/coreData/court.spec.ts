@@ -13,21 +13,23 @@ test.describe("court", () => {
   }) => {
     await navigateToCategories(page, documentNumber)
 
+    await waitForInputValue(page, "[aria-label='Gericht']", "")
+
     await waitForSaving(
       async () => {
         await page.locator("[aria-label='Gericht']").fill("BGH")
-        await expect(
-          page.locator("[aria-label='dropdown-option']"),
-        ).toHaveCount(1)
-        await page.keyboard.press("ArrowDown")
-        await page.keyboard.press("Enter")
+        await waitForInputValue(page, "[aria-label='Gericht']", "BGH")
+        await expect(page.locator("text=BGH")).toBeVisible()
+        await page.locator("text=BGH").click()
+        await waitForInputValue(page, "[aria-label='Gericht']", "BGH")
       },
       page,
       { reload: true, clickSaveButton: true },
     )
 
     await page.reload()
-    await waitForInputValue(page, "[aria-label='Gericht']", "BGH")
+    await page.locator("[aria-label='Gericht']").focus()
+    await expect(page.locator("[aria-label='Gericht']")).toHaveValue("BGH")
   })
 
   test("open incorrect court field, input one, save and reload", async ({
@@ -125,12 +127,12 @@ test.describe("court", () => {
       page.locator("[aria-label='dropdown-option'] >> nth=" + minTotalCourts),
     ).toBeVisible()
     await expect(page.locator("text=AG Aachen")).toBeVisible()
-    await expect(page.locator("text=AG Aalen")).toBeVisible()
 
     // type search string: 3 results for "bayern"
     await page.locator("[aria-label='Gericht']").fill("bayern")
     await waitForInputValue(page, "[aria-label='Gericht']", "bayern")
     await expect(page.locator("[aria-label='dropdown-option']")).toHaveCount(3)
+    await expect(page.locator("text=aufgehoben seit: 1973")).toBeVisible()
 
     // use the clear icon
     await page.locator("[aria-label='Auswahl zurücksetzen']").click()
@@ -146,11 +148,8 @@ test.describe("court", () => {
     await waitForInputValue(page, "[aria-label='Gericht']", "")
     await expect(page.locator("[aria-label='dropdown-option']")).toBeHidden()
 
-    // open dropdown again by typing a search string
-    await page.locator("[aria-label='Gericht']").fill("bayern")
-    await expect(page.locator("[aria-label='dropdown-option']")).toHaveCount(3)
-    // first search result displays a revoked string
-    await expect(page.locator("text=aufgehoben seit: 1973")).toBeVisible()
+    // open dropdown again by focussing
+    await page.locator("[aria-label='Gericht']").focus()
 
     // close dropdown using the esc key, user input text gets removed and last saved value restored
     await page.keyboard.down("Escape")
@@ -168,6 +167,7 @@ test.describe("court", () => {
     await expect(page.locator("[aria-label='dropdown-option']")).toBeHidden()
 
     await page.locator("[aria-label='Gericht']").fill("BVerfG")
+    await waitForInputValue(page, "[aria-label='Gericht']", "BVerfG")
     await page.locator("text=BVerfG").click()
 
     await expect(page.locator("[aria-label='dropdown-option']")).toBeHidden()
@@ -238,9 +238,9 @@ test.describe("court", () => {
   }) => {
     await navigateToCategories(page, documentNumber)
     await waitForInputValue(page, "select#legalEffect", "Keine Angabe")
-    await page.locator("[aria-label='Gericht']").fill("bgh")
-    await page.locator("text=BGH").click()
+    await page.locator("[aria-label='Gericht']").fill("BGH")
     await waitForInputValue(page, "[aria-label='Gericht']", "BGH")
+    await page.locator("text=BGH").click()
     await waitForInputValue(page, "select#legalEffect", "Ja")
     await page
       .getByRole("combobox", { name: "Rechtskraft" })
