@@ -217,7 +217,7 @@ dependencies {
     // implementation(files("ris-norms-juris-converter-0.19.2.jar"))
     // implementation("org.apache.commons:commons-text:1.10.0")
     implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.15.2")
-    implementation("io.micrometer:micrometer-registry-prometheus:1.11.2")
+    implementation("io.micrometer:micrometer-registry-prometheus:1.12.1")
     implementation("io.micrometer:micrometer-core:1.11.4")
     implementation(platform("io.sentry:sentry-bom:6.33.1"))
     implementation("io.sentry:sentry-spring-boot-starter-jakarta")
