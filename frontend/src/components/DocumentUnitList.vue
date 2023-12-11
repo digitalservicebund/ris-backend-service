@@ -100,9 +100,9 @@ function onDelete() {
         <div class="table-cell p-16"></div>
         <div class="table-cell p-16">Gerichtstyp</div>
         <div class="table-cell p-16">Ort</div>
-        <div class="table-cell p-16">Datum</div>
+        <div class="table-cell p-16">Entscheidungsdatum</div>
         <div class="table-cell p-16">Aktenzeichen</div>
-        <div class="table-cell p-16">Typ</div>
+        <div class="table-cell p-16">Dokumenttyp</div>
         <div class="table-cell p-16">Status</div>
         <div class="table-cell p-16">Löschen</div>
       </div>
