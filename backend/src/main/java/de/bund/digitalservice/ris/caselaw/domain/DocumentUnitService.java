@@ -306,7 +306,7 @@ public class DocumentUnitService {
         .sort(Comparator.comparing(PublicationHistoryRecord::getDate).reversed());
   }
 
-  public Page<DocumentationUnitSearchResult> searchByLinkedDocumentationUnit(
+  public Page<RelatedDocumentationUnit> searchByLinkedDocumentationUnit(
       RelatedDocumentationUnit relatedDocumentationUnit,
       DocumentationOffice documentationOffice,
       Pageable pageable) {

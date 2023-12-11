@@ -195,7 +195,7 @@ public class DocumentUnitController {
 
   @PutMapping(value = "/search-by-linked-documentation-unit")
   @PreAuthorize("isAuthenticated()")
-  public Mono<Page<DocumentationUnitSearchResult>> searchByLinkedDocumentationUnit(
+  public Mono<Page<RelatedDocumentationUnit>> searchByLinkedDocumentationUnit(
       @RequestParam("pg") int page,
       @RequestParam("sz") int size,
       @RequestBody RelatedDocumentationUnit relatedDocumentationUnit,

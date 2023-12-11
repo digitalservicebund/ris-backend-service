@@ -2,6 +2,8 @@ package de.bund.digitalservice.ris.caselaw.adapter.transformer;
 
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitSearchResultDTO;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitSearchResult;
+import de.bund.digitalservice.ris.caselaw.domain.RelatedDocumentationUnit;
+import de.bund.digitalservice.ris.caselaw.domain.RelatedDocumentationUnit.RelatedDocumentationUnitBuilder;
 import de.bund.digitalservice.ris.caselaw.domain.Status;
 import lombok.extern.slf4j.Slf4j;
 
@@ -66,6 +68,29 @@ public class DocumentationUnitSearchResultTransformer {
                         documentationUnitSearchResultDTO.getStatus().get(0) == null
                             || documentationUnitSearchResultDTO.getStatus().get(0).isWithError())
                     .build());
+
+    return builder.build();
+  }
+
+  public static RelatedDocumentationUnit transformToRelatedDocumentation(
+      DocumentationUnitSearchResultDTO documentationUnitSearchResultDTO) {
+
+    RelatedDocumentationUnitBuilder<?, ?> builder =
+        RelatedDocumentationUnit.builder()
+            .uuid(documentationUnitSearchResultDTO.getId())
+            .documentNumber(documentationUnitSearchResultDTO.getDocumentNumber())
+            .court(CourtTransformer.transformToDomain(documentationUnitSearchResultDTO.getCourt()))
+            .decisionDate(documentationUnitSearchResultDTO.getDecisionDate())
+            .documentType(
+                DocumentTypeTransformer.transformToDomain(
+                    documentationUnitSearchResultDTO.getDocumentType()))
+            .referenceFound(true);
+
+    if (documentationUnitSearchResultDTO.getFileNumbers() != null
+        && !documentationUnitSearchResultDTO.getFileNumbers().isEmpty()) {
+
+      builder.fileNumber(documentationUnitSearchResultDTO.getFileNumbers().get(0).getValue());
+    }
 
     return builder.build();
   }

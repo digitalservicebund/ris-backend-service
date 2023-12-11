@@ -397,7 +397,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
 
   @Override
   @Transactional(transactionManager = "jpaTransactionManager")
-  public Page<DocumentationUnitSearchResult> searchByRelatedDocumentationUnit(
+  public Page<RelatedDocumentationUnit> searchByRelatedDocumentationUnit(
       RelatedDocumentationUnit relatedDocumentationUnit,
       DocumentationOffice documentationOffice,
       Pageable pageable) {
@@ -423,12 +423,8 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
             DocumentTypeTransformer.transformToDTO(relatedDocumentationUnit.getDocumentType()),
             pageable);
 
-    List<DocumentationUnitSearchResult> list =
-        documentationUnitSearchResultDTOPage.stream()
-            .map(DocumentationUnitSearchResultTransformer::transformToDomain)
-            .toList();
-
-    return new PageImpl<>(list, pageable, documentationUnitSearchResultDTOPage.getTotalElements());
+    return documentationUnitSearchResultDTOPage.map(
+        DocumentationUnitSearchResultTransformer::transformToRelatedDocumentation);
   }
 
   @Transactional(transactionManager = "jpaTransactionManager")
