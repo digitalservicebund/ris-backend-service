@@ -101,7 +101,7 @@ watch(
       </InputField>
     </div>
   </header>
-  <div class="bg-blue-200 px-16 pt-24" role="main">
+  <div class="min-h-screen bg-blue-200 px-16 pt-24" role="main">
     <div class="flex flex-row">
       <div v-if="procedures" class="flex-1 py-56">
         <Pagination
