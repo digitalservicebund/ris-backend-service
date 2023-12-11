@@ -65,7 +65,9 @@ onMounted(async () => {
   const previewResponse = await publishService.getPreview(
     props.documentUnit.uuid,
   )
-  if (previewResponse.data && previewResponse.data.xml) {
+  if (previewResponse.error) {
+    errorMessage.value = previewResponse.error
+  } else if (previewResponse.data && previewResponse.data.xml) {
     preview.value = previewResponse.data
   }
 
@@ -82,9 +84,10 @@ onMounted(async () => {
       item.date = formatDate(item.date)
       item.xml = item.xml ? item.xml : ""
     }
+  } else {
+    errorMessage.value = response.error
   }
 
-  errorMessage.value = response.error
   loadDone.value = true
 })
 </script>

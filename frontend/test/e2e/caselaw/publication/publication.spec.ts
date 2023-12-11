@@ -232,6 +232,16 @@ test.describe("ensuring the publishing of documentunits works as expected", () =
     await navigateToPublication(page, prefilledDocumentUnit.documentNumber!)
 
     await expect(
+      page.locator("text=XML Vorschau der Veröffentlichung"),
+    ).toBeVisible()
+
+    await page.locator("text=XML Vorschau der Veröffentlichung").click()
+
+    await expect(
+      page.locator("text='        <entsch-datum>2019-12-31</entsch-datum>'"),
+    ).toBeVisible()
+
+    await expect(
       page.locator("text=Alle Pflichtfelder sind korrekt ausgefüllt"),
     ).toBeVisible()
 

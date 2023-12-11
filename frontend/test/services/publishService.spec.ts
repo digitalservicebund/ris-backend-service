@@ -18,4 +18,23 @@ describe("publishService", () => {
       "Die Dokumentationseinheit kann nicht veröffentlicht werden.",
     )
   })
+
+  it("returns correct error message if preview contains error", async () => {
+    vi.mock("@/services/httpClient", () => {
+      return {
+        default: {
+          get: vi.fn().mockReturnValue({ status: 400 }),
+          put: vi.fn().mockReturnValue({ status: 400 }),
+        },
+      }
+    })
+
+    const result = await service.getPreview("123")
+    expect(result.error?.title).toEqual(
+      "Fehler beim Laden der Veröffentlichungs-Vorschau",
+    )
+    expect(result.error?.description).toEqual(
+      "Die Vorschau konnte nicht geladen werden.",
+    )
+  })
 })

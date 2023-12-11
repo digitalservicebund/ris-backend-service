@@ -81,6 +81,33 @@ describe("PublicationDocument:", () => {
       ).toBeInTheDocument()
     })
 
+    it("render preview error", async () => {
+      render(PublicationDocument, {
+        props: {
+          documentUnit: new DocumentUnit("123", {
+            coreData: {
+              fileNumbers: ["foo"],
+              court: { type: "type", location: "location", label: "label" },
+              decisionDate: "2022-02-01",
+              legalEffect: "legalEffect",
+              documentType: {
+                jurisShortcut: "ca",
+                label: "category",
+              },
+            },
+          }),
+          errorMessage: {
+            title: "preview error",
+            description: "error message description",
+          },
+        },
+        global: {
+          plugins: [router],
+        },
+      })
+      expect(await screen.findByText("preview error")).toBeInTheDocument()
+    })
+
     it("with required fields missing", async () => {
       render(PublicationDocument, {
         props: {
@@ -222,6 +249,41 @@ describe("PublicationDocument:", () => {
         `Letzte Veröffentlichungen Diese Dokumentationseinheit wurde bisher nicht veröffentlicht`,
       )
     })
+  })
+
+  it("with preview stubbing", async () => {
+    render(PublicationDocument, {
+      props: {
+        documentUnit: new DocumentUnit("123", {
+          coreData: {
+            fileNumbers: ["foo"],
+            court: { type: "type", location: "location", label: "label" },
+            decisionDate: "2022-02-01",
+            legalEffect: "legalEffect",
+            documentType: {
+              jurisShortcut: "ca",
+              label: "category",
+            },
+          },
+        }),
+        preview: { xml: "<xml>all good</xml>", statusCode: "200" },
+      },
+      global: {
+        plugins: [router],
+        stubs: {
+          CodeSnippet: {
+            template: '<div data-testid="code-snippet"/>',
+          },
+        },
+      },
+    })
+
+    await fireEvent.click(screen.getByText("XML Vorschau der Veröffentlichung"))
+    const codeSnippet = screen.queryByTestId("code-snippet")
+
+    expect(codeSnippet).toBeInTheDocument()
+    expect(codeSnippet).toHaveAttribute("XML")
+    expect(codeSnippet?.getAttribute("xml")).toBe("<xml>all good</xml>")
   })
 
   it("with stubbing", () => {
