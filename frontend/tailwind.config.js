@@ -9,20 +9,30 @@ module.exports = {
     plugin(function ({ addComponents }) {
       addComponents({
         ".ds-input::placeholder, .ds-textarea::placeholder": {
+          fontFamily: "BundesSansWeb",
           fontStyle: "normal",
+          color: "#6F7785",
         },
         ".ds-input::-webkit-input-placeholder, .ds-textarea::-webkit-input-placeholder":
           {
+            fontFamily: "BundesSansWeb",
             fontStyle: "normal",
+            color: "#6F7785",
           },
         ".ds-input::-moz-placeholder, .ds-textarea::-moz-placeholder": {
+          fontFamily: "BundesSansWeb",
           fontStyle: "normal",
+          color: "#6F7785",
         },
         ".ds-input:-ms-input-placeholder, .ds-textarea:-ms-input-placeholder": {
+          fontFamily: "BundesSansWeb",
           fontStyle: "normal",
+          color: "#6F7785",
         },
         ".ds-input:-moz-placeholder, .ds-textarea:-moz-placeholder": {
+          fontFamily: "BundesSansWeb",
           fontStyle: "normal",
+          color: "#6F7785",
         },
       })
     }),
