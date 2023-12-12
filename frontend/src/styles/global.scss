@@ -12,4 +12,15 @@
   a {
     @apply text-black no-underline;
   }
+
+  .ds-input,
+  .ds-input input,
+  .ds-select,
+  .ds-select select {
+    &::placeholder {
+      color: theme("colors.gray.800");
+      font-family: BundesSansWeb, sans-serif;
+      font-style: normal;
+    }
+  }
 }

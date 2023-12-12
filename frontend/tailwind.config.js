@@ -1,42 +1,8 @@
-const plugin = require("tailwindcss/plugin")
-
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: ["./src/**/*.{html,vue,js,ts}"],
   presets: [require("@digitalservice4germany/style-dictionary/tailwind")],
-  plugins: [
-    require("@digitalservice4germany/angie"),
-    plugin(function ({ addComponents }) {
-      addComponents({
-        ".ds-input::placeholder, .ds-textarea::placeholder": {
-          fontFamily: "BundesSansWeb",
-          fontStyle: "normal",
-          color: "#6F7785",
-        },
-        ".ds-input::-webkit-input-placeholder, .ds-textarea::-webkit-input-placeholder":
-          {
-            fontFamily: "BundesSansWeb",
-            fontStyle: "normal",
-            color: "#6F7785",
-          },
-        ".ds-input::-moz-placeholder, .ds-textarea::-moz-placeholder": {
-          fontFamily: "BundesSansWeb",
-          fontStyle: "normal",
-          color: "#6F7785",
-        },
-        ".ds-input:-ms-input-placeholder, .ds-textarea:-ms-input-placeholder": {
-          fontFamily: "BundesSansWeb",
-          fontStyle: "normal",
-          color: "#6F7785",
-        },
-        ".ds-input:-moz-placeholder, .ds-textarea:-moz-placeholder": {
-          fontFamily: "BundesSansWeb",
-          fontStyle: "normal",
-          color: "#6F7785",
-        },
-      })
-    }),
-  ],
+  plugins: [require("@digitalservice4germany/angie")],
 
   theme: {
     fontWeight: {

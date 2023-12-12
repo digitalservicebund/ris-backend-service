@@ -50,7 +50,7 @@ const effectiveHasError = computed(
 )
 
 const conditionalClasses = computed(() => ({
-  "has-error placeholder-black": props.hasError || effectiveHasError.value,
+  "has-error": effectiveHasError.value,
 }))
 
 function validateInput() {

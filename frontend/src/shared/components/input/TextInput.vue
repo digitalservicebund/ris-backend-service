@@ -38,7 +38,7 @@ const localModelValue = computed({
 })
 
 const conditionalClasses = computed(() => ({
-  "has-error placeholder-black": props.hasError,
+  "has-error": props.hasError,
   "h-full": props.fullHeight,
   "ds-input-medium": props.size === "medium",
   "ds-input-small": props.size === "small",

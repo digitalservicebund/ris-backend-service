@@ -49,12 +49,8 @@ const noCurrentlyDisplayeditems = computed(
 
 const conditionalClasses = computed(() =>
   props.hasError
-    ? "border-red-800 bg-red-200 focus:shadow-red-800 placeholder-black"
+    ? "border-red-800 bg-red-200 focus:shadow-red-800"
     : "bg-white border-blue-800 focus:shadow-blue-800 h-64 hover:shadow-blue-800",
-)
-
-const placeholderColor = computed(() =>
-  props.hasError ? "placeholder-black" : "",
 )
 
 const toggleDropdown = async () => {
@@ -222,8 +218,9 @@ export type InputModelProps =
 <template>
   <div ref="dropdownContainerRef" class="relative w-full">
     <div
-      class="space-between flex h-64 flex-row whitespace-nowrap border-2 border-solid px-16 py-12 hover:shadow-hover focus:shadow-focus"
+      class="space-between ds-input flex flex-row whitespace-nowrap px-16 py-12"
       :class="conditionalClasses"
+      contenteditable
     >
       <input
         :id="id"
@@ -231,8 +228,7 @@ export type InputModelProps =
         v-model="inputText"
         :aria-label="ariaLabel"
         autocomplete="off"
-        class="w-full bg-transparent placeholder:font-font-family-sans placeholder:not-italic placeholder:text-gray-800 focus:outline-none"
-        :class="placeholderColor"
+        class="w-full bg-transparent focus:outline-none"
         :placeholder="placeholder"
         :readonly="false"
         tabindex="0"
