@@ -5,7 +5,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import org.junit.jupiter.api.Tag;
-import org.springframework.boot.test.autoconfigure.data.r2dbc.AutoConfigureDataR2dbc;
+import org.springframework.boot.test.autoconfigure.orm.jpa.AutoConfigureDataJpa;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.context.annotation.Import;
@@ -18,7 +18,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 @Import({})
 @Tag("integration")
 @Testcontainers(disabledWithoutDocker = true)
-@AutoConfigureDataR2dbc
+@AutoConfigureDataJpa
 @AutoConfigureWebTestClient(timeout = "PT10S")
 public @interface RISIntegrationTest {
   @AliasFor(annotation = Import.class, attribute = "value")

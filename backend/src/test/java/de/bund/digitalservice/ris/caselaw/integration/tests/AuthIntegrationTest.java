@@ -7,8 +7,6 @@ import de.bund.digitalservice.ris.caselaw.TestConfig;
 import de.bund.digitalservice.ris.caselaw.adapter.AuthController;
 import de.bund.digitalservice.ris.caselaw.adapter.AuthService;
 import de.bund.digitalservice.ris.caselaw.adapter.KeycloakUserService;
-import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
-import de.bund.digitalservice.ris.caselaw.config.PostgresConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
 import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
@@ -24,8 +22,6 @@ import org.testcontainers.junit.jupiter.Container;
 
 @RISIntegrationTest(
     imports = {
-      FlywayConfig.class,
-      PostgresConfig.class,
       PostgresJPAConfig.class,
       KeycloakUserService.class,
       SecurityConfig.class,

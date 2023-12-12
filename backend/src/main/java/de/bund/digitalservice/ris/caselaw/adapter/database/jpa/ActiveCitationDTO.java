@@ -3,6 +3,7 @@ package de.bund.digitalservice.ris.caselaw.adapter.database.jpa;
 import de.bund.digitalservice.ris.caselaw.domain.RelatedDocumentationType.Values;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import java.util.Objects;
@@ -17,7 +18,7 @@ import lombok.experimental.SuperBuilder;
 @DiscriminatorValue(Values.ACTIVE_CITATION)
 public class ActiveCitationDTO extends RelatedDocumentationDTO {
 
-  @ManyToOne
+  @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "citation_type_id")
   private CitationTypeDTO citationType;
 

@@ -33,9 +33,7 @@ import org.testcontainers.utility.DockerImageName;
 class HealthEndpointIntegrationTest {
 
   @Container
-  static PostgreSQLContainer<?> postgreSQLContainer =
-      new PostgreSQLContainer<>("postgres:14")
-          .withInitScript("db/create_migration_scheme_and_extensions.sql");
+  static PostgreSQLContainer<?> postgreSQLContainer = new PostgreSQLContainer<>("postgres:14");
 
   @Container
   static GenericContainer<?> redis =

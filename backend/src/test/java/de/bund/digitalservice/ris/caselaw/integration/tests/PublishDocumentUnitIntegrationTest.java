@@ -26,8 +26,6 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresXmlPublic
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PublicationReportDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.StatusDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.XmlPublicationDTO;
-import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
-import de.bund.digitalservice.ris.caselaw.config.PostgresConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
 import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
@@ -67,8 +65,6 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
       XmlEMailPublishService.class,
       DatabaseDocumentUnitStatusService.class,
       MockXmlExporter.class,
-      FlywayConfig.class,
-      PostgresConfig.class,
       PostgresJPAConfig.class,
       SecurityConfig.class,
       AuthService.class,

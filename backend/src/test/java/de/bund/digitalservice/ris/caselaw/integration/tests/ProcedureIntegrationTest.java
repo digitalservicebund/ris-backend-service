@@ -24,8 +24,6 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOffi
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentationUnitRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ProcedureDTO;
-import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
-import de.bund.digitalservice.ris.caselaw.config.PostgresConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
 import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
@@ -65,8 +63,6 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
       DocumentUnitService.class,
       KeycloakUserService.class,
       PostgresDocumentationUnitRepositoryImpl.class,
-      FlywayConfig.class,
-      PostgresConfig.class,
       PostgresJPAConfig.class,
       SecurityConfig.class,
       AuthService.class,

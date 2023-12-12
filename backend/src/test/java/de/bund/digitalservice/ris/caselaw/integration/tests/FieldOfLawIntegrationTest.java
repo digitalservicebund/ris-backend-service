@@ -10,8 +10,6 @@ import de.bund.digitalservice.ris.caselaw.adapter.FieldOfLawController;
 import de.bund.digitalservice.ris.caselaw.adapter.FieldOfLawService;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseFieldOfLawRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresFieldOfLawRepositoryImpl;
-import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
-import de.bund.digitalservice.ris.caselaw.config.PostgresConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
 import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
@@ -39,8 +37,6 @@ import org.testcontainers.junit.jupiter.Container;
 @RISIntegrationTest(
     imports = {
       FieldOfLawService.class,
-      FlywayConfig.class,
-      PostgresConfig.class,
       PostgresJPAConfig.class,
       PostgresFieldOfLawRepositoryImpl.class,
       SecurityConfig.class,

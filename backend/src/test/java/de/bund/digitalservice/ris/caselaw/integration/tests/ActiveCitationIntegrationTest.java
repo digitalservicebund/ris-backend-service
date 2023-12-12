@@ -22,8 +22,6 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOffi
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentationUnitRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresPublicationReportRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationOfficeTransformer;
-import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
-import de.bund.digitalservice.ris.caselaw.config.PostgresConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
 import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
 import de.bund.digitalservice.ris.caselaw.domain.ActiveCitation;
@@ -60,8 +58,6 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
       DatabaseDocumentUnitStatusService.class,
       PostgresDocumentationUnitRepositoryImpl.class,
       PostgresPublicationReportRepositoryImpl.class,
-      FlywayConfig.class,
-      PostgresConfig.class,
       PostgresJPAConfig.class,
       SecurityConfig.class,
       AuthService.class,
@@ -583,7 +579,6 @@ class ActiveCitationIntegrationTest {
             response ->
                 assertThat(response.getResponseBody().contentRelatedIndexing().activeCitations())
                     .hasSize(2));
-
     UUID uuid = UUID.fromString("f0232240-7416-11ee-b962-0242ac120002");
 
     DocumentUnit documentUnitFromFrontend =

@@ -58,8 +58,6 @@ values
 insert into
   incremental_migration.related_documentation (
     id,
-    court_location,
-    court_type,
     court_id,
     date,
     document_number,
@@ -74,8 +72,6 @@ insert into
 values
   (
     'f0232240-7416-11ee-b962-0242ac120002',
-    'Karlsruhe',
-    'BGH',
     '96301f85-9bd2-4690-a67f-f9fdfe725de3',
     '2011-01-21',
     null,
@@ -89,8 +85,6 @@ values
   ),
   (
     'f0232240-7416-11ee-b962-0242ac120003',
-    'Karlsruhe',
-    'BGH',
     '96301f85-9bd2-4690-a67f-f9fdfe725de3',
     '2011-01-21',
     'documentnr002',

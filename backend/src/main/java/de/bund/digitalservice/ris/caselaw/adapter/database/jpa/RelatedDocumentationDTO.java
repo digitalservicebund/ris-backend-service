@@ -3,6 +3,7 @@ package de.bund.digitalservice.ris.caselaw.adapter.database.jpa;
 import de.bund.digitalservice.ris.caselaw.domain.RelatedDocumentationType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.Inheritance;
@@ -34,12 +35,13 @@ public abstract class RelatedDocumentationDTO {
 
   @Include @Id @GeneratedValue private UUID id;
 
-  @ManyToOne private CourtDTO court;
+  @ManyToOne(fetch = FetchType.LAZY)
+  private CourtDTO court;
 
   @Column(name = "date")
   private LocalDate date;
 
-  @ManyToOne
+  @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "document_type_id")
   private DocumentTypeDTO documentType;
 
@@ -54,7 +56,7 @@ public abstract class RelatedDocumentationDTO {
 
   @Column @NotNull private Integer rank;
 
-  @ManyToOne
+  @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "document_number", referencedColumnName = "document_number")
   private DocumentationUnitDTO referencedDocumentationUnit;
 

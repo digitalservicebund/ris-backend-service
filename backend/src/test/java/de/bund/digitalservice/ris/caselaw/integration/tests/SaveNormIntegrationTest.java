@@ -23,8 +23,6 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.NormAbbreviationD
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.NormReferenceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentationUnitRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresPublicationReportRepositoryImpl;
-import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
-import de.bund.digitalservice.ris.caselaw.config.PostgresConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
 import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
 import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
@@ -61,8 +59,6 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
       DatabaseDocumentUnitStatusService.class,
       PostgresDocumentationUnitRepositoryImpl.class,
       PostgresPublicationReportRepositoryImpl.class,
-      FlywayConfig.class,
-      PostgresConfig.class,
       PostgresJPAConfig.class,
       SecurityConfig.class,
       AuthService.class,
@@ -164,7 +160,11 @@ class SaveNormIntegrationTest {
                 .documentNumber("1234567890124")
                 .documentationOffice(documentationOfficeDTO)
                 .normReferences(
-                    List.of(NormReferenceDTO.builder().normAbbreviation(normAbbreviation).build()))
+                    List.of(
+                        NormReferenceDTO.builder()
+                            .rank(1)
+                            .normAbbreviation(normAbbreviation)
+                            .build()))
                 .build());
 
     DocumentUnit documentUnitFromFrontend =

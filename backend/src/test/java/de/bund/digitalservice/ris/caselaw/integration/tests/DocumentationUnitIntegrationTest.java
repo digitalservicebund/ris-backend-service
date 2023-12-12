@@ -34,8 +34,6 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.FileNumberDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentationUnitRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresPublicationReportRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.StatusDTO;
-import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
-import de.bund.digitalservice.ris.caselaw.config.PostgresConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
 import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
@@ -85,9 +83,6 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
       DatabaseProcedureService.class,
       PostgresPublicationReportRepositoryImpl.class,
       PostgresDocumentationUnitRepositoryImpl.class,
-      //      DatabaseStatusRepository.class,
-      FlywayConfig.class,
-      PostgresConfig.class,
       PostgresJPAConfig.class,
       SecurityConfig.class,
       AuthService.class,
@@ -113,7 +108,6 @@ class DocumentationUnitIntegrationTest {
   @Autowired private DatabaseDocumentationUnitRepository repository;
   @Autowired private DatabaseFileNumberRepository fileNumberRepository;
   @Autowired private DatabaseDocumentTypeRepository databaseDocumentTypeRepository;
-  //  @Autowired private DatabaseStatusRepository databaseStatusRepository;
 
   @Autowired private DatabaseDocumentCategoryRepository databaseDocumentCategoryRepository;
   @Autowired private DatabaseDocumentationOfficeRepository documentationOfficeRepository;
@@ -374,7 +368,9 @@ class DocumentationUnitIntegrationTest {
 
   @Test
   void testSearchResultsAreDeterministic() {
+    var office = documentationOfficeRepository.findByAbbreviation("DS");
     for (int i = 0; i < 20; i++) {
+      var random = RandomStringUtils.random(10, true, true);
       CourtDTO court =
           courtRepository.save(
               CourtDTO.builder()
@@ -388,10 +384,9 @@ class DocumentationUnitIntegrationTest {
       DocumentationUnitDTO dto =
           repository.save(
               DocumentationUnitDTO.builder()
-                  .id(UUID.randomUUID())
-                  .documentNumber(RandomStringUtils.random(10, true, true))
+                  .documentNumber(random)
                   .court(court)
-                  .documentationOffice(documentationOfficeRepository.findByAbbreviation("DS"))
+                  .documentationOffice(office)
                   .build());
 
       dto = repository.findById(dto.getId()).get();

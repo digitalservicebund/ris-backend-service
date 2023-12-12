@@ -24,8 +24,6 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DeviatingFileNumb
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentationUnitRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresPublicationReportRepositoryImpl;
-import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
-import de.bund.digitalservice.ris.caselaw.config.PostgresConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
 import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
@@ -61,8 +59,6 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
       DatabaseProcedureService.class,
       PostgresPublicationReportRepositoryImpl.class,
       PostgresDocumentationUnitRepositoryImpl.class,
-      FlywayConfig.class,
-      PostgresConfig.class,
       PostgresJPAConfig.class,
       SecurityConfig.class,
       AuthService.class,
@@ -125,8 +121,16 @@ class DeviatingObjectIntegrationTest {
         dto.toBuilder()
             .deviatingFileNumbers(
                 List.of(
-                    DeviatingFileNumberDTO.builder().documentationUnit(dto).value("dfn1").build(),
-                    DeviatingFileNumberDTO.builder().documentationUnit(dto).value("dfn2").build()))
+                    DeviatingFileNumberDTO.builder()
+                        .rank(1L)
+                        .documentationUnit(dto)
+                        .value("dfn1")
+                        .build(),
+                    DeviatingFileNumberDTO.builder()
+                        .rank(2L)
+                        .documentationUnit(dto)
+                        .value("dfn2")
+                        .build()))
             .build());
   }
 
@@ -335,8 +339,8 @@ class DeviatingObjectIntegrationTest {
                 documentationOfficeRepository.findByAbbreviation(docOffice.abbreviation()))
             .deviatingEclis(
                 List.of(
-                    DeviatingEcliDTO.builder().value("decli1").build(),
-                    DeviatingEcliDTO.builder().value("decli2").build()))
+                    DeviatingEcliDTO.builder().rank(1L).value("decli1").build(),
+                    DeviatingEcliDTO.builder().rank(2L).value("decli2").build()))
             .build();
 
     repository.save(dto);
@@ -367,8 +371,8 @@ class DeviatingObjectIntegrationTest {
                 documentationOfficeRepository.findByAbbreviation(docOffice.abbreviation()))
             .deviatingEclis(
                 List.of(
-                    DeviatingEcliDTO.builder().value("decli1").build(),
-                    DeviatingEcliDTO.builder().value("decli2").build()))
+                    DeviatingEcliDTO.builder().rank(1L).value("decli1").build(),
+                    DeviatingEcliDTO.builder().rank(2L).value("decli2").build()))
             .build();
 
     DocumentationUnitDTO savedDTO = repository.save(dto);
@@ -421,8 +425,8 @@ class DeviatingObjectIntegrationTest {
                 documentationOfficeRepository.findByAbbreviation(docOffice.abbreviation()))
             .deviatingEclis(
                 List.of(
-                    DeviatingEcliDTO.builder().value("decli1").build(),
-                    DeviatingEcliDTO.builder().value("decli2").build()))
+                    DeviatingEcliDTO.builder().rank(1L).value("decli1").build(),
+                    DeviatingEcliDTO.builder().rank(2L).value("decli2").build()))
             .build();
 
     DocumentationUnitDTO savedDTO = repository.save(dto);
@@ -457,8 +461,8 @@ class DeviatingObjectIntegrationTest {
                 documentationOfficeRepository.findByAbbreviation(docOffice.abbreviation()))
             .deviatingEclis(
                 List.of(
-                    DeviatingEcliDTO.builder().value("decli1").build(),
-                    DeviatingEcliDTO.builder().value("decli2").build()))
+                    DeviatingEcliDTO.builder().rank(1L).value("decli1").build(),
+                    DeviatingEcliDTO.builder().rank(2L).value("decli2").build()))
             .build();
 
     DocumentationUnitDTO savedDTO = repository.save(dto);
@@ -500,8 +504,8 @@ class DeviatingObjectIntegrationTest {
                 documentationOfficeRepository.findByAbbreviation(docOffice.abbreviation()))
             .deviatingEclis(
                 List.of(
-                    DeviatingEcliDTO.builder().value("decli1").build(),
-                    DeviatingEcliDTO.builder().value("decli2").build()))
+                    DeviatingEcliDTO.builder().rank(1L).value("decli1").build(),
+                    DeviatingEcliDTO.builder().rank(2L).value("decli2").build()))
             .build();
 
     DocumentationUnitDTO savedDTO = repository.save(dto);
@@ -542,8 +546,8 @@ class DeviatingObjectIntegrationTest {
                 documentationOfficeRepository.findByAbbreviation(docOffice.abbreviation()))
             .deviatingEclis(
                 List.of(
-                    DeviatingEcliDTO.builder().value("decli1").build(),
-                    DeviatingEcliDTO.builder().value("decli2").build()))
+                    DeviatingEcliDTO.builder().rank(1L).value("decli1").build(),
+                    DeviatingEcliDTO.builder().rank(2L).value("decli2").build()))
             .build();
 
     DocumentationUnitDTO savedDTO = repository.save(dto);
@@ -587,8 +591,8 @@ class DeviatingObjectIntegrationTest {
                 documentationOfficeRepository.findByAbbreviation(docOffice.abbreviation()))
             .deviatingCourts(
                 List.of(
-                    DeviatingCourtDTO.builder().value("dc1").build(),
-                    DeviatingCourtDTO.builder().value("dc2").build()))
+                    DeviatingCourtDTO.builder().rank(1L).value("dc1").build(),
+                    DeviatingCourtDTO.builder().rank(2L).value("dc2").build()))
             .build();
 
     repository.save(dto);
@@ -620,8 +624,8 @@ class DeviatingObjectIntegrationTest {
                 documentationOfficeRepository.findByAbbreviation(docOffice.abbreviation()))
             .deviatingCourts(
                 List.of(
-                    DeviatingCourtDTO.builder().value("dc1").build(),
-                    DeviatingCourtDTO.builder().value("dc2").build()))
+                    DeviatingCourtDTO.builder().rank(1L).value("dc1").build(),
+                    DeviatingCourtDTO.builder().rank(2L).value("dc2").build()))
             .build();
 
     DocumentationUnitDTO savedDTO = repository.save(dto);
@@ -675,8 +679,8 @@ class DeviatingObjectIntegrationTest {
                 documentationOfficeRepository.findByAbbreviation(docOffice.abbreviation()))
             .deviatingCourts(
                 List.of(
-                    DeviatingCourtDTO.builder().value("dc1").build(),
-                    DeviatingCourtDTO.builder().value("dc2").build()))
+                    DeviatingCourtDTO.builder().rank(1L).value("dc1").build(),
+                    DeviatingCourtDTO.builder().rank(2L).value("dc2").build()))
             .build();
 
     DocumentationUnitDTO savedDTO = repository.save(dto);
@@ -711,8 +715,8 @@ class DeviatingObjectIntegrationTest {
                 documentationOfficeRepository.findByAbbreviation(docOffice.abbreviation()))
             .deviatingCourts(
                 List.of(
-                    DeviatingCourtDTO.builder().value("dc1").build(),
-                    DeviatingCourtDTO.builder().value("dc2").build()))
+                    DeviatingCourtDTO.builder().rank(1L).value("dc1").build(),
+                    DeviatingCourtDTO.builder().rank(2L).value("dc2").build()))
             .build();
 
     DocumentationUnitDTO savedDTO = repository.save(dto);
@@ -755,8 +759,8 @@ class DeviatingObjectIntegrationTest {
                 documentationOfficeRepository.findByAbbreviation(docOffice.abbreviation()))
             .deviatingCourts(
                 List.of(
-                    DeviatingCourtDTO.builder().value("dc1").build(),
-                    DeviatingCourtDTO.builder().value("dc2").build()))
+                    DeviatingCourtDTO.builder().rank(1L).value("dc1").build(),
+                    DeviatingCourtDTO.builder().rank(2L).value("dc2").build()))
             .build();
 
     DocumentationUnitDTO savedDTO = repository.save(dto);
@@ -798,8 +802,8 @@ class DeviatingObjectIntegrationTest {
                 documentationOfficeRepository.findByAbbreviation(docOffice.abbreviation()))
             .deviatingCourts(
                 List.of(
-                    DeviatingCourtDTO.builder().value("dc1").build(),
-                    DeviatingCourtDTO.builder().value("dc2").build()))
+                    DeviatingCourtDTO.builder().rank(1L).value("dc1").build(),
+                    DeviatingCourtDTO.builder().rank(2L).value("dc2").build()))
             .build();
 
     DocumentationUnitDTO savedDTO = repository.save(dto);
@@ -844,8 +848,8 @@ class DeviatingObjectIntegrationTest {
                 documentationOfficeRepository.findByAbbreviation(docOffice.abbreviation()))
             .deviatingDates(
                 List.of(
-                    DeviatingDateDTO.builder().value(LocalDate.of(2000, 1, 2)).build(),
-                    DeviatingDateDTO.builder().value(LocalDate.of(2010, 9, 10)).build()))
+                    DeviatingDateDTO.builder().rank(1L).value(LocalDate.of(2000, 1, 2)).build(),
+                    DeviatingDateDTO.builder().rank(2L).value(LocalDate.of(2010, 9, 10)).build()))
             .build();
 
     repository.save(dto);
@@ -878,8 +882,8 @@ class DeviatingObjectIntegrationTest {
                 documentationOfficeRepository.findByAbbreviation(docOffice.abbreviation()))
             .deviatingDates(
                 List.of(
-                    DeviatingDateDTO.builder().value(LocalDate.of(2000, 1, 2)).build(),
-                    DeviatingDateDTO.builder().value(LocalDate.of(2010, 9, 10)).build()))
+                    DeviatingDateDTO.builder().rank(1L).value(LocalDate.of(2000, 1, 2)).build(),
+                    DeviatingDateDTO.builder().rank(2L).value(LocalDate.of(2010, 9, 10)).build()))
             .build();
 
     DocumentationUnitDTO savedDTO = repository.save(dto);
@@ -941,9 +945,9 @@ class DeviatingObjectIntegrationTest {
                 documentationOfficeRepository.findByAbbreviation(docOffice.abbreviation()))
             .deviatingDates(
                 List.of(
-                    DeviatingDateDTO.builder().value(LocalDate.of(2000, 1, 2)).build(),
-                    DeviatingDateDTO.builder().value(LocalDate.of(2010, 9, 10)).build(),
-                    DeviatingDateDTO.builder().value(LocalDate.of(2010, 9, 10)).build()))
+                    DeviatingDateDTO.builder().rank(1L).value(LocalDate.of(2000, 1, 2)).build(),
+                    DeviatingDateDTO.builder().rank(2L).value(LocalDate.of(2010, 9, 10)).build(),
+                    DeviatingDateDTO.builder().rank(3L).value(LocalDate.of(2010, 9, 10)).build()))
             .build();
 
     DocumentationUnitDTO savedDTO = repository.save(dto);
@@ -982,8 +986,8 @@ class DeviatingObjectIntegrationTest {
                 documentationOfficeRepository.findByAbbreviation(docOffice.abbreviation()))
             .deviatingDates(
                 List.of(
-                    DeviatingDateDTO.builder().value(LocalDate.of(2000, 1, 2)).build(),
-                    DeviatingDateDTO.builder().value(LocalDate.of(2010, 9, 10)).build()))
+                    DeviatingDateDTO.builder().rank(1L).value(LocalDate.of(2000, 1, 2)).build(),
+                    DeviatingDateDTO.builder().rank(2L).value(LocalDate.of(2010, 9, 10)).build()))
             .build();
 
     DocumentationUnitDTO savedDTO = repository.save(dto);
@@ -1026,8 +1030,8 @@ class DeviatingObjectIntegrationTest {
                 documentationOfficeRepository.findByAbbreviation(docOffice.abbreviation()))
             .deviatingDates(
                 List.of(
-                    DeviatingDateDTO.builder().value(LocalDate.of(2000, 1, 2)).build(),
-                    DeviatingDateDTO.builder().value(LocalDate.of(2010, 9, 10)).build()))
+                    DeviatingDateDTO.builder().rank(1L).value(LocalDate.of(2000, 1, 2)).build(),
+                    DeviatingDateDTO.builder().rank(2L).value(LocalDate.of(2010, 9, 10)).build()))
             .build();
 
     DocumentationUnitDTO savedDTO = repository.save(dto);
@@ -1069,8 +1073,8 @@ class DeviatingObjectIntegrationTest {
                 documentationOfficeRepository.findByAbbreviation(docOffice.abbreviation()))
             .deviatingDates(
                 List.of(
-                    DeviatingDateDTO.builder().value(LocalDate.of(2000, 1, 2)).build(),
-                    DeviatingDateDTO.builder().value(LocalDate.of(2010, 9, 10)).build()))
+                    DeviatingDateDTO.builder().rank(1L).value(LocalDate.of(2000, 1, 2)).build(),
+                    DeviatingDateDTO.builder().rank(2L).value(LocalDate.of(2010, 9, 10)).build()))
             .build();
 
     DocumentationUnitDTO savedDTO = repository.save(dto);
