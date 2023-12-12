@@ -5,6 +5,8 @@ application:
     user: ${STAGING_USER:test}
 
 spring:
+  flyway:
+    enabled: false
   sql:
     init:
       mode: always

@@ -30,7 +30,7 @@ open class PostgresTestcontainerIntegrationTest {
           withDatabaseName("testdb")
           withUsername("user")
           withPassword("password")
-          withInitScript("db/create_migration_scheme_and_extensions.sql")
+          withInitScript("db/create_minimum_migration_scheme_and_extensions.sql")
           start()
         }
 
