@@ -81,6 +81,12 @@ describe("Pagination", () => {
     await screen.findByText("1 von 200")
   })
 
+  test("displays 0 pages if there a no pages", async () => {
+    renderComponent({ totalPages: 0 })
+
+    await screen.findByText("0 von 0")
+  })
+
   test("next button disabled if on last page", async () => {
     renderComponent({ last: true })
 
