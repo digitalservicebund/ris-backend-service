@@ -38,6 +38,7 @@ public class ProcedureTransformer {
         .filter(
             documentationUnitDTO ->
                 documentationUnitDTO.getProcedures().get(0).getProcedure().equals(procedureDTO))
+        .distinct()
         .count();
   }
 

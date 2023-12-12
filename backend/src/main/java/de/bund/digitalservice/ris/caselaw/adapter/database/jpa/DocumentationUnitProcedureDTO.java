@@ -7,6 +7,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.MapsId;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import java.io.Serializable;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
@@ -40,7 +41,15 @@ public class DocumentationUnitProcedureDTO {
   @JoinColumn(name = "procedure_id")
   private ProcedureDTO procedure;
 
-  private int rank;
+  @Transient
+  public int getRank() {
+    return primaryKey.getRank();
+  }
+
+  @Transient
+  public void setRank(int rank) {
+    primaryKey.setRank(rank);
+  }
 }
 
 @Embeddable
@@ -51,6 +60,7 @@ class DocumentationUnitProcedureId implements Serializable {
   private UUID documentationUnitId;
 
   private UUID procedureId;
+  @Setter private int rank;
 
   public DocumentationUnitProcedureId(UUID documentationUnitId, UUID procedureId) {
     this.documentationUnitId = documentationUnitId;

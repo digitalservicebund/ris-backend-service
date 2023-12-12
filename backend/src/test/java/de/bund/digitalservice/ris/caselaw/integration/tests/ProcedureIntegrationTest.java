@@ -38,6 +38,8 @@ import de.bund.digitalservice.ris.caselaw.domain.PublicationReportRepository;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
+import java.util.concurrent.atomic.AtomicReference;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
@@ -318,6 +320,46 @@ class ProcedureIntegrationTest {
   }
 
   @Test
+  void testAddProcedureWhichIsInHistoryAgain() {
+    DocumentationUnitDTO dto =
+        documentUnitRepository.save(
+            DocumentationUnitDTO.builder()
+                .documentNumber("1234567890123")
+                .documentationOffice(documentationOfficeDTO)
+                .build());
+
+    UUID procedureId = addProcedure(dto, "foo");
+    addProcedure(dto, "bar");
+
+    DocumentUnit documentUnitFromFrontend1 =
+        DocumentUnit.builder()
+            .uuid(dto.getId())
+            .documentNumber(dto.getDocumentNumber())
+            .coreData(
+                CoreData.builder()
+                    .procedure(Procedure.builder().id(procedureId).build())
+                    .documentationOffice(docOffice)
+                    .build())
+            .build();
+
+    risWebTestClient
+        .withDefaultLogin()
+        .put()
+        .uri("/api/v1/caselaw/documentunits/" + dto.getId())
+        .bodyValue(documentUnitFromFrontend1)
+        .exchange()
+        .expectStatus()
+        .is2xxSuccessful()
+        .expectBody(DocumentUnit.class)
+        .consumeWith(
+            response -> {
+              CoreData coreData = response.getResponseBody().coreData();
+              assertThat(coreData.procedure().label()).isEqualTo("foo");
+              assertThat(coreData.previousProcedures()).containsExactly("bar", "foo");
+            });
+  }
+
+  @Test
   void testAddProcedureWithSameNameToDifferentOffice() {
     DocumentationOfficeDTO bghDocOfficeDTO =
         documentationOfficeRepository.findByAbbreviation("BGH");
@@ -491,6 +533,38 @@ class ProcedureIntegrationTest {
 
   private ProcedureDTO createProcedure(String label, DocumentationOfficeDTO documentationOffice) {
     return createProcedures(List.of(label), documentationOffice).get(0);
+  }
+
+  private UUID addProcedure(DocumentationUnitDTO dto, String procedureValue) {
+    DocumentUnit documentUnitFromFrontend1 =
+        DocumentUnit.builder()
+            .uuid(dto.getId())
+            .documentNumber(dto.getDocumentNumber())
+            .coreData(
+                CoreData.builder()
+                    .procedure(Procedure.builder().label(procedureValue).build())
+                    .documentationOffice(docOffice)
+                    .build())
+            .build();
+
+    AtomicReference<UUID> procedureId = new AtomicReference<>();
+    risWebTestClient
+        .withDefaultLogin()
+        .put()
+        .uri("/api/v1/caselaw/documentunits/" + dto.getId())
+        .bodyValue(documentUnitFromFrontend1)
+        .exchange()
+        .expectStatus()
+        .is2xxSuccessful()
+        .expectBody(DocumentUnit.class)
+        .consumeWith(
+            response -> {
+              CoreData coreData = response.getResponseBody().coreData();
+              assertThat(coreData.procedure().label()).isEqualTo(procedureValue);
+              procedureId.set(coreData.procedure().id());
+            });
+
+    return procedureId.get();
   }
 
   public static class RestPageImpl<T> extends PageImpl<T> {

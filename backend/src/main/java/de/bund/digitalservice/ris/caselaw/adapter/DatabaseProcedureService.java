@@ -69,6 +69,7 @@ public class DatabaseProcedureService implements ProcedureService {
 
                           return procedures.get(0).getProcedure().equals(procedureDTO);
                         })
+                    .distinct()
                     .map(DocumentationUnitTransformer::transformToMetaDomain)
                     .toList())
         .orElse(null);
