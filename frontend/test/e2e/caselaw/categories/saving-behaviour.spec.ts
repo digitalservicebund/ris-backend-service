@@ -153,7 +153,7 @@ test.describe("saving behaviour", () => {
     await waitForSaving(
       async () => {
         await fillActiveCitationInputs(page, {
-          documentType: "AnU",
+          documentType: "Anerkenntnisurteil",
         })
         await page.getByLabel("Aktivzitierung speichern").click()
       },

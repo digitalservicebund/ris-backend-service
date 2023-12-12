@@ -42,7 +42,7 @@ test.describe("active citations", () => {
       citationType: "Änderung",
       court: prefilledDocumentUnit.coreData.court?.label,
       fileNumber: prefilledDocumentUnit.coreData.fileNumbers?.[0],
-      documentType: prefilledDocumentUnit.coreData.documentType?.jurisShortcut,
+      documentType: prefilledDocumentUnit.coreData.documentType?.label,
       decisionDate: "01.01.2020",
     })
 
@@ -63,7 +63,7 @@ test.describe("active citations", () => {
       citationType: "Änderung",
       court: prefilledDocumentUnit.coreData.court?.label,
       fileNumber: prefilledDocumentUnit.coreData.fileNumbers?.[0],
-      documentType: prefilledDocumentUnit.coreData.documentType?.jurisShortcut,
+      documentType: prefilledDocumentUnit.coreData.documentType?.label,
       decisionDate: "01.01.2020",
     })
     await page.getByLabel("Aktivzitierung speichern").click()
@@ -94,8 +94,7 @@ test.describe("active citations", () => {
           citationType: "Änderung",
           court: prefilledDocumentUnit.coreData.court?.label,
           fileNumber: prefilledDocumentUnit.coreData.fileNumbers?.[0],
-          documentType:
-            prefilledDocumentUnit.coreData.documentType?.jurisShortcut,
+          documentType: prefilledDocumentUnit.coreData.documentType?.label,
           decisionDate: "01.01.2020",
         })
         await page.getByLabel("Aktivzitierung speichern").click()
@@ -233,7 +232,7 @@ test.describe("active citations", () => {
       citationType: "Änderung",
       court: prefilledDocumentUnit.coreData.court?.label,
       fileNumber: prefilledDocumentUnit.coreData.fileNumbers?.[0],
-      documentType: prefilledDocumentUnit.coreData.documentType?.jurisShortcut,
+      documentType: prefilledDocumentUnit.coreData.documentType?.label,
       decisionDate: "31.12.2019",
     })
 
@@ -267,7 +266,7 @@ test.describe("active citations", () => {
       citationType: "Änderung",
       court: prefilledDocumentUnit.coreData.court?.label,
       fileNumber: prefilledDocumentUnit.coreData.fileNumbers?.[0],
-      documentType: prefilledDocumentUnit.coreData.documentType?.jurisShortcut,
+      documentType: prefilledDocumentUnit.coreData.documentType?.label,
       decisionDate: "31.12.2019",
     })
 
@@ -312,7 +311,7 @@ test.describe("active citations", () => {
     await fillActiveCitationInputs(page, {
       court: prefilledDocumentUnit.coreData.court?.label,
       fileNumber: prefilledDocumentUnit.coreData.fileNumbers?.[0],
-      documentType: prefilledDocumentUnit.coreData.documentType?.jurisShortcut,
+      documentType: prefilledDocumentUnit.coreData.documentType?.label,
       decisionDate: "31.12.2019",
     })
 
@@ -373,7 +372,7 @@ test.describe("active citations", () => {
       citationType: "Änderung",
       court: prefilledDocumentUnit.coreData.court?.label,
       fileNumber: prefilledDocumentUnit.coreData.fileNumbers?.[0],
-      documentType: prefilledDocumentUnit.coreData.documentType?.jurisShortcut,
+      documentType: prefilledDocumentUnit.coreData.documentType?.label,
       decisionDate: "31.12.2019",
     })
     await page.getByLabel("Aktivzitierung speichern").click()

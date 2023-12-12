@@ -12,7 +12,6 @@ import IconKeyboardArrowUp from "~icons/ic/baseline-keyboard-arrow-up"
 const props = defineProps<{
   id: string
   itemService: ComboboxAttributes["itemService"]
-  throttleItemServiceThroughput?: boolean
   modelValue: T
   ariaLabel: string
   placeholder?: string
@@ -59,8 +58,8 @@ const placeholderColor = computed(() =>
 )
 
 const toggleDropdown = async () => {
-  showDropdown.value = !showDropdown.value
   focusedItemIndex.value = 0
+  showDropdown.value = !showDropdown.value
   if (showDropdown.value) {
     if (inputText.value) {
       filter.value = inputText.value
@@ -70,7 +69,16 @@ const toggleDropdown = async () => {
   }
 }
 
-const clearSelection = async () => {
+const showUpdatedDropdown = async () => {
+  focusedItemIndex.value = 0
+  showDropdown.value = true
+  if (inputText.value) {
+    filter.value = inputText.value
+  }
+  await updateCurrentItems(filter.value)
+}
+
+const clearDropdown = async () => {
   if (props.noClear) return
 
   emit("update:modelValue", undefined)
@@ -129,29 +137,10 @@ const updateFocusedItem = () => {
   if (item && item.innerText !== NO_MATCHING_ENTRY) item.focus()
 }
 
-let timer: ReturnType<typeof setTimeout>
-
-const onTextChange = () => {
-  focusedItemIndex.value = 0
-  showDropdown.value = true
-  filter.value = inputText.value ? inputText.value.trim() : inputText.value
-  if (timer) clearTimeout(timer)
-  if (props.throttleItemServiceThroughput) {
-    timer = setTimeout(() => void updateCurrentItems(filter.value), 300)
-  } else {
-    updateCurrentItems(filter.value)
-  }
-}
-
 const updateCurrentItems = async (searchStr?: string) => {
   const response = await props.itemService(searchStr)
   if (!response.data) {
     console.error(response.error)
-    return
-  }
-
-  if (props.throttleItemServiceThroughput && searchStr !== filter.value) {
-    // this request is outdated, ignore its result
     return
   }
 
@@ -218,7 +207,6 @@ onMounted(() => {
 })
 
 onBeforeUnmount(() => {
-  if (timer) clearTimeout(timer)
   window.removeEventListener("click", handleClickOutside)
 })
 </script>
@@ -249,7 +237,8 @@ export type InputModelProps =
         :readonly="false"
         tabindex="0"
         @click="selectAllText"
-        @input="onTextChange"
+        @focus="showUpdatedDropdown"
+        @input="showUpdatedDropdown"
         @keydown.enter="onEnter"
         @keydown.esc="closeDropdownAndRevertToLastSavedValue"
         @keydown.tab="closeDropdownAndRevertToLastSavedValue"
@@ -260,7 +249,7 @@ export type InputModelProps =
         aria-label="Auswahl zurücksetzen"
         class="input-close-icon flex items-center text-blue-800"
         tabindex="0"
-        @click="clearSelection"
+        @click="clearDropdown"
       >
         <IconClear />
       </button>

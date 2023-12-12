@@ -219,9 +219,8 @@ test.describe("core data", () => {
     await expect(page.locator("[aria-label='Dokumenttyp']")).toHaveValue("")
     await expect(page.locator("[aria-label='dropdown-option']")).toBeHidden()
 
-    // open dropdown again by typing a search string
-    await page.locator("[aria-label='Dokumenttyp']").fill("zwischen")
-    await expect(page.locator("[aria-label='dropdown-option']")).toHaveCount(3)
+    // open dropdown again by focussing
+    await page.locator("[aria-label='Dokumenttyp']").focus()
 
     // close dropdown using the esc key, user input text gets removed and last saved value restored
     await page.keyboard.down("Escape")

@@ -147,8 +147,14 @@ export async function fillPreviousDecisionInputs(
   }
   if (values?.documentType) {
     await fillInput("Dokumenttyp Vorgehende Entscheidung", values?.documentType)
-    await page.locator("[aria-label='dropdown-option']").first().click()
+    await page.getByText(values.documentType, { exact: true }).click()
+    await waitForInputValue(
+      page,
+      "[aria-label='Dokumenttyp Vorgehende Entscheidung']",
+      values.documentType,
+    )
   }
+
   if (values?.dateKnown === false) {
     const dateUnknownCheckbox = page.getByLabel("Datum unbekannt")
     if (!(await dateUnknownCheckbox.isChecked())) {
@@ -199,7 +205,12 @@ export async function fillEnsuingDecisionInputs(
       "Dokumenttyp Nachgehende Entscheidung",
       values?.documentType,
     )
-    await page.locator("[aria-label='dropdown-option']").first().click()
+    await page.getByText(values.documentType, { exact: true }).click()
+    await waitForInputValue(
+      page,
+      "[aria-label='Dokumenttyp Nachgehende Entscheidung']",
+      values.documentType,
+    )
   }
   if (values?.pending) {
     const pendingCheckbox = page.getByLabel("Anhängige Entscheidung")
@@ -269,7 +280,7 @@ export async function fillActiveCitationInputs(
 
   if (values?.citationType) {
     await fillInput("Art der Zitierung", values?.citationType)
-    await page.getByRole("button", { name: "dropdown-option" }).click()
+    await page.getByText(values.citationType, { exact: true }).click()
     await waitForInputValue(
       page,
       "[aria-label='Art der Zitierung']",
@@ -297,7 +308,12 @@ export async function fillActiveCitationInputs(
   }
   if (values?.documentType) {
     await fillInput("Dokumenttyp der Aktivzitierung", values?.documentType)
-    await page.locator("[aria-label='dropdown-option']").first().click()
+    await page.getByText(values.documentType, { exact: true }).click()
+    await waitForInputValue(
+      page,
+      "[aria-label='Dokumenttyp der Aktivzitierung']",
+      values.documentType,
+    )
   }
 }
 
