@@ -113,45 +113,6 @@ type ComboboxItemService = {
   ) => (filter?: string) => Promise<ServiceResponse<ComboboxItem[]>>
 }
 
-// Function to debounce the actual HTTP request
-function debounce(
-  func: (
-    endpoint: Endpoint,
-    filter?: string,
-    size?: number,
-  ) => Promise<ServiceResponse<ComboboxItem[]>>,
-  delay: number,
-) {
-  let timeoutId: NodeJS.Timeout
-
-  return async function (
-    endpoint: Endpoint,
-    filter?: string,
-    size?: number,
-  ): Promise<ServiceResponse<ComboboxItem[]>> {
-    clearTimeout(timeoutId)
-
-    return new Promise<ServiceResponse<ComboboxItem[]>>(async (resolve) => {
-      timeoutId = setTimeout(async () => {
-        const result = await func(endpoint, filter, size)
-        resolve(result)
-      }, delay)
-    })
-  }
-}
-
-// Debounced version of the fetchFromEndpoint function
-const debouncedFetch = debounce(fetchFromEndpoint, 400) // Set your desired delay in milliseconds
-
-async function fetchFromEndpointDebounced(
-  endpoint: Endpoint,
-  filter?: string,
-  size?: number,
-) {
-  return debouncedFetch(endpoint, filter, size)
-}
-
-// Modify your service to use the debounced function
 const service: ComboboxItemService = {
   filterItems: (items: ComboboxItem[]) => (filter?: string) => {
     const filteredItems = filter
@@ -160,22 +121,19 @@ const service: ComboboxItemService = {
     return Promise.resolve({ status: 200, data: filteredItems })
   },
   getCourts: async (filter?: string) =>
-    await fetchFromEndpointDebounced(Endpoint.courts, filter),
+    await fetchFromEndpoint(Endpoint.courts, filter),
   getDocumentTypes: async (filter?: string) =>
-    await fetchFromEndpointDebounced(Endpoint.documentTypes, filter),
+    await fetchFromEndpoint(Endpoint.documentTypes, filter),
   getFieldOfLawSearchByIdentifier: async (filter?: string) =>
-    await fetchFromEndpointDebounced(
-      Endpoint.fieldOfLawSearchByIdentifier,
-      filter,
-    ),
+    await fetchFromEndpoint(Endpoint.fieldOfLawSearchByIdentifier, filter),
   getRisAbbreviations: async (filter?: string) =>
-    await fetchFromEndpointDebounced(Endpoint.risAbbreviations, filter),
+    await fetchFromEndpoint(Endpoint.risAbbreviations, filter),
   getRisAbbreviationsAwesome: async (filter?: string) =>
-    await fetchFromEndpointDebounced(Endpoint.risAbbreviationsAwesome, filter),
+    await fetchFromEndpoint(Endpoint.risAbbreviationsAwesome, filter),
   getCitationTypes: async (filter?: string) =>
-    await fetchFromEndpointDebounced(Endpoint.citationTypes, filter),
+    await fetchFromEndpoint(Endpoint.citationTypes, filter),
   getProcedures: async (filter?: string) =>
-    await fetchFromEndpointDebounced(Endpoint.procedures, filter, 10),
+    await fetchFromEndpoint(Endpoint.procedures, filter, 10),
 }
 
 export default service
