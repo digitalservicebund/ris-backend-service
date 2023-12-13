@@ -1,4 +1,5 @@
 <script setup lang="ts" generic="T extends InputModelProps">
+import * as Sentry from "@sentry/vue"
 import { onBeforeUnmount, onMounted, ref, watch, computed } from "vue"
 import {
   ComboboxAttributes,
@@ -38,6 +39,10 @@ const dropdownContainerRef = ref<HTMLElement>()
 const dropdownItemsRef = ref<HTMLElement>()
 const inputFieldRef = ref<HTMLInputElement>()
 const focusedItemIndex = ref<number>(0)
+
+const isUpdating = ref(false)
+const hasToUpdate = ref(false)
+
 const ariaLabelDropdownIcon = computed(() =>
   showDropdown.value ? "Dropdown schließen" : "Dropdown öffnen",
 )
@@ -134,7 +139,29 @@ const updateFocusedItem = () => {
 }
 
 const updateCurrentItems = async (searchStr?: string) => {
-  const response = await props.itemService(searchStr)
+  hasToUpdate.value = true
+  if (isUpdating.value && hasToUpdate.value) {
+    return
+  }
+
+  isUpdating.value = true
+
+  let response
+  let tries = 0
+  do {
+    hasToUpdate.value = false
+    response = await props.itemService(filter.value)
+    isUpdating.value = false
+    tries++
+  } while (hasToUpdate.value && tries < 6)
+
+  if (tries >= 6) {
+    Sentry.captureMessage(
+      "more than 5 tries to call the item service at the combobox",
+      "error",
+    )
+  }
+
   if (!response.data) {
     console.error(response.error)
     return
