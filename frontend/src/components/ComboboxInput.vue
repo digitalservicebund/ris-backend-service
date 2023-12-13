@@ -113,6 +113,13 @@ const onEnter = async () => {
   await toggleDropdown()
 }
 
+const onInput = async () => {
+  if (inputText.value === "") {
+    emit("update:modelValue", undefined)
+  }
+  await showUpdatedDropdown()
+}
+
 const keyup = () => {
   if (focusedItemIndex.value > 1) {
     focusedItemIndex.value -= 1
@@ -261,7 +268,7 @@ export type InputModelProps =
         tabindex="0"
         @click="selectAllText"
         @focus="showUpdatedDropdown"
-        @input="showUpdatedDropdown"
+        @input="onInput"
         @keydown.enter="onEnter"
         @keydown.esc="closeDropdownAndRevertToLastSavedValue"
         @keydown.tab="closeDropdownAndRevertToLastSavedValue"

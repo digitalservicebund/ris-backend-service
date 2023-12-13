@@ -396,8 +396,8 @@ describe("Active Citations", () => {
     await user.click(screen.getByLabelText("Aktivzitierung speichern"))
 
     expect(
-      screen.queryByText(/Änderungen, 01.02.2022, documentType1/),
-    ).not.toBeInTheDocument()
+      screen.getByText(/Änderungen, 01.02.2022, documentType1/),
+    ).toBeInTheDocument()
   })
 
   it("renders limited edit view if linked document unit", async () => {
