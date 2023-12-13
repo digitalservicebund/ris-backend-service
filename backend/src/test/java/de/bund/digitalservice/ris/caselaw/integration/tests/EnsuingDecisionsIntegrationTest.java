@@ -175,7 +175,8 @@ class EnsuingDecisionsIntegrationTest {
                         .pending(true)
                         .note("note2")
                         .build(),
-                    EnsuingDecision.builder().pending(false).note("note3").build()))
+                    EnsuingDecision.builder().pending(false).note("note3").build(),
+                    EnsuingDecision.builder().pending(false).note("note4").build()))
             .build();
 
     risWebTestClient
@@ -189,7 +190,7 @@ class EnsuingDecisionsIntegrationTest {
         .expectBody(DocumentUnit.class)
         .consumeWith(
             response -> {
-              assertThat(response.getResponseBody().ensuingDecisions()).hasSize(3);
+              assertThat(response.getResponseBody().ensuingDecisions()).hasSize(4);
               assertThat(response.getResponseBody().ensuingDecisions().get(2).isPending())
                   .isFalse();
             });

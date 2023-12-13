@@ -54,6 +54,7 @@ public class ActiveCitationTransformer extends RelatedDocumentationUnitTransform
                         .id(activeCitation.getUuid())
                         .documentNumber(activeCitation.getDocumentNumber())
                         .build())
+            .documentNumber(activeCitation.getDocumentNumber())
             .documentType(getDocumentTypeFromDomain(activeCitation.getDocumentType()))
             .fileNumber(getFileNumber(activeCitation.getFileNumber()));
 

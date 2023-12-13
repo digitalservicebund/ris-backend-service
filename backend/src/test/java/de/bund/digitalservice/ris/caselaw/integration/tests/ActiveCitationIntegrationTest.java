@@ -204,7 +204,13 @@ class ActiveCitationIntegrationTest {
                                         .build())
                                 .build(),
                             ActiveCitation.builder()
-                                .uuid(UUID.fromString("7da39a1e-78a9-11ee-b962-0242ac120002"))
+                                .citationType(
+                                    CitationType.builder()
+                                        .uuid(
+                                            UUID.fromString("6b4bd747-fce9-4e49-8af4-3fb4f1d3663c"))
+                                        .build())
+                                .build(),
+                            ActiveCitation.builder()
                                 .citationType(
                                     CitationType.builder()
                                         .uuid(
@@ -226,7 +232,7 @@ class ActiveCitationIntegrationTest {
         .consumeWith(
             response -> {
               assertThat(response.getResponseBody().contentRelatedIndexing().activeCitations())
-                  .hasSize(3);
+                  .hasSize(4);
               assertThat(
                       response
                           .getResponseBody()

@@ -35,6 +35,7 @@ public class PreviousDecisionTransformer extends RelatedDocumentationUnitTransfo
                     .documentNumber(previousDecision.getDocumentNumber())
                     .build())
         .documentType(getDocumentTypeFromDomain(previousDecision.getDocumentType()))
+        .documentNumber(previousDecision.getDocumentNumber())
         .fileNumber(getFileNumber(previousDecision.getFileNumber()))
         .dateKnown(previousDecision.isDateKnown())
         .build();

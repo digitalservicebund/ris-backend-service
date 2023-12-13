@@ -35,6 +35,7 @@ public class EnsuingDecisionTransformer extends RelatedDocumentationUnitTransfor
                     .documentNumber(ensuingDecision.getDocumentNumber())
                     .build())
         .documentType(getDocumentTypeFromDomain(ensuingDecision.getDocumentType()))
+        .documentNumber(ensuingDecision.getDocumentNumber())
         .fileNumber(getFileNumber(ensuingDecision.getFileNumber()))
         .note(ensuingDecision.getNote())
         .build();
