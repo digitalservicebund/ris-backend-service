@@ -13,8 +13,7 @@
     @apply text-black no-underline;
   }
 
-  ol,
-  ul {
+  .editor ol {
     padding: revert;
     margin: auto;
     list-style: auto;
