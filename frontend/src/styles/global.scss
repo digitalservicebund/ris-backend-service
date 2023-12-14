@@ -13,6 +13,13 @@
     @apply text-black no-underline;
   }
 
+  ol,
+  ul {
+    padding: revert;
+    margin: auto;
+    list-style: auto;
+  }
+
   .ds-input,
   .ds-input input,
   .ds-select,
