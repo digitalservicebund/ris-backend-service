@@ -81,6 +81,9 @@ watch(
   () => props.modelValue,
   () => {
     modelValueList.value = props.modelValue
+    localList.value = props.modelValue.map((value, index) =>
+      index != editIndex.value ? value : localList.value[index],
+    )
   },
   { immediate: true, deep: true },
 )
