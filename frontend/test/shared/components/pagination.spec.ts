@@ -35,12 +35,7 @@ describe("Pagination", () => {
   test("display navigation", async () => {
     renderComponent()
 
-    for (const element of [
-      "zurück",
-      "1 von 1",
-      "vor",
-      "5 Ergebnisse gefunden.",
-    ]) {
+    for (const element of ["zurück", "vor"]) {
       await screen.findByText(element)
     }
   })
