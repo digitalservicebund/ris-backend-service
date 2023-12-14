@@ -32,9 +32,9 @@ import org.mockito.MockedStatic;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.context.annotation.Import;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Slice;
 import org.springframework.http.HttpHeaders;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -474,7 +474,7 @@ class DocumentUnitServiceTest {
             pageRequest, documentationOffice, documentationUnitSearchInput))
         .thenReturn(new PageImpl<>(List.of(documentationUnitSearchResult)));
 
-    Page<DocumentationUnitSearchResult> documentationUnitSearchEntries =
+    Slice<DocumentationUnitSearchResult> documentationUnitSearchEntries =
         service.searchByDocumentationUnitSearchInput(
             pageRequest,
             documentationOffice,

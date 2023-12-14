@@ -19,8 +19,8 @@ import java.time.LocalDate;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Slice;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -97,7 +97,7 @@ public class DocumentUnitController {
   @GetMapping(value = "/search")
   @PreAuthorize("isAuthenticated()")
   // Access rights are being enforced through SQL filtering
-  public Mono<Page<DocumentationUnitSearchResult>> searchByDocumentUnitListEntry(
+  public Mono<Slice<DocumentationUnitSearchResult>> searchByDocumentUnitListEntry(
       @RequestParam("pg") int page,
       @RequestParam("sz") int size,
       @RequestParam(value = "documentNumberOrFileNumber")
@@ -195,7 +195,7 @@ public class DocumentUnitController {
 
   @PutMapping(value = "/search-by-linked-documentation-unit")
   @PreAuthorize("isAuthenticated()")
-  public Mono<Page<RelatedDocumentationUnit>> searchByLinkedDocumentationUnit(
+  public Mono<Slice<RelatedDocumentationUnit>> searchByLinkedDocumentationUnit(
       @RequestParam("pg") int page,
       @RequestParam("sz") int size,
       @RequestBody RelatedDocumentationUnit relatedDocumentationUnit,

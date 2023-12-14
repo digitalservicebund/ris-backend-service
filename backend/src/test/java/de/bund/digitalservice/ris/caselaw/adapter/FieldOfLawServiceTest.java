@@ -25,6 +25,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.test.StepVerifier;
 
@@ -44,7 +45,7 @@ class FieldOfLawServiceTest {
         .consumeNextWith(
             page -> {
               assertThat(page.getContent()).isEmpty();
-              assertThat(page.getTotalElements()).isZero();
+              assertThat(page.isEmpty()).isTrue();
             })
         .verifyComplete();
 
@@ -60,7 +61,7 @@ class FieldOfLawServiceTest {
         .consumeNextWith(
             page -> {
               assertThat(page.getContent()).isEmpty();
-              assertThat(page.getTotalElements()).isZero();
+              assertThat(page.isEmpty()).isTrue();
             })
         .verifyComplete();
 
@@ -77,7 +78,7 @@ class FieldOfLawServiceTest {
         .consumeNextWith(
             page -> {
               assertThat(page.getContent()).isEmpty();
-              assertThat(page.getTotalElements()).isZero();
+              assertThat(page.isEmpty()).isTrue();
             })
         .verifyComplete();
 
@@ -96,7 +97,7 @@ class FieldOfLawServiceTest {
         .consumeNextWith(
             page -> {
               assertThat(page.getContent()).isEmpty();
-              assertThat(page.getTotalElements()).isZero();
+              assertThat(page.isEmpty()).isTrue();
             })
         .verifyComplete();
 
@@ -219,7 +220,7 @@ class FieldOfLawServiceTest {
 
     when(repository.findBySearchTerms(any(String[].class))).thenReturn(List.of(databaseFieldOfLaw));
 
-    Page<FieldOfLaw> result = service.searchAndOrderByScore("foo", PageRequest.of(1, 5));
+    Slice<FieldOfLaw> result = service.searchAndOrderByScore("foo", PageRequest.of(1, 5));
     assertThat(result).isEmpty();
   }
 }

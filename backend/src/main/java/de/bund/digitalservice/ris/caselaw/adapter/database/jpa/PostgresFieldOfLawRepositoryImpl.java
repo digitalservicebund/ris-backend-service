@@ -7,9 +7,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -72,7 +72,7 @@ public class PostgresFieldOfLawRepositoryImpl implements FieldOfLawRepository {
 
   @Override
   @Transactional(transactionManager = "jpaTransactionManager")
-  public Page<FieldOfLaw> findAllByOrderByIdentifierAsc(Pageable pageable) {
+  public Slice<FieldOfLaw> findAllByOrderByIdentifierAsc(Pageable pageable) {
     return repository
         .findAllByOrderByIdentifierAsc(pageable)
         .map(item -> FieldOfLawTransformer.transformToDomain(item, false, true));

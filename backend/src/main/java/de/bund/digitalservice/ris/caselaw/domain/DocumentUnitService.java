@@ -18,9 +18,9 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -177,7 +177,7 @@ public class DocumentUnitService {
         .flatMap(Function.identity());
   }
 
-  public Page<DocumentationUnitSearchResult> searchByDocumentationUnitSearchInput(
+  public Slice<DocumentationUnitSearchResult> searchByDocumentationUnitSearchInput(
       Pageable pageable,
       DocumentationOffice documentationOffice,
       Optional<String> documentNumberOrFileNumber,
@@ -306,7 +306,7 @@ public class DocumentUnitService {
         .sort(Comparator.comparing(PublicationHistoryRecord::getDate).reversed());
   }
 
-  public Page<RelatedDocumentationUnit> searchByLinkedDocumentationUnit(
+  public Slice<RelatedDocumentationUnit> searchByLinkedDocumentationUnit(
       RelatedDocumentationUnit relatedDocumentationUnit,
       DocumentationOffice documentationOffice,
       Pageable pageable) {

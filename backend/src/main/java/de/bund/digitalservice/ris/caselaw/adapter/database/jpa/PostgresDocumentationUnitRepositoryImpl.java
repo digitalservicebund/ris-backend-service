@@ -25,9 +25,8 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Primary;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Mono;
@@ -411,7 +410,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
 
   @Override
   @Transactional(transactionManager = "jpaTransactionManager")
-  public Page<RelatedDocumentationUnit> searchByRelatedDocumentationUnit(
+  public Slice<RelatedDocumentationUnit> searchByRelatedDocumentationUnit(
       RelatedDocumentationUnit relatedDocumentationUnit,
       DocumentationOffice documentationOffice,
       Pageable pageable) {
@@ -423,7 +422,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
     DocumentationOfficeDTO documentationOfficeDTO =
         documentationOfficeRepository.findByAbbreviation(documentationOffice.abbreviation());
 
-    Page<DocumentationUnitSearchResultDTO> documentationUnitSearchResultDTOPage =
+    Slice<DocumentationUnitSearchResultDTO> documentationUnitSearchResultDTOPage =
         repository.searchByDocumentUnitSearchInput(
             documentationOfficeDTO.getId(),
             relatedDocumentationUnit.getFileNumber(),
@@ -442,7 +441,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
   }
 
   @Transactional(transactionManager = "jpaTransactionManager")
-  public Page<DocumentationUnitSearchResult> searchByDocumentationUnitSearchInput(
+  public Slice<DocumentationUnitSearchResult> searchByDocumentationUnitSearchInput(
       Pageable pageable,
       DocumentationOffice documentationOffice,
       DocumentationUnitSearchInput searchInput) {
@@ -453,20 +452,10 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
     DocumentationOfficeDTO documentationOfficeDTO =
         documentationOfficeRepository.findByAbbreviation(documentationOffice.abbreviation());
 
-    //    String publicationStatus =
-    //        Optional.ofNullable(searchInput.status())
-    //            .flatMap(
-    //                status ->
-    //                    Optional.ofNullable(status.publicationStatus())
-    //                        .map(
-    //                            notNullPublicationStatus ->
-    //                                String.valueOf(notNullPublicationStatus.ordinal())))
-    //            .orElse(null);
-
     Boolean withError =
         Optional.ofNullable(searchInput.status()).map(Status::withError).orElse(false);
 
-    Page<DocumentationUnitSearchResultDTO> documentationUnitSearchResultDTOPage =
+    Slice<DocumentationUnitSearchResultDTO> documentationUnitSearchResultDTOPage =
         repository.searchByDocumentUnitSearchInput(
             documentationOfficeDTO.getId(),
             searchInput.documentNumberOrFileNumber(),
@@ -480,12 +469,8 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
             null,
             pageable);
 
-    List<DocumentationUnitSearchResult> list =
-        documentationUnitSearchResultDTOPage.stream()
-            .map(DocumentationUnitSearchResultTransformer::transformToDomain)
-            .toList();
-
-    return new PageImpl<>(list, pageable, documentationUnitSearchResultDTOPage.getTotalElements());
+    return documentationUnitSearchResultDTOPage.map(
+        DocumentationUnitSearchResultTransformer::transformToDomain);
   }
 
   @Override

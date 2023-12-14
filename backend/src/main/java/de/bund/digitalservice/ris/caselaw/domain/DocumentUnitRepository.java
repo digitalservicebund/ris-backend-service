@@ -2,8 +2,8 @@ package de.bund.digitalservice.ris.caselaw.domain;
 
 import java.util.Map;
 import java.util.UUID;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.data.repository.NoRepositoryBean;
 import reactor.core.publisher.Mono;
 
@@ -32,12 +32,12 @@ public interface DocumentUnitRepository {
 
   void delete(DocumentUnit documentUnit);
 
-  Page<RelatedDocumentationUnit> searchByRelatedDocumentationUnit(
+  Slice<RelatedDocumentationUnit> searchByRelatedDocumentationUnit(
       RelatedDocumentationUnit relatedDocumentationUnit,
       DocumentationOffice documentationOffice,
       Pageable pageable);
 
-  Page<DocumentationUnitSearchResult> searchByDocumentationUnitSearchInput(
+  Slice<DocumentationUnitSearchResult> searchByDocumentationUnitSearchInput(
       Pageable pageable,
       DocumentationOffice documentationOffice,
       DocumentationUnitSearchInput searchInput);

@@ -61,9 +61,6 @@ export type PageableService<TResult, TQuery = TResult> = (
           <IconArrowBack />
           <span class="underline">zurück</span>
         </PaginationButton>
-        <span v-if="page">
-          {{ page.totalPages ? page.number + 1 : 0 }} von {{ page.totalPages }}
-        </span>
         <PaginationButton
           aria-label="nächste Ergebnisse"
           :disabled="page?.last"
@@ -74,11 +71,6 @@ export type PageableService<TResult, TQuery = TResult> = (
           <IconArrowForward />
         </PaginationButton>
       </div>
-    </div>
-    <div class="ds-label-02-reg mt-2 text-center text-gray-900">
-      {{ page?.totalElements }}
-      {{ page?.totalElements === 1 ? "Ergebnis" : "Ergebnisse" }}
-      gefunden.
     </div>
   </div>
   <slot v-if="props.navigationPosition == 'top'"></slot>

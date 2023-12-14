@@ -15,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
@@ -30,7 +31,7 @@ public class FieldOfLawService {
     this.repository = repository;
   }
 
-  public Mono<Page<FieldOfLaw>> getFieldsOfLawBySearchQuery(
+  public Mono<Slice<FieldOfLaw>> getFieldsOfLawBySearchQuery(
       Optional<String> optionalSearchStr, Pageable pageable) {
 
     if (optionalSearchStr.isEmpty() || optionalSearchStr.get().isBlank()) {
@@ -44,7 +45,7 @@ public class FieldOfLawService {
     return Arrays.stream(searchStr.split("\\s+")).map(String::trim).toArray(String[]::new);
   }
 
-  Page<FieldOfLaw> searchAndOrderByScore(String searchStr, Pageable pageable) {
+  Slice<FieldOfLaw> searchAndOrderByScore(String searchStr, Pageable pageable) {
     Matcher matcher = NORMS_PATTERN.matcher(searchStr);
     String[] searchTerms;
     String normStr;

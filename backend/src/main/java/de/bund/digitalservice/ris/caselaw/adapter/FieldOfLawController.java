@@ -5,8 +5,8 @@ import de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw.FieldOfL
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import java.util.Optional;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Slice;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -27,7 +27,7 @@ public class FieldOfLawController {
 
   @GetMapping
   @PreAuthorize("isAuthenticated()")
-  public Mono<Page<FieldOfLaw>> getFieldsOfLawBySearchQuery(
+  public Mono<Slice<FieldOfLaw>> getFieldsOfLawBySearchQuery(
       @RequestParam("q") Optional<String> searchStr,
       @RequestParam("pg") int page,
       @RequestParam("sz") int size) {

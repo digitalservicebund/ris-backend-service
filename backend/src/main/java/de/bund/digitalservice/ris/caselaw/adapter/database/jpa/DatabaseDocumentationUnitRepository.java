@@ -4,8 +4,8 @@ import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import java.time.LocalDate;
 import java.util.Optional;
 import java.util.UUID;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -57,7 +57,7 @@ public interface DatabaseDocumentationUnitRepository
 """)
   @SuppressWarnings("java:S107")
   // We use JPA repository interface magic, so reducing parameter count is not possible.
-  Page<DocumentationUnitSearchResultDTO> searchByDocumentUnitSearchInput(
+  Slice<DocumentationUnitSearchResultDTO> searchByDocumentUnitSearchInput(
       UUID documentationOfficeId,
       String documentNumberOrFileNumber,
       String courtType,
