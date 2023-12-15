@@ -256,7 +256,7 @@ watch(
         @click="addActiveCitation"
       />
     </div>
-    <div v-if="searchResultsCurrentPage" class="mb-10 mt-20">
+    <div v-if="!searchRunning && searchResultsCurrentPage" class="mb-10 mt-20">
       <Pagination
         navigation-position="bottom"
         :page="searchResultsCurrentPage"
@@ -268,10 +268,7 @@ watch(
         />
       </Pagination>
     </div>
-    <div
-      v-if="searchRunning && !searchResultsCurrentPage"
-      class="mb-10 ml-40 mt-20"
-    >
+    <div v-if="searchRunning" class="mb-10 ml-40 mt-20">
       ... Suche läuft ...
     </div>
   </div>

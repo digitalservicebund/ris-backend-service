@@ -29,12 +29,11 @@ async function previousPage() {
 export type Page<T> = {
   content: T[]
   size: number
-  totalElements: number
-  totalPages: number
   number: number
   numberOfElements: number
   first: boolean
   last: boolean
+  empty: boolean
 }
 
 export type PageableService<TResult, TQuery = TResult> = (
@@ -61,6 +60,10 @@ export type PageableService<TResult, TQuery = TResult> = (
           <IconArrowBack />
           <span class="underline">zurück</span>
         </PaginationButton>
+        <span v-if="!page?.empty">
+          {{ page.numberOfElements }} Ergebniss(e) auf Seite
+          {{ page.number + 1 }}
+        </span>
         <PaginationButton
           aria-label="nächste Ergebnisse"
           :disabled="page?.last"

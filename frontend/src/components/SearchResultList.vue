@@ -21,7 +21,7 @@ export type SearchResults<Type extends RelatedDocumentation> = {
 <template>
   <div>
     <span v-if="!searchResults?.length" class="ds-label-01-bold"
-      >Suche hat keine Treffer ergeben</span
+      >Die Suche hat keine Treffer ergeben</span
     >
     <div class="mt-16 table">
       <div
