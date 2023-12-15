@@ -231,6 +231,7 @@ onMounted(() => {
 
     <div>
       <TextButton
+        v-if="!ensuingDecision.hasForeignSource"
         aria-label="Nach Entscheidung suchen"
         button-type="secondary"
         class="mr-28"
