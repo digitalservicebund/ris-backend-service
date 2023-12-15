@@ -146,7 +146,7 @@ const contentRelatedIndexing = computed({
 })
 
 const { hash: routeHash } = toRefs(route)
-useScrollToHash(routeHash)
+useScrollToHash(routeHash, 145)
 
 async function getOriginalDocumentUnit() {
   if (fileAsHTML.value.length > 0) return

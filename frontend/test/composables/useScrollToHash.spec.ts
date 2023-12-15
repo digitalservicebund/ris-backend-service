@@ -11,19 +11,26 @@ describe("useScrollToHash", async () => {
   })
 
   it("scrolls element into view if element with hash exists", async () => {
-    const hashElement = { scrollIntoView: vi.fn() }
+    const hashElement = { getBoundingClientRect: vi.fn(() => ({ top: 100 })) }
     // @ts-expect-error It's not a proper HTML element but good enough for testing
     vi.spyOn(document, "getElementById").mockReturnValue(hashElement)
+
+    const scrollToSpy = vi.fn()
+    Object.defineProperty(global.window, "scrollTo", { value: scrollToSpy })
 
     useScrollToHash(ref("test-hash"))
     vi.runAllTimers()
 
     expect(document.getElementById).toHaveBeenCalledWith("test-hash")
-    expect(hashElement.scrollIntoView).toHaveBeenCalledOnce()
+
+    expect(scrollToSpy).toHaveBeenCalledWith({
+      top: 100,
+      behavior: "smooth",
+    })
   })
 
   it("removes the # from the route hash", async () => {
-    const hashElement = { scrollIntoView: vi.fn() }
+    const hashElement = { getBoundingClientRect: vi.fn(() => ({ top: 100 })) }
     // @ts-expect-error It's not a proper HTML element but good enough for testing
     vi.spyOn(document, "getElementById").mockReturnValue(hashElement)
 
@@ -31,18 +38,20 @@ describe("useScrollToHash", async () => {
     vi.runAllTimers()
 
     expect(document.getElementById).toHaveBeenCalledWith("test-hash")
-    expect(hashElement.scrollIntoView).toHaveBeenCalledOnce()
   })
 
   it("does not scroll if no element exists for this hash", async () => {
-    const hashElement = { scrollIntoView: vi.fn() }
+    const hashElement = { getBoundingClientRect: vi.fn() }
     vi.spyOn(document, "getElementById").mockReturnValue(null)
+
+    const scrollToSpy = vi.fn()
+    Object.defineProperty(global.window, "scrollTo", { value: scrollToSpy })
 
     useScrollToHash(ref("unknown-hash"))
     vi.runAllTimers()
 
     expect(document.getElementById).toHaveBeenCalledWith("unknown-hash")
-    expect(hashElement.scrollIntoView).not.toHaveBeenCalledOnce()
+    expect(hashElement.getBoundingClientRect).not.toHaveBeenCalledOnce()
   })
 
   it("does nothing if given route has no hash", async () => {
@@ -55,22 +64,43 @@ describe("useScrollToHash", async () => {
   })
 
   it("detects new hash on route changes", async () => {
-    const hashElement = { scrollIntoView: vi.fn() }
+    const hashElement = { getBoundingClientRect: vi.fn(() => ({ top: 100 })) }
     // @ts-expect-error It's not a proper HTML element but good enough for testing
     vi.spyOn(document, "getElementById").mockReturnValue(hashElement)
     const route = ref<string | undefined>(undefined)
+    const scrollToSpy = vi.fn()
+    Object.defineProperty(global.window, "scrollTo", { value: scrollToSpy })
 
     useScrollToHash(route)
     vi.runAllTimers()
 
     expect(document.getElementById).not.toHaveBeenCalled()
-    expect(hashElement.scrollIntoView).not.toHaveBeenCalled()
+    expect(scrollToSpy).not.toHaveBeenCalled()
 
-    route.value = "yolo"
+    route.value = "new"
     await nextTick()
     vi.runAllTimers()
 
     expect(document.getElementById).toHaveBeenCalled()
-    expect(hashElement.scrollIntoView).toHaveBeenCalled()
+    expect(scrollToSpy).toHaveBeenCalled()
+  })
+
+  it("scrolls with offset", async () => {
+    const hashElement = { getBoundingClientRect: vi.fn(() => ({ top: 100 })) }
+    // @ts-expect-error It's not a proper HTML element but good enough for testing
+    vi.spyOn(document, "getElementById").mockReturnValue(hashElement)
+
+    const scrollToSpy = vi.fn()
+    Object.defineProperty(global.window, "scrollTo", { value: scrollToSpy })
+
+    useScrollToHash(ref("test-hash"), 50)
+    vi.runAllTimers()
+
+    expect(document.getElementById).toHaveBeenCalledWith("test-hash")
+
+    expect(scrollToSpy).toHaveBeenCalledWith({
+      top: 50,
+      behavior: "smooth",
+    })
   })
 })
