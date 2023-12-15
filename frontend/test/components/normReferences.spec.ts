@@ -65,15 +65,21 @@ describe("Norm references", () => {
     Promise.resolve({ status: 200, data: dropdownAbbreviationItems }),
   )
 
-  it("renders empty norm reference in edit mode, when no norm references in list", () => {
+  it("renders empty norm reference in edit mode, when no norm references in list", async () => {
     renderComponent()
-    expect(screen.getAllByLabelText("Listen Eintrag").length).toBe(1)
-    expect(screen.getByLabelText("RIS-Abkürzung der Norm")).toBeInTheDocument()
-    expect(screen.getByLabelText("Einzelnorm der Norm")).toBeInTheDocument()
-    expect(screen.getByLabelText("Fassungsdatum der Norm")).toBeInTheDocument()
-    expect(screen.getByLabelText("Jahr der Norm")).toBeInTheDocument()
-    expect(screen.getByLabelText("Jahr der Norm")).toBeInTheDocument()
-    expect(screen.getByLabelText("Norm speichern")).toBeDisabled()
+    expect((await screen.findAllByLabelText("Listen Eintrag")).length).toBe(1)
+    expect(
+      await screen.findByLabelText("RIS-Abkürzung der Norm"),
+    ).toBeInTheDocument()
+    expect(
+      await screen.findByLabelText("Einzelnorm der Norm"),
+    ).toBeInTheDocument()
+    expect(
+      await screen.findByLabelText("Fassungsdatum der Norm"),
+    ).toBeInTheDocument()
+    expect(await screen.findByLabelText("Jahr der Norm")).toBeInTheDocument()
+    expect(await screen.findByLabelText("Jahr der Norm")).toBeInTheDocument()
+    expect(await screen.findByLabelText("Norm speichern")).toBeDisabled()
     expect(
       screen.queryByText(/Pflichtfeld nicht befüllt/),
     ).not.toBeInTheDocument()

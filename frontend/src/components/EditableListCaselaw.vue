@@ -1,6 +1,6 @@
 <script lang="ts" setup generic="T extends ListItem">
 import type { Component, Ref } from "vue"
-import { ref, watch, onMounted, nextTick } from "vue"
+import { ref, watch, nextTick, onMounted } from "vue"
 import ListItem from "@/domain/editableListItem"
 import DataSetSummary from "@/shared/components/DataSetSummary.vue"
 import IconAdd from "~icons/ic/baseline-add"
@@ -30,10 +30,10 @@ const emit = defineEmits<{
   deleteLastEntry: [void]
 }>()
 
-const modelValueList = ref<T[]>([]) as Ref<T[]>
-const localList = ref([...props.modelValue]) as Ref<T[]>
+const modelValueList = ref<T[]>([...props.modelValue]) as Ref<T[]>
 const elementList = ref<HTMLElement[]>([])
-const editIndex = ref<number | undefined>(undefined)
+
+const editIndex = ref<number | undefined>()
 
 const focusFirstFocusableElementOfCurrentEditElement = async () => {
   await nextTick()
@@ -57,73 +57,50 @@ function setEditIndex(index?: number) {
 
 function addNewListEntry() {
   const { defaultValue } = props
-  const newEntry =
-    typeof defaultValue === "object" ? { ...defaultValue } : defaultValue
-  localList.value.push(newEntry)
-  editIndex.value = localList.value.length - 1
+  modelValueList.value.push(
+    typeof defaultValue === "object" ? { ...defaultValue } : defaultValue,
+  )
+
+  editIndex.value = modelValueList.value.length - 1
 }
 
 function removeListEntry(index: number) {
-  localList.value.splice(index, 1)
-  modelValueList.value = localList.value
+  modelValueList.value.splice(index, 1)
 
   if (editIndex.value !== undefined && index < editIndex.value) {
     editIndex.value -= 1
   }
+
+  emit(
+    "update:modelValue",
+    [...props.modelValue].filter((_, i) => i !== index),
+  )
 }
 
 function updateModel() {
   setEditIndex()
-  modelValueList.value = localList.value
+  emit("update:modelValue", modelValueList.value)
 }
 
 watch(
   () => props.modelValue,
   () => {
-    modelValueList.value = props.modelValue
-    localList.value = props.modelValue.map((value, index) =>
-      index != editIndex.value ? value : localList.value[index],
+    modelValueList.value = modelValueList.value.map((value, index) =>
+      index == editIndex.value ? value : props.modelValue[index],
     )
   },
   { immediate: true, deep: true },
 )
 
-watch(
-  modelValueList,
-  () => {
-    emit("update:modelValue", modelValueList.value)
-  },
-  { deep: true, immediate: true },
-)
-
-watch(
-  localList,
-  () => {
-    setEmptyEntryInEditMode()
-    if (localList.value.length == 0) {
-      addNewListEntry()
-    }
-  },
-  { deep: true, immediate: true },
-)
-
-function setEmptyEntryInEditMode(): void {
-  const emptyItemIndex = localList.value.findIndex((element) => element.isEmpty)
-  if (emptyItemIndex !== -1) setEditIndex(emptyItemIndex)
-}
-
 onMounted(() => {
-  localList.value = [...props.modelValue]
-  if (localList.value.length == 0) {
-    addNewListEntry()
-  }
+  if (props.modelValue.length == 0) addNewListEntry()
 })
 </script>
 
 <template>
   <div class="w-full">
     <div
-      v-for="(entry, index) in localList"
+      v-for="(entry, index) in modelValueList"
       :key="index"
       ref="elementList"
       aria-label="Listen Eintrag"
@@ -170,9 +147,9 @@ onMounted(() => {
       <component
         :is="editComponent"
         v-else
-        v-model="localList[index]"
+        v-model="modelValueList[index]"
         class="py-16 group-first:pt-0"
-        :model-value-list="localList"
+        :model-value-list="modelValueList"
         @add-entry="updateModel"
       />
     </div>

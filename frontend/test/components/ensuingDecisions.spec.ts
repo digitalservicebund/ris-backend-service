@@ -136,22 +136,24 @@ describe("EnsuingDecisions", () => {
 
   it("renders empty ensuing decision in edit mode, when no ensuingDecisions in list", async () => {
     renderComponent()
-    expect(screen.getByLabelText("Anhängige Entscheidung")).toBeVisible()
+    expect(await screen.findByLabelText("Anhängige Entscheidung")).toBeVisible()
     expect(
-      screen.getByLabelText("Gericht Nachgehende Entscheidung"),
+      await screen.findByLabelText("Gericht Nachgehende Entscheidung"),
     ).toBeVisible()
     expect(
-      screen.getByLabelText("Entscheidungsdatum Nachgehende Entscheidung"),
+      await screen.findByLabelText(
+        "Entscheidungsdatum Nachgehende Entscheidung",
+      ),
     ).toBeVisible()
     expect(
-      screen.getByLabelText("Aktenzeichen Nachgehende Entscheidung"),
+      await screen.findByLabelText("Aktenzeichen Nachgehende Entscheidung"),
     ).toBeInTheDocument()
     expect(
-      screen.getByLabelText("Dokumenttyp Nachgehende Entscheidung"),
+      await screen.findByLabelText("Dokumenttyp Nachgehende Entscheidung"),
     ).toBeInTheDocument()
-    expect(screen.getByLabelText("Vermerk")).toBeInTheDocument()
+    expect(await screen.findByLabelText("Vermerk")).toBeInTheDocument()
     expect(
-      screen.getByLabelText("Nachgehende Entscheidung speichern"),
+      await screen.findByLabelText("Nachgehende Entscheidung speichern"),
     ).toBeDisabled()
   })
 
@@ -169,11 +171,15 @@ describe("EnsuingDecisions", () => {
     expect(screen.getByText(/345/)).toBeInTheDocument()
   })
 
-  it("creates new ensuing desision manually", async () => {
+  it("creates new ensuing decision manually", async () => {
     const { user } = renderComponent()
-    const input = screen.getByLabelText("Aktenzeichen Nachgehende Entscheidung")
+    const input = await screen.findByLabelText(
+      "Aktenzeichen Nachgehende Entscheidung",
+    )
     await user.type(input, "123")
-    const button = screen.getByLabelText("Nachgehende Entscheidung speichern")
+    const button = await screen.findByLabelText(
+      "Nachgehende Entscheidung speichern",
+    )
     await user.click(button)
 
     expect(screen.getAllByLabelText("Listen Eintrag").length).toBe(1)
@@ -342,7 +348,7 @@ describe("EnsuingDecisions", () => {
     const { user } = renderComponent()
 
     expect(screen.queryByText(/test fileNumber/)).not.toBeInTheDocument()
-    await user.click(screen.getByLabelText("Nach Entscheidung suchen"))
+    await user.click(await screen.findByLabelText("Nach Entscheidung suchen"))
 
     expect(screen.getAllByText(/test fileNumber/).length).toBe(1)
   })
@@ -350,8 +356,8 @@ describe("EnsuingDecisions", () => {
   it("adds ensuing decision from search results", async () => {
     const { user } = renderComponent()
 
-    await user.click(screen.getByLabelText("Nach Entscheidung suchen"))
-    await user.click(screen.getByLabelText("Treffer übernehmen"))
+    await user.click(await screen.findByLabelText("Nach Entscheidung suchen"))
+    await user.click(await screen.findByLabelText("Treffer übernehmen"))
     expect(screen.getAllByText(/test fileNumber/).length).toBe(1)
   })
 

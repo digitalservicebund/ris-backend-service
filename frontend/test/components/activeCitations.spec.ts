@@ -157,7 +157,7 @@ describe("Active Citations", () => {
 
   it("renders empty active citation in edit mode, when no activeCitations in list", async () => {
     renderComponent()
-    expect(screen.getAllByLabelText("Listen Eintrag").length).toBe(1)
+    expect((await screen.findAllByLabelText("Listen Eintrag")).length).toBe(1)
     expect(screen.getByLabelText("Art der Zitierung")).toBeVisible()
     expect(screen.getByLabelText("Gericht der Aktivzitierung")).toBeVisible()
     expect(
@@ -186,7 +186,9 @@ describe("Active Citations", () => {
 
   it("creates new active citation manually", async () => {
     const { user } = renderComponent()
-    const input = screen.getByLabelText("Aktenzeichen der Aktivzitierung")
+    const input = await screen.findByLabelText(
+      "Aktenzeichen der Aktivzitierung",
+    )
     await user.type(input, "123")
     const button = screen.getByLabelText("Aktivzitierung speichern")
     await user.click(button)
@@ -428,7 +430,7 @@ describe("Active Citations", () => {
     const { user } = renderComponent()
 
     expect(screen.queryByText(/test fileNumber/)).not.toBeInTheDocument()
-    await user.click(screen.getByLabelText("Nach Entscheidung suchen"))
+    await user.click(await screen.findByLabelText("Nach Entscheidung suchen"))
 
     expect(screen.getAllByText(/test fileNumber/).length).toBe(1)
   })
@@ -436,8 +438,8 @@ describe("Active Citations", () => {
   it("adds active citation from search results", async () => {
     const { user } = renderComponent()
 
-    await user.click(screen.getByLabelText("Nach Entscheidung suchen"))
-    await user.click(screen.getByLabelText("Treffer übernehmen"))
+    await user.click(await screen.findByLabelText("Nach Entscheidung suchen"))
+    await user.click(await screen.findByLabelText("Treffer übernehmen"))
     expect(screen.getAllByText(/test fileNumber/).length).toBe(1)
   })
 

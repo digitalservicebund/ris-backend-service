@@ -135,22 +135,24 @@ describe("PreviousDecisions", () => {
   it("renders empty previous decision in edit mode, when no previousDecisions in list", async () => {
     renderComponent()
     expect(
-      screen.getByLabelText("Gericht Vorgehende Entscheidung"),
+      await screen.findByLabelText("Gericht Vorgehende Entscheidung"),
     ).toBeVisible()
     expect(
-      screen.getByLabelText("Entscheidungsdatum Vorgehende Entscheidung"),
+      await screen.findByLabelText(
+        "Entscheidungsdatum Vorgehende Entscheidung",
+      ),
     ).toBeVisible()
     expect(
-      screen.getByLabelText("Datum Unbekannt Vorgehende Entscheidung"),
+      await screen.findByLabelText("Datum Unbekannt Vorgehende Entscheidung"),
     ).toBeInTheDocument()
     expect(
-      screen.getByLabelText("Aktenzeichen Vorgehende Entscheidung"),
+      await screen.findByLabelText("Aktenzeichen Vorgehende Entscheidung"),
     ).toBeInTheDocument()
     expect(
-      screen.getByLabelText("Dokumenttyp Vorgehende Entscheidung"),
+      await screen.findByLabelText("Dokumenttyp Vorgehende Entscheidung"),
     ).toBeInTheDocument()
     expect(
-      screen.getByLabelText("Vorgehende Entscheidung speichern"),
+      await screen.findByLabelText("Vorgehende Entscheidung speichern"),
     ).toBeDisabled()
   })
 
@@ -170,7 +172,9 @@ describe("PreviousDecisions", () => {
 
   it("creates new proceeding desision manually", async () => {
     const { user } = renderComponent()
-    const input = screen.getByLabelText("Aktenzeichen Vorgehende Entscheidung")
+    const input = await screen.findByLabelText(
+      "Aktenzeichen Vorgehende Entscheidung",
+    )
     await user.type(input, "123")
     const button = screen.getByLabelText("Vorgehende Entscheidung speichern")
     await user.click(button)
@@ -368,7 +372,7 @@ describe("PreviousDecisions", () => {
     const { user } = renderComponent()
 
     expect(screen.queryByText(/test fileNumber/)).not.toBeInTheDocument()
-    await user.click(screen.getByLabelText("Nach Entscheidung suchen"))
+    await user.click(await screen.findByLabelText("Nach Entscheidung suchen"))
 
     expect(screen.getAllByText(/test fileNumber/).length).toBe(1)
   })
@@ -376,9 +380,9 @@ describe("PreviousDecisions", () => {
   it("adds previous decision from search results", async () => {
     const { user } = renderComponent()
 
-    await user.click(screen.getByLabelText("Nach Entscheidung suchen"))
-    await user.click(screen.getByLabelText("Treffer übernehmen"))
-    expect(screen.getAllByText(/test fileNumber/).length).toBe(1)
+    await user.click(await screen.findByLabelText("Nach Entscheidung suchen"))
+    await user.click(await screen.findByLabelText("Treffer übernehmen"))
+    expect((await screen.findAllByText(/test fileNumber/)).length).toBe(1)
   })
 
   it("indicates that search result already added to previous decisions", async () => {
