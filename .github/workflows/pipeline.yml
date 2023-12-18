@@ -41,7 +41,7 @@ jobs:
           arguments: build --profile -x integrationTest -x test
           build-root-directory: ./backend
       - name: Upload build performance report
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: performance-report
           path: backend/build/reports/profile/profile*.html
@@ -159,7 +159,7 @@ jobs:
           format: "cosign-vuln"
           output: "vuln-backend.json"
       - name: Upload cosign vulnerability scan record
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: "vuln-backend.json"
           path: "vuln-backend.json"
@@ -265,7 +265,7 @@ jobs:
         working-directory: ./backend
         run: ./gradlew checkLicense
       - name: Upload licence report
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: licence-reports
           retention-days: 3
@@ -295,7 +295,7 @@ jobs:
         run: npm run audit:licences
         working-directory: ./frontend
       - name: Upload licence report
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: licence-reports
           retention-days: 3
@@ -374,7 +374,7 @@ jobs:
           format: "cosign-vuln"
           output: "vuln-frontend.json"
       - name: Upload cosign vulnerability scan record
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: "vuln-frontend.json"
           path: "vuln-frontend.json"
@@ -866,7 +866,7 @@ jobs:
           flags: --debug
           version: 0.9.0
       - name: Upload mermaid ER-diagram
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: erdiagram
           retention-days: 3
@@ -892,7 +892,7 @@ jobs:
         working-directory: ./backend
         run: ./gradlew dokkaHtml
       - name: Upload documentation
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: backend-code-documentation
           retention-days: 3

@@ -81,7 +81,7 @@ jobs:
           npm run test:"$test_target" -- --project ${{ inputs.browser }} --repeat-each ${{ inputs.runs}}
         working-directory: ./frontend
       - name: Upload screenshots and traces of failed tests
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: ${{ failure() }}
         with:
           name: failed-${{ inputs.mode }}-tests-${{ inputs.browser }}
