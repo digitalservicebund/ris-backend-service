@@ -3,7 +3,7 @@ import { navigateToCategories, waitForSaving } from "../../e2e-utils"
 import { caselawTest as test } from "../../fixtures"
 
 test.describe("core data", () => {
-  test("test core data change", async ({ page, documentNumber }) => {
+  test("core data change", async ({ page, documentNumber }) => {
     await navigateToCategories(page, documentNumber)
 
     await waitForSaving(
@@ -167,7 +167,7 @@ test.describe("core data", () => {
     await expect(page.locator("text=testthree").first()).toBeVisible()
   })
 
-  test("test legal effect dropdown", async ({ page, documentNumber }) => {
+  test("legal effect dropdown", async ({ page, documentNumber }) => {
     await navigateToCategories(page, documentNumber)
     const dropdown = page.getByRole("combobox", { name: "Rechtskraft" })
     await expect(dropdown).toHaveValue("Keine Angabe")
@@ -179,7 +179,7 @@ test.describe("core data", () => {
     ).toHaveCount(1)
   })
 
-  test("test document type dropdown", async ({ page, documentNumber }) => {
+  test("document type dropdown", async ({ page, documentNumber }) => {
     await navigateToCategories(page, documentNumber)
     const totalCaselawDocumentTypes = 43
 

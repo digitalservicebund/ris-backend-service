@@ -109,7 +109,7 @@ test.describe("court", () => {
     await expect(page.locator("text=IncorrectCourt2")).toBeVisible()
   })
 
-  test("test court dropdown", async ({ page, documentNumber }) => {
+  test("court dropdown", async ({ page, documentNumber }) => {
     await navigateToCategories(page, documentNumber)
     const minTotalCourts = 4052
 
@@ -160,7 +160,7 @@ test.describe("court", () => {
     await waitForInputValue(page, "[aria-label='Gericht']", "")
   })
 
-  test("test correct esc/tab behaviour in court dropdown", async ({
+  test("correct esc/tab behaviour in court dropdown", async ({
     page,
     documentNumber,
   }) => {
@@ -191,7 +191,7 @@ test.describe("court", () => {
     await expect(page.locator("[aria-label='Gericht']")).toHaveValue("BVerfG")
   })
 
-  test("test that setting a court sets the region automatically", async ({
+  test("that setting a court sets the region automatically", async ({
     page,
     documentNumber,
   }) => {
@@ -234,7 +234,7 @@ test.describe("court", () => {
     await waitForInputValue(page, "[aria-label='Region']", "")
   })
 
-  test("test that setting a special court sets legal effect to yes, but it can be changed afterwards", async ({
+  test("that setting a special court sets legal effect to yes, but it can be changed afterwards", async ({
     page,
     documentNumber,
   }) => {
@@ -251,7 +251,7 @@ test.describe("court", () => {
     await expect(page.getByLabel("Rechtskraft")).toHaveValue("Nein")
   })
 
-  test("test that setting a non-special court leaves legal effect unchanged", async ({
+  test("that setting a non-special court leaves legal effect unchanged", async ({
     page,
     documentNumber,
   }) => {

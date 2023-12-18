@@ -9,10 +9,7 @@ import { caselawTest as test } from "../fixtures"
 import { generateString } from "~/test-helper/dataGenerators"
 
 test.describe("saving behaviour", () => {
-  test("test could not update documentUnit", async ({
-    page,
-    documentNumber,
-  }) => {
+  test("could not update documentUnit", async ({ page, documentNumber }) => {
     await navigateToCategories(page, documentNumber)
 
     await page.route("**/*", async (route) => {
@@ -25,7 +22,7 @@ test.describe("saving behaviour", () => {
     await expect(page.locator("text='Fehler beim Speichern'")).toBeVisible()
   })
 
-  test("test input during save not lost", async ({ page, documentNumber }) => {
+  test("input during save not lost", async ({ page, documentNumber }) => {
     await navigateToCategories(page, documentNumber)
 
     await page.locator("[aria-label='Spruchkörper']").fill("VG-001")
@@ -47,7 +44,7 @@ test.describe("saving behaviour", () => {
     )
   })
 
-  test("test input not lost on page unload (autosave not triggered yet)", async ({
+  test("input not lost on page unload (autosave not triggered yet)", async ({
     page,
     documentNumber,
   }) => {
@@ -69,7 +66,7 @@ test.describe("saving behaviour", () => {
     )
   })
 
-  test("test removing last chip element not possible", async ({
+  test("removing last chip element not possible", async ({
     page,
     documentNumber,
   }) => {
