@@ -46,6 +46,26 @@ export default defineConfig({
     ],
     coverage: {
       reporter: ["lcov"],
+      exclude: [
+        // Configuration and generated outputs
+        "**/[.]**",
+        "coverage/**/*",
+        "dist/**/*",
+        "**/.*rc.{?(c|m)js,yml}",
+        "*.config.{js,ts}",
+
+        // Types
+        "**/*.d.ts",
+
+        // Tests
+        "test/**/*",
+
+        // App content we're not interested in covering with unit tests
+        "src/routes/**/*",
+        "src/kitchensink/**/*",
+        "src/App.vue",
+        "src/main.ts",
+      ],
     },
   },
   define: {
