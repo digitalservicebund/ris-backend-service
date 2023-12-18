@@ -92,7 +92,7 @@
     "eslint": "^8.55.0",
     "eslint-plugin-import": "^2.29.0",
     "eslint-plugin-jest-dom": "^5.1.0",
-    "eslint-plugin-playwright": "^0.18.0",
+    "eslint-plugin-playwright": "^0.20.0",
     "eslint-plugin-prettier": "^5.0.0",
     "eslint-plugin-testing-library": "^6.2.0",
     "eslint-plugin-vue": "^9.19.2",
