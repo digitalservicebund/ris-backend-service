@@ -10,7 +10,7 @@ describe("useNormMenuItems", () => {
     const menuItems = useNormMenuItems(guid, route)
 
     for (const menuItem of menuItems.value) {
-      expect(menuItem.route.params).toContain({ normGuid: "fake-guid" })
+      expect(menuItem.route.params).toMatchObject({ normGuid: "fake-guid" })
     }
   })
 
