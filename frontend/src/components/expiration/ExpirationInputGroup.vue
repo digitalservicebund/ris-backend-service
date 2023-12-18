@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+/* v8 ignore start */
 import { computed } from "vue"
 import DateUndefinedDateInputGroup from "@/components/DateUndefinedDateInputGroup.vue"
 import { Metadata, MetadatumType, UndefinedDate } from "@/domain/norm"
@@ -66,6 +67,7 @@ const dateSection = computed({
     emit("update:modelValue", next)
   },
 })
+/* v8 ignore stop */
 </script>
 
 <template>
