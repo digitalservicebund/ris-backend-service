@@ -89,7 +89,7 @@
     "autoprefixer": "^10.4.15",
     "axe-playwright": "^1.2.3",
     "axios-mock-adapter": "^1.22.0",
-    "eslint": "^8.55.0",
+    "eslint": "^8.56.0",
     "eslint-plugin-import": "^2.29.0",
     "eslint-plugin-jest-dom": "^5.1.0",
     "eslint-plugin-playwright": "^0.20.0",
