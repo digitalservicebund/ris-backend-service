@@ -19,7 +19,6 @@ mail:
         password: pa55word
 #logging:
 #  level:
-#    org.springframework: DEBUG
-#    org.hibernate.SQL: DEBUG
-#    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+#    sql: debug
+#    org.hibernate.orm.jdbc.bind: trace
 

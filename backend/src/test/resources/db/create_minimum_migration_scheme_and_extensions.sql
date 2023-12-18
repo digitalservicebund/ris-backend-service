@@ -601,3 +601,12 @@ CREATE INDEX
 
 CREATE INDEX
   status_documentation_unit_id_idx ON incremental_migration.status USING btree (documentation_unit_id);
+
+CREATE INDEX
+  file_number_value_upper_trgm_idx ON incremental_migration.file_number USING gin (UPPER(value::text) gin_trgm_ops);
+
+CREATE INDEX
+  deviating_file_number_value_upper_trgm_idx ON incremental_migration.deviating_file_number USING gin (UPPER(value::text) gin_trgm_ops);
+
+CREATE INDEX
+  documentation_unit_document_number_upper_trgm_idx ON incremental_migration.documentation_unit USING gin (UPPER(document_number::text) gin_trgm_ops);

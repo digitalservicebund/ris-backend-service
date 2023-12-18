@@ -22,21 +22,84 @@ public interface DatabaseDocumentationUnitRepository
           """
     SELECT documentationUnit FROM DocumentationUnitDTO documentationUnit
     LEFT JOIN documentationUnit.court court
-    WHERE (
-       (:documentNumberOrFileNumber IS NULL
-         OR (upper(documentationUnit.documentNumber) like upper(concat('%', :documentNumberOrFileNumber,'%'))
-            OR EXISTS (
-               SELECT 1
-               FROM FileNumberDTO fileNumber
-               WHERE fileNumber.documentationUnit.id = documentationUnit.id
-               AND upper(fileNumber.value) like upper(:documentNumberOrFileNumber)
-            )
-            OR EXISTS (
-               SELECT 1
-               FROM DeviatingFileNumberDTO deviatingFileNumber
-               WHERE deviatingFileNumber.documentationUnit.id = documentationUnit.id
-               AND deviatingFileNumber.value = :documentNumberOrFileNumber
-            )))
+    WHERE (:courtType IS NULL OR upper(court.type) like upper(cast(:courtType as text)))
+       AND (:courtLocation IS NULL OR upper(court.location) like upper(cast(:courtLocation as text)))
+       AND (cast(:decisionDate as date) IS NULL
+           OR (cast(:decisionDateEnd as date) IS NULL AND documentationUnit.decisionDate = :decisionDate)
+           OR (cast(:decisionDateEnd as date) IS NOT NULL AND documentationUnit.decisionDate BETWEEN :decisionDate AND :decisionDateEnd))
+       AND (:myDocOfficeOnly = FALSE OR (:myDocOfficeOnly = TRUE AND
+    documentationUnit.documentationOffice.id = :documentationOfficeId))
+       AND (cast(:documentType as uuid) IS NULL OR documentationUnit.documentType = :documentType)
+       AND
+         (
+            (:status IS NULL AND ((documentationUnit.documentationOffice.id = :documentationOfficeId OR EXISTS (SELECT 1 FROM StatusDTO status WHERE status.documentationUnitDTO.id = documentationUnit.id AND status.publicationStatus IN (de.bund.digitalservice.ris.caselaw.domain.PublicationStatus.PUBLISHED, de.bund.digitalservice.ris.caselaw.domain.PublicationStatus.PUBLISHING)))))
+         OR
+            (:status IS NOT NULL AND EXISTS (SELECT 1 FROM StatusDTO status WHERE status.documentationUnitDTO.id = documentationUnit.id AND status.publicationStatus = :status AND (:status IN ('PUBLISHED', 'PUBLISHING') OR documentationUnit.documentationOffice.id = :documentationOfficeId)))
+         )
+       AND (:withErrorOnly = FALSE OR documentationUnit.documentationOffice.id = :documentationOfficeId AND EXISTS (SELECT 1 FROM StatusDTO status WHERE status.documentationUnitDTO.id = documentationUnit.id AND status.withError = TRUE))
+
+    ORDER BY documentationUnit.documentNumber
+""")
+  @SuppressWarnings("java:S107")
+  // We use JPA repository interface magic, so reducing parameter count is not possible.
+  Slice<DocumentationUnitSearchResultDTO> searchByDocumentUnitSearchInput(
+      UUID documentationOfficeId,
+      String courtType,
+      String courtLocation,
+      LocalDate decisionDate,
+      LocalDate decisionDateEnd,
+      PublicationStatus status,
+      Boolean withErrorOnly,
+      Boolean myDocOfficeOnly,
+      DocumentTypeDTO documentType,
+      Pageable pageable);
+
+  @Query(
+      value =
+          """
+      SELECT documentationUnit FROM DocumentationUnitDTO documentationUnit
+      LEFT JOIN documentationUnit.court court
+      WHERE (upper(documentationUnit.documentNumber) like upper(concat('%', :documentNumberOrFileNumber,'%'))
+         AND (:courtType IS NULL OR upper(court.type) like upper(cast(:courtType as text)))
+         AND (:courtLocation IS NULL OR upper(court.location) like upper(cast(:courtLocation as text)))
+         AND (cast(:decisionDate as date) IS NULL
+             OR (cast(:decisionDateEnd as date) IS NULL AND documentationUnit.decisionDate = :decisionDate)
+             OR (cast(:decisionDateEnd as date) IS NOT NULL AND documentationUnit.decisionDate BETWEEN :decisionDate AND :decisionDateEnd))
+         AND (:myDocOfficeOnly = FALSE OR (:myDocOfficeOnly = TRUE AND
+      documentationUnit.documentationOffice.id = :documentationOfficeId))
+         AND (cast(:documentType as uuid) IS NULL OR documentationUnit.documentType = :documentType)
+         AND
+           (
+              (:status IS NULL AND ((documentationUnit.documentationOffice.id = :documentationOfficeId OR EXISTS (SELECT 1 FROM StatusDTO status WHERE status.documentationUnitDTO.id = documentationUnit.id AND status.publicationStatus IN (de.bund.digitalservice.ris.caselaw.domain.PublicationStatus.PUBLISHED, de.bund.digitalservice.ris.caselaw.domain.PublicationStatus.PUBLISHING)))))
+           OR
+              (:status IS NOT NULL AND EXISTS (SELECT 1 FROM StatusDTO status WHERE status.documentationUnitDTO.id = documentationUnit.id AND status.publicationStatus = :status AND (:status IN ('PUBLISHED', 'PUBLISHING') OR documentationUnit.documentationOffice.id = :documentationOfficeId)))
+           )
+         AND (:withErrorOnly = FALSE OR documentationUnit.documentationOffice.id = :documentationOfficeId AND EXISTS (SELECT 1 FROM StatusDTO status WHERE status.documentationUnitDTO.id = documentationUnit.id AND status.withError = TRUE))
+      )
+      ORDER BY documentationUnit.documentNumber
+  """)
+  @SuppressWarnings("java:S107")
+  // We use JPA repository interface magic, so reducing parameter count is not possible.
+  Slice<DocumentationUnitSearchResultDTO> searchByDocumentUnitSearchInputDocumentNumber(
+      UUID documentationOfficeId,
+      String documentNumberOrFileNumber,
+      String courtType,
+      String courtLocation,
+      LocalDate decisionDate,
+      LocalDate decisionDateEnd,
+      PublicationStatus status,
+      Boolean withErrorOnly,
+      Boolean myDocOfficeOnly,
+      DocumentTypeDTO documentType,
+      Pageable pageable);
+
+  @Query(
+      value =
+          """
+    SELECT documentationUnit FROM DocumentationUnitDTO documentationUnit
+    LEFT JOIN documentationUnit.court court
+    LEFT JOIN documentationUnit.fileNumbers fileNumber
+    WHERE (upper(fileNumber.value) like upper(concat('%', :documentNumberOrFileNumber,'%')))
        AND (:courtType IS NULL OR upper(court.type) like upper(cast(:courtType as text)))
        AND (:courtLocation IS NULL OR upper(court.location) like upper(cast(:courtLocation as text)))
        AND (cast(:decisionDate as date) IS NULL
@@ -52,12 +115,51 @@ public interface DatabaseDocumentationUnitRepository
             (:status IS NOT NULL AND EXISTS (SELECT 1 FROM StatusDTO status WHERE status.documentationUnitDTO.id = documentationUnit.id AND status.publicationStatus = :status AND (:status IN ('PUBLISHED', 'PUBLISHING') OR documentationUnit.documentationOffice.id = :documentationOfficeId)))
          )
        AND (:withErrorOnly = FALSE OR documentationUnit.documentationOffice.id = :documentationOfficeId AND EXISTS (SELECT 1 FROM StatusDTO status WHERE status.documentationUnitDTO.id = documentationUnit.id AND status.withError = TRUE))
-    )
     ORDER BY documentationUnit.documentNumber
 """)
   @SuppressWarnings("java:S107")
   // We use JPA repository interface magic, so reducing parameter count is not possible.
-  Slice<DocumentationUnitSearchResultDTO> searchByDocumentUnitSearchInput(
+  Slice<DocumentationUnitSearchResultDTO> searchByDocumentUnitSearchInputFileNumber(
+      UUID documentationOfficeId,
+      String documentNumberOrFileNumber,
+      String courtType,
+      String courtLocation,
+      LocalDate decisionDate,
+      LocalDate decisionDateEnd,
+      PublicationStatus status,
+      Boolean withErrorOnly,
+      Boolean myDocOfficeOnly,
+      DocumentTypeDTO documentType,
+      Pageable pageable);
+
+  @Query(
+      value =
+          """
+    SELECT documentationUnit FROM DocumentationUnitDTO documentationUnit
+    LEFT JOIN documentationUnit.court court
+    LEFT JOIN documentationUnit.deviatingFileNumbers fileNumber
+    WHERE upper(fileNumber.value) like upper(concat('%', :documentNumberOrFileNumber,'%'))
+       AND (:courtType IS NULL OR upper(court.type) like upper(cast(:courtType as text)))
+       AND (:courtLocation IS NULL OR upper(court.location) like upper(cast(:courtLocation as text)))
+       AND (cast(:decisionDate as date) IS NULL
+           OR (cast(:decisionDateEnd as date) IS NULL AND documentationUnit.decisionDate = :decisionDate)
+           OR (cast(:decisionDateEnd as date) IS NOT NULL AND documentationUnit.decisionDate BETWEEN :decisionDate AND :decisionDateEnd))
+       AND (:myDocOfficeOnly = FALSE OR (:myDocOfficeOnly = TRUE AND
+    documentationUnit.documentationOffice.id = :documentationOfficeId))
+       AND (cast(:documentType as uuid) IS NULL OR documentationUnit.documentType = :documentType)
+       AND
+         (
+            (:status IS NULL AND ((documentationUnit.documentationOffice.id = :documentationOfficeId OR EXISTS (SELECT 1 FROM StatusDTO status WHERE status.documentationUnitDTO.id = documentationUnit.id AND status.publicationStatus IN (de.bund.digitalservice.ris.caselaw.domain.PublicationStatus.PUBLISHED, de.bund.digitalservice.ris.caselaw.domain.PublicationStatus.PUBLISHING)))))
+         OR
+            (:status IS NOT NULL AND EXISTS (SELECT 1 FROM StatusDTO status WHERE status.documentationUnitDTO.id = documentationUnit.id AND status.publicationStatus = :status AND (:status IN ('PUBLISHED', 'PUBLISHING') OR documentationUnit.documentationOffice.id = :documentationOfficeId)))
+         )
+       AND (:withErrorOnly = FALSE OR documentationUnit.documentationOffice.id = :documentationOfficeId AND EXISTS (SELECT 1 FROM StatusDTO status WHERE status.documentationUnitDTO.id = documentationUnit.id AND status.withError = TRUE))
+
+    ORDER BY documentationUnit.documentNumber
+  """)
+  @SuppressWarnings("java:S107")
+  // We use JPA repository interface magic, so reducing parameter count is not possible.
+  Slice<DocumentationUnitSearchResultDTO> searchByDocumentUnitSearchInputDeviatingFileNumber(
       UUID documentationOfficeId,
       String documentNumberOrFileNumber,
       String courtType,

@@ -11,12 +11,15 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitException;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitSearchInput;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitSearchResult;
 import de.bund.digitalservice.ris.caselaw.domain.Procedure;
+import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.RelatedDocumentationType;
 import de.bund.digitalservice.ris.caselaw.domain.RelatedDocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.Status;
 import de.bund.digitalservice.ris.caselaw.domain.court.Court;
+import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw.FieldOfLaw;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -24,9 +27,12 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.context.annotation.Primary;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.SliceImpl;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Mono;
@@ -422,22 +428,121 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
     DocumentationOfficeDTO documentationOfficeDTO =
         documentationOfficeRepository.findByAbbreviation(documentationOffice.abbreviation());
 
-    Slice<DocumentationUnitSearchResultDTO> documentationUnitSearchResultDTOPage =
-        repository.searchByDocumentUnitSearchInput(
-            documentationOfficeDTO.getId(),
-            relatedDocumentationUnit.getFileNumber(),
+    List<DocumentationUnitSearchResultDTO> allResults =
+        getDocumentationUnitSearchResultDTOS(
+            pageable,
             courtType,
             courtLocation,
+            relatedDocumentationUnit.getFileNumber(),
             relatedDocumentationUnit.getDecisionDate(),
             null,
             null,
             false,
             false,
-            DocumentTypeTransformer.transformToDTO(relatedDocumentationUnit.getDocumentType()),
-            pageable);
+            relatedDocumentationUnit.getDocumentType(),
+            documentationOfficeDTO);
 
-    return documentationUnitSearchResultDTOPage.map(
-        DocumentationUnitSearchResultTransformer::transformToRelatedDocumentation);
+    Slice<DocumentationUnitSearchResultDTO> all =
+        new SliceImpl<>(
+            allResults.subList(
+                pageable.getPageNumber() * 30,
+                Math.min(
+                    allResults.size(), (pageable.getPageNumber() + 1) * pageable.getPageSize())),
+            pageable,
+            allResults.size() >= (pageable.getPageNumber() + 1) * pageable.getPageSize());
+
+    return all.map(DocumentationUnitSearchResultTransformer::transformToRelatedDocumentation);
+  }
+
+  @NotNull
+  private List<DocumentationUnitSearchResultDTO> getDocumentationUnitSearchResultDTOS(
+      Pageable pageable,
+      String courtType,
+      String courtLocation,
+      String docNumberOrFileNumber,
+      LocalDate decisionDate,
+      LocalDate decisionDateEnd,
+      PublicationStatus status,
+      Boolean withError,
+      Boolean myDocOfficeOnly,
+      DocumentType documentType,
+      DocumentationOfficeDTO documentationOfficeDTO) {
+    if (docNumberOrFileNumber == null || docNumberOrFileNumber.isEmpty()) {
+      return repository
+          .searchByDocumentUnitSearchInput(
+              documentationOfficeDTO.getId(),
+              courtType,
+              courtLocation,
+              decisionDate,
+              decisionDateEnd,
+              status,
+              withError,
+              myDocOfficeOnly,
+              DocumentTypeTransformer.transformToDTO(documentType),
+              pageable)
+          .getContent();
+    }
+
+    // FIXME we can't always start at index provided by the frontend because we cut the list
+    // afterwards. That's why we always reset the pageNumber to 0 to have all results for now
+    Pageable fixedPageRequest =
+        PageRequest.of(0, (pageable.getPageNumber() + 1) * pageable.getPageSize());
+
+    Slice<DocumentationUnitSearchResultDTO> docNumberResults =
+        repository.searchByDocumentUnitSearchInputDocumentNumber(
+            documentationOfficeDTO.getId(),
+            docNumberOrFileNumber,
+            courtType,
+            courtLocation,
+            decisionDate,
+            decisionDateEnd,
+            status,
+            withError,
+            myDocOfficeOnly,
+            DocumentTypeTransformer.transformToDTO(documentType),
+            fixedPageRequest);
+
+    Slice<DocumentationUnitSearchResultDTO> fileNumberResults =
+        repository.searchByDocumentUnitSearchInputFileNumber(
+            documentationOfficeDTO.getId(),
+            docNumberOrFileNumber,
+            courtType,
+            courtLocation,
+            decisionDate,
+            decisionDateEnd,
+            status,
+            withError,
+            myDocOfficeOnly,
+            DocumentTypeTransformer.transformToDTO(documentType),
+            fixedPageRequest);
+
+    Slice<DocumentationUnitSearchResultDTO> deviatingFileNumberResults =
+        repository.searchByDocumentUnitSearchInputDeviatingFileNumber(
+            documentationOfficeDTO.getId(),
+            docNumberOrFileNumber,
+            courtType,
+            courtLocation,
+            decisionDate,
+            decisionDateEnd,
+            status,
+            withError,
+            myDocOfficeOnly,
+            DocumentTypeTransformer.transformToDTO(documentType),
+            fixedPageRequest);
+    List<DocumentationUnitSearchResultDTO> allResults = new ArrayList<>();
+    allResults.addAll(docNumberResults.getContent());
+    allResults.addAll(fileNumberResults.getContent());
+    allResults.addAll(deviatingFileNumberResults.getContent());
+
+    return allResults.stream()
+        .sorted(
+            (o1, o2) -> {
+              if (o1.getDocumentNumber() != null && o2.getDocumentNumber() != null) {
+                return o1.getDocumentNumber().compareTo(o2.getDocumentNumber());
+              }
+              return 0;
+            })
+        .toList();
   }
 
   @Transactional(transactionManager = "jpaTransactionManager")
@@ -455,22 +560,31 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
     Boolean withError =
         Optional.ofNullable(searchInput.status()).map(Status::withError).orElse(false);
 
-    Slice<DocumentationUnitSearchResultDTO> documentationUnitSearchResultDTOPage =
-        repository.searchByDocumentUnitSearchInput(
-            documentationOfficeDTO.getId(),
-            searchInput.documentNumberOrFileNumber(),
+    List<DocumentationUnitSearchResultDTO> allResults =
+        getDocumentationUnitSearchResultDTOS(
+            pageable,
             searchInput.courtType(),
             searchInput.courtLocation(),
+            searchInput.documentNumberOrFileNumber(),
             searchInput.decisionDate(),
             searchInput.decisionDateEnd(),
             searchInput.status() != null ? searchInput.status().publicationStatus() : null,
             withError,
             searchInput.myDocOfficeOnly(),
             null,
-            pageable);
+            documentationOfficeDTO);
 
-    return documentationUnitSearchResultDTOPage.map(
-        DocumentationUnitSearchResultTransformer::transformToDomain);
+    // FIXME in case we by chance only have exactly <pageSize> results, we still get hasNext = true
+    Slice<DocumentationUnitSearchResultDTO> all =
+        new SliceImpl<>(
+            allResults.subList(
+                pageable.getPageNumber() * 30,
+                Math.min(
+                    allResults.size(), (pageable.getPageNumber() + 1) * pageable.getPageSize())),
+            pageable,
+            allResults.size() >= (pageable.getPageNumber() + 1) * pageable.getPageSize());
+
+    return all.map(DocumentationUnitSearchResultTransformer::transformToDomain);
   }
 
   @Override
