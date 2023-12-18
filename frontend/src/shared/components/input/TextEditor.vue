@@ -28,11 +28,11 @@ import { CustomOrderedList } from "../../editor/orderedList"
 import { CustomParagraph } from "../../editor/paragraph"
 import { CustomSuperscript, CustomSubscript } from "../../editor/scriptText"
 import { TableStyle } from "../../editor/tableStyle"
-import { FieldSize } from "@/shared/components/input/FieldSize"
 import TextEditorButton, {
   EditorButton,
 } from "@/shared/components/input/TextEditorButton.vue"
 import { useCollapsingMenuBar } from "@/shared/composables/useCollapsingMenuBar"
+import IconExpand from "~icons/ic/baseline-expand"
 import IconAlignJustify from "~icons/ic/baseline-format-align-justify"
 import IconAlignRight from "~icons/ic/baseline-format-align-right"
 import IconBold from "~icons/ic/baseline-format-bold"
@@ -48,14 +48,12 @@ import IconAlignLeft from "~icons/ic/outline-format-align-left"
 
 interface Props {
   value?: string
-  fieldSize?: FieldSize
   editable?: boolean
   ariaLabel?: string
 }
 
 const props = withDefaults(defineProps<Props>(), {
   value: undefined,
-  fieldSize: "small",
   editable: false,
   ariaLabel: "Editor Feld",
 })
@@ -223,6 +221,15 @@ const buttons = computed(() => [
   },
 ])
 
+const fixButtons = [
+  {
+    type: "",
+    icon: IconExpand,
+    ariaLabel: "fullview",
+    callback: () => (editorExpanded.value = !editorExpanded.value),
+  },
+]
+
 const editorButtons = computed(() =>
   buttons.value.map((button) => ({
     ...button,
@@ -237,6 +244,12 @@ const containerWidth = ref()
 const maxButtonEntries = computed(() =>
   Math.floor((containerWidth.value - 100) / buttonSize),
 )
+
+const editorExpanded = ref(false)
+const editorSize = computed(() => {
+  if (props.editable) return editorExpanded.value ? "h-640" : "h-320"
+  else return ""
+})
 const { collapsedButtons } = useCollapsingMenuBar(
   editorButtons,
   maxButtonEntries,
@@ -291,16 +304,20 @@ const resizeObserver = new ResizeObserver((entries) => {
             @toggle="handleButtonClick"
           />
         </div>
+        <div class="flex flex-row">
+          <TextEditorButton
+            v-for="(button, index) in fixButtons"
+            :key="index"
+            v-bind="button"
+            @toggle="handleButtonClick"
+          />
+        </div>
       </div>
       <hr />
     </div>
     <div>
       <EditorContent
-        :class="{
-          'h-64': fieldSize === 'small',
-          'h-128': fieldSize === 'medium',
-          'h-320': fieldSize === 'large',
-        }"
+        :class="editorSize"
         :data-testid="ariaLabel"
         :editor="editor"
       />

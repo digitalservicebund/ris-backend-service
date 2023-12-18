@@ -17,7 +17,6 @@ const data = computed(() =>
       name: item.name,
       label: item.label,
       aria: item.label,
-      fieldSize: item.fieldSize,
       value: props.texts[item.name as keyof Texts],
     }
   }),
@@ -39,7 +38,6 @@ const data = computed(() =>
           :aria-label="item.aria"
           class="outline outline-2 outline-blue-900"
           editable
-          :field-size="item.fieldSize"
           :value="item.value"
           @update-value="emit('updateValue', [item.id, $event])"
         />

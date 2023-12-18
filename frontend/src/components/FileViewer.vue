@@ -91,7 +91,7 @@ onMounted(async () => {
       />
     </div>
 
-    <TextEditor class="grow bg-white" field-size="max" :value="fileAsHtml" />
+    <TextEditor class="grow bg-white" :value="fileAsHtml" />
 
     <PopupModal
       v-if="showModal"

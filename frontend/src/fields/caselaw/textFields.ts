@@ -1,15 +1,13 @@
-import { FieldSize } from "../../shared/components/input/FieldSize"
-
-function defineTextEntry(name: string, label: string, fieldSize: FieldSize) {
-  return { name, label, fieldSize }
+function defineTextEntry(name: string, label: string) {
+  return { name, label }
 }
 export const texts = [
-  defineTextEntry("decisionName", "Entscheidungsname", "small"),
-  defineTextEntry("headline", "Titelzeile", "small"),
-  defineTextEntry("guidingPrinciple", "Leitsatz", "medium"),
-  defineTextEntry("headnote", "Orientierungssatz", "small"),
-  defineTextEntry("tenor", "Tenor", "medium"),
-  defineTextEntry("reasons", "Gründe", "large"),
-  defineTextEntry("caseFacts", "Tatbestand", "large"),
-  defineTextEntry("decisionReasons", "Entscheidungsgründe", "large"),
+  defineTextEntry("decisionName", "Entscheidungsname"),
+  defineTextEntry("headline", "Titelzeile"),
+  defineTextEntry("guidingPrinciple", "Leitsatz"),
+  defineTextEntry("headnote", "Orientierungssatz"),
+  defineTextEntry("tenor", "Tenor"),
+  defineTextEntry("reasons", "Gründe"),
+  defineTextEntry("caseFacts", "Tatbestand"),
+  defineTextEntry("decisionReasons", "Entscheidungsgründe"),
 ]
