@@ -178,7 +178,6 @@ watch(
         clear-on-choosing-item
         :has-error="slotProps.hasError"
         :item-service="ComboboxItemService.getCitationTypes"
-        placeholder="Bitte auswählen"
       ></ComboboxInput>
     </InputField>
     <div v-if="!activeCitation.hasForeignSource">
@@ -196,7 +195,6 @@ watch(
             clear-on-choosing-item
             :has-error="slotProps.hasError"
             :item-service="ComboboxItemService.getCourts"
-            placeholder="Aktivzitierung Gericht"
           >
           </ComboboxInput>
         </InputField>
@@ -227,7 +225,6 @@ watch(
             v-model="activeCitation.fileNumber"
             aria-label="Aktenzeichen der Aktivzitierung"
             :has-error="slotProps.hasError"
-            placeholder="Aktenzeichen"
           ></TextInput>
         </InputField>
         <InputField id="activeCitationDecisionDocumentType" label="Dokumenttyp">
@@ -236,7 +233,6 @@ watch(
             v-model="activeCitation.documentType"
             aria-label="Dokumenttyp der Aktivzitierung"
             :item-service="ComboboxItemService.getDocumentTypes"
-            placeholder="Bitte auswählen"
           ></ComboboxInput>
         </InputField>
       </div>

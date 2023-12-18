@@ -190,7 +190,6 @@ export type DocumentUnitSearchParameter =
             v-model="query.documentNumberOrFileNumber"
             aria-label="Dokumentnummer oder Aktenzeichen Suche"
             class="ds-input-small"
-            placeholder="Dokumentnummer/ Aktenzeichen"
             @focus="resetErrors"
           ></TextInput>
         </InputField>
@@ -212,7 +211,7 @@ export type DocumentUnitSearchParameter =
             v-model="query.courtLocation"
             aria-label="Gerichtsort Suche"
             class="ds-input-small"
-            placeholder="Gerichtsort"
+            placeholder="Ort"
             @focus="resetErrors"
           ></TextInput>
         </InputField>

@@ -107,7 +107,7 @@ watch(props, () => {
         aria-label="Norm Suchfeld"
         clear-on-choosing-item
         :item-service="ComboboxItemService.getRisAbbreviationsAwesome"
-        placeholder="Suchfeld"
+        placeholder="Nach Norm suchen"
         throttle-item-service-throughput
       ></ComboboxInput>
     </InputField>
@@ -124,7 +124,6 @@ watch(props, () => {
         clear-on-choosing-item
         :has-error="slotProps.hasError"
         :item-service="ComboboxItemService.getRisAbbreviations"
-        placeholder="RIS Abkürzung"
         @click="validationStore.remove('normAbbreviation')"
       >
       </ComboboxInput>

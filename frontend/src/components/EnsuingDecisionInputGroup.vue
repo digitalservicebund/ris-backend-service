@@ -156,7 +156,6 @@ onMounted(() => {
             clear-on-choosing-item
             :has-error="slotProps.hasError"
             :item-service="ComboboxItemService.getCourts"
-            placeholder="Gerichtstyp Gerichtsort"
             @click="validationStore.remove('court')"
           ></ComboboxInput>
         </InputField>
@@ -192,7 +191,6 @@ onMounted(() => {
             v-model="ensuingDecision.fileNumber"
             aria-label="Aktenzeichen Nachgehende Entscheidung"
             :has-error="slotProps.hasError"
-            placeholder="Aktenzeichen"
             @input="validationStore.remove('fileNumber')"
           ></TextInput>
         </InputField>
@@ -207,7 +205,6 @@ onMounted(() => {
             v-model="ensuingDecision.documentType"
             aria-label="Dokumenttyp Nachgehende Entscheidung"
             :item-service="ComboboxItemService.getDocumentTypes"
-            placeholder="Bitte auswählen"
           ></ComboboxInput>
         </InputField>
       </div>
@@ -224,7 +221,6 @@ onMounted(() => {
         v-model="ensuingDecision.note"
         aria-label="Vermerk"
         :has-error="hasError"
-        placeholder="Vermerk"
         @input="validationStore.remove('note')"
       ></TextInput>
     </InputField>
