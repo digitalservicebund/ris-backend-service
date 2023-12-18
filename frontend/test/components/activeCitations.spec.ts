@@ -91,12 +91,11 @@ describe("Active Citations", () => {
           }),
         ],
         size: 0,
-        totalElements: 20,
-        totalPages: 2,
         number: 0,
         numberOfElements: 20,
         first: true,
         last: false,
+        empty: false,
       },
     }),
   )

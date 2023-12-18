@@ -6,8 +6,6 @@ function renderComponent(options?: {
   currentPage?: number
   getInitialData?: boolean
   navigationPosition?: "top" | "bottom"
-  totalElements?: number
-  totalPages?: number
   last?: boolean
   first?: boolean
 }) {
@@ -16,10 +14,7 @@ function renderComponent(options?: {
       page: {
         content: [1, 2, 3, 4, 5],
         size: 100,
-        totalElements: options?.totalElements ?? 5,
-        totalPages: options?.totalPages ?? 1,
         number: options?.currentPage ?? 0,
-        numberOfElements: options?.totalElements ?? 5,
         first: options?.first ?? true,
         last: options?.last ?? true,
       },
@@ -59,36 +54,32 @@ describe("Pagination", () => {
   })
 
   // TODO test slice instead of page
-  // eslint-disable-next-line playwright/no-skipped-test
-  test.skip("displays correct max Items", async () => {
-    renderComponent({ getInitialData: true, totalElements: 1337 })
+  // test.skip("displays correct max Items", async () => {
+  //   renderComponent({ getInitialData: true, totalElements: 1337 })
 
-    await screen.findByText("1337 Ergebnisse gefunden.")
-  })
-
-  // TODO test slice instead of page
-  // eslint-disable-next-line playwright/no-skipped-test
-  test.skip("updates string correctly for one result", async () => {
-    renderComponent({ getInitialData: true, totalElements: 1 })
-
-    await screen.findByText("1 Ergebnis gefunden.")
-  })
+  //   await screen.findByText("1337 Ergebnisse gefunden.")
+  // })
 
   // TODO test slice instead of page
-  // eslint-disable-next-line playwright/no-skipped-test
-  test.skip("displays correct max Pages", async () => {
-    renderComponent({ totalPages: 200 })
+  // test.skip("updates string correctly for one result", async () => {
+  //   renderComponent({ getInitialData: true, totalElements: 1 })
 
-    await screen.findByText("1 von 200")
-  })
+  //   await screen.findByText("1 Ergebnis gefunden.")
+  // })
 
   // TODO test slice instead of page
-  // eslint-disable-next-line playwright/no-skipped-test
-  test.skip("displays 0 pages if there a no pages", async () => {
-    renderComponent({ totalPages: 0 })
+  // test.skip("displays correct max Pages", async () => {
+  //   renderComponent({ totalPages: 200 })
 
-    await screen.findByText("0 von 0")
-  })
+  //   await screen.findByText("1 von 200")
+  // })
+
+  // TODO test slice instead of page
+  // test.skip("displays 0 pages if there a no pages", async () => {
+  //   renderComponent({ totalPages: 0 })
+
+  //   await screen.findByText("0 von 0")
+  // })
 
   test("next button disabled if on last page", async () => {
     renderComponent({ last: true })

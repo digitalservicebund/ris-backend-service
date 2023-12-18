@@ -17,12 +17,11 @@ async function mockedItemService(page: number, size: number) {
     data: {
       content: Array.from({ length: end - start }, (_, i) => start + i),
       size: size,
-      totalElements,
-      totalPages: totalElements / size,
       number: page,
       numberOfElements: 100,
       first: page === 0,
       last: page + 1 >= totalElements / size,
+      empty: false,
     },
   }
 }

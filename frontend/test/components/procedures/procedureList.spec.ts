@@ -54,12 +54,11 @@ async function renderComponent(options?: { procedures: Procedure[][] }) {
           },
         ],
         size: 1,
-        totalElements: 10,
-        totalPages: 10,
         number: 1,
         numberOfElements: 200,
         first: true,
         last: false,
+        empty: false,
       },
     })
     .mockResolvedValueOnce({
@@ -73,12 +72,11 @@ async function renderComponent(options?: { procedures: Procedure[][] }) {
           },
         ],
         size: 1,
-        totalElements: 10,
-        totalPages: 10,
         number: 1,
         numberOfElements: 200,
         first: true,
         last: false,
+        empty: false,
       },
     })
 
