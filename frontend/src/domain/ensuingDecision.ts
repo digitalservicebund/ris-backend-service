@@ -68,12 +68,8 @@ export default class EnsuingDecision
     fieldName: keyof EnsuingDecision,
     value: EnsuingDecision[(typeof EnsuingDecision.fields)[number]],
   ) {
-    if (fieldName === "pending" && value === true) {
-      return false
-    }
-
-    if (fieldName === "decisionDate" && this.pending === true) {
-      return false
+    if (fieldName === "pending") {
+      return true
     }
     if (value === undefined || !value || value === null) {
       return true

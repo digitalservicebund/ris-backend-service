@@ -65,7 +65,7 @@ const toggleDropdown = async () => {
     if (inputText.value) {
       filter.value = inputText.value
     }
-    await updateCurrentItems(filter.value)
+    await updateCurrentItems()
     inputFieldRef.value?.focus()
   }
 }
@@ -76,7 +76,7 @@ const showUpdatedDropdown = async () => {
   if (inputText.value) {
     filter.value = inputText.value
   }
-  await updateCurrentItems(filter.value)
+  await updateCurrentItems()
 }
 
 const clearDropdown = async () => {
@@ -87,7 +87,7 @@ const clearDropdown = async () => {
   inputText.value = ""
   focusedItemIndex.value = 0
   if (showDropdown.value) {
-    await updateCurrentItems("")
+    await updateCurrentItems()
   }
   inputFieldRef.value?.focus()
 }
@@ -145,7 +145,7 @@ const updateFocusedItem = () => {
   if (item && item.innerText !== NO_MATCHING_ENTRY) item.focus()
 }
 
-const updateCurrentItems = async (searchStr?: string) => {
+const updateCurrentItems = async () => {
   hasToUpdate.value = true
   if (isUpdating.value && hasToUpdate.value) {
     return
@@ -180,10 +180,12 @@ const updateCurrentItems = async (searchStr?: string) => {
     noCurrentlyDisplayeditems.value ||
     //no exact match found when add manual entry option set
     (props.manualEntry &&
-      searchStr &&
-      !currentlyDisplayedItems.value.find((item) => item.label === searchStr))
+      filter.value &&
+      !currentlyDisplayedItems.value.find(
+        (item) => item.label === filter.value,
+      ))
   ) {
-    handleNoSearchResults(searchStr)
+    handleNoSearchResults(filter.value)
   } else {
     createNewItem.value = undefined
     candidateForSelection.value = currentlyDisplayedItems.value[0]
