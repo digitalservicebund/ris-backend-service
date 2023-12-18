@@ -36,6 +36,6 @@ const isInvalid = computed(() => props.validationError !== undefined)
     class="ds-checkbox"
     :class="{ 'has-error': isInvalid, 'ds-checkbox-small': size === 'small' }"
     type="checkbox"
-    @keydown.enter="localModelValue = !localModelValue"
+    @keydown.space="localModelValue = !localModelValue"
   />
 </template>
