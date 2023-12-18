@@ -7,10 +7,14 @@ import { useCaseLawMenuItems } from "@/composables/useCaseLawMenuItems"
 import { useStatusBadge } from "@/composables/useStatusBadge"
 import { useToggleStateInRouteQuery } from "@/composables/useToggleStateInRouteQuery"
 import DocumentUnit from "@/domain/documentUnit"
+import { ServiceResponse } from "@/services/httpClient"
 import NavbarSide from "@/shared/components/NavbarSide.vue"
 import SideToggle from "@/shared/components/SideToggle.vue"
 
-const props = defineProps<{ documentUnit: DocumentUnit }>()
+const props = defineProps<{
+  documentUnit: DocumentUnit
+  saveCallback?: () => Promise<ServiceResponse<void>>
+}>()
 const route = useRoute()
 const router = useRouter()
 const documentNumber = computed(() => props.documentUnit.documentNumber)
@@ -81,6 +85,7 @@ watchEffect(() => {
         :document-unit="documentUnit"
         :first-row="firstRowInfos"
         :heading="documentUnit.documentNumber ?? ''"
+        :save-callback="saveCallback"
         :second-row="secondRowInfos"
       />
 

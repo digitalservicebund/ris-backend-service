@@ -1,5 +1,7 @@
 <script lang="ts" setup>
 import { toRaw } from "vue"
+import SaveButton from "@/components/SaveDocumentUnitButton.vue"
+import { ServiceResponse } from "@/services/httpClient"
 import IconBadge, { IconBadgeProps } from "@/shared/components/IconBadge.vue"
 import PropertyInfo from "@/shared/components/PropertyInfo.vue"
 
@@ -12,12 +14,14 @@ interface Props {
   heading?: string
   firstRow?: (PropertyInfoType | IconBadgeProps)[]
   secondRow?: (PropertyInfoType | IconBadgeProps)[]
+  saveCallback?: () => Promise<ServiceResponse<void>>
 }
 
 withDefaults(defineProps<Props>(), {
   heading: "",
   firstRow: () => [],
   secondRow: () => [],
+  saveCallback: undefined,
 })
 
 function isBadge(
@@ -71,5 +75,10 @@ function isBadge(
         </div>
       </div>
     </div>
+    <SaveButton
+      v-if="saveCallback"
+      aria-label="Speichern Button"
+      :service-callback="saveCallback"
+    />
   </div>
 </template>

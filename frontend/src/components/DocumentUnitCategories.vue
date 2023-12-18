@@ -8,7 +8,6 @@ import DocumentUnitWrapper from "@/components/DocumentUnitWrapper.vue"
 import EnsuingDecisions from "@/components/EnsuingDecisions.vue"
 import OriginalFileSidePanel from "@/components/OriginalFileSidePanel.vue"
 import PreviousDecisions from "@/components/PreviousDecisions.vue"
-import SaveButton from "@/components/SaveDocumentUnitButton.vue"
 import { useScrollToHash } from "@/composables/useScrollToHash"
 import { useToggleStateInRouteQuery } from "@/composables/useToggleStateInRouteQuery"
 import DocumentUnit, { Texts, CoreData } from "@/domain/documentUnit"
@@ -164,17 +163,11 @@ onMounted(async () => {
 </script>
 
 <template>
-  <DocumentUnitWrapper :document-unit="updatedDocumentUnit as DocumentUnit">
+  <DocumentUnitWrapper
+    :document-unit="updatedDocumentUnit as DocumentUnit"
+    :save-callback="handleUpdateDocumentUnit"
+  >
     <template #default="{ classes }">
-      <div
-        class="sticky top-[2rem] z-30 -mt-96 grid h-[6rem] w-full justify-items-end pb-8 pr-[2rem]"
-      >
-        <SaveButton
-          aria-label="Speichern Button"
-          :service-callback="handleUpdateDocumentUnit"
-        />
-      </div>
-
       <div class="flex w-full flex-grow">
         <div class="flex flex-col bg-gray-100" :class="classes">
           <DocumentUnitCoreData
