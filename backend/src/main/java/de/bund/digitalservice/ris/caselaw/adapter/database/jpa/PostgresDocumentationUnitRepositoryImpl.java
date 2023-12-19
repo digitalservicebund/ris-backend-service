@@ -428,7 +428,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
     DocumentationOfficeDTO documentationOfficeDTO =
         documentationOfficeRepository.findByAbbreviation(documentationOffice.abbreviation());
 
-    List<DocumentationUnitSearchResultDTO> allResults =
+    Slice<DocumentationUnitSearchResultDTO> allResults =
         getDocumentationUnitSearchResultDTOS(
             pageable,
             courtType,
@@ -442,20 +442,12 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
             relatedDocumentationUnit.getDocumentType(),
             documentationOfficeDTO);
 
-    Slice<DocumentationUnitSearchResultDTO> all =
-        new SliceImpl<>(
-            allResults.subList(
-                pageable.getPageNumber() * 30,
-                Math.min(
-                    allResults.size(), (pageable.getPageNumber() + 1) * pageable.getPageSize())),
-            pageable,
-            allResults.size() >= (pageable.getPageNumber() + 1) * pageable.getPageSize());
-
-    return all.map(DocumentationUnitSearchResultTransformer::transformToRelatedDocumentation);
+    return allResults.map(
+        DocumentationUnitSearchResultTransformer::transformToRelatedDocumentation);
   }
 
   @NotNull
-  private List<DocumentationUnitSearchResultDTO> getDocumentationUnitSearchResultDTOS(
+  private Slice<DocumentationUnitSearchResultDTO> getDocumentationUnitSearchResultDTOS(
       Pageable pageable,
       String courtType,
       String courtLocation,
@@ -468,19 +460,17 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
       DocumentType documentType,
       DocumentationOfficeDTO documentationOfficeDTO) {
     if (docNumberOrFileNumber == null || docNumberOrFileNumber.isEmpty()) {
-      return repository
-          .searchByDocumentUnitSearchInput(
-              documentationOfficeDTO.getId(),
-              courtType,
-              courtLocation,
-              decisionDate,
-              decisionDateEnd,
-              status,
-              withError,
-              myDocOfficeOnly,
-              DocumentTypeTransformer.transformToDTO(documentType),
-              pageable)
-          .getContent();
+      return repository.searchByDocumentUnitSearchInput(
+          documentationOfficeDTO.getId(),
+          courtType,
+          courtLocation,
+          decisionDate,
+          decisionDateEnd,
+          status,
+          withError,
+          myDocOfficeOnly,
+          DocumentTypeTransformer.transformToDTO(documentType),
+          pageable);
     }
 
     // FIXME we can't always start at index provided by the frontend because we cut the list
@@ -534,15 +524,23 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
     allResults.addAll(fileNumberResults.getContent());
     allResults.addAll(deviatingFileNumberResults.getContent());
 
-    return allResults.stream()
-        .sorted(
-            (o1, o2) -> {
-              if (o1.getDocumentNumber() != null && o2.getDocumentNumber() != null) {
-                return o1.getDocumentNumber().compareTo(o2.getDocumentNumber());
-              }
-              return 0;
-            })
-        .toList();
+    // FIXME in case we by chance only have exactly <pageSize> results, we still get hasNext = true
+    return new SliceImpl<>(
+        allResults.stream()
+            .sorted(
+                (o1, o2) -> {
+                  if (o1.getDocumentNumber() != null && o2.getDocumentNumber() != null) {
+                    return o1.getDocumentNumber().compareTo(o2.getDocumentNumber());
+                  }
+                  return 0;
+                })
+            .toList()
+            .subList(
+                pageable.getPageNumber() * 30,
+                Math.min(
+                    allResults.size(), (pageable.getPageNumber() + 1) * pageable.getPageSize())),
+        pageable,
+        allResults.size() >= (pageable.getPageNumber() + 1) * pageable.getPageSize());
   }
 
   @Transactional(transactionManager = "jpaTransactionManager")
@@ -560,7 +558,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
     Boolean withError =
         Optional.ofNullable(searchInput.status()).map(Status::withError).orElse(false);
 
-    List<DocumentationUnitSearchResultDTO> allResults =
+    Slice<DocumentationUnitSearchResultDTO> allResults =
         getDocumentationUnitSearchResultDTOS(
             pageable,
             searchInput.courtType(),
@@ -574,17 +572,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
             null,
             documentationOfficeDTO);
 
-    // FIXME in case we by chance only have exactly <pageSize> results, we still get hasNext = true
-    Slice<DocumentationUnitSearchResultDTO> all =
-        new SliceImpl<>(
-            allResults.subList(
-                pageable.getPageNumber() * 30,
-                Math.min(
-                    allResults.size(), (pageable.getPageNumber() + 1) * pageable.getPageSize())),
-            pageable,
-            allResults.size() >= (pageable.getPageNumber() + 1) * pageable.getPageSize());
-
-    return all.map(DocumentationUnitSearchResultTransformer::transformToDomain);
+    return allResults.map(DocumentationUnitSearchResultTransformer::transformToDomain);
   }
 
   @Override
