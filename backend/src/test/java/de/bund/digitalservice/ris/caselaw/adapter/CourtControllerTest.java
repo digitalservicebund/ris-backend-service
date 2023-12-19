@@ -9,7 +9,6 @@ import de.bund.digitalservice.ris.caselaw.TestConfig;
 import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
 import de.bund.digitalservice.ris.caselaw.domain.CourtService;
 import java.util.ArrayList;
-import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +29,7 @@ class CourtControllerTest {
 
   @Test
   void testGetCourts() {
-    when(service.getCourts(Optional.empty())).thenReturn(new ArrayList<>());
+    when(service.getCourts(null)).thenReturn(new ArrayList<>());
 
     risWebTestClient
         .withDefaultLogin()
@@ -40,6 +39,6 @@ class CourtControllerTest {
         .expectStatus()
         .isOk();
 
-    verify(service, times(1)).getCourts(Optional.empty());
+    verify(service, times(1)).getCourts(null);
   }
 }

@@ -85,6 +85,7 @@ class PreviousDecisionIntegrationTest {
           .withInitScript("db/create_migration_scheme_and_extensions.sql");
 
   private DocumentCategoryDTO category;
+  private CourtDTO testCourt;
 
   @DynamicPropertySource
   static void registerDynamicProperties(DynamicPropertyRegistry registry) {
@@ -112,7 +113,7 @@ class PreviousDecisionIntegrationTest {
   private DocumentationOfficeDTO documentationOfficeDTO;
   @Autowired private DatabaseDocumentCategoryRepository databaseDocumentCategoryRepository;
 
-  private AtomicInteger courtJurisId = new AtomicInteger(100);
+  private final AtomicInteger courtJurisId = new AtomicInteger(100);
 
   @BeforeEach
   void setUp() {
@@ -123,6 +124,17 @@ class PreviousDecisionIntegrationTest {
     category =
         databaseDocumentCategoryRepository.saveAndFlush(
             DocumentCategoryDTO.builder().label("R").build());
+
+    testCourt =
+        courtRepository.save(
+            CourtDTO.builder()
+                .type("Court1")
+                .location("Berlin")
+                .jurisId(courtJurisId.getAndIncrement())
+                .isForeignCourt(false)
+                .isSuperiorCourt(false)
+                .id(UUID.randomUUID())
+                .build());
   }
 
   @AfterEach
@@ -355,20 +367,16 @@ class PreviousDecisionIntegrationTest {
   }
 
   @Test
-  void testSearchForDocumentUnitsByPreviousDecisionInput_onlyCourt_shouldMatchOne() {
+  void testSearchForDocumentUnitsByPreviousDecisionInput_onlyCourt_shouldMatchThree() {
     prepareDocumentUnitMetadataDTOs();
     simulateAPICall(
-            PreviousDecision.builder().court(Court.builder().type("SomeCourt").build()).build())
-        .consumeWith(
-            result -> {
-              System.out.println("result = " + result.toString());
-            })
+            PreviousDecision.builder().court(Court.builder().type("Court1").build()).build())
         .jsonPath("$.content")
         .isNotEmpty()
         .jsonPath("$.content.length()")
-        .isEqualTo(1)
+        .isEqualTo(3)
         .jsonPath("$.content[0].court.type")
-        .isEqualTo("SomeCourt");
+        .isEqualTo("Court1");
   }
 
   @Test
@@ -415,7 +423,7 @@ class PreviousDecisionIntegrationTest {
     simulateAPICall(
             PreviousDecision.builder()
                 .decisionDate(date1)
-                .court(Court.builder().type("SomeCourt").build())
+                .court(Court.builder().type("Court1").build())
                 .fileNumber("AkteX")
                 .documentType(
                     DocumentType.builder().uuid(UUID.randomUUID()).jurisShortcut("XY").build())
@@ -430,7 +438,6 @@ class PreviousDecisionIntegrationTest {
 
     var du1 =
         createDocumentUnit(
-            CourtDTO.builder().type("Court1").location("Berlin").build(),
             date,
             List.of("AkteZ"),
             "EF",
@@ -438,7 +445,6 @@ class PreviousDecisionIntegrationTest {
             Status.builder().publicationStatus(PublicationStatus.UNPUBLISHED).build());
     var du2 =
         createDocumentUnit(
-            CourtDTO.builder().type("Court2").location("Berlin").build(),
             date,
             List.of("AkteZ"),
             "EF",
@@ -447,7 +453,6 @@ class PreviousDecisionIntegrationTest {
 
     var du4 =
         createDocumentUnit(
-            CourtDTO.builder().type("Court4").location("Berlin").build(),
             date,
             List.of("AkteZ"),
             "EF",
@@ -456,7 +461,6 @@ class PreviousDecisionIntegrationTest {
 
     var du5 =
         createDocumentUnit(
-            CourtDTO.builder().type("Court5").location("Berlin").build(),
             date,
             List.of("AkteZ"),
             "EF",
@@ -480,7 +484,6 @@ class PreviousDecisionIntegrationTest {
     LocalDate date1 = LocalDate.parse("2023-01-02");
     DocumentationUnitMetadataDTO documentUnit1 =
         createDocumentUnit(
-            CourtDTO.builder().type("SomeCourt").location("Berlin").build(),
             date1,
             List.of("AkteX", "AkteY"),
             "CD",
@@ -490,7 +493,6 @@ class PreviousDecisionIntegrationTest {
     LocalDate date2 = LocalDate.parse("2023-02-03");
     DocumentationUnitMetadataDTO documentUnit2 =
         createDocumentUnit(
-            CourtDTO.builder().type("AnotherCourt").location("Hamburg").build(),
             date2,
             null,
             "EF",
@@ -500,7 +502,6 @@ class PreviousDecisionIntegrationTest {
     LocalDate date3 = LocalDate.parse("2023-03-04");
     DocumentationUnitMetadataDTO documentUnit3 =
         createDocumentUnit(
-            CourtDTO.builder().type("YetAnotherCourt").location("Munich").build(),
             date3,
             List.of("AkteX"),
             "GH",
@@ -523,7 +524,6 @@ class PreviousDecisionIntegrationTest {
   }
 
   private DocumentationUnitDTO createDocumentUnit(
-      CourtDTO court,
       LocalDate decisionDate,
       List<String> fileNumbers,
       String documentTypeJurisShortcut,
@@ -549,25 +549,6 @@ class PreviousDecisionIntegrationTest {
       }
     }
 
-    if (court != null) {
-
-      var existingcourt =
-          courtRepository.findByTypeAndLocation(court.getType(), court.getLocation());
-
-      if (existingcourt.isEmpty()) {
-        court =
-            courtRepository.saveAndFlush(
-                court.toBuilder()
-                    .jurisId(courtJurisId.getAndIncrement())
-                    .isForeignCourt(false)
-                    .isSuperiorCourt(false)
-                    .id(UUID.randomUUID())
-                    .build());
-      } else {
-        court = existingcourt.get(0);
-      }
-    }
-
     DocumentationOfficeDTO documentOffice =
         documentationOfficeRepository.findByAbbreviation(documentOfficeLabel);
     assertThat(documentOffice).isNotNull();
@@ -577,7 +558,7 @@ class PreviousDecisionIntegrationTest {
             .id(UUID.randomUUID())
             .documentationOffice(documentOffice)
             .documentNumber(RandomStringUtils.randomAlphanumeric(13))
-            .court(court)
+            .court(testCourt)
             .decisionDate(decisionDate)
             .documentType(documentTypeDTO)
             .documentationOffice(documentOffice)

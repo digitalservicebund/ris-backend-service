@@ -8,7 +8,6 @@ import de.bund.digitalservice.ris.caselaw.domain.CourtService;
 import de.bund.digitalservice.ris.caselaw.domain.court.Court;
 import de.bund.digitalservice.ris.caselaw.domain.court.CourtRepository;
 import java.util.List;
-import java.util.Optional;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -36,7 +35,7 @@ class CourtServiceTest {
     List<Court> returnedCourts = List.of(courtA, courtB);
     when(courtRepository.findAllByOrderByTypeAscLocationAsc()).thenReturn(returnedCourts);
 
-    List<Court> resultCourts = service.getCourts(Optional.empty());
+    List<Court> resultCourts = service.getCourts(null);
 
     Assertions.assertEquals(returnedCourts, resultCourts);
 
@@ -54,7 +53,7 @@ class CourtServiceTest {
     List<Court> returnedCourts = List.of(courtA, courtB);
     when(courtRepository.findBySearchStr(trimmedSearchString)).thenReturn(returnedCourts);
 
-    List<Court> resultCourts = service.getCourts(Optional.of(searchString));
+    List<Court> resultCourts = service.getCourts(searchString);
 
     Assertions.assertEquals(returnedCourts, resultCourts);
 
@@ -69,7 +68,7 @@ class CourtServiceTest {
     List<Court> returnedCourts = List.of(courtA, courtB);
     when(courtRepository.findAllByOrderByTypeAscLocationAsc()).thenReturn(returnedCourts);
 
-    List<Court> resultCourts = service.getCourts(Optional.of(""));
+    List<Court> resultCourts = service.getCourts("");
 
     Assertions.assertEquals(returnedCourts, resultCourts);
 

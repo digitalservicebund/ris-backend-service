@@ -4,7 +4,6 @@ import de.bund.digitalservice.ris.OpenApiConfiguration;
 import de.bund.digitalservice.ris.caselaw.domain.CourtService;
 import de.bund.digitalservice.ris.caselaw.domain.court.Court;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,7 +25,7 @@ public class CourtController {
 
   @GetMapping
   @PreAuthorize("isAuthenticated()")
-  public Flux<Court> getCourts(@RequestParam(value = "q") Optional<String> searchStr) {
+  public Flux<Court> getCourts(@RequestParam(value = "q", required = false) String searchStr) {
     return Flux.fromIterable(service.getCourts(searchStr));
   }
 }

@@ -3,7 +3,6 @@ package de.bund.digitalservice.ris.caselaw.domain;
 import de.bund.digitalservice.ris.caselaw.domain.court.Court;
 import de.bund.digitalservice.ris.caselaw.domain.court.CourtRepository;
 import java.util.List;
-import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -16,9 +15,9 @@ public class CourtService {
     this.courtRepository = courtRepository;
   }
 
-  public List<Court> getCourts(Optional<String> searchStr) {
-    if (searchStr.isPresent() && !searchStr.get().isBlank()) {
-      return courtRepository.findBySearchStr(searchStr.get().trim());
+  public List<Court> getCourts(String searchStr) {
+    if (searchStr != null && !searchStr.trim().isBlank()) {
+      return courtRepository.findBySearchStr(searchStr.trim());
     }
 
     return courtRepository.findAllByOrderByTypeAscLocationAsc();

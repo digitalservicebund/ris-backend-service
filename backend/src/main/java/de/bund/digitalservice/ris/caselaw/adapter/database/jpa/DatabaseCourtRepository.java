@@ -9,7 +9,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface DatabaseCourtRepository extends JpaRepository<CourtDTO, UUID> {
-  List<CourtDTO> findByTypeAndLocation(String type, String location);
 
   List<CourtDTO> findAllByOrderByTypeAscLocationAsc();
 
