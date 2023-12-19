@@ -372,5 +372,27 @@ test.describe("previous decisions", () => {
     ).toHaveValue("")
   })
 
-  // TODO test dateKnown
+  test("no date is displayed or sent if date known is false", async ({
+    page,
+    documentNumber,
+  }) => {
+    await navigateToCategories(page, documentNumber)
+    await expect(page.getByText(documentNumber)).toBeVisible()
+
+    await page
+      .locator("[aria-label='Datum Unbekannt Vorgehende Entscheidung']")
+      .click()
+
+    await expect(
+      page.locator("[aria-label='Entscheidungsdatum Vorgehende Entscheidung']"),
+    ).toBeDisabled()
+
+    await page
+      .locator("[aria-label='Datum Unbekannt Vorgehende Entscheidung']")
+      .click()
+
+    await page
+      .locator("[aria-label='Entscheidungsdatum Vorgehende Entscheidung']")
+      .isVisible()
+  })
 })
