@@ -13,10 +13,8 @@ import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentUnitStatusServ
 import de.bund.digitalservice.ris.caselaw.adapter.DatabaseProcedureService;
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentUnitController;
 import de.bund.digitalservice.ris.caselaw.adapter.DocxConverterService;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentTypeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationOfficeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseFileNumberRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DeviatingCourtDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DeviatingDateDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DeviatingEcliDTO;
@@ -36,7 +34,6 @@ import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-import java.util.UUID;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -82,8 +79,6 @@ class DeviatingObjectIntegrationTest {
 
   @Autowired private RisWebTestClient risWebTestClient;
   @Autowired private DatabaseDocumentationUnitRepository repository;
-  @Autowired private DatabaseFileNumberRepository fileNumberRepository;
-  @Autowired private DatabaseDocumentTypeRepository databaseDocumentTypeRepository;
   @Autowired private DatabaseDocumentationOfficeRepository documentationOfficeRepository;
   @MockBean private S3AsyncClient s3AsyncClient;
   @MockBean private EmailPublishService publishService;
@@ -157,17 +152,13 @@ class DeviatingObjectIntegrationTest {
               List<String> deviatingFileNumbers =
                   response.getResponseBody().coreData().deviatingFileNumbers();
               assertThat(deviatingFileNumbers).hasSize(2);
-              // TODO: ordering by rank
-              assertThat(deviatingFileNumbers).containsExactlyInAnyOrder("dfn1", "dfn2");
+              assertThat(deviatingFileNumbers).containsExactly("dfn1", "dfn2");
             });
   }
 
   @Test
   void testAddANewDeviatingFileNumberToAnExistingList() {
     DocumentationUnitDTO savedDTO = prepareDocumentationUnitDTOWithDeviatingFileNumbers();
-
-    UUID dfn1Id = savedDTO.getDeviatingFileNumbers().get(0).getId();
-    UUID dfn12d = savedDTO.getDeviatingFileNumbers().get(1).getId();
 
     DocumentUnit documentUnit =
         DocumentUnit.builder()
@@ -194,15 +185,8 @@ class DeviatingObjectIntegrationTest {
               List<String> deviatingFileNumbers =
                   response.getResponseBody().coreData().deviatingFileNumbers();
               assertThat(deviatingFileNumbers).hasSize(3);
-              // TODO: ordering by rank
-              assertThat(deviatingFileNumbers).containsExactlyInAnyOrder("dfn1", "dfn2", "dfn3");
+              assertThat(deviatingFileNumbers).containsExactly("dfn1", "dfn2", "dfn3");
             });
-    // TODO
-    //    DocumentationUnitDTO updatedDocumentationUnitDTO =
-    // repository.findById(savedDTO.getId()).get();
-    //    assertThat(updatedDocumentationUnitDTO.getDeviatingFileNumbers())
-    //        .extracting("id")
-    //        .doesNotContain(dfn1Id, dfn12d);
   }
 
   @Test
@@ -323,8 +307,7 @@ class DeviatingObjectIntegrationTest {
               List<String> deviatingFileNumbers =
                   response.getResponseBody().coreData().deviatingFileNumbers();
               assertThat(deviatingFileNumbers).hasSize(2);
-              // TODO: ordering by rank
-              assertThat(deviatingFileNumbers).containsExactlyInAnyOrder("dfn1", "dfn2");
+              assertThat(deviatingFileNumbers).containsExactly("dfn1", "dfn2");
             });
   }
 
@@ -357,8 +340,7 @@ class DeviatingObjectIntegrationTest {
             response -> {
               List<String> deviatingEclis = response.getResponseBody().coreData().deviatingEclis();
               assertThat(deviatingEclis).hasSize(2);
-              // TODO: ordering by rank
-              assertThat(deviatingEclis).containsExactlyInAnyOrder("decli1", "decli2");
+              assertThat(deviatingEclis).containsExactly("decli1", "decli2");
             });
   }
 
@@ -376,9 +358,6 @@ class DeviatingObjectIntegrationTest {
             .build();
 
     DocumentationUnitDTO savedDTO = repository.save(dto);
-
-    UUID decli1Id = savedDTO.getDeviatingEclis().get(0).getId();
-    UUID decli12d = savedDTO.getDeviatingEclis().get(1).getId();
 
     DocumentUnit documentUnit =
         DocumentUnit.builder()
@@ -405,15 +384,8 @@ class DeviatingObjectIntegrationTest {
             response -> {
               List<String> deviatingEclis = response.getResponseBody().coreData().deviatingEclis();
               assertThat(deviatingEclis).hasSize(3);
-              // TODO: ordering by rank
-              assertThat(deviatingEclis).containsExactlyInAnyOrder("decli1", "decli2", "decli3");
+              assertThat(deviatingEclis).containsExactly("decli1", "decli2", "decli3");
             });
-    // TODO
-    //    DocumentationUnitDTO updatedDocumentationUnitDTO =
-    // repository.findById(savedDTO.getId()).get();
-    //    assertThat(updatedDocumentationUnitDTO.getDeviatingFileNumbers())
-    //        .extracting("id")
-    //        .doesNotContain(decli1Id, decli12d);
   }
 
   @Test
@@ -575,7 +547,6 @@ class DeviatingObjectIntegrationTest {
             response -> {
               List<String> deviatingEclis = response.getResponseBody().coreData().deviatingEclis();
               assertThat(deviatingEclis).hasSize(2);
-              // TODO: ordering by rank
               assertThat(deviatingEclis).containsExactly("decli1", "decli2");
             });
   }
@@ -610,8 +581,7 @@ class DeviatingObjectIntegrationTest {
               List<String> deviatingCourts =
                   response.getResponseBody().coreData().deviatingCourts();
               assertThat(deviatingCourts).hasSize(2);
-              // TODO: ordering by rank
-              assertThat(deviatingCourts).containsExactlyInAnyOrder("dc1", "dc2");
+              assertThat(deviatingCourts).containsExactly("dc1", "dc2");
             });
   }
 
@@ -629,9 +599,6 @@ class DeviatingObjectIntegrationTest {
             .build();
 
     DocumentationUnitDTO savedDTO = repository.save(dto);
-
-    UUID dc1Id = savedDTO.getDeviatingCourts().get(0).getId();
-    UUID dc12d = savedDTO.getDeviatingCourts().get(1).getId();
 
     DocumentUnit documentUnit =
         DocumentUnit.builder()
@@ -658,16 +625,8 @@ class DeviatingObjectIntegrationTest {
               List<String> deviatingCourts =
                   response.getResponseBody().coreData().deviatingCourts();
               assertThat(deviatingCourts).hasSize(3);
-              // TODO: ordering by rank
-              assertThat(deviatingCourts).containsExactlyInAnyOrder("dc1", "dc2", "dc3");
+              assertThat(deviatingCourts).containsExactly("dc1", "dc2", "dc3");
             });
-
-    // TODO
-    //    DocumentationUnitDTO updatedDocumentationUnitDTO =
-    // repository.findById(savedDTO.getId()).get();
-    //    assertThat(updatedDocumentationUnitDTO.getDeviatingCourts())
-    //        .extracting("id")
-    //        .doesNotContain(dc1Id, dc12d);
   }
 
   @Test
@@ -746,7 +705,7 @@ class DeviatingObjectIntegrationTest {
               List<String> deviatingCourts =
                   response.getResponseBody().coreData().deviatingCourts();
               assertThat(deviatingCourts).hasSize(1);
-              assertThat(deviatingCourts).containsExactlyInAnyOrder("dc2");
+              assertThat(deviatingCourts).containsExactly("dc2");
             });
   }
 
@@ -832,8 +791,7 @@ class DeviatingObjectIntegrationTest {
               List<String> deviatingCourts =
                   response.getResponseBody().coreData().deviatingCourts();
               assertThat(deviatingCourts).hasSize(2);
-              // TODO: ordering by rank
-              assertThat(deviatingCourts).containsExactlyInAnyOrder("dc1", "dc2");
+              assertThat(deviatingCourts).containsExactly("dc1", "dc2");
             });
   }
 
@@ -867,9 +825,8 @@ class DeviatingObjectIntegrationTest {
               List<LocalDate> deviatingDates =
                   response.getResponseBody().coreData().deviatingDecisionDates();
               assertThat(deviatingDates).hasSize(2);
-              // TODO: ordering by rank
               assertThat(deviatingDates)
-                  .containsExactlyInAnyOrder(LocalDate.of(2000, 1, 2), LocalDate.of(2010, 9, 10));
+                  .containsExactly(LocalDate.of(2000, 1, 2), LocalDate.of(2010, 9, 10));
             });
   }
 
@@ -887,9 +844,6 @@ class DeviatingObjectIntegrationTest {
             .build();
 
     DocumentationUnitDTO savedDTO = repository.save(dto);
-
-    UUID dd1Id = savedDTO.getDeviatingDates().get(0).getId();
-    UUID dd12d = savedDTO.getDeviatingDates().get(1).getId();
 
     DocumentUnit documentUnit =
         DocumentUnit.builder()
@@ -920,20 +874,12 @@ class DeviatingObjectIntegrationTest {
               List<LocalDate> deviatingDates =
                   response.getResponseBody().coreData().deviatingDecisionDates();
               assertThat(deviatingDates).hasSize(3);
-              // TODO: ordering by rank
               assertThat(deviatingDates)
-                  .containsExactlyInAnyOrder(
+                  .containsExactly(
                       LocalDate.of(2000, 1, 2),
                       LocalDate.of(2010, 9, 10),
                       LocalDate.of(2020, 4, 5));
             });
-
-    // TODO
-    //    DocumentationUnitDTO updatedDocumentationUnitDTO =
-    // repository.findById(savedDTO.getId()).get();
-    //    assertThat(updatedDocumentationUnitDTO.getDeviatingDates())
-    //        .extracting("id")
-    //        .doesNotContain(dd1Id, dd12d);
   }
 
   @Test
@@ -1103,9 +1049,8 @@ class DeviatingObjectIntegrationTest {
               List<LocalDate> deviatingDates =
                   response.getResponseBody().coreData().deviatingDecisionDates();
               assertThat(deviatingDates).hasSize(2);
-              // TODO: ordering by rank
               assertThat(deviatingDates)
-                  .containsExactlyInAnyOrder(LocalDate.of(2000, 1, 2), LocalDate.of(2010, 9, 10));
+                  .containsExactly(LocalDate.of(2000, 1, 2), LocalDate.of(2010, 9, 10));
             });
   }
 }
