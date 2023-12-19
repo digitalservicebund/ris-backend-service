@@ -8,15 +8,18 @@ function renderComponent(options?: {
   navigationPosition?: "top" | "bottom"
   last?: boolean
   first?: boolean
+  empty?: boolean
 }) {
   return render(Pagination, {
     props: {
       page: {
         content: [1, 2, 3, 4, 5],
         size: 100,
+        numberOfElements: 100,
         number: options?.currentPage ?? 0,
         first: options?.first ?? true,
         last: options?.last ?? true,
+        empty: options?.empty ?? false,
       },
       ...(options?.navigationPosition
         ? { navigationPosition: options.navigationPosition }
@@ -53,33 +56,17 @@ describe("Pagination", () => {
     expect(slot.compareDocumentPosition(navigation)).toBe(2)
   })
 
-  // TODO test slice instead of page
-  // test.skip("displays correct max Items", async () => {
-  //   renderComponent({ getInitialData: true, totalElements: 1337 })
+  test("displays 0 pages if there a no pages", async () => {
+    renderComponent({ empty: true })
 
-  //   await screen.findByText("1337 Ergebnisse gefunden.")
-  // })
+    await screen.findByText("Keine Ergebnisse")
+  })
 
-  // TODO test slice instead of page
-  // test.skip("updates string correctly for one result", async () => {
-  //   renderComponent({ getInitialData: true, totalElements: 1 })
+  test("updates string correctly for one result", async () => {
+    renderComponent({ getInitialData: true })
 
-  //   await screen.findByText("1 Ergebnis gefunden.")
-  // })
-
-  // TODO test slice instead of page
-  // test.skip("displays correct max Pages", async () => {
-  //   renderComponent({ totalPages: 200 })
-
-  //   await screen.findByText("1 von 200")
-  // })
-
-  // TODO test slice instead of page
-  // test.skip("displays 0 pages if there a no pages", async () => {
-  //   renderComponent({ totalPages: 0 })
-
-  //   await screen.findByText("0 von 0")
-  // })
+    await screen.findByText("100 Ergebniss(e) auf Seite 1")
+  })
 
   test("next button disabled if on last page", async () => {
     renderComponent({ last: true })

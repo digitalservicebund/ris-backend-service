@@ -326,8 +326,7 @@ test.describe("ensuing decisions", () => {
       .getByLabel("Nach Entscheidung suchen")
       .click()
 
-    // TODO replace
-    // await expect(page.getByText("1 Ergebnis gefunden.")).toBeVisible()
+    await expect(page.getByText("1 Ergebniss(e) auf Seite 1")).toBeVisible()
 
     const result = page.getByText(
       `nachgehend, AG Aachen, 31.12.2019, ${prefilledDocumentUnit.coreData.fileNumbers?.[0]}, AnU, ${prefilledDocumentUnit.documentNumber}`,
@@ -356,8 +355,7 @@ test.describe("ensuing decisions", () => {
       .getByLabel("Nach Entscheidung suchen")
       .click()
 
-    // TODO replace
-    // await expect(page.getByText("1 Ergebnis gefunden.")).toBeVisible()
+    await expect(page.getByText("1 Ergebniss(e) auf Seite 1")).toBeVisible()
     await expect(page.getByText("Bereits hinzugefügt")).toBeVisible()
 
     //can be deleted
@@ -400,8 +398,7 @@ test.describe("ensuing decisions", () => {
       .getByLabel("Nach Entscheidung suchen")
       .click()
 
-    // TODO replace
-    // await expect(page.getByText("1 Ergebnis gefunden.")).toBeVisible()
+    await expect(page.getByText("1 Ergebniss(e) auf Seite 1")).toBeVisible()
 
     const result = page.getByText(
       `nachgehend, AG Aachen, 31.12.2019, ${prefilledDocumentUnit.coreData.fileNumbers?.[0]}, AnU, ${prefilledDocumentUnit.documentNumber}`,

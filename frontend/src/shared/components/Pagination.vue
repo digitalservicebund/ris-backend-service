@@ -64,6 +64,7 @@ export type PageableService<TResult, TQuery = TResult> = (
           {{ page.numberOfElements }} Ergebniss(e) auf Seite
           {{ page.number + 1 }}
         </span>
+        <span v-else> Keine Ergebnisse </span>
         <PaginationButton
           aria-label="nächste Ergebnisse"
           :disabled="page?.last"

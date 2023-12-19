@@ -236,15 +236,13 @@ test.describe("field of law", () => {
 
   // Search
 
-  // TODO test slice instead of page
-  // eslint-disable-next-line playwright/no-skipped-test
-  test.skip("Search without results", async ({ page, documentNumber }) => {
+  test("Search without results", async ({ page, documentNumber }) => {
     await navigateToCategories(page, documentNumber)
     await toggleFieldOfLawSection(page)
 
     await page.locator("[aria-label='Sachgebiete Suche']").fill("xyz")
     await page.keyboard.press("Enter")
-    await expect(page.getByText("0 Ergebnisse gefunden.")).toBeVisible()
+    await expect(page.getByText("Keine Ergebnisse")).toBeVisible()
   })
 
   test("Search with paginated results - test the pagination navigation", async ({
@@ -262,8 +260,7 @@ test.describe("field of law", () => {
       })
       .click()
 
-    // TODO test slice instead of page
-    //await expect(page.getByText("1 von 3")).toBeVisible()
+    await expect(page.getByText("10 Ergebniss(e) auf Seite 1")).toBeVisible()
     await expect(
       page.getByRole("button", { name: "vorherige Ergebnisse" }),
     ).toBeDisabled()
@@ -274,8 +271,7 @@ test.describe("field of law", () => {
       })
       .click()
 
-    // TODO test slice instead of page
-    // await expect(page.getByText("2 von 3")).toBeVisible()
+    await expect(page.getByText("10 Ergebniss(e) auf Seite 2")).toBeVisible()
     await expect(
       page.getByRole("button", { name: "vorherige Ergebnisse" }),
     ).toBeEnabled()
@@ -286,8 +282,7 @@ test.describe("field of law", () => {
       })
       .click()
 
-    // TODO test slice instead of page
-    // await expect(page.getByText("3 von 3")).toBeVisible()
+    // we expect between 20 and 30 results (3 pages)
     await expect(
       page.getByRole("button", { name: "nächste Ergebnisse" }),
     ).toBeDisabled()
