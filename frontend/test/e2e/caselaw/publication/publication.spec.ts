@@ -1,6 +1,7 @@
 import { expect } from "@playwright/test"
 import {
   fillActiveCitationInputs,
+  fillEnsuingDecisionInputs,
   fillNormInputs,
   fillPreviousDecisionInputs,
   navigateToCategories,
@@ -24,7 +25,7 @@ test.describe("ensuring the publishing of documentunits works as expected", () =
     await expect(page.locator("li:has-text('Dokumenttyp')")).toBeVisible()
   })
 
-  test("publication page shows missing required fields of proceeding decisions", async ({
+  test("publication page shows missing required fields of previous decisions", async ({
     page,
     documentNumber,
   }) => {
@@ -66,7 +67,7 @@ test.describe("ensuring the publishing of documentunits works as expected", () =
   })
 
   // RISDEV-2183
-  test("publication page shows missing required fields of proceeding decisions with only missing fields in proceeding decisions", async ({
+  test("publication page shows missing required fields of previous decisions with only missing fields in previous decisions", async ({
     page,
     prefilledDocumentUnit,
   }) => {
@@ -105,6 +106,79 @@ test.describe("ensuring the publishing of documentunits works as expected", () =
         .locator("li:has-text('Vorgehende Entscheidungen')")
         .getByText("Aktenzeichen"),
     ).toBeVisible()
+  })
+
+  test("publication page shows missing required fields of ensuing decisions", async ({
+    page,
+    documentNumber,
+  }) => {
+    await navigateToCategories(page, documentNumber)
+    await expect(page.getByText(documentNumber)).toBeVisible()
+
+    await waitForSaving(
+      async () => {
+        await fillEnsuingDecisionInputs(page, {
+          court: "AG Aalen",
+        })
+        await page.getByLabel("Nachgehende Entscheidung speichern").click()
+      },
+      page,
+      { clickSaveButton: true },
+    )
+
+    await expect(
+      page.getByText(`nachgehend, AG Aalen`, {
+        exact: true,
+      }),
+    ).toBeVisible()
+    await navigateToPublication(page, documentNumber)
+
+    await expect(
+      page.locator("li:has-text('Nachgehende Entscheidungen')"),
+    ).toBeVisible()
+
+    await expect(
+      page
+        .locator("li:has-text('Nachgehende Entscheidungen')")
+        .getByText("Entscheidungsdatum"),
+    ).toBeVisible()
+    await expect(
+      page
+        .locator("li:has-text('Nachgehende Entscheidungen')")
+        .getByText("Aktenzeichen"),
+    ).toBeVisible()
+  })
+
+  test("publication page does not show missing required decision date, when ensuing decision is pending", async ({
+    page,
+    documentNumber,
+  }) => {
+    await navigateToCategories(page, documentNumber)
+    await expect(page.getByText(documentNumber)).toBeVisible()
+
+    await waitForSaving(
+      async () => {
+        await fillEnsuingDecisionInputs(page, {
+          pending: true,
+          court: "AG Aalen",
+          fileNumber: "123",
+        })
+        await page.getByLabel("Nachgehende Entscheidung speichern").click()
+      },
+      page,
+      { clickSaveButton: true },
+    )
+
+    await expect(
+      page.getByText(`anhängig, AG Aalen, Datum unbekannt, 123`, {
+        exact: true,
+      }),
+    ).toBeVisible()
+    await navigateToPublication(page, documentNumber)
+
+    await expect(
+      page.locator("li:has-text('Nachgehende Entscheidungen')"),
+    ).toBeHidden()
   })
 
   test("publication page shows missing required fields of norms", async ({

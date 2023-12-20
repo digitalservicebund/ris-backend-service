@@ -216,11 +216,6 @@ export async function fillEnsuingDecisionInputs(
     if (!(await pendingCheckbox.isChecked())) {
       await pendingCheckbox.click()
       await expect(pendingCheckbox).toBeChecked()
-      await waitForInputValue(
-        page,
-        "[aria-label='Entscheidungsdatum Nachgehende Entscheidung']",
-        "",
-      )
     }
   }
 }
