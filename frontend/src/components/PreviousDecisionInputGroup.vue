@@ -15,6 +15,7 @@ import InputField, {
 } from "@/shared/components/input/InputField.vue"
 import TextButton from "@/shared/components/input/TextButton.vue"
 import TextInput from "@/shared/components/input/TextInput.vue"
+import LoadingSpinner from "@/shared/components/LoadingSpinner.vue"
 import Pagination, { Page } from "@/shared/components/Pagination.vue"
 
 const props = defineProps<{
@@ -231,8 +232,8 @@ onMounted(() => {
         />
       </Pagination>
     </div>
-    <div v-if="searchRunning" class="mb-10 ml-40 mt-20">
-      ... Suche läuft ...
+    <div v-if="searchRunning" class="mt-40 text-center">
+      <LoadingSpinner />
     </div>
   </div>
 </template>
