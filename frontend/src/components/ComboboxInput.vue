@@ -115,7 +115,8 @@ const onEnter = async () => {
 
 const onInput = async () => {
   if (inputText.value === "") {
-    emit("update:modelValue", undefined)
+    if (!props.noClear) emit("update:modelValue", undefined)
+    else inputText.value = ""
   }
   await showUpdatedDropdown()
 }
