@@ -61,14 +61,14 @@ describe("Decision ListItem", () => {
     expect(await screen.findByText(/testLabel/)).toBeVisible()
   })
 
-  it("renders documentType shortcut", async () => {
+  it("renders documentType label", async () => {
     renderComponent({
       documentType: {
         label: "fooLabel",
         jurisShortcut: "barShortcut",
       },
     })
-    expect(await screen.findByText(/barShortcut/)).toBeVisible()
+    expect(await screen.findByText(/fooLabel/)).toBeVisible()
   })
 
   it("renders date correctly", async () => {

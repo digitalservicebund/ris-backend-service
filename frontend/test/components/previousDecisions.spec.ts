@@ -329,9 +329,7 @@ describe("PreviousDecisions", () => {
     })
 
     expect(
-      screen.getByText(
-        "label1, 01.02.2022, test fileNumber, documentTypeShortcut1",
-      ),
+      screen.getByText("label1, 01.02.2022, test fileNumber, documentType1"),
     ).toBeInTheDocument()
     const editButton = screen.getByLabelText("Eintrag bearbeiten")
     await user.click(editButton)
@@ -348,9 +346,7 @@ describe("PreviousDecisions", () => {
 
     await user.click(screen.getByLabelText("Vorgehende Entscheidung speichern"))
 
-    expect(
-      screen.getByText(/01.02.2022, documentTypeShortcut1/),
-    ).toBeInTheDocument()
+    expect(screen.getByText(/01.02.2022, documentType1/)).toBeInTheDocument()
   })
 
   it("renders from search added previous decisions as non-editable list item", async () => {

@@ -338,7 +338,7 @@ describe("EnsuingDecisions", () => {
     await user.click(saveButton)
     expect(
       screen.getByText(
-        /nachgehend, label1, 01.02.2022, test fileNumber, documentTypeShortcut1, Vermerk, ABC/,
+        /nachgehend, label1, 01.02.2022, test fileNumber, documentType1, Vermerk, ABC/,
       ),
     ).toBeInTheDocument()
   })

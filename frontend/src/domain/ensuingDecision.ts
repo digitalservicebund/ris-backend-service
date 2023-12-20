@@ -33,7 +33,7 @@ export default class EnsuingDecision
         : []),
       ...(this.pending ? ["Datum unbekannt"] : []),
       ...(this.fileNumber ? [this.fileNumber] : []),
-      ...(this.documentType ? [this.documentType?.jurisShortcut] : []),
+      ...(this.documentType ? [this.documentType?.label] : []),
       ...(this.note ? [this.note] : []),
       ...(this.documentNumber ? [this.documentNumber] : []),
     ].join(", ")

@@ -29,7 +29,7 @@ export default class PreviousDecision
         : []),
       ...(this.dateKnown === false ? ["Datum unbekannt"] : []),
       ...(this.fileNumber ? [this.fileNumber] : []),
-      ...(this.documentType ? [this.documentType?.jurisShortcut] : []),
+      ...(this.documentType ? [this.documentType?.label] : []),
       ...(this.documentNumber ? [this.documentNumber] : []),
     ].join(", ")
   }

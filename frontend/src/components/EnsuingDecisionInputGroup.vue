@@ -31,8 +31,8 @@ const ensuingDecision = ref(new EnsuingDecision({ ...props.modelValue }))
 const validationStore =
   useValidationStore<(typeof EnsuingDecision.fields)[number]>()
 const searchRunning = ref(false)
-const searchResultsCurrentPage = ref<Page<EnsuingDecision>>()
-const searchResults = ref<SearchResults<EnsuingDecision>>()
+const searchResultsCurrentPage = ref<Page<RelatedDocumentation>>()
+const searchResults = ref<SearchResults<RelatedDocumentation>>()
 
 const isPending = computed({
   get: () => ensuingDecision.value.pending,
@@ -56,12 +56,12 @@ async function search(page = 0) {
     searchResultsCurrentPage.value = {
       ...response.data,
       content: response.data.content.map(
-        (decision) => new EnsuingDecision({ ...decision }),
+        (decision) => new RelatedDocumentation({ ...decision }),
       ),
     }
     searchResults.value = response.data.content.map((searchResult) => {
       return {
-        decision: new EnsuingDecision({ ...searchResult }),
+        decision: new RelatedDocumentation({ ...searchResult }),
         isLinked: searchResult.isLinkedWith(props.modelValueList),
       }
     })
@@ -92,6 +92,7 @@ async function addEnsuingDecision() {
 async function addEnsuingDecisionFromSearch(decision: RelatedDocumentation) {
   const decisionWithNote = new EnsuingDecision({
     ...decision,
+    pending: ensuingDecision.value?.pending,
     referenceFound: true,
     note: ensuingDecision.value?.note,
   })

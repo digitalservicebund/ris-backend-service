@@ -53,8 +53,8 @@ const activeCitationType = computed({
   },
 })
 
-const searchResultsCurrentPage = ref<Page<ActiveCitation>>()
-const searchResults = ref<SearchResults<ActiveCitation>>()
+const searchResultsCurrentPage = ref<Page<RelatedDocumentation>>()
+const searchResults = ref<SearchResults<RelatedDocumentation>>()
 
 async function search(page = 0) {
   const activeCitationRef = new ActiveCitation({
@@ -73,12 +73,12 @@ async function search(page = 0) {
     searchResultsCurrentPage.value = {
       ...response.data,
       content: response.data.content.map(
-        (decision) => new ActiveCitation({ ...decision }),
+        (decision) => new RelatedDocumentation({ ...decision }),
       ),
     }
     searchResults.value = response.data.content.map((searchResult) => {
       return {
-        decision: new ActiveCitation({ ...searchResult }),
+        decision: new RelatedDocumentation({ ...searchResult }),
         isLinked: searchResult.isLinkedWith(props.modelValueList),
       }
     })

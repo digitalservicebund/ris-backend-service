@@ -54,7 +54,7 @@ test.describe("ensuing decisions", () => {
     await page.getByLabel("Nachgehende Entscheidung speichern").click()
     await expect(
       page.getByText(
-        `nachgehend, AG Aachen, 01.01.2020, ${prefilledDocumentUnit.coreData.fileNumbers?.[0]}, AnU`,
+        `nachgehend, AG Aachen, 01.01.2020, ${prefilledDocumentUnit.coreData.fileNumbers?.[0]}, Anerkenntnisurteil`,
         {
           exact: true,
         },
@@ -100,7 +100,7 @@ test.describe("ensuing decisions", () => {
     await page.getByLabel("Nachgehende Entscheidung speichern").click()
     await expect(
       page.getByText(
-        `nachgehend, AG Aachen, 01.01.2020, ${prefilledDocumentUnit.coreData.fileNumbers?.[0]}, AnU`,
+        `nachgehend, AG Aachen, 01.01.2020, ${prefilledDocumentUnit.coreData.fileNumbers?.[0]}, Anerkenntnisurteil`,
         {
           exact: true,
         },
@@ -133,7 +133,7 @@ test.describe("ensuing decisions", () => {
     await page.getByLabel("Nachgehende Entscheidung speichern").click()
     await expect(
       page.getByText(
-        `anhängig, AG Aachen, Datum unbekannt, ${prefilledDocumentUnit.coreData.fileNumbers?.[0]}, AnU`,
+        `anhängig, AG Aachen, Datum unbekannt, ${prefilledDocumentUnit.coreData.fileNumbers?.[0]}, Anerkenntnisurteil`,
         {
           exact: true,
         },
@@ -165,7 +165,7 @@ test.describe("ensuing decisions", () => {
         await page.getByLabel("Nachgehende Entscheidung speichern").click()
         await expect(
           page.getByText(
-            `nachgehend, AG Aachen, 01.01.2020, ${prefilledDocumentUnit.coreData.fileNumbers?.[0]}, AnU`,
+            `nachgehend, AG Aachen, 01.01.2020, ${prefilledDocumentUnit.coreData.fileNumbers?.[0]}, Anerkenntnisurteil`,
             {
               exact: true,
             },
@@ -329,7 +329,7 @@ test.describe("ensuing decisions", () => {
     await expect(page.getByText("1 Ergebniss(e) auf Seite 1")).toBeVisible()
 
     const result = page.getByText(
-      `nachgehend, AG Aachen, 31.12.2019, ${prefilledDocumentUnit.coreData.fileNumbers?.[0]}, AnU, ${prefilledDocumentUnit.documentNumber}`,
+      `AG Aachen, 31.12.2019, ${prefilledDocumentUnit.coreData.fileNumbers?.[0]}, Anerkenntnisurteil, ${prefilledDocumentUnit.documentNumber}`,
     )
 
     await expect(result).toBeVisible()
@@ -337,7 +337,7 @@ test.describe("ensuing decisions", () => {
 
     //make sure to have citation style in list
     const listItem = page.getByText(
-      `nachgehend, AG Aachen, 31.12.2019, ${prefilledDocumentUnit.coreData.fileNumbers?.[0]}, AnU, ${prefilledDocumentUnit.documentNumber}`,
+      `nachgehend, AG Aachen, 31.12.2019, ${prefilledDocumentUnit.coreData.fileNumbers?.[0]}, Anerkenntnisurteil, ${prefilledDocumentUnit.documentNumber}`,
     )
     await expect(listItem).toBeVisible()
     await expect(page.getByLabel("Eintrag löschen")).toBeVisible()
@@ -401,7 +401,7 @@ test.describe("ensuing decisions", () => {
     await expect(page.getByText("1 Ergebniss(e) auf Seite 1")).toBeVisible()
 
     const result = page.getByText(
-      `nachgehend, AG Aachen, 31.12.2019, ${prefilledDocumentUnit.coreData.fileNumbers?.[0]}, AnU, ${prefilledDocumentUnit.documentNumber}`,
+      `AG Aachen, 31.12.2019, ${prefilledDocumentUnit.coreData.fileNumbers?.[0]}, Anerkenntnisurteil, ${prefilledDocumentUnit.documentNumber}`,
     )
 
     await expect(result).toBeVisible()
@@ -410,7 +410,7 @@ test.describe("ensuing decisions", () => {
     //make sure to have citation style in list
     await expect(
       page.getByText(
-        `nachgehend, AG Aachen, 31.12.2019, ${prefilledDocumentUnit.coreData.fileNumbers?.[0]}, AnU, ${prefilledDocumentUnit.documentNumber}`,
+        `nachgehend, AG Aachen, 31.12.2019, ${prefilledDocumentUnit.coreData.fileNumbers?.[0]}, Anerkenntnisurteil, ${prefilledDocumentUnit.documentNumber}`,
       ),
     ).toBeVisible()
     await expect(page.getByLabel("Eintrag löschen")).toBeVisible()
@@ -438,7 +438,7 @@ test.describe("ensuing decisions", () => {
     await page.getByLabel("Nachgehende Entscheidung speichern").click()
     await expect(
       page.getByText(
-        `nachgehend, AG Aachen, 31.12.2019, ${prefilledDocumentUnit.coreData.fileNumbers?.[0]}, AnU, Vermerk, ${prefilledDocumentUnit.documentNumber}`,
+        `nachgehend, AG Aachen, 31.12.2019, ${prefilledDocumentUnit.coreData.fileNumbers?.[0]}, Anerkenntnisurteil, Vermerk, ${prefilledDocumentUnit.documentNumber}`,
       ),
     ).toBeVisible()
   })

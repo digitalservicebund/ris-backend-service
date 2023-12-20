@@ -50,7 +50,7 @@ test.describe("previous decisions", () => {
     await page.getByLabel("Vorgehende Entscheidung speichern").click()
     await expect(
       page.getByText(
-        `AG Aachen, 01.01.2020, ${prefilledDocumentUnit.coreData.fileNumbers?.[0]}, AnU`,
+        `AG Aachen, 01.01.2020, ${prefilledDocumentUnit.coreData.fileNumbers?.[0]}, Anerkenntnisurteil`,
         {
           exact: true,
         },
@@ -98,7 +98,7 @@ test.describe("previous decisions", () => {
         await page.getByLabel("Vorgehende Entscheidung speichern").click()
         await expect(
           page.getByText(
-            `AG Aachen, 01.01.2020, ${prefilledDocumentUnit.coreData.fileNumbers?.[0]}, AnU`,
+            `AG Aachen, 01.01.2020, ${prefilledDocumentUnit.coreData.fileNumbers?.[0]}, Anerkenntnisurteil`,
             {
               exact: true,
             },
@@ -262,7 +262,7 @@ test.describe("previous decisions", () => {
     await expect(page.getByText("1 Ergebniss(e) auf Seite 1")).toBeVisible()
 
     const result = page.getByText(
-      `AG Aachen, 31.12.2019, ${prefilledDocumentUnit.coreData.fileNumbers?.[0]}, AnU, ${prefilledDocumentUnit.documentNumber}`,
+      `AG Aachen, 31.12.2019, ${prefilledDocumentUnit.coreData.fileNumbers?.[0]}, Anerkenntnisurteil, ${prefilledDocumentUnit.documentNumber}`,
     )
 
     await expect(result).toBeVisible()
@@ -270,7 +270,7 @@ test.describe("previous decisions", () => {
 
     //make sure to have citation style in list
     const listItem = page.getByText(
-      `AG Aachen, 31.12.2019, ${prefilledDocumentUnit.coreData.fileNumbers?.[0]}, AnU, ${prefilledDocumentUnit.documentNumber}`,
+      `AG Aachen, 31.12.2019, ${prefilledDocumentUnit.coreData.fileNumbers?.[0]}, Anerkenntnisurteil, ${prefilledDocumentUnit.documentNumber}`,
     )
     await expect(listItem).toBeVisible()
     await expect(page.getByLabel("Eintrag löschen")).toBeVisible()

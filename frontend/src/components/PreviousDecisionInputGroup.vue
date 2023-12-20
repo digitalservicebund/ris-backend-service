@@ -31,8 +31,8 @@ const previousDecision = ref(new PreviousDecision({ ...props.modelValue }))
 const validationStore =
   useValidationStore<(typeof PreviousDecision.fields)[number]>()
 const searchRunning = ref(false)
-const searchResultsCurrentPage = ref<Page<PreviousDecision>>()
-const searchResults = ref<SearchResults<PreviousDecision>>()
+const searchResultsCurrentPage = ref<Page<RelatedDocumentation>>()
+const searchResults = ref<SearchResults<RelatedDocumentation>>()
 
 async function search(page = 0) {
   const previousDecisionRef = new PreviousDecision({
@@ -48,12 +48,12 @@ async function search(page = 0) {
     searchResultsCurrentPage.value = {
       ...response.data,
       content: response.data.content.map(
-        (decision) => new PreviousDecision({ ...decision }),
+        (decision) => new RelatedDocumentation({ ...decision }),
       ),
     }
     searchResults.value = response.data.content.map((searchResult) => {
       return {
-        decision: new PreviousDecision({ ...searchResult }),
+        decision: new RelatedDocumentation({ ...searchResult }),
         isLinked: searchResult.isLinkedWith(props.modelValueList),
       }
     })
@@ -82,8 +82,11 @@ async function addPreviousDecision() {
 }
 
 async function addPreviousDecisionFromSearch(decision: RelatedDocumentation) {
-  decision.referenceFound = true
-  emit("update:modelValue", decision as PreviousDecision)
+  const previousDecision = new PreviousDecision({
+    ...decision,
+    referenceFound: true,
+  })
+  emit("update:modelValue", previousDecision)
   emit("addEntry")
   scrollToTop()
 }
