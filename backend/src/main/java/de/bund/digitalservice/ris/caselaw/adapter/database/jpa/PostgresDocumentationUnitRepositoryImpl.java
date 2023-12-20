@@ -21,9 +21,11 @@ import de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw.FieldOfL
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
@@ -523,7 +525,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
             myDocOfficeOnly,
             DocumentTypeTransformer.transformToDTO(documentType),
             fixedPageRequest);
-    List<DocumentationUnitSearchResultDTO> allResults = new ArrayList<>();
+    Set<DocumentationUnitSearchResultDTO> allResults = new HashSet<>();
     allResults.addAll(docNumberResults.getContent());
     allResults.addAll(fileNumberResults.getContent());
     allResults.addAll(deviatingFileNumberResults.getContent());

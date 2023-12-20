@@ -117,7 +117,8 @@ public class DocumentationUnitDTO
       orphanRemoval = true,
       cascade = {CascadeType.PERSIST, CascadeType.MERGE})
   @OrderBy("rank")
-  private List<DocumentationUnitProcedureDTO> procedures;
+  @Builder.Default
+  private List<DocumentationUnitProcedureDTO> procedures = new ArrayList<>();
 
   @ManyToMany(
       cascade = {CascadeType.MERGE},
@@ -135,6 +136,7 @@ public class DocumentationUnitDTO
       orphanRemoval = true,
       cascade = {CascadeType.PERSIST, CascadeType.MERGE})
   @OrderBy("rank")
+  @Builder.Default
   private List<DocumentationUnitFieldOfLawDTO> documentationUnitFieldsOfLaw = new ArrayList<>();
 
   @Column private String source;
@@ -212,6 +214,7 @@ public class DocumentationUnitDTO
       orphanRemoval = true,
       cascade = {CascadeType.PERSIST, CascadeType.MERGE})
   @OrderBy("rank")
+  @Builder.Default
   private List<DocumentationUnitKeywordDTO> documentationUnitKeywordDTOs = new ArrayList<>();
 
   // Nachgehende Entscheidungen
