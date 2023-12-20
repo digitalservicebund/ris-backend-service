@@ -9,6 +9,7 @@ interface Props {
 }
 
 const props = withDefaults(defineProps<Props>(), {
+  value: false,
   modelValue: false,
   validationError: undefined,
   size: "regular",
@@ -35,6 +36,6 @@ const isInvalid = computed(() => props.validationError !== undefined)
     class="ds-checkbox"
     :class="{ 'has-error': isInvalid, 'ds-checkbox-small': size === 'small' }"
     type="checkbox"
-    @keydown.space.stop.prevent="localModelValue = !localModelValue"
+    @keydown.space.prevent="localModelValue = !localModelValue"
   />
 </template>
