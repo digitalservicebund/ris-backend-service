@@ -1,6 +1,0 @@
-ALTER TABLE
-  lookuptable_subject_field
-ADD COLUMN IF NOT EXISTS
-  is_leaf_in_tree BOOLEAN DEFAULT FALSE,
-ADD COLUMN IF NOT EXISTS
-  depth_in_tree BIGINT NOT NULL DEFAULT 0
