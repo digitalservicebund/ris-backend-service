@@ -27,23 +27,31 @@ public interface DatabaseCourtRepository extends JpaRepository<CourtDTO, UUID> {
   @Query(
       nativeQuery = true,
       value =
-          "WITH label_added AS (SELECT *, "
-              + "                            UPPER(CONCAT(type, ' ', location)) AS label "
-              + "                     from incremental_migration.court) "
-              + "SELECT *,"
-              + "       label, "
-              + "       CASE "
-              + "           WHEN label LIKE UPPER(:searchStr||'%') THEN 1 "
-              + "           WHEN label LIKE UPPER('% '||:searchStr||'%') THEN 2 "
-              + "           WHEN label LIKE UPPER('%-'||:searchStr||'%') THEN 2 "
-              + "           ELSE 3 "
-              + "           END AS weight "
-              + "FROM label_added as court "
-              // FIXME: this inner join has been added to fill the region field in court. This
-              // should be solved in other ways with better performance (e.g. change query or use a
-              // Interface instead of the full CourtDTO
-              + "LEFT JOIN incremental_migration.court_region as region on court.id = region.court_id  "
-              + "WHERE label LIKE UPPER('%'||:searchStr||'%') "
-              + "ORDER BY weight, label")
+          """
+                      WITH court_with_label AS (
+                        SELECT
+                          *,
+                          UPPER(CONCAT(type,' ',location)) AS label
+                        FROM
+                          incremental_migration.court
+                      )
+                      SELECT
+                        *,
+                        label,
+                        CASE
+                          WHEN label LIKE UPPER(:searchStr || '%') THEN 1
+                          WHEN label LIKE UPPER('% ' || :searchStr || '%') THEN 2
+                          WHEN label LIKE UPPER('%-' || :searchStr || '%') THEN 2
+                          ELSE 3
+                        END AS weight
+                      FROM
+                        court_with_label
+                        LEFT JOIN incremental_migration.court_region AS region ON court_with_label.id = region.court_id
+                      WHERE
+                        label LIKE UPPER('%' || :searchStr || '%')
+                      ORDER BY
+                        weight,
+                        label
+                      """)
   List<CourtDTO> findBySearchStr(@Param("searchStr") String searchStr);
 }

@@ -15,28 +15,23 @@ public class CourtTransformer {
 
     String revoked = extractRevoked(courtDTO.getAdditionalInformation());
 
+    Court.CourtBuilder builder =
+        Court.builder().id(courtDTO.getId()).type(courtDTO.getType()).revoked(revoked);
+
     if (Boolean.TRUE.equals(courtDTO.isSuperiorCourt())) {
-      return Court.builder()
-          .id(courtDTO.getId())
-          .type(courtDTO.getType())
-          .label(courtDTO.getType())
-          .revoked(revoked)
-          .build();
+      return builder.label(courtDTO.getType()).build();
     }
 
-    return Court.builder()
-        .id(courtDTO.getId())
-        .type(courtDTO.getType())
+    return builder
         .location(courtDTO.getLocation())
-        .label(Court.generateLabel(courtDTO.getType(), courtDTO.getLocation()))
-        .revoked(revoked)
+        .label(generateLabel(courtDTO.getType(), courtDTO.getLocation()))
         .build();
   }
 
   public static CourtDTO transformToDTO(Court court) {
     if (court == null) return null;
 
-    return CourtDTO.builder().id(court.id()).type(court.type()).location(court.location()).build();
+    return CourtDTO.builder().id(court.id()).build();
   }
 
   private static String extractRevoked(String additional) {
@@ -59,5 +54,9 @@ public class CourtTransformer {
 
     // detect more patterns?
     return null;
+  }
+
+  public static String generateLabel(String courtType, String courtLocation) {
+    return courtType + (courtLocation != null ? " " + courtLocation : "");
   }
 }
