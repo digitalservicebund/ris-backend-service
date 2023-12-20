@@ -473,10 +473,14 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
           pageable);
     }
 
-    // FIXME we can't always start at index provided by the frontend because we cut the list
-    // afterwards. That's why we always reset the pageNumber to 0 to have all results for now
-    Pageable fixedPageRequest =
-        PageRequest.of(0, (pageable.getPageNumber() + 1) * pageable.getPageSize());
+    // The highest possible number of results - For page 0: 30, for page 1: 60, for page 2: 90, etc.
+    int maxResultsUpToCurrentPage = (pageable.getPageNumber() + 1) * pageable.getPageSize();
+
+    // We need to start with index 0 because we collect 3 results sets, each of the desired size of
+    // the page. Then we sort the full ist and cut it to the page size (possibly leaving 2x page
+    // size results behind). If we don't always start with index 0, we might miss results.
+    // This approach could even be better if we replace the next/previous with a "load more" button
+    Pageable fixedPageRequest = PageRequest.of(0, maxResultsUpToCurrentPage);
 
     Slice<DocumentationUnitSearchResultDTO> docNumberResults =
         repository.searchByDocumentUnitSearchInputDocumentNumber(
@@ -524,7 +528,15 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
     allResults.addAll(fileNumberResults.getContent());
     allResults.addAll(deviatingFileNumberResults.getContent());
 
-    // FIXME in case we by chance only have exactly <pageSize> results, we still get hasNext = true
+    // We can provide entries for a next page if ...
+    // A) we already have collected more results than fit on the current page, or
+    // B) at least one of the queries has more results
+    boolean hasNext =
+        allResults.size() >= maxResultsUpToCurrentPage
+            || docNumberResults.hasNext()
+            || fileNumberResults.hasNext()
+            || deviatingFileNumberResults.hasNext();
+
     return new SliceImpl<>(
         allResults.stream()
             .sorted(
@@ -537,10 +549,9 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
             .toList()
             .subList(
                 pageable.getPageNumber() * 30,
-                Math.min(
-                    allResults.size(), (pageable.getPageNumber() + 1) * pageable.getPageSize())),
+                Math.min(allResults.size(), maxResultsUpToCurrentPage)),
         pageable,
-        allResults.size() >= (pageable.getPageNumber() + 1) * pageable.getPageSize());
+        hasNext);
   }
 
   @Transactional(transactionManager = "jpaTransactionManager")
