@@ -47,7 +47,7 @@ describe("originalFile SidePanel", () => {
       global: { plugins: [router] },
     })
     screen.getByText("Originaldokument")
-    expect(screen.queryByText("Dokument wird geladen")).not.toBeInTheDocument()
+    expect(screen.queryByLabelText("Ladestatus")).not.toBeInTheDocument()
     expect(
       screen.queryByText("Es wurde noch kein Originaldokument hochgeladen."),
     ).not.toBeInTheDocument()
@@ -61,7 +61,7 @@ describe("originalFile SidePanel", () => {
       },
       global: { plugins: [router] },
     })
-    screen.getByText("Dokument wird geladen")
+    screen.getByLabelText("Ladestatus")
   })
 
   test("links to file upload if documentUnit has no file", async () => {

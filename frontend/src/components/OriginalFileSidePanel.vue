@@ -2,8 +2,8 @@
 import { computed, ref, watch } from "vue"
 import { useRoute } from "vue-router"
 import TextEditor from "@/shared/components/input/TextEditor.vue"
+import LoadingSpinner from "@/shared/components/LoadingSpinner.vue"
 import IconArrowForward from "~icons/ic/baseline-arrow-forward"
-import IconCloudUpload from "~icons/ic/baseline-cloud-upload"
 
 const props = defineProps<{
   open?: boolean
@@ -46,8 +46,6 @@ const uploadFileRoute = computed(() =>
       </div>
 
       <div v-if="!hasFile" class="flex flex-col gap-24">
-        <IconCloudUpload class="text-48 text-blue-800" />
-
         Es wurde noch kein Originaldokument hochgeladen.
 
         <router-link
@@ -60,7 +58,7 @@ const uploadFileRoute = computed(() =>
         </router-link>
       </div>
 
-      <div v-else-if="!file">Dokument wird geladen</div>
+      <div v-else-if="!file" class="text-center"><LoadingSpinner /></div>
 
       <div
         v-else

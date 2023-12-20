@@ -3,6 +3,7 @@ import dayjs from "dayjs"
 import { computed } from "vue"
 import { Procedure } from "@/domain/documentUnit"
 import DocumentUnitListEntry from "@/domain/documentUnitListEntry"
+import LoadingSpinner from "@/shared/components/LoadingSpinner.vue"
 
 const props = defineProps<{
   procedure: Procedure
@@ -28,13 +29,9 @@ function renderDocumentUnit(documentUnit: DocumentUnitListEntry): string {
 <template>
   <div
     v-if="isLoading"
-    aria-label="Ladestatus"
     class="grid justify-items-center bg-white bg-opacity-60"
   >
-    <div
-      class="inline-block h-32 w-32 animate-spin rounded-full border-[3px] border-solid border-blue-900 border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]"
-      role="status"
-    ></div>
+    <LoadingSpinner />
   </div>
   <div v-else class="grid grid-cols-[14em_auto] gap-x-24">
     <div class="flex items-end">

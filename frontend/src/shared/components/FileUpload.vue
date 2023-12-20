@@ -2,8 +2,8 @@
 import { ref } from "vue"
 import InfoModal from "@/shared/components/InfoModal.vue"
 import FileInput from "@/shared/components/input/FileInput.vue"
-import IconCloudUpload from "~icons/ic/baseline-cloud-upload"
-import IconRefresh from "~icons/ic/baseline-refresh"
+import LoadingSpinner from "@/shared/components/LoadingSpinner.vue"
+import IconUpload from "~icons/ic/outline-file-upload"
 
 const props = defineProps<{
   error?: { title: string; description?: string }
@@ -73,12 +73,12 @@ function onFileSelect(event: Event) {
     @drop="drop"
   >
     <span v-if="isLoading" class="flex flex-col items-center">
-      <IconRefresh class="text-72 text-blue-800" />
+      <LoadingSpinner />
       <div class="ds-heading-03-reg mt-[0.5rem]">Upload läuft</div>
       <div>{{ status.file ? status.file.name : "" }}</div>
     </span>
     <span v-else class="flex flex-col items-center">
-      <IconCloudUpload class="text-72 text-blue-800" />
+      <IconUpload class="text-72 text-blue-800" />
 
       <div class="ds-heading-03-reg mt-[0.5rem]">
         Datei in diesen Bereich ziehen

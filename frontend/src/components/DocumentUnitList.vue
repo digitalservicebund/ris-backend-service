@@ -8,6 +8,7 @@ import { ResponseError } from "@/services/httpClient"
 import IconBadge from "@/shared/components/IconBadge.vue"
 import InfoModal from "@/shared/components/InfoModal.vue"
 import TextButton from "@/shared/components/input/TextButton.vue"
+import LoadingSpinner from "@/shared/components/LoadingSpinner.vue"
 import PopupModal from "@/shared/components/PopupModal.vue"
 import IconAttachedFile from "~icons/ic/baseline-attach-file"
 import IconDelete from "~icons/ic/baseline-delete"
@@ -186,13 +187,9 @@ function onDelete() {
     <!-- Loading State -->
     <div
       v-if="isLoading"
-      aria-label="Ladestatus"
       class="my-112 grid justify-items-center bg-white bg-opacity-60"
     >
-      <div
-        class="inline-block h-32 w-32 animate-spin rounded-full border-[3px] border-solid border-blue-900 border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]"
-        role="status"
-      ></div>
+      <LoadingSpinner />
     </div>
     <!-- Error State -->
     <div v-if="searchResponseError" class="mt-24">
