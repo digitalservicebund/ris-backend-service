@@ -230,9 +230,7 @@ const closeDropdownAndRevertToLastSavedValue = () => {
 watch(
   props,
   () => {
-    //When the inputText was cleared and noClear prop set to true, the modelValue should not override the local empty value until an item was chosen or field blurred.
-    if (inputText.value !== "" && !props.noClear)
-      inputText.value = props.modelValue?.label
+    inputText.value = props.modelValue?.label
   },
   { immediate: true },
 )
