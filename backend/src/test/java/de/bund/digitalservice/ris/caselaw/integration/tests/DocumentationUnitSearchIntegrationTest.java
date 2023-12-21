@@ -259,7 +259,7 @@ class DocumentationUnitSearchIntegrationTest {
                               .documentationUnit(doc)
                               .rank(0L)
                               .build()))
-              // index 5+ get a deviating fileNumber
+              // index 4+ get a deviating fileNumber
               .deviatingFileNumbers(
                   i < 4
                       ? List.of()
@@ -310,41 +310,42 @@ class DocumentationUnitSearchIntegrationTest {
 
     // expect first page...
     // to have 4 results
-    assertThat((int) JsonPath.read(resultPage1.getResponseBody(), "$.numberOfElements"))
-        .isEqualTo(4);
+    String responseBodyFirstPage = resultPage1.getResponseBody();
+    assertThat((int) JsonPath.read(responseBodyFirstPage, "$.numberOfElements")).isEqualTo(4);
     // not to be the last page
-    assertThat((boolean) JsonPath.read(resultPage1.getResponseBody(), "$.first")).isTrue();
-    assertThat((boolean) JsonPath.read(resultPage1.getResponseBody(), "$.last")).isFalse();
+    assertThat((boolean) JsonPath.read(responseBodyFirstPage, "$.first")).isTrue();
+    assertThat((boolean) JsonPath.read(responseBodyFirstPage, "$.last")).isFalse();
     // to have docNumbers "AB1234567800", "AB1234567801", "AB1234567802", "AB1234567803"
     List<String> documentNumbers1Actual =
-        JsonPath.read(resultPage1.getResponseBody(), "$.content[*].documentNumber");
+        JsonPath.read(responseBodyFirstPage, "$.content[*].documentNumber");
     assertThat(documentNumbers1Actual)
         .hasSize(4)
         .containsExactly("AB1234567800", "AB1234567801", "AB1234567802", "AB1234567803");
 
     // expect second page...
+    String responseBodySecondPage = resultPage2.getResponseBody();
     // to have 4 results
-    assertThat((int) JsonPath.read(resultPage2.getResponseBody(), "$.numberOfElements"))
-        .isEqualTo(4);
+    assertThat((int) JsonPath.read(responseBodySecondPage, "$.numberOfElements")).isEqualTo(4);
     // not to be the last or first page
-    assertThat((boolean) JsonPath.read(resultPage2.getResponseBody(), "$.first")).isFalse();
-    assertThat((boolean) JsonPath.read(resultPage2.getResponseBody(), "$.last")).isFalse();
+    assertThat((boolean) JsonPath.read(responseBodySecondPage, "$.first")).isFalse();
+    assertThat((boolean) JsonPath.read(responseBodySecondPage, "$.last")).isFalse();
     // to have docNumbers "AB1234567804", "GE1234567805", "GE1234567806", "GE1234567807"
     List<String> documentNumbers2Actual =
-        JsonPath.read(resultPage2.getResponseBody(), "$.content[*].documentNumber");
+        JsonPath.read(responseBodySecondPage, "$.content[*].documentNumber");
     assertThat(documentNumbers2Actual)
         .hasSize(4)
         .containsExactly("AB1234567804", "GE1234567805", "GE1234567806", "GE1234567807");
 
     // expect third page...
-    assertThat((int) JsonPath.read(resultPage3.getResponseBody(), "$.numberOfElements"))
-        .isEqualTo(2);
+    String responseBodyThirdPage = resultPage3.getResponseBody();
+    // to have 2 results
+    assertThat((int) JsonPath.read(responseBodyThirdPage, "$.numberOfElements")).isEqualTo(2);
     // not to be the first but to be the last page
-    assertThat((boolean) JsonPath.read(resultPage3.getResponseBody(), "$.first")).isFalse();
-    assertThat((boolean) JsonPath.read(resultPage3.getResponseBody(), "$.last")).isTrue();
+    assertThat((boolean) JsonPath.read(responseBodyThirdPage, "$.first")).isFalse();
+    assertThat((boolean) JsonPath.read(responseBodyThirdPage, "$.last")).isTrue();
     // to have docNumbers "GE1234567808", "GE1234567809"
     List<String> documentNumbers3Actual =
-        JsonPath.read(resultPage3.getResponseBody(), "$.content[*].documentNumber");
+        JsonPath.read(responseBodyThirdPage, "$.content[*].documentNumber");
     assertThat(documentNumbers3Actual).hasSize(2).containsExactly("GE1234567808", "GE1234567809");
   }
 
@@ -361,7 +362,7 @@ class DocumentationUnitSearchIntegrationTest {
             .withDefaultLogin()
             .get()
             .uri(
-                "/api/v1/caselaw/documentunits/search?pg=0&sz=10&documentNumberOrFileNumber=+++++AB")
+                "/api/v1/caselaw/documentunits/search?pg=0&sz=10&documentNumberOrFileNumber=+++AB++")
             .exchange()
             .expectStatus()
             .isOk()
