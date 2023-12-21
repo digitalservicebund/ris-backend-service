@@ -15,7 +15,6 @@ import InputField, {
 } from "@/shared/components/input/InputField.vue"
 import TextButton from "@/shared/components/input/TextButton.vue"
 import TextInput from "@/shared/components/input/TextInput.vue"
-import LoadingSpinner from "@/shared/components/LoadingSpinner.vue"
 import Pagination, { Page } from "@/shared/components/Pagination.vue"
 
 const props = defineProps<{
@@ -31,18 +30,22 @@ const emit = defineEmits<{
 const previousDecision = ref(new PreviousDecision({ ...props.modelValue }))
 const validationStore =
   useValidationStore<(typeof PreviousDecision.fields)[number]>()
-const searchRunning = ref(false)
+const pageNumber = ref<number>(0)
+const itemsPerPage = ref<number>(30)
+const isLoading = ref(false)
+
 const searchResultsCurrentPage = ref<Page<RelatedDocumentation>>()
 const searchResults = ref<SearchResults<RelatedDocumentation>>()
 
-async function search(page = 0) {
+async function search() {
+  isLoading.value = true
   const previousDecisionRef = new PreviousDecision({
     ...previousDecision.value,
   })
 
   const response = await documentUnitService.searchByRelatedDocumentation(
-    page,
-    30,
+    pageNumber.value,
+    itemsPerPage.value,
     previousDecisionRef,
   )
   if (response.data) {
@@ -59,12 +62,12 @@ async function search(page = 0) {
       }
     })
   }
-  searchRunning.value = false
+  isLoading.value = false
 }
 
-function handleSearch() {
-  searchRunning.value = true
-  search(0)
+async function updatePage(page: number) {
+  pageNumber.value = page
+  search()
 }
 
 async function validateRequiredInput() {
@@ -208,7 +211,7 @@ onMounted(() => {
         class="mr-28"
         label="Suchen"
         size="small"
-        @click="handleSearch"
+        @click="search"
       />
       <TextButton
         aria-label="Vorgehende Entscheidung speichern"
@@ -220,20 +223,18 @@ onMounted(() => {
       />
     </div>
 
-    <div v-if="!searchRunning && searchResultsCurrentPage" class="mb-10 mt-20">
+    <div class="mb-10 mt-20">
       <Pagination
         navigation-position="bottom"
         :page="searchResultsCurrentPage"
-        @update-page="search"
+        @update-page="updatePage"
       >
         <SearchResultList
+          :is-loading="isLoading"
           :search-results="searchResults"
           @link-decision="addPreviousDecisionFromSearch"
         />
       </Pagination>
-    </div>
-    <div v-if="searchRunning" class="mt-40 text-center">
-      <LoadingSpinner />
     </div>
   </div>
 </template>

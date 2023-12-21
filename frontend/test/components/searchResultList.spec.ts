@@ -8,9 +8,11 @@ import ProceedingDecision from "@/domain/previousDecision"
 
 function renderSearchResults(
   searchResults?: SearchResults<ProceedingDecision | ActiveCitation>,
+  isLoading?: boolean,
 ) {
   const props: {
     searchResults: SearchResults<ProceedingDecision | ActiveCitation>
+    isLoading: boolean
   } = {
     searchResults: searchResults ?? [
       {
@@ -28,6 +30,7 @@ function renderSearchResults(
         isLinked: false,
       },
     ],
+    isLoading: isLoading ?? false,
   }
 
   const utils = render(SearchResultList, {
@@ -110,5 +113,10 @@ describe("ProceedingDecision SearchResult List", () => {
 
     expect(await screen.findByText("Übernehmen")).toBeVisible()
     expect(await screen.findByText(/Bereits hinzugefügt/)).toBeVisible()
+  })
+
+  it("renders loading spinner, when loading", async () => {
+    renderSearchResults([], true)
+    expect(await screen.findByLabelText("Ladestatus")).toBeVisible()
   })
 })

@@ -39,8 +39,6 @@ const emptyStatus = computed(() => {
     return "Starten Sie die Suche oder erstellen Sie eine neue Dokumentationseinheit."
   } else if (props.documentUnitListEntries.length === 0) {
     return "Keine Ergebnisse gefunden."
-  } else if (props.isLoading) {
-    return "Dokumentationseinheiten werden geladen ..."
   }
   return undefined
 })

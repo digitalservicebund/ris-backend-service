@@ -13,7 +13,6 @@ import DateInput from "@/shared/components/input/DateInput.vue"
 import InputField from "@/shared/components/input/InputField.vue"
 import TextButton from "@/shared/components/input/TextButton.vue"
 import TextInput from "@/shared/components/input/TextInput.vue"
-import LoadingSpinner from "@/shared/components/LoadingSpinner.vue"
 import Pagination, { Page } from "@/shared/components/Pagination.vue"
 
 const props = defineProps<{
@@ -30,8 +29,9 @@ const activeCitation = ref(new ActiveCitation({ ...props.modelValue }))
 
 const validationStore =
   useValidationStore<(typeof ActiveCitation.fields)[number]>()
-
-const searchRunning = ref(false)
+const pageNumber = ref<number>(0)
+const itemsPerPage = ref<number>(30)
+const isLoading = ref(false)
 
 const activeCitationType = computed({
   get: () =>
@@ -57,7 +57,8 @@ const activeCitationType = computed({
 const searchResultsCurrentPage = ref<Page<RelatedDocumentation>>()
 const searchResults = ref<SearchResults<RelatedDocumentation>>()
 
-async function search(page = 0) {
+async function search() {
+  isLoading.value = true
   const activeCitationRef = new ActiveCitation({
     ...activeCitation.value,
   })
@@ -66,8 +67,8 @@ async function search(page = 0) {
     delete activeCitationRef["citationType"]
   }
   const response = await documentUnitService.searchByRelatedDocumentation(
-    page,
-    30,
+    pageNumber.value,
+    itemsPerPage.value,
     activeCitationRef,
   )
   if (response.data) {
@@ -84,12 +85,12 @@ async function search(page = 0) {
       }
     })
   }
-  searchRunning.value = false
+  isLoading.value = false
 }
 
-function handleSearch() {
-  searchRunning.value = true
-  search(0)
+async function updatePage(page: number) {
+  pageNumber.value = page
+  search()
 }
 
 async function validateRequiredInput() {
@@ -246,7 +247,7 @@ watch(
         class="mr-28"
         label="Suchen"
         size="small"
-        @click="handleSearch"
+        @click="search"
       />
       <TextButton
         aria-label="Aktivzitierung speichern"
@@ -257,20 +258,18 @@ watch(
         @click="addActiveCitation"
       />
     </div>
-    <div v-if="!searchRunning && searchResultsCurrentPage" class="mb-10 mt-20">
+    <div class="mb-10 mt-20">
       <Pagination
         navigation-position="bottom"
         :page="searchResultsCurrentPage"
-        @update-page="search"
+        @update-page="updatePage"
       >
         <SearchResultList
+          :is-loading="isLoading"
           :search-results="searchResults"
           @link-decision="addActiveCitationFromSearch"
         />
       </Pagination>
-    </div>
-    <div v-if="searchRunning" class="mt-40 text-center">
-      <LoadingSpinner />
     </div>
   </div>
 </template>
