@@ -230,7 +230,8 @@ const closeDropdownAndRevertToLastSavedValue = () => {
 watch(
   props,
   () => {
-    inputText.value = props.modelValue?.label
+    if (inputText.value !== "" && props.noClear)
+      inputText.value = props.modelValue?.label
   },
   { immediate: true },
 )
