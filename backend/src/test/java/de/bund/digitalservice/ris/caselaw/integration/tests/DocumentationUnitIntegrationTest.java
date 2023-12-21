@@ -538,6 +538,7 @@ class DocumentationUnitIntegrationTest {
                       StatusDTO.builder()
                           .documentationUnitDTO(dto)
                           .publicationStatus(statuses.get(i))
+                          .createdAt(Instant.now())
                           .withError(errorStatuses.get(i))
                           .build()))
               .build());

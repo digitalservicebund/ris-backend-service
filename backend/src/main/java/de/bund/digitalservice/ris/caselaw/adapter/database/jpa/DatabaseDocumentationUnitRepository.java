@@ -15,6 +15,9 @@ public interface DatabaseDocumentationUnitRepository
 
   Optional<DocumentationUnitMetadataDTO> findMetadataById(UUID documentUnitUuid);
 
+  String SELECT_STATUS_WHERE_LATEST =
+      "SELECT 1 FROM StatusDTO status WHERE status.documentationUnitDTO.id = documentationUnit.id AND status.createdAt = (SELECT MAX(s.createdAt) FROM StatusDTO s WHERE s.documentationUnitDTO.id = documentationUnit.id)";
+
   static final String BASE_QUERY =
       """
    (:courtType IS NULL OR upper(court.type) like upper(cast(:courtType as text)))
@@ -26,11 +29,23 @@ public interface DatabaseDocumentationUnitRepository
    AND (cast(:documentType as uuid) IS NULL OR documentationUnit.documentType = :documentType)
    AND
      (
-        (:status IS NULL AND ((documentationUnit.documentationOffice.id = :documentationOfficeId OR EXISTS (SELECT 1 FROM StatusDTO status WHERE status.documentationUnitDTO.id = documentationUnit.id AND status.publicationStatus IN (de.bund.digitalservice.ris.caselaw.domain.PublicationStatus.PUBLISHED, de.bund.digitalservice.ris.caselaw.domain.PublicationStatus.PUBLISHING)))))
+        (:status IS NULL AND ((documentationUnit.documentationOffice.id = :documentationOfficeId OR EXISTS (
+        """
+          + SELECT_STATUS_WHERE_LATEST
+          + """
+        AND status.publicationStatus IN (de.bund.digitalservice.ris.caselaw.domain.PublicationStatus.PUBLISHED, de.bund.digitalservice.ris.caselaw.domain.PublicationStatus.PUBLISHING)))))
      OR
-        (:status IS NOT NULL AND EXISTS (SELECT 1 FROM StatusDTO status WHERE status.documentationUnitDTO.id = documentationUnit.id AND status.publicationStatus = :status AND (:status IN ('PUBLISHED', 'PUBLISHING') OR documentationUnit.documentationOffice.id = :documentationOfficeId)))
+        (:status IS NOT NULL AND EXISTS (
+        """
+          + SELECT_STATUS_WHERE_LATEST
+          + """
+       AND status.publicationStatus = :status AND (:status IN ('PUBLISHED', 'PUBLISHING') OR documentationUnit.documentationOffice.id = :documentationOfficeId)))
      )
-   AND (:withErrorOnly = FALSE OR documentationUnit.documentationOffice.id = :documentationOfficeId AND EXISTS (SELECT 1 FROM StatusDTO status WHERE status.documentationUnitDTO.id = documentationUnit.id AND status.withError = TRUE))
+   AND (:withErrorOnly = FALSE OR documentationUnit.documentationOffice.id = :documentationOfficeId AND EXISTS (
+        """
+          + SELECT_STATUS_WHERE_LATEST
+          + """
+        AND status.withError = TRUE))
 ORDER BY documentationUnit.documentNumber
 """;
 
