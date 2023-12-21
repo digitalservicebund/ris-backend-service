@@ -1,3 +1,4 @@
+import { CaptureConsole } from "@sentry/integrations"
 import * as Sentry from "@sentry/vue"
 import { createPinia } from "pinia"
 import { createApp } from "vue"
@@ -24,6 +25,7 @@ if (import.meta.env.PROD) {
         tracePropagationTargets: targets(),
         routingInstrumentation: Sentry.vueRouterInstrumentation(router),
       }),
+      new CaptureConsole(),
     ],
     // Performance Monitoring
     tracesSampleRate: 0.1, // Capture 100% of the transactions, reduce in production!
