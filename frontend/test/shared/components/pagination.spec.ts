@@ -65,7 +65,7 @@ describe("Pagination", () => {
   test("updates string correctly for one result", async () => {
     renderComponent({ getInitialData: true })
 
-    await screen.findByText("100 Ergebniss(e) auf Seite 1")
+    await screen.findByText("Seite 1")
   })
 
   test("next button disabled if on last page", async () => {

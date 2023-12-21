@@ -259,7 +259,7 @@ test.describe("previous decisions", () => {
       .getByLabel("Nach Entscheidung suchen")
       .click()
 
-    await expect(page.getByText("1 Ergebniss(e) auf Seite 1")).toBeVisible()
+    await expect(page.getByText("Seite 1")).toBeVisible()
 
     const result = page.getByText(
       `AG Aachen, 31.12.2019, ${prefilledDocumentUnit.coreData.fileNumbers?.[0]}, Anerkenntnisurteil, ${prefilledDocumentUnit.documentNumber}`,
@@ -291,7 +291,7 @@ test.describe("previous decisions", () => {
       .getByLabel("Nach Entscheidung suchen")
       .click()
 
-    await expect(page.getByText("1 Ergebniss(e) auf Seite 1")).toBeVisible()
+    await expect(page.getByText("Seite 1")).toBeVisible()
     await expect(page.getByText("Bereits hinzugefügt")).toBeVisible()
 
     //can be deleted

@@ -60,10 +60,7 @@ export type PageableService<TResult, TQuery = TResult> = (
           <IconArrowBack />
           <span class="underline">zurück</span>
         </PaginationButton>
-        <span v-if="!page?.empty">
-          {{ page.numberOfElements }} Ergebniss(e) auf Seite
-          {{ page.number + 1 }}
-        </span>
+        <span v-if="!page?.empty"> Seite {{ page.number + 1 }} </span>
         <span v-else> Keine Ergebnisse </span>
         <PaginationButton
           aria-label="nächste Ergebnisse"

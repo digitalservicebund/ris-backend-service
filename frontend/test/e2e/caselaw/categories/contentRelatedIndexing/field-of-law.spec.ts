@@ -260,7 +260,7 @@ test.describe("field of law", () => {
       })
       .click()
 
-    await expect(page.getByText("10 Ergebniss(e) auf Seite 1")).toBeVisible()
+    await expect(page.getByText("Seite 1")).toBeVisible()
     await expect(
       page.getByRole("button", { name: "vorherige Ergebnisse" }),
     ).toBeDisabled()
@@ -271,7 +271,7 @@ test.describe("field of law", () => {
       })
       .click()
 
-    await expect(page.getByText("10 Ergebniss(e) auf Seite 2")).toBeVisible()
+    await expect(page.getByText("Seite 2")).toBeVisible()
     await expect(
       page.getByRole("button", { name: "vorherige Ergebnisse" }),
     ).toBeEnabled()

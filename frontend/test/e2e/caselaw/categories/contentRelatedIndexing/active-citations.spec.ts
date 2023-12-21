@@ -238,9 +238,7 @@ test.describe("active citations", () => {
 
     const activeCitationContainer = page.getByLabel("Aktivzitierung")
     await activeCitationContainer.getByLabel("Nach Entscheidung suchen").click()
-    await expect(
-      activeCitationContainer.getByText("1 Ergebniss(e) auf Seite 1"),
-    ).toBeVisible()
+    await expect(activeCitationContainer.getByText("Seite 1")).toBeVisible()
 
     //citation style ignored in search results
     const result = page.getByText(
@@ -272,9 +270,7 @@ test.describe("active citations", () => {
 
     await activeCitationContainer.getByLabel("Nach Entscheidung suchen").click()
 
-    await expect(
-      activeCitationContainer.getByText("1 Ergebniss(e) auf Seite 1"),
-    ).toBeVisible()
+    await expect(activeCitationContainer.getByText("Seite 1")).toBeVisible()
     await expect(
       activeCitationContainer.getByText("Bereits hinzugefügt"),
     ).toBeVisible()
@@ -317,9 +313,7 @@ test.describe("active citations", () => {
 
     const activeCitationContainer = page.getByLabel("Aktivzitierung")
     await activeCitationContainer.getByLabel("Nach Entscheidung suchen").click()
-    await expect(
-      activeCitationContainer.getByText("1 Ergebniss(e) auf Seite 1"),
-    ).toBeVisible()
+    await expect(activeCitationContainer.getByText("Seite 1")).toBeVisible()
 
     const result = page.getByText(
       `AG Aachen, 31.12.2019, ${prefilledDocumentUnit.coreData.fileNumbers?.[0]}, Anerkenntnisurteil, ${prefilledDocumentUnit.documentNumber}`,
