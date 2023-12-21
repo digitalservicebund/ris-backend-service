@@ -261,7 +261,7 @@ class DocumentationUnitSearchIntegrationTest {
                               .build()))
               // index 5+ get a deviating fileNumber
               .deviatingFileNumbers(
-                  i > 4
+                  i < 4
                       ? List.of()
                       : List.of(
                           DeviatingFileNumberDTO.builder()
@@ -276,7 +276,8 @@ class DocumentationUnitSearchIntegrationTest {
         risWebTestClient
             .withDefaultLogin()
             .get()
-            .uri("/api/v1/caselaw/documentunits/search?pg=0&sz=4&q=" + "AB")
+            .uri(
+                "/api/v1/caselaw/documentunits/search?pg=0&sz=4&documentNumberOrFileNumber=" + "AB")
             .exchange()
             .expectStatus()
             .isOk()
@@ -287,7 +288,8 @@ class DocumentationUnitSearchIntegrationTest {
         risWebTestClient
             .withDefaultLogin()
             .get()
-            .uri("/api/v1/caselaw/documentunits/search?pg=1&sz=4&q=" + "AB")
+            .uri(
+                "/api/v1/caselaw/documentunits/search?pg=1&sz=4&documentNumberOrFileNumber=" + "AB")
             .exchange()
             .expectStatus()
             .isOk()
@@ -298,7 +300,8 @@ class DocumentationUnitSearchIntegrationTest {
         risWebTestClient
             .withDefaultLogin()
             .get()
-            .uri("/api/v1/caselaw/documentunits/search?pg=2&sz=4&q=" + "AB")
+            .uri(
+                "/api/v1/caselaw/documentunits/search?pg=2&sz=4&documentNumberOrFileNumber=" + "AB")
             .exchange()
             .expectStatus()
             .isOk()
@@ -343,5 +346,30 @@ class DocumentationUnitSearchIntegrationTest {
     List<String> documentNumbers3Actual =
         JsonPath.read(resultPage3.getResponseBody(), "$.content[*].documentNumber");
     assertThat(documentNumbers3Actual).hasSize(2).containsExactly("GE1234567808", "GE1234567809");
+  }
+
+  @Test
+  void testTrim() {
+    repository.save(
+        DocumentationUnitDTO.builder()
+            .documentNumber("AB1234567802")
+            .documentationOffice(docOfficeDTO)
+            .build());
+
+    EntityExchangeResult<String> result =
+        risWebTestClient
+            .withDefaultLogin()
+            .get()
+            .uri(
+                "/api/v1/caselaw/documentunits/search?pg=0&sz=10&documentNumberOrFileNumber=+++++AB")
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectBody(String.class)
+            .returnResult();
+
+    List<String> documentNumbersActual =
+        JsonPath.read(result.getResponseBody(), "$.content[*].documentNumber");
+    assertThat(documentNumbersActual).hasSize(1).containsExactly("AB1234567802");
   }
 }

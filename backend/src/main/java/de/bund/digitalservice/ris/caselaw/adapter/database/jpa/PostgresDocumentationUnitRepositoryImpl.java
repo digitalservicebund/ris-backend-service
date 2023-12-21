@@ -461,7 +461,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
       Boolean myDocOfficeOnly,
       DocumentType documentType,
       DocumentationOfficeDTO documentationOfficeDTO) {
-    if (docNumberOrFileNumber == null || docNumberOrFileNumber.isEmpty()) {
+    if (docNumberOrFileNumber == null || docNumberOrFileNumber.trim().isEmpty()) {
       return repository.searchByDocumentUnitSearchInput(
           documentationOfficeDTO.getId(),
           courtType,
@@ -483,6 +483,8 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
     // size results behind). If we don't always start with index 0, we might miss results.
     // This approach could even be better if we replace the next/previous with a "load more" button
     Pageable fixedPageRequest = PageRequest.of(0, maxResultsUpToCurrentPage);
+
+    docNumberOrFileNumber = docNumberOrFileNumber.trim();
 
     Slice<DocumentationUnitSearchResultDTO> docNumberResults =
         repository.searchByDocumentUnitSearchInputDocumentNumber(
@@ -550,7 +552,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
                 })
             .toList()
             .subList(
-                pageable.getPageNumber() * 30,
+                pageable.getPageNumber() * pageable.getPageSize(),
                 Math.min(allResults.size(), maxResultsUpToCurrentPage)),
         pageable,
         hasNext);
