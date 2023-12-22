@@ -19,8 +19,6 @@ public class CitationTypeTransformer {
 
     return CitationType.builder()
         .uuid(citationTypeDTO.getId())
-        .citationDocumentType(citationTypeDTO.getCitationDocumentCategory().getLabel())
-        .documentType(citationTypeDTO.getDocumentationUnitDocumentCategory().getLabel())
         .label(citationTypeDTO.getLabel())
         .jurisShortcut(citationTypeDTO.getAbbreviation())
         .build();

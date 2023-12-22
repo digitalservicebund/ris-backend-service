@@ -19,8 +19,6 @@ public class ActiveCitationTransformer extends RelatedDocumentationUnitTransform
       citationType =
           CitationType.builder()
               .uuid(citationTypeDTO.getId())
-              .documentType(citationTypeDTO.getDocumentationUnitDocumentCategory().getLabel())
-              .citationDocumentType(citationTypeDTO.getCitationDocumentCategory().getLabel())
               .jurisShortcut(citationTypeDTO.getAbbreviation())
               .label(citationTypeDTO.getLabel())
               .build();
