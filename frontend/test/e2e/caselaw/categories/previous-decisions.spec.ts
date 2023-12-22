@@ -383,7 +383,7 @@ test.describe("previous decisions", () => {
 
     await expect(
       page.locator("[aria-label='Entscheidungsdatum Vorgehende Entscheidung']"),
-    ).toBeDisabled()
+    ).toBeHidden()
 
     await page
       .locator("[aria-label='Datum Unbekannt Vorgehende Entscheidung']")

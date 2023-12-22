@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { onMounted, ref } from "vue"
+import { onMounted, ref, computed } from "vue"
 import SearchResultList, { SearchResults } from "./SearchResultList.vue"
 import ComboboxInput from "@/components/ComboboxInput.vue"
 import { useValidationStore } from "@/composables/useValidationStore"
@@ -36,6 +36,14 @@ const isLoading = ref(false)
 
 const searchResultsCurrentPage = ref<Page<RelatedDocumentation>>()
 const searchResults = ref<SearchResults<RelatedDocumentation>>()
+
+const dateUnkown = computed({
+  get: () => !previousDecision.value.dateKnown,
+  set: (value) => {
+    if (value) previousDecision.value.decisionDate = undefined
+    previousDecision.value.dateKnown = !value
+  },
+})
 
 async function search() {
   isLoading.value = true
@@ -132,7 +140,7 @@ onMounted(() => {
     >
       <CheckboxInput
         :id="id"
-        v-model="previousDecision.dateUnknown"
+        v-model="dateUnkown"
         aria-label="Datum Unbekannt Vorgehende Entscheidung"
       />
     </InputField>
@@ -153,7 +161,7 @@ onMounted(() => {
           @click="validationStore.remove('court')"
         ></ComboboxInput>
       </InputField>
-      <div class="flex w-full justify-between gap-24">
+      <div v-if="!dateUnkown" class="flex w-full justify-between gap-24">
         <InputField
           id="date"
           v-slot="slotProps"
@@ -164,7 +172,6 @@ onMounted(() => {
             id="decisionDate"
             v-model="previousDecision.decisionDate"
             aria-label="Entscheidungsdatum Vorgehende Entscheidung"
-            :disabled="!previousDecision.dateKnown"
             :has-error="slotProps.hasError"
             @focus="validationStore.remove('decisionDate')"
             @update:validation-error="slotProps.updateValidationError"

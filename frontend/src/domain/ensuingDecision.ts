@@ -11,7 +11,6 @@ export default class EnsuingDecision
 
   static requiredFields = ["fileNumber", "court", "decisionDate"] as const
   static fields = [
-    "pending",
     "fileNumber",
     "court",
     "decisionDate",
@@ -44,9 +43,11 @@ export default class EnsuingDecision
   }
 
   get missingRequiredFields() {
-    return EnsuingDecision.requiredFields.filter((field) =>
-      this.fieldIsEmpty(field, this[field]),
-    )
+    return EnsuingDecision.requiredFields.filter((field) => {
+      if (field === "decisionDate" && this.pending === true) {
+        return false
+      } else return this.fieldIsEmpty(field, this[field])
+    })
   }
 
   get isReadOnly(): boolean {
@@ -68,21 +69,18 @@ export default class EnsuingDecision
     fieldName: keyof EnsuingDecision,
     value: EnsuingDecision[(typeof EnsuingDecision.fields)[number]],
   ) {
-    if (fieldName === "pending") {
-      return true
-    }
-
-    if (fieldName === "decisionDate" && this.pending === true) {
-      return false
-    }
-
     if (value === undefined || !value || value === null) {
       return true
     }
     if (value instanceof Array && value.length === 0) {
       return true
     }
-    if (typeof value === "object" && "location" in value && "type" in value) {
+    if (
+      typeof value === "object" &&
+      fieldName === "court" &&
+      "location" in value &&
+      "type" in value
+    ) {
       return value.location === "" && value.type === ""
     }
     return false
