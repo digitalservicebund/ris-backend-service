@@ -4,6 +4,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.transformer.CitationTypeTransf
 import de.bund.digitalservice.ris.caselaw.domain.CitationTypeRepository;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.citation.CitationType;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -15,18 +16,8 @@ public class PostgresCitationTypeRepositoryImpl implements CitationTypeRepositor
   }
 
   @Override
-  public List<CitationType> findAllBySearchStr(String searchStr) {
+  public List<CitationType> findAllBySearchStr(Optional<String> searchStr) {
     return repository.findBySearchStr(searchStr).stream()
-        .map(CitationTypeTransformer::transformToDomain)
-        .toList();
-  }
-
-  @Override
-  public List<CitationType> findAllByCitationDocumentCategoryOrderByAbbreviation(
-      String documentCategoryLabel) {
-    return repository
-        .findAllByCitationDocumentCategoryOrderByAbbreviation(documentCategoryLabel)
-        .stream()
         .map(CitationTypeTransformer::transformToDomain)
         .toList();
   }

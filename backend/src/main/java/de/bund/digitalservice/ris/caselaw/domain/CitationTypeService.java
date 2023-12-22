@@ -17,10 +17,6 @@ public class CitationTypeService {
   }
 
   public List<CitationType> getCitationStyles(Optional<String> searchStr) {
-    if (searchStr.isPresent() && !searchStr.get().isBlank()) {
-      return citationTypeRepository.findAllBySearchStr(searchStr.get().trim());
-    }
-
-    return citationTypeRepository.findAllByCitationDocumentCategoryOrderByAbbreviation("R");
+    return citationTypeRepository.findAllBySearchStr(searchStr.map(String::trim));
   }
 }
