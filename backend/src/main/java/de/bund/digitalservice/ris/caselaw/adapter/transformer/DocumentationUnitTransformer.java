@@ -171,7 +171,6 @@ public class DocumentationUnitTransformer {
                   activeCitationDTO.setRank(i.getAndIncrement());
                   return activeCitationDTO;
                 })
-            .distinct()
             .toList());
   }
 
@@ -202,8 +201,8 @@ public class DocumentationUnitTransformer {
         }
       }
 
-      builder.ensuingDecisions(ensuingDecisionDTOs.stream().distinct().toList());
-      builder.pendingDecisions(pendingDecisionDTOs.stream().distinct().toList());
+      builder.ensuingDecisions(ensuingDecisionDTOs.stream().toList());
+      builder.pendingDecisions(pendingDecisionDTOs.stream().toList());
     }
   }
 
@@ -221,7 +220,6 @@ public class DocumentationUnitTransformer {
                     previousDecisionDTO.setRank(i.getAndIncrement());
                     return previousDecisionDTO;
                   })
-              .distinct()
               .toList());
     }
   }

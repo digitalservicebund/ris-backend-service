@@ -908,42 +908,6 @@ class EnsuingDecisionsIntegrationTest {
   }
 
   @Test
-  void testUpdateDocumentationUnit_shouldNotAddSameLinkedDecisionTwice() {
-    DocumentUnit documentUnitFromFrontend =
-        DocumentUnit.builder()
-            .uuid(UUID.fromString("46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3"))
-            .documentNumber("documentnr001")
-            .coreData(CoreData.builder().build())
-            .ensuingDecisions(
-                List.of(
-                    EnsuingDecision.builder()
-                        .uuid(UUID.fromString("f0232240-7416-11ee-b962-0242ac120002"))
-                        .documentNumber("documentnr002")
-                        .build(),
-                    EnsuingDecision.builder()
-                        .uuid(UUID.fromString("f0232240-7416-11ee-b962-0242ac120002"))
-                        .documentNumber("documentnr002")
-                        .build()))
-            .build();
-
-    risWebTestClient
-        .withDefaultLogin()
-        .put()
-        .uri("/api/v1/caselaw/documentunits/46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3")
-        .bodyValue(documentUnitFromFrontend)
-        .exchange()
-        .expectStatus()
-        .isOk()
-        .expectBody(DocumentUnit.class)
-        .consumeWith(
-            response -> {
-              assertThat(response.getResponseBody().ensuingDecisions()).hasSize(1);
-              assertThat(response.getResponseBody().ensuingDecisions().get(0).getDocumentNumber())
-                  .isEqualTo("documentnr002");
-            });
-  }
-
-  @Test
   void testUpdateDocumentUnit_removeLinkedEnsuingDecision() {
     UUID uuid = UUID.fromString("46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3");
     UUID ensuingDecisionUUID1 = UUID.fromString("f0232240-7416-11ee-b962-0242ac120002");

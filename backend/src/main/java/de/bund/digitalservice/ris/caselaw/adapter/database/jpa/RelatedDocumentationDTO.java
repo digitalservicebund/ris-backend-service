@@ -13,7 +13,6 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
-import java.util.Objects;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -60,17 +59,4 @@ public abstract class RelatedDocumentationDTO {
 
   @Column(name = "document_number", insertable = false, updatable = false)
   private String documentNumber;
-
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass() || documentNumber == null) return false;
-    RelatedDocumentationDTO that = (RelatedDocumentationDTO) o;
-    return Objects.equals(documentNumber, that.getDocumentNumber());
-  }
-
-  @Override
-  public int hashCode() {
-    return Objects.hash(documentNumber);
-  }
 }

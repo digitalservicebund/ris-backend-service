@@ -1147,63 +1147,6 @@ class ActiveCitationIntegrationTest {
   }
 
   @Test
-  void testUpdateDocumentationUnit_shouldNotAddSameLinkedActiveCitationTwice() {
-    UUID activeCitationUUID1 = UUID.fromString("f0232240-7416-11ee-b962-0242ac120002");
-    UUID activeCitationUUID2 = UUID.fromString("f0232240-7416-11ee-b962-0242ac120003");
-    DocumentUnit documentUnitFromFrontend =
-        DocumentUnit.builder()
-            .uuid(UUID.fromString("46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3"))
-            .documentNumber("documentnr001")
-            .coreData(CoreData.builder().build())
-            .contentRelatedIndexing(
-                ContentRelatedIndexing.builder()
-                    .activeCitations(
-                        List.of(
-                            ActiveCitation.builder()
-                                .uuid(activeCitationUUID1)
-                                .court(
-                                    Court.builder()
-                                        .id(UUID.fromString("96301f85-9bd2-4690-a67f-f9fdfe725de3"))
-                                        .location("Karlsruhe")
-                                        .type("BGH")
-                                        .build())
-                                .build(),
-                            ActiveCitation.builder()
-                                .uuid(activeCitationUUID2)
-                                .documentNumber("documentnr002")
-                                .build(),
-                            ActiveCitation.builder()
-                                .uuid(activeCitationUUID2)
-                                .documentNumber("documentnr002")
-                                .build()))
-                    .build())
-            .build();
-
-    risWebTestClient
-        .withDefaultLogin()
-        .put()
-        .uri("/api/v1/caselaw/documentunits/46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3")
-        .bodyValue(documentUnitFromFrontend)
-        .exchange()
-        .expectStatus()
-        .isOk()
-        .expectBody(DocumentUnit.class)
-        .consumeWith(
-            response -> {
-              assertThat(response.getResponseBody().contentRelatedIndexing().activeCitations())
-                  .hasSize(2);
-              assertThat(
-                      response
-                          .getResponseBody()
-                          .contentRelatedIndexing()
-                          .activeCitations()
-                          .get(1)
-                          .getDocumentNumber())
-                  .isEqualTo("documentnr002");
-            });
-  }
-
-  @Test
   void testUpdateDocumentUnit_removeLinkedActiveCitation() {
     risWebTestClient
         .withDefaultLogin()

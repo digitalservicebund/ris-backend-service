@@ -337,7 +337,7 @@ class PreviousDecisionIntegrationTest {
         .expectBody(DocumentUnit.class)
         .consumeWith(
             response -> {
-              assertThat(response.getResponseBody().previousDecisions()).hasSize(1);
+              assertThat(response.getResponseBody().previousDecisions()).hasSize(2);
               assertThat(response.getResponseBody().previousDecisions().get(0))
                   .extracting("documentNumber")
                   .isEqualTo("xxx");
