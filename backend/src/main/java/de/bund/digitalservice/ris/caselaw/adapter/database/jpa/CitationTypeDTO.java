@@ -15,7 +15,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
 
 @Getter
 @Setter
@@ -40,9 +39,4 @@ public class CitationTypeDTO {
   @JoinColumn(name = "citation_document_category_id")
   @NotNull
   private DocumentCategoryDTO citationDocumentCategory;
-
-  @Column(name = "juris_id", nullable = false, unique = true, updatable = false)
-  @ToString.Include
-  @NotNull
-  private Integer jurisId;
 }
