@@ -42,9 +42,6 @@ public abstract class RelatedDocumentationDTO {
   @JoinColumn(name = "document_type_id")
   private DocumentTypeDTO documentType;
 
-  @Column(name = "document_type_raw_value", insertable = false, updatable = false)
-  private String documentTypeRawValue;
-
   @Column(name = "file_number")
   private String fileNumber;
 
