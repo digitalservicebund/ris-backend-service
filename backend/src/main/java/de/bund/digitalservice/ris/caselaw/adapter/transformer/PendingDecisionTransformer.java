@@ -3,19 +3,23 @@ package de.bund.digitalservice.ris.caselaw.adapter.transformer;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PendingDecisionDTO;
 import de.bund.digitalservice.ris.caselaw.domain.EnsuingDecision;
+import java.util.Optional;
 
 public class PendingDecisionTransformer extends RelatedDocumentationUnitTransformer {
   public static EnsuingDecision transformToDomain(PendingDecisionDTO pendingDecisionDTO) {
+    Optional<DocumentationUnitDTO> referencedDocumentationUnit =
+        Optional.ofNullable(pendingDecisionDTO.getReferencedDocumentationUnit());
     return EnsuingDecision.builder()
         .uuid(pendingDecisionDTO.getId())
-        .documentNumber(pendingDecisionDTO.getDocumentNumber())
+        .documentNumber(
+            referencedDocumentationUnit.map(DocumentationUnitDTO::getDocumentNumber).orElse(null))
         .court(getCourtFromDTO(pendingDecisionDTO.getCourt()))
         .fileNumber(getFileNumber(pendingDecisionDTO.getFileNumber()))
         .documentType(getDocumentTypeFromDTO(pendingDecisionDTO.getDocumentType()))
         .decisionDate(pendingDecisionDTO.getDate())
         .note(pendingDecisionDTO.getNote())
         .pending(true)
-        .referenceFound(pendingDecisionDTO.getReferencedDocumentationUnit() != null)
+        .referenceFound(referencedDocumentationUnit.isPresent())
         .build();
   }
 

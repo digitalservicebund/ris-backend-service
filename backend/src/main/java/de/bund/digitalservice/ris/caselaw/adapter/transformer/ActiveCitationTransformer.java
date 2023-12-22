@@ -6,6 +6,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CitationTypeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
 import de.bund.digitalservice.ris.caselaw.domain.ActiveCitation;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.citation.CitationType;
+import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -25,15 +26,18 @@ public class ActiveCitationTransformer extends RelatedDocumentationUnitTransform
               .build();
     }
 
+    Optional<DocumentationUnitDTO> referencedDocumentationUnit =
+        Optional.ofNullable(activeCitationDTO.getReferencedDocumentationUnit());
     return ActiveCitation.builder()
         .uuid(activeCitationDTO.getId())
-        .documentNumber(activeCitationDTO.getDocumentNumber())
+        .documentNumber(
+            referencedDocumentationUnit.map(DocumentationUnitDTO::getDocumentNumber).orElse(null))
         .court(getCourtFromDTO(activeCitationDTO.getCourt()))
         .fileNumber(getFileNumber(activeCitationDTO.getFileNumber()))
         .documentType(getDocumentTypeFromDTO(activeCitationDTO.getDocumentType()))
         .decisionDate(activeCitationDTO.getDate())
         .citationType(citationType)
-        .referenceFound(activeCitationDTO.getReferencedDocumentationUnit() != null)
+        .referenceFound(referencedDocumentationUnit.isPresent())
         .build();
   }
 
@@ -54,7 +58,6 @@ public class ActiveCitationTransformer extends RelatedDocumentationUnitTransform
                         .id(activeCitation.getUuid())
                         .documentNumber(activeCitation.getDocumentNumber())
                         .build())
-            .documentNumber(activeCitation.getDocumentNumber())
             .documentType(getDocumentTypeFromDomain(activeCitation.getDocumentType()))
             .fileNumber(getFileNumber(activeCitation.getFileNumber()));
 
