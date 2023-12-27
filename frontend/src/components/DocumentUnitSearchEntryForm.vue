@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, onMounted, ref, watch } from "vue"
+import { computed, onMounted, onUnmounted, ref, watch } from "vue"
 import useQuery, { Query } from "@/composables/useQueryFromRoute"
 import { useValidationStore } from "@/composables/useValidationStore"
 import { PublicationState } from "@/domain/documentUnit"
@@ -134,6 +134,10 @@ function handleSearchButtonClicked() {
   }
 }
 
+function handleSearchShortcut(event: KeyboardEvent) {
+  if (event.ctrlKey && event.key == "Enter") handleSearchButtonClicked()
+}
+
 watch(
   route,
   () => {
@@ -154,6 +158,11 @@ watch(
 
 onMounted(async () => {
   if (!searchEntryEmpty.value) emit("search", getQueryFromRoute())
+  window.addEventListener("keydown", handleSearchShortcut)
+})
+
+onUnmounted(() => {
+  window.removeEventListener("keydown", handleSearchShortcut)
 })
 </script>
 

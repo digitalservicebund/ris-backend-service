@@ -1,11 +1,10 @@
 import { userEvent } from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
-import { createPinia, setActivePinia } from "pinia"
+import { createPinia } from "pinia"
 import { createRouter, createWebHistory } from "vue-router"
 import DocumentUnitSearchEntryForm from "@/components/DocumentUnitSearchEntryForm.vue"
 
-function renderComponent(options?: { isLoading: boolean }) {
-  // eslint-disable-next-line testing-library/await-async-events
+async function renderComponent(options?: { isLoading: boolean }) {
   const props = {
     isLoading: options?.isLoading ? options?.isLoading : false,
   }
@@ -14,23 +13,8 @@ function renderComponent(options?: { isLoading: boolean }) {
     history: createWebHistory(),
     routes: [
       {
-        path: "/caselaw/documentUnit/new",
-        name: "new",
-        component: {},
-      },
-      {
         path: "/",
         name: "home",
-        component: {},
-      },
-      {
-        path: "/caselaw/documentUnit/:documentNumber/categories",
-        name: "caselaw-documentUnit-documentNumber-categories",
-        component: {},
-      },
-      {
-        path: "/caselaw/documentUnit/:documentNumber/files",
-        name: "caselaw-documentUnit-documentNumber-files",
         component: {},
       },
     ],
@@ -39,20 +23,16 @@ function renderComponent(options?: { isLoading: boolean }) {
   return {
     ...render(DocumentUnitSearchEntryForm, {
       props,
-      global: { plugins: [router] },
+      global: { plugins: [router, createPinia()] },
     }),
+    user: userEvent.setup(),
+    router: router,
   }
 }
 
 describe("Documentunit Search", () => {
-  const user = userEvent.setup()
-
-  beforeEach(async () => {
-    setActivePinia(createPinia())
-  })
-
   test("renders correctly", async () => {
-    renderComponent()
+    await renderComponent()
     expect(
       screen.getByLabelText("Dokumentnummer oder Aktenzeichen Suche"),
     ).toBeVisible()
@@ -64,7 +44,7 @@ describe("Documentunit Search", () => {
   })
 
   test("click on 'Suche zurücksetzen' emits 'resetSearchResults'", async () => {
-    const { emitted } = renderComponent()
+    const { emitted, user } = await renderComponent()
     await user.type(
       screen.getByLabelText("Entscheidungsdatum Suche"),
       "22.02.2001",
@@ -74,11 +54,12 @@ describe("Documentunit Search", () => {
   })
 
   test("click on 'Ergebnisse anzeigen' emits search event", async () => {
-    const { emitted } = renderComponent()
+    const { emitted, user } = await renderComponent()
 
-    const input = screen.getByLabelText("Entscheidungsdatum Suche")
-
-    await user.type(input, "22.02.2001")
+    await user.type(
+      screen.getByLabelText("Entscheidungsdatum Suche"),
+      "22.02.2001",
+    )
     await user.click(
       screen.getByLabelText("Nach Dokumentationseinheiten suchen"),
     )
@@ -87,7 +68,7 @@ describe("Documentunit Search", () => {
   })
 
   test("click on 'Nur meine Dokstelle' renders 'Nur fehlerhafte Dokumentationseinheiten' checkbox", async () => {
-    renderComponent()
+    const { user } = await renderComponent()
     expect(
       screen.queryByLabelText("Nur fehlerhafte Dokumentationseinheiten"),
     ).not.toBeInTheDocument()
@@ -99,7 +80,7 @@ describe("Documentunit Search", () => {
   })
 
   test("click on 'Nur meine Dokstelle' renders 'Nur fehlerhafte Dokumentationseinheiten' checkbox", async () => {
-    renderComponent()
+    const { user } = await renderComponent()
     expect(
       screen.queryByLabelText("Nur fehlerhafte Dokumentationseinheiten"),
     ).not.toBeInTheDocument()
@@ -108,5 +89,19 @@ describe("Documentunit Search", () => {
     expect(
       screen.getByLabelText("Nur fehlerhafte Dokumentationseinheiten"),
     ).toBeVisible()
+  })
+
+  test("search by pressing ctrl & enter", async () => {
+    const { emitted, router, user } = await renderComponent()
+    await router.push("/") // reset for whatever reason
+
+    await user.type(
+      screen.getByLabelText("Entscheidungsdatum Suche"),
+      "22.02.2002",
+    )
+
+    await user.keyboard("{Control>}{Enter}")
+
+    expect(emitted("search")).toBeTruthy()
   })
 })
