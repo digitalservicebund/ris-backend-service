@@ -8,6 +8,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 public interface DatabaseDocumentationUnitRepository
     extends JpaRepository<DocumentationUnitDTO, UUID> {
@@ -60,16 +61,16 @@ ORDER BY documentationUnit.documentNumber
   @SuppressWarnings("java:S107")
   // We use JPA repository interface magic, so reducing parameter count is not possible.
   Slice<DocumentationUnitSearchResultDTO> searchByDocumentUnitSearchInput(
-      UUID documentationOfficeId,
-      String courtType,
-      String courtLocation,
-      LocalDate decisionDate,
-      LocalDate decisionDateEnd,
-      PublicationStatus status,
-      Boolean withErrorOnly,
-      Boolean myDocOfficeOnly,
-      DocumentTypeDTO documentType,
-      Pageable pageable);
+      @Param("documentationOfficeId") UUID documentationOfficeId,
+      @Param("courtType") String courtType,
+      @Param("courtLocation") String courtLocation,
+      @Param("decisionDate") LocalDate decisionDate,
+      @Param("decisionDateEnd") LocalDate decisionDateEnd,
+      @Param("status") PublicationStatus status,
+      @Param("withErrorOnly") Boolean withErrorOnly,
+      @Param("myDocOfficeOnly") Boolean myDocOfficeOnly,
+      @Param("documentType") DocumentTypeDTO documentType,
+      @Param("pageable") Pageable pageable);
 
   @Query(
       value =
@@ -83,17 +84,17 @@ ORDER BY documentationUnit.documentNumber
   @SuppressWarnings("java:S107")
   // We use JPA repository interface magic, so reducing parameter count is not possible.
   Slice<DocumentationUnitSearchResultDTO> searchByDocumentUnitSearchInputDocumentNumber(
-      UUID documentationOfficeId,
-      String documentNumberOrFileNumber,
-      String courtType,
-      String courtLocation,
-      LocalDate decisionDate,
-      LocalDate decisionDateEnd,
-      PublicationStatus status,
-      Boolean withErrorOnly,
-      Boolean myDocOfficeOnly,
-      DocumentTypeDTO documentType,
-      Pageable pageable);
+      @Param("documentationOfficeId") UUID documentationOfficeId,
+      @Param("documentNumberOrFileNumber") String documentNumberOrFileNumber,
+      @Param("courtType") String courtType,
+      @Param("courtLocation") String courtLocation,
+      @Param("decisionDate") LocalDate decisionDate,
+      @Param("decisionDateEnd") LocalDate decisionDateEnd,
+      @Param("status") PublicationStatus status,
+      @Param("withErrorOnly") Boolean withErrorOnly,
+      @Param("myDocOfficeOnly") Boolean myDocOfficeOnly,
+      @Param("documentType") DocumentTypeDTO documentType,
+      @Param("pageable") Pageable pageable);
 
   @Query(
       value =
@@ -108,17 +109,17 @@ ORDER BY documentationUnit.documentNumber
   @SuppressWarnings("java:S107")
   // We use JPA repository interface magic, so reducing parameter count is not possible.
   Slice<DocumentationUnitSearchResultDTO> searchByDocumentUnitSearchInputFileNumber(
-      UUID documentationOfficeId,
-      String documentNumberOrFileNumber,
-      String courtType,
-      String courtLocation,
-      LocalDate decisionDate,
-      LocalDate decisionDateEnd,
-      PublicationStatus status,
-      Boolean withErrorOnly,
-      Boolean myDocOfficeOnly,
-      DocumentTypeDTO documentType,
-      Pageable pageable);
+      @Param("documentationOfficeId") UUID documentationOfficeId,
+      @Param("documentNumberOrFileNumber") String documentNumberOrFileNumber,
+      @Param("courtType") String courtType,
+      @Param("courtLocation") String courtLocation,
+      @Param("decisionDate") LocalDate decisionDate,
+      @Param("decisionDateEnd") LocalDate decisionDateEnd,
+      @Param("status") PublicationStatus status,
+      @Param("withErrorOnly") Boolean withErrorOnly,
+      @Param("myDocOfficeOnly") Boolean myDocOfficeOnly,
+      @Param("documentType") DocumentTypeDTO documentType,
+      @Param("pageable") Pageable pageable);
 
   @Query(
       value =

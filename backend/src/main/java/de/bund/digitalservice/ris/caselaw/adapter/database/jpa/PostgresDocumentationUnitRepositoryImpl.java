@@ -35,6 +35,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Mono;
@@ -562,7 +563,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
   public Slice<DocumentationUnitSearchResult> searchByDocumentationUnitSearchInput(
       Pageable pageable,
       DocumentationOffice documentationOffice,
-      DocumentationUnitSearchInput searchInput) {
+      @Param("searchInput") DocumentationUnitSearchInput searchInput) {
     if (log.isDebugEnabled()) {
       log.debug("Find by overview search: {}, {}", documentationOffice, searchInput);
     }
