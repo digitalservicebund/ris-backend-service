@@ -12,6 +12,7 @@ import LoadingSpinner from "@/shared/components/LoadingSpinner.vue"
 import PopupModal from "@/shared/components/PopupModal.vue"
 import IconAttachedFile from "~icons/ic/baseline-attach-file"
 import IconDelete from "~icons/ic/baseline-delete"
+import IconError from "~icons/ic/baseline-error"
 
 const props = defineProps<{
   documentUnitListEntries?: DocumentUnitListEntry[]
@@ -24,15 +25,6 @@ const emit = defineEmits<{
 }>()
 
 const router = useRouter()
-
-const listEntriesWithStatus = computed(() => {
-  return props.documentUnitListEntries && !props.isLoading
-    ? props.documentUnitListEntries.map((entry) => ({
-        ...entry,
-        status: useStatusBadge(entry.status).value,
-      }))
-    : []
-})
 
 const emptyStatus = computed(() => {
   if (!props.documentUnitListEntries) {
@@ -108,7 +100,7 @@ function onDelete() {
       </div>
 
       <div
-        v-for="(listEntry, id) in listEntriesWithStatus"
+        v-for="(listEntry, id) in documentUnitListEntries"
         :key="id"
         class="ds-label-01-reg table-row border-b-2 border-b-gray-100 px-16 hover:bg-gray-100"
         data-testid="listEntry"
@@ -154,19 +146,19 @@ function onDelete() {
         </div>
         <div class="table-cell p-16">
           <IconBadge
-            v-if="listEntry.status"
-            :color="listEntry.status.color"
-            :icon="listEntry.status.icon"
-            :value="listEntry.status.value"
+            v-if="listEntry.status?.publicationStatus"
+            v-bind="useStatusBadge(listEntry.status).value"
           />
         </div>
         <div class="table-cell p-16">
           <IconBadge
-            v-if="listEntry.status"
-            :color="listEntry.status.color"
-            :icon="listEntry.status.icon"
-            :value="listEntry.status.value"
+            v-if="!listEntry.status?.withError"
+            background-color="bg-red-300"
+            color="text-red-900"
+            :icon="IconError"
+            label="Fehler"
           />
+          <span v-else>-</span>
         </div>
         <div class="table-cell p-16">
           <button

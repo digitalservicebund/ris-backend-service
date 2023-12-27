@@ -223,7 +223,7 @@ test.describe("active citations", () => {
     await expect(page.locator("text=Email wurde versendet")).toBeVisible()
 
     await expect(page.locator("text=Xml Email Abgabe -")).toBeVisible()
-    await expect(page.locator("text=in Veröffentlichung")).toBeVisible()
+    await expect(page.locator("text=In Veröffentlichung")).toBeVisible()
 
     await navigateToCategories(page, documentNumber)
     await expect(page.getByText(documentNumber)).toBeVisible()
@@ -299,7 +299,7 @@ test.describe("active citations", () => {
     await expect(page.locator("text=Email wurde versendet")).toBeVisible()
 
     await expect(page.locator("text=Xml Email Abgabe -")).toBeVisible()
-    await expect(page.locator("text=in Veröffentlichung")).toBeVisible()
+    await expect(page.locator("text=In Veröffentlichung")).toBeVisible()
 
     await navigateToCategories(page, documentNumber)
     await expect(page.getByText(documentNumber)).toBeVisible()

@@ -45,9 +45,10 @@ function isBadge(
         <div v-for="entry in firstRow" :key="entry.label">
           <IconBadge
             v-if="isBadge(entry)"
+            :background-color="entry.backgroundColor"
             :color="entry.color"
             :icon="toRaw(entry.icon)"
-            :value="entry.value"
+            :label="entry.label"
           />
           <PropertyInfo
             v-else
@@ -62,9 +63,10 @@ function isBadge(
         <div v-for="entry in secondRow" :key="entry.label" class="-mt-20">
           <IconBadge
             v-if="isBadge(entry)"
+            :background-color="entry.backgroundColor"
             :color="entry.color"
             :icon="entry.icon"
-            :value="entry.value"
+            :label="entry.label"
           />
           <PropertyInfo
             v-else
