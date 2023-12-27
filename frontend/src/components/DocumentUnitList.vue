@@ -85,27 +85,29 @@ function onDelete() {
       @close-modal="toggleModal"
       @confirm-action="onDelete"
     />
-    <div class="document-unit-list-table relative table w-full border-collapse">
-      <div class="ds-label-01-bold table-row bg-gray-400">
-        <div class="table-cell p-16">Dokumentnummer</div>
-        <div class="table-cell p-16">Aktenzeichen</div>
-        <div class="table-cell p-16">Gerichtstyp</div>
-        <div class="table-cell p-16">Gerichtsort</div>
-        <div class="table-cell p-16">Datum</div>
-        <div class="table-cell p-16">Typ</div>
-        <div class="table-cell p-16">Inhalt</div>
-        <div class="table-cell p-16">Status</div>
-        <div class="table-cell p-16">Fehler</div>
-        <div class="table-cell p-16"></div>
+    <div class="relative table w-full border-collapse">
+      <div
+        class="ds-label-03-bold table-row border-b-2 border-solid border-blue-300 text-gray-900"
+      >
+        <div class="table-cell px-16 py-12">Dokumentnummer</div>
+        <div class="table-cell px-16 py-12">Aktenzeichen</div>
+        <div class="table-cell px-16 py-12">Gerichtstyp</div>
+        <div class="table-cell px-16 py-12">Gerichtsort</div>
+        <div class="table-cell px-16 py-12">Datum</div>
+        <div class="table-cell px-16 py-12">Typ</div>
+        <div class="table-cell px-16 py-12">Inhalt</div>
+        <div class="table-cell px-16 py-12">Status</div>
+        <div class="table-cell px-16 py-12">Fehler</div>
+        <div class="table-cell px-16 py-12"></div>
       </div>
 
       <div
         v-for="(listEntry, id) in documentUnitListEntries"
         :key="id"
-        class="ds-label-01-reg table-row border-b-2 border-b-gray-100 px-16 hover:bg-gray-100"
+        class="ds-body-01-reg table-row border-b-1 border-b-blue-300 hover:bg-gray-100"
         data-testid="listEntry"
       >
-        <div class="table-cell p-16">
+        <div class="table-cell px-16 py-12">
           <router-link
             class="underline"
             :to="{
@@ -118,41 +120,43 @@ function onDelete() {
             {{ listEntry.documentNumber }}
           </router-link>
         </div>
-        <div class="table-cell p-16">
+        <div class="table-cell px-16 py-12">
           {{ listEntry.fileNumber ? listEntry.fileNumber : "-" }}
         </div>
 
-        <div class="table-cell p-16">
+        <div class="table-cell px-16 py-12">
           {{ listEntry.court ? listEntry.court.type : "-" }}
         </div>
-        <div class="table-cell p-16">
+        <div class="table-cell px-16 py-12">
           {{ listEntry.court ? listEntry.court.location : "-" }}
         </div>
-        <div class="table-cell p-16">
+        <div class="table-cell px-16 py-12">
           {{
             listEntry.decisionDate
               ? dayjs(listEntry.decisionDate).format("DD.MM.YYYY")
               : "-"
           }}
         </div>
-        <div class="table-cell p-16">
-          {{ listEntry.documentType ? listEntry.documentType.label : "-" }}
+        <div class="table-cell px-16 py-12">
+          {{
+            listEntry.documentType ? listEntry.documentType.jurisShortcut : "-"
+          }}
         </div>
-        <div class="table-cell p-16">
+        <div class="table-cell px-16 py-12">
           <span v-if="listEntry.fileName">
             <IconAttachedFile />
           </span>
           <span v-else>-</span>
         </div>
-        <div class="table-cell p-16">
+        <div class="table-cell px-16 py-12">
           <IconBadge
             v-if="listEntry.status?.publicationStatus"
             v-bind="useStatusBadge(listEntry.status).value"
           />
         </div>
-        <div class="table-cell p-16">
+        <div class="table-cell px-16 py-12">
           <IconBadge
-            v-if="!listEntry.status?.withError"
+            v-if="listEntry.status?.withError"
             background-color="bg-red-300"
             color="text-red-900"
             :icon="IconError"
@@ -160,7 +164,7 @@ function onDelete() {
           />
           <span v-else>-</span>
         </div>
-        <div class="table-cell p-16">
+        <div class="table-cell px-16 py-12">
           <button
             aria-label="Dokumentationseinheit löschen"
             class="cursor-pointer"
