@@ -96,14 +96,15 @@ function onDelete() {
     <div class="document-unit-list-table relative table w-full border-collapse">
       <div class="ds-label-01-bold table-row bg-gray-400">
         <div class="table-cell p-16">Dokumentnummer</div>
-        <div class="table-cell p-16"></div>
-        <div class="table-cell p-16">Gerichtstyp</div>
-        <div class="table-cell p-16">Ort</div>
-        <div class="table-cell p-16">Entscheidungsdatum</div>
         <div class="table-cell p-16">Aktenzeichen</div>
-        <div class="table-cell p-16">Dokumenttyp</div>
+        <div class="table-cell p-16">Gerichtstyp</div>
+        <div class="table-cell p-16">Gerichtsort</div>
+        <div class="table-cell p-16">Datum</div>
+        <div class="table-cell p-16">Typ</div>
+        <div class="table-cell p-16">Inhalt</div>
         <div class="table-cell p-16">Status</div>
-        <div class="table-cell p-16">Löschen</div>
+        <div class="table-cell p-16">Fehler</div>
+        <div class="table-cell p-16"></div>
       </div>
 
       <div
@@ -126,11 +127,9 @@ function onDelete() {
           </router-link>
         </div>
         <div class="table-cell p-16">
-          <span v-if="listEntry.fileName">
-            <IconAttachedFile />
-          </span>
-          <span v-else>-</span>
+          {{ listEntry.fileNumber ? listEntry.fileNumber : "-" }}
         </div>
+
         <div class="table-cell p-16">
           {{ listEntry.court ? listEntry.court.type : "-" }}
         </div>
@@ -145,10 +144,21 @@ function onDelete() {
           }}
         </div>
         <div class="table-cell p-16">
-          {{ listEntry.fileNumber ? listEntry.fileNumber : "-" }}
+          {{ listEntry.documentType ? listEntry.documentType.label : "-" }}
         </div>
         <div class="table-cell p-16">
-          {{ listEntry.documentType ? listEntry.documentType.label : "-" }}
+          <span v-if="listEntry.fileName">
+            <IconAttachedFile />
+          </span>
+          <span v-else>-</span>
+        </div>
+        <div class="table-cell p-16">
+          <IconBadge
+            v-if="listEntry.status"
+            :color="listEntry.status.color"
+            :icon="listEntry.status.icon"
+            :value="listEntry.status.value"
+          />
         </div>
         <div class="table-cell p-16">
           <IconBadge
