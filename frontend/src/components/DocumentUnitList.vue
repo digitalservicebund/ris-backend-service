@@ -95,7 +95,7 @@ function onDelete() {
         <div class="table-cell px-16 py-12">Gerichtsort</div>
         <div class="table-cell px-16 py-12">Datum</div>
         <div class="table-cell px-16 py-12">Typ</div>
-        <div class="table-cell px-16 py-12">Inhalt</div>
+        <div class="table-cell px-16 py-12">Anhang</div>
         <div class="table-cell px-16 py-12">Status</div>
         <div class="table-cell px-16 py-12">Fehler</div>
         <div class="table-cell px-16 py-12"></div>
@@ -142,11 +142,11 @@ function onDelete() {
             listEntry.documentType ? listEntry.documentType.jurisShortcut : "-"
           }}
         </div>
-        <div class="table-cell px-16 py-12">
-          <span v-if="listEntry.fileName">
+        <div class="table-cell px-12 align-middle">
+          <span v-if="listEntry.fileName" class="text-blue-800">
             <IconAttachedFile />
           </span>
-          <span v-else>-</span>
+          <span v-else class="text-blue-300"><IconAttachedFile /></span>
         </div>
         <div class="table-cell px-16 py-12">
           <IconBadge
