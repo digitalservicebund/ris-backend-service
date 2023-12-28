@@ -11,7 +11,7 @@ import TextButton from "@/shared/components/input/TextButton.vue"
 import LoadingSpinner from "@/shared/components/LoadingSpinner.vue"
 import PopupModal from "@/shared/components/PopupModal.vue"
 import IconAttachedFile from "~icons/ic/baseline-attach-file"
-import IconDelete from "~icons/ic/baseline-delete"
+import IconDelete from "~icons/ic/baseline-close"
 import IconError from "~icons/ic/baseline-error"
 
 const props = defineProps<{
@@ -164,10 +164,10 @@ function onDelete() {
           />
           <span v-else>-</span>
         </div>
-        <div class="table-cell px-16 py-12">
+        <div class="table-cell px-12">
           <button
             aria-label="Dokumentationseinheit löschen"
-            class="cursor-pointer"
+            class="cursor-pointer align-middle text-blue-800"
             @click="
               setSelectedDocumentUnitListEntry(
                 documentUnitListEntries?.find(
