@@ -99,7 +99,7 @@ watch(props, () => {
 </script>
 
 <template>
-  <div>
+  <div class="flex flex-col gap-24">
     <InputField id="norm-reference-search-field" label="Suchfeld">
       <ComboboxInput
         id="norm-reference-search"
@@ -140,6 +140,7 @@ watch(props, () => {
           v-model="norm.singleNorm"
           aria-label="Einzelnorm der Norm"
           :has-error="slotProps.hasError"
+          size="medium"
           @input="validationStore.remove('singleNorm')"
         ></TextInput>
       </InputField>
@@ -153,6 +154,7 @@ watch(props, () => {
           id="norm-date-of-version"
           v-model="norm.dateOfVersion"
           aria-label="Fassungsdatum der Norm"
+          class="ds-input-medium"
           :has-error="slotProps.hasError"
           @update:validation-error="slotProps.updateValidationError"
         />
@@ -168,17 +170,20 @@ watch(props, () => {
           v-model="norm.dateOfRelevance"
           aria-label="Jahr der Norm"
           :has-error="slotProps.hasError"
+          size="medium"
           @update:validation-error="slotProps.updateValidationError"
         />
       </InputField>
     </div>
-    <TextButton
-      aria-label="Norm speichern"
-      class="mr-28"
-      :disabled="norm.isEmpty"
-      label="Übernehmen"
-      size="small"
-      @click="addNormReference"
-    />
+    <div>
+      <TextButton
+        aria-label="Norm speichern"
+        button-type="tertiary"
+        :disabled="norm.isEmpty"
+        label="Übernehmen"
+        size="small"
+        @click="addNormReference"
+      />
+    </div>
   </div>
 </template>

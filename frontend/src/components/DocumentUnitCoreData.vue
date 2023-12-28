@@ -39,10 +39,11 @@ const resizeObserver = new ResizeObserver((entries) => {
 </script>
 
 <template>
-  <div v-if="!modelValue">Loading...</div>
-
-  <div v-else class="mb-[4rem]">
-    <h1 class="core-data ds-heading-02-reg mb-[1rem]">Stammdaten</h1>
+  <div
+    aria-label="Nachgehende Entscheidung"
+    class="core-data mb-16 flex flex-col gap-24 bg-white p-32"
+  >
+    <h2 class="ds-heading-03-bold">Stammdaten</h2>
 
     <InputGroup
       v-model="courtValues"

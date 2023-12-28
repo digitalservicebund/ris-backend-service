@@ -132,8 +132,8 @@ onMounted(() => {
 </script>
 
 <template>
-  <div>
-    <div v-if="!ensuingDecision.hasForeignSource">
+  <div class="flex flex-col gap-24">
+    <div v-if="!ensuingDecision.hasForeignSource" class="flex flex-col gap-24">
       <InputField
         id="isPending"
         v-slot="{ id }"
@@ -144,6 +144,7 @@ onMounted(() => {
           :id="id"
           v-model="isPending"
           aria-label="Anhängige Entscheidung"
+          size="small"
         />
       </InputField>
       <div class="flex justify-between gap-24">
@@ -174,6 +175,7 @@ onMounted(() => {
               id="decisionDate"
               v-model="ensuingDecision.decisionDate"
               aria-label="Entscheidungsdatum Nachgehende Entscheidung"
+              class="ds-input-medium"
               :has-error="slotProps.hasError"
               @focus="validationStore.remove('decisionDate')"
               @update:validation-error="slotProps.updateValidationError"
@@ -195,6 +197,7 @@ onMounted(() => {
             v-model="ensuingDecision.fileNumber"
             aria-label="Aktenzeichen Nachgehende Entscheidung"
             :has-error="slotProps.hasError"
+            size="medium"
             @input="validationStore.remove('fileNumber')"
           ></TextInput>
         </InputField>
@@ -225,6 +228,7 @@ onMounted(() => {
         v-model="ensuingDecision.note"
         aria-label="Vermerk"
         :has-error="hasError"
+        size="medium"
         @input="validationStore.remove('note')"
       ></TextInput>
     </InputField>
@@ -233,7 +237,7 @@ onMounted(() => {
       <TextButton
         v-if="!ensuingDecision.hasForeignSource"
         aria-label="Nach Entscheidung suchen"
-        button-type="secondary"
+        button-type="primary"
         class="mr-28"
         label="Suchen"
         size="small"
@@ -241,15 +245,19 @@ onMounted(() => {
       />
       <TextButton
         aria-label="Nachgehende Entscheidung speichern"
+        button-type="tertiary"
         class="mr-28"
         :disabled="ensuingDecision.isEmpty"
-        label="Übernehmen"
+        label="Direkt übernehmen"
         size="small"
         @click="addEnsuingDecision"
       />
     </div>
 
-    <div class="mb-10 mt-20">
+    <div
+      v-if="isLoading || (searchResults && searchResults.length > 0)"
+      class="mb-10 mt-20"
+    >
       <Pagination
         navigation-position="bottom"
         :page="searchResultsCurrentPage"

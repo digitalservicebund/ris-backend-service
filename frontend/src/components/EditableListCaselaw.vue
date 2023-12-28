@@ -3,7 +3,7 @@ import type { Component, Ref } from "vue"
 import { ref, watch, nextTick, onMounted } from "vue"
 import ListItem from "@/domain/editableListItem"
 import DataSetSummary from "@/shared/components/DataSetSummary.vue"
-import IconAdd from "~icons/ic/baseline-add"
+import TextButton from "@/shared/components/input/TextButton.vue"
 import IconEditNote from "~icons/ic/baseline-edit-note"
 import IconDelete from "~icons/ic/outline-delete"
 
@@ -108,7 +108,7 @@ onMounted(() => {
       <div
         v-if="index !== editIndex"
         :key="index"
-        class="group flex cursor-pointer items-center justify-between gap-8 border-b-1 border-gray-400 py-8 group-first:pt-0"
+        class="group flex cursor-pointer items-center justify-between gap-8 border-b-1 border-gray-400 py-8"
         :class="{ '!border-none': noHorizontalSeparators }"
       >
         <component
@@ -148,28 +148,20 @@ onMounted(() => {
         :is="editComponent"
         v-else
         v-model="modelValueList[index]"
-        class="py-16 group-first:pt-0"
+        :class="modelValueList.length == 1 ? 'py-0' : 'py-24'"
         :model-value-list="modelValueList"
         @add-entry="updateModel"
       />
     </div>
 
-    <button
+    <TextButton
       v-if="!disableMultiEntry && editIndex === undefined"
       aria-label="Weitere Angabe"
-      class="add-button gap-0.5 mt-16 flex items-center whitespace-nowrap bg-blue-300 px-8 py-2 text-14 font-bold leading-18 text-blue-800 outline-none outline-0 outline-offset-4 outline-blue-800 hover:bg-blue-800 hover:text-white focus:outline-4"
+      button-type="tertiary"
+      class="mt-24"
+      label="Weitere Angabe"
+      size="small"
       @click="addNewListEntry"
-    >
-      <IconAdd class="mr-4" />
-      Weitere Angabe
-    </button>
+    />
   </div>
 </template>
-
-<style lang="scss" scoped>
-.add-button {
-  &:focus:not(:focus-visible) {
-    @apply outline-transparent;
-  }
-}
-</style>

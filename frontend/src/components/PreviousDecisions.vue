@@ -63,19 +63,19 @@ const DecisionSummary = withSummarizer(decisionSummarizer)
 </script>
 
 <template>
-  <h2 id="proceedingDecisions" class="ds-heading-02-reg mb-[1rem]">
-    Rechtszug
-  </h2>
-  <div aria-label="Vorgehende Entscheidung" class="mb-32 bg-white p-16">
-    <h2 class="ds-label-02-bold mb-[1rem]">Vorgehende Entscheidungen</h2>
-    <div class="flex flex-row">
-      <div class="flex-1">
-        <EditableList
-          v-model="proceedingDecisions"
-          :default-value="defaultValue"
-          :edit-component="PreviousDecisionInputGroup"
-          :summary-component="DecisionSummary"
-        />
+  <div class="mb-2 flex flex-col gap-24 bg-white p-32">
+    <h2 class="ds-heading-03-bold">Rechtszug</h2>
+    <div aria-label="Vorgehende Entscheidung">
+      <h2 class="ds-heading-03-reg mb-24">Vorgehende Entscheidungen</h2>
+      <div class="flex flex-row">
+        <div class="flex-1">
+          <EditableList
+            v-model="proceedingDecisions"
+            :default-value="defaultValue"
+            :edit-component="PreviousDecisionInputGroup"
+            :summary-component="DecisionSummary"
+          />
+        </div>
       </div>
     </div>
   </div>

@@ -46,8 +46,8 @@ function decisionSummarizer(normEntry: NormReference) {
 const NormsSummary = withSummarizer(decisionSummarizer)
 </script>
 <template>
-  <div class="bg-white p-16">
-    <h2 id="norms" class="ds-label-02-bold mb-[1rem]">Normen</h2>
+  <div class="bg-white p-32">
+    <h2 class="ds-heading-03-reg mb-24">Normen</h2>
     <div class="flex flex-row">
       <div class="flex-1">
         <EditableList

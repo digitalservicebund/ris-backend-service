@@ -48,6 +48,7 @@ async function submitSearch(page: number) {
             v-model="searchStr"
             aria-label="Sachgebiete Suche"
             full-height
+            size="medium"
             @enter-released="submitSearch(0)"
           />
         </div>

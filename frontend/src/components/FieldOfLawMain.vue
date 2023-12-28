@@ -85,7 +85,7 @@ const SelectedFieldsOfLawSummary = withSummarizer(selectedFieldsOfLawSummarizer)
   >
     <div class="w-full">
       <div class="flex flex-row">
-        <div class="flex flex-1 flex-col bg-white p-20">
+        <div class="flex flex-1 flex-col bg-white p-32">
           <FieldOfLawSearch
             @do-show-norms="showNorms = true"
             @node-clicked="handleNodeClicked"

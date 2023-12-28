@@ -67,13 +67,14 @@ function toggleContentVisibility(): void {
         v-model="parentValue"
         :attributes="fields.parent.inputAttributes"
         :has-error="hasError"
+        size="medium"
         :type="fields.parent.type"
         @update:validation-error="updateValidationError"
       ></InputElement>
     </InputFieldComponent>
 
     <!-- Toggle Button -->
-    <div class="absolute -right-10 top-48 z-10">
+    <div class="absolute -right-10 top-38 z-10">
       <button
         :aria-label="`${ariaLabel} ${
           localIsExpanded ? 'schließen' : 'anzeigen'
@@ -96,6 +97,7 @@ function toggleContentVisibility(): void {
       :id="fields.child.name"
       :key="fields.child.name"
       v-slot="{ id, hasError, updateValidationError }"
+      class="mt-24"
       :label="fields.child.label"
       :required="fields.child.required"
     >

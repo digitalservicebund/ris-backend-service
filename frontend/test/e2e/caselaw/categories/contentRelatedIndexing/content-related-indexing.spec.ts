@@ -25,6 +25,8 @@ test.describe("content related indexing", () => {
 
     await page.getByRole("link", { name: "Inhaltliche Erschließung" }).click()
 
-    await expect(page.locator("#contentRelatedIndexing > h2")).toBeInViewport()
+    await expect(
+      page.getByRole("heading", { name: "Inhaltliche Erschließung" }),
+    ).toBeInViewport()
   })
 })

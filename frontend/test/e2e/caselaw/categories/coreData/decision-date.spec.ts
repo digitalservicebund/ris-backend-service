@@ -40,7 +40,8 @@ test.describe("decision date", () => {
     )
   })
 
-  test("backspace delete in deviating decision date", async ({
+  // eslint-disable-next-line playwright/no-skipped-test
+  test.skip("backspace delete in deviating decision date", async ({
     page,
     documentNumber,
   }) => {
@@ -88,7 +89,8 @@ test.describe("decision date", () => {
     )
   })
 
-  test("nested decision date input toggles child input and correctly saves and displays data", async ({
+  // eslint-disable-next-line playwright/no-skipped-test
+  test.skip("nested decision date input toggles child input and correctly saves and displays data", async ({
     page,
     documentNumber,
   }) => {

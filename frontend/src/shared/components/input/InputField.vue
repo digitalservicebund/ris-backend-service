@@ -100,7 +100,7 @@ export enum LabelPosition {
 </script>
 
 <template>
-  <div class="flex-start mb-16 flex w-full gap-4" :class="wrapperClasses">
+  <div class="flex-start flex w-full gap-4" :class="wrapperClasses">
     <div
       v-if="labelConverted && labelConverted.length !== 0"
       class="flex flex-row items-center"

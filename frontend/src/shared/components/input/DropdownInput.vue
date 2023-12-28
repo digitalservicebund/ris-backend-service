@@ -32,7 +32,7 @@ const hasPlaceholder = computed(() =>
   <!-- eslint-disable vuejs-accessibility/form-control-has-label -->
   <select
     v-model="localModelValue"
-    class="ds-select"
+    class="ds-select ds-select-medium"
     :data-placeholder="hasPlaceholder ? true : undefined"
     tabindex="0"
   >

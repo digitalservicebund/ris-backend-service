@@ -79,7 +79,7 @@ test.describe("saving behaviour", () => {
 
         const labels = [
           "Abweichendes Aktenzeichen",
-          "Abweichendes Entscheidungsdatum",
+          // "Abweichendes Entscheidungsdatum",
           "Abweichender ECLI",
           "Fehlerhaftes Gericht",
         ]

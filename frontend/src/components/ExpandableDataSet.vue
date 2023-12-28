@@ -33,7 +33,7 @@ function collapse(): void {
 <template>
   <ExpandableContent
     v-model:is-expanded="isExpanded"
-    class="border-gray-400 bg-white p-16 pt-20"
+    class="border-gray-400 bg-white p-32"
     :class="{
       'hover:border-blue-500 hover:bg-blue-200': !isExpanded,
       'border-b': borderBottom,
@@ -49,10 +49,7 @@ function collapse(): void {
 
     <template #header>
       <div class="flex w-full gap-8" :class="{ 'flex-col': asColumn }">
-        <h2
-          class="ds-label-02-bold w-[15rem] flex-none text-left"
-          :class="{ 'mb-24': asColumn && !isExpanded }"
-        >
+        <h2 class="ds-heading-03-reg">
           {{ title }}
         </h2>
         <span

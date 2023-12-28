@@ -76,11 +76,11 @@ watch(
 </script>
 
 <template>
-  <div class="flex w-full flex-col">
+  <div class="flex w-full flex-col gap-24">
     <div
       v-for="(group, index) in fieldRows"
       :key="index"
-      class="flex min-h-[120px] flex-wrap"
+      class="flex flex-wrap gap-24"
       :style="gapStyle"
     >
       <InputFieldComponent
@@ -99,6 +99,7 @@ watch(
           :attributes="field.inputAttributes"
           class="w-full"
           :has-error="hasError"
+          size="medium"
           :type="field.type"
           @update:validation-error="updateValidationError"
         />

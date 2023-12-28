@@ -24,12 +24,15 @@ const data = computed(() =>
 </script>
 
 <template>
-  <div class="mb-[4rem]">
-    <h1 class="ds-heading-02-reg mb-[1rem]">Kurz- & Langtexte</h1>
+  <div
+    aria-label="Nachgehende Entscheidung"
+    class="core-data mb-16 flex flex-col gap-24 bg-white p-32"
+  >
+    <h2 class="ds-heading-03-bold">Kurz- & Langtexte</h2>
 
-    <div class="flex flex-col gap-36">
+    <div class="flex flex-col gap-24">
       <div v-for="item in data" :key="item.id" class="">
-        <label class="ds-label-02-reg mb-2" :for="item.id">{{
+        <label class="ds-label-02-reg mb-4" :for="item.id">{{
           item.label
         }}</label>
 

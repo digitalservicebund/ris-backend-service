@@ -197,7 +197,7 @@ export const coreDataFields: InputField[] = [
         "Entscheidungsdatum",
         "Entscheidungsdatum",
       ),
-      child: defineChipsDateField(
+      child: defineChipsField(
         "deviatingDecisionDates",
         "Abweichendes Entscheidungsdatum",
         "Abweichendes Entscheidungsdatum",

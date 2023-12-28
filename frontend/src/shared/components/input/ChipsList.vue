@@ -112,14 +112,14 @@ function focusNext() {
 <template>
   <ul
     ref="containerRef"
-    class="my-4 mr-8 flex flex-row flex-wrap items-center gap-8 empty:m-0"
+    class="mr-8 flex flex-row flex-wrap items-center gap-8 empty:m-0"
   >
     <template v-if="modelValue">
       <!-- eslint-disable-next-line vuejs-accessibility/no-static-element-interactions -->
       <li
         v-for="(chip, i) in modelValue"
         :key="i"
-        class="group ds-body-01-reg relative flex items-center break-words rounded-10 outline-none"
+        class="group ds-body-01-reg relative flex items-center break-words rounded-full outline-none"
         :class="[
           readOnly
             ? 'cursor-default bg-gray-400 pr-0'
@@ -134,7 +134,7 @@ function focusNext() {
         @keydown.right.stop.prevent="focusNext"
       >
         <span
-          class="flex min-h-[2rem] whitespace-pre-wrap px-6 py-4 leading-24"
+          class="ds-label-03-reg flex whitespace-pre-wrap px-6 py-4"
           data-testid="chip-value"
           >{{ chip }}
         </span>

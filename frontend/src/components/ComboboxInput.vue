@@ -55,7 +55,7 @@ const noCurrentlyDisplayeditems = computed(
 const conditionalClasses = computed(() =>
   props.hasError
     ? "border-red-800 bg-red-200 focus:shadow-red-800"
-    : "bg-white border-blue-800 focus:shadow-blue-800 h-64 hover:shadow-blue-800",
+    : "bg-white border-blue-800 focus:shadow-blue-800 hover:shadow-blue-800",
 )
 
 const toggleDropdown = async () => {
@@ -255,7 +255,7 @@ export type InputModelProps =
 <template>
   <div ref="dropdownContainerRef" class="relative w-full">
     <div
-      class="space-between flex h-64 flex-row whitespace-nowrap border-2 border-solid px-16 py-12 hover:shadow-hover focus:shadow-focus"
+      class="space-between flex h-48 flex-row whitespace-nowrap border-2 border-solid px-16 py-12 hover:shadow-hover focus:shadow-focus"
       :class="conditionalClasses"
     >
       <input

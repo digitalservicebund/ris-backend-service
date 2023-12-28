@@ -131,7 +131,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <div>
+  <div class="flex flex-col gap-24">
     <InputField
       id="dateKnown"
       v-slot="{ id }"
@@ -142,6 +142,7 @@ onMounted(() => {
         :id="id"
         v-model="dateUnkown"
         aria-label="Datum Unbekannt Vorgehende Entscheidung"
+        size="small"
       />
     </InputField>
     <div class="flex justify-between gap-24">
@@ -172,6 +173,7 @@ onMounted(() => {
             id="decisionDate"
             v-model="previousDecision.decisionDate"
             aria-label="Entscheidungsdatum Vorgehende Entscheidung"
+            class="ds-input-medium"
             :has-error="slotProps.hasError"
             @focus="validationStore.remove('decisionDate')"
             @update:validation-error="slotProps.updateValidationError"
@@ -184,7 +186,7 @@ onMounted(() => {
       <InputField
         id="fileNumber"
         v-slot="slotProps"
-        class="fake-input-group__row__field flex-col"
+        class="flex-col"
         label="Aktenzeichen *"
         :validation-error="validationStore.getByField('fileNumber')"
       >
@@ -192,16 +194,14 @@ onMounted(() => {
           id="fileNumber"
           v-model="previousDecision.fileNumber"
           aria-label="Aktenzeichen Vorgehende Entscheidung"
+          class="ds-input-medium"
           :has-error="slotProps.hasError"
+          size="medium"
           @input="validationStore.remove('fileNumber')"
         ></TextInput>
       </InputField>
 
-      <InputField
-        id="documentType"
-        class="fake-input-group__row__field flex-col"
-        label="Dokumenttyp"
-      >
+      <InputField id="documentType" class="flex-col" label="Dokumenttyp">
         <ComboboxInput
           id="documentType"
           v-model="previousDecision.documentType"
@@ -214,7 +214,7 @@ onMounted(() => {
     <div>
       <TextButton
         aria-label="Nach Entscheidung suchen"
-        button-type="secondary"
+        button-type="primary"
         class="mr-28"
         label="Suchen"
         size="small"
@@ -222,15 +222,19 @@ onMounted(() => {
       />
       <TextButton
         aria-label="Vorgehende Entscheidung speichern"
+        button-type="tertiary"
         class="mr-28"
         :disabled="previousDecision.isEmpty"
-        label="Übernehmen"
+        label="Direkt übernehmen"
         size="small"
         @click="addPreviousDecision"
       />
     </div>
 
-    <div class="mb-10 mt-20">
+    <div
+      v-if="isLoading || (searchResults && searchResults.length > 0)"
+      class="mb-10 mt-20"
+    >
       <Pagination
         navigation-position="bottom"
         :page="searchResultsCurrentPage"

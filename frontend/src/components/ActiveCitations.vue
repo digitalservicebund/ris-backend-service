@@ -31,11 +31,7 @@ function decisionSummarizer(activeCitation: ActiveCitation) {
       h(
         RouterLink,
         {
-          class: [
-            "ds-link-01-bold",
-            "underline",
-            !activeCitation.citationType && "pl-32",
-          ],
+          class: ["ds-link-01-bold", "underline", !activeCitation.citationType],
           target: "_blank",
           tabindex: -1,
           to: {
@@ -74,10 +70,8 @@ const CitationsSummary = withSummarizer(decisionSummarizer)
 </script>
 
 <template>
-  <div aria-label="Aktivzitierung" class="bg-white p-16">
-    <h2 id="activeCitations" class="ds-label-02-bold mb-[1rem]">
-      Aktivzitierung
-    </h2>
+  <div aria-label="Aktivzitierung" class="mb-16 bg-white p-32">
+    <h2 class="ds-heading-03-reg mb-24">Aktivzitierung</h2>
     <div class="flex flex-row">
       <div class="flex-1">
         <EditableList

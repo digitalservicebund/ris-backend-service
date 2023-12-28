@@ -12,6 +12,7 @@ interface Props {
   ariaLabel: string
   isFutureDate?: boolean
   hasError?: boolean
+  size?: "regular" | "medium" | "small"
 }
 
 const props = defineProps<Props>()
@@ -51,6 +52,8 @@ const effectiveHasError = computed(
 
 const conditionalClasses = computed(() => ({
   "has-error": effectiveHasError.value,
+  "ds-input-medium": props.size === "medium",
+  "ds-input-small": props.size === "small",
 }))
 
 function validateInput() {

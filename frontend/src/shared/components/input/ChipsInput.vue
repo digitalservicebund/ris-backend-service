@@ -129,7 +129,7 @@ watch(newChipText, async () => {
   <!-- eslint-disable-next-line vuejs-accessibility/no-static-element-interactions -->
   <div
     ref="wrapperEl"
-    class="flex min-h-[4rem] w-full cursor-text flex-wrap items-center overflow-hidden bg-white px-16 py-8 outline-2 -outline-offset-4 autofill:text-inherit autofill:shadow-white autofill:focus:text-inherit autofill:focus:shadow-white"
+    class="flex h-48 w-full cursor-text flex-wrap items-center overflow-hidden bg-white px-16 py-8 outline-2 -outline-offset-4 autofill:text-inherit autofill:shadow-white autofill:focus:text-inherit autofill:focus:shadow-white"
     :class="[
       readOnly
         ? 'hover:outline-none'

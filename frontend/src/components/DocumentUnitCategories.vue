@@ -180,7 +180,6 @@ onMounted(async () => {
               )
             "
           />
-
           <PreviousDecisions v-model="previousDecisions" />
           <EnsuingDecisions v-model="ensuingDecisions" />
 

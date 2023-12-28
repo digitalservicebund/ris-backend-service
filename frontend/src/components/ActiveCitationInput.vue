@@ -159,17 +159,17 @@ watch(
 </script>
 
 <template>
-  <div>
+  <div class="flex flex-col gap-24">
     <div
       v-if="activeCitation.hasForeignSource"
-      class="ds-link-01-bold mb-24 underline"
+      class="ds-link-01-bold underline"
     >
       {{ activeCitation.renderDecision }}
     </div>
     <InputField
       id="activeCitationPredicate"
       v-slot="slotProps"
-      class="mb-16 border-b-1 border-gray-400"
+      class="border-b-1 border-gray-400"
       label="Art der Zitierung *"
       :validation-error="validationStore.getByField('citationType')"
     >
@@ -182,7 +182,7 @@ watch(
         :item-service="ComboboxItemService.getCitationTypes"
       ></ComboboxInput>
     </InputField>
-    <div v-if="!activeCitation.hasForeignSource">
+    <div v-if="!activeCitation.hasForeignSource" class="flex flex-col gap-24">
       <div class="flex justify-between gap-24">
         <InputField
           id="activeCitationCourt"
@@ -210,6 +210,7 @@ watch(
             id="activeCitationDecisionDate"
             v-model="activeCitation.decisionDate"
             aria-label="Entscheidungsdatum der Aktivzitierung"
+            class="ds-input-medium"
             :has-error="slotProps.hasError"
             @update:validation-error="slotProps.updateValidationError"
           ></DateInput>
@@ -227,6 +228,7 @@ watch(
             v-model="activeCitation.fileNumber"
             aria-label="Aktenzeichen der Aktivzitierung"
             :has-error="slotProps.hasError"
+            size="medium"
           ></TextInput>
         </InputField>
         <InputField id="activeCitationDecisionDocumentType" label="Dokumenttyp">
@@ -243,7 +245,7 @@ watch(
       <TextButton
         v-if="!activeCitation.hasForeignSource"
         aria-label="Nach Entscheidung suchen"
-        button-type="secondary"
+        button-type="primary"
         class="mr-28"
         label="Suchen"
         size="small"
@@ -251,14 +253,17 @@ watch(
       />
       <TextButton
         aria-label="Aktivzitierung speichern"
-        class="mr-28"
+        button-type="tertiary"
         :disabled="activeCitation.isEmpty"
-        label="Übernehmen"
+        label="Direkt übernehmen"
         size="small"
         @click="addActiveCitation"
       />
     </div>
-    <div class="mb-10 mt-20">
+    <div
+      v-if="isLoading || (searchResults && searchResults.length > 0)"
+      class="mb-10 mt-20"
+    >
       <Pagination
         navigation-position="bottom"
         :page="searchResultsCurrentPage"
