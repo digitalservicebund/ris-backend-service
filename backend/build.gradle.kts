@@ -235,7 +235,7 @@ dependencies {
     implementation(flywayCore)
     "migrationImplementation"(flywayCore)
     implementation("org.jetbrains.kotlin:kotlin-reflect")
-    implementation("org.jsoup:jsoup:1.16.1")
+    implementation("org.jsoup:jsoup:1.17.1")
     implementation("io.getunleash:unleash-client-java:9.2.0")
 
     testImplementation("com.ninja-squad:springmockk:4.0.0")
