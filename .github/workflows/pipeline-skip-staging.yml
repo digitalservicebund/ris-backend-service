@@ -224,7 +224,7 @@ jobs:
         # against the sigstore community Fulcio instance.
         run: cosign sign --yes ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}:${{ env.CONTAINER_IMAGE_VERSION }}
       - name: Download cosign vulnerability scan record
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v3
         with:
           name: "vuln-backend.json"
       - name: Attest vulnerability scan
@@ -286,7 +286,7 @@ jobs:
         # against the sigstore community Fulcio instance.
         run: cosign sign --yes ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}/frontend:${{ env.CONTAINER_IMAGE_VERSION }}
       - name: Download cosign vulnerability scan record
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v3
         with:
           name: "vuln-frontend.json"
       - name: Attest vulnerability scan
