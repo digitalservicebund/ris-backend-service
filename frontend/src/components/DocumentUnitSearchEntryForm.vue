@@ -135,7 +135,8 @@ function handleSearchButtonClicked() {
 }
 
 function handleSearchShortcut(event: KeyboardEvent) {
-  if (event.ctrlKey && event.key == "Enter") handleSearchButtonClicked()
+  if (event.key == "Enter" && (event.ctrlKey || event.metaKey))
+    handleSearchButtonClicked()
 }
 
 watch(
