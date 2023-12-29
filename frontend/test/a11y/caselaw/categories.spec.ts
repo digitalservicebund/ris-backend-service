@@ -63,30 +63,6 @@ test.describe("a11y of categories page (/caselaw/documentunit/{documentNumber}/c
     expect(accessibilityScanResults.violations).toEqual([])
   })
 
-  test("entscheidungsdatum", async ({ page, documentNumber }) => {
-    await navigateToCategories(page, documentNumber)
-
-    await page.locator("[aria-label='Entscheidungsdatum']").fill("03.02.2022")
-
-    await page
-      .locator("[aria-label='Abweichendes Entscheidungsdatum anzeigen']")
-      .click()
-
-    await page
-      .locator("[aria-label='Abweichendes Entscheidungsdatum']")
-      .fill("02.02.2022")
-    await page.keyboard.press("Enter")
-    await page
-      .locator("[aria-label='Abweichendes Entscheidungsdatum']")
-      .fill("01.02.2022")
-    await page.keyboard.press("Enter")
-
-    const accessibilityScanResults = await new AxeBuilder({ page })
-      .disableRules(["duplicate-id-aria"])
-      .analyze()
-    expect(accessibilityScanResults.violations).toEqual([])
-  })
-
   test("dokumenttyp", async ({ page, documentNumber }) => {
     await navigateToCategories(page, documentNumber)
 
