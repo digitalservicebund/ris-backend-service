@@ -41,7 +41,7 @@ function isBadge(
         class="flex items-center space-x-[2rem]"
         data-testid="document-unit-info-panel-items"
       >
-        <div class="text-30">{{ heading }}</div>
+        <h1 class="text-30">{{ heading }}</h1>
         <div v-for="entry in firstRow" :key="entry.label">
           <IconBadge
             v-if="isBadge(entry)"
