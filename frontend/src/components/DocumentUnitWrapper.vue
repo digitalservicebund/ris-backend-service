@@ -90,7 +90,7 @@ watchEffect(() => {
       />
 
       <div class="flex grow flex-col items-start">
-        <slot :classes="['p-[2rem] w-full grow']" />
+        <slot :classes="['p-24 w-full grow']" />
       </div>
     </div>
   </div>
