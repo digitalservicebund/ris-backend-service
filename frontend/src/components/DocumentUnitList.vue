@@ -127,10 +127,10 @@ function onDelete() {
         </div>
 
         <div class="table-cell px-16 py-12">
-          {{ listEntry.court ? listEntry.court.type : "-" }}
+          {{ listEntry.court?.type ?? "-" }}
         </div>
         <div class="table-cell px-16 py-12">
-          {{ listEntry.court ? listEntry.court.location : "-" }}
+          {{ listEntry.court?.location ?? "-" }}
         </div>
         <div class="table-cell px-16 py-12">
           {{
