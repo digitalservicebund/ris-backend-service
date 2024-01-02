@@ -41,7 +41,7 @@ const resizeObserver = new ResizeObserver((entries) => {
 <template>
   <div
     aria-label="Nachgehende Entscheidung"
-    class="core-data mb-16 flex flex-col gap-24 bg-white p-32"
+    class="core-data flex flex-col gap-24 bg-white p-32"
   >
     <h2 class="ds-heading-03-bold">Stammdaten</h2>
 

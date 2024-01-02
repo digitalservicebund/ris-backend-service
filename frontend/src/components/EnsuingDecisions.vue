@@ -70,7 +70,7 @@ const DecisionSummary = withSummarizer(decisionSummarizer)
 <template>
   <div
     aria-label="Nachgehende Entscheidung"
-    class="mb-16 flex flex-col bg-white p-32"
+    class="flex flex-col bg-white p-32"
   >
     <h2 class="ds-heading-03-reg mb-24">Nachgehende Entscheidungen</h2>
     <div class="flex flex-row">

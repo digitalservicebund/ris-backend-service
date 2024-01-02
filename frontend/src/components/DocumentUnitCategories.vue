@@ -174,6 +174,7 @@ onMounted(async () => {
           <DocumentUnitCoreData
             id="coreData"
             v-model="coreData"
+            class="mb-24"
             :validation-errors="
               validationErrors.filter(
                 (err) => err.instance.split('\.')[0] === 'coreData',
@@ -181,11 +182,12 @@ onMounted(async () => {
             "
           />
           <PreviousDecisions v-model="previousDecisions" />
-          <EnsuingDecisions v-model="ensuingDecisions" />
+          <EnsuingDecisions v-model="ensuingDecisions" class="mb-24" />
 
           <DocumentUnitContentRelatedIndexing
             id="contentRelatedIndexing"
             v-model="contentRelatedIndexing"
+            class="mb-24"
           />
 
           <DocumentUnitTexts
