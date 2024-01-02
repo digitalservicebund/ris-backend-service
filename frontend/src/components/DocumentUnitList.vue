@@ -85,78 +85,130 @@ function onDelete() {
       @close-modal="toggleModal"
       @confirm-action="onDelete"
     />
-    <div class="relative table w-full border-collapse">
+    <div class="relative table w-full border-separate">
       <div
-        class="ds-label-02-bold table-row border-b-2 border-solid border-blue-300 text-gray-900"
+        class="ds-label-02-bold sticky top-0 table-row bg-white text-gray-900"
       >
-        <div class="table-cell px-16 py-12">Dokumentnummer</div>
-        <div class="table-cell px-16 py-12">Aktenzeichen</div>
-        <div class="table-cell px-16 py-12">Gerichtstyp</div>
-        <div class="table-cell px-16 py-12">Ort</div>
-        <div class="table-cell px-16 py-12">Datum</div>
-        <div class="table-cell px-16 py-12">Typ</div>
-        <div class="table-cell px-16 py-12">Anhang</div>
-        <div class="table-cell px-16 py-12">Status</div>
-        <div class="table-cell px-16 py-12">Fehler</div>
-        <div class="table-cell px-16 py-12"></div>
+        <div
+          class="table-cell border-b-2 border-solid border-blue-300 px-16 py-12"
+        >
+          Dokumentnummer
+        </div>
+        <div
+          class="table-cell border-b-2 border-solid border-blue-300 px-16 py-12"
+        >
+          Aktenzeichen
+        </div>
+        <div
+          class="table-cell border-b-2 border-solid border-blue-300 px-16 py-12"
+        >
+          Gerichtstyp
+        </div>
+        <div
+          class="table-cell border-b-2 border-solid border-blue-300 px-16 py-12"
+        >
+          Ort
+        </div>
+        <div
+          class="table-cell border-b-2 border-solid border-blue-300 px-16 py-12"
+        >
+          Datum
+        </div>
+        <div
+          class="table-cell border-b-2 border-solid border-blue-300 px-16 py-12"
+        >
+          Typ
+        </div>
+        <div
+          class="table-cell border-b-2 border-solid border-blue-300 px-16 py-12"
+        >
+          Anhang
+        </div>
+        <div
+          class="table-cell border-b-2 border-solid border-blue-300 px-16 py-12"
+        >
+          Status
+        </div>
+        <div
+          class="table-cell border-b-2 border-solid border-blue-300 px-16 py-12"
+        >
+          Fehler
+        </div>
+        <div
+          class="table-cell border-b-2 border-solid border-blue-300 px-16 py-12"
+        ></div>
       </div>
 
       <div
         v-for="(listEntry, id) in documentUnitListEntries"
         :key="id"
-        class="ds-label-01-reg table-row border-b-1 border-b-blue-300 hover:bg-gray-100"
+        class="ds-label-01-reg table-row hover:bg-gray-100"
         data-testid="listEntry"
       >
-        <div class="table-cell min-h-56 px-16 py-12 align-middle">
-          <strong>
-            <router-link
-              class="underline"
-              :to="{
-                name: listEntry.fileName
-                  ? 'caselaw-documentUnit-documentNumber-categories'
-                  : 'caselaw-documentUnit-documentNumber-files',
-                params: { documentNumber: listEntry.documentNumber },
-              }"
-            >
-              {{ listEntry.documentNumber }}
-            </router-link>
-          </strong>
+        <div
+          class="table-cell min-h-56 border-b-1 border-blue-300 px-16 py-12 align-middle"
+        >
+          <router-link
+            class="underline"
+            :to="{
+              name: listEntry.fileName
+                ? 'caselaw-documentUnit-documentNumber-categories'
+                : 'caselaw-documentUnit-documentNumber-files',
+              params: { documentNumber: listEntry.documentNumber },
+            }"
+          >
+            {{ listEntry.documentNumber }}
+          </router-link>
         </div>
-        <div class="table-cell px-16 py-12 align-middle">
+        <div
+          class="table-cell border-b-1 border-blue-300 px-16 py-12 align-middle"
+        >
           {{ listEntry.fileNumber ? listEntry.fileNumber : "-" }}
         </div>
 
-        <div class="table-cell px-16 py-12 align-middle">
+        <div
+          class="table-cell border-b-1 border-blue-300 px-16 py-12 align-middle"
+        >
           {{ listEntry.court?.type ?? "-" }}
         </div>
-        <div class="table-cell px-16 py-12 align-middle">
+        <div
+          class="table-cell border-b-1 border-blue-300 px-16 py-12 align-middle"
+        >
           {{ listEntry.court?.location ?? "-" }}
         </div>
-        <div class="table-cell px-16 py-12 align-middle">
+        <div
+          class="table-cell border-b-1 border-blue-300 px-16 py-12 align-middle"
+        >
           {{
             listEntry.decisionDate
               ? dayjs(listEntry.decisionDate).format("DD.MM.YYYY")
               : "-"
           }}
         </div>
-        <div class="table-cell px-16 py-12 align-middle">
+        <div
+          class="table-cell border-b-1 border-blue-300 px-16 py-12 align-middle"
+        >
           {{
             listEntry.documentType ? listEntry.documentType.jurisShortcut : "-"
           }}
         </div>
-        <div class="table-cell px-12 align-middle">
+        <div class="table-cell border-b-1 border-blue-300 px-12 align-middle">
           <span v-if="listEntry.fileName" class="text-blue-800">
             <IconAttachedFile />
           </span>
           <span v-else class="text-gray-500"><IconAttachedFile /></span>
         </div>
-        <div class="table-cell px-16 py-12 align-middle">
+        <div
+          class="table-cell border-b-1 border-blue-300 px-16 py-12 align-middle"
+        >
           <IconBadge
             v-if="listEntry.status?.publicationStatus"
             v-bind="useStatusBadge(listEntry.status).value"
           />
         </div>
-        <div class="table-cell px-16 py-12 align-middle">
+        <div
+          class="table-cell border-b-1 border-blue-300 px-16 py-12 align-middle"
+        >
           <IconBadge
             v-if="listEntry.status?.withError"
             background-color="bg-red-300"
@@ -166,7 +218,7 @@ function onDelete() {
           />
           <span v-else>-</span>
         </div>
-        <div class="table-cell px-12 align-middle">
+        <div class="table-cell border-b-1 border-blue-300 px-12 align-middle">
           <button
             aria-label="Dokumentationseinheit löschen"
             class="cursor-pointer align-middle text-blue-800"
