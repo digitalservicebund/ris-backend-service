@@ -92,6 +92,7 @@ watch(newChipText, (is) => {
       v-model="newChipText"
       :aria-label="ariaLabel ?? ''"
       class="mb-8"
+      size="medium"
       @blur="handleOnBlur"
       @keydown.enter.stop="addChip"
       @keydown.right.stop="maybeFocusFirst"
