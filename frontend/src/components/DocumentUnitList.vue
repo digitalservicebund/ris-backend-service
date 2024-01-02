@@ -92,7 +92,7 @@ function onDelete() {
         <div class="table-cell px-16 py-12">Dokumentnummer</div>
         <div class="table-cell px-16 py-12">Aktenzeichen</div>
         <div class="table-cell px-16 py-12">Gerichtstyp</div>
-        <div class="table-cell px-16 py-12">Gerichtsort</div>
+        <div class="table-cell px-16 py-12">Ort</div>
         <div class="table-cell px-16 py-12">Datum</div>
         <div class="table-cell px-16 py-12">Typ</div>
         <div class="table-cell px-16 py-12">Anhang</div>
