@@ -87,7 +87,7 @@ function onDelete() {
     />
     <div class="relative table w-full border-collapse">
       <div
-        class="ds-label-03-bold table-row border-b-2 border-solid border-blue-300 text-gray-900"
+        class="ds-label-02-bold table-row border-b-2 border-solid border-blue-300 text-gray-900"
       >
         <div class="table-cell px-16 py-12">Dokumentnummer</div>
         <div class="table-cell px-16 py-12">Aktenzeichen</div>
@@ -104,21 +104,23 @@ function onDelete() {
       <div
         v-for="(listEntry, id) in documentUnitListEntries"
         :key="id"
-        class="ds-body-01-reg table-row border-b-1 border-b-blue-300 hover:bg-gray-100"
+        class="ds-label-01-reg table-row border-b-1 border-b-blue-300 hover:bg-gray-100"
         data-testid="listEntry"
       >
-        <div class="table-cell px-16 py-12">
-          <router-link
-            class="underline"
-            :to="{
-              name: listEntry.fileName
-                ? 'caselaw-documentUnit-documentNumber-categories'
-                : 'caselaw-documentUnit-documentNumber-files',
-              params: { documentNumber: listEntry.documentNumber },
-            }"
-          >
-            {{ listEntry.documentNumber }}
-          </router-link>
+        <div class="table-cell min-h-56 px-16 py-12">
+          <strong>
+            <router-link
+              class="underline"
+              :to="{
+                name: listEntry.fileName
+                  ? 'caselaw-documentUnit-documentNumber-categories'
+                  : 'caselaw-documentUnit-documentNumber-files',
+                params: { documentNumber: listEntry.documentNumber },
+              }"
+            >
+              {{ listEntry.documentNumber }}
+            </router-link>
+          </strong>
         </div>
         <div class="table-cell px-16 py-12">
           {{ listEntry.fileNumber ? listEntry.fileNumber : "-" }}
