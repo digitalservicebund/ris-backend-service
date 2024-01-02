@@ -148,7 +148,7 @@ function onDelete() {
           <span v-if="listEntry.fileName" class="text-blue-800">
             <IconAttachedFile />
           </span>
-          <span v-else class="text-blue-300"><IconAttachedFile /></span>
+          <span v-else class="text-gray-500"><IconAttachedFile /></span>
         </div>
         <div class="table-cell px-16 py-12">
           <IconBadge
