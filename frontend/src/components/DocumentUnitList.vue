@@ -107,7 +107,7 @@ function onDelete() {
         class="ds-label-01-reg table-row border-b-1 border-b-blue-300 hover:bg-gray-100"
         data-testid="listEntry"
       >
-        <div class="table-cell min-h-56 px-16 py-12">
+        <div class="table-cell min-h-56 px-16 py-12 align-middle">
           <strong>
             <router-link
               class="underline"
@@ -122,24 +122,24 @@ function onDelete() {
             </router-link>
           </strong>
         </div>
-        <div class="table-cell px-16 py-12">
+        <div class="table-cell px-16 py-12 align-middle">
           {{ listEntry.fileNumber ? listEntry.fileNumber : "-" }}
         </div>
 
-        <div class="table-cell px-16 py-12">
+        <div class="table-cell px-16 py-12 align-middle">
           {{ listEntry.court?.type ?? "-" }}
         </div>
-        <div class="table-cell px-16 py-12">
+        <div class="table-cell px-16 py-12 align-middle">
           {{ listEntry.court?.location ?? "-" }}
         </div>
-        <div class="table-cell px-16 py-12">
+        <div class="table-cell px-16 py-12 align-middle">
           {{
             listEntry.decisionDate
               ? dayjs(listEntry.decisionDate).format("DD.MM.YYYY")
               : "-"
           }}
         </div>
-        <div class="table-cell px-16 py-12">
+        <div class="table-cell px-16 py-12 align-middle">
           {{
             listEntry.documentType ? listEntry.documentType.jurisShortcut : "-"
           }}
@@ -150,13 +150,13 @@ function onDelete() {
           </span>
           <span v-else class="text-gray-500"><IconAttachedFile /></span>
         </div>
-        <div class="table-cell px-16 py-12">
+        <div class="table-cell px-16 py-12 align-middle">
           <IconBadge
             v-if="listEntry.status?.publicationStatus"
             v-bind="useStatusBadge(listEntry.status).value"
           />
         </div>
-        <div class="table-cell px-16 py-12">
+        <div class="table-cell px-16 py-12 align-middle">
           <IconBadge
             v-if="listEntry.status?.withError"
             background-color="bg-red-300"
@@ -166,7 +166,7 @@ function onDelete() {
           />
           <span v-else>-</span>
         </div>
-        <div class="table-cell px-12">
+        <div class="table-cell px-12 align-middle">
           <button
             aria-label="Dokumentationseinheit löschen"
             class="cursor-pointer align-middle text-blue-800"
