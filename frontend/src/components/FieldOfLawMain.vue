@@ -115,3 +115,10 @@ const SelectedFieldsOfLawSummary = withSummarizer(selectedFieldsOfLawSummarizer)
     </div>
   </ExpandableDataSet>
 </template>
+
+<style scoped>
+/* stylelint-disable */
+::v-deep(li:first-of-type) {
+  margin-top: 32px;
+}
+</style>
