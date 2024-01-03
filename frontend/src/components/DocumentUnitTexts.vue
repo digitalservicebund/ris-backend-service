@@ -24,10 +24,7 @@ const data = computed(() =>
 </script>
 
 <template>
-  <div
-    aria-label="Nachgehende Entscheidung"
-    class="core-data mb-16 flex flex-col gap-24 bg-white p-32"
-  >
+  <div class="core-data mb-16 flex flex-col gap-24 bg-white p-32">
     <h2 class="ds-heading-03-bold">Kurz- & Langtexte</h2>
 
     <div class="flex flex-col gap-24">
