@@ -74,7 +74,7 @@ function toggleContentVisibility(): void {
     </InputFieldComponent>
 
     <!-- Toggle Button -->
-    <div class="absolute -right-10 top-38 z-10">
+    <div class="absolute right-[-9px] top-[39px] z-10">
       <button
         :aria-label="`${ariaLabel} ${
           localIsExpanded ? 'schließen' : 'anzeigen'
@@ -83,10 +83,10 @@ function toggleContentVisibility(): void {
         @click="toggleContentVisibility"
       >
         <slot v-if="localIsExpanded" name="close-icon">
-          <IconHorizontalRule />
+          <IconHorizontalRule class="h-20 w-20" />
         </slot>
         <slot v-else name="open-icon">
-          <IconAdd />
+          <IconAdd class="h-20 w-20" />
         </slot>
       </button>
     </div>
