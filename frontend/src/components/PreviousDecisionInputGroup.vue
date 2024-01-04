@@ -136,6 +136,7 @@ onMounted(() => {
       id="dateKnown"
       v-slot="{ id }"
       label="Datum unbekannt"
+      label-class="ds-label-01-reg"
       :label-position="LabelPosition.RIGHT"
     >
       <CheckboxInput

@@ -338,4 +338,11 @@ describe("InputField", () => {
     await user.click(screen.getByRole("button"))
     expect(element).not.toBeInTheDocument()
   })
+
+  it("renders custom label classes", async () => {
+    renderComponent({ label: "foo", labelClass: "ds-label-01-reg" })
+
+    const element = screen.getByText("foo")
+    expect(element.parentNode).toHaveClass("ds-label-01-reg")
+  })
 })

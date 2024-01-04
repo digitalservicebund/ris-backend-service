@@ -138,6 +138,7 @@ onMounted(() => {
         id="isPending"
         v-slot="{ id }"
         label="anhängig"
+        label-class="ds-label-01-reg"
         :label-position="LabelPosition.RIGHT"
       >
         <CheckboxInput

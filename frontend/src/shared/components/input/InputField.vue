@@ -11,14 +11,16 @@ interface Props {
   label: string | string[]
   required?: boolean
   labelPosition?: LabelPosition
+  labelClass?: string
   validationError?: ValidationError
   visuallyHideLabel?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  validationError: undefined,
   required: false,
   labelPosition: LabelPosition.TOP,
+  labelClass: undefined,
+  validationError: undefined,
 })
 
 defineSlots<{
@@ -116,8 +118,11 @@ export enum LabelPosition {
       />
 
       <label
-        class="ds-label-02-reg grid items-center"
-        :class="{ 'pl-4': labelPosition === LabelPosition.RIGHT }"
+        class="grid items-center"
+        :class="[
+          { 'pl-4': labelPosition === LabelPosition.RIGHT },
+          labelClass ? labelClass : 'ds-label-02-reg',
+        ]"
         :for="id"
       >
         <span v-for="(line, index) in labelConverted" :key="line">

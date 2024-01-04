@@ -88,6 +88,7 @@ const showNormsModelValue = computed({
       id="showNorms"
       aria-label="Beschlussfassung mit qualifizierter Mehrheit"
       label="Normen anzeigen"
+      label-class="ds-label-01-reg"
       :label-position="LabelPosition.RIGHT"
     >
       <CheckboxInput
