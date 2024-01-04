@@ -183,7 +183,7 @@ const updateCurrentItems = async () => {
     (props.manualEntry &&
       filter.value &&
       !currentlyDisplayedItems.value.find(
-        (item) => item.label === filter.value,
+        (item) => item.label === filter.value?.trim(),
       ))
   ) {
     handleNoSearchResults(filter.value)

@@ -1,5 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.adapter.database.jpa;
 
+import java.util.Optional;
 import java.util.UUID;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -26,4 +27,7 @@ public interface DatabaseProcedureRepository extends JpaRepository<ProcedureDTO,
 
   Page<ProcedureDTO> findAllByDocumentationOffice(
       DocumentationOfficeDTO documentationOfficeDTO, Pageable pageable);
+
+  Optional<ProcedureDTO> findAllByLabelAndDocumentationOffice(
+      String label, DocumentationOfficeDTO documentationUnitDTO);
 }

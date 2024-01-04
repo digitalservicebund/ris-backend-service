@@ -270,15 +270,22 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
 
               ProcedureDTO procedureDTO = null;
               if (procedure.id() == null) {
-                procedureDTO =
-                    ProcedureDTO.builder()
-                        .label(procedure.label())
-                        .createdAt(Instant.now())
-                        .documentationOffice(documentationUnitDTO.getDocumentationOffice())
-                        .build();
+                Optional<ProcedureDTO> existingProcedure =
+                    procedureRepository.findAllByLabelAndDocumentationOffice(
+                        procedure.label().trim(), documentationUnitDTO.getDocumentationOffice());
 
-                procedureDTO = procedureRepository.save(procedureDTO);
+                if (existingProcedure.isPresent()) {
+                  procedureDTO = existingProcedure.get();
+                } else {
+                  procedureDTO =
+                      ProcedureDTO.builder()
+                          .label(procedure.label())
+                          .createdAt(Instant.now())
+                          .documentationOffice(documentationUnitDTO.getDocumentationOffice())
+                          .build();
 
+                  procedureDTO = procedureRepository.save(procedureDTO);
+                }
               } else {
                 Optional<ProcedureDTO> optionalProcedureDTO =
                     procedureRepository.findById(procedure.id());
