@@ -25,8 +25,13 @@ const getErrorDetails = () => {
   return ""
 }
 
-onBeforeUnmount(triggerSave)
-window.onbeforeunload = triggerSave
+onBeforeUnmount(function () {
+  triggerSave()
+  window.onbeforeunload = null
+})
+window.onbeforeunload = function () {
+  triggerSave()
+}
 </script>
 
 <template>
