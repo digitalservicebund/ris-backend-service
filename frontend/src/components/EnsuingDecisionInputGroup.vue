@@ -137,7 +137,7 @@ onMounted(() => {
       <InputField
         id="isPending"
         v-slot="{ id }"
-        label="anhängig"
+        label="Anhängig"
         label-class="ds-label-01-reg"
         :label-position="LabelPosition.RIGHT"
       >
