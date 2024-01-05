@@ -246,7 +246,7 @@ watch(
         v-if="!activeCitation.hasForeignSource"
         aria-label="Nach Entscheidung suchen"
         button-type="primary"
-        class="mr-28"
+        class="mr-24"
         label="Suchen"
         size="small"
         @click="search"
