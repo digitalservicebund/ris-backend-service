@@ -119,7 +119,7 @@ function focusNext() {
       <li
         v-for="(chip, i) in modelValue"
         :key="i"
-        class="group ds-body-01-reg relative -mt-2 flex items-center break-words rounded-full outline-none"
+        class="group ds-body-01-reg relative -mt-1 flex items-center break-words rounded-full outline-none"
         :class="[
           readOnly
             ? 'cursor-default bg-gray-400 pr-0'
