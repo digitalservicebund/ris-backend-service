@@ -139,7 +139,7 @@ test.describe("a11y of categories page (/caselaw/documentunit/{documentNumber}/c
 
   test("text editor", async ({ page, documentNumber }) => {
     await navigateToCategories(page, documentNumber)
-    const editorField = page.locator("[data-testid='Entscheidungsname'] >> div")
+    const editorField = page.locator("[data-testid='Leitsatz'] >> div")
     await editorField.click()
     await editorField.type("this is text")
 
