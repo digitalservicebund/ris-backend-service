@@ -3,6 +3,8 @@ import { computed } from "vue"
 import { Texts } from "../domain/documentUnit"
 import TextEditor from "../shared/components/input/TextEditor.vue"
 import { texts as textsFields } from "@/fields/caselaw"
+import TextAreaInput from "@/shared/components/input/TextAreaInput.vue"
+import TextInput from "@/shared/components/input/TextInput.vue"
 
 const props = defineProps<{ texts: Texts }>()
 
@@ -18,6 +20,7 @@ const data = computed(() =>
       label: item.label,
       aria: item.label,
       value: props.texts[item.name as keyof Texts],
+      fieldType: item.fieldType,
     }
   }),
 )
@@ -34,12 +37,22 @@ const data = computed(() =>
         }}</label>
 
         <TextEditor
+          v-if="item.fieldType == TextAreaInput"
           :id="item.id"
           :aria-label="item.aria"
-          class="outline outline-2 outline-blue-900"
+          class="ml-2 pl-2 outline outline-2 outline-blue-900"
           editable
           :value="item.value"
           @update-value="emit('updateValue', [item.id, $event])"
+        />
+
+        <TextInput
+          v-if="item.fieldType == TextInput"
+          :id="item.id"
+          :aria-label="item.aria"
+          :model-value="item.value"
+          size="medium"
+          @update:model-value="emit('updateValue', [item.id, $event as string])"
         />
       </div>
     </div>
