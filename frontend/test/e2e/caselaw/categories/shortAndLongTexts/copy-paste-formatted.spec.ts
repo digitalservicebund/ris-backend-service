@@ -69,7 +69,7 @@ test("copy-paste from side panel", async ({ page }) => {
   await page.keyboard.press(`${modifier}+KeyC`)
 
   // paste from clipboard into input field "Entscheidungsgründe"
-  const inputField = page.locator("[data-testid='Entscheidungsname']")
+  const inputField = page.locator("[data-testid='Leitsatz']")
   await inputField.click()
   await page.keyboard.press(`${modifier}+KeyV`)
   const inputFieldInnerHTML = await inputField.innerHTML()
