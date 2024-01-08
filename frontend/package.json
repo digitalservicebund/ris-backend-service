@@ -105,7 +105,7 @@
     "license-checker": "^25.0.1",
     "playwright": "^1.38.0",
     "postcss": "^8.4.29",
-    "postcss-import": "^15.1.0",
+    "postcss-import": "^16.0.0",
     "postcss-scrollbar": "^0.5.1",
     "prettier": "^3.1.0",
     "prettier-plugin-tailwindcss": "^0.5.4",
