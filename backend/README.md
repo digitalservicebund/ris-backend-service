@@ -1,6 +1,6 @@
 # Backend
 
-Java service built with the [Spring WebFlux reactive stack](https://docs.spring.io/spring-framework/docs/current/reference/html/web-reactive.html#spring-webflux).
+Java service built with Spring Boot.
 
 ## Development
 
@@ -31,44 +31,13 @@ SPRING_PROFILES_ACTIVE=local ./gradlew bootRun
 >
 > The application depends on a Java package from a private GitHub package repository. To be able to download it in the Gradle build process, you'll need to set up your local env as described in the [root readme](../README.md#setup-local-environment).
 
-### Lookup tables
-
-Some dropdown menus in the frontend get populated via calls to the backend that query the respective database tables. If you are developing locally and want to see values in those dropdown menus you need to do this one-time step: trigger the import of XML files to these database tables. Furthermore, some e2e tests are testing this behaviour. Those will fail locally if your lookup tables are not populated.
-
-To import the XML files, follow these steps:
-
-- Download the XML files `doktyp.xml`, `gerichtdata_gesamt.xml`, `buland.xml`, `sachneudata_gesamt.xml`, `zitartdata_gesamt.xml` (Link in the Engineering Onboarding Wiki)
-- Start the application (see [root README](../README.md)), open it in your browser and log in
-- Copy the `SESSION` cookie value from the Browser Developer Tools --> Application Tab --> Cookies
-  (If you prefer using Postman, it also supports [importing cookies](https://github.com/digitalservicebund/ris-backend-service/commit/69684a3872ce9875484761fcb18f3367d0143bce#commitcomment-99597762) from your browser.)
-
-Fill these variables with your values:
-
-```bash
-export PATH_TO_XML_FILES="/path/to/xml/files"    # where you placed the xml files
-export SESSION_VALUE="your-session-cookie-value" # copied from Browser Developer Tools
-export HOST="http://127.0.0.1"                   # backend host
-```
-
-Then do the requests with curl:
-
-```bash
-curl -v -X PUT -H 'Content-Type: application/xml' -H "cookie: SESSION=$SESSION_VALUE" --data "@$PATH_TO_XML_FILES/doktyp.xml" $HOST/api/v1/caselaw/lookuptableimporter/doktyp
-curl -v -X PUT -H 'Content-Type: application/xml' -H "cookie: SESSION=$SESSION_VALUE" --data "@$PATH_TO_XML_FILES/gerichtdata_gesamt.xml" $HOST/api/v1/caselaw/lookuptableimporter/gerichtdata
-curl -v -X PUT -H 'Content-Type: application/xml' -H "cookie: SESSION=$SESSION_VALUE" --data "@$PATH_TO_XML_FILES/buland.xml" $HOST/api/v1/caselaw/lookuptableimporter/buland
-curl -v -X PUT -H 'Content-Type: application/xml' -H "cookie: SESSION=$SESSION_VALUE" --data "@$PATH_TO_XML_FILES/sachneudata_gesamt.xml" $HOST/api/v1/caselaw/lookuptableimporter/fieldOfLaw
-curl -v -X PUT -H 'Content-Type: application/xml' -H "cookie: SESSION=$SESSION_VALUE" --data "@$PATH_TO_XML_FILES/zitartdata_gesamt.xml" $HOST/api/v1/caselaw/lookuptableimporter/zitart
-```
-
-### Refresh materialized views
-
-```bash
-curl -v -X PUT -H "cookie: SESSION=$SESSION_VALUE" http://127.0.0.1/api/v1/caselaw/normabbreviation/refreshMaterializedViews
-```
-
 ### Database Setup & Migration with Flyway
 
-The application uses Flyway for maintaining and versioning database migrations. In order to create a change in the database you should follow one of the two methods:
+The application uses Flyway for maintaining and versioning database migrations.
+
+Most of the caselaw database structure is setup through ris-data-migration repo - see [instructions here](../migration_schema_local_setup.md). This repo manages only norms tables and those with data that does not exist in migrated documentation units (e.g. publication reports, .docx files).
+
+In order to create a change in the database you should follow one of the two methods:
 
 1. If you want to create a migration using SQL:
    - You should create a new sql file on the directory `src\main\resources\db\migration`.
