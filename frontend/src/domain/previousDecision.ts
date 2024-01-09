@@ -68,6 +68,10 @@ export default class PreviousDecision
     return isEmpty
   }
 
+  get showSummaryOnEdit(): boolean {
+    return false
+  }
+
   private fieldIsEmpty(
     fieldName: keyof PreviousDecision,
     value: PreviousDecision[(typeof PreviousDecision.fields)[number]],

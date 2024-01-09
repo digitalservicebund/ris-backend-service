@@ -59,6 +59,10 @@ export default class NormReference implements EditableListItem {
     return isEmpty
   }
 
+  get showSummaryOnEdit(): boolean {
+    return false
+  }
+
   private fieldIsEmpty(
     value: NormReference[(typeof NormReference.fields)[number]],
   ) {

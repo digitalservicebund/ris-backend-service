@@ -65,6 +65,10 @@ export default class EnsuingDecision
     return isEmpty
   }
 
+  get showSummaryOnEdit(): boolean {
+    return this.hasForeignSource
+  }
+
   private fieldIsEmpty(
     fieldName: keyof EnsuingDecision,
     value: EnsuingDecision[(typeof EnsuingDecision.fields)[number]],

@@ -66,6 +66,10 @@ export default class ActiveCitation
     return !!this.citationType?.uuid
   }
 
+  get showSummaryOnEdit(): boolean {
+    return false
+  }
+
   private fieldIsEmpty(
     value: ActiveCitation[(typeof ActiveCitation.fields)[number]],
   ): boolean {

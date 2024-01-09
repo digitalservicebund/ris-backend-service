@@ -104,12 +104,17 @@ onMounted(() => {
       :key="index"
       ref="elementList"
       aria-label="Listen Eintrag"
+      class="border-b-1 border-gray-400"
+      :class="{
+        '!border-none':
+          noHorizontalSeparators ||
+          (index === editIndex && !entry.showSummaryOnEdit),
+      }"
     >
       <div
-        v-if="index !== editIndex"
+        v-if="index !== editIndex || entry.showSummaryOnEdit"
         :key="index"
-        class="group flex cursor-pointer items-center justify-between gap-8 border-b-1 border-gray-400 py-8"
-        :class="{ '!border-none': noHorizontalSeparators }"
+        class="group flex cursor-pointer items-center gap-8 py-8"
       >
         <component
           :is="summaryComponent"
@@ -146,7 +151,7 @@ onMounted(() => {
 
       <component
         :is="editComponent"
-        v-else
+        v-if="index === editIndex"
         v-model="modelValueList[index]"
         :class="modelValueList.length == 1 ? 'py-0' : 'py-24'"
         :model-value-list="modelValueList"
