@@ -443,6 +443,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
             pageable,
             courtType,
             courtLocation,
+            null,
             relatedDocumentationUnit.getFileNumber(),
             relatedDocumentationUnit.getDecisionDate(),
             null,
@@ -461,7 +462,8 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
       Pageable pageable,
       String courtType,
       String courtLocation,
-      String docNumberOrFileNumber,
+      String docNumber,
+      String fileNumber,
       LocalDate decisionDate,
       LocalDate decisionDateEnd,
       PublicationStatus status,
@@ -469,7 +471,8 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
       Boolean myDocOfficeOnly,
       DocumentType documentType,
       DocumentationOfficeDTO documentationOfficeDTO) {
-    if (docNumberOrFileNumber == null || docNumberOrFileNumber.trim().isEmpty()) {
+    if ((fileNumber == null || fileNumber.trim().isEmpty())
+        && (docNumber == null || docNumber.trim().isEmpty())) {
       return repository.searchByDocumentUnitSearchInput(
           documentationOfficeDTO.getId(),
           courtType,
@@ -492,49 +495,56 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
     // This approach could even be better if we replace the next/previous with a "load more" button
     Pageable fixedPageRequest = PageRequest.of(0, maxResultsUpToCurrentPage);
 
-    docNumberOrFileNumber = docNumberOrFileNumber.trim();
+    Slice<DocumentationUnitSearchResultDTO> docNumberResults = new SliceImpl<>(List.of());
+    Slice<DocumentationUnitSearchResultDTO> fileNumberResults = new SliceImpl<>(List.of());
+    Slice<DocumentationUnitSearchResultDTO> deviatingFileNumberResults = new SliceImpl<>(List.of());
 
-    Slice<DocumentationUnitSearchResultDTO> docNumberResults =
-        repository.searchByDocumentUnitSearchInputDocumentNumber(
-            documentationOfficeDTO.getId(),
-            docNumberOrFileNumber,
-            courtType,
-            courtLocation,
-            decisionDate,
-            decisionDateEnd,
-            status,
-            withError,
-            myDocOfficeOnly,
-            DocumentTypeTransformer.transformToDTO(documentType),
-            fixedPageRequest);
+    if (docNumber != null && !docNumber.trim().isEmpty()) {
+      docNumberResults =
+          repository.searchByDocumentUnitSearchInputDocumentNumber(
+              documentationOfficeDTO.getId(),
+              docNumber.trim(),
+              courtType,
+              courtLocation,
+              decisionDate,
+              decisionDateEnd,
+              status,
+              withError,
+              myDocOfficeOnly,
+              DocumentTypeTransformer.transformToDTO(documentType),
+              fixedPageRequest);
+    }
 
-    Slice<DocumentationUnitSearchResultDTO> fileNumberResults =
-        repository.searchByDocumentUnitSearchInputFileNumber(
-            documentationOfficeDTO.getId(),
-            docNumberOrFileNumber,
-            courtType,
-            courtLocation,
-            decisionDate,
-            decisionDateEnd,
-            status,
-            withError,
-            myDocOfficeOnly,
-            DocumentTypeTransformer.transformToDTO(documentType),
-            fixedPageRequest);
+    if (fileNumber != null && !fileNumber.trim().isEmpty()) {
+      fileNumberResults =
+          repository.searchByDocumentUnitSearchInputFileNumber(
+              documentationOfficeDTO.getId(),
+              fileNumber.trim(),
+              courtType,
+              courtLocation,
+              decisionDate,
+              decisionDateEnd,
+              status,
+              withError,
+              myDocOfficeOnly,
+              DocumentTypeTransformer.transformToDTO(documentType),
+              fixedPageRequest);
 
-    Slice<DocumentationUnitSearchResultDTO> deviatingFileNumberResults =
-        repository.searchByDocumentUnitSearchInputDeviatingFileNumber(
-            documentationOfficeDTO.getId(),
-            docNumberOrFileNumber,
-            courtType,
-            courtLocation,
-            decisionDate,
-            decisionDateEnd,
-            status,
-            withError,
-            myDocOfficeOnly,
-            DocumentTypeTransformer.transformToDTO(documentType),
-            fixedPageRequest);
+      deviatingFileNumberResults =
+          repository.searchByDocumentUnitSearchInputDeviatingFileNumber(
+              documentationOfficeDTO.getId(),
+              fileNumber.trim(),
+              courtType,
+              courtLocation,
+              decisionDate,
+              decisionDateEnd,
+              status,
+              withError,
+              myDocOfficeOnly,
+              DocumentTypeTransformer.transformToDTO(documentType),
+              fixedPageRequest);
+    }
+
     Set<DocumentationUnitSearchResultDTO> allResults = new HashSet<>();
     allResults.addAll(docNumberResults.getContent());
     allResults.addAll(fileNumberResults.getContent());
@@ -586,6 +596,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
             pageable,
             searchInput.courtType(),
             searchInput.courtLocation(),
+            searchInput.documentNumberOrFileNumber(),
             searchInput.documentNumberOrFileNumber(),
             searchInput.decisionDate(),
             searchInput.decisionDateEnd(),

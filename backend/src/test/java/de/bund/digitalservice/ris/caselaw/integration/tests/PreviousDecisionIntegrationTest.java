@@ -392,6 +392,14 @@ class PreviousDecisionIntegrationTest {
   }
 
   @Test
+  void testSearchForDocumentUnitsByPreviousDecisionInput_onlyFileNumber_shouldNotMatchDocNumber() {
+    prepareDocumentUnitMetadataDTOs();
+    simulateAPICall(PreviousDecision.builder().fileNumber("XX").build())
+        .jsonPath("$.content")
+        .isEmpty();
+  }
+
+  @Test
   void testSearchForDocumentUnitsByPreviousDecisionInput_onlyDocumentType_shouldMatchOne() {
     prepareDocumentUnitMetadataDTOs();
     DocumentType documentType =
@@ -557,7 +565,7 @@ class PreviousDecisionIntegrationTest {
         DocumentationUnitDTO.builder()
             .id(UUID.randomUUID())
             .documentationOffice(documentOffice)
-            .documentNumber(RandomStringUtils.randomAlphanumeric(13))
+            .documentNumber("XX" + RandomStringUtils.randomAlphanumeric(11))
             .court(testCourt)
             .decisionDate(decisionDate)
             .documentType(documentTypeDTO)
