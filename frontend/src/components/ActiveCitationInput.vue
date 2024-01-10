@@ -260,10 +260,7 @@ watch(
         @click="addActiveCitation"
       />
     </div>
-    <div
-      v-if="isLoading || (searchResults && searchResults.length > 0)"
-      class="mb-10 mt-20"
-    >
+    <div class="mb-10 mt-20">
       <Pagination
         navigation-position="bottom"
         :page="searchResultsCurrentPage"

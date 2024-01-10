@@ -46,7 +46,7 @@ export type PageableService<TResult, TQuery = TResult> = (
 <template>
   <slot v-if="props.navigationPosition == 'bottom'"></slot>
   <div
-    v-if="page?.content && !isLoading"
+    v-if="page?.content && page?.content?.length > 0 && !isLoading"
     class="my-32 flex flex-col items-center"
   >
     <div class="flex items-center">
