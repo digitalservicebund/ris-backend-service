@@ -77,7 +77,7 @@ ORDER BY documentationUnit.documentNumber
           """
   SELECT documentationUnit FROM DocumentationUnitDTO documentationUnit
   LEFT JOIN documentationUnit.court court
-  WHERE upper(documentationUnit.documentNumber) like upper(concat('%', :documentNumberOrFileNumber,'%'))
+  WHERE upper(documentationUnit.documentNumber) like upper(concat('%', :documentNumber,'%'))
   AND
    """
               + BASE_QUERY)
@@ -85,7 +85,7 @@ ORDER BY documentationUnit.documentNumber
   // We use JPA repository interface magic, so reducing parameter count is not possible.
   Slice<DocumentationUnitSearchResultDTO> searchByDocumentUnitSearchInputDocumentNumber(
       @Param("documentationOfficeId") UUID documentationOfficeId,
-      @Param("documentNumberOrFileNumber") String documentNumberOrFileNumber,
+      @Param("documentNumber") String documentNumber,
       @Param("courtType") String courtType,
       @Param("courtLocation") String courtLocation,
       @Param("decisionDate") LocalDate decisionDate,
@@ -102,7 +102,7 @@ ORDER BY documentationUnit.documentNumber
   SELECT documentationUnit FROM DocumentationUnitDTO documentationUnit
   LEFT JOIN documentationUnit.court court
   LEFT JOIN documentationUnit.fileNumbers fileNumber
-  WHERE (upper(fileNumber.value) like upper(concat('%', :documentNumberOrFileNumber,'%')))
+  WHERE (upper(fileNumber.value) like upper(concat('%', :fileNumber,'%')))
   AND
   """
               + BASE_QUERY)
@@ -110,7 +110,7 @@ ORDER BY documentationUnit.documentNumber
   // We use JPA repository interface magic, so reducing parameter count is not possible.
   Slice<DocumentationUnitSearchResultDTO> searchByDocumentUnitSearchInputFileNumber(
       @Param("documentationOfficeId") UUID documentationOfficeId,
-      @Param("documentNumberOrFileNumber") String documentNumberOrFileNumber,
+      @Param("fileNumber") String fileNumber,
       @Param("courtType") String courtType,
       @Param("courtLocation") String courtLocation,
       @Param("decisionDate") LocalDate decisionDate,
@@ -127,7 +127,7 @@ ORDER BY documentationUnit.documentNumber
   SELECT documentationUnit FROM DocumentationUnitDTO documentationUnit
   LEFT JOIN documentationUnit.court court
   LEFT JOIN documentationUnit.deviatingFileNumbers deviatingFileNumber
-  WHERE (upper(deviatingFileNumber.value) like upper(concat('%', :documentNumberOrFileNumber,'%')))
+  WHERE (upper(deviatingFileNumber.value) like upper(concat('%', :fileNumber,'%')))
   AND
   """
               + BASE_QUERY)
@@ -135,7 +135,7 @@ ORDER BY documentationUnit.documentNumber
   // We use JPA repository interface magic, so reducing parameter count is not possible.
   Slice<DocumentationUnitSearchResultDTO> searchByDocumentUnitSearchInputDeviatingFileNumber(
       UUID documentationOfficeId,
-      String documentNumberOrFileNumber,
+      String fileNumber,
       String courtType,
       String courtLocation,
       LocalDate decisionDate,
