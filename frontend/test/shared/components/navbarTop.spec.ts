@@ -21,6 +21,11 @@ describe("navbar top", () => {
         name: "norms",
         component: {},
       },
+      {
+        path: "",
+        name: "search",
+        component: {},
+      },
     ],
   })
 

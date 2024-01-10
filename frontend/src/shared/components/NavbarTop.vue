@@ -68,6 +68,12 @@ onMounted(async () => {
         :to="{ name: 'norms' }"
         >Normen</router-link
       >
+      <router-link
+        class="p-8 hover:bg-yellow-500 hover:underline"
+        :class="{ underline: route.path.includes('suche') }"
+        :to="{ name: 'search' }"
+        >Suche</router-link
+      >
     </div>
 
     <div v-if="user" class="grid grid-cols-[auto,1fr] gap-10">
