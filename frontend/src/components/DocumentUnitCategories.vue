@@ -181,7 +181,10 @@ onMounted(async () => {
               )
             "
           />
-          <PreviousDecisions v-model="previousDecisions" />
+          <PreviousDecisions
+            id="proceedingDecisions"
+            v-model="previousDecisions"
+          />
           <EnsuingDecisions v-model="ensuingDecisions" class="mb-24" />
 
           <DocumentUnitContentRelatedIndexing
