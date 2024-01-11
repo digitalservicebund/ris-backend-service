@@ -12,6 +12,7 @@ import org.springframework.security.oauth2.jwt.ReactiveJwtDecoder;
 import org.springframework.security.oauth2.jwt.ReactiveJwtDecoders;
 import org.springframework.security.web.server.SecurityWebFilterChain;
 import org.springframework.security.web.server.authentication.HttpStatusServerEntryPoint;
+import org.springframework.security.web.server.authentication.RedirectServerAuthenticationFailureHandler;
 import org.springframework.security.web.server.header.ReferrerPolicyServerHttpHeadersWriter;
 import org.springframework.security.web.server.header.XContentTypeOptionsServerHttpHeadersWriter;
 import org.springframework.security.web.server.header.XFrameOptionsServerHttpHeadersWriter;
@@ -38,7 +39,10 @@ public class SecurityConfig {
                     .permitAll()
                     .anyExchange()
                     .authenticated())
-        .oauth2Login(Customizer.withDefaults())
+        .oauth2Login(
+            oauth2 ->
+                oauth2.authenticationFailureHandler(
+                    new RedirectServerAuthenticationFailureHandler("/error?404.html")))
         .exceptionHandling(
             handling ->
                 handling.authenticationEntryPoint(
