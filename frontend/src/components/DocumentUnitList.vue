@@ -267,7 +267,7 @@ function onDelete() {
         v-if="!isLoading"
         aria-label="Neue Dokumentationseinheit erstellen"
         button-type="ghost"
-        label="Neue Dokumentationseinheit"
+        label="Neue Dokumentationseinheit erstellen"
         @click="router.push({ name: 'caselaw-documentUnit-new' })"
       />
     </div>
