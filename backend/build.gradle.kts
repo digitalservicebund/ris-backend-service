@@ -24,7 +24,7 @@ plugins {
     id("com.github.ben-manes.versions") version "0.50.0"
     id("org.jetbrains.dokka") version "1.9.10"
     id("io.franzbecker.gradle-lombok") version "5.0.0"
-    id("org.flywaydb.flyway") version "10.1.0"
+    id("org.flywaydb.flyway") version "10.5.0"
 }
 
 group = "de.bund.digitalservice"
