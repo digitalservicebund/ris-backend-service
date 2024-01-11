@@ -77,5 +77,8 @@ async function submitSearch(page: number) {
         @node-clicked="emit('node-clicked', fieldOfLawNode.identifier)"
       />
     </Pagination>
+    <div v-if="!currentPage?.content || currentPage?.content?.length == 0">
+      Keine Ergebnisse
+    </div>
   </div>
 </template>
