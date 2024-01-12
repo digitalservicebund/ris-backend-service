@@ -41,6 +41,7 @@ export default defineConfig({
     exclude: [
       "test/e2e/**/*.ts",
       "test/a11y/**/*.ts",
+      "test/queries/**/*.ts",
       "test/test-helper/**/*.ts",
       "test/setup.ts",
     ],
