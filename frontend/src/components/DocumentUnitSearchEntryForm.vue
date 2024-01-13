@@ -183,17 +183,15 @@ export type DocumentUnitSearchParameter =
 <template>
   <div class="pyb-24 mb-32 flex flex-col bg-blue-200">
     <div
-      class="m-40 grid grid-flow-col grid-cols-[180px_1fr_180px_1fr] grid-rows-[auto_auto_auto_auto] gap-x-20 gap-y-20"
+      class="m-40 grid grid-flow-col grid-cols-[auto_1fr_auto_1fr] grid-rows-[auto_auto_auto_auto] gap-x-12 gap-y-20 lg:gap-x-32"
     >
       <!-- Column 1 -->
-      <div class="ds-body-01-reg flex flex-row items-center pl-32">
-        Aktenzeichen
-      </div>
-      <div class="ds-body-01-reg flex flex-row items-center pl-32">Gericht</div>
-      <div class="ds-body-01-reg flex flex-row items-center pl-32">Datum</div>
-      <div class="pl-32"></div>
+      <div class="ds-body-01-reg flex flex-row items-center">Aktenzeichen</div>
+      <div class="ds-body-01-reg flex flex-row items-center">Gericht</div>
+      <div class="ds-body-01-reg flex flex-row items-center">Datum</div>
+      <div></div>
       <!-- Column 2 -->
-      <div class="pr-32">
+      <div>
         <InputField id="fileNumber" label="Aktenzeichen" visually-hide-label>
           <TextInput
             id="fileNumber"
@@ -204,7 +202,7 @@ export type DocumentUnitSearchParameter =
           ></TextInput>
         </InputField>
       </div>
-      <div class="flex flex-row gap-24 pr-32">
+      <div class="flex flex-row gap-24">
         <InputField id="courtType" label="Gerichtstyp" visually-hide-label>
           <TextInput
             id="courtType"
@@ -226,7 +224,7 @@ export type DocumentUnitSearchParameter =
           ></TextInput>
         </InputField>
       </div>
-      <div class="flex flex-row gap-10 pr-32">
+      <div class="flex flex-row gap-10">
         <InputField
           id="decisionDate"
           v-slot="{ id, hasError }"
@@ -248,7 +246,7 @@ export type DocumentUnitSearchParameter =
             "
           ></DateInput>
         </InputField>
-        <span>-</span>
+        <span class="pt-6">-</span>
         <InputField
           id="decisionDateEnd"
           v-slot="{ id, hasError }"
@@ -274,14 +272,16 @@ export type DocumentUnitSearchParameter =
       </div>
       <div class="pl-32"></div>
       <!-- Column 3 -->
-      <div class="ds-body-01-reg flex flex-row items-center pl-32">
+      <div class="ds-body-01-reg flex flex-row items-center pl-24 lg:pl-48">
         Dokumentnummer
       </div>
-      <div class="ds-body-01-reg flex flex-row items-center pl-32">Status</div>
-      <div class="pl-32"></div>
-      <div class="pl-32"></div>
+      <div class="ds-body-01-reg flex flex-row items-center pl-24 lg:pl-48">
+        Status
+      </div>
+      <div></div>
+      <div></div>
       <!-- Column 4 -->
-      <div class="pr-32">
+      <div class="">
         <InputField
           id="documentNumber"
           label="Dokumentnummer"
@@ -296,7 +296,7 @@ export type DocumentUnitSearchParameter =
           ></TextInput>
         </InputField>
       </div>
-      <div class="pr-32">
+      <div class="">
         <InputField id="status" label="Status" visually-hide-label>
           <DropdownInput
             id="status"
@@ -308,7 +308,7 @@ export type DocumentUnitSearchParameter =
           />
         </InputField>
       </div>
-      <div class="flex flex-row gap-20 pr-32">
+      <div class="flex flex-row gap-20">
         <InputField
           id="documentationOffice"
           v-slot="{ id }"
