@@ -183,7 +183,7 @@ export type DocumentUnitSearchParameter =
 <template>
   <div class="pyb-24 mb-32 flex flex-col bg-blue-200">
     <div
-      class="m-40 grid grid-flow-col grid-cols-[180px_1fr_180px_1fr] grid-rows-4 gap-x-20 gap-y-20"
+      class="m-40 grid grid-flow-col grid-cols-[180px_1fr_180px_1fr] grid-rows-[auto_auto_auto_auto] gap-x-20 gap-y-20"
     >
       <!-- Column 1 -->
       <div class="ds-body-01-reg flex flex-row items-center pl-32">
