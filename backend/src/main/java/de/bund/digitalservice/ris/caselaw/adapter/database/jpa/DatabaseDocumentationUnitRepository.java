@@ -21,7 +21,8 @@ public interface DatabaseDocumentationUnitRepository
 
   static final String BASE_QUERY =
       """
-   (:courtType IS NULL OR upper(court.type) like upper(cast(:courtType as text)))
+   (:documentNumber IS NULL OR upper(documentationUnit.documentNumber) like concat('%', upper(cast(:documentNumber as text)), '%'))
+   AND (:courtType IS NULL OR upper(court.type) like upper(cast(:courtType as text)))
    AND (:courtLocation IS NULL OR upper(court.location) like upper(cast(:courtLocation as text)))
    AND (cast(:decisionDate as date) IS NULL
        OR (cast(:decisionDateEnd as date) IS NULL AND documentationUnit.decisionDate = :decisionDate)
@@ -62,29 +63,6 @@ ORDER BY documentationUnit.documentNumber
   // We use JPA repository interface magic, so reducing parameter count is not possible.
   Slice<DocumentationUnitSearchResultDTO> searchByDocumentUnitSearchInput(
       @Param("documentationOfficeId") UUID documentationOfficeId,
-      @Param("courtType") String courtType,
-      @Param("courtLocation") String courtLocation,
-      @Param("decisionDate") LocalDate decisionDate,
-      @Param("decisionDateEnd") LocalDate decisionDateEnd,
-      @Param("status") PublicationStatus status,
-      @Param("withErrorOnly") Boolean withErrorOnly,
-      @Param("myDocOfficeOnly") Boolean myDocOfficeOnly,
-      @Param("documentType") DocumentTypeDTO documentType,
-      @Param("pageable") Pageable pageable);
-
-  @Query(
-      value =
-          """
-  SELECT documentationUnit FROM DocumentationUnitDTO documentationUnit
-  LEFT JOIN documentationUnit.court court
-  WHERE upper(documentationUnit.documentNumber) like upper(concat('%', :documentNumber,'%'))
-  AND
-   """
-              + BASE_QUERY)
-  @SuppressWarnings("java:S107")
-  // We use JPA repository interface magic, so reducing parameter count is not possible.
-  Slice<DocumentationUnitSearchResultDTO> searchByDocumentUnitSearchInputDocumentNumber(
-      @Param("documentationOfficeId") UUID documentationOfficeId,
       @Param("documentNumber") String documentNumber,
       @Param("courtType") String courtType,
       @Param("courtLocation") String courtLocation,
@@ -110,6 +88,7 @@ ORDER BY documentationUnit.documentNumber
   // We use JPA repository interface magic, so reducing parameter count is not possible.
   Slice<DocumentationUnitSearchResultDTO> searchByDocumentUnitSearchInputFileNumber(
       @Param("documentationOfficeId") UUID documentationOfficeId,
+      @Param("documentNumber") String documentNumber,
       @Param("fileNumber") String fileNumber,
       @Param("courtType") String courtType,
       @Param("courtLocation") String courtLocation,
@@ -135,6 +114,7 @@ ORDER BY documentationUnit.documentNumber
   // We use JPA repository interface magic, so reducing parameter count is not possible.
   Slice<DocumentationUnitSearchResultDTO> searchByDocumentUnitSearchInputDeviatingFileNumber(
       UUID documentationOfficeId,
+      String documentNumber,
       String fileNumber,
       String courtType,
       String courtLocation,

@@ -563,8 +563,7 @@ class DocumentationUnitIntegrationTest {
     // by documentNumber & fileNumber
     searchInput =
         DocumentationUnitSearchInput.builder().fileNumber("abc").documentNumber("abc").build();
-    assertThat(extractDocumentNumbersFromSearchCall(searchInput))
-        .containsExactly("ABCD202300007", "MNOP202300099");
+    assertThat(extractDocumentNumbersFromSearchCall(searchInput)).isEmpty();
 
     // by court
     searchInput =
