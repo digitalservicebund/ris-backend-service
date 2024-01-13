@@ -485,6 +485,7 @@ class DocumentUnitServiceTest {
             Optional.empty(),
             Optional.empty(),
             Optional.empty(),
+            Optional.empty(),
             Optional.empty());
     assertThat(documentationUnitSearchEntries).contains(documentationUnitSearchResult);
     verify(repository)

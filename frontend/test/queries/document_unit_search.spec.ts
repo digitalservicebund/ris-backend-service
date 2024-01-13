@@ -12,7 +12,7 @@ test.describe("document unit search queries", () => {
     {
       title: "documentNumber and courtType",
       parameter: {
-        documentNumberOrFileNumber: "KORE",
+        documentNumber: "KORE",
         courtType: "BGH",
       },
       maxDuration: 500,
@@ -21,7 +21,7 @@ test.describe("document unit search queries", () => {
     {
       title: "not existing documentNumber",
       parameter: {
-        documentNumberOrFileNumber: "notExistingFoo",
+        fileNumber: "notExistingFoo",
       },
       maxDuration: 500,
     },

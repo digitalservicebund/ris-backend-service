@@ -179,9 +179,7 @@ test.describe("saving behaviour", () => {
       { clickSaveButton: true },
     )
     await page.goto("/")
-    await page
-      .getByLabel("Dokumentnummer oder Aktenzeichen Suche")
-      .fill(fileNumber)
+    await page.getByLabel("Aktenzeichen Suche").fill(fileNumber)
     await page.getByLabel("Nach Dokumentationseinheiten suchen").click()
     //TODO: remove the timeout when search performance get better
     await expect(

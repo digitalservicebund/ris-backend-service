@@ -2,6 +2,7 @@ import httpClient, {
   ServiceResponse,
   FailedValidationServerResponse,
 } from "./httpClient"
+import { DocumentUnitSearchParameter } from "@/components/DocumentUnitSearchEntryForm.vue"
 import DocumentUnit from "@/domain/documentUnit"
 import DocumentUnitListEntry from "@/domain/documentUnitListEntry"
 import { SingleNormValidationInfo } from "@/domain/normReference"
@@ -152,7 +153,9 @@ const service: DocumentUnitService = {
     }
   },
 
-  async searchByDocumentUnitSearchInput(requestParams = {}) {
+  async searchByDocumentUnitSearchInput(
+    requestParams: { [K in DocumentUnitSearchParameter]?: string } = {},
+  ) {
     const response = await httpClient.get<Page<DocumentUnitListEntry>>(
       `caselaw/documentunits/search`,
       {

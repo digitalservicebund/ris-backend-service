@@ -482,6 +482,7 @@ class DocumentUnitControllerTest {
             Optional.empty(),
             Optional.empty(),
             Optional.empty(),
+            Optional.empty(),
             Optional.empty()))
         .thenReturn(Page.empty());
 
@@ -497,6 +498,7 @@ class DocumentUnitControllerTest {
         .searchByDocumentationUnitSearchInput(
             pageRequest,
             docOffice,
+            Optional.empty(),
             Optional.empty(),
             Optional.empty(),
             Optional.empty(),

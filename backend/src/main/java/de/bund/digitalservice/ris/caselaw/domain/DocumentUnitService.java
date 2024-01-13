@@ -180,7 +180,8 @@ public class DocumentUnitService {
   public Slice<DocumentationUnitSearchResult> searchByDocumentationUnitSearchInput(
       Pageable pageable,
       DocumentationOffice documentationOffice,
-      Optional<String> documentNumberOrFileNumber,
+      Optional<String> documentNumber,
+      Optional<String> fileNumber,
       Optional<String> courtType,
       Optional<String> courtLocation,
       Optional<LocalDate> decisionDate,
@@ -191,7 +192,8 @@ public class DocumentUnitService {
 
     DocumentationUnitSearchInput searchInput =
         DocumentationUnitSearchInput.builder()
-            .documentNumberOrFileNumber(documentNumberOrFileNumber.orElse(null))
+            .documentNumber(documentNumber.orElse(null))
+            .fileNumber(fileNumber.orElse(null))
             .courtType(courtType.orElse(null))
             .courtLocation(courtLocation.orElse(null))
             .decisionDate(decisionDate.orElse(null))

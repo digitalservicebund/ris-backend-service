@@ -100,8 +100,8 @@ public class DocumentUnitController {
   public Mono<Slice<DocumentationUnitSearchResult>> searchByDocumentUnitListEntry(
       @RequestParam("pg") int page,
       @RequestParam("sz") int size,
-      @RequestParam(value = "documentNumberOrFileNumber")
-          Optional<String> documentNumberOrFileNumber,
+      @RequestParam(value = "documentNumber") Optional<String> documentNumber,
+      @RequestParam(value = "fileNumber") Optional<String> fileNumber,
       @RequestParam(value = "courtType") Optional<String> courtType,
       @RequestParam(value = "courtLocation") Optional<String> courtLocation,
       @RequestParam(value = "decisionDate") Optional<LocalDate> decisionDate,
@@ -119,7 +119,8 @@ public class DocumentUnitController {
                     service.searchByDocumentationUnitSearchInput(
                         PageRequest.of(page, size),
                         documentationOffice,
-                        documentNumberOrFileNumber,
+                        documentNumber,
+                        fileNumber,
                         courtType,
                         courtLocation,
                         decisionDate,

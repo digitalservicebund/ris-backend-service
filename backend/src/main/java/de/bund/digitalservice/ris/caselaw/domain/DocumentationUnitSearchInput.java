@@ -7,7 +7,8 @@ import lombok.Builder;
 @Builder
 public record DocumentationUnitSearchInput(
     UUID uuid,
-    String documentNumberOrFileNumber,
+    String documentNumber,
+    String fileNumber,
     String courtType,
     String courtLocation,
     LocalDate decisionDate,

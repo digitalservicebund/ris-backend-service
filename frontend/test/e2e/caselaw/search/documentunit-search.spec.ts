@@ -17,9 +17,7 @@ test.describe("search", () => {
       page.getByRole("heading", { name: "Übersicht Rechtsprechung" }),
     ).toBeVisible()
 
-    await expect(
-      page.getByLabel("Dokumentnummer oder Aktenzeichen Suche"),
-    ).toBeVisible()
+    await expect(page.getByLabel("Aktenzeichen Suche")).toBeVisible()
     await expect(page.getByLabel("Gerichtstyp Suche")).toBeVisible()
     await expect(page.getByLabel("Gerichtsort Suche")).toBeVisible()
     await expect(
@@ -32,6 +30,7 @@ test.describe("search", () => {
         exact: true,
       }),
     ).toBeVisible()
+    await expect(page.getByLabel("Dokumentnummer Suche")).toBeVisible()
     await expect(page.getByLabel("Status Suche")).toBeVisible()
     await expect(page.getByLabel("Nur meine Dokstelle Filter")).toBeVisible()
 
@@ -69,9 +68,7 @@ test.describe("search", () => {
     await expect(page.getByLabel("Ladestatus")).toBeVisible()
 
     //results
-    await page
-      .getByLabel("Dokumentnummer oder Aktenzeichen Suche")
-      .fill(documentNumber)
+    await page.getByLabel("Dokumentnummer Suche").fill(documentNumber)
     await page.getByLabel("Nach Dokumentationseinheiten suchen").click()
     await expect(
       page.locator(".table-row", {
@@ -80,9 +77,7 @@ test.describe("search", () => {
     ).toBeVisible({ timeout: 30000 }) // RISDEV-2269
 
     //no results
-    await page
-      .getByLabel("Dokumentnummer oder Aktenzeichen Suche")
-      .fill("wrong document number")
+    await page.getByLabel("Dokumentnummer Suche").fill("wrong document number")
     await page.getByLabel("Nach Dokumentationseinheiten suchen").click()
     await expect(
       page.locator(".table-row", {
@@ -481,9 +476,7 @@ test.describe("search", () => {
     const resetSearch = page.getByLabel("Suche zurücksetzen")
     const searchTerm = generateString()
     await expect(resetSearch).toBeHidden()
-    await page
-      .getByLabel("Dokumentnummer oder Aktenzeichen Suche")
-      .fill(searchTerm)
+    await page.getByLabel("Aktenzeichen Suche").fill(searchTerm)
     await expect(resetSearch).toBeVisible()
     await page.getByLabel("Nach Dokumentationseinheiten suchen").click()
 
