@@ -39,7 +39,6 @@ describe("text editor", async () => {
     render(TextEditor, {
       props: {
         value: "Test Value",
-        fieldSize: "large",
         ariaLabel: "Test Editor Feld",
       },
       global: { plugins: [router] },
@@ -54,6 +53,20 @@ describe("text editor", async () => {
     ).not.toBeInTheDocument()
 
     expect(screen.getByTestId("Test Editor Feld")).toBeInTheDocument()
+  })
+
+  test.each([
+    ["big", "h-320"],
+    ["medium", "h-160"],
+    ["small", "h-96"],
+    [undefined, "h-160"],
+  ])("renders %s field with correct class", async (a, expected) => {
+    render(TextEditor, {
+      props: { fieldSize: a },
+      global: { plugins: [router] },
+    })
+
+    expect(await screen.findByTestId("Editor Feld")).toHaveClass(expected)
   })
 
   test("show buttons on focus", async () => {
