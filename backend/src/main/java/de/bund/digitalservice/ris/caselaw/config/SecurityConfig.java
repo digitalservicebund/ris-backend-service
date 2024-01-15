@@ -42,7 +42,7 @@ public class SecurityConfig {
         .oauth2Login(
             oauth2 ->
                 oauth2.authenticationFailureHandler(
-                    new RedirectServerAuthenticationFailureHandler("/error?404.html")))
+                    new RedirectServerAuthenticationFailureHandler("/error")))
         .exceptionHandling(
             handling ->
                 handling.authenticationEntryPoint(
