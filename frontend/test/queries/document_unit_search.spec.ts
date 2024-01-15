@@ -19,11 +19,83 @@ test.describe("document unit search queries", () => {
       minResults: 5,
     },
     {
+      title: "vague documentNumber",
+      parameter: {
+        documentNumber: "KO",
+      },
+      maxDuration: 500,
+      minResults: 5,
+    },
+    {
       title: "not existing documentNumber",
+      parameter: {
+        documentNumber: "notExistingFoo",
+      },
+      maxDuration: 500,
+    },
+    {
+      title: "vague fileNumber",
+      parameter: {
+        fileNumber: "VI",
+      },
+      maxDuration: 500,
+      minResults: 5,
+    },
+    {
+      title: "not existing fileNumber",
       parameter: {
         fileNumber: "notExistingFoo",
       },
       maxDuration: 500,
+    },
+    {
+      title: "only unpublished",
+      parameter: {
+        publicationStatus: "UNPUBLISHED",
+      },
+      maxDuration: 500,
+      minResults: 5,
+    },
+    {
+      title: "of all time",
+      parameter: {
+        decisionDate: "1900-01-01",
+        decisionDateEnd: " 2024-01-15",
+      },
+      maxDuration: 500,
+      minResults: 5,
+    },
+    {
+      title: "one day",
+      parameter: {
+        decisionDate: "2021-04-22",
+      },
+      maxDuration: 200,
+      minResults: 5,
+    },
+    {
+      title: "only court location",
+      parameter: {
+        courtLocation: "Berlin",
+      },
+      maxDuration: 200,
+      minResults: 5,
+    },
+    {
+      title: "only court type",
+      parameter: {
+        courtType: "BGH",
+      },
+      maxDuration: 200,
+      minResults: 5,
+    },
+    {
+      title: "only my doc office",
+      parameter: {
+        myDocOfficeOnly: "true",
+      },
+      maxDuration: 200,
+      minResults: 5,
     },
   ]
 
