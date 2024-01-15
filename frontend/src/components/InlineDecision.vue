@@ -18,7 +18,11 @@ defineProps<{
         params: { documentNumber: decision.documentNumber },
       }"
     >
-      <button class="underline">{{ decision.renderDecision }}</button>
+      <button
+        class="underline focus:outline-none focus-visible:outline-blue-800"
+      >
+        {{ decision.renderDecision }}
+      </button>
     </router-link>
 
     <span v-else class="ds-label-02-reg">{{ decision.renderDecision }}</span>
