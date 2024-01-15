@@ -51,14 +51,11 @@ async function runTestMultipleTimes(
       body: Buffer.from(durations),
       contentType: "application/json",
     })
-    await testInfo.attach("maxDuration", {
-      body: Buffer.from(`${search.maxDuration}`),
-    })
     return
   }
 
   const request = await getRequest(
-    "http://127.0.0.1/api/v1/caselaw/documentunits/search?pg=0&sz=30" +
+    "/api/v1/caselaw/documentunits/search?pg=0&sz=30" +
       getUrlParams(search.parameter),
     page,
   )
