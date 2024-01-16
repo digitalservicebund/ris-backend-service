@@ -1,5 +1,6 @@
 import type {
   FullConfig,
+  FullResult,
   Reporter,
   Suite,
   TestCase,
@@ -9,6 +10,7 @@ import playwrightConfig from "./../../playwright.config"
 
 class QueriesReporter implements Reporter {
   private resultsWithDuration: { test: TestCase; result: TestResult }[] = []
+  private failedTests: string[] = []
 
   onBegin(_config: FullConfig, suite: Suite) {
     console.log(
@@ -17,6 +19,9 @@ class QueriesReporter implements Reporter {
   }
 
   onTestEnd(test: TestCase, result: TestResult) {
+    if (["failed", "timedOut", "interrupted"].includes(result.status))
+      this.failedTests.push(test.title)
+
     if (
       result.attachments.length &&
       result.attachments.find((attachment) => attachment.name == "durations")
@@ -24,25 +29,31 @@ class QueriesReporter implements Reporter {
       this.resultsWithDuration.push({ test, result })
   }
 
-  onEnd() {
-    const stats = this.resultsWithDuration.map(({ test, result }) => {
-      const durations = result.attachments
-        .find((attachment) => attachment.name == "durations")
-        ?.body?.toJSON().data
+  onEnd(result: FullResult) {
+    if (result.status != "passed") {
+      console.error("\nThe following test cases failed: ")
+      console.table(this.failedTests)
+      console.log("Use `pm run test:queries -- --reporter=line` to see errors")
+    } else {
+      const stats = this.resultsWithDuration.map(({ test, result }) => {
+        const durations = result.attachments
+          .find((attachment) => attachment.name == "durations")
+          ?.body?.toJSON().data
 
-      return (
-        durations && {
-          title: test.title,
-          average_duration:
-            durations.reduce((a, b) => a + b, 0) / durations.length,
-          max_duration: Math.max(...durations),
-          min_duration: Math.min(...durations),
-          runs: durations.length,
-        }
-      )
-    })
+        return (
+          durations && {
+            title: test.title,
+            average_duration:
+              durations.reduce((a, b) => a + b, 0) / durations.length,
+            max_duration: Math.max(...durations),
+            min_duration: Math.min(...durations),
+            runs: durations.length,
+          }
+        )
+      })
 
-    console.table(stats)
+      console.table(stats)
+    }
   }
 
   private getRunsWithoutSetup(suite: Suite): number {
