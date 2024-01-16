@@ -22,6 +22,7 @@ public interface DatabaseDocumentationUnitRepository
   static final String BASE_QUERY =
       """
    (:documentNumber IS NULL OR upper(documentationUnit.documentNumber) like concat('%', upper(cast(:documentNumber as text)), '%'))
+   AND (:documentNumberToExclude IS NULL OR documentationUnit.documentNumber != :documentNumberToExclude)
    AND (:courtType IS NULL OR upper(court.type) like upper(cast(:courtType as text)))
    AND (:courtLocation IS NULL OR upper(court.location) like upper(cast(:courtLocation as text)))
    AND (cast(:decisionDate as date) IS NULL
@@ -64,6 +65,7 @@ ORDER BY documentationUnit.documentNumber
   Slice<DocumentationUnitSearchResultDTO> searchByDocumentUnitSearchInput(
       @Param("documentationOfficeId") UUID documentationOfficeId,
       @Param("documentNumber") String documentNumber,
+      @Param("documentNumberToExclude") String documentNumberToExclude,
       @Param("courtType") String courtType,
       @Param("courtLocation") String courtLocation,
       @Param("decisionDate") LocalDate decisionDate,
@@ -89,6 +91,7 @@ ORDER BY documentationUnit.documentNumber
   Slice<DocumentationUnitSearchResultDTO> searchByDocumentUnitSearchInputFileNumber(
       @Param("documentationOfficeId") UUID documentationOfficeId,
       @Param("documentNumber") String documentNumber,
+      @Param("documentNumberToExclude") String documentNumberToExclude,
       @Param("fileNumber") String fileNumber,
       @Param("courtType") String courtType,
       @Param("courtLocation") String courtLocation,
@@ -115,6 +118,7 @@ ORDER BY documentationUnit.documentNumber
   Slice<DocumentationUnitSearchResultDTO> searchByDocumentUnitSearchInputDeviatingFileNumber(
       UUID documentationOfficeId,
       String documentNumber,
+      String documentNumberToExclude,
       String fileNumber,
       String courtType,
       String courtLocation,

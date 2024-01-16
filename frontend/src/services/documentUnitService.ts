@@ -121,11 +121,15 @@ const service: DocumentUnitService = {
     size: number,
     query = new RelatedDocumentation(),
   ) {
+    const urlParams = window.location.pathname.split("/")
+    const documentNumberToExclude =
+      urlParams[urlParams.indexOf("documentunit") + 1]
+
     const response = await httpClient.put<
       RelatedDocumentation,
       Page<RelatedDocumentation>
     >(
-      `caselaw/documentunits/search-by-linked-documentation-unit?pg=${page}&sz=${size}`,
+      `caselaw/documentunits/${documentNumberToExclude}/search-linkable-documentation-units?pg=${page}&sz=${size}`,
       {
         headers: {
           Accept: "application/json",

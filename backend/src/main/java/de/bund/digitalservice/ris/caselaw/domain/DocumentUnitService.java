@@ -308,13 +308,14 @@ public class DocumentUnitService {
         .sort(Comparator.comparing(PublicationHistoryRecord::getDate).reversed());
   }
 
-  public Slice<RelatedDocumentationUnit> searchByLinkedDocumentationUnit(
+  public Slice<RelatedDocumentationUnit> searchLinkableDocumentationUnits(
       RelatedDocumentationUnit relatedDocumentationUnit,
       DocumentationOffice documentationOffice,
+      String documentNumberToExclude,
       Pageable pageable) {
 
-    return repository.searchByRelatedDocumentationUnit(
-        relatedDocumentationUnit, documentationOffice, pageable);
+    return repository.searchLinkableDocumentationUnits(
+        relatedDocumentationUnit, documentationOffice, documentNumberToExclude, pageable);
   }
 
   public Mono<String> validateSingleNorm(SingleNormValidationInfo singleNormValidationInfo) {

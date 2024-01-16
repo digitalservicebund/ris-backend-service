@@ -523,7 +523,8 @@ class PreviousDecisionIntegrationTest {
     return risWebTestClient
         .withDefaultLogin()
         .put()
-        .uri("/api/v1/caselaw/documentunits/search-by-linked-documentation-unit?pg=0&sz=30")
+        .uri(
+            "/api/v1/caselaw/documentunitKORE000000000/search-linkable-documentation-units?pg=0&sz=30")
         .bodyValue(PreviousDecisionSearchInput)
         .exchange()
         .expectStatus()

@@ -211,6 +211,7 @@ test.describe("active citations", () => {
     page,
     documentNumber,
     prefilledDocumentUnit,
+    secondPrefilledDocumentUnit,
   }) => {
     await navigateToPublication(
       page,
@@ -230,10 +231,10 @@ test.describe("active citations", () => {
 
     await fillActiveCitationInputs(page, {
       citationType: "Änderung",
-      court: prefilledDocumentUnit.coreData.court?.label,
-      fileNumber: prefilledDocumentUnit.coreData.fileNumbers?.[0],
-      documentType: prefilledDocumentUnit.coreData.documentType?.label,
-      decisionDate: "31.12.2019",
+      court: secondPrefilledDocumentUnit.coreData.court?.label,
+      fileNumber: secondPrefilledDocumentUnit.coreData.fileNumbers?.[0],
+      documentType: secondPrefilledDocumentUnit.coreData.documentType?.label,
+      decisionDate: "01.01.2020",
     })
 
     const activeCitationContainer = page.getByLabel("Aktivzitierung")
@@ -242,7 +243,7 @@ test.describe("active citations", () => {
 
     //citation style ignored in search results
     const result = page.getByText(
-      `AG Aachen, 31.12.2019, ${prefilledDocumentUnit.coreData.fileNumbers?.[0]}, Anerkenntnisurteil, ${prefilledDocumentUnit.documentNumber}`,
+      `AG Aachen, 01.01.2020, ${secondPrefilledDocumentUnit.coreData.fileNumbers?.[0]}, Anerkenntnisurteil, ${secondPrefilledDocumentUnit.documentNumber}`,
     )
 
     await expect(result).toBeVisible()
@@ -250,7 +251,7 @@ test.describe("active citations", () => {
 
     //make sure to have citation style in list
     const listItem = page.getByText(
-      `Änderung, AG Aachen, 31.12.2019, ${prefilledDocumentUnit.coreData.fileNumbers?.[0]}, Anerkenntnisurteil, ${prefilledDocumentUnit.documentNumber}`,
+      `Änderung, AG Aachen, 01.01.2020, ${secondPrefilledDocumentUnit.coreData.fileNumbers?.[0]}, Anerkenntnisurteil, ${secondPrefilledDocumentUnit.documentNumber}`,
     )
     await expect(listItem).toBeVisible()
     await expect(page.getByLabel("Eintrag löschen")).toBeVisible()
@@ -262,10 +263,10 @@ test.describe("active citations", () => {
     await activeCitationContainer.getByLabel("Weitere Angabe").click()
     await fillActiveCitationInputs(page, {
       citationType: "Änderung",
-      court: prefilledDocumentUnit.coreData.court?.label,
-      fileNumber: prefilledDocumentUnit.coreData.fileNumbers?.[0],
-      documentType: prefilledDocumentUnit.coreData.documentType?.label,
-      decisionDate: "31.12.2019",
+      court: secondPrefilledDocumentUnit.coreData.court?.label,
+      fileNumber: secondPrefilledDocumentUnit.coreData.fileNumbers?.[0],
+      documentType: secondPrefilledDocumentUnit.coreData.documentType?.label,
+      decisionDate: "01.01.2020",
     })
 
     await activeCitationContainer.getByLabel("Nach Entscheidung suchen").click()
@@ -408,5 +409,41 @@ test.describe("active citations", () => {
     await expect(
       page.locator("[aria-label='Entscheidungsdatum der Aktivzitierung']"),
     ).toHaveValue("")
+  })
+
+  test("search for documentunits does not return current documentation unit", async ({
+    page,
+    prefilledDocumentUnit,
+  }) => {
+    await navigateToPublication(
+      page,
+      prefilledDocumentUnit.documentNumber || "",
+    )
+
+    await page
+      .locator("[aria-label='Dokumentationseinheit veröffentlichen']")
+      .click()
+    await expect(page.locator("text=Email wurde versendet")).toBeVisible()
+
+    await expect(page.locator("text=Xml Email Abgabe -")).toBeVisible()
+    await expect(page.locator("text=In Veröffentlichung")).toBeVisible()
+
+    await navigateToCategories(page, prefilledDocumentUnit.documentNumber || "")
+    await expect(
+      page.getByText(prefilledDocumentUnit.documentNumber || ""),
+    ).toBeVisible()
+
+    await fillActiveCitationInputs(page, {
+      citationType: "Änderung",
+      fileNumber: prefilledDocumentUnit.coreData.fileNumbers?.[0],
+      documentType: prefilledDocumentUnit.coreData.documentType?.label,
+      decisionDate: "31.12.2019",
+    })
+
+    const activeCitationContainer = page.getByLabel("Aktivzitierung")
+    await activeCitationContainer.getByLabel("Nach Entscheidung suchen").click()
+    await expect(
+      activeCitationContainer.getByText("Keine Ergebnisse gefunden."),
+    ).toBeVisible()
   })
 })

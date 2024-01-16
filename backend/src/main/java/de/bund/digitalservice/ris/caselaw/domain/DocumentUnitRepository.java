@@ -32,9 +32,10 @@ public interface DocumentUnitRepository {
 
   void delete(DocumentUnit documentUnit);
 
-  Slice<RelatedDocumentationUnit> searchByRelatedDocumentationUnit(
+  Slice<RelatedDocumentationUnit> searchLinkableDocumentationUnits(
       RelatedDocumentationUnit relatedDocumentationUnit,
       DocumentationOffice documentationOffice,
+      String documentNumberToExclude,
       Pageable pageable);
 
   Slice<DocumentationUnitSearchResult> searchByDocumentationUnitSearchInput(

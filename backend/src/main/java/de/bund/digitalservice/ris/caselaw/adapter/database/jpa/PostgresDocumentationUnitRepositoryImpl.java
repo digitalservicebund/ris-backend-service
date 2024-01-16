@@ -426,9 +426,10 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
 
   @Override
   @Transactional(transactionManager = "jpaTransactionManager")
-  public Slice<RelatedDocumentationUnit> searchByRelatedDocumentationUnit(
+  public Slice<RelatedDocumentationUnit> searchLinkableDocumentationUnits(
       RelatedDocumentationUnit relatedDocumentationUnit,
       DocumentationOffice documentationOffice,
+      String documentNumberToExclude,
       Pageable pageable) {
     String courtType =
         Optional.ofNullable(relatedDocumentationUnit.getCourt()).map(Court::type).orElse(null);
@@ -444,6 +445,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
             courtType,
             courtLocation,
             null,
+            documentNumberToExclude,
             relatedDocumentationUnit.getFileNumber(),
             relatedDocumentationUnit.getDecisionDate(),
             null,
@@ -463,6 +465,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
       String courtType,
       String courtLocation,
       String documentNumber,
+      String documentNumberToExclude,
       String fileNumber,
       LocalDate decisionDate,
       LocalDate decisionDateEnd,
@@ -475,6 +478,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
       return repository.searchByDocumentUnitSearchInput(
           documentationOfficeDTO.getId(),
           documentNumber,
+          documentNumberToExclude,
           courtType,
           courtLocation,
           decisionDate,
@@ -498,11 +502,12 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
     Slice<DocumentationUnitSearchResultDTO> fileNumberResults = new SliceImpl<>(List.of());
     Slice<DocumentationUnitSearchResultDTO> deviatingFileNumberResults = new SliceImpl<>(List.of());
 
-    if (fileNumber != null && !fileNumber.trim().isEmpty()) {
+    if (!fileNumber.trim().isEmpty()) {
       fileNumberResults =
           repository.searchByDocumentUnitSearchInputFileNumber(
               documentationOfficeDTO.getId(),
               documentNumber,
+              documentNumberToExclude,
               fileNumber.trim(),
               courtType,
               courtLocation,
@@ -518,6 +523,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
           repository.searchByDocumentUnitSearchInputDeviatingFileNumber(
               documentationOfficeDTO.getId(),
               documentNumber,
+              documentNumberToExclude,
               fileNumber.trim(),
               courtType,
               courtLocation,
@@ -580,6 +586,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
             searchInput.courtType(),
             searchInput.courtLocation(),
             searchInput.documentNumber(),
+            null,
             searchInput.fileNumber(),
             searchInput.decisionDate(),
             searchInput.decisionDateEnd(),
