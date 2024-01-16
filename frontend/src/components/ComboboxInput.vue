@@ -306,7 +306,7 @@ export type InputModelProps =
         v-for="(item, index) in currentlyDisplayedItems"
         :key="index"
         aria-label="dropdown-option"
-        class="cursor-pointer px-[1rem] py-[0.75rem] hover:bg-blue-100 focus:border-l-4 focus:border-solid focus:border-l-blue-800 focus:bg-blue-200 focus:outline-none"
+        class="cursor-pointer px-16 py-12 hover:bg-blue-100 focus:border-l-4 focus:border-solid focus:border-l-blue-800 focus:bg-blue-200 focus:outline-none"
         :class="{
           'border-l-4 border-solid border-l-blue-800 bg-blue-200':
             candidateForSelection === item,
@@ -334,7 +334,7 @@ export type InputModelProps =
         v-if="createNewItem"
         key="createNewItem"
         aria-label="dropdown-option"
-        class="cursor-pointer border-b-1 border-b-gray-400 px-[1.5rem] py-[1rem] last:border-b-0 hover:bg-gray-400 focus:bg-blue-200 focus:outline-none"
+        class="cursor-pointer px-16 py-12 hover:bg-blue-100 focus:border-l-4 focus:border-solid focus:border-l-blue-800 focus:bg-blue-200 focus:outline-none"
         role="button"
         tabindex="0"
         @click="setChosenItem(createNewItem)"
