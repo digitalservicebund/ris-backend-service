@@ -202,7 +202,7 @@ export type DocumentUnitSearchParameter =
           ></TextInput>
         </InputField>
       </div>
-      <div class="flex flex-row gap-24">
+      <div class="flex flex-row gap-10">
         <InputField id="courtType" label="Gerichtstyp" visually-hide-label>
           <TextInput
             id="courtType"
@@ -213,6 +213,7 @@ export type DocumentUnitSearchParameter =
             @focus="resetErrors"
           ></TextInput>
         </InputField>
+        <span class="pt-6">-</span>
         <InputField id="courtLocation" label="Gerichtsort" visually-hide-label>
           <TextInput
             id="courtLocation"
