@@ -440,6 +440,7 @@ class DocumentationUnitIntegrationTest {
               // make sure the documentNumber originating the search is not in the result
               List<String> documentNumbers =
                   JsonPath.read(responseBody, "$.content[*].documentNumber");
+              assertThat(documentNumbers).isNotEmpty();
               assertThat(documentNumbers).doesNotContain(documentNumberToExclude);
             });
 
