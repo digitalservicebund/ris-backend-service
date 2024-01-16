@@ -231,7 +231,7 @@ dependencies {
     implementation("com.google.guava:guava:32.1.3-jre")
     // Manually updating to 1.1.13 because parents already latest version (CVE-2023-34062)
     implementation("io.projectreactor.netty:reactor-netty-http:1.1.13")
-    var flywayCore = "org.flywaydb:flyway-core:9.22.2"
+    var flywayCore = "org.flywaydb:flyway-core:10.6.0"
     implementation(flywayCore)
     "migrationImplementation"(flywayCore)
     implementation("org.jetbrains.kotlin:kotlin-reflect")
