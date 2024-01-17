@@ -9,8 +9,8 @@ export default class NormReference implements EditableListItem {
   public dateOfRelevance?: string
   public hasForeignSource: boolean = false
 
-  static requiredFields = ["normAbbreviation"] as const
-  static fields = [
+  static readonly requiredFields = ["normAbbreviation"] as const
+  static readonly fields = [
     "normAbbreviation",
     "singleNorm",
     "dateOfVersion",
