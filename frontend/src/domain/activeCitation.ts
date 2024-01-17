@@ -9,14 +9,14 @@ export default class ActiveCitation
 {
   public citationType?: CitationType
 
-  static requiredFields = [
+  static readonly requiredFields = [
     "citationType",
     "fileNumber",
     "court",
     "decisionDate",
   ] as const
 
-  static fields = [
+  static readonly fields = [
     "citationType",
     "fileNumber",
     "court",
