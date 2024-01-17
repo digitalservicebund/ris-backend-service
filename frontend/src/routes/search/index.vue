@@ -1,19 +1,12 @@
 <script lang="ts" setup>
 import { onMounted, ref } from "vue"
-import { axiosInstance } from "@/services/httpClient"
+import httpClient from "@/services/httpClient"
 
-const msg = ref<string>("Loading...")
-const RIS_SEARCH_BASE_URL = ""
+const msg = ref<string | undefined>("Loading...")
 
 onMounted(async () => {
-  const baseUrl = window.location.host.includes("localhost")
-    ? "http://localhost:8090"
-    : RIS_SEARCH_BASE_URL
-  const response = await axiosInstance.request({
-    method: "GET",
-    url: `${baseUrl}/v1/search`,
-  })
-  console.log(response.data)
+  const response = await httpClient.get<string>(`search`)
+  console.log(response)
   msg.value = response.data
 })
 </script>
