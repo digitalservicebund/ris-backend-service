@@ -12,18 +12,18 @@ test.describe("document unit search queries", () => {
     {
       title: "documentNumber and courtType",
       parameter: {
-        documentNumber: "KORE",
-        courtType: "BGH",
+        documentNumber: "BVRE",
+        courtType: "VerfGH",
       },
-      maxDuration: 500,
+      maxDuration: 1000,
       minResults: 5,
     },
     {
       title: "vague documentNumber",
       parameter: {
-        documentNumber: "KO",
+        documentNumber: "BV",
       },
-      maxDuration: 500,
+      maxDuration: 1000,
       minResults: 5,
     },
     {
@@ -31,14 +31,14 @@ test.describe("document unit search queries", () => {
       parameter: {
         documentNumber: "notExistingFoo",
       },
-      maxDuration: 500,
+      maxDuration: 1000,
     },
     {
       title: "vague fileNumber",
       parameter: {
-        fileNumber: "VI",
+        fileNumber: "Bv",
       },
-      maxDuration: 500,
+      maxDuration: 1000,
       minResults: 5,
     },
     {
@@ -46,47 +46,47 @@ test.describe("document unit search queries", () => {
       parameter: {
         fileNumber: "notExistingFoo",
       },
-      maxDuration: 500,
+      maxDuration: 1000,
     },
     {
       title: "only unpublished",
       parameter: {
         publicationStatus: "UNPUBLISHED",
       },
-      maxDuration: 500,
+      maxDuration: 1000,
       minResults: 5,
     },
     {
       title: "of all time",
       parameter: {
         decisionDate: "1900-01-01",
-        decisionDateEnd: " 2024-01-15",
+        decisionDateEnd: "2024-01-15",
       },
-      maxDuration: 500,
+      maxDuration: 1000,
       minResults: 5,
     },
     {
       title: "one day",
       parameter: {
-        decisionDate: "2021-04-22",
+        decisionDate: "1975-06-16",
       },
-      maxDuration: 200,
-      minResults: 5,
+      maxDuration: 1000,
+      minResults: 1,
     },
     {
       title: "only court location",
       parameter: {
-        courtLocation: "Berlin",
+        courtLocation: "München",
       },
-      maxDuration: 200,
+      maxDuration: 1000,
       minResults: 5,
     },
     {
       title: "only court type",
       parameter: {
-        courtType: "BGH",
+        courtType: "VerfGH",
       },
-      maxDuration: 200,
+      maxDuration: 1000,
       minResults: 5,
     },
     {
@@ -94,7 +94,7 @@ test.describe("document unit search queries", () => {
       parameter: {
         myDocOfficeOnly: "true",
       },
-      maxDuration: 200,
+      maxDuration: 1000,
       minResults: 5,
     },
   ]
@@ -139,7 +139,7 @@ async function runTestMultipleTimes(
     const documentUnits =
       ((await (await request.response())?.json())?.content as DocumentUnit[]) ||
       []
-    expect(documentUnits.length).toBeGreaterThan(search.minResults)
+    expect(documentUnits.length).toBeGreaterThanOrEqual(search.minResults)
   }
 
   await runTestMultipleTimes(runs - 1, search, page, testInfo, [

@@ -33,27 +33,26 @@ class QueriesReporter implements Reporter {
     if (result.status != "passed") {
       console.error("\nThe following test cases failed: ")
       console.table(this.failedTests)
-      console.log("Use `pm run test:queries -- --reporter=line` to see errors")
-    } else {
-      const stats = this.resultsWithDuration.map(({ test, result }) => {
-        const durations = result.attachments
-          .find((attachment) => attachment.name == "durations")
-          ?.body?.toJSON().data
-
-        return (
-          durations && {
-            title: test.title,
-            average_duration:
-              durations.reduce((a, b) => a + b, 0) / durations.length,
-            max_duration: Math.max(...durations),
-            min_duration: Math.min(...durations),
-            runs: durations.length,
-          }
-        )
-      })
-
-      console.table(stats)
+      console.log("Use `npm run test:queries -- --reporter=line` to see errors")
     }
+    const stats = this.resultsWithDuration.map(({ test, result }) => {
+      const durations = result.attachments
+        .find((attachment) => attachment.name == "durations")
+        ?.body?.toJSON().data
+
+      return (
+        durations && {
+          title: test.title,
+          average_duration:
+            durations.reduce((a, b) => a + b, 0) / durations.length,
+          max_duration: Math.max(...durations),
+          min_duration: Math.min(...durations),
+          runs: durations.length,
+        }
+      )
+    })
+
+    console.table(stats)
   }
 
   private getRunsWithoutSetup(suite: Suite): number {
