@@ -17,7 +17,6 @@ function onClickToggle(button: EditorButton) {
 }
 
 const closeDropDownWhenClickOutSide = (event: MouseEvent) => {
-  //TODO: not working
   if (props.type) {
     const button = document.querySelector(`#${props.type}`)
     if (button == null) return

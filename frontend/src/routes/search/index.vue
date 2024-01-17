@@ -3,7 +3,7 @@ import { onMounted, ref } from "vue"
 import { axiosInstance } from "@/services/httpClient"
 
 const msg = ref<string>("Loading...")
-const RIS_SEARCH_BASE_URL = "" // TODO
+const RIS_SEARCH_BASE_URL = ""
 
 onMounted(async () => {
   const baseUrl = window.location.host.includes("localhost")
