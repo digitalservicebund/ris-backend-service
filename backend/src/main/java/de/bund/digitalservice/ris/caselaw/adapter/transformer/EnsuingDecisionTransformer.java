@@ -14,7 +14,7 @@ public class EnsuingDecisionTransformer extends RelatedDocumentationUnitTransfor
         .documentNumber(
             referencedDocumentationUnit.map(DocumentationUnitDTO::getDocumentNumber).orElse(null))
         .court(getCourtFromDTO(ensuingDecisionDTO.getCourt()))
-        .fileNumber(getFileNumber(ensuingDecisionDTO.getFileNumber()))
+        .fileNumber(ensuingDecisionDTO.getFileNumber())
         .documentType(getDocumentTypeFromDTO(ensuingDecisionDTO.getDocumentType()))
         .decisionDate(ensuingDecisionDTO.getDate())
         .note(ensuingDecisionDTO.getNote())
@@ -39,7 +39,7 @@ public class EnsuingDecisionTransformer extends RelatedDocumentationUnitTransfor
                     .documentNumber(ensuingDecision.getDocumentNumber())
                     .build())
         .documentType(getDocumentTypeFromDomain(ensuingDecision.getDocumentType()))
-        .fileNumber(getFileNumber(ensuingDecision.getFileNumber()))
+        .fileNumber(ensuingDecision.getFileNumber())
         .note(ensuingDecision.getNote())
         .build();
   }

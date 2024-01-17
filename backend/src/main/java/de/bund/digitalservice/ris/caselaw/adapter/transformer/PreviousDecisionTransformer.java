@@ -14,7 +14,7 @@ public class PreviousDecisionTransformer extends RelatedDocumentationUnitTransfo
         .documentNumber(
             referencedDocumentationUnit.map(DocumentationUnitDTO::getDocumentNumber).orElse(null))
         .court(getCourtFromDTO(previousDecisionDTO.getCourt()))
-        .fileNumber(getFileNumber(previousDecisionDTO.getFileNumber()))
+        .fileNumber(previousDecisionDTO.getFileNumber())
         .documentType(getDocumentTypeFromDTO(previousDecisionDTO.getDocumentType()))
         .deviatingFileNumber(previousDecisionDTO.getDeviatingFileNumber())
         .decisionDate(previousDecisionDTO.getDate())
@@ -40,7 +40,7 @@ public class PreviousDecisionTransformer extends RelatedDocumentationUnitTransfo
                     .documentNumber(previousDecision.getDocumentNumber())
                     .build())
         .documentType(getDocumentTypeFromDomain(previousDecision.getDocumentType()))
-        .fileNumber(getFileNumber(previousDecision.getFileNumber()))
+        .fileNumber(previousDecision.getFileNumber())
         .deviatingFileNumber(previousDecision.getDeviatingFileNumber())
         .dateKnown(previousDecision.isDateKnown())
         .build();

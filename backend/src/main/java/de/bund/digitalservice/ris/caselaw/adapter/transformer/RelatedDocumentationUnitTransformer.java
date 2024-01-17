@@ -8,14 +8,6 @@ import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.Docume
 public class RelatedDocumentationUnitTransformer {
   RelatedDocumentationUnitTransformer() {}
 
-  static String getFileNumber(String fileNumber) {
-    if (fileNumber == null) {
-      return null;
-    }
-
-    return fileNumber;
-  }
-
   static Court getCourtFromDTO(CourtDTO courtDTO) {
     if (courtDTO == null || courtDTO.getType() == null) {
       return null;
