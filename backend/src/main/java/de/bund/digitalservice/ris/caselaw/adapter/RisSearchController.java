@@ -8,8 +8,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
 
 @RestController
@@ -32,14 +34,15 @@ public class RisSearchController {
 
   @GetMapping(value = "")
   @PreAuthorize("isAuthenticated()")
-  public Mono<ResponseEntity<String>> callRisSearchEndpoint() {
-    String risSearchUrl = "https://ris-search.dev.ds4g.net/v1/search";
+  public Mono<ResponseEntity<String>> callRisSearchEndpoint(@RequestParam String query) {
+    String url = "https://ris-search.dev.ds4g.net/v1/search";
     if (risSearchUsername.isEmpty() || risSearchPassword.isEmpty()) {
-      risSearchUrl = "http://localhost:8090/v1/search";
+      url = "http://localhost:8090/v1/search";
     }
+    url = UriComponentsBuilder.fromHttpUrl(url).queryParam("query", query).toUriString();
     return webClient
         .get()
-        .uri(risSearchUrl)
+        .uri(url)
         .headers(headers -> headers.setBasicAuth(risSearchUsername, risSearchPassword))
         .retrieve()
         .bodyToMono(String.class)
