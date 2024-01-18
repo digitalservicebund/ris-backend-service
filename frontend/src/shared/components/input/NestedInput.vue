@@ -106,6 +106,7 @@ function toggleContentVisibility(): void {
         v-model="childValue"
         :attributes="fields.child.inputAttributes"
         :has-error="hasError"
+        size="medium"
         :type="fields.child.type"
         @update:validation-error="updateValidationError"
       ></InputElement>

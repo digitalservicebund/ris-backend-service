@@ -7,10 +7,12 @@ export default class PreviousDecision
   implements EditableListItem
 {
   public dateKnown: boolean = true
+  public deviatingFileNumber?: string
 
   static requiredFields = ["fileNumber", "court", "decisionDate"] as const
   static fields = [
     "fileNumber",
+    "deviatingFileNumber",
     "court",
     "decisionDate",
     "documentType",

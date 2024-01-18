@@ -1,11 +1,12 @@
 <script lang="ts" setup>
-import { onMounted, ref, computed } from "vue"
+import { onMounted, ref, computed, Ref } from "vue"
 import SearchResultList, { SearchResults } from "./SearchResultList.vue"
 import ComboboxInput from "@/components/ComboboxInput.vue"
 import { useValidationStore } from "@/composables/useValidationStore"
 import values from "@/data/values.json"
 import PreviousDecision from "@/domain/previousDecision"
 import RelatedDocumentation from "@/domain/relatedDocumentation"
+import { defineTextField } from "@/fields/caselaw/coreDataFields"
 import ComboboxItemService from "@/services/comboboxItemService"
 import documentUnitService from "@/services/documentUnitService"
 import CheckboxInput from "@/shared/components/input/CheckboxInput.vue"
@@ -13,8 +14,12 @@ import DateInput from "@/shared/components/input/DateInput.vue"
 import InputField, {
   LabelPosition,
 } from "@/shared/components/input/InputField.vue"
+import NestedInput from "@/shared/components/input/NestedInput.vue"
 import TextButton from "@/shared/components/input/TextButton.vue"
-import TextInput from "@/shared/components/input/TextInput.vue"
+import {
+  NestedInputAttributes,
+  NestedInputModelType,
+} from "@/shared/components/input/types"
 import Pagination, { Page } from "@/shared/components/Pagination.vue"
 
 const props = defineProps<{
@@ -37,11 +42,37 @@ const isLoading = ref(false)
 const searchResultsCurrentPage = ref<Page<RelatedDocumentation>>()
 const searchResults = ref<SearchResults<RelatedDocumentation>>()
 
-const dateUnkown = computed({
+const dateUnknown = computed({
   get: () => !previousDecision.value.dateKnown,
   set: (value) => {
     if (value) previousDecision.value.decisionDate = undefined
     previousDecision.value.dateKnown = !value
+  },
+})
+
+const nestedInputFields: NestedInputAttributes["fields"] = {
+  parent: defineTextField("fileNumber", "Aktenzeichen *", "Aktenzeichen *", ""),
+  child: defineTextField(
+    "deviatingFileNumber",
+    "Abweichendes Aktenzeichen",
+    "Abweichendes Aktenzeichen",
+    "",
+  ),
+}
+
+const nestedInputValue: Ref<NestedInputModelType> = computed({
+  get: () => {
+    console.log("getter is being called")
+    return {
+      fields: {
+        parent: previousDecision.value.fileNumber,
+        child: previousDecision.value.deviatingFileNumber,
+      },
+    }
+  },
+  set: (value) => {
+    previousDecision.value.fileNumber = value.fields.parent
+    previousDecision.value.deviatingFileNumber = value.fields.child
   },
 })
 
@@ -141,7 +172,7 @@ onMounted(() => {
     >
       <CheckboxInput
         :id="id"
-        v-model="dateUnkown"
+        v-model="dateUnknown"
         aria-label="Datum Unbekannt Vorgehende Entscheidung"
         size="small"
       />
@@ -163,7 +194,7 @@ onMounted(() => {
           @click="validationStore.remove('court')"
         ></ComboboxInput>
       </InputField>
-      <div v-if="!dateUnkown" class="flex w-full justify-between gap-24">
+      <div v-if="!dateUnknown" class="flex w-full justify-between gap-24">
         <InputField
           id="date"
           v-slot="slotProps"
@@ -184,6 +215,7 @@ onMounted(() => {
     </div>
 
     <div class="flex justify-between gap-24">
+      <!--
       <InputField
         id="fileNumber"
         v-slot="slotProps"
@@ -201,6 +233,15 @@ onMounted(() => {
           @input="validationStore.remove('fileNumber')"
         ></TextInput>
       </InputField>
+            -->
+
+      <NestedInput
+        v-model="nestedInputValue"
+        aria-label="Aktenzeichen Vorgehende Entscheidung"
+        class="w-full flex-col"
+        :fields="nestedInputFields"
+      >
+      </NestedInput>
 
       <InputField id="documentType" class="flex-col" label="Dokumenttyp">
         <ComboboxInput
