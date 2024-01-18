@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { onMounted, ref, computed, Ref } from "vue"
+import { onMounted, ref, computed } from "vue"
 import SearchResultList, { SearchResults } from "./SearchResultList.vue"
 import ComboboxInput from "@/components/ComboboxInput.vue"
 import { useValidationStore } from "@/composables/useValidationStore"
@@ -16,10 +16,7 @@ import InputField, {
 } from "@/shared/components/input/InputField.vue"
 import NestedInput from "@/shared/components/input/NestedInput.vue"
 import TextButton from "@/shared/components/input/TextButton.vue"
-import {
-  NestedInputAttributes,
-  NestedInputModelType,
-} from "@/shared/components/input/types"
+import { NestedInputAttributes } from "@/shared/components/input/types"
 import Pagination, { Page } from "@/shared/components/Pagination.vue"
 
 const props = defineProps<{
@@ -35,6 +32,7 @@ const emit = defineEmits<{
 const previousDecision = ref(new PreviousDecision({ ...props.modelValue }))
 const validationStore =
   useValidationStore<(typeof PreviousDecision.fields)[number]>()
+
 const pageNumber = ref<number>(0)
 const itemsPerPage = ref<number>(30)
 const isLoading = ref(false)
@@ -60,19 +58,10 @@ const nestedInputFields: NestedInputAttributes["fields"] = {
   ),
 }
 
-const nestedInputValue: Ref<NestedInputModelType> = computed({
-  get: () => {
-    console.log("getter is being called")
-    return {
-      fields: {
-        parent: previousDecision.value.fileNumber,
-        child: previousDecision.value.deviatingFileNumber,
-      },
-    }
-  },
-  set: (value) => {
-    previousDecision.value.fileNumber = value.fields.parent
-    previousDecision.value.deviatingFileNumber = value.fields.child
+const fileNumbers = ref({
+  fields: {
+    parent: props.modelValue?.fileNumber,
+    child: props.modelValue?.deviatingFileNumber,
   },
 })
 
@@ -80,6 +69,8 @@ async function search() {
   isLoading.value = true
   const previousDecisionRef = new PreviousDecision({
     ...previousDecision.value,
+    fileNumber: fileNumbers.value.fields.parent,
+    deviatingFileNumber: fileNumbers.value.fields.child,
   })
 
   const response = await documentUnitService.searchByRelatedDocumentation(
@@ -236,7 +227,7 @@ onMounted(() => {
             -->
 
       <NestedInput
-        v-model="nestedInputValue"
+        v-model="fileNumbers"
         aria-label="Aktenzeichen Vorgehende Entscheidung"
         class="w-full flex-col"
         :fields="nestedInputFields"
