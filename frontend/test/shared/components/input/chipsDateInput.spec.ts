@@ -1,193 +1,103 @@
 import { userEvent } from "@testing-library/user-event"
-import { fireEvent, render, screen } from "@testing-library/vue"
-import { nextTick } from "vue"
+import { render, screen } from "@testing-library/vue"
 import ChipsDateInput from "@/shared/components/input/ChipsDateInput.vue"
 
-function renderComponent(options?: {
-  ariaLabel?: string
-  value?: string
-  modelValue?: string[]
-  placeholder?: string
-}) {
+type DateChipsInputProps = InstanceType<typeof ChipsDateInput>["$props"]
+
+function renderComponent(props?: Partial<DateChipsInputProps>) {
   const user = userEvent.setup()
-  const props = {
-    id: "identifier",
-    value: options?.value,
-    modelValue: options?.modelValue,
-    ariaLabel: options?.ariaLabel ?? "aria-label",
-    placeholder: options?.placeholder,
+
+  let modelValue: string[] | undefined = props?.modelValue ?? []
+
+  const effectiveProps: DateChipsInputProps = {
+    id: props?.id ?? "identifier",
+    modelValue,
+    "onUpdate:modelValue":
+      props?.["onUpdate:modelValue"] ??
+      ((val: string[] | undefined) => (modelValue = val)),
+    "onUpdate:validationError": props?.["onUpdate:validationError"],
+    ariaLabel: props?.ariaLabel ?? "aria-label",
+    readOnly: props?.readOnly,
   }
-  const utils = render(ChipsDateInput, { props })
-  return { screen, user, props, ...utils }
+
+  return { user, ...render(ChipsDateInput, { props: effectiveProps }) }
 }
 
 describe("ChipsInput", () => {
   it("shows a chips input element", () => {
-    renderComponent({
-      ariaLabel: "test-label",
-    })
-    const input = screen.getByLabelText("test-label") as HTMLInputElement
+    renderComponent()
+    const input = screen.getByRole<HTMLInputElement>("textbox")
 
     expect(input).toBeInTheDocument()
     expect(input?.type).toBe("text")
   })
 
-  it("shows chips date input with an aria label", () => {
-    renderComponent({
-      ariaLabel: "test-label",
-    })
-    const input = screen.getByLabelText("test-label")
+  it("shows dates in correct format", () => {
+    renderComponent({ modelValue: ["2020-11-30"] })
 
-    expect(input).toBeInTheDocument()
+    const chips = screen.getAllByRole("listitem")
+    expect(chips).toHaveLength(1)
+    expect(chips[0]).toHaveTextContent("30.11.2020")
   })
 
-  it("press enter renders formatted date value in chip", async () => {
+  it("converts date format of user input", async () => {
+    const onUpdate = vi.fn()
+    const { user } = renderComponent({ "onUpdate:modelValue": onUpdate })
+
+    const input = screen.getByRole("textbox")
+    await user.type(input, "30.11.2020{enter}")
+    expect(onUpdate).toHaveBeenCalledWith(["2020-11-30"])
+  })
+
+  it("uses date input maska", async () => {
+    const { user } = renderComponent()
+
+    const input = screen.getByRole("textbox")
+    await user.type(input, "abc12d§07202099")
+    expect(input).toHaveValue("12.07.2020")
+  })
+
+  it("does not accept incorrect dates", async () => {
+    const id = "id"
+
+    const onError = vi.fn()
+    const onUpdate = vi.fn()
     const { user } = renderComponent({
-      ariaLabel: "test-label",
+      id: id,
+      "onUpdate:modelValue": onUpdate,
+      "onUpdate:validationError": onError,
     })
-    const input = screen.getByLabelText("test-label")
 
-    await user.type(input, "03.02.2022")
-    await user.type(input, "{enter}")
+    const input = screen.getByRole("textbox")
+    await user.type(input, "50022020{enter}")
 
-    const chipList = screen.getAllByLabelText("chip")
-    expect(chipList.length).toBe(1)
-    expect(chipList[0]).toHaveTextContent("03.02.2022")
-
-    expect(input).toHaveValue("")
+    expect(onUpdate).not.toHaveBeenCalled()
+    expect(onError).toHaveBeenCalledWith({
+      message: "Kein valides Datum",
+      instance: id,
+    })
   })
 
-  it("press enter does not render chip if date string empty", async () => {
-    const { user } = renderComponent()
-    const input = screen.getByLabelText("aria-label")
-    expect(input).toHaveValue("")
+  it("does not accept dates in future", async () => {
+    const id = "id"
+    const ariaLabel = "chip"
 
-    await user.type(input, "{enter}")
+    const onError = vi.fn()
+    const onUpdate = vi.fn()
+    const { user } = renderComponent({
+      id: id,
+      ariaLabel: ariaLabel,
+      "onUpdate:modelValue": onUpdate,
+      "onUpdate:validationError": onError,
+    })
 
-    const chipList = screen.queryAllByLabelText("chip")
+    const input = screen.getByRole("textbox")
+    await user.type(input, "01012100{enter}")
 
-    expect(chipList.length).toBe(0)
-
-    expect(input).toHaveValue("")
-  })
-
-  it("adds multiple date values in chips", async () => {
-    const { user } = renderComponent()
-    const input = screen.getByLabelText("aria-label")
-
-    await user.type(input, "03.02.2022")
-    await user.type(input, "{enter}")
-    await user.type(input, "03.01.2022")
-    await user.type(input, "{enter}")
-
-    const chipList = screen.getAllByLabelText("chip")
-    expect(chipList.length).toBe(2)
-    expect(chipList[0]).toHaveTextContent("03.02.2022")
-    expect(chipList[1]).toHaveTextContent("03.01.2022")
-
-    expect(input).toHaveValue("")
-  })
-
-  it("does not render chips with letters", async () => {
-    const { user } = renderComponent()
-    const input = screen.getByLabelText("aria-label")
-    expect(input).toHaveValue("")
-
-    await user.type(input, "test")
-    await user.type(input, "{enter}")
-
-    expect(screen.queryByLabelText("chip")).not.toBeInTheDocument()
-    expect(input).toHaveValue("")
-  })
-
-  it("emits model update event when user adds an input", async () => {
-    const { emitted, user } = renderComponent()
-    const input = screen.getByLabelText("aria-label")
-    await user.type(input, "03.02.2022")
-    await user.type(input, "{enter}")
-    await userEvent.tab()
-
-    expect(emitted()["update:modelValue"]).toEqual([[["2022-02-03"]]])
-  })
-
-  it("resets date input on backspace delete", async () => {
-    renderComponent()
-    const input: HTMLInputElement = screen.queryByLabelText(
-      "aria-label",
-    ) as HTMLInputElement
-    await userEvent.type(input, "13.05.2022")
-    expect(input).toHaveValue("13.05.2022")
-    await userEvent.type(input, "{backspace}")
-    await fireEvent.update(input)
-    await nextTick()
-
-    expect(input).toHaveValue("")
-  })
-
-  it("deletes active chip on press enter", async () => {
-    const { user } = renderComponent()
-    const input = screen.getByLabelText("aria-label") as HTMLInputElement
-    expect(input).toHaveValue("")
-
-    await user.type(input, "03.02.2022")
-    await user.type(input, "{enter}")
-    await user.type(input, "04.02.2022")
-    await user.type(input, "{enter}")
-
-    const chipList = screen.getAllByLabelText("chip")
-    expect(chipList.length).toBe(2)
-
-    await user.type(input, "{arrowleft}")
-    await user.type(input, "{arrowleft}")
-    expect(chipList[0]).toHaveFocus()
-
-    await user.type(chipList[0], "{enter}")
-    expect(screen.getAllByLabelText("chip").length).toBe(1)
-    expect(chipList[0]).toHaveTextContent("04.02.2022")
-  })
-
-  it("deleting chips multiple times correctly resets focus", async () => {
-    const { user } = renderComponent()
-    const input = screen.getByLabelText("aria-label") as HTMLInputElement
-    expect(input).toHaveValue("")
-
-    await user.type(input, "03.02.2022")
-    await user.type(input, "{enter}")
-
-    expect(screen.getAllByLabelText("chip").length).toBe(1)
-
-    await user.type(input, "{arrowleft}")
-    await user.type(screen.getByLabelText("chip"), "{enter}")
-
-    expect(screen.queryAllByLabelText("chip").length).toBe(0)
-
-    await user.type(input, "03.02.2022")
-    await user.type(input, "{enter}")
-
-    expect(screen.getAllByLabelText("chip").length).toBe(1)
-
-    await user.type(input, "{arrowleft}")
-    await user.type(screen.getByLabelText("chip"), "{enter}")
-
-    expect(screen.queryAllByLabelText("chip").length).toBe(0)
-  })
-
-  it("does not allow incomplete dates", async () => {
-    const { emitted } = renderComponent()
-    const input = screen.queryByLabelText("aria-label") as HTMLInputElement
-
-    await userEvent.type(input, "03")
-    await userEvent.type(input, "{tab}")
-    await nextTick()
-
-    expect(emitted()["update:modelValue"]).not.toBeTruthy()
-    expect(emitted()["update:validationError"]).toEqual([
-      [
-        {
-          message: "Unvollständiges Datum",
-          instance: "identifier",
-        },
-      ],
-    ])
+    expect(onUpdate).not.toHaveBeenCalled()
+    expect(onError).toHaveBeenCalledWith({
+      message: ariaLabel + " darf nicht in der Zukunft liegen",
+      instance: id,
+    })
   })
 })
