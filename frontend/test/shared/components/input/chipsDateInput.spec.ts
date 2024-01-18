@@ -17,7 +17,6 @@ function renderComponent(props?: Partial<DateChipsInputProps>) {
       ((val: string[] | undefined) => (modelValue = val)),
     "onUpdate:validationError": props?.["onUpdate:validationError"],
     ariaLabel: props?.ariaLabel ?? "aria-label",
-    readOnly: props?.readOnly,
   }
 
   return { user, ...render(ChipsDateInput, { props: effectiveProps }) }
