@@ -329,7 +329,6 @@ create table
     document_number varchar(255),
     document_type_id uuid constraint fk_document_type references incremental_migration.document_type,
     file_number varchar(255),
-    deviating_file_number character varying(255),
     citation_type_id uuid constraint fk_citation_type references incremental_migration.citation_type,
     note text,
     dtype varchar(31) not null,

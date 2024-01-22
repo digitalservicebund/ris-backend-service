@@ -15,14 +15,12 @@ import lombok.experimental.SuperBuilder;
 @Data
 public class PreviousDecision extends RelatedDocumentationUnit {
   private boolean dateKnown = true;
-  private String deviatingFileNumber;
 
   public boolean hasNoValues() {
     return court == null
         && decisionDate == null
         && fileNumber == null
         && documentType == null
-        && documentNumber == null
-        && deviatingFileNumber == null;
+        && documentNumber == null;
   }
 }

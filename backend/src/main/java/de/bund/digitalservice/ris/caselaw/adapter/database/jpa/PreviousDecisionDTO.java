@@ -18,7 +18,4 @@ import lombok.experimental.SuperBuilder;
 public class PreviousDecisionDTO extends RelatedDocumentationDTO {
   @Column(name = "date_known")
   private boolean dateKnown;
-
-  @Column(name = "deviating_file_number")
-  private String deviatingFileNumber;
 }
