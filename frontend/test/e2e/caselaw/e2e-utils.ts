@@ -119,6 +119,7 @@ export async function fillPreviousDecisionInputs(
     fileNumber?: string
     documentType?: string
     dateKnown?: boolean
+    deviatingFileNumber?: string
   },
   decisionIndex = 0,
 ): Promise<void> {
@@ -162,6 +163,18 @@ export async function fillPreviousDecisionInputs(
       await dateUnknownCheckbox.click()
       await expect(dateUnknownCheckbox).toBeChecked()
     }
+  }
+
+  if (values?.deviatingFileNumber) {
+    await page
+      .locator(
+        "[aria-label='Abweichendes Aktenzeichen Vorgehende Entscheidung anzeigen']",
+      )
+      .click()
+    await fillInput(
+      "Abweichendes Aktenzeichen Vorgehende Entscheidung",
+      values?.deviatingFileNumber,
+    )
   }
 }
 
