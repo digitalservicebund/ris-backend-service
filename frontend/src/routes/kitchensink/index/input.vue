@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { reactive, ref } from "vue"
-import { defineDateField } from "@/fields/caselaw"
+import { defineTextField } from "@/fields/caselaw"
 import KitchensinkPage from "@/kitchensink/components/KitchensinkPage.vue"
 import KitchensinkStory from "@/kitchensink/components/KitchensinkStory.vue"
 import { InfoStatus } from "@/shared/components/enumInfoStatus"
@@ -17,8 +17,8 @@ import {
 import YearInput from "@/shared/components/input/YearInput.vue"
 
 const nestedInputFields: NestedInputAttributes["fields"] = {
-  parent: defineDateField("field", "Input", "Input"),
-  child: defineDateField(
+  parent: defineTextField("field", "Input", "Input"),
+  child: defineTextField(
     "deviatingField",
     "Abweichender Input",
     "Abweichender Input",
@@ -42,6 +42,7 @@ const values = reactive({
   dateInput: "",
   yearInput: "",
   timeInput: "",
+  nestedInput: { fields: { parent: "hello", child: "bye" } },
 })
 </script>
 
@@ -211,6 +212,7 @@ const values = reactive({
 
     <KitchensinkStory class="w-320" name="Nested">
       <NestedInput
+        v-model="values.nestedInput"
         aria-label="Nested Input"
         :fields="nestedInputFields"
       ></NestedInput>
