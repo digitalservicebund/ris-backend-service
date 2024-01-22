@@ -268,7 +268,6 @@ CREATE TABLE
     guiding_principle text,
     headline text,
     headnote text,
-    input_type character varying(255),
     judicial_body character varying(255),
     jurisdiction_type_id uuid,
     other_headnote text,
@@ -282,6 +281,15 @@ CREATE TABLE
     legislative_mandate boolean DEFAULT false NOT NULL,
     legal_effect character varying(255),
     legal_effect_raw_value character varying(255)
+  );
+
+CREATE TABLE IF NOT EXISTS
+  incremental_migration.input_type (
+    id uuid NOT NULL,
+    value character varying(255) COLLATE pg_catalog."default" NOT NULL,
+    documentation_unit_id uuid NOT NULL,
+    rank INTEGER DEFAULT '-1'::INTEGER NOT NULL,
+    CONSTRAINT input_type_pkey PRIMARY KEY (id)
   );
 
 --
