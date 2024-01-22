@@ -6,7 +6,6 @@ import { useValidationStore } from "@/composables/useValidationStore"
 import values from "@/data/values.json"
 import PreviousDecision from "@/domain/previousDecision"
 import RelatedDocumentation from "@/domain/relatedDocumentation"
-import { defineTextField } from "@/fields/caselaw/coreDataFields"
 import ComboboxItemService from "@/services/comboboxItemService"
 import documentUnitService from "@/services/documentUnitService"
 import CheckboxInput from "@/shared/components/input/CheckboxInput.vue"
@@ -14,9 +13,9 @@ import DateInput from "@/shared/components/input/DateInput.vue"
 import InputField, {
   LabelPosition,
 } from "@/shared/components/input/InputField.vue"
-import NestedInput from "@/shared/components/input/NestedInput.vue"
 import TextButton from "@/shared/components/input/TextButton.vue"
-import { NestedInputAttributes } from "@/shared/components/input/types"
+import TextInput from "@/shared/components/input/TextInput.vue"
+import NestedComponent from "@/shared/components/NestedComponents.vue"
 import Pagination, { Page } from "@/shared/components/Pagination.vue"
 
 const props = defineProps<{
@@ -48,29 +47,10 @@ const dateUnknown = computed({
   },
 })
 
-const nestedInputFields: NestedInputAttributes["fields"] = {
-  parent: defineTextField("fileNumber", "Aktenzeichen *", "Aktenzeichen *", ""),
-  child: defineTextField(
-    "deviatingFileNumber",
-    "Abweichendes Aktenzeichen",
-    "Abweichendes Aktenzeichen",
-    "",
-  ),
-}
-
-const fileNumbers = ref({
-  fields: {
-    parent: props.modelValue?.fileNumber,
-    child: props.modelValue?.deviatingFileNumber,
-  },
-})
-
 async function search() {
   isLoading.value = true
   const previousDecisionRef = new PreviousDecision({
     ...previousDecision.value,
-    fileNumber: fileNumbers.value.fields.parent,
-    deviatingFileNumber: fileNumbers.value.fields.child,
   })
 
   const response = await documentUnitService.searchByRelatedDocumentation(
@@ -206,33 +186,47 @@ onMounted(() => {
     </div>
 
     <div class="flex justify-between gap-24">
-      <!--
-      <InputField
-        id="fileNumber"
-        v-slot="slotProps"
-        class="flex-col"
-        label="Aktenzeichen *"
-        :validation-error="validationStore.getByField('fileNumber')"
-      >
-        <TextInput
+      <NestedComponent aria-label="Abweichendes Aktenzeichen" class="w-full">
+        <InputField
           id="fileNumber"
-          v-model="previousDecision.fileNumber"
-          aria-label="Aktenzeichen Vorgehende Entscheidung"
-          class="ds-input-medium"
-          :has-error="slotProps.hasError"
-          size="medium"
-          @input="validationStore.remove('fileNumber')"
-        ></TextInput>
-      </InputField>
-            -->
-
-      <NestedInput
-        v-model="fileNumbers"
-        aria-label="Aktenzeichen Vorgehende Entscheidung"
-        class="w-full flex-col"
-        :fields="nestedInputFields"
-      >
-      </NestedInput>
+          v-slot="slotProps"
+          class="flex-col"
+          label="Aktenzeichen *"
+          :validation-error="validationStore.getByField('fileNumber')"
+        >
+          <TextInput
+            id="fileNumber"
+            v-model="previousDecision.fileNumber"
+            aria-label="Aktenzeichen Vorgehende Entscheidung"
+            class="ds-input-medium"
+            :has-error="slotProps.hasError"
+            size="medium"
+            @input="validationStore.remove('fileNumber')"
+          ></TextInput>
+        </InputField>
+        <!-- Child  -->
+        <template #children>
+          <InputField
+            id="deviatingFileNumber"
+            v-slot="slotProps"
+            class="flex-col"
+            label="Abweichendes Aktenzeichen"
+            :validation-error="
+              validationStore.getByField('deviatingFileNumber')
+            "
+          >
+            <TextInput
+              id="fileNumber"
+              v-model="previousDecision.deviatingFileNumber"
+              aria-label="Abweichendes Aktenzeichen Vorgehende Entscheidung"
+              class="ds-input-medium"
+              :has-error="slotProps.hasError"
+              size="medium"
+              @input="validationStore.remove('deviatingFileNumber')"
+            ></TextInput>
+          </InputField>
+        </template>
+      </NestedComponent>
 
       <InputField id="documentType" class="flex-col" label="Dokumenttyp">
         <ComboboxInput
