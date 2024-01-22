@@ -162,6 +162,7 @@ class JurisXmlExporterWrapperIntegrationTest {
                 .decisionDate(LocalDate.parse("2020-04-05"))
                 .dateKnown(true)
                 .fileNumber("fileNumber")
+                .deviatingFileNumber("deviatingFileNumber")
                 .documentType(
                     DocumentType.builder().jurisShortcut("category").label("category123").build())
                 .build());
