@@ -7,6 +7,7 @@ export default class PreviousDecision
   implements EditableListItem
 {
   public dateKnown: boolean = true
+  public deviatingFileNumber?: string
 
   static readonly requiredFields = [
     "fileNumber",
@@ -15,6 +16,7 @@ export default class PreviousDecision
   ] as const
   static readonly fields = [
     "fileNumber",
+    "deviatingFileNumber",
     "court",
     "decisionDate",
     "documentType",

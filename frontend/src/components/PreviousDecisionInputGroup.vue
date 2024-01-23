@@ -15,6 +15,7 @@ import InputField, {
 } from "@/shared/components/input/InputField.vue"
 import TextButton from "@/shared/components/input/TextButton.vue"
 import TextInput from "@/shared/components/input/TextInput.vue"
+import NestedComponent from "@/shared/components/NestedComponents.vue"
 import Pagination, { Page } from "@/shared/components/Pagination.vue"
 
 const props = defineProps<{
@@ -30,6 +31,7 @@ const emit = defineEmits<{
 const previousDecision = ref(new PreviousDecision({ ...props.modelValue }))
 const validationStore =
   useValidationStore<(typeof PreviousDecision.fields)[number]>()
+
 const pageNumber = ref<number>(0)
 const itemsPerPage = ref<number>(30)
 const isLoading = ref(false)
@@ -37,7 +39,7 @@ const isLoading = ref(false)
 const searchResultsCurrentPage = ref<Page<RelatedDocumentation>>()
 const searchResults = ref<SearchResults<RelatedDocumentation>>()
 
-const dateUnkown = computed({
+const dateUnknown = computed({
   get: () => !previousDecision.value.dateKnown,
   set: (value) => {
     if (value) previousDecision.value.decisionDate = undefined
@@ -141,7 +143,7 @@ onMounted(() => {
     >
       <CheckboxInput
         :id="id"
-        v-model="dateUnkown"
+        v-model="dateUnknown"
         aria-label="Datum Unbekannt Vorgehende Entscheidung"
         size="small"
       />
@@ -163,7 +165,7 @@ onMounted(() => {
           @click="validationStore.remove('court')"
         ></ComboboxInput>
       </InputField>
-      <div v-if="!dateUnkown" class="flex w-full justify-between gap-24">
+      <div v-if="!dateUnknown" class="flex w-full justify-between gap-24">
         <InputField
           id="date"
           v-slot="slotProps"
@@ -184,23 +186,47 @@ onMounted(() => {
     </div>
 
     <div class="flex justify-between gap-24">
-      <InputField
-        id="fileNumber"
-        v-slot="slotProps"
-        class="flex-col"
-        label="Aktenzeichen *"
-        :validation-error="validationStore.getByField('fileNumber')"
-      >
-        <TextInput
+      <NestedComponent aria-label="Abweichendes Aktenzeichen" class="w-full">
+        <InputField
           id="fileNumber"
-          v-model="previousDecision.fileNumber"
-          aria-label="Aktenzeichen Vorgehende Entscheidung"
-          class="ds-input-medium"
-          :has-error="slotProps.hasError"
-          size="medium"
-          @input="validationStore.remove('fileNumber')"
-        ></TextInput>
-      </InputField>
+          v-slot="slotProps"
+          class="flex-col"
+          label="Aktenzeichen *"
+          :validation-error="validationStore.getByField('fileNumber')"
+        >
+          <TextInput
+            id="fileNumber"
+            v-model="previousDecision.fileNumber"
+            aria-label="Aktenzeichen Vorgehende Entscheidung"
+            class="ds-input-medium"
+            :has-error="slotProps.hasError"
+            size="medium"
+            @input="validationStore.remove('fileNumber')"
+          ></TextInput>
+        </InputField>
+        <!-- Child  -->
+        <template #children>
+          <InputField
+            id="deviatingFileNumber"
+            v-slot="slotProps"
+            class="flex-col"
+            label="Abweichendes Aktenzeichen"
+            :validation-error="
+              validationStore.getByField('deviatingFileNumber')
+            "
+          >
+            <TextInput
+              id="fileNumber"
+              v-model="previousDecision.deviatingFileNumber"
+              aria-label="Abweichendes Aktenzeichen Vorgehende Entscheidung"
+              class="ds-input-medium"
+              :has-error="slotProps.hasError"
+              size="medium"
+              @input="validationStore.remove('deviatingFileNumber')"
+            ></TextInput>
+          </InputField>
+        </template>
+      </NestedComponent>
 
       <InputField id="documentType" class="flex-col" label="Dokumenttyp">
         <ComboboxInput
