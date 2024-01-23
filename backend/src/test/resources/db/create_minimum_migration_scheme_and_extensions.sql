@@ -137,7 +137,6 @@ CREATE TABLE IF NOT EXISTS
     guiding_principle text COLLATE pg_catalog."default",
     headline text COLLATE pg_catalog."default",
     headnote text COLLATE pg_catalog."default",
-    input_type character varying(255) COLLATE pg_catalog."default",
     judicial_body character varying(255) COLLATE pg_catalog."default",
     jurisdiction_type_id uuid,
     other_headnote text COLLATE pg_catalog."default",
@@ -150,6 +149,24 @@ CREATE TABLE IF NOT EXISTS
     duplicate_check boolean,
     legal_effect character varying(255),
     CONSTRAINT documentation_unit_pkey PRIMARY KEY (id)
+  );
+
+CREATE TABLE IF NOT EXISTS
+  incremental_migration.input_type (
+    id uuid NOT NULL,
+    value character varying(255) COLLATE pg_catalog."default" NOT NULL,
+    documentation_unit_id uuid NOT NULL,
+    rank INTEGER DEFAULT '-1'::INTEGER NOT NULL,
+    CONSTRAINT input_type_pkey PRIMARY KEY (id)
+  );
+
+CREATE TABLE IF NOT EXISTS
+  incremental_migration.source (
+    id uuid NOT NULL,
+    value character varying(1000) COLLATE pg_catalog."default" NOT NULL,
+    documentation_unit_id uuid NOT NULL,
+    rank INTEGER DEFAULT '-1'::INTEGER NOT NULL,
+    CONSTRAINT source_pkey PRIMARY KEY (id)
   );
 
 CREATE TABLE IF NOT EXISTS

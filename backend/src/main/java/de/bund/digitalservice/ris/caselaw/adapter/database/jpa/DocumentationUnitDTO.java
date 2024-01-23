@@ -91,8 +91,11 @@ public class DocumentationUnitDTO
 
   @Column private String headnote;
 
-  @Column(name = "input_type")
-  private String inputType;
+  @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+  @JoinColumn(name = "documentation_unit_id", nullable = false)
+  @Builder.Default
+  @OrderBy("rank")
+  private List<InputTypeDTO> inputTypes = new ArrayList<>();
 
   @Column(name = "judicial_body")
   private String judicialBody;
@@ -139,7 +142,11 @@ public class DocumentationUnitDTO
   @Builder.Default
   private List<DocumentationUnitFieldOfLawDTO> documentationUnitFieldsOfLaw = new ArrayList<>();
 
-  @Column private String source;
+  @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+  @JoinColumn(name = "documentation_unit_id", nullable = false)
+  @Builder.Default
+  @OrderBy("rank")
+  private List<SourceDTO> source = new ArrayList<>();
 
   @Column private String tenor;
 

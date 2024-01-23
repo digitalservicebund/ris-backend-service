@@ -23,6 +23,6 @@ public record CoreData(
     @PastOrPresent LocalDate decisionDate,
     @UniqueElements List<LocalDate> deviatingDecisionDates,
     String legalEffect,
-    String inputType,
+    List<String> inputTypes,
     DocumentationOffice documentationOffice,
     String region) {}

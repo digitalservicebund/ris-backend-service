@@ -19,7 +19,7 @@ export type CoreData = {
   decisionDate?: string
   deviatingDecisionDates?: string[]
   legalEffect?: string
-  inputType?: string
+  inputType?: string[]
   documentationOffice?: DocumentationOffice
   region?: string
 }

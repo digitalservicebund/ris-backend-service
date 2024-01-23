@@ -8,7 +8,7 @@ fileignoreconfig:
 - filename: backend/src/main/kotlin/de/bund/digitalservice/ris/norms/framework/adapter/input/restapi/controller/GetFileController.kt
   checksum: f989b3c9c176b1b985c2f78ca6ca13fa1403cbb69f367ae9b1cb8ea64d5f6747
 - filename: backend/src/test/java/de/bund/digitalservice/ris/caselaw/integration/tests/JurisXmlExporterWrapperIntegrationTest.java
-  checksum: 7ab60583530e775db428c50f3cecd4875152cc3513e5c062d4087728ec6284e9
+  checksum: a91e1bf3765170daffa978263e3d8b3d94523fbd08e95f60c0fcea108be85a23
 - filename: backend/src/test/java/de/bund/digitalservice/ris/caselaw/integration/tests/DeviatingObjectIntegrationTest.java
   checksum: 8ac9372e4d04d725843f073f70f90d42c7512aa6a9725626b9d0d56eae3230c6
 - filename: backend/src/test/kotlin/unit/adapter/input/restapi/controller/GenerateNormFileControllerTest.kt
@@ -18,13 +18,13 @@ fileignoreconfig:
 - filename: backend/src/test/kotlin/unit/application/service/GetFileServiceTest.kt
   checksum: 8133265c6f388df84a3e0f61050428e8628853e0ba80b432e4723750a34b781e
 - filename: compose.yaml
-  checksum: 819adfdca16189b30817f0af958088fd9d76d466d8cee377c5f05bb4ddec0b89
+  checksum: 115babd7423cf11e41da11bad567eb5c69e3080d27acb80e345151ff129fcbe8
 - filename: doc/norms/backend-api.yaml
   checksum: df4fa1f7e6d7023f9a7a98d1052c2b88c1785366962004b3165453edcd5bf4db
 - filename: doc/structurizr/workspace.json
   checksum: 541780133a0bf013ac75f6a3bc402c77981a273654c5648eabeb32ccb271a834
 - filename: frontend/Dockerfile.prod
-  checksum: ded78213b6e42141227ada2d018729b0bac907a31afb98e177d5840ed5fd88ba
+  checksum: da26b5932eb54b7e7f5cd1f4910e07f5034a0034daa19f3621113e3a77cabfd7
 - filename: frontend/FRONTEND_STYLEGUIDE.md
   checksum: e6b8194eba2012f2a769c5a5d3577715a573b441a7b94e744c32b3149d0d3a93
 - filename: frontend/src/main.ts

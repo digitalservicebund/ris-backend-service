@@ -10,6 +10,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnit
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO.DocumentationUnitDTOBuilder;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.EnsuingDecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.FileNumberDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.InputTypeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LegalEffectDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.NormReferenceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.OriginalFileDocumentDTO;
@@ -63,13 +64,13 @@ public class DocumentationUnitTransformer {
           .ecli(coreData.ecli())
           .judicialBody(coreData.appraisalBody())
           .decisionDate(coreData.decisionDate())
-          .inputType(coreData.inputType())
           .documentType(
               coreData.documentType() != null
                   ? DocumentTypeTransformer.transformToDTO(coreData.documentType())
                   : null)
           .court(CourtTransformer.transformToDTO(coreData.court()));
 
+      addInputTypes(builder, coreData);
       addFileNumbers(currentDto, builder, coreData);
       addDeviationCourts(builder, coreData);
       addDeviatingDecisionDates(builder, coreData);
@@ -83,7 +84,6 @@ public class DocumentationUnitTransformer {
           .ecli(null)
           .judicialBody(null)
           .decisionDate(null)
-          .inputType(null)
           .court(null)
           .documentType(null)
           .documentationOffice(null);
@@ -329,6 +329,21 @@ public class DocumentationUnitTransformer {
     builder.deviatingCourts(deviatingCourtDTOs);
   }
 
+  private static void addInputTypes(DocumentationUnitDTOBuilder builder, CoreData coreData) {
+    if (coreData.inputTypes() == null) {
+      return;
+    }
+
+    List<InputTypeDTO> inputTypeDTOs = new ArrayList<>();
+    List<String> inputTypes = coreData.inputTypes();
+
+    for (int i = 0; i < inputTypes.size(); i++) {
+      inputTypeDTOs.add(InputTypeDTO.builder().value(inputTypes.get(i)).rank(i + 1L).build());
+    }
+
+    builder.inputTypes(inputTypeDTOs);
+  }
+
   private static void addFileNumbers(
       DocumentationUnitDTO currentDto, DocumentationUnitDTOBuilder builder, CoreData coreData) {
     if (coreData.fileNumbers() == null) {
@@ -386,9 +401,9 @@ public class DocumentationUnitTransformer {
             .ecli(documentationUnitDTO.getEcli())
             .decisionDate(documentationUnitDTO.getDecisionDate())
             .appraisalBody(documentationUnitDTO.getJudicialBody())
-            .legalEffect(legalEffect.getLabel())
-            .inputType(documentationUnitDTO.getInputType());
+            .legalEffect(legalEffect.getLabel());
 
+    addInputTypesToDomain(documentationUnitDTO, coreDataBuilder);
     addFileNumbersToDomain(documentationUnitDTO, coreDataBuilder);
     addDeviatingFileNumbersToDomain(documentationUnitDTO, coreDataBuilder);
     addDeviatingCourtsToDomain(documentationUnitDTO, coreDataBuilder);
@@ -575,6 +590,17 @@ public class DocumentationUnitTransformer {
             .map(DeviatingFileNumberDTO::getValue)
             .toList();
     coreDataBuilder.deviatingFileNumbers(deviatingFileNumbers);
+  }
+
+  private static void addInputTypesToDomain(
+      DocumentationUnitDTO documentationUnitDTO, CoreDataBuilder coreDataBuilder) {
+    if (documentationUnitDTO.getInputTypes() == null) {
+      return;
+    }
+
+    List<String> inputTypes =
+        documentationUnitDTO.getInputTypes().stream().map(InputTypeDTO::getValue).toList();
+    coreDataBuilder.inputTypes(inputTypes);
   }
 
   private static void addFileNumbersToDomain(

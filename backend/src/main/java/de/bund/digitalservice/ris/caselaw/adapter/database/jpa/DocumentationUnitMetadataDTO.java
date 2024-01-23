@@ -20,7 +20,7 @@ public interface DocumentationUnitMetadataDTO {
 
   String getJudicialBody();
 
-  String getInputType();
+  List<InputTypeDTO> getInputTypes();
 
   CourtDTO getCourt();
 

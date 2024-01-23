@@ -136,7 +136,7 @@ class JurisXmlExporterWrapperIntegrationTest {
             .appraisalBody("appraisalBody")
             .decisionDate(LocalDate.parse("2021-01-01"))
             .legalEffect("legalEffect")
-            .inputType("inputType")
+            .inputTypes(List.of("inputType"))
             .documentationOffice(DocumentationOffice.builder().abbreviation("fooOffice").build())
             .region("region")
             .build();
