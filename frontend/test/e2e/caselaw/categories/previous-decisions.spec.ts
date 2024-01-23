@@ -24,7 +24,7 @@ test.describe("previous decisions", () => {
       page.getByLabel("Entscheidungsdatum Vorgehende Entscheidung"),
     ).toBeVisible()
     await expect(
-      page.getByLabel("Aktenzeichen Vorgehende Entscheidung"),
+      page.locator("[aria-label='Aktenzeichen Vorgehende Entscheidung']"),
     ).toBeVisible()
     await expect(
       page.getByLabel("Dokumenttyp Vorgehende Entscheidung"),
@@ -140,7 +140,7 @@ test.describe("previous decisions", () => {
     await waitForSaving(
       async () => {
         await page
-          .getByLabel("Aktenzeichen Vorgehende Entscheidung")
+          .locator("[aria-label='Aktenzeichen Vorgehende Entscheidung']")
           .fill("two")
         await page.getByLabel("Vorgehende Entscheidung speichern").click()
       },
@@ -165,7 +165,7 @@ test.describe("previous decisions", () => {
     await waitForSaving(
       async () => {
         await page
-          .getByLabel("Aktenzeichen Vorgehende Entscheidung")
+          .locator("[aria-label='Aktenzeichen Vorgehende Entscheidung']")
           .fill(fileNumber1)
       },
       page,
@@ -178,7 +178,7 @@ test.describe("previous decisions", () => {
     await waitForSaving(
       async () => {
         await page
-          .getByLabel("Aktenzeichen Vorgehende Entscheidung")
+          .locator("[aria-label='Aktenzeichen Vorgehende Entscheidung']")
           .fill(fileNumber2)
       },
       page,
@@ -198,7 +198,7 @@ test.describe("previous decisions", () => {
     await waitForSaving(
       async () => {
         await page
-          .getByLabel("Aktenzeichen Vorgehende Entscheidung")
+          .locator("[aria-label='Aktenzeichen Vorgehende Entscheidung']")
           .fill("one")
       },
       page,
@@ -210,7 +210,7 @@ test.describe("previous decisions", () => {
     await waitForSaving(
       async () => {
         await page
-          .getByLabel("Aktenzeichen Vorgehende Entscheidung")
+          .locator("[aria-label='Aktenzeichen Vorgehende Entscheidung']")
           .fill("two")
       },
       page,
@@ -430,7 +430,7 @@ test.describe("previous decisions", () => {
     await navigateToCategories(page, documentNumber)
 
     await page
-      .getByLabel("Aktenzeichen Vorgehende Entscheidung")
+      .locator("[aria-label='Aktenzeichen Vorgehende Entscheidung']")
       .fill(fileNumber)
     await page
       .locator(

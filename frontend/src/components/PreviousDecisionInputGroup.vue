@@ -186,7 +186,10 @@ onMounted(() => {
     </div>
 
     <div class="flex justify-between gap-24">
-      <NestedComponent aria-label="Abweichendes Aktenzeichen" class="w-full">
+      <NestedComponent
+        aria-label="Abweichendes Aktenzeichen Vorgehende Entscheidung"
+        class="w-full"
+      >
         <InputField
           id="fileNumber"
           v-slot="slotProps"
