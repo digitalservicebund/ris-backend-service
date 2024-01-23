@@ -419,8 +419,7 @@ test.describe("previous decisions", () => {
       .isVisible()
   })
 
-  // eslint-disable-next-line playwright/no-skipped-test
-  test.skip("deviating file number can be added and edited for manually added previous decisions", async ({
+  test("deviating file number can be added and edited for manually added previous decisions", async ({
     page,
     documentNumber,
   }) => {
@@ -440,7 +439,7 @@ test.describe("previous decisions", () => {
 
     // Knödel
     const container = page
-      .locator("[aria-label=‘Vorgehende Entscheidung‘]")
+      .locator("[aria-label='Vorgehende Entscheidung']")
       .first()
     await expect(
       container.locator("text=Abweichendes Aktenzeichen").first(),
@@ -449,7 +448,9 @@ test.describe("previous decisions", () => {
     await waitForSaving(
       async () => {
         await page
-          .getByLabel("Abweichendes Aktenzeichen Vorgehende Entscheidung")
+          .locator(
+            "[aria-label='Abweichendes Aktenzeichen Vorgehende Entscheidung']",
+          )
           .fill(deviatingFileNumber1)
 
         await page.getByLabel("Vorgehende Entscheidung speichern").click()
@@ -464,12 +465,19 @@ test.describe("previous decisions", () => {
         "[aria-label='Abweichendes Aktenzeichen Vorgehende Entscheidung anzeigen']",
       )
       .click()
-    await expect(page.getByText(deviatingFileNumber1)).toBeVisible()
+    // TODO why doesn't "await expect(page.getByText(deviatingFileNumber1)).toBeVisible()" work?
+    await expect(
+      page.locator(
+        "[aria-label='Abweichendes Aktenzeichen Vorgehende Entscheidung']",
+      ),
+    ).toHaveValue(deviatingFileNumber1)
 
     await waitForSaving(
       async () => {
         await page
-          .getByLabel("Abweichendes Aktenzeichen Vorgehende Entscheidung")
+          .locator(
+            "[aria-label='Abweichendes Aktenzeichen Vorgehende Entscheidung']",
+          )
           .fill(deviatingFileNumber2)
 
         await page.getByLabel("Vorgehende Entscheidung speichern").click()
@@ -484,6 +492,11 @@ test.describe("previous decisions", () => {
         "[aria-label='Abweichendes Aktenzeichen Vorgehende Entscheidung anzeigen']",
       )
       .click()
-    await expect(page.getByText(deviatingFileNumber2)).toBeVisible()
+    // TODO why doesn't "await expect(page.getByText(deviatingFileNumber2)).toBeVisible()" work?
+    await expect(
+      page.locator(
+        "[aria-label='Abweichendes Aktenzeichen Vorgehende Entscheidung']",
+      ),
+    ).toHaveValue(deviatingFileNumber2)
   })
 })
