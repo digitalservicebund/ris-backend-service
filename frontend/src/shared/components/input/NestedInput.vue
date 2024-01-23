@@ -79,7 +79,7 @@ function toggleContentVisibility(): void {
         :aria-label="`${ariaLabel} ${
           localIsExpanded ? 'schließen' : 'anzeigen'
         }`"
-        class="w-icon rounded-full bg-blue-800 text-white"
+        class="w-icon rounded-full bg-blue-800 text-white focus:outline-none focus-visible:outline-blue-800 focus-visible:ring-4 focus-visible:ring-white"
         @click="toggleContentVisibility"
       >
         <slot v-if="localIsExpanded" name="close-icon">

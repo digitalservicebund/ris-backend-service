@@ -31,6 +31,7 @@ import { TableStyle } from "../../editor/tableStyle"
 import TextEditorButton, {
   EditorButton,
 } from "@/shared/components/input/TextEditorButton.vue"
+import { TextAreaInputAttributes } from "@/shared/components/input/types"
 import { useCollapsingMenuBar } from "@/shared/composables/useCollapsingMenuBar"
 import IconExpand from "~icons/ic/baseline-expand"
 import IconAlignJustify from "~icons/ic/baseline-format-align-justify"
@@ -50,12 +51,14 @@ interface Props {
   value?: string
   editable?: boolean
   ariaLabel?: string
+  fieldSize?: TextAreaInputAttributes["fieldSize"]
 }
 
 const props = withDefaults(defineProps<Props>(), {
   value: undefined,
   editable: false,
   ariaLabel: "Editor Feld",
+  fieldSize: "medium",
 })
 
 const emit = defineEmits<{
@@ -247,8 +250,15 @@ const maxButtonEntries = computed(() =>
 
 const editorExpanded = ref(false)
 const editorSize = computed(() => {
-  if (props.editable) return editorExpanded.value ? "h-640" : "h-320"
-  else return ""
+  return editorExpanded.value
+    ? "h-640"
+    : props.fieldSize == "big"
+      ? "h-320"
+      : props.fieldSize == "medium"
+        ? "h-160"
+        : props.fieldSize == "small"
+          ? "h-96"
+          : undefined
 })
 const { collapsedButtons } = useCollapsingMenuBar(
   editorButtons,

@@ -95,4 +95,12 @@ test.describe("authentication", () => {
       ).status(),
     ).toEqual(200)
   })
+
+  test("should see a custom error page for unknown paths", async ({ page }) => {
+    await page.goto("/doesNotExists")
+
+    await expect(
+      page.getByText("Diese Internetseite existiert nicht"),
+    ).toBeVisible()
+  })
 })

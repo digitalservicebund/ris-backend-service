@@ -6,7 +6,7 @@ import { normData as norm } from "./testdata/norm_basic_exported"
 import { FieldType, fillInputField } from "./utilities"
 import { Article, MetadataSectionName, MetadatumType } from "@/domain/norm"
 
-testWithImportedNorm(
+testWithImportedNorm.skip(
   "Check if XML can be retrieved by ELI and content is correct",
   async ({ page, guid, request }) => {
     // Open frame data

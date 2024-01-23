@@ -84,14 +84,7 @@ describe("Documentunit Search", () => {
 
   test("renders correctly", async () => {
     renderComponent()
-    expect(
-      screen.getByLabelText("Dokumentnummer oder Aktenzeichen Suche"),
-    ).toBeVisible()
-    expect(screen.getByLabelText("Gerichtstyp Suche")).toBeVisible()
-    expect(screen.getByLabelText("Gerichtsort Suche")).toBeVisible()
-    expect(screen.getByLabelText("Entscheidungsdatum Suche")).toBeVisible()
-    expect(screen.getByLabelText("Status Suche")).toBeVisible()
-    expect(screen.getByLabelText("Nur meine Dokstelle Filter")).toBeVisible()
+
     expect(
       screen.getByLabelText("Neue Dokumentationseinheit erstellen"),
     ).toBeVisible()

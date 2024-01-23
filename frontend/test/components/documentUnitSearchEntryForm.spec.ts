@@ -30,17 +30,18 @@ async function renderComponent(options?: { isLoading: boolean }) {
   }
 }
 
-describe("Documentunit Search", () => {
+describe("Documentunit search form", () => {
   test("renders correctly", async () => {
     await renderComponent()
-    expect(
-      screen.getByLabelText("Dokumentnummer oder Aktenzeichen Suche"),
-    ).toBeVisible()
-    expect(screen.getByLabelText("Gerichtstyp Suche")).toBeVisible()
-    expect(screen.getByLabelText("Gerichtsort Suche")).toBeVisible()
-    expect(screen.getByLabelText("Entscheidungsdatum Suche")).toBeVisible()
-    expect(screen.getByLabelText("Status Suche")).toBeVisible()
-    expect(screen.getByLabelText("Nur meine Dokstelle Filter")).toBeVisible()
+    ;[
+      "Aktenzeichen Suche",
+      "Gerichtstyp Suche",
+      "Gerichtsort Suche",
+      "Entscheidungsdatum Suche",
+      "Dokumentnummer Suche",
+      "Status Suche",
+      "Nur meine Dokstelle Filter",
+    ].forEach((label) => expect(screen.getByLabelText(label)).toBeVisible())
   })
 
   test("click on 'Suche zurücksetzen' emits 'resetSearchResults'", async () => {

@@ -46,8 +46,8 @@ export type PageableService<TResult, TQuery = TResult> = (
 <template>
   <slot v-if="props.navigationPosition == 'bottom'"></slot>
   <div
-    v-if="page?.content && page?.content?.length > 0 && !isLoading"
-    class="my-32 flex flex-col items-center"
+    v-if="page?.content && !page?.empty && !isLoading"
+    class="my-32 mb-10 mt-20 flex flex-col items-center"
   >
     <div class="flex items-center">
       <div class="relative flex flex-grow items-center justify-center">
@@ -60,8 +60,7 @@ export type PageableService<TResult, TQuery = TResult> = (
           <IconArrowBack />
           <span class="underline">zurück</span>
         </PaginationButton>
-        <span v-if="!page?.empty"> Seite {{ page.number + 1 }} </span>
-        <span v-else> Keine Ergebnisse </span>
+        <span>Seite {{ page.number + 1 }} </span>
         <PaginationButton
           aria-label="nächste Ergebnisse"
           :disabled="page?.last"

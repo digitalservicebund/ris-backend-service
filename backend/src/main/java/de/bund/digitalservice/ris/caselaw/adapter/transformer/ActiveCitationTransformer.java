@@ -31,7 +31,7 @@ public class ActiveCitationTransformer extends RelatedDocumentationUnitTransform
         .documentNumber(
             referencedDocumentationUnit.map(DocumentationUnitDTO::getDocumentNumber).orElse(null))
         .court(getCourtFromDTO(activeCitationDTO.getCourt()))
-        .fileNumber(getFileNumber(activeCitationDTO.getFileNumber()))
+        .fileNumber(activeCitationDTO.getFileNumber())
         .documentType(getDocumentTypeFromDTO(activeCitationDTO.getDocumentType()))
         .decisionDate(activeCitationDTO.getDate())
         .citationType(citationType)
@@ -57,7 +57,7 @@ public class ActiveCitationTransformer extends RelatedDocumentationUnitTransform
                         .documentNumber(activeCitation.getDocumentNumber())
                         .build())
             .documentType(getDocumentTypeFromDomain(activeCitation.getDocumentType()))
-            .fileNumber(getFileNumber(activeCitation.getFileNumber()));
+            .fileNumber(activeCitation.getFileNumber());
 
     CitationType citationType = activeCitation.getCitationType();
 

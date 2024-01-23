@@ -369,8 +369,12 @@ class DocumentationUnitIntegrationTest {
   @Test
   void testSearchResultsAreDeterministic() {
     var office = documentationOfficeRepository.findByAbbreviation("DS");
-    for (int i = 0; i < 20; i++) {
-      var random = RandomStringUtils.random(10, true, true);
+
+    var documentNumberToExclude = "KORE000000000";
+
+    for (int i = 0; i < 21; i++) {
+      var randomDocNumber =
+          i == 0 ? documentNumberToExclude : RandomStringUtils.random(10, true, true);
       CourtDTO court =
           courtRepository.save(
               CourtDTO.builder()
@@ -384,7 +388,7 @@ class DocumentationUnitIntegrationTest {
       DocumentationUnitDTO dto =
           repository.save(
               DocumentationUnitDTO.builder()
-                  .documentNumber(random)
+                  .documentNumber(randomDocNumber)
                   .court(court)
                   .documentationOffice(office)
                   .build());
@@ -403,7 +407,7 @@ class DocumentationUnitIntegrationTest {
               .build());
     }
 
-    assertThat(repository.findAll()).hasSize(20);
+    assertThat(repository.findAll()).hasSize(21);
 
     List<UUID> responseUUIDs = new ArrayList<>();
 
@@ -411,7 +415,10 @@ class DocumentationUnitIntegrationTest {
     risWebTestClient
         .withDefaultLogin()
         .put()
-        .uri("/api/v1/caselaw/documentunits/search-by-linked-documentation-unit?pg=0&sz=20")
+        .uri(
+            "/api/v1/caselaw/documentunits/"
+                + documentNumberToExclude
+                + "/search-linkable-documentation-units?pg=0&sz=20")
         .bodyValue(proceedingDecision)
         .exchange()
         .expectStatus()
@@ -429,12 +436,21 @@ class DocumentationUnitIntegrationTest {
               List<String> uuids = JsonPath.read(responseBody, "$.content[*].uuid");
               assertThat(uuids).hasSize(20);
               responseUUIDs.addAll(uuids.stream().map(UUID::fromString).toList());
+
+              // make sure the documentNumber originating the search is not in the result
+              List<String> documentNumbers =
+                  JsonPath.read(responseBody, "$.content[*].documentNumber");
+              assertThat(documentNumbers).isNotEmpty();
+              assertThat(documentNumbers).doesNotContain(documentNumberToExclude);
             });
 
     risWebTestClient
         .withDefaultLogin()
         .put()
-        .uri("/api/v1/caselaw/documentunits/search-by-linked-documentation-unit?pg=0&sz=20")
+        .uri(
+            "/api/v1/caselaw/documentunits/"
+                + documentNumberToExclude
+                + "/search-linkable-documentation-units?pg=0&sz=20")
         .bodyValue(proceedingDecision)
         .exchange()
         .expectStatus()
@@ -552,10 +568,18 @@ class DocumentationUnitIntegrationTest {
         .containsExactly(
             "ABCD202300007", "EFGH202200123", "IJKL202101234", "MNOP202300099", "UVWX202311090");
 
-    // by documentNumber / fileNumber
-    searchInput = DocumentationUnitSearchInput.builder().documentNumberOrFileNumber("abc").build();
-    assertThat(extractDocumentNumbersFromSearchCall(searchInput))
-        .containsExactly("ABCD202300007", "MNOP202300099");
+    // by documentNumber
+    searchInput = DocumentationUnitSearchInput.builder().documentNumber("abc").build();
+    assertThat(extractDocumentNumbersFromSearchCall(searchInput)).containsExactly("ABCD202300007");
+
+    // by fileNumber
+    searchInput = DocumentationUnitSearchInput.builder().fileNumber("abc").build();
+    assertThat(extractDocumentNumbersFromSearchCall(searchInput)).containsExactly("MNOP202300099");
+
+    // by documentNumber & fileNumber
+    searchInput =
+        DocumentationUnitSearchInput.builder().fileNumber("abc").documentNumber("abc").build();
+    assertThat(extractDocumentNumbersFromSearchCall(searchInput)).isEmpty();
 
     // by court
     searchInput =
@@ -609,7 +633,7 @@ class DocumentationUnitIntegrationTest {
     // all combined
     searchInput =
         DocumentationUnitSearchInput.builder()
-            .documentNumberOrFileNumber("abc")
+            .documentNumber("abc")
             .courtType("MNO")
             .courtLocation("Hamburg")
             .decisionDate(decisionDates.get(0))
@@ -626,8 +650,12 @@ class DocumentationUnitIntegrationTest {
     queryParams.add("pg", "0");
     queryParams.add("sz", "30");
 
-    if (searchInput.documentNumberOrFileNumber() != null) {
-      queryParams.add("documentNumberOrFileNumber", searchInput.documentNumberOrFileNumber());
+    if (searchInput.documentNumber() != null) {
+      queryParams.add("documentNumber", searchInput.documentNumber());
+    }
+
+    if (searchInput.fileNumber() != null) {
+      queryParams.add("fileNumber", searchInput.fileNumber());
     }
 
     if (searchInput.courtType() != null) {

@@ -825,6 +825,7 @@ CREATE TABLE
     document_number character varying(255),
     document_type_id uuid,
     file_number character varying(255),
+    deviating_file_number character varying(255),
     citation_type_id uuid,
     note text,
     dtype character varying(24) NOT NULL,

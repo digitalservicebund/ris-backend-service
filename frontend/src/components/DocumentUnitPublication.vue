@@ -67,7 +67,7 @@ onMounted(async () => {
   )
   if (previewResponse.error) {
     errorMessage.value = previewResponse.error
-  } else if (previewResponse.data && previewResponse.data.xml) {
+  } else if (previewResponse.data?.xml) {
     preview.value = previewResponse.data
   }
 

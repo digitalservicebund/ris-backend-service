@@ -180,7 +180,8 @@ public class DocumentUnitService {
   public Slice<DocumentationUnitSearchResult> searchByDocumentationUnitSearchInput(
       Pageable pageable,
       DocumentationOffice documentationOffice,
-      Optional<String> documentNumberOrFileNumber,
+      Optional<String> documentNumber,
+      Optional<String> fileNumber,
       Optional<String> courtType,
       Optional<String> courtLocation,
       Optional<LocalDate> decisionDate,
@@ -191,7 +192,8 @@ public class DocumentUnitService {
 
     DocumentationUnitSearchInput searchInput =
         DocumentationUnitSearchInput.builder()
-            .documentNumberOrFileNumber(documentNumberOrFileNumber.orElse(null))
+            .documentNumber(documentNumber.orElse(null))
+            .fileNumber(fileNumber.orElse(null))
             .courtType(courtType.orElse(null))
             .courtLocation(courtLocation.orElse(null))
             .decisionDate(decisionDate.orElse(null))
@@ -306,13 +308,14 @@ public class DocumentUnitService {
         .sort(Comparator.comparing(PublicationHistoryRecord::getDate).reversed());
   }
 
-  public Slice<RelatedDocumentationUnit> searchByLinkedDocumentationUnit(
+  public Slice<RelatedDocumentationUnit> searchLinkableDocumentationUnits(
       RelatedDocumentationUnit relatedDocumentationUnit,
       DocumentationOffice documentationOffice,
+      String documentNumberToExclude,
       Pageable pageable) {
 
-    return repository.searchByRelatedDocumentationUnit(
-        relatedDocumentationUnit, documentationOffice, pageable);
+    return repository.searchLinkableDocumentationUnits(
+        relatedDocumentationUnit, documentationOffice, documentNumberToExclude, pageable);
   }
 
   public Mono<String> validateSingleNorm(SingleNormValidationInfo singleNormValidationInfo) {

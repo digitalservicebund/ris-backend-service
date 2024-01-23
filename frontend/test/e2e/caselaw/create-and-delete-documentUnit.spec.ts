@@ -23,9 +23,7 @@ test.describe("create a doc unit and delete it again", () => {
 
   caselawTest("cancel delete doc unit", async ({ page, documentNumber }) => {
     await page.goto("/")
-    await page
-      .getByLabel("Dokumentnummer oder Aktenzeichen Suche")
-      .fill(documentNumber)
+    await page.getByLabel("Dokumentnummer Suche").fill(documentNumber)
     await page.getByLabel("Nach Dokumentationseinheiten suchen").click()
     //TODO: remove the timeout when search performance get better
     await expect(

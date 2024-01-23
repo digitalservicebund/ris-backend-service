@@ -56,12 +56,6 @@ describe("Pagination", () => {
     expect(slot.compareDocumentPosition(navigation)).toBe(2)
   })
 
-  test("displays 0 pages if there a no pages", async () => {
-    renderComponent({ empty: true })
-
-    await screen.findByText("Keine Ergebnisse")
-  })
-
   test("updates string correctly for one result", async () => {
     renderComponent({ getInitialData: true })
 

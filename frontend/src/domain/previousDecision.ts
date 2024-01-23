@@ -8,8 +8,12 @@ export default class PreviousDecision
 {
   public dateKnown: boolean = true
 
-  static requiredFields = ["fileNumber", "court", "decisionDate"] as const
-  static fields = [
+  static readonly requiredFields = [
+    "fileNumber",
+    "court",
+    "decisionDate",
+  ] as const
+  static readonly fields = [
     "fileNumber",
     "court",
     "decisionDate",

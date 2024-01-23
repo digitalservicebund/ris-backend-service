@@ -6,11 +6,15 @@ export default class EnsuingDecision
   extends RelatedDocumentation
   implements EditableListItem
 {
-  public pending: boolean | undefined
-  public note: string | undefined
+  public pending?: boolean
+  public note?: string
 
-  static requiredFields = ["fileNumber", "court", "decisionDate"] as const
-  static fields = [
+  static readonly requiredFields = [
+    "fileNumber",
+    "court",
+    "decisionDate",
+  ] as const
+  static readonly fields = [
     "fileNumber",
     "court",
     "decisionDate",

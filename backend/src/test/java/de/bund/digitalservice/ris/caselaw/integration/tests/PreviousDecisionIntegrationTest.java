@@ -155,7 +155,12 @@ class PreviousDecisionIntegrationTest {
             .documentationOffice(documentationOfficeDTO)
             .documentNumber("documntnumber")
             .previousDecisions(
-                List.of(PreviousDecisionDTO.builder().fileNumber("test").rank(1).build()))
+                List.of(
+                    PreviousDecisionDTO.builder()
+                        .fileNumber("test")
+                        .deviatingFileNumber("deviatest")
+                        .rank(1)
+                        .build()))
             .build();
     parentDocumentUnitDTO = repository.save(parentDocumentUnitDTO);
 
@@ -173,6 +178,9 @@ class PreviousDecisionIntegrationTest {
               assertThat(responseBody.previousDecisions())
                   .extracting("fileNumber")
                   .containsExactly("test");
+              assertThat(responseBody.previousDecisions())
+                  .extracting("deviatingFileNumber")
+                  .containsExactly("deviatest");
             });
   }
 
@@ -237,6 +245,7 @@ class PreviousDecisionIntegrationTest {
                     PreviousDecision.builder()
                         .uuid(childDocumentationUnitUuid)
                         .documentNumber(childDocumentUnitDTO.getDocumentNumber())
+                        .deviatingFileNumber("deviatest")
                         .build()))
             .coreData(CoreData.builder().documentationOffice(docOffice).build())
             .build();
@@ -255,6 +264,9 @@ class PreviousDecisionIntegrationTest {
               assertThat(response.getResponseBody().previousDecisions())
                   .extracting("documentNumber")
                   .containsExactly("abcdefghjikl");
+              assertThat(response.getResponseBody().previousDecisions())
+                  .extracting("deviatingFileNumber")
+                  .containsExactly("deviatest");
             });
   }
 
@@ -523,7 +535,8 @@ class PreviousDecisionIntegrationTest {
     return risWebTestClient
         .withDefaultLogin()
         .put()
-        .uri("/api/v1/caselaw/documentunits/search-by-linked-documentation-unit?pg=0&sz=30")
+        .uri(
+            "/api/v1/caselaw/documentunits/KORE000000000/search-linkable-documentation-units?pg=0&sz=30")
         .bodyValue(PreviousDecisionSearchInput)
         .exchange()
         .expectStatus()

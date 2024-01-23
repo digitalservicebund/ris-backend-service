@@ -1,5 +1,6 @@
 import type {
   FullConfig,
+  FullResult,
   Reporter,
   Suite,
   TestCase,
@@ -9,6 +10,7 @@ import playwrightConfig from "./../../playwright.config"
 
 class QueriesReporter implements Reporter {
   private resultsWithDuration: { test: TestCase; result: TestResult }[] = []
+  private failedTests: string[] = []
 
   onBegin(_config: FullConfig, suite: Suite) {
     console.log(
@@ -17,6 +19,9 @@ class QueriesReporter implements Reporter {
   }
 
   onTestEnd(test: TestCase, result: TestResult) {
+    if (["failed", "timedOut", "interrupted"].includes(result.status))
+      this.failedTests.push(test.title)
+
     if (
       result.attachments.length &&
       result.attachments.find((attachment) => attachment.name == "durations")
@@ -24,7 +29,12 @@ class QueriesReporter implements Reporter {
       this.resultsWithDuration.push({ test, result })
   }
 
-  onEnd() {
+  onEnd(result: FullResult) {
+    if (result.status != "passed") {
+      console.error("\nThe following test cases failed: ")
+      console.table(this.failedTests)
+      console.log("Use `npm run test:queries -- --reporter=line` to see errors")
+    }
     const stats = this.resultsWithDuration.map(({ test, result }) => {
       const durations = result.attachments
         .find((attachment) => attachment.name == "durations")

@@ -149,7 +149,7 @@ function onDelete() {
           class="table-cell min-h-56 border-b-1 border-blue-300 px-16 py-12 align-middle"
         >
           <router-link
-            class="underline"
+            class="underline focus:outline-none focus-visible:outline-blue-800"
             :to="{
               name: listEntry.fileName
                 ? 'caselaw-documentUnit-documentNumber-categories'
@@ -221,7 +221,7 @@ function onDelete() {
         <div class="table-cell border-b-1 border-blue-300 px-12 align-middle">
           <button
             aria-label="Dokumentationseinheit löschen"
-            class="cursor-pointer align-middle text-blue-800"
+            class="cursor-pointer align-middle text-blue-800 focus:outline-none focus-visible:outline-blue-800"
             @click="
               setSelectedDocumentUnitListEntry(
                 documentUnitListEntries?.find(

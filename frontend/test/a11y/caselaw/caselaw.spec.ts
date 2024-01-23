@@ -23,9 +23,7 @@ test.describe("a11y of start page (/caselaw)", () => {
         exact: true,
       }),
     ).toBeVisible()
-    await page
-      .getByLabel("Dokumentnummer oder Aktenzeichen Suche")
-      .fill(documentNumber)
+    await page.getByLabel("Dokumentnummer Suche").fill(documentNumber)
     await page.getByLabel("Nach Dokumentationseinheiten suchen").click()
     //TODO: remove the timeout when search performance get better
     await expect(

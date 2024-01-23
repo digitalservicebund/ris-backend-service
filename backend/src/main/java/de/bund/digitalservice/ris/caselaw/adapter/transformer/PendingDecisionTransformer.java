@@ -14,7 +14,7 @@ public class PendingDecisionTransformer extends RelatedDocumentationUnitTransfor
         .documentNumber(
             referencedDocumentationUnit.map(DocumentationUnitDTO::getDocumentNumber).orElse(null))
         .court(getCourtFromDTO(pendingDecisionDTO.getCourt()))
-        .fileNumber(getFileNumber(pendingDecisionDTO.getFileNumber()))
+        .fileNumber(pendingDecisionDTO.getFileNumber())
         .documentType(getDocumentTypeFromDTO(pendingDecisionDTO.getDocumentType()))
         .decisionDate(pendingDecisionDTO.getDate())
         .note(pendingDecisionDTO.getNote())
@@ -40,7 +40,7 @@ public class PendingDecisionTransformer extends RelatedDocumentationUnitTransfor
                     .documentNumber(ensuingDecision.getDocumentNumber())
                     .build())
         .documentType(getDocumentTypeFromDomain(ensuingDecision.getDocumentType()))
-        .fileNumber(getFileNumber(ensuingDecision.getFileNumber()))
+        .fileNumber(ensuingDecision.getFileNumber())
         .note(ensuingDecision.getNote())
         .build();
   }

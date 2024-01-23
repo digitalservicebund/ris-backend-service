@@ -260,18 +260,16 @@ watch(
         @click="addActiveCitation"
       />
     </div>
-    <div class="mb-10 mt-20">
-      <Pagination
-        navigation-position="bottom"
-        :page="searchResultsCurrentPage"
-        @update-page="updatePage"
-      >
-        <SearchResultList
-          :is-loading="isLoading"
-          :search-results="searchResults"
-          @link-decision="addActiveCitationFromSearch"
-        />
-      </Pagination>
-    </div>
+    <Pagination
+      navigation-position="bottom"
+      :page="searchResultsCurrentPage"
+      @update-page="updatePage"
+    >
+      <SearchResultList
+        :is-loading="isLoading"
+        :search-results="searchResults"
+        @link-decision="addActiveCitationFromSearch"
+      />
+    </Pagination>
   </div>
 </template>

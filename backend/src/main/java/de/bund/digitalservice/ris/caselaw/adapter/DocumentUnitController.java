@@ -100,8 +100,8 @@ public class DocumentUnitController {
   public Mono<Slice<DocumentationUnitSearchResult>> searchByDocumentUnitListEntry(
       @RequestParam("pg") int page,
       @RequestParam("sz") int size,
-      @RequestParam(value = "documentNumberOrFileNumber")
-          Optional<String> documentNumberOrFileNumber,
+      @RequestParam(value = "documentNumber") Optional<String> documentNumber,
+      @RequestParam(value = "fileNumber") Optional<String> fileNumber,
       @RequestParam(value = "courtType") Optional<String> courtType,
       @RequestParam(value = "courtLocation") Optional<String> courtLocation,
       @RequestParam(value = "decisionDate") Optional<LocalDate> decisionDate,
@@ -119,7 +119,8 @@ public class DocumentUnitController {
                     service.searchByDocumentationUnitSearchInput(
                         PageRequest.of(page, size),
                         documentationOffice,
-                        documentNumberOrFileNumber,
+                        documentNumber,
+                        fileNumber,
                         courtType,
                         courtLocation,
                         decisionDate,
@@ -193,9 +194,10 @@ public class DocumentUnitController {
     return service.previewPublication(uuid);
   }
 
-  @PutMapping(value = "/search-by-linked-documentation-unit")
+  @PutMapping(value = "/{documentNumberToExclude}/search-linkable-documentation-units")
   @PreAuthorize("isAuthenticated()")
-  public Mono<Slice<RelatedDocumentationUnit>> searchByLinkedDocumentationUnit(
+  public Mono<Slice<RelatedDocumentationUnit>> searchLinkableDocumentationUnits(
+      @PathVariable("documentNumberToExclude") String documentNumberToExclude,
       @RequestParam("pg") int page,
       @RequestParam("sz") int size,
       @RequestBody RelatedDocumentationUnit relatedDocumentationUnit,
@@ -206,9 +208,10 @@ public class DocumentUnitController {
         .flatMap(
             documentationOffice ->
                 Mono.just(
-                    service.searchByLinkedDocumentationUnit(
+                    service.searchLinkableDocumentationUnits(
                         relatedDocumentationUnit,
                         documentationOffice,
+                        documentNumberToExclude,
                         PageRequest.of(page, size))));
   }
 

@@ -169,7 +169,8 @@ onUnmounted(() => {
 
 <script lang="ts">
 export type DocumentUnitSearchParameter =
-  | "documentNumberOrFileNumber"
+  | "documentNumber"
+  | "fileNumber"
   | "publicationStatus"
   | "courtType"
   | "courtLocation"
@@ -180,31 +181,28 @@ export type DocumentUnitSearchParameter =
 </script>
 
 <template>
-  <div class="mb-32 flex flex-col bg-blue-200 py-24">
+  <div class="pyb-24 mb-32 flex flex-col bg-blue-200">
     <div
-      class="m-32 grid grid-flow-col grid-cols-[180px_1fr_180px_1fr] grid-rows-[66px_66px_66px] gap-x-20 gap-y-4"
+      class="m-40 grid grid-flow-col grid-cols-[auto_1fr_auto_1fr] grid-rows-[auto_auto_auto_auto] gap-x-12 gap-y-20 lg:gap-x-32"
     >
       <!-- Column 1 -->
-      <div class="ds-body-01-reg pl-32">Dokumentnummer/ Aktenzeichen</div>
-      <div class="ds-body-01-reg pl-32">Gericht</div>
-      <div class="ds-body-01-reg pl-32">Entscheidungsdatum</div>
+      <div class="ds-body-01-reg flex flex-row items-center">Aktenzeichen</div>
+      <div class="ds-body-01-reg flex flex-row items-center">Gericht</div>
+      <div class="ds-body-01-reg flex flex-row items-center">Datum</div>
+      <div></div>
       <!-- Column 2 -->
-      <div class="pr-32">
-        <InputField
-          id="documentNumberOrFileNumber"
-          label="Dokumentnummer oder Aktenzeichen"
-          visually-hide-label
-        >
+      <div>
+        <InputField id="fileNumber" label="Aktenzeichen" visually-hide-label>
           <TextInput
-            id="documentNumberOrFileNumber"
-            v-model="query.documentNumberOrFileNumber"
-            aria-label="Dokumentnummer oder Aktenzeichen Suche"
+            id="fileNumber"
+            v-model="query.fileNumber"
+            aria-label="Aktenzeichen Suche"
             class="ds-input-small"
             @focus="resetErrors"
           ></TextInput>
         </InputField>
       </div>
-      <div class="flex flex-row gap-24 pr-32">
+      <div class="flex flex-row gap-10">
         <InputField id="courtType" label="Gerichtstyp" visually-hide-label>
           <TextInput
             id="courtType"
@@ -215,6 +213,7 @@ export type DocumentUnitSearchParameter =
             @focus="resetErrors"
           ></TextInput>
         </InputField>
+        <span class="pt-6">-</span>
         <InputField id="courtLocation" label="Gerichtsort" visually-hide-label>
           <TextInput
             id="courtLocation"
@@ -226,7 +225,7 @@ export type DocumentUnitSearchParameter =
           ></TextInput>
         </InputField>
       </div>
-      <div class="flex flex-row gap-10 pr-32">
+      <div class="flex flex-row gap-10">
         <InputField
           id="decisionDate"
           v-slot="{ id, hasError }"
@@ -248,7 +247,7 @@ export type DocumentUnitSearchParameter =
             "
           ></DateInput>
         </InputField>
-        <span>-</span>
+        <span class="pt-6">-</span>
         <InputField
           id="decisionDateEnd"
           v-slot="{ id, hasError }"
@@ -272,12 +271,33 @@ export type DocumentUnitSearchParameter =
           ></DateInput>
         </InputField>
       </div>
+      <div class="pl-32"></div>
       <!-- Column 3 -->
-      <div class="ds-body-01-reg pl-32">Status</div>
-      <div class="pl-32"></div>
-      <div class="pl-32"></div>
+      <div class="ds-body-01-reg flex flex-row items-center pl-24 lg:pl-48">
+        Dokumentnummer
+      </div>
+      <div class="ds-body-01-reg flex flex-row items-center pl-24 lg:pl-48">
+        Status
+      </div>
+      <div></div>
+      <div></div>
       <!-- Column 4 -->
-      <div class="pr-32">
+      <div class="">
+        <InputField
+          id="documentNumber"
+          label="Dokumentnummer"
+          visually-hide-label
+        >
+          <TextInput
+            id="documentNumber"
+            v-model="query.documentNumber"
+            aria-label="Dokumentnummer Suche"
+            class="ds-input-small"
+            @focus="resetErrors"
+          ></TextInput>
+        </InputField>
+      </div>
+      <div class="">
         <InputField id="status" label="Status" visually-hide-label>
           <DropdownInput
             id="status"
@@ -289,7 +309,7 @@ export type DocumentUnitSearchParameter =
           />
         </InputField>
       </div>
-      <div class="flex flex-row gap-20 pr-32">
+      <div class="flex flex-row gap-20">
         <InputField
           id="documentationOffice"
           v-slot="{ id }"
@@ -301,7 +321,7 @@ export type DocumentUnitSearchParameter =
             :id="id"
             v-model="myDocOfficeOnly"
             aria-label="Nur meine Dokstelle Filter"
-            class="ds-checkbox-mini"
+            class="ds-checkbox-mini bg-white"
             @focus="resetErrors"
           />
         </InputField>
@@ -316,7 +336,7 @@ export type DocumentUnitSearchParameter =
             :id="id"
             v-model="withError"
             aria-label="Nur fehlerhafte Dokumentationseinheiten"
-            class="ds-checkbox-mini"
+            class="ds-checkbox-mini bg-white"
             @focus="resetErrors"
           />
         </InputField>

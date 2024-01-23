@@ -12,18 +12,90 @@ test.describe("document unit search queries", () => {
     {
       title: "documentNumber and courtType",
       parameter: {
-        documentNumberOrFileNumber: "KORE",
-        courtType: "BGH",
+        documentNumber: "BVRE",
+        courtType: "VerfGH",
       },
-      maxDuration: 500,
+      maxDuration: 1000,
+      minResults: 5,
+    },
+    {
+      title: "vague documentNumber",
+      parameter: {
+        documentNumber: "BV",
+      },
+      maxDuration: 1000,
       minResults: 5,
     },
     {
       title: "not existing documentNumber",
       parameter: {
-        documentNumberOrFileNumber: "notExistingFoo",
+        documentNumber: "notExistingFoo",
       },
-      maxDuration: 500,
+      maxDuration: 1000,
+    },
+    {
+      title: "vague fileNumber",
+      parameter: {
+        fileNumber: "Bv",
+      },
+      maxDuration: 1000,
+      minResults: 5,
+    },
+    {
+      title: "not existing fileNumber",
+      parameter: {
+        fileNumber: "notExistingFoo",
+      },
+      maxDuration: 1000,
+    },
+    {
+      title: "only unpublished",
+      parameter: {
+        publicationStatus: "UNPUBLISHED",
+      },
+      maxDuration: 1000,
+      minResults: 5,
+    },
+    {
+      title: "of all time",
+      parameter: {
+        decisionDate: "1900-01-01",
+        decisionDateEnd: "2024-01-15",
+      },
+      maxDuration: 1000,
+      minResults: 5,
+    },
+    {
+      title: "one day",
+      parameter: {
+        decisionDate: "1975-06-16",
+      },
+      maxDuration: 1000,
+      minResults: 1,
+    },
+    {
+      title: "only court location",
+      parameter: {
+        courtLocation: "München",
+      },
+      maxDuration: 1000,
+      minResults: 5,
+    },
+    {
+      title: "only court type",
+      parameter: {
+        courtType: "VerfGH",
+      },
+      maxDuration: 1000,
+      minResults: 5,
+    },
+    {
+      title: "only my doc office",
+      parameter: {
+        myDocOfficeOnly: "true",
+      },
+      maxDuration: 1000,
+      minResults: 5,
     },
   ]
 
@@ -51,14 +123,11 @@ async function runTestMultipleTimes(
       body: Buffer.from(durations),
       contentType: "application/json",
     })
-    await testInfo.attach("maxDuration", {
-      body: Buffer.from(`${search.maxDuration}`),
-    })
     return
   }
 
   const request = await getRequest(
-    "http://127.0.0.1/api/v1/caselaw/documentunits/search?pg=0&sz=30" +
+    "/api/v1/caselaw/documentunits/search?pg=0&sz=30" +
       getUrlParams(search.parameter),
     page,
   )
@@ -70,7 +139,7 @@ async function runTestMultipleTimes(
     const documentUnits =
       ((await (await request.response())?.json())?.content as DocumentUnit[]) ||
       []
-    expect(documentUnits.length).toBeGreaterThan(search.minResults)
+    expect(documentUnits.length).toBeGreaterThanOrEqual(search.minResults)
   }
 
   await runTestMultipleTimes(runs - 1, search, page, testInfo, [

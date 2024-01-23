@@ -92,7 +92,7 @@ export default class DocumentUnit {
   public ensuingDecisions?: EnsuingDecision[]
   public contentRelatedIndexing: ContentRelatedIndexing = {}
 
-  static requiredFields = [
+  static readonly requiredFields = [
     "fileNumbers",
     "court",
     "decisionDate",

@@ -6,9 +6,9 @@ import {
   ComboboxInputModelType,
   ComboboxItem,
 } from "@/shared/components/input/types"
-import IconClear from "~icons/ic/baseline-clear"
 import IconKeyboardArrowDown from "~icons/ic/baseline-keyboard-arrow-down"
 import IconKeyboardArrowUp from "~icons/ic/baseline-keyboard-arrow-up"
+import IconClear from "~icons/material-symbols/close-small"
 
 const props = defineProps<{
   id: string
@@ -279,7 +279,7 @@ export type InputModelProps =
       <button
         v-if="inputText && !noClear"
         aria-label="Auswahl zurücksetzen"
-        class="input-close-icon flex items-center text-blue-800"
+        class="input-close-icon flex items-center text-blue-800 focus:outline-none focus-visible:outline-blue-800"
         tabindex="0"
         @click="clearDropdown"
       >
@@ -299,17 +299,17 @@ export type InputModelProps =
     <div
       v-if="showDropdown"
       ref="dropdownItemsRef"
-      class="absolute left-0 right-0 top-[100%] z-20 flex max-h-[300px] flex-col overflow-y-scroll bg-white drop-shadow-md"
+      class="absolute left-0 right-0 top-[100%] z-20 flex max-h-[300px] flex-col overflow-y-scroll bg-white px-8 py-12 drop-shadow-md"
       tabindex="-1"
     >
       <div
         v-for="(item, index) in currentlyDisplayedItems"
         :key="index"
         aria-label="dropdown-option"
-        class="cursor-pointer border-b-1 border-b-gray-400 px-[1.5rem] py-[1rem] last:border-b-0 hover:bg-gray-400 focus:bg-blue-200 focus:outline-none"
+        class="cursor-pointer px-16 py-12 hover:bg-blue-100 focus:border-l-4 focus:border-solid focus:border-l-blue-800 focus:bg-blue-200 focus:outline-none"
         :class="{
-          'bg-blue-200': candidateForSelection === item,
-          'border-l-4 border-solid border-l-blue-800': inputText === item.label,
+          'border-l-4 border-solid border-l-blue-800 bg-blue-200':
+            candidateForSelection === item,
         }"
         role="button"
         tabindex="0"
@@ -334,7 +334,7 @@ export type InputModelProps =
         v-if="createNewItem"
         key="createNewItem"
         aria-label="dropdown-option"
-        class="cursor-pointer border-b-1 border-b-gray-400 px-[1.5rem] py-[1rem] last:border-b-0 hover:bg-gray-400 focus:bg-blue-200 focus:outline-none"
+        class="cursor-pointer px-16 py-12 hover:bg-blue-100 focus:border-l-4 focus:border-solid focus:border-l-blue-800 focus:bg-blue-200 focus:outline-none"
         role="button"
         tabindex="0"
         @click="setChosenItem(createNewItem)"

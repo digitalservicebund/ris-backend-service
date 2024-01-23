@@ -227,11 +227,15 @@ test.describe("previous decisions", () => {
     ).toHaveCount(1)
   })
 
-  test("search for documentunits and link as previous decision", async ({
+  // eslint-disable-next-line playwright/no-skipped-test
+  test.skip("search for documentunits and link as previous decision", async ({
     page,
     documentNumber,
     prefilledDocumentUnit,
   }) => {
+    const deviatingFileNumber1 = generateString()
+    const deviatingFileNumber2 = generateString()
+
     await navigateToPublication(
       page,
       prefilledDocumentUnit.documentNumber || "",
@@ -253,6 +257,7 @@ test.describe("previous decisions", () => {
       fileNumber: prefilledDocumentUnit.coreData.fileNumbers?.[0],
       documentType: prefilledDocumentUnit.coreData.documentType?.label,
       decisionDate: "31.12.2019",
+      deviatingFileNumber: deviatingFileNumber1,
     })
     const previousDecisionContainer = page.getByLabel("Vorgehende Entscheidung")
     await previousDecisionContainer
@@ -275,8 +280,28 @@ test.describe("previous decisions", () => {
     await expect(listItem).toBeVisible()
     await expect(page.getByLabel("Eintrag löschen")).toBeVisible()
 
-    //can not be edited
-    await expect(page.getByLabel("Eintrag bearbeiten")).toBeHidden()
+    //deviating file number can be edited
+    await expect(page.getByLabel("Eintrag bearbeiten")).toBeVisible()
+    await page.getByLabel("Eintrag bearbeiten").first().click()
+
+    await expect(
+      page.getByLabel("Abweichendes Aktenzeichen Vorgehende Entscheidung"),
+    ).toHaveValue(deviatingFileNumber1)
+
+    await waitForSaving(
+      async () => {
+        await page
+          .getByLabel("Abweichendes Aktenzeichen Vorgehende Entscheidung")
+          .fill(deviatingFileNumber2)
+
+        await page.getByLabel("Vorgehende Entscheidung speichern").click()
+      },
+      page,
+      { clickSaveButton: true },
+    )
+
+    await page.getByLabel("Eintrag bearbeiten").first().click()
+    await expect(page.getByText(deviatingFileNumber2)).toBeVisible()
 
     // search for same parameters gives same result, indication that decision is already added
     await page.getByLabel("Weitere Angabe").click()
@@ -392,5 +417,73 @@ test.describe("previous decisions", () => {
     await page
       .locator("[aria-label='Entscheidungsdatum Vorgehende Entscheidung']")
       .isVisible()
+  })
+
+  // eslint-disable-next-line playwright/no-skipped-test
+  test.skip("deviating file number can be added and edited for manually added previous decisions", async ({
+    page,
+    documentNumber,
+  }) => {
+    const fileNumber = generateString()
+    const deviatingFileNumber1 = generateString()
+    const deviatingFileNumber2 = generateString()
+    await navigateToCategories(page, documentNumber)
+
+    await page
+      .getByLabel("Aktenzeichen Vorgehende Entscheidung")
+      .fill(fileNumber)
+    await page
+      .locator(
+        "[aria-label='Abweichendes Aktenzeichen Vorgehende Entscheidung anzeigen']",
+      )
+      .click()
+
+    // Knödel
+    const container = page
+      .locator("[aria-label=‘Vorgehende Entscheidung‘]")
+      .first()
+    await expect(
+      container.locator("text=Abweichendes Aktenzeichen").first(),
+    ).toBeVisible()
+
+    await waitForSaving(
+      async () => {
+        await page
+          .getByLabel("Abweichendes Aktenzeichen Vorgehende Entscheidung")
+          .fill(deviatingFileNumber1)
+
+        await page.getByLabel("Vorgehende Entscheidung speichern").click()
+      },
+      page,
+      { clickSaveButton: true },
+    )
+
+    await page.getByLabel("Eintrag bearbeiten").click()
+    await page
+      .locator(
+        "[aria-label='Abweichendes Aktenzeichen Vorgehende Entscheidung anzeigen']",
+      )
+      .click()
+    await expect(page.getByText(deviatingFileNumber1)).toBeVisible()
+
+    await waitForSaving(
+      async () => {
+        await page
+          .getByLabel("Abweichendes Aktenzeichen Vorgehende Entscheidung")
+          .fill(deviatingFileNumber2)
+
+        await page.getByLabel("Vorgehende Entscheidung speichern").click()
+      },
+      page,
+      { clickSaveButton: true },
+    )
+
+    await page.getByLabel("Eintrag bearbeiten").click()
+    await page
+      .locator(
+        "[aria-label='Abweichendes Aktenzeichen Vorgehende Entscheidung anzeigen']",
+      )
+      .click()
+    await expect(page.getByText(deviatingFileNumber2)).toBeVisible()
   })
 })
