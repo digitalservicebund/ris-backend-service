@@ -279,7 +279,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
                 } else {
                   procedureDTO =
                       ProcedureDTO.builder()
-                          .label(procedure.label())
+                          .label(procedure.label().trim())
                           .createdAt(Instant.now())
                           .documentationOffice(documentationUnitDTO.getDocumentationOffice())
                           .build();

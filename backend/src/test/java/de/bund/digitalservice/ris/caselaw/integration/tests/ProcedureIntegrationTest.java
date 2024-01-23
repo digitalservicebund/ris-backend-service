@@ -319,6 +319,51 @@ class ProcedureIntegrationTest {
   }
 
   @Test
+  void testProcedureLabelWithTrailingSpaces_shouldSaveProcedureWithoutTrailingSpaces() {
+    DocumentationUnitDTO dto =
+        documentUnitRepository.save(
+            DocumentationUnitDTO.builder()
+                .documentNumber("1234567890123")
+                .documentationOffice(documentationOfficeDTO)
+                .build());
+
+    Procedure procedure = Procedure.builder().label("  testProcedure  ").build();
+
+    DocumentUnit documentUnitFromFrontend =
+        DocumentUnit.builder()
+            .uuid(dto.getId())
+            .documentNumber(dto.getDocumentNumber())
+            .coreData(
+                CoreData.builder().procedure(procedure).documentationOffice(docOffice).build())
+            .build();
+
+    risWebTestClient
+        .withDefaultLogin()
+        .put()
+        .uri("/api/v1/caselaw/documentunits/" + dto.getId())
+        .bodyValue(documentUnitFromFrontend)
+        .exchange()
+        .expectStatus()
+        .is2xxSuccessful()
+        .expectBody(DocumentUnit.class)
+        .consumeWith(
+            response ->
+                assertThat(response.getResponseBody().coreData().procedure())
+                    .extracting("label")
+                    .isEqualTo("testProcedure"));
+
+    assertThat(repository.findAll()).hasSize(1);
+    ProcedureDTO firstProcedure =
+        linkRepository.findFirstByDocumentationUnitOrderByRankDesc(dto).getProcedure();
+    assertThat(firstProcedure).extracting("label").isEqualTo("testProcedure");
+    assertThat(firstProcedure.getDocumentationUnits()).hasSize(1);
+    assertThat(firstProcedure.getDocumentationUnits().get(0))
+        .extracting("id", "documentNumber")
+        .containsExactly(dto.getId(), dto.getDocumentNumber());
+    assertThat(linkRepository.findAll()).hasSize(1);
+  }
+
+  @Test
   void testAddingProcedureToPreviousProcedures() {
     DocumentationUnitDTO dto =
         documentUnitRepository.save(

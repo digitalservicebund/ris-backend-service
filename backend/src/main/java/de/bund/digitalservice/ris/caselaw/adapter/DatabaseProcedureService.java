@@ -73,18 +73,6 @@ public class DatabaseProcedureService implements ProcedureService {
                     .map(DocumentationUnitTransformer::transformToMetaDomain)
                     .toList())
         .orElse(null);
-    //    return linkRepository
-    //        .findLatestProcedureLinksByProcedure(
-    //            repository
-    //                .findByLabelAndDocumentationOffice(
-    //                    procedureLabel,
-    //                    documentationOfficeRepository.findByAbbreviation(
-    //                        documentationOffice.abbreviation()))
-    //                .getId())
-    //        .stream()
-    //        .map(ProcedureLinkDTO::getDocumentationUnitDTO)
-    //        .map(DocumentationUnitTransformer::transformToDomain)
-    //        .toList();
   }
 
   @Override
