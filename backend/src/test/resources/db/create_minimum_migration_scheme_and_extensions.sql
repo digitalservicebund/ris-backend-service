@@ -161,6 +161,15 @@ CREATE TABLE IF NOT EXISTS
   );
 
 CREATE TABLE IF NOT EXISTS
+  incremental_migration.source (
+    id uuid NOT NULL,
+    value character varying(1000) COLLATE pg_catalog."default" NOT NULL,
+    documentation_unit_id uuid NOT NULL,
+    rank INTEGER DEFAULT '-1'::INTEGER NOT NULL,
+    CONSTRAINT source_pkey PRIMARY KEY (id)
+  );
+
+CREATE TABLE IF NOT EXISTS
   incremental_migration.file_number (
     id uuid NOT NULL,
     value character varying(1000) COLLATE pg_catalog."default" NOT NULL,

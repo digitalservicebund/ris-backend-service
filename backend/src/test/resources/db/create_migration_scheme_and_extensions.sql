@@ -292,6 +292,15 @@ CREATE TABLE IF NOT EXISTS
     CONSTRAINT input_type_pkey PRIMARY KEY (id)
   );
 
+CREATE TABLE IF NOT EXISTS
+  incremental_migration.source (
+    id uuid NOT NULL,
+    value character varying(1000) COLLATE pg_catalog."default" NOT NULL,
+    documentation_unit_id uuid NOT NULL,
+    rank INTEGER DEFAULT '-1'::INTEGER NOT NULL,
+    CONSTRAINT source_pkey PRIMARY KEY (id)
+  );
+
 --
 -- Name: documentation_unit_field_of_law; Type: TABLE; Schema: incremental_migration; Owner: -
 --
