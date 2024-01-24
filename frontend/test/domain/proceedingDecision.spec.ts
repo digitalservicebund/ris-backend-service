@@ -39,7 +39,7 @@ describe("ProceedingDecision", () => {
       documentNumber: "ABC",
       referenceFound: true,
     })
-    expect(proceedingDecision.isReadOnly).toBeTruthy()
+    expect(proceedingDecision.isReadOnly).toBeFalsy()
   })
 
   it("returns a string representation of a proceeding decision", () => {

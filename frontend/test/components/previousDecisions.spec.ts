@@ -349,7 +349,7 @@ describe("PreviousDecisions", () => {
     expect(screen.getByText(/01.02.2022, documentType1/)).toBeInTheDocument()
   })
 
-  it("renders from search added previous decisions as non-editable list item", async () => {
+  it("renders from search added previous decisions as editable list item", async () => {
     renderComponent({
       modelValue: [
         generatePreviousDecision({
@@ -358,9 +358,7 @@ describe("PreviousDecisions", () => {
         }),
       ],
     })
-    expect(
-      screen.queryByLabelText("Eintrag bearbeiten"),
-    ).not.toBeInTheDocument()
+    expect(screen.getByLabelText("Eintrag bearbeiten")).toBeInTheDocument()
   })
 
   it("lists search results", async () => {
