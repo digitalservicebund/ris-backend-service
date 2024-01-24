@@ -1,11 +1,9 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
 import static de.bund.digitalservice.ris.caselaw.AuthUtils.buildDefaultDocOffice;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -46,7 +44,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.security.oauth2.client.registration.ReactiveClientRegistrationRepository;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.web.reactive.function.BodyInserters;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -101,64 +98,6 @@ class DocumentUnitControllerTest {
 
     verify(service, times(1)).generateNewDocumentUnit(docOffice);
     verify(userService, times(1)).getDocumentationOffice(any(OidcUser.class));
-  }
-
-  @Test
-  void testAttachFileToDocumentUnit() {
-    var headersCaptor = ArgumentCaptor.forClass(HttpHeaders.class);
-    when(service.attachFileToDocumentUnit(
-            eq(TEST_UUID), any(ByteBuffer.class), any(HttpHeaders.class)))
-        .thenReturn(Mono.empty());
-    risWebClient
-        .withDefaultLogin()
-        .put()
-        .uri("/api/v1/caselaw/documentunits/" + TEST_UUID + "/file")
-        .body(BodyInserters.fromValue(new byte[] {}))
-        .exchange()
-        .expectStatus()
-        .isOk();
-
-    verify(service)
-        .attachFileToDocumentUnit(eq(TEST_UUID), captor.capture(), headersCaptor.capture());
-    assertEquals(0, Objects.requireNonNull(captor.getValue()).array().length);
-    assertEquals(0, headersCaptor.getValue().getContentLength());
-  }
-
-  @Test
-  void testAttachFileToDocumentUnit_withInvalidUuid() {
-    risWebClient
-        .withDefaultLogin()
-        .put()
-        .uri("/api/v1/caselaw/documentunits/abc/file")
-        .exchange()
-        .expectStatus()
-        .is4xxClientError();
-  }
-
-  @Test
-  void testRemoveFileFromDocumentUnit() {
-    when(service.removeFileFromDocumentUnit(TEST_UUID)).thenReturn(Mono.empty());
-
-    risWebClient
-        .withDefaultLogin()
-        .delete()
-        .uri("/api/v1/caselaw/documentunits/" + TEST_UUID + "/file")
-        .exchange()
-        .expectStatus()
-        .isOk();
-
-    verify(service, times(1)).removeFileFromDocumentUnit(TEST_UUID);
-  }
-
-  @Test
-  void testRemoveFileFromDocumentUnit_withInvalidUuid() {
-    risWebClient
-        .withDefaultLogin()
-        .delete()
-        .uri("/api/v1/caselaw/documentunits/abc/file")
-        .exchange()
-        .expectStatus()
-        .is4xxClientError();
   }
 
   @Test

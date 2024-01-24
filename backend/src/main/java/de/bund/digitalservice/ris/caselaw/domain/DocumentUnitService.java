@@ -1,5 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.domain;
 
+import de.bund.digitalservice.ris.caselaw.domain.docx.Docx2Html;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
 import java.io.ByteArrayInputStream;
@@ -326,5 +327,11 @@ public class DocumentUnitService {
       return Mono.just("Ok");
     }
     return Mono.just("Validation error");
+  }
+
+  public void updateECLI(UUID uuid, Docx2Html docx2html) {
+    if (docx2html.ecliList().size() == 1) {
+      repository.updateECLI(uuid, docx2html.ecliList().get(0));
+    }
   }
 }

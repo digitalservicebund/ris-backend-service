@@ -71,17 +71,31 @@ public class DocumentUnitController {
         .onErrorReturn(ResponseEntity.internalServerError().body(DocumentUnit.builder().build()));
   }
 
+  /**
+   * Attach a content file (docx) to the documentation unit. This file is used to fill the
+   * categories of the documentation unit.
+   *
+   * <p>Do a conversion into html and parse the footer for ECLI information.
+   *
+   * @param uuid UUID of the documentation unit
+   * @param byteBuffer bytes of the content file
+   * @param httpHeaders http headers with the X-Filename information
+   * @return the into html converted content of the file with some additional metadata (ECLI)
+   */
   @PutMapping(value = "/{uuid}/file")
   @PreAuthorize("@userHasWriteAccessByDocumentUnitUuid.apply(#uuid)")
-  public Mono<ResponseEntity<DocumentUnit>> attachFileToDocumentUnit(
+  public Mono<ResponseEntity<Docx2Html>> attachFileToDocumentUnit(
       @PathVariable UUID uuid,
       @RequestBody ByteBuffer byteBuffer,
       @RequestHeader HttpHeaders httpHeaders) {
 
     return service
         .attachFileToDocumentUnit(uuid, byteBuffer, httpHeaders)
-        .map(documentUnit -> ResponseEntity.status(HttpStatus.CREATED).body(documentUnit))
-        .onErrorReturn(ResponseEntity.internalServerError().body(DocumentUnit.builder().build()));
+        .flatMap(
+            documentationUnit -> converterService.getConvertedObject(documentationUnit.s3path()))
+        .doOnNext(docx2html -> service.updateECLI(uuid, docx2html))
+        .map(docx2Html -> ResponseEntity.status(HttpStatus.OK).body(docx2Html))
+        .onErrorReturn(ResponseEntity.internalServerError().build());
   }
 
   @DeleteMapping(value = "/{uuid}/file")

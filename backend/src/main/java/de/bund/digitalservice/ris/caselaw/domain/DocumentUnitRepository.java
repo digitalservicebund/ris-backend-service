@@ -44,4 +44,6 @@ public interface DocumentUnitRepository {
       DocumentationUnitSearchInput searchInput);
 
   Map<RelatedDocumentationType, Long> getAllDocumentationUnitWhichLink(UUID documentUnitUuid);
+
+  void updateECLI(UUID uuid, String s);
 }

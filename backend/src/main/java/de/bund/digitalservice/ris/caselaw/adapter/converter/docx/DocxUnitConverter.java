@@ -5,9 +5,7 @@ import java.math.BigInteger;
 /**
  * Convert some unit formats which are used in the docx specification to screen pixel.
  *
- * <p>
- *
- * <h1>twip</h1>
+ * <h2>twip</h2>
  *
  * Find more information: <a href="https://en.wikipedia.org/wiki/Twip">twip</a> and <a
  * href="https://www.pixelto.net/px-to-twip-converter">twip converter</a>
@@ -19,7 +17,7 @@ import java.math.BigInteger;
  *   <li>1 px = 15 twip
  * </ul>
  *
- * <h1>EMU (English Metric Unit)</h1>
+ * <h2>EMU (English Metric Unit)</h2>
  *
  * <ul>
  *   <li>1 in = 914400 EMU 1 cm = 360000 EMU

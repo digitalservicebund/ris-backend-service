@@ -1,7 +1,6 @@
 <script lang="ts" setup>
 import dayjs from "dayjs"
-import { computed, onMounted, ref } from "vue"
-import fileService from "@/services/fileService"
+import { computed, ref } from "vue"
 import TextButton from "@/shared/components/input/TextButton.vue"
 import TextEditor from "@/shared/components/input/TextEditor.vue"
 import LoadingSpinner from "@/shared/components/LoadingSpinner.vue"
@@ -14,6 +13,7 @@ const props = defineProps<{
   fileName?: string
   fileType?: string
   uploadTimeStamp?: string
+  html?: string
 }>()
 
 defineEmits<{
@@ -59,19 +59,6 @@ const toggleModal = () => {
     }
   }
 }
-
-const isLoading = ref(true)
-const fileAsHtml = ref()
-
-onMounted(async () => {
-  const fileResponse = await fileService.getDocxFileAsHtml(props.uuid)
-  if (fileResponse.error) {
-    console.error(fileResponse.error)
-  } else {
-    fileAsHtml.value = fileResponse.data
-    isLoading.value = false
-  }
-})
 </script>
 
 <template>
@@ -93,9 +80,9 @@ onMounted(async () => {
         @click="toggleModal"
       />
     </div>
-    <div v-if="isLoading" class="text-center"><LoadingSpinner /></div>
+    <div v-if="!html" class="text-center"><LoadingSpinner /></div>
 
-    <TextEditor v-else class="grow bg-white" :value="fileAsHtml" />
+    <TextEditor v-else class="grow bg-white" :value="html" />
 
     <PopupModal
       v-if="showModal"

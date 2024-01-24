@@ -10,6 +10,15 @@ import java.util.stream.Collectors;
 
 public abstract class StyledElement implements DocumentUnitDocx {
   private final Map<String, List<String>> styles = new HashMap<>();
+  private String styleReference;
+
+  public String getStyleReference() {
+    return styleReference;
+  }
+
+  public void setStyleReference(String styleReference) {
+    this.styleReference = styleReference;
+  }
 
   public void addStyle(String property, String value) {
     styles.computeIfAbsent(property, k -> new ArrayList<>());

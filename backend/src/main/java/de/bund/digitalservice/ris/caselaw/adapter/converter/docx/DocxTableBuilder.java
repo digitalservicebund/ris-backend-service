@@ -66,7 +66,7 @@ public class DocxTableBuilder extends DocxBuilder {
       return;
     }
 
-    Style style = styles.get(table.getTblPr().getTblStyle().getVal());
+    Style style = converter.getStyles().get(table.getTblPr().getTblStyle().getVal());
     if (style == null) {
       return;
     }
@@ -368,7 +368,7 @@ public class DocxTableBuilder extends DocxBuilder {
 
     if (table.getTblPr().getTblStyle() != null) {
       var tblStyleKey = table.getTblPr().getTblStyle().getVal();
-      Style style = styles.get(tblStyleKey);
+      Style style = converter.getStyles().get(tblStyleKey);
       addTableProperties(tableElement, style.getTblPr());
     }
 
@@ -434,12 +434,13 @@ public class DocxTableBuilder extends DocxBuilder {
 
   private String parseCTShd(CTShd ctShd) {
     switch (ctShd.getVal()) {
-      case CLEAR:
+      case CLEAR -> {
         return "#" + ctShd.getFill();
-      case SOLID:
+      }
+      case SOLID -> {
         return "#" + ctShd.getColor();
-      default:
-        LOGGER.error("unsupported shading value: {}", ctShd.getVal());
+      }
+      default -> LOGGER.error("unsupported shading value: {}", ctShd.getVal());
     }
     return "#ffffff";
   }
@@ -507,7 +508,7 @@ public class DocxTableBuilder extends DocxBuilder {
 
     if (table.getTblPr().getTblStyle() != null) {
       String tableStyleKey = table.getTblPr().getTblStyle().getVal();
-      Style style = styles.get(tableStyleKey);
+      Style style = converter.getStyles().get(tableStyleKey);
       if (style.getTblPr() != null) {
         addBordersToCells(cells, style.getTblPr().getTblBorders());
       }
@@ -554,13 +555,7 @@ public class DocxTableBuilder extends DocxBuilder {
         .forEach(
             element -> {
               if (element instanceof P p) {
-                DocumentUnitDocxBuilder paragraphBuilder = DocumentUnitDocxBuilder.newInstance();
-                paragraphBuilder
-                    .useImages(images)
-                    .useStyles(styles)
-                    .useListNumberingDefinitions(listNumberingDefinitions);
-                paragraphBuilder.setParagraph(p);
-                paragraphElements.add(paragraphBuilder.build());
+                paragraphElements.add(ParagraphConverter.convert(p, converter));
               } else {
                 LOGGER.error("unknown tr element: {}", element);
               }
@@ -575,7 +570,7 @@ public class DocxTableBuilder extends DocxBuilder {
   private void addTcStyle(TableCellElement cellElement, Tc tc) {
     if (table.getTblPr().getTblStyle() != null) {
       var tblStyleKey = table.getTblPr().getTblStyle().getVal();
-      Style style = styles.get(tblStyleKey);
+      Style style = converter.getStyles().get(tblStyleKey);
       addTcStyle(cellElement, style.getTcPr());
     }
 

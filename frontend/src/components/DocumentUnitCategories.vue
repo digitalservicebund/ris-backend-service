@@ -11,6 +11,7 @@ import PreviousDecisions from "@/components/PreviousDecisions.vue"
 import { useScrollToHash } from "@/composables/useScrollToHash"
 import { useToggleStateInRouteQuery } from "@/composables/useToggleStateInRouteQuery"
 import DocumentUnit, { Texts, CoreData } from "@/domain/documentUnit"
+import { Docx2HTML } from "@/domain/docx2html"
 import EnsuingDecision from "@/domain/ensuingDecision"
 import PreviousDecision from "@/domain/previousDecision"
 import documentUnitService from "@/services/documentUnitService"
@@ -28,7 +29,7 @@ const updatedDocumentUnit = ref<DocumentUnit>(props.documentUnit)
 const validationErrors = ref<ValidationError[]>([])
 const router = useRouter()
 const route = useRoute()
-const fileAsHTML = ref("")
+const fileAsHTML = ref<Docx2HTML>()
 const showDocPanel = useToggleStateInRouteQuery(
   "showDocPanel",
   route,
@@ -86,7 +87,7 @@ async function handleUpdateDocumentUnit(): Promise<ServiceResponse<void>> {
 watch(
   showDocPanel,
   async () => {
-    if (showDocPanel.value && fileAsHTML.value.length == 0) {
+    if (showDocPanel.value && fileAsHTML.value?.html.length == 0) {
       await getOriginalDocumentUnit()
     }
   },
@@ -149,7 +150,7 @@ const headerOffset = 145
 useScrollToHash(routeHash, headerOffset)
 
 async function getOriginalDocumentUnit() {
-  if (fileAsHTML.value.length > 0) return
+  if (fileAsHTML.value?.html && fileAsHTML.value.html.length > 0) return
   if (props.documentUnit.s3path) {
     const htmlResponse = await fileService.getDocxFileAsHtml(
       props.documentUnit.uuid,
@@ -215,7 +216,7 @@ onMounted(async () => {
               v-model:open="showDocPanel"
               class="bg-white"
               :class="classes"
-              :file="fileAsHTML"
+              :file="fileAsHTML?.html"
               :has-file="documentUnit.hasFile"
             />
           </SideToggle>

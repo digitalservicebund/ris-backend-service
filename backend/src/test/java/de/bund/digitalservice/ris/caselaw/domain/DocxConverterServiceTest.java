@@ -153,7 +153,7 @@ class DocxConverterServiceTest {
                         + "<border-number><number>1</number><content><p>border number 1</p></content></border-number>"
                         + "<border-number><number>2</number><content><p>border number 2</p></content></border-number>"
                         + "<table style=\"border-collapse: collapse;\"><tr><td style=\"min-width: 5px; padding: 5px;\"><p>table content</p></td></tr></table>",
-                    docx2Html.content());
+                    docx2Html.html());
               })
           .verifyComplete();
     }
@@ -272,7 +272,7 @@ class DocxConverterServiceTest {
                     "<p>test</p><border-number><number>1</number></border-number>"
                         + "<border-number><number>2</number><content><p>border number 2</p>"
                         + "</content></border-number>",
-                    docx2Html.content());
+                    docx2Html.html());
               })
           .verifyComplete();
     }
@@ -383,7 +383,7 @@ class DocxConverterServiceTest {
                           + "<p>decimal list entry 2</p>"
                           + "</li>"
                           + "</ol>",
-                      docx2Html.content());
+                      docx2Html.html());
                 })
             .verifyComplete();
       }
@@ -474,7 +474,7 @@ class DocxConverterServiceTest {
                           + "<li style=\"display:table-row\">"
                           + "<p style=\"display:table-cell;text-align:right;\"><span style=\"\"></span><span> </span></p><p>list entry 1</p>"
                           + "</li></ol>",
-                      docx2Html.content());
+                      docx2Html.html());
                 })
             .verifyComplete();
       }
@@ -527,7 +527,7 @@ class DocxConverterServiceTest {
                           + "<p>bullet list entry 3</p>"
                           + "</li>"
                           + "</ul>",
-                      docx2Html.content());
+                      docx2Html.html());
                 })
             .verifyComplete();
       }
@@ -563,7 +563,7 @@ class DocxConverterServiceTest {
                           + "<p style=\"display:table-cell;text-align:right;\"><span style=\"\">&#9679;</span><span> </span></p>"
                           + "<p>bullet list entry 1</p>"
                           + "</li></ul>",
-                      docx2Html.content());
+                      docx2Html.html());
                 })
             .verifyComplete();
       }
@@ -595,7 +595,7 @@ class DocxConverterServiceTest {
                   assertNotNull(docx2Html);
                   assertEquals(
                       "<ul style=\"list-style-type:disc;\"><li style=\"list-style-type:decimal\"><p>bullet list entry 1</p></li></ul>",
-                      docx2Html.content());
+                      docx2Html.html());
                 })
             .verifyComplete();
       }
@@ -631,7 +631,7 @@ class DocxConverterServiceTest {
                           + "<p style=\"display:table-cell;text-align:left;\"><span style=\"\">&#9679;</span><span> </span></p>"
                           + "<p>bullet list entry 1</p>"
                           + "</li></ul>",
-                      docx2Html.content());
+                      docx2Html.html());
                 })
             .verifyComplete();
       }
@@ -667,7 +667,7 @@ class DocxConverterServiceTest {
                           + "<p style=\"display:table-cell;text-align:center;\"><span style=\"\">&#9679;</span><span> </span></p>"
                           + "<p>bullet list entry 1</p>"
                           + "</li></ul>",
-                      docx2Html.content());
+                      docx2Html.html());
                 })
             .verifyComplete();
       }
@@ -703,7 +703,7 @@ class DocxConverterServiceTest {
                           + "<p style=\"display:table-cell;text-align:right;\"><span style=\"\">&#9679;</span><span></span></p>"
                           + "<p>bullet list entry 1</p>"
                           + "</li></ul>",
-                      docx2Html.content());
+                      docx2Html.html());
                 })
             .verifyComplete();
       }
@@ -741,7 +741,7 @@ class DocxConverterServiceTest {
                           + "<p style=\"display:table-cell;text-align:right;\"><span style=\"\">1.</span><span> </span></p>"
                           + "<p>bullet list entry 1</p>"
                           + "</li></ol>",
-                      docx2Html.content());
+                      docx2Html.html());
                 })
             .verifyComplete();
       }
@@ -778,7 +778,7 @@ class DocxConverterServiceTest {
                           + "<span style=\"\">&#9679;</span><span>&emsp;</span></p>"
                           + "<p>bullet list entry 1</p>"
                           + "</li></ul>",
-                      docx2Html.content());
+                      docx2Html.html());
                 })
             .verifyComplete();
       }
@@ -849,7 +849,7 @@ class DocxConverterServiceTest {
                           + "</li>"
                           + "</ol>"
                           + "</ol>",
-                      docx2Html.content());
+                      docx2Html.html());
                 })
             .verifyComplete();
       }
@@ -948,7 +948,7 @@ class DocxConverterServiceTest {
                           + "<p>bullet list entry 3</p>"
                           + "</li>"
                           + "</ul>",
-                      docx2Html.content());
+                      docx2Html.html());
                 })
             .verifyComplete();
       }
@@ -1057,7 +1057,7 @@ class DocxConverterServiceTest {
                           + "<p>lower roman list entry 3</p>"
                           + "</li>"
                           + "</ol>",
-                      docx2Html.content());
+                      docx2Html.html());
                 })
             .verifyComplete();
       }
@@ -1165,7 +1165,7 @@ class DocxConverterServiceTest {
                           + "<p>upper roman list entry 3</p>"
                           + "</li>"
                           + "</ol>",
-                      docx2Html.content());
+                      docx2Html.html());
                 })
             .verifyComplete();
       }
@@ -1270,7 +1270,7 @@ class DocxConverterServiceTest {
                           + "<p>lower letter list entry 3</p>"
                           + "</li>"
                           + "</ol>",
-                      docx2Html.content());
+                      docx2Html.html());
                 })
             .verifyComplete();
       }
@@ -1378,7 +1378,7 @@ class DocxConverterServiceTest {
                           + "<p>upper letter list entry 3</p>"
                           + "</li>"
                           + "</ol>",
-                      docx2Html.content());
+                      docx2Html.html());
                 })
             .verifyComplete();
       }
@@ -1483,7 +1483,7 @@ class DocxConverterServiceTest {
                           + "<p>decimal list entry 3</p>"
                           + "</li>"
                           + "</ol>",
-                      docx2Html.content());
+                      docx2Html.html());
                 })
             .verifyComplete();
       }
@@ -1599,7 +1599,7 @@ class DocxConverterServiceTest {
                           + "<p style=\"display:table-cell;text-align:right;\"><span style=\"font-family:Symbol;font-size:9pt;\">3.</span><span> </span></p>"
                           + "<p>list entry 3</p>"
                           + "</li></ol>",
-                      docx2Html.content());
+                      docx2Html.html());
                 })
             .verifyComplete();
       }
@@ -1647,7 +1647,7 @@ class DocxConverterServiceTest {
                           + "<span> </span></p>"
                           + "<p>1. entry with own numbering</p>"
                           + "</li></ol>",
-                      docx2Html.content());
+                      docx2Html.html());
                 })
             .verifyComplete();
       }

@@ -196,7 +196,7 @@ dependencies {
     implementation("com.github.spullara.mustache.java:compiler:0.9.10")
     // CVE-2022-40153
     implementation("com.fasterxml.woodstox:woodstox-core:6.5.0")
-    implementation("org.docx4j:docx4j-JAXB-MOXy:11.4.9")
+    implementation("org.docx4j:docx4j-JAXB-ReferenceImpl:11.4.9")
     implementation("jakarta.mail:jakarta.mail-api:2.0.1")
     implementation("com.sun.activation:jakarta.activation:2.0.1")
     implementation("jakarta.xml.bind:jakarta.xml.bind-api") {

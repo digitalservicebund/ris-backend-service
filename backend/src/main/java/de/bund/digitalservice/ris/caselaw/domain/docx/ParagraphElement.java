@@ -44,4 +44,17 @@ public class ParagraphElement extends TextElement {
 
     return sb.toString();
   }
+
+  public String getText() {
+    StringBuilder text = new StringBuilder();
+
+    runElements.stream()
+        .filter(RunTextElement.class::isInstance)
+        .forEach(
+            runElement -> {
+              text.append(((RunTextElement) runElement).getText());
+            });
+
+    return text.toString();
+  }
 }

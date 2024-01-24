@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref } from "vue"
+import { onMounted, ref } from "vue"
 import DocumentUnitWrapper from "@/components/DocumentUnitWrapper.vue"
 import FileViewer from "@/components/FileViewer.vue"
 import DocumentUnit from "@/domain/documentUnit"
@@ -12,7 +12,9 @@ const props = defineProps<{ documentUnit: DocumentUnit }>()
 const emit = defineEmits<{
   updateDocumentUnit: [updatedDocumentUnit: DocumentUnit]
 }>()
+
 const error = ref<ResponseError>()
+const html = ref<string>()
 const isUploading = ref(false)
 
 async function handleDeleteFile() {
@@ -24,6 +26,7 @@ async function handleDeleteFile() {
       console.error(updateResponse.error)
     } else {
       emit("updateDocumentUnit", updateResponse.data)
+      html.value = undefined
     }
   }
 }
@@ -33,15 +36,28 @@ async function upload(file: File) {
 
   try {
     const response = await fileService.upload(props.documentUnit.uuid, file)
-    if (response.status === 201 && response.data) {
-      emit("updateDocumentUnit", response.data)
+    if (response.status === 200 && response.data) {
+      html.value = response.data.html
     } else {
       error.value = response.error
     }
   } finally {
     isUploading.value = false
+    emit("updateDocumentUnit", props.documentUnit)
   }
 }
+
+onMounted(async () => {
+  const fileResponse = await fileService.getDocxFileAsHtml(
+    props.documentUnit.uuid,
+  )
+
+  if (fileResponse.error) {
+    console.error(fileResponse.error)
+  } else {
+    html.value = fileResponse.data.html
+  }
+})
 </script>
 
 <template>
@@ -51,9 +67,10 @@ async function upload(file: File) {
         <h1 class="ds-heading-02-reg mb-[1rem]">Dokumente</h1>
 
         <FileViewer
-          v-if="documentUnit.hasFile"
+          v-if="html"
           :file-name="documentUnit.filename"
           :file-type="documentUnit.filetype"
+          :html="html"
           :upload-time-stamp="documentUnit.fileuploadtimestamp"
           :uuid="documentUnit.uuid"
           @delete-file="handleDeleteFile"

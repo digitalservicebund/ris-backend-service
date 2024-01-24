@@ -3,13 +3,18 @@ package de.bund.digitalservice.ris.caselaw.adapter;
 import de.bund.digitalservice.ris.caselaw.adapter.converter.docx.DocumentUnitDocxListUtils;
 import de.bund.digitalservice.ris.caselaw.adapter.converter.docx.DocxConverter;
 import de.bund.digitalservice.ris.caselaw.adapter.converter.docx.DocxConverterException;
+import de.bund.digitalservice.ris.caselaw.adapter.converter.docx.FooterConverter;
 import de.bund.digitalservice.ris.caselaw.domain.ConverterService;
 import de.bund.digitalservice.ris.caselaw.domain.docx.DocumentUnitDocx;
 import de.bund.digitalservice.ris.caselaw.domain.docx.Docx2Html;
 import de.bund.digitalservice.ris.caselaw.domain.docx.DocxImagePart;
+import de.bund.digitalservice.ris.caselaw.domain.docx.ECLIElement;
+import de.bund.digitalservice.ris.caselaw.domain.docx.FooterElement;
+import de.bund.digitalservice.ris.caselaw.domain.docx.ParagraphElement;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -17,6 +22,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -27,6 +34,7 @@ import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.docx4j.model.listnumbering.ListNumberingDefinition;
+import org.docx4j.model.structure.HeaderFooterPolicy;
 import org.docx4j.openpackaging.exceptions.Docx4JException;
 import org.docx4j.openpackaging.packages.WordprocessingMLPackage;
 import org.docx4j.openpackaging.parts.WordprocessingML.BinaryPartAbstractImage;
@@ -109,6 +117,13 @@ public class DocxConverterService implements ConverterService {
         .map(response -> response.contents().stream().map(S3Object::key).toList());
   }
 
+  /**
+   * Convert docx file to a object with the html content of the word file and some metadata
+   * extracted of the docx file.
+   *
+   * @param fileName name of the file in the bucket
+   * @return the generated object with html content and metadata
+   */
   public Mono<Docx2Html> getConvertedObject(String fileName) {
     GetObjectRequest request = GetObjectRequest.builder().bucket(bucketName).key(fileName).build();
 
@@ -121,6 +136,14 @@ public class DocxConverterService implements ConverterService {
             documentUnitDocxList -> {
               List<DocumentUnitDocx> packedList =
                   DocumentUnitDocxListUtils.packList(documentUnitDocxList);
+
+              List<String> ecliList =
+                  packedList.stream()
+                      .filter(ECLIElement.class::isInstance)
+                      .map(ECLIElement.class::cast)
+                      .map(ECLIElement::getText)
+                      .toList();
+
               String content = null;
               if (!packedList.isEmpty()) {
                 content =
@@ -128,11 +151,19 @@ public class DocxConverterService implements ConverterService {
                         .map(DocumentUnitDocx::toHtmlString)
                         .collect(Collectors.joining());
               }
-              return new Docx2Html(content);
+
+              return new Docx2Html(content, ecliList);
             })
         .doOnError(ex -> log.error("Couldn't convert docx", ex));
   }
 
+  /**
+   * Convert the content file (docx) into a list of DocumentUnitDocx elements. Read the styles,
+   * images, footers and numbering definitions from the docx file.
+   *
+   * @param inputStream input stream of the content file
+   * @return list of DocumentUnitDocx elements
+   */
   public List<DocumentUnitDocx> parseAsDocumentUnitDocxList(InputStream inputStream) {
     if (inputStream == null) {
       return Collections.emptyList();
@@ -147,20 +178,134 @@ public class DocxConverterService implements ConverterService {
 
     converter.setStyles(readStyles(mlPackage));
     converter.setImages(readImages(mlPackage));
-    converter.setNumbering(readNumbering(mlPackage));
+    converter.setFooters(readFooters(mlPackage, converter));
+    converter.setListNumberingDefinitions(readListNumberingDefinitions(mlPackage));
 
     List<DocumentUnitDocx> documentUnitDocxList =
         mlPackage.getMainDocumentPart().getContent().stream()
             .map(converter::convert)
             .filter(Objects::nonNull)
-            .toList();
+            .collect(Collectors.toList());
+
+    List<FooterElement> footerElements = parseECLIFromFooter();
+    documentUnitDocxList.addAll(
+        0, footerElements.stream().filter(ECLIElement.class::isInstance).toList());
+    documentUnitDocxList.addAll(
+        footerElements.stream()
+            .filter(footerElement -> !(footerElement instanceof ECLIElement))
+            .toList());
 
     DocumentUnitDocxListUtils.postProcessBorderNumbers(documentUnitDocxList);
 
     return documentUnitDocxList;
   }
 
-  private Map<String, ListNumberingDefinition> readNumbering(WordprocessingMLPackage mlPackage) {
+  private List<FooterElement> parseECLIFromFooter() {
+    List<FooterElement> footerElements = new ArrayList<>();
+
+    converter
+        .getFooters()
+        .forEach(
+            footer -> {
+              if (footer == null || footer.getText() == null) {
+                return;
+              }
+
+              if (isECLI(footer.getText())) {
+                footerElements.add(new ECLIElement(footer));
+              } else {
+                footerElements.add(new FooterElement(footer));
+              }
+            });
+
+    return footerElements;
+  }
+
+  /**
+   * Check if the ECLI has the right format
+   *
+   * @see <a
+   *     href="https://e-justice.europa.eu/175/EN/european_case_law_identifier_ecli?init=true">European
+   *     Case Law Identifier</a>
+   * @param ecli ECLI to check
+   * @return true if the input value is equals to the format specification, else false
+   */
+  private boolean isECLI(String ecli) {
+    if (!ecli.startsWith("ECLI")) {
+      return false;
+    }
+
+    String[] parts = ecli.split(":");
+
+    if (parts.length != 5) {
+      return false;
+    }
+
+    if (!parts[0].equals("ECLI")) {
+      return false;
+    }
+
+    if (parts[2].length() > 7) {
+      return false;
+    }
+
+    if (parts[3].length() != 4) {
+      return false;
+    }
+
+    try {
+      Integer.parseInt(parts[3]);
+    } catch (NumberFormatException ex) {
+      return false;
+    }
+
+    Pattern pattern = Pattern.compile("[\\w.]{1,25}");
+    Matcher matcher = pattern.matcher(parts[4]);
+
+    return matcher.matches();
+  }
+
+  private List<ParagraphElement> readFooters(
+      WordprocessingMLPackage mlPackage, DocxConverter converter) {
+    if (mlPackage == null
+        || mlPackage.getDocumentModel() == null
+        || mlPackage.getDocumentModel().getSections() == null) {
+      return Collections.emptyList();
+    }
+
+    List<ParagraphElement> footers = new ArrayList<>();
+
+    mlPackage
+        .getDocumentModel()
+        .getSections()
+        .forEach(
+            section -> {
+              HeaderFooterPolicy headerFooterPolicy = section.getHeaderFooterPolicy();
+
+              if (headerFooterPolicy.getDefaultFooter() != null) {
+                footers.add(
+                    FooterConverter.convert(
+                        headerFooterPolicy.getDefaultFooter().getContent(), converter));
+              }
+
+              if (headerFooterPolicy.getFirstFooter() != null) {
+                footers.add(
+                    FooterConverter.convert(
+                        headerFooterPolicy.getFirstFooter().getContent(), converter));
+              }
+
+              if (headerFooterPolicy.getEvenFooter() != null) {
+                footers.add(
+                    FooterConverter.convert(
+                        headerFooterPolicy.getEvenFooter().getContent(), converter));
+              }
+            });
+
+    return footers;
+  }
+
+  private Map<String, ListNumberingDefinition> readListNumberingDefinitions(
+      WordprocessingMLPackage mlPackage) {
     if (mlPackage == null
         || mlPackage.getMainDocumentPart() == null
         || mlPackage.getMainDocumentPart().getNumberingDefinitionsPart() == null) {

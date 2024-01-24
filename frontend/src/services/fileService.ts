@@ -1,14 +1,14 @@
 import httpClient, { ServiceResponse } from "./httpClient"
-import DocumentUnit from "@/domain/documentUnit"
+import { Docx2HTML } from "@/domain/docx2html"
 import errorMessages from "@/shared/i18n/errors.json"
 
 interface FileService {
   upload(
     documentUnitUuid: string,
     file: File,
-  ): Promise<ServiceResponse<DocumentUnit>>
+  ): Promise<ServiceResponse<Docx2HTML>>
   delete(documentUnitUuid: string): Promise<ServiceResponse<unknown>>
-  getDocxFileAsHtml(uuid: string): Promise<ServiceResponse<string>>
+  getDocxFileAsHtml(uuid: string): Promise<ServiceResponse<Docx2HTML>>
 }
 
 const service: FileService = {
@@ -24,7 +24,7 @@ const service: FileService = {
       }
     }
 
-    const response = await httpClient.put<File, DocumentUnit>(
+    const response = await httpClient.put<File, Docx2HTML>(
       `caselaw/documentunits/${documentUnitUuid}/file`,
       {
         headers: {
@@ -70,7 +70,7 @@ const service: FileService = {
   },
 
   async getDocxFileAsHtml(uuid: string) {
-    const response = await httpClient.get<string>(
+    const response = await httpClient.get<Docx2HTML>(
       `caselaw/documentunits/${uuid}/docx`,
     )
     response.error =

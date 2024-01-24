@@ -203,7 +203,9 @@ class DocxTableBuilderTest {
     style.setTblPr(externalTblPr);
     styles.put("external-style", style);
 
-    var result = DocxTableBuilder.newInstance().setTable(table).useStyles(styles).build();
+    var converter = new DocxConverter();
+    converter.setStyles(styles);
+    var result = DocxTableBuilder.newInstance().setTable(table).setConverter(converter).build();
 
     assertThat(result).isInstanceOf(TableElement.class);
     TableElement tableElement = (TableElement) result;
@@ -238,7 +240,9 @@ class DocxTableBuilderTest {
     internalTblBorder.setLeft(internalLeftBorder);
     tblPr.setTblBorders(internalTblBorder);
 
-    var result = DocxTableBuilder.newInstance().setTable(table).useStyles(styles).build();
+    var converter = new DocxConverter();
+    converter.setStyles(styles);
+    var result = DocxTableBuilder.newInstance().setTable(table).setConverter(converter).build();
 
     assertThat(result).isInstanceOf(TableElement.class);
     TableElement tableElement = (TableElement) result;
@@ -276,7 +280,9 @@ class DocxTableBuilderTest {
     style.setRPr(styleRPr);
     styles.put("external-style", style);
 
-    var result = DocxTableBuilder.newInstance().setTable(table).useStyles(styles).build();
+    var converter = new DocxConverter();
+    converter.setStyles(styles);
+    var result = DocxTableBuilder.newInstance().setTable(table).setConverter(converter).build();
 
     assertThat(result).isInstanceOf(TableElement.class);
     TableElement tableElement = (TableElement) result;
@@ -301,7 +307,9 @@ class DocxTableBuilderTest {
     putTableStylePrToStyle(style);
     styles.put("external-style", style);
 
-    var result = DocxTableBuilder.newInstance().setTable(table).useStyles(styles).build();
+    var converter = new DocxConverter();
+    converter.setStyles(styles);
+    var result = DocxTableBuilder.newInstance().setTable(table).setConverter(converter).build();
 
     assertThat(result).isInstanceOf(TableElement.class);
     TableElement tableElement = (TableElement) result;
@@ -347,7 +355,9 @@ class DocxTableBuilderTest {
       tcJAXBElement.getValue().setTcPr(tcPr);
       styles.put("external-style", style);
 
-      return DocxTableBuilder.newInstance().setTable(table).useStyles(styles).build();
+      var converter = new DocxConverter();
+      converter.setStyles(styles);
+      return DocxTableBuilder.newInstance().setTable(table).setConverter(converter).build();
     }
 
     @Test

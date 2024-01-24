@@ -679,8 +679,13 @@ class DocumentUnitDocxBuilderTest {
             .setParagraphStyle(pPr)
             .build();
 
+    var converter = new DocxConverter();
+    converter.setStyles(styles);
     var result =
-        DocumentUnitDocxBuilder.newInstance().setParagraph(paragraph).useStyles(styles).build();
+        DocumentUnitDocxBuilder.newInstance()
+            .setParagraph(paragraph)
+            .setConverter(converter)
+            .build();
 
     assertTrue(result instanceof ParagraphElement);
     ParagraphElement paragraphElement = (ParagraphElement) result;
@@ -735,7 +740,9 @@ class DocumentUnitDocxBuilderTest {
     DocxImagePart image = new DocxImagePart("content-type", new byte[] {1, 2});
     images.put("image-ref", image);
 
-    var result = builder.setParagraph(paragraph).useImages(images).build();
+    var converter = new DocxConverter();
+    converter.setImages(images);
+    var result = builder.setParagraph(paragraph).setConverter(converter).build();
 
     assertTrue(result instanceof ParagraphElement);
     ParagraphElement paragraphElement = (ParagraphElement) result;
@@ -765,7 +772,9 @@ class DocumentUnitDocxBuilderTest {
     DocxImagePart image = new DocxImagePart("content-type", new byte[] {1, 2});
     images.put("image-ref", image);
 
-    var result = builder.setParagraph(paragraph).useImages(images).build();
+    var converter = new DocxConverter();
+    converter.setImages(images);
+    var result = builder.setParagraph(paragraph).setConverter(converter).build();
 
     assertTrue(result instanceof ParagraphElement);
     ParagraphElement paragraphElement = (ParagraphElement) result;
@@ -797,7 +806,9 @@ class DocumentUnitDocxBuilderTest {
     DocxImagePart image = new DocxImagePart("content-type", new byte[] {1, 2});
     images.put("image-ref", image);
 
-    var result = builder.setParagraph(paragraph).useImages(images).build();
+    var converter = new DocxConverter();
+    converter.setImages(images);
+    var result = builder.setParagraph(paragraph).setConverter(converter).build();
 
     assertTrue(result instanceof ParagraphElement);
     ParagraphElement paragraphElement = (ParagraphElement) result;
@@ -829,7 +840,9 @@ class DocumentUnitDocxBuilderTest {
     DocxImagePart image = new DocxImagePart("content-type", new byte[] {1, 2});
     images.put("image-ref", image);
 
-    var result = builder.setParagraph(paragraph).useImages(images).build();
+    var converter = new DocxConverter();
+    converter.setImages(images);
+    var result = builder.setParagraph(paragraph).setConverter(converter).build();
 
     assertTrue(result instanceof ParagraphElement);
     ParagraphElement paragraphElement = (ParagraphElement) result;
@@ -861,7 +874,9 @@ class DocumentUnitDocxBuilderTest {
     DocxImagePart image = new DocxImagePart("content-type", new byte[] {1, 2});
     images.put("image-ref", image);
 
-    var result = builder.setParagraph(paragraph).useImages(images).build();
+    var converter = new DocxConverter();
+    converter.setImages(images);
+    var result = builder.setParagraph(paragraph).setConverter(converter).build();
 
     assertTrue(result instanceof ParagraphElement);
     ParagraphElement paragraphElement = (ParagraphElement) result;
@@ -891,7 +906,9 @@ class DocumentUnitDocxBuilderTest {
     DocxImagePart image = new DocxImagePart("content-type", new byte[] {1, 2});
     images.put("image-ref", image);
 
-    var result = builder.setParagraph(paragraph).useImages(images).build();
+    var converter = new DocxConverter();
+    converter.setImages(images);
+    var result = builder.setParagraph(paragraph).setConverter(converter).build();
 
     assertTrue(result instanceof ParagraphElement);
     ParagraphElement paragraphElement = (ParagraphElement) result;
@@ -923,7 +940,9 @@ class DocumentUnitDocxBuilderTest {
     DocxImagePart image = new DocxImagePart("content-type", new byte[] {1, 2});
     images.put("image-ref", image);
 
-    var result = builder.setParagraph(paragraph).useImages(images).build();
+    var converter = new DocxConverter();
+    converter.setImages(images);
+    var result = builder.setParagraph(paragraph).setConverter(converter).build();
 
     assertTrue(result instanceof ParagraphElement);
     ParagraphElement paragraphElement = (ParagraphElement) result;
@@ -955,7 +974,9 @@ class DocumentUnitDocxBuilderTest {
     DocxImagePart image = new DocxImagePart("content-type", new byte[] {1, 2});
     images.put("image-ref", image);
 
-    var result = builder.setParagraph(paragraph).useImages(images).build();
+    var converter = new DocxConverter();
+    converter.setImages(images);
+    var result = builder.setParagraph(paragraph).setConverter(converter).build();
 
     assertTrue(result instanceof ParagraphElement);
     ParagraphElement paragraphElement = (ParagraphElement) result;
@@ -1036,11 +1057,9 @@ class DocumentUnitDocxBuilderTest {
     when(abstractListDefinition.getListLevels()).thenReturn(listLevels);
     listNumberingDefinitions.put("0", listNumberingDefinition);
 
-    var result =
-        builder
-            .setParagraph(paragraph)
-            .useListNumberingDefinitions(listNumberingDefinitions)
-            .build();
+    var converter = new DocxConverter();
+    converter.setListNumberingDefinitions(listNumberingDefinitions);
+    var result = builder.setParagraph(paragraph).setConverter(converter).build();
 
     assertTrue(result instanceof NumberingListEntry);
     var numberingListEntry = (NumberingListEntry) result;
@@ -1065,10 +1084,12 @@ class DocumentUnitDocxBuilderTest {
             .addRunElement(TestDocxBuilder.buildTextRunElement("test 3"))
             .build();
 
+    var converter = new DocxConverter();
+    converter.setImages(TestDocxBuilder.getImageMap());
     var result =
         DocumentUnitDocxBuilder.newInstance()
             .setParagraph(paragraph)
-            .useImages(TestDocxBuilder.getImageMap())
+            .setConverter(converter)
             .build();
 
     assertThat(result).isInstanceOf(ParagraphElement.class);
@@ -1091,10 +1112,12 @@ class DocumentUnitDocxBuilderTest {
             .addRunElement(TestDocxBuilder.buildVmlImage())
             .build();
 
+    var converter = new DocxConverter();
+    converter.setImages(TestDocxBuilder.getImageMap());
     var result =
         DocumentUnitDocxBuilder.newInstance()
             .setParagraph(paragraph)
-            .useImages(TestDocxBuilder.getImageMap())
+            .setConverter(converter)
             .build();
 
     assertThat(result).isInstanceOf(ParagraphElement.class);
@@ -1154,11 +1177,9 @@ class DocumentUnitDocxBuilderTest {
     when(abstractListDefinition.getListLevels()).thenReturn(listLevels);
     listNumberingDefinitions.put("0", listNumberingDefinition);
 
-    var result =
-        builder
-            .setParagraph(paragraph)
-            .useListNumberingDefinitions(listNumberingDefinitions)
-            .build();
+    var converter = new DocxConverter();
+    converter.setListNumberingDefinitions(listNumberingDefinitions);
+    var result = builder.setParagraph(paragraph).setConverter(converter).build();
 
     assertTrue(result instanceof NumberingListEntry);
     var numberingListEntry = (NumberingListEntry) result;

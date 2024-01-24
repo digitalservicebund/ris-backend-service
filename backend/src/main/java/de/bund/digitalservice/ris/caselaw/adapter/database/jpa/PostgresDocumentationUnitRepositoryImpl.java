@@ -607,4 +607,17 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
         .stream()
         .collect(Collectors.groupingBy(RelatedDocumentationDTO::getType, Collectors.counting()));
   }
+
+  @Override
+  @Transactional(transactionManager = "jpaTransactionManager")
+  public void updateECLI(UUID uuid, String ecli) {
+    Optional<DocumentationUnitDTO> documentationUnitDTOOptional = repository.findById(uuid);
+    if (documentationUnitDTOOptional.isPresent()) {
+      DocumentationUnitDTO dto = documentationUnitDTOOptional.get();
+      if (dto.getEcli() == null) {
+        dto.setEcli(ecli);
+        repository.save(dto);
+      }
+    }
+  }
 }
