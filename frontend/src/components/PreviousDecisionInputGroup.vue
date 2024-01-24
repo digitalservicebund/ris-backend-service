@@ -96,11 +96,13 @@ async function addPreviousDecision() {
 }
 
 async function addPreviousDecisionFromSearch(decision: RelatedDocumentation) {
-  const previousDecision = new PreviousDecision({
+  const newPreviousDecision = new PreviousDecision({
     ...decision,
     referenceFound: true,
+    deviatingFileNumber: previousDecision.value.deviatingFileNumber,
   })
-  emit("update:modelValue", previousDecision)
+
+  emit("update:modelValue", newPreviousDecision)
   emit("addEntry")
   scrollToTop()
 }
@@ -134,115 +136,137 @@ onMounted(() => {
 
 <template>
   <div class="flex flex-col gap-24">
-    <InputField
-      id="dateKnown"
-      v-slot="{ id }"
-      label="Datum unbekannt"
-      label-class="ds-label-01-reg"
-      :label-position="LabelPosition.RIGHT"
-    >
-      <CheckboxInput
-        :id="id"
-        v-model="dateUnknown"
-        aria-label="Datum Unbekannt Vorgehende Entscheidung"
-        size="small"
-      />
-    </InputField>
-    <div class="flex justify-between gap-24">
+    <div v-if="!modelValue?.hasForeignSource" class="flex flex-col gap-24">
       <InputField
-        id="court"
-        v-slot="slotProps"
-        label="Gericht *"
-        :validation-error="validationStore.getByField('court')"
+        id="dateKnown"
+        v-slot="{ id }"
+        label="Datum unbekannt"
+        label-class="ds-label-01-reg"
+        :label-position="LabelPosition.RIGHT"
       >
-        <ComboboxInput
-          id="court"
-          v-model="previousDecision.court"
-          aria-label="Gericht Vorgehende Entscheidung"
-          clear-on-choosing-item
-          :has-error="slotProps.hasError"
-          :item-service="ComboboxItemService.getCourts"
-          @click="validationStore.remove('court')"
-        ></ComboboxInput>
+        <CheckboxInput
+          :id="id"
+          v-model="dateUnknown"
+          aria-label="Datum Unbekannt Vorgehende Entscheidung"
+          size="small"
+        />
       </InputField>
-      <div v-if="!dateUnknown" class="flex w-full justify-between gap-24">
+      <div class="flex justify-between gap-24">
         <InputField
-          id="date"
+          id="court"
           v-slot="slotProps"
-          label="Entscheidungsdatum *"
-          :validation-error="validationStore.getByField('decisionDate')"
+          label="Gericht *"
+          :validation-error="validationStore.getByField('court')"
         >
-          <DateInput
-            id="decisionDate"
-            v-model="previousDecision.decisionDate"
-            aria-label="Entscheidungsdatum Vorgehende Entscheidung"
-            class="ds-input-medium"
+          <ComboboxInput
+            id="court"
+            v-model="previousDecision.court"
+            aria-label="Gericht Vorgehende Entscheidung"
+            clear-on-choosing-item
             :has-error="slotProps.hasError"
-            @focus="validationStore.remove('decisionDate')"
-            @update:validation-error="slotProps.updateValidationError"
-          ></DateInput>
+            :item-service="ComboboxItemService.getCourts"
+            @click="validationStore.remove('court')"
+          ></ComboboxInput>
         </InputField>
-      </div>
-    </div>
-
-    <div class="flex justify-between gap-24">
-      <NestedComponent
-        aria-label="Abweichendes Aktenzeichen Vorgehende Entscheidung"
-        class="w-full"
-      >
-        <InputField
-          id="fileNumber"
-          v-slot="slotProps"
-          class="flex-col"
-          label="Aktenzeichen *"
-          :validation-error="validationStore.getByField('fileNumber')"
-        >
-          <TextInput
-            id="fileNumber"
-            v-model="previousDecision.fileNumber"
-            aria-label="Aktenzeichen Vorgehende Entscheidung"
-            class="ds-input-medium"
-            :has-error="slotProps.hasError"
-            size="medium"
-            @input="validationStore.remove('fileNumber')"
-          ></TextInput>
-        </InputField>
-        <!-- Child  -->
-        <template #children>
+        <div v-if="!dateUnknown" class="flex w-full justify-between gap-24">
           <InputField
-            id="deviatingFileNumber"
+            id="date"
+            v-slot="slotProps"
+            label="Entscheidungsdatum *"
+            :validation-error="validationStore.getByField('decisionDate')"
+          >
+            <DateInput
+              id="decisionDate"
+              v-model="previousDecision.decisionDate"
+              aria-label="Entscheidungsdatum Vorgehende Entscheidung"
+              class="ds-input-medium"
+              :has-error="slotProps.hasError"
+              @focus="validationStore.remove('decisionDate')"
+              @update:validation-error="slotProps.updateValidationError"
+            ></DateInput>
+          </InputField>
+        </div>
+      </div>
+
+      <div class="flex justify-between gap-24">
+        <NestedComponent
+          aria-label="Abweichendes Aktenzeichen Vorgehende Entscheidung"
+          class="w-full"
+        >
+          <InputField
+            id="fileNumber"
             v-slot="slotProps"
             class="flex-col"
-            label="Abweichendes Aktenzeichen"
-            :validation-error="
-              validationStore.getByField('deviatingFileNumber')
-            "
+            label="Aktenzeichen *"
+            :validation-error="validationStore.getByField('fileNumber')"
           >
             <TextInput
               id="fileNumber"
-              v-model="previousDecision.deviatingFileNumber"
-              aria-label="Abweichendes Aktenzeichen Vorgehende Entscheidung"
+              v-model="previousDecision.fileNumber"
+              aria-label="Aktenzeichen Vorgehende Entscheidung"
               class="ds-input-medium"
               :has-error="slotProps.hasError"
               size="medium"
-              @input="validationStore.remove('deviatingFileNumber')"
+              @input="validationStore.remove('fileNumber')"
             ></TextInput>
           </InputField>
-        </template>
-      </NestedComponent>
+          <!-- Child  -->
+          <template #children>
+            <InputField
+              id="deviatingFileNumber"
+              v-slot="slotProps"
+              class="flex-col"
+              label="Abweichendes Aktenzeichen"
+              :validation-error="
+                validationStore.getByField('deviatingFileNumber')
+              "
+            >
+              <TextInput
+                id="deviatingFileNumber"
+                v-model="previousDecision.deviatingFileNumber"
+                aria-label="Abweichendes Aktenzeichen Vorgehende Entscheidung"
+                class="ds-input-medium"
+                :has-error="slotProps.hasError"
+                size="medium"
+                @input="validationStore.remove('deviatingFileNumber')"
+              ></TextInput>
+            </InputField>
+          </template>
+        </NestedComponent>
 
-      <InputField id="documentType" class="flex-col" label="Dokumenttyp">
-        <ComboboxInput
-          id="documentType"
-          v-model="previousDecision.documentType"
-          aria-label="Dokumenttyp Vorgehende Entscheidung"
-          :item-service="ComboboxItemService.getDocumentTypes"
-        ></ComboboxInput>
+        <InputField id="documentType" class="flex-col" label="Dokumenttyp">
+          <ComboboxInput
+            id="documentType"
+            v-model="previousDecision.documentType"
+            aria-label="Dokumenttyp Vorgehende Entscheidung"
+            :item-service="ComboboxItemService.getDocumentTypes"
+          ></ComboboxInput>
+        </InputField>
+      </div>
+    </div>
+    <div v-if="modelValue?.hasForeignSource">
+      <InputField
+        id="deviatingFileNumber"
+        v-slot="slotProps"
+        class="flex-col"
+        label="Abweichendes Aktenzeichen"
+        :validation-error="validationStore.getByField('deviatingFileNumber')"
+      >
+        <TextInput
+          id="deviatingFileNumber"
+          v-model="previousDecision.deviatingFileNumber"
+          aria-label="Abweichendes Aktenzeichen Vorgehende Entscheidung"
+          class="ds-input-medium"
+          :has-error="slotProps.hasError"
+          size="medium"
+          @input="validationStore.remove('deviatingFileNumber')"
+        ></TextInput>
       </InputField>
     </div>
 
     <div>
       <TextButton
+        v-if="!modelValue?.hasForeignSource"
         aria-label="Nach Entscheidung suchen"
         button-type="primary"
         class="mr-24"

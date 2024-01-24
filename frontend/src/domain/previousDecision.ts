@@ -7,7 +7,6 @@ export default class PreviousDecision
   implements EditableListItem
 {
   public dateKnown: boolean = true
-  public deviatingFileNumber?: string
 
   static readonly requiredFields = [
     "fileNumber",
@@ -33,16 +32,18 @@ export default class PreviousDecision
       ...(this.decisionDate
         ? [dayjs(this.decisionDate).format("DD.MM.YYYY")]
         : []),
-      ...(this.dateKnown === false ? ["Datum unbekannt"] : []),
+      ...(!this.dateKnown ? ["Datum unbekannt"] : []),
       ...(this.fileNumber ? [this.fileNumber] : []),
       ...(this.documentType ? [this.documentType?.label] : []),
       ...(this.documentNumber ? [this.documentNumber] : []),
+      ...(this.deviatingFileNumber ? [this.deviatingFileNumber] : []),
     ].join(", ")
   }
 
   get dateUnknown(): boolean {
-    return this.dateKnown === false
+    return !this.dateKnown
   }
+
   set dateUnknown(dateUnknown: boolean) {
     this.dateKnown = !dateUnknown
   }
@@ -52,7 +53,7 @@ export default class PreviousDecision
   }
 
   get isReadOnly(): boolean {
-    return this.documentNumber != null
+    return false
   }
 
   get missingRequiredFields() {
@@ -75,14 +76,14 @@ export default class PreviousDecision
   }
 
   get showSummaryOnEdit(): boolean {
-    return false
+    return true
   }
 
   private fieldIsEmpty(
     fieldName: keyof PreviousDecision,
     value: PreviousDecision[(typeof PreviousDecision.fields)[number]],
   ) {
-    if (value === undefined || !value || value === null) {
+    if (!value) {
       return true
     }
     if (value instanceof Array && value.length === 0) {
@@ -104,5 +105,6 @@ export const previousDecisionFieldLabels: { [name: string]: string } = {
   court: "Gericht",
   decisionDate: "Entscheidungsdatum",
   fileNumber: "Aktenzeichen",
+  deviatingFileNumber: "Abweichendes Aktenzeichen",
   documentType: "Dokumenttyp",
 }

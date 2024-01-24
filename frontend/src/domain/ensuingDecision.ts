@@ -77,7 +77,7 @@ export default class EnsuingDecision
     fieldName: keyof EnsuingDecision,
     value: EnsuingDecision[(typeof EnsuingDecision.fields)[number]],
   ) {
-    if (value === undefined || !value || value === null) {
+    if (value === undefined || !value) {
       return true
     }
     if (value instanceof Array && value.length === 0) {

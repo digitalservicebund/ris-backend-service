@@ -4,6 +4,7 @@ import { Court, DocumentType } from "./documentUnit"
 export default class RelatedDocumentation {
   public uuid?: string
   public documentNumber?: string
+  public deviatingFileNumber?: string
   public court?: Court
   public decisionDate?: string
   public fileNumber?: string
