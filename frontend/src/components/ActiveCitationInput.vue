@@ -25,6 +25,7 @@ const emit = defineEmits<{
   addEntry: [void]
 }>()
 
+const lastSearchInput = ref(new ActiveCitation())
 const activeCitation = ref(new ActiveCitation({ ...props.modelValue }))
 
 const validationStore =
@@ -63,6 +64,15 @@ async function search() {
     ...activeCitation.value,
   })
 
+  if (
+    activeCitationRef.court != lastSearchInput.value.court ||
+    activeCitationRef.decisionDate != lastSearchInput.value.decisionDate ||
+    activeCitationRef.fileNumber != lastSearchInput.value.fileNumber ||
+    activeCitationRef.documentType != lastSearchInput.value.documentType
+  ) {
+    pageNumber.value = 0
+  }
+
   if (activeCitationRef.citationType) {
     delete activeCitationRef["citationType"]
   }
@@ -85,6 +95,7 @@ async function search() {
       }
     })
   }
+  lastSearchInput.value = activeCitationRef
   isLoading.value = false
 }
 

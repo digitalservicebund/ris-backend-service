@@ -28,6 +28,7 @@ const emit = defineEmits<{
   addEntry: [void]
 }>()
 
+const lastSearchInput = ref(new PreviousDecision())
 const previousDecision = ref(new PreviousDecision({ ...props.modelValue }))
 const validationStore =
   useValidationStore<(typeof PreviousDecision.fields)[number]>()
@@ -53,6 +54,15 @@ async function search() {
     ...previousDecision.value,
   })
 
+  if (
+    previousDecisionRef.court != lastSearchInput.value.court ||
+    previousDecisionRef.decisionDate != lastSearchInput.value.decisionDate ||
+    previousDecisionRef.fileNumber != lastSearchInput.value.fileNumber ||
+    previousDecisionRef.documentType != lastSearchInput.value.documentType
+  ) {
+    pageNumber.value = 0
+  }
+
   const response = await documentUnitService.searchByRelatedDocumentation(
     pageNumber.value,
     itemsPerPage.value,
@@ -72,6 +82,7 @@ async function search() {
       }
     })
   }
+  lastSearchInput.value = previousDecisionRef
   isLoading.value = false
 }
 

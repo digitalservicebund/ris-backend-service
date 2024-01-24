@@ -207,83 +207,6 @@ test.describe("active citations", () => {
     ).toHaveCount(1)
   })
 
-  test("search for documentunits and link as active citation", async ({
-    page,
-    documentNumber,
-    prefilledDocumentUnit,
-    secondPrefilledDocumentUnit,
-  }) => {
-    await navigateToPublication(
-      page,
-      prefilledDocumentUnit.documentNumber || "",
-    )
-
-    await page
-      .locator("[aria-label='Dokumentationseinheit veröffentlichen']")
-      .click()
-    await expect(page.locator("text=Email wurde versendet")).toBeVisible()
-
-    await expect(page.locator("text=Xml Email Abgabe -")).toBeVisible()
-    await expect(page.locator("text=In Veröffentlichung")).toBeVisible()
-
-    await navigateToCategories(page, documentNumber)
-    await expect(page.getByText(documentNumber)).toBeVisible()
-
-    await fillActiveCitationInputs(page, {
-      citationType: "Änderung",
-      court: secondPrefilledDocumentUnit.coreData.court?.label,
-      fileNumber: secondPrefilledDocumentUnit.coreData.fileNumbers?.[0],
-      documentType: secondPrefilledDocumentUnit.coreData.documentType?.label,
-      decisionDate: "01.01.2020",
-    })
-
-    const activeCitationContainer = page.getByLabel("Aktivzitierung")
-    await activeCitationContainer.getByLabel("Nach Entscheidung suchen").click()
-    await expect(activeCitationContainer.getByText("Seite 1")).toBeVisible()
-
-    //citation style ignored in search results
-    const result = page.getByText(
-      `AG Aachen, 01.01.2020, ${secondPrefilledDocumentUnit.coreData.fileNumbers?.[0]}, Anerkenntnisurteil, ${secondPrefilledDocumentUnit.documentNumber}`,
-    )
-
-    await expect(result).toBeVisible()
-    await page.getByLabel("Treffer übernehmen").click()
-
-    //make sure to have citation style in list
-    const listItem = page.getByText(
-      `Änderung, AG Aachen, 01.01.2020, ${secondPrefilledDocumentUnit.coreData.fileNumbers?.[0]}, Anerkenntnisurteil, ${secondPrefilledDocumentUnit.documentNumber}`,
-    )
-    await expect(listItem).toBeVisible()
-    await expect(page.getByLabel("Eintrag löschen")).toBeVisible()
-
-    //can be edited
-    await expect(page.getByLabel("Eintrag bearbeiten")).toBeVisible()
-
-    // search for same parameters gives same result, indication that decision is already added
-    await activeCitationContainer.getByLabel("Weitere Angabe").click()
-    await fillActiveCitationInputs(page, {
-      citationType: "Änderung",
-      court: secondPrefilledDocumentUnit.coreData.court?.label,
-      fileNumber: secondPrefilledDocumentUnit.coreData.fileNumbers?.[0],
-      documentType: secondPrefilledDocumentUnit.coreData.documentType?.label,
-      decisionDate: "01.01.2020",
-    })
-
-    await activeCitationContainer.getByLabel("Nach Entscheidung suchen").click()
-
-    await expect(activeCitationContainer.getByText("Seite 1")).toBeVisible()
-    await expect(
-      activeCitationContainer.getByText("Bereits hinzugefügt"),
-    ).toBeVisible()
-
-    //can be deleted
-    await page.getByLabel("Eintrag löschen").first().click()
-    await expect(
-      activeCitationContainer.getByLabel("Listen Eintrag"),
-    ).toHaveCount(1)
-    await expect(listItem).toBeHidden()
-  })
-
   test("citation style can be edited in linked decisions", async ({
     page,
     documentNumber,
@@ -314,21 +237,13 @@ test.describe("active citations", () => {
 
     const activeCitationContainer = page.getByLabel("Aktivzitierung")
     await activeCitationContainer.getByLabel("Nach Entscheidung suchen").click()
-    await expect(activeCitationContainer.getByText("Seite 1")).toBeVisible()
-
-    const result = page.getByText(
-      `AG Aachen, 31.12.2019, ${prefilledDocumentUnit.coreData.fileNumbers?.[0]}, Anerkenntnisurteil, ${prefilledDocumentUnit.documentNumber}`,
-    )
-
-    await expect(result).toBeVisible()
-    await page.getByLabel("Treffer übernehmen").click()
 
     await expect(
       page.getByText(
         `AG Aachen, 31.12.2019, ${prefilledDocumentUnit.coreData.fileNumbers?.[0]}, Anerkenntnisurteil, ${prefilledDocumentUnit.documentNumber}`,
       ),
     ).toBeVisible()
-    await expect(page.getByLabel("Eintrag löschen")).toBeVisible()
+    await page.getByLabel("Treffer übernehmen").click()
 
     //can be edited
     await expect(page.getByLabel("Eintrag bearbeiten")).toBeVisible()

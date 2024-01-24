@@ -27,6 +27,7 @@ const emit = defineEmits<{
   addEntry: [void]
 }>()
 
+const lastSearchInput = ref(new EnsuingDecision())
 const ensuingDecision = ref(new EnsuingDecision({ ...props.modelValue }))
 const validationStore =
   useValidationStore<(typeof EnsuingDecision.fields)[number]>()
@@ -50,6 +51,15 @@ async function search() {
     ...ensuingDecision.value,
   })
 
+  if (
+    ensuingDecisionRef.court != lastSearchInput.value.court ||
+    ensuingDecisionRef.decisionDate != lastSearchInput.value.decisionDate ||
+    ensuingDecisionRef.fileNumber != lastSearchInput.value.fileNumber ||
+    ensuingDecisionRef.documentType != lastSearchInput.value.documentType
+  ) {
+    pageNumber.value = 0
+  }
+
   const response = await documentUnitService.searchByRelatedDocumentation(
     pageNumber.value,
     itemsPerPage.value,
@@ -70,6 +80,7 @@ async function search() {
     })
   }
   isLoading.value = false
+  lastSearchInput.value = ensuingDecisionRef
 }
 
 async function updatePage(page: number) {

@@ -166,11 +166,19 @@ export async function fillPreviousDecisionInputs(
   }
 
   if (values?.deviatingFileNumber) {
-    await page
-      .locator(
-        "[aria-label='Abweichendes Aktenzeichen Vorgehende Entscheidung anzeigen']",
-      )
-      .click()
+    if (
+      !(await page
+        .getByLabel("Abweichendes Aktenzeichen Vorgehende Entscheidung", {
+          exact: true,
+        })
+        .isVisible())
+    ) {
+      await page
+        .locator(
+          "[aria-label='Abweichendes Aktenzeichen Vorgehende Entscheidung anzeigen']",
+        )
+        .click()
+    }
     await fillInput(
       "Abweichendes Aktenzeichen Vorgehende Entscheidung",
       values?.deviatingFileNumber,
