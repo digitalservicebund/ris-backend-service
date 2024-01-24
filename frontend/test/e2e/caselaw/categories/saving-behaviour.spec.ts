@@ -186,7 +186,7 @@ test.describe("saving behaviour", () => {
       page.locator(".table-row", {
         hasText: documentNumber,
       }),
-    ).toBeVisible({ timeout: 30000 })
+    ).toBeVisible()
     await expect(
       page.locator(".table-row", {
         hasText: documentNumber,

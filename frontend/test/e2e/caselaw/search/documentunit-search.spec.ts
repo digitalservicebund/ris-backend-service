@@ -42,8 +42,7 @@ test.describe("search", () => {
   })
 
   // Suchzustände
-  // eslint-disable-next-line playwright/no-skipped-test
-  test.skip("renders search results and updates states correctly", async ({
+  test("renders search results and updates states correctly", async ({
     page,
     documentNumber,
   }) => {
@@ -64,7 +63,6 @@ test.describe("search", () => {
     //loading
     await page.getByLabel("Nur meine Dokstelle Filter").click()
     await page.getByLabel("Nach Dokumentationseinheiten suchen").click()
-    // TODO: investigate on why this is no longer visible
     await expect(page.getByLabel("Ladestatus")).toBeVisible()
 
     //results
@@ -74,7 +72,7 @@ test.describe("search", () => {
       page.locator(".table-row", {
         hasText: documentNumber,
       }),
-    ).toBeVisible({ timeout: 30000 }) // RISDEV-2269
+    ).toBeVisible()
 
     //no results
     await page.getByLabel("Dokumentnummer Suche").fill("wrong document number")
@@ -83,7 +81,12 @@ test.describe("search", () => {
       page.locator(".table-row", {
         hasText: documentNumber,
       }),
-    ).toBeHidden({ timeout: 30000 }) // RISDEV-2269
+    ).toBeHidden()
+  })
+
+  // eslint-disable-next-line playwright/no-skipped-test
+  test.skip("renders message when offline", async ({ page }) => {
+    await page.goto("/")
 
     //error
     await page.getByLabel("Nur meine Dokstelle Filter").click()
@@ -92,8 +95,6 @@ test.describe("search", () => {
     })
     await page.getByLabel("Nach Dokumentationseinheiten suchen").click()
 
-    // TODO: investigate on why this is no longer visible
-    await expect(page.getByLabel("Infomodal")).toBeVisible({ timeout: 30000 }) // RISDEV-2269
     await expect(
       page.getByText("Die Suchergebnisse konnten nicht geladen werden."),
     ).toBeVisible()
@@ -119,13 +120,11 @@ test.describe("search", () => {
     await page.getByLabel("Entscheidungsdatum Suche Ende").fill("28.02.2023")
     await page.getByLabel("Nach Dokumentationseinheiten suchen").click()
     await expect(page.getByText("Fehler in Suchkriterien")).toBeHidden()
-    // TODO: investigate on why this is no longer visible
-    await expect(page.getByLabel("Ladestatus")).toBeVisible()
+    await expect(page.getByText("Keine Ergebnisse gefunden.")).toBeVisible()
   })
 
   // Datumskomponente Zeitraum
-  // eslint-disable-next-line playwright/no-skipped-test
-  test.skip("search for exact dates", async ({
+  test("search for exact dates", async ({
     page,
     prefilledDocumentUnit,
     secondPrefilledDocumentUnit,
@@ -140,26 +139,25 @@ test.describe("search", () => {
       )
     await page.getByLabel("Nach Dokumentationseinheiten suchen").click()
 
-    await expect(page.getByLabel("Ladestatus")).toBeHidden({ timeout: 30000 }) // RISDEV-2269
-    expect(
-      await page
-        .locator(".table-row", {
-          hasText: dayjs(prefilledDocumentUnit.coreData.decisionDate).format(
-            "DD.MM.YYYY",
-          ),
-        })
-        .count(),
-    ).toBeGreaterThanOrEqual(1)
+    await expect
+      .poll(async () =>
+        page
+          .locator(".table-row", {
+            hasText: dayjs(prefilledDocumentUnit.coreData.decisionDate).format(
+              "DD.MM.YYYY",
+            ),
+          })
+          .count(),
+      )
+      .toBeGreaterThanOrEqual(1)
 
-    expect(
-      await page
-        .locator(".table-row", {
-          hasText: dayjs(
-            secondPrefilledDocumentUnit.coreData.decisionDate,
-          ).format("DD.MM.YYYY"),
-        })
-        .count(),
-    ).toBe(0)
+    await expect(
+      page.locator(".table-row", {
+        hasText: dayjs(
+          secondPrefilledDocumentUnit.coreData.decisionDate,
+        ).format("DD.MM.YYYY"),
+      }),
+    ).toHaveCount(0)
 
     await page
       .getByLabel("Entscheidungsdatum Suche", { exact: true })
@@ -169,31 +167,29 @@ test.describe("search", () => {
         ),
       )
     await page.getByLabel("Nach Dokumentationseinheiten suchen").click()
-    await expect(page.getByLabel("Ladestatus")).toBeHidden({ timeout: 30000 }) // RISDEV-2269
 
-    expect(
-      await page
-        .locator(".table-row", {
-          hasText: dayjs(
-            secondPrefilledDocumentUnit.coreData.decisionDate,
-          ).format("DD.MM.YYYY"),
-        })
-        .count(),
-    ).toBeGreaterThanOrEqual(1)
+    await expect
+      .poll(async () =>
+        page
+          .locator(".table-row", {
+            hasText: dayjs(
+              secondPrefilledDocumentUnit.coreData.decisionDate,
+            ).format("DD.MM.YYYY"),
+          })
+          .count(),
+      )
+      .toBeGreaterThanOrEqual(1)
 
-    expect(
-      await page
-        .locator(".table-row", {
-          hasText: dayjs(prefilledDocumentUnit.coreData.decisionDate).format(
-            "DD.MM.YYYY",
-          ),
-        })
-        .count(),
-    ).toBe(0)
+    await expect(
+      page.locator(".table-row", {
+        hasText: dayjs(prefilledDocumentUnit.coreData.decisionDate).format(
+          "DD.MM.YYYY",
+        ),
+      }),
+    ).toHaveCount(0)
   })
 
-  // eslint-disable-next-line playwright/no-skipped-test
-  test.skip("search results between two dates", async ({
+  test("search results between two dates", async ({
     page,
     prefilledDocumentUnit,
     secondPrefilledDocumentUnit,
@@ -215,27 +211,18 @@ test.describe("search", () => {
         ),
       )
     await page.getByLabel("Nach Dokumentationseinheiten suchen").click()
-    await expect(page.getByLabel("Ladestatus")).toBeHidden({ timeout: 30000 }) // RISDEV-2269
 
-    //TODO: add this line again when sorting by asc desc date in possible
-    // expect(
-    //   await page
-    //     .locator(".table-row", {
-    //       hasText: dayjs(prefilledDocumentUnit.coreData.decisionDate).format(
-    //         "DD.MM.YYYY",
-    //       ),
-    //     })
-    //     .count(),
-    // ).toBeGreaterThanOrEqual(1)
-    expect(
-      await page
-        .locator(".table-row", {
-          hasText: dayjs(
-            secondPrefilledDocumentUnit.coreData.decisionDate,
-          ).format("DD.MM.YYYY"),
-        })
-        .count(),
-    ).toBeGreaterThanOrEqual(1)
+    await expect
+      .poll(async () =>
+        page
+          .locator(".table-row", {
+            hasText: dayjs(
+              secondPrefilledDocumentUnit.coreData.decisionDate,
+            ).format("DD.MM.YYYY"),
+          })
+          .count(),
+      )
+      .toBeGreaterThanOrEqual(1)
 
     //Same date entered: Show results for the exact date
     await page
@@ -245,26 +232,26 @@ test.describe("search", () => {
       )
 
     await page.getByLabel("Nach Dokumentationseinheiten suchen").click()
-    await expect(page.getByLabel("Ladestatus")).toBeHidden({ timeout: 30000 }) // RISDEV-2269
 
-    expect(
-      await page
-        .locator(".table-row", {
-          hasText: dayjs(prefilledDocumentUnit.coreData.decisionDate).format(
-            "DD.MM.YYYY",
-          ),
-        })
-        .count(),
-    ).toBeGreaterThanOrEqual(1)
-    expect(
-      await page
-        .locator(".table-row", {
-          hasText: dayjs(
-            secondPrefilledDocumentUnit.coreData.decisionDate,
-          ).format("DD.MM.YYYY"),
-        })
-        .count(),
-    ).toBe(0)
+    await expect
+      .poll(async () =>
+        page
+          .locator(".table-row", {
+            hasText: dayjs(prefilledDocumentUnit.coreData.decisionDate).format(
+              "DD.MM.YYYY",
+            ),
+          })
+          .count(),
+      )
+      .toBeGreaterThanOrEqual(1)
+
+    await expect(
+      page.locator(".table-row", {
+        hasText: dayjs(
+          secondPrefilledDocumentUnit.coreData.decisionDate,
+        ).format("DD.MM.YYYY"),
+      }),
+    ).toHaveCount(0)
   })
 
   test("displaying errors on focus and blur", async ({
@@ -364,13 +351,9 @@ test.describe("search", () => {
       .getByLabel("Nach Dokumentationseinheiten suchen")
       .click()
 
-    await expect(pageWithBghUser.getByLabel("Ladestatus")).toBeHidden({
-      timeout: 30000,
-    }) // RISDEV-2269
-
-    expect(
-      await pageWithBghUser.getByText("unveröffentlicht").count(),
-    ).toBeGreaterThanOrEqual(1)
+    await expect
+      .poll(async () => pageWithBghUser.getByText("unveröffentlicht").count())
+      .toBeGreaterThanOrEqual(1)
 
     const select = pageWithBghUser.locator(`select[id="status"]`)
     await select.selectOption("Veröffentlicht")
@@ -379,13 +362,9 @@ test.describe("search", () => {
       .getByLabel("Nach Dokumentationseinheiten suchen")
       .click()
 
-    await expect(pageWithBghUser.getByLabel("Ladestatus")).toBeHidden({
-      timeout: 30000,
-    }) // RISDEV-2269
-
-    expect(
-      await pageWithBghUser.getByText("veröffentlicht").count(),
-    ).toBeGreaterThanOrEqual(1)
+    await expect
+      .poll(async () => pageWithBghUser.getByText("veröffentlicht").count())
+      .toBeGreaterThanOrEqual(1)
 
     await expect(pageWithBghUser.getByText("unveröffentlicht")).toBeHidden()
   })
@@ -410,13 +389,9 @@ test.describe("search", () => {
       .getByLabel("Nach Dokumentationseinheiten suchen")
       .click()
 
-    await expect(pageWithBghUser.getByLabel("Ladestatus")).toBeHidden({
-      timeout: 30000,
-    }) // RISDEV-2269
-
-    expect(
-      await pageWithBghUser.getByText("XXRE").count(),
-    ).toBeGreaterThanOrEqual(1)
+    await expect
+      .poll(async () => pageWithBghUser.getByText("XXRE").count())
+      .toBeGreaterThanOrEqual(1)
 
     await select.selectOption("Alle")
     await docofficeOnly.click()
@@ -425,28 +400,22 @@ test.describe("search", () => {
       .getByLabel("Nach Dokumentationseinheiten suchen")
       .click()
 
-    await expect(pageWithBghUser.getByLabel("Ladestatus")).toBeHidden({
-      timeout: 30000,
-    }) // RISDEV-2269
-    expect(
-      await pageWithBghUser.getByText("KORE").count(),
-    ).toBeGreaterThanOrEqual(1)
+    await expect
+      .poll(async () => pageWithBghUser.getByText("KORE").count())
+      .toBeGreaterThanOrEqual(1)
 
-    await expect(pageWithBghUser.getByText("XXRE")).toBeHidden({
-      timeout: 30000,
-    }) // RISDEV-2269
+    await expect(pageWithBghUser.getByText("XXRE")).toBeHidden()
 
     await errorsOnly.click()
     await pageWithBghUser
       .getByLabel("Nach Dokumentationseinheiten suchen")
       .click()
 
-    await expect(pageWithBghUser.getByLabel("Ladestatus")).toBeHidden({
-      timeout: 30000,
-    }) // RISDEV-2269
-    expect(
-      await pageWithBghUser.getByText("Nicht veröffentlicht (Fehler)").count(),
-    ).toBeGreaterThanOrEqual(1)
+    await expect
+      .poll(async () =>
+        pageWithBghUser.getByText("Nicht veröffentlicht (Fehler)").count(),
+      )
+      .toBeGreaterThanOrEqual(1)
 
     await docofficeOnly.click()
     await expect(errorsOnly).toBeHidden()
@@ -455,13 +424,9 @@ test.describe("search", () => {
       .getByLabel("Nach Dokumentationseinheiten suchen")
       .click()
 
-    await expect(pageWithBghUser.getByLabel("Ladestatus")).toBeHidden({
-      timeout: 30000,
-    }) // RISDEV-2269
-
-    expect(
-      await pageWithBghUser.getByText("unveröffentlicht").count(),
-    ).toBeGreaterThanOrEqual(1)
+    await expect
+      .poll(async () => pageWithBghUser.getByText("unveröffentlicht").count())
+      .toBeGreaterThanOrEqual(1)
 
     //unclick my dokstelle should also reset errors only filter
     await docofficeOnly.click()
@@ -469,8 +434,7 @@ test.describe("search", () => {
   })
 
   // Suche zurücksetzen
-  // eslint-disable-next-line playwright/no-skipped-test
-  test.skip("resetting the search", async ({ page }) => {
+  test("resetting the search", async ({ page }) => {
     // on input button is visible
     await page.goto("/")
     const resetSearch = page.getByLabel("Suche zurücksetzen")
@@ -480,13 +444,9 @@ test.describe("search", () => {
     await expect(resetSearch).toBeVisible()
     await page.getByLabel("Nach Dokumentationseinheiten suchen").click()
 
-    await expect(page.getByLabel("Ladestatus")).toBeHidden({
-      timeout: 30000,
-    }) // RISDEV-2269
+    await expect(page.getByLabel("Ladestatus")).toBeHidden()
     await expect(page.getByText("Keine Ergebnisse")).toBeVisible()
-    await resetSearch.click({
-      timeout: 30000,
-    })
+    await resetSearch.click()
     await expect(page.getByText(searchTerm)).toBeHidden()
     await expect(page.getByText("Keine Ergebnisse")).toBeHidden()
     await expect(
