@@ -13,20 +13,20 @@ const props = withDefaults(defineProps<Props>(), {
 const localIsExpanded = ref(props.isOpen.valueOf())
 </script>
 <template>
-  <div class="flex-column">
-    <div class="col-auto">
+  <div class="flex flex-col">
+    <div class="relative flex flex-row">
       <!-- Parent component-->
       <slot />
       <!-- Toggle Button-->
       <ToggleButton
         v-model="localIsExpanded"
         :aria-label="props.ariaLabel"
-        class="relative float-end"
+        class="absolute float-end"
       />
     </div>
-    <!-- Children components-->
-    <div v-show="localIsExpanded">
-      <slot class="col-auto" name="children"></slot>
+    <!-- Children component-->
+    <div v-show="localIsExpanded" class="mt-24">
+      <slot name="children"></slot>
     </div>
   </div>
 </template>
