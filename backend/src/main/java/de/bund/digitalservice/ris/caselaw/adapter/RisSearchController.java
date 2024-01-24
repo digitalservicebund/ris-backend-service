@@ -29,6 +29,9 @@ public class RisSearchController {
   @Value("${ris-search.basic-auth.password:}")
   private String risSearchPassword;
 
+  @Value("${ris-search.url:http://localhost:8090/v1/search}")
+  private String risSearchUrl;
+
   private final UserService userService;
   private final WebClient webClient;
 
@@ -55,12 +58,7 @@ public class RisSearchController {
   }
 
   private String buildUrl(String query, String abbreviation) {
-    String baseUrl =
-        risSearchUsername.isEmpty() || risSearchPassword.isEmpty()
-            ? "http://localhost:8090/v1/search"
-            : "https://ris-search.dev.ds4g.net/v1/search";
-
-    return UriComponentsBuilder.fromHttpUrl(baseUrl)
+    return UriComponentsBuilder.fromHttpUrl(risSearchUrl)
         .queryParam("query", query)
         .queryParam("documentationOfficeAbbreviation", abbreviation)
         .toUriString();
