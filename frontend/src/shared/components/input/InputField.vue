@@ -112,11 +112,6 @@ export enum LabelPosition {
       }"
       data-testid="label-wrapper"
     >
-      <IconErrorOutline
-        v-if="localValidationError"
-        class="pr-4 text-20 text-red-800"
-      />
-
       <label
         class="grid items-center"
         :class="[
@@ -144,12 +139,19 @@ export enum LabelPosition {
       />
     </div>
 
-    <div
-      v-if="localValidationError"
-      class="ds-label-03-reg min-h-[1rem] text-red-800"
-      :data-testid="id + '-validationError'"
-    >
-      {{ errorMessage }}
+    <div class="flex flex-row items-center">
+      <IconErrorOutline
+        v-if="localValidationError"
+        class="pr-4 text-14 text-red-800"
+      />
+
+      <div
+        v-if="localValidationError"
+        class="lex-row ds-label-03-reg mt-2 text-red-800"
+        :data-testid="id + '-validationError'"
+      >
+        {{ errorMessage }}
+      </div>
     </div>
   </div>
 </template>
