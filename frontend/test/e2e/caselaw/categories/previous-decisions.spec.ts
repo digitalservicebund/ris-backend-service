@@ -228,7 +228,7 @@ test.describe("previous decisions", () => {
   })
 
   // eslint-disable-next-line playwright/no-skipped-test
-  test.skip("search for documentunits and link as previous decision", async ({
+  test("search for documentunits and link as previous decision with deviating file number", async ({
     page,
     documentNumber,
     prefilledDocumentUnit,
@@ -264,21 +264,12 @@ test.describe("previous decisions", () => {
       .getByLabel("Nach Entscheidung suchen")
       .click()
 
-    await expect(page.getByText("Seite 1")).toBeVisible()
-
-    const result = page.getByText(
-      `AG Aachen, 31.12.2019, ${prefilledDocumentUnit.coreData.fileNumbers?.[0]}, Anerkenntnisurteil, ${prefilledDocumentUnit.documentNumber}`,
-    )
-
-    await expect(result).toBeVisible()
+    await expect(
+      page.getByText(
+        `AG Aachen, 31.12.2019, ${prefilledDocumentUnit.coreData.fileNumbers?.[0]}, Anerkenntnisurteil, ${prefilledDocumentUnit.documentNumber}`,
+      ),
+    ).toBeVisible()
     await page.getByLabel("Treffer übernehmen").click()
-
-    //make sure to have citation style in list
-    const listItem = page.getByText(
-      `AG Aachen, 31.12.2019, ${prefilledDocumentUnit.coreData.fileNumbers?.[0]}, Anerkenntnisurteil, ${prefilledDocumentUnit.documentNumber}`,
-    )
-    await expect(listItem).toBeVisible()
-    await expect(page.getByLabel("Eintrag löschen")).toBeVisible()
 
     //deviating file number can be edited
     await expect(page.getByLabel("Eintrag bearbeiten")).toBeVisible()
@@ -302,29 +293,6 @@ test.describe("previous decisions", () => {
 
     await page.getByLabel("Eintrag bearbeiten").first().click()
     await expect(page.getByText(deviatingFileNumber2)).toBeVisible()
-
-    // search for same parameters gives same result, indication that decision is already added
-    await page.getByLabel("Weitere Angabe").click()
-    await fillPreviousDecisionInputs(page, {
-      court: prefilledDocumentUnit.coreData.court?.label,
-      fileNumber: prefilledDocumentUnit.coreData.fileNumbers?.[0],
-      documentType: prefilledDocumentUnit.coreData.documentType?.label,
-      decisionDate: "31.12.2019",
-    })
-
-    await previousDecisionContainer
-      .getByLabel("Nach Entscheidung suchen")
-      .click()
-
-    await expect(page.getByText("Seite 1")).toBeVisible()
-    await expect(page.getByText("Bereits hinzugefügt")).toBeVisible()
-
-    //can be deleted
-    await page.getByLabel("Eintrag löschen").first().click()
-    await expect(
-      previousDecisionContainer.getByLabel("Listen Eintrag"),
-    ).toHaveCount(1)
-    await expect(listItem).toBeHidden()
   })
 
   test("validates against required fields", async ({

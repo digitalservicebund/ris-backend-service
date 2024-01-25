@@ -30,7 +30,7 @@ test.describe("a11y of start page (/caselaw)", () => {
       page.locator(".table-row", {
         hasText: documentNumber,
       }),
-    ).toBeVisible({ timeout: 30000 })
+    ).toBeVisible()
     await page
       .locator(".table-row", {
         hasText: documentNumber,
