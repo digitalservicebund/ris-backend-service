@@ -5,7 +5,10 @@ import EnsuingDecisionInputGroup from "./EnsuingDecisionInputGroup.vue"
 import EditableList from "@/components/EditableListCaselaw.vue"
 import EnsuingDecision from "@/domain/ensuingDecision"
 import { withSummarizer } from "@/shared/components/DataSetSummary.vue"
+import BaselineArrowOutward from "~icons/ic/baseline-arrow-outward"
+import IconBaselineDescription from "~icons/ic/baseline-description"
 import IconErrorOutline from "~icons/ic/baseline-error-outline"
+import IconOutlineDescription from "~icons/ic/outline-description"
 
 const props = defineProps<{
   modelValue: EnsuingDecision[] | undefined
@@ -25,28 +28,59 @@ const ensuingDecisions = computed({
 })
 const defaultValue = new EnsuingDecision()
 
-function decisionSummarizer(dataEntry: EnsuingDecision) {
-  if (dataEntry.hasForeignSource) {
-    return h(
-      RouterLink,
-      {
-        class: ["ds-link-01-bold", "underline"],
-        target: "_blank",
-        tabindex: -1,
-        to: {
-          name: "caselaw-documentUnit-documentNumber-categories",
-          params: { documentNumber: dataEntry.documentNumber },
-        },
+function renderLink(dataEntry: EnsuingDecision) {
+  return h(
+    RouterLink,
+    {
+      class: [
+        "ds-link-03-bold ml-8 border-b-2 border-blue-800 flex flex-row leading-24",
+      ],
+      target: "_blank",
+      tabindex: -1,
+      to: {
+        name: "caselaw-documentUnit-documentNumber-categories",
+        params: { documentNumber: dataEntry.documentNumber },
       },
-      () => dataEntry.renderDecision,
-    )
+    },
+    () =>
+      h("div", { class: ["flex flex-row items-center"] }, [
+        h(() => dataEntry.documentNumber),
+        h(() => h(BaselineArrowOutward)),
+      ]),
+  )
+}
+
+function decisionSummarizer(dataEntry: EnsuingDecision) {
+  // Linked DocUnit
+  if (dataEntry.hasForeignSource) {
+    return h("div", { class: ["flex flex-row items-center"] }, [
+      h(h(IconBaselineDescription), {
+        class: ["mr-8 "],
+      }),
+      h("div", { class: ["flex flex-row items-baseline"] }, [
+        h("div", { class: ["ds-label-01-reg"] }, dataEntry.renderDecision),
+        h("span", { class: ["ds-label-01-reg ml-8"] }, "|"),
+        renderLink(dataEntry),
+      ]),
+
+      ,
+    ])
+    // Ghost DocUnit
   } else if (
     !dataEntry.hasMissingRequiredFields ||
     (dataEntry.missingRequiredFields.length === 1 &&
       dataEntry.missingRequiredFields[0] === "decisionDate" &&
       dataEntry.pending)
   ) {
-    return h("div", { class: ["link-02-reg"] }, dataEntry.renderDecision)
+    return h("div", { class: ["flex flex-row items-center"] }, [
+      h(
+        h(h(IconOutlineDescription), {
+          class: ["mr-8 "],
+        }),
+      ),
+      h("div", { class: ["ds-label-01-reg"] }, dataEntry.renderDecision),
+    ])
+    // Ghost DocUnit with missing fields
   } else {
     return h("div", { class: ["flex flex-row items-center"] }, [
       h(
@@ -57,7 +91,7 @@ function decisionSummarizer(dataEntry: EnsuingDecision) {
       ),
       h(
         "div",
-        { class: ["ds-label-02-bold text-red-800"] },
+        { class: ["ds-label-01-reg text-red-800"] },
         dataEntry.renderDecision,
       ),
     ])

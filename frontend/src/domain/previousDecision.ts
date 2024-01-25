@@ -34,9 +34,8 @@ export default class PreviousDecision
         : []),
       ...(!this.dateKnown ? ["Datum unbekannt"] : []),
       ...(this.fileNumber ? [this.fileNumber] : []),
-      ...(this.documentType ? [this.documentType?.label] : []),
-      ...(this.documentNumber ? [this.documentNumber] : []),
       ...(this.deviatingFileNumber ? [this.deviatingFileNumber] : []),
+      ...(this.documentType ? [this.documentType?.label] : []),
     ].join(", ")
   }
 

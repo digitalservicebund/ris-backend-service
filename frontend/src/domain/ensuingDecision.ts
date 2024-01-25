@@ -38,7 +38,6 @@ export default class EnsuingDecision
       ...(this.fileNumber ? [this.fileNumber] : []),
       ...(this.documentType ? [this.documentType?.label] : []),
       ...(this.note ? [this.note] : []),
-      ...(this.documentNumber ? [this.documentNumber] : []),
     ].join(", ")
   }
 

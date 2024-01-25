@@ -38,7 +38,6 @@ export default class ActiveCitation
         : []),
       ...(this.fileNumber ? [this.fileNumber] : []),
       ...(this.documentType ? [this.documentType.label] : []),
-      ...(this.documentNumber ? [this.documentNumber] : []),
     ].join(", ")
   }
 
