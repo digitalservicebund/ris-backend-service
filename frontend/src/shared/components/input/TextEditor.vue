@@ -52,6 +52,7 @@ interface Props {
   editable?: boolean
   ariaLabel?: string
   fieldSize?: TextAreaInputAttributes["fieldSize"]
+  expanded?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -59,6 +60,7 @@ const props = withDefaults(defineProps<Props>(), {
   editable: false,
   ariaLabel: "Editor Feld",
   fieldSize: "medium",
+  expanded: false,
 })
 
 const emit = defineEmits<{
@@ -248,7 +250,7 @@ const maxButtonEntries = computed(() =>
   Math.floor((containerWidth.value - 100) / buttonSize),
 )
 
-const editorExpanded = ref(false)
+const editorExpanded = ref(props.expanded)
 const editorSize = computed(() => {
   return editorExpanded.value
     ? "h-640"
