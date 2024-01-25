@@ -111,13 +111,13 @@ test.describe("search", () => {
 
     await page
       .getByLabel("Entscheidungsdatum Suche", { exact: true })
-      .fill("28.02.2022")
+      .fill("24.12.2022")
     await page.getByLabel("Entscheidungsdatum Suche Ende").fill("29.02.2023")
     await expect(page.getByText("Kein valides Datum")).toBeVisible()
     await page.getByLabel("Nach Dokumentationseinheiten suchen").click()
     await expect(page.getByText("Fehler in Suchkriterien")).toBeVisible()
 
-    await page.getByLabel("Entscheidungsdatum Suche Ende").fill("28.02.2023")
+    await page.getByLabel("Entscheidungsdatum Suche Ende").fill("25.12.2022")
     await page.getByLabel("Nach Dokumentationseinheiten suchen").click()
     await expect(page.getByText("Fehler in Suchkriterien")).toBeHidden()
     await expect(page.getByText("Keine Ergebnisse gefunden.")).toBeVisible()
