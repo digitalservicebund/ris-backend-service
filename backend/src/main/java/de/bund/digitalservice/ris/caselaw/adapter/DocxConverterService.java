@@ -17,9 +17,11 @@ import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 import java.util.regex.Matcher;
@@ -187,7 +189,7 @@ public class DocxConverterService implements ConverterService {
             .filter(Objects::nonNull)
             .collect(Collectors.toList());
 
-    List<FooterElement> footerElements = parseECLIFromFooter();
+    Set<FooterElement> footerElements = parseECLIFromFooter();
     documentUnitDocxList.addAll(
         0, footerElements.stream().filter(ECLIElement.class::isInstance).toList());
     documentUnitDocxList.addAll(
@@ -200,8 +202,8 @@ public class DocxConverterService implements ConverterService {
     return documentUnitDocxList;
   }
 
-  private List<FooterElement> parseECLIFromFooter() {
-    List<FooterElement> footerElements = new ArrayList<>();
+  private Set<FooterElement> parseECLIFromFooter() {
+    Set<FooterElement> footerElements = new HashSet<>();
 
     converter
         .getFooters()
