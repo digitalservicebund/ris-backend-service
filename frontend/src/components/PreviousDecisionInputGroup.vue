@@ -292,7 +292,7 @@ onMounted(() => {
         :disabled="previousDecision.isEmpty"
         label="Direkt übernehmen"
         size="small"
-        @click="addPreviousDecision"
+        @click.stop="addPreviousDecision"
       />
     </div>
 

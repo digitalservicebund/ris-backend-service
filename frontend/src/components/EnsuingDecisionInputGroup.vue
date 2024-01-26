@@ -262,7 +262,7 @@ onMounted(() => {
         :disabled="ensuingDecision.isEmpty"
         label="Direkt übernehmen"
         size="small"
-        @click="addEnsuingDecision"
+        @click.stop="addEnsuingDecision"
       />
     </div>
 

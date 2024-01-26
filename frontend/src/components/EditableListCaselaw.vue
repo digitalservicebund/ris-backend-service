@@ -4,30 +4,22 @@ import { ref, watch, nextTick, onMounted } from "vue"
 import ListItem from "@/domain/editableListItem"
 import DataSetSummary from "@/shared/components/DataSetSummary.vue"
 import TextButton from "@/shared/components/input/TextButton.vue"
-import IconEditNote from "~icons/ic/baseline-edit-note"
-import IconDelete from "~icons/ic/outline-delete"
+import IconArrowDown from "~icons/ic/baseline-keyboard-arrow-down"
 
 interface Props {
   editComponent: Component
   summaryComponent?: Component
   modelValue?: T[]
   defaultValue: T
-  disableMultiEntry?: boolean
-  addEntryLabel?: string
-  noHorizontalSeparators?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
   summaryComponent: DataSetSummary,
   modelValue: () => [],
-  disableMultiEntry: false,
-  addEntryLabel: "Weitere Angabe",
-  noHorizontalSeparators: false,
 })
 
 const emit = defineEmits<{
   "update:modelValue": [value: T[]]
-  deleteLastEntry: [void]
 }>()
 
 const modelValueList = ref<T[]>([...props.modelValue]) as Ref<T[]>
@@ -64,19 +56,6 @@ function addNewListEntry() {
   editIndex.value = modelValueList.value.length - 1
 }
 
-function removeListEntry(index: number) {
-  modelValueList.value.splice(index, 1)
-
-  if (editIndex.value !== undefined && index < editIndex.value) {
-    editIndex.value -= 1
-  }
-
-  emit(
-    "update:modelValue",
-    [...props.modelValue].filter((_, i) => i !== index),
-  )
-}
-
 function updateModel() {
   setEditIndex()
   emit("update:modelValue", modelValueList.value)
@@ -104,17 +83,15 @@ onMounted(() => {
       :key="index"
       ref="elementList"
       aria-label="Listen Eintrag"
-      class="border-b-1 border-gray-400"
-      :class="{
-        '!border-none':
-          noHorizontalSeparators ||
-          (index === editIndex && !entry.showSummaryOnEdit),
-      }"
+      class="border-b-1 border-blue-500 first:border-t-1"
+      :class="index !== editIndex && 'hover:bg-gray-100'"
+      role="presentation"
+      @click="setEditIndex(index)"
     >
       <div
-        v-if="index !== editIndex || entry.showSummaryOnEdit"
+        v-if="index !== editIndex"
         :key="index"
-        class="group flex cursor-pointer items-center gap-8 py-8"
+        class="group flex cursor-pointer items-center gap-8 py-16"
       >
         <component
           :is="summaryComponent"
@@ -130,22 +107,7 @@ onMounted(() => {
         />
 
         <div class="flex gap-8">
-          <button
-            v-if="!entry.isReadOnly"
-            aria-label="Eintrag bearbeiten"
-            class="p-2 text-blue-800 outline-none outline-offset-2 hover:bg-blue-200 focus:outline-2 focus:outline-blue-800 active:bg-blue-500 active:outline-none"
-            @click="setEditIndex(index)"
-          >
-            <IconEditNote />
-          </button>
-
-          <button
-            aria-label="Eintrag löschen"
-            class="p-2 text-blue-800 outline-none outline-offset-2 hover:bg-blue-200 focus:outline-2 focus:outline-blue-800 active:bg-blue-500 active:outline-none"
-            @click="removeListEntry(index)"
-          >
-            <IconDelete />
-          </button>
+          <IconArrowDown />
         </div>
       </div>
 
@@ -153,14 +115,14 @@ onMounted(() => {
         :is="editComponent"
         v-if="index === editIndex"
         v-model="modelValueList[index]"
-        :class="modelValueList.length == 1 ? 'py-0' : 'py-24'"
+        class="py-24"
         :model-value-list="modelValueList"
         @add-entry="updateModel"
       />
     </div>
 
     <TextButton
-      v-if="!disableMultiEntry && editIndex === undefined"
+      v-if="editIndex === undefined"
       aria-label="Weitere Angabe"
       button-type="tertiary"
       class="mt-24"

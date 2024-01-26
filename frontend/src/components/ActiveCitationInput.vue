@@ -171,16 +171,9 @@ watch(
 
 <template>
   <div class="flex flex-col gap-24">
-    <div
-      v-if="activeCitation.hasForeignSource"
-      class="ds-link-01-bold underline"
-    >
-      {{ activeCitation.renderDecision }}
-    </div>
     <InputField
       id="activeCitationPredicate"
       v-slot="slotProps"
-      class="border-b-1 border-gray-400"
       label="Art der Zitierung *"
       :validation-error="validationStore.getByField('citationType')"
     >
@@ -268,7 +261,7 @@ watch(
         :disabled="activeCitation.isEmpty"
         label="Direkt übernehmen"
         size="small"
-        @click="addActiveCitation"
+        @click.stop="addActiveCitation"
       />
     </div>
     <Pagination
