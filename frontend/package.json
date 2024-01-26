@@ -111,7 +111,7 @@
     "postcss-scrollbar": "^0.5.1",
     "prettier": "^3.1.0",
     "prettier-plugin-tailwindcss": "^0.5.4",
-    "sass": "^1.69.0",
+    "sass": "^1.70.0",
     "stylelint": "^15.11.0",
     "stylelint-config-idiomatic-order": "^10.0.0",
     "stylelint-config-prettier-scss": "^1.0.0",
