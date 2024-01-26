@@ -227,7 +227,6 @@ test.describe("previous decisions", () => {
     ).toHaveCount(1)
   })
 
-  // eslint-disable-next-line playwright/no-skipped-test
   test("search for documentunits and link as previous decision with deviating file number", async ({
     page,
     documentNumber,
@@ -293,6 +292,15 @@ test.describe("previous decisions", () => {
 
     await page.getByLabel("Eintrag bearbeiten").first().click()
     await expect(page.getByText(deviatingFileNumber2)).toBeVisible()
+    await waitForSaving(
+      async () => {
+        await page.getByLabel("Eintrag löschen").first().click()
+      },
+      page,
+      { clickSaveButton: true, reload: true },
+    )
+
+    await expect(page.getByText(deviatingFileNumber2)).toBeHidden()
   })
 
   test("validates against required fields", async ({
