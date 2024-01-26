@@ -7,7 +7,9 @@ spring:
     kubernetes:
       config:
         fail-fast: true
-        name: ris-search-config
+        sources:
+          - name: database-config
+          - name: ris-search-config
       secrets:
         enabled: true
         fail-fast: true
