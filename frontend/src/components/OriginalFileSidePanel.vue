@@ -64,7 +64,7 @@ const uploadFileRoute = computed(() =>
         v-else
         class="h-[65vh] overflow-scroll border-1 border-solid border-gray-400"
       >
-        <TextEditor element-id="odoc" :value="file" />
+        <TextEditor element-id="odoc" expanded :value="file" />
       </div>
     </div>
   </div>
