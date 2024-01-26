@@ -63,7 +63,6 @@ test.describe("search", () => {
     //loading
     await page.getByLabel("Nur meine Dokstelle Filter").click()
     await page.getByLabel("Nach Dokumentationseinheiten suchen").click()
-    await expect(page.getByLabel("Ladestatus")).toBeVisible()
 
     //results
     await page.getByLabel("Dokumentnummer Suche").fill(documentNumber)

@@ -1,11 +1,9 @@
 import { expect } from "@playwright/test"
-import { generateString } from "../../../test-helper/dataGenerators"
 import {
   fillEnsuingDecisionInputs,
   navigateToCategories,
-  navigateToPublication,
-  waitForSaving,
   waitForInputValue,
+  publishDocumentationUnit,
 } from "~/e2e/caselaw/e2e-utils"
 import { caselawTest as test } from "~/e2e/caselaw/fixtures"
 
@@ -34,61 +32,12 @@ test.describe("ensuing decisions", () => {
     await expect(page.getByLabel("Datum unbekannt")).toBeVisible()
   })
 
-  test("create and renders new ensuing decision in list", async ({
-    page,
-    documentNumber,
-    prefilledDocumentUnit,
-  }) => {
-    await navigateToCategories(page, documentNumber)
-    await expect(page.getByText(documentNumber)).toBeVisible()
-
-    await fillEnsuingDecisionInputs(page, {
-      pending: false,
-      court: prefilledDocumentUnit.coreData.court?.label,
-      fileNumber: prefilledDocumentUnit.coreData.fileNumbers?.[0],
-      documentType: prefilledDocumentUnit.coreData.documentType?.label,
-      decisionDate: "01.01.2020",
-      note: "abc",
-    })
-
-    await page.getByLabel("Nachgehende Entscheidung speichern").click()
-    await expect(
-      page.getByText(
-        `nachgehend, AG Aachen, 01.01.2020, ${prefilledDocumentUnit.coreData.fileNumbers?.[0]}, Anerkenntnisurteil`,
-        {
-          exact: true,
-        },
-      ),
-    ).toBeVisible()
-
-    const ensuingDecisionContainer = page.getByLabel("Nachgehende Entscheidung")
-
-    await expect(
-      ensuingDecisionContainer.getByLabel("Listen Eintrag"),
-    ).toHaveCount(1)
-
-    await page.getByLabel("Weitere Angabe").click()
-    await fillEnsuingDecisionInputs(page, {
-      court: prefilledDocumentUnit.coreData.court?.label,
-      fileNumber: prefilledDocumentUnit.coreData.fileNumbers?.[0],
-      documentType: prefilledDocumentUnit.coreData.documentType?.label,
-      decisionDate: "01.01.2020",
-    })
-
-    await page.getByLabel("Nachgehende Entscheidung speichern").click()
-
-    await expect(
-      ensuingDecisionContainer.getByLabel("Listen Eintrag"),
-    ).toHaveCount(2)
-  })
-
   test("change to 'anhaengig' removes date with value and vice versa", async ({
     page,
     documentNumber,
     prefilledDocumentUnit,
   }) => {
     await navigateToCategories(page, documentNumber)
-    await expect(page.getByText(documentNumber)).toBeVisible()
 
     await fillEnsuingDecisionInputs(page, {
       court: prefilledDocumentUnit.coreData.court?.label,
@@ -145,175 +94,17 @@ test.describe("ensuing decisions", () => {
     ).toHaveCount(2)
   })
 
-  test("saving behaviour of ensuing decision", async ({
-    page,
-    documentNumber,
-    prefilledDocumentUnit,
-  }) => {
-    await navigateToCategories(page, documentNumber)
-    await expect(page.getByText(documentNumber)).toBeVisible()
-
-    await waitForSaving(
-      async () => {
-        await fillEnsuingDecisionInputs(page, {
-          court: prefilledDocumentUnit.coreData.court?.label,
-          fileNumber: prefilledDocumentUnit.coreData.fileNumbers?.[0],
-          documentType: prefilledDocumentUnit.coreData.documentType?.label,
-          decisionDate: "01.01.2020",
-        })
-
-        await page.getByLabel("Nachgehende Entscheidung speichern").click()
-        await expect(
-          page.getByText(
-            `nachgehend, AG Aachen, 01.01.2020, ${prefilledDocumentUnit.coreData.fileNumbers?.[0]}, Anerkenntnisurteil`,
-            {
-              exact: true,
-            },
-          ),
-        ).toBeVisible()
-      },
-      page,
-      { clickSaveButton: true },
-    )
-
-    const ensuingDecisionContainer = page.getByLabel("Nachgehende Entscheidung")
-
-    await expect(
-      ensuingDecisionContainer.getByLabel("Listen Eintrag"),
-    ).toHaveCount(1)
-
-    await page.reload()
-
-    await expect(
-      ensuingDecisionContainer.getByLabel("Listen Eintrag"),
-    ).toHaveCount(1, { timeout: 10000 }) // reloading can be slow if too many parallel tests
-
-    // Change with commit reload by saving
-    // await page.getByLabel("Weitere Angabe").click()
-    // await page.getByLabel("Aktenzeichen Nachgehende Entscheidung").fill("two")
-    // await page.getByLabel("Nachgehende Entscheidung speichern").click()
-    // await expect(
-    //   page.getByText(`nachgehend, two`, {
-    //     exact: true,
-    //   }),
-    // ).toBeVisible()
-    // // "Nachgehende Entscheidung speichern" only saves state in frontend, no communication to backend yet
-    // await page.reload()
-    // await expect(
-    //   ensuingDecisionContainer.getByLabel("Listen Eintrag"),
-    // ).toHaveCount(1, { timeout: 10000 }) // reloading can be slow if too many parallel tests
-
-    await page.getByLabel("Weitere Angabe").click()
-    await waitForSaving(
-      async () => {
-        await page
-          .getByLabel("Aktenzeichen Nachgehende Entscheidung")
-          .fill("two")
-        await page.getByLabel("Nachgehende Entscheidung speichern").click()
-      },
-      page,
-      { clickSaveButton: true },
-    )
-
-    await page.reload()
-    await expect(
-      ensuingDecisionContainer.getByLabel("Listen Eintrag"),
-    ).toHaveCount(2, { timeout: 20000 })
-  })
-
-  test("manually added ensuing decision can be edited", async ({
-    page,
-    documentNumber,
-  }) => {
-    const fileNumber1 = generateString()
-    const fileNumber2 = generateString()
-    await navigateToCategories(page, documentNumber)
-
-    await waitForSaving(
-      async () => {
-        await page
-          .getByLabel("Aktenzeichen Nachgehende Entscheidung")
-          .fill(fileNumber1)
-      },
-      page,
-      { clickSaveButton: true },
-    )
-    await page.getByLabel("Nachgehende Entscheidung speichern").click()
-    await expect(page.getByText(fileNumber1)).toBeVisible()
-
-    await page.getByLabel("Eintrag bearbeiten").click()
-    await waitForSaving(
-      async () => {
-        await page
-          .getByLabel("Aktenzeichen Nachgehende Entscheidung")
-          .fill(fileNumber2)
-      },
-      page,
-      { clickSaveButton: true },
-    )
-    await page.getByLabel("Nachgehende Entscheidung speichern").click()
-    await expect(page.getByText(fileNumber1)).toBeHidden()
-    await expect(page.getByText(fileNumber2)).toBeVisible()
-  })
-
-  test("manually added ensuing decision can be deleted", async ({
-    page,
-    documentNumber,
-  }) => {
-    await navigateToCategories(page, documentNumber)
-
-    await waitForSaving(
-      async () => {
-        await page
-          .getByLabel("Aktenzeichen Nachgehende Entscheidung")
-          .fill("one")
-      },
-      page,
-      { clickSaveButton: true },
-    )
-
-    await page.getByLabel("Nachgehende Entscheidung speichern").click()
-    await page.getByLabel("Weitere Angabe").click()
-    await waitForSaving(
-      async () => {
-        await page
-          .getByLabel("Aktenzeichen Nachgehende Entscheidung")
-          .fill("two")
-      },
-      page,
-      { clickSaveButton: true },
-    )
-    const ensuingDecisionContainer = page.getByLabel("Nachgehende Entscheidung")
-    await page.getByLabel("Nachgehende Entscheidung speichern").click()
-    await expect(
-      ensuingDecisionContainer.getByLabel("Listen Eintrag"),
-    ).toHaveCount(2)
-    await page.getByLabel("Eintrag löschen").first().click()
-    await expect(
-      ensuingDecisionContainer.getByLabel("Listen Eintrag"),
-    ).toHaveCount(1)
-  })
-
+  // TODO move to small-search.spec.ts?
   test("only note of linked ensuing decision is editable", async ({
     page,
     documentNumber,
     prefilledDocumentUnit,
   }) => {
-    await navigateToPublication(
+    await publishDocumentationUnit(
       page,
       prefilledDocumentUnit.documentNumber || "",
     )
-
-    await page
-      .locator("[aria-label='Dokumentationseinheit veröffentlichen']")
-      .click()
-    await expect(page.locator("text=Email wurde versendet")).toBeVisible()
-
-    await expect(page.locator("text=Xml Email Abgabe -")).toBeVisible()
-    await expect(page.locator("text=In Veröffentlichung")).toBeVisible()
-
     await navigateToCategories(page, documentNumber)
-    await expect(page.getByText(documentNumber)).toBeVisible()
 
     await fillEnsuingDecisionInputs(page, {
       court: prefilledDocumentUnit.coreData.court?.label,
@@ -377,7 +168,6 @@ test.describe("ensuing decisions", () => {
     prefilledDocumentUnit,
   }) => {
     await navigateToCategories(page, documentNumber)
-    await expect(page.getByText(documentNumber)).toBeVisible()
 
     await fillEnsuingDecisionInputs(page, {
       fileNumber: "abc",
@@ -408,9 +198,9 @@ test.describe("ensuing decisions", () => {
     documentNumber,
   }) => {
     await navigateToCategories(page, documentNumber)
-    await expect(page.getByText(documentNumber)).toBeVisible()
-
-    await page.getByLabel("Nachgehende Entscheidung speichern").isDisabled()
+    await expect(
+      page.getByLabel("Nachgehende Entscheidung speichern"),
+    ).toBeDisabled()
   })
 
   test("incomplete date input shows error message and does not persist", async ({
@@ -418,7 +208,6 @@ test.describe("ensuing decisions", () => {
     documentNumber,
   }) => {
     await navigateToCategories(page, documentNumber)
-    await expect(page.getByText(documentNumber)).toBeVisible()
 
     await page
       .locator("[aria-label='Entscheidungsdatum Nachgehende Entscheidung']")

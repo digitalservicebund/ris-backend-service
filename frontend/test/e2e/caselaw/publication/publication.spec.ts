@@ -30,7 +30,6 @@ test.describe("ensuring the publishing of documentunits works as expected", () =
     documentNumber,
   }) => {
     await navigateToCategories(page, documentNumber)
-    await expect(page.getByText(documentNumber)).toBeVisible()
 
     await waitForSaving(
       async () => {
@@ -113,7 +112,6 @@ test.describe("ensuring the publishing of documentunits works as expected", () =
     documentNumber,
   }) => {
     await navigateToCategories(page, documentNumber)
-    await expect(page.getByText(documentNumber)).toBeVisible()
 
     await waitForSaving(
       async () => {
@@ -154,7 +152,6 @@ test.describe("ensuring the publishing of documentunits works as expected", () =
     documentNumber,
   }) => {
     await navigateToCategories(page, documentNumber)
-    await expect(page.getByText(documentNumber)).toBeVisible()
 
     await waitForSaving(
       async () => {

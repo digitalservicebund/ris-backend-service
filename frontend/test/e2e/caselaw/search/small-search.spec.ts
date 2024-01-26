@@ -4,9 +4,81 @@ import {
   fillEnsuingDecisionInputs,
   fillPreviousDecisionInputs,
   navigateToCategories,
-  navigateToPublication,
+  publishDocumentationUnit,
+  waitForSaving,
 } from "~/e2e/caselaw/e2e-utils"
 import { caselawTest as test } from "~/e2e/caselaw/fixtures"
+import { generateString } from "~/test-helper/dataGenerators"
+
+test("manually added items are saved, can be edited and deleted", async ({
+  page,
+  documentNumber,
+}) => {
+  await navigateToCategories(page, documentNumber)
+
+  const activeCitationContainer = page.getByLabel("Aktivzitierung")
+  const previousDecisionContainer = page.getByLabel("Vorgehende Entscheidung")
+  const ensuingDecisionContainer = page.getByLabel("Nachgehende Entscheidung")
+  const containers = [
+    activeCitationContainer,
+    previousDecisionContainer,
+    ensuingDecisionContainer,
+  ]
+
+  for (const container of containers) {
+    const section = await container.first().getAttribute("aria-label")
+    const fileNumber1 = generateString()
+    const fileNumber2 = generateString()
+    const fileNumber3 = generateString()
+
+    await test.step("for category " + section, async () => {
+      // adding empty entry not possible
+      await expect(page.getByLabel(section + " speichern")).toBeDisabled()
+
+      // add entry
+      await container
+        .getByLabel("Aktenzeichen " + section, { exact: true })
+        .fill(fileNumber1)
+
+      await container.getByLabel(section + " speichern").click()
+      await expect(container.getByText(fileNumber1)).toBeVisible()
+
+      // edit entry
+      await container.getByLabel("Eintrag bearbeiten").click()
+      await container
+        .getByLabel("Aktenzeichen " + section, { exact: true })
+        .fill(fileNumber2)
+
+      await container.getByLabel(section + " speichern").click()
+      await expect(container.getByText(fileNumber1)).toBeHidden()
+      await expect(container.getByText(fileNumber2)).toBeVisible()
+
+      await expect(container.getByLabel("Listen Eintrag")).toHaveCount(1)
+
+      // add second entry
+      await container.getByLabel("Weitere Angabe").click()
+      await waitForSaving(
+        async () => {
+          await container
+            .getByLabel("Aktenzeichen " + section, { exact: true })
+            .fill(fileNumber3)
+          await container.getByLabel(section + " speichern").click()
+        },
+        page,
+        { clickSaveButton: true },
+      )
+
+      await expect(container.getByLabel("Listen Eintrag")).toHaveCount(2)
+      await page.reload()
+      await expect(container.getByLabel("Listen Eintrag")).toHaveCount(2)
+      await expect(container.getByLabel("Eintrag löschen")).toHaveCount(2)
+      await expect(container.getByLabel("Eintrag bearbeiten")).toHaveCount(2)
+
+      await container.getByLabel("Eintrag löschen").first().click()
+      await expect(container.getByLabel("Listen Eintrag")).toHaveCount(1)
+    })
+  }
+})
 
 /* eslint-disable playwright/no-conditional-in-test */
 test("search for documentunits and link decision", async ({
@@ -14,18 +86,11 @@ test("search for documentunits and link decision", async ({
   documentNumber,
   prefilledDocumentUnit,
 }) => {
-  await navigateToPublication(page, prefilledDocumentUnit.documentNumber || "")
-
-  await page
-    .locator("[aria-label='Dokumentationseinheit veröffentlichen']")
-    .click()
-  await expect(page.locator("text=Email wurde versendet")).toBeVisible()
-
-  await expect(page.locator("text=Xml Email Abgabe -")).toBeVisible()
-  await expect(page.locator("text=In Veröffentlichung")).toBeVisible()
-
+  await publishDocumentationUnit(
+    page,
+    prefilledDocumentUnit.documentNumber || "",
+  )
   await navigateToCategories(page, documentNumber)
-  await expect(page.getByText(documentNumber)).toBeVisible()
 
   const activeCitationContainer = page.getByLabel("Aktivzitierung")
   const previousDecisionContainer = page.getByLabel("Vorgehende Entscheidung")
@@ -156,8 +221,7 @@ test("search with changed parameters resets the page to 0", async ({
 
   for (const container of containers) {
     await test.step(
-      "for category " +
-        (await activeCitationContainer.first().getAttribute("aria-label")),
+      "for category " + (await container.first().getAttribute("aria-label")),
       async () => {
         await container.getByLabel("Nach Entscheidung suchen").click()
         await expect(container.getByText("Seite 1")).toBeVisible()
@@ -179,6 +243,58 @@ test("search with changed parameters resets the page to 0", async ({
 
         await container.getByLabel("Nach Entscheidung suchen").click()
 
+        await expect(
+          container.getByText("Keine Ergebnisse gefunden."),
+        ).toBeVisible()
+      },
+    )
+  }
+})
+
+test("search for documentunits does not return current documentation unit", async ({
+  page,
+  prefilledDocumentUnit,
+}) => {
+  await publishDocumentationUnit(
+    page,
+    prefilledDocumentUnit.documentNumber || "",
+  )
+
+  await navigateToCategories(page, prefilledDocumentUnit.documentNumber || "")
+
+  const activeCitationContainer = page.getByLabel("Aktivzitierung", {
+    exact: true,
+  })
+  const previousDecisionContainer = page.getByLabel("Vorgehende Entscheidung")
+  const ensuingDecisionContainer = page.getByLabel("Nachgehende Entscheidung")
+
+  const containers = [
+    activeCitationContainer,
+    previousDecisionContainer,
+    ensuingDecisionContainer,
+  ]
+
+  for (const container of containers) {
+    await test.step(
+      "for category " + (await container.first().getAttribute("aria-label")),
+      async () => {
+        const inputs = {
+          fileNumber: prefilledDocumentUnit.coreData.fileNumbers?.[0],
+          documentType: prefilledDocumentUnit.coreData.documentType?.label,
+          decisionDate: "31.12.2019",
+        }
+
+        if (container === activeCitationContainer) {
+          await fillActiveCitationInputs(page, inputs)
+        }
+        if (container === previousDecisionContainer) {
+          await fillPreviousDecisionInputs(page, inputs)
+        }
+        if (container === ensuingDecisionContainer) {
+          await fillEnsuingDecisionInputs(page, inputs)
+        }
+
+        await container.getByLabel("Nach Entscheidung suchen").click()
         await expect(
           container.getByText("Keine Ergebnisse gefunden."),
         ).toBeVisible()

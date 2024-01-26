@@ -3,6 +3,7 @@ import {
   navigateToCategories,
   navigateToFiles,
   navigateToPublication,
+  publishDocumentationUnit,
   uploadTestfile,
 } from "./e2e-utils"
 import { caselawTest as test } from "./fixtures"
@@ -44,14 +45,10 @@ test.describe("ensuring the publishing of documentunits works as expected", () =
     pageWithBghUser,
   }) => {
     await test.step("publish as authorized user", async () => {
-      await navigateToPublication(
+      await publishDocumentationUnit(
         page,
         prefilledDocumentUnit.documentNumber as string,
       )
-      await page
-        .locator("[aria-label='Dokumentationseinheit veröffentlichen']")
-        .click()
-      await expect(page.locator("text=Email wurde versendet")).toBeVisible()
     })
 
     await test.step("attempt to edit categories as unauthorized user", async () => {

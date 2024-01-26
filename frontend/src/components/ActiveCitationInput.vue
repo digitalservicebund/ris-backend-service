@@ -237,7 +237,7 @@ watch(
           <TextInput
             id="activeCitationDocumentType"
             v-model="activeCitation.fileNumber"
-            aria-label="Aktenzeichen der Aktivzitierung"
+            aria-label="Aktenzeichen Aktivzitierung"
             :has-error="slotProps.hasError"
             size="medium"
           ></TextInput>

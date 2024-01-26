@@ -9,6 +9,7 @@ export const navigateToCategories = async (
   await expect(page.locator("text=Spruchkörper")).toBeVisible({
     timeout: 15000, // for backend warm up
   })
+  await expect(page.getByText(documentNumber)).toBeVisible()
 }
 
 export const navigateToFiles = async (page: Page, documentNumber: string) => {
@@ -26,6 +27,20 @@ export const navigateToPublication = async (
   await expect(page.locator("h1:has-text('Veröffentlichen')")).toBeVisible({
     timeout: 15000, // for backend warm up
   })
+}
+
+export const publishDocumentationUnit = async (
+  page: Page,
+  documentNumber: string,
+) => {
+  await navigateToPublication(page, documentNumber)
+  await page
+    .locator("[aria-label='Dokumentationseinheit veröffentlichen']")
+    .click()
+  await expect(page.locator("text=Email wurde versendet")).toBeVisible()
+
+  await expect(page.locator("text=Xml Email Abgabe -")).toBeVisible()
+  await expect(page.locator("text=In Veröffentlichung")).toBeVisible()
 }
 
 export const uploadTestfile = async (page: Page, filename: string) => {
@@ -321,7 +336,7 @@ export async function fillActiveCitationInputs(
     )
   }
   if (values?.fileNumber) {
-    await fillInput("Aktenzeichen der Aktivzitierung", values?.fileNumber)
+    await fillInput("Aktenzeichen Aktivzitierung", values?.fileNumber)
   }
   if (values?.documentType) {
     await fillInput("Dokumenttyp der Aktivzitierung", values?.documentType)

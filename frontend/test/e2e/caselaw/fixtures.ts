@@ -23,7 +23,12 @@ export const caselawTest = test.extend<MyFixtures>({
 
     await use(documentNumber)
 
-    await request.delete(`/api/v1/caselaw/documentunits/${uuid}`)
+    const deleteResponse = await request.delete(
+      `/api/v1/caselaw/documentunits/${uuid}`,
+    )
+    if (!deleteResponse.ok) {
+      console.log("DELETE NOT POSSIBLE 1")
+    }
   },
 
   prefilledDocumentUnit: async ({ request }, use) => {
@@ -56,9 +61,13 @@ export const caselawTest = test.extend<MyFixtures>({
 
     await use(await updateResponse.json())
 
-    await request.delete(
+    const deleteResponse = await request.delete(
       `/api/v1/caselaw/documentunits/${prefilledDocumentUnit.uuid}`,
     )
+
+    if (!deleteResponse.ok) {
+      console.log("DELETE NOT POSSIBLE 2")
+    }
   },
 
   secondPrefilledDocumentUnit: async ({ request }, use) => {
@@ -91,9 +100,13 @@ export const caselawTest = test.extend<MyFixtures>({
 
     await use(await updateResponse.json())
 
-    await request.delete(
+    const deleteResponse = await request.delete(
       `/api/v1/caselaw/documentunits/${secondPrefilledDocumentUnit.uuid}`,
     )
+
+    if (!deleteResponse.ok) {
+      console.log("DELETE NOT POSSIBLE 3")
+    }
   },
 
   editorField: async ({ page, documentNumber }, use) => {
