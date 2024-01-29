@@ -47,6 +47,10 @@ function setEditIndex(index?: number) {
   editIndex.value = index
 }
 
+function cancelEdit() {
+  setEditIndex()
+}
+
 function addNewListEntry() {
   const { defaultValue } = props
   modelValueList.value.push(
@@ -54,6 +58,21 @@ function addNewListEntry() {
   )
 
   editIndex.value = modelValueList.value.length - 1
+}
+
+function removeListEntry(index: number) {
+  modelValueList.value.splice(index, 1)
+
+  if (editIndex.value !== undefined && index < editIndex.value) {
+    editIndex.value -= 1
+  }
+
+  emit(
+    "update:modelValue",
+    [...props.modelValue].filter((_, i) => i !== index),
+  )
+
+  editIndex.value = undefined
 }
 
 function updateModel() {
@@ -118,6 +137,8 @@ onMounted(() => {
         class="py-24"
         :model-value-list="modelValueList"
         @add-entry="updateModel"
+        @cancel-edit="cancelEdit"
+        @remove-list-entry="removeListEntry(index)"
       />
     </div>
 
@@ -125,7 +146,7 @@ onMounted(() => {
       v-if="editIndex === undefined"
       aria-label="Weitere Angabe"
       button-type="tertiary"
-      class="mt-24"
+      class="mt-24 first:mt-0"
       label="Weitere Angabe"
       size="small"
       @click="addNewListEntry"

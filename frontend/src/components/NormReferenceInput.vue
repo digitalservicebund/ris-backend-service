@@ -16,12 +16,15 @@ const props = defineProps<{ modelValue?: NormReference }>()
 const emit = defineEmits<{
   "update:modelValue": [value: NormReference]
   addEntry: [void]
+  cancelEdit: [void]
+  removeListEntry: [void]
 }>()
 
 const validationStore =
   useValidationStore<(typeof NormReference.fields)[number]>()
 
 const norm = ref(new NormReference({ ...props.modelValue }))
+const lastModelValue = ref(new NormReference({ ...props.modelValue }))
 
 const normAbbreviation = computed({
   get: () =>
@@ -175,14 +178,35 @@ watch(props, () => {
         />
       </InputField>
     </div>
-    <div>
+    <div class="flex w-full flex-row justify-between">
+      <div>
+        <div>
+          <TextButton
+            aria-label="Norm speichern"
+            button-type="tertiary"
+            class="mr-24"
+            :disabled="norm.isEmpty"
+            label="Übernehmen"
+            size="small"
+            @click.stop="addNormReference"
+          />
+          <TextButton
+            v-if="!lastModelValue.isEmpty"
+            aria-label="Abbrechen"
+            button-type="ghost"
+            label="Abbrechen"
+            size="small"
+            @click.stop="emit('cancelEdit')"
+          />
+        </div>
+      </div>
       <TextButton
-        aria-label="Norm speichern"
-        button-type="tertiary"
-        :disabled="norm.isEmpty"
-        label="Übernehmen"
+        v-if="!lastModelValue.isEmpty"
+        aria-label="Norm löschen"
+        button-type="error"
+        label="Eintrag löschen"
         size="small"
-        @click="addNormReference"
+        @click.stop="emit('removeListEntry')"
       />
     </div>
   </div>

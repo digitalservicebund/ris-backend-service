@@ -26,9 +26,12 @@ const props = defineProps<{
 const emit = defineEmits<{
   "update:modelValue": [value: PreviousDecision]
   addEntry: [void]
+  cancelEdit: [void]
+  removeListEntry: [void]
 }>()
 
 const lastSearchInput = ref(new PreviousDecision())
+const lastModelValue = ref(new PreviousDecision({ ...props.modelValue }))
 const previousDecision = ref(new PreviousDecision({ ...props.modelValue }))
 const validationStore =
   useValidationStore<(typeof PreviousDecision.fields)[number]>()
@@ -274,25 +277,44 @@ onMounted(() => {
         ></TextInput>
       </InputField>
     </div>
-
-    <div>
+    <div class="flex w-full flex-row justify-between">
+      <div>
+        <div>
+          <TextButton
+            v-if="!modelValue?.hasForeignSource"
+            aria-label="Nach Entscheidung suchen"
+            button-type="primary"
+            class="mr-24"
+            label="Suchen"
+            size="small"
+            @click="search"
+          />
+          <TextButton
+            aria-label="Vorgehende Entscheidung speichern"
+            button-type="tertiary"
+            class="mr-24"
+            :disabled="previousDecision.isEmpty"
+            label="Übernehmen"
+            size="small"
+            @click.stop="addPreviousDecision"
+          />
+          <TextButton
+            v-if="!lastModelValue.isEmpty"
+            aria-label="Abbrechen"
+            button-type="ghost"
+            label="Abbrechen"
+            size="small"
+            @click.stop="emit('cancelEdit')"
+          />
+        </div>
+      </div>
       <TextButton
-        v-if="!modelValue?.hasForeignSource"
-        aria-label="Nach Entscheidung suchen"
-        button-type="primary"
-        class="mr-24"
-        label="Suchen"
+        v-if="!lastModelValue.isEmpty"
+        aria-label="Vorgehende Entscheidung löschen"
+        button-type="error"
+        label="Eintrag löschen"
         size="small"
-        @click="search"
-      />
-      <TextButton
-        aria-label="Vorgehende Entscheidung speichern"
-        button-type="tertiary"
-        class="mr-24"
-        :disabled="previousDecision.isEmpty"
-        label="Direkt übernehmen"
-        size="small"
-        @click.stop="addPreviousDecision"
+        @click.stop="emit('removeListEntry')"
       />
     </div>
 

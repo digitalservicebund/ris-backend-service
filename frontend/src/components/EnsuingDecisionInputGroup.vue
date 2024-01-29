@@ -25,9 +25,12 @@ const props = defineProps<{
 const emit = defineEmits<{
   "update:modelValue": [value: EnsuingDecision]
   addEntry: [void]
+  cancelEdit: [void]
+  removeListEntry: [void]
 }>()
 
 const lastSearchInput = ref(new EnsuingDecision())
+const lastModelValue = ref(new EnsuingDecision({ ...props.modelValue }))
 const ensuingDecision = ref(new EnsuingDecision({ ...props.modelValue }))
 const validationStore =
   useValidationStore<(typeof EnsuingDecision.fields)[number]>()
@@ -245,24 +248,44 @@ onMounted(() => {
       ></TextInput>
     </InputField>
 
-    <div>
+    <div class="flex w-full flex-row justify-between">
+      <div>
+        <div>
+          <TextButton
+            v-if="!ensuingDecision.hasForeignSource"
+            aria-label="Nach Entscheidung suchen"
+            button-type="primary"
+            class="mr-24"
+            label="Suchen"
+            size="small"
+            @click="search"
+          />
+          <TextButton
+            aria-label="Nachgehende Entscheidung speichern"
+            button-type="tertiary"
+            class="mr-24"
+            :disabled="ensuingDecision.isEmpty"
+            label="Übernehmen"
+            size="small"
+            @click.stop="addEnsuingDecision"
+          />
+          <TextButton
+            v-if="!lastModelValue.isEmpty"
+            aria-label="Abbrechen"
+            button-type="ghost"
+            label="Abbrechen"
+            size="small"
+            @click.stop="emit('cancelEdit')"
+          />
+        </div>
+      </div>
       <TextButton
-        v-if="!ensuingDecision.hasForeignSource"
-        aria-label="Nach Entscheidung suchen"
-        button-type="primary"
-        class="mr-24"
-        label="Suchen"
+        v-if="!lastModelValue.isEmpty"
+        aria-label="Nachgehende Entscheidung löschen"
+        button-type="error"
+        label="Eintrag löschen"
         size="small"
-        @click="search"
-      />
-      <TextButton
-        aria-label="Nachgehende Entscheidung speichern"
-        button-type="tertiary"
-        class="mr-24"
-        :disabled="ensuingDecision.isEmpty"
-        label="Direkt übernehmen"
-        size="small"
-        @click.stop="addEnsuingDecision"
+        @click.stop="emit('removeListEntry')"
       />
     </div>
 

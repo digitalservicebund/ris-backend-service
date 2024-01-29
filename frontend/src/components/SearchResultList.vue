@@ -13,12 +13,12 @@ const emits =
   defineEmits<(event: "linkDecision", decision: RelatedDocumentation) => void>()
 </script>
 
-<!-- <script lang="ts">
+<script lang="ts">
 export type SearchResults<Type extends RelatedDocumentation> = {
   decision: Type
   isLinked: boolean
 }[]
-</script> -->
+</script>
 
 <template>
   <div v-if="!!isLoading" class="mt-40 text-center">
@@ -48,7 +48,7 @@ export type SearchResults<Type extends RelatedDocumentation> = {
           :disabled="searchResult.isLinked"
           label="Übernehmen"
           size="small"
-          @click="emits('linkDecision', searchResult.decision)"
+          @click.stop="emits('linkDecision', searchResult.decision)"
         />
       </div>
       <span

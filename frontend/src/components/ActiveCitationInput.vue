@@ -23,9 +23,12 @@ const props = defineProps<{
 const emit = defineEmits<{
   "update:modelValue": [value: ActiveCitation]
   addEntry: [void]
+  cancelEdit: [void]
+  removeListEntry: [void]
 }>()
 
 const lastSearchInput = ref(new ActiveCitation())
+const lastModelValue = ref(new ActiveCitation({ ...props.modelValue }))
 const activeCitation = ref(new ActiveCitation({ ...props.modelValue }))
 
 const validationStore =
@@ -245,25 +248,47 @@ watch(
         </InputField>
       </div>
     </div>
-    <div>
+    <div class="flex w-full flex-row justify-between">
+      <div>
+        <div>
+          <TextButton
+            v-if="!activeCitation.hasForeignSource"
+            aria-label="Nach Entscheidung suchen"
+            button-type="primary"
+            class="mr-24"
+            label="Suchen"
+            size="small"
+            @click="search"
+          />
+          <TextButton
+            aria-label="Aktivzitierung speichern"
+            button-type="tertiary"
+            class="mr-24"
+            :disabled="activeCitation.isEmpty"
+            label="Übernehmen"
+            size="small"
+            @click.stop="addActiveCitation"
+          />
+          <TextButton
+            v-if="!lastModelValue.isEmpty"
+            aria-label="Abbrechen"
+            button-type="ghost"
+            label="Abbrechen"
+            size="small"
+            @click.stop="emit('cancelEdit')"
+          />
+        </div>
+      </div>
       <TextButton
-        v-if="!activeCitation.hasForeignSource"
-        aria-label="Nach Entscheidung suchen"
-        button-type="primary"
-        class="mr-24"
-        label="Suchen"
+        v-if="!lastModelValue.isEmpty"
+        aria-label="Aktivzitierung löschen"
+        button-type="error"
+        label="Eintrag löschen"
         size="small"
-        @click="search"
-      />
-      <TextButton
-        aria-label="Aktivzitierung speichern"
-        button-type="tertiary"
-        :disabled="activeCitation.isEmpty"
-        label="Direkt übernehmen"
-        size="small"
-        @click.stop="addActiveCitation"
+        @click.stop="emit('removeListEntry')"
       />
     </div>
+
     <Pagination
       navigation-position="bottom"
       :page="searchResultsCurrentPage"
