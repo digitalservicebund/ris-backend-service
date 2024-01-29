@@ -13,6 +13,7 @@ interface Props {
   download?: boolean | string
   size?: "large" | "medium" | "small"
   target?: "_self" | "_blank" | "_parent" | "_top"
+  iconPosition?: "left" | "right"
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -25,6 +26,7 @@ const props = withDefaults(defineProps<Props>(), {
   download: undefined,
   size: "medium",
   target: undefined,
+  iconPosition: "left",
 })
 
 const buttonClasses = computed(() => ({
@@ -66,7 +68,11 @@ const render = () => {
       download,
       target,
     },
-    [renderIcon(), renderLabel()],
+    [
+      props.iconPosition === "right"
+        ? [renderLabel(), renderIcon()]
+        : [renderIcon(), renderLabel()],
+    ],
   )
 }
 </script>

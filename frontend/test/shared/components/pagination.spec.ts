@@ -9,16 +9,17 @@ function renderComponent(options?: {
   last?: boolean
   first?: boolean
   empty?: boolean
+  numberOfElements?: number
 }) {
   return render(Pagination, {
     props: {
       page: {
         content: [1, 2, 3, 4, 5],
         size: 100,
-        numberOfElements: 100,
+        numberOfElements: options?.numberOfElements ?? 100,
         number: options?.currentPage ?? 0,
         first: options?.first ?? true,
-        last: options?.last ?? true,
+        last: options?.last ?? false,
         empty: options?.empty ?? false,
       },
       ...(options?.navigationPosition
@@ -33,7 +34,7 @@ describe("Pagination", () => {
   test("display navigation", async () => {
     renderComponent()
 
-    for (const element of ["zurück", "vor"]) {
+    for (const element of ["Zurück", "Weiter"]) {
       await screen.findByText(element)
     }
   })
@@ -42,7 +43,7 @@ describe("Pagination", () => {
     renderComponent({ navigationPosition: "bottom" })
 
     const slot = screen.getByText("list slot")
-    const navigation = await screen.findByText("vor")
+    const navigation = await screen.findByText("Weiter")
 
     expect(slot.compareDocumentPosition(navigation)).toBe(4)
   })
@@ -51,19 +52,13 @@ describe("Pagination", () => {
     renderComponent({ navigationPosition: "top" })
 
     const slot = screen.getByText("list slot")
-    const navigation = await screen.findByText("vor")
+    const navigation = await screen.findByText("Zurück")
 
     expect(slot.compareDocumentPosition(navigation)).toBe(2)
   })
 
-  test("updates string correctly for one result", async () => {
-    renderComponent({ getInitialData: true })
-
-    await screen.findByText("Seite 1")
-  })
-
   test("next button disabled if on last page", async () => {
-    renderComponent({ last: true })
+    renderComponent({ first: false, last: true })
 
     const nextButton = await screen.findByLabelText("nächste Ergebnisse")
     expect(nextButton).toBeDisabled()
@@ -74,6 +69,34 @@ describe("Pagination", () => {
 
     const nextButton = await screen.findByLabelText("nächste Ergebnisse")
     expect(nextButton).toBeEnabled()
+  })
+
+  test("number of results and no buttons shown for total one page", async () => {
+    renderComponent({ first: true, last: true })
+
+    const resultText = await screen.findByText("100 Ergebnisse gefunden")
+    expect(resultText).toBeVisible()
+
+    const nextButton = screen.queryByLabelText("nächste Ergebnisse")
+    expect(nextButton).not.toBeInTheDocument()
+    const previousButton = screen.queryByLabelText("vorherige Ergebnisse")
+    expect(previousButton).not.toBeInTheDocument()
+  })
+
+  test("number of results shown for first of multiple pages", async () => {
+    renderComponent({ first: true, last: false })
+
+    const pageText = await screen.findByText("Seite 1: ", { trim: false })
+    expect(pageText).toBeVisible()
+    const resultText = await screen.findByText("100 Ergebnisse angezeigt")
+    expect(resultText).toBeVisible()
+  })
+
+  test("exactly one result shown in single case", async () => {
+    renderComponent({ first: true, last: true, numberOfElements: 1 })
+
+    const resultText = await screen.findByText("1 Ergebnis gefunden")
+    expect(resultText).toBeVisible()
   })
 
   test("previous button disabled if on first page", async () => {

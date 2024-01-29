@@ -31,7 +31,7 @@ const activeCitation = ref(new ActiveCitation({ ...props.modelValue }))
 const validationStore =
   useValidationStore<(typeof ActiveCitation.fields)[number]>()
 const pageNumber = ref<number>(0)
-const itemsPerPage = ref<number>(30)
+const itemsPerPage = ref<number>(15)
 const isLoading = ref(false)
 
 const activeCitationType = computed({

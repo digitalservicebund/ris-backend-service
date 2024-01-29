@@ -1,6 +1,6 @@
 <!-- eslint-disable vue/multi-word-component-names -->
 <script setup lang="ts">
-import PaginationButton from "./PaginationButton.vue"
+import TextButton from "./input/TextButton.vue"
 import { ServiceResponse } from "@/services/httpClient"
 import IconArrowBack from "~icons/ic/baseline-arrow-back"
 import IconArrowForward from "~icons/ic/baseline-arrow-forward"
@@ -49,27 +49,46 @@ export type PageableService<TResult, TQuery = TResult> = (
     v-if="page?.content && !page?.empty && !isLoading"
     class="my-32 mb-10 mt-20 flex flex-col items-center"
   >
-    <div class="flex items-center">
-      <div class="relative flex flex-grow items-center justify-center">
-        <PaginationButton
+    <div class="flex w-full items-center">
+      <div class="relative flex flex-grow items-center justify-between">
+        <TextButton
+          v-if="!(page.first && page.last)"
           aria-label="vorherige Ergebnisse"
+          button-type="tertiary"
           :disabled="page?.first"
+          :icon="IconArrowBack"
+          icon-position="left"
+          label="Zurück"
+          size="small"
           @click="previousPage"
           @keydown.enter="previousPage"
         >
-          <IconArrowBack />
-          <span class="underline">zurück</span>
-        </PaginationButton>
-        <span>Seite {{ page.number + 1 }} </span>
-        <PaginationButton
+        </TextButton>
+        <span class="only:m-auto">
+          <b v-if="!(page.first && page.last)">Seite {{ page.number + 1 }}: </b>
+          <span>
+            {{
+              page.numberOfElements == 1
+                ? "1 Ergebnis"
+                : page.numberOfElements + " Ergebnisse"
+            }}
+            {{ page.first && page.last ? "gefunden" : "angezeigt" }}</span
+          >
+        </span>
+        <TextButton
+          v-if="!(page.first && page.last)"
           aria-label="nächste Ergebnisse"
+          button-type="tertiary"
+          class="mr-24"
           :disabled="page?.last"
+          :icon="IconArrowForward"
+          icon-position="right"
+          label="Weiter"
+          size="small"
           @click="nextPage"
           @keydown.enter="nextPage"
         >
-          <span class="underline">vor</span>
-          <IconArrowForward />
-        </PaginationButton>
+        </TextButton>
       </div>
     </div>
   </div>

@@ -34,7 +34,7 @@ const validationStore =
   useValidationStore<(typeof PreviousDecision.fields)[number]>()
 
 const pageNumber = ref<number>(0)
-const itemsPerPage = ref<number>(30)
+const itemsPerPage = ref<number>(15)
 const isLoading = ref(false)
 
 const searchResultsCurrentPage = ref<Page<RelatedDocumentation>>()

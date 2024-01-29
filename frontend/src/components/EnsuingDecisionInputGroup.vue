@@ -32,7 +32,7 @@ const ensuingDecision = ref(new EnsuingDecision({ ...props.modelValue }))
 const validationStore =
   useValidationStore<(typeof EnsuingDecision.fields)[number]>()
 const pageNumber = ref<number>(0)
-const itemsPerPage = ref<number>(30)
+const itemsPerPage = ref<number>(15)
 const isLoading = ref(false)
 const searchResultsCurrentPage = ref<Page<RelatedDocumentation>>()
 const searchResults = ref<SearchResults<RelatedDocumentation>>()

@@ -12,7 +12,7 @@ import Pagination, { Page } from "@/shared/components/Pagination.vue"
 const documentUnitListEntries = ref<DocumentUnitListEntry[]>()
 const currentPage = ref<Page<DocumentUnitListEntry>>()
 
-const itemsPerPage = 30
+const itemsPerPage = 100
 const searchResponseError = ref()
 const isLoading = ref(false)
 const searchQuery = ref<Query<DocumentUnitSearchParameter>>()
