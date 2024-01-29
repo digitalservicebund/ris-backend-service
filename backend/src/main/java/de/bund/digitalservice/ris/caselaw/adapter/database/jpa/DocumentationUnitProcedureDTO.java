@@ -13,7 +13,6 @@ import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
-import lombok.EqualsAndHashCode.Include;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -23,12 +22,11 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Entity
 @Table(schema = "incremental_migration", name = "documentation_unit_procedure")
 public class DocumentationUnitProcedureDTO {
 
-  @EmbeddedId @Include
+  @EmbeddedId @Builder.Default
   private DocumentationUnitProcedureId primaryKey = new DocumentationUnitProcedureId();
 
   @ManyToOne

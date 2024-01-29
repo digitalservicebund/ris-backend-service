@@ -1,6 +1,7 @@
 package de.bund.digitalservice.ris.caselaw.domain;
 
 import de.bund.digitalservice.ris.caselaw.domain.validator.DateKnownConstraint;
+import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -14,7 +15,7 @@ import lombok.experimental.SuperBuilder;
 @DateKnownConstraint
 @Data
 public class PreviousDecision extends RelatedDocumentationUnit {
-  private boolean dateKnown = true;
+  @Builder.Default private boolean dateKnown = true;
   private String deviatingFileNumber;
 
   public boolean hasNoValues() {

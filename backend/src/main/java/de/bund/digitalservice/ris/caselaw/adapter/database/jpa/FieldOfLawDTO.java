@@ -17,6 +17,7 @@ import jakarta.persistence.OrderBy;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import jakarta.validation.Valid;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -64,16 +65,17 @@ public class FieldOfLawDTO {
       name = "field_of_law_field_of_law_keyword",
       joinColumns = @JoinColumn(name = "field_of_law_id"),
       inverseJoinColumns = @JoinColumn(name = "field_of_law_keyword_id"))
-  private List<FieldOfLawKeywordDTO> keywords;
+  @Builder.Default
+  private List<FieldOfLawKeywordDTO> keywords = new ArrayList<>();
 
   @OneToMany(
       mappedBy = "fieldOfLaw",
       cascade = CascadeType.ALL,
       fetch = FetchType.LAZY,
       orphanRemoval = true)
-  @Builder.Default
   @Valid
   @OrderBy("abbreviation")
+  @Builder.Default
   private Set<FieldOfLawNormDTO> norms = new HashSet<>();
 
   @ManyToOne(fetch = FetchType.LAZY)
@@ -86,6 +88,7 @@ public class FieldOfLawDTO {
 
   @OneToMany(fetch = FetchType.LAZY, mappedBy = "parent")
   @OrderBy("identifier")
+  @Builder.Default
   private Set<FieldOfLawDTO> children = new HashSet<>();
 
   @ManyToMany(fetch = FetchType.LAZY)

@@ -25,7 +25,7 @@ import lombok.Setter;
 @Table(schema = "incremental_migration", name = "documentation_unit_field_of_law")
 public class DocumentationUnitFieldOfLawDTO {
 
-  @EmbeddedId
+  @EmbeddedId @Builder.Default
   private DocumentationUnitFieldOfLawId primaryKey = new DocumentationUnitFieldOfLawId();
 
   @ManyToOne

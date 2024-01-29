@@ -25,7 +25,8 @@ import lombok.Setter;
 @Table(schema = "incremental_migration", name = "documentation_unit_keyword")
 public class DocumentationUnitKeywordDTO {
 
-  @EmbeddedId private DocumentationUnitKeywordId primaryKey = new DocumentationUnitKeywordId();
+  @EmbeddedId @Builder.Default
+  private DocumentationUnitKeywordId primaryKey = new DocumentationUnitKeywordId();
 
   @ManyToOne
   @MapsId("documentationUnitId")
