@@ -173,7 +173,7 @@ export interface TextAreaInputAttributes extends BaseInputAttributes {
   readOnly?: boolean
   autosize?: boolean
   rows?: number
-  fieldSize: "big" | "medium" | "small"
+  fieldSize: "max" | "big" | "medium" | "small"
 }
 
 export interface TextAreaInputField extends BaseInputField {

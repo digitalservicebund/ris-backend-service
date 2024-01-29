@@ -82,7 +82,7 @@ const toggleModal = () => {
     </div>
     <div v-if="!html" class="text-center"><LoadingSpinner /></div>
 
-    <TextEditor v-else class="grow bg-white" expanded :value="html" />
+    <TextEditor v-else class="grow bg-white" field-size="max" :value="html" />
 
     <PopupModal
       v-if="showModal"

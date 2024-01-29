@@ -52,7 +52,6 @@ interface Props {
   editable?: boolean
   ariaLabel?: string
   fieldSize?: TextAreaInputAttributes["fieldSize"]
-  expanded?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -60,7 +59,6 @@ const props = withDefaults(defineProps<Props>(), {
   editable: false,
   ariaLabel: "Editor Feld",
   fieldSize: "medium",
-  expanded: false,
 })
 
 const emit = defineEmits<{
@@ -250,17 +248,19 @@ const maxButtonEntries = computed(() =>
   Math.floor((containerWidth.value - 100) / buttonSize),
 )
 
-const editorExpanded = ref(props.expanded)
+const editorExpanded = ref(false)
 const editorSize = computed(() => {
   return editorExpanded.value
     ? "h-640"
-    : props.fieldSize == "big"
-      ? "h-320"
-      : props.fieldSize == "medium"
-        ? "h-160"
-        : props.fieldSize == "small"
-          ? "h-96"
-          : undefined
+    : props.fieldSize == "max"
+      ? "h-full"
+      : props.fieldSize == "big"
+        ? "h-320"
+        : props.fieldSize == "medium"
+          ? "h-160"
+          : props.fieldSize == "small"
+            ? "h-96"
+            : undefined
 })
 const { collapsedButtons } = useCollapsingMenuBar(
   editorButtons,
