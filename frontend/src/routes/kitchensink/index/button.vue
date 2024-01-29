@@ -15,6 +15,12 @@ import IconClear from "~icons/ic/baseline-clear"
           :icon="IconClear"
           label="Button Primary With Icon"
         />
+        <TextButton
+          button-type="primary"
+          :icon="IconClear"
+          icon-position="right"
+          label="Button Primary With Icon on the Right"
+        />
         <TextButton button-type="primary" :icon="IconClear" />
         <TextButton button-type="primary" disabled label="Disabled" />
       </div>
@@ -27,6 +33,12 @@ import IconClear from "~icons/ic/baseline-clear"
           button-type="secondary"
           :icon="IconClear"
           label="Button Secondary With Icon"
+        />
+        <TextButton
+          button-type="secondary"
+          :icon="IconClear"
+          icon-position="right"
+          label="Button Primary With Icon on the Right"
         />
         <TextButton button-type="secondary" :icon="IconClear" />
         <TextButton button-type="secondary" disabled label="Disabled" />
@@ -41,6 +53,12 @@ import IconClear from "~icons/ic/baseline-clear"
           :icon="IconClear"
           label="Button Tertiary With Icon"
         />
+        <TextButton
+          button-type="tertiary"
+          :icon="IconClear"
+          icon-position="right"
+          label="Button Primary With Icon on the Right"
+        />
         <TextButton button-type="tertiary" :icon="IconClear" />
         <TextButton button-type="tertiary" disabled label="Disabled" />
       </div>
@@ -53,6 +71,12 @@ import IconClear from "~icons/ic/baseline-clear"
           button-type="ghost"
           :icon="IconClear"
           label="Button Ghost With Icon"
+        />
+        <TextButton
+          button-type="ghost"
+          :icon="IconClear"
+          icon-position="right"
+          label="Button Primary With Icon on the Right"
         />
         <TextButton button-type="ghost" :icon="IconClear" />
         <TextButton button-type="ghost" disabled label="Disabled" />
