@@ -38,7 +38,10 @@ test.describe("active citations", () => {
     await page.getByLabel("Aktivzitierung speichern").click()
 
     await expect(page.getByLabel("Fehlerhafte Eingabe")).toBeVisible()
-    await page.getByLabel("Eintrag bearbeiten").click()
+    await page
+      .getByLabel("Aktivzitierung", { exact: true })
+      .getByLabel("Listen Eintrag")
+      .click()
     await expect(
       page.getByLabel("Aktivzitierung").getByText("Pflichtfeld nicht befüllt"),
     ).toHaveCount(3)

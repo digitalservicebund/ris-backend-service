@@ -3,20 +3,19 @@ import { render, screen } from "@testing-library/vue"
 import SearchResultList, {
   SearchResults,
 } from "@/components/SearchResultList.vue"
-import ActiveCitation from "@/domain/activeCitation"
-import ProceedingDecision from "@/domain/previousDecision"
+import RelatedDocumentation from "@/domain/relatedDocumentation"
 
 function renderSearchResults(
-  searchResults?: SearchResults<ProceedingDecision | ActiveCitation>,
+  searchResults?: SearchResults<RelatedDocumentation>,
   isLoading?: boolean,
 ) {
   const props: {
-    searchResults: SearchResults<ProceedingDecision | ActiveCitation>
+    searchResults: SearchResults<RelatedDocumentation>
     isLoading: boolean
   } = {
     searchResults: searchResults ?? [
       {
-        decision: new ProceedingDecision({
+        decision: new RelatedDocumentation({
           ...{
             court: {
               type: "fooType",
@@ -44,7 +43,7 @@ function renderSearchResults(
   return { user, ...utils }
 }
 
-describe("ProceedingDecision SearchResult List", () => {
+describe("Search result list", () => {
   it("renders correctly", async () => {
     renderSearchResults()
 
@@ -53,17 +52,17 @@ describe("ProceedingDecision SearchResult List", () => {
     expect(screen.queryByText(/Bereits hinzugefügt/)).not.toBeInTheDocument()
   })
 
-  it("indicates not yet added proceeding decisions", async () => {
+  it("indicates not yet added previous decisions", async () => {
     renderSearchResults()
 
     expect(await screen.findByText("Übernehmen")).toBeVisible()
     expect(screen.queryByText(/Bereits hinzugefügt/)).not.toBeInTheDocument()
   })
 
-  it("indicates already added proceeding decisions", async () => {
+  it("indicates already added previous decisions", async () => {
     renderSearchResults([
       {
-        decision: new ProceedingDecision({
+        decision: new RelatedDocumentation({
           ...{
             court: {
               type: "fooType",
@@ -97,7 +96,7 @@ describe("ProceedingDecision SearchResult List", () => {
   it("renders search results for active citations", async () => {
     renderSearchResults([
       {
-        decision: new ActiveCitation({
+        decision: new RelatedDocumentation({
           ...{
             court: {
               type: "fooType",

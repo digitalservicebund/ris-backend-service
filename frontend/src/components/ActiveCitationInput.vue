@@ -281,7 +281,7 @@ watch(
       </div>
       <TextButton
         v-if="!lastModelValue.isEmpty"
-        aria-label="Aktivzitierung löschen"
+        aria-label="Eintrag löschen"
         button-type="error"
         label="Eintrag löschen"
         size="small"

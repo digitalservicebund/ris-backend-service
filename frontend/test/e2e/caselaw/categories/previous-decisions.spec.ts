@@ -44,7 +44,10 @@ test.describe("previous decisions", () => {
     await page.getByLabel("Vorgehende Entscheidung speichern").click()
 
     await expect(page.getByLabel("Fehlerhafte Eingabe")).toBeVisible()
-    await page.getByLabel("Eintrag bearbeiten").click()
+    await page
+      .getByLabel("Vorgehende Entscheidung", { exact: true })
+      .getByLabel("Listen Eintrag")
+      .click()
     await expect(
       page
         .getByLabel("Vorgehende Entscheidung")
@@ -160,7 +163,10 @@ test.describe("previous decisions", () => {
       { clickSaveButton: true },
     )
 
-    await page.getByLabel("Eintrag bearbeiten").click()
+    await page
+      .getByLabel("Vorgehende Entscheidung", { exact: true })
+      .getByLabel("Listen Eintrag")
+      .click()
     await page
       .locator(
         "[aria-label='Abweichendes Aktenzeichen Vorgehende Entscheidung anzeigen']",
@@ -187,7 +193,10 @@ test.describe("previous decisions", () => {
       { clickSaveButton: true },
     )
 
-    await page.getByLabel("Eintrag bearbeiten").click()
+    await page
+      .getByLabel("Vorgehende Entscheidung", { exact: true })
+      .getByLabel("Listen Eintrag")
+      .click()
     await page
       .locator(
         "[aria-label='Abweichendes Aktenzeichen Vorgehende Entscheidung anzeigen']",

@@ -201,8 +201,8 @@ describe("Active Citations", () => {
         }),
       ],
     })
-    const button = screen.getByLabelText("Eintrag bearbeiten")
-    await user.click(button)
+    const itemHeader = screen.getByLabelText("Listen Eintrag")
+    await user.click(itemHeader)
 
     expect(screen.getByLabelText("Art der Zitierung")).toBeVisible()
     expect(
@@ -223,7 +223,7 @@ describe("Active Citations", () => {
     renderComponent({
       modelValue: [generateActiveCitation()],
     })
-    expect(screen.getByLabelText("Eintrag bearbeiten")).toBeInTheDocument()
+    expect(screen.getByLabelText("Listen Eintrag")).toBeInTheDocument()
   })
 
   it("correctly updates value citation style input", async () => {
@@ -241,8 +241,8 @@ describe("Active Citations", () => {
 
     expect(screen.queryByText(/Änderungen/)).not.toBeInTheDocument()
 
-    const editButton = screen.getByLabelText("Eintrag bearbeiten")
-    await user.click(editButton)
+    const itemHeader = screen.getByLabelText("Listen Eintrag")
+    await user.click(itemHeader)
 
     await user.type(
       await screen.findByLabelText("Art der Zitierung"),
@@ -264,8 +264,8 @@ describe("Active Citations", () => {
 
     expect(screen.queryByText(/EuGH-Vorlage/)).not.toBeInTheDocument()
 
-    const editButton = screen.getByLabelText("Eintrag bearbeiten")
-    await user.click(editButton)
+    const itemHeader = screen.getByLabelText("Listen Eintrag")
+    await user.click(itemHeader)
 
     await user.type(
       await screen.findByLabelText("Dokumenttyp der Aktivzitierung"),
@@ -287,8 +287,8 @@ describe("Active Citations", () => {
 
     expect(screen.queryByText(/AG Test/)).not.toBeInTheDocument()
 
-    const editButton = screen.getByLabelText("Eintrag bearbeiten")
-    await user.click(editButton)
+    const itemHeader = screen.getByLabelText("Listen Eintrag")
+    await user.click(itemHeader)
 
     await user.type(
       await screen.findByLabelText("Gericht der Aktivzitierung"),
@@ -309,8 +309,8 @@ describe("Active Citations", () => {
     })
 
     expect(screen.queryByText(/new fileNumber/)).not.toBeInTheDocument()
-    const editButton = screen.getByLabelText("Eintrag bearbeiten")
-    await user.click(editButton)
+    const itemHeader = screen.getByLabelText("Listen Eintrag")
+    await user.click(itemHeader)
 
     const fileNumberInput = await screen.findByLabelText(
       "Aktenzeichen Aktivzitierung",
@@ -330,8 +330,8 @@ describe("Active Citations", () => {
     })
 
     expect(screen.queryByText(/02.02.2022/)).not.toBeInTheDocument()
-    const editButton = screen.getByLabelText("Eintrag bearbeiten")
-    await user.click(editButton)
+    const itemHeader = screen.getByLabelText("Listen Eintrag")
+    await user.click(itemHeader)
 
     const fileNumberInput = await screen.findByLabelText(
       "Entscheidungsdatum der Aktivzitierung",
@@ -351,8 +351,8 @@ describe("Active Citations", () => {
     })
     const activeCitations = screen.getAllByLabelText("Listen Eintrag")
     expect(activeCitations.length).toBe(2)
-    const buttonList = screen.getAllByLabelText("Eintrag löschen")
-    await user.click(buttonList[0])
+    await user.click(activeCitations[0])
+    await user.click(screen.getByLabelText("Eintrag löschen"))
     expect(screen.getAllByLabelText("Listen Eintrag").length).toBe(1)
   })
 
@@ -364,8 +364,8 @@ describe("Active Citations", () => {
     const { user } = renderComponent({ modelValue })
     const activeCitations = screen.getAllByLabelText("Listen Eintrag")
     expect(activeCitations.length).toBe(2)
-    const buttonList = screen.getAllByLabelText("Eintrag löschen")
-    await user.click(buttonList[0])
+    await user.click(activeCitations[0])
+    await user.click(screen.getByLabelText("Eintrag löschen"))
     expect(screen.getAllByLabelText("Listen Eintrag").length).toBe(1)
   })
 
@@ -379,8 +379,8 @@ describe("Active Citations", () => {
         "Änderungen, label1, 01.02.2022, test fileNumber, documentType1",
       ),
     ).toBeInTheDocument()
-    const editButton = screen.getByLabelText("Eintrag bearbeiten")
-    await user.click(editButton)
+    const itemHeader = screen.getByLabelText("Listen Eintrag")
+    await user.click(itemHeader)
 
     const fileNumberInput = await screen.findByLabelText(
       "Aktenzeichen Aktivzitierung",
@@ -409,7 +409,8 @@ describe("Active Citations", () => {
       ],
     })
 
-    await user.click(screen.getByLabelText("Eintrag bearbeiten"))
+    const itemHeader = screen.getByLabelText("Listen Eintrag")
+    await user.click(itemHeader)
 
     expect(screen.getByLabelText("Art der Zitierung")).toBeVisible()
     ;[
@@ -453,8 +454,8 @@ describe("Active Citations", () => {
   it("displays error in list and edit component when fields missing", async () => {
     const modelValue: ActiveCitation[] = [generateActiveCitation()]
     const { user } = renderComponent({ modelValue })
-    const editButton = screen.getByLabelText("Eintrag bearbeiten")
-    await user.click(editButton)
+    const itemHeader = screen.getByLabelText("Listen Eintrag")
+    await user.click(itemHeader)
 
     const fileInput = await screen.findByLabelText(
       "Aktenzeichen Aktivzitierung",
@@ -462,7 +463,7 @@ describe("Active Citations", () => {
     await user.clear(fileInput)
     await user.click(screen.getByLabelText("Aktivzitierung speichern"))
     expect(screen.getByLabelText(/Fehlerhafte Eingabe/)).toBeInTheDocument()
-    await user.click(editButton)
+    await user.click(itemHeader)
     expect(screen.getAllByText(/Pflichtfeld nicht befüllt/).length).toBe(1)
   })
 
@@ -494,8 +495,8 @@ describe("Active Citations", () => {
         }),
       ],
     })
-    const editButton = screen.getByLabelText("Eintrag bearbeiten")
-    await user.click(editButton)
+    const itemHeader = screen.getByLabelText("Listen Eintrag")
+    await user.click(itemHeader)
 
     expect(screen.getByText("Art der Zitierung *")).toBeVisible()
     expect(screen.getAllByText(/Pflichtfeld nicht befüllt/).length).toBe(1)

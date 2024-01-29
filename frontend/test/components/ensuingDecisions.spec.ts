@@ -184,7 +184,7 @@ describe("EnsuingDecisions", () => {
     expect(screen.getAllByLabelText("Listen Eintrag").length).toBe(1)
   })
 
-  it("click on edit icon, opens the list entry in edit mode", async () => {
+  it("click on list item, opens the list entry in edit mode", async () => {
     const { user } = renderComponent({
       modelValue: [
         generateEnsuingDecision({
@@ -197,8 +197,8 @@ describe("EnsuingDecisions", () => {
       screen.queryByLabelText("Nachgehende Entscheidung speichern"),
     ).not.toBeInTheDocument()
 
-    const button = screen.getByLabelText("Eintrag bearbeiten")
-    await user.click(button)
+    const entryHeader = screen.getByLabelText("Listen Eintrag")
+    await user.click(entryHeader)
 
     expect(
       screen.getByLabelText("Nachgehende Entscheidung speichern"),
@@ -210,8 +210,8 @@ describe("EnsuingDecisions", () => {
       modelValue: [generateEnsuingDecision()],
     })
 
-    const editButton = screen.getByLabelText("Eintrag bearbeiten")
-    await user.click(editButton)
+    const entryHeader = screen.getByLabelText("Listen Eintrag")
+    await user.click(entryHeader)
 
     const checkbox = await screen.findByLabelText("Anhängige Entscheidung")
 
@@ -228,8 +228,8 @@ describe("EnsuingDecisions", () => {
 
     expect(screen.queryByText(/AG Test/)).not.toBeInTheDocument()
 
-    const editButton = screen.getByLabelText("Eintrag bearbeiten")
-    await user.click(editButton)
+    const entryHeader = screen.getByLabelText("Listen Eintrag")
+    await user.click(entryHeader)
 
     await user.type(
       await screen.findByLabelText("Gericht Nachgehende Entscheidung"),
@@ -250,8 +250,8 @@ describe("EnsuingDecisions", () => {
     })
 
     expect(screen.queryByText(/new fileNumber/)).not.toBeInTheDocument()
-    const editButton = screen.getByLabelText("Eintrag bearbeiten")
-    await user.click(editButton)
+    const entryHeader = screen.getByLabelText("Listen Eintrag")
+    await user.click(entryHeader)
 
     const fileNumberInput = await screen.findByLabelText(
       "Aktenzeichen Nachgehende Entscheidung",
@@ -271,8 +271,8 @@ describe("EnsuingDecisions", () => {
     })
 
     expect(screen.queryByText(/02.02.2022/)).not.toBeInTheDocument()
-    const editButton = screen.getByLabelText("Eintrag bearbeiten")
-    await user.click(editButton)
+    const entryHeader = screen.getByLabelText("Listen Eintrag")
+    await user.click(entryHeader)
 
     const fileNumberInput = await screen.findByLabelText(
       "Entscheidungsdatum Nachgehende Entscheidung",
@@ -292,8 +292,9 @@ describe("EnsuingDecisions", () => {
     })
     const proceedingDecisions = screen.getAllByLabelText("Listen Eintrag")
     expect(proceedingDecisions.length).toBe(2)
-    const buttonList = screen.getAllByLabelText("Eintrag löschen")
-    await user.click(buttonList[0])
+
+    await user.click(proceedingDecisions[0])
+    await user.click(screen.getByLabelText("Eintrag löschen"))
     expect(screen.getAllByLabelText("Listen Eintrag").length).toBe(1)
   })
 
@@ -306,10 +307,8 @@ describe("EnsuingDecisions", () => {
         }),
       ],
     })
-    expect(screen.getByLabelText("Eintrag bearbeiten")).toBeInTheDocument()
-
-    const editButton = screen.getByLabelText("Eintrag bearbeiten")
-    await user.click(editButton)
+    const entryHeader = screen.getByLabelText("Listen Eintrag")
+    await user.click(entryHeader)
 
     expect(
       screen.queryByLabelText("Anhängige Entscheidung"),
@@ -338,7 +337,7 @@ describe("EnsuingDecisions", () => {
     await user.click(saveButton)
     expect(
       screen.getByText(
-        /nachgehend, label1, 01.02.2022, test fileNumber, documentType1, Vermerk, ABC/,
+        /nachgehend, label1, 01.02.2022, test fileNumber, documentType1, Vermerk/,
       ),
     ).toBeInTheDocument()
   })
@@ -373,8 +372,8 @@ describe("EnsuingDecisions", () => {
   it("displays error in list and edit component when fields missing", async () => {
     const modelValue: EnsuingDecision[] = [generateEnsuingDecision()]
     const { user } = renderComponent({ modelValue })
-    const editButton = screen.getByLabelText("Eintrag bearbeiten")
-    await user.click(editButton)
+    const entryHeader = screen.getByLabelText("Listen Eintrag")
+    await user.click(entryHeader)
 
     const fileInput = await screen.findByLabelText(
       "Aktenzeichen Nachgehende Entscheidung",
@@ -384,7 +383,7 @@ describe("EnsuingDecisions", () => {
       screen.getByLabelText("Nachgehende Entscheidung speichern"),
     )
     expect(screen.getByLabelText(/Fehlerhafte Eingabe/)).toBeInTheDocument()
-    await user.click(editButton)
+    await user.click(entryHeader)
     expect(screen.getAllByText(/Pflichtfeld nicht befüllt/).length).toBe(1)
   })
 })

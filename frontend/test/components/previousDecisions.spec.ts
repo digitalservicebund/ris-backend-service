@@ -181,7 +181,7 @@ describe("PreviousDecisions", () => {
     expect(screen.getAllByLabelText("Listen Eintrag").length).toBe(1)
   })
 
-  it("click on edit icon, opens the list entry in edit mode", async () => {
+  it("click on list item, opens the list entry in edit mode", async () => {
     const { user } = renderComponent({
       modelValue: [
         generatePreviousDecision({
@@ -189,8 +189,8 @@ describe("PreviousDecisions", () => {
         }),
       ],
     })
-    const button = screen.getByLabelText("Eintrag bearbeiten")
-    await user.click(button)
+    const itemHeader = screen.getByLabelText("Listen Eintrag")
+    await user.click(itemHeader)
 
     expect(
       screen.getByLabelText("Gericht Vorgehende Entscheidung"),
@@ -213,7 +213,7 @@ describe("PreviousDecisions", () => {
     renderComponent({
       modelValue: [generatePreviousDecision()],
     })
-    expect(screen.getByLabelText("Eintrag bearbeiten")).toBeInTheDocument()
+    expect(screen.getByLabelText("Listen Eintrag")).toBeInTheDocument()
   })
 
   it("correctly updates value court input", async () => {
@@ -223,8 +223,8 @@ describe("PreviousDecisions", () => {
 
     expect(screen.queryByText(/AG Test/)).not.toBeInTheDocument()
 
-    const editButton = screen.getByLabelText("Eintrag bearbeiten")
-    await user.click(editButton)
+    const itemHeader = screen.getByLabelText("Listen Eintrag")
+    await user.click(itemHeader)
 
     await user.type(
       await screen.findByLabelText("Gericht Vorgehende Entscheidung"),
@@ -245,8 +245,8 @@ describe("PreviousDecisions", () => {
     })
 
     expect(screen.queryByText(/new fileNumber/)).not.toBeInTheDocument()
-    const editButton = screen.getByLabelText("Eintrag bearbeiten")
-    await user.click(editButton)
+    const itemHeader = screen.getByLabelText("Listen Eintrag")
+    await user.click(itemHeader)
 
     const fileNumberInput = await screen.findByLabelText(
       "Aktenzeichen Vorgehende Entscheidung",
@@ -265,8 +265,8 @@ describe("PreviousDecisions", () => {
       modelValue: [generatePreviousDecision()],
     })
 
-    const editButton = screen.getByLabelText("Eintrag bearbeiten")
-    await user.click(editButton)
+    const itemHeader = screen.getByLabelText("Listen Eintrag")
+    await user.click(itemHeader)
 
     const checkbox = await screen.findByLabelText(
       "Datum Unbekannt Vorgehende Entscheidung",
@@ -284,8 +284,8 @@ describe("PreviousDecisions", () => {
     })
 
     expect(screen.queryByText(/02.02.2022/)).not.toBeInTheDocument()
-    const editButton = screen.getByLabelText("Eintrag bearbeiten")
-    await user.click(editButton)
+    const itemHeader = screen.getByLabelText("Listen Eintrag")
+    await user.click(itemHeader)
 
     const fileNumberInput = await screen.findByLabelText(
       "Entscheidungsdatum Vorgehende Entscheidung",
@@ -305,8 +305,8 @@ describe("PreviousDecisions", () => {
     })
     const proceedingDecisions = screen.getAllByLabelText("Listen Eintrag")
     expect(proceedingDecisions.length).toBe(2)
-    const buttonList = screen.getAllByLabelText("Eintrag löschen")
-    await user.click(buttonList[0])
+    await user.click(proceedingDecisions[0])
+    await user.click(screen.getByLabelText("Eintrag löschen"))
     expect(screen.getAllByLabelText("Listen Eintrag").length).toBe(1)
   })
 
@@ -318,8 +318,8 @@ describe("PreviousDecisions", () => {
     const { user } = renderComponent({ modelValue })
     const proceedingDecisions = screen.getAllByLabelText("Listen Eintrag")
     expect(proceedingDecisions.length).toBe(2)
-    const buttonList = screen.getAllByLabelText("Eintrag löschen")
-    await user.click(buttonList[0])
+    await user.click(proceedingDecisions[0])
+    await user.click(screen.getByLabelText("Eintrag löschen"))
     expect(screen.getAllByLabelText("Listen Eintrag").length).toBe(1)
   })
 
@@ -331,8 +331,8 @@ describe("PreviousDecisions", () => {
     expect(
       screen.getByText("label1, 01.02.2022, test fileNumber, documentType1"),
     ).toBeInTheDocument()
-    const editButton = screen.getByLabelText("Eintrag bearbeiten")
-    await user.click(editButton)
+    const itemHeader = screen.getByLabelText("Listen Eintrag")
+    await user.click(itemHeader)
 
     const fileNumberInput = await screen.findByLabelText(
       "Aktenzeichen Vorgehende Entscheidung",
@@ -358,7 +358,7 @@ describe("PreviousDecisions", () => {
         }),
       ],
     })
-    expect(screen.getByLabelText("Eintrag bearbeiten")).toBeInTheDocument()
+    expect(screen.getByLabelText("Listen Eintrag")).toBeInTheDocument()
   })
 
   it("lists search results", async () => {
@@ -391,8 +391,8 @@ describe("PreviousDecisions", () => {
   it("displays error in list and edit component when fields missing", async () => {
     const modelValue: PreviousDecision[] = [generatePreviousDecision()]
     const { user } = renderComponent({ modelValue })
-    const editButton = screen.getByLabelText("Eintrag bearbeiten")
-    await user.click(editButton)
+    const itemHeader = screen.getByLabelText("Listen Eintrag")
+    await user.click(itemHeader)
 
     const fileInput = await screen.findByLabelText(
       "Aktenzeichen Vorgehende Entscheidung",
@@ -400,7 +400,7 @@ describe("PreviousDecisions", () => {
     await user.clear(fileInput)
     await user.click(screen.getByLabelText("Vorgehende Entscheidung speichern"))
     expect(screen.getByLabelText(/Fehlerhafte Eingabe/)).toBeInTheDocument()
-    await user.click(editButton)
+    await user.click(itemHeader)
     expect(screen.getAllByText(/Pflichtfeld nicht befüllt/).length).toBe(1)
   })
 })

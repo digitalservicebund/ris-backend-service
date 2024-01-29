@@ -92,8 +92,6 @@ describe("Norm references", () => {
     ]
     renderComponent({ modelValue })
 
-    expect(screen.getAllByLabelText("Eintrag bearbeiten").length).toBe(2)
-    expect(screen.getAllByLabelText("Eintrag löschen").length).toBe(2)
     expect(screen.getAllByLabelText("Listen Eintrag").length).toBe(2)
     expect(
       screen.queryByLabelText("RIS-Abkürzung der Norm"),
@@ -102,7 +100,7 @@ describe("Norm references", () => {
     expect(screen.getByText(/§ 345/)).toBeInTheDocument()
   })
 
-  it("click on edit icon, opens the list entry in edit mode", async () => {
+  it("click on list item, opens the list entry in edit mode", async () => {
     vi.spyOn(documentUnitService, "validateSingleNorm").mockImplementation(() =>
       Promise.resolve({ status: 200, data: "Ok" }),
     )
@@ -113,8 +111,8 @@ describe("Norm references", () => {
         }),
       ],
     })
-    const button = screen.getByLabelText("Eintrag bearbeiten")
-    await user.click(button)
+    const itemHeader = screen.getByLabelText("Listen Eintrag")
+    await user.click(itemHeader)
 
     expect(screen.getByLabelText("RIS-Abkürzung der Norm")).toBeInTheDocument()
     expect(screen.getByLabelText("Einzelnorm der Norm")).toBeInTheDocument()
@@ -127,9 +125,10 @@ describe("Norm references", () => {
       modelValue: [generateNormReference(), generateNormReference()],
     })
 
-    expect(screen.getAllByLabelText("Listen Eintrag").length).toBe(2)
-    const buttonList = screen.getAllByLabelText("Eintrag löschen")
-    await user.click(buttonList[0])
+    const norms = screen.getAllByLabelText("Listen Eintrag")
+    expect(norms.length).toBe(2)
+    await user.click(norms[0])
+    await user.click(screen.getByLabelText("Eintrag löschen"))
     expect(screen.getAllByLabelText("Listen Eintrag").length).toBe(1)
   })
 
@@ -154,8 +153,8 @@ describe("Norm references", () => {
     ]
     const { user } = renderComponent({ modelValue })
     await screen.findByText(/CDE, 01.02.2022, 2022/)
-    const editButton = screen.getByLabelText("Eintrag bearbeiten")
-    await user.click(editButton)
+    const itemHeader = screen.getByLabelText("Listen Eintrag")
+    await user.click(itemHeader)
 
     const abbreviationInput = await screen.findByLabelText(
       "RIS-Abkürzung der Norm",
@@ -166,7 +165,7 @@ describe("Norm references", () => {
     await user.click(screen.getByLabelText("Norm speichern"))
     await screen.findByText(/01.02.2022, 2022/)
     expect(screen.getByLabelText(/Fehlerhafte Eingabe/)).toBeInTheDocument()
-    await user.click(editButton)
+    await user.click(itemHeader)
     expect(screen.getAllByText(/Pflichtfeld nicht befüllt/).length).toBe(1)
   })
 })

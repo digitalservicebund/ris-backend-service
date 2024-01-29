@@ -44,7 +44,7 @@ test("manually added items are saved, can be edited and deleted", async ({
       await expect(container.getByText(fileNumber1)).toBeVisible()
 
       // edit entry
-      await container.getByLabel("Eintrag bearbeiten").click()
+      await container.getByLabel("Listen Eintrag").click()
       await container
         .getByLabel("Aktenzeichen " + section, { exact: true })
         .fill(fileNumber2)
@@ -70,11 +70,10 @@ test("manually added items are saved, can be edited and deleted", async ({
 
       await expect(container.getByLabel("Listen Eintrag")).toHaveCount(2)
       await page.reload()
-      await expect(container.getByLabel("Listen Eintrag")).toHaveCount(2)
-      await expect(container.getByLabel("Eintrag löschen")).toHaveCount(2)
-      await expect(container.getByLabel("Eintrag bearbeiten")).toHaveCount(2)
-
-      await container.getByLabel("Eintrag löschen").first().click()
+      const listEntries = container.getByLabel("Listen Eintrag")
+      await expect(listEntries).toHaveCount(2)
+      await listEntries.first().click()
+      await container.getByLabel("Eintrag löschen").click()
       await expect(container.getByLabel("Listen Eintrag")).toHaveCount(1)
     })
   }
@@ -126,7 +125,7 @@ test("search for documentunits and link decision", async ({
 
         await expect(container.getByText("1 Ergebnis gefunden")).toBeVisible()
 
-        let summary = `AG Aachen, 31.12.2019, ${prefilledDocumentUnit.coreData.fileNumbers?.[0]}, Anerkenntnisurteil, ${prefilledDocumentUnit.documentNumber}`
+        let summary = `AG Aachen, 31.12.2019, ${prefilledDocumentUnit.coreData.fileNumbers?.[0]}, Anerkenntnisurteil`
 
         const result = container.getByText(summary)
         await expect(result).toBeVisible()
@@ -139,9 +138,7 @@ test("search for documentunits and link decision", async ({
 
         const listItem = container.getByLabel("Listen Eintrag").last()
         await expect(listItem).toBeVisible()
-        await expect(listItem).toHaveText(summary, { useInnerText: true })
-
-        await expect(container.getByLabel("Eintrag löschen")).toBeVisible()
+        await expect(listItem).toContainText(summary, { useInnerText: true })
 
         // search for same parameters gives same result, indication that decision is already added
         await container.getByLabel("Weitere Angabe").click()
@@ -162,8 +159,7 @@ test("search for documentunits and link decision", async ({
         await expect(container.getByText("Bereits hinzugefügt")).toBeVisible()
 
         //can be edited
-        await expect(container.getByLabel("Eintrag bearbeiten")).toBeVisible()
-        await container.getByLabel("Eintrag bearbeiten").click()
+        await container.getByLabel("Listen Eintrag").last().click()
 
         if (container === activeCitationContainer) {
           await fillActiveCitationInputs(page, { citationType: "Änderung" })
@@ -186,10 +182,9 @@ test("search for documentunits and link decision", async ({
             .click()
         }
 
-        await expect(container.getByText(summary)).toBeVisible()
-
         //can be deleted
-        await container.getByLabel("Eintrag löschen").first().click()
+        await container.getByLabel("Listen Eintrag").last().click()
+        await container.getByLabel("Eintrag löschen").click()
         await expect(container.getByLabel("Listen Eintrag")).toHaveCount(1)
 
         await expect(

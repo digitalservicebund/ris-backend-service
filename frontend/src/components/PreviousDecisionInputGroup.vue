@@ -310,7 +310,7 @@ onMounted(() => {
       </div>
       <TextButton
         v-if="!lastModelValue.isEmpty"
-        aria-label="Vorgehende Entscheidung löschen"
+        aria-label="Eintrag löschen"
         button-type="error"
         label="Eintrag löschen"
         size="small"
