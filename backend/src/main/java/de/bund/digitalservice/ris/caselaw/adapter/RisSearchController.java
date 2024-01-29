@@ -58,9 +58,12 @@ public class RisSearchController {
   }
 
   private String buildUrl(String query, String abbreviation) {
-    return UriComponentsBuilder.fromHttpUrl(risSearchUrl)
-        .queryParam("query", query)
-        .queryParam("documentationOfficeAbbreviation", abbreviation)
-        .toUriString();
+    String url =
+        UriComponentsBuilder.fromHttpUrl(risSearchUrl)
+            .queryParam("query", query)
+            .queryParam("documentationOfficeAbbreviation", abbreviation)
+            .toUriString();
+    System.out.println("url: " + url);
+    return url;
   }
 }
