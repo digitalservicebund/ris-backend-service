@@ -147,7 +147,7 @@ onMounted(() => {
 
 <template>
   <div class="flex flex-col gap-24">
-    <div v-if="!ensuingDecision.hasForeignSource" class="flex flex-col gap-24">
+    <div class="flex flex-col gap-24">
       <InputField
         id="isPending"
         v-slot="{ id }"
@@ -159,6 +159,7 @@ onMounted(() => {
           :id="id"
           v-model="isPending"
           aria-label="Anhängige Entscheidung"
+          :readonly="ensuingDecision.hasForeignSource"
           size="small"
         />
       </InputField>
@@ -176,6 +177,7 @@ onMounted(() => {
             clear-on-choosing-item
             :has-error="slotProps.hasError"
             :item-service="ComboboxItemService.getCourts"
+            :readonly="ensuingDecision.hasForeignSource"
             @click="validationStore.remove('court')"
           ></ComboboxInput>
         </InputField>
@@ -192,6 +194,7 @@ onMounted(() => {
               aria-label="Entscheidungsdatum Nachgehende Entscheidung"
               class="ds-input-medium"
               :has-error="slotProps.hasError"
+              :readonly="ensuingDecision.hasForeignSource"
               @focus="validationStore.remove('decisionDate')"
               @update:validation-error="slotProps.updateValidationError"
             ></DateInput>
@@ -212,6 +215,7 @@ onMounted(() => {
             v-model="ensuingDecision.fileNumber"
             aria-label="Aktenzeichen Nachgehende Entscheidung"
             :has-error="slotProps.hasError"
+            :readonly="ensuingDecision.hasForeignSource"
             size="medium"
             @input="validationStore.remove('fileNumber')"
           ></TextInput>
@@ -227,6 +231,7 @@ onMounted(() => {
             v-model="ensuingDecision.documentType"
             aria-label="Dokumenttyp Nachgehende Entscheidung"
             :item-service="ComboboxItemService.getDocumentTypes"
+            :readonly="ensuingDecision.hasForeignSource"
           ></ComboboxInput>
         </InputField>
       </div>

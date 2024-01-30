@@ -189,7 +189,7 @@ watch(
         :item-service="ComboboxItemService.getCitationTypes"
       ></ComboboxInput>
     </InputField>
-    <div v-if="!activeCitation.hasForeignSource" class="flex flex-col gap-24">
+    <div class="flex flex-col gap-24">
       <div class="flex justify-between gap-24">
         <InputField
           id="activeCitationCourt"
@@ -204,6 +204,7 @@ watch(
             clear-on-choosing-item
             :has-error="slotProps.hasError"
             :item-service="ComboboxItemService.getCourts"
+            :readonly="activeCitation.hasForeignSource"
           >
           </ComboboxInput>
         </InputField>
@@ -219,6 +220,7 @@ watch(
             aria-label="Entscheidungsdatum der Aktivzitierung"
             class="ds-input-medium"
             :has-error="slotProps.hasError"
+            :readonly="activeCitation.hasForeignSource"
             @update:validation-error="slotProps.updateValidationError"
           ></DateInput>
         </InputField>
@@ -235,6 +237,7 @@ watch(
             v-model="activeCitation.fileNumber"
             aria-label="Aktenzeichen Aktivzitierung"
             :has-error="slotProps.hasError"
+            :readonly="activeCitation.hasForeignSource"
             size="medium"
           ></TextInput>
         </InputField>
@@ -244,6 +247,7 @@ watch(
             v-model="activeCitation.documentType"
             aria-label="Dokumenttyp der Aktivzitierung"
             :item-service="ComboboxItemService.getDocumentTypes"
+            :readonly="activeCitation.hasForeignSource"
           ></ComboboxInput>
         </InputField>
       </div>

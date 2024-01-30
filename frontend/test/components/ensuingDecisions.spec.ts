@@ -298,7 +298,7 @@ describe("EnsuingDecisions", () => {
     expect(screen.getAllByLabelText("Listen Eintrag").length).toBe(1)
   })
 
-  it("renders from search added ensuing decisions as editable list item, only note is editable", async () => {
+  it("renders from search added ensuing decisions as editable list item, note can be updated", async () => {
     const { user } = renderComponent({
       modelValue: [
         generateEnsuingDecision({
@@ -310,21 +310,7 @@ describe("EnsuingDecisions", () => {
     const entryHeader = screen.getByLabelText("Listen Eintrag")
     await user.click(entryHeader)
 
-    expect(
-      screen.queryByLabelText("Anhängige Entscheidung"),
-    ).not.toBeInTheDocument()
-    expect(
-      screen.queryByLabelText("Gericht Nachgehende Entscheidung"),
-    ).not.toBeInTheDocument()
-    expect(
-      screen.queryByLabelText("Entscheidungsdatum Nachgehende Entscheidung"),
-    ).not.toBeInTheDocument()
-    expect(
-      screen.queryByLabelText("Aktenzeichen Nachgehende Entscheidung"),
-    ).not.toBeInTheDocument()
-    expect(
-      screen.queryByLabelText("Dokumenttyp Nachgehende Entscheidung"),
-    ).not.toBeInTheDocument()
+    expect(screen.getByLabelText("Anhängige Entscheidung")).toBeDisabled()
     expect(screen.getByLabelText("Vermerk")).toBeInTheDocument()
     const saveButton = screen.getByLabelText(
       "Nachgehende Entscheidung speichern",

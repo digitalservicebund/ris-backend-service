@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from "vue"
+import { ref, onMounted } from "vue"
 import ToggleButton from "@/shared/components/ToggleButton.vue"
 
 interface Props {
@@ -10,7 +10,11 @@ const props = withDefaults(defineProps<Props>(), {
   isOpen: false,
 })
 
-const localIsExpanded = ref(props.isOpen.valueOf())
+const localIsExpanded = ref(props.isOpen)
+
+onMounted(() => {
+  localIsExpanded.value = props.isOpen
+})
 </script>
 <template>
   <div class="flex flex-col">

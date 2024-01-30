@@ -20,6 +20,7 @@ const props = defineProps<{
   manualEntry?: boolean
   noClear?: boolean
   hasError?: boolean
+  readonly?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -52,11 +53,10 @@ const noCurrentlyDisplayeditems = computed(
     currentlyDisplayedItems.value.length === 0,
 )
 
-const conditionalClasses = computed(() =>
-  props.hasError
-    ? "border-red-800 bg-red-200 focus:shadow-red-800"
-    : "bg-white border-blue-800 focus:shadow-blue-800 hover:shadow-blue-800",
-)
+const conditionalClasses = computed(() => ({
+  "!shadow-red-900 !bg-red-200": props.hasError,
+  "!shadow-none !bg-blue-300": props.readonly,
+}))
 
 const toggleDropdown = async () => {
   focusedItemIndex.value = 0
@@ -219,7 +219,7 @@ const handleClickOutside = (event: MouseEvent) => {
 }
 
 const selectAllText = () => {
-  inputFieldRef.value?.select()
+  if (!props.readonly) inputFieldRef.value?.select()
 }
 
 const closeDropdownAndRevertToLastSavedValue = () => {
@@ -255,7 +255,7 @@ export type InputModelProps =
 <template>
   <div ref="dropdownContainerRef" class="relative w-full">
     <div
-      class="space-between flex h-48 flex-row whitespace-nowrap border-2 border-solid px-16 py-12 hover:shadow-hover focus:shadow-focus"
+      class="space-between flex h-48 flex-row whitespace-nowrap bg-white px-16 py-12 shadow-button shadow-blue-800"
       :class="conditionalClasses"
     >
       <input
@@ -266,7 +266,7 @@ export type InputModelProps =
         autocomplete="off"
         class="w-full bg-transparent placeholder:font-font-family-sans placeholder:not-italic placeholder:text-gray-800 focus:outline-none"
         :placeholder="placeholder"
-        :readonly="false"
+        :readonly="readonly"
         tabindex="0"
         @click="selectAllText"
         @focus="showUpdatedDropdown"
@@ -276,28 +276,30 @@ export type InputModelProps =
         @keydown.tab="closeDropdownAndRevertToLastSavedValue"
         @keyup.down="keydown"
       />
-      <button
-        v-if="inputText && !noClear"
-        aria-label="Auswahl zurücksetzen"
-        class="input-close-icon flex items-center text-blue-800 focus:outline-none focus-visible:outline-blue-800"
-        tabindex="0"
-        @click="clearDropdown"
-      >
-        <IconClear />
-      </button>
+      <div v-if="!readonly" class="flex flex-row">
+        <button
+          v-if="inputText && !noClear"
+          aria-label="Auswahl zurücksetzen"
+          class="input-close-icon flex items-center text-blue-800 focus:outline-none focus-visible:outline-blue-800"
+          tabindex="0"
+          @click="clearDropdown"
+        >
+          <IconClear />
+        </button>
 
-      <button
-        :aria-label="ariaLabelDropdownIcon"
-        class="input-expand-icon flex items-center text-blue-800"
-        tabindex="-1"
-        @click="toggleDropdown"
-      >
-        <IconKeyboardArrowDown v-if="!showDropdown" />
-        <IconKeyboardArrowUp v-else />
-      </button>
+        <button
+          :aria-label="ariaLabelDropdownIcon"
+          class="input-expand-icon flex items-center text-blue-800"
+          tabindex="-1"
+          @click="toggleDropdown"
+        >
+          <IconKeyboardArrowDown v-if="!showDropdown" />
+          <IconKeyboardArrowUp v-else />
+        </button>
+      </div>
     </div>
     <div
-      v-if="showDropdown"
+      v-if="showDropdown && !readonly"
       ref="dropdownItemsRef"
       class="absolute left-0 right-0 top-[100%] z-20 flex max-h-[300px] flex-col overflow-y-scroll bg-white px-8 py-12 drop-shadow-md"
       tabindex="-1"

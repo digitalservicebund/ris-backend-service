@@ -138,16 +138,16 @@ test.describe("ensuing decisions", () => {
       .click()
     await expect(
       page.getByLabel("Gericht Nachgehende Entscheidung"),
-    ).toBeHidden()
+    ).not.toBeEditable()
     await expect(
       page.getByLabel("Entscheidungsdatum Nachgehende Entscheidung"),
-    ).toBeHidden()
+    ).not.toBeEditable()
     await expect(
       page.getByLabel("Aktenzeichen Nachgehende Entscheidung"),
-    ).toBeHidden()
+    ).not.toBeEditable()
     await expect(
       page.getByLabel("Dokumenttyp Nachgehende Entscheidung"),
-    ).toBeHidden()
+    ).not.toBeEditable()
     await expect(page.getByLabel("Vermerk")).toBeVisible()
 
     await page.getByLabel("Vermerk").fill("Vermerk")

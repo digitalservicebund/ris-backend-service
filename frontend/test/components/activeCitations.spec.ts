@@ -61,7 +61,7 @@ function generateActiveCitation(options?: {
   return activeCitation
 }
 
-describe("Active Citations", () => {
+describe("active citations", () => {
   global.ResizeObserver = require("resize-observer-polyfill")
   beforeEach(async () => {
     setActivePinia(createPinia())
@@ -397,31 +397,6 @@ describe("Active Citations", () => {
     expect(
       screen.getByText(/Änderungen, 01.02.2022, documentType1/),
     ).toBeInTheDocument()
-  })
-
-  it("renders limited edit view if linked document unit", async () => {
-    const { user } = renderComponent({
-      modelValue: [
-        generateActiveCitation({
-          documentNumber: "ABC",
-          referenceFound: true,
-        }),
-      ],
-    })
-
-    const itemHeader = screen.getByLabelText("Listen Eintrag")
-    await user.click(itemHeader)
-
-    expect(screen.getByLabelText("Art der Zitierung")).toBeVisible()
-    ;[
-      "Gericht der Aktivzitierung",
-      "Entscheidungsdatum der Aktivzitierung",
-      "Aktenzeichen Aktivzitierung",
-      "Dokumenttyp der Aktivzitierung",
-      "Nach Entscheidung suchen",
-    ].forEach((label) =>
-      expect(screen.queryByLabelText(label)).not.toBeInTheDocument(),
-    )
   })
 
   it("lists search results", async () => {

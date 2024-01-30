@@ -150,7 +150,7 @@ onMounted(() => {
 
 <template>
   <div class="flex flex-col gap-24">
-    <div v-if="!modelValue?.hasForeignSource" class="flex flex-col gap-24">
+    <div class="flex flex-col gap-24">
       <InputField
         id="dateKnown"
         v-slot="{ id }"
@@ -162,6 +162,7 @@ onMounted(() => {
           :id="id"
           v-model="dateUnknown"
           aria-label="Datum Unbekannt Vorgehende Entscheidung"
+          :readonly="previousDecision.hasForeignSource"
           size="small"
         />
       </InputField>
@@ -179,6 +180,7 @@ onMounted(() => {
             clear-on-choosing-item
             :has-error="slotProps.hasError"
             :item-service="ComboboxItemService.getCourts"
+            :readonly="previousDecision.hasForeignSource"
             @click="validationStore.remove('court')"
           ></ComboboxInput>
         </InputField>
@@ -195,6 +197,7 @@ onMounted(() => {
               aria-label="Entscheidungsdatum Vorgehende Entscheidung"
               class="ds-input-medium"
               :has-error="slotProps.hasError"
+              :readonly="previousDecision.hasForeignSource"
               @focus="validationStore.remove('decisionDate')"
               @update:validation-error="slotProps.updateValidationError"
             ></DateInput>
@@ -206,6 +209,7 @@ onMounted(() => {
         <NestedComponent
           aria-label="Abweichendes Aktenzeichen Vorgehende Entscheidung"
           class="w-full"
+          :is-open="previousDecision.hasForeignSource"
         >
           <InputField
             id="fileNumber"
@@ -220,6 +224,7 @@ onMounted(() => {
               aria-label="Aktenzeichen Vorgehende Entscheidung"
               class="ds-input-medium"
               :has-error="slotProps.hasError"
+              :readonly="previousDecision.hasForeignSource"
               size="medium"
               @input="validationStore.remove('fileNumber')"
             ></TextInput>
@@ -254,28 +259,10 @@ onMounted(() => {
             v-model="previousDecision.documentType"
             aria-label="Dokumenttyp Vorgehende Entscheidung"
             :item-service="ComboboxItemService.getDocumentTypes"
+            :readonly="previousDecision.hasForeignSource"
           ></ComboboxInput>
         </InputField>
       </div>
-    </div>
-    <div v-if="modelValue?.hasForeignSource">
-      <InputField
-        id="deviatingFileNumber"
-        v-slot="slotProps"
-        class="flex-col"
-        label="Abweichendes Aktenzeichen"
-        :validation-error="validationStore.getByField('deviatingFileNumber')"
-      >
-        <TextInput
-          id="deviatingFileNumber"
-          v-model="previousDecision.deviatingFileNumber"
-          aria-label="Abweichendes Aktenzeichen Vorgehende Entscheidung"
-          class="ds-input-medium"
-          :has-error="slotProps.hasError"
-          size="medium"
-          @input="validationStore.remove('deviatingFileNumber')"
-        ></TextInput>
-      </InputField>
     </div>
     <div class="flex w-full flex-row justify-between">
       <div>

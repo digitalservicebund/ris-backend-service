@@ -69,7 +69,7 @@
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.8.0",
-    "@digitalservice4germany/angie": "^1.1.0",
+    "@digitalservice4germany/angie": "^1.1.1",
     "@digitalservice4germany/style-dictionary": "^2.0.0",
     "@iconify-json/ic": "^1.1.14",
     "@iconify-json/material-symbols": "^1.1.70",

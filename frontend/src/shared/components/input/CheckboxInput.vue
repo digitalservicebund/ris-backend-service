@@ -6,6 +6,7 @@ interface Props {
   modelValue?: boolean
   validationError?: ValidationError
   size?: "small" | "regular"
+  readonly?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -34,7 +35,12 @@ const isInvalid = computed(() => props.validationError !== undefined)
   <input
     v-model="localModelValue"
     class="ds-checkbox"
-    :class="{ 'has-error': isInvalid, 'ds-checkbox-small': size === 'small' }"
+    :class="{
+      'has-error': isInvalid,
+      'ds-checkbox-small': size === 'small',
+      '!bg-blue-300 !shadow-none': readonly,
+    }"
+    :disabled="readonly"
     type="checkbox"
     @keydown.space.prevent="localModelValue = !localModelValue"
   />
