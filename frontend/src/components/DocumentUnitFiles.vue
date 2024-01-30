@@ -56,7 +56,7 @@ onMounted(async () => {
     )
 
     if (fileResponse.error) {
-      console.error(fileResponse.error)
+      console.error(JSON.stringify(fileResponse.error))
     } else {
       html.value = fileResponse.data.html
     }

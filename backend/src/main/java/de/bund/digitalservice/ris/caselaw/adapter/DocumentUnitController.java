@@ -234,8 +234,14 @@ public class DocumentUnitController {
   public Mono<ResponseEntity<Docx2Html>> html(@PathVariable UUID uuid) {
     return service
         .getByUuid(uuid)
-        .map(DocumentUnit::s3path)
-        .flatMap(converterService::getConvertedObject)
+        .flatMap(
+            documentUnit -> {
+              if (documentUnit.s3path() != null) {
+                return converterService.getConvertedObject(documentUnit.s3path());
+              } else {
+                return Mono.empty();
+              }
+            })
         .map(ResponseEntity::ok)
         .onErrorReturn(ResponseEntity.internalServerError().build());
   }

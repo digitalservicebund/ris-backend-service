@@ -124,9 +124,14 @@ public class DocxConverterService implements ConverterService {
    * extracted of the docx file.
    *
    * @param fileName name of the file in the bucket
-   * @return the generated object with html content and metadata
+   * @return the generated object with html content and metadata, if the file name is null a empty
+   *     mono is returned
    */
   public Mono<Docx2Html> getConvertedObject(String fileName) {
+    if (fileName == null) {
+      return Mono.empty();
+    }
+
     GetObjectRequest request = GetObjectRequest.builder().bucket(bucketName).key(fileName).build();
 
     CompletableFuture<ResponseBytes<GetObjectResponse>> futureResponse =
