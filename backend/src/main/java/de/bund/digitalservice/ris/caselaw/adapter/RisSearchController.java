@@ -23,12 +23,6 @@ import reactor.core.publisher.Mono;
 @Tag(name = OpenApiConfiguration.CASELAW_TAG)
 public class RisSearchController {
 
-  @Value("${ris-search.basic-auth.username:}")
-  private String risSearchUsername;
-
-  @Value("${ris-search.basic-auth.password:}")
-  private String risSearchPassword;
-
   @Value("${ris-search.url:http://localhost:8090/v1/search}")
   private String risSearchUrl;
 
@@ -51,19 +45,15 @@ public class RisSearchController {
                 webClient
                     .get()
                     .uri(buildUrl(query, documentationOffice.abbreviation()))
-                    .headers(headers -> headers.setBasicAuth(risSearchUsername, risSearchPassword))
                     .retrieve()
                     .bodyToMono(String.class)
                     .map(ResponseEntity::ok));
   }
 
   private String buildUrl(String query, String abbreviation) {
-    String url =
-        UriComponentsBuilder.fromHttpUrl(risSearchUrl)
-            .queryParam("query", query)
-            .queryParam("documentationOfficeAbbreviation", abbreviation)
-            .toUriString();
-    System.out.println("url: " + url);
-    return url;
+    return UriComponentsBuilder.fromHttpUrl(risSearchUrl)
+        .queryParam("query", query)
+        .queryParam("documentationOfficeAbbreviation", abbreviation)
+        .toUriString();
   }
 }
