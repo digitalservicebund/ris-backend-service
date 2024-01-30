@@ -120,7 +120,8 @@ test.describe("court", () => {
 
     // open dropdown
     await page
-      .locator("[aria-label='Gericht'] + button.input-expand-icon")
+      .locator("#nestedInputOfCourtAndDeviatingCourts")
+      .getByLabel("Dropdown öffnen")
       .click()
     await expect(
       page.locator("[aria-label='dropdown-option'] >> nth=" + minTotalCourts),
@@ -142,9 +143,7 @@ test.describe("court", () => {
     ).toBeVisible()
 
     // close dropdown
-    await page
-      .locator("[aria-label='Gericht'] + button.input-expand-icon")
-      .click()
+    await page.getByLabel("Dropdown schließen").click()
     await waitForInputValue(page, "[aria-label='Gericht']", "")
     await expect(page.locator("[aria-label='dropdown-option']")).toBeHidden()
 

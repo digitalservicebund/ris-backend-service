@@ -190,7 +190,9 @@ test.describe("core data", () => {
 
     // open dropdown
     await page
-      .locator("[aria-label='Dokumenttyp'] + button.input-expand-icon")
+      .locator("div")
+      .filter({ hasText: /^Spruchkörper Dokumenttyp \*$/ })
+      .getByLabel("Dropdown öffnen")
       .click()
     await expect(page.locator("[aria-label='dropdown-option']")).toHaveCount(
       totalCaselawDocumentTypes,
@@ -213,9 +215,7 @@ test.describe("core data", () => {
     )
 
     // close dropdown
-    await page
-      .locator("[aria-label='Dokumenttyp'] + button.input-expand-icon")
-      .click()
+    await page.getByLabel("Dropdown schließen").click()
     await expect(page.locator("[aria-label='Dokumenttyp']")).toHaveValue("")
     await expect(page.locator("[aria-label='dropdown-option']")).toBeHidden()
 

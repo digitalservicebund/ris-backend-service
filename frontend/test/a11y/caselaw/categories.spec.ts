@@ -19,7 +19,8 @@ test.describe("a11y of categories page (/caselaw/documentunit/{documentNumber}/c
   test("gericht", async ({ page, documentNumber }) => {
     await navigateToCategories(page, documentNumber)
     await page
-      .locator("[aria-label='Gericht'] + button.input-expand-icon")
+      .locator("#nestedInputOfCourtAndDeviatingCourts")
+      .getByLabel("Dropdown öffnen")
       .click()
     await expect(
       page.locator("[aria-label='dropdown-option'] >> nth=4052"),
@@ -67,8 +68,11 @@ test.describe("a11y of categories page (/caselaw/documentunit/{documentNumber}/c
     await navigateToCategories(page, documentNumber)
 
     await page
-      .locator("[aria-label='Dokumenttyp'] + button.input-expand-icon")
+      .locator("div")
+      .filter({ hasText: /^Spruchkörper Dokumenttyp \*$/ })
+      .getByLabel("Dropdown öffnen")
       .click()
+
     await expect(page.locator("[aria-label='dropdown-option']")).toHaveCount(43)
 
     // type search string: 3 results for "zwischen"
