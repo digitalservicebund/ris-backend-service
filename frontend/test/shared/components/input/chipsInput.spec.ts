@@ -15,6 +15,7 @@ function renderComponent(props?: Partial<ChipsInputProps>) {
     "onUpdate:modelValue":
       props?.["onUpdate:modelValue"] ??
       ((val: string[] | undefined) => (modelValue = val)),
+    "onUpdate:validationError": props?.["onUpdate:validationError"],
     ariaLabel: props?.ariaLabel ?? "aria-label",
     readOnly: props?.readOnly,
   }
@@ -45,11 +46,16 @@ describe("Chips Input", () => {
 
   it("emits model update when a chip is added", async () => {
     const onUpdate = vi.fn()
-    const { user } = renderComponent({ "onUpdate:modelValue": onUpdate })
+    const onError = vi.fn()
+    const { user } = renderComponent({
+      "onUpdate:modelValue": onUpdate,
+      "onUpdate:validationError": onError,
+    })
 
     const input = screen.getByRole("textbox")
     await user.type(input, "foo{enter}")
     expect(onUpdate).toHaveBeenCalledWith(["foo"])
+    expect(onError).toHaveBeenCalledWith(undefined)
   })
 
   it("removes whitespace from chips when added", async () => {
@@ -116,6 +122,29 @@ describe("Chips Input", () => {
     await user.type(input, "   {enter}")
 
     expect(onUpdate).not.toHaveBeenCalled()
+  })
+
+  it("does not add chips if input already exists", async () => {
+    const id = "id"
+    const modelValue: ChipsInputProps["modelValue"] = ["foo", "bar"]
+
+    const onError = vi.fn()
+    const onUpdate = vi.fn()
+    const { user } = renderComponent({
+      id: id,
+      modelValue: modelValue,
+      "onUpdate:modelValue": onUpdate,
+      "onUpdate:validationError": onError,
+    })
+
+    const input = screen.getByRole<HTMLInputElement>("textbox")
+    await user.type(input, "foo{enter}")
+
+    expect(onUpdate).not.toHaveBeenCalled()
+    expect(onError).toHaveBeenCalledWith({
+      message: "Eintrag bereits vorhanden",
+      instance: id,
+    })
   })
 
   it("focuses the input when clicking on the chips component", async () => {

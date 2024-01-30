@@ -3,6 +3,7 @@ import { produce } from "immer"
 import { vMaska } from "maska"
 import { nextTick, ref, watch, watchEffect } from "vue"
 import ChipsList from "@/shared/components/input/ChipsList.vue"
+import { ValidationError } from "@/shared/components/input/types"
 import IconSubdirectoryArrowLeft from "~icons/ic/baseline-subdirectory-arrow-left"
 
 interface Props {
@@ -17,6 +18,7 @@ const props = defineProps<Props>()
 
 const emit = defineEmits<{
   "update:modelValue": [value?: string[]]
+  "update:validationError": [value?: ValidationError]
 }>()
 
 /* -------------------------------------------------- *
@@ -31,13 +33,21 @@ function addChip() {
   const chip = newChipText.value.trim()
   if (!chip) return
 
-  const next = props.modelValue
-    ? produce(props.modelValue, (draft) => {
-        draft.push(chip)
-      })
-    : [chip]
+  const current = props.modelValue ?? []
 
-  emit("update:modelValue", next)
+  if (current.includes(chip)) {
+    emit("update:validationError", {
+      message: "Eintrag bereits vorhanden",
+      instance: props.id,
+    })
+  } else {
+    const next = produce(current, (draft) => {
+      draft.push(chip)
+    })
+    emit("update:modelValue", next)
+    emit("update:validationError", undefined)
+  }
+
   newChipText.value = ""
 }
 

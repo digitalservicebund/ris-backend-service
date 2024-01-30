@@ -72,5 +72,6 @@ dayjs.extend(customParseFormat)
     v-model="chips"
     :aria-label="ariaLabel"
     maska="##.##.####"
+    @update:validation-error="$emit('update:validationError', $event)"
   />
 </template>
