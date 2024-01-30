@@ -37,6 +37,8 @@ const buttonClasses = computed(() => ({
   "ds-button-secondary": props.buttonType == "secondary",
   "ds-button-ghost": props.buttonType == "ghost",
   "ds-button-tertiary": props.buttonType == "tertiary",
+  "shadow-button shadow-red-900 text-red-900 bg-transparent hover:bg-red-200 focus:bg-red-200 active:bg-red-200 active:border-none active:text-red-900 disabled:text-gray-600 disabled:shadow-gray-600 disabled:bg-transparent":
+    props.buttonType == "destructive",
   "ds-button-with-icon": props.icon,
   "ds-button-with-icon-only": props.icon && !props.label,
   "is-disabled": props.href && props.disabled,

@@ -203,7 +203,7 @@ watch(props, () => {
       <TextButton
         v-if="!lastModelValue.isEmpty"
         aria-label="Eintrag löschen"
-        button-type="error"
+        button-type="destructive"
         label="Eintrag löschen"
         size="small"
         @click.stop="emit('removeListEntry')"
