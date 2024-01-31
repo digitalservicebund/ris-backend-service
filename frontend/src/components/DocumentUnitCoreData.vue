@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { toRefs, watch } from "vue"
 import ComboboxInput from "@/components/ComboboxInput.vue"
+import { useValidationStore } from "@/composables/useValidationStore"
 import legalEffectTypes from "@/data/legalEffectTypes.json"
 import { CoreData } from "@/domain/documentUnit"
 import ComboboxItemService from "@/services/comboboxItemService"
@@ -21,6 +22,7 @@ const emit = defineEmits<{
   "update:modelValue": [value: CoreData]
 }>()
 const { modelValue } = toRefs(props)
+const validationStore = useValidationStore<["decisionDate"][number]>()
 
 watch(
   modelValue,
@@ -32,7 +34,10 @@ watch(
 </script>
 
 <template>
-  <div class="core-data flex flex-col gap-24 bg-white p-32">
+  <div
+    aria-label="Stammdaten"
+    class="core-data flex flex-col gap-24 bg-white p-32"
+  >
     <h2 class="ds-heading-03-bold">Stammdaten</h2>
     <NestedComponent aria-label="Fehlerhaftes Gericht" class="w-full">
       <InputField id="court" v-slot="slotProps" label="Gericht *">
@@ -58,7 +63,7 @@ watch(
     </NestedComponent>
 
     <div class="flex flex-row gap-24">
-      <NestedComponent aria-label="Fehlerhaftes Gericht" class="w-full">
+      <NestedComponent aria-label="Abweichendes Aktenzeichen" class="w-full">
         <InputField id="fileNumber" label="Aktenzeichen *">
           <ChipsInput
             id="fileNumber"
@@ -84,12 +89,20 @@ watch(
         aria-label="Abweichendes Entscheidungsdatum"
         class="w-full"
       >
-        <InputField id="decisionDate" label="Entscheidungsdatum">
+        <InputField
+          id="decisionDate"
+          v-slot="slotProps"
+          label="Entscheidungsdatum *"
+          :validation-error="validationStore.getByField('decisionDate')"
+        >
           <DateInput
             id="decisionDate"
             v-model="modelValue.decisionDate"
             aria-label="Entscheidungsdatum"
             class="ds-input-medium"
+            :has-error="slotProps.hasError"
+            @focus="validationStore.remove('decisionDate')"
+            @update:validation-error="slotProps.updateValidationError"
           ></DateInput>
         </InputField>
         <!-- Child  -->
@@ -135,7 +148,7 @@ watch(
     </div>
 
     <div class="flex flex-row gap-24">
-      <NestedComponent aria-label="Fehlerhaftes Gericht" class="w-full">
+      <NestedComponent aria-label="Abweichender ECLI" class="w-full">
         <InputField id="ecli" class="flex-col" label="ECLI">
           <TextInput
             id="ecli"
@@ -181,11 +194,11 @@ watch(
     </div>
 
     <div class="flex flex-row gap-24">
-      <InputField id="emptyDropdown" v-slot="{ id }" label="Rechtskraft *">
+      <InputField id="legalEffect" v-slot="{ id }" label="Rechtskraft *">
         <DropdownInput
           :id="id"
           v-model="modelValue.legalEffect"
-          aria-label="dropdown input"
+          aria-label="Rechtskraft"
           :items="legalEffectTypes.items"
           placeholder="Bitte auswählen"
         />

@@ -120,7 +120,8 @@ test.describe("court", () => {
 
     // open dropdown
     await page
-      .locator("#nestedInputOfCourtAndDeviatingCourts")
+      .locator("#coreData div")
+      .filter({ hasText: "Gericht * Fehlerhaftes" })
       .getByLabel("Dropdown öffnen")
       .click()
     await expect(

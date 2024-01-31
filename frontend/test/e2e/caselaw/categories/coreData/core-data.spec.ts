@@ -190,8 +190,8 @@ test.describe("core data", () => {
 
     // open dropdown
     await page
-      .locator("div")
-      .filter({ hasText: /^Spruchkörper Dokumenttyp \*$/ })
+      .locator("#coreData div")
+      .filter({ hasText: "Spruchkörper Dokumenttyp" })
       .getByLabel("Dropdown öffnen")
       .click()
     await expect(page.locator("[aria-label='dropdown-option']")).toHaveCount(
