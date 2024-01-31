@@ -1,47 +1,33 @@
 <script lang="ts" setup>
-import { computed, onMounted, ref, toRefs } from "vue"
-import { CoreData } from "../domain/documentUnit"
-import InputGroup from "../shared/components/input/InputGroup.vue"
+import { toRefs, watch } from "vue"
 import ComboboxInput from "@/components/ComboboxInput.vue"
-import { courtFields, coreDataFields } from "@/fields/caselaw"
+import legalEffectTypes from "@/data/legalEffectTypes.json"
+import { CoreData } from "@/domain/documentUnit"
 import ComboboxItemService from "@/services/comboboxItemService"
 import ChipsInput from "@/shared/components/input/ChipsInput.vue"
 import DateInput from "@/shared/components/input/DateInput.vue"
+import DropdownInput from "@/shared/components/input/DropdownInput.vue"
 import InputField from "@/shared/components/input/InputField.vue"
-import { ValidationError } from "@/shared/components/input/types"
+import TextInput from "@/shared/components/input/TextInput.vue"
 import NestedComponent from "@/shared/components/NestedComponents.vue"
-import { useTransformNestedData } from "@/shared/composables/useTransformNestedData"
 
 interface Props {
   modelValue: CoreData
-  validationErrors?: ValidationError[]
 }
 
 const props = defineProps<Props>()
-
 const emit = defineEmits<{
-  updateDocumentUnit: [void]
   "update:modelValue": [value: CoreData]
 }>()
-
 const { modelValue } = toRefs(props)
 
-const values = useTransformNestedData(modelValue, coreDataFields, emit)
-const courtValues = useTransformNestedData(modelValue, courtFields, emit)
-
-const containerWidth = ref()
-const columnCount = computed(() => (containerWidth.value < 600 ? 1 : 2))
-
-onMounted(() => {
-  const editorContainer = document.querySelector(".core-data")
-  if (editorContainer != null) resizeObserver.observe(editorContainer)
-})
-
-const resizeObserver = new ResizeObserver((entries) => {
-  for (const entry of entries) {
-    containerWidth.value = entry.contentRect.width
-  }
-})
+watch(
+  modelValue,
+  () => {
+    emit("update:modelValue", modelValue.value)
+  },
+  { deep: true },
+)
 </script>
 
 <template>
@@ -59,8 +45,8 @@ const resizeObserver = new ResizeObserver((entries) => {
         ></ComboboxInput>
       </InputField>
       <!-- Child  -->
-      <template #children
-        ><InputField id="deviatingCourt" label="Fehlerhaftes Gericht">
+      <template #children>
+        <InputField id="deviatingCourt" label="Fehlerhaftes Gericht">
           <ChipsInput
             id="deviatingCourt"
             v-model="modelValue.deviatingCourts"
@@ -80,8 +66,8 @@ const resizeObserver = new ResizeObserver((entries) => {
           ></ChipsInput>
         </InputField>
         <!-- Child  -->
-        <template #children
-          ><InputField
+        <template #children>
+          <InputField
             id="deviatingFileNumber"
             label="Abweichendes Aktenzeichen"
           >
@@ -106,8 +92,8 @@ const resizeObserver = new ResizeObserver((entries) => {
           ></DateInput>
         </InputField>
         <!-- Child  -->
-        <template #children
-          ><InputField
+        <template #children>
+          <InputField
             id="deviatingDecisionDates"
             label="Abweichendes Entscheidungsdatum"
           >
@@ -120,19 +106,102 @@ const resizeObserver = new ResizeObserver((entries) => {
         </template>
       </NestedComponent>
     </div>
+    <div class="flex flex-row gap-24">
+      <InputField
+        id="appraisalBody"
+        v-slot="slotProps"
+        class="flex-col"
+        label="Spruchkörper"
+      >
+        <TextInput
+          id="appraisalBody"
+          v-model="modelValue.appraisalBody"
+          aria-label="Spruchkörper"
+          class="ds-input-medium"
+          :has-error="slotProps.hasError"
+          size="medium"
+        ></TextInput>
+      </InputField>
 
-    <InputGroup
-      v-model="courtValues"
-      :column-count="1"
-      :fields="courtFields"
-      :validation-errors="props.validationErrors"
-    />
-    <InputGroup
-      v-model="values"
-      :column-count="columnCount"
-      :fields="coreDataFields"
-      :validation-errors="props.validationErrors"
-    />
+      <InputField id="documentType" class="flex-col" label="Dokumenttyp">
+        <ComboboxInput
+          id="documentType"
+          v-model="modelValue.documentType"
+          aria-label="Dokumenttyp"
+          :item-service="ComboboxItemService.getDocumentTypes"
+        ></ComboboxInput>
+      </InputField>
+    </div>
+
+    <div class="flex flex-row gap-24">
+      <NestedComponent aria-label="Fehlerhaftes Gericht" class="w-full">
+        <InputField id="ecli" class="flex-col" label="ECLI">
+          <TextInput
+            id="ecli"
+            v-model="modelValue.ecli"
+            aria-label="ECLI"
+            class="ds-input-medium"
+            size="medium"
+          ></TextInput>
+        </InputField>
+        <!-- Child  -->
+        <template #children>
+          <InputField id="deviatingEclis" label="Abweichender ECLI">
+            <ChipsInput
+              id="deviatingEclis"
+              v-model="modelValue.deviatingEclis"
+              aria-label="Abweichender ECLI"
+            ></ChipsInput>
+          </InputField>
+        </template>
+      </NestedComponent>
+
+      <NestedComponent aria-label="Vorgangshistorie" class="w-full">
+        <InputField id="procedure" class="flex-col" label="Vorgang">
+          <ComboboxInput
+            id="procedure"
+            v-model="modelValue.procedure"
+            aria-label="Vorgang"
+            :item-service="ComboboxItemService.getProcedures"
+          ></ComboboxInput>
+        </InputField>
+        <!-- Child  -->
+        <template #children>
+          <InputField id="previousProcedure" label="Vorgangshistorie">
+            <ChipsInput
+              id="previousProcedure"
+              v-model="modelValue.previousProcedure"
+              aria-label="Vorgangshistorie"
+              read-only
+            ></ChipsInput>
+          </InputField>
+        </template>
+      </NestedComponent>
+    </div>
+
+    <div class="flex flex-row gap-24">
+      <InputField id="emptyDropdown" v-slot="{ id }" label="Rechtskraft *">
+        <DropdownInput
+          :id="id"
+          v-model="modelValue.legalEffect"
+          aria-label="dropdown input"
+          :items="legalEffectTypes.items"
+          placeholder="Bitte auswählen"
+        />
+      </InputField>
+
+      <InputField id="region" class="flex-col" label="Region">
+        <TextInput
+          id="region"
+          v-model="modelValue.region"
+          aria-label="Region"
+          class="ds-input-medium"
+          read-only
+          size="medium"
+        ></TextInput>
+      </InputField>
+    </div>
+
     <div class="mt-4">* Pflichtfelder zum Veröffentlichen</div>
   </div>
 </template>

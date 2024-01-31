@@ -13,6 +13,7 @@ export type CoreData = {
   deviatingCourts?: string[]
   documentType?: DocumentType
   procedure?: Procedure
+  previousProcedure?: string[]
   ecli?: string
   deviatingEclis?: string[]
   appraisalBody?: string
@@ -141,19 +142,23 @@ export default class DocumentUnit {
 
     Object.assign(this, data)
   }
+
   get hasFile(): boolean {
     return !!this.s3path
   }
+
   get missingRequiredFields() {
     return DocumentUnit.requiredFields.filter((field) =>
       this.isEmpty(this.coreData[field]),
     )
   }
+
   public static isRequiredField(fieldName: string) {
     return DocumentUnit.requiredFields.some(
       (requiredfieldName) => requiredfieldName === fieldName,
     )
   }
+
   public isEmpty(
     value: CoreData[(typeof DocumentUnit.requiredFields)[number]],
   ) {
