@@ -4,6 +4,7 @@ import ComboboxInput from "@/components/ComboboxInput.vue"
 import legalEffectTypes from "@/data/legalEffectTypes.json"
 import { CoreData } from "@/domain/documentUnit"
 import ComboboxItemService from "@/services/comboboxItemService"
+import ChipsDateInput from "@/shared/components/input/ChipsDateInput.vue"
 import ChipsInput from "@/shared/components/input/ChipsInput.vue"
 import DateInput from "@/shared/components/input/DateInput.vue"
 import DropdownInput from "@/shared/components/input/DropdownInput.vue"
@@ -97,11 +98,11 @@ watch(
             id="deviatingDecisionDates"
             label="Abweichendes Entscheidungsdatum"
           >
-            <ChipsInput
+            <ChipsDateInput
               id="deviatingDecisionDates"
               v-model="modelValue.deviatingDecisionDates"
               aria-label="Abweichendes Entscheidungsdatum"
-            ></ChipsInput>
+            />
           </InputField>
         </template>
       </NestedComponent>
