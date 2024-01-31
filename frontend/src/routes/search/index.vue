@@ -7,13 +7,20 @@ import TextInput from "@/shared/components/input/TextInput.vue"
 
 const msg = ref("")
 const searchInputValue = ref("")
+const isLoading = ref(false)
 
 async function handleSearchSubmit() {
-  const response = await httpClient.get<string>(
-    `search?query=${encodeURIComponent(searchInputValue.value)}`,
-  )
-  if (response.data) {
-    msg.value = response.data
+  isLoading.value = true
+  msg.value = "Loading ..."
+  try {
+    const response = await httpClient.get<string>(
+      `search?query=${encodeURIComponent(searchInputValue.value)}`,
+    )
+    if (response.data) {
+      msg.value = response.data
+    }
+  } finally {
+    isLoading.value = false
   }
 }
 </script>
@@ -28,6 +35,7 @@ async function handleSearchSubmit() {
           v-model="searchInputValue"
           aria-label="Sucheingabe"
           class="ds-input-medium"
+          :disabled="isLoading"
           placeholder="Sucheingabe"
         ></TextInput>
       </InputField>
@@ -36,6 +44,7 @@ async function handleSearchSubmit() {
       <TextButton
         aria-label="Suchen"
         class="self-start"
+        :disabled="isLoading"
         label="Suchen"
         size="small"
         @click="handleSearchSubmit"
