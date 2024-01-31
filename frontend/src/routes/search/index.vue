@@ -5,20 +5,27 @@ import InputField from "@/shared/components/input/InputField.vue"
 import TextButton from "@/shared/components/input/TextButton.vue"
 import TextInput from "@/shared/components/input/TextInput.vue"
 
-const msg = ref("")
-const searchInputValue = ref("")
+const searchInput = ref("")
 const isLoading = ref(false)
+const hasError = ref(false)
+const message = ref("")
 
 async function handleSearchSubmit() {
   isLoading.value = true
-  msg.value = "Loading ..."
+  message.value = "Loading ..."
+  hasError.value = false
   try {
     const response = await httpClient.get<string>(
-      `search?query=${encodeURIComponent(searchInputValue.value)}`,
+      `search?query=${encodeURIComponent(searchInput.value)}`,
     )
     if (response.data) {
-      msg.value = response.data
+      message.value = response.data
     }
+    if (response.status !== 200) {
+      hasError.value = true
+    }
+  } catch (error) {
+    hasError.value = true
   } finally {
     isLoading.value = false
   }
@@ -32,7 +39,7 @@ async function handleSearchSubmit() {
       <InputField id="searchInput" label="Suche" visually-hide-label>
         <TextInput
           id="searchInput"
-          v-model="searchInputValue"
+          v-model="searchInput"
           aria-label="Sucheingabe"
           class="ds-input-medium"
           :disabled="isLoading"
@@ -50,6 +57,6 @@ async function handleSearchSubmit() {
         @click="handleSearchSubmit"
       />
     </div>
-    <p>{{ msg }}</p>
+    <p :class="{ 'text-red-700': hasError }">{{ message }}</p>
   </header>
 </template>

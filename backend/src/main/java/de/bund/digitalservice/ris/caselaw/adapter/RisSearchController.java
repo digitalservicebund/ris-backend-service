@@ -3,8 +3,10 @@ package de.bund.digitalservice.ris.caselaw.adapter;
 import de.bund.digitalservice.ris.OpenApiConfiguration;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.util.concurrent.atomic.AtomicReference;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -38,6 +40,7 @@ public class RisSearchController {
   @PreAuthorize("isAuthenticated()")
   public Mono<ResponseEntity<String>> callRisSearchEndpoint(
       @AuthenticationPrincipal OidcUser oidcUser, @RequestParam String query) {
+    AtomicReference<HttpStatusCode> statusCode = new AtomicReference<>();
     return userService
         .getDocumentationOffice(oidcUser)
         .flatMap(
@@ -46,8 +49,16 @@ public class RisSearchController {
                     .get()
                     .uri(buildUrl(query, documentationOffice.abbreviation()))
                     .retrieve()
+                    .onStatus(
+                        status -> true,
+                        clientResponse -> {
+                          statusCode.set(clientResponse.statusCode());
+                          return Mono.empty();
+                        })
                     .bodyToMono(String.class)
-                    .map(ResponseEntity::ok));
+                    .map(
+                        responseBody ->
+                            ResponseEntity.status(statusCode.get()).body(responseBody)));
   }
 
   private String buildUrl(String query, String abbreviation) {
