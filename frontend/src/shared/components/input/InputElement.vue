@@ -7,7 +7,6 @@ import ChipsInput from "@/shared/components/input/ChipsInput.vue"
 import DateInput from "@/shared/components/input/DateInput.vue"
 import DropdownInput from "@/shared/components/input/DropdownInput.vue"
 import FileInput from "@/shared/components/input/FileInput.vue"
-import NestedInput from "@/shared/components/input/NestedInput.vue"
 import TextAreaInput from "@/shared/components/input/TextAreaInput.vue"
 import TextInput from "@/shared/components/input/TextInput.vue"
 import TimeInput from "@/shared/components/input/TimeInput.vue"
@@ -62,8 +61,6 @@ const component = computed(() => {
       return ChipsInput
     case InputType.DATECHIPS:
       return ChipsDateInput
-    case InputType.NESTED:
-      return NestedInput
     case InputType.COMBOBOX:
       return ComboboxInput
     case InputType.TEXTAREA:

@@ -1,29 +1,16 @@
 <script lang="ts" setup>
 import { reactive, ref } from "vue"
-import { defineTextField } from "@/fields/caselaw"
 import KitchensinkPage from "@/kitchensink/components/KitchensinkPage.vue"
 import KitchensinkStory from "@/kitchensink/components/KitchensinkStory.vue"
 import { InfoStatus } from "@/shared/components/enumInfoStatus"
 import InfoModal from "@/shared/components/InfoModal.vue"
 import DateInput from "@/shared/components/input/DateInput.vue"
 import InputField from "@/shared/components/input/InputField.vue"
-import NestedInput from "@/shared/components/input/NestedInput.vue"
 import TextInput from "@/shared/components/input/TextInput.vue"
 import TimeInput from "@/shared/components/input/TimeInput.vue"
-import {
-  NestedInputAttributes,
-  ValidationError,
-} from "@/shared/components/input/types"
+import { ValidationError } from "@/shared/components/input/types"
 import YearInput from "@/shared/components/input/YearInput.vue"
-
-const nestedInputFields: NestedInputAttributes["fields"] = {
-  parent: defineTextField("field", "Input", "Input"),
-  child: defineTextField(
-    "deviatingField",
-    "Abweichender Input",
-    "Abweichender Input",
-  ),
-}
+import NestedComponent from "@/shared/components/NestedComponents.vue"
 
 const validationError = ref<ValidationError>({
   message: "Invalid value",
@@ -42,7 +29,6 @@ const values = reactive({
   dateInput: "",
   yearInput: "",
   timeInput: "",
-  nestedInput: { fields: { parent: "hello", child: "bye" } },
 })
 </script>
 
@@ -211,11 +197,27 @@ const values = reactive({
     </KitchensinkStory>
 
     <KitchensinkStory class="w-320" name="Nested">
-      <NestedInput
-        v-model="values.nestedInput"
-        aria-label="Nested Input"
-        :fields="nestedInputFields"
-      ></NestedInput>
+      <NestedComponent aria-label="Nested Component" class="w-full">
+        <InputField id="smallTextInput" v-slot="{ id }" label="Parent Input">
+          <TextInput
+            :id="id"
+            v-model="values.smallTextInput"
+            aria-label="small text input"
+            size="medium"
+          />
+        </InputField>
+        <!-- Child  -->
+        <template #children>
+          <InputField id="smallTextInput" v-slot="{ id }" label="Child Input">
+            <TextInput
+              :id="id"
+              v-model="values.smallTextInput"
+              aria-label="small text input"
+              size="medium"
+            />
+          </InputField>
+        </template>
+      </NestedComponent>
     </KitchensinkStory>
   </KitchensinkPage>
 </template>
