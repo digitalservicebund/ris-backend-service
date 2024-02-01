@@ -19,7 +19,8 @@ test.describe("a11y of categories page (/caselaw/documentunit/{documentNumber}/c
   test("gericht", async ({ page, documentNumber }) => {
     await navigateToCategories(page, documentNumber)
     await page
-      .locator("#nestedInputOfCourtAndDeviatingCourts")
+      .locator("#coreData div")
+      .filter({ hasText: "Gericht * Fehlerhaftes" })
       .getByLabel("Dropdown öffnen")
       .click()
     await expect(
@@ -68,8 +69,8 @@ test.describe("a11y of categories page (/caselaw/documentunit/{documentNumber}/c
     await navigateToCategories(page, documentNumber)
 
     await page
-      .locator("div")
-      .filter({ hasText: /^Spruchkörper Dokumenttyp \*$/ })
+      .locator("#coreData div")
+      .filter({ hasText: "Spruchkörper Dokumenttyp" })
       .getByLabel("Dropdown öffnen")
       .click()
 
