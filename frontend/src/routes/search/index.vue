@@ -17,12 +17,18 @@ async function handleSearchSubmit() {
   try {
     const response = await httpClient.get<string>(
       `search?query=${encodeURIComponent(searchInput.value)}`,
+      {
+        timeout: 10000,
+      },
     )
     if (response.data) {
       message.value = response.data
     }
     if (response.status !== 200) {
       hasError.value = true
+    }
+    if (response.status == 504) {
+      message.value = "Request timed out"
     }
   } catch (error) {
     hasError.value = true

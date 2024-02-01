@@ -11,6 +11,7 @@ type RequestOptions = {
   params?: {
     [key: string]: string
   }
+  timeout?: number
 }
 
 interface HttpClient {
@@ -65,8 +66,12 @@ async function baseHttp<T>(
           : response.data,
     }
   } catch (error) {
+    let errorCode = (error as AxiosError).code
+    if (errorCode === "ECONNABORTED") {
+      errorCode = "504" // use "Gateway Timeout" code if frontend timeout option has triggered
+    }
     return {
-      status: Number((error as AxiosError).code) || 500,
+      status: Number(errorCode) || 500,
       error: {
         title:
           (error as AxiosError).status?.toString() ??
