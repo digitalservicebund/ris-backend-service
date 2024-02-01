@@ -59,14 +59,14 @@ watch(localIsExpanded, () => emit("update:isExpanded", localIsExpanded.value))
     <!-- eslint-disable-next-line vuejs-accessibility/no-static-element-interactions -->
     <div
       :aria-labelledby="headerId"
-      class="flex w-full items-center justify-between focus:outline-none focus-visible:outline-blue-800"
+      class="flex w-full items-center justify-between focus:outline-none focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-blue-800"
       :class="{ 'cursor-pointer': !preventExpandOnClick }"
       @click.stop="toggleContentVisibility"
     >
       <button
         v-if="props.iconsOnLeft"
         :aria-label="ariaLabel"
-        class="icon self-start focus:outline-none focus-visible:outline-blue-800"
+        class="icon self-start focus:outline-none focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-blue-800"
         data-testid="icons-open-close"
         :style="{ marginLeft: `${marginLevel * 24}px` }"
         @click.stop="toggleContentVisibilityOnButton"

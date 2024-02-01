@@ -102,28 +102,24 @@ onMounted(() => {
       :key="index"
       ref="elementList"
       aria-label="Listen Eintrag"
-      class="border-b-1 border-blue-500 first:border-t-1"
-      :class="index !== editIndex && 'hover:bg-gray-100'"
+      class="border-b-1 border-blue-500 first:border-t-1 focus:outline-none"
+      :class="
+        index !== editIndex &&
+        'hover:bg-gray-100 focus:outline-none focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-blue-800'
+      "
       role="presentation"
+      tabindex="0"
       @click="setEditIndex(index)"
+      @keypress.enter="
+        index !== editIndex ? setEditIndex(index) : setEditIndex()
+      "
     >
       <div
         v-if="index !== editIndex"
         :key="index"
         class="group flex cursor-pointer items-center gap-8 py-16"
       >
-        <component
-          :is="summaryComponent"
-          class="focus:outline-none focus-visible:outline-blue-800"
-          :data="entry"
-          tabindex="0"
-          @click="
-            entry.hasForeignSource
-              ? (e: Event) => e.preventDefault()
-              : setEditIndex(index)
-          "
-          @keypress.enter="setEditIndex(index)"
-        />
+        <component :is="summaryComponent" :data="entry" />
 
         <div class="flex gap-8">
           <IconArrowDown />

@@ -32,20 +32,32 @@ function renderLink(dataEntry: ActiveCitation) {
     RouterLink,
     {
       class: [
-        "ds-link-03-bold ml-8 border-b-2 border-blue-800 flex flex-row leading-24",
+        "ds-link-03-bold ml-8 border-b-2 border-blue-800 flex flex-row leading-24 focus:outline-none focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-blue-800",
       ],
       target: "_blank",
-      tabindex: -1,
+      tabindex: 0,
       to: {
         name: "caselaw-documentUnit-documentNumber-categories",
         params: { documentNumber: dataEntry.documentNumber },
       },
+      onClick: (e: Event) => {
+        e.stopPropagation()
+      },
+      onKeydown: (e: KeyboardEvent) => {
+        e.stopPropagation()
+      },
     },
     () =>
-      h("div", { class: ["flex flex-row items-center"] }, [
-        h(() => dataEntry.documentNumber),
-        h(() => h(BaselineArrowOutward)),
-      ]),
+      h(
+        "div",
+        {
+          onClick: (e: Event) => {
+            e.stopPropagation()
+          },
+          class: ["flex flex-row items-center"],
+        },
+        [h(() => dataEntry.documentNumber), h(() => h(BaselineArrowOutward))],
+      ),
   )
 }
 

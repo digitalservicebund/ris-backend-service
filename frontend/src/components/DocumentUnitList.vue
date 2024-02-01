@@ -149,7 +149,7 @@ function onDelete() {
           class="table-cell min-h-56 border-b-1 border-blue-300 px-16 py-12 align-middle"
         >
           <router-link
-            class="underline focus:outline-none focus-visible:outline-blue-800"
+            class="underline focus:outline-none focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-blue-800"
             :to="{
               name: listEntry.fileName
                 ? 'caselaw-documentUnit-documentNumber-categories'

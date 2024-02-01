@@ -19,7 +19,7 @@ defineProps<{
       }"
     >
       <button
-        class="underline focus:outline-none focus-visible:outline-blue-800"
+        class="underline focus:outline-none focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-blue-800"
       >
         {{ decision.renderDecision }}
       </button>
