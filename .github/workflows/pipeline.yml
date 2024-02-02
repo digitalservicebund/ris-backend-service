@@ -736,7 +736,7 @@ jobs:
           GH_PACKAGES_REPOSITORY_TOKEN: ${{ secrets.GH_PACKAGES_REPOSITORY_TOKEN }}
         run: |
           echo "Running query performance tests"
-          npm run test:queries
+          npm run test:queries -- --workers=1
         working-directory: ./frontend
       - name: Send status to Slack
         # Third-party action, pin to commit SHA!

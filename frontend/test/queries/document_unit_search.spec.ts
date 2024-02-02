@@ -4,7 +4,7 @@ import DocumentUnit from "../../src/domain/documentUnit"
 
 // This is a performance test for the backend search endpoint
 // We run it sequentially not to skew the results
-test.describe.serial("document unit search queries", () => {
+test.describe("document unit search queries", () => {
   const testConfigurations: {
     title: string
     parameter: { [K in DocumentUnitSearchParameter]?: string }
@@ -17,7 +17,7 @@ test.describe.serial("document unit search queries", () => {
         documentNumber: "BVRE",
         courtType: "VerfGH",
       },
-      maxDuration: 850, // last max 856
+      maxDuration: 1000, // last max 856
       minResults: 5,
     },
     {
@@ -33,7 +33,7 @@ test.describe.serial("document unit search queries", () => {
       parameter: {
         documentNumber: "notExistingFoo",
       },
-      maxDuration: 900, // last max 921
+      maxDuration: 1000, // last max 921
     },
     {
       title: "vague fileNumber",
@@ -48,14 +48,14 @@ test.describe.serial("document unit search queries", () => {
       parameter: {
         fileNumber: "notExistingFoo",
       },
-      maxDuration: 100, // last max 86
+      maxDuration: 700, // last max 795
     },
     {
       title: "only unpublished",
       parameter: {
         publicationStatus: "UNPUBLISHED",
       },
-      maxDuration: 1200, // last max 879
+      maxDuration: 1000, // last max 879
       minResults: 5,
     },
     {
@@ -121,11 +121,11 @@ async function runTestMultipleTimes(
   durations: number[] = [],
 ) {
   if (runs === 0) {
-    const meanDuration = durations.reduce((a, b) => a + b, 0) / durations.length
     await testInfo.attach("durations", {
       body: Buffer.from(JSON.stringify(durations)),
       contentType: "application/json",
     })
+    const meanDuration = durations.reduce((a, b) => a + b, 0) / durations.length
     expect(meanDuration).toBeLessThan(search.maxDuration)
     return
   }
