@@ -45,6 +45,7 @@ The application has
 - unit tests (using [Vitest](https://github.com/vitest-dev/vitest))
 - end-to-end tests (using [Playwright](https://playwright.dev/docs/intro))
 - accessibility tests (using [Axe](https://github.com/abhinaba-ghosh/axe-playwright#readme) and [Playwright](https://playwright.dev/docs/intro))
+- performance tests for the backend search endpoints (using [Playwright](https://playwright.dev/docs/intro))
 
 **To run the unit tests:**
 
@@ -85,6 +86,20 @@ npx playwright test filename.spec.ts -g "test name"
 
 ```bash
 npm run test:a11y
+```
+
+**To run the performance tests:**
+
+```bash
+npm run test:queries -- --workers=1
+```
+
+**To run playwright tests against a different environment:**
+
+Add the URL of the environment like this
+
+```bash
+E2E_BASE_URL='<ENV_URL>' npm run <your_test>
 ```
 
 ### Style (linting & formatting)
