@@ -40,6 +40,16 @@ import TextEditor from "@/shared/components/input/TextEditor.vue"
       />
     </KitchensinkStory>
 
+    <KitchensinkStory name="Editable max (filling parent)">
+      <TextEditor
+        aria-label="text editor"
+        class="overflow-y-auto outline outline-2 outline-blue-900"
+        editable
+        field-size="max"
+        value="This texteditor is editable: Lorem ipsum dolor sit, amet consectetur adipisicing elit. Minus accusamus temporibus omnis, odio harum necessitatibus voluptate sunt sapiente officia quibusdam totam inventore quaerat consectetur, facere iure fugit dolorem quia pariatur."
+      />
+    </KitchensinkStory>
+
     <KitchensinkStory name="Not editable">
       <TextEditor
         aria-label="text editor"

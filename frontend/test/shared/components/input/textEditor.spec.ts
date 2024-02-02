@@ -56,6 +56,7 @@ describe("text editor", async () => {
   })
 
   test.each([
+    ["max", "h-full"],
     ["big", "h-320"],
     ["medium", "h-160"],
     ["small", "h-96"],
