@@ -36,12 +36,17 @@ class QueriesReporter implements Reporter {
           ?.body?.toString() || "[]",
       )
 
+      const maxDuration: number = result.attachments.find(
+        (attachment) => attachment.name == "maxDuration",
+      )?.body?.toString as unknown as number
+
       return (
         durations && {
           title: test.title,
           average_duration: Math.round(
             durations.reduce((a, b) => a + b, 0) / durations.length,
           ),
+          expected: maxDuration as number,
           max_duration: Math.round(Math.max(...durations)),
           min_duration: Math.round(Math.min(...durations)),
           runs: durations.length,

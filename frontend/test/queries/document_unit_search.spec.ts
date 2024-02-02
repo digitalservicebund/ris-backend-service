@@ -125,6 +125,10 @@ async function runTestMultipleTimes(
       body: Buffer.from(JSON.stringify(durations)),
       contentType: "application/json",
     })
+    await testInfo.attach("maxDuration", {
+      body: search.maxDuration.toString(),
+      contentType: "application/text",
+    })
     const meanDuration = durations.reduce((a, b) => a + b, 0) / durations.length
     expect(meanDuration).toBeLessThan(search.maxDuration)
     return
