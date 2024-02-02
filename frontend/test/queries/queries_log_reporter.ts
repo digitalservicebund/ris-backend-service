@@ -21,7 +21,7 @@ class QueriesReporter implements Reporter {
   onTestEnd(test: TestCase, result: TestResult) {
     if (["failed", "timedOut", "interrupted"].includes(result.status))
       this.failedTests.push({ test, result })
-    if (
+    else if (
       result.attachments.length &&
       result.attachments.find((attachment) => attachment.name == "durations")
     )
@@ -55,11 +55,10 @@ class QueriesReporter implements Reporter {
         getStats(test, result),
       )
       console.table(failedStats)
-      console.log("Use `npm run test:queries -- --reporter=line` to see errors")
     }
 
-    const stats = this.resultsWithDuration.map(({ test, result }) =>
-      getStats(test, result),
+    const stats = this.resultsWithDuration.map(
+      ({ test, result }) => getStats(test, result) || null,
     )
     console.table(stats)
   }

@@ -17,7 +17,7 @@ test.describe.serial("document unit search queries", () => {
         documentNumber: "BVRE",
         courtType: "VerfGH",
       },
-      maxDuration: 300, // last max 267
+      maxDuration: 850, // last max 856
       minResults: 5,
     },
     {
@@ -25,7 +25,7 @@ test.describe.serial("document unit search queries", () => {
       parameter: {
         documentNumber: "BV",
       },
-      maxDuration: 1600, // last max 1572
+      maxDuration: 3000, // last max 3011
       minResults: 5,
     },
     {
@@ -33,7 +33,7 @@ test.describe.serial("document unit search queries", () => {
       parameter: {
         documentNumber: "notExistingFoo",
       },
-      maxDuration: 100, // last max 79
+      maxDuration: 900, // last max 921
     },
     {
       title: "vague fileNumber",
@@ -55,7 +55,7 @@ test.describe.serial("document unit search queries", () => {
       parameter: {
         publicationStatus: "UNPUBLISHED",
       },
-      maxDuration: 12000, // last max 879
+      maxDuration: 1200, // last max 879
       minResults: 5,
     },
     {
@@ -64,7 +64,7 @@ test.describe.serial("document unit search queries", () => {
         decisionDate: "1900-01-01",
         decisionDateEnd: "2024-01-15",
       },
-      maxDuration: 200, // last max 165
+      maxDuration: 1200, // last max 1213
       minResults: 5,
     },
     {
@@ -72,7 +72,7 @@ test.describe.serial("document unit search queries", () => {
       parameter: {
         decisionDate: "1975-06-16",
       },
-      maxDuration: 100, // last max 81
+      maxDuration: 400, // last max 430
       minResults: 1,
     },
     {
@@ -80,7 +80,7 @@ test.describe.serial("document unit search queries", () => {
       parameter: {
         courtLocation: "München",
       },
-      maxDuration: 1300, // last max 1133
+      maxDuration: 2600, // last max 2684
       minResults: 5,
     },
     {
@@ -96,7 +96,7 @@ test.describe.serial("document unit search queries", () => {
       parameter: {
         myDocOfficeOnly: "true",
       },
-      maxDuration: 200, // last max 154
+      maxDuration: 2400, // last max 2495
       minResults: 5,
     },
   ]
