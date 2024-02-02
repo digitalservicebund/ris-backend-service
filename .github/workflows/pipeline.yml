@@ -687,7 +687,7 @@ jobs:
   query-performance-tests:
     runs-on: ubuntu-latest
     if: ${{ github.ref == 'refs/heads/main' }}
-    needs: [prep-playwright-tests] # add deploy-staging
+    needs: [deploy-staging, prep-playwright-tests]
     environment: staging
     steps:
       - uses: actions/checkout@v4
@@ -738,13 +738,13 @@ jobs:
           echo "Running query performance tests"
           npm run test:queries
         working-directory: ./frontend
-      # - name: Send status to Slack
-      #   # Third-party action, pin to commit SHA!
-      #   # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
-      #   uses: digitalservicebund/notify-on-failure-gha@15dd05b628141b7bac0ad26e08c1935cb3ba6bc8 # v1.4.0
-      #   if: ${{ failure() }}
-      #   with:
-      #     SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+      - name: Send status to Slack
+        # Third-party action, pin to commit SHA!
+        # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
+        uses: digitalservicebund/notify-on-failure-gha@15dd05b628141b7bac0ad26e08c1935cb3ba6bc8 # v1.4.0
+        if: ${{ failure() }}
+        with:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
 
   check-latest-deploy-tag:
     if: ${{ github.ref == 'refs/heads/main' }}
