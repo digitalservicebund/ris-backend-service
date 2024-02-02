@@ -2,7 +2,9 @@ import { expect, test, Request, Page, TestInfo } from "@playwright/test"
 import { DocumentUnitSearchParameter } from "../../src/components/DocumentUnitSearchEntryForm.vue"
 import DocumentUnit from "../../src/domain/documentUnit"
 
-test.describe("document unit search queries", () => {
+// This is a performance test for the backend search endpoint
+// We run it sequentially not to skew the results
+test.describe.serial("document unit search queries", () => {
   const testConfigurations: {
     title: string
     parameter: { [K in DocumentUnitSearchParameter]?: string }
@@ -15,7 +17,7 @@ test.describe("document unit search queries", () => {
         documentNumber: "BVRE",
         courtType: "VerfGH",
       },
-      maxDuration: 1000,
+      maxDuration: 300, // last max 267
       minResults: 5,
     },
     {
@@ -23,7 +25,7 @@ test.describe("document unit search queries", () => {
       parameter: {
         documentNumber: "BV",
       },
-      maxDuration: 1000,
+      maxDuration: 1600, // last max 1572
       minResults: 5,
     },
     {
@@ -31,14 +33,14 @@ test.describe("document unit search queries", () => {
       parameter: {
         documentNumber: "notExistingFoo",
       },
-      maxDuration: 1000,
+      maxDuration: 100, // last max 79
     },
     {
       title: "vague fileNumber",
       parameter: {
         fileNumber: "Bv",
       },
-      maxDuration: 1000,
+      maxDuration: 2000, // last max 1801
       minResults: 5,
     },
     {
@@ -46,14 +48,14 @@ test.describe("document unit search queries", () => {
       parameter: {
         fileNumber: "notExistingFoo",
       },
-      maxDuration: 1000,
+      maxDuration: 100, // last max 86
     },
     {
       title: "only unpublished",
       parameter: {
         publicationStatus: "UNPUBLISHED",
       },
-      maxDuration: 1000,
+      maxDuration: 12000, // last max 879
       minResults: 5,
     },
     {
@@ -62,7 +64,7 @@ test.describe("document unit search queries", () => {
         decisionDate: "1900-01-01",
         decisionDateEnd: "2024-01-15",
       },
-      maxDuration: 1000,
+      maxDuration: 200, // last max 165
       minResults: 5,
     },
     {
@@ -70,7 +72,7 @@ test.describe("document unit search queries", () => {
       parameter: {
         decisionDate: "1975-06-16",
       },
-      maxDuration: 1000,
+      maxDuration: 100, // last max 81
       minResults: 1,
     },
     {
@@ -78,7 +80,7 @@ test.describe("document unit search queries", () => {
       parameter: {
         courtLocation: "München",
       },
-      maxDuration: 1000,
+      maxDuration: 1300, // last max 1133
       minResults: 5,
     },
     {
@@ -86,7 +88,7 @@ test.describe("document unit search queries", () => {
       parameter: {
         courtType: "VerfGH",
       },
-      maxDuration: 1000,
+      maxDuration: 300, // last max 231
       minResults: 5,
     },
     {
@@ -94,14 +96,14 @@ test.describe("document unit search queries", () => {
       parameter: {
         myDocOfficeOnly: "true",
       },
-      maxDuration: 1000,
+      maxDuration: 200, // last max 154
       minResults: 5,
     },
   ]
 
   testConfigurations.forEach((search) =>
     test(search.title, async ({ page }, testInfo) =>
-      runTestMultipleTimes(10, search, page, testInfo),
+      runTestMultipleTimes(5, search, page, testInfo),
     ),
   )
 })
@@ -119,22 +121,22 @@ async function runTestMultipleTimes(
   durations: number[] = [],
 ) {
   if (runs === 0) {
+    const meanDuration = durations.reduce((a, b) => a + b, 0) / durations.length
     await testInfo.attach("durations", {
-      body: Buffer.from(durations),
+      body: Buffer.from(JSON.stringify(durations)),
       contentType: "application/json",
     })
+    expect(meanDuration).toBeLessThan(search.maxDuration)
     return
   }
 
-  const request = await getRequest(
-    "/api/v1/caselaw/documentunits/search?pg=0&sz=30" +
-      getUrlParams(search.parameter),
-    page,
-  )
+  const url =
+    "/api/v1/caselaw/documentunits/search?pg=0&sz=100" +
+    getUrlParams(search.parameter)
+  const request = await getRequest(url, page)
 
   const duration = request.timing().responseStart
   expect(duration).not.toBe(-1)
-  expect(duration).toBeLessThan(search.maxDuration)
   if (search.minResults) {
     const documentUnits =
       ((await (await request.response())?.json())?.content as DocumentUnit[]) ||

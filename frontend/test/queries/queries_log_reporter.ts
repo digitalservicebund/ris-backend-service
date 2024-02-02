@@ -10,7 +10,7 @@ import playwrightConfig from "./../../playwright.config"
 
 class QueriesReporter implements Reporter {
   private resultsWithDuration: { test: TestCase; result: TestResult }[] = []
-  private failedTests: string[] = []
+  private failedTests: { test: TestCase; result: TestResult }[] = []
 
   onBegin(_config: FullConfig, suite: Suite) {
     console.log(
@@ -20,8 +20,7 @@ class QueriesReporter implements Reporter {
 
   onTestEnd(test: TestCase, result: TestResult) {
     if (["failed", "timedOut", "interrupted"].includes(result.status))
-      this.failedTests.push(test.title)
-
+      this.failedTests.push({ test, result })
     if (
       result.attachments.length &&
       result.attachments.find((attachment) => attachment.name == "durations")
@@ -30,28 +29,38 @@ class QueriesReporter implements Reporter {
   }
 
   onEnd(result: FullResult) {
-    if (result.status != "passed") {
-      console.error("\nThe following test cases failed: ")
-      console.table(this.failedTests)
-      console.log("Use `npm run test:queries -- --reporter=line` to see errors")
-    }
-    const stats = this.resultsWithDuration.map(({ test, result }) => {
-      const durations = result.attachments
-        .find((attachment) => attachment.name == "durations")
-        ?.body?.toJSON().data
+    const getStats = (test: TestCase, result: TestResult) => {
+      const durations: number[] = JSON.parse(
+        result.attachments
+          .find((attachment) => attachment.name === "durations")
+          ?.body?.toString() || "[]",
+      )
 
       return (
         durations && {
           title: test.title,
-          average_duration:
+          average_duration: Math.round(
             durations.reduce((a, b) => a + b, 0) / durations.length,
-          max_duration: Math.max(...durations),
-          min_duration: Math.min(...durations),
+          ),
+          max_duration: Math.round(Math.max(...durations)),
+          min_duration: Math.round(Math.min(...durations)),
           runs: durations.length,
         }
       )
-    })
+    }
 
+    if (result.status !== "passed") {
+      console.error("\nThe following test cases failed: ")
+      const failedStats = this.failedTests.map(({ test, result }) =>
+        getStats(test, result),
+      )
+      console.table(failedStats)
+      console.log("Use `npm run test:queries -- --reporter=line` to see errors")
+    }
+
+    const stats = this.resultsWithDuration.map(({ test, result }) =>
+      getStats(test, result),
+    )
     console.table(stats)
   }
 
