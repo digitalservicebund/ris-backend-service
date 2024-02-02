@@ -12,7 +12,8 @@ You need (or may want) the following CLI tools. For UNIX users, there is a prepa
 
 - [lefthook](https://github.com/evilmartians/lefthook#install) - manages our git hooks
 - [talisman](https://thoughtworks.github.io/talisman/docs) - scans for secrets before you would commit them
-- [docker](https://docs.docker.com/get-docker/) - our container runtime (on macOS, the easiest way is to use [Docker Desktop](https://www.docker.com/products/docker-desktop/))
+- [docker](https://docs.docker.com/get-docker/) - our container runtime (on macOS, the easiest way is to
+  use [Docker Desktop](https://www.docker.com/products/docker-desktop/))
 - [gopass](https://www.gopass.pw/#install) - a tool to sync secrets
 - [Node.js](https://nodejs.org/en/) - JavaScript runtime & dependency management
 - [nodenv](https://github.com/nodenv/nodenv#installation) - manages the node.js environment
@@ -25,19 +26,24 @@ You need (or may want) the following CLI tools. For UNIX users, there is a prepa
 
 - [jq](https://github.com/stedolan/jq) - handy JSON Processor
 - [yq](https://github.com/mikefarah/yq) - handy YAML Processor
-- [actionlint](https://github.com/rhysd/actionlint/blob/main/docs/install.md) - a tool that lints GitHub Action pipeline definitions
-- [shellcheck](https://github.com/koalaman/shellcheck#installing) - shell script analyzer, that also provides extensions for [VS Code](https://marketplace.visualstudio.com/items?itemName=timonwong.shellcheck)
+- [actionlint](https://github.com/rhysd/actionlint/blob/main/docs/install.md) - a tool that lints GitHub Action pipeline
+  definitions
+- [shellcheck](https://github.com/koalaman/shellcheck#installing) - shell script analyzer, that also provides extensions
+  for [VS Code](https://marketplace.visualstudio.com/items?itemName=timonwong.shellcheck)
 - [trivy](https://github.com/aquasecurity/trivy#get-trivy) - our vulnerability scanner
-- [adr-tools](https://github.com/npryce/adr-tools) - a command-line tool to manage our [Architecture Decision Records (ADRs)](#architecture-decision-records)
+- [adr-tools](https://github.com/npryce/adr-tools) - a command-line tool to manage
+  our [Architecture Decision Records (ADRs)](#architecture-decision-records)
 - [direnv](https://github.com/direnv/direnv/blob/master/docs/installation.md) - manages our local environment
 
-If you use [`homebrew`](https://brew.sh/), you can simply execute this to to install all required and optional dependencies:
+If you use [`homebrew`](https://brew.sh/), you can simply execute this to to install all required and optional
+dependencies:
 
 ```bash
 brew bundle
 ```
 
-If you decided to install `direnv`, you have to hook it onto your shell as described [here](https://github.com/direnv/direnv/blob/master/docs/hook.md). E.g. for ZSH add this to `~/.zshrc`:
+If you decided to install `direnv`, you have to hook it onto your shell as
+described [here](https://github.com/direnv/direnv/blob/master/docs/hook.md). E.g. for ZSH add this to `~/.zshrc`:
 
 ```bash
 eval "$(direnv hook zsh)"
@@ -101,7 +107,10 @@ Now you can generate a new `.env` file containig the secrets:
 
 ### Importing example data
 
-Learn how to import example data for the app [here](https://github.com/digitalservicebund/ris-backend-service/tree/main/backend#lookup-tables). Note that while this step isn't required to run the app, some tests may fail since they depend on preexisting data from the example data set.
+Learn how to import example data for the
+app [here](https://github.com/digitalservicebund/ris-backend-service/tree/main/backend#lookup-tables). Note that while
+this step isn't required to run the app, some tests may fail since they depend on preexisting data from the example data
+set.
 
 ## Development
 
@@ -109,19 +118,32 @@ Learn how to import example data for the app [here](https://github.com/digitalse
 ./run.sh dev
 ```
 
-If you don't want to watch the log stream but let Docker perform health checks until everything is up, use detached mode:
+If you don't want to watch the log stream but let Docker perform health checks until everything is up, use detached
+mode:
 
 ```bash
 ./run.sh dev -d
 ```
 
+To run a service separately:
+
+```bash
+./run.sh dev --no-backend
+```
+
 The application is available at <http://127.0.0.1>.
 
-This will start the backend [utilizing Spring Boot developer tools](https://docs.spring.io/spring-boot/docs/current/reference/html/using.html#using.devtools.restart) so changes in the Java sources will be reflected without manually restarting. Similarly, the frontend is served from [Vite](https://vitejs.dev) with [HMR](https://vitejs.dev/guide/features.html#hot-module-replacement).
+This will start the
+backend [utilizing Spring Boot developer tools](https://docs.spring.io/spring-boot/docs/current/reference/html/using.html#using.devtools.restart)
+so changes in the Java sources will be reflected without manually restarting. Similarly, the frontend is served
+from [Vite](https://vitejs.dev) with [HMR](https://vitejs.dev/guide/features.html#hot-module-replacement).
 
 > **Note**
 >
-> When first starting the development server, dependencies will be installed automatically. This includes supported browsers for E2E and a11y testing through playwright. Should that fail, you can [install them manually](https://github.com/digitalservicebund/ris-backend-service/tree/main/frontend#prerequisites).
+> When first starting the development server, dependencies will be installed automatically. This includes supported
+> browsers for E2E and a11y testing through playwright. Should that fail, you
+>
+can [install them manually](https://github.com/digitalservicebund/ris-backend-service/tree/main/frontend#prerequisites).
 
 To see logs of the containers, use e.g.
 
@@ -143,15 +165,18 @@ Read the component individual documentation to figure out how to run them indivi
 
 ## Deployment
 
-The pipeline performs the deployment through GitOps using [ArgoCD](https://argoproj.github.io/cd/) (see [example pipeline deploy step definition](https://github.com/digitalservicebund/ris-backend-service/blob/main/.github/workflows/pipeline.yml#L657-L667)):
+The pipeline performs the deployment through GitOps using [ArgoCD](https://argoproj.github.io/cd/) (
+see [example pipeline deploy step definition](https://github.com/digitalservicebund/ris-backend-service/blob/main/.github/workflows/pipeline.yml#L657-L667)):
 
 - Build and push the new Docker image (see here)
 - Commit the new tag in the deployment manifest in the neuris-infra repository
-- Sync the respective ArgoCD App, which will cause ArgoCD to apply all changed Kubernetes manifests on the cluster to create the desired state
+- Sync the respective ArgoCD App, which will cause ArgoCD to apply all changed Kubernetes manifests on the cluster to
+  create the desired state
 
 ## Working with [Talisman](https://thoughtworks.github.io/talisman/)
 
-Given you already know that a file that was edited, f.ex. `.github/workflows/pipeline.yml`, will require an updated checksum field in `.talismanrc`, execute the following command:
+Given you already know that a file that was edited, f.ex. `.github/workflows/pipeline.yml`, will require an updated
+checksum field in `.talismanrc`, execute the following command:
 
 ```bash
 talisman -c .github/workflows/pipeline.yml | sed -n '3,5p' | yq e '.fileignoreconfig[0].checksum' - | tr -d '\r\n' | pbcopy
@@ -178,11 +203,14 @@ index df6f840..de8d552 100644
 ```
 
 ## API Documentation
-To access the api documentation, start the application and navigate to `/api/docs.html` or `/api/docs.json` in your browser.
+
+To access the api documentation, start the application and navigate to `/api/docs.html` or `/api/docs.json` in your
+browser.
 
 ## Architecture Decision Records
 
-[Architecture decisions](https://cognitect.com/blog/2011/11/15/documenting-architecture-decisions) are kept in the [doc/adr](doc/adr) directory and are managed with [adr-tools](https://github.com/npryce/adr-tools).
+[Architecture decisions](https://cognitect.com/blog/2011/11/15/documenting-architecture-decisions) are kept in
+the [doc/adr](doc/adr) directory and are managed with [adr-tools](https://github.com/npryce/adr-tools).
 
 ## Slack notifications
 
