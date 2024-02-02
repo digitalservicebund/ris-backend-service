@@ -110,9 +110,7 @@ onMounted(() => {
       role="presentation"
       tabindex="0"
       @click="setEditIndex(index)"
-      @keypress.enter="
-        index !== editIndex ? setEditIndex(index) : setEditIndex()
-      "
+      @keypress.enter="setEditIndex(index)"
     >
       <div
         v-if="index !== editIndex"
