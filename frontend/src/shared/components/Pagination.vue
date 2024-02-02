@@ -79,7 +79,6 @@ export type PageableService<TResult, TQuery = TResult> = (
           v-if="!(page.first && page.last)"
           aria-label="nächste Ergebnisse"
           button-type="tertiary"
-          class="mr-24"
           :disabled="page?.last"
           :icon="IconArrowForward"
           icon-position="right"
