@@ -36,9 +36,9 @@ class QueriesReporter implements Reporter {
           ?.body?.toString() || "[]",
       )
 
-      const maxDuration: number = result.attachments.find(
-        (attachment) => attachment.name == "maxDuration",
-      )?.body?.toString as unknown as number
+      const maxDuration: number = result.attachments
+        .find((attachment) => attachment.name == "maxDuration")
+        ?.body?.toString() as unknown as number
 
       return (
         durations && {
