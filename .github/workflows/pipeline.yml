@@ -687,7 +687,7 @@ jobs:
   query-performance-tests:
     runs-on: ubuntu-latest
     if: ${{ github.ref == 'refs/heads/main' }}
-    needs: [deploy-staging, prep-playwright-tests]
+    needs: [e2e-tests, prep-playwright-tests]
     environment: staging
     steps:
       - uses: actions/checkout@v4

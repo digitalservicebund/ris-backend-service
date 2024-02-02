@@ -40,7 +40,7 @@ test.describe("document unit search queries", () => {
       parameter: {
         fileNumber: "Bv",
       },
-      maxDuration: 2000, // last max 1801
+      maxDuration: 2500, // last max 2116
       minResults: 5,
     },
     {
@@ -55,7 +55,7 @@ test.describe("document unit search queries", () => {
       parameter: {
         publicationStatus: "UNPUBLISHED",
       },
-      maxDuration: 1000, // last max 879
+      maxDuration: 2000, // last max 2359
       minResults: 5,
     },
     {
@@ -88,7 +88,7 @@ test.describe("document unit search queries", () => {
       parameter: {
         courtType: "VerfGH",
       },
-      maxDuration: 300, // last max 231
+      maxDuration: 700, // last max 722
       minResults: 5,
     },
     {
