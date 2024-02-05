@@ -227,21 +227,20 @@ test.describe("related documentation units", () => {
             .first()
             .getAttribute("aria-label")) as string
 
-          const number1 = "1234"
-          const number2 = "4321"
+          const number = "1234"
           await navigateToCategories(page, documentNumber)
 
           if (container === activeCitationContainer) {
-            await fillActiveCitationInputs(page, { fileNumber: number1 })
+            await fillActiveCitationInputs(page, { fileNumber: number })
           }
           if (container === previousDecisionContainer) {
-            await fillPreviousDecisionInputs(page, { fileNumber: number1 })
+            await fillPreviousDecisionInputs(page, { fileNumber: number })
           }
           if (container === ensuingDecisionContainer) {
-            await fillEnsuingDecisionInputs(page, { fileNumber: number1 })
+            await fillEnsuingDecisionInputs(page, { fileNumber: number })
           }
           if (container === normsContainer) {
-            await fillNormInputs(page, { dateOfRelevance: number1 })
+            await fillNormInputs(page, { dateOfRelevance: number })
           }
 
           await container.getByLabel(`${containerLabel} speichern`).click()
@@ -251,31 +250,36 @@ test.describe("related documentation units", () => {
           await container.getByLabel("Weitere Angabe").click()
 
           if (container === activeCitationContainer) {
-            await fillActiveCitationInputs(page, { fileNumber: number2 })
+            await fillActiveCitationInputs(page, { fileNumber: number })
           }
           if (container === previousDecisionContainer) {
-            await fillPreviousDecisionInputs(page, { fileNumber: number2 })
+            await fillPreviousDecisionInputs(page, { fileNumber: number })
           }
           if (container === ensuingDecisionContainer) {
-            await fillEnsuingDecisionInputs(page, { fileNumber: number2 })
+            await fillEnsuingDecisionInputs(page, { fileNumber: number })
           }
 
           if (container === normsContainer) {
-            await fillNormInputs(page, { dateOfRelevance: number2 })
+            await fillNormInputs(page, { dateOfRelevance: number })
           }
 
           await container.getByLabel(`${containerLabel} speichern`).click()
 
           await expect(container.getByLabel("Listen Eintrag")).toHaveCount(2)
 
-          // deleting second, sets first list item in edit mode
+          // leaving an empty list item, deletes it
+          await container.getByLabel("Weitere Angabe").click()
+          await expect(container.getByLabel("Listen Eintrag")).toHaveCount(3)
+          await container.getByLabel("Listen Eintrag").nth(1).click()
+          await expect(container.getByLabel("Listen Eintrag")).toHaveCount(2)
+
+          // deleting item, sets previous list item in edit mode
           await container.getByLabel("Listen Eintrag").nth(1).click()
 
           await container.getByLabel("Löschen").click()
 
           await expect(container.getByLabel("Listen Eintrag")).toHaveCount(1)
 
-          // when this button is visible, item is in edit mode
           await expect(
             container.getByLabel(`${containerLabel} speichern`),
           ).toBeVisible()
@@ -287,7 +291,6 @@ test.describe("related documentation units", () => {
           //deleting last list item, adds a new default item
           await container.getByLabel("Löschen").click()
 
-          //hidden cancel and delete button means, that an item hasn't been saved yet --> new item
           await expect(container.getByLabel("Abbrechen")).toBeHidden()
 
           await expect(container.getByLabel("Löschen")).toBeHidden()

@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, onMounted, ref, watch } from "vue"
+import { computed, onMounted, onBeforeUnmount, ref, watch } from "vue"
 import ComboboxInput from "@/components/ComboboxInput.vue"
 import { useValidationStore } from "@/composables/useValidationStore"
 import { NormAbbreviation } from "@/domain/normAbbreviation"
@@ -99,6 +99,10 @@ onMounted(async () => {
     await validateNorm()
   }
   norm.value = new NormReference({ ...props.modelValue })
+})
+
+onBeforeUnmount(() => {
+  if (norm.value.isEmpty) emit("removeListEntry")
 })
 </script>
 

@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, onMounted, ref, watch } from "vue"
+import { computed, onMounted, onBeforeUnmount, ref, watch } from "vue"
 import SearchResultList, { SearchResults } from "./SearchResultList.vue"
 import ComboboxInput from "@/components/ComboboxInput.vue"
 import { useValidationStore } from "@/composables/useValidationStore"
@@ -177,6 +177,10 @@ onMounted(() => {
     validateRequiredInput()
   }
   activeCitation.value = new ActiveCitation({ ...props.modelValue })
+})
+
+onBeforeUnmount(() => {
+  if (activeCitation.value.isEmpty) emit("removeListEntry")
 })
 </script>
 

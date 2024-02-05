@@ -63,7 +63,11 @@ function addNewListEntry() {
 function removeListEntry(index: number) {
   modelValueList.value.splice(index, 1)
 
-  if (editIndex.value !== undefined && modelValueList.value.length !== 0) {
+  if (
+    editIndex.value !== undefined &&
+    modelValueList.value.length !== 0 &&
+    index <= editIndex.value
+  ) {
     editIndex.value -= 1
   }
 
