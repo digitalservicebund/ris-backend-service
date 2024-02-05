@@ -12,9 +12,9 @@ public class FooterConverter {
   /**
    * Convert a list of docx4j content elements to {@link ParagraphElement}
    *
-   * @param content
-   * @param converter
-   * @return
+   * @param content list of docx4j objects
+   * @param converter converter to convert the objects to domain objects
+   * @return a parent paragraph element with the content elements as children
    */
   public static ParagraphElement convert(List<Object> content, DocxConverter converter) {
     AtomicReference<ParagraphElement> paragraphElement = new AtomicReference<>();

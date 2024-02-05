@@ -194,7 +194,7 @@ public class DocxConverterService implements ConverterService {
             .filter(Objects::nonNull)
             .collect(Collectors.toList());
 
-    Set<FooterElement> footerElements = parseECLIFromFooter();
+    Set<FooterElement> footerElements = parseFooterAndIdentifyECLI();
     documentUnitDocxList.addAll(
         0, footerElements.stream().filter(ECLIElement.class::isInstance).toList());
     documentUnitDocxList.addAll(
@@ -207,7 +207,7 @@ public class DocxConverterService implements ConverterService {
     return documentUnitDocxList;
   }
 
-  private Set<FooterElement> parseECLIFromFooter() {
+  private Set<FooterElement> parseFooterAndIdentifyECLI() {
     Set<FooterElement> footerElements = new HashSet<>();
 
     converter
