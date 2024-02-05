@@ -1,6 +1,6 @@
 <script lang="ts" setup generic="T extends ListItem">
 import type { Component, Ref } from "vue"
-import { ref, watch, nextTick, onMounted } from "vue"
+import { ref, watch, nextTick } from "vue"
 import ListItem from "@/domain/editableListItem"
 import DataSetSummary from "@/shared/components/DataSetSummary.vue"
 import TextButton from "@/shared/components/input/TextButton.vue"
@@ -63,7 +63,7 @@ function addNewListEntry() {
 function removeListEntry(index: number) {
   modelValueList.value.splice(index, 1)
 
-  if (editIndex.value !== undefined && index < editIndex.value) {
+  if (editIndex.value !== undefined && modelValueList.value.length !== 0) {
     editIndex.value -= 1
   }
 
@@ -71,8 +71,6 @@ function removeListEntry(index: number) {
     "update:modelValue",
     [...props.modelValue].filter((_, i) => i !== index),
   )
-
-  editIndex.value = undefined
 }
 
 function updateModel() {
@@ -90,9 +88,13 @@ watch(
   { immediate: true, deep: true },
 )
 
-onMounted(() => {
-  if (props.modelValue.length == 0) addNewListEntry()
-})
+watch(
+  () => modelValueList,
+  () => {
+    if (modelValueList.value.length == 0) addNewListEntry()
+  },
+  { immediate: true, deep: true },
+)
 </script>
 
 <template>

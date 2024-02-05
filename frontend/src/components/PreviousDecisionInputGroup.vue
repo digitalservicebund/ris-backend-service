@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { onMounted, ref, computed } from "vue"
+import { watch, ref, computed, onMounted } from "vue"
 import SearchResultList, { SearchResults } from "./SearchResultList.vue"
 import ComboboxInput from "@/components/ComboboxInput.vue"
 import { useValidationStore } from "@/composables/useValidationStore"
@@ -31,7 +31,7 @@ const emit = defineEmits<{
 }>()
 
 const lastSearchInput = ref(new PreviousDecision())
-const lastModelValue = ref(new PreviousDecision({ ...props.modelValue }))
+const lastSavedModelValue = ref(new PreviousDecision({ ...props.modelValue }))
 const previousDecision = ref(new PreviousDecision({ ...props.modelValue }))
 const validationStore =
   useValidationStore<(typeof PreviousDecision.fields)[number]>()
@@ -134,6 +134,15 @@ function scrollToTop() {
     })
   }
 }
+
+watch(
+  () => props.modelValue,
+  () => {
+    previousDecision.value = new PreviousDecision({ ...props.modelValue })
+    lastSavedModelValue.value = new PreviousDecision({ ...props.modelValue })
+    if (lastSavedModelValue.value.isEmpty) validationStore.reset()
+  },
+)
 
 onMounted(() => {
   // On first mount, we don't need to validate. When the props.modelValue do not
@@ -286,7 +295,7 @@ onMounted(() => {
             @click.stop="addPreviousDecision"
           />
           <TextButton
-            v-if="!lastModelValue.isEmpty"
+            v-if="!lastSavedModelValue.isEmpty"
             aria-label="Abbrechen"
             button-type="ghost"
             label="Abbrechen"
@@ -296,7 +305,7 @@ onMounted(() => {
         </div>
       </div>
       <TextButton
-        v-if="!lastModelValue.isEmpty"
+        v-if="!lastSavedModelValue.isEmpty"
         aria-label="Eintrag löschen"
         button-type="destructive"
         label="Eintrag löschen"

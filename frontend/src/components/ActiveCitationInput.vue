@@ -28,7 +28,7 @@ const emit = defineEmits<{
 }>()
 
 const lastSearchInput = ref(new ActiveCitation())
-const lastModelValue = ref(new ActiveCitation({ ...props.modelValue }))
+const lastSavedModelValue = ref(new ActiveCitation({ ...props.modelValue }))
 const activeCitation = ref(new ActiveCitation({ ...props.modelValue }))
 
 const validationStore =
@@ -148,14 +148,6 @@ function scrollToTop() {
     })
   }
 }
-
-onMounted(() => {
-  if (props.modelValue?.isEmpty !== undefined) {
-    validateRequiredInput()
-  }
-  activeCitation.value = new ActiveCitation({ ...props.modelValue })
-})
-
 watch(
   activeCitation,
   () => {
@@ -170,6 +162,22 @@ watch(
   },
   { deep: true },
 )
+
+watch(
+  () => props.modelValue,
+  () => {
+    activeCitation.value = new ActiveCitation({ ...props.modelValue })
+    lastSavedModelValue.value = new ActiveCitation({ ...props.modelValue })
+    if (lastSavedModelValue.value.isEmpty) validationStore.reset()
+  },
+)
+
+onMounted(() => {
+  if (props.modelValue?.isEmpty !== undefined) {
+    validateRequiredInput()
+  }
+  activeCitation.value = new ActiveCitation({ ...props.modelValue })
+})
 </script>
 
 <template>
@@ -274,7 +282,7 @@ watch(
             @click.stop="addActiveCitation"
           />
           <TextButton
-            v-if="!lastModelValue.isEmpty"
+            v-if="!lastSavedModelValue.isEmpty"
             aria-label="Abbrechen"
             button-type="ghost"
             label="Abbrechen"
@@ -284,7 +292,7 @@ watch(
         </div>
       </div>
       <TextButton
-        v-if="!lastModelValue.isEmpty"
+        v-if="!lastSavedModelValue.isEmpty"
         aria-label="Eintrag löschen"
         button-type="destructive"
         label="Eintrag löschen"

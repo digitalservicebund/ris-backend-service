@@ -24,7 +24,7 @@ const validationStore =
   useValidationStore<(typeof NormReference.fields)[number]>()
 
 const norm = ref(new NormReference({ ...props.modelValue }))
-const lastModelValue = ref(new NormReference({ ...props.modelValue }))
+const lastSavedModelValue = ref(new NormReference({ ...props.modelValue }))
 
 const normAbbreviation = computed({
   get: () =>
@@ -80,6 +80,15 @@ async function addNormReference() {
   }
 }
 
+watch(
+  () => props.modelValue,
+  () => {
+    norm.value = new NormReference({ ...props.modelValue })
+    lastSavedModelValue.value = new NormReference({ ...props.modelValue })
+    if (lastSavedModelValue.value.isEmpty) validationStore.reset()
+  },
+)
+
 onMounted(async () => {
   // On first mount, we don't need to validate. When the props.modelValue do not
   // have the isEmpty getter, we can be sure that it has not been initialized as
@@ -90,14 +99,6 @@ onMounted(async () => {
     await validateNorm()
   }
   norm.value = new NormReference({ ...props.modelValue })
-})
-
-watch(props, () => {
-  if (
-    props.modelValue?.normAbbreviation?.abbreviation !==
-    norm.value?.normAbbreviation?.abbreviation
-  )
-    norm.value = new NormReference({ ...props.modelValue })
 })
 </script>
 
@@ -191,7 +192,7 @@ watch(props, () => {
             @click.stop="addNormReference"
           />
           <TextButton
-            v-if="!lastModelValue.isEmpty"
+            v-if="!lastSavedModelValue.isEmpty"
             aria-label="Abbrechen"
             button-type="ghost"
             label="Abbrechen"
@@ -201,7 +202,7 @@ watch(props, () => {
         </div>
       </div>
       <TextButton
-        v-if="!lastModelValue.isEmpty"
+        v-if="!lastSavedModelValue.isEmpty"
         aria-label="Eintrag löschen"
         button-type="destructive"
         label="Eintrag löschen"
