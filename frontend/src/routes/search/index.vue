@@ -1,6 +1,8 @@
 <script lang="ts" setup>
 import { ref } from "vue"
-import httpClient from "@/services/httpClient"
+import httpClient, {
+  FailedValidationServerResponse,
+} from "@/services/httpClient"
 import InputField from "@/shared/components/input/InputField.vue"
 import TextButton from "@/shared/components/input/TextButton.vue"
 import TextInput from "@/shared/components/input/TextInput.vue"
@@ -9,29 +11,30 @@ const searchInput = ref("")
 const isLoading = ref(false)
 const hasError = ref(false)
 const message = ref("")
+const TIMEOUT = 10000
 
 async function handleSearchSubmit() {
   isLoading.value = true
   message.value = "Loading ..."
   hasError.value = false
   try {
-    const response = await httpClient.get<string>(
-      `search?query=${encodeURIComponent(searchInput.value)}`,
-      {
-        timeout: 10000,
-      },
-    )
-    if (response.data) {
-      message.value = response.data
-    }
-    if (response.status !== 200) {
-      hasError.value = true
-    }
+    const response = await httpClient.get<
+      string | FailedValidationServerResponse
+    >(`search?query=${encodeURIComponent(searchInput.value)}`, {
+      timeout: TIMEOUT,
+    })
     if (response.status == 504) {
       message.value = "Request timed out"
+    } else if (response.status === 200 && response.data) {
+      message.value = response.data as string
+    } else {
+      hasError.value = true
+      const errorResponse = response.data as FailedValidationServerResponse
+      message.value = errorResponse.errors.map((e) => e.message).join(", ")
     }
   } catch (error) {
     hasError.value = true
+    message.value = error as string
   } finally {
     isLoading.value = false
   }
