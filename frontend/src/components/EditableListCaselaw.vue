@@ -122,11 +122,11 @@ watch(
       <div
         v-if="index !== editIndex"
         :key="index"
-        class="group flex cursor-pointer items-center gap-8 py-16"
+        class="group flex cursor-pointer items-center gap-8 px-2 py-16"
       >
         <component :is="summaryComponent" :data="entry" />
 
-        <div class="flex gap-8">
+        <div class="flex gap-8 text-blue-800">
           <IconArrowDown />
         </div>
       </div>
