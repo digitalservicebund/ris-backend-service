@@ -93,7 +93,7 @@ test.describe("keywords", () => {
     await waitForInputValue(page, "[aria-label='Schlagwörter']", keyword)
     await page.keyboard.press("Enter")
 
-    await expect(page.getByText(keyword + / bereits vorhanden/)).toBeVisible()
+    await expect(page.getByText(keyword + " bereits vorhanden")).toBeVisible()
   })
 
   test("delete keywords", async ({ page, documentNumber }) => {
