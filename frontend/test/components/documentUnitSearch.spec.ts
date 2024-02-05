@@ -1,6 +1,5 @@
 import { userEvent } from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
-import { createPinia, setActivePinia } from "pinia"
 import { createRouter, createWebHistory } from "vue-router"
 import DocumentUnitSearch from "@/components/DocumentUnitSearch.vue"
 import DocumentUnitListEntry from "@/domain/documentUnitListEntry"
@@ -44,10 +43,6 @@ function renderComponent() {
 }
 
 describe("Documentunit Search", () => {
-  beforeEach(async () => {
-    setActivePinia(createPinia())
-  })
-
   vi.spyOn(
     documentUnitService,
     "searchByDocumentUnitSearchInput",

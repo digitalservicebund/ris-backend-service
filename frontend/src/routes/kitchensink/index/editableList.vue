@@ -2,7 +2,7 @@
 import { ref } from "vue"
 import KitchensinkPage from "@/kitchensink/components/KitchensinkPage.vue"
 import KitchensinkStory from "@/kitchensink/components/KitchensinkStory.vue"
-import EditableList from "@/shared/components/EditableList.vue"
+import EditableList from "@/shared/components/EditableListCaselaw.vue"
 import TextInput from "@/shared/components/input/TextInput.vue"
 
 const listWithEntries = ref(["list entry 1", "list entry 2"])

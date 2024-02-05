@@ -1,6 +1,5 @@
 import { userEvent } from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
-import { createPinia, setActivePinia } from "pinia"
 import PreviousDecisions from "@/components/PreviousDecisions.vue"
 import { Court, DocumentType } from "@/domain/documentUnit"
 import PreviousDecision from "@/domain/previousDecision"
@@ -57,10 +56,6 @@ function generatePreviousDecision(options?: {
 }
 
 describe("PreviousDecisions", () => {
-  beforeEach(async () => {
-    setActivePinia(createPinia())
-  })
-
   vi.spyOn(
     documentUnitService,
     "searchByRelatedDocumentation",

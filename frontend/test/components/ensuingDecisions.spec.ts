@@ -1,6 +1,5 @@
 import { userEvent } from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
-import { createPinia, setActivePinia } from "pinia"
 import EnsuingDecisions from "@/components/EnsuingDecisions.vue"
 import { Court, DocumentType } from "@/domain/documentUnit"
 import EnsuingDecision from "@/domain/ensuingDecision"
@@ -59,10 +58,6 @@ function generateEnsuingDecision(options?: {
 }
 
 describe("EnsuingDecisions", () => {
-  beforeEach(async () => {
-    setActivePinia(createPinia())
-  })
-
   vi.spyOn(
     documentUnitService,
     "searchByRelatedDocumentation",

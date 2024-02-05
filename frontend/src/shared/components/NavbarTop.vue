@@ -69,12 +69,6 @@ onMounted(async () => {
         >Vorgänge</router-link
       >
       <router-link
-        class="p-8 hover:bg-yellow-500 hover:underline"
-        :class="{ underline: route.path.includes('norms') }"
-        :to="{ name: 'norms' }"
-        >Normen</router-link
-      >
-      <router-link
         v-if="showSearchTab"
         class="p-8 hover:bg-yellow-500 hover:underline"
         :class="{ underline: route.path.includes('suche') }"

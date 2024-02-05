@@ -28,9 +28,9 @@ fileignoreconfig:
 - filename: frontend/FRONTEND_STYLEGUIDE.md
   checksum: e6b8194eba2012f2a769c5a5d3577715a573b441a7b94e744c32b3149d0d3a93
 - filename: frontend/src/main.ts
-  checksum: 1c51fff6c6236527d361c16c4dde13fb6c4748cbad9db67d33216220a590d522
+  checksum: 746fce5ecaaf1dbe88d5bdf574c21670fdf4e1a67dad62f5cdfe02ef3dcdd6b9
 - filename: frontend/test/test-helper/dataGenerators.ts
-  checksum: a3d04d1168dcc221ba5fcd72e8d8bada60f48644c7586bde3a7602b748d0682c
+  checksum: d8c709167000b46f3cccbf4f95058e1acb9dbe20e5b7160b6c47458f520e6603
 - filename: migration_schema_local_setup.md
   checksum: 0e3fc84949750036f1e433f23f3091abcc7866192673580fa69c0fa15782022a
 scopeconfig:

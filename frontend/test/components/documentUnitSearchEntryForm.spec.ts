@@ -1,6 +1,5 @@
 import { userEvent } from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
-import { createPinia } from "pinia"
 import { createRouter, createWebHistory } from "vue-router"
 import DocumentUnitSearchEntryForm from "@/components/DocumentUnitSearchEntryForm.vue"
 
@@ -23,7 +22,7 @@ async function renderComponent(options?: { isLoading: boolean }) {
   return {
     ...render(DocumentUnitSearchEntryForm, {
       props,
-      global: { plugins: [router, createPinia()] },
+      global: { plugins: [router] },
     }),
     user: userEvent.setup(),
     router: router,
