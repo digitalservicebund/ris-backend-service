@@ -22,7 +22,7 @@ function renderComponent(props?: Partial<DateChipsInputProps>) {
   return { user, ...render(ChipsDateInput, { props: effectiveProps }) }
 }
 
-describe("ChipsInput", () => {
+describe("ChipsDateInput", () => {
   it("shows a chips input element", () => {
     renderComponent()
     const input = screen.getByRole<HTMLInputElement>("textbox")
@@ -98,5 +98,29 @@ describe("ChipsInput", () => {
       message: ariaLabel + " darf nicht in der Zukunft liegen",
       instance: id,
     })
+  })
+
+  it("deletes on button click", async () => {
+    const onUpdate = vi.fn()
+    const { user } = renderComponent({
+      modelValue: ["2020-01-01"],
+      "onUpdate:modelValue": onUpdate,
+    })
+    const deleteButtons = screen.getAllByRole("button")
+    await user.click(deleteButtons[0])
+    expect(onUpdate).toHaveBeenCalled()
+  })
+
+  it("deletes the focused chip on enter", async () => {
+    const onUpdate = vi.fn()
+    const { user } = renderComponent({
+      "onUpdate:modelValue": onUpdate,
+      modelValue: ["2020-01-01", "2021-01-01"],
+    })
+
+    const chips = screen.getAllByRole("listitem")
+    await user.click(chips[1])
+    await user.keyboard("{enter}")
+    expect(onUpdate).toHaveBeenCalledWith(["2020-01-01"])
   })
 })

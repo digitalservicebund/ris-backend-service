@@ -53,6 +53,12 @@ The application has
 npm test
 ```
 
+**To run one unit test:**
+
+```bash
+npm test -- chipsDateInput.spec.ts
+```
+
 **Run unit tests with watcher:**
 
 ```bash

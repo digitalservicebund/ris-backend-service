@@ -28,23 +28,15 @@ const chips = computed<string[]>({
   },
 
   set: (newValue: string[]) => {
-    const lastValue = newValue[newValue.length - 1]
+    if (!newValue || newValue.length === 0) {
+      emit("update:modelValue", undefined)
+      return
+    }
 
-    const isValidDate = dayjs(lastValue, "DD.MM.YYYY", true).isValid()
+    const lastValue = newValue.at(-1)
+    const lastDate = dayjs(lastValue, "DD.MM.YYYY", true)
 
-    if (isValidDate) {
-      // if valid date, check for future dates
-      const isInFuture = dayjs(lastValue, "DD.MM.YYYY", true).isAfter(dayjs())
-      if (isInFuture) {
-        emit("update:validationError", {
-          message: props.ariaLabel + " darf nicht in der Zukunft liegen",
-          instance: props.id,
-        })
-        return
-      } else {
-        emit("update:validationError", undefined)
-      }
-    } else {
+    if (!lastDate.isValid()) {
       emit("update:validationError", {
         message: "Kein valides Datum",
         instance: props.id,
@@ -52,13 +44,22 @@ const chips = computed<string[]>({
       return
     }
 
+    // if valid date, check for future dates
+    const isInFuture = lastDate.isAfter(dayjs())
+    if (isInFuture) {
+      emit("update:validationError", {
+        message: props.ariaLabel + " darf nicht in der Zukunft liegen",
+        instance: props.id,
+      })
+      return
+    }
+    emit("update:validationError", undefined)
+
     emit(
       "update:modelValue",
-      newValue.length === 0
-        ? undefined
-        : newValue.map((value) =>
-            dayjs(value, "DD.MM.YYYY", true).format("YYYY-MM-DD"),
-          ),
+      newValue.map((value) =>
+        dayjs(value, "DD.MM.YYYY", true).format("YYYY-MM-DD"),
+      ),
     )
   },
 })
