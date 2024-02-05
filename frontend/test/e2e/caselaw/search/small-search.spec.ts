@@ -298,4 +298,80 @@ test("search for documentunits does not return current documentation unit", asyn
   }
 })
 
-/* eslint-enable playwright/no-conditional-in-test */
+/* eslint-disable playwright/no-conditional-in-test */
+test("clicking on link of referenced documentation unit added by search opens new tab, does not enter edit mode", async ({
+  page,
+  documentNumber,
+  prefilledDocumentUnit,
+}) => {
+  await publishDocumentationUnit(
+    page,
+    prefilledDocumentUnit.documentNumber || "",
+  )
+  await navigateToCategories(page, documentNumber)
+
+  const activeCitationContainer = page.getByLabel("Aktivzitierung")
+  const previousDecisionContainer = page.getByLabel("Vorgehende Entscheidung")
+  const ensuingDecisionContainer = page.getByLabel("Nachgehende Entscheidung")
+  const containers = [
+    activeCitationContainer,
+    previousDecisionContainer,
+    ensuingDecisionContainer,
+  ]
+
+  for (const container of containers) {
+    await test.step(
+      "for category " + (await container.first().getAttribute("aria-label")),
+      async () => {
+        const inputs = {
+          court: prefilledDocumentUnit.coreData.court?.label,
+          fileNumber: prefilledDocumentUnit.coreData.fileNumbers?.[0],
+          documentType: prefilledDocumentUnit.coreData.documentType?.label,
+          decisionDate: "31.12.2019",
+        }
+
+        if (container === activeCitationContainer) {
+          await fillActiveCitationInputs(page, inputs)
+        }
+        if (container === previousDecisionContainer) {
+          await fillPreviousDecisionInputs(page, inputs)
+        }
+        if (container === ensuingDecisionContainer) {
+          await fillEnsuingDecisionInputs(page, inputs)
+        }
+
+        await container.getByLabel("Nach Entscheidung suchen").click()
+
+        await expect(container.getByText("1 Ergebnis gefunden")).toBeVisible()
+
+        const summary = `AG Aachen, 31.12.2019, ${prefilledDocumentUnit.coreData.fileNumbers?.[0]}, Anerkenntnisurteil`
+
+        const result = container.getByText(summary)
+        await expect(result).toBeVisible()
+        await container.getByLabel("Treffer übernehmen").click()
+
+        //check if summary has link
+
+        const referencedDocumentNumber = container.getByText(
+          `${prefilledDocumentUnit.documentNumber}`,
+        )
+        await expect(referencedDocumentNumber).toBeVisible()
+
+        // clicking the link opens new tab but not the edit mode
+        const newTabPromise = page.waitForEvent("popup")
+        await referencedDocumentNumber.click()
+
+        const newTab = await newTabPromise
+        await newTab.waitForLoadState()
+
+        await expect(newTab.url()).toContain(
+          `${prefilledDocumentUnit.documentNumber}`,
+        )
+
+        await expect(
+          container.getByLabel("Nach Entscheidung suchen"),
+        ).toBeHidden()
+      },
+    )
+  }
+})

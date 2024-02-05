@@ -46,7 +46,7 @@ function decisionSummarizer(normEntry: NormReference) {
 const NormsSummary = withSummarizer(decisionSummarizer)
 </script>
 <template>
-  <div class="bg-white p-32">
+  <div aria-label="Norm" class="bg-white p-32">
     <h2 class="ds-heading-03-reg mb-24">Normen</h2>
     <div class="flex flex-row">
       <div class="flex-1">

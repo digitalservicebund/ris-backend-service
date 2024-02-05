@@ -158,15 +158,15 @@ describe("active citations", () => {
     renderComponent()
     expect((await screen.findAllByLabelText("Listen Eintrag")).length).toBe(1)
     expect(screen.getByLabelText("Art der Zitierung")).toBeVisible()
-    expect(screen.getByLabelText("Gericht der Aktivzitierung")).toBeVisible()
+    expect(screen.getByLabelText("Gericht Aktivzitierung")).toBeVisible()
     expect(
-      screen.getByLabelText("Entscheidungsdatum der Aktivzitierung"),
+      screen.getByLabelText("Entscheidungsdatum Aktivzitierung"),
     ).toBeVisible()
     expect(
       screen.getByLabelText("Aktenzeichen Aktivzitierung"),
     ).toBeInTheDocument()
     expect(
-      screen.getByLabelText("Dokumenttyp der Aktivzitierung"),
+      screen.getByLabelText("Dokumenttyp Aktivzitierung"),
     ).toBeInTheDocument()
     expect(screen.getByLabelText("Aktivzitierung speichern")).toBeDisabled()
   })
@@ -206,16 +206,16 @@ describe("active citations", () => {
 
     expect(screen.getByLabelText("Art der Zitierung")).toBeVisible()
     expect(
-      screen.getByLabelText("Entscheidungsdatum der Aktivzitierung"),
+      screen.getByLabelText("Entscheidungsdatum Aktivzitierung"),
     ).toBeVisible()
     expect(
-      screen.getByLabelText("Entscheidungsdatum der Aktivzitierung"),
+      screen.getByLabelText("Entscheidungsdatum Aktivzitierung"),
     ).toBeInTheDocument()
     expect(
       screen.getByLabelText("Aktenzeichen Aktivzitierung"),
     ).toBeInTheDocument()
     expect(
-      screen.getByLabelText("Dokumenttyp der Aktivzitierung"),
+      screen.getByLabelText("Dokumenttyp Aktivzitierung"),
     ).toBeInTheDocument()
   })
 
@@ -268,7 +268,7 @@ describe("active citations", () => {
     await user.click(itemHeader)
 
     await user.type(
-      await screen.findByLabelText("Dokumenttyp der Aktivzitierung"),
+      await screen.findByLabelText("Dokumenttyp Aktivzitierung"),
       "Ant",
     )
     const dropdownItems = screen.getAllByLabelText("dropdown-option")
@@ -291,7 +291,7 @@ describe("active citations", () => {
     await user.click(itemHeader)
 
     await user.type(
-      await screen.findByLabelText("Gericht der Aktivzitierung"),
+      await screen.findByLabelText("Gericht Aktivzitierung"),
       "AG",
     )
     const dropdownItems = screen.getAllByLabelText("dropdown-option")
@@ -334,7 +334,7 @@ describe("active citations", () => {
     await user.click(itemHeader)
 
     const fileNumberInput = await screen.findByLabelText(
-      "Entscheidungsdatum der Aktivzitierung",
+      "Entscheidungsdatum Aktivzitierung",
     )
 
     await user.clear(fileNumberInput)
@@ -385,9 +385,7 @@ describe("active citations", () => {
     const fileNumberInput = await screen.findByLabelText(
       "Aktenzeichen Aktivzitierung",
     )
-    const courtInput = await screen.findByLabelText(
-      "Gericht der Aktivzitierung",
-    )
+    const courtInput = await screen.findByLabelText("Gericht Aktivzitierung")
 
     await user.clear(fileNumberInput)
     await user.clear(courtInput)

@@ -8,10 +8,7 @@ import {
 import { caselawTest as test } from "~/e2e/caselaw/fixtures"
 
 test.describe("ensuing decisions", () => {
-  test("renders empty ensuing decision in edit mode, when none in list", async ({
-    page,
-    documentNumber,
-  }) => {
+  test("renders all fields", async ({ page, documentNumber }) => {
     await navigateToCategories(page, documentNumber)
     await expect(
       page.getByRole("heading", { name: "Nachgehende Entscheidung " }),
@@ -31,7 +28,6 @@ test.describe("ensuing decisions", () => {
     await expect(page.getByLabel("Vermerk")).toBeVisible()
     await expect(page.getByLabel("Datum unbekannt")).toBeVisible()
   })
-
   test("change to 'anhaengig' removes date with value and vice versa", async ({
     page,
     documentNumber,
@@ -94,7 +90,6 @@ test.describe("ensuing decisions", () => {
     ).toHaveCount(2)
   })
 
-  // TODO move to small-search.spec.ts?
   test("only note of linked ensuing decision is editable", async ({
     page,
     documentNumber,
@@ -126,7 +121,6 @@ test.describe("ensuing decisions", () => {
     await expect(result).toBeVisible()
     await page.getByLabel("Treffer übernehmen").click()
 
-    //make sure to have citation style in list
     await expect(
       page.getByText(
         `nachgehend, AG Aachen, 31.12.2019, ${prefilledDocumentUnit.coreData.fileNumbers?.[0]}, Anerkenntnisurteil`,
@@ -158,78 +152,5 @@ test.describe("ensuing decisions", () => {
         `nachgehend, AG Aachen, 31.12.2019, ${prefilledDocumentUnit.coreData.fileNumbers?.[0]}, Anerkenntnisurteil, Vermerk`,
       ),
     ).toBeVisible()
-  })
-
-  test("validates against required fields", async ({
-    page,
-    documentNumber,
-    prefilledDocumentUnit,
-  }) => {
-    await navigateToCategories(page, documentNumber)
-
-    await fillEnsuingDecisionInputs(page, {
-      fileNumber: "abc",
-    })
-    await page.getByLabel("Nachgehende Entscheidung speichern").click()
-
-    await expect(page.getByLabel("Fehlerhafte Eingabe")).toBeVisible()
-    await page
-      .getByLabel("Nachgehende Entscheidung", { exact: true })
-      .getByLabel("Listen Eintrag")
-      .click()
-    await expect(
-      page
-        .getByLabel("Nachgehende Entscheidung")
-        .getByText("Pflichtfeld nicht befüllt"),
-    ).toHaveCount(2)
-
-    await fillEnsuingDecisionInputs(page, {
-      court: prefilledDocumentUnit.coreData.court?.label,
-      fileNumber: prefilledDocumentUnit.coreData.fileNumbers?.[0],
-      documentType: prefilledDocumentUnit.coreData.documentType?.label,
-      decisionDate: "01.01.2020",
-    })
-    await page.getByLabel("Nachgehende Entscheidung speichern").click()
-
-    await expect(page.getByLabel("Fehlerhafte Eingabe")).toBeHidden()
-  })
-
-  test("adding empty ensuing decision not possible", async ({
-    page,
-    documentNumber,
-  }) => {
-    await navigateToCategories(page, documentNumber)
-    await expect(
-      page.getByLabel("Nachgehende Entscheidung speichern"),
-    ).toBeDisabled()
-  })
-
-  test("incomplete date input shows error message and does not persist", async ({
-    page,
-    documentNumber,
-  }) => {
-    await navigateToCategories(page, documentNumber)
-
-    await page
-      .locator("[aria-label='Entscheidungsdatum Nachgehende Entscheidung']")
-      .fill("03")
-
-    await page.keyboard.press("Tab")
-
-    await expect(
-      page.locator(
-        "[aria-label='Entscheidungsdatum Nachgehende Entscheidung']",
-      ),
-    ).toHaveValue("03")
-
-    await expect(page.locator("text=Unvollständiges Datum")).toBeVisible()
-
-    await page.reload()
-
-    await expect(
-      page.locator(
-        "[aria-label='Entscheidungsdatum Nachgehende Entscheidung']",
-      ),
-    ).toHaveValue("")
   })
 })

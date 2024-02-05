@@ -208,7 +208,7 @@ onMounted(() => {
           <ComboboxInput
             id="activeCitationCourt"
             v-model="activeCitation.court"
-            aria-label="Gericht der Aktivzitierung"
+            aria-label="Gericht Aktivzitierung"
             clear-on-choosing-item
             :has-error="slotProps.hasError"
             :item-service="ComboboxItemService.getCourts"
@@ -225,7 +225,7 @@ onMounted(() => {
           <DateInput
             id="activeCitationDecisionDate"
             v-model="activeCitation.decisionDate"
-            aria-label="Entscheidungsdatum der Aktivzitierung"
+            aria-label="Entscheidungsdatum Aktivzitierung"
             class="ds-input-medium"
             :has-error="slotProps.hasError"
             :readonly="activeCitation.hasForeignSource"
@@ -253,7 +253,7 @@ onMounted(() => {
           <ComboboxInput
             id="activeCitationDecisionDocumentType"
             v-model="activeCitation.documentType"
-            aria-label="Dokumenttyp der Aktivzitierung"
+            aria-label="Dokumenttyp Aktivzitierung"
             :item-service="ComboboxItemService.getDocumentTypes"
             :readonly="activeCitation.hasForeignSource"
           ></ComboboxInput>
