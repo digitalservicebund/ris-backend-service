@@ -31,6 +31,16 @@ watch(
   },
   { deep: true },
 )
+
+// TODO: Handle this part in the backend.
+/*watch(
+  () => modelValue.value.court,
+  (value) => {
+    if (value?.label !== "BGH")
+      modelValue.value.leadingDecisionNormReferences = undefined
+  },
+  { deep: true },
+)*/
 </script>
 
 <template>
@@ -213,6 +223,17 @@ watch(
           read-only
           size="medium"
         ></TextInput>
+      </InputField>
+    </div>
+    <!--          :read-only="modelValue.documentationOffice?.abbreviation !== 'BGH'"-->
+
+    <div v-if="modelValue.court?.label === 'BGH'" class="flex flex-row gap-24">
+      <InputField id="leadingDecisionNormReferences" label="NSW-Fundstellen">
+        <ChipsInput
+          id="leadingDecisionNormReferences"
+          v-model="modelValue.leadingDecisionNormReferences"
+          aria-label="NSW-Fundstellen"
+        ></ChipsInput>
       </InputField>
     </div>
 

@@ -25,4 +25,5 @@ public record CoreData(
     String legalEffect,
     List<String> inputTypes,
     DocumentationOffice documentationOffice,
-    String region) {}
+    String region,
+    List<String> leadingDecisionNormReferences) {}

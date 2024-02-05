@@ -23,6 +23,7 @@ export type CoreData = {
   inputTypes?: string[]
   documentationOffice?: DocumentationOffice
   region?: string
+  leadingDecisionNormReferences?: string[]
 }
 
 export type ContentRelatedIndexing = {
