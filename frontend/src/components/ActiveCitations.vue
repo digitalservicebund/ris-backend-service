@@ -64,18 +64,34 @@ function renderLink(dataEntry: ActiveCitation) {
 function decisionSummarizer(dataEntry: ActiveCitation) {
   // Linked DocUnit
   if (dataEntry.hasForeignSource) {
-    return h("div", { class: ["flex flex-row items-center"] }, [
-      h(h(IconBaselineDescription), {
-        class: ["mr-8 "],
-      }),
-      h("div", { class: ["flex flex-row items-baseline"] }, [
-        h("div", { class: ["ds-label-01-reg"] }, dataEntry.renderDecision),
-        h("span", { class: ["ds-label-01-reg ml-8"] }, "|"),
-        renderLink(dataEntry),
-      ]),
-
-      ,
-    ])
+    if (!dataEntry.citationTypeIsSet) {
+      return h("div", { class: ["flex flex-row items-center"] }, [
+        h(h(IconErrorOutline), {
+          "aria-label": "Fehlerhafte Eingabe",
+          class: ["mr-8 text-red-800"],
+        }),
+        h("div", { class: ["flex flex-row items-baseline"] }, [
+          h(
+            "div",
+            { class: ["ds-label-01-reg text-red-800"] },
+            dataEntry.renderDecision,
+          ),
+          h("span", { class: ["ds-label-01-reg ml-8"] }, "|"),
+          renderLink(dataEntry),
+        ]),
+      ])
+    } else {
+      return h("div", { class: ["flex flex-row items-center"] }, [
+        h(h(IconBaselineDescription), {
+          class: ["mr-8 "],
+        }),
+        h("div", { class: ["flex flex-row items-baseline"] }, [
+          h("div", { class: ["ds-label-01-reg"] }, dataEntry.renderDecision),
+          h("span", { class: ["ds-label-01-reg ml-8"] }, "|"),
+          renderLink(dataEntry),
+        ]),
+      ])
+    }
     // Ghost DocUnit with missing fields
   } else if (dataEntry.hasMissingRequiredFields) {
     return h("div", { class: ["flex flex-row items-center"] }, [

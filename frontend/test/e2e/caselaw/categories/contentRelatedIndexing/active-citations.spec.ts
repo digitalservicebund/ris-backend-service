@@ -56,6 +56,8 @@ test.describe("active citations", () => {
       ),
     ).toBeVisible()
 
+    await expect(page.getByLabel("Fehlerhafte Eingabe")).toBeVisible()
+
     await page
       .getByText(
         `AG Aachen, 31.12.2019, ${prefilledDocumentUnit.coreData.fileNumbers?.[0]}, Anerkenntnisurteil`,
@@ -82,5 +84,7 @@ test.describe("active citations", () => {
         `Änderung, AG Aachen, 31.12.2019, ${prefilledDocumentUnit.coreData.fileNumbers?.[0]}, Anerkenntnisurteil`,
       ),
     ).toBeVisible()
+
+    await expect(page.getByLabel("Fehlerhafte Eingabe")).toBeHidden()
   })
 })
