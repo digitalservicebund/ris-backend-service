@@ -35,7 +35,8 @@ const buttonClasses = computed(() => ({
   "ds-button-small": props.size === "small",
   "ds-button-primary": props.buttonType == "primary",
   "ds-button-secondary": props.buttonType == "secondary",
-  "ds-button-ghost": props.buttonType == "ghost",
+  "ds-button-ghost hover:bg-blue-200 hover:shadow-none focus:shadow-none focus:bg-blue-200":
+    props.buttonType == "ghost",
   "ds-button-tertiary": props.buttonType == "tertiary",
   "shadow-button shadow-red-900 text-red-900 bg-transparent hover:bg-red-200 focus:bg-red-200 active:bg-red-200 active:border-none active:text-red-900 disabled:text-gray-600 disabled:shadow-gray-600 disabled:bg-transparent":
     props.buttonType == "destructive",
