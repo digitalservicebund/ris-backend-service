@@ -178,46 +178,50 @@ describe("Keywords Chips Input", () => {
 
   it("shows an error message when adding a chip that already exists", async () => {
     const onUpdate = vi.fn()
+    const value = "one"
+    const errorMessage = value + " bereits vorhanden."
+
     const { user } = renderComponent({
-      modelValue: ["one"],
+      modelValue: [value],
       "onUpdate:modelValue": onUpdate,
     })
 
     const input = screen.getByRole<HTMLInputElement>("textbox")
-    await user.type(input, "one{enter}")
-    expect(screen.getByText("Schlagwort bereits vergeben.")).toBeInTheDocument()
+    await user.type(input, value + "{enter}")
+    expect(screen.getByText(errorMessage)).toBeInTheDocument()
     expect(onUpdate).not.toHaveBeenCalled()
   })
 
   it("clears the error message on blur", async () => {
     const onUpdate = vi.fn()
+    const value = "one"
+    const errorMessage = value + " bereits vorhanden."
+
     const { user } = renderComponent({
-      modelValue: ["one"],
+      modelValue: [value],
       "onUpdate:modelValue": onUpdate,
     })
 
     const input = screen.getByRole<HTMLInputElement>("textbox")
-    await user.type(input, "one{enter}")
-    expect(screen.getByText("Schlagwort bereits vergeben.")).toBeInTheDocument()
+    await user.type(input, value + "{enter}")
+    expect(screen.getByText(errorMessage)).toBeInTheDocument()
     await user.tab()
-    expect(
-      screen.queryByText("Schlagwort bereits vergeben."),
-    ).not.toBeInTheDocument()
+    expect(screen.queryByText(errorMessage)).not.toBeInTheDocument()
   })
 
   it("clears the error message on input", async () => {
     const onUpdate = vi.fn()
+    const value = "one"
+    const errorMessage = value + " bereits vorhanden."
     const { user } = renderComponent({
-      modelValue: ["one"],
+      modelValue: [value],
       "onUpdate:modelValue": onUpdate,
     })
 
     const input = screen.getByRole<HTMLInputElement>("textbox")
-    await user.type(input, "one{enter}")
-    expect(screen.getByText("Schlagwort bereits vergeben.")).toBeInTheDocument()
+    await user.type(input, value + "{enter}")
+    expect(screen.getByText(errorMessage)).toBeInTheDocument()
     await user.type(input, "two")
-    expect(
-      screen.queryByText("Schlagwort bereits vergeben."),
-    ).not.toBeInTheDocument()
+    expect(screen.queryByText(errorMessage)).not.toBeInTheDocument()
   })
 })
