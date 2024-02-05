@@ -34,7 +34,7 @@ const handleOnBlur = () => {
   errorMessage.value = undefined
 }
 
-function addChip() {
+const addChip = () => {
   handleOnBlur()
 
   if (props.readOnly) return
@@ -43,9 +43,8 @@ function addChip() {
   if (!chip) return
 
   if (props.modelValue?.includes(chip)) {
-    errorMessage.value = { title: "Schlagwort bereits vergeben." }
+    errorMessage.value = { title: chip + " bereits vorhanden." }
     newChipText.value = ""
-    return
   }
 
   const current = props.modelValue ?? []
