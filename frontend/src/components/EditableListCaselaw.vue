@@ -110,8 +110,9 @@ watch(
       aria-label="Listen Eintrag"
       class="border-b-1 border-blue-500 first:border-t-1 focus:outline-none"
       :class="
-        index !== editIndex &&
-        'hover:bg-gray-100 focus:outline-none focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-blue-800'
+        index !== editIndex
+          ? 'hover:bg-gray-100 focus:outline-none focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-blue-800'
+          : 'first:border-t-0 last:border-b-0'
       "
       role="presentation"
       tabindex="0"
