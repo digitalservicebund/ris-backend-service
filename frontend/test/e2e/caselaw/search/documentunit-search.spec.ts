@@ -83,20 +83,22 @@ test.describe("search", () => {
     ).toBeHidden()
   })
 
-  // eslint-disable-next-line playwright/no-skipped-test
-  test.skip("renders message when offline", async ({ page }) => {
+  test("renders message when error occurs", async ({ page }) => {
     await page.goto("/")
 
     //error
     await page.getByLabel("Nur meine Dokstelle Filter").click()
     await page.route("**/*", async (route) => {
-      await route.abort("internetdisconnected")
-    })
-    await page.getByLabel("Nach Dokumentationseinheiten suchen").click()
+      await route.fulfill({
+        status: 404,
+        contentType: "text/plain",
+        body: "Not Found!",
+      })
 
-    await expect(
-      page.getByText("Die Suchergebnisse konnten nicht geladen werden."),
-    ).toBeVisible()
+      await expect(
+        page.getByText("Die Suchergebnisse konnten nicht geladen werden."),
+      ).toBeVisible()
+    })
   })
 
   test("starting search with all kinds of errors or no search parameters not possible", async ({
@@ -188,8 +190,7 @@ test.describe("search", () => {
     ).toHaveCount(0)
   })
 
-  // eslint-disable-next-line playwright/no-skipped-test
-  test.skip("search results between two dates", async ({
+  test("search results between two dates", async ({
     page,
     prefilledDocumentUnit,
     secondPrefilledDocumentUnit,
@@ -454,5 +455,43 @@ test.describe("search", () => {
         "Starten Sie die Suche oder erstellen Sie eine neue Dokumentationseinheit.",
       ),
     ).toBeVisible()
+  })
+
+  test("reload and navigation back in browser history persist search parameters in url", async ({
+    page,
+    prefilledDocumentUnit,
+    secondPrefilledDocumentUnit,
+  }) => {
+    await page.goto("/")
+
+    await page
+      .getByLabel("Entscheidungsdatum Suche", { exact: true })
+      .fill(
+        dayjs(prefilledDocumentUnit.coreData.decisionDate).format("DD.MM.YYYY"),
+      )
+
+    await page.getByLabel("Nach Dokumentationseinheiten suchen").click()
+
+    await expect(page).toHaveURL(/decisionDate=2019-12-31/)
+    await page.reload()
+    await expect(page).toHaveURL(/decisionDate=2019-12-31/)
+
+    await page
+      .getByLabel("Entscheidungsdatum Suche Ende", { exact: true })
+      .fill(
+        dayjs(secondPrefilledDocumentUnit.coreData.decisionDate).format(
+          "DD.MM.YYYY",
+        ),
+      )
+    await page.getByLabel("Nach Dokumentationseinheiten suchen").click()
+    await expect(page).toHaveURL(
+      /decisionDate=2019-12-31&decisionDateEnd=2020-01-01/,
+    )
+
+    await page.goBack()
+    await expect(page).not.toHaveURL(
+      /decisionDate=2019-12-31&decisionDateEnd=2020-01-01/,
+    )
+    await expect(page).toHaveURL(/decisionDate=2019-12-31/)
   })
 })
