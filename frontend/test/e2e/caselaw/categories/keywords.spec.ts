@@ -1,11 +1,11 @@
 import { expect } from "@playwright/test"
-import { generateString } from "../../../../test-helper/dataGenerators"
 import {
   navigateToCategories,
   waitForSaving,
   waitForInputValue,
-} from "../../e2e-utils"
-import { caselawTest as test } from "../../fixtures"
+} from "../e2e-utils"
+import { caselawTest as test } from "../fixtures"
+import { generateString } from "~/test-helper/dataGenerators"
 
 test.describe("keywords", () => {
   test("rendering", async ({ page, documentNumber }) => {

@@ -1,5 +1,4 @@
 import { expect } from "@playwright/test"
-import { generateString } from "../../../test-helper/dataGenerators"
 import {
   navigateToCategories,
   waitForSaving,
@@ -7,6 +6,7 @@ import {
   fillPreviousDecisionInputs,
 } from "~/e2e/caselaw/e2e-utils"
 import { caselawTest as test } from "~/e2e/caselaw/fixtures"
+import { generateString } from "~/test-helper/dataGenerators"
 
 test.describe("previous decisions", () => {
   test("renders all fields", async ({ page, documentNumber }) => {

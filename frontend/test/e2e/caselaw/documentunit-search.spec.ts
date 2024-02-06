@@ -1,7 +1,7 @@
 import { expect } from "@playwright/test"
 import dayjs from "dayjs"
-import { generateString } from "../../../test-helper/dataGenerators"
 import { caselawTest as test } from "~/e2e/caselaw/fixtures"
+import { generateString } from "~/test-helper/dataGenerators"
 
 test.describe("search", () => {
   test("renders search entry form", async ({ page }) => {
