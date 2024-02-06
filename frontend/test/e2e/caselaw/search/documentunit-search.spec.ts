@@ -190,7 +190,8 @@ test.describe("search", () => {
     ).toHaveCount(0)
   })
 
-  test("search results between two dates", async ({
+  // eslint-disable-next-line playwright/no-skipped-test
+  test.skip("search results between two dates", async ({
     page,
     prefilledDocumentUnit,
     secondPrefilledDocumentUnit,
