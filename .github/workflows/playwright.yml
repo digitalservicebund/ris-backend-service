@@ -24,7 +24,6 @@ on:
         required: false
         type: choice
         options:
-          - norms
           - caselaw
           - all
       runs:
@@ -39,8 +38,8 @@ jobs:
   playwright-test:
     uses: ./.github/workflows/_playwright-test.yml
     with:
-      browser: ${{ inputs.browser || 'chromium' }} 
-      mode: ${{ inputs.mode || 'e2e' }}  
-      runs: ${{ inputs.runs || '1' }} 
+      browser: ${{ inputs.browser || 'chromium' }}
+      mode: ${{ inputs.mode || 'e2e' }}
+      runs: ${{ inputs.runs || '1' }}
       subproject: ${{ inputs.subproject }}
     secrets: inherit
