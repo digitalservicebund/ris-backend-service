@@ -79,7 +79,7 @@ test.describe("previous decisions", () => {
       .locator("[aria-label='Vorgehende Entscheidung']")
       .first()
     await expect(
-      container.locator("text=Abweichendes Aktenzeichen").first(),
+      container.locator("text=Abweichendes Aktenzeichen Vorinstanz").first(),
     ).toBeVisible()
 
     await waitForSaving(

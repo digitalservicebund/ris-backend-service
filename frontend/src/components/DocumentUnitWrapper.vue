@@ -74,7 +74,7 @@ watchEffect(() => {
         label="Navigation"
       >
         <NavbarSide
-          go-back-label="Zurück"
+          go-back-label="Suche"
           :go-back-route="goBackRoute"
           :menu-items="menuItems"
         />

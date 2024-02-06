@@ -248,7 +248,7 @@ onBeforeUnmount(() => {
               id="deviatingFileNumber"
               v-slot="slotProps"
               class="flex-col"
-              label="Abweichendes Aktenzeichen"
+              label="Abweichendes Aktenzeichen Vorinstanz"
               :validation-error="
                 validationStore.getByField('deviatingFileNumber')
               "
