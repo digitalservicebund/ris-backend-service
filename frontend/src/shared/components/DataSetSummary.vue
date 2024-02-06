@@ -62,7 +62,11 @@ export function withSummarizer(
       },
     },
     setup(props) {
-      return () => h(Ourselves, { ...props, summarizer })
+      return () =>
+        h(Ourselves, {
+          ...props,
+          summarizer,
+        })
     },
   })
 }
@@ -73,7 +77,7 @@ export function withSummarizer(
     <li
       v-for="(summary, index) in summaries"
       :key="index"
-      class="flex-start ds-label-02-reg flex w-full border-b-1 border-b-gray-400 py-10 first:pt-0 last:border-none last:pb-0"
+      class="flex-start ds-label-01-reg flex w-full border-b-1 border-b-gray-400 py-10 first:pt-0 last:border-none last:pb-0"
     >
       <component :is="summary" />
     </li>

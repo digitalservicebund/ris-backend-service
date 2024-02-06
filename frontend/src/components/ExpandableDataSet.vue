@@ -11,14 +11,12 @@ interface Props {
   title: string
   dataSet: any // eslint-disable-line @typescript-eslint/no-explicit-any
   summaryComponent?: Component
-  asColumn?: boolean
   fallbackText?: string
   borderBottom?: boolean
 }
 
 withDefaults(defineProps<Props>(), {
   summaryComponent: DataSetSummary,
-  asColumn: false,
   fallbackText: undefined,
   borderBottom: false,
 })
@@ -48,7 +46,7 @@ function collapse(): void {
     </template>
 
     <template #header>
-      <div class="flex w-full gap-8" :class="{ 'flex-col': asColumn }">
+      <div class="flex w-full flex-col gap-24">
         <h2 class="ds-heading-03-reg">
           {{ title }}
         </h2>
