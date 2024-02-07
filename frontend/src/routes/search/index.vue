@@ -212,7 +212,7 @@ function handleMockClick() {
         class="ds-label-01-reg table-row hover:bg-gray-100"
       >
         <div
-          class="min-h-56 table-cell border-b-1 border-blue-300 px-16 py-12 align-middle"
+          class="table-cell min-h-56 border-b-1 border-blue-300 px-16 py-12 align-middle"
         >
           {{ item.documentNumber }}
         </div>
