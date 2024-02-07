@@ -151,46 +151,47 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
         }
       }
 
-      List<String> leadingDecisionNormReferences =
-          documentUnit.coreData().leadingDecisionNormReferences();
-      if (leadingDecisionNormReferences != null && !leadingDecisionNormReferences.isEmpty()) {
-        LegalPeriodicalDTO leadingDecisionLegalPeriodicalEntry =
-            legalPeriodicalRepository.findByAbbreviation("NSW");
-        // insert leading decision norm references after other existing references
-        AtomicInteger i =
-            new AtomicInteger(
-                documentationUnitDTO.getReferences().stream()
-                    .flatMapToInt(r -> IntStream.of(r.getRank() + 1))
-                    .max()
-                    .orElse(0));
+      Optional<List<String>> leadingDecisionNormReferences =
+          Optional.ofNullable(documentUnit.coreData().leadingDecisionNormReferences());
 
-        List<ReferenceDTO> existing = new ArrayList<>(documentationUnitDTO.getReferences());
+      LegalPeriodicalDTO leadingDecisionLegalPeriodicalEntry =
+          legalPeriodicalRepository.findByAbbreviation("NSW");
 
-        List<ReferenceDTO> newList =
-            Stream.concat(
-                    // existing references that are no leading decision norm references
-                    existing.stream().filter(r -> !r.getLegalPeriodicalRawValue().equals("NSW")),
-                    // leading decision norm references
-                    leadingDecisionNormReferences.stream()
-                        .map(
-                            reference ->
-                                ReferenceDTO.builder()
-                                    .id(UUID.randomUUID())
-                                    .citation(reference + " (BGH-intern)")
-                                    .rank(i.getAndIncrement())
-                                    .type("amtlich")
-                                    .referenceSupplement("BGH-intern")
-                                    .legalPeriodical(leadingDecisionLegalPeriodicalEntry)
-                                    .legalPeriodicalRawValue("NSW")
-                                    .documentationUnit(
-                                        DocumentationUnitDTO.builder()
-                                            .id(documentUnit.uuid())
-                                            .build())
-                                    .build()))
-                .toList();
+      List<ReferenceDTO> existingReferences = new ArrayList<>(documentationUnitDTO.getReferences());
 
-        documentationUnitDTO = documentationUnitDTO.toBuilder().references(newList).build();
-      }
+      // insert leading decision norm references after other existing references
+      AtomicInteger i =
+          new AtomicInteger(
+              existingReferences.stream()
+                  .flatMapToInt(r -> IntStream.of(r.getRank() + 1))
+                  .max()
+                  .orElse(0));
+
+      List<ReferenceDTO> updatedReferences =
+          Stream.concat(
+                  // existing references that are no leading decision norm references
+                  existingReferences.stream()
+                      .filter(r -> !r.getLegalPeriodicalRawValue().equals("NSW")),
+                  // leading decision norm references
+                  leadingDecisionNormReferences.orElse(List.of()).stream()
+                      .map(
+                          reference ->
+                              ReferenceDTO.builder()
+                                  .id(UUID.randomUUID())
+                                  .citation(reference)
+                                  .rank(i.getAndIncrement())
+                                  .type("amtlich")
+                                  .referenceSupplement("BGH-intern")
+                                  .legalPeriodical(leadingDecisionLegalPeriodicalEntry)
+                                  .legalPeriodicalRawValue("NSW")
+                                  .documentationUnit(
+                                      DocumentationUnitDTO.builder()
+                                          .id(documentUnit.uuid())
+                                          .build())
+                                  .build()))
+              .toList();
+
+      documentationUnitDTO = documentationUnitDTO.toBuilder().references(updatedReferences).build();
     }
     // ---
 
