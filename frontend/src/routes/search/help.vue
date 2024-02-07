@@ -77,6 +77,10 @@ const fields = computed(() => {
           />
         </div>
         <table class="w-full">
+          <caption class="sr-only">
+            Auflistung der verfügbaren Rubriken mit Kennung und Beispielen für
+            die Suche.
+          </caption>
           <thead class="sticky top-0">
             <tr>
               <th
