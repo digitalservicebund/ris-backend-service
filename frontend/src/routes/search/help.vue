@@ -1,8 +1,8 @@
 <script lang="ts" setup>
-import DropdownInput from "@/shared/components/input/DropdownInput.vue"
-import type { DropdownItem } from "@/shared/components/input/types"
 import { computed, ref } from "vue"
 import { availableFields, availableFeatures, type FieldType } from "./data"
+import DropdownInput from "@/shared/components/input/DropdownInput.vue"
+import type { DropdownItem } from "@/shared/components/input/types"
 
 const filter = ref<FieldType>("all")
 const filters: DropdownItem[] = [
@@ -37,8 +37,8 @@ const fields = computed(() => {
         <dl class="flex flex-col gap-16 divide-y divide-gray-200">
           <div
             v-for="feature in availableFeatures"
-            :key="feature.label"
             :id="feature.id"
+            :key="feature.label"
             class="gap-8 md:flex md:flex-row"
           >
             <dt class="w-2/6">
@@ -47,16 +47,16 @@ const fields = computed(() => {
               </h3>
             </dt>
             <dd class="w-4/6">
-              <p class="" v-html="feature.description" />
+              <!-- eslint-disable-next-line vue/no-v-html -->
+              <p v-html="feature.description" />
               <div
-                class="ds-body-02-reg mt-4"
                 v-if="feature.examples.length > 0"
+                class="ds-body-02-reg mt-4"
               >
-                <template v-for="example in feature.examples">
-                  <pre
-                    class="inline-block w-auto border border-gray-200 px-4"
-                    >{{ example }}</pre
-                  >
+                <template v-for="example in feature.examples" :key="example">
+                  <pre class="inline-block w-auto border border-gray-200 px-4">
+                    {{ example }}
+                  </pre>
                 </template>
               </div>
             </dd>
@@ -68,11 +68,11 @@ const fields = computed(() => {
         <div class="flex flex-row justify-between">
           <h2 class="ds-heading-03-reg mb-20">Verfügbare Rubriken</h2>
           <DropdownInput
-            :items="filters"
-            aria-label="dropdown input"
             v-model="filter"
-            placeholder="Bitte auswählen"
+            aria-label="dropdown input"
             class="ds-select-small w-auto"
+            :items="filters"
+            placeholder="Bitte auswählen"
           />
         </div>
         <table class="w-full">
@@ -98,8 +98,8 @@ const fields = computed(() => {
           <tbody>
             <tr
               v-for="field in fields"
-              :key="field.label"
               :id="field.label.toLocaleLowerCase()"
+              :key="field.label"
               class="hover:bg-gray-100"
             >
               <td class="border-b-1 border-blue-300 px-16 py-12 align-middle">
@@ -108,23 +108,22 @@ const fields = computed(() => {
               <td
                 class="ds-body-02-reg border-b-1 border-blue-300 px-16 py-12 align-middle"
               >
-                <template v-for="alias in field.aliases">
+                <template v-for="alias in field.aliases" :key="alias">
                   <code>{{ alias }}</code>
                 </template>
               </td>
               <td
                 class="ds-body-02-reg border-b-1 border-blue-300 px-16 py-12 align-middle"
               >
-                <template v-for="example in field.examples">
-                  <pre
-                    class="inline-block w-auto border border-gray-200 px-4"
-                    >{{ example }}</pre
-                  >
+                <template v-for="example in field.examples" :key="example">
+                  <pre class="inline-block w-auto border border-gray-200 px-4">
+                    {{ example }}
+                  </pre>
                 </template>
               </td>
             </tr>
             <tr v-if="fields.length === 0">
-              <td colspan="3" class="p-12">
+              <td class="p-12" colspan="3">
                 Für diese Dokumentart sind aktuell keine Rubriken verfügbar.
               </td>
             </tr>
