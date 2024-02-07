@@ -26,4 +26,4 @@ public record CoreData(
     List<String> inputTypes,
     DocumentationOffice documentationOffice,
     String region,
-    List<String> leadingDecisionNormReferences) {}
+    @UniqueElements List<String> leadingDecisionNormReferences) {}

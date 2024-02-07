@@ -27,7 +27,10 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.context.annotation.Primary;
@@ -51,6 +54,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
   private final DatabaseFieldOfLawRepository fieldOfLawRepository;
   private final DatabaseProcedureRepository procedureRepository;
   private final DatabaseRelatedDocumentationRepository relatedDocumentationRepository;
+  private final DatabaseLegalPeriodicalRepository legalPeriodicalRepository;
 
   public PostgresDocumentationUnitRepositoryImpl(
       DatabaseDocumentationUnitRepository repository,
@@ -59,7 +63,8 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
       DatabaseRelatedDocumentationRepository relatedDocumentationRepository,
       DatabaseKeywordRepository keywordRepository,
       DatabaseProcedureRepository procedureRepository,
-      DatabaseFieldOfLawRepository fieldOfLawRepository) {
+      DatabaseFieldOfLawRepository fieldOfLawRepository,
+      DatabaseLegalPeriodicalRepository legalPeriodicalRepository) {
 
     this.repository = repository;
     this.databaseCourtRepository = databaseCourtRepository;
@@ -68,6 +73,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
     this.relatedDocumentationRepository = relatedDocumentationRepository;
     this.fieldOfLawRepository = fieldOfLawRepository;
     this.procedureRepository = procedureRepository;
+    this.legalPeriodicalRepository = legalPeriodicalRepository;
   }
 
   @Override
@@ -143,6 +149,47 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
         if (court.isPresent() && court.get().getRegion() != null) {
           documentationUnitDTO.getRegions().add(court.get().getRegion());
         }
+      }
+
+      List<String> leadingDecisionNormReferences =
+          documentUnit.coreData().leadingDecisionNormReferences();
+      if (leadingDecisionNormReferences != null && !leadingDecisionNormReferences.isEmpty()) {
+        LegalPeriodicalDTO leadingDecisionLegalPeriodicalEntry =
+            legalPeriodicalRepository.findByAbbreviation("NSW");
+        // insert leading decision norm references after other existing references
+        AtomicInteger i =
+            new AtomicInteger(
+                documentationUnitDTO.getReferences().stream()
+                    .flatMapToInt(r -> IntStream.of(r.getRank() + 1))
+                    .max()
+                    .orElse(0));
+
+        List<ReferenceDTO> existing = new ArrayList<>(documentationUnitDTO.getReferences());
+
+        List<ReferenceDTO> newList =
+            Stream.concat(
+                    // existing references that are no leading decision norm references
+                    existing.stream().filter(r -> !r.getLegalPeriodicalRawValue().equals("NSW")),
+                    // leading decision norm references
+                    leadingDecisionNormReferences.stream()
+                        .map(
+                            reference ->
+                                ReferenceDTO.builder()
+                                    .id(UUID.randomUUID())
+                                    .citation(reference + " (BGH-intern)")
+                                    .rank(i.getAndIncrement())
+                                    .type("amtlich")
+                                    .referenceSupplement("BGH-intern")
+                                    .legalPeriodical(leadingDecisionLegalPeriodicalEntry)
+                                    .legalPeriodicalRawValue("NSW")
+                                    .documentationUnit(
+                                        DocumentationUnitDTO.builder()
+                                            .id(documentUnit.uuid())
+                                            .build())
+                                    .build()))
+                .toList();
+
+        documentationUnitDTO = documentationUnitDTO.toBuilder().references(newList).build();
       }
     }
     // ---
