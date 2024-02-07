@@ -54,9 +54,10 @@ const fields = computed(() => {
                 class="ds-body-02-reg mt-4"
               >
                 <template v-for="example in feature.examples" :key="example">
-                  <pre class="inline-block w-auto border border-gray-200 px-4">
-                    {{ example }}
-                  </pre>
+                  <pre
+                    class="inline-block w-auto border border-gray-200 px-4"
+                    >{{ example }}</pre
+                  >
                 </template>
               </div>
             </dd>
@@ -116,9 +117,10 @@ const fields = computed(() => {
                 class="ds-body-02-reg border-b-1 border-blue-300 px-16 py-12 align-middle"
               >
                 <template v-for="example in field.examples" :key="example">
-                  <pre class="inline-block w-auto border border-gray-200 px-4">
-                    {{ example }}
-                  </pre>
+                  <pre
+                    class="inline-block w-auto border border-gray-200 px-4"
+                    >{{ example }}</pre
+                  >
                 </template>
               </td>
             </tr>
