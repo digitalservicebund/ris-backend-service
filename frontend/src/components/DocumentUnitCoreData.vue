@@ -31,16 +31,6 @@ watch(
   },
   { deep: true },
 )
-
-// TODO: Handle this part in the backend.
-/*watch(
-  () => modelValue.value.court,
-  (value) => {
-    if (value?.label !== "BGH")
-      modelValue.value.leadingDecisionNormReferences = undefined
-  },
-  { deep: true },
-)*/
 </script>
 
 <template>
