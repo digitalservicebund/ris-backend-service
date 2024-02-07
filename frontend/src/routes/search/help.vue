@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import DOMPurify from "dompurify"
 import { computed, ref } from "vue"
 import { availableFields, availableFeatures, type FieldType } from "./data"
 import DropdownInput from "@/shared/components/input/DropdownInput.vue"
@@ -48,10 +47,7 @@ const fields = computed(() => {
               </h3>
             </dt>
             <dd class="w-4/6">
-              <!-- eslint-disable-next-line vue/no-v-html -->
-              <p v-html="DOMPurify.sanitize(feature.description)" />
-              <!-- NOSONAR -->
-              <!-- Reason for NOSONAR: The raw HTML is not from user input, plus it is sanitized -->
+              <p>{{ feature.description }}/></p>
               <div
                 v-if="feature.examples.length > 0"
                 class="ds-body-02-reg mt-4"

@@ -111,7 +111,7 @@ export const availableFeatures = [
     id: "und",
     label: "UND-Verknüpfung",
     description:
-      "Gefunden werden Dokumente, die <strong>alle</strong> der durch AND verknüpften Suchbegriffe enthalten.",
+      "Gefunden werden Dokumente, die alle der durch AND verknüpften Suchbegriffe enthalten.",
     examples: [
       `decision_date:[2000 TO 2010] AND guiding_principle:Arbeitsverhältnis`,
     ],
@@ -120,7 +120,7 @@ export const availableFeatures = [
     id: "oder",
     label: "ODER-Verknüpfung",
     description:
-      "Gefunden werden Dokumente, die <strong>mindestens einen</strong> der durch OR verknüpften Suchbegriffe enthalten.",
+      "Gefunden werden Dokumente, die mindestens einen der durch OR verknüpften Suchbegriffe enthalten.",
     examples: [
       `decision_date:[2000 TO 2010] OR guiding_principle:Arbeitsverhältnis`,
     ],
