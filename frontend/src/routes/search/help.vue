@@ -50,6 +50,8 @@ const fields = computed(() => {
             <dd class="w-4/6">
               <!-- eslint-disable-next-line vue/no-v-html -->
               <p v-html="DOMPurify.sanitize(feature.description)" />
+              <!-- NOSONAR -->
+              <!-- Reason for NOSONAR: The raw HTML is not from user input, plus it is sanitized -->
               <div
                 v-if="feature.examples.length > 0"
                 class="ds-body-02-reg mt-4"
