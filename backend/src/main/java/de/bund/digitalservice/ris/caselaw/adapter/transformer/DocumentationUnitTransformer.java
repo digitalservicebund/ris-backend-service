@@ -11,6 +11,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnit
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.EnsuingDecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.FileNumberDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.InputTypeDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LeadingDecisionNormReferenceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LegalEffectDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.NormReferenceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.OriginalFileDocumentDTO;
@@ -76,6 +77,7 @@ public class DocumentationUnitTransformer {
       addDeviatingFileNumbers(currentDto, builder, coreData);
       addDeviatingEclis(builder, coreData);
       addLegalEffect(currentDto, updatedDomainObject, builder);
+      addLeadingDecisionNormReferences(currentDto, updatedDomainObject, builder);
 
     } else {
       builder
@@ -256,6 +258,28 @@ public class DocumentationUnitTransformer {
     }
 
     builder.legalEffect(legalEffectDTO);
+  }
+
+  private static void addLeadingDecisionNormReferences(
+      DocumentationUnitDTO currentDto,
+      DocumentUnit updatedDomainObject,
+      DocumentationUnitDTOBuilder builder) {
+
+    List<String> leadingDecisionNormReferences =
+        updatedDomainObject.coreData().leadingDecisionNormReferences();
+    if (leadingDecisionNormReferences != null) {
+      AtomicInteger i = new AtomicInteger(1);
+      builder.leadingDecisionNormReferences(
+          leadingDecisionNormReferences.stream()
+              .map(
+                  normReference ->
+                      LeadingDecisionNormReferenceDTO.builder()
+                          .documentationUnit(currentDto)
+                          .normReference(normReference)
+                          .rank(i.getAndIncrement())
+                          .build())
+              .toList());
+    }
   }
 
   private static void addDeviatingEclis(DocumentationUnitDTOBuilder builder, CoreData coreData) {
