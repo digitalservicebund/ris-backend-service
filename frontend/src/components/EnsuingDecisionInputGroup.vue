@@ -1,21 +1,20 @@
 <script lang="ts" setup>
 import { watch, ref, computed, onMounted, onBeforeUnmount } from "vue"
 import SearchResultList, { SearchResults } from "./SearchResultList.vue"
+import { LabelPosition } from "./utils/enumLabelPosition"
+import CheckboxInput from "@/components/CheckboxInput.vue"
 import ComboboxInput from "@/components/ComboboxInput.vue"
+import DateInput from "@/components/DateInput.vue"
+import InputField from "@/components/InputField.vue"
+import Pagination, { Page } from "@/components/Pagination.vue"
+import TextButton from "@/components/TextButton.vue"
+import TextInput from "@/components/TextInput.vue"
 import { useValidationStore } from "@/composables/useValidationStore"
 import values from "@/data/values.json"
 import EnsuingDecision from "@/domain/ensuingDecision"
 import RelatedDocumentation from "@/domain/relatedDocumentation"
 import ComboboxItemService from "@/services/comboboxItemService"
 import documentUnitService from "@/services/documentUnitService"
-import CheckboxInput from "@/shared/components/input/CheckboxInput.vue"
-import DateInput from "@/shared/components/input/DateInput.vue"
-import InputField, {
-  LabelPosition,
-} from "@/shared/components/input/InputField.vue"
-import TextButton from "@/shared/components/input/TextButton.vue"
-import TextInput from "@/shared/components/input/TextInput.vue"
-import Pagination, { Page } from "@/shared/components/Pagination.vue"
 
 const props = defineProps<{
   modelValue?: EnsuingDecision

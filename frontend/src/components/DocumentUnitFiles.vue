@@ -1,13 +1,13 @@
 <script lang="ts" setup>
 import { onMounted, ref } from "vue"
 import DocumentUnitWrapper from "@/components/DocumentUnitWrapper.vue"
+import FileUpload from "@/components/FileUpload.vue"
 import FileViewer from "@/components/FileViewer.vue"
+import LoadingSpinner from "@/components/LoadingSpinner.vue"
 import DocumentUnit from "@/domain/documentUnit"
 import documentUnitService from "@/services/documentUnitService"
 import fileService from "@/services/fileService"
 import { ResponseError } from "@/services/httpClient"
-import FileUpload from "@/shared/components/FileUpload.vue"
-import LoadingSpinner from "@/shared/components/LoadingSpinner.vue"
 
 const props = defineProps<{ documentUnit: DocumentUnit }>()
 const emit = defineEmits<{

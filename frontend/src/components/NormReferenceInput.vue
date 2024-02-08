@@ -1,16 +1,16 @@
 <script lang="ts" setup>
 import { computed, onMounted, onBeforeUnmount, ref, watch } from "vue"
 import ComboboxInput from "@/components/ComboboxInput.vue"
+import DateInput from "@/components/DateInput.vue"
+import InputField from "@/components/InputField.vue"
+import TextButton from "@/components/TextButton.vue"
+import TextInput from "@/components/TextInput.vue"
+import YearInput from "@/components/YearInput.vue"
 import { useValidationStore } from "@/composables/useValidationStore"
 import { NormAbbreviation } from "@/domain/normAbbreviation"
 import NormReference, { SingleNormValidationInfo } from "@/domain/normReference"
 import ComboboxItemService from "@/services/comboboxItemService"
 import documentUnitService from "@/services/documentUnitService"
-import DateInput from "@/shared/components/input/DateInput.vue"
-import InputField from "@/shared/components/input/InputField.vue"
-import TextButton from "@/shared/components/input/TextButton.vue"
-import TextInput from "@/shared/components/input/TextInput.vue"
-import YearInput from "@/shared/components/input/YearInput.vue"
 
 const props = defineProps<{ modelValue?: NormReference }>()
 const emit = defineEmits<{

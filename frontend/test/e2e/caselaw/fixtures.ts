@@ -107,7 +107,7 @@ export const caselawTest = test.extend<MyFixtures>({
 
   pageWithBghUser: async ({ browser }, use) => {
     const bghContext = await browser.newContext({
-      storageState: `test/e2e/shared/.auth/user_bgh.json`,
+      storageState: `test/e2e/.auth/user_bgh.json`,
     })
     const pageWithBghUser = await bghContext.newPage()
 

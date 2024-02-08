@@ -1,7 +1,7 @@
 <script lang="ts" setup>
+import PropertyInfo from "@/components/PropertyInfo.vue"
 import KitchensinkPage from "@/kitchensink/components/KitchensinkPage.vue"
 import KitchensinkStory from "@/kitchensink/components/KitchensinkStory.vue"
-import PropertyInfo from "@/shared/components/PropertyInfo.vue"
 </script>
 
 <template>

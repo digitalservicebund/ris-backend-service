@@ -1,12 +1,12 @@
 import { userEvent } from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
 import ActiveCitations from "@/components/ActiveCitations.vue"
+import { ComboboxItem } from "@/components/utils/types"
 import ActiveCitation from "@/domain/activeCitation"
 import { CitationType } from "@/domain/citationType"
 import { Court, DocumentType } from "@/domain/documentUnit"
 import comboboxItemService from "@/services/comboboxItemService"
 import documentUnitService from "@/services/documentUnitService"
-import { ComboboxItem } from "@/shared/components/input/types"
 
 function renderComponent(options?: { modelValue?: ActiveCitation[] }) {
   const props = {

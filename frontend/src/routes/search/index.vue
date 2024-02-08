@@ -1,11 +1,11 @@
 <script lang="ts" setup>
 import { ref } from "vue"
+import InputField from "@/components/InputField.vue"
+import TextButton from "@/components/TextButton.vue"
+import TextInput from "@/components/TextInput.vue"
 import httpClient, {
   FailedValidationServerResponse,
 } from "@/services/httpClient"
-import InputField from "@/shared/components/input/InputField.vue"
-import TextButton from "@/shared/components/input/TextButton.vue"
-import TextInput from "@/shared/components/input/TextInput.vue"
 
 const searchInput = ref("")
 const isLoading = ref(false)

@@ -1,12 +1,12 @@
 <script lang="ts" setup>
 import { ref } from "vue"
+import ChipsDateInput from "@/components/ChipsDateInput.vue"
+import ChipsInput from "@/components/ChipsInput.vue"
+import InputField from "@/components/InputField.vue"
+import ChipsInputBottom from "@/components/KeywordsChipsInput.vue"
+import type { ChipsInputModelType } from "@/components/utils/types"
 import KitchensinkPage from "@/kitchensink/components/KitchensinkPage.vue"
 import KitchensinkStory from "@/kitchensink/components/KitchensinkStory.vue"
-import ChipsDateInput from "@/shared/components/input/ChipsDateInput.vue"
-import ChipsInput from "@/shared/components/input/ChipsInput.vue"
-import InputField from "@/shared/components/input/InputField.vue"
-import ChipsInputBottom from "@/shared/components/input/KeywordsChipsInput.vue"
-import type { ChipsInputModelType } from "@/shared/components/input/types"
 
 const inlineChips = ref<ChipsInputModelType>(["one", "two"])
 const stackedChips = ref<ChipsInputModelType>(["one", "two"])

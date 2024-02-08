@@ -1,9 +1,9 @@
 <script lang="ts" setup>
 import { toRaw } from "vue"
+import IconBadge, { IconBadgeProps } from "@/components/IconBadge.vue"
+import PropertyInfo from "@/components/PropertyInfo.vue"
 import SaveButton from "@/components/SaveDocumentUnitButton.vue"
 import { ServiceResponse } from "@/services/httpClient"
-import IconBadge, { IconBadgeProps } from "@/shared/components/IconBadge.vue"
-import PropertyInfo from "@/shared/components/PropertyInfo.vue"
 
 interface PropertyInfoType {
   label: string

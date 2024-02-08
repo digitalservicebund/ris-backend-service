@@ -1,0 +1,106 @@
+import { expect } from "@playwright/test"
+import { caselawTest as test } from "./fixtures"
+
+test.describe("authentication", () => {
+  test("name and documentation center should be displayed", async ({
+    page,
+  }) => {
+    await page.goto("/")
+
+    await expect(page.getByText("e2e_tests DigitalService")).toBeVisible()
+  })
+
+  test("should not be able to access with invalid session and redirect to login", async ({
+    page,
+    documentNumber,
+  }) => {
+    await page.goto("/")
+    await expect(
+      page.getByRole("button", {
+        name: "Neue Dokumentationseinheit",
+        exact: true,
+      }),
+    ).toBeVisible()
+
+    await page.context().clearCookies()
+
+    await page.goto(`/caselaw/documentunit/${documentNumber}/categories`)
+    await expect(page.locator("text=Spruchkörper")).toBeHidden()
+    await expect(page.getByLabel("E-Mailadresse")).toBeVisible()
+  })
+
+  test("should get new session ID without new login", async ({
+    page,
+    documentNumber,
+  }) => {
+    await page.goto("/")
+    await expect(
+      page.getByRole("button", {
+        name: "Neue Dokumentationseinheit",
+        exact: true,
+      }),
+    ).toBeVisible()
+
+    await page.context().clearCookies()
+
+    await page.goto(`/caselaw/documentunit/${documentNumber}/categories`)
+    await expect(page.locator("text=Spruchkörper")).toBeHidden()
+    await expect(page.getByLabel("E-Mailadresse")).toBeVisible()
+  })
+
+  test("should remember location after new login", async ({
+    page,
+    documentNumber,
+  }) => {
+    await page.goto("/")
+    await expect(
+      page.getByRole("button", {
+        name: "Neue Dokumentationseinheit",
+        exact: true,
+      }),
+    ).toBeVisible()
+    const validCookies = await page.context().cookies()
+
+    await page.context().clearCookies()
+    await page.goto(`/caselaw/documentunit/${documentNumber}/categories`)
+
+    // expect to be on login page
+    await expect(page.locator("text=Spruchkörper")).toBeHidden()
+    await expect(page.getByLabel("E-Mailadresse")).toBeVisible()
+
+    // login
+    await page.context().addCookies(validCookies)
+    await page.goto("/")
+
+    await expect(page).toHaveURL(
+      `/caselaw/documentunit/${documentNumber}/categories`,
+    )
+  })
+
+  test("public endpoints (`open/`) should be restricted with basicAuth", async ({
+    page,
+    baseURL,
+  }) => {
+    // E2E_BASE_URL is only set in staging
+    // eslint-disable-next-line playwright/no-skipped-test
+    test.skip(!process.env.E2E_BASE_URL)
+
+    expect((await page.request.get("/api/v1/open/norms")).status()).toEqual(401)
+    const hostname = new URL(baseURL as string).hostname
+    expect(
+      (
+        await page.request.get(
+          `https://${process.env.E2E_TEST_BASIC_AUTH_USER}:${process.env.E2E_TEST_BASIC_AUTH_PASSWORD}@${hostname}/api/v1/open/norms`,
+        )
+      ).status(),
+    ).toEqual(200)
+  })
+
+  test("should see a custom error page for unknown paths", async ({ page }) => {
+    await page.goto("/doesNotExists")
+
+    await expect(
+      page.getByText("Diese Internetseite existiert nicht"),
+    ).toBeVisible()
+  })
+})

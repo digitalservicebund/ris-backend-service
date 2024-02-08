@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { ref, computed } from "vue"
+import KeywordsChipsInput from "@/components/KeywordsChipsInput.vue"
 import { ResponseError } from "@/services/httpClient"
-import KeywordsChipsInput from "@/shared/components/input/KeywordsChipsInput.vue"
 
 const props = defineProps<{
   modelValue: string[] | undefined

@@ -1,11 +1,11 @@
 import { userEvent } from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
 import NormReferenceInput from "@/components/NormReferenceInput.vue"
+import { ComboboxItem } from "@/components/utils/types"
 import { NormAbbreviation } from "@/domain/normAbbreviation"
 import NormReference from "@/domain/normReference"
 import comboboxItemService from "@/services/comboboxItemService"
 import documentUnitService from "@/services/documentUnitService"
-import { ComboboxItem } from "@/shared/components/input/types"
 
 function renderComponent(options?: { modelValue?: NormReference }) {
   // eslint-disable-next-line testing-library/await-async-events

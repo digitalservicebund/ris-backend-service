@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { onMounted, ref } from "vue"
+import Pagination, { Page } from "@/components/Pagination.vue"
 import KitchensinkPage from "@/kitchensink/components/KitchensinkPage.vue"
-import Pagination, { Page } from "@/shared/components/Pagination.vue"
 
 const itemsPerPage = 10
 const items = ref<number[]>()

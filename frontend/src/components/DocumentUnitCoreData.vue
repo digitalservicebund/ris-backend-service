@@ -1,17 +1,17 @@
 <script lang="ts" setup>
 import { toRefs, watch } from "vue"
+import ChipsDateInput from "@/components/ChipsDateInput.vue"
+import ChipsInput from "@/components/ChipsInput.vue"
 import ComboboxInput from "@/components/ComboboxInput.vue"
+import DateInput from "@/components/DateInput.vue"
+import DropdownInput from "@/components/DropdownInput.vue"
+import InputField from "@/components/InputField.vue"
+import NestedComponent from "@/components/NestedComponents.vue"
+import TextInput from "@/components/TextInput.vue"
 import { useValidationStore } from "@/composables/useValidationStore"
 import legalEffectTypes from "@/data/legalEffectTypes.json"
 import { CoreData } from "@/domain/documentUnit"
 import ComboboxItemService from "@/services/comboboxItemService"
-import ChipsDateInput from "@/shared/components/input/ChipsDateInput.vue"
-import ChipsInput from "@/shared/components/input/ChipsInput.vue"
-import DateInput from "@/shared/components/input/DateInput.vue"
-import DropdownInput from "@/shared/components/input/DropdownInput.vue"
-import InputField from "@/shared/components/input/InputField.vue"
-import TextInput from "@/shared/components/input/TextInput.vue"
-import NestedComponent from "@/shared/components/NestedComponents.vue"
 
 interface Props {
   modelValue: CoreData

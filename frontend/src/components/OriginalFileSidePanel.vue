@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { computed, ref, watch } from "vue"
 import { useRoute } from "vue-router"
-import TextEditor from "@/shared/components/input/TextEditor.vue"
-import LoadingSpinner from "@/shared/components/LoadingSpinner.vue"
+import LoadingSpinner from "@/components/LoadingSpinner.vue"
+import TextEditor from "@/components/TextEditor.vue"
 import IconArrowForward from "~icons/ic/baseline-arrow-forward"
 
 const props = defineProps<{

@@ -3,12 +3,12 @@ import httpClient, {
   FailedValidationServerResponse,
 } from "./httpClient"
 import { DocumentUnitSearchParameter } from "@/components/DocumentUnitSearchEntryForm.vue"
+import { PageableService, Page } from "@/components/Pagination.vue"
 import DocumentUnit from "@/domain/documentUnit"
 import DocumentUnitListEntry from "@/domain/documentUnitListEntry"
 import { SingleNormValidationInfo } from "@/domain/normReference"
 import RelatedDocumentation from "@/domain/relatedDocumentation"
-import { PageableService, Page } from "@/shared/components/Pagination.vue"
-import errorMessages from "@/shared/i18n/errors.json"
+import errorMessages from "@/i18n/errors.json"
 
 interface DocumentUnitService {
   getByDocumentNumber(

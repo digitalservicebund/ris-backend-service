@@ -25,7 +25,7 @@ const config: PlaywrightTestConfig = {
       use: {
         ...devices["Desktop Chrome"],
         channel: "chrome",
-        storageState: "test/e2e/shared/.auth/user.json",
+        storageState: "test/e2e/.auth/user.json",
       },
       dependencies: ["setup"],
     },
@@ -33,7 +33,7 @@ const config: PlaywrightTestConfig = {
       name: "firefox",
       use: {
         ...devices["Desktop Firefox"],
-        storageState: "test/e2e/shared/.auth/user.json",
+        storageState: "test/e2e/.auth/user.json",
       },
       dependencies: ["setup"],
     },
@@ -43,7 +43,7 @@ const config: PlaywrightTestConfig = {
       use: {
         ...devices["Desktop Chrome"],
         channel: "chrome",
-        storageState: "test/e2e/shared/.auth/user.json",
+        storageState: "test/e2e/.auth/user.json",
       },
       dependencies: ["setup"],
     },
@@ -53,7 +53,7 @@ const config: PlaywrightTestConfig = {
       use: {
         ...devices["Desktop Chrome"],
         channel: "chrome",
-        storageState: "test/e2e/shared/.auth/user.json",
+        storageState: "test/e2e/.auth/user.json",
       },
       dependencies: ["setup"],
     },

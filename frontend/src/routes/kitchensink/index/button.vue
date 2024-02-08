@@ -1,7 +1,7 @@
 <script lang="ts" setup>
+import TextButton from "@/components/utils/TextButton.vue"
 import KitchensinkPage from "@/kitchensink/components/KitchensinkPage.vue"
 import KitchensinkStory from "@/kitchensink/components/KitchensinkStory.vue"
-import TextButton from "@/shared/components/input/TextButton.vue"
 import IconClear from "~icons/ic/baseline-clear"
 </script>
 

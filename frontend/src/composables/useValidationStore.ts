@@ -1,5 +1,5 @@
 import { ref } from "vue"
-import { ValidationError } from "@/shared/components/input/types"
+import { ValidationError } from "@/components/utils/types"
 
 type ValidationStore<T> = {
   getAll: () => ValidationError[]

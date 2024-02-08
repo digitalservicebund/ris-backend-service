@@ -1,6 +1,6 @@
 <script lang="ts" setup>
+import FileUpload from "@/components/FileUpload.vue"
 import KitchensinkPage from "@/kitchensink/components/KitchensinkPage.vue"
-import FileUpload from "@/shared/components/FileUpload.vue"
 </script>
 
 <template>

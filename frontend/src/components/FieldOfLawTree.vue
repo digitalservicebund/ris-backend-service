@@ -1,12 +1,11 @@
 <script lang="ts" setup>
 import { computed, watch, ref } from "vue"
 import FieldOfLawNodeComponent from "./FieldOfLawNodeComponent.vue"
+import { LabelPosition } from "./utils/enumLabelPosition"
+import CheckboxInput from "@/components/CheckboxInput.vue"
+import InputField from "@/components/InputField.vue"
 import { buildRoot, getDescendants, FieldOfLawNode } from "@/domain/fieldOfLaw"
 import FieldOfLawService from "@/services/fieldOfLawService"
-import CheckboxInput from "@/shared/components/input/CheckboxInput.vue"
-import InputField, {
-  LabelPosition,
-} from "@/shared/components/input/InputField.vue"
 
 const props = defineProps<{
   modelValue: FieldOfLawNode[]

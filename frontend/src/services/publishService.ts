@@ -1,6 +1,6 @@
 import httpClient, { ServiceResponse } from "./httpClient"
 import PublicationHistoryRecord from "@/domain/xmlMail"
-import errorMessages from "@/shared/i18n/errors.json"
+import errorMessages from "@/i18n/errors.json"
 
 interface PublishService {
   publishDocument(

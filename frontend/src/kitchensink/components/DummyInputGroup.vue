@@ -1,9 +1,9 @@
 <script lang="ts" setup>
 import { ref, watch, onBeforeUnmount } from "vue"
+import InputField from "@/components/InputField.vue"
+import TextButton from "@/components/TextButton.vue"
+import TextInput from "@/components/TextInput.vue"
 import DummyListItem from "@/kitchensink/domain/dummyListItem"
-import InputField from "@/shared/components/input/InputField.vue"
-import TextButton from "@/shared/components/input/TextButton.vue"
-import TextInput from "@/shared/components/input/TextInput.vue"
 
 const props = defineProps<{
   modelValue?: DummyListItem
