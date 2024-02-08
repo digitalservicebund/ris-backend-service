@@ -1,11 +1,11 @@
 import { expect } from "@playwright/test"
-import { generateString } from "../../../../test-helper/dataGenerators"
 import {
   navigateToCategories,
   waitForSaving,
   waitForInputValue,
-} from "../../e2e-utils"
-import { caselawTest as test } from "../../fixtures"
+} from "../e2e-utils"
+import { caselawTest as test } from "../fixtures"
+import { generateString } from "~/test-helper/dataGenerators"
 
 test.describe("keywords", () => {
   test("rendering", async ({ page, documentNumber }) => {
@@ -93,7 +93,7 @@ test.describe("keywords", () => {
     await waitForInputValue(page, "[aria-label='Schlagwörter']", keyword)
     await page.keyboard.press("Enter")
 
-    await expect(page.getByText(/Schlagwort bereits vergeben/)).toBeVisible()
+    await expect(page.getByText(keyword + " bereits vorhanden")).toBeVisible()
   })
 
   test("delete keywords", async ({ page, documentNumber }) => {

@@ -3,7 +3,7 @@ import { produce } from "immer"
 import { ref, watch } from "vue"
 import ChipsList from "@/shared/components/input/ChipsList.vue"
 import TextInput from "@/shared/components/input/TextInput.vue"
-import IconErrorOutline from "~icons/ic/baseline-error-outline"
+import InputErrorMessages from "@/shared/components/InputErrorMessages.vue"
 
 interface Props {
   id: string
@@ -30,7 +30,7 @@ function addChip() {
   if (!chip) return
 
   if (props.modelValue?.includes(chip)) {
-    errorMessage.value = { title: "Schlagwort bereits vergeben." }
+    errorMessage.value = { title: chip + " bereits vorhanden." }
     newChipText.value = ""
     return
   }
@@ -98,10 +98,9 @@ watch(newChipText, (is) => {
       @keydown.right.stop="maybeFocusFirst"
     />
 
-    <div v-if="errorMessage" class="flex flex-row items-center">
-      <IconErrorOutline class="leading-default text-gray-900" />
-      <p class="ds-label-02-reg m-4 text-gray-900">{{ errorMessage?.title }}</p>
-    </div>
+    <InputErrorMessages
+      :error-message="errorMessage?.title"
+    ></InputErrorMessages>
 
     <ChipsList
       v-model:focused-item="focusedChip"

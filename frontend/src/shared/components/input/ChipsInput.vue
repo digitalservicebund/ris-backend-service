@@ -4,6 +4,7 @@ import { vMaska } from "maska"
 import { nextTick, ref, watch, watchEffect } from "vue"
 import ChipsList from "@/shared/components/input/ChipsList.vue"
 import { ValidationError } from "@/shared/components/input/types"
+import InputErrorMessages from "@/shared/components/InputErrorMessages.vue"
 import IconSubdirectoryArrowLeft from "~icons/ic/baseline-subdirectory-arrow-left"
 
 interface Props {
@@ -21,17 +22,30 @@ const emit = defineEmits<{
   "update:validationError": [value?: ValidationError]
 }>()
 
+const errorMessage = ref()
+
 /* -------------------------------------------------- *
  * Data handling                                      *
  * -------------------------------------------------- */
 
 const newChipText = ref<string>("")
 
-function addChip() {
+const handleOnBlur = () => {
+  errorMessage.value = undefined
+}
+
+const addChip = () => {
+  handleOnBlur()
+
   if (props.readOnly) return
 
   const chip = newChipText.value.trim()
   if (!chip) return
+
+  if (props.modelValue?.includes(chip)) {
+    errorMessage.value = { title: chip + " bereits vorhanden." }
+    newChipText.value = ""
+  }
 
   const current = props.modelValue ?? []
 
@@ -131,60 +145,68 @@ watchEffect(() => {
 watch(newChipText, async () => {
   await determineInputWidth()
 })
+
+watch(newChipText, (is) => {
+  if (errorMessage.value && is !== "") errorMessage.value = undefined
+})
 </script>
 
 <template>
-  <!-- Ignore requirement to have a keyboard listener as it's only a convenience
-  for mouse users, but keyboard users can already do the same thing by tabbing
-  just fine -->
-  <!-- eslint-disable vuejs-accessibility/click-events-have-key-events -->
-  <!-- eslint-disable-next-line vuejs-accessibility/no-static-element-interactions -->
-  <div
-    ref="wrapperEl"
-    class="flex min-h-48 w-full cursor-text flex-wrap items-center overflow-hidden bg-white px-16 py-8 outline-2 -outline-offset-4 autofill:text-inherit autofill:shadow-white autofill:focus:text-inherit autofill:focus:shadow-white"
-    :class="[
-      readOnly
-        ? '!bg-blue-300 hover:outline-none'
-        : 'border-2 border-solid border-blue-800 outline-blue-800 hover:outline [&:has(:focus)]:outline',
-    ]"
-    :data-testid="`chips-input_${id}`"
-    @click="focusInput"
-  >
-    <ChipsList
-      v-model:focused-item="focusedChip"
-      :model-value="modelValue"
-      :read-only="readOnly"
-      @chip-deleted="onDeleteChip"
-      @next-clicked-on-last="focusInput"
-      @update:model-value="$emit('update:modelValue', $event)"
-    />
-
-    <span
-      v-if="!readOnly"
-      class="flex max-w-full flex-auto items-center justify-start"
+  <div class="w-full">
+    <!-- Ignore requirement to have a keyboard listener as it's only a convenience
+    for mouse users, but keyboard users can already do the same thing by tabbing
+    just fine -->
+    <!-- eslint-disable vuejs-accessibility/click-events-have-key-events -->
+    <!-- eslint-disable-next-line vuejs-accessibility/no-static-element-interactions -->
+    <div
+      ref="wrapperEl"
+      class="flex min-h-48 w-full cursor-text flex-wrap items-center overflow-hidden bg-white px-16 py-8 outline-2 -outline-offset-4 autofill:text-inherit autofill:shadow-white autofill:focus:text-inherit autofill:focus:shadow-white"
+      :class="[
+        readOnly
+          ? '!bg-blue-300 hover:outline-none'
+          : 'border-2 border-solid border-blue-800 outline-blue-800 hover:outline [&:has(:focus)]:outline',
+      ]"
+      :data-testid="`chips-input_${id}`"
+      @click="focusInput"
     >
-      <span :id="`enter-note-for-${id}`" class="sr-only">
-        Enter drücken, um die Eingabe zu bestätigen
-      </span>
-      <input
-        :id="id"
-        ref="chipsInput"
-        v-model="newChipText"
-        v-maska
-        :aria-describedby="`enter-note-for-${id}`"
-        :aria-label="ariaLabel"
-        class="peer w-4 min-w-0 border-none bg-transparent outline-none"
-        :data-maska="maska ?? null"
-        :style="{ width: inputContentWidth }"
-        type="text"
-        @blur="addChip"
-        @focus="focusedChip = undefined"
-        @keydown.enter.stop.prevent="addChip"
-        @keydown.left="maybeFocusPrevious"
+      <ChipsList
+        v-model:focused-item="focusedChip"
+        :model-value="modelValue"
+        :read-only="readOnly"
+        @chip-deleted="onDeleteChip"
+        @next-clicked-on-last="focusInput"
+        @update:model-value="$emit('update:modelValue', $event)"
       />
-      <span class="flex-none text-transparent peer-focus:text-gray-900">
-        <IconSubdirectoryArrowLeft height="16px" width="16px" />
+
+      <span
+        v-if="!readOnly"
+        class="flex max-w-full flex-auto items-center justify-start"
+      >
+        <span :id="`enter-note-for-${id}`" class="sr-only">
+          Enter drücken, um die Eingabe zu bestätigen
+        </span>
+        <input
+          :id="id"
+          ref="chipsInput"
+          v-model="newChipText"
+          v-maska
+          :aria-describedby="`enter-note-for-${id}`"
+          :aria-label="ariaLabel"
+          class="peer w-4 min-w-0 border-none bg-transparent outline-none"
+          :data-maska="maska ?? null"
+          :style="{ width: inputContentWidth }"
+          type="text"
+          @blur="addChip"
+          @focus="focusedChip = undefined"
+          @keydown.enter.stop.prevent="addChip"
+          @keydown.left="maybeFocusPrevious"
+        />
+        <span class="flex-none text-transparent peer-focus:text-gray-900">
+          <IconSubdirectoryArrowLeft height="16px" width="16px" />
+        </span>
       </span>
-    </span>
+    </div>
+
+    <InputErrorMessages :error-message="errorMessage?.title" />
   </div>
 </template>

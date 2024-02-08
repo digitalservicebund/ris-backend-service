@@ -271,4 +271,42 @@ test.describe("core data", () => {
       ).toBeVisible()
     })
   })
+
+  test("ensure that leadingDecisionNormReferences are visible, savable, and deletable for the BGH", async ({
+    page,
+    documentNumber,
+  }) => {
+    await navigateToCategories(page, documentNumber)
+    const nswButton = page.locator("[aria-label='NSW-Fundstellen']")
+    const CITATION = "1968, 249-252 (ST)"
+    const nswChipTag = page.locator(`text=${CITATION}`)
+    await expect(nswButton).toBeHidden()
+
+    // Addiding tag to list
+
+    await waitForSaving(
+      async () => {
+        await page.locator("[aria-label='Gericht']").fill("BGH")
+        await page.locator("text=BGH").click()
+        await expect(nswButton).toBeVisible()
+        await nswButton.type(CITATION)
+        await page.keyboard.press("Enter")
+      },
+      page,
+      { clickSaveButton: true },
+    )
+    await expect(nswChipTag).toBeVisible()
+
+    await waitForSaving(
+      async () => {
+        await page
+          .getByTestId("chips-input_leadingDecisionNormReferences")
+          .getByLabel("Löschen")
+          .click()
+      },
+      page,
+      { clickSaveButton: true },
+    )
+    await expect(nswChipTag).toBeHidden()
+  })
 })

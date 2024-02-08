@@ -244,4 +244,13 @@ public class DocumentationUnitDTO
   @Builder.Default
   @OrderBy("rank")
   private List<PreviousDecisionDTO> previousDecisions = new ArrayList<>();
+
+  @OneToMany(
+      mappedBy = "documentationUnit",
+      cascade = CascadeType.ALL,
+      fetch = FetchType.LAZY,
+      orphanRemoval = true)
+  @Builder.Default
+  @OrderBy("rank")
+  private List<ReferenceDTO> references = new ArrayList<>();
 }

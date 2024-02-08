@@ -11,13 +11,4 @@ test.describe("norm", () => {
     await expect(page.getByLabel("Fassungsdatum")).toBeVisible()
     await expect(page.getByLabel("Jahr")).toBeVisible()
   })
-
-  //Todo single norm validation
-  // test("single norm validation", async ({ page, documentNumber }) => {
-  //   await navigateToCategories(page, documentNumber)
-  //   await fillNormInputs(page, { normAbbreviation: "BayWaldNatPV BY" })
-  //   await expect(page.getByLabel("RIS-Abkürzung der Norm")).toHaveValue(
-  //     "BayWaldNatPV BY",
-  //   )
-  // })
 })

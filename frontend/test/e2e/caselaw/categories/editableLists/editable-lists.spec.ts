@@ -1,5 +1,4 @@
 import { expect } from "@playwright/test"
-import { generateString } from "../../../test-helper/dataGenerators"
 import {
   fillPreviousDecisionInputs,
   fillActiveCitationInputs,
@@ -7,8 +6,10 @@ import {
   navigateToCategories,
   publishDocumentationUnit,
   fillNormInputs,
+  waitForSaving,
 } from "~/e2e/caselaw/e2e-utils"
 import { caselawTest as test } from "~/e2e/caselaw/fixtures"
+import { generateString } from "~/test-helper/dataGenerators"
 
 /* eslint-disable playwright/no-conditional-in-test */
 test.describe("related documentation units", () => {
@@ -36,7 +37,7 @@ test.describe("related documentation units", () => {
             .first()
             .getAttribute("aria-label")) as string
 
-          //adding, deleting and cancel editing of empty previous decision not possible
+          //adding, deleting and cancel editing of empty item not possible
           await expect(
             container.getByLabel(`${containerLabel} speichern`),
           ).toBeDisabled()
@@ -48,7 +49,79 @@ test.describe("related documentation units", () => {
       )
     }
   })
-  /* eslint-disable playwright/no-conditional-in-test */
+
+  test("added items are saved, can be edited and deleted", async ({
+    page,
+    documentNumber,
+  }) => {
+    await navigateToCategories(page, documentNumber)
+
+    const activeCitationContainer = page.getByLabel("Aktivzitierung")
+    const previousDecisionContainer = page.getByLabel("Vorgehende Entscheidung")
+    const ensuingDecisionContainer = page.getByLabel("Nachgehende Entscheidung")
+    // todo: find generic way to fill forms without too many conditionals
+    // const normsContainer = page.getByLabel("Norm")
+    const containers = [
+      activeCitationContainer,
+      previousDecisionContainer,
+      ensuingDecisionContainer,
+      // normsContainer,
+    ]
+
+    for (const container of containers) {
+      const section = await container.first().getAttribute("aria-label")
+      const fileNumber1 = generateString()
+      const fileNumber2 = generateString()
+      const fileNumber3 = generateString()
+
+      await test.step("for category " + section, async () => {
+        // adding empty entry not possible
+        await expect(page.getByLabel(section + " speichern")).toBeDisabled()
+
+        // add entry
+        await container
+          .getByLabel("Aktenzeichen " + section, { exact: true })
+          .fill(fileNumber1)
+
+        await container.getByLabel(section + " speichern").click()
+        await expect(container.getByText(fileNumber1)).toBeVisible()
+
+        // edit entry
+        await container.getByLabel("Listen Eintrag").click()
+        await container
+          .getByLabel("Aktenzeichen " + section, { exact: true })
+          .fill(fileNumber2)
+
+        await container.getByLabel(section + " speichern").click()
+        await expect(container.getByText(fileNumber1)).toBeHidden()
+        await expect(container.getByText(fileNumber2)).toBeVisible()
+
+        await expect(container.getByLabel("Listen Eintrag")).toHaveCount(1)
+
+        // add second entry
+        await container.getByLabel("Weitere Angabe").click()
+        await waitForSaving(
+          async () => {
+            await container
+              .getByLabel("Aktenzeichen " + section, { exact: true })
+              .fill(fileNumber3)
+            await container.getByLabel(section + " speichern").click()
+          },
+          page,
+          { clickSaveButton: true },
+        )
+
+        await expect(container.getByLabel("Listen Eintrag")).toHaveCount(2)
+        await page.reload()
+        const listEntries = container.getByLabel("Listen Eintrag")
+        await expect(listEntries).toHaveCount(2)
+        await listEntries.first().click()
+        await container.getByLabel("Eintrag löschen").click()
+        await expect(container.getByLabel("Listen Eintrag")).toHaveCount(1)
+      })
+    }
+  })
+
   test("validates list item against required fields", async ({
     page,
     documentNumber,
@@ -85,17 +158,13 @@ test.describe("related documentation units", () => {
             .first()
             .getAttribute("aria-label")) as string
 
-          if (container === activeCitationContainer) {
-            await fillActiveCitationInputs(page, { fileNumber: "abc" })
-          }
-          if (container === previousDecisionContainer) {
-            await fillPreviousDecisionInputs(page, { fileNumber: "abc" })
-          }
-          if (container === ensuingDecisionContainer) {
-            await fillEnsuingDecisionInputs(page, { fileNumber: "abc" })
-          }
+          const fileNumber = generateString()
           if (container === normsContainer) {
             await fillNormInputs(page, { dateOfRelevance: "1234" })
+          } else {
+            await container
+              .getByLabel("Aktenzeichen " + containerLabel, { exact: true })
+              .fill(fileNumber)
           }
 
           await page.getByLabel(`${containerLabel} speichern`).click()
@@ -111,35 +180,31 @@ test.describe("related documentation units", () => {
                 .getByLabel(containerLabel)
                 .getByText("Pflichtfeld nicht befüllt"),
             ).toHaveCount(3)
+            await fillActiveCitationInputs(page, {
+              ...inputs,
+              citationType: "Änderung",
+            })
           } else if (container === normsContainer) {
             await expect(
               page
                 .getByLabel(containerLabel)
                 .getByText("Pflichtfeld nicht befüllt"),
             ).toHaveCount(1)
-          } else {
+            await fillNormInputs(page, { normAbbreviation: "BayWaldNatPV BY" })
+          } else if (container === previousDecisionContainer) {
             await expect(
               page
                 .getByLabel(containerLabel)
                 .getByText("Pflichtfeld nicht befüllt"),
             ).toHaveCount(2)
-          }
-
-          if (container === activeCitationContainer) {
-            await fillActiveCitationInputs(page, {
-              ...inputs,
-              citationType: "Änderung",
-            })
-          }
-          if (container === previousDecisionContainer) {
             await fillPreviousDecisionInputs(page, inputs)
-          }
-          if (container === ensuingDecisionContainer) {
+          } else if (container === ensuingDecisionContainer) {
+            await expect(
+              page
+                .getByLabel(containerLabel)
+                .getByText("Pflichtfeld nicht befüllt"),
+            ).toHaveCount(2)
             await fillEnsuingDecisionInputs(page, inputs)
-          }
-
-          if (container === normsContainer) {
-            await fillNormInputs(page, { normAbbreviation: "BayWaldNatPV BY" })
           }
 
           await page.getByLabel(`${containerLabel} speichern`).click()
@@ -211,12 +276,13 @@ test.describe("related documentation units", () => {
     const activeCitationContainer = page.getByLabel("Aktivzitierung")
     const previousDecisionContainer = page.getByLabel("Vorgehende Entscheidung")
     const ensuingDecisionContainer = page.getByLabel("Nachgehende Entscheidung")
-    const normsContainer = page.getByLabel("Norm")
+    // todo: find generic way to fill forms without too many conditionals
+    // const normsContainer = page.getByLabel("Norm")
     const containers = [
       activeCitationContainer,
       previousDecisionContainer,
       ensuingDecisionContainer,
-      normsContainer,
+      // normsContainer
     ]
 
     for (const container of containers) {
@@ -227,62 +293,104 @@ test.describe("related documentation units", () => {
             .first()
             .getAttribute("aria-label")) as string
 
-          const number = "1234"
           await navigateToCategories(page, documentNumber)
 
+          //list item 1
+          const fileNumber1 = generateString()
           if (container === activeCitationContainer) {
-            await fillActiveCitationInputs(page, { fileNumber: number })
+            await fillActiveCitationInputs(page, {
+              fileNumber: fileNumber1,
+            })
           }
           if (container === previousDecisionContainer) {
-            await fillPreviousDecisionInputs(page, { fileNumber: number })
+            await fillPreviousDecisionInputs(page, {
+              fileNumber: fileNumber1,
+            })
           }
           if (container === ensuingDecisionContainer) {
-            await fillEnsuingDecisionInputs(page, { fileNumber: number })
+            await fillEnsuingDecisionInputs(page, {
+              fileNumber: fileNumber1,
+            })
           }
-          if (container === normsContainer) {
-            await fillNormInputs(page, { dateOfRelevance: number })
-          }
-
           await container.getByLabel(`${containerLabel} speichern`).click()
-
           await expect(container.getByLabel("Listen Eintrag")).toHaveCount(1)
+          await expect(
+            container.getByLabel("Listen Eintrag").last(),
+          ).toContainText(fileNumber1)
 
+          //list item 2
           await container.getByLabel("Weitere Angabe").click()
-
+          const fileNumber2 = generateString()
           if (container === activeCitationContainer) {
-            await fillActiveCitationInputs(page, { fileNumber: number })
+            await fillActiveCitationInputs(page, {
+              fileNumber: fileNumber2,
+            })
           }
           if (container === previousDecisionContainer) {
-            await fillPreviousDecisionInputs(page, { fileNumber: number })
+            await fillPreviousDecisionInputs(page, {
+              fileNumber: fileNumber2,
+            })
           }
           if (container === ensuingDecisionContainer) {
-            await fillEnsuingDecisionInputs(page, { fileNumber: number })
+            await fillEnsuingDecisionInputs(page, {
+              fileNumber: fileNumber2,
+            })
           }
-
-          if (container === normsContainer) {
-            await fillNormInputs(page, { dateOfRelevance: number })
-          }
-
           await container.getByLabel(`${containerLabel} speichern`).click()
-
           await expect(container.getByLabel("Listen Eintrag")).toHaveCount(2)
+          await expect(
+            container.getByLabel("Listen Eintrag").last(),
+          ).toContainText(fileNumber2)
+
+          //list item 3
+          await container.getByLabel("Weitere Angabe").click()
+          const fileNumber3 = generateString()
+          if (container === activeCitationContainer) {
+            await fillActiveCitationInputs(page, {
+              fileNumber: fileNumber3,
+            })
+          }
+          if (container === previousDecisionContainer) {
+            await fillPreviousDecisionInputs(page, {
+              fileNumber: fileNumber3,
+            })
+          }
+          if (container === ensuingDecisionContainer) {
+            await fillEnsuingDecisionInputs(page, {
+              fileNumber: fileNumber3,
+            })
+          }
+          await container.getByLabel(`${containerLabel} speichern`).click()
+          await expect(container.getByLabel("Listen Eintrag")).toHaveCount(3)
+          await expect(
+            container.getByLabel("Listen Eintrag").last(),
+          ).toContainText(fileNumber3)
 
           // leaving an empty list item, deletes it
           await container.getByLabel("Weitere Angabe").click()
+          await expect(container.getByLabel("Listen Eintrag")).toHaveCount(4)
+          await container.getByLabel("Listen Eintrag").nth(1).click()
           await expect(container.getByLabel("Listen Eintrag")).toHaveCount(3)
-          await container.getByLabel("Listen Eintrag").nth(1).click()
-          await expect(container.getByLabel("Listen Eintrag")).toHaveCount(2)
 
-          // deleting item, sets previous list item in edit mode
-          await container.getByLabel("Listen Eintrag").nth(1).click()
-
+          // deleting last item, sets previous list item in edit mode
+          await container.getByLabel("Listen Eintrag").last().click()
           await container.getByLabel("Löschen").click()
-
-          await expect(container.getByLabel("Listen Eintrag")).toHaveCount(1)
-
+          await expect(container.getByLabel("Listen Eintrag")).toHaveCount(2)
           await expect(
-            container.getByLabel(`${containerLabel} speichern`),
-          ).toBeVisible()
+            container.getByLabel(`Aktenzeichen ${containerLabel}`, {
+              exact: true,
+            }),
+          ).toHaveValue(fileNumber2)
+
+          // deleting first item, sets next list item in edit mode
+          await container.getByLabel("Listen Eintrag").first().click()
+          await container.getByLabel("Löschen").click()
+          await expect(container.getByLabel("Listen Eintrag")).toHaveCount(1)
+          await expect(
+            container.getByLabel(`Aktenzeichen ${containerLabel}`, {
+              exact: true,
+            }),
+          ).toHaveValue(fileNumber2)
 
           expect(
             await container.getByText("Pflichtfeld nicht befüllt").count(),
@@ -292,10 +400,13 @@ test.describe("related documentation units", () => {
           await container.getByLabel("Löschen").click()
 
           await expect(container.getByLabel("Abbrechen")).toBeHidden()
-
           await expect(container.getByLabel("Löschen")).toBeHidden()
-
           await expect(container.getByLabel("Listen Eintrag")).toHaveCount(1)
+          await expect(
+            container.getByLabel(`Aktenzeichen ${containerLabel}`, {
+              exact: true,
+            }),
+          ).toHaveValue("")
 
           // resets validation errors
           await expect(
@@ -306,7 +417,7 @@ test.describe("related documentation units", () => {
     }
   })
 
-  test("cancel editing previous decision does not update values", async ({
+  test("cancel editing list item does not update values", async ({
     page,
     documentNumber,
   }) => {
@@ -386,7 +497,7 @@ test.describe("related documentation units", () => {
     }
   })
 
-  test("add new decision only possible when no item in edit mode", async ({
+  test("add new item only possible when no item in edit mode", async ({
     page,
     documentNumber,
   }) => {

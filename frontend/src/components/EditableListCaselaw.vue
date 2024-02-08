@@ -66,7 +66,7 @@ function removeListEntry(index: number) {
   if (
     editIndex.value !== undefined &&
     modelValueList.value.length !== 0 &&
-    index <= editIndex.value
+    index !== 0
   ) {
     editIndex.value -= 1
   }

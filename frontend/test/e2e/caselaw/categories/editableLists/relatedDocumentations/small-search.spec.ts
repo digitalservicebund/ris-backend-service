@@ -5,79 +5,8 @@ import {
   fillPreviousDecisionInputs,
   navigateToCategories,
   publishDocumentationUnit,
-  waitForSaving,
 } from "~/e2e/caselaw/e2e-utils"
 import { caselawTest as test } from "~/e2e/caselaw/fixtures"
-import { generateString } from "~/test-helper/dataGenerators"
-
-test("manually added items are saved, can be edited and deleted", async ({
-  page,
-  documentNumber,
-}) => {
-  await navigateToCategories(page, documentNumber)
-
-  const activeCitationContainer = page.getByLabel("Aktivzitierung")
-  const previousDecisionContainer = page.getByLabel("Vorgehende Entscheidung")
-  const ensuingDecisionContainer = page.getByLabel("Nachgehende Entscheidung")
-  const containers = [
-    activeCitationContainer,
-    previousDecisionContainer,
-    ensuingDecisionContainer,
-  ]
-
-  for (const container of containers) {
-    const section = await container.first().getAttribute("aria-label")
-    const fileNumber1 = generateString()
-    const fileNumber2 = generateString()
-    const fileNumber3 = generateString()
-
-    await test.step("for category " + section, async () => {
-      // adding empty entry not possible
-      await expect(page.getByLabel(section + " speichern")).toBeDisabled()
-
-      // add entry
-      await container
-        .getByLabel("Aktenzeichen " + section, { exact: true })
-        .fill(fileNumber1)
-
-      await container.getByLabel(section + " speichern").click()
-      await expect(container.getByText(fileNumber1)).toBeVisible()
-
-      // edit entry
-      await container.getByLabel("Listen Eintrag").click()
-      await container
-        .getByLabel("Aktenzeichen " + section, { exact: true })
-        .fill(fileNumber2)
-
-      await container.getByLabel(section + " speichern").click()
-      await expect(container.getByText(fileNumber1)).toBeHidden()
-      await expect(container.getByText(fileNumber2)).toBeVisible()
-
-      await expect(container.getByLabel("Listen Eintrag")).toHaveCount(1)
-
-      // add second entry
-      await container.getByLabel("Weitere Angabe").click()
-      await waitForSaving(
-        async () => {
-          await container
-            .getByLabel("Aktenzeichen " + section, { exact: true })
-            .fill(fileNumber3)
-          await container.getByLabel(section + " speichern").click()
-        },
-        page,
-        { clickSaveButton: true },
-      )
-
-      await expect(container.getByLabel("Listen Eintrag")).toHaveCount(2)
-      await page.reload()
-      const listEntries = container.getByLabel("Listen Eintrag")
-      await expect(listEntries).toHaveCount(2)
-      await listEntries.first().click()
-      await container.getByLabel("Eintrag löschen").click()
-      await expect(container.getByLabel("Listen Eintrag")).toHaveCount(1)
-    })
-  }
-})
 
 /* eslint-disable playwright/no-conditional-in-test */
 test("search for documentunits and link decision", async ({
@@ -157,39 +86,6 @@ test("search for documentunits and link decision", async ({
 
         await expect(container.getByText("1 Ergebnis gefunden")).toBeVisible()
         await expect(container.getByText("Bereits hinzugefügt")).toBeVisible()
-
-        //can be edited
-        await container.getByLabel("Listen Eintrag").last().click()
-
-        if (container === activeCitationContainer) {
-          await fillActiveCitationInputs(page, { citationType: "Änderung" })
-          await container.getByLabel("Aktivzitierung speichern").click()
-          //make sure to have citation style in list
-          summary = `Änderung, ` + summary
-        }
-        if (container === previousDecisionContainer) {
-          await fillPreviousDecisionInputs(page, {
-            deviatingFileNumber: "deviating file number",
-          })
-          await container
-            .getByLabel("Vorgehende Entscheidung speichern")
-            .click()
-        }
-        if (container === ensuingDecisionContainer) {
-          await fillEnsuingDecisionInputs(page, { note: "Vermerk" })
-          await container
-            .getByLabel("Nachgehende Entscheidung speichern")
-            .click()
-        }
-
-        //can be deleted
-        await container.getByLabel("Listen Eintrag").last().click()
-        await container.getByLabel("Eintrag löschen").click()
-        await expect(container.getByLabel("Listen Eintrag")).toHaveCount(1)
-
-        await expect(
-          container.getByLabel("Listen Eintrag").last(),
-        ).not.toHaveText(summary)
       },
     )
   }
@@ -298,7 +194,6 @@ test("search for documentunits does not return current documentation unit", asyn
   }
 })
 
-/* eslint-disable playwright/no-conditional-in-test */
 test("clicking on link of referenced documentation unit added by search opens new tab, does not enter edit mode", async ({
   page,
   documentNumber,

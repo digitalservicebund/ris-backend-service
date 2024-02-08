@@ -55,7 +55,8 @@ public class DocumentationUnitTransformer {
     DocumentationUnitDTO.DocumentationUnitDTOBuilder builder =
         currentDto.toBuilder()
             .id(updatedDomainObject.uuid())
-            .documentNumber(updatedDomainObject.documentNumber());
+            .documentNumber(updatedDomainObject.documentNumber())
+            .references(currentDto.getReferences());
 
     if (updatedDomainObject.coreData() != null) {
       var coreData = updatedDomainObject.coreData();
@@ -409,6 +410,7 @@ public class DocumentationUnitTransformer {
     addDeviatingCourtsToDomain(documentationUnitDTO, coreDataBuilder);
     addDeviatingEclisToDomain(documentationUnitDTO, coreDataBuilder);
     addDeviatingDecisionDatesToDomain(documentationUnitDTO, coreDataBuilder);
+    addReferencesToDomain(documentationUnitDTO, coreDataBuilder);
 
     DocumentTypeDTO documentTypeDTO = documentationUnitDTO.getDocumentType();
     if (documentTypeDTO != null) {
@@ -612,6 +614,21 @@ public class DocumentationUnitTransformer {
     List<String> fileNumbers =
         documentationUnitDTO.getFileNumbers().stream().map(FileNumberDTO::getValue).toList();
     coreDataBuilder.fileNumbers(fileNumbers);
+  }
+
+  private static void addReferencesToDomain(
+      DocumentationUnitDTO documentationUnitDTO, CoreDataBuilder coreDataBuilder) {
+    if (documentationUnitDTO.getFileNumbers() == null) {
+      return;
+    }
+
+    List<String> references =
+        documentationUnitDTO.getReferences().stream()
+            .filter(
+                referenceDTO -> Objects.equals(referenceDTO.getLegalPeriodicalRawValue(), "NSW"))
+            .map(referennceDTO -> referennceDTO.getCitation().replace(" (BGH-intern)", ""))
+            .toList();
+    coreDataBuilder.leadingDecisionNormReferences(references);
   }
 
   private static void addEnsuingDecisionsToDomain(

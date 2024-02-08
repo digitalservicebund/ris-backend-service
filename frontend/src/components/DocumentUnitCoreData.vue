@@ -215,6 +215,17 @@ watch(
         ></TextInput>
       </InputField>
     </div>
+    <!--          :read-only="modelValue.documentationOffice?.abbreviation !== 'BGH'"-->
+
+    <div v-if="modelValue.court?.label === 'BGH'" class="flex flex-row gap-24">
+      <InputField id="leadingDecisionNormReferences" label="NSW-Fundstellen">
+        <ChipsInput
+          id="leadingDecisionNormReferences"
+          v-model="modelValue.leadingDecisionNormReferences"
+          aria-label="NSW-Fundstellen"
+        ></ChipsInput>
+      </InputField>
+    </div>
 
     <div class="mt-4">* Pflichtfelder zum Veröffentlichen</div>
   </div>

@@ -104,6 +104,6 @@ export const previousDecisionFieldLabels: { [name: string]: string } = {
   court: "Gericht",
   decisionDate: "Entscheidungsdatum",
   fileNumber: "Aktenzeichen",
-  deviatingFileNumber: "Abweichendes Aktenzeichen",
+  deviatingFileNumber: "Abweichendes Aktenzeichen Vorinstanz",
   documentType: "Dokumenttyp",
 }
