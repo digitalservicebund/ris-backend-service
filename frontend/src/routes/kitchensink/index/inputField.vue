@@ -1,11 +1,12 @@
 <script lang="ts" setup>
 import { computed, ref } from "vue"
-import CheckboxInput from "@/components/CheckboxInput.vue"
-import InputField from "@/components/InputField.vue"
-import { LabelPosition } from "@/components/utils/enumLabelPosition"
-import { ValidationError } from "@/components/utils/types"
 import KitchensinkPage from "@/kitchensink/components/KitchensinkPage.vue"
 import KitchensinkStory from "@/kitchensink/components/KitchensinkStory.vue"
+import CheckboxInput from "@/shared/components/input/CheckboxInput.vue"
+import InputField, {
+  LabelPosition,
+} from "@/shared/components/input/InputField.vue"
+import { ValidationError } from "@/shared/components/input/types"
 
 const showValidationErrors = ref(false)
 

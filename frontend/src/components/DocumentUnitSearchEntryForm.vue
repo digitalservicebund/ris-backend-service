@@ -1,16 +1,17 @@
 <script lang="ts" setup>
 import { computed, onMounted, onUnmounted, ref, watch } from "vue"
-import { LabelPosition } from "./utils/enumLabelPosition"
-import Checkbox from "@/components/CheckboxInput.vue"
-import DateInput from "@/components/DateInput.vue"
-import DropdownInput from "@/components/DropdownInput.vue"
-import InputField from "@/components/InputField.vue"
-import TextButton from "@/components/TextButton.vue"
-import TextInput from "@/components/TextInput.vue"
-import { DropdownItem, ValidationError } from "@/components/utils/types"
 import useQuery, { Query } from "@/composables/useQueryFromRoute"
 import { useValidationStore } from "@/composables/useValidationStore"
 import { PublicationState } from "@/domain/documentUnit"
+import Checkbox from "@/shared/components/input/CheckboxInput.vue"
+import DateInput from "@/shared/components/input/DateInput.vue"
+import DropdownInput from "@/shared/components/input/DropdownInput.vue"
+import InputField, {
+  LabelPosition,
+} from "@/shared/components/input/InputField.vue"
+import TextButton from "@/shared/components/input/TextButton.vue"
+import TextInput from "@/shared/components/input/TextInput.vue"
+import { DropdownItem, ValidationError } from "@/shared/components/input/types"
 
 defineProps<{
   isLoading?: boolean
@@ -242,8 +243,7 @@ export type DocumentUnitSearchParameter =
             @blur="validateSearchInput"
             @focus="resetErrors(id as DocumentUnitSearchParameter)"
             @update:validation-error="
-              (validationError: ValidationError | undefined) =>
-                handleLocalInputError(validationError, id)
+              (validationError) => handleLocalInputError(validationError, id)
             "
           ></DateInput>
         </InputField>
@@ -266,8 +266,7 @@ export type DocumentUnitSearchParameter =
             @blur="validateSearchInput"
             @focus="resetErrors(id as DocumentUnitSearchParameter)"
             @update:validation-error="
-              (validationError: ValidationError | undefined) =>
-                handleLocalInputError(validationError, id)
+              (validationError) => handleLocalInputError(validationError, id)
             "
           ></DateInput>
         </InputField>

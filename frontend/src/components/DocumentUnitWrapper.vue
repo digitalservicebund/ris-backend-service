@@ -3,13 +3,13 @@ import dayjs from "dayjs"
 import { computed, ref, watchEffect } from "vue"
 import { useRoute, useRouter } from "vue-router"
 import DocumentUnitInfoPanel from "@/components/DocumentUnitInfoPanel.vue"
-import NavbarSide from "@/components/NavbarSide.vue"
-import SideToggle from "@/components/SideToggle.vue"
 import { useCaseLawMenuItems } from "@/composables/useCaseLawMenuItems"
 import { useStatusBadge } from "@/composables/useStatusBadge"
 import { useToggleStateInRouteQuery } from "@/composables/useToggleStateInRouteQuery"
 import DocumentUnit from "@/domain/documentUnit"
 import { ServiceResponse } from "@/services/httpClient"
+import NavbarSide from "@/shared/components/NavbarSide.vue"
+import SideToggle from "@/shared/components/SideToggle.vue"
 
 const props = defineProps<{
   documentUnit: DocumentUnit

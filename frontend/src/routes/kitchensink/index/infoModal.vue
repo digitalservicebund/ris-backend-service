@@ -1,8 +1,8 @@
 <script lang="ts" setup>
-import InfoModal from "@/components/InfoModal.vue"
-import { InfoStatus } from "@/components/utils/enumInfoStatus"
 import KitchensinkPage from "@/kitchensink/components/KitchensinkPage.vue"
 import KitchensinkStory from "@/kitchensink/components/KitchensinkStory.vue"
+import { InfoStatus } from "@/shared/components/enumInfoStatus"
+import InfoModal from "@/shared/components/InfoModal.vue"
 </script>
 
 <template>

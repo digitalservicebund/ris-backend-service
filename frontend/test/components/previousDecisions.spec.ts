@@ -1,11 +1,11 @@
 import { userEvent } from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
 import PreviousDecisions from "@/components/PreviousDecisions.vue"
-import { ComboboxItem } from "@/components/utils/types"
 import { Court, DocumentType } from "@/domain/documentUnit"
 import PreviousDecision from "@/domain/previousDecision"
 import comboboxItemService from "@/services/comboboxItemService"
 import documentUnitService from "@/services/documentUnitService"
+import { ComboboxItem } from "@/shared/components/input/types"
 
 function renderComponent(options?: { modelValue?: PreviousDecision[] }) {
   const props = {

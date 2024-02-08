@@ -1,8 +1,8 @@
 import httpClient, { ServiceResponse } from "./httpClient"
-import { Page } from "@/components/Pagination.vue"
 import { Procedure } from "@/domain/documentUnit"
 import DocumentUnitListEntry from "@/domain/documentUnitListEntry"
-import errorMessages from "@/i18n/errors.json"
+import { Page } from "@/shared/components/Pagination.vue"
+import errorMessages from "@/shared/i18n/errors.json"
 
 interface ProcedureService {
   get(

@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { ref } from "vue"
-import InputField from "@/components/InputField.vue"
-import TextAreaInput from "@/components/TextAreaInput.vue"
-import { ValidationError } from "@/components/utils/types"
 import KitchensinkPage from "@/kitchensink/components/KitchensinkPage.vue"
 import KitchensinkStory from "@/kitchensink/components/KitchensinkStory.vue"
+import InputField from "@/shared/components/input/InputField.vue"
+import TextAreaInput from "@/shared/components/input/TextAreaInput.vue"
+import { ValidationError } from "@/shared/components/input/types"
 
 const validationError = ref<ValidationError>({
   message: "Invalid value",

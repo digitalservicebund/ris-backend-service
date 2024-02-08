@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import InlineDecision from "./InlineDecision.vue"
-import LoadingSpinner from "@/components/LoadingSpinner.vue"
-import TextButton from "@/components/TextButton.vue"
 import RelatedDocumentation from "@/domain/relatedDocumentation"
+import TextButton from "@/shared/components/input/TextButton.vue"
+import LoadingSpinner from "@/shared/components/LoadingSpinner.vue"
 
 defineProps<{
   searchResults?: SearchResults<RelatedDocumentation>

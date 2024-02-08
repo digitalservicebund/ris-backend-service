@@ -2,9 +2,12 @@
 import { userEvent } from "@testing-library/user-event"
 import { render, screen, fireEvent } from "@testing-library/vue"
 import ComboboxInput from "@/components/ComboboxInput.vue"
-import { ComboboxItem, ComboboxAttributes } from "@/components/utils/types"
 import { Court } from "@/domain/documentUnit"
 import service from "@/services/comboboxItemService"
+import {
+  ComboboxItem,
+  ComboboxAttributes,
+} from "@/shared/components/input/types"
 
 function renderComponent(
   options: {

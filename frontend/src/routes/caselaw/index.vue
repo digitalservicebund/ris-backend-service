@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { useRouter } from "vue-router"
 import DocumentUnitSearch from "@/components/DocumentUnitSearch.vue"
-import TextButton from "@/components/TextButton.vue"
+import TextButton from "@/shared/components/input/TextButton.vue"
 
 const router = useRouter()
 </script>

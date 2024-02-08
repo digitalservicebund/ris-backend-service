@@ -1,7 +1,7 @@
 import httpClient, { ServiceResponse } from "./httpClient"
-import { Page, PageableService } from "@/components/Pagination.vue"
 import { FieldOfLawNode } from "@/domain/fieldOfLaw"
-import errorMessages from "@/i18n/errors.json"
+import { Page, PageableService } from "@/shared/components/Pagination.vue"
+import errorMessages from "@/shared/i18n/errors.json"
 
 interface FieldOfLawService {
   getSelectedFieldsOfLaw(

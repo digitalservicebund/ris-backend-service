@@ -1,10 +1,10 @@
 @ -1,59 +0,0 @@
 <script lang="ts" setup>
 import { h } from "vue"
-import { withSummarizer } from "@/components/DataSetSummary.vue"
 import ExpandableDataSet from "@/components/ExpandableDataSet.vue"
 import KitchensinkPage from "@/kitchensink/components/KitchensinkPage.vue"
 import KitchensinkStory from "@/kitchensink/components/KitchensinkStory.vue"
+import { withSummarizer } from "@/shared/components/DataSetSummary.vue"
 import IconErrorOutline from "~icons/ic/baseline-error-outline"
 
 function demoSummarizer(dataEntry: undefined) {

@@ -1,7 +1,7 @@
 <script lang="ts" setup>
-import TextEditor from "@/components/utils/TextEditor.vue"
 import KitchensinkPage from "@/kitchensink/components/KitchensinkPage.vue"
 import KitchensinkStory from "@/kitchensink/components/KitchensinkStory.vue"
+import TextEditor from "@/shared/components/input/TextEditor.vue"
 </script>
 
 <template>

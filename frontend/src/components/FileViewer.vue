@@ -1,11 +1,11 @@
 <script lang="ts" setup>
 import dayjs from "dayjs"
 import { computed, ref } from "vue"
-import LoadingSpinner from "@/components/LoadingSpinner.vue"
-import PopupModal from "@/components/PopupModal.vue"
-import PropertyInfo from "@/components/PropertyInfo.vue"
-import TextButton from "@/components/TextButton.vue"
-import TextEditor from "@/components/TextEditor.vue"
+import TextButton from "@/shared/components/input/TextButton.vue"
+import TextEditor from "@/shared/components/input/TextEditor.vue"
+import LoadingSpinner from "@/shared/components/LoadingSpinner.vue"
+import PopupModal from "@/shared/components/PopupModal.vue"
+import PropertyInfo from "@/shared/components/PropertyInfo.vue"
 import IconDelete from "~icons/ic/outline-delete"
 
 const props = defineProps<{

@@ -1,9 +1,9 @@
 <script lang="ts" setup>
 import dayjs from "dayjs"
 import { computed } from "vue"
-import LoadingSpinner from "@/components/LoadingSpinner.vue"
 import { Procedure } from "@/domain/documentUnit"
 import DocumentUnitListEntry from "@/domain/documentUnitListEntry"
+import LoadingSpinner from "@/shared/components/LoadingSpinner.vue"
 
 const props = defineProps<{
   procedure: Procedure

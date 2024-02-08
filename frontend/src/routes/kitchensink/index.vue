@@ -1,7 +1,9 @@
 <script lang="ts" setup>
 import { computed, watchEffect, watch } from "vue"
 import { useRouter } from "vue-router"
-import NavbarSide, { LevelOneMenuItem } from "@/components/NavbarSide.vue"
+import NavbarSide, {
+  LevelOneMenuItem,
+} from "@/shared/components/NavbarSide.vue"
 
 const router = useRouter()
 

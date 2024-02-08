@@ -1,12 +1,7 @@
 <script lang="ts" setup>
 import { computed, onMounted, onBeforeUnmount, ref, watch } from "vue"
 import SearchResultList, { SearchResults } from "./SearchResultList.vue"
-import DateInput from "@/components//DateInput.vue"
-import InputField from "@/components//InputField.vue"
-import TextButton from "@/components//TextButton.vue"
-import TextInput from "@/components//TextInput.vue"
 import ComboboxInput from "@/components/ComboboxInput.vue"
-import Pagination, { Page } from "@/components/Pagination.vue"
 import { useValidationStore } from "@/composables/useValidationStore"
 import values from "@/data/values.json"
 import ActiveCitation from "@/domain/activeCitation"
@@ -14,6 +9,11 @@ import { CitationType } from "@/domain/citationType"
 import RelatedDocumentation from "@/domain/relatedDocumentation"
 import ComboboxItemService from "@/services/comboboxItemService"
 import documentUnitService from "@/services/documentUnitService"
+import DateInput from "@/shared/components/input/DateInput.vue"
+import InputField from "@/shared/components/input/InputField.vue"
+import TextButton from "@/shared/components/input/TextButton.vue"
+import TextInput from "@/shared/components/input/TextInput.vue"
+import Pagination, { Page } from "@/shared/components/Pagination.vue"
 
 const props = defineProps<{
   modelValue?: ActiveCitation

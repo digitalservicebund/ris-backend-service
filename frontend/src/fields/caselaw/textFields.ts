@@ -1,6 +1,6 @@
-import TextAreaInput from "@/components/TextAreaInput.vue"
-import TextInput from "@/components/TextInput.vue"
-import { TextAreaInputAttributes } from "@/components/utils/types"
+import TextAreaInput from "@/shared/components/input/TextAreaInput.vue"
+import TextInput from "@/shared/components/input/TextInput.vue"
+import { TextAreaInputAttributes } from "@/shared/components/input/types"
 
 function defineTextEntry(
   name: string,

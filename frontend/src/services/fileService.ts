@@ -1,6 +1,6 @@
 import httpClient, { ServiceResponse } from "./httpClient"
 import { Docx2HTML } from "@/domain/docx2html"
-import errorMessages from "@/i18n/errors.json"
+import errorMessages from "@/shared/i18n/errors.json"
 
 interface FileService {
   upload(

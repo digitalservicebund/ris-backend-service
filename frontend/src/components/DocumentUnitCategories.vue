@@ -8,8 +8,6 @@ import DocumentUnitWrapper from "@/components/DocumentUnitWrapper.vue"
 import EnsuingDecisions from "@/components/EnsuingDecisions.vue"
 import OriginalFileSidePanel from "@/components/OriginalFileSidePanel.vue"
 import PreviousDecisions from "@/components/PreviousDecisions.vue"
-import SideToggle, { OpeningDirection } from "@/components/SideToggle.vue"
-import { ValidationError } from "@/components/utils/types"
 import { useScrollToHash } from "@/composables/useScrollToHash"
 import { useToggleStateInRouteQuery } from "@/composables/useToggleStateInRouteQuery"
 import DocumentUnit, { Texts, CoreData } from "@/domain/documentUnit"
@@ -19,6 +17,10 @@ import PreviousDecision from "@/domain/previousDecision"
 import documentUnitService from "@/services/documentUnitService"
 import fileService from "@/services/fileService"
 import { ServiceResponse } from "@/services/httpClient"
+import { ValidationError } from "@/shared/components/input/types"
+import SideToggle, {
+  OpeningDirection,
+} from "@/shared/components/SideToggle.vue"
 
 const props = defineProps<{
   documentUnit: DocumentUnit

@@ -1,6 +1,6 @@
 import httpClient, { ServiceResponse } from "./httpClient"
 import { User } from "@/domain/user"
-import errorMessages from "@/i18n/errors.json"
+import errorMessages from "@/shared/i18n/errors.json"
 
 export const loginEndpoint = "/oauth2/authorization/oidcclient"
 

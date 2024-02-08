@@ -1,11 +1,14 @@
 import httpClient, { ServiceResponse } from "./httpClient"
-import { Page } from "@/components/Pagination.vue"
-import { ComboboxInputModelType, ComboboxItem } from "@/components/utils/types"
 import { CitationType } from "@/domain/citationType"
 import { Court, Procedure, DocumentType } from "@/domain/documentUnit"
 import { FieldOfLawNode } from "@/domain/fieldOfLaw"
 import { NormAbbreviation } from "@/domain/normAbbreviation"
-import errorMessages from "@/i18n/errors.json"
+import {
+  ComboboxInputModelType,
+  ComboboxItem,
+} from "@/shared/components/input/types"
+import { Page } from "@/shared/components/Pagination.vue"
+import errorMessages from "@/shared/i18n/errors.json"
 
 enum Endpoint {
   documentTypes = "documenttypes",

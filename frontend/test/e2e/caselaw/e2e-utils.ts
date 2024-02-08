@@ -1,4 +1,4 @@
-import { expect, Page, JSHandle } from "@playwright/test"
+import { expect, Page } from "@playwright/test"
 import { generateString } from "../../test-helper/dataGenerators"
 
 export const navigateToCategories = async (
@@ -354,29 +354,5 @@ export async function checkIfPreviousDecisionCleared(page: Page) {
     "Dokumenttyp Vorgehende Entscheidung",
   ].forEach((ariaLabel) =>
     waitForInputValue(page, `[aria-label='${ariaLabel}']`, ""),
-  )
-}
-
-export async function createDataTransfer(
-  page: Page,
-  fileContent: Buffer,
-  fileName: string,
-  fileType: string,
-): Promise<JSHandle<DataTransfer>> {
-  return page.evaluateHandle(
-    async ({ buffer, fileName, fileType }) => {
-      const blob = await fetch(buffer).then((value) => value.blob())
-      const file = new File([blob], fileName, { type: fileType })
-      const data = new DataTransfer()
-      data.items.add(file)
-      return data
-    },
-    {
-      buffer: `data:application/octet-stream;base64,${fileContent.toString(
-        "base64",
-      )}`,
-      fileName,
-      fileType,
-    },
   )
 }

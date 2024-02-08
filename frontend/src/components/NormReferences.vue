@@ -1,9 +1,9 @@
 <script lang="ts" setup>
 import { computed, h } from "vue"
-import { withSummarizer } from "@/components/DataSetSummary.vue"
 import EditableList from "@/components/EditableListCaselaw.vue"
 import NormReferenceInput from "@/components/NormReferenceInput.vue"
 import NormReference from "@/domain/normReference"
+import { withSummarizer } from "@/shared/components/DataSetSummary.vue"
 import IconErrorOutline from "~icons/ic/baseline-error-outline"
 
 const props = defineProps<{

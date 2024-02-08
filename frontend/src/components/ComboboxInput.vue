@@ -5,7 +5,7 @@ import {
   ComboboxAttributes,
   ComboboxInputModelType,
   ComboboxItem,
-} from "@/components/utils/types"
+} from "@/shared/components/input/types"
 import IconKeyboardArrowDown from "~icons/ic/baseline-keyboard-arrow-down"
 import IconKeyboardArrowUp from "~icons/ic/baseline-keyboard-arrow-up"
 import IconClear from "~icons/material-symbols/close-small"

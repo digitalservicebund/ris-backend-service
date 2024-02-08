@@ -1,9 +1,9 @@
 <script lang="ts" setup>
 import type { Component } from "vue"
 import { ref } from "vue"
-import DataSetSummary from "@/components/DataSetSummary.vue"
 import ExpandableContent from "@/components/ExpandableContent.vue"
-import TextButton from "@/components/TextButton.vue"
+import DataSetSummary from "@/shared/components/DataSetSummary.vue"
+import TextButton from "@/shared/components/input/TextButton.vue"
 import IconExpandLess from "~icons/ic/baseline-expand-less"
 import IconExpandMore from "~icons/ic/baseline-expand-more"
 
