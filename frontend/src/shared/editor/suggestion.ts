@@ -60,7 +60,10 @@ function createSuggestionExtensionOptions(
     HTMLAttributes: {
       class: options.elementClasses?.join(" "),
     },
-    renderLabel({ node }) {
+    renderText({ node }) {
+      return `${node.attrs.label}`
+    },
+    renderHTML({ node }) {
       return `${node.attrs.label}`
     },
     suggestion: {
