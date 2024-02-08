@@ -131,16 +131,6 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
     // ---
     // Doing database-related (pre) transformation
 
-    //      if (documentUnit.coreData().documentType() != null) {
-    //
-    // documentationUnitDTO.setDocumentType(getDbDocType(documentUnit.coreData().documentType()));
-    //      }
-
-    //      if (documentUnit.coreData().procedure() != null) {
-    //        documentationUnitDTO.setProcedures(getDbProcedures(documentUnit,
-    // documentationUnitDTO));
-    //      }
-
     if (documentUnit.coreData() != null) {
       documentationUnitDTO.getRegions().clear();
       if (documentUnit.coreData().court() != null && documentUnit.coreData().court().id() != null) {
@@ -148,6 +138,10 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
             databaseCourtRepository.findById(documentUnit.coreData().court().id());
         if (court.isPresent() && court.get().getRegion() != null) {
           documentationUnitDTO.getRegions().add(court.get().getRegion());
+        }
+        // delete leading decision norm references if court is not BGH
+        if (court.isPresent() && !court.get().getType().equals("BGH")) {
+          documentUnit.coreData().leadingDecisionNormReferences().clear();
         }
       }
 
@@ -159,7 +153,9 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
 
       List<ReferenceDTO> existingReferences = new ArrayList<>(documentationUnitDTO.getReferences());
 
-      // insert leading decision norm references after other existing references
+      // TODO we temporarily save the leading decision norm references in the reference table. In
+      // the future with RISDEV-3336, they will be saved in a dedicated table and this
+      // transformation outside of the transformer won't be necessary anymore
       AtomicInteger i =
           new AtomicInteger(
               existingReferences.stream()
@@ -172,7 +168,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
                   // existing references that are no leading decision norm references
                   existingReferences.stream()
                       .filter(r -> !r.getLegalPeriodicalRawValue().equals("NSW")),
-                  // leading decision norm references
+                  // leading decision norm references from client
                   leadingDecisionNormReferences.orElse(List.of()).stream()
                       .map(
                           reference ->
