@@ -30,9 +30,7 @@ public class LeadingDecisionNormReferenceDTO {
   @JoinColumn(name = "documentation_unit_id")
   private DocumentationUnitDTO documentationUnit;
 
-  @ManyToOne
   @MapsId("normReferenceId")
-  @JoinColumn(name = "norm_reference")
   private String normReference;
 
   private int rank;
