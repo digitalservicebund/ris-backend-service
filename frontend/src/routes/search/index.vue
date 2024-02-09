@@ -13,8 +13,8 @@ const isLoading = ref(false)
 const hasError = ref(false)
 const message = ref("")
 const TIMEOUT = 10000
-const searchResults = ref<SearchApiDataDTO[]>()
-const currentPage = ref<Page<SearchApiDataDTO>>()
+const searchResults = ref<SearchApiDataDTO[] | undefined>()
+const currentPage = ref<Page<SearchApiDataDTO> | undefined>()
 
 // mimics Page<SearchApiDataDTO>
 type SearchApiDTOServerMock = {
@@ -40,16 +40,21 @@ async function handleSearchSubmit() {
   isLoading.value = true
   message.value = "Loading ..."
   hasError.value = false
+  currentPage.value = undefined
+  searchResults.value = undefined
   try {
     const response = await httpClient.get<
-      string | FailedValidationServerResponse
+      Page<SearchApiDataDTO> | FailedValidationServerResponse
     >(`search?query=${encodeURIComponent(searchInput.value)}`, {
       timeout: TIMEOUT,
     })
     if (response.status == 504) {
       message.value = "Request timed out"
     } else if (response.status === 200 && response.data) {
-      message.value = response.data as string
+      message.value = ""
+      const page = response.data as Page<SearchApiDataDTO>
+      currentPage.value = page
+      searchResults.value = page.content
     } else {
       hasError.value = true
       const errorResponse = response.data as FailedValidationServerResponse
