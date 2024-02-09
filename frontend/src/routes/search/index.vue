@@ -6,21 +6,25 @@ import httpClient, {
 import InputField from "@/shared/components/input/InputField.vue"
 import TextButton from "@/shared/components/input/TextButton.vue"
 import TextInput from "@/shared/components/input/TextInput.vue"
+import Pagination, { Page } from "@/shared/components/Pagination.vue"
 
 const searchInput = ref("")
 const isLoading = ref(false)
 const hasError = ref(false)
 const message = ref("")
 const TIMEOUT = 10000
-const searchResults = ref<SearchApiDTO | null>(null)
+const searchResults = ref<SearchApiDataDTO[]>()
+const currentPage = ref<Page<SearchApiDataDTO>>()
 
-type SearchApiDTO = {
-  totalItems: number
-  data: SearchApiDataDTO[]
-  next: string
-  prev: string
-  totalResults: number
-  totalPages: number
+// mimics Page<SearchApiDataDTO>
+type SearchApiDTOServerMock = {
+  size: number
+  content: SearchApiDataDTO[]
+  first: boolean
+  last: boolean
+  empty: boolean
+  number: number
+  numberOfElements: number
 }
 
 type SearchApiDataDTO = {
@@ -60,9 +64,9 @@ async function handleSearchSubmit() {
 }
 
 function handleMockClick() {
-  searchResults.value = {
-    totalItems: 2,
-    data: [
+  const mockApiResponse: SearchApiDTOServerMock = {
+    size: 10,
+    content: [
       {
         documentNumber: "ABCD000012345",
         reference: ["II 1234/56 A"],
@@ -80,11 +84,14 @@ function handleMockClick() {
         documentType: "Urteil",
       },
     ],
-    next: "",
-    prev: "",
-    totalResults: 2,
-    totalPages: 1,
+    first: true,
+    last: true,
+    empty: false,
+    number: 1,
+    numberOfElements: 2,
   }
+  currentPage.value = mockApiResponse
+  searchResults.value = mockApiResponse.content
 }
 </script>
 
@@ -168,80 +175,86 @@ function handleMockClick() {
       </div>
       <p :class="{ 'text-red-700': hasError }">{{ message }}</p>
     </div>
-    <div
-      v-if="searchResults && searchResults.data.length > 0"
-      class="relative mt-8 table w-full border-separate"
+    <Pagination
+      :is-loading="isLoading"
+      navigation-position="bottom"
+      :page="currentPage"
     >
       <div
-        class="ds-label-02-bold sticky top-0 table-row bg-white text-gray-900"
+        v-if="searchResults && searchResults.length > 0"
+        class="relative mt-8 table w-full border-separate"
       >
         <div
-          class="table-cell border-b-2 border-solid border-blue-300 px-16 py-12"
+          class="ds-label-02-bold sticky top-0 table-row bg-white text-gray-900"
         >
-          Dokumentnummer
+          <div
+            class="table-cell border-b-2 border-solid border-blue-300 px-16 py-12"
+          >
+            Dokumentnummer
+          </div>
+          <div
+            class="table-cell border-b-2 border-solid border-blue-300 px-16 py-12"
+          >
+            Referenzen
+          </div>
+          <div
+            class="table-cell border-b-2 border-solid border-blue-300 px-16 py-12"
+          >
+            Gericht
+          </div>
+          <div
+            class="table-cell border-b-2 border-solid border-blue-300 px-16 py-12"
+          >
+            Ort
+          </div>
+          <div
+            class="table-cell border-b-2 border-solid border-blue-300 px-16 py-12"
+          >
+            Entscheidungsdatum
+          </div>
+          <div
+            class="table-cell border-b-2 border-solid border-blue-300 px-16 py-12"
+          >
+            Dokumenttyp
+          </div>
         </div>
         <div
-          class="table-cell border-b-2 border-solid border-blue-300 px-16 py-12"
+          v-for="(item, index) in searchResults"
+          :key="index"
+          class="ds-label-01-reg table-row hover:bg-gray-100"
         >
-          Referenzen
-        </div>
-        <div
-          class="table-cell border-b-2 border-solid border-blue-300 px-16 py-12"
-        >
-          Gericht
-        </div>
-        <div
-          class="table-cell border-b-2 border-solid border-blue-300 px-16 py-12"
-        >
-          Ort
-        </div>
-        <div
-          class="table-cell border-b-2 border-solid border-blue-300 px-16 py-12"
-        >
-          Entscheidungsdatum
-        </div>
-        <div
-          class="table-cell border-b-2 border-solid border-blue-300 px-16 py-12"
-        >
-          Dokumenttyp
+          <div
+            class="table-cell min-h-56 border-b-1 border-blue-300 px-16 py-12 align-middle"
+          >
+            {{ item.documentNumber }}
+          </div>
+          <div
+            class="table-cell border-b-1 border-blue-300 px-16 py-12 align-middle"
+          >
+            {{ item.reference.join(", ") }}
+          </div>
+          <div
+            class="table-cell border-b-1 border-blue-300 px-16 py-12 align-middle"
+          >
+            {{ item.court }}
+          </div>
+          <div
+            class="table-cell border-b-1 border-blue-300 px-16 py-12 align-middle"
+          >
+            {{ item.location }}
+          </div>
+          <div
+            class="table-cell border-b-1 border-blue-300 px-16 py-12 align-middle"
+          >
+            {{ item.decisionDate }}
+          </div>
+          <div
+            class="table-cell border-b-1 border-blue-300 px-16 py-12 align-middle"
+          >
+            {{ item.documentType }}
+          </div>
         </div>
       </div>
-      <div
-        v-for="(item, index) in searchResults.data"
-        :key="index"
-        class="ds-label-01-reg table-row hover:bg-gray-100"
-      >
-        <div
-          class="table-cell min-h-56 border-b-1 border-blue-300 px-16 py-12 align-middle"
-        >
-          {{ item.documentNumber }}
-        </div>
-        <div
-          class="table-cell border-b-1 border-blue-300 px-16 py-12 align-middle"
-        >
-          {{ item.reference.join(", ") }}
-        </div>
-        <div
-          class="table-cell border-b-1 border-blue-300 px-16 py-12 align-middle"
-        >
-          {{ item.court }}
-        </div>
-        <div
-          class="table-cell border-b-1 border-blue-300 px-16 py-12 align-middle"
-        >
-          {{ item.location }}
-        </div>
-        <div
-          class="table-cell border-b-1 border-blue-300 px-16 py-12 align-middle"
-        >
-          {{ item.decisionDate }}
-        </div>
-        <div
-          class="table-cell border-b-1 border-blue-300 px-16 py-12 align-middle"
-        >
-          {{ item.documentType }}
-        </div>
-      </div>
-    </div>
+    </Pagination>
   </header>
 </template>

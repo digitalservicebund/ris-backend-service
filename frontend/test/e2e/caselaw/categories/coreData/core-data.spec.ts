@@ -272,7 +272,7 @@ test.describe("core data", () => {
     })
   })
 
-  test("ensure that leadingDecisionNormReferences are visible, savable, and deletable for the BGH", async ({
+  test("ensure that leadingDecisionNormReferences are visible, savable, and deletable for the BGH and not for others", async ({
     page,
     documentNumber,
   }) => {
@@ -281,8 +281,6 @@ test.describe("core data", () => {
     const CITATION = "1968, 249-252 (ST)"
     const nswChipTag = page.locator(`text=${CITATION}`)
     await expect(nswButton).toBeHidden()
-
-    // Addiding tag to list
 
     await waitForSaving(
       async () => {
@@ -295,7 +293,10 @@ test.describe("core data", () => {
       page,
       { clickSaveButton: true },
     )
-    await expect(nswChipTag).toBeVisible()
+    await expect(
+      nswChipTag,
+      "NSW Fundstelle is not visible for BGH",
+    ).toBeVisible()
 
     await waitForSaving(
       async () => {
@@ -307,6 +308,13 @@ test.describe("core data", () => {
       page,
       { clickSaveButton: true },
     )
-    await expect(nswChipTag).toBeHidden()
+    await expect(nswChipTag, "Citation was not deleted").toBeHidden()
+
+    await page.locator("[aria-label='Gericht']").fill("AG Aalen")
+    await page.locator("text=AG Aalen").click()
+    await expect(
+      nswButton,
+      "NSW Fundstelle is visible for other courts",
+    ).toBeHidden()
   })
 })
