@@ -87,24 +87,24 @@ This document will help Developers in NeuRIS to setup the new schema with data i
 13. Build the ris-data-migration application into a jar
 
     ```bash
-    ./gradlew bootJar
+    ./gradlew :cli:bootJar
     ```
 
 14. Import the static lookup tables into your new schema (see Confluence "Wertetabellen" to find out what is static and dynamic)
     ```bash
-    java -jar build/libs/ris-data-migration.jar refdata seed
+    java -jar cli/build/libs/ris-data-migration-cli.jar refdata seed
     ```
 
 15. Import the dynamic lookup tables
 
     ```bash
-    java -jar build/libs/ris-data-migration.jar juris-table seed
+    java -jar cli/build/libs/ris-data-migration-cli.jar juris-table seed
     ```
 
 16. Import the BGH DocumentationUnits
 
     ```bash
-    java -jar build/libs/ris-data-migration.jar juris-r migrate -p juris-xml-data/
+    java -jar cli/build/libs/ris-data-migration-cli.jar juris-r migrate -p juris-xml-data/
     ```
 
 
