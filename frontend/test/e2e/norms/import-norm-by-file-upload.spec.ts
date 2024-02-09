@@ -23,9 +23,11 @@ test.describe("import a norm by uploading a file", () => {
     await page.waitForURL("/norms/norm/*/content")
     await expect(
       page.locator(
-        `text=${normData.metadataSections?.[MetadataSectionName.NORM]?.[0]?.[
-          MetadatumType.OFFICIAL_LONG_TITLE
-        ]?.[0]}`,
+        `text=${
+          normData.metadataSections?.[MetadataSectionName.NORM]?.[0]?.[
+            MetadatumType.OFFICIAL_LONG_TITLE
+          ]?.[0]
+        }`,
       ),
     ).toBeVisible()
   })
@@ -48,9 +50,11 @@ test.describe("import a norm by uploading a file", () => {
     await page.waitForURL("/norms/norm/*/content")
     await expect(
       page.locator(
-        `text=${normData.metadataSections?.[MetadataSectionName.NORM]?.[0]?.[
-          MetadatumType.OFFICIAL_LONG_TITLE
-        ]?.[0]}`,
+        `text=${
+          normData.metadataSections?.[MetadataSectionName.NORM]?.[0]?.[
+            MetadatumType.OFFICIAL_LONG_TITLE
+          ]?.[0]
+        }`,
       ),
     ).toBeVisible()
   })

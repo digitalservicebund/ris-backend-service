@@ -569,30 +569,27 @@ export function encodeMetadataSections(
   if (Object.entries(sections).length == 0) {
     return null
   }
-  const encodedMapping = mapValues(
-    sections,
-    (group, name) =>
-      group?.map((value, index) => {
-        const metadata = filterEntries(
-          value,
-          (data, key) =>
-            Object.keys(MetadatumType).includes(key) && data !== undefined,
-        ) as Metadata
+  const encodedMapping = mapValues(sections, (group, name) =>
+    group?.map((value, index) => {
+      const metadata = filterEntries(
+        value,
+        (data, key) =>
+          Object.keys(MetadatumType).includes(key) && data !== undefined,
+      ) as Metadata
 
-        const childSections = filterEntries(
-          value,
-          (data, key) =>
-            Object.keys(MetadataSectionName).includes(key) &&
-            data !== undefined,
-        ) as MetadataSections
+      const childSections = filterEntries(
+        value,
+        (data, key) =>
+          Object.keys(MetadataSectionName).includes(key) && data !== undefined,
+      ) as MetadataSections
 
-        return {
-          name,
-          order: index + 1,
-          metadata: encodeMetadata(metadata),
-          sections: encodeMetadataSections(childSections),
-        }
-      }),
+      return {
+        name,
+        order: index + 1,
+        metadata: encodeMetadata(metadata),
+        sections: encodeMetadataSections(childSections),
+      }
+    }),
   )
 
   const encodedSections = mergeValues(encodedMapping)

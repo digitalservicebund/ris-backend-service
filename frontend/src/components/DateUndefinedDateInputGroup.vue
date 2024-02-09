@@ -19,8 +19,8 @@ interface Props {
 defineProps<Props>()
 
 defineEmits<{
-  "update:dateValue": [value: string]
-  "update:undefinedDateStateValue": [value?: UndefinedDate]
+  "update:dateValue": [value: string | undefined]
+  "update:undefinedDateStateValue": [value?: string | undefined]
 }>()
 
 const ENTRY_INTO_FORCE_DATE_TRANSLATIONS: { [Value in UndefinedDate]: string } =

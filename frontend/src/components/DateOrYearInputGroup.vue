@@ -16,9 +16,9 @@ defineProps<{
 }>()
 
 defineEmits<{
-  "update:dateValue": [value: string]
-  "update:yearValue": [value: string]
-  "update:selectedInputType": [value: MetadatumType.YEAR | MetadatumType.DATE]
+  "update:dateValue": [value: string | undefined]
+  "update:yearValue": [value: string | undefined]
+  "update:selectedInputType": [value: string | undefined]
 }>()
 </script>
 
