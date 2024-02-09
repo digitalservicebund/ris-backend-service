@@ -69,7 +69,7 @@ jobs:
       - uses: gradle/gradle-build-action@e1ada08a9a43fad9770411d5dd099f25ece2569d
         with:
           gradle-version: ${{ env.GRADLE_VERSION}}
-          arguments: test -x integrationTest
+          arguments: test -x integrationTest --tests 'de.bund.digitalservice.ris.caselaw*'
           build-root-directory: ./backend
       - name: Send status to Slack
         # Third-party action, pin to commit SHA!
@@ -95,7 +95,7 @@ jobs:
       - uses: gradle/gradle-build-action@e1ada08a9a43fad9770411d5dd099f25ece2569d
         with:
           gradle-version: ${{ env.GRADLE_VERSION }}
-          arguments: integrationTest -x test
+          arguments: integrationTest -x test --tests 'de.bund.digitalservice.ris.caselaw.integration*'
           build-root-directory: ./backend
       - name: Send status to Slack
         # Third-party action, pin to commit SHA!
