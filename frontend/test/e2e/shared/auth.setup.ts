@@ -16,7 +16,7 @@ function authenticateUser(user: {
 
     await page
       .context()
-      .storageState({ path: `test/e2e/.auth/${user.name}.json` })
+      .storageState({ path: `test/e2e/shared/.auth/${user.name}.json` })
   })
 }
 
