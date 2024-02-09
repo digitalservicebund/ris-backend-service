@@ -28,6 +28,12 @@ public class RisSearchController {
   @Value("${ris-search.url:http://localhost:8090/v1/search}")
   private String risSearchUrl;
 
+  @Value("${ris-search.basic-auth.username:}")
+  private String risSearchUsername;
+
+  @Value("${ris-search.basic-auth.password:}")
+  private String risSearchPassword;
+
   private final UserService userService;
   private final WebClient webClient;
 
@@ -48,6 +54,7 @@ public class RisSearchController {
                 webClient
                     .get()
                     .uri(buildUrl(query, documentationOffice.abbreviation()))
+                    .headers(headers -> headers.setBasicAuth(risSearchUsername, risSearchPassword))
                     .retrieve()
                     .onStatus(
                         status -> true,
