@@ -1,9 +1,9 @@
 <script lang="ts" setup>
 import { ref } from "vue"
 import ComboboxInput from "@/components/ComboboxInput.vue"
+import { ComboboxInputModelType } from "@/components/input/types"
 import { FieldOfLawNode } from "@/domain/fieldOfLaw"
 import ComboboxItemService from "@/services/comboboxItemService"
-import { ComboboxInputModelType } from "@/shared/components/input/types"
 
 const emit = defineEmits<{
   "add-to-list": [item: FieldOfLawNode]

@@ -1,9 +1,9 @@
 <script lang="ts" setup generic="T extends ListItem">
 import type { Component, Ref } from "vue"
 import { ref, watch, nextTick } from "vue"
+import DataSetSummary from "@/components/DataSetSummary.vue"
+import TextButton from "@/components/input/TextButton.vue"
 import ListItem from "@/domain/editableListItem"
-import DataSetSummary from "@/shared/components/DataSetSummary.vue"
-import TextButton from "@/shared/components/input/TextButton.vue"
 import IconArrowDown from "~icons/ic/baseline-keyboard-arrow-down"
 
 interface Props {

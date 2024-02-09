@@ -4,10 +4,10 @@ import DocumentUnitList from "@/components/DocumentUnitList.vue"
 import DocumentUnitSearchEntryForm, {
   DocumentUnitSearchParameter,
 } from "@/components/DocumentUnitSearchEntryForm.vue"
+import Pagination, { Page } from "@/components/Pagination.vue"
 import { Query } from "@/composables/useQueryFromRoute"
 import DocumentUnitListEntry from "@/domain/documentUnitListEntry"
 import service from "@/services/documentUnitService"
-import Pagination, { Page } from "@/shared/components/Pagination.vue"
 
 const documentUnitListEntries = ref<DocumentUnitListEntry[]>()
 const currentPage = ref<Page<DocumentUnitListEntry>>()

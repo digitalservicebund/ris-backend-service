@@ -1,12 +1,12 @@
 <script lang="ts" setup>
 import { computed, h, ref } from "vue"
+import { withSummarizer } from "@/components/DataSetSummary.vue"
 import EditableList from "@/components/EditableListCaselaw.vue"
 import EditableListItem from "@/domain/editableListItem"
 import DummyInputGroup from "@/kitchensink/components/DummyInputGroup.vue"
 import KitchensinkPage from "@/kitchensink/components/KitchensinkPage.vue"
 import KitchensinkStory from "@/kitchensink/components/KitchensinkStory.vue"
 import DummyListItem from "@/kitchensink/domain/dummyListItem"
-import { withSummarizer } from "@/shared/components/DataSetSummary.vue"
 
 const listWithEntries = ref<DummyListItem[]>([
   new DummyListItem({ text: "foo" }),

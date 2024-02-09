@@ -1,17 +1,15 @@
 <script lang="ts" setup>
 import { computed, onMounted, onUnmounted, ref, watch } from "vue"
+import Checkbox from "@/components/input/CheckboxInput.vue"
+import DateInput from "@/components/input/DateInput.vue"
+import DropdownInput from "@/components/input/DropdownInput.vue"
+import InputField, { LabelPosition } from "@/components/input/InputField.vue"
+import TextButton from "@/components/input/TextButton.vue"
+import TextInput from "@/components/input/TextInput.vue"
+import { DropdownItem, ValidationError } from "@/components/input/types"
 import useQuery, { Query } from "@/composables/useQueryFromRoute"
 import { useValidationStore } from "@/composables/useValidationStore"
 import { PublicationState } from "@/domain/documentUnit"
-import Checkbox from "@/shared/components/input/CheckboxInput.vue"
-import DateInput from "@/shared/components/input/DateInput.vue"
-import DropdownInput from "@/shared/components/input/DropdownInput.vue"
-import InputField, {
-  LabelPosition,
-} from "@/shared/components/input/InputField.vue"
-import TextButton from "@/shared/components/input/TextButton.vue"
-import TextInput from "@/shared/components/input/TextInput.vue"
-import { DropdownItem, ValidationError } from "@/shared/components/input/types"
 
 defineProps<{
   isLoading?: boolean

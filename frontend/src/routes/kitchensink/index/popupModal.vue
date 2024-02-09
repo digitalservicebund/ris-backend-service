@@ -1,8 +1,8 @@
 <script lang="ts" setup>
 import { ref } from "vue"
+import TextButton from "@/components/input/TextButton.vue"
+import PopupModal from "@/components/PopupModal.vue"
 import KitchensinkPage from "@/kitchensink/components/KitchensinkPage.vue"
-import TextButton from "@/shared/components/input/TextButton.vue"
-import PopupModal from "@/shared/components/PopupModal.vue"
 
 const showModal = ref(false)
 const toggleModal = () => {

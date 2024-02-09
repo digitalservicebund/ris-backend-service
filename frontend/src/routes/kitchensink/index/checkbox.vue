@@ -1,11 +1,9 @@
 <script setup lang="ts">
 import { reactive } from "vue"
+import CheckboxInput from "@/components/input/CheckboxInput.vue"
+import InputField, { LabelPosition } from "@/components/input/InputField.vue"
 import KitchensinkPage from "@/kitchensink/components/KitchensinkPage.vue"
 import KitchensinkStory from "@/kitchensink/components/KitchensinkStory.vue"
-import CheckboxInput from "@/shared/components/input/CheckboxInput.vue"
-import InputField, {
-  LabelPosition,
-} from "@/shared/components/input/InputField.vue"
 
 const values = reactive({
   regular: false,

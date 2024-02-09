@@ -1,10 +1,10 @@
 <script lang="ts" setup>
 import { computed } from "vue"
+import TextEditor from "../components/input/TextEditor.vue"
 import { Texts } from "../domain/documentUnit"
-import TextEditor from "../shared/components/input/TextEditor.vue"
+import TextAreaInput from "@/components/input/TextAreaInput.vue"
+import TextInput from "@/components/input/TextInput.vue"
 import { texts as textsFields } from "@/fields/caselaw"
-import TextAreaInput from "@/shared/components/input/TextAreaInput.vue"
-import TextInput from "@/shared/components/input/TextInput.vue"
 
 const props = defineProps<{ texts: Texts }>()
 

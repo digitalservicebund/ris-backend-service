@@ -1,16 +1,16 @@
 <script lang="ts" setup>
 import { reactive, ref } from "vue"
+import { InfoStatus } from "@/components/enumInfoStatus"
+import InfoModal from "@/components/InfoModal.vue"
+import DateInput from "@/components/input/DateInput.vue"
+import InputField from "@/components/input/InputField.vue"
+import TextInput from "@/components/input/TextInput.vue"
+import TimeInput from "@/components/input/TimeInput.vue"
+import { ValidationError } from "@/components/input/types"
+import YearInput from "@/components/input/YearInput.vue"
+import NestedComponent from "@/components/NestedComponents.vue"
 import KitchensinkPage from "@/kitchensink/components/KitchensinkPage.vue"
 import KitchensinkStory from "@/kitchensink/components/KitchensinkStory.vue"
-import { InfoStatus } from "@/shared/components/enumInfoStatus"
-import InfoModal from "@/shared/components/InfoModal.vue"
-import DateInput from "@/shared/components/input/DateInput.vue"
-import InputField from "@/shared/components/input/InputField.vue"
-import TextInput from "@/shared/components/input/TextInput.vue"
-import TimeInput from "@/shared/components/input/TimeInput.vue"
-import { ValidationError } from "@/shared/components/input/types"
-import YearInput from "@/shared/components/input/YearInput.vue"
-import NestedComponent from "@/shared/components/NestedComponents.vue"
 
 const validationError = ref<ValidationError>({
   message: "Invalid value",

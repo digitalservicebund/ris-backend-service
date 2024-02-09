@@ -1,6 +1,6 @@
 <script lang="ts" setup>
+import SideToggle from "@/components/SideToggle.vue"
 import KitchensinkPage from "@/kitchensink/components/KitchensinkPage.vue"
-import SideToggle from "@/shared/components/SideToggle.vue"
 </script>
 
 <template>

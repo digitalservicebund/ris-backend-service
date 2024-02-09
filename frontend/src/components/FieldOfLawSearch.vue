@@ -1,11 +1,11 @@
 <script lang="ts" setup>
 import { ref } from "vue"
 import FieldOfLawListEntry from "@/components/FieldOfLawListEntry.vue"
+import TextButton from "@/components/input/TextButton.vue"
+import TextInput from "@/components/input/TextInput.vue"
+import Pagination, { Page } from "@/components/Pagination.vue"
 import { FieldOfLawNode } from "@/domain/fieldOfLaw"
 import service from "@/services/fieldOfLawService"
-import TextButton from "@/shared/components/input/TextButton.vue"
-import TextInput from "@/shared/components/input/TextInput.vue"
-import Pagination, { Page } from "@/shared/components/Pagination.vue"
 
 const emit = defineEmits<{
   "linkedField:clicked": [identifier: string]

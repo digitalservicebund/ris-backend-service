@@ -1,11 +1,9 @@
 <script setup lang="ts">
 import { reactive } from "vue"
+import InputField, { LabelPosition } from "@/components/input/InputField.vue"
+import RadioInput from "@/components/input/RadioInput.vue"
 import KitchensinkPage from "@/kitchensink/components/KitchensinkPage.vue"
 import KitchensinkStory from "@/kitchensink/components/KitchensinkStory.vue"
-import InputField, {
-  LabelPosition,
-} from "@/shared/components/input/InputField.vue"
-import RadioInput from "@/shared/components/input/RadioInput.vue"
 
 const radioValues = reactive({
   regular: "r1",

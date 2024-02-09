@@ -2,21 +2,19 @@
 import { watch, ref, computed, onMounted, onBeforeUnmount } from "vue"
 import SearchResultList, { SearchResults } from "./SearchResultList.vue"
 import ComboboxInput from "@/components/ComboboxInput.vue"
+import CheckboxInput from "@/components/input/CheckboxInput.vue"
+import DateInput from "@/components/input/DateInput.vue"
+import InputField, { LabelPosition } from "@/components/input/InputField.vue"
+import TextButton from "@/components/input/TextButton.vue"
+import TextInput from "@/components/input/TextInput.vue"
+import NestedComponent from "@/components/NestedComponents.vue"
+import Pagination, { Page } from "@/components/Pagination.vue"
 import { useValidationStore } from "@/composables/useValidationStore"
 import values from "@/data/values.json"
 import PreviousDecision from "@/domain/previousDecision"
 import RelatedDocumentation from "@/domain/relatedDocumentation"
 import ComboboxItemService from "@/services/comboboxItemService"
 import documentUnitService from "@/services/documentUnitService"
-import CheckboxInput from "@/shared/components/input/CheckboxInput.vue"
-import DateInput from "@/shared/components/input/DateInput.vue"
-import InputField, {
-  LabelPosition,
-} from "@/shared/components/input/InputField.vue"
-import TextButton from "@/shared/components/input/TextButton.vue"
-import TextInput from "@/shared/components/input/TextInput.vue"
-import NestedComponent from "@/shared/components/NestedComponents.vue"
-import Pagination, { Page } from "@/shared/components/Pagination.vue"
 
 const props = defineProps<{
   modelValue?: PreviousDecision

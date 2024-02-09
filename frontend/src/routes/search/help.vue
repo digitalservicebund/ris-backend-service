@@ -1,8 +1,8 @@
 <script lang="ts" setup>
 import { computed, ref } from "vue"
 import { availableFields, availableFeatures, type FieldType } from "./data"
-import DropdownInput from "@/shared/components/input/DropdownInput.vue"
-import type { DropdownItem } from "@/shared/components/input/types"
+import DropdownInput from "@/components/input/DropdownInput.vue"
+import type { DropdownItem } from "@/components/input/types"
 
 const filter = ref<FieldType>("all")
 const filters: DropdownItem[] = [

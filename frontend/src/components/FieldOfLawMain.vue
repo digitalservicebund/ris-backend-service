@@ -2,11 +2,11 @@
 import { h, ref, watch } from "vue"
 import FieldOfLawSelectionList from "./FieldOfLawSelectionList.vue"
 import FieldOfLawTree from "./FieldOfLawTree.vue"
+import { withSummarizer } from "@/components/DataSetSummary.vue"
 import ExpandableDataSet from "@/components/ExpandableDataSet.vue"
 import FieldOfLawDirectInputSearch from "@/components/FieldOfLawDirectInputSearch.vue"
 import FieldOfLawSearch from "@/components/FieldOfLawSearch.vue"
 import { FieldOfLawNode } from "@/domain/fieldOfLaw"
-import { withSummarizer } from "@/shared/components/DataSetSummary.vue"
 
 const props = defineProps<{
   modelValue: FieldOfLawNode[] | undefined

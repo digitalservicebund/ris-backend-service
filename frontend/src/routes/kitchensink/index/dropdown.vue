@@ -1,10 +1,10 @@
 <script lang="ts" setup>
 import { ref } from "vue"
+import DropdownInput from "@/components/input/DropdownInput.vue"
+import InputField from "@/components/input/InputField.vue"
+import type { DropdownItem } from "@/components/input/types"
 import KitchensinkPage from "@/kitchensink/components/KitchensinkPage.vue"
 import KitchensinkStory from "@/kitchensink/components/KitchensinkStory.vue"
-import DropdownInput from "@/shared/components/input/DropdownInput.vue"
-import InputField from "@/shared/components/input/InputField.vue"
-import type { DropdownItem } from "@/shared/components/input/types"
 
 const emptyDropdown = ref<string>()
 const preselectedDropdown = ref<string>("I1")

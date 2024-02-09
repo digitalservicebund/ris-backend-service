@@ -1,13 +1,9 @@
 <script lang="ts" setup>
 import { computed, ref, watch } from "vue"
+import InputElement from "@/components/input/InputElement.vue"
+import InputField from "@/components/input/InputField.vue"
+import { InputAttributes, InputType, ModelType } from "@/components/input/types"
 import { useLocator } from "@/composables/useLocator"
-import InputElement from "@/shared/components/input/InputElement.vue"
-import InputField from "@/shared/components/input/InputField.vue"
-import {
-  InputAttributes,
-  InputType,
-  ModelType,
-} from "@/shared/components/input/types"
 
 interface Props {
   id: string

@@ -1,5 +1,5 @@
 import httpClient, { ServiceResponse } from "./httpClient"
-import errorMessages from "@/shared/i18n/errors.json"
+import errorMessages from "@/i18n/errors.json"
 
 interface FeatureToggleService {
   isEnabled(toggleName: string): Promise<ServiceResponse<boolean>>

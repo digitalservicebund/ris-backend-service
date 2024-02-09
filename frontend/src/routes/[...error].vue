@@ -1,6 +1,6 @@
 <script setup lang="ts">
+import TextButton from "@/components/input/TextButton.vue"
 import router from "@/router"
-import TextButton from "@/shared/components/input/TextButton.vue"
 </script>
 
 <template>
