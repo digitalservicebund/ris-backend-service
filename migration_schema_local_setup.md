@@ -29,7 +29,7 @@ This document will help Developers in NeuRIS to setup the new schema with data i
    cd ris-data-migration
    ```
 
-4. Checkout the repo on the commit used by staging (commit id to be found [here](https://github.com/digitalservicebund/neuris-migration-infra/blob/main/manifests/shared/kustomization.yaml#L13)):
+4. Checkout the repo on the commit used by staging (commit id to be found [here](https://github.com/digitalservicebund/neuris-migration-infra/blob/main/manifests/overlays/staging/kustomization.yaml#L30)):
    ```
    git checkout <commit-hash>
    ```
@@ -37,10 +37,10 @@ This document will help Developers in NeuRIS to setup the new schema with data i
 5. Create a directory where you will store the xml files to import into the database
 
    ```
-   mkdir juris-xml-data 
+   mkdir juris-xml-data
    ```
 
-6. Follow the steps here to get access to OTC buckets via command line. You can use the `AWS_` environment variables that you use for `neuris-infra`: https://platform-docs.prod.ds4g.net/user-docs/how-to-guides/access-obs-via-aws-sdk/ 
+6. Follow the steps here to get access to OTC buckets via command line. You can use the `AWS_` environment variables that you use for `neuris-infra`: https://platform-docs.prod.ds4g.net/user-docs/how-to-guides/access-obs-via-aws-sdk/
 
 7. Check if you can access the right bucket with
    ```bash
@@ -69,7 +69,7 @@ This document will help Developers in NeuRIS to setup the new schema with data i
     RIS_MIGRATION_TABLES_LOCATION=juris-xml-data
     RIS_MIGRATION_INCLUDE_NORM_ABBREVIATIONS=true
     RIS_MIGRATION_CLI_MODE=true
-    
+
     # database config
     RIS_MIGRATION_DB_HOST=localhost
     RIS_MIGRATION_DB_PORT=5432
@@ -92,7 +92,7 @@ This document will help Developers in NeuRIS to setup the new schema with data i
 
 14. Import the static lookup tables into your new schema (see Confluence "Wertetabellen" to find out what is static and dynamic)
     ```bash
-    java -jar build/libs/ris-data-migration.jar refdata seed 
+    java -jar build/libs/ris-data-migration.jar refdata seed
     ```
 
 15. Import the dynamic lookup tables
@@ -107,7 +107,7 @@ This document will help Developers in NeuRIS to setup the new schema with data i
     java -jar build/libs/ris-data-migration.jar juris-r migrate -p juris-xml-data/
     ```
 
-    
+
 
 ### Upgrade the Schema
 
@@ -115,7 +115,7 @@ This document will help Developers in NeuRIS to setup the new schema with data i
 
 2. Optional: download the new lookup tables and Document Units (see step 8 & 9 above)
 
-3. Checkout the ris-data-migration repo on the new commit used by staging (commit id to be found [here](https://github.com/digitalservicebund/neuris-migration-infra/blob/main/manifests/shared/kustomization.yaml#L13)):
+3. Checkout the ris-data-migration repo on the new commit used by staging (commit id to be found [here](https://github.com/digitalservicebund/neuris-migration-infra/blob/main/manifests/overlays/staging/kustomization.yaml#L30)):
 
    ```
    git checkout <commit-hash>
