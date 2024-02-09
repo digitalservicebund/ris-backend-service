@@ -137,7 +137,7 @@ watch(
         ></TextInput>
       </InputField>
 
-      <InputField id="documentType" class="flex-col" label="Dokumenttyp">
+      <InputField id="documentType" class="flex-col" label="Dokumenttyp *">
         <ComboboxInput
           id="documentType"
           v-model="modelValue.documentType"
