@@ -20,6 +20,7 @@ import {
   BorderNumberContent,
   BorderNumberNumber,
 } from "../../editor/borderNumber"
+import { BorderNumberLink } from "../../editor/borderNumberLink"
 import { CustomBulletList } from "../../editor/bulletList"
 import { FontSize } from "../../editor/fontSize"
 import { CustomImage } from "../../editor/image"
@@ -83,6 +84,7 @@ const editor = new Editor({
     BorderNumber,
     BorderNumberNumber,
     BorderNumberContent,
+    BorderNumberLink,
     Bold,
     Color,
     FontSize,
