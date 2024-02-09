@@ -78,7 +78,6 @@ const SelectedFieldsOfLawSummary = withSummarizer(selectedFieldsOfLawSummarizer)
 
 <template>
   <ExpandableDataSet
-    as-column
     :data-set="localModelValue"
     :summary-component="SelectedFieldsOfLawSummary"
     title="Sachgebiete"

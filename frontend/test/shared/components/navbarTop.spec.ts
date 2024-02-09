@@ -18,11 +18,6 @@ describe("navbar top", () => {
       },
       {
         path: "",
-        name: "norms",
-        component: {},
-      },
-      {
-        path: "",
         name: "search",
         component: {},
       },
@@ -37,7 +32,6 @@ describe("navbar top", () => {
 
     expect(screen.getByText("Rechtsinformationen")).toBeInTheDocument()
     expect(screen.getByText("Vorgänge")).toBeInTheDocument()
-    expect(screen.getByText("Normen")).toBeInTheDocument()
     expect(screen.getByText("des Bundes")).toBeInTheDocument()
   })
 })

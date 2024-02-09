@@ -5,10 +5,10 @@ import IconPublished from "~icons/ic/outline-campaign"
 
 const firstRowInfos = [
   {
-    label: "status",
-    value: "veröffentlicht",
+    label: "Veröffentlicht",
     icon: IconPublished,
     color: "black",
+    backgroundColor: "bg-green-300",
   },
   {
     label: "Dokumentationsstelle",

@@ -1,12 +1,9 @@
 import { CaptureConsole } from "@sentry/integrations"
 import * as Sentry from "@sentry/vue"
-import { createPinia } from "pinia"
 import { createApp } from "vue"
 import "@/styles/global.scss"
 import App from "./App.vue"
 import router from "./router"
-
-const storeManager = createPinia()
 
 const app = createApp(App)
 
@@ -34,4 +31,4 @@ if (import.meta.env.PROD) {
   })
 }
 
-app.use(router).use(storeManager).mount("#app")
+app.use(router).mount("#app")

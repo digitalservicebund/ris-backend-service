@@ -1,5 +1,4 @@
 import { flushPromises } from "@vue/test-utils"
-import { createPinia, setActivePinia } from "pinia"
 import { useSaveToRemote } from "@/shared/composables/useSaveToRemote"
 
 vi.mock("vue", async (importActual) => {
@@ -8,10 +7,6 @@ vi.mock("vue", async (importActual) => {
 })
 
 describe("useSaveToRemote", () => {
-  beforeEach(async () => {
-    setActivePinia(createPinia())
-  })
-
   beforeEach(() => {
     vi.useFakeTimers()
   })

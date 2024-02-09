@@ -1,5 +1,4 @@
 import { render, screen } from "@testing-library/vue"
-import { createPinia, setActivePinia } from "pinia"
 import DocumentUnitCoreData from "@/components/DocumentUnitCoreData.vue"
 import DocumentUnit, { CoreData } from "@/domain/documentUnit"
 
@@ -16,9 +15,6 @@ function renderComponent(options?: {
 }
 
 describe("Core Data", () => {
-  beforeEach(async () => {
-    setActivePinia(createPinia())
-  })
   global.ResizeObserver = require("resize-observer-polyfill")
   test("renders correctly with given documentUnitId", async () => {
     const documentUnit = new DocumentUnit("1", {

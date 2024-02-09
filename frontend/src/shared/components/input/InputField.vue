@@ -1,9 +1,8 @@
 <script lang="ts" setup>
-import { computed, ref, toValue, watch } from "vue"
+import { computed, ref, watch } from "vue"
 import { ValidationError } from "@/shared/components/input/types"
 import errors from "@/shared/i18n/errors.json"
 import { isErrorCode } from "@/shared/i18n/utils"
-import { useGlobalValidationErrorStore } from "@/stores/globalValidationErrorStore"
 import IconErrorOutline from "~icons/ic/baseline-error-outline"
 
 interface Props {
@@ -50,16 +49,12 @@ const labelConverted = computed(() => {
  * Validation error handling                          *
  * -------------------------------------------------- */
 
-const { getByInstance } = useGlobalValidationErrorStore()
-const errorsFromStore = getByInstance(props.id)
-const storeValidationError = computed(() => errorsFromStore.value[0])
-
 function updateValidationError(newValidationError?: ValidationError) {
   localValidationError.value = newValidationError
 }
 
 const localValidationError = ref<ValidationError | undefined>(
-  props.validationError ?? toValue(storeValidationError),
+  props.validationError,
 )
 
 const errorMessage = computed(() => {
@@ -72,26 +67,14 @@ const errorMessage = computed(() => {
 
 watch(
   () => props.validationError,
-  (is, was) => {
+  (is) => {
     if (is) {
       localValidationError.value = is
-    } else if (!is && was && storeValidationError.value) {
-      localValidationError.value = storeValidationError.value
     } else {
       localValidationError.value = undefined
     }
   },
 )
-
-watch(storeValidationError, (is, was) => {
-  if (is) {
-    localValidationError.value = is
-  } else if (!is && was && props.validationError) {
-    localValidationError.value = props.validationError
-  } else {
-    localValidationError.value = undefined
-  }
-})
 </script>
 
 <script lang="ts">

@@ -1,31 +1,52 @@
 <script lang="ts" setup>
-import { ref } from "vue"
+import { computed, h, ref } from "vue"
+import EditableList from "@/components/EditableListCaselaw.vue"
+import EditableListItem from "@/domain/editableListItem"
+import DummyInputGroup from "@/kitchensink/components/DummyInputGroup.vue"
 import KitchensinkPage from "@/kitchensink/components/KitchensinkPage.vue"
 import KitchensinkStory from "@/kitchensink/components/KitchensinkStory.vue"
-import EditableList from "@/shared/components/EditableList.vue"
-import TextInput from "@/shared/components/input/TextInput.vue"
+import DummyListItem from "@/kitchensink/domain/dummyListItem"
+import { withSummarizer } from "@/shared/components/DataSetSummary.vue"
 
-const listWithEntries = ref(["list entry 1", "list entry 2"])
+const listWithEntries = ref<DummyListItem[]>([
+  new DummyListItem({ text: "foo" }),
+  new DummyListItem({ text: "bar" }),
+])
+
+function summerizer(dataEntry: EditableListItem) {
+  return h("div", { class: ["ds-label-01-reg"] }, dataEntry.renderDecision)
+}
+
+const SummaryComponent = withSummarizer(summerizer)
+
+const defaultValue = new DummyListItem()
 const emptyList = ref([])
-const defaultValue = ""
+
+const localModelValue = computed({
+  get: () => listWithEntries.value,
+  set: (value: DummyListItem[]) => {
+    console.log("set", value)
+    listWithEntries.value = value
+  },
+})
 </script>
 
 <template>
-  <KitchensinkPage name="Edtiable list">
+  <KitchensinkPage name="Editable list">
     <KitchensinkStory name="With entries">
       <EditableList
-        v-model="listWithEntries"
+        v-model="localModelValue"
         :default-value="defaultValue"
-        :edit-component="TextInput"
+        :edit-component="DummyInputGroup"
+        :summary-component="SummaryComponent"
       />
     </KitchensinkStory>
-
-    <KitchensinkStory name="Without entries">
+    <KitchensinkStory name="With no entries">
       <EditableList
         v-model="emptyList"
         :default-value="defaultValue"
-        :edit-component="TextInput"
-        transformer=""
+        :edit-component="DummyInputGroup"
+        :summary-component="SummaryComponent"
       />
     </KitchensinkStory>
   </KitchensinkPage>

@@ -1,7 +1,6 @@
 /* eslint-disable jest-dom/prefer-in-document */
 import { userEvent } from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
-import { createPinia, setActivePinia } from "pinia"
 import FieldOfLawTreeVue from "@/components/FieldOfLawTree.vue"
 import { FieldOfLawNode } from "@/domain/fieldOfLaw"
 import FieldOfLawService from "@/services/fieldOfLawService"
@@ -21,9 +20,6 @@ function renderComponent(
 }
 
 describe("FieldOfLawTree", () => {
-  beforeEach(async () => {
-    setActivePinia(createPinia())
-  })
   const user = userEvent.setup()
 
   const fetchSpy = vi

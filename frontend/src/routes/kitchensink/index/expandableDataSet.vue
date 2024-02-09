@@ -1,56 +1,43 @@
+@ -1,59 +0,0 @@
 <script lang="ts" setup>
+import { h } from "vue"
 import ExpandableDataSet from "@/components/ExpandableDataSet.vue"
-import {
-  normsMetadataSummarizer,
-  SummarizerDataSet,
-  Type,
-} from "@/helpers/normsMetadataSummarizer"
 import KitchensinkPage from "@/kitchensink/components/KitchensinkPage.vue"
 import KitchensinkStory from "@/kitchensink/components/KitchensinkStory.vue"
-import DataSetSummary, {
-  withSummarizer,
-  defaultSummarizer,
-} from "@/shared/components/DataSetSummary.vue"
+import { withSummarizer } from "@/shared/components/DataSetSummary.vue"
+import IconErrorOutline from "~icons/ic/baseline-error-outline"
 
-function checkMarkSummarizer(dataEntry: undefined) {
-  const summarizerData: SummarizerDataSet[] = []
-  summarizerData.push(
-    new SummarizerDataSet([defaultSummarizer(dataEntry)], {
-      type: Type.CHECKMARK,
-    }),
-  )
-  return normsMetadataSummarizer(summarizerData)
+function demoSummarizer(dataEntry: undefined) {
+  return h("div", { class: ["flex flex-row items-center"] }, [
+    h(
+      h(h(IconErrorOutline), {
+        "aria-label": "Fehlerhafte Eingabe",
+        class: ["mr-8 text-red-800"],
+      }),
+    ),
+    h("div", { class: ["ds-label-01-reg text-red-800"] }, dataEntry),
+  ])
 }
 
-const CheckmarkSummary = withSummarizer(checkMarkSummarizer)
+const CustomSummary = withSummarizer(demoSummarizer)
 </script>
 
 <template>
   <KitchensinkPage name="Expandable data set">
-    <KitchensinkStory name="Short section">
+    <KitchensinkStory name="Default summarizer">
       <ExpandableDataSet
         :data-set="['First Value', 'SecondValue']"
-        title="Short Section"
+        title="Title"
       >
         <div class="h-64">Content</div>
       </ExpandableDataSet>
     </KitchensinkStory>
 
-    <KitchensinkStory name="Long section">
+    <KitchensinkStory name="Custom Summarizer">
       <ExpandableDataSet
-        :data-set="['Single Value']"
-        :summary-component="DataSetSummary"
-        title="A Much Longer Section Name"
-      >
-        <div class="h-64">Content</div>
-      </ExpandableDataSet>
-    </KitchensinkStory>
-
-    <KitchensinkStory name="Special section">
-      <ExpandableDataSet
-        :data-set="['Checkbox example value']"
-        :summary-component="CheckmarkSummary"
-        title="Special Section"
+        :data-set="['First Value', 'SecondValue']"
+        :summary-component="CustomSummary"
+        title="Title"
       >
         <div class="h-64">Content</div>
       </ExpandableDataSet>

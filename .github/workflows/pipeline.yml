@@ -671,7 +671,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        subproject: [caselaw, norms, shared]
+        subproject: [caselaw, shared]
         browser: [chromium, firefox]
         mode: [e2e]
         include:

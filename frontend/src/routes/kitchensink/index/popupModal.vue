@@ -12,17 +12,23 @@ const toggleModal = () => {
 
 <template>
   <KitchensinkPage name="Popup modal">
-    <TextButton button-type="primary" label="Open Modal" @click="toggleModal" />
-    <PopupModal
-      v-if="showModal"
-      aria-label="Popup Modal"
-      cancel-button-type="ghost"
-      confirm-button-type="secondary"
-      confirm-text="Bestätigen"
-      content-text="This is Popup Modal content"
-      header-text="Popup Modal"
-      @close-modal="toggleModal"
-      @confirm-action="toggleModal"
-    />
+    <div>
+      <TextButton
+        button-type="primary"
+        label="Open Modal"
+        @click="toggleModal"
+      />
+      <PopupModal
+        v-if="showModal"
+        aria-label="Popup Modal"
+        cancel-button-type="ghost"
+        confirm-button-type="secondary"
+        confirm-text="Bestätigen"
+        content-text="This is Popup Modal content"
+        header-text="Popup Modal"
+        @close-modal="toggleModal"
+        @confirm-action="toggleModal"
+      />
+    </div>
   </KitchensinkPage>
 </template>

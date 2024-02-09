@@ -1,6 +1,5 @@
 import { userEvent } from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
-import { createPinia, setActivePinia } from "pinia"
 import ActiveCitations from "@/components/ActiveCitations.vue"
 import ActiveCitation from "@/domain/activeCitation"
 import { CitationType } from "@/domain/citationType"
@@ -63,9 +62,6 @@ function generateActiveCitation(options?: {
 
 describe("active citations", () => {
   global.ResizeObserver = require("resize-observer-polyfill")
-  beforeEach(async () => {
-    setActivePinia(createPinia())
-  })
 
   vi.spyOn(
     documentUnitService,
