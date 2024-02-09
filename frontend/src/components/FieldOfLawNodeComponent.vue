@@ -1,10 +1,10 @@
 <script lang="ts" setup>
-import { computed, toRaw } from "vue"
+import { computed, onMounted, toRaw } from "vue"
+import Checkbox from "@/components/input/CheckboxInput.vue"
 import TokenizeText from "@/components/TokenizeText.vue"
 import { ROOT_ID, FieldOfLawNode } from "@/domain/fieldOfLaw"
 import FieldOfLawService from "@/services/fieldOfLawService"
 import IconAdd from "~icons/ic/baseline-add"
-import IconDone from "~icons/ic/baseline-done"
 import IconHorizontalRule from "~icons/ic/baseline-horizontal-rule"
 
 interface Props {
@@ -23,8 +23,11 @@ const emit = defineEmits<{
 
 const node = computed(() => props.node)
 
-const isExpandable = computed(() => {
-  return canLoadMoreChildren() || !props.node.isExpanded
+const fieldOfLawSelected = computed({
+  get: () => props.selected,
+  set: (value) => {
+    value ? emit("node:select", node.value) : emit("node:unselect", node.value)
+  },
 })
 
 function handleTokenClick(tokenContent: string) {
@@ -36,6 +39,15 @@ function canLoadMoreChildren() {
 }
 
 async function handleToggle() {
+  await getChildren()
+  if (node.value.inDirectPathMode) {
+    node.value.inDirectPathMode = false
+  } else {
+    node.value.isExpanded = !node.value.isExpanded
+  }
+}
+
+async function getChildren() {
   if (canLoadMoreChildren()) {
     let childToReattach: FieldOfLawNode
     if (node.value.children.length > 0) {
@@ -58,12 +70,11 @@ async function handleToggle() {
       },
     )
   }
-  if (node.value.inDirectPathMode) {
-    node.value.inDirectPathMode = false
-  } else {
-    node.value.isExpanded = !node.value.isExpanded
-  }
 }
+
+onMounted(async () => {
+  await getChildren()
+})
 </script>
 
 <template>
@@ -75,11 +86,11 @@ async function handleToggle() {
       <div v-if="node.childrenCount === 0" class="pl-24"></div>
       <div v-else>
         <button
-          :aria-label="node.identifier + ' ' + node.text + ' aufklappen'"
+          :aria-label="node.text + ' aufklappen'"
           class="w-icon rounded-full bg-blue-200 text-blue-800"
           @click="handleToggle"
         >
-          <slot v-if="!isExpandable" name="close-icon">
+          <slot v-if="props.node.isExpanded" name="close-icon">
             <IconHorizontalRule />
           </slot>
           <slot v-else name="open-icon">
@@ -88,25 +99,17 @@ async function handleToggle() {
         </button>
       </div>
       <div v-if="node.identifier !== ROOT_ID">
-        <button
+        <Checkbox
+          id="fieldOfLawSelected"
+          v-model="fieldOfLawSelected"
           :aria-label="
             node.identifier +
             ' ' +
             node.text +
             (selected ? ' entfernen' : ' hinzufügen')
           "
-          class="ml-12 h-24 w-24 appearance-none rounded-sm border-2 align-top text-blue-800 outline-none outline-0 outline-offset-[-4px] outline-blue-800 hover:outline-2 focus:outline-2"
-          @click="
-            selected ? emit('node:unselect', node) : emit('node:select', node)
-          "
-        >
-          <!-- TODO: replace by checkmark component -->
-          <IconDone
-            v-if="selected"
-            aria-label="Sachgebiet entfernen"
-            class="text-14"
-          />
-        </button>
+          class="ds-checkbox-mini ml-8 bg-white"
+        />
       </div>
       <div>
         <div class="flex flex-col">

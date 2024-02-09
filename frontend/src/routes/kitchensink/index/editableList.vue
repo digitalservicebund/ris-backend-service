@@ -25,7 +25,6 @@ const emptyList = ref([])
 const localModelValue = computed({
   get: () => listWithEntries.value,
   set: (value: DummyListItem[]) => {
-    console.log("set", value)
     listWithEntries.value = value
   },
 })

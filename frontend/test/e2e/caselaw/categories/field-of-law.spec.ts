@@ -19,7 +19,7 @@ test.describe("field of law", () => {
     await expect(
       page.getByRole("heading", { name: "Sachgebietsbaum" }),
     ).toBeVisible()
-    await expect(page.getByText("Alle Sachgebiete anzeigen")).toBeVisible()
+    await expect(page.getByText("Alle Sachgebiete")).toBeVisible()
     await expect(page.getByRole("heading", { name: "Suche" })).toBeVisible()
     await expect(page.getByText("Direkteingabe Sachgebiet")).toBeVisible()
   })
@@ -35,7 +35,7 @@ test.describe("field of law", () => {
 
     await page
       .getByRole("button", {
-        name: "root Alle Sachgebiete anzeigen aufklappen",
+        name: "Alle Sachgebiete aufklappen",
       })
       .click()
 
@@ -52,14 +52,14 @@ test.describe("field of law", () => {
 
     await page
       .getByRole("button", {
-        name: "root Alle Sachgebiete anzeigen aufklappen",
+        name: "Alle Sachgebiete aufklappen",
       })
       .click()
 
     await expect(page.getByText("Strafrecht", { exact: true })).toBeVisible()
     await expect(page.getByText("Ordnungswidrigkeitenrecht")).toBeHidden()
 
-    await page.getByRole("button", { name: "SR Strafrecht aufklappen" }).click()
+    await page.getByRole("button", { name: "Strafrecht aufklappen" }).click()
 
     await expect(page.getByText("Strafrecht", { exact: true })).toBeVisible()
     await expect(page.getByText("Ordnungswidrigkeitenrecht")).toBeVisible()
@@ -74,21 +74,21 @@ test.describe("field of law", () => {
 
     await page
       .getByRole("button", {
-        name: "root Alle Sachgebiete anzeigen aufklappen",
+        name: "Alle Sachgebiete aufklappen",
       })
       .click()
 
     await expect(page.getByText("Strafrecht", { exact: true })).toBeVisible()
     await expect(page.getByText("Ordnungswidrigkeitenrecht")).toBeHidden()
 
-    await page.getByRole("button", { name: "SR Strafrecht aufklappen" }).click()
+    await page.getByRole("button", { name: "Strafrecht aufklappen" }).click()
 
     await expect(page.getByText("Strafrecht", { exact: true })).toBeVisible()
     await expect(page.getByText("Ordnungswidrigkeitenrecht")).toBeVisible()
 
     await page
       .getByRole("button", {
-        name: "root Alle Sachgebiete anzeigen aufklappen",
+        name: "Alle Sachgebiete aufklappen",
       })
       .click()
 
@@ -97,7 +97,7 @@ test.describe("field of law", () => {
 
     await page
       .getByRole("button", {
-        name: "root Alle Sachgebiete anzeigen aufklappen",
+        name: "Alle Sachgebiete aufklappen",
       })
       .click()
 
@@ -114,21 +114,17 @@ test.describe("field of law", () => {
 
     await page
       .getByRole("button", {
-        name: "root Alle Sachgebiete anzeigen aufklappen",
+        name: "Alle Sachgebiete aufklappen",
       })
       .click()
 
     await expect(page.getByText("Strafrecht", { exact: true })).toBeVisible()
 
-    await page.getByRole("button", { name: "SR Strafrecht aufklappen" }).click()
+    await page.getByRole("button", { name: "Strafrecht aufklappen" }).click()
 
     await expect(page.getByText("Ordnungswidrigkeitenrecht")).toBeVisible()
 
-    await page
-      .getByRole("button", {
-        name: "SR-07 Ordnungswidrigkeitenrecht hinzufügen",
-      })
-      .click()
+    await page.getByLabel("SR-07 Ordnungswidrigkeitenrecht hinzufügen").click()
 
     await expect(page.getByText("Die Liste ist aktuell leer")).toBeHidden()
     await expect(
@@ -137,14 +133,7 @@ test.describe("field of law", () => {
       ),
     ).toBeVisible()
     await expect(
-      page.getByRole("button", {
-        name: "SR-07 Ordnungswidrigkeitenrecht aus Liste entfernen",
-      }),
-    ).toBeVisible()
-    await expect(
-      page.getByRole("button", {
-        name: "SR-07 Ordnungswidrigkeitenrecht entfernen",
-      }),
+      page.getByLabel("SR-07 Ordnungswidrigkeitenrecht entfernen"),
     ).toBeVisible()
   })
 
@@ -157,39 +146,27 @@ test.describe("field of law", () => {
 
     await page
       .getByRole("button", {
-        name: "root Alle Sachgebiete anzeigen aufklappen",
+        name: "Alle Sachgebiete aufklappen",
       })
       .click()
 
     await expect(page.getByText("Strafrecht", { exact: true })).toBeVisible()
 
-    await page.getByRole("button", { name: "SR Strafrecht aufklappen" }).click()
+    await page.getByRole("button", { name: "Strafrecht aufklappen" }).click()
 
     await expect(page.getByText("Ordnungswidrigkeitenrecht")).toBeVisible()
 
-    await page
-      .getByRole("button", {
-        name: "SR-07 Ordnungswidrigkeitenrecht hinzufügen",
-      })
-      .click()
+    await page.getByLabel("SR-07 Ordnungswidrigkeitenrecht hinzufügen").click()
 
     await expect(
-      page.getByRole("button", {
-        name: "SR-07 Ordnungswidrigkeitenrecht entfernen",
-      }),
+      page.getByLabel("SR-07 Ordnungswidrigkeitenrecht entfernen"),
     ).toBeVisible()
 
-    await page
-      .getByRole("button", {
-        name: "SR-07 Ordnungswidrigkeitenrecht entfernen",
-      })
-      .click()
+    await page.getByLabel("SR-07 Ordnungswidrigkeitenrecht entfernen").click()
 
     await expect(page.getByText("Die Liste ist aktuell leer")).toBeVisible()
     await expect(
-      page.getByRole("button", {
-        name: "SR-07 Ordnungswidrigkeitenrecht hinzufügen",
-      }),
+      page.getByLabel("SR-07 Ordnungswidrigkeitenrecht hinzufügen"),
     ).toBeVisible()
   })
 
@@ -202,35 +179,25 @@ test.describe("field of law", () => {
 
     await page
       .getByRole("button", {
-        name: "root Alle Sachgebiete anzeigen aufklappen",
+        name: "Alle Sachgebiete aufklappen",
       })
       .click()
 
     await expect(page.getByText("Strafrecht", { exact: true })).toBeVisible()
 
-    await page.getByRole("button", { name: "SR Strafrecht aufklappen" }).click()
+    await page.getByRole("button", { name: "Strafrecht aufklappen" }).click()
 
     await expect(page.getByText("Ordnungswidrigkeitenrecht")).toBeVisible()
 
-    await page
-      .getByRole("button", {
-        name: "SR-07 Ordnungswidrigkeitenrecht hinzufügen",
-      })
-      .click()
+    await page.getByLabel("SR-07 Ordnungswidrigkeitenrecht hinzufügen").click()
 
     await expect(page.getByText("Die Liste ist aktuell leer")).toBeHidden()
 
-    await page
-      .getByRole("button", {
-        name: "SR-07 Ordnungswidrigkeitenrecht aus Liste entfernen",
-      })
-      .click()
+    await page.getByLabel("SR-07 Ordnungswidrigkeitenrecht entfernen").click()
 
     await expect(page.getByText("Die Liste ist aktuell leer")).toBeVisible()
     await expect(
-      page.getByRole("button", {
-        name: "SR-07 Ordnungswidrigkeitenrecht hinzufügen",
-      }),
+      page.getByLabel("SR-07 Ordnungswidrigkeitenrecht hinzufügen"),
     ).toBeVisible()
   })
 

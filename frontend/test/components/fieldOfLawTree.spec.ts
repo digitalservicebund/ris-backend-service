@@ -51,12 +51,11 @@ describe("FieldOfLawTree", () => {
 
   it("Tree is fully closed upon at start", async () => {
     renderComponent()
-    expect(fetchSpy).toBeCalledTimes(0)
-    expect(screen.getByText("Alle Sachgebiete anzeigen")).toBeInTheDocument()
-    const expandIcons = screen.getAllByLabelText(
-      "root Alle Sachgebiete anzeigen aufklappen",
-    )
-    expect(expandIcons).toHaveLength(1)
+    expect(fetchSpy).toBeCalledTimes(1)
+    expect(screen.getByText("Alle Sachgebiete")).toBeInTheDocument()
+    expect(
+      screen.getByLabelText("Alle Sachgebiete aufklappen"),
+    ).toBeInTheDocument()
     expect(screen.queryByText("Text for AB")).not.toBeInTheDocument()
     expect(screen.queryByText("And text for CD")).not.toBeInTheDocument()
   })
@@ -64,27 +63,17 @@ describe("FieldOfLawTree", () => {
   it("Tree opens top level nodes upon root click", async () => {
     renderComponent()
 
-    await user.click(
-      screen.getAllByLabelText(
-        "root Alle Sachgebiete anzeigen aufklappen",
-      )[0] as HTMLElement,
-    )
+    await user.click(screen.getByLabelText("Alle Sachgebiete aufklappen"))
 
-    expect(fetchSpy).toBeCalledTimes(1)
+    expect(fetchSpy).toBeCalledTimes(3)
     expect(screen.getByText("Text for AB")).toBeInTheDocument()
     expect(screen.getByText("And text for CD with link to")).toBeInTheDocument()
-    expect(screen.getByText("Alle Sachgebiete anzeigen")).toBeInTheDocument()
+    expect(screen.getByText("Alle Sachgebiete")).toBeInTheDocument()
   })
 
   it("Linked node gets displayed as link in stext", async () => {
     const { emitted } = renderComponent()
-
-    await user.click(
-      screen.getAllByLabelText(
-        "root Alle Sachgebiete anzeigen aufklappen",
-      )[0] as HTMLElement,
-    )
-
+    await user.click(screen.getByLabelText("Alle Sachgebiete aufklappen"))
     const node1ids = screen.getAllByText("AB-01")
     const nonLinkText = screen.getByText("And text for CD with link to")
 

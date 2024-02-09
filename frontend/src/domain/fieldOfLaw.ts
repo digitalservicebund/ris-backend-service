@@ -24,7 +24,7 @@ export const ROOT_ID = "root"
 export function buildRoot(): FieldOfLawNode {
   return {
     identifier: ROOT_ID,
-    text: "Alle Sachgebiete anzeigen",
+    text: "Alle Sachgebiete",
     children: [],
     childrenCount: -1,
     norms: [],

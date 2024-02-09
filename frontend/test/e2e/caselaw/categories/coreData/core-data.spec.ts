@@ -277,17 +277,17 @@ test.describe("core data", () => {
     documentNumber,
   }) => {
     await navigateToCategories(page, documentNumber)
-    const nswButton = page.locator("[aria-label='NSW-Fundstellen']")
+    const nswInput = page.locator("[aria-label='NSW-Fundstellen']")
     const CITATION = "1968, 249-252 (ST)"
     const nswChipTag = page.locator(`text=${CITATION}`)
-    await expect(nswButton).toBeHidden()
+    await expect(nswInput).toBeHidden()
 
     await waitForSaving(
       async () => {
         await page.locator("[aria-label='Gericht']").fill("BGH")
         await page.locator("text=BGH").click()
-        await expect(nswButton).toBeVisible()
-        await nswButton.type(CITATION)
+        await expect(nswInput).toBeVisible()
+        await nswInput.fill(CITATION)
         await page.keyboard.press("Enter")
       },
       page,
@@ -313,7 +313,7 @@ test.describe("core data", () => {
     await page.locator("[aria-label='Gericht']").fill("AG Aalen")
     await page.locator("text=AG Aalen").click()
     await expect(
-      nswButton,
+      nswInput,
       "NSW Fundstelle is visible for other courts",
     ).toBeHidden()
   })

@@ -82,19 +82,21 @@ const showNormsModelValue = computed({
 <template>
   <div class="flex flex-col justify-between">
     <h1 class="ds-heading-03-reg pb-10">Sachgebietsbaum</h1>
-    <InputField
-      id="showNorms"
-      aria-label="Beschlussfassung mit qualifizierter Mehrheit"
-      label="Normen anzeigen"
-      label-class="ds-label-01-reg"
-      :label-position="LabelPosition.RIGHT"
-    >
-      <CheckboxInput
+    <div class="my-14">
+      <InputField
         id="showNorms"
-        v-model="showNormsModelValue"
-        size="small"
-      />
-    </InputField>
+        aria-label="Beschlussfassung mit qualifizierter Mehrheit"
+        label="Normen anzeigen"
+        label-class="ds-label-01-reg"
+        :label-position="LabelPosition.RIGHT"
+      >
+        <CheckboxInput
+          id="showNorms"
+          v-model="showNormsModelValue"
+          size="small"
+        />
+      </InputField>
+    </div>
   </div>
   <FieldOfLawNodeComponent
     :key="root.identifier"

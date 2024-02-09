@@ -90,7 +90,7 @@ const SelectedFieldsOfLawSummary = withSummarizer(selectedFieldsOfLawSummarizer)
             @node-clicked="handleNodeClicked"
           />
         </div>
-        <div class="flex-1 bg-white p-20">
+        <div class="flex-1 bg-white p-32">
           <FieldOfLawTree
             v-model="localModelValue"
             :clicked-identifier="clickedIdentifier"
