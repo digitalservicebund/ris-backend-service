@@ -16,13 +16,16 @@ const TIMEOUT = 10000
 const searchResults = ref<SearchApiDataDTO[] | undefined>()
 const currentPage = ref<Page<SearchApiDataDTO> | undefined>()
 
+type DocumentType = "CASELAW" | "LEGISLATION"
+
 type SearchApiDataDTO = {
   documentNumber: string
   reference: string[]
   court: string
   location: string
   decisionDate: string
-  documentType: string
+  documentSubType: string
+  documentType: DocumentType
 }
 
 async function handleSearchSubmit() {
