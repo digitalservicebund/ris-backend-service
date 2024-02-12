@@ -42,6 +42,8 @@ function handleSelect(node: FieldOfLawNode) {
       (entry) => entry.identifier === node.identifier,
     )
   ) {
+    if (node.isExpanded) delete node.isExpanded
+    if (node.inDirectPathMode) delete node.inDirectPathMode
     localModelValue.value?.push(node)
   }
 }

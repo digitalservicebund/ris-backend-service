@@ -10,7 +10,7 @@ export type FieldOfLawNode = {
   norms: Norm[]
   children: FieldOfLawNode[]
   childrenCount: number
-  isExpanded: boolean
+  isExpanded?: boolean
   inDirectPathMode?: boolean
 }
 
