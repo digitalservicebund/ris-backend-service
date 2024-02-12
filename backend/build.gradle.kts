@@ -127,7 +127,7 @@ dependencies {
     // CVE-2023-6481
     val logbackVersion = "1.4.14"
     val r2dbcVersion = "1.0.0.RELEASE"
-    val jacksonModuleVersion = "2.15.2"
+    val jacksonModuleVersion = "2.16.1"
     val testContainersVersion = "1.19.0"
 
     implementation("org.springframework.boot:spring-boot-starter-actuator")
