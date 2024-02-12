@@ -9,7 +9,6 @@ import org.jetbrains.dokka.gradle.DokkaTask
 import org.springframework.boot.gradle.tasks.bundling.BootBuildImage
 
 plugins {
-    id("com.autonomousapps.dependency-analysis") version "1.29.0"
     java
     jacoco
     id("org.springframework.boot") version "3.1.8"
@@ -215,10 +214,8 @@ dependencies {
     var flywayCore = "org.flywaydb:flyway-core:9.22.2"
     implementation(flywayCore)
     "migrationImplementation"(flywayCore)
-    implementation("org.jsoup:jsoup:1.17.1")
     implementation("io.getunleash:unleash-client-java:9.2.0")
 
-    testImplementation("com.ninja-squad:springmockk:4.0.0")
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
         exclude(group = "org.mockito", module = "mockito-core")
     }
@@ -232,7 +229,6 @@ dependencies {
     testImplementation("org.testcontainers:junit-jupiter:$testContainersVersion")
     testImplementation("org.testcontainers:postgresql:$testContainersVersion")
     testImplementation("org.jeasy:easy-random-core:5.0.0")
-    testImplementation("com.google.code.gson:gson:2.10.1")
 
     compileOnly("org.projectlombok:lombok")
     annotationProcessor("org.projectlombok:lombok")
