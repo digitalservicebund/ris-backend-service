@@ -55,7 +55,7 @@ jacoco {
 }
 
 lombok {
-    version = "1.18.26"
+    version = "1.18.30"
 }
 
 springBoot {
@@ -182,7 +182,6 @@ dependencies {
     // CVE-2022-42004, CVE-2022-42003
     implementation("com.fasterxml.jackson:jackson-bom:$jacksonModuleVersion")
     implementation("com.fasterxml.jackson.core:jackson-databind:2.14.2")
-    implementation("com.github.spullara.mustache.java:compiler:0.9.10")
     // CVE-2022-40153
     implementation("com.fasterxml.woodstox:woodstox-core:6.5.0")
     implementation("org.docx4j:docx4j-JAXB-ReferenceImpl:11.4.9")
@@ -213,8 +212,6 @@ dependencies {
     implementation("com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer:20220608.1")
     // => CVE-2023-2976
     implementation("com.google.guava:guava:33.0.0-jre")
-    // Manually updating to 1.1.13 because parents already latest version (CVE-2023-34062)
-    implementation("io.projectreactor.netty:reactor-netty-http:1.1.13")
     var flywayCore = "org.flywaydb:flyway-core:9.22.2"
     implementation(flywayCore)
     "migrationImplementation"(flywayCore)
