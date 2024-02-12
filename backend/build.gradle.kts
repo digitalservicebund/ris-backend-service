@@ -6,15 +6,12 @@ import com.github.jk1.license.render.ReportRenderer
 import io.franzbecker.gradle.lombok.task.DelombokTask
 import org.flywaydb.gradle.task.FlywayMigrateTask
 import org.jetbrains.dokka.gradle.DokkaTask
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.springframework.boot.gradle.tasks.bundling.BootBuildImage
 
 plugins {
     id("com.autonomousapps.dependency-analysis") version "1.29.0"
     java
     jacoco
-    kotlin("jvm") version "1.9.0"
-    kotlin("plugin.spring") version "1.8.22"
     id("org.springframework.boot") version "3.1.8"
     id("io.spring.dependency-management") version "1.1.0"
     id("com.diffplug.spotless") version "6.22.0"
@@ -76,7 +73,6 @@ configurations {
 }
 
 spotless {
-    kotlin { ktfmt() }
     java {
         removeUnusedImports()
         googleJavaFormat()
@@ -186,7 +182,6 @@ dependencies {
     // CVE-2022-42004, CVE-2022-42003
     implementation("com.fasterxml.jackson:jackson-bom:$jacksonModuleVersion")
     implementation("com.fasterxml.jackson.core:jackson-databind:2.14.2")
-    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:$jacksonModuleVersion")
     implementation("com.github.spullara.mustache.java:compiler:0.9.10")
     // CVE-2022-40153
     implementation("com.fasterxml.woodstox:woodstox-core:6.5.0")
@@ -213,7 +208,6 @@ dependencies {
     implementation("io.sentry:sentry-spring-boot-starter-jakarta")
     implementation("io.sentry:sentry-logback")
     implementation("org.springframework.boot:spring-boot-starter-validation")
-    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     // => CVE-2023-20883
     implementation("org.springframework.boot:spring-boot-autoconfigure")
     implementation("com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer:20220608.1")
@@ -224,7 +218,6 @@ dependencies {
     var flywayCore = "org.flywaydb:flyway-core:9.22.2"
     implementation(flywayCore)
     "migrationImplementation"(flywayCore)
-    implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.jsoup:jsoup:1.17.1")
     implementation("io.getunleash:unleash-client-java:9.2.0")
 
@@ -268,10 +261,6 @@ tasks {
 
     jar {
         enabled = false
-    }
-
-    withType<KotlinCompile> {
-        kotlinOptions.jvmTarget = "17"
     }
 
     withType<Test> {
