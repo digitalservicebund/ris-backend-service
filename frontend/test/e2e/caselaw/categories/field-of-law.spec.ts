@@ -291,7 +291,7 @@ test.describe("field of law", () => {
     ).toBeVisible()
 
     // if this is visible, it means that the "Normen anzeigen" checkbox got set to true
-    await expect(page.getByText("§ 251 BGB")).toBeVisible()
+    await expect(page.getByText("§ 251 BGB").first()).toBeVisible()
   })
 
   // Direct input
