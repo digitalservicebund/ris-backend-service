@@ -8,7 +8,7 @@ fileignoreconfig:
 - filename: backend/src/main/kotlin/de/bund/digitalservice/ris/norms/framework/adapter/input/restapi/controller/GetFileController.kt
   checksum: f989b3c9c176b1b985c2f78ca6ca13fa1403cbb69f367ae9b1cb8ea64d5f6747
 - filename: backend/src/test/java/de/bund/digitalservice/ris/caselaw/integration/tests/JurisXmlExporterWrapperIntegrationTest.java
-  checksum: a91e1bf3765170daffa978263e3d8b3d94523fbd08e95f60c0fcea108be85a23
+  checksum: 564472e7d31773165234aeb0f1afd3cd7689369323516b1b15627f618008a17e
 - filename: backend/src/test/java/de/bund/digitalservice/ris/caselaw/integration/tests/DeviatingObjectIntegrationTest.java
   checksum: 8ac9372e4d04d725843f073f70f90d42c7512aa6a9725626b9d0d56eae3230c6
 - filename: backend/src/test/kotlin/unit/adapter/input/restapi/controller/GenerateNormFileControllerTest.kt
