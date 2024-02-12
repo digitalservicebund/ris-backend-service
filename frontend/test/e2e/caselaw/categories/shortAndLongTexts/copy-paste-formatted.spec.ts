@@ -24,8 +24,8 @@ test("copy-paste from side panel", async ({ page }) => {
 
   // upload file
   await uploadTestfile(page, "some-text-aligment.docx")
-  await page.waitForSelector("text=some-text-aligment.docx")
-  await page.waitForSelector("text=Datei löschen")
+  await expect(page.locator(`"text=some-text-aligment.docx`)).toBeVisible()
+  await expect(page.locator(`text=Datei löschen`)).toBeVisible()
   await expect(page.locator(`text=${leftAlignText}`)).toBeVisible()
   await expect(page.locator(`text=${rightAlignText}`)).toBeVisible()
   await expect(page.locator(`text=${centerAlignText}`)).toBeVisible()

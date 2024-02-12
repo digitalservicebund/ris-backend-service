@@ -12,8 +12,8 @@ test.describe("upload an original document to a doc unit", () => {
   test("upload and delete docx file per file chooser", async ({ page }) => {
     await uploadTestfile(page, "sample.docx")
     await expect(page.locator("text=Hochgeladen am")).toBeVisible()
-    await page.waitForSelector("text=sample.docx")
-    await page.waitForSelector("text=Die ist ein Test")
+    await expect(page.locator(`text=sample.docx`)).toBeVisible()
+    await expect(page.locator(`text=Die ist ein Test`)).toBeVisible()
 
     // delete file
     await page.locator("text=Datei löschen").click()
