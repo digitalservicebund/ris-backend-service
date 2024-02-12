@@ -16,17 +16,6 @@ const TIMEOUT = 10000
 const searchResults = ref<SearchApiDataDTO[] | undefined>()
 const currentPage = ref<Page<SearchApiDataDTO> | undefined>()
 
-// mimics Page<SearchApiDataDTO>
-type SearchApiDTOServerMock = {
-  size: number
-  content: SearchApiDataDTO[]
-  first: boolean
-  last: boolean
-  empty: boolean
-  number: number
-  numberOfElements: number
-}
-
 type SearchApiDataDTO = {
   documentNumber: string
   reference: string[]
@@ -66,37 +55,6 @@ async function handleSearchSubmit() {
   } finally {
     isLoading.value = false
   }
-}
-
-function handleMockClick() {
-  const mockApiResponse: SearchApiDTOServerMock = {
-    size: 10,
-    content: [
-      {
-        documentNumber: "ABCD000012345",
-        reference: ["II 1234/56 A"],
-        court: "AB",
-        location: "Berlin",
-        decisionDate: "1990-01-02",
-        documentType: "Urteil",
-      },
-      {
-        documentNumber: "EFGH000067890",
-        reference: ["II 7890/12 B"],
-        court: "CD",
-        location: "Hamburg",
-        decisionDate: "1999-03-04",
-        documentType: "Urteil",
-      },
-    ],
-    first: true,
-    last: true,
-    empty: false,
-    number: 1,
-    numberOfElements: 2,
-  }
-  currentPage.value = mockApiResponse
-  searchResults.value = mockApiResponse.content
 }
 </script>
 
@@ -161,14 +119,6 @@ function handleMockClick() {
           label="Suchen"
           size="small"
           @click="handleSearchSubmit"
-        />
-        <TextButton
-          aria-label="Mock"
-          class="self-start"
-          :disabled="isLoading"
-          label="Mock"
-          size="small"
-          @click="handleMockClick"
         />
         <router-link
           class="block underline focus:outline-none focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-blue-800"
