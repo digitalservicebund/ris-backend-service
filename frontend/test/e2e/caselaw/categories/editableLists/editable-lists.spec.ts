@@ -342,61 +342,26 @@ test.describe("related documentation units", () => {
             container.getByLabel("Listen Eintrag").last(),
           ).toContainText(fileNumber2)
 
-          //list item 3
-          await container.getByLabel("Weitere Angabe").click()
-          const fileNumber3 = generateString()
-          if (container === activeCitationContainer) {
-            await fillActiveCitationInputs(page, {
-              fileNumber: fileNumber3,
-            })
-          }
-          if (container === previousDecisionContainer) {
-            await fillPreviousDecisionInputs(page, {
-              fileNumber: fileNumber3,
-            })
-          }
-          if (container === ensuingDecisionContainer) {
-            await fillEnsuingDecisionInputs(page, {
-              fileNumber: fileNumber3,
-            })
-          }
-          await container.getByLabel(`${containerLabel} speichern`).click()
-          await expect(container.getByLabel("Listen Eintrag")).toHaveCount(3)
-          await expect(
-            container.getByLabel("Listen Eintrag").last(),
-          ).toContainText(fileNumber3)
-
           // leaving an empty list item, deletes it
           await container.getByLabel("Weitere Angabe").click()
-          await expect(container.getByLabel("Listen Eintrag")).toHaveCount(4)
-          await container.getByLabel("Listen Eintrag").nth(1).click()
           await expect(container.getByLabel("Listen Eintrag")).toHaveCount(3)
+          await container.getByLabel("Listen Eintrag").nth(1).click()
+          await expect(container.getByLabel("Listen Eintrag")).toHaveCount(2)
 
-          // deleting last item, sets previous list item in edit mode
           await container.getByLabel("Listen Eintrag").last().click()
           await container.getByLabel("Löschen").click()
-          await expect(container.getByLabel("Listen Eintrag")).toHaveCount(2)
-          await expect(
-            container.getByLabel(`Aktenzeichen ${containerLabel}`, {
-              exact: true,
-            }),
-          ).toHaveValue(fileNumber2)
-
-          // deleting first item, sets next list item in edit mode
-          await container.getByLabel("Listen Eintrag").first().click()
-          await container.getByLabel("Löschen").click()
           await expect(container.getByLabel("Listen Eintrag")).toHaveCount(1)
+
+          //deleting last list item, adds a new default item
+          await container.getByLabel("Listen Eintrag").first().click()
           await expect(
             container.getByLabel(`Aktenzeichen ${containerLabel}`, {
               exact: true,
             }),
-          ).toHaveValue(fileNumber2)
-
+          ).toHaveValue(fileNumber1)
           expect(
             await container.getByText("Pflichtfeld nicht befüllt").count(),
           ).toBeGreaterThanOrEqual(1)
-
-          //deleting last list item, adds a new default item
           await container.getByLabel("Löschen").click()
 
           await expect(container.getByLabel("Abbrechen")).toBeHidden()

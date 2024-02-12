@@ -63,18 +63,18 @@ function addNewListEntry() {
 function removeListEntry(index: number) {
   modelValueList.value.splice(index, 1)
 
+  emit(
+    "update:modelValue",
+    [...props.modelValue].filter((_, i) => i !== index),
+  )
+
   if (
     editIndex.value !== undefined &&
     modelValueList.value.length !== 0 &&
     index !== 0
   ) {
-    editIndex.value -= 1
+    editIndex.value = undefined
   }
-
-  emit(
-    "update:modelValue",
-    [...props.modelValue].filter((_, i) => i !== index),
-  )
 }
 
 function updateModel() {
