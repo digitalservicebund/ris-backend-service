@@ -182,7 +182,7 @@ dependencies {
     implementation("com.fasterxml.jackson:jackson-bom:$jacksonModuleVersion")
     implementation("com.fasterxml.jackson.core:jackson-databind:2.14.2")
     // CVE-2022-40153
-    implementation("com.fasterxml.woodstox:woodstox-core:6.5.0")
+    implementation("com.fasterxml.woodstox:woodstox-core:6.6.0")
     implementation("org.docx4j:docx4j-JAXB-ReferenceImpl:11.4.9")
     implementation("jakarta.mail:jakarta.mail-api:2.0.1")
     implementation("com.sun.activation:jakarta.activation:2.0.1")
