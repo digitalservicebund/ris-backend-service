@@ -618,7 +618,7 @@ public class DocumentationUnitTransformer {
 
   private static void addReferencesToDomain(
       DocumentationUnitDTO documentationUnitDTO, CoreDataBuilder coreDataBuilder) {
-    if (documentationUnitDTO.getFileNumbers() == null) {
+    if (documentationUnitDTO.getReferences() == null) {
       return;
     }
 
