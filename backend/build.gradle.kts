@@ -5,7 +5,6 @@ import com.github.jk1.license.render.CsvReportRenderer
 import com.github.jk1.license.render.ReportRenderer
 import io.franzbecker.gradle.lombok.task.DelombokTask
 import org.flywaydb.gradle.task.FlywayMigrateTask
-import org.jetbrains.dokka.gradle.DokkaTask
 import org.springframework.boot.gradle.tasks.bundling.BootBuildImage
 
 plugins {
@@ -19,7 +18,6 @@ plugins {
     id("com.gorylenko.gradle-git-properties") version "2.4.1"
     id("com.adarshr.test-logger") version "4.0.0"
     id("com.github.ben-manes.versions") version "0.51.0"
-    id("org.jetbrains.dokka") version "1.9.10"
     id("io.franzbecker.gradle-lombok") version "5.0.0"
     id("org.flywaydb.flyway") version "10.6.0"
 }
@@ -340,14 +338,5 @@ tasks {
         val outputDir: File by delombok.get().extra
         source = fileTree(outputDir)
         isFailOnError = false
-    }
-
-    withType<DokkaTask> {
-        dokkaSourceSets.configureEach {
-            perPackageOption {
-                matchingRegex.set(".*caselaw.*")
-                suppress.set(true)
-            }
-        }
     }
 }
