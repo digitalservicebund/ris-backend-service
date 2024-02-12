@@ -1,9 +1,7 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
-import de.bund.digitalservice.ris.OpenApiConfiguration;
 import de.bund.digitalservice.ris.caselaw.domain.CourtService;
 import de.bund.digitalservice.ris.caselaw.domain.court.Court;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,7 +13,6 @@ import reactor.core.publisher.Flux;
 @RestController
 @RequestMapping("api/v1/caselaw/courts")
 @Slf4j
-@Tag(name = OpenApiConfiguration.CASELAW_TAG)
 public class CourtController {
   private final CourtService service;
 

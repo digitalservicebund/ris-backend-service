@@ -10,6 +10,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.springframework.boot.gradle.tasks.bundling.BootBuildImage
 
 plugins {
+    id("com.autonomousapps.dependency-analysis") version "1.29.0"
     java
     jacoco
     kotlin("jvm") version "1.9.0"
@@ -38,13 +39,6 @@ repositories {
     }
     maven {
         url = uri("https://maven.pkg.github.com/digitalservicebund/neuris-juris-xml-export")
-        credentials {
-            username = System.getenv("GH_PACKAGES_REPOSITORY_USER")
-            password = System.getenv("GH_PACKAGES_REPOSITORY_TOKEN")
-        }
-    }
-    maven {
-        url = uri("https://maven.pkg.github.com/digitalservicebund/ris-norms-juris-converter")
         credentials {
             username = System.getenv("GH_PACKAGES_REPOSITORY_USER")
             password = System.getenv("GH_PACKAGES_REPOSITORY_TOKEN")
@@ -212,10 +206,6 @@ dependencies {
     // for local development:
     // implementation(files("../../neuris-juris-xml-export/build/libs/neuris-juris-xml-export-0.8.16.jar"))
     implementation("com.icegreen:greenmail:2.0.0")
-    implementation("de.bund.digitalservice:ris-norms-juris-converter:0.19.2")
-    // for local development:
-    // implementation(files("ris-norms-juris-converter-0.19.2.jar"))
-    // implementation("org.apache.commons:commons-text:1.10.0")
     implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.16.1")
     implementation("io.micrometer:micrometer-registry-prometheus:1.12.2")
     implementation("io.micrometer:micrometer-core:1.12.2")

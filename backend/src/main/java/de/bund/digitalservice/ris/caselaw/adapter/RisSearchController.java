@@ -1,8 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
-import de.bund.digitalservice.ris.OpenApiConfiguration;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.concurrent.atomic.AtomicReference;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -22,7 +20,6 @@ import reactor.core.publisher.Mono;
 @RestController
 @RequestMapping("api/v1/search")
 @Slf4j
-@Tag(name = OpenApiConfiguration.CASELAW_TAG)
 public class RisSearchController {
 
   @Value("${ris-search.url:http://localhost:8090/v1/search}")
