@@ -186,7 +186,7 @@ dependencies {
     implementation("com.sendinblue:sib-api-v3-sdk:7.0.0")
     // CVE-2022-4244
     implementation("org.codehaus.plexus:plexus-utils:4.0.0")
-    implementation(platform("software.amazon.awssdk:bom:2.23.10"))
+    implementation(platform("software.amazon.awssdk:bom:2.24.0"))
     implementation("software.amazon.awssdk:netty-nio-client")
     implementation("software.amazon.awssdk:s3")
     // CVE-2022-42004, CVE-2022-42003
@@ -216,10 +216,10 @@ dependencies {
     // for local development:
     // implementation(files("ris-norms-juris-converter-0.19.2.jar"))
     // implementation("org.apache.commons:commons-text:1.10.0")
-    implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.15.2")
-    implementation("io.micrometer:micrometer-registry-prometheus:1.11.2")
-    implementation("io.micrometer:micrometer-core:1.11.4")
-    implementation(platform("io.sentry:sentry-bom:6.33.1"))
+    implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.16.1")
+    implementation("io.micrometer:micrometer-registry-prometheus:1.12.2")
+    implementation("io.micrometer:micrometer-core:1.12.2")
+    implementation(platform("io.sentry:sentry-bom:7.3.0"))
     implementation("io.sentry:sentry-spring-boot-starter-jakarta")
     implementation("io.sentry:sentry-logback")
     implementation("org.springframework.boot:spring-boot-starter-validation")
@@ -228,7 +228,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-autoconfigure")
     implementation("com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer:20220608.1")
     // => CVE-2023-2976
-    implementation("com.google.guava:guava:32.1.3-jre")
+    implementation("com.google.guava:guava:33.0.0-jre")
     // Manually updating to 1.1.13 because parents already latest version (CVE-2023-34062)
     implementation("io.projectreactor.netty:reactor-netty-http:1.1.13")
     var flywayCore = "org.flywaydb:flyway-core:9.22.2"
