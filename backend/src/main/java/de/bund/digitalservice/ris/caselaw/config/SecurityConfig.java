@@ -31,11 +31,7 @@ public class SecurityConfig {
             exchanges ->
                 exchanges
                     .pathMatchers(
-                        "/actuator/**",
-                        "/api/v1/open/norms/**",
-                        "/admin/webhook",
-                        "/api/webjars/**",
-                        "/api/docs.*/**")
+                        "/actuator/**", "/admin/webhook", "/api/webjars/**", "/api/docs.*/**")
                     .permitAll()
                     .anyExchange()
                     .authenticated())

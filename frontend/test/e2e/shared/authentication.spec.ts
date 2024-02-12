@@ -77,25 +77,6 @@ test.describe("authentication", () => {
     )
   })
 
-  test("public endpoints (`open/`) should be restricted with basicAuth", async ({
-    page,
-    baseURL,
-  }) => {
-    // E2E_BASE_URL is only set in staging
-    // eslint-disable-next-line playwright/no-skipped-test
-    test.skip(!process.env.E2E_BASE_URL)
-
-    expect((await page.request.get("/api/v1/open/norms")).status()).toEqual(401)
-    const hostname = new URL(baseURL as string).hostname
-    expect(
-      (
-        await page.request.get(
-          `https://${process.env.E2E_TEST_BASIC_AUTH_USER}:${process.env.E2E_TEST_BASIC_AUTH_PASSWORD}@${hostname}/api/v1/open/norms`,
-        )
-      ).status(),
-    ).toEqual(200)
-  })
-
   test("should see a custom error page for unknown paths", async ({ page }) => {
     await page.goto("/doesNotExists")
 
