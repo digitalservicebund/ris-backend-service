@@ -175,6 +175,11 @@ async function handleSearchSubmit() {
           >
             Dokumenttyp
           </div>
+          <div
+            class="table-cell border-b-2 border-solid border-blue-300 px-16 py-12"
+          >
+            DokumentSubtyp
+          </div>
         </div>
         <div
           v-for="(item, index) in searchResults"
@@ -210,6 +215,11 @@ async function handleSearchSubmit() {
             class="table-cell border-b-1 border-blue-300 px-16 py-12 align-middle"
           >
             {{ item.documentType }}
+          </div>
+          <div
+            class="table-cell border-b-1 border-blue-300 px-16 py-12 align-middle"
+          >
+            {{ item.documentSubType }}
           </div>
         </div>
       </div>
