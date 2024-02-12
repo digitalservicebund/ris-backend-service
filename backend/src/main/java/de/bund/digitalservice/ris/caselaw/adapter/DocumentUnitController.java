@@ -1,6 +1,5 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
-import de.bund.digitalservice.ris.OpenApiConfiguration;
 import de.bund.digitalservice.ris.caselaw.domain.ConverterService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
@@ -12,7 +11,6 @@ import de.bund.digitalservice.ris.caselaw.domain.SingleNormValidationInfo;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import de.bund.digitalservice.ris.caselaw.domain.XmlResultObject;
 import de.bund.digitalservice.ris.caselaw.domain.docx.Docx2Html;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.nio.ByteBuffer;
 import java.time.LocalDate;
@@ -45,7 +43,6 @@ import reactor.core.publisher.Mono;
 @RestController
 @RequestMapping("api/v1/caselaw/documentunits")
 @Slf4j
-@Tag(name = OpenApiConfiguration.CASELAW_TAG)
 public class DocumentUnitController {
   private final DocumentUnitService service;
   private final UserService userService;

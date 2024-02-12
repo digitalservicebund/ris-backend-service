@@ -1,11 +1,9 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
-import de.bund.digitalservice.ris.OpenApiConfiguration;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitListEntry;
 import de.bund.digitalservice.ris.caselaw.domain.Procedure;
 import de.bund.digitalservice.ris.caselaw.domain.ProcedureService;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.data.domain.Page;
@@ -27,7 +25,6 @@ import reactor.core.publisher.Mono;
 
 @RestController
 @RequestMapping("api/v1/caselaw/procedure")
-@Tag(name = OpenApiConfiguration.CASELAW_TAG)
 public class ProcedureController {
   private final ProcedureService service;
   private final UserService userService;

@@ -1,8 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
-import de.bund.digitalservice.ris.OpenApiConfiguration;
 import de.bund.digitalservice.ris.caselaw.domain.MailTrackingService;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +15,6 @@ import reactor.core.publisher.Mono;
 @RestController
 @RequestMapping("admin")
 @Slf4j
-@Tag(name = OpenApiConfiguration.CASELAW_TAG)
 public class MailTrackingController {
 
   private final MailTrackingService service;
