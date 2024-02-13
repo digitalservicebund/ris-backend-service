@@ -31,7 +31,7 @@
   "dependencies": {
     "@braintree/sanitize-url": "^7.0.0",
     "@sentry/integrations": "^7.100.1",
-    "@sentry/vue": "^7.100.1",
+    "@sentry/vue": "^7.101.0",
     "@tiptap/extension-bold": "^2.2.2",
     "@tiptap/extension-bullet-list": "^2.2.2",
     "@tiptap/extension-color": "^2.2.2",
