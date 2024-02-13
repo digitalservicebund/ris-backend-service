@@ -1,11 +1,12 @@
 import { expect } from "@playwright/test"
 import dayjs from "dayjs"
+import { fillSearchInput, navigateToSearch } from "~/e2e/caselaw/e2e-utils"
 import { caselawTest as test } from "~/e2e/caselaw/fixtures"
 import { generateString } from "~/test-helper/dataGenerators"
 
 test.describe("search", () => {
   test("renders search entry form", async ({ page }) => {
-    await page.goto("/")
+    await navigateToSearch(page)
     await expect(
       page.getByRole("button", {
         name: "Neue Dokumentationseinheit",
@@ -46,7 +47,7 @@ test.describe("search", () => {
     page,
     documentNumber,
   }) => {
-    await page.goto("/")
+    await navigateToSearch(page)
 
     //initial state
     await expect(
@@ -84,7 +85,7 @@ test.describe("search", () => {
   })
 
   test("renders message when error occurs", async ({ page }) => {
-    await page.goto("/")
+    await navigateToSearch(page)
 
     //error
     await page.getByLabel("Nur meine Dokstelle Filter").click()
@@ -104,7 +105,7 @@ test.describe("search", () => {
   test("starting search with all kinds of errors or no search parameters not possible", async ({
     page,
   }) => {
-    await page.goto("/")
+    await navigateToSearch(page)
     await page.getByLabel("Nach Dokumentationseinheiten suchen").click()
     await expect(
       page.getByText("Geben Sie mindestens ein Suchkriterium ein"),
@@ -131,7 +132,7 @@ test.describe("search", () => {
     secondPrefilledDocumentUnit,
   }) => {
     //1st date input provided: display results matching exactly this date.
-    await page.goto("/")
+    await navigateToSearch(page)
 
     await page
       .getByLabel("Entscheidungsdatum Suche", { exact: true })
@@ -197,7 +198,7 @@ test.describe("search", () => {
     secondPrefilledDocumentUnit,
   }) => {
     //Both inputs provided: display results matching the date range.
-    await page.goto("/")
+    await navigateToSearch(page)
 
     await page
       .getByLabel("Entscheidungsdatum Suche", { exact: true })
@@ -261,7 +262,7 @@ test.describe("search", () => {
     prefilledDocumentUnit,
     secondPrefilledDocumentUnit,
   }) => {
-    await page.goto("/")
+    await navigateToSearch(page)
 
     await page
       .getByLabel("Entscheidungsdatum Suche Ende")
@@ -308,7 +309,7 @@ test.describe("search", () => {
   test("updating of date input errors and interdependent errors", async ({
     page,
   }) => {
-    await page.goto("/")
+    await navigateToSearch(page)
 
     const firstDate = page.getByLabel("Entscheidungsdatum Suche", {
       exact: true,
@@ -438,7 +439,7 @@ test.describe("search", () => {
   // Suche zurücksetzen
   test("resetting the search", async ({ page }) => {
     // on input button is visible
-    await page.goto("/")
+    await navigateToSearch(page)
     const resetSearch = page.getByLabel("Suche zurücksetzen")
     const searchTerm = generateString()
     await expect(resetSearch).toBeHidden()
@@ -463,7 +464,7 @@ test.describe("search", () => {
     prefilledDocumentUnit,
     secondPrefilledDocumentUnit,
   }) => {
-    await page.goto("/")
+    await navigateToSearch(page)
 
     await page
       .getByLabel("Entscheidungsdatum Suche", { exact: true })
@@ -494,5 +495,236 @@ test.describe("search", () => {
       /decisionDate=2019-12-31&decisionDateEnd=2020-01-01/,
     )
     await expect(page).toHaveURL(/decisionDate=2019-12-31/)
+  })
+
+  test("show button for creating new doc unit from search parameters", async ({
+    page,
+  }) => {
+    await navigateToSearch(page)
+
+    //initial state
+    await expect(
+      page.getByText(
+        "Starten Sie die Suche oder erstellen Sie eine neue Dokumentationseinheit.",
+      ),
+    ).toBeVisible()
+    await expect(
+      page.getByRole("button", {
+        name: "Neue Dokumentationseinheit erstellen",
+      }),
+    ).toBeVisible()
+
+    const fileNumber = generateString()
+    const courtType = "AG"
+    const courtLocation = "Lüneburg"
+    const decisionDate = "12.02.2000"
+
+    await test.step("all the data can be used", async () => {
+      await fillSearchInput(page, {
+        fileNumber,
+        courtType,
+        courtLocation,
+        decisionDate,
+      })
+
+      await expect(
+        page.getByText(
+          `${fileNumber}, ${courtType} ${courtLocation}, ${decisionDate}`,
+        ),
+      ).toBeVisible()
+    })
+
+    await test.step("only file number set", async () => {
+      await fillSearchInput(page, {
+        fileNumber,
+      })
+      await expect(
+        page.getByText(`${fileNumber}, Gericht unbekannt, Datum unbekannt`),
+      ).toBeVisible()
+    })
+
+    await test.step("only court set", async () => {
+      await fillSearchInput(page, { courtType, courtLocation })
+      await expect(
+        page.getByText(
+          `Aktenzeichen unbekannt, ${courtType} ${courtLocation}, Datum unbekannt`,
+        ),
+      ).toBeVisible()
+    })
+
+    await test.step("only date set", async () => {
+      await fillSearchInput(page, { decisionDate })
+      await expect(
+        page.getByText(
+          `Aktenzeichen unbekannt, Gericht unbekannt, ${decisionDate}`,
+        ),
+      ).toBeVisible()
+    })
+
+    await test.step("invalid court", async () => {
+      await fillSearchInput(page, {
+        fileNumber,
+        courtType: "invalid",
+        courtLocation,
+        decisionDate,
+      })
+      await expect(
+        page.getByText(`${fileNumber}, Gericht unbekannt, ${decisionDate}`),
+      ).toBeVisible()
+    })
+
+    await test.step("decision date end is set, so decision date can not be used", async () => {
+      await fillSearchInput(page, {
+        fileNumber,
+        courtType,
+        courtLocation,
+        decisionDate,
+        decisionDateEnd: "01.01.2002",
+      })
+      await expect(
+        page.getByText(
+          `${fileNumber}, ${courtType} ${courtLocation}, Datum unbekannt`,
+        ),
+      ).toBeVisible()
+    })
+
+    await test.step("document number is set, so nothing can be used", async () => {
+      await fillSearchInput(page, {
+        fileNumber,
+        courtType,
+        courtLocation,
+        decisionDate,
+        documentNumber: "test",
+      })
+      await expect(
+        page.getByRole("button", {
+          name: "Neue Dokumentationseinheit erstellen",
+        }),
+      ).toBeVisible()
+    })
+
+    // await test.step("my docoffice only is set, so nothing can be used", async () => {
+    //   await fillSearchInput(page, {
+    //     fileNumber,
+    //     courtType,
+    //     courtLocation,
+    //     decisionDate,
+    //     myDocOfficeOnly: true,
+    //   })
+    //   await expect(
+    //     page.getByRole("button", {
+    //       name: "Neue Dokumentationseinheit erstellen",
+    //     }),
+    //   ).toBeVisible()
+    // })
+
+    // await test.step("status is set, so nothing can be used", async () => {
+    //   await fillSearchInput(page, {
+    //     fileNumber,
+    //     courtType,
+    //     courtLocation,
+    //     decisionDate,
+    //     status: "Veröffentlicht",
+    //   })
+    //   await expect(
+    //     page.getByRole("button", {
+    //       name: "Neue Dokumentationseinheit erstellen",
+    //     }),
+    //   ).toBeVisible()
+    // })
+  })
+
+  test("create new doc unit from search parameter and switch to categories page", async ({
+    page,
+    request,
+  }) => {
+    await navigateToSearch(page)
+
+    const fileNumber = generateString()
+    const courtType = "AG"
+    const courtLocation = "Aachen"
+    const decisionDate = "23.12.2000"
+
+    await fillSearchInput(page, {
+      fileNumber,
+      courtType,
+      courtLocation,
+      decisionDate,
+    })
+
+    await expect(
+      page.getByText(
+        `${fileNumber}, ${courtType} ${courtLocation}, ${decisionDate}`,
+      ),
+    ).toBeVisible()
+
+    await page
+      .getByRole("button", {
+        name: "Übernehmen und fortfahren",
+      })
+      .click()
+    await expect(page).toHaveURL(/categories$/)
+
+    const documentNumber = page
+      .url()
+      .match(/documentunit\/([A-Z0-9]{13})\/categories/)![1]
+
+    const infoPanel = page.getByText(
+      new RegExp(
+        `${documentNumber}.*Aktenzeichen.*Entscheidungsdatum.*Gericht.*`,
+      ),
+    )
+    await expect(infoPanel.getByText(`Aktenzeichen${fileNumber}`)).toBeVisible()
+    await expect(page.locator("[aria-label='Gericht']")).toHaveValue(
+      `${courtType} ${courtLocation}`,
+    )
+    await expect(
+      infoPanel.getByText(`Gericht${courtType} ${courtLocation}`),
+    ).toBeVisible()
+    await expect(
+      infoPanel.getByText(`Entscheidungsdatum${decisionDate}`),
+    ).toBeVisible()
+
+    // Clean up
+    const response = await (
+      await request.get(`api/v1/caselaw/documentunits/${documentNumber}`)
+    ).json()
+    await request.delete(`/api/v1/caselaw/documentunits/${response.uuid}`)
+  })
+
+  test("show error message when creating new doc unit from search parameters fails", async ({
+    page,
+  }) => {
+    await navigateToSearch(page)
+
+    const fileNumber = generateString()
+
+    await fillSearchInput(page, {
+      fileNumber: fileNumber,
+    })
+
+    await expect(
+      page.getByText(`${fileNumber}, Gericht unbekannt, Datum unbekannt`),
+    ).toBeVisible()
+
+    await page.route("**/new", async (route) => {
+      await route.fulfill({
+        status: 404,
+        contentType: "text/plain",
+        body: "Not Found!",
+      })
+
+      await expect(
+        page.getByText(
+          "Neue Dokumentationseinheit konnte nicht erstellt werden.",
+        ),
+      ).toBeVisible()
+    })
+
+    await page
+      .getByRole("button", {
+        name: "Übernehmen und fortfahren",
+      })
+      .click()
   })
 })

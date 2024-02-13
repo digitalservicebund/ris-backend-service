@@ -1,11 +1,9 @@
 <script lang="ts" setup>
 import dayjs from "dayjs"
 import { computed, ref } from "vue"
-import { useRouter } from "vue-router"
 import DocumentUnitListEntry from "../domain/documentUnitListEntry"
 import IconBadge from "@/components/IconBadge.vue"
 import InfoModal from "@/components/InfoModal.vue"
-import TextButton from "@/components/input/TextButton.vue"
 import LoadingSpinner from "@/components/LoadingSpinner.vue"
 import PopupModal from "@/components/PopupModal.vue"
 import { useStatusBadge } from "@/composables/useStatusBadge"
@@ -23,8 +21,6 @@ const props = defineProps<{
 const emit = defineEmits<{
   deleteDocumentUnit: [documentUnitListEntry: DocumentUnitListEntry]
 }>()
-
-const router = useRouter()
 
 const emptyStatus = computed(() => {
   if (!props.documentUnitListEntries) {
@@ -262,14 +258,8 @@ function onDelete() {
       v-if="emptyStatus && !searchResponseError && !isLoading"
       class="my-112 grid justify-items-center"
     >
-      <span class="">{{ emptyStatus }}</span>
-      <TextButton
-        v-if="!isLoading"
-        aria-label="Neue Dokumentationseinheit erstellen"
-        button-type="ghost"
-        label="Neue Dokumentationseinheit erstellen"
-        @click="router.push({ name: 'caselaw-documentUnit-new' })"
-      />
+      <span class="mb-16">{{ emptyStatus }}</span>
+      <slot name="newlink" />
     </div>
   </div>
 </template>

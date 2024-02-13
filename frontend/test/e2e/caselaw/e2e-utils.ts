@@ -1,6 +1,15 @@
 import { expect, Page } from "@playwright/test"
 import { generateString } from "../../test-helper/dataGenerators"
 
+export const navigateToSearch = async (page: Page) => {
+  await page.goto(`/caselaw`)
+  await page.waitForURL("/caselaw")
+
+  await expect(page.locator("text=Übersicht Rechtsprechung")).toBeVisible({
+    timeout: 15000, // for backend warm up
+  })
+}
+
 export const navigateToCategories = async (
   page: Page,
   documentNumber: string,
@@ -120,6 +129,70 @@ export async function waitForInputValue(
     },
     { selector, expectedValue },
   )
+}
+
+export async function fillSearchInput(
+  page: Page,
+  values?: {
+    fileNumber?: string
+    courtType?: string
+    courtLocation?: string
+    decisionDate?: string
+    decisionDateEnd?: string
+    documentNumber?: string
+    myDocOfficeOnly?: boolean
+    status?: string
+  },
+) {
+  const fillInput = async (ariaLabel: string, value = generateString()) => {
+    const input = page.locator(`[aria-label='${ariaLabel}']`)
+    await input.fill(value ?? ariaLabel)
+    await waitForInputValue(page, `[aria-label='${ariaLabel}']`, value)
+  }
+
+  //reset search first
+  await navigateToSearch(page)
+
+  if (values?.fileNumber) {
+    await fillInput("Aktenzeichen Suche", values?.fileNumber)
+  }
+  if (values?.courtType) {
+    await fillInput("Gerichtstyp Suche", values?.courtType)
+  }
+
+  if (values?.courtLocation) {
+    await fillInput("Gerichtsort Suche", values?.courtLocation)
+  }
+
+  if (values?.decisionDate) {
+    await fillInput("Entscheidungsdatum Suche", values?.decisionDate)
+  }
+
+  if (values?.decisionDateEnd) {
+    await fillInput("Entscheidungsdatum Suche Ende", values?.decisionDateEnd)
+  }
+
+  if (values?.documentNumber) {
+    await fillInput("Dokumentnummer Suche", values?.documentNumber)
+  }
+
+  if (values?.myDocOfficeOnly === true) {
+    const myDocOfficeOnlyCheckbox = page.getByLabel(
+      "Nur meine Dokstelle Filter",
+    )
+    if (!(await myDocOfficeOnlyCheckbox.isChecked())) {
+      await myDocOfficeOnlyCheckbox.click()
+      await expect(myDocOfficeOnlyCheckbox).toBeChecked()
+    }
+  }
+
+  if (values?.status) {
+    const select = page.locator(`select[id="status"]`)
+    await select.selectOption(values?.status)
+  }
+
+  await page.getByLabel("Nach Dokumentationseinheiten suchen").click()
+  await expect(page.getByLabel("Ladestatus")).toBeHidden()
 }
 
 export async function toggleNormsSection(page: Page): Promise<void> {
