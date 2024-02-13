@@ -69,3 +69,13 @@ springdoc:
 
 unleash:
   appName: unleash-proxy
+
+neuris:
+  doofficenumbers:
+    bgh: KORE7****YYYY # results in e.g. KORE 7 0001 24
+    bverfg: KVRE*****YY41 # results in e.g. KVRE 00001 24 41
+    bverwg: WBRE61******* # TODO where put user und year?
+    bsg: BSGRE1****YY
+    # TODO: other docoffices
+    ds: DSRE*****YY
+    cc-ris: XXRE*****YY
