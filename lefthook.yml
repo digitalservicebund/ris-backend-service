@@ -15,6 +15,7 @@ pre-commit:
     frontend-prettier:
       tags: format frontend
       root: frontend/
+      glob: "*.{vue,ts,js,json}"
       run: npm run --silent prettier:fix {staged_files} && git add {staged_files}
     frontend-eslint:
       tags: frontend lint
