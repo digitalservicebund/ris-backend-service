@@ -14,7 +14,7 @@ class DocumentNumberFormatTest {
     Year currentYear = DateUtil.getCurrentYear();
 
     DocumentNumberFormat documentNumberFormat =
-        DocumentNumberFormat.builder().pattern(format).year(currentYear).docNumber(1).build();
+        DocumentNumberFormat.builder().pattern(format).year(currentYear).docNumber(2).build();
 
     var expectedId = "KORE70002" + currentYear;
 
