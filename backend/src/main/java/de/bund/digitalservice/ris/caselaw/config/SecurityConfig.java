@@ -1,15 +1,11 @@
 package de.bund.digitalservice.ris.caselaw.config;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableReactiveMethodSecurity;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
-import org.springframework.security.oauth2.jwt.ReactiveJwtDecoder;
-import org.springframework.security.oauth2.jwt.ReactiveJwtDecoders;
 import org.springframework.security.web.server.SecurityWebFilterChain;
 import org.springframework.security.web.server.authentication.HttpStatusServerEntryPoint;
 import org.springframework.security.web.server.authentication.RedirectServerAuthenticationFailureHandler;
@@ -21,9 +17,6 @@ import org.springframework.security.web.server.header.XFrameOptionsServerHttpHea
 @EnableWebFluxSecurity
 @EnableReactiveMethodSecurity(useAuthorizationManager = true) // enables @PreAuthorize to work
 public class SecurityConfig {
-
-  @Value("${OAUTH2_CLIENT_ISSUER:https://neuris.login.bare.id/auth/realms/development}")
-  String issuerUri;
 
   @Bean
   public SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity http) {
@@ -71,12 +64,6 @@ public class SecurityConfig {
                                     + "clipboard-read=(self), clipboard-write=(self), gamepad=(), speaker-selection=(), conversion-measurement=(), "
                                     + "focus-without-user-activation=(self), hid=(), idle-detection=(), interest-cohort=(), serial=(), sync-script=(), "
                                     + "trust-token-redemption=(), window-placement=(), vertical-scroll=(self)")))
-        .oauth2ResourceServer(jwtCustomizer -> jwtCustomizer.jwt(Customizer.withDefaults()))
         .build();
-  }
-
-  @Bean
-  public ReactiveJwtDecoder jwtDecoder() {
-    return ReactiveJwtDecoders.fromIssuerLocation(issuerUri);
   }
 }
