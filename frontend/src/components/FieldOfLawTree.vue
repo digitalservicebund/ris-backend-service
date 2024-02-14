@@ -87,7 +87,7 @@ const showNormsModelValue = computed({
     <div class="my-14">
       <InputField
         id="showNorms"
-        aria-label="Beschlussfassung mit qualifizierter Mehrheit"
+        aria-label="Normen anzeigen"
         label="Normen anzeigen"
         label-class="ds-label-01-reg"
         :label-position="LabelPosition.RIGHT"

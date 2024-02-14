@@ -2,6 +2,7 @@ import { expect } from "@playwright/test"
 import {
   navigateToCategories,
   toggleFieldOfLawSection,
+  waitForSaving,
 } from "~/e2e/caselaw/e2e-utils"
 import { caselawTest as test } from "~/e2e/caselaw/fixtures"
 
@@ -88,7 +89,7 @@ test.describe("field of law", () => {
 
     await page
       .getByRole("button", {
-        name: "Alle Sachgebiete aufklappen",
+        name: "Alle Sachgebiete einklappen",
       })
       .click()
 
@@ -168,6 +169,61 @@ test.describe("field of law", () => {
     await expect(
       page.getByLabel("SR-07 Ordnungswidrigkeitenrecht hinzufügen"),
     ).toBeVisible()
+  })
+  test("opening and closing tree nodes, nodes with no children do not display expand icon", async ({
+    page,
+    documentNumber,
+  }) => {
+    await navigateToCategories(page, documentNumber)
+    await toggleFieldOfLawSection(page)
+
+    await page
+      .getByRole("button", {
+        name: "Alle Sachgebiete aufklappen",
+      })
+      .click()
+
+    await expect(page.getByLabel("Strafrecht aufklappen")).toBeVisible()
+
+    await page.getByRole("button", { name: "Strafrecht aufklappen" }).click()
+
+    await expect(page.getByLabel("Strafrecht einklappen")).toBeVisible()
+
+    await expect(
+      page.getByLabel("Ordnungswidrigkeitenrecht aufklappen"),
+    ).toBeVisible()
+
+    await page
+      .getByRole("button", { name: "Ordnungswidrigkeitenrecht aufklappen" })
+      .click()
+
+    await expect(
+      page.getByLabel("Ordnungswidrigkeitenrecht einklappen"),
+    ).toBeVisible()
+
+    await page.getByRole("button", { name: "OWi-Verfahren aufklappen" }).click()
+
+    //last layer: nodes with no children do not display expand icon
+
+    await expect(
+      page.getByText("Zuständigkeiten", {
+        exact: true,
+      }),
+    ).toBeVisible()
+
+    await expect(page.getByLabel("Zuständigkeiten aufklappen")).toBeHidden()
+
+    //toggling again closes child nodes tree
+
+    await page.getByRole("button", { name: "OWi-Verfahren einklappen" }).click()
+
+    await expect(
+      page.getByText("Zuständigkeiten", {
+        exact: true,
+      }),
+    ).toBeHidden()
+
+    await expect(page.getByLabel("OWi-Verfahren aufklappen")).toBeVisible()
   })
 
   test("open 'Strafrecht' - tree and add 'Ordnungswidrigkeitenrecht', remove it in the selection list", async ({
@@ -270,6 +326,35 @@ test.describe("field of law", () => {
     await expect(
       page.getByText("Person, Sache, Willenserklärung, Vertrag, IPR"),
     ).toBeVisible()
+  })
+
+  test("Search with paginated results - click on result opens tree in direct path mode to selected result and can be saved", async ({
+    page,
+    documentNumber,
+  }) => {
+    await navigateToCategories(page, documentNumber)
+    await toggleFieldOfLawSection(page)
+
+    await page.locator("[aria-label='Sachgebiete Suche']").fill("Grundstück")
+    await page.keyboard.press("Enter")
+
+    const searchResult = page.getByLabel(
+      "BR-01-06-05 Grundstückskaufvertrag im Sachgebietsbaum anzeigen",
+    )
+    await expect(searchResult).toBeVisible()
+    await searchResult.click()
+
+    await waitForSaving(
+      async () => {
+        const searchResultInTree = page.getByLabel(
+          "BR-01-06-05 Grundstückskaufvertrag hinzufügen",
+        )
+        await expect(searchResultInTree).toBeVisible()
+        await searchResultInTree.click()
+      },
+      page,
+      { clickSaveButton: true },
+    )
   })
 
   test("Search with both norm string and stext string - sets show norm checkbox to true", async ({

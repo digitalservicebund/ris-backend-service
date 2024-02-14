@@ -86,7 +86,10 @@ onMounted(async () => {
       <div v-if="node.childrenCount === 0" class="pl-24"></div>
       <div v-else>
         <button
-          :aria-label="node.text + ' aufklappen'"
+          :aria-label="
+            node.text +
+            `${props.node.isExpanded ? ' einklappen' : ' aufklappen'}`
+          "
           class="w-icon rounded-full bg-blue-200 text-blue-800"
           @click="handleToggle"
         >
