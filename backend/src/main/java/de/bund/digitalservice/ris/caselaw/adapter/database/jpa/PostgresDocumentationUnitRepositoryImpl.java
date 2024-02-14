@@ -79,9 +79,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
   @Override
   @Transactional(transactionManager = "jpaTransactionManager")
   public Mono<DocumentUnit> findByDocumentNumber(String documentNumber) {
-    if (log.isDebugEnabled()) {
-      log.debug("find by document number: {}", documentNumber);
-    }
+    log.debug("find by document number: {}", documentNumber);
 
     return Mono.just(
         DocumentationUnitTransformer.transformToDomain(
@@ -91,9 +89,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
   @Override
   @Transactional(transactionManager = "jpaTransactionManager")
   public DocumentUnit findByUuid(UUID uuid) {
-    if (log.isDebugEnabled()) {
-      log.debug("find by uuid: {}", uuid);
-    }
+    log.debug("find by uuid: {}", uuid);
 
     return DocumentationUnitTransformer.transformToDomain(repository.findById(uuid).orElse(null));
   }
@@ -614,9 +610,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
       Pageable pageable,
       DocumentationOffice documentationOffice,
       @Param("searchInput") DocumentationUnitSearchInput searchInput) {
-    if (log.isDebugEnabled()) {
-      log.debug("Find by overview search: {}, {}", documentationOffice, searchInput);
-    }
+    log.debug("Find by overview search: {}, {}", documentationOffice.abbreviation(), searchInput);
 
     DocumentationOfficeDTO documentationOfficeDTO =
         documentationOfficeRepository.findByAbbreviation(documentationOffice.abbreviation());

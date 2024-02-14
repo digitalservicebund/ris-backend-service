@@ -13,15 +13,13 @@ public class DocumentationUnitSearchResultTransformer {
 
   public static DocumentationUnitSearchResult transformToDomain(
       DocumentationUnitSearchResultDTO documentationUnitSearchResultDTO) {
-    if (log.isDebugEnabled()) {
-      log.debug(
-          "transfer database documentation unit '{}' to domain object",
-          documentationUnitSearchResultDTO.getId());
-    }
-
     if (documentationUnitSearchResultDTO == null) {
       return DocumentationUnitSearchResult.builder().build();
     }
+
+    log.debug(
+        "transfer database documentation unit '{}' to domain object",
+        documentationUnitSearchResultDTO.getId());
 
     DocumentationUnitSearchResult.DocumentationUnitSearchResultBuilder builder =
         DocumentationUnitSearchResult.builder();

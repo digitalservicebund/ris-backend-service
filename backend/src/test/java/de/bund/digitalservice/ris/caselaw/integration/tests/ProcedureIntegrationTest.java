@@ -24,11 +24,13 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOffi
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentationUnitRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ProcedureDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.transformer.ProcedureTransformer;
 import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
 import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentNumberService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitListEntry;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatusService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
@@ -42,7 +44,6 @@ import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -514,7 +515,6 @@ class ProcedureIntegrationTest {
     DocumentationUnitDTO dto =
         documentUnitRepository.save(
             DocumentationUnitDTO.builder()
-                // .creationtimestamp(Instant.now())
                 .documentNumber("1234567890123")
                 .documentationOffice(documentationOfficeDTO)
                 .build());
@@ -647,16 +647,16 @@ class ProcedureIntegrationTest {
   }
 
   @Test
-  @Disabled(
-      "only for e2e test needed. remove controller endpoint. check how to handle cleanup after e2e tests.")
+  // only needed for e2e test
+  // TODO remove controller endpoint. check how to handle cleanup after e2e tests
   void testDeleteProcedure() {
-    createProcedures(List.of("fooProcedure"), documentationOfficeDTO);
+    ProcedureDTO procedureDTO = createProcedure("fooProcedure", documentationOfficeDTO);
     assertThat(repository.findAll()).hasSize(1);
 
     risWebTestClient
         .withDefaultLogin()
         .delete()
-        .uri("/api/v1/caselaw/procedure/fooProcedure")
+        .uri("/api/v1/caselaw/procedure/" + procedureDTO.getId())
         .exchange()
         .expectStatus()
         .is2xxSuccessful();
@@ -665,23 +665,61 @@ class ProcedureIntegrationTest {
   }
 
   @Test
-  @Disabled(
-      "only for e2e test needed. remove controller endpoint. check how to handle cleanup after e2e tests.")
-  void testDontDeleteProcedureOfForeignOffice() {
+  void testProcedureControllerReturnsDocUnitsPerProcedure() {
     DocumentationOfficeDTO bghDocOfficeDTO =
         documentationOfficeRepository.findByAbbreviation("BGH");
-    createProcedures(List.of("fooProcedure"), bghDocOfficeDTO);
+
+    DocumentationUnitDTO dto =
+        documentUnitRepository.save(
+            DocumentationUnitDTO.builder()
+                .documentNumber("1234567890123")
+                .documentationOffice(documentationOfficeDTO)
+                .build());
+
+    ProcedureDTO procedure = createProcedure("testProcedure", bghDocOfficeDTO);
+
     assertThat(repository.findAll()).hasSize(1);
+
+    DocumentUnit documentUnitFromFrontend1 =
+        DocumentUnit.builder()
+            .uuid(dto.getId())
+            .documentNumber(dto.getDocumentNumber())
+            .coreData(
+                CoreData.builder()
+                    .procedure(ProcedureTransformer.transformToDomain(procedure))
+                    .documentationOffice(docOffice)
+                    .build())
+            .build();
 
     risWebTestClient
         .withDefaultLogin()
-        .delete()
-        .uri("/api/v1/caselaw/procedure/fooProcedure")
+        .put()
+        .uri("/api/v1/caselaw/documentunits/" + dto.getId())
+        .bodyValue(documentUnitFromFrontend1)
         .exchange()
         .expectStatus()
-        .is2xxSuccessful();
+        .is2xxSuccessful()
+        .expectBody(DocumentUnit.class)
+        .consumeWith(
+            response -> {
+              assertThat(response.getResponseBody().coreData().procedure().label())
+                  .isEqualTo(procedure.getLabel());
+              assertThat(response.getResponseBody().coreData().previousProcedures()).isEmpty();
+            });
 
-    assertThat(repository.findAll()).hasSize(1);
+    risWebTestClient
+        .withDefaultLogin()
+        .get()
+        .uri("/api/v1/caselaw/procedure/" + procedure.getId() + "/documentunits")
+        .exchange()
+        .expectStatus()
+        .is2xxSuccessful()
+        .expectBody(new ParameterizedTypeReference<List<DocumentUnitListEntry>>() {})
+        .consumeWith(
+            response -> {
+              assertThat(Objects.requireNonNull(response.getResponseBody()).get(0).documentNumber())
+                  .isEqualTo("1234567890123");
+            });
   }
 
   private List<ProcedureDTO> createProcedures(

@@ -48,9 +48,7 @@ public class DocumentationUnitTransformer {
   public static DocumentationUnitDTO transformToDTO(
       DocumentationUnitDTO currentDto, DocumentUnit updatedDomainObject) {
 
-    if (log.isDebugEnabled()) {
-      log.debug("transform database documentation unit '{}'", currentDto.getId());
-    }
+    log.debug("transform database documentation unit '{}'", currentDto.getId());
 
     DocumentationUnitDTO.DocumentationUnitDTOBuilder builder =
         currentDto.toBuilder()
@@ -367,15 +365,12 @@ public class DocumentationUnitTransformer {
   }
 
   public static DocumentUnit transformToDomain(DocumentationUnitDTO documentationUnitDTO) {
-    if (log.isDebugEnabled()) {
-      log.debug(
-          "transfer database documentation unit '{}' to domain object",
-          documentationUnitDTO.getId());
-    }
-
     if (documentationUnitDTO == null) {
       return DocumentUnit.builder().build();
     }
+
+    log.debug(
+        "transfer database documentation unit '{}' to domain object", documentationUnitDTO.getId());
 
     LegalEffect legalEffect = getLegalEffectForDomain(documentationUnitDTO);
 

@@ -9,13 +9,11 @@ public class CitationTypeTransformer {
   private CitationTypeTransformer() {}
 
   public static CitationType transformToDomain(CitationTypeDTO citationTypeDTO) {
-    if (log.isDebugEnabled()) {
-      log.debug("transform '{}' to citation style domain object", citationTypeDTO.getId());
-    }
-
     if (citationTypeDTO == null) {
       return null;
     }
+
+    log.debug("transform '{}' to citation style domain object", citationTypeDTO.getId());
 
     return CitationType.builder()
         .uuid(citationTypeDTO.getId())
