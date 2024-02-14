@@ -7,7 +7,6 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentNumberFormat;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentNumberService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import java.util.Map;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
@@ -18,9 +17,11 @@ public class DatabaseDocumentNumberService implements DocumentNumberService {
 
   public DatabaseDocumentNumberService(
       DatabaseDocumentNumberRepository repository,
-      @Autowired DocumentNumberPatternProperties documentNumberPatternProperties) {
+      DocumentNumberPatternProperties documentNumberPatternProperties) {
     this.repository = repository;
     this.documentNumberPatterns = documentNumberPatternProperties.getDocumentNumberPatterns();
+    assert (documentNumberPatterns != null);
+    assert (repository != null);
   }
 
   @Override

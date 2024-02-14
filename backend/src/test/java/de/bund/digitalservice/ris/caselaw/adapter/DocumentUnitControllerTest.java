@@ -49,7 +49,12 @@ import reactor.core.publisher.Mono;
 
 @ExtendWith(SpringExtension.class)
 @WebFluxTest(controllers = DocumentUnitController.class)
-@Import({SecurityConfig.class, AuthService.class, TestConfig.class})
+@Import({
+  SecurityConfig.class,
+  AuthService.class,
+  TestConfig.class,
+  DocumentNumberPatternProperties.class
+})
 class DocumentUnitControllerTest {
   @Autowired private RisWebTestClient risWebClient;
   @MockBean private DocumentUnitService service;

@@ -20,7 +20,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith(SpringExtension.class)
 @WebFluxTest(controllers = CourtController.class)
-@Import({SecurityConfig.class, TestConfig.class})
+@Import({SecurityConfig.class, TestConfig.class, DocumentNumberPatternProperties.class})
 class CourtControllerTest {
   @Autowired private RisWebTestClient risWebTestClient;
 

@@ -55,6 +55,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
   private final DatabaseProcedureRepository procedureRepository;
   private final DatabaseRelatedDocumentationRepository relatedDocumentationRepository;
   private final DatabaseLegalPeriodicalRepository legalPeriodicalRepository;
+  private final DatabaseDocumentNumberRepository databaseDocumentNumberRepository;
 
   public PostgresDocumentationUnitRepositoryImpl(
       DatabaseDocumentationUnitRepository repository,
@@ -64,7 +65,8 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
       DatabaseKeywordRepository keywordRepository,
       DatabaseProcedureRepository procedureRepository,
       DatabaseFieldOfLawRepository fieldOfLawRepository,
-      DatabaseLegalPeriodicalRepository legalPeriodicalRepository) {
+      DatabaseLegalPeriodicalRepository legalPeriodicalRepository,
+      DatabaseDocumentNumberRepository databaseDocumentNumberRepository) {
 
     this.repository = repository;
     this.databaseCourtRepository = databaseCourtRepository;
@@ -74,6 +76,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
     this.fieldOfLawRepository = fieldOfLawRepository;
     this.procedureRepository = procedureRepository;
     this.legalPeriodicalRepository = legalPeriodicalRepository;
+    this.databaseDocumentNumberRepository = databaseDocumentNumberRepository;
   }
 
   @Override

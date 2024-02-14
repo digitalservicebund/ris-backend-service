@@ -86,7 +86,8 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
       PostgresJPAConfig.class,
       SecurityConfig.class,
       AuthService.class,
-      TestConfig.class
+      TestConfig.class,
+      DocumentNumberPatternProperties.class
     },
     controllers = {DocumentUnitController.class})
 class DocumentationUnitIntegrationTest {
@@ -108,16 +109,17 @@ class DocumentationUnitIntegrationTest {
   @Autowired private DatabaseDocumentationUnitRepository repository;
   @Autowired private DatabaseFileNumberRepository fileNumberRepository;
   @Autowired private DatabaseDocumentTypeRepository databaseDocumentTypeRepository;
-
   @Autowired private DatabaseDocumentCategoryRepository databaseDocumentCategoryRepository;
   @Autowired private DatabaseDocumentationOfficeRepository documentationOfficeRepository;
   @Autowired private DatabaseCourtRepository courtRepository;
+  @Autowired private DatabaseDocumentNumberRepository databaseDocumentNumberRepository;
+
   @MockBean private S3AsyncClient s3AsyncClient;
   @MockBean private EmailPublishService publishService;
   @MockBean private DocxConverterService docxConverterService;
   @MockBean private UserService userService;
   @MockBean private ReactiveClientRegistrationRepository clientRegistrationRepository;
-
+  @MockBean private DatabaseDocumentNumberService databaseDocumentNumberService;
   private final DocumentationOffice docOffice = buildDefaultDocOffice();
   private UUID documentationOfficeUuid;
 
