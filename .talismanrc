@@ -6,7 +6,7 @@ fileignoreconfig:
   ignore_detectors:
   - filecontent
 - filename: backend/src/test/java/de/bund/digitalservice/ris/caselaw/integration/tests/JurisXmlExporterWrapperIntegrationTest.java
-  checksum: 564472e7d31773165234aeb0f1afd3cd7689369323516b1b15627f618008a17e
+  checksum: ff7ea855e9641163cd3949f47bfacfaa1ee4dc1f319abd2fe8d39d312bba5ff8
 - filename: backend/src/test/java/de/bund/digitalservice/ris/caselaw/integration/tests/DeviatingObjectIntegrationTest.java
   checksum: 8ac9372e4d04d725843f073f70f90d42c7512aa6a9725626b9d0d56eae3230c6
 - filename: compose.yaml
