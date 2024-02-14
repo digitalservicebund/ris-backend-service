@@ -1,4 +1,0 @@
-ALTER TABLE
-  files
-ADD COLUMN IF NOT EXISTS
-  created_at TIMESTAMP DEFAULT (now());
