@@ -71,11 +71,11 @@ unleash:
   appName: unleash-proxy
 
 neuris:
-  document-numbers:
-    bgh: KORE7****YYYY # results in e.g. KORE 7 0001 24
-    bverfg: KVRE*****YY41 # results in e.g. KVRE 00001 24 41
-    bverwg: WBRE61******* # TODO where put user und year?
-    bsg: BSGRE1****YY
+  document-number-patterns:
+    BGH: KORE7****YYYY # results in e.g. KORE 7 0001 24
+    BVerfG: KVRE*****YY41 # results in e.g. KVRE 00001 24 41
+    BVerwG: WBRE61******* # TODO where put user und year?
+    BSG: BSGRE1****YY
+    DS: DSRE*****YY
+    CC-RIS: XXRE*****YY
     # TODO: other docoffices
-    ds: DSRE*****YY
-    cc-ris: XXRE*****YY
