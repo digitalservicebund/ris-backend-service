@@ -991,7 +991,7 @@ jobs:
       #     name: erdiagram
       #     path: tmp/erdiagram-reports/
       # - name: ER-diagram - git add report
-      #   uses: digitalservicebund/ris-reports/actions/git-add-report@da8cfce630414b940051870f02413c700320d510
+      #   uses: digitalservicebund/github-actions/add-ris-report@a4d00619e174444b1382e59871b3f9adc83f95e0
       #   with:
       #     filePath: tmp/erdiagram-reports/latest.mmd
       #     destinationDir: entity-relationship-diagrams/ris-backend-service
@@ -1003,12 +1003,12 @@ jobs:
           path: tmp/licence-reports/
           merge-multiple: true
       - name: Frontend licence report - git add report
-        uses: digitalservicebund/ris-reports/actions/git-add-report@da8cfce630414b940051870f02413c700320d510
+        uses: digitalservicebund/github-actions/add-ris-report@a4d00619e174444b1382e59871b3f9adc83f95e0
         with:
           filePath: tmp/licence-reports/frontend-licence-report.csv
           destinationDir: licence-reports/frontend/ris-backend-service
       - name: Backend licence report - git add report
-        uses: digitalservicebund/ris-reports/actions/git-add-report@da8cfce630414b940051870f02413c700320d510
+        uses: digitalservicebund/github-actions/add-ris-report@a4d00619e174444b1382e59871b3f9adc83f95e0
         with:
           filePath: tmp/licence-reports/backend-licence-report.csv
           destinationDir: licence-reports/backend/ris-backend-service
@@ -1020,7 +1020,7 @@ jobs:
           path: tmp/performance-reports/
       - run: mv tmp/performance-reports/profile*.html tmp/performance-reports/profile-report.html
       - name: Performance report - git add report
-        uses: digitalservicebund/ris-reports/actions/git-add-report@da8cfce630414b940051870f02413c700320d510
+        uses: digitalservicebund/github-actions/add-ris-report@a4d00619e174444b1382e59871b3f9adc83f95e0
         with:
           filePath: tmp/performance-reports/profile-report.html
           destinationDir: performance-reports/ris-backend-service
@@ -1031,7 +1031,7 @@ jobs:
           name: backend-code-documentation
           path: tmp/backend-code-documentation/
       - name: Java - git add report
-        uses: digitalservicebund/ris-reports/actions/git-add-report@da8cfce630414b940051870f02413c700320d510
+        uses: digitalservicebund/github-actions/add-ris-report@a4d00619e174444b1382e59871b3f9adc83f95e0
         with:
           filePath: tmp/backend-code-documentation
           destinationDir: backend-code-documentation/java
