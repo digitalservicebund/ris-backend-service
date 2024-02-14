@@ -8,11 +8,11 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitRepository;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatusService;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.Status;
+import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
 import java.util.Objects;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 

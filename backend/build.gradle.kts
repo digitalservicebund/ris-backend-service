@@ -116,7 +116,7 @@ sonar {
         property("sonar.host.url", "https://sonarcloud.io")
         property(
             "sonar.coverage.exclusions",
-            "**/src/fields/**,**/config/**,**/S3AsyncMockClient.java,**/Application.java,**/NormsMemoryRepository.kt"
+            "**/config/**,**/S3AsyncMockClient.java,**/Application.java"
         )
     }
 }
