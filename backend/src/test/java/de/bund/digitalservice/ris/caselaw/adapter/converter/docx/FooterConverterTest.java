@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 
-public class FooterConverterTest {
+class FooterConverterTest {
 
   @Test
   void testConvert() {
