@@ -120,8 +120,7 @@ public class DocumentUnitService {
   }
 
   void checkDocx(ByteBuffer byteBuffer) {
-    var zip =
-        new ZipInputStream(new ByteArrayInputStream(ServiceUtils.byteBufferToArray(byteBuffer)));
+    var zip = new ZipInputStream(new ByteArrayInputStream(byteBufferToArray(byteBuffer)));
     ZipEntry entry;
     try {
       while ((entry = zip.getNextEntry()) != null) {
@@ -333,5 +332,13 @@ public class DocumentUnitService {
     if (docx2html.ecliList().size() == 1) {
       repository.updateECLI(uuid, docx2html.ecliList().get(0));
     }
+  }
+
+  private byte[] byteBufferToArray(ByteBuffer byteBuffer) {
+    byteBuffer.rewind();
+    byte[] byteBufferArray = new byte[byteBuffer.remaining()];
+    byteBuffer.get(byteBufferArray);
+    byteBuffer.rewind();
+    return byteBufferArray;
   }
 }
