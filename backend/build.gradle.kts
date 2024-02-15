@@ -141,7 +141,7 @@ dependencies {
     implementation("org.springframework.security:spring-security-oauth2-resource-server:$springSecurityVersion")
     implementation("org.springframework:spring-web:$springWebVersion")
     implementation("org.springframework:spring-webflux:$springWebVersion")
-    implementation("org.springdoc:springdoc-openapi-starter-webflux-ui:2.2.0")
+    implementation("org.springdoc:springdoc-openapi-starter-webflux-ui:2.3.0")
     implementation("org.springframework.boot:spring-boot-starter-webflux") {
         exclude(group = "io.netty", module = "netty-tcnative-classes")
         because("CVE-2021-43797, not using Tomcat")
@@ -182,7 +182,8 @@ dependencies {
     // CVE-2022-40153
     implementation("com.fasterxml.woodstox:woodstox-core:6.6.0")
     implementation("org.docx4j:docx4j-JAXB-ReferenceImpl:11.4.9")
-    implementation("jakarta.mail:jakarta.mail-api:2.0.1")
+    implementation("jakarta.mail:jakarta.mail-api:2.1.2")
+    implementation("org.eclipse.angus:angus-mail:2.0.2")
     implementation("com.sun.activation:jakarta.activation:2.0.1")
     implementation("jakarta.xml.bind:jakarta.xml.bind-api") {
         version {
@@ -220,7 +221,7 @@ dependencies {
     testImplementation("org.mockito:mockito-inline:5.2.0")
     testImplementation("io.projectreactor:reactor-test:3.6.1")
     // => CVE-2023-34034
-    testImplementation("org.springframework.security:spring-security-test:6.1.2")
+    testImplementation("org.springframework.security:spring-security-test:6.2.1")
     testImplementation("com.tngtech.archunit:archunit-junit5:1.2.0")
     testImplementation("org.mockito:mockito-junit-jupiter:5.10.0")
     testImplementation("org.testcontainers:testcontainers:$testContainersVersion")
