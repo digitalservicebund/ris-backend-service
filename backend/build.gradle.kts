@@ -122,7 +122,7 @@ sonar {
 }
 
 dependencies {
-    val springSecurityVersion = "6.1.2"
+    val springSecurityVersion = "6.2.1"
     val springWebVersion = "6.0.11"
     // CVE-2023-6481
     val logbackVersion = "1.4.14"
