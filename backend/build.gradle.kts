@@ -10,7 +10,7 @@ import org.springframework.boot.gradle.tasks.bundling.BootBuildImage
 plugins {
     java
     jacoco
-    id("org.springframework.boot") version "3.1.8"
+    id("org.springframework.boot") version "3.2.2"
     id("io.spring.dependency-management") version "1.1.0"
     id("com.diffplug.spotless") version "6.25.0"
     id("org.sonarqube") version "4.4.1.3373"
