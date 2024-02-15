@@ -31,7 +31,6 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -231,55 +230,6 @@ class DocumentUnitServiceTest {
         .verifyComplete();
 
     verify(s3AsyncClient, times(0)).deleteObject(any(DeleteObjectRequest.class));
-  }
-
-  @Test
-  @Disabled("done by JPA can be checked later")
-  void testDeleteByUuid_withProceedingDecisions() {
-    DocumentUnit documentUnit =
-        DocumentUnit.builder()
-            .uuid(TEST_UUID)
-            .previousDecisions(List.of(PreviousDecision.builder().build()))
-            .build();
-    when(repository.findByUuid(TEST_UUID)).thenReturn(documentUnit);
-
-    StepVerifier.create(service.deleteByUuid(TEST_UUID))
-        .consumeNextWith(
-            string -> {
-              assertNotNull(string);
-              assertEquals(
-                  "Dokumentationseinheit gelöscht: "
-                      + TEST_UUID
-                      + ", zudem die Verknüpfungen mit 1 vorgehenden Entscheidungen",
-                  string);
-            })
-        .verifyComplete();
-  }
-
-  @Test
-  @Disabled("done by JPA can be checked later")
-  void testDeleteByUuid_withActiveCitations() {
-    DocumentUnit documentUnit =
-        DocumentUnit.builder()
-            .uuid(TEST_UUID)
-            .contentRelatedIndexing(
-                ContentRelatedIndexing.builder()
-                    .activeCitations(List.of(ActiveCitation.builder().build()))
-                    .build())
-            .build();
-    when(repository.findByUuid(TEST_UUID)).thenReturn(documentUnit);
-
-    StepVerifier.create(service.deleteByUuid(TEST_UUID))
-        .consumeNextWith(
-            string -> {
-              assertNotNull(string);
-              assertEquals(
-                  "Dokumentationseinheit gelöscht: "
-                      + TEST_UUID
-                      + ", zudem die Verknüpfungen mit 1 Aktivzitierungen",
-                  string);
-            })
-        .verifyComplete();
   }
 
   @Test
