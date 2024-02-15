@@ -18,6 +18,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentUnitStatusService;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationOfficeRepository;
 import jakarta.validation.Validator;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -78,6 +79,8 @@ class DocumentUnitServiceTest {
   @MockBean private PublicationReportRepository publicationReportRepository;
 
   @MockBean private DatabaseDocumentUnitStatusService documentUnitStatusService;
+
+  @MockBean private DatabaseDocumentationOfficeRepository documentationOfficeRepository;
 
   @MockBean private Validator validator;
 

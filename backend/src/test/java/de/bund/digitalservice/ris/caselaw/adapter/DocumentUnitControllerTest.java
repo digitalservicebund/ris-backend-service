@@ -53,7 +53,7 @@ import reactor.core.publisher.Mono;
   SecurityConfig.class,
   AuthService.class,
   TestConfig.class,
-  DocumentNumberPatternProperties.class
+  DocumentNumberPatternConfig.class
 })
 class DocumentUnitControllerTest {
   @Autowired private RisWebTestClient risWebClient;

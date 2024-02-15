@@ -25,7 +25,7 @@ import reactor.core.publisher.Mono;
 
 @ExtendWith(SpringExtension.class)
 @WebFluxTest(controllers = MailTrackingController.class)
-@Import({SecurityConfig.class, TestConfig.class, DocumentNumberPatternProperties.class})
+@Import({SecurityConfig.class, TestConfig.class, DocumentNumberPatternConfig.class})
 class MailTrackingControllerTest {
   @Autowired private RisWebTestClient risWebTestClient;
   @MockBean private MailTrackingService service;

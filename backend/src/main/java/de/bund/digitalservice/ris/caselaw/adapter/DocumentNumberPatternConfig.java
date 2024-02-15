@@ -12,7 +12,7 @@ import org.springframework.context.annotation.Configuration;
 @ConfigurationProperties(prefix = "neuris")
 @Getter
 @Setter
-public class DocumentNumberPatternProperties implements InitializingBean {
+public class DocumentNumberPatternConfig implements InitializingBean {
 
   Map<String, String> documentNumberPatterns;
 

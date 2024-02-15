@@ -11,6 +11,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.AuthService;
 import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentNumberService;
 import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentUnitStatusService;
 import de.bund.digitalservice.ris.caselaw.adapter.DatabaseProcedureService;
+import de.bund.digitalservice.ris.caselaw.adapter.DocumentNumberPatternConfig;
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentUnitController;
 import de.bund.digitalservice.ris.caselaw.adapter.DocxConverterService;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationOfficeRepository;
@@ -59,7 +60,8 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
       PostgresJPAConfig.class,
       SecurityConfig.class,
       AuthService.class,
-      TestConfig.class
+      TestConfig.class,
+      DocumentNumberPatternConfig.class
     },
     controllers = {DocumentUnitController.class})
 class DeviatingObjectIntegrationTest {

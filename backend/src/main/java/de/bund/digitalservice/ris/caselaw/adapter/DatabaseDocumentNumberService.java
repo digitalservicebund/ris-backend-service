@@ -18,9 +18,9 @@ public class DatabaseDocumentNumberService implements DocumentNumberService {
 
   public DatabaseDocumentNumberService(
       DatabaseDocumentNumberRepository repository,
-      DocumentNumberPatternProperties documentNumberPatternProperties) {
+      DocumentNumberPatternConfig documentNumberPatternConfig) {
     this.repository = repository;
-    this.documentNumberPatterns = documentNumberPatternProperties.getDocumentNumberPatterns();
+    this.documentNumberPatterns = documentNumberPatternConfig.getDocumentNumberPatterns();
     assert (documentNumberPatterns != null);
     assert (repository != null);
   }
