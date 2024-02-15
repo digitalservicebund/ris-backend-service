@@ -189,7 +189,15 @@ async function handleSearchSubmit() {
           <div
             class="table-cell min-h-56 border-b-1 border-blue-300 px-16 py-12 align-middle"
           >
-            {{ item.documentNumber }}
+            <router-link
+              class="underline focus:outline-none focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-blue-800"
+              :to="{
+                name: 'caselaw-documentUnit-documentNumber-categories',
+                params: { documentNumber: item.documentNumber },
+              }"
+            >
+              {{ item.documentNumber }}
+            </router-link>
           </div>
           <div
             class="table-cell border-b-1 border-blue-300 px-16 py-12 align-middle"
