@@ -19,11 +19,11 @@ import lombok.NoArgsConstructor;
 public class DocumentNumberDTO {
 
   @Id
-  @Column(name = "documentationOfficeAbbreviation")
+  @Column(name = "documentation_office_abbreviation")
   @NotEmpty
   private String documentationOfficeAbbreviation;
 
-  @Column(name = "lastNumber")
+  @Column(name = "last_number")
   private int lastNumber;
 
   public Integer increaseLastNumber() {
