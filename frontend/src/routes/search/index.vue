@@ -29,6 +29,11 @@ type SearchApiDataDTO = {
 }
 
 async function handleSearchSubmit() {
+  if (!searchInput.value) {
+    message.value = "Bitte geben Sie eine Suchanfrage ein"
+    hasError.value = true
+    return
+  }
   isLoading.value = true
   message.value = "Loading ..."
   hasError.value = false
@@ -41,7 +46,7 @@ async function handleSearchSubmit() {
       timeout: TIMEOUT,
     })
     if (response.status == 504) {
-      message.value = "Request timed out"
+      message.value = "Zeitüberschreitung der Anfrage"
     } else if (response.status === 200 && response.data) {
       message.value = ""
       const page = response.data as Page<SearchApiDataDTO>
