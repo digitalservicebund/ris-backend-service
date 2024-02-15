@@ -1,5 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.domain;
 
+import static de.bund.digitalservice.ris.caselaw.domain.RelatedDocumentationType.ACTIVE_CITATION;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -25,6 +26,7 @@ import java.nio.ByteBuffer;
 import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
 import java.util.UUID;
@@ -272,6 +274,23 @@ class DocumentUnitServiceTest {
     StepVerifier.create(service.deleteByUuid(TEST_UUID)).expectError().verify();
 
     verify(repository).findByUuid(TEST_UUID);
+  }
+
+  @Test
+  void testDeleteByUuid_withLinks() {
+    when(repository.findByUuid(TEST_UUID)).thenReturn(DocumentUnit.builder().build());
+    when(repository.getAllDocumentationUnitWhichLink(TEST_UUID))
+        .thenReturn(Map.of(ACTIVE_CITATION, 2L));
+
+    StepVerifier.create(service.deleteByUuid(TEST_UUID))
+        .expectErrorMatches(
+            throwable ->
+                throwable instanceof DocumentUnitDeletionException
+                    && throwable
+                        .getMessage()
+                        .contains(
+                            "Die Dokumentationseinheit konnte nicht gelöscht werden, da (2: Aktivzitierung,)"))
+        .verify();
   }
 
   @Test
