@@ -50,7 +50,14 @@ public abstract class RelatedDocumentationDTO {
 
   @Column @NotNull private Integer rank;
 
+  @Column(name = "document_number")
+  private String documentNumber;
+
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "document_number", referencedColumnName = "document_number")
+  @JoinColumn(
+      name = "document_number",
+      referencedColumnName = "document_number",
+      insertable = false,
+      updatable = false)
   private DocumentationUnitDTO referencedDocumentationUnit;
 }

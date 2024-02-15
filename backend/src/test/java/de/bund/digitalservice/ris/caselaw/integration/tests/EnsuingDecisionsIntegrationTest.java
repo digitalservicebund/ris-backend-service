@@ -883,11 +883,7 @@ class EnsuingDecisionsIntegrationTest {
             .documentNumber("documentnr001")
             .coreData(CoreData.builder().build())
             .ensuingDecisions(
-                List.of(
-                    EnsuingDecision.builder()
-                        .uuid(UUID.randomUUID())
-                        .documentNumber("documentnr002")
-                        .build()))
+                List.of(EnsuingDecision.builder().documentNumber("documentnr002").build()))
             .build();
 
     risWebTestClient
@@ -904,6 +900,8 @@ class EnsuingDecisionsIntegrationTest {
               assertThat(response.getResponseBody().ensuingDecisions()).hasSize(1);
               assertThat(response.getResponseBody().ensuingDecisions().get(0).getDocumentNumber())
                   .isEqualTo("documentnr002");
+              assertThat(response.getResponseBody().ensuingDecisions().get(0).isReferenceFound())
+                  .isTrue();
             });
   }
 

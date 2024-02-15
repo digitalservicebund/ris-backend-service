@@ -11,8 +11,7 @@ public class PreviousDecisionTransformer extends RelatedDocumentationUnitTransfo
         Optional.ofNullable(previousDecisionDTO.getReferencedDocumentationUnit());
     return PreviousDecision.builder()
         .uuid(previousDecisionDTO.getId())
-        .documentNumber(
-            referencedDocumentationUnit.map(DocumentationUnitDTO::getDocumentNumber).orElse(null))
+        .documentNumber(previousDecisionDTO.getDocumentNumber())
         .court(getCourtFromDTO(previousDecisionDTO.getCourt()))
         .fileNumber(previousDecisionDTO.getFileNumber())
         .documentType(getDocumentTypeFromDTO(previousDecisionDTO.getDocumentType()))
@@ -32,13 +31,7 @@ public class PreviousDecisionTransformer extends RelatedDocumentationUnitTransfo
         .id(previousDecision.getUuid())
         .court(getCourtFromDomain(previousDecision.getCourt()))
         .date(previousDecision.getDecisionDate())
-        .referencedDocumentationUnit(
-            previousDecision.getDocumentNumber() == null
-                ? null
-                : DocumentationUnitDTO.builder()
-                    .id(previousDecision.getUuid())
-                    .documentNumber(previousDecision.getDocumentNumber())
-                    .build())
+        .documentNumber(previousDecision.getDocumentNumber())
         .documentType(getDocumentTypeFromDomain(previousDecision.getDocumentType()))
         .fileNumber(previousDecision.getFileNumber())
         .deviatingFileNumber(previousDecision.getDeviatingFileNumber())

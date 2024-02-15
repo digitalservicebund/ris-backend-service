@@ -1114,11 +1114,7 @@ class ActiveCitationIntegrationTest {
             .contentRelatedIndexing(
                 ContentRelatedIndexing.builder()
                     .activeCitations(
-                        List.of(
-                            ActiveCitation.builder()
-                                .uuid(UUID.randomUUID())
-                                .documentNumber("documentnr002")
-                                .build()))
+                        List.of(ActiveCitation.builder().documentNumber("documentnr002").build()))
                     .build())
             .build();
 
@@ -1143,6 +1139,14 @@ class ActiveCitationIntegrationTest {
                           .get(0)
                           .getDocumentNumber())
                   .isEqualTo("documentnr002");
+              assertThat(
+                      response
+                          .getResponseBody()
+                          .contentRelatedIndexing()
+                          .activeCitations()
+                          .get(0)
+                          .isReferenceFound())
+                  .isTrue();
             });
   }
 

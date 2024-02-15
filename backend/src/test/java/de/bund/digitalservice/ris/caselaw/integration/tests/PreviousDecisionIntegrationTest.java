@@ -243,7 +243,6 @@ class PreviousDecisionIntegrationTest {
             .previousDecisions(
                 List.of(
                     PreviousDecision.builder()
-                        .uuid(childDocumentationUnitUuid)
                         .documentNumber(childDocumentUnitDTO.getDocumentNumber())
                         .deviatingFileNumber("deviatest")
                         .build()))
@@ -264,6 +263,8 @@ class PreviousDecisionIntegrationTest {
               assertThat(response.getResponseBody().previousDecisions())
                   .extracting("documentNumber")
                   .containsExactly("abcdefghjikl");
+              assertThat(response.getResponseBody().previousDecisions().get(0).isReferenceFound())
+                  .isTrue();
               assertThat(response.getResponseBody().previousDecisions())
                   .extracting("deviatingFileNumber")
                   .containsExactly("deviatest");

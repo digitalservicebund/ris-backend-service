@@ -11,8 +11,7 @@ public class EnsuingDecisionTransformer extends RelatedDocumentationUnitTransfor
         Optional.ofNullable(ensuingDecisionDTO.getReferencedDocumentationUnit());
     return EnsuingDecision.builder()
         .uuid(ensuingDecisionDTO.getId())
-        .documentNumber(
-            referencedDocumentationUnit.map(DocumentationUnitDTO::getDocumentNumber).orElse(null))
+        .documentNumber(ensuingDecisionDTO.getDocumentNumber())
         .court(getCourtFromDTO(ensuingDecisionDTO.getCourt()))
         .fileNumber(ensuingDecisionDTO.getFileNumber())
         .documentType(getDocumentTypeFromDTO(ensuingDecisionDTO.getDocumentType()))
@@ -31,13 +30,7 @@ public class EnsuingDecisionTransformer extends RelatedDocumentationUnitTransfor
         .id(ensuingDecision.getUuid())
         .court(getCourtFromDomain(ensuingDecision.getCourt()))
         .date(ensuingDecision.getDecisionDate())
-        .referencedDocumentationUnit(
-            ensuingDecision.getDocumentNumber() == null
-                ? null
-                : DocumentationUnitDTO.builder()
-                    .id(ensuingDecision.getUuid())
-                    .documentNumber(ensuingDecision.getDocumentNumber())
-                    .build())
+        .documentNumber(ensuingDecision.getDocumentNumber())
         .documentType(getDocumentTypeFromDomain(ensuingDecision.getDocumentType()))
         .fileNumber(ensuingDecision.getFileNumber())
         .note(ensuingDecision.getNote())

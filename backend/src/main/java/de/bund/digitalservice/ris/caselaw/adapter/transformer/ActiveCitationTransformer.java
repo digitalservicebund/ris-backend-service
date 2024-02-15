@@ -28,8 +28,7 @@ public class ActiveCitationTransformer extends RelatedDocumentationUnitTransform
         Optional.ofNullable(activeCitationDTO.getReferencedDocumentationUnit());
     return ActiveCitation.builder()
         .uuid(activeCitationDTO.getId())
-        .documentNumber(
-            referencedDocumentationUnit.map(DocumentationUnitDTO::getDocumentNumber).orElse(null))
+        .documentNumber(activeCitationDTO.getDocumentNumber())
         .court(getCourtFromDTO(activeCitationDTO.getCourt()))
         .fileNumber(activeCitationDTO.getFileNumber())
         .documentType(getDocumentTypeFromDTO(activeCitationDTO.getDocumentType()))
@@ -49,13 +48,7 @@ public class ActiveCitationTransformer extends RelatedDocumentationUnitTransform
             .id(activeCitation.getUuid())
             .court(getCourtFromDomain(activeCitation.getCourt()))
             .date(activeCitation.getDecisionDate())
-            .referencedDocumentationUnit(
-                activeCitation.getDocumentNumber() == null
-                    ? null
-                    : DocumentationUnitDTO.builder()
-                        .id(activeCitation.getUuid())
-                        .documentNumber(activeCitation.getDocumentNumber())
-                        .build())
+            .documentNumber(activeCitation.getDocumentNumber())
             .documentType(getDocumentTypeFromDomain(activeCitation.getDocumentType()))
             .fileNumber(activeCitation.getFileNumber());
 
