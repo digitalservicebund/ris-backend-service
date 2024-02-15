@@ -499,6 +499,20 @@ class DocumentUnitServiceTest {
     assertThrows(ResponseStatusException.class, () -> service.checkDocx(byteBuffer));
   }
 
+  @Test
+  void testPreviewPublication() {
+    DocumentUnit testDocumentUnit = DocumentUnit.builder().build();
+    XmlResultObject mockXmlResultObject =
+        new XmlResultObject("some xml", "200", List.of("success"), "foo.xml", Instant.now());
+    when(repository.findByUuid(TEST_UUID)).thenReturn(testDocumentUnit);
+    when(publishService.getPublicationPreview(testDocumentUnit))
+        .thenReturn(Mono.just(mockXmlResultObject));
+
+    StepVerifier.create(service.previewPublication(TEST_UUID))
+        .expectNext(mockXmlResultObject)
+        .verifyComplete();
+  }
+
   private CompletableFuture<DeleteObjectResponse> buildEmptyDeleteObjectResponse() {
     return CompletableFuture.completedFuture(DeleteObjectResponse.builder().build());
   }
