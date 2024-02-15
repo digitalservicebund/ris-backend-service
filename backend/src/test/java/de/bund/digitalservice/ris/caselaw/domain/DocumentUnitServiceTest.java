@@ -1,8 +1,10 @@
 package de.bund.digitalservice.ris.caselaw.domain;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.any;
@@ -17,13 +19,18 @@ import static org.mockito.Mockito.when;
 import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentUnitStatusService;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationOfficeRepository;
 import jakarta.validation.Validator;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.Random;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -39,6 +46,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
@@ -493,7 +501,51 @@ class DocumentUnitServiceTest {
             pageRequest, documentationOffice, documentationUnitSearchInput);
   }
 
+  @Test
+  void testCheckDocx_withValidDocument() {
+    ByteBuffer byteBuffer = buildBuffer("word/document.xml");
+    assertDoesNotThrow(() -> service.checkDocx(byteBuffer));
+  }
+
+  @Test
+  void testCheckDocx_withInvalidFormat() {
+    ByteBuffer byteBuffer = buildBuffer("word/document.csv");
+    assertThrows(ResponseStatusException.class, () -> service.checkDocx(byteBuffer));
+  }
+
+  @Test
+  void testCheckDocx_withCorruptedDocx() {
+    byte[] corruptedData = new byte[1024];
+    new Random().nextBytes(corruptedData);
+    ByteBuffer byteBuffer = ByteBuffer.wrap(corruptedData);
+
+    assertThrows(ResponseStatusException.class, () -> service.checkDocx(byteBuffer));
+  }
+
+  @Test
+  void testCheckDocx_withEmptyBuffer() {
+    byte[] emptyData = new byte[] {};
+    ByteBuffer byteBuffer = ByteBuffer.wrap(emptyData);
+
+    assertThrows(ResponseStatusException.class, () -> service.checkDocx(byteBuffer));
+  }
+
   private CompletableFuture<DeleteObjectResponse> buildEmptyDeleteObjectResponse() {
     return CompletableFuture.completedFuture(DeleteObjectResponse.builder().build());
+  }
+
+  private ByteBuffer buildBuffer(String entry) {
+    try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        ZipOutputStream zipOutputStream = new ZipOutputStream(byteArrayOutputStream)) {
+      ZipEntry zipEntry = new ZipEntry(entry);
+      zipOutputStream.putNextEntry(zipEntry);
+      zipOutputStream.closeEntry();
+      zipOutputStream.finish();
+
+      byte[] zipBytes = byteArrayOutputStream.toByteArray();
+      return ByteBuffer.wrap(zipBytes);
+    } catch (IOException exception) {
+      throw new RuntimeException("Failed to create zip", exception);
+    }
   }
 }
