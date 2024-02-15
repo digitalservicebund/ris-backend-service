@@ -178,7 +178,7 @@ dependencies {
     implementation("software.amazon.awssdk:s3")
     // CVE-2022-42004, CVE-2022-42003
     implementation("com.fasterxml.jackson:jackson-bom:$jacksonModuleVersion")
-    implementation("com.fasterxml.jackson.core:jackson-databind:2.14.2")
+    implementation("com.fasterxml.jackson.core:jackson-databind:2.16.1")
     // CVE-2022-40153
     implementation("com.fasterxml.woodstox:woodstox-core:6.6.0")
     implementation("org.docx4j:docx4j-JAXB-ReferenceImpl:11.4.9")
