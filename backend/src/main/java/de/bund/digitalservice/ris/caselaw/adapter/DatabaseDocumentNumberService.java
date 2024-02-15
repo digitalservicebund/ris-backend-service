@@ -8,6 +8,7 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentNumberService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import java.util.Map;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Mono;
 
 @Service
@@ -25,6 +26,7 @@ public class DatabaseDocumentNumberService implements DocumentNumberService {
   }
 
   @Override
+  @Transactional(transactionManager = "jpaTransactionManager")
   public Mono<String> generateNextDocumentNumber(DocumentationOffice documentationOffice) {
     String abbreviation = documentationOffice.abbreviation();
 
