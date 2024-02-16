@@ -125,7 +125,7 @@ dependencies {
     val springSecurityVersion = "6.1.2"
     val springWebVersion = "6.0.11"
     // CVE-2023-6481
-    val logbackVersion = "1.4.14"
+    val logbackVersion = "1.5.0"
     val r2dbcVersion = "1.0.0.RELEASE"
     val jacksonModuleVersion = "2.16.1"
     val testContainersVersion = "1.19.0"
