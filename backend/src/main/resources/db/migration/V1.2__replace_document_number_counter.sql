@@ -5,7 +5,5 @@ CREATE TABLE IF NOT EXISTS
     constraint document_number_pkey primary key (documentation_office_abbreviation)
   );
 
-/* Todo: drop table if new document number counter for each docoffice implemented
 DROP TABLE IF EXISTS
-document_number_counter CASCADE;
- */
+  document_number_counter CASCADE;
