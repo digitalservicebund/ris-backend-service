@@ -89,4 +89,24 @@ class DocumentTypeIntegrationTest {
     List<String> shortcuts = JsonPath.read(result.getResponseBody(), "$[*].label");
     assertThat(shortcuts).containsExactly("AmA", "Ao", "Bes", "Ur");
   }
+
+  @Test
+  void testGetDocumentTypesWithQuery() {
+    EntityExchangeResult<String> result =
+        risWebTestClient
+            .withDefaultLogin()
+            .get()
+            .uri("/api/v1/caselaw/documenttypes?q=Anord")
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectBody(String.class)
+            .returnResult();
+
+    List<String> labels = JsonPath.read(result.getResponseBody(), "$[*].jurisShortcut");
+    assertThat(labels).containsExactly("Anordnung", "Amtsrechtliche Anordnung");
+
+    List<String> shortcuts = JsonPath.read(result.getResponseBody(), "$[*].label");
+    assertThat(shortcuts).containsExactly("Ao", "AmA");
+  }
 }
