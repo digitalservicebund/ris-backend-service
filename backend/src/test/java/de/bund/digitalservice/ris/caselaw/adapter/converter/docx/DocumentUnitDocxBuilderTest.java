@@ -16,6 +16,7 @@ import de.bund.digitalservice.ris.caselaw.domain.docx.BorderNumber;
 import de.bund.digitalservice.ris.caselaw.domain.docx.DocxImagePart;
 import de.bund.digitalservice.ris.caselaw.domain.docx.ErrorRunElement;
 import de.bund.digitalservice.ris.caselaw.domain.docx.InlineImageElement;
+import de.bund.digitalservice.ris.caselaw.domain.docx.NumberingList;
 import de.bund.digitalservice.ris.caselaw.domain.docx.NumberingListEntry;
 import de.bund.digitalservice.ris.caselaw.domain.docx.ParagraphElement;
 import de.bund.digitalservice.ris.caselaw.domain.docx.RunTextElement;
@@ -88,6 +89,11 @@ class DocumentUnitDocxBuilderTest {
     DocumentUnitDocxBuilder builder = DocumentUnitDocxBuilder.newInstance();
     P paragraph = new P();
     PPr pPr = new PPr();
+    NumPr numPr = new NumPr();
+    NumId numId = new NumId();
+    numId.setVal(new BigInteger("0"));
+    numPr.setNumId(numId);
+    pPr.setNumPr(numPr);
     PPrBase.PStyle pStyle = new PPrBase.PStyle();
     pStyle.setVal("RandNummer");
     pPr.setPStyle(pStyle);
@@ -104,6 +110,7 @@ class DocumentUnitDocxBuilderTest {
     assertTrue(result instanceof BorderNumber);
     var borderNumberElement = (BorderNumber) result;
     assertEquals("1", borderNumberElement.getNumber());
+    assertEquals(numId.getVal().intValue(), borderNumberElement.getNumId());
 
     var htmlString = borderNumberElement.toHtmlString();
     assertEquals("<border-number><number>1</number></border-number>", htmlString);
@@ -1071,6 +1078,29 @@ class DocumentUnitDocxBuilderTest {
 
     var htmlString = numberingListEntry.toHtmlString();
     assertEquals("<p>test text</p>", htmlString);
+  }
+
+  @Test
+  void testBuild_withNumberingList_havingBullets() {
+    DocumentUnitDocxBuilder builder = DocumentUnitDocxBuilder.newInstance();
+    PPr pPr = new PPr();
+    NumPr numPr = new NumPr();
+    NumId numId = new NumId();
+    numId.setVal(new BigInteger("1"));
+    numPr.setNumId(numId);
+    pPr.setNumPr(numPr);
+    P paragraph = new P();
+    paragraph.setPPr(pPr);
+
+    var listNumberingDefinitions = new HashMap<String, ListNumberingDefinition>();
+    var converter = new DocxConverter();
+    converter.setListNumberingDefinitions(listNumberingDefinitions);
+    var result = builder.setParagraph(paragraph).setConverter(converter).build();
+    assertTrue(result instanceof NumberingListEntry);
+    var numberingListEntry = (NumberingListEntry) result;
+    assertEquals(
+        NumberingList.DocumentUnitNumberingListNumberFormat.BULLET,
+        numberingListEntry.numberingListEntryIndex().numberFormat());
   }
 
   @Test

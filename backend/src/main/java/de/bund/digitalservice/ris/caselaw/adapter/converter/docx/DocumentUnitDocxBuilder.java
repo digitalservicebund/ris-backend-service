@@ -45,7 +45,7 @@ public class DocumentUnitDocxBuilder extends DocxBuilder {
   }
 
   private boolean isText() {
-    if (paragraph == null) {
+    if (!isParagraph()) {
       return false;
     }
 
@@ -75,7 +75,7 @@ public class DocumentUnitDocxBuilder extends DocxBuilder {
   }
 
   private boolean isBorderNumber() {
-    if (paragraph == null || !isText()) {
+    if (!isText()) {
       return false;
     }
 
@@ -145,10 +145,6 @@ public class DocumentUnitDocxBuilder extends DocxBuilder {
   }
 
   private NumberingListEntry convertToNumberingListEntry() {
-    if (!isNumberingListEntry()) {
-      return null;
-    }
-
     NumPr numPr = paragraph.getPPr().getNumPr();
     String numId = null;
     String iLvl = null;
