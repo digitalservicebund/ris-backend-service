@@ -28,6 +28,6 @@ neuris:
     BVerfG: KVRE*****YY41 # results in e.g. KVRE 00001 24 41
     BVerwG: WBRE61*****YY # TODO where put user und year?
     BSG: BSGRE1*****YY
-    DS: DSRE*****YYYY
-    CC-RIS: XXRE*******YY
+    DS: XXRE0******YY
+    CC-RIS: XXRE1******YY
     # TODO: other docoffices
