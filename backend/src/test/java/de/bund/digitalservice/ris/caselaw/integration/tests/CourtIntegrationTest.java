@@ -101,7 +101,7 @@ class CourtIntegrationTest {
               assertThat(response.getResponseBody()).hasSize(2);
               assertThat(response.getResponseBody()[0].label()).isEqualTo("AB Berlin");
               assertThat(response.getResponseBody()[0].revoked())
-                  .isEqualTo("aufgehoben seit: 1970");
+                  .isEqualTo("aufgehoben seit: 1975");
 
               assertThat(response.getResponseBody()[1].label()).isEqualTo("BGH");
             });
