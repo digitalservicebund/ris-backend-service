@@ -7,12 +7,16 @@ import java.util.Calendar;
 public class DateUtil {
 
   public static Year getCurrentYear() {
-
     return Year.of(Calendar.getInstance().get(Calendar.YEAR));
   }
 
   public static String getYearAsYY(Year year) {
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yy");
     return year.format(formatter);
+  }
+
+  public static String getYearAsYY() {
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yy");
+    return getCurrentYear().format(formatter);
   }
 }
