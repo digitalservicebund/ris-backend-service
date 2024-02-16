@@ -13,7 +13,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
 
-public class JurisMessageWrapperFactoryTest {
+class JurisMessageWrapperFactoryTest {
   private JurisMessageWrapperFactory factory;
 
   @Mock private Message message;
