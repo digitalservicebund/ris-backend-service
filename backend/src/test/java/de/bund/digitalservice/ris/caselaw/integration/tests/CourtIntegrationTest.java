@@ -75,6 +75,7 @@ class CourtIntegrationTest {
             .location("Berlin")
             .isSuperiorCourt(false)
             .isForeignCourt(false)
+            .additionalInformation("- aufgehoben: 1975-02-01 -")
             .build();
     databaseCourtRepository.save(courtDTO);
     courtDTO =
@@ -99,6 +100,9 @@ class CourtIntegrationTest {
             response -> {
               assertThat(response.getResponseBody()).hasSize(2);
               assertThat(response.getResponseBody()[0].label()).isEqualTo("AB Berlin");
+              assertThat(response.getResponseBody()[0].revoked())
+                  .isEqualTo("aufgehoben seit: 1970");
+
               assertThat(response.getResponseBody()[1].label()).isEqualTo("BGH");
             });
   }
