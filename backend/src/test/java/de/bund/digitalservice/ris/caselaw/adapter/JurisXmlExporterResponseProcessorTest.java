@@ -1,5 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.ArgumentMatchers.any;
@@ -40,6 +41,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -215,56 +217,56 @@ class JurisXmlExporterResponseProcessorTest {
         .thenReturn(Mono.just("test@digitalservice.bund.de"));
     String providedHtml =
         """
-<html>
-<head>
-    <META http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <title>Title</title>
-</head>
-<body>
-    <p><img src="https://placehold.it/120x120&text=image1" align="right"><br></p>
-    <h2>Header</h2>
-    <table border="0" width="55%">
-        <tbody>
-            <tr>
-                <td width="50%"><strong>ABC</strong></td>
-                <td width="50%" align="right"><strong>DEF</strong></td>
-            </tr>
-        </tbody>
-    </table>
-    <hr width="100%">
-    <p>Paragraph 1</p>
-    <p><strong>Paragraph 2<font color="#ff0000" size="+1">
-                <i>Italic</i>
-            </font><br>
-            <table hspace="50" border="0" width="50%" cellSpacing="8">
-                <tbody></tbody>
-            </table>Text
-        </strong><br></p>
-    <hr width="100%">
-</body>
-</html>""";
+                    <html>
+                    <head>
+                        <META http-equiv="Content-Type" content="text/html; charset=UTF-8">
+                        <title>Title</title>
+                    </head>
+                    <body>
+                        <p><img src="https://placehold.it/120x120&text=image1" align="right"><br></p>
+                        <h2>Header</h2>
+                        <table border="0" width="55%">
+                            <tbody>
+                                <tr>
+                                    <td width="50%"><strong>ABC</strong></td>
+                                    <td width="50%" align="right"><strong>DEF</strong></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <hr width="100%">
+                        <p>Paragraph 1</p>
+                        <p><strong>Paragraph 2<font color="#ff0000" size="+1">
+                                    <i>Italic</i>
+                                </font><br>
+                                <table hspace="50" border="0" width="50%" cellSpacing="8">
+                                    <tbody></tbody>
+                                </table>Text
+                            </strong><br></p>
+                        <hr width="100%">
+                    </body>
+                    </html>""";
     String expectedHtml =
         """
-<p><img src="https://placehold.it/120x120&amp;text&#61;image1" align="right" /><br /></p>
-<h2>Header</h2>
-<table border="0" width="55%">
-   <tbody>
-       <tr>
-           <td width="50%"><strong>ABC</strong></td>
-           <td width="50%" align="right"><strong>DEF</strong></td>
-       </tr>
-   </tbody>
-</table>
-<hr width="100%" />
-<p>Paragraph 1</p>
-<p><strong>Paragraph 2<font color="#ff0000">
-           <i>Italic</i>
-       </font><br />
-       <table hspace="50" border="0" width="50%" cellspacing="8">
-           <tbody></tbody>
-       </table>Text
-   </strong><br /></p>
-<hr width="100%" />""";
+                    <p><img src="https://placehold.it/120x120&amp;text&#61;image1" align="right" /><br /></p>
+                    <h2>Header</h2>
+                    <table border="0" width="55%">
+                       <tbody>
+                           <tr>
+                               <td width="50%"><strong>ABC</strong></td>
+                               <td width="50%" align="right"><strong>DEF</strong></td>
+                           </tr>
+                       </tbody>
+                    </table>
+                    <hr width="100%" />
+                    <p>Paragraph 1</p>
+                    <p><strong>Paragraph 2<font color="#ff0000">
+                               <i>Italic</i>
+                           </font><br />
+                           <table hspace="50" border="0" width="50%" cellspacing="8">
+                               <tbody></tbody>
+                           </table>Text
+                       </strong><br /></p>
+                    <hr width="100%" />""";
     when(processMessageWrapper.getAttachments())
         .thenReturn(
             List.of(
@@ -433,5 +435,34 @@ class JurisXmlExporterResponseProcessorTest {
     when(statusService.getLatestIssuerAddress(DOCUMENT_NUMBER)).thenReturn(Mono.empty());
 
     assertDoesNotThrow(responseProcessor::readEmails);
+  }
+
+  @Test
+  void testRethrowsIfCannotGetFolder() throws MessagingException {
+    when(store.getFolder("INBOX")).thenThrow(new MessagingException());
+
+    StatusImporterException exception =
+        assertThrows(StatusImporterException.class, () -> responseProcessor.readEmails());
+    Assertions.assertTrue(exception.getMessage().contains("Error processing inbox: "));
+  }
+
+  @Test
+  void testRethrowsIfCannotSaveAttachment() throws MessagingException {
+    when(inbox.getMessages()).thenReturn(new Message[] {processMessage});
+    when(processMessageWrapper.getReceivedDate()).thenThrow(new MessagingException());
+
+    StatusImporterException exception =
+        assertThrows(StatusImporterException.class, () -> responseProcessor.readEmails());
+    assertEquals("Error saving attachments", exception.getMessage());
+  }
+
+  @Test
+  void testRethrowsIfCannotSetStatus() throws MessagingException {
+    when(inbox.getMessages()).thenReturn(new Message[] {processMessage});
+    when(processMessageWrapper.hasErrors()).thenThrow(new IOException());
+
+    StatusImporterException exception =
+        assertThrows(StatusImporterException.class, () -> responseProcessor.readEmails());
+    Assertions.assertTrue(exception.getMessage().contains("Could not update publicationStatus"));
   }
 }

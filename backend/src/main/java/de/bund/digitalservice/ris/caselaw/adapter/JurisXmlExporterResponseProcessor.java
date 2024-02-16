@@ -155,7 +155,7 @@ public class JurisXmlExporterResponseProcessor {
           .thenReturn(messageWrapper)
           .block();
     } catch (MessagingException | IOException | NullPointerException e) {
-      throw new StatusImporterException("Could not update publicationStatus" + e);
+      throw new StatusImporterException("Could not update publicationStatus: " + e);
     }
   }
 
