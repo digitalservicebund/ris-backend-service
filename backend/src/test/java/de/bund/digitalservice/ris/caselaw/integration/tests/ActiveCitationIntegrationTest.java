@@ -10,6 +10,7 @@ import de.bund.digitalservice.ris.caselaw.TestConfig;
 import de.bund.digitalservice.ris.caselaw.adapter.AuthService;
 import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentNumberService;
 import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentUnitStatusService;
+import de.bund.digitalservice.ris.caselaw.adapter.DocumentNumberPatternConfig;
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentUnitController;
 import de.bund.digitalservice.ris.caselaw.adapter.DocxConverterService;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentCategoryRepository;
@@ -17,7 +18,6 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentT
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationOfficeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseRelatedDocumentationRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentCategoryDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentationUnitRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresPublicationReportRepositoryImpl;
@@ -33,8 +33,6 @@ import de.bund.digitalservice.ris.caselaw.domain.EmailPublishService;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import de.bund.digitalservice.ris.caselaw.domain.court.Court;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.citation.CitationType;
-import java.time.Instant;
-import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
@@ -61,7 +59,8 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
       PostgresJPAConfig.class,
       SecurityConfig.class,
       AuthService.class,
-      TestConfig.class
+      TestConfig.class,
+      DocumentNumberPatternConfig.class
     },
     controllers = {DocumentUnitController.class})
 @Sql(scripts = {"classpath:active_citations_init.sql"})
@@ -93,14 +92,6 @@ class ActiveCitationIntegrationTest {
   @MockBean private S3AsyncClient s3AsyncClient;
   @MockBean private EmailPublishService publishService;
   @MockBean private DocxConverterService docxConverterService;
-
-  private static final String DOCUMENT_NUMBER_PREFIX = "XXRE20230000";
-  private static final String UUID_PREFIX = "88888888-4444-4444-4444-11111111111";
-  private static final Instant TIMESTAMP = Instant.parse("2000-02-01T20:13:36.00Z");
-  private static final LocalDate DECISION_DATE = LocalDate.parse("1983-09-15");
-  private UUID docOfficeUuid;
-
-  private DocumentCategoryDTO category;
   @Autowired private DatabaseDocumentCategoryRepository databaseDocumentCategoryRepository;
 
   @BeforeEach

@@ -70,8 +70,6 @@ class DocumentUnitServiceTest {
 
   @MockBean private DocumentUnitRepository repository;
 
-  @MockBean private DatabaseDocumentationOfficeRepository documentationOfficeRepository;
-
   @MockBean private DocumentNumberService documentNumberService;
 
   @MockBean private S3AsyncClient s3AsyncClient;
@@ -81,6 +79,8 @@ class DocumentUnitServiceTest {
   @MockBean private PublicationReportRepository publicationReportRepository;
 
   @MockBean private DatabaseDocumentUnitStatusService documentUnitStatusService;
+
+  @MockBean private DatabaseDocumentationOfficeRepository documentationOfficeRepository;
 
   @MockBean private Validator validator;
 

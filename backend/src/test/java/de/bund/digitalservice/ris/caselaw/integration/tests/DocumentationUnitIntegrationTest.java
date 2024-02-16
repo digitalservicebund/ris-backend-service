@@ -16,16 +16,17 @@ import de.bund.digitalservice.ris.caselaw.adapter.AuthService;
 import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentNumberService;
 import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentUnitStatusService;
 import de.bund.digitalservice.ris.caselaw.adapter.DatabaseProcedureService;
+import de.bund.digitalservice.ris.caselaw.adapter.DocumentNumberPatternConfig;
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentUnitController;
 import de.bund.digitalservice.ris.caselaw.adapter.DocxConverterService;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CourtDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseCourtRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentCategoryRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentNumberRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentTypeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationOfficeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseFileNumberRepository;
-// import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseStatusRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentCategoryDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentTypeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
@@ -86,7 +87,8 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
       PostgresJPAConfig.class,
       SecurityConfig.class,
       AuthService.class,
-      TestConfig.class
+      TestConfig.class,
+      DocumentNumberPatternConfig.class
     },
     controllers = {DocumentUnitController.class})
 class DocumentationUnitIntegrationTest {
@@ -108,16 +110,15 @@ class DocumentationUnitIntegrationTest {
   @Autowired private DatabaseDocumentationUnitRepository repository;
   @Autowired private DatabaseFileNumberRepository fileNumberRepository;
   @Autowired private DatabaseDocumentTypeRepository databaseDocumentTypeRepository;
-
   @Autowired private DatabaseDocumentCategoryRepository databaseDocumentCategoryRepository;
   @Autowired private DatabaseDocumentationOfficeRepository documentationOfficeRepository;
   @Autowired private DatabaseCourtRepository courtRepository;
+  @Autowired private DatabaseDocumentNumberRepository databaseDocumentNumberRepository;
   @MockBean private S3AsyncClient s3AsyncClient;
   @MockBean private EmailPublishService publishService;
   @MockBean private DocxConverterService docxConverterService;
   @MockBean private UserService userService;
   @MockBean private ReactiveClientRegistrationRepository clientRegistrationRepository;
-
   private final DocumentationOffice docOffice = buildDefaultDocOffice();
   private UUID documentationOfficeUuid;
 
@@ -160,6 +161,7 @@ class DocumentationUnitIntegrationTest {
   @Test
   @Transactional(transactionManager = "jpaTransactionManager")
   void testForCorrectDbEntryAfterNewDocumentUnitCreation() {
+
     risWebTestClient
         .withDefaultLogin()
         .get()
@@ -171,13 +173,13 @@ class DocumentationUnitIntegrationTest {
         .consumeWith(
             response -> {
               assertThat(response.getResponseBody()).isNotNull();
-              assertThat(response.getResponseBody().documentNumber()).startsWith("XXRE");
+              assertThat(response.getResponseBody().documentNumber()).startsWith("XXRE0");
             });
 
     List<DocumentationUnitDTO> list = repository.findAll();
     assertThat(list).hasSize(1);
     DocumentationUnitDTO documentUnitDTO = list.get(0);
-    assertThat(documentUnitDTO.getDocumentNumber()).startsWith("XXRE");
+    assertThat(documentUnitDTO.getDocumentNumber()).startsWith("XXRE0");
     assertThat(documentUnitDTO.getDecisionDate()).isNull();
 
     assertThat(documentUnitDTO.getStatus()).hasSize(1);

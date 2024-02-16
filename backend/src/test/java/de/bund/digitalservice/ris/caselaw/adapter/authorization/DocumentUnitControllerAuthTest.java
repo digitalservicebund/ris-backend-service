@@ -11,6 +11,7 @@ import static org.mockito.Mockito.when;
 import de.bund.digitalservice.ris.caselaw.RisWebTestClient;
 import de.bund.digitalservice.ris.caselaw.TestConfig;
 import de.bund.digitalservice.ris.caselaw.adapter.AuthService;
+import de.bund.digitalservice.ris.caselaw.adapter.DocumentNumberPatternConfig;
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentUnitController;
 import de.bund.digitalservice.ris.caselaw.adapter.DocxConverterService;
 import de.bund.digitalservice.ris.caselaw.adapter.KeycloakUserService;
@@ -39,7 +40,12 @@ import reactor.core.publisher.Mono;
 
 @ExtendWith(SpringExtension.class)
 @WebFluxTest(controllers = DocumentUnitController.class)
-@Import({SecurityConfig.class, AuthService.class, TestConfig.class})
+@Import({
+  SecurityConfig.class,
+  AuthService.class,
+  TestConfig.class,
+  DocumentNumberPatternConfig.class
+})
 class DocumentUnitControllerAuthTest {
   @Autowired private RisWebTestClient risWebTestClient;
 

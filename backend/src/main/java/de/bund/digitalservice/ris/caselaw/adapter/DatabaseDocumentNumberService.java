@@ -1,63 +1,55 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentNumberCounterRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentNumberCounterDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentNumberRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentNumberDTO;
+import de.bund.digitalservice.ris.caselaw.domain.DateUtil;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentNumberFormatter;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentNumberService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
-import java.util.Calendar;
 import java.util.Map;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Mono;
 
 @Service
 public class DatabaseDocumentNumberService implements DocumentNumberService {
-  private final DatabaseDocumentNumberCounterRepository repository;
-  private static final String CASELAW_ABBREVIATION = "RE";
+  private final DatabaseDocumentNumberRepository repository;
+  private final Map<String, String> documentNumberPatterns;
 
-  private static final Map<String, String> DOCUMENT_NUMBER_ABBREVIATIONS =
-      Map.ofEntries(
-          Map.entry("BGH", "KO"),
-          Map.entry("BVerfG", "KV"),
-          Map.entry("BAG", "EF"),
-          Map.entry("BFH", "ST"),
-          Map.entry("BPatG", "MP"),
-          Map.entry("BSG", "KS"),
-          Map.entry("BVerwG", "LE"),
-          Map.entry("OVG_NRW", "MW"),
-          Map.entry("BZSt", "FM"),
-          Map.entry("DS", "XX"),
-          Map.entry("CC-RIS", "XX"));
-
-  public DatabaseDocumentNumberService(DatabaseDocumentNumberCounterRepository repository) {
+  public DatabaseDocumentNumberService(
+      DatabaseDocumentNumberRepository repository,
+      DocumentNumberPatternConfig documentNumberPatternConfig) {
     this.repository = repository;
+    this.documentNumberPatterns = documentNumberPatternConfig.getDocumentNumberPatterns();
   }
 
   @Override
+  @Transactional(transactionManager = "jpaTransactionManager")
   public Mono<String> generateNextDocumentNumber(DocumentationOffice documentationOffice) {
-    int currentYear = Calendar.getInstance().get(Calendar.YEAR);
+    String abbreviation = documentationOffice.abbreviation();
 
-    DocumentNumberCounterDTO numberCounterDTO =
-        repository
-            .findById(1)
-            .orElse(
-                DocumentNumberCounterDTO.builder().currentYear(currentYear).nextNumber(1).build());
-
-    if (numberCounterDTO.getCurrentYear() != currentYear) {
-      numberCounterDTO.setCurrentYear(currentYear);
-      numberCounterDTO.setNextNumber(1);
+    if (abbreviation == null || abbreviation.isBlank()) {
+      throw new IllegalArgumentException("Documentation Office abbreviation can not be empty");
     }
 
-    String result =
-        String.format(
-            "%s%s%04d%05d",
-            DOCUMENT_NUMBER_ABBREVIATIONS.get(documentationOffice.abbreviation()),
-            CASELAW_ABBREVIATION,
-            currentYear,
-            numberCounterDTO.getNextNumber());
+    DocumentNumberDTO documentNumberDTO =
+        repository
+            .findById(abbreviation)
+            .orElse(
+                DocumentNumberDTO.builder()
+                    .documentationOfficeAbbreviation(abbreviation)
+                    .lastNumber(0)
+                    .build());
 
-    numberCounterDTO.setNextNumber(numberCounterDTO.getNextNumber() + 1);
-    repository.save(numberCounterDTO);
+    var documentNumberFormat =
+        DocumentNumberFormatter.builder()
+            .docNumber(documentNumberDTO.increaseLastNumber())
+            .year(DateUtil.getCurrentYear())
+            .pattern(documentNumberPatterns.get(abbreviation))
+            .build();
 
-    return Mono.just(result);
-  }
+    repository.save(documentNumberDTO);
+
+    return Mono.just(documentNumberFormat.toString());
+  } /**/
 }

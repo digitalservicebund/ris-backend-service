@@ -25,7 +25,7 @@ import reactor.core.publisher.Mono;
 
 @ExtendWith(SpringExtension.class)
 @WebFluxTest(controllers = MailTrackingController.class)
-@Import({SecurityConfig.class, TestConfig.class})
+@Import({SecurityConfig.class, TestConfig.class, DocumentNumberPatternConfig.class})
 class MailTrackingControllerTest {
   @Autowired private RisWebTestClient risWebTestClient;
   @MockBean private MailTrackingService service;
@@ -40,11 +40,11 @@ class MailTrackingControllerTest {
     String sendInBlueResponse =
         String.format(
             """
-            {
-              "event": "%s",
-              "tags": ["%s"],
-              "ignoredKey": 123
-            }""",
+                                {
+                                  "event": "%s",
+                                  "tags": ["%s"],
+                                  "ignoredKey": 123
+                                }""",
             mailTrackingEvent, TEST_UUID);
 
     when(service.getMappedPublishState(mailTrackingEvent)).thenReturn(expectedEmailPublishState);
@@ -69,13 +69,13 @@ class MailTrackingControllerTest {
       strings = {
         // no event
         """
-          {"tags": ["%s"]}""",
+                            {"tags": ["%s"]}""",
         // no tags
         """
-          {"event": "%s"}""",
+                            {"event": "%s"}""",
         // empty tags
         """
-          {"event": "%s", "tags": []}""",
+                            {"event": "%s", "tags": []}""",
       })
   void testSetPublishState_withInvalidPayload(String jsonString) {
     String sendInBlueResponse = String.format(jsonString, TEST_UUID);
@@ -96,23 +96,23 @@ class MailTrackingControllerTest {
       strings = {
         // no event
         """
-                    {"tags": ["%s"]}""",
+                            {"tags": ["%s"]}""",
         // no tags
         """
-                    {"event": "%s"}""",
+                            {"event": "%s"}""",
         // empty tags
         """
-                    {"event": "%s", "tags": []}""",
+                            {"event": "%s", "tags": []}""",
       })
   void testSetPublishState_withDifferentTags(String jsonString) {
 
     String sendInBlueResponse =
         """
-        {
-          "event": "delivered",
-          "tags": ["no-uuid"],
-          "ignoredKey": 123
-        }""";
+                        {
+                          "event": "delivered",
+                          "tags": ["no-uuid"],
+                          "ignoredKey": 123
+                        }""";
 
     when(service.updatePublishingState("no-uuid", "delivered"))
         .thenReturn(Mono.just(ResponseEntity.noContent().build()));

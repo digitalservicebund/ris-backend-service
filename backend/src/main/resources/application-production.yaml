@@ -11,3 +11,10 @@ spring:
 sentry:
   environment: production
   traces-sample-rate: 0.01
+
+neuris:
+  document-number-patterns:
+    BGH: KORE8****YYYY # results in e.g. KORE 8 0001 24
+    BVerfG: KVRE*****YY42 # results in e.g. KVRE 00001 24 42
+    BVerwG: WBRE60******* # TODO where put user und year?
+    BSG: BSGRE0*****YY
