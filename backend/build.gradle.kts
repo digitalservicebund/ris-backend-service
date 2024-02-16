@@ -10,7 +10,7 @@ import org.springframework.boot.gradle.tasks.bundling.BootBuildImage
 plugins {
     java
     jacoco
-    id("org.springframework.boot") version "3.1.8"
+    id("org.springframework.boot") version "3.2.2"
     id("io.spring.dependency-management") version "1.1.0"
     id("com.diffplug.spotless") version "6.25.0"
     id("org.sonarqube") version "4.4.1.3373"
@@ -122,25 +122,17 @@ sonar {
 }
 
 dependencies {
-    val springSecurityVersion = "6.1.2"
-    val springWebVersion = "6.0.11"
     // CVE-2023-6481
     val logbackVersion = "1.4.14"
-    val r2dbcVersion = "1.0.0.RELEASE"
     val jacksonModuleVersion = "2.16.1"
     val testContainersVersion = "1.19.0"
 
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework.boot:spring-boot-starter-security")
     implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
-    // => CVE-2023-34035, CVE-2023-34034
-    implementation("org.springframework.security:spring-security-web:$springSecurityVersion")
-    implementation("org.springframework.security:spring-security-config:$springSecurityVersion")
-    // => CVE-2023-34034
-    implementation("org.springframework.security:spring-security-core:$springSecurityVersion")
-    implementation("org.springframework.security:spring-security-oauth2-resource-server:$springSecurityVersion")
-    implementation("org.springframework:spring-web:$springWebVersion")
-    implementation("org.springframework:spring-webflux:$springWebVersion")
+    implementation("org.springframework.security:spring-security-oauth2-resource-server")
+    implementation("org.springframework:spring-web")
+    implementation("org.springframework:spring-webflux")
     implementation("org.springdoc:springdoc-openapi-starter-webflux-ui:2.3.0")
     implementation("org.springframework.boot:spring-boot-starter-webflux") {
         exclude(group = "io.netty", module = "netty-tcnative-classes")
@@ -151,7 +143,6 @@ dependencies {
     implementation("org.bitbucket.b_c:jose4j:0.9.3")
     implementation("org.springframework.boot:spring-boot-starter-data-redis")
     implementation("org.springframework.session:spring-session-data-redis")
-    implementation("org.springframework.boot:spring-boot-starter-data-r2dbc")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     // => CVE-2023-1370
     implementation("net.minidev:json-smart:2.5.0")
@@ -163,12 +154,10 @@ dependencies {
         because("CVE-2021-43797, not using Tomcat")
     }
     implementation("io.projectreactor.netty:reactor-netty-core:1.1.8")
-    implementation("org.yaml:snakeyaml:2.2")
+
     implementation("ch.qos.logback:logback-classic:$logbackVersion")
     implementation("ch.qos.logback:logback-core:$logbackVersion")
-    implementation("org.postgresql:r2dbc-postgresql:1.0.1.RELEASE")
-    implementation("io.r2dbc:r2dbc-spi:$r2dbcVersion")
-    implementation("io.r2dbc:r2dbc-pool:$r2dbcVersion")
+
     implementation("org.postgresql:postgresql:42.7.1")
     implementation("com.sendinblue:sib-api-v3-sdk:7.0.0")
     // CVE-2022-4244
