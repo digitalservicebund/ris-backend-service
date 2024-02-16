@@ -21,8 +21,6 @@ public class DatabaseDocumentNumberService implements DocumentNumberService {
       DocumentNumberPatternConfig documentNumberPatternConfig) {
     this.repository = repository;
     this.documentNumberPatterns = documentNumberPatternConfig.getDocumentNumberPatterns();
-    assert (documentNumberPatterns != null);
-    assert (repository != null);
   }
 
   @Override

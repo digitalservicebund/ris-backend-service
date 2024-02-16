@@ -18,7 +18,15 @@ public class DocumentNumberPatternConfig implements InitializingBean {
 
   @Override
   public void afterPropertiesSet() {
-    if (documentNumberPatterns == null) return;
+    validate();
+  }
+
+  private void validate() {
+    if (documentNumberPatterns == null || documentNumberPatterns.isEmpty()) {
+      throw new DocumentNumberPatternException(
+          "Document number pattern list is empty check yml config");
+    }
+
     documentNumberPatterns
         .values()
         .forEach(
