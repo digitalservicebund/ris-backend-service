@@ -20,7 +20,7 @@ class DocumentNumberFormatterTest {
       strings = {
         "KORE7****YYYY",
         "KVRE*****YY41",
-        "WBRE61*******",
+        "WBRE61*****YY",
         "BSGRE1*****YY",
         "DSRE*****YYYY",
         "XXRE*******YY"

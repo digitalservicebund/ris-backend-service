@@ -114,13 +114,11 @@ class DocumentationUnitIntegrationTest {
   @Autowired private DatabaseDocumentationOfficeRepository documentationOfficeRepository;
   @Autowired private DatabaseCourtRepository courtRepository;
   @Autowired private DatabaseDocumentNumberRepository databaseDocumentNumberRepository;
-
   @MockBean private S3AsyncClient s3AsyncClient;
   @MockBean private EmailPublishService publishService;
   @MockBean private DocxConverterService docxConverterService;
   @MockBean private UserService userService;
   @MockBean private ReactiveClientRegistrationRepository clientRegistrationRepository;
-  @MockBean private DatabaseDocumentNumberService databaseDocumentNumberService;
   private final DocumentationOffice docOffice = buildDefaultDocOffice();
   private UUID documentationOfficeUuid;
 
@@ -163,6 +161,7 @@ class DocumentationUnitIntegrationTest {
   @Test
   @Transactional(transactionManager = "jpaTransactionManager")
   void testForCorrectDbEntryAfterNewDocumentUnitCreation() {
+
     risWebTestClient
         .withDefaultLogin()
         .get()
@@ -174,13 +173,13 @@ class DocumentationUnitIntegrationTest {
         .consumeWith(
             response -> {
               assertThat(response.getResponseBody()).isNotNull();
-              assertThat(response.getResponseBody().documentNumber()).startsWith("XXRE");
+              assertThat(response.getResponseBody().documentNumber()).startsWith("DSRE");
             });
 
     List<DocumentationUnitDTO> list = repository.findAll();
     assertThat(list).hasSize(1);
     DocumentationUnitDTO documentUnitDTO = list.get(0);
-    assertThat(documentUnitDTO.getDocumentNumber()).startsWith("XXRE");
+    assertThat(documentUnitDTO.getDocumentNumber()).startsWith("DSRE");
     assertThat(documentUnitDTO.getDecisionDate()).isNull();
 
     assertThat(documentUnitDTO.getStatus()).hasSize(1);
