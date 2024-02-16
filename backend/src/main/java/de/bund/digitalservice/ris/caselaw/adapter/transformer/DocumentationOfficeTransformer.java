@@ -13,12 +13,4 @@ public class DocumentationOfficeTransformer {
         .map(dto -> DocumentationOffice.builder().abbreviation(dto.getAbbreviation()).build())
         .orElse(null);
   }
-
-  public static DocumentationOfficeDTO transformToDTO(DocumentationOffice documentationOffice) {
-    return Optional.ofNullable(documentationOffice)
-        .map(
-            domainObject ->
-                DocumentationOfficeDTO.builder().abbreviation(domainObject.abbreviation()).build())
-        .orElse(null);
-  }
 }
