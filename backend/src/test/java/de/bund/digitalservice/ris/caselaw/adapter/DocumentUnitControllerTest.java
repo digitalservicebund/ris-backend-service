@@ -38,7 +38,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
-import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.oauth2.client.registration.ReactiveClientRegistrationRepository;
@@ -397,7 +397,7 @@ class DocumentUnitControllerTest {
 
     when(service.searchLinkableDocumentationUnits(
             linkedDocumentationUnit, docOffice, "KORE0000000000", pageRequest))
-        .thenReturn(new PageImpl<>(List.of(), pageRequest, 0));
+        .thenReturn(Page.empty());
 
     risWebClient
         .withDefaultLogin()
@@ -431,7 +431,7 @@ class DocumentUnitControllerTest {
             Optional.empty(),
             Optional.empty(),
             Optional.empty()))
-        .thenReturn(new PageImpl<>(List.of(), pageRequest, 0));
+        .thenReturn(Page.empty());
 
     risWebClient
         .withDefaultLogin()

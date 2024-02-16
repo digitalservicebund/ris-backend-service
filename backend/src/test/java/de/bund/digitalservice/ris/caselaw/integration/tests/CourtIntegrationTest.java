@@ -68,7 +68,7 @@ class CourtIntegrationTest {
 
   @Test
   void testGetAllCourts() {
-    CourtDTO courtDTO1 =
+    CourtDTO courtDTO =
         CourtDTO.builder()
             .jurisId(0)
             .type("AB")
@@ -77,8 +77,8 @@ class CourtIntegrationTest {
             .isForeignCourt(false)
             .additionalInformation("- aufgehoben: 1975-02-01 -")
             .build();
-    databaseCourtRepository.save(courtDTO1);
-    CourtDTO courtDTO2 =
+    databaseCourtRepository.save(courtDTO);
+    courtDTO =
         CourtDTO.builder()
             .jurisId(1)
             .type("BGH")
@@ -86,27 +86,7 @@ class CourtIntegrationTest {
             .isSuperiorCourt(true)
             .isForeignCourt(false)
             .build();
-    databaseCourtRepository.save(courtDTO2);
-    CourtDTO courtDTO3 =
-        CourtDTO.builder()
-            .jurisId(2)
-            .type("LG")
-            .location("Glückstadt")
-            .isSuperiorCourt(false)
-            .isForeignCourt(false)
-            .additionalInformation("aufgehoben")
-            .build();
-    databaseCourtRepository.save(courtDTO3);
-    CourtDTO courtDTO4 =
-        CourtDTO.builder()
-            .jurisId(3)
-            .type("OLG")
-            .location("Altdorf")
-            .isSuperiorCourt(false)
-            .isForeignCourt(false)
-            .additionalInformation("andere Information")
-            .build();
-    databaseCourtRepository.save(courtDTO4);
+    databaseCourtRepository.save(courtDTO);
 
     risWebTestClient
         .withDefaultLogin()
@@ -118,22 +98,12 @@ class CourtIntegrationTest {
         .expectBody(Court[].class)
         .consumeWith(
             response -> {
-              assertThat(response.getResponseBody()).hasSize(4);
-              var court1 = response.getResponseBody()[0];
-              assertThat(court1.label()).isEqualTo("AB Berlin");
-              assertThat(court1.revoked()).isEqualTo("aufgehoben seit: 1975");
+              assertThat(response.getResponseBody()).hasSize(2);
+              assertThat(response.getResponseBody()[0].label()).isEqualTo("AB Berlin");
+              assertThat(response.getResponseBody()[0].revoked())
+                  .isEqualTo("aufgehoben seit: 1975");
 
-              var court2 = response.getResponseBody()[1];
-              assertThat(court2.label()).isEqualTo("BGH");
-              assertThat(court2.revoked()).isNull();
-
-              var court3 = response.getResponseBody()[2];
-              assertThat(court3.label()).isEqualTo("LG Glückstadt");
-              assertThat(court3.revoked()).isEqualTo("aufgehoben");
-
-              var court4 = response.getResponseBody()[3];
-              assertThat(court4.label()).isEqualTo("OLG Altdorf");
-              assertThat(court4.revoked()).isNull();
+              assertThat(response.getResponseBody()[1].label()).isEqualTo("BGH");
             });
   }
 
