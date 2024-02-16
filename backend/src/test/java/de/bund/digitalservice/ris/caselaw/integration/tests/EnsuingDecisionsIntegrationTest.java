@@ -498,10 +498,99 @@ class EnsuingDecisionsIntegrationTest {
   }
 
   @Test
-  void testUpdateDocumentationUnit_deletePendingDecision() {
+  void
+      testUpdateDocumentationUnit_addPendingDecisionWithDocumentNumber_shouldLinkReferencedDocumentationUnit() {
     UUID uuid = UUID.fromString("46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3");
     UUID ensuingDecisionUUID1 = UUID.fromString("f0232240-7416-11ee-b962-0242ac120002");
     UUID ensuingDecisionUUID2 = UUID.fromString("f0232240-7416-11ee-b962-0242ac120003");
+    DocumentUnit documentUnitFromFrontend =
+        DocumentUnit.builder()
+            .uuid(uuid)
+            .documentNumber("documentnr001")
+            .coreData(CoreData.builder().build())
+            .ensuingDecisions(
+                List.of(
+                    EnsuingDecision.builder()
+                        .pending(true)
+                        .documentNumber("documentnr002")
+                        .note("new note")
+                        .build(),
+                    EnsuingDecision.builder()
+                        .uuid(ensuingDecisionUUID1)
+                        .pending(true)
+                        .note("note1")
+                        .build(),
+                    EnsuingDecision.builder()
+                        .uuid(ensuingDecisionUUID2)
+                        .pending(true)
+                        .note("note2")
+                        .build()))
+            .build();
+
+    risWebTestClient
+        .withDefaultLogin()
+        .put()
+        .uri("/api/v1/caselaw/documentunits/46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3")
+        .bodyValue(documentUnitFromFrontend)
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody(DocumentUnit.class)
+        .consumeWith(
+            response -> {
+              assertThat(response.getResponseBody().ensuingDecisions()).hasSize(3);
+              assertThat(response.getResponseBody().ensuingDecisions().get(0).isPending()).isTrue();
+              assertThat(response.getResponseBody().ensuingDecisions().get(1).isPending()).isTrue();
+            });
+  }
+
+  @Test
+  void testUpdateDocumentationUnit_addEmptyPendingDecision_shouldNotSaveTheEmpty() {
+    UUID uuid = UUID.fromString("46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3");
+    UUID ensuingDecisionUUID1 = UUID.fromString("f0232240-7416-11ee-b962-0242ac120002");
+    UUID ensuingDecisionUUID2 = UUID.fromString("f0232240-7416-11ee-b962-0242ac120003");
+    DocumentUnit documentUnitFromFrontend =
+        DocumentUnit.builder()
+            .uuid(uuid)
+            .documentNumber("documentnr001")
+            .coreData(CoreData.builder().build())
+            .ensuingDecisions(
+                List.of(
+                    EnsuingDecision.builder().pending(true).build(),
+                    EnsuingDecision.builder()
+                        .uuid(ensuingDecisionUUID1)
+                        .pending(true)
+                        .note("note1")
+                        .build(),
+                    EnsuingDecision.builder()
+                        .uuid(ensuingDecisionUUID2)
+                        .pending(true)
+                        .note("note2")
+                        .build()))
+            .build();
+
+    risWebTestClient
+        .withDefaultLogin()
+        .put()
+        .uri("/api/v1/caselaw/documentunits/46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3")
+        .bodyValue(documentUnitFromFrontend)
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody(DocumentUnit.class)
+        .consumeWith(
+            response -> {
+              assertThat(response.getResponseBody().ensuingDecisions()).hasSize(2);
+              assertThat(response.getResponseBody().ensuingDecisions().get(0).isPending()).isTrue();
+              assertThat(response.getResponseBody().ensuingDecisions().get(1).isPending()).isTrue();
+            });
+  }
+
+  @Test
+  void testUpdateDocumentationUnit_deletePendingDecision() {
+    UUID uuid = UUID.fromString("46f9ae5c-ea72-46d8-864c-ce9dd7cee4a3");
+    UUID ensuingDecisionUUID1 = UUID.fromString("f0232240-7416-11ee-b962-0242ac120002");
+
     risWebTestClient
         .withDefaultLogin()
         .get()
