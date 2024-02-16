@@ -173,13 +173,13 @@ class DocumentationUnitIntegrationTest {
         .consumeWith(
             response -> {
               assertThat(response.getResponseBody()).isNotNull();
-              assertThat(response.getResponseBody().documentNumber()).startsWith("DSRE");
+              assertThat(response.getResponseBody().documentNumber()).startsWith("XXRE0");
             });
 
     List<DocumentationUnitDTO> list = repository.findAll();
     assertThat(list).hasSize(1);
     DocumentationUnitDTO documentUnitDTO = list.get(0);
-    assertThat(documentUnitDTO.getDocumentNumber()).startsWith("DSRE");
+    assertThat(documentUnitDTO.getDocumentNumber()).startsWith("XXRE0");
     assertThat(documentUnitDTO.getDecisionDate()).isNull();
 
     assertThat(documentUnitDTO.getStatus()).hasSize(1);
