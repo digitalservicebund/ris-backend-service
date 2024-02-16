@@ -1,5 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.domain;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -25,6 +26,7 @@ import de.bund.digitalservice.ris.caselaw.domain.docx.RunTextElement;
 import de.bund.digitalservice.ris.caselaw.domain.docx.TableCellElement;
 import de.bund.digitalservice.ris.caselaw.domain.docx.TableElement;
 import de.bund.digitalservice.ris.caselaw.domain.docx.TableRowElement;
+import jakarta.xml.bind.JAXBElement;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -34,7 +36,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import org.docx4j.model.structure.DocumentModel;
+import org.docx4j.model.structure.HeaderFooterPolicy;
+import org.docx4j.model.structure.SectionWrapper;
 import org.docx4j.openpackaging.exceptions.Docx4JException;
 import org.docx4j.openpackaging.exceptions.InvalidFormatException;
 import org.docx4j.openpackaging.packages.WordprocessingMLPackage;
@@ -42,6 +49,7 @@ import org.docx4j.openpackaging.parts.Part;
 import org.docx4j.openpackaging.parts.PartName;
 import org.docx4j.openpackaging.parts.Parts;
 import org.docx4j.openpackaging.parts.WordprocessingML.BinaryPartAbstractImage;
+import org.docx4j.openpackaging.parts.WordprocessingML.FooterPart;
 import org.docx4j.openpackaging.parts.WordprocessingML.ImageJpegPart;
 import org.docx4j.openpackaging.parts.WordprocessingML.ImagePngPart;
 import org.docx4j.openpackaging.parts.WordprocessingML.MainDocumentPart;
@@ -49,8 +57,12 @@ import org.docx4j.openpackaging.parts.WordprocessingML.MetafileEmfPart;
 import org.docx4j.openpackaging.parts.WordprocessingML.StyleDefinitionsPart;
 import org.docx4j.relationships.Relationship;
 import org.docx4j.wml.JcEnumeration;
+import org.docx4j.wml.P;
+import org.docx4j.wml.R;
+import org.docx4j.wml.RPr;
 import org.docx4j.wml.Style;
 import org.docx4j.wml.Styles;
+import org.docx4j.wml.Text;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -63,6 +75,7 @@ import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.test.StepVerifier;
@@ -83,28 +96,53 @@ class DocxConverterServiceTest {
 
   @MockBean S3AsyncClient client;
 
+  @SpyBean DocumentBuilderFactory documentBuilderFactory;
+
   @Mock WordprocessingMLPackage mlPackage;
 
   @Mock ResponseBytes<GetObjectResponse> responseBytes;
 
-  @Autowired DocumentBuilderFactory documentBuilderFactory;
-
   @MockBean DocxConverter converter;
 
   @Captor ArgumentCaptor<Map<String, Style>> styleMapCaptor;
+  @Captor ArgumentCaptor<List<ParagraphElement>> footerCaptor;
 
   @Captor ArgumentCaptor<Map<String, DocxImagePart>> imageMapCaptor;
 
   @Test
-  void testGetOriginalText() {
+  void testGetOriginalText() throws ParserConfigurationException {
+    MainDocumentPart mockedMainDocumentPart = mock(MainDocumentPart.class);
+    when(mlPackage.getMainDocumentPart()).thenReturn(mockedMainDocumentPart);
+    when(mlPackage.getMainDocumentPart().getXML())
+        .thenReturn("<document><p><t>text</t></p></document>");
+    var result = service.getOriginalText(mlPackage);
+
+    assertEquals("text", result);
+  }
+
+  @Test
+  void testGetOriginalText_withNoMlPackage() {
+    mlPackage = null;
+    var result = service.getOriginalText(mlPackage);
+
+    assertEquals("<no word file selected>", result);
+  }
+
+  @Test
+  public void testGetOriginalText_throwsException() throws ParserConfigurationException {
     MainDocumentPart mockedMainDocumentPart = mock(MainDocumentPart.class);
     when(mlPackage.getMainDocumentPart()).thenReturn(mockedMainDocumentPart);
     when(mlPackage.getMainDocumentPart().getXML())
         .thenReturn("<document><p><t>text</t></p></document>");
 
-    var result = service.getOriginalText(mlPackage);
+    when(documentBuilderFactory.newDocumentBuilder()).thenThrow(new ParserConfigurationException());
 
-    assertEquals("text", result);
+    assertThatThrownBy(
+            () -> {
+              service.getOriginalText(mlPackage);
+            })
+        .isInstanceOf(DocxConverterException.class)
+        .hasMessageContaining("Couldn't read all text elements of docx xml!");
   }
 
   @Test
@@ -157,6 +195,14 @@ class DocxConverterServiceTest {
               })
           .verifyComplete();
     }
+  }
+
+  @Test
+  void testGetHtml_WithNoFilename() {
+    String fileName = null;
+
+    // Verify that the Mono completes without emitting any onNext signals
+    StepVerifier.create(service.getConvertedObject(fileName)).verifyComplete();
   }
 
   @Test
@@ -246,6 +292,59 @@ class DocxConverterServiceTest {
       assertEquals("image/jpeg", imageMapValue.get("jpegPart").contentType());
       assertTrue(imageMapValue.containsKey("pngPart"));
       assertEquals("image/png", imageMapValue.get("pngPart").contentType());
+    }
+  }
+
+  @Test
+  void testGetHtml_withFooters() {
+    when(client.getObject(any(GetObjectRequest.class), any(AsyncResponseTransformer.class)))
+        .thenReturn(CompletableFuture.completedFuture(responseBytes));
+    when(responseBytes.asInputStream()).thenReturn(new ByteArrayInputStream(new byte[] {}));
+    MainDocumentPart mainDocumentPart = mock(MainDocumentPart.class);
+    when(mlPackage.getMainDocumentPart()).thenReturn(mainDocumentPart);
+
+    P paragraph = new P();
+    RPr rPr = new RPr();
+    R run = new R();
+    run.setRPr(rPr);
+    Text text = new Text();
+    text.setValue("ECLI:65432:87654:4321:4321");
+    JAXBElement<Text> element = new JAXBElement<>(new QName("text"), Text.class, text);
+    run.getContent().add(element);
+    paragraph.getContent().add(run);
+
+    List<Object> content = List.of(paragraph);
+    FooterPart defaultFooter = mock(FooterPart.class);
+    FooterPart firstFooter = mock(FooterPart.class);
+    FooterPart evenFooter = mock(FooterPart.class);
+    HeaderFooterPolicy headerFooterPolicy = mock(HeaderFooterPolicy.class);
+    SectionWrapper section = mock(SectionWrapper.class);
+    List<SectionWrapper> sections = List.of(section);
+    DocumentModel documentModel = mock(DocumentModel.class);
+    when(defaultFooter.getContent()).thenReturn(content);
+    when(firstFooter.getContent()).thenReturn(content);
+    when(evenFooter.getContent()).thenReturn(content);
+    when(headerFooterPolicy.getDefaultFooter()).thenReturn(defaultFooter);
+    when(headerFooterPolicy.getFirstFooter()).thenReturn(defaultFooter);
+    when(headerFooterPolicy.getFirstFooter()).thenReturn(firstFooter);
+    when(headerFooterPolicy.getEvenFooter()).thenReturn(evenFooter);
+    when(section.getHeaderFooterPolicy()).thenReturn(headerFooterPolicy);
+    when(documentModel.getSections()).thenReturn(sections);
+    when(mlPackage.getDocumentModel()).thenReturn(documentModel);
+
+    try (MockedStatic<WordprocessingMLPackage> mockedMLPackageStatic =
+        mockStatic(WordprocessingMLPackage.class)) {
+      mockedMLPackageStatic
+          .when(() -> WordprocessingMLPackage.load(any(InputStream.class)))
+          .thenReturn(mlPackage);
+
+      StepVerifier.create(service.getConvertedObject("test.docx"))
+          .consumeNextWith(
+              docx2Html -> {
+                assertNotNull(docx2Html);
+                // assertEquals(3,docx2Html.ecliList().size());
+              })
+          .verifyComplete();
     }
   }
 

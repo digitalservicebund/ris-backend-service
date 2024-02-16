@@ -210,6 +210,10 @@ public class DocxConverterService implements ConverterService {
   private Set<FooterElement> parseFooterAndIdentifyECLI() {
     Set<FooterElement> footerElements = new HashSet<>();
 
+    // Check if footers are null
+    if (converter.getFooters() == null) {
+      return footerElements;
+    }
     converter
         .getFooters()
         .forEach(
