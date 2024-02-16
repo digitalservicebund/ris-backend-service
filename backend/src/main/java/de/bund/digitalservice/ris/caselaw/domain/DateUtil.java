@@ -3,7 +3,9 @@ package de.bund.digitalservice.ris.caselaw.domain;
 import java.time.Year;
 import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
+import lombok.experimental.UtilityClass;
 
+@UtilityClass
 public class DateUtil {
 
   public static Year getCurrentYear() {
