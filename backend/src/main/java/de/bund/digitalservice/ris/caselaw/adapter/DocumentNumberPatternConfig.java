@@ -33,7 +33,7 @@ public class DocumentNumberPatternConfig implements InitializingBean {
             pattern -> {
               if (pattern.length() != 13) {
                 throw new DocumentNumberPatternException(
-                    "Document number pattern: " + pattern + " must consist of 13 digits");
+                    "Document number pattern: " + pattern + " must consist of 13 chars");
               }
             });
   }

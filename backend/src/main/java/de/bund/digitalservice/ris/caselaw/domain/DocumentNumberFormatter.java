@@ -2,6 +2,7 @@ package de.bund.digitalservice.ris.caselaw.domain;
 
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Size;
 import java.text.DecimalFormat;
 import java.time.Year;
 import lombok.Builder;
@@ -10,14 +11,16 @@ import org.springframework.validation.annotation.Validated;
 
 @Builder
 @Validated
-public class DocumentNumberFormat {
+public class DocumentNumberFormatter {
   // TODO: Lombok annotation from unknown reason ignores the @NotEmpty annotation
   @NonNull final Year year;
 
   @Min(value = 0, message = "Doc number must be positive")
   int docNumber;
 
-  @NotEmpty final String pattern;
+  @NotEmpty
+  @Size(min = 13, max = 14, message = "Pattern support 13 chars only")
+  final String pattern;
 
   private String fillYear(String pattern) {
     if (pattern.contains("YYYY")) {

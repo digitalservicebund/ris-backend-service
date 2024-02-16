@@ -3,7 +3,7 @@ package de.bund.digitalservice.ris.caselaw.adapter;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentNumberRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentNumberDTO;
 import de.bund.digitalservice.ris.caselaw.domain.DateUtil;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentNumberFormat;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentNumberFormatter;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentNumberService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import java.util.Map;
@@ -42,7 +42,7 @@ public class DatabaseDocumentNumberService implements DocumentNumberService {
                     .build());
 
     var documentNumberFormat =
-        DocumentNumberFormat.builder()
+        DocumentNumberFormatter.builder()
             .docNumber(documentNumberDTO.increaseLastNumber())
             .year(DateUtil.getCurrentYear())
             .pattern(documentNumberPatterns.get(abbreviation))
