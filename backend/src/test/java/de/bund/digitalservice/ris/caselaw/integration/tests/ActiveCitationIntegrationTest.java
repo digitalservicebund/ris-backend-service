@@ -193,6 +193,8 @@ class ActiveCitationIntegrationTest {
                                     CitationType.builder()
                                         .uuid(
                                             UUID.fromString("4e768071-1a19-43a1-8ab9-c185adec94bf"))
+                                        .jurisShortcut("Anwendung")
+                                        .label("Anwendung")
                                         .build())
                                 .build(),
                             ActiveCitation.builder()
