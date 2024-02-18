@@ -1,6 +1,7 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
+import de.bund.digitalservice.ris.caselaw.domain.WebClientService;
 import java.util.concurrent.atomic.AtomicReference;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -13,7 +14,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
 
@@ -32,11 +32,11 @@ public class RisSearchController {
   private String risSearchPassword;
 
   private final UserService userService;
-  private final WebClient webClient;
+  private final WebClientService webClientService;
 
-  public RisSearchController(UserService userService, WebClient.Builder webClientBuilder) {
+  public RisSearchController(UserService userService, WebClientService webClientService) {
     this.userService = userService;
-    this.webClient = webClientBuilder.build();
+    this.webClientService = webClientService;
   }
 
   @GetMapping(value = "")
@@ -48,21 +48,10 @@ public class RisSearchController {
         .getDocumentationOffice(oidcUser)
         .flatMap(
             documentationOffice ->
-                webClient
-                    .get()
-                    .uri(buildUrl(query, documentationOffice.abbreviation()))
-                    .headers(headers -> headers.setBasicAuth(risSearchUsername, risSearchPassword))
-                    .retrieve()
-                    .onStatus(
-                        status -> true,
-                        clientResponse -> {
-                          statusCode.set(clientResponse.statusCode());
-                          return Mono.empty();
-                        })
-                    .bodyToMono(String.class)
-                    .map(
-                        responseBody ->
-                            ResponseEntity.status(statusCode.get()).body(responseBody)));
+                webClientService.callExternalService(
+                    buildUrl(query, documentationOffice.abbreviation()),
+                    risSearchUsername,
+                    risSearchPassword));
   }
 
   private String buildUrl(String query, String abbreviation) {
