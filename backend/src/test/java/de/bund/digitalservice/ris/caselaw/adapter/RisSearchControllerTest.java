@@ -47,7 +47,7 @@ class RisSearchControllerTest {
     risWebClient
         .withDefaultLogin()
         .get()
-        .uri("/api/v1/search?query=test123")
+        .uri("/api/v1/search?query=test123&sz=100&pg=0")
         .accept(MediaType.APPLICATION_JSON)
         .exchange()
         .expectStatus()
@@ -67,7 +67,7 @@ class RisSearchControllerTest {
     risWebClient
         .withDefaultLogin()
         .get()
-        .uri("/api/v1/search?query=test123")
+        .uri("/api/v1/search?query=test123&sz=100&pg=0")
         .accept(MediaType.APPLICATION_JSON)
         .exchange()
         .expectStatus()
