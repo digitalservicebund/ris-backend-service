@@ -26,7 +26,7 @@ import reactor.core.publisher.Mono;
 @ExtendWith(SpringExtension.class)
 @WebFluxTest(controllers = RisSearchController.class)
 @Import({SecurityConfig.class, AuthService.class, TestConfig.class})
-public class RisSearchControllerTest {
+class RisSearchControllerTest {
 
   @Autowired private RisWebTestClient risWebClient;
   @MockBean private DocumentUnitService documentUnitService;
@@ -37,7 +37,7 @@ public class RisSearchControllerTest {
   private final DocumentationOffice docOffice = buildDefaultDocOffice();
 
   @Test
-  public void endpointToPassOnStatusAndContentWithoutChangingIt_shouldBeOk() {
+  void endpointToPassOnStatusAndContentWithoutChangingIt_shouldBeOk() {
     ResponseEntity<String> mockResponse = ResponseEntity.ok("some content");
     when(webClientService.callExternalService(anyString(), anyString(), anyString()))
         .thenReturn(Mono.just(mockResponse));
@@ -57,7 +57,7 @@ public class RisSearchControllerTest {
   }
 
   @Test
-  public void endpointToPassOnStatusAndContentWithoutChangingIt_shouldBeBad() {
+  void endpointToPassOnStatusAndContentWithoutChangingIt_shouldBeBad() {
     ResponseEntity<String> mockResponse = ResponseEntity.badRequest().body("some content");
     when(webClientService.callExternalService(anyString(), anyString(), anyString()))
         .thenReturn(Mono.just(mockResponse));

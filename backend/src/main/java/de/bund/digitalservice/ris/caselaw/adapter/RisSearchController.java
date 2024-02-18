@@ -2,10 +2,8 @@ package de.bund.digitalservice.ris.caselaw.adapter;
 
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import de.bund.digitalservice.ris.caselaw.domain.WebClientService;
-import java.util.concurrent.atomic.AtomicReference;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -46,7 +44,6 @@ public class RisSearchController {
       @RequestParam String query,
       @RequestParam String sz,
       @RequestParam String pg) {
-    AtomicReference<HttpStatusCode> statusCode = new AtomicReference<>();
     return userService
         .getDocumentationOffice(oidcUser)
         .flatMap(
