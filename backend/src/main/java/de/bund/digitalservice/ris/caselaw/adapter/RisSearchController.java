@@ -42,22 +42,27 @@ public class RisSearchController {
   @GetMapping(value = "")
   @PreAuthorize("isAuthenticated()")
   public Mono<ResponseEntity<String>> callRisSearchEndpoint(
-      @AuthenticationPrincipal OidcUser oidcUser, @RequestParam String query) {
+      @AuthenticationPrincipal OidcUser oidcUser,
+      @RequestParam String query,
+      @RequestParam String sz,
+      @RequestParam String pg) {
     AtomicReference<HttpStatusCode> statusCode = new AtomicReference<>();
     return userService
         .getDocumentationOffice(oidcUser)
         .flatMap(
             documentationOffice ->
                 webClientService.callExternalService(
-                    buildUrl(query, documentationOffice.abbreviation()),
+                    buildUrl(query, sz, pg, documentationOffice.abbreviation()),
                     risSearchUsername,
                     risSearchPassword));
   }
 
-  private String buildUrl(String query, String abbreviation) {
+  private String buildUrl(String query, String sz, String pg, String docOfficeAbbreviation) {
     return UriComponentsBuilder.fromHttpUrl(risSearchUrl)
         .queryParam("query", query)
-        .queryParam("documentationOfficeAbbreviation", abbreviation)
+        .queryParam("sz", sz)
+        .queryParam("pg", pg)
+        .queryParam("documentationOfficeAbbreviation", docOfficeAbbreviation)
         .toUriString();
   }
 }

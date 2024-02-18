@@ -15,6 +15,8 @@ const message = ref("")
 const TIMEOUT = 10000
 const searchResults = ref<SearchApiDataDTO[] | undefined>()
 const currentPage = ref<Page<SearchApiDataDTO> | undefined>()
+const itemsPerPage = 100
+const pageNumber = ref<number>(0)
 
 type DocumentType = "CASELAW" | "LEGISLATION"
 
@@ -39,12 +41,21 @@ async function handleSearchSubmit() {
   hasError.value = false
   currentPage.value = undefined
   searchResults.value = undefined
+  pageNumber.value = 0
+
+  await search()
+}
+
+async function search() {
   try {
     const response = await httpClient.get<
       Page<SearchApiDataDTO> | FailedValidationServerResponse
-    >(`search?query=${encodeURIComponent(searchInput.value)}`, {
-      timeout: TIMEOUT,
-    })
+    >(
+      `search?query=${encodeURIComponent(searchInput.value)}&sz=${itemsPerPage}&pg=${pageNumber.value}`,
+      {
+        timeout: TIMEOUT,
+      },
+    )
     if (response.status == 504) {
       message.value = "Zeitüberschreitung der Anfrage"
     } else if (response.status === 200 && response.data) {
@@ -63,6 +74,11 @@ async function handleSearchSubmit() {
   } finally {
     isLoading.value = false
   }
+}
+
+async function updatePage(page: number) {
+  pageNumber.value = page
+  await search()
 }
 </script>
 
@@ -142,6 +158,7 @@ async function handleSearchSubmit() {
       :is-loading="isLoading"
       navigation-position="bottom"
       :page="currentPage"
+      @update-page="updatePage"
     >
       <div
         v-if="searchResults && searchResults.length > 0"
