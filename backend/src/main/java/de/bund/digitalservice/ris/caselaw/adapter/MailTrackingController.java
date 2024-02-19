@@ -28,7 +28,9 @@ public class MailTrackingController {
   @PreAuthorize("permitAll")
   public Mono<ResponseEntity<String>> setPublishState(
       @RequestBody @Valid MailTrackingResponsePayload payload) {
-
-    return service.updatePublishingState(payload.tags().get(0), payload.event());
+    if (payload != null && payload.tags() != null && !payload.tags().isEmpty()) {
+      return service.updatePublishingState(payload.tags().get(0), payload.event());
+    }
+    return Mono.just(ResponseEntity.badRequest().build());
   }
 }
