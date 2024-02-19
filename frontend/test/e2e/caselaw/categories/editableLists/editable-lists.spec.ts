@@ -122,6 +122,7 @@ test.describe("related documentation units", () => {
     }
   })
 
+  /* eslint-disable playwright/no-conditional-expect */
   test("validates list item against required fields", async ({
     page,
     documentNumber,

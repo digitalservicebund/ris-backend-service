@@ -1,6 +1,6 @@
-import { expect, test } from "@playwright/test"
+import { expect } from "@playwright/test"
 import { deleteDocumentUnit } from "./e2e-utils"
-import { caselawTest } from "./fixtures"
+import { caselawTest as test } from "./fixtures"
 
 test.describe("create a doc unit and delete it again", () => {
   test("create and delete new doc unit", async ({ page }) => {
@@ -21,7 +21,7 @@ test.describe("create a doc unit and delete it again", () => {
     await deleteDocumentUnit(page, documentNumber)
   })
 
-  caselawTest("cancel delete doc unit", async ({ page, documentNumber }) => {
+  test("cancel delete doc unit", async ({ page, documentNumber }) => {
     await page.goto("/")
     await page.getByLabel("Dokumentnummer Suche").fill(documentNumber)
     await page.getByLabel("Nach Dokumentationseinheiten suchen").click()
