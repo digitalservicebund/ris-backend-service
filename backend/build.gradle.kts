@@ -10,7 +10,7 @@ import org.springframework.boot.gradle.tasks.bundling.BootBuildImage
 plugins {
     java
     jacoco
-    id("org.springframework.boot") version "3.1.8"
+    id("org.springframework.boot") version "3.2.2"
     id("io.spring.dependency-management") version "1.1.0"
     id("com.diffplug.spotless") version "6.25.0"
     id("org.sonarqube") version "4.4.1.3373"
@@ -122,112 +122,81 @@ sonar {
 }
 
 dependencies {
-    val springSecurityVersion = "6.1.2"
-    val springWebVersion = "6.0.11"
-    // CVE-2023-6481
-    val logbackVersion = "1.4.14"
-    val r2dbcVersion = "1.0.0.RELEASE"
-    val jacksonModuleVersion = "2.16.1"
     val testContainersVersion = "1.19.0"
 
+    implementation("org.springframework:spring-web")
+    implementation("org.springframework:spring-webflux")
+
+    implementation("org.springframework.boot:spring-boot-starter-webflux")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
+    implementation("org.springframework.boot:spring-boot-starter-data-redis")
+    implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+    implementation("org.springframework.boot:spring-boot-starter-validation")
+    implementation("org.springframework.boot:spring-boot-autoconfigure")
+    implementation("org.springframework.session:spring-session-data-redis")
     implementation("org.springframework.boot:spring-boot-starter-security")
     implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
-    // => CVE-2023-34035, CVE-2023-34034
-    implementation("org.springframework.security:spring-security-web:$springSecurityVersion")
-    implementation("org.springframework.security:spring-security-config:$springSecurityVersion")
-    // => CVE-2023-34034
-    implementation("org.springframework.security:spring-security-core:$springSecurityVersion")
-    implementation("org.springframework.security:spring-security-oauth2-resource-server:$springSecurityVersion")
-    implementation("org.springframework:spring-web:$springWebVersion")
-    implementation("org.springframework:spring-webflux:$springWebVersion")
+    implementation("org.springframework.security:spring-security-oauth2-resource-server")
+
     implementation("org.springdoc:springdoc-openapi-starter-webflux-ui:2.3.0")
-    implementation("org.springframework.boot:spring-boot-starter-webflux") {
-        exclude(group = "io.netty", module = "netty-tcnative-classes")
-        because("CVE-2021-43797, not using Tomcat")
-    }
-    implementation("org.springframework.cloud:spring-cloud-starter-kubernetes-client-config:2.1.3")
-    // CVE-2023-31582
-    implementation("org.bitbucket.b_c:jose4j:0.9.3")
-    implementation("org.springframework.boot:spring-boot-starter-data-redis")
-    implementation("org.springframework.session:spring-session-data-redis")
-    implementation("org.springframework.boot:spring-boot-starter-data-r2dbc")
-    implementation("org.springframework.boot:spring-boot-starter-data-jpa")
-    // => CVE-2023-1370
-    implementation("net.minidev:json-smart:2.5.0")
-    // CVE-2022-3171
-    implementation("com.google.protobuf:protobuf-java:3.25.0")
-    // => CVE-2021-37136, CVE-2021-37137, CVE-2021-43797
-    implementation("io.netty:netty-all:4.1.100.Final") {
-        exclude(group = "io.netty", module = "netty-tcnative-classes")
-        because("CVE-2021-43797, not using Tomcat")
-    }
-    implementation("io.projectreactor.netty:reactor-netty-core:1.1.8")
-    implementation("org.yaml:snakeyaml:2.2")
-    implementation("ch.qos.logback:logback-classic:$logbackVersion")
-    implementation("ch.qos.logback:logback-core:$logbackVersion")
-    implementation("org.postgresql:r2dbc-postgresql:1.0.1.RELEASE")
-    implementation("io.r2dbc:r2dbc-spi:$r2dbcVersion")
-    implementation("io.r2dbc:r2dbc-pool:$r2dbcVersion")
+
+    implementation("org.springframework.cloud:spring-cloud-starter-kubernetes-client-config:3.1.0")
+
     implementation("org.postgresql:postgresql:42.7.1")
+
     implementation("com.sendinblue:sib-api-v3-sdk:7.0.0")
     // CVE-2022-4244
     implementation("org.codehaus.plexus:plexus-utils:4.0.0")
+
     implementation(platform("software.amazon.awssdk:bom:2.24.0"))
     implementation("software.amazon.awssdk:netty-nio-client")
     implementation("software.amazon.awssdk:s3")
-    // CVE-2022-42004, CVE-2022-42003
-    implementation("com.fasterxml.jackson:jackson-bom:$jacksonModuleVersion")
-    implementation("com.fasterxml.jackson.core:jackson-databind:2.16.1")
-    // CVE-2022-40153
-    implementation("com.fasterxml.woodstox:woodstox-core:6.6.0")
+
     implementation("org.docx4j:docx4j-JAXB-ReferenceImpl:11.4.9")
+    implementation("org.freehep:freehep-graphicsio-emf:2.4")
+
     implementation("jakarta.mail:jakarta.mail-api:2.1.2")
     implementation("org.eclipse.angus:angus-mail:2.0.2")
-    implementation("com.sun.activation:jakarta.activation:2.0.1")
-    implementation("jakarta.xml.bind:jakarta.xml.bind-api") {
-        version {
-            strictly("3.0.1")
-        }
-    }
-    implementation("org.freehep:freehep-graphicsio-emf:2.4")
+    implementation("com.icegreen:greenmail:2.0.0")
+
     // package served by private repo, requires authentication:
     implementation("de.bund.digitalservice:neuris-juris-xml-export:0.8.29") {
         exclude(group = "org.slf4j", module = "slf4j-simple")
     }
     // for local development:
     // implementation(files("../../neuris-juris-xml-export/build/libs/neuris-juris-xml-export-0.8.16.jar"))
-    implementation("com.icegreen:greenmail:2.0.0")
+
     implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.16.1")
-    implementation("io.micrometer:micrometer-registry-prometheus:1.12.2")
-    implementation("io.micrometer:micrometer-core:1.12.2")
+
+    implementation("io.micrometer:micrometer-registry-prometheus:1.12.3")
+    implementation("io.micrometer:micrometer-core:1.12.3")
+
     implementation(platform("io.sentry:sentry-bom:7.3.0"))
     implementation("io.sentry:sentry-spring-boot-starter-jakarta")
     implementation("io.sentry:sentry-logback")
-    implementation("org.springframework.boot:spring-boot-starter-validation")
-    // => CVE-2023-20883
-    implementation("org.springframework.boot:spring-boot-autoconfigure")
+
     implementation("com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer:20220608.1")
     // => CVE-2023-2976
     implementation("com.google.guava:guava:33.0.0-jre")
+
     var flywayCore = "org.flywaydb:flyway-core:9.22.2"
     implementation(flywayCore)
     "migrationImplementation"(flywayCore)
+
     implementation("io.getunleash:unleash-client-java:9.2.0")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
         exclude(group = "org.mockito", module = "mockito-core")
     }
-    testImplementation("org.mockito:mockito-inline:5.2.0")
-    testImplementation("io.projectreactor:reactor-test:3.6.1")
-    // => CVE-2023-34034
-    testImplementation("org.springframework.security:spring-security-test:6.2.1")
-    testImplementation("com.tngtech.archunit:archunit-junit5:1.2.0")
     testImplementation("org.mockito:mockito-junit-jupiter:5.10.0")
+    testImplementation("org.mockito:mockito-inline:5.2.0")
+
+    testImplementation("io.projectreactor:reactor-test:3.6.1")
+    testImplementation("org.springframework.security:spring-security-test")
+    testImplementation("com.tngtech.archunit:archunit-junit5:1.2.0")
     testImplementation("org.testcontainers:testcontainers:$testContainersVersion")
     testImplementation("org.testcontainers:junit-jupiter:$testContainersVersion")
     testImplementation("org.testcontainers:postgresql:$testContainersVersion")
-    testImplementation("org.jeasy:easy-random-core:5.0.0")
 
     compileOnly("org.projectlombok:lombok")
     annotationProcessor("org.projectlombok:lombok")

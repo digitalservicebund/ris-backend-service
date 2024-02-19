@@ -21,7 +21,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -39,7 +38,8 @@ class FieldOfLawServiceTest {
   @Test
   void testGetFieldsOfLaw_withoutQuery_shouldntCallRepository() {
     Pageable pageable = Pageable.unpaged();
-    when(repository.findAllByOrderByIdentifierAsc(pageable)).thenReturn(Page.empty());
+    when(repository.findAllByOrderByIdentifierAsc(pageable))
+        .thenReturn(new PageImpl<>(List.of(), pageable, 0));
 
     StepVerifier.create(service.getFieldsOfLawBySearchQuery(Optional.empty(), pageable))
         .consumeNextWith(
@@ -55,7 +55,8 @@ class FieldOfLawServiceTest {
   @Test
   void testGetFieldsOfLaw_withEmptyQuery_shouldntCallRepository() {
     Pageable pageable = Pageable.unpaged();
-    when(repository.findAllByOrderByIdentifierAsc(pageable)).thenReturn(Page.empty());
+    when(repository.findAllByOrderByIdentifierAsc(pageable))
+        .thenReturn(new PageImpl<>(List.of(), pageable, 0));
 
     StepVerifier.create(service.getFieldsOfLawBySearchQuery(Optional.of(""), pageable))
         .consumeNextWith(
