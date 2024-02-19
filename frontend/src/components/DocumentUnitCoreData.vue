@@ -219,11 +219,14 @@ watch(
     <!--          :read-only="modelValue.documentationOffice?.abbreviation !== 'BGH'"-->
 
     <div v-if="modelValue.court?.label === 'BGH'" class="flex flex-row gap-24">
-      <InputField id="leadingDecisionNormReferences" label="NSW-Fundstellen">
+      <InputField
+        id="leadingDecisionNormReferences"
+        label="BGH Nachschlagewerk"
+      >
         <ChipsInput
           id="leadingDecisionNormReferences"
           v-model="modelValue.leadingDecisionNormReferences"
-          aria-label="NSW-Fundstellen"
+          aria-label="BGH Nachschlagewerk"
         ></ChipsInput>
       </InputField>
     </div>

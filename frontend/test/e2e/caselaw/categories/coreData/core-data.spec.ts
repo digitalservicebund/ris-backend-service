@@ -277,7 +277,7 @@ test.describe("core data", () => {
     documentNumber,
   }) => {
     await navigateToCategories(page, documentNumber)
-    const nswInput = page.locator("[aria-label='NSW-Fundstellen']")
+    const nswInput = page.locator("[aria-label='BGH Nachschlagewerk']")
     const CITATION = "1968, 249-252 (ST)"
     const nswChipTag = page.locator(`text=${CITATION}`)
     await expect(nswInput).toBeHidden()
