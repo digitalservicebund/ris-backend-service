@@ -3,8 +3,10 @@ package de.bund.digitalservice.ris.caselaw.adapter.database.jpa;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.FieldOfLawTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.FieldOfLawRepository;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw.FieldOfLaw;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.PageRequest;
@@ -96,19 +98,7 @@ public class PostgresFieldOfLawRepositoryImpl implements FieldOfLawRepository {
     }
 
     return listWithFirstSearchTerm.stream()
-        .filter(
-            fieldOfLawDTO -> {
-              for (int i = 1; i < searchTerms.length; i++) {
-                if (StringUtils.containsIgnoreCase(fieldOfLawDTO.getIdentifier(), searchTerms[i])) {
-                  return true;
-                }
-
-                if (StringUtils.containsIgnoreCase(fieldOfLawDTO.getText(), searchTerms[i])) {
-                  return true;
-                }
-              }
-              return false;
-            })
+        .filter(fieldOfLawDTO -> returnTrueIfInTextOrIdentifier(fieldOfLawDTO, searchTerms))
         .map(fol -> FieldOfLawTransformer.transformToDomain(fol, false, true))
         .toList();
   }
@@ -139,30 +129,23 @@ public class PostgresFieldOfLawRepositoryImpl implements FieldOfLawRepository {
   @Transactional(transactionManager = "jpaTransactionManager")
   public List<FieldOfLaw> findByNormStrAndSearchTerms(String normStr, String[] searchTerms) {
     List<FieldOfLawNormDTO> listWithNormStr = getNormDTOs(normStr);
+
     return listWithNormStr.stream()
-        .filter(
-            fieldOfLawNormDTO -> {
-              for (String searchTerm : searchTerms) {
-                FieldOfLawDTO fieldOfLawDTO = fieldOfLawNormDTO.getFieldOfLaw();
-                if (fieldOfLawDTO == null) {
-                  return false;
-                }
-
-                if (StringUtils.containsIgnoreCase(fieldOfLawDTO.getIdentifier(), searchTerm)) {
-                  return true;
-                }
-
-                if (StringUtils.containsIgnoreCase(fieldOfLawDTO.getText(), searchTerm)) {
-                  return true;
-                }
-              }
-
-              return false;
-            })
         .map(FieldOfLawNormDTO::getFieldOfLaw)
+        .filter(Objects::nonNull)
+        .filter(fieldOfLawDTO -> returnTrueIfInTextOrIdentifier(fieldOfLawDTO, searchTerms))
         .distinct()
-        .map(item -> FieldOfLawTransformer.transformToDomain(item, false, true))
+        .map(fieldOfLawDTO -> FieldOfLawTransformer.transformToDomain(fieldOfLawDTO, false, true))
         .toList();
+  }
+
+  public static boolean returnTrueIfInTextOrIdentifier(
+      FieldOfLawDTO fieldOfLawDTO, String[] searchTerms) {
+    return Arrays.stream(searchTerms)
+        .anyMatch(
+            searchTerm ->
+                StringUtils.containsIgnoreCase(fieldOfLawDTO.getIdentifier(), searchTerm)
+                    || StringUtils.containsIgnoreCase(fieldOfLawDTO.getText(), searchTerm));
   }
 
   @Override
