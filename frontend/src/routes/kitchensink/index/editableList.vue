@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { computed, h, ref } from "vue"
 import { withSummarizer } from "@/components/DataSetSummary.vue"
-import EditableList from "@/components/EditableListCaselaw.vue"
+import EditableList from "@/components/EditableList.vue"
 import EditableListItem from "@/domain/editableListItem"
 import DummyInputGroup from "@/kitchensink/components/DummyInputGroup.vue"
 import KitchensinkPage from "@/kitchensink/components/KitchensinkPage.vue"

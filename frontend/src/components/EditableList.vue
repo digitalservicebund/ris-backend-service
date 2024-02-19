@@ -1,6 +1,6 @@
 <script lang="ts" setup generic="T extends ListItem">
 import type { Component, Ref } from "vue"
-import { ref, watch, nextTick } from "vue"
+import { ref, watch } from "vue"
 import DataSetSummary from "@/components/DataSetSummary.vue"
 import TextButton from "@/components/input/TextButton.vue"
 import ListItem from "@/domain/editableListItem"
@@ -23,25 +23,8 @@ const emit = defineEmits<{
 }>()
 
 const modelValueList = ref<T[]>([...props.modelValue]) as Ref<T[]>
-const elementList = ref<HTMLElement[]>([])
 
 const editIndex = ref<number | undefined>()
-
-const focusFirstFocusableElementOfCurrentEditElement = async () => {
-  await nextTick()
-
-  if (!editIndex.value) {
-    return
-  }
-
-  const editElement = elementList.value[editIndex.value]
-  editElement
-    ?.querySelector<HTMLElement>(
-      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
-    )
-    ?.focus()
-}
-watch(editIndex, focusFirstFocusableElementOfCurrentEditElement)
 
 function setEditIndex(index?: number) {
   editIndex.value = index
@@ -67,14 +50,7 @@ function removeListEntry(index: number) {
     "update:modelValue",
     [...props.modelValue].filter((_, i) => i !== index),
   )
-
-  if (
-    editIndex.value !== undefined &&
-    modelValueList.value.length !== 0 &&
-    index !== 0
-  ) {
-    editIndex.value = undefined
-  }
+  editIndex.value = undefined
 }
 
 function updateModel() {
@@ -106,7 +82,6 @@ watch(
     <div
       v-for="(entry, index) in modelValueList"
       :key="index"
-      ref="elementList"
       aria-label="Listen Eintrag"
       class="border-b-1 border-blue-500 first:border-t-1 focus:outline-none"
       :class="

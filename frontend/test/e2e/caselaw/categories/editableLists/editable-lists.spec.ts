@@ -352,6 +352,9 @@ test.describe("related documentation units", () => {
           await container.getByLabel("Löschen").click()
           await expect(container.getByLabel("Listen Eintrag")).toHaveCount(1)
 
+          //deleting resets edit mode
+          await expect(container.getByLabel("Weitere Angabe")).toBeVisible()
+
           //deleting last list item, adds a new default item
           await container.getByLabel("Listen Eintrag").first().click()
           await expect(
