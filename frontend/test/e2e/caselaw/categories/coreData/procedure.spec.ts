@@ -8,8 +8,7 @@ import { caselawTest as test } from "~/e2e/caselaw/fixtures"
 import { generateString } from "~/test-helper/dataGenerators"
 
 test.describe("procedure", () => {
-  // eslint-disable-next-line playwright/no-skipped-test
-  test.skip("add new procedure in coreData", async ({
+  test("add new procedure in coreData", async ({
     page,
     documentNumber,
     pageWithBghUser,
@@ -42,7 +41,7 @@ test.describe("procedure", () => {
       await page.locator("[aria-label='Speichern Button']").click()
       await expect(page.getByText(`Zuletzt`).first()).toBeVisible()
 
-      await page.getByLabel("Vorgänge anzeigen").click()
+      await page.getByLabel("Vorgangshistorie anzeigen").click()
       await expect(page.getByText("Vorgangshistorie")).toBeVisible()
       await expect(
         page

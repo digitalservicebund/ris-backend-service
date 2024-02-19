@@ -177,14 +177,15 @@ watch(
             v-model="modelValue.procedure"
             aria-label="Vorgang"
             :item-service="ComboboxItemService.getProcedures"
+            manual-entry
           ></ComboboxInput>
         </InputField>
         <!-- Child  -->
         <template #children>
-          <InputField id="previousProcedure" label="Vorgangshistorie">
+          <InputField id="previousProcedures" label="Vorgangshistorie">
             <ChipsInput
-              id="previousProcedure"
-              v-model="modelValue.previousProcedure"
+              id="previousProcedures"
+              v-model="modelValue.previousProcedures"
               aria-label="Vorgangshistorie"
               read-only
             ></ChipsInput>

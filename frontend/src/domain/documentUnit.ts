@@ -13,7 +13,7 @@ export type CoreData = {
   deviatingCourts?: string[]
   documentType?: DocumentType
   procedure?: Procedure
-  previousProcedure?: string[]
+  previousProcedures?: string[]
   ecli?: string
   deviatingEclis?: string[]
   appraisalBody?: string
