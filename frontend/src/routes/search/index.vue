@@ -131,6 +131,7 @@ async function updatePage(page: number) {
             class="ds-input-medium"
             :disabled="isLoading"
             placeholder="Suchanfrage"
+            @enter-released="handleSearchSubmit"
           />
         </InputField>
       </div>
@@ -229,6 +230,7 @@ async function updatePage(page: number) {
           >
             <router-link
               class="underline focus:outline-none focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-blue-800"
+              target="_blank"
               :to="{
                 name: 'caselaw-documentUnit-documentNumber-categories',
                 params: { documentNumber: item.documentNumber },
