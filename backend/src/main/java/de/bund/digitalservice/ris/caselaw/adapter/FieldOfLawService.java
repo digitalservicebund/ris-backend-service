@@ -12,7 +12,6 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -68,7 +67,7 @@ public class FieldOfLawService {
     }
 
     if (unorderedList == null || unorderedList.isEmpty()) {
-      return Page.empty();
+      return new PageImpl<>(List.of(), pageable, 0);
     }
 
     Map<FieldOfLaw, Integer> scores = calculateScore(searchTerms, normStr, unorderedList);
