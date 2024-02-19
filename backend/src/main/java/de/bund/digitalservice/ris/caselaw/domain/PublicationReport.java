@@ -1,12 +1,14 @@
 package de.bund.digitalservice.ris.caselaw.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import java.time.Instant;
 import lombok.Builder;
 
 @Builder(toBuilder = true)
 public record PublicationReport(
-    @JsonIgnore String documentNumber, String content, @JsonIgnore Instant receivedDate)
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY) String documentNumber,
+    String content,
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY) Instant receivedDate)
     implements PublicationHistoryRecord {
   @Override
   public PublicationHistoryRecordType getType() {

@@ -1,6 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
@@ -15,7 +15,7 @@ public record XmlPublication(
     String statusCode,
     List<String> statusMessages,
     String fileName,
-    @JsonIgnore Instant publishDate,
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY) Instant publishDate,
     String publishStateDisplayText)
     implements Publication {
   @Override
