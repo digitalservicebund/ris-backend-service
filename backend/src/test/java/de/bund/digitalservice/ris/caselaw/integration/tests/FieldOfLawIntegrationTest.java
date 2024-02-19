@@ -125,6 +125,7 @@ class FieldOfLawIntegrationTest {
     assertThat(identifiers).containsExactly("FL-01", "FL-01-01");
   }
 
+  // TODO: Do we integrate rank or this test is not relevant?
   @Test
   @Disabled("enable it after order by rank")
   void testPaginationInGetFieldsOfLawBySearchQuery() {
@@ -310,6 +311,23 @@ class FieldOfLawIntegrationTest {
   }
 
   @Test
+  void testGetParentlessChildrenForFieldOfLawByNorms() {
+    risWebTestClient
+        .withDefaultLogin()
+        .get()
+        .uri("/api/v1/caselaw/fieldsoflaw/root/children")
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody(FieldOfLaw[].class)
+        .consumeWith(
+            response ->
+                assertThat(response.getResponseBody())
+                    .extracting("identifier")
+                    .containsExactlyInAnyOrder("AB-01", "CD", "FL", "FO"));
+  }
+
+  @Test
   void testGetChildrenForFieldOfLawNumber() {
     // TODO: order by rank
     risWebTestClient
@@ -352,6 +370,7 @@ class FieldOfLawIntegrationTest {
             });
   }
 
+  // TODO: Is this test still relevant? It is disabled.
   @Test
   @Disabled(
       "wrong test, syntax incorrect, logic replaced in refactoring, have to redesign in a later iteration")
@@ -382,6 +401,25 @@ class FieldOfLawIntegrationTest {
 
   @Test
   void testOrderingOfGetFieldsOfLawByIdentifierSearch() {
+    EntityExchangeResult<String> result =
+        risWebTestClient
+            .withDefaultLogin()
+            .get()
+            .uri("/api/v1/caselaw/fieldsoflaw/search-by-identifier?q=fl")
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectBody(String.class)
+            .returnResult();
+
+    List<String> actualIdentifiers = JsonPath.read(result.getResponseBody(), "$[*].identifier");
+    // TODO: order by rank
+    assertThat(actualIdentifiers)
+        .containsExactlyInAnyOrder("FL", "FL-01", "FL-01-01", "FL-02", "FL-03", "FL-04");
+  }
+
+  @Test
+  void testFindParentByChild() {
     EntityExchangeResult<String> result =
         risWebTestClient
             .withDefaultLogin()
