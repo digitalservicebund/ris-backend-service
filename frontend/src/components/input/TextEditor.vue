@@ -284,10 +284,7 @@ watch(
   },
 )
 
-const showButtons = () => {
-  const showButtons = props.editable && hasFocus.value
-  return showButtons
-}
+const showButtons = computed(() => props.editable && hasFocus.value)
 
 const ariaLabel = props.ariaLabel ? props.ariaLabel : null
 
@@ -305,7 +302,7 @@ const resizeObserver = new ResizeObserver((entries) => {
 
 <template>
   <div class="editor bg-white" fluid>
-    <div v-if="showButtons()">
+    <div v-if="showButtons">
       <div
         :aria-label="ariaLabel + ' Button Leiste'"
         class="pa-1 flex flex-row flex-wrap justify-between"
