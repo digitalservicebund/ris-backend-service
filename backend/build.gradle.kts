@@ -141,6 +141,10 @@ dependencies {
     implementation("org.springdoc:springdoc-openapi-starter-webflux-ui:2.3.0")
 
     implementation("org.springframework.cloud:spring-cloud-starter-kubernetes-client-config:2.1.3")
+    // CVE-2022-3171
+    implementation("com.google.protobuf:protobuf-java:3.25.0")
+    // CVE-2023-31582
+    implementation("org.bitbucket.b_c:jose4j:0.9.3")
 
     implementation("org.postgresql:postgresql:42.7.1")
 
