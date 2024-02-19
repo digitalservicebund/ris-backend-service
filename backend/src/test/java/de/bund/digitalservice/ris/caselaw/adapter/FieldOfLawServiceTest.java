@@ -16,6 +16,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,6 +68,15 @@ class FieldOfLawServiceTest {
         .verifyComplete();
 
     verify(repository, times(1)).findAllByOrderByIdentifierAsc(pageable);
+  }
+
+  @Test
+  void testGetFieldsOfLaw_withEmptyTerms_shouldReturnEmptyList() {
+    List<FieldOfLaw> resultWithNullSearchTerms = repository.findBySearchTerms(null);
+    List<FieldOfLaw> resultWithEmptySearchTerms = repository.findBySearchTerms(new String[0]);
+
+    Assertions.assertEquals(0, resultWithNullSearchTerms.size());
+    Assertions.assertEquals(0, resultWithEmptySearchTerms.size());
   }
 
   @Test
