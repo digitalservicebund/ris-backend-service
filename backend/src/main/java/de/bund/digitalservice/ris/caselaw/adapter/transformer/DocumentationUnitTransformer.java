@@ -37,7 +37,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 import lombok.extern.slf4j.Slf4j;
-import org.jetbrains.annotations.NotNull;
 
 @Slf4j
 public class DocumentationUnitTransformer {
@@ -395,7 +394,7 @@ public class DocumentationUnitTransformer {
             .ecli(documentationUnitDTO.getEcli())
             .decisionDate(documentationUnitDTO.getDecisionDate())
             .appraisalBody(documentationUnitDTO.getJudicialBody())
-            .legalEffect(legalEffect.getLabel());
+            .legalEffect(legalEffect == null ? null : legalEffect.getLabel());
 
     addInputTypesToDomain(documentationUnitDTO, coreDataBuilder);
     addFileNumbersToDomain(documentationUnitDTO, coreDataBuilder);
@@ -498,15 +497,16 @@ public class DocumentationUnitTransformer {
     return builder.build();
   }
 
-  @NotNull
   private static LegalEffect getLegalEffectForDomain(DocumentationUnitDTO documentationUnitDTO) {
-    LegalEffect legalEffect = LegalEffect.NOT_SPECIFIED;
+    LegalEffect legalEffect = null;
 
     if (documentationUnitDTO.getLegalEffect() != null) {
       if (documentationUnitDTO.getLegalEffect() == LegalEffectDTO.NEIN) {
         legalEffect = LegalEffect.NO;
       } else if (documentationUnitDTO.getLegalEffect() == LegalEffectDTO.JA) {
         legalEffect = LegalEffect.YES;
+      } else if (documentationUnitDTO.getLegalEffect() == LegalEffectDTO.KEINE_ANGABE) {
+        legalEffect = LegalEffect.NOT_SPECIFIED;
       }
     }
 

@@ -1,0 +1,399 @@
+package de.bund.digitalservice.ris.caselaw.adapter.transformer;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CourtDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO.DocumentationUnitDTOBuilder;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.EnsuingDecisionDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.FileNumberDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.InputTypeDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LegalEffectDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PendingDecisionDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.RegionDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.StatusDTO;
+import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
+import de.bund.digitalservice.ris.caselaw.domain.CoreData;
+import de.bund.digitalservice.ris.caselaw.domain.CoreData.CoreDataBuilder;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit.DocumentUnitBuilder;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitListEntry;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
+import de.bund.digitalservice.ris.caselaw.domain.EnsuingDecision;
+import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
+import de.bund.digitalservice.ris.caselaw.domain.Status;
+import de.bund.digitalservice.ris.caselaw.domain.Texts;
+import de.bund.digitalservice.ris.caselaw.domain.court.Court;
+import java.util.Collections;
+import java.util.List;
+import java.util.UUID;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
+
+class DocumentationUnitTransformerTest {
+  @Test
+  void testTransformToDTO_withoutCoreData() {
+    DocumentationUnitDTO currentDto = DocumentationUnitDTO.builder().build();
+    DocumentUnit updatedDomainObject = DocumentUnit.builder().build();
+
+    DocumentationUnitDTO documentationUnitDTO =
+        DocumentationUnitTransformer.transformToDTO(currentDto, updatedDomainObject);
+
+    assertThat(documentationUnitDTO.getProcedures()).isEmpty();
+    assertThat(documentationUnitDTO.getEcli()).isNull();
+    assertThat(documentationUnitDTO.getJudicialBody()).isNull();
+    assertThat(documentationUnitDTO.getDecisionDate()).isNull();
+    assertThat(documentationUnitDTO.getCourt()).isNull();
+    assertThat(documentationUnitDTO.getDocumentType()).isNull();
+    assertThat(documentationUnitDTO.getDocumentationOffice()).isNull();
+  }
+
+  @Test
+  void testTransformToDTO_withoutDecisionNames() {
+    DocumentationUnitDTO currentDto = DocumentationUnitDTO.builder().build();
+    Texts texts = Texts.builder().build();
+    DocumentUnit updatedDomainObject = DocumentUnit.builder().texts(texts).build();
+
+    DocumentationUnitDTO documentationUnitDTO =
+        DocumentationUnitTransformer.transformToDTO(currentDto, updatedDomainObject);
+
+    assertThat(documentationUnitDTO.getDecisionNames()).isEmpty();
+  }
+
+  @Test
+  void testTransformToDTO_addLegalEffectWithCoreDataDeleted_shouldSetLegalEffectToNull() {
+    DocumentationUnitDTO currentDto =
+        DocumentationUnitDTO.builder().court(CourtDTO.builder().build()).build();
+    DocumentUnit updatedDomainObject = DocumentUnit.builder().build();
+
+    DocumentationUnitDTO documentationUnitDTO =
+        DocumentationUnitTransformer.transformToDTO(currentDto, updatedDomainObject);
+
+    assertThat(documentationUnitDTO.getLegalEffect()).isNull();
+  }
+
+  @Test
+  void
+      testTransformToDTO_addLegalEffectWithCourtDeletedWithoutLegalEffectSet_shouldSetLegalEffectToNull() {
+    DocumentationUnitDTO currentDto =
+        DocumentationUnitDTO.builder().court(CourtDTO.builder().build()).build();
+    DocumentUnit updatedDomainObject = DocumentUnit.builder().build();
+
+    DocumentationUnitDTO documentationUnitDTO =
+        DocumentationUnitTransformer.transformToDTO(currentDto, updatedDomainObject);
+
+    assertThat(documentationUnitDTO.getLegalEffect()).isNull();
+  }
+
+  @Test
+  void
+      testTransformToDTO_addLegalEffectWithCourtChangedAndNotSuperiorCourtAndLegalEffectNo_shouldSetLegalEffectToNo() {
+    DocumentationUnitDTO currentDto =
+        DocumentationUnitDTO.builder()
+            .court(
+                CourtDTO.builder()
+                    .id(UUID.fromString("CCCCCCCC-1111-2222-3333-444444444444"))
+                    .build())
+            .build();
+    DocumentUnit updatedDomainObject =
+        DocumentUnit.builder()
+            .coreData(
+                CoreData.builder()
+                    .court(
+                        Court.builder()
+                            .id(UUID.fromString("CCCCCCCC-2222-3333-4444-55555555555"))
+                            .type("not superior")
+                            .build())
+                    .legalEffect("Nein")
+                    .build())
+            .build();
+
+    DocumentationUnitDTO documentationUnitDTO =
+        DocumentationUnitTransformer.transformToDTO(currentDto, updatedDomainObject);
+
+    assertThat(documentationUnitDTO.getLegalEffect()).isEqualTo(LegalEffectDTO.NEIN);
+  }
+
+  @Test
+  void
+      testTransformToDTO_addLegalEffectWithCourtChangedAndNotSuperiorCourtAndLegalEffectNotSpecified_shouldSetLegalEffectToNotSpecified() {
+    DocumentationUnitDTO currentDto =
+        DocumentationUnitDTO.builder()
+            .court(
+                CourtDTO.builder()
+                    .id(UUID.fromString("CCCCCCCC-1111-2222-3333-444444444444"))
+                    .build())
+            .build();
+    DocumentUnit updatedDomainObject =
+        DocumentUnit.builder()
+            .coreData(
+                CoreData.builder()
+                    .court(
+                        Court.builder()
+                            .id(UUID.fromString("CCCCCCCC-2222-3333-4444-55555555555"))
+                            .type("not superior")
+                            .build())
+                    .legalEffect("Keine Angabe")
+                    .build())
+            .build();
+
+    DocumentationUnitDTO documentationUnitDTO =
+        DocumentationUnitTransformer.transformToDTO(currentDto, updatedDomainObject);
+
+    assertThat(documentationUnitDTO.getLegalEffect()).isEqualTo(LegalEffectDTO.KEINE_ANGABE);
+  }
+
+  @Test
+  void
+      testTransformToDTO_addLegalEffectWithCourtChangedAndNotSuperiorCourtAndLegalEffectYes_shouldSetLegalEffectToYes() {
+    DocumentationUnitDTO currentDto =
+        DocumentationUnitDTO.builder()
+            .court(
+                CourtDTO.builder()
+                    .id(UUID.fromString("CCCCCCCC-1111-2222-3333-444444444444"))
+                    .build())
+            .build();
+    DocumentUnit updatedDomainObject =
+        DocumentUnit.builder()
+            .coreData(
+                CoreData.builder()
+                    .court(
+                        Court.builder()
+                            .id(UUID.fromString("CCCCCCCC-2222-3333-4444-55555555555"))
+                            .type("not superior")
+                            .build())
+                    .legalEffect("Ja")
+                    .build())
+            .build();
+
+    DocumentationUnitDTO documentationUnitDTO =
+        DocumentationUnitTransformer.transformToDTO(currentDto, updatedDomainObject);
+
+    assertThat(documentationUnitDTO.getLegalEffect()).isEqualTo(LegalEffectDTO.JA);
+  }
+
+  @ParameterizedTest
+  @ValueSource(strings = {"BGH", "BVerwG", "BFH", "BVerfG", "BAG", "BSG"})
+  void
+      testTransformToDTO_addLegalEffectWithCourtChangedAndSuperiorCourt_shouldSetLegalEffectToYes() {
+    DocumentationUnitDTO currentDto =
+        DocumentationUnitDTO.builder()
+            .court(
+                CourtDTO.builder()
+                    .id(UUID.fromString("CCCCCCCC-1111-2222-3333-444444444444"))
+                    .build())
+            .build();
+    DocumentUnit updatedDomainObject =
+        DocumentUnit.builder()
+            .coreData(
+                CoreData.builder()
+                    .court(
+                        Court.builder()
+                            .id(UUID.fromString("CCCCCCCC-2222-3333-4444-55555555555"))
+                            .type("BGH")
+                            .build())
+                    .legalEffect("Nein")
+                    .build())
+            .build();
+
+    DocumentationUnitDTO documentationUnitDTO =
+        DocumentationUnitTransformer.transformToDTO(currentDto, updatedDomainObject);
+
+    assertThat(documentationUnitDTO.getLegalEffect()).isEqualTo(LegalEffectDTO.JA);
+  }
+
+  @Test
+  void testTransformToDTO_withInputTypes() {
+    DocumentationUnitDTO currentDto = DocumentationUnitDTO.builder().build();
+    List<String> inputTypes = List.of("input types 1", "input types 3", "input types 2");
+    DocumentUnit updatedDomainObject =
+        DocumentUnit.builder().coreData(CoreData.builder().inputTypes(inputTypes).build()).build();
+
+    DocumentationUnitDTO documentationUnitDTO =
+        DocumentationUnitTransformer.transformToDTO(currentDto, updatedDomainObject);
+
+    assertThat(documentationUnitDTO.getInputTypes())
+        .usingRecursiveFieldByFieldElementComparator()
+        .containsExactly(
+            InputTypeDTO.builder().value("input types 1").rank(1L).build(),
+            InputTypeDTO.builder().value("input types 3").rank(2L).build(),
+            InputTypeDTO.builder().value("input types 2").rank(3L).build());
+  }
+
+  @Test
+  void testTransformToDomain_withDocumentationUnitDTOIsNull_shouldReturnEmptyDocumentUnit() {
+
+    DocumentUnit documentUnit = DocumentationUnitTransformer.transformToDomain(null);
+
+    assertThat(documentUnit).isEqualTo(DocumentUnit.builder().build());
+  }
+
+  @Test
+  void testTransformToDomain_withRegion_shouldSetRegion() {
+    DocumentationUnitDTO documentationUnitDTO =
+        generateSimpleDTOBuilder()
+            .regions(List.of(RegionDTO.builder().code("region").build()))
+            .build();
+    DocumentUnit expected =
+        generateSimpleDocumentUnitBuilder()
+            .coreData(generateSimpleCoreDataBuilder().region("region").build())
+            .build();
+
+    DocumentUnit documentUnit =
+        DocumentationUnitTransformer.transformToDomain(documentationUnitDTO);
+
+    assertThat(documentUnit).isEqualTo(expected);
+  }
+
+  @Test
+  void testTransformToDomain_withLegalEffectYes_shouldSetLegalEffectToYes() {
+    DocumentationUnitDTO documentationUnitDTO =
+        generateSimpleDTOBuilder().legalEffect(LegalEffectDTO.JA).build();
+    DocumentUnit expected =
+        generateSimpleDocumentUnitBuilder()
+            .coreData(generateSimpleCoreDataBuilder().legalEffect("Ja").build())
+            .build();
+
+    DocumentUnit documentUnit =
+        DocumentationUnitTransformer.transformToDomain(documentationUnitDTO);
+
+    assertThat(documentUnit).isEqualTo(expected);
+  }
+
+  @Test
+  void testTransformToDomain_withLegalEffectNo_shouldSetLegalEffectToNo() {
+    DocumentationUnitDTO documentationUnitDTO =
+        generateSimpleDTOBuilder().legalEffect(LegalEffectDTO.NEIN).build();
+    DocumentUnit expected =
+        generateSimpleDocumentUnitBuilder()
+            .coreData(generateSimpleCoreDataBuilder().legalEffect("Nein").build())
+            .build();
+
+    DocumentUnit documentUnit =
+        DocumentationUnitTransformer.transformToDomain(documentationUnitDTO);
+
+    assertThat(documentUnit).isEqualTo(expected);
+  }
+
+  @Test
+  void testTransformToDomain_withLegalEffectNotSpecified_shouldSetLegalEffectToNotSpecified() {
+    DocumentationUnitDTO documentationUnitDTO =
+        generateSimpleDTOBuilder().legalEffect(LegalEffectDTO.KEINE_ANGABE).build();
+    DocumentUnit expected =
+        generateSimpleDocumentUnitBuilder()
+            .coreData(generateSimpleCoreDataBuilder().legalEffect("Keine Angabe").build())
+            .build();
+
+    DocumentUnit documentUnit =
+        DocumentationUnitTransformer.transformToDomain(documentationUnitDTO);
+
+    assertThat(documentUnit).isEqualTo(expected);
+  }
+
+  @Test
+  void testTransformToDomain_withLegalEffectWrongValue_shouldSetLegalEffectToNull() {
+    DocumentationUnitDTO documentationUnitDTO =
+        generateSimpleDTOBuilder().legalEffect(LegalEffectDTO.FALSCHE_ANGABE).build();
+    DocumentUnit expected =
+        generateSimpleDocumentUnitBuilder()
+            .coreData(generateSimpleCoreDataBuilder().build())
+            .build();
+
+    DocumentUnit documentUnit =
+        DocumentationUnitTransformer.transformToDomain(documentationUnitDTO);
+
+    assertThat(documentUnit).isEqualTo(expected);
+  }
+
+  @Test
+  void testTransformToDomain_withEnsuingAndPendingDecisionsWithoutARank_shouldAddItToTheEnd() {
+    DocumentationUnitDTO documentationUnitDTO =
+        generateSimpleDTOBuilder()
+            .ensuingDecisions(
+                List.of(
+                    EnsuingDecisionDTO.builder().note("ensuing with rank").rank(1).build(),
+                    EnsuingDecisionDTO.builder().note("ensuing without rank").rank(0).build()))
+            .pendingDecisions(
+                List.of(
+                    PendingDecisionDTO.builder().note("pending with rank").rank(2).build(),
+                    PendingDecisionDTO.builder().note("pending without rank").rank(0).build()))
+            .build();
+    DocumentUnit expected =
+        generateSimpleDocumentUnitBuilder()
+            .coreData(generateSimpleCoreDataBuilder().build())
+            .ensuingDecisions(
+                List.of(
+                    EnsuingDecision.builder().pending(false).note("ensuing with rank").build(),
+                    EnsuingDecision.builder().pending(true).note("pending with rank").build(),
+                    EnsuingDecision.builder().pending(false).note("ensuing without rank").build(),
+                    EnsuingDecision.builder().pending(true).note("pending without rank").build()))
+            .build();
+
+    DocumentUnit documentUnit =
+        DocumentationUnitTransformer.transformToDomain(documentationUnitDTO);
+
+    assertThat(documentUnit).isEqualTo(expected);
+  }
+
+  @Test
+  void testTransformToMetaDomain() {
+    DocumentationUnitDTO documentationUnitDTO =
+        generateSimpleDTOBuilder()
+            .status(
+                List.of(StatusDTO.builder().publicationStatus(PublicationStatus.PUBLISHED).build()))
+            .fileNumbers(List.of(FileNumberDTO.builder().value("file number").build()))
+            .court(CourtDTO.builder().type("court type").location("court location").build())
+            .build();
+    DocumentUnitListEntry expected =
+        DocumentUnitListEntry.builder()
+            .documentationOffice(DocumentationOffice.builder().abbreviation("doc office").build())
+            .status(Status.builder().publicationStatus(PublicationStatus.PUBLISHED).build())
+            .fileNumber("file number")
+            .court(
+                Court.builder()
+                    .type("court type")
+                    .location("court location")
+                    .label("court type court location")
+                    .build())
+            .build();
+
+    DocumentUnitListEntry result =
+        DocumentationUnitTransformer.transformToMetaDomain(documentationUnitDTO);
+
+    assertThat(result).isEqualTo(expected);
+  }
+
+  private DocumentationUnitDTOBuilder generateSimpleDTOBuilder() {
+    return DocumentationUnitDTO.builder()
+        .documentationOffice(DocumentationOfficeDTO.builder().abbreviation("doc office").build());
+  }
+
+  private DocumentUnitBuilder generateSimpleDocumentUnitBuilder() {
+    return DocumentUnit.builder()
+        .previousDecisions(Collections.emptyList())
+        .ensuingDecisions(Collections.emptyList())
+        .texts(Texts.builder().build())
+        .contentRelatedIndexing(
+            ContentRelatedIndexing.builder()
+                .keywords(Collections.emptyList())
+                .fieldsOfLaw(Collections.emptyList())
+                .norms(Collections.emptyList())
+                .activeCitations(Collections.emptyList())
+                .build());
+  }
+
+  private CoreDataBuilder generateSimpleCoreDataBuilder() {
+    return CoreData.builder()
+        .documentationOffice(DocumentationOffice.builder().abbreviation("doc office").build())
+        .fileNumbers(Collections.emptyList())
+        .deviatingFileNumbers(Collections.emptyList())
+        .deviatingCourts(Collections.emptyList())
+        .previousProcedures(Collections.emptyList())
+        .deviatingEclis(Collections.emptyList())
+        .deviatingDecisionDates(Collections.emptyList())
+        .inputTypes(Collections.emptyList())
+        .leadingDecisionNormReferences(Collections.emptyList());
+  }
+}

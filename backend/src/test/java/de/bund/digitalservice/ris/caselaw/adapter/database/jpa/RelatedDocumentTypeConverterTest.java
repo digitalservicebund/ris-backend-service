@@ -49,7 +49,7 @@ class RelatedDocumentTypeConverterTest {
 
     String result = converter.convertToDatabaseColumn(null);
 
-    assertThat(result).isEqualTo(null);
+    assertThat(result).isNull();
   }
 
   @Test
@@ -94,7 +94,7 @@ class RelatedDocumentTypeConverterTest {
 
     RelatedDocumentationType result = converter.convertToEntityAttribute(null);
 
-    assertThat(result).isEqualTo(null);
+    assertThat(result).isNull();
   }
 
   @Test
