@@ -160,6 +160,22 @@ async function updatePage(page: number) {
       :page="currentPage"
       @update-page="updatePage"
     >
+      <div v-if="currentPage" class="flex w-full justify-center">
+        <span v-if="currentPage.empty">Keine Ergebnisse gefunden</span>
+        <span
+          v-if="
+            !currentPage.empty &&
+            currentPage.totalElements &&
+            currentPage.totalElements > currentPage.numberOfElements
+          "
+          >{{ currentPage.totalElements }}
+          {{
+            currentPage.totalElements && currentPage.totalElements > 1
+              ? "Ergebnisse insgesamt"
+              : "Ergebnis insgesamt"
+          }}</span
+        >
+      </div>
       <div
         v-if="searchResults && searchResults.length > 0"
         class="relative mt-8 table w-full border-separate"

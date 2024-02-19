@@ -31,6 +31,7 @@ export type Page<T> = {
   size: number
   number: number
   numberOfElements: number
+  totalElements?: number
   first: boolean
   last: boolean
   empty: boolean
