@@ -10,7 +10,7 @@ import de.bund.digitalservice.ris.caselaw.TestConfig;
 import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
-import de.bund.digitalservice.ris.caselaw.domain.WebClientService;
+import de.bund.digitalservice.ris.caselaw.domain.RisSearchWebClientService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,17 +32,18 @@ class RisSearchControllerTest {
   @MockBean private DocumentUnitService documentUnitService;
   @MockBean private KeycloakUserService userService;
   @MockBean private ReactiveClientRegistrationRepository clientRegistrationRepository;
-  @MockBean private WebClientService webClientService;
+  @MockBean private RisSearchWebClientService webClientService;
 
   private final DocumentationOffice docOffice = buildDefaultDocOffice();
 
   @Test
   void endpointToPassOnStatusAndContentWithoutChangingIt_shouldBeOk() {
     ResponseEntity<String> mockResponse = ResponseEntity.ok("some content");
-    when(webClientService.callExternalService(anyString(), anyString(), anyString()))
-        .thenReturn(Mono.just(mockResponse));
 
     when(userService.getDocumentationOffice(any())).thenReturn(Mono.just(docOffice));
+
+    when(webClientService.callEndpoint(anyString(), anyString(), anyString(), any()))
+        .thenReturn(Mono.just(mockResponse));
 
     risWebClient
         .withDefaultLogin()
@@ -58,11 +59,11 @@ class RisSearchControllerTest {
 
   @Test
   void endpointToPassOnStatusAndContentWithoutChangingIt_shouldBeBad() {
-    ResponseEntity<String> mockResponse = ResponseEntity.badRequest().body("some content");
-    when(webClientService.callExternalService(anyString(), anyString(), anyString()))
-        .thenReturn(Mono.just(mockResponse));
-
     when(userService.getDocumentationOffice(any())).thenReturn(Mono.just(docOffice));
+
+    ResponseEntity<String> mockResponse = ResponseEntity.badRequest().body("some content");
+    when(webClientService.callEndpoint(anyString(), anyString(), anyString(), any()))
+        .thenReturn(Mono.just(mockResponse));
 
     risWebClient
         .withDefaultLogin()
