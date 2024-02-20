@@ -1,4 +1,4 @@
-import { CaptureConsole } from "@sentry/integrations"
+import { captureConsoleIntegration } from "@sentry/integrations"
 import * as Sentry from "@sentry/vue"
 import { createApp } from "vue"
 import "@/styles/global.scss"
@@ -17,12 +17,12 @@ if (import.meta.env.PROD) {
     environment: window.location.host,
     dsn: "https://26a9485d49884fd1aaa8be1489916aa3@o1248831.ingest.sentry.io/4505600659619840",
     integrations: [
-      new Sentry.BrowserTracing({
+      Sentry.browserTracingIntegration({
         // Set 'tracePropagationTargets' to control for which URLs distributed tracing should be enabled
         tracePropagationTargets: targets(),
-        routingInstrumentation: Sentry.vueRouterInstrumentation(router),
+        router,
       }),
-      new CaptureConsole(),
+      captureConsoleIntegration(),
     ],
     // Performance Monitoring
     tracesSampleRate: 0.1, // Capture 100% of the transactions, reduce in production!
