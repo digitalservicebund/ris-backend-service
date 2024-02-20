@@ -122,7 +122,7 @@ module.exports = {
       extends: ["plugin:jest-dom/recommended"],
     },
     {
-      files: ["**/e2e/**/*.ts", "**/a11y/**/*.ts"],
+      files: ["**/e2e/**/*.ts", "**/a11y/**/*.ts", "**/queries/**/*.ts"],
       extends: ["plugin:playwright/playwright-test"],
       rules: { ...moduleImportRules },
     },
