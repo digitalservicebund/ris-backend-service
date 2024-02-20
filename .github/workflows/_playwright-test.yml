@@ -82,7 +82,7 @@ jobs:
           fi
 
           workers_config=""
-          if [[ ${{ inputs.workers }} ]]; then
+          if [[ ${{ inputs.workers || 'default' }} != 'default' ]]; then
             workers_config="--workers ${{ inputs.workers }}"
           fi
 
