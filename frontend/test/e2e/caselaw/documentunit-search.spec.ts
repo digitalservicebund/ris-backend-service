@@ -517,7 +517,7 @@ test.describe("search", () => {
     const fileNumber = generateString()
     const courtType = "AG"
     const courtLocation = "Lüneburg"
-    const decisionDate = "12.02.2000"
+    const decisionDate = "25.12.1999"
 
     await test.step("all the data can be used", async () => {
       await fillSearchInput(page, {
@@ -644,7 +644,7 @@ test.describe("search", () => {
     const fileNumber = generateString()
     const courtType = "AG"
     const courtLocation = "Aachen"
-    const decisionDate = "23.12.2000"
+    const decisionDate = "25.12.2000"
 
     await fillSearchInput(page, {
       fileNumber,
