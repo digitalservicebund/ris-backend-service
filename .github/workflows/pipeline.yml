@@ -685,15 +685,65 @@ jobs:
     secrets: inherit
 
   query-performance-tests:
+    runs-on: ubuntu-latest
     if: ${{ github.ref == 'refs/heads/main' }}
     needs: [e2e-tests, prep-playwright-tests]
-    uses: ./.github/workflows/_playwright-test.yml
-    with:
-      subproject: "all"
-      browser: "queries" # ueses the 'queries' project
-      mode: "queries"
-      runs: 1
-      workers: 1
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: ./frontend/.node-version
+          cache: npm
+          cache-dependency-path: ./frontend/package-lock.json
+      - name: cache node modules
+        id: cache-node
+        uses: actions/cache@v4
+        with:
+          path: |
+            ./frontend/node_modules
+          key: modules-${{ hashFiles('./frontend/package-lock.json') }}
+      - name: Install node modules
+        if: steps.cache-node.outputs.cache-hit != 'true'
+        run: |
+          npm ci
+        working-directory: ./frontend
+      - name: Get Playwright version
+        working-directory: ./frontend
+        run: echo "PLAYWRIGHT_VERSION=$(jq -r '.packages["node_modules/@playwright/test"].version' package-lock.json)" >> $GITHUB_ENV
+      - name: Cache browser binaries
+        id: cache-browser-binaries
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ env.PLAYWRIGHT_VERSION }}
+      - name: Install playwright browsers
+        if: steps.cache-browser-binaries.outputs.cache-hit != 'true'
+        run: |
+          npx --yes playwright install --with-deps chromium
+        working-directory: ./frontend
+      - name: Run query performance tests in chromium
+        env:
+          E2E_BASE_URL: ${{ secrets.STAGING_URL }}
+          E2E_TEST_USER: ${{ secrets.E2E_TEST_USER }}
+          E2E_TEST_PASSWORD: ${{ secrets.E2E_TEST_PASSWORD }}
+          E2E_TEST_USER_BGH: ${{ secrets.E2E_TEST_USER_BGH }}
+          E2E_TEST_PASSWORD_BGH: ${{ secrets.E2E_TEST_PASSWORD_BGH }}
+          E2E_TEST_BASIC_AUTH_USER: ${{ secrets.E2E_TEST_BASIC_AUTH_USER }}
+          E2E_TEST_BASIC_AUTH_PASSWORD: ${{ secrets.E2E_TEST_BASIC_AUTH_PASSWORD }}
+          GH_PACKAGES_REPOSITORY_USER: ${{ secrets.GH_PACKAGES_REPOSITORY_USER }}
+          GH_PACKAGES_REPOSITORY_TOKEN: ${{ secrets.GH_PACKAGES_REPOSITORY_TOKEN }}
+        run: |
+          echo "Running query performance tests"
+          npm run test:queries -- --workers=1
+        working-directory: ./frontend
+      - name: Send status to Slack
+        # Third-party action, pin to commit SHA!
+        # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
+        uses: digitalservicebund/notify-on-failure-gha@15dd05b628141b7bac0ad26e08c1935cb3ba6bc8 # v1.4.0
+        if: ${{ failure() }}
+        with:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
 
   check-latest-deploy-tag:
     if: ${{ github.ref == 'refs/heads/main' }}
