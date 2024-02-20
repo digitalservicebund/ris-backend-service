@@ -115,7 +115,7 @@ async function createFromSearchQuery() {
   docUnit.coreData.fileNumbers = fileNumberFromQuery.value
     ? [fileNumberFromQuery.value]
     : []
-  docUnit.coreData.decisionDate = searchQuery.value?.decisionDate
+  docUnit.coreData.decisionDate = dateFromQuery.value
   docUnit.coreData.court = courtFromQuery.value
 
   const updateResponse = await service.update(docUnit)
@@ -144,9 +144,7 @@ const dateFromQuery = computed(() => {
     searchQuery.value?.decisionDate == undefined
   )
     return undefined
-  return dayjs(searchQuery.value.decisionDate, "YYYY-MM-DD", true).format(
-    "DD.MM.YYYY",
-  )
+  return searchQuery.value.decisionDate
 })
 
 const isSearchCompletedWithNoResults = computed(
@@ -226,7 +224,9 @@ const showDefaultLink = computed(() => {
                   `${courtFromQuery?.label ?? "Gericht unbekannt"}, `
                 }}</span>
                 <span :class="{ 'text-gray-800': !dateFromQuery }">{{
-                  dateFromQuery ?? "Datum unbekannt"
+                  dayjs(dateFromQuery, "YYYY-MM-DD", true).format(
+                    "DD.MM.YYYY",
+                  ) ?? "Datum unbekannt"
                 }}</span>
               </p>
               <TextButton
