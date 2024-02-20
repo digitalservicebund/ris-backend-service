@@ -83,10 +83,10 @@ jobs:
 
           workers_config=""
           if [[ ${{ inputs.workers || 'default' }} != 'default' ]]; then
-            workers_config="--workers ${{ inputs.workers }}"
+            workers_config="--workers=${{ inputs.workers }}"
           fi
 
-          npm run test:"$test_target" -- --project ${{ inputs.browser }} --repeat-each ${{ inputs.runs}} "$workers_config"
+          npm run test:"$test_target" -- --project ${{ inputs.browser }} --repeat-each ${{ inputs.runs}} $workers_config
         working-directory: ./frontend
       - name: Upload screenshots and traces of failed tests
         uses: actions/upload-artifact@v4
