@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import dayjs from "dayjs"
 import { ref, onMounted, watch } from "vue"
 import ProcedureDetail from "./ProcedureDetail.vue"
 import ExpandableContent from "@/components/ExpandableContent.vue"
@@ -8,8 +9,10 @@ import Pagination, { Page } from "@/components/Pagination.vue"
 import useQuery, { Query } from "@/composables/useQueryFromRoute"
 import { Procedure } from "@/domain/documentUnit"
 import service from "@/services/procedureService"
+import IconBaselineDescription from "~icons/ic/baseline-description"
 import IconExpandLess from "~icons/ic/baseline-expand-less"
 import IconExpandMore from "~icons/ic/baseline-expand-more"
+import IconFolderOpen from "~icons/ic/baseline-folder-open"
 
 const itemsPerPage = 10
 const procedures = ref<Procedure[]>()
@@ -87,9 +90,9 @@ watch(
 </script>
 
 <template>
-  <header class="bg-white px-16 py-16">
+  <div class="space-y-24 bg-gray-100 px-16 py-16">
     <h1 class="ds-heading-02-reg">Vorgänge</h1>
-    <div class="mt-32" role="search">
+    <div class="mt-24 w-480" role="search">
       <InputField id="procedureFilter" label="Vorgang" visually-hide-label>
         <TextInput
           id="procedureFilter"
@@ -100,49 +103,59 @@ watch(
         ></TextInput>
       </InputField>
     </div>
-  </header>
-  <div class="min-h-screen bg-blue-200 px-16 pt-24" role="main">
-    <div class="flex flex-row">
-      <div v-if="procedures" class="flex-1 py-56">
-        <Pagination
-          v-if="currentPage"
-          navigation-position="bottom"
-          :page="currentPage"
-          @update-page="(page) => updateProcedures(page, query)"
-        >
-          <ExpandableContent
-            v-for="procedure in procedures"
-            :key="procedure.label"
-            class="mb-24 bg-white p-16"
-            @update:is-expanded="
-              (isExpanded) => isExpanded && loadDocumentUnits(procedure)
-            "
+
+    <div class="min-h-screen" role="main">
+      <div class="flex flex-row">
+        <div v-if="procedures" class="flex-1">
+          <Pagination
+            v-if="currentPage"
+            navigation-position="bottom"
+            :page="currentPage"
+            @update-page="(page) => updateProcedures(page, query)"
           >
-            <template #open-icon>
-              <IconExpandMore />
-            </template>
+            <ExpandableContent
+              v-for="procedure in procedures"
+              :key="procedure.label"
+              class="border-b-1 border-blue-500 bg-white px-24 py-20"
+              @update:is-expanded="
+                (isExpanded) => isExpanded && loadDocumentUnits(procedure)
+              "
+            >
+              <template #open-icon>
+                <IconExpandMore class="text-blue-800" />
+              </template>
 
-            <template #close-icon>
-              <IconExpandLess />
-            </template>
+              <template #close-icon>
+                <IconExpandLess class="text-blue-800" />
+              </template>
 
-            <template #header>
-              <div class="grid grid-cols-[14em,max-content] gap-x-24">
-                <span class="truncate font-bold" :title="procedure.label">{{
-                  procedure.label
-                }}</span>
-                <span class="mr-16"
-                  >{{
-                    procedure.documentUnitCount
-                  }}
-                  Dokumentationseinheiten</span
-                >
-              </div>
-            </template>
+              <template #header>
+                <div class="flex w-full justify-between">
+                  <div class="flex flex-row items-center gap-16">
+                    <IconFolderOpen />
+                    <span class="ds-label-01-reg" :title="procedure.label">{{
+                      procedure.label
+                    }}</span>
+                    <div
+                      class="ds-body-02-reg flex flex-row items-center gap-4 rounded-full bg-blue-300 px-8 py-2 outline-none"
+                    >
+                      <IconBaselineDescription class="w-16 text-blue-800" />
+                      <span class="-mb-2">
+                        {{ procedure.documentUnitCount }}
+                      </span>
+                    </div>
+                  </div>
+                  <span class="mr-24"
+                    >erstellt am
+                    {{ dayjs(procedure.createdAt).format("DD.MM.YYYY") }}</span
+                  >
+                </div>
+              </template>
 
-            <ProcedureDetail :procedure="procedure" />
-          </ExpandableContent>
-        </Pagination>
+              <ProcedureDetail :procedure="procedure" />
+            </ExpandableContent>
+          </Pagination>
+        </div>
       </div>
     </div>
   </div>
