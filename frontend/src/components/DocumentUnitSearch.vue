@@ -48,8 +48,7 @@ async function search() {
   if (
     isSearchCompletedWithNoResults.value &&
     !hasFilters.value &&
-    searchQuery.value &&
-    searchQuery.value.courtType
+    searchQuery.value?.courtType
   ) {
     const courtFilter =
       searchQuery.value.courtType +
@@ -145,7 +144,7 @@ const dateFromQuery = computed(() => {
     searchQuery.value?.decisionDate == undefined
   )
     return undefined
-  return dayjs(searchQuery.value!.decisionDate, "YYYY-MM-DD", true).format(
+  return dayjs(searchQuery.value.decisionDate, "YYYY-MM-DD", true).format(
     "DD.MM.YYYY",
   )
 })
