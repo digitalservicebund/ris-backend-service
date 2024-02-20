@@ -37,6 +37,9 @@ import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 
 @Slf4j
 public class DocumentationUnitTransformer {
@@ -469,6 +472,12 @@ public class DocumentationUnitTransformer {
             .reasons(documentationUnitDTO.getGrounds())
             .caseFacts(documentationUnitDTO.getCaseFacts())
             .decisionReasons(documentationUnitDTO.getDecisionGrounds())
+            .borderNumbers(
+                transformBorderNumbers(
+                    documentationUnitDTO.getTenor(),
+                    documentationUnitDTO.getGrounds(),
+                    documentationUnitDTO.getCaseFacts(),
+                    documentationUnitDTO.getDecisionGrounds()))
             .build();
 
     if (documentationUnitDTO.getOriginalFileDocument() != null) {
@@ -710,6 +719,33 @@ public class DocumentationUnitTransformer {
     }
 
     return size;
+  }
+
+  private static List<String> transformBorderNumbers(String... input) {
+    if (Objects.isNull(input)) {
+      return new ArrayList<>();
+    }
+    List<String> borderNumbers = new ArrayList<>();
+    Arrays.stream(input)
+        .forEach(
+            longText -> {
+              if (Objects.isNull(longText)) {
+                return;
+              }
+              Document doc = Jsoup.parse(longText);
+              var borderNumberElements = doc.getElementsByTag("border-number");
+              borderNumberElements.forEach(
+                  element -> {
+                    var numberElement = element.getElementsByTag("number");
+                    if (numberElement.size() == 1) {
+                      var number = numberElement.get(0).text();
+                      if (StringUtils.isNotBlank(number)) {
+                        borderNumbers.add(numberElement.text());
+                      }
+                    }
+                  });
+            });
+    return borderNumbers;
   }
 
   public static DocumentUnitListEntry transformToMetaDomain(

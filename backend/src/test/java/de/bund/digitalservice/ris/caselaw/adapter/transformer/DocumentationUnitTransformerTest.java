@@ -338,6 +338,66 @@ class DocumentationUnitTransformerTest {
   }
 
   @Test
+  void testTransformToDomain_textWithMultipleBorderNumberElements_shouldAddAllBorderNumbers() {
+    DocumentationUnitDTO documentationUnitDTO =
+        generateSimpleDTOBuilder()
+            .grounds(
+                "lorem ipsum<border-number><number>1</number><content>foo</content></border-number> dolor sit amet <border-number><number>2</number><content>bar</content></border-number>")
+            .build();
+
+    DocumentUnit documentUnit =
+        DocumentationUnitTransformer.transformToDomain(documentationUnitDTO);
+
+    assertThat(documentUnit.texts().borderNumbers()).hasSize(2).containsExactly("1", "2");
+  }
+
+  @Test
+  void testTransformToDomain_multipleTextsWithBorderNumberElements_shouldAddAllBorderNumbers() {
+    DocumentationUnitDTO documentationUnitDTO =
+        generateSimpleDTOBuilder()
+            .tenor(
+                "lorem ipsum <border-number><number>1</number><content>foo</content></border-number>")
+            .grounds(
+                "dolor sit amet <border-number><number>2</number><content>bar</content></border-number>")
+            .caseFacts(
+                "consectetur <border-number><number>3</number><content>baz</content></border-number>")
+            .decisionGrounds(
+                "adipiscing <border-number><number>4</number><content>qux</content></border-number>")
+            .build();
+
+    DocumentUnit documentUnit =
+        DocumentationUnitTransformer.transformToDomain(documentationUnitDTO);
+
+    assertThat(documentUnit.texts().borderNumbers()).hasSize(4).containsExactly("1", "2", "3", "4");
+  }
+
+  @Test
+  void testTransformToDomain_textWithoutBorderNumberElements_shouldNotAddBorderNumbers() {
+    DocumentationUnitDTO documentationUnitDTO =
+        generateSimpleDTOBuilder().grounds("lorem ipsum dolor sit amet").build();
+
+    DocumentUnit documentUnit =
+        DocumentationUnitTransformer.transformToDomain(documentationUnitDTO);
+
+    assertThat(documentUnit.texts().borderNumbers()).isEmpty();
+  }
+
+  @Test
+  void
+      testTransformToDomain_textWithMalformedBorderNumberElement_shouldOnlyAddValidBorderNumbers() {
+    DocumentationUnitDTO documentationUnitDTO =
+        generateSimpleDTOBuilder()
+            .grounds(
+                "lorem ipsum<border-number><content>foo</content></border-number> dolor sit amet <border-number><number>2</number><content>bar</content></border-number>")
+            .build();
+
+    DocumentUnit documentUnit =
+        DocumentationUnitTransformer.transformToDomain(documentationUnitDTO);
+
+    assertThat(documentUnit.texts().borderNumbers()).hasSize(1).containsExactly("2");
+  }
+
+  @Test
   void testTransformToMetaDomain() {
     DocumentationUnitDTO documentationUnitDTO =
         generateSimpleDTOBuilder()
@@ -374,7 +434,7 @@ class DocumentationUnitTransformerTest {
     return DocumentUnit.builder()
         .previousDecisions(Collections.emptyList())
         .ensuingDecisions(Collections.emptyList())
-        .texts(Texts.builder().build())
+        .texts(Texts.builder().borderNumbers(Collections.emptyList()).build())
         .contentRelatedIndexing(
             ContentRelatedIndexing.builder()
                 .keywords(Collections.emptyList())
