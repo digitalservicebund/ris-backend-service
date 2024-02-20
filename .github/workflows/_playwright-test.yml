@@ -16,6 +16,9 @@ on:
       subproject:
         required: false
         type: string
+      workers:
+        required: false
+        type: string
     secrets:
       STAGING_URL:
         required: true
@@ -78,7 +81,12 @@ jobs:
             test_target=${{ inputs.mode }}:${{ inputs.subproject }}
           fi
 
-          npm run test:"$test_target" -- --project ${{ inputs.browser }} --repeat-each ${{ inputs.runs}}
+          workers_config=""
+          if [[ ${{ inputs.workers }} ]]; then
+            workers_config="--workers ${{ inputs.workers }}"
+          fi
+
+          npm run test:"$test_target" -- --project ${{ inputs.browser }} --repeat-each ${{ inputs.runs}} "$workers_config"
         working-directory: ./frontend
       - name: Upload screenshots and traces of failed tests
         uses: actions/upload-artifact@v4

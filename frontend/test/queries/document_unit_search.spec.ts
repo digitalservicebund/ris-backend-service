@@ -17,7 +17,7 @@ test.describe("document unit search queries", () => {
         documentNumber: "BVRE",
         courtType: "VerfGH",
       },
-      maxDuration: 700, // last max 657
+      maxDuration: 500, // last max 382
       minResults: 5,
     },
     {
@@ -25,7 +25,7 @@ test.describe("document unit search queries", () => {
       parameter: {
         documentNumber: "BV",
       },
-      maxDuration: 3000, // last max 3677
+      maxDuration: 3000, // last max 1547
       minResults: 5,
     },
     {
@@ -33,14 +33,14 @@ test.describe("document unit search queries", () => {
       parameter: {
         documentNumber: "notExistingFoo",
       },
-      maxDuration: 400, // last max 364
+      maxDuration: 300, // last max 228
     },
     {
       title: "vague fileNumber",
       parameter: {
         fileNumber: "Bv",
       },
-      maxDuration: 1800, // last max 2054
+      maxDuration: 1700, // last max 1365
       minResults: 5,
     },
     {
@@ -48,14 +48,14 @@ test.describe("document unit search queries", () => {
       parameter: {
         fileNumber: "notExistingFoo",
       },
-      maxDuration: 350, // last max 368
+      maxDuration: 300, // last max 230
     },
     {
       title: "only unpublished",
       parameter: {
         publicationStatus: "UNPUBLISHED",
       },
-      maxDuration: 1600, // last max 1535
+      maxDuration: 1300, // last max 1041
       minResults: 5,
     },
     {
@@ -64,7 +64,7 @@ test.describe("document unit search queries", () => {
         decisionDate: "1900-01-01",
         decisionDateEnd: "2024-01-15",
       },
-      maxDuration: 500, // last max 453
+      maxDuration: 400, // last max 332
       minResults: 5,
     },
     {
@@ -72,7 +72,7 @@ test.describe("document unit search queries", () => {
       parameter: {
         decisionDate: "1975-06-16",
       },
-      maxDuration: 350, // last max 375
+      maxDuration: 350, // last max 249
       minResults: 1,
     },
     {
@@ -80,7 +80,7 @@ test.describe("document unit search queries", () => {
       parameter: {
         courtLocation: "München",
       },
-      maxDuration: 2000, // last max 2238
+      maxDuration: 1700, // last max 1249
       minResults: 5,
     },
     {
@@ -88,7 +88,7 @@ test.describe("document unit search queries", () => {
       parameter: {
         courtType: "VerfGH",
       },
-      maxDuration: 600, // last max 502
+      maxDuration: 450, // last max 364
       minResults: 5,
     },
     {
@@ -96,7 +96,7 @@ test.describe("document unit search queries", () => {
       parameter: {
         myDocOfficeOnly: "true",
       },
-      maxDuration: 500, // last max 448
+      maxDuration: 450, // last max 332
       minResults: 5,
     },
   ]
