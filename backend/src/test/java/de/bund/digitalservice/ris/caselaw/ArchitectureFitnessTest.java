@@ -19,7 +19,6 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.repository.reactive.ReactiveCrudRepository;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.stereotype.Repository;
@@ -161,22 +160,6 @@ class ArchitectureFitnessTest {
             .areAnnotatedWith(Repository.class)
             .should()
             .resideInAPackage(ADAPTER_LAYER_PACKAGES);
-    rule.check(classes);
-  }
-
-  @Test
-  @Disabled("no r2dbc classes")
-  void repositoryInR2DBCAdapterPackageAreInterfacesWhichExtendReactiveCrudRepository() {
-    ArchRule rule =
-        ArchRuleDefinition.classes()
-            .that()
-            .resideInAPackage(R2DBC_LAYER_PACKAGES)
-            .and()
-            .haveSimpleNameEndingWith("Repository")
-            .should()
-            .beInterfaces()
-            .andShould()
-            .beAssignableTo(ReactiveCrudRepository.class);
     rule.check(classes);
   }
 

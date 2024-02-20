@@ -7,6 +7,7 @@ type RequestOptions = {
     Accept?: string
     "Content-Type"?: string
     "X-Filename"?: string
+    "X-API-KEY"?: string
   }
   params?: {
     [key: string]: string

@@ -81,7 +81,7 @@ onMounted(async () => {
       <IconPermIdentity />
       <div>
         <div class="ds-label-01-bold">
-          {{ user.name }}
+          <router-link :to="{ name: 'settings' }">{{ user.name }}</router-link>
         </div>
         <div v-if="user.documentationOffice" class="ds-label-03-reg">
           {{ user.documentationOffice.abbreviation }}

@@ -15,6 +15,8 @@ import de.bund.digitalservice.ris.caselaw.adapter.DocumentNumberPatternConfig;
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentUnitController;
 import de.bund.digitalservice.ris.caselaw.adapter.DocxConverterService;
 import de.bund.digitalservice.ris.caselaw.adapter.KeycloakUserService;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseApiKeyRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationOfficeRepository;
 import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
@@ -53,6 +55,8 @@ class DocumentUnitControllerAuthTest {
   @MockBean private KeycloakUserService userService;
   @MockBean private DocxConverterService docxConverterService;
   @MockBean ReactiveClientRegistrationRepository clientRegistrationRepository;
+  @MockBean DatabaseApiKeyRepository apiKeyRepository;
+  @MockBean DatabaseDocumentationOfficeRepository officeRepository;
 
   private static final UUID TEST_UUID = UUID.fromString("88888888-4444-4444-4444-121212121212");
   private final String docOffice1Group = "/CC-RIS";

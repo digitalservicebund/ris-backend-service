@@ -189,6 +189,7 @@ dependencies {
     runtimeOnly("org.flywaydb:flyway-database-postgresql:10.8.1")
 
     implementation("io.getunleash:unleash-client-java:9.2.0")
+    implementation("org.apache.commons:commons-text:1.11.0")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
         exclude(group = "org.mockito", module = "mockito-core")

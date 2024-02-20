@@ -7,6 +7,8 @@ import static org.mockito.Mockito.when;
 
 import de.bund.digitalservice.ris.caselaw.RisWebTestClient;
 import de.bund.digitalservice.ris.caselaw.TestConfig;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseApiKeyRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationOfficeRepository;
 import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
@@ -33,6 +35,8 @@ class RisSearchControllerTest {
   @MockBean private KeycloakUserService userService;
   @MockBean private ReactiveClientRegistrationRepository clientRegistrationRepository;
   @MockBean private RisSearchWebClientService webClientService;
+  @MockBean DatabaseApiKeyRepository apiKeyRepository;
+  @MockBean DatabaseDocumentationOfficeRepository officeRepository;
 
   private final DocumentationOffice docOffice = buildDefaultDocOffice();
 

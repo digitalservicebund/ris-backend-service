@@ -170,5 +170,13 @@
   "SESSION_TIMEOUT": {
     "title": "Fehler beim Speichern: Die Sitzung ist abgelaufen. Es kann helfen, die Seite neu zu laden.",
     "description": ""
+  },
+  "API_KEY_COULD_NOT_GENERATED": {
+    "title": "API Key konnte nicht erstellt werden.",
+    "description": ""
+  },
+  "API_KEY_COULD_NOT_INVALIDATED": {
+    "title": "API Key konnte nicht gesperrt werden.",
+    "description": ""
   }
 }
