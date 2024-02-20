@@ -11,15 +11,15 @@ export const BorderNumberLink = Node.create({
   parseHTML() {
     return [{ tag: "border-number-link" }]
   },
-  renderHTML() {
+  renderHTML({ node }) {
     return [
       "border-number-link",
       {
         style:
-          "color: #003350; font-weight: bold; text-decoration: underline; padding: 2px",
+          "color: #003350; font-weight: bold; text-decoration: underline; padding: 2px; font-style: italic",
         contenteditable: false,
       },
-      0,
+      `Rn. ${node.textContent}`,
     ]
   },
 })
