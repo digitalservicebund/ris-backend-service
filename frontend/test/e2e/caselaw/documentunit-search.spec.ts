@@ -4,6 +4,7 @@ import { fillSearchInput, navigateToSearch } from "~/e2e/caselaw/e2e-utils"
 import { caselawTest as test } from "~/e2e/caselaw/fixtures"
 import { generateString } from "~/test-helper/dataGenerators"
 
+/* eslint-disable playwright/no-conditional-in-test */
 test.describe("search", () => {
   test("renders search entry form", async ({ page }) => {
     await navigateToSearch(page)
@@ -543,16 +544,6 @@ test.describe("search", () => {
       ).toBeVisible()
     })
 
-    // Skipping for now, since on Staging there are always search results for all the courts...
-    // await test.step("only court set", async () => {
-    //   await fillSearchInput(page, { courtType, courtLocation })
-    //   await expect(
-    //     page.getByText(
-    //       `Aktenzeichen unbekannt, ${courtType} ${courtLocation}, Datum unbekannt`,
-    //     ),
-    //   ).toBeVisible()
-    // })
-
     await test.step("only date set", async () => {
       await fillSearchInput(page, { decisionDate })
       await expect(
@@ -588,6 +579,16 @@ test.describe("search", () => {
         ),
       ).toBeVisible()
     })
+  })
+
+  test("do not show button for creating new doc unit, when filters set", async ({
+    page,
+    browserName,
+  }) => {
+    const fileNumber = generateString()
+    const courtType = "AG"
+    const courtLocation = "Lüneburg"
+    const decisionDate = "25.12.1999"
 
     await test.step("document number is set, so nothing can be used", async () => {
       await fillSearchInput(page, {
@@ -604,35 +605,44 @@ test.describe("search", () => {
       ).toBeVisible()
     })
 
-    // await test.step("my docoffice only is set, so nothing can be used", async () => {
-    //   await fillSearchInput(page, {
-    //     fileNumber,
-    //     courtType,
-    //     courtLocation,
-    //     decisionDate,
-    //     myDocOfficeOnly: true,
-    //   })
-    //   await expect(
-    //     page.getByRole("button", {
-    //       name: "Neue Dokumentationseinheit erstellen",
-    //     }),
-    //   ).toBeVisible()
-    // })
+    // Todo: Known error in firefox (NS_BINDING_ABORTED),
+    // when navigating with a concurrent navigation triggered
+    // eslint-disable-next-line playwright/no-wait-for-timeout
+    if (browserName === "firefox") await page.waitForTimeout(500)
 
-    // await test.step("status is set, so nothing can be used", async () => {
-    //   await fillSearchInput(page, {
-    //     fileNumber,
-    //     courtType,
-    //     courtLocation,
-    //     decisionDate,
-    //     status: "Veröffentlicht",
-    //   })
-    //   await expect(
-    //     page.getByRole("button", {
-    //       name: "Neue Dokumentationseinheit erstellen",
-    //     }),
-    //   ).toBeVisible()
-    // })
+    await test.step("my docoffice only is set, so nothing can be used", async () => {
+      await fillSearchInput(page, {
+        fileNumber,
+        courtType,
+        courtLocation,
+        decisionDate,
+        myDocOfficeOnly: true,
+      })
+      await expect(
+        page.getByRole("button", {
+          name: "Neue Dokumentationseinheit erstellen",
+        }),
+      ).toBeVisible()
+    })
+
+    // Todo: Known error in firefox (NS_BINDING_ABORTED),
+    // when navigating with a concurrent navigation triggered
+    // eslint-disable-next-line playwright/no-wait-for-timeout
+    if (browserName === "firefox") await page.waitForTimeout(500)
+    await test.step("status is set, so nothing can be used", async () => {
+      await fillSearchInput(page, {
+        fileNumber,
+        courtType,
+        courtLocation,
+        decisionDate,
+        status: "Veröffentlicht",
+      })
+      await expect(
+        page.getByRole("button", {
+          name: "Neue Dokumentationseinheit erstellen",
+        }),
+      ).toBeVisible()
+    })
   })
 
   test("create new doc unit from search parameter and switch to categories page", async ({
