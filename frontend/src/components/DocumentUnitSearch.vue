@@ -140,11 +140,12 @@ const fileNumberFromQuery = computed(() => {
 const courtFromQuery = ref<Court | undefined>()
 const dateFromQuery = computed(() => {
   if (
-    searchQuery.value?.decisionDateEnd != undefined ||
+    (searchQuery.value?.decisionDateEnd != undefined &&
+      searchQuery.value?.decisionDateEnd != searchQuery.value?.decisionDate) ||
     searchQuery.value?.decisionDate == undefined
   )
     return undefined
-  return searchQuery.value.decisionDate
+  return searchQuery.value?.decisionDate
 })
 
 const isSearchCompletedWithNoResults = computed(
@@ -224,9 +225,11 @@ const showDefaultLink = computed(() => {
                   `${courtFromQuery?.label ?? "Gericht unbekannt"}, `
                 }}</span>
                 <span :class="{ 'text-gray-800': !dateFromQuery }">{{
-                  dayjs(dateFromQuery, "YYYY-MM-DD", true).format(
-                    "DD.MM.YYYY",
-                  ) ?? "Datum unbekannt"
+                  dateFromQuery
+                    ? dayjs(dateFromQuery, "YYYY-MM-DD", true).format(
+                        "DD.MM.YYYY",
+                      )
+                    : "Datum unbekannt"
                 }}</span>
               </p>
               <TextButton
