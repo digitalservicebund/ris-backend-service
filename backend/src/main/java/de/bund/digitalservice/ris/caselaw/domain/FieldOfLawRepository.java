@@ -24,7 +24,5 @@ public interface FieldOfLawRepository {
 
   List<FieldOfLaw> findByNormStrAndSearchTerms(String normStr, String[] searchTerms);
 
-  List<FieldOfLaw> getFirst30OrderByIdentifier();
-
   List<FieldOfLaw> findByIdentifierSearch(String searchStr);
 }

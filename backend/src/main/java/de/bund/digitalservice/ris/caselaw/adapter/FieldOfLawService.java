@@ -13,6 +13,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
@@ -166,7 +167,8 @@ public class FieldOfLawService {
   public Mono<List<FieldOfLaw>> getFieldsOfLawByIdentifierSearch(
       Optional<String> optionalSearchStr) {
     if (optionalSearchStr.isEmpty() || optionalSearchStr.get().isBlank()) {
-      return Mono.just(repository.getFirst30OrderByIdentifier());
+      return Mono.just(
+          repository.findAllByOrderByIdentifierAsc(PageRequest.of(0, 30)).stream().toList());
     }
     return Mono.just(repository.findByIdentifierSearch(optionalSearchStr.get().trim()));
   }

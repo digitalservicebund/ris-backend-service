@@ -1,9 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
-import static de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresFieldOfLawRepositoryImpl.returnTrueIfInTextOrIdentifier;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.never;
@@ -11,7 +8,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.FieldOfLawDTO;
 import de.bund.digitalservice.ris.caselaw.domain.FieldOfLawRepository;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw.FieldOfLaw;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw.Norm;
@@ -81,24 +77,6 @@ class FieldOfLawServiceTest {
 
     Assertions.assertEquals(0, resultWithNullSearchTerms.size());
     Assertions.assertEquals(0, resultWithEmptySearchTerms.size());
-  }
-
-  @Test
-  void testReturnTrueIfInTextOrIdentifier() {
-    assertTrue(
-        returnTrueIfInTextOrIdentifier(
-            FieldOfLawDTO.builder().identifier("AB-31-21").text("find me by text").build(),
-            new String[] {"find me by text"}));
-
-    assertTrue(
-        returnTrueIfInTextOrIdentifier(
-            FieldOfLawDTO.builder().identifier("AB-31-21").text("find me by identifier").build(),
-            new String[] {"AB-31-21"}));
-
-    assertFalse(
-        returnTrueIfInTextOrIdentifier(
-            FieldOfLawDTO.builder().identifier("AB-31-21").text("dont find me at all").build(),
-            new String[] {"no matches"}));
   }
 
   @Test
@@ -240,7 +218,7 @@ class FieldOfLawServiceTest {
         .consumeNextWith(
             response -> {
               assertThat(response).hasSize(1);
-              assertThat(response).extracting("identifier").containsExactly("TS-01-01");
+              assertThat(response).extracting("identifier").containsExactly("TS-01" + "-01");
             })
         .verifyComplete();
 

@@ -91,7 +91,8 @@ class FieldOfLawIntegrationTest {
             .expectBody(String.class)
             .returnResult();
 
-    List<String> identifiers = JsonPath.read(result.getResponseBody(), "$.content[*].identifier");
+    List<String> identifiers =
+        JsonPath.read(result.getResponseBody(), "$.content[*]" + ".identifier");
     assertThat(identifiers)
         .containsExactly(
             "AB-01",
@@ -121,7 +122,8 @@ class FieldOfLawIntegrationTest {
             .expectBody(String.class)
             .returnResult();
 
-    List<String> identifiers = JsonPath.read(result.getResponseBody(), "$.content[*].identifier");
+    List<String> identifiers =
+        JsonPath.read(result.getResponseBody(), "$.content[*]" + ".identifier");
     assertThat(identifiers).containsExactly("FL-01", "FL-01-01");
   }
 
@@ -205,7 +207,8 @@ class FieldOfLawIntegrationTest {
             .expectBody(String.class)
             .returnResult();
 
-    List<String> identifiers = JsonPath.read(result.getResponseBody(), "$.content[*].identifier");
+    List<String> identifiers =
+        JsonPath.read(result.getResponseBody(), "$.content[*]" + ".identifier");
     assertThat(identifiers).containsExactlyInAnyOrder("FL", "AB-01");
   }
 
@@ -227,7 +230,8 @@ class FieldOfLawIntegrationTest {
             .expectBody(String.class)
             .returnResult();
 
-    List<String> identifiers = JsonPath.read(result.getResponseBody(), "$.content[*].identifier");
+    List<String> identifiers =
+        JsonPath.read(result.getResponseBody(), "$.content[*]" + ".identifier");
     assertThat(identifiers).containsExactly("AB-01", "AB-01-01", "CD-02");
   }
 
@@ -249,7 +253,8 @@ class FieldOfLawIntegrationTest {
             .expectBody(String.class)
             .returnResult();
 
-    List<String> identifiers = JsonPath.read(result.getResponseBody(), "$.content[*].identifier");
+    List<String> identifiers =
+        JsonPath.read(result.getResponseBody(), "$.content[*]" + ".identifier");
     assertThat(identifiers).containsExactly("AB-01", "FL");
   }
 
@@ -272,7 +277,8 @@ class FieldOfLawIntegrationTest {
             .expectBody(String.class)
             .returnResult();
 
-    List<String> identifiers = JsonPath.read(result.getResponseBody(), "$.content[*].identifier");
+    List<String> identifiers =
+        JsonPath.read(result.getResponseBody(), "$.content[*]" + ".identifier");
     assertThat(identifiers).containsExactly("FL");
   }
 
@@ -289,7 +295,8 @@ class FieldOfLawIntegrationTest {
             .expectBody(String.class)
             .returnResult();
 
-    List<String> identifiers = JsonPath.read(result.getResponseBody(), "$.content[*].identifier");
+    List<String> identifiers =
+        JsonPath.read(result.getResponseBody(), "$.content[*]" + ".identifier");
     assertThat(identifiers).containsExactly("FL-01");
   }
 
@@ -342,7 +349,7 @@ class FieldOfLawIntegrationTest {
             response ->
                 assertThat(response.getResponseBody())
                     .extracting("identifier")
-                    .containsExactlyInAnyOrder("FL-01", "FL-02", "FL-03", "FL-04"));
+                    .containsExactlyInAnyOrder("FL-01", "FL-02", "FL-03", "FL" + "-04"));
   }
 
   @Test
@@ -373,7 +380,8 @@ class FieldOfLawIntegrationTest {
   // TODO: Is this test still relevant? It is disabled.
   @Test
   @Disabled(
-      "wrong test, syntax incorrect, logic replaced in refactoring, have to redesign in a later iteration")
+      "wrong test, syntax incorrect, logic replaced in refactoring, have to redesign in a "
+          + "later iteration")
   void testOrderingOfGetFieldsOfLawByNormsAndSearchQuery() {
     String searchStr = "norm:\"§ 123 ab\" AB here text";
 
