@@ -146,7 +146,7 @@ dependencies {
     // CVE-2023-31582
     implementation("org.bitbucket.b_c:jose4j:0.9.3")
 
-    implementation("org.postgresql:postgresql:42.7.1")
+    implementation("org.postgresql:postgresql:42.7.2")
 
     implementation("com.sendinblue:sib-api-v3-sdk:7.0.0")
     // CVE-2022-4244
