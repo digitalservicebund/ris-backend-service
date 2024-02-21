@@ -8,7 +8,7 @@ import lombok.experimental.UtilityClass;
 @UtilityClass
 public class DateUtil {
 
-  public static Year getCurrentYear() {
+  public static Year getYear() {
     return Year.of(Calendar.getInstance().get(Calendar.YEAR));
   }
 
@@ -20,6 +20,6 @@ public class DateUtil {
   }
 
   public static String getYear(int digits) {
-    return getYear(getCurrentYear(), digits);
+    return getYear(getYear(), digits);
   }
 }

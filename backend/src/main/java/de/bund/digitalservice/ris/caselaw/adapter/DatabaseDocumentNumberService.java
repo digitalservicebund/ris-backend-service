@@ -65,7 +65,7 @@ public class DatabaseDocumentNumberService implements DocumentNumberService {
     String documentNumber =
         DocumentNumberFormatter.builder()
             .docNumber(documentNumberDTO.increaseLastNumber())
-            .year(DateUtil.getCurrentYear())
+            .year(DateUtil.getYear())
             .pattern(pattern)
             .build()
             .generate();

@@ -29,7 +29,7 @@ class DocumentNumberFormatterTest {
         "XXRE******YYY"
       })
   void shouldCreateCorrectFormat(String pattern) throws DocumentNumberFormatterException {
-    Year currentYear = DateUtil.getCurrentYear();
+    Year currentYear = DateUtil.getYear();
     var prefix = pattern.substring(0, pattern.indexOf('*'));
     DocumentNumberFormatter documentNumberFormatter =
         DocumentNumberFormatter.builder().pattern(pattern).year(currentYear).docNumber(2).build();
@@ -46,7 +46,7 @@ class DocumentNumberFormatterTest {
 
   @Test
   void shouldCreateShortYearFormat() throws DocumentNumberFormatterException {
-    var currentYear = DateUtil.getCurrentYear();
+    var currentYear = DateUtil.getYear();
     String format = "BSRE1******YY";
     DocumentNumberFormatter documentNumberFormatter =
         DocumentNumberFormatter.builder().pattern(format).year(currentYear).docNumber(1).build();
@@ -58,7 +58,7 @@ class DocumentNumberFormatterTest {
 
   @Test
   void shouldCreateLongYearFormat() throws DocumentNumberFormatterException {
-    var currentYear = DateUtil.getCurrentYear();
+    var currentYear = DateUtil.getYear();
     String format = "BSRE1****YYYY";
     DocumentNumberFormatter documentNumberFormatter =
         DocumentNumberFormatter.builder().pattern(format).year(currentYear).docNumber(1).build();
@@ -75,7 +75,7 @@ class DocumentNumberFormatterTest {
     DocumentNumberFormatter documentNumberFormatter =
         DocumentNumberFormatter.builder()
             .pattern(pattern)
-            .year(DateUtil.getCurrentYear())
+            .year(DateUtil.getYear())
             .docNumber(10000)
             .build();
 
@@ -97,7 +97,7 @@ class DocumentNumberFormatterTest {
         () -> {
           DocumentNumberFormatter.builder()
               .pattern(pattern)
-              .year(DateUtil.getCurrentYear())
+              .year(DateUtil.getYear())
               .docNumber(-4) // Passing a negative docNumber
               .build();
         });
