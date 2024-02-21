@@ -729,10 +729,9 @@ public class DocumentationUnitTransformer {
   }
 
   /**
-   * Takes a variable amount of string inputs and checks each of them for <border-number> tags.
-   * Given that a <border-number> tag is found, it is checked for having a child <number> tag. Given
-   * that a single <number> tag is found and its content is not blank, the content is added to the
-   * list of border numbers to be returned.
+   * Extracts all border numbers from the passed strings and returns them as a list based on the
+   * following rules: For all <border-number> elements that contain a single <number> element with
+   * non-blank content, that content will be added to the list of border numbers.
    *
    * @param input the strings to be searched for border numbers
    * @return a list of found border numbers or an empty list, if the input is null
