@@ -1,6 +1,8 @@
 package de.bund.digitalservice.ris.caselaw.domain;
 
-public class DocumentNumberPatternException extends RuntimeException {
+import java.io.IOException;
+
+public class DocumentNumberPatternException extends IOException {
   public DocumentNumberPatternException(String message) {
     super(message);
   }

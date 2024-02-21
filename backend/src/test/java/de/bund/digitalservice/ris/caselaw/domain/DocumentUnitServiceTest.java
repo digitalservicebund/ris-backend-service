@@ -85,13 +85,14 @@ class DocumentUnitServiceTest {
   @MockBean private Validator validator;
 
   @Test
-  void testGenerateNewDocumentUnit() {
+  void testGenerateNewDocumentUnit()
+      throws DocumentNumberPatternException, DocumentNumberFormatterException {
     DocumentationOffice documentationOffice = DocumentationOffice.builder().build();
     DocumentUnit documentUnit = DocumentUnit.builder().build();
 
     when(repository.createNewDocumentUnit("nextDocumentNumber", documentationOffice))
         .thenReturn(Mono.just(documentUnit));
-    when(documentNumberService.generateNextDocumentNumber(documentationOffice))
+    when(documentNumberService.generateNextAvailableDocumentNumber(documentationOffice))
         .thenReturn(Mono.just("nextDocumentNumber"));
     when(documentUnitStatusService.setInitialStatus(documentUnit))
         .thenReturn(Mono.just(documentUnit));
@@ -102,7 +103,7 @@ class DocumentUnitServiceTest {
     StepVerifier.create(service.generateNewDocumentUnit(documentationOffice))
         .expectNextCount(1) // That it's a DocumentUnit is given by the generic type..
         .verifyComplete();
-    verify(documentNumberService).generateNextDocumentNumber(documentationOffice);
+    verify(documentNumberService).generateNextAvailableDocumentNumber(documentationOffice);
     verify(repository).createNewDocumentUnit("nextDocumentNumber", documentationOffice);
   }
 

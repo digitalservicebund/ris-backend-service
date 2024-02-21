@@ -4,32 +4,53 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentN
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentNumberDTO;
 import de.bund.digitalservice.ris.caselaw.domain.DateUtil;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentNumberFormatter;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentNumberFormatterException;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentNumberPatternException;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentNumberService;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitRepository;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
-import java.util.Map;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitExistsException;
+import de.bund.digitalservice.ris.caselaw.domain.StringsUtil;
+import jakarta.validation.constraints.NotEmpty;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Mono;
 
 @Service
 public class DatabaseDocumentNumberService implements DocumentNumberService {
   private final DatabaseDocumentNumberRepository repository;
-  private final Map<String, String> documentNumberPatterns;
+  private final DocumentNumberPatternConfig documentNumberPatternConfig;
+  private final DocumentUnitRepository documentUnitRepository;
 
   public DatabaseDocumentNumberService(
       DatabaseDocumentNumberRepository repository,
-      DocumentNumberPatternConfig documentNumberPatternConfig) {
+      DocumentNumberPatternConfig documentNumberPatternConfig,
+      DocumentUnitRepository documentUnitRepository) {
     this.repository = repository;
-    this.documentNumberPatterns = documentNumberPatternConfig.getDocumentNumberPatterns();
+    this.documentNumberPatternConfig = documentNumberPatternConfig;
+    this.documentUnitRepository = documentUnitRepository;
   }
 
   @Override
-  @Transactional(transactionManager = "jpaTransactionManager")
-  public Mono<String> generateNextDocumentNumber(DocumentationOffice documentationOffice) {
-    String abbreviation = documentationOffice.abbreviation();
+  public Mono<String> generateNextAvailableDocumentNumber(DocumentationOffice documentationOffice)
+      throws DocumentNumberPatternException, DocumentNumberFormatterException {
+    try {
+      return execute(documentationOffice.abbreviation());
+    } catch (DocumentationUnitExistsException documentationUnitExistsException) {
+      return generateNextAvailableDocumentNumber(documentationOffice);
+    }
+  }
 
-    if (abbreviation == null || abbreviation.isBlank()) {
+  private Mono<String> execute(@NotEmpty String abbreviation)
+      throws DocumentNumberPatternException, DocumentNumberFormatterException {
+    if (StringsUtil.returnTrueIfNullOrBlank(abbreviation)) {
       throw new IllegalArgumentException("Documentation Office abbreviation can not be empty");
+    }
+    String pattern =
+        documentNumberPatternConfig.documentNumberPatterns.getOrDefault(abbreviation, null);
+
+    if (pattern == null) {
+      throw new DocumentNumberPatternException(
+          "Could not find pattern for abbreviation " + abbreviation);
     }
 
     DocumentNumberDTO documentNumberDTO =
@@ -41,15 +62,29 @@ public class DatabaseDocumentNumberService implements DocumentNumberService {
                     .lastNumber(0)
                     .build());
 
-    var documentNumberFormat =
+    String documentNumber =
         DocumentNumberFormatter.builder()
             .docNumber(documentNumberDTO.increaseLastNumber())
             .year(DateUtil.getCurrentYear())
-            .pattern(documentNumberPatterns.get(abbreviation))
-            .build();
+            .pattern(pattern)
+            .build()
+            .generate();
 
     repository.save(documentNumberDTO);
 
-    return Mono.just(documentNumberFormat.toString());
-  } /**/
+    assertNotExists(documentNumber);
+
+    return Mono.just(documentNumber);
+  }
+
+  private void assertNotExists(String documentNumber) {
+    documentUnitRepository
+        .findByDocumentNumber(documentNumber)
+        .doOnSuccess(
+            documentUnit -> {
+              throw new DocumentationUnitExistsException(
+                  "Document Number already exists: " + documentNumber);
+            })
+        .subscribe();
+  }
 }

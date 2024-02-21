@@ -28,13 +28,13 @@ class DocumentNumberFormatterTest {
         "XXRE*******YY",
         "XXRE******YYY"
       })
-  void shouldCreateCorrectFormat(String pattern) {
+  void shouldCreateCorrectFormat(String pattern) throws DocumentNumberFormatterException {
     Year currentYear = DateUtil.getCurrentYear();
     var prefix = pattern.substring(0, pattern.indexOf('*'));
     DocumentNumberFormatter documentNumberFormatter =
         DocumentNumberFormatter.builder().pattern(pattern).year(currentYear).docNumber(2).build();
 
-    var result = documentNumberFormatter.toString();
+    var result = documentNumberFormatter.generate();
 
     Assertions.assertEquals(13, result.length(), "Format must contain 13");
     Assertions.assertTrue(result.startsWith(prefix), " Prefix is not contained in format");
@@ -45,25 +45,25 @@ class DocumentNumberFormatterTest {
   }
 
   @Test
-  void shouldCreateShortYearFormat() {
+  void shouldCreateShortYearFormat() throws DocumentNumberFormatterException {
     var currentYear = DateUtil.getCurrentYear();
     String format = "BSRE1******YY";
     DocumentNumberFormatter documentNumberFormatter =
         DocumentNumberFormatter.builder().pattern(format).year(currentYear).docNumber(1).build();
 
-    var result = documentNumberFormatter.toString();
+    var result = documentNumberFormatter.generate();
 
     Assertions.assertTrue(result.endsWith(getYear(currentYear, 2)));
   }
 
   @Test
-  void shouldCreateLongYearFormat() {
+  void shouldCreateLongYearFormat() throws DocumentNumberFormatterException {
     var currentYear = DateUtil.getCurrentYear();
     String format = "BSRE1****YYYY";
     DocumentNumberFormatter documentNumberFormatter =
         DocumentNumberFormatter.builder().pattern(format).year(currentYear).docNumber(1).build();
 
-    var result = documentNumberFormatter.toString();
+    var result = documentNumberFormatter.generate();
 
     Assertions.assertTrue(result.endsWith(getYear(currentYear, 4)));
   }
@@ -80,7 +80,7 @@ class DocumentNumberFormatterTest {
             .build();
 
     Exception exception =
-        assertThrows(DocumentNumberPatternException.class, documentNumberFormatter::toString);
+        assertThrows(DocumentNumberFormatterException.class, documentNumberFormatter::generate);
 
     String expectedMessage = "Doc number is bigger than the * amount";
     String actualMessage = exception.getMessage();
@@ -89,7 +89,7 @@ class DocumentNumberFormatterTest {
   }
 
   @Test // TODO: Fix lombok annotation validator.
-  @Disabled("Lombok annotation validation doesnot work.")
+  @Disabled("Lombok annotation validation does not work.")
   void shouldThrownExceptionWhenDocNumberWithNegativeDocNumber() {
     String pattern = "BSGRE1****YY";
     assertThrows(

@@ -17,11 +17,11 @@ public class DocumentNumberPatternConfig implements InitializingBean {
   Map<String, String> documentNumberPatterns;
 
   @Override
-  public void afterPropertiesSet() {
+  public void afterPropertiesSet() throws DocumentNumberPatternException {
     validate();
   }
 
-  private void validate() {
+  private void validate() throws DocumentNumberPatternException {
     if (documentNumberPatterns == null || documentNumberPatterns.isEmpty()) {
       throw new DocumentNumberPatternException(
           "Document number pattern list is empty check yml config");
@@ -32,8 +32,12 @@ public class DocumentNumberPatternConfig implements InitializingBean {
         .forEach(
             pattern -> {
               if (pattern.length() != 13) {
-                throw new DocumentNumberPatternException(
-                    "Document number pattern: " + pattern + " must consist of 13 chars");
+                try {
+                  throw new DocumentNumberPatternException(
+                      "Document number pattern: " + pattern + " must consist of 13 chars");
+                } catch (DocumentNumberPatternException e) {
+                  throw new RuntimeException(e);
+                }
               }
             });
   }
