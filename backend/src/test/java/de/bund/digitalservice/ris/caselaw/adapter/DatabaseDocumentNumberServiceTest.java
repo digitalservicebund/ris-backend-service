@@ -7,50 +7,46 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentN
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
 import de.bund.digitalservice.ris.caselaw.domain.DateUtil;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentNumberService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitExistsException;
 import java.util.Optional;
 import java.util.UUID;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.boot.test.context.ConfigDataApplicationContextInitializer;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith(SpringExtension.class)
-@Disabled("Due to injection not working")
-@Import({DatabaseDocumentNumberService.class, DocumentNumberPatternConfig.class})
-// @TestPropertySource(properties = {"neuris.document-number-patterns.bgh=BGH"})
+@ContextConfiguration(initializers = ConfigDataApplicationContextInitializer.class)
+@EnableConfigurationProperties(value = DocumentNumberPatternConfig.class)
+@Import(DatabaseDocumentNumberService.class)
 class DatabaseDocumentNumberServiceTest {
 
-  @Autowired private DocumentNumberService service;
-
-  @MockBean DatabaseDocumentNumberRepository documentNumberRepository;
-
+  @Autowired DocumentNumberPatternConfig documentNumberPatternConfig;
+  @MockBean DatabaseDocumentNumberRepository databaseDocumentNumberRepository;
   @MockBean DatabaseDocumentationUnitRepository databaseDocumentationUnitRepository;
 
-  @Autowired DocumentNumberPatternConfig documentNumberPatternConfig;
-
-  @BeforeEach
-  void setup() {}
+  @Autowired DatabaseDocumentNumberService service;
 
   @Test
   void generateNextDocumentNumber_shouldNotSaveDuplicates() {
     var documentNumber = "KORE70000" + DateUtil.getYear();
-    var abbrivation = "BGH";
-
+    var nextNumber = "KORE70001" + DateUtil.getYear();
+    var abbreviation = "BGH";
     var documentationUnitDTO =
         DocumentationUnitDTO.builder().id(UUID.randomUUID()).documentNumber(documentNumber).build();
-    when(databaseDocumentationUnitRepository.findByDocumentNumber(documentNumber))
+    when(databaseDocumentationUnitRepository.findByDocumentNumber(nextNumber))
         .thenReturn(Optional.of(documentationUnitDTO));
+
     assertThatThrownBy(
             () -> {
-              service.execute(abbrivation);
+              service.execute(abbreviation);
             })
         .isInstanceOf(DocumentationUnitExistsException.class)
-        .hasMessageContaining("Index: 2, Size: 2");
+        .hasMessageContaining("Document Number already exists: " + nextNumber);
   }
 }
