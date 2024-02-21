@@ -1,10 +1,11 @@
 package de.bund.digitalservice.ris.caselaw.domain;
 
-import static de.bund.digitalservice.ris.caselaw.domain.DateUtil.getYearAsYY;
+import static de.bund.digitalservice.ris.caselaw.domain.DateUtil.getYear;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import jakarta.validation.ConstraintViolationException;
 import java.time.Year;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -24,7 +25,8 @@ class DocumentNumberFormatterTest {
         "WBRE61*****YY",
         "BSGRE1*****YY",
         "DSRE*****YYYY",
-        "XXRE*******YY"
+        "XXRE*******YY",
+        "XXRE******YYY"
       })
   void shouldCreateCorrectFormat(String pattern) {
     Year currentYear = DateUtil.getCurrentYear();
@@ -37,19 +39,33 @@ class DocumentNumberFormatterTest {
     Assertions.assertEquals(13, result.length(), "Format must contain 13");
     Assertions.assertTrue(result.startsWith(prefix), " Prefix is not contained in format");
     Assertions.assertFalse(result.contains("*"), "Doc number was not parsed correctly");
-    Assertions.assertTrue(result.contains(getYearAsYY()), "Year is not included in format");
+    Assertions.assertTrue(
+        result.contains(getYear(StringUtils.countMatches(pattern, "Y"))),
+        "Year is not included in format");
   }
 
   @Test
   void shouldCreateShortYearFormat() {
     var currentYear = DateUtil.getCurrentYear();
-    String format = "BSGRE1****YY";
+    String format = "BSRE1******YY";
     DocumentNumberFormatter documentNumberFormatter =
         DocumentNumberFormatter.builder().pattern(format).year(currentYear).docNumber(1).build();
 
     var result = documentNumberFormatter.toString();
 
-    Assertions.assertTrue(result.endsWith(getYearAsYY(currentYear)));
+    Assertions.assertTrue(result.endsWith(getYear(currentYear, 2)));
+  }
+
+  @Test
+  void shouldCreateLongYearFormat() {
+    var currentYear = DateUtil.getCurrentYear();
+    String format = "BSRE1****YYYY";
+    DocumentNumberFormatter documentNumberFormatter =
+        DocumentNumberFormatter.builder().pattern(format).year(currentYear).docNumber(1).build();
+
+    var result = documentNumberFormatter.toString();
+
+    Assertions.assertTrue(result.endsWith(getYear(currentYear, 4)));
   }
 
   @Test

@@ -7,6 +7,7 @@ import java.text.DecimalFormat;
 import java.time.Year;
 import lombok.Builder;
 import lombok.NonNull;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.validation.annotation.Validated;
 
 @Builder
@@ -23,12 +24,11 @@ public class DocumentNumberFormatter {
   final String pattern;
 
   private String fillYear(String pattern) {
-    if (pattern.contains("YYYY")) {
-      return pattern.replace("YYYY", year.toString());
-    } else if (pattern.contains("YY")) {
-      return pattern.replace("YY", DateUtil.getYearAsYY(year));
-    }
-    throw new DocumentNumberPatternException("YY | YYYY must be provided in the format");
+    int yearDigits = StringUtils.countMatches(pattern, "Y");
+    if (yearDigits > 0 && yearDigits < 5)
+      return pattern.replace("Y".repeat(yearDigits), DateUtil.getYear(year, yearDigits));
+
+    throw new DocumentNumberPatternException("Y | YY | YYY | YYYY must be provided in the format");
   }
 
   private String fillCounter(String pattern) {

@@ -12,13 +12,14 @@ public class DateUtil {
     return Year.of(Calendar.getInstance().get(Calendar.YEAR));
   }
 
-  public static String getYearAsYY(Year year) {
-    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yy");
-    return year.format(formatter);
+  public static String getYear(Year year, int digits) {
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("y".repeat(digits));
+    String yearString = year.format(formatter);
+    // allow 3-digit year (YYY)
+    return yearString.substring(yearString.length() - digits);
   }
 
-  public static String getYearAsYY() {
-    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yy");
-    return getCurrentYear().format(formatter);
+  public static String getYear(int digits) {
+    return getYear(getCurrentYear(), digits);
   }
 }

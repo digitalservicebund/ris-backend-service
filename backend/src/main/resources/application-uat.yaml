@@ -11,3 +11,7 @@ spring:
 sentry:
   environment: uat
   traces-sample-rate: 0.01
+
+neuris:
+  document-number-patterns:
+    BGH: KORE7****1YYY
