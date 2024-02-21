@@ -64,6 +64,13 @@ async function search() {
       const page = response.data as Page<SearchApiDataDTO>
       currentPage.value = page
       searchResults.value = page.content
+    } else if (
+      response.status == 500 &&
+      JSON.stringify(response.data).includes("Connection refused")
+    ) {
+      hasError.value = true
+      message.value =
+        "Verbindung zum Such-Server fehlgeschlagen, evtl. ist dieser nicht erreichbar"
     } else {
       hasError.value = true
       const errorResponse = response.data as FailedValidationServerResponse
