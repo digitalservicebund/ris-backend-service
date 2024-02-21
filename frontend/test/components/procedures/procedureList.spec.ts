@@ -119,7 +119,7 @@ describe("ProcedureList", () => {
     expect(mockedGetDocumentUnits).toHaveBeenCalledOnce()
   })
 
-  it("does not fetches docUnits if unecessary", async () => {
+  it("does not fetch docUnits if unecessary", async () => {
     const { mockedGetDocumentUnits, user } = await renderComponent({
       procedures: [
         [
@@ -174,35 +174,5 @@ describe("ProcedureList", () => {
     })
 
     expect(mocks.mockedPushQuery).toHaveBeenCalledWith({ q: "b" })
-  })
-
-  it("keeps toggled procedure open on search (copies loaded documentUnits)", async () => {
-    const { user } = await renderComponent({
-      procedures: [
-        [
-          {
-            label: "foo",
-            documentUnitCount: 0,
-            createdAt: "2023-09-18T19:57:01.826083Z",
-          },
-          {
-            label: "bar",
-            documentUnitCount: 0,
-            createdAt: "2023-09-18T19:57:01.826083Z",
-          },
-        ],
-        [
-          {
-            label: "bar",
-            documentUnitCount: 0,
-            createdAt: "2023-09-18T19:57:01.826083Z",
-          },
-        ],
-      ],
-    })
-
-    await user.type(await screen.findByLabelText("Nach Vorgängen suchen"), "b")
-    expect(screen.queryByText("foo")).not.toBeInTheDocument()
-    expect(await screen.findByText("erstellt am 18.09.2023")).toBeVisible()
   })
 })

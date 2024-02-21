@@ -12,7 +12,7 @@ import service from "@/services/procedureService"
 import IconBaselineDescription from "~icons/ic/baseline-description"
 import IconExpandLess from "~icons/ic/baseline-expand-less"
 import IconExpandMore from "~icons/ic/baseline-expand-more"
-import IconFolderOpen from "~icons/ic/baseline-folder-open"
+import IconFolderOpen from "~icons/material-symbols/folder-open"
 
 const itemsPerPage = 10
 const procedures = ref<Procedure[]>()
