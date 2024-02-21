@@ -1,8 +1,13 @@
 package de.bund.digitalservice.ris.caselaw.domain;
 
-import reactor.core.publisher.Mono;
-
 public interface DocumentNumberService {
-  Mono<String> generateNextAvailableDocumentNumber(DocumentationOffice documentationOffice)
+  String generateNextAvailableDocumentNumber(DocumentationOffice documentationOffice)
       throws DocumentNumberPatternException, DocumentNumberFormatterException;
+
+  String execute(String abbriviation)
+      throws DocumentNumberPatternException,
+          DocumentationUnitExistsException,
+          DocumentNumberFormatterException;
+
+  void assertNotExists(String documentNumber) throws DocumentationUnitExistsException;
 }

@@ -93,7 +93,7 @@ class DocumentUnitServiceTest {
     when(repository.createNewDocumentUnit("nextDocumentNumber", documentationOffice))
         .thenReturn(Mono.just(documentUnit));
     when(documentNumberService.generateNextAvailableDocumentNumber(documentationOffice))
-        .thenReturn(Mono.just("nextDocumentNumber"));
+        .thenReturn("nextDocumentNumber");
     when(documentUnitStatusService.setInitialStatus(documentUnit))
         .thenReturn(Mono.just(documentUnit));
     // Can we use a captor to check if the document number was correctly created?

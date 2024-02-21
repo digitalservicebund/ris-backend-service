@@ -86,7 +86,8 @@ public class DocumentUnitService {
   // TODO: How do we want to handle it
   private Mono<String> generateDocumentNumber(DocumentationOffice documentationOffice) {
     try {
-      return documentNumberService.generateNextAvailableDocumentNumber(documentationOffice);
+      return Mono.just(
+          documentNumberService.generateNextAvailableDocumentNumber(documentationOffice));
     } catch (DocumentNumberPatternException | DocumentNumberFormatterException e) {
       throw new DocumentationUnitException("Could not generate document number: " + e.getMessage());
     }

@@ -1,6 +1,8 @@
 package de.bund.digitalservice.ris.caselaw.domain;
 
-public class DocumentationUnitExistsException extends RuntimeException {
+import java.io.IOException;
+
+public class DocumentationUnitExistsException extends IOException {
   public DocumentationUnitExistsException(String message) {
     super(message);
   }

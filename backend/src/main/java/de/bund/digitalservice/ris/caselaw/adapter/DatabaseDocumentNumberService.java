@@ -7,13 +7,13 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentNumberFormatter;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentNumberFormatterException;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentNumberPatternException;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentNumberService;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitRepository;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitExistsException;
 import de.bund.digitalservice.ris.caselaw.domain.StringsUtil;
 import jakarta.validation.constraints.NotEmpty;
 import org.springframework.stereotype.Service;
-import reactor.core.publisher.Mono;
 
 @Service
 public class DatabaseDocumentNumberService implements DocumentNumberService {
@@ -31,17 +31,19 @@ public class DatabaseDocumentNumberService implements DocumentNumberService {
   }
 
   @Override
-  public Mono<String> generateNextAvailableDocumentNumber(DocumentationOffice documentationOffice)
+  public String generateNextAvailableDocumentNumber(DocumentationOffice documentationOffice)
       throws DocumentNumberPatternException, DocumentNumberFormatterException {
     try {
       return execute(documentationOffice.abbreviation());
-    } catch (DocumentationUnitExistsException documentationUnitExistsException) {
+    } catch (DocumentationUnitExistsException e) {
       return generateNextAvailableDocumentNumber(documentationOffice);
     }
   }
 
-  private Mono<String> execute(@NotEmpty String abbreviation)
-      throws DocumentNumberPatternException, DocumentNumberFormatterException {
+  public String execute(@NotEmpty String abbreviation)
+      throws DocumentNumberPatternException,
+          DocumentationUnitExistsException,
+          DocumentNumberFormatterException {
     if (StringsUtil.returnTrueIfNullOrBlank(abbreviation)) {
       throw new IllegalArgumentException("Documentation Office abbreviation can not be empty");
     }
@@ -74,17 +76,14 @@ public class DatabaseDocumentNumberService implements DocumentNumberService {
 
     assertNotExists(documentNumber);
 
-    return Mono.just(documentNumber);
+    return documentNumber;
   }
 
-  private void assertNotExists(String documentNumber) {
-    documentUnitRepository
-        .findByDocumentNumber(documentNumber)
-        .doOnSuccess(
-            documentUnit -> {
-              throw new DocumentationUnitExistsException(
-                  "Document Number already exists: " + documentNumber);
-            })
-        .subscribe();
+  public void assertNotExists(String documentNumber) throws DocumentationUnitExistsException {
+    DocumentUnit documentUnit = documentUnitRepository.findByDocumentNumber(documentNumber).block();
+    if (documentUnit != null) {
+      throw new DocumentationUnitExistsException(
+          "Document Number already exists: " + documentNumber);
+    }
   }
 }
