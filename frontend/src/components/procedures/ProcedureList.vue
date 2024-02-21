@@ -100,7 +100,7 @@ watch(
 </script>
 
 <template>
-  <div class="space-y-24 bg-gray-100 px-16 py-16">
+  <div class="flex h-full flex-col space-y-24 bg-gray-100 px-16 py-16">
     <h1 class="ds-heading-02-reg">Vorgänge</h1>
     <div class="mt-24 w-480" role="search">
       <InputField id="procedureFilter" label="Vorgang" visually-hide-label>
@@ -114,59 +114,68 @@ watch(
       </InputField>
     </div>
 
-    <div class="min-h-screen">
-      <div class="flex flex-row">
-        <div v-if="procedures" class="flex-1">
-          <Pagination
-            v-if="currentPage"
-            navigation-position="bottom"
-            :page="currentPage"
-            @update-page="(page) => updateProcedures(page, query)"
-          >
-            <ExpandableContent
-              v-for="(procedure, index) in procedures"
-              :key="index"
-              class="border-b-1 border-blue-300 bg-white px-24 py-20"
-              :class="{ 'my-24': index === isExpandedIndex }"
-              @update:is-expanded="
-                (isExpanded) => handleIsExpanded(isExpanded, procedure, index)
-              "
-            >
-              <template #open-icon>
-                <IconExpandMore class="text-blue-800" />
-              </template>
+    <div v-if="procedures" class="flex-1">
+      <Pagination
+        v-if="currentPage"
+        navigation-position="bottom"
+        :page="currentPage"
+        @update-page="(page) => updateProcedures(page, query)"
+      >
+        <ExpandableContent
+          v-for="(procedure, index) in procedures"
+          :key="index"
+          class="border-b-1 border-blue-300 bg-white px-24 py-20"
+          :class="{ 'my-24': index === isExpandedIndex }"
+          @update:is-expanded="
+            (isExpanded) => handleIsExpanded(isExpanded, procedure, index)
+          "
+        >
+          <template #open-icon>
+            <IconExpandMore class="text-blue-800" />
+          </template>
 
-              <template #close-icon>
-                <IconExpandLess class="text-blue-800" />
-              </template>
+          <template #close-icon>
+            <IconExpandLess class="text-blue-800" />
+          </template>
 
-              <template #header>
-                <div class="flex w-full justify-between">
-                  <div class="flex flex-row items-center gap-16">
-                    <IconFolderOpen />
-                    <span class="ds-label-01-reg" :title="procedure.label">{{
-                      procedure.label
-                    }}</span>
-                    <div
-                      class="ds-body-02-reg flex flex-row items-center gap-4 rounded-full bg-blue-300 px-8 py-2 outline-none"
-                    >
-                      <IconBaselineDescription class="w-16 text-blue-800" />
-                      <span class="-mb-2">
-                        {{ procedure.documentUnitCount }}
-                      </span>
-                    </div>
-                  </div>
-                  <span class="mr-24"
-                    >erstellt am
-                    {{ dayjs(procedure.createdAt).format("DD.MM.YYYY") }}</span
-                  >
+          <template #header>
+            <div class="flex w-full justify-between">
+              <div class="flex flex-row items-center gap-16">
+                <IconFolderOpen />
+                <span class="ds-label-01-reg" :title="procedure.label">{{
+                  procedure.label
+                }}</span>
+                <div
+                  class="ds-body-02-reg flex flex-row items-center gap-4 rounded-full bg-blue-300 px-8 py-2 outline-none"
+                >
+                  <IconBaselineDescription class="w-16 text-blue-800" />
+                  <span class="-mb-2">
+                    {{ procedure.documentUnitCount }}
+                  </span>
                 </div>
-              </template>
+              </div>
+              <span class="mr-24"
+                >erstellt am
+                {{ dayjs(procedure.createdAt).format("DD.MM.YYYY") }}</span
+              >
+            </div>
+          </template>
 
-              <ProcedureDetail :procedure="procedure" />
-            </ExpandableContent>
-          </Pagination>
-        </div>
+          <ProcedureDetail :procedure="procedure" />
+        </ExpandableContent>
+      </Pagination>
+    </div>
+    <div
+      v-else
+      class="flex h-full w-full flex-1 items-center justify-center bg-white"
+    >
+      <div class="flex flex-col items-center space-y-24">
+        <span
+          class="flex flex h-128 w-128 items-center justify-center justify-center rounded-full bg-blue-200"
+        >
+          <IconFolderOpen class="text-64 text-blue-700" />
+        </span>
+        <span>Es wurden noch keine Vorgänge angelegt.</span>
       </div>
     </div>
   </div>

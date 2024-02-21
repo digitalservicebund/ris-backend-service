@@ -29,4 +29,9 @@ const isLoading = computed(
     >
     </DocumentUnitList>
   </div>
+  <div v-else class="px-40 pb-12 pt-36">
+    <div class="flex w-full items-center justify-center bg-blue-200 py-16">
+      <span>Keine Dokeinheiten sind zugewiesen.</span>
+    </div>
+  </div>
 </template>
