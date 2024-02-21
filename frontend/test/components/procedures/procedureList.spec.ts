@@ -201,9 +201,6 @@ describe("ProcedureList", () => {
       ],
     })
 
-    await user.click(await screen.findByText("bar"))
-    expect(await screen.findByText("erstellt am 18.09.2023")).toBeVisible()
-
     await user.type(await screen.findByLabelText("Nach Vorgängen suchen"), "b")
     expect(screen.queryByText("foo")).not.toBeInTheDocument()
     expect(await screen.findByText("erstellt am 18.09.2023")).toBeVisible()

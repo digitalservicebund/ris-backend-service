@@ -34,11 +34,6 @@ function renderDocumentUnit(documentUnit: DocumentUnitListEntry): string {
     <LoadingSpinner />
   </div>
   <div v-else class="grid grid-cols-[14em_auto] gap-x-24">
-    <div class="flex items-end">
-      <span class="bottom ds-label-02-reg pt-28 italic text-gray-600"
-        >erstellt am {{ dayjs(procedure.createdAt).format("DD.MM.YYYY") }}</span
-      >
-    </div>
     <ul class="py-24 text-left">
       <li
         v-for="documentUnit in procedure.documentUnits"
