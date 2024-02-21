@@ -1,14 +1,13 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentNumberRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentNumberDTO;
 import de.bund.digitalservice.ris.caselaw.domain.DateUtil;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentNumberFormatter;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentNumberFormatterException;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentNumberPatternException;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentNumberService;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitRepository;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitExistsException;
 import de.bund.digitalservice.ris.caselaw.domain.StringsUtil;
@@ -19,20 +18,23 @@ import org.springframework.stereotype.Service;
 public class DatabaseDocumentNumberService implements DocumentNumberService {
   private final DatabaseDocumentNumberRepository repository;
   private final DocumentNumberPatternConfig documentNumberPatternConfig;
-  private final DocumentUnitRepository documentUnitRepository;
+  private final DatabaseDocumentationUnitRepository databaseDocumentationUnitRepository;
+
+  // TODO: DatabaseDocumentationUnitRepository instead of documentUnitRepository
 
   public DatabaseDocumentNumberService(
       DatabaseDocumentNumberRepository repository,
       DocumentNumberPatternConfig documentNumberPatternConfig,
-      DocumentUnitRepository documentUnitRepository) {
+      DatabaseDocumentationUnitRepository databaseDocumentationUnitRepository) {
     this.repository = repository;
     this.documentNumberPatternConfig = documentNumberPatternConfig;
-    this.documentUnitRepository = documentUnitRepository;
+    this.databaseDocumentationUnitRepository = databaseDocumentationUnitRepository;
   }
 
   @Override
   public String generateNextAvailableDocumentNumber(DocumentationOffice documentationOffice)
       throws DocumentNumberPatternException, DocumentNumberFormatterException {
+    // TODO: 5 - 10 tries
     try {
       return execute(documentationOffice.abbreviation());
     } catch (DocumentationUnitExistsException e) {
@@ -48,7 +50,7 @@ public class DatabaseDocumentNumberService implements DocumentNumberService {
       throw new IllegalArgumentException("Documentation Office abbreviation can not be empty");
     }
     String pattern =
-        documentNumberPatternConfig.documentNumberPatterns.getOrDefault(abbreviation, null);
+        documentNumberPatternConfig.getDocumentNumberPatterns().getOrDefault(abbreviation, null);
 
     if (pattern == null) {
       throw new DocumentNumberPatternException(
@@ -80,8 +82,7 @@ public class DatabaseDocumentNumberService implements DocumentNumberService {
   }
 
   public void assertNotExists(String documentNumber) throws DocumentationUnitExistsException {
-    DocumentUnit documentUnit = documentUnitRepository.findByDocumentNumber(documentNumber).block();
-    if (documentUnit != null) {
+    if (databaseDocumentationUnitRepository.findByDocumentNumber(documentNumber).isPresent()) {
       throw new DocumentationUnitExistsException(
           "Document Number already exists: " + documentNumber);
     }
