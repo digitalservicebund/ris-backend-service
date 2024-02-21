@@ -2,20 +2,17 @@ package de.bund.digitalservice.ris.caselaw.adapter;
 
 import de.bund.digitalservice.ris.caselaw.domain.DocumentNumberPatternException;
 import java.util.Map;
-import lombok.Getter;
+import lombok.Data;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @ConfigurationProperties(prefix = "neuris")
+@Data
 public class DocumentNumberPatternConfig implements InitializingBean {
 
-  @Getter private final Map<String, String> documentNumberPatterns;
-
-  public DocumentNumberPatternConfig(Map<String, String> documentNumberPatterns) {
-    this.documentNumberPatterns = documentNumberPatterns;
-  }
+  Map<String, String> documentNumberPatterns;
 
   @Override
   public void afterPropertiesSet() throws DocumentNumberPatternException {
@@ -27,19 +24,15 @@ public class DocumentNumberPatternConfig implements InitializingBean {
       throw new DocumentNumberPatternException(
           "Document number pattern list is empty check yml config");
     }
+    validateMaxCharacters();
+  }
 
-    documentNumberPatterns
-        .values()
-        .forEach(
-            pattern -> {
-              if (pattern.length() != 13) {
-                try {
-                  throw new DocumentNumberPatternException(
-                      "Document number pattern: " + pattern + " must consist of 13 chars");
-                } catch (DocumentNumberPatternException e) {
-                  throw new RuntimeException(e);
-                }
-              }
-            });
+  private void validateMaxCharacters() throws DocumentNumberPatternException {
+    for (String pattern : documentNumberPatterns.values()) {
+      if (pattern.length() != 13) {
+        throw new DocumentNumberPatternException(
+            "Document number pattern: " + pattern + " must consist of 13 chars");
+      }
+    }
   }
 }

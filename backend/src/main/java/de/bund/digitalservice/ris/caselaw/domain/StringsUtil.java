@@ -6,9 +6,6 @@ import lombok.experimental.UtilityClass;
 public class StringsUtil {
 
   public static boolean returnTrueIfNullOrBlank(String string) {
-    if (string == null || string.isBlank()) {
-      return true;
-    }
-    return false;
+    return string == null || string.isBlank();
   }
 }

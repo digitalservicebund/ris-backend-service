@@ -1,6 +1,7 @@
 package de.bund.digitalservice.ris.caselaw.domain;
 
 import static de.bund.digitalservice.ris.caselaw.domain.DateUtil.getYear;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import jakarta.validation.ConstraintViolationException;
@@ -92,14 +93,10 @@ class DocumentNumberFormatterTest {
   @Disabled("Lombok annotation validation does not work.")
   void shouldThrownExceptionWhenDocNumberWithNegativeDocNumber() {
     String pattern = "BSGRE1****YY";
-    assertThrows(
-        ConstraintViolationException.class,
-        () -> {
-          DocumentNumberFormatter.builder()
-              .pattern(pattern)
-              .year(DateUtil.getYear())
-              .docNumber(-4) // Passing a negative docNumber
-              .build();
-        });
+    var documentNumberFormatter =
+        DocumentNumberFormatter.builder().pattern(pattern).year(DateUtil.getYear()).docNumber(-4);
+    assertThatThrownBy(documentNumberFormatter::build)
+        .isInstanceOf(ConstraintViolationException.class)
+        .hasMessageContaining("Doc number must be positive");
   }
 }
