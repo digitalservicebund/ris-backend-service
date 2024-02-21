@@ -20,7 +20,7 @@ const isLoading = computed(
   >
     <LoadingSpinner />
   </div>
-  <div v-else-if="procedure.documentUnits" class="px-24 pb-12 pt-36">
+  <div v-else-if="procedure.documentUnits" class="pb-12 pl-24 pr-48 pt-36">
     <DocumentUnitList
       class="grow"
       :document-unit-list-entries="procedure.documentUnits"

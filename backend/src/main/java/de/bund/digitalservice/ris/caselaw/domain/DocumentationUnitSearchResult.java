@@ -14,6 +14,7 @@ public record DocumentationUnitSearchResult(
     String fileNumber,
     String fileName,
     LocalDate decisionDate,
+    String appraisalBody,
     DocumentType documentType,
     UUID referencedDocumentationUnitId,
     Status status) {}

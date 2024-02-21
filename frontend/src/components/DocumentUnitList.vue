@@ -104,6 +104,11 @@ function onDelete() {
         <div
           class="table-cell border-b-2 border-solid border-blue-300 px-16 py-12"
         >
+          Spruchkörper
+        </div>
+        <div
+          class="table-cell border-b-2 border-solid border-blue-300 px-16 py-12"
+        >
           Datum
         </div>
         <div
@@ -168,6 +173,11 @@ function onDelete() {
           class="table-cell border-b-1 border-blue-300 px-16 py-12 align-middle"
         >
           {{ listEntry.court?.location ?? "-" }}
+        </div>
+        <div
+          class="table-cell border-b-1 border-blue-300 px-16 py-12 align-middle"
+        >
+          {{ listEntry.appraisalBody ?? "-" }}
         </div>
         <div
           class="table-cell border-b-1 border-blue-300 px-16 py-12 align-middle"

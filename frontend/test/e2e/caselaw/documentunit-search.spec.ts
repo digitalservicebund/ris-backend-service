@@ -192,6 +192,29 @@ test.describe("search", () => {
     ).toHaveCount(0)
   })
 
+  test("appraisal/judicial body shown in test results", async ({
+    page,
+    prefilledDocumentUnit,
+  }) => {
+    //1st date input provided: display results matching exactly this date.
+    await navigateToSearch(page)
+
+    await fillSearchInput(page, {
+      documentNumber: prefilledDocumentUnit.documentNumber,
+    })
+    await page.getByLabel("Nach Dokumentationseinheiten suchen").click()
+
+    await expect
+      .poll(async () =>
+        page
+          .locator(".table-row", {
+            hasText: prefilledDocumentUnit.coreData.appraisalBody,
+          })
+          .count(),
+      )
+      .toBeGreaterThanOrEqual(1)
+  })
+
   // eslint-disable-next-line playwright/no-skipped-test
   test.skip("search results between two dates", async ({
     page,

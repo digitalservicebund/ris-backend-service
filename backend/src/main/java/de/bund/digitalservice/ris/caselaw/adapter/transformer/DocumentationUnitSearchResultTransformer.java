@@ -29,6 +29,7 @@ public class DocumentationUnitSearchResultTransformer {
         .documentNumber(documentationUnitSearchResultDTO.getDocumentNumber())
         .referencedDocumentationUnitId(documentationUnitSearchResultDTO.getId())
         .decisionDate(documentationUnitSearchResultDTO.getDecisionDate())
+        .appraisalBody(documentationUnitSearchResultDTO.getJudicialBody())
         .fileName(
             documentationUnitSearchResultDTO.getOriginalFileDocument() == null
                 ? null

@@ -14,5 +14,6 @@ public record DocumentUnitListEntry(
     String fileNumber,
     DocumentType documentType,
     Court court,
+    String appraisalBody,
     DocumentationOffice documentationOffice,
     Status status) {}

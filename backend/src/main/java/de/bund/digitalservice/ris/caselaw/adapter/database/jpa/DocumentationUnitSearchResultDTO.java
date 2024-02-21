@@ -9,6 +9,8 @@ public interface DocumentationUnitSearchResultDTO {
 
   String getDocumentNumber();
 
+  String getJudicialBody();
+
   CourtDTO getCourt();
 
   List<FileNumberDTO> getFileNumbers();

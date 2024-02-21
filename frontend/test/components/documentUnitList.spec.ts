@@ -94,6 +94,7 @@ describe("documentUnit list", () => {
           decisionDate: "2022-02-10",
           fileName: "",
           fileNumber: "",
+          appraisalBody: "",
           documentType: { label: "Test", jurisShortcut: "T" },
           court: { type: "typeA", location: "locB", label: "typeA locB" },
           status: {
@@ -108,6 +109,7 @@ describe("documentUnit list", () => {
           decisionDate: "2022-02-10",
           fileName: "abc",
           fileNumber: "",
+          appraisalBody: "cba",
           documentType: { label: "Test", jurisShortcut: "T" },
           court: { type: "typeA", location: "locB", label: "typeA locB" },
           status: {
@@ -119,6 +121,9 @@ describe("documentUnit list", () => {
     })
 
     expect(screen.getAllByTestId("listEntry").length).toBe(2)
+
+    //Spruchkörper visible
+    expect(screen.getByText("cba")).toBeVisible()
 
     expect(screen.getByRole("link", { name: "123" })).toHaveAttribute(
       "href",

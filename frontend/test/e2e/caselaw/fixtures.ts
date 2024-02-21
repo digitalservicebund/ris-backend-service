@@ -49,6 +49,7 @@ export const caselawTest = test.extend<MyFixtures>({
             documentType: documentType?.[0],
             fileNumbers: [generateString()],
             decisionDate: "2019-12-31",
+            appraisalBody: "1. Senat, 2. Kammer",
           },
         },
       },

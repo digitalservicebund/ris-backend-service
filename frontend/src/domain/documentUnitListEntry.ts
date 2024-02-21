@@ -10,6 +10,7 @@ export default class DocumentUnitListEntry {
   fileName?: string
   documentType?: DocumentType
   court?: Court
+  appraisalBody?: string
 
   constructor(data: Partial<DocumentUnitListEntry> = {}) {
     Object.assign(this, data)
