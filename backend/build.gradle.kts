@@ -181,7 +181,7 @@ dependencies {
     implementation("io.micrometer:micrometer-registry-prometheus:1.12.3")
     implementation("io.micrometer:micrometer-core:1.12.3")
 
-    implementation(platform("io.sentry:sentry-bom:7.3.0"))
+    implementation(platform("io.sentry:sentry-bom:7.4.0"))
     implementation("io.sentry:sentry-spring-boot-starter-jakarta")
     implementation("io.sentry:sentry-logback")
 
