@@ -114,7 +114,7 @@ watch(
       </InputField>
     </div>
 
-    <div class="min-h-screen" role="main">
+    <div class="min-h-screen">
       <div class="flex flex-row">
         <div v-if="procedures" class="flex-1">
           <Pagination
