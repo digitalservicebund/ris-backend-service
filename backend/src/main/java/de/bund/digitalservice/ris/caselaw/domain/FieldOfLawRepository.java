@@ -14,8 +14,6 @@ public interface FieldOfLawRepository {
 
   FieldOfLaw findTreeByIdentifier(String identifier);
 
-  FieldOfLaw findParentByChild(FieldOfLaw child);
-
   Slice<FieldOfLaw> findAllByOrderByIdentifierAsc(Pageable pageable);
 
   List<FieldOfLaw> findBySearchTerms(String[] searchTerms);

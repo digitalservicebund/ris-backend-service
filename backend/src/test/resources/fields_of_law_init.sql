@@ -18,7 +18,7 @@ values
   (
     'ce5bab9c-8852-49a3-8ed8-08b67399abde',
     'FL-01-01',
-    'fl-01-01',
+    'multiple cats are allowed on a tree',
     3,
     'NEW'
   ),

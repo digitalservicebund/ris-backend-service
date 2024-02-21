@@ -421,27 +421,55 @@ class FieldOfLawIntegrationTest {
             .returnResult();
 
     List<String> actualIdentifiers = JsonPath.read(result.getResponseBody(), "$[*].identifier");
-    // TODO: order by rank
+    // TODO: test order by score
     assertThat(actualIdentifiers)
         .containsExactlyInAnyOrder("FL", "FL-01", "FL-01-01", "FL-02", "FL-03", "FL-04");
   }
 
   @Test
-  void testFindParentByChild() {
+  void testFindByMultipleSearchTerms() {
     EntityExchangeResult<String> result =
         risWebTestClient
             .withDefaultLogin()
             .get()
-            .uri("/api/v1/caselaw/fieldsoflaw/search-by-identifier?q=fl")
+            .uri("/api/v1/caselaw/fieldsoflaw?q=FL+multiple&pg=0&sz=10")
             .exchange()
             .expectStatus()
             .isOk()
             .expectBody(String.class)
             .returnResult();
 
-    List<String> actualIdentifiers = JsonPath.read(result.getResponseBody(), "$[*].identifier");
-    // TODO: order by rank
-    assertThat(actualIdentifiers)
-        .containsExactlyInAnyOrder("FL", "FL-01", "FL-01-01", "FL-02", "FL-03", "FL-04");
+    List<String> identifiers =
+        JsonPath.read(result.getResponseBody(), "$.content[*]" + ".identifier");
+    assertThat(identifiers).containsExactly("FL-01-01");
+  }
+
+  @Test
+  void testFindByEmptySearchTerms() {
+    EntityExchangeResult<String> result =
+        risWebTestClient
+            .withDefaultLogin()
+            .get()
+            .uri("/api/v1/caselaw/fieldsoflaw?pg=0&sz=10")
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectBody(String.class)
+            .returnResult();
+
+    List<String> identifiers =
+        JsonPath.read(result.getResponseBody(), "$.content[*]" + ".identifier");
+    assertThat(identifiers)
+        .containsExactly(
+            "AB-01",
+            "AB-01-01",
+            "CD",
+            "CD-01",
+            "CD-02",
+            "FL",
+            "FL-01",
+            "FL-01-01",
+            "FL-02",
+            "FL-03");
   }
 }

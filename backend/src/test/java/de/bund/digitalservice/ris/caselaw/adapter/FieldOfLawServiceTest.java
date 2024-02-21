@@ -73,9 +73,8 @@ class FieldOfLawServiceTest {
   @Test
   void testGetFieldsOfLaw_withEmptyTerms_shouldReturnEmptyList() {
     List<FieldOfLaw> resultWithNullSearchTerms = repository.findBySearchTerms(null);
-    List<FieldOfLaw> resultWithEmptySearchTerms = repository.findBySearchTerms(new String[0]);
-
     Assertions.assertEquals(0, resultWithNullSearchTerms.size());
+    List<FieldOfLaw> resultWithEmptySearchTerms = repository.findBySearchTerms(new String[0]);
     Assertions.assertEquals(0, resultWithEmptySearchTerms.size());
   }
 
@@ -86,6 +85,24 @@ class FieldOfLawServiceTest {
     when(repository.findBySearchTerms(searchTerms)).thenReturn(Collections.emptyList());
 
     StepVerifier.create(service.getFieldsOfLawBySearchQuery(Optional.of("test"), pageable))
+        .consumeNextWith(
+            page -> {
+              assertThat(page.getContent()).isEmpty();
+              assertThat(page.isEmpty()).isTrue();
+            })
+        .verifyComplete();
+
+    verify(repository, times(1)).findBySearchTerms(searchTerms);
+    verify(repository, never()).findAllByOrderByIdentifierAsc(pageable);
+  }
+
+  @Test
+  void testGetFieldsOfLaw_withMultipleSearchTerms_shouldCallRepository() {
+    Pageable pageable = PageRequest.of(0, 10);
+    String[] searchTerms = new String[] {"test", "multiple"};
+    when(repository.findBySearchTerms(searchTerms)).thenReturn(Collections.emptyList());
+
+    StepVerifier.create(service.getFieldsOfLawBySearchQuery(Optional.of("test multiple"), pageable))
         .consumeNextWith(
             page -> {
               assertThat(page.getContent()).isEmpty();
@@ -157,14 +174,12 @@ class FieldOfLawServiceTest {
     StepVerifier.create(service.getTreeForFieldOfLaw("test")).verifyComplete();
 
     verify(repository, times(1)).findTreeByIdentifier("test");
-    verify(repository, never()).findParentByChild(any(FieldOfLaw.class));
   }
 
   @Test
   void testGetTreeForFieldOfLaw_withFieldNumberAtTopLevel() {
     FieldOfLaw child = FieldOfLaw.builder().identifier("test").build();
     when(repository.findTreeByIdentifier("test")).thenReturn(child);
-    when(repository.findParentByChild(child)).thenReturn(null);
 
     StepVerifier.create(service.getTreeForFieldOfLaw("test")).expectNext(child).verifyComplete();
 

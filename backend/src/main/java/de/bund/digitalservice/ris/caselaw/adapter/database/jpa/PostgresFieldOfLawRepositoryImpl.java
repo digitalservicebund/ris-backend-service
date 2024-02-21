@@ -7,7 +7,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -61,13 +60,6 @@ public class PostgresFieldOfLawRepositoryImpl implements FieldOfLawRepository {
     }
 
     return parent;
-  }
-
-  @Override
-  @Transactional(transactionManager = "jpaTransactionManager")
-  public FieldOfLaw findParentByChild(FieldOfLaw child) {
-    Optional<FieldOfLawDTO> childDTO = repository.findById(child.id());
-    return childDTO.map(PostgresFieldOfLawRepositoryImpl::getWithNormsWithoutChildren).orElse(null);
   }
 
   @Override
@@ -139,8 +131,11 @@ public class PostgresFieldOfLawRepositoryImpl implements FieldOfLawRepository {
 
   public static boolean returnTrueIfInTextOrIdentifier(
       FieldOfLawDTO fieldOfLawDTO, String[] searchTerms) {
+    if (searchTerms == null || searchTerms.length == 0) {
+      return false;
+    }
     return Arrays.stream(searchTerms)
-        .anyMatch(
+        .allMatch(
             searchTerm ->
                 StringUtils.containsIgnoreCase(fieldOfLawDTO.getIdentifier(), searchTerm)
                     || StringUtils.containsIgnoreCase(fieldOfLawDTO.getText(), searchTerm));

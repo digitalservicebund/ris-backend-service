@@ -58,7 +58,24 @@ class PostgresFieldOfLawRepositoryImplTest {
 
     assertTrue(
         returnTrueIfInTextOrIdentifier(fieldOfLaw, new String[] {fieldOfLaw.getIdentifier()}));
+    assertTrue(
+        returnTrueIfInTextOrIdentifier(
+            fieldOfLaw, new String[] {fieldOfLaw.getIdentifier(), fieldOfLaw.getText()}));
+    assertTrue(returnTrueIfInTextOrIdentifier(fieldOfLaw, new String[] {"find", "AB"}));
+  }
 
+  @Test
+  void testReturnFalseIfInTextOrIdentifier() {
+    var fieldOfLaw = generateFieldOfLawDto("find me by text");
+    assertFalse(returnTrueIfInTextOrIdentifier(fieldOfLaw, null));
+    assertFalse(returnTrueIfInTextOrIdentifier(fieldOfLaw, new String[] {}));
     assertFalse(returnTrueIfInTextOrIdentifier(fieldOfLaw, new String[] {"no matches"}));
+    assertFalse(
+        returnTrueIfInTextOrIdentifier(
+            fieldOfLaw, new String[] {fieldOfLaw.getIdentifier(), "no matches"}));
+    assertFalse(
+        returnTrueIfInTextOrIdentifier(
+            fieldOfLaw,
+            new String[] {fieldOfLaw.getIdentifier(), fieldOfLaw.getText(), "no matches"}));
   }
 }
