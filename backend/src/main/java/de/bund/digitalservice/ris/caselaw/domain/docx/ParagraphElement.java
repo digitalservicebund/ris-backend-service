@@ -50,10 +50,7 @@ public class ParagraphElement extends TextElement {
 
     runElements.stream()
         .filter(RunTextElement.class::isInstance)
-        .forEach(
-            runElement -> {
-              text.append(((RunTextElement) runElement).getText());
-            });
+        .forEach(runElement -> text.append(((RunTextElement) runElement).getText()));
 
     return text.toString();
   }

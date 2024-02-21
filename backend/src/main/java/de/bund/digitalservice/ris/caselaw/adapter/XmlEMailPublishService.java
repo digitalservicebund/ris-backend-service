@@ -22,7 +22,6 @@ import java.util.UUID;
 import java.util.stream.Stream;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
@@ -39,19 +38,23 @@ public class XmlEMailPublishService implements EmailPublishService {
 
   private final XmlPublicationRepository repository;
 
+  private final Environment env;
+
   @Value("${mail.exporter.senderAddress:export.test@neuris}")
   private String senderAddress;
-
-  @Autowired private Environment env;
 
   @Value("${mail.exporter.jurisUsername:invalid-user}")
   private String jurisUsername;
 
   public XmlEMailPublishService(
-      XmlExporter xmlExporter, HttpMailSender mailSender, XmlPublicationRepository repository) {
+      XmlExporter xmlExporter,
+      HttpMailSender mailSender,
+      XmlPublicationRepository repository,
+      Environment env) {
     this.xmlExporter = xmlExporter;
     this.mailSender = mailSender;
     this.repository = repository;
+    this.env = env;
   }
 
   @Override

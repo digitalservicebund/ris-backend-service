@@ -4,6 +4,7 @@ import de.bund.digitalservice.ris.caselaw.domain.ApiKey;
 import de.bund.digitalservice.ris.caselaw.domain.ImportApiKeyException;
 import de.bund.digitalservice.ris.caselaw.domain.User;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -18,6 +19,7 @@ import reactor.core.publisher.Mono;
 
 @RestController
 @RequestMapping("/api/v1/auth")
+@Slf4j
 public class AuthController {
 
   private final UserService userService;
@@ -64,6 +66,7 @@ public class AuthController {
       ApiKey apiKey = authService.generateImportApiKey(oidcUser);
       return Mono.just(ResponseEntity.ok(apiKey));
     } catch (ImportApiKeyException ignored) {
+      log.error("error by generation of import api key");
     }
 
     return Mono.just(ResponseEntity.badRequest().build());
@@ -92,6 +95,7 @@ public class AuthController {
       ApiKey lastApiKey = authService.invalidateImportApiKey(oidcUser, apiKey);
       return Mono.just(ResponseEntity.ok(lastApiKey));
     } catch (ImportApiKeyException ignored) {
+      log.error("error by invalidation of import api key");
     }
 
     return Mono.just(ResponseEntity.badRequest().build());

@@ -129,7 +129,7 @@ class DocxConverterServiceTest {
   }
 
   @Test
-  public void testGetOriginalText_throwsException() throws ParserConfigurationException {
+  void testGetOriginalText_throwsException() throws ParserConfigurationException {
     MainDocumentPart mockedMainDocumentPart = mock(MainDocumentPart.class);
     when(mlPackage.getMainDocumentPart()).thenReturn(mockedMainDocumentPart);
     when(mlPackage.getMainDocumentPart().getXML())
@@ -338,12 +338,9 @@ class DocxConverterServiceTest {
           .when(() -> WordprocessingMLPackage.load(any(InputStream.class)))
           .thenReturn(mlPackage);
 
+      // assertEquals(3,docx2Html.ecliList().size());
       StepVerifier.create(service.getConvertedObject("test.docx"))
-          .consumeNextWith(
-              docx2Html -> {
-                assertNotNull(docx2Html);
-                // assertEquals(3,docx2Html.ecliList().size());
-              })
+          .consumeNextWith(Assertions::assertNotNull)
           .verifyComplete();
     }
   }
