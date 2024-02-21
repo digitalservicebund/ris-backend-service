@@ -17,6 +17,7 @@ import IconFolderOpen from "~icons/ic/baseline-folder-open"
 const itemsPerPage = 10
 const procedures = ref<Procedure[]>()
 const currentPage = ref<Page<Procedure>>()
+const isExpandedIndex = ref()
 
 async function updateProcedures(page: number, queries?: Query<string>) {
   const response = await service.get(itemsPerPage, page, queries?.q)
@@ -57,6 +58,15 @@ function copyDocumentUnits(
     )
     return oldProcedure?.documentUnits ? oldProcedure : newProcedure
   })
+}
+
+async function handleIsExpanded(
+  isExpanded: boolean,
+  procedure: Procedure,
+  index: number,
+) {
+  isExpanded && loadDocumentUnits(procedure)
+  isExpandedIndex.value = index
 }
 
 const debouncedPushQueryToRoute = (() => {
@@ -114,11 +124,12 @@ watch(
             @update-page="(page) => updateProcedures(page, query)"
           >
             <ExpandableContent
-              v-for="procedure in procedures"
-              :key="procedure.label"
-              class="border-b-1 border-blue-500 bg-white px-24 py-20"
+              v-for="(procedure, index) in procedures"
+              :key="index"
+              class="border-b-1 border-blue-300 bg-white px-24 py-20"
+              :class="{ 'my-24': index === isExpandedIndex }"
               @update:is-expanded="
-                (isExpanded) => isExpanded && loadDocumentUnits(procedure)
+                (isExpanded) => handleIsExpanded(isExpanded, procedure, index)
               "
             >
               <template #open-icon>

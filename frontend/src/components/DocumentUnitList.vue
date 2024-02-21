@@ -16,6 +16,7 @@ const props = defineProps<{
   documentUnitListEntries?: DocumentUnitListEntry[]
   searchResponseError?: ResponseError
   isLoading?: boolean
+  isDeletable?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -93,11 +94,6 @@ function onDelete() {
         <div
           class="table-cell border-b-2 border-solid border-blue-300 px-16 py-12"
         >
-          Aktenzeichen
-        </div>
-        <div
-          class="table-cell border-b-2 border-solid border-blue-300 px-16 py-12"
-        >
           Gerichtstyp
         </div>
         <div
@@ -109,6 +105,11 @@ function onDelete() {
           class="table-cell border-b-2 border-solid border-blue-300 px-16 py-12"
         >
           Datum
+        </div>
+        <div
+          class="table-cell border-b-2 border-solid border-blue-300 px-16 py-12"
+        >
+          Aktenzeichen
         </div>
         <div
           class="table-cell border-b-2 border-solid border-blue-300 px-16 py-12"
@@ -131,6 +132,7 @@ function onDelete() {
           Fehler
         </div>
         <div
+          v-if="isDeletable"
           class="table-cell border-b-2 border-solid border-blue-300 px-16 py-12"
         ></div>
       </div>
@@ -156,11 +158,6 @@ function onDelete() {
             {{ listEntry.documentNumber }}
           </router-link>
         </div>
-        <div
-          class="table-cell border-b-1 border-blue-300 px-16 py-12 align-middle"
-        >
-          {{ listEntry.fileNumber ? listEntry.fileNumber : "-" }}
-        </div>
 
         <div
           class="table-cell border-b-1 border-blue-300 px-16 py-12 align-middle"
@@ -180,6 +177,11 @@ function onDelete() {
               ? dayjs(listEntry.decisionDate).format("DD.MM.YYYY")
               : "-"
           }}
+        </div>
+        <div
+          class="table-cell border-b-1 border-blue-300 px-16 py-12 align-middle"
+        >
+          {{ listEntry.fileNumber ? listEntry.fileNumber : "-" }}
         </div>
         <div
           class="table-cell border-b-1 border-blue-300 px-16 py-12 align-middle"
@@ -214,7 +216,10 @@ function onDelete() {
           />
           <span v-else>-</span>
         </div>
-        <div class="table-cell border-b-1 border-blue-300 px-12 align-middle">
+        <div
+          v-if="isDeletable"
+          class="table-cell border-b-1 border-blue-300 px-12 align-middle"
+        >
           <button
             aria-label="Dokumentationseinheit löschen"
             class="cursor-pointer align-middle text-blue-800 focus:outline-none focus-visible:outline-blue-800"

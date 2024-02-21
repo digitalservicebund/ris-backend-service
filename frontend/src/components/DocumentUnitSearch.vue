@@ -193,6 +193,7 @@ const showDefaultLink = computed(() => {
       <DocumentUnitList
         class="grow"
         :document-unit-list-entries="documentUnitListEntries"
+        is-deletable
         :is-loading="isLoading"
         :search-response-error="searchResponseError"
         @delete-document-unit="handleDelete"

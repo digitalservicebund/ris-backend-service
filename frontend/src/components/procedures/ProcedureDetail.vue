@@ -1,9 +1,8 @@
 <script lang="ts" setup>
-import dayjs from "dayjs"
 import { computed } from "vue"
+import DocumentUnitList from "@/components/DocumentUnitList.vue"
 import LoadingSpinner from "@/components/LoadingSpinner.vue"
 import { Procedure } from "@/domain/documentUnit"
-import DocumentUnitListEntry from "@/domain/documentUnitListEntry"
 
 const props = defineProps<{
   procedure: Procedure
@@ -12,18 +11,6 @@ const props = defineProps<{
 const isLoading = computed(
   () => !props.procedure.documentUnits && props.procedure.documentUnitCount > 0,
 )
-
-function renderDocumentUnit(documentUnit: DocumentUnitListEntry): string {
-  return [
-    ...(documentUnit.court ? [`${documentUnit.court.label}`] : []),
-    ...(documentUnit.decisionDate
-      ? [dayjs(documentUnit.decisionDate).format("DD.MM.YYYY")]
-      : []),
-    ...(documentUnit.documentType ? [documentUnit.documentType.label] : []),
-    ...(documentUnit.fileNumber ? [documentUnit.fileNumber] : []),
-    ...(documentUnit.documentNumber ? [documentUnit.documentNumber] : []),
-  ].join(", ")
-}
 </script>
 
 <template>
@@ -33,26 +20,13 @@ function renderDocumentUnit(documentUnit: DocumentUnitListEntry): string {
   >
     <LoadingSpinner />
   </div>
-  <div v-else class="grid grid-cols-[14em_auto] gap-x-24">
-    <ul class="py-24 text-left">
-      <li
-        v-for="documentUnit in procedure.documentUnits"
-        :key="documentUnit.documentNumber"
-      >
-        <router-link
-          class="ds-link-01-bold underline"
-          tabindex="-1"
-          target="_blank"
-          :to="{
-            name: 'caselaw-documentUnit-documentNumber-categories',
-            params: { documentNumber: documentUnit.documentNumber },
-          }"
-        >
-          <button class="text-left underline">
-            {{ renderDocumentUnit(documentUnit) }}
-          </button>
-        </router-link>
-      </li>
-    </ul>
+  <div v-else-if="procedure.documentUnits" class="px-24 pb-12 pt-36">
+    <DocumentUnitList
+      class="grow"
+      :document-unit-list-entries="procedure.documentUnits"
+      :is-deletable="false"
+      :is-loading="isLoading"
+    >
+    </DocumentUnitList>
   </div>
 </template>

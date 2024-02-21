@@ -10,6 +10,7 @@ function renderComponent(options?: {
   documentUnitListEntries?: DocumentUnitListEntry[]
   searchResponseError?: ResponseError
   isLoading?: boolean
+  isDeletable?: boolean
 }) {
   // eslint-disable-next-line testing-library/await-async-events
   const user = userEvent.setup()
@@ -20,6 +21,7 @@ function renderComponent(options?: {
         documentUnitListEntries: options?.documentUnitListEntries,
         searchResponseError: options?.searchResponseError ?? undefined,
         isLoading: options?.isLoading ?? false,
+        isDeletable: options?.isDeletable ?? true,
       },
       global: {
         plugins: [

@@ -83,7 +83,7 @@ watch(
       v-for="(entry, index) in modelValueList"
       :key="index"
       aria-label="Listen Eintrag"
-      class="border-b-1 border-blue-500 first:border-t-1 focus:outline-none"
+      class="border-b-1 border-blue-300 first:border-t-1 focus:outline-none"
       :class="
         index !== editIndex
           ? 'hover:bg-gray-100 focus:outline-none focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-blue-800'
