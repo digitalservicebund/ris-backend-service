@@ -364,6 +364,13 @@ public class DocumentationUnitTransformer {
     builder.fileNumbers(fileNumberDTOs);
   }
 
+  /**
+   * Transforms a documentation unit object from its database representation into a domain object
+   * that is suitable to be consumed by clients of the REST service.
+   *
+   * @param documentationUnitDTO the database documentation unit
+   * @return a transformed domain object, or an empty domain object if the input is null
+   */
   public static DocumentUnit transformToDomain(DocumentationUnitDTO documentationUnitDTO) {
     if (documentationUnitDTO == null) {
       return DocumentUnit.builder().build();
@@ -473,7 +480,7 @@ public class DocumentationUnitTransformer {
             .caseFacts(documentationUnitDTO.getCaseFacts())
             .decisionReasons(documentationUnitDTO.getDecisionGrounds())
             .borderNumbers(
-                transformBorderNumbers(
+                extractBorderNumbers(
                     documentationUnitDTO.getTenor(),
                     documentationUnitDTO.getGrounds(),
                     documentationUnitDTO.getCaseFacts(),
@@ -721,7 +728,16 @@ public class DocumentationUnitTransformer {
     return size;
   }
 
-  private static List<String> transformBorderNumbers(String... input) {
+  /**
+   * Takes a variable amount of string inputs and checks each of them for <border-number> tags.
+   * Given that a <border-number> tag is found, it is checked for having a child <number> tag. Given
+   * that a single <number> tag is found and its content is not blank, the content is added to the
+   * list of border numbers to be returned.
+   *
+   * @param input the strings to be searched for border numbers
+   * @return a list of found border numbers or an empty list, if the input is null
+   */
+  private static List<String> extractBorderNumbers(String... input) {
     if (Objects.isNull(input)) {
       return new ArrayList<>();
     }
