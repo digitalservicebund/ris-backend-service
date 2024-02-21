@@ -80,6 +80,22 @@ async function updatePage(page: number) {
   pageNumber.value = page
   await search()
 }
+
+function buildResultCountString() {
+  if (!currentPage.value || currentPage.value.empty) {
+    return "Keine Ergebnisse gefunden"
+  }
+  if (
+    !currentPage.value.totalElements ||
+    currentPage.value.totalElements <= 1
+  ) {
+    return ""
+  }
+  if (currentPage.value.totalElements === 10000) {
+    return "Mehr als 10000 Ergebnisse insgesamt"
+  }
+  return `${currentPage.value.totalElements} "Ergebnisse insgesamt"`
+}
 </script>
 
 <template>
@@ -162,20 +178,7 @@ async function updatePage(page: number) {
       @update-page="updatePage"
     >
       <div v-if="currentPage" class="flex w-full justify-center">
-        <span v-if="currentPage.empty">Keine Ergebnisse gefunden</span>
-        <span
-          v-if="
-            !currentPage.empty &&
-            currentPage.totalElements &&
-            currentPage.totalElements > currentPage.numberOfElements
-          "
-          >{{ currentPage.totalElements }}
-          {{
-            currentPage.totalElements && currentPage.totalElements > 1
-              ? "Ergebnisse insgesamt"
-              : "Ergebnis insgesamt"
-          }}</span
-        >
+        <span class="ds-label-02-bold"> {{ buildResultCountString() }} </span>
       </div>
       <div
         v-if="searchResults && searchResults.length > 0"
@@ -212,12 +215,12 @@ async function updatePage(page: number) {
           <div
             class="table-cell border-b-2 border-solid border-blue-300 px-16 py-12"
           >
-            Dokumenttyp
+            Dokumentart
           </div>
           <div
             class="table-cell border-b-2 border-solid border-blue-300 px-16 py-12"
           >
-            DokumentSubtyp
+            Dokumenttyp
           </div>
         </div>
         <div
