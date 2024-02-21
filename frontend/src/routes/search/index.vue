@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import dayjs from "dayjs"
 import { ref } from "vue"
 import InputField from "@/components/input/InputField.vue"
 import TextButton from "@/components/input/TextButton.vue"
@@ -260,7 +261,11 @@ function buildResultCountString() {
           <div
             class="table-cell border-b-1 border-blue-300 px-16 py-12 align-middle"
           >
-            {{ item.decisionDate }}
+            {{
+              item.decisionDate
+                ? dayjs(item.decisionDate).format("DD.MM.YYYY")
+                : "-"
+            }}
           </div>
           <div
             class="table-cell border-b-1 border-blue-300 px-16 py-12 align-middle"
