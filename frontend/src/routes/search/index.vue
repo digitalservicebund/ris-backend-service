@@ -102,7 +102,7 @@ function buildResultCountString() {
   if (currentPage.value.totalElements === 10000) {
     return "Mehr als 10000 Ergebnisse insgesamt"
   }
-  return `${currentPage.value.totalElements} "Ergebnisse insgesamt"`
+  return `${currentPage.value.totalElements} Ergebnisse insgesamt`
 }
 </script>
 
