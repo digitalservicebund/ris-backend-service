@@ -147,6 +147,7 @@ public class AuthService {
             .apiKey(rsg.generate(64))
             .userAccount(userService.getEmail(oidcUser))
             .documentationOffice(documentationOfficeDTO)
+            .createdAt(Instant.now())
             .validUntil(Instant.now().plus(30, ChronoUnit.DAYS))
             .build();
 
@@ -186,7 +187,9 @@ public class AuthService {
       throw new ImportApiKeyException();
     }
 
-    if (!apiKeyOptional.get().getUserAccount().equals(oidcUser.getEmail())) {
+    if (apiKeyOptional.get().getUserAccount() == null
+        || !apiKeyOptional.get().getUserAccount().equals(oidcUser.getEmail())) {
+
       log.error("api key doesn't belongs to user");
       throw new ImportApiKeyException();
     }
