@@ -57,27 +57,23 @@ async function search() {
         timeout: TIMEOUT,
       },
     )
+    hasError.value = true
     if (response.status == 504) {
       message.value = "Zeitüberschreitung der Anfrage"
+    } else if (response.status == 500) {
+      message.value =
+        "Verbindung fehlgeschlagen, evtl. sind Sie oder der Such-Server offline"
     } else if (response.status === 200 && response.data) {
       message.value = ""
+      hasError.value = false
       const page = response.data as Page<SearchApiDataDTO>
       currentPage.value = page
       searchResults.value = page.content
-    } else if (
-      response.status == 500 &&
-      JSON.stringify(response.data).includes("Connection refused")
-    ) {
-      hasError.value = true
-      message.value =
-        "Verbindung zum Such-Server fehlgeschlagen, evtl. ist dieser nicht erreichbar"
     } else {
-      hasError.value = true
       const errorResponse = response.data as FailedValidationServerResponse
       message.value = errorResponse.errors.map((e) => e.message).join(", ")
     }
   } catch (error) {
-    hasError.value = true
     message.value = error as string
   } finally {
     isLoading.value = false
