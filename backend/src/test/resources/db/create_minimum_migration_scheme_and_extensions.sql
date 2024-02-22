@@ -628,3 +628,32 @@ CREATE INDEX
 
 CREATE INDEX
   documentation_unit_document_number_upper_trgm_idx ON incremental_migration.documentation_unit USING gin (UPPER(document_number::text) gin_trgm_ops);
+
+CREATE INDEX
+  ON incremental_migration.source (documentation_unit_id);
+
+CREATE INDEX
+  ON incremental_migration.input_type (documentation_unit_id);
+
+CREATE TABLE IF NOT EXISTS
+  incremental_migration.api_key (
+    id uuid primary key,
+    api_key varchar(255) unique,
+    user_account varchar(255),
+    documentation_office uuid,
+    created_at timestamp,
+    valid_until timestamp,
+    invalidated boolean,
+    CONSTRAINT fk_documentation_office FOREIGN KEY (documentation_office) REFERENCES incremental_migration.documentation_office (id)
+  );
+
+CREATE TABLE
+  incremental_migration.leading_decision_norm_reference (
+    id UUID NOT NULL CONSTRAINT leading_decision_norm_reference_pkey PRIMARY KEY,
+    norm_reference VARCHAR(255) NOT NULL,
+    documentation_unit_id UUID NOT NULL CONSTRAINT documentation_unit_fkey REFERENCES incremental_migration.documentation_unit,
+    rank INTEGER DEFAULT '-1'::INTEGER NOT NULL
+  );
+
+CREATE INDEX
+  ON incremental_migration.documentation_unit (document_number);

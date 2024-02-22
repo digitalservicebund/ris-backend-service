@@ -27,10 +27,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.context.annotation.Primary;
@@ -54,7 +51,6 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
   private final DatabaseFieldOfLawRepository fieldOfLawRepository;
   private final DatabaseProcedureRepository procedureRepository;
   private final DatabaseRelatedDocumentationRepository relatedDocumentationRepository;
-  private final DatabaseLegalPeriodicalRepository legalPeriodicalRepository;
 
   public PostgresDocumentationUnitRepositoryImpl(
       DatabaseDocumentationUnitRepository repository,
@@ -63,8 +59,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
       DatabaseRelatedDocumentationRepository relatedDocumentationRepository,
       DatabaseKeywordRepository keywordRepository,
       DatabaseProcedureRepository procedureRepository,
-      DatabaseFieldOfLawRepository fieldOfLawRepository,
-      DatabaseLegalPeriodicalRepository legalPeriodicalRepository) {
+      DatabaseFieldOfLawRepository fieldOfLawRepository) {
 
     this.repository = repository;
     this.databaseCourtRepository = databaseCourtRepository;
@@ -73,7 +68,6 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
     this.relatedDocumentationRepository = relatedDocumentationRepository;
     this.fieldOfLawRepository = fieldOfLawRepository;
     this.procedureRepository = procedureRepository;
-    this.legalPeriodicalRepository = legalPeriodicalRepository;
   }
 
   @Override
@@ -140,50 +134,6 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
           documentUnit.coreData().leadingDecisionNormReferences().clear();
         }
       }
-
-      Optional<List<String>> leadingDecisionNormReferences =
-          Optional.ofNullable(documentUnit.coreData().leadingDecisionNormReferences());
-
-      LegalPeriodicalDTO leadingDecisionLegalPeriodicalEntry =
-          legalPeriodicalRepository.findByAbbreviation("NSW");
-
-      List<ReferenceDTO> existingReferences = new ArrayList<>(documentationUnitDTO.getReferences());
-
-      // TODO we temporarily save the leading decision norm references in the reference table. In
-      // the future with RISDEV-3336, they will be saved in a dedicated table and this
-      // transformation outside of the transformer won't be necessary anymore
-      AtomicInteger i =
-          new AtomicInteger(
-              existingReferences.stream()
-                  .flatMapToInt(r -> IntStream.of(r.getRank() + 1))
-                  .max()
-                  .orElse(0));
-
-      List<ReferenceDTO> updatedReferences =
-          Stream.concat(
-                  // existing references that are no leading decision norm references
-                  existingReferences.stream()
-                      .filter(r -> !r.getLegalPeriodicalRawValue().equals("NSW")),
-                  // leading decision norm references from client
-                  leadingDecisionNormReferences.orElse(List.of()).stream()
-                      .map(
-                          reference ->
-                              ReferenceDTO.builder()
-                                  .id(UUID.randomUUID())
-                                  .citation(reference)
-                                  .rank(i.getAndIncrement())
-                                  .type("amtlich")
-                                  .referenceSupplement("BGH-intern")
-                                  .legalPeriodical(leadingDecisionLegalPeriodicalEntry)
-                                  .legalPeriodicalRawValue("NSW")
-                                  .documentationUnit(
-                                      DocumentationUnitDTO.builder()
-                                          .id(documentUnit.uuid())
-                                          .build())
-                                  .build()))
-              .toList();
-
-      documentationUnitDTO = documentationUnitDTO.toBuilder().references(updatedReferences).build();
     }
     // ---
 

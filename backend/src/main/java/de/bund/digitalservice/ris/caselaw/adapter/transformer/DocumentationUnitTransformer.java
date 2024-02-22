@@ -436,7 +436,7 @@ public class DocumentationUnitTransformer {
     addDeviatingCourtsToDomain(documentationUnitDTO, coreDataBuilder);
     addDeviatingEclisToDomain(documentationUnitDTO, coreDataBuilder);
     addDeviatingDecisionDatesToDomain(documentationUnitDTO, coreDataBuilder);
-    addReferencesToDomain(documentationUnitDTO, coreDataBuilder);
+    addLeadingDecisionNormReferencesToDomain(documentationUnitDTO, coreDataBuilder);
 
     DocumentTypeDTO documentTypeDTO = documentationUnitDTO.getDocumentType();
     if (documentTypeDTO != null) {
@@ -644,19 +644,15 @@ public class DocumentationUnitTransformer {
     coreDataBuilder.fileNumbers(fileNumbers);
   }
 
-  private static void addReferencesToDomain(
+  private static void addLeadingDecisionNormReferencesToDomain(
       DocumentationUnitDTO documentationUnitDTO, CoreDataBuilder coreDataBuilder) {
-    if (documentationUnitDTO.getReferences() == null) {
+    if (documentationUnitDTO.getLeadingDecisionNormReferences() == null) {
       return;
     }
-
-    List<String> references =
-        documentationUnitDTO.getReferences().stream()
-            .filter(
-                referenceDTO -> Objects.equals(referenceDTO.getLegalPeriodicalRawValue(), "NSW"))
-            .map(referennceDTO -> referennceDTO.getCitation().replace(" (BGH-intern)", ""))
-            .toList();
-    coreDataBuilder.leadingDecisionNormReferences(references);
+    coreDataBuilder.leadingDecisionNormReferences(
+        documentationUnitDTO.getLeadingDecisionNormReferences().stream()
+            .map(LeadingDecisionNormReferenceDTO::getNormReference)
+            .toList());
   }
 
   private static void addEnsuingDecisionsToDomain(
