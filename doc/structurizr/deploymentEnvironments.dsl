@@ -1,11 +1,11 @@
-deploymentEnvironment "DevelopmentLocal" {
+deploymentEnvironment "DevelopmentLocalEnv" {
     deploymentNode "Developer Laptop" "" "Microsoft Windows 10 or Apple macOS" {
         deploymentNode "Web Browser" "" "Chrome, Firefox, Safari, or Edge" {
-            developerRisFrontendInstance = containerInstance risFrontend
+            developerrspFrontendInstance = containerInstance rspFrontend
         }
         deploymentNode "Docker Container - Web Anwendung" "" "Docker" {
             deploymentNode "Spring Boot Application" "" "Spring Boot 3.x" {
-                developerRisBackendInstance = containerInstance risBackend
+                developerrspBackendInstance = containerInstance rspBackend
             }
         }
         deploymentNode "Docker Container - Database Server" "" "Docker" {
@@ -16,11 +16,11 @@ deploymentEnvironment "DevelopmentLocal" {
     }
 }
 
-deploymentEnvironment "DevelopmentCloud" {
+deploymentEnvironment "DevelopmentCloudEnv" {
     deploymentNode "Cloud" "" "Open Telecom Cloud" "" {
         deploymentNode "Compute Cluster" "" "Kubernetes" "" {
-            containerInstance risFrontend
-            containerInstance risBackend
+            containerInstance rspFrontend
+            containerInstance rspBackend
         }
         deploymentNode "Managed Database" "" "PostgreSQL" "" {
             containerInstance database

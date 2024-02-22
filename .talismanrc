@@ -12,7 +12,7 @@ fileignoreconfig:
 - filename: compose.yaml
   checksum: 14a7e049d82352e4d50e3e2f6c82e87150de461aa7ede5553883cdadb1d446b2
 - filename: doc/structurizr/workspace.json
-  checksum: e8259490d7f7583eab3abb13291288915cface77c64a2b5b6b74d06f1edebb54
+  checksum: 9267b0782e197c929c12550458583139f3a7f1ce928027545afdcda9d92df400
 - filename: frontend/FRONTEND_STYLEGUIDE.md
   checksum: e6b8194eba2012f2a769c5a5d3577715a573b441a7b94e744c32b3149d0d3a93
 - filename: frontend/src/main.ts

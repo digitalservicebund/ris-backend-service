@@ -1,4 +1,5 @@
 views {
+    # purpose: overview of the system with relations to external systems
     systemContext ris "SystemContext" {
         include *
         exclude user
@@ -9,37 +10,132 @@ views {
         exclude jurisSftp
     }
 
-    deployment ris "DevelopmentLocal" {
+    # purpose: show containers used while development
+    deployment ris "DevelopmentLocalEnv" {
         include *
     }
 
-    deployment ris "DevelopmentCloud" {
+    # purpose: show containers used in the staging environment
+    deployment ris "DevelopmentCloudEnv" {
         include *
     }
 
-    container ris "UsersAndContainers" {
+    # purpose: show containers used in the user acceptance testing environment
+    #deployment ris "UATCloudEnv" {
+    #    include *
+    #}
+
+    # purpose: show containers used in the production environment
+    #deployment ris "ProductionCloudEnv" {
+    #    include *
+    #}
+
+    container ris "UsersAndContainersRSP" {
         include *
-        exclude caselawDocumentary
+        
+        # specific users
+        exclude user
         exclude normsDocumentary
+        exclude publicUser
+
+        # external systems
         exclude openIdProvider
         exclude emailApiProvider
         exclude emailHoster
         exclude errorMonitoring
         exclude jurisSftp
+
+        # norms containers
+        exclude normBackend
+        exclude normFrontend
+        exclude normCodeEditor
+
+        # migration containers
+        exclude normMigration
+
+        # portal containers
+        exclude portalFrontend
+    }
+
+    container ris "UsersAndContainersNORM" {
+        include *
+
+        # specific users
+        exclude user
+        exclude caselawDocumentary
+        exclude publicUser
+
+        # external systems
+        exclude openIdProvider
+        exclude emailApiProvider
+        exclude emailHoster
+        exclude errorMonitoring
+        exclude jurisSftp
+
+        # caselaw containers
+        exclude rspBackend
+        exclude rspFrontend
+        exclude fileStore
+
+        # migration containers
+        exclude rspMigration
+
+        # portal containers
+        exclude portalFrontend
+
+        # shared infrastructure containers
+        exclude featureFlags
+    }
+
+    container ris "UsersAndContainersPortal" {
+        include *
+
+        # specific users
+        exclude caselawDocumentary
+        exclude normsDocumentary
+
+        # external systems
+        exclude openIdProvider
+        exclude emailApiProvider
+        exclude emailHoster
+        exclude errorMonitoring
+        exclude jurisSftp
+
+        # caselaw containers
+        exclude fileStore
+
+        # norms containers
+        exclude normBackend
+        exclude normFrontend
+        exclude normCodeEditor
+
+        # migration containers
+        exclude rspMigration
+        exclude normMigration
+        exclude sftpImport
+        exclude migrationStore
+
+        # shared infrastructure containers
+        exclude featureFlags
+        exclude sessionStore
+        exclude database
     }
 
     container ris "Migration" {
-        include risMigration
+        include sftpImport
+        include rspMigration
+        include normMigration
         include jurisSftp
         include database
-        include risBackend
-        include fileStore
+        include rspBackend
+        include normBackend
+        include migrationStore
     }
 
     container ris "Monitoring" {
-        include risBackend
-        include risFrontend
-        include risMigration
+        include rspBackend
+        include rspFrontend
+        include rspMigration
         include monitoring
         include errorMonitoring
         
@@ -47,8 +143,8 @@ views {
     }
 
     container ris "IdentityAndAccessManagement" {
-        include risBackend
-        include risFrontend
+        include rspBackend
+        include rspFrontend
         
         include openIdProvider
         
@@ -57,9 +153,9 @@ views {
         include systemAdministrator
     }
 
-    container ris "ContainerAndExternals" {
-        include risBackend
-        include risFrontend
+    container ris "ContainerAndExternalsRSP" {
+        include rspBackend
+        include rspFrontend
         
         include openIdProvider
         include emailApiProvider
@@ -70,12 +166,12 @@ views {
     }
 
     container ris "DevelopedByDigitalService" {
-        include risBackend
-        include risFrontend
+        include rspBackend
+        include rspFrontend
         
         include portalBackend
         include portalFrontend
-        include risMigration
+        include rspMigration
     }
 
     systemlandscape "SystemLandscape" {
@@ -86,7 +182,11 @@ views {
         exclude publicUser
     }
 
-    component risBackend "BackendComponents" {
+    component rspBackend "BackendComponentsCaselaw" {
+        include *
+    }
+
+    component normBackend "BackendComponentsNorms" {
         include *
     }
 
