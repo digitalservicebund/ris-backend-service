@@ -100,8 +100,7 @@ workspace {
 
         # relationships to/from components # TODO generate in components.dsl from code
 
-
-        deploymentEnvironment "Development" {
+        deploymentEnvironment "DevelopmentLocal" {
             deploymentNode "Developer Laptop" "" "Microsoft Windows 10 or Apple macOS" {
                 deploymentNode "Web Browser" "" "Chrome, Firefox, Safari, or Edge" {
                     developerRisFrontendInstance = containerInstance risFrontend
@@ -117,6 +116,9 @@ workspace {
                     }
                 }
             }
+        }
+
+        deploymentEnvironment "DevelopmentCloud" {
             deploymentNode "Cloud" "" "Open Telecom Cloud" "" {
                 deploymentNode "Compute Cluster" "" "Kubernetes" "" {
                     containerInstance risFrontend
@@ -129,7 +131,6 @@ workspace {
                     containerInstance fileStore
                 }
             }
-
         }
     }
 
@@ -142,6 +143,14 @@ workspace {
             exclude emailHoster
             exclude errorMonitoring
             exclude jurisSftp
+        }
+
+        deployment ris "DevelopmentLocal" {
+            include *
+        }
+
+        deployment ris "DevelopmentCloud" {
+            include *
         }
 
         container ris "UsersAndContainers" {
@@ -194,6 +203,15 @@ workspace {
             include errorMonitoring
 
             include user
+        }
+
+        container ris "DevelopedByDigitalService" {
+            include risBackend
+            include risFrontend
+            
+            include portalBackend
+            include portalFrontend
+            include risMigration
         }
 
         systemlandscape "SystemLandscape" {
