@@ -22,11 +22,7 @@ const currentlyExpanded = ref<number[]>([])
 async function updateProcedures(page: number, queries?: Query<string>) {
   const response = await service.get(itemsPerPage, page, queries?.q)
   if (response.data) {
-    procedures.value = copyDocumentUnits(
-      response.data.content,
-      procedures.value,
-    )
-
+    procedures.value = response.data.content
     currentPage.value = response.data
   }
 }
@@ -46,18 +42,6 @@ async function loadDocumentUnits(loadingProcedure: Procedure) {
       ? { ...procedure, documentUnits: response.data }
       : procedure,
   )
-}
-
-function copyDocumentUnits(
-  newProcedures: Procedure[],
-  oldProcedures?: Procedure[],
-): Procedure[] {
-  return newProcedures.map((newProcedure) => {
-    const oldProcedure = oldProcedures?.find(
-      (oldProcedure) => oldProcedure.label == newProcedure.label,
-    )
-    return oldProcedure?.documentUnits ? oldProcedure : newProcedure
-  })
 }
 
 async function handleIsExpanded(
@@ -103,6 +87,12 @@ watch(
   },
   { deep: true },
 )
+
+watch(currentPage, (newPage) => {
+  if (newPage?.number !== currentPage.value) {
+    currentlyExpanded.value = []
+  }
+})
 </script>
 
 <template>
@@ -131,7 +121,11 @@ watch(
           v-for="(procedure, index) in procedures"
           :key="index"
           class="border-b-1 border-blue-300 bg-white px-24 py-20"
-          :class="{ 'my-24': currentlyExpanded.includes(index) }"
+          :class="{
+            'my-24': currentlyExpanded.includes(index),
+            'hover:bg-blue-100': !currentlyExpanded.includes(index),
+          }"
+          :is-expanded="currentlyExpanded.includes(index)"
           @update:is-expanded="
             (isExpanded) => handleIsExpanded(isExpanded, procedure, index)
           "
@@ -152,10 +146,10 @@ watch(
                   procedure.label
                 }}</span>
                 <div
-                  class="ds-body-02-reg flex flex-row items-center gap-4 rounded-full bg-blue-300 px-8 py-2 outline-none"
+                  class="ds-label-02-reg flex flex-row items-center gap-4 rounded-full bg-blue-300 px-8 py-2 outline-none"
                 >
                   <IconBaselineDescription class="w-16 text-blue-800" />
-                  <span class="-mb-2">
+                  <span>
                     {{ procedure.documentUnitCount }}
                   </span>
                 </div>

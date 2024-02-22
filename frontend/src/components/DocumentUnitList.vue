@@ -104,17 +104,17 @@ function onDelete() {
         <div
           class="table-cell border-b-2 border-solid border-blue-300 px-16 py-12"
         >
-          Spruchkörper
-        </div>
-        <div
-          class="table-cell border-b-2 border-solid border-blue-300 px-16 py-12"
-        >
           Datum
         </div>
         <div
           class="table-cell border-b-2 border-solid border-blue-300 px-16 py-12"
         >
           Aktenzeichen
+        </div>
+        <div
+          class="table-cell border-b-2 border-solid border-blue-300 px-16 py-12"
+        >
+          Spruchkörper
         </div>
         <div
           class="table-cell border-b-2 border-solid border-blue-300 px-16 py-12"
@@ -145,7 +145,7 @@ function onDelete() {
       <div
         v-for="(listEntry, id) in documentUnitListEntries"
         :key="id"
-        class="ds-label-01-reg table-row hover:bg-gray-100"
+        class="ds-label-01-reg table-row hover:bg-blue-100"
         data-testid="listEntry"
       >
         <div
@@ -177,11 +177,6 @@ function onDelete() {
         <div
           class="table-cell border-b-1 border-blue-300 px-16 py-12 align-middle"
         >
-          {{ listEntry.appraisalBody ?? "-" }}
-        </div>
-        <div
-          class="table-cell border-b-1 border-blue-300 px-16 py-12 align-middle"
-        >
           {{
             listEntry.decisionDate
               ? dayjs(listEntry.decisionDate).format("DD.MM.YYYY")
@@ -192,6 +187,11 @@ function onDelete() {
           class="table-cell border-b-1 border-blue-300 px-16 py-12 align-middle"
         >
           {{ listEntry.fileNumber ? listEntry.fileNumber : "-" }}
+        </div>
+        <div
+          class="table-cell border-b-1 border-blue-300 px-16 py-12 align-middle"
+        >
+          {{ listEntry.appraisalBody ?? "-" }}
         </div>
         <div
           class="table-cell border-b-1 border-blue-300 px-16 py-12 align-middle"

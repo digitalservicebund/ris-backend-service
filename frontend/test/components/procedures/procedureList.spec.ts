@@ -175,4 +175,26 @@ describe("ProcedureList", () => {
 
     expect(mocks.mockedPushQuery).toHaveBeenCalledWith({ q: "b" })
   })
+
+  it("resets currently expanded procedures on search", async () => {
+    const { mockedGetDocumentUnits, user } = await renderComponent()
+
+    expect(mockedGetDocumentUnits).not.toHaveBeenCalled()
+
+    await user.click(await screen.findByTestId("icons-open-close"))
+    expect(mockedGetDocumentUnits).toHaveBeenCalledOnce()
+    await user.type(await screen.findByLabelText("Nach Vorgängen suchen"), "b")
+    expect(mockedGetDocumentUnits).toHaveBeenCalledOnce()
+  })
+
+  it("resets currently expanded procedures on page change", async () => {
+    const { mockedGetDocumentUnits, user } = await renderComponent()
+
+    expect(mockedGetDocumentUnits).not.toHaveBeenCalled()
+
+    await user.click(await screen.findByTestId("icons-open-close"))
+    expect(mockedGetDocumentUnits).toHaveBeenCalledOnce()
+    await user.click(await screen.findByLabelText("nächste Ergebnisse"))
+    expect(mockedGetDocumentUnits).toHaveBeenCalledOnce()
+  })
 })
