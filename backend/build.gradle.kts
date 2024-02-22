@@ -138,9 +138,15 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
     implementation("org.springframework.security:spring-security-oauth2-resource-server")
 
+    // CVE-2024-22234
+    implementation("org.springframework.security:spring-security-core:6.2.2")
+
     implementation("org.springdoc:springdoc-openapi-starter-webflux-ui:2.3.0")
 
     implementation("org.springframework.cloud:spring-cloud-starter-kubernetes-client-config:2.1.3")
+
+    // CVE-2024-26308
+    implementation("org.apache.commons:commons-compress:1.26.0")
     // CVE-2022-3171
     implementation("com.google.protobuf:protobuf-java:3.25.0")
     // CVE-2023-31582
