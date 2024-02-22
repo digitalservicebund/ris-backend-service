@@ -6,6 +6,7 @@ import TextEditor from "@/components/input/TextEditor.vue"
 import LoadingSpinner from "@/components/LoadingSpinner.vue"
 import PopupModal from "@/components/PopupModal.vue"
 import PropertyInfo from "@/components/PropertyInfo.vue"
+import { BorderNumberLinkMark } from "@/editor/borderNumberLinkMark"
 import IconDelete from "~icons/ic/outline-delete"
 
 const props = defineProps<{
@@ -82,7 +83,15 @@ const toggleModal = () => {
     </div>
     <div v-if="!html" class="text-center"><LoadingSpinner /></div>
 
-    <TextEditor v-else class="grow bg-white" field-size="max" :value="html" />
+    <TextEditor
+      v-else
+      class="grow bg-white"
+      :extensions="[
+        BorderNumberLinkMark.configure({ validBorderNumbers: [1, 2, 3, 9] }),
+      ]"
+      field-size="max"
+      :value="html"
+    />
 
     <PopupModal
       v-if="showModal"

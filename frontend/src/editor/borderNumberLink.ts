@@ -39,13 +39,13 @@ export const BorderNumberLink = Node.create({
           "color: #003350; font-weight: bold; text-decoration: underline; padding: 2px; font-style: italic",
         contenteditable: false,
       },
-      node.attrs.nr ? `${node.attrs.nr}` : 0,
+      `Rn. ${node.attrs.nr ?? node.textContent}`,
     ]
   },
   addKeyboardShortcuts() {
     return {
-      Backspace: () =>
-        this.editor.commands.command(({ tr, state }) => {
+      Backspace: () => {
+        return this.editor.commands.command(({ tr, state }) => {
           let isBorderNumberLink = false
           const { selection } = state
           const { empty, anchor } = selection
@@ -64,7 +64,8 @@ export const BorderNumberLink = Node.create({
           })
 
           return isBorderNumberLink
-        }),
+        })
+      },
     }
   },
   addInputRules() {

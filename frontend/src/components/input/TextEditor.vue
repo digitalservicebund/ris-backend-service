@@ -20,7 +20,6 @@ import {
   BorderNumberContent,
   BorderNumberNumber,
 } from "../../editor/borderNumber"
-import { BorderNumberLink } from "../../editor/borderNumberLink"
 import { CustomBulletList } from "../../editor/bulletList"
 import { FontSize } from "../../editor/fontSize"
 import { CustomImage } from "../../editor/image"
@@ -34,6 +33,7 @@ import TextEditorButton, {
 } from "@/components/input/TextEditorButton.vue"
 import { TextAreaInputAttributes } from "@/components/input/types"
 import { useCollapsingMenuBar } from "@/composables/useCollapsingMenuBar"
+import { BorderNumberLinkMark } from "@/editor/borderNumberLinkMark"
 import IconExpand from "~icons/ic/baseline-expand"
 import IconAlignJustify from "~icons/ic/baseline-format-align-justify"
 import IconAlignRight from "~icons/ic/baseline-format-align-right"
@@ -84,7 +84,8 @@ const editor = new Editor({
     BorderNumber,
     BorderNumberNumber,
     BorderNumberContent,
-    BorderNumberLink,
+    // BorderNumberLink,
+    BorderNumberLinkMark,
     Bold,
     Color,
     FontSize,
