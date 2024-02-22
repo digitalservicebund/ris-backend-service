@@ -11,6 +11,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnit
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.EnsuingDecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.FileNumberDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.InputTypeDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LeadingDecisionNormReferenceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LegalEffectDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.NormReferenceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.OriginalFileDocumentDTO;
@@ -53,8 +54,7 @@ public class DocumentationUnitTransformer {
     DocumentationUnitDTO.DocumentationUnitDTOBuilder builder =
         currentDto.toBuilder()
             .id(updatedDomainObject.uuid())
-            .documentNumber(updatedDomainObject.documentNumber())
-            .references(currentDto.getReferences());
+            .documentNumber(updatedDomainObject.documentNumber());
 
     if (updatedDomainObject.coreData() != null) {
       var coreData = updatedDomainObject.coreData();
@@ -76,6 +76,7 @@ public class DocumentationUnitTransformer {
       addDeviatingFileNumbers(currentDto, builder, coreData);
       addDeviatingEclis(builder, coreData);
       addLegalEffect(currentDto, updatedDomainObject, builder);
+      addLeadingDecisionNormReferences(currentDto, updatedDomainObject, builder);
 
     } else {
       builder
@@ -258,6 +259,28 @@ public class DocumentationUnitTransformer {
     builder.legalEffect(legalEffectDTO);
   }
 
+  private static void addLeadingDecisionNormReferences(
+      DocumentationUnitDTO currentDto,
+      DocumentUnit updatedDomainObject,
+      DocumentationUnitDTOBuilder builder) {
+
+    List<String> leadingDecisionNormReferences =
+        updatedDomainObject.coreData().leadingDecisionNormReferences();
+    if (leadingDecisionNormReferences != null) {
+      AtomicInteger i = new AtomicInteger(1);
+      builder.leadingDecisionNormReferences(
+          leadingDecisionNormReferences.stream()
+              .map(
+                  normReference ->
+                      LeadingDecisionNormReferenceDTO.builder()
+                          .documentationUnit(currentDto)
+                          .normReference(normReference)
+                          .rank(i.getAndIncrement())
+                          .build())
+              .toList());
+    }
+  }
+
   private static void addDeviatingEclis(DocumentationUnitDTOBuilder builder, CoreData coreData) {
     if (coreData.deviatingEclis() == null) {
       return;
@@ -412,7 +435,7 @@ public class DocumentationUnitTransformer {
     addDeviatingCourtsToDomain(documentationUnitDTO, coreDataBuilder);
     addDeviatingEclisToDomain(documentationUnitDTO, coreDataBuilder);
     addDeviatingDecisionDatesToDomain(documentationUnitDTO, coreDataBuilder);
-    addReferencesToDomain(documentationUnitDTO, coreDataBuilder);
+    addLeadingDecisionNormReferencesToDomain(documentationUnitDTO, coreDataBuilder);
 
     DocumentTypeDTO documentTypeDTO = documentationUnitDTO.getDocumentType();
     if (documentTypeDTO != null) {
@@ -620,19 +643,15 @@ public class DocumentationUnitTransformer {
     coreDataBuilder.fileNumbers(fileNumbers);
   }
 
-  private static void addReferencesToDomain(
+  private static void addLeadingDecisionNormReferencesToDomain(
       DocumentationUnitDTO documentationUnitDTO, CoreDataBuilder coreDataBuilder) {
-    if (documentationUnitDTO.getReferences() == null) {
+    if (documentationUnitDTO.getLeadingDecisionNormReferences() == null) {
       return;
     }
-
-    List<String> references =
-        documentationUnitDTO.getReferences().stream()
-            .filter(
-                referenceDTO -> Objects.equals(referenceDTO.getLegalPeriodicalRawValue(), "NSW"))
-            .map(referennceDTO -> referennceDTO.getCitation().replace(" (BGH-intern)", ""))
-            .toList();
-    coreDataBuilder.leadingDecisionNormReferences(references);
+    coreDataBuilder.leadingDecisionNormReferences(
+        documentationUnitDTO.getLeadingDecisionNormReferences().stream()
+            .map(LeadingDecisionNormReferenceDTO::getNormReference)
+            .toList());
   }
 
   private static void addEnsuingDecisionsToDomain(

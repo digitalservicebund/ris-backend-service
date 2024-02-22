@@ -252,5 +252,15 @@ public class DocumentationUnitDTO
       orphanRemoval = true)
   @Builder.Default
   @OrderBy("rank")
-  private List<ReferenceDTO> references = new ArrayList<>();
+  private List<LeadingDecisionNormReferenceDTO> leadingDecisionNormReferences = new ArrayList<>();
+
+  // This will be used to send legal periodical references to the exporter and frontend
+  //  @OneToMany(
+  //      mappedBy = "documentationUnit",
+  //      cascade = CascadeType.ALL,
+  //      fetch = FetchType.LAZY,
+  //      orphanRemoval = true)
+  //  @Builder.Default
+  //  @OrderBy("rank")
+  //  private List<ReferenceDTO> references = new ArrayList<>();
 }
