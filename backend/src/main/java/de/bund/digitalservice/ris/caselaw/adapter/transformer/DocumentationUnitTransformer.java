@@ -54,8 +54,7 @@ public class DocumentationUnitTransformer {
     DocumentationUnitDTO.DocumentationUnitDTOBuilder builder =
         currentDto.toBuilder()
             .id(updatedDomainObject.uuid())
-            .documentNumber(updatedDomainObject.documentNumber())
-            .references(currentDto.getReferences());
+            .documentNumber(updatedDomainObject.documentNumber());
 
     if (updatedDomainObject.coreData() != null) {
       var coreData = updatedDomainObject.coreData();
