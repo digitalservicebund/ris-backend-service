@@ -39,6 +39,10 @@ const modalHeaderText = "Dokumentationseinheit löschen"
 const modalCancelButtonType = "ghost"
 const modalConfirmButtonType = "secondary"
 const selectedDocumentUnitListEntry = ref<DocumentUnitListEntry>()
+
+/**
+ * Stops propagation of scrolling event, and toggles the showModal value
+ */
 function toggleModal() {
   showModal.value = !showModal.value
   if (showModal.value) {
@@ -53,6 +57,11 @@ function toggleModal() {
     }
   }
 }
+
+/**
+ * Clicking on a delete icon of a list entry triggers toggleModal() and asks for user input to proceed
+ * @param {DocumentUnitListEntry} documentUnitListEntry - The documentationunit list entry to be deleted
+ */
 function setSelectedDocumentUnitListEntry(
   documentUnitListEntry: DocumentUnitListEntry,
 ) {
@@ -61,6 +70,9 @@ function setSelectedDocumentUnitListEntry(
   toggleModal()
 }
 
+/**
+ * Propagates delete event to parent and closes modal again
+ */
 function onDelete() {
   if (selectedDocumentUnitListEntry.value) {
     emit("deleteDocumentUnit", selectedDocumentUnitListEntry.value)

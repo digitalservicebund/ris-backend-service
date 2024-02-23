@@ -26,23 +26,42 @@ const modelValueList = ref<T[]>([...props.modelValue]) as Ref<T[]>
 
 const editIndex = ref<number | undefined>()
 
+/**
+ * Setting the edit index, renders the edit component of the given index, the summary component is not visible
+ * @param {number} index - The index of the list item to be shown in edit mode
+ */
 function setEditIndex(index?: number) {
   editIndex.value = index
 }
 
+/**
+ * Resetting the edit index to undefined, to show all list items in summary mode
+ */
 function cancelEdit() {
   setEditIndex()
 }
 
+/**
+ * Adds a new list item of the type given by the "defaultValue" property and sets it in edit mode
+ */
 function addNewListEntry() {
   const { defaultValue } = props
   modelValueList.value.push(
-    typeof defaultValue === "object" ? { ...defaultValue } : defaultValue,
+    typeof defaultValue === "object"
+      ? {
+          ...defaultValue,
+        }
+      : defaultValue,
   )
 
   editIndex.value = modelValueList.value.length - 1
 }
 
+/**
+ * Removes the list item, with the given index, by propagating an updated list without the list item
+ * at the given index to the parent component. The edit index is resetted, to show list in summary mode.
+ * @param {number} index - The index of the list item to be removed
+ */
 function removeListEntry(index: number) {
   modelValueList.value.splice(index, 1)
 
@@ -53,27 +72,43 @@ function removeListEntry(index: number) {
   editIndex.value = undefined
 }
 
+/**
+ * Updating the modelValue with the local modelValue list, is not propagated, until the user actively
+ * decides to click the save button in edit mode. The edit index is resetted, to show list in summary mode.
+ * @param {number} index - The index of the list item to be removed
+ */
 function updateModel() {
   setEditIndex()
   emit("update:modelValue", modelValueList.value)
 }
 
+/**
+ * When the modelValue changes, it is copied to a local copy. The user can update an item in that local model value list,
+ * it is not saved until the save button is clicked.
+ */
 watch(
   () => props.modelValue,
   () => {
-    modelValueList.value = modelValueList.value.map((value, index) =>
-      index == editIndex.value ? value : props.modelValue[index],
-    )
+    modelValueList.value = props.modelValue
   },
-  { immediate: true, deep: true },
+  {
+    immediate: true,
+    deep: true,
+  },
 )
 
+/**
+ * When the local model value list is empty, (e.g. on mount or by removing an item) a new empty list entry is added to list.
+ */
 watch(
   () => modelValueList,
   () => {
     if (modelValueList.value.length == 0) addNewListEntry()
   },
-  { immediate: true, deep: true },
+  {
+    immediate: true,
+    deep: true,
+  },
 )
 </script>
 

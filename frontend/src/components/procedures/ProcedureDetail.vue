@@ -8,6 +8,9 @@ const props = defineProps<{
   procedure: Procedure
 }>()
 
+/**
+ * Sets loading state to true, when mismatch between the documentUnitCount and the actual loaded documentUnits
+ */
 const isLoading = computed(
   () => !props.procedure.documentUnits && props.procedure.documentUnitCount > 0,
 )

@@ -27,6 +27,13 @@ const isLoading = ref(false)
 const searchQuery = ref<Query<DocumentUnitSearchParameter>>()
 const pageNumber = ref<number>(0)
 
+/**
+ * Searches all documentation units by given input and updates the local
+ * documentunit list entries, the currentPage for pagination and catches errors
+ * if they happen. When no results found, but a court was given, the court input
+ * is validated against the court table, in order to be able to create a new
+ * documentation unit from search the given search input, if the user wants to.
+ */
 async function search() {
   isLoading.value = true
 
@@ -70,6 +77,10 @@ async function search() {
   isLoading.value = false
 }
 
+/**
+ * Deletes a documentation unit
+ * @param {DocumentUnitListEntry} documentUnitListEntry - The entry in the list to be removed
+ */
 async function handleDelete(documentUnitListEntry: DocumentUnitListEntry) {
   if (documentUnitListEntries.value) {
     const response = await service.delete(documentUnitListEntry.uuid as string)
@@ -83,17 +94,32 @@ async function handleDelete(documentUnitListEntry: DocumentUnitListEntry) {
   }
 }
 
+/**
+ * When using the navigation a new page number is set, the search is triggered,
+ * with the given page number.
+ * @param {number} page - The page to be updated
+ */
 async function updatePage(page: number) {
   pageNumber.value = page
   search()
 }
 
+/**
+ * The search form emits an event, when clicking the search button and is
+ * triggering the search with the updated query here.
+ * It will always reset the pagination to the first page.
+ * @param {Query<DocumentUnitSearchParameter>} value - The page to be updated
+ */
 async function updateQuery(value: Query<DocumentUnitSearchParameter>) {
   searchQuery.value = value
   pageNumber.value = 0
   search()
 }
 
+/**
+ * The search form emits an event, when resetting the search,
+ * which empties the document unit list and resets the pagination.
+ */
 async function handleReset() {
   documentUnitListEntries.value = undefined
   currentPage.value = undefined
@@ -101,6 +127,12 @@ async function handleReset() {
 
 const createFromSearchQueryResponseError = ref<ResponseError | undefined>()
 
+/**
+ * When a search returns no results and at least one valid search parameter
+ * is given and no filters (documentNumber, myDocofficeOnly, status) are set,
+ * a new documentation unit can be created with fileNumber, court and/ or date
+ * from the current search query.
+ */
 async function createFromSearchQuery() {
   isLoading.value = true
   createFromSearchQueryResponseError.value = undefined

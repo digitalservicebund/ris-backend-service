@@ -23,6 +23,8 @@ const query = ref(getQueryFromRoute())
 
 /**
  * Loads all proceudres
+ * @param {number} page - page to be updated
+ * @param {Query<string>} queries - parameters from route to filter search results
  */
 async function updateProcedures(page: number, queries?: Query<string>) {
   const response = await service.get(itemsPerPage, page, queries?.q)
@@ -44,7 +46,10 @@ async function loadDocumentUnits(loadingProcedure: Procedure) {
 
   procedures.value = procedures.value.map((procedure) =>
     procedure.label == loadingProcedure.label
-      ? { ...procedure, documentUnits: response.data }
+      ? {
+          ...procedure,
+          documentUnits: response.data,
+        }
       : procedure,
   )
 }
