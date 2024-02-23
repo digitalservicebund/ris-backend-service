@@ -7,6 +7,7 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
+/** Config to import and validate doc number patterns to generate doc numbers by doc office */
 @Configuration
 @ConfigurationProperties(prefix = "neuris")
 @Data

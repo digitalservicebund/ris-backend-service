@@ -83,12 +83,10 @@ public class DocumentUnitService {
         .doOnError(ex -> log.error("Couldn't create empty doc unit", ex));
   }
 
-  // TODO: How do we want to handle it
   private Mono<String> generateDocumentNumber(DocumentationOffice documentationOffice) {
     try {
-      return Mono.just(
-          documentNumberService.generateNextAvailableDocumentNumber(documentationOffice));
-    } catch (DocumentNumberPatternException | DocumentNumberFormatterException e) {
+      return Mono.just(documentNumberService.execute(documentationOffice.abbreviation(), 5));
+    } catch (Exception e) {
       throw new DocumentationUnitException("Could not generate document number", e);
     }
   }

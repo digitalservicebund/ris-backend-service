@@ -8,7 +8,7 @@ import static org.mockito.Mockito.when;
 import de.bund.digitalservice.ris.caselaw.RisWebTestClient;
 import de.bund.digitalservice.ris.caselaw.TestConfig;
 import de.bund.digitalservice.ris.caselaw.adapter.AuthService;
-import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentNumberService;
+import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentNumberGeneratorService;
 import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentUnitStatusService;
 import de.bund.digitalservice.ris.caselaw.adapter.DatabaseProcedureService;
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentNumberPatternConfig;
@@ -52,7 +52,7 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
 @RISIntegrationTest(
     imports = {
       DocumentUnitService.class,
-      DatabaseDocumentNumberService.class,
+      DatabaseDocumentNumberGeneratorService.class,
       DatabaseDocumentUnitStatusService.class,
       DatabaseProcedureService.class,
       PostgresPublicationReportRepositoryImpl.class,

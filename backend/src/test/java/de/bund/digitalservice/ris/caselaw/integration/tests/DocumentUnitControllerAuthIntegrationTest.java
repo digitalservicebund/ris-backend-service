@@ -9,7 +9,7 @@ import com.jayway.jsonpath.JsonPath;
 import de.bund.digitalservice.ris.caselaw.RisWebTestClient;
 import de.bund.digitalservice.ris.caselaw.TestConfig;
 import de.bund.digitalservice.ris.caselaw.adapter.AuthService;
-import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentNumberService;
+import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentNumberGeneratorService;
 import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentUnitStatusService;
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentNumberPatternConfig;
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentUnitController;
@@ -60,7 +60,7 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
       DocumentUnitService.class,
       AuthService.class,
       KeycloakUserService.class,
-      DatabaseDocumentNumberService.class,
+      DatabaseDocumentNumberGeneratorService.class,
       DatabaseDocumentUnitStatusService.class,
       PostgresDocumentationUnitRepositoryImpl.class,
       PostgresPublicationReportRepositoryImpl.class,

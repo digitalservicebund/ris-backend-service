@@ -8,21 +8,20 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentNumberFormatter;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentNumberFormatterException;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentNumberPatternException;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentNumberService;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitException;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitExistsException;
 import de.bund.digitalservice.ris.caselaw.domain.StringsUtil;
 import jakarta.validation.constraints.NotEmpty;
 import org.springframework.stereotype.Service;
 
+/** Service to generate the next available doc unit number based on documentation office */
 @Service
-public class DatabaseDocumentNumberService implements DocumentNumberService {
+public class DatabaseDocumentNumberGeneratorService implements DocumentNumberService {
   private final DatabaseDocumentNumberRepository repository;
   private final DocumentNumberPatternConfig documentNumberPatternConfig;
   private final DatabaseDocumentationUnitRepository databaseDocumentationUnitRepository;
 
-  // TODO: DatabaseDocumentationUnitRepository instead of documentUnitRepository
-
-  public DatabaseDocumentNumberService(
+  public DatabaseDocumentNumberGeneratorService(
       DatabaseDocumentNumberRepository repository,
       DocumentNumberPatternConfig documentNumberPatternConfig,
       DatabaseDocumentationUnitRepository databaseDocumentationUnitRepository) {
@@ -32,37 +31,43 @@ public class DatabaseDocumentNumberService implements DocumentNumberService {
   }
 
   @Override
-  public String generateNextAvailableDocumentNumber(DocumentationOffice documentationOffice)
+  public String execute(String documentationOfficeAbbreviation, int maxTries)
       throws DocumentNumberPatternException, DocumentNumberFormatterException {
-    // TODO: 5 - 10 tries
     try {
-      return execute(documentationOffice.abbreviation());
+      return execute(documentationOfficeAbbreviation);
     } catch (DocumentationUnitExistsException e) {
-      return generateNextAvailableDocumentNumber(documentationOffice);
+      if (maxTries <= 0) {
+        throw new DocumentationUnitException("Could not generate Document number", e);
+      }
+      return execute(documentationOfficeAbbreviation, maxTries - 1);
     }
   }
 
-  public String execute(@NotEmpty String abbreviation)
+  @Override
+  public String execute(@NotEmpty String docUnitAbbreviation)
       throws DocumentNumberPatternException,
           DocumentationUnitExistsException,
           DocumentNumberFormatterException {
-    if (StringsUtil.returnTrueIfNullOrBlank(abbreviation)) {
-      throw new IllegalArgumentException("Documentation Office abbreviation can not be empty");
+    if (StringsUtil.returnTrueIfNullOrBlank(docUnitAbbreviation)) {
+      throw new DocumentNumberPatternException(
+          "Documentation Office abbreviation can not be empty");
     }
     String pattern =
-        documentNumberPatternConfig.getDocumentNumberPatterns().getOrDefault(abbreviation, null);
+        documentNumberPatternConfig
+            .getDocumentNumberPatterns()
+            .getOrDefault(docUnitAbbreviation, null);
 
     if (pattern == null) {
       throw new DocumentNumberPatternException(
-          "Could not find pattern for abbreviation " + abbreviation);
+          "Could not find pattern for abbreviation " + docUnitAbbreviation);
     }
 
     DocumentNumberDTO documentNumberDTO =
         repository
-            .findById(abbreviation)
+            .findById(docUnitAbbreviation)
             .orElse(
                 DocumentNumberDTO.builder()
-                    .documentationOfficeAbbreviation(abbreviation)
+                    .documentationOfficeAbbreviation(docUnitAbbreviation)
                     .lastNumber(0)
                     .build());
 
@@ -84,7 +89,7 @@ public class DatabaseDocumentNumberService implements DocumentNumberService {
   public void assertNotExists(String documentNumber) throws DocumentationUnitExistsException {
     if (databaseDocumentationUnitRepository.findByDocumentNumber(documentNumber).isPresent()) {
       throw new DocumentationUnitExistsException(
-          "Document Number already exists: " + documentNumber);
+          "Document number already exists: " + documentNumber);
     }
   }
 }

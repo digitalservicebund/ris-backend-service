@@ -10,10 +10,10 @@ import lombok.NonNull;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.validation.annotation.Validated;
 
+/** A validator and generator of doc number id based on its pattern */
 @Builder
 @Validated
 public class DocumentNumberFormatter {
-  // TODO: Lombok annotation from unknown reason ignores the @NotEmpty annotation
   @NonNull final Year year;
 
   @Min(value = 0, message = "Doc number must be positive")
