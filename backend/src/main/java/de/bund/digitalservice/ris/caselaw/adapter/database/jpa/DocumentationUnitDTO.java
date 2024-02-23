@@ -245,11 +245,8 @@ public class DocumentationUnitDTO
   @OrderBy("rank")
   private List<PreviousDecisionDTO> previousDecisions = new ArrayList<>();
 
-  @OneToMany(
-      mappedBy = "documentationUnit",
-      cascade = CascadeType.ALL,
-      fetch = FetchType.LAZY,
-      orphanRemoval = true)
+  @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+  @JoinColumn(name = "documentation_unit_id", nullable = false)
   @Builder.Default
   @OrderBy("rank")
   private List<LeadingDecisionNormReferenceDTO> leadingDecisionNormReferences = new ArrayList<>();

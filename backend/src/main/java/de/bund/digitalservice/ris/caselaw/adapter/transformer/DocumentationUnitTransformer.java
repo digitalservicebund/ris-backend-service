@@ -76,7 +76,7 @@ public class DocumentationUnitTransformer {
       addDeviatingFileNumbers(currentDto, builder, coreData);
       addDeviatingEclis(builder, coreData);
       addLegalEffect(currentDto, updatedDomainObject, builder);
-      addLeadingDecisionNormReferences(currentDto, updatedDomainObject, builder);
+      addLeadingDecisionNormReferences(updatedDomainObject, builder);
 
     } else {
       builder
@@ -260,9 +260,7 @@ public class DocumentationUnitTransformer {
   }
 
   private static void addLeadingDecisionNormReferences(
-      DocumentationUnitDTO currentDto,
-      DocumentUnit updatedDomainObject,
-      DocumentationUnitDTOBuilder builder) {
+      DocumentUnit updatedDomainObject, DocumentationUnitDTOBuilder builder) {
 
     List<String> leadingDecisionNormReferences =
         updatedDomainObject.coreData().leadingDecisionNormReferences();
@@ -273,11 +271,12 @@ public class DocumentationUnitTransformer {
               .map(
                   normReference ->
                       LeadingDecisionNormReferenceDTO.builder()
-                          .documentationUnit(currentDto)
                           .normReference(normReference)
                           .rank(i.getAndIncrement())
                           .build())
               .toList());
+    } else {
+      builder.leadingDecisionNormReferences(Collections.emptyList());
     }
   }
 
