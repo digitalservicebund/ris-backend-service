@@ -27,13 +27,16 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentT
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationOfficeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseFileNumberRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseRegionRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentCategoryDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentTypeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.FileNumberDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LeadingDecisionNormReferenceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentationUnitRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresPublicationReportRepositoryImpl;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.RegionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.StatusDTO;
 import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
 import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
@@ -48,6 +51,7 @@ import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.Status;
 import de.bund.digitalservice.ris.caselaw.domain.Texts;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
+import de.bund.digitalservice.ris.caselaw.domain.court.Court;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
@@ -113,6 +117,7 @@ class DocumentationUnitIntegrationTest {
   @Autowired private DatabaseDocumentCategoryRepository databaseDocumentCategoryRepository;
   @Autowired private DatabaseDocumentationOfficeRepository documentationOfficeRepository;
   @Autowired private DatabaseCourtRepository courtRepository;
+  @Autowired private DatabaseRegionRepository regionRepository;
   @Autowired private DatabaseDocumentNumberRepository databaseDocumentNumberRepository;
   @MockBean private S3AsyncClient s3AsyncClient;
   @MockBean private EmailPublishService publishService;
@@ -235,6 +240,118 @@ class DocumentationUnitIntegrationTest {
         fileNumberRepository.findAllByDocumentationUnit(list.get(0));
     assertThat(fileNumberEntries).hasSize(1);
     assertThat(fileNumberEntries.get(0).getValue()).isEqualTo("AkteX");
+  }
+
+  @Test
+  void testDeleteLeadingDecisionNormReferencesForNonBGHDecisions() {
+    CourtDTO bghCourt =
+        courtRepository.save(
+            CourtDTO.builder()
+                .type("BGH")
+                .isSuperiorCourt(true)
+                .isForeignCourt(false)
+                .jurisId(new Random().nextInt())
+                .build());
+    CourtDTO lgCourt =
+        courtRepository.save(
+            CourtDTO.builder()
+                .type("LG")
+                .isSuperiorCourt(false)
+                .isForeignCourt(false)
+                .jurisId(new Random().nextInt())
+                .build());
+
+    DocumentationUnitDTO dto =
+        repository.save(
+            DocumentationUnitDTO.builder()
+                .documentNumber("1234567890123")
+                .leadingDecisionNormReferences(
+                    List.of(
+                        LeadingDecisionNormReferenceDTO.builder()
+                            .normReference("BGB §1")
+                            .rank(1)
+                            .build()))
+                .court(bghCourt)
+                .documentationOffice(documentationOfficeRepository.findByAbbreviation("DS"))
+                .build());
+
+    DocumentUnit documentUnitFromFrontend =
+        DocumentUnit.builder()
+            .uuid(dto.getId())
+            .documentNumber(dto.getDocumentNumber())
+            .coreData(
+                CoreData.builder()
+                    .leadingDecisionNormReferences(List.of("BGB §1"))
+                    .documentationOffice(docOffice)
+                    .court(Court.builder().id(lgCourt.getId()).build())
+                    .build())
+            .build();
+
+    risWebTestClient
+        .withDefaultLogin()
+        .put()
+        .uri("/api/v1/caselaw/documentunits/" + dto.getId())
+        .bodyValue(documentUnitFromFrontend)
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody(DocumentUnit.class)
+        .consumeWith(
+            response -> {
+              assertThat(response.getResponseBody()).isNotNull();
+              assertThat(response.getResponseBody().coreData().leadingDecisionNormReferences())
+                  .isEmpty();
+            });
+  }
+
+  @Test
+  void testSetRegionForCourt() {
+    RegionDTO region =
+        regionRepository.save(RegionDTO.builder().id(UUID.randomUUID()).code("DEU").build());
+
+    CourtDTO bghCourt =
+        courtRepository.save(
+            CourtDTO.builder()
+                .type("BGH")
+                .location("Karlsruhe")
+                .isSuperiorCourt(true)
+                .isForeignCourt(false)
+                .jurisId(new Random().nextInt())
+                .region(region)
+                .build());
+
+    DocumentationUnitDTO dto =
+        repository.save(
+            DocumentationUnitDTO.builder()
+                .documentNumber("1234567890123")
+                .documentationOffice(documentationOfficeRepository.findByAbbreviation("DS"))
+                .build());
+
+    DocumentUnit documentUnitFromFrontend =
+        DocumentUnit.builder()
+            .uuid(dto.getId())
+            .documentNumber(dto.getDocumentNumber())
+            .coreData(
+                CoreData.builder()
+                    .documentationOffice(docOffice)
+                    .court(Court.builder().id(bghCourt.getId()).build())
+                    .build())
+            .build();
+
+    risWebTestClient
+        .withDefaultLogin()
+        .put()
+        .uri("/api/v1/caselaw/documentunits/" + dto.getId())
+        .bodyValue(documentUnitFromFrontend)
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody(DocumentUnit.class)
+        .consumeWith(
+            response -> {
+              assertThat(response.getResponseBody()).isNotNull();
+              assertThat(response.getResponseBody().coreData().region()).isEqualTo("DEU");
+            });
   }
 
   @Test

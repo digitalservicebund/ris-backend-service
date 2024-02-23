@@ -9,6 +9,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnit
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.EnsuingDecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.FileNumberDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.InputTypeDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LeadingDecisionNormReferenceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LegalEffectDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PendingDecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.RegionDTO;
@@ -223,6 +224,71 @@ class DocumentationUnitTransformerTest {
   }
 
   @Test
+  void testTransformToDTO_withLeadingDecisionNormReferences() {
+    DocumentationUnitDTO currentDto = DocumentationUnitDTO.builder().build();
+    List<String> leadingDecisionNormReferences = List.of("BGB §1", "BGB §2", "BGB §3");
+    DocumentUnit updatedDomainObject =
+        DocumentUnit.builder()
+            .coreData(
+                CoreData.builder()
+                    .court(
+                        Court.builder()
+                            .id(UUID.fromString("CCCCCCCC-2222-3333-4444-55555555555"))
+                            .type("BGH")
+                            .build())
+                    .leadingDecisionNormReferences(leadingDecisionNormReferences)
+                    .build())
+            .build();
+
+    DocumentationUnitDTO documentationUnitDTO =
+        DocumentationUnitTransformer.transformToDTO(currentDto, updatedDomainObject);
+
+    assertThat(documentationUnitDTO.getLeadingDecisionNormReferences())
+        .usingRecursiveFieldByFieldElementComparator()
+        .containsExactly(
+            LeadingDecisionNormReferenceDTO.builder().normReference("BGB §1").rank(1).build(),
+            LeadingDecisionNormReferenceDTO.builder().normReference("BGB §2").rank(2).build(),
+            LeadingDecisionNormReferenceDTO.builder().normReference("BGB §3").rank(3).build());
+  }
+
+  @Test
+  void testTransformToDTO_deletedLeadingDecisionNormReferences() {
+    DocumentationUnitDTO currentDto =
+        DocumentationUnitDTO.builder()
+            .court(
+                CourtDTO.builder()
+                    .id(UUID.fromString("CCCCCCCC-2222-3333-4444-55555555555"))
+                    .type("BGH")
+                    .build())
+            .leadingDecisionNormReferences(
+                List.of(
+                    LeadingDecisionNormReferenceDTO.builder()
+                        .id(UUID.fromString("CCCCCCCC-1111-3333-4444-55555555555"))
+                        .normReference("BGB §1")
+                        .rank(1)
+                        .build()))
+            .build();
+
+    DocumentUnit updatedDomainObject =
+        DocumentUnit.builder()
+            .coreData(
+                CoreData.builder()
+                    .court(
+                        Court.builder()
+                            .id(UUID.fromString("CCCCCCCC-2222-3333-4444-55555555555"))
+                            .type("BGH")
+                            .build())
+                    .leadingDecisionNormReferences(List.of())
+                    .build())
+            .build();
+
+    DocumentationUnitDTO documentationUnitDTO =
+        DocumentationUnitTransformer.transformToDTO(currentDto, updatedDomainObject);
+
+    assertThat(documentationUnitDTO.getLeadingDecisionNormReferences()).isEmpty();
+  }
+
+  @Test
   void testTransformToDomain_withDocumentationUnitDTOIsNull_shouldReturnEmptyDocumentUnit() {
 
     DocumentUnit documentUnit = DocumentationUnitTransformer.transformToDomain(null);
@@ -395,6 +461,34 @@ class DocumentationUnitTransformerTest {
         DocumentationUnitTransformer.transformToDomain(documentationUnitDTO);
 
     assertThat(documentUnit.texts().borderNumbers()).hasSize(1).containsExactly("2");
+  }
+
+  @Test
+  void testTransformToDomain_shouldAddLeadingDecisionNormReferences() {
+    DocumentationUnitDTO documentationUnitDTO =
+        generateSimpleDTOBuilder()
+            .leadingDecisionNormReferences(
+                List.of(
+                    LeadingDecisionNormReferenceDTO.builder()
+                        .normReference("BGB §1")
+                        .rank(1)
+                        .build(),
+                    LeadingDecisionNormReferenceDTO.builder()
+                        .normReference("BGB §2")
+                        .rank(2)
+                        .build(),
+                    LeadingDecisionNormReferenceDTO.builder()
+                        .normReference("BGB §3")
+                        .rank(3)
+                        .build()))
+            .build();
+
+    DocumentUnit documentUnit =
+        DocumentationUnitTransformer.transformToDomain(documentationUnitDTO);
+
+    assertThat(documentUnit.coreData().leadingDecisionNormReferences())
+        .hasSize(3)
+        .containsExactly("BGB §1", "BGB §2", "BGB §3");
   }
 
   @Test
