@@ -54,7 +54,6 @@ interface Props {
   editable?: boolean
   ariaLabel?: string
   fieldSize?: TextAreaInputAttributes["fieldSize"]
-  // eslint-disable-next-line vue/require-default-prop
   extensions?: (Extension | Mark)[]
 }
 
@@ -63,6 +62,7 @@ const props = withDefaults(defineProps<Props>(), {
   editable: false,
   ariaLabel: "Editor Feld",
   fieldSize: "medium",
+  extensions: undefined,
 })
 
 const emit = defineEmits<{
@@ -118,6 +118,7 @@ const editor = new Editor({
     History.configure({
       depth: 100,
     }),
+    ...(props.extensions ? props.extensions : []),
   ],
   onUpdate: () => {
     emit("updateValue", editor.getHTML())
