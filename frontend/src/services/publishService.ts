@@ -82,38 +82,16 @@ const service: PublishService = {
       `caselaw/documentunits/${documentUnitUuid}/preview-publication-xml`,
     )
 
-    if (response.status >= 300 || Number(response.data?.statusCode) >= 300) {
-      response.status = response.data?.statusCode
-        ? Number(response.data.statusCode)
-        : response.status
-
-      let description =
-        errorMessages.DOCUMENT_UNIT_LOADING_PUBLICATION_PREVIEW.description
-      if (
-        response.data?.statusMessages &&
-        response.data.statusMessages.length > 0
-      ) {
-        description = '<ul class="list-disc">'
-      }
-      response.data?.statusMessages?.forEach(
-        (value) =>
-          (description +=
-            '<li class="ds-body-02-reg font-bold ml-[1rem] list-item">' +
-            value +
-            "</li>"),
-      )
-      if (
-        response.data?.statusMessages &&
-        response.data.statusMessages.length > 0
-      ) {
-        description += "</ul>"
-      }
-
-      response.error = {
-        title: errorMessages.DOCUMENT_UNIT_LOADING_PUBLICATION_PREVIEW.title,
-        description,
-      }
-    }
+    response.error =
+      response.status >= 300
+        ? {
+            title:
+              errorMessages.DOCUMENT_UNIT_LOADING_PUBLICATION_PREVIEW.title,
+            description:
+              errorMessages.DOCUMENT_UNIT_LOADING_PUBLICATION_PREVIEW
+                .description,
+          }
+        : undefined
 
     return response
   },
