@@ -11,6 +11,14 @@ import lombok.extern.slf4j.Slf4j;
 public class DocumentationUnitSearchResultTransformer {
   private DocumentationUnitSearchResultTransformer() {}
 
+  /**
+   * Transforms a documentation unit search result object from its database representation into a
+   * documentation unit domain object that is suitable to be consumed by clients of the REST
+   * service.
+   *
+   * @param documentationUnitSearchResultDTO the database documentation unit search result
+   * @return DocumentationUnitSearchResult the domain documentation unit search result
+   */
   public static DocumentationUnitSearchResult transformToDomain(
       DocumentationUnitSearchResultDTO documentationUnitSearchResultDTO) {
     if (documentationUnitSearchResultDTO == null) {
@@ -71,6 +79,16 @@ public class DocumentationUnitSearchResultTransformer {
     return builder.build();
   }
 
+  /**
+   * Transforms a documentation unit search result object from its database representation into a
+   * domain object of related (linked) documentation unit, that is suitable to be consumed by
+   * clients of the REST service.
+   *
+   * @param documentationUnitSearchResultDTO A database representation of a documentation unit
+   *     search result, containing only relevant information
+   * @return RelatedDocumentationUnit A representation of a linked documentation unit, containing
+   *     only relevant data
+   */
   public static RelatedDocumentationUnit transformToRelatedDocumentation(
       DocumentationUnitSearchResultDTO documentationUnitSearchResultDTO) {
 
