@@ -112,6 +112,8 @@ const coreData = computed({
     newValues.deviatingCourts = newValues.deviatingCourts ?? []
     newValues.deviatingEclis = newValues.deviatingEclis ?? []
     newValues.deviatingDecisionDates = newValues.deviatingDecisionDates ?? []
+    newValues.leadingDecisionNormReferences =
+      newValues.leadingDecisionNormReferences ?? []
 
     // ---
 

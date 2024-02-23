@@ -11,4 +11,5 @@ export const fieldLabels = {
   previousProcedures: "Vorgang Historie",
   legalEffect: "Rechtskraft",
   region: "Region",
+  leadingDecisionNormReferences: "BGH Nachschlagewerk",
 }
