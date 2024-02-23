@@ -4,6 +4,7 @@ import TextEditor from "../components/input/TextEditor.vue"
 import { Texts } from "../domain/documentUnit"
 import TextAreaInput from "@/components/input/TextAreaInput.vue"
 import TextInput from "@/components/input/TextInput.vue"
+import { BorderNumberLink } from "@/editor/borderNumberLink"
 import { texts as textsFields } from "@/fields/caselaw"
 
 const props = defineProps<{ texts: Texts }>()
@@ -43,6 +44,11 @@ const data = computed(() =>
           :aria-label="item.aria"
           class="ml-2 pl-2 outline outline-2 outline-blue-900"
           editable
+          :extensions="[
+            BorderNumberLink.configure({
+              validBorderNumbers: ['4', '5', '6'],
+            }),
+          ]"
           :field-size="item.fieldSize"
           :value="item.value"
           @update-value="emit('updateValue', [item.id, $event])"
