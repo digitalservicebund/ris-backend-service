@@ -18,7 +18,12 @@ const itemsPerPage = 10
 const procedures = ref<Procedure[]>()
 const currentPage = ref<Page<Procedure>>()
 const currentlyExpanded = ref<number[]>([])
+const { getQueryFromRoute, pushQueryToRoute, route } = useQuery<"q">()
+const query = ref(getQueryFromRoute())
 
+/**
+ * Loads all proceudres
+ */
 async function updateProcedures(page: number, queries?: Query<string>) {
   const response = await service.get(itemsPerPage, page, queries?.q)
   if (response.data) {
@@ -27,9 +32,9 @@ async function updateProcedures(page: number, queries?: Query<string>) {
   }
 }
 
-const { getQueryFromRoute, pushQueryToRoute, route } = useQuery<"q">()
-const query = ref(getQueryFromRoute())
-
+/**
+ * Loads documentunits and adds to local value
+ */
 async function loadDocumentUnits(loadingProcedure: Procedure) {
   if (!procedures.value) return
   if (loadingProcedure.documentUnitCount == 0) return
@@ -44,6 +49,11 @@ async function loadDocumentUnits(loadingProcedure: Procedure) {
   )
 }
 
+/**
+ * Lazily loads the documentunits, only when the procedure list is expanded.
+ * When the isExpanded state changes, the procdedure is added/ removed from
+ * the currentlyExpanded procedures list, because the need dynamic css classes accordingly
+ */
 async function handleIsExpanded(
   isExpanded: boolean,
   procedure: Procedure,
@@ -59,6 +69,10 @@ async function handleIsExpanded(
   }
 }
 
+/**
+ * Sets a timeout before pushing the search query to the route,
+ * in order to only change the url params when the user input pauses.
+ */
 const debouncedPushQueryToRoute = (() => {
   let timeoutId: number | null = null
 
@@ -69,16 +83,18 @@ const debouncedPushQueryToRoute = (() => {
   }
 })()
 
-onMounted(() => {
-  updateProcedures(0, query.value)
-})
-
+/**
+ * Get query from url and set local query value
+ */
 watch(route, () => {
   const currentQuery = getQueryFromRoute()
   if (JSON.stringify(query.value) != JSON.stringify(currentQuery))
     query.value = currentQuery
 })
 
+/**
+ * Update procedures with local query value und update after timeout
+ */
 watch(
   query,
   async () => {
@@ -88,10 +104,17 @@ watch(
   { deep: true },
 )
 
+/**
+ * Switching pages closes all expanded items
+ */
 watch(currentPage, (newPage) => {
   if (newPage?.number !== currentPage.value) {
     currentlyExpanded.value = []
   }
+})
+
+onMounted(() => {
+  updateProcedures(0, query.value)
 })
 </script>
 
