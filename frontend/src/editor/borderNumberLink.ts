@@ -29,6 +29,7 @@ export const BorderNumberLink = Mark.create<BorderNumberOptions>({
       {
         class: `font-bold ${color} underline italic before:content-["Rn._"]`,
         valid: valid,
+        nr: mark.attrs.nr,
       },
       0,
     ]

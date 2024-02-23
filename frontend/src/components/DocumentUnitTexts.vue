@@ -7,7 +7,7 @@ import TextInput from "@/components/input/TextInput.vue"
 import { BorderNumberLink } from "@/editor/borderNumberLink"
 import { texts as textsFields } from "@/fields/caselaw"
 
-const props = defineProps<{ texts: Texts }>()
+const props = defineProps<{ texts: Texts; validBorderNumbers: string[] }>()
 
 const emit = defineEmits<{
   updateValue: [updatedValue: [keyof Texts, string]]
@@ -46,7 +46,7 @@ const data = computed(() =>
           editable
           :extensions="[
             BorderNumberLink.configure({
-              validBorderNumbers: ['4', '5', '6'],
+              validBorderNumbers: props.validBorderNumbers,
             }),
           ]"
           :field-size="item.fieldSize"

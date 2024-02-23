@@ -63,6 +63,7 @@ export type Texts = {
   reasons?: string
   caseFacts?: string
   decisionReasons?: string
+  borderNumbers?: string[]
 }
 
 export enum PublicationState {
