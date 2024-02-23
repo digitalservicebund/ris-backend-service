@@ -43,24 +43,20 @@ describe("publishService", () => {
     vi.mock("@/services/httpClient", () => {
       return {
         default: {
-          get: vi
-            .fn()
-            .mockReturnValue({
-              status: 200,
-              data: {
-                statusCode: "400",
-                statusMessages: ["Fehler 1", "Fehler 2"],
-              },
-            }),
-          put: vi
-            .fn()
-            .mockReturnValue({
-              status: 200,
-              data: {
-                statusCode: "400",
-                statusMessages: ["Fehler 1", "Fehler 2"],
-              },
-            }),
+          get: vi.fn().mockReturnValue({
+            status: 200,
+            data: {
+              statusCode: "400",
+              statusMessages: ["Fehler 1", "Fehler 2"],
+            },
+          }),
+          put: vi.fn().mockReturnValue({
+            status: 200,
+            data: {
+              statusCode: "400",
+              statusMessages: ["Fehler 1", "Fehler 2"],
+            },
+          }),
         },
       }
     })
