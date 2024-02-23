@@ -56,6 +56,7 @@ spring:
             scope:
               - openid
               - profile
+              - email
       resourceserver:
         jwt:
           issuer-uri: ${OAUTH2_CLIENT_ISSUER:}

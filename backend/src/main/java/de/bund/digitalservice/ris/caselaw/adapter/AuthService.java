@@ -145,7 +145,7 @@ public class AuthService {
     ApiKeyDTO apiKeyDTO =
         ApiKeyDTO.builder()
             .apiKey(rsg.generate(64))
-            .userAccount(userService.getEmail(oidcUser))
+            .userAccount(oidcUser.getEmail())
             .documentationOffice(documentationOfficeDTO)
             .createdAt(Instant.now())
             .validUntil(Instant.now().plus(30, ChronoUnit.DAYS))
