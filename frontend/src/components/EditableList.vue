@@ -47,11 +47,7 @@ function cancelEdit() {
 function addNewListEntry() {
   const { defaultValue } = props
   modelValueList.value.push(
-    typeof defaultValue === "object"
-      ? {
-          ...defaultValue,
-        }
-      : defaultValue,
+    typeof defaultValue === "object" ? { ...defaultValue } : defaultValue,
   )
 
   editIndex.value = modelValueList.value.length - 1
@@ -89,7 +85,9 @@ function updateModel() {
 watch(
   () => props.modelValue,
   () => {
-    modelValueList.value = props.modelValue
+    modelValueList.value = modelValueList.value.map((value, index) =>
+      index == editIndex.value ? value : props.modelValue[index],
+    )
   },
   {
     immediate: true,
