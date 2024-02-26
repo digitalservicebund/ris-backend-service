@@ -420,7 +420,7 @@ public class DocxTableBuilder extends DocxBuilder {
         case DASHED:
           type = "dashed";
           break;
-        case NONE:
+        case NONE, NIL:
           type = "none";
           break;
         default:
