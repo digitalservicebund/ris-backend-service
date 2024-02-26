@@ -39,7 +39,7 @@ export const BorderNumberLink = Mark.create<BorderNumberOptions>({
   addInputRules() {
     return [
       markInputRule({
-        find: /(?:^|\s)((?:#)((?:[^#]+))(?:#))$/,
+        find: /(?:^|\s)(#([^#]+)#)$/,
         type: this.type,
         getAttributes(match) {
           return { nr: match[2] }
