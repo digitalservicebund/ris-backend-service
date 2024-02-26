@@ -17,14 +17,14 @@ public class DocumentNumberFormatter {
   @NonNull final Year year;
 
   @Min(value = 0, message = "Doc number must be positive")
-  int docNumber;
+  int documentNumber;
 
   @NotEmpty
-  @Size(min = 13, max = 14, message = "Pattern support 13 chars only")
+  @Size(min = 13, max = 14, message = "Pattern supports 13-14 chars only")
   final String pattern;
 
   public String generate() throws DocumentNumberFormatterException {
-    return fillCounter(fillYear(pattern));
+    return fillSequenceNumber(fillYear(pattern));
   }
 
   private String fillYear(String pattern) throws DocumentNumberFormatterException {
@@ -36,20 +36,14 @@ public class DocumentNumberFormatter {
         "Y | YY | YYY | YYYY must be provided in the format");
   }
 
-  private String fillCounter(String pattern) throws DocumentNumberFormatterException {
-    String asteriskString =
-        pattern
-            .chars()
-            .filter(ch -> ch == '*')
-            .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
-            .toString();
+  private String fillSequenceNumber(String pattern) throws DocumentNumberFormatterException {
+    int sequentialDigits = StringUtils.countMatches(pattern, "*");
+    DecimalFormat decimalFormat = new DecimalFormat("0".repeat(sequentialDigits));
+    String docNumberString = decimalFormat.format(documentNumber);
 
-    DecimalFormat decimalFormat = new DecimalFormat(asteriskString.replace("*", "0"));
-    String docNumberString = decimalFormat.format(docNumber);
-
-    if (docNumberString.length() > asteriskString.length()) {
+    if (docNumberString.length() > sequentialDigits) {
       throw new DocumentNumberFormatterException("Doc number is bigger than the * amount");
     }
-    return pattern.replace(asteriskString, docNumberString);
+    return pattern.replace("*".repeat(sequentialDigits), docNumberString);
   }
 }

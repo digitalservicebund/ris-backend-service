@@ -30,6 +30,19 @@ public class DatabaseDocumentNumberGeneratorService implements DocumentNumberSer
     this.databaseDocumentationUnitRepository = databaseDocumentationUnitRepository;
   }
 
+  /**
+   * A recursive function to attempt generating a document office identifier by incrementing the
+   * sequence up to a maximum number of tries. If the pattern is incorrect or there are no available
+   * document numbers left, the function will terminate with an error.
+   *
+   * @param documentationOfficeAbbreviation The abbreviation of the documentation office.
+   * @param maxTries The maximum number of attempts to generate the document number.
+   * @return The generated next available document number to use.
+   * @throws DocumentNumberPatternException If the pattern for generating document numbers is
+   *     invalid.
+   * @throws DocumentNumberFormatterException If there is an issue with formatting the document
+   *     number.
+   */
   @Override
   public String execute(String documentationOfficeAbbreviation, int maxTries)
       throws DocumentNumberPatternException, DocumentNumberFormatterException {
@@ -43,37 +56,49 @@ public class DatabaseDocumentNumberGeneratorService implements DocumentNumberSer
     }
   }
 
+  /**
+   * Executes the generation of a document number for the provided documentation office.
+   *
+   * @param documentationOfficeAbbreviation The abbreviation of the documentation office. Must not
+   *     be empty.
+   * @return The generated next available document number to use.
+   * @throws DocumentNumberPatternException If the pattern for generating document numbers is
+   *     invalid.
+   * @throws DocumentationUnitExistsException If a documentation unit already exists.
+   * @throws DocumentNumberFormatterException If there is an issue with formatting the document
+   *     number.
+   */
   @Override
-  public String execute(@NotEmpty String docUnitAbbreviation)
+  public String execute(@NotEmpty String documentationOfficeAbbreviation)
       throws DocumentNumberPatternException,
           DocumentationUnitExistsException,
           DocumentNumberFormatterException {
-    if (StringsUtil.returnTrueIfNullOrBlank(docUnitAbbreviation)) {
+    if (StringsUtil.returnTrueIfNullOrBlank(documentationOfficeAbbreviation)) {
       throw new DocumentNumberPatternException(
           "Documentation Office abbreviation can not be empty");
     }
     String pattern =
         documentNumberPatternConfig
             .getDocumentNumberPatterns()
-            .getOrDefault(docUnitAbbreviation, null);
+            .getOrDefault(documentationOfficeAbbreviation, null);
 
     if (pattern == null) {
       throw new DocumentNumberPatternException(
-          "Could not find pattern for abbreviation " + docUnitAbbreviation);
+          "Could not find pattern for abbreviation " + documentationOfficeAbbreviation);
     }
 
     DocumentNumberDTO documentNumberDTO =
         repository
-            .findById(docUnitAbbreviation)
+            .findById(documentationOfficeAbbreviation)
             .orElse(
                 DocumentNumberDTO.builder()
-                    .documentationOfficeAbbreviation(docUnitAbbreviation)
+                    .documentationOfficeAbbreviation(documentationOfficeAbbreviation)
                     .lastNumber(0)
                     .build());
 
     String documentNumber =
         DocumentNumberFormatter.builder()
-            .docNumber(documentNumberDTO.increaseLastNumber())
+            .documentNumber(documentNumberDTO.increaseLastNumber())
             .year(DateUtil.getYear())
             .pattern(pattern)
             .build()
@@ -86,6 +111,12 @@ public class DatabaseDocumentNumberGeneratorService implements DocumentNumberSer
     return documentNumber;
   }
 
+  /**
+   * Validate document number not exists in the database
+   *
+   * @param documentNumber
+   * @throws DocumentationUnitExistsException
+   */
   public void assertNotExists(String documentNumber) throws DocumentationUnitExistsException {
     if (databaseDocumentationUnitRepository.findByDocumentNumber(documentNumber).isPresent()) {
       throw new DocumentationUnitExistsException(

@@ -33,7 +33,11 @@ class DocumentNumberFormatterTest {
     Year currentYear = DateUtil.getYear();
     var prefix = pattern.substring(0, pattern.indexOf('*'));
     DocumentNumberFormatter documentNumberFormatter =
-        DocumentNumberFormatter.builder().pattern(pattern).year(currentYear).docNumber(2).build();
+        DocumentNumberFormatter.builder()
+            .pattern(pattern)
+            .year(currentYear)
+            .documentNumber(2)
+            .build();
 
     var result = documentNumberFormatter.generate();
 
@@ -50,7 +54,11 @@ class DocumentNumberFormatterTest {
     var currentYear = DateUtil.getYear();
     String format = "BSRE1******YY";
     DocumentNumberFormatter documentNumberFormatter =
-        DocumentNumberFormatter.builder().pattern(format).year(currentYear).docNumber(1).build();
+        DocumentNumberFormatter.builder()
+            .pattern(format)
+            .year(currentYear)
+            .documentNumber(1)
+            .build();
 
     var result = documentNumberFormatter.generate();
 
@@ -62,7 +70,11 @@ class DocumentNumberFormatterTest {
     var currentYear = DateUtil.getYear();
     String format = "BSRE1****YYYY";
     DocumentNumberFormatter documentNumberFormatter =
-        DocumentNumberFormatter.builder().pattern(format).year(currentYear).docNumber(1).build();
+        DocumentNumberFormatter.builder()
+            .pattern(format)
+            .year(currentYear)
+            .documentNumber(1)
+            .build();
 
     var result = documentNumberFormatter.generate();
 
@@ -77,7 +89,7 @@ class DocumentNumberFormatterTest {
         DocumentNumberFormatter.builder()
             .pattern(pattern)
             .year(DateUtil.getYear())
-            .docNumber(10000)
+            .documentNumber(10000)
             .build();
 
     Exception exception =
@@ -90,11 +102,14 @@ class DocumentNumberFormatterTest {
   }
 
   @Test // TODO: Fix lombok annotation validator.
-  @Disabled("Lombok annotation validation does not work.")
+  @Disabled("Lombok annotation validation pass through Jakarta, see RISDEV-3374")
   void shouldThrownExceptionWhenDocNumberWithNegativeDocNumber() {
     String pattern = "BSGRE1****YY";
     var documentNumberFormatter =
-        DocumentNumberFormatter.builder().pattern(pattern).year(DateUtil.getYear()).docNumber(-4);
+        DocumentNumberFormatter.builder()
+            .pattern(pattern)
+            .year(DateUtil.getYear())
+            .documentNumber(-4);
     assertThatThrownBy(documentNumberFormatter::build)
         .isInstanceOf(ConstraintViolationException.class)
         .hasMessageContaining("Doc number must be positive");
