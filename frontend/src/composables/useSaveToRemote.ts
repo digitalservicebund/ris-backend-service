@@ -33,9 +33,10 @@ export function useSaveToRemote(
       if (lastSaveError.value == undefined) {
         lastSavedOn.value = new Date()
       } else {
-        Sentry.captureException(lastSaveError.value, {
-          tags: { type: "save_failed" },
-        })
+        Sentry.captureMessage(
+          "save_failed: " + JSON.stringify(lastSaveError.value),
+          "error",
+        )
       }
     } catch (error) {
       lastSaveError.value = { title: "Verbindung fehlgeschlagen" }
