@@ -28,7 +28,6 @@ public class StatusDTO {
   @Id @GeneratedValue UUID id;
 
   @Column(name = "created_at")
-  @GeneratedValue
   private Instant createdAt;
 
   @Column(name = "publication_status")
