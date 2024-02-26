@@ -3,6 +3,7 @@ import { render, fireEvent, screen } from "@testing-library/vue"
 import { createRouter, createWebHistory } from "vue-router"
 import PublicationDocument from "@/components/PublicationDocument.vue"
 import DocumentUnit from "@/domain/documentUnit"
+import publishService from "@/services/publishService"
 
 const router = createRouter({
   history: createWebHistory(),
@@ -56,7 +57,6 @@ const setupWithAllRequiredFields = () =>
           },
         },
       }),
-      preview: { xml: "<xml>all good</xml>", statusCode: "200" },
     },
     global: {
       plugins: [router],
@@ -64,6 +64,16 @@ const setupWithAllRequiredFields = () =>
   })
 
 describe("PublicationDocument:", () => {
+  vi.spyOn(publishService, "getPreview").mockImplementation(() =>
+    Promise.resolve({
+      status: 200,
+      data: {
+        xml: "<xml>all good</xml>",
+        statusCode: "200",
+      },
+    }),
+  )
+
   describe("renders plausibility check", () => {
     it("with all required fields filled", async () => {
       setupWithAllRequiredFields()
@@ -266,7 +276,6 @@ describe("PublicationDocument:", () => {
             },
           },
         }),
-        preview: { xml: "<xml>all good</xml>", statusCode: "200" },
       },
       global: {
         plugins: [router],
@@ -277,6 +286,10 @@ describe("PublicationDocument:", () => {
         },
       },
     })
+
+    expect(
+      await screen.findByText("XML Vorschau der Veröffentlichung"),
+    ).toBeInTheDocument()
 
     await fireEvent.click(screen.getByText("XML Vorschau der Veröffentlichung"))
     const codeSnippet = screen.queryByTestId("code-snippet")

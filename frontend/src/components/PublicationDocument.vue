@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref, computed } from "vue"
+import { ref, computed, onMounted } from "vue"
 import { RouterLink } from "vue-router"
 import ExpandableContent from "./ExpandableContent.vue"
 import CodeSnippet from "@/components/CodeSnippet.vue"
@@ -18,6 +18,7 @@ import PreviousDecision, {
 import XmlMail, { PublicationHistoryRecordType } from "@/domain/xmlMail"
 import { fieldLabels } from "@/fields/caselaw"
 import { ResponseError } from "@/services/httpClient"
+import publishService from "@/services/publishService"
 import IconCheck from "~icons/ic/baseline-check"
 import IconErrorOutline from "~icons/ic/baseline-error-outline"
 import IconKeyboardArrowDown from "~icons/ic/baseline-keyboard-arrow-down"
@@ -26,7 +27,6 @@ import IconPublish from "~icons/ic/outline-campaign"
 
 const props = defineProps<{
   documentUnit: DocumentUnit
-  preview?: XmlMail
   publishResult?: XmlMail
   publicationLog?: XmlMail[]
   errorMessage?: ResponseError
@@ -45,8 +45,24 @@ const isFirstTimePublication = computed(() => {
   return !props.publicationLog || props.publicationLog.length === 0
 })
 
+const preview = ref<XmlMail>()
 const frontendError = ref()
-const errorMessage = computed(() => frontendError.value ?? props.errorMessage)
+const previewError = ref()
+const errorMessage = computed(
+  () => frontendError.value ?? previewError.value ?? props.errorMessage,
+)
+
+onMounted(async () => {
+  if (fieldsMissing.value) return
+  const previewResponse = await publishService.getPreview(
+    props.documentUnit.uuid,
+  )
+  if (previewResponse.error) {
+    previewError.value = previewResponse.error
+  } else if (previewResponse.data?.xml) {
+    preview.value = previewResponse.data
+  }
+})
 
 function publishDocumentUnit() {
   if (fieldsMissing.value) {
