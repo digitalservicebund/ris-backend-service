@@ -32,8 +32,8 @@ public class RisSearchController {
   public Mono<ResponseEntity<String>> callRisSearchEndpoint(
       @AuthenticationPrincipal OidcUser oidcUser,
       @RequestParam String query,
-      @RequestParam String sz,
-      @RequestParam String pg) {
+      @RequestParam int sz,
+      @RequestParam int pg) {
     return userService
         .getDocumentationOffice(oidcUser)
         .flatMap(

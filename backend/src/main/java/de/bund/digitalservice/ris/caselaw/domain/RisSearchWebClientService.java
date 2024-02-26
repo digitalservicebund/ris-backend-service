@@ -30,7 +30,7 @@ public class RisSearchWebClientService {
   }
 
   public Mono<ResponseEntity<String>> callEndpoint(
-      String query, String sz, String pg, DocumentationOffice documentationOffice) {
+      String query, int sz, int pg, DocumentationOffice documentationOffice) {
     AtomicReference<HttpStatusCode> statusCode = new AtomicReference<>();
 
     return webClient
@@ -48,7 +48,7 @@ public class RisSearchWebClientService {
         .map(responseBody -> ResponseEntity.status(statusCode.get()).body(responseBody));
   }
 
-  private String buildUrl(String query, String sz, String pg, String docOfficeAbbreviation) {
+  private String buildUrl(String query, int sz, int pg, String docOfficeAbbreviation) {
     return UriComponentsBuilder.fromHttpUrl(risSearchUrl)
         .queryParam("query", query)
         .queryParam("sz", sz)

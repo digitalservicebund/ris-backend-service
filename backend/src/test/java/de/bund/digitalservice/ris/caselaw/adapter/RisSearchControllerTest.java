@@ -2,6 +2,7 @@ package de.bund.digitalservice.ris.caselaw.adapter;
 
 import static de.bund.digitalservice.ris.caselaw.AuthUtils.buildDefaultDocOffice;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
@@ -46,7 +47,7 @@ class RisSearchControllerTest {
 
     when(userService.getDocumentationOffice(any())).thenReturn(Mono.just(docOffice));
 
-    when(webClientService.callEndpoint(anyString(), anyString(), anyString(), any()))
+    when(webClientService.callEndpoint(anyString(), anyInt(), anyInt(), any()))
         .thenReturn(Mono.just(mockResponse));
 
     risWebClient
@@ -66,7 +67,7 @@ class RisSearchControllerTest {
     when(userService.getDocumentationOffice(any())).thenReturn(Mono.just(docOffice));
 
     ResponseEntity<String> mockResponse = ResponseEntity.badRequest().body("some content");
-    when(webClientService.callEndpoint(anyString(), anyString(), anyString(), any()))
+    when(webClientService.callEndpoint(anyString(), anyInt(), anyInt(), any()))
         .thenReturn(Mono.just(mockResponse));
 
     risWebClient
