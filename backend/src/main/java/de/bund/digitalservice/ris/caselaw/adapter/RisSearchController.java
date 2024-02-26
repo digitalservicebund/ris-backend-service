@@ -33,11 +33,12 @@ public class RisSearchController {
       @AuthenticationPrincipal OidcUser oidcUser,
       @RequestParam String query,
       @RequestParam int sz,
-      @RequestParam int pg) {
+      @RequestParam int pg,
+      @RequestParam String sort) {
     return userService
         .getDocumentationOffice(oidcUser)
         .flatMap(
             documentationOffice ->
-                risSearchWebClientService.callEndpoint(query, sz, pg, documentationOffice));
+                risSearchWebClientService.callEndpoint(query, sz, pg, sort, documentationOffice));
   }
 }

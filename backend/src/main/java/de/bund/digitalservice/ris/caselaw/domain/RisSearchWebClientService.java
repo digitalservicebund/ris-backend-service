@@ -30,12 +30,12 @@ public class RisSearchWebClientService {
   }
 
   public Mono<ResponseEntity<String>> callEndpoint(
-      String query, int sz, int pg, DocumentationOffice documentationOffice) {
+      String query, int sz, int pg, String sort, DocumentationOffice documentationOffice) {
     AtomicReference<HttpStatusCode> statusCode = new AtomicReference<>();
 
     return webClient
         .get()
-        .uri(buildUrl(query, sz, pg, documentationOffice.abbreviation()))
+        .uri(buildUrl(query, sz, pg, sort, documentationOffice.abbreviation()))
         .headers(headers -> headers.setBasicAuth(risSearchUsername, risSearchPassword))
         .retrieve()
         .onStatus(
@@ -48,11 +48,12 @@ public class RisSearchWebClientService {
         .map(responseBody -> ResponseEntity.status(statusCode.get()).body(responseBody));
   }
 
-  private String buildUrl(String query, int sz, int pg, String docOfficeAbbreviation) {
+  private String buildUrl(String query, int sz, int pg, String sort, String docOfficeAbbreviation) {
     return UriComponentsBuilder.fromHttpUrl(risSearchUrl)
         .queryParam("query", query)
         .queryParam("sz", sz)
         .queryParam("pg", pg)
+        .queryParam("sort", sort)
         .queryParam("documentationOfficeAbbreviation", docOfficeAbbreviation)
         .toUriString();
   }

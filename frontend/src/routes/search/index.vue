@@ -1,9 +1,11 @@
 <script lang="ts" setup>
 import dayjs from "dayjs"
-import { ref } from "vue"
+import { ref, watch } from "vue"
+import DropdownInput from "@/components/input/DropdownInput.vue"
 import InputField from "@/components/input/InputField.vue"
 import TextButton from "@/components/input/TextButton.vue"
 import TextInput from "@/components/input/TextInput.vue"
+import { DropdownItem } from "@/components/input/types"
 import Pagination, { Page } from "@/components/Pagination.vue"
 import httpClient, {
   FailedValidationServerResponse,
@@ -19,6 +21,16 @@ const currentPage = ref<Page<SearchApiDataDTO> | undefined>()
 const itemsPerPage = 100
 const pageNumber = ref<number>(0)
 
+const currentSorting = ref("default")
+
+const sortingDropdownItems: DropdownItem[] = [
+  { label: "Relevanz (Standard)", value: "default" },
+  { label: "Dokumentnummer", value: "document_number-asc" },
+  { label: "-Dokumentnummer", value: "document_number-desc" },
+  { label: "Entscheidungsdatum", value: "decision_date-asc" },
+  { label: "-Entscheidungsdatum", value: "decision_date-desc" },
+]
+
 type DocumentType = "CASELAW" | "LEGISLATION"
 
 type SearchApiDataDTO = {
@@ -30,6 +42,12 @@ type SearchApiDataDTO = {
   documentSubType: string
   documentType: DocumentType
 }
+
+watch(currentSorting, () => {
+  if (searchInput.value) {
+    search()
+  }
+})
 
 async function handleSearchSubmit() {
   if (!searchInput.value) {
@@ -52,7 +70,7 @@ async function search() {
     const response = await httpClient.get<
       Page<SearchApiDataDTO> | FailedValidationServerResponse
     >(
-      `search?query=${encodeURIComponent(searchInput.value)}&sz=${itemsPerPage}&pg=${pageNumber.value}`,
+      `search?query=${encodeURIComponent(searchInput.value)}&sz=${itemsPerPage}&pg=${pageNumber.value}&sort=${currentSorting.value}`,
       {
         timeout: TIMEOUT,
       },
@@ -174,6 +192,18 @@ function buildResultCountString() {
         </router-link>
       </div>
       <p :class="{ 'text-red-700': hasError }">{{ message }}</p>
+    </div>
+    <div class="flex items-center justify-end gap-8">
+      <label class="ds-label" for="sorting">Sorting:</label>
+      <div class="w-auto">
+        <DropdownInput
+          id="sorting"
+          v-model="currentSorting"
+          aria-label="Sortierung"
+          class="ds-select-small"
+          :items="sortingDropdownItems"
+        />
+      </div>
     </div>
     <Pagination
       :is-loading="isLoading"

@@ -47,7 +47,7 @@ class RisSearchControllerTest {
 
     when(userService.getDocumentationOffice(any())).thenReturn(Mono.just(docOffice));
 
-    when(webClientService.callEndpoint(anyString(), anyInt(), anyInt(), any()))
+    when(webClientService.callEndpoint(anyString(), anyInt(), anyInt(), anyString(), any()))
         .thenReturn(Mono.just(mockResponse));
 
     risWebClient
@@ -67,7 +67,7 @@ class RisSearchControllerTest {
     when(userService.getDocumentationOffice(any())).thenReturn(Mono.just(docOffice));
 
     ResponseEntity<String> mockResponse = ResponseEntity.badRequest().body("some content");
-    when(webClientService.callEndpoint(anyString(), anyInt(), anyInt(), any()))
+    when(webClientService.callEndpoint(anyString(), anyInt(), anyInt(), anyString(), any()))
         .thenReturn(Mono.just(mockResponse));
 
     risWebClient
