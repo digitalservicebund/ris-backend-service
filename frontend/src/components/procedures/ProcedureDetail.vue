@@ -1,11 +1,12 @@
 <script lang="ts" setup>
 import { computed } from "vue"
 import DocumentUnitList from "@/components/DocumentUnitList.vue"
-import LoadingSpinner from "@/components/LoadingSpinner.vue"
 import { Procedure } from "@/domain/documentUnit"
+import { ResponseError } from "@/services/httpClient"
 
 const props = defineProps<{
   procedure: Procedure
+  responseError?: ResponseError
 }>()
 
 /**
@@ -17,18 +18,13 @@ const isLoading = computed(
 </script>
 
 <template>
-  <div
-    v-if="isLoading"
-    class="grid justify-items-center bg-white bg-opacity-60"
-  >
-    <LoadingSpinner />
-  </div>
-  <div v-else-if="procedure.documentUnits" class="pb-12 pl-24 pr-48 pt-36">
+  <div v-if="procedure.documentUnits" class="pb-12 pl-24 pr-48 pt-36">
     <DocumentUnitList
       class="grow"
       :document-unit-list-entries="procedure.documentUnits"
       :is-deletable="false"
       :is-loading="isLoading"
+      :search-response-error="responseError"
     >
     </DocumentUnitList>
   </div>

@@ -20,6 +20,7 @@ const currentPage = ref<Page<Procedure>>()
 const currentlyExpanded = ref<number[]>([])
 const { getQueryFromRoute, pushQueryToRoute, route } = useQuery<"q">()
 const query = ref(getQueryFromRoute())
+const responseError = ref()
 
 /**
  * Loads all proceudres
@@ -38,11 +39,19 @@ async function updateProcedures(page: number, queries?: Query<string>) {
  * Loads documentunits and adds to local value
  */
 async function loadDocumentUnits(loadingProcedure: Procedure) {
+  if (responseError.value) {
+    responseError.value = undefined
+  }
   if (!procedures.value) return
   if (loadingProcedure.documentUnitCount == 0) return
   if (loadingProcedure.documentUnits) return
 
   const response = await service.getDocumentUnits(loadingProcedure.id)
+
+  if (response.error) {
+    responseError.value = response.error
+    return
+  }
 
   procedures.value = procedures.value.map((procedure) =>
     procedure.label == loadingProcedure.label
@@ -189,7 +198,10 @@ onMounted(() => {
             </div>
           </template>
 
-          <ProcedureDetail :procedure="procedure" />
+          <ProcedureDetail
+            :procedure="procedure"
+            :response-error="responseError"
+          />
         </ExpandableContent>
       </Pagination>
     </div>
