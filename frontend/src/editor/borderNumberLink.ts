@@ -6,6 +6,7 @@ export interface BorderNumberOptions {
 
 export const BorderNumberLink = Mark.create<BorderNumberOptions>({
   name: "BorderNumberLink",
+  inclusive: false,
 
   addOptions() {
     return {
