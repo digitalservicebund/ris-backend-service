@@ -69,11 +69,15 @@ test.describe("search", () => {
     //results
     await page.getByLabel("Dokumentnummer Suche").fill(documentNumber)
     await page.getByLabel("Nach Dokumentationseinheiten suchen").click()
-    await expect(
-      page.locator(".table-row", {
-        hasText: documentNumber,
-      }),
-    ).toBeVisible()
+    await expect
+      .poll(async () =>
+        page
+          .locator(".table-row", {
+            hasText: documentNumber,
+          })
+          .count(),
+      )
+      .toBe(1)
 
     //no results
     await page.getByLabel("Dokumentnummer Suche").fill("wrong document number")
@@ -215,8 +219,7 @@ test.describe("search", () => {
       .toBeGreaterThanOrEqual(1)
   })
 
-  // eslint-disable-next-line playwright/no-skipped-test
-  test.skip("search results between two dates", async ({
+  test("search results between two dates", async ({
     page,
     prefilledDocumentUnit,
     secondPrefilledDocumentUnit,
@@ -363,101 +366,6 @@ test.describe("search", () => {
     await secondDate.clear()
     await secondDate.fill("29.02.2022")
     await expect(secondDateInput.getByText("Kein valides Datum")).toBeVisible()
-  })
-
-  // eslint-disable-next-line playwright/no-skipped-test
-  test.skip("search for status", async ({ pageWithBghUser }) => {
-    await pageWithBghUser.goto("/")
-
-    const docofficeOnly = pageWithBghUser.getByLabel(
-      "Nur meine Dokstelle Filter",
-    )
-    await docofficeOnly.click()
-
-    await pageWithBghUser
-      .getByLabel("Nach Dokumentationseinheiten suchen")
-      .click()
-
-    await expect
-      .poll(async () => pageWithBghUser.getByText("unveröffentlicht").count())
-      .toBeGreaterThanOrEqual(1)
-
-    const select = pageWithBghUser.locator(`select[id="status"]`)
-    await select.selectOption("Veröffentlicht")
-
-    await pageWithBghUser
-      .getByLabel("Nach Dokumentationseinheiten suchen")
-      .click()
-
-    await expect
-      .poll(async () => pageWithBghUser.getByText("veröffentlicht").count())
-      .toBeGreaterThanOrEqual(1)
-
-    await expect(pageWithBghUser.getByText("unveröffentlicht")).toBeHidden()
-  })
-
-  // Filtern auf Fehler
-  // eslint-disable-next-line playwright/no-skipped-test
-  test.skip("filter for documentunits with errors only", async ({
-    pageWithBghUser,
-  }) => {
-    await pageWithBghUser.goto("/")
-
-    const docofficeOnly = pageWithBghUser.getByLabel(
-      "Nur meine Dokstelle Filter",
-    )
-    const errorsOnly = pageWithBghUser.getByLabel(
-      "Nur fehlerhafte Dokumentationseinheiten",
-    )
-
-    const select = pageWithBghUser.locator(`select[id="status"]`)
-    await select.selectOption("Veröffentlicht")
-    await pageWithBghUser
-      .getByLabel("Nach Dokumentationseinheiten suchen")
-      .click()
-
-    await expect
-      .poll(async () => pageWithBghUser.getByText("XXRE").count())
-      .toBeGreaterThanOrEqual(1)
-
-    await select.selectOption("Alle")
-    await docofficeOnly.click()
-
-    await pageWithBghUser
-      .getByLabel("Nach Dokumentationseinheiten suchen")
-      .click()
-
-    await expect
-      .poll(async () => pageWithBghUser.getByText("KORE").count())
-      .toBeGreaterThanOrEqual(1)
-
-    await expect(pageWithBghUser.getByText("XXRE")).toBeHidden()
-
-    await errorsOnly.click()
-    await pageWithBghUser
-      .getByLabel("Nach Dokumentationseinheiten suchen")
-      .click()
-
-    await expect
-      .poll(async () =>
-        pageWithBghUser.getByText("Nicht veröffentlicht (Fehler)").count(),
-      )
-      .toBeGreaterThanOrEqual(1)
-
-    await docofficeOnly.click()
-    await expect(errorsOnly).toBeHidden()
-
-    await pageWithBghUser
-      .getByLabel("Nach Dokumentationseinheiten suchen")
-      .click()
-
-    await expect
-      .poll(async () => pageWithBghUser.getByText("unveröffentlicht").count())
-      .toBeGreaterThanOrEqual(1)
-
-    //unclick my dokstelle should also reset errors only filter
-    await docofficeOnly.click()
-    await expect(errorsOnly).not.toBeChecked()
   })
 
   // Suche zurücksetzen
