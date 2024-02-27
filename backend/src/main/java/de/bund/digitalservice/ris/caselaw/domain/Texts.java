@@ -1,6 +1,5 @@
 package de.bund.digitalservice.ris.caselaw.domain;
 
-import java.util.List;
 import lombok.Builder;
 
 @Builder
@@ -12,5 +11,4 @@ public record Texts(
     String tenor,
     String reasons,
     String caseFacts,
-    String decisionReasons,
-    List<String> borderNumbers) {}
+    String decisionReasons) {}

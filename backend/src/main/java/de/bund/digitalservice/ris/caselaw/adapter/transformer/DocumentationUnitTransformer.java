@@ -501,13 +501,14 @@ public class DocumentationUnitTransformer {
             .reasons(documentationUnitDTO.getGrounds())
             .caseFacts(documentationUnitDTO.getCaseFacts())
             .decisionReasons(documentationUnitDTO.getDecisionGrounds())
-            .borderNumbers(
-                extractBorderNumbers(
-                    documentationUnitDTO.getTenor(),
-                    documentationUnitDTO.getGrounds(),
-                    documentationUnitDTO.getCaseFacts(),
-                    documentationUnitDTO.getDecisionGrounds()))
             .build();
+
+    List<String> borderNumbers =
+        extractBorderNumbers(
+            documentationUnitDTO.getTenor(),
+            documentationUnitDTO.getGrounds(),
+            documentationUnitDTO.getCaseFacts(),
+            documentationUnitDTO.getDecisionGrounds());
 
     if (documentationUnitDTO.getOriginalFileDocument() != null) {
       OriginalFileDocumentDTO originalFileDocumentDTO =
@@ -528,6 +529,7 @@ public class DocumentationUnitTransformer {
         .documentNumber(documentationUnitDTO.getDocumentNumber())
         .coreData(coreData)
         .texts(texts)
+        .borderNumbers(borderNumbers)
         .contentRelatedIndexing(contentRelatedIndexing);
 
     addStatusToDomain(documentationUnitDTO, builder);
