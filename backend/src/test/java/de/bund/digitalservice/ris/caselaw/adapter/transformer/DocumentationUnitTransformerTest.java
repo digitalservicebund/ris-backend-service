@@ -7,23 +7,18 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOffi
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO.DocumentationUnitDTOBuilder;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.EnsuingDecisionDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.FileNumberDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.InputTypeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LeadingDecisionNormReferenceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LegalEffectDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PendingDecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.RegionDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.StatusDTO;
 import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData.CoreDataBuilder;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit.DocumentUnitBuilder;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitListEntry;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.EnsuingDecision;
-import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
-import de.bund.digitalservice.ris.caselaw.domain.Status;
 import de.bund.digitalservice.ris.caselaw.domain.Texts;
 import de.bund.digitalservice.ris.caselaw.domain.court.Court;
 import java.util.Collections;
@@ -489,34 +484,6 @@ class DocumentationUnitTransformerTest {
     assertThat(documentUnit.coreData().leadingDecisionNormReferences())
         .hasSize(3)
         .containsExactly("BGB §1", "BGB §2", "BGB §3");
-  }
-
-  @Test
-  void testTransformToMetaDomain() {
-    DocumentationUnitDTO documentationUnitDTO =
-        generateSimpleDTOBuilder()
-            .status(
-                List.of(StatusDTO.builder().publicationStatus(PublicationStatus.PUBLISHED).build()))
-            .fileNumbers(List.of(FileNumberDTO.builder().value("file number").build()))
-            .court(CourtDTO.builder().type("court type").location("court location").build())
-            .build();
-    DocumentUnitListEntry expected =
-        DocumentUnitListEntry.builder()
-            .documentationOffice(DocumentationOffice.builder().abbreviation("doc office").build())
-            .status(Status.builder().publicationStatus(PublicationStatus.PUBLISHED).build())
-            .fileNumber("file number")
-            .court(
-                Court.builder()
-                    .type("court type")
-                    .location("court location")
-                    .label("court type court location")
-                    .build())
-            .build();
-
-    DocumentUnitListEntry result =
-        DocumentationUnitTransformer.transformToMetaDomain(documentationUnitDTO);
-
-    assertThat(result).isEqualTo(expected);
   }
 
   private DocumentationUnitDTOBuilder generateSimpleDTOBuilder() {

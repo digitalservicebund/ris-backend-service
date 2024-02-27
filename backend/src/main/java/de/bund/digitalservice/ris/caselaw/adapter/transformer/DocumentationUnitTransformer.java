@@ -21,8 +21,6 @@ import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData.CoreDataBuilder;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit.DocumentUnitBuilder;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitListEntry;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitListEntry.DocumentUnitListEntryBuilder;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.EnsuingDecision;
 import de.bund.digitalservice.ris.caselaw.domain.LegalEffect;
@@ -793,40 +791,5 @@ public class DocumentationUnitTransformer {
                   });
             });
     return borderNumbers;
-  }
-
-  /**
-   * Transforms a documentation unit from the database representation into a domain object with
-   * reduced information to be shown in a list
-   *
-   * @param documentationUnitDTO the database documentation unit
-   * @return a transformed documentation unit list entry domain object, might be null
-   */
-  public static DocumentUnitListEntry transformToMetaDomain(
-      DocumentationUnitDTO documentationUnitDTO) {
-    DocumentUnitListEntryBuilder builder =
-        DocumentUnitListEntry.builder()
-            .documentNumber(documentationUnitDTO.getDocumentNumber())
-            .documentationOffice(
-                DocumentationOfficeTransformer.transformToDomain(
-                    documentationUnitDTO.getDocumentationOffice()))
-            .documentType(
-                DocumentTypeTransformer.transformToDomain(documentationUnitDTO.getDocumentType()))
-            .decisionDate(documentationUnitDTO.getDecisionDate());
-
-    if (documentationUnitDTO.getFileNumbers() != null
-        && !documentationUnitDTO.getFileNumbers().isEmpty()) {
-      builder.fileNumber(documentationUnitDTO.getFileNumbers().get(0).getValue());
-    }
-
-    if (documentationUnitDTO.getStatus() != null && !documentationUnitDTO.getStatus().isEmpty()) {
-      builder.status(StatusTransformer.transformToDomain(documentationUnitDTO.getStatus().get(0)));
-    }
-
-    if (documentationUnitDTO.getCourt() != null) {
-      builder.court(CourtTransformer.transformToDomain(documentationUnitDTO.getCourt()));
-    }
-
-    return builder.build();
   }
 }

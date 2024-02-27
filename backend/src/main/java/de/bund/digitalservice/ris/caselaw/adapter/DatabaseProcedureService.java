@@ -4,10 +4,10 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumenta
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseProcedureRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitProcedureDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationUnitTransformer;
+import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationUnitSearchResultTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.ProcedureTransformer;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitListEntry;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitSearchResult;
 import de.bund.digitalservice.ris.caselaw.domain.Procedure;
 import de.bund.digitalservice.ris.caselaw.domain.ProcedureService;
 import java.util.List;
@@ -56,7 +56,7 @@ public class DatabaseProcedureService implements ProcedureService {
 
   @Override
   @Transactional(transactionManager = "jpaTransactionManager")
-  public List<DocumentUnitListEntry> getDocumentUnits(UUID procedureId) {
+  public List<DocumentationUnitSearchResult> getDocumentUnits(UUID procedureId) {
     return repository
         .findById(procedureId)
         .map(
@@ -70,7 +70,7 @@ public class DatabaseProcedureService implements ProcedureService {
                           return procedures.get(0).getProcedure().equals(procedureDTO);
                         })
                     .distinct()
-                    .map(DocumentationUnitTransformer::transformToMetaDomain)
+                    .map(DocumentationUnitSearchResultTransformer::transformToDomain)
                     .toList())
         .orElse(null);
   }

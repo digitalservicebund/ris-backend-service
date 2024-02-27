@@ -10,7 +10,7 @@ public interface ProcedureService {
   Page<Procedure> search(
       Optional<String> query, DocumentationOffice documentationOffice, Pageable pageable);
 
-  List<DocumentUnitListEntry> getDocumentUnits(UUID procedureid);
+  List<DocumentationUnitSearchResult> getDocumentUnits(UUID procedureid);
 
   void delete(UUID procedureId);
 }
