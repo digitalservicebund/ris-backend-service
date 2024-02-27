@@ -1,11 +1,9 @@
 <script lang="ts" setup>
-import { Mark } from "@tiptap/core"
-import { computed, ref, watch } from "vue"
+import { computed } from "vue"
 import TextEditor from "../components/input/TextEditor.vue"
 import TextAreaInput from "@/components/input/TextAreaInput.vue"
 import TextInput from "@/components/input/TextInput.vue"
 import { Texts } from "@/domain/documentUnit"
-import { BorderNumberLink } from "@/editor/borderNumberLink"
 import { texts as textsFields } from "@/fields/caselaw"
 
 const props = defineProps<{ texts: Texts; validBorderNumbers: string[] }>()
@@ -14,33 +12,32 @@ const emit = defineEmits<{
   updateValue: [updatedValue: [keyof Texts, string]]
 }>()
 
-function getValidBorderNumbers() {
-  return props.validBorderNumbers
+const validateBorderNumberLinks = (divElem: HTMLDivElement) => {
+  const linkTags = Array.from(
+    divElem.getElementsByTagName("border-number-link"),
+  )
+
+  linkTags.forEach((linkTag) => {
+    const borderNumber = linkTag.getAttribute("nr")
+    const hasBorderNumber = borderNumber
+      ? props.validBorderNumbers.includes(borderNumber)
+      : false
+    linkTag.setAttribute("valid", hasBorderNumber.toString())
+  })
+  return divElem
 }
-
-const extension = ref<Mark>(
-  BorderNumberLink.configure({
-    validBorderNumbers: getValidBorderNumbers,
-  }),
-)
-
-watch(
-  () => props.validBorderNumbers,
-  () => {
-    extension.value = BorderNumberLink.configure({
-      validBorderNumbers: getValidBorderNumbers,
-    })
-  },
-)
 
 const data = computed(() =>
   textsFields.map((item) => {
+    const divElem = document.createElement("div")
+    divElem.innerHTML = props.texts[item.name as keyof Texts] as string
+    const validatedContent = validateBorderNumberLinks(divElem).innerHTML
     return {
       id: item.name as keyof Texts,
       name: item.name,
       label: item.label,
       aria: item.label,
-      value: props.texts[item.name as keyof Texts],
+      value: validatedContent,
       fieldType: item.fieldType,
       fieldSize: item.fieldSize,
     }
@@ -64,7 +61,6 @@ const data = computed(() =>
           :aria-label="item.aria"
           class="ml-2 pl-2 outline outline-2 outline-blue-900"
           editable
-          :extensions="[extension]"
           :field-size="item.fieldSize"
           :value="item.value"
           @update-value="emit('updateValue', [item.id, $event])"

@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import { Extension, Mark } from "@tiptap/core"
 import { Bold } from "@tiptap/extension-bold"
 import { Color } from "@tiptap/extension-color"
 import { Document } from "@tiptap/extension-document"
@@ -34,6 +33,7 @@ import TextEditorButton, {
 } from "@/components/input/TextEditorButton.vue"
 import { TextAreaInputAttributes } from "@/components/input/types"
 import { useCollapsingMenuBar } from "@/composables/useCollapsingMenuBar"
+import { BorderNumberLink } from "@/editor/borderNumberLink"
 import IconExpand from "~icons/ic/baseline-expand"
 import IconAlignJustify from "~icons/ic/baseline-format-align-justify"
 import IconAlignRight from "~icons/ic/baseline-format-align-right"
@@ -53,7 +53,6 @@ interface Props {
   editable?: boolean
   ariaLabel?: string
   fieldSize?: TextAreaInputAttributes["fieldSize"]
-  extensions?: (Extension | Mark)[]
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -61,7 +60,6 @@ const props = withDefaults(defineProps<Props>(), {
   editable: false,
   ariaLabel: "Editor Feld",
   fieldSize: "medium",
-  extensions: undefined,
 })
 
 const emit = defineEmits<{
@@ -86,6 +84,7 @@ const editor = new Editor({
     BorderNumber,
     BorderNumberNumber,
     BorderNumberContent,
+    BorderNumberLink,
     Bold,
     Color,
     FontSize,
@@ -116,7 +115,6 @@ const editor = new Editor({
     History.configure({
       depth: 100,
     }),
-    ...(props.extensions ? props.extensions : []),
   ],
   onUpdate: () => {
     emit("updateValue", editor.getHTML())
@@ -283,14 +281,6 @@ watch(
     }
     // incoming changes
     editor.commands.setContent(value, false)
-  },
-)
-
-watch(
-  () => props.extensions,
-  () => {
-    editor.commands.clearContent()
-    editor.commands.setContent(props.value ? props.value : "")
   },
 )
 

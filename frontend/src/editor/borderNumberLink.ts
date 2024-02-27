@@ -1,18 +1,8 @@
 import { Mark, markInputRule } from "@tiptap/core"
 
-export interface BorderNumberOptions {
-  validBorderNumbers: () => string[]
-}
-
-export const BorderNumberLink = Mark.create<BorderNumberOptions>({
+export const BorderNumberLink = Mark.create({
   name: "BorderNumberLink",
   inclusive: false,
-
-  addOptions() {
-    return {
-      validBorderNumbers: () => [],
-    }
-  },
 
   parseHTML() {
     return [
@@ -23,13 +13,15 @@ export const BorderNumberLink = Mark.create<BorderNumberOptions>({
   },
 
   renderHTML({ mark }) {
-    const valid = this.options.validBorderNumbers().includes(mark.attrs.nr)
-    const color = valid ? "text-blue-800" : "text-red-800"
+    const color =
+      mark.attrs.valid === "true"
+        ? "text-white bg-blue-700"
+        : "text-red-900 bg-red-200"
     return [
       "border-number-link",
       {
-        class: `font-bold ${color} underline italic before:content-["Rn._"]`,
-        valid: valid,
+        class: `font-bold ${color} before:content-["Rd_"]`,
+        valid: mark.attrs.valid,
         nr: mark.attrs.nr,
       },
       0,
@@ -51,10 +43,15 @@ export const BorderNumberLink = Mark.create<BorderNumberOptions>({
   addAttributes() {
     return {
       nr: {
-        default: null,
         parseHTML: (element) => element.getAttribute("nr"),
         renderHTML: (attributes) => ({
           nr: attributes.nr,
+        }),
+      },
+      valid: {
+        parseHTML: (element) => element.getAttribute("valid"),
+        renderHTML: (attributes) => ({
+          valid: attributes.valid,
         }),
       },
     }
