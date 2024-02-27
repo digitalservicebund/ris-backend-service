@@ -7,10 +7,11 @@ import java.util.UUID;
 import lombok.Builder;
 
 /**
- * A record representing the domain object of a minimized documentation unit returned by search,
- * that is suitable to be consumed by clients of the REST service.
+ * Representing the domain object of search results, returned by a search for documentation units.
+ * Has only the most important information of a documentation unit. It is consumed by clients of the
+ * REST service.
  *
- * @param uuid the identifier of the search result
+ * @param uuid (Universal unique identifier) the identifier of the search result
  * @param documentNumber (Dokumentnummer) of the search result
  * @param court (Gericht) of the search result
  * @param fileNumber (Aktenzeichen) of the search result
@@ -18,7 +19,7 @@ import lombok.Builder;
  * @param decisionDate (Entscheidungsdatum) of the search result
  * @param appraisalBody (Spruchkörper) of the search result
  * @param documentType (Dokumenttyp) of the search result
- * @param referencedDocumentationUnitId the id of a referenced documentation units, if search result
+ * @param referencedDocumentationUnitId the id of a referenced documentation unit, if search result
  *     from a search for related documentation units
  * @param status (Status) of the search result
  */
