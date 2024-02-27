@@ -1,7 +1,7 @@
 import { Mark, markInputRule } from "@tiptap/core"
 
 export interface BorderNumberOptions {
-  validBorderNumbers: string[]
+  validBorderNumbers: () => string[]
 }
 
 export const BorderNumberLink = Mark.create<BorderNumberOptions>({
@@ -10,7 +10,7 @@ export const BorderNumberLink = Mark.create<BorderNumberOptions>({
 
   addOptions() {
     return {
-      validBorderNumbers: [],
+      validBorderNumbers: () => [],
     }
   },
 
@@ -23,7 +23,7 @@ export const BorderNumberLink = Mark.create<BorderNumberOptions>({
   },
 
   renderHTML({ mark }) {
-    const valid = this.options.validBorderNumbers.includes(mark.attrs.nr)
+    const valid = this.options.validBorderNumbers().includes(mark.attrs.nr)
     const color = valid ? "text-blue-800" : "text-red-800"
     return [
       "border-number-link",

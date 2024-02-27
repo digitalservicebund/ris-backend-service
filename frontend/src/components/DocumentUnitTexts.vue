@@ -1,9 +1,10 @@
 <script lang="ts" setup>
-import { computed } from "vue"
+import { Mark } from "@tiptap/core"
+import { computed, ref, watch } from "vue"
 import TextEditor from "../components/input/TextEditor.vue"
-import { Texts } from "../domain/documentUnit"
 import TextAreaInput from "@/components/input/TextAreaInput.vue"
 import TextInput from "@/components/input/TextInput.vue"
+import { Texts } from "@/domain/documentUnit"
 import { BorderNumberLink } from "@/editor/borderNumberLink"
 import { texts as textsFields } from "@/fields/caselaw"
 
@@ -12,6 +13,25 @@ const props = defineProps<{ texts: Texts; validBorderNumbers: string[] }>()
 const emit = defineEmits<{
   updateValue: [updatedValue: [keyof Texts, string]]
 }>()
+
+function getValidBorderNumbers() {
+  return props.validBorderNumbers
+}
+
+const extension = ref<Mark>(
+  BorderNumberLink.configure({
+    validBorderNumbers: getValidBorderNumbers,
+  }),
+)
+
+watch(
+  () => props.validBorderNumbers,
+  () => {
+    extension.value = BorderNumberLink.configure({
+      validBorderNumbers: getValidBorderNumbers,
+    })
+  },
+)
 
 const data = computed(() =>
   textsFields.map((item) => {
@@ -44,11 +64,7 @@ const data = computed(() =>
           :aria-label="item.aria"
           class="ml-2 pl-2 outline outline-2 outline-blue-900"
           editable
-          :extensions="[
-            BorderNumberLink.configure({
-              validBorderNumbers: props.validBorderNumbers,
-            }),
-          ]"
+          :extensions="[extension]"
           :field-size="item.fieldSize"
           :value="item.value"
           @update-value="emit('updateValue', [item.id, $event])"

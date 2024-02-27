@@ -286,6 +286,14 @@ watch(
   },
 )
 
+watch(
+  () => props.extensions,
+  () => {
+    editor.commands.clearContent()
+    editor.commands.setContent(props.value ? props.value : "")
+  },
+)
+
 const showButtons = computed(() => props.editable && hasFocus.value)
 
 const ariaLabel = props.ariaLabel ? props.ariaLabel : null
