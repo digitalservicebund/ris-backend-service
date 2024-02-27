@@ -414,7 +414,7 @@ class DocumentationUnitTransformerTest {
     DocumentUnit documentUnit =
         DocumentationUnitTransformer.transformToDomain(documentationUnitDTO);
 
-    assertThat(documentUnit.texts().borderNumbers()).hasSize(2).containsExactly("1", "2");
+    assertThat(documentUnit.borderNumbers()).hasSize(2).containsExactly("1", "2");
   }
 
   @Test
@@ -434,7 +434,7 @@ class DocumentationUnitTransformerTest {
     DocumentUnit documentUnit =
         DocumentationUnitTransformer.transformToDomain(documentationUnitDTO);
 
-    assertThat(documentUnit.texts().borderNumbers()).hasSize(4).containsExactly("1", "2", "3", "4");
+    assertThat(documentUnit.borderNumbers()).hasSize(4).containsExactly("1", "2", "3", "4");
   }
 
   @Test
@@ -445,7 +445,7 @@ class DocumentationUnitTransformerTest {
     DocumentUnit documentUnit =
         DocumentationUnitTransformer.transformToDomain(documentationUnitDTO);
 
-    assertThat(documentUnit.texts().borderNumbers()).isEmpty();
+    assertThat(documentUnit.borderNumbers()).isEmpty();
   }
 
   @Test
@@ -460,7 +460,7 @@ class DocumentationUnitTransformerTest {
     DocumentUnit documentUnit =
         DocumentationUnitTransformer.transformToDomain(documentationUnitDTO);
 
-    assertThat(documentUnit.texts().borderNumbers()).hasSize(1).containsExactly("2");
+    assertThat(documentUnit.borderNumbers()).hasSize(1).containsExactly("2");
   }
 
   @Test
@@ -528,7 +528,8 @@ class DocumentationUnitTransformerTest {
     return DocumentUnit.builder()
         .previousDecisions(Collections.emptyList())
         .ensuingDecisions(Collections.emptyList())
-        .texts(Texts.builder().borderNumbers(Collections.emptyList()).build())
+        .texts(Texts.builder().build())
+        .borderNumbers(Collections.emptyList())
         .contentRelatedIndexing(
             ContentRelatedIndexing.builder()
                 .keywords(Collections.emptyList())

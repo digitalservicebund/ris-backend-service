@@ -25,6 +25,7 @@ import java.lang.reflect.Field;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
@@ -192,6 +193,7 @@ class JurisXmlExporterWrapperIntegrationTest {
             .previousDecisions(previousDecisions)
             .ensuingDecisions(new ArrayList<>())
             .texts(texts)
+            .borderNumbers(Collections.emptyList())
             .contentRelatedIndexing(indexing)
             .status(Status.builder().publicationStatus(PublicationStatus.UNPUBLISHED).build())
             .build();

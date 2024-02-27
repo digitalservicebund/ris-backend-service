@@ -8,7 +8,7 @@ fileignoreconfig:
 - filename: backend/src/test/java/de/bund/digitalservice/ris/caselaw/integration/tests/DeviatingObjectIntegrationTest.java
   checksum: bf5a4257b6b69bad9f9bc1b605a63bcdf93531821705c5fb1319acf95465cf94
 - filename: backend/src/test/java/de/bund/digitalservice/ris/caselaw/integration/tests/JurisXmlExporterWrapperIntegrationTest.java
-  checksum: 3ff40b1d3859300fa13f4041c7de6ec8006909b6edc08ba0be3d67ca4a289889
+  checksum: d3028c315809a47be7f2a77f84ebde1dc235df0ff39fd5bee6c91f5fd8dffe45
 - filename: compose.yaml
   checksum: 14a7e049d82352e4d50e3e2f6c82e87150de461aa7ede5553883cdadb1d446b2
 - filename: doc/structurizr/workspace.json
