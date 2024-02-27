@@ -30,7 +30,7 @@ const validateBorderNumberLinks = (divElem: HTMLDivElement) => {
 const data = computed(() =>
   textsFields.map((item) => {
     const divElem = document.createElement("div")
-    divElem.innerHTML = props.texts[item.name as keyof Texts] as string
+    divElem.innerHTML = props.texts[item.name as keyof Texts] ?? ""
     const validatedContent = validateBorderNumberLinks(divElem).innerHTML
     return {
       id: item.name as keyof Texts,
