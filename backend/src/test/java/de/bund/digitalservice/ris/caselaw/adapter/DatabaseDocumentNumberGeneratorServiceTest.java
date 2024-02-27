@@ -48,10 +48,7 @@ class DatabaseDocumentNumberGeneratorServiceTest {
     when(databaseDocumentationUnitRepository.findByDocumentNumber(nextDocumentNumber))
         .thenReturn(Optional.of(documentationUnitDTO));
 
-    assertThatThrownBy(
-            () -> {
-              service.generateDocumentNumber(abbreviation);
-            })
+    assertThatThrownBy(() -> service.generateDocumentNumber(abbreviation))
         .isInstanceOf(DocumentationUnitExistsException.class);
   }
 
@@ -71,10 +68,7 @@ class DatabaseDocumentNumberGeneratorServiceTest {
     when(databaseDocumentationUnitRepository.findByDocumentNumber(nextDocumentNumber))
         .thenReturn(Optional.of(documentationUnitDTO));
 
-    assertThatThrownBy(
-            () -> {
-              service.generateDocumentNumber(documentationOffice, maxTries);
-            })
+    assertThatThrownBy(() -> service.generateDocumentNumber(documentationOffice, maxTries))
         .isInstanceOf(DocumentationUnitException.class)
         .hasMessageContaining("Could not generate Document number");
   }
@@ -84,10 +78,7 @@ class DatabaseDocumentNumberGeneratorServiceTest {
     var docOfficeAbbreviation = "NOT_IN_NUMBER_PATTERN_PROPERTIES";
     int maxTries = 3;
 
-    assertThatThrownBy(
-            () -> {
-              service.generateDocumentNumber(docOfficeAbbreviation, maxTries);
-            })
+    assertThatThrownBy(() -> service.generateDocumentNumber(docOfficeAbbreviation, maxTries))
         .isInstanceOf(DocumentNumberPatternException.class)
         .hasMessageContaining(
             "Could not " + "find pattern for abbreviation " + docOfficeAbbreviation);

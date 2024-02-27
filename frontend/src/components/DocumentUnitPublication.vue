@@ -21,7 +21,7 @@ const publishResult = ref<XmlMail>()
 const errorMessage = ref<ResponseError>()
 const succeedMessage = ref<{ title: string; description: string }>()
 
-async function publishADocument() {
+async function publishDocument() {
   const response = await publishService.publishDocument(props.documentUnit.uuid)
   publishResult.value = response.data
   if (!publicationLog.value) publicationLog.value = []
@@ -64,11 +64,7 @@ onMounted(async () => {
     props.documentUnit.uuid,
   )
   if (response.data) {
-    loadDone.value = true
     publicationLog.value = response.data
-  }
-
-  if (publicationLog.value) {
     for (const item of publicationLog.value) {
       item.date = formatDate(item.date)
       item.xml = item.xml ? item.xml : ""
@@ -92,7 +88,7 @@ onMounted(async () => {
           :publication-log="publicationLog"
           :publish-result="publishResult"
           :succeed-message="succeedMessage"
-          @publish-a-document="publishADocument"
+          @publish-document="publishDocument"
         />
 
         <div v-else class="spinner">

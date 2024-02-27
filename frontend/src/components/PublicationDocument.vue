@@ -34,7 +34,7 @@ const props = defineProps<{
 }>()
 
 const emits = defineEmits<{
-  publishADocument: []
+  publishDocument: []
 }>()
 
 const categoriesRoute = computed(() => ({
@@ -72,7 +72,7 @@ function publishDocumentUnit() {
         "Die Dokumentationseinheit kann nicht veröffentlicht werden.",
     }
   } else {
-    emits("publishADocument")
+    emits("publishDocument")
   }
 }
 

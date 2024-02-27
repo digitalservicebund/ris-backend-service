@@ -117,7 +117,6 @@ CREATE TABLE IF NOT EXISTS
     documentation_unit_id uuid,
     norm_abbreviation_id uuid,
     date_of_version_raw_value character varying(255) COLLATE pg_catalog."default",
-    legacy_doc_unit_id uuid,
     rank int default -1
   );
 
@@ -598,9 +597,6 @@ CREATE INDEX
 
 CREATE INDEX
   norm_reference_documentation_unit_id_idx ON incremental_migration.norm_reference USING btree (documentation_unit_id);
-
-CREATE INDEX
-  norm_reference_legacy_doc_unit_id_idx ON incremental_migration.norm_reference USING btree (legacy_doc_unit_id);
 
 CREATE INDEX
   norm_reference_norm_abbreviation_id_idx ON incremental_migration.norm_reference USING btree (norm_abbreviation_id);

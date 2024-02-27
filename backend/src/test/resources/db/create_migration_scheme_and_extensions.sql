@@ -755,7 +755,6 @@ CREATE TABLE
     documentation_unit_id uuid,
     norm_abbreviation_id uuid,
     date_of_version_raw_value character varying(255),
-    legacy_doc_unit_id uuid,
     rank integer DEFAULT '-1'::integer NOT NULL
   );
 
@@ -1941,12 +1940,6 @@ CREATE INDEX
 --
 CREATE INDEX
   norm_reference_documentation_unit_id_idx ON incremental_migration.norm_reference USING btree (documentation_unit_id);
-
---
--- Name: norm_reference_legacy_doc_unit_id_idx; Type: INDEX; Schema: incremental_migration; Owner: -
---
-CREATE INDEX
-  norm_reference_legacy_doc_unit_id_idx ON incremental_migration.norm_reference USING btree (legacy_doc_unit_id);
 
 --
 -- Name: norm_reference_norm_abbreviation_id_idx; Type: INDEX; Schema: incremental_migration; Owner: -

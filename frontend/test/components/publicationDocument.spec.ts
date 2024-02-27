@@ -175,7 +175,7 @@ describe("PublicationDocument:", () => {
       })
       await fireEvent.click(publishButton)
 
-      expect(emitted().publishADocument).toBeTruthy()
+      expect(emitted().publishDocument).toBeTruthy()
     })
 
     it("renders error modal from backend", async () => {
