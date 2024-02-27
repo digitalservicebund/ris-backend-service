@@ -50,7 +50,7 @@ class DatabaseDocumentNumberGeneratorServiceTest {
 
     assertThatThrownBy(
             () -> {
-              service.execute(abbreviation);
+              service.generateDocumentNumber(abbreviation);
             })
         .isInstanceOf(DocumentationUnitExistsException.class);
   }
@@ -73,7 +73,7 @@ class DatabaseDocumentNumberGeneratorServiceTest {
 
     assertThatThrownBy(
             () -> {
-              service.execute(documentationOffice, maxTries);
+              service.generateDocumentNumber(documentationOffice, maxTries);
             })
         .isInstanceOf(DocumentationUnitException.class)
         .hasMessageContaining("Could not generate Document number");
@@ -86,7 +86,7 @@ class DatabaseDocumentNumberGeneratorServiceTest {
 
     assertThatThrownBy(
             () -> {
-              service.execute(docOfficeAbbreviation, maxTries);
+              service.generateDocumentNumber(docOfficeAbbreviation, maxTries);
             })
         .isInstanceOf(DocumentNumberPatternException.class)
         .hasMessageContaining(

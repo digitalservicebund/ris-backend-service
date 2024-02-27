@@ -36,7 +36,7 @@ class DocumentNumberFormatterTest {
         DocumentNumberFormatter.builder()
             .pattern(pattern)
             .year(currentYear)
-            .documentNumber(2)
+            .sequenceNumber(2)
             .build();
 
     var result = documentNumberFormatter.generate();
@@ -57,7 +57,7 @@ class DocumentNumberFormatterTest {
         DocumentNumberFormatter.builder()
             .pattern(format)
             .year(currentYear)
-            .documentNumber(1)
+            .sequenceNumber(1)
             .build();
 
     var result = documentNumberFormatter.generate();
@@ -73,7 +73,7 @@ class DocumentNumberFormatterTest {
         DocumentNumberFormatter.builder()
             .pattern(format)
             .year(currentYear)
-            .documentNumber(1)
+            .sequenceNumber(1)
             .build();
 
     var result = documentNumberFormatter.generate();
@@ -89,7 +89,7 @@ class DocumentNumberFormatterTest {
         DocumentNumberFormatter.builder()
             .pattern(pattern)
             .year(DateUtil.getYear())
-            .documentNumber(10000)
+            .sequenceNumber(10000)
             .build();
 
     Exception exception =
@@ -109,7 +109,7 @@ class DocumentNumberFormatterTest {
         DocumentNumberFormatter.builder()
             .pattern(pattern)
             .year(DateUtil.getYear())
-            .documentNumber(-4);
+            .sequenceNumber(-4);
     assertThatThrownBy(documentNumberFormatter::build)
         .isInstanceOf(ConstraintViolationException.class)
         .hasMessageContaining("Doc number must be positive");

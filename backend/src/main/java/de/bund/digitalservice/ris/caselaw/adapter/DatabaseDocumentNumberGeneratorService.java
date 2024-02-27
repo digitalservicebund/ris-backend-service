@@ -44,15 +44,15 @@ public class DatabaseDocumentNumberGeneratorService implements DocumentNumberSer
    *     number.
    */
   @Override
-  public String execute(String documentationOfficeAbbreviation, int maxTries)
+  public String generateDocumentNumber(String documentationOfficeAbbreviation, int maxTries)
       throws DocumentNumberPatternException, DocumentNumberFormatterException {
     try {
-      return execute(documentationOfficeAbbreviation);
+      return generateDocumentNumber(documentationOfficeAbbreviation);
     } catch (DocumentationUnitExistsException e) {
       if (maxTries <= 0) {
         throw new DocumentationUnitException("Could not generate Document number", e);
       }
-      return execute(documentationOfficeAbbreviation, maxTries - 1);
+      return generateDocumentNumber(documentationOfficeAbbreviation, maxTries - 1);
     }
   }
 
@@ -69,7 +69,7 @@ public class DatabaseDocumentNumberGeneratorService implements DocumentNumberSer
    *     number.
    */
   @Override
-  public String execute(@NotEmpty String documentationOfficeAbbreviation)
+  public String generateDocumentNumber(@NotEmpty String documentationOfficeAbbreviation)
       throws DocumentNumberPatternException,
           DocumentationUnitExistsException,
           DocumentNumberFormatterException {
@@ -98,7 +98,7 @@ public class DatabaseDocumentNumberGeneratorService implements DocumentNumberSer
 
     String documentNumber =
         DocumentNumberFormatter.builder()
-            .documentNumber(documentNumberDTO.increaseLastNumber())
+            .sequenceNumber(documentNumberDTO.increaseLastNumber())
             .year(DateUtil.getYear())
             .pattern(pattern)
             .build()

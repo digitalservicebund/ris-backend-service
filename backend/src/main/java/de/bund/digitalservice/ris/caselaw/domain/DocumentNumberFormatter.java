@@ -17,7 +17,7 @@ public class DocumentNumberFormatter {
   @NonNull final Year year;
 
   @Min(value = 0, message = "Doc number must be positive")
-  int documentNumber;
+  int sequenceNumber;
 
   @NotEmpty
   @Size(min = 13, max = 14, message = "Pattern supports 13-14 chars only")
@@ -39,7 +39,7 @@ public class DocumentNumberFormatter {
   private String fillSequenceNumber(String pattern) throws DocumentNumberFormatterException {
     int sequentialDigits = StringUtils.countMatches(pattern, "*");
     DecimalFormat decimalFormat = new DecimalFormat("0".repeat(sequentialDigits));
-    String docNumberString = decimalFormat.format(documentNumber);
+    String docNumberString = decimalFormat.format(sequenceNumber);
 
     if (docNumberString.length() > sequentialDigits) {
       throw new DocumentNumberFormatterException("Doc number is bigger than the * amount");

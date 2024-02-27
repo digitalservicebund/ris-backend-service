@@ -94,7 +94,7 @@ class DocumentUnitServiceTest {
 
     when(repository.createNewDocumentUnit("nextDocumentNumber", documentationOffice))
         .thenReturn(Mono.just(documentUnit));
-    when(documentNumberService.execute(documentationOffice.abbreviation(), 5))
+    when(documentNumberService.generateDocumentNumber(documentationOffice.abbreviation(), 5))
         .thenReturn("nextDocumentNumber");
     when(documentUnitStatusService.setInitialStatus(documentUnit))
         .thenReturn(Mono.just(documentUnit));
@@ -105,7 +105,7 @@ class DocumentUnitServiceTest {
     StepVerifier.create(service.generateNewDocumentUnit(documentationOffice))
         .expectNextCount(1) // That it's a DocumentUnit is given by the generic type..
         .verifyComplete();
-    verify(documentNumberService).execute(documentationOffice.abbreviation(), 5);
+    verify(documentNumberService).generateDocumentNumber(documentationOffice.abbreviation(), 5);
     verify(repository).createNewDocumentUnit("nextDocumentNumber", documentationOffice);
   }
 
