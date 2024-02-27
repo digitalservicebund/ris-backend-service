@@ -24,7 +24,6 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentCategoryD
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentTypeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitMetadataDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.FileNumberDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentationUnitRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresPublicationReportRepositoryImpl;
@@ -361,7 +360,7 @@ class PreviousDecisionIntegrationTest {
 
   @Test
   void testSearchForDocumentUnitsByPreviousDecisionInput_noSearchCriteria_shouldMatchAll() {
-    prepareDocumentUnitMetadataDTOs();
+    prepareDocumentUnitDTOs();
     simulateAPICall(PreviousDecision.builder().build())
         .jsonPath("$.content")
         .isNotEmpty()
@@ -371,7 +370,7 @@ class PreviousDecisionIntegrationTest {
 
   @Test
   void testSearchForDocumentUnitsByPreviousDecisionInput_onlyDate_shouldMatchOne() {
-    LocalDate date1 = prepareDocumentUnitMetadataDTOs();
+    LocalDate date1 = prepareDocumentUnitDTOs();
     simulateAPICall(PreviousDecision.builder().decisionDate(date1).build())
         .jsonPath("$.content")
         .isNotEmpty()
@@ -383,7 +382,7 @@ class PreviousDecisionIntegrationTest {
 
   @Test
   void testSearchForDocumentUnitsByPreviousDecisionInput_onlyCourt_shouldMatchThree() {
-    prepareDocumentUnitMetadataDTOs();
+    prepareDocumentUnitDTOs();
     simulateAPICall(
             PreviousDecision.builder().court(Court.builder().type("Court1").build()).build())
         .jsonPath("$.content")
@@ -396,7 +395,7 @@ class PreviousDecisionIntegrationTest {
 
   @Test
   void testSearchForDocumentUnitsByPreviousDecisionInput_onlyFileNumber_shouldMatchTwo() {
-    prepareDocumentUnitMetadataDTOs();
+    prepareDocumentUnitDTOs();
     simulateAPICall(PreviousDecision.builder().fileNumber("AkteX").build())
         .jsonPath("$.content")
         .isNotEmpty()
@@ -408,7 +407,7 @@ class PreviousDecisionIntegrationTest {
 
   @Test
   void testSearchForDocumentUnitsByPreviousDecisionInput_onlyFileNumber_shouldNotMatchDocNumber() {
-    prepareDocumentUnitMetadataDTOs();
+    prepareDocumentUnitDTOs();
     simulateAPICall(PreviousDecision.builder().fileNumber("XX").build())
         .jsonPath("$.content")
         .isEmpty();
@@ -416,7 +415,7 @@ class PreviousDecisionIntegrationTest {
 
   @Test
   void testSearchForDocumentUnitsByPreviousDecisionInput_onlyDocumentType_shouldMatchOne() {
-    prepareDocumentUnitMetadataDTOs();
+    prepareDocumentUnitDTOs();
     DocumentType documentType =
         DocumentTypeTransformer.transformToDomain(
             databaseDocumentTypeRepository.findFirstByAbbreviationAndCategory("GH", category));
@@ -431,7 +430,7 @@ class PreviousDecisionIntegrationTest {
 
   @Test
   void testSearchForDocumentUnitsByPreviousDecisionInput_nullDocumentType_shouldAll() {
-    prepareDocumentUnitMetadataDTOs();
+    prepareDocumentUnitDTOs();
     simulateAPICall(PreviousDecision.builder().documentType(null).build())
         .jsonPath("$.content")
         .isArray()
@@ -442,7 +441,7 @@ class PreviousDecisionIntegrationTest {
   @Test
   void
       testSearchForDocumentUnitsByPreviousDecisionInput_threeMatchingOneDoesNot_shouldMatchNothing() {
-    LocalDate date1 = prepareDocumentUnitMetadataDTOs();
+    LocalDate date1 = prepareDocumentUnitDTOs();
     simulateAPICall(
             PreviousDecision.builder()
                 .decisionDate(date1)
@@ -503,9 +502,9 @@ class PreviousDecisionIntegrationTest {
         .isArray();
   }
 
-  private LocalDate prepareDocumentUnitMetadataDTOs() {
+  private LocalDate prepareDocumentUnitDTOs() {
     LocalDate date1 = LocalDate.parse("2023-01-02");
-    DocumentationUnitMetadataDTO documentUnit1 =
+    DocumentationUnitDTO documentUnit1 =
         createDocumentUnit(
             date1,
             List.of("AkteX", "AkteY"),
@@ -514,7 +513,7 @@ class PreviousDecisionIntegrationTest {
             Status.builder().publicationStatus(PublicationStatus.PUBLISHED).build());
 
     LocalDate date2 = LocalDate.parse("2023-02-03");
-    DocumentationUnitMetadataDTO documentUnit2 =
+    DocumentationUnitDTO documentUnit2 =
         createDocumentUnit(
             date2,
             null,
@@ -523,7 +522,7 @@ class PreviousDecisionIntegrationTest {
             Status.builder().publicationStatus(PublicationStatus.PUBLISHED).build());
 
     LocalDate date3 = LocalDate.parse("2023-03-04");
-    DocumentationUnitMetadataDTO documentUnit3 =
+    DocumentationUnitDTO documentUnit3 =
         createDocumentUnit(
             date3,
             List.of("AkteX"),

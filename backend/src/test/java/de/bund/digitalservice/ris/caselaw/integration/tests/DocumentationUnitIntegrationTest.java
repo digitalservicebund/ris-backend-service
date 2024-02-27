@@ -150,20 +150,6 @@ class DocumentationUnitIntegrationTest {
   }
 
   @Test
-  void testMetadataCanBeRetrieved() {
-    var docUnit =
-        repository.save(
-            DocumentationUnitDTO.builder()
-                .caseFacts("abc")
-                .documentNumber("1234567890123")
-                .documentationOffice(documentationOfficeRepository.findByAbbreviation("DS"))
-                .build());
-
-    assertThat(repository.findAll()).hasSize(1);
-    assertThat(repository.findMetadataById(docUnit.getId())).isPresent();
-  }
-
-  @Test
   @Transactional(transactionManager = "jpaTransactionManager")
   void testForCorrectDbEntryAfterNewDocumentUnitCreation() {
 

@@ -14,8 +14,6 @@ public interface DatabaseDocumentationUnitRepository
     extends JpaRepository<DocumentationUnitDTO, UUID> {
   Optional<DocumentationUnitDTO> findByDocumentNumber(String documentNumber);
 
-  Optional<DocumentationUnitMetadataDTO> findMetadataById(UUID documentUnitUuid);
-
   String SELECT_STATUS_WHERE_LATEST =
       "SELECT 1 FROM StatusDTO status WHERE status.documentationUnitDTO.id = documentationUnit.id AND status.createdAt = (SELECT MAX(s.createdAt) FROM StatusDTO s WHERE s.documentationUnitDTO.id = documentationUnit.id)";
 
