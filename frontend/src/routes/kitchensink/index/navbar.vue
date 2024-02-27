@@ -4,7 +4,6 @@ import Navbar from "@/components/NavbarTop.vue"
 import KitchensinkPage from "@/kitchensink/components/KitchensinkPage.vue"
 import KitchensinkStory from "@/kitchensink/components/KitchensinkStory.vue"
 
-const goBackRoute = { name: "kitchensink" }
 const menuItems: LevelOneMenuItem[] = [
   {
     label: "Kitchensink",
@@ -37,11 +36,7 @@ const menuItems: LevelOneMenuItem[] = [
     </KitchensinkStory>
 
     <KitchensinkStory name="Side">
-      <NavbarSide
-        go-back-label="Zurück"
-        :go-back-route="goBackRoute"
-        :menu-items="menuItems"
-      />
+      <NavbarSide :menu-items="menuItems" />
     </KitchensinkStory>
   </KitchensinkPage>
 </template>

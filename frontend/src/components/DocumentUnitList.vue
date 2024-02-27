@@ -160,9 +160,7 @@ function onDelete() {
           <router-link
             class="underline focus:outline-none focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-blue-800"
             :to="{
-              name: listEntry.fileName
-                ? 'caselaw-documentUnit-documentNumber-categories'
-                : 'caselaw-documentUnit-documentNumber-files',
+              name: 'caselaw-documentUnit-documentNumber-categories',
               params: { documentNumber: listEntry.documentNumber },
             }"
           >

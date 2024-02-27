@@ -31,11 +31,11 @@ test.describe("test the different layout options", () => {
     await navigateToCategories(page, documentNumber)
     await page.getByLabel("Navigation schließen").click()
     await expect(page).toHaveURL(/showNavBar=false/)
-    await expect(page.locator("aside", { hasText: "Suche" })).toBeHidden()
+    await expect(page.locator("aside", { hasText: "Rubriken" })).toBeHidden()
 
     await page.getByLabel("Navigation öffnen").click()
     await expect(page).toHaveURL(/showNavBar=true/)
-    await expect(page.locator("aside", { hasText: "Suche" })).toBeVisible()
+    await expect(page.locator("aside", { hasText: "Rubriken" })).toBeVisible()
   })
 
   test("persist toggle queries for new pages", async ({

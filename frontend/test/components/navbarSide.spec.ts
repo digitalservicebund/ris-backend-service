@@ -5,18 +5,6 @@ import NavbarSide from "@/components/NavbarSide.vue"
 import { generateString } from "~/test-helper/dataGenerators"
 
 describe("NavbarSide", () => {
-  it("displays the go back label with related route", async () => {
-    await renderComponent({
-      goBackLabel: "Zur Übersicht",
-      goBackRoute: "/origin-route",
-    })
-
-    const goBackItem = screen.getByLabelText("Zur Übersicht")
-
-    expect(goBackItem).toBeVisible()
-    expect(goBackItem?.getAttribute("href")).toBe("/origin-route")
-  })
-
   it("renders sidenav with multiple items and correct routes", async () => {
     const menuItems = [
       { label: "first item", route: "/first-route" },
@@ -304,33 +292,24 @@ interface MenuItem {
 }
 
 async function renderComponent(options?: {
-  goBackLabel?: string
-  goBackRoute?: RouteLocationRaw
   menuItems?: MenuItem[]
   activeRoute?: RouteLocationRaw
 }) {
-  const goBackRoute = options?.goBackRoute ?? "/go-back-route"
   const menuItems = options?.menuItems ?? []
   const activeRoute = options?.activeRoute ?? "/"
-  const router = buildRouter(goBackRoute, menuItems)
+  const router = buildRouter(menuItems)
   await router.replace(activeRoute)
   await router.isReady()
   const global = { plugins: [router] }
   const props = {
-    goBackLabel: options?.goBackLabel ?? "go back label",
-    goBackRoute,
     menuItems: options?.menuItems ?? [],
   }
   return render(NavbarSide, { props, global })
 }
 
-function buildRouter(
-  goBackRoute: RouteLocationRaw,
-  menuItems: MenuItem[],
-): Router {
+function buildRouter(menuItems: MenuItem[]): Router {
   const routes = []
   routes.push(generateRouterRoute({ path: "/" }))
-  routes.push(generateRouterRoute(goBackRoute))
 
   for (const item of menuItems) {
     routes.push(generateRouterRoute(item.route))

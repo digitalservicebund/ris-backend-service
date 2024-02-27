@@ -130,11 +130,6 @@ describe("documentUnit list", () => {
 
     //Spruchkörper visible
     expect(screen.getByText("cba")).toBeVisible()
-
-    expect(screen.getByRole("link", { name: "123" })).toHaveAttribute(
-      "href",
-      "/caselaw/documentUnit/123/files",
-    )
     expect(screen.getByRole("link", { name: "234" })).toHaveAttribute(
       "href",
       "/caselaw/documentUnit/234/categories",

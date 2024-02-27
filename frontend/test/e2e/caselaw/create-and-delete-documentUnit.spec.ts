@@ -39,7 +39,9 @@ test.describe("create a doc unit and delete it again", () => {
       .click()
     await page.locator('button:has-text("Abbrechen")').click()
     await expect(
-      page.locator(`a[href*="/caselaw/documentunit/${documentNumber}/files"]`),
+      page.locator(
+        `a[href*="/caselaw/documentunit/${documentNumber}/categories"]`,
+      ),
     ).toBeVisible()
   })
 })

@@ -2,12 +2,9 @@
 import { computed } from "vue"
 import type { RouteLocationRaw, RouteRecordName } from "vue-router"
 import { useRoute } from "vue-router"
-import IconArrowBack from "~icons/ic/baseline-arrow-back"
 
 interface Props {
   menuItems: LevelOneMenuItem[]
-  goBackLabel: string
-  goBackRoute: RouteLocationRaw
 }
 
 const props = defineProps<Props>()
@@ -139,14 +136,6 @@ export interface LevelTwoMenuItem {
 <template>
   <aside aria-labelledby="sidebarNavigation" class="w-[16rem]">
     <span id="sidebarNavigation" hidden>SideBar Navigation</span>
-    <router-link
-      aria-labelledby="toOverviewButton"
-      class="ds-link-01-bold flex h-80 items-center gap-12 border-b-1 border-gray-400 px-14 text-blue-800"
-      :to="goBackRoute"
-    >
-      <IconArrowBack class="text-18" />
-      <span id="toOverviewButton">{{ goBackLabel }}</span>
-    </router-link>
 
     <div
       v-for="(levelOneItem, levelOneIndex) in enhancedActiveMenuItems"
