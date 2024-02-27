@@ -23,7 +23,7 @@ const query = ref(getQueryFromRoute())
 const responseError = ref()
 
 /**
- * Loads all proceudres
+ * Loads all procedures
  * @param {number} page - page to be updated
  * @param {Query<string>} queries - parameters from route to filter search results
  */
@@ -36,7 +36,7 @@ async function updateProcedures(page: number, queries?: Query<string>) {
 }
 
 /**
- * Loads documentunits and adds to local value
+ * Loads document units and adds to local value
  */
 async function loadDocumentUnits(loadingProcedure: Procedure) {
   if (responseError.value) {
@@ -64,9 +64,9 @@ async function loadDocumentUnits(loadingProcedure: Procedure) {
 }
 
 /**
- * Lazily loads the documentunits, only when the procedure list is expanded.
- * When the isExpanded state changes, the procdedure is added/ removed from
- * the currentlyExpanded procedures list, because the need dynamic css classes accordingly
+ * Lazily loads the document units, only when the procedure list is expanded.
+ * When the isExpanded state changes, the procedure is added / removed from
+ * the currentlyExpanded procedures list.
  */
 async function handleIsExpanded(
   isExpanded: boolean,
@@ -90,10 +90,10 @@ async function handleIsExpanded(
 const debouncedPushQueryToRoute = (() => {
   let timeoutId: number | null = null
 
-  return (currentQuerry: Query<string>) => {
+  return (currentQuery: Query<string>) => {
     if (timeoutId != null) window.clearTimeout(timeoutId)
 
-    timeoutId = window.setTimeout(() => pushQueryToRoute(currentQuerry), 500)
+    timeoutId = window.setTimeout(() => pushQueryToRoute(currentQuery), 500)
   }
 })()
 
@@ -107,7 +107,7 @@ watch(route, () => {
 })
 
 /**
- * Update procedures with local query value und update after timeout
+ * Update procedures with local query value und update url after timeout
  */
 watch(
   query,
