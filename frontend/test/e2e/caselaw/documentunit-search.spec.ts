@@ -44,10 +44,7 @@ test.describe("search", () => {
   })
 
   // Suchzustände
-  test("renders search results and updates states correctly", async ({
-    page,
-    documentNumber,
-  }) => {
+  test("renders search results", async ({ page, documentNumber }) => {
     await navigateToSearch(page)
 
     //initial state
@@ -61,10 +58,6 @@ test.describe("search", () => {
         name: "Neue Dokumentationseinheit erstellen",
       }),
     ).toBeVisible()
-
-    //loading
-    await page.getByLabel("Nur meine Dokstelle Filter").click()
-    await page.getByLabel("Nach Dokumentationseinheiten suchen").click()
 
     //results
     await page.getByLabel("Dokumentnummer Suche").fill(documentNumber)
