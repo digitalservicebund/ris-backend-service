@@ -24,7 +24,7 @@ const emit = defineEmits<{
   deleteDocumentUnit: [documentUnitListEntry: DocumentUnitListEntry]
 }>()
 
-const emptyStatus = computed(() => props.emptyState ?? "Keine Ergebnisse.")
+const emptyStatus = computed(() => props.emptyState)
 
 const showModal = ref(false)
 const popupModalText = ref("")
