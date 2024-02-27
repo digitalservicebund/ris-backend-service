@@ -71,7 +71,7 @@
     "@iconify-json/ic": "^1.1.17",
     "@iconify-json/material-symbols": "^1.1.73",
     "@namics/stylelint-bem": "^10.0.0",
-    "@playwright/test": "^1.41.2",
+    "@playwright/test": "^1.42.0",
     "@sentry/vite-plugin": "^2.14.1",
     "@testing-library/dom": "^9.3.4",
     "@testing-library/jest-dom": "^6.4.2",
