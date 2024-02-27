@@ -27,6 +27,15 @@ const isLoading = ref(false)
 const searchQuery = ref<Query<DocumentUnitSearchParameter>>()
 const pageNumber = ref<number>(0)
 
+const emptyStatus = computed(() => {
+  if (!documentUnitListEntries.value) {
+    return "Starten Sie die Suche oder erstellen Sie eine neue Dokumentationseinheit."
+  } else if (documentUnitListEntries.value.length === 0) {
+    return "Keine Ergebnisse gefunden."
+  }
+  return undefined
+})
+
 /**
  * Searches all documentation units by given input and updates the local
  * documentunit list entries, the currentPage for pagination and catches errors
@@ -225,6 +234,7 @@ const showDefaultLink = computed(() => {
       <DocumentUnitList
         class="grow"
         :document-unit-list-entries="documentUnitListEntries"
+        :empty-state="emptyStatus"
         is-deletable
         :is-loading="isLoading"
         :search-response-error="searchResponseError"

@@ -11,6 +11,7 @@ function renderComponent(options?: {
   searchResponseError?: ResponseError
   isLoading?: boolean
   isDeletable?: boolean
+  emptyState?: string
 }) {
   // eslint-disable-next-line testing-library/await-async-events
   const user = userEvent.setup()
@@ -22,6 +23,11 @@ function renderComponent(options?: {
         searchResponseError: options?.searchResponseError ?? undefined,
         isLoading: options?.isLoading ?? false,
         isDeletable: options?.isDeletable ?? true,
+        emptyState:
+          options?.emptyState ??
+          (!options?.documentUnitListEntries
+            ? "Starten Sie die Suche oder erstellen Sie eine neue Dokumentationseinheit."
+            : "Keine Ergebnisse gefunden."),
       },
       global: {
         plugins: [
@@ -53,7 +59,7 @@ function renderComponent(options?: {
 
 describe("documentUnit list", () => {
   test("initial state feedback", async () => {
-    renderComponent()
+    renderComponent({})
 
     expect(
       screen.getByText(/Starten Sie die Suche oder erstellen Sie eine/),
@@ -65,7 +71,7 @@ describe("documentUnit list", () => {
       documentUnitListEntries: [],
     })
 
-    expect(screen.getByText(/Keine Ergebnisse gefunden./)).toBeVisible()
+    expect(screen.getByText(/Keine Ergebnisse./)).toBeVisible()
   })
 
   test("shows error", () => {

@@ -17,20 +17,14 @@ const props = defineProps<{
   searchResponseError?: ResponseError
   isLoading?: boolean
   isDeletable?: boolean
+  emptyState?: string
 }>()
 
 const emit = defineEmits<{
   deleteDocumentUnit: [documentUnitListEntry: DocumentUnitListEntry]
 }>()
 
-const emptyStatus = computed(() => {
-  if (!props.documentUnitListEntries) {
-    return "Starten Sie die Suche oder erstellen Sie eine neue Dokumentationseinheit."
-  } else if (props.documentUnitListEntries.length === 0) {
-    return "Keine Ergebnisse gefunden."
-  }
-  return undefined
-})
+const emptyStatus = computed(() => props.emptyState ?? "Keine Ergebnisse.")
 
 const showModal = ref(false)
 const popupModalText = ref("")
