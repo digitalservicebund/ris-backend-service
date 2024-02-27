@@ -63,7 +63,6 @@ export type Texts = {
   reasons?: string
   caseFacts?: string
   decisionReasons?: string
-  borderNumbers?: string[]
 }
 
 export enum PublicationState {
@@ -94,6 +93,7 @@ export default class DocumentUnit {
   public previousDecisions?: PreviousDecision[]
   public ensuingDecisions?: EnsuingDecision[]
   public contentRelatedIndexing: ContentRelatedIndexing = {}
+  public borderNumbers: string[] = []
 
   static readonly requiredFields = [
     "fileNumbers",

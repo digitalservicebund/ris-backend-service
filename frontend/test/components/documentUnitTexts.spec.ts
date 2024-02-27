@@ -10,6 +10,7 @@ describe("Texts", () => {
       props: {
         texts: new DocumentUnit("foo").texts,
         updateStatus: 0,
+        validBorderNumbers: ["1", "2", "3"],
       },
     })
 

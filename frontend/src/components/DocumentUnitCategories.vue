@@ -197,7 +197,7 @@ onMounted(async () => {
           <DocumentUnitTexts
             id="texts"
             :texts="updatedDocumentUnit.texts"
-            :valid-border-numbers="updatedDocumentUnit.texts.borderNumbers"
+            :valid-border-numbers="updatedDocumentUnit.borderNumbers"
             @update-value="handleUpdateValueDocumentUnitTexts"
           />
         </div>
