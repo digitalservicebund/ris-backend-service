@@ -1,7 +1,7 @@
 package de.bund.digitalservice.ris.caselaw.domain;
 
 public interface DocumentNumberService {
-  String generateDocumentNumber(String documentationOfficeAbbreviation, int maxTries)
+  String generateDocumentNumber(String documentationOfficeAbbreviation, int attempts)
       throws DocumentationUnitExistsException,
           DocumentNumberPatternException,
           DocumentNumberFormatterException;

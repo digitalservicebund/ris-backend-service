@@ -36,7 +36,7 @@ public class DatabaseDocumentNumberGeneratorService implements DocumentNumberSer
    * document numbers left, the function will terminate with an error.
    *
    * @param documentationOfficeAbbreviation The abbreviation of the documentation office.
-   * @param maxTries The maximum number of attempts to generate the document number.
+   * @param attempts The maximum number of attempts to generate the document number.
    * @return The generated next available document number to use.
    * @throws DocumentNumberPatternException If the pattern for generating document numbers is
    *     invalid.
@@ -44,15 +44,15 @@ public class DatabaseDocumentNumberGeneratorService implements DocumentNumberSer
    *     number.
    */
   @Override
-  public String generateDocumentNumber(String documentationOfficeAbbreviation, int maxTries)
+  public String generateDocumentNumber(String documentationOfficeAbbreviation, int attempts)
       throws DocumentNumberPatternException, DocumentNumberFormatterException {
     try {
       return generateDocumentNumber(documentationOfficeAbbreviation);
     } catch (DocumentationUnitExistsException e) {
-      if (maxTries <= 0) {
+      if (attempts <= 0) {
         throw new DocumentationUnitException("Could not generate Document number", e);
       }
-      return generateDocumentNumber(documentationOfficeAbbreviation, maxTries - 1);
+      return generateDocumentNumber(documentationOfficeAbbreviation, attempts - 1);
     }
   }
 

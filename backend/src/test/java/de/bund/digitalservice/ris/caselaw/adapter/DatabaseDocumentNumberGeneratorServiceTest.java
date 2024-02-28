@@ -57,7 +57,7 @@ class DatabaseDocumentNumberGeneratorServiceTest {
     var nextDocumentNumber = "KORE70001" + DateUtil.getYear();
 
     var documentationOffice = "BGH";
-    int maxTries = 3;
+    int attempts = 3;
 
     DocumentationUnitDTO documentationUnitDTO =
         DocumentationUnitDTO.builder()
@@ -68,7 +68,7 @@ class DatabaseDocumentNumberGeneratorServiceTest {
     when(databaseDocumentationUnitRepository.findByDocumentNumber(nextDocumentNumber))
         .thenReturn(Optional.of(documentationUnitDTO));
 
-    assertThatThrownBy(() -> service.generateDocumentNumber(documentationOffice, maxTries))
+    assertThatThrownBy(() -> service.generateDocumentNumber(documentationOffice, attempts))
         .isInstanceOf(DocumentationUnitException.class)
         .hasMessageContaining("Could not generate Document number");
   }
@@ -76,9 +76,9 @@ class DatabaseDocumentNumberGeneratorServiceTest {
   @Test
   void shouldStopTrying_ifPatternIsInvalid() {
     var docOfficeAbbreviation = "NOT_IN_NUMBER_PATTERN_PROPERTIES";
-    int maxTries = 3;
+    int attempts = 3;
 
-    assertThatThrownBy(() -> service.generateDocumentNumber(docOfficeAbbreviation, maxTries))
+    assertThatThrownBy(() -> service.generateDocumentNumber(docOfficeAbbreviation, attempts))
         .isInstanceOf(DocumentNumberPatternException.class)
         .hasMessageContaining(
             "Could not " + "find pattern for abbreviation " + docOfficeAbbreviation);
