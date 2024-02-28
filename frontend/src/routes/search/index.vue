@@ -25,10 +25,10 @@ const currentSorting = ref("default")
 
 const sortingDropdownItems: DropdownItem[] = [
   { label: "Relevanz (Standard)", value: "default" },
-  { label: "Dokumentnummer", value: "document_number-asc" },
-  { label: "-Dokumentnummer", value: "document_number-desc" },
-  { label: "Entscheidungsdatum", value: "decision_date-asc" },
-  { label: "-Entscheidungsdatum", value: "decision_date-desc" },
+  { label: "Dokumentnummer ↑", value: "document_number-asc" },
+  { label: "Dokumentnummer ↓", value: "document_number-desc" },
+  { label: "Entscheidungsdatum ↑", value: "decision_date-asc" },
+  { label: "Entscheidungsdatum ↓", value: "decision_date-desc" },
 ]
 
 type DocumentType = "CASELAW" | "LEGISLATION"
@@ -193,8 +193,11 @@ function buildResultCountString() {
       </div>
       <p :class="{ 'text-red-700': hasError }">{{ message }}</p>
     </div>
-    <div class="flex items-center justify-end gap-8">
-      <label class="ds-label" for="sorting">Sorting:</label>
+    <div
+      v-if="searchResults && searchResults.length > 0"
+      class="flex items-center justify-end gap-8"
+    >
+      <label class="ds-label" for="sorting">Sortierung:</label>
       <div class="w-auto">
         <DropdownInput
           id="sorting"
