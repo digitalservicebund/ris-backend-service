@@ -12,6 +12,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+/** Entity for the leading_decision_norm_reference table. */
 @Getter
 @Setter
 @Builder

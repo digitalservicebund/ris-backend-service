@@ -40,6 +40,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Mono;
 
+/** Implementation of the DocumentUnitRepository for the Postgres database */
 @Repository
 @Slf4j
 @Primary
@@ -337,48 +338,6 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
       documentationUnitProcedureDTO.setRank(i + 1);
     }
   }
-
-  //  private DocumentTypeDTO getDbDocType(DocumentType documentType) {
-  //    if (documentType == null) {
-  //      return null;
-  //    }
-  //    // TODO cache category at application start
-  //    DocumentTypeDTO docTypeDTO =
-  //        databaseDocumentTypeRepository.findFirstByAbbreviationAndCategory(
-  //            documentType.jurisShortcut(),
-  // databaseDocumentCategoryRepository.findFirstByLabel("R"));
-  //
-  //    if (docTypeDTO == null) {
-  //      throw new DocumentationUnitException(
-  //          "no document type for the shortcut '" + documentType.jurisShortcut() + "' found.");
-  //    }
-  //    return docTypeDTO;
-  //  }
-  //
-  //  private List<ProcedureDTO> getDbProcedures(
-  //      DocumentUnit documentUnit, DocumentationUnitDTO documentationUnitDTO) {
-  //    Stream<String> procedureLabels = Stream.of(documentUnit.coreData().procedure().label());
-  //    if (documentUnit.coreData().previousProcedures() != null)
-  //      procedureLabels =
-  //          Stream.concat(procedureLabels, documentUnit.coreData().previousProcedures().stream());
-  //
-  //    return procedureLabels
-  //        .map(procedureLabel -> findOrCreateProcedureDTO(procedureLabel, documentationUnitDTO))
-  //        .toList();
-  //  }
-  //
-  //  private ProcedureDTO findOrCreateProcedureDTO(
-  //      String procedureLabel, DocumentationUnitDTO documentationUnitDTO) {
-  //    return Optional.ofNullable(
-  //            databaseProcedureRepository.findByLabelAndDocumentationOffice(
-  //                procedureLabel, documentationUnitDTO.getDocumentationOffice()))
-  //        .orElse(
-  //            ProcedureDTO.builder()
-  //                .label(procedureLabel)
-  //                .documentationOffice(documentationUnitDTO.getDocumentationOffice())
-  //                .documentationUnits(List.of(documentationUnitDTO))
-  //                .build());
-  //  }
 
   @Override
   @Transactional(transactionManager = "jpaTransactionManager")

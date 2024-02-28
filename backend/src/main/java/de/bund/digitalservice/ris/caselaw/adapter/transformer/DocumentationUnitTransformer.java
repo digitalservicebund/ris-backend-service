@@ -42,10 +42,22 @@ import org.apache.commons.lang3.StringUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
+/**
+ * This class is responsible for transforming a documentation unit object from its domain
+ * representation into a database object and back
+ */
 @Slf4j
 public class DocumentationUnitTransformer {
   private DocumentationUnitTransformer() {}
 
+  /**
+   * Transforms a documentation unit object from its domain representation into a database object
+   *
+   * @param currentDto the current database documentation unit
+   * @param updatedDomainObject the updated domain object, e.g. by a REST call
+   * @return a transformed database object containing the changes from the @param
+   *     updatedDomainObject
+   */
   public static DocumentationUnitDTO transformToDTO(
       DocumentationUnitDTO currentDto, DocumentUnit updatedDomainObject) {
 
@@ -783,6 +795,13 @@ public class DocumentationUnitTransformer {
     return borderNumbers;
   }
 
+  /**
+   * Transforms a documentation unit from the database representation into a domain object with
+   * reduced information to be shown in a list
+   *
+   * @param documentationUnitDTO the database documentation unit
+   * @return a transformed documentation unit list entry domain object, might be null
+   */
   public static DocumentUnitListEntry transformToMetaDomain(
       DocumentationUnitDTO documentationUnitDTO) {
     DocumentUnitListEntryBuilder builder =
