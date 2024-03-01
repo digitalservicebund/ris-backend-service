@@ -43,9 +43,13 @@ class DatabaseDocumentNumberGeneratorServiceTest {
 
   private static final String DEFAULT_ABBREVIATION = "BGH";
 
+  private static String generateDefaultDocumentNumber() {
+    return "KORE70001" + DateUtil.getYear();
+  }
+
   @Test
   void shouldThrowErrorIfDocumentAlreadyExists() {
-    var nextDocumentNumber = "KORE70001" + DateUtil.getYear();
+    var nextDocumentNumber = generateDefaultDocumentNumber();
 
     DocumentationUnitDTO documentationUnitDTO =
         DocumentationUnitDTO.builder()
@@ -65,7 +69,7 @@ class DatabaseDocumentNumberGeneratorServiceTest {
       throws DocumentNumberPatternException,
           DocumentNumberFormatterException,
           DocumentationUnitExistsException {
-    var nextDocumentNumber = "KORE70001" + DateUtil.getYear();
+    var nextDocumentNumber = generateDefaultDocumentNumber();
     when(service.recycle(nextDocumentNumber)).thenReturn(Optional.of(nextDocumentNumber));
 
     Assert.assertEquals(service.generateDocumentNumber(DEFAULT_ABBREVIATION), nextDocumentNumber);
@@ -73,7 +77,7 @@ class DatabaseDocumentNumberGeneratorServiceTest {
 
   @Test
   void shouldKeepTrying_ifDocumentNumberExists() {
-    var nextDocumentNumber = "KORE70001" + DateUtil.getYear();
+    var nextDocumentNumber = generateDefaultDocumentNumber();
 
     int attempts = 3;
 

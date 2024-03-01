@@ -9,6 +9,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseStatusRep
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DeletedDocumentationUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.StatusDTO;
+import de.bund.digitalservice.ris.caselaw.domain.DateUtil;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import java.time.Instant;
 import java.time.Year;
@@ -38,7 +39,9 @@ class DatabaseDocumentNumberRecyclingServiceTest {
 
   private static final String DEFAULT_DOCUMENTATION_OFFICE = "BGH";
 
-  private static final String DEFAULT_DOCUMENTATION_NUMBER = "KORE700012024";
+  private static String generateDefaultDocumentNumber() {
+    return "KORE70001" + DateUtil.getYear();
+  }
 
   @Test
   void shouldSaveIfOnly_unpublished() {
@@ -115,14 +118,14 @@ class DatabaseDocumentNumberRecyclingServiceTest {
   private static DocumentationUnitDTO generateDocumentationUnitDto() {
     return DocumentationUnitDTO.builder()
         .id(UUID.randomUUID())
-        .documentNumber(DEFAULT_DOCUMENTATION_NUMBER)
+        .documentNumber(generateDefaultDocumentNumber())
         .build();
   }
 
   private static DeletedDocumentationUnitDTO generateDeletedDocumentationUnitDTO() {
 
     return DeletedDocumentationUnitDTO.builder()
-        .documentNumber(DEFAULT_DOCUMENTATION_NUMBER)
+        .documentNumber(generateDefaultDocumentNumber())
         .year(Year.now())
         .abbreviation(DEFAULT_DOCUMENTATION_OFFICE)
         .build();
