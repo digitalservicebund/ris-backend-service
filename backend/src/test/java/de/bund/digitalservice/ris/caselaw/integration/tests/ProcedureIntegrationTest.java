@@ -33,7 +33,7 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatusService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitSearchResult;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitListItem;
 import de.bund.digitalservice.ris.caselaw.domain.EmailPublishService;
 import de.bund.digitalservice.ris.caselaw.domain.Procedure;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationReportRepository;
@@ -714,7 +714,7 @@ class ProcedureIntegrationTest {
         .exchange()
         .expectStatus()
         .is2xxSuccessful()
-        .expectBody(new ParameterizedTypeReference<List<DocumentationUnitSearchResult>>() {})
+        .expectBody(new ParameterizedTypeReference<List<DocumentationUnitListItem>>() {})
         .consumeWith(
             response -> {
               assertThat(Objects.requireNonNull(response.getResponseBody()).get(0).documentNumber())

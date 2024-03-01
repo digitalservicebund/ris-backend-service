@@ -60,7 +60,7 @@ ORDER BY documentationUnit.documentNumber
               + BASE_QUERY)
   @SuppressWarnings("java:S107")
   // We use JPA repository interface magic, so reducing parameter count is not possible.
-  Slice<DocumentationUnitSearchResultDTO> searchByDocumentUnitSearchInput(
+  Slice<DocumentationUnitListItemDTO> searchByDocumentUnitSearchInput(
       @Param("documentationOfficeId") UUID documentationOfficeId,
       @Param("documentNumber") String documentNumber,
       @Param("documentNumberToExclude") String documentNumberToExclude,
@@ -86,7 +86,7 @@ ORDER BY documentationUnit.documentNumber
               + BASE_QUERY)
   @SuppressWarnings("java:S107")
   // We use JPA repository interface magic, so reducing parameter count is not possible.
-  Slice<DocumentationUnitSearchResultDTO> searchByDocumentUnitSearchInputFileNumber(
+  Slice<DocumentationUnitListItemDTO> searchByDocumentUnitSearchInputFileNumber(
       @Param("documentationOfficeId") UUID documentationOfficeId,
       @Param("documentNumber") String documentNumber,
       @Param("documentNumberToExclude") String documentNumberToExclude,
@@ -113,7 +113,7 @@ ORDER BY documentationUnit.documentNumber
               + BASE_QUERY)
   @SuppressWarnings("java:S107")
   // We use JPA repository interface magic, so reducing parameter count is not possible.
-  Slice<DocumentationUnitSearchResultDTO> searchByDocumentUnitSearchInputDeviatingFileNumber(
+  Slice<DocumentationUnitListItemDTO> searchByDocumentUnitSearchInputDeviatingFileNumber(
       UUID documentationOfficeId,
       String documentNumber,
       String documentNumberToExclude,

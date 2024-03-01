@@ -446,15 +446,15 @@ class DocumentUnitServiceTest {
     DocumentationOffice documentationOffice = DocumentationOffice.builder().build();
     DocumentationUnitSearchInput documentationUnitSearchInput =
         DocumentationUnitSearchInput.builder().build();
-    DocumentationUnitSearchResult documentationUnitSearchResult =
-        DocumentationUnitSearchResult.builder().build();
+    DocumentationUnitListItem documentationUnitListItem =
+        DocumentationUnitListItem.builder().build();
     PageRequest pageRequest = PageRequest.of(0, 10);
 
     when(repository.searchByDocumentationUnitSearchInput(
             pageRequest, documentationOffice, documentationUnitSearchInput))
-        .thenReturn(new PageImpl<>(List.of(documentationUnitSearchResult)));
+        .thenReturn(new PageImpl<>(List.of(documentationUnitListItem)));
 
-    Slice<DocumentationUnitSearchResult> documentationUnitSearchEntries =
+    Slice<DocumentationUnitListItem> documentationUnitSearchEntries =
         service.searchByDocumentationUnitSearchInput(
             pageRequest,
             documentationOffice,
@@ -467,7 +467,7 @@ class DocumentUnitServiceTest {
             Optional.empty(),
             Optional.empty(),
             Optional.empty());
-    assertThat(documentationUnitSearchEntries).contains(documentationUnitSearchResult);
+    assertThat(documentationUnitSearchEntries).contains(documentationUnitListItem);
     verify(repository)
         .searchByDocumentationUnitSearchInput(
             pageRequest, documentationOffice, documentationUnitSearchInput);

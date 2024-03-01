@@ -24,7 +24,7 @@ import lombok.Builder;
  * @param status (Status) of the search result
  */
 @Builder
-public record DocumentationUnitSearchResult(
+public record DocumentationUnitListItem(
     UUID uuid,
     String documentNumber,
     Court court,

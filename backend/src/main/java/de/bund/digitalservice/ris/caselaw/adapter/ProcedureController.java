@@ -1,6 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
-import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitSearchResult;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitListItem;
 import de.bund.digitalservice.ris.caselaw.domain.Procedure;
 import de.bund.digitalservice.ris.caselaw.domain.ProcedureService;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
@@ -50,7 +50,7 @@ public class ProcedureController {
 
   @GetMapping(value = "/{procedureUUID}/documentunits")
   @PreAuthorize("isAuthenticated()")
-  public Flux<DocumentationUnitSearchResult> getDocumentUnits(
+  public Flux<DocumentationUnitListItem> getDocumentUnits(
       @AuthenticationPrincipal OidcUser oidcUser, @NonNull @PathVariable UUID procedureUUID) {
     return Flux.fromIterable(service.getDocumentUnits(procedureUUID));
   }

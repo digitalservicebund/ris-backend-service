@@ -4,11 +4,8 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
-/**
- * An interface representing a minimized documentation unit as a result of documentation unit
- * search, returning only the relevant information
- */
-public interface DocumentationUnitSearchResultDTO {
+/** An interface representing a documentation unit with reduced information to be shown in a list */
+public interface DocumentationUnitListItemDTO {
   UUID getId();
 
   String getDocumentNumber();

@@ -1,15 +1,15 @@
 package de.bund.digitalservice.ris.caselaw.adapter.database.jpa;
 
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentTypeTransformer;
-import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationUnitSearchResultTransformer;
+import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationUnitListItemTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationUnitTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitRepository;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitException;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitListItem;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitSearchInput;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitSearchResult;
 import de.bund.digitalservice.ris.caselaw.domain.Procedure;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.RelatedDocumentationType;
@@ -388,7 +388,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
     DocumentationOfficeDTO documentationOfficeDTO =
         documentationOfficeRepository.findByAbbreviation(documentationOffice.abbreviation());
 
-    Slice<DocumentationUnitSearchResultDTO> allResults =
+    Slice<DocumentationUnitListItemDTO> allResults =
         getDocumentationUnitSearchResultDTOS(
             pageable,
             courtType,
@@ -404,12 +404,11 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
             relatedDocumentationUnit.getDocumentType(),
             documentationOfficeDTO);
 
-    return allResults.map(
-        DocumentationUnitSearchResultTransformer::transformToRelatedDocumentation);
+    return allResults.map(DocumentationUnitListItemTransformer::transformToRelatedDocumentation);
   }
 
   @NotNull
-  private Slice<DocumentationUnitSearchResultDTO> getDocumentationUnitSearchResultDTOS(
+  private Slice<DocumentationUnitListItemDTO> getDocumentationUnitSearchResultDTOS(
       Pageable pageable,
       String courtType,
       String courtLocation,
@@ -448,8 +447,8 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
     // This approach could even be better if we replace the next/previous with a "load more" button
     Pageable fixedPageRequest = PageRequest.of(0, maxResultsUpToCurrentPage);
 
-    Slice<DocumentationUnitSearchResultDTO> fileNumberResults = new SliceImpl<>(List.of());
-    Slice<DocumentationUnitSearchResultDTO> deviatingFileNumberResults = new SliceImpl<>(List.of());
+    Slice<DocumentationUnitListItemDTO> fileNumberResults = new SliceImpl<>(List.of());
+    Slice<DocumentationUnitListItemDTO> deviatingFileNumberResults = new SliceImpl<>(List.of());
 
     if (!fileNumber.trim().isEmpty()) {
       fileNumberResults =
@@ -485,7 +484,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
               fixedPageRequest);
     }
 
-    Set<DocumentationUnitSearchResultDTO> allResults = new HashSet<>();
+    Set<DocumentationUnitListItemDTO> allResults = new HashSet<>();
     allResults.addAll(fileNumberResults.getContent());
     allResults.addAll(deviatingFileNumberResults.getContent());
 
@@ -515,7 +514,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
   }
 
   @Transactional(transactionManager = "jpaTransactionManager")
-  public Slice<DocumentationUnitSearchResult> searchByDocumentationUnitSearchInput(
+  public Slice<DocumentationUnitListItem> searchByDocumentationUnitSearchInput(
       Pageable pageable,
       DocumentationOffice documentationOffice,
       @Param("searchInput") DocumentationUnitSearchInput searchInput) {
@@ -527,7 +526,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
     Boolean withError =
         Optional.ofNullable(searchInput.status()).map(Status::withError).orElse(false);
 
-    Slice<DocumentationUnitSearchResultDTO> allResults =
+    Slice<DocumentationUnitListItemDTO> allResults =
         getDocumentationUnitSearchResultDTOS(
             pageable,
             searchInput.courtType(),
@@ -543,7 +542,7 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
             null,
             documentationOfficeDTO);
 
-    return allResults.map(DocumentationUnitSearchResultTransformer::transformToDomain);
+    return allResults.map(DocumentationUnitListItemTransformer::transformToDomain);
   }
 
   @Override

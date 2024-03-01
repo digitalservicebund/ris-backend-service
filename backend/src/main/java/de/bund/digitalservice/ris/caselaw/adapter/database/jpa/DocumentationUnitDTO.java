@@ -43,7 +43,7 @@ import lombok.ToString.Include;
 @SuppressWarnings(
     "java:S6539") // This class depends on many classes, because it's the key part and merging
 // everything.
-public class DocumentationUnitDTO implements DocumentationUnitSearchResultDTO {
+public class DocumentationUnitDTO implements DocumentationUnitListItemDTO {
 
   @Id @GeneratedValue @Include private UUID id;
 

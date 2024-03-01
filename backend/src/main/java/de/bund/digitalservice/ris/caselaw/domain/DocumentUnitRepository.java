@@ -116,7 +116,7 @@ public interface DocumentUnitRepository {
    * @param searchInput the search parameters
    * @return the search result containing the documentation units found
    */
-  Slice<DocumentationUnitSearchResult> searchByDocumentationUnitSearchInput(
+  Slice<DocumentationUnitListItem> searchByDocumentationUnitSearchInput(
       Pageable pageable,
       DocumentationOffice documentationOffice,
       DocumentationUnitSearchInput searchInput);

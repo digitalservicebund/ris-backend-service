@@ -186,7 +186,7 @@ public class DocumentUnitService {
         .flatMap(Function.identity());
   }
 
-  public Slice<DocumentationUnitSearchResult> searchByDocumentationUnitSearchInput(
+  public Slice<DocumentationUnitListItem> searchByDocumentationUnitSearchInput(
       Pageable pageable,
       DocumentationOffice documentationOffice,
       Optional<String> documentNumber,

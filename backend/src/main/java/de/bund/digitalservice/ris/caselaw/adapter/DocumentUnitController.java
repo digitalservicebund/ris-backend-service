@@ -3,7 +3,7 @@ package de.bund.digitalservice.ris.caselaw.adapter;
 import de.bund.digitalservice.ris.caselaw.domain.ConverterService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitSearchResult;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitListItem;
 import de.bund.digitalservice.ris.caselaw.domain.Publication;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationHistoryRecord;
 import de.bund.digitalservice.ris.caselaw.domain.RelatedDocumentationUnit;
@@ -108,7 +108,7 @@ public class DocumentUnitController {
   @GetMapping(value = "/search")
   @PreAuthorize("isAuthenticated()")
   // Access rights are being enforced through SQL filtering
-  public Mono<Slice<DocumentationUnitSearchResult>> searchByDocumentUnitListEntry(
+  public Mono<Slice<DocumentationUnitListItem>> searchByDocumentUnitListEntry(
       @RequestParam("pg") int page,
       @RequestParam("sz") int size,
       @RequestParam(value = "documentNumber") Optional<String> documentNumber,
