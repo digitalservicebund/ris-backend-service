@@ -47,7 +47,7 @@ const fields = computed(() => {
               </h3>
             </dt>
             <dd class="w-4/6">
-              <p>{{ feature.description }}/></p>
+              <p class="whitespace-pre-wrap">{{ feature.description }}</p>
               <div
                 v-if="feature.examples.length > 0"
                 class="ds-body-02-reg mt-4"
@@ -113,7 +113,8 @@ const fields = computed(() => {
                 class="ds-body-02-reg border-b-1 border-blue-300 px-16 py-12 align-middle"
               >
                 <template v-for="alias in field.aliases" :key="alias">
-                  <code>{{ alias }}</code>
+                  <code>{{ alias }}</code
+                  ><br />
                 </template>
               </td>
               <td

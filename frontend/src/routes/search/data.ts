@@ -16,91 +16,91 @@ export type Field = {
 export const availableFields: Field[] = [
   {
     label: "Abweichende Meinung",
-    aliases: ["dissenting_opinion"],
+    aliases: ["ABWMEIN"],
     examples: [],
     types: ["case_law"],
   },
   {
     label: "Dokumentnummer",
-    aliases: ["document_number"],
-    examples: ["document_number:ABCD200501001"],
+    aliases: ["DOKUMENTNUMMER", "NR"],
+    examples: ["NR:ABCD200501001"],
     types: ["case_law"],
   },
   {
     label: "Dokumenttyp",
-    aliases: ["document_type"],
-    examples: ["document_type:Beschluss"],
+    aliases: ["DOKUMENTTYP", "TYP"],
+    examples: ["TYP:Beschluss"],
     types: ["case_law"],
   },
   {
     label: "ECLI",
-    aliases: ["ecli"],
-    examples: ['ecli:"ECLI:DE:BEISPIEL:2024:0001.000000.00.00"'],
+    aliases: ["ECLI", "ecli"],
+    examples: ['ECLI:"ECLI:DE:BEISPIEL:2024:0001.000000.00.00"'],
     types: ["case_law"],
   },
   {
     label: "Entscheidungsdatum",
-    aliases: ["decision_date"],
-    examples: ["decision_date:2024-01-01"],
+    aliases: ["DATUM", "DAT"],
+    examples: ["DAT:2024-01-01"],
     types: ["case_law"],
   },
   {
     label: "Entscheidungsgründe",
-    aliases: ["decision_grounds"],
+    aliases: ["ENTSCHEIDUNGSGRUENDE", "EGR"],
     examples: [],
     types: ["case_law"],
   },
   {
     label: "Entscheidungsname",
-    aliases: ["headline"],
+    aliases: ["ENTSCHEIDUNGSNAME", "ENAME"],
     examples: [],
     types: ["case_law"],
   },
   {
     label: "Gründe",
-    aliases: ["grounds"],
+    aliases: ["GRUENDE", "GR"],
     examples: [],
     types: ["case_law"],
   },
   {
     label: "Leitsatz",
-    aliases: ["guiding_principle"],
+    aliases: ["LEITSATZ", "LS"],
     examples: [],
     types: ["case_law"],
   },
   {
     label: "Orientierungssatz",
-    aliases: ["headnote"],
+    aliases: ["ORIENTIERUNGSSATZ", "OSATZ"],
     examples: [],
     types: ["case_law"],
   },
   {
     label: "Sonstiger Langtext",
-    aliases: ["other_long_text"],
+    aliases: ["SLANGTEXT", "STEXT"],
     examples: [],
     types: ["case_law"],
   },
   {
     label: "Sonstiger Orientierungssatz",
-    aliases: ["other_headnote"],
+    aliases: ["SORIENTIERUNGSSATZ", "SOSATZ"],
     examples: [],
     types: ["case_law"],
   },
   {
     label: "Tatbestand",
-    aliases: ["case_facts"],
+    aliases: ["TATBESTAND", "TB"],
     examples: [],
     types: ["case_law"],
   },
   {
     label: "Tenor",
-    aliases: ["tenor"],
-    examples: ['tenor:"Arbeitsverhältnis"'],
+    aliases: ["TENOR"],
+    examples: ['TENOR:"Arbeitsverhältnis"'],
     types: ["case_law"],
   },
   {
     label: "Titelzeile",
-    aliases: ["headline"],
+    aliases: ["TITELZEILE", "TTZE"],
     examples: [],
     types: ["case_law"],
   },
@@ -111,18 +111,73 @@ export const availableFeatures = [
     id: "und",
     label: "UND-Verknüpfung",
     description:
-      "Gefunden werden Dokumente, die alle der durch AND verknüpften Suchbegriffe enthalten.",
-    examples: [
-      `decision_date:[2000 TO 2010] AND guiding_principle:Arbeitsverhältnis`,
-    ],
+      "Gefunden werden Dokumente, die alle der durch AND verknüpften Suchbegriffe enthalten..",
+    examples: [`DATUM:[2000 TO 2010] AND LEITSATZ:Arbeitsverhältnis`],
   },
   {
     id: "oder",
     label: "ODER-Verknüpfung",
     description:
       "Gefunden werden Dokumente, die mindestens einen der durch OR verknüpften Suchbegriffe enthalten.",
+    examples: [`DATUM:[2000 TO 2010] OR LEITSATZ:Arbeitsverhältnis`],
+  },
+  {
+    id: "Exact phrasing",
+    label: "Genauer Ausdruck",
+    description:
+      "Gefunden werden Dokumente, die den genauen Ausdruck enthalten.",
+    examples: [`ECLI:"ECLI:DE:LAGRLP:2001:0809.6SA135.01.0A"`],
+  },
+  {
+    id: "Wildcards",
+    label: "Platzhalter-Suche für mehrere Zeichen",
+    description:
+      'Platzhalter-Suchen können für einzelne Begriffe ausgeführt werden, wobei * null oder mehr Zeichen ersetzt. `TENOR:"Arbeits*"`  findet Dokumente, die den Ausdruck “Arbeits-” enthalten, wie z.B. Arbeitsgericht, Arbeitsverhältnis. Gefunden werden somit auch Dokumente, die etwa die Formulierung “Arbeits- und Beschäftigungsfragen” nutzen.',
+    examples: [`TENOR:"Arbeits*"`],
+  },
+  {
+    id: "Wildcards2",
+    label: "Platzhalter-Suche für ein Zeichen",
+    description:
+      "Platzhalter-Suchen können für einzelne Begriffe ausgeführt werden, wobei ? ein einzelnes Zeichen ersetzt. So können bei der Suche nach dem EGMR-Urteil “Akkoç/Türkei”, mehrere Schreibweisen berücksichtigt werden.",
+    examples: [`ENTSCHEIDUNGSNAME:Akko?`],
+  },
+  {
+    id: "Fuzzyness",
+    label: "Unschärfe",
+    description:
+      "Gefunden werden Dokumente, die nicht exakt mit dem Suchbegriff übereinstimmen, sondern eine gewisse Ähnlichkeit aufweisen (Schifffahrt, Schiffahrt). Berücksichtigt werden standardmäßig Begriffe, die maximal zwei Bearbeitungsschritte benötigen. Soll lediglich ein Zeichenunterschied berücksichtigt werden, kann eine Zahl ergänzt werden (Schifffahrt~1).",
+    examples: [`ENTSCHEIDUNGSNAME:Schifffahrt~`],
+  },
+  {
+    id: "Proximity searches",
+    label: "Nahe Suche",
+    description:
+      "Während eine Suchanfrage zu einem genauen Ausdruck “Corona Impfung“ nur die exakte Schreibweise und Reihenfolge berücksichtigt, werden bei folgendem Beispiel auch Leitsätze wie Corona-Schutz-Impfung oder Impfung in der Trefferliste angezeigt. Durch den Wert der Zahl kann die maximale Bearbeitungsdistanz festgelegt werden.",
+    examples: [`LEITSATZ:"Corona-Impfung"~5`],
+  },
+  {
+    id: "ranges",
+    label: "Bereiche",
+    description:
+      "Bereiche können für Datum-, numerische oder Zeichenfelder angegeben werden. Inklusive Bereiche werden mit eckigen Klammern [min TO max] und exklusive Bereiche mit geschweiften Klammern {min TO max} angegeben.Bereiche mit einer unbeschränkten Seite können die folgende Syntax verwenden:DATUM:>2024-01-15",
+    examples: [`DATUM:[2024-01-01 TO 2024-01-10]`, `DATUM:>2024-01-15`],
+  },
+  {
+    id: "boosting",
+    label: "Boost-Funktion",
+    description:
+      "Die Boost-Funktion wird genutzt, um einen Begriff relevanter zu mache als einen anderen. Sollen also z.B. Dokumente zu den Begriffen “Corona” und “Impfung” gefunden werden, aber besonderes Interesse an Dokumenten zu “Corona” besteht.",
     examples: [
-      `decision_date:[2000 TO 2010] OR guiding_principle:Arbeitsverhältnis`,
+      `LEITSATZ:Corona^2 Impfung`,
+      `"Landessozialgericht"^2 (COVID-19 Corona)^4`,
     ],
+  },
+  {
+    id: "grouping",
+    label: "Gruppieren",
+    description:
+      "Mehrere Begriffe oder Ausdrücke können mit Klammern gruppiert werden.",
+    examples: [`GRUENDE:(Krankfeiern OR Krankheitsandrohung) AND Kündigung`],
   },
 ]
