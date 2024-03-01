@@ -118,6 +118,7 @@ test("create and validate border number links", async ({ page }) => {
 
   // save
   await page.getByText("Speichern").click()
+  await page.waitForEvent("requestfinished")
 
   // check first border number link: should be invalid now
   await expect(borderNumberLink.first()).toHaveAttribute("valid", "false")
