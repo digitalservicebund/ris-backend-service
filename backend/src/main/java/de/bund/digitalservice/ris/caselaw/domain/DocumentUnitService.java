@@ -47,6 +47,8 @@ public class DocumentUnitService {
   private final S3AsyncClient s3AsyncClient;
   private final EmailPublishService publicationService;
   private final DocumentUnitStatusService documentUnitStatusService;
+
+  private final DocumentNumberRecyclingService documentNumberRecyclingService;
   private final Validator validator;
 
   @Value("${otc.obs.bucket-name}")
@@ -62,6 +64,7 @@ public class DocumentUnitService {
       EmailPublishService publicationService,
       DocumentUnitStatusService documentUnitStatusService,
       PublicationReportRepository publicationReportRepository,
+      DocumentNumberRecyclingService documentNumberRecyclingService,
       Validator validator) {
 
     this.repository = repository;
@@ -70,6 +73,7 @@ public class DocumentUnitService {
     this.publicationService = publicationService;
     this.documentUnitStatusService = documentUnitStatusService;
     this.publicationReportRepository = publicationReportRepository;
+    this.documentNumberRecyclingService = documentNumberRecyclingService;
     this.validator = validator;
   }
 
@@ -253,6 +257,7 @@ public class DocumentUnitService {
           .defaultIfEmpty(DeleteObjectResponse.builder().build())
           .map(
               deleteObjectResponse -> {
+                saveForRecycling(documentUnit);
                 repository.delete(documentUnit);
                 return "Dokumentationseinheit gelöscht: " + documentUnitUuid;
               });
@@ -349,5 +354,17 @@ public class DocumentUnitService {
     byteBuffer.get(byteBufferArray);
     byteBuffer.rewind();
     return byteBufferArray;
+  }
+
+  private void saveForRecycling(DocumentUnit documentUnit) {
+    try {
+      documentNumberRecyclingService.addForRecycling(
+          documentUnit.uuid(),
+          documentUnit.documentNumber(),
+          documentUnit.coreData().documentationOffice().abbreviation());
+
+    } catch (Exception e) {
+      log.info("Did not save for recycling", e);
+    }
   }
 }

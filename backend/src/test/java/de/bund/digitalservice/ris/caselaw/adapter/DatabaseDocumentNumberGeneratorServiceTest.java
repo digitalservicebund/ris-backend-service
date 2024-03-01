@@ -7,11 +7,14 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentN
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
 import de.bund.digitalservice.ris.caselaw.domain.DateUtil;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentNumberFormatterException;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentNumberPatternException;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentNumberRecyclingService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitException;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitExistsException;
 import java.util.Optional;
 import java.util.UUID;
+import org.junit.Assert;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,34 +32,49 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 class DatabaseDocumentNumberGeneratorServiceTest {
 
   @Autowired DocumentNumberPatternConfig documentNumberPatternConfig;
+
   @MockBean DatabaseDocumentNumberRepository databaseDocumentNumberRepository;
+
   @MockBean DatabaseDocumentationUnitRepository databaseDocumentationUnitRepository;
 
   @Autowired DatabaseDocumentNumberGeneratorService service;
 
+  @MockBean DocumentNumberRecyclingService documentNumberRecyclingService;
+
+  private static final String DEFAULT_ABBREVIATION = "BGH";
+
   @Test
   void shouldThrowErrorIfDocumentAlreadyExists() {
     var nextDocumentNumber = "KORE70001" + DateUtil.getYear();
-
-    var abbreviation = "BGH";
 
     DocumentationUnitDTO documentationUnitDTO =
         DocumentationUnitDTO.builder()
             .id(UUID.randomUUID())
             .documentNumber(nextDocumentNumber)
             .build();
+
     when(databaseDocumentationUnitRepository.findByDocumentNumber(nextDocumentNumber))
         .thenReturn(Optional.of(documentationUnitDTO));
 
-    assertThatThrownBy(() -> service.generateDocumentNumber(abbreviation))
+    assertThatThrownBy(() -> service.generateDocumentNumber(DEFAULT_ABBREVIATION))
         .isInstanceOf(DocumentationUnitExistsException.class);
+  }
+
+  @Test
+  void shouldRecycleDocumentNumber()
+      throws DocumentNumberPatternException,
+          DocumentNumberFormatterException,
+          DocumentationUnitExistsException {
+    var nextDocumentNumber = "KORE70001" + DateUtil.getYear();
+    when(service.recycle(nextDocumentNumber)).thenReturn(Optional.of(nextDocumentNumber));
+
+    Assert.assertEquals(service.generateDocumentNumber(DEFAULT_ABBREVIATION), nextDocumentNumber);
   }
 
   @Test
   void shouldKeepTrying_ifDocumentNumberExists() {
     var nextDocumentNumber = "KORE70001" + DateUtil.getYear();
 
-    var documentationOffice = "BGH";
     int attempts = 3;
 
     DocumentationUnitDTO documentationUnitDTO =
@@ -68,7 +86,7 @@ class DatabaseDocumentNumberGeneratorServiceTest {
     when(databaseDocumentationUnitRepository.findByDocumentNumber(nextDocumentNumber))
         .thenReturn(Optional.of(documentationUnitDTO));
 
-    assertThatThrownBy(() -> service.generateDocumentNumber(documentationOffice, attempts))
+    assertThatThrownBy(() -> service.generateDocumentNumber(DEFAULT_ABBREVIATION, attempts))
         .isInstanceOf(DocumentationUnitException.class)
         .hasMessageContaining("Could not generate Document number");
   }

@@ -28,6 +28,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.transformer.ProcedureTransform
 import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
 import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentNumberRecyclingService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentNumberService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
@@ -96,6 +97,7 @@ class ProcedureIntegrationTest {
 
   @MockBean private DocumentNumberService numberService;
   @MockBean private DocumentUnitStatusService statusService;
+  @MockBean private DocumentNumberRecyclingService documentNumberRecyclingService;
   @MockBean private PublicationReportRepository publicationReportRepository;
   @MockBean private UserService userService;
   @MockBean ReactiveClientRegistrationRepository clientRegistrationRepository;

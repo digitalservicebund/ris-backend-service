@@ -1,6 +1,9 @@
 package de.bund.digitalservice.ris.caselaw.domain;
 
+import java.time.Instant;
 import java.time.Year;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import lombok.experimental.UtilityClass;
@@ -21,5 +24,10 @@ public class DateUtil {
 
   public static String getYear(int digits) {
     return getYear(getYear(), digits);
+  }
+
+  public static Year getYear(Instant instant) {
+    ZonedDateTime zonedDateTime = instant.atZone(ZoneId.systemDefault());
+    return Year.from(zonedDateTime);
   }
 }

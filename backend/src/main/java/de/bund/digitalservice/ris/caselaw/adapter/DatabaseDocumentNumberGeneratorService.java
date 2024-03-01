@@ -7,11 +7,14 @@ import de.bund.digitalservice.ris.caselaw.domain.DateUtil;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentNumberFormatter;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentNumberFormatterException;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentNumberPatternException;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentNumberRecyclingService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentNumberService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitException;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitExistsException;
 import de.bund.digitalservice.ris.caselaw.domain.StringsUtil;
 import jakarta.validation.constraints.NotEmpty;
+import java.time.Year;
+import java.util.Optional;
 import org.springframework.stereotype.Service;
 
 /** Service to generate the next available doc unit number based on documentation office */
@@ -21,13 +24,17 @@ public class DatabaseDocumentNumberGeneratorService implements DocumentNumberSer
   private final DocumentNumberPatternConfig documentNumberPatternConfig;
   private final DatabaseDocumentationUnitRepository databaseDocumentationUnitRepository;
 
+  private final DocumentNumberRecyclingService documentNumberRecyclingService;
+
   public DatabaseDocumentNumberGeneratorService(
       DatabaseDocumentNumberRepository repository,
       DocumentNumberPatternConfig documentNumberPatternConfig,
-      DatabaseDocumentationUnitRepository databaseDocumentationUnitRepository) {
+      DatabaseDocumentationUnitRepository databaseDocumentationUnitRepository,
+      DocumentNumberRecyclingService documentNumberRecyclingService) {
     this.repository = repository;
     this.documentNumberPatternConfig = documentNumberPatternConfig;
     this.databaseDocumentationUnitRepository = databaseDocumentationUnitRepository;
+    this.documentNumberRecyclingService = documentNumberRecyclingService;
   }
 
   /**
@@ -77,6 +84,7 @@ public class DatabaseDocumentNumberGeneratorService implements DocumentNumberSer
       throw new DocumentNumberPatternException(
           "Documentation Office abbreviation can not be empty");
     }
+
     String pattern =
         documentNumberPatternConfig
             .getDocumentNumberPatterns()
@@ -86,6 +94,10 @@ public class DatabaseDocumentNumberGeneratorService implements DocumentNumberSer
       throw new DocumentNumberPatternException(
           "Could not find pattern for abbreviation " + documentationOfficeAbbreviation);
     }
+
+    String recycledId = recycle(documentationOfficeAbbreviation).orElse(null);
+
+    if (recycledId != null) return recycledId;
 
     DocumentNumberDTO documentNumberDTO =
         repository
@@ -122,5 +134,18 @@ public class DatabaseDocumentNumberGeneratorService implements DocumentNumberSer
       throw new DocumentationUnitExistsException(
           "Document number already exists: " + documentNumber);
     }
+  }
+
+  public Optional<String> recycle(String documentationOfficeAbbreviation) {
+    var optionalDeletedDocumentationUnitID =
+        documentNumberRecyclingService.findDeletedDocumentNumber(
+            documentationOfficeAbbreviation, Year.now());
+
+    if (optionalDeletedDocumentationUnitID.isPresent()) {
+      var recycledDocumentNumber = optionalDeletedDocumentationUnitID.get();
+      documentNumberRecyclingService.delete(recycledDocumentNumber);
+      return Optional.of(recycledDocumentNumber);
+    }
+    return Optional.empty();
   }
 }
