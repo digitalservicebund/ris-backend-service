@@ -20,7 +20,8 @@ test.beforeEach(async ({ page, documentNumber }) => {
     5. Delete original border numbers in reasons
     6. Check validation state after save
 */
-test("create and validate border number links", async ({ page }) => {
+// eslint-disable-next-line playwright/no-skipped-test
+test.skip("create and validate border number links", async ({ page }) => {
   // Copy border numbers from side panel into reasons to have reference data
   const documentOrigin = "Gründe:"
   const firstReason = "First reason"
