@@ -2,6 +2,7 @@ package de.bund.digitalservice.ris.caselaw.adapter;
 
 import static org.mockito.Mockito.when;
 
+import de.bund.digitalservice.ris.caselaw.domain.DocumentNumberRecyclingService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentNumberService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitRepository;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
@@ -37,6 +38,7 @@ class SingleNormValidationTest {
   @MockBean private DocumentUnitRepository repository;
   @MockBean private NormElementRepository normElementRepository;
   @MockBean private DocumentNumberService numberService;
+  @MockBean private DocumentNumberRecyclingService documentNumberRecyclingService;
   @MockBean private S3AsyncClient s3AsyncClient;
   @MockBean private EmailPublishService publishService;
   @MockBean private DocumentUnitStatusService statusService;

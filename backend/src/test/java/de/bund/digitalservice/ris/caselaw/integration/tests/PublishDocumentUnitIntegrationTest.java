@@ -7,6 +7,7 @@ import de.bund.digitalservice.ris.caselaw.RisWebTestClient;
 import de.bund.digitalservice.ris.caselaw.TestConfig;
 import de.bund.digitalservice.ris.caselaw.adapter.AuthService;
 import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentNumberGeneratorService;
+import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentNumberRecyclingService;
 import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentUnitStatusService;
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentNumberPatternConfig;
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentUnitController;
@@ -60,6 +61,7 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
       DocumentUnitService.class,
       KeycloakUserService.class,
       DatabaseDocumentNumberGeneratorService.class,
+      DatabaseDocumentNumberRecyclingService.class,
       PostgresDocumentationUnitRepositoryImpl.class,
       PostgresXmlPublicationRepositoryImpl.class,
       PostgresPublicationReportRepositoryImpl.class,

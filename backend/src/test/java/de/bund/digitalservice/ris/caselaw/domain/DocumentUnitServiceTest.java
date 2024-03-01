@@ -72,6 +72,8 @@ class DocumentUnitServiceTest {
 
   @MockBean private DocumentNumberService documentNumberService;
 
+  @MockBean private DocumentNumberRecyclingService documentNumberRecyclingService;
+
   @MockBean private S3AsyncClient s3AsyncClient;
 
   @MockBean private EmailPublishService publishService;
