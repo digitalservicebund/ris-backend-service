@@ -132,7 +132,7 @@ export const availableFeatures = [
     id: "Wildcards",
     label: "Platzhalter-Suche für mehrere Zeichen",
     description:
-      'Platzhalter-Suchen können für einzelne Begriffe ausgeführt werden, wobei * null oder mehr Zeichen ersetzt. `TENOR:"Arbeits*"`  findet Dokumente, die den Ausdruck “Arbeits-” enthalten, wie z.B. Arbeitsgericht, Arbeitsverhältnis. Gefunden werden somit auch Dokumente, die etwa die Formulierung “Arbeits- und Beschäftigungsfragen” nutzen.',
+      "Platzhalter-Suchen können für einzelne Begriffe ausgeführt werden, wobei * null oder mehr Zeichen ersetzt. “Arbeits*“ findet Dokumente, die den Ausdruck “Arbeits” enthalten, wie z.B. Arbeitsgericht, Arbeitsverhältnis. Gefunden werden somit auch Dokumente, die etwa die Formulierung “Arbeits- und Beschäftigungsfragen” nutzen.",
     examples: [`TENOR:"Arbeits*"`],
   },
   {
@@ -160,8 +160,12 @@ export const availableFeatures = [
     id: "ranges",
     label: "Bereiche",
     description:
-      "Bereiche können für Datum-, numerische oder Zeichenfelder angegeben werden. Inklusive Bereiche werden mit eckigen Klammern [min TO max] und exklusive Bereiche mit geschweiften Klammern {min TO max} angegeben.Bereiche mit einer unbeschränkten Seite können die folgende Syntax verwenden:DATUM:>2024-01-15",
-    examples: [`DATUM:[2024-01-01 TO 2024-01-10]`, `DATUM:>2024-01-15`],
+      "Bereiche können für Datum-, numerische oder Zeichenfelder angegeben werden. Inklusive Bereiche werden mit eckigen Klammern ([]) und exklusive Bereiche mit geschweiften Klammern ({}) angegeben. Für Bereiche mit einer unbeschränkten Seite können das Größer-als-Zeichen (>) oder das Kleiner-als-Zeichen (<) verwendet werden.",
+    examples: [
+      `DATUM:[2024-01-01 TO 2024-01-10]`,
+      `DATUM:{2024-01-01 TO 2024-01-10}`,
+      `DATUM:>2024-01-15`,
+    ],
   },
   {
     id: "boosting",
@@ -178,6 +182,6 @@ export const availableFeatures = [
     label: "Gruppieren",
     description:
       "Mehrere Begriffe oder Ausdrücke können mit Klammern gruppiert werden.",
-    examples: [`GRUENDE:(Krankfeiern OR Krankheitsandrohung) AND Kündigung`],
+    examples: [`GRUENDE:(Hund OR Katze) AND Haustier`],
   },
 ]
