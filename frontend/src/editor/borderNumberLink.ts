@@ -13,14 +13,14 @@ export const BorderNumberLink = Mark.create({
   },
 
   renderHTML({ mark }) {
-    const color =
+    const styleClasses =
       mark.attrs.valid === "true"
-        ? "text-white bg-blue-700"
-        : "text-red-900 bg-red-200"
+        ? 'text-white bg-blue-700 before:content-["Rd_"]'
+        : 'text-red-900 bg-red-200 before:content-["⚠Rd_"]'
     return [
       "border-number-link",
       {
-        class: `font-bold ${color} before:content-["Rd_"]`,
+        class: `font-bold ${styleClasses}`,
         valid: mark.attrs.valid,
         nr: mark.attrs.nr,
       },
