@@ -94,6 +94,7 @@ test("create and validate border number links", async ({ page }) => {
 
   // save
   await page.getByText("Speichern").click()
+  await page.waitForEvent("requestfinished")
 
   // valid border number link
   const borderNumberLink = page
