@@ -182,6 +182,59 @@ class DocumentationUnitIntegrationTest {
   }
 
   @Test
+  @Transactional(transactionManager = "jpaTransactionManager")
+  void testDocumentUnitDeletionAndRecyclingOfDocumentNumber() {
+
+    risWebTestClient
+        .withDefaultLogin()
+        .get()
+        .uri("/api/v1/caselaw/documentunits/new")
+        .exchange()
+        .expectStatus()
+        .isCreated()
+        .expectBody(DocumentUnit.class)
+        .consumeWith(
+            response -> {
+              assertThat(response.getResponseBody()).isNotNull();
+              assertThat(response.getResponseBody().documentNumber()).startsWith("XXRE0");
+            });
+
+    assertThat(repository.findAll()).hasSize(1);
+    var deletedDocumentUnit = repository.findAll().get(0);
+    var reusableDocumentNumber = deletedDocumentUnit.getDocumentNumber();
+
+    risWebTestClient
+        .withDefaultLogin()
+        .delete()
+        .uri("/api/v1/caselaw/documentunits/" + deletedDocumentUnit.getId())
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody(String.class)
+        .consumeWith(
+            response -> {
+              assertThat(response.getResponseBody()).isNotNull();
+            });
+
+    assertThat(repository.findAll()).isEmpty();
+
+    risWebTestClient
+        .withDefaultLogin()
+        .get()
+        .uri("/api/v1/caselaw/documentunits/new")
+        .exchange()
+        .expectStatus()
+        .isCreated()
+        .expectBody(DocumentUnit.class)
+        .consumeWith(
+            response -> {
+              assertThat(response.getResponseBody()).isNotNull();
+              assertThat(response.getResponseBody().documentNumber())
+                  .isEqualTo(reusableDocumentNumber);
+            });
+  }
+
+  @Test
   void testForFileNumbersDbEntryAfterUpdateByUuid() {
 
     DocumentationUnitDTO dto =
