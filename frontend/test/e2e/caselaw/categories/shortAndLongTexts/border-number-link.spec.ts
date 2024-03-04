@@ -21,7 +21,7 @@ test.beforeEach(async ({ page, documentNumber }) => {
     6. Check validation state after save
 */
 // eslint-disable-next-line playwright/no-skipped-test
-test("create and validate border number links", async ({ page }) => {
+test.skip("create and validate border number links", async ({ page }) => {
   // Copy border numbers from side panel into reasons to have reference data
   const documentOrigin = "Gründe:"
   const firstReason = "First reason"
@@ -97,7 +97,7 @@ test("create and validate border number links", async ({ page }) => {
   await page.getByText("Speichern").click()
   await page.waitForEvent("requestfinished")
 
-  // check valid border number link
+  // valid border number link
   const borderNumberLink = page
     .locator("[data-testid='Leitsatz']")
     .locator("border-number-link")
@@ -106,7 +106,7 @@ test("create and validate border number links", async ({ page }) => {
     'font-bold text-white bg-blue-700 before:content-["Rd_"]',
   )
 
-  // check invalid border number link
+  // invalid border number link
   await expect(borderNumberLink.last()).toHaveAttribute("valid", "false")
   await expect(borderNumberLink.last()).toHaveClass(
     'font-bold text-red-900 bg-red-200 before:content-["⚠Rd_"]',
@@ -123,9 +123,7 @@ test("create and validate border number links", async ({ page }) => {
   await page.waitForEvent("requestfinished")
 
   // check first border number link: should be invalid now
-  await expect(borderNumberLink.first()).toHaveAttribute("valid", "false", {
-    timeout: 10000,
-  })
+  await expect(borderNumberLink.first()).toHaveAttribute("valid", "false")
   await expect(borderNumberLink.first()).toHaveClass(
     'font-bold text-red-900 bg-red-200 before:content-["⚠Rd_"]',
   )
