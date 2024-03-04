@@ -11,6 +11,7 @@ export default class DocumentUnitListEntry {
   documentType?: DocumentType
   court?: Court
   appraisalBody?: string
+  hasHeadnoteOrPrinciple?: boolean
 
   constructor(data: Partial<DocumentUnitListEntry> = {}) {
     Object.assign(this, data)

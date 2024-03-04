@@ -12,6 +12,10 @@ public interface DocumentationUnitListItemDTO {
 
   String getJudicialBody();
 
+  String getHeadnote();
+
+  String getGuidingPrinciple();
+
   CourtDTO getCourt();
 
   List<FileNumberDTO> getFileNumbers();

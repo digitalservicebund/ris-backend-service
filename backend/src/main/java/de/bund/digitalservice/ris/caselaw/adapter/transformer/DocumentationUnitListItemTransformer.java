@@ -38,6 +38,7 @@ public class DocumentationUnitListItemTransformer {
         .referencedDocumentationUnitId(documentationUnitListItemDTO.getId())
         .decisionDate(documentationUnitListItemDTO.getDecisionDate())
         .appraisalBody(documentationUnitListItemDTO.getJudicialBody())
+        .hasHeadnoteOrPrinciple(hasHeadnoteOrPrinciple(documentationUnitListItemDTO))
         .fileName(
             documentationUnitListItemDTO.getOriginalFileDocument() == null
                 ? null
@@ -77,6 +78,23 @@ public class DocumentationUnitListItemTransformer {
                     .build());
 
     return builder.build();
+  }
+
+  /**
+   * Checks if a headnote or a guiding principle is given in a documentation unit, to display the
+   * information in a list
+   *
+   * @param documentationUnitListItemDTO
+   * @return a boolean value if either the headnote or the guiding principle are filled in (i.e. one
+   *     or both of these fields)
+   */
+  private static boolean hasHeadnoteOrPrinciple(
+      DocumentationUnitListItemDTO documentationUnitListItemDTO) {
+    String headnote = documentationUnitListItemDTO.getHeadnote();
+    String guidingPrinciple = documentationUnitListItemDTO.getGuidingPrinciple();
+
+    return !(headnote == null || headnote.isEmpty())
+        || !(guidingPrinciple == null || guidingPrinciple.isEmpty());
   }
 
   /**

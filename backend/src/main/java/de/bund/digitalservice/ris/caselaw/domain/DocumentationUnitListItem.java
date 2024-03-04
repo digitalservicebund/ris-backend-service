@@ -32,6 +32,7 @@ public record DocumentationUnitListItem(
     String fileName,
     LocalDate decisionDate,
     String appraisalBody,
+    Boolean hasHeadnoteOrPrinciple,
     DocumentType documentType,
     UUID referencedDocumentationUnitId,
     Status status) {}

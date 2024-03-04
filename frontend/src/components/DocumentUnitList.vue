@@ -11,6 +11,7 @@ import { ResponseError } from "@/services/httpClient"
 import IconAttachedFile from "~icons/ic/baseline-attach-file"
 import IconDelete from "~icons/ic/baseline-close"
 import IconError from "~icons/ic/baseline-error"
+import IconSubject from "~icons/ic/baseline-subject"
 
 const props = defineProps<{
   documentUnitListEntries?: DocumentUnitListEntry[]
@@ -130,7 +131,7 @@ function onDelete() {
         <div
           class="table-cell border-b-2 border-solid border-blue-300 px-16 py-12"
         >
-          Anhang
+          Inhalte
         </div>
         <div
           class="table-cell border-b-2 border-solid border-blue-300 px-16 py-12"
@@ -205,10 +206,24 @@ function onDelete() {
           }}
         </div>
         <div class="table-cell border-b-1 border-blue-300 px-12 align-middle">
-          <span v-if="listEntry.fileName" class="text-blue-800">
-            <IconAttachedFile />
-          </span>
-          <span v-else class="text-gray-500"><IconAttachedFile /></span>
+          <div class="flex flex-row">
+            <span
+              v-if="listEntry.fileName"
+              class="text-blue-800"
+              data-testid="file-attached-icon"
+            >
+              <IconAttachedFile />
+            </span>
+            <span v-else class="text-gray-500"><IconAttachedFile /></span>
+            <span
+              v-if="listEntry.hasHeadnoteOrPrinciple"
+              class="text-blue-800"
+              data-testid="headnote-principle-icon"
+            >
+              <IconSubject />
+            </span>
+            <span v-else class="text-gray-500"><IconSubject /></span>
+          </div>
         </div>
         <div
           class="table-cell border-b-1 border-blue-300 px-16 py-12 align-middle"

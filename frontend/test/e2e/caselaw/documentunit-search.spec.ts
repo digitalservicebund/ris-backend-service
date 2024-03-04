@@ -193,7 +193,6 @@ test.describe("search", () => {
     page,
     prefilledDocumentUnit,
   }) => {
-    //1st date input provided: display results matching exactly this date.
     await navigateToSearch(page)
 
     await fillSearchInput(page, {
@@ -212,71 +211,17 @@ test.describe("search", () => {
       .toBeGreaterThanOrEqual(1)
   })
 
-  //Skipped until test data set implemented
-  // eslint-disable-next-line playwright/no-skipped-test
-  test.skip("search results between two dates", async ({
+  test("exisiting headnote/ guiding principle are indicated as icon", async ({
     page,
     prefilledDocumentUnit,
-    secondPrefilledDocumentUnit,
   }) => {
-    //Both inputs provided: display results matching the date range.
     await navigateToSearch(page)
 
-    await page
-      .getByLabel("Entscheidungsdatum Suche", { exact: true })
-      .fill(
-        dayjs(prefilledDocumentUnit.coreData.decisionDate).format("DD.MM.YYYY"),
-      )
-
-    await page
-      .getByLabel("Entscheidungsdatum Suche Ende", { exact: true })
-      .fill(
-        dayjs(secondPrefilledDocumentUnit.coreData.decisionDate).format(
-          "DD.MM.YYYY",
-        ),
-      )
+    await fillSearchInput(page, {
+      documentNumber: prefilledDocumentUnit.documentNumber,
+    })
     await page.getByLabel("Nach Dokumentationseinheiten suchen").click()
-
-    await expect
-      .poll(async () =>
-        page
-          .locator(".table-row", {
-            hasText: dayjs(
-              secondPrefilledDocumentUnit.coreData.decisionDate,
-            ).format("DD.MM.YYYY"),
-          })
-          .count(),
-      )
-      .toBeGreaterThanOrEqual(1)
-
-    //Same date entered: Show results for the exact date
-    await page
-      .getByLabel("Entscheidungsdatum Suche Ende", { exact: true })
-      .fill(
-        dayjs(prefilledDocumentUnit.coreData.decisionDate).format("DD.MM.YYYY"),
-      )
-
-    await page.getByLabel("Nach Dokumentationseinheiten suchen").click()
-
-    await expect
-      .poll(async () =>
-        page
-          .locator(".table-row", {
-            hasText: dayjs(prefilledDocumentUnit.coreData.decisionDate).format(
-              "DD.MM.YYYY",
-            ),
-          })
-          .count(),
-      )
-      .toBeGreaterThanOrEqual(1)
-
-    await expect(
-      page.locator(".table-row", {
-        hasText: dayjs(
-          secondPrefilledDocumentUnit.coreData.decisionDate,
-        ).format("DD.MM.YYYY"),
-      }),
-    ).toHaveCount(0)
+    await expect(page.getByTestId("headnote-principle-icon")).toBeVisible()
   })
 
   test("displaying errors on focus and blur", async ({
