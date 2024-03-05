@@ -18,8 +18,8 @@ import { ResponseError } from "@/services/httpClient"
 
 const router = useRouter()
 
-const documentUnitListEntries = ref<DocumentUnitListEntry[]>()
 const currentPage = ref<Page<DocumentUnitListEntry>>()
+const documentUnitListEntries = computed(() => currentPage.value?.content)
 
 const itemsPerPage = 100
 const searchResponseError = ref()
@@ -54,7 +54,6 @@ async function search() {
     ...searchQuery.value,
   })
   if (response.data) {
-    documentUnitListEntries.value = response.data.content
     currentPage.value = response.data
   }
   if (response.error) {
@@ -94,9 +93,12 @@ async function handleDelete(documentUnitListEntry: DocumentUnitListEntry) {
   if (documentUnitListEntries.value) {
     const response = await service.delete(documentUnitListEntry.uuid as string)
     if (response.status === 200) {
-      documentUnitListEntries.value = documentUnitListEntries.value.filter(
+      const newEntries = documentUnitListEntries.value.filter(
         (item) => item != documentUnitListEntry,
       )
+      currentPage.value!.content = newEntries
+      currentPage.value!.numberOfElements = newEntries.length
+      currentPage.value!.empty = newEntries.length == 0
     } else {
       alert("Fehler beim Löschen der Dokumentationseinheit: " + response.data)
     }
@@ -130,7 +132,6 @@ async function updateQuery(value: Query<DocumentUnitSearchParameter>) {
  * which empties the document unit list and resets the pagination.
  */
 async function handleReset() {
-  documentUnitListEntries.value = undefined
   currentPage.value = undefined
 }
 
