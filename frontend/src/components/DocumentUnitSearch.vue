@@ -90,15 +90,15 @@ async function search() {
  * @param {DocumentUnitListEntry} documentUnitListEntry - The entry in the list to be removed
  */
 async function handleDelete(documentUnitListEntry: DocumentUnitListEntry) {
-  if (documentUnitListEntries.value) {
+  if (documentUnitListEntries.value && currentPage.value) {
     const response = await service.delete(documentUnitListEntry.uuid as string)
     if (response.status === 200) {
       const newEntries = documentUnitListEntries.value.filter(
         (item) => item != documentUnitListEntry,
       )
-      currentPage.value!.content = newEntries
-      currentPage.value!.numberOfElements = newEntries.length
-      currentPage.value!.empty = newEntries.length == 0
+      currentPage.value.content = newEntries
+      currentPage.value.numberOfElements = newEntries.length
+      currentPage.value.empty = newEntries.length == 0
     } else {
       alert("Fehler beim Löschen der Dokumentationseinheit: " + response.data)
     }
