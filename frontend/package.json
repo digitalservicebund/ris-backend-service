@@ -30,8 +30,8 @@
   },
   "dependencies": {
     "@braintree/sanitize-url": "^7.0.0",
-    "@sentry/integrations": "^7.104.0",
-    "@sentry/vue": "^7.104.0",
+    "@sentry/integrations": "^7.105.0",
+    "@sentry/vue": "^7.105.0",
     "@tiptap/extension-bold": "^2.2.4",
     "@tiptap/extension-bullet-list": "^2.2.4",
     "@tiptap/extension-color": "^2.2.4",
