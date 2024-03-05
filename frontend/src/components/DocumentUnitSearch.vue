@@ -93,6 +93,10 @@ async function handleDelete(documentUnitListEntry: DocumentUnitListEntry) {
   if (documentUnitListEntries.value && currentPage.value) {
     const response = await service.delete(documentUnitListEntry.uuid as string)
     if (response.status === 200) {
+      if (documentUnitListEntries.value.length === 1) {
+        await search()
+        return
+      }
       const newEntries = documentUnitListEntries.value.filter(
         (item) => item != documentUnitListEntry,
       )
