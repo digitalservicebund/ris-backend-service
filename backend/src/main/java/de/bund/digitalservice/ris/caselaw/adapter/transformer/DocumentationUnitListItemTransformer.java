@@ -1,10 +1,11 @@
 package de.bund.digitalservice.ris.caselaw.adapter.transformer;
 
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitListItemDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.StatusDTO;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitListItem;
 import de.bund.digitalservice.ris.caselaw.domain.RelatedDocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.RelatedDocumentationUnit.RelatedDocumentationUnitBuilder;
-import de.bund.digitalservice.ris.caselaw.domain.Status;
+import java.util.Comparator;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -44,14 +45,9 @@ public class DocumentationUnitListItemTransformer {
                 ? null
                 : documentationUnitListItemDTO.getOriginalFileDocument().getFilename())
         .documentType(
-            documentationUnitListItemDTO.getDocumentType() == null
-                ? null
-                : DocumentTypeTransformer.transformToDomain(
-                    documentationUnitListItemDTO.getDocumentType()))
-        .court(
-            documentationUnitListItemDTO.getCourt() == null
-                ? null
-                : CourtTransformer.transformToDomain(documentationUnitListItemDTO.getCourt()))
+            DocumentTypeTransformer.transformToDomain(
+                documentationUnitListItemDTO.getDocumentType()))
+        .court(CourtTransformer.transformToDomain(documentationUnitListItemDTO.getCourt()))
         .fileNumber(
             documentationUnitListItemDTO.getFileNumbers() == null
                     || documentationUnitListItemDTO.getFileNumbers().isEmpty()
@@ -61,22 +57,10 @@ public class DocumentationUnitListItemTransformer {
             documentationUnitListItemDTO.getStatus() == null
                     || documentationUnitListItemDTO.getStatus().isEmpty()
                 ? null
-                : Status.builder()
-                    // TODO is the first status the most recent?
-                    .publicationStatus(
-                        documentationUnitListItemDTO.getStatus().get(0) == null // NOSONAR
-                            // reason for NOSONAR: it's still readable and there is still a todo, so
-                            // still object to change
-                            ? null
-                            : documentationUnitListItemDTO
-                                .getStatus()
-                                .get(0)
-                                .getPublicationStatus())
-                    .withError(
-                        documentationUnitListItemDTO.getStatus().get(0) == null
-                            || documentationUnitListItemDTO.getStatus().get(0).isWithError())
-                    .build());
-
+                : StatusTransformer.transformToDomain(
+                    documentationUnitListItemDTO.getStatus().stream()
+                        .max(Comparator.comparing(StatusDTO::getCreatedAt))
+                        .orElse(null)));
     return builder.build();
   }
 

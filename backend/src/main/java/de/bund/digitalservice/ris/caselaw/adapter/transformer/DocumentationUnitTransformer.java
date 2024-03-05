@@ -16,6 +16,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LegalEffectDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.NormReferenceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.OriginalFileDocumentDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PendingDecisionDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.StatusDTO;
 import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData.CoreDataBuilder;
@@ -32,6 +33,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -568,8 +570,11 @@ public class DocumentationUnitTransformer {
     if (documentationUnitDTO.getStatus() == null || documentationUnitDTO.getStatus().isEmpty()) {
       return;
     }
-
-    builder.status(StatusTransformer.transformToDomain(documentationUnitDTO.getStatus().get(0)));
+    builder.status(
+        StatusTransformer.transformToDomain(
+            documentationUnitDTO.getStatus().stream()
+                .max(Comparator.comparing(StatusDTO::getCreatedAt))
+                .orElse(null)));
   }
 
   private static void addPreviousDecisionsToDomain(

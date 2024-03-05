@@ -8,6 +8,9 @@ public class StatusTransformer {
   private StatusTransformer() {}
 
   public static Status transformToDomain(StatusDTO statusDTO) {
+    if (statusDTO == null) {
+      return null;
+    }
     return Status.builder()
         .withError(statusDTO.isWithError())
         .publicationStatus(statusDTO.getPublicationStatus())

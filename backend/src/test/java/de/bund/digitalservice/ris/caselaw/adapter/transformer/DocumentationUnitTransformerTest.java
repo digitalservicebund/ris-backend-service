@@ -12,6 +12,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LeadingDecisionNo
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LegalEffectDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PendingDecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.RegionDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.StatusDTO;
 import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData.CoreDataBuilder;
@@ -19,8 +20,10 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit.DocumentUnitBuilder;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.EnsuingDecision;
+import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.Texts;
 import de.bund.digitalservice.ris.caselaw.domain.court.Court;
+import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
@@ -484,6 +487,33 @@ class DocumentationUnitTransformerTest {
     assertThat(documentUnit.coreData().leadingDecisionNormReferences())
         .hasSize(3)
         .containsExactly("BGB §1", "BGB §2", "BGB §3");
+  }
+
+  @Test
+  void testTransformToDomain_shouldUseLatestStatus() {
+    DocumentationUnitDTO documentationUnitDTO =
+        generateSimpleDTOBuilder()
+            .status(
+                List.of(
+                    // was published yesterday
+                    StatusDTO.builder()
+                        .createdAt(Instant.now().minus(1, java.time.temporal.ChronoUnit.DAYS))
+                        .publicationStatus(PublicationStatus.PUBLISHED)
+                        .withError(true)
+                        .build(),
+                    // was unpublished now
+                    StatusDTO.builder()
+                        .createdAt(Instant.now())
+                        .publicationStatus(PublicationStatus.UNPUBLISHED)
+                        .withError(false)
+                        .build()))
+            .build();
+
+    DocumentUnit documentUnit =
+        DocumentationUnitTransformer.transformToDomain(documentationUnitDTO);
+
+    assertThat(documentUnit.status().publicationStatus()).isEqualTo(PublicationStatus.UNPUBLISHED);
+    assertThat(documentUnit.status().withError()).isFalse();
   }
 
   private DocumentationUnitDTOBuilder generateSimpleDTOBuilder() {
