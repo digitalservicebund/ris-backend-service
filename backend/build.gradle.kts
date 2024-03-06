@@ -192,7 +192,7 @@ dependencies {
     var flywayCore = "org.flywaydb:flyway-core:10.8.1"
     implementation(flywayCore)
     "migrationImplementation"(flywayCore)
-    runtimeOnly("org.flywaydb:flyway-database-postgresql:10.8.1")
+    runtimeOnly("org.flywaydb:flyway-database-postgresql:10.9.0")
 
     implementation("io.getunleash:unleash-client-java:9.2.0")
     implementation("org.apache.commons:commons-text:1.11.0")
