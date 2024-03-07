@@ -15,7 +15,8 @@ Requires the all but backend to be running in docker:
 
 **Start backend with IntelliJ:**
 
-- Use the checked in run config in `../.idea/runConfigurations/`. If you open just this `backend` folder with IntelliJ, you will need to copy and adjust it.
+- Use the checked in run config in `../.idea/runConfigurations/`. If you open just this `backend`
+  folder with IntelliJ, you will need to copy and adjust it.
 
 **Start backend with VS Code:**
 
@@ -29,24 +30,37 @@ SPRING_PROFILES_ACTIVE=local ./gradlew bootRun
 
 > **Note**
 >
-> The application depends on a Java package from a private GitHub package repository. To be able to download it in the Gradle build process, you'll need to set up your local env as described in the [root readme](../README.md#setup-local-environment).
+> The application depends on a Java package from a private GitHub package repository. To be able to
+> download it in the Gradle build process, you'll need to set up your local env as described in
+> the [root readme](../README.md#setup-local-environment).
 
 ### Database Setup & Migration with Flyway
 
 The application uses Flyway for maintaining and versioning database migrations.
 
-Most of the caselaw database structure is setup through ris-data-migration repo - see [instructions here](../migration_schema_local_setup.md). This repo manages only norms tables and those with data that does not exist in migrated documentation units (e.g. publication reports, .docx files).
+Most of the caselaw database structure is setup through ris-data-migration repo -
+see [instructions here](../migration_schema_local_setup.md). This repo manages only norms tables and
+those with data that does not exist in migrated documentation units (e.g. publication reports, .docx
+files).
 
 In order to create a change in the database you should follow one of the two methods:
 
 1. If you want to create a migration using SQL:
    - You should create a new sql file on the directory `src\main\resources\db\migration`.
-   - The file should be named in the following format: `Vx.x__teamname_create_table_xyz.sql` where `x.x` is your migration version (make sure to pull first from the repository and see what is the latest version otherwise migrations wouldn't work properly).
+   - The file should be named in the following format: `Vx.x__teamname_create_table_xyz.sql`
+     where `x.x` is your migration version (make sure to pull first from the repository and see
+     what is the latest version otherwise migrations wouldn't work properly).
 2. If you want to create a migration using Java:
-   - You should create a new Java class on the directory `src\main\java\db\migration` that extends `BaseJavaMigration` and implements the method `void migrate(Context context) throws Exception`.
-   - The file should be named in the following format: `Vx_x__teamname_create_table_xyz.sql` where `x_x` is your migration version (make sure to pull first from the repository and see what is the latest version in the sql path and the java path otherwise migrations wouldn't work properly).
+   - You should create a new Java class on the directory `src\main\java\db\migration` that
+     extends `BaseJavaMigration` and implements the
+     method `void migrate(Context context) throws Exception`.
+   - The file should be named in the following format: `Vx_x__teamname_create_table_xyz.sql`
+     where `x_x` is your migration version (make sure to pull first from the repository and see
+     what is the latest version in the sql path and the java path otherwise migrations wouldn't
+     work properly).
 
-For both migration file names, the `teamname` can be replaced with: whether `caselaw` or `norms` and is normally followed by a descriptive name for the migration.
+For both migration file names, the `teamname` can be replaced with: whether `caselaw` or `norms` and
+is normally followed by a descriptive name for the migration.
 
 Flyway automatically detects new files and run migrations accordingly on sprint boot start.
 
@@ -68,7 +82,9 @@ The project has distinct unit and integration test sets.
 
 > **Note**
 >
-> Running integration tests requires passing unit tests (in Gradle terms: integration tests depend on unit tests), so unit tests are going to be run first. In case there are failing unit tests we won't attempt to continue running any integration tests.
+> Running integration tests requires passing unit tests (in Gradle terms: integration tests depend
+> on unit tests), so unit tests are going to be run first. In case there are failing unit tests we
+> won't attempt to continue running any integration tests.
 
 **To run integration tests exclusively, without the unit test dependency:**
 
@@ -76,13 +92,19 @@ The project has distinct unit and integration test sets.
 ./gradlew integrationTest --exclude-task test
 ```
 
-Denoting an integration test is accomplished by using a JUnit 5 tag annotation: `@Tag("integration")`.
+Denoting an integration test is accomplished by using a JUnit 5 tag
+annotation: `@Tag("integration")`.
 
-Furthermore, there is another type of test worth mentioning. We're using [ArchUnit](https://www.archunit.org/getting-started) for ensuring certain architectural characteristics, for instance making sure that there are no cyclic dependencies.
+Furthermore, there is another type of test worth mentioning. We're
+using [ArchUnit](https://www.archunit.org/getting-started) for ensuring certain architectural
+characteristics, for instance making sure that there are no cyclic dependencies.
 
 ## Formatting & Styleguide
 
-Check our [Java Styleguides](JAVA_STYLEGUIDES.md) document. To set up IntelliJ IDEA follow [these instructions](https://github.com/google/google-java-format#intellij-android-studio-and-other-jetbrains-ides). Consistent formatting, for Java as well as various other types of source code, is being enforced via [Spotless](https://github.com/diffplug/spotless).
+Check our [Java Styleguides](JAVA_STYLEGUIDES.md) document. To set up IntelliJ IDEA
+follow [these instructions](https://github.com/google/google-java-format#intellij-android-studio-and-other-jetbrains-ides).
+Consistent formatting, for Java as well as various other types of source code, is being enforced
+via [Spotless](https://github.com/diffplug/spotless).
 
 **Check formatting:**
 
@@ -99,7 +121,8 @@ Check our [Java Styleguides](JAVA_STYLEGUIDES.md) document. To set up IntelliJ I
 ## Code quality analysis
 
 Continuous code quality analysis is performed in the pipeline upon pushing to trunk; it requires a
-token provided as `SONAR_TOKEN` repository secret that needs to be obtained from https://sonarcloud.io.
+token provided as `SONAR_TOKEN` repository secret that needs to be obtained
+from https://sonarcloud.io.
 
 **To run the analysis locally:**
 
@@ -107,7 +130,9 @@ token provided as `SONAR_TOKEN` repository secret that needs to be obtained from
 SONAR_TOKEN=[sonar-token] ./gradlew sonarqube
 ```
 
-Go to [https://sonarcloud.io](https://sonarcloud.io/dashboard?id=digitalservicebund_ris-backend-service) for the analysis results.
+Go
+to [https://sonarcloud.io](https://sonarcloud.io/dashboard?id=digitalservicebund_ris-backend-service)
+for the analysis results.
 
 ## Container image
 
@@ -129,7 +154,8 @@ We are using Spring's built-in support for producing an optimized container imag
 docker run -p8080:8080 ghcr.io/digitalservicebund/ris-backend-service
 ```
 
-Container images in the registry are [signed with keyless signatures](https://github.com/sigstore/cosign/blob/main/KEYLESS.md).
+Container images in the registry
+are [signed with keyless signatures](https://github.com/sigstore/cosign/blob/main/KEYLESS.md).
 
 **To verify an image:**
 
@@ -148,7 +174,8 @@ export CONTAINER_IMAGE_VERSION="$(git log -1 --format='%H')"
 CONTAINER_REGISTRY_USER=[github-user] CONTAINER_REGISTRY_PASSWORD=[github-token] ./gradlew bootBuildImage --publishImage
 ```
 
-**Note:** Make sure you're using a GitHub token with the necessary `write:packages` scope for this to work.
+**Note:** Make sure you're using a GitHub token with the necessary `write:packages` scope for this
+to work.
 
 **Using Docker:**
 
@@ -157,12 +184,15 @@ echo [github-token] | docker login ghcr.io -u [github-user] --password-stdin
 docker push "ghcr.io/digitalservicebund/ris-backend-service:$(git log -1 --format='%H')"
 ```
 
-**Note:** Make sure you're using a GitHub token with the necessary `write:packages` scope for this to work.
+**Note:** Make sure you're using a GitHub token with the necessary `write:packages` scope for this
+to work.
 
 ## Vulnerability Scanning
 
-Scanning container images for vulnerabilities is performed with [Trivy](https://github.com/aquasecurity/trivy)
-as part of the pipeline's `build` job, as well as each night for the latest published image in the container
+Scanning container images for vulnerabilities is performed
+with [Trivy](https://github.com/aquasecurity/trivy)
+as part of the pipeline's `build` job, as well as each night for the latest published image in the
+container
 repository.
 
 To run a scan locally:
@@ -174,7 +204,8 @@ trivy image --severity HIGH,CRITICAL ghcr.io/digitalservicebund/ris-backend-serv
 
 ## License Scanning
 
-License scanning is performed as part of the pipeline's `build` job. Whenever a production dependency
+License scanning is performed as part of the pipeline's `build` job. Whenever a production
+dependency
 is being added with a yet unknown license the build is going to fail.
 
 **To run a scan locally:**
@@ -185,7 +216,11 @@ is being added with a yet unknown license the build is going to fail.
 
 ## Dependency Updates
 
-Can be used to show the latest release version for every dependency. Generate a report in `build/dependencyUpdates/report.txt`.
+Can be used to show the latest release version for every dependency. Generate a report
+in `build/dependencyUpdates/report.txt`.
+
+> [!IMPORTANT]
+> Only update final release. Exclude alpha beta or RC (Release Candidate) if possible.
 
 **To run a scan locally:**
 
