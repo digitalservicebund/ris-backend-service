@@ -42,8 +42,6 @@ server:
 #  level:
 #    org.springframework: DEBUG
 spring:
-  config:
-    import: "kubernetes:"
   codec:
     max-in-memory-size: 100MB
   sql:
