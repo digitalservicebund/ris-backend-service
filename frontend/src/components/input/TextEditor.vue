@@ -280,10 +280,9 @@ watch(
       return
     }
     // incoming changes
-    editor.commands.setContent(value, false)
-
     // the cursor should not jump to the end of the content but stay where it is
     const cursorPos = editor.state.selection.anchor
+    editor.commands.setContent(value, false)
     editor.commands.setTextSelection(cursorPos)
   },
 )
