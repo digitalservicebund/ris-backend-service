@@ -237,46 +237,34 @@ public class DocumentUnitService {
   }
 
   public Mono<String> deleteByUuid(UUID documentUnitUuid) {
-    Map<RelatedDocumentationType, Long> linkCounter =
+    Map<RelatedDocumentationType, Long> relatedEntities =
         repository.getAllDocumentationUnitWhichLink(documentUnitUuid);
 
-    if (linkCounter == null
-        || linkCounter.isEmpty()
-        || linkCounter.values().stream().mapToLong(Long::longValue).sum() == 0) {
-      DocumentUnit documentUnit = repository.findByUuid(documentUnitUuid);
-
-      log.debug("Deleting DocumentUnitDTO " + documentUnitUuid);
-
-      return deleteObjectFromBucket(documentUnit.s3path())
-          .doOnNext(
-              deleteObjectResponse -> log.debug("Deleted file {} in bucket", documentUnit.s3path()))
-          .doOnError(
-              exception ->
-                  log.error(
-                      "Error by deleting file {} in bucket", documentUnit.s3path(), exception))
-          .defaultIfEmpty(DeleteObjectResponse.builder().build())
-          .map(
-              deleteObjectResponse -> {
-                saveForRecycling(documentUnit);
-                repository.delete(documentUnit);
-                return "Dokumentationseinheit gelöscht: " + documentUnitUuid;
-              });
+    if (!(relatedEntities == null
+        || relatedEntities.isEmpty()
+        || relatedEntities.values().stream().mapToLong(Long::longValue).sum() == 0)) {
+      return Mono.error(
+          new DocumentUnitDeletionException(
+              "Die Dokumentationseinheit konnte nicht gelöscht werden, da", relatedEntities));
     }
 
-    log.error("Couldn't delete the DocumentUnit");
+    DocumentUnit documentUnit = repository.findByUuid(documentUnitUuid);
 
-    StringBuilder errorMessage =
-        new StringBuilder("Die Dokumentationseinheit konnte nicht gelöscht werden, da (");
-    for (var entry : linkCounter.entrySet()) {
-      errorMessage
-          .append(entry.getValue())
-          .append(": ")
-          .append(entry.getKey().getName())
-          .append(",");
-    }
-    errorMessage.append(")");
+    log.debug("Deleting DocumentUnitDTO " + documentUnitUuid);
 
-    return Mono.error(new DocumentUnitDeletionException(errorMessage.toString()));
+    return deleteObjectFromBucket(documentUnit.s3path())
+        .doOnNext(
+            deleteObjectResponse -> log.debug("Deleted file {} in bucket", documentUnit.s3path()))
+        .doOnError(
+            exception ->
+                log.error("Error by deleting file {} in bucket", documentUnit.s3path(), exception))
+        .defaultIfEmpty(DeleteObjectResponse.builder().build())
+        .map(
+            deleteObjectResponse -> {
+              saveForRecycling(documentUnit);
+              repository.delete(documentUnit);
+              return "Dokumentationseinheit gelöscht: " + documentUnitUuid;
+            });
   }
 
   public Mono<DocumentUnit> updateDocumentUnit(DocumentUnit documentUnit) {
