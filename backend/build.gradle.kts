@@ -83,7 +83,16 @@ spotless {
         }
     }
     format("misc") {
-        target("**/*.js", "**/*.json", "**/*.md", "**/*.properties", "**/*.sh", "**/*.sql", "**/*.yaml", "**/*.yml")
+        target(
+            "**/*.js",
+            "**/*.json",
+            "**/*.md",
+            "**/*.properties",
+            "**/*.sh",
+            "**/*.sql",
+            "**/*.yaml",
+            "**/*.yml"
+        )
         targetExclude("frontend/**", "**/dist/**", "**/static/**")
         // spotless:off
         prettier(
@@ -106,7 +115,12 @@ spotless {
 licenseReport {
     allowedLicensesFile = File("$projectDir/../allowed-licenses.json")
     renderers = arrayOf<ReportRenderer>(CsvReportRenderer("backend-licence-report.csv"))
-    filters = arrayOf<DependencyFilter>(LicenseBundleNormalizer("$projectDir/license-normalizer-bundle.json", true))
+    filters = arrayOf<DependencyFilter>(
+        LicenseBundleNormalizer(
+            "$projectDir/license-normalizer-bundle.json",
+            true
+        )
+    )
 }
 
 sonar {
@@ -150,7 +164,7 @@ dependencies {
     // CVE-2022-3171
     implementation("com.google.protobuf:protobuf-java:3.25.0")
     // CVE-2023-31582
-    implementation("org.bitbucket.b_c:jose4j:0.9.3")
+    implementation("org.bitbucket.b_c:jose4j:0.9.5")
 
     implementation("org.postgresql:postgresql:42.7.2")
 
@@ -287,7 +301,8 @@ tasks {
 
     getByName<BootBuildImage>("bootBuildImage") {
         val containerRegistry = System.getenv("CONTAINER_REGISTRY") ?: "ghcr.io"
-        val containerImageName = System.getenv("CONTAINER_IMAGE_NAME") ?: "digitalservicebund/${rootProject.name}"
+        val containerImageName =
+            System.getenv("CONTAINER_IMAGE_NAME") ?: "digitalservicebund/${rootProject.name}"
         val containerImageVersion = System.getenv("CONTAINER_IMAGE_VERSION") ?: "latest"
 
         imageName.set("${containerRegistry}/${containerImageName}:${containerImageVersion}")
