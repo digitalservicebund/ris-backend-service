@@ -136,7 +136,7 @@ sonar {
 }
 
 dependencies {
-    val testContainersVersion = "1.19.0"
+    val testContainersVersion = "1.19.7"
 
     implementation("org.springframework:spring-web")
     implementation("org.springframework:spring-webflux")
@@ -157,14 +157,14 @@ dependencies {
 
     implementation("org.springdoc:springdoc-openapi-starter-webflux-ui:2.3.0")
 
-    implementation("org.springframework.cloud:spring-cloud-starter-kubernetes-client-config:2.1.3")
+    implementation("org.springframework.cloud:spring-cloud-starter-kubernetes-client-config:3.1.0")
 
     // CVE-2024-26308
     implementation("org.apache.commons:commons-compress:1.26.0")
     // CVE-2022-3171
     implementation("com.google.protobuf:protobuf-java:3.25.0")
     // CVE-2023-31582
-    implementation("org.bitbucket.b_c:jose4j:0.9.5")
+    implementation("org.bitbucket.b_c:jose4j:0.9.6")
 
     implementation("org.postgresql:postgresql:42.7.2")
 
@@ -172,15 +172,15 @@ dependencies {
     // CVE-2022-4244
     implementation("org.codehaus.plexus:plexus-utils:4.0.0")
 
-    implementation(platform("software.amazon.awssdk:bom:2.25.0"))
+    implementation(platform("software.amazon.awssdk:bom:2.25.4"))
     implementation("software.amazon.awssdk:netty-nio-client")
     implementation("software.amazon.awssdk:s3")
 
-    implementation("org.docx4j:docx4j-JAXB-ReferenceImpl:11.4.9")
+    implementation("org.docx4j:docx4j-JAXB-ReferenceImpl:11.4.11")
     implementation("org.freehep:freehep-graphicsio-emf:2.4")
 
-    implementation("jakarta.mail:jakarta.mail-api:2.1.2")
-    implementation("org.eclipse.angus:angus-mail:2.0.2")
+    implementation("jakarta.mail:jakarta.mail-api:2.1.3")
+    implementation("org.eclipse.angus:angus-mail:2.0.3")
     implementation("com.icegreen:greenmail:2.0.0")
 
     // package served by private repo, requires authentication:
@@ -218,9 +218,9 @@ dependencies {
     testImplementation("org.mockito:mockito-junit-jupiter:5.11.0")
     testImplementation("org.mockito:mockito-inline:5.2.0")
 
-    testImplementation("io.projectreactor:reactor-test:3.6.1")
+    testImplementation("io.projectreactor:reactor-test:3.6.2")
     testImplementation("org.springframework.security:spring-security-test")
-    testImplementation("com.tngtech.archunit:archunit-junit5:1.2.0")
+    testImplementation("com.tngtech.archunit:archunit-junit5:1.2.1")
     testImplementation("org.testcontainers:testcontainers:$testContainersVersion")
     testImplementation("org.testcontainers:junit-jupiter:$testContainersVersion")
     testImplementation("org.testcontainers:postgresql:$testContainersVersion")
