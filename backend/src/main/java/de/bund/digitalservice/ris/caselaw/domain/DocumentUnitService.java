@@ -243,6 +243,12 @@ public class DocumentUnitService {
     if (!(relatedEntities == null
         || relatedEntities.isEmpty()
         || relatedEntities.values().stream().mapToLong(Long::longValue).sum() == 0)) {
+
+      log.debug(
+          "Could not delete document unit {} cause of related entities: {}",
+          documentUnitUuid,
+          relatedEntities);
+
       return Mono.error(
           new DocumentUnitDeletionException(
               "Die Dokumentationseinheit konnte nicht gelöscht werden, da", relatedEntities));

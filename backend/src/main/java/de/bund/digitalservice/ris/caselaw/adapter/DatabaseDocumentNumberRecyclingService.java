@@ -75,7 +75,7 @@ public class DatabaseDocumentNumberRecyclingService implements DocumentNumberRec
       return Optional.of(repository.save(deleted).getDocumentNumber());
 
     } catch (Exception e) {
-      log.info("Won´t reuse the document number: ", e);
+      log.info("Won´t reuse the document number", e);
       return Optional.empty();
     }
   }
