@@ -13,7 +13,7 @@ public class ProcedureTransformer {
       List<DocumentationUnitProcedureDTO> procedureDTOs) {
     if (procedureDTOs == null || procedureDTOs.isEmpty()) return null;
 
-    return transformToDomain(procedureDTOs.get(0).getProcedure());
+    return transformToDomain(procedureDTOs.get(procedureDTOs.size() - 1).getProcedure());
   }
 
   public static List<String> transformPreviousProceduresToLabel(
@@ -22,7 +22,7 @@ public class ProcedureTransformer {
       return Collections.emptyList();
     }
 
-    return procedureDTOs.subList(1, procedureDTOs.size()).stream()
+    return procedureDTOs.subList(0, procedureDTOs.size() - 1).stream()
         .map(DocumentationUnitProcedureDTO::getProcedure)
         .map(ProcedureDTO::getLabel)
         .toList();

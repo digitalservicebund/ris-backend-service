@@ -460,7 +460,7 @@ class ProcedureIntegrationTest {
               assertThat(response.getResponseBody().coreData().procedure().label())
                   .isEqualTo(procedure3.label());
               assertThat(response.getResponseBody().coreData().previousProcedures())
-                  .containsExactly("bar", "foo");
+                  .containsExactly("foo", "bar");
             });
 
     assertThat(repository.findAll()).hasSize(3);
@@ -503,7 +503,7 @@ class ProcedureIntegrationTest {
             response -> {
               CoreData coreData = response.getResponseBody().coreData();
               assertThat(coreData.procedure().label()).isEqualTo("foo");
-              assertThat(coreData.previousProcedures()).containsExactly("bar", "foo");
+              assertThat(coreData.previousProcedures()).containsExactly("foo", "bar");
             });
   }
 

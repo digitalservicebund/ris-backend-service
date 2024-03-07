@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { toRefs, watch } from "vue"
+import { computed, toRefs, watch } from "vue"
 import ComboboxInput from "@/components/ComboboxInput.vue"
 import ChipsDateInput from "@/components/input/ChipsDateInput.vue"
 import ChipsInput from "@/components/input/ChipsInput.vue"
@@ -23,6 +23,13 @@ const emit = defineEmits<{
 }>()
 const { modelValue } = toRefs(props)
 const validationStore = useValidationStore<["decisionDate"][number]>()
+
+/**
+ * Our UI turns the chronological order of the list, so the latest previous precedure is first.
+ */
+const previousProcedures = computed(() =>
+  modelValue.value.previousProcedures?.toReversed(),
+)
 
 watch(
   modelValue,
@@ -185,7 +192,7 @@ watch(
           <InputField id="previousProcedures" label="Vorgangshistorie">
             <ChipsInput
               id="previousProcedures"
-              v-model="modelValue.previousProcedures"
+              v-model="previousProcedures"
               aria-label="Vorgangshistorie"
               read-only
             ></ChipsInput>

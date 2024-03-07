@@ -284,26 +284,13 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
                   procedureDTO = optionalProcedureDTO.get();
                 }
               }
-
               boolean sameAsLast =
                   !documentationUnitDTO.getProcedures().isEmpty()
                       && documentationUnitDTO
                           .getProcedures()
-                          .get(0)
+                          .get(documentationUnitDTO.getProcedures().size() - 1)
                           .getProcedure()
                           .equals(procedureDTO);
-
-              if (procedureDTO != null && !sameAsLast) {
-                DocumentationUnitProcedureDTO documentationUnitProcedureDTO =
-                    DocumentationUnitProcedureDTO.builder()
-                        .primaryKey(
-                            new DocumentationUnitProcedureId(
-                                documentationUnitDTO.getId(), procedureDTO.getId()))
-                        .documentationUnit(documentationUnitDTO)
-                        .procedure(procedureDTO)
-                        .build();
-                documentationUnitProcedureDTOs.add(documentationUnitProcedureDTO);
-              }
 
               documentationUnitDTO
                   .getProcedures()
@@ -320,6 +307,18 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
                                 .build();
                         documentationUnitProcedureDTOs.add(newLink);
                       });
+
+              if (procedureDTO != null && !sameAsLast) {
+                DocumentationUnitProcedureDTO documentationUnitProcedureDTO =
+                    DocumentationUnitProcedureDTO.builder()
+                        .primaryKey(
+                            new DocumentationUnitProcedureId(
+                                documentationUnitDTO.getId(), procedureDTO.getId()))
+                        .documentationUnit(documentationUnitDTO)
+                        .procedure(procedureDTO)
+                        .build();
+                documentationUnitProcedureDTOs.add(documentationUnitProcedureDTO);
+              }
 
               updateProcedureRank(documentationUnitProcedureDTOs);
 
