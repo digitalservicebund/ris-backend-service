@@ -14,7 +14,7 @@ plugins {
     id("io.spring.dependency-management") version "1.1.0"
     id("com.diffplug.spotless") version "6.25.0"
     id("org.sonarqube") version "4.4.1.3373"
-    id("com.github.jk1.dependency-license-report") version "2.5"
+    id("com.github.jk1.dependency-license-report") version "2.6"
     id("com.gorylenko.gradle-git-properties") version "2.4.1"
     id("com.adarshr.test-logger") version "4.0.0"
     id("com.github.ben-manes.versions") version "0.51.0"
