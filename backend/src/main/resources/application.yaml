@@ -42,6 +42,12 @@ server:
 #  level:
 #    org.springframework: DEBUG
 spring:
+  config:
+    import: "kubernetes:"
+  cloud:
+    kubernetes:
+      secrets:
+        paths: /etc/secrets
   codec:
     max-in-memory-size: 100MB
   sql:
