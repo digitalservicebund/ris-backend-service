@@ -4,6 +4,7 @@ import de.bund.digitalservice.ris.caselaw.domain.ApiKey;
 import de.bund.digitalservice.ris.caselaw.domain.ImportApiKeyException;
 import de.bund.digitalservice.ris.caselaw.domain.User;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
+import java.util.Locale;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.server.reactive.ServerHttpRequest;
@@ -61,15 +62,11 @@ public class AuthController {
   @PutMapping(value = "api-key/import")
   @PreAuthorize("isAuthenticated()")
   public Mono<ResponseEntity<ApiKey>> generateImportApiKey(
-      @AuthenticationPrincipal OidcUser oidcUser) {
-    try {
-      ApiKey apiKey = authService.generateImportApiKey(oidcUser);
-      return Mono.just(ResponseEntity.ok(apiKey));
-    } catch (ImportApiKeyException ignored) {
-      log.error("error by generation of import api key");
-    }
+      @AuthenticationPrincipal OidcUser oidcUser, Locale locale) {
 
-    return Mono.just(ResponseEntity.badRequest().build());
+    ApiKey apiKey = authService.generateImportApiKey(oidcUser, locale);
+
+    return Mono.just(ResponseEntity.ok(apiKey));
   }
 
   /**
@@ -88,16 +85,11 @@ public class AuthController {
     String apiKey = request.getHeaders().getFirst("X-API-KEY");
 
     if (apiKey == null) {
-      return Mono.just(ResponseEntity.badRequest().build());
+      throw new ImportApiKeyException("No api key set.");
     }
 
-    try {
-      ApiKey lastApiKey = authService.invalidateImportApiKey(oidcUser, apiKey);
-      return Mono.just(ResponseEntity.ok(lastApiKey));
-    } catch (ImportApiKeyException ignored) {
-      log.error("error by invalidation of import api key");
-    }
+    ApiKey lastApiKey = authService.invalidateImportApiKey(oidcUser, apiKey);
 
-    return Mono.just(ResponseEntity.badRequest().build());
+    return Mono.just(ResponseEntity.ok(lastApiKey));
   }
 }

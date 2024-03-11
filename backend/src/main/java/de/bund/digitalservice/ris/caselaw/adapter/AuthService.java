@@ -15,6 +15,7 @@ import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Function;
@@ -120,14 +121,15 @@ public class AuthService {
    * @param oidcUser current user via openid connect system
    * @return the generated api key
    */
-  public ApiKey generateImportApiKey(OidcUser oidcUser) {
+  public ApiKey generateImportApiKey(OidcUser oidcUser, Locale locale) {
     Optional<ApiKeyDTO> apiKeyOptional =
         keyRepository.findByUserAccountAndValidUntilAfter(oidcUser.getEmail(), Instant.now());
 
     if (apiKeyOptional.isPresent()) {
       log.error(
           "No new import api key couldn't generate because a valid api key for the user exist.");
-      throw new ImportApiKeyException();
+      throw new ImportApiKeyException(
+          "No new import api key couldn't generate because a valid api key for the user exist.");
     }
 
     char[][] allowedCharacters = {{'a', 'z'}, {'A', 'Z'}, {'0', '9'}};
@@ -184,14 +186,14 @@ public class AuthService {
 
     if (apiKeyOptional.isEmpty()) {
       log.error("Can't invalidate api key '{}' because it doesn't exist!", apiKey);
-      throw new ImportApiKeyException();
+      throw new ImportApiKeyException("Can't invalidate api key because it doesn't exist!");
     }
 
     if (apiKeyOptional.get().getUserAccount() == null
         || !apiKeyOptional.get().getUserAccount().equals(oidcUser.getEmail())) {
 
       log.error("api key doesn't belongs to user");
-      throw new ImportApiKeyException();
+      throw new ImportApiKeyException("Api key doesn't belongs to user");
     }
 
     ApiKeyDTO apiKeyDTO = apiKeyOptional.get();
