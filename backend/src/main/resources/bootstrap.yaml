@@ -1,7 +1,5 @@
 spring:
   cloud:
-    bootstrap:
-      enabled: true
     kubernetes:
       config:
         fail-fast: true
