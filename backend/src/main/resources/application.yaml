@@ -43,12 +43,9 @@ server:
 #    org.springframework: DEBUG
 spring:
   config:
-    import: "optional:kubernetes:"
+    import: "kubernetes:"
   cloud:
     kubernetes:
-      config:
-        fail-fast: true
-        name: ris-database-credentials
       secrets:
         paths: /etc/secrets
   codec:
