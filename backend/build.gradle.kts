@@ -155,7 +155,7 @@ dependencies {
     // CVE-2024-22234
     implementation("org.springframework.security:spring-security-core:6.2.2")
 
-    implementation("org.springdoc:springdoc-openapi-starter-webflux-ui:2.3.0")
+    implementation("org.springdoc:springdoc-openapi-starter-webflux-ui:2.4.0")
 
     implementation("org.springframework.cloud:spring-cloud-starter-kubernetes-client-config:3.1.0")
 
