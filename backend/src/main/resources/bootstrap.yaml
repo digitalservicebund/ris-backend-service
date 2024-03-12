@@ -1,9 +1,12 @@
 spring:
+  config:
+    import: "optional:kubernetes:"
   cloud:
     kubernetes:
       config:
         fail-fast: true
         name: database-config
+        enabled: true
       secrets:
         enabled: true
         fail-fast: true
