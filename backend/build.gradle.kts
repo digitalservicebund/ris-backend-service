@@ -157,7 +157,7 @@ dependencies {
 
     implementation("org.springdoc:springdoc-openapi-starter-webflux-ui:2.3.0")
 
-    implementation("org.springframework.cloud:spring-cloud-starter-kubernetes-client-config:2.1.3")
+    implementation("org.springframework.cloud:spring-cloud-starter-kubernetes-client-config:3.1.0")
 
     // CVE-2024-26308
     implementation("org.apache.commons:commons-compress:1.26.0")
