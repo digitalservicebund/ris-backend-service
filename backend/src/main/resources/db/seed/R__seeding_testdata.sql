@@ -9,7 +9,7 @@ INSERT INTO
   incremental_migration.documentation_unit (id, document_number, documentation_office_id)
 SELECT
   '491aef4d-9fb3-4769-b1a5-4edbb9321c6d'::uuid,
-  'YYYTestDoc1',
+  'YYTestDoc0001',
   id
 FROM
   incremental_migration.documentation_office
@@ -18,7 +18,7 @@ WHERE
 UNION ALL
 SELECT
   '947ff4db-71a8-466d-995d-dd6be8760f98'::uuid,
-  'YYYTestDoc2',
+  'YYTestDoc0002',
   id
 FROM
   incremental_migration.documentation_office
