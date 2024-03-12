@@ -27,7 +27,7 @@ const validationStore = useValidationStore<["decisionDate"][number]>()
 /**
  * Our UI turns the chronological order of the list, so the latest previous precedure is first.
  */
-const previousProcedures = computed(() =>
+const descendingPreviousProcedures = computed(() =>
   modelValue.value.previousProcedures?.toReversed(),
 )
 
@@ -192,7 +192,7 @@ watch(
           <InputField id="previousProcedures" label="Vorgangshistorie">
             <ChipsInput
               id="previousProcedures"
-              v-model="previousProcedures"
+              v-model="descendingPreviousProcedures"
               aria-label="Vorgangshistorie"
               read-only
             ></ChipsInput>
