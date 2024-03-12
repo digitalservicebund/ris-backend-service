@@ -128,6 +128,17 @@ public class DocumentUnitDocxListUtils {
           && currentBorderNumber.getChildrenSize() >= 1) {
         currentBorderNumber = null;
       }
+      // BorderNumber-block-breaking condition 3: paragraphs with the pattern I. or II. or III.
+      if (element instanceof ParagraphElement paragraphElement
+              && paragraphElement.getText().trim().matches("^[IVX]+\\.$")
+          || element instanceof NumberingList numberingList
+              && numberingList.getEntries().size() == 1
+              && numberingList.getEntries().get(0).paragraphElement()
+                  instanceof ParagraphElement numberingListEntryParagraph
+              && numberingListEntryParagraph.getText().trim().matches("^[IVX]+\\.$")) {
+        currentBorderNumber = null;
+      }
+
       if (currentBorderNumber == null) {
         // not within a BorderNumber-block --> add whatever it is straight to the list
         packedList.add(element);
