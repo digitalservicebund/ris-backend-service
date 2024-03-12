@@ -28,6 +28,9 @@ mail:
       mailbox:
         username: user@neuris.dev
         password: pa55word
+
+database:
+  seed: true
 #logging:
 #  level:
 #    sql: debug

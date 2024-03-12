@@ -12,6 +12,9 @@ spring:
       host: redis
       username: redis
 
+database:
+  seed: true
+
 sentry:
   environment: staging
   traces-sample-rate: 0.1

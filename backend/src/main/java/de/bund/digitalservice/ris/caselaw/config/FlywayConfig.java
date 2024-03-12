@@ -27,13 +27,18 @@ public class FlywayConfig {
   @Value("${database.database:neuris}")
   private String database;
 
+  @Value("${database.seed:false}")
+  private Boolean seed;
+
   @Bean
   public Flyway flyway() {
     final String url = "jdbc:postgresql://" + host + ":" + port + "/" + database;
+    String locationsPath = seed ? "classpath:db" : "classpath:db/migration";
     return Flyway.configure()
         .dataSource(url, user, password)
         .baselineOnMigrate(true)
         .baselineVersion("0.0")
+        .locations(locationsPath)
         .load();
   }
 
