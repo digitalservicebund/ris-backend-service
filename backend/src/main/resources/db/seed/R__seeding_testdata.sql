@@ -6,21 +6,732 @@ where
   document_number LIKE 'YY%';
 
 INSERT INTO
-  incremental_migration.documentation_unit (id, document_number, documentation_office_id)
-SELECT
-  gen_random_uuid (),
-  'YYTestDoc0001',
-  id
-FROM
-  incremental_migration.documentation_office
-WHERE
-  abbreviation = 'DS'
-UNION ALL
-SELECT
-  gen_random_uuid (),
-  'YYTestDoc0002',
-  id
-FROM
-  incremental_migration.documentation_office
-WHERE
-  abbreviation = 'DS';
+  incremental_migration.documentation_unit (
+    id,
+    court_id,
+    decision_date,
+    document_number,
+    document_type_id,
+    documentation_office_id,
+    guiding_principle,
+    judicial_body,
+    procedure,
+    tenor
+  )
+VALUES
+  (
+    gen_random_uuid (),
+    (
+      SELECT
+        id
+      FROM
+        incremental_migration.court
+      WHERE
+      type
+        = 'BAG'
+    ),
+    '1963-01-02',
+    'YYTestDoc0001',
+    (
+      SELECT
+        id
+      FROM
+        incremental_migration.document_type
+      WHERE
+        abbreviation = 'ÄN'
+    ),
+    (
+      SELECT
+        id
+      FROM
+        incremental_migration.documentation_office
+      WHERE
+        abbreviation = 'DS'
+    ),
+    'guiding principle',
+    '1.Senat, 2. Kammer',
+    NULL,
+    'tenor1'
+  ),
+  (
+    gen_random_uuid (),
+    NULL,
+    '2024-02-02',
+    'YYTestDoc0002',
+    NULL,
+    (
+      SELECT
+        id
+      FROM
+        incremental_migration.documentation_office
+      WHERE
+        abbreviation = 'DS'
+    ),
+    NULL,
+    NULL,
+    NULL,
+    NULL
+  ),
+  (
+    gen_random_uuid (),
+    (
+      SELECT
+        id
+      FROM
+        incremental_migration.court
+      WHERE
+      type
+        = 'BGH'
+    ),
+    '1964-10-10',
+    'YYTestDoc0003',
+    (
+      SELECT
+        id
+      FROM
+        incremental_migration.document_type
+      WHERE
+        abbreviation = 'Entscheidung'
+    ),
+    (
+      SELECT
+        id
+      FROM
+        incremental_migration.documentation_office
+      WHERE
+        abbreviation = 'DS'
+    ),
+    'guiding principle',
+    '1.Senat, 2. Kammer',
+    NULL,
+    'tenorx'
+  ),
+  (
+    gen_random_uuid (),
+    (
+      SELECT
+        id
+      FROM
+        incremental_migration.court
+      WHERE
+      type
+        = 'AG'
+        AND location = 'Bremen'
+    ),
+    '2022-02-02',
+    'YYTestDoc0004',
+    (
+      SELECT
+        id
+      FROM
+        incremental_migration.document_type
+      WHERE
+        abbreviation = 'Entscheidung'
+    ),
+    (
+      SELECT
+        id
+      FROM
+        incremental_migration.documentation_office
+      WHERE
+        abbreviation = 'DS'
+    ),
+    'guiding principle',
+    '1.Senat, 2. Kammer',
+    NULL,
+    'tenorx'
+  ),
+  (
+    gen_random_uuid (),
+    (
+      SELECT
+        id
+      FROM
+        incremental_migration.court
+      WHERE
+      type
+        = 'BGH'
+    ),
+    NULL,
+    'YYTestDoc0005',
+    (
+      SELECT
+        id
+      FROM
+        incremental_migration.document_type
+      WHERE
+        abbreviation = 'Entscheidung'
+    ),
+    (
+      SELECT
+        id
+      FROM
+        incremental_migration.documentation_office
+      WHERE
+        abbreviation = 'DS'
+    ),
+    'guiding principle',
+    '1.Senat, 2. Kammer',
+    NULL,
+    'tenorx'
+  ),
+  (
+    gen_random_uuid (),
+    NULL,
+    '2024-01-02',
+    'YYTestDoc0006',
+    NULL,
+    (
+      SELECT
+        id
+      FROM
+        incremental_migration.documentation_office
+      WHERE
+        abbreviation = 'DS'
+    ),
+    NULL,
+    NULL,
+    NULL,
+    'tenorx'
+  ),
+  (
+    gen_random_uuid (),
+    NULL,
+    '1935-12-02',
+    'YYTestDoc0007',
+    NULL,
+    (
+      SELECT
+        id
+      FROM
+        incremental_migration.documentation_office
+      WHERE
+        abbreviation = 'DS'
+    ),
+    NULL,
+    NULL,
+    NULL,
+    'tenorx'
+  ),
+  (
+    gen_random_uuid (),
+    NULL,
+    '1978-05-28',
+    'YYTestDoc0008',
+    (
+      SELECT
+        id
+      FROM
+        incremental_migration.document_type
+      WHERE
+        abbreviation = 'Entscheidung'
+    ),
+    (
+      SELECT
+        id
+      FROM
+        incremental_migration.documentation_office
+      WHERE
+        abbreviation = 'DS'
+    ),
+    'guiding principle',
+    '1.Senat, 2. Kammer',
+    NULL,
+    'tenorx'
+  ),
+  (
+    gen_random_uuid (),
+    NULL,
+    '2022-10-01',
+    'YYTestDoc0009',
+    (
+      SELECT
+        id
+      FROM
+        incremental_migration.document_type
+      WHERE
+        abbreviation = 'BE'
+    ),
+    (
+      SELECT
+        id
+      FROM
+        incremental_migration.documentation_office
+      WHERE
+        abbreviation = 'DS'
+    ),
+    'guiding principle',
+    '1.Senat, 2. Kammer',
+    NULL,
+    'tenorx'
+  ),
+  (
+    gen_random_uuid (),
+    (
+      SELECT
+        id
+      FROM
+        incremental_migration.court
+      WHERE
+      type
+        = 'BSG'
+    ),
+    '1990-02-03',
+    'YYTestDoc0010',
+    (
+      SELECT
+        id
+      FROM
+        incremental_migration.document_type
+      WHERE
+        abbreviation = 'BE'
+    ),
+    (
+      SELECT
+        id
+      FROM
+        incremental_migration.documentation_office
+      WHERE
+        abbreviation = 'DS'
+    ),
+    'guiding principle',
+    '1.Senat, 2. Kammer',
+    NULL,
+    'tenorx'
+  ),
+  (
+    gen_random_uuid (),
+    (
+      SELECT
+        id
+      FROM
+        incremental_migration.court
+      WHERE
+      type
+        = 'BVerfG'
+    ),
+    '2022-02-03',
+    'YYTestDoc0011',
+    (
+      SELECT
+        id
+      FROM
+        incremental_migration.document_type
+      WHERE
+        abbreviation = 'BR'
+    ),
+    (
+      SELECT
+        id
+      FROM
+        incremental_migration.documentation_office
+      WHERE
+        abbreviation = 'DS'
+    ),
+    'guiding principle',
+    '1.Senat, 2. Kammer',
+    NULL,
+    'tenorx'
+  ),
+  (
+    gen_random_uuid (),
+    (
+      SELECT
+        id
+      FROM
+        incremental_migration.court
+      WHERE
+      type
+        = 'BVerwG'
+    ),
+    '1987-09-09',
+    'YYTestDoc0012',
+    (
+      SELECT
+        id
+      FROM
+        incremental_migration.document_type
+      WHERE
+        abbreviation = 'EU'
+    ),
+    (
+      SELECT
+        id
+      FROM
+        incremental_migration.documentation_office
+      WHERE
+        abbreviation = 'DS'
+    ),
+    'guiding principle',
+    '1.Senat, 2. Kammer',
+    NULL,
+    'tenorx'
+  ),
+  (
+    gen_random_uuid (),
+    (
+      SELECT
+        id
+      FROM
+        incremental_migration.court
+      WHERE
+      type
+        = 'BVerfG'
+    ),
+    '2080-02-02',
+    'YYTestDoc0013',
+    (
+      SELECT
+        id
+      FROM
+        incremental_migration.document_type
+      WHERE
+        abbreviation = 'GB'
+    ),
+    (
+      SELECT
+        id
+      FROM
+        incremental_migration.documentation_office
+      WHERE
+        abbreviation = 'DS'
+    ),
+    'guiding principle',
+    '1.Senat, 2. Kammer',
+    NULL,
+    'tenorx'
+  ),
+  (
+    gen_random_uuid (),
+    (
+      SELECT
+        id
+      FROM
+        incremental_migration.court
+      WHERE
+      type
+        = 'AG'
+        AND location = 'Aachen'
+    ),
+    '1989-01-01',
+    'YYTestDoc0014',
+    (
+      SELECT
+        id
+      FROM
+        incremental_migration.document_type
+      WHERE
+        abbreviation = 'BE'
+    ),
+    (
+      SELECT
+        id
+      FROM
+        incremental_migration.documentation_office
+      WHERE
+        abbreviation = 'DS'
+    ),
+    'guiding principle',
+    '1.Senat, 2. Kammer',
+    NULL,
+    'tenorx'
+  ),
+  (
+    gen_random_uuid (),
+    NULL,
+    '2001-07-24',
+    'YYTestDoc0015',
+    (
+      SELECT
+        id
+      FROM
+        incremental_migration.document_type
+      WHERE
+        abbreviation = 'BE'
+    ),
+    (
+      SELECT
+        id
+      FROM
+        incremental_migration.documentation_office
+      WHERE
+        abbreviation = 'DS'
+    ),
+    'guiding principle',
+    '1.Senat, 2. Kammer',
+    NULL,
+    'tenorx'
+  );
+
+INSERT INTO
+  incremental_migration.status (
+    id,
+    publication_status,
+    with_error,
+    documentation_unit_id
+  )
+VALUES
+  (
+    gen_random_uuid (),
+    'PUBLISHED',
+    false,
+    (
+      SELECT
+        id
+      FROM
+        incremental_migration.documentation_unit
+      WHERE
+        document_number = 'YYTestDoc0001'
+    )
+  ),
+  (
+    gen_random_uuid (),
+    'PUBLISHED',
+    true,
+    (
+      SELECT
+        id
+      FROM
+        incremental_migration.documentation_unit
+      WHERE
+        document_number = 'YYTestDoc0002'
+    )
+  ),
+  (
+    gen_random_uuid (),
+    'UNPUBLISHED',
+    false,
+    (
+      SELECT
+        id
+      FROM
+        incremental_migration.documentation_unit
+      WHERE
+        document_number = 'YYTestDoc0003'
+    )
+  ),
+  (
+    gen_random_uuid (),
+    'PUBLISHED',
+    false,
+    (
+      SELECT
+        id
+      FROM
+        incremental_migration.documentation_unit
+      WHERE
+        document_number = 'YYTestDoc0004'
+    )
+  ),
+  (
+    gen_random_uuid (),
+    'PUBLISHING',
+    false,
+    (
+      SELECT
+        id
+      FROM
+        incremental_migration.documentation_unit
+      WHERE
+        document_number = 'YYTestDoc0005'
+    )
+  ),
+  (
+    gen_random_uuid (),
+    'UNPUBLISHED',
+    false,
+    (
+      SELECT
+        id
+      FROM
+        incremental_migration.documentation_unit
+      WHERE
+        document_number = 'YYTestDoc0006'
+    )
+  ),
+  (
+    gen_random_uuid (),
+    'UNPUBLISHED',
+    false,
+    (
+      SELECT
+        id
+      FROM
+        incremental_migration.documentation_unit
+      WHERE
+        document_number = 'YYTestDoc0007'
+    )
+  ),
+  (
+    gen_random_uuid (),
+    'UNPUBLISHED',
+    false,
+    (
+      SELECT
+        id
+      FROM
+        incremental_migration.documentation_unit
+      WHERE
+        document_number = 'YYTestDoc0008'
+    )
+  ),
+  (
+    gen_random_uuid (),
+    'UNPUBLISHED',
+    false,
+    (
+      SELECT
+        id
+      FROM
+        incremental_migration.documentation_unit
+      WHERE
+        document_number = 'YYTestDoc0009'
+    )
+  ),
+  (
+    gen_random_uuid (),
+    'PUBLISHING',
+    false,
+    (
+      SELECT
+        id
+      FROM
+        incremental_migration.documentation_unit
+      WHERE
+        document_number = 'YYTestDoc0010'
+    )
+  ),
+  (
+    gen_random_uuid (),
+    'PUBLISHED',
+    true,
+    (
+      SELECT
+        id
+      FROM
+        incremental_migration.documentation_unit
+      WHERE
+        document_number = 'YYTestDoc0011'
+    )
+  ),
+  (
+    gen_random_uuid (),
+    'PUBLISHED',
+    false,
+    (
+      SELECT
+        id
+      FROM
+        incremental_migration.documentation_unit
+      WHERE
+        document_number = 'YYTestDoc0012'
+    )
+  ),
+  (
+    gen_random_uuid (),
+    'PUBLISHED',
+    false,
+    (
+      SELECT
+        id
+      FROM
+        incremental_migration.documentation_unit
+      WHERE
+        document_number = 'YYTestDoc0013'
+    )
+  ),
+  (
+    gen_random_uuid (),
+    'PUBLISHED',
+    true,
+    (
+      SELECT
+        id
+      FROM
+        incremental_migration.documentation_unit
+      WHERE
+        document_number = 'YYTestDoc0014'
+    )
+  ),
+  (
+    gen_random_uuid (),
+    'UNPUBLISHED',
+    false,
+    (
+      SELECT
+        id
+      FROM
+        incremental_migration.documentation_unit
+      WHERE
+        document_number = 'YYTestDoc0015'
+    )
+  );
+
+INSERT INTO
+  incremental_migration.file_number (id, value, documentation_unit_id, rank)
+VALUES
+  (
+    gen_random_uuid (),
+    'fileNumber1',
+    (
+      SELECT
+        id
+      FROM
+        incremental_migration.documentation_unit
+      WHERE
+        document_number = 'YYTestDoc0001'
+    ),
+    1
+  ),
+  (
+    gen_random_uuid (),
+    'fileNumber2',
+    (
+      SELECT
+        id
+      FROM
+        incremental_migration.documentation_unit
+      WHERE
+        document_number = 'YYTestDoc0001'
+    ),
+    2
+  ),
+  (
+    gen_random_uuid (),
+    'fileNumber3',
+    (
+      SELECT
+        id
+      FROM
+        incremental_migration.documentation_unit
+      WHERE
+        document_number = 'YYTestDoc0004'
+    ),
+    1
+  ),
+  (
+    gen_random_uuid (),
+    'fileNumber4',
+    (
+      SELECT
+        id
+      FROM
+        incremental_migration.documentation_unit
+      WHERE
+        document_number = 'YYTestDoc0012'
+    ),
+    1
+  ),
+  (
+    gen_random_uuid (),
+    'fileNumber5',
+    (
+      SELECT
+        id
+      FROM
+        incremental_migration.documentation_unit
+      WHERE
+        document_number = 'YYTestDoc0013'
+    ),
+    1
+  );
