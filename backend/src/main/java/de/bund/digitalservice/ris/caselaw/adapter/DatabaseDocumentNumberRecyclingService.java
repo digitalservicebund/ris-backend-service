@@ -52,11 +52,17 @@ public class DatabaseDocumentNumberRecyclingService implements DocumentNumberRec
 
     try {
 
+      if (StringsUtil.returnTrueIfNullOrBlank(documentationUnitNumber)) {
+        throw new DocumentNumberPatternException("Document number is empty");
+      }
       if (!documentNumberPatternConfig
           .getDocumentNumberPatterns()
           .containsKey(documentationOfficeAbbreviation))
         throw new DocumentNumberPatternException(
             documentationOfficeAbbreviation + " is not included in pattern");
+
+      if (!documentNumberPatternConfig.hasValidPrefix(documentationUnitNumber))
+        throw new DocumentNumberPatternException("prefix is not included in pattern");
 
       var status = statusRepository.findAllByDocumentationUnitDTO_Id(documentationUnitId);
 
@@ -90,11 +96,13 @@ public class DatabaseDocumentNumberRecyclingService implements DocumentNumberRec
   public Optional<String> findDeletedDocumentNumber(
       String documentationOfficeAbbreviation, Year year) {
 
+    var optionalDeletedDocumentationUnitDTO =
+        repository.findFirstByAbbreviationAndYear(documentationOfficeAbbreviation, year);
+
+    if (optionalDeletedDocumentationUnitDTO.isEmpty()) return Optional.empty();
+    var deletedDocumentationUnitDTO = optionalDeletedDocumentationUnitDTO.get();
+
     try {
-      var deletedDocumentationUnitDTO =
-          repository
-              .findFirstByAbbreviationAndYear(documentationOfficeAbbreviation, year)
-              .orElseThrow();
 
       var deletedDocumentNumber = deletedDocumentationUnitDTO.getDocumentNumber();
 
@@ -102,9 +110,14 @@ public class DatabaseDocumentNumberRecyclingService implements DocumentNumberRec
         throw new DocumentNumberPatternException("Can't reuse empty document number");
       }
 
+      if (!documentNumberPatternConfig.hasValidPrefix(deletedDocumentNumber)) {
+        throw new DocumentNumberPatternException("Prefix is not included in pattern");
+      }
+
       return Optional.of(deletedDocumentNumber);
 
     } catch (Exception e) {
+      repository.deleteById(deletedDocumentationUnitDTO.getDocumentNumber());
       return Optional.empty();
     }
   }

@@ -46,4 +46,14 @@ public class DocumentNumberFormatter {
     }
     return pattern.replace("*".repeat(sequentialDigits), docNumberString);
   }
+
+  /**
+   * Extract the prefix of patterns, like KORE7****YYYY
+   *
+   * @param pattern gets a document number pattern like KORE7****YYYY
+   * @return return its prefix, KORE7
+   */
+  public static String extractPrefix(String pattern) {
+    return pattern.substring(0, pattern.indexOf('*'));
+  }
 }
