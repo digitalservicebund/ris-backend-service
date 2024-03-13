@@ -190,7 +190,7 @@ dependencies {
     // for local development:
     // implementation(files("../../neuris-juris-xml-export/build/libs/neuris-juris-xml-export-0.8.16.jar"))
 
-    implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.16.1")
+    implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.17.0")
 
     implementation("io.micrometer:micrometer-registry-prometheus:1.12.3")
     implementation("io.micrometer:micrometer-core:1.12.3")
