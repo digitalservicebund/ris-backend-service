@@ -19,7 +19,7 @@ test.describe("procedure", () => {
       await navigateToCategories(page, documentNumber)
 
       await expect(async () => {
-        newProcedure = generateString({ length: 10 })
+        newProcedure = "test_" + generateString({ length: 10 })
         await page.locator("[aria-label='Vorgang']").fill(newProcedure)
         await page.getByText(`${newProcedure} neu erstellen`).click()
       }).toPass()
@@ -33,7 +33,7 @@ test.describe("procedure", () => {
 
     await test.step("fill previous procedures", async () => {
       await expect(async () => {
-        const secondProcedure = generateString({ length: 10 })
+        const secondProcedure = "test_" + generateString({ length: 10 })
         await page.locator("[aria-label='Vorgang']").fill(secondProcedure)
         await page.getByText(`${secondProcedure} neu erstellen`).click()
       }).toPass()
