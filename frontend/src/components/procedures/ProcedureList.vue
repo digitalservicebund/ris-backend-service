@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import dayjs from "dayjs"
-import { ref, onMounted, watch } from "vue"
+import { ref, onMounted, watch, computed } from "vue"
 import ProcedureDetail from "./ProcedureDetail.vue"
 import ExpandableContent from "@/components/ExpandableContent.vue"
 import InputField from "@/components/input/InputField.vue"
@@ -15,8 +15,8 @@ import IconExpandMore from "~icons/ic/baseline-expand-more"
 import IconFolderOpen from "~icons/material-symbols/folder-open"
 
 const itemsPerPage = 10
-const procedures = ref<Procedure[]>()
 const currentPage = ref<Page<Procedure>>()
+const procedures = computed(() => currentPage.value?.content)
 const currentlyExpanded = ref<number[]>([])
 const { getQueryFromRoute, pushQueryToRoute, route } = useQuery<"q">()
 const query = ref(getQueryFromRoute())
@@ -30,7 +30,6 @@ const responseError = ref()
 async function updateProcedures(page: number, queries?: Query<string>) {
   const response = await service.get(itemsPerPage, page, queries?.q)
   if (response.data) {
-    procedures.value = response.data.content
     currentPage.value = response.data
   }
 }
@@ -42,7 +41,7 @@ async function loadDocumentUnits(loadingProcedure: Procedure) {
   if (responseError.value) {
     responseError.value = undefined
   }
-  if (!procedures.value) return
+  if (!currentPage.value?.content) return
   if (loadingProcedure.documentUnitCount == 0) return
   if (loadingProcedure.documentUnits) return
 
@@ -53,14 +52,12 @@ async function loadDocumentUnits(loadingProcedure: Procedure) {
     return
   }
 
-  procedures.value = procedures.value.map((procedure) =>
-    procedure.label == loadingProcedure.label
-      ? {
-          ...procedure,
-          documentUnits: response.data,
-        }
-      : procedure,
+  const procedureIndex = currentPage.value.content.findIndex(
+    (procedure) => procedure.label == loadingProcedure.label,
   )
+  if (procedureIndex > -1) {
+    currentPage.value.content[procedureIndex].documentUnits = response.data
+  }
 }
 
 /**
@@ -211,7 +208,7 @@ onMounted(() => {
     >
       <div class="flex flex-col items-center space-y-24">
         <span
-          class="flex flex h-128 w-128 items-center justify-center justify-center rounded-full bg-blue-200"
+          class="flex h-128 w-128 items-center justify-center rounded-full bg-blue-200"
         >
           <IconFolderOpen class="text-64 text-blue-700" />
         </span>

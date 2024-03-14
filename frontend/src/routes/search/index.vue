@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import dayjs from "dayjs"
-import { ref, watch } from "vue"
+import { computed, ref, watch } from "vue"
 import DropdownInput from "@/components/input/DropdownInput.vue"
 import InputField from "@/components/input/InputField.vue"
 import TextButton from "@/components/input/TextButton.vue"
@@ -16,8 +16,8 @@ const isLoading = ref(false)
 const hasError = ref(false)
 const message = ref("")
 const TIMEOUT = 10000
-const searchResults = ref<SearchApiDataDTO[] | undefined>()
 const currentPage = ref<Page<SearchApiDataDTO> | undefined>()
+const searchResults = computed(() => currentPage.value?.content)
 const itemsPerPage = 100
 const pageNumber = ref<number>(0)
 
@@ -59,7 +59,6 @@ async function handleSearchSubmit() {
   message.value = "Loading ..."
   hasError.value = false
   currentPage.value = undefined
-  searchResults.value = undefined
   pageNumber.value = 0
 
   await search()
@@ -84,9 +83,7 @@ async function search() {
     } else if (response.status === 200 && response.data) {
       message.value = ""
       hasError.value = false
-      const page = response.data as Page<SearchApiDataDTO>
-      currentPage.value = page
-      searchResults.value = page.content
+      currentPage.value = response.data as Page<SearchApiDataDTO>
     } else {
       const errorResponse = response.data as FailedValidationServerResponse
       message.value = errorResponse.errors.map((e) => e.message).join(", ")
