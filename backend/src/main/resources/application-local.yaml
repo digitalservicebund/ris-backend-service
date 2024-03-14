@@ -31,7 +31,3 @@ mail:
 
 database:
   seed: true
-#logging:
-#  level:
-#    sql: debug
-#    org.hibernate.orm.jdbc.bind: trace

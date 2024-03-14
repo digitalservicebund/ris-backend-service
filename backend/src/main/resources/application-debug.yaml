@@ -1,0 +1,15 @@
+spring:
+  jpa:
+    properties:
+      hibernate:
+        format_sql: true
+    show-sql: true
+
+logging:
+  level:
+    org:
+      hibernate: info
+    sql: debug
+    org.hibernate.orm.jdbc.bind: trace
+    web: debug
+    root: debug

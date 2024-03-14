@@ -1,3 +1,6 @@
+application:
+  name: NeuRIS Rechtsinformationssystem
+  description: API service
 error:
   nodes:
     active: false
