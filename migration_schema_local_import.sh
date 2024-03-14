@@ -17,8 +17,8 @@ DATA_MIGRATION_SERVICE_PATH="../ris-data-migration"
 DATA_MIGRATION_IMPORT_PATH="./juris-xml-data"
 
 #  In ris-backend-service restart the database to add the user and the scheme:
-docker-compose -f "compose.yaml" down postgres14 --remove-orphans
-docker-compose -f "compose.yaml" up postgres14 -d
+docker compose -f "compose.yaml" down postgres14 --remove-orphans
+docker compose -f "compose.yaml" up postgres14 -d
 echo "Docker run in background, waiting"
 sleep 15
 
@@ -59,3 +59,5 @@ java -jar cli/build/libs/ris-data-migration-cli.jar juris-table seed
 
 # Import the BGH Documentation Units
 java -jar cli/build/libs/ris-data-migration-cli.jar juris-r migrate -p juris-xml-data/
+
+docker compose -f "compose.yaml" down postgres14 --remove-orphans
