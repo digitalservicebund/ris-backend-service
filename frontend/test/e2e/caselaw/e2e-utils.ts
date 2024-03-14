@@ -100,10 +100,17 @@ export async function toggleFieldOfLawSection(page: Page): Promise<void> {
 }
 
 export async function deleteDocumentUnit(page: Page, documentNumber: string) {
-  const response = await page.request.delete(
+  const getResponse = await page.request.get(
     `/api/v1/caselaw/documentunits/${documentNumber}`,
   )
-  expect(response.ok).toBeTruthy()
+  expect(getResponse.ok()).toBeTruthy()
+
+  const { uuid } = await getResponse.json()
+
+  const deleteResponse = await page.request.delete(
+    `/api/v1/caselaw/documentunits/${uuid}`,
+  )
+  expect(deleteResponse.ok()).toBeTruthy()
 }
 
 export async function documentUnitExists(
