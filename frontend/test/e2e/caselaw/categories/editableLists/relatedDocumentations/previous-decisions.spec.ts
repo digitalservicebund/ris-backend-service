@@ -217,13 +217,5 @@ test.describe("previous decisions", () => {
         `AG Aachen, 31.12.2019, ${prefilledDocumentUnit.coreData.fileNumbers?.[0]}, ${deviatingFileNumber1}, Anerkenntnisurteil`,
       ),
     ).toBeVisible()
-
-    // Clean up:
-    // We need to unlink the document units in order to be allowed to delete them in the fixtures
-    await previousDecisionContainer.getByLabel("Listen Eintrag").click()
-    await previousDecisionContainer.getByLabel("Eintrag löschen").click()
-
-    await page.getByText("Speichern").click()
-    await page.waitForEvent("requestfinished")
   })
 })

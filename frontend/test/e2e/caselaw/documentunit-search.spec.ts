@@ -1,10 +1,6 @@
 import { expect } from "@playwright/test"
 import dayjs from "dayjs"
-import {
-  deleteDocumentUnit,
-  fillSearchInput,
-  navigateToSearch,
-} from "~/e2e/caselaw/e2e-utils"
+import { fillSearchInput, navigateToSearch } from "~/e2e/caselaw/e2e-utils"
 import { caselawTest as test } from "~/e2e/caselaw/fixtures"
 import { generateString } from "~/test-helper/dataGenerators"
 
@@ -522,6 +518,7 @@ test.describe("search", () => {
 
   test("create new doc unit from search parameter and switch to categories page", async ({
     page,
+    request,
   }) => {
     await navigateToSearch(page)
 
@@ -570,7 +567,11 @@ test.describe("search", () => {
       infoPanel.getByText(`Entscheidungsdatum${decisionDate}`),
     ).toBeVisible()
 
-    await deleteDocumentUnit(page, documentNumber)
+    // Clean up
+    const response = await (
+      await request.get(`api/v1/caselaw/documentunits/${documentNumber}`)
+    ).json()
+    await request.delete(`/api/v1/caselaw/documentunits/${response.uuid}`)
   })
 
   test("show error message when creating new doc unit from search parameters fails", async ({
