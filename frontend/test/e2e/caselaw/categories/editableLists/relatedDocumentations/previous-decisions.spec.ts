@@ -221,12 +221,6 @@ test.describe("previous decisions", () => {
     // Clean up:
     // We need to unlink the document units in order to be allowed to delete them in the fixtures
     await previousDecisionContainer.getByLabel("Listen Eintrag").click()
-    await page
-      .getByLabel("Abweichendes Aktenzeichen Vorgehende Entscheidung", {
-        exact: true,
-      })
-      .clear()
-
     await previousDecisionContainer.getByLabel("Eintrag löschen").click()
 
     await page.getByText("Speichern").click()
