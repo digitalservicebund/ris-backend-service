@@ -1,5 +1,9 @@
 import { expect } from "@playwright/test"
-import { navigateToCategories, waitForSaving } from "../../e2e-utils"
+import {
+  deleteDocumentUnit,
+  navigateToCategories,
+  waitForSaving,
+} from "../../e2e-utils"
 import { caselawTest as test } from "../../fixtures"
 
 test.describe("core data", () => {
@@ -246,6 +250,12 @@ test.describe("core data", () => {
 
       await page.getByText("Rubriken").click()
       await expect(page.getByText("DOKUMENTATIONSSTELLEDS")).toBeVisible()
+
+      const documentNumber = page
+        .url()
+        .match(/documentunit\/([A-Z0-9]{13})\/files/)![1]
+
+      await deleteDocumentUnit(page, documentNumber)
     })
   })
 
@@ -269,6 +279,12 @@ test.describe("core data", () => {
       await expect(
         pageWithBghUser.getByText("DOKUMENTATIONSSTELLEBGH"),
       ).toBeVisible()
+
+      const documentNumber = pageWithBghUser
+        .url()
+        .match(/documentunit\/([A-Z0-9]{13})\/files/)![1]
+
+      await deleteDocumentUnit(pageWithBghUser, documentNumber)
     })
   })
 
