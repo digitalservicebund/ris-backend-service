@@ -189,6 +189,82 @@ test.describe("search", () => {
     ).toHaveCount(0)
   })
 
+  test("search results between two dates", async ({ page }) => {
+    //Both inputs provided: display results matching the date range.
+    await page.goto("/")
+
+    await page.getByLabel("Dokumentnummer Suche").fill("YYTestDoc")
+
+    await page
+      .getByLabel("Entscheidungsdatum Suche", { exact: true })
+      .fill("02.02.2022")
+
+    await page
+      .getByLabel("Entscheidungsdatum Suche Ende", { exact: true })
+      .fill("02.02.2024")
+
+    await page.getByLabel("Nach Dokumentationseinheiten suchen").click()
+
+    await expect
+      .poll(async () => page.locator(".table-row").count())
+      .toBeGreaterThanOrEqual(5)
+
+    //Same date entered: Show results for the exact date
+    await page
+      .getByLabel("Entscheidungsdatum Suche Ende", { exact: true })
+      .fill("02.02.2022")
+
+    await page.getByLabel("Nach Dokumentationseinheiten suchen").click()
+
+    await expect
+      .poll(async () => page.locator(".table-row").count())
+      .toBeGreaterThanOrEqual(1)
+  })
+
+  test("search for status", async ({ page }) => {
+    await page.goto("/")
+
+    const docofficeOnly = page.getByLabel("Nur meine Dokstelle Filter")
+    await docofficeOnly.click()
+
+    await page.getByLabel("Nach Dokumentationseinheiten suchen").click()
+
+    await expect
+      .poll(async () => page.getByText("Unveröffentlicht").count())
+      .toBeGreaterThanOrEqual(1)
+
+    const select = page.locator(`select[id="status"]`)
+    await select.selectOption("Veröffentlicht")
+
+    await page.getByLabel("Nach Dokumentationseinheiten suchen").click()
+
+    await expect(page.getByText("Unveröffentlicht")).toBeHidden()
+  })
+
+  test("filter for documentunits with errors only", async ({ page }) => {
+    await page.goto("/")
+
+    await page.getByLabel("Dokumentnummer Suche").fill("YYTestDoc")
+    await page.getByLabel("Nach Dokumentationseinheiten suchen").click()
+    //15 + table header
+    await expect.poll(async () => page.locator(".table-row").count()).toBe(16)
+
+    const docofficeOnly = page.getByLabel("Nur meine Dokstelle Filter")
+    await docofficeOnly.click()
+    const errorsOnly = page.getByLabel(
+      "Nur fehlerhafte Dokumentationseinheiten",
+    )
+    await errorsOnly.click()
+    await page.getByLabel("Nach Dokumentationseinheiten suchen").click()
+
+    //3 + table header
+    await expect.poll(async () => page.locator(".table-row").count()).toBe(4)
+
+    //unclick my dokstelle should also reset errors only filter
+    await docofficeOnly.click()
+    await expect(errorsOnly).toBeHidden()
+  })
+
   test("appraisal/judicial body shown in test results", async ({
     page,
     prefilledDocumentUnit,

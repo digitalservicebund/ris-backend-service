@@ -484,6 +484,7 @@ VALUES
 INSERT INTO
   incremental_migration.status (
     id,
+    created_at,
     publication_status,
     with_error,
     documentation_unit_id
@@ -491,6 +492,7 @@ INSERT INTO
 VALUES
   (
     gen_random_uuid (),
+    '2024-03-14 18:38:43.043877 +00:00',
     'PUBLISHED',
     false,
     (
@@ -504,6 +506,7 @@ VALUES
   ),
   (
     gen_random_uuid (),
+    '2024-03-14 18:38:43.043877 +00:00',
     'PUBLISHED',
     true,
     (
@@ -517,6 +520,7 @@ VALUES
   ),
   (
     gen_random_uuid (),
+    '2024-03-14 18:38:43.043877 +00:00',
     'UNPUBLISHED',
     false,
     (
@@ -530,6 +534,7 @@ VALUES
   ),
   (
     gen_random_uuid (),
+    '2024-03-14 18:38:43.043877 +00:00',
     'PUBLISHED',
     false,
     (
@@ -543,6 +548,7 @@ VALUES
   ),
   (
     gen_random_uuid (),
+    '2024-03-14 18:38:43.043877 +00:00',
     'PUBLISHING',
     false,
     (
@@ -556,6 +562,7 @@ VALUES
   ),
   (
     gen_random_uuid (),
+    '2024-03-14 18:38:43.043877 +00:00',
     'UNPUBLISHED',
     false,
     (
@@ -569,6 +576,7 @@ VALUES
   ),
   (
     gen_random_uuid (),
+    '2024-03-14 18:38:43.043877 +00:00',
     'UNPUBLISHED',
     false,
     (
@@ -582,6 +590,7 @@ VALUES
   ),
   (
     gen_random_uuid (),
+    '2024-03-14 18:38:43.043877 +00:00',
     'UNPUBLISHED',
     false,
     (
@@ -595,6 +604,7 @@ VALUES
   ),
   (
     gen_random_uuid (),
+    '2024-03-14 18:38:43.043877 +00:00',
     'UNPUBLISHED',
     false,
     (
@@ -608,6 +618,7 @@ VALUES
   ),
   (
     gen_random_uuid (),
+    '2024-03-14 18:38:43.043877 +00:00',
     'PUBLISHING',
     false,
     (
@@ -621,6 +632,7 @@ VALUES
   ),
   (
     gen_random_uuid (),
+    '2024-03-14 18:38:43.043877 +00:00',
     'PUBLISHED',
     true,
     (
@@ -634,6 +646,7 @@ VALUES
   ),
   (
     gen_random_uuid (),
+    '2024-03-14 18:38:43.043877 +00:00',
     'PUBLISHED',
     false,
     (
@@ -647,6 +660,7 @@ VALUES
   ),
   (
     gen_random_uuid (),
+    '2024-03-14 18:38:43.043877 +00:00',
     'PUBLISHED',
     false,
     (
@@ -660,6 +674,7 @@ VALUES
   ),
   (
     gen_random_uuid (),
+    '2024-03-14 18:38:43.043877 +00:00',
     'PUBLISHED',
     true,
     (
@@ -673,6 +688,7 @@ VALUES
   ),
   (
     gen_random_uuid (),
+    '2024-03-14 18:38:43.043877 +00:00',
     'UNPUBLISHED',
     false,
     (
