@@ -106,6 +106,13 @@ export async function deleteDocumentUnit(page: Page, documentNumber: string) {
   expect(response.ok).toBeTruthy()
 }
 
+export async function deleteProcedure(page: Page, uuid: string) {
+  const response = await page.request.delete(
+    `/api/v1/caselaw/procedure/${uuid}`,
+  )
+  expect(response.ok()).toBeTruthy()
+}
+
 export async function documentUnitExists(
   page: Page,
   documentNumber: string,

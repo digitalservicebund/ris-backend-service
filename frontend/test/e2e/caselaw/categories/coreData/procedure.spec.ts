@@ -1,6 +1,7 @@
 import { expect } from "@playwright/test"
 import {
   deleteDocumentUnit,
+  deleteProcedure,
   navigateToCategories,
   waitForInputValue,
 } from "~/e2e/caselaw/e2e-utils"
@@ -8,6 +9,13 @@ import { caselawTest as test } from "~/e2e/caselaw/fixtures"
 import { generateString } from "~/test-helper/dataGenerators"
 
 test.describe("procedure", () => {
+  test.beforeAll(async ({ browser }) => {
+    const page = await browser.newPage()
+    await page.goto(`/caselaw/procedures?q=test_`)
+    const listItems = page.getByRole("listitem")
+    // Todo: this should fail, because the delete does not work
+    await expect(listItems).toHaveCount(0)
+  })
   test("add new procedure in coreData", async ({
     page,
     documentNumber,
@@ -88,5 +96,25 @@ test.describe("procedure", () => {
         )?.[1] as string,
       )
     })
+  })
+  test.afterAll(async ({ browser }) => {
+    const page = await browser.newPage()
+    await page.goto(`/caselaw/procedures?q=test_`)
+    const listItems = page.getByRole("listitem")
+
+    for (const listItem of await listItems.all()) {
+      const spanLocator = listItem.locator("span.ds-label-01-reg")
+      const title = await spanLocator.getAttribute("title")
+      const response = await page.request.get(
+        `/api/v1/caselaw/procedure?sz=10&pg=0&q=${title}`,
+      )
+
+      const responseBody = await response.json()
+      console.log(responseBody, responseBody.content[0]["id"])
+      const { uuid } = responseBody.content[0]
+      await deleteProcedure(page, uuid)
+    }
+    // Todo: this should fail, because the delete does not work
+    await expect(listItems).toHaveCount(0)
   })
 })

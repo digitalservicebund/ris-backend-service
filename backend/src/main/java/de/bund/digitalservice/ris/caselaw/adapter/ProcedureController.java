@@ -55,7 +55,7 @@ public class ProcedureController {
     return Flux.fromIterable(service.getDocumentUnits(procedureUUID));
   }
 
-  @DeleteMapping(value = "{procedureUUID}")
+  @DeleteMapping(value = "/{procedureUUID}")
   @PreAuthorize("isAuthenticated()")
   public Mono<ResponseEntity<Void>> delete(
       @AuthenticationPrincipal OidcUser oidcUser, @NonNull @PathVariable UUID procedureUUID) {

@@ -160,6 +160,7 @@ onMounted(() => {
             'hover:bg-blue-100': !currentlyExpanded.includes(index),
           }"
           :is-expanded="currentlyExpanded.includes(index)"
+          role="listitem"
           @update:is-expanded="
             (isExpanded) => handleIsExpanded(isExpanded, procedure, index)
           "
