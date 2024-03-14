@@ -96,7 +96,8 @@ pre-push:
       run: currentbranch=$(git rev-parse --abbrev-ref HEAD); echo "refs/heads/$currentbranch HEAD refs/heads/$currentbranch $(git log -1 origin/$currentbranch --format='%H')" | talisman --githook pre-push
     check-pipeline-status:
       run: |
-        which gh 2>&1 >/dev/null || exit 0
+        which gh 2>&1 >/dev/null ||
+        (echo "You need to install and configure Github CLI."; exit 1)
 
         conclusion="$(
           gh run list --branch main --workflow pipeline --json conclusion,status \
