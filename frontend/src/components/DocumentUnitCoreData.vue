@@ -223,7 +223,6 @@ watch(
         ></TextInput>
       </InputField>
     </div>
-    <!--          :read-only="modelValue.documentationOffice?.abbreviation !== 'BGH'"-->
 
     <div v-if="modelValue.court?.label === 'BGH'" class="flex flex-row gap-24">
       <InputField

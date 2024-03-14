@@ -252,17 +252,19 @@ const maxButtonEntries = computed(() =>
 
 const editorExpanded = ref(false)
 const editorSize = computed(() => {
-  return editorExpanded.value
-    ? "h-640"
-    : props.fieldSize == "max"
-      ? "h-full"
-      : props.fieldSize == "big"
-        ? "h-320"
-        : props.fieldSize == "medium"
-          ? "h-160"
-          : props.fieldSize == "small"
-            ? "h-96"
-            : undefined
+  if (editorExpanded.value) return "h-640"
+
+  switch (props.fieldSize) {
+    case "max":
+      return "h-full"
+    case "big":
+      return "h-320"
+    case "medium":
+      return "h-160"
+    case "small":
+      return "h-96"
+  }
+  return undefined
 })
 const { collapsedButtons } = useCollapsingMenuBar(
   editorButtons,

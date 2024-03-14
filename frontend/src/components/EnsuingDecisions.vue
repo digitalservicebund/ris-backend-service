@@ -71,8 +71,6 @@ function decisionSummarizer(dataEntry: EnsuingDecision) {
         h("span", { class: ["ds-label-01-reg ml-8"] }, "|"),
         renderLink(dataEntry),
       ]),
-
-      ,
     ])
     // Ghost DocUnit
   } else if (
