@@ -203,7 +203,7 @@ dependencies {
     // => CVE-2023-2976
     implementation("com.google.guava:guava:33.0.0-jre")
 
-    var flywayCore = "org.flywaydb:flyway-core:10.9.0"
+    var flywayCore = "org.flywaydb:flyway-core:10.10.0"
     implementation(flywayCore)
     "migrationImplementation"(flywayCore)
     runtimeOnly("org.flywaydb:flyway-database-postgresql:10.9.0")
