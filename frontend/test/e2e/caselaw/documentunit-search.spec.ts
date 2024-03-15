@@ -241,6 +241,7 @@ test.describe("search", () => {
     await select.selectOption("Veröffentlicht")
 
     await page.getByLabel("Nach Dokumentationseinheiten suchen").click()
+    await page.waitForEvent("requestfinished")
 
     await expect(page.getByText("Unveröffentlicht")).toBeHidden()
   })
