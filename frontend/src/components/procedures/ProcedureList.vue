@@ -144,7 +144,7 @@ onMounted(() => {
       </InputField>
     </div>
 
-    <div v-if="procedures" class="flex-1" role="list">
+    <div v-if="procedures" class="flex-1">
       <Pagination
         v-if="currentPage"
         navigation-position="bottom"
@@ -154,13 +154,13 @@ onMounted(() => {
         <ExpandableContent
           v-for="(procedure, index) in procedures"
           :key="index"
+          aria-label="Vorgang Listenelement"
           class="border-b-1 border-blue-300 bg-white px-24 py-20"
           :class="{
             'my-24': currentlyExpanded.includes(index),
             'hover:bg-blue-100': !currentlyExpanded.includes(index),
           }"
           :is-expanded="currentlyExpanded.includes(index)"
-          role="listitem"
           @update:is-expanded="
             (isExpanded) => handleIsExpanded(isExpanded, procedure, index)
           "

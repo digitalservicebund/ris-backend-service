@@ -12,7 +12,7 @@ test.describe("procedure", () => {
   test.beforeAll(async ({ browser }) => {
     const page = await browser.newPage()
     await page.goto(`/caselaw/procedures?q=test_`)
-    const listItems = page.getByRole("listitem")
+    const listItems = page.getByLabel("Vorgang Listenelement")
     // Todo: this should fail, because the delete does not work
     await expect(listItems).toHaveCount(0)
   })
@@ -100,7 +100,7 @@ test.describe("procedure", () => {
   test.afterAll(async ({ browser }) => {
     const page = await browser.newPage()
     await page.goto(`/caselaw/procedures?q=test_`)
-    const listItems = page.getByRole("listitem")
+    const listItems = page.getByLabel("Vorgang Listenelement")
 
     for (const listItem of await listItems.all()) {
       const spanLocator = listItem.locator("span.ds-label-01-reg")
