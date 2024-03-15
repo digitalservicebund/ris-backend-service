@@ -89,6 +89,29 @@ test("search for documentunits and link decision", async ({
       },
     )
   }
+
+  // Clean up:
+  // We need to unlink the document units in order to be allowed to delete them in the fixtures
+  await activeCitationContainer
+    .getByText("AG Aachen, 31.12.2019")
+    .first()
+    .click()
+  await activeCitationContainer.getByLabel("Eintrag löschen").click()
+
+  await ensuingDecisionContainer
+    .getByText("AG Aachen, 31.12.2019")
+    .first()
+    .click()
+  await ensuingDecisionContainer.getByLabel("Eintrag löschen").click()
+
+  await previousDecisionContainer
+    .getByText("AG Aachen, 31.12.2019")
+    .first()
+    .click()
+  await previousDecisionContainer.getByLabel("Eintrag löschen").click()
+
+  await page.getByText("Speichern").click()
+  await page.waitForEvent("requestfinished")
 })
 
 test("search with changed parameters resets the page to 0", async ({
@@ -269,4 +292,29 @@ test("clicking on link of referenced documentation unit added by search opens ne
       },
     )
   }
+
+  // Clean up:
+  // We need to unlink the document units in order to be allowed to delete them in the fixtures
+  await navigateToCategories(page, documentNumber)
+
+  await activeCitationContainer
+    .getByText("AG Aachen, 31.12.2019")
+    .first()
+    .click()
+  await activeCitationContainer.getByLabel("Eintrag löschen").click()
+
+  await ensuingDecisionContainer
+    .getByText("AG Aachen, 31.12.2019")
+    .first()
+    .click()
+  await ensuingDecisionContainer.getByLabel("Eintrag löschen").click()
+
+  await previousDecisionContainer
+    .getByText("AG Aachen, 31.12.2019")
+    .first()
+    .click()
+  await previousDecisionContainer.getByLabel("Eintrag löschen").click()
+
+  await page.getByText("Speichern").click()
+  await page.waitForEvent("requestfinished")
 })
