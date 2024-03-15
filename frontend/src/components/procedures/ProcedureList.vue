@@ -144,7 +144,7 @@ onMounted(() => {
       </InputField>
     </div>
 
-    <div v-if="procedures" class="flex-1">
+    <div v-if="procedures" class="flex-1" role="list">
       <Pagination
         v-if="currentPage"
         navigation-position="bottom"

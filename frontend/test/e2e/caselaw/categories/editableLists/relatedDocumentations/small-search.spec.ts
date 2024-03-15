@@ -289,31 +289,14 @@ test("clicking on link of referenced documentation unit added by search opens ne
         await expect(
           container.getByLabel("Nach Entscheidung suchen"),
         ).toBeHidden()
+
+        // Clean up: We need to unlink the document units in order to be allowed to delete them in the fixtures
+        await container.getByText("AG Aachen, 31.12.2019").first().click()
+        await expect(container.getByLabel("Eintrag löschen")).toBeVisible()
+        await container.getByLabel("Eintrag löschen").click()
       },
     )
   }
-
-  // Clean up:
-  // We need to unlink the document units in order to be allowed to delete them in the fixtures
-  await navigateToCategories(page, documentNumber)
-
-  await activeCitationContainer
-    .getByText("AG Aachen, 31.12.2019")
-    .first()
-    .click()
-  await activeCitationContainer.getByLabel("Eintrag löschen").click()
-
-  await ensuingDecisionContainer
-    .getByText("AG Aachen, 31.12.2019")
-    .first()
-    .click()
-  await ensuingDecisionContainer.getByLabel("Eintrag löschen").click()
-
-  await previousDecisionContainer
-    .getByText("AG Aachen, 31.12.2019")
-    .first()
-    .click()
-  await previousDecisionContainer.getByLabel("Eintrag löschen").click()
 
   await page.getByText("Speichern").click()
   await page.waitForEvent("requestfinished")
