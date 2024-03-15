@@ -11,6 +11,7 @@ You need (or may want) the following CLI tools. For UNIX users, there is a prepa
 **Necessary tools:**
 
 - [lefthook](https://github.com/evilmartians/lefthook#install) - manages our git hooks
+- [Github CLI](https://cli.github.com/) - used by lefthook to check for pipeline status before push
 - [talisman](https://thoughtworks.github.io/talisman/docs) - scans for secrets before you would commit them
 - [docker](https://docs.docker.com/get-docker/) - our container runtime (on macOS, the easiest way is to
   use [Docker Desktop](https://www.docker.com/products/docker-desktop/))
