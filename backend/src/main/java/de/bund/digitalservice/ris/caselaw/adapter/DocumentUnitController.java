@@ -3,6 +3,7 @@ package de.bund.digitalservice.ris.caselaw.adapter;
 import de.bund.digitalservice.ris.caselaw.domain.ConverterService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitException;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitListItem;
 import de.bund.digitalservice.ris.caselaw.domain.Publication;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationHistoryRecord;
@@ -147,7 +148,9 @@ public class DocumentUnitController {
       @NonNull @PathVariable String documentNumber) {
 
     if (documentNumber.length() != 13 && documentNumber.length() != 14) {
-      return Mono.just(ResponseEntity.unprocessableEntity().body(DocumentUnit.builder().build()));
+      return Mono.error(
+          new DocumentationUnitException(
+              "Die Dokumentennummer unterstützt nur " + "13-14 Zeichen"));
     }
 
     return service.getByDocumentNumber(documentNumber).map(ResponseEntity::ok);

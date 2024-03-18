@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import DocumentUnitCategories from "@/components/DocumentUnitCategories.vue"
-import RouteErrorDisplay from "@/components/RouteErrorDisplay.vue"
+import ErrorPage from "@/components/ErrorPage.vue"
 import documentUnitService from "@/services/documentUnitService"
 
 const props = defineProps<{
@@ -13,5 +13,5 @@ const { data: documentUnit, error } =
 
 <template>
   <DocumentUnitCategories v-if="documentUnit" :document-unit="documentUnit" />
-  <RouteErrorDisplay v-else :error="error" />
+  <ErrorPage v-else :error="error" :title="error?.title" />
 </template>

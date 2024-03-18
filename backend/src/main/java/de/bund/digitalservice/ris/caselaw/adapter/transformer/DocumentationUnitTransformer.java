@@ -23,6 +23,7 @@ import de.bund.digitalservice.ris.caselaw.domain.CoreData.CoreDataBuilder;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit.DocumentUnitBuilder;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitException;
 import de.bund.digitalservice.ris.caselaw.domain.EnsuingDecision;
 import de.bund.digitalservice.ris.caselaw.domain.LegalEffect;
 import de.bund.digitalservice.ris.caselaw.domain.NormReference;
@@ -407,7 +408,7 @@ public class DocumentationUnitTransformer {
    */
   public static DocumentUnit transformToDomain(DocumentationUnitDTO documentationUnitDTO) {
     if (documentationUnitDTO == null) {
-      return DocumentUnit.builder().build();
+      throw new DocumentationUnitException("Document unit does not exist");
     }
 
     log.debug(
