@@ -88,27 +88,40 @@ test("create and validate border number links", async ({ page }) => {
   expect(inputFieldInnerHTML.includes(secondReason)).toBeTruthy()
   expect(inputFieldInnerHTML.includes(thirdReason)).toBeTruthy()
 
-  // Create valid and invalid border number link in Leitsatz
+  // Create valid and invalid border number links in Leitsatz
   const guidingPrincipleInput = page.locator("[data-testid='Leitsatz']")
   await guidingPrincipleInput.click()
-  await page.keyboard.type(`#1# #4# `)
+  await page.keyboard.type(`#1# #4# #99999# #1000000# #not a border number#`)
 
   // save
   await page.getByText("Speichern").click()
   await page.waitForEvent("requestfinished")
 
   // check valid border number link
-  const borderNumberLink = page
+  const locators = await page
     .locator("[data-testid='Leitsatz']")
     .locator("border-number-link")
-  await expect(borderNumberLink.first()).toHaveAttribute("valid", "true")
-  await expect(borderNumberLink.first()).toHaveClass(
+    .all()
+
+  // only three of the input values should be rendered as borderNumberLinks
+  expect(locators.length).toBe(3)
+
+  const validLink = locators[0]
+  const invalidLink = locators[1]
+  const invalidHighestNumberLink = locators[2]
+
+  await expect(validLink).toHaveAttribute("valid", "true")
+  await expect(validLink).toHaveClass(
     'font-bold text-white bg-blue-700 before:content-["Rd_"]',
   )
 
-  // check invalid border number link
-  await expect(borderNumberLink.last()).toHaveAttribute("valid", "false")
-  await expect(borderNumberLink.last()).toHaveClass(
+  // check invalid border number links
+  await expect(invalidLink).toHaveAttribute("valid", "false")
+  await expect(invalidLink).toHaveClass(
+    'font-bold text-red-900 bg-red-200 before:content-["⚠Rd_"]',
+  )
+  await expect(invalidHighestNumberLink).toHaveAttribute("valid", "false")
+  await expect(invalidHighestNumberLink).toHaveClass(
     'font-bold text-red-900 bg-red-200 before:content-["⚠Rd_"]',
   )
 
@@ -123,8 +136,8 @@ test("create and validate border number links", async ({ page }) => {
   await page.waitForEvent("requestfinished")
 
   // check first border number link: should be invalid now
-  await expect(borderNumberLink.first()).toHaveAttribute("valid", "false")
-  await expect(borderNumberLink.first()).toHaveClass(
+  await expect(validLink).toHaveAttribute("valid", "false")
+  await expect(validLink).toHaveClass(
     'font-bold text-red-900 bg-red-200 before:content-["⚠Rd_"]',
   )
 })

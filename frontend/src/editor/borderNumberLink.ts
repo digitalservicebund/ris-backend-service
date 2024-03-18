@@ -31,10 +31,11 @@ export const BorderNumberLink = Mark.create({
   addInputRules() {
     return [
       markInputRule({
-        find: /(?:^|\s)(#([^#]+)#)$/,
+        // find numbers between #'s and allow numbers up to 99999
+        find: /#([1-9]|[1-9]\d|[1-9]\d\d|[1-9]\d\d\d|[1-9]\d\d\d\d)#/,
         type: this.type,
         getAttributes(match) {
-          return { nr: match[2] }
+          return { nr: match[1] }
         },
       }),
     ]
