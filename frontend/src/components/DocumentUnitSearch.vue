@@ -74,14 +74,15 @@ async function search() {
     const courtResponse = (await ComboboxItemService.getCourts(courtFilter))
       .data
 
+    //filter for exact matches
+    const matches = courtResponse
+      ? courtResponse.filter((item) => item.label === courtFilter)
+      : []
+
+    // add as court query only if 1 exact match
     courtFromQuery.value =
-      courtResponse &&
-      courtResponse.length === 1 &&
-      (courtResponse[0].value as Court).label == courtFilter
-        ? (courtResponse[0].value as Court)
-        : undefined
+      matches.length === 1 ? (matches[0].value as Court) : undefined
   } else courtFromQuery.value = undefined
-  // --
   isLoading.value = false
 }
 
