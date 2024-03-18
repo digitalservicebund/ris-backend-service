@@ -162,7 +162,7 @@ dependencies {
     // CVE-2024-26308
     implementation("org.apache.commons:commons-compress:1.26.1")
     // CVE-2022-3171
-    implementation("com.google.protobuf:protobuf-java:3.25.0")
+    implementation("com.google.protobuf:protobuf-java:4.26.0")
     // CVE-2023-31582
     implementation("org.bitbucket.b_c:jose4j:0.9.6")
 
