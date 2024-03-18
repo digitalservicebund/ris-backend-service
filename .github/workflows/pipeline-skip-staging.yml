@@ -319,7 +319,7 @@ jobs:
     steps:
       - uses: chainguard-dev/actions/setup-gitsign@ac42db4c9c2e2bd9f66aadf3290c5995891d91a3
       - name: Deploy new images
-        uses: digitalservicebund/github-actions/argocd-deploy@a9479ef95842280372a310120ce42dc49c4735e1
+        uses: digitalservicebund/argocd-deploy@4fac1bb67c92ed168f6d9b22f8779ce241a9e412 # v1.0.0
         with:
           environment: production
           version: ${{ needs.push-backend-image-to-registry.outputs.version }}
@@ -330,7 +330,7 @@ jobs:
           argocd_pipeline_password: ${{ secrets.ARGOCD_PIPELINE_PASSWORD }}
           argocd_server: ${{ secrets.ARGOCD_SERVER }}
       - name: Track deploy
-        uses: digitalservicebund/github-actions/track-deployment@b51920b9fdeeb0c8721c210853aee955bd7cefc0
+        uses: digitalservicebund/track-deployment@5a2815e150e1268983aac5ca04c8c046ed1b614a # v1.0.0
         with:
           project: RIS
           environment: production
@@ -358,7 +358,7 @@ jobs:
     steps:
       - uses: chainguard-dev/actions/setup-gitsign@ac42db4c9c2e2bd9f66aadf3290c5995891d91a3
       - name: Deploy new images
-        uses: digitalservicebund/github-actions/argocd-deploy@a9479ef95842280372a310120ce42dc49c4735e1
+        uses: digitalservicebund/argocd-deploy@4fac1bb67c92ed168f6d9b22f8779ce241a9e412 # v1.0.0
         with:
           environment: uat
           version: ${{ needs.push-backend-image-to-registry.outputs.version }}
