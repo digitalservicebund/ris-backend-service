@@ -27,6 +27,12 @@ const emit = defineEmits<{
 
 const emptyStatus = computed(() => props.emptyState)
 
+const listEntries = computed(() => {
+  return props.documentUnitListEntries && !props.isLoading
+    ? props.documentUnitListEntries
+    : []
+})
+
 const showModal = ref(false)
 const popupModalText = ref("")
 const modalConfirmText = ref("Löschen")
@@ -148,9 +154,8 @@ function onDelete() {
           class="table-cell border-b-2 border-solid border-blue-300 px-16 py-12"
         ></div>
       </div>
-
       <div
-        v-for="(listEntry, id) in documentUnitListEntries"
+        v-for="(listEntry, id) in listEntries"
         :key="id"
         class="ds-label-01-reg table-row hover:bg-blue-100"
         data-testid="listEntry"
