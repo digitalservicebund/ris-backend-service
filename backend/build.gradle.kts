@@ -11,7 +11,7 @@ plugins {
     java
     jacoco
     id("org.springframework.boot") version "3.2.3"
-    id("io.spring.dependency-management") version "1.1.0"
+    id("io.spring.dependency-management") version "1.1.4"
     id("com.diffplug.spotless") version "6.25.0"
     id("org.sonarqube") version "4.4.1.3373"
     id("com.github.jk1.dependency-license-report") version "2.6"
@@ -19,7 +19,7 @@ plugins {
     id("com.adarshr.test-logger") version "4.0.0"
     id("com.github.ben-manes.versions") version "0.51.0"
     id("io.franzbecker.gradle-lombok") version "5.0.0"
-    id("org.flywaydb.flyway") version "10.9.0"
+    id("org.flywaydb.flyway") version "10.10.0"
 }
 
 group = "de.bund.digitalservice"
@@ -153,26 +153,26 @@ dependencies {
     implementation("org.springframework.security:spring-security-oauth2-resource-server")
 
     // CVE-2024-22234
-    implementation("org.springframework.security:spring-security-core:6.2.2")
+    implementation("org.springframework.security:spring-security-core:6.2.3")
 
-    implementation("org.springdoc:springdoc-openapi-starter-webflux-ui:2.3.0")
+    implementation("org.springdoc:springdoc-openapi-starter-webflux-ui:2.4.0")
 
     implementation("org.springframework.cloud:spring-cloud-starter-kubernetes-client-config:3.1.0")
 
     // CVE-2024-26308
-    implementation("org.apache.commons:commons-compress:1.26.0")
+    implementation("org.apache.commons:commons-compress:1.26.1")
     // CVE-2022-3171
     implementation("com.google.protobuf:protobuf-java:3.25.0")
     // CVE-2023-31582
     implementation("org.bitbucket.b_c:jose4j:0.9.6")
 
-    implementation("org.postgresql:postgresql:42.7.2")
+    implementation("org.postgresql:postgresql:42.7.3")
 
     implementation("com.sendinblue:sib-api-v3-sdk:7.0.0")
     // CVE-2022-4244
     implementation("org.codehaus.plexus:plexus-utils:4.0.0")
 
-    implementation(platform("software.amazon.awssdk:bom:2.25.4"))
+    implementation(platform("software.amazon.awssdk:bom:2.25.11"))
     implementation("software.amazon.awssdk:netty-nio-client")
     implementation("software.amazon.awssdk:s3")
 
@@ -181,7 +181,7 @@ dependencies {
 
     implementation("jakarta.mail:jakarta.mail-api:2.1.3")
     implementation("org.eclipse.angus:angus-mail:2.0.3")
-    implementation("com.icegreen:greenmail:2.0.0")
+    implementation("com.icegreen:greenmail:2.1.0-alpha-4")
 
     // package served by private repo, requires authentication:
     implementation("de.bund.digitalservice:neuris-juris-xml-export:0.8.32") {
@@ -190,10 +190,10 @@ dependencies {
     // for local development:
     // implementation(files("../../neuris-juris-xml-export/build/libs/neuris-juris-xml-export-0.8.16.jar"))
 
-    implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.16.1")
+    implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.17.0")
 
-    implementation("io.micrometer:micrometer-registry-prometheus:1.12.3")
-    implementation("io.micrometer:micrometer-core:1.12.3")
+    implementation("io.micrometer:micrometer-registry-prometheus:1.12.4")
+    implementation("io.micrometer:micrometer-core:1.12.4")
 
     implementation(platform("io.sentry:sentry-bom:7.6.0"))
     implementation("io.sentry:sentry-spring-boot-starter-jakarta")
@@ -201,12 +201,12 @@ dependencies {
 
     implementation("com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer:20220608.1")
     // => CVE-2023-2976
-    implementation("com.google.guava:guava:33.0.0-jre")
+    implementation("com.google.guava:guava:33.1.0-jre")
 
-    var flywayCore = "org.flywaydb:flyway-core:10.9.0"
+    var flywayCore = "org.flywaydb:flyway-core:10.10.0"
     implementation(flywayCore)
     "migrationImplementation"(flywayCore)
-    runtimeOnly("org.flywaydb:flyway-database-postgresql:10.9.0")
+    runtimeOnly("org.flywaydb:flyway-database-postgresql:10.10.0")
 
     implementation("io.getunleash:unleash-client-java:9.2.0")
     implementation("org.apache.commons:commons-text:1.11.0")
@@ -218,7 +218,7 @@ dependencies {
     testImplementation("org.mockito:mockito-junit-jupiter:5.11.0")
     testImplementation("org.mockito:mockito-inline:5.2.0")
 
-    testImplementation("io.projectreactor:reactor-test:3.6.2")
+    testImplementation("io.projectreactor:reactor-test:3.6.4")
     testImplementation("org.springframework.security:spring-security-test")
     testImplementation("com.tngtech.archunit:archunit-junit5:1.2.1")
     testImplementation("org.testcontainers:testcontainers:$testContainersVersion")
