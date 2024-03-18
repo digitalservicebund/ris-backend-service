@@ -96,7 +96,7 @@ test.describe("document unit search queries", () => {
       parameter: {
         myDocOfficeOnly: "true",
       },
-      maxDuration: 800, // last max 332 // TODO: Back to 450 when staging database is cleaned
+      maxDuration: 450, // last max 332
       minResults: 5,
     },
   ]
