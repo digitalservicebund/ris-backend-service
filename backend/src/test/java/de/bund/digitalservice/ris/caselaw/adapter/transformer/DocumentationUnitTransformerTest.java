@@ -1,7 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.adapter.transformer;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.CourtDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOfficeDTO;
@@ -20,7 +19,6 @@ import de.bund.digitalservice.ris.caselaw.domain.CoreData.CoreDataBuilder;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit.DocumentUnitBuilder;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitException;
 import de.bund.digitalservice.ris.caselaw.domain.EnsuingDecision;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.Texts;
@@ -291,9 +289,9 @@ class DocumentationUnitTransformerTest {
   @Test
   void testTransformToDomain_withDocumentationUnitDTOIsNull_shouldReturnEmptyDocumentUnit() {
 
-    assertThatThrownBy(() -> DocumentationUnitTransformer.transformToDomain(null))
-        .isInstanceOf(DocumentationUnitException.class)
-        .hasMessageContaining("Document unit does not exist");
+    DocumentUnit documentUnit = DocumentationUnitTransformer.transformToDomain(null);
+
+    assertThat(documentUnit).isEqualTo(DocumentUnit.builder().build());
   }
 
   @Test

@@ -76,13 +76,9 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
   public Mono<DocumentUnit> findByDocumentNumber(String documentNumber) {
     log.debug("find by document number: {}", documentNumber);
 
-    try {
-      return Mono.just(
-          DocumentationUnitTransformer.transformToDomain(
-              repository.findByDocumentNumber(documentNumber).orElse(null)));
-    } catch (Exception e) {
-      return Mono.error(e);
-    }
+    return Mono.just(
+        DocumentationUnitTransformer.transformToDomain(
+            repository.findByDocumentNumber(documentNumber).orElse(null)));
   }
 
   @Override

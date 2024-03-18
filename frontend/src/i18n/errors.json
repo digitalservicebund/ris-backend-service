@@ -178,9 +178,5 @@
   "API_KEY_COULD_NOT_INVALIDATED": {
     "title": "API Key konnte nicht gesperrt werden.",
     "description": ""
-  },
-  "PAGE_NOT_FIND": {
-    "title": "Diese Internetseite existiert nicht",
-    "description": ""
   }
 }
