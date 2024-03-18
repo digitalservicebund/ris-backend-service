@@ -12,9 +12,8 @@ test.describe("procedure", () => {
   test.beforeAll(async ({ browser }) => {
     const page = await browser.newPage()
     await page.goto(`/caselaw/procedures?q=test_`)
-    const listItems = page.getByLabel("Vorgang Listenelement")
-    // Todo: this should fail, because the delete does not work
-    await expect(listItems).toHaveCount(0)
+    const listItems = await page.getByLabel("Vorgang Listenelement").all()
+    expect(listItems.length).toBe(0)
   })
   test("add new procedure in coreData", async ({
     page,
@@ -100,9 +99,10 @@ test.describe("procedure", () => {
   test.afterAll(async ({ browser }) => {
     const page = await browser.newPage()
     await page.goto(`/caselaw/procedures?q=test_`)
-    const listItems = page.getByLabel("Vorgang Listenelement")
+    await expect(page.getByLabel("Nach Vorgängen suchen")).toBeVisible()
+    const listItems = await page.getByLabel("Vorgang Listenelement").all()
 
-    for (const listItem of await listItems.all()) {
+    for (const listItem of listItems) {
       const spanLocator = listItem.locator("span.ds-label-01-reg")
       const title = await spanLocator.getAttribute("title")
       const response = await page.request.get(
@@ -110,11 +110,12 @@ test.describe("procedure", () => {
       )
 
       const responseBody = await response.json()
-      console.log(responseBody, responseBody.content[0]["id"])
-      const { uuid } = responseBody.content[0]
+      const uuid = responseBody.content[0].id
       await deleteProcedure(page, uuid)
     }
-    // Todo: this should fail, because the delete does not work
-    await expect(listItems).toHaveCount(0)
+
+    await page.reload()
+    const listItemsAfterDeletion = await page.getByRole("listitem").all()
+    expect(listItemsAfterDeletion.length).toBe(0)
   })
 })
