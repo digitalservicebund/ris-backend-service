@@ -81,9 +81,9 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
         return Mono.just(
             DocumentationUnitTransformer.transformToDomain(documentUnitOptional.get()));
       }
-      throw new DocumentationUnitNotExistsException("Document unit not exists");
+      throw new DocumentationUnitNotExistsException(documentNumber);
     } catch (Exception e) {
-      log.info("Could not find by document number: {} ", documentNumber, e);
+      log.info(e.getMessage(), e);
       return Mono.empty();
     }
   }
@@ -93,7 +93,9 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
   public DocumentUnit findByUuid(UUID uuid) {
     log.debug("find by uuid: {}", uuid);
 
-    return DocumentationUnitTransformer.transformToDomain(repository.findById(uuid).orElse(null));
+    var documentUnit =
+        repository.findById(uuid).orElseThrow(() -> new DocumentationUnitNotExistsException(uuid));
+    return DocumentationUnitTransformer.transformToDomain(documentUnit);
   }
 
   @Override
