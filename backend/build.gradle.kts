@@ -138,8 +138,10 @@ sonar {
 dependencies {
     val testContainersVersion = "1.19.7"
 
-    implementation("org.springframework:spring-web")
-    implementation("org.springframework:spring-webflux")
+    implementation("org.springframework:spring-web:6.1.5")
+    implementation("org.springframework:spring-webflux:6.1.5")
+    // CVE-2024-22259
+    implementation("org.springframework:spring-core:6.1.5")
 
     implementation("org.springframework.boot:spring-boot-starter-webflux")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
@@ -150,7 +152,7 @@ dependencies {
     implementation("org.springframework.session:spring-session-data-redis")
     implementation("org.springframework.boot:spring-boot-starter-security")
     implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
-    implementation("org.springframework.security:spring-security-oauth2-resource-server")
+    implementation("org.springframework.security:spring-security-oauth2-resource-server:6.2.3")
 
     // CVE-2024-22234
     implementation("org.springframework.security:spring-security-core:6.2.3")
@@ -219,7 +221,7 @@ dependencies {
     testImplementation("org.mockito:mockito-inline:5.2.0")
 
     testImplementation("io.projectreactor:reactor-test:3.6.4")
-    testImplementation("org.springframework.security:spring-security-test")
+    testImplementation("org.springframework.security:spring-security-test:6.2.3")
     testImplementation("com.tngtech.archunit:archunit-junit5:1.2.1")
     testImplementation("org.testcontainers:testcontainers:$testContainersVersion")
     testImplementation("org.testcontainers:junit-jupiter:$testContainersVersion")
