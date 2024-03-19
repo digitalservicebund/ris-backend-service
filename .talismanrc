@@ -23,6 +23,8 @@ fileignoreconfig:
   checksum: d8c709167000b46f3cccbf4f95058e1acb9dbe20e5b7160b6c47458f520e6603
 - filename: migration_schema_local_setup.md
   checksum: b270e144ecc5df8730a03237f05e0c4aebe4a62e033103e8876a87d50858362c
+- filename: doc/adr/0020-db-migrations-as-library.md
+  checksum: 347d83a8e1bd768b2e23a38fed1371faad0732d19866d8e6e79c1aff20593eb9
   ignore_detectors:
   - secrets
 scopeconfig:
