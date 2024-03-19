@@ -149,8 +149,7 @@ public class DocumentUnitController {
 
     if (documentNumber.length() != 13 && documentNumber.length() != 14) {
       return Mono.error(
-          new DocumentationUnitException(
-              "Die Dokumentennummer unterstützt nur " + "13-14 Zeichen"));
+          new DocumentationUnitException("Die Dokumentennummer unterstützt nur 13-14 Zeichen"));
     }
 
     return service.getByDocumentNumber(documentNumber).map(ResponseEntity::ok);

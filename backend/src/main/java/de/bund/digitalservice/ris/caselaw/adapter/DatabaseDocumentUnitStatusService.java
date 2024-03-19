@@ -104,24 +104,28 @@ public class DatabaseDocumentUnitStatusService implements DocumentUnitStatusServ
   }
 
   private Mono<StatusDTO> getLatestPublishing(String documentNumber) {
-    return documentUnitRepository
-        .findByDocumentNumber(documentNumber)
-        .flatMap(
-            documentUnit -> {
-              if (documentUnit == null || documentUnit.uuid() == null) {
-                return Mono.empty();
-              }
-              return Mono.just(
-                  Objects.requireNonNull(
-                      databaseDocumentationUnitRepository
-                          .findByDocumentNumber(documentNumber)
-                          .map(
-                              documentationUnitDTO ->
-                                  repository
-                                      .findFirstByDocumentationUnitDTOAndPublicationStatusOrderByCreatedAtDesc(
-                                          documentationUnitDTO, PublicationStatus.PUBLISHING))
-                          .orElse(null)));
-            });
+    try {
+      return documentUnitRepository
+          .findByDocumentNumber(documentNumber)
+          .flatMap(
+              documentUnit -> {
+                if (documentUnit == null || documentUnit.uuid() == null) {
+                  return Mono.empty();
+                }
+                return Mono.just(
+                    Objects.requireNonNull(
+                        databaseDocumentationUnitRepository
+                            .findByDocumentNumber(documentNumber)
+                            .map(
+                                documentationUnitDTO ->
+                                    repository
+                                        .findFirstByDocumentationUnitDTOAndPublicationStatusOrderByCreatedAtDesc(
+                                            documentationUnitDTO, PublicationStatus.PUBLISHING))
+                            .orElse(null)));
+              });
+    } catch (Exception e) {
+      return Mono.empty();
+    }
   }
 
   private Mono<StatusDTO> getLatestPublishing(UUID documentUuid) {
