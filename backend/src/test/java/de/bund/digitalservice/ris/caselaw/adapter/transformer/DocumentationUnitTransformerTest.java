@@ -292,7 +292,7 @@ class DocumentationUnitTransformerTest {
 
     assertThatThrownBy(() -> DocumentationUnitTransformer.transformToDomain(null))
         .isInstanceOf(DocumentUnitTransformerException.class)
-        .hasMessageContaining("Document unit is empty and won't transform");
+        .hasMessageContaining("Document unit is null and won't transform");
   }
 
   @Test

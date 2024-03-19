@@ -9,6 +9,7 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitRepository;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitException;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitListItem;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitNotExistsException;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitSearchInput;
 import de.bund.digitalservice.ris.caselaw.domain.Procedure;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
@@ -75,11 +76,14 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
   @Transactional(transactionManager = "jpaTransactionManager")
   public Mono<DocumentUnit> findByDocumentNumber(String documentNumber) {
     try {
-      return Mono.just(
-          DocumentationUnitTransformer.transformToDomain(
-              repository.findByDocumentNumber(documentNumber).orElse(null)));
+      var documentUnitOptional = repository.findByDocumentNumber(documentNumber);
+      if (documentUnitOptional.isPresent()) {
+        return Mono.just(
+            DocumentationUnitTransformer.transformToDomain(documentUnitOptional.get()));
+      }
+      throw new DocumentationUnitNotExistsException("Document unit not exists");
     } catch (Exception e) {
-      log.debug("Could not find by document number: {} ", documentNumber, e);
+      log.info("Could not find by document number: {} ", documentNumber, e);
       return Mono.empty();
     }
   }

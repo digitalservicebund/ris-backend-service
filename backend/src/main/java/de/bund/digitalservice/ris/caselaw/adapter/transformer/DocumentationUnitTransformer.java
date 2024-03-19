@@ -407,7 +407,7 @@ public class DocumentationUnitTransformer {
    */
   public static DocumentUnit transformToDomain(DocumentationUnitDTO documentationUnitDTO) {
     if (documentationUnitDTO == null) {
-      throw new DocumentUnitTransformerException("Document unit is empty and won't transform");
+      throw new DocumentUnitTransformerException("Document unit is null and won't transform");
     }
 
     log.debug(
