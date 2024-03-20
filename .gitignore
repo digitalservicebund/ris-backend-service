@@ -21,6 +21,7 @@ lefthook-local.yml
 .env
 Brewfile.lock.json
 ris-data-migration/
+.vite/vitest/results.json
 
 ### structurizr c4 language server log ###
 c4-language-server.log

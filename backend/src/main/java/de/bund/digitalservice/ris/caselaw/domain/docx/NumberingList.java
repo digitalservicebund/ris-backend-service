@@ -72,13 +72,7 @@ public class NumberingList implements DocumentUnitDocx {
                 .append(entry.toHtmlString())
                 .append("</li>");
           } else {
-            String strIndex =
-                getIndexWithFormat(
-                    lvlTextIndex, resetLvlText, cLvl[0], entry.numberingListEntryIndex());
-            sb.append("<li style=\"display:table-row\">")
-                .append(strIndex)
-                .append(entry.toHtmlString())
-                .append("</li>");
+            sb.append("<li>").append(entry.toHtmlString()).append("</li>");
           }
 
           if (!currentNumberFormat.isEmpty()) {
@@ -152,15 +146,10 @@ public class NumberingList implements DocumentUnitDocx {
       LOGGER.error("Unsupported picture bullet, use default bullet for list");
       return "list-style-type:disc;";
     }
-    boolean hasStyle =
-        (!numberingListEntryIndex.fontStyle().isBlank())
-            || (!numberingListEntryIndex.color().isBlank())
-            || (!numberingListEntryIndex.fontSize().isBlank());
-    if (hasStyle) return "list-style-type:none;display:table;";
     Pattern docxIndexMatchPattern = Pattern.compile("(%\\d)");
     String lvlText = numberingListEntryIndex.lvlText();
     if (!lvlText.isBlank() && docxIndexMatchPattern.matcher(lvlText).find())
-      return "list-style-type:none;display:table;";
+      return "list-style-type:none;";
     return switch (numberFormat) {
       case NONE -> null;
       case DECIMAL -> "list-style-type:decimal;";
@@ -168,7 +157,8 @@ public class NumberingList implements DocumentUnitDocx {
       case LOWER_LETTER -> "list-style-type:upper-latin;";
       case UPPER_ROMAN -> "list-style-type:upper-roman;";
       case LOWER_ROMAN -> "list-style-type:lower-roman";
-      default -> "list-style-type:disc;";
+      case BULLET -> "list-style-type:disc";
+      default -> "list-style-type:none;";
     };
   }
 
@@ -214,7 +204,7 @@ public class NumberingList implements DocumentUnitDocx {
   }
 
   private String getIndexJc(NumberingListEntryIndex numberingListEntryIndex) {
-    StringBuilder sb = new StringBuilder().append("display:table-cell;");
+    StringBuilder sb = new StringBuilder();
     sb.append(
         switch (numberingListEntryIndex.lvlJc()) {
           case LEFT -> "text-align:left;";
