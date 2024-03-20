@@ -229,7 +229,13 @@ public class DocumentUnitService {
   }
 
   public Mono<DocumentUnit> getByDocumentNumber(String documentNumber) {
-    return repository.findByDocumentNumber(documentNumber);
+    return Mono.defer(
+        () -> {
+          var optionalDocumentUnit = repository.findByDocumentNumber(documentNumber);
+          return optionalDocumentUnit
+              .<Mono<? extends DocumentUnit>>map(Mono::just)
+              .orElseGet(Mono::empty);
+        });
   }
 
   public Mono<DocumentUnit> getByUuid(UUID documentUnitUuid) {

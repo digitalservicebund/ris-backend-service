@@ -6,11 +6,11 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.StatusDTO;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitRepository;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatusService;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitNotExistsException;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.Status;
 import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
-import java.util.Objects;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -21,7 +21,9 @@ import reactor.core.publisher.Mono;
 public class DatabaseDocumentUnitStatusService implements DocumentUnitStatusService {
 
   private final DatabaseStatusRepository repository;
+
   private final DocumentUnitRepository documentUnitRepository;
+
   private final DatabaseDocumentationUnitRepository databaseDocumentationUnitRepository;
 
   public DatabaseDocumentUnitStatusService(
@@ -65,8 +67,9 @@ public class DatabaseDocumentUnitStatusService implements DocumentUnitStatusServ
 
   @Override
   public Mono<Void> update(String documentNumber, Status status) {
+
     return getLatestPublishing(documentNumber)
-        .flatMap(previousStatusDTO -> saveStatus(status, previousStatusDTO))
+        .map(previousStatusDTO -> saveStatus(status, previousStatusDTO))
         .then();
   }
 
@@ -105,33 +108,23 @@ public class DatabaseDocumentUnitStatusService implements DocumentUnitStatusServ
 
   private Mono<StatusDTO> getLatestPublishing(String documentNumber) {
     try {
-      return documentUnitRepository
-          .findByDocumentNumber(documentNumber)
-          .flatMap(
-              documentUnit -> {
-                if (documentUnit == null || documentUnit.uuid() == null) {
-                  return Mono.empty();
-                }
-                return Mono.just(
-                    Objects.requireNonNull(
-                        databaseDocumentationUnitRepository
-                            .findByDocumentNumber(documentNumber)
-                            .map(
-                                documentationUnitDTO ->
-                                    repository
-                                        .findFirstByDocumentationUnitDTOAndPublicationStatusOrderByCreatedAtDesc(
-                                            documentationUnitDTO, PublicationStatus.PUBLISHING))
-                            .orElse(null)));
-              });
+      var documentUnit =
+          databaseDocumentationUnitRepository
+              .findByDocumentNumber(documentNumber)
+              .orElseThrow(() -> new DocumentationUnitNotExistsException(documentNumber));
+      return getLatestPublishing(documentUnit.getId());
+
     } catch (Exception e) {
-      return Mono.empty();
+      return Mono.error(e);
     }
   }
 
   private Mono<StatusDTO> getLatestPublishing(UUID documentUuid) {
-    return Mono.just(
-        repository.findFirstByDocumentationUnitDTOAndPublicationStatusOrderByCreatedAtDesc(
-            databaseDocumentationUnitRepository.getReferenceById(documentUuid),
-            PublicationStatus.PUBLISHING));
+    return Mono.fromSupplier(
+            () ->
+                repository
+                    .findFirstByDocumentationUnitDTO_IdAndPublicationStatusOrderByCreatedAtDesc(
+                        documentUuid, PublicationStatus.PUBLISHING))
+        .flatMap(Mono::justOrEmpty);
   }
 }

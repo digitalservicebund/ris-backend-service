@@ -26,7 +26,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 @ExtendWith(SpringExtension.class)
@@ -98,14 +97,14 @@ class DatabaseDocumentUnitStatusServiceTest {
   void testUpdate_withDocumentNumberAndDocumentationUnitNotFound_shouldNotSaveAStatus() {
     String documentNumber = "document number";
     Status status = Status.builder().build();
-    DocumentUnit documentUnit = DocumentUnit.builder().build();
-    when(documentUnitRepository.findByDocumentNumber(documentNumber))
-        .thenReturn(Mono.just(documentUnit));
+    DocumentationUnitDTO documentUnitDto = DocumentationUnitDTO.builder().build();
+
+    when(databaseDocumentationUnitRepository.findByDocumentNumber(documentNumber))
+        .thenReturn(Optional.of(documentUnitDto));
 
     StepVerifier.create(statusService.update(documentNumber, status)).verifyComplete();
 
-    verify(documentUnitRepository, times(1)).findByDocumentNumber(documentNumber);
-    verify(databaseDocumentationUnitRepository, never()).findByDocumentNumber(documentNumber);
+    verify(databaseDocumentationUnitRepository, times(1)).findByDocumentNumber(documentNumber);
     verify(repository, never())
         .findFirstByDocumentationUnitDTOAndPublicationStatusOrderByCreatedAtDesc(
             any(DocumentationUnitDTO.class), any(PublicationStatus.class));
@@ -119,20 +118,20 @@ class DatabaseDocumentUnitStatusServiceTest {
     Status status = Status.builder().build();
     DocumentUnit documentationUnit = DocumentUnit.builder().uuid(TEST_UUID).build();
     DocumentationUnitDTO documentationUnitDTO =
-        DocumentationUnitDTO.builder().id(TEST_UUID).build();
-    when(documentUnitRepository.findByDocumentNumber(documentNumber))
-        .thenReturn(Mono.just(documentationUnit));
+        DocumentationUnitDTO.builder()
+            .id(TEST_UUID)
+            .documentNumber(documentationUnit.documentNumber())
+            .build();
     when(databaseDocumentationUnitRepository.findByDocumentNumber(documentNumber))
         .thenReturn(Optional.of(documentationUnitDTO));
-    when(repository.findFirstByDocumentationUnitDTOAndPublicationStatusOrderByCreatedAtDesc(
-            documentationUnitDTO, PublicationStatus.PUBLISHING))
+    when(repository.findFirstByDocumentationUnitDTO_IdAndPublicationStatusOrderByCreatedAtDesc(
+            documentationUnitDTO.getId(), PublicationStatus.PUBLISHING))
         .thenReturn(null);
 
     StepVerifier.create(statusService.update(documentNumber, status))
         .expectError(NullPointerException.class);
 
-    verify(documentUnitRepository, times(1)).findByDocumentNumber(documentNumber);
-    verify(databaseDocumentationUnitRepository, never()).findByDocumentNumber(documentNumber);
+    verify(databaseDocumentationUnitRepository, times(1)).findByDocumentNumber(documentNumber);
     verify(repository, never())
         .findFirstByDocumentationUnitDTOAndPublicationStatusOrderByCreatedAtDesc(
             any(DocumentationUnitDTO.class), any(PublicationStatus.class));
@@ -147,12 +146,14 @@ class DatabaseDocumentUnitStatusServiceTest {
         Status.builder().publicationStatus(PublicationStatus.PUBLISHED).withError(true).build();
     DocumentUnit documentationUnit = DocumentUnit.builder().uuid(TEST_UUID).build();
     DocumentationUnitDTO documentationUnitDTO =
-        DocumentationUnitDTO.builder().id(TEST_UUID).build();
+        DocumentationUnitDTO.builder().id(TEST_UUID).documentNumber(documentNumber).build();
     StatusDTO statusDTO =
         StatusDTO.builder()
             .documentationUnitDTO(documentationUnitDTO)
             .issuerAddress("issuer address")
+            .withError(false)
             .build();
+
     StatusDTO updatedStatus =
         StatusDTO.builder()
             .documentationUnitDTO(documentationUnitDTO)
@@ -161,22 +162,19 @@ class DatabaseDocumentUnitStatusServiceTest {
             .withError(true)
             .build();
     ArgumentCaptor<StatusDTO> captor = ArgumentCaptor.forClass(StatusDTO.class);
-    when(documentUnitRepository.findByDocumentNumber(documentNumber))
-        .thenReturn(Mono.just(documentationUnit));
+
     when(databaseDocumentationUnitRepository.findByDocumentNumber(documentNumber))
         .thenReturn(Optional.of(documentationUnitDTO));
-    when(repository.findFirstByDocumentationUnitDTOAndPublicationStatusOrderByCreatedAtDesc(
-            documentationUnitDTO, PublicationStatus.PUBLISHING))
-        .thenReturn(statusDTO);
+    when(repository.findFirstByDocumentationUnitDTO_IdAndPublicationStatusOrderByCreatedAtDesc(
+            documentationUnitDTO.getId(), PublicationStatus.PUBLISHING))
+        .thenReturn(Optional.of(statusDTO));
     when(repository.save(any(StatusDTO.class))).thenReturn(updatedStatus);
 
     StepVerifier.create(statusService.update(documentNumber, status)).verifyComplete();
 
-    verify(documentUnitRepository, times(1)).findByDocumentNumber(documentNumber);
-    verify(databaseDocumentationUnitRepository, times(1)).findByDocumentNumber(documentNumber);
     verify(repository, times(1))
-        .findFirstByDocumentationUnitDTOAndPublicationStatusOrderByCreatedAtDesc(
-            documentationUnitDTO, PublicationStatus.PUBLISHING);
+        .findFirstByDocumentationUnitDTO_IdAndPublicationStatusOrderByCreatedAtDesc(
+            documentationUnitDTO.getId(), PublicationStatus.PUBLISHING);
     verify(repository, times(1)).save(captor.capture());
     assertThat(captor.getValue())
         .usingRecursiveComparison()
@@ -205,17 +203,16 @@ class DatabaseDocumentUnitStatusServiceTest {
     ArgumentCaptor<StatusDTO> captor = ArgumentCaptor.forClass(StatusDTO.class);
     when(databaseDocumentationUnitRepository.getReferenceById(TEST_UUID))
         .thenReturn(documentationUnitDTO);
-    when(repository.findFirstByDocumentationUnitDTOAndPublicationStatusOrderByCreatedAtDesc(
-            documentationUnitDTO, PublicationStatus.PUBLISHING))
-        .thenReturn(statusDTO);
+    when(repository.findFirstByDocumentationUnitDTO_IdAndPublicationStatusOrderByCreatedAtDesc(
+            documentationUnitDTO.getId(), PublicationStatus.PUBLISHING))
+        .thenReturn(Optional.of(statusDTO));
     when(repository.save(any(StatusDTO.class))).thenReturn(updatedStatus);
 
     StepVerifier.create(statusService.update(TEST_UUID, status)).verifyComplete();
 
     verify(repository, times(1))
-        .findFirstByDocumentationUnitDTOAndPublicationStatusOrderByCreatedAtDesc(
-            documentationUnitDTO, PublicationStatus.PUBLISHING);
-    verify(databaseDocumentationUnitRepository, times(1)).getReferenceById(TEST_UUID);
+        .findFirstByDocumentationUnitDTO_IdAndPublicationStatusOrderByCreatedAtDesc(
+            documentationUnitDTO.getId(), PublicationStatus.PUBLISHING);
     verify(repository, times(1)).save(captor.capture());
     assertThat(captor.getValue())
         .usingRecursiveComparison()
@@ -235,22 +232,21 @@ class DatabaseDocumentUnitStatusServiceTest {
             .issuerAddress("issuer address")
             .build();
     when(documentUnitRepository.findByDocumentNumber(documentNumber))
-        .thenReturn(Mono.just(documentationUnit));
+        .thenReturn(Optional.of(documentationUnit));
     when(databaseDocumentationUnitRepository.findByDocumentNumber(documentNumber))
         .thenReturn(Optional.of(documentationUnitDTO));
-    when(repository.findFirstByDocumentationUnitDTOAndPublicationStatusOrderByCreatedAtDesc(
-            documentationUnitDTO, PublicationStatus.PUBLISHING))
-        .thenReturn(statusDTO);
+    when(repository.findFirstByDocumentationUnitDTO_IdAndPublicationStatusOrderByCreatedAtDesc(
+            documentationUnitDTO.getId(), PublicationStatus.PUBLISHING))
+        .thenReturn(Optional.of(statusDTO));
 
     StepVerifier.create(statusService.getLatestIssuerAddress("document number"))
         .expectNext("issuer address")
         .verifyComplete();
 
-    verify(documentUnitRepository, times(1)).findByDocumentNumber(documentNumber);
     verify(databaseDocumentationUnitRepository, times(1)).findByDocumentNumber(documentNumber);
     verify(repository, times(1))
-        .findFirstByDocumentationUnitDTOAndPublicationStatusOrderByCreatedAtDesc(
-            documentationUnitDTO, PublicationStatus.PUBLISHING);
+        .findFirstByDocumentationUnitDTO_IdAndPublicationStatusOrderByCreatedAtDesc(
+            documentationUnitDTO.getId(), PublicationStatus.PUBLISHING);
   }
 
   @Test

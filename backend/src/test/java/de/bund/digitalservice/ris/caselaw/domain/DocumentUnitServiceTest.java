@@ -212,7 +212,7 @@ class DocumentUnitServiceTest {
   @Test
   void testGetByDocumentnumber() {
     when(repository.findByDocumentNumber("ABCDE20220001"))
-        .thenReturn(Mono.just(DocumentUnit.builder().build()));
+        .thenReturn(Optional.of(DocumentUnit.builder().build()));
     StepVerifier.create(service.getByDocumentNumber("ABCDE20220001"))
         .consumeNextWith(documentUnit -> assertEquals(documentUnit.getClass(), DocumentUnit.class))
         .verifyComplete();

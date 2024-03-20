@@ -74,17 +74,15 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
 
   @Override
   @Transactional(transactionManager = "jpaTransactionManager")
-  public Mono<DocumentUnit> findByDocumentNumber(String documentNumber) {
+  public Optional<DocumentUnit> findByDocumentNumber(String documentNumber) {
     try {
-      var documentUnitOptional = repository.findByDocumentNumber(documentNumber);
-      if (documentUnitOptional.isPresent()) {
-        return Mono.just(
-            DocumentationUnitTransformer.transformToDomain(documentUnitOptional.get()));
-      }
-      throw new DocumentationUnitNotExistsException(documentNumber);
+      var documentUnit =
+          repository
+              .findByDocumentNumber(documentNumber)
+              .orElseThrow(() -> new DocumentationUnitNotExistsException(documentNumber));
+      return Optional.of(DocumentationUnitTransformer.transformToDomain(documentUnit));
     } catch (Exception e) {
-      log.info(e.getMessage(), e);
-      return Mono.empty();
+      return Optional.empty();
     }
   }
 

@@ -1,6 +1,7 @@
 package de.bund.digitalservice.ris.caselaw.domain;
 
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -17,7 +18,7 @@ public interface DocumentUnitRepository {
    * @param documentNumber the document number
    * @return the documentation unit found
    */
-  Mono<DocumentUnit> findByDocumentNumber(String documentNumber);
+  Optional<DocumentUnit> findByDocumentNumber(String documentNumber);
 
   /**
    * Find a documentation unit by its UUID
