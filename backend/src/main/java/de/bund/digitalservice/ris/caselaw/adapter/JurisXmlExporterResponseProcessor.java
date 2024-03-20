@@ -2,6 +2,7 @@ package de.bund.digitalservice.ris.caselaw.adapter;
 
 import de.bund.digitalservice.ris.caselaw.domain.Attachment;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatusService;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitNotExistsException;
 import de.bund.digitalservice.ris.caselaw.domain.HttpMailSender;
 import de.bund.digitalservice.ris.caselaw.domain.MailStoreFactory;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationReport;
@@ -22,6 +23,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import org.jetbrains.annotations.NotNull;
 import org.owasp.html.HtmlPolicyBuilder;
 import org.owasp.html.PolicyFactory;
 import org.slf4j.Logger;
@@ -67,21 +69,24 @@ public class JurisXmlExporterResponseProcessor {
       Folder inbox = store.getFolder("INBOX");
       inbox.open(Folder.READ_WRITE);
 
-      List<MessageWrapper> processedMessages =
-          Arrays.stream(inbox.getMessages())
-              .map(wrapperFactory::getResponsibleWrapper)
-              .flatMap(Optional::stream)
-              .sorted(
-                  Comparator.comparing(wrapper -> wrapper instanceof ImportMessageWrapper ? 0 : 1))
-              .map(this::forwardMessage)
-              .flatMap(Optional::stream)
-              .map(this::setPublicationStatus)
-              .map(this::saveAttachments)
-              .toList();
+      List<MessageWrapper> processedMessages = processMessages(inbox);
       moveMessages(processedMessages, inbox, store.getFolder("processed"));
     } catch (MessagingException e) {
       throw new StatusImporterException("Error processing inbox: " + e);
     }
+  }
+
+  @NotNull
+  private List<MessageWrapper> processMessages(Folder inbox) throws MessagingException {
+    return Arrays.stream(inbox.getMessages())
+        .map(wrapperFactory::getResponsibleWrapper)
+        .flatMap(Optional::stream)
+        .sorted(Comparator.comparing(wrapper -> wrapper instanceof ImportMessageWrapper ? 0 : 1))
+        .map(this::forwardMessage)
+        .flatMap(Optional::stream)
+        .map(this::setPublicationStatus)
+        .map(this::saveAttachments)
+        .toList();
   }
 
   private MessageWrapper saveAttachments(MessageWrapper messageWrapper) {
@@ -178,6 +183,9 @@ public class JurisXmlExporterResponseProcessor {
                 return messageWrapper;
               });
 
+    } catch (DocumentationUnitNotExistsException e) {
+      //      LOGGER.info("Could not forward Message: {}", messageWrapper, e);
+      return Optional.empty();
     } catch (MessagingException | IOException e) {
       throw new StatusImporterException("Could not forward Message");
     } catch (NullPointerException ex) {

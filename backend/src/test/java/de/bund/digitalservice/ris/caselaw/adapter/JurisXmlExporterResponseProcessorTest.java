@@ -1,6 +1,5 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.ArgumentMatchers.any;
@@ -15,6 +14,7 @@ import static org.mockito.Mockito.when;
 
 import de.bund.digitalservice.ris.caselaw.domain.Attachment;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatusService;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitNotExistsException;
 import de.bund.digitalservice.ris.caselaw.domain.HttpMailSender;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationReport;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationReportRepository;
@@ -73,7 +73,7 @@ class JurisXmlExporterResponseProcessorTest {
   private JurisXmlExporterResponseProcessor responseProcessor;
 
   @BeforeEach
-  void setup() throws MessagingException {
+  void setup() throws MessagingException, DocumentationUnitNotExistsException {
     when(storeFactory.createStore()).thenReturn(store);
     when(store.getFolder("INBOX")).thenReturn(inbox);
     when(store.getFolder("processed")).thenReturn(processed);
@@ -100,7 +100,7 @@ class JurisXmlExporterResponseProcessorTest {
   }
 
   @Test
-  void testMessageGetsForwarded() throws MessagingException {
+  void testMessageGetsForwarded() throws MessagingException, DocumentationUnitNotExistsException {
     when(inbox.getMessages()).thenReturn(new Message[] {importMessage});
 
     responseProcessor.readEmails();
@@ -130,7 +130,8 @@ class JurisXmlExporterResponseProcessorTest {
   }
 
   @Test
-  void testMessageGetsNotMovedIfDocumentNumberNotFound() throws MessagingException {
+  void testMessageGetsNotMovedIfDocumentNumberNotFound()
+      throws MessagingException, DocumentationUnitNotExistsException {
     when(inbox.getMessages()).thenReturn(new Message[] {importMessage});
     when(statusService.getLatestIssuerAddress(DOCUMENT_NUMBER)).thenReturn(Mono.empty());
 
@@ -298,7 +299,8 @@ class JurisXmlExporterResponseProcessorTest {
   }
 
   @Test
-  void testProcessMessageSetsPublishingStatus() throws MessagingException {
+  void testProcessMessageSetsPublishingStatus()
+      throws MessagingException, DocumentationUnitNotExistsException {
     when(inbox.getMessages()).thenReturn(new Message[] {importMessage});
 
     when(processMessageWrapper.isPublished()).thenReturn(Optional.empty());
@@ -317,7 +319,8 @@ class JurisXmlExporterResponseProcessorTest {
   }
 
   @Test
-  void testProcessMessageSetsUnpublishedStatus() throws MessagingException {
+  void testProcessMessageSetsUnpublishedStatus()
+      throws MessagingException, DocumentationUnitNotExistsException {
     when(inbox.getMessages()).thenReturn(new Message[] {processMessage});
 
     when(processMessageWrapper.isPublished()).thenReturn(Optional.of(false));
@@ -336,7 +339,8 @@ class JurisXmlExporterResponseProcessorTest {
   }
 
   @Test
-  void testImportMessageSetsPublishedStatus() throws MessagingException {
+  void testImportMessageSetsPublishedStatus()
+      throws MessagingException, DocumentationUnitNotExistsException {
     when(inbox.getMessages()).thenReturn(new Message[] {processMessage});
 
     when(processMessageWrapper.isPublished()).thenReturn(Optional.of(true));
@@ -355,7 +359,8 @@ class JurisXmlExporterResponseProcessorTest {
   }
 
   @Test
-  void testImportMessageSetsPublishedWithErrorsStatus() throws MessagingException {
+  void testImportMessageSetsPublishedWithErrorsStatus()
+      throws MessagingException, DocumentationUnitNotExistsException {
     when(inbox.getMessages()).thenReturn(new Message[] {processMessage});
 
     when(processMessageWrapper.isPublished()).thenReturn(Optional.of(true));
@@ -374,7 +379,8 @@ class JurisXmlExporterResponseProcessorTest {
   }
 
   @Test
-  void testImportMessageSetsUnpublishedStatus() throws MessagingException {
+  void testImportMessageSetsUnpublishedStatus()
+      throws MessagingException, DocumentationUnitNotExistsException {
     when(inbox.getMessages()).thenReturn(new Message[] {importMessage});
 
     when(importMessageWrapper.isPublished()).thenReturn(Optional.of(false));
@@ -393,7 +399,8 @@ class JurisXmlExporterResponseProcessorTest {
   }
 
   @Test
-  void testImportMessagesGetProcessedFirst() throws MessagingException {
+  void testImportMessagesGetProcessedFirst()
+      throws MessagingException, DocumentationUnitNotExistsException {
     when(inbox.getMessages()).thenReturn(new Message[] {processMessage, importMessage});
 
     when(processMessageWrapper.hasErrors()).thenReturn(false);
@@ -430,7 +437,8 @@ class JurisXmlExporterResponseProcessorTest {
   }
 
   @Test
-  void testLoggingForUnknownDocumentNumber() throws MessagingException {
+  void testLoggingForUnknownDocumentNumber()
+      throws MessagingException, DocumentationUnitNotExistsException {
     when(inbox.getMessages()).thenReturn(new Message[] {processMessage});
     when(statusService.getLatestIssuerAddress(DOCUMENT_NUMBER)).thenReturn(Mono.empty());
 
@@ -453,7 +461,7 @@ class JurisXmlExporterResponseProcessorTest {
 
     StatusImporterException exception =
         assertThrows(StatusImporterException.class, () -> responseProcessor.readEmails());
-    assertEquals("Error saving attachments", exception.getMessage());
+    Assertions.assertEquals("Error saving attachments", exception.getMessage());
   }
 
   @Test

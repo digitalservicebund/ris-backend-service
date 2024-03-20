@@ -26,7 +26,7 @@ public interface DocumentUnitRepository {
    * @param uuid the UUID to search for
    * @return the documentation unit found
    */
-  DocumentUnit findByUuid(UUID uuid);
+  Optional<DocumentUnit> findByUuid(UUID uuid);
 
   /**
    * Create a new documentation unit with the given document number and documentation office

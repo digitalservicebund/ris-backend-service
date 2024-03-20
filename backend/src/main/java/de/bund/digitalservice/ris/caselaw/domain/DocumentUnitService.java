@@ -108,7 +108,7 @@ public class DocumentUnitService {
 
     return putObjectIntoBucket(fileUuid, byteBuffer, httpHeaders)
         .doOnNext(putObjectResponse -> log.debug("generate doc unit for {}", fileUuid))
-        .map(putObjectResponse -> repository.findByUuid(documentUnitUuid))
+        .map(putObjectResponse -> repository.findByUuid(documentUnitUuid).orElseThrow())
         .doOnNext(
             documentUnit ->
                 log.debug(
@@ -121,15 +121,23 @@ public class DocumentUnitService {
   }
 
   public Mono<DocumentUnit> removeFileFromDocumentUnit(UUID documentUnitId) {
-    DocumentUnit documentUnit = repository.findByUuid(documentUnitId);
+    try {
 
-    return deleteObjectFromBucket(documentUnit.s3path())
-        .map(
-            response -> {
-              log.debug("deleted file {} in bucket", documentUnit.s3path());
-              return repository.removeFile(documentUnitId);
-            })
-        .doOnError(ex -> log.error("Couldn't remove the file from the DocumentUnit", ex));
+      DocumentUnit documentUnit =
+          repository
+              .findByUuid(documentUnitId)
+              .orElseThrow(() -> new DocumentationUnitNotExistsException(documentUnitId));
+
+      return deleteObjectFromBucket(documentUnit.s3path())
+          .map(
+              response -> {
+                log.debug("deleted file {} in bucket", documentUnit.s3path());
+                return repository.removeFile(documentUnitId);
+              })
+          .doOnError(ex -> log.error("Couldn't remove the file from the DocumentUnit", ex));
+    } catch (Exception e) {
+      return Mono.error(e);
+    }
   }
 
   void checkDocx(ByteBuffer byteBuffer) {
@@ -239,44 +247,53 @@ public class DocumentUnitService {
   }
 
   public Mono<DocumentUnit> getByUuid(UUID documentUnitUuid) {
-    return Mono.just(repository.findByUuid(documentUnitUuid));
+    return Mono.just(repository.findByUuid(documentUnitUuid).orElseThrow());
   }
 
   public Mono<String> deleteByUuid(UUID documentUnitUuid) {
-    Map<RelatedDocumentationType, Long> relatedEntities =
-        repository.getAllDocumentationUnitWhichLink(documentUnitUuid);
+    try {
 
-    if (!(relatedEntities == null
-        || relatedEntities.isEmpty()
-        || relatedEntities.values().stream().mapToLong(Long::longValue).sum() == 0)) {
+      Map<RelatedDocumentationType, Long> relatedEntities =
+          repository.getAllDocumentationUnitWhichLink(documentUnitUuid);
 
-      log.debug(
-          "Could not delete document unit {} cause of related entities: {}",
-          documentUnitUuid,
-          relatedEntities);
+      if (!(relatedEntities == null
+          || relatedEntities.isEmpty()
+          || relatedEntities.values().stream().mapToLong(Long::longValue).sum() == 0)) {
 
-      return Mono.error(
-          new DocumentUnitDeletionException(
-              "Die Dokumentationseinheit konnte nicht gelöscht werden, da", relatedEntities));
+        log.debug(
+            "Could not delete document unit {} cause of related entities: {}",
+            documentUnitUuid,
+            relatedEntities);
+
+        return Mono.error(
+            new DocumentUnitDeletionException(
+                "Die Dokumentationseinheit konnte nicht gelöscht werden, da", relatedEntities));
+      }
+
+      DocumentUnit documentUnit =
+          repository
+              .findByUuid(documentUnitUuid)
+              .orElseThrow(() -> new DocumentationUnitNotExistsException(documentUnitUuid));
+
+      log.debug("Deleting DocumentUnitDTO " + documentUnitUuid);
+
+      return deleteObjectFromBucket(documentUnit.s3path())
+          .doOnNext(
+              deleteObjectResponse -> log.debug("Deleted file {} in bucket", documentUnit.s3path()))
+          .doOnError(
+              exception ->
+                  log.error(
+                      "Error by deleting file {} in bucket", documentUnit.s3path(), exception))
+          .defaultIfEmpty(DeleteObjectResponse.builder().build())
+          .map(
+              deleteObjectResponse -> {
+                saveForRecycling(documentUnit);
+                repository.delete(documentUnit);
+                return "Dokumentationseinheit gelöscht: " + documentUnitUuid;
+              });
+    } catch (Exception e) {
+      return Mono.error(e);
     }
-
-    DocumentUnit documentUnit = repository.findByUuid(documentUnitUuid);
-
-    log.debug("Deleting DocumentUnitDTO " + documentUnitUuid);
-
-    return deleteObjectFromBucket(documentUnit.s3path())
-        .doOnNext(
-            deleteObjectResponse -> log.debug("Deleted file {} in bucket", documentUnit.s3path()))
-        .doOnError(
-            exception ->
-                log.error("Error by deleting file {} in bucket", documentUnit.s3path(), exception))
-        .defaultIfEmpty(DeleteObjectResponse.builder().build())
-        .map(
-            deleteObjectResponse -> {
-              saveForRecycling(documentUnit);
-              repository.delete(documentUnit);
-              return "Dokumentationseinheit gelöscht: " + documentUnitUuid;
-            });
   }
 
   public Mono<DocumentUnit> updateDocumentUnit(DocumentUnit documentUnit) {
@@ -286,33 +303,51 @@ public class DocumentUnitService {
 
     repository.save(documentUnit);
 
-    return Mono.just(repository.findByUuid(documentUnit.uuid()));
+    try {
+      return Mono.just(
+          repository
+              .findByUuid(documentUnit.uuid())
+              .orElseThrow(
+                  () -> new DocumentationUnitNotExistsException(documentUnit.documentNumber())));
+    } catch (DocumentationUnitNotExistsException e) {
+      return Mono.error(e);
+    }
   }
 
   public Mono<Publication> publishAsEmail(UUID documentUnitUuid, String issuerAddress) {
-    DocumentUnit documentUnit = repository.findByUuid(documentUnitUuid);
+    try {
+      DocumentUnit documentUnit =
+          repository
+              .findByUuid(documentUnitUuid)
+              .orElseThrow(() -> new DocumentationUnitNotExistsException(documentUnitUuid));
 
-    if (documentUnit == null) {
-      return Mono.empty();
+      return publicationService
+          .publish(documentUnit, recipientAddress)
+          .flatMap(
+              mailResponse -> {
+                if (mailResponse.getStatusCode().equals(String.valueOf(HttpStatus.OK.value()))) {
+                  return documentUnitStatusService
+                      .setToPublishing(documentUnit, mailResponse.getPublishDate(), issuerAddress)
+                      .thenReturn(mailResponse);
+                } else {
+                  return Mono.just(mailResponse);
+                }
+              });
+    } catch (Exception e) {
+      return Mono.error(e);
     }
-
-    return publicationService
-        .publish(documentUnit, recipientAddress)
-        .flatMap(
-            mailResponse -> {
-              if (mailResponse.getStatusCode().equals(String.valueOf(HttpStatus.OK.value()))) {
-                return documentUnitStatusService
-                    .setToPublishing(documentUnit, mailResponse.getPublishDate(), issuerAddress)
-                    .thenReturn(mailResponse);
-              } else {
-                return Mono.just(mailResponse);
-              }
-            });
   }
 
   public Mono<XmlResultObject> previewPublication(UUID documentUuid) {
-    DocumentUnit documentUnit = repository.findByUuid(documentUuid);
-    return publicationService.getPublicationPreview(documentUnit);
+    try {
+      DocumentUnit documentUnit =
+          repository
+              .findByUuid(documentUuid)
+              .orElseThrow(() -> new DocumentationUnitNotExistsException(documentUuid));
+      return publicationService.getPublicationPreview(documentUnit);
+    } catch (Exception e) {
+      return Mono.error(e);
+    }
   }
 
   public Flux<PublicationHistoryRecord> getPublicationHistory(UUID documentUuid) {

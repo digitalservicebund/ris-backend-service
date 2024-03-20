@@ -9,6 +9,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumenta
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseStatusRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.StatusDTO;
+import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -38,7 +39,8 @@ class DocumentUnitStatusServiceTest {
     StatusDTO documentUnitStatusDTO = StatusDTO.builder().build();
 
     when(repository.save(any(StatusDTO.class))).thenReturn(documentUnitStatusDTO);
-    when(documentUnitRepo.findByUuid(documentUnitDTO.getId())).thenReturn(documentUnit);
+    when(documentUnitRepo.findByUuid(documentUnitDTO.getId()))
+        .thenReturn(Optional.of(documentUnit));
 
     StepVerifier.create(service.setInitialStatus(documentUnit)).expectNextCount(1).verifyComplete();
 

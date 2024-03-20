@@ -1,8 +1,9 @@
 package de.bund.digitalservice.ris.caselaw.domain;
 
+import java.io.IOException;
 import java.util.UUID;
 
-public class DocumentationUnitNotExistsException extends RuntimeException {
+public class DocumentationUnitNotExistsException extends IOException {
 
   private static final String DEFAULT_MESSAGE = "Documentation unit does not exist";
 
@@ -11,10 +12,10 @@ public class DocumentationUnitNotExistsException extends RuntimeException {
   }
 
   public DocumentationUnitNotExistsException(String documentNumber) {
-    super(DEFAULT_MESSAGE + ": " + documentNumber);
+    super(DEFAULT_MESSAGE + (documentNumber == null ? "" : ": " + documentNumber));
   }
 
   public DocumentationUnitNotExistsException(UUID documentUUID) {
-    super(DEFAULT_MESSAGE + ": " + documentUUID);
+    super(DEFAULT_MESSAGE + (documentUUID == null ? "" : ": " + documentUUID));
   }
 }
