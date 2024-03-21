@@ -130,7 +130,7 @@ class DocumentUnitServiceTest {
             .build();
     when(repository.attachFile(TEST_UUID, TEST_UUID.toString(), "docx", "testfile.docx"))
         .thenReturn(Mono.just(savedDocumentUnit));
-    when(repository.findByUuid(TEST_UUID)).thenReturn(savedDocumentUnit);
+    when(repository.findByUuid(TEST_UUID)).thenReturn(Optional.of(savedDocumentUnit));
 
     doNothing().when(service).checkDocx(any(ByteBuffer.class));
     when(s3AsyncClient.putObject(any(PutObjectRequest.class), any(AsyncRequestBody.class)))
@@ -174,7 +174,7 @@ class DocumentUnitServiceTest {
 
     var documentUnitAfter = DocumentUnit.builder().uuid(TEST_UUID).build();
 
-    when(repository.findByUuid(TEST_UUID)).thenReturn(documentUnitBefore);
+    when(repository.findByUuid(TEST_UUID)).thenReturn(Optional.of(documentUnitBefore));
     // is the thenReturn ok? Or am I bypassing the actual functionality-test?
     when(repository.removeFile(TEST_UUID)).thenReturn(documentUnitAfter);
     when(s3AsyncClient.deleteObject(any(DeleteObjectRequest.class)))
@@ -226,7 +226,7 @@ class DocumentUnitServiceTest {
     // something flaky with the repository mock? Investigate this later
     DocumentUnit documentUnit = DocumentUnit.builder().uuid(TEST_UUID).build();
     // can we also test that the fileUuid from the DocumentUnit is used? with a captor somehow?
-    when(repository.findByUuid(TEST_UUID)).thenReturn(documentUnit);
+    when(repository.findByUuid(TEST_UUID)).thenReturn(Optional.of(documentUnit));
 
     StepVerifier.create(service.deleteByUuid(TEST_UUID))
         .consumeNextWith(
@@ -244,7 +244,7 @@ class DocumentUnitServiceTest {
     DocumentUnit documentUnit =
         DocumentUnit.builder().uuid(TEST_UUID).s3path(TEST_UUID.toString()).build();
 
-    when(repository.findByUuid(TEST_UUID)).thenReturn(documentUnit);
+    when(repository.findByUuid(TEST_UUID)).thenReturn(Optional.ofNullable(documentUnit));
     when(s3AsyncClient.deleteObject(any(DeleteObjectRequest.class)))
         .thenReturn(buildEmptyDeleteObjectResponse());
 
@@ -262,7 +262,7 @@ class DocumentUnitServiceTest {
   @Test
   void testDeleteByUuid_withoutFileAttached_withExceptionFromBucket() {
     when(repository.findByUuid(TEST_UUID))
-        .thenReturn(DocumentUnit.builder().s3path("test.file").build());
+        .thenReturn(Optional.ofNullable(DocumentUnit.builder().s3path("test.file").build()));
     when(s3AsyncClient.deleteObject(any(DeleteObjectRequest.class)))
         .thenThrow(SdkException.create("exception", null));
 
@@ -273,7 +273,8 @@ class DocumentUnitServiceTest {
 
   @Test
   void testDeleteByUuid_withoutFileAttached_withExceptionFromRepository() {
-    when(repository.findByUuid(TEST_UUID)).thenReturn(DocumentUnit.builder().build());
+    when(repository.findByUuid(TEST_UUID))
+        .thenReturn(Optional.ofNullable(DocumentUnit.builder().build()));
     doThrow(new IllegalArgumentException()).when(repository).delete(DocumentUnit.builder().build());
 
     StepVerifier.create(service.deleteByUuid(TEST_UUID)).expectError().verify();
@@ -283,7 +284,8 @@ class DocumentUnitServiceTest {
 
   @Test
   void testDeleteByUuid_withLinks() {
-    when(repository.findByUuid(TEST_UUID)).thenReturn(DocumentUnit.builder().build());
+    when(repository.findByUuid(TEST_UUID))
+        .thenReturn(Optional.ofNullable(DocumentUnit.builder().build()));
     when(repository.getAllDocumentationUnitWhichLink(TEST_UUID))
         .thenReturn(Map.of(ACTIVE_CITATION, 2L));
 
@@ -307,7 +309,7 @@ class DocumentUnitServiceTest {
             .fileuploadtimestamp(Instant.now())
             //            .proceedingDecisions(null)
             .build();
-    when(repository.findByUuid(documentUnit.uuid())).thenReturn(documentUnit);
+    when(repository.findByUuid(documentUnit.uuid())).thenReturn(Optional.of(documentUnit));
 
     StepVerifier.create(service.updateDocumentUnit(documentUnit))
         .consumeNextWith(du -> assertEquals(du, documentUnit))
@@ -318,7 +320,8 @@ class DocumentUnitServiceTest {
 
   @Test
   void testPublishByEmail() {
-    when(repository.findByUuid(TEST_UUID)).thenReturn(DocumentUnit.builder().build());
+    when(repository.findByUuid(TEST_UUID))
+        .thenReturn(Optional.ofNullable(DocumentUnit.builder().build()));
     XmlPublication xmlPublication =
         XmlPublication.builder()
             .documentUnitUuid(TEST_UUID)
@@ -348,9 +351,9 @@ class DocumentUnitServiceTest {
 
   @Test
   void testPublishByEmail_withoutDocumentUnitForUuid() {
-    when(repository.findByUuid(TEST_UUID)).thenReturn(null);
+    when(repository.findByUuid(TEST_UUID)).thenReturn(Optional.empty());
 
-    StepVerifier.create(service.publishAsEmail(TEST_UUID, ISSUER_ADDRESS)).verifyComplete();
+    StepVerifier.create(service.publishAsEmail(TEST_UUID, ISSUER_ADDRESS)).verifyError();
     verify(repository).findByUuid(TEST_UUID);
     verify(publishService, never()).publish(eq(DocumentUnit.builder().build()), anyString());
   }
@@ -509,7 +512,7 @@ class DocumentUnitServiceTest {
     DocumentUnit testDocumentUnit = DocumentUnit.builder().build();
     XmlResultObject mockXmlResultObject =
         new XmlResultObject("some xml", "200", List.of("success"), "foo.xml", Instant.now());
-    when(repository.findByUuid(TEST_UUID)).thenReturn(testDocumentUnit);
+    when(repository.findByUuid(TEST_UUID)).thenReturn(Optional.ofNullable(testDocumentUnit));
     when(publishService.getPublicationPreview(testDocumentUnit))
         .thenReturn(Mono.just(mockXmlResultObject));
 

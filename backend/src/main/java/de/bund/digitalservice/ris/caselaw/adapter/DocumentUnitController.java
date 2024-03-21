@@ -100,10 +100,14 @@ public class DocumentUnitController {
   @PreAuthorize("@userHasWriteAccessByDocumentUnitUuid.apply(#uuid)")
   public Mono<ResponseEntity<DocumentUnit>> removeFileFromDocumentUnit(@PathVariable UUID uuid) {
 
-    return service
-        .removeFileFromDocumentUnit(uuid)
-        .map(documentUnit -> ResponseEntity.status(HttpStatus.OK).body(documentUnit))
-        .onErrorReturn(ResponseEntity.internalServerError().body(DocumentUnit.builder().build()));
+    try {
+      return service
+          .removeFileFromDocumentUnit(uuid)
+          .map(documentUnit -> ResponseEntity.status(HttpStatus.OK).body(documentUnit))
+          .onErrorReturn(ResponseEntity.internalServerError().body(DocumentUnit.builder().build()));
+    } catch (Exception e) {
+      return Mono.error(e);
+    }
   }
 
   @GetMapping(value = "/search")

@@ -88,12 +88,16 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
 
   @Override
   @Transactional(transactionManager = "jpaTransactionManager")
-  public DocumentUnit findByUuid(UUID uuid) {
-    log.debug("find by uuid: {}", uuid);
-
-    var documentUnit =
-        repository.findById(uuid).orElseThrow(() -> new DocumentationUnitNotExistsException(uuid));
-    return DocumentationUnitTransformer.transformToDomain(documentUnit);
+  public Optional<DocumentUnit> findByUuid(UUID uuid) {
+    try {
+      var documentUnit =
+          repository
+              .findById(uuid)
+              .orElseThrow(() -> new DocumentationUnitNotExistsException(uuid));
+      return Optional.of(DocumentationUnitTransformer.transformToDomain(documentUnit));
+    } catch (Exception e) {
+      return Optional.empty();
+    }
   }
 
   @Override

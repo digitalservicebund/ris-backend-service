@@ -14,6 +14,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.StatusDTO;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitRepository;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatusService;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitNotExistsException;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.Status;
 import java.time.Instant;
@@ -51,7 +52,7 @@ class DatabaseDocumentUnitStatusServiceTest {
             .build();
     ArgumentCaptor<StatusDTO> captor = ArgumentCaptor.forClass(StatusDTO.class);
     when(repository.save(any(StatusDTO.class))).thenReturn(statusDTO);
-    when(documentUnitRepository.findByUuid(TEST_UUID)).thenReturn(documentUnit);
+    when(documentUnitRepository.findByUuid(TEST_UUID)).thenReturn(Optional.of(documentUnit));
 
     StepVerifier.create(statusService.setInitialStatus(documentUnit))
         .expectNext(documentUnit)
@@ -81,7 +82,7 @@ class DatabaseDocumentUnitStatusServiceTest {
             .build();
     ArgumentCaptor<StatusDTO> captor = ArgumentCaptor.forClass(StatusDTO.class);
     when(repository.save(any(StatusDTO.class))).thenReturn(statusDTO);
-    when(documentUnitRepository.findByUuid(TEST_UUID)).thenReturn(documentUnit);
+    when(documentUnitRepository.findByUuid(TEST_UUID)).thenReturn(Optional.of(documentUnit));
 
     StepVerifier.create(statusService.setToPublishing(documentUnit, publishedDate, issuerAddress))
         .expectNext(documentUnit)
@@ -94,7 +95,8 @@ class DatabaseDocumentUnitStatusServiceTest {
   }
 
   @Test
-  void testUpdate_withDocumentNumberAndDocumentationUnitNotFound_shouldNotSaveAStatus() {
+  void testUpdate_withDocumentNumberAndDocumentationUnitNotFound_shouldNotSaveAStatus()
+      throws DocumentationUnitNotExistsException {
     String documentNumber = "document number";
     Status status = Status.builder().build();
     DocumentationUnitDTO documentUnitDto = DocumentationUnitDTO.builder().build();
@@ -102,7 +104,7 @@ class DatabaseDocumentUnitStatusServiceTest {
     when(databaseDocumentationUnitRepository.findByDocumentNumber(documentNumber))
         .thenReturn(Optional.of(documentUnitDto));
 
-    StepVerifier.create(statusService.update(documentNumber, status)).verifyComplete();
+    StepVerifier.create(statusService.update(documentNumber, status)).verifyError();
 
     verify(databaseDocumentationUnitRepository, times(1)).findByDocumentNumber(documentNumber);
     verify(repository, never())
@@ -113,7 +115,8 @@ class DatabaseDocumentUnitStatusServiceTest {
 
   @Test
   void
-      testUpdate_withDocumentNumberAndDocumentationUnitFoundWithoutExistingStatus_shouldNotSaveAStatus() {
+      testUpdate_withDocumentNumberAndDocumentationUnitFoundWithoutExistingStatus_shouldNotSaveAStatus()
+          throws DocumentationUnitNotExistsException {
     String documentNumber = "document number";
     Status status = Status.builder().build();
     DocumentUnit documentationUnit = DocumentUnit.builder().uuid(TEST_UUID).build();
@@ -140,7 +143,8 @@ class DatabaseDocumentUnitStatusServiceTest {
 
   @Test
   void
-      testUpdate_withDocumentNumberAndDocumentationUnitFoundWithExistingStatus_shouldUpdateTheExistingStatus() {
+      testUpdate_withDocumentNumberAndDocumentationUnitFoundWithExistingStatus_shouldUpdateTheExistingStatus()
+          throws DocumentationUnitNotExistsException {
     String documentNumber = "document number";
     Status status =
         Status.builder().publicationStatus(PublicationStatus.PUBLISHED).withError(true).build();
@@ -221,7 +225,7 @@ class DatabaseDocumentUnitStatusServiceTest {
   }
 
   @Test
-  void testGetLatestIssuerAddress() {
+  void testGetLatestIssuerAddress() throws DocumentationUnitNotExistsException {
     String documentNumber = "document number";
     DocumentUnit documentationUnit = DocumentUnit.builder().uuid(TEST_UUID).build();
     DocumentationUnitDTO documentationUnitDTO =
