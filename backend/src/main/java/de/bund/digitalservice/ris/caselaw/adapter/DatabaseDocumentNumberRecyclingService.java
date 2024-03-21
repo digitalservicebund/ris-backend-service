@@ -9,7 +9,6 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.StatusDTO;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentNumberPatternException;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentNumberRecyclingService;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
-import de.bund.digitalservice.ris.caselaw.domain.StringsUtil;
 import java.time.Year;
 import java.util.List;
 import java.util.Optional;
@@ -52,17 +51,10 @@ public class DatabaseDocumentNumberRecyclingService implements DocumentNumberRec
 
     try {
 
-      if (StringsUtil.returnTrueIfNullOrBlank(documentationUnitNumber)) {
-        throw new DocumentNumberPatternException("Document number is empty");
+      if (!documentNumberPatternConfig.hasValidPattern(
+          documentationOfficeAbbreviation, documentationUnitNumber)) {
+        throw new DocumentNumberPatternException("Pattern is invalid");
       }
-      if (!documentNumberPatternConfig
-          .getDocumentNumberPatterns()
-          .containsKey(documentationOfficeAbbreviation))
-        throw new DocumentNumberPatternException(
-            documentationOfficeAbbreviation + " is not included in pattern");
-
-      if (!documentNumberPatternConfig.hasValidPrefix(documentationUnitNumber))
-        throw new DocumentNumberPatternException("prefix is not included in pattern");
 
       var status = statusRepository.findAllByDocumentationUnitDTO_Id(documentationUnitId);
 
@@ -99,25 +91,23 @@ public class DatabaseDocumentNumberRecyclingService implements DocumentNumberRec
     var optionalDeletedDocumentationUnitDTO =
         repository.findFirstByAbbreviationAndYear(documentationOfficeAbbreviation, year);
 
-    if (optionalDeletedDocumentationUnitDTO.isEmpty()) return Optional.empty();
-    var deletedDocumentationUnitDTO = optionalDeletedDocumentationUnitDTO.get();
-
     try {
-
-      var deletedDocumentNumber = deletedDocumentationUnitDTO.getDocumentNumber();
-
-      if (StringsUtil.returnTrueIfNullOrBlank(deletedDocumentNumber)) {
-        throw new DocumentNumberPatternException("Can't reuse empty document number");
+      if (optionalDeletedDocumentationUnitDTO.isEmpty()) {
+        return Optional.empty();
       }
 
-      if (!documentNumberPatternConfig.hasValidPrefix(deletedDocumentNumber)) {
-        throw new DocumentNumberPatternException("Prefix is not included in pattern");
-      }
+      var deletedDocumentationUnitDTO = optionalDeletedDocumentationUnitDTO.get();
 
-      return Optional.of(deletedDocumentNumber);
+      if (!documentNumberPatternConfig.hasValidPattern(
+          documentationOfficeAbbreviation, deletedDocumentationUnitDTO.getDocumentNumber())) {
+        throw new DocumentNumberPatternException("Pattern is invalid");
+      }
+      return Optional.of(deletedDocumentationUnitDTO.getDocumentNumber());
 
     } catch (Exception e) {
-      repository.deleteById(deletedDocumentationUnitDTO.getDocumentNumber());
+      optionalDeletedDocumentationUnitDTO.ifPresent(
+          deletedDocumentationUnitDTO ->
+              repository.deleteById(deletedDocumentationUnitDTO.getDocumentNumber()));
       return Optional.empty();
     }
   }

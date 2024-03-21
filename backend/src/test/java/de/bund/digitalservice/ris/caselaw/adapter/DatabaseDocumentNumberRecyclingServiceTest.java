@@ -46,10 +46,11 @@ class DatabaseDocumentNumberRecyclingServiceTest {
 
   @Test
   void shouldNotSaveInvalidPrefix() {
+
     var documentationUnitDTO =
         DocumentationUnitDTO.builder()
             .id(UUID.randomUUID())
-            .documentNumber("KORE" + Year.now() + "00037")
+            .documentNumber("KORE2" + Year.now() + "00037")
             .build();
 
     var unpublished = generateStatus(documentationUnitDTO, PublicationStatus.UNPUBLISHED);
@@ -79,7 +80,7 @@ class DatabaseDocumentNumberRecyclingServiceTest {
   void shouldNotOfferInvalidPrefix() {
     var outdatedDeletedId =
         DeletedDocumentationUnitDTO.builder()
-            .documentNumber("KORE" + Year.now() + "00037")
+            .documentNumber("KORE2" + Year.now() + "0037")
             .year(Year.now())
             .abbreviation(DEFAULT_DOCUMENTATION_OFFICE)
             .build();

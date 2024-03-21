@@ -14,7 +14,7 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitException;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitExistsException;
 import java.util.Optional;
 import java.util.UUID;
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -72,7 +72,8 @@ class DatabaseDocumentNumberGeneratorServiceTest {
     var nextDocumentNumber = generateDefaultDocumentNumber();
     when(service.recycle(nextDocumentNumber)).thenReturn(Optional.of(nextDocumentNumber));
 
-    Assert.assertEquals(service.generateDocumentNumber(DEFAULT_ABBREVIATION), nextDocumentNumber);
+    Assertions.assertEquals(
+        service.generateDocumentNumber(DEFAULT_ABBREVIATION), nextDocumentNumber);
   }
 
   @Test

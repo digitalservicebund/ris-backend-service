@@ -4,8 +4,6 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentNumberFormatter;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentNumberPatternException;
 import de.bund.digitalservice.ris.caselaw.domain.StringsUtil;
 import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
 import lombok.Data;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -19,12 +17,9 @@ public class DocumentNumberPatternConfig implements InitializingBean {
 
   Map<String, String> documentNumberPatterns;
 
-  Set<String> prefixes;
-
   @Override
   public void afterPropertiesSet() throws DocumentNumberPatternException {
     validate();
-    savePrefixes();
   }
 
   private void validate() throws DocumentNumberPatternException {
@@ -47,24 +42,29 @@ public class DocumentNumberPatternConfig implements InitializingBean {
   /**
    * Validate that the document number follows the updated document pattern prefixes.
    *
-   * @param documentNumber give document number of documentation unit
-   * @return true if prefix matches the document number
+   * @param documentationOfficeAbbreviation document office abbreviation
+   * @param documentationUnitNumber document number for check
+   * @return true if document office pattern matches the document number pattern
    */
-  public boolean hasValidPrefix(String documentNumber) {
-    if (StringsUtil.returnTrueIfNullOrBlank(documentNumber)) {
+  public boolean hasValidPattern(
+      String documentationOfficeAbbreviation, String documentationUnitNumber) {
+    try {
+      if (StringsUtil.returnTrueIfNullOrBlank(documentationUnitNumber)) {
+        throw new DocumentNumberPatternException("Document unit number is null or blank");
+      }
+
+      var pattern = documentNumberPatterns.get(documentationOfficeAbbreviation);
+
+      if (pattern == null)
+        throw new DocumentNumberPatternException(
+            documentationOfficeAbbreviation + " is not included in pattern");
+
+      if (!documentationUnitNumber.contains(DocumentNumberFormatter.extractPrefix(pattern))) {
+        throw new DocumentNumberPatternException("prefix is not included in pattern");
+      }
+      return true;
+    } catch (Exception e) {
       return false;
-    }
-    return prefixes.stream().anyMatch(documentNumber::contains);
-  }
-
-  private void savePrefixes() throws DocumentNumberPatternException {
-    prefixes =
-        documentNumberPatterns.values().stream()
-            .map(DocumentNumberFormatter::extractPrefix)
-            .collect(Collectors.toSet());
-
-    if (prefixes.isEmpty()) {
-      throw new DocumentNumberPatternException("Document number pattern prefixes are not empty");
     }
   }
 }
