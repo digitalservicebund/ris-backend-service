@@ -2,7 +2,6 @@ package de.bund.digitalservice.ris.caselaw.adapter;
 
 import de.bund.digitalservice.ris.caselaw.domain.Attachment;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatusService;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitNotExistsException;
 import de.bund.digitalservice.ris.caselaw.domain.HttpMailSender;
 import de.bund.digitalservice.ris.caselaw.domain.MailStoreFactory;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationReport;
@@ -183,13 +182,11 @@ public class JurisXmlExporterResponseProcessor {
                 return messageWrapper;
               });
 
-    } catch (DocumentationUnitNotExistsException e) {
-      //      LOGGER.info("Could not forward Message: {}", messageWrapper, e);
-      return Optional.empty();
-    } catch (MessagingException | IOException e) {
+    } catch (NullPointerException e) {
+      LOGGER.error("NPE with messageWrapper: {}", messageWrapper, e);
       throw new StatusImporterException("Could not forward Message");
-    } catch (NullPointerException ex) {
-      LOGGER.error("NPE with messageWrapper: {}", messageWrapper, ex);
+    } catch (Exception e) {
+      LOGGER.error("Could not forward Message", e);
       throw new StatusImporterException("Could not forward Message");
     }
   }

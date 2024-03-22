@@ -113,9 +113,12 @@ public class DatabaseDocumentUnitStatusService implements DocumentUnitStatusServ
                 .build()));
   }
 
-  public Mono<String> getLatestIssuerAddress(String documentNumber)
-      throws DocumentationUnitNotExistsException {
-    return getLatestPublishing(documentNumber).map(StatusDTO::getIssuerAddress);
+  public Mono<String> getLatestIssuerAddress(String documentNumber) {
+    try {
+      return getLatestPublishing(documentNumber).map(StatusDTO::getIssuerAddress);
+    } catch (Exception e) {
+      return Mono.empty();
+    }
   }
 
   @Override
@@ -141,7 +144,7 @@ public class DatabaseDocumentUnitStatusService implements DocumentUnitStatusServ
           repository
               .findFirstByDocumentationUnitDTO_IdAndPublicationStatusOrderByCreatedAtDesc(
                   documentUuid, PublicationStatus.PUBLISHING)
-              .orElseThrow());
+              .orElseThrow(() -> new DocumentationUnitNotExistsException(documentUuid)));
     } catch (Exception e) {
       return Mono.error(e);
     }
