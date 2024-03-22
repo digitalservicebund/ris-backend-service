@@ -183,11 +183,10 @@ public class JurisXmlExporterResponseProcessor {
               });
 
     } catch (NullPointerException e) {
-      LOGGER.error("NPE with messageWrapper: {}", messageWrapper, e);
-      throw new StatusImporterException("Could not forward Message");
+      throw new StatusImporterException(
+          "Could not forward Message, NPE with messageWrapper: " + messageWrapper, e);
     } catch (Exception e) {
-      LOGGER.error("Could not forward Message", e);
-      throw new StatusImporterException("Could not forward Message");
+      throw new StatusImporterException("Could not forward Message", e);
     }
   }
 
