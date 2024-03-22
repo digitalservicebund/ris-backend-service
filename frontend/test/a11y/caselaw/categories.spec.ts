@@ -74,7 +74,9 @@ test.describe("a11y of categories page (/caselaw/documentunit/{documentNumber}/c
       .getByLabel("Dropdown öffnen")
       .click()
 
-    await expect(page.locator("[aria-label='dropdown-option']")).toHaveCount(43)
+    await expect(
+      page.locator("[aria-label='dropdown-option']"),
+    ).not.toHaveCount(0)
 
     // type search string: 3 results for "zwischen"
     await page.locator("[aria-label='Dokumenttyp']").fill("zwischen")

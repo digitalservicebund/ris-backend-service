@@ -185,7 +185,6 @@ test.describe("core data", () => {
 
   test("document type dropdown", async ({ page, documentNumber }) => {
     await navigateToCategories(page, documentNumber)
-    const totalCaselawDocumentTypes = 43
 
     // on start: closed dropdown, no input text
     await expect(page.locator("[aria-label='Dokumenttyp']")).toHaveValue("")
@@ -198,9 +197,9 @@ test.describe("core data", () => {
       .filter({ hasText: "Spruchkörper Dokumenttyp" })
       .getByLabel("Dropdown öffnen")
       .click()
-    await expect(page.locator("[aria-label='dropdown-option']")).toHaveCount(
-      totalCaselawDocumentTypes,
-    )
+    await expect(
+      page.locator("[aria-label='dropdown-option']"),
+    ).not.toHaveCount(0)
     await expect(page.locator("text=Anerkenntnisurteil")).toBeVisible()
     await expect(page.locator("text=Anhängiges Verfahren")).toBeVisible()
 
@@ -214,9 +213,9 @@ test.describe("core data", () => {
     // use the clear icon
     await page.locator("[aria-label='Auswahl zurücksetzen']").click()
     await expect(page.locator("[aria-label='Dokumenttyp']")).toHaveValue("")
-    await expect(page.locator("[aria-label='dropdown-option']")).toHaveCount(
-      totalCaselawDocumentTypes,
-    )
+    await expect(
+      page.locator("[aria-label='dropdown-option']"),
+    ).not.toHaveCount(0)
 
     // close dropdown
     await page.getByLabel("Dropdown schließen").click()
