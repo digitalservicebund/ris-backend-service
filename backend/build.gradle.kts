@@ -10,7 +10,7 @@ import org.springframework.boot.gradle.tasks.bundling.BootBuildImage
 plugins {
     java
     jacoco
-    id("org.springframework.boot") version "3.2.3"
+    id("org.springframework.boot") version "3.2.4"
     id("io.spring.dependency-management") version "1.1.4"
     id("com.diffplug.spotless") version "6.25.0"
     id("org.sonarqube") version "4.4.1.3373"
@@ -138,11 +138,6 @@ sonar {
 dependencies {
     val testContainersVersion = "1.19.7"
 
-    implementation("org.springframework:spring-web:6.1.5")
-    implementation("org.springframework:spring-webflux:6.1.5")
-    // CVE-2024-22259
-    implementation("org.springframework:spring-core:6.1.5")
-
     implementation("org.springframework.boot:spring-boot-starter-webflux")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework.boot:spring-boot-starter-data-redis")
@@ -153,9 +148,6 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-security")
     implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
     implementation("org.springframework.security:spring-security-oauth2-resource-server:6.2.3")
-
-    // CVE-2024-22234
-    implementation("org.springframework.security:spring-security-core:6.2.3")
 
     implementation("org.springdoc:springdoc-openapi-starter-webflux-ui:2.4.0")
 
