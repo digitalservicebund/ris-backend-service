@@ -52,7 +52,7 @@ jacoco {
 }
 
 lombok {
-    version = "1.18.30"
+    version = "1.18.32"
 }
 
 springBoot {
@@ -168,7 +168,7 @@ dependencies {
     // CVE-2022-4244
     implementation("org.codehaus.plexus:plexus-utils:4.0.0")
 
-    implementation(platform("software.amazon.awssdk:bom:2.25.11"))
+    implementation(platform("software.amazon.awssdk:bom:2.25.15"))
     implementation("software.amazon.awssdk:netty-nio-client")
     implementation("software.amazon.awssdk:s3")
 
@@ -180,7 +180,7 @@ dependencies {
     implementation("com.icegreen:greenmail:2.1.0-alpha-4")
 
     // package served by private repo, requires authentication:
-    implementation("de.bund.digitalservice:neuris-juris-xml-export:0.8.32") {
+    implementation("de.bund.digitalservice:neuris-juris-xml-export:0.8.33") {
         exclude(group = "org.slf4j", module = "slf4j-simple")
     }
     // for local development:
