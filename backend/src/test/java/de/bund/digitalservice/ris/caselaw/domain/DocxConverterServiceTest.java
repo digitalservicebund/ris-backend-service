@@ -459,26 +459,7 @@ class DocxConverterServiceTest {
                 docx2Html -> {
                   assertNotNull(docx2Html);
                   assertEquals(
-                      "<ul style=\"list-style-type:disc;\">"
-                          + "<li style=\"display:table-row\">"
-                          + "<p style=\"display:table-cell;text-align:right;\"><span style=\"\">&#9679;</span><span> </span></p>"
-                          + "<p>bullet list entry 1</p>"
-                          + "</li>"
-                          + "<li style=\"display:table-row\">"
-                          + "<p style=\"display:table-cell;text-align:right;\"><span style=\"\">&#9679;</span><span> </span></p>"
-                          + "<p>bullet list entry 2</p>"
-                          + "</li>"
-                          + "</ul>"
-                          + "<ol style=\"list-style-type:decimal;\">"
-                          + "<li style=\"display:table-row\">"
-                          + "<p style=\"display:table-cell;text-align:right;\"><span style=\"\"></span><span> </span></p>"
-                          + "<p>decimal list entry 1</p>"
-                          + "</li>"
-                          + "<li style=\"display:table-row\">"
-                          + "<p style=\"display:table-cell;text-align:right;\"><span style=\"\"></span><span> </span></p>"
-                          + "<p>decimal list entry 2</p>"
-                          + "</li>"
-                          + "</ol>",
+                      "<ul style=\"list-style-type:disc\"><li><p>bullet list entry 1</p></li><li><p>bullet list entry 2</p></li></ul><ol style=\"list-style-type:decimal;\"><li><p>decimal list entry 1</p></li><li><p>decimal list entry 2</p></li></ol>",
                       docx2Html.html());
                 })
             .verifyComplete();
@@ -546,30 +527,7 @@ class DocxConverterServiceTest {
                 docx2Html -> {
                   assertNotNull(docx2Html);
                   assertEquals(
-                      "<ol style=\"list-style-type:lower-latin;\">"
-                          + "<li style=\"display:table-row\">"
-                          + "<p style=\"display:table-cell;text-align:right;\"><span style=\"\"></span><span> </span></p><p>list entry 1</p>"
-                          + "</li></ol>"
-                          + "<p>Middle Text</p>"
-                          + "<ol style=\"list-style-type:upper-latin;\">"
-                          + "<li style=\"display:table-row\">"
-                          + "<p style=\"display:table-cell;text-align:right;\"><span style=\"\"></span><span> </span></p><p>list entry 1</p>"
-                          + "</li></ol>"
-                          + "<p>Middle Text</p>"
-                          + "<ol style=\"list-style-type:upper-roman;\">"
-                          + "<li style=\"display:table-row\">"
-                          + "<p style=\"display:table-cell;text-align:right;\"><span style=\"\"></span><span> </span></p><p>list entry 1</p>"
-                          + "</li></ol>"
-                          + "<p>Middle Text</p>"
-                          + "<ol style=\"list-style-type:lower-roman\">"
-                          + "<li style=\"display:table-row\">"
-                          + "<p style=\"display:table-cell;text-align:right;\"><span style=\"\"></span><span> </span></p><p>list entry 1</p>"
-                          + "</li></ol>"
-                          + "<p>Middle Text</p>"
-                          + "<ol style=\"list-style-type:decimal;\">"
-                          + "<li style=\"display:table-row\">"
-                          + "<p style=\"display:table-cell;text-align:right;\"><span style=\"\"></span><span> </span></p><p>list entry 1</p>"
-                          + "</li></ol>",
+                      "<ol style=\"list-style-type:lower-latin;\"><li><p>list entry 1</p></li></ol><p>Middle Text</p><ol style=\"list-style-type:upper-latin;\"><li><p>list entry 1</p></li></ol><p>Middle Text</p><ol style=\"list-style-type:upper-roman;\"><li><p>list entry 1</p></li></ol><p>Middle Text</p><ol style=\"list-style-type:lower-roman\"><li><p>list entry 1</p></li></ol><p>Middle Text</p><ol style=\"list-style-type:decimal;\"><li><p>list entry 1</p></li></ol>",
                       docx2Html.html());
                 })
             .verifyComplete();
@@ -609,20 +567,7 @@ class DocxConverterServiceTest {
                 docx2Html -> {
                   assertNotNull(docx2Html);
                   assertEquals(
-                      "<ul style=\"list-style-type:none;display:table;\">"
-                          + "<li style=\"display:table-row\">"
-                          + "<p style=\"display:table-cell;text-align:right;\"><span style=\"font-family:Symbol;font-size:14pt;color:#000000;\">&#9679;</span><span> </span></p>"
-                          + "<p>bullet list entry 1</p>"
-                          + "</li>"
-                          + "<li style=\"display:table-row\">"
-                          + "<p style=\"display:table-cell;text-align:right;\"><span style=\"font-family:Symbol;font-size:14pt;color:#000000;\">&#9679;</span><span> </span></p>"
-                          + "<p>bullet list entry 2</p>"
-                          + "</li>"
-                          + "<li style=\"display:table-row\">"
-                          + "<p style=\"display:table-cell;text-align:right;\"><span style=\"font-family:Symbol;font-size:14pt;color:#000000;\">&#9679;</span><span> </span></p>"
-                          + "<p>bullet list entry 3</p>"
-                          + "</li>"
-                          + "</ul>",
+                      "<ul style=\"list-style-type:disc\"><li><p>bullet list entry 1</p></li><li><p>bullet list entry 2</p></li><li><p>bullet list entry 3</p></li></ul>",
                       docx2Html.html());
                 })
             .verifyComplete();
@@ -654,11 +599,7 @@ class DocxConverterServiceTest {
                 docx2Html -> {
                   assertNotNull(docx2Html);
                   assertEquals(
-                      "<ul style=\"list-style-type:disc;\">"
-                          + "<li style=\"display:table-row\">"
-                          + "<p style=\"display:table-cell;text-align:right;\"><span style=\"\">&#9679;</span><span> </span></p>"
-                          + "<p>bullet list entry 1</p>"
-                          + "</li></ul>",
+                      "<ul style=\"list-style-type:disc;\"><li><p>bullet list entry 1</p></li></ul>",
                       docx2Html.html());
                 })
             .verifyComplete();
@@ -690,7 +631,7 @@ class DocxConverterServiceTest {
                 docx2Html -> {
                   assertNotNull(docx2Html);
                   assertEquals(
-                      "<ul style=\"list-style-type:disc;\"><li style=\"list-style-type:decimal\"><p>bullet list entry 1</p></li></ul>",
+                      "<ul style=\"list-style-type:disc\"><li style=\"list-style-type:decimal\"><p>bullet list entry 1</p></li></ul>",
                       docx2Html.html());
                 })
             .verifyComplete();
@@ -722,11 +663,7 @@ class DocxConverterServiceTest {
                 docx2Html -> {
                   assertNotNull(docx2Html);
                   assertEquals(
-                      "<ul style=\"list-style-type:disc;\">"
-                          + "<li style=\"display:table-row\">"
-                          + "<p style=\"display:table-cell;text-align:left;\"><span style=\"\">&#9679;</span><span> </span></p>"
-                          + "<p>bullet list entry 1</p>"
-                          + "</li></ul>",
+                      "<ul style=\"list-style-type:disc\"><li><p>bullet list entry 1</p></li></ul>",
                       docx2Html.html());
                 })
             .verifyComplete();
@@ -758,11 +695,7 @@ class DocxConverterServiceTest {
                 docx2Html -> {
                   assertNotNull(docx2Html);
                   assertEquals(
-                      "<ul style=\"list-style-type:disc;\">"
-                          + "<li style=\"display:table-row\">"
-                          + "<p style=\"display:table-cell;text-align:center;\"><span style=\"\">&#9679;</span><span> </span></p>"
-                          + "<p>bullet list entry 1</p>"
-                          + "</li></ul>",
+                      "<ul style=\"list-style-type:disc\"><li><p>bullet list entry 1</p></li></ul>",
                       docx2Html.html());
                 })
             .verifyComplete();
@@ -794,11 +727,7 @@ class DocxConverterServiceTest {
                 docx2Html -> {
                   assertNotNull(docx2Html);
                   assertEquals(
-                      "<ul style=\"list-style-type:disc;\">"
-                          + "<li style=\"display:table-row\">"
-                          + "<p style=\"display:table-cell;text-align:right;\"><span style=\"\">&#9679;</span><span></span></p>"
-                          + "<p>bullet list entry 1</p>"
-                          + "</li></ul>",
+                      "<ul style=\"list-style-type:disc\"><li><p>bullet list entry 1</p></li></ul>",
                       docx2Html.html());
                 })
             .verifyComplete();
@@ -832,11 +761,7 @@ class DocxConverterServiceTest {
                 docx2Html -> {
                   assertNotNull(docx2Html);
                   assertEquals(
-                      "<ol style=\"list-style-type:none;display:table;\">"
-                          + "<li style=\"display:table-row\">"
-                          + "<p style=\"display:table-cell;text-align:right;\"><span style=\"\">1.</span><span> </span></p>"
-                          + "<p>bullet list entry 1</p>"
-                          + "</li></ol>",
+                      "<ol style=\"list-style-type:none;\"><li><p>bullet list entry 1</p></li></ol>",
                       docx2Html.html());
                 })
             .verifyComplete();
@@ -868,12 +793,7 @@ class DocxConverterServiceTest {
                 docx2Html -> {
                   assertNotNull(docx2Html);
                   assertEquals(
-                      "<ul style=\"list-style-type:disc;\">"
-                          + "<li style=\"display:table-row\">"
-                          + "<p style=\"display:table-cell;text-align:right;\">"
-                          + "<span style=\"\">&#9679;</span><span>&emsp;</span></p>"
-                          + "<p>bullet list entry 1</p>"
-                          + "</li></ul>",
+                      "<ul style=\"list-style-type:disc\"><li><p>bullet list entry 1</p></li></ul>",
                       docx2Html.html());
                 })
             .verifyComplete();
@@ -923,28 +843,7 @@ class DocxConverterServiceTest {
                 docx2Html -> {
                   assertNotNull(docx2Html);
                   assertEquals(
-                      "<ol style=\"list-style-type:none;display:table;\">"
-                          + "<li style=\"display:table-row\">"
-                          + "<p style=\"display:table-cell;text-align:right;\"><span style=\"\">1.</span><span> </span></p>"
-                          + "<p>list entry 1</p>"
-                          + "</li>"
-                          + "<ol style=\"list-style-type:none;display:table;\">"
-                          + "<li style=\"display:table-row\">"
-                          + "<p style=\"display:table-cell;text-align:right;\"><span style=\"\">1.</span><span> </span></p>"
-                          + "<p>list entry 1</p>"
-                          + "</li>"
-                          + "</ol>"
-                          + "<li style=\"display:table-row\">"
-                          + "<p style=\"display:table-cell;text-align:right;\"><span style=\"\">2.</span><span> </span></p>"
-                          + "<p>list entry 1</p>"
-                          + "</li>"
-                          + "<ol style=\"list-style-type:none;display:table;\">"
-                          + "<li style=\"display:table-row\">"
-                          + "<p style=\"display:table-cell;text-align:right;\"><span style=\"\">6.</span><span> </span></p>"
-                          + "<p>list entry 1</p>"
-                          + "</li>"
-                          + "</ol>"
-                          + "</ol>",
+                      "<ol style=\"list-style-type:none;\"><li><p>list entry 1</p></li><ol style=\"list-style-type:none;\"><li><p>list entry 1</p></li></ol><li><p>list entry 1</p></li><ol style=\"list-style-type:none;\"><li><p>list entry 1</p></li></ol></ol>",
                       docx2Html.html());
                 })
             .verifyComplete();
@@ -1007,43 +906,7 @@ class DocxConverterServiceTest {
                 docx2Html -> {
                   assertNotNull(docx2Html);
                   assertEquals(
-                      "<ul style=\"list-style-type:disc;\">"
-                          + "<li style=\"display:table-row\">"
-                          + "<p style=\"display:table-cell;text-align:right;\"><span style=\"\">&#9679;</span><span> </span></p>"
-                          + "<p>bullet list entry 1</p>"
-                          + "</li>"
-                          + "<li style=\"display:table-row\">"
-                          + "<p style=\"display:table-cell;text-align:right;\"><span style=\"\">&#9679;</span><span> </span></p>"
-                          + "<p>bullet list entry 2</p></li><ul style=\"list-style-type:none;display:table;\">"
-                          + "<li style=\"display:table-row\">"
-                          + "<p style=\"display:table-cell;text-align:right;\"><span style=\"font-family:Courier New;\">&#9675;</span><span> </span></p>"
-                          + "<p>bullet list entry 2.1</p>"
-                          + "</li>"
-                          + "<li style=\"display:table-row\">"
-                          + "<p style=\"display:table-cell;text-align:right;\"><span style=\"font-family:Courier New;\">&#9675;</span><span> </span></p>"
-                          + "<p>bullet list entry 2.2</p>"
-                          + "</li>"
-                          + "<ul style=\"list-style-type:none;display:table;\">"
-                          + "<li style=\"display:table-row\">"
-                          + "<p style=\"display:table-cell;text-align:right;\"><span style=\"font-family:Wingdings;\">&#9642;</span><span> </span></p>"
-                          + "<p>bullet list entry 2.2.1</p>"
-                          + "</li>"
-                          + "<li style=\"display:table-row\">"
-                          + "<p style=\"display:table-cell;text-align:right;\"><span style=\"font-family:Wingdings;\">&#9642;</span><span> </span></p>"
-                          + "<p>bullet list entry 2.2.2</p>"
-                          + "</li>"
-                          + "</ul>"
-                          + "<li style=\"display:table-row\">"
-                          + "<p style=\"display:table-cell;text-align:right;\"><span style=\"font-family:Courier New;\">&#9675;</span><span> </span></p>"
-                          + "<p>bullet list entry 2.3</p>"
-                          + "</li>"
-                          + "</ul>"
-                          + "<li style=\"display:table-row\">"
-                          + "<p style=\"display:table-cell;text-align:right;\">"
-                          + "<span style=\"font-family:Symbol;\">&#9679;</span><span> </span></p>"
-                          + "<p>bullet list entry 3</p>"
-                          + "</li>"
-                          + "</ul>",
+                      "<ul style=\"list-style-type:disc\"><li><p>bullet list entry 1</p></li><li><p>bullet list entry 2</p></li><ul style=\"list-style-type:disc\"><li><p>bullet list entry 2.1</p></li><li><p>bullet list entry 2.2</p></li><ul style=\"list-style-type:disc\"><li><p>bullet list entry 2.2.1</p></li><li><p>bullet list entry 2.2.2</p></li></ul><li><p>bullet list entry 2.3</p></li></ul><li><p>bullet list entry 3</p></li></ul>",
                       docx2Html.html());
                 })
             .verifyComplete();
@@ -1114,45 +977,7 @@ class DocxConverterServiceTest {
                 docx2Html -> {
                   assertNotNull(docx2Html);
                   assertEquals(
-                      "<ol style=\"list-style-type:none;display:table;\">"
-                          + "<li style=\"display:table-row\">"
-                          + "<p style=\"display:table-cell;text-align:right;\"><span style=\"\">i.</span><span> </span></p>"
-                          + "<p>lower roman list entry 1</p>"
-                          + "</li>"
-                          + "<li style=\"display:table-row\">"
-                          + "<p style=\"display:table-cell;text-align:right;\">"
-                          + "<span style=\"\">ii.</span><span> </span></p>"
-                          + "<p>lower roman list entry 2</p>"
-                          + "</li>"
-                          + "<ol style=\"list-style-type:none;display:table;\">"
-                          + "<li style=\"display:table-row\">"
-                          + "<p style=\"display:table-cell;text-align:right;\"><span style=\"\">i.</span><span> </span></p>"
-                          + "<p>lower roman list entry 2.1</p>"
-                          + "</li>"
-                          + "<li style=\"display:table-row\">"
-                          + "<p style=\"display:table-cell;text-align:right;\"><span style=\"\">ii.</span><span> </span></p>"
-                          + "<p>lower roman list entry 2.2</p>"
-                          + "</li>"
-                          + "<ol style=\"list-style-type:none;display:table;\">"
-                          + "<li style=\"display:table-row\">"
-                          + "<p style=\"display:table-cell;text-align:right;\"><span style=\"\">i.</span><span> </span></p>"
-                          + "<p>lower roman list entry 2.2.1</p>"
-                          + "</li>"
-                          + "<li style=\"display:table-row\">"
-                          + "<p style=\"display:table-cell;text-align:right;\"><span style=\"\">ii.</span><span> </span></p>"
-                          + "<p>lower roman list entry 2.2.2</p>"
-                          + "</li>"
-                          + "</ol>"
-                          + "<li style=\"display:table-row\">"
-                          + "<p style=\"display:table-cell;text-align:right;\"><span style=\"\">iii.</span><span> </span></p>"
-                          + "<p>lower roman list entry 2.3</p>"
-                          + "</li>"
-                          + "</ol>"
-                          + "<li style=\"display:table-row\">"
-                          + "<p style=\"display:table-cell;text-align:right;\"><span style=\"\">iii.</span><span> </span></p>"
-                          + "<p>lower roman list entry 3</p>"
-                          + "</li>"
-                          + "</ol>",
+                      "<ol style=\"list-style-type:none;\"><li><p>lower roman list entry 1</p></li><li><p>lower roman list entry 2</p></li><ol style=\"list-style-type:none;\"><li><p>lower roman list entry 2.1</p></li><li><p>lower roman list entry 2.2</p></li><ol style=\"list-style-type:none;\"><li><p>lower roman list entry 2.2.1</p></li><li><p>lower roman list entry 2.2.2</p></li></ol><li><p>lower roman list entry 2.3</p></li></ol><li><p>lower roman list entry 3</p></li></ol>",
                       docx2Html.html());
                 })
             .verifyComplete();
@@ -1223,44 +1048,7 @@ class DocxConverterServiceTest {
                 docx2Html -> {
                   assertNotNull(docx2Html);
                   assertEquals(
-                      "<ol style=\"list-style-type:none;display:table;\">"
-                          + "<li style=\"display:table-row\">"
-                          + "<p style=\"display:table-cell;text-align:right;\"><span style=\"\">I.</span><span> </span></p>"
-                          + "<p>upper roman list entry 1</p>"
-                          + "</li>"
-                          + "<li style=\"display:table-row\">"
-                          + "<p style=\"display:table-cell;text-align:right;\"><span style=\"\">II.</span><span> </span></p>"
-                          + "<p>upper roman list entry 2</p>"
-                          + "</li>"
-                          + "<ol style=\"list-style-type:none;display:table;\">"
-                          + "<li style=\"display:table-row\">"
-                          + "<p style=\"display:table-cell;text-align:right;\"><span style=\"\">I.</span><span> </span></p>"
-                          + "<p>upper roman list entry 2.1</p>"
-                          + "</li>"
-                          + "<li style=\"display:table-row\">"
-                          + "<p style=\"display:table-cell;text-align:right;\"><span style=\"\">II.</span><span> </span></p>"
-                          + "<p>upper roman list entry 2.2</p>"
-                          + "</li>"
-                          + "<ol style=\"list-style-type:none;display:table;\">"
-                          + "<li style=\"display:table-row\">"
-                          + "<p style=\"display:table-cell;text-align:right;\"><span style=\"\">I.</span><span> </span></p>"
-                          + "<p>upper roman list entry 2.2.1</p>"
-                          + "</li>"
-                          + "<li style=\"display:table-row\">"
-                          + "<p style=\"display:table-cell;text-align:right;\"><span style=\"\">II.</span><span> </span></p>"
-                          + "<p>upper roman list entry 2.2.2</p>"
-                          + "</li>"
-                          + "</ol>"
-                          + "<li style=\"display:table-row\">"
-                          + "<p style=\"display:table-cell;text-align:right;\"><span style=\"\">III.</span><span> </span></p>"
-                          + "<p>upper roman list entry 2.3</p>"
-                          + "</li>"
-                          + "</ol>"
-                          + "<li style=\"display:table-row\">"
-                          + "<p style=\"display:table-cell;text-align:right;\"><span style=\"\">III.</span><span> </span></p>"
-                          + "<p>upper roman list entry 3</p>"
-                          + "</li>"
-                          + "</ol>",
+                      "<ol style=\"list-style-type:none;\"><li><p>upper roman list entry 1</p></li><li><p>upper roman list entry 2</p></li><ol style=\"list-style-type:none;\"><li><p>upper roman list entry 2.1</p></li><li><p>upper roman list entry 2.2</p></li><ol style=\"list-style-type:none;\"><li><p>upper roman list entry 2.2.1</p></li><li><p>upper roman list entry 2.2.2</p></li></ol><li><p>upper roman list entry 2.3</p></li></ol><li><p>upper roman list entry 3</p></li></ol>",
                       docx2Html.html());
                 })
             .verifyComplete();
@@ -1331,41 +1119,7 @@ class DocxConverterServiceTest {
                 docx2Html -> {
                   assertNotNull(docx2Html);
                   assertEquals(
-                      "<ol style=\"list-style-type:none;display:table;\">"
-                          + "<li style=\"display:table-row\">"
-                          + "<p style=\"display:table-cell;text-align:right;\"><span style=\"\">a)</span><span> </span></p>"
-                          + "<p>lower letter list entry 1</p>"
-                          + "</li>"
-                          + "<li style=\"display:table-row\">"
-                          + "<p style=\"display:table-cell;text-align:right;\"><span style=\"\">b)</span><span> </span></p>"
-                          + "<p>lower letter list entry 2</p>"
-                          + "</li>"
-                          + "<ol style=\"list-style-type:none;display:table;\">"
-                          + "<li style=\"display:table-row\">"
-                          + "<p style=\"display:table-cell;text-align:right;\"><span style=\"\">a.</span><span> </span></p>"
-                          + "<p>lower letter list entry 2.1</p>"
-                          + "</li>"
-                          + "<li style=\"display:table-row\">"
-                          + "<p style=\"display:table-cell;text-align:right;\"><span style=\"\">b.</span><span> </span></p>"
-                          + "<p>lower letter list entry 2.2</p>"
-                          + "</li>"
-                          + "<ol style=\"list-style-type:none;display:table;\">"
-                          + "<li style=\"display:table-row\">"
-                          + "<p style=\"display:table-cell;text-align:right;\"><span style=\"\">(a)</span><span> </span></p>"
-                          + "<p>lower letter list entry 2.2.1</p>"
-                          + "</li>"
-                          + "<li style=\"display:table-row\">"
-                          + "<p style=\"display:table-cell;text-align:right;\"><span style=\"\">(b)</span><span> </span></p>"
-                          + "<p>lower letter list entry 2.2.2</p>"
-                          + "</li>"
-                          + "</ol>"
-                          + "<li style=\"display:table-row\">"
-                          + "<p style=\"display:table-cell;text-align:right;\"><span style=\"\">c.</span><span> </span></p>"
-                          + "<p>lower letter list entry 2.3</p></li></ol><li style=\"display:table-row\">"
-                          + "<p style=\"display:table-cell;text-align:right;\"><span style=\"\">c)</span><span> </span></p>"
-                          + "<p>lower letter list entry 3</p>"
-                          + "</li>"
-                          + "</ol>",
+                      "<ol style=\"list-style-type:none;\"><li><p>lower letter list entry 1</p></li><li><p>lower letter list entry 2</p></li><ol style=\"list-style-type:none;\"><li><p>lower letter list entry 2.1</p></li><li><p>lower letter list entry 2.2</p></li><ol style=\"list-style-type:none;\"><li><p>lower letter list entry 2.2.1</p></li><li><p>lower letter list entry 2.2.2</p></li></ol><li><p>lower letter list entry 2.3</p></li></ol><li><p>lower letter list entry 3</p></li></ol>",
                       docx2Html.html());
                 })
             .verifyComplete();
@@ -1436,44 +1190,7 @@ class DocxConverterServiceTest {
                 docx2Html -> {
                   assertNotNull(docx2Html);
                   assertEquals(
-                      "<ol style=\"list-style-type:none;display:table;\">"
-                          + "<li style=\"display:table-row\">"
-                          + "<p style=\"display:table-cell;text-align:right;\"><span style=\"\">A)</span><span> </span></p>"
-                          + "<p>upper letter list entry 1</p>"
-                          + "</li>"
-                          + "<li style=\"display:table-row\">"
-                          + "<p style=\"display:table-cell;text-align:right;\"><span style=\"\">B)</span><span> </span></p>"
-                          + "<p>upper letter list entry 2</p>"
-                          + "</li>"
-                          + "<ol style=\"list-style-type:none;display:table;\">"
-                          + "<li style=\"display:table-row\">"
-                          + "<p style=\"display:table-cell;text-align:right;\"><span style=\"\">A.</span><span> </span></p>"
-                          + "<p>upper letter list entry 2.1</p>"
-                          + "</li>"
-                          + "<li style=\"display:table-row\">"
-                          + "<p style=\"display:table-cell;text-align:right;\"><span style=\"\">B.</span><span> </span></p>"
-                          + "<p>upper letter list entry 2.2</p>"
-                          + "</li>"
-                          + "<ol style=\"list-style-type:none;display:table;\">"
-                          + "<li style=\"display:table-row\">"
-                          + "<p style=\"display:table-cell;text-align:right;\"><span style=\"\">(A)</span><span> </span></p>"
-                          + "<p>upper letter list entry 2.2.1</p>"
-                          + "</li>"
-                          + "<li style=\"display:table-row\">"
-                          + "<p style=\"display:table-cell;text-align:right;\"><span style=\"\">(B)</span><span> </span></p>"
-                          + "<p>upper letter list entry 2.2.2</p>"
-                          + "</li>"
-                          + "</ol>"
-                          + "<li style=\"display:table-row\">"
-                          + "<p style=\"display:table-cell;text-align:right;\"><span style=\"\">C.</span><span> </span></p>"
-                          + "<p>upper letter list entry 2.3</p>"
-                          + "</li>"
-                          + "</ol>"
-                          + "<li style=\"display:table-row\">"
-                          + "<p style=\"display:table-cell;text-align:right;\"><span style=\"\">C)</span><span> </span></p>"
-                          + "<p>upper letter list entry 3</p>"
-                          + "</li>"
-                          + "</ol>",
+                      "<ol style=\"list-style-type:none;\"><li><p>upper letter list entry 1</p></li><li><p>upper letter list entry 2</p></li><ol style=\"list-style-type:none;\"><li><p>upper letter list entry 2.1</p></li><li><p>upper letter list entry 2.2</p></li><ol style=\"list-style-type:none;\"><li><p>upper letter list entry 2.2.1</p></li><li><p>upper letter list entry 2.2.2</p></li></ol><li><p>upper letter list entry 2.3</p></li></ol><li><p>upper letter list entry 3</p></li></ol>",
                       docx2Html.html());
                 })
             .verifyComplete();
@@ -1541,44 +1258,7 @@ class DocxConverterServiceTest {
                 docx2Html -> {
                   assertNotNull(docx2Html);
                   assertEquals(
-                      "<ol style=\"list-style-type:none;display:table;\">"
-                          + "<li style=\"display:table-row\">"
-                          + "<p style=\"display:table-cell;text-align:right;\"><span style=\"\">1.</span><span> </span></p>"
-                          + "<p>decimal list entry 1</p>"
-                          + "</li>"
-                          + "<li style=\"display:table-row\">"
-                          + "<p style=\"display:table-cell;text-align:right;\"><span style=\"\">2.</span><span> </span></p>"
-                          + "<p>decimal list entry 2</p>"
-                          + "</li>"
-                          + "<ol style=\"list-style-type:none;display:table;\">"
-                          + "<li style=\"display:table-row\">"
-                          + "<p style=\"display:table-cell;text-align:right;\"><span style=\"\">2.1.</span><span> </span></p>"
-                          + "<p>decimal list entry 2.1</p>"
-                          + "</li>"
-                          + "<li style=\"display:table-row\">"
-                          + "<p style=\"display:table-cell;text-align:right;\"><span style=\"\">2.2.</span><span> </span></p>"
-                          + "<p>decimal list entry 2.2</p>"
-                          + "</li>"
-                          + "<ol style=\"list-style-type:none;display:table;\">"
-                          + "<li style=\"display:table-row\">"
-                          + "<p style=\"display:table-cell;text-align:right;\"><span style=\"\">2.2.1.</span><span> </span></p>"
-                          + "<p>decimal list entry 2.2.1</p>"
-                          + "</li>"
-                          + "<li style=\"display:table-row\">"
-                          + "<p style=\"display:table-cell;text-align:right;\"><span style=\"\">2.2.2.</span><span> </span></p>"
-                          + "<p>decimal list entry 2.2.2</p>"
-                          + "</li>"
-                          + "</ol>"
-                          + "<li style=\"display:table-row\">"
-                          + "<p style=\"display:table-cell;text-align:right;\"><span style=\"\">2.3.</span><span> </span></p>"
-                          + "<p>decimal list entry 2.3</p>"
-                          + "</li>"
-                          + "</ol>"
-                          + "<li style=\"display:table-row\">"
-                          + "<p style=\"display:table-cell;text-align:right;\"><span style=\"\">3.</span><span> </span></p>"
-                          + "<p>decimal list entry 3</p>"
-                          + "</li>"
-                          + "</ol>",
+                      "<ol style=\"list-style-type:none;\"><li><p>decimal list entry 1</p></li><li><p>decimal list entry 2</p></li><ol style=\"list-style-type:none;\"><li><p>decimal list entry 2.1</p></li><li><p>decimal list entry 2.2</p></li><ol style=\"list-style-type:none;\"><li><p>decimal list entry 2.2.1</p></li><li><p>decimal list entry 2.2.2</p></li></ol><li><p>decimal list entry 2.3</p></li></ol><li><p>decimal list entry 3</p></li></ol>",
                       docx2Html.html());
                 })
             .verifyComplete();
@@ -1652,49 +1332,7 @@ class DocxConverterServiceTest {
                 docx2Html -> {
                   assertNotNull(docx2Html);
                   assertEquals(
-                      "<ol style=\"list-style-type:none;display:table;\">"
-                          + "<li style=\"display:table-row\">"
-                          + "<p style=\"display:table-cell;text-align:right;\"><span style=\"\">1.</span><span> </span></p>"
-                          + "<p>list entry 1</p>"
-                          + "</li>"
-                          + "<li style=\"display:table-row\">"
-                          + "<p style=\"display:table-cell;text-align:right;\"><span style=\"\">2.</span><span> </span></p>"
-                          + "<p>list entry 2</p>"
-                          + "</li>"
-                          + "<ul style=\"list-style-type:none;display:table;\">"
-                          + "<li style=\"display:table-row\">"
-                          + "<p style=\"display:table-cell;text-align:right;\"><span style=\"font-family:Symbol;font-size:9pt;\">&#9679;</span><span> </span></p>"
-                          + "<p>list entry 2.1</p>"
-                          + "</li>"
-                          + "<li style=\"display:table-row\">"
-                          + "<p style=\"display:table-cell;text-align:right;\"><span style=\"font-family:Symbol;font-size:9pt;\">&#9679;</span><span> </span></p>"
-                          + "<p>list entry 2.2</p>"
-                          + "</li>"
-                          + "<ol style=\"list-style-type:none;display:table;\">"
-                          + "<li style=\"display:table-row\">"
-                          + "<p style=\"display:table-cell;text-align:right;\"><span style=\"font-family:Symbol;font-size:9pt;\">2..1.</span><span> </span></p>"
-                          + "<p>list entry 2.2.1</p>"
-                          + "</li>"
-                          + "<li style=\"display:table-row\">"
-                          + "<p style=\"display:table-cell;text-align:right;\"><span style=\"font-family:Symbol;font-size:9pt;\">2..2.</span><span> </span></p>"
-                          + "<p>list entry 2.2.2</p>"
-                          + "</li>"
-                          + "</ol>"
-                          + "<li style=\"display:table-row\">"
-                          + "<p style=\"display:table-cell;text-align:right;\"><span style=\"font-family:Symbol;font-size:9pt;\">2.1.</span><span> </span></p>"
-                          + "<p>list entry 2.3</p>"
-                          + "</li>"
-                          + "<ul style=\"list-style-type:none;display:table;\">"
-                          + "<li style=\"display:table-row\">"
-                          + "<p style=\"display:table-cell;text-align:right;\"><span style=\"font-family:Symbol;font-size:9pt;\">&#9679;</span><span> </span></p>"
-                          + "<p>list entry 2.3.1</p>"
-                          + "</li>"
-                          + "</ul>"
-                          + "</ul>"
-                          + "<li style=\"display:table-row\">"
-                          + "<p style=\"display:table-cell;text-align:right;\"><span style=\"font-family:Symbol;font-size:9pt;\">3.</span><span> </span></p>"
-                          + "<p>list entry 3</p>"
-                          + "</li></ol>",
+                      "<ol style=\"list-style-type:none;\"><li><p>list entry 1</p></li><li><p>list entry 2</p></li><ul style=\"list-style-type:none;\"><li><p>list entry 2.1</p></li><li><p>list entry 2.2</p></li><ol style=\"list-style-type:none;\"><li><p>list entry 2.2.1</p></li><li><p>list entry 2.2.2</p></li></ol><li><p>list entry 2.3</p></li><ul style=\"list-style-type:none;\"><li><p>list entry 2.3.1</p></li></ul></ul><li><p>list entry 3</p></li></ol>",
                       docx2Html.html());
                 })
             .verifyComplete();
@@ -1737,13 +1375,7 @@ class DocxConverterServiceTest {
                 docx2Html -> {
                   assertNotNull(docx2Html);
                   assertEquals(
-                      "<ol><li style=\"display:table-row\">"
-                          + "<p style=\"display:table-cell;text-align:right;\">"
-                          + "<span style=\"\"></span>"
-                          + "<span> </span></p>"
-                          + "<p>1. entry with own numbering</p>"
-                          + "</li></ol>",
-                      docx2Html.html());
+                      "<ol><li><p>1. entry with own numbering</p></li></ol>", docx2Html.html());
                 })
             .verifyComplete();
       }
