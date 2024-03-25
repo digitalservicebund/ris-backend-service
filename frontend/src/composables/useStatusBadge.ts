@@ -22,7 +22,9 @@ export function useStatusBadge(status: DocumentUnit["status"]) {
       badge.backgroundColor = "bg-green-300"
     }
     if (status?.publicationStatus == "UNPUBLISHED") {
-      badge.label = "Unveröffentlicht"
+      badge.label = status?.withError
+        ? "Nicht veröffentlicht"
+        : "Unveröffentlicht"
       badge.backgroundColor = "bg-blue-300"
     }
     if (status?.publicationStatus == "PUBLISHING") {
