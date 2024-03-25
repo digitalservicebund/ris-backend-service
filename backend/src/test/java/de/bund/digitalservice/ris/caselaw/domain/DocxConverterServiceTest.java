@@ -459,7 +459,7 @@ class DocxConverterServiceTest {
                 docx2Html -> {
                   assertNotNull(docx2Html);
                   assertEquals(
-                      "<ul style=\"list-style-type:disc\">"
+                      "<ul style=\"list-style-type:disc;\">"
                           + "<li>"
                           + "<p>bullet list entry 1</p>"
                           + "</li>"
@@ -585,7 +585,7 @@ class DocxConverterServiceTest {
                 docx2Html -> {
                   assertNotNull(docx2Html);
                   assertEquals(
-                      "<ol style=\"list-style-type:lower-roman\">"
+                      "<ol style=\"list-style-type:lower-roman;\">"
                           + "<li><p>list entry 1</p></li>"
                           + "<li><p>list entry 2</p></li>"
                           + "</ol>",
@@ -769,7 +769,19 @@ class DocxConverterServiceTest {
                 docx2Html -> {
                   assertNotNull(docx2Html);
                   assertEquals(
-                      "<ul style=\"list-style-type:disc\"><li><p>bullet list entry 1</p></li><li><p>bullet list entry 2</p></li><ul style=\"list-style-type:disc\"><li><p>bullet list entry 2.1</p></li><li><p>bullet list entry 2.2</p></li><ul style=\"list-style-type:disc\"><li><p>bullet list entry 2.2.1</p></li><li><p>bullet list entry 2.2.2</p></li></ul><li><p>bullet list entry 2.3</p></li></ul><li><p>bullet list entry 3</p></li></ul>",
+                      "<ul style=\"list-style-type:disc;\">"
+                          + "<li><p>bullet list entry 1</p></li>"
+                          + "<li><p>bullet list entry 2</p></li>"
+                          + "<ul style=\"list-style-type:disc;\">"
+                          + "<li><p>bullet list entry 2.1</p></li>"
+                          + "<li><p>bullet list entry 2.2</p></li>"
+                          + "<ul style=\"list-style-type:disc;\">"
+                          + "<li><p>bullet list entry 2.2.1</p></li>"
+                          + "<li><p>bullet list entry 2.2.2</p></li>"
+                          + "</ul><li><p>bullet list entry 2.3</p></li>"
+                          + "</ul>"
+                          + "<li><p>bullet list entry 3</p></li>"
+                          + "</ul>",
                       docx2Html.html());
                 })
             .verifyComplete();
@@ -840,7 +852,7 @@ class DocxConverterServiceTest {
                 docx2Html -> {
                   assertNotNull(docx2Html);
                   assertEquals(
-                      "<ol style=\"list-style-type:lower-roman\"><li><p>lower roman list entry 1</p></li><li><p>lower roman list entry 2</p></li><ol style=\"list-style-type:lower-roman\"><li><p>lower roman list entry 2.1</p></li><li><p>lower roman list entry 2.2</p></li><ol style=\"list-style-type:lower-roman\"><li><p>lower roman list entry 2.2.1</p></li><li><p>lower roman list entry 2.2.2</p></li></ol><li><p>lower roman list entry 2.3</p></li></ol><li><p>lower roman list entry 3</p></li></ol>",
+                      "<ol style=\"list-style-type:lower-roman;\"><li><p>lower roman list entry 1</p></li><li><p>lower roman list entry 2</p></li><ol style=\"list-style-type:lower-roman;\"><li><p>lower roman list entry 2.1</p></li><li><p>lower roman list entry 2.2</p></li><ol style=\"list-style-type:lower-roman;\"><li><p>lower roman list entry 2.2.1</p></li><li><p>lower roman list entry 2.2.2</p></li></ol><li><p>lower roman list entry 2.3</p></li></ol><li><p>lower roman list entry 3</p></li></ol>",
                       docx2Html.html());
                 })
             .verifyComplete();
@@ -1221,7 +1233,7 @@ class DocxConverterServiceTest {
                 docx2Html -> {
                   assertNotNull(docx2Html);
                   assertEquals(
-                      "<ol style=\"list-style-type:decimal;\"><li><p>list entry 1</p></li><li><p>list entry 2</p></li><ul style=\"list-style-type:disc\"><li><p>list entry 2.1</p></li><li><p>list entry 2.2</p></li><ol style=\"list-style-type:decimal;\"><li><p>list entry 2.2.1</p></li><li><p>list entry 2.2.2</p></li></ol><li><p>list entry 2.3</p></li><ul style=\"list-style-type:disc\"><li><p>list entry 2.3.1</p></li></ul></ul><li><p>list entry 3</p></li></ol>",
+                      "<ol style=\"list-style-type:decimal;\"><li><p>list entry 1</p></li><li><p>list entry 2</p></li><ul style=\"list-style-type:disc;\"><li><p>list entry 2.1</p></li><li><p>list entry 2.2</p></li><ol style=\"list-style-type:decimal;\"><li><p>list entry 2.2.1</p></li><li><p>list entry 2.2.2</p></li></ol><li><p>list entry 2.3</p></li><ul style=\"list-style-type:disc;\"><li><p>list entry 2.3.1</p></li></ul></ul><li><p>list entry 3</p></li></ol>",
                       docx2Html.html());
                 })
             .verifyComplete();
