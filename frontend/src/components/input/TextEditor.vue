@@ -342,7 +342,8 @@ const resizeObserver = new ResizeObserver((entries) => {
 </template>
 
 <style lang="scss" module>
-ol {
+ol,
+ul {
   padding: revert;
   margin: auto;
   list-style: auto;

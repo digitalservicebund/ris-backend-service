@@ -131,8 +131,8 @@ public class NumberingList implements DocumentUnitDocx {
       case UPPER_LETTER -> "list-style-type:upper-latin;";
       case LOWER_LETTER -> "list-style-type:lower-latin;";
       case UPPER_ROMAN -> "list-style-type:upper-roman;";
-      case LOWER_ROMAN -> "list-style-type:lower-roman";
-      case BULLET -> "list-style-type:disc";
+      case LOWER_ROMAN -> "list-style-type:lower-roman;";
+      case BULLET -> "list-style-type:disc;";
       default -> "list-style-type:none;";
     };
   }
