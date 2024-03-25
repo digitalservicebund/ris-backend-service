@@ -3,7 +3,6 @@ package de.bund.digitalservice.ris.caselaw.domain.docx;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -126,15 +125,11 @@ public class NumberingList implements DocumentUnitDocx {
       LOGGER.error("Unsupported picture bullet, use default bullet for list");
       return "list-style-type:disc;";
     }
-    Pattern docxIndexMatchPattern = Pattern.compile("(%\\d)");
-    String lvlText = numberingListEntryIndex.lvlText();
-    if (!lvlText.isBlank() && docxIndexMatchPattern.matcher(lvlText).find())
-      return "list-style-type:none;";
     return switch (numberFormat) {
       case NONE -> null;
       case DECIMAL -> "list-style-type:decimal;";
-      case UPPER_LETTER -> "list-style-type:lower-latin;";
-      case LOWER_LETTER -> "list-style-type:upper-latin;";
+      case UPPER_LETTER -> "list-style-type:upper-latin;";
+      case LOWER_LETTER -> "list-style-type:lower-latin;";
       case UPPER_ROMAN -> "list-style-type:upper-roman;";
       case LOWER_ROMAN -> "list-style-type:lower-roman";
       case BULLET -> "list-style-type:disc";
