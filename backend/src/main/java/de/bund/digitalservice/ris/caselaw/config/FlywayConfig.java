@@ -28,7 +28,7 @@ public class FlywayConfig {
   private String database;
 
   @Value("${database.seed:false}")
-  private Boolean seed;
+  private boolean seed;
 
   @Bean
   public Flyway flyway() {
