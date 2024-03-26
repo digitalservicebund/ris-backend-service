@@ -852,7 +852,20 @@ class DocxConverterServiceTest {
                 docx2Html -> {
                   assertNotNull(docx2Html);
                   assertEquals(
-                      "<ol style=\"list-style-type:lower-roman;\"><li><p>lower roman list entry 1</p></li><li><p>lower roman list entry 2</p></li><ol style=\"list-style-type:lower-roman;\"><li><p>lower roman list entry 2.1</p></li><li><p>lower roman list entry 2.2</p></li><ol style=\"list-style-type:lower-roman;\"><li><p>lower roman list entry 2.2.1</p></li><li><p>lower roman list entry 2.2.2</p></li></ol><li><p>lower roman list entry 2.3</p></li></ol><li><p>lower roman list entry 3</p></li></ol>",
+                      "<ol style=\"list-style-type:lower-roman;\">"
+                          + "<li><p>lower roman list entry 1</p></li>"
+                          + "<li><p>lower roman list entry 2</p></li>"
+                          + "<ol style=\"list-style-type:lower-roman;\">"
+                          + "<li><p>lower roman list entry 2.1</p></li>"
+                          + "<li><p>lower roman list entry 2.2</p></li>"
+                          + "<ol style=\"list-style-type:lower-roman;\">"
+                          + "<li><p>lower roman list entry 2.2.1</p></li>"
+                          + "<li><p>lower roman list entry 2.2.2</p></li>"
+                          + "</ol>"
+                          + "<li><p>lower roman list entry 2.3</p></li>"
+                          + "</ol>"
+                          + "<li><p>lower roman list entry 3</p></li>"
+                          + "</ol>",
                       docx2Html.html());
                 })
             .verifyComplete();
@@ -923,7 +936,18 @@ class DocxConverterServiceTest {
                 docx2Html -> {
                   assertNotNull(docx2Html);
                   assertEquals(
-                      "<ol style=\"list-style-type:upper-roman;\"><li><p>upper roman list entry 1</p></li><li><p>upper roman list entry 2</p></li><ol style=\"list-style-type:upper-roman;\"><li><p>upper roman list entry 2.1</p></li><li><p>upper roman list entry 2.2</p></li><ol style=\"list-style-type:upper-roman;\"><li><p>upper roman list entry 2.2.1</p></li><li><p>upper roman list entry 2.2.2</p></li></ol><li><p>upper roman list entry 2.3</p></li></ol><li><p>upper roman list entry 3</p></li></ol>",
+                      "<ol style=\"list-style-type:upper-roman;\">"
+                          + "<li><p>upper roman list entry 1</p></li>"
+                          + "<li><p>upper roman list entry 2</p></li>"
+                          + "<ol style=\"list-style-type:upper-roman;\">"
+                          + "<li><p>upper roman list entry 2.1</p></li>"
+                          + "<li><p>upper roman list entry 2.2</p></li>"
+                          + "<ol style=\"list-style-type:upper-roman;\">"
+                          + "<li><p>upper roman list entry 2.2.1</p></li>"
+                          + "<li><p>upper roman list entry 2.2.2</p></li></ol>"
+                          + "<li><p>upper roman list entry 2.3</p></li></ol>"
+                          + "<li><p>upper roman list entry 3</p></li>"
+                          + "</ol>",
                       docx2Html.html());
                 })
             .verifyComplete();
@@ -1159,7 +1183,20 @@ class DocxConverterServiceTest {
                 docx2Html -> {
                   assertNotNull(docx2Html);
                   assertEquals(
-                      "<ol style=\"list-style-type:decimal;\"><li><p>decimal list entry 1</p></li><li><p>decimal list entry 2</p></li><ol style=\"list-style-type:decimal;\"><li><p>decimal list entry 2.1</p></li><li><p>decimal list entry 2.2</p></li><ol style=\"list-style-type:decimal;\"><li><p>decimal list entry 2.2.1</p></li><li><p>decimal list entry 2.2.2</p></li></ol><li><p>decimal list entry 2.3</p></li></ol><li><p>decimal list entry 3</p></li></ol>",
+                      "<ol style=\"list-style-type:decimal;\">"
+                          + "<li><p>decimal list entry 1</p></li>"
+                          + "<li><p>decimal list entry 2</p></li>"
+                          + "<ol style=\"list-style-type:decimal;\">"
+                          + "<li><p>decimal list entry 2.1</p></li>"
+                          + "<li><p>decimal list entry 2.2</p></li>"
+                          + "<ol style=\"list-style-type:decimal;\">"
+                          + "<li><p>decimal list entry 2.2.1</p></li>"
+                          + "<li><p>decimal list entry 2.2.2</p></li>"
+                          + "</ol>"
+                          + "<li><p>decimal list entry 2.3</p></li>"
+                          + "</ol>"
+                          + "<li><p>decimal list entry 3</p></li>"
+                          + "</ol>",
                       docx2Html.html());
                 })
             .verifyComplete();
@@ -1233,7 +1270,23 @@ class DocxConverterServiceTest {
                 docx2Html -> {
                   assertNotNull(docx2Html);
                   assertEquals(
-                      "<ol style=\"list-style-type:decimal;\"><li><p>list entry 1</p></li><li><p>list entry 2</p></li><ul style=\"list-style-type:disc;\"><li><p>list entry 2.1</p></li><li><p>list entry 2.2</p></li><ol style=\"list-style-type:decimal;\"><li><p>list entry 2.2.1</p></li><li><p>list entry 2.2.2</p></li></ol><li><p>list entry 2.3</p></li><ul style=\"list-style-type:disc;\"><li><p>list entry 2.3.1</p></li></ul></ul><li><p>list entry 3</p></li></ol>",
+                      "<ol style=\"list-style-type:decimal;\">"
+                          + "<li><p>list entry 1</p></li>"
+                          + "<li><p>list entry 2</p></li>"
+                          + "<ul style=\"list-style-type:disc;\">"
+                          + "<li><p>list entry 2.1</p></li>"
+                          + "<li><p>list entry 2.2</p></li>"
+                          + "<ol style=\"list-style-type:decimal;\">"
+                          + "<li><p>list entry 2.2.1</p></li>"
+                          + "<li><p>list entry 2.2.2</p></li>"
+                          + "</ol>"
+                          + "<li><p>list entry 2.3</p></li>"
+                          + "<ul style=\"list-style-type:disc;\">"
+                          + "<li><p>list entry 2.3.1</p></li>"
+                          + "</ul>"
+                          + "</ul>"
+                          + "<li><p>list entry 3</p></li>"
+                          + "</ol>",
                       docx2Html.html());
                 })
             .verifyComplete();
