@@ -840,7 +840,6 @@ CREATE TABLE
     documentation_unit_id uuid,
     document_type_raw_value character varying(255),
     rank integer DEFAULT '-1'::integer NOT NULL,
-    referenced_documentation_unit_id uuid,
     date_known boolean DEFAULT true NOT NULL
   );
 
@@ -1995,7 +1994,6 @@ CREATE INDEX
 CREATE INDEX
   related_documentation_documentation_unit_id_idx ON incremental_migration.related_documentation USING btree (documentation_unit_id);
 
---- CREATE INDEX related_documentation_referenced_documentation_unit_id_idx ON incremental_migration.related_documentation USING btree (referenced_documentation_unit_id);
 --
 -- Name: related_documentation_dtype_idx; Type: INDEX; Schema: incremental_migration; Owner: -
 --
