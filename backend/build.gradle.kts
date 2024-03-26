@@ -167,8 +167,11 @@ dependencies {
     implementation("com.sendinblue:sib-api-v3-sdk:7.0.0")
     // CVE-2022-4244
     implementation("org.codehaus.plexus:plexus-utils:4.0.0")
+    // CVE-2024-29025
+    implementation("io.netty:netty-codec-http:4.1.108.Final")
+    implementation("io.netty:netty-codec-http2:4.1.108.Final")
 
-    implementation(platform("software.amazon.awssdk:bom:2.25.15"))
+    implementation(platform("software.amazon.awssdk:bom:2.25.16"))
     implementation("software.amazon.awssdk:netty-nio-client")
     implementation("software.amazon.awssdk:s3")
 
