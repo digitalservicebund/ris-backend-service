@@ -35,38 +35,12 @@ public class PostgresNormAbbreviationRepositoryImpl implements NormAbbreviationR
   public List<NormAbbreviation> findAllContainingOrderByAccuracy(
       String query, Integer size, Integer page) {
 
-    String cleanedQuery =
-        query
-            .trim()
-            .replace(",", "")
-            .replace(";", "")
-            .replace("(", "")
-            .replace(")", "")
-            .replace("*", "")
-            .replace("+", "")
-            .replace("-", "")
-            .replace(":", "")
-            .replace("/", " ");
-    String directInput = cleanedQuery.toLowerCase();
-    String[] queryBlocks = cleanedQuery.split(" ");
-    StringBuilder tsQuery = new StringBuilder();
-    for (int i = 0; i < queryBlocks.length; i++) {
-      if (queryBlocks[i].isBlank()) continue;
-
-      if (i > 0) {
-        tsQuery.append(" & ");
-      }
-
-      tsQuery.append(queryBlocks[i]).append(":*");
-    }
-
     List<NormAbbreviationDTO> results =
-        repository.findByAbbreviationIgnoreCase(directInput, PageRequest.of(page, size));
+        repository.findByAbbreviationIgnoreCase(query, PageRequest.of(page, size));
 
     if (results.size() < size) {
       var officialLetterAbbreviationExact =
-          repository.findByOfficialLetterAbbreviationIgnoreCase(
-              directInput, PageRequest.of(page, size));
+          repository.findByOfficialLetterAbbreviationIgnoreCase(query, PageRequest.of(page, size));
       officialLetterAbbreviationExact.stream()
           .filter(e -> results.size() < size && !results.contains(e))
           .forEach(results::add);
@@ -74,8 +48,7 @@ public class PostgresNormAbbreviationRepositoryImpl implements NormAbbreviationR
 
     if (results.size() < size) {
       var abbreviationStartingWith =
-          repository.findByAbbreviationStartsWithIgnoreCase(
-              directInput, PageRequest.of(page, size));
+          repository.findByAbbreviationStartsWithIgnoreCase(query, PageRequest.of(page, size));
       abbreviationStartingWith.stream()
           .filter(e -> results.size() < size && !results.contains(e))
           .forEach(results::add);
@@ -84,15 +57,14 @@ public class PostgresNormAbbreviationRepositoryImpl implements NormAbbreviationR
     if (results.size() < size) {
       var officialLetterAbbreviationStartingWith =
           repository.findByOfficialLetterAbbreviationStartsWithIgnoreCase(
-              directInput, PageRequest.of(page, size));
+              query, PageRequest.of(page, size));
       officialLetterAbbreviationStartingWith.stream()
           .filter(e -> results.size() < size && !results.contains(e))
           .forEach(results::add);
     }
 
     if (results.size() < size) {
-      var rankWeightedVector =
-          repository.findByRankWeightedVector(tsQuery.toString(), size, page * size);
+      var rankWeightedVector = repository.findByRankWeightedVector(query, size, page * size);
       rankWeightedVector.stream()
           .filter(e -> results.size() < size && !results.contains(e))
           .forEach(results::add);

@@ -133,6 +133,19 @@ class NormAbbreviationIntegrationTest {
           .officialShortTitle("official short title 7")
           .source("Y")
           .build();
+
+  private NormAbbreviationDTO abbreviationWithSpecialCharacters =
+      NormAbbreviationDTO.builder()
+          .abbreviation("With special / characters ;+-*:()")
+          .decisionDate(LocalDate.of(2023, Month.MAY, 25))
+          .documentId(7891L)
+          .documentNumber("document number 8")
+          .officialLetterAbbreviation("official letter abbreviation 8")
+          .officialLongTitle("official long title 8")
+          .officialShortTitle("official short title 8")
+          .source("Z")
+          .build();
+
   private DocumentCategoryDTO documentCategoryDTO1 =
       DocumentCategoryDTO.builder().label("L").build();
   private DocumentCategoryDTO documentCategoryDTO2 =
@@ -382,6 +395,29 @@ class NormAbbreviationIntegrationTest {
   }
 
   @Test
+  void testGetNormAbbreviationBySearchQuery_allowSpecialCharacters() {
+    generateLookupValues();
+    repository.refreshMaterializedViews();
+
+    String query = "With special / characters ;";
+
+    risWebTestClient
+        .withDefaultLogin()
+        .get()
+        .uri("/api/v1/caselaw/normabbreviation/search?pg=0&sz=30&q=" + query)
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody(NormAbbreviation[].class)
+        .consumeWith(
+            response -> {
+              assertThat(response.getResponseBody())
+                  .extracting("id")
+                  .containsExactly(abbreviationWithSpecialCharacters.getId());
+            });
+  }
+
+  @Test
   void testGetNormAbbreviationByAwesomeSearchQuery_returnInTheRightOrder() {
     generateLookupValues();
     repository.refreshMaterializedViews();
@@ -443,6 +479,7 @@ class NormAbbreviationIntegrationTest {
     abbreviation5 = repository.save(abbreviation5);
     abbreviation6 = repository.save(abbreviation6);
     abbreviation7 = repository.save(abbreviation7);
+    abbreviationWithSpecialCharacters = repository.save(abbreviationWithSpecialCharacters);
   }
 
   private class NormAbbreviationTestBuilder {
