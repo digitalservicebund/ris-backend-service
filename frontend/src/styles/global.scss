@@ -1,6 +1,14 @@
 @import "@digitalservice4germany/angie/fonts.css";
 
 @tailwind base;
+
+@layer base {
+  ul,
+  ol {
+    padding: revert;
+    margin: revert;
+  }
+}
 @tailwind components;
 @tailwind utilities;
 

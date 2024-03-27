@@ -185,6 +185,7 @@ watch(
             aria-label="Vorgang"
             :item-service="ComboboxItemService.getProcedures"
             manual-entry
+            no-clear
           ></ComboboxInput>
         </InputField>
         <!-- Child  -->

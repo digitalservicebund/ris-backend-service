@@ -180,7 +180,7 @@ watch(newChipText, (is) => {
 
       <span
         v-if="!readOnly"
-        class="flex max-w-full flex-auto items-center justify-start"
+        class="ml-8 flex max-w-full flex-auto items-center justify-start"
       >
         <span :id="`enter-note-for-${id}`" class="sr-only">
           Enter drücken, um die Eingabe zu bestätigen
