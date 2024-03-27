@@ -18,6 +18,7 @@ import jakarta.mail.MessagingException;
 import jakarta.mail.Store;
 import java.io.IOException;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
@@ -59,7 +60,7 @@ public class JurisXmlExporterResponseProcessor {
     try (Store store = storeFactory.createStore()) {
       processInbox(store);
     } catch (MessagingException e) {
-      throw new StatusImporterException("Error creating or closing the store session: " + e);
+      LOGGER.error("Error creating or closing the store session", e);
     }
   }
 
@@ -71,24 +72,43 @@ public class JurisXmlExporterResponseProcessor {
       List<MessageWrapper> processedMessages = processMessages(inbox);
       moveMessages(processedMessages, inbox, store.getFolder("processed"));
     } catch (MessagingException e) {
-      throw new StatusImporterException("Error processing inbox: " + e);
+      throw new StatusImporterException("Error processing inbox", e);
     }
   }
 
   @NotNull
   private List<MessageWrapper> processMessages(Folder inbox) throws MessagingException {
-    return Arrays.stream(inbox.getMessages())
+    List<MessageWrapper> successfulProcessedMessages = new ArrayList<>();
+
+    Arrays.stream(inbox.getMessages())
         .map(wrapperFactory::getResponsibleWrapper)
         .flatMap(Optional::stream)
         .sorted(Comparator.comparing(wrapper -> wrapper instanceof ImportMessageWrapper ? 0 : 1))
-        .map(this::forwardMessage)
-        .flatMap(Optional::stream)
-        .map(this::setPublicationStatus)
-        .map(this::saveAttachments)
-        .toList();
+        .forEach(
+            messageWrapper -> {
+              String subject = null;
+
+              try {
+                subject = messageWrapper.getSubject();
+
+                forwardMessage(messageWrapper);
+                setPublicationStatus(messageWrapper);
+                saveAttachments(messageWrapper);
+
+                successfulProcessedMessages.add(messageWrapper);
+              } catch (MessagingException ex) {
+                LOGGER.error("Message has no subject", ex);
+              } catch (StatusImporterException ex) {
+                LOGGER.error("Message {} couldn't processed", subject, ex);
+              } catch (Exception ex) {
+                LOGGER.error("Unexpected exception by process messages", ex);
+              }
+            });
+
+    return successfulProcessedMessages;
   }
 
-  private MessageWrapper saveAttachments(MessageWrapper messageWrapper) {
+  private void saveAttachments(MessageWrapper messageWrapper) {
     PolicyFactory policy =
         new HtmlPolicyBuilder()
             .allowElements(
@@ -121,9 +141,8 @@ public class JurisXmlExporterResponseProcessor {
                                       : stringToHTML(attachment.fileContent())))
                           .build())
               .toList());
-      return messageWrapper;
     } catch (MessagingException | IOException e) {
-      throw new StatusImporterException("Error saving attachments");
+      throw new StatusImporterException("Error saving attachments", e);
     }
   }
 
@@ -147,44 +166,40 @@ public class JurisXmlExporterResponseProcessor {
         .toList();
   }
 
-  private MessageWrapper setPublicationStatus(MessageWrapper messageWrapper) {
+  private void setPublicationStatus(MessageWrapper messageWrapper) {
     try {
-      return statusService
+      statusService
           .update(
               messageWrapper.getDocumentNumber(),
               Status.builder()
                   .publicationStatus(getPublicationStatus(messageWrapper.isPublished()))
                   .withError(messageWrapper.hasErrors())
                   .build())
-          .thenReturn(messageWrapper)
           .block();
-    } catch (MessagingException | IOException | NullPointerException e) {
-      throw new StatusImporterException("Could not update publicationStatus: " + e);
+    } catch (Exception e) {
+      throw new StatusImporterException("Could not update publicationStatus", e);
     }
   }
 
-  private Optional<MessageWrapper> forwardMessage(MessageWrapper messageWrapper) {
+  private void forwardMessage(MessageWrapper messageWrapper) {
     try {
       String documentNumber = messageWrapper.getDocumentNumber();
       String subject = messageWrapper.getSubject();
       List<Attachment> attachments = collectAttachments(messageWrapper);
 
-      return Optional.ofNullable(statusService.getLatestIssuerAddress(documentNumber).block())
-          .map(
-              issuerAddress -> {
-                mailSender.sendMail(
-                    storeFactory.getUsername(),
-                    issuerAddress,
-                    "FWD: " + subject,
-                    "Anbei weitergeleitet von der jDV:",
-                    attachments,
-                    "report-" + documentNumber);
-                return messageWrapper;
-              });
-
-    } catch (NullPointerException e) {
-      throw new StatusImporterException(
-          "Could not forward Message, NPE with messageWrapper: " + messageWrapper, e);
+      var issuerAddress = statusService.getLatestIssuerAddress(documentNumber).block();
+      if (issuerAddress != null) {
+        mailSender.sendMail(
+            storeFactory.getUsername(),
+            issuerAddress,
+            "FWD: " + subject,
+            "Anbei weitergeleitet von der jDV:",
+            attachments,
+            "report-" + documentNumber);
+      } else {
+        throw new StatusImporterException(
+            "Couldn't find issuer address for document number: " + documentNumber);
+      }
     } catch (Exception e) {
       throw new StatusImporterException("Could not forward Message", e);
     }
@@ -201,7 +216,7 @@ public class JurisXmlExporterResponseProcessor {
       deleteMessages(messages);
       from.expunge();
     } catch (MessagingException e) {
-      throw new StatusImporterException("Error moving message: " + e);
+      throw new StatusImporterException("Error moving message", e);
     }
   }
 
@@ -211,7 +226,7 @@ public class JurisXmlExporterResponseProcessor {
           try {
             message.setFlag(Flag.DELETED, true);
           } catch (MessagingException e) {
-            throw new StatusImporterException("Error deleting Message: " + e);
+            throw new StatusImporterException("Error deleting Message", e);
           }
         });
   }

@@ -1,7 +1,8 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
-import static org.junit.Assert.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.argThat;
@@ -12,6 +13,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
+import ch.qos.logback.classic.Level;
+import de.bund.digitalservice.ris.caselaw.TestMemoryAppender;
 import de.bund.digitalservice.ris.caselaw.domain.Attachment;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatusService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitNotExistsException;
@@ -41,7 +44,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -117,16 +119,18 @@ class JurisXmlExporterResponseProcessorTest {
   void testMessageGetsNotMovedIfNotForwarded() throws MessagingException {
     when(inbox.getMessages()).thenReturn(new Message[] {importMessage});
     when(importMessageWrapper.getSubject()).thenThrow(new MessagingException());
+    TestMemoryAppender memoryAppender =
+        new TestMemoryAppender(JurisXmlExporterResponseProcessor.class);
 
-    assertThrows(
-        StatusImporterException.class,
-        () -> {
-          responseProcessor.readEmails();
-        });
+    responseProcessor.readEmails();
 
     verifyNoInteractions(mailSender);
     verify(inbox, never()).copyMessages(any(), any());
     verify(importMessage, never()).setFlag(Flag.DELETED, true);
+    assertThat(memoryAppender.count(Level.ERROR)).isEqualTo(1L);
+    assertThat(memoryAppender.getMessage(Level.ERROR, 0)).isEqualTo("Message has no subject");
+
+    memoryAppender.detachLoggingTestAppender();
   }
 
   @Test
@@ -134,12 +138,21 @@ class JurisXmlExporterResponseProcessorTest {
       throws MessagingException, DocumentationUnitNotExistsException {
     when(inbox.getMessages()).thenReturn(new Message[] {importMessage});
     when(statusService.getLatestIssuerAddress(DOCUMENT_NUMBER)).thenReturn(Mono.empty());
+    TestMemoryAppender memoryAppender =
+        new TestMemoryAppender(JurisXmlExporterResponseProcessor.class);
 
     responseProcessor.readEmails();
 
     verifyNoInteractions(mailSender);
     verify(inbox, never()).copyMessages(new Message[] {importMessage}, processed);
     verify(importMessage, never()).setFlag(Flag.DELETED, true);
+    assertThat(memoryAppender.count(Level.ERROR)).isEqualTo(1L);
+    assertThat(memoryAppender.getMessage(Level.ERROR, 0))
+        .isEqualTo("Message null couldn't processed");
+    assertThat(memoryAppender.getCause(Level.ERROR, 0).getCause().getMessage())
+        .isEqualTo("Couldn't find issuer address for document number: KORE123456789");
+
+    memoryAppender.detachLoggingTestAppender();
   }
 
   @Test
@@ -442,35 +455,51 @@ class JurisXmlExporterResponseProcessorTest {
     when(inbox.getMessages()).thenReturn(new Message[] {processMessage});
     when(statusService.getLatestIssuerAddress(DOCUMENT_NUMBER)).thenReturn(Mono.empty());
 
-    assertDoesNotThrow(responseProcessor::readEmails);
+    assertThatCode(responseProcessor::readEmails).doesNotThrowAnyException();
   }
 
   @Test
   void testRethrowsIfCannotGetFolder() throws MessagingException {
     when(store.getFolder("INBOX")).thenThrow(new MessagingException());
 
-    StatusImporterException exception =
-        assertThrows(StatusImporterException.class, () -> responseProcessor.readEmails());
-    Assertions.assertTrue(exception.getMessage().contains("Error processing inbox: "));
+    assertThatThrownBy(() -> responseProcessor.readEmails())
+        .isInstanceOf(StatusImporterException.class)
+        .hasMessage("Error processing inbox");
   }
 
   @Test
   void testRethrowsIfCannotSaveAttachment() throws MessagingException {
     when(inbox.getMessages()).thenReturn(new Message[] {processMessage});
     when(processMessageWrapper.getReceivedDate()).thenThrow(new MessagingException());
+    TestMemoryAppender memoryAppender =
+        new TestMemoryAppender(JurisXmlExporterResponseProcessor.class);
 
-    StatusImporterException exception =
-        assertThrows(StatusImporterException.class, () -> responseProcessor.readEmails());
-    Assertions.assertEquals("Error saving attachments", exception.getMessage());
+    responseProcessor.readEmails();
+
+    assertThat(memoryAppender.count(Level.ERROR)).isEqualTo(1L);
+    assertThat(memoryAppender.getMessage(Level.ERROR, 0))
+        .isEqualTo("Message null couldn't processed");
+    assertThat(memoryAppender.getCause(Level.ERROR, 0).getMessage())
+        .isEqualTo("Error saving attachments");
+
+    memoryAppender.detachLoggingTestAppender();
   }
 
   @Test
   void testRethrowsIfCannotSetStatus() throws MessagingException {
     when(inbox.getMessages()).thenReturn(new Message[] {processMessage});
     when(processMessageWrapper.hasErrors()).thenThrow(new IOException());
+    TestMemoryAppender memoryAppender =
+        new TestMemoryAppender(JurisXmlExporterResponseProcessor.class);
 
-    StatusImporterException exception =
-        assertThrows(StatusImporterException.class, () -> responseProcessor.readEmails());
-    Assertions.assertTrue(exception.getMessage().contains("Could not update publicationStatus"));
+    responseProcessor.readEmails();
+
+    assertThat(memoryAppender.count(Level.ERROR)).isEqualTo(1L);
+    assertThat(memoryAppender.getMessage(Level.ERROR, 0))
+        .isEqualTo("Message null couldn't processed");
+    assertThat(memoryAppender.getCause(Level.ERROR, 0).getMessage())
+        .isEqualTo("Could not update publicationStatus");
+
+    memoryAppender.detachLoggingTestAppender();
   }
 }

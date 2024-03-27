@@ -26,7 +26,7 @@ public class JurisMessageWrapperFactory {
           | NoSuchMethodException
           | InvocationTargetException
           | IllegalAccessException e) {
-        throw new StatusImporterException("Could not get responsible wrapper: " + e);
+        throw new StatusImporterException("Could not get responsible wrapper", e);
       }
     }
     return Optional.empty();
