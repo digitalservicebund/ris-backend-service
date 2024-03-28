@@ -42,9 +42,9 @@ public interface DatabaseNormAbbreviationRepository
               + " official_short_title,"
               + " source,"
               + " region_id,"
-              + " ts_rank_cd(weighted_vector, to_tsquery('german', '' || :tsQuery || '')) rank"
+              + " ts_rank_cd(weighted_vector, plainto_tsquery('german', '' || :tsQuery || '')) rank"
               + " from incremental_migration.norm_abbreviation_search_migration"
-              + " where weighted_vector @@ to_tsquery('german', '' || :tsQuery || '')"
+              + " where weighted_vector @@ plainto_tsquery('german', '' || :tsQuery || '')"
               + " order by rank desc"
               + " limit :size"
               + " offset :offset",
