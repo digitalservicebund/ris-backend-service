@@ -27,8 +27,4 @@ public class NormAbbreviationService {
       String query, Integer size, Integer page) {
     return repository.findAllContainingOrderByAccuracy(query, size, page);
   }
-
-  public void refreshMaterializedViews() {
-    repository.refreshMaterializedViews();
-  }
 }

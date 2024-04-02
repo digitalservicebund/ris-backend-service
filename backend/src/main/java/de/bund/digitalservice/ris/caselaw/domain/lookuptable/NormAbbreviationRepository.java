@@ -12,6 +12,4 @@ public interface NormAbbreviationRepository {
       String query, Integer size, Integer page);
 
   List<NormAbbreviation> findAllContainingOrderByAccuracy(String query, Integer size, Integer page);
-
-  void refreshMaterializedViews();
 }

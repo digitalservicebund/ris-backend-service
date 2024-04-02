@@ -72,9 +72,4 @@ public class PostgresNormAbbreviationRepositoryImpl implements NormAbbreviationR
 
     return results.stream().map(NormAbbreviationTransformer::transformDTO).toList();
   }
-
-  @Override
-  public void refreshMaterializedViews() {
-    repository.refreshMaterializedViews();
-  }
 }
