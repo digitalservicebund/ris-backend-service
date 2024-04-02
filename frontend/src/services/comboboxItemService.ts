@@ -12,8 +12,7 @@ enum Endpoint {
   courts = "courts",
   citationTypes = "citationtypes",
   fieldOfLawSearchByIdentifier = "fieldsoflaw/search-by-identifier",
-  risAbbreviations = `normabbreviation?pg=0&sz=30`,
-  risAbbreviationsAwesome = `normabbreviation/search?pg=0&sz=30`,
+  risAbbreviations = `normabbreviation/search?pg=0&sz=30`,
   procedures = `procedure`,
 }
 
@@ -43,8 +42,7 @@ function formatDropdownItems(
         additionalInformation: item.text,
       }))
     }
-    case Endpoint.risAbbreviations:
-    case Endpoint.risAbbreviationsAwesome: {
+    case Endpoint.risAbbreviations: {
       return (responseData as NormAbbreviation[]).map((item) => ({
         label: item.abbreviation,
         value: item,
@@ -125,8 +123,6 @@ const service: ComboboxItemService = {
     await fetchFromEndpoint(Endpoint.fieldOfLawSearchByIdentifier, filter),
   getRisAbbreviations: async (filter?: string) =>
     await fetchFromEndpoint(Endpoint.risAbbreviations, filter),
-  getRisAbbreviationsAwesome: async (filter?: string) =>
-    await fetchFromEndpoint(Endpoint.risAbbreviationsAwesome, filter),
   getCitationTypes: async (filter?: string) =>
     await fetchFromEndpoint(Endpoint.citationTypes, filter),
   getProcedures: async (filter?: string) =>

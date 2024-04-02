@@ -54,19 +54,10 @@ describe("Norm references", () => {
     Promise.resolve({ status: 200, data: dropdownAbbreviationItems }),
   )
 
-  vi.spyOn(
-    comboboxItemService,
-    "getRisAbbreviationsAwesome",
-  ).mockImplementation(() =>
-    Promise.resolve({ status: 200, data: dropdownAbbreviationItems }),
-  )
-
   it("renders empty norm reference in edit mode, when no norm references in list", async () => {
     renderComponent()
     expect((await screen.findAllByLabelText("Listen Eintrag")).length).toBe(1)
-    expect(
-      await screen.findByLabelText("RIS-Abkürzung der Norm"),
-    ).toBeInTheDocument()
+    expect(await screen.findByLabelText("RIS-Abkürzung")).toBeInTheDocument()
     expect(
       await screen.findByLabelText("Einzelnorm der Norm"),
     ).toBeInTheDocument()
@@ -89,9 +80,7 @@ describe("Norm references", () => {
     renderComponent({ modelValue })
 
     expect(screen.getAllByLabelText("Listen Eintrag").length).toBe(2)
-    expect(
-      screen.queryByLabelText("RIS-Abkürzung der Norm"),
-    ).not.toBeInTheDocument()
+    expect(screen.queryByLabelText("RIS-Abkürzung")).not.toBeInTheDocument()
     expect(screen.getByText(/§ 123/)).toBeInTheDocument()
     expect(screen.getByText(/§ 345/)).toBeInTheDocument()
   })
@@ -110,7 +99,7 @@ describe("Norm references", () => {
     const itemHeader = screen.getByLabelText("Listen Eintrag")
     await user.click(itemHeader)
 
-    expect(screen.getByLabelText("RIS-Abkürzung der Norm")).toBeInTheDocument()
+    expect(screen.getByLabelText("RIS-Abkürzung")).toBeInTheDocument()
     expect(screen.getByLabelText("Einzelnorm der Norm")).toBeInTheDocument()
     expect(screen.getByLabelText("Fassungsdatum der Norm")).toBeInTheDocument()
     expect(screen.getByLabelText("Jahr der Norm")).toBeInTheDocument()
@@ -152,16 +141,14 @@ describe("Norm references", () => {
     const itemHeader = screen.getByLabelText("Listen Eintrag")
     await user.click(itemHeader)
 
-    const abbreviationInput = await screen.findByLabelText(
-      "RIS-Abkürzung der Norm",
-    )
-    screen.getAllByLabelText("Auswahl zurücksetzen")[1].click()
+    const abbreviationInput = await screen.findByLabelText("RIS-Abkürzung")
+    screen.getByLabelText("Auswahl zurücksetzen").click()
     await user.clear(abbreviationInput)
     expect(abbreviationInput).toHaveValue("")
     await user.click(screen.getByLabelText("Norm speichern"))
     await screen.findByText(/01.02.2022, 2022/)
     expect(screen.getByLabelText(/Fehlerhafte Eingabe/)).toBeInTheDocument()
     await user.click(itemHeader)
-    expect(screen.getAllByText(/Pflichtfeld nicht befüllt/).length).toBe(1)
+    expect(screen.getByText(/Pflichtfeld nicht befüllt/)).toBeInTheDocument()
   })
 })

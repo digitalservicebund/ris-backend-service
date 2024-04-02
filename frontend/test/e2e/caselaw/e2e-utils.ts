@@ -361,11 +361,11 @@ export async function fillNormInputs(
   }
 
   if (values?.normAbbreviation) {
-    await fillInput("RIS-Abkürzung der Norm", values?.normAbbreviation)
+    await fillInput("RIS-Abkürzung", values?.normAbbreviation)
     await page.getByRole("button", { name: "dropdown-option" }).click()
     await waitForInputValue(
       page,
-      "[aria-label='RIS-Abkürzung der Norm']",
+      "[aria-label='RIS-Abkürzung']",
       values.normAbbreviation,
     )
   }

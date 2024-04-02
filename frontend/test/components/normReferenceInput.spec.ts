@@ -35,7 +35,7 @@ describe("NormReferenceEntry", () => {
   )
   it("render empty norm input group on initial load", () => {
     renderComponent()
-    expect(screen.getByLabelText("RIS-Abkürzung der Norm")).toBeInTheDocument()
+    expect(screen.getByLabelText("RIS-Abkürzung")).toBeInTheDocument()
     expect(screen.getByLabelText("Einzelnorm der Norm")).toBeInTheDocument()
     expect(screen.getByLabelText("Fassungsdatum der Norm")).toBeInTheDocument()
     expect(screen.getByLabelText("Jahr der Norm")).toBeInTheDocument()
@@ -56,7 +56,7 @@ describe("NormReferenceEntry", () => {
       } as NormReference,
     })
 
-    const abbreviationField = screen.getByLabelText("RIS-Abkürzung der Norm")
+    const abbreviationField = screen.getByLabelText("RIS-Abkürzung")
 
     const singleNormField = screen.getByLabelText("Einzelnorm der Norm")
 
@@ -126,7 +126,7 @@ describe("NormReferenceEntry", () => {
 
   it("correctly updates the value of ris abbreviation input", async () => {
     const { user, emitted } = renderComponent()
-    const abbreviationField = screen.getByLabelText("RIS-Abkürzung der Norm")
+    const abbreviationField = screen.getByLabelText("RIS-Abkürzung")
 
     await user.type(abbreviationField, "1000")
     const dropdownItems = screen.getAllByLabelText(

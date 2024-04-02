@@ -108,17 +108,6 @@ onBeforeUnmount(() => {
 
 <template>
   <div class="flex flex-col gap-24">
-    <InputField id="norm-reference-search-field" label="Suchfeld">
-      <ComboboxInput
-        id="norm-reference-search"
-        v-model="normAbbreviation"
-        aria-label="Norm Suchfeld"
-        clear-on-choosing-item
-        :item-service="ComboboxItemService.getRisAbbreviationsAwesome"
-        placeholder="Nach Norm suchen"
-        throttle-item-service-throughput
-      ></ComboboxInput>
-    </InputField>
     <InputField
       id="norm-reference-abbreviation-field"
       v-slot="slotProps"
@@ -128,13 +117,14 @@ onBeforeUnmount(() => {
       <ComboboxInput
         id="norm-reference-abbreviation"
         v-model="normAbbreviation"
-        aria-label="RIS-Abkürzung der Norm"
+        aria-label="RIS-Abkürzung"
         clear-on-choosing-item
         :has-error="slotProps.hasError"
         :item-service="ComboboxItemService.getRisAbbreviations"
+        placeholder="Abkürzung, Kurz-oder Langtitel oder Region eingeben ..."
+        throttle-item-service-throughput
         @click="validationStore.remove('normAbbreviation')"
-      >
-      </ComboboxInput>
+      ></ComboboxInput>
     </InputField>
     <div class="flex justify-between gap-24">
       <InputField
