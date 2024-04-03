@@ -11,6 +11,7 @@ import { NormAbbreviation } from "@/domain/normAbbreviation"
 import NormReference, { SingleNormValidationInfo } from "@/domain/normReference"
 import ComboboxItemService from "@/services/comboboxItemService"
 import documentUnitService from "@/services/documentUnitService"
+import IconAdd from "~icons/ic/baseline-add"
 
 const props = defineProps<{ modelValue?: NormReference }>()
 const emit = defineEmits<{
@@ -124,7 +125,10 @@ onBeforeUnmount(() => {
         @click="validationStore.remove('normAbbreviation')"
       ></ComboboxInput>
     </InputField>
-    <div v-if="normAbbreviation" class="flex justify-between gap-24">
+    <div
+      v-if="normAbbreviation"
+      class="flex justify-between gap-24 border-t-1 border-blue-300 pt-24"
+    >
       <InputField
         id="norm-reference-singleNorm-field"
         v-slot="slotProps"
@@ -173,11 +177,18 @@ onBeforeUnmount(() => {
     </div>
     <div class="flex w-full flex-row justify-between">
       <div>
-        <div>
+        <div class="flex gap-24">
+          <TextButton
+            aria-label="Weitere Einzelnorm"
+            button-type="tertiary"
+            :disabled="!norm.singleNorm"
+            :icon="IconAdd"
+            label="Weitere Einzelnorm"
+            size="small"
+          />
           <TextButton
             aria-label="Norm speichern"
-            button-type="tertiary"
-            class="mr-24"
+            button-type="primary"
             :disabled="norm.isEmpty"
             label="Übernehmen"
             size="small"
