@@ -5,7 +5,6 @@ import {
   fillEnsuingDecisionInputs,
   navigateToCategories,
   publishDocumentationUnit,
-  fillNormInputs,
   waitForSaving,
 } from "~/e2e/caselaw/e2e-utils"
 import { caselawTest as test } from "~/e2e/caselaw/fixtures"
@@ -21,12 +20,10 @@ test.describe("related documentation units", () => {
     const activeCitationContainer = page.getByLabel("Aktivzitierung")
     const previousDecisionContainer = page.getByLabel("Vorgehende Entscheidung")
     const ensuingDecisionContainer = page.getByLabel("Nachgehende Entscheidung")
-    const normsContainer = page.getByLabel("Norm")
     const containers = [
       activeCitationContainer,
       previousDecisionContainer,
       ensuingDecisionContainer,
-      normsContainer,
     ]
 
     for (const container of containers) {
@@ -59,13 +56,10 @@ test.describe("related documentation units", () => {
     const activeCitationContainer = page.getByLabel("Aktivzitierung")
     const previousDecisionContainer = page.getByLabel("Vorgehende Entscheidung")
     const ensuingDecisionContainer = page.getByLabel("Nachgehende Entscheidung")
-    // todo: find generic way to fill forms without too many conditionals
-    // const normsContainer = page.getByLabel("Norm")
     const containers = [
       activeCitationContainer,
       previousDecisionContainer,
       ensuingDecisionContainer,
-      // normsContainer,
     ]
 
     for (const container of containers) {
@@ -136,12 +130,10 @@ test.describe("related documentation units", () => {
     const activeCitationContainer = page.getByLabel("Aktivzitierung")
     const previousDecisionContainer = page.getByLabel("Vorgehende Entscheidung")
     const ensuingDecisionContainer = page.getByLabel("Nachgehende Entscheidung")
-    const normsContainer = page.getByLabel("Norm")
     const containers = [
       activeCitationContainer,
       previousDecisionContainer,
       ensuingDecisionContainer,
-      normsContainer,
     ]
 
     for (const container of containers) {
@@ -159,13 +151,10 @@ test.describe("related documentation units", () => {
             .getAttribute("aria-label")) as string
 
           const fileNumber = generateString()
-          if (container === normsContainer) {
-            await fillNormInputs(page, { dateOfRelevance: "1234" })
-          } else {
-            await container
-              .getByLabel("Aktenzeichen " + containerLabel, { exact: true })
-              .fill(fileNumber)
-          }
+
+          await container
+            .getByLabel("Aktenzeichen " + containerLabel, { exact: true })
+            .fill(fileNumber)
 
           await page.getByLabel(`${containerLabel} speichern`).click()
 
@@ -184,13 +173,6 @@ test.describe("related documentation units", () => {
               ...inputs,
               citationType: "Änderung",
             })
-          } else if (container === normsContainer) {
-            await expect(
-              page
-                .getByLabel(containerLabel)
-                .getByText("Pflichtfeld nicht befüllt"),
-            ).toHaveCount(1)
-            await fillNormInputs(page, { normAbbreviation: "BayWaldNatPV BY" })
           } else if (container === previousDecisionContainer) {
             await expect(
               page
@@ -224,12 +206,10 @@ test.describe("related documentation units", () => {
     const activeCitationContainer = page.getByLabel("Aktivzitierung")
     const previousDecisionContainer = page.getByLabel("Vorgehende Entscheidung")
     const ensuingDecisionContainer = page.getByLabel("Nachgehende Entscheidung")
-    const normsContainer = page.getByLabel("Norm")
     const containers = [
       activeCitationContainer,
       previousDecisionContainer,
       ensuingDecisionContainer,
-      normsContainer,
     ]
 
     for (const container of containers) {
@@ -249,9 +229,6 @@ test.describe("related documentation units", () => {
           }
           if (container === ensuingDecisionContainer) {
             await fillEnsuingDecisionInputs(page, { fileNumber: fileNumber })
-          }
-          if (container === normsContainer) {
-            await fillNormInputs(page, { dateOfRelevance: "2022" })
           }
 
           await expect(container.getByLabel("Abbrechen")).toBeHidden()
@@ -276,13 +253,10 @@ test.describe("related documentation units", () => {
     const activeCitationContainer = page.getByLabel("Aktivzitierung")
     const previousDecisionContainer = page.getByLabel("Vorgehende Entscheidung")
     const ensuingDecisionContainer = page.getByLabel("Nachgehende Entscheidung")
-    // todo: find generic way to fill forms without too many conditionals
-    // const normsContainer = page.getByLabel("Norm")
     const containers = [
       activeCitationContainer,
       previousDecisionContainer,
       ensuingDecisionContainer,
-      // normsContainer
     ]
 
     for (const container of containers) {
@@ -393,12 +367,10 @@ test.describe("related documentation units", () => {
     const activeCitationContainer = page.getByLabel("Aktivzitierung")
     const previousDecisionContainer = page.getByLabel("Vorgehende Entscheidung")
     const ensuingDecisionContainer = page.getByLabel("Nachgehende Entscheidung")
-    const normsContainer = page.getByLabel("Norm")
     const containers = [
       activeCitationContainer,
       previousDecisionContainer,
       ensuingDecisionContainer,
-      normsContainer,
     ]
 
     for (const container of containers) {
@@ -421,10 +393,6 @@ test.describe("related documentation units", () => {
           }
           if (container === ensuingDecisionContainer) {
             await fillEnsuingDecisionInputs(page, { fileNumber: number })
-          }
-
-          if (container === normsContainer) {
-            await fillNormInputs(page, { dateOfRelevance: number })
           }
 
           await expect(container.getByLabel("Abbrechen")).toBeHidden()
@@ -453,10 +421,6 @@ test.describe("related documentation units", () => {
             })
           }
 
-          if (container === normsContainer) {
-            await fillNormInputs(page, { dateOfRelevance: editedNumber })
-          }
-
           await container.getByLabel("Abbrechen").click()
           await expect(container.getByText(number)).toBeVisible()
           await expect(container.getByText(editedNumber)).toBeHidden()
@@ -473,12 +437,10 @@ test.describe("related documentation units", () => {
     const activeCitationContainer = page.getByLabel("Aktivzitierung")
     const previousDecisionContainer = page.getByLabel("Vorgehende Entscheidung")
     const ensuingDecisionContainer = page.getByLabel("Nachgehende Entscheidung")
-    const normsContainer = page.getByLabel("Norm")
     const containers = [
       activeCitationContainer,
       previousDecisionContainer,
       ensuingDecisionContainer,
-      normsContainer,
     ]
 
     for (const container of containers) {
@@ -502,9 +464,6 @@ test.describe("related documentation units", () => {
           }
           if (container === ensuingDecisionContainer) {
             await fillEnsuingDecisionInputs(page, { fileNumber: fileNumber })
-          }
-          if (container === normsContainer) {
-            await fillNormInputs(page, { dateOfRelevance: "1234" })
           }
 
           await container.getByLabel(`${containerLabel} speichern`).click()

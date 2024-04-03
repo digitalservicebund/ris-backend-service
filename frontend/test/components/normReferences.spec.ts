@@ -58,18 +58,6 @@ describe("Norm references", () => {
     renderComponent()
     expect((await screen.findAllByLabelText("Listen Eintrag")).length).toBe(1)
     expect(await screen.findByLabelText("RIS-Abkürzung")).toBeInTheDocument()
-    expect(
-      await screen.findByLabelText("Einzelnorm der Norm"),
-    ).toBeInTheDocument()
-    expect(
-      await screen.findByLabelText("Fassungsdatum der Norm"),
-    ).toBeInTheDocument()
-    expect(await screen.findByLabelText("Jahr der Norm")).toBeInTheDocument()
-    expect(await screen.findByLabelText("Jahr der Norm")).toBeInTheDocument()
-    expect(await screen.findByLabelText("Norm speichern")).toBeDisabled()
-    expect(
-      screen.queryByText(/Pflichtfeld nicht befüllt/),
-    ).not.toBeInTheDocument()
   })
 
   it("renders norm references as list entries", () => {

@@ -118,15 +118,13 @@ onBeforeUnmount(() => {
         id="norm-reference-abbreviation"
         v-model="normAbbreviation"
         aria-label="RIS-Abkürzung"
-        clear-on-choosing-item
         :has-error="slotProps.hasError"
         :item-service="ComboboxItemService.getRisAbbreviations"
         placeholder="Abkürzung, Kurz-oder Langtitel oder Region eingeben ..."
-        throttle-item-service-throughput
         @click="validationStore.remove('normAbbreviation')"
       ></ComboboxInput>
     </InputField>
-    <div class="flex justify-between gap-24">
+    <div v-if="normAbbreviation" class="flex justify-between gap-24">
       <InputField
         id="norm-reference-singleNorm-field"
         v-slot="slotProps"

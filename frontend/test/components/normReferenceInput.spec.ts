@@ -33,21 +33,22 @@ describe("NormReferenceEntry", () => {
   vi.spyOn(documentUnitService, "validateSingleNorm").mockImplementation(() =>
     Promise.resolve({ status: 200, data: "Ok" }),
   )
-  it("render empty norm input group on initial load", () => {
+  it("render empty norm input group on initial load", async () => {
     renderComponent()
     expect(screen.getByLabelText("RIS-Abkürzung")).toBeInTheDocument()
-    expect(screen.getByLabelText("Einzelnorm der Norm")).toBeInTheDocument()
-    expect(screen.getByLabelText("Fassungsdatum der Norm")).toBeInTheDocument()
-    expect(screen.getByLabelText("Jahr der Norm")).toBeInTheDocument()
-    expect(screen.getByLabelText("Jahr der Norm")).toBeInTheDocument()
-    expect(screen.getByLabelText("Norm speichern")).toBeDisabled()
+
     expect(
-      screen.queryByText(/Pflichtfeld nicht befüllt/),
+      screen.queryByLabelText("Einzelnorm der Norm"),
     ).not.toBeInTheDocument()
+    expect(
+      screen.queryByLabelText("Fassungsdatum der Norm"),
+    ).not.toBeInTheDocument()
+    expect(screen.queryByLabelText("Jahr der Norm")).not.toBeInTheDocument()
+    expect(screen.getByLabelText("Norm speichern")).toBeInTheDocument()
   })
 
-  it("render values if given", () => {
-    const { screen } = renderComponent({
+  it("render values if given", async () => {
+    const { user, screen } = renderComponent({
       modelValue: {
         normAbbreviation: { id: "123", abbreviation: "ABC" },
         singleNorm: "12",
@@ -57,6 +58,8 @@ describe("NormReferenceEntry", () => {
     })
 
     const abbreviationField = screen.getByLabelText("RIS-Abkürzung")
+
+    await user.click(screen.getByLabelText("RIS-Abkürzung"))
 
     const singleNormField = screen.getByLabelText("Einzelnorm der Norm")
 
@@ -71,9 +74,10 @@ describe("NormReferenceEntry", () => {
     expect(screen.getByLabelText("Norm speichern")).toBeEnabled()
   })
 
-  it("Add norm without valid single norm not possible", async () => {
+  it("add norm without valid single norm not possible", async () => {
     const { user, emitted } = renderComponent({
       modelValue: {
+        normAbbreviation: { id: "123", abbreviation: "ABC" },
         singleNorm: "12",
       } as NormReference,
     })
@@ -91,27 +95,15 @@ describe("NormReferenceEntry", () => {
     expect(emitted("update:modelValue")).toEqual(undefined)
   })
 
-  it("Add norm without all required fields filled possible", async () => {
-    const { user, emitted } = renderComponent({
-      modelValue: {
-        dateOfVersion: "2022-01-31T23:00:00Z",
-        dateOfRelevance: "2023",
-      } as NormReference,
-    })
-
-    const button = screen.getByLabelText("Norm speichern")
-    await user.click(button)
-
-    expect(emitted("addEntry")).toBeTruthy()
-  })
-
-  it("New input removes error message", async () => {
+  it("new input removes error message", async () => {
     const { user } = renderComponent({
       modelValue: {
+        normAbbreviation: { id: "123", abbreviation: "ABC" },
         singleNorm: "12",
       } as NormReference,
     })
 
+    await user.click(screen.getByLabelText("RIS-Abkürzung"))
     const singleNormInput = await screen.findByLabelText("Einzelnorm der Norm")
     expect(singleNormInput).toHaveValue("12")
     const button = screen.getByLabelText("Norm speichern")
@@ -153,7 +145,11 @@ describe("NormReferenceEntry", () => {
   })
 
   it("correctly updates the value of the single norm input", async () => {
-    const { user } = renderComponent()
+    const { user } = renderComponent({
+      modelValue: {
+        normAbbreviation: { id: "123", abbreviation: "ABC" },
+      } as NormReference,
+    })
     const singleNormInput = await screen.findByLabelText("Einzelnorm der Norm")
 
     await user.type(singleNormInput, "§ 123")
@@ -161,7 +157,11 @@ describe("NormReferenceEntry", () => {
   })
 
   it("correctly updates the value of the version date input", async () => {
-    const { user } = renderComponent()
+    const { user } = renderComponent({
+      modelValue: {
+        normAbbreviation: { id: "123", abbreviation: "ABC" },
+      } as NormReference,
+    })
 
     const versionField = screen.getByLabelText("Fassungsdatum der Norm")
     await user.type(versionField, "31.01.2022")
@@ -170,7 +170,11 @@ describe("NormReferenceEntry", () => {
   })
 
   it("correctly updates the value of the version date input", async () => {
-    const { user } = renderComponent()
+    const { user } = renderComponent({
+      modelValue: {
+        normAbbreviation: { id: "123", abbreviation: "ABC" },
+      } as NormReference,
+    })
 
     const relevanceField = screen.getByLabelText("Jahr der Norm")
     await user.type(relevanceField, "2023")

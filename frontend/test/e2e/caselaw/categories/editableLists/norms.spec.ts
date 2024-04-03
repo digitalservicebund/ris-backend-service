@@ -7,8 +7,5 @@ test.describe("norm", () => {
     await navigateToCategories(page, documentNumber)
     await expect(page.getByRole("heading", { name: "Normen" })).toBeVisible()
     await expect(page.getByLabel("RIS-Abkürzung")).toBeVisible()
-    await expect(page.getByLabel("Einzelnorm")).toBeVisible()
-    await expect(page.getByLabel("Fassungsdatum")).toBeVisible()
-    await expect(page.getByLabel("Jahr")).toBeVisible()
   })
 })
