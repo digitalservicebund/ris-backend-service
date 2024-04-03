@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @RestController
@@ -19,16 +18,6 @@ public class NormAbbreviationController {
 
   public NormAbbreviationController(NormAbbreviationService service) {
     this.service = service;
-  }
-
-  @GetMapping
-  @PreAuthorize("isAuthenticated()")
-  public Flux<NormAbbreviation> getAllNormAbbreviationsStartingWithExact(
-      @RequestParam(value = "q", required = false, defaultValue = "") String normAbbreviation,
-      @RequestParam(value = "sz", required = false, defaultValue = "30") Integer size,
-      @RequestParam(value = "pg", required = false, defaultValue = "0") Integer page) {
-    return Flux.fromIterable(
-        service.getNormAbbreviationsStartingWithExact(normAbbreviation, size, page));
   }
 
   @GetMapping("/{uuid}")

@@ -207,7 +207,8 @@ class NormAbbreviationIntegrationTest {
 
   @Test
   void testGetNormAbbreviationById_allValuesFilled() {
-    generateLookupValues();
+    generateAbbreviations();
+    generateOtherLookupValues();
 
     repository.save(
         abbreviation1.toBuilder().documentTypeList(List.of(documentType1)).region(region2).build());
@@ -235,7 +236,8 @@ class NormAbbreviationIntegrationTest {
 
   @Test
   void testGetNormAbbreviationById_withoutLinkedDocumentType() {
-    generateLookupValues();
+    generateAbbreviations();
+    generateOtherLookupValues();
 
     repository.save(abbreviation1.toBuilder().region(region1).build());
 
@@ -261,7 +263,8 @@ class NormAbbreviationIntegrationTest {
 
   @Test
   void testGetNormAbbreviationById_withoutLinkedRegion() {
-    generateLookupValues();
+    generateAbbreviations();
+    generateOtherLookupValues();
 
     repository.save(abbreviation1.toBuilder().documentTypeList(List.of(documentType1)).build());
 
@@ -287,7 +290,8 @@ class NormAbbreviationIntegrationTest {
 
   @Test
   void testGetNormAbbreviationById_withoutLinkedDocumentTypeAndRegion() {
-    generateLookupValues();
+    generateAbbreviations();
+    generateOtherLookupValues();
 
     NormAbbreviation expectedNormAbbreviation =
         new NormAbbreviationTestBuilder().getExpectedNormAbbreviation().build();
@@ -308,7 +312,8 @@ class NormAbbreviationIntegrationTest {
 
   @Test
   void testGetNormAbbreviationById_withTwoLinkedDocumentTypesAndTwoRegions() {
-    generateLookupValues();
+    generateAbbreviations();
+    generateOtherLookupValues();
 
     repository.saveAndFlush(
         abbreviation1.toBuilder()
@@ -339,13 +344,17 @@ class NormAbbreviationIntegrationTest {
   }
 
   @Test
-  void testGetNormAbbreviationBySearchQuery() {
-    generateLookupValues();
+  void testGetNormAbbreviationByExactSearchQuery() {
+    generateOtherLookupValues();
+    generateAbbreviations();
+
+    repository.refreshMaterializedViews();
+    String query = "search query at the beginning";
 
     risWebTestClient
         .withDefaultLogin()
         .get()
-        .uri("/api/v1/caselaw/normabbreviation?q=search query at the beginning")
+        .uri("/api/v1/caselaw/normabbreviation/search?pg=0&sz=30&q=" + query)
         .exchange()
         .expectStatus()
         .isOk()
@@ -359,28 +368,77 @@ class NormAbbreviationIntegrationTest {
   }
 
   @Test
-  void testGetNormAbbreviationBySearchQueryOnlySearchesStartWith() {
-    generateLookupValues();
+  void testGetNormAbbreviationByPartialSearchQuery() {
+    generateOtherLookupValues();
+    generateAbbreviations();
+    repository.refreshMaterializedViews();
+    String query = "search query";
 
     risWebTestClient
         .withDefaultLogin()
         .get()
-        .uri("/api/v1/caselaw/normabbreviation?q=beginning")
+        .uri("/api/v1/caselaw/normabbreviation/search?pg=0&sz=30&q=" + query)
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody()
-        .json("[]", true);
+        .expectBody(NormAbbreviation[].class)
+        .consumeWith(
+            response -> {
+              assertThat(response.getResponseBody())
+                  .extracting("id")
+                  .containsExactly(abbreviation2.getId(), abbreviation4.getId(), abbreviation3.getId());
+            });
   }
 
   @Test
-  void testGetNormAbbreviationBySearchQuery_returnInTheRightOrder() {
-    generateLookupValues();
+  void testGetNormAbbreviationBySearchQuery_returnRightOrder() {
+    generateOtherLookupValues();
+    // Exact abbreviation
+    NormAbbreviationDTO abbreviation1 = NormAbbreviationDTO.builder().abbreviation("Abbreviation")
+        .documentId(1234L)
+        .build();
+    // Exact official letter abbreviation
+    NormAbbreviationDTO abbreviation2 = NormAbbreviationDTO.builder().abbreviation("No match")
+        .documentId(2345L)
+        .officialLetterAbbreviation("abbreviation")
+        .build();
+    // Abbreviation starts with
+    NormAbbreviationDTO abbreviation3 = NormAbbreviationDTO.builder().abbreviation("Abbreviation starts with")
+        .documentId(3456L)
+        .build();
+    // Official letter abbreviation starts with
+    NormAbbreviationDTO abbreviation4 = NormAbbreviationDTO.builder().abbreviation("No match")
+        .documentId(4567L)
+        .officialLetterAbbreviation("Abbreviation official letter")
+        .build();
+    // Some abbreviation found by weighted vector (no detailed test possible)
+    NormAbbreviationDTO abbreviation5 = NormAbbreviationDTO.builder().abbreviation("No match")
+        .documentId(5567L)
+        .officialLetterAbbreviation("Some ranked result")
+        .officialShortTitle("Abbreviation")
+        .build();
+    // Some abbreviation which should be excluded from the search result
+    NormAbbreviationDTO abbreviation6 = NormAbbreviationDTO.builder().abbreviation("No match")
+        .documentId(6567L)
+        .officialLetterAbbreviation("No match")
+        .officialShortTitle("No match")
+        .build();
+
+    repository.save(abbreviation1);
+    repository.save(abbreviation2);
+    repository.save(abbreviation3);
+    repository.save(abbreviation4);
+    repository.save(abbreviation5);
+    repository.save(abbreviation6);
+
+    repository.refreshMaterializedViews();
+
+    String query = "Abbreviation";
 
     risWebTestClient
         .withDefaultLogin()
         .get()
-        .uri("/api/v1/caselaw/normabbreviation?q=Search")
+        .uri("/api/v1/caselaw/normabbreviation/search?pg=0&sz=30&q=" + query)
         .exchange()
         .expectStatus()
         .isOk()
@@ -390,13 +448,15 @@ class NormAbbreviationIntegrationTest {
               assertThat(response.getResponseBody())
                   .extracting("id")
                   .containsExactly(
-                      abbreviation6.getId(), abbreviation5.getId(), abbreviation7.getId());
+                      abbreviation1.getId(), abbreviation2.getId(),
+                      abbreviation3.getId(), abbreviation4.getId(), abbreviation5.getId());
             });
   }
 
   @Test
   void testGetNormAbbreviationBySearchQuery_allowSpecialCharacters() {
-    generateLookupValues();
+    generateOtherLookupValues();
+    generateAbbreviations();
     repository.refreshMaterializedViews();
 
     String query = "With special / characters ;";
@@ -418,8 +478,9 @@ class NormAbbreviationIntegrationTest {
   }
 
   @Test
-  void testGetNormAbbreviationByAwesomeSearchQuery_returnInTheRightOrder() {
-    generateLookupValues();
+  void testGetNormAbbreviationBySearchQuery_returnInTheRightOrder() {
+    generateOtherLookupValues();
+    generateAbbreviations();
     repository.refreshMaterializedViews();
 
     String query = "search query";
@@ -459,7 +520,7 @@ class NormAbbreviationIntegrationTest {
             });
   }
 
-  private void generateLookupValues() {
+  private void generateOtherLookupValues() {
 
     documentCategoryDTO1 = documentCategoryRepository.save(documentCategoryDTO1);
     documentCategoryDTO2 = documentCategoryRepository.save(documentCategoryDTO2);
@@ -471,7 +532,9 @@ class NormAbbreviationIntegrationTest {
 
     region1 = regionRepository.save(region1);
     region2 = regionRepository.save(region2);
+  }
 
+  private void generateAbbreviations() {
     abbreviation1 = repository.save(abbreviation1);
     abbreviation2 = repository.save(abbreviation2);
     abbreviation3 = repository.save(abbreviation3);
