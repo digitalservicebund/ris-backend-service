@@ -68,7 +68,7 @@ class NormAbbreviationIntegrationTest {
 
   private NormAbbreviationDTO abbreviation2 =
       NormAbbreviationDTO.builder()
-          .abbreviation("search query at the beginning")
+          .abbreviation("search query exact")
           .decisionDate(LocalDate.of(2023, Month.MAY, 20))
           .documentId(2345L)
           .documentNumber("document number 2")
@@ -349,7 +349,7 @@ class NormAbbreviationIntegrationTest {
     generateAbbreviations();
 
     repository.refreshMaterializedViews();
-    String query = "search query at the beginning";
+    String query = "search query exact";
 
     risWebTestClient
         .withDefaultLogin()
@@ -386,7 +386,8 @@ class NormAbbreviationIntegrationTest {
             response -> {
               assertThat(response.getResponseBody())
                   .extracting("id")
-                  .containsExactly(abbreviation2.getId(), abbreviation4.getId(), abbreviation3.getId());
+                  .containsExactly(
+                      abbreviation2.getId(), abbreviation4.getId(), abbreviation3.getId());
             });
   }
 
@@ -394,35 +395,44 @@ class NormAbbreviationIntegrationTest {
   void testGetNormAbbreviationBySearchQuery_returnRightOrder() {
     generateOtherLookupValues();
     // Exact abbreviation
-    NormAbbreviationDTO abbreviation1 = NormAbbreviationDTO.builder().abbreviation("Abbreviation")
-        .documentId(1234L)
-        .build();
+    NormAbbreviationDTO abbreviation1 =
+        NormAbbreviationDTO.builder().abbreviation("Abbreviation").documentId(1234L).build();
     // Exact official letter abbreviation
-    NormAbbreviationDTO abbreviation2 = NormAbbreviationDTO.builder().abbreviation("No match")
-        .documentId(2345L)
-        .officialLetterAbbreviation("abbreviation")
-        .build();
+    NormAbbreviationDTO abbreviation2 =
+        NormAbbreviationDTO.builder()
+            .abbreviation("No match")
+            .documentId(2345L)
+            .officialLetterAbbreviation("abbreviation")
+            .build();
     // Abbreviation starts with
-    NormAbbreviationDTO abbreviation3 = NormAbbreviationDTO.builder().abbreviation("Abbreviation starts with")
-        .documentId(3456L)
-        .build();
+    NormAbbreviationDTO abbreviation3 =
+        NormAbbreviationDTO.builder()
+            .abbreviation("Abbreviation starts with")
+            .documentId(3456L)
+            .build();
     // Official letter abbreviation starts with
-    NormAbbreviationDTO abbreviation4 = NormAbbreviationDTO.builder().abbreviation("No match")
-        .documentId(4567L)
-        .officialLetterAbbreviation("Abbreviation official letter")
-        .build();
+    NormAbbreviationDTO abbreviation4 =
+        NormAbbreviationDTO.builder()
+            .abbreviation("No match")
+            .documentId(4567L)
+            .officialLetterAbbreviation("Abbreviation official letter")
+            .build();
     // Some abbreviation found by weighted vector (no detailed test possible)
-    NormAbbreviationDTO abbreviation5 = NormAbbreviationDTO.builder().abbreviation("No match")
-        .documentId(5567L)
-        .officialLetterAbbreviation("Some ranked result")
-        .officialShortTitle("Abbreviation")
-        .build();
+    NormAbbreviationDTO abbreviation5 =
+        NormAbbreviationDTO.builder()
+            .abbreviation("No match")
+            .documentId(5567L)
+            .officialLetterAbbreviation("Some ranked result")
+            .officialShortTitle("Abbreviation")
+            .build();
     // Some abbreviation which should be excluded from the search result
-    NormAbbreviationDTO abbreviation6 = NormAbbreviationDTO.builder().abbreviation("No match")
-        .documentId(6567L)
-        .officialLetterAbbreviation("No match")
-        .officialShortTitle("No match")
-        .build();
+    NormAbbreviationDTO abbreviation6 =
+        NormAbbreviationDTO.builder()
+            .abbreviation("No match")
+            .documentId(6567L)
+            .officialLetterAbbreviation("No match")
+            .officialShortTitle("No match")
+            .build();
 
     repository.save(abbreviation1);
     repository.save(abbreviation2);
@@ -448,8 +458,11 @@ class NormAbbreviationIntegrationTest {
               assertThat(response.getResponseBody())
                   .extracting("id")
                   .containsExactly(
-                      abbreviation1.getId(), abbreviation2.getId(),
-                      abbreviation3.getId(), abbreviation4.getId(), abbreviation5.getId());
+                      abbreviation1.getId(),
+                      abbreviation2.getId(),
+                      abbreviation3.getId(),
+                      abbreviation4.getId(),
+                      abbreviation5.getId());
             });
   }
 
