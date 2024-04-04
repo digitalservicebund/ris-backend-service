@@ -1,22 +1,18 @@
 import dayjs from "dayjs"
-import EditableListItem from "./editableListItem"
-import { NormAbbreviation } from "./normAbbreviation"
-import SingleNorm from "./singleNorm"
 
-export default class NormReference implements EditableListItem {
-  public normAbbreviation?: NormAbbreviation
-  public singleNorms?: SingleNorm[]
-  public hasForeignSource: boolean = false
+export default class SingleNorm {
+  public singleNorm?: string
+  public dateOfVersion?: string
+  public dateOfRelevance?: string
 
-  static readonly requiredFields = ["normAbbreviation"] as const
+  static readonly requiredFields = ["singleNorm"] as const
   static readonly fields = [
-    "normAbbreviation",
     "singleNorm",
     "dateOfVersion",
     "dateOfRelevance",
   ] as const
 
-  constructor(data: Partial<NormReference> = {}) {
+  constructor(data: Partial<SingleNorm> = {}) {
     Object.assign(this, data)
   }
 
@@ -26,9 +22,6 @@ export default class NormReference implements EditableListItem {
 
   get renderDecision(): string {
     return [
-      ...(this.normAbbreviation?.abbreviation
-        ? [`${this.normAbbreviation?.abbreviation}`]
-        : []),
       ...(this.singleNorm ? [this.singleNorm] : []),
       ...(this.dateOfVersion
         ? [dayjs(this.dateOfVersion).format("DD.MM.YYYY")]
@@ -42,7 +35,7 @@ export default class NormReference implements EditableListItem {
   }
 
   get missingRequiredFields() {
-    return NormReference.requiredFields.filter((field) =>
+    return SingleNorm.requiredFields.filter((field) =>
       this.fieldIsEmpty(this[field]),
     )
   }
@@ -50,7 +43,7 @@ export default class NormReference implements EditableListItem {
   get isEmpty(): boolean {
     let isEmpty = true
 
-    NormReference.fields.map((key) => {
+    SingleNorm.fields.map((key) => {
       if (!this.fieldIsEmpty(this[key])) {
         isEmpty = false
       }
@@ -62,9 +55,7 @@ export default class NormReference implements EditableListItem {
     return false
   }
 
-  private fieldIsEmpty(
-    value: NormReference[(typeof NormReference.fields)[number]],
-  ) {
+  private fieldIsEmpty(value: SingleNorm[(typeof SingleNorm.fields)[number]]) {
     if (
       value === undefined ||
       !value ||
@@ -79,5 +70,12 @@ export default class NormReference implements EditableListItem {
 }
 
 export const normFieldLabels: { [name: string]: string } = {
-  normAbbreviation: "RIS-Abkürzung",
+  singleNorm: "Einzelnorm",
+  dateOfVersion: "Fassungsdatum",
+  dateOfRelevance: "Jahr",
+}
+
+export type SingleNormValidationInfo = {
+  singleNorm: string
+  normAbbreviation?: string
 }
