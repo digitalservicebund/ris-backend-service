@@ -100,11 +100,12 @@ onMounted(async () => {
               :is-loading="false"
               @file-selected="(file) => upload(file)"
             />
+
+            <div>
+              Zulässige Dateiformate:
+              {{ acceptedFileFormats.toString().replace(/\./g, " ") }}
+            </div>
           </div>
-        </div>
-        <div>
-          Zulässige Dateiformate:
-          {{ acceptedFileFormats.toString().replace(/\./g, " ") }}
         </div>
       </div>
     </template>
