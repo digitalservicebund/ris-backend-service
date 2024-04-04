@@ -23,15 +23,6 @@ public class PostgresNormAbbreviationRepositoryImpl implements NormAbbreviationR
   }
 
   @Override
-  public List<NormAbbreviation> getNormAbbreviationsStartingWithExact(
-      String query, Integer size, Integer page) {
-    var list =
-        repository.findByAbbreviationStartsWithOrderByAbbreviation(
-            query, PageRequest.of(page, size));
-    return list.stream().map(NormAbbreviationTransformer::transformDTO).toList();
-  }
-
-  @Override
   public List<NormAbbreviation> findAllContainingOrderByAccuracy(
       String query, Integer size, Integer page) {
 
