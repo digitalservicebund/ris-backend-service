@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { onMounted, ref, watch } from "vue"
+import { computed } from "vue"
 import DateInput from "@/components/input/DateInput.vue"
 import InputField from "@/components/input/InputField.vue"
 import TextInput from "@/components/input/TextInput.vue"
@@ -13,9 +13,20 @@ const props = defineProps<{
   normAbbreviation: string
 }>()
 
+const emit = defineEmits<{
+  "update:modelValue": [value: SingleNorm]
+}>()
+
 const validationStore = useValidationStore<(typeof SingleNorm.fields)[number]>()
 
-const singleNorm = ref(props.modelValue)
+const singleNorm = computed({
+  get: () => {
+    return props.modelValue
+  },
+  set: (value) => {
+    if (value) emit("update:modelValue", value)
+  },
+})
 
 async function validateNorm() {
   validationStore.reset()
@@ -41,22 +52,6 @@ async function validateNorm() {
     })
   }
 }
-
-watch(
-  () => props.modelValue,
-  () => {
-    singleNorm.value = new SingleNorm({ ...props.modelValue })
-  },
-)
-
-onMounted(async () => {
-  // On first mount, we don't need to validate. When the props.modelValue do not
-  // have the isEmpty getter, we can be sure that it has not been initialized as
-  // NormReference and is therefore the inital load. As soons as we are using
-  // uuid for norms, the check should be 'props.modelValue?.uuid !== undefined'
-
-  singleNorm.value = new SingleNorm({ ...props.modelValue })
-})
 </script>
 
 <template>

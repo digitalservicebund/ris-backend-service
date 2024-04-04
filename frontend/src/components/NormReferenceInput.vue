@@ -50,9 +50,12 @@ const normAbbreviation = computed({
 })
 
 async function addNormReference() {
-  // await validateNorm()
   if (!validationStore.getByMessage("Inhalt nicht valide").length) {
-    emit("update:modelValue", norm.value as NormReference)
+    const normRef = new NormReference({
+      ...norm.value,
+      singleNorms: singleNorms.value.map((norm) => new SingleNorm({ ...norm })),
+    })
+    emit("update:modelValue", normRef)
     emit("addEntry")
   }
 }
@@ -67,6 +70,7 @@ watch(
     norm.value = new NormReference({ ...props.modelValue })
     lastSavedModelValue.value = new NormReference({ ...props.modelValue })
     if (lastSavedModelValue.value.isEmpty) validationStore.reset()
+    //when list is empty, add new emptry single norm entry
     if (singleNorms.value?.length == 0 || !singleNorms.value)
       addNewSingleNormEntry()
   },
@@ -102,7 +106,6 @@ onBeforeUnmount(() => {
         v-for="(entry, index) in singleNorms"
         :key="index"
         v-model="singleNorms[index] as SingleNorm"
-        :aria-label="entry.singleNorm"
         norm-abbreviation="normAbbreviation.abbreviation"
       />
 
