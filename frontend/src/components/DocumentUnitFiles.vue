@@ -17,6 +17,7 @@ const emit = defineEmits<{
 const error = ref<ResponseError>()
 const html = ref<string>()
 const isLoading = ref(false)
+const acceptedFileFormats = [".docx"]
 
 async function handleDeleteFile() {
   if ((await fileService.delete(props.documentUnit.uuid)).status < 300) {
@@ -94,11 +95,16 @@ onMounted(async () => {
             </div>
 
             <FileUpload
+              :accept="acceptedFileFormats.toString()"
               :error="error"
               :is-loading="false"
               @file-selected="(file) => upload(file)"
             />
           </div>
+        </div>
+        <div>
+          Zulässige Dateiformate:
+          {{ acceptedFileFormats.toString().replace(/\./g, " ") }}
         </div>
       </div>
     </template>
