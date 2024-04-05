@@ -15,6 +15,7 @@ import de.bund.digitalservice.ris.caselaw.domain.NormReference;
 import de.bund.digitalservice.ris.caselaw.domain.PreviousDecision;
 import de.bund.digitalservice.ris.caselaw.domain.Procedure;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
+import de.bund.digitalservice.ris.caselaw.domain.SingleNorm;
 import de.bund.digitalservice.ris.caselaw.domain.Status;
 import de.bund.digitalservice.ris.caselaw.domain.Texts;
 import de.bund.digitalservice.ris.caselaw.domain.court.Court;
@@ -177,7 +178,11 @@ class JurisXmlExporterWrapperIntegrationTest {
                         .identifier("SF-01")
                         .text("field of law text")
                         .build()))
-            .norms(List.of(NormReference.builder().singleNorm("01").build()))
+            .norms(
+                List.of(
+                    NormReference.builder()
+                        .singleNorms(List.of(SingleNorm.builder().singleNorm("01").build()))
+                        .build()))
             .build();
 
     DocumentUnit documentUnit =

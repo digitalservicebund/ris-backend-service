@@ -2,7 +2,7 @@ package de.bund.digitalservice.ris.caselaw.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.NormAbbreviation;
-import java.time.LocalDate;
+import java.util.List;
 import java.util.UUID;
 import lombok.Builder;
 
@@ -12,6 +12,5 @@ import lombok.Builder;
 public record NormReference(
     UUID id,
     NormAbbreviation normAbbreviation,
-    String singleNorm,
-    LocalDate dateOfVersion,
-    String dateOfRelevance) {}
+    String normAbbreviationRawValue,
+    List<SingleNorm> singleNorms) {}
