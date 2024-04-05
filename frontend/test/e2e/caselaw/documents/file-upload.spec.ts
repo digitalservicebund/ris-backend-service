@@ -13,23 +13,19 @@ test.describe("upload an original document to a doc unit", () => {
     await uploadTestfile(page, "sample.docx")
     await expect(page.locator("text=Hochgeladen am")).toBeVisible()
     await expect(page.locator(`text=sample.docx`)).toBeVisible()
-    await expect(page.locator(`text=Die ist ein Test`)).toBeVisible()
+
+    const tableView = page.getByRole("cell", {
+      name: "Dateiname",
+      exact: true,
+    })
+
+    await expect(tableView).toBeVisible()
 
     // delete file
-    await page.locator("text=Datei löschen").click()
-    await page.locator("[role='dialog'] >> button:has-text('Löschen')").click()
+    await page.getByLabel("Datei löschen").click()
 
-    await expect(
-      page.locator(
-        "text=Aktuell ist keine Datei hinterlegt. Wählen Sie die Datei des Originaldokumentes aus",
-      ),
-    ).toBeVisible()
     await page.reload()
-    await expect(
-      page.locator(
-        "text=Aktuell ist keine Datei hinterlegt. Wählen Sie die Datei des Originaldokumentes aus",
-      ),
-    ).toBeVisible()
+    await expect(tableView).toBeHidden()
   })
 
   test("upload non-docx file per file chooser", async ({ page }) => {
@@ -68,7 +64,7 @@ test.describe("upload an original document to a doc unit", () => {
     )
 
     await page.dispatchEvent(".upload-drop-area", "drop", { dataTransfer })
-    await expect(page.getByText("Die ist ein Test")).toBeVisible()
+    await expect(page.getByText("sample.docx")).toBeVisible()
   })
 
   test("drop non-docx file in upload area", async ({ page }) => {

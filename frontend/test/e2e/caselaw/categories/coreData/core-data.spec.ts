@@ -236,6 +236,11 @@ test.describe("core data", () => {
   }) => {
     await test.step("create new docUnit with logged in user", async () => {
       await page.goto("/caselaw")
+      const tableView = page.getByRole("cell", {
+        name: "Dateiname",
+        exact: true,
+      })
+
       await page
         .getByRole("button", {
           name: "Neue Dokumentationseinheit",
@@ -243,9 +248,7 @@ test.describe("core data", () => {
         })
         .click()
 
-      await expect(
-        page.getByText("Aktuell ist keine Datei hinterlegt"),
-      ).toBeVisible()
+      await expect(tableView).toBeHidden()
 
       await page.getByText("Rubriken").click()
       await expect(page.getByText("DOKUMENTATIONSSTELLEDS")).toBeVisible()
@@ -270,9 +273,12 @@ test.describe("core data", () => {
         })
         .click()
 
-      await expect(
-        pageWithBghUser.getByText("Aktuell ist keine Datei hinterlegt"),
-      ).toBeVisible()
+      const tableView = pageWithBghUser.getByRole("cell", {
+        name: "Dateiname",
+        exact: true,
+      })
+
+      await expect(tableView).toBeHidden()
 
       await pageWithBghUser.getByText("Rubriken").click()
       await expect(
