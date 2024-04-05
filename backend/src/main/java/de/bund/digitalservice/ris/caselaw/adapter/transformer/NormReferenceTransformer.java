@@ -3,6 +3,8 @@ package de.bund.digitalservice.ris.caselaw.adapter.transformer;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.NormAbbreviationDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.NormReferenceDTO;
 import de.bund.digitalservice.ris.caselaw.domain.NormReference;
+import de.bund.digitalservice.ris.caselaw.domain.SingleNorm;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -10,11 +12,13 @@ public class NormReferenceTransformer {
   private NormReferenceTransformer() {}
 
   public static NormReference transformToDomain(NormReferenceDTO normDTO) {
+    List<SingleNorm> list = new ArrayList<>();
+    list.add(SingleNormTransformer.transformToDomain(normDTO));
+
     return NormReference.builder()
-        .id(normDTO.getId())
         .normAbbreviation(NormAbbreviationTransformer.transformDTO(normDTO.getNormAbbreviation()))
         .normAbbreviationRawValue(normDTO.getNormAbbreviationRawValue())
-        .singleNorms(List.of(SingleNormTransformer.transformToDomain(normDTO)))
+        .singleNorms(list)
         .build();
   }
 
@@ -29,18 +33,14 @@ public class NormReferenceTransformer {
             : null;
 
     if (normReference.singleNorms() == null) {
-      return List.of(
-          NormReferenceDTO.builder()
-              .id(normReference.id())
-              .normAbbreviation(normAbbreviationDTO)
-              .build());
+      return List.of(NormReferenceDTO.builder().normAbbreviation(normAbbreviationDTO).build());
     }
 
     return normReference.singleNorms().stream()
         .map(
             singleNorm ->
                 NormReferenceDTO.builder()
-                    .id(normReference.id())
+                    .id(singleNorm.id())
                     .normAbbreviation(normAbbreviationDTO)
                     .singleNorm(singleNorm.singleNorm())
                     .dateOfVersion(singleNorm.dateOfVersion())

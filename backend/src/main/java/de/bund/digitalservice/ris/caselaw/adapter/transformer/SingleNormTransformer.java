@@ -7,6 +7,7 @@ public class SingleNormTransformer {
 
   public static SingleNorm transformToDomain(NormReferenceDTO normReferenceDTO) {
     return SingleNorm.builder()
+        .id(normReferenceDTO.getId())
         .singleNorm(normReferenceDTO.getSingleNorm())
         .dateOfRelevance(normReferenceDTO.getDateOfRelevance())
         .dateOfVersion(normReferenceDTO.getDateOfVersion())

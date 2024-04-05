@@ -559,31 +559,29 @@ public class DocumentationUnitTransformer {
             normReferenceDTO -> {
               NormReference normReference =
                   NormReferenceTransformer.transformToDomain(normReferenceDTO);
-              if (normReferences.contains(normReference)) {
-                List<NormReference> existingNormReferences =
-                    normReferences.stream()
-                        .filter(
-                            existingNormReference ->
-                                existingNormReference
-                                    .normAbbreviation()
-                                    .id()
-                                    .equals(normReferenceDTO.getNormAbbreviation().getId()))
-                        .toList();
-                if (existingNormReferences.size() != 1) {
-                  log.error(
-                      "More than one norm references for norm abbreviation ({}, {})",
-                      normReferenceDTO.getNormAbbreviation().getId(),
-                      normReferenceDTO.getNormAbbreviation().getAbbreviation());
-                  throw new DocumentUnitTransformerException(
-                      "More than one norm references with the same norm abbreviation.");
-                } else {
-                  normReferences
-                      .get(0)
-                      .singleNorms()
-                      .add(SingleNormTransformer.transformToDomain(normReferenceDTO));
-                }
-              } else {
+              List<NormReference> existingNormReferences =
+                  normReferences.stream()
+                      .filter(
+                          existingNormReference ->
+                              existingNormReference
+                                  .normAbbreviation()
+                                  .id()
+                                  .equals(normReferenceDTO.getNormAbbreviation().getId()))
+                      .toList();
+              if (existingNormReferences.size() > 1) {
+                log.error(
+                    "More than one norm references for norm abbreviation ({}, {})",
+                    normReferenceDTO.getNormAbbreviation().getId(),
+                    normReferenceDTO.getNormAbbreviation().getAbbreviation());
+                throw new DocumentUnitTransformerException(
+                    "More than one norm references with the same norm abbreviation.");
+              } else if (existingNormReferences.isEmpty()) {
                 normReferences.add(normReference);
+              } else {
+                existingNormReferences
+                    .get(0)
+                    .singleNorms()
+                    .add(SingleNormTransformer.transformToDomain(normReferenceDTO));
               }
             });
 
