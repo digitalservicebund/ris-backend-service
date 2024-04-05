@@ -177,11 +177,10 @@ onBeforeUnmount(() => {
     </div>
     <div class="flex w-full flex-row justify-between">
       <div>
-        <div class="flex">
+        <div class="flex gap-16">
           <TextButton
             aria-label="Weitere Einzelnorm"
             button-type="tertiary"
-            class="mr-16"
             :disabled="!norm.singleNorm"
             :icon="IconAdd"
             label="Weitere Einzelnorm"
@@ -190,7 +189,6 @@ onBeforeUnmount(() => {
           <TextButton
             aria-label="Norm speichern"
             button-type="primary"
-            class="mr-16"
             :disabled="norm.isEmpty"
             label="Übernehmen"
             size="small"
