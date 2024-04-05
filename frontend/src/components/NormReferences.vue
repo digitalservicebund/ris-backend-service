@@ -39,7 +39,14 @@ function decisionSummarizer(normEntry: NormReference) {
             normEntry.renderDecision,
           ),
         ])
-      : h("div", { class: ["link-02-reg"] }, normEntry.renderDecision),
+      : h(
+          "div",
+          { class: ["link-02-reg"] },
+          normEntry.singleNorms
+            ?.map((singleNorm) => singleNorm.renderDecision)
+            .join(" | "),
+        ),
+    ,
   ])
 }
 
