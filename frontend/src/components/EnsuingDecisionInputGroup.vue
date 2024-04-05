@@ -266,12 +266,11 @@ onBeforeUnmount(() => {
 
     <div class="flex w-full flex-row justify-between">
       <div>
-        <div>
+        <div class="flex gap-16">
           <TextButton
             v-if="!ensuingDecision.hasForeignSource"
             aria-label="Nach Entscheidung suchen"
             button-type="primary"
-            class="mr-24"
             label="Suchen"
             size="small"
             @click="search"
@@ -279,7 +278,6 @@ onBeforeUnmount(() => {
           <TextButton
             aria-label="Nachgehende Entscheidung speichern"
             button-type="tertiary"
-            class="mr-24"
             :disabled="ensuingDecision.isEmpty"
             label="Übernehmen"
             size="small"

@@ -177,7 +177,7 @@ onBeforeUnmount(() => {
     </div>
     <div class="flex w-full flex-row justify-between">
       <div>
-        <div class="flex gap-24">
+        <div class="flex gap-16">
           <TextButton
             aria-label="Weitere Einzelnorm"
             button-type="tertiary"
