@@ -9,7 +9,7 @@ import documentUnitService from "@/services/documentUnitService"
 import fileService from "@/services/fileService"
 import { ResponseError } from "@/services/httpClient"
 
-const props = defineProps<{ documentUnit: DocumentUnit; files: [FileItem] }>()
+const props = defineProps<{ documentUnit: DocumentUnit }>()
 const emit = defineEmits<{
   updateDocumentUnit: [updatedDocumentUnit: DocumentUnit]
 }>()
