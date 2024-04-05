@@ -44,9 +44,15 @@ const buttonClasses = computed(() => ({
   "ds-button-with-icon-only": props.icon && !props.label,
   "is-disabled": props.href && props.disabled,
   "pl-16":
-    props.icon && props.buttonType == "ghost" && props.iconPosition === "left",
+    props.icon &&
+    props.label &&
+    props.buttonType !== "ghost" &&
+    props.iconPosition === "left",
   "pr-16":
-    props.icon && props.buttonType == "ghost" && props.iconPosition === "right",
+    props.icon &&
+    props.label &&
+    props.buttonType !== "ghost" &&
+    props.iconPosition === "right",
 }))
 
 const isLink = computed(() => !!props.href)
