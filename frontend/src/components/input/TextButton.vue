@@ -43,6 +43,10 @@ const buttonClasses = computed(() => ({
   "ds-button-with-icon": props.icon,
   "ds-button-with-icon-only": props.icon && !props.label,
   "is-disabled": props.href && props.disabled,
+  "pl-16":
+    props.icon && props.buttonType == "ghost" && props.iconPosition === "left",
+  "pr-16":
+    props.icon && props.buttonType == "ghost" && props.iconPosition === "right",
 }))
 
 const isLink = computed(() => !!props.href)
@@ -53,26 +57,6 @@ const renderIcon = () =>
 
 const renderLabel = () =>
   props.label ? h("span", { class: "ds-button-label" }, props.label) : undefined
-
-const getStyleForButtonWithIcon = () => {
-  const isButtonWithIcon = buttonClasses.value["ds-button-with-icon"]
-  const isButtonWithIconOnly = buttonClasses.value["ds-button-with-icon-only"]
-  const isIconLeft = props.iconPosition === "left"
-  const isIconRight = props.iconPosition === "right"
-  const isGhostButton = props.buttonType === "ghost"
-
-  const decreasePaddingLeft =
-    isButtonWithIcon && !isButtonWithIconOnly && isIconLeft && !isGhostButton
-  const decreasePaddingRight =
-    isButtonWithIcon && !isButtonWithIconOnly && isIconRight && !isGhostButton
-
-  if (decreasePaddingLeft) {
-    return { paddingLeft: "16px" }
-  } else if (decreasePaddingRight) {
-    return { paddingRight: "16px" }
-  }
-  return ""
-}
 
 const render = () => {
   const { disabled, href, download, target } = props
@@ -88,7 +72,6 @@ const render = () => {
       "aria-label": props.ariaLabel,
       disabled: !href && disabled,
       href: sanitizedUrl.value,
-      style: getStyleForButtonWithIcon(),
       download,
       target,
     },
