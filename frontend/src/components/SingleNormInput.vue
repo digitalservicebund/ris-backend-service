@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed } from "vue"
+import { computed, onMounted } from "vue"
 import DateInput from "@/components/input/DateInput.vue"
 import InputField from "@/components/input/InputField.vue"
 import TextInput from "@/components/input/TextInput.vue"
@@ -52,6 +52,12 @@ async function validateNorm() {
     })
   }
 }
+
+onMounted(async () => {
+  if (props.modelValue.singleNorm) {
+    await validateNorm()
+  }
+})
 </script>
 
 <template>
