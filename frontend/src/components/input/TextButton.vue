@@ -54,6 +54,26 @@ const renderIcon = () =>
 const renderLabel = () =>
   props.label ? h("span", { class: "ds-button-label" }, props.label) : undefined
 
+const getStyleForButtonWithIcon = () => {
+  const isButtonWithIcon = buttonClasses.value["ds-button-with-icon"]
+  const isButtonWithIconOnly = buttonClasses.value["ds-button-with-icon-only"]
+  const isIconLeft = props.iconPosition === "left"
+  const isIconRight = props.iconPosition === "right"
+  const isGhostButton = props.buttonType === "ghost"
+
+  const decreasePaddingLeft =
+    isButtonWithIcon && !isButtonWithIconOnly && isIconLeft && !isGhostButton
+  const decreasePaddingRight =
+    isButtonWithIcon && !isButtonWithIconOnly && isIconRight && !isGhostButton
+
+  if (decreasePaddingLeft) {
+    return { paddingLeft: "16px" }
+  } else if (decreasePaddingRight) {
+    return { paddingRight: "16px" }
+  }
+  return ""
+}
+
 const render = () => {
   const { disabled, href, download, target } = props
   let tag = "button"
@@ -68,6 +88,7 @@ const render = () => {
       "aria-label": props.ariaLabel,
       disabled: !href && disabled,
       href: sanitizedUrl.value,
+      style: getStyleForButtonWithIcon(),
       download,
       target,
     },
@@ -90,5 +111,9 @@ const render = () => {
 // eslint-disable vue-scoped-css/no-unused-selector
 .ds-button-large > .ds-button-icon {
   font-size: 2rem;
+}
+
+.ds-button.ds-button-ghost {
+  padding: 12px;
 }
 </style>

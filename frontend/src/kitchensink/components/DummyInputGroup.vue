@@ -56,7 +56,7 @@ onBeforeUnmount(() => {
           <TextButton
             aria-label="Listeneintrag speichern"
             button-type="tertiary"
-            class="mr-24"
+            class="mr-16"
             :disabled="listEntry.isEmpty"
             label="Übernehmen"
             size="small"
