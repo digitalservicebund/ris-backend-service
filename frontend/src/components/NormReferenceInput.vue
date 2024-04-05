@@ -16,7 +16,7 @@ const emit = defineEmits<{
   "update:modelValue": [value: NormReference]
   addEntry: [void]
   cancelEdit: [void]
-  removeListEntry: [void]
+  removeEntry: [void]
 }>()
 
 const validationStore =
@@ -64,6 +64,11 @@ function addNewSingleNormEntry() {
   singleNorms.value.push(new SingleNorm())
 }
 
+async function removeNormReference() {
+  emit("removeEntry")
+  singleNorms.value = []
+}
+
 watch(
   () => props.modelValue,
   () => {
@@ -78,7 +83,7 @@ watch(
 )
 
 onBeforeUnmount(() => {
-  if (norm.value.isEmpty) emit("removeListEntry")
+  if (norm.value.isEmpty) emit("removeEntry")
 })
 </script>
 
@@ -143,7 +148,7 @@ onBeforeUnmount(() => {
           button-type="destructive"
           label="Eintrag löschen"
           size="small"
-          @click.stop="emit('removeListEntry')"
+          @click.stop="removeNormReference"
         />
       </div>
     </div>
