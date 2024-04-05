@@ -24,7 +24,7 @@ const emit = defineEmits<{
   "update:modelValue": [value: EnsuingDecision]
   addEntry: [void]
   cancelEdit: [void]
-  removeListEntry: [void]
+  removeEntry: [void]
 }>()
 
 const lastSearchInput = ref(new EnsuingDecision())
@@ -152,7 +152,7 @@ onMounted(() => {
 })
 
 onBeforeUnmount(() => {
-  if (ensuingDecision.value.isEmpty) emit("removeListEntry")
+  if (ensuingDecision.value.isEmpty) emit("removeEntry")
 })
 </script>
 
@@ -301,7 +301,7 @@ onBeforeUnmount(() => {
         button-type="destructive"
         label="Eintrag löschen"
         size="small"
-        @click.stop="emit('removeListEntry')"
+        @click.stop="emit('removeEntry')"
       />
     </div>
 

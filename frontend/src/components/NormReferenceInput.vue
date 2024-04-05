@@ -60,13 +60,20 @@ async function addNormReference() {
   }
 }
 
-function addNewSingleNormEntry() {
-  singleNorms.value.push(new SingleNorm())
-}
-
 async function removeNormReference() {
   emit("removeEntry")
   singleNorms.value = []
+}
+
+function addSingleNormEntry() {
+  singleNorms.value.push(new SingleNorm())
+}
+/**
+ * Removes the single norm entry, with the given index.
+ * @param {number} index - The index of the list item to be removed
+ */
+function removeSingleNormEntry(index: number) {
+  singleNorms.value.splice(index, 1)
 }
 
 watch(
@@ -77,7 +84,7 @@ watch(
     if (lastSavedModelValue.value.isEmpty) validationStore.reset()
     //when list is empty, add new emptry single norm entry
     if (singleNorms.value?.length == 0 || !singleNorms.value)
-      addNewSingleNormEntry()
+      addSingleNormEntry()
   },
   { immediate: true },
 )
@@ -112,6 +119,7 @@ onBeforeUnmount(() => {
         :key="index"
         v-model="singleNorms[index] as SingleNorm"
         norm-abbreviation="normAbbreviation.abbreviation"
+        @remove-entry="removeSingleNormEntry(index)"
       />
 
       <div class="flex w-full flex-row justify-between">
@@ -123,7 +131,7 @@ onBeforeUnmount(() => {
               :icon="IconAdd"
               label="Weitere Einzelnorm"
               size="small"
-              @click.stop="addNewSingleNormEntry"
+              @click.stop="addSingleNormEntry"
             />
             <TextButton
               aria-label="Norm speichern"

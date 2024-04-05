@@ -13,7 +13,7 @@ const emit = defineEmits<{
   "update:modelValue": [value: DummyListItem]
   addEntry: [void]
   cancelEdit: [void]
-  removeListEntry: [void]
+  removeEntry: [void]
 }>()
 
 const lastSavedModelValue = ref(new DummyListItem({ ...props.modelValue }))
@@ -34,7 +34,7 @@ watch(
 )
 
 onBeforeUnmount(() => {
-  if (listEntry.value.isEmpty) emit("removeListEntry")
+  if (listEntry.value.isEmpty) emit("removeEntry")
 })
 </script>
 
@@ -78,7 +78,7 @@ onBeforeUnmount(() => {
         button-type="destructive"
         label="Eintrag löschen"
         size="small"
-        @click.stop="emit('removeListEntry')"
+        @click.stop="emit('removeEntry')"
       />
     </div>
   </div>

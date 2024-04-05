@@ -7,6 +7,7 @@ import YearInput from "@/components/input/YearInput.vue"
 import { useValidationStore } from "@/composables/useValidationStore"
 import SingleNorm, { SingleNormValidationInfo } from "@/domain/singleNorm"
 import documentUnitService from "@/services/documentUnitService"
+import IconClear from "~icons/material-symbols/close-small"
 
 const props = defineProps<{
   modelValue: SingleNorm
@@ -15,6 +16,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   "update:modelValue": [value: SingleNorm]
+  removeEntry: [void]
 }>()
 
 const validationStore = useValidationStore<(typeof SingleNorm.fields)[number]>()
@@ -51,6 +53,10 @@ async function validateNorm() {
       validationStore.add("Pflichtfeld nicht befüllt", missingField)
     })
   }
+}
+
+async function removeSingleNormEntry() {
+  emit("removeEntry")
 }
 
 onMounted(async () => {
@@ -110,5 +116,13 @@ onMounted(async () => {
         @update:validation-error="slotProps.updateValidationError"
       />
     </InputField>
+    <button
+      aria-label="Einzelnorm löschen"
+      class="input-close-icon flex items-center pt-16 text-blue-800 focus:outline-none focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-blue-800"
+      tabindex="0"
+      @click="removeSingleNormEntry"
+    >
+      <IconClear />
+    </button>
   </div>
 </template>
