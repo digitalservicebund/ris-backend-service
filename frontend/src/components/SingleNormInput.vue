@@ -11,6 +11,7 @@ import IconClear from "~icons/material-symbols/close-small"
 
 const props = defineProps<{
   modelValue: SingleNorm
+  normAbbreviation: string
 }>()
 
 const emit = defineEmits<{
@@ -36,7 +37,7 @@ async function validateNorm() {
   if (singleNorm.value?.singleNorm) {
     const singleNormValidationInfo: SingleNormValidationInfo = {
       singleNorm: singleNorm.value?.singleNorm,
-      normAbbreviation: props.modelValue.normAbbreviation?.abbreviation,
+      normAbbreviation: props.normAbbreviation,
     }
     const response = await documentUnitService.validateSingleNorm(
       singleNormValidationInfo,

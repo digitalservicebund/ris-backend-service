@@ -66,9 +66,7 @@ async function removeNormReference() {
 }
 
 function addSingleNormEntry() {
-  singleNorms.value.push(
-    new SingleNorm({ normAbbreviation: norm.value.normAbbreviation }),
-  )
+  singleNorms.value.push(new SingleNorm())
 }
 /**
  * Removes the single norm entry, with the given index.
@@ -120,6 +118,7 @@ onBeforeUnmount(() => {
         v-for="(entry, index) in singleNorms"
         :key="index"
         v-model="singleNorms[index] as SingleNorm"
+        norm-abbreviation="normAbbreviation.abbreviation"
         @remove-entry="removeSingleNormEntry(index)"
       />
 
