@@ -23,7 +23,7 @@ test.describe("a11y of document page (/caselaw/documentunit/{documentNumber}/fil
 
     await uploadTestfile(page, "sample.docx")
     await expect(page.locator("text=Hochgeladen am")).toBeVisible()
-    await page.locator("text=Datei löschen").click()
+    await page.getByLabel("Datei löschen").click()
 
     const accessibilityScanResults = await new AxeBuilder({ page }).analyze()
     expect(accessibilityScanResults.violations).toEqual([])
