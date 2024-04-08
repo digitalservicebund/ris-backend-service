@@ -4,6 +4,7 @@ import { ComboboxItem } from "@/components/input/types"
 import NormReferences from "@/components/NormReferences.vue"
 import { NormAbbreviation } from "@/domain/normAbbreviation"
 import NormReference from "@/domain/normReference"
+import SingleNorm from "@/domain/singleNorm"
 import comboboxItemService from "@/services/comboboxItemService"
 import documentUnitService from "@/services/documentUnitService"
 
@@ -27,15 +28,11 @@ function renderComponent(options?: { modelValue?: NormReference[] }) {
 
 function generateNormReference(options?: {
   normAbbreviation?: NormAbbreviation
-  singleNorm?: string
-  dateOfVersion?: string
-  dateOfRelevance?: string
+  singleNorms?: SingleNorm[]
 }) {
   const normReference = new NormReference({
     normAbbreviation: options?.normAbbreviation ?? { abbreviation: "ABC" },
-    singleNorm: options?.singleNorm ?? "",
-    dateOfVersion: options?.dateOfVersion ?? "2022-02-01",
-    dateOfRelevance: options?.dateOfRelevance ?? "2022",
+    singleNorms: options?.singleNorms ?? [],
   })
   return normReference
 }
@@ -62,8 +59,12 @@ describe("Norm references", () => {
 
   it("renders norm references as list entries", () => {
     const modelValue: NormReference[] = [
-      generateNormReference({ singleNorm: "§ 123" }),
-      generateNormReference({ singleNorm: "§ 345" }),
+      generateNormReference({
+        singleNorms: [new SingleNorm({ singleNorm: "§ 123" })],
+      }),
+      generateNormReference({
+        singleNorms: [new SingleNorm({ singleNorm: "§ 345" })],
+      }),
     ]
     renderComponent({ modelValue })
 
@@ -80,7 +81,7 @@ describe("Norm references", () => {
     const { user } = renderComponent({
       modelValue: [
         generateNormReference({
-          singleNorm: "§ 123",
+          singleNorms: [new SingleNorm({ singleNorm: "§ 123" })],
         }),
       ],
     })
@@ -93,7 +94,46 @@ describe("Norm references", () => {
     expect(screen.getByLabelText("Jahr der Norm")).toBeInTheDocument()
   })
 
-  it("correctly deletes norm reference", async () => {
+  it("updates norm reference", async () => {
+    const { user, emitted } = renderComponent({
+      modelValue: [generateNormReference()],
+    })
+
+    const norms = screen.getAllByLabelText("Listen Eintrag")
+    expect(norms.length).toBe(1)
+    await user.click(norms[0])
+    const abbreviationField = screen.getByLabelText("RIS-Abkürzung")
+    await user.type(abbreviationField, "1000")
+    const dropdownItems = screen.getAllByLabelText(
+      "dropdown-option",
+    ) as HTMLElement[]
+    expect(dropdownItems[0]).toHaveTextContent("1000g-BefV")
+    await user.click(dropdownItems[0])
+
+    const button = screen.getByLabelText("Norm speichern")
+    await user.click(button)
+    expect(emitted("update:modelValue")).toEqual([
+      [
+        [
+          {
+            normAbbreviation: {
+              abbreviation: "1000g-BefV",
+            },
+            singleNorms: [
+              {
+                dateOfRelevance: undefined,
+                dateOfVersion: undefined,
+                singleNorm: undefined,
+              },
+            ],
+            hasForeignSource: false,
+          },
+        ],
+      ],
+    ])
+  })
+
+  it("deletes norm reference", async () => {
     const { user } = renderComponent({
       modelValue: [generateNormReference(), generateNormReference()],
     })
@@ -118,25 +158,78 @@ describe("Norm references", () => {
     expect(screen.getAllByLabelText("Listen Eintrag").length).toBe(3)
   })
 
-  it("displays error in list and edit component when fields missing", async () => {
+  it("render summary with one single norms", async () => {
     const modelValue: NormReference[] = [
       generateNormReference({
-        normAbbreviation: { abbreviation: "CDE" },
+        normAbbreviation: {
+          abbreviation: "1000g-BefV",
+        },
+        singleNorms: [new SingleNorm({ singleNorm: "§ 123" })],
       }),
     ]
-    const { user } = renderComponent({ modelValue })
-    await screen.findByText(/CDE, 01.02.2022, 2022/)
-    const itemHeader = screen.getByLabelText("Listen Eintrag")
-    await user.click(itemHeader)
+    renderComponent({ modelValue })
 
-    const abbreviationInput = await screen.findByLabelText("RIS-Abkürzung")
-    screen.getByLabelText("Auswahl zurücksetzen").click()
-    await user.clear(abbreviationInput)
-    expect(abbreviationInput).toHaveValue("")
-    await user.click(screen.getByLabelText("Norm speichern"))
-    await screen.findByText(/01.02.2022, 2022/)
-    expect(screen.getByLabelText(/Fehlerhafte Eingabe/)).toBeInTheDocument()
-    await user.click(itemHeader)
-    expect(screen.getByText(/Pflichtfeld nicht befüllt/)).toBeInTheDocument()
+    expect(screen.getByLabelText("Listen Eintrag")).toHaveTextContent(
+      "1000g-BefV§ 123",
+    )
+  })
+
+  it("render summary with multiple single norms", async () => {
+    const modelValue: NormReference[] = [
+      generateNormReference({
+        normAbbreviation: {
+          abbreviation: "1000g-BefV",
+        },
+        singleNorms: [
+          new SingleNorm({ singleNorm: "§ 123" }),
+          new SingleNorm({
+            singleNorm: "§ 345",
+            dateOfRelevance: "02-02-2022",
+            dateOfVersion: "2022",
+          }),
+        ],
+      }),
+    ]
+    renderComponent({ modelValue })
+
+    expect(screen.getByLabelText("Listen Eintrag")).toHaveTextContent(
+      "1000g-BefV§ 123§ 345, 01.01.2022, 02-02-2022",
+    )
+  })
+
+  it("render summary with no single norms", async () => {
+    const modelValue: NormReference[] = [
+      generateNormReference({
+        normAbbreviation: {
+          abbreviation: "1000g-BefV",
+        },
+        singleNorms: [
+          new SingleNorm({ singleNorm: "§ 123" }),
+          new SingleNorm({
+            singleNorm: "§ 345",
+            dateOfRelevance: "02-02-2022",
+            dateOfVersion: "2022",
+          }),
+        ],
+      }),
+    ]
+    renderComponent({ modelValue })
+
+    expect(screen.getByLabelText("Listen Eintrag")).toHaveTextContent(
+      "1000g-BefV§ 123§ 345, 01.01.2022, 02-02-2022",
+    )
+  })
+
+  it("render error badge, when required fields missing", async () => {
+    const modelValue: NormReference[] = [
+      new NormReference({
+        singleNorms: [new SingleNorm({ singleNorm: "§ 123" })],
+      }),
+    ]
+
+    renderComponent({ modelValue })
+
+    // Todo:
+    // add check for error badge when implemented
   })
 })

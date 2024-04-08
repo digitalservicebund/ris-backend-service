@@ -13,7 +13,7 @@ import IconAdd from "~icons/ic/baseline-add"
 
 const props = defineProps<{
   modelValue?: NormReference
-  modelValueList: NormReference[]
+  modelValueList?: NormReference[]
 }>()
 const emit = defineEmits<{
   "update:modelValue": [value: NormReference]
@@ -47,7 +47,7 @@ const normAbbreviation = computed({
     if (newValue) {
       validationStore.remove("normAbbreviation")
       // Check if newValue.abbreviation is already in singleNorms
-      const isAbbreviationPresent = props.modelValueList.some(
+      const isAbbreviationPresent = props.modelValueList?.some(
         (norm) =>
           norm.normAbbreviation?.abbreviation ===
           newNormAbbreviation.abbreviation,
@@ -132,9 +132,10 @@ onBeforeUnmount(() => {
     </InputField>
     <div v-if="normAbbreviation">
       <SingleNormInput
-        v-for="(entry, index) in singleNorms"
+        v-for="(_, index) in singleNorms"
         :key="index"
         v-model="singleNorms[index] as SingleNorm"
+        aria-label="Einzelnorm"
         norm-abbreviation="normAbbreviation.abbreviation"
         @remove-entry="removeSingleNormEntry(index)"
       />

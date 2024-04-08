@@ -118,7 +118,7 @@ onMounted(async () => {
     </InputField>
     <button
       aria-label="Einzelnorm löschen"
-      class="input-close-icon flex items-center pt-16 text-blue-800 focus:outline-none focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-blue-800"
+      class="input-close-icon flex items-center text-blue-800 focus:outline-none focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-blue-800"
       tabindex="0"
       @click="removeSingleNormEntry"
     >

@@ -1,8 +1,6 @@
 import dayjs from "dayjs"
-import { NormAbbreviation } from "./normAbbreviation"
 
 export default class SingleNorm {
-  public normAbbreviation?: NormAbbreviation
   public singleNorm?: string
   public dateOfVersion?: string
   public dateOfRelevance?: string
@@ -24,9 +22,6 @@ export default class SingleNorm {
 
   get renderDecision(): string {
     return [
-      ...(this.normAbbreviation?.abbreviation
-        ? [`${this.normAbbreviation?.abbreviation}`]
-        : []),
       ...(this.singleNorm ? [this.singleNorm] : []),
       ...(this.dateOfVersion
         ? [dayjs(this.dateOfVersion).format("DD.MM.YYYY")]

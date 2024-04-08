@@ -6,8 +6,8 @@ import { DocumentUnitSearchParameter } from "@/components/DocumentUnitSearchEntr
 import { PageableService, Page } from "@/components/Pagination.vue"
 import DocumentUnit from "@/domain/documentUnit"
 import DocumentUnitListEntry from "@/domain/documentUnitListEntry"
-import { SingleNormValidationInfo } from "@/domain/normReference"
 import RelatedDocumentation from "@/domain/relatedDocumentation"
+import { SingleNormValidationInfo } from "@/domain/singleNorm"
 import errorMessages from "@/i18n/errors.json"
 
 interface DocumentUnitService {
