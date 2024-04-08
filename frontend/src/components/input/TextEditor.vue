@@ -306,7 +306,7 @@ const resizeObserver = new ResizeObserver((entries) => {
 </script>
 
 <template>
-  <div id="text-editor" class="editor bg-white" fluid>
+  <div class="editor bg-white" fluid>
     <div v-if="showButtons">
       <div
         :aria-label="ariaLabel + ' Button Leiste'"

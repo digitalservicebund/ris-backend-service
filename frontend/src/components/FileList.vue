@@ -12,19 +12,14 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{
-  (e: "delete", id: number): void
-  (e: "select", id: number): void
+  deleteEvent: [file: File]
 }>()
 
 /**
  * Propagates delete event to parent and closes modal again
  */
-const onDelete = (index: number) => {
-  emit("delete", index)
-}
-
-const onSelect = (index: number) => {
-  emit("select", index)
+const onDelete = (file: File) => {
+  emit("deleteEvent", file)
 }
 </script>
 
@@ -37,11 +32,9 @@ const onSelect = (index: number) => {
       <CellItem></CellItem>
     </TableHeader>
     <TableRow
-      v-for="(file, index) in props.files"
-      :key="index"
-      class="cursor-pointer"
+      v-for="(file, id) in props.files"
+      :key="id"
       data-testid="listEntry"
-      @click="onSelect(index)"
     >
       <CellItem>
         {{ file.name ?? "-" }}
@@ -61,7 +54,7 @@ const onSelect = (index: number) => {
         <button
           aria-label="Datei löschen"
           class="-full cursor-pointer align-middle text-blue-800 focus:outline-none focus-visible:outline-blue-800"
-          @click="onDelete(index)"
+          @click="onDelete(file)"
           @keyup.enter="null"
         >
           <IconDelete />
