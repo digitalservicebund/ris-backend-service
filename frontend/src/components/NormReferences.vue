@@ -27,7 +27,8 @@ const norms = computed({
 function hasSingleNorms(normEntry: NormReference) {
   if (normEntry.singleNorms)
     return (
-      normEntry.singleNorms?.length > 1 || !normEntry.singleNorms[0].isEmpty
+      normEntry.singleNorms?.length > 1 ||
+      (normEntry.singleNorms?.length > 0 && !normEntry.singleNorms[0].isEmpty)
     )
   else return false
 }
