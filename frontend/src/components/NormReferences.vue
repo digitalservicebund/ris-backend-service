@@ -24,6 +24,14 @@ const norms = computed({
   },
 })
 
+function hasSingleNorms(normEntry: NormReference) {
+  if (normEntry.singleNorms)
+    return (
+      normEntry.singleNorms?.length > 1 || !normEntry.singleNorms[0].isEmpty
+    )
+  else return false
+}
+
 const defaultValue = new NormReference()
 
 function decisionSummarizer(normEntry: NormReference) {
@@ -32,16 +40,24 @@ function decisionSummarizer(normEntry: NormReference) {
       h(IconBook, { class: ["mr-8"] }),
       h("div", { class: ["link-01-reg"] }, normEntry.renderDecision),
     ]),
-    h(
-      "div",
-      { class: ["flex flex-col gap-32"] },
-      normEntry.singleNorms?.map((singleNorm) =>
-        h("div", { class: ["flex flex-row items-center"] }, [
-          h(IconArrowRight, { class: ["mr-8"] }),
-          h("div", { class: ["link-01-reg"] }, singleNorm.renderDecision),
-        ]),
-      ),
-    ),
+    hasSingleNorms(normEntry)
+      ? h(
+          "div",
+          { class: ["flex flex-col gap-32"] },
+          normEntry.singleNorms?.map((singleNorm) => {
+            return !singleNorm.isEmpty
+              ? h("div", { class: ["flex flex-row items-center"] }, [
+                  h(IconArrowRight, { class: ["mr-8"] }),
+                  h(
+                    "div",
+                    { class: ["link-01-reg"] },
+                    singleNorm.renderDecision,
+                  ),
+                ])
+              : null
+          }),
+        )
+      : null,
   ])
 }
 
