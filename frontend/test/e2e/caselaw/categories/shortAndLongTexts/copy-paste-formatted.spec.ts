@@ -25,11 +25,12 @@ test("copy-paste from side panel", async ({ page }) => {
   // upload file
   await uploadTestfile(page, "some-text-aligment.docx")
   await expect(page.locator(`text=some-text-aligment.docx`)).toBeVisible()
-  await expect(page.locator(`text=Datei löschen`)).toBeVisible()
-  await expect(page.locator(`text=${leftAlignText}`)).toBeVisible()
-  await expect(page.locator(`text=${rightAlignText}`)).toBeVisible()
-  await expect(page.locator(`text=${centerAlignText}`)).toBeVisible()
-  await expect(page.locator(`text=${justifyAlignText}`)).toBeVisible()
+  await expect(page.getByLabel(`Datei löschen`)).toBeVisible()
+  // todo: re-enable once file preview is re-instated
+  // await expect(page.locator(`text=${leftAlignText}`)).toBeVisible()
+  // await expect(page.locator(`text=${rightAlignText}`)).toBeVisible()
+  // await expect(page.locator(`text=${centerAlignText}`)).toBeVisible()
+  // await expect(page.locator(`text=${justifyAlignText}`)).toBeVisible()
 
   // Click on "Rubriken" und check if original document loaded
   await page.locator("a >> text=Rubriken").click()
