@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { ref } from "vue"
 import { useRoute } from "vue-router"
-import OriginalFileSidePanel from "@/components/OriginalFileSidePanel.vue"
+import OriginalFileSidePanel from "@/components/FilePreview.vue"
 import KitchensinkPage from "@/kitchensink/components/KitchensinkPage.vue"
 import KitchensinkStory from "@/kitchensink/components/KitchensinkStory.vue"
 
@@ -17,7 +17,7 @@ route.params["documentNumber"] = "AABB2022000057"
       <OriginalFileSidePanel
         id="odoc-panel-element"
         class="w-full grow bg-white p-[2rem] pl-40"
-        file="This is some file content"
+        content="This is some file content"
         :has-file="hasFile"
         :open="isOpen"
       />
@@ -27,7 +27,7 @@ route.params["documentNumber"] = "AABB2022000057"
       <OriginalFileSidePanel
         id="odoc-panel-element"
         class="w-full grow bg-white p-[2rem] pl-40"
-        file="This is some file content"
+        content="This is some file content"
         :has-file="!hasFile"
         :open="isOpen"
       />
