@@ -32,20 +32,16 @@ const lastSavedModelValue = ref(new NormReference({ ...props.modelValue }))
 
 const normAbbreviation = computed({
   get: () =>
-    props.modelValue?.normAbbreviation
+    norm.value.normAbbreviation
       ? {
-          label: props.modelValue.normAbbreviation.abbreviation,
+          label: norm.value.normAbbreviation.abbreviation,
           value: norm.value.normAbbreviation,
-          additionalInformation:
-            props.modelValue.normAbbreviation.officialLongTitle,
+          additionalInformation: norm.value.normAbbreviation.officialLongTitle,
         }
       : undefined,
   set: (newValue) => {
     const newNormAbbreviation = { ...newValue } as NormAbbreviation
-    const normRef = new NormReference({
-      normAbbreviation: newNormAbbreviation,
-    })
-    emit("update:modelValue", normRef)
+    norm.value.normAbbreviation = newNormAbbreviation
   },
 })
 
