@@ -64,6 +64,9 @@ const normAbbreviation = computed({
   },
 })
 
+const hasEmptySingleNorms = computed(() =>
+  singleNorms.value.some((singleNorm) => singleNorm.isEmpty),
+)
 async function addNormReference() {
   if (!validationStore.getByMessage("Inhalt nicht valide").length) {
     const normRef = new NormReference({
@@ -141,6 +144,7 @@ onBeforeUnmount(() => {
             <TextButton
               aria-label="Weitere Einzelnorm"
               button-type="tertiary"
+              :disabled="hasEmptySingleNorms"
               :icon="IconAdd"
               label="Weitere Einzelnorm"
               size="small"
