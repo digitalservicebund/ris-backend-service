@@ -1,29 +1,36 @@
 import AxeBuilder from "@axe-core/playwright"
 import { expect } from "@playwright/test"
+import { caselawTest as test } from "../../e2e/caselaw/fixtures"
 import {
   navigateToFiles,
   navigateToPublication,
   uploadTestfile,
-} from "../../e2e/caselaw/e2e-utils"
-import { caselawTest as test } from "../../e2e/caselaw/fixtures"
+} from "~/e2e/caselaw/e2e-utils"
 
 test.describe("a11y of document page (/caselaw/documentunit/{documentNumber}/files)", () => {
   test("upload document", async ({ page, documentNumber }) => {
     await navigateToFiles(page, documentNumber)
 
-    await uploadTestfile(page, "sample.docx")
-    await expect(page.locator("text=Hochgeladen am")).toBeVisible()
+    const tableView = page.getByRole("cell", {
+      name: "Hochgeladen am",
+      exact: true,
+    })
 
+    await uploadTestfile(page, "sample.docx")
+    await expect(tableView).toBeVisible()
     const accessibilityScanResults = await new AxeBuilder({ page }).analyze()
     expect(accessibilityScanResults.violations).toEqual([])
   })
 
   test("delete document", async ({ page, documentNumber }) => {
     await navigateToFiles(page, documentNumber)
-
+    const tableView = page.getByRole("cell", {
+      name: "Hochgeladen am",
+      exact: true,
+    })
     await uploadTestfile(page, "sample.docx")
-    await expect(page.locator("text=Hochgeladen am")).toBeVisible()
     await page.getByLabel("Datei löschen").click()
+    await expect(tableView).toBeHidden()
 
     const accessibilityScanResults = await new AxeBuilder({ page }).analyze()
     expect(accessibilityScanResults.violations).toEqual([])
