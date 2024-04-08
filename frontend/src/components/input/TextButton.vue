@@ -43,6 +43,16 @@ const buttonClasses = computed(() => ({
   "ds-button-with-icon": props.icon,
   "ds-button-with-icon-only": props.icon && !props.label,
   "is-disabled": props.href && props.disabled,
+  "pl-16":
+    props.icon &&
+    props.label &&
+    props.buttonType !== "ghost" &&
+    props.iconPosition === "left",
+  "pr-16":
+    props.icon &&
+    props.label &&
+    props.buttonType !== "ghost" &&
+    props.iconPosition === "right",
 }))
 
 const isLink = computed(() => !!props.href)
@@ -90,5 +100,9 @@ const render = () => {
 // eslint-disable vue-scoped-css/no-unused-selector
 .ds-button-large > .ds-button-icon {
   font-size: 2rem;
+}
+
+.ds-button.ds-button-ghost {
+  padding: 12px;
 }
 </style>

@@ -135,7 +135,6 @@ onBeforeUnmount(() => {
         norm-abbreviation="normAbbreviation.abbreviation"
         @remove-entry="removeSingleNormEntry(index)"
       />
-
       <div class="flex w-full flex-row justify-between">
         <div>
           <div class="flex gap-24">

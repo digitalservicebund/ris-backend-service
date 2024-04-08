@@ -18,11 +18,6 @@ public class NormAbbreviationService {
     return repository.findById(uuid);
   }
 
-  public List<NormAbbreviation> getNormAbbreviationsStartingWithExact(
-      String query, Integer size, Integer page) {
-    return repository.getNormAbbreviationsStartingWithExact(query, size, page);
-  }
-
   public List<NormAbbreviation> findAllNormAbbreviationsContaining(
       String query, Integer size, Integer page) {
     return repository.findAllContainingOrderByAccuracy(query, size, page);

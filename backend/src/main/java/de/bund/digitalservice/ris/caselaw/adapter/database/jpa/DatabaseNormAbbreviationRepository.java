@@ -17,9 +17,6 @@ public interface DatabaseNormAbbreviationRepository
 
   List<NormAbbreviationDTO> findByAbbreviationIgnoreCase(String abbreviation, PageRequest of);
 
-  List<NormAbbreviationDTO> findByAbbreviationStartsWithOrderByAbbreviation(
-      String query, PageRequest of);
-
   List<NormAbbreviationDTO> findByOfficialLetterAbbreviationIgnoreCase(
       String officialLetterAbbreviation, PageRequest of);
 

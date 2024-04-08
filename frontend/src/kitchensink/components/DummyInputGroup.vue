@@ -52,11 +52,10 @@ onBeforeUnmount(() => {
 
     <div class="flex w-full flex-row justify-between">
       <div>
-        <div>
+        <div class="flex gap-16">
           <TextButton
             aria-label="Listeneintrag speichern"
             button-type="tertiary"
-            class="mr-24"
             :disabled="listEntry.isEmpty"
             label="Übernehmen"
             size="small"

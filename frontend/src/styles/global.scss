@@ -2,13 +2,6 @@
 
 @tailwind base;
 
-@layer base {
-  ul,
-  ol {
-    padding: revert;
-    margin: revert;
-  }
-}
 @tailwind components;
 @tailwind utilities;
 
@@ -34,5 +27,11 @@
       font-family: BundesSansWeb, sans-serif;
       font-style: normal;
     }
+  }
+
+  ul,
+  ol {
+    padding: revert;
+    margin: revert;
   }
 }

@@ -1,10 +1,10 @@
 <script lang="ts" setup>
 import { onMounted, ref } from "vue"
 import DocumentUnitWrapper from "@/components/DocumentUnitWrapper.vue"
+import DocumentUnitFileList from "@/components/FileList.vue"
 import FileUpload from "@/components/FileUpload.vue"
-import FileViewer from "@/components/FileViewer.vue"
-import LoadingSpinner from "@/components/LoadingSpinner.vue"
 import DocumentUnit from "@/domain/documentUnit"
+import FileItem from "@/domain/file"
 import documentUnitService from "@/services/documentUnitService"
 import fileService from "@/services/fileService"
 import { ResponseError } from "@/services/httpClient"
@@ -17,6 +17,7 @@ const emit = defineEmits<{
 const error = ref<ResponseError>()
 const html = ref<string>()
 const isLoading = ref(false)
+const acceptedFileFormats = [".docx"]
 
 async function handleDeleteFile() {
   if ((await fileService.delete(props.documentUnit.uuid)).status < 300) {
@@ -48,6 +49,11 @@ async function upload(file: File) {
   }
 }
 
+const deleteFile = (file: FileItem) => {
+  console.log(file)
+  handleDeleteFile()
+}
+
 onMounted(async () => {
   isLoading.value = true
   try {
@@ -69,36 +75,33 @@ onMounted(async () => {
 <template>
   <DocumentUnitWrapper :document-unit="documentUnit">
     <template #default="{ classes }">
-      <div class="flex flex-col" :class="classes">
+      <div class="flex flex-col space-y-20" :class="classes">
         <h1 class="ds-heading-02-reg mb-[1rem]">Dokumente</h1>
-
-        <span v-if="isLoading" class="flex flex-col items-center">
-          <LoadingSpinner />
-        </span>
-
-        <div v-else>
-          <FileViewer
-            v-if="html"
-            :file-name="documentUnit.filename"
-            :file-type="documentUnit.filetype"
-            :html="html"
-            :upload-time-stamp="documentUnit.fileuploadtimestamp"
-            :uuid="documentUnit.uuid"
-            @delete-file="handleDeleteFile"
-          />
-
-          <div v-else class="flex w-[40rem] flex-col items-start">
-            <div class="mb-14">
-              Aktuell ist keine Datei hinterlegt. Wählen Sie die Datei des
-              Originaldokumentes aus
-            </div>
-
+        <DocumentUnitFileList
+          v-if="documentUnit.filename != null"
+          id="file-table"
+          :files="[
+            {
+              name: documentUnit.filename,
+              format: documentUnit.filetype,
+              uploadedDate: documentUnit.fileuploadtimestamp,
+            },
+          ]"
+          @delete-event="deleteFile"
+        ></DocumentUnitFileList>
+        <div>
+          <div class="flex flex-col items-start">
             <FileUpload
+              :accept="acceptedFileFormats.toString()"
               :error="error"
               :is-loading="false"
               @file-selected="(file) => upload(file)"
             />
           </div>
+        </div>
+        <div>
+          Zulässige Dateiformate:
+          {{ acceptedFileFormats.toString().replace(/\./g, " ") }}
         </div>
       </div>
     </template>
