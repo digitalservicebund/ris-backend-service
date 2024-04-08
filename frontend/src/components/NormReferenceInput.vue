@@ -11,7 +11,10 @@ import SingleNorm from "@/domain/singleNorm"
 import ComboboxItemService from "@/services/comboboxItemService"
 import IconAdd from "~icons/ic/baseline-add"
 
-const props = defineProps<{ modelValue?: NormReference }>()
+const props = defineProps<{
+  modelValue?: NormReference
+  modelValueList: NormReference[]
+}>()
 const emit = defineEmits<{
   "update:modelValue": [value: NormReference]
   addEntry: [void]
@@ -41,7 +44,23 @@ const normAbbreviation = computed({
       : undefined,
   set: (newValue) => {
     const newNormAbbreviation = { ...newValue } as NormAbbreviation
-    norm.value.normAbbreviation = newNormAbbreviation
+    if (newValue) {
+      validationStore.remove("normAbbreviation")
+      // Check if newValue.abbreviation is already in singleNorms
+      const isAbbreviationPresent = props.modelValueList.some(
+        (norm) =>
+          norm.normAbbreviation?.abbreviation ===
+          newNormAbbreviation.abbreviation,
+      )
+      if (isAbbreviationPresent) {
+        validationStore.add(
+          "RIS-Abkürzung bereits eingegeben",
+          "normAbbreviation",
+        )
+      } else {
+        norm.value.normAbbreviation = newNormAbbreviation
+      }
+    }
   },
 })
 
@@ -106,7 +125,6 @@ onBeforeUnmount(() => {
         :item-service="ComboboxItemService.getRisAbbreviations"
         no-clear
         placeholder="Abkürzung, Kurz-oder Langtitel oder Region eingeben ..."
-        @click="validationStore.remove('normAbbreviation')"
       ></ComboboxInput>
     </InputField>
     <div v-if="normAbbreviation">
