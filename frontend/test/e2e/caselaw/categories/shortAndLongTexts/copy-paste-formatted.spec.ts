@@ -1,5 +1,9 @@
 import { expect } from "@playwright/test"
-import { navigateToFiles, uploadTestfile } from "../../e2e-utils"
+import {
+  navigateToFiles,
+  uploadTestfile,
+  navigateToCategories,
+} from "../../e2e-utils"
 import { caselawTest as test } from "../../fixtures"
 
 // eslint-disable-next-line playwright/no-skipped-test
@@ -12,7 +16,7 @@ test.beforeEach(async ({ page, documentNumber }) => {
   await navigateToFiles(page, documentNumber)
 })
 
-test("copy-paste from side panel", async ({ page }) => {
+test("copy-paste from side panel", async ({ page, documentNumber }) => {
   const leftAlignText = "I am left aligned"
   const rightAlignText = "I am right aligned"
   const centerAlignText = "I am centered"
@@ -33,7 +37,8 @@ test("copy-paste from side panel", async ({ page }) => {
   // await expect(page.locator(`text=${justifyAlignText}`)).toBeVisible()
 
   // Click on "Rubriken" und check if original document loaded
-  await page.locator("a >> text=Rubriken").click()
+  await navigateToCategories(page, documentNumber)
+
   await page.getByLabel("Originaldokument öffnen").click()
   await expect(page.getByLabel("Ladestatus")).toBeHidden()
   await expect(page.locator(`text=${rightAlignText}`)).toBeVisible()

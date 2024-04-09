@@ -19,7 +19,7 @@ plugins {
     id("com.adarshr.test-logger") version "4.0.0"
     id("com.github.ben-manes.versions") version "0.51.0"
     id("io.franzbecker.gradle-lombok") version "5.0.0"
-    id("org.flywaydb.flyway") version "10.10.0"
+    id("org.flywaydb.flyway") version "10.11.0"
 }
 
 group = "de.bund.digitalservice"
@@ -194,7 +194,7 @@ dependencies {
     implementation("io.micrometer:micrometer-registry-prometheus:1.12.4")
     implementation("io.micrometer:micrometer-core:1.12.4")
 
-    implementation(platform("io.sentry:sentry-bom:7.6.0"))
+    implementation(platform("io.sentry:sentry-bom:7.7.0"))
     implementation("io.sentry:sentry-spring-boot-starter-jakarta")
     implementation("io.sentry:sentry-logback")
 
@@ -202,10 +202,10 @@ dependencies {
     // => CVE-2023-2976
     implementation("com.google.guava:guava:33.1.0-jre")
 
-    var flywayCore = "org.flywaydb:flyway-core:10.10.0"
+    var flywayCore = "org.flywaydb:flyway-core:10.11.0"
     implementation(flywayCore)
     "migrationImplementation"(flywayCore)
-    runtimeOnly("org.flywaydb:flyway-database-postgresql:10.10.0")
+    runtimeOnly("org.flywaydb:flyway-database-postgresql:10.11.0")
 
     implementation("io.getunleash:unleash-client-java:9.2.0")
     implementation("org.apache.commons:commons-text:1.11.0")

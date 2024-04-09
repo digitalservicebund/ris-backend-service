@@ -83,6 +83,25 @@ import IconClear from "~icons/ic/baseline-clear"
       </div>
     </KitchensinkStory>
 
+    <KitchensinkStory name="Destructive">
+      <div class="flex gap-20">
+        <TextButton button-type="destructive" label="Button Destructive" />
+        <TextButton
+          button-type="destructive"
+          :icon="IconClear"
+          label="Button Destructive With Icon"
+        />
+        <TextButton
+          button-type="destructive"
+          :icon="IconClear"
+          icon-position="right"
+          label="Button Destructive With Icon on the Right"
+        />
+        <TextButton button-type="destructive" :icon="IconClear" />
+        <TextButton button-type="destructive" disabled label="Disabled" />
+      </div>
+    </KitchensinkStory>
+
     <KitchensinkStory name="Medium">
       <div class="flex gap-20">
         <TextButton

@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, ref, watch } from "vue"
+import { computed } from "vue"
 import IconChevronLeft from "~icons/ic/baseline-chevron-left"
 import IconChevronRight from "~icons/ic/baseline-chevron-right"
 
@@ -17,29 +17,9 @@ const props = withDefaults(defineProps<Props>(), {
 
 const emit = defineEmits<{
   "update:isExpanded": [value: boolean]
-  toggle: [void]
 }>()
 
-const localIsExpanded = ref(false)
-
-const closeIconNames = {
-  [OpeningDirection.LEFT]: "chevron_right",
-  [OpeningDirection.RIGHT]: "chevron_left",
-}
-
-const openIconNames = {
-  [OpeningDirection.RIGHT]: "chevron_right",
-  [OpeningDirection.LEFT]: "chevron_left",
-}
-
-const iconName = computed(() =>
-  localIsExpanded.value
-    ? closeIconNames[props.openingDirection]
-    : openIconNames[props.openingDirection],
-)
-
-const postFix = computed(() => (localIsExpanded.value ? "schließen" : "öffnen"))
-const label = computed(() => props.label + " " + postFix.value)
+const postFix = computed(() => (props.isExpanded ? "schließen" : "öffnen"))
 
 const classes = computed(() => ({
   "right-0": props.openingDirection == OpeningDirection.RIGHT,
@@ -48,18 +28,9 @@ const classes = computed(() => ({
   "-ml-12": props.openingDirection == OpeningDirection.LEFT,
 }))
 
-function toggleContentVisibility(): void {
-  localIsExpanded.value = !localIsExpanded.value
-  emit("toggle")
+const toggle = () => {
+  emit("update:isExpanded", !props.isExpanded)
 }
-
-watch(
-  () => props.isExpanded,
-  () => (localIsExpanded.value = props.isExpanded ?? false),
-  { immediate: true },
-)
-
-watch(localIsExpanded, () => emit("update:isExpanded", localIsExpanded.value))
 </script>
 
 <script lang="ts">
@@ -72,19 +43,25 @@ export enum OpeningDirection {
 <template>
   <div class="relative bg-white pr-[1.25rem]">
     <button
-      :aria-label="label"
+      :aria-label="props.label + ' ' + postFix"
       class="absolute top-28 z-20 flex items-center"
       :class="classes"
-      @click="toggleContentVisibility"
     >
       <span
         class="w-icon rounded-full border-1 border-solid border-gray-400 bg-white text-16 text-gray-900"
       >
-        <IconChevronLeft v-if="iconName === 'chevron_left'" />
-        <IconChevronRight v-else-if="iconName === 'chevron_right'" />
+        <IconChevronLeft
+          v-if="
+            props.openingDirection === OpeningDirection.LEFT
+              ? !isExpanded
+              : isExpanded
+          "
+          @click="toggle"
+        />
+        <IconChevronRight v-else @click="toggle" />
       </span>
     </button>
-    <div v-show="localIsExpanded" class="-mr-[1.25rem]">
+    <div v-show="isExpanded" class="-mr-[1.25rem]">
       <slot />
     </div>
   </div>

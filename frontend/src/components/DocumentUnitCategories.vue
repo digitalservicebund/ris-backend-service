@@ -6,8 +6,8 @@ import DocumentUnitCoreData from "@/components/DocumentUnitCoreData.vue"
 import DocumentUnitTexts from "@/components/DocumentUnitTexts.vue"
 import DocumentUnitWrapper from "@/components/DocumentUnitWrapper.vue"
 import EnsuingDecisions from "@/components/EnsuingDecisions.vue"
+import FilePreview from "@/components/FilePreview.vue"
 import { ValidationError } from "@/components/input/types"
-import OriginalFileSidePanel from "@/components/OriginalFileSidePanel.vue"
 import PreviousDecisions from "@/components/PreviousDecisions.vue"
 import SideToggle, { OpeningDirection } from "@/components/SideToggle.vue"
 import { useScrollToHash } from "@/composables/useScrollToHash"
@@ -51,9 +51,6 @@ const handleUpdateValueDocumentUnitTexts = async (
 function hasDataChange(): boolean {
   const newValue = JSON.stringify(updatedDocumentUnit.value)
   const oldValue = JSON.stringify(lastUpdatedDocumentUnit.value)
-
-  // console.log("newValue:", newValue)
-  // console.log("oldValue:", oldValue)
 
   return newValue !== oldValue
 }
@@ -159,6 +156,10 @@ async function getOriginalDocumentUnit() {
   }
 }
 
+const togglePanel = () => {
+  showDocPanel.value = !showDocPanel.value
+}
+
 onMounted(async () => {
   await getOriginalDocumentUnit()
 })
@@ -203,22 +204,24 @@ onMounted(async () => {
         </div>
 
         <div
+          v-show="documentUnit.hasFile"
           class="flex flex-col border-l-1 border-solid border-gray-400 bg-white"
           :class="{ full: showDocPanel }"
         >
           <SideToggle
-            v-model:is-expanded="showDocPanel"
             class="sticky top-[8rem] z-20"
+            :is-expanded="showDocPanel"
             label="Originaldokument"
             :opening-direction="OpeningDirection.LEFT"
+            @update:is-expanded="togglePanel"
           >
-            <OriginalFileSidePanel
+            <FilePreview
+              v-if="fileAsHTML?.html"
               id="odoc-panel-element"
               v-model:open="showDocPanel"
               class="bg-white"
               :class="classes"
-              :file="fileAsHTML?.html"
-              :has-file="documentUnit.hasFile"
+              :content="fileAsHTML.html"
             />
           </SideToggle>
         </div>

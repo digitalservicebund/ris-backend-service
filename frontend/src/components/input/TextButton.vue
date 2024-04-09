@@ -103,6 +103,7 @@ const render = () => {
 }
 
 .ds-button.ds-button-ghost {
-  padding: 12px;
+  padding-right: 12px;
+  padding-left: 12px;
 }
 </style>

@@ -1,5 +1,9 @@
 import { expect } from "@playwright/test"
-import { navigateToFiles, uploadTestfile } from "../../e2e-utils"
+import {
+  navigateToCategories,
+  navigateToFiles,
+  uploadTestfile,
+} from "../../e2e-utils"
 import { caselawTest as test } from "../../fixtures"
 
 // eslint-disable-next-line playwright/no-skipped-test
@@ -21,7 +25,10 @@ test.beforeEach(async ({ page, documentNumber }) => {
     6. Check validation state after save
 */
 // eslint-disable-next-line playwright/no-skipped-test
-test("create and validate border number links", async ({ page }) => {
+test("create and validate border number links", async ({
+  page,
+  documentNumber,
+}) => {
   // Copy border numbers from side panel into reasons to have reference data
   const documentOrigin = "Gründe:"
   const firstReason = "First reason"
@@ -38,7 +45,7 @@ test("create and validate border number links", async ({ page }) => {
   //await expect(page.locator(`text=${thirdReason}`)).toBeVisible()
 
   // Click on "Rubriken" und check if original document loaded
-  await page.locator("a >> text=Rubriken").click()
+  await navigateToCategories(page, documentNumber)
   await page.getByLabel("Originaldokument öffnen").click()
   await expect(page.getByLabel("Ladestatus")).toBeHidden()
   await expect(page.locator(`text=${firstReason}`)).toBeVisible()
