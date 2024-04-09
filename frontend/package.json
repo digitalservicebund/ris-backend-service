@@ -34,7 +34,7 @@
     "@sentry/vue": "^7.109.0",
     "@tiptap/extension-bold": "^2.2.6",
     "@tiptap/extension-bullet-list": "^2.2.6",
-    "@tiptap/extension-color": "^2.2.6",
+    "@tiptap/extension-color": "^2.3.0",
     "@tiptap/extension-document": "^2.2.6",
     "@tiptap/extension-history": "^2.2.6",
     "@tiptap/extension-image": "^2.2.6",
