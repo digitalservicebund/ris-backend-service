@@ -31,6 +31,7 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.EmailPublishService;
+import de.bund.digitalservice.ris.caselaw.domain.OriginalFileDocumentService;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw.FieldOfLaw;
 import java.util.Collections;
@@ -96,6 +97,7 @@ class DocumentUnitFieldOfLawIntegrationTest {
   @MockBean private DocxConverterService docxConverterService;
   @MockBean private UserService userService;
   @MockBean private ReactiveClientRegistrationRepository clientRegistrationRepository;
+  @MockBean private OriginalFileDocumentService originalFileDocumentService;
 
   private final DocumentationOffice docOffice = buildDefaultDocOffice();
   private DocumentationOfficeDTO documentationOfficeDTO;

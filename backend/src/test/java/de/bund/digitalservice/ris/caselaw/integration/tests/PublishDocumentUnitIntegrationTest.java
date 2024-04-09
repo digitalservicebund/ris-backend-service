@@ -32,6 +32,7 @@ import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
 import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.HttpMailSender;
+import de.bund.digitalservice.ris.caselaw.domain.OriginalFileDocumentService;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationHistoryRecordType;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.XmlPublication;
@@ -110,6 +111,7 @@ class PublishDocumentUnitIntegrationTest {
   @MockBean private S3AsyncClient s3AsyncClient;
   @MockBean private HttpMailSender mailSender;
   @MockBean DocxConverterService docxConverterService;
+  @MockBean OriginalFileDocumentService originalFileDocumentService;
 
   private DocumentationOfficeDTO docOffice;
 

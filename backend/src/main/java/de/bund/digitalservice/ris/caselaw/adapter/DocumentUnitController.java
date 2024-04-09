@@ -5,6 +5,7 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitException;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitListItem;
+import de.bund.digitalservice.ris.caselaw.domain.OriginalFileDocumentService;
 import de.bund.digitalservice.ris.caselaw.domain.Publication;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationHistoryRecord;
 import de.bund.digitalservice.ris.caselaw.domain.RelatedDocumentationUnit;
@@ -47,12 +48,17 @@ import reactor.core.publisher.Mono;
 public class DocumentUnitController {
   private final DocumentUnitService service;
   private final UserService userService;
+  private final OriginalFileDocumentService originalFileDocumentService;
   private final ConverterService converterService;
 
   public DocumentUnitController(
-      DocumentUnitService service, UserService userService, ConverterService converterService) {
+      DocumentUnitService service,
+      UserService userService,
+      OriginalFileDocumentService originalFileDocumentService,
+      ConverterService converterService) {
     this.service = service;
     this.userService = userService;
+    this.originalFileDocumentService = originalFileDocumentService;
     this.converterService = converterService;
   }
 
@@ -87,24 +93,23 @@ public class DocumentUnitController {
       @RequestBody ByteBuffer byteBuffer,
       @RequestHeader HttpHeaders httpHeaders) {
 
-    return service
-        .attachFileToDocumentUnit(uuid, byteBuffer, httpHeaders)
-        .flatMap(
-            documentationUnit -> converterService.getConvertedObject(documentationUnit.s3path()))
-        .doOnNext(docx2html -> service.updateECLI(uuid, docx2html))
+    return converterService
+        .getConvertedObject(
+            originalFileDocumentService
+                .attachFileToDocumentationUnit(uuid, byteBuffer, httpHeaders)
+                .s3path())
         .map(docx2Html -> ResponseEntity.status(HttpStatus.OK).body(docx2Html))
         .onErrorReturn(ResponseEntity.internalServerError().build());
   }
 
-  @DeleteMapping(value = "/{uuid}/file")
+  @DeleteMapping(value = "/{uuid}/file/{s3Path}")
   @PreAuthorize("@userHasWriteAccessByDocumentUnitUuid.apply(#uuid)")
-  public Mono<ResponseEntity<DocumentUnit>> removeFileFromDocumentUnit(@PathVariable UUID uuid) {
+  public Mono<ResponseEntity<Object>> removeFileFromDocumentUnit(
+      @PathVariable UUID uuid, @PathVariable String s3Path) {
 
     try {
-      return service
-          .removeFileFromDocumentUnit(uuid)
-          .map(documentUnit -> ResponseEntity.status(HttpStatus.OK).body(documentUnit))
-          .onErrorReturn(ResponseEntity.internalServerError().body(DocumentUnit.builder().build()));
+      originalFileDocumentService.deleteByS3path(s3Path);
+      return Mono.just(ResponseEntity.noContent().build());
     } catch (Exception e) {
       return Mono.error(e);
     }
@@ -234,13 +239,14 @@ public class DocumentUnitController {
 
   @GetMapping(value = "/{uuid}/docx", produces = MediaType.APPLICATION_JSON_VALUE)
   @PreAuthorize("@userHasReadAccessByDocumentUnitUuid.apply(#uuid)")
-  public Mono<ResponseEntity<Docx2Html>> html(@PathVariable UUID uuid) {
+  public Mono<ResponseEntity<Docx2Html>> getHtml(@PathVariable UUID uuid) {
     return service
         .getByUuid(uuid)
         .flatMap(
             documentUnit -> {
-              if (documentUnit.s3path() != null) {
-                return converterService.getConvertedObject(documentUnit.s3path());
+              if (documentUnit.originalFiles().get(0).s3path() != null) {
+                return converterService.getConvertedObject(
+                    documentUnit.originalFiles().get(0).s3path());
               } else {
                 return Mono.empty();
               }

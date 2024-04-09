@@ -34,6 +34,7 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.EmailPublishService;
 import de.bund.digitalservice.ris.caselaw.domain.NormReference;
+import de.bund.digitalservice.ris.caselaw.domain.OriginalFileDocumentService;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.NormAbbreviation;
 import java.util.ArrayList;
@@ -96,6 +97,7 @@ class SaveNormIntegrationTest {
   @MockBean private DocxConverterService docxConverterService;
   @MockBean private UserService userService;
   @MockBean private ReactiveClientRegistrationRepository clientRegistrationRepository;
+  @MockBean private OriginalFileDocumentService originalFileDocumentService;
 
   private final DocumentationOffice docOffice = buildDefaultDocOffice();
   private DocumentationOfficeDTO documentationOfficeDTO;
@@ -125,7 +127,7 @@ class SaveNormIntegrationTest {
     normAbbreviationRepository.deleteAll();
   }
 
-  // TODO: write a test for add a document type with a wrong shortcut
+  // TODO: write a test for add a document extension with a wrong shortcut
 
   @Test
   void testSaveNorm_withoutNorm() {

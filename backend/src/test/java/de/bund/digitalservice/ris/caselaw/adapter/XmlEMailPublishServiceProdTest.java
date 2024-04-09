@@ -10,6 +10,7 @@ import de.bund.digitalservice.ris.caselaw.domain.Attachment;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.HttpMailSender;
+import de.bund.digitalservice.ris.caselaw.domain.OriginalFileDocument;
 import de.bund.digitalservice.ris.caselaw.domain.XmlExporter;
 import de.bund.digitalservice.ris.caselaw.domain.XmlPublication;
 import de.bund.digitalservice.ris.caselaw.domain.XmlPublicationRepository;
@@ -102,7 +103,8 @@ class XmlEMailPublishServiceProdTest {
                 CoreData.builder()
                     .court(Court.builder().location("testLocation").label("testLabel").build())
                     .build())
-            .filename("file_name")
+            .originalFiles(
+                Collections.singletonList(OriginalFileDocument.builder().name("file_name").build()))
             .build();
     when(xmlExporter.generateXml(any(DocumentUnit.class))).thenReturn(FORMATTED_XML);
 

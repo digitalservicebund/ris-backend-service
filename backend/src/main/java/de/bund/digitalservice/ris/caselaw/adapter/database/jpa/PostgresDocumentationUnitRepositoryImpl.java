@@ -352,35 +352,6 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
   }
 
   @Override
-  @Transactional(transactionManager = "jpaTransactionManager")
-  public Mono<DocumentUnit> attachFile(
-      UUID documentUnitUuid, String fileUuid, String type, String fileName) {
-    var docUnitDto = repository.findById(documentUnitUuid).orElseThrow();
-    docUnitDto.setOriginalFileDocument(
-        OriginalFileDocumentDTO.builder()
-            .id(UUID.randomUUID())
-            .s3ObjectPath(fileUuid)
-            .filename(fileName)
-            .extension(type)
-            .uploadTimestamp(Instant.now())
-            .build());
-    docUnitDto = repository.save(docUnitDto);
-    return Mono.just(DocumentationUnitTransformer.transformToDomain(docUnitDto));
-  }
-
-  @Override
-  @Transactional(transactionManager = "jpaTransactionManager")
-  public DocumentUnit removeFile(UUID documentUnitId) {
-    var docUnitDto = repository.findById(documentUnitId).orElseThrow();
-
-    docUnitDto.setOriginalFileDocument(null);
-
-    docUnitDto = repository.save(docUnitDto);
-
-    return DocumentationUnitTransformer.transformToDomain(docUnitDto);
-  }
-
-  @Override
   public void delete(DocumentUnit documentUnit) {
     repository.deleteById(documentUnit.uuid());
   }

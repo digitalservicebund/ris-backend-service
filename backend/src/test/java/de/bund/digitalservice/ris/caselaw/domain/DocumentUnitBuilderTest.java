@@ -6,6 +6,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOffi
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.OriginalFileDocumentDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationUnitTransformer;
+import java.util.Collections;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -15,14 +16,14 @@ class DocumentUnitBuilderTest {
   @Test
   void shouldConvertDocumentationUnitCorrectly() {
     DocumentationUnitDTO documentationUnitDTO = new DocumentationUnitDTO();
-    documentationUnitDTO.setOriginalFileDocument(
-        OriginalFileDocumentDTO.builder().filename("doc.docx").build());
+    documentationUnitDTO.setOriginalFileDocuments(
+        Collections.singletonList(OriginalFileDocumentDTO.builder().filename("doc.docx").build()));
     documentationUnitDTO.setGrounds("reasons123");
     documentationUnitDTO.setDocumentationOffice(DocumentationOfficeDTO.builder().build());
     DocumentUnit documentUnit =
         DocumentationUnitTransformer.transformToDomain(documentationUnitDTO);
 
-    assertThat(documentUnit.filename()).isEqualTo("doc.docx");
+    assertThat(documentUnit.originalFiles().get(0).name()).isEqualTo("doc.docx");
     assertThat(documentUnit.texts().reasons()).isEqualTo("reasons123");
   }
 }

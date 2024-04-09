@@ -5,7 +5,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.ManyToOne;
 import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
 import java.util.UUID;
@@ -35,7 +35,7 @@ public class OriginalFileDocumentDTO {
   @Column(name = "s3_object_path")
   private String s3ObjectPath;
 
-  @OneToOne
+  @ManyToOne
   @JoinColumn(name = "documentation_unit_id")
   private DocumentationUnitDTO documentationUnit;
 }

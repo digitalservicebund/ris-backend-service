@@ -67,26 +67,6 @@ public interface DocumentUnitRepository {
   void saveProcedures(DocumentUnit documentUnit);
 
   /**
-   * Attach a file (e.g. .docx) to a documentation unit
-   *
-   * @param documentUnitUuid the documentation unit uuid to save the file for
-   * @param fileUuid the id of the uploaded file to attach
-   * @param type the type of the attached file
-   * @param fileName the name of the attached file
-   * @return the updated documentation unit with the file attached
-   */
-  Mono<DocumentUnit> attachFile(
-      UUID documentUnitUuid, String fileUuid, String type, String fileName);
-
-  /**
-   * Remove a file from a documentation unit
-   *
-   * @param documentUnitId the documentation unit id to remove the file from
-   * @return the documentation unit with the file removed
-   */
-  DocumentUnit removeFile(UUID documentUnitId);
-
-  /**
    * Delete a documentation unit
    *
    * @param documentUnit the documentation unit to delete
@@ -127,8 +107,8 @@ public interface DocumentUnitRepository {
    * documentation unit can safely be deleted.
    *
    * @param documentUnitUuid the UUID of the documentation unit to find links to
-   * @return a map containing the relation type (e.g. previous decision) and the number of links
-   *     with this relation in the documentation unit with the given id
+   * @return a map containing the relation extension (e.g. previous decision) and the number of
+   *     links with this relation in the documentation unit with the given id
    */
   Map<RelatedDocumentationType, Long> getAllDocumentationUnitWhichLink(UUID documentUnitUuid);
 

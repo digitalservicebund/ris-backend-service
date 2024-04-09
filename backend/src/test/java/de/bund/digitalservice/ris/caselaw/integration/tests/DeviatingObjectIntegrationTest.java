@@ -31,6 +31,7 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.EmailPublishService;
+import de.bund.digitalservice.ris.caselaw.domain.OriginalFileDocumentService;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import java.time.LocalDate;
 import java.util.Collections;
@@ -84,11 +85,13 @@ class DeviatingObjectIntegrationTest {
   @Autowired private RisWebTestClient risWebTestClient;
   @Autowired private DatabaseDocumentationUnitRepository repository;
   @Autowired private DatabaseDocumentationOfficeRepository documentationOfficeRepository;
+
   @MockBean private S3AsyncClient s3AsyncClient;
   @MockBean private EmailPublishService publishService;
   @MockBean private DocxConverterService docxConverterService;
   @MockBean private UserService userService;
   @MockBean private ReactiveClientRegistrationRepository clientRegistrationRepository;
+  @MockBean private OriginalFileDocumentService originalFileDocumentService;
 
   private final DocumentationOffice docOffice = buildDefaultDocOffice();
 

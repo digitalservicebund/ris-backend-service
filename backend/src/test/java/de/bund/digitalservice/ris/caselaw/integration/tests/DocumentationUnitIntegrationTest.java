@@ -47,6 +47,7 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitSearchInput;
 import de.bund.digitalservice.ris.caselaw.domain.EmailPublishService;
+import de.bund.digitalservice.ris.caselaw.domain.OriginalFileDocumentService;
 import de.bund.digitalservice.ris.caselaw.domain.PreviousDecision;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.Status;
@@ -121,11 +122,13 @@ class DocumentationUnitIntegrationTest {
   @Autowired private DatabaseCourtRepository courtRepository;
   @Autowired private DatabaseRegionRepository regionRepository;
   @Autowired private DatabaseDocumentNumberRepository databaseDocumentNumberRepository;
+
   @MockBean private S3AsyncClient s3AsyncClient;
   @MockBean private EmailPublishService publishService;
   @MockBean private DocxConverterService docxConverterService;
   @MockBean private UserService userService;
   @MockBean private ReactiveClientRegistrationRepository clientRegistrationRepository;
+  @MockBean private OriginalFileDocumentService originalFileDocumentService;
   private final DocumentationOffice docOffice = buildDefaultDocOffice();
   private UUID documentationOfficeUuid;
 

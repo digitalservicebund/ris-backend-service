@@ -29,7 +29,7 @@ public record DocumentationUnitListItem(
     String documentNumber,
     Court court,
     String fileNumber,
-    String fileName,
+    Boolean hasFiles,
     LocalDate decisionDate,
     String appraisalBody,
     Boolean hasHeadnoteOrPrinciple,

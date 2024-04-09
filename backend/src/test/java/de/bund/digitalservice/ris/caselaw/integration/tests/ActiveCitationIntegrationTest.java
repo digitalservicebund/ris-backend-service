@@ -31,6 +31,7 @@ import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.EmailPublishService;
+import de.bund.digitalservice.ris.caselaw.domain.OriginalFileDocumentService;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import de.bund.digitalservice.ris.caselaw.domain.court.Court;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.citation.CitationType;
@@ -89,12 +90,14 @@ class ActiveCitationIntegrationTest {
   @Autowired private DatabaseDocumentTypeRepository documentTypeRepository;
   @Autowired private DatabaseDocumentationOfficeRepository documentationOfficeRepository;
   @Autowired private DatabaseRelatedDocumentationRepository relatedDocumentationRepository;
+  @Autowired private DatabaseDocumentCategoryRepository databaseDocumentCategoryRepository;
+
   @MockBean private UserService userService;
-  @MockBean ReactiveClientRegistrationRepository clientRegistrationRepository;
+  @MockBean private ReactiveClientRegistrationRepository clientRegistrationRepository;
   @MockBean private S3AsyncClient s3AsyncClient;
   @MockBean private EmailPublishService publishService;
   @MockBean private DocxConverterService docxConverterService;
-  @Autowired private DatabaseDocumentCategoryRepository databaseDocumentCategoryRepository;
+  @MockBean private OriginalFileDocumentService originalFileDocumentService;
 
   @BeforeEach
   void setUp() {

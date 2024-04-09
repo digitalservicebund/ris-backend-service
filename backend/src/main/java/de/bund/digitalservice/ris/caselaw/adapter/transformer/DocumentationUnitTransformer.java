@@ -14,7 +14,6 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.InputTypeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LeadingDecisionNormReferenceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LegalEffectDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.NormReferenceDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.OriginalFileDocumentDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PendingDecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.StatusDTO;
 import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
@@ -522,17 +521,7 @@ public class DocumentationUnitTransformer {
             documentationUnitDTO.getCaseFacts(),
             documentationUnitDTO.getDecisionGrounds());
 
-    if (documentationUnitDTO.getOriginalFileDocument() != null) {
-      OriginalFileDocumentDTO originalFileDocumentDTO =
-          documentationUnitDTO.getOriginalFileDocument();
-
-      builder
-          .fileuploadtimestamp(originalFileDocumentDTO.getUploadTimestamp())
-          .s3path(originalFileDocumentDTO.getS3ObjectPath())
-          .filetype(originalFileDocumentDTO.getExtension())
-          .filename(originalFileDocumentDTO.getFilename());
-    }
-
+    addOriginalFileDocuments(documentationUnitDTO, builder);
     addPreviousDecisionsToDomain(documentationUnitDTO, builder);
     addEnsuingDecisionsToDomain(documentationUnitDTO, builder);
 
@@ -608,6 +597,14 @@ public class DocumentationUnitTransformer {
     }
 
     return legalEffect;
+  }
+
+  private static void addOriginalFileDocuments(
+      DocumentationUnitDTO documentationUnitDTO, DocumentUnitBuilder builder) {
+    builder.originalFiles(
+        documentationUnitDTO.getOriginalFileDocuments().stream()
+            .map(OriginalFileDocumentTransformer::transformToDomain)
+            .toList());
   }
 
   private static void addStatusToDomain(
