@@ -100,7 +100,7 @@ watch(
     norm.value = new NormReference({ ...props.modelValue })
     lastSavedModelValue.value = new NormReference({ ...props.modelValue })
     if (lastSavedModelValue.value.isEmpty) validationStore.reset()
-    //when list is empty, add new emptry single norm entry
+    //when list is empty, add new empty single norm entry
     if (singleNorms.value?.length == 0 || !singleNorms.value)
       addSingleNormEntry()
   },
