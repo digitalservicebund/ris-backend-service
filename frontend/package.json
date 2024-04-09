@@ -36,7 +36,7 @@
     "@tiptap/extension-bullet-list": "^2.2.6",
     "@tiptap/extension-color": "^2.2.6",
     "@tiptap/extension-document": "^2.2.6",
-    "@tiptap/extension-history": "^2.2.6",
+    "@tiptap/extension-history": "^2.3.0",
     "@tiptap/extension-image": "^2.2.6",
     "@tiptap/extension-italic": "^2.2.6",
     "@tiptap/extension-list-item": "^2.2.6",
