@@ -14,7 +14,7 @@ function renderComponent(options?: { modelValue?: NormReference }) {
     modelValue: new NormReference({ ...options?.modelValue }),
   }
   const utils = render(NormReferenceInput, { props })
-  return { screen, user, props, ...utils }
+  return { user, props, ...utils }
 }
 
 describe("NormReferenceEntry", () => {
@@ -44,22 +44,24 @@ describe("NormReferenceEntry", () => {
       screen.queryByLabelText("Fassungsdatum der Norm"),
     ).not.toBeInTheDocument()
     expect(screen.queryByLabelText("Jahr der Norm")).not.toBeInTheDocument()
-    expect(screen.getByLabelText("Norm speichern")).toBeInTheDocument()
+    expect(screen.queryByLabelText("Norm speichern")).not.toBeInTheDocument()
   })
 
   it("render values if given", async () => {
-    const { user, screen } = renderComponent({
+    renderComponent({
       modelValue: {
         normAbbreviation: { id: "123", abbreviation: "ABC" },
-        singleNorm: "12",
-        dateOfVersion: "2022-01-31",
-        dateOfRelevance: "2023",
+        singleNorms: [
+          {
+            singleNorm: "12",
+            dateOfVersion: "2022-01-31",
+            dateOfRelevance: "2023",
+          },
+        ],
       } as NormReference,
     })
 
     const abbreviationField = screen.getByLabelText("RIS-Abkürzung")
-
-    await user.click(screen.getByLabelText("RIS-Abkürzung"))
 
     const singleNormField = screen.getByLabelText("Einzelnorm der Norm")
 
@@ -74,40 +76,150 @@ describe("NormReferenceEntry", () => {
     expect(screen.getByLabelText("Norm speichern")).toBeEnabled()
   })
 
-  it("add norm without valid single norm not possible", async () => {
-    const { user, emitted } = renderComponent({
+  it("renders multiple single norm input groups", async () => {
+    renderComponent({
       modelValue: {
         normAbbreviation: { id: "123", abbreviation: "ABC" },
-        singleNorm: "12",
+        singleNorms: [
+          {
+            singleNorm: "12",
+            dateOfVersion: "2022-01-31",
+            dateOfRelevance: "2023",
+          },
+          {
+            singleNorm: "§ 123",
+            dateOfVersion: "2022-01-31",
+            dateOfRelevance: "2023",
+          },
+          {
+            singleNorm: "§ 345",
+            dateOfVersion: "2022-01-31",
+            dateOfRelevance: "2023",
+          },
+        ],
       } as NormReference,
     })
 
-    vi.spyOn(documentUnitService, "validateSingleNorm").mockImplementation(() =>
-      Promise.resolve({ status: 200, data: "Validation error" }),
-    )
+    expect((await screen.findAllByLabelText("Einzelnorm")).length).toBe(3)
+  })
+
+  it("adds new single norm", async () => {
+    const { user } = renderComponent({
+      modelValue: {
+        normAbbreviation: { id: "123", abbreviation: "ABC" },
+        singleNorms: [
+          {
+            singleNorm: "12",
+          },
+        ],
+      } as NormReference,
+    })
+
+    expect((await screen.findAllByLabelText("Einzelnorm")).length).toBe(1)
+    const addSingleNormButton = screen.getByLabelText("Weitere Einzelnorm")
+    await user.click(addSingleNormButton)
+    expect((await screen.findAllByLabelText("Einzelnorm")).length).toBe(2)
+  })
+
+  it("removes single norm", async () => {
+    const { user } = renderComponent({
+      modelValue: {
+        normAbbreviation: { id: "123", abbreviation: "ABC" },
+        singleNorms: [
+          {
+            singleNorm: "12",
+          },
+          {
+            singleNorm: "34",
+          },
+        ],
+      } as NormReference,
+    })
+
+    expect((await screen.findAllByLabelText("Einzelnorm")).length).toBe(2)
+    const removeSingleNormButtons =
+      screen.getAllByLabelText("Einzelnorm löschen")
+    await user.click(removeSingleNormButtons[0])
+    expect((await screen.findAllByLabelText("Einzelnorm")).length).toBe(1)
+  })
+
+  it("removes last single norm in list", async () => {
+    const { user } = renderComponent({
+      modelValue: {
+        normAbbreviation: { id: "123", abbreviation: "ABC" },
+        singleNorms: [
+          {
+            singleNorm: "§ 34",
+          },
+        ],
+      } as NormReference,
+    })
+
+    expect((await screen.findAllByLabelText("Einzelnorm")).length).toBe(1)
+    const removeSingleNormButtons =
+      screen.getAllByLabelText("Einzelnorm löschen")
+    await user.click(removeSingleNormButtons[0])
+    expect(screen.queryByText("Einzelnorm")).not.toBeInTheDocument()
+  })
+
+  it("validates invalid norm input on blur", async () => {
+    const { user } = renderComponent({
+      modelValue: {
+        normAbbreviation: { id: "123", abbreviation: "ABC" },
+      } as NormReference,
+    })
+
+    const fetchSpy = vi
+      .spyOn(documentUnitService, "validateSingleNorm")
+      .mockImplementation(() =>
+        Promise.resolve({ status: 200, data: "Validation error" }),
+      )
+
+    const singleNormInput = await screen.findByLabelText("Einzelnorm der Norm")
+    await user.type(singleNormInput, "hi")
+    expect(singleNormInput).toHaveValue("hi")
+    await user.tab()
+
+    expect(fetchSpy).toHaveBeenCalledTimes(1)
+
+    await screen.findByText(/Inhalt nicht valide/)
+  })
+
+  it("validates invalid norm input on mount", async () => {
+    renderComponent({
+      modelValue: {
+        normAbbreviation: { id: "123", abbreviation: "ABC" },
+        singleNorms: [
+          {
+            singleNorm: "12",
+          },
+        ],
+      } as NormReference,
+    })
 
     const singleNormInput = await screen.findByLabelText("Einzelnorm der Norm")
     expect(singleNormInput).toHaveValue("12")
-    const button = screen.getByLabelText("Norm speichern")
-    await user.click(button)
 
     await screen.findByText(/Inhalt nicht valide/)
-    expect(emitted("update:modelValue")).toEqual(undefined)
   })
 
   it("new input removes error message", async () => {
     const { user } = renderComponent({
       modelValue: {
         normAbbreviation: { id: "123", abbreviation: "ABC" },
-        singleNorm: "12",
+        singleNorms: [
+          {
+            singleNorm: "12",
+          },
+        ],
       } as NormReference,
     })
 
-    await user.click(screen.getByLabelText("RIS-Abkürzung"))
-    const singleNormInput = await screen.findByLabelText("Einzelnorm der Norm")
+    const risAbbreviation = screen.getByLabelText("RIS-Abkürzung")
+    expect(risAbbreviation).toHaveValue("ABC")
+
+    const singleNormInput = screen.getByLabelText("Einzelnorm der Norm")
     expect(singleNormInput).toHaveValue("12")
-    const button = screen.getByLabelText("Norm speichern")
-    await user.click(button)
 
     await screen.findByText(/Inhalt nicht valide/)
 
@@ -132,12 +244,16 @@ describe("NormReferenceEntry", () => {
     expect(emitted("update:modelValue")).toEqual([
       [
         {
-          dateOfRelevance: undefined,
-          dateOfVersion: undefined,
           normAbbreviation: {
             abbreviation: "1000g-BefV",
           },
-          singleNorm: undefined,
+          singleNorms: [
+            {
+              dateOfRelevance: undefined,
+              dateOfVersion: undefined,
+              singleNorm: undefined,
+            },
+          ],
           hasForeignSource: false,
         },
       ],
@@ -180,5 +296,44 @@ describe("NormReferenceEntry", () => {
     await user.type(relevanceField, "2023")
 
     expect(relevanceField).toHaveValue("2023")
+  })
+
+  it("emits add event", async () => {
+    const { user, emitted } = renderComponent({
+      modelValue: {
+        normAbbreviation: { id: "123", abbreviation: "ABC" },
+      } as NormReference,
+    })
+
+    const addButton = screen.getByLabelText("Norm speichern")
+    await user.click(addButton)
+
+    expect(emitted("addEntry")).toBeTruthy()
+  })
+
+  it("emits delete event", async () => {
+    const { user, emitted } = renderComponent({
+      modelValue: {
+        normAbbreviation: { id: "123", abbreviation: "ABC" },
+      } as NormReference,
+    })
+
+    const deleteButton = screen.getByLabelText("Eintrag löschen")
+    await user.click(deleteButton)
+
+    expect(emitted("removeEntry")).toBeTruthy()
+  })
+
+  it("cancels edit mode", async () => {
+    const { user, emitted } = renderComponent({
+      modelValue: {
+        normAbbreviation: { id: "123", abbreviation: "ABC" },
+      } as NormReference,
+    })
+
+    const cancelEdit = screen.getByLabelText("Abbrechen")
+    await user.click(cancelEdit)
+
+    expect(emitted("cancelEdit")).toBeTruthy()
   })
 })

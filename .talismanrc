@@ -10,7 +10,7 @@ fileignoreconfig:
   ignore_detectors:
   - secrets
 - filename: backend/src/test/java/de/bund/digitalservice/ris/caselaw/integration/tests/JurisXmlExporterWrapperIntegrationTest.java
-  checksum: d3028c315809a47be7f2a77f84ebde1dc235df0ff39fd5bee6c91f5fd8dffe45
+  checksum: d0b2b7585f3de59af8555897e6ae25fb404f0ad76da41d1803760363397a9078
 - filename: compose.yaml
   checksum: 14a7e049d82352e4d50e3e2f6c82e87150de461aa7ede5553883cdadb1d446b2
 - filename: doc/structurizr/workspace.json

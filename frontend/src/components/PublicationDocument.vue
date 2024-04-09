@@ -136,13 +136,7 @@ const missingNormsFields = ref(
 )
 
 function getMissingNormsFields(normReference: NormReference) {
-  if (
-    normReference.normAbbreviation === null &&
-    normReference.singleNorm === null &&
-    normReference.dateOfRelevance === null &&
-    normReference.dateOfVersion === null
-  )
-    return []
+  if (normReference.normAbbreviation === null) return []
   else {
     return normReference.missingRequiredFields.map(
       (field) => normFieldLabels[field],

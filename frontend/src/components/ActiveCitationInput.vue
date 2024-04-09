@@ -24,7 +24,7 @@ const emit = defineEmits<{
   "update:modelValue": [value: ActiveCitation]
   addEntry: [void]
   cancelEdit: [void]
-  removeListEntry: [void]
+  removeEntry: [void]
 }>()
 
 const lastSearchInput = ref(new ActiveCitation())
@@ -180,7 +180,7 @@ onMounted(() => {
 })
 
 onBeforeUnmount(() => {
-  if (activeCitation.value.isEmpty) emit("removeListEntry")
+  if (activeCitation.value.isEmpty) emit("removeEntry")
 })
 </script>
 
@@ -299,7 +299,7 @@ onBeforeUnmount(() => {
         button-type="destructive"
         label="Eintrag löschen"
         size="small"
-        @click.stop="emit('removeListEntry')"
+        @click.stop="emit('removeEntry')"
       />
     </div>
 

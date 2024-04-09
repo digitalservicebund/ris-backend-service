@@ -3,33 +3,52 @@ package de.bund.digitalservice.ris.caselaw.adapter.transformer;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.NormAbbreviationDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.NormReferenceDTO;
 import de.bund.digitalservice.ris.caselaw.domain.NormReference;
+import de.bund.digitalservice.ris.caselaw.domain.SingleNorm;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class NormReferenceTransformer {
   private NormReferenceTransformer() {}
 
   public static NormReference transformToDomain(NormReferenceDTO normDTO) {
+    List<SingleNorm> list = new ArrayList<>();
+    SingleNorm singleNorm = SingleNormTransformer.transformToDomain(normDTO);
+    if (singleNorm != null) {
+      list.add(singleNorm);
+    }
+
     return NormReference.builder()
-        .id(normDTO.getId())
         .normAbbreviation(NormAbbreviationTransformer.transformDTO(normDTO.getNormAbbreviation()))
-        .singleNorm(normDTO.getSingleNorm())
-        .dateOfVersion(normDTO.getDateOfVersion())
-        .dateOfRelevance(normDTO.getDateOfRelevance())
+        .normAbbreviationRawValue(normDTO.getNormAbbreviationRawValue())
+        .singleNorms(list)
         .build();
   }
 
-  public static NormReferenceDTO transformToDTO(NormReference normReference) {
+  public static List<NormReferenceDTO> transformToDTO(NormReference normReference) {
     if (normReference == null) {
-      return null;
+      return Collections.emptyList();
     }
-    return NormReferenceDTO.builder()
-        .id(normReference.id())
-        .normAbbreviation(
-            normReference.normAbbreviation() != null
-                ? NormAbbreviationDTO.builder().id(normReference.normAbbreviation().id()).build()
-                : null)
-        .singleNorm(normReference.singleNorm())
-        .dateOfVersion(normReference.dateOfVersion())
-        .dateOfRelevance(normReference.dateOfRelevance())
-        .build();
+
+    NormAbbreviationDTO normAbbreviationDTO =
+        normReference.normAbbreviation() != null
+            ? NormAbbreviationDTO.builder().id(normReference.normAbbreviation().id()).build()
+            : null;
+
+    if (normReference.singleNorms() == null || normReference.singleNorms().isEmpty()) {
+      return List.of(NormReferenceDTO.builder().normAbbreviation(normAbbreviationDTO).build());
+    }
+
+    return normReference.singleNorms().stream()
+        .map(
+            singleNorm ->
+                NormReferenceDTO.builder()
+                    .id(singleNorm.id())
+                    .normAbbreviation(normAbbreviationDTO)
+                    .singleNorm(singleNorm.singleNorm())
+                    .dateOfVersion(singleNorm.dateOfVersion())
+                    .dateOfRelevance(singleNorm.dateOfRelevance())
+                    .build())
+        .toList();
   }
 }

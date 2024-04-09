@@ -1,21 +1,14 @@
-import dayjs from "dayjs"
 import EditableListItem from "./editableListItem"
 import { NormAbbreviation } from "./normAbbreviation"
+import SingleNorm from "./singleNorm"
 
 export default class NormReference implements EditableListItem {
   public normAbbreviation?: NormAbbreviation
-  public singleNorm?: string
-  public dateOfVersion?: string
-  public dateOfRelevance?: string
+  public singleNorms?: SingleNorm[]
   public hasForeignSource: boolean = false
 
   static readonly requiredFields = ["normAbbreviation"] as const
-  static readonly fields = [
-    "normAbbreviation",
-    "singleNorm",
-    "dateOfVersion",
-    "dateOfRelevance",
-  ] as const
+  static readonly fields = ["normAbbreviation"] as const
 
   constructor(data: Partial<NormReference> = {}) {
     Object.assign(this, data)
@@ -30,11 +23,6 @@ export default class NormReference implements EditableListItem {
       ...(this.normAbbreviation?.abbreviation
         ? [`${this.normAbbreviation?.abbreviation}`]
         : []),
-      ...(this.singleNorm ? [this.singleNorm] : []),
-      ...(this.dateOfVersion
-        ? [dayjs(this.dateOfVersion).format("DD.MM.YYYY")]
-        : []),
-      ...(this.dateOfRelevance ? [this.dateOfRelevance] : []),
     ].join(", ")
   }
 
@@ -81,12 +69,4 @@ export default class NormReference implements EditableListItem {
 
 export const normFieldLabels: { [name: string]: string } = {
   normAbbreviation: "RIS-Abkürzung",
-  singleNorm: "Einzelnorm",
-  dateOfVersion: "Fassungsdatum",
-  dateOfRelevance: "Jahr",
-}
-
-export type SingleNormValidationInfo = {
-  singleNorm: string
-  normAbbreviation?: string
 }

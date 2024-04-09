@@ -5,6 +5,7 @@ import EnsuingDecision from "./ensuingDecision"
 import { FieldOfLawNode } from "./fieldOfLaw"
 import NormReference from "./normReference"
 import PreviousDecision from "./previousDecision"
+import SingleNorm from "./singleNorm"
 
 export type CoreData = {
   fileNumbers?: string[]
@@ -133,7 +134,13 @@ export default class DocumentUnit {
 
     if (data.contentRelatedIndexing?.norms)
       data.contentRelatedIndexing.norms = data.contentRelatedIndexing.norms.map(
-        (norm) => new NormReference({ ...norm }),
+        (norm) =>
+          new NormReference({
+            ...norm,
+            singleNorms: norm.singleNorms?.map(
+              (norm) => new SingleNorm({ ...norm }),
+            ),
+          }),
       )
 
     if (data.contentRelatedIndexing?.activeCitations)

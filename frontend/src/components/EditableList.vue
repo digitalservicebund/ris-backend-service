@@ -58,7 +58,7 @@ function addNewListEntry() {
  * at the given index to the parent component. The edit index is resetted, to show list in summary mode.
  * @param {number} index - The index of the list item to be removed
  */
-function removeListEntry(index: number) {
+function removeEntry(index: number) {
   modelValueList.value.splice(index, 1)
 
   emit(
@@ -130,7 +130,7 @@ watch(
       <div
         v-if="index !== editIndex"
         :key="index"
-        class="group flex cursor-pointer items-center gap-8 px-2 py-16"
+        class="group flex cursor-pointer gap-8 px-2 py-16"
       >
         <component :is="summaryComponent" :data="entry" />
 
@@ -147,7 +147,7 @@ watch(
         :model-value-list="modelValueList"
         @add-entry="updateModel"
         @cancel-edit="cancelEdit"
-        @remove-list-entry="removeListEntry(index)"
+        @remove-entry="removeEntry(index)"
       />
     </div>
 

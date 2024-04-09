@@ -73,7 +73,7 @@ export function withSummarizer(
 </script>
 
 <template>
-  <ul class="flex w-full flex-col items-start text-start">
+  <ul class="m-0 flex w-full flex-col items-start p-0 text-start">
     <li
       v-for="(summary, index) in summaries"
       :key="index"

@@ -68,7 +68,8 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
       TestConfig.class,
       DocumentNumberPatternConfig.class
     },
-    controllers = {DocumentUnitController.class})
+    controllers = {DocumentUnitController.class},
+    timeout = "PT2M")
 class SaveNormIntegrationTest {
   @Container
   static PostgreSQLContainer<?> postgreSQLContainer =
@@ -208,7 +209,7 @@ class SaveNormIntegrationTest {
             });
   }
 
-  /** Sorting by remove norm abbreviation of a existing norm reference */
+  /** Sorting by remove norm abbreviation of an existing norm reference */
   @Test
   void testSaveNorm_RISDEV2185() {
     var dbNormAbbreviation1 = addNormToDB(1);
@@ -246,6 +247,7 @@ class SaveNormIntegrationTest {
             response -> {
               assertThat(response.getResponseBody()).isNotNull();
               assertThat(response.getResponseBody().contentRelatedIndexing()).isNotNull();
+              assertThat(response.getResponseBody().contentRelatedIndexing().norms()).hasSize(2);
               assertThat(
                       response
                           .getResponseBody()

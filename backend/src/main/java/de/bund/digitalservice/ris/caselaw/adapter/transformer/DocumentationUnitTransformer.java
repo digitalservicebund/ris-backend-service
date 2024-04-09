@@ -156,15 +156,19 @@ public class DocumentationUnitTransformer {
     }
 
     AtomicInteger i = new AtomicInteger(1);
-    builder.normReferences(
-        contentRelatedIndexing.norms().stream()
-            .map(
-                norm -> {
-                  NormReferenceDTO normReferenceDTO = NormReferenceTransformer.transformToDTO(norm);
-                  normReferenceDTO.setRank(i.getAndIncrement());
-                  return normReferenceDTO;
-                })
-            .toList());
+    List<NormReferenceDTO> flattenNormReferenceDTOs = new ArrayList<>();
+    contentRelatedIndexing
+        .norms()
+        .forEach(
+            norm -> {
+              List<NormReferenceDTO> normReferenceDTOs =
+                  NormReferenceTransformer.transformToDTO(norm);
+              normReferenceDTOs.forEach(
+                  normReferenceDTO -> normReferenceDTO.setRank(i.getAndIncrement()));
+              flattenNormReferenceDTOs.addAll(normReferenceDTOs);
+            });
+
+    builder.normReferences(flattenNormReferenceDTOs);
   }
 
   private static void addActiveCitations(
@@ -469,11 +473,7 @@ public class DocumentationUnitTransformer {
     }
 
     if (documentationUnitDTO.getNormReferences() != null) {
-      List<NormReference> norms =
-          documentationUnitDTO.getNormReferences().stream()
-              .map(NormReferenceTransformer::transformToDomain)
-              .toList();
-
+      List<NormReference> norms = addNormReferencesToDomain(documentationUnitDTO);
       contentRelatedIndexingBuilder.norms(norms);
     }
 
@@ -547,6 +547,51 @@ public class DocumentationUnitTransformer {
     addStatusToDomain(documentationUnitDTO, builder);
 
     return builder.build();
+  }
+
+  private static List<NormReference> addNormReferencesToDomain(
+      DocumentationUnitDTO documentationUnitDTO) {
+    List<NormReference> normReferences = new ArrayList<>();
+
+    documentationUnitDTO.getNormReferences().stream()
+        .filter(normReferenceDTO -> normReferenceDTO.getNormAbbreviation() != null)
+        .forEach(
+            normReferenceDTO -> {
+              NormReference normReference =
+                  NormReferenceTransformer.transformToDomain(normReferenceDTO);
+              List<NormReference> existingNormReferences =
+                  normReferences.stream()
+                      .filter(
+                          existingNormReference ->
+                              existingNormReference
+                                  .normAbbreviation()
+                                  .id()
+                                  .equals(normReferenceDTO.getNormAbbreviation().getId()))
+                      .toList();
+              if (existingNormReferences.size() > 1) {
+                log.error(
+                    "More than one norm references for norm abbreviation ({}, {})",
+                    normReferenceDTO.getNormAbbreviation().getId(),
+                    normReferenceDTO.getNormAbbreviation().getAbbreviation());
+                throw new DocumentUnitTransformerException(
+                    "More than one norm references with the same norm abbreviation.");
+              } else if (existingNormReferences.isEmpty()) {
+                normReferences.add(normReference);
+              } else {
+                existingNormReferences
+                    .get(0)
+                    .singleNorms()
+                    .add(SingleNormTransformer.transformToDomain(normReferenceDTO));
+              }
+            });
+
+    normReferences.addAll(
+        documentationUnitDTO.getNormReferences().stream()
+            .filter(normReferenceDTO -> normReferenceDTO.getNormAbbreviation() == null)
+            .map(NormReferenceTransformer::transformToDomain)
+            .toList());
+
+    return normReferences;
   }
 
   private static LegalEffect getLegalEffectForDomain(DocumentationUnitDTO documentationUnitDTO) {

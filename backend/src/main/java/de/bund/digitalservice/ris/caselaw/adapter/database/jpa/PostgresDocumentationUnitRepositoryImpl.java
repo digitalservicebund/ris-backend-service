@@ -81,7 +81,8 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
               .findByDocumentNumber(documentNumber)
               .orElseThrow(() -> new DocumentationUnitNotExistsException(documentNumber));
       return Optional.of(DocumentationUnitTransformer.transformToDomain(documentUnit));
-    } catch (Exception e) {
+    } catch (Exception ex) {
+      log.error("Error to get a documentation unit by document number.", ex);
       return Optional.empty();
     }
   }
@@ -95,7 +96,8 @@ public class PostgresDocumentationUnitRepositoryImpl implements DocumentUnitRepo
               .findById(uuid)
               .orElseThrow(() -> new DocumentationUnitNotExistsException(uuid));
       return Optional.of(DocumentationUnitTransformer.transformToDomain(documentUnit));
-    } catch (Exception e) {
+    } catch (Exception ex) {
+      log.error("Error to get a documentation unit by uuid.", ex);
       return Optional.empty();
     }
   }

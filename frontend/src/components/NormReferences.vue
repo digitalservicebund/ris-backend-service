@@ -4,7 +4,8 @@ import { withSummarizer } from "@/components/DataSetSummary.vue"
 import EditableList from "@/components/EditableList.vue"
 import NormReferenceInput from "@/components/NormReferenceInput.vue"
 import NormReference from "@/domain/normReference"
-import IconErrorOutline from "~icons/ic/baseline-error-outline"
+import IconBook from "~icons/material-symbols/book-2"
+import IconArrowRight from "~icons/material-symbols/subdirectory-arrow-right"
 
 const props = defineProps<{
   modelValue: NormReference[] | undefined
@@ -23,23 +24,40 @@ const norms = computed({
   },
 })
 
+function hasSingleNorms(normEntry: NormReference) {
+  if (normEntry.singleNorms)
+    return (
+      normEntry.singleNorms?.length > 0 && !normEntry.singleNorms[0].isEmpty
+    )
+  else return false
+}
+
 const defaultValue = new NormReference()
 
 function decisionSummarizer(normEntry: NormReference) {
-  return h("div", [
-    normEntry.hasMissingRequiredFields
-      ? h("div", { class: ["flex flex-row items-center"] }, [
-          h(h(IconErrorOutline), {
-            "aria-label": "Fehlerhafte Eingabe",
-            class: ["mr-8 text-red-800"],
+  return h("div", { class: ["flex flex-col gap-32"] }, [
+    h("div", { class: ["flex flex-row items-center"] }, [
+      h(IconBook, { class: ["mr-8"] }),
+      h("div", { class: ["link-01-reg"] }, normEntry.renderDecision),
+    ]),
+    hasSingleNorms(normEntry)
+      ? h(
+          "div",
+          { class: ["flex flex-col gap-32"] },
+          normEntry.singleNorms?.map((singleNorm) => {
+            return !singleNorm.isEmpty
+              ? h("div", { class: ["flex flex-row items-center"] }, [
+                  h(IconArrowRight, { class: ["mr-8"] }),
+                  h(
+                    "div",
+                    { class: ["link-01-reg"] },
+                    singleNorm.renderDecision,
+                  ),
+                ])
+              : null
           }),
-          h(
-            "div",
-            { class: ["ds-label-02-bold text-red-800"] },
-            normEntry.renderDecision,
-          ),
-        ])
-      : h("div", { class: ["link-02-reg"] }, normEntry.renderDecision),
+        )
+      : null,
   ])
 }
 
