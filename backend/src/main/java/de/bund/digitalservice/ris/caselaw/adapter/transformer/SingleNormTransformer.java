@@ -6,6 +6,10 @@ import de.bund.digitalservice.ris.caselaw.domain.SingleNorm;
 public class SingleNormTransformer {
 
   public static SingleNorm transformToDomain(NormReferenceDTO normReferenceDTO) {
+    if (normReferenceDTO.getSingleNorm() == null) {
+      return null;
+    }
+
     return SingleNorm.builder()
         .id(normReferenceDTO.getId())
         .singleNorm(normReferenceDTO.getSingleNorm())

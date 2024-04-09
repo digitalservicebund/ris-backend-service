@@ -13,7 +13,10 @@ public class NormReferenceTransformer {
 
   public static NormReference transformToDomain(NormReferenceDTO normDTO) {
     List<SingleNorm> list = new ArrayList<>();
-    list.add(SingleNormTransformer.transformToDomain(normDTO));
+    SingleNorm singleNorm = SingleNormTransformer.transformToDomain(normDTO);
+    if (singleNorm != null) {
+      list.add(singleNorm);
+    }
 
     return NormReference.builder()
         .normAbbreviation(NormAbbreviationTransformer.transformDTO(normDTO.getNormAbbreviation()))
@@ -32,7 +35,7 @@ public class NormReferenceTransformer {
             ? NormAbbreviationDTO.builder().id(normReference.normAbbreviation().id()).build()
             : null;
 
-    if (normReference.singleNorms() == null) {
+    if (normReference.singleNorms() == null || normReference.singleNorms().isEmpty()) {
       return List.of(NormReferenceDTO.builder().normAbbreviation(normAbbreviationDTO).build());
     }
 
