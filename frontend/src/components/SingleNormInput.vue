@@ -116,9 +116,10 @@ onMounted(async () => {
         @update:validation-error="slotProps.updateValidationError"
       />
     </InputField>
+
     <button
       aria-label="Einzelnorm löschen"
-      class="input-close-icon flex items-center text-blue-800 focus:outline-none focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-blue-800"
+      class="mt-[25px] h-[50px] text-blue-800 focus:shadow-[inset_0_0_0_0.25rem] focus:shadow-blue-800 focus:outline-none"
       tabindex="0"
       @click="removeSingleNormEntry"
     >
