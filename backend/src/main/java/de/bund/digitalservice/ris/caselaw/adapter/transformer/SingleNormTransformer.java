@@ -5,8 +5,10 @@ import de.bund.digitalservice.ris.caselaw.domain.SingleNorm;
 
 public class SingleNormTransformer {
 
+  private SingleNormTransformer() {}
+
   public static SingleNorm transformToDomain(NormReferenceDTO normReferenceDTO) {
-    if (normReferenceDTO.getSingleNorm() == null) {
+    if (normReferenceDTO.isSingleNormEmpty()) {
       return null;
     }
 

@@ -8,6 +8,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import java.time.LocalDate;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
@@ -47,4 +48,9 @@ public class NormReferenceDTO {
 
   @Column(name = "rank")
   private Integer rank;
+
+  @Transient
+  public boolean isSingleNormEmpty() {
+    return singleNorm == null && dateOfVersion == null && dateOfRelevance == null;
+  }
 }
