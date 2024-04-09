@@ -7,7 +7,9 @@ interface FileService {
     documentUnitUuid: string,
     file: File,
   ): Promise<ServiceResponse<Docx2HTML>>
+
   delete(documentUnitUuid: string): Promise<ServiceResponse<unknown>>
+
   getDocxFileAsHtml(uuid: string): Promise<ServiceResponse<Docx2HTML>>
 }
 
