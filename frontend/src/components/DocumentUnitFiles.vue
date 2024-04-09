@@ -8,6 +8,7 @@ import FileUpload from "@/components/FileUpload.vue"
 import FlexContainer from "@/components/FlexContainer.vue"
 import FlexItem from "@/components/FlexItem.vue"
 import PageNavigator from "@/components/PageNavigator.vue"
+import PopupModal from "@/components/PopupModal.vue"
 import SideToggle, { OpeningDirection } from "@/components/SideToggle.vue"
 import { useToggleStateInRouteQuery } from "@/composables/useToggleStateInRouteQuery"
 import DocumentUnit from "@/domain/documentUnit"
@@ -35,6 +36,9 @@ const isLoading = ref(false)
 const acceptedFileFormats = [".docx"]
 const fileIndex: Ref<number> = ref(0)
 const fileAsHTML = ref<Docx2HTML>()
+
+const showDeleteModal = ref(false)
+const deleteModalHeaderText = "Anhang löschen"
 
 watch(
   showDocPanel,
@@ -66,6 +70,19 @@ async function handleDeleteFile(index: number) {
 const handleOnSelect = (index: number) => {
   fileIndex.value = index
   togglePanel()
+}
+
+const handleOnDelete = (index: number) => {
+  fileIndex.value = index
+  toggleDeleteModal()
+}
+
+const deleteFile = (index: number) => {
+  handleDeleteFile(index)
+  toggleDeleteModal()
+  if (showDocPanel) {
+    togglePanel()
+  }
 }
 
 async function getOriginalDocumentUnit() {
@@ -116,8 +133,19 @@ const togglePanel = () => {
   showDocPanel.value = !showDocPanel.value
 }
 
-const deleteFile = (index: number) => {
-  handleDeleteFile(index)
+function toggleDeleteModal() {
+  showDeleteModal.value = !showDeleteModal.value
+  if (showDeleteModal.value) {
+    const scrollLeft = document.documentElement.scrollLeft
+    const scrollTop = document.documentElement.scrollTop
+    window.onscroll = () => {
+      window.scrollTo(scrollLeft, scrollTop)
+    }
+  } else {
+    window.onscroll = () => {
+      return
+    }
+  }
 }
 
 onMounted(async () => {
@@ -142,13 +170,29 @@ onMounted(async () => {
   <DocumentUnitWrapper :document-unit="documentUnit">
     <template #default="{ classes }">
       <FlexContainer class="w-full flex-row">
+        <PopupModal
+          v-if="
+            showDeleteModal &&
+            files[fileIndex] !== undefined &&
+            files[fileIndex] !== null &&
+            files[fileIndex].name != null
+          "
+          :aria-label="deleteModalHeaderText"
+          cancel-button-type="tertiary"
+          confirm-button-type="destructive"
+          confirm-text="Löschen"
+          :content-text="`Möchten Sie den Anhang ${files[fileIndex].name} wirklich dauerhaft löschen?`"
+          :header-text="deleteModalHeaderText"
+          @close-modal="toggleDeleteModal"
+          @confirm-action="deleteFile(fileIndex)"
+        />
         <FlexItem class="space-y-20" :class="classes">
           <h1 class="ds-heading-02-reg mb-[1rem]">Dokumente</h1>
           <DocumentUnitFileList
             v-if="files.length > 0"
             id="file-table"
             :files="files"
-            @delete="deleteFile"
+            @delete="handleOnDelete"
             @select="handleOnSelect"
           ></DocumentUnitFileList>
           <div>

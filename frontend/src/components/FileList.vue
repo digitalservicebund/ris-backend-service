@@ -41,16 +41,15 @@ const onSelect = (index: number) => {
       :key="index"
       class="cursor-pointer"
       data-testid="listEntry"
-      @click="onSelect(index)"
     >
-      <CellItem>
+      <CellItem @click="onSelect(index)">
         {{ file.name ?? "-" }}
       </CellItem>
-      <CellItem>
+      <CellItem @click="onSelect(index)">
         {{ file.format ?? "-" }}
       </CellItem>
 
-      <CellItem>
+      <CellItem @click="onSelect(index)">
         {{
           file.uploadedDate
             ? dayjs(file.uploadedDate).format("DD.MM.YYYY")
