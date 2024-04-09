@@ -30,7 +30,18 @@ test.describe("a11y of document page (/caselaw/documentunit/{documentNumber}/fil
     })
     await uploadTestfile(page, "sample.docx")
     await page.getByLabel("Datei löschen").click()
+    await page.getByRole("button", { name: "Löschen", exact: true }).click()
     await expect(tableView).toBeHidden()
+
+    const accessibilityScanResults = await new AxeBuilder({ page }).analyze()
+    expect(accessibilityScanResults.violations).toEqual([])
+  })
+
+  test("delete document modal", async ({ page, documentNumber }) => {
+    await navigateToFiles(page, documentNumber)
+    await uploadTestfile(page, "sample.docx")
+    await page.getByLabel("Datei löschen").click()
+    await page.locator("[aria-label='Anhang löschen']").click()
 
     const accessibilityScanResults = await new AxeBuilder({ page }).analyze()
     expect(accessibilityScanResults.violations).toEqual([])
