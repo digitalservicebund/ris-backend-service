@@ -5,6 +5,7 @@ import DocumentUnitCategories from "@/components/DocumentUnitCategories.vue"
 import { ComboboxItem } from "@/components/input/types"
 import DocumentUnit, { Court } from "@/domain/documentUnit"
 import comboboxItemService from "@/services/comboboxItemService"
+import documentUnitService from "@/services/documentUnitService"
 
 function renderComponent() {
   // eslint-disable-next-line testing-library/await-async-events
@@ -58,6 +59,25 @@ function renderComponent() {
   }
 }
 describe("Document Unit Categories", () => {
+  vi.spyOn(documentUnitService, "update").mockImplementation(() =>
+    Promise.resolve({
+      status: 200,
+      data: new DocumentUnit("foo", {
+        documentNumber: "1234567891234",
+        coreData: {
+          court: {
+            type: "AG",
+            location: "Test",
+            label: "AG Test",
+          },
+        },
+        texts: {},
+        previousDecisions: undefined,
+        ensuingDecisions: undefined,
+        contentRelatedIndexing: {},
+      }),
+    }),
+  )
   test("renders correctly", async () => {
     renderComponent()
 
