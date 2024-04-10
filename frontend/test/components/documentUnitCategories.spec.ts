@@ -1,8 +1,10 @@
 import { userEvent } from "@testing-library/user-event"
-import { render, screen } from "@testing-library/vue"
+import { render, screen, within } from "@testing-library/vue"
 import { createRouter, createWebHistory } from "vue-router"
 import DocumentUnitCategories from "@/components/DocumentUnitCategories.vue"
-import DocumentUnit from "@/domain/documentUnit"
+import { ComboboxItem } from "@/components/input/types"
+import DocumentUnit, { Court } from "@/domain/documentUnit"
+import comboboxItemService from "@/services/comboboxItemService"
 
 function renderComponent() {
   // eslint-disable-next-line testing-library/await-async-events
@@ -59,11 +61,52 @@ describe("Document Unit Categories", () => {
   test("renders correctly", async () => {
     renderComponent()
 
-    screen.getByText("Stammdaten")
-    screen.getByText("Rechtszug")
-    screen.getByText("Inhaltliche Erschließung")
-    screen.getByText("Kurz- & Langtexte")
+    expect(
+      screen.getByRole("heading", { name: "Stammdaten" }),
+    ).toBeInTheDocument()
+
+    expect(
+      screen.getByRole("heading", { name: "Rechtszug" }),
+    ).toBeInTheDocument()
+
+    expect(
+      screen.getByRole("heading", { name: "Inhaltliche Erschließung" }),
+    ).toBeInTheDocument()
+
+    expect(
+      screen.getByRole("heading", { name: "Kurz- & Langtexte" }),
+    ).toBeInTheDocument()
   })
 
-  test("updates core data", async () => {})
+  test("updates core data", async () => {
+    const court: Court = {
+      type: "AG",
+      location: "Test",
+      label: "AG Test",
+    }
+
+    const dropdownCourtItems: ComboboxItem[] = [
+      {
+        label: court.label,
+        value: court,
+        additionalInformation: court.revoked,
+      },
+    ]
+
+    vi.spyOn(comboboxItemService, "getCourts").mockImplementation(() =>
+      Promise.resolve({ status: 200, data: dropdownCourtItems }),
+    )
+    const { user } = renderComponent()
+
+    const coreDataCourt = within(
+      screen.getByLabelText("Stammdaten", { selector: "div" }),
+    ).getByLabelText("Gericht")
+    await user.type(coreDataCourt, "AG")
+
+    const dropdownItems = screen.getAllByLabelText("dropdown-option")
+    expect(dropdownItems[0]).toHaveTextContent("AG Test")
+    await user.click(dropdownItems[0])
+
+    expect(screen.getByText(/AG Test/)).toBeVisible()
+  })
 })
