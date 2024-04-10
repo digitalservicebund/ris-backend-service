@@ -1,12 +1,22 @@
 <script lang="ts" setup>
-import SideToggle from "@/components/SideToggle.vue"
+import { ref } from "vue"
+import FlexContainer from "@/components/FlexContainer.vue"
+import SideToggle, { OpeningDirection } from "@/components/SideToggle.vue"
 import KitchensinkPage from "@/kitchensink/components/KitchensinkPage.vue"
+
+const toggleShow = ref(true)
 </script>
 
 <template>
   <KitchensinkPage name="Side toggle">
-    <div class="flex h-[10rem] justify-between gap-[3rem]">
-      <SideToggle from-side="left" label="Inhalt">
+    <FlexContainer class="h-[10rem] justify-between gap-[3rem]">
+      <SideToggle
+        class="float-right"
+        :is-expanded="toggleShow"
+        label="Inhalt links"
+        :opening-direction="OpeningDirection.LEFT"
+        @update:is-expanded="toggleShow = !toggleShow.valueOf()"
+      >
         <div class="flex w-full p-24">
           Lorem ipsum dolor sit amet consectetur adipisicing elit. Voluptatem
           iusto autem quasi saepe fuga quis dolores dolor ipsum eligendi dolore
@@ -14,7 +24,12 @@ import KitchensinkPage from "@/kitchensink/components/KitchensinkPage.vue"
           accusamus.
         </div>
       </SideToggle>
-      <SideToggle from-side="right" label="Inhalt rechts">
+      <SideToggle
+        :is-expanded="!toggleShow"
+        label="Inhalt rechts"
+        :opening-direction="OpeningDirection.RIGHT"
+        @update:is-expanded="toggleShow = !toggleShow"
+      >
         <div class="flex w-full p-24">
           Lorem ipsum dolor sit amet consectetur adipisicing elit. Voluptatem
           iusto autem quasi saepe fuga quis dolores dolor ipsum eligendi dolore
@@ -22,6 +37,6 @@ import KitchensinkPage from "@/kitchensink/components/KitchensinkPage.vue"
           accusamus.
         </div>
       </SideToggle>
-    </div>
+    </FlexContainer>
   </KitchensinkPage>
 </template>

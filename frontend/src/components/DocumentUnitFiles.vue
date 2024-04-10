@@ -3,11 +3,11 @@ import { computed, onMounted, Ref, ref, watch } from "vue"
 import { useRoute, useRouter } from "vue-router"
 import DocumentUnitWrapper from "@/components/DocumentUnitWrapper.vue"
 import DocumentUnitFileList from "@/components/FileList.vue"
+import FileNavigator from "@/components/FileNavigator.vue"
 import FilePreview from "@/components/FilePreview.vue"
 import FileUpload from "@/components/FileUpload.vue"
 import FlexContainer from "@/components/FlexContainer.vue"
 import FlexItem from "@/components/FlexItem.vue"
-import PageNavigator from "@/components/PageNavigator.vue"
 import PopupModal from "@/components/PopupModal.vue"
 import SideToggle, { OpeningDirection } from "@/components/SideToggle.vue"
 import { useToggleStateInRouteQuery } from "@/composables/useToggleStateInRouteQuery"
@@ -223,11 +223,11 @@ onMounted(async () => {
               :opening-direction="OpeningDirection.LEFT"
               @update:is-expanded="togglePanel"
             >
-              <PageNavigator
+              <FileNavigator
                 :current-index="fileIndex"
                 :files="files"
                 @select="handleOnSelect"
-              ></PageNavigator>
+              ></FileNavigator>
               <FilePreview
                 v-if="files.length > 0 && fileAsHTML?.html"
                 id="odoc-panel-element"

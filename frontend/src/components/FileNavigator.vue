@@ -2,7 +2,10 @@
 import { computed } from "vue"
 import FlexContainer from "@/components/FlexContainer.vue"
 import FlexItem from "@/components/FlexItem.vue"
+import TextButton from "@/components/input/TextButton.vue"
 import File from "@/domain/file"
+import IcOutlineArrowBack from "~icons/ic/outline-arrow-back"
+import IcOutlineArrowForward from "~icons/ic/outline-arrow-forward"
 
 const props = defineProps<{
   files: File[]
@@ -34,26 +37,25 @@ const hasPrevious = computed(() => {
 <template>
   <FlexContainer
     v-if="files.length > 1"
-    class="space-x-5 float-end m-16 ml-20 items-center"
+    class="float-end m-16 ml-20 items-center space-x-8"
   >
     <FlexItem class="ds-label-02-bold">
       {{ props.files[currentIndex].name }}
     </FlexItem>
-    <button
+    <TextButton
       id="decrease"
-      class="ds-button ds-button-tertiary m-8"
+      button-type="tertiary"
       :disabled="!hasPrevious.valueOf()"
+      :icon="IcOutlineArrowBack"
       @click="decreaseFileIndex"
-    >
-      &lt;
-    </button>
-    <button
+    />
+
+    <TextButton
       id="increase"
-      class="ds-button ds-button-tertiary"
+      button-type="tertiary"
       :disabled="!hasNext.valueOf()"
+      :icon="IcOutlineArrowForward"
       @click="incrementFileIndex"
-    >
-      &gt;
-    </button>
+    />
   </FlexContainer>
 </template>
