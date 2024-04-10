@@ -1,12 +1,12 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.AttachmentRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseOriginalFileDocumentRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.OriginalFileDocumentDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.transformer.OriginalFileDocumentTransformer;
-import de.bund.digitalservice.ris.caselaw.domain.OriginalFileDocument;
-import de.bund.digitalservice.ris.caselaw.domain.OriginalFileDocumentException;
-import de.bund.digitalservice.ris.caselaw.domain.OriginalFileDocumentService;
+import de.bund.digitalservice.ris.caselaw.adapter.transformer.AttachmentTransformer;
+import de.bund.digitalservice.ris.caselaw.domain.Attachment;
+import de.bund.digitalservice.ris.caselaw.domain.AttachmentException;
+import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
 import de.bund.digitalservice.ris.caselaw.domain.StringsUtil;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -35,16 +35,16 @@ import software.amazon.awssdk.services.s3.model.PutObjectResponse;
 
 @Slf4j
 @Service
-public class DatabaseOriginalFileDocumentService implements OriginalFileDocumentService {
-  private final DatabaseOriginalFileDocumentRepository repository;
+public class DatabaseAttachmentService implements AttachmentService {
+  private final AttachmentRepository repository;
   private final S3AsyncClient s3AsyncClient;
   private final DatabaseDocumentationUnitRepository documentUnitRepository;
 
   @Value("${otc.obs.bucket-name}")
   private String bucketName;
 
-  public DatabaseOriginalFileDocumentService(
-      DatabaseOriginalFileDocumentRepository repository,
+  public DatabaseAttachmentService(
+      AttachmentRepository repository,
       S3AsyncClient s3AsyncClient,
       DatabaseDocumentationUnitRepository documentUnitRepository) {
     this.repository = repository;
@@ -52,7 +52,7 @@ public class DatabaseOriginalFileDocumentService implements OriginalFileDocument
     this.documentUnitRepository = documentUnitRepository;
   }
 
-  public OriginalFileDocument attachFileToDocumentationUnit(
+  public Attachment attachFileToDocumentationUnit(
       UUID documentationUnitUuid, ByteBuffer byteBuffer, HttpHeaders httpHeaders) {
     var fileUuid = UUID.randomUUID();
     String fileName =
@@ -64,8 +64,8 @@ public class DatabaseOriginalFileDocumentService implements OriginalFileDocument
 
     putObjectIntoBucket(fileUuid.toString(), byteBuffer, httpHeaders);
 
-    OriginalFileDocumentDTO originalFileDocumentDTO =
-        OriginalFileDocumentDTO.builder()
+    AttachmentDTO attachmentDTO =
+        AttachmentDTO.builder()
             .id(fileUuid)
             .s3ObjectPath(fileUuid.toString())
             .documentationUnit(documentUnitRepository.findById(documentationUnitUuid).orElseThrow())
@@ -74,19 +74,19 @@ public class DatabaseOriginalFileDocumentService implements OriginalFileDocument
             .uploadTimestamp(Instant.now())
             .build();
 
-    return OriginalFileDocumentTransformer.transformToDomain(
-        repository.save(originalFileDocumentDTO));
+    return AttachmentTransformer.transformToDomain(repository.save(attachmentDTO));
   }
 
   @Transactional(transactionManager = "jpaTransactionManager")
   public void deleteByS3path(String s3Path) {
     deleteObjectFromBucket(s3Path);
+    // Todo: Fix delete by s3Objectpath
     repository.deleteByS3ObjectPath(s3Path);
   }
 
   public void deleteAllObjectsFromBucketForDocumentationUnit(UUID uuid) {
     repository.findAllByDocumentationUnitId(uuid).stream()
-        .map(OriginalFileDocumentDTO::getS3ObjectPath)
+        .map(AttachmentDTO::getS3ObjectPath)
         .forEach(this::deleteObjectFromBucket);
   }
 
@@ -143,13 +143,13 @@ public class DatabaseOriginalFileDocumentService implements OriginalFileDocument
     try {
       return s3AsyncClient.putObject(putObjectRequest, asyncRequestBody).get();
     } catch (InterruptedException | ExecutionException e) {
-      throw new OriginalFileDocumentException("Could not save object to bucket: " + fileUuid);
+      throw new AttachmentException("Could not save object to bucket: " + fileUuid);
     }
   }
 
   private void deleteObjectFromBucket(String s3Path) {
     if (StringsUtil.returnTrueIfNullOrBlank(s3Path)) {
-      throw new OriginalFileDocumentException("s3Path cant be null");
+      throw new AttachmentException("s3Path cant be null");
     }
 
     var deleteObjectRequest = DeleteObjectRequest.builder().bucket(bucketName).key(s3Path).build();

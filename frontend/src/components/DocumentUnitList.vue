@@ -213,7 +213,7 @@ function onDelete() {
         <div class="table-cell border-b-1 border-blue-300 px-12 align-middle">
           <div class="flex flex-row">
             <span
-              v-if="listEntry.fileName"
+              v-if="listEntry.hasAttachments"
               class="text-blue-800"
               data-testid="file-attached-icon"
             >

@@ -8,7 +8,10 @@ interface FileService {
     file: File,
   ): Promise<ServiceResponse<Docx2HTML>>
 
-  delete(documentUnitUuid: string): Promise<ServiceResponse<unknown>>
+  delete(
+    documentUnitUuid: string,
+    s3path: string,
+  ): Promise<ServiceResponse<unknown>>
 
   getDocxFileAsHtml(uuid: string): Promise<ServiceResponse<Docx2HTML>>
 }
@@ -59,9 +62,9 @@ const service: FileService = {
     return response
   },
 
-  async delete(documentUnitUuid: string) {
+  async delete(documentUnitUuid: string, s3path: string) {
     const response = await httpClient.delete(
-      `caselaw/documentunits/${documentUnitUuid}/file`,
+      `caselaw/documentunits/${documentUnitUuid}/file/${s3path}`,
     )
     response.error =
       response.status >= 300

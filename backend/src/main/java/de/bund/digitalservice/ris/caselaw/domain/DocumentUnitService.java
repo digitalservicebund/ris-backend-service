@@ -30,7 +30,7 @@ public class DocumentUnitService {
   private final DocumentNumberService documentNumberService;
   private final EmailPublishService publicationService;
   private final DocumentUnitStatusService documentUnitStatusService;
-  private final OriginalFileDocumentService originalFileDocumentService;
+  private final AttachmentService attachmentService;
   private final DocumentNumberRecyclingService documentNumberRecyclingService;
   private final Validator validator;
 
@@ -48,7 +48,7 @@ public class DocumentUnitService {
       PublicationReportRepository publicationReportRepository,
       DocumentNumberRecyclingService documentNumberRecyclingService,
       Validator validator,
-      OriginalFileDocumentService originalFileDocumentService) {
+      AttachmentService attachmentService) {
 
     this.repository = repository;
     this.documentNumberService = documentNumberService;
@@ -57,7 +57,7 @@ public class DocumentUnitService {
     this.publicationReportRepository = publicationReportRepository;
     this.documentNumberRecyclingService = documentNumberRecyclingService;
     this.validator = validator;
-    this.originalFileDocumentService = originalFileDocumentService;
+    this.attachmentService = attachmentService;
   }
 
   public Mono<DocumentUnit> generateNewDocumentUnit(DocumentationOffice documentationOffice) {
@@ -157,7 +157,7 @@ public class DocumentUnitService {
               .orElseThrow(() -> new DocumentationUnitNotExistsException(documentUnitUuid));
 
       log.debug("Deleting DocumentUnitDTO " + documentUnitUuid);
-      originalFileDocumentService.deleteAllObjectsFromBucketForDocumentationUnit(documentUnitUuid);
+      attachmentService.deleteAllObjectsFromBucketForDocumentationUnit(documentUnitUuid);
       saveForRecycling(documentUnit);
       repository.delete(documentUnit);
       return Mono.just("Dokumentationseinheit gelöscht: " + documentUnitUuid);

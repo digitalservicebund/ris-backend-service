@@ -204,7 +204,7 @@ onMounted(async () => {
         </div>
 
         <div
-          v-show="documentUnit.hasFile"
+          v-show="documentUnit.hasAttachments"
           class="flex flex-col border-l-1 border-solid border-gray-400 bg-white"
           :class="{ full: showDocPanel }"
         >

@@ -4,8 +4,8 @@ import java.nio.ByteBuffer;
 import java.util.UUID;
 import org.springframework.http.HttpHeaders;
 
-public interface OriginalFileDocumentService {
-  OriginalFileDocument attachFileToDocumentationUnit(
+public interface AttachmentService {
+  Attachment attachFileToDocumentationUnit(
       UUID documentUnitUuid, ByteBuffer byteBuffer, HttpHeaders httpHeaders);
 
   void deleteByS3path(String s3path);

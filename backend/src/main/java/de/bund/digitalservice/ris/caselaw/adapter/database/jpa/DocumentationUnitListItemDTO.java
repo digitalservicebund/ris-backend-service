@@ -20,7 +20,7 @@ public interface DocumentationUnitListItemDTO {
 
   List<FileNumberDTO> getFileNumbers();
 
-  List<OriginalFileDocumentDTO> getOriginalFileDocuments();
+  List<AttachmentDTO> getAttachments();
 
   LocalDate getDecisionDate();
 

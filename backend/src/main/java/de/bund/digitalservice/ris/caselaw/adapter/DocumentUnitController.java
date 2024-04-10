@@ -1,11 +1,11 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
+import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
 import de.bund.digitalservice.ris.caselaw.domain.ConverterService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitException;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitListItem;
-import de.bund.digitalservice.ris.caselaw.domain.OriginalFileDocumentService;
 import de.bund.digitalservice.ris.caselaw.domain.Publication;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationHistoryRecord;
 import de.bund.digitalservice.ris.caselaw.domain.RelatedDocumentationUnit;
@@ -48,17 +48,17 @@ import reactor.core.publisher.Mono;
 public class DocumentUnitController {
   private final DocumentUnitService service;
   private final UserService userService;
-  private final OriginalFileDocumentService originalFileDocumentService;
+  private final AttachmentService attachmentService;
   private final ConverterService converterService;
 
   public DocumentUnitController(
       DocumentUnitService service,
       UserService userService,
-      OriginalFileDocumentService originalFileDocumentService,
+      AttachmentService attachmentService,
       ConverterService converterService) {
     this.service = service;
     this.userService = userService;
-    this.originalFileDocumentService = originalFileDocumentService;
+    this.attachmentService = attachmentService;
     this.converterService = converterService;
   }
 
@@ -95,9 +95,7 @@ public class DocumentUnitController {
 
     return converterService
         .getConvertedObject(
-            originalFileDocumentService
-                .attachFileToDocumentationUnit(uuid, byteBuffer, httpHeaders)
-                .s3path())
+            attachmentService.attachFileToDocumentationUnit(uuid, byteBuffer, httpHeaders).s3path())
         .map(docx2Html -> ResponseEntity.status(HttpStatus.OK).body(docx2Html))
         .onErrorReturn(ResponseEntity.internalServerError().build());
   }
@@ -108,7 +106,7 @@ public class DocumentUnitController {
       @PathVariable UUID uuid, @PathVariable String s3Path) {
 
     try {
-      originalFileDocumentService.deleteByS3path(s3Path);
+      attachmentService.deleteByS3path(s3Path);
       return Mono.just(ResponseEntity.noContent().build());
     } catch (Exception e) {
       return Mono.error(e);
@@ -244,9 +242,9 @@ public class DocumentUnitController {
         .getByUuid(uuid)
         .flatMap(
             documentUnit -> {
-              if (documentUnit.originalFiles().get(0).s3path() != null) {
+              if (documentUnit.attachments().get(0).s3path() != null) {
                 return converterService.getConvertedObject(
-                    documentUnit.originalFiles().get(0).s3path());
+                    documentUnit.attachments().get(0).s3path());
               } else {
                 return Mono.empty();
               }

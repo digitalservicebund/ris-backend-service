@@ -16,13 +16,13 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOffi
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationUnitTransformer;
 import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
+import de.bund.digitalservice.ris.caselaw.domain.Attachment;
+import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitPublishException;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
-import de.bund.digitalservice.ris.caselaw.domain.OriginalFileDocument;
-import de.bund.digitalservice.ris.caselaw.domain.OriginalFileDocumentService;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationReport;
 import de.bund.digitalservice.ris.caselaw.domain.RelatedDocumentationUnit;
 import de.bund.digitalservice.ris.caselaw.domain.XmlPublication;
@@ -63,7 +63,7 @@ class DocumentUnitControllerTest {
   @MockBean private KeycloakUserService userService;
   @MockBean private DocxConverterService docxConverterService;
   @MockBean private ReactiveClientRegistrationRepository clientRegistrationRepository;
-  @MockBean private OriginalFileDocumentService originalFileDocumentService;
+  @MockBean private AttachmentService attachmentService;
   @MockBean DatabaseApiKeyRepository apiKeyRepository;
   @MockBean DatabaseDocumentationOfficeRepository officeRepository;
 
@@ -465,9 +465,8 @@ class DocumentUnitControllerTest {
         .thenReturn(
             Mono.just(
                 DocumentUnit.builder()
-                    .originalFiles(
-                        Collections.singletonList(
-                            OriginalFileDocument.builder().s3path("123").build()))
+                    .attachments(
+                        Collections.singletonList(Attachment.builder().s3path("123").build()))
                     .coreData(CoreData.builder().documentationOffice(docOffice).build())
                     .build()));
     when(docxConverterService.getConvertedObject("123")).thenReturn(Mono.empty());

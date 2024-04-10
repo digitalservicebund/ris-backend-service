@@ -110,7 +110,7 @@ public class DocumentationUnitDTO implements DocumentationUnitListItemDTO {
       cascade = CascadeType.ALL,
       orphanRemoval = true,
       mappedBy = "documentationUnit")
-  private List<OriginalFileDocumentDTO> originalFileDocuments = new ArrayList<>();
+  private List<AttachmentDTO> attachments = new ArrayList<>();
 
   @Column(name = "other_long_text")
   String otherLongText;

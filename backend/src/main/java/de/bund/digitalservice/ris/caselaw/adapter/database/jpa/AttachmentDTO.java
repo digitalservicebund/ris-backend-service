@@ -20,8 +20,8 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder(toBuilder = true)
-@Entity(name = "original_file_document")
-public class OriginalFileDocumentDTO {
+@Entity(name = "attachment")
+public class AttachmentDTO {
 
   @Id @GeneratedValue @NotNull private UUID id;
 

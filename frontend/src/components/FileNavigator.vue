@@ -3,12 +3,12 @@ import { computed } from "vue"
 import FlexContainer from "@/components/FlexContainer.vue"
 import FlexItem from "@/components/FlexItem.vue"
 import TextButton from "@/components/input/TextButton.vue"
-import File from "@/domain/file"
+import Attachment from "@/domain/attachment"
 import IcOutlineArrowBack from "~icons/ic/outline-arrow-back"
 import IcOutlineArrowForward from "~icons/ic/outline-arrow-forward"
 
 const props = defineProps<{
-  files: File[]
+  files: Attachment[]
   currentIndex: number
 }>()
 

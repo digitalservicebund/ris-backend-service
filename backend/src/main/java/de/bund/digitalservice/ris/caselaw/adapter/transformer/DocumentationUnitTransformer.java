@@ -601,9 +601,9 @@ public class DocumentationUnitTransformer {
 
   private static void addOriginalFileDocuments(
       DocumentationUnitDTO documentationUnitDTO, DocumentUnitBuilder builder) {
-    builder.originalFiles(
-        documentationUnitDTO.getOriginalFileDocuments().stream()
-            .map(OriginalFileDocumentTransformer::transformToDomain)
+    builder.attachments(
+        documentationUnitDTO.getAttachments().stream()
+            .map(AttachmentTransformer::transformToDomain)
             .toList());
   }
 

@@ -40,7 +40,7 @@ public class DocumentationUnitListItemTransformer {
         .decisionDate(documentationUnitListItemDTO.getDecisionDate())
         .appraisalBody(documentationUnitListItemDTO.getJudicialBody())
         .hasHeadnoteOrPrinciple(hasHeadnoteOrPrinciple(documentationUnitListItemDTO))
-        .hasFiles(!documentationUnitListItemDTO.getOriginalFileDocuments().isEmpty())
+        .hasAttachments(!documentationUnitListItemDTO.getAttachments().isEmpty())
         .documentType(
             DocumentTypeTransformer.transformToDomain(
                 documentationUnitListItemDTO.getDocumentType()))

@@ -26,9 +26,9 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresPublicati
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.StatusDTO;
 import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
 import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
+import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.EmailPublishService;
-import de.bund.digitalservice.ris.caselaw.domain.OriginalFileDocumentService;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
 import de.bund.digitalservice.ris.caselaw.domain.Status;
 import java.time.Instant;
@@ -98,7 +98,7 @@ class DocumentUnitControllerAuthIntegrationTest {
   @MockBean private EmailPublishService publishService;
   @MockBean DocxConverterService docxConverterService;
   @MockBean ReactiveClientRegistrationRepository clientRegistrationRepository;
-  @MockBean OriginalFileDocumentService originalFileDocumentService;
+  @MockBean AttachmentService attachmentService;
 
   static Stream<Arguments> getUnauthorizedCases() {
     return Stream.of(

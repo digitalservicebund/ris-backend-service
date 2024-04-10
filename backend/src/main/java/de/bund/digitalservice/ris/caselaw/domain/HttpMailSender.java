@@ -8,6 +8,6 @@ public interface HttpMailSender {
       String receiverAddress,
       String subject,
       String content,
-      List<Attachment> attachments,
+      List<MailAttachment> mailAttachments,
       String tag);
 }

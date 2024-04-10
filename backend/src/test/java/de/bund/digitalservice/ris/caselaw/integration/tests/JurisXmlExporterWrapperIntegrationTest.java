@@ -188,7 +188,7 @@ class JurisXmlExporterWrapperIntegrationTest {
         DocumentUnit.builder()
             .uuid(TEST_UUID)
             .documentNumber(documentNr)
-            .originalFiles(Collections.emptyList())
+            .attachments(Collections.emptyList())
             .dataSource(DataSource.NEURIS)
             .coreData(coreData)
             .previousDecisions(previousDecisions)

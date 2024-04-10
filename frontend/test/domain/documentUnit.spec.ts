@@ -33,15 +33,15 @@ describe("DocumentUnit", () => {
 
   it("returns false if no file is attached", () => {
     const documentUnit = new DocumentUnit("foo")
-    expect(documentUnit.hasFile).toBeFalsy()
+    expect(documentUnit.hasAttachments).toBeFalsy()
 
     const documentUnit2 = new DocumentUnit("foo", { s3path: "" })
-    expect(documentUnit2.hasFile).toBeFalsy()
+    expect(documentUnit2.hasAttachments).toBeFalsy()
   })
 
   it("returns true if file is attached", () => {
     const documentUnit = new DocumentUnit("foo", { s3path: "foo-path" })
-    expect(documentUnit.hasFile).toBeTruthy()
+    expect(documentUnit.hasAttachments).toBeTruthy()
   })
 
   it("returns all missing required fields", () => {

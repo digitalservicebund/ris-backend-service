@@ -12,7 +12,7 @@ public record DocumentUnit(
     @Size(min = 13, max = 14, message = "documentNumber has to be 13 or 14 characters long")
         String documentNumber,
     DataSource dataSource,
-    List<OriginalFileDocument> originalFiles,
+    List<Attachment> attachments,
     @Valid CoreData coreData,
     List<PreviousDecision> previousDecisions,
     List<EnsuingDecision> ensuingDecisions,

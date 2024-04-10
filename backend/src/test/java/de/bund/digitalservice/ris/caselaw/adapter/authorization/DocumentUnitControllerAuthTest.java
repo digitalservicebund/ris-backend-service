@@ -17,12 +17,12 @@ import de.bund.digitalservice.ris.caselaw.adapter.KeycloakUserService;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseApiKeyRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationOfficeRepository;
 import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
+import de.bund.digitalservice.ris.caselaw.domain.Attachment;
+import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
-import de.bund.digitalservice.ris.caselaw.domain.OriginalFileDocument;
-import de.bund.digitalservice.ris.caselaw.domain.OriginalFileDocumentService;
 import de.bund.digitalservice.ris.caselaw.domain.Status;
 import java.util.Collections;
 import java.util.UUID;
@@ -54,7 +54,7 @@ class DocumentUnitControllerAuthTest {
   @MockBean private DocumentUnitService service;
   @MockBean private KeycloakUserService userService;
   @MockBean private DocxConverterService docxConverterService;
-  @MockBean private OriginalFileDocumentService originalFileDocumentService;
+  @MockBean private AttachmentService attachmentService;
   @MockBean ReactiveClientRegistrationRepository clientRegistrationRepository;
   @MockBean DatabaseApiKeyRepository apiKeyRepository;
   @MockBean DatabaseDocumentationOfficeRepository officeRepository;
@@ -285,8 +285,7 @@ class DocumentUnitControllerAuthTest {
         DocumentUnit.builder()
             .uuid(TEST_UUID)
             .status(status)
-            .originalFiles(
-                Collections.singletonList(OriginalFileDocument.builder().s3path(s3path).build()))
+            .attachments(Collections.singletonList(Attachment.builder().s3path(s3path).build()))
             .coreData(CoreData.builder().documentationOffice(docOffice).build())
             .build();
     when(service.getByUuid(TEST_UUID)).thenReturn(Mono.just(docUnit));

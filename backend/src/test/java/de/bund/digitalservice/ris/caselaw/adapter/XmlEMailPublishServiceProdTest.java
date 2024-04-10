@@ -10,7 +10,7 @@ import de.bund.digitalservice.ris.caselaw.domain.Attachment;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.HttpMailSender;
-import de.bund.digitalservice.ris.caselaw.domain.OriginalFileDocument;
+import de.bund.digitalservice.ris.caselaw.domain.MailAttachment;
 import de.bund.digitalservice.ris.caselaw.domain.XmlExporter;
 import de.bund.digitalservice.ris.caselaw.domain.XmlPublication;
 import de.bund.digitalservice.ris.caselaw.domain.XmlPublicationRepository;
@@ -103,8 +103,7 @@ class XmlEMailPublishServiceProdTest {
                 CoreData.builder()
                     .court(Court.builder().location("testLocation").label("testLabel").build())
                     .build())
-            .originalFiles(
-                Collections.singletonList(OriginalFileDocument.builder().name("file_name").build()))
+            .attachments(Collections.singletonList(Attachment.builder().name("file_name").build()))
             .build();
     when(xmlExporter.generateXml(any(DocumentUnit.class))).thenReturn(FORMATTED_XML);
 
@@ -131,7 +130,7 @@ class XmlEMailPublishServiceProdTest {
             SAVED_XML_MAIL_PROD.mailSubject(),
             "neuris",
             Collections.singletonList(
-                Attachment.builder()
+                MailAttachment.builder()
                     .fileName(SAVED_XML_MAIL_PROD.fileName())
                     .fileContent(SAVED_XML_MAIL_PROD.xml())
                     .build()),

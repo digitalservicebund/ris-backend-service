@@ -60,7 +60,7 @@ class DocumentUnitServiceTest {
   @MockBean private PublicationReportRepository publicationReportRepository;
   @MockBean private DatabaseDocumentUnitStatusService documentUnitStatusService;
   @MockBean private DatabaseDocumentationOfficeRepository documentationOfficeRepository;
-  @MockBean private OriginalFileDocumentService originalFileDocumentService;
+  @MockBean private AttachmentService attachmentService;
   @MockBean private Validator validator;
 
   @Test
@@ -102,7 +102,7 @@ class DocumentUnitServiceTest {
   //    var savedDocumentUnit =
   //        DocumentUnit.builder()
   //            .uuid(TEST_UUID)
-  //            .originalFiles(
+  //            .attachments(
   //                Collections.singletonList(
   //                    OriginalFileDocument.builder()
   //                        .s3path(TEST_UUID.toString())
@@ -150,7 +150,7 @@ class DocumentUnitServiceTest {
   //        DocumentUnit.builder()
   //            .uuid(TEST_UUID)
   //
-  // .originalFiles(Collections.singletonList(OriginalFileDocument.builder().s3path(TEST_UUID.toString()).name("testfile.docx").build()))
+  // .attachments(Collections.singletonList(OriginalFileDocument.builder().s3path(TEST_UUID.toString()).name("testfile.docx").build()))
   //            .build();
   //
   //    var documentUnitAfter = DocumentUnit.builder().uuid(TEST_UUID).build();
@@ -226,7 +226,7 @@ class DocumentUnitServiceTest {
   //    DocumentUnit documentUnit =
   //        DocumentUnit.builder().uuid(TEST_UUID)
   //
-  // .originalFiles(Collections.singletonList(OriginalFileDocument.builder().s3path(TEST_UUID.toString()).build()))
+  // .attachments(Collections.singletonList(OriginalFileDocument.builder().s3path(TEST_UUID.toString()).build()))
   //                .build();
   //
   //    when(repository.findByUuid(TEST_UUID)).thenReturn(Optional.ofNullable(documentUnit));
@@ -249,7 +249,7 @@ class DocumentUnitServiceTest {
   //    when(repository.findByUuid(TEST_UUID))
   //        .thenReturn(Optional.ofNullable(DocumentUnit.builder()
   //
-  // .originalFiles(Collections.singletonList(OriginalFileDocument.builder().s3path("fooPath").build()))
+  // .attachments(Collections.singletonList(OriginalFileDocument.builder().s3path("fooPath").build()))
   //                .build()));
   //    when(s3AsyncClient.deleteObject(any(DeleteObjectRequest.class)))
   //        .thenThrow(SdkException.create("exception", null));
@@ -295,9 +295,9 @@ class DocumentUnitServiceTest {
         DocumentUnit.builder()
             .uuid(UUID.randomUUID())
             .documentNumber("ABCDE20220001")
-            .originalFiles(
+            .attachments(
                 Collections.singletonList(
-                    OriginalFileDocument.builder().uploadTimestamp(Instant.now()).build()))
+                    Attachment.builder().uploadTimestamp(Instant.now()).build()))
             .build();
     when(repository.findByUuid(documentUnit.uuid())).thenReturn(Optional.of(documentUnit));
 

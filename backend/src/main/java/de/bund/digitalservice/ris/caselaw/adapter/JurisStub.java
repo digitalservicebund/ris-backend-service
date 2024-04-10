@@ -2,8 +2,8 @@ package de.bund.digitalservice.ris.caselaw.adapter;
 
 import com.icegreen.greenmail.util.GreenMail;
 import com.icegreen.greenmail.util.ServerSetup;
-import de.bund.digitalservice.ris.caselaw.domain.Attachment;
 import de.bund.digitalservice.ris.caselaw.domain.HttpMailSender;
+import de.bund.digitalservice.ris.caselaw.domain.MailAttachment;
 import de.bund.digitalservice.ris.caselaw.domain.MailStoreFactory;
 import de.bund.digitalservice.ris.domain.export.juris.response.JurisMailMockBuilder;
 import jakarta.mail.Folder;
@@ -62,7 +62,7 @@ public class JurisStub implements MailStoreFactory, HttpMailSender {
       String receiverAddress,
       String subject,
       String content,
-      List<Attachment> attachments,
+      List<MailAttachment> mailAttachments,
       String tag) {
 
     if (!isPublication(subject)) {
@@ -74,10 +74,10 @@ public class JurisStub implements MailStoreFactory, HttpMailSender {
 
     addMessage(
         JurisMailMockBuilder.generateImportMessage(
-            server.getSmtp().createSession(), documentNumber, hasErrors(attachments)));
+            server.getSmtp().createSession(), documentNumber, hasErrors(mailAttachments)));
     addMessage(
         JurisMailMockBuilder.generateProcessMessage(
-            server.getSmtp().createSession(), documentNumber, hasErrors(attachments)));
+            server.getSmtp().createSession(), documentNumber, hasErrors(mailAttachments)));
 
     LOGGER.info("Publication received and created mocked response");
   }
@@ -105,7 +105,7 @@ public class JurisStub implements MailStoreFactory, HttpMailSender {
     }
   }
 
-  private boolean hasErrors(List<Attachment> attachments) {
-    return attachments.get(0).fileContent().contains("<aktenzeichen>ERROR</aktenzeichen>");
+  private boolean hasErrors(List<MailAttachment> mailAttachments) {
+    return mailAttachments.get(0).fileContent().contains("<aktenzeichen>ERROR</aktenzeichen>");
   }
 }

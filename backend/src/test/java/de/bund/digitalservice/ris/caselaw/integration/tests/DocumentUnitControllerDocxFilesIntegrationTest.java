@@ -10,10 +10,10 @@ import static org.mockito.Mockito.when;
 import de.bund.digitalservice.ris.caselaw.RisWebTestClient;
 import de.bund.digitalservice.ris.caselaw.TestConfig;
 import de.bund.digitalservice.ris.caselaw.adapter.AuthService;
+import de.bund.digitalservice.ris.caselaw.adapter.DatabaseAttachmentService;
 import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentNumberGeneratorService;
 import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentNumberRecyclingService;
 import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentUnitStatusService;
-import de.bund.digitalservice.ris.caselaw.adapter.DatabaseOriginalFileDocumentService;
 import de.bund.digitalservice.ris.caselaw.adapter.DatabaseProcedureService;
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentNumberPatternConfig;
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentUnitController;
@@ -29,10 +29,10 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumenta
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresPublicationReportRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
 import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
+import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.EmailPublishService;
-import de.bund.digitalservice.ris.caselaw.domain.OriginalFileDocumentService;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import de.bund.digitalservice.ris.caselaw.domain.docx.Docx2Html;
 import java.io.IOException;
@@ -74,7 +74,7 @@ import software.amazon.awssdk.services.s3.model.PutObjectResponse;
       AuthService.class,
       TestConfig.class,
       DocumentNumberPatternConfig.class,
-      DatabaseOriginalFileDocumentService.class,
+      DatabaseAttachmentService.class,
     },
     controllers = {DocumentUnitController.class})
 class DocumentUnitControllerDocxFilesIntegrationTest {
@@ -99,7 +99,7 @@ class DocumentUnitControllerDocxFilesIntegrationTest {
   @Autowired private DatabaseDocumentCategoryRepository databaseDocumentCategoryRepository;
   @Autowired private DatabaseDocumentationOfficeRepository documentationOfficeRepository;
   @Autowired private DatabaseCourtRepository courtRepository;
-  @Autowired private OriginalFileDocumentService originalFileDocumentService;
+  @Autowired private AttachmentService attachmentService;
 
   @SpyBean private DocumentUnitService service;
 
@@ -156,7 +156,7 @@ class DocumentUnitControllerDocxFilesIntegrationTest {
         .expectStatus()
         .isOk();
 
-    assertThat(repository.findById(dto.getId()).get().getOriginalFileDocuments()).hasSize(1);
+    assertThat(repository.findById(dto.getId()).get().getAttachments()).hasSize(1);
   }
 
   @Test
@@ -186,7 +186,7 @@ class DocumentUnitControllerDocxFilesIntegrationTest {
   //    doReturn(
   //            Mono.just(
   //                DocumentUnit.builder()
-  //                    .originalFiles(
+  //                    .attachments(
   //                        Collections.singletonList(
   //                            OriginalFileDocument.builder().s3path("filename").build()))
   //                    .build()))
@@ -232,7 +232,7 @@ class DocumentUnitControllerDocxFilesIntegrationTest {
   //    doReturn(
   //            Mono.just(
   //                DocumentUnit.builder()
-  //                    .originalFiles(
+  //                    .attachments(
   //                        Collections.singletonList(
   //                            OriginalFileDocument.builder().s3path("filename").build()))
   //                    .build()))

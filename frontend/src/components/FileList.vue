@@ -4,11 +4,11 @@ import CellItem from "@/components/CellItem.vue"
 import TableHeader from "@/components/TableHeader.vue"
 import TableRow from "@/components/TableRow.vue"
 import TableView from "@/components/TableView.vue"
-import File from "@/domain/file"
+import Attachment from "@/domain/attachment"
 import IconDelete from "~icons/ic/baseline-close"
 
 const props = defineProps<{
-  files?: File[]
+  files?: Attachment[]
 }>()
 
 const emit = defineEmits<{
