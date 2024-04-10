@@ -5,7 +5,6 @@ export default class SingleNorm {
   public dateOfVersion?: string
   public dateOfRelevance?: string
 
-  static readonly requiredFields = ["singleNorm"] as const
   static readonly fields = [
     "singleNorm",
     "dateOfVersion",
@@ -28,16 +27,6 @@ export default class SingleNorm {
         : []),
       ...(this.dateOfRelevance ? [this.dateOfRelevance] : []),
     ].join(", ")
-  }
-
-  get hasMissingRequiredFields(): boolean {
-    return this.missingRequiredFields.length > 0
-  }
-
-  get missingRequiredFields() {
-    return SingleNorm.requiredFields.filter((field) =>
-      this.fieldIsEmpty(this[field]),
-    )
   }
 
   get isEmpty(): boolean {

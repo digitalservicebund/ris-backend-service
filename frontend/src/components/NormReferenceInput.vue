@@ -23,7 +23,7 @@ const emit = defineEmits<{
 }>()
 
 const validationStore =
-  useValidationStore<(typeof NormReference.fields)[number]>()
+  useValidationStore<["normAbbreviation", "singleNorm"][number]>()
 
 const norm = ref(new NormReference({ ...props.modelValue }))
 const singleNorms = ref(
@@ -137,7 +137,11 @@ onBeforeUnmount(() => {
         v-model="singleNorms[index] as SingleNorm"
         aria-label="Einzelnorm"
         norm-abbreviation="normAbbreviation.abbreviation"
+        @add-validation-error="
+          validationStore.add('Inhalt nicht valide', 'singleNorm')
+        "
         @remove-entry="removeSingleNormEntry(index)"
+        @remove-validation-error="validationStore.remove('singleNorm')"
       />
       <div class="flex w-full flex-row justify-between">
         <div>

@@ -17,6 +17,8 @@ const props = defineProps<{
 const emit = defineEmits<{
   "update:modelValue": [value: SingleNorm]
   removeEntry: [void]
+  addValidationError: [void]
+  removeValidationError: [void]
 }>()
 
 const validationStore = useValidationStore<(typeof SingleNorm.fields)[number]>()
@@ -32,6 +34,7 @@ const singleNorm = computed({
 
 async function validateNorm() {
   validationStore.reset()
+  emit("removeValidationError")
 
   //validate singleNorm
   if (singleNorm.value?.singleNorm) {
@@ -43,15 +46,10 @@ async function validateNorm() {
       singleNormValidationInfo,
     )
 
-    if (response.data !== "Ok")
+    if (response.data !== "Ok") {
       validationStore.add("Inhalt nicht valide", "singleNorm")
-  }
-
-  //validate required fields
-  if (singleNorm.value?.missingRequiredFields?.length) {
-    singleNorm.value?.missingRequiredFields.forEach((missingField) => {
-      validationStore.add("Pflichtfeld nicht befüllt", missingField)
-    })
+      emit("addValidationError")
+    }
   }
 }
 
