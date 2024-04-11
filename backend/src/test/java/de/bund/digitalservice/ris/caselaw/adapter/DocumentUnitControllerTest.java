@@ -474,7 +474,7 @@ class DocumentUnitControllerTest {
     risWebClient
         .withDefaultLogin()
         .get()
-        .uri("/api/v1/caselaw/documentunits/" + TEST_UUID + "/docx")
+        .uri("/api/v1/caselaw/documentunits/" + TEST_UUID + "/docx/123")
         .exchange()
         .expectStatus()
         .isOk();

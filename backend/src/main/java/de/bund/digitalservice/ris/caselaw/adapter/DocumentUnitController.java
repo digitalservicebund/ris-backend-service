@@ -235,7 +235,7 @@ public class DocumentUnitController {
                         PageRequest.of(page, size))));
   }
 
-  @GetMapping(value = "/{uuid}/docx/{s3path}", produces = MediaType.APPLICATION_JSON_VALUE)
+  @GetMapping(value = "/{uuid}/docx/{s3Path}", produces = MediaType.APPLICATION_JSON_VALUE)
   @PreAuthorize("@userHasReadAccessByDocumentUnitUuid.apply(#uuid)")
   public Mono<ResponseEntity<Docx2Html>> getHtml(
       @PathVariable UUID uuid, @PathVariable String s3Path) {
