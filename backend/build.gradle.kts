@@ -219,7 +219,7 @@ dependencies {
 
     testImplementation("io.projectreactor:reactor-test:3.6.4")
     testImplementation("org.springframework.security:spring-security-test:6.2.3")
-    testImplementation("com.tngtech.archunit:archunit-junit5:1.2.1")
+    testImplementation("com.tngtech.archunit:archunit-junit5:1.3.0")
     testImplementation("org.testcontainers:testcontainers:$testContainersVersion")
     testImplementation("org.testcontainers:junit-jupiter:$testContainersVersion")
     testImplementation("org.testcontainers:postgresql:$testContainersVersion")
