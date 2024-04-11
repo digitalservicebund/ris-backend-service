@@ -219,6 +219,8 @@ onMounted(async () => {
           v-if="props.documentUnit.attachments"
           :attachments="documentUnit.attachments"
           :is-expanded="showDocPanel"
+          @select="handleOnSelect"
+          @update="togglePanel"
         ></AttachmentViewSidePanel>
       </FlexContainer>
     </template>

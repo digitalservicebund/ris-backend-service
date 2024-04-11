@@ -11,7 +11,7 @@ const props = defineProps<{
 <template>
   <FlexContainer
     v-if="props.content"
-    class="sticky top-0 flex w-full flex-col gap-40"
+    class="sticky top-0 flex w-full flex-col gap-40 p-24"
     v-bind="$attrs"
   >
     <FlexItem
