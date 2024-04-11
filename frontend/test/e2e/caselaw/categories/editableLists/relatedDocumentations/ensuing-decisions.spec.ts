@@ -56,9 +56,8 @@ test.describe("ensuing decisions", () => {
 
     await expect(
       ensuingDecisionContainer.getByLabel("Listen Eintrag"),
-    ).toHaveCount(1)
+    ).toHaveCount(2)
 
-    await page.getByLabel("Weitere Angabe").click()
     await fillEnsuingDecisionInputs(page, {
       court: prefilledDocumentUnit.coreData.court?.label,
       fileNumber: prefilledDocumentUnit.coreData.fileNumbers?.[0],
@@ -87,7 +86,7 @@ test.describe("ensuing decisions", () => {
 
     await expect(
       ensuingDecisionContainer.getByLabel("Listen Eintrag"),
-    ).toHaveCount(2)
+    ).toHaveCount(3)
   })
 
   test("only note of linked ensuing decision is editable", async ({
@@ -129,6 +128,7 @@ test.describe("ensuing decisions", () => {
     await page
       .getByLabel("Nachgehende Entscheidung", { exact: true })
       .getByLabel("Listen Eintrag")
+      .first()
       .click()
     await expect(
       page.getByLabel("Gericht Nachgehende Entscheidung"),

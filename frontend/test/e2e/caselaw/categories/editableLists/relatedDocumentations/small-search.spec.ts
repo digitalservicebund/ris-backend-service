@@ -65,13 +65,11 @@ test("search for documentunits and link decision", async ({
           summary = `nachgehend, ` + summary
         }
 
-        const listItem = container.getByLabel("Listen Eintrag").last()
+        const listItem = container.getByLabel("Listen Eintrag").first()
         await expect(listItem).toBeVisible()
         await expect(listItem).toContainText(summary, { useInnerText: true })
 
         // search for same parameters gives same result, indication that decision is already added
-        await container.getByLabel("Weitere Angabe").click()
-
         if (container === activeCitationContainer) {
           await fillActiveCitationInputs(page, inputs)
         }
@@ -282,13 +280,11 @@ test("clicking on link of referenced documentation unit added by search opens ne
         const newTab = await newTabPromise
         await newTab.waitForLoadState()
 
-        await expect(newTab.url()).toContain(
+        expect(newTab.url()).toContain(
           `${prefilledDocumentUnit.documentNumber}`,
         )
 
-        await expect(
-          container.getByLabel("Nach Entscheidung suchen"),
-        ).toBeHidden()
+        await newTab.close()
 
         // Clean up: We need to unlink the document units in order to be allowed to delete them in the fixtures
         await container.getByText("AG Aachen, 31.12.2019").first().click()

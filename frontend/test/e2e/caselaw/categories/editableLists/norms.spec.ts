@@ -38,7 +38,7 @@ test.describe("norm", () => {
     await expect(container.getByText("PBefG")).toBeVisible()
 
     // edit entry
-    await container.getByLabel("Listen Eintrag").click()
+    await container.getByLabel("Listen Eintrag").first().click()
     await fillNormInputs(page, {
       normAbbreviation: "PBefGRVZustBehV NW",
     })
@@ -46,10 +46,10 @@ test.describe("norm", () => {
     await container.getByLabel("Norm speichern").click()
     await expect(container.getByText("PBefGRVZustBehV NW")).toBeVisible()
 
-    await expect(container.getByLabel("Listen Eintrag")).toHaveCount(1)
+    // the second list item is a default list entry
+    await expect(container.getByLabel("Listen Eintrag")).toHaveCount(2)
 
     // add second entry
-    await container.getByLabel("Weitere Angabe").click()
     await waitForSaving(
       async () => {
         await fillNormInputs(page, {
@@ -61,13 +61,21 @@ test.describe("norm", () => {
       { clickSaveButton: true },
     )
 
-    await expect(container.getByLabel("Listen Eintrag")).toHaveCount(2)
+    // the third list item is a default list entry
+    await expect(container.getByLabel("Listen Eintrag")).toHaveCount(3)
     await page.reload()
+    // the default list entry is not shown on reload page
+    await expect(container.getByLabel("Listen Eintrag")).toHaveCount(2)
+    await container.getByLabel("Weitere Angabe").isVisible()
+
     const listEntries = container.getByLabel("Listen Eintrag")
     await expect(listEntries).toHaveCount(2)
+
     await listEntries.first().click()
     await container.getByLabel("Eintrag löschen").click()
+    // the default list entry is not shown on delete item
     await expect(container.getByLabel("Listen Eintrag")).toHaveCount(1)
+    await container.getByLabel("Weitere Angabe").isVisible()
   })
 
   test("single norm validation", async ({ page, documentNumber }) => {

@@ -13,7 +13,7 @@ const emit = defineEmits<{
   "update:modelValue": [value: DummyListItem]
   addEntry: [void]
   cancelEdit: [void]
-  removeEntry: [void]
+  removeEntry: [value?: boolean]
 }>()
 
 const lastSavedModelValue = ref(new DummyListItem({ ...props.modelValue }))
@@ -77,7 +77,7 @@ onBeforeUnmount(() => {
         button-type="destructive"
         label="Eintrag löschen"
         size="small"
-        @click.stop="emit('removeEntry')"
+        @click.stop="emit('removeEntry', true)"
       />
     </div>
   </div>

@@ -91,7 +91,7 @@ test.describe("related documentation units", () => {
         await expect(container.getByText(fileNumber1)).toBeVisible()
 
         // edit entry
-        await container.getByLabel("Listen Eintrag").click()
+        await container.getByLabel("Listen Eintrag").first().click()
         await container
           .getByLabel("Aktenzeichen " + section, { exact: true })
           .fill(fileNumber2)
@@ -100,10 +100,10 @@ test.describe("related documentation units", () => {
         await expect(container.getByText(fileNumber1)).toBeHidden()
         await expect(container.getByText(fileNumber2)).toBeVisible()
 
-        await expect(container.getByLabel("Listen Eintrag")).toHaveCount(1)
+        // the second list item is a default list entry
+        await expect(container.getByLabel("Listen Eintrag")).toHaveCount(2)
 
         // add second entry
-        await container.getByLabel("Weitere Angabe").click()
         await waitForSaving(
           async () => {
             await container
@@ -115,13 +115,20 @@ test.describe("related documentation units", () => {
           { clickSaveButton: true },
         )
 
-        await expect(container.getByLabel("Listen Eintrag")).toHaveCount(2)
+        // the third list item is a default list entry
+        await expect(container.getByLabel("Listen Eintrag")).toHaveCount(3)
         await page.reload()
+        // the default list entry is not shown on reload page
+        await expect(container.getByLabel("Listen Eintrag")).toHaveCount(2)
+        await container.getByLabel("Weitere Angabe").isVisible()
+
         const listEntries = container.getByLabel("Listen Eintrag")
         await expect(listEntries).toHaveCount(2)
         await listEntries.first().click()
         await container.getByLabel("Eintrag löschen").click()
+        // the default list entry is not shown on delete item
         await expect(container.getByLabel("Listen Eintrag")).toHaveCount(1)
+        await container.getByLabel("Weitere Angabe").isVisible()
       })
     }
   })
@@ -172,6 +179,7 @@ test.describe("related documentation units", () => {
           await page
             .getByLabel(containerLabel, { exact: true })
             .getByLabel("Listen Eintrag")
+            .first()
             .click()
           if (container === activeCitationContainer) {
             await expect(
@@ -257,9 +265,9 @@ test.describe("related documentation units", () => {
 
           await container.getByLabel(`${containerLabel} speichern`).click()
 
-          await expect(container.getByLabel("Listen Eintrag")).toHaveCount(1)
+          await expect(container.getByLabel("Listen Eintrag")).toHaveCount(2)
 
-          await container.getByLabel("Listen Eintrag").click()
+          await container.getByLabel("Listen Eintrag").first().click()
           await expect(container.getByLabel("Abbrechen")).toBeVisible()
 
           await expect(
@@ -316,10 +324,9 @@ test.describe("related documentation units", () => {
             })
           }
           await container.getByLabel(`${containerLabel} speichern`).click()
-          await expect(container.getByLabel("Listen Eintrag")).toHaveCount(1)
+          await expect(container.getByLabel("Listen Eintrag")).toHaveCount(2)
 
           //list item 2
-          await container.getByLabel("Weitere Angabe").click()
           const fileNumber2 = generateString()
           if (container === activeCitationContainer) {
             await fillActiveCitationInputs(page, {
@@ -342,11 +349,9 @@ test.describe("related documentation units", () => {
             })
           }
           await container.getByLabel(`${containerLabel} speichern`).click()
-          await expect(container.getByLabel("Listen Eintrag")).toHaveCount(2)
+          await expect(container.getByLabel("Listen Eintrag")).toHaveCount(3)
 
           // leaving an empty list item, deletes it
-          await container.getByLabel("Weitere Angabe").click()
-          await expect(container.getByLabel("Listen Eintrag")).toHaveCount(3)
           await container.getByLabel("Listen Eintrag").nth(1).click()
           await expect(container.getByLabel("Listen Eintrag")).toHaveCount(2)
 
@@ -423,9 +428,9 @@ test.describe("related documentation units", () => {
 
           await container.getByLabel(`${containerLabel} speichern`).click()
 
-          await expect(container.getByLabel("Listen Eintrag")).toHaveCount(1)
+          await expect(container.getByLabel("Listen Eintrag")).toHaveCount(2)
 
-          await container.getByLabel("Listen Eintrag").click()
+          await container.getByLabel("Listen Eintrag").first().click()
 
           await expect(container.getByLabel("Abbrechen")).toBeVisible()
 
@@ -505,11 +510,9 @@ test.describe("related documentation units", () => {
 
           await container.getByLabel(`${containerLabel} speichern`).click()
 
-          await expect(container.getByLabel("Weitere Angabe")).toBeVisible()
+          await expect(container.getByLabel("Listen Eintrag")).toHaveCount(2)
 
-          await expect(container.getByLabel("Listen Eintrag")).toHaveCount(1)
-
-          await container.getByLabel("Listen Eintrag").click()
+          await container.getByLabel("Listen Eintrag").first().click()
 
           await expect(container.getByLabel("Weitere Angabe")).toBeHidden()
         },

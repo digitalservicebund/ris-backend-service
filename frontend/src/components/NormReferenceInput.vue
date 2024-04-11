@@ -19,7 +19,7 @@ const emit = defineEmits<{
   "update:modelValue": [value: NormReference]
   addEntry: [void]
   cancelEdit: [void]
-  removeEntry: [void]
+  removeEntry: [value?: boolean]
 }>()
 
 const validationStore =
@@ -79,7 +79,7 @@ async function addNormReference() {
 }
 
 async function removeNormReference() {
-  emit("removeEntry")
+  emit("removeEntry", true)
   singleNorms.value = []
 }
 

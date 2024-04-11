@@ -68,7 +68,7 @@ test.describe("previous decisions", () => {
     await page
       .locator("[aria-label='Aktenzeichen Vorgehende Entscheidung']")
       .fill(fileNumber)
-    // Knödel
+
     await page
       .locator(
         "[aria-label='Abweichendes Aktenzeichen Vorgehende Entscheidung anzeigen']",
@@ -99,6 +99,7 @@ test.describe("previous decisions", () => {
     await page
       .getByLabel("Vorgehende Entscheidung", { exact: true })
       .getByLabel("Listen Eintrag")
+      .first()
       .click()
     await page
       .locator(
@@ -128,6 +129,7 @@ test.describe("previous decisions", () => {
     await page
       .getByLabel("Vorgehende Entscheidung", { exact: true })
       .getByLabel("Listen Eintrag")
+      .first()
       .click()
     // if 'Abweichendes Aktenzeichen' input filled, the nested input is expanded
     await page
@@ -220,7 +222,7 @@ test.describe("previous decisions", () => {
 
     // Clean up:
     // We need to unlink the document units in order to be allowed to delete them in the fixtures
-    await previousDecisionContainer.getByLabel("Listen Eintrag").click()
+    await previousDecisionContainer.getByLabel("Listen Eintrag").first().click()
     await previousDecisionContainer.getByLabel("Eintrag löschen").click()
 
     await page.getByText("Speichern").click()
