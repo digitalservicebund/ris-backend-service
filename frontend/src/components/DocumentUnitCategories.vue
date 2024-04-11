@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { computed, ref, onMounted, toRefs, watch } from "vue"
 import { useRoute, useRouter } from "vue-router"
+import FilePreview from "@/components/AttachementView.vue"
 import DocumentUnitContentRelatedIndexing from "@/components/DocumentUnitContentRelatedIndexing.vue"
 import DocumentUnitCoreData from "@/components/DocumentUnitCoreData.vue"
 import DocumentUnitTexts from "@/components/DocumentUnitTexts.vue"
 import DocumentUnitWrapper from "@/components/DocumentUnitWrapper.vue"
 import EnsuingDecisions from "@/components/EnsuingDecisions.vue"
-import FilePreview from "@/components/FilePreview.vue"
 import { ValidationError } from "@/components/input/types"
 import PreviousDecisions from "@/components/PreviousDecisions.vue"
 import SideToggle, { OpeningDirection } from "@/components/SideToggle.vue"

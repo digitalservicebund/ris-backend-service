@@ -1,10 +1,10 @@
 <script lang="ts" setup>
 import { onMounted, Ref, ref, watch } from "vue"
 import { useRoute, useRouter } from "vue-router"
+import FilePreview from "@/components/AttachementView.vue"
 import DocumentUnitWrapper from "@/components/DocumentUnitWrapper.vue"
 import DocumentUnitFileList from "@/components/FileList.vue"
 import FileNavigator from "@/components/FileNavigator.vue"
-import FilePreview from "@/components/FilePreview.vue"
 import FileUpload from "@/components/FileUpload.vue"
 import FlexContainer from "@/components/FlexContainer.vue"
 import FlexItem from "@/components/FlexItem.vue"
