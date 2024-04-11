@@ -107,7 +107,7 @@ test.describe("norm", () => {
       singleNorms: [
         {
           singleNorm: "§ 123",
-          dateOfVersion: "29-02-2021",
+          dateOfVersion: "29.02.2021",
           dateOfRelevance: "0023",
         } as SingleNorm,
       ],
