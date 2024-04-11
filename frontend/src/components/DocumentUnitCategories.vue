@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, onMounted, toRefs, watch } from "vue"
 import { useRoute, useRouter } from "vue-router"
-import FilePreview from "@/components/AttachementView.vue"
+import FilePreview from "@/components/AttachmentView.vue"
 import DocumentUnitContentRelatedIndexing from "@/components/DocumentUnitContentRelatedIndexing.vue"
 import DocumentUnitCoreData from "@/components/DocumentUnitCoreData.vue"
 import DocumentUnitTexts from "@/components/DocumentUnitTexts.vue"

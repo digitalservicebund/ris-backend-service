@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { ref } from "vue"
 import { useRoute } from "vue-router"
-import OriginalFileSidePanel from "@/components/AttachementView.vue"
+import AttachmentView from "@/components/AttachmentView.vue"
 import KitchensinkPage from "@/kitchensink/components/KitchensinkPage.vue"
 import KitchensinkStory from "@/kitchensink/components/KitchensinkStory.vue"
 
@@ -12,23 +12,13 @@ route.params["documentNumber"] = "AABB2022000057"
 </script>
 
 <template>
-  <KitchensinkPage name="Original file side panel">
+  <KitchensinkPage name="Attachment View">
     <KitchensinkStory name="Has file">
-      <OriginalFileSidePanel
-        id="odoc-panel-element"
+      <AttachmentView
+        id="attachment-view-element"
         class="w-full grow bg-white p-[2rem] pl-40"
         content="This is some file content"
         :has-file="hasFile"
-        :open="isOpen"
-      />
-    </KitchensinkStory>
-
-    <KitchensinkStory name="Doesn't have file">
-      <OriginalFileSidePanel
-        id="odoc-panel-element"
-        class="w-full grow bg-white p-[2rem] pl-40"
-        content="This is some file content"
-        :has-file="!hasFile"
         :open="isOpen"
       />
     </KitchensinkStory>

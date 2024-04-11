@@ -1,6 +1,6 @@
 import { render, screen } from "@testing-library/vue"
 import { Router, createRouter, createWebHistory } from "vue-router"
-import FilePreview from "@/components/AttachementView.vue"
+import FilePreview from "@/components/AttachmentView.vue"
 
 describe("originalFile SidePanel", () => {
   let router: Router

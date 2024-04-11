@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { onMounted, Ref, ref, watch } from "vue"
 import { useRoute, useRouter } from "vue-router"
-import FilePreview from "@/components/AttachementView.vue"
+import AttachmentView from "@/components/AttachmentView.vue"
 import DocumentUnitWrapper from "@/components/DocumentUnitWrapper.vue"
 import DocumentUnitFileList from "@/components/FileList.vue"
 import FileNavigator from "@/components/FileNavigator.vue"
@@ -217,34 +217,32 @@ onMounted(async () => {
             {{ acceptedFileFormats.toString().replace(/\./g, " ") }}
           </div>
         </FlexItem>
-        <FlexItem v-show="props.documentUnit.hasAttachments">
-          <div
-            class="flex h-full flex-col border-l-1 border-solid border-gray-400 bg-white"
-            :class="{ full: showDocPanel }"
+        <FlexItem
+          v-show="props.documentUnit.hasAttachments"
+          class="h-full flex-col border-l-1 border-solid border-gray-400 bg-white"
+        >
+          <SideToggle
+            v-if="props.documentUnit.hasAttachments"
+            class="sticky top-[8rem] z-20"
+            :is-expanded="showDocPanel"
+            label="Originaldokument"
+            :opening-direction="OpeningDirection.LEFT"
+            @update:is-expanded="togglePanel"
           >
-            <SideToggle
-              v-if="props.documentUnit.hasAttachments"
-              class="sticky top-[8rem] z-20"
-              :is-expanded="showDocPanel"
-              label="Originaldokument"
-              :opening-direction="OpeningDirection.LEFT"
-              @update:is-expanded="togglePanel"
-            >
-              <FileNavigator
-                :current-index="selectedAttachmentIndex"
-                :files="getAttachments()"
-                @select="handleOnSelect"
-              ></FileNavigator>
-              <FilePreview
-                v-if="props.documentUnit.hasAttachments && fileAsHTML?.html"
-                id="odoc-panel-element"
-                v-model:open="showDocPanel"
-                class="bg-white"
-                :class="classes"
-                :content="fileAsHTML.html"
-              />
-            </SideToggle>
-          </div>
+            <FileNavigator
+              :current-index="selectedAttachmentIndex"
+              :files="getAttachments()"
+              @select="handleOnSelect"
+            ></FileNavigator>
+            <AttachmentView
+              v-if="props.documentUnit.hasAttachments && fileAsHTML?.html"
+              id="odoc-panel-element"
+              v-model:open="showDocPanel"
+              class="bg-white"
+              :class="classes"
+              :content="fileAsHTML.html"
+            />
+          </SideToggle>
         </FlexItem>
       </FlexContainer>
     </template>
