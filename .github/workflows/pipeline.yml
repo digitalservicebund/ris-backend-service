@@ -35,7 +35,7 @@ jobs:
         with:
           java-version: "17.0"
           distribution: "temurin"
-      - uses: gradle/gradle-build-action@e1ada08a9a43fad9770411d5dd099f25ece2569d
+      - uses: gradle/gradle-build-action@bdf99f9dada2506e990bac6de8ec5e3de34a04f1
         with:
           gradle-version: ${{ env.GRADLE_VERSION }}
           arguments: build --profile -x integrationTest -x test
@@ -66,7 +66,7 @@ jobs:
         with:
           java-version: "17.0"
           distribution: "temurin"
-      - uses: gradle/gradle-build-action@e1ada08a9a43fad9770411d5dd099f25ece2569d
+      - uses: gradle/gradle-build-action@bdf99f9dada2506e990bac6de8ec5e3de34a04f1
         with:
           gradle-version: ${{ env.GRADLE_VERSION}}
           arguments: test -x integrationTest
@@ -92,7 +92,7 @@ jobs:
         with:
           java-version: "17.0"
           distribution: "temurin"
-      - uses: gradle/gradle-build-action@e1ada08a9a43fad9770411d5dd099f25ece2569d
+      - uses: gradle/gradle-build-action@bdf99f9dada2506e990bac6de8ec5e3de34a04f1
         with:
           gradle-version: ${{ env.GRADLE_VERSION }}
           arguments: integrationTest -x test
@@ -123,7 +123,7 @@ jobs:
         with:
           java-version: "17.0"
           distribution: "temurin"
-      - uses: gradle/gradle-build-action@e1ada08a9a43fad9770411d5dd099f25ece2569d
+      - uses: gradle/gradle-build-action@bdf99f9dada2506e990bac6de8ec5e3de34a04f1
         with:
           gradle-version: ${{ env.GRADLE_VERSION }}
           arguments: bootBuildImage
@@ -416,7 +416,7 @@ jobs:
           path: ~/.sonar/cache
           key: ${{ runner.os }}-sonar
       - name: Scan with SonarQube
-        uses: gradle/gradle-build-action@e1ada08a9a43fad9770411d5dd099f25ece2569d
+        uses: gradle/gradle-build-action@bdf99f9dada2506e990bac6de8ec5e3de34a04f1
         with:
           gradle-version: ${{ env.GRADLE_VERSION }}
           arguments: sonar --info
@@ -856,7 +856,7 @@ jobs:
           java-version: "17.0"
           distribution: "temurin"
           cache: gradle
-      - uses: gradle/gradle-build-action@e1ada08a9a43fad9770411d5dd099f25ece2569d
+      - uses: gradle/gradle-build-action@bdf99f9dada2506e990bac6de8ec5e3de34a04f1
         with:
           gradle-version: ${{ env.GRADLE_VERSION }}
           arguments: migrateDatabaseForERD
