@@ -13,7 +13,10 @@ interface FileService {
     s3path: string,
   ): Promise<ServiceResponse<unknown>>
 
-  getDocxFileAsHtml(uuid: string): Promise<ServiceResponse<Docx2HTML>>
+  getDocxFileAsHtml(
+    uuid: string,
+    s3path: string,
+  ): Promise<ServiceResponse<Docx2HTML>>
 }
 
 const service: FileService = {
@@ -74,9 +77,9 @@ const service: FileService = {
     return response
   },
 
-  async getDocxFileAsHtml(uuid: string) {
+  async getDocxFileAsHtml(uuid: string, s3path: string) {
     const response = await httpClient.get<Docx2HTML>(
-      `caselaw/documentunits/${uuid}/docx`,
+      `caselaw/documentunits/${uuid}/docx/${s3path}`,
     )
     response.error =
       response.status >= 300

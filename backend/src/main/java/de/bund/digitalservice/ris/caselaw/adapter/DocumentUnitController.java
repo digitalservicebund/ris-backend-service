@@ -235,20 +235,14 @@ public class DocumentUnitController {
                         PageRequest.of(page, size))));
   }
 
-  @GetMapping(value = "/{uuid}/docx", produces = MediaType.APPLICATION_JSON_VALUE)
+  @GetMapping(value = "/{uuid}/docx/{s3path}", produces = MediaType.APPLICATION_JSON_VALUE)
   @PreAuthorize("@userHasReadAccessByDocumentUnitUuid.apply(#uuid)")
-  public Mono<ResponseEntity<Docx2Html>> getHtml(@PathVariable UUID uuid) {
+  public Mono<ResponseEntity<Docx2Html>> getHtml(
+      @PathVariable UUID uuid, @PathVariable String s3Path) {
+
     return service
         .getByUuid(uuid)
-        .flatMap(
-            documentUnit -> {
-              if (documentUnit.attachments().get(0).s3path() != null) {
-                return converterService.getConvertedObject(
-                    documentUnit.attachments().get(0).s3path());
-              } else {
-                return Mono.empty();
-              }
-            })
+        .flatMap(documentUnit -> converterService.getConvertedObject(s3Path))
         .map(ResponseEntity::ok)
         .onErrorReturn(ResponseEntity.internalServerError().build());
   }

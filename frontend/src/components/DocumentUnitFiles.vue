@@ -53,7 +53,7 @@ watch(
   showDocPanel,
   async () => {
     if (showDocPanel.value) {
-      await getOriginalDocumentUnit()
+      await getAttachmentHTML()
     }
   },
   { immediate: true },
@@ -137,11 +137,13 @@ function toggleDeleteModal() {
   }
 }
 
-async function getOriginalDocumentUnit() {
+const getAttachmentHTML = async () => {
   if (fileAsHTML.value?.html && fileAsHTML.value.html.length > 0) return
-  if (getAttachment(selectedAttachmentIndex.value).s3path) {
+  const selectedS3path = getAttachment(selectedAttachmentIndex.value).s3path
+  if (selectedS3path) {
     const htmlResponse = await fileService.getDocxFileAsHtml(
       props.documentUnit.uuid,
+      selectedS3path,
     )
     if (htmlResponse.error === undefined) fileAsHTML.value = htmlResponse.data
   }
@@ -149,18 +151,23 @@ async function getOriginalDocumentUnit() {
 
 onMounted(async () => {
   isLoading.value = true
-  try {
-    const fileResponse = await fileService.getDocxFileAsHtml(
-      props.documentUnit.uuid,
-    )
+  const selectedS3path = getAttachment(selectedAttachmentIndex.value).s3path
 
-    if (fileResponse.error) {
-      console.error(JSON.stringify(fileResponse.error))
-    } else {
-      html.value = fileResponse.data.html
+  if (selectedS3path) {
+    try {
+      const fileResponse = await fileService.getDocxFileAsHtml(
+        props.documentUnit.uuid,
+        selectedS3path,
+      )
+
+      if (fileResponse.error) {
+        console.error(JSON.stringify(fileResponse.error))
+      } else {
+        html.value = fileResponse.data.html
+      }
+    } finally {
+      isLoading.value = false
     }
-  } finally {
-    isLoading.value = false
   }
 })
 </script>

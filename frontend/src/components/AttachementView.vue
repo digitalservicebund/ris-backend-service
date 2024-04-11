@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import FlexContainer from "@/components/FlexContainer.vue"
+import FlexItem from "@/components/FlexItem.vue"
 import TextEditor from "@/components/input/TextEditor.vue"
 
 const props = defineProps<{
@@ -7,20 +9,22 @@ const props = defineProps<{
 </script>
 
 <template>
-  <div v-if="props.content" v-bind="$attrs">
-    <div class="sticky top-0 flex w-full flex-col gap-40">
-      <div
-        class="h-[65vh] overflow-scroll border-1 border-solid border-gray-400"
-      >
-        <TextEditor
-          data-testid="text-editor"
-          element-id="odoc"
-          field-size="max"
-          :value="props.content"
-        />
-      </div>
-    </div>
-  </div>
+  <FlexContainer
+    v-if="props.content"
+    class="sticky top-0 flex w-full flex-col gap-40"
+    v-bind="$attrs"
+  >
+    <FlexItem
+      class="h-[65vh] overflow-scroll border-1 border-solid border-gray-400"
+    >
+      <TextEditor
+        data-testid="text-editor"
+        element-id="odoc"
+        field-size="max"
+        :value="props.content"
+      />
+    </FlexItem>
+  </FlexContainer>
 </template>
 
 <style lang="scss" scoped>
