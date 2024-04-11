@@ -1,17 +1,35 @@
 <script setup lang="ts">
+import { ref } from "vue"
 import FlexContainer from "@/components/FlexContainer.vue"
 import FlexItem from "@/components/FlexItem.vue"
 import TextEditor from "@/components/input/TextEditor.vue"
+import { Docx2HTML } from "@/domain/docx2html"
+import fileService from "@/services/fileService"
 
 const props = defineProps<{
-  content: string
+  documentUnitUuid?: string
+  s3Path?: string
 }>()
+
+const fileAsHTML = ref<Docx2HTML>()
+
+const getAttachmentHTML = async () => {
+  if (props.documentUnitUuid && props.s3Path) {
+    const htmlResponse = await fileService.getDocxFileAsHtml(
+      props.documentUnitUuid,
+      props.s3Path,
+    )
+
+    if (htmlResponse.error === undefined) fileAsHTML.value = htmlResponse.data
+  }
+}
+getAttachmentHTML()
 </script>
 
 <template>
   <FlexContainer
-    v-if="props.content"
-    class="sticky top-0 flex w-full flex-col gap-40 p-24"
+    v-if="fileAsHTML?.html"
+    class="sticky top-0 flex w-full flex-col gap-40 bg-white p-24"
     v-bind="$attrs"
   >
     <FlexItem
@@ -21,7 +39,7 @@ const props = defineProps<{
         data-testid="text-editor"
         element-id="odoc"
         field-size="max"
-        :value="props.content"
+        :value="fileAsHTML?.html"
       />
     </FlexItem>
   </FlexContainer>

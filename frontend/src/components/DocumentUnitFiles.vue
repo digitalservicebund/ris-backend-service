@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { onMounted, Ref, ref, watch } from "vue"
+import { onMounted, Ref, ref } from "vue"
 import { useRoute, useRouter } from "vue-router"
 import AttachmentViewSidePanel from "@/components/AttachmentViewSidePanel.vue"
 import DocumentUnitWrapper from "@/components/DocumentUnitWrapper.vue"
@@ -11,7 +11,6 @@ import PopupModal from "@/components/PopupModal.vue"
 import { useToggleStateInRouteQuery } from "@/composables/useToggleStateInRouteQuery"
 import Attachment from "@/domain/attachment"
 import DocumentUnit from "@/domain/documentUnit"
-import { Docx2HTML } from "@/domain/docx2html"
 import documentUnitService from "@/services/documentUnitService"
 import fileService from "@/services/fileService"
 import { ResponseError } from "@/services/httpClient"
@@ -34,7 +33,6 @@ const html = ref<string>()
 const isLoading = ref(false)
 const acceptedFileFormats = [".docx"]
 const selectedAttachmentIndex: Ref<number> = ref(0)
-const fileAsHTML = ref<Docx2HTML>()
 
 const showDeleteModal = ref(false)
 const deleteModalHeaderText = "Anhang löschen"
@@ -46,16 +44,6 @@ const getAttachments = (): Attachment[] => {
 const getAttachment = (index: number): Attachment => {
   return getAttachments()[index]
 }
-
-watch(
-  showDocPanel,
-  async () => {
-    if (showDocPanel.value) {
-      await getAttachmentHTML()
-    }
-  },
-  { immediate: true },
-)
 
 async function handleDeleteFile(index: number) {
   console.log(index)
@@ -135,18 +123,6 @@ function toggleDeleteModal() {
   }
 }
 
-const getAttachmentHTML = async () => {
-  if (fileAsHTML.value?.html && fileAsHTML.value.html.length > 0) return
-  const selectedS3path = getAttachment(selectedAttachmentIndex.value).s3path
-  if (selectedS3path) {
-    const htmlResponse = await fileService.getDocxFileAsHtml(
-      props.documentUnit.uuid,
-      selectedS3path,
-    )
-    if (htmlResponse.error === undefined) fileAsHTML.value = htmlResponse.data
-  }
-}
-
 onMounted(async () => {
   isLoading.value = true
   const selectedS3path = getAttachment(selectedAttachmentIndex.value).s3path
@@ -218,6 +194,7 @@ onMounted(async () => {
         <AttachmentViewSidePanel
           v-if="props.documentUnit.attachments"
           :attachments="documentUnit.attachments"
+          :document-unit-uuid="props.documentUnit.uuid"
           :is-expanded="showDocPanel"
           @select="handleOnSelect"
           @update="togglePanel"
