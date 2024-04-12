@@ -184,4 +184,35 @@ test.describe("norm", () => {
     await expect(container.getByText("§ 123")).toBeVisible()
     await expect(container.getByText("§ 456, 2022")).toBeHidden()
   })
+
+  test("cancel editing does not save anything", async ({
+    page,
+    documentNumber,
+  }) => {
+    await navigateToCategories(page, documentNumber)
+
+    const container = page.getByLabel("Norm")
+
+    await fillNormInputs(page, {
+      normAbbreviation: "PBefG",
+      singleNorms: [{ singleNorm: "§ 123" } as SingleNorm],
+    })
+
+    await container.getByLabel("Norm speichern").click()
+    await expect(container.getByText("PBefG")).toBeVisible()
+    await expect(container.getByText("§ 123")).toBeVisible()
+
+    const listEntries = container.getByLabel("Listen Eintrag")
+    await listEntries.first().click()
+
+    await fillNormInputs(page, {
+      normAbbreviation: "PBefG",
+      singleNorms: [{ singleNorm: "§ 456" } as SingleNorm],
+    })
+
+    await container.getByLabel("Abbrechen").click()
+    await expect(container.getByText("PBefG")).toBeVisible()
+    await expect(container.getByText("§ 123")).toBeVisible()
+    await expect(container.getByText("§ 456")).toBeHidden()
+  })
 })

@@ -26,12 +26,13 @@ const validationStore =
   useValidationStore<["normAbbreviation", "singleNorm"][number]>()
 
 const norm = ref(new NormReference({ ...props.modelValue }))
-const singleNorms = ref(
+const lastSavedModelValue = ref(new NormReference({ ...props.modelValue }))
+
+const singleNorms = computed(() =>
   props.modelValue?.singleNorms
-    ? props.modelValue.singleNorms
+    ? props.modelValue?.singleNorms?.map((norm) => new SingleNorm({ ...norm }))
     : ([] as SingleNorm[]),
 )
-const lastSavedModelValue = ref(new NormReference({ ...props.modelValue }))
 
 const normAbbreviation = computed({
   get: () =>
