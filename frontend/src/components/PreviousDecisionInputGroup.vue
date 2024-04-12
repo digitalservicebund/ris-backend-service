@@ -25,7 +25,7 @@ const emit = defineEmits<{
   "update:modelValue": [value: PreviousDecision]
   addEntry: [void]
   cancelEdit: [void]
-  removeEntry: [void]
+  removeEntry: [value?: boolean]
 }>()
 
 const lastSearchInput = ref(new PreviousDecision())
@@ -310,7 +310,7 @@ onBeforeUnmount(() => {
         button-type="destructive"
         label="Eintrag löschen"
         size="small"
-        @click.stop="emit('removeEntry')"
+        @click.stop="emit('removeEntry', true)"
       />
     </div>
 

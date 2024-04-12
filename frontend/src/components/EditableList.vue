@@ -26,6 +26,8 @@ const modelValueList = ref<T[]>([...props.modelValue]) as Ref<T[]>
 
 const editIndex = ref<number | undefined>()
 
+const shouldAddDefaultEntry = ref<boolean>(false)
+
 /**
  * Setting the edit index, renders the edit component of the given index, the summary component is not visible
  * @param {number} index - The index of the list item to be shown in edit mode
@@ -50,22 +52,25 @@ function addNewListEntry() {
     typeof defaultValue === "object" ? { ...defaultValue } : defaultValue,
   )
 
-  editIndex.value = modelValueList.value.length - 1
+  setEditIndex(modelValueList.value.length - 1)
 }
 
 /**
  * Removes the list item, with the given index, by propagating an updated list without the list item
  * at the given index to the parent component. The edit index is resetted, to show list in summary mode.
  * @param {number} index - The index of the list item to be removed
+ * @param {boolean} shouldResetEditIndex - Indicates if the editIndex should be reset to undefined
  */
-function removeEntry(index: number) {
+function removeEntry(index: number, shouldResetEditIndex?: boolean) {
   modelValueList.value.splice(index, 1)
 
   emit(
     "update:modelValue",
     [...props.modelValue].filter((_, i) => i !== index),
   )
-  editIndex.value = undefined
+  if (shouldResetEditIndex) {
+    setEditIndex()
+  }
 }
 
 /**
@@ -76,6 +81,7 @@ function removeEntry(index: number) {
 function updateModel() {
   setEditIndex()
   emit("update:modelValue", modelValueList.value)
+  shouldAddDefaultEntry.value = true
 }
 
 /**
@@ -88,6 +94,10 @@ watch(
     modelValueList.value = modelValueList.value.map((value, index) =>
       index == editIndex.value ? value : props.modelValue[index],
     )
+    if (shouldAddDefaultEntry.value) {
+      addNewListEntry()
+      shouldAddDefaultEntry.value = false
+    }
   },
   {
     immediate: true,
@@ -147,7 +157,7 @@ watch(
         :model-value-list="modelValueList"
         @add-entry="updateModel"
         @cancel-edit="cancelEdit"
-        @remove-entry="removeEntry(index)"
+        @remove-entry="(value?: boolean) => removeEntry(index, value)"
       />
     </div>
 
