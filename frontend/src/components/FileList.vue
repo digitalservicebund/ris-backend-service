@@ -51,8 +51,8 @@ const onSelect = (index: number) => {
 
       <CellItem @click="onSelect(index)">
         {{
-          file.uploadedDate
-            ? dayjs(file.uploadedDate).format("DD.MM.YYYY")
+          file.uploadTimestamp
+            ? dayjs(file.uploadTimestamp).format("DD.MM.YYYY")
             : "-"
         }}
       </CellItem>

@@ -6,4 +6,4 @@ import lombok.Builder;
 
 @Builder
 public record Attachment(
-    String s3path, String extension, String name, @PastOrPresent Instant uploadTimestamp) {}
+    String s3path, String format, String name, @PastOrPresent Instant uploadTimestamp) {}

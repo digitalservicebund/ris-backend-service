@@ -28,7 +28,7 @@ public class AttachmentDTO {
   @Column(name = "upload_timestamp")
   private Instant uploadTimestamp;
 
-  @Column private String extension;
+  @Column private String format;
 
   @Column private String filename;
 

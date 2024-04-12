@@ -70,7 +70,7 @@ public class DatabaseAttachmentService implements AttachmentService {
             .s3ObjectPath(fileUuid.toString())
             .documentationUnit(documentUnitRepository.findById(documentationUnitUuid).orElseThrow())
             .filename(fileName)
-            .extension("docx")
+            .format("docx")
             .uploadTimestamp(Instant.now())
             .build();
 

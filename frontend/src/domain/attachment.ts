@@ -1,5 +1,5 @@
 export default class Attachment {
-  uploadedDate?: string
+  uploadTimestamp?: string
   name?: string
   format?: string
   s3path?: string

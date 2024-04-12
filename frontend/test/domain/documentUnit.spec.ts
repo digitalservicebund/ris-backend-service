@@ -35,17 +35,21 @@ describe("DocumentUnit", () => {
     const documentUnit = new DocumentUnit("foo")
     expect(documentUnit.hasAttachments).toBeFalsy()
 
-    const documentUnit2 = new DocumentUnit("foo", { s3path: "" })
+    const documentUnit2 = new DocumentUnit("foo", { attachments: [] })
     expect(documentUnit2.hasAttachments).toBeFalsy()
   })
 
   it("returns true if file is attached", () => {
-    const documentUnit = new DocumentUnit("foo", { s3path: "foo-path" })
+    const documentUnit = new DocumentUnit("foo", {
+      attachments: [{ s3path: "foo-path" }],
+    })
     expect(documentUnit.hasAttachments).toBeTruthy()
   })
 
   it("returns all missing required fields", () => {
-    const documentUnit = new DocumentUnit("foo", { s3path: "foo-path" })
+    const documentUnit = new DocumentUnit("foo", {
+      attachments: [{ s3path: "foo-path" }],
+    })
     expect(documentUnit.missingRequiredFields).toStrictEqual([
       "fileNumbers",
       "court",
@@ -57,7 +61,7 @@ describe("DocumentUnit", () => {
 
   it("identify missing fields correctly if one field is set", () => {
     const documentUnit = new DocumentUnit("foo", {
-      s3path: "foo-path",
+      attachments: [{ s3path: "foo-path" }],
       coreData: { legalEffect: "foo" },
     })
     expect(documentUnit.missingRequiredFields).toStrictEqual([
@@ -70,7 +74,7 @@ describe("DocumentUnit", () => {
 
   it("indentify empty fileNumbers as missing", () => {
     const documentUnit = new DocumentUnit("foo", {
-      s3path: "foo-path",
+      attachments: [{ s3path: "foo-path" }],
       coreData: { fileNumbers: [] },
     })
     expect(documentUnit.missingRequiredFields).toStrictEqual([
@@ -84,7 +88,7 @@ describe("DocumentUnit", () => {
 
   it("indentify empty decisionDate as missing", () => {
     const documentUnit = new DocumentUnit("foo", {
-      s3path: "foo-path",
+      attachments: [{ s3path: "foo-path" }],
       coreData: { decisionDate: "" },
     })
     expect(documentUnit.missingRequiredFields).toStrictEqual([
@@ -98,7 +102,7 @@ describe("DocumentUnit", () => {
 
   it("indentify all missing required fields", () => {
     const documentUnit = new DocumentUnit("foo", {
-      s3path: "foo-path",
+      attachments: [{ s3path: "foo-path" }],
       coreData: { legalEffect: "foo" },
     })
     expect(documentUnit.missingRequiredFields).toStrictEqual([

@@ -15,7 +15,7 @@ const fileAsHTML = ref<Docx2HTML>()
 
 const getAttachmentHTML = async () => {
   if (props.documentUnitUuid && props.s3Path) {
-    const htmlResponse = await fileService.getDocxFileAsHtml(
+    const htmlResponse = await fileService.getAttachmentAsHtml(
       props.documentUnitUuid,
       props.s3Path,
     )
@@ -44,7 +44,7 @@ watch(
     >
       <TextEditor
         data-testid="text-editor"
-        element-id="odoc"
+        element-id="text-editor"
         field-size="max"
         :value="fileAsHTML?.html"
       />

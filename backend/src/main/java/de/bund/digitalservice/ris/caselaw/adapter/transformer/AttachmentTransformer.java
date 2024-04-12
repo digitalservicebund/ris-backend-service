@@ -10,7 +10,7 @@ public class AttachmentTransformer {
   public static Attachment transformToDomain(AttachmentDTO dto) {
     return Attachment.builder()
         .name(dto.getFilename())
-        .extension(dto.getExtension())
+        .format(dto.getFormat())
         .s3path(dto.getS3ObjectPath())
         .uploadTimestamp(dto.getUploadTimestamp())
         .build();
