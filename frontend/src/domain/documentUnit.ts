@@ -137,6 +137,7 @@ export default class DocumentUnit {
         (norm) =>
           new NormReference({
             ...norm,
+            normAbbreviationRawValue: norm.normAbbreviationRawValue,
             singleNorms: norm.singleNorms?.map(
               (norm) => new SingleNorm({ ...norm }),
             ),

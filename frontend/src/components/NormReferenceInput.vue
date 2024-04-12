@@ -34,14 +34,22 @@ const singleNorms = ref(
 const lastSavedModelValue = ref(new NormReference({ ...props.modelValue }))
 
 const normAbbreviation = computed({
-  get: () =>
-    norm.value.normAbbreviation
-      ? {
-          label: norm.value.normAbbreviation.abbreviation,
-          value: norm.value.normAbbreviation,
-          additionalInformation: norm.value.normAbbreviation.officialLongTitle,
-        }
-      : undefined,
+  get: () => {
+    if (norm.value.normAbbreviation) {
+      return {
+        label: norm.value.normAbbreviation.abbreviation,
+        value: norm.value.normAbbreviation,
+        additionalInformation: norm.value.normAbbreviation.officialLongTitle,
+      }
+    } else if (norm.value.normAbbreviationRawValue) {
+      return {
+        label: norm.value.normAbbreviationRawValue,
+        value: norm.value.normAbbreviationRawValue,
+        additionalInformation: norm.value.normAbbreviationRawValue,
+      }
+    }
+    return undefined
+  },
   set: (newValue) => {
     const newNormAbbreviation = { ...newValue } as NormAbbreviation
     if (newValue) {
@@ -130,7 +138,7 @@ onBeforeUnmount(() => {
         placeholder="Abkürzung, Kurz-oder Langtitel oder Region eingeben ..."
       ></ComboboxInput>
     </InputField>
-    <div v-if="normAbbreviation">
+    <div v-if="normAbbreviation || norm.normAbbreviationRawValue">
       <SingleNormInput
         v-for="(_, index) in singleNorms"
         :key="index"
