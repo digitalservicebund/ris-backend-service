@@ -7,6 +7,8 @@ import DocumentUnitCoreData from "@/components/DocumentUnitCoreData.vue"
 import DocumentUnitTexts from "@/components/DocumentUnitTexts.vue"
 import DocumentUnitWrapper from "@/components/DocumentUnitWrapper.vue"
 import EnsuingDecisions from "@/components/EnsuingDecisions.vue"
+import FlexContainer from "@/components/FlexContainer.vue"
+import FlexItem from "@/components/FlexItem.vue"
 import { ValidationError } from "@/components/input/types"
 import PreviousDecisions from "@/components/PreviousDecisions.vue"
 import { useScrollToHash } from "@/composables/useScrollToHash"
@@ -148,8 +150,8 @@ const handleOnSelect = (index: number) => {
     :save-callback="handleUpdateDocumentUnit"
   >
     <template #default="{ classes }">
-      <div class="flex w-full flex-grow">
-        <div class="flex flex-col bg-gray-100" :class="classes">
+      <FlexContainer class="w-full flex-grow">
+        <FlexItem class="flex-1 flex-col bg-gray-100" :class="classes">
           <DocumentUnitCoreData
             id="coreData"
             v-model="coreData"
@@ -178,7 +180,7 @@ const handleOnSelect = (index: number) => {
             :valid-border-numbers="updatedDocumentUnit.borderNumbers"
             @update-value="handleUpdateValueDocumentUnitTexts"
           />
-        </div>
+        </FlexItem>
 
         <AttachmentViewSidePanel
           v-if="props.documentUnit.attachments"
@@ -189,7 +191,7 @@ const handleOnSelect = (index: number) => {
           @select="handleOnSelect"
           @update="togglePanel"
         ></AttachmentViewSidePanel>
-      </div>
+      </FlexContainer>
     </template>
   </DocumentUnitWrapper>
 </template>

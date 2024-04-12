@@ -37,7 +37,7 @@ const hasPrevious = computed(() => {
 <template>
   <FlexContainer
     v-if="files.length > 1"
-    class="float-end m-16 ml-20 items-center space-x-8"
+    class="float-end m-16 ml-20 items-center space-x-8 px-8"
   >
     <FlexItem class="ds-label-02-bold">
       {{ props.files[currentIndex].name }}

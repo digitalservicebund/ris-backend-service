@@ -36,10 +36,12 @@ const handlePanelExpanded = (isExpanded: boolean) => {
 
 <template>
   <FlexItem
+    v-if="true"
     class="h-full flex-col border-l-1 border-solid border-gray-400 bg-white"
+    :class="[props.isExpanded ? 'flex-1' : '', props.isExpanded ? 'w-1/2' : '']"
   >
     <SideToggle
-      class="sticky top-[8rem] z-20 w-full"
+      class="sticky top-[8rem] z-20"
       :is-expanded="props.isExpanded"
       label="AttachmentViewSideToggle"
       :opening-direction="OpeningDirection.LEFT"
