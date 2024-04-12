@@ -36,7 +36,7 @@ const handlePanelExpanded = (isExpanded: boolean) => {
 
 <template>
   <FlexItem
-    v-if="true"
+    v-if="attachments.length > 0"
     class="h-full flex-col border-l-1 border-solid border-gray-400 bg-white"
     :class="[props.isExpanded ? 'flex-1' : '', props.isExpanded ? 'w-1/2' : '']"
   >
