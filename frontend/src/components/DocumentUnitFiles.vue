@@ -71,8 +71,12 @@ async function handleDeleteFile(index: number) {
 console.log(props.documentUnit)
 
 const handleOnSelect = (index: number) => {
-  selectedAttachmentIndex.value = index
-  showDocPanel.value = true
+  if (selectedAttachmentIndex.value == index) {
+    showDocPanel.value = !showDocPanel.value
+  } else {
+    selectedAttachmentIndex.value = index
+    showDocPanel.value = true
+  }
 }
 
 const handleOnDelete = (index: number) => {
