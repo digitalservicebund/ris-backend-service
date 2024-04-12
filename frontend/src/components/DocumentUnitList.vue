@@ -120,9 +120,10 @@ function onDelete() {
         :key="id"
         data-testid="listEntry"
       >
-        <CellItem>
+        <CellItem
+          class="underline focus:outline-none focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-blue-800"
+        >
           <router-link
-            class="underline focus:outline-none focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-blue-800"
             :to="{
               name: 'caselaw-documentUnit-documentNumber-categories',
               params: { documentNumber: listEntry.documentNumber },
@@ -162,7 +163,14 @@ function onDelete() {
               class="text-blue-800"
               data-testid="file-attached-icon"
             >
-              <IconAttachedFile />
+              <router-link
+                :to="{
+                  name: 'caselaw-documentUnit-documentNumber-files',
+                  params: { documentNumber: listEntry.documentNumber },
+                }"
+              >
+                <IconAttachedFile />
+              </router-link>
             </FlexItem>
             <FlexItem v-else class="text-gray-500">
               <IconAttachedFile />
