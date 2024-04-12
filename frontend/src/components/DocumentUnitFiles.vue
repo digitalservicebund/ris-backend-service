@@ -72,7 +72,7 @@ console.log(props.documentUnit)
 
 const handleOnSelect = (index: number) => {
   selectedAttachmentIndex.value = index
-  showDocPanel.value = !showDocPanel.value
+  showDocPanel.value = true
 }
 
 const handleOnDelete = (index: number) => {
