@@ -154,7 +154,7 @@ export default class DocumentUnit {
   }
 
   get hasAttachments(): boolean {
-    return this.attachments.length > 0
+    return this.attachments && this.attachments.length > 0
   }
 
   get missingRequiredFields() {

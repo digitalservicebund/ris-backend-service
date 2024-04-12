@@ -13,7 +13,7 @@ route.params["documentNumber"] = "AABB2022000057"
 
 <template>
   <KitchensinkPage name="Attachment View">
-    <KitchensinkStory name="Has file">
+    <KitchensinkStory name="Attachment View">
       <AttachmentView
         id="attachment-view-element"
         class="w-full grow bg-white p-[2rem] pl-40"

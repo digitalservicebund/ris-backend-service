@@ -2,10 +2,10 @@ import { userEvent } from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
 import { createRouter, createWebHistory } from "vue-router"
 import DocumentUnitAttachments from "@/components/DocumentUnitAttachments.vue"
+import Attachment from "@/domain/attachment"
 import DocumentUnit from "@/domain/documentUnit"
-import documentUnitService from "@/services/documentUnitService"
 
-function renderComponent() {
+function renderComponent(attachments?: Attachment[]) {
   // eslint-disable-next-line testing-library/await-async-events
   const user = userEvent.setup()
 
@@ -45,11 +45,7 @@ function renderComponent() {
       props: {
         documentUnit: new DocumentUnit("foo", {
           documentNumber: "1234567891234",
-          coreData: {},
-          texts: {},
-          previousDecisions: undefined,
-          ensuingDecisions: undefined,
-          contentRelatedIndexing: {},
+          attachments: attachments,
         }),
       },
       global: { plugins: [router] },
@@ -58,23 +54,32 @@ function renderComponent() {
 }
 
 describe("Document Unit Categories", () => {
-  vi.spyOn(documentUnitService, "update").mockImplementation(() =>
-    Promise.resolve({
-      status: 200,
-      data: new DocumentUnit("foo", {
-        documentNumber: "1234567891234",
-
-        texts: {},
-        previousDecisions: undefined,
-        ensuingDecisions: undefined,
-        contentRelatedIndexing: {},
-      }),
-    }),
-  )
-  test("renders correctly without attachments", async () => {
+  test("renders without attachments", async () => {
     renderComponent()
 
     expect(screen.getByTestId("title")).toBeVisible()
+    expect(screen.queryByTestId("attachment-list")).not.toBeInTheDocument()
+    expect(
+      screen.queryByTestId("attachment-view-side-panel"),
+    ).not.toBeInTheDocument()
+  })
+
+  test("renders file list if has attachments", async () => {
+    const name = "this-is-a-file-name.docx"
+    const format = "docx"
+    const attachment: Attachment = {
+      name: name,
+      format: format,
+      s3path: "./path.docx",
+      uploadTimestamp: "11.04.2024",
+    }
+    renderComponent([attachment])
+
     expect(screen.getByTestId("title")).toBeVisible()
+    expect(screen.queryByTestId("attachment-list")).toBeVisible()
+    expect(screen.queryByTestId("attachment-view-side-panel")).toBeVisible()
+    expect(screen.queryByText(name)).toBeVisible()
+    expect(screen.queryByText(format)).toBeVisible()
+    expect(screen.getByTestId("uploaded-at-cell")).toBeInTheDocument()
   })
 })

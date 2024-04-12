@@ -52,7 +52,7 @@ const onSelect = (index: number) => {
         {{ file.format ?? "-" }}
       </CellItem>
 
-      <CellItem @click="onSelect(index)">
+      <CellItem data-testid="uploaded-at-cell" @click="onSelect(index)">
         {{
           file.uploadTimestamp
             ? dayjs(file.uploadTimestamp).format("DD.MM.YYYY")
