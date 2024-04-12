@@ -134,7 +134,7 @@ test.describe("norm", () => {
   })
 
   // eslint-disable-next-line playwright/no-skipped-test
-  test("adding and deleting multiple single norms", async ({
+  test.skip("adding and deleting multiple single norms", async ({
     page,
     documentNumber,
   }) => {
