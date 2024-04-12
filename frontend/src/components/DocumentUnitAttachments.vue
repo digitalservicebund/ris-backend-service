@@ -1,13 +1,14 @@
 <script lang="ts" setup>
 import { Ref, ref } from "vue"
 import { useRoute, useRouter } from "vue-router"
+import AttachmentList from "@/components/AttachmentList.vue"
 import AttachmentViewSidePanel from "@/components/AttachmentViewSidePanel.vue"
 import DocumentUnitWrapper from "@/components/DocumentUnitWrapper.vue"
-import DocumentUnitFileList from "@/components/FileList.vue"
 import FileUpload from "@/components/FileUpload.vue"
 import FlexContainer from "@/components/FlexContainer.vue"
 import FlexItem from "@/components/FlexItem.vue"
 import PopupModal from "@/components/PopupModal.vue"
+import TitleElement from "@/components/TitleElement.vue"
 import { useToggleStateInRouteQuery } from "@/composables/useToggleStateInRouteQuery"
 import Attachment from "@/domain/attachment"
 import DocumentUnit from "@/domain/documentUnit"
@@ -67,8 +68,6 @@ async function handleDeleteFile(index: number) {
     }
   }
 }
-
-console.log(props.documentUnit)
 
 const handleOnSelect = (index: number) => {
   if (selectedAttachmentIndex.value == index) {
@@ -150,14 +149,14 @@ function toggleDeleteModal() {
           @confirm-action="deleteFile(selectedAttachmentIndex)"
         />
         <FlexItem class="flex-1 space-y-20" :class="classes">
-          <h1 class="ds-heading-02-reg mb-[1rem]">Dokumente</h1>
-          <DocumentUnitFileList
+          <TitleElement>Dokumente</TitleElement>
+          <AttachmentList
             v-if="props.documentUnit.hasAttachments"
             id="file-table"
             :files="getAttachments()"
             @delete="handleOnDelete"
             @select="handleOnSelect"
-          ></DocumentUnitFileList>
+          ></AttachmentList>
           <div>
             <div class="flex flex-col items-start">
               <FileUpload

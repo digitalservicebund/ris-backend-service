@@ -29,7 +29,10 @@ const onSelect = (index: number) => {
 </script>
 
 <template>
-  <TableView class="relative table w-full border-separate">
+  <TableView
+    class="relative table w-full border-separate"
+    data-testid="attachment-list"
+  >
     <TableHeader>
       <CellItem> Dateiname</CellItem>
       <CellItem> Format</CellItem>

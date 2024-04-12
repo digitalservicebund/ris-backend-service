@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { onMounted, ref } from "vue"
-import DocumentUnitFiles from "@/components/DocumentUnitFiles.vue"
+import DocumentUnitFiles from "@/components/DocumentUnitAttachments.vue"
 import RouteErrorDisplay from "@/components/RouteErrorDisplay.vue"
 import DocumentUnit from "@/domain/documentUnit"
 import documentUnitService from "@/services/documentUnitService"
