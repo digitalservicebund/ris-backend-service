@@ -19,7 +19,6 @@ const getAttachmentHTML = async () => {
       props.documentUnitUuid,
       props.s3Path,
     )
-
     if (htmlResponse.error === undefined) fileAsHTML.value = htmlResponse.data
   }
 }
