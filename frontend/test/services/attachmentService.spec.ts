@@ -1,6 +1,6 @@
 import service from "@/services/attachmentService"
 
-describe("fileService", () => {
+describe("attachmentService", () => {
   it("should return 415 if not docx file", async () => {
     const testFile = new File([new Blob(["foo"])], "test.pdf")
 
