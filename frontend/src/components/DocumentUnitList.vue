@@ -3,6 +3,8 @@ import dayjs from "dayjs"
 import { computed, ref } from "vue"
 import DocumentUnitListEntry from "../domain/documentUnitListEntry"
 import CellItem from "@/components/CellItem.vue"
+import FlexContainer from "@/components/FlexContainer.vue"
+import FlexItem from "@/components/FlexItem.vue"
 import IconBadge from "@/components/IconBadge.vue"
 import InfoModal from "@/components/InfoModal.vue"
 import LoadingSpinner from "@/components/LoadingSpinner.vue"
@@ -154,24 +156,26 @@ function onDelete() {
           }}
         </CellItem>
         <CellItem>
-          <div class="flex flex-row">
-            <span
+          <FlexContainer class="flex-row">
+            <FlexItem
               v-if="listEntry.hasAttachments"
               class="text-blue-800"
               data-testid="file-attached-icon"
             >
               <IconAttachedFile />
-            </span>
-            <span v-else class="text-gray-500"><IconAttachedFile /></span>
-            <span
+            </FlexItem>
+            <FlexItem v-else class="text-gray-500">
+              <IconAttachedFile />
+            </FlexItem>
+            <FlexItem
               v-if="listEntry.hasHeadnoteOrPrinciple"
               class="text-blue-800"
               data-testid="headnote-principle-icon"
             >
               <IconSubject />
-            </span>
+            </FlexItem>
             <span v-else class="text-gray-500"><IconSubject /></span>
-          </div>
+          </FlexContainer>
         </CellItem>
         <CellItem>
           <IconBadge
