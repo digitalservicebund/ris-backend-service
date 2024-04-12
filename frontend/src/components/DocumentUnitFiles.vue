@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { onMounted, Ref, ref } from "vue"
+import { Ref, ref } from "vue"
 import { useRoute, useRouter } from "vue-router"
 import AttachmentViewSidePanel from "@/components/AttachmentViewSidePanel.vue"
 import DocumentUnitWrapper from "@/components/DocumentUnitWrapper.vue"
@@ -122,28 +122,6 @@ function toggleDeleteModal() {
     }
   }
 }
-
-onMounted(async () => {
-  isLoading.value = true
-  const selectedS3path = getAttachment(selectedAttachmentIndex.value).s3path
-
-  if (selectedS3path) {
-    try {
-      const fileResponse = await fileService.getDocxFileAsHtml(
-        props.documentUnit.uuid,
-        selectedS3path,
-      )
-
-      if (fileResponse.error) {
-        console.error(JSON.stringify(fileResponse.error))
-      } else {
-        html.value = fileResponse.data.html
-      }
-    } finally {
-      isLoading.value = false
-    }
-  }
-})
 </script>
 
 <template>
@@ -194,6 +172,7 @@ onMounted(async () => {
         <AttachmentViewSidePanel
           v-if="props.documentUnit.attachments"
           :attachments="documentUnit.attachments"
+          :current-index="selectedAttachmentIndex"
           :document-unit-uuid="props.documentUnit.uuid"
           :is-expanded="showDocPanel"
           @select="handleOnSelect"

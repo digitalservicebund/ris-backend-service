@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from "vue"
+import { ref, watch } from "vue"
 import FlexContainer from "@/components/FlexContainer.vue"
 import FlexItem from "@/components/FlexItem.vue"
 import TextEditor from "@/components/input/TextEditor.vue"
@@ -24,6 +24,13 @@ const getAttachmentHTML = async () => {
   }
 }
 getAttachmentHTML()
+
+watch(
+  () => props.s3Path,
+  () => {
+    getAttachmentHTML()
+  },
+)
 </script>
 
 <template>

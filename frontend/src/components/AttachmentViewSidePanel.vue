@@ -8,16 +8,15 @@ import Attachment from "@/domain/attachment"
 interface Props {
   isExpanded: boolean
   attachments: Attachment[]
-  currentIndex?: number
-  label?: string
+  currentIndex: number
   documentUnitUuid: string
+  label?: string
   openingDirection?: OpeningDirection
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  openingDirection: OpeningDirection.RIGHT,
   label: "attachment view side panel",
-  currentIndex: 0,
+  openingDirection: OpeningDirection.RIGHT,
 })
 
 const emit = defineEmits<{
@@ -27,14 +26,11 @@ const emit = defineEmits<{
 
 const handleOnSelect = (index: number) => {
   emit("select", index)
+  console.log(index)
 }
 
 const handlePanelExpanded = (isExpanded: boolean) => {
   emit("update", isExpanded)
-}
-
-const getAttachment = (index: number): Attachment | undefined => {
-  return props.attachments[index]
 }
 </script>
 
@@ -55,8 +51,15 @@ const getAttachment = (index: number): Attachment | undefined => {
         @select="handleOnSelect"
       ></FileNavigator>
       <AttachmentView
+        v-if="
+          props.documentUnitUuid &&
+          attachments &&
+          props.currentIndex != null &&
+          attachments[props.currentIndex] &&
+          attachments[props.currentIndex]?.s3path
+        "
         :document-unit-uuid="props.documentUnitUuid"
-        :s3-path="getAttachment(currentIndex)?.s3path"
+        :s3-path="attachments[props.currentIndex].s3path"
       />
     </SideToggle>
   </FlexItem>
