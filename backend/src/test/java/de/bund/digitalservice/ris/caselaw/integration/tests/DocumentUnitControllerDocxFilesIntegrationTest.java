@@ -38,7 +38,6 @@ import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitNotExistsException;
 import de.bund.digitalservice.ris.caselaw.domain.EmailPublishService;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import de.bund.digitalservice.ris.caselaw.domain.docx.Docx2Html;
@@ -50,6 +49,7 @@ import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -124,7 +124,6 @@ class DocumentUnitControllerDocxFilesIntegrationTest {
   @MockBean private ReactiveClientRegistrationRepository clientRegistrationRepository;
 
   private final DocumentationOffice docOffice = buildDefaultDocOffice();
-  private DocumentationUnitDTO documentationUnitDTO;
 
   @BeforeEach
   void setUp() {
@@ -143,10 +142,11 @@ class DocumentUnitControllerDocxFilesIntegrationTest {
   @AfterEach
   void cleanUp() {
     repository.deleteAll();
+    attachmentRepository.deleteAll();
   }
 
   @Test
-  void testAttachFileToDocumentUnit() throws IOException {
+  void testAttachDocxToDocumentationUnit() throws IOException {
     DocumentationUnitDTO dto =
         repository.save(
             DocumentationUnitDTO.builder()
@@ -169,12 +169,59 @@ class DocumentUnitControllerDocxFilesIntegrationTest {
         .expectStatus()
         .isOk();
 
-    assertThat(attachmentRepository.findAllByDocumentationUnitId(dto.getId())).isNotNull();
-    // todo: check for proper values
+    var savedAttachment = attachmentRepository.findAllByDocumentationUnitId(dto.getId()).get(0);
+    assertThat(savedAttachment.getUploadTimestamp()).isInstanceOf(Instant.class);
+    assertThat(savedAttachment.getId()).isInstanceOf(UUID.class);
   }
 
   @Test
-  void testAttachFileToDocumentUnit_withInvalidUuid() {
+  void testAttachMultipleDocxToDocumentationUnitSequentially() throws IOException {
+    DocumentationUnitDTO documentationUnitDto =
+        repository.save(
+            DocumentationUnitDTO.builder()
+                .documentNumber("1234567890123")
+                .documentationOffice(documentationOfficeRepository.findByAbbreviation("DS"))
+                .build());
+    byte[] docxBytes = Files.readAllBytes(Paths.get("src/test/resources/fixtures/attachment.docx"));
+
+    when(s3AsyncClient.putObject(any(PutObjectRequest.class), any(AsyncRequestBody.class)))
+        .thenReturn(CompletableFuture.completedFuture(PutObjectResponse.builder().build()));
+    when(docxConverterService.getConvertedObject(any(String.class)))
+        .thenReturn(Mono.just(Docx2Html.EMPTY));
+
+    risWebTestClient
+        .withDefaultLogin()
+        .put()
+        .uri("/api/v1/caselaw/documentunits/" + documentationUnitDto.getId() + "/file")
+        .body(BodyInserters.fromValue(docxBytes))
+        .exchange()
+        .expectStatus()
+        .isOk();
+
+    risWebTestClient
+        .withDefaultLogin()
+        .put()
+        .uri("/api/v1/caselaw/documentunits/" + documentationUnitDto.getId() + "/file")
+        .body(BodyInserters.fromValue(docxBytes))
+        .exchange()
+        .expectStatus()
+        .isOk();
+
+    risWebTestClient
+        .withDefaultLogin()
+        .put()
+        .uri("/api/v1/caselaw/documentunits/" + documentationUnitDto.getId() + "/file")
+        .body(BodyInserters.fromValue(docxBytes))
+        .exchange()
+        .expectStatus()
+        .isOk();
+
+    assertThat(attachmentRepository.findAllByDocumentationUnitId(documentationUnitDto.getId()))
+        .hasSize(3);
+  }
+
+  @Test
+  void testAttachFileToDocumentationUnit_withInvalidUuid() {
     risWebTestClient
         .withDefaultLogin()
         .put()
@@ -278,7 +325,10 @@ class DocumentUnitControllerDocxFilesIntegrationTest {
   //  }
 
   @Test
-  void testRemoveFileFromDocumentUnit() throws DocumentationUnitNotExistsException {
+  void testRemoveFileFromDocumentUnit() {
+    when(s3AsyncClient.deleteObject(any(DeleteObjectRequest.class)))
+        .thenReturn(new CompletableFuture<>());
+
     DocumentationUnitDTO dto =
         repository.save(
             DocumentationUnitDTO.builder()
@@ -286,21 +336,15 @@ class DocumentUnitControllerDocxFilesIntegrationTest {
                 .documentationOffice(documentationOfficeRepository.findByAbbreviation("DS"))
                 .build());
 
-    repository.save(
-        dto.toBuilder()
-            .attachments(
-                Collections.singletonList(
-                    AttachmentDTO.builder()
-                        .s3ObjectPath("fooPath")
-                        .documentationUnit(dto)
-                        .uploadTimestamp(Instant.now())
-                        .filename("fooFile")
-                        .extension("docx")
-                        .build()))
+    attachmentRepository.save(
+        AttachmentDTO.builder()
+            .s3ObjectPath("fooPath")
+            .documentationUnit(dto)
+            .uploadTimestamp(Instant.now())
+            .filename("fooFile")
+            .format("docx")
             .build());
 
-    when(s3AsyncClient.deleteObject(any(DeleteObjectRequest.class)))
-        .thenReturn(new CompletableFuture<>());
     assertThat(attachmentRepository.findAll()).hasSize(1);
 
     risWebTestClient
