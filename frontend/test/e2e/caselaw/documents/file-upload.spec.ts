@@ -23,8 +23,57 @@ test.describe("upload an original document to a doc unit", () => {
 
     // delete file
     await page.getByLabel("Datei löschen").click()
+    await page.getByLabel("Löschen", { exact: true }).click() // confirm
+    await expect(page.locator(`text=sample.docx`)).toBeHidden()
 
     await page.reload()
+    await expect(page.getByText("Datei in diesen Bereich ziehen")).toBeVisible()
+    await expect(tableView).toBeHidden()
+  })
+
+  test("upload and delete multiple docx files per file chooser", async ({
+    page,
+  }) => {
+    await uploadTestfile(page, "sample.docx")
+    await expect(page.locator("text=Hochgeladen am")).toBeVisible()
+    await expect(page.locator(`text=sample.docx`)).toBeVisible()
+
+    await uploadTestfile(page, "some-formatting.docx")
+    await expect(page.locator(`text=some-formatting.docx`)).toBeVisible()
+
+    const tableView = page.getByRole("cell", {
+      name: "Dateiname",
+      exact: true,
+    })
+    await expect(tableView).toBeVisible()
+
+    // show in side panel when toggled
+    await page.getByLabel("Dokumentansicht öffnen").click()
+    await expect(page.locator(`text=Die ist ein Test`)).toBeVisible()
+    await page.getByLabel("Nächstes Dokument anzeigen").click()
+    await expect(page.locator(`text=Die ist ein Test`)).toBeHidden()
+    await expect(page.locator(`text=Subheadline`)).toBeVisible()
+
+    // show in side panel when selected in table
+    await page.getByLabel("Dokumentansicht schließen").click()
+    await expect(page.locator(`text=Subheadline`)).toBeHidden()
+    await page.getByText("some-formatting.docx").locator("visible=true").click()
+    await expect(page.locator(`text=Subheadline`)).toBeVisible()
+
+    // delete files
+    await expect(page.getByLabel("Datei löschen")).toHaveCount(2)
+    await page.getByLabel("Datei löschen").nth(0).click()
+    await page.getByLabel("Löschen", { exact: true }).click() // confirm
+    await expect(page.getByText("sample.docx").nth(0)).toBeHidden() // in table
+    await expect(page.getByText("sample.docx").nth(1)).toBeHidden() // in sidepanel
+
+    await expect(page.getByLabel("Datei löschen")).toHaveCount(1)
+    await page.getByLabel("Datei löschen").nth(0).click()
+    await page.getByLabel("Löschen", { exact: true }).click() // confirm
+    await expect(page.locator(`text=some-formatting.docx`)).toBeHidden()
+
+    await page.reload()
+    await expect(page.getByText("Datei in diesen Bereich ziehen")).toBeVisible()
     await expect(tableView).toBeHidden()
   })
 

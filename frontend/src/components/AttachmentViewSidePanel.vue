@@ -43,7 +43,7 @@ const handlePanelExpanded = (isExpanded: boolean) => {
     <SideToggle
       class="sticky top-[8rem] z-20"
       :is-expanded="props.isExpanded"
-      label="AttachmentViewSideToggle"
+      label="Dokumentansicht"
       :opening-direction="OpeningDirection.LEFT"
       @update:is-expanded="handlePanelExpanded"
     >

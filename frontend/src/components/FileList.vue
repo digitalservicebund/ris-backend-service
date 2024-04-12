@@ -40,7 +40,7 @@ const onSelect = (index: number) => {
       v-for="(file, index) in props.files"
       :key="index"
       class="cursor-pointer"
-      data-testid="listEntry"
+      :data-testid="`listEntry-${index}`"
     >
       <CellItem @click="onSelect(index)">
         {{ file.name ?? "-" }}

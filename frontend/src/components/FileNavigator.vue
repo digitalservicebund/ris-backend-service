@@ -44,6 +44,7 @@ const hasPrevious = computed(() => {
     </FlexItem>
     <TextButton
       id="decrease"
+      aria-label="Vorheriges Dokument anzeigen"
       button-type="tertiary"
       :disabled="!hasPrevious.valueOf()"
       :icon="IcOutlineArrowBack"
@@ -52,6 +53,7 @@ const hasPrevious = computed(() => {
 
     <TextButton
       id="increase"
+      aria-label="Nächstes Dokument anzeigen"
       button-type="tertiary"
       :disabled="!hasNext.valueOf()"
       :icon="IcOutlineArrowForward"

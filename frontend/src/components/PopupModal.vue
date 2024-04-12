@@ -65,11 +65,13 @@ onMounted(() => {
       <div class="ds-label-03-reg text-black">{{ contentText }}</div>
       <div class="modal-buttons-container flex flex-row gap-[1rem]">
         <TextButton
+          aria-label="Abbrechen"
           :button-type="cancelButtonType"
           label="Abbrechen"
           @click="$emit('closeModal')"
         />
         <TextButton
+          :aria-label="confirmText"
           :button-type="confirmButtonType"
           :label="confirmText"
           @click="$emit('confirmAction')"
