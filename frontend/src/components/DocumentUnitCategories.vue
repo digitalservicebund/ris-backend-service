@@ -195,9 +195,3 @@ const handleOnSelect = (index: number) => {
     </template>
   </DocumentUnitWrapper>
 </template>
-
-<style lang="scss" scoped>
-.full {
-  @apply w-full grow;
-}
-</style>
