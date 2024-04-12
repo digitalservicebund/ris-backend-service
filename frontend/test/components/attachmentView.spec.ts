@@ -11,7 +11,7 @@ describe("attachments are shown in side panel", () => {
     render(AttachmentView, {
       props: {
         documentUnitUuid: "123",
-        s3path: "foo-path",
+        s3Path: "foo-path",
       },
     })
     expect(screen.getByTestId("text-editor")).toBeInTheDocument()
