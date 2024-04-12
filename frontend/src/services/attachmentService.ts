@@ -2,7 +2,7 @@ import httpClient, { ServiceResponse } from "./httpClient"
 import { Docx2HTML } from "@/domain/docx2html"
 import errorMessages from "@/i18n/errors.json"
 
-interface FileService {
+interface AttachmentService {
   upload(
     documentUnitUuid: string,
     file: File,
@@ -19,7 +19,7 @@ interface FileService {
   ): Promise<ServiceResponse<Docx2HTML>>
 }
 
-const service: FileService = {
+const service: AttachmentService = {
   async upload(documentUnitUuid: string, file: File) {
     const extension = file.name?.split(".").pop()
     if (!extension || extension.toLowerCase() !== "docx") {

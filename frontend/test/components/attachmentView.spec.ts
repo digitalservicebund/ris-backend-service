@@ -1,11 +1,11 @@
 import { render, screen } from "@testing-library/vue"
 import AttachmentView from "@/components/AttachmentView.vue"
-import fileService from "@/services/fileService"
+import attachmentService from "@/services/attachmentService"
 
 describe("attachments are shown in side panel", () => {
   test("panel shows content", async () => {
     const content = "content"
-    vi.spyOn(fileService, "getAttachmentAsHtml").mockImplementation(() =>
+    vi.spyOn(attachmentService, "getAttachmentAsHtml").mockImplementation(() =>
       Promise.resolve({ status: 200, data: { html: content } }),
     )
 

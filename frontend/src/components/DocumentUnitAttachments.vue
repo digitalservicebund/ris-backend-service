@@ -12,8 +12,8 @@ import TitleElement from "@/components/TitleElement.vue"
 import { useToggleStateInRouteQuery } from "@/composables/useToggleStateInRouteQuery"
 import Attachment from "@/domain/attachment"
 import DocumentUnit from "@/domain/documentUnit"
+import fileService from "@/services/attachmentService"
 import documentUnitService from "@/services/documentUnitService"
-import fileService from "@/services/fileService"
 import { ResponseError } from "@/services/httpClient"
 
 const props = defineProps<{ documentUnit: DocumentUnit }>()

@@ -1,4 +1,4 @@
-import service from "@/services/fileService"
+import service from "@/services/attachmentService"
 
 describe("fileService", () => {
   it("should return 415 if not docx file", async () => {

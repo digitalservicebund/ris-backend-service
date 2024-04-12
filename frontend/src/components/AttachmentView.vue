@@ -4,7 +4,7 @@ import FlexContainer from "@/components/FlexContainer.vue"
 import FlexItem from "@/components/FlexItem.vue"
 import TextEditor from "@/components/input/TextEditor.vue"
 import { Docx2HTML } from "@/domain/docx2html"
-import fileService from "@/services/fileService"
+import fileService from "@/services/attachmentService"
 
 const props = defineProps<{
   documentUnitUuid?: string
