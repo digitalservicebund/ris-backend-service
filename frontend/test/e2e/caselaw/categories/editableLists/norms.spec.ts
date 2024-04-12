@@ -133,8 +133,7 @@ test.describe("norm", () => {
     await expect(container.getByText("Norm speichern")).toBeHidden()
   })
 
-  // eslint-disable-next-line playwright/no-skipped-test
-  test.skip("adding and deleting multiple single norms", async ({
+  test("adding and deleting multiple single norms", async ({
     page,
     documentNumber,
   }) => {
