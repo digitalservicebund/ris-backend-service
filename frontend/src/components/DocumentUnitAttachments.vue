@@ -46,11 +46,12 @@ const getAttachment = (index: number): Attachment => {
   return getAttachments()[index]
 }
 
-async function handleDeleteFile(index: number) {
-  console.log(index)
+const handleDeleteAttachment = async (index: number) => {
   const fileToDelete = getAttachment(index)
-  if (fileToDelete.s3path == undefined) return
-  //TODO: Error handling
+  if (fileToDelete.s3path == undefined) {
+    console.error("file path is undefined", index)
+    return
+  }
 
   if (
     (await fileService.delete(props.documentUnit.uuid, fileToDelete.s3path))
@@ -84,7 +85,7 @@ const handleOnDelete = (index: number) => {
 }
 
 const deleteFile = (index: number) => {
-  handleDeleteFile(index)
+  handleDeleteAttachment(index)
   toggleDeleteModal()
   if (showDocPanel) {
     togglePanel()
