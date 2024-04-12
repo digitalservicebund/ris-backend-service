@@ -134,7 +134,7 @@ test.describe("norm", () => {
   })
 
   // eslint-disable-next-line playwright/no-skipped-test
-  test.skip("adding and deleting multiple single norms", async ({
+  test("adding and deleting multiple single norms", async ({
     page,
     documentNumber,
   }) => {
@@ -146,10 +146,6 @@ test.describe("norm", () => {
       normAbbreviation: "PBefG",
     })
 
-    await expect(page.getByLabel("Weitere Einzelnorm")).toBeDisabled()
-    await fillNormInputs(page, {
-      singleNorms: [{ singleNorm: "§ 123" } as SingleNorm],
-    })
     await container.getByLabel("Weitere Einzelnorm").click()
     await expect(
       container.getByLabel("Einzelnorm", { exact: true }),
@@ -162,12 +158,18 @@ test.describe("norm", () => {
       ],
     })
 
-    await container.getByLabel("Weitere Einzelnorm").click()
+    await container.getByLabel("Norm speichern").click()
+    await expect(container.getByText("PBefG")).toBeVisible()
+    await expect(container.getByText("§ 123")).toBeVisible()
+    await expect(container.getByText("§ 456, 2022")).toBeVisible()
 
-    await expect(page.getByLabel("Weitere Einzelnorm")).toBeDisabled()
+    const listEntries = container.getByLabel("Listen Eintrag")
+    await expect(listEntries).toHaveCount(1)
+    await listEntries.first().click()
+
     await expect(
       container.getByLabel("Einzelnorm löschen", { exact: true }),
-    ).toHaveCount(3)
+    ).toHaveCount(2)
 
     await container
       .getByLabel("Einzelnorm löschen", { exact: true })
@@ -176,11 +178,11 @@ test.describe("norm", () => {
 
     await expect(
       container.getByLabel("Einzelnorm", { exact: true }),
-    ).toHaveCount(2)
+    ).toHaveCount(1)
 
     await container.getByLabel("Norm speichern").click()
     await expect(container.getByText("PBefG")).toBeVisible()
     await expect(container.getByText("§ 123")).toBeVisible()
-    await expect(container.getByText("§ 456, 2022")).toBeVisible()
+    await expect(container.getByText("§ 456, 2022")).toBeHidden()
   })
 })

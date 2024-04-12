@@ -371,11 +371,22 @@ export async function fillNormInputs(
   if (values?.singleNorms) {
     const promises = values.singleNorms.map(async (entry, index) => {
       if (entry.singleNorm) {
-        const input = page.getByLabel("Einzelnorm der Norm").nth(index)
-        await input.fill(entry.singleNorm)
-        await expect(
-          page.locator("[aria-label='Einzelnorm der Norm'] >> nth=" + index),
-        ).toHaveValue(entry.singleNorm)
+        await page
+          .getByLabel("Einzelnorm der Norm")
+          .nth(index)
+          .fill(entry.singleNorm)
+
+        const expectedValue = entry.singleNorm
+        await page.waitForFunction(
+          async ({ index, expectedValue }) => {
+            const input = document.querySelectorAll(
+              "#norm-reference-singleNorm",
+            )[index] as HTMLInputElement
+
+            return input && input.value === expectedValue
+          },
+          { index, expectedValue },
+        )
       }
       if (entry.dateOfVersion) {
         const input = page.getByLabel("Fassungsdatum der Norm").nth(index)
