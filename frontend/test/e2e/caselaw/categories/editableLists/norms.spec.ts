@@ -164,7 +164,7 @@ test.describe("norm", () => {
     await expect(container.getByText("§ 456, 2022")).toBeVisible()
 
     const listEntries = container.getByLabel("Listen Eintrag")
-    await expect(listEntries).toHaveCount(1)
+    await expect(listEntries).toHaveCount(2)
     await listEntries.first().click()
 
     await expect(
