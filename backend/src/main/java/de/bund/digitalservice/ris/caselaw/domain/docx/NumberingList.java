@@ -62,7 +62,7 @@ public class NumberingList implements DocumentUnitDocx {
           }
 
           if (entry.numberingListEntryIndex().isLgl()) {
-            sb.append("<li style=\"list-style-extension:decimal\">")
+            sb.append("<li style=\"list-style-type:decimal\">")
                 .append(entry.toHtmlString())
                 .append("</li>");
           } else {
@@ -123,17 +123,17 @@ public class NumberingList implements DocumentUnitDocx {
       NumberingListEntryIndex numberingListEntryIndex) {
     if (numberingListEntryIndex.lvlPicBullet()) {
       LOGGER.error("Unsupported picture bullet, use default bullet for list");
-      return "list-style-extension:disc;";
+      return "list-style-type:disc;";
     }
     return switch (numberFormat) {
       case NONE -> null;
-      case DECIMAL -> "list-style-extension:decimal;";
-      case UPPER_LETTER -> "list-style-extension:upper-latin;";
-      case LOWER_LETTER -> "list-style-extension:lower-latin;";
-      case UPPER_ROMAN -> "list-style-extension:upper-roman;";
-      case LOWER_ROMAN -> "list-style-extension:lower-roman;";
-      case BULLET -> "list-style-extension:disc;";
-      default -> "list-style-extension:none;";
+      case DECIMAL -> "list-style-type:decimal;";
+      case UPPER_LETTER -> "list-style-type:upper-latin;";
+      case LOWER_LETTER -> "list-style-type:lower-latin;";
+      case UPPER_ROMAN -> "list-style-type:upper-roman;";
+      case LOWER_ROMAN -> "list-style-type:lower-roman;";
+      case BULLET -> "list-style-type:disc;";
+      default -> "list-style-type:none;";
     };
   }
 
