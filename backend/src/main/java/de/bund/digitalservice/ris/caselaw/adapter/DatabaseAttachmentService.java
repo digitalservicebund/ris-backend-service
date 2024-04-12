@@ -80,7 +80,6 @@ public class DatabaseAttachmentService implements AttachmentService {
   @Transactional(transactionManager = "jpaTransactionManager")
   public void deleteByS3path(String s3Path) {
     deleteObjectFromBucket(s3Path);
-    // Todo: Fix delete by s3Objectpath
     repository.deleteByS3ObjectPath(s3Path);
   }
 

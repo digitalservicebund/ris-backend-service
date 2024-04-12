@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface AttachmentRepository extends JpaRepository<AttachmentDTO, UUID> {
-  void deleteByS3ObjectPath(String s3ObjectPath);
+  Long deleteByS3ObjectPath(String s3ObjectPath);
 
   void deleteAllByDocumentationUnitId(UUID documentationUnitId);
 

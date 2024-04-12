@@ -106,7 +106,7 @@ public class DocumentationUnitDTO implements DocumentationUnitListItemDTO {
 
   @Builder.Default
   @OneToMany(
-      fetch = FetchType.EAGER,
+      fetch = FetchType.LAZY,
       cascade = CascadeType.ALL,
       orphanRemoval = true,
       mappedBy = "documentationUnit")
