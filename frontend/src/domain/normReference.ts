@@ -23,7 +23,7 @@ export default class NormReference implements EditableListItem {
   }
 
   get renderDecision(): string {
-    let result: string[] = []
+    let result: string[]
     if (this.normAbbreviation?.abbreviation) {
       result = [`${this.normAbbreviation?.abbreviation}`]
     } else if (this.normAbbreviationRawValue) {
