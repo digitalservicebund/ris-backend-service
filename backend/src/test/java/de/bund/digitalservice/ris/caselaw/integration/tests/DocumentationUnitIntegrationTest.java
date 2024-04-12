@@ -35,7 +35,6 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationOffi
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DocumentationUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.FileNumberDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.LeadingDecisionNormReferenceDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.NormReferenceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumentationUnitRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresPublicationReportRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.RegionDTO;
@@ -349,17 +348,18 @@ class DocumentationUnitIntegrationTest {
             });
   }
 
+  /**
+   * The normAbbreviationRawValue is not insertable or updatable. This test validates that the
+   * client can send a normReference without normAbbreviation and with normAbbreviationRawValue
+   * without breaking anything.
+   */
   @Test
-  void testNormReferenceUpdateWithOnlyNormAbbreviationRawValue() {
-    NormReferenceDTO normReferenceDTO =
-        NormReferenceDTO.builder().rank(1).normAbbreviationRawValue("EWGAssRBes 1/80").build();
-
+  void testUpdateNormReferenceWithoutNormAbbreviationAndWithNormAbbreviationRawValue() {
     DocumentationUnitDTO dto =
         repository.save(
             DocumentationUnitDTO.builder()
                 .documentNumber("1234567890123")
                 .documentationOffice(documentationOfficeRepository.findByAbbreviation("DS"))
-                .normReferences(List.of(normReferenceDTO))
                 .build());
 
     List<SingleNorm> singleNorms = List.of(SingleNorm.builder().singleNorm("Art 7 S 1").build());
@@ -393,8 +393,32 @@ class DocumentationUnitIntegrationTest {
             response -> {
               assertThat(response.getResponseBody()).isNotNull();
               assertThat(response.getResponseBody().documentNumber()).isEqualTo("1234567890123");
-              assertThat(response.getResponseBody().contentRelatedIndexing().norms().get(0))
-                  .isEqualTo(norms.get(0));
+              assertThat(
+                      response
+                          .getResponseBody()
+                          .contentRelatedIndexing()
+                          .norms()
+                          .get(0)
+                          .singleNorms()
+                          .get(0)
+                          .singleNorm())
+                  .isEqualTo("Art 7 S 1");
+              assertThat(
+                      response
+                          .getResponseBody()
+                          .contentRelatedIndexing()
+                          .norms()
+                          .get(0)
+                          .normAbbreviation())
+                  .isNull();
+              assertThat(
+                      response
+                          .getResponseBody()
+                          .contentRelatedIndexing()
+                          .norms()
+                          .get(0)
+                          .normAbbreviationRawValue())
+                  .isNull();
             });
 
     List<DocumentationUnitDTO> list = repository.findAll();
