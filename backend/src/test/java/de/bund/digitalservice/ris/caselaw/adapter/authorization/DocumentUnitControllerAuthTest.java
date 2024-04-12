@@ -5,6 +5,8 @@ import static de.bund.digitalservice.ris.caselaw.AuthUtils.setUpDocumentationOff
 import static de.bund.digitalservice.ris.caselaw.domain.PublicationStatus.PUBLISHED;
 import static de.bund.digitalservice.ris.caselaw.domain.PublicationStatus.UNPUBLISHED;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 import de.bund.digitalservice.ris.caselaw.RisWebTestClient;
@@ -24,6 +26,8 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.Status;
+import de.bund.digitalservice.ris.caselaw.domain.docx.Docx2Html;
+import java.nio.ByteBuffer;
 import java.util.Collections;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
@@ -37,6 +41,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.security.oauth2.client.registration.ReactiveClientRegistrationRepository;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.web.reactive.function.BodyInserters;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -93,57 +98,57 @@ class DocumentUnitControllerAuthTest {
         .isForbidden();
   }
 
-  //  @Test
-  //  void testAttachFileToDocumentUnit() {
-  //    when(service.attachFileToDocumentUnit(
-  //            eq(TEST_UUID), any(ByteBuffer.class), any(HttpHeaders.class)))
-  //        .thenReturn(Mono.empty());
-  //    mockDocumentUnit(docOffice1, null, null);
-  //
-  //    String uri = "/api/v1/caselaw/documentunits/" + TEST_UUID + "/file";
-  //
-  //    risWebTestClient
-  //        .withLogin(docOffice1Group)
-  //        .put()
-  //        .uri(uri)
-  //        .body(BodyInserters.fromValue(new byte[] {}))
-  //        .exchange()
-  //        .expectStatus()
-  //        .isOk();
-  //
-  //    risWebTestClient
-  //        .withLogin(docOffice2Group)
-  //        .put()
-  //        .uri(uri)
-  //        .body(BodyInserters.fromValue(new byte[] {}))
-  //        .exchange()
-  //        .expectStatus()
-  //        .isForbidden();
-  //  }
-  //
-  //  @Test
-  //  void testRemoveFileFromDocumentUnit() {
-  //    when(service.removeOriginalFile("fooPath")).thenReturn(Mono.empty());
-  //    mockDocumentUnit(docOffice2, null, null);
-  //
-  //    String uri = "/api/v1/caselaw/documentunits/" + TEST_UUID + "/file/fooPath";
-  //
-  //    risWebTestClient
-  //        .withLogin(docOffice1Group)
-  //        .delete()
-  //        .uri(uri)
-  //        .exchange()
-  //        .expectStatus()
-  //        .isForbidden();
-  //
-  //    risWebTestClient
-  //        .withLogin(docOffice2Group)
-  //        .delete()
-  //        .uri(uri)
-  //        .exchange()
-  //        .expectStatus()
-  //        .isNoContent();
-  //  }
+  @Test
+  void testAttachFileToDocumentUnit() {
+    when(attachmentService.attachFileToDocumentationUnit(
+            eq(TEST_UUID), any(ByteBuffer.class), any(HttpHeaders.class)))
+        .thenReturn(Attachment.builder().s3path("fooPath").build());
+    when(docxConverterService.getConvertedObject(anyString()))
+        .thenReturn(Mono.just(Docx2Html.EMPTY));
+    mockDocumentUnit(docOffice1, null, null);
+
+    String uri = "/api/v1/caselaw/documentunits/" + TEST_UUID + "/file";
+
+    risWebTestClient
+        .withLogin(docOffice1Group)
+        .put()
+        .uri(uri)
+        .body(BodyInserters.fromValue(new byte[] {}))
+        .exchange()
+        .expectStatus()
+        .isOk();
+
+    risWebTestClient
+        .withLogin(docOffice2Group)
+        .put()
+        .uri(uri)
+        .body(BodyInserters.fromValue(new byte[] {}))
+        .exchange()
+        .expectStatus()
+        .isForbidden();
+  }
+
+  @Test
+  void testRemoveFileFromDocumentUnit() {
+    mockDocumentUnit(docOffice2, null, null);
+    String uri = "/api/v1/caselaw/documentunits/" + TEST_UUID + "/file/fooPath";
+
+    risWebTestClient
+        .withLogin(docOffice1Group)
+        .delete()
+        .uri(uri)
+        .exchange()
+        .expectStatus()
+        .isForbidden();
+
+    risWebTestClient
+        .withLogin(docOffice2Group)
+        .delete()
+        .uri(uri)
+        .exchange()
+        .expectStatus()
+        .isNoContent();
+  }
 
   @Test
   void testDeleteByUuid() {
@@ -217,11 +222,11 @@ class DocumentUnitControllerAuthTest {
   }
 
   @Test
-  void testHtml() {
+  void testGetHtml() {
     mockDocumentUnit(docOffice1, "123", Status.builder().publicationStatus(PUBLISHED).build());
     when(docxConverterService.getConvertedObject("123")).thenReturn(Mono.empty());
 
-    String uri = "/api/v1/caselaw/documentunits/" + TEST_UUID + "/docx";
+    String uri = "/api/v1/caselaw/documentunits/" + TEST_UUID + "/docx/123";
 
     risWebTestClient.withLogin(docOffice1Group).get().uri(uri).exchange().expectStatus().isOk();
 
