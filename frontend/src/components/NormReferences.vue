@@ -35,30 +35,47 @@ function hasSingleNorms(normEntry: NormReference) {
 const defaultValue = new NormReference()
 
 function decisionSummarizer(normEntry: NormReference) {
-  return h("div", { class: ["flex flex-col gap-32"] }, [
-    h("div", { class: ["flex flex-row items-center"] }, [
-      h(IconBook, { class: ["mr-8"] }),
-      h("div", { class: ["link-01-reg"] }, normEntry.renderDecision),
-    ]),
-    hasSingleNorms(normEntry)
-      ? h(
+  if (normEntry.singleNorms?.length === 1) {
+    return h("div", { class: ["flex flex-col gap-32"] }, [
+      h("div", { class: ["flex flex-row items-center"] }, [
+        h(IconBook, { class: ["mr-8"] }),
+        h(
           "div",
-          { class: ["flex flex-col gap-32"] },
-          normEntry.singleNorms?.map((singleNorm) => {
-            return !singleNorm.isEmpty
-              ? h("div", { class: ["flex flex-row items-center"] }, [
-                  h(IconArrowRight, { class: ["mr-8"] }),
-                  h(
-                    "div",
-                    { class: ["link-01-reg"] },
-                    singleNorm.renderDecision,
-                  ),
-                ])
-              : null
-          }),
-        )
-      : null,
-  ])
+          { class: ["link-01-reg"] },
+          normEntry.renderDecision +
+            ", " +
+            normEntry.singleNorms[0].renderDecision,
+        ),
+      ]),
+    ])
+  } else {
+    return h("div", { class: ["flex flex-col gap-32"] }, [
+      h("div", { class: ["flex flex-row items-center"] }, [
+        h(IconBook, { class: ["mr-8"] }),
+        h("div", { class: ["link-01-reg"] }, normEntry.renderDecision),
+      ]),
+      hasSingleNorms(normEntry)
+        ? h(
+            "div",
+            { class: ["flex flex-col gap-32"] },
+            normEntry.singleNorms?.map((singleNorm) => {
+              return !singleNorm.isEmpty
+                ? h("div", { class: ["flex flex-row items-center"] }, [
+                    h(IconArrowRight, { class: ["mr-8"] }),
+                    h(
+                      "div",
+                      { class: ["link-01-reg"] },
+                      normEntry.renderDecision +
+                        ", " +
+                        singleNorm.renderDecision,
+                    ),
+                  ])
+                : null
+            }),
+          )
+        : null,
+    ])
+  }
 }
 
 const NormsSummary = withSummarizer(decisionSummarizer)

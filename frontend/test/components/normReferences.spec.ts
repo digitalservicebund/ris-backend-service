@@ -170,7 +170,7 @@ describe("Norm references", () => {
     renderComponent({ modelValue })
 
     expect(screen.getByLabelText("Listen Eintrag")).toHaveTextContent(
-      "1000g-BefV§ 123",
+      "1000g-BefV, § 123",
     )
   })
 
@@ -193,7 +193,7 @@ describe("Norm references", () => {
     renderComponent({ modelValue })
 
     expect(screen.getByLabelText("Listen Eintrag")).toHaveTextContent(
-      "1000g-BefV§ 123§ 345, 01.01.2022, 02-02-2022",
+      "1000g-BefV1000g-BefV, § 1231000g-BefV, § 345, 01.01.2022, 02-02-2022",
     )
   })
 
@@ -216,7 +216,7 @@ describe("Norm references", () => {
     renderComponent({ modelValue })
 
     expect(screen.getByLabelText("Listen Eintrag")).toHaveTextContent(
-      "1000g-BefV§ 123§ 345, 01.01.2022, 02-02-2022",
+      "1000g-BefV1000g-BefV, § 1231000g-BefV, § 345, 01.01.2022, 02-02-2022",
     )
   })
 

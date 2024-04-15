@@ -158,9 +158,9 @@ test.describe("norm", () => {
     })
 
     await container.getByLabel("Norm speichern").click()
-    await expect(container.getByText("PBefG")).toBeVisible()
-    await expect(container.getByText("§ 123")).toBeVisible()
-    await expect(container.getByText("§ 456, 2022")).toBeVisible()
+    await expect(container.getByText("PBefG", { exact: true })).toBeVisible()
+    await expect(container.getByText("PBefG, § 123")).toBeVisible()
+    await expect(container.getByText("PBefG, § 456,")).toBeVisible()
 
     const listEntries = container.getByLabel("Listen Eintrag")
     await expect(listEntries).toHaveCount(2)
@@ -180,8 +180,9 @@ test.describe("norm", () => {
     ).toHaveCount(1)
 
     await container.getByLabel("Norm speichern").click()
-    await expect(container.getByText("PBefG")).toBeVisible()
-    await expect(container.getByText("§ 123")).toBeVisible()
+    // with only one singlenorm, the ris abkürzung is not shown as headline
+    await expect(container.getByText("PBefG", { exact: true })).toBeHidden()
+    await expect(container.getByText("PBefG, § 123")).toBeVisible()
     await expect(container.getByText("§ 456, 2022")).toBeHidden()
   })
 
