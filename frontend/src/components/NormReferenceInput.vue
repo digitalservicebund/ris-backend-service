@@ -127,7 +127,7 @@ onBeforeUnmount(() => {
         placeholder="Abkürzung, Kurz-oder Langtitel oder Region eingeben ..."
       ></ComboboxInput>
     </InputField>
-    <div v-if="normAbbreviation">
+    <div v-if="normAbbreviation || norm.normAbbreviationRawValue">
       <SingleNormInput
         v-for="(_, index) in singleNorms"
         :key="index"

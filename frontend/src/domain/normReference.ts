@@ -5,10 +5,14 @@ import SingleNorm from "./singleNorm"
 export default class NormReference implements EditableListItem {
   public normAbbreviation?: NormAbbreviation
   public singleNorms?: SingleNorm[]
+  public normAbbreviationRawValue?: string
   public hasForeignSource: boolean = false
 
   static readonly requiredFields = ["normAbbreviation"] as const
-  static readonly fields = ["normAbbreviation"] as const
+  static readonly fields = [
+    "normAbbreviation",
+    "normAbbreviationRawValue",
+  ] as const
 
   constructor(data: Partial<NormReference> = {}) {
     Object.assign(this, data)
@@ -19,11 +23,15 @@ export default class NormReference implements EditableListItem {
   }
 
   get renderDecision(): string {
-    return [
-      ...(this.normAbbreviation?.abbreviation
-        ? [`${this.normAbbreviation?.abbreviation}`]
-        : []),
-    ].join(", ")
+    let result: string[]
+    if (this.normAbbreviation?.abbreviation) {
+      result = [`${this.normAbbreviation?.abbreviation}`]
+    } else if (this.normAbbreviationRawValue) {
+      result = [`${this.normAbbreviationRawValue}`]
+    } else {
+      result = []
+    }
+    return [...result].join(", ")
   }
 
   get hasMissingRequiredFields(): boolean {

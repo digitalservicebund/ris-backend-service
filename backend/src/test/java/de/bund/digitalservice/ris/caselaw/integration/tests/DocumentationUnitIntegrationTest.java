@@ -41,14 +41,17 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.RegionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.StatusDTO;
 import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
 import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
+import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitSearchInput;
 import de.bund.digitalservice.ris.caselaw.domain.EmailPublishService;
+import de.bund.digitalservice.ris.caselaw.domain.NormReference;
 import de.bund.digitalservice.ris.caselaw.domain.PreviousDecision;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
+import de.bund.digitalservice.ris.caselaw.domain.SingleNorm;
 import de.bund.digitalservice.ris.caselaw.domain.Status;
 import de.bund.digitalservice.ris.caselaw.domain.Texts;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
@@ -343,6 +346,84 @@ class DocumentationUnitIntegrationTest {
               assertThat(response.getResponseBody().coreData().leadingDecisionNormReferences())
                   .isEmpty();
             });
+  }
+
+  /**
+   * The normAbbreviationRawValue is not insertable or updatable. This test validates that the
+   * client can send a normReference without normAbbreviation and with normAbbreviationRawValue
+   * without breaking anything.
+   */
+  @Test
+  void testUpdateNormReferenceWithoutNormAbbreviationAndWithNormAbbreviationRawValue() {
+    DocumentationUnitDTO dto =
+        repository.save(
+            DocumentationUnitDTO.builder()
+                .documentNumber("1234567890123")
+                .documentationOffice(documentationOfficeRepository.findByAbbreviation("DS"))
+                .build());
+
+    List<SingleNorm> singleNorms = List.of(SingleNorm.builder().singleNorm("Art 7 S 1").build());
+
+    List<NormReference> norms =
+        List.of(
+            NormReference.builder()
+                .normAbbreviation(null)
+                .normAbbreviationRawValue("EWGAssRBes 1/80")
+                .singleNorms(singleNorms)
+                .build());
+
+    DocumentUnit documentUnitFromFrontend =
+        DocumentUnit.builder()
+            .uuid(dto.getId())
+            .documentNumber(dto.getDocumentNumber())
+            .contentRelatedIndexing(ContentRelatedIndexing.builder().norms(norms).build())
+            .coreData(CoreData.builder().documentationOffice(docOffice).build())
+            .build();
+
+    risWebTestClient
+        .withDefaultLogin()
+        .put()
+        .uri("/api/v1/caselaw/documentunits/" + dto.getId())
+        .bodyValue(documentUnitFromFrontend)
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody(DocumentUnit.class)
+        .consumeWith(
+            response -> {
+              assertThat(response.getResponseBody()).isNotNull();
+              assertThat(response.getResponseBody().documentNumber()).isEqualTo("1234567890123");
+              assertThat(
+                      response
+                          .getResponseBody()
+                          .contentRelatedIndexing()
+                          .norms()
+                          .get(0)
+                          .singleNorms()
+                          .get(0)
+                          .singleNorm())
+                  .isEqualTo("Art 7 S 1");
+              assertThat(
+                      response
+                          .getResponseBody()
+                          .contentRelatedIndexing()
+                          .norms()
+                          .get(0)
+                          .normAbbreviation())
+                  .isNull();
+              assertThat(
+                      response
+                          .getResponseBody()
+                          .contentRelatedIndexing()
+                          .norms()
+                          .get(0)
+                          .normAbbreviationRawValue())
+                  .isNull();
+            });
+
+    List<DocumentationUnitDTO> list = repository.findAll();
+    assertThat(list).hasSize(1);
+    assertThat(list.get(0).getDocumentNumber()).isEqualTo("1234567890123");
   }
 
   @Test
