@@ -373,7 +373,6 @@ class ProcedureIntegrationTest {
     DocumentationUnitDTO dto =
         documentUnitRepository.save(
             DocumentationUnitDTO.builder()
-                // .creationtimestamp(Instant.now())
                 .documentNumber("1234567890123")
                 .documentationOffice(documentationOfficeDTO)
                 .build());
@@ -467,6 +466,37 @@ class ProcedureIntegrationTest {
 
     assertThat(repository.findAll()).hasSize(3);
     assertThat(repository.findAll().get(2).getLabel()).isEqualTo("baz");
+
+    var procedure1Id = repository.findAll().get(0).getId();
+
+    risWebTestClient
+        .withDefaultLogin()
+        .get()
+        .uri("/api/v1/caselaw/procedure/" + procedure1Id + "/documentunits")
+        .exchange()
+        .expectStatus()
+        .is2xxSuccessful()
+        .expectBody(new ParameterizedTypeReference<List<DocumentationUnitListItem>>() {})
+        .consumeWith(
+            response -> {
+              assertThat(Objects.requireNonNull(response.getResponseBody())).isEmpty();
+            });
+
+    var procedure3Id = repository.findAll().get(2).getId();
+
+    risWebTestClient
+        .withDefaultLogin()
+        .get()
+        .uri("/api/v1/caselaw/procedure/" + procedure3Id + "/documentunits")
+        .exchange()
+        .expectStatus()
+        .is2xxSuccessful()
+        .expectBody(new ParameterizedTypeReference<List<DocumentationUnitListItem>>() {})
+        .consumeWith(
+            response -> {
+              assertThat(Objects.requireNonNull(response.getResponseBody()).get(0).documentNumber())
+                  .isEqualTo("1234567890123");
+            });
   }
 
   @Test
