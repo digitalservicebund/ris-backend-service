@@ -77,10 +77,6 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
       DatabaseProcedureService.class
     },
     controllers = {DocumentUnitController.class, ProcedureController.class})
-@Sql(scripts = {"classpath:procedures_init.sql"})
-@Sql(
-    scripts = {"classpath:procedures_cleanup.sql"},
-    executionPhase = AFTER_TEST_METHOD)
 class ProcedureIntegrationTest {
   @Container
   static PostgreSQLContainer<?> postgreSQLContainer =
@@ -645,6 +641,10 @@ class ProcedureIntegrationTest {
   }
 
   @Test
+  @Sql(scripts = {"classpath:procedures_init.sql"})
+  @Sql(
+      scripts = {"classpath:procedures_cleanup.sql"},
+      executionPhase = AFTER_TEST_METHOD)
   void testProcedureControllerReturnsProceduresWithDateFirst() {
     assertThat(repository.findAll()).hasSize(3);
 
