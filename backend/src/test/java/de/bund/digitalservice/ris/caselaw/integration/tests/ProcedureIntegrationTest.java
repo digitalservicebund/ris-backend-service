@@ -467,6 +467,24 @@ class ProcedureIntegrationTest {
     assertThat(repository.findAll()).hasSize(3);
     assertThat(repository.findAll().get(2).getLabel()).isEqualTo("baz");
 
+    risWebTestClient
+        .withDefaultLogin()
+        .get()
+        .uri("/api/v1/caselaw/procedure?q=" + procedure1.label() + "&sz=1&pg=0")
+        .exchange()
+        .expectStatus()
+        .is2xxSuccessful()
+        .expectBody(new ParameterizedTypeReference<RestPageImpl<Procedure>>() {})
+        .consumeWith(
+            response -> {
+              assertThat(
+                      Objects.requireNonNull(response.getResponseBody())
+                          .getContent()
+                          .get(0)
+                          .documentUnitCount())
+                  .isZero();
+            });
+
     var procedure1Id = repository.findAll().get(0).getId();
 
     risWebTestClient
@@ -480,6 +498,24 @@ class ProcedureIntegrationTest {
         .consumeWith(
             response -> {
               assertThat(Objects.requireNonNull(response.getResponseBody())).isEmpty();
+            });
+
+    risWebTestClient
+        .withDefaultLogin()
+        .get()
+        .uri("/api/v1/caselaw/procedure?q=" + procedure3.label() + "&sz=1&pg=0")
+        .exchange()
+        .expectStatus()
+        .is2xxSuccessful()
+        .expectBody(new ParameterizedTypeReference<RestPageImpl<Procedure>>() {})
+        .consumeWith(
+            response -> {
+              assertThat(
+                      Objects.requireNonNull(response.getResponseBody())
+                          .getContent()
+                          .get(0)
+                          .documentUnitCount())
+                  .isEqualTo(1);
             });
 
     var procedure3Id = repository.findAll().get(2).getId();

@@ -37,7 +37,11 @@ public class ProcedureTransformer {
     return procedureDTO.getDocumentationUnits().stream()
         .filter(
             documentationUnitDTO ->
-                documentationUnitDTO.getProcedures().get(0).getProcedure().equals(procedureDTO))
+                documentationUnitDTO
+                    .getProcedures()
+                    .get(documentationUnitDTO.getProcedures().size() - 1)
+                    .getProcedure()
+                    .equals(procedureDTO))
         .distinct()
         .count();
   }
