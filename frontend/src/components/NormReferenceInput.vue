@@ -34,16 +34,14 @@ const singleNorms = ref(
 const lastSavedModelValue = ref(new NormReference({ ...props.modelValue }))
 
 const normAbbreviation = computed({
-  get: () => {
-    if (norm.value.normAbbreviation) {
-      return {
-        label: norm.value.normAbbreviation.abbreviation,
-        value: norm.value.normAbbreviation,
-        additionalInformation: norm.value.normAbbreviation.officialLongTitle,
-      }
-    }
-    return undefined
-  },
+  get: () =>
+    norm.value.normAbbreviation
+      ? {
+          label: norm.value.normAbbreviation.abbreviation,
+          value: norm.value.normAbbreviation,
+          additionalInformation: norm.value.normAbbreviation.officialLongTitle,
+        }
+      : undefined,
   set: (newValue) => {
     const newNormAbbreviation = { ...newValue } as NormAbbreviation
     if (newValue) {
