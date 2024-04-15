@@ -13,7 +13,6 @@ import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
-import jakarta.persistence.OneToOne;
 import jakarta.persistence.OrderBy;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
@@ -105,8 +104,13 @@ public class DocumentationUnitDTO implements DocumentationUnitListItemDTO {
   @OrderBy("rank")
   private List<NormReferenceDTO> normReferences = new ArrayList<>();
 
-  @OneToOne(mappedBy = "documentationUnit", cascade = CascadeType.ALL, orphanRemoval = true)
-  private OriginalFileDocumentDTO originalFileDocument;
+  @Builder.Default
+  @OneToMany(
+      fetch = FetchType.LAZY,
+      cascade = CascadeType.ALL,
+      orphanRemoval = true,
+      mappedBy = "documentationUnit")
+  private List<AttachmentDTO> attachments = new ArrayList<>();
 
   @Column(name = "other_long_text")
   String otherLongText;
@@ -161,13 +165,6 @@ public class DocumentationUnitDTO implements DocumentationUnitListItemDTO {
   @OneToMany(mappedBy = "documentationUnitDTO", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
   @OrderBy("createdAt desc")
   private List<StatusDTO> status;
-
-  public void setOriginalFileDocument(OriginalFileDocumentDTO originalFileDocument) {
-    if (originalFileDocument != null) {
-      originalFileDocument.setDocumentationUnit(this);
-    }
-    this.originalFileDocument = originalFileDocument;
-  }
 
   // Gericht
   @ManyToOne

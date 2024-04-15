@@ -27,6 +27,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresPublicati
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationOfficeTransformer;
 import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
 import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
+import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
@@ -100,6 +101,7 @@ class EnsuingDecisionsIntegrationTest {
   @MockBean private S3AsyncClient s3AsyncClient;
   @MockBean private EmailPublishService publishService;
   @MockBean DocxConverterService docxConverterService;
+  @MockBean AttachmentService attachmentService;
 
   private final DocumentationOffice docOffice = buildDefaultDocOffice();
   private DocumentationOfficeDTO documentationOfficeDTO;

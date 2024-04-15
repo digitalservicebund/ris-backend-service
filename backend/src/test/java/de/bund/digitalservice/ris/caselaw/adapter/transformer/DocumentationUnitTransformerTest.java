@@ -528,6 +528,7 @@ class DocumentationUnitTransformerTest {
         .ensuingDecisions(Collections.emptyList())
         .texts(Texts.builder().build())
         .borderNumbers(Collections.emptyList())
+        .attachments(Collections.emptyList())
         .contentRelatedIndexing(
             ContentRelatedIndexing.builder()
                 .keywords(Collections.emptyList())

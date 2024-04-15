@@ -1,23 +1,22 @@
 <script setup lang="ts">
-import { computed, ref, onMounted, toRefs, watch } from "vue"
+import { computed, ref, toRefs, Ref } from "vue"
 import { useRoute, useRouter } from "vue-router"
+import AttachmentViewSidePanel from "@/components/AttachmentViewSidePanel.vue"
 import DocumentUnitContentRelatedIndexing from "@/components/DocumentUnitContentRelatedIndexing.vue"
 import DocumentUnitCoreData from "@/components/DocumentUnitCoreData.vue"
 import DocumentUnitTexts from "@/components/DocumentUnitTexts.vue"
 import DocumentUnitWrapper from "@/components/DocumentUnitWrapper.vue"
 import EnsuingDecisions from "@/components/EnsuingDecisions.vue"
-import FilePreview from "@/components/FilePreview.vue"
+import FlexContainer from "@/components/FlexContainer.vue"
+import FlexItem from "@/components/FlexItem.vue"
 import { ValidationError } from "@/components/input/types"
 import PreviousDecisions from "@/components/PreviousDecisions.vue"
-import SideToggle, { OpeningDirection } from "@/components/SideToggle.vue"
 import { useScrollToHash } from "@/composables/useScrollToHash"
 import { useToggleStateInRouteQuery } from "@/composables/useToggleStateInRouteQuery"
 import DocumentUnit, { Texts, CoreData } from "@/domain/documentUnit"
-import { Docx2HTML } from "@/domain/docx2html"
 import EnsuingDecision from "@/domain/ensuingDecision"
 import PreviousDecision from "@/domain/previousDecision"
 import documentUnitService from "@/services/documentUnitService"
-import fileService from "@/services/fileService"
 import { ServiceResponse } from "@/services/httpClient"
 
 const props = defineProps<{
@@ -27,7 +26,6 @@ const updatedDocumentUnit = ref<DocumentUnit>(props.documentUnit)
 const validationErrors = ref<ValidationError[]>([])
 const router = useRouter()
 const route = useRoute()
-const fileAsHTML = ref<Docx2HTML>()
 const showDocPanel = useToggleStateInRouteQuery(
   "showDocPanel",
   route,
@@ -35,6 +33,7 @@ const showDocPanel = useToggleStateInRouteQuery(
   false,
 )
 const lastUpdatedDocumentUnit = ref()
+const selectedAttachmentIndex: Ref<number> = ref(0)
 
 const handleUpdateValueDocumentUnitTexts = async (
   updatedValue: [keyof Texts, string],
@@ -78,16 +77,6 @@ async function handleUpdateDocumentUnit(): Promise<ServiceResponse<void>> {
   }
   return { status: 200, data: undefined } as ServiceResponse<void>
 }
-
-watch(
-  showDocPanel,
-  async () => {
-    if (showDocPanel.value && fileAsHTML.value?.html.length == 0) {
-      await getOriginalDocumentUnit()
-    }
-  },
-  { immediate: true },
-)
 
 const coreData = computed({
   get: () => updatedDocumentUnit.value.coreData,
@@ -146,23 +135,13 @@ const { hash: routeHash } = toRefs(route)
 const headerOffset = 145
 useScrollToHash(routeHash, headerOffset)
 
-async function getOriginalDocumentUnit() {
-  if (fileAsHTML.value?.html && fileAsHTML.value.html.length > 0) return
-  if (props.documentUnit.s3path) {
-    const htmlResponse = await fileService.getDocxFileAsHtml(
-      props.documentUnit.uuid,
-    )
-    if (htmlResponse.error === undefined) fileAsHTML.value = htmlResponse.data
-  }
-}
-
 const togglePanel = () => {
   showDocPanel.value = !showDocPanel.value
 }
 
-onMounted(async () => {
-  await getOriginalDocumentUnit()
-})
+const handleOnSelect = (index: number) => {
+  selectedAttachmentIndex.value = index
+}
 </script>
 
 <template>
@@ -171,8 +150,8 @@ onMounted(async () => {
     :save-callback="handleUpdateDocumentUnit"
   >
     <template #default="{ classes }">
-      <div class="flex w-full flex-grow">
-        <div class="flex flex-col bg-gray-100" :class="classes">
+      <FlexContainer class="w-full flex-grow">
+        <FlexItem class="flex-1 flex-col bg-gray-100" :class="classes">
           <DocumentUnitCoreData
             id="coreData"
             v-model="coreData"
@@ -201,37 +180,18 @@ onMounted(async () => {
             :valid-border-numbers="updatedDocumentUnit.borderNumbers"
             @update-value="handleUpdateValueDocumentUnitTexts"
           />
-        </div>
+        </FlexItem>
 
-        <div
-          v-show="documentUnit.hasFile"
-          class="flex flex-col border-l-1 border-solid border-gray-400 bg-white"
-          :class="{ full: showDocPanel }"
-        >
-          <SideToggle
-            class="sticky top-[8rem] z-20"
-            :is-expanded="showDocPanel"
-            label="Originaldokument"
-            :opening-direction="OpeningDirection.LEFT"
-            @update:is-expanded="togglePanel"
-          >
-            <FilePreview
-              v-if="fileAsHTML?.html"
-              id="odoc-panel-element"
-              v-model:open="showDocPanel"
-              class="bg-white"
-              :class="classes"
-              :content="fileAsHTML.html"
-            />
-          </SideToggle>
-        </div>
-      </div>
+        <AttachmentViewSidePanel
+          v-if="props.documentUnit.attachments"
+          :attachments="documentUnit.attachments"
+          :current-index="selectedAttachmentIndex"
+          :document-unit-uuid="props.documentUnit.uuid"
+          :is-expanded="showDocPanel"
+          @select="handleOnSelect"
+          @update="togglePanel"
+        ></AttachmentViewSidePanel>
+      </FlexContainer>
     </template>
   </DocumentUnitWrapper>
 </template>
-
-<style lang="scss" scoped>
-.full {
-  @apply w-full grow;
-}
-</style>

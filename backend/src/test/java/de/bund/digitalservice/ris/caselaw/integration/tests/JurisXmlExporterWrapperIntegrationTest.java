@@ -23,7 +23,6 @@ import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.Docume
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw.FieldOfLaw;
 import de.bund.digitalservice.ris.domain.export.juris.JurisXmlExporter;
 import java.lang.reflect.Field;
-import java.time.Instant;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -107,10 +106,10 @@ class JurisXmlExporterWrapperIntegrationTest {
         DocumentUnit.builder()
             .uuid(TEST_UUID)
             .documentNumber(documentNr)
-            .fileuploadtimestamp(Instant.parse("2021-01-01T00:00:00Z"))
-            .s3path("s3path")
-            .filetype("filetype")
-            .filename("filename")
+            //            .fileuploadtimestamp(Instant.parse("2021-01-01T00:00:00Z"))
+            //            .s3path("s3path")
+            //            .filetype("filetype")
+            //            .filename("filename")
             .build();
 
     encryptedXml = jurisXmlExporter.generateEncryptedXMLString(documentUnit);
@@ -189,11 +188,8 @@ class JurisXmlExporterWrapperIntegrationTest {
         DocumentUnit.builder()
             .uuid(TEST_UUID)
             .documentNumber(documentNr)
-            .fileuploadtimestamp(Instant.parse("2021-01-01T00:00:00Z"))
+            .attachments(Collections.emptyList())
             .dataSource(DataSource.NEURIS)
-            .s3path("s3path")
-            .filetype("filetype")
-            .filename("filename")
             .coreData(coreData)
             .previousDecisions(previousDecisions)
             .ensuingDecisions(new ArrayList<>())

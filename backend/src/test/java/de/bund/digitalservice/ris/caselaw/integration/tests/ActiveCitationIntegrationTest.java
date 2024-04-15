@@ -26,6 +26,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationOffic
 import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
 import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
 import de.bund.digitalservice.ris.caselaw.domain.ActiveCitation;
+import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
 import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
@@ -89,12 +90,14 @@ class ActiveCitationIntegrationTest {
   @Autowired private DatabaseDocumentTypeRepository documentTypeRepository;
   @Autowired private DatabaseDocumentationOfficeRepository documentationOfficeRepository;
   @Autowired private DatabaseRelatedDocumentationRepository relatedDocumentationRepository;
+  @Autowired private DatabaseDocumentCategoryRepository databaseDocumentCategoryRepository;
+
   @MockBean private UserService userService;
-  @MockBean ReactiveClientRegistrationRepository clientRegistrationRepository;
+  @MockBean private ReactiveClientRegistrationRepository clientRegistrationRepository;
   @MockBean private S3AsyncClient s3AsyncClient;
   @MockBean private EmailPublishService publishService;
   @MockBean private DocxConverterService docxConverterService;
-  @Autowired private DatabaseDocumentCategoryRepository databaseDocumentCategoryRepository;
+  @MockBean private AttachmentService attachmentService;
 
   @BeforeEach
   void setUp() {

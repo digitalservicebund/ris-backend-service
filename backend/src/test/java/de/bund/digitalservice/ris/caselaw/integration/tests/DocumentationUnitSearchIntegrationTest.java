@@ -27,6 +27,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.StatusDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationOfficeTransformer;
 import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
 import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
+import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.EmailPublishService;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
@@ -89,6 +90,7 @@ class DocumentationUnitSearchIntegrationTest {
   @MockBean DocxConverterService docxConverterService;
   @MockBean UserService userService;
   @MockBean ReactiveClientRegistrationRepository clientRegistrationRepository;
+  @MockBean AttachmentService attachmentService;
 
   private DocumentationOfficeDTO docOfficeDTO;
 

@@ -7,11 +7,11 @@ export default class DocumentUnitListEntry {
   decisionDate?: string
   status?: NonNullable<DocumentUnit["status"]>
   fileNumber?: string
-  fileName?: string
   documentType?: DocumentType
   court?: Court
   appraisalBody?: string
   hasHeadnoteOrPrinciple?: boolean
+  hasAttachments?: boolean
 
   constructor(data: Partial<DocumentUnitListEntry> = {}) {
     Object.assign(this, data)

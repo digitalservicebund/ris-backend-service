@@ -744,7 +744,7 @@ class DocumentUnitDocxBuilderTest {
     paragraph.getContent().add(run);
 
     HashMap<String, DocxImagePart> images = new HashMap<>();
-    DocxImagePart image = new DocxImagePart("content-type", new byte[] {1, 2});
+    DocxImagePart image = new DocxImagePart("content-extension", new byte[] {1, 2});
     images.put("image-ref", image);
 
     var converter = new DocxConverter();
@@ -757,11 +757,11 @@ class DocumentUnitDocxBuilderTest {
     var runElement = paragraphElement.getRunElements().get(0);
     assertEquals(InlineImageElement.class, runElement.getClass());
     var runImageElement = (InlineImageElement) runElement;
-    assertEquals("content-type", runImageElement.getContentType());
+    assertEquals("content-extension", runImageElement.getContentType());
     assertEquals("AQI=", runImageElement.getBase64Representation());
 
     var htmlString = paragraphElement.toHtmlString();
-    assertEquals("<p><img src=\"data:content-type;base64, AQI=\" /></p>", htmlString);
+    assertEquals("<p><img src=\"data:content-extension;base64, AQI=\" /></p>", htmlString);
   }
 
   @Test
@@ -776,7 +776,7 @@ class DocumentUnitDocxBuilderTest {
     paragraph.getContent().add(run);
 
     HashMap<String, DocxImagePart> images = new HashMap<>();
-    DocxImagePart image = new DocxImagePart("content-type", new byte[] {1, 2});
+    DocxImagePart image = new DocxImagePart("content-extension", new byte[] {1, 2});
     images.put("image-ref", image);
 
     var converter = new DocxConverter();
@@ -789,12 +789,12 @@ class DocumentUnitDocxBuilderTest {
     var runElement = paragraphElement.getRunElements().get(0);
     assertEquals(InlineImageElement.class, runElement.getClass());
     var runImageElement = (InlineImageElement) runElement;
-    assertEquals("content-type", runImageElement.getContentType());
+    assertEquals("content-extension", runImageElement.getContentType());
     assertEquals("AQI=", runImageElement.getBase64Representation());
 
     var htmlString = paragraphElement.toHtmlString();
     assertEquals(
-        "<p><img src=\"data:content-type;base64, AQI=\" alt=\"namedescription\" /></p>",
+        "<p><img src=\"data:content-extension;base64, AQI=\" alt=\"namedescription\" /></p>",
         htmlString);
   }
 
@@ -810,7 +810,7 @@ class DocumentUnitDocxBuilderTest {
     paragraph.getContent().add(run);
 
     HashMap<String, DocxImagePart> images = new HashMap<>();
-    DocxImagePart image = new DocxImagePart("content-type", new byte[] {1, 2});
+    DocxImagePart image = new DocxImagePart("content-extension", new byte[] {1, 2});
     images.put("image-ref", image);
 
     var converter = new DocxConverter();
@@ -823,12 +823,12 @@ class DocumentUnitDocxBuilderTest {
     var runElement = paragraphElement.getRunElements().get(0);
     assertEquals(InlineImageElement.class, runElement.getClass());
     var runImageElement = (InlineImageElement) runElement;
-    assertEquals("content-type", runImageElement.getContentType());
+    assertEquals("content-extension", runImageElement.getContentType());
     assertEquals("AQI=", runImageElement.getBase64Representation());
 
     var htmlString = paragraphElement.toHtmlString();
     assertEquals(
-        "<p><img src=\"data:content-type;base64, AQI=\" width=\"10\" height=\"10\" /></p>",
+        "<p><img src=\"data:content-extension;base64, AQI=\" width=\"10\" height=\"10\" /></p>",
         htmlString);
   }
 
@@ -844,7 +844,7 @@ class DocumentUnitDocxBuilderTest {
     paragraph.getContent().add(run);
 
     HashMap<String, DocxImagePart> images = new HashMap<>();
-    DocxImagePart image = new DocxImagePart("content-type", new byte[] {1, 2});
+    DocxImagePart image = new DocxImagePart("content-extension", new byte[] {1, 2});
     images.put("image-ref", image);
 
     var converter = new DocxConverter();
@@ -857,12 +857,12 @@ class DocumentUnitDocxBuilderTest {
     var runElement = paragraphElement.getRunElements().get(0);
     assertEquals(InlineImageElement.class, runElement.getClass());
     var runImageElement = (InlineImageElement) runElement;
-    assertEquals("content-type", runImageElement.getContentType());
+    assertEquals("content-extension", runImageElement.getContentType());
     assertEquals("AQI=", runImageElement.getBase64Representation());
 
     var htmlString = paragraphElement.toHtmlString();
     assertEquals(
-        "<p><img src=\"data:content-type;base64, AQI=\" alt=\"namedescription\" width=\"10\" height=\"10\" /></p>",
+        "<p><img src=\"data:content-extension;base64, AQI=\" alt=\"namedescription\" width=\"10\" height=\"10\" /></p>",
         htmlString);
   }
 
@@ -878,7 +878,7 @@ class DocumentUnitDocxBuilderTest {
     paragraph.getContent().add(run);
 
     HashMap<String, DocxImagePart> images = new HashMap<>();
-    DocxImagePart image = new DocxImagePart("content-type", new byte[] {1, 2});
+    DocxImagePart image = new DocxImagePart("content-extension", new byte[] {1, 2});
     images.put("image-ref", image);
 
     var converter = new DocxConverter();
@@ -891,11 +891,11 @@ class DocumentUnitDocxBuilderTest {
     var runElement = paragraphElement.getRunElements().get(0);
     assertEquals(AnchorImageElement.class, runElement.getClass());
     var runImageElement = (AnchorImageElement) runElement;
-    assertEquals("content-type", runImageElement.getContentType());
+    assertEquals("content-extension", runImageElement.getContentType());
     assertEquals("AQI=", runImageElement.getBase64Representation());
 
     var htmlString = paragraphElement.toHtmlString();
-    assertEquals("<p><img src=\"data:content-type;base64, AQI=\" /></p>", htmlString);
+    assertEquals("<p><img src=\"data:content-extension;base64, AQI=\" /></p>", htmlString);
   }
 
   @Test
@@ -910,7 +910,7 @@ class DocumentUnitDocxBuilderTest {
     paragraph.getContent().add(run);
 
     HashMap<String, DocxImagePart> images = new HashMap<>();
-    DocxImagePart image = new DocxImagePart("content-type", new byte[] {1, 2});
+    DocxImagePart image = new DocxImagePart("content-extension", new byte[] {1, 2});
     images.put("image-ref", image);
 
     var converter = new DocxConverter();
@@ -923,12 +923,12 @@ class DocumentUnitDocxBuilderTest {
     var runElement = paragraphElement.getRunElements().get(0);
     assertEquals(AnchorImageElement.class, runElement.getClass());
     var runImageElement = (AnchorImageElement) runElement;
-    assertEquals("content-type", runImageElement.getContentType());
+    assertEquals("content-extension", runImageElement.getContentType());
     assertEquals("AQI=", runImageElement.getBase64Representation());
 
     var htmlString = paragraphElement.toHtmlString();
     assertEquals(
-        "<p class=\"clearfix\"><img src=\"data:content-type;base64, AQI=\" style=\"float: left;\" /></p>",
+        "<p class=\"clearfix\"><img src=\"data:content-extension;base64, AQI=\" style=\"float: left;\" /></p>",
         htmlString);
   }
 
@@ -944,7 +944,7 @@ class DocumentUnitDocxBuilderTest {
     paragraph.getContent().add(run);
 
     HashMap<String, DocxImagePart> images = new HashMap<>();
-    DocxImagePart image = new DocxImagePart("content-type", new byte[] {1, 2});
+    DocxImagePart image = new DocxImagePart("content-extension", new byte[] {1, 2});
     images.put("image-ref", image);
 
     var converter = new DocxConverter();
@@ -957,12 +957,12 @@ class DocumentUnitDocxBuilderTest {
     var runElement = paragraphElement.getRunElements().get(0);
     assertEquals(AnchorImageElement.class, runElement.getClass());
     var runImageElement = (AnchorImageElement) runElement;
-    assertEquals("content-type", runImageElement.getContentType());
+    assertEquals("content-extension", runImageElement.getContentType());
     assertEquals("AQI=", runImageElement.getBase64Representation());
 
     var htmlString = paragraphElement.toHtmlString();
     assertEquals(
-        "<p class=\"clearfix\"><img src=\"data:content-type;base64, AQI=\" style=\"float: right;\" /></p>",
+        "<p class=\"clearfix\"><img src=\"data:content-extension;base64, AQI=\" style=\"float: right;\" /></p>",
         htmlString);
   }
 
@@ -978,7 +978,7 @@ class DocumentUnitDocxBuilderTest {
     paragraph.getContent().add(run);
 
     HashMap<String, DocxImagePart> images = new HashMap<>();
-    DocxImagePart image = new DocxImagePart("content-type", new byte[] {1, 2});
+    DocxImagePart image = new DocxImagePart("content-extension", new byte[] {1, 2});
     images.put("image-ref", image);
 
     var converter = new DocxConverter();
@@ -1156,7 +1156,7 @@ class DocumentUnitDocxBuilderTest {
     assertThat(paragraphElement.getRunElements().get(0)).isInstanceOf(AnchorImageElement.class);
     AnchorImageElement imageElement = (AnchorImageElement) paragraphElement.getRunElements().get(0);
     assertThat(imageElement.getBase64Representation()).isEqualTo("dm1s");
-    assertThat(imageElement.getContentType()).isEqualTo("vml-content-type");
+    assertThat(imageElement.getContentType()).isEqualTo("vml-content-extension");
   }
 
   @Test

@@ -2,10 +2,16 @@
 import dayjs from "dayjs"
 import { computed, ref } from "vue"
 import DocumentUnitListEntry from "../domain/documentUnitListEntry"
+import CellItem from "@/components/CellItem.vue"
+import FlexContainer from "@/components/FlexContainer.vue"
+import FlexItem from "@/components/FlexItem.vue"
 import IconBadge from "@/components/IconBadge.vue"
 import InfoModal from "@/components/InfoModal.vue"
 import LoadingSpinner from "@/components/LoadingSpinner.vue"
 import PopupModal from "@/components/PopupModal.vue"
+import TableHeader from "@/components/TableHeader.vue"
+import TableRow from "@/components/TableRow.vue"
+import TableView from "@/components/TableView.vue"
 import { useStatusBadge } from "@/composables/useStatusBadge"
 import { ResponseError } from "@/services/httpClient"
 import IconAttachedFile from "~icons/ic/baseline-attach-file"
@@ -95,76 +101,29 @@ function onDelete() {
       @close-modal="toggleModal"
       @confirm-action="onDelete"
     />
-    <div class="relative table w-full border-separate">
-      <div
-        class="ds-label-02-bold sticky top-0 table-row bg-white text-gray-900"
-      >
-        <div
-          class="table-cell border-b-2 border-solid border-blue-300 px-16 py-12"
-        >
-          Dokumentnummer
-        </div>
-        <div
-          class="table-cell border-b-2 border-solid border-blue-300 px-16 py-12"
-        >
-          Gerichtstyp
-        </div>
-        <div
-          class="table-cell border-b-2 border-solid border-blue-300 px-16 py-12"
-        >
-          Ort
-        </div>
-        <div
-          class="table-cell border-b-2 border-solid border-blue-300 px-16 py-12"
-        >
-          Datum
-        </div>
-        <div
-          class="table-cell border-b-2 border-solid border-blue-300 px-16 py-12"
-        >
-          Aktenzeichen
-        </div>
-        <div
-          class="table-cell border-b-2 border-solid border-blue-300 px-16 py-12"
-        >
-          Spruchkörper
-        </div>
-        <div
-          class="table-cell border-b-2 border-solid border-blue-300 px-16 py-12"
-        >
-          Typ
-        </div>
-        <div
-          class="table-cell border-b-2 border-solid border-blue-300 px-16 py-12"
-        >
-          Inhalte
-        </div>
-        <div
-          class="table-cell border-b-2 border-solid border-blue-300 px-16 py-12"
-        >
-          Status
-        </div>
-        <div
-          class="table-cell border-b-2 border-solid border-blue-300 px-16 py-12"
-        >
-          Fehler
-        </div>
-        <div
-          v-if="isDeletable"
-          class="table-cell border-b-2 border-solid border-blue-300 px-16 py-12"
-        ></div>
-      </div>
-      <div
+    <TableView class="relative table w-full border-separate">
+      <TableHeader>
+        <CellItem> Dokumentnummer</CellItem>
+        <CellItem> Gerichtstyp</CellItem>
+        <CellItem> Ort</CellItem>
+        <CellItem> Datum</CellItem>
+        <CellItem> Aktenzeichen</CellItem>
+        <CellItem> Spruchkörper</CellItem>
+        <CellItem> Typ</CellItem>
+        <CellItem> Inhalte</CellItem>
+        <CellItem> Status</CellItem>
+        <CellItem> Fehler</CellItem>
+        <CellItem v-if="isDeletable"></CellItem>
+      </TableHeader>
+      <TableRow
         v-for="(listEntry, id) in listEntries"
         :key="id"
-        class="ds-label-01-reg table-row hover:bg-blue-100"
         data-testid="listEntry"
       >
-        <div
-          class="table-cell min-h-56 border-b-1 border-blue-300 px-16 py-12 align-middle"
+        <CellItem
+          class="underline focus:outline-none focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-blue-800"
         >
           <router-link
-            class="underline focus:outline-none focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-blue-800"
             :to="{
               name: 'caselaw-documentUnit-documentNumber-categories',
               params: { documentNumber: listEntry.documentNumber },
@@ -172,75 +131,67 @@ function onDelete() {
           >
             {{ listEntry.documentNumber }}
           </router-link>
-        </div>
-
-        <div
-          class="table-cell border-b-1 border-blue-300 px-16 py-12 align-middle"
-        >
+        </CellItem>
+        <CellItem>
           {{ listEntry.court?.type ?? "-" }}
-        </div>
-        <div
-          class="table-cell border-b-1 border-blue-300 px-16 py-12 align-middle"
-        >
+        </CellItem>
+        <CellItem>
           {{ listEntry.court?.location ?? "-" }}
-        </div>
-        <div
-          class="table-cell border-b-1 border-blue-300 px-16 py-12 align-middle"
-        >
+        </CellItem>
+        <CellItem>
           {{
             listEntry.decisionDate
               ? dayjs(listEntry.decisionDate).format("DD.MM.YYYY")
               : "-"
           }}
-        </div>
-        <div
-          class="table-cell border-b-1 border-blue-300 px-16 py-12 align-middle"
-        >
+        </CellItem>
+        <CellItem>
           {{ listEntry.fileNumber ? listEntry.fileNumber : "-" }}
-        </div>
-        <div
-          class="table-cell border-b-1 border-blue-300 px-16 py-12 align-middle"
-        >
+        </CellItem>
+        <CellItem>
           {{ listEntry.appraisalBody ?? "-" }}
-        </div>
-        <div
-          class="table-cell border-b-1 border-blue-300 px-16 py-12 align-middle"
-        >
+        </CellItem>
+        <CellItem>
           {{
             listEntry.documentType ? listEntry.documentType.jurisShortcut : "-"
           }}
-        </div>
-        <div class="table-cell border-b-1 border-blue-300 px-12 align-middle">
-          <div class="flex flex-row">
-            <span
-              v-if="listEntry.fileName"
+        </CellItem>
+        <CellItem>
+          <FlexContainer class="flex-row">
+            <FlexItem
+              v-if="listEntry.hasAttachments"
               class="text-blue-800"
               data-testid="file-attached-icon"
             >
+              <router-link
+                :to="{
+                  name: 'caselaw-documentUnit-documentNumber-files',
+                  params: { documentNumber: listEntry.documentNumber },
+                }"
+              >
+                <IconAttachedFile />
+              </router-link>
+            </FlexItem>
+            <FlexItem v-else class="text-gray-500">
               <IconAttachedFile />
-            </span>
-            <span v-else class="text-gray-500"><IconAttachedFile /></span>
-            <span
+            </FlexItem>
+            <FlexItem
               v-if="listEntry.hasHeadnoteOrPrinciple"
               class="text-blue-800"
               data-testid="headnote-principle-icon"
             >
               <IconSubject />
-            </span>
+            </FlexItem>
             <span v-else class="text-gray-500"><IconSubject /></span>
-          </div>
-        </div>
-        <div
-          class="table-cell border-b-1 border-blue-300 px-16 py-12 align-middle"
-        >
+          </FlexContainer>
+        </CellItem>
+        <CellItem>
           <IconBadge
             v-if="listEntry.status?.publicationStatus"
             v-bind="useStatusBadge(listEntry.status).value"
           />
-        </div>
-        <div
-          class="table-cell border-b-1 border-blue-300 px-16 py-12 align-middle"
-        >
+        </CellItem>
+        <CellItem>
           <IconBadge
             v-if="listEntry.status?.withError"
             background-color="bg-red-300"
@@ -249,11 +200,8 @@ function onDelete() {
             label="Fehler"
           />
           <span v-else>-</span>
-        </div>
-        <div
-          v-if="isDeletable"
-          class="table-cell border-b-1 border-blue-300 px-12 align-middle"
-        >
+        </CellItem>
+        <CellItem v-if="isDeletable">
           <button
             aria-label="Dokumentationseinheit löschen"
             class="cursor-pointer align-middle text-blue-800 focus:outline-none focus-visible:outline-blue-800"
@@ -274,9 +222,9 @@ function onDelete() {
           >
             <IconDelete />
           </button>
-        </div>
-      </div>
-    </div>
+        </CellItem>
+      </TableRow>
+    </TableView>
     <!-- Loading State -->
     <div
       v-if="isLoading"

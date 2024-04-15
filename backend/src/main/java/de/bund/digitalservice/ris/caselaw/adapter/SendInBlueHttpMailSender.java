@@ -1,8 +1,8 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
-import de.bund.digitalservice.ris.caselaw.domain.Attachment;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitPublishException;
 import de.bund.digitalservice.ris.caselaw.domain.HttpMailSender;
+import de.bund.digitalservice.ris.caselaw.domain.MailAttachment;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
@@ -29,7 +29,7 @@ public class SendInBlueHttpMailSender implements HttpMailSender {
       String receiverAddress,
       String subject,
       String content,
-      List<Attachment> attachments,
+      List<MailAttachment> mailAttachments,
       String tag) {
 
     ApiClient defaultClient = Configuration.getDefaultApiClient();
@@ -46,7 +46,7 @@ public class SendInBlueHttpMailSender implements HttpMailSender {
     toList.add(to);
 
     List<SendSmtpEmailAttachment> attachmentList = new ArrayList<>();
-    for (Attachment a : attachments) {
+    for (MailAttachment a : mailAttachments) {
       SendSmtpEmailAttachment attachment = new SendSmtpEmailAttachment();
       attachment.setName(a.fileName());
       attachment.setContent(a.fileContent().getBytes(StandardCharsets.UTF_8));

@@ -92,12 +92,13 @@ public class TestDocxBuilder {
     Map<String, DocxImagePart> map = new HashMap<>();
     map.put(
         "inline-ref",
-        new DocxImagePart("inline-content-type", "inline".getBytes(StandardCharsets.UTF_8)));
+        new DocxImagePart("inline-content-extension", "inline".getBytes(StandardCharsets.UTF_8)));
     map.put(
         "anchor-ref",
-        new DocxImagePart("anchor-content-type", "anchor".getBytes(StandardCharsets.UTF_8)));
+        new DocxImagePart("anchor-content-extension", "anchor".getBytes(StandardCharsets.UTF_8)));
     map.put(
-        "vml-ref", new DocxImagePart("vml-content-type", "vml".getBytes(StandardCharsets.UTF_8)));
+        "vml-ref",
+        new DocxImagePart("vml-content-extension", "vml".getBytes(StandardCharsets.UTF_8)));
     return map;
   }
 

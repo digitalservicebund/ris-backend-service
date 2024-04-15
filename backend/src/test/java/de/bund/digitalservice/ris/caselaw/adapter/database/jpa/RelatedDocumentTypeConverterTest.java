@@ -101,7 +101,7 @@ class RelatedDocumentTypeConverterTest {
   void testConvertToEntityAttribute_withUnknownType_shouldThrowIllegalArgumentException() {
     RelatedDocumentTypeConverter converter = new RelatedDocumentTypeConverter();
 
-    assertThatThrownBy(() -> converter.convertToEntityAttribute("unknown type"))
+    assertThatThrownBy(() -> converter.convertToEntityAttribute("unknown extension"))
         .isInstanceOf(IllegalArgumentException.class);
   }
 }

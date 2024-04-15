@@ -27,6 +27,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.ProcedureDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.ProcedureTransformer;
 import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
 import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
+import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentNumberRecyclingService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentNumberService;
@@ -104,6 +105,7 @@ class ProcedureIntegrationTest {
   @MockBean private S3AsyncClient s3AsyncClient;
   @MockBean private EmailPublishService publishService;
   @MockBean private DocxConverterService docxConverterService;
+  @MockBean private AttachmentService attachmentService;
 
   private final DocumentationOffice docOffice = buildDefaultDocOffice();
   private DocumentationOfficeDTO documentationOfficeDTO;

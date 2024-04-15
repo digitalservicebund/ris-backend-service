@@ -5,6 +5,7 @@ import static de.bund.digitalservice.ris.caselaw.AuthUtils.setUpDocumentationOff
 import static de.bund.digitalservice.ris.caselaw.domain.PublicationStatus.PUBLISHED;
 import static de.bund.digitalservice.ris.caselaw.domain.PublicationStatus.UNPUBLISHED;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
@@ -18,12 +19,16 @@ import de.bund.digitalservice.ris.caselaw.adapter.KeycloakUserService;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseApiKeyRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationOfficeRepository;
 import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
+import de.bund.digitalservice.ris.caselaw.domain.Attachment;
+import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.Status;
+import de.bund.digitalservice.ris.caselaw.domain.docx.Docx2Html;
 import java.nio.ByteBuffer;
+import java.util.Collections;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -54,6 +59,7 @@ class DocumentUnitControllerAuthTest {
   @MockBean private DocumentUnitService service;
   @MockBean private KeycloakUserService userService;
   @MockBean private DocxConverterService docxConverterService;
+  @MockBean private AttachmentService attachmentService;
   @MockBean ReactiveClientRegistrationRepository clientRegistrationRepository;
   @MockBean DatabaseApiKeyRepository apiKeyRepository;
   @MockBean DatabaseDocumentationOfficeRepository officeRepository;
@@ -94,9 +100,11 @@ class DocumentUnitControllerAuthTest {
 
   @Test
   void testAttachFileToDocumentUnit() {
-    when(service.attachFileToDocumentUnit(
+    when(attachmentService.attachFileToDocumentationUnit(
             eq(TEST_UUID), any(ByteBuffer.class), any(HttpHeaders.class)))
-        .thenReturn(Mono.empty());
+        .thenReturn(Attachment.builder().s3path("fooPath").build());
+    when(docxConverterService.getConvertedObject(anyString()))
+        .thenReturn(Mono.just(Docx2Html.EMPTY));
     mockDocumentUnit(docOffice1, null, null);
 
     String uri = "/api/v1/caselaw/documentunits/" + TEST_UUID + "/file";
@@ -122,10 +130,8 @@ class DocumentUnitControllerAuthTest {
 
   @Test
   void testRemoveFileFromDocumentUnit() {
-    when(service.removeFileFromDocumentUnit(TEST_UUID)).thenReturn(Mono.empty());
     mockDocumentUnit(docOffice2, null, null);
-
-    String uri = "/api/v1/caselaw/documentunits/" + TEST_UUID + "/file";
+    String uri = "/api/v1/caselaw/documentunits/" + TEST_UUID + "/file/fooPath";
 
     risWebTestClient
         .withLogin(docOffice1Group)
@@ -135,7 +141,13 @@ class DocumentUnitControllerAuthTest {
         .expectStatus()
         .isForbidden();
 
-    risWebTestClient.withLogin(docOffice2Group).delete().uri(uri).exchange().expectStatus().isOk();
+    risWebTestClient
+        .withLogin(docOffice2Group)
+        .delete()
+        .uri(uri)
+        .exchange()
+        .expectStatus()
+        .isNoContent();
   }
 
   @Test
@@ -210,11 +222,11 @@ class DocumentUnitControllerAuthTest {
   }
 
   @Test
-  void testHtml() {
+  void testGetHtml() {
     mockDocumentUnit(docOffice1, "123", Status.builder().publicationStatus(PUBLISHED).build());
     when(docxConverterService.getConvertedObject("123")).thenReturn(Mono.empty());
 
-    String uri = "/api/v1/caselaw/documentunits/" + TEST_UUID + "/docx";
+    String uri = "/api/v1/caselaw/documentunits/" + TEST_UUID + "/docx/123";
 
     risWebTestClient.withLogin(docOffice1Group).get().uri(uri).exchange().expectStatus().isOk();
 
@@ -278,7 +290,7 @@ class DocumentUnitControllerAuthTest {
         DocumentUnit.builder()
             .uuid(TEST_UUID)
             .status(status)
-            .s3path(s3path)
+            .attachments(Collections.singletonList(Attachment.builder().s3path(s3path).build()))
             .coreData(CoreData.builder().documentationOffice(docOffice).build())
             .build();
     when(service.getByUuid(TEST_UUID)).thenReturn(Mono.just(docUnit));

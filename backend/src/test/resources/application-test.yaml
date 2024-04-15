@@ -21,7 +21,7 @@ mail:
 #  level:
 #    org.springframework: DEBUG
 #    org.hibernate.SQL: DEBUG
-#    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+#    org.hibernate.extension.descriptor.sql.BasicBinder: TRACE
 
 neuris:
   document-number-patterns:

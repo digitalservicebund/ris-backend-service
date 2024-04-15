@@ -2,18 +2,24 @@ import httpClient, { ServiceResponse } from "./httpClient"
 import { Docx2HTML } from "@/domain/docx2html"
 import errorMessages from "@/i18n/errors.json"
 
-interface FileService {
+interface AttachmentService {
   upload(
     documentUnitUuid: string,
     file: File,
   ): Promise<ServiceResponse<Docx2HTML>>
 
-  delete(documentUnitUuid: string): Promise<ServiceResponse<unknown>>
+  delete(
+    documentUnitUuid: string,
+    s3path: string,
+  ): Promise<ServiceResponse<unknown>>
 
-  getDocxFileAsHtml(uuid: string): Promise<ServiceResponse<Docx2HTML>>
+  getAttachmentAsHtml(
+    uuid: string,
+    s3path: string,
+  ): Promise<ServiceResponse<Docx2HTML>>
 }
 
-const service: FileService = {
+const service: AttachmentService = {
   async upload(documentUnitUuid: string, file: File) {
     const extension = file.name?.split(".").pop()
     if (!extension || extension.toLowerCase() !== "docx") {
@@ -59,9 +65,9 @@ const service: FileService = {
     return response
   },
 
-  async delete(documentUnitUuid: string) {
+  async delete(documentUnitUuid: string, s3path: string) {
     const response = await httpClient.delete(
-      `caselaw/documentunits/${documentUnitUuid}/file`,
+      `caselaw/documentunits/${documentUnitUuid}/file/${s3path}`,
     )
     response.error =
       response.status >= 300
@@ -71,9 +77,9 @@ const service: FileService = {
     return response
   },
 
-  async getDocxFileAsHtml(uuid: string) {
+  async getAttachmentAsHtml(uuid: string, s3path: string) {
     const response = await httpClient.get<Docx2HTML>(
-      `caselaw/documentunits/${uuid}/docx`,
+      `caselaw/documentunits/${uuid}/docx/${s3path}`,
     )
     response.error =
       response.status >= 300

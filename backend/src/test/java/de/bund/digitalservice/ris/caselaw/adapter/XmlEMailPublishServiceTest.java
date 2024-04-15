@@ -10,11 +10,11 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.DatabaseDocumentationUnitRepository;
-import de.bund.digitalservice.ris.caselaw.domain.Attachment;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitPublishException;
 import de.bund.digitalservice.ris.caselaw.domain.HttpMailSender;
+import de.bund.digitalservice.ris.caselaw.domain.MailAttachment;
 import de.bund.digitalservice.ris.caselaw.domain.XmlExporter;
 import de.bund.digitalservice.ris.caselaw.domain.XmlPublication;
 import de.bund.digitalservice.ris.caselaw.domain.XmlPublicationRepository;
@@ -145,7 +145,7 @@ class XmlEMailPublishServiceTest {
             SAVED_XML_MAIL.mailSubject(),
             "neuris",
             Collections.singletonList(
-                Attachment.builder()
+                MailAttachment.builder()
                     .fileName(SAVED_XML_MAIL.fileName())
                     .fileContent(SAVED_XML_MAIL.xml())
                     .build()),
@@ -247,7 +247,7 @@ class XmlEMailPublishServiceTest {
             MAIL_SUBJECT,
             "neuris",
             Collections.singletonList(
-                Attachment.builder().fileName("test.xml").fileContent("xml").build()),
+                MailAttachment.builder().fileName("test.xml").fileContent("xml").build()),
             TEST_UUID.toString());
 
     Assert.assertThrows(
@@ -261,7 +261,7 @@ class XmlEMailPublishServiceTest {
             MAIL_SUBJECT,
             "neuris",
             Collections.singletonList(
-                Attachment.builder().fileName("test.xml").fileContent("xml").build()),
+                MailAttachment.builder().fileName("test.xml").fileContent("xml").build()),
             TEST_UUID.toString());
   }
 

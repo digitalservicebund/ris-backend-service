@@ -4,11 +4,11 @@ import CellItem from "@/components/CellItem.vue"
 import TableHeader from "@/components/TableHeader.vue"
 import TableRow from "@/components/TableRow.vue"
 import TableView from "@/components/TableView.vue"
-import File from "@/domain/file"
+import Attachment from "@/domain/attachment"
 import IconDelete from "~icons/ic/baseline-close"
 
 const props = defineProps<{
-  files?: File[]
+  files?: Attachment[]
 }>()
 
 const emit = defineEmits<{
@@ -29,7 +29,10 @@ const onSelect = (index: number) => {
 </script>
 
 <template>
-  <TableView class="relative table w-full border-separate">
+  <TableView
+    class="relative table w-full border-separate"
+    data-testid="attachment-list"
+  >
     <TableHeader>
       <CellItem> Dateiname</CellItem>
       <CellItem> Format</CellItem>
@@ -40,7 +43,7 @@ const onSelect = (index: number) => {
       v-for="(file, index) in props.files"
       :key="index"
       class="cursor-pointer"
-      data-testid="listEntry"
+      :data-testid="`listEntry-${index}`"
     >
       <CellItem @click="onSelect(index)">
         {{ file.name ?? "-" }}
@@ -49,10 +52,10 @@ const onSelect = (index: number) => {
         {{ file.format ?? "-" }}
       </CellItem>
 
-      <CellItem @click="onSelect(index)">
+      <CellItem data-testid="uploaded-at-cell" @click="onSelect(index)">
         {{
-          file.uploadedDate
-            ? dayjs(file.uploadedDate).format("DD.MM.YYYY")
+          file.uploadTimestamp
+            ? dayjs(file.uploadTimestamp).format("DD.MM.YYYY")
             : "-"
         }}
       </CellItem>

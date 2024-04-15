@@ -25,6 +25,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresDocumenta
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.PostgresPublicationReportRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
 import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
+import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
 import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
@@ -96,6 +97,7 @@ class DocumentUnitFieldOfLawIntegrationTest {
   @MockBean private DocxConverterService docxConverterService;
   @MockBean private UserService userService;
   @MockBean private ReactiveClientRegistrationRepository clientRegistrationRepository;
+  @MockBean private AttachmentService attachmentService;
 
   private final DocumentationOffice docOffice = buildDefaultDocOffice();
   private DocumentationOfficeDTO documentationOfficeDTO;

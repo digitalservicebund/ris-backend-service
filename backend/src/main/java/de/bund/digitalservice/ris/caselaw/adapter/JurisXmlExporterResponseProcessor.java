@@ -1,8 +1,8 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
-import de.bund.digitalservice.ris.caselaw.domain.Attachment;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatusService;
 import de.bund.digitalservice.ris.caselaw.domain.HttpMailSender;
+import de.bund.digitalservice.ris.caselaw.domain.MailAttachment;
 import de.bund.digitalservice.ris.caselaw.domain.MailStoreFactory;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationReport;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationReportRepository;
@@ -124,11 +124,11 @@ public class JurisXmlExporterResponseProcessor {
             .toFactory();
 
     try {
-      List<Attachment> attachments = collectAttachments(messageWrapper);
+      List<MailAttachment> mailAttachments = collectAttachments(messageWrapper);
       String documentNumber = messageWrapper.getDocumentNumber();
       Instant receivedDate = messageWrapper.getReceivedDate();
       reportRepository.saveAll(
-          attachments.stream()
+          mailAttachments.stream()
               .map(
                   attachment ->
                       PublicationReport.builder()
@@ -154,12 +154,12 @@ public class JurisXmlExporterResponseProcessor {
         + "</html>";
   }
 
-  private List<Attachment> collectAttachments(MessageWrapper messageWrapper)
+  private List<MailAttachment> collectAttachments(MessageWrapper messageWrapper)
       throws MessagingException, IOException {
     return messageWrapper.getAttachments().stream()
         .map(
             attachment ->
-                Attachment.builder()
+                MailAttachment.builder()
                     .fileName(attachment.fileName())
                     .fileContent(attachment.fileContent())
                     .build())
@@ -185,7 +185,7 @@ public class JurisXmlExporterResponseProcessor {
     try {
       String documentNumber = messageWrapper.getDocumentNumber();
       String subject = messageWrapper.getSubject();
-      List<Attachment> attachments = collectAttachments(messageWrapper);
+      List<MailAttachment> mailAttachments = collectAttachments(messageWrapper);
 
       var issuerAddress = statusService.getLatestIssuerAddress(documentNumber).block();
       if (issuerAddress != null) {
@@ -194,7 +194,7 @@ public class JurisXmlExporterResponseProcessor {
             issuerAddress,
             "FWD: " + subject,
             "Anbei weitergeleitet von der jDV:",
-            attachments,
+            mailAttachments,
             "report-" + documentNumber);
       } else {
         throw new StatusImporterException(

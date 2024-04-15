@@ -15,10 +15,10 @@ import static org.mockito.Mockito.when;
 
 import ch.qos.logback.classic.Level;
 import de.bund.digitalservice.ris.caselaw.TestMemoryAppender;
-import de.bund.digitalservice.ris.caselaw.domain.Attachment;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatusService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationUnitNotExistsException;
 import de.bund.digitalservice.ris.caselaw.domain.HttpMailSender;
+import de.bund.digitalservice.ris.caselaw.domain.MailAttachment;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationReport;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationReportRepository;
 import de.bund.digitalservice.ris.caselaw.domain.PublicationStatus;
@@ -185,7 +185,7 @@ class JurisXmlExporterResponseProcessorTest {
             any(),
             any(),
             any(),
-            argThat(list -> list.get(0).equals(new Attachment("test.txt", "ÄÜÖäüöß"))),
+            argThat(list -> list.get(0).equals(new MailAttachment("test.txt", "ÄÜÖäüöß"))),
             eq("report-" + DOCUMENT_NUMBER));
   }
 

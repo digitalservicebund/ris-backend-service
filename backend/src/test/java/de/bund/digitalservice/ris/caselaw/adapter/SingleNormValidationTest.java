@@ -2,6 +2,7 @@ package de.bund.digitalservice.ris.caselaw.adapter;
 
 import static org.mockito.Mockito.when;
 
+import de.bund.digitalservice.ris.caselaw.domain.AttachmentService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentNumberRecyclingService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentNumberService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitRepository;
@@ -43,6 +44,7 @@ class SingleNormValidationTest {
   @MockBean private EmailPublishService publishService;
   @MockBean private DocumentUnitStatusService statusService;
   @MockBean private PublicationReportRepository publicationReportRepository;
+  @MockBean AttachmentService attachmentService;
 
   @BeforeEach
   void setUp() {

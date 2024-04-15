@@ -6,6 +6,7 @@ import { FieldOfLawNode } from "./fieldOfLaw"
 import NormReference from "./normReference"
 import PreviousDecision from "./previousDecision"
 import SingleNorm from "./singleNorm"
+import Attachment from "@/domain/attachment"
 
 export type CoreData = {
   fileNumbers?: string[]
@@ -81,14 +82,8 @@ export default class DocumentUnit {
   readonly uuid: string
   readonly id?: string
   readonly documentNumber?: string
-  readonly creationtimestamp?: string
   readonly status?: PublicationStatus
-
-  public fileuploadtimestamp?: string
-  public s3path?: string
-  public filetype?: string
-  public filename?: string
-
+  public attachments: Attachment[] = []
   public coreData: CoreData = {}
   public texts: Texts = {}
   public previousDecisions?: PreviousDecision[]
@@ -149,11 +144,17 @@ export default class DocumentUnit {
           (activeCitations) => new ActiveCitation({ ...activeCitations }),
         )
 
+    if (data.attachments != undefined && data.attachments.length > 0) {
+      data.attachments.map(
+        (attachment: Attachment) => new Attachment({ ...attachment }),
+      )
+    }
+
     Object.assign(this, data)
   }
 
-  get hasFile(): boolean {
-    return !!this.s3path
+  get hasAttachments(): boolean {
+    return this.attachments && this.attachments.length > 0
   }
 
   get missingRequiredFields() {

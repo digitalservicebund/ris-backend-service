@@ -75,7 +75,7 @@ const render = () => {
     tag,
     {
       class: ["ds-button", buttonClasses.value],
-      "aria-label": props.ariaLabel,
+      ariaLabel: props.ariaLabel,
       disabled: !href && disabled,
       href: sanitizedUrl.value,
       download,

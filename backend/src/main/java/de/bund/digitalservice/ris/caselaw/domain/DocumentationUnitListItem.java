@@ -15,7 +15,6 @@ import lombok.Builder;
  * @param documentNumber (Dokumentnummer) of the search result
  * @param court (Gericht) of the search result
  * @param fileNumber (Aktenzeichen) of the search result
- * @param fileName (Dokumentname) of the search result
  * @param decisionDate (Entscheidungsdatum) of the search result
  * @param appraisalBody (Spruchkörper) of the search result
  * @param documentType (Dokumenttyp) of the search result
@@ -29,7 +28,7 @@ public record DocumentationUnitListItem(
     String documentNumber,
     Court court,
     String fileNumber,
-    String fileName,
+    Boolean hasAttachments,
     LocalDate decisionDate,
     String appraisalBody,
     Boolean hasHeadnoteOrPrinciple,
