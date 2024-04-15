@@ -28,7 +28,7 @@ const validationStore =
 const norm = ref(new NormReference({ ...props.modelValue }))
 const lastSavedModelValue = ref(new NormReference({ ...props.modelValue }))
 
-const singleNorms = computed(() =>
+const singleNorms = ref(
   props.modelValue?.singleNorms
     ? props.modelValue?.singleNorms?.map((norm) => new SingleNorm({ ...norm }))
     : ([] as SingleNorm[]),
