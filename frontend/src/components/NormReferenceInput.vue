@@ -41,12 +41,6 @@ const normAbbreviation = computed({
         value: norm.value.normAbbreviation,
         additionalInformation: norm.value.normAbbreviation.officialLongTitle,
       }
-    } else if (norm.value.normAbbreviationRawValue) {
-      return {
-        label: norm.value.normAbbreviationRawValue,
-        value: norm.value.normAbbreviationRawValue,
-        additionalInformation: norm.value.normAbbreviationRawValue,
-      }
     }
     return undefined
   },
