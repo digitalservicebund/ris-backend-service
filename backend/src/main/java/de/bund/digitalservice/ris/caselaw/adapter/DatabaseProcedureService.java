@@ -41,17 +41,12 @@ public class DatabaseProcedureService implements ProcedureService {
     return query
         .map(
             queryString ->
-                repository.findAllByLabelContainingAndDocumentationOffice(
+                repository.findAllByLabelContainingAndDocumentationOfficeOrderByCreatedAtDesc(
                     queryString.trim(), documentationOfficeDTO, pageable))
-        .orElse(repository.findAllByDocumentationOffice(documentationOfficeDTO, pageable))
+        .orElse(
+            repository.findAllByDocumentationOfficeOrderByCreatedAtDesc(
+                documentationOfficeDTO, pageable))
         .map(ProcedureTransformer::transformToDomain);
-
-    //    return repository
-    //        .findByLabelContainingAndDocumentationOffice(
-    //            query,
-    //
-    // documentationOfficeRepository.findByAbbreviation(documentationOffice.abbreviation()),
-    //            pageable);
   }
 
   @Override

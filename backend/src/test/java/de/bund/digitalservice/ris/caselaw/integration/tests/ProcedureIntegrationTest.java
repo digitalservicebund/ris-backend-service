@@ -4,6 +4,7 @@ import static de.bund.digitalservice.ris.caselaw.AuthUtils.buildDefaultDocOffice
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
+import static org.springframework.test.context.jdbc.Sql.ExecutionPhase.AFTER_TEST_METHOD;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -58,6 +59,7 @@ import org.springframework.security.oauth2.client.registration.ReactiveClientReg
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.test.context.jdbc.Sql;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import reactor.core.publisher.Mono;
@@ -75,6 +77,10 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
       DatabaseProcedureService.class
     },
     controllers = {DocumentUnitController.class, ProcedureController.class})
+@Sql(scripts = {"classpath:procedures_init.sql"})
+@Sql(
+    scripts = {"classpath:procedures_cleanup.sql"},
+    executionPhase = AFTER_TEST_METHOD)
 class ProcedureIntegrationTest {
   @Container
   static PostgreSQLContainer<?> postgreSQLContainer =
@@ -635,6 +641,30 @@ class ProcedureIntegrationTest {
               assertThat(response.getResponseBody()).hasSize(3);
               assertThat(response.getResponseBody().getContent().get(0).label())
                   .isEqualTo("testProcedure3");
+            });
+  }
+
+  @Test
+  void testProcedureControllerReturnsProceduresWithDateFirst() {
+    assertThat(repository.findAll()).hasSize(3);
+
+    risWebTestClient
+        .withDefaultLogin()
+        .get()
+        .uri("/api/v1/caselaw/procedure?sz=20&pg=0")
+        .exchange()
+        .expectStatus()
+        .is2xxSuccessful()
+        .expectBody(new ParameterizedTypeReference<RestPageImpl<Procedure>>() {})
+        .consumeWith(
+            response -> {
+              assertThat(response.getResponseBody()).hasSize(3);
+              assertThat(response.getResponseBody().getContent().get(0).label())
+                  .isEqualTo("with date");
+              assertThat(response.getResponseBody().getContent().get(1).label())
+                  .isEqualTo("with date in past");
+              assertThat(response.getResponseBody().getContent().get(2).label())
+                  .isEqualTo("without date");
             });
   }
 

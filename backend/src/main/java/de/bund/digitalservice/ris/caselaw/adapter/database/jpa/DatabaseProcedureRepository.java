@@ -5,6 +5,7 @@ import java.util.UUID;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
@@ -14,19 +15,18 @@ public interface DatabaseProcedureRepository extends JpaRepository<ProcedureDTO,
   //  ProcedureDTO findByLabelAndDocumentationOffice(
   //      String label, DocumentationOfficeDTO documentationOfficeDTO);
 
-  //  @Query(
-  //      "SELECT p FROM ProcedureDTO p WHERE (:label IS NULL OR p.label LIKE %:label%) AND
-  // p.documentationOffice = :documentationOffice")
-  Page<ProcedureDTO> findAllByLabelContainingAndDocumentationOffice(
+  @Query(
+      "SELECT p FROM ProcedureDTO p WHERE (:label IS NULL OR p.label LIKE %:label%) AND p.documentationOffice = :documentationOffice ORDER BY createdAt DESC NULLS LAST")
+  Page<ProcedureDTO> findAllByLabelContainingAndDocumentationOfficeOrderByCreatedAtDesc(
       @Param("label") String label,
       @Param("documentationOffice") DocumentationOfficeDTO documentationOfficeDTO,
       Pageable pageable);
 
-  void deleteByLabelAndDocumentationOffice(
-      String label, DocumentationOfficeDTO documentationOfficeDTO);
-
-  Page<ProcedureDTO> findAllByDocumentationOffice(
-      DocumentationOfficeDTO documentationOfficeDTO, Pageable pageable);
+  @Query(
+      "SELECT p FROM ProcedureDTO p WHERE p.documentationOffice = :documentationOffice ORDER BY createdAt DESC NULLS LAST")
+  Page<ProcedureDTO> findAllByDocumentationOfficeOrderByCreatedAtDesc(
+      @Param("documentationOffice") DocumentationOfficeDTO documentationOfficeDTO,
+      Pageable pageable);
 
   Optional<ProcedureDTO> findAllByLabelAndDocumentationOffice(
       String label, DocumentationOfficeDTO documentationUnitDTO);

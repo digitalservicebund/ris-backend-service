@@ -8,7 +8,6 @@ import java.util.Optional;
 import java.util.UUID;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.NonNull;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -45,7 +44,7 @@ public class ProcedureController {
         service.search(
             query,
             userService.getDocumentationOffice(oidcUser).block(),
-            PageRequest.of(page.orElse(0), size, Sort.by(Sort.Direction.DESC, "createdAt"))));
+            PageRequest.of(page.orElse(0), size)));
   }
 
   @GetMapping(value = "/{procedureUUID}/documentunits")
