@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, onMounted } from "vue"
+import { computed, onMounted, ref } from "vue"
 import DateInput from "@/components/input/DateInput.vue"
 import InputField from "@/components/input/InputField.vue"
 import TextInput from "@/components/input/TextInput.vue"
@@ -22,6 +22,7 @@ const emit = defineEmits<{
 }>()
 
 const validationStore = useValidationStore<(typeof SingleNorm.fields)[number]>()
+const singleNormInput = ref<InstanceType<typeof TextInput> | null>(null)
 
 const singleNorm = computed({
   get: () => {
@@ -61,6 +62,8 @@ onMounted(async () => {
   if (props.modelValue.singleNorm) {
     await validateNorm()
   }
+
+  singleNormInput.value?.focusInput()
 })
 </script>
 
@@ -76,6 +79,7 @@ onMounted(async () => {
     >
       <TextInput
         id="norm-reference-singleNorm"
+        ref="singleNormInput"
         v-model="singleNorm.singleNorm"
         aria-label="Einzelnorm der Norm"
         :has-error="slotProps.hasError"
