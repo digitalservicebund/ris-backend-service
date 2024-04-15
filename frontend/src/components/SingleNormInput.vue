@@ -68,9 +68,7 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div
-    class="mb-24 flex justify-between gap-24 border-b-1 border-blue-300 pb-24"
-  >
+  <div class="mb-24 flex justify-between gap-24">
     <InputField
       id="norm-reference-singleNorm-field"
       v-slot="slotProps"
