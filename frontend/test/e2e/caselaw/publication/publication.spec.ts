@@ -2,7 +2,6 @@ import { expect } from "@playwright/test"
 import {
   fillActiveCitationInputs,
   fillEnsuingDecisionInputs,
-  fillNormInputs,
   fillPreviousDecisionInputs,
   navigateToCategories,
   navigateToPublication,
@@ -176,34 +175,6 @@ test.describe("ensuring the publishing of documentunits works as expected", () =
     await expect(
       page.locator("li:has-text('Nachgehende Entscheidungen')"),
     ).toBeHidden()
-  })
-
-  //Todo: not able to add norm without norm abbreviation
-  // eslint-disable-next-line playwright/no-skipped-test
-  test.skip("publication page shows missing required fields of norms", async ({
-    page,
-    documentNumber,
-  }) => {
-    await navigateToCategories(page, documentNumber)
-
-    await waitForSaving(
-      async () => {
-        await fillNormInputs(page, {
-          dateOfRelevance: "1234",
-        })
-        await page.getByLabel("Norm speichern").click()
-      },
-      page,
-      { clickSaveButton: true },
-    )
-
-    await navigateToPublication(page, documentNumber)
-
-    await expect(page.locator("li:has-text('Normen')")).toBeVisible()
-
-    await expect(
-      page.locator("li:has-text('Normen')").getByText("RIS-Abkürzung"),
-    ).toBeVisible()
   })
 
   test("publication page shows missing required fields of active citations", async ({

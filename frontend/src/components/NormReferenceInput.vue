@@ -19,19 +19,20 @@ const emit = defineEmits<{
   "update:modelValue": [value: NormReference]
   addEntry: [void]
   cancelEdit: [void]
-  removeEntry: [void]
+  removeEntry: [value?: boolean]
 }>()
 
 const validationStore =
   useValidationStore<["normAbbreviation", "singleNorm"][number]>()
 
 const norm = ref(new NormReference({ ...props.modelValue }))
-const singleNorms = ref(
+const lastSavedModelValue = ref(new NormReference({ ...props.modelValue }))
+
+const singleNorms = computed(() =>
   props.modelValue?.singleNorms
-    ? props.modelValue.singleNorms
+    ? props.modelValue?.singleNorms?.map((norm) => new SingleNorm({ ...norm }))
     : ([] as SingleNorm[]),
 )
-const lastSavedModelValue = ref(new NormReference({ ...props.modelValue }))
 
 const normAbbreviation = computed({
   get: () =>
@@ -64,9 +65,6 @@ const normAbbreviation = computed({
   },
 })
 
-const hasEmptySingleNorms = computed(() =>
-  singleNorms.value.some((singleNorm) => singleNorm.isEmpty),
-)
 async function addNormReference() {
   if (!validationStore.getByMessage("Inhalt nicht valide").length) {
     const normRef = new NormReference({
@@ -79,7 +77,7 @@ async function addNormReference() {
 }
 
 async function removeNormReference() {
-  emit("removeEntry")
+  emit("removeEntry", true)
   singleNorms.value = []
 }
 
@@ -130,7 +128,7 @@ onBeforeUnmount(() => {
         placeholder="Abkürzung, Kurz-oder Langtitel oder Region eingeben ..."
       ></ComboboxInput>
     </InputField>
-    <div v-if="normAbbreviation">
+    <div v-if="normAbbreviation || norm.normAbbreviationRawValue">
       <SingleNormInput
         v-for="(_, index) in singleNorms"
         :key="index"
@@ -149,7 +147,6 @@ onBeforeUnmount(() => {
             <TextButton
               aria-label="Weitere Einzelnorm"
               button-type="tertiary"
-              :disabled="hasEmptySingleNorms"
               :icon="IconAdd"
               label="Weitere Einzelnorm"
               size="small"

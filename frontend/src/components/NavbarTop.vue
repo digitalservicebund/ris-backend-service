@@ -10,7 +10,6 @@ import IconPermIdentity from "~icons/ic/baseline-perm-identity"
 const route = useRoute()
 const user = ref<User>()
 const fontColor = ref<string>()
-const showSearchTab = ref<boolean>(false)
 
 onMounted(async () => {
   const nameResponse = await getName()
@@ -24,11 +23,6 @@ onMounted(async () => {
   } else {
     fontColor.value = "black"
   }
-
-  const featureToggleSearchTab = (
-    await FeatureToggleService.isEnabled("neuris.show-search-tab")
-  ).data
-  showSearchTab.value = !!featureToggleSearchTab
 })
 </script>
 
@@ -67,13 +61,6 @@ onMounted(async () => {
         :class="{ underline: route.path.includes('procedures') }"
         :to="{ name: 'caselaw-procedures' }"
         >Vorgänge</router-link
-      >
-      <router-link
-        v-if="showSearchTab"
-        class="p-8 hover:bg-yellow-500 hover:underline"
-        :class="{ underline: route.path.includes('suche') }"
-        :to="{ name: 'search' }"
-        >Suche</router-link
       >
     </div>
 

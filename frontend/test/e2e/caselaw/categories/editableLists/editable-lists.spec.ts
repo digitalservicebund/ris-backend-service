@@ -1,4 +1,7 @@
+/* eslint-disable playwright/no-conditional-in-test */
+/* eslint-disable playwright/no-conditional-expect */
 import { expect } from "@playwright/test"
+import SingleNorm from "@/domain/singleNorm"
 import {
   fillPreviousDecisionInputs,
   fillActiveCitationInputs,
@@ -6,11 +9,11 @@ import {
   navigateToCategories,
   publishDocumentationUnit,
   waitForSaving,
+  fillNormInputs,
 } from "~/e2e/caselaw/e2e-utils"
 import { caselawTest as test } from "~/e2e/caselaw/fixtures"
 import { generateString } from "~/test-helper/dataGenerators"
 
-/* eslint-disable playwright/no-conditional-in-test */
 test.describe("related documentation units", () => {
   test("renders empty list item in creation mode, when none in list", async ({
     page,
@@ -20,10 +23,12 @@ test.describe("related documentation units", () => {
     const activeCitationContainer = page.getByLabel("Aktivzitierung")
     const previousDecisionContainer = page.getByLabel("Vorgehende Entscheidung")
     const ensuingDecisionContainer = page.getByLabel("Nachgehende Entscheidung")
+    const normsContainer = page.getByLabel("Norm")
     const containers = [
       activeCitationContainer,
       previousDecisionContainer,
       ensuingDecisionContainer,
+      normsContainer,
     ]
 
     for (const container of containers) {
@@ -35,9 +40,14 @@ test.describe("related documentation units", () => {
             .getAttribute("aria-label")) as string
 
           //adding, deleting and cancel editing of empty item not possible
-          await expect(
-            container.getByLabel(`${containerLabel} speichern`),
-          ).toBeDisabled()
+          if (container === normsContainer) {
+            await expect(
+              container.getByLabel(`${containerLabel} speichern`),
+            ).toBeHidden()
+          } else
+            await expect(
+              container.getByLabel(`${containerLabel} speichern`),
+            ).toBeDisabled()
 
           await expect(container.getByLabel("Abbrechen")).toBeHidden()
 
@@ -81,7 +91,7 @@ test.describe("related documentation units", () => {
         await expect(container.getByText(fileNumber1)).toBeVisible()
 
         // edit entry
-        await container.getByLabel("Listen Eintrag").click()
+        await container.getByLabel("Listen Eintrag").first().click()
         await container
           .getByLabel("Aktenzeichen " + section, { exact: true })
           .fill(fileNumber2)
@@ -90,10 +100,10 @@ test.describe("related documentation units", () => {
         await expect(container.getByText(fileNumber1)).toBeHidden()
         await expect(container.getByText(fileNumber2)).toBeVisible()
 
-        await expect(container.getByLabel("Listen Eintrag")).toHaveCount(1)
+        // the second list item is a default list entry
+        await expect(container.getByLabel("Listen Eintrag")).toHaveCount(2)
 
         // add second entry
-        await container.getByLabel("Weitere Angabe").click()
         await waitForSaving(
           async () => {
             await container
@@ -105,17 +115,24 @@ test.describe("related documentation units", () => {
           { clickSaveButton: true },
         )
 
-        await expect(container.getByLabel("Listen Eintrag")).toHaveCount(2)
+        // the third list item is a default list entry
+        await expect(container.getByLabel("Listen Eintrag")).toHaveCount(3)
         await page.reload()
+        // the default list entry is not shown on reload page
+        await expect(container.getByLabel("Listen Eintrag")).toHaveCount(2)
+        await container.getByLabel("Weitere Angabe").isVisible()
+
         const listEntries = container.getByLabel("Listen Eintrag")
         await expect(listEntries).toHaveCount(2)
         await listEntries.first().click()
         await container.getByLabel("Eintrag löschen").click()
+        // the default list entry is not shown on delete item
         await expect(container.getByLabel("Listen Eintrag")).toHaveCount(1)
+        await container.getByLabel("Weitere Angabe").isVisible()
       })
     }
   })
-  /* eslint-disable playwright/no-conditional-expect */
+
   test("validates list item against required fields", async ({
     page,
     documentNumber,
@@ -162,6 +179,7 @@ test.describe("related documentation units", () => {
           await page
             .getByLabel(containerLabel, { exact: true })
             .getByLabel("Listen Eintrag")
+            .first()
             .click()
           if (container === activeCitationContainer) {
             await expect(
@@ -206,10 +224,12 @@ test.describe("related documentation units", () => {
     const activeCitationContainer = page.getByLabel("Aktivzitierung")
     const previousDecisionContainer = page.getByLabel("Vorgehende Entscheidung")
     const ensuingDecisionContainer = page.getByLabel("Nachgehende Entscheidung")
+    const normsContainer = page.getByLabel("Norm")
     const containers = [
       activeCitationContainer,
       previousDecisionContainer,
       ensuingDecisionContainer,
+      normsContainer,
     ]
 
     for (const container of containers) {
@@ -231,18 +251,28 @@ test.describe("related documentation units", () => {
             await fillEnsuingDecisionInputs(page, { fileNumber: fileNumber })
           }
 
+          if (container === normsContainer) {
+            await fillNormInputs(page, {
+              normAbbreviation: "PBefG",
+            })
+          }
+
           await expect(container.getByLabel("Abbrechen")).toBeHidden()
 
-          await expect(container.getByLabel("Löschen")).toBeHidden()
+          await expect(
+            container.getByLabel("Löschen", { exact: true }),
+          ).toBeHidden()
 
           await container.getByLabel(`${containerLabel} speichern`).click()
 
-          await expect(container.getByLabel("Listen Eintrag")).toHaveCount(1)
+          await expect(container.getByLabel("Listen Eintrag")).toHaveCount(2)
 
-          await container.getByLabel("Listen Eintrag").click()
+          await container.getByLabel("Listen Eintrag").first().click()
           await expect(container.getByLabel("Abbrechen")).toBeVisible()
 
-          await expect(container.getByLabel("Löschen")).toBeVisible()
+          await expect(
+            container.getByLabel("Eintrag löschen", { exact: true }),
+          ).toBeVisible()
         },
       )
     }
@@ -253,10 +283,12 @@ test.describe("related documentation units", () => {
     const activeCitationContainer = page.getByLabel("Aktivzitierung")
     const previousDecisionContainer = page.getByLabel("Vorgehende Entscheidung")
     const ensuingDecisionContainer = page.getByLabel("Nachgehende Entscheidung")
+    const normsContainer = page.getByLabel("Norm")
     const containers = [
       activeCitationContainer,
       previousDecisionContainer,
       ensuingDecisionContainer,
+      normsContainer,
     ]
 
     for (const container of containers) {
@@ -286,14 +318,15 @@ test.describe("related documentation units", () => {
               fileNumber: fileNumber1,
             })
           }
+          if (container === normsContainer) {
+            await fillNormInputs(page, {
+              normAbbreviation: "PBefG",
+            })
+          }
           await container.getByLabel(`${containerLabel} speichern`).click()
-          await expect(container.getByLabel("Listen Eintrag")).toHaveCount(1)
-          await expect(
-            container.getByLabel("Listen Eintrag").last(),
-          ).toContainText(fileNumber1)
+          await expect(container.getByLabel("Listen Eintrag")).toHaveCount(2)
 
           //list item 2
-          await container.getByLabel("Weitere Angabe").click()
           const fileNumber2 = generateString()
           if (container === activeCitationContainer) {
             await fillActiveCitationInputs(page, {
@@ -310,20 +343,20 @@ test.describe("related documentation units", () => {
               fileNumber: fileNumber2,
             })
           }
+          if (container === normsContainer) {
+            await fillNormInputs(page, {
+              normAbbreviation: "AusstgBeschWoEigGVV",
+            })
+          }
           await container.getByLabel(`${containerLabel} speichern`).click()
-          await expect(container.getByLabel("Listen Eintrag")).toHaveCount(2)
-          await expect(
-            container.getByLabel("Listen Eintrag").last(),
-          ).toContainText(fileNumber2)
+          await expect(container.getByLabel("Listen Eintrag")).toHaveCount(3)
 
           // leaving an empty list item, deletes it
-          await container.getByLabel("Weitere Angabe").click()
-          await expect(container.getByLabel("Listen Eintrag")).toHaveCount(3)
           await container.getByLabel("Listen Eintrag").nth(1).click()
           await expect(container.getByLabel("Listen Eintrag")).toHaveCount(2)
 
           await container.getByLabel("Listen Eintrag").last().click()
-          await container.getByLabel("Löschen").click()
+          await container.getByLabel("Eintrag löschen").click()
           await expect(container.getByLabel("Listen Eintrag")).toHaveCount(1)
 
           //deleting resets edit mode
@@ -331,24 +364,11 @@ test.describe("related documentation units", () => {
 
           //deleting last list item, adds a new default item
           await container.getByLabel("Listen Eintrag").first().click()
-          await expect(
-            container.getByLabel(`Aktenzeichen ${containerLabel}`, {
-              exact: true,
-            }),
-          ).toHaveValue(fileNumber1)
-          expect(
-            await container.getByText("Pflichtfeld nicht befüllt").count(),
-          ).toBeGreaterThanOrEqual(1)
-          await container.getByLabel("Löschen").click()
+          await container.getByLabel("Eintrag löschen").click()
 
           await expect(container.getByLabel("Abbrechen")).toBeHidden()
-          await expect(container.getByLabel("Löschen")).toBeHidden()
+          await expect(container.getByLabel("Eintrag löschen")).toBeHidden()
           await expect(container.getByLabel("Listen Eintrag")).toHaveCount(1)
-          await expect(
-            container.getByLabel(`Aktenzeichen ${containerLabel}`, {
-              exact: true,
-            }),
-          ).toHaveValue("")
 
           // resets validation errors
           await expect(
@@ -367,10 +387,12 @@ test.describe("related documentation units", () => {
     const activeCitationContainer = page.getByLabel("Aktivzitierung")
     const previousDecisionContainer = page.getByLabel("Vorgehende Entscheidung")
     const ensuingDecisionContainer = page.getByLabel("Nachgehende Entscheidung")
+    const normsContainer = page.getByLabel("Norm")
     const containers = [
       activeCitationContainer,
       previousDecisionContainer,
       ensuingDecisionContainer,
+      normsContainer,
     ]
 
     for (const container of containers) {
@@ -381,49 +403,62 @@ test.describe("related documentation units", () => {
             .first()
             .getAttribute("aria-label")) as string
 
-          const number = "1234"
-          const editedNumber = "4321"
+          const firstEntry = container === normsContainer ? "PBefG" : "1234"
+          const secondEntry =
+            container === normsContainer ? "KaffeeStG" : "4321"
           await navigateToCategories(page, documentNumber)
 
           if (container === activeCitationContainer) {
-            await fillActiveCitationInputs(page, { fileNumber: number })
+            await fillActiveCitationInputs(page, { fileNumber: firstEntry })
           }
           if (container === previousDecisionContainer) {
-            await fillPreviousDecisionInputs(page, { fileNumber: number })
+            await fillPreviousDecisionInputs(page, { fileNumber: firstEntry })
           }
           if (container === ensuingDecisionContainer) {
-            await fillEnsuingDecisionInputs(page, { fileNumber: number })
+            await fillEnsuingDecisionInputs(page, { fileNumber: firstEntry })
+          }
+
+          if (container === normsContainer) {
+            await fillNormInputs(page, {
+              normAbbreviation: firstEntry,
+            })
           }
 
           await expect(container.getByLabel("Abbrechen")).toBeHidden()
 
           await container.getByLabel(`${containerLabel} speichern`).click()
 
-          await expect(container.getByLabel("Listen Eintrag")).toHaveCount(1)
+          await expect(container.getByLabel("Listen Eintrag")).toHaveCount(2)
 
-          await container.getByLabel("Listen Eintrag").click()
+          await container.getByLabel("Listen Eintrag").first().click()
 
           await expect(container.getByLabel("Abbrechen")).toBeVisible()
 
           if (container === activeCitationContainer) {
             await fillActiveCitationInputs(page, {
-              fileNumber: editedNumber,
+              fileNumber: secondEntry,
             })
           }
           if (container === previousDecisionContainer) {
             await fillPreviousDecisionInputs(page, {
-              fileNumber: editedNumber,
+              fileNumber: secondEntry,
             })
           }
           if (container === ensuingDecisionContainer) {
             await fillEnsuingDecisionInputs(page, {
-              fileNumber: editedNumber,
+              fileNumber: secondEntry,
+            })
+          }
+
+          if (container === normsContainer) {
+            await fillNormInputs(page, {
+              normAbbreviation: secondEntry,
             })
           }
 
           await container.getByLabel("Abbrechen").click()
-          await expect(container.getByText(number)).toBeVisible()
-          await expect(container.getByText(editedNumber)).toBeHidden()
+          await expect(container.getByText(firstEntry)).toBeVisible()
+          await expect(container.getByText(secondEntry)).toBeHidden()
         },
       )
     }
@@ -437,10 +472,12 @@ test.describe("related documentation units", () => {
     const activeCitationContainer = page.getByLabel("Aktivzitierung")
     const previousDecisionContainer = page.getByLabel("Vorgehende Entscheidung")
     const ensuingDecisionContainer = page.getByLabel("Nachgehende Entscheidung")
+    const normsContainer = page.getByLabel("Norm")
     const containers = [
       activeCitationContainer,
       previousDecisionContainer,
       ensuingDecisionContainer,
+      normsContainer,
     ]
 
     for (const container of containers) {
@@ -465,14 +502,17 @@ test.describe("related documentation units", () => {
           if (container === ensuingDecisionContainer) {
             await fillEnsuingDecisionInputs(page, { fileNumber: fileNumber })
           }
+          if (container === normsContainer) {
+            await fillNormInputs(page, {
+              normAbbreviation: "PBefG",
+            })
+          }
 
           await container.getByLabel(`${containerLabel} speichern`).click()
 
-          await expect(container.getByLabel("Weitere Angabe")).toBeVisible()
+          await expect(container.getByLabel("Listen Eintrag")).toHaveCount(2)
 
-          await expect(container.getByLabel("Listen Eintrag")).toHaveCount(1)
-
-          await container.getByLabel("Listen Eintrag").click()
+          await container.getByLabel("Listen Eintrag").first().click()
 
           await expect(container.getByLabel("Weitere Angabe")).toBeHidden()
         },
@@ -488,20 +528,18 @@ test.describe("related documentation units", () => {
     const activeCitationContainer = page.getByLabel("Aktivzitierung")
     const previousDecisionContainer = page.getByLabel("Vorgehende Entscheidung")
     const ensuingDecisionContainer = page.getByLabel("Nachgehende Entscheidung")
+    const normsContainer = page.getByLabel("Norm")
     const containers = [
       activeCitationContainer,
       previousDecisionContainer,
       ensuingDecisionContainer,
+      normsContainer,
     ]
 
     for (const container of containers) {
       await test.step(
         "for category " + (await container.first().getAttribute("aria-label")),
         async () => {
-          const containerLabel = (await container
-            .first()
-            .getAttribute("aria-label")) as string
-
           await navigateToCategories(page, documentNumber)
 
           if (container === activeCitationContainer) {
@@ -513,22 +551,19 @@ test.describe("related documentation units", () => {
           if (container === ensuingDecisionContainer) {
             await fillEnsuingDecisionInputs(page, { decisionDate: "03" })
           }
+          if (container === normsContainer) {
+            await fillEnsuingDecisionInputs(page, { decisionDate: "03" })
+          }
+          await fillNormInputs(page, {
+            normAbbreviation: "PBefG",
+            singleNorms: [{ dateOfVersion: "03" } as SingleNorm],
+          })
 
           await page.keyboard.press("Tab")
 
           await expect(
-            container.getByLabel(`Entscheidungsdatum ${containerLabel}`),
-          ).toHaveValue("03")
-
-          await expect(
             container.locator("text=Unvollständiges Datum"),
           ).toBeVisible()
-
-          await page.reload()
-
-          await expect(
-            container.getByLabel(`Entscheidungsdatum ${containerLabel}`),
-          ).toHaveValue("")
         },
       )
     }

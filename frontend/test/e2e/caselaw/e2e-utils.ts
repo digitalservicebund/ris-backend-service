@@ -1,5 +1,6 @@
 import { expect, Page } from "@playwright/test"
 import { generateString } from "../../test-helper/dataGenerators"
+import SingleNorm from "@/domain/singleNorm"
 
 export const navigateToSearch = async (page: Page) => {
   await page.goto(`/caselaw`)
@@ -349,9 +350,7 @@ export async function fillNormInputs(
   page: Page,
   values?: {
     normAbbreviation?: string
-    singleNorm?: string
-    dateOfVersion?: string
-    dateOfRelevance?: string
+    singleNorms?: SingleNorm[]
   },
 ): Promise<void> {
   const fillInput = async (ariaLabel: string, value = generateString()) => {
@@ -361,23 +360,40 @@ export async function fillNormInputs(
   }
 
   if (values?.normAbbreviation) {
-    await fillInput("RIS-Abkürzung", values?.normAbbreviation)
-    await page.getByRole("button", { name: "dropdown-option" }).click()
+    await fillInput("RIS-Abkürzung", values.normAbbreviation)
+    await page.getByText(values.normAbbreviation, { exact: true }).click()
     await waitForInputValue(
       page,
       "[aria-label='RIS-Abkürzung']",
       values.normAbbreviation,
     )
   }
+  if (values?.singleNorms) {
+    for (let index = 0; index < values.singleNorms.length; index++) {
+      const entry = values.singleNorms[index]
+      if (entry.singleNorm) {
+        const input = page.getByLabel("Einzelnorm der Norm").nth(index)
+        await input.fill(entry.singleNorm)
+        await expect(
+          page.locator("[aria-label='Einzelnorm der Norm'] >> nth=" + index),
+        ).toHaveValue(entry.singleNorm)
+      }
 
-  if (values?.singleNorm) {
-    await fillInput("Einzelnorm der Norm", values?.singleNorm)
-  }
-  if (values?.dateOfVersion) {
-    await fillInput("Fassungsdatum der Norm", values?.dateOfVersion)
-  }
-  if (values?.dateOfRelevance) {
-    await fillInput("Jahr der Norm", values?.dateOfRelevance)
+      if (entry.dateOfVersion) {
+        const input = page.getByLabel("Fassungsdatum der Norm").nth(index)
+        await input.fill(entry.dateOfVersion)
+        await expect(
+          page.locator("[aria-label='Fassungsdatum der Norm'] >> nth=" + index),
+        ).toHaveValue(entry.dateOfVersion)
+      }
+      if (entry.dateOfRelevance) {
+        const input = page.getByLabel("Jahr der Norm").nth(index)
+        await input.fill(entry.dateOfRelevance)
+        await expect(
+          page.locator("[aria-label='Jahr der Norm'] >> nth=" + index),
+        ).toHaveValue(entry.dateOfRelevance)
+      }
+    }
   }
 }
 
