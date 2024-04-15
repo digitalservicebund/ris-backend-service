@@ -66,8 +66,10 @@ public class DatabaseProcedureService implements ProcedureService {
                         documentationUnitDTO -> {
                           List<DocumentationUnitProcedureDTO> procedures =
                               documentationUnitDTO.getProcedures();
-
-                          return procedures.get(0).getProcedure().equals(procedureDTO);
+                          return procedures
+                              .get(procedures.size() - 1)
+                              .getProcedure()
+                              .equals(procedureDTO);
                         })
                     .distinct()
                     .map(DocumentationUnitListItemTransformer::transformToDomain)
