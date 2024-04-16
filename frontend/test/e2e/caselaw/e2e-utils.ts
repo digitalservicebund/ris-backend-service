@@ -53,12 +53,21 @@ export const publishDocumentationUnit = async (
   await expect(page.locator("text=In Veröffentlichung")).toBeVisible()
 }
 
-export const uploadTestfile = async (page: Page, filename: string) => {
+export const uploadTestfile = async (
+  page: Page,
+  filename: string | string[],
+) => {
   const [fileChooser] = await Promise.all([
     page.waitForEvent("filechooser"),
     page.locator("text=oder Datei auswählen").click(),
   ])
-  await fileChooser.setFiles("./test/e2e/caselaw/testfiles/" + filename)
+  if (Array.isArray(filename)) {
+    await fileChooser.setFiles(
+      filename.map((file) => "./test/e2e/caselaw/testfiles/" + file),
+    )
+  } else {
+    await fileChooser.setFiles("./test/e2e/caselaw/testfiles/" + filename)
+  }
   await expect(async () => {
     await expect(page.getByLabel("Ladestatus")).not.toBeAttached()
   }).toPass({ timeout: 15000 })

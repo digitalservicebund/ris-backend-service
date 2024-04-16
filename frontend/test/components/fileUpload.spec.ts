@@ -22,25 +22,40 @@ describe("FileUpload", () => {
     screen.getByText("this is an error")
   })
 
-  test("fires events on file selected", async () => {
+  test.each([
+    [
+      [
+        new File(["test"], "sample.docx", {
+          type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        }),
+      ],
+    ],
+
+    [
+      [
+        new File(["testA"], "sample-a.docx", {
+          type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        }),
+        new File(["testB"], "sample-b.docx", {
+          type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        }),
+      ],
+    ],
+  ])(`fires events on files selected`, async (files) => {
     const { emitted } = render(FileUpload)
     const inputEl = screen.getByLabelText("oder Datei auswählen", {
       selector: "input",
       exact: false,
     })
 
-    const file = new File(["test"], "sample.docx", {
-      type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-    })
-
     Object.defineProperty(inputEl, "files", {
-      value: [file],
+      value: files,
       configurable: true,
     })
 
     await fireEvent.update(inputEl)
     await flushPromises()
-    expect(emitted().fileSelected).toBeTruthy()
+    expect(emitted().filesSelected).toBeTruthy()
   })
 
   test("shows spinner when set on loading", async () => {

@@ -92,15 +92,16 @@ const deleteFile = (index: number) => {
   }
 }
 
-async function upload(file: File) {
-  isLoading.value = false
-
+async function upload(files: FileList) {
   try {
-    const response = await fileService.upload(props.documentUnit.uuid, file)
-    if (response.status === 200 && response.data) {
-      html.value = response.data.html
-    } else {
-      error.value = response.error
+    for (const file of Array.from(files)) {
+      isLoading.value = true
+      const response = await fileService.upload(props.documentUnit.uuid, file)
+      if (response.status === 200 && response.data) {
+        html.value = response.data.html
+      } else {
+        error.value = response.error
+      }
     }
   } finally {
     isLoading.value = false
@@ -163,8 +164,8 @@ function toggleDeleteModal() {
               <FileUpload
                 :accept="acceptedFileFormats.toString()"
                 :error="error"
-                :is-loading="false"
-                @file-selected="(file) => upload(file)"
+                :is-loading="isLoading"
+                @files-selected="(files) => upload(files)"
               />
             </div>
           </div>

@@ -12,7 +12,7 @@ const props = defineProps<{
 }>()
 
 const emits = defineEmits<{
-  fileSelected: [file: File]
+  filesSelected: [files: FileList]
 }>()
 
 interface Status {
@@ -46,7 +46,7 @@ function drop(e: DragEvent) {
   e.preventDefault()
   reset()
   if (e.dataTransfer) {
-    emits("fileSelected", e.dataTransfer.files[0])
+    emits("filesSelected", e.dataTransfer.files)
   }
 }
 
@@ -55,7 +55,7 @@ function onFileSelect(event: Event) {
 
   if (files) {
     reset()
-    emits("fileSelected", files[0])
+    emits("filesSelected", files)
   }
 }
 </script>

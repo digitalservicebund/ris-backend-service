@@ -41,6 +41,7 @@ function onEnter() {
         :accept="accept"
         class=""
         hidden="true"
+        multiple="true"
         tabindex="-1"
         type="file"
         @change="emitInputEvent"

@@ -34,11 +34,9 @@ test.describe("upload an original document to a doc unit", () => {
   test("upload and delete multiple docx files per file chooser", async ({
     page,
   }) => {
-    await uploadTestfile(page, "sample.docx")
+    await uploadTestfile(page, ["sample.docx", "some-formatting.docx"])
     await expect(page.locator("text=Hochgeladen am")).toBeVisible()
-    await expect(page.locator(`text=sample.docx`)).toBeVisible()
-
-    await uploadTestfile(page, "some-formatting.docx")
+    await expect(page.locator(`text=sample.docx`).first()).toBeVisible()
     await expect(page.locator(`text=some-formatting.docx`)).toBeVisible()
 
     const tableView = page.getByRole("cell", {
