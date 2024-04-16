@@ -69,7 +69,9 @@ async function addNormReference() {
   if (!validationStore.getByMessage("Inhalt nicht valide").length) {
     const normRef = new NormReference({
       ...norm.value,
-      singleNorms: singleNorms.value.map((norm) => new SingleNorm({ ...norm })),
+      singleNorms: singleNorms.value
+        .map((norm) => (!norm.isEmpty ? new SingleNorm({ ...norm }) : null))
+        .filter((norm) => norm !== null) as SingleNorm[],
     })
     emit("update:modelValue", normRef)
     emit("addEntry")

@@ -247,13 +247,8 @@ describe("NormReferenceEntry", () => {
           normAbbreviation: {
             abbreviation: "1000g-BefV",
           },
-          singleNorms: [
-            {
-              dateOfRelevance: undefined,
-              dateOfVersion: undefined,
-              singleNorm: undefined,
-            },
-          ],
+          singleNorms: [],
+          normAbbreviationRawValue: undefined,
           hasForeignSource: false,
         },
       ],
