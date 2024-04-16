@@ -12,7 +12,7 @@ export const InvisibleCharacters = Extension.create({
   addProseMirrorPlugins() {
     return [
       createInvisiblesPlugin([space, hardBreak, paragraph], {
-        shouldShowInvisibles: true,
+        shouldShowInvisibles: false,
       }),
     ]
   },
