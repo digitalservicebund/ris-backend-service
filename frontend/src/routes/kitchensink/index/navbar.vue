@@ -1,29 +1,44 @@
 <script lang="ts" setup>
-import NavbarSide, { LevelOneMenuItem } from "@/components/NavbarSide.vue"
+import NavbarSide from "@/components/NavbarSide.vue"
 import Navbar from "@/components/NavbarTop.vue"
+import MenuItem from "@/domain/menuItem"
 import KitchensinkPage from "@/kitchensink/components/KitchensinkPage.vue"
 import KitchensinkStory from "@/kitchensink/components/KitchensinkStory.vue"
 
-const menuItems: LevelOneMenuItem[] = [
+const menuItems: MenuItem[] = [
   {
     label: "Kitchensink",
-    route: "/kitchensink",
+    route: {
+      name: "/kitchensink",
+      hash: "#navbarTop",
+    },
     children: [
-      { label: "Navbar Top", route: "/kitchensink#navbarTop" },
-      { label: "Navbar Side", route: "/kitchensink#navbarSide" },
+      {
+        label: "Navbar Top",
+        route: { name: "/kitchensink", hash: "#navbarTop" },
+      },
+      {
+        label: "Navbar Side",
+        route: { name: "/kitchensink", hash: "#navbarSide" },
+      },
     ],
   },
   {
     label: "Disabled Item",
-    route: "/caselaw",
+    route: {
+      name: "/caselaw",
+    },
     isDisabled: true,
   },
   {
     label: "Last Item",
-    route: "/kitchensink#nothing",
+    route: {
+      name: "/kitchensink",
+      hash: "#nothing",
+    },
     children: [
-      { label: "Foo", route: "/kitchensink#foo" },
-      { label: "Bar", route: "/kitchensink#bar" },
+      { label: "Foo", route: { name: "/kitchensink", hash: "#foo" } },
+      { label: "Bar", route: { name: "/kitchensink", hash: "#bar" } },
     ],
   },
 ]
