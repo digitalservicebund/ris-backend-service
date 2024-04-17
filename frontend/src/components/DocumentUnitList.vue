@@ -2,6 +2,7 @@
 import dayjs from "dayjs"
 import { computed, ref } from "vue"
 import DocumentUnitListEntry from "../domain/documentUnitListEntry"
+import CellHeaderItem from "@/components/CellHeaderItem.vue"
 import CellItem from "@/components/CellItem.vue"
 import FlexContainer from "@/components/FlexContainer.vue"
 import FlexItem from "@/components/FlexItem.vue"
@@ -103,17 +104,17 @@ function onDelete() {
     />
     <TableView class="relative table w-full border-separate">
       <TableHeader>
-        <CellItem> Dokumentnummer</CellItem>
-        <CellItem> Gerichtstyp</CellItem>
-        <CellItem> Ort</CellItem>
-        <CellItem> Datum</CellItem>
-        <CellItem> Aktenzeichen</CellItem>
-        <CellItem> Spruchkörper</CellItem>
-        <CellItem> Typ</CellItem>
-        <CellItem> Inhalte</CellItem>
-        <CellItem> Status</CellItem>
-        <CellItem> Fehler</CellItem>
-        <CellItem v-if="isDeletable"></CellItem>
+        <CellHeaderItem> Dokumentnummer</CellHeaderItem>
+        <CellHeaderItem> Gerichtstyp</CellHeaderItem>
+        <CellHeaderItem> Ort</CellHeaderItem>
+        <CellHeaderItem> Datum</CellHeaderItem>
+        <CellHeaderItem> Aktenzeichen</CellHeaderItem>
+        <CellHeaderItem> Spruchkörper</CellHeaderItem>
+        <CellHeaderItem> Typ</CellHeaderItem>
+        <CellHeaderItem> Inhalte</CellHeaderItem>
+        <CellHeaderItem> Status</CellHeaderItem>
+        <CellHeaderItem> Fehler</CellHeaderItem>
+        <CellHeaderItem v-if="isDeletable"></CellHeaderItem>
       </TableHeader>
       <TableRow
         v-for="(listEntry, id) in listEntries"
@@ -201,7 +202,7 @@ function onDelete() {
           />
           <span v-else>-</span>
         </CellItem>
-        <CellItem v-if="isDeletable">
+        <CellItem v-if="isDeletable" class="text-end">
           <button
             aria-label="Dokumentationseinheit löschen"
             class="cursor-pointer align-middle text-blue-800 focus:outline-none focus-visible:outline-blue-800"

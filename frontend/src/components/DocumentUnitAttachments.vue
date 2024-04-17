@@ -158,7 +158,7 @@ function toggleDeleteModal() {
             :files="getAttachments()"
             @delete="handleOnDelete"
             @select="handleOnSelect"
-          ></AttachmentList>
+          />
           <div>
             <div class="flex flex-col items-start">
               <FileUpload

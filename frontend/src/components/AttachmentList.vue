@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import dayjs from "dayjs"
+import CellHeaderItem from "@/components/CellHeaderItem.vue"
 import CellItem from "@/components/CellItem.vue"
 import TableHeader from "@/components/TableHeader.vue"
 import TableRow from "@/components/TableRow.vue"
@@ -34,10 +35,10 @@ const onSelect = (index: number) => {
     data-testid="attachment-list"
   >
     <TableHeader>
-      <CellItem> Dateiname</CellItem>
-      <CellItem> Format</CellItem>
-      <CellItem> Hochgeladen am</CellItem>
-      <CellItem></CellItem>
+      <CellHeaderItem> Dateiname</CellHeaderItem>
+      <CellHeaderItem> Format</CellHeaderItem>
+      <CellHeaderItem> Hochgeladen am</CellHeaderItem>
+      <CellHeaderItem></CellHeaderItem>
     </TableHeader>
     <TableRow
       v-for="(file, index) in props.files"
@@ -59,10 +60,10 @@ const onSelect = (index: number) => {
             : "-"
         }}
       </CellItem>
-      <CellItem class="ext-center">
+      <CellItem class="text-end">
         <button
           aria-label="Datei löschen"
-          class="-full cursor-pointer align-middle text-blue-800 focus:outline-none focus-visible:outline-blue-800"
+          class="cursor-pointer align-middle text-blue-800 focus:outline-none focus-visible:outline-blue-800"
           @click="onDelete(index)"
           @keyup.enter="null"
         >
