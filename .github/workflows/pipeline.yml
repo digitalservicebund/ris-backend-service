@@ -511,10 +511,6 @@ jobs:
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
         uses: sigstore/cosign-installer@59acb6260d9c0ba8f4a2f9d9b48431a222b68e20
       - name: Sign the published Docker image
-        env:
-          COSIGN_EXPERIMENTAL: "true"
-        # This step uses the identity token to provision an ephemeral certificate
-        # against the sigstore community Fulcio instance.
         run: cosign sign --yes ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}:${{ env.CONTAINER_IMAGE_VERSION }}
       - name: Download cosign vulnerability scan record
         uses: actions/download-artifact@v4
@@ -522,8 +518,6 @@ jobs:
           name: "vuln-backend.json"
       - name: Attest vulnerability scan
         run: cosign attest --yes --replace --predicate vuln-backend.json --type vuln ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}:${{ env.CONTAINER_IMAGE_VERSION }}
-        env:
-          COSIGN_EXPERIMENTAL: "true"
       - id: set-version
         run: echo "version=$CONTAINER_IMAGE_VERSION" >> "$GITHUB_OUTPUT"
       - name: Send status to Slack
@@ -572,10 +566,6 @@ jobs:
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
         uses: sigstore/cosign-installer@59acb6260d9c0ba8f4a2f9d9b48431a222b68e20
       - name: Sign the published Docker image
-        env:
-          COSIGN_EXPERIMENTAL: "true"
-        # This step uses the identity token to provision an ephemeral certificate
-        # against the sigstore community Fulcio instance.
         run: cosign sign --yes ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}/frontend:${{ env.CONTAINER_IMAGE_VERSION }}
       - name: Download cosign vulnerability scan record
         uses: actions/download-artifact@v4
@@ -583,8 +573,6 @@ jobs:
           name: "vuln-frontend.json"
       - name: Attest vulnerability scan
         run: cosign attest --yes --replace --predicate vuln-frontend.json --type vuln ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}/frontend:${{ env.CONTAINER_IMAGE_VERSION }}
-        env:
-          COSIGN_EXPERIMENTAL: "true"
       - id: set-version
         run: echo "version=$CONTAINER_IMAGE_VERSION" >> "$GITHUB_OUTPUT"
       - name: Send status to Slack
