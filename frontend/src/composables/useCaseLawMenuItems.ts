@@ -1,16 +1,17 @@
-import { LocationQuery } from "vue-router"
-import MenuItem from "@/domain/menuItem"
+import { computed } from "vue"
+import type { Ref } from "vue"
+import type { RouteLocationNormalizedLoaded } from "vue-router"
 
 export function useCaseLawMenuItems(
-  documentNumber: string | undefined,
-  routeQuery: LocationQuery, // Replace with the appropriate type for route query
-): MenuItem[] {
+  documentNumber: Ref<string | undefined>,
+  route: RouteLocationNormalizedLoaded,
+) {
   const baseRoute = {
-    params: { documentNumber },
-    query: routeQuery,
+    params: { documentNumber: documentNumber.value },
+    query: route.query,
   }
 
-  return [
+  return computed(() => [
     {
       label: "Rubriken",
       route: {
@@ -20,19 +21,35 @@ export function useCaseLawMenuItems(
       children: [
         {
           label: "Stammdaten",
-          route: { ...baseRoute, hash: "#coreData" },
+          route: {
+            ...baseRoute,
+            name: "caselaw-documentUnit-documentNumber-categories",
+            hash: "#coreData",
+          },
         },
         {
           label: "Rechtszug",
-          route: { ...baseRoute, hash: "#proceedingDecisions" },
+          route: {
+            ...baseRoute,
+            name: "caselaw-documentUnit-documentNumber-categories",
+            hash: "#proceedingDecisions",
+          },
         },
         {
           label: "Inhaltliche Erschließung",
-          route: { ...baseRoute, hash: "#contentRelatedIndexing" },
+          route: {
+            ...baseRoute,
+            name: "caselaw-documentUnit-documentNumber-categories",
+            hash: "#contentRelatedIndexing",
+          },
         },
         {
           label: "Kurz- & Langtexte",
-          route: { ...baseRoute, hash: "#texts" },
+          route: {
+            ...baseRoute,
+            name: "caselaw-documentUnit-documentNumber-categories",
+            hash: "#texts",
+          },
         },
       ],
     },
@@ -50,5 +67,5 @@ export function useCaseLawMenuItems(
         name: "caselaw-documentUnit-documentNumber-publication",
       },
     },
-  ]
+  ])
 }
