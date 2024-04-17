@@ -4,21 +4,68 @@ import type { Router, RouteRecordRaw, RouteLocationRaw } from "vue-router"
 import NavbarSide from "@/components/NavbarSide.vue"
 import { generateString } from "~/test-helper/dataGenerators"
 
+function renderComponentNew(menuItems: MenuItem[]) {
+  // eslint-disable-next-line testing-library/await-async-events
+
+  const router = createRouter({
+    history: createWebHistory(),
+    routes: [
+      {
+        path: "/caselaw/documentUnit/new",
+        name: "new",
+        component: {},
+      },
+      {
+        path: "/",
+        name: "home",
+        component: {},
+      },
+      {
+        path: "/caselaw/documentUnit/:documentNumber/categories",
+        name: "caselaw-documentUnit-documentNumber-categories",
+        component: {},
+      },
+      {
+        path: "/caselaw/documentUnit/:documentNumber/files",
+        name: "caselaw-documentUnit-documentNumber-files",
+        component: {},
+      },
+      {
+        path: "/caselaw/documentUnit/:documentNumber/publication",
+        name: "caselaw-documentUnit-documentNumber-publication",
+        component: {},
+      },
+    ],
+  })
+  return {
+    ...render(NavbarSide, {
+      props: {
+        menuItems: menuItems,
+      },
+      global: { plugins: [router] },
+    }),
+  }
+}
+
 describe("NavbarSide", () => {
-  xit("renders sidenav with multiple items and correct routes", async () => {
+  it("renders sidenav with multiple items and correct routes", async () => {
     const menuItems = [
-      { label: "first item", route: "/first-route" },
-      { label: "second item", route: "/second-route" },
+      { label: "first-parent", route: "/first-parent-route" },
+      { label: "second-parent", route: "/second-parent-route" },
     ]
 
-    await renderComponent({ menuItems })
+    renderComponentNew(menuItems)
+
     expect(screen.getByText(menuItems[0].label)).toBeVisible()
+    expect(screen.getByTestId("43434")).toBeInTheDocument()
+
     expect(screen.getByTestId(menuItems[0].route)).toHaveAttribute(
       "href",
       menuItems[0].route,
     )
 
     expect(screen.getByText(menuItems[1].label)).toBeVisible()
+
     expect(screen.getByTestId(menuItems[1].route)).toHaveAttribute(
       "href",
       menuItems[1].route,
