@@ -1,12 +1,11 @@
 import { computed } from "vue"
 import type { Ref } from "vue"
 import type { RouteLocationNormalizedLoaded } from "vue-router"
-import MenuItem from "@/domain/menuItem"
 
 export function useCaseLawMenuItems(
   documentNumber: Ref<string | undefined>,
   route: RouteLocationNormalizedLoaded,
-): Ref<MenuItem[]> {
+) {
   const baseRoute = {
     params: { documentNumber: documentNumber.value },
     query: route.query,

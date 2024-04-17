@@ -1,8 +1,7 @@
 <script lang="ts" setup>
 import { computed, watchEffect, watch } from "vue"
 import { useRouter } from "vue-router"
-import NavbarSide from "@/components/NavbarSide.vue"
-import MenuItem from "@/domain/menuItem"
+import NavbarSide, { LevelOneMenuItem } from "@/components/NavbarSide.vue"
 
 const router = useRouter()
 
@@ -14,11 +13,11 @@ const router = useRouter()
 // - Sort the items alphabetically
 //
 // To add a new page to the kitchensink, simply add a new page in /kitchensink/index.
-const navigation = computed<MenuItem[]>(() =>
+const navigation = computed<LevelOneMenuItem[]>(() =>
   router
     .getRoutes()
     .filter(({ name }) => name?.toString().startsWith("kitchensink-index-"))
-    .map<MenuItem>((route) => {
+    .map<LevelOneMenuItem>((route) => {
       const label = route.name
         ?.toString()
         .replace("kitchensink-index-", "")
