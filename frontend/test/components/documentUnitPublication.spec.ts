@@ -4,6 +4,7 @@ import { createRouter, createWebHistory } from "vue-router"
 import DocumentUnitPublication from "@/components/DocumentUnitPublication.vue"
 import DocumentUnit from "@/domain/documentUnit"
 import { PublicationHistoryRecordType } from "@/domain/xmlMail"
+import documentUnitService from "@/services/documentUnitService"
 import publishService from "@/services/publishService"
 
 function renderComponent() {
@@ -65,17 +66,17 @@ function renderComponent() {
   }
 }
 describe("Document Unit Publication", () => {
+  vi.spyOn(publishService, "getPublicationLog").mockImplementation(() =>
+    Promise.resolve({
+      status: 200,
+      data: [
+        {
+          type: PublicationHistoryRecordType.PUBLICATION_REPORT,
+        },
+      ],
+    }),
+  )
   test("renders successfully", async () => {
-    vi.spyOn(publishService, "getPublicationLog").mockImplementation(() =>
-      Promise.resolve({
-        status: 200,
-        data: [
-          {
-            type: PublicationHistoryRecordType.PUBLICATION_REPORT,
-          },
-        ],
-      }),
-    )
     renderComponent()
 
     expect(
@@ -112,17 +113,7 @@ describe("Document Unit Publication", () => {
     ).toBeInTheDocument()
   })
 
-  test.skip("renders publish result", async () => {
-    vi.spyOn(publishService, "getPublicationLog").mockImplementation(() =>
-      Promise.resolve({
-        status: 200,
-        data: [
-          {
-            type: PublicationHistoryRecordType.PUBLICATION_REPORT,
-          },
-        ],
-      }),
-    )
+  test("renders publish result", async () => {
     vi.spyOn(publishService, "publishDocument").mockImplementation(() =>
       Promise.resolve({
         status: 200,
@@ -131,6 +122,26 @@ describe("Document Unit Publication", () => {
           statusCode: "200",
         },
       }),
+    )
+    vi.spyOn(documentUnitService, "getByDocumentNumber").mockImplementation(
+      () =>
+        Promise.resolve({
+          status: 200,
+          data: new DocumentUnit("foo", {
+            documentNumber: "1234567891234",
+            coreData: {
+              court: {
+                type: "AG",
+                location: "Test",
+                label: "AG Test",
+              },
+            },
+            texts: {},
+            previousDecisions: undefined,
+            ensuingDecisions: undefined,
+            contentRelatedIndexing: {},
+          }),
+        }),
     )
     const { user } = renderComponent()
 
