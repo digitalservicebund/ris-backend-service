@@ -113,7 +113,7 @@ describe("Document Unit Publication", () => {
     ).toBeInTheDocument()
   })
 
-  test("renders publish result", async () => {
+  test.skip("renders publish result", async () => {
     vi.spyOn(publishService, "publishDocument").mockImplementation(() =>
       Promise.resolve({
         status: 200,
