@@ -156,5 +156,6 @@ describe("text editor", async () => {
     expect(screen.getByLabelText("superscript")).toBeInTheDocument()
     expect(screen.getByLabelText("subscript")).toBeInTheDocument()
     expect(screen.getByLabelText("fullview")).toBeInTheDocument()
+    expect(screen.getByLabelText("invisible-characters")).toBeInTheDocument()
   })
 })

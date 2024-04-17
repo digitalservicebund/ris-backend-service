@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import { commands, selectActiveState } from "@guardian/prosemirror-invisibles"
 import { Bold } from "@tiptap/extension-bold"
 import { Color } from "@tiptap/extension-color"
 import { Document } from "@tiptap/extension-document"
@@ -48,6 +49,7 @@ import IconSuperscript from "~icons/ic/baseline-superscript"
 import IconUndo from "~icons/ic/baseline-undo"
 import IconAlignCenter from "~icons/ic/outline-format-align-center"
 import IconAlignLeft from "~icons/ic/outline-format-align-left"
+import IconParagraph from "~icons/material-symbols/format-paragraph"
 
 interface Props {
   value?: string
@@ -226,6 +228,15 @@ const buttons = computed(() => [
     isCollapsable: false,
     callback: () => editor.chain().focus().toggleMark("subscript").run(),
   },
+  {
+    type: "invisible-characters",
+    icon: IconParagraph,
+    ariaLabel: "invisible-characters",
+    group: "view",
+    isCollapsable: true,
+    callback: () =>
+      commands.toggleActiveState()(editor.state, editor.view.dispatch),
+  },
 ])
 
 const fixButtons = [
@@ -243,7 +254,9 @@ const editorButtons = computed(() =>
     isActive:
       button.group == "alignment"
         ? editor.isActive({ textAlign: button.type })
-        : editor.isActive(button.type),
+        : button.ariaLabel == "invisible-characters"
+          ? selectActiveState(editor.view.state)
+          : editor.isActive(button.type),
   })),
 )
 const buttonSize = 48

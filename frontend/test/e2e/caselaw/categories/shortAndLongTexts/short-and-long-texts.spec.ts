@@ -31,3 +31,17 @@ test.describe("short and long texts", () => {
     expect(parseInt(largeEditorHeight)).toBeGreaterThanOrEqual(320)
   })
 })
+
+test("toggle invisible characters", async ({ page, documentNumber }) => {
+  await navigateToCategories(page, documentNumber)
+
+  const guidingPrincipleInput = page.locator("[data-testid='Leitsatz']")
+  await guidingPrincipleInput.click()
+  await page.keyboard.type(`this is a test paragraph`)
+
+  await expect(page.locator("[class='ProseMirror-separator']")).toBeHidden()
+  await page.getByLabel("invisible-characters").click()
+  await expect(page.locator("[class='ProseMirror-separator']")).toBeVisible()
+  await page.getByLabel("invisible-characters").click()
+  await expect(page.locator("[class='ProseMirror-separator']")).toBeHidden()
+})
