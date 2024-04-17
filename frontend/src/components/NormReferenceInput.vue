@@ -66,7 +66,10 @@ const normAbbreviation = computed({
 })
 
 async function addNormReference() {
-  if (!validationStore.getByMessage("Inhalt nicht valide").length) {
+  if (
+    !validationStore.getByMessage("Inhalt nicht valide").length &&
+    !validationStore.getByMessage("RIS-Abkürzung bereits eingegeben").length
+  ) {
     const normRef = new NormReference({
       ...norm.value,
       singleNorms: singleNorms.value
@@ -128,6 +131,7 @@ onBeforeUnmount(() => {
         :item-service="ComboboxItemService.getRisAbbreviations"
         no-clear
         placeholder="Abkürzung, Kurz-oder Langtitel oder Region eingeben..."
+        @input="validationStore.remove('normAbbreviation')"
       ></ComboboxInput>
     </InputField>
     <div v-if="normAbbreviation || norm.normAbbreviationRawValue">

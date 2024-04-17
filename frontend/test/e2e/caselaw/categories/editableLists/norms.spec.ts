@@ -216,4 +216,47 @@ test.describe("norm", () => {
     await expect(container.getByText("§ 123")).toBeVisible()
     await expect(container.getByText("§ 456")).toBeHidden()
   })
+
+  test("validates agaist duplicate norm abbreviations", async ({
+    page,
+    documentNumber,
+  }) => {
+    await navigateToCategories(page, documentNumber)
+
+    const container = page.getByLabel("Norm")
+
+    await fillNormInputs(page, {
+      normAbbreviation: "PBefG",
+      singleNorms: [{ singleNorm: "§ 123" } as SingleNorm],
+    })
+
+    await container.getByLabel("Norm speichern").click()
+    await expect(container.getByText("PBefG")).toBeVisible()
+    await expect(container.getByText("§ 123")).toBeVisible()
+
+    await page.getByLabel("RIS-Abkürzung").fill("PBefG")
+    await page.getByText("PBefG", { exact: true }).click()
+
+    await expect(
+      container.getByText("RIS-Abkürzung bereits eingegeben"),
+    ).toBeVisible()
+
+    await fillNormInputs(page, {
+      normAbbreviation: "AEG",
+    })
+
+    await container.getByLabel("Norm speichern").click()
+    const listEntries = container.getByLabel("Listen Eintrag")
+    await listEntries.nth(1).click()
+    await page.getByLabel("RIS-Abkürzung").fill("PBefG")
+    await page.getByText("PBefG", { exact: true }).click()
+
+    await expect(
+      container.getByText("RIS-Abkürzung bereits eingegeben"),
+    ).toBeVisible()
+    await container.getByLabel("Norm speichern").click()
+    await expect(
+      container.getByText("RIS-Abkürzung bereits eingegeben"),
+    ).toBeVisible()
+  })
 })

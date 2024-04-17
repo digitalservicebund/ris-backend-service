@@ -94,6 +94,57 @@ describe("Norm references", () => {
     expect(screen.getByLabelText("Jahr der Norm")).toBeInTheDocument()
   })
 
+  it("validates against duplicate entries in new entries", async () => {
+    vi.spyOn(documentUnitService, "validateSingleNorm").mockImplementation(() =>
+      Promise.resolve({ status: 200, data: "Ok" }),
+    )
+    const { user } = renderComponent({
+      modelValue: [
+        generateNormReference({
+          normAbbreviation: { abbreviation: "1000g-BefV" },
+        }),
+      ],
+    })
+    await user.click(screen.getByLabelText("Weitere Angabe"))
+
+    const abbreviationField = screen.getByLabelText("RIS-Abkürzung")
+    await user.type(abbreviationField, "1000g-BefV")
+    const dropdownItems = screen.getAllByLabelText(
+      "dropdown-option",
+    ) as HTMLElement[]
+    expect(dropdownItems[0]).toHaveTextContent("1000g-BefV")
+    await user.click(dropdownItems[0])
+    await screen.findByText(/RIS-Abkürzung bereits eingegeben/)
+  })
+
+  it("validates against duplicate entries in existing entries", async () => {
+    vi.spyOn(documentUnitService, "validateSingleNorm").mockImplementation(() =>
+      Promise.resolve({ status: 200, data: "Ok" }),
+    )
+    const { user } = renderComponent({
+      modelValue: [
+        generateNormReference({
+          normAbbreviation: { abbreviation: "1000g-BefV" },
+        }),
+        generateNormReference(),
+      ],
+    })
+    const listEntries = screen.getAllByLabelText("Listen Eintrag")
+    await user.click(listEntries[1])
+
+    const abbreviationField = screen.getByLabelText("RIS-Abkürzung")
+    await user.type(abbreviationField, "1000g-BefV")
+    const dropdownItems = screen.getAllByLabelText(
+      "dropdown-option",
+    ) as HTMLElement[]
+    expect(dropdownItems[0]).toHaveTextContent("1000g-BefV")
+    await user.click(dropdownItems[0])
+    await screen.findByText(/RIS-Abkürzung bereits eingegeben/)
+    const button = screen.getByLabelText("Norm speichern")
+    await user.click(button)
+    await screen.findByText(/RIS-Abkürzung bereits eingegeben/)
+  })
+
   it("updates norm reference", async () => {
     const { user, emitted } = renderComponent({
       modelValue: [generateNormReference()],
