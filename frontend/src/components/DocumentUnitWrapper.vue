@@ -19,7 +19,6 @@ const route = useRoute()
 const router = useRouter()
 const documentNumber = computed(() => props.documentUnit.documentNumber)
 const menuItems = useCaseLawMenuItems(documentNumber, route)
-const goBackRoute = { name: "caselaw" }
 const navigationIsOpen = useToggleStateInRouteQuery(
   "showNavBar",
   route,
@@ -73,11 +72,7 @@ watchEffect(() => {
         class="sticky top-0 z-20"
         label="Navigation"
       >
-        <NavbarSide
-          go-back-label="Suche"
-          :go-back-route="goBackRoute"
-          :menu-items="menuItems"
-        />
+        <NavbarSide :is-child="false" :menu-items="menuItems" />
       </SideToggle>
     </div>
     <div class="flex w-full flex-col bg-gray-100">
