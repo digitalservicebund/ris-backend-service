@@ -68,7 +68,6 @@ const isOnlyParentActive = (currentNavItem: MenuItem) => {
         </div>
         <div v-else>
           <FlexItem
-            v-if="isParentActive(navItem)"
             id="child-menu-item"
             class="ds-label-02-reg block py-[1rem] pl-[2rem]"
             :class="isChildActive(navItem) ? 'bg-blue-200 underline' : ''"
