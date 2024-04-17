@@ -241,6 +241,7 @@ function onDelete() {
     </div>
 
     <!-- Empty State -->
+    <!-- TODO: move component to parent, extract it as a component -->
     <div
       v-if="emptyStatus && !searchResponseError && !isLoading"
       class="my-112 grid justify-items-center"
