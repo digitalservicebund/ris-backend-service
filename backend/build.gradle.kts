@@ -149,6 +149,9 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
     implementation("org.springframework.security:spring-security-oauth2-resource-server:6.2.3")
 
+    // CVE-2024-22262
+    implementation("org.springframework:spring-web:6.1.6")
+
     implementation("org.springdoc:springdoc-openapi-starter-webflux-ui:2.5.0")
 
     implementation("org.springframework.cloud:spring-cloud-starter-kubernetes-client-config:3.1.0")
