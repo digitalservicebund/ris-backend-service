@@ -1,7 +1,4 @@
-interface Route {
-  name?: string
-  hash?: string
-}
+import Route from "@/domain/route"
 
 export default interface MenuItem {
   label: string

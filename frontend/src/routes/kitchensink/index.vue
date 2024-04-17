@@ -3,6 +3,7 @@ import { computed, watchEffect, watch } from "vue"
 import { useRouter } from "vue-router"
 import NavbarSide from "@/components/NavbarSide.vue"
 import MenuItem from "@/domain/menuItem"
+import RouterUtil from "@/utils/routeUtil"
 
 const router = useRouter()
 
@@ -40,7 +41,9 @@ watchEffect(() => {
     router.currentRoute.value.name === "kitchensink" &&
     navigation.value.length > 0
   ) {
-    router.replace(navigation.value[0].route)
+    router.replace(
+      RouterUtil.transformToRouteLocationRaw(navigation.value[0].route),
+    )
   }
 })
 

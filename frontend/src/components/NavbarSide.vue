@@ -3,6 +3,7 @@ import { useRoute } from "vue-router"
 import FlexContainer from "@/components/FlexContainer.vue"
 import FlexItem from "@/components/FlexItem.vue"
 import MenuItem from "@/domain/menuItem"
+import RouteUtil from "@/utils/routeUtil"
 import StringsUtil from "@/utils/stringsUtil"
 
 interface Props {
@@ -51,7 +52,7 @@ const isOnlyParentActive = (currentNavItem: MenuItem) => {
         class="w-full hover:bg-blue-200 hover:underline focus:bg-blue-200 focus:underline"
         :data-testid="navItem.route"
         :params="activeRoute.params"
-        :to="navItem.route"
+        :to="RouteUtil.transformToRouteLocationRaw(navItem.route)"
       >
         <div v-if="!props.isChild">
           <FlexItem

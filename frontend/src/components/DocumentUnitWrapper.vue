@@ -17,8 +17,11 @@ const props = defineProps<{
 }>()
 const route = useRoute()
 const router = useRouter()
-const documentNumber = computed(() => props.documentUnit.documentNumber)
-const menuItems = useCaseLawMenuItems(documentNumber, route)
+
+const menuItems = useCaseLawMenuItems(
+  props.documentUnit.documentNumber,
+  route.query,
+)
 const navigationIsOpen = useToggleStateInRouteQuery(
   "showNavBar",
   route,
