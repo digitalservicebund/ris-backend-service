@@ -65,17 +65,17 @@ function renderComponent() {
   }
 }
 describe("Document Unit Publication", () => {
-  vi.spyOn(publishService, "getPublicationLog").mockImplementation(() =>
-    Promise.resolve({
-      status: 200,
-      data: [
-        {
-          type: PublicationHistoryRecordType.PUBLICATION_REPORT,
-        },
-      ],
-    }),
-  )
   test("renders successfully", async () => {
+    vi.spyOn(publishService, "getPublicationLog").mockImplementation(() =>
+      Promise.resolve({
+        status: 200,
+        data: [
+          {
+            type: PublicationHistoryRecordType.PUBLICATION_REPORT,
+          },
+        ],
+      }),
+    )
     renderComponent()
 
     expect(
@@ -112,7 +112,17 @@ describe("Document Unit Publication", () => {
     ).toBeInTheDocument()
   })
 
-  test.skip("renders publish result", async () => {
+  test("renders publish result", async () => {
+    vi.spyOn(publishService, "getPublicationLog").mockImplementation(() =>
+      Promise.resolve({
+        status: 200,
+        data: [
+          {
+            type: PublicationHistoryRecordType.PUBLICATION_REPORT,
+          },
+        ],
+      }),
+    )
     vi.spyOn(publishService, "publishDocument").mockImplementation(() =>
       Promise.resolve({
         status: 200,
