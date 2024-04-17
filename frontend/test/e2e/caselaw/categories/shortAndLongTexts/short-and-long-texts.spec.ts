@@ -39,9 +39,15 @@ test("toggle invisible characters", async ({ page, documentNumber }) => {
   await guidingPrincipleInput.click()
   await page.keyboard.type(`this is a test paragraph`)
 
-  await expect(page.locator("[class='ProseMirror-separator']")).toBeHidden()
+  await expect(
+    guidingPrincipleInput.locator("[class='ProseMirror-trailingBreak']"),
+  ).toHaveCount(0)
   await page.getByLabel("invisible-characters").click()
-  await expect(page.locator("[class='ProseMirror-separator']")).toBeVisible()
+  await expect(
+    guidingPrincipleInput.locator("[class='ProseMirror-trailingBreak']"),
+  ).toHaveCount(1)
   await page.getByLabel("invisible-characters").click()
-  await expect(page.locator("[class='ProseMirror-separator']")).toBeHidden()
+  await expect(
+    guidingPrincipleInput.locator("[class='ProseMirror-trailingBreak']"),
+  ).toHaveCount(0)
 })
