@@ -127,7 +127,7 @@ describe("Document Unit Publication", () => {
       Promise.resolve({
         status: 200,
         data: {
-          type: PublicationHistoryRecordType.PUBLICATION_REPORT,
+          xml: "<xml>all good</xml>",
           statusCode: "200",
         },
       }),
