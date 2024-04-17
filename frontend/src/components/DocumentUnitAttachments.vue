@@ -169,7 +169,7 @@ function toggleDeleteModal() {
               />
             </div>
           </div>
-          <div>
+          <div class="ds-label-02-reg text-gray-900">
             Zulässige Dateiformate:
             {{ acceptedFileFormats.toString().replace(/\./g, " ") }}
           </div>
