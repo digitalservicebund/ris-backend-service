@@ -2,6 +2,7 @@ import { render, screen } from "@testing-library/vue"
 import { createRouter, createWebHistory } from "vue-router"
 import type { Router, RouteRecordRaw, RouteLocationRaw } from "vue-router"
 import NavbarSide from "@/components/NavbarSide.vue"
+import MenuItem from "@/domain/menuItem"
 import { generateString } from "~/test-helper/dataGenerators"
 
 describe("NavbarSide", () => {
@@ -305,13 +306,6 @@ describe("NavbarSide", () => {
     })
   })
 })
-
-interface MenuItem {
-  label: string
-  route: RouteLocationRaw
-  children?: MenuItem[]
-  isDisabled?: boolean
-}
 
 async function renderComponent(options?: {
   menuItems?: MenuItem[]
