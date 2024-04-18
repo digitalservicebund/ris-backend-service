@@ -14,6 +14,7 @@ import IconClear from "~icons/ic/baseline-clear"
           <a
             class="ds-link-01-bold"
             href="https://icon-sets.iconify.design/ic/"
+            rel="noopener"
             target="_blank"
             >Google Material</a
           >
@@ -21,6 +22,7 @@ import IconClear from "~icons/ic/baseline-clear"
           <a
             class="ds-link-01-bold"
             href="https://icon-sets.iconify.design/material-symbols"
+            rel="noopener"
             target="_blank"
             >Material Symbols</a
           >
