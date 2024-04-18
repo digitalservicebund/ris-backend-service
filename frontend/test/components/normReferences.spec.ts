@@ -215,6 +215,18 @@ describe("Norm references", () => {
     )
   })
 
+  it("render error badge, when norm reference is ambiguous", async () => {
+    const modelValue: NormReference[] = [
+      new NormReference({
+        normAbbreviationRawValue: "EWGAssRBes 1/80",
+      }),
+    ]
+
+    renderComponent({ modelValue })
+
+    expect(screen.getByText("Mehrdeutiger Verweis")).toBeInTheDocument()
+  })
+
   it("render error badge, when required fields missing", async () => {
     const modelValue: NormReference[] = [
       new NormReference({

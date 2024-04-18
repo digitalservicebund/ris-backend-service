@@ -2,8 +2,10 @@
 import { computed, h } from "vue"
 import { withSummarizer } from "@/components/DataSetSummary.vue"
 import EditableList from "@/components/EditableList.vue"
+import IconBadge from "@/components/IconBadge.vue"
 import NormReferenceInput from "@/components/NormReferenceInput.vue"
 import NormReference from "@/domain/normReference"
+import IconError from "~icons/ic/baseline-error"
 import IconBook from "~icons/material-symbols/book-2"
 import IconArrowRight from "~icons/material-symbols/subdirectory-arrow-right"
 
@@ -14,6 +16,8 @@ const props = defineProps<{
 const emit = defineEmits<{
   "update:modelValue": [value?: NormReference[]]
 }>()
+
+const ambiguousNormReferenceError = "Mehrdeutiger Verweis"
 
 const norms = computed({
   get: () => {
@@ -41,18 +45,34 @@ function decisionSummarizer(normEntry: NormReference) {
         h(IconBook, { class: ["mr-8"] }),
         h(
           "div",
-          { class: ["link-01-reg"] },
+          { class: ["link-01-reg mr-8"] },
           normEntry.renderDecision +
             ", " +
             normEntry.singleNorms[0].renderDecision,
         ),
+        normEntry.hasAmbiguousNormReference
+          ? h(IconBadge, {
+              backgroundColor: "bg-red-300",
+              color: "text-red-900",
+              icon: IconError,
+              label: ambiguousNormReferenceError,
+            })
+          : null,
       ]),
     ])
   } else {
     return h("div", { class: ["flex flex-col gap-32"] }, [
       h("div", { class: ["flex flex-row items-center"] }, [
         h(IconBook, { class: ["mr-8"] }),
-        h("div", { class: ["link-01-reg"] }, normEntry.renderDecision),
+        h("div", { class: ["link-01-reg mr-8"] }, normEntry.renderDecision),
+        normEntry.hasAmbiguousNormReference
+          ? h(IconBadge, {
+              backgroundColor: "bg-red-300",
+              color: "text-red-900",
+              icon: IconError,
+              label: ambiguousNormReferenceError,
+            })
+          : null,
       ]),
       hasSingleNorms(normEntry)
         ? h(

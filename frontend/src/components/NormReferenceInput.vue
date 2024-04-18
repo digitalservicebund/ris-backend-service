@@ -99,7 +99,14 @@ watch(
   () => {
     norm.value = new NormReference({ ...props.modelValue })
     lastSavedModelValue.value = new NormReference({ ...props.modelValue })
-    if (lastSavedModelValue.value.isEmpty) validationStore.reset()
+    if (lastSavedModelValue.value.isEmpty) {
+      validationStore.reset()
+    } else if (
+      !lastSavedModelValue.value.normAbbreviation &&
+      lastSavedModelValue.value.normAbbreviationRawValue
+    ) {
+      validationStore.add("Mehrdeutiger Verweis", "normAbbreviation")
+    }
     //when list is empty, add new empty single norm entry
     if (singleNorms.value?.length == 0 || !singleNorms.value)
       addSingleNormEntry()
