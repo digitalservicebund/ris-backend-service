@@ -3,25 +3,25 @@ import { createRouter, createWebHistory } from "vue-router"
 import type { Router, RouteRecordRaw, RouteLocationRaw } from "vue-router"
 import NavbarSide from "@/components/NavbarSide.vue"
 import MenuItem from "@/domain/menuItem"
-import { generateString } from "~/test-helper/dataGenerators"
+import Route from "@/domain/route"
 
 describe("NavbarSide", () => {
   it("renders sidenav with multiple items and correct routes", async () => {
     const menuItems: MenuItem[] = [
-      { label: "first item", route: { name: "/first-route" } },
-      { label: "second item", route: { name: "/second-route" } },
+      { label: "first item", route: { name: "first-route" } },
+      { label: "second item", route: { name: "second-route" } },
     ]
 
     await renderComponent({ menuItems })
     expect(screen.getByText("first item")).toBeVisible()
     expect(screen.getByText("second item")).toBeVisible()
 
-    expect(screen.getByTestId("/first-route")).toHaveAttribute(
+    expect(screen.getByTestId("first-route")).toHaveAttribute(
       "href",
       "/first-route",
     )
 
-    expect(screen.getByTestId("/second-route")).toHaveAttribute(
+    expect(screen.getByTestId("second-route")).toHaveAttribute(
       "href",
       "/second-route",
     )
@@ -312,7 +312,7 @@ async function renderComponent(options?: {
   activeRoute?: RouteLocationRaw
 }) {
   const menuItems = options?.menuItems ?? []
-  const activeRoute = options?.activeRoute ?? "/"
+  const activeRoute = options?.activeRoute ?? "/index"
   const router = buildRouter(menuItems)
   await router.replace(activeRoute)
   await router.isReady()
@@ -325,7 +325,7 @@ async function renderComponent(options?: {
 
 function buildRouter(menuItems: MenuItem[]): Router {
   const routes = []
-  routes.push(generateRouterRoute({ path: "/" }))
+  routes.push(generateRouterRoute({ name: "/index" }))
 
   for (const item of menuItems) {
     routes.push(generateRouterRoute(item.route))
@@ -338,15 +338,11 @@ function buildRouter(menuItems: MenuItem[]): Router {
   return createRouter({ routes, history: createWebHistory() })
 }
 
-function generateRouterRoute(routeLocation: RouteLocationRaw): RouteRecordRaw {
-  if (typeof routeLocation === "string") {
-    const routeAsUrl = new URL(routeLocation, "https://fake.com")
-    return { path: routeAsUrl.pathname, component: {} }
-  } else {
-    const path =
-      "path" in routeLocation && routeLocation.path
-        ? routeLocation.path
-        : generateString({ prefix: "/path-" })
-    return { ...routeLocation, path, component: {} }
+function generateRouterRoute(route?: Route): RouteRecordRaw {
+  let path = "/" + route?.name
+  if (route?.hash) {
+    path = path + "/" + route?.hash
   }
+
+  return { ...route, path, component: {} }
 }

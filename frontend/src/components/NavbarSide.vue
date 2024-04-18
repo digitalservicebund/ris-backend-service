@@ -50,7 +50,6 @@ const isOnlyParentActive = (currentNavItem: MenuItem) => {
         v-if="!navItem.isDisabled"
         class="w-full hover:bg-blue-200 hover:underline focus:bg-blue-200 focus:underline"
         :data-testid="navItem.route.name"
-        :params="activeRoute.params"
         :to="navItem.route"
       >
         <div v-if="!props.isChild">
