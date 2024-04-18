@@ -39,7 +39,7 @@ const hasPrevious = computed(() => {
     v-if="files.length > 1"
     class="float-end m-16 ml-20 items-center space-x-8 px-8"
   >
-    <FlexItem class="ds-label-02-bold">
+    <FlexItem class="ds-label-01-bold">
       {{ props.files[currentIndex].name }}
     </FlexItem>
     <TextButton
@@ -48,6 +48,7 @@ const hasPrevious = computed(() => {
       button-type="tertiary"
       :disabled="!hasPrevious.valueOf()"
       :icon="IcOutlineArrowBack"
+      size="small"
       @click="decreaseFileIndex"
     />
 
@@ -57,6 +58,7 @@ const hasPrevious = computed(() => {
       button-type="tertiary"
       :disabled="!hasNext.valueOf()"
       :icon="IcOutlineArrowForward"
+      size="small"
       @click="incrementFileIndex"
     />
   </FlexContainer>

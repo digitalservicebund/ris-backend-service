@@ -15,12 +15,14 @@ import de.bund.digitalservice.ris.caselaw.domain.XmlResultObject;
 import de.bund.digitalservice.ris.caselaw.domain.docx.Docx2Html;
 import jakarta.validation.Valid;
 import java.nio.ByteBuffer;
+import java.time.Duration;
 import java.time.LocalDate;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
+import org.springframework.http.CacheControl;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -243,7 +245,11 @@ public class DocumentUnitController {
     return service
         .getByUuid(uuid)
         .flatMap(documentUnit -> converterService.getConvertedObject(s3Path))
-        .map(ResponseEntity::ok)
+        .map(
+            docx2Html ->
+                ResponseEntity.ok()
+                    .cacheControl(CacheControl.maxAge(Duration.ofDays(1))) // Set cache duration
+                    .body(docx2Html))
         .onErrorReturn(ResponseEntity.internalServerError().build());
   }
 
