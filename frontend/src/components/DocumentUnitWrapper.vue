@@ -75,7 +75,7 @@ watchEffect(() => {
         class="sticky top-0 z-20"
         label="Navigation"
       >
-        <NavbarSide :is-child="false" :menu-items="menuItems" />
+        <NavbarSide :is-child="false" :menu-items="menuItems" :route="route" />
       </SideToggle>
     </div>
     <div class="flex w-full flex-col bg-gray-100">
