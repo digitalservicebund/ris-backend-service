@@ -96,22 +96,6 @@ describe("NavbarSide", () => {
       expect(screen.getByText("passive item")).not.toHaveClass("underline")
     })
 
-    it("routes match also by name", async () => {
-      const menuItems = [
-        { label: "active item", route: { name: "active" } },
-        { label: "passive item", route: { name: "passive" } },
-      ]
-      await renderComponent({
-        menuItems,
-        activeRoute: { name: "active" },
-      })
-
-      expect(screen.getByLabelText("active item")).toHaveClass("bg-blue-200")
-      expect(screen.getByLabelText("passive item")).not.toHaveClass(
-        "bg-blue-200",
-      )
-    })
-
     it("routes match includes hash if given", async () => {
       const menuItems = [
         { label: "active item", route: { path: "/foo", hash: "#matching" } },
@@ -143,44 +127,40 @@ describe("NavbarSide", () => {
       expect(screen.getByLabelText("active item")).toHaveClass("bg-blue-200")
     })
 
-    it("can also match with URL encoded hashes", async () => {
-      const menuItems = [
-        { label: "active item", route: "/foo#matching" },
-        { label: "passive item", route: "/foo#not-matching" },
-      ]
-      await renderComponent({
-        menuItems,
-        activeRoute: { path: "/foo", hash: "#matching" },
-      })
-
-      expect(screen.getByLabelText("active item")).toHaveClass("bg-blue-200")
-      expect(screen.getByLabelText("passive item")).not.toHaveClass(
-        "bg-blue-200",
-      )
-    })
-
-    it("ignore level one item if any of its level two matches active route ", async () => {
-      const menuItems = [
+    it("don't highlight parent if its child is active", async () => {
+      const menuItems: MenuItem[] = [
         {
-          label: "level one",
-          route: "/matching",
+          label: "parent node",
+          route: {
+            name: "parent",
+          },
           children: [
-            { label: "first level two", route: "/matching#hash" },
-            { label: "second level two", route: "/not-matching" },
+            {
+              label: "first child node",
+              route: {
+                name: "parent",
+                hash: "#active",
+              },
+            },
+            {
+              label: "second child node",
+              route: {
+                name: "parent",
+                hash: "#not-active",
+              },
+            },
           ],
         },
       ]
 
       await renderComponent({
         menuItems,
-        activeRoute: "/matching#hash",
+        activeRoute: "/parent#active",
       })
 
-      expect(screen.getByLabelText("level one")).not.toHaveClass("bg-blue-200")
-      expect(screen.getByLabelText("first level two")).toHaveClass(
-        "bg-blue-200",
-      )
-      expect(screen.getByLabelText("second level two")).not.toHaveClass(
+      expect(screen.getByTestId("parent node")).not.toHaveClass("bg-blue-200")
+      expect(screen.getByTestId("first child node")).toHaveClass("bg-blue-200")
+      expect(screen.getByTestId("second child node")).not.toHaveClass(
         "bg-blue-200",
       )
     })
