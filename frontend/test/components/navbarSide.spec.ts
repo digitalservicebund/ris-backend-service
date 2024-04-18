@@ -127,7 +127,7 @@ describe("NavbarSide", () => {
       expect(screen.getByLabelText("active item")).toHaveClass("bg-blue-200")
     })
 
-    it("don't highlight parent if its child is active", async () => {
+    it("activated child styling: highlight child and underlines both parent and child", async () => {
       const menuItems: MenuItem[] = [
         {
           label: "parent node",
@@ -158,28 +158,14 @@ describe("NavbarSide", () => {
         activeRoute: "/parent#active",
       })
 
+      expect(screen.getByText("parent node")).toHaveClass("underline")
+      expect(screen.getByText("first child node")).toHaveClass("underline")
+
       expect(screen.getByTestId("parent node")).not.toHaveClass("bg-blue-200")
       expect(screen.getByTestId("first child node")).toHaveClass("bg-blue-200")
       expect(screen.getByTestId("second child node")).not.toHaveClass(
         "bg-blue-200",
       )
-    })
-
-    it("underlines the active level two menu item", async () => {
-      const menuItems = [
-        {
-          label: "level one",
-          route: "/route",
-          children: [
-            { label: "active level two", route: "/active-level-two" },
-            { label: "passive level two", route: "/passive-level-two" },
-          ],
-        },
-      ]
-
-      await renderComponent({ menuItems, activeRoute: "/active-level-two" })
-
-      expect(screen.getByLabelText("active level two")).toHaveClass("underline")
     })
   })
 
