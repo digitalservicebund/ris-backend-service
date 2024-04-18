@@ -8,8 +8,8 @@ import { generateString } from "~/test-helper/dataGenerators"
 describe("NavbarSide", () => {
   it("renders sidenav with multiple items and correct routes", async () => {
     const menuItems: MenuItem[] = [
-      { label: "first item", route: "/first-route" },
-      { label: "second item", route: "/second-route" },
+      { label: "first item", route: { name: "/first-route" } },
+      { label: "second item", route: { name: "/second-route" } },
     ]
 
     await renderComponent({ menuItems })

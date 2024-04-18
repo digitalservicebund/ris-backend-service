@@ -49,7 +49,7 @@ const isOnlyParentActive = (currentNavItem: MenuItem) => {
       <RouterLink
         v-if="!navItem.isDisabled"
         class="w-full hover:bg-blue-200 hover:underline focus:bg-blue-200 focus:underline"
-        :data-testid="navItem.route"
+        :data-testid="navItem.route.name"
         :params="activeRoute.params"
         :to="navItem.route"
       >
