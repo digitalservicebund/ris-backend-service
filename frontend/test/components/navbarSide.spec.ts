@@ -12,14 +12,18 @@ describe("NavbarSide", () => {
     ]
 
     await renderComponent({ menuItems })
-    const firstItem = screen.getByLabelText("first item") as HTMLElement
-    const secondItem = screen.getByLabelText("second item") as HTMLElement
+    expect(screen.getByText("first item")).toBeVisible()
+    expect(screen.getByText("second item")).toBeVisible()
 
-    expect(firstItem).toBeVisible()
-    expect(secondItem).toBeVisible()
+    expect(screen.getByTestId("/first-route")).toHaveAttribute(
+      "href",
+      "/first-route",
+    )
 
-    expect(firstItem).toHaveAttribute("href", "/first-route")
-    expect(secondItem).toHaveAttribute("href", "/second-route")
+    expect(screen.getByTestId("/second-route")).toHaveAttribute(
+      "href",
+      "/second-route",
+    )
   })
 
   it("allows to render level one item with level two items as children", async () => {
